@@ -14,7 +14,6 @@
 
 #include <Profiling.hpp>
 
-#include <boost/log/trivial.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 using namespace armnn;
@@ -196,13 +195,13 @@ void RefNormalizationWorkload::Execute() const
         }
         else
         {
-            BOOST_LOG_TRIVIAL(warning) << "Illegal NORMALIZATION mode in normalization_f32";
+            ARMNN_LOG(warning) << "Illegal NORMALIZATION mode in normalization_f32";
             return;
         }
     }
     else
     {
-        BOOST_LOG_TRIVIAL(warning) << "Lcr method (Jarret 2009: Local Contrast Normalization) not supported yet.";
+        ARMNN_LOG(warning) << "Lcr method (Jarret 2009: Local Contrast Normalization) not supported yet.";
         return;
     }
 }

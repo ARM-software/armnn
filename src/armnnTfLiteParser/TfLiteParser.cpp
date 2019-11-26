@@ -7,6 +7,7 @@
 
 #include <armnn/ArmNN.hpp>
 #include <armnn/Exceptions.hpp>
+#include <armnn/Logging.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <boost/filesystem.hpp>
 
@@ -23,8 +24,6 @@
 
 #include <boost/core/ignore_unused.hpp>
 #include <boost/assert.hpp>
-#include <boost/format.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -607,7 +606,7 @@ INetworkPtr TfLiteParser::CreateNetworkFromModel()
                 errorString << "Failed to parse operator #" << operatorIndex
                             << " within subgraph #" << subgraphIndex
                             << " error: " << e.what();
-                BOOST_LOG_TRIVIAL(error) << errorString.str();
+                ARMNN_LOG(error) << errorString.str();
 
                 errors << errorString.str() << "\n";
             }

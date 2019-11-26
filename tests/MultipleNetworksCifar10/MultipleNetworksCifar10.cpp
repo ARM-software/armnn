@@ -6,7 +6,6 @@
 #include <chrono>
 #include <vector>
 #include <array>
-#include <boost/log/trivial.hpp>
 
 #include "armnn/ArmNN.hpp"
 #include "armnn/Utils.hpp"
@@ -32,8 +31,6 @@ int main(int argc, char* argv[])
     {
         // Configures logging for both the ARMNN library and this test program.
         armnn::ConfigureLogging(true, true, level);
-        armnnUtils::ConfigureLogging(boost::log::core::get().get(), true, true, level);
-
         namespace po = boost::program_options;
 
         std::vector<armnn::BackendId> computeDevice;
@@ -98,8 +95,8 @@ int main(int argc, char* argv[])
         std::string invalidBackends;
         if (!CheckRequestedBackendsAreValid(computeDevice, armnn::Optional<std::string&>(invalidBackends)))
         {
-            BOOST_LOG_TRIVIAL(fatal) << "The list of preferred devices contains invalid backend IDs: "
-                                     << invalidBackends;
+            ARMNN_LOG(fatal) << "The list of preferred devices contains invalid backend IDs: "
+                             << invalidBackends;
             return EXIT_FAILURE;
         }
 
@@ -143,7 +140,7 @@ int main(int argc, char* argv[])
             {
                 std::stringstream message;
                 message << "armnn::Exception ("<<e.what()<<") caught from optimize.";
-                BOOST_LOG_TRIVIAL(fatal) << message.str();
+                ARMNN_LOG(fatal) << message.str();
                 return 1;
             }
 
@@ -152,7 +149,7 @@ int main(int argc, char* argv[])
             status = runtime->LoadNetwork(networkId, std::move(optimizedNet));
             if (status == armnn::Status::Failure)
             {
-                BOOST_LOG_TRIVIAL(fatal) << "armnn::IRuntime: Failed to load network";
+                ARMNN_LOG(fatal) << "armnn::IRuntime: Failed to load network";
                 return 1;
             }
 
@@ -195,7 +192,7 @@ int main(int argc, char* argv[])
                     armnnUtils::MakeOutputTensors(outputBindings, outputDataContainers));
                 if (status == armnn::Status::Failure)
                 {
-                    BOOST_LOG_TRIVIAL(fatal) << "armnn::IRuntime: Failed to enqueue workload";
+                    ARMNN_LOG(fatal) << "armnn::IRuntime: Failed to enqueue workload";
                     return 1;
                 }
             }
@@ -209,13 +206,13 @@ int main(int argc, char* argv[])
 
                 if (!std::equal(output0.begin(), output0.end(), outputK.begin(), outputK.end()))
                 {
-                    BOOST_LOG_TRIVIAL(error) << "Multiple networks inference failed!";
+                    ARMNN_LOG(error) << "Multiple networks inference failed!";
                     return 1;
                 }
             }
         }
 
-        BOOST_LOG_TRIVIAL(info) << "Multiple networks inference ran successfully!";
+        ARMNN_LOG(info) << "Multiple networks inference ran successfully!";
         return 0;
     }
     catch (armnn::Exception const& e)

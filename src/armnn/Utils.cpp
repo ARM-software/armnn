@@ -2,17 +2,15 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+#include "armnn/Logging.hpp"
 #include "armnn/Utils.hpp"
-#include "Logging.hpp"
-
-#include <boost/log/core.hpp>
 
 namespace armnn
 {
 void ConfigureLogging(bool printToStandardOutput, bool printToDebugOutput, LogSeverity severity)
 {
-    using armnnUtils::ConfigureLogging;
-    ConfigureLogging(boost::log::core::get().get(), printToStandardOutput, printToDebugOutput, severity);
+    SetAllLoggingSinks(printToStandardOutput, printToDebugOutput, false);
+    SetLogFilter(severity);
 }
 
 // Defaults to logging completely disabled.

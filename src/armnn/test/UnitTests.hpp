@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include <Logging.hpp>
+#include <armnn/Logging.hpp>
 #include <armnn/Utils.hpp>
 #include <reference/RefWorkloadFactory.hpp>
 #include <backendsCommon/test/LayerTests.hpp>
@@ -16,7 +16,6 @@ inline void ConfigureLoggingTest()
 {
     // Configures logging for both the ARMNN library and this test program.
     armnn::ConfigureLogging(true, true, armnn::LogSeverity::Fatal);
-    armnnUtils::ConfigureLogging(boost::log::core::get().get(), true, true, armnn::LogSeverity::Fatal);
 }
 
 // The following macros require the caller to have defined FactoryType, with one of the following using statements:

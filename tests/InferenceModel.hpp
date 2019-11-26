@@ -24,7 +24,6 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/exception/exception.hpp>
 #include <boost/exception/diagnostic_information.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>

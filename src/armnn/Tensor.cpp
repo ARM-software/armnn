@@ -9,7 +9,6 @@
 #include "armnn/TypesUtils.hpp"
 
 #include <boost/assert.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <sstream>

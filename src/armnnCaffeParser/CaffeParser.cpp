@@ -16,7 +16,6 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
-#include <boost/log/trivial.hpp>
 
 // Caffe
 #include "caffe/proto/caffe.pb.h"

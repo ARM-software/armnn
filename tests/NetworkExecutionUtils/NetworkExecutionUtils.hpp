@@ -23,7 +23,6 @@
 #include "CsvReader.hpp"
 #include "../InferenceTest.hpp"
 
-#include <Logging.hpp>
 #include <Profiling.hpp>
 #include <ResolveType.hpp>
 
@@ -62,7 +61,7 @@ std::vector<T> ParseArrayImpl(std::istream& stream, TParseElementFunc parseEleme
         }
         catch (const std::exception& e)
         {
-            BOOST_LOG_TRIVIAL(error) << "An error occurred when splitting tokens: " << e.what();
+            ARMNN_LOG(error) << "An error occurred when splitting tokens: " << e.what();
             continue;
         }
         for (const std::string& token : tokens)
@@ -75,7 +74,7 @@ std::vector<T> ParseArrayImpl(std::istream& stream, TParseElementFunc parseEleme
                 }
                 catch (const std::exception&)
                 {
-                    BOOST_LOG_TRIVIAL(error) << "'" << token << "' is not a valid number. It has been ignored.";
+                    ARMNN_LOG(error) << "'" << token << "' is not a valid number. It has been ignored.";
                 }
             }
         }
@@ -264,7 +263,7 @@ private:
             }
             else
             {
-                BOOST_LOG_TRIVIAL(info) << "Output Tensor File: " << m_OutputTensorFile << " could not be opened!";
+                ARMNN_LOG(info) << "Output Tensor File: " << m_OutputTensorFile << " could not be opened!";
             }
             outputTensorFile.close();
         }
@@ -335,7 +334,7 @@ void PopulateTensorWithData(TContainer& tensorData,
     else
     {
         std::string errorMessage = "Unsupported tensor data type " + dataTypeStr;
-        BOOST_LOG_TRIVIAL(fatal) << errorMessage;
+        ARMNN_LOG(fatal) << errorMessage;
 
         inputTensorFile.close();
         throw armnn::Exception(errorMessage);
@@ -465,7 +464,7 @@ int MainImpl(const ExecuteNetworkParams& params,
             }
             else
             {
-                BOOST_LOG_TRIVIAL(fatal) << "Unsupported tensor data type \"" << params.m_OutputTypes[i] << "\". ";
+                ARMNN_LOG(fatal) << "Unsupported tensor data type \"" << params.m_OutputTypes[i] << "\". ";
                 return EXIT_FAILURE;
             }
         }
@@ -475,7 +474,7 @@ int MainImpl(const ExecuteNetworkParams& params,
 
         if (params.m_GenerateTensorData)
         {
-            BOOST_LOG_TRIVIAL(warning) << "The input data was generated, note that the output will not be useful";
+            ARMNN_LOG(warning) << "The input data was generated, note that the output will not be useful";
         }
 
         // Print output tensors
@@ -489,28 +488,28 @@ int MainImpl(const ExecuteNetworkParams& params,
             boost::apply_visitor(printer, outputDataContainers[i]);
         }
 
-        BOOST_LOG_TRIVIAL(info) << "\nInference time: " << std::setprecision(2)
+        ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)
                                 << std::fixed << inference_duration.count() << " ms";
 
         // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
         if (params.m_ThresholdTime != 0.0)
         {
-            BOOST_LOG_TRIVIAL(info) << "Threshold time: " << std::setprecision(2)
+            ARMNN_LOG(info) << "Threshold time: " << std::setprecision(2)
                                     << std::fixed << params.m_ThresholdTime << " ms";
             auto thresholdMinusInference = params.m_ThresholdTime - inference_duration.count();
-            BOOST_LOG_TRIVIAL(info) << "Threshold time - Inference time: " << std::setprecision(2)
+            ARMNN_LOG(info) << "Threshold time - Inference time: " << std::setprecision(2)
                                     << std::fixed << thresholdMinusInference << " ms" << "\n";
 
             if (thresholdMinusInference < 0)
             {
-                BOOST_LOG_TRIVIAL(fatal) << "Elapsed inference time is greater than provided threshold time.\n";
+                ARMNN_LOG(fatal) << "Elapsed inference time is greater than provided threshold time.\n";
                 return EXIT_FAILURE;
             }
         }
     }
     catch (armnn::Exception const& e)
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Armnn Error: " << e.what();
+        ARMNN_LOG(fatal) << "Armnn Error: " << e.what();
         return EXIT_FAILURE;
     }
 
@@ -562,27 +561,27 @@ int RunTest(const std::string& format,
     }
     else
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat << "'. Please include 'binary' or 'text'";
+        ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat << "'. Please include 'binary' or 'text'";
         return EXIT_FAILURE;
     }
 
     if ((inputTensorShapesVector.size() != 0) && (inputTensorShapesVector.size() != inputNamesVector.size()))
     {
-        BOOST_LOG_TRIVIAL(fatal) << "input-name and input-tensor-shape must have the same amount of elements.";
+        ARMNN_LOG(fatal) << "input-name and input-tensor-shape must have the same amount of elements.";
         return EXIT_FAILURE;
     }
 
     if ((inputTensorDataFilePathsVector.size() != 0) &&
         (inputTensorDataFilePathsVector.size() != inputNamesVector.size()))
     {
-        BOOST_LOG_TRIVIAL(fatal) << "input-name and input-tensor-data must have the same amount of elements.";
+        ARMNN_LOG(fatal) << "input-name and input-tensor-data must have the same amount of elements.";
         return EXIT_FAILURE;
     }
 
     if ((outputTensorFilesVector.size() != 0) &&
         (outputTensorFilesVector.size() != outputNamesVector.size()))
     {
-        BOOST_LOG_TRIVIAL(fatal) << "output-name and write-outputs-to-file must have the same amount of elements.";
+        ARMNN_LOG(fatal) << "output-name and write-outputs-to-file must have the same amount of elements.";
         return EXIT_FAILURE;
     }
 
@@ -593,7 +592,7 @@ int RunTest(const std::string& format,
     }
     else if ((inputTypesVector.size() != 0) && (inputTypesVector.size() != inputNamesVector.size()))
     {
-        BOOST_LOG_TRIVIAL(fatal) << "input-name and input-type must have the same amount of elements.";
+        ARMNN_LOG(fatal) << "input-name and input-type must have the same amount of elements.";
         return EXIT_FAILURE;
     }
 
@@ -604,7 +603,7 @@ int RunTest(const std::string& format,
     }
     else if ((outputTypesVector.size() != 0) && (outputTypesVector.size() != outputNamesVector.size()))
     {
-        BOOST_LOG_TRIVIAL(fatal) << "output-name and output-type must have the same amount of elements.";
+        ARMNN_LOG(fatal) << "output-name and output-type must have the same amount of elements.";
         return EXIT_FAILURE;
     }
 
@@ -627,7 +626,7 @@ int RunTest(const std::string& format,
             }
             catch (const armnn::InvalidArgumentException& e)
             {
-                BOOST_LOG_TRIVIAL(fatal) << "Cannot create tensor shape: " << e.what();
+                ARMNN_LOG(fatal) << "Cannot create tensor shape: " << e.what();
                 return EXIT_FAILURE;
             }
         }
@@ -636,7 +635,7 @@ int RunTest(const std::string& format,
     // Check that threshold time is not less than zero
     if (thresholdTime < 0)
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Threshold time supplied as a command line argument is less than zero.";
+        ARMNN_LOG(fatal) << "Threshold time supplied as a command line argument is less than zero.";
         return EXIT_FAILURE;
     }
 
@@ -665,7 +664,7 @@ int RunTest(const std::string& format,
     // Warn if ExecuteNetwork will generate dummy input data
     if (params.m_GenerateTensorData)
     {
-        BOOST_LOG_TRIVIAL(warning) << "No input files provided, input tensors will be filled with 0s.";
+        ARMNN_LOG(warning) << "No input files provided, input tensors will be filled with 0s.";
     }
 
     // Forward to implementation based on the parser type
@@ -674,7 +673,7 @@ int RunTest(const std::string& format,
 #if defined(ARMNN_SERIALIZER)
     return MainImpl<armnnDeserializer::IDeserializer, float>(params, runtime);
 #else
-    BOOST_LOG_TRIVIAL(fatal) << "Not built with serialization support.";
+        ARMNN_LOG(fatal) << "Not built with serialization support.";
     return EXIT_FAILURE;
 #endif
     }
@@ -683,7 +682,7 @@ int RunTest(const std::string& format,
 #if defined(ARMNN_CAFFE_PARSER)
         return MainImpl<armnnCaffeParser::ICaffeParser, float>(params, runtime);
 #else
-        BOOST_LOG_TRIVIAL(fatal) << "Not built with Caffe parser support.";
+        ARMNN_LOG(fatal) << "Not built with Caffe parser support.";
         return EXIT_FAILURE;
 #endif
     }
@@ -692,7 +691,7 @@ int RunTest(const std::string& format,
 #if defined(ARMNN_ONNX_PARSER)
     return MainImpl<armnnOnnxParser::IOnnxParser, float>(params, runtime);
 #else
-    BOOST_LOG_TRIVIAL(fatal) << "Not built with Onnx parser support.";
+        ARMNN_LOG(fatal) << "Not built with Onnx parser support.";
     return EXIT_FAILURE;
 #endif
     }
@@ -701,7 +700,7 @@ int RunTest(const std::string& format,
 #if defined(ARMNN_TF_PARSER)
         return MainImpl<armnnTfParser::ITfParser, float>(params, runtime);
 #else
-        BOOST_LOG_TRIVIAL(fatal) << "Not built with Tensorflow parser support.";
+        ARMNN_LOG(fatal) << "Not built with Tensorflow parser support.";
         return EXIT_FAILURE;
 #endif
     }
@@ -710,20 +709,20 @@ int RunTest(const std::string& format,
 #if defined(ARMNN_TF_LITE_PARSER)
         if (! isModelBinary)
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat << "'. Only 'binary' format supported \
+            ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat << "'. Only 'binary' format supported \
               for tflite files";
             return EXIT_FAILURE;
         }
         return MainImpl<armnnTfLiteParser::ITfLiteParser, float>(params, runtime);
 #else
-        BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat <<
+        ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat <<
             "'. Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'";
         return EXIT_FAILURE;
 #endif
     }
     else
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat <<
+        ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat <<
                                  "'. Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'";
         return EXIT_FAILURE;
     }
@@ -797,7 +796,7 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
         // and that desc.add_options() can throw boost::io::too_few_args.
         // They really won't in any of these cases.
         BOOST_ASSERT_MSG(false, "Caught unexpected exception");
-        BOOST_LOG_TRIVIAL(fatal) << "Fatal internal error: " << e.what();
+        ARMNN_LOG(fatal) << "Fatal internal error: " << e.what();
         return EXIT_FAILURE;
     }
 
@@ -837,7 +836,7 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
     std::string invalidBackends;
     if (!CheckRequestedBackendsAreValid(computeDevices, armnn::Optional<std::string&>(invalidBackends)))
     {
-        BOOST_LOG_TRIVIAL(fatal) << "The list of preferred devices contains invalid backend IDs: "
+        ARMNN_LOG(fatal) << "The list of preferred devices contains invalid backend IDs: "
                                  << invalidBackends;
         return EXIT_FAILURE;
     }

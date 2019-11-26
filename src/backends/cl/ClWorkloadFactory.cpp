@@ -25,7 +25,6 @@
 
 #include <boost/polymorphic_cast.hpp>
 #include <boost/format.hpp>
-#include <boost/log/trivial.hpp>
 
 namespace armnn
 {

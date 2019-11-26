@@ -12,7 +12,6 @@
 #include "workloads/RefWorkloads.hpp"
 #include "RefTensorHandle.hpp"
 
-#include <boost/log/trivial.hpp>
 
 namespace armnn
 {

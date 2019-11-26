@@ -42,8 +42,6 @@ list(APPEND armnnUtils_sources
     include/armnnUtils/TensorUtils.hpp
     src/armnnUtils/GraphTopologicalSort.hpp
     src/armnnUtils/Half.hpp
-    src/armnnUtils/Logging.hpp
-    src/armnnUtils/Logging.cpp
     src/armnnUtils/Permute.cpp
     src/armnnUtils/DataLayoutIndexed.cpp
     src/armnnUtils/DotSerializer.cpp
@@ -93,7 +91,7 @@ if(BUILD_CAFFE_PARSER)
 
     target_include_directories(armnnCaffeParser PRIVATE src/armnnUtils)
 
-    target_link_libraries(armnnCaffeParser ${Boost_LOG_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+    target_link_libraries(armnnCaffeParser ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
     target_link_libraries(armnnCaffeParser armnn)
     target_link_libraries(armnnCaffeParser ${PROTOBUF_LIBRARIES})
@@ -178,7 +176,6 @@ if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
             ${Boost_SYSTEM_LIBRARY}
             ${Boost_PROGRAM_OPTIONS_LIBRARY}
             ${Boost_FILESYSTEM_LIBRARY}
-            ${Boost_LOG_LIBRARY}
             ${Boost_THREAD_LIBRARY} )
 
     add_executable_ex(ArmnnQuantizer
@@ -191,7 +188,6 @@ if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
             ${Boost_SYSTEM_LIBRARY}
             ${Boost_PROGRAM_OPTIONS_LIBRARY}
             ${Boost_FILESYSTEM_LIBRARY}
-            ${Boost_LOG_LIBRARY}
             ${Boost_THREAD_LIBRARY} )
 
     target_link_libraries(ArmnnQuantizer
@@ -227,6 +223,7 @@ list(APPEND armnn_sources
     include/armnn/IRuntime.hpp
     include/armnn/LayerSupport.hpp
     include/armnn/LayerVisitorBase.hpp
+    include/armnn/Logging.hpp
     include/armnn/LstmParams.hpp
     include/armnn/MemorySources.hpp
     include/armnn/NetworkFwd.hpp
@@ -554,7 +551,7 @@ endif()
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-target_link_libraries(armnn ${Boost_LOG_LIBRARY} ${Boost_THREAD_LIBRARY}
+target_link_libraries(armnn ${Boost_THREAD_LIBRARY}
                             ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
 
 if(ARMCOMPUTENEON OR ARMCOMPUTECL)

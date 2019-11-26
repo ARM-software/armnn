@@ -7,9 +7,10 @@
 
 #include "SendCounterPacketTests.hpp"
 
+#include <armnn/Logging.hpp>
+
 #include <CommandHandlerFunctor.hpp>
 #include <IProfilingConnection.hpp>
-#include <Logging.hpp>
 #include <ProfilingService.hpp>
 
 #include <boost/polymorphic_cast.hpp>

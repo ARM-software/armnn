@@ -12,7 +12,6 @@
 
 #include <armnn/TypesUtils.hpp>
 
-#include <boost/log/trivial.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <array>
@@ -100,7 +99,7 @@ std::unique_ptr<MobileNetSsdTestCaseData> MobileNetSsdDatabase::GetTestCaseData(
     }
     catch (const InferenceTestImageException& e)
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to load image for test case " << testCaseId << ". Error: " << e.what();
+        ARMNN_LOG(fatal) << "Failed to load image for test case " << testCaseId << ". Error: " << e.what();
         return nullptr;
     }
 

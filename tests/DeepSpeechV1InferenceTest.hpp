@@ -8,7 +8,6 @@
 #include "DeepSpeechV1Database.hpp"
 
 #include <boost/assert.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 
@@ -51,7 +50,7 @@ public:
         {
             if(!m_FloatComparer(output1[j], m_ExpectedOutputs.m_InputSeq[j]))
             {
-                BOOST_LOG_TRIVIAL(error) << "InputSeq for Lstm " << this->GetTestCaseId() <<
+                ARMNN_LOG(error) << "InputSeq for Lstm " << this->GetTestCaseId() <<
                                          " is incorrect at" << j;
                 return TestCaseResult::Failed;
             }
@@ -61,7 +60,7 @@ public:
         {
             if(!m_FloatComparer(output2[j], m_ExpectedOutputs.m_StateH[j]))
             {
-                BOOST_LOG_TRIVIAL(error) << "StateH for Lstm " << this->GetTestCaseId() <<
+                ARMNN_LOG(error) << "StateH for Lstm " << this->GetTestCaseId() <<
                                          " is incorrect";
                 return TestCaseResult::Failed;
             }
@@ -71,7 +70,7 @@ public:
         {
             if(!m_FloatComparer(output3[j], m_ExpectedOutputs.m_StateC[j]))
             {
-                BOOST_LOG_TRIVIAL(error) << "StateC for Lstm " << this->GetTestCaseId() <<
+                ARMNN_LOG(error) << "StateC for Lstm " << this->GetTestCaseId() <<
                                          " is incorrect";
                 return TestCaseResult::Failed;
             }

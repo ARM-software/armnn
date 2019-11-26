@@ -4,13 +4,14 @@
 //
 
 #include "ClBackendContext.hpp"
+
+#include <armnn/Logging.hpp>
+
 #include "ClContextControl.hpp"
 
 #include <arm_compute/core/CL/OpenCL.h>
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
-
-#include <boost/log/trivial.hpp>
 
 namespace armnn
 {
@@ -34,8 +35,8 @@ struct ClBackendContext::ClContextControlWrapper
             }
             catch (const cl::Error&)
             {
-                BOOST_LOG_TRIVIAL(warning) << "WARNING: Runtime::UnloadNetwork(): an error occurred while waiting for "
-                                              "the queued CL requests to finish";
+                ARMNN_LOG(warning) << "Runtime::UnloadNetwork(): an error occurred while waiting for "
+                                      "the queued CL requests to finish";
                 return false;
             }
         }

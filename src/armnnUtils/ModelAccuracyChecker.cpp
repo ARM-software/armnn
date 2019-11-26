@@ -4,8 +4,10 @@
 //
 
 #include "ModelAccuracyChecker.hpp"
+
+#include <armnn/Logging.hpp>
+
 #include <boost/filesystem.hpp>
-#include <boost/log/trivial.hpp>
 #include <map>
 #include <vector>
 
@@ -22,8 +24,8 @@ float ModelAccuracyChecker::GetAccuracy(unsigned int k)
 {
     if (k > 10)
     {
-        BOOST_LOG_TRIVIAL(warning) << "Accuracy Tool only supports a maximum of Top 10 Accuracy. "
-                                      "Printing Top 10 Accuracy result!";
+        ARMNN_LOG(warning) << "Accuracy Tool only supports a maximum of Top 10 Accuracy. "
+                              "Printing Top 10 Accuracy result!";
         k = 10;
     }
     unsigned int total = 0;

@@ -6,6 +6,9 @@
 #include <boost/test/unit_test.hpp>
 
 #include "UnitTests.hpp"
+#include <armnn/Logging.hpp>
+
+#include <boost/algorithm/string.hpp>
 
 struct ConfigureLoggingFixture
 {
@@ -58,3 +61,54 @@ private:
 BOOST_GLOBAL_FIXTURE(SetupDebugOutput);
 
 #endif // defined(_MSC_VER)
+
+
+BOOST_AUTO_TEST_SUITE(LoggerSuite)
+
+BOOST_AUTO_TEST_CASE(LoggerTest)
+{
+    std::stringstream ss;
+
+    {
+        struct StreamRedirector
+        {
+        public:
+            StreamRedirector(std::ostream& stream, std::streambuf* newStreamBuffer)
+                : m_Stream(stream)
+                , m_BackupBuffer(m_Stream.rdbuf(newStreamBuffer))
+            {}
+            ~StreamRedirector() { m_Stream.rdbuf(m_BackupBuffer); }
+
+        private:
+            std::ostream& m_Stream;
+            std::streambuf* m_BackupBuffer;
+        };
+
+
+        StreamRedirector redirect(std::cout, ss.rdbuf());
+
+        using namespace armnn;
+        SetLogFilter(LogSeverity::Trace);
+        SetAllLoggingSinks(true, false, false);
+
+
+        ARMNN_LOG(trace) << "My trace message; " << -2;
+        ARMNN_LOG(debug) << "My debug message; " << -1;
+        ARMNN_LOG(info) << "My info message; " << 0;
+        ARMNN_LOG(warning) << "My warning message; "  << 1;
+        ARMNN_LOG(error) << "My error message; " << 2;
+        ARMNN_LOG(fatal) << "My fatal message; "  << 3;
+
+        SetLogFilter(LogSeverity::Fatal);
+
+    }
+
+    BOOST_CHECK(boost::contains(ss.str(), "Trace: My trace message; -2"));
+    BOOST_CHECK(boost::contains(ss.str(), "Debug: My debug message; -1"));
+    BOOST_CHECK(boost::contains(ss.str(), "Info: My info message; 0"));
+    BOOST_CHECK(boost::contains(ss.str(), "Warning: My warning message; 1"));
+    BOOST_CHECK(boost::contains(ss.str(), "Error: My error message; 2"));
+    BOOST_CHECK(boost::contains(ss.str(), "Fatal: My fatal message; 3"));
+}
+
+BOOST_AUTO_TEST_SUITE_END()

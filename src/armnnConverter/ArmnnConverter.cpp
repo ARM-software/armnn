@@ -20,7 +20,6 @@
 #include <armnnTfLiteParser/ITfLiteParser.hpp>
 #endif
 
-#include <Logging.hpp>
 #include <HeapProfiling.hpp>
 
 #include <boost/format.hpp>
@@ -52,7 +51,7 @@ armnn::TensorShape ParseTensorShape(std::istream& stream)
         }
         catch (const std::exception& e)
         {
-            BOOST_LOG_TRIVIAL(error) << "An error occurred when splitting tokens: " << e.what();
+            ARMNN_LOG(error) << "An error occurred when splitting tokens: " << e.what();
             continue;
         }
         for (const std::string& token : tokens)
@@ -65,7 +64,7 @@ armnn::TensorShape ParseTensorShape(std::istream& stream)
                 }
                 catch (const std::exception&)
                 {
-                    BOOST_LOG_TRIVIAL(error) << "'" << token << "' is not a valid number. It has been ignored.";
+                    ARMNN_LOG(error) << "'" << token << "' is not a valid number. It has been ignored.";
                 }
             }
         }
@@ -192,7 +191,7 @@ int ParseCommandLineArgs(int argc, const char* argv[],
     }
     else
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat << "'. Please include 'binary' or 'text'";
+        ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat << "'. Please include 'binary' or 'text'";
         return EXIT_FAILURE;
     }
 
@@ -364,12 +363,12 @@ int main(int argc, const char* argv[])
        && !defined(ARMNN_ONNX_PARSER) \
        && !defined(ARMNN_TF_PARSER)   \
        && !defined(ARMNN_TF_LITE_PARSER))
-    BOOST_LOG_TRIVIAL(fatal) << "Not built with any of the supported parsers, Caffe, Onnx, Tensorflow, or TfLite.";
+    ARMNN_LOG(fatal) << "Not built with any of the supported parsers, Caffe, Onnx, Tensorflow, or TfLite.";
     return EXIT_FAILURE;
 #endif
 
 #if !defined(ARMNN_SERIALIZER)
-    BOOST_LOG_TRIVIAL(fatal) << "Not built with Serializer support.";
+    ARMNN_LOG(fatal) << "Not built with Serializer support.";
     return EXIT_FAILURE;
 #endif
 
@@ -380,7 +379,6 @@ int main(int argc, const char* argv[])
 #endif
 
     armnn::ConfigureLogging(true, true, level);
-    armnnUtils::ConfigureLogging(boost::log::core::get().get(), true, true, level);
 
     std::string modelFormat;
     std::string modelPath;
@@ -414,7 +412,7 @@ int main(int argc, const char* argv[])
             }
             catch (const armnn::InvalidArgumentException& e)
             {
-                BOOST_LOG_TRIVIAL(fatal) << "Cannot create tensor shape: " << e.what();
+                ARMNN_LOG(fatal) << "Cannot create tensor shape: " << e.what();
                 return EXIT_FAILURE;
             }
         }
@@ -427,11 +425,11 @@ int main(int argc, const char* argv[])
 #if defined(ARMNN_CAFFE_PARSER)
         if (!converter.CreateNetwork<armnnCaffeParser::ICaffeParser>())
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Failed to load model from file";
+            ARMNN_LOG(fatal) << "Failed to load model from file";
             return EXIT_FAILURE;
         }
 #else
-        BOOST_LOG_TRIVIAL(fatal) << "Not built with Caffe parser support.";
+        ARMNN_LOG(fatal) << "Not built with Caffe parser support.";
         return EXIT_FAILURE;
 #endif
     }
@@ -440,11 +438,11 @@ int main(int argc, const char* argv[])
 #if defined(ARMNN_ONNX_PARSER)
         if (!converter.CreateNetwork<armnnOnnxParser::IOnnxParser>())
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Failed to load model from file";
+            ARMNN_LOG(fatal) << "Failed to load model from file";
             return EXIT_FAILURE;
         }
 #else
-        BOOST_LOG_TRIVIAL(fatal) << "Not built with Onnx parser support.";
+        ARMNN_LOG(fatal) << "Not built with Onnx parser support.";
         return EXIT_FAILURE;
 #endif
     }
@@ -453,11 +451,11 @@ int main(int argc, const char* argv[])
 #if defined(ARMNN_TF_PARSER)
         if (!converter.CreateNetwork<armnnTfParser::ITfParser>())
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Failed to load model from file";
+            ARMNN_LOG(fatal) << "Failed to load model from file";
             return EXIT_FAILURE;
         }
 #else
-        BOOST_LOG_TRIVIAL(fatal) << "Not built with Tensorflow parser support.";
+        ARMNN_LOG(fatal) << "Not built with Tensorflow parser support.";
         return EXIT_FAILURE;
 #endif
     }
@@ -466,30 +464,30 @@ int main(int argc, const char* argv[])
 #if defined(ARMNN_TF_LITE_PARSER)
         if (!isModelBinary)
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat << "'. Only 'binary' format supported \
+            ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat << "'. Only 'binary' format supported \
               for tflite files";
             return EXIT_FAILURE;
         }
 
         if (!converter.CreateNetwork<armnnTfLiteParser::ITfLiteParser>())
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Failed to load model from file";
+            ARMNN_LOG(fatal) << "Failed to load model from file";
             return EXIT_FAILURE;
         }
 #else
-        BOOST_LOG_TRIVIAL(fatal) << "Not built with TfLite parser support.";
+        ARMNN_LOG(fatal) << "Not built with TfLite parser support.";
         return EXIT_FAILURE;
 #endif
     }
     else
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat << "'";
+        ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat << "'";
         return EXIT_FAILURE;
     }
 
     if (!converter.Serialize())
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to serialize model";
+        ARMNN_LOG(fatal) << "Failed to serialize model";
         return EXIT_FAILURE;
     }
 

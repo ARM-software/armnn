@@ -5,6 +5,7 @@
 #include "YoloDatabase.hpp"
 
 #include <armnn/Exceptions.hpp>
+#include <armnn/Logging.hpp>
 
 #include <array>
 #include <cstdint>
@@ -13,7 +14,6 @@
 
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include "InferenceTestImage.hpp"
@@ -91,7 +91,7 @@ std::unique_ptr<YoloDatabase::TTestCaseData> YoloDatabase::GetTestCaseData(unsig
     }
     catch (const InferenceTestImageException& e)
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to load test case " << testCaseId << " with error: " << e.what();
+        ARMNN_LOG(fatal) << "Failed to load test case " << testCaseId << " with error: " << e.what();
         return nullptr;
     }
 

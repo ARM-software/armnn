@@ -23,7 +23,6 @@
 #include <boost/polymorphic_cast.hpp>
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
-#include <boost/log/trivial.hpp>
 
 namespace armnn
 {
@@ -90,7 +89,7 @@ std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<
     auto Fail = [&](const std::exception& error) -> std::unique_ptr<LoadedNetwork>
     {
         errorMessage = ToErrorMessage("An error occurred when preparing the network workloads: ", error);
-        BOOST_LOG_TRIVIAL(error) << errorMessage;
+        ARMNN_LOG(error) << errorMessage;
 
         return std::unique_ptr<LoadedNetwork>();
     };
@@ -418,7 +417,7 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
     // Walk graph to determine the order of execution.
     if (graph.GetNumLayers() < 2)
     {
-        BOOST_LOG_TRIVIAL(warning) << "IRuntime::EnqueueWorkload()::Less than two nodes in graph";
+        ARMNN_LOG(warning) << "IRuntime::EnqueueWorkload()::Less than two nodes in graph";
         return Status::Failure;
     }
 
@@ -679,7 +678,7 @@ bool LoadedNetwork::Execute(std::unique_ptr<TimelineUtilityMethods>& timelineUti
 
     auto Fail = [&](const std::exception& error)
     {
-        BOOST_LOG_TRIVIAL(error) << "An error occurred attempting to execute a workload: " << error.what();
+        ARMNN_LOG(error) << "An error occurred attempting to execute a workload: " << error.what();
         success = false;
     };
 

@@ -145,7 +145,7 @@ public:
             const YoloDetectedObject& detectedObject = *outputIt;
             if (detectedObject.m_Class != expectedDetection.m_Class)
             {
-                BOOST_LOG_TRIVIAL(error) << "Prediction for test case " << this->GetTestCaseId() <<
+                ARMNN_LOG(error) << "Prediction for test case " << this->GetTestCaseId() <<
                     " is incorrect: Expected (" << expectedDetection.m_Class << ")" <<
                     " but predicted (" << detectedObject.m_Class << ")";
                 return TestCaseResult::Failed;
@@ -157,7 +157,7 @@ public:
                 !m_FloatComparer(detectedObject.m_Box.m_H, expectedDetection.m_Box.m_H) ||
                 !m_FloatComparer(detectedObject.m_Confidence, expectedDetection.m_Confidence))
             {
-                BOOST_LOG_TRIVIAL(error) << "Detected bounding box for test case " << this->GetTestCaseId() <<
+                ARMNN_LOG(error) << "Detected bounding box for test case " << this->GetTestCaseId() <<
                     " is incorrect";
                 return TestCaseResult::Failed;
             }

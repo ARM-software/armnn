@@ -111,7 +111,6 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/FloatingPointConverter.cpp \
         src/armnnUtils/HeapProfiling.cpp \
         src/armnnUtils/LeakChecking.cpp \
-        src/armnnUtils/Logging.cpp \
         src/armnnUtils/ParserHelper.cpp \
         src/armnnUtils/Permute.cpp \
         src/armnnUtils/TensorUtils.cpp \

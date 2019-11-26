@@ -8,7 +8,6 @@
 #include "MobileNetSsdDatabase.hpp"
 
 #include <boost/assert.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 
@@ -52,7 +51,7 @@ public:
         const size_t expectedNumDetections = m_DetectedObjects.size();
         if (numDetections != expectedNumDetections)
         {
-            BOOST_LOG_TRIVIAL(error) << "Number of detections is incorrect: Expected (" <<
+            ARMNN_LOG(error) << "Number of detections is incorrect: Expected (" <<
                 expectedNumDetections << ")" << " but got (" << numDetections << ")";
             return TestCaseResult::Failed;
         }
@@ -85,7 +84,7 @@ public:
         {
             if (it == detectedObjects.end())
             {
-                BOOST_LOG_TRIVIAL(error) << "No more detected objects found! Index out of bounds: " << i;
+                ARMNN_LOG(error) << "No more detected objects found! Index out of bounds: " << i;
                 return TestCaseResult::Abort;
             }
 
@@ -94,7 +93,7 @@ public:
 
             if (detectedObject.m_Class != expectedObject.m_Class)
             {
-                BOOST_LOG_TRIVIAL(error) << "Prediction for test case " << this->GetTestCaseId() <<
+                ARMNN_LOG(error) << "Prediction for test case " << this->GetTestCaseId() <<
                     " is incorrect: Expected (" << expectedObject.m_Class << ")" <<
                     " but predicted (" << detectedObject.m_Class << ")";
                 return TestCaseResult::Failed;
@@ -102,7 +101,7 @@ public:
 
             if(!m_FloatComparer(detectedObject.m_Confidence, expectedObject.m_Confidence))
             {
-                BOOST_LOG_TRIVIAL(error) << "Confidence of prediction for test case " << this->GetTestCaseId() <<
+                ARMNN_LOG(error) << "Confidence of prediction for test case " << this->GetTestCaseId() <<
                     " is incorrect: Expected (" << expectedObject.m_Confidence << ")  +- 1.0 pc" <<
                     " but predicted (" << detectedObject.m_Confidence << ")";
                 return TestCaseResult::Failed;
@@ -113,7 +112,7 @@ public:
                 !m_FloatComparer(detectedObject.m_BoundingBox.m_XMax, expectedObject.m_BoundingBox.m_XMax) ||
                 !m_FloatComparer(detectedObject.m_BoundingBox.m_YMax, expectedObject.m_BoundingBox.m_YMax))
             {
-                BOOST_LOG_TRIVIAL(error) << "Detected bounding box for test case " << this->GetTestCaseId() <<
+                ARMNN_LOG(error) << "Detected bounding box for test case " << this->GetTestCaseId() <<
                     " is incorrect";
                 return TestCaseResult::Failed;
             }

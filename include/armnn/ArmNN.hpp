@@ -9,6 +9,7 @@
 #include "Exceptions.hpp"
 #include "INetwork.hpp"
 #include "IRuntime.hpp"
+#include "Logging.hpp"
 #include "LstmParams.hpp"
 #include "Optional.hpp"
 #include "QuantizedLstmParams.hpp"

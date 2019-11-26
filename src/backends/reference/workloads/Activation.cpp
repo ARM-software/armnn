@@ -5,8 +5,6 @@
 
 #include "Activation.hpp"
 
-#include <boost/log/trivial.hpp>
-
 #include <cmath>
 
 namespace armnn

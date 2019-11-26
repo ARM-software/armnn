@@ -14,7 +14,6 @@
 
 #include <iostream>
 
-#include <boost/log/trivial.hpp>
 #include <boost/polymorphic_cast.hpp>
 
 using namespace armnn;
@@ -106,8 +105,8 @@ Status Runtime::UnloadNetwork(NetworkId networkId)
 
     if (!unloadOk)
     {
-        BOOST_LOG_TRIVIAL(warning) << "Runtime::UnloadNetwork(): failed to unload "
-                                      "network with ID:" << networkId << " because BeforeUnloadNetwork failed";
+        ARMNN_LOG(warning) << "Runtime::UnloadNetwork(): failed to unload "
+                              "network with ID:" << networkId << " because BeforeUnloadNetwork failed";
         return Status::Failure;
     }
 
@@ -116,7 +115,7 @@ Status Runtime::UnloadNetwork(NetworkId networkId)
 
         if (m_LoadedNetworks.erase(networkId) == 0)
         {
-            BOOST_LOG_TRIVIAL(warning) << "WARNING: Runtime::UnloadNetwork(): " << networkId << " not found!";
+            ARMNN_LOG(warning) << "WARNING: Runtime::UnloadNetwork(): " << networkId << " not found!";
             return Status::Failure;
         }
     }
@@ -126,7 +125,7 @@ Status Runtime::UnloadNetwork(NetworkId networkId)
         context.second->AfterUnloadNetwork(networkId);
     }
 
-    BOOST_LOG_TRIVIAL(debug) << "Runtime::UnloadNetwork(): Unloaded network with ID: " << networkId;
+    ARMNN_LOG(debug) << "Runtime::UnloadNetwork(): Unloaded network with ID: " << networkId;
     return Status::Success;
 }
 
@@ -146,7 +145,7 @@ Runtime::Runtime(const CreationOptions& options)
     : m_NetworkIdCounter(0)
     , m_DeviceSpec{BackendRegistryInstance().GetBackendIds()}
 {
-    BOOST_LOG_TRIVIAL(info) << "ArmNN v" << ARMNN_VERSION << "\n";
+    ARMNN_LOG(info) << "ArmNN v" << ARMNN_VERSION << "\n";
 
     // pass configuration info to the profiling service
     armnn::profiling::ProfilingService::Instance().ConfigureProfilingService(options.m_ProfilingOptions);

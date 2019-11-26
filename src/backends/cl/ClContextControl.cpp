@@ -14,7 +14,6 @@
 
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/polymorphic_cast.hpp>
 #include <boost/core/ignore_unused.hpp>
 

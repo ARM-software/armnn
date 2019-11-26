@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 #include "armnn/Descriptors.hpp"
+#include "armnn/Logging.hpp"
 
 #include <algorithm>
 #include <array>
 #include <vector>
 
 #include <boost/format.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 namespace armnn
@@ -160,13 +160,13 @@ Status OriginsDescriptor::SetViewOriginCoord(uint32_t view, uint32_t coord, uint
 {
     if (view >= m_NumViews)
     {
-        BOOST_LOG_TRIVIAL(error) << "OriginsDescriptor::SetViewOriginCoord: view argument:" << view <<
+        ARMNN_LOG(error) << "OriginsDescriptor::SetViewOriginCoord: view argument:" << view <<
             " is out of range";
         return Status::Failure;
     }
     if (coord >= m_NumDimensions)
     {
-        BOOST_LOG_TRIVIAL(error) << "OriginsDescriptor::SetViewOriginCoord: coord argument:" << coord <<
+        ARMNN_LOG(error) << "OriginsDescriptor::SetViewOriginCoord: coord argument:" << coord <<
             " is out of range";
         return Status::Failure;
     }
@@ -308,19 +308,19 @@ Status ViewsDescriptor::SetViewSize(uint32_t view, uint32_t coord, uint32_t valu
 {
     if (!m_ViewSizes)
     {
-        BOOST_LOG_TRIVIAL(error) << "ViewsDescriptor::SetViewSize: invalid view sizes";
+        ARMNN_LOG(error) << "ViewsDescriptor::SetViewSize: invalid view sizes";
         return Status::Failure;
     }
 
     if (view >= GetNumViews())
     {
-        BOOST_LOG_TRIVIAL(error) << "ViewsDescriptor::SetViewSize: view argument:" << view <<
+        ARMNN_LOG(error) << "ViewsDescriptor::SetViewSize: view argument:" << view <<
                                  " is out of range";
         return Status::Failure;
     }
     if (coord >= GetNumDimensions())
     {
-        BOOST_LOG_TRIVIAL(error) << "ViewsDescriptor::SetViewSize: coord argument:" << coord <<
+        ARMNN_LOG(error) << "ViewsDescriptor::SetViewSize: coord argument:" << coord <<
                                  " is out of range";
         return Status::Failure;
     }

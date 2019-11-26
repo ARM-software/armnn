@@ -11,7 +11,6 @@
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/log/trivial.hpp>
 
 namespace armnn
 {

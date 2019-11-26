@@ -4,8 +4,9 @@
 //
 #include "MnistDatabase.hpp"
 
+#include <armnn/Logging.hpp>
+
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/assert.hpp>
 #include <fstream>
 #include <vector>
@@ -36,12 +37,12 @@ std::unique_ptr<MnistDatabase::TTestCaseData> MnistDatabase::GetTestCaseData(uns
 
     if (!imageStream.is_open())
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to load " << imagePath;
+        ARMNN_LOG(fatal) << "Failed to load " << imagePath;
         return nullptr;
     }
     if (!labelStream.is_open())
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to load " << imagePath;
+        ARMNN_LOG(fatal) << "Failed to load " << imagePath;
         return nullptr;
     }
 
@@ -51,13 +52,13 @@ std::unique_ptr<MnistDatabase::TTestCaseData> MnistDatabase::GetTestCaseData(uns
     imageStream.read(reinterpret_cast<char*>(&magic), sizeof(magic));
     if (magic != 0x03080000)
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to read " << imagePath;
+        ARMNN_LOG(fatal) << "Failed to read " << imagePath;
         return nullptr;
     }
     labelStream.read(reinterpret_cast<char*>(&magic), sizeof(magic));
     if (magic != 0x01080000)
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to read " << labelPath;
+        ARMNN_LOG(fatal) << "Failed to read " << labelPath;
         return nullptr;
     }
 
@@ -79,12 +80,12 @@ std::unique_ptr<MnistDatabase::TTestCaseData> MnistDatabase::GetTestCaseData(uns
 
     if (!imageStream.good())
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to read " << imagePath;
+        ARMNN_LOG(fatal) << "Failed to read " << imagePath;
         return nullptr;
     }
     if (!labelStream.good())
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to read " << labelPath;
+        ARMNN_LOG(fatal) << "Failed to read " << labelPath;
         return nullptr;
     }
 

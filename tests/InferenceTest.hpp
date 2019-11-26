@@ -5,12 +5,11 @@
 #pragma once
 
 #include <armnn/ArmNN.hpp>
+#include <armnn/Logging.hpp>
 #include <armnn/TypesUtils.hpp>
 #include "InferenceModel.hpp"
 
-#include <Logging.hpp>
 
-#include <boost/log/core/core.hpp>
 #include <boost/program_options.hpp>
 
 

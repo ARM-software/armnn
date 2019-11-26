@@ -5,7 +5,8 @@
 
 #include "ProfilingService.hpp"
 
-#include <boost/log/trivial.hpp>
+#include <armnn/Logging.hpp>
+
 #include <boost/format.hpp>
 
 namespace armnn
@@ -118,8 +119,8 @@ void ProfilingService::Update()
         }
         catch (const Exception& e)
         {
-            BOOST_LOG_TRIVIAL(warning) << "An error has occurred when creating the profiling connection: "
-                                       << e.what() << std::endl;
+            ARMNN_LOG(warning) << "An error has occurred when creating the profiling connection: "
+                                       << e.what();
         }
 
         // Move to the next state

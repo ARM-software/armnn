@@ -6,7 +6,6 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
@@ -121,11 +120,11 @@ TestCaseResult ClassifierTestCase<TTestCaseDatabase, TModel>::ProcessResult(cons
     ClassifierResultProcessor resultProcessor(m_QuantizationParams.first, m_QuantizationParams.second);
     boost::apply_visitor(resultProcessor, output);
 
-    BOOST_LOG_TRIVIAL(info) << "= Prediction values for test #" << testCaseId;
+    ARMNN_LOG(info) << "= Prediction values for test #" << testCaseId;
     auto it = resultProcessor.GetResultMap().rbegin();
     for (int i=0; i<5 && it != resultProcessor.GetResultMap().rend(); ++i)
     {
-        BOOST_LOG_TRIVIAL(info) << "Top(" << (i+1) << ") prediction is " << it->second <<
+        ARMNN_LOG(info) << "Top(" << (i+1) << ") prediction is " << it->second <<
           " with value: " << (it->first);
         ++it;
     }
@@ -141,7 +140,7 @@ TestCaseResult ClassifierTestCase<TTestCaseDatabase, TModel>::ProcessResult(cons
     // If we're just running the defaultTestCaseIds, each one must be classified correctly.
     if (params.m_IterationCount == 0 && prediction != m_Label)
     {
-        BOOST_LOG_TRIVIAL(error) << "Prediction for test case " << testCaseId << " (" << prediction << ")" <<
+        ARMNN_LOG(error) << "Prediction for test case " << testCaseId << " (" << prediction << ")" <<
             " is incorrect (should be " << m_Label << ")";
         return TestCaseResult::Failed;
     }
@@ -149,7 +148,7 @@ TestCaseResult ClassifierTestCase<TTestCaseDatabase, TModel>::ProcessResult(cons
     // If a validation file was provided as input, it checks that the prediction matches.
     if (!m_ValidationPredictions.empty() && prediction != m_ValidationPredictions[testCaseId])
     {
-        BOOST_LOG_TRIVIAL(error) << "Prediction for test case " << testCaseId << " (" << prediction << ")" <<
+        ARMNN_LOG(error) << "Prediction for test case " << testCaseId << " (" << prediction << ")" <<
             " doesn't match the prediction in the validation file (" << m_ValidationPredictions[testCaseId] << ")";
         return TestCaseResult::Failed;
     }
@@ -250,7 +249,7 @@ bool ClassifierTestCaseProvider<TDatabase, InferenceModel>::OnInferenceTestFinis
 {
     const double accuracy = boost::numeric_cast<double>(m_NumCorrectInferences) /
         boost::numeric_cast<double>(m_NumInferences);
-    BOOST_LOG_TRIVIAL(info) << std::fixed << std::setprecision(3) << "Overall accuracy: " << accuracy;
+    ARMNN_LOG(info) << std::fixed << std::setprecision(3) << "Overall accuracy: " << accuracy;
 
     // If a validation file was requested as output, the predictions are saved to it.
     if (!m_ValidationFileOut.empty())
@@ -265,7 +264,7 @@ bool ClassifierTestCaseProvider<TDatabase, InferenceModel>::OnInferenceTestFinis
         }
         else
         {
-            BOOST_LOG_TRIVIAL(error) << "Failed to open output validation file: " << m_ValidationFileOut;
+            ARMNN_LOG(error) << "Failed to open output validation file: " << m_ValidationFileOut;
             return false;
         }
     }
@@ -310,7 +309,6 @@ int InferenceTestMain(int argc,
     armnn::LogSeverity level = armnn::LogSeverity::Debug;
 #endif
     armnn::ConfigureLogging(true, true, level);
-    armnnUtils::ConfigureLogging(boost::log::core::get().get(), true, true, level);
 
     try
     {
@@ -331,7 +329,7 @@ int InferenceTestMain(int argc,
     }
     catch (armnn::Exception const& e)
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Armnn Error: " << e.what();
+        ARMNN_LOG(fatal) << "Armnn Error: " << e.what();
         return 1;
     }
 }

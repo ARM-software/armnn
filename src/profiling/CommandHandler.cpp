@@ -6,7 +6,7 @@
 #include "CommandHandler.hpp"
 #include "ProfilingService.hpp"
 
-#include <boost/log/trivial.hpp>
+#include <armnn/Logging.hpp>
 
 namespace armnn
 {
@@ -75,7 +75,7 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
         catch (const Exception& e)
         {
             // Log the error and continue
-            BOOST_LOG_TRIVIAL(warning) << "An error has occurred when handling a command: " << e.what() << std::endl;
+            ARMNN_LOG(warning) << "An error has occurred when handling a command: " << e.what();
             // Did we get here because the socket failed?
             if ( !profilingConnection.IsOpen() )
             {

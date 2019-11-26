@@ -7,7 +7,6 @@
 #include "../src/armnn/Profiling.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
@@ -125,7 +124,7 @@ bool InferenceTest(const InferenceTestOptions& params,
 #if !defined (NDEBUG)
     if (params.m_IterationCount > 0) // If just running a few select images then don't bother to warn.
     {
-        BOOST_LOG_TRIVIAL(warning) << "Performance test running in DEBUG build - results may be inaccurate.";
+        ARMNN_LOG(warning) << "Performance test running in DEBUG build - results may be inaccurate.";
     }
 #endif
 
@@ -141,7 +140,7 @@ bool InferenceTest(const InferenceTestOptions& params,
         inferenceTimesFile.open(params.m_InferenceTimesFile.c_str(), ios_base::trunc | ios_base::out);
         if (!inferenceTimesFile.good())
         {
-            BOOST_LOG_TRIVIAL(error) << "Failed to open inference times file for writing: "
+            ARMNN_LOG(error) << "Failed to open inference times file for writing: "
                 << params.m_InferenceTimesFile;
             return false;
         }
@@ -158,7 +157,7 @@ bool InferenceTest(const InferenceTestOptions& params,
     std::unique_ptr<IInferenceTestCase> warmupTestCase = testCaseProvider.GetTestCase(0);
     if (warmupTestCase == nullptr)
     {
-        BOOST_LOG_TRIVIAL(error) << "Failed to load test case";
+        ARMNN_LOG(error) << "Failed to load test case";
         return false;
     }
 
@@ -168,7 +167,7 @@ bool InferenceTest(const InferenceTestOptions& params,
     }
     catch (const TestFrameworkException& testError)
     {
-        BOOST_LOG_TRIVIAL(error) << testError.what();
+        ARMNN_LOG(error) << testError.what();
         return false;
     }
 
@@ -182,7 +181,7 @@ bool InferenceTest(const InferenceTestOptions& params,
 
         if (testCase == nullptr)
         {
-            BOOST_LOG_TRIVIAL(error) << "Failed to load test case";
+            ARMNN_LOG(error) << "Failed to load test case";
             return false;
         }
 
@@ -214,7 +213,7 @@ bool InferenceTest(const InferenceTestOptions& params,
         }
         catch (const TestFrameworkException& testError)
         {
-            BOOST_LOG_TRIVIAL(error) << testError.what();
+            ARMNN_LOG(error) << testError.what();
             result = TestCaseResult::Abort;
         }
 
@@ -236,9 +235,9 @@ bool InferenceTest(const InferenceTestOptions& params,
 
     const double averageTimePerTestCaseMs = totalTime / nbProcessed * 1000.0f;
 
-    BOOST_LOG_TRIVIAL(info) << std::fixed << std::setprecision(3) <<
+    ARMNN_LOG(info) << std::fixed << std::setprecision(3) <<
         "Total time for " << nbProcessed << " test cases: " << totalTime << " seconds";
-    BOOST_LOG_TRIVIAL(info) << std::fixed << std::setprecision(3) <<
+    ARMNN_LOG(info) << std::fixed << std::setprecision(3) <<
         "Average time per test case: " << averageTimePerTestCaseMs << " ms";
 
     // if profiling is enabled print out the results
@@ -249,7 +248,7 @@ bool InferenceTest(const InferenceTestOptions& params,
 
     if (!success)
     {
-        BOOST_LOG_TRIVIAL(error) << "One or more test cases failed";
+        ARMNN_LOG(error) << "One or more test cases failed";
         return false;
     }
 

@@ -5,12 +5,12 @@
 
 #include "ImageTensorGenerator.hpp"
 #include "../InferenceTestImage.hpp"
+#include <armnn/Logging.hpp>
 #include <armnn/TypesUtils.hpp>
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/program_options.hpp>
 #include <boost/variant.hpp>
 
@@ -285,7 +285,7 @@ int main(int argc, char* argv[])
     }
     catch (const InferenceTestImageException& e)
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to load image file " << imagePath << " with error: " << e.what();
+        ARMNN_LOG(fatal) << "Failed to load image file " << imagePath << " with error: " << e.what();
         return -1;
     }
 
@@ -297,7 +297,7 @@ int main(int argc, char* argv[])
                              imageDataContainers[0]);
         if (!imageTensorFile)
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Failed to write to output file" << outputPath;
+            ARMNN_LOG(fatal) << "Failed to write to output file" << outputPath;
             imageTensorFile.close();
             return -1;
         }
@@ -305,7 +305,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to open output file" << outputPath;
+        ARMNN_LOG(fatal) << "Failed to open output file" << outputPath;
         return -1;
     }
 

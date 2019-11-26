@@ -7,7 +7,6 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/log/trivial.hpp>
 
 #include <regex>
 
@@ -84,8 +83,8 @@ std::vector<std::string> DynamicBackendUtils::GetBackendPaths(const std::string&
     {
         if (!IsPathValid(overrideBackendPath))
         {
-            BOOST_LOG_TRIVIAL(warning) << "WARNING: The given override path for dynamic backends \""
-                                       << overrideBackendPath << "\" is not valid";
+            ARMNN_LOG(warning) << "WARNING: The given override path for dynamic backends \""
+                               << overrideBackendPath << "\" is not valid";
 
             return {};
         }
@@ -146,7 +145,7 @@ bool DynamicBackendUtils::IsPathValid(const std::string& path)
 {
     if (path.empty())
     {
-        BOOST_LOG_TRIVIAL(warning) << "WARNING: The given backend path is empty";
+        ARMNN_LOG(warning) << "WARNING: The given backend path is empty";
         return false;
     }
 
@@ -154,19 +153,19 @@ bool DynamicBackendUtils::IsPathValid(const std::string& path)
 
     if (!boost::filesystem::exists(boostPath))
     {
-        BOOST_LOG_TRIVIAL(warning) << "WARNING: The given backend path \"" << path << "\" does not exist";
+        ARMNN_LOG(warning) << "WARNING: The given backend path \"" << path << "\" does not exist";
         return false;
     }
 
     if (!boost::filesystem::is_directory(boostPath))
     {
-        BOOST_LOG_TRIVIAL(warning) << "WARNING: The given backend path \"" << path << "\" is not a directory";
+        ARMNN_LOG(warning) << "WARNING: The given backend path \"" << path << "\" is not a directory";
         return false;
     }
 
     if (!boostPath.is_absolute())
     {
-        BOOST_LOG_TRIVIAL(warning) << "WARNING: The given backend path \"" << path << "\" is not absolute";
+        ARMNN_LOG(warning) << "WARNING: The given backend path \"" << path << "\" is not absolute";
         return false;
     }
 
@@ -214,7 +213,7 @@ std::vector<std::string> DynamicBackendUtils::GetSharedObjects(const std::vector
             }
             catch (const filesystem_error& e)
             {
-                BOOST_LOG_TRIVIAL(warning) << "GetSharedObjects warning: " << e.what();
+                ARMNN_LOG(warning) << "GetSharedObjects warning: " << e.what();
             }
             if (canonicalPath.empty())
             {
@@ -235,7 +234,7 @@ std::vector<std::string> DynamicBackendUtils::GetSharedObjects(const std::vector
             }
             catch (const std::exception& e)
             {
-                BOOST_LOG_TRIVIAL(warning) << "GetSharedObjects warning: " << e.what();
+                ARMNN_LOG(warning) << "GetSharedObjects warning: " << e.what();
             }
             if (!filenameMatch)
             {
@@ -274,13 +273,13 @@ std::vector<DynamicBackendPtr> DynamicBackendUtils::CreateDynamicBackends(const 
         }
         catch (const RuntimeException& e)
         {
-            BOOST_LOG_TRIVIAL(warning) << "Cannot create a handle to the shared object file \""
-                                       << sharedObject << "\": " << e.what();
+            ARMNN_LOG(warning) << "Cannot create a handle to the shared object file \""
+                               << sharedObject << "\": " << e.what();
             continue;
         }
         if (!sharedObjectHandle)
         {
-            BOOST_LOG_TRIVIAL(warning) << "Invalid handle to the shared object file \"" << sharedObject << "\"";
+            ARMNN_LOG(warning) << "Invalid handle to the shared object file \"" << sharedObject << "\"";
 
             continue;
         }
@@ -293,14 +292,14 @@ std::vector<DynamicBackendPtr> DynamicBackendUtils::CreateDynamicBackends(const 
         }
         catch (const Exception& e)
         {
-            BOOST_LOG_TRIVIAL(warning) << "Cannot create a valid dynamic backend from the shared object file \""
-                                       << sharedObject << "\": " << e.what();
+            ARMNN_LOG(warning) << "Cannot create a valid dynamic backend from the shared object file \""
+                               << sharedObject << "\": " << e.what();
             continue;
         }
         if (!dynamicBackend)
         {
-            BOOST_LOG_TRIVIAL(warning) << "Invalid dynamic backend object for the shared object file \""
-                                       << sharedObject << "\"";
+            ARMNN_LOG(warning) << "Invalid dynamic backend object for the shared object file \""
+                               << sharedObject << "\"";
             continue;
         }
 
@@ -337,14 +336,14 @@ BackendIdSet DynamicBackendUtils::RegisterDynamicBackendsImpl(BackendRegistry& b
         }
         catch (const RuntimeException& e)
         {
-            BOOST_LOG_TRIVIAL(warning) << "Cannot register dynamic backend, "
-                                       << "an error has occurred when getting the backend id: " << e.what();
+            ARMNN_LOG(warning) << "Cannot register dynamic backend, "
+                               << "an error has occurred when getting the backend id: " << e.what();
             continue;
         }
         if (dynamicBackendId.IsEmpty() ||
             dynamicBackendId.IsUndefined())
         {
-            BOOST_LOG_TRIVIAL(warning) << "Cannot register dynamic backend, invalid backend id: " << dynamicBackendId;
+            ARMNN_LOG(warning) << "Cannot register dynamic backend, invalid backend id: " << dynamicBackendId;
             continue;
         }
 
@@ -352,8 +351,8 @@ BackendIdSet DynamicBackendUtils::RegisterDynamicBackendsImpl(BackendRegistry& b
         bool backendAlreadyRegistered = backendRegistry.IsBackendRegistered(dynamicBackendId);
         if (backendAlreadyRegistered)
         {
-            BOOST_LOG_TRIVIAL(warning) << "Cannot register dynamic backend \"" << dynamicBackendId
-                                       << "\": backend already registered";
+            ARMNN_LOG(warning) << "Cannot register dynamic backend \"" << dynamicBackendId
+                               << "\": backend already registered";
             continue;
         }
 
@@ -365,15 +364,15 @@ BackendIdSet DynamicBackendUtils::RegisterDynamicBackendsImpl(BackendRegistry& b
         }
         catch (const RuntimeException& e)
         {
-            BOOST_LOG_TRIVIAL(warning) << "Cannot register dynamic backend \"" << dynamicBackendId
-                                       << "\": an error has occurred when getting the backend factory function: "
-                                       << e.what();
+            ARMNN_LOG(warning) << "Cannot register dynamic backend \"" << dynamicBackendId
+                               << "\": an error has occurred when getting the backend factory function: "
+                               << e.what();
             continue;
         }
         if (dynamicBackendFactoryFunction == nullptr)
         {
-            BOOST_LOG_TRIVIAL(warning) << "Cannot register dynamic backend \"" << dynamicBackendId
-                                       << "\": invalid backend factory function";
+            ARMNN_LOG(warning) << "Cannot register dynamic backend \"" << dynamicBackendId
+                               << "\": invalid backend factory function";
             continue;
         }
 
@@ -384,8 +383,8 @@ BackendIdSet DynamicBackendUtils::RegisterDynamicBackendsImpl(BackendRegistry& b
         }
         catch (const InvalidArgumentException& e)
         {
-            BOOST_LOG_TRIVIAL(warning) << "An error has occurred when registering the dynamic backend \""
-                                       << dynamicBackendId << "\": " << e.what();
+            ARMNN_LOG(warning) << "An error has occurred when registering the dynamic backend \""
+                               << dynamicBackendId << "\": " << e.what();
             continue;
         }
 

@@ -4,8 +4,9 @@
 //
 #include "Cifar10Database.hpp"
 
+#include <armnn/Logging.hpp>
+
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/log/trivial.hpp>
 #include <fstream>
 #include <vector>
 
@@ -25,7 +26,7 @@ std::unique_ptr<Cifar10Database::TTestCaseData> Cifar10Database::GetTestCaseData
     std::ifstream fileStream(fullpath, std::ios::binary);
     if (!fileStream.is_open())
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to load " << fullpath;
+        ARMNN_LOG(fatal) << "Failed to load " << fullpath;
         return nullptr;
     }
 
@@ -34,7 +35,7 @@ std::unique_ptr<Cifar10Database::TTestCaseData> Cifar10Database::GetTestCaseData
 
     if (!fileStream.good())
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to read " << fullpath;
+        ARMNN_LOG(fatal) << "Failed to read " << fullpath;
         return nullptr;
     }
 

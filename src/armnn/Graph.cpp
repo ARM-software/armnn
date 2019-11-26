@@ -14,7 +14,6 @@
 #include <armnn/TypesUtils.hpp>
 
 #include <boost/polymorphic_cast.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
 
@@ -62,18 +61,18 @@ Status Graph::Print() const
 {
     if (m_Layers.empty())
     {
-        BOOST_LOG_TRIVIAL(info) << "\n Graph is empty.\n";
+        ARMNN_LOG(info) << "\n Graph is empty.\n";
         return Status::Success;
     }
-    BOOST_LOG_TRIVIAL(info) << "\n";
-    BOOST_LOG_TRIVIAL(info) << "Walking Pattern: \n";
+    ARMNN_LOG(info) << "\n";
+    ARMNN_LOG(info) << "Walking Pattern: \n";
 
     for (auto&& it : TopologicalSort())
     {
-        BOOST_LOG_TRIVIAL(info) << it->GetName() << ":" << GetLayerTypeAsCString(it->GetType())
+        ARMNN_LOG(info) << it->GetName() << ":" << GetLayerTypeAsCString(it->GetType())
                                 << ":" << it->GetBackendId().Get();
     }
-    BOOST_LOG_TRIVIAL(info) << "\n\n";
+    ARMNN_LOG(info) << "\n\n";
 
     return Status::Success;
 }

@@ -12,7 +12,6 @@
 
 #include <armnn/TypesUtils.hpp>
 
-#include <boost/log/trivial.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <array>
@@ -39,7 +38,7 @@ std::vector<T> ParseArrayImpl(std::istream& stream, TParseElementFunc parseEleme
         }
         catch (const std::exception& e)
         {
-            BOOST_LOG_TRIVIAL(error) << "An error occurred when splitting tokens: " << e.what();
+            ARMNN_LOG(error) << "An error occurred when splitting tokens: " << e.what();
             continue;
         }
         for (const std::string& token : tokens)
@@ -52,7 +51,7 @@ std::vector<T> ParseArrayImpl(std::istream& stream, TParseElementFunc parseEleme
                 }
                 catch (const std::exception&)
                 {
-                    BOOST_LOG_TRIVIAL(error) << "'" << token << "' is not a valid number. It has been ignored.";
+                    ARMNN_LOG(error) << "'" << token << "' is not a valid number. It has been ignored.";
                 }
             }
         }
@@ -163,7 +162,7 @@ std::unique_ptr<DeepSpeechV1TestCaseData> DeepSpeechV1Database::GetTestCaseData(
     }
     catch (const InferenceTestImageException& e)
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to load image for test case " << testCaseId << ". Error: " << e.what();
+        ARMNN_LOG(fatal) << "Failed to load image for test case " << testCaseId << ". Error: " << e.what();
         return nullptr;
     }
 
@@ -188,7 +187,7 @@ std::unique_ptr<DeepSpeechV1TestCaseData> DeepSpeechV1Database::GetTestCaseData(
     }
     catch (const InferenceTestImageException& e)
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to load image for test case " << testCaseId << ". Error: " << e.what();
+        ARMNN_LOG(fatal) << "Failed to load image for test case " << testCaseId << ". Error: " << e.what();
         return nullptr;
     }
 

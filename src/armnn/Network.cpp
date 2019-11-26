@@ -33,7 +33,6 @@
 
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/numeric/conversion/converter_policies.hpp>
 #include <boost/cast.hpp>
 
@@ -76,7 +75,7 @@ void ReportError(const std::string& errorMessage,
 {
     std::stringstream fullErrorMessage;
     fullErrorMessage << "ERROR: " << errorMessage;
-    BOOST_LOG_TRIVIAL(warning) << fullErrorMessage.str();
+    ARMNN_LOG(warning) << fullErrorMessage.str();
     if (errorMessages)
     {
         errorMessages.value().push_back(fullErrorMessage.str());
@@ -88,7 +87,7 @@ void ReportWarning(const std::string& warningMessage,
 {
     std::stringstream fullWarningMessage;
     fullWarningMessage << "WARNING: " << warningMessage;
-    BOOST_LOG_TRIVIAL(warning) << fullWarningMessage.str();
+    ARMNN_LOG(warning) << fullWarningMessage.str();
     if (warningMessages)
     {
         warningMessages.value().push_back(fullWarningMessage.str());
@@ -120,7 +119,7 @@ bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string
                 ss << "Quantization parameters for Softmax layer (Scale: " <<
                 info.GetQuantizationScale() << " and Offset: " << info.GetQuantizationOffset() <<
                 ") are incorrect and have been updated to Scale: 0.00390625 and Offset: 0";
-                BOOST_LOG_TRIVIAL(warning) << ss.str();
+                ARMNN_LOG(warning) << ss.str();
                 info.SetQuantizationScale((1.0f /256.0f));
                 info.SetQuantizationOffset(0);
                 outputSlot.SetTensorInfo(info);

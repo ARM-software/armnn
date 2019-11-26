@@ -15,7 +15,6 @@ int main(int argc, const char* argv[])
     armnn::LogSeverity level = armnn::LogSeverity::Debug;
 #endif
     armnn::ConfigureLogging(true, true, level);
-    armnnUtils::ConfigureLogging(boost::log::core::get().get(), true, true, level);
 
     std::string testCasesFile;
 
@@ -120,7 +119,7 @@ int main(int argc, const char* argv[])
         // and that desc.add_options() can throw boost::io::too_few_args.
         // They really won't in any of these cases.
         BOOST_ASSERT_MSG(false, "Caught unexpected exception");
-        BOOST_LOG_TRIVIAL(fatal) << "Fatal internal error: " << e.what();
+        ARMNN_LOG(fatal) << "Fatal internal error: " << e.what();
         return EXIT_FAILURE;
     }
 
@@ -166,7 +165,7 @@ int main(int argc, const char* argv[])
         // Check that the file exists.
         if (!boost::filesystem::exists(testCasesFile))
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Given file \"" << testCasesFile << "\" does not exist";
+            ARMNN_LOG(fatal) << "Given file \"" << testCasesFile << "\" does not exist";
             return EXIT_FAILURE;
         }
 
@@ -177,7 +176,7 @@ int main(int argc, const char* argv[])
         // Check that there is at least one test case to run
         if (testCases.empty())
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Given file \"" << testCasesFile << "\" has no test cases";
+            ARMNN_LOG(fatal) << "Given file \"" << testCasesFile << "\" has no test cases";
             return EXIT_FAILURE;
         }
 

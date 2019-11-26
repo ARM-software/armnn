@@ -53,7 +53,6 @@ int main(int argc, char* argv[])
         using namespace boost::filesystem;
         armnn::LogSeverity level = armnn::LogSeverity::Debug;
         armnn::ConfigureLogging(true, true, level);
-        armnnUtils::ConfigureLogging(boost::log::core::get().get(), true, true, level);
 
         // Set-up program Options
         namespace po = boost::program_options;
@@ -138,8 +137,8 @@ int main(int argc, char* argv[])
         std::string invalidBackends;
         if (!CheckRequestedBackendsAreValid(computeDevice, armnn::Optional<std::string&>(invalidBackends)))
         {
-            BOOST_LOG_TRIVIAL(fatal) << "The list of preferred devices contains invalid backend IDs: "
-                                     << invalidBackends;
+            ARMNN_LOG(fatal) << "The list of preferred devices contains invalid backend IDs: "
+                             << invalidBackends;
             return EXIT_FAILURE;
         }
         armnn::Status status;
@@ -166,7 +165,7 @@ int main(int argc, char* argv[])
         {
             std::stringstream message;
             message << "armnn::Exception (" << e.what() << ") caught from optimize.";
-            BOOST_LOG_TRIVIAL(fatal) << message.str();
+            ARMNN_LOG(fatal) << message.str();
             return 1;
         }
 
@@ -175,7 +174,7 @@ int main(int argc, char* argv[])
         status = runtime->LoadNetwork(networkId, std::move(optimizedNet));
         if (status == armnn::Status::Failure)
         {
-            BOOST_LOG_TRIVIAL(fatal) << "armnn::IRuntime: Failed to load network";
+            ARMNN_LOG(fatal) << "armnn::IRuntime: Failed to load network";
             return 1;
         }
 
@@ -200,7 +199,7 @@ int main(int argc, char* argv[])
         if (modelOutputLabelsPath.empty() || !boost::filesystem::exists(modelOutputLabelsPath) ||
             !boost::filesystem::is_regular_file(modelOutputLabelsPath))
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Invalid model output labels path at " << modelOutputLabelsPath;
+            ARMNN_LOG(fatal) << "Invalid model output labels path at " << modelOutputLabelsPath;
         }
         const std::vector<armnnUtils::LabelCategoryNames> modelOutputLabels =
             LoadModelOutputLabels(modelOutputLabelsPath);
@@ -211,7 +210,7 @@ int main(int argc, char* argv[])
         size_t imageEndIndex;
         if (imageIndexStrs.size() != 2)
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Invalid validation range specification: Invalid format " << validationRange;
+            ARMNN_LOG(fatal) << "Invalid validation range specification: Invalid format " << validationRange;
             return 1;
         }
         try
@@ -221,7 +220,7 @@ int main(int argc, char* argv[])
         }
         catch (const std::exception& e)
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Invalid validation range specification: " << validationRange;
+            ARMNN_LOG(fatal) << "Invalid validation range specification: " << validationRange;
             return 1;
         }
 
@@ -229,7 +228,7 @@ int main(int argc, char* argv[])
         if (!blacklistPath.empty() &&
             !(boost::filesystem::exists(blacklistPath) && boost::filesystem::is_regular_file(blacklistPath)))
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Invalid path to blacklist file at " << blacklistPath;
+            ARMNN_LOG(fatal) << "Invalid path to blacklist file at " << blacklistPath;
             return 1;
         }
 
@@ -265,7 +264,7 @@ int main(int argc, char* argv[])
             }
             else
             {
-                BOOST_LOG_TRIVIAL(fatal) << "Invalid Data layout: " << inputLayout;
+                ARMNN_LOG(fatal) << "Invalid Data layout: " << inputLayout;
                 return 1;
             }
             const unsigned int inputTensorWidth =
@@ -277,7 +276,7 @@ int main(int argc, char* argv[])
             // Check output tensor shape is valid
             if (modelOutputLabels.size() != outputNumElements)
             {
-                BOOST_LOG_TRIVIAL(fatal) << "Number of output elements: " << outputNumElements
+                ARMNN_LOG(fatal) << "Number of output elements: " << outputNumElements
                                          << " , mismatches the number of output labels: " << modelOutputLabels.size();
                 return 1;
             }
@@ -299,7 +298,7 @@ int main(int argc, char* argv[])
             }
             else
             {
-                BOOST_LOG_TRIVIAL(fatal) << "Unsupported frontend: " << modelFormat;
+                ARMNN_LOG(fatal) << "Unsupported frontend: " << modelFormat;
                 return 1;
             }
             const NormalizationParameters& normParams = GetNormalizationParameters(modelFrontend, inputTensorDataType);
@@ -350,7 +349,7 @@ int main(int argc, char* argv[])
 
                 if (status == armnn::Status::Failure)
                 {
-                    BOOST_LOG_TRIVIAL(fatal) << "armnn::IRuntime: Failed to enqueue workload for image: " << imageName;
+                    ARMNN_LOG(fatal) << "armnn::IRuntime: Failed to enqueue workload for image: " << imageName;
                 }
 
                 checker.AddImageResult<TContainer>(imageName, outputDataContainers);
@@ -366,7 +365,7 @@ int main(int argc, char* argv[])
             std::cout << "Top " << i <<  " Accuracy: " << checker.GetAccuracy(i) << "%" << "\n";
         }
 
-        BOOST_LOG_TRIVIAL(info) << "Accuracy Tool ran successfully!";
+        ARMNN_LOG(info) << "Accuracy Tool ran successfully!";
         return 0;
     }
     catch (armnn::Exception const & e)

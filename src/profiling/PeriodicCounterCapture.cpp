@@ -5,7 +5,8 @@
 
 #include "PeriodicCounterCapture.hpp"
 
-#include <boost/log/trivial.hpp>
+#include <armnn/Logging.hpp>
+
 #include <iostream>
 
 namespace armnn
@@ -85,8 +86,8 @@ void PeriodicCounterCapture::Capture(const IReadCounterValues& readCounterValues
             catch (const Exception& e)
             {
                 // Report the error and continue
-                BOOST_LOG_TRIVIAL(warning) << "An error has occurred when getting a counter value: "
-                                           << e.what() << std::endl;
+                ARMNN_LOG(warning) << "An error has occurred when getting a counter value: "
+                                           << e.what();
                 continue;
             }
             values.emplace_back(std::make_pair(requestedId, counterValue));

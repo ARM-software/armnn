@@ -324,11 +324,6 @@ bool ClLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
                                               const Optional<TensorInfo>& biases,
                                               Optional<std::string&> reasonIfUnsupported) const
 {
-    if (weights.HasPerAxisQuantization())
-    {
-        return false;
-    }
-
     // Multiplier > 1.0f currently not supported in ACL
     if ((input.GetQuantizationScale() * weights.GetQuantizationScale()) / output.GetQuantizationScale() > 1.0f)
     {

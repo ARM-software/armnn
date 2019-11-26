@@ -36,6 +36,12 @@ inline bool CompatibleTypes<uint8_t>(DataType dataType)
 }
 
 template<>
+inline bool CompatibleTypes<int8_t>(DataType dataType)
+{
+    return dataType == DataType::QuantisedSymm8 || dataType == DataType::QuantizedSymm8PerAxis;
+}
+
+template<>
 inline bool CompatibleTypes<int16_t>(DataType dataType)
 {
     return dataType == DataType::QuantisedSymm16;

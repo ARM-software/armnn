@@ -46,6 +46,9 @@ inline void InitializeArmComputeTensorData(arm_compute::Tensor& tensor,
         case DataType::QuantisedAsymm8:
             CopyArmComputeTensorData(tensor, handle->GetConstTensor<uint8_t>());
             break;
+        case DataType::QuantizedSymm8PerAxis:
+            CopyArmComputeTensorData(tensor, handle->GetConstTensor<int8_t>());
+            break;
         case DataType::Signed32:
             CopyArmComputeTensorData(tensor, handle->GetConstTensor<int32_t>());
             break;

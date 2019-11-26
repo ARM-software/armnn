@@ -195,6 +195,14 @@ constexpr bool IsQuantizedType()
     return std::is_integral<T>::value;
 }
 
+constexpr bool IsQuantizedType(DataType dataType)
+{
+    return dataType == DataType::QuantisedAsymm8 ||
+           dataType == DataType::QuantisedSymm8  ||
+           dataType == DataType::QuantisedSymm16 ||
+           dataType == DataType::QuantizedSymm8PerAxis;
+}
+
 inline std::ostream& operator<<(std::ostream& os, Status stat)
 {
     os << GetStatusAsCString(stat);

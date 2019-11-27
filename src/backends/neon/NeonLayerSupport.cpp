@@ -18,6 +18,7 @@
 
 #if defined(ARMCOMPUTENEON_ENABLED)
 #include <aclCommon/ArmComputeUtils.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
 #include "workloads/NeonAbsWorkload.hpp"
 #include "workloads/NeonAdditionWorkload.hpp"
 #include "workloads/NeonActivationWorkload.hpp"
@@ -110,6 +111,13 @@ inline bool IsWorkloadSupported(FuncType& func, Optional<std::string&> reasonIfU
 #else
 #define FORWARD_WORKLOAD_VALIDATE_FUNC(func, reasonIfUnsupported, ...) \
     return IsNeonBackendSupported(reasonIfUnsupported);
+#endif
+
+#if defined(ARMCOMPUTENEON_ENABLED)
+#define IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights) \
+armcomputetensorutils::IsQuantMultiplierSupported(input, output, weights)
+#else
+#define IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights) true
 #endif
 
 } // anonymous namespace
@@ -274,8 +282,7 @@ bool NeonLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
                                                 const Optional<TensorInfo>& biases,
                                                 Optional<std::string&> reasonIfUnsupported) const
 {
-    // Multiplier > 1.0f currently not supported in ACL
-    if ((input.GetQuantizationScale() * weights.GetQuantizationScale()) / output.GetQuantizationScale() > 1.0f)
+    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
     {
         return false;
     }
@@ -308,13 +315,7 @@ bool NeonLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                                        const Optional<TensorInfo>& biases,
                                                        Optional<std::string&> reasonIfUnsupported) const
 {
-    if (weights.HasPerAxisQuantization())
-    {
-        return false;
-    }
-
-    // Multiplier > 1.0f currently not supported in ACL
-    if ((input.GetQuantizationScale() * weights.GetQuantizationScale()) / output.GetQuantizationScale() > 1.0f)
+    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
     {
         return false;
     }
@@ -345,8 +346,7 @@ bool NeonLayerSupport::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& 
                                                               const Optional<TensorInfo>& biases,
                                                               Optional<std::string&> reasonIfUnsupported) const
 {
-    // Multiplier > 1.0f currently not supported in ACL
-    if ((input.GetQuantizationScale() * weights.GetQuantizationScale()) / output.GetQuantizationScale() > 1.0f)
+    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
     {
         return false;
     }
@@ -751,8 +751,7 @@ bool NeonLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input
                                                          const Optional<TensorInfo>& biases,
                                                          Optional<std::string&> reasonIfUnsupported) const
 {
-    // Multiplier > 1.0f currently not supported in ACL
-    if ((input.GetQuantizationScale() * weights.GetQuantizationScale()) / output.GetQuantizationScale() > 1.0f)
+    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
     {
         return false;
     }

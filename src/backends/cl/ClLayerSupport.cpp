@@ -16,6 +16,7 @@
 
 #if defined(ARMCOMPUTECL_ENABLED)
 #include <aclCommon/ArmComputeUtils.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
 #include "workloads/ClAbsWorkload.hpp"
 #include "workloads/ClAdditionWorkload.hpp"
 #include "workloads/ClActivationWorkload.hpp"
@@ -143,6 +144,13 @@ bool IsSupportedForDataTypeCl(Optional<std::string&> reasonIfUnsupported,
                                       &FalseFunc<>,
                                       std::forward<Params>(params)...);
 }
+
+#if defined(ARMCOMPUTECL_ENABLED)
+#define IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights) \
+armcomputetensorutils::IsQuantMultiplierSupported(input, output, weights)
+#else
+#define IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights) true
+#endif
 
 } // anonymous namespace
 
@@ -324,8 +332,7 @@ bool ClLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
                                               const Optional<TensorInfo>& biases,
                                               Optional<std::string&> reasonIfUnsupported) const
 {
-    // Multiplier > 1.0f currently not supported in ACL
-    if ((input.GetQuantizationScale() * weights.GetQuantizationScale()) / output.GetQuantizationScale() > 1.0f)
+    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
     {
         return false;
     }
@@ -368,13 +375,7 @@ bool ClLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                                      const Optional<TensorInfo>& biases,
                                                      Optional<std::string&> reasonIfUnsupported) const
 {
-    if (weights.HasPerAxisQuantization())
-    {
-        return false;
-    }
-
-    // Multiplier > 1.0f currently not supported in ACL
-    if ((input.GetQuantizationScale() * weights.GetQuantizationScale()) / output.GetQuantizationScale() > 1.0f)
+    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
     {
         return false;
     }
@@ -395,8 +396,7 @@ bool ClLayerSupport::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& in
                                                             const Optional<TensorInfo>& biases,
                                                             Optional<std::string&> reasonIfUnsupported) const
 {
-    // Multiplier > 1.0f currently not supported in ACL
-    if ((input.GetQuantizationScale() * weights.GetQuantizationScale()) / output.GetQuantizationScale() > 1.0f)
+    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
     {
         return false;
     }
@@ -814,8 +814,7 @@ bool ClLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
                                                        const Optional<TensorInfo>& biases,
                                                        Optional<std::string&> reasonIfUnsupported) const
 {
-    // Multiplier > 1.0f currently not supported in ACL
-    if ((input.GetQuantizationScale() * weights.GetQuantizationScale()) / output.GetQuantizationScale() > 1.0f)
+    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
     {
         return false;
     }

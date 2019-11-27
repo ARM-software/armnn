@@ -842,6 +842,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     if (options.m_ReduceFp32ToFp16)
     {
         Optimizer::Pass(optGraph, MakeOptimizations(Fp32NetworkToFp16Converter()));
+        Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
     }
 
     // Initialize backend settings

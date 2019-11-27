@@ -599,9 +599,7 @@ bool ClLayerSupport::IsPermuteSupported(const TensorInfo& input,
                                         const PermuteDescriptor& descriptor,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(input);
-    ignore_unused(output);
-    FORWARD_WORKLOAD_VALIDATE_FUNC(ClPermuteWorkloadValidate, reasonIfUnsupported, descriptor);
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClPermuteWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
 }
 
 bool ClLayerSupport::IsPooling2dSupported(const TensorInfo& input,

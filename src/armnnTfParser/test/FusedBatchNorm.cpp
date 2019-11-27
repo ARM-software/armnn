@@ -141,16 +141,22 @@ struct FusedBatchNormFixture : public armnnUtils::ParserPrototxtFixture<armnnTfP
             "    value { \n"
             "      type: DT_FLOAT \n"
             "    } \n"
-            "  } \n"
-            "  attr { \n"
-            "    key: \"data_format\" \n"
-            "    value { \n"
-            "      s: \"";
-        m_Prototext.append(dataLayout);
-        m_Prototext.append("\" \n"
-                           "    } \n"
-                           "  } \n"
-                           "  attr { \n"
+            "  } \n";
+
+        // NOTE: we only explicitly set data_format when it is not the default NHWC
+        if (dataLayout != "NHWC")
+        {
+            m_Prototext.append("  attr { \n"
+                "    key: \"data_format\" \n"
+                "    value { \n"
+                "      s: \"");
+            m_Prototext.append(dataLayout);
+            m_Prototext.append("\" \n"
+                "    } \n"
+                "  } \n");
+        }
+
+        m_Prototext.append("  attr { \n"
                            "    key: \"epsilon\" \n"
                            "    value { \n"
                            "      f: 0.0010000000475 \n"

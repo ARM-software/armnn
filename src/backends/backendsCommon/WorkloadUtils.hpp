@@ -53,8 +53,12 @@ void CopyTensorContentsGeneric(const ITensorHandle* srcTensor, ITensorHandle* ds
 
     TensorShape srcStrides      = srcTensor->GetStrides();
     const TensorShape& srcShape = srcTensor->GetShape();
+    const auto srcSize          = srcTensor->GetStrides()[0] * srcShape[0];
+    boost::ignore_unused(srcSize);  // Only used for asserts
     TensorShape dstStrides      = dstTensor->GetStrides();
     const TensorShape& dstShape = dstTensor->GetShape();
+    const auto dstSize          = dstTensor->GetStrides()[0] * dstShape[0];
+    boost::ignore_unused(dstSize);  // Only used for asserts
 
     size_t srcDepth    = 1;
     size_t srcBatches  = 1;
@@ -112,15 +116,15 @@ void CopyTensorContentsGeneric(const ITensorHandle* srcTensor, ITensorHandle* ds
                  dstBatchStride,
                  dstDepthStride);
 
-    const unsigned char* srcData;
-    unsigned char* dstData;
+    const unsigned char* srcDataStart;
+    unsigned char* dstDataStart;
     {
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Synchronize buffers");
-        srcData = static_cast<const uint8_t*>(srcTensor->Map());
-        dstData = static_cast<uint8_t*>(dstTensor->Map());
+        srcDataStart = static_cast<const uint8_t*>(srcTensor->Map());
+        dstDataStart = static_cast<uint8_t*>(dstTensor->Map());
     }
 
-    size_t copyLength  = std::min(srcChannels*srcChannelStride, dstChannels*dstChannelStride);
+    size_t copyLength  = std::min(srcChannels * srcChannelStride, dstChannels * dstChannelStride);
     size_t copyWidth   = std::min(srcWidth, dstWidth);
     size_t copyHeight  = std::min(srcHeight, dstHeight);
     size_t copyBatches = std::min(srcBatches, dstBatches);
@@ -147,6 +151,8 @@ void CopyTensorContentsGeneric(const ITensorHandle* srcTensor, ITensorHandle* ds
         }
     }
 
+    const unsigned char* srcData = srcDataStart;
+    unsigned char* dstData = dstDataStart;
     for (unsigned int d = 0; d < copyDepth; ++d)
     {
         auto srcPtrDepth = srcData;
@@ -161,6 +167,8 @@ void CopyTensorContentsGeneric(const ITensorHandle* srcTensor, ITensorHandle* ds
                 auto dstPtrChannel = dstData;
                 for (unsigned int w = 0; w < copyWidth; ++w)
                 {
+                    BOOST_ASSERT(srcData >= srcDataStart && srcData + copyLength <= srcDataStart + srcSize);
+                    BOOST_ASSERT(dstData >= dstDataStart && dstData + copyLength <= dstDataStart + dstSize);
                     copy(dstData, srcData, copyLength);
                     dstData += dstWidthStride;
                     srcData += srcWidthStride;

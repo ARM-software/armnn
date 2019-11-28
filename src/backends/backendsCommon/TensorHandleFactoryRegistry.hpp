@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "ITensorHandleFactory.hpp"
+#include <armnn/backends/ITensorHandleFactory.hpp>
 
 #include <memory>
 #include <vector>

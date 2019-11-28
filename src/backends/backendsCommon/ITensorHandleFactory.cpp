@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ITensorHandleFactory.hpp"
+#include <armnn/backends/ITensorHandleFactory.hpp>
 
 namespace armnn
 {

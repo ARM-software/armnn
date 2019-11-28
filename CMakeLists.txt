@@ -394,6 +394,8 @@ list(APPEND armnn_sources
     src/armnn/Observable.hpp
     src/armnn/Optimizer.cpp
     src/armnn/Optimizer.hpp
+    src/armnn/OutputHandler.cpp
+    src/armnn/OutputHandler.hpp
     src/armnn/OverrideInputRangeVisitor.cpp
     src/armnn/OverrideInputRangeVisitor.hpp
     src/armnn/Profiling.cpp

@@ -2,16 +2,19 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #pragma once
 
-#include "CpuTensorHandleFwd.hpp"
-#include "CompatibleTypes.hpp"
+#include <armnn/backends/CpuTensorHandleFwd.hpp>
+#include <armnn/backends/ITensorHandle.hpp>
 
 #include <armnn/TypesUtils.hpp>
 
-#include <backendsCommon/OutputHandler.hpp>
+#include <CompatibleTypes.hpp>
 
 #include <algorithm>
+
+#include <boost/assert.hpp>
 
 namespace armnn
 {

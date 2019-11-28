@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "LayerSupportBase.hpp"
-
 #include <armnn/Exceptions.hpp>
+
+#include <backendsCommon/LayerSupportBase.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 

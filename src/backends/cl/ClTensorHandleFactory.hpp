@@ -4,9 +4,9 @@
 //
 #pragma once
 
-#include <backendsCommon/ITensorHandleFactory.hpp>
+#include <armnn/backends/ITensorHandleFactory.hpp>
 #include <aclCommon/BaseMemoryManager.hpp>
-#include <backendsCommon/IMemoryManager.hpp>
+#include <armnn/backends/IMemoryManager.hpp>
 #include <armnn/MemorySources.hpp>
 
 namespace armnn

@@ -7,7 +7,7 @@
 
 #include <Half.hpp>
 
-#include <backendsCommon/IBackendInternal.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <vector>

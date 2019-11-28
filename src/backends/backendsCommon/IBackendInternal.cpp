@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "IBackendInternal.hpp"
+#include <armnn/backends/IBackendInternal.hpp>
 
 namespace armnn
 {

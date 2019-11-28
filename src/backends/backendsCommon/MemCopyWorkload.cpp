@@ -3,11 +3,10 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "MemCopyWorkload.hpp"
-
-#include "CpuTensorHandle.hpp"
-
 #include <ResolveType.hpp>
+
+#include <backendsCommon/MemCopyWorkload.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <boost/cast.hpp>
 

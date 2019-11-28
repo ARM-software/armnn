@@ -7,7 +7,7 @@
 
 #include "LayerTestResult.hpp"
 
-#include <backendsCommon/IBackendInternal.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 LayerTestResult<uint8_t, 4> QuantizeSimpleUint8Test(

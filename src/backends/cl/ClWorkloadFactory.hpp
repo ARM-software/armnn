@@ -8,7 +8,6 @@
 #include <armnn/Optional.hpp>
 
 #include <backendsCommon/WorkloadFactoryBase.hpp>
-#include <backendsCommon/OutputHandler.hpp>
 #include <aclCommon/BaseMemoryManager.hpp>
 
 namespace armnn

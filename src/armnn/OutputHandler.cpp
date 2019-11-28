@@ -5,9 +5,8 @@
 
 #include "OutputHandler.hpp"
 
-#include "ITensorHandle.hpp"
-#include "WorkloadDataCollector.hpp"
-
+#include <armnn/backends/ITensorHandle.hpp>
+#include <backendsCommon/WorkloadDataCollector.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <boost/assert.hpp>

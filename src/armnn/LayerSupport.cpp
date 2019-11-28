@@ -8,7 +8,7 @@
 #include <armnn/ILayerSupport.hpp>
 #include <armnn/BackendRegistry.hpp>
 
-#include <backendsCommon/IBackendInternal.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 
 #include <boost/assert.hpp>
 

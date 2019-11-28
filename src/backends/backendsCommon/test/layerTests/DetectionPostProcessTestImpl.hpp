@@ -9,7 +9,7 @@
 #include <armnn/Types.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
-#include <backendsCommon/IBackendInternal.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <backendsCommon/test/TensorCopyUtils.hpp>

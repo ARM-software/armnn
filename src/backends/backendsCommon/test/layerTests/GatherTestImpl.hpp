@@ -9,7 +9,7 @@
 
 #include <Half.hpp>
 
-#include <backendsCommon/IBackendInternal.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 LayerTestResult<float, 1> Gather1dParamsFloat32Test(

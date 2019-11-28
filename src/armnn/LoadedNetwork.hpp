@@ -11,7 +11,7 @@
 #include "LayerFwd.hpp"
 #include "Profiling.hpp"
 
-#include <backendsCommon/IBackendInternal.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>

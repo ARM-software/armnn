@@ -7,7 +7,7 @@
 #include <armnn/Version.hpp>
 #include <armnn/BackendRegistry.hpp>
 
-#include <backendsCommon/IBackendContext.hpp>
+#include <armnn/backends/IBackendContext.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
 
 #include <ProfilingService.hpp>

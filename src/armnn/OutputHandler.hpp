@@ -4,8 +4,8 @@
 //
 #pragma once
 
-#include "ITensorHandle.hpp"
-#include "ITensorHandleFactory.hpp"
+#include <armnn/backends/ITensorHandle.hpp>
+#include <armnn/backends/ITensorHandleFactory.hpp>
 
 #include <armnn/Descriptors.hpp>
 #include <armnn/INetwork.hpp>

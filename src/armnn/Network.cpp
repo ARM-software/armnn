@@ -14,7 +14,7 @@
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-#include <backendsCommon/IBackendInternal.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 
 #include <armnn/Exceptions.hpp>

@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <backendsCommon/IBackendInternal.hpp>
-#include <backendsCommon/IMemoryManager.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
+#include <armnn/backends/IMemoryManager.hpp>
 #include <backendsCommon/test/WorkloadFactoryHelper.hpp>
 
 #include <cl/ClBackend.hpp>

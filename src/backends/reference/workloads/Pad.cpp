@@ -4,7 +4,7 @@
 //
 
 #include "Pad.hpp"
-#include "backendsCommon/WorkloadData.hpp"
+#include <backendsCommon/WorkloadData.hpp>
 #include "TensorBufferArrayView.hpp"
 #include "Encoders.hpp"
 

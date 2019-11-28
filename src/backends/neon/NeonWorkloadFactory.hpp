@@ -7,7 +7,6 @@
 #include <armnn/Optional.hpp>
 
 #include <backendsCommon/WorkloadFactoryBase.hpp>
-#include <backendsCommon/OutputHandler.hpp>
 #include <aclCommon/BaseMemoryManager.hpp>
 
 #include <boost/core/ignore_unused.hpp>

@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include <backendsCommon/IMemoryManager.hpp>
+#include <armnn/backends/IMemoryManager.hpp>
 
 #include <forward_list>
 #include <vector>

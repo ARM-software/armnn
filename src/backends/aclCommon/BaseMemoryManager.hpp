@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include <backendsCommon/IMemoryManager.hpp>
+#include <armnn/backends/IMemoryManager.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)

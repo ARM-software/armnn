@@ -6,7 +6,8 @@
 #pragma once
 
 #include "CpuTensorHandle.hpp"
-#include "ITensorHandle.hpp"
+
+#include <armnn/backends/ITensorHandle.hpp>
 
 #include <armnn/Tensor.hpp>
 

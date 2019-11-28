@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include "backendsCommon/Workload.hpp"
+#include <backendsCommon/Workload.hpp>
 
 #include <armnn/TypesUtils.hpp>
 

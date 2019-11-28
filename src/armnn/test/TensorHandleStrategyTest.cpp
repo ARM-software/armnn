@@ -6,10 +6,10 @@
 
 #include <armnn/LayerVisitorBase.hpp>
 
-#include <backendsCommon/IBackendContext.hpp>
-#include <backendsCommon/IBackendInternal.hpp>
-#include <backendsCommon/IMemoryManager.hpp>
-#include <backendsCommon/ITensorHandleFactory.hpp>
+#include <armnn/backends/IBackendContext.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
+#include <armnn/backends/IMemoryManager.hpp>
+#include <armnn/backends/ITensorHandleFactory.hpp>
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 
 #include <optimizations/Optimization.hpp>

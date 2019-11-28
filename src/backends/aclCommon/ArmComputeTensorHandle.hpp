@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <armnn/backends/ITensorHandle.hpp>
+
 #include <arm_compute/runtime/IMemoryGroup.h>
 #include <arm_compute/runtime/Tensor.h>
 

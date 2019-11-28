@@ -6,7 +6,7 @@
 #include <armnn/BackendHelper.hpp>
 #include <armnn/BackendRegistry.hpp>
 
-#include <backendsCommon/IBackendInternal.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 
 namespace armnn
 {

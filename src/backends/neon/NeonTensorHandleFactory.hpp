@@ -6,7 +6,7 @@
 #pragma once
 
 #include <aclCommon/BaseMemoryManager.hpp>
-#include <backendsCommon/ITensorHandleFactory.hpp>
+#include <armnn/backends/ITensorHandleFactory.hpp>
 
 namespace armnn
 {

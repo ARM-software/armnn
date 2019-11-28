@@ -4,6 +4,7 @@
 //
 
 #pragma once
+
 #include <SubgraphView.hpp>
 
 namespace armnn

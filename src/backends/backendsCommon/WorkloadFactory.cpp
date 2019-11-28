@@ -3,9 +3,6 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "CpuTensorHandle.hpp"
-#include "WorkloadFactory.hpp"
-
 #include <Layer.hpp>
 #include <LayersFwd.hpp>
 
@@ -15,7 +12,10 @@
 #include <armnn/BackendRegistry.hpp>
 
 #include <backendsCommon/WorkloadFactory.hpp>
-#include <backendsCommon/IBackendInternal.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/WorkloadFactory.hpp>
+
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
 #include <boost/cast.hpp>

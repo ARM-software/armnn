@@ -3,9 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "TensorHandleFactoryRegistry.hpp"
-#include "IMemoryManager.hpp"
-
+#include <backendsCommon/TensorHandleFactoryRegistry.hpp>
+#include <armnn/backends/IMemoryManager.hpp>
 
 namespace armnn
 {

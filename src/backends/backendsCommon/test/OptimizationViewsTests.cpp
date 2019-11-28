@@ -8,7 +8,7 @@
 #include <Graph.hpp>
 #include <SubgraphView.hpp>
 #include <SubgraphViewSelector.hpp>
-#include <backendsCommon/OptimizationViews.hpp>
+#include <armnn/backends/OptimizationViews.hpp>
 #include <Network.hpp>
 
 #include "CommonTestUtils.hpp"

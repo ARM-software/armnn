@@ -7,7 +7,7 @@
 #include "SubgraphView.hpp"
 #include "LayersFwd.hpp"
 
-#include <backendsCommon/IBackendInternal.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 
 #include <armnn/BackendId.hpp>
 #include <armnn/Utils.hpp>

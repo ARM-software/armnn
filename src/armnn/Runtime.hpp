@@ -12,7 +12,7 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/BackendId.hpp>
 
-#include <backendsCommon/DynamicBackend.hpp>
+#include <armnn/backends/DynamicBackend.hpp>
 
 #include <mutex>
 #include <unordered_map>

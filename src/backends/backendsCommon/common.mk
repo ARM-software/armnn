@@ -18,7 +18,6 @@ COMMON_SOURCES := \
     MemImportWorkload.cpp \
     MemSyncWorkload.cpp \
     OptimizationViews.cpp \
-    OutputHandler.cpp \
     TensorHandleFactoryRegistry.cpp \
     WorkloadData.cpp \
     WorkloadFactory.cpp \

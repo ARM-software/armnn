@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "backendsCommon/Workload.hpp"
-#include "backendsCommon/WorkloadData.hpp"
+#include <backendsCommon/Workload.hpp>
+#include <backendsCommon/WorkloadData.hpp>
 
 #include "Decoders.hpp"
 #include "Encoders.hpp"

@@ -7,7 +7,7 @@
 
 #include "RefMemoryManager.hpp"
 
-#include <backendsCommon/ITensorHandleFactory.hpp>
+#include <armnn/backends/ITensorHandleFactory.hpp>
 
 namespace armnn
 {

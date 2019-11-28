@@ -17,8 +17,6 @@
 
 #include <backendsCommon/LayerSupportRules.hpp>
 
-#include <backendsCommon/test/WorkloadTestUtils.hpp>
-
 #include <boost/cast.hpp>
 #include <boost/core/ignore_unused.hpp>
 

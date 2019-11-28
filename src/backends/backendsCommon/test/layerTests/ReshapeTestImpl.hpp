@@ -9,7 +9,7 @@
 
 #include <ResolveType.hpp>
 
-#include <backendsCommon/IBackendInternal.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>

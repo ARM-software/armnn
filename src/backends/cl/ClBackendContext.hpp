@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include <backendsCommon/IBackendContext.hpp>
+#include <armnn/backends/IBackendContext.hpp>
 #include <unordered_set>
 #include <mutex>
 

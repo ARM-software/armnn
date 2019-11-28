@@ -11,9 +11,6 @@
 namespace armnn
 {
 
-namespace
-{
-
 inline armnn::Optional<armnn::DataType> GetBiasTypeFromWeightsType(armnn::Optional<armnn::DataType> weightsType)
 {
     if (!weightsType)
@@ -35,8 +32,6 @@ inline armnn::Optional<armnn::DataType> GetBiasTypeFromWeightsType(armnn::Option
     }
     return armnn::EmptyOptional();
 }
-
-} //namespace
 
 template<typename F>
 bool CheckSupportRule(F rule, Optional<std::string&> reasonIfUnsupported, const char* reason)

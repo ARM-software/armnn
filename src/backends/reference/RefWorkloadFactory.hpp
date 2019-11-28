@@ -6,7 +6,6 @@
 
 #include <armnn/Optional.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-#include <backendsCommon/OutputHandler.hpp>
 
 #include "RefMemoryManager.hpp"
 

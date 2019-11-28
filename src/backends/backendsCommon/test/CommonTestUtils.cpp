@@ -5,7 +5,7 @@
 
 #include "CommonTestUtils.hpp"
 
-#include <backendsCommon/IBackendInternal.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 
 using namespace armnn;
 

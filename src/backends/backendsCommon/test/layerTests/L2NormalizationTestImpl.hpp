@@ -9,7 +9,7 @@
 
 #include <armnn/Types.hpp>
 
-#include <backendsCommon/IBackendInternal.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 LayerTestResult<float, 4> L2NormalizationDefaultEpsilonTest(

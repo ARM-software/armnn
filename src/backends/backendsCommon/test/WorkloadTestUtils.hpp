@@ -6,8 +6,8 @@
 
 #include <armnn/Tensor.hpp>
 
-#include <backendsCommon/IBackendInternal.hpp>
-#include <backendsCommon/IMemoryManager.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
+#include <armnn/backends/IMemoryManager.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadInfo.hpp>
 

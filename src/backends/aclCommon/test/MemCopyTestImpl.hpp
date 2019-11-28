@@ -6,7 +6,7 @@
 
 #include <ResolveType.hpp>
 
-#include <backendsCommon/IBackendInternal.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 
 #include <backendsCommon/test/LayerTests.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>

@@ -6,8 +6,8 @@
 #include "NeonLstmFloatWorkload.hpp"
 #include "NeonWorkloadUtils.hpp"
 
-#include "backendsCommon/CpuTensorHandle.hpp"
 #include "aclCommon/ArmComputeTensorUtils.hpp"
+
 #include "neon/NeonTensorHandle.hpp"
 
 namespace armnn

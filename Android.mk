@@ -95,6 +95,7 @@ LOCAL_SRC_FILES := \
         src/armnn/Observable.cpp \
         src/armnn/Optimizer.cpp \
         src/armnn/optimizations/PermuteAndBatchToSpaceAsDepthToSpace.cpp \
+        src/armnn/OutputHandler.cpp \
         src/armnn/ProfilingEvent.cpp \
         src/armnn/Profiling.cpp \
         src/armnn/Runtime.cpp \

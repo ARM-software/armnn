@@ -6,8 +6,8 @@
 
 #include "LayerFwd.hpp"
 
-#include <backendsCommon/ITensorHandleFactory.hpp>
-#include <backendsCommon/OutputHandler.hpp>
+#include <armnn/backends/ITensorHandleFactory.hpp>
+#include <OutputHandler.hpp>
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 #include <backendsCommon/WorkloadDataCollector.hpp>
 #include <backendsCommon/WorkloadInfo.hpp>

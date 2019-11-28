@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "IBackendInternal.hpp"
-#include "DynamicBackend.hpp"
+#include <armnn/backends/DynamicBackend.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 
 #include <armnn/Exceptions.hpp>
 

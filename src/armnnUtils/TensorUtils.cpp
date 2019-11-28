@@ -5,7 +5,7 @@
 
 #include <armnnUtils/TensorUtils.hpp>
 
-#include <backendsCommon/ITensorHandle.hpp>
+#include <armnn/backends/ITensorHandle.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/format.hpp>

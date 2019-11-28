@@ -4,7 +4,8 @@
 //
 #pragma once
 
-#include "CpuTensorHandleFwd.hpp"
+#include <armnn/backends/CpuTensorHandleFwd.hpp>
+#include <armnn/backends/ITensorHandle.hpp>
 
 #include <InternalTypes.hpp>
 
@@ -14,7 +15,6 @@
 #include <armnn/Types.hpp>
 #include <armnn/Tensor.hpp>
 
-#include <backendsCommon/OutputHandler.hpp>
 #include <backendsCommon/WorkloadInfo.hpp>
 
 namespace armnn

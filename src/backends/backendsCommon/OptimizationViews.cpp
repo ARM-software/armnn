@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "OptimizationViews.hpp"
-
+#include <armnn/backends/OptimizationViews.hpp>
 
 namespace armnn
 {

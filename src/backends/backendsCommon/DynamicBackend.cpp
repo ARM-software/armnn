@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "DynamicBackend.hpp"
-#include "DynamicBackendUtils.hpp"
+#include <armnn/backends/DynamicBackend.hpp>
+#include <backendsCommon/DynamicBackendUtils.hpp>
 
 namespace armnn
 {

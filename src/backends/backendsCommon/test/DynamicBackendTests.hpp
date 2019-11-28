@@ -5,12 +5,13 @@
 
 #pragma once
 
-#include <backendsCommon/DynamicBackend.hpp>
+#include <armnn/BackendRegistry.hpp>
+#include <armnn/ILayerSupport.hpp>
+
+#include <armnn/backends/DynamicBackend.hpp>
+
 #include <backendsCommon/DynamicBackendUtils.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
-
-#include <armnn/ILayerSupport.hpp>
-#include <armnn/BackendRegistry.hpp>
 
 #include <reference/workloads/RefConvolution2dWorkload.hpp>
 

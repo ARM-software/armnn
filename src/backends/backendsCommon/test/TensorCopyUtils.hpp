@@ -6,7 +6,7 @@
 
 #include <armnn/Tensor.hpp>
 
-#include <backendsCommon/ITensorHandle.hpp>
+#include <armnn/backends/ITensorHandle.hpp>
 
 void CopyDataToITensorHandle(armnn::ITensorHandle* tensorHandle, const void* memory);
 

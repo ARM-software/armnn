@@ -4,19 +4,20 @@
 //
 #include "GraphUtils.hpp"
 
-#include <boost/test/unit_test.hpp>
-#include <boost/cast.hpp>
+#include <Graph.hpp>
+#include <Layer.hpp>
 
 #include <armnn/ArmNN.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <armnn/Exceptions.hpp>
-#include <Graph.hpp>
-#include <Layer.hpp>
+
+#include <armnn/backends/IBackendInternal.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
-#include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 
+#include <boost/cast.hpp>
+#include <boost/test/unit_test.hpp>
 
 /// Checks that first comes before second in the order.
 bool CheckOrder(const armnn::Graph& graph, const armnn::Layer* first, const armnn::Layer* second)

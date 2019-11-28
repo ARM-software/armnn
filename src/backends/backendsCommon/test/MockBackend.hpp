@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <backendsCommon/IBackendInternal.hpp>
-#include <backendsCommon/OptimizationViews.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
+#include <armnn/backends/OptimizationViews.hpp>
 #include <LayerSupportCommon.hpp>
 #include <backendsCommon/LayerSupportBase.hpp>
 

@@ -6,7 +6,6 @@
 
 #include <Half.hpp>
 
-#include <backendsCommon/OutputHandler.hpp>
 #include <aclCommon/ArmComputeTensorHandle.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 

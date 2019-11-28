@@ -6,8 +6,8 @@
 
 #include <armnn/TensorFwd.hpp>
 #include <armnn/Optional.hpp>
+#include <armnn/backends/ITensorHandle.hpp>
 
-#include <backendsCommon/OutputHandler.hpp>
 #include <backendsCommon/Workload.hpp>
 
 #include <memory>

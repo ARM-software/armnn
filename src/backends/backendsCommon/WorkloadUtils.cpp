@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "WorkloadUtils.hpp"
+#include <backendsCommon/WorkloadUtils.hpp>
 
 namespace armnn
 {

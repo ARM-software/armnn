@@ -11,8 +11,8 @@
 
 #include <armnn/BackendRegistry.hpp>
 
-#include <backendsCommon/IBackendContext.hpp>
-#include <backendsCommon/IMemoryManager.hpp>
+#include <armnn/backends/IBackendContext.hpp>
+#include <armnn/backends/IMemoryManager.hpp>
 
 #include <Optimizer.hpp>
 

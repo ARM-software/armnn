@@ -5,7 +5,7 @@
 
 #include "TestDynamicBackend.hpp"
 
-#include <backendsCommon/IBackendInternal.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 
 constexpr const char* TestDynamicBackendId()
 {

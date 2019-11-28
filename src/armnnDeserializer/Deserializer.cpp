@@ -8,8 +8,9 @@
 #include <armnn/ArmNN.hpp>
 #include <armnn/Exceptions.hpp>
 
+#include <armnnUtils/Permute.hpp>
+
 #include <ParserHelper.hpp>
-#include <Permute.hpp>
 #include <VerificationHelpers.hpp>
 
 #include <boost/filesystem.hpp>

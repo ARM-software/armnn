@@ -7,8 +7,9 @@
 
 #include "Optimization.hpp"
 
+#include <armnnUtils/FloatingPointConverter.hpp>
+
 #include <backendsCommon/CpuTensorHandle.hpp>
-#include <FloatingPointConverter.hpp>
 
 #include <Half.hpp>
 

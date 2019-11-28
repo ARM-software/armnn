@@ -4,8 +4,10 @@
 //
 
 #include "../InferenceTestImage.hpp"
-#include "Permute.hpp"
+
 #include <armnn/TypesUtils.hpp>
+
+#include <armnnUtils/Permute.hpp>
 
 #include <algorithm>
 #include <fstream>

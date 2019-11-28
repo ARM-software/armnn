@@ -4,10 +4,11 @@
 //
 
 #include "Pooling2d.hpp"
-#include "DataLayoutIndexed.hpp"
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Types.hpp>
+
+#include <armnnUtils/DataLayoutIndexed.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
 

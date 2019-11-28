@@ -8,10 +8,11 @@
 #include <armnn/TypesUtils.hpp>
 #include <armnn/Descriptors.hpp>
 
+#include <armnnUtils/Permute.hpp>
+#include <armnnUtils/DataLayoutIndexed.hpp>
+
 #include <GraphTopologicalSort.hpp>
 #include <ParserHelper.hpp>
-#include <Permute.hpp>
-#include <DataLayoutIndexed.hpp>
 
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>

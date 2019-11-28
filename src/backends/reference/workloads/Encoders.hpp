@@ -6,7 +6,8 @@
 #pragma once
 
 #include "BaseIterator.hpp"
-#include "TensorUtils.hpp"
+
+#include <armnnUtils/TensorUtils.hpp>
 
 #include <boost/assert.hpp>
 

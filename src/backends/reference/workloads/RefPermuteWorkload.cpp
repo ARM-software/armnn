@@ -6,7 +6,8 @@
 #include "RefPermuteWorkload.hpp"
 #include "RefWorkloadUtils.hpp"
 
-#include <Permute.hpp>
+#include <armnnUtils/Permute.hpp>
+
 #include <ResolveType.hpp>
 
 namespace armnn

@@ -8,7 +8,7 @@
 
 #include <armnn/Tensor.hpp>
 
-#include <DataLayoutIndexed.hpp>
+#include <armnnUtils/DataLayoutIndexed.hpp>
 
 #include <cmath>
 

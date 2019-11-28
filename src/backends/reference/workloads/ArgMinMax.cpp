@@ -5,7 +5,7 @@
 
 #include "ArgMinMax.hpp"
 
-#include <TensorUtils.hpp>
+#include <armnnUtils/TensorUtils.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
 

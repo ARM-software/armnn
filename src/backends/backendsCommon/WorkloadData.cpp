@@ -2,11 +2,13 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include "WorkloadData.hpp"
 
 #include "CpuTensorHandle.hpp"
 
-#include <DataLayoutIndexed.hpp>
+#include <armnnUtils/DataLayoutIndexed.hpp>
+#include <armnnUtils/TensorUtils.hpp>
 
 #include <algorithm>
 #include <iomanip>
@@ -15,7 +17,6 @@
 
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include <TensorUtils.hpp>
 
 using namespace armnnUtils;
 

@@ -10,8 +10,9 @@
 
 #include <armnn/Tensor.hpp>
 
+#include <armnnUtils/Permute.hpp>
+
 #include <Half.hpp>
-#include <Permute.hpp>
 #include <Profiling.hpp>
 
 #include <boost/cast.hpp>

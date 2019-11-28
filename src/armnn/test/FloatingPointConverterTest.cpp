@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "FloatingPointConverter.hpp"
+#include <armnnUtils/FloatingPointConverter.hpp>
+
 #include <Half.hpp>
 
 #include <boost/test/unit_test.hpp>

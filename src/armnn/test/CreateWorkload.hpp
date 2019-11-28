@@ -6,14 +6,15 @@
 
 #include "TestUtils.hpp"
 
+#include <Graph.hpp>
+#include <Network.hpp>
+#include <ResolveType.hpp>
+
+#include <armnnUtils/DataLayoutIndexed.hpp>
+
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
-
-#include <Graph.hpp>
-#include <DataLayoutIndexed.hpp>
-#include <Network.hpp>
-#include <ResolveType.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/cast.hpp>

@@ -5,11 +5,12 @@
 
 #include "BatchNormalizationTestImpl.hpp"
 
-#include <DataLayoutIndexed.hpp>
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
+
+#include <armnnUtils/DataLayoutIndexed.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/IBackendInternal.hpp>

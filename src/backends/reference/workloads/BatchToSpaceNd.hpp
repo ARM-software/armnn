@@ -5,15 +5,16 @@
 
 #pragma once
 
-#include <armnn/Types.hpp>
-
-#include <backendsCommon/Workload.hpp>
-#include <backendsCommon/WorkloadData.hpp>
 #include "BaseIterator.hpp"
 #include "Decoders.hpp"
 #include "Encoders.hpp"
 
-#include <DataLayoutIndexed.hpp>
+#include <armnn/Types.hpp>
+
+#include <armnnUtils/DataLayoutIndexed.hpp>
+
+#include <backendsCommon/Workload.hpp>
+#include <backendsCommon/WorkloadData.hpp>
 
 namespace armnn
 {

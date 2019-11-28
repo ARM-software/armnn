@@ -2,19 +2,19 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "BatchToSpaceNdLayer.hpp"
 
+#include "BatchToSpaceNdLayer.hpp"
 #include "LayerCloneBase.hpp"
 #include "LayerWithParameters.hpp"
 #include "BatchToSpaceNdLayer.hpp"
 
 #include <armnn/TypesUtils.hpp>
 
+#include <armnnUtils/DataLayoutIndexed.hpp>
+
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-
-#include <DataLayoutIndexed.hpp>
 
 #include <numeric>
 

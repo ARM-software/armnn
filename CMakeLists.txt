@@ -36,14 +36,16 @@ add_custom_target(AdditionalCMakeFiles SOURCES ${additional_cmake_files})
 
 set(armnnUtils_sources)
 list(APPEND armnnUtils_sources
+    include/armnnUtils/DataLayoutIndexed.hpp
+    include/armnnUtils/Permute.hpp
+    include/armnnUtils/FloatingPointConverter.hpp
+    include/armnnUtils/TensorUtils.hpp
     src/armnnUtils/GraphTopologicalSort.hpp
     src/armnnUtils/Half.hpp
     src/armnnUtils/Logging.hpp
     src/armnnUtils/Logging.cpp
-    src/armnnUtils/Permute.hpp
     src/armnnUtils/Permute.cpp
     src/armnnUtils/DataLayoutIndexed.cpp
-    src/armnnUtils/DataLayoutIndexed.hpp
     src/armnnUtils/DotSerializer.cpp
     src/armnnUtils/DotSerializer.hpp
     src/armnnUtils/HeapProfiling.cpp
@@ -55,7 +57,6 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/CsvReader.cpp
     src/armnnUtils/CsvReader.hpp
     src/armnnUtils/FloatingPointConverter.cpp
-    src/armnnUtils/FloatingPointConverter.hpp
     src/armnnUtils/VerificationHelpers.hpp
     src/armnnUtils/VerificationHelpers.cpp
     src/armnnUtils/ParserHelper.hpp
@@ -65,7 +66,6 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/PrototxtConversions.cpp
     src/armnnUtils/QuantizeHelper.hpp
     src/armnnUtils/TensorIOUtils.hpp
-    src/armnnUtils/TensorUtils.hpp
     src/armnnUtils/TensorUtils.cpp
     )
 

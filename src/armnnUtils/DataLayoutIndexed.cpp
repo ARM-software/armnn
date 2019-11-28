@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "DataLayoutIndexed.hpp"
+#include <armnnUtils/DataLayoutIndexed.hpp>
+
 using namespace armnn;
 
 namespace armnnUtils

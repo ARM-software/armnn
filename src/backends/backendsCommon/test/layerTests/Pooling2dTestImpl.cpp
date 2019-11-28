@@ -5,13 +5,14 @@
 
 #include "Pooling2dTestImpl.hpp"
 
-#include <armnn/LayerSupport.hpp>
-
-#include <DataLayoutIndexed.hpp>
-#include <Permute.hpp>
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
-#include <TensorUtils.hpp>
+
+#include <armnn/LayerSupport.hpp>
+
+#include <armnnUtils/TensorUtils.hpp>
+#include <armnnUtils/DataLayoutIndexed.hpp>
+#include <armnnUtils/Permute.hpp>
 
 #include <backendsCommon/WorkloadInfo.hpp>
 

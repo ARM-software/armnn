@@ -5,10 +5,11 @@
 
 #include "L2NormalizationTestImpl.hpp"
 
-#include <Permute.hpp>
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
-#include <TensorUtils.hpp>
+
+#include <armnnUtils/TensorUtils.hpp>
+#include <armnnUtils/Permute.hpp>
 
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>

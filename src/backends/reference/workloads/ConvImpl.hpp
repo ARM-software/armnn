@@ -13,12 +13,10 @@
 
 #include <armnn/Tensor.hpp>
 
-#include <DataLayoutIndexed.hpp>
+#include <armnnUtils/DataLayoutIndexed.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-
-#include <DataLayoutIndexed.hpp>
 
 #include <cmath>
 #include <limits>

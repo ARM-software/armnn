@@ -7,9 +7,12 @@
 
 #include "NeonWorkloadUtils.hpp"
 
-#include <DataLayoutIndexed.hpp>
+#include <armnnUtils/DataLayoutIndexed.hpp>
+
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+
 #include <neon/NeonLayerSupport.hpp>
+
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadUtils.hpp>
 

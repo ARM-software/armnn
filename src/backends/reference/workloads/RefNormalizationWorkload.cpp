@@ -4,14 +4,14 @@
 //
 
 #include "RefNormalizationWorkload.hpp"
-
 #include "RefWorkloadUtils.hpp"
 #include "Decoders.hpp"
 #include "Encoders.hpp"
 
 #include <armnn/Tensor.hpp>
 
-#include <DataLayoutIndexed.hpp>
+#include <armnnUtils/DataLayoutIndexed.hpp>
+
 #include <Profiling.hpp>
 
 #include <boost/log/trivial.hpp>

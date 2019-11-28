@@ -5,8 +5,8 @@
 
 #include "DepthToSpace.hpp"
 
-#include <DataLayoutIndexed.hpp>
-#include <Permute.hpp>
+#include <armnnUtils/DataLayoutIndexed.hpp>
+#include <armnnUtils/Permute.hpp>
 
 #include <boost/assert.hpp>
 

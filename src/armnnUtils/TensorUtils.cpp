@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "TensorUtils.hpp"
+#include <armnnUtils/TensorUtils.hpp>
 
 #include <backendsCommon/ITensorHandle.hpp>
 

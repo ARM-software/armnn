@@ -5,7 +5,7 @@
 
 #include "LogSoftmax.hpp"
 
-#include <TensorUtils.hpp>
+#include <armnnUtils/TensorUtils.hpp>
 
 #include <cmath>
 

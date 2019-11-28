@@ -5,7 +5,7 @@
 
 #include "SpaceToDepth.hpp"
 
-#include <DataLayoutIndexed.hpp>
+#include <armnnUtils/DataLayoutIndexed.hpp>
 
 using namespace armnnUtils;
 

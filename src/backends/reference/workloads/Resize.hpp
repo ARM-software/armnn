@@ -6,9 +6,10 @@
 #pragma once
 
 #include "BaseIterator.hpp"
+
 #include <armnn/Tensor.hpp>
 
-#include <DataLayoutIndexed.hpp>
+#include <armnnUtils/DataLayoutIndexed.hpp>
 
 namespace armnn
 {
@@ -20,4 +21,4 @@ void Resize(Decoder<float>&               in,
             armnnUtils::DataLayoutIndexed dataLayout = DataLayout::NCHW,
             ResizeMethod                  resizeMethod = ResizeMethod::NearestNeighbor);
 
-} //namespace armnn
+} // namespace armnn

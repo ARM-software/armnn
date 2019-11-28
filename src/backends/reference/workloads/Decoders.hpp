@@ -6,8 +6,9 @@
 #pragma once
 
 #include "BaseIterator.hpp"
-#include "FloatingPointConverter.hpp"
-#include "TensorUtils.hpp"
+
+#include <armnnUtils/FloatingPointConverter.hpp>
+#include <armnnUtils/TensorUtils.hpp>
 
 #include <boost/assert.hpp>
 

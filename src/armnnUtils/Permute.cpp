@@ -3,10 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "Permute.hpp"
+#include <armnn/Tensor.hpp>
+
+#include <armnnUtils/Permute.hpp>
 
 #include "Half.hpp"
-#include <armnn/Tensor.hpp>
 
 #include <cassert>
 #include <cstring>

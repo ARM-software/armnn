@@ -5,12 +5,13 @@
 
 #include "ResizeTestImpl.hpp"
 
-#include <DataLayoutIndexed.hpp>
-#include <Permute.hpp>
 #include <QuantizeHelper.hpp>
-#include <TensorUtils.hpp>
 
 #include <armnn/ArmNN.hpp>
+
+#include <armnnUtils/TensorUtils.hpp>
+#include <armnnUtils/DataLayoutIndexed.hpp>
+#include <armnnUtils/Permute.hpp>
 
 #include <backendsCommon/test/DataLayoutUtils.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>

@@ -5,12 +5,13 @@
 
 #include "Conv2dTestImpl.hpp"
 
-#include <DataLayoutIndexed.hpp>
-#include <Permute.hpp>
 #include <QuantizeHelper.hpp>
-#include <TensorUtils.hpp>
+#include <armnnUtils/TensorUtils.hpp>
 
 #include <armnn/ArmNN.hpp>
+
+#include <armnnUtils/DataLayoutIndexed.hpp>
+#include <armnnUtils/Permute.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 

@@ -5,7 +5,8 @@
 #pragma once
 
 #include "Optimization.hpp"
-#include "Permute.hpp"
+
+#include <armnnUtils/Permute.hpp>
 
 namespace armnn
 {

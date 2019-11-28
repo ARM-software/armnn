@@ -2,6 +2,7 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include "TfLiteParser.hpp"
 
 #include <armnn/ArmNN.hpp>
@@ -10,12 +11,15 @@
 #include <boost/filesystem.hpp>
 
 // armnnUtils:
+#include <armnnUtils/Permute.hpp>
+
 #include <ParserHelper.hpp>
-#include <Permute.hpp>
 #include <VerificationHelpers.hpp>
 
 // The generated code based on the Tf Lite schema:
 #include <schema_generated.h>
+
+#include <flatbuffers/flexbuffers.h>
 
 #include <boost/core/ignore_unused.hpp>
 #include <boost/assert.hpp>
@@ -28,7 +32,6 @@
 #include <algorithm>
 #include <limits>
 #include <numeric>
-#include <flatbuffers/flexbuffers.h>
 
 using namespace armnn;
 using armnn::CheckLocation;

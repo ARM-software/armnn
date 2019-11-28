@@ -4,15 +4,14 @@
 //
 
 #include "DepthToSpaceLayer.hpp"
-
 #include "LayerCloneBase.hpp"
 
 #include <armnn/TypesUtils.hpp>
 
+#include <armnnUtils/DataLayoutIndexed.hpp>
+
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-
-#include <DataLayoutIndexed.hpp>
 
 #include <numeric>
 

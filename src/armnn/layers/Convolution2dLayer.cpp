@@ -2,15 +2,18 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "Convolution2dLayer.hpp"
 
+#include "Convolution2dLayer.hpp"
 #include "LayerCloneBase.hpp"
 
 #include <armnn/TypesUtils.hpp>
+
+#include <armnnUtils/DataLayoutIndexed.hpp>
+
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
+
 #include <string>
-#include <DataLayoutIndexed.hpp>
 
 using namespace armnnUtils;
 

@@ -3,13 +3,17 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
-#include "armnnTfParser/ITfParser.hpp"
 #include "ParserPrototxtFixture.hpp"
+
+#include "armnnTfParser/ITfParser.hpp"
+
+#include <armnnUtils/Permute.hpp>
+
+#include <boost/test/unit_test.hpp>
+
 #include <string>
 #include <iostream>
 
-#include <Permute.hpp>
 using namespace armnnUtils;
 using namespace armnn;
 

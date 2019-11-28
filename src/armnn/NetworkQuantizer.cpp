@@ -13,13 +13,14 @@
 #include "QuantizerVisitor.hpp"
 #include "OverrideInputRangeVisitor.hpp"
 
+#include <TensorIOUtils.hpp>
+
 #include <armnn/ILayerVisitor.hpp>
 #include <armnn/INetwork.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
 
-#include <TensorUtils.hpp>
-#include <TensorIOUtils.hpp>
+#include <armnnUtils/TensorUtils.hpp>
 
 #include <boost/variant.hpp>
 

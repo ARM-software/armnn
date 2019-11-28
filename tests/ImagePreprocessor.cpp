@@ -2,10 +2,13 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include "InferenceTestImage.hpp"
 #include "ImagePreprocessor.hpp"
-#include "Permute.hpp"
+
 #include <armnn/TypesUtils.hpp>
+
+#include <armnnUtils/Permute.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/assert.hpp>

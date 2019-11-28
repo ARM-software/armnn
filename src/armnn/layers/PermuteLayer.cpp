@@ -2,15 +2,17 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include "PermuteLayer.hpp"
 
 #include "LayerCloneBase.hpp"
 
 #include <armnn/TypesUtils.hpp>
+
+#include <armnnUtils/Permute.hpp>
+
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-
-#include <Permute.hpp>
 
 namespace armnn
 {

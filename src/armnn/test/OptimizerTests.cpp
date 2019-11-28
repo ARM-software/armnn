@@ -5,11 +5,14 @@
 
 #include "TestUtils.hpp"
 
-#include <armnn/ArmNN.hpp>
 #include <Graph.hpp>
 #include <Optimizer.hpp>
+
+#include <armnn/ArmNN.hpp>
+
+#include <armnnUtils/FloatingPointConverter.hpp>
+
 #include <backendsCommon/CpuTensorHandle.hpp>
-#include <FloatingPointConverter.hpp>
 
 #include <boost/test/unit_test.hpp>
 

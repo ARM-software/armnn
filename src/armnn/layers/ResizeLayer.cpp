@@ -2,16 +2,16 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "ResizeLayer.hpp"
 
+#include "ResizeLayer.hpp"
 #include "LayerCloneBase.hpp"
 
 #include <armnn/TypesUtils.hpp>
 
+#include <armnnUtils/DataLayoutIndexed.hpp>
+
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-
-#include <DataLayoutIndexed.hpp>
 
 using namespace armnnUtils;
 

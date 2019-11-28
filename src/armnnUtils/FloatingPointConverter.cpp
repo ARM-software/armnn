@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "FloatingPointConverter.hpp"
+#include <armnnUtils/FloatingPointConverter.hpp>
 
 #include "Half.hpp"
 

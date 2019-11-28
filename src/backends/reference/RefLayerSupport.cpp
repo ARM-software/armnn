@@ -6,17 +6,20 @@
 #include "RefLayerSupport.hpp"
 #include "RefBackendId.hpp"
 
-#include <DataLayoutIndexed.hpp>
-#include <InternalTypes.hpp>
-#include <LayerSupportCommon.hpp>
-
 #include <armnn/Types.hpp>
 #include <armnn/Descriptors.hpp>
 #include <armnn/BackendRegistry.hpp>
 
+#include <armnnUtils/DataLayoutIndexed.hpp>
+
+#include <InternalTypes.hpp>
+#include <LayerSupportCommon.hpp>
+
 #include <backendsCommon/LayerSupportRules.hpp>
+
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
+#include <boost/cast.hpp>
 #include <boost/core/ignore_unused.hpp>
 
 #include <vector>

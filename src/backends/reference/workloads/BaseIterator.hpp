@@ -5,9 +5,10 @@
 
 #pragma once
 
-#include "FloatingPointConverter.hpp"
-
 #include <armnn/ArmNN.hpp>
+
+#include <armnnUtils/FloatingPointConverter.hpp>
+
 #include <ResolveType.hpp>
 
 #include <boost/assert.hpp>

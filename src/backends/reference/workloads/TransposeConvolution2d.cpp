@@ -5,7 +5,7 @@
 
 #include "TransposeConvolution2d.hpp"
 
-#include <DataLayoutIndexed.hpp>
+#include <armnnUtils/DataLayoutIndexed.hpp>
 
 namespace armnn
 {

@@ -4,12 +4,11 @@
 //
 
 #include "InstanceNormalizationEndToEndTestImpl.hpp"
-
-#include "DataLayoutIndexed.hpp"
 #include "EndToEndTestImpl.hpp"
 #include "ResolveType.hpp"
 
-#include <Permute.hpp>
+#include <armnnUtils/Permute.hpp>
+#include <armnnUtils/DataLayoutIndexed.hpp>
 
 #include <armnn/INetwork.hpp>
 

@@ -8,7 +8,8 @@
 
 #include <armnn/ArmNN.hpp>
 
-#include <Permute.hpp>
+#include <armnnUtils/Permute.hpp>
+
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 

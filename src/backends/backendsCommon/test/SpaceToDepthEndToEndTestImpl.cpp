@@ -4,14 +4,13 @@
 //
 
 #include "SpaceToDepthEndToEndTestImpl.hpp"
-
 #include "ResolveType.hpp"
-#include "DataLayoutIndexed.hpp"
 #include "EndToEndTestImpl.hpp"
 
-#include <Permute.hpp>
-
 #include <armnn/INetwork.hpp>
+
+#include <armnnUtils/Permute.hpp>
+#include <armnnUtils/DataLayoutIndexed.hpp>
 
 #include <backendsCommon/test/DataLayoutUtils.hpp>
 

@@ -2,13 +2,14 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "ArgMinMaxLayer.hpp"
 
+#include "ArgMinMaxLayer.hpp"
 #include "LayerCloneBase.hpp"
 
-#include <TensorUtils.hpp>
-
 #include <armnn/TypesUtils.hpp>
+
+#include <armnnUtils/TensorUtils.hpp>
+
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 

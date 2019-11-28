@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <TensorUtils.hpp>
-
 #include <armnn/Types.hpp>
+
+#include <armnnUtils/TensorUtils.hpp>
 
 #include <boost/test/unit_test.hpp>
 

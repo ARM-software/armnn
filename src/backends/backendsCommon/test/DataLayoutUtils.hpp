@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include <Permute.hpp>
-
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
+
+#include <armnnUtils/Permute.hpp>
 
 template<typename T>
 void PermuteTensorNchwToNhwc(armnn::TensorInfo& tensorInfo, std::vector<T>& tensorData)

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -9,6 +9,7 @@
 
 namespace armnnUtils
 {
+
 class FloatingPointConverter
 {
 public:
@@ -18,4 +19,5 @@ public:
 
     static void ConvertFloat16To32(const void *srcFloat16Buffer, size_t numElements, float *dstFloat32Buffer);
 };
-} //namespace armnnUtils
+
+} // namespace armnnUtils

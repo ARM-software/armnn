@@ -5,11 +5,12 @@
 
 #include "SpaceToBatchNdTestImpl.hpp"
 
-#include <Permute.hpp>
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
+
+#include <armnnUtils/Permute.hpp>
 
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>

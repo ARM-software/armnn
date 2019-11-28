@@ -7,8 +7,10 @@
 #include "NeonWorkloadUtils.hpp"
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+
 #include <backendsCommon/CpuTensorHandle.hpp>
-#include <TensorUtils.hpp>
+
+#include <armnnUtils/TensorUtils.hpp>
 
 #include <arm_compute/runtime/NEON/functions/NEArgMinMaxLayer.h>
 

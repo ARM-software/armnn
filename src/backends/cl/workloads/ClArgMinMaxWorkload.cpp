@@ -10,7 +10,7 @@
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 
-#include <TensorUtils.hpp>
+#include <armnnUtils/TensorUtils.hpp>
 
 #include <cl/ClTensorHandle.hpp>
 #include <cl/ClLayerSupport.hpp>

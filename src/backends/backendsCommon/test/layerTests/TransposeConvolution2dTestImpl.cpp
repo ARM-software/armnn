@@ -5,10 +5,11 @@
 
 #include "TransposeConvolution2dTestImpl.hpp"
 
+#include <QuantizeHelper.hpp>
+
 #include <armnn/ArmNN.hpp>
 
-#include <Permute.hpp>
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/Permute.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 

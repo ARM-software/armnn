@@ -974,8 +974,8 @@ void SendCounterPacket::Stop(bool rethrowSendThreadExceptions)
 
 void SendCounterPacket::Send(IProfilingConnection& profilingConnection)
 {
-    // Keep the sending procedure looping until the thread is signalled to stop
-    while (m_KeepRunning.load())
+    // Run once and keep the sending procedure looping until the thread is signalled to stop
+    do
     {
         // Check the current state of the profiling service
         ProfilingState currentState = m_StateMachine.GetCurrentState();
@@ -1054,7 +1054,7 @@ void SendCounterPacket::Send(IProfilingConnection& profilingConnection)
 
         // Send all the available packets in the buffer
         FlushBuffer(profilingConnection);
-    }
+    } while (m_KeepRunning.load());
 
     // Ensure that all readable data got written to the profiling connection before the thread is stopped
     // (do not notify any watcher in this case, as this is just to wrap up things before shutting down the send thread)

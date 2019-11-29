@@ -1793,8 +1793,6 @@ BOOST_AUTO_TEST_CASE(SendThreadTest0)
     sendCounterPacket.Start(mockProfilingConnection);
     BOOST_CHECK(sendCounterPacket.IsRunning());
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
-
     sendCounterPacket.Stop();
     BOOST_CHECK(!sendCounterPacket.IsRunning());
 }
@@ -1899,7 +1897,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest1)
 
     sendCounterPacket.SetReadyToRead();
 
-    // To test an exact value of the "read size" in the mock buffer, wait two seconds to allow the send thread to
+    // To test an exact value of the "read size" in the mock buffer, wait to allow the send thread to
     // read all what's remaining in the buffer
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
@@ -2022,7 +2020,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest2)
 
     sendCounterPacket.SetReadyToRead();
 
-    // To test an exact value of the "read size" in the mock buffer, wait two seconds to allow the send thread to
+    // To test an exact value of the "read size" in the mock buffer, wait to allow the send thread to
     // read all what's remaining in the buffer
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
@@ -2346,10 +2344,6 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket1)
     sendCounterPacket.Start(mockProfilingConnection);
 
     // The profiling state is set to "Uninitialized", so the send thread should throw an exception
-
-    // Wait a bit to make sure that the send thread is properly started
-    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
-
     BOOST_CHECK_THROW(sendCounterPacket.Stop(), armnn::RuntimeException);
 }
 
@@ -2364,10 +2358,6 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket2)
     sendCounterPacket.Start(mockProfilingConnection);
 
     // The profiling state is set to "NotConnected", so the send thread should throw an exception
-
-    // Wait a bit to make sure that the send thread is properly started
-    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
-
     BOOST_CHECK_THROW(sendCounterPacket.Stop(), armnn::RuntimeException);
 }
 
@@ -2387,10 +2377,7 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket3)
     sendCounterPacket.Start(mockProfilingConnection);
 
     // The profiling state is set to "WaitingForAck", so the send thread should send a Stream Metadata packet
-
-    // Wait for a bit to make sure that we get the packet
-    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
-
+    // Wait for sendCounterPacket to join
     BOOST_CHECK_NO_THROW(sendCounterPacket.Stop());
 
     // Check that the buffer contains one Stream Metadata packet
@@ -2415,10 +2402,10 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket4)
     sendCounterPacket.Start(mockProfilingConnection);
 
     // The profiling state is set to "WaitingForAck", so the send thread should send a Stream Metadata packet
+    // Wait for sendCounterPacket to join
+    sendCounterPacket.Stop();
 
-    // Wait for a bit to make sure that we get the packet
-    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
-
+    sendCounterPacket.Start(mockProfilingConnection);
     // Check that the profiling state is still "WaitingForAck"
     BOOST_TEST((profilingStateMachine.GetCurrentState() == ProfilingState::WaitingForAck));
 
@@ -2432,8 +2419,8 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket4)
     // Try triggering a new buffer read
     sendCounterPacket.SetReadyToRead();
 
-    // Wait for a bit to make sure that we get the packet
-    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
+    // Wait for sendCounterPacket to join
+    BOOST_CHECK_NO_THROW(sendCounterPacket.Stop());
 
     // Check that the profiling state is still "WaitingForAck"
     BOOST_TEST((profilingStateMachine.GetCurrentState() == ProfilingState::WaitingForAck));
@@ -2441,8 +2428,6 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket4)
     // Check that the buffer contains one Stream Metadata packet
     BOOST_TEST(writtenData.size() == 1);
     BOOST_TEST(writtenData[0] == streamMetadataPacketsize);
-
-    BOOST_CHECK_NO_THROW(sendCounterPacket.Stop());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

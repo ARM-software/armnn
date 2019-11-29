@@ -815,4 +815,144 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                            offset);
 
     bufferManager.MarkRead(readableBuffer);
+
+    // Creates structures for input & output.
+    std::vector<float> inputData(inputInfo.GetNumElements());
+    std::vector<float> outputData(outputInfo.GetNumElements());
+
+    InputTensors inputTensors
+    {
+        {0, ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())}
+    };
+    OutputTensors outputTensors
+    {
+        {0, Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data())}
+    };
+
+    // Does the inference.
+    runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
+
+    // Get readable buffer for output workload
+    auto outputReadableBuffer = bufferManager.GetReadableBuffer();
+    BOOST_CHECK(outputReadableBuffer != nullptr);
+
+    // Get readable buffer for input workload
+    auto inputReadableBuffer = bufferManager.GetReadableBuffer();
+    BOOST_CHECK(inputReadableBuffer != nullptr);
+
+    // Validate input workload data
+    size = inputReadableBuffer->GetSize();
+    BOOST_CHECK(size == 252);
+
+    readableData = inputReadableBuffer->GetReadableData();
+    BOOST_CHECK(readableData != nullptr);
+
+    offset = 0;
+
+    // Input workload
+    // Input workload entity
+    VerifyTimelineEntityBinaryPacket(EmptyOptional(), readableData, offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Type label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::TYPE_GUID,
+                                           readableData,
+                                           offset);
+
+    // BackendId entity
+    VerifyTimelineLabelBinaryPacket(EmptyOptional(), backendId.Get(), readableData, offset);
+
+    // Entity - BackendId relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // BackendId label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::BACKENDID_GUID,
+                                           readableData,
+                                           offset);
+
+    // Input layer - Input workload relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                           EmptyOptional(),
+                                           input->GetGuid(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    bufferManager.MarkRead(inputReadableBuffer);
+
+    // Validate output workload data
+    size = outputReadableBuffer->GetSize();
+    BOOST_CHECK(size == 252);
+
+    readableData = outputReadableBuffer->GetReadableData();
+    BOOST_CHECK(readableData != nullptr);
+
+    offset = 0;
+
+    // Output workload
+    // Output workload entity
+    VerifyTimelineEntityBinaryPacket(EmptyOptional(), readableData, offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Type label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::TYPE_GUID,
+                                           readableData,
+                                           offset);
+
+    // BackendId entity
+    VerifyTimelineLabelBinaryPacket(EmptyOptional(), backendId.Get(), readableData, offset);
+
+    // Entity - BackendId relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // BackendId label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::BACKENDID_GUID,
+                                           readableData,
+                                           offset);
+
+    // Output layer - Output workload relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                           EmptyOptional(),
+                                           output->GetGuid(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    bufferManager.MarkRead(outputReadableBuffer);
 }

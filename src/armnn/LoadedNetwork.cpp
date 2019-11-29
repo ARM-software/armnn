@@ -510,9 +510,18 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
     else
     {
         // Create a mem copy workload for input since we did not import
-        auto inputWorkload = std::make_unique<CopyMemGenericWorkload>(inputQueueDescriptor, info);
+        std::unique_ptr<IWorkload> inputWorkload = std::make_unique<CopyMemGenericWorkload>(inputQueueDescriptor, info);
 
         BOOST_ASSERT_MSG(inputWorkload, "No input workload created");
+
+        std::unique_ptr<TimelineUtilityMethods> timelineUtils = TimelineUtilityMethods::GetTimelineUtils();
+        if (timelineUtils)
+        {
+            // Add Input Workload to the post-optimisation network structure
+            AddWorkloadStructure(timelineUtils, inputWorkload, layer);
+            timelineUtils->Commit();
+        }
+
         m_InputQueue.push_back(move(inputWorkload));
     }
 }
@@ -593,8 +602,18 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
         outputQueueDescriptor.m_Inputs.push_back(inputTensorHandle);
         info.m_InputTensorInfos.push_back(inputTensorInfo);
 
-        auto outputWorkload = std::make_unique<CopyMemGenericWorkload>(outputQueueDescriptor, info);
+        std::unique_ptr<IWorkload> outputWorkload =
+            std::make_unique<CopyMemGenericWorkload>(outputQueueDescriptor, info);
         BOOST_ASSERT_MSG(outputWorkload, "No output workload created");
+
+        std::unique_ptr<TimelineUtilityMethods> timelineUtils = TimelineUtilityMethods::GetTimelineUtils();
+        if (timelineUtils)
+        {
+            // Add Output Workload to the post-optimisation network structure
+            AddWorkloadStructure(timelineUtils, outputWorkload, layer);
+            timelineUtils->Commit();
+        }
+
         m_OutputQueue.push_back(move(outputWorkload));
     }
 }

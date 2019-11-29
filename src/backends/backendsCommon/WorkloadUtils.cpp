@@ -172,6 +172,9 @@ armnn::ConstTensor ConvertWeightTensorFromArmnnToAcl(const ConstCpuTensorHandle*
             case DataType::QuantisedAsymm8:
                 weightPermuted = ReorderWeightChannelsForAcl<uint8_t>(weightPermuted, dataLayout, permuteBuffer);
                 break;
+            case DataType::QuantizedSymm8PerAxis:
+                weightPermuted = ReorderWeightChannelsForAcl<int8_t>(weightPermuted, dataLayout, permuteBuffer);
+                break;
             default:
                 break;
         }

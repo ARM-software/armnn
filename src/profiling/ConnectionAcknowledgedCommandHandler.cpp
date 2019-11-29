@@ -37,9 +37,7 @@ void ConnectionAcknowledgedCommandHandler::operator()(const Packet& packet)
 
         // Once a Connection Acknowledged packet has been received, move to the Active state immediately
         m_StateMachine.TransitionToState(ProfilingState::Active);
-
-        // Send all the packet required for the handshake with the external profiling service
-        m_SendCounterPacket.SendStreamMetaDataPacket();
+        // Send the counter directory packet.
         m_SendCounterPacket.SendCounterDirectoryPacket(m_CounterDirectory);
         m_SendTimelinePacket.SendTimelineMessageDirectoryPackage();
 

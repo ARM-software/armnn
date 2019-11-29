@@ -64,12 +64,11 @@ public:
     void Stop(bool rethrowSendThreadExceptions = true);
     bool IsRunning() { return m_IsRunning.load(); }
 
-    void WaitForPacketSent()
+    void WaitForPacketSent(uint32_t timeout = 1000)
     {
         std::unique_lock<std::mutex> lock(m_PacketSentWaitMutex);
-
-        // Blocks until notified that at least a packet has been sent
-        m_PacketSentWaitCondition.wait(lock);
+        // Blocks until notified that at least a packet has been sent or until timeout expires.
+        m_PacketSentWaitCondition.wait_for(lock, std::chrono::milliseconds(timeout));
     }
 
 private:

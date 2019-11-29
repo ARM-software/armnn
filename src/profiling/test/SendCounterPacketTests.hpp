@@ -67,11 +67,9 @@ public:
 
     Packet ReadPacket(uint32_t timeout) override
     {
-        // Simulate a delay in the reading process
-        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
-
+        // Simulate a delay in the reading process. The default timeout is way too long.
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
         std::lock_guard<std::mutex> lock(m_Mutex);
-
         return std::move(m_Packet);
     }
 
@@ -82,6 +80,12 @@ public:
         std::vector<uint32_t> writtenData = m_WrittenData;
         m_WrittenData.clear();
         return writtenData;
+    }
+
+    const bool HasWrittenData()
+    {
+        std::lock_guard<std::mutex> lock(m_Mutex);
+        return !m_WrittenData.empty();
     }
 
     void Clear()

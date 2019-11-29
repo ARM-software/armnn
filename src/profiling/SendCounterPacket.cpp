@@ -1012,10 +1012,10 @@ void SendCounterPacket::Send(IProfilingConnection& profilingConnection)
                  // Flush the buffer manually to send the packet
                 FlushBuffer(profilingConnection);
 
-                // Wait indefinitely until notified otherwise (it could that the profiling state has changed due to the
-                // connection being acknowledged, or that new data is ready to be sent, or that the send thread is
-                // being shut down, etc.)
-                m_WaitCondition.wait(lock);
+                // Wait for a connection ack from the remote server. We should expect a response within timeout value.
+                // If not, drop back to the start of the loop and detect somebody closing the thread. Then send the
+                // StreamMetadata again.
+                m_WaitCondition.wait_for(lock, std::chrono::milliseconds(m_Timeout));
 
                 // Do not flush the buffer again
                 continue;

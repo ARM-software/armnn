@@ -46,7 +46,18 @@ public:
         : m_Stream(stream)
         , m_BackupBuffer(m_Stream.rdbuf(newStreamBuffer))
     {}
-    ~StreamRedirector() { m_Stream.rdbuf(m_BackupBuffer); }
+
+    ~StreamRedirector() { CancelRedirect(); }
+
+    void CancelRedirect()
+    {
+        // Only cancel the redirect once.
+        if (m_BackupBuffer != nullptr )
+        {
+            m_Stream.rdbuf(m_BackupBuffer);
+            m_BackupBuffer = nullptr;
+        }
+    }
 
 private:
     std::ostream& m_Stream;
@@ -67,11 +78,21 @@ public:
 
     Packet ReadPacket(uint32_t timeout) override
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
-
-        // Return connection acknowledged packet
-        return Packet(65536);
+        // First time we're called return a connection ack packet. After that always timeout.
+        if (m_FirstCall)
+        {
+            m_FirstCall = false;
+            // Return connection acknowledged packet
+            return Packet(65536);
+        }
+        else
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+            throw armnn::TimeoutException("Simulate a timeout error\n");
+        }
     }
+
+    bool m_FirstCall = true;
 };
 
 class TestProfilingConnectionTimeoutError : public TestProfilingConnectionBase
@@ -83,31 +104,46 @@ public:
 
     Packet ReadPacket(uint32_t timeout) override
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
-
-        if (m_ReadRequests < 3)
+        // Return connection acknowledged packet after three timeouts
+        if (m_ReadRequests % 3 == 0)
         {
-            m_ReadRequests++;
+            std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+            ++m_ReadRequests;
             throw armnn::TimeoutException("Simulate a timeout error\n");
         }
 
-        // Return connection acknowledged packet after three timeouts
         return Packet(65536);
     }
 
+    int ReadCalledCount()
+    {
+        return m_ReadRequests.load();
+    }
+
 private:
-    int m_ReadRequests;
+    std::atomic<int> m_ReadRequests;
 };
 
 class TestProfilingConnectionArmnnError : public TestProfilingConnectionBase
 {
 public:
+    TestProfilingConnectionArmnnError()
+        : m_ReadRequests(0)
+    {}
+
     Packet ReadPacket(uint32_t timeout) override
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
-
+        ++m_ReadRequests;
         throw armnn::Exception("Simulate a non-timeout error");
     }
+
+    int ReadCalledCount()
+    {
+        return m_ReadRequests.load();
+    }
+
+private:
+    std::atomic<int> m_ReadRequests;
 };
 
 class TestFunctorA : public CommandHandlerFunctor
@@ -172,9 +208,17 @@ public:
         TransitionToState(ProfilingService::Instance(), newState);
     }
 
-    void WaitForProfilingPacketsSent()
+    void WaitForProfilingPacketsSent(MockProfilingConnection* mockProfilingConnection, uint32_t timeout = 1000)
     {
-        return WaitForPacketSent(ProfilingService::Instance());
+        if (!mockProfilingConnection->HasWrittenData())
+        {
+            WaitForPacketSent(ProfilingService::Instance(), timeout);
+            // It's possible the wait has timed out. Check there is some data.
+            if (!mockProfilingConnection->HasWrittenData())
+            {
+                throw RuntimeException("ProfilingTests::WaitForProfilingPacketsSent timeout waiting for packet.");
+            }
+        }
     }
 
 private:

@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(StaticGuidGeneratorCollisionTest)
 {
     ProfilingGuidGenerator generator;
     std::set<uint64_t> guids;
-    for (int i = 0; i < 1000000; ++i)
+    for ( int i = 0; i < 100000; ++i )
     {
         std::stringstream ss;
         ss << i;

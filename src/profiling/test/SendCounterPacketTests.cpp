@@ -24,6 +24,9 @@ using namespace armnn::profiling;
 namespace
 {
 
+// A short delay to wait for the thread to process a packet.
+uint16_t constexpr WAIT_UNTIL_READABLE_MS = 100;
+
 void SetNotConnectedProfilingState(ProfilingStateMachine& profilingStateMachine)
 {
     ProfilingState currentState = profilingStateMachine.GetCurrentState();
@@ -1790,7 +1793,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest0)
     sendCounterPacket.Start(mockProfilingConnection);
     BOOST_CHECK(sendCounterPacket.IsRunning());
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     sendCounterPacket.Stop();
     BOOST_CHECK(!sendCounterPacket.IsRunning());
@@ -1811,7 +1814,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest1)
     // Interleaving writes and reads to/from the buffer with pauses to test that the send thread actually waits for
     // something to become available for reading
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     CounterDirectory counterDirectory;
     sendCounterPacket.SendStreamMetaDataPacket();
@@ -1824,7 +1827,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest1)
 
     sendCounterPacket.SetReadyToRead();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     sendCounterPacket.SendCounterDirectoryPacket(counterDirectory);
 
@@ -1834,7 +1837,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest1)
 
     sendCounterPacket.SetReadyToRead();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     sendCounterPacket.SendPeriodicCounterCapturePacket(123u,
                                                        {
@@ -1848,7 +1851,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest1)
 
     sendCounterPacket.SetReadyToRead();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     sendCounterPacket.SendPeriodicCounterCapturePacket(44u,
                                                        {
@@ -1886,7 +1889,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest1)
 
     sendCounterPacket.SetReadyToRead();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     sendCounterPacket.SendPeriodicCounterSelectionPacket(1000u, { 1345u, 254u, 4536u, 408u, 54u, 6323u, 428u, 1u, 6u });
 
@@ -1898,7 +1901,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest1)
 
     // To test an exact value of the "read size" in the mock buffer, wait two seconds to allow the send thread to
     // read all what's remaining in the buffer
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     sendCounterPacket.Stop();
 
@@ -1922,7 +1925,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest2)
     // Adding many spurious "ready to read" signals throughout the test to check that the send thread is
     // capable of handling unnecessary read requests
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     sendCounterPacket.SetReadyToRead();
 
@@ -1937,7 +1940,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest2)
 
     sendCounterPacket.SetReadyToRead();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     sendCounterPacket.SendCounterDirectoryPacket(counterDirectory);
 
@@ -1948,7 +1951,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest2)
     sendCounterPacket.SetReadyToRead();
     sendCounterPacket.SetReadyToRead();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     sendCounterPacket.SendPeriodicCounterCapturePacket(123u,
                                                        {
@@ -1962,13 +1965,13 @@ BOOST_AUTO_TEST_CASE(SendThreadTest2)
 
     sendCounterPacket.SetReadyToRead();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     sendCounterPacket.SetReadyToRead();
     sendCounterPacket.SetReadyToRead();
     sendCounterPacket.SetReadyToRead();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     sendCounterPacket.SetReadyToRead();
     sendCounterPacket.SendPeriodicCounterCapturePacket(44u,
@@ -2009,7 +2012,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest2)
     sendCounterPacket.SetReadyToRead();
     sendCounterPacket.SetReadyToRead();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     sendCounterPacket.SendPeriodicCounterSelectionPacket(1000u, { 1345u, 254u, 4536u, 408u, 54u, 6323u, 428u, 1u, 6u });
 
@@ -2021,7 +2024,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest2)
 
     // To test an exact value of the "read size" in the mock buffer, wait two seconds to allow the send thread to
     // read all what's remaining in the buffer
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     sendCounterPacket.Stop();
 
@@ -2148,7 +2151,7 @@ BOOST_AUTO_TEST_CASE(SendThreadBufferTest)
 
     // Interleaving writes and reads to/from the buffer with pauses to test that the send thread actually waits for
     // something to become available for reading
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     // SendStreamMetaDataPacket
     sendCounterPacket.SendStreamMetaDataPacket();
@@ -2173,7 +2176,7 @@ BOOST_AUTO_TEST_CASE(SendThreadBufferTest)
 
     sendCounterPacket.SetReadyToRead();
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     // The buffer is read by the send thread so it should not be in the readable buffer.
     auto readBuffer = bufferManager.GetReadableBuffer();
@@ -2211,7 +2214,7 @@ BOOST_AUTO_TEST_CASE(SendThreadBufferTest)
 
     sendCounterPacket.SetReadyToRead();
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     // The buffer is read by the send thread so it should not be in the readable buffer.
     readBuffer = bufferManager.GetReadableBuffer();
@@ -2252,7 +2255,7 @@ BOOST_AUTO_TEST_CASE(SendThreadBufferTest)
 
     sendCounterPacket.SetReadyToRead();
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     // The buffer is read by the send thread so it should not be in the readable buffer.
     readBuffer = bufferManager.GetReadableBuffer();
@@ -2345,7 +2348,7 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket1)
     // The profiling state is set to "Uninitialized", so the send thread should throw an exception
 
     // Wait a bit to make sure that the send thread is properly started
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     BOOST_CHECK_THROW(sendCounterPacket.Stop(), armnn::RuntimeException);
 }
@@ -2363,7 +2366,7 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket2)
     // The profiling state is set to "NotConnected", so the send thread should throw an exception
 
     // Wait a bit to make sure that the send thread is properly started
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     BOOST_CHECK_THROW(sendCounterPacket.Stop(), armnn::RuntimeException);
 }
@@ -2386,7 +2389,7 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket3)
     // The profiling state is set to "WaitingForAck", so the send thread should send a Stream Metadata packet
 
     // Wait for a bit to make sure that we get the packet
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     BOOST_CHECK_NO_THROW(sendCounterPacket.Stop());
 
@@ -2414,7 +2417,7 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket4)
     // The profiling state is set to "WaitingForAck", so the send thread should send a Stream Metadata packet
 
     // Wait for a bit to make sure that we get the packet
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     // Check that the profiling state is still "WaitingForAck"
     BOOST_TEST((profilingStateMachine.GetCurrentState() == ProfilingState::WaitingForAck));
@@ -2430,7 +2433,7 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket4)
     sendCounterPacket.SetReadyToRead();
 
     // Wait for a bit to make sure that we get the packet
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
 
     // Check that the profiling state is still "WaitingForAck"
     BOOST_TEST((profilingStateMachine.GetCurrentState() == ProfilingState::WaitingForAck));

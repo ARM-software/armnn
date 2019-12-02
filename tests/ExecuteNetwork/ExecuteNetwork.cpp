@@ -110,7 +110,9 @@ int main(int argc, const char* argv[])
             ("file-only-external-profiling,g", po::bool_switch()->default_value(false),
              "If enabled then the 'file-only' test mode of external profiling will be enabled")
             ("counter-capture-period,u", po::value<uint32_t>(&counterCapturePeriod)->default_value(150u),
-             "If profiling is enabled in 'file-only' mode this is the capture period that will be used in the test");
+             "If profiling is enabled in 'file-only' mode this is the capture period that will be used in the test")
+            ("parse-unsupported", po::bool_switch()->default_value(false),
+                "Add unsupported operators as stand-in layers (where supported by parser)");
     }
     catch (const std::exception& e)
     {
@@ -155,6 +157,8 @@ int main(int argc, const char* argv[])
     bool printIntermediate = vm["print-intermediate-layers"].as<bool>();
     bool enableExternalProfiling = vm["enable-external-profiling"].as<bool>();
     bool fileOnlyExternalProfiling = vm["file-only-external-profiling"].as<bool>();
+    bool parseUnsupported = vm["parse-unsupported"].as<bool>();
+
 
     // Check whether we have to load test cases from a file.
     if (CheckOption(vm, "test-cases"))
@@ -202,7 +206,7 @@ int main(int argc, const char* argv[])
                 testCase.values.insert(testCase.values.begin(), executableName);
                 results.push_back(std::async(std::launch::async, RunCsvTest, std::cref(testCase), std::cref(runtime),
                                              enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate,
-                                             enableLayerDetails));
+                                             enableLayerDetails, parseUnsupported));
             }
 
             // Check results
@@ -222,7 +226,7 @@ int main(int argc, const char* argv[])
                 testCase.values.insert(testCase.values.begin(), executableName);
                 if (RunCsvTest(testCase, runtime, enableProfiling,
                                enableFp16TurboMode, thresholdTime, printIntermediate,
-                               enableLayerDetails) != EXIT_SUCCESS)
+                               enableLayerDetails, parseUnsupported) != EXIT_SUCCESS)
                 {
                     return EXIT_FAILURE;
                 }
@@ -268,6 +272,6 @@ int main(int argc, const char* argv[])
         return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
                        inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
                        outputTensorFiles, enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate,
-                       subgraphId, enableLayerDetails, runtime);
+                       subgraphId, enableLayerDetails, parseUnsupported, runtime);
     }
 }

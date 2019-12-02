@@ -371,6 +371,7 @@ struct ExecuteNetworkParams
     size_t                        m_SubgraphId;
     bool                          m_EnableLayerDetails = false;
     bool                          m_GenerateTensorData;
+    bool                          m_ParseUnsupported = false;
 };
 
 template<typename TParser, typename TDataType>
@@ -534,6 +535,7 @@ int RunTest(const std::string& format,
             bool printIntermediate,
             const size_t subgraphId,
             bool enableLayerDetails = false,
+            bool parseUnsupported = false,
             const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
     std::string modelFormat = boost::trim_copy(format);
@@ -657,6 +659,7 @@ int RunTest(const std::string& format,
     params.m_SubgraphId               = subgraphId;
     params.m_EnableLayerDetails       = enableLayerDetails;
     params.m_GenerateTensorData       = inputTensorDataFilePathsVector.empty();
+    params.m_ParseUnsupported         = parseUnsupported;
 
     // Warn if ExecuteNetwork will generate dummy input data
     if (params.m_GenerateTensorData)
@@ -727,7 +730,7 @@ int RunTest(const std::string& format,
 
 int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IRuntime>& runtime,
                const bool enableProfiling, const bool enableFp16TurboMode, const double& thresholdTime,
-               const bool printIntermediate, bool enableLayerDetails = false)
+               const bool printIntermediate, bool enableLayerDetails = false, bool parseUnuspported = false)
 {
     std::string modelFormat;
     std::string modelPath;
@@ -841,5 +844,5 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
     return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
                    inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames, outputTensorFiles,
                    enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate, subgraphId,
-                   enableLayerDetails);
+                   enableLayerDetails, parseUnuspported);
 }

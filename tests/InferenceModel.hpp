@@ -93,6 +93,7 @@ struct Params
     bool                            m_VisualizePostOptimizationModel;
     bool                            m_EnableFp16TurboMode;
     bool                            m_PrintIntermediateLayers;
+    bool                            m_ParseUnsupported;
 
     Params()
         : m_ComputeDevices{}
@@ -101,6 +102,7 @@ struct Params
         , m_VisualizePostOptimizationModel(false)
         , m_EnableFp16TurboMode(false)
         , m_PrintIntermediateLayers(false)
+        , m_ParseUnsupported(false)
     {}
 };
 
@@ -235,7 +237,9 @@ public:
         const std::string& modelPath = params.m_ModelPath;
 
         // Create a network from a file on disk
-        auto parser(IParser::Create());
+        IParser::TfLiteParserOptions options;
+        options.m_StandInLayerForUnsupported = params.m_ParseUnsupported;
+        auto parser(IParser::Create(options));
 
         armnn::INetworkPtr network{nullptr, [](armnn::INetwork *){}};
 

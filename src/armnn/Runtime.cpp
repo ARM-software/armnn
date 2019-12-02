@@ -92,6 +92,11 @@ Status Runtime::LoadNetwork(NetworkId& networkIdOut,
         context.second->AfterLoadNetwork(networkIdOut);
     }
 
+    if (profiling::ProfilingService::Instance().IsProfilingEnabled())
+    {
+        profiling::ProfilingService::Instance().IncrementCounterValue(armnn::profiling::NETWORK_LOADS);
+    }
+
     return Status::Success;
 }
 
@@ -117,6 +122,10 @@ Status Runtime::UnloadNetwork(NetworkId networkId)
         {
             ARMNN_LOG(warning) << "WARNING: Runtime::UnloadNetwork(): " << networkId << " not found!";
             return Status::Failure;
+        }
+        if (profiling::ProfilingService::Instance().IsProfilingEnabled())
+        {
+            profiling::ProfilingService::Instance().IncrementCounterValue(armnn::profiling::NETWORK_UNLOADS);
         }
     }
 

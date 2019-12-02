@@ -420,7 +420,9 @@ public:
         return counterSetPtr;
     }
 
-    const Counter* RegisterCounter(const std::string& parentCategoryName,
+    const Counter* RegisterCounter(const BackendId& backendId,
+                                   const uint16_t uid,
+                                   const std::string& parentCategoryName,
                                    uint16_t counterClass,
                                    uint16_t interpolation,
                                    double multiplier,
@@ -441,7 +443,7 @@ public:
         uint16_t counterSetUidValue = counterSetUid.has_value() ? counterSetUid.value() : 0;
 
         // Get the counter UIDs and calculate the max counter UID
-        std::vector<uint16_t> counterUids = GetNextCounterUids(deviceCores);
+        std::vector<uint16_t> counterUids = GetNextCounterUids(uid, deviceCores);
         BOOST_ASSERT(!counterUids.empty());
         uint16_t maxCounterUid = deviceCores <= 1 ? counterUids.front() : counterUids.back();
 
@@ -449,7 +451,8 @@ public:
         const std::string unitsValue = units.has_value() ? units.value() : "";
 
         // Create the counter
-        CounterPtr counter = std::make_shared<Counter>(counterUids.front(),
+        CounterPtr counter = std::make_shared<Counter>(armnn::profiling::BACKEND_ID,
+                                                       counterUids.front(),
                                                        maxCounterUid,
                                                        counterClass,
                                                        interpolation,

@@ -2,11 +2,12 @@
 // Copyright © 2019 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+#include "DirectoryCaptureCommandHandler.hpp"
+
+#include <armnn/BackendId.hpp>
+#include "ProfilingUtils.hpp"
 
 #include <atomic>
-#include "DirectoryCaptureCommandHandler.hpp"
-#include "SendCounterPacket.hpp"
-
 #include <iostream>
 
 namespace armnn
@@ -199,9 +200,15 @@ void DirectoryCaptureCommandHandler::ReadCategoryRecords(const unsigned char* co
             GetStringNameFromBuffer(data, categoryRecordOffset + nameOffset), deviceUid, counterSetUid);
         for (auto& counter : eventRecords)
         {
-            const Counter* registeredCounter = m_CounterDirectory.RegisterCounter(
-                category->m_Name, counter.m_CounterClass, counter.m_CounterInterpolation, counter.m_CounterMultiplier,
-                counter.m_CounterName, counter.m_CounterDescription, counter.m_CounterUnits);
+            const Counter* registeredCounter = m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                                  counter.m_CounterUid,
+                                                                                  category->m_Name,
+                                                                                  counter.m_CounterClass,
+                                                                                  counter.m_CounterInterpolation,
+                                                                                  counter.m_CounterMultiplier,
+                                                                                  counter.m_CounterName,
+                                                                                  counter.m_CounterDescription,
+                                                                                  counter.m_CounterUnits);
             m_UidTranslation[registeredCounter->m_Uid] = counter.m_CounterUid;
         }
     }

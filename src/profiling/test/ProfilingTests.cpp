@@ -663,8 +663,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterValues)
     const Counters& counters                  = counterDirectory.GetCounters();
     BOOST_CHECK(!counters.empty());
 
-    // Get the UID of the first counter for testing
-    uint16_t counterUid = counters.begin()->first;
+    // Get the UID of the first counter for testing;
 
     ProfilingService* profilingServicePtr = &profilingService;
     std::vector<std::thread> writers;
@@ -672,21 +671,35 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterValues)
     for (int i = 0; i < 100; ++i)
     {
         // Increment and decrement the first counter
-        writers.push_back(std::thread(&ProfilingService::IncrementCounterValue, profilingServicePtr, counterUid));
-        writers.push_back(std::thread(&ProfilingService::DecrementCounterValue, profilingServicePtr, counterUid));
+        writers.push_back(std::thread(&ProfilingService::IncrementCounterValue,
+                          profilingServicePtr,
+                          armnn::profiling::REGISTERED_BACKENDS));
+
+        writers.push_back(std::thread(&ProfilingService::IncrementCounterValue,
+                          profilingServicePtr,
+                          armnn::profiling::UNREGISTERED_BACKENDS));
+
         // Add 10 and subtract 5 from the first counter
-        writers.push_back(std::thread(&ProfilingService::AddCounterValue, profilingServicePtr, counterUid, 10));
-        writers.push_back(std::thread(&ProfilingService::SubtractCounterValue, profilingServicePtr, counterUid, 5));
+        writers.push_back(std::thread(&ProfilingService::AddCounterValue,
+                          profilingServicePtr,
+                          armnn::profiling::INFERENCES_RUN,
+                          10));
+        writers.push_back(std::thread(&ProfilingService::SubtractCounterValue,
+                          profilingServicePtr,
+                          armnn::profiling::INFERENCES_RUN,
+                          5));
     }
     std::for_each(writers.begin(), writers.end(), mem_fn(&std::thread::join));
 
     uint32_t counterValue = 0;
-    BOOST_CHECK_NO_THROW(counterValue = profilingService.GetCounterValue(counterUid));
-    BOOST_CHECK(counterValue == 500);
+    BOOST_CHECK(counterValue ==
+               (profilingService.GetCounterValue(armnn::profiling::UNREGISTERED_BACKENDS)
+               - profilingService.GetCounterValue(armnn::profiling::REGISTERED_BACKENDS)));
+    BOOST_CHECK(profilingService.GetCounterValue(armnn::profiling::INFERENCES_RUN) == 500);
 
-    BOOST_CHECK_NO_THROW(profilingService.SetCounterValue(counterUid, 0));
-    BOOST_CHECK_NO_THROW(counterValue = profilingService.GetCounterValue(counterUid));
-    BOOST_CHECK(counterValue == 0);
+    BOOST_CHECK_NO_THROW(profilingService.SetCounterValue(armnn::profiling::UNREGISTERED_BACKENDS, 4));
+    BOOST_CHECK_NO_THROW(counterValue = profilingService.GetCounterValue(armnn::profiling::UNREGISTERED_BACKENDS));
+    BOOST_CHECK(counterValue == 4);
     // Reset the profiling service to stop any running thread
     options.m_EnableProfiling = false;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -703,18 +716,19 @@ BOOST_AUTO_TEST_CASE(CheckProfilingObjectUids)
     BOOST_CHECK(nextUid > uid);
 
     std::vector<uint16_t> counterUids;
-    BOOST_CHECK_NO_THROW(counterUids = GetNextCounterUids(0));
+    BOOST_CHECK_NO_THROW(counterUids = GetNextCounterUids(uid,0));
     BOOST_CHECK(counterUids.size() == 1);
     BOOST_CHECK(counterUids[0] >= 0);
 
     std::vector<uint16_t> nextCounterUids;
-    BOOST_CHECK_NO_THROW(nextCounterUids = GetNextCounterUids(1));
-    BOOST_CHECK(nextCounterUids.size() == 1);
+    BOOST_CHECK_NO_THROW(nextCounterUids = GetNextCounterUids(nextUid, 2));
+    BOOST_CHECK(nextCounterUids.size() == 2);
     BOOST_CHECK(nextCounterUids[0] > counterUids[0]);
 
     std::vector<uint16_t> counterUidsMultiCore;
+    uint16_t thirdUid = 4;
     uint16_t numberOfCores = 13;
-    BOOST_CHECK_NO_THROW(counterUidsMultiCore = GetNextCounterUids(numberOfCores));
+    BOOST_CHECK_NO_THROW(counterUidsMultiCore = GetNextCounterUids(thirdUid, numberOfCores));
     BOOST_CHECK(counterUidsMultiCore.size() == numberOfCores);
     BOOST_CHECK(counterUidsMultiCore.front() >= nextCounterUids[0]);
     for (size_t i = 1; i < numberOfCores; i++)
@@ -1127,34 +1141,68 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     // Register a counter with an invalid parent category name
     const Counter* noCounter = nullptr;
     BOOST_CHECK_THROW(noCounter =
-                          counterDirectory.RegisterCounter("", 0, 1, 123.45f, "valid name", "valid description"),
+                          counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                           0,
+                                                           "",
+                                                           0,
+                                                           1,
+                                                           123.45f,
+                                                           "valid ",
+                                                           "name"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid parent category name
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("invalid parent category", 0, 1, 123.45f,
-                                                                   "valid name", "valid description"),
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                   1,
+                                                                   "invalid parent category",
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid name",
+                                                                   "valid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid class
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category", 2, 1, 123.45f, "valid name",
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                   2,
+                                                                   "valid_parent_category",
+                                                                   2,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid "
+                                                                   "name",
                                                                    "valid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid interpolation
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category", 0, 3, 123.45f, "valid name",
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                   4,
+                                                                   "valid_parent_category",
+                                                                   0,
+                                                                   3,
+                                                                   123.45f,
+                                                                   "valid "
+                                                                   "name",
                                                                    "valid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid multiplier
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category", 0, 1, .0f, "valid name",
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                   5,
+                                                                   "valid_parent_category",
+                                                                   0,
+                                                                   1,
+                                                                   .0f,
+                                                                   "valid "
+                                                                   "name",
                                                                    "valid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
@@ -1162,42 +1210,82 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a counter with an invalid name
     BOOST_CHECK_THROW(
-        noCounter = counterDirectory.RegisterCounter("valid_parent_category", 0, 1, 123.45f, "", "valid description"),
+        noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                     6,
+                                                     "valid_parent_category",
+                                                     0,
+                                                     1,
+                                                     123.45f,
+                                                     "",
+                                                     "valid description"),
         armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid name
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category", 0, 1, 123.45f,
-                                                                   "invalid nam€", "valid description"),
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                   7,
+                                                                   "valid_parent_category",
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "invalid nam€",
+                                                                   "valid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid description
     BOOST_CHECK_THROW(noCounter =
-                          counterDirectory.RegisterCounter("valid_parent_category", 0, 1, 123.45f, "valid name", ""),
+                          counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                           8,
+                                                           "valid_parent_category",
+                                                           0,
+                                                           1,
+                                                           123.45f,
+                                                           "valid name",
+                                                           ""),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid description
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category", 0, 1, 123.45f, "valid name",
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                   9,
+                                                                   "valid_parent_category",
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid "
+                                                                   "name",
                                                                    "inv@lid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid unit2
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category", 0, 1, 123.45f, "valid name",
-                                                                   "valid description", std::string("Mb/s2")),
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                   10,
+                                                                   "valid_parent_category",
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid name",
+                                                                   "valid description",
+                                                                   std::string("Mb/s2")),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with a non-existing parent category name
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("invalid_parent_category", 0, 1, 123.45f,
-                                                                   "valid name", "valid description"),
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                   11,
+                                                                   "invalid_parent_category",
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid name",
+                                                                   "valid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
@@ -1220,7 +1308,14 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     // Register a counter with a valid parent category name
     const Counter* counter = nullptr;
     BOOST_CHECK_NO_THROW(
-        counter = counterDirectory.RegisterCounter(categoryName, 0, 1, 123.45f, "valid name", "valid description"));
+        counter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                   12,
+                                                   categoryName,
+                                                   0,
+                                                   1,
+                                                   123.45f,
+                                                   "valid name",
+                                                   "valid description"));
     BOOST_CHECK(counterDirectory.GetCounterCount() == 1);
     BOOST_CHECK(counter);
     BOOST_CHECK(counter->m_Uid >= 0);
@@ -1239,16 +1334,30 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     // Register a counter with a name of a counter already registered for the given parent category name
     const Counter* counterSameName = nullptr;
     BOOST_CHECK_THROW(counterSameName =
-                          counterDirectory.RegisterCounter(categoryName, 0, 0, 1.0f, "valid name", "valid description"),
+                          counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                           13,
+                                                           categoryName,
+                                                           0,
+                                                           0,
+                                                           1.0f,
+                                                           "valid name",
+                                                           "valid description",
+                                                           std::string("description")),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 1);
     BOOST_CHECK(!counterSameName);
 
     // Register a counter with a valid parent category name and units
     const Counter* counterWUnits = nullptr;
-    BOOST_CHECK_NO_THROW(counterWUnits = counterDirectory.RegisterCounter(categoryName, 0, 1, 123.45f, "valid name 2",
-                                                                          "valid description",
-                                                                          std::string("Mnnsq2")));    // Units
+    BOOST_CHECK_NO_THROW(counterWUnits = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                             14,
+                                                                             categoryName,
+                                                                             0,
+                                                                             1,
+                                                                             123.45f,
+                                                                             "valid name 2",
+                                                                             "valid description",
+                                                                             std::string("Mnnsq2")));    // Units
     BOOST_CHECK(counterDirectory.GetCounterCount() == 2);
     BOOST_CHECK(counterWUnits);
     BOOST_CHECK(counterWUnits->m_Uid >= 0);
@@ -1267,11 +1376,17 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a counter with a valid parent category name and not associated with a device
     const Counter* counterWoDevice = nullptr;
-    BOOST_CHECK_NO_THROW(counterWoDevice = counterDirectory.RegisterCounter(
-                             categoryName, 0, 1, 123.45f, "valid name 3", "valid description",
-                             armnn::EmptyOptional(),    // Units
-                             armnn::EmptyOptional(),    // Number of cores
-                             0));                       // Device UID
+    BOOST_CHECK_NO_THROW(counterWoDevice = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                               26,
+                                                                               categoryName,
+                                                                               0,
+                                                                               1,
+                                                                               123.45f,
+                                                                               "valid name 3",
+                                                                               "valid description",
+                                                                               armnn::EmptyOptional(),// Units
+                                                                               armnn::EmptyOptional(),// Number of cores
+                                                                               0));                   // Device UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 3);
     BOOST_CHECK(counterWoDevice);
     BOOST_CHECK(counterWoDevice->m_Uid >= 0);
@@ -1289,7 +1404,13 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     BOOST_CHECK(category->m_Counters.back() == counterWoDevice->m_Uid);
 
     // Register a counter with a valid parent category name and associated to an invalid device
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(categoryName, 0, 1, 123.45f, "valid name 4",
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                   15,
+                                                                   categoryName,
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid name 4",
                                                                    "valid description",
                                                                    armnn::EmptyOptional(),    // Units
                                                                    armnn::EmptyOptional(),    // Number of cores
@@ -1310,8 +1431,14 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a counter with a valid parent category name and associated to a device
     const Counter* counterWDevice = nullptr;
-    BOOST_CHECK_NO_THROW(counterWDevice = counterDirectory.RegisterCounter(categoryName, 0, 1, 123.45f, "valid name 5",
-                                                                           "valid description",
+    BOOST_CHECK_NO_THROW(counterWDevice = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                           16,
+                                                                           categoryName,
+                                                                           0,
+                                                                           1,
+                                                                           123.45f,
+                                                                           "valid name 5",
+                                                                           std::string("valid description"),
                                                                            armnn::EmptyOptional(),    // Units
                                                                            armnn::EmptyOptional(),    // Number of cores
                                                                            device->m_Uid));           // Device UID
@@ -1333,12 +1460,18 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a counter with a valid parent category name and not associated with a counter set
     const Counter* counterWoCounterSet = nullptr;
-    BOOST_CHECK_NO_THROW(counterWoCounterSet = counterDirectory.RegisterCounter(
-                             categoryName, 0, 1, 123.45f, "valid name 6", "valid description",
-                             armnn::EmptyOptional(),    // Units
-                             armnn::EmptyOptional(),    // Number of cores
-                             armnn::EmptyOptional(),    // Device UID
-                             0));                       // Counter set UID
+    BOOST_CHECK_NO_THROW(counterWoCounterSet = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                                17,
+                                                                                categoryName,
+                                                                                0,
+                                                                                1,
+                                                                                123.45f,
+                                                                                "valid name 6",
+                                                                                "valid description",
+                                                                                armnn::EmptyOptional(),// Units
+                                                                                armnn::EmptyOptional(),// No of cores
+                                                                                armnn::EmptyOptional(),// Device UID
+                                                                                0));                   // CounterSet UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 5);
     BOOST_CHECK(counterWoCounterSet);
     BOOST_CHECK(counterWoCounterSet->m_Uid >= 0);
@@ -1356,12 +1489,18 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     BOOST_CHECK(category->m_Counters.back() == counterWoCounterSet->m_Uid);
 
     // Register a counter with a valid parent category name and associated to an invalid counter set
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(categoryName, 0, 1, 123.45f, "valid name 7",
-                                                                   "valid description",
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                   18,
+                                                                   categoryName,
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid ",
+                                                                   "name 7",
+                                                                   std::string("valid description"),
                                                                    armnn::EmptyOptional(),    // Units
                                                                    armnn::EmptyOptional(),    // Number of cores
-                                                                   armnn::EmptyOptional(),    // Device UID
-                                                                   100),                      // Counter set UID
+                                                                   100),            // Counter set UID
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 5);
     BOOST_CHECK(!noCounter);
@@ -1370,6 +1509,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     const Counter* counterWNumberOfCores = nullptr;
     uint16_t numberOfCores               = 15;
     BOOST_CHECK_NO_THROW(counterWNumberOfCores = counterDirectory.RegisterCounter(
+                             armnn::profiling::BACKEND_ID, 50,
                              categoryName, 0, 1, 123.45f, "valid name 8", "valid description",
                              armnn::EmptyOptional(),      // Units
                              numberOfCores,               // Number of cores
@@ -1408,7 +1548,8 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     // Register a counter with a valid parent category name and associated to the multi-core device
     const Counter* counterWMultiCoreDevice = nullptr;
     BOOST_CHECK_NO_THROW(counterWMultiCoreDevice = counterDirectory.RegisterCounter(
-                             categoryName, 0, 1, 123.45f, "valid name 9", "valid description",
+                             armnn::profiling::BACKEND_ID, 19, categoryName, 0, 1,
+                             123.45f, "valid name 9", "valid description",
                              armnn::EmptyOptional(),      // Units
                              armnn::EmptyOptional(),      // Number of cores
                              multiCoreDevice->m_Uid,      // Device UID
@@ -1447,12 +1588,19 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     // Register a counter with a valid parent category name and getting the number of cores of the multi-core device
     // associated to that category
     const Counter* counterWMultiCoreDeviceWParentCategory = nullptr;
-    BOOST_CHECK_NO_THROW(counterWMultiCoreDeviceWParentCategory = counterDirectory.RegisterCounter(
-                             categoryName, 0, 1, 123.45f, "valid name 10", "valid description",
-                             armnn::EmptyOptional(),      // Units
-                             armnn::EmptyOptional(),      // Number of cores
-                             armnn::EmptyOptional(),      // Device UID
-                             armnn::EmptyOptional()));    // Counter set UID
+    BOOST_CHECK_NO_THROW(counterWMultiCoreDeviceWParentCategory =
+                                                counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                                                   100,
+                                                                                                   categoryName,
+                                                                                                   0,
+                                                                                                   1,
+                                                                                                   123.45f,
+                                                                                                  "valid name 10",
+                                                                                                  "valid description",
+                                                                             armnn::EmptyOptional(),// Units
+                                                                             armnn::EmptyOptional(),// Number of cores
+                                                                             armnn::EmptyOptional(),// Device UID
+                                                                             armnn::EmptyOptional()));// Counter set UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 26);
     BOOST_CHECK(counterWMultiCoreDeviceWParentCategory);
     BOOST_CHECK(counterWMultiCoreDeviceWParentCategory->m_Uid >= 0);
@@ -1487,6 +1635,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     // Register a counter with a valid parent category name and associated to a counter set
     const Counter* counterWCounterSet = nullptr;
     BOOST_CHECK_NO_THROW(counterWCounterSet = counterDirectory.RegisterCounter(
+                             armnn::profiling::BACKEND_ID, 300,
                              categoryName, 0, 1, 123.45f, "valid name 11", "valid description",
                              armnn::EmptyOptional(),    // Units
                              0,                         // Number of cores
@@ -1511,6 +1660,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     // Register a counter with a valid parent category name and associated to a device and a counter set
     const Counter* counterWDeviceWCounterSet = nullptr;
     BOOST_CHECK_NO_THROW(counterWDeviceWCounterSet = counterDirectory.RegisterCounter(
+                             armnn::profiling::BACKEND_ID, 23,
                              categoryName, 0, 1, 123.45f, "valid name 12", "valid description",
                              armnn::EmptyOptional(),    // Units
                              1,                         // Number of cores
@@ -1546,7 +1696,8 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a counter to the other category
     const Counter* anotherCounter = nullptr;
-    BOOST_CHECK_NO_THROW(anotherCounter = counterDirectory.RegisterCounter(anotherCategoryName, 1, 0, .00043f,
+    BOOST_CHECK_NO_THROW(anotherCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID, 24,
+                                                                           anotherCategoryName, 1, 0, .00043f,
                                                                            "valid name", "valid description",
                                                                            armnn::EmptyOptional(),    // Units
                                                                            armnn::EmptyOptional(),    // Number of cores
@@ -2128,8 +2279,10 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
     const CounterSet* counterSet = counterDirectory.RegisterCounterSet("countersetA");
     BOOST_CHECK(counterSet != nullptr);
     counterDirectory.RegisterCategory("categoryA", device->m_Uid, counterSet->m_Uid);
-    counterDirectory.RegisterCounter("categoryA", 0, 1, 2.0f, "counterA", "descA");
-    counterDirectory.RegisterCounter("categoryA", 1, 1, 3.0f, "counterB", "descB");
+    counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID, 24,
+                                     "categoryA", 0, 1, 2.0f, "counterA", "descA");
+    counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID, 25,
+                                     "categoryA", 1, 1, 3.0f, "counterB", "descB");
 
     profilingStateMachine.TransitionToState(ProfilingState::Uninitialised);
     BOOST_CHECK_THROW(commandHandler(packet), armnn::RuntimeException);    // Wrong profiling state
@@ -2325,7 +2478,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodRequestCounterDirectoryPacket)
     const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
     BOOST_TEST(writtenData.size() == 2);
     BOOST_TEST(writtenData[0] == 427); // The size of the expected Timeline Directory packet
-    BOOST_TEST(writtenData[1] == 416); // The size of the expected Counter Directory packet
+    BOOST_TEST(writtenData[1] ==656); // The size of the expected Counter Directory packet
 
     // The Request Counter Directory Command Handler should not have updated the profiling state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
@@ -2996,7 +3149,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
 
     // Wait for a bit (must at least be the delay value of the mock profiling connection) to make sure that
     // the Connection Acknowledged packet gets processed by the profiling service
-    std::this_thread::sleep_for(std::chrono::milliseconds(7));
+    std::this_thread::sleep_for(std::chrono::milliseconds(15));
 
     streamRedirector.CancelRedirect();
 
@@ -3075,7 +3228,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadRequestCounterDirectoryPacket)
 
     // Wait for a bit (must at least be the delay value of the mock profiling connection) to make sure that
     // the Create the Request Counter packet gets processed by the profiling service
-    std::this_thread::sleep_for(std::chrono::milliseconds(7));
+    std::this_thread::sleep_for(std::chrono::milliseconds(15));
 
     streamRedirector.CancelRedirect();
 

@@ -32,7 +32,6 @@ public:
     virtual uint32_t AddCounterValue(uint16_t counterUid, uint32_t value) = 0;
     virtual uint32_t SubtractCounterValue(uint16_t counterUid, uint32_t value) = 0;
     virtual uint32_t IncrementCounterValue(uint16_t counterUid) = 0;
-    virtual uint32_t DecrementCounterValue(uint16_t counterUid) = 0;
 };
 
 class IReadWriteCounterValues : public IReadCounterValues, public IWriteCounterValues

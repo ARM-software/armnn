@@ -6,7 +6,6 @@
 #include "ProfilingUtils.hpp"
 
 #include <armnn/Version.hpp>
-#include <armnn/Conversion.hpp>
 
 #include <WallClockTimer.hpp>
 
@@ -72,20 +71,17 @@ uint16_t GetNextUid(bool peekOnly)
     }
 }
 
-std::vector<uint16_t> GetNextCounterUids(uint16_t cores)
+std::vector<uint16_t> GetNextCounterUids(uint16_t firstUid, uint16_t cores)
 {
-    // The UID used for counters only. The first valid UID is 0
-    static uint16_t counterUid = 0;
-
     // Check that it is possible to generate the next counter UID without causing an overflow (throws in case of error)
-    ThrowIfCantGenerateNextUid(counterUid, cores);
+    ThrowIfCantGenerateNextUid(firstUid, cores);
 
     // Get the next counter UIDs
     size_t counterUidsSize = cores == 0 ? 1 : cores;
     std::vector<uint16_t> counterUids(counterUidsSize, 0);
     for (size_t i = 0; i < counterUidsSize; i++)
     {
-        counterUids[i] = counterUid++;
+        counterUids[i] = firstUid++;
     }
     return counterUids;
 }

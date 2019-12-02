@@ -5,6 +5,7 @@
 
 #include "ProfilingService.hpp"
 
+#include <armnn/BackendId.hpp>
 #include <armnn/Logging.hpp>
 
 #include <boost/format.hpp>
@@ -27,6 +28,11 @@ void ProfilingService::ResetExternalProfilingOptions(const ExternalProfilingOpti
         // Reset the profiling service
         Reset();
     }
+}
+
+bool ProfilingService::IsProfilingEnabled()
+{
+    return m_Options.m_EnableProfiling;
 }
 
 ProfilingState ProfilingService::ConfigureProfilingService(
@@ -235,14 +241,6 @@ uint32_t ProfilingService::IncrementCounterValue(uint16_t counterUid)
     return counterValuePtr->operator++(std::memory_order::memory_order_relaxed);
 }
 
-uint32_t ProfilingService::DecrementCounterValue(uint16_t counterUid)
-{
-    CheckCounterUid(counterUid);
-    std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
-    BOOST_ASSERT(counterValuePtr);
-    return counterValuePtr->operator--(std::memory_order::memory_order_relaxed);
-}
-
 ProfilingDynamicGuid ProfilingService::NextGuid()
 {
     return m_GuidGenerator.NextGuid();
@@ -266,41 +264,77 @@ void ProfilingService::Initialize()
         m_CounterDirectory.RegisterCategory("ArmNN_Runtime");
     }
 
-    // Register a counter for the number of loaded networks
-    if (!m_CounterDirectory.IsCounterRegistered("Loaded networks"))
+    // Register a counter for the number of Network loads
+    if (!m_CounterDirectory.IsCounterRegistered("Network loads"))
     {
         const Counter* loadedNetworksCounter =
-                m_CounterDirectory.RegisterCounter("ArmNN_Runtime",
+                m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                   armnn::profiling::NETWORK_LOADS,
+                                                   "ArmNN_Runtime",
                                                    0,
                                                    0,
                                                    1.f,
-                                                   "Loaded networks",
+                                                   "Network loads",
                                                    "The number of networks loaded at runtime",
                                                    std::string("networks"));
         BOOST_ASSERT(loadedNetworksCounter);
         InitializeCounterValue(loadedNetworksCounter->m_Uid);
     }
-
-    // Register a counter for the number of registered backends
-    if (!m_CounterDirectory.IsCounterRegistered("Registered backends"))
+    // Register a counter for the number of unloaded networks
+    if (!m_CounterDirectory.IsCounterRegistered("Network unloads"))
     {
-        const Counter* registeredBackendsCounter =
-                m_CounterDirectory.RegisterCounter("ArmNN_Runtime",
+        const Counter* unloadedNetworksCounter =
+                m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                   armnn::profiling::NETWORK_UNLOADS,
+                                                   "ArmNN_Runtime",
                                                    0,
                                                    0,
                                                    1.f,
-                                                   "Registered backends",
+                                                   "Network unloads",
+                                                   "The number of networks unloaded at runtime",
+                                                   std::string("networks"));
+        BOOST_ASSERT(unloadedNetworksCounter);
+        InitializeCounterValue(unloadedNetworksCounter->m_Uid);
+    }
+    // Register a counter for the number of registered backends
+    if (!m_CounterDirectory.IsCounterRegistered("Backends registered"))
+    {
+        const Counter* registeredBackendsCounter =
+                m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                   armnn::profiling::REGISTERED_BACKENDS,
+                                                   "ArmNN_Runtime",
+                                                   0,
+                                                   0,
+                                                   1.f,
+                                                   "Backends registered",
                                                    "The number of registered backends",
                                                    std::string("backends"));
         BOOST_ASSERT(registeredBackendsCounter);
         InitializeCounterValue(registeredBackendsCounter->m_Uid);
     }
-
+    // Register a counter for the number of registered backends
+    if (!m_CounterDirectory.IsCounterRegistered("Backends unregistered"))
+    {
+        const Counter* unregisteredBackendsCounter =
+                m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                   armnn::profiling::UNREGISTERED_BACKENDS,
+                                                   "ArmNN_Runtime",
+                                                   0,
+                                                   0,
+                                                   1.f,
+                                                   "Backends unregistered",
+                                                   "The number of unregistered backends",
+                                                   std::string("backends"));
+        BOOST_ASSERT(unregisteredBackendsCounter);
+        InitializeCounterValue(unregisteredBackendsCounter->m_Uid);
+    }
     // Register a counter for the number of inferences run
     if (!m_CounterDirectory.IsCounterRegistered("Inferences run"))
     {
         const Counter* inferencesRunCounter =
-                m_CounterDirectory.RegisterCounter("ArmNN_Runtime",
+                m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                   armnn::profiling::INFERENCES_RUN,
+                                                   "ArmNN_Runtime",
                                                    0,
                                                    0,
                                                    1.f,

@@ -462,6 +462,10 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
     bool executionSucceeded = true;
 
     {
+        if (profiling::ProfilingService::Instance().IsProfilingEnabled())
+        {
+            profiling::ProfilingService::Instance().IncrementCounterValue(armnn::profiling::INFERENCES_RUN);
+        }
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Execute");
         ARMNN_SCOPED_HEAP_PROFILING("Executing");
         executionSucceeded = Execute(timelineUtils, inferenceGuid);

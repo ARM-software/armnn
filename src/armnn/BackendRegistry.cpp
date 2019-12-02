@@ -5,6 +5,7 @@
 
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Exceptions.hpp>
+#include <ProfilingService.hpp>
 
 namespace armnn
 {
@@ -23,12 +24,19 @@ void BackendRegistry::Register(const BackendId& id, BackendRegistry::FactoryFunc
             std::string(id) + " already registered as IBackend factory",
             CHECK_LOCATION());
     }
-
+    if (profiling::ProfilingService::Instance().IsProfilingEnabled())
+    {
+        profiling::ProfilingService::Instance().IncrementCounterValue(armnn::profiling::REGISTERED_BACKENDS);
+    }
     m_Factories[id] = factory;
 }
 
 void BackendRegistry::Deregister(const BackendId& id)
 {
+    if (profiling::ProfilingService::Instance().IsProfilingEnabled())
+    {
+        profiling::ProfilingService::Instance().IncrementCounterValue(armnn::profiling::UNREGISTERED_BACKENDS);
+    }
     m_Factories.erase(id);
 }
 

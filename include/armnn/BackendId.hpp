@@ -165,6 +165,12 @@ struct hash<armnn::BackendId>
 namespace armnn
 {
 
+namespace profiling
+{
+    // Static constant describing ArmNN as a dummy backend
+    static const BackendId BACKEND_ID("ARMNN");
+} // profiling
+
 inline std::ostream& operator<<(std::ostream& os, const BackendId& id)
 {
     os << id.Get();

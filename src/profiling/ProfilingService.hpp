@@ -26,6 +26,12 @@ namespace armnn
 
 namespace profiling
 {
+// Static constants describing ArmNN's counter UID's
+static const uint16_t NETWORK_LOADS         =   0;
+static const uint16_t NETWORK_UNLOADS       =   1;
+static const uint16_t REGISTERED_BACKENDS   =   2;
+static const uint16_t UNREGISTERED_BACKENDS =   3;
+static const uint16_t INFERENCES_RUN        =   4;
 
 class ProfilingService : public IReadWriteCounterValues, public IProfilingGuidGenerator
 {
@@ -59,15 +65,15 @@ public:
     const ICounterDirectory& GetCounterDirectory() const;
     ProfilingState GetCurrentState() const;
     bool IsCounterRegistered(uint16_t counterUid) const override;
-    uint16_t GetCounterCount() const override;
     uint32_t GetCounterValue(uint16_t counterUid) const override;
+    uint16_t GetCounterCount() const override;
+    bool IsProfilingEnabled();
 
     // Setters for the profiling service state
     void SetCounterValue(uint16_t counterUid, uint32_t value) override;
     uint32_t AddCounterValue(uint16_t counterUid, uint32_t value) override;
     uint32_t SubtractCounterValue(uint16_t counterUid, uint32_t value) override;
     uint32_t IncrementCounterValue(uint16_t counterUid) override;
-    uint32_t DecrementCounterValue(uint16_t counterUid) override;
 
     // IProfilingGuidGenerator functions
     /// Return the next random Guid in the sequence

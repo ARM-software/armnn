@@ -524,7 +524,8 @@ BOOST_AUTO_TEST_CASE(CreateEventRecordTest)
     const std::string counterName = "some_valid_counter";
     const std::string counterDescription = "a_counter_for_testing";
     const std::string counterUnits = "Mrads2";
-    const CounterPtr counter = std::make_unique<Counter>(counterUid,
+    const CounterPtr counter = std::make_unique<Counter>(armnn::profiling::BACKEND_ID,
+                                                         counterUid,
                                                          maxCounterUid,
                                                          counterClass,
                                                          counterInterpolation,
@@ -645,7 +646,8 @@ BOOST_AUTO_TEST_CASE(CreateEventRecordNoUnitsTest)
     double counterMultiplier = 4435.0023f;
     const std::string counterName = "some_valid_counter";
     const std::string counterDescription = "a_counter_for_testing";
-    const CounterPtr counter = std::make_unique<Counter>(counterUid,
+    const CounterPtr counter = std::make_unique<Counter>(armnn::profiling::BACKEND_ID,
+                                                         counterUid,
                                                          maxCounterUid,
                                                          counterClass,
                                                          counterInterpolation,
@@ -751,7 +753,8 @@ BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest1)
     const std::string counterName = "some_invalid_counter £££"; // Invalid name
     const std::string counterDescription = "a_counter_for_testing";
     const std::string counterUnits = "Mrads2";
-    const CounterPtr counter = std::make_unique<Counter>(counterUid,
+    const CounterPtr counter = std::make_unique<Counter>(armnn::profiling::BACKEND_ID,
+                                                         counterUid,
                                                          maxCounterUid,
                                                          counterClass,
                                                          counterInterpolation,
@@ -791,7 +794,8 @@ BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest2)
     const std::string counterName = "some_invalid_counter";
     const std::string counterDescription = "an invalid d€scription"; // Invalid description
     const std::string counterUnits = "Mrads2";
-    const CounterPtr counter = std::make_unique<Counter>(counterUid,
+    const CounterPtr counter = std::make_unique<Counter>(armnn::profiling::BACKEND_ID,
+                                                         counterUid,
                                                          maxCounterUid,
                                                          counterClass,
                                                          counterInterpolation,
@@ -831,7 +835,8 @@ BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest3)
     const std::string counterName = "some_invalid_counter";
     const std::string counterDescription = "a valid description";
     const std::string counterUnits = "Mrad s2"; // Invalid units
-    const CounterPtr counter = std::make_unique<Counter>(counterUid,
+    const CounterPtr counter = std::make_unique<Counter>(armnn::profiling::BACKEND_ID,
+                                                         counterUid,
                                                          maxCounterUid,
                                                          counterClass,
                                                          counterInterpolation,
@@ -871,10 +876,11 @@ BOOST_AUTO_TEST_CASE(CreateCategoryRecordTest)
     // Create a collection of counters
     Counters counters;
     counters.insert(std::make_pair<uint16_t, CounterPtr>(11,
-                                                         CounterPtr(new Counter(11,
-                                                                                1234,
+                                                         CounterPtr(new Counter(armnn::profiling::BACKEND_ID,
                                                                                 0,
-                                                                                1,
+                                                                                11,
+                                                                                0,
+                                                                                0,
                                                                                 534.0003f,
                                                                                 "counter1",
                                                                                 "the first counter",
@@ -882,9 +888,10 @@ BOOST_AUTO_TEST_CASE(CreateCategoryRecordTest)
                                                                                 0,
                                                                                 0))));
     counters.insert(std::make_pair<uint16_t, CounterPtr>(23,
-                                                         CounterPtr(new Counter(23,
-                                                                                344,
+                                                         CounterPtr(new Counter(armnn::profiling::BACKEND_ID,
                                                                                 1,
+                                                                                23,
+                                                                                0,
                                                                                 1,
                                                                                 534.0003f,
                                                                                 "this is counter 2",
@@ -893,8 +900,9 @@ BOOST_AUTO_TEST_CASE(CreateCategoryRecordTest)
                                                                                 0,
                                                                                 0))));
     counters.insert(std::make_pair<uint16_t, CounterPtr>(5670,
-                                                         CounterPtr(new Counter(5670,
-                                                                                31,
+                                                         CounterPtr(new Counter(armnn::profiling::BACKEND_ID,
+                                                                                2,
+                                                                                5670,
                                                                                 0,
                                                                                 0,
                                                                                 534.0003f,
@@ -1099,7 +1107,8 @@ BOOST_AUTO_TEST_CASE(CreateInvalidCategoryRecordTest2)
     // Create a collection of counters
     Counters counters;
     counters.insert(std::make_pair<uint16_t, CounterPtr>(11,
-                                                         CounterPtr(new Counter(11,
+                                                         CounterPtr(new Counter(armnn::profiling::BACKEND_ID,
+                                                                                11,
                                                                                 1234,
                                                                                 0,
                                                                                 1,
@@ -1198,7 +1207,9 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
 
     // Register a counter associated to "category1"
     const Counter* counter1 = nullptr;
-    BOOST_CHECK_NO_THROW(counter1 = counterDirectory.RegisterCounter(category1Name,
+    BOOST_CHECK_NO_THROW(counter1 = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                     0,
+                                                                     category1Name,
                                                                      0,
                                                                      1,
                                                                      123.45f,
@@ -1210,7 +1221,9 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
 
     // Register a counter associated to "category1"
     const Counter* counter2 = nullptr;
-    BOOST_CHECK_NO_THROW(counter2 = counterDirectory.RegisterCounter(category1Name,
+    BOOST_CHECK_NO_THROW(counter2 = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                     4,
+                                                                     category1Name,
                                                                      1,
                                                                      0,
                                                                      330.1245656765f,
@@ -1225,7 +1238,9 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
 
     // Register a counter associated to "category2"
     const Counter* counter3 = nullptr;
-    BOOST_CHECK_NO_THROW(counter3 = counterDirectory.RegisterCounter(category2Name,
+    BOOST_CHECK_NO_THROW(counter3 = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                     5,
+                                                                     category2Name,
                                                                      1,
                                                                      1,
                                                                      0.0000045399f,
@@ -1755,7 +1770,9 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest7)
 
     // Register an invalid counter associated to a valid category
     const Counter* counter = nullptr;
-    BOOST_CHECK_NO_THROW(counter = counterDirectory.RegisterCounter(categoryName,
+    BOOST_CHECK_NO_THROW(counter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+                                                                    0,
+                                                                    categoryName,
                                                                     0,
                                                                     1,
                                                                     123.45f,

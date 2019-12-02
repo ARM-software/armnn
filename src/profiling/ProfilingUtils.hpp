@@ -136,7 +136,7 @@ bool ConvertDirectoryComponent(const std::string& directoryComponent, SwTraceBuf
 
 uint16_t GetNextUid(bool peekOnly = false);
 
-std::vector<uint16_t> GetNextCounterUids(uint16_t cores);
+std::vector<uint16_t> GetNextCounterUids(uint16_t firstUid, uint16_t cores);
 
 void WriteBytes(const IPacketBuffer& packetBuffer, unsigned int offset, const void* value, unsigned int valueSize);
 

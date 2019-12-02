@@ -8,6 +8,7 @@
 #include "ICounterDirectory.hpp"
 
 #include <armnn/Optional.hpp>
+#include <armnn/BackendId.hpp>
 
 #include <string>
 #include <unordered_set>
@@ -37,16 +38,18 @@ public:
     const CounterSet* RegisterCounterSet(const std::string& counterSetName,
                                          uint16_t count = 0,
                                          const Optional<std::string>& parentCategoryName = EmptyOptional());
-    const Counter*    RegisterCounter   (const std::string& parentCategoryName,
-                                         uint16_t counterClass,
-                                         uint16_t interpolation,
-                                         double multiplier,
-                                         const std::string& name,
-                                         const std::string& description,
-                                         const Optional<std::string>& units = EmptyOptional(),
-                                         const Optional<uint16_t>& numberOfCores = EmptyOptional(),
-                                         const Optional<uint16_t>& deviceUid = EmptyOptional(),
-                                         const Optional<uint16_t>& counterSetUid = EmptyOptional());
+    const Counter* RegisterCounter(const BackendId& backendId,
+                                   const uint16_t uid,
+                                   const std::string& parentCategoryName,
+                                   uint16_t counterClass,
+                                   uint16_t interpolation,
+                                   double multiplier,
+                                   const std::string& name,
+                                   const std::string& description,
+                                   const Optional<std::string>& units = EmptyOptional(),
+                                   const Optional<uint16_t>& numberOfCores = EmptyOptional(),
+                                   const Optional<uint16_t>& deviceUid = EmptyOptional(),
+                                   const Optional<uint16_t>& counterSetUid = EmptyOptional());
 
     // Getters for counts
     uint16_t GetCategoryCount()   const override { return boost::numeric_cast<uint16_t>(m_Categories.size());  }

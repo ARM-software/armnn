@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
     BOOST_CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_TEST(size == 308);
+    BOOST_TEST(size == 388);
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
 
@@ -140,6 +140,16 @@ BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
     // Connection
     VerifyTimelineLabelBinaryPacket(LabelsAndEventClasses::CONNECTION_GUID,
                                     LabelsAndEventClasses::CONNECTION,
+                                    readableData,
+                                    offset);
+    // Inference
+    VerifyTimelineLabelBinaryPacket(LabelsAndEventClasses::INFERENCE_GUID,
+                                    LabelsAndEventClasses::INFERENCE,
+                                    readableData,
+                                    offset);
+    // Workload Execution
+    VerifyTimelineLabelBinaryPacket(LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
+                                    LabelsAndEventClasses::WORKLOAD_EXECUTION,
                                     readableData,
                                     offset);
 

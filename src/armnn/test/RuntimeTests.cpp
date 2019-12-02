@@ -654,6 +654,10 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     // Does the inference.
     runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
 
+    // Get readable buffer for inference timeline
+    auto inferenceReadableBuffer = bufferManager.GetReadableBuffer();
+    BOOST_CHECK(inferenceReadableBuffer != nullptr);
+
     // Get readable buffer for output workload
     auto outputReadableBuffer = bufferManager.GetReadableBuffer();
     BOOST_CHECK(outputReadableBuffer != nullptr);
@@ -777,6 +781,314 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                            offset);
 
     bufferManager.MarkRead(outputReadableBuffer);
+
+    // Validate inference data
+    size = inferenceReadableBuffer->GetSize();
+    BOOST_CHECK(size == 1608);
+
+    readableData = inferenceReadableBuffer->GetReadableData();
+    BOOST_CHECK(readableData != nullptr);
+
+    offset = 0;
+
+    // Inference timeline trace
+    // Inference entity
+    VerifyTimelineEntityBinaryPacket(EmptyOptional(), readableData, offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::INFERENCE_GUID,
+                                           readableData,
+                                           offset);
+
+    // Type label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::TYPE_GUID,
+                                           readableData,
+                                           offset);
+
+    // Network - Inference relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                           EmptyOptional(),
+                                           optNetGuid,
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Start Inference life
+    // Event packet - timeline, threadId, eventGuid
+    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+
+    // Inference - event relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::ExecutionLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Event - event class relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::DataLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
+                                           readableData,
+                                           offset);
+
+    // Execution
+    // Input workload execution
+    // Input workload execution entity
+    VerifyTimelineEntityBinaryPacket(EmptyOptional(), readableData, offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
+                                           readableData,
+                                           offset);
+
+    // Type label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::TYPE_GUID,
+                                           readableData,
+                                           offset);
+
+    // Inference - Workload execution relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Workload - Workload execution relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Start Input workload execution life
+    // Event packet - timeline, threadId, eventGuid
+    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+
+    // Input workload execution - event relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::ExecutionLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Event - event class relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::DataLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
+                                           readableData,
+                                           offset);
+
+    // End of Input workload execution life
+    // Event packet - timeline, threadId, eventGuid
+    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+
+    // Input workload execution - event relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::ExecutionLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Event - event class relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::DataLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
+                                           readableData,
+                                           offset);
+
+    // Normalize workload execution
+    // Normalize workload execution entity
+    VerifyTimelineEntityBinaryPacket(EmptyOptional(), readableData, offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
+                                           readableData,
+                                           offset);
+
+    // Type label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::TYPE_GUID,
+                                           readableData,
+                                           offset);
+
+    // Inference - Workload execution relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Workload - Workload execution relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Start Normalize workload execution life
+    // Event packet - timeline, threadId, eventGuid
+    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+
+    // Normalize workload execution - event relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::ExecutionLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Event - event class relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::DataLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
+                                           readableData,
+                                           offset);
+
+    // End of Normalize workload execution life
+    // Event packet - timeline, threadId, eventGuid
+    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+
+    // Normalize workload execution - event relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::ExecutionLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Event - event class relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::DataLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
+                                           readableData,
+                                           offset);
+
+    // Output workload execution
+    // Output workload execution entity
+    VerifyTimelineEntityBinaryPacket(EmptyOptional(), readableData, offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
+                                           readableData,
+                                           offset);
+
+    // Type label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::TYPE_GUID,
+                                           readableData,
+                                           offset);
+
+    // Inference - Workload execution relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Workload - Workload execution relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Start Output workload execution life
+    // Event packet - timeline, threadId, eventGuid
+    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+
+    // Output workload execution - event relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::ExecutionLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Event - event class relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::DataLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
+                                           readableData,
+                                           offset);
+
+    // End of Normalize workload execution life
+    // Event packet - timeline, threadId, eventGuid
+    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+
+    // Output workload execution - event relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::ExecutionLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Event - event class relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::DataLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
+                                           readableData,
+                                           offset);
+
+    // End of Inference life
+    // Event packet - timeline, threadId, eventGuid
+    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+
+    // Inference - event relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::ExecutionLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Event - event class relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::DataLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
+                                           readableData,
+                                           offset);
+
+    bufferManager.MarkRead(inferenceReadableBuffer);
 }
 
 BOOST_AUTO_TEST_CASE(ProfilingPostOptimisationStructureCpuRef)

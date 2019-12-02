@@ -15,6 +15,7 @@
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
+#include <TimelineUtilityMethods.hpp>
 
 #include <mutex>
 #include <unordered_map>
@@ -62,7 +63,9 @@ private:
 
     void EnqueueOutput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo);
 
-    bool Execute();
+    bool Execute(std::unique_ptr<profiling::TimelineUtilityMethods>& timelineUtils,
+                 profiling::ProfilingGuid inferenceGuid);
+
 
     const IWorkloadFactory& GetWorkloadFactory(const Layer& layer) const;
 

@@ -80,6 +80,11 @@ public:
 
     ProfilingDynamicGuid RecordEvent(ProfilingGuid entityGuid, ProfilingStaticGuid eventClassGuid);
 
+    ProfilingDynamicGuid RecordWorkloadInferenceAndStartOfLifeEvent(ProfilingGuid workloadGuid,
+                                                                    ProfilingGuid inferenceGuid);
+
+    void RecordEndOfLifeEvent(ProfilingGuid entityGuid);
+
     void Commit() { m_SendTimelinePacket->Commit(); }
 
 private:

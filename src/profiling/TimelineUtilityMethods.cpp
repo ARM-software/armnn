@@ -62,6 +62,14 @@ void TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses()
     m_SendTimelinePacket->SendTimelineLabelBinaryPacket(LabelsAndEventClasses::CONNECTION_GUID,
                                                         LabelsAndEventClasses::CONNECTION);
 
+    // Send the "inference" label, this call throws in case of error
+    m_SendTimelinePacket->SendTimelineLabelBinaryPacket(LabelsAndEventClasses::INFERENCE_GUID,
+                                                        LabelsAndEventClasses::INFERENCE);
+
+    // Send the "workload_execution" label, this call throws in case of error
+    m_SendTimelinePacket->SendTimelineLabelBinaryPacket(LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
+                                                        LabelsAndEventClasses::WORKLOAD_EXECUTION);
+
     // Send the "start of life" event class, this call throws in case of error
     m_SendTimelinePacket->SendTimelineEventClassBinaryPacket(LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
 
@@ -384,6 +392,22 @@ ProfilingDynamicGuid TimelineUtilityMethods::RecordEvent(ProfilingGuid entityGui
                                                                eventClassGuid);
 
     return eventGuid;
+}
+
+ProfilingDynamicGuid TimelineUtilityMethods::RecordWorkloadInferenceAndStartOfLifeEvent(ProfilingGuid workloadGuid,
+                                                                                        ProfilingGuid inferenceGuid)
+{
+    ProfilingDynamicGuid workloadInferenceGuid = ProfilingService::Instance().NextGuid();
+    CreateTypedEntity(workloadInferenceGuid, LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID);
+    CreateRelationship(ProfilingRelationshipType::RetentionLink, inferenceGuid, workloadInferenceGuid);
+    CreateRelationship(ProfilingRelationshipType::RetentionLink, workloadGuid, workloadInferenceGuid);
+    RecordEvent(workloadInferenceGuid, LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
+    return workloadInferenceGuid;
+}
+
+void TimelineUtilityMethods::RecordEndOfLifeEvent(ProfilingGuid entityGuid)
+{
+    RecordEvent(entityGuid, LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
 }
 
 } // namespace profiling

@@ -19,7 +19,6 @@
 #include <backendsCommon/MemSyncWorkload.hpp>
 #include <LabelsAndEventClasses.hpp>
 #include <ProfilingService.hpp>
-#include <TimelineUtilityMethods.hpp>
 
 #include <boost/polymorphic_cast.hpp>
 #include <boost/assert.hpp>
@@ -449,14 +448,31 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
         EnqueueOutput(*outputLayer, pin.GetTensorHandle(), pin.GetTensorInfo());
     }
 
+    std::unique_ptr<TimelineUtilityMethods> timelineUtils = TimelineUtilityMethods::GetTimelineUtils();
+    ProfilingGuid inferenceGuid = ProfilingService::Instance().NextGuid();
+    if (timelineUtils)
+    {
+        // Add inference timeline trace if profiling is enabled.
+        ProfilingGuid networkGuid = m_OptimizedNetwork->GetGuid();
+        timelineUtils->CreateTypedEntity(inferenceGuid, LabelsAndEventClasses::INFERENCE_GUID);
+        timelineUtils->CreateRelationship(ProfilingRelationshipType::RetentionLink, networkGuid, inferenceGuid);
+        timelineUtils->RecordEvent(inferenceGuid, LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
+    }
+
     bool executionSucceeded = true;
 
     {
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Execute");
         ARMNN_SCOPED_HEAP_PROFILING("Executing");
-        executionSucceeded = Execute();
+        executionSucceeded = Execute(timelineUtils, inferenceGuid);
     }
 
+    if (timelineUtils)
+    {
+        // Add end of life of the inference timeline if profiling is enabled.
+        timelineUtils->RecordEvent(inferenceGuid, LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
+        timelineUtils->Commit();
+    }
     return executionSucceeded ? Status::Success : Status::Failure;
 }
 
@@ -656,7 +672,8 @@ void LoadedNetwork::FreeWorkingMemory()
     m_IsWorkingMemAllocated = false;
 }
 
-bool LoadedNetwork::Execute()
+bool LoadedNetwork::Execute(std::unique_ptr<TimelineUtilityMethods>& timelineUtils,
+                            profiling::ProfilingGuid inferenceGuid)
 {
     bool success = true;
 
@@ -671,19 +688,46 @@ bool LoadedNetwork::Execute()
         std::lock_guard<std::mutex> lockGuard(m_WorkingMemMutex);
         AllocateWorkingMemory();
 
+        ProfilingDynamicGuid workloadInferenceID(0);
         for (auto& input : m_InputQueue)
         {
+            if(timelineUtils)
+            {
+                workloadInferenceID = timelineUtils->RecordWorkloadInferenceAndStartOfLifeEvent(input->GetGuid(),
+                                                                                                inferenceGuid);
+            }
             input->Execute();
+            if(timelineUtils)
+            {
+                timelineUtils->RecordEndOfLifeEvent(workloadInferenceID);
+            }
         }
 
         for (auto& workload : m_WorkloadQueue)
         {
+            if(timelineUtils)
+            {
+                workloadInferenceID = timelineUtils->RecordWorkloadInferenceAndStartOfLifeEvent(workload->GetGuid(),
+                                                                                                inferenceGuid);
+            }
             workload->Execute();
+            if(timelineUtils)
+            {
+                timelineUtils->RecordEndOfLifeEvent(workloadInferenceID);
+            }
         }
-
         for (auto& output: m_OutputQueue)
         {
+            if(timelineUtils)
+            {
+                workloadInferenceID = timelineUtils->RecordWorkloadInferenceAndStartOfLifeEvent(output->GetGuid(),
+                                                                                                inferenceGuid);
+            }
             output->Execute();
+            if(timelineUtils)
+            {
+                timelineUtils->RecordEndOfLifeEvent(workloadInferenceID);
+            }
         }
     }
     catch (const RuntimeException& error)

@@ -33,10 +33,14 @@ public:
     static std::string WORKLOAD;
     static std::string NETWORK;
     static std::string CONNECTION;
+    static std::string INFERENCE;
+    static std::string WORKLOAD_EXECUTION;
     static ProfilingStaticGuid LAYER_GUID;
     static ProfilingStaticGuid WORKLOAD_GUID;
     static ProfilingStaticGuid NETWORK_GUID;
     static ProfilingStaticGuid CONNECTION_GUID;
+    static ProfilingStaticGuid INFERENCE_GUID;
+    static ProfilingStaticGuid WORKLOAD_EXECUTION_GUID;
 
     // Event Class GUIDs
     static ProfilingStaticGuid ARMNN_PROFILING_SOL_EVENT_CLASS;

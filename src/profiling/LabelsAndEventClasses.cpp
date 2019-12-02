@@ -33,6 +33,8 @@ std::string LabelsAndEventClasses::LAYER("layer");
 std::string LabelsAndEventClasses::WORKLOAD("workload");
 std::string LabelsAndEventClasses::NETWORK("network");
 std::string LabelsAndEventClasses::CONNECTION("connection");
+std::string LabelsAndEventClasses::INFERENCE("inference");
+std::string LabelsAndEventClasses::WORKLOAD_EXECUTION("workload_execution");
 
 ProfilingStaticGuid LabelsAndEventClasses::LAYER_GUID(
     m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::LAYER));
@@ -42,6 +44,10 @@ ProfilingStaticGuid LabelsAndEventClasses::NETWORK_GUID(
     m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::NETWORK));
 ProfilingStaticGuid LabelsAndEventClasses::CONNECTION_GUID(
     m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::CONNECTION));
+ProfilingStaticGuid LabelsAndEventClasses::INFERENCE_GUID(
+    m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::INFERENCE));
+ProfilingStaticGuid LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID(
+    m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::WORKLOAD_EXECUTION));
 
 // Event Class GUIDs
 ProfilingStaticGuid LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS(

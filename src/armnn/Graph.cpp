@@ -199,6 +199,11 @@ Status Graph::AllocateDynamicBuffers()
                 {
                     handleReferenceCounts[tensorHandle] = numConnections;
                     tensorHandle->Manage();
+                    if (handleReferenceCounts[tensorHandle] == 0u)
+                    {
+                          // if nobody consumes this tensor we call Allocate()
+                          tensorHandle->Allocate();
+                    }
                 }
                 else
                 {

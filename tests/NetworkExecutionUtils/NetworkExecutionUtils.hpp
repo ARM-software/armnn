@@ -392,6 +392,7 @@ int MainImpl(const ExecuteNetworkParams& params,
         inferenceModelParams.m_DynamicBackendsPath            = params.m_DynamicBackendsPath;
         inferenceModelParams.m_PrintIntermediateLayers        = params.m_PrintIntermediate;
         inferenceModelParams.m_VisualizePostOptimizationModel = params.m_EnableLayerDetails;
+        inferenceModelParams.m_ParseUnsupported               = params.m_ParseUnsupported;
 
         for(const std::string& inputName: params.m_InputNames)
         {

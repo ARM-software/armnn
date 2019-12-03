@@ -109,6 +109,8 @@ private:
     std::thread m_SendThread;
     std::atomic<bool> m_IsRunning;
     std::atomic<bool> m_KeepRunning;
+    // m_ReadyToRead will be protected by m_WaitMutex
+    bool m_ReadyToRead;
     std::exception_ptr m_SendThreadException;
     std::mutex m_PacketSentWaitMutex;
     std::condition_variable m_PacketSentWaitCondition;

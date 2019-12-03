@@ -90,6 +90,7 @@ void ProfilingService::Update()
     switch (currentState)
     {
     case ProfilingState::Uninitialised:
+
         // Initialize the profiling service
         Initialize();
 
@@ -366,6 +367,11 @@ inline void ProfilingService::CheckCounterUid(uint16_t counterUid) const
     {
         throw InvalidArgumentException(boost::str(boost::format("Counter UID %1% is not registered") % counterUid));
     }
+}
+
+ProfilingService::~ProfilingService()
+{
+    Stop();
 }
 
 } // namespace profiling

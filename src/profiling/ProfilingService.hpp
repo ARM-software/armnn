@@ -179,7 +179,7 @@ protected:
         // Register the "Per-Job Counter Selection" command handler
         m_CommandHandlerRegistry.RegisterFunctor(&m_PerJobCounterSelectionCommandHandler);
     }
-    ~ProfilingService() = default;
+    ~ProfilingService();
 
     // Protected methods for testing
     void SwapProfilingConnectionFactory(ProfilingService& instance,

@@ -45,8 +45,8 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
     profilingService.Update();
     profilingService.Update();
 
-    uint32_t timeout   = 25; // Wait for a maximum of 25mSec
-    uint32_t sleepTime = 1;  // in 1mSec intervals.
+    uint32_t timeout = 1000; // Wait for a maximum of 1000mSec
+    uint32_t sleepTime = 2;  // in 2mSec intervals.
     uint32_t timeSlept = 0;
 
     // Give the profiling service sending thread time start executing and send the stream metadata.
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
     options.m_EnableProfiling = false;
     profilingService.ResetExternalProfilingOptions(options, true);
     // Wait a short time to allow the threads to clean themselves up.
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     // The output file size should be greater than 0.
     struct stat statusBuffer;

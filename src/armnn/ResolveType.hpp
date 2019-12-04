@@ -33,6 +33,12 @@ struct ResolveTypeImpl<DataType::QuantisedAsymm8>
 };
 
 template<>
+struct ResolveTypeImpl<DataType::QSymmS8>
+{
+    using Type = int8_t;
+};
+
+template<>
 struct ResolveTypeImpl<DataType::QuantisedSymm16>
 {
     using Type = int16_t;

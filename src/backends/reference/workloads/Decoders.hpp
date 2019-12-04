@@ -105,6 +105,13 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
         {
             return MakeSigned32Decoder(info, data);
         }
+        case DataType::QSymmS8:
+        {
+            return std::make_unique<QSymmS8Decoder>(
+            static_cast<const int8_t*>(data),
+            info.GetQuantizationScale(),
+            info.GetQuantizationOffset());
+        }
         default:
         {
             BOOST_ASSERT_MSG(false, "Unsupported Data Type!");

@@ -163,6 +163,9 @@ INetworkPtr NetworkQuantizer::ExportNetwork()
         case DataType::QuantisedAsymm8:
             quantizationScheme = std::make_unique<QAsymm8QuantizationScheme>();
             break;
+        case DataType::QSymmS8:
+            quantizationScheme = std::make_unique<QSymmS8QuantizationScheme>();
+            break;
         case DataType::QuantisedSymm16:
             quantizationScheme = std::make_unique<QSymm16QuantizationScheme>();
             break;

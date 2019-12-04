@@ -48,6 +48,11 @@ void RefQuantizeWorkload::Execute() const
             QuantizeImpl<uint8_t>(input, output, m_NumElements, m_Scale, m_Offset);
             break;
         }
+        case DataType::QSymmS8:
+        {
+            QuantizeImpl<int8_t>(input, output, m_NumElements, m_Scale, m_Offset);
+            break;
+        }
         case DataType::QuantisedSymm16:
         {
             QuantizeImpl<int16_t>(input, output, m_NumElements, m_Scale, 0);

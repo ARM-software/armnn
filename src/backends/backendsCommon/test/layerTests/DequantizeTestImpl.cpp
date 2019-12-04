@@ -143,6 +143,13 @@ LayerTestResult<float, 4> DequantizeOffsetUint8Test(
     return DequantizeOffsetTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
 }
 
+LayerTestResult<float, 4> DequantizeSimpleInt8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return DequantizeSimpleTest<armnn::DataType::QSymmS8>(workloadFactory, memoryManager);
+}
+
 LayerTestResult<float, 4> DequantizeSimpleInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -156,6 +163,13 @@ LayerTestResult<armnn::Half, 4> DequantizeSimpleUint8ToFp16Test(
 {
     return DequantizeSimpleTest<armnn::DataType::QuantisedAsymm8, armnn::DataType::Float16>(workloadFactory,
                                                                                             memoryManager);
+}
+
+LayerTestResult<armnn::Half, 4> DequantizeSimpleInt8ToFp16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return DequantizeSimpleTest<armnn::DataType::QSymmS8, armnn::DataType::Float16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<armnn::Half, 4> DequantizeSimpleInt16ToFp16Test(

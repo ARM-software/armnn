@@ -37,7 +37,7 @@ enum class DataType
     Boolean = 4,
     QuantisedSymm16 = 5,
     QuantizedSymm8PerAxis = 6,
-    QuantisedSymm8 = 7
+    QSymmS8 = 7
 };
 
 enum class DataLayout

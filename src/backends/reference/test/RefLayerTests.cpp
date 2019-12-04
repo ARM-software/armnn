@@ -1419,13 +1419,16 @@ BOOST_AUTO_TEST_CASE(DetectionPostProcessFastNmsInt16)
 // Dequantize
 ARMNN_AUTO_TEST_CASE(DequantizeSimpleUint8, DequantizeSimpleUint8Test)
 ARMNN_AUTO_TEST_CASE(DequantizeOffsetUint8, DequantizeOffsetUint8Test)
+ARMNN_AUTO_TEST_CASE(DequantizeSimpleInt8, DequantizeSimpleInt8Test)
 ARMNN_AUTO_TEST_CASE(DequantizeSimpleInt16, DequantizeSimpleInt16Test)
 ARMNN_AUTO_TEST_CASE(DequantizeSimpleUint8ToFp16, DequantizeSimpleUint8ToFp16Test)
+ARMNN_AUTO_TEST_CASE(DequantizeSimpleInt8ToFp16, DequantizeSimpleInt8ToFp16Test)
 ARMNN_AUTO_TEST_CASE(DequantizeSimpleInt16ToFp16, DequantizeSimpleInt16ToFp16Test)
 
 // Quantize
 ARMNN_AUTO_TEST_CASE(QuantizeSimpleUint8, QuantizeSimpleUint8Test)
 ARMNN_AUTO_TEST_CASE(QuantizeClampUint8, QuantizeClampUint8Test)
+ARMNN_AUTO_TEST_CASE(QuantizeClampInt8, QuantizeClampInt8Test)
 ARMNN_AUTO_TEST_CASE(QuantizeClampInt16, QuantizeClampInt16Test)
 
 // PReLU

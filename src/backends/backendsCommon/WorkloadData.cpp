@@ -2179,6 +2179,7 @@ void QuantizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
 
     if (outputTensorInfo.GetDataType() != DataType::QuantisedAsymm8 &&
+        outputTensorInfo.GetDataType() != DataType::QSymmS8 &&
         outputTensorInfo.GetDataType() != DataType::QuantisedSymm16)
     {
         throw InvalidArgumentException(descriptorName + ": Output of quantized layer must be quantized type.");

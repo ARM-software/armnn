@@ -27,7 +27,7 @@ arm_compute::DataType GetArmComputeDataType(armnn::DataType dataType)
             return arm_compute::DataType::QASYMM8;
         case armnn::DataType::QuantisedSymm16:
             return arm_compute::DataType::QSYMM16;
-        case armnn::DataType::QuantisedSymm8:
+        case armnn::DataType::QSymmS8:
             return arm_compute::DataType::QSYMM8;
         case armnn::DataType::QuantizedSymm8PerAxis:
             return arm_compute::DataType::QSYMM8_PER_CHANNEL;

@@ -615,8 +615,9 @@ bool RefLayerSupport::IsDequantizeSupported(const TensorInfo& input,
 {
    bool supported = true;
 
-    std::array<DataType,2> supportedInputTypes = {
+    std::array<DataType,3> supportedInputTypes = {
         DataType::QuantisedAsymm8,
+        DataType::QSymmS8,
         DataType::QuantisedSymm16
     };
 
@@ -1398,7 +1399,7 @@ bool RefLayerSupport::IsQuantizeSupported(const TensorInfo& input,
 {
    bool supported = true;
 
-    // Define supported output types.
+    // Define supported input types.
     std::array<DataType,1> supportedInputTypes = {
         DataType::Float32,
     };
@@ -1407,8 +1408,9 @@ bool RefLayerSupport::IsQuantizeSupported(const TensorInfo& input,
                                   "Reference quantize: input type not supported.");
 
     // Define supported output types.
-    std::array<DataType,2> supportedOutputTypes = {
+    std::array<DataType,3> supportedOutputTypes = {
         DataType::QuantisedAsymm8,
+        DataType::QSymmS8,
         DataType::QuantisedSymm16
     };
     supported &= CheckSupportRule(TypeAnyOf(output, supportedOutputTypes), reasonIfUnsupported,

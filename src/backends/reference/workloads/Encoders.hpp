@@ -37,6 +37,13 @@ inline std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void*
                 info.GetQuantizationScale(),
                 info.GetQuantizationOffset());
         }
+        case DataType::QSymmS8:
+        {
+            return std::make_unique<QSymmS8Encoder>(
+                    static_cast<int8_t*>(data),
+                    info.GetQuantizationScale(),
+                    info.GetQuantizationOffset());
+        }
         case armnn::DataType::QuantisedSymm16:
         {
             return std::make_unique<QSymm16Encoder>(

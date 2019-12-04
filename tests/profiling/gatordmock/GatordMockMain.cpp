@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
         0, 4, packetVersionResolver.ResolvePacketVersion(0, 4).GetEncodedValue());
     // This functor will receive the counter data.
     armnn::gatordmock::PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler(
-        1, 0, packetVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue());
+        3, 0, packetVersionResolver.ResolvePacketVersion(3, 0).GetEncodedValue());
 
     armnn::profiling::DirectoryCaptureCommandHandler directoryCaptureCommandHandler(
         0, 2, packetVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), false);

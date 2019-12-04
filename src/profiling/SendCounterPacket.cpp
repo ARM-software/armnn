@@ -814,7 +814,7 @@ void SendCounterPacket::SendPeriodicCounterCapturePacket(uint64_t timestamp, con
     uint32_t uint32_t_size = sizeof(uint32_t);
     uint32_t uint64_t_size = sizeof(uint64_t);
 
-    uint32_t packetFamily = 1;
+    uint32_t packetFamily = 3;
     uint32_t packetClass = 0;
     uint32_t packetType = 0;
     uint32_t headerSize = 2 * uint32_t_size;

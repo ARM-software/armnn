@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterCapturePacketTest)
     uint32_t headerWord1 = ReadUint32(readBuffer2, 4);
     uint64_t readTimestamp = ReadUint64(readBuffer2, 8);
 
-    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 1); // packet family
+    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 3); // packet family
     BOOST_TEST(((headerWord0 >> 19) & 0x0000007F) == 0); // packet class
     BOOST_TEST(((headerWord0 >> 16) & 0x00000007) == 0); // packet type
     BOOST_TEST(headerWord1 == 8);                        // data length
@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterCapturePacketTest)
     headerWord1 = ReadUint32(readBuffer3, 4);
     uint64_t readTimestamp2 = ReadUint64(readBuffer3, 8);
 
-    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 1); // packet family
+    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 3); // packet family
     BOOST_TEST(((headerWord0 >> 19) & 0x0000007F) == 0); // packet class
     BOOST_TEST(((headerWord0 >> 16) & 0x00000007) == 0); // packet type
     BOOST_TEST(headerWord1 == 38);                       // data length

@@ -115,7 +115,9 @@ private:
     void ParseRelu(size_t subgraphIndex, size_t operatorIndex);
     void ParseRelu6(size_t subgraphIndex, size_t operatorIndex);
     void ParseReshape(size_t subgraphIndex, size_t operatorIndex);
+    void ParseResize(size_t subgraphIndex, size_t operatorIndex, armnn::ResizeMethod resizeMethod);
     void ParseResizeBilinear(size_t subgraphIndex, size_t operatorIndex);
+    void ParseResizeNearestNeighbor(size_t subgraphIndex, size_t operatorIndex);
     void ParseSlice(size_t subgraphIndex, size_t operatorIndex);
     void ParseSoftmax(size_t subgraphIndex, size_t operatorIndex);
     void ParseSpaceToBatchND(size_t subgraphIndex, size_t operatorIndex);

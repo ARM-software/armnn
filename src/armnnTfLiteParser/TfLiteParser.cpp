@@ -436,38 +436,39 @@ TfLiteParser::TfLiteParser(const Optional<ITfLiteParser::TfLiteParserOptions>& o
 , m_ParserFunctions(tflite::BuiltinOperator_MAX+1, &TfLiteParser::ParseUnsupportedOperator)
 {
     // register supported operators
-    m_ParserFunctions[tflite::BuiltinOperator_AVERAGE_POOL_2D]   = &TfLiteParser::ParseAveragePool2D;
-    m_ParserFunctions[tflite::BuiltinOperator_BATCH_TO_SPACE_ND] = &TfLiteParser::ParseBatchToSpaceND;
-    m_ParserFunctions[tflite::BuiltinOperator_CONCATENATION]     = &TfLiteParser::ParseConcatenation;
-    m_ParserFunctions[tflite::BuiltinOperator_CONV_2D]           = &TfLiteParser::ParseConv2D;
-    m_ParserFunctions[tflite::BuiltinOperator_DEPTHWISE_CONV_2D] = &TfLiteParser::ParseDepthwiseConv2D;
-    m_ParserFunctions[tflite::BuiltinOperator_CUSTOM]            = &TfLiteParser::ParseCustomOperator;
-    m_ParserFunctions[tflite::BuiltinOperator_FULLY_CONNECTED]   = &TfLiteParser::ParseFullyConnected;
-    m_ParserFunctions[tflite::BuiltinOperator_LOGISTIC]          = &TfLiteParser::ParseLogistic;
-    m_ParserFunctions[tflite::BuiltinOperator_L2_NORMALIZATION]  = &TfLiteParser::ParseL2Normalization;
-    m_ParserFunctions[tflite::BuiltinOperator_MAX_POOL_2D]       = &TfLiteParser::ParseMaxPool2D;
-    m_ParserFunctions[tflite::BuiltinOperator_MAXIMUM]           = &TfLiteParser::ParseMaximum;
-    m_ParserFunctions[tflite::BuiltinOperator_MINIMUM]           = &TfLiteParser::ParseMinimum;
-    m_ParserFunctions[tflite::BuiltinOperator_RELU]              = &TfLiteParser::ParseRelu;
-    m_ParserFunctions[tflite::BuiltinOperator_RELU6]             = &TfLiteParser::ParseRelu6;
-    m_ParserFunctions[tflite::BuiltinOperator_RESHAPE]           = &TfLiteParser::ParseReshape;
-    m_ParserFunctions[tflite::BuiltinOperator_RESIZE_BILINEAR]   = &TfLiteParser::ParseResizeBilinear;
-    m_ParserFunctions[tflite::BuiltinOperator_SOFTMAX]           = &TfLiteParser::ParseSoftmax;
-    m_ParserFunctions[tflite::BuiltinOperator_SPACE_TO_BATCH_ND] = &TfLiteParser::ParseSpaceToBatchND;
-    m_ParserFunctions[tflite::BuiltinOperator_SQUEEZE]           = &TfLiteParser::ParseSqueeze;
-    m_ParserFunctions[tflite::BuiltinOperator_STRIDED_SLICE]     = &TfLiteParser::ParseStridedSlice;
-    m_ParserFunctions[tflite::BuiltinOperator_SUB]               = &TfLiteParser::ParseSub;
-    m_ParserFunctions[tflite::BuiltinOperator_ADD]               = &TfLiteParser::ParseAdd;
-    m_ParserFunctions[tflite::BuiltinOperator_MUL]               = &TfLiteParser::ParseMul;
-    m_ParserFunctions[tflite::BuiltinOperator_MEAN]              = &TfLiteParser::ParseMean;
-    m_ParserFunctions[tflite::BuiltinOperator_PACK]              = &TfLiteParser::ParsePack;
-    m_ParserFunctions[tflite::BuiltinOperator_PAD]               = &TfLiteParser::ParsePad;
-    m_ParserFunctions[tflite::BuiltinOperator_SLICE]             = &TfLiteParser::ParseSlice;
-    m_ParserFunctions[tflite::BuiltinOperator_SPLIT]             = &TfLiteParser::ParseSplit;
-    m_ParserFunctions[tflite::BuiltinOperator_TANH]              = &TfLiteParser::ParseTanH;
-    m_ParserFunctions[tflite::BuiltinOperator_TRANSPOSE]         = &TfLiteParser::ParseTranspose;
-    m_ParserFunctions[tflite::BuiltinOperator_TRANSPOSE_CONV]    = &TfLiteParser::ParseTransposeConv;
-    m_ParserFunctions[tflite::BuiltinOperator_UNPACK]            = &TfLiteParser::ParseUnpack;
+    m_ParserFunctions[tflite::BuiltinOperator_AVERAGE_POOL_2D]         = &TfLiteParser::ParseAveragePool2D;
+    m_ParserFunctions[tflite::BuiltinOperator_BATCH_TO_SPACE_ND]       = &TfLiteParser::ParseBatchToSpaceND;
+    m_ParserFunctions[tflite::BuiltinOperator_CONCATENATION]           = &TfLiteParser::ParseConcatenation;
+    m_ParserFunctions[tflite::BuiltinOperator_CONV_2D]                 = &TfLiteParser::ParseConv2D;
+    m_ParserFunctions[tflite::BuiltinOperator_DEPTHWISE_CONV_2D]       = &TfLiteParser::ParseDepthwiseConv2D;
+    m_ParserFunctions[tflite::BuiltinOperator_CUSTOM]                  = &TfLiteParser::ParseCustomOperator;
+    m_ParserFunctions[tflite::BuiltinOperator_FULLY_CONNECTED]         = &TfLiteParser::ParseFullyConnected;
+    m_ParserFunctions[tflite::BuiltinOperator_LOGISTIC]                = &TfLiteParser::ParseLogistic;
+    m_ParserFunctions[tflite::BuiltinOperator_L2_NORMALIZATION]        = &TfLiteParser::ParseL2Normalization;
+    m_ParserFunctions[tflite::BuiltinOperator_MAX_POOL_2D]             = &TfLiteParser::ParseMaxPool2D;
+    m_ParserFunctions[tflite::BuiltinOperator_MAXIMUM]                 = &TfLiteParser::ParseMaximum;
+    m_ParserFunctions[tflite::BuiltinOperator_MINIMUM]                 = &TfLiteParser::ParseMinimum;
+    m_ParserFunctions[tflite::BuiltinOperator_RELU]                    = &TfLiteParser::ParseRelu;
+    m_ParserFunctions[tflite::BuiltinOperator_RELU6]                   = &TfLiteParser::ParseRelu6;
+    m_ParserFunctions[tflite::BuiltinOperator_RESHAPE]                 = &TfLiteParser::ParseReshape;
+    m_ParserFunctions[tflite::BuiltinOperator_RESIZE_BILINEAR]         = &TfLiteParser::ParseResizeBilinear;
+    m_ParserFunctions[tflite::BuiltinOperator_RESIZE_NEAREST_NEIGHBOR] = &TfLiteParser::ParseResizeNearestNeighbor;
+    m_ParserFunctions[tflite::BuiltinOperator_SOFTMAX]                 = &TfLiteParser::ParseSoftmax;
+    m_ParserFunctions[tflite::BuiltinOperator_SPACE_TO_BATCH_ND]       = &TfLiteParser::ParseSpaceToBatchND;
+    m_ParserFunctions[tflite::BuiltinOperator_SQUEEZE]                 = &TfLiteParser::ParseSqueeze;
+    m_ParserFunctions[tflite::BuiltinOperator_STRIDED_SLICE]           = &TfLiteParser::ParseStridedSlice;
+    m_ParserFunctions[tflite::BuiltinOperator_SUB]                     = &TfLiteParser::ParseSub;
+    m_ParserFunctions[tflite::BuiltinOperator_ADD]                     = &TfLiteParser::ParseAdd;
+    m_ParserFunctions[tflite::BuiltinOperator_MUL]                     = &TfLiteParser::ParseMul;
+    m_ParserFunctions[tflite::BuiltinOperator_MEAN]                    = &TfLiteParser::ParseMean;
+    m_ParserFunctions[tflite::BuiltinOperator_PACK]                    = &TfLiteParser::ParsePack;
+    m_ParserFunctions[tflite::BuiltinOperator_PAD]                     = &TfLiteParser::ParsePad;
+    m_ParserFunctions[tflite::BuiltinOperator_SLICE]                   = &TfLiteParser::ParseSlice;
+    m_ParserFunctions[tflite::BuiltinOperator_SPLIT]                   = &TfLiteParser::ParseSplit;
+    m_ParserFunctions[tflite::BuiltinOperator_TANH]                    = &TfLiteParser::ParseTanH;
+    m_ParserFunctions[tflite::BuiltinOperator_TRANSPOSE]               = &TfLiteParser::ParseTranspose;
+    m_ParserFunctions[tflite::BuiltinOperator_TRANSPOSE_CONV]          = &TfLiteParser::ParseTransposeConv;
+    m_ParserFunctions[tflite::BuiltinOperator_UNPACK]                  = &TfLiteParser::ParseUnpack;
 
     // register supported custom operators
     m_CustomParserFunctions["TFLite_Detection_PostProcess"]      = &TfLiteParser::ParseDetectionPostProcess;
@@ -1877,6 +1878,16 @@ void TfLiteParser::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
 
 void TfLiteParser::ParseResizeBilinear(size_t subgraphIndex, size_t operatorIndex)
 {
+    ParseResize(subgraphIndex, operatorIndex, ResizeMethod::Bilinear);
+}
+
+void TfLiteParser::ParseResizeNearestNeighbor(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseResize(subgraphIndex, operatorIndex, ResizeMethod::NearestNeighbor);
+}
+
+void TfLiteParser::ParseResize(size_t subgraphIndex, size_t operatorIndex, ResizeMethod resizeMethod)
+{
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
@@ -1894,12 +1905,33 @@ void TfLiteParser::ParseResizeBilinear(size_t subgraphIndex, size_t operatorInde
     ::memcpy(sizeTensorData.data(), sizeBufferPtr->data.data(), sizeTensorInfo.GetNumBytes());
 
     ResizeDescriptor desc;
-    desc.m_Method       = armnn::ResizeMethod::Bilinear;
+    desc.m_Method       = resizeMethod;
     desc.m_TargetHeight = static_cast<uint32_t> (sizeTensorData[0]);
     desc.m_TargetWidth  = static_cast<uint32_t> (sizeTensorData[1]);
     desc.m_DataLayout   = armnn::DataLayout::NHWC;
 
-    auto layerName = boost::str(boost::format("ResizeBilinear:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = str(boost::format("Resize:"));
+
+    switch (resizeMethod)
+    {
+        case ResizeMethod::Bilinear:
+        {
+            layerName += str(boost::format("BILINEAR:%1%:%2%") % subgraphIndex % operatorIndex);
+            break;
+        }
+        case ResizeMethod::NearestNeighbor:
+        {
+            layerName += str(boost::format("NEARESTNEIGHBOR:%1%:%2%") % subgraphIndex % operatorIndex);
+            break;
+        }
+        default:
+        {
+            throw ParseException(
+                boost::str(boost::format("Unexpected ResizeMethod[%1%] when creating layerName "
+                                         " %2% ") %static_cast<int>(resizeMethod)% CHECK_LOCATION().AsString()));
+        }
+    }
+
     IConnectableLayer* layer = m_Network->AddResizeLayer(desc, layerName.c_str());
 
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);

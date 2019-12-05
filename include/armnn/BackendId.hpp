@@ -147,7 +147,7 @@ namespace std
 template <>
 struct hash<armnn::BackendId>
 {
-    std::size_t operator()(const armnn::BackendId& id) const
+    std::size_t operator()(const armnn::BackendId& id) const noexcept
     {
         std::hash<std::string> hasher;
         return hasher(id.Get());

@@ -205,7 +205,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDequantize(const Dequantiz
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDetectionPostProcess(
     const armnn::DetectionPostProcessQueueDescriptor& descriptor, const armnn::WorkloadInfo& info) const
 {
-    return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
+    return std::make_unique<NeonDetectionPostProcessWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateDivision(

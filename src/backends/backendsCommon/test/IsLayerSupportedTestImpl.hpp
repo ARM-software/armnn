@@ -238,6 +238,24 @@ struct DummyLayer<armnn::TransposeConvolution2dLayer>
 {
 };
 
+template<>
+struct DummyLayer<armnn::DetectionPostProcessLayer>
+{
+    DummyLayer()
+    {
+        m_Layer = dummyGraph.AddLayer<armnn::DetectionPostProcessLayer>(armnn::DetectionPostProcessDescriptor(), "");
+        m_Layer->m_Anchors = std::make_unique<armnn::ScopedCpuTensorHandle>(
+            armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
+    }
+
+    ~DummyLayer()
+    {
+        dummyGraph.EraseLayer(m_Layer);
+    }
+
+    armnn::DetectionPostProcessLayer* m_Layer;
+};
+
 template <typename LstmLayerType>
 struct DummyLstmLayer
 {

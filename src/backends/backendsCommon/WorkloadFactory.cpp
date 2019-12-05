@@ -272,12 +272,24 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::DetectionPostProcess:
         {
-            const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             auto cLayer = boost::polymorphic_downcast<const DetectionPostProcessLayer*>(&layer);
+            const TensorInfo& boxEncodings = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& scores = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
+            const TensorInfo& anchors = cLayer->m_Anchors->GetTensorInfo();
+
+            const TensorInfo& detectionBoxes = layer.GetOutputSlot(0).GetTensorInfo();
+            const TensorInfo& detectionClasses = layer.GetOutputSlot(1).GetTensorInfo();
+            const TensorInfo& detectionScores = layer.GetOutputSlot(2).GetTensorInfo();
+            const TensorInfo& numDetections = layer.GetOutputSlot(3).GetTensorInfo();
+
             const DetectionPostProcessDescriptor& descriptor = cLayer->GetParameters();
-            result = layerSupportObject->IsDetectionPostProcessSupported(input0,
-                                                                         input1,
+            result = layerSupportObject->IsDetectionPostProcessSupported(boxEncodings,
+                                                                         scores,
+                                                                         anchors,
+                                                                         detectionBoxes,
+                                                                         detectionClasses,
+                                                                         detectionScores,
+                                                                         numDetections,
                                                                          descriptor,
                                                                          reason);
             break;

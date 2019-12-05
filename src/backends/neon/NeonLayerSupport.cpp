@@ -28,6 +28,7 @@
 #include "workloads/NeonDepthToSpaceWorkload.hpp"
 #include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
 #include "workloads/NeonDequantizeWorkload.hpp"
+#include "workloads/NeonDetectionPostProcessWorkload.hpp"
 #include "workloads/NeonGreaterWorkload.hpp"
 #include "workloads/NeonInstanceNormalizationWorkload.hpp"
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
@@ -338,6 +339,29 @@ bool NeonLayerSupport::IsDequantizeSupported(const TensorInfo& input,
                                    input,
                                    output);
 }
+
+bool NeonLayerSupport::IsDetectionPostProcessSupported(const TensorInfo& boxEncodings,
+                                                       const TensorInfo& scores,
+                                                       const TensorInfo& anchors,
+                                                       const TensorInfo& detectionBoxes,
+                                                       const TensorInfo& detectionClasses,
+                                                       const TensorInfo& detectionScores,
+                                                       const TensorInfo& numDetections,
+                                                       const DetectionPostProcessDescriptor& descriptor,
+                                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonDetectionPostProcessValidate,
+                                   reasonIfUnsupported,
+                                   boxEncodings,
+                                   scores,
+                                   anchors,
+                                   detectionBoxes,
+                                   detectionClasses,
+                                   detectionScores,
+                                   numDetections,
+                                   descriptor);
+}
+
 
 bool NeonLayerSupport::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& input,
                                                               const TensorInfo& output,

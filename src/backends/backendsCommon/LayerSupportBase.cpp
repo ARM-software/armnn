@@ -163,10 +163,15 @@ bool LayerSupportBase::IsDequantizeSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsDetectionPostProcessSupported(const armnn::TensorInfo& input0,
-                                                       const armnn::TensorInfo& input1,
-                                                       const armnn::DetectionPostProcessDescriptor& descriptor,
-                                                       armnn::Optional<std::string&> reasonIfUnsupported) const
+bool LayerSupportBase::IsDetectionPostProcessSupported(const TensorInfo& boxEncodings,
+                                                       const TensorInfo& scores,
+                                                       const TensorInfo& anchors,
+                                                       const TensorInfo& detectionBoxes,
+                                                       const TensorInfo& detectionClasses,
+                                                       const TensorInfo& detectionScores,
+                                                       const TensorInfo& numDetections,
+                                                       const DetectionPostProcessDescriptor& descriptor,
+                                                       Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }

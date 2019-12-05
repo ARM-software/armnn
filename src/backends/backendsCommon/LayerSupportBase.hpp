@@ -96,8 +96,13 @@ public:
                                const TensorInfo& output,
                                Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    bool IsDetectionPostProcessSupported(const TensorInfo& input0,
-                                         const TensorInfo& input1,
+    bool IsDetectionPostProcessSupported(const TensorInfo& boxEncodings,
+                                         const TensorInfo& scores,
+                                         const TensorInfo& anchors,
+                                         const TensorInfo& detectionBoxes,
+                                         const TensorInfo& detectionClasses,
+                                         const TensorInfo& detectionScores,
+                                         const TensorInfo& numDetections,
                                          const DetectionPostProcessDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 

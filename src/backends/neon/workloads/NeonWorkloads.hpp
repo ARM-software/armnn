@@ -16,6 +16,7 @@
 #include "NeonDepthToSpaceWorkload.hpp"
 #include "NeonDepthwiseConvolutionWorkload.hpp"
 #include "NeonDequantizeWorkload.hpp"
+#include "NeonDetectionPostProcessWorkload.hpp"
 #include "NeonFloorFloatWorkload.hpp"
 #include "NeonFullyConnectedWorkload.hpp"
 #include "NeonGreaterWorkload.hpp"

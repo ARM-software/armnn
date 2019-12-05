@@ -637,10 +637,15 @@ bool RefLayerSupport::IsDequantizeSupported(const TensorInfo& input,
     return supported;
 }
 
-bool RefLayerSupport::IsDetectionPostProcessSupported(const armnn::TensorInfo& input0,
-                                                      const armnn::TensorInfo& input1,
-                                                      const armnn::DetectionPostProcessDescriptor& descriptor,
-                                                      armnn::Optional<std::string&> reasonIfUnsupported) const
+bool RefLayerSupport::IsDetectionPostProcessSupported(const TensorInfo& boxEncodings,
+                                                      const TensorInfo& scores,
+                                                      const TensorInfo& anchors,
+                                                      const TensorInfo& detectionBoxes,
+                                                      const TensorInfo& detectionClasses,
+                                                      const TensorInfo& detectionScores,
+                                                      const TensorInfo& numDetections,
+                                                      const DetectionPostProcessDescriptor& descriptor,
+                                                      Optional<std::string&> reasonIfUnsupported) const
 {
     bool supported = true;
 
@@ -651,10 +656,10 @@ bool RefLayerSupport::IsDetectionPostProcessSupported(const armnn::TensorInfo& i
         DataType::QuantisedSymm16
     };
 
-    supported &= CheckSupportRule(TypeAnyOf(input0, supportedInputTypes), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypeAnyOf(boxEncodings, supportedInputTypes), reasonIfUnsupported,
                                   "Reference DetectionPostProcess: input 0 is not a supported type.");
 
-    supported &= CheckSupportRule(TypeAnyOf(input1, supportedInputTypes), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypeAnyOf(scores, supportedInputTypes), reasonIfUnsupported,
                                   "Reference DetectionPostProcess: input 1 is not a supported type.");
 
     return supported;

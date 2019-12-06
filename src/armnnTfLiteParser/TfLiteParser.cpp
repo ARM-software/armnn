@@ -314,6 +314,12 @@ armnn::TensorInfo ToTensorInfo(TfLiteParser::TensorRawPtr tensorPtr, const std::
         case tflite::TensorType_FLOAT32:
             type = armnn::DataType::Float32;
             break;
+        case tflite::TensorType_INT8:
+            type = armnn::DataType::QSymmS8;
+            break;
+        case tflite::TensorType_INT16:
+            type = armnn::DataType::QuantisedSymm16;
+            break;
         case tflite::TensorType_INT32:
             type = armnn::DataType::Signed32;
             break;
@@ -440,6 +446,7 @@ TfLiteParser::TfLiteParser(const Optional<ITfLiteParser::TfLiteParserOptions>& o
     m_ParserFunctions[tflite::BuiltinOperator_CONCATENATION]           = &TfLiteParser::ParseConcatenation;
     m_ParserFunctions[tflite::BuiltinOperator_CONV_2D]                 = &TfLiteParser::ParseConv2D;
     m_ParserFunctions[tflite::BuiltinOperator_DEPTHWISE_CONV_2D]       = &TfLiteParser::ParseDepthwiseConv2D;
+    m_ParserFunctions[tflite::BuiltinOperator_DEQUANTIZE]              = &TfLiteParser::ParseDequantize;
     m_ParserFunctions[tflite::BuiltinOperator_CUSTOM]                  = &TfLiteParser::ParseCustomOperator;
     m_ParserFunctions[tflite::BuiltinOperator_FULLY_CONNECTED]         = &TfLiteParser::ParseFullyConnected;
     m_ParserFunctions[tflite::BuiltinOperator_LOGISTIC]                = &TfLiteParser::ParseLogistic;
@@ -921,6 +928,31 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
     // register the output connection slots for the layer, connections are made after all layers have been created
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParseDequantize(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = boost::str(boost::format("Dequantize:%1%:%2%") % subgraphIndex % operatorIndex);
+
+    IConnectableLayer* layer = m_Network->AddDequantizeLayer(layerName.c_str());
+    BOOST_ASSERT(layer != nullptr);
+
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, outputTensorIndexes);
 }
 
 void TfLiteParser::ParseTranspose(size_t subgraphIndex, size_t operatorIndex)

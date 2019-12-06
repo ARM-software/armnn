@@ -100,6 +100,7 @@ private:
     void ParseConcatenation(size_t subgraphIndex, size_t operatorIndex);
     void ParseConv2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorIndex);
+    void ParseDequantize(size_t subgraphIndex, size_t operatorIndex);
     void ParseDetectionPostProcess(size_t subgraphIndex, size_t operatorIndex);
     void ParseFullyConnected(size_t subgraphIndex, size_t operatorIndex);
     void ParseLogistic(size_t subgraphIndex, size_t operatorIndex);

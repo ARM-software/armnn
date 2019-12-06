@@ -7,7 +7,6 @@
 
 #include <Packet.hpp>
 #include <CommandHandlerFunctor.hpp>
-#include "../../armnn/src/profiling/Packet.hpp"
 
 #include <vector>
 

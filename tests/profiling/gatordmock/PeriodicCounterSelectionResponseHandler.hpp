@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "../../armnn/src/profiling/CommandHandlerFunctor.hpp"
-#include "../../armnn/src/profiling/Packet.hpp"
+#include <CommandHandlerFunctor.hpp>
+#include <Packet.hpp>
 
 #include <vector>
 

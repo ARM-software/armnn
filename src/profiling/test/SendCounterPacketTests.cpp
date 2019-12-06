@@ -2380,9 +2380,9 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket3)
     // Wait for sendCounterPacket to join
     BOOST_CHECK_NO_THROW(sendCounterPacket.Stop());
 
-    // Check that the buffer contains one Stream Metadata packet
+    // Check that the buffer contains at least one Stream Metadata packet
     const std::vector<uint32_t> writtenData = mockProfilingConnection.GetWrittenData();
-    BOOST_TEST(writtenData.size() == 1);
+    BOOST_TEST(writtenData.size() >= 1);
     BOOST_TEST(writtenData[0] == streamMetadataPacketsize);
 }
 
@@ -2409,9 +2409,9 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket4)
     // Check that the profiling state is still "WaitingForAck"
     BOOST_TEST((profilingStateMachine.GetCurrentState() == ProfilingState::WaitingForAck));
 
-    // Check that the buffer contains one Stream Metadata packet
+    // Check that the buffer contains at least one Stream Metadata packet
     const std::vector<uint32_t> writtenData = mockProfilingConnection.GetWrittenData();
-    BOOST_TEST(writtenData.size() == 1);
+    BOOST_TEST(writtenData.size() >= 1);
     BOOST_TEST(writtenData[0] == streamMetadataPacketsize);
 
     mockProfilingConnection.Clear();
@@ -2425,8 +2425,8 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket4)
     // Check that the profiling state is still "WaitingForAck"
     BOOST_TEST((profilingStateMachine.GetCurrentState() == ProfilingState::WaitingForAck));
 
-    // Check that the buffer contains one Stream Metadata packet
-    BOOST_TEST(writtenData.size() == 1);
+    // Check that the buffer contains at least one Stream Metadata packet
+    BOOST_TEST(writtenData.size() >= 1);
     BOOST_TEST(writtenData[0] == streamMetadataPacketsize);
 }
 

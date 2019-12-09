@@ -42,6 +42,7 @@ public:
 
     static std::vector<DynamicBackendPtr> CreateDynamicBackends(const std::vector<std::string>& sharedObjects);
     static BackendIdSet RegisterDynamicBackends(const std::vector<DynamicBackendPtr>& dynamicBackends);
+    static void DeregisterDynamicBackends(const BackendIdSet& dynamicBackends);
 
 protected:
     /// Protected methods for testing purposes

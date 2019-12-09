@@ -55,7 +55,9 @@ ARMNN_SIMPLE_TEST_CASE(RegisterMultipleDynamicBackends, RegisterMultipleDynamicB
 ARMNN_SIMPLE_TEST_CASE(RegisterMultipleInvalidDynamicBackends, RegisterMultipleInvalidDynamicBackendsTestImpl);
 ARMNN_SIMPLE_TEST_CASE(RegisterMixedDynamicBackends, RegisterMixedDynamicBackendsTestImpl);
 
+#if !defined(ARMNN_DYNAMIC_BACKEND_ENABLED)
 ARMNN_SIMPLE_TEST_CASE(RuntimeEmpty, RuntimeEmptyTestImpl);
+#endif
 ARMNN_SIMPLE_TEST_CASE(RuntimeDynamicBackends, RuntimeDynamicBackendsTestImpl);
 ARMNN_SIMPLE_TEST_CASE(RuntimeDuplicateDynamicBackends, RuntimeDuplicateDynamicBackendsTestImpl);
 ARMNN_SIMPLE_TEST_CASE(RuntimeInvalidDynamicBackends, RuntimeInvalidDynamicBackendsTestImpl);

@@ -43,6 +43,8 @@ public:
         }
     };
 
+    void Deregister(const BackendId& id);
+
 protected:
     using FactoryStorage = std::unordered_map<BackendId, FactoryFunction>;
 

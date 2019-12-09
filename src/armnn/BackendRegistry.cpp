@@ -27,6 +27,11 @@ void BackendRegistry::Register(const BackendId& id, BackendRegistry::FactoryFunc
     m_Factories[id] = factory;
 }
 
+void BackendRegistry::Deregister(const BackendId& id)
+{
+    m_Factories.erase(id);
+}
+
 bool BackendRegistry::IsBackendRegistered(const BackendId& id) const
 {
     return (m_Factories.find(id) != m_Factories.end());

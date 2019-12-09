@@ -302,6 +302,11 @@ if(ARMNNREF)
     add_definitions(-DARMNNREF_ENABLED)
 endif()
 
+# ArmNN dynamic backend
+if(DYNAMIC_BACKEND_PATHS)
+    add_definitions(-DARMNN_DYNAMIC_BACKEND_ENABLED)
+endif()
+
 # Streamline annotate
 if(PROFILING_BACKEND_STREAMLINE)
     include_directories("${GATOR_ROOT}/annotate")

@@ -214,6 +214,10 @@ Runtime::~Runtime()
                       << std::endl;
         }
     }
+
+    // Clear all dynamic backends.
+    DynamicBackendUtils::DeregisterDynamicBackends(m_DeviceSpec.GetDynamicBackends());
+    m_DeviceSpec.ClearDynamicBackends();
 }
 
 LoadedNetwork* Runtime::GetLoadedNetworkPtr(NetworkId networkId) const
@@ -273,7 +277,7 @@ void Runtime::LoadDynamicBackends(const std::string& overrideBackendPath)
     BackendIdSet registeredBackendIds = DynamicBackendUtils::RegisterDynamicBackends(m_DynamicBackends);
 
     // Add the registered dynamic backend ids to the list of supported backends
-    m_DeviceSpec.AddSupportedBackends(registeredBackendIds);
+    m_DeviceSpec.AddSupportedBackends(registeredBackendIds, true);
 }
 
 } // namespace armnn

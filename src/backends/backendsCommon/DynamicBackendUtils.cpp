@@ -310,6 +310,18 @@ std::vector<DynamicBackendPtr> DynamicBackendUtils::CreateDynamicBackends(const 
     return dynamicBackends;
 }
 
+void DynamicBackendUtils::DeregisterDynamicBackends(const BackendIdSet& dynamicBackends)
+{
+    // Get a reference of the backend registry
+    BackendRegistry& backendRegistry = BackendRegistryInstance();
+
+    for (const auto& id : dynamicBackends)
+    {
+        backendRegistry.Deregister(id);
+    }
+
+}
+
 BackendIdSet DynamicBackendUtils::RegisterDynamicBackends(const std::vector<DynamicBackendPtr>& dynamicBackends)
 {
     // Get a reference of the backend registry

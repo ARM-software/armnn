@@ -1198,6 +1198,8 @@ void RegisterMixedDynamicBackendsTestImpl()
     }
 }
 
+#if !defined(ARMNN_DYNAMIC_BACKEND_ENABLED)
+
 void RuntimeEmptyTestImpl()
 {
     using namespace armnn;
@@ -1217,6 +1219,8 @@ void RuntimeEmptyTestImpl()
 
     BOOST_TEST(backendRegistry.Size() == 0);
 }
+
+#endif
 
 void RuntimeDynamicBackendsTestImpl()
 {

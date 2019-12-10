@@ -8,6 +8,7 @@
 
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 
+#include <boost/core/ignore_unused.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 
@@ -51,6 +52,7 @@ void InputLayerVisitor::VisitInputLayer(const armnn::IConnectableLayer* layer,
                                         armnn::LayerBindingId id,
                                         const char* name)
 {
+    boost::ignore_unused(name);
     m_TensorInfos.emplace(id, layer->GetOutputSlot(0).GetTensorInfo());
 }
 

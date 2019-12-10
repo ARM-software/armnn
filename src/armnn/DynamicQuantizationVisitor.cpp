@@ -84,6 +84,7 @@ void DynamicQuantizationVisitor::VisitNonCalibratedLayers() {
 
 void DynamicQuantizationVisitor::VisitAdditionLayer(const IConnectableLayer* layer, const char* name)
 {
+    boost::ignore_unused(name);
     SetRange(layer, 0, -20.f, 20.f);
     AddToCalibratedLayers(layer);
 }
@@ -138,6 +139,7 @@ void DynamicQuantizationVisitor::VisitActivationLayer(const IConnectableLayer* l
                                                       const ActivationDescriptor& activationDescriptor,
                                                       const char* name)
 {
+    boost::ignore_unused(name, activationDescriptor);
     switch (activationDescriptor.m_Function)
     {
         // Range is 0, 15 for Abs, Linear, ReLu and Soft ReLu
@@ -246,6 +248,8 @@ void DynamicQuantizationVisitor::VisitConcatLayer(const IConnectableLayer* layer
                                                   const ConcatDescriptor& originsDescriptor,
                                                   const char* name)
 {
+    boost::ignore_unused(name);
+    boost::ignore_unused(originsDescriptor);
     float min = std::numeric_limits<float>::max();
     float max = std::numeric_limits<float>::lowest();
     for (unsigned int i = 0; i < layer->GetNumInputSlots(); ++i)

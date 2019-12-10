@@ -10,6 +10,7 @@
 #include <armnn/IRuntime.hpp>
 #include <armnnDeserializer/IDeserializer.hpp>
 
+#include <boost/core/ignore_unused.hpp>
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
 
@@ -154,6 +155,7 @@ struct ParserFlatbuffersSerializeFixture
                       armnnSerializer::TensorInfo tensorType, const std::string& name,
                       const float scale, const int64_t zeroPoint)
     {
+        boost::ignore_unused(name);
         BOOST_CHECK_EQUAL(shapeSize, tensors->dimensions()->size());
         BOOST_CHECK_EQUAL_COLLECTIONS(shape.begin(), shape.end(),
                                       tensors->dimensions()->begin(), tensors->dimensions()->end());

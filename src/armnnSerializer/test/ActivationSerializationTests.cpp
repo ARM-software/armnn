@@ -8,6 +8,8 @@
 #include <armnn/INetwork.hpp>
 #include "../Serializer.hpp"
 #include <sstream>
+
+#include <boost/core/ignore_unused.hpp>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(SerializerTests)
@@ -19,6 +21,7 @@ public:
                               const armnn::ActivationDescriptor& activationDescriptor,
                               const char* name) override
     {
+        boost::ignore_unused(layer, activationDescriptor);
         BOOST_TEST(name == "activation");
     }
 };

@@ -710,6 +710,7 @@ INetworkPtr Deserializer::CreateNetworkFromGraph(GraphPtr graph)
 BindingPointInfo Deserializer::GetNetworkInputBindingInfo(unsigned int layerIndex,
                                                           const std::string& name) const
 {
+    boost::ignore_unused(layerIndex);
     for (auto inputBinding : m_InputBindings)
     {
         if (inputBinding.first == name)
@@ -727,6 +728,7 @@ BindingPointInfo Deserializer::GetNetworkInputBindingInfo(unsigned int layerInde
 BindingPointInfo Deserializer::GetNetworkOutputBindingInfo(unsigned int layerIndex,
                                                                 const std::string& name) const
 {
+    boost::ignore_unused(layerIndex);
     for (auto outputBinding : m_OutputBindings)
     {
         if (outputBinding.first == name)
@@ -1676,6 +1678,7 @@ void Deserializer::ParsePermute(GraphPtr graph, unsigned int layerIndex)
 armnn::Pooling2dDescriptor Deserializer::GetPoolingDescriptor(Deserializer::PoolingDescriptor pooling2dDesc,
                                                               unsigned int layerIndex)
 {
+    boost::ignore_unused(layerIndex);
     armnn::Pooling2dDescriptor desc;
 
     switch (pooling2dDesc->poolType())
@@ -2027,6 +2030,7 @@ armnn::NormalizationDescriptor Deserializer::GetNormalizationDescriptor(
     Deserializer::NormalizationDescriptorPtr normalizationDescriptor,
     unsigned int layerIndex)
 {
+    boost::ignore_unused(layerIndex);
     armnn::NormalizationDescriptor desc;
 
     switch (normalizationDescriptor->normChannelType())

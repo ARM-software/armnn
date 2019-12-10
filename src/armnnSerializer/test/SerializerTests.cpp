@@ -56,7 +56,7 @@ public: \
 
 struct DefaultLayerVerifierPolicy
 {
-    static void Apply(const std::string s = "")
+    static void Apply(const std::string)
     {
         BOOST_TEST_MESSAGE("Unexpected layer found in network");
         BOOST_TEST(false);
@@ -75,7 +75,7 @@ public:
 
     void VisitInputLayer(const armnn::IConnectableLayer*, armnn::LayerBindingId, const char*) override {}
 
-    void VisitOutputLayer(const armnn::IConnectableLayer*, armnn::LayerBindingId id, const char*) override {}
+    void VisitOutputLayer(const armnn::IConnectableLayer*, armnn::LayerBindingId, const char*) override {}
 
 protected:
     void VerifyNameAndConnections(const armnn::IConnectableLayer* layer, const char* name)
@@ -521,7 +521,7 @@ BOOST_AUTO_TEST_CASE(SerializeConstant)
             CompareConstTensor(input, m_LayerInput);
         }
 
-        void VisitAdditionLayer(const armnn::IConnectableLayer* layer, const char* name = nullptr) override {}
+        void VisitAdditionLayer(const armnn::IConnectableLayer*, const char*) override {}
 
     private:
         armnn::ConstTensor m_LayerInput;
@@ -927,7 +927,7 @@ public:
         BOOST_CHECK(descriptor.m_Operation == armnn::ComparisonOperation::Equal);
     }
 
-    void VisitEqualLayer(const armnn::IConnectableLayer* layer, const char* name) override
+    void VisitEqualLayer(const armnn::IConnectableLayer*, const char*) override
     {
         throw armnn::Exception("EqualLayer should have translated to ComparisonLayer");
     }
@@ -1146,9 +1146,9 @@ BOOST_AUTO_TEST_CASE(SerializeGather)
             VerifyNameAndConnections(layer, name);
         }
 
-        void VisitConstantLayer(const armnn::IConnectableLayer* layer,
-                                const armnn::ConstTensor& input,
-                                const char *name) override {}
+        void VisitConstantLayer(const armnn::IConnectableLayer*,
+                                const armnn::ConstTensor&,
+                                const char*) override {}
     };
 
     const std::string layerName("gather");
@@ -1201,7 +1201,7 @@ public:
         BOOST_CHECK(descriptor.m_Operation == armnn::ComparisonOperation::Greater);
     }
 
-    void VisitGreaterLayer(const armnn::IConnectableLayer* layer, const char* name) override
+    void VisitGreaterLayer(const armnn::IConnectableLayer*, const char*) override
     {
         throw armnn::Exception("GreaterLayer should have translated to ComparisonLayer");
     }
@@ -1543,9 +1543,9 @@ public:
                         const armnn::OriginsDescriptor& descriptor)
         : LayerVerifierBaseWithDescriptor<armnn::OriginsDescriptor>(layerName, inputInfos, outputInfos, descriptor) {}
 
-    void VisitMergerLayer(const armnn::IConnectableLayer* layer,
-                          const armnn::OriginsDescriptor& descriptor,
-                          const char* name) override
+    void VisitMergerLayer(const armnn::IConnectableLayer*,
+                          const armnn::OriginsDescriptor&,
+                          const char*) override
     {
         throw armnn::Exception("MergerLayer should have translated to ConcatLayer");
     }
@@ -2514,9 +2514,9 @@ BOOST_AUTO_TEST_CASE(SerializeSwitch)
             VerifyNameAndConnections(layer, name);
         }
 
-        void VisitConstantLayer(const armnn::IConnectableLayer* layer,
-                                const armnn::ConstTensor& input,
-                                const char *name) override {}
+        void VisitConstantLayer(const armnn::IConnectableLayer*,
+                                const armnn::ConstTensor&,
+                                const char*) override {}
     };
 
     const std::string layerName("switch");
@@ -2658,7 +2658,7 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeNonLinearNetwork)
             CompareConstTensor(input, m_LayerInput);
         }
 
-        void VisitAdditionLayer(const armnn::IConnectableLayer* layer, const char* name = nullptr) override {}
+        void VisitAdditionLayer(const armnn::IConnectableLayer*, const char*) override {}
 
     private:
         armnn::ConstTensor m_LayerInput;

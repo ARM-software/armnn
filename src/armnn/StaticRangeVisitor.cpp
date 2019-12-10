@@ -31,6 +31,7 @@ void StaticRangeVisitor::ForwardParentParameters(const IConnectableLayer* layer)
 
 void StaticRangeVisitor::VisitAdditionLayer(const IConnectableLayer* layer, const char* name)
 {
+    boost::ignore_unused(name);
     SetRange(layer, 0, -20.f, 20.f);
 }
 
@@ -81,6 +82,7 @@ void StaticRangeVisitor::VisitActivationLayer(const IConnectableLayer* layer,
                                               const ActivationDescriptor& activationDescriptor,
                                               const char* name)
 {
+    boost::ignore_unused(name);
     switch (activationDescriptor.m_Function)
     {
         // Range is 0, 15 for Abs, Linear, ReLu and Soft ReLu
@@ -141,6 +143,7 @@ void StaticRangeVisitor::VisitPooling2dLayer(const IConnectableLayer* layer,
                                              const char* name)
 {
     boost::ignore_unused(pooling2dDescriptor);
+    boost::ignore_unused(name);
     ForwardParentParameters(layer);
 }
 
@@ -149,6 +152,7 @@ void StaticRangeVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
                                            const char* name)
 {
     boost::ignore_unused(softmaxDescriptor);
+    boost::ignore_unused(name);
     SetRange(layer, 0, 0.f, 1.f);
 }
 
@@ -156,6 +160,8 @@ void StaticRangeVisitor::VisitConcatLayer(const IConnectableLayer* layer,
                                           const OriginsDescriptor& originsDescriptor,
                                           const char* name)
 {
+    boost::ignore_unused(originsDescriptor);
+    boost::ignore_unused(name);
     float min = std::numeric_limits<float>::max();
     float max = std::numeric_limits<float>::lowest();
     for (unsigned int i = 0; i < layer->GetNumInputSlots(); ++i)

@@ -11,6 +11,8 @@
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 
+#include <boost/core/ignore_unused.hpp>
+
 #include <Half.hpp>
 
 namespace armnn
@@ -70,6 +72,7 @@ public:
 
     void Run(Graph& graph, Layer& layer) const override
     {
+        boost::ignore_unused(graph);
         if (Predicate::Test(layer))
         {
             layer.OperateOnConstantTensors(Converter::Func);

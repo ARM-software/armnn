@@ -17,8 +17,9 @@ void ProcessConcatInputTensorInfo(armnn::TensorInfo& inputTensorInfo,
                                   unsigned int& mergeDimOrigin);
 
 /// Creates a tensor info after reducing the dimensions mentioned in axisData.
-void CalculateReducedOutputTensoInfo(const armnn::TensorInfo& inputTensorInfo, const armnn::TensorInfo& axisTensorInfo,
-                                     const std::set<unsigned int>& axisSet, bool keepDims,
+void CalculateReducedOutputTensoInfo(const armnn::TensorInfo& inputTensorInfo,
+                                     const std::set<unsigned int>& axisSet,
+                                     bool keepDims,
                                      armnn::TensorInfo& outputTensorInfo);
 
 } // namespace armnnUtils

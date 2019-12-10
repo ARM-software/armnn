@@ -385,6 +385,7 @@ CreateConstTensorImpl(TfLiteParser::BufferRawPtr bufferPtr,
                       armnn::TensorInfo& tensorInfo,
                       armnn::Optional<armnn::PermutationVector&> permutationVector)
 {
+    boost::ignore_unused(tensorPtr);
     BOOST_ASSERT_MSG(tensorPtr != nullptr, "tensorPtr is null");
     BOOST_ASSERT_MSG(bufferPtr != nullptr,
         boost::str(

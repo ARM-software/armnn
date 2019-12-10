@@ -33,7 +33,7 @@ public:
 
     void VisitInputLayer(const IConnectableLayer*, LayerBindingId, const char*) override {}
 
-    void VisitOutputLayer(const IConnectableLayer*, LayerBindingId id, const char*) override {}
+    void VisitOutputLayer(const IConnectableLayer*, LayerBindingId, const char*) override {}
 
     void VisitStandInLayer(const IConnectableLayer* layer,
                            const StandInDescriptor& descriptor,

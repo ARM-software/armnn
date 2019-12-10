@@ -51,8 +51,9 @@ void ProcessConcatInputTensorInfo(armnn::TensorInfo& inputTensorInfo,
     }
 }
 
-void CalculateReducedOutputTensoInfo(const armnn::TensorInfo& inputTensorInfo, const armnn::TensorInfo& axisTensorInfo,
-                                     const std::set<unsigned int>& axisSet, bool keepDims,
+void CalculateReducedOutputTensoInfo(const armnn::TensorInfo& inputTensorInfo,
+                                     const std::set<unsigned int>& axisSet,
+                                     bool keepDims,
                                      armnn::TensorInfo& outputTensorInfo)
 {
     std::vector<unsigned int> outputShapeVector;

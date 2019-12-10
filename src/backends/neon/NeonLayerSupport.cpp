@@ -69,7 +69,7 @@ namespace
 template< typename ... Args>
 bool IsNeonBackendSupported(Optional<std::string&> reasonIfUnsupported, Args... args)
 {
-    boost::ignore_unused((args)...);
+    boost::ignore_unused(reasonIfUnsupported, (args)...);
 #if defined(ARMCOMPUTENEON_ENABLED)
     return true;
 #else

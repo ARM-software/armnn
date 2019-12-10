@@ -75,7 +75,12 @@ public:
 
     void Close() override {}
 
-    bool WritePacket(const unsigned char* buffer, uint32_t length) override { return false; }
+    bool WritePacket(const unsigned char* buffer, uint32_t length) override
+    {
+        boost::ignore_unused(buffer, length);
+
+        return false;
+    }
 
     Packet ReadPacket(uint32_t timeout) override
     {
@@ -134,6 +139,7 @@ public:
 
     Packet ReadPacket(uint32_t timeout) override
     {
+        boost::ignore_unused(timeout);
         ++m_ReadRequests;
         throw armnn::Exception("Simulate a non-timeout error");
     }
@@ -156,6 +162,7 @@ public:
 
     void operator()(const Packet& packet) override
     {
+        boost::ignore_unused(packet);
         m_Count++;
     }
 

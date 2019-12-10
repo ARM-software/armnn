@@ -7,6 +7,8 @@
 
 #include <atomic>
 
+#include <boost/core/ignore_unused.hpp>
+
 namespace armnn
 {
 
@@ -33,6 +35,7 @@ public:
 
     bool IsOneOfStates(ProfilingState state1)
     {
+        boost::ignore_unused(state1);
         return false;
     }
 

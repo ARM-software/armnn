@@ -7,6 +7,8 @@
 
 #include <cstdint>
 
+#include <boost/core/ignore_unused.hpp>
+
 namespace armnn
 {
 
@@ -28,7 +30,7 @@ public:
     uint32_t GetPacketId() const;
     uint32_t GetVersion()  const;
 
-    virtual void operator()(const Packet& packet) {}
+    virtual void operator()(const Packet& packet) = 0;
 
     virtual ~CommandHandlerFunctor() {}
 

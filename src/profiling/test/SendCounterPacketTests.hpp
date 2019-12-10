@@ -67,13 +67,15 @@ public:
 
     Packet ReadPacket(uint32_t timeout) override
     {
+        boost::ignore_unused(timeout);
+
         // Simulate a delay in the reading process. The default timeout is way too long.
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
         std::lock_guard<std::mutex> lock(m_Mutex);
         return std::move(m_Packet);
     }
 
-    const std::vector<uint32_t> GetWrittenData()
+    std::vector<uint32_t> GetWrittenData()
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -82,7 +84,7 @@ public:
         return writtenData;
     }
 
-    const bool HasWrittenData()
+    bool HasWrittenData() const
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
         return !m_WrittenData.empty();
@@ -107,6 +109,7 @@ class MockProfilingConnectionFactory : public IProfilingConnectionFactory
 public:
     IProfilingConnectionPtr GetProfilingConnection(const ExternalProfilingOptions& options) const override
     {
+        boost::ignore_unused(options);
         return std::make_unique<MockProfilingConnection>();
     }
 };
@@ -295,6 +298,8 @@ public:
 
     void SendCounterDirectoryPacket(const ICounterDirectory& counterDirectory) override
     {
+        boost::ignore_unused(counterDirectory);
+
         std::string message("SendCounterDirectoryPacket");
         unsigned int reserved = 0;
         IPacketBufferPtr buffer = m_BufferManager.Reserve(1024, reserved);
@@ -305,6 +310,8 @@ public:
     void SendPeriodicCounterCapturePacket(uint64_t timestamp,
                                           const std::vector<std::pair<uint16_t, uint32_t>>& values) override
     {
+        boost::ignore_unused(timestamp, values);
+
         std::string message("SendPeriodicCounterCapturePacket");
         unsigned int reserved = 0;
         IPacketBufferPtr buffer = m_BufferManager.Reserve(1024, reserved);
@@ -315,6 +322,8 @@ public:
     void SendPeriodicCounterSelectionPacket(uint32_t capturePeriod,
                                             const std::vector<uint16_t>& selectedCounterIds) override
     {
+        boost::ignore_unused(capturePeriod, selectedCounterIds);
+
         std::string message("SendPeriodicCounterSelectionPacket");
         unsigned int reserved = 0;
         IPacketBufferPtr buffer = m_BufferManager.Reserve(1024, reserved);
@@ -515,16 +524,19 @@ public:
 
     const Device* GetDevice(uint16_t uid) const override
     {
+        boost::ignore_unused(uid);
         return nullptr; // Not used by the unit tests
     }
 
     const CounterSet* GetCounterSet(uint16_t uid) const override
     {
+        boost::ignore_unused(uid);
         return nullptr; // Not used by the unit tests
     }
 
     const Counter* GetCounter(uint16_t uid) const override
     {
+        boost::ignore_unused(uid);
         return nullptr; // Not used by the unit tests
     }
 

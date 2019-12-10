@@ -718,7 +718,6 @@ BOOST_AUTO_TEST_CASE(CheckProfilingObjectUids)
     std::vector<uint16_t> counterUids;
     BOOST_CHECK_NO_THROW(counterUids = GetNextCounterUids(uid,0));
     BOOST_CHECK(counterUids.size() == 1);
-    BOOST_CHECK(counterUids[0] >= 0);
 
     std::vector<uint16_t> nextCounterUids;
     BOOST_CHECK_NO_THROW(nextCounterUids = GetNextCounterUids(nextUid, 2));
@@ -1318,7 +1317,6 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
                                                    "valid description"));
     BOOST_CHECK(counterDirectory.GetCounterCount() == 1);
     BOOST_CHECK(counter);
-    BOOST_CHECK(counter->m_Uid >= 0);
     BOOST_CHECK(counter->m_MaxCounterUid == counter->m_Uid);
     BOOST_CHECK(counter->m_Class == 0);
     BOOST_CHECK(counter->m_Interpolation == 1);
@@ -1360,7 +1358,6 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
                                                                              std::string("Mnnsq2")));    // Units
     BOOST_CHECK(counterDirectory.GetCounterCount() == 2);
     BOOST_CHECK(counterWUnits);
-    BOOST_CHECK(counterWUnits->m_Uid >= 0);
     BOOST_CHECK(counterWUnits->m_Uid > counter->m_Uid);
     BOOST_CHECK(counterWUnits->m_MaxCounterUid == counterWUnits->m_Uid);
     BOOST_CHECK(counterWUnits->m_Class == 0);
@@ -1389,7 +1386,6 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
                                                                                0));                   // Device UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 3);
     BOOST_CHECK(counterWoDevice);
-    BOOST_CHECK(counterWoDevice->m_Uid >= 0);
     BOOST_CHECK(counterWoDevice->m_Uid > counter->m_Uid);
     BOOST_CHECK(counterWoDevice->m_MaxCounterUid == counterWoDevice->m_Uid);
     BOOST_CHECK(counterWoDevice->m_Class == 0);
@@ -1444,7 +1440,6 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
                                                                            device->m_Uid));           // Device UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 4);
     BOOST_CHECK(counterWDevice);
-    BOOST_CHECK(counterWDevice->m_Uid >= 0);
     BOOST_CHECK(counterWDevice->m_Uid > counter->m_Uid);
     BOOST_CHECK(counterWDevice->m_MaxCounterUid == counterWDevice->m_Uid);
     BOOST_CHECK(counterWDevice->m_Class == 0);
@@ -1474,7 +1469,6 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
                                                                                 0));                   // CounterSet UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 5);
     BOOST_CHECK(counterWoCounterSet);
-    BOOST_CHECK(counterWoCounterSet->m_Uid >= 0);
     BOOST_CHECK(counterWoCounterSet->m_Uid > counter->m_Uid);
     BOOST_CHECK(counterWoCounterSet->m_MaxCounterUid == counterWoCounterSet->m_Uid);
     BOOST_CHECK(counterWoCounterSet->m_Class == 0);
@@ -1517,7 +1511,6 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
                              armnn::EmptyOptional()));    // Counter set UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 20);
     BOOST_CHECK(counterWNumberOfCores);
-    BOOST_CHECK(counterWNumberOfCores->m_Uid >= 0);
     BOOST_CHECK(counterWNumberOfCores->m_Uid > counter->m_Uid);
     BOOST_CHECK(counterWNumberOfCores->m_MaxCounterUid == counterWNumberOfCores->m_Uid + numberOfCores - 1);
     BOOST_CHECK(counterWNumberOfCores->m_Class == 0);
@@ -1556,7 +1549,6 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
                              armnn::EmptyOptional()));    // Counter set UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 24);
     BOOST_CHECK(counterWMultiCoreDevice);
-    BOOST_CHECK(counterWMultiCoreDevice->m_Uid >= 0);
     BOOST_CHECK(counterWMultiCoreDevice->m_Uid > counter->m_Uid);
     BOOST_CHECK(counterWMultiCoreDevice->m_MaxCounterUid ==
                 counterWMultiCoreDevice->m_Uid + multiCoreDevice->m_Cores - 1);
@@ -1603,7 +1595,6 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
                                                                              armnn::EmptyOptional()));// Counter set UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 26);
     BOOST_CHECK(counterWMultiCoreDeviceWParentCategory);
-    BOOST_CHECK(counterWMultiCoreDeviceWParentCategory->m_Uid >= 0);
     BOOST_CHECK(counterWMultiCoreDeviceWParentCategory->m_Uid > counter->m_Uid);
     BOOST_CHECK(counterWMultiCoreDeviceWParentCategory->m_MaxCounterUid ==
                 counterWMultiCoreDeviceWParentCategory->m_Uid + multiCoreDeviceWParentCategory->m_Cores - 1);
@@ -1643,7 +1634,6 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
                              counterSet->m_Uid));       // Counter set UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 27);
     BOOST_CHECK(counterWCounterSet);
-    BOOST_CHECK(counterWCounterSet->m_Uid >= 0);
     BOOST_CHECK(counterWCounterSet->m_Uid > counter->m_Uid);
     BOOST_CHECK(counterWCounterSet->m_MaxCounterUid == counterWCounterSet->m_Uid);
     BOOST_CHECK(counterWCounterSet->m_Class == 0);
@@ -1668,7 +1658,6 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
                              counterSet->m_Uid));       // Counter set UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 28);
     BOOST_CHECK(counterWDeviceWCounterSet);
-    BOOST_CHECK(counterWDeviceWCounterSet->m_Uid >= 0);
     BOOST_CHECK(counterWDeviceWCounterSet->m_Uid > counter->m_Uid);
     BOOST_CHECK(counterWDeviceWCounterSet->m_MaxCounterUid == counterWDeviceWCounterSet->m_Uid);
     BOOST_CHECK(counterWDeviceWCounterSet->m_Class == 0);
@@ -1705,7 +1694,6 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
                                                                            counterSet->m_Uid));       // Counter set UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 29);
     BOOST_CHECK(anotherCounter);
-    BOOST_CHECK(anotherCounter->m_Uid >= 0);
     BOOST_CHECK(anotherCounter->m_MaxCounterUid == anotherCounter->m_Uid);
     BOOST_CHECK(anotherCounter->m_Class == 1);
     BOOST_CHECK(anotherCounter->m_Interpolation == 0);
@@ -1737,6 +1725,7 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     {
         bool IsCounterRegistered(uint16_t counterUid) const override
         {
+            boost::ignore_unused(counterUid);
             return true;
         }
         uint16_t GetCounterCount() const override
@@ -1745,6 +1734,7 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
         }
         uint32_t GetCounterValue(uint16_t counterUid) const override
         {
+            boost::ignore_unused(counterUid);
             return 0;
         }
     };
@@ -2109,6 +2099,7 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
         //not used
         bool IsCounterRegistered(uint16_t counterUid) const override
         {
+            boost::ignore_unused(counterUid);
             return false;
         }
 

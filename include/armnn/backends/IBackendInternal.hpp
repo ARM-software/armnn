@@ -127,7 +127,7 @@ public:
     /// (Optional) Register TensorHandleFactories
     /// Either this method or CreateMemoryManager() and
     /// IWorkloadFactory::CreateTensor()/IWorkloadFactory::CreateSubtensor() methods must be implemented.
-    virtual void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry) {}
+    virtual void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& /*registry*/) {}
 
     /// Returns the version of the Backend API
     static constexpr BackendVersion GetApiVersion() { return BackendVersion(1, 0); }

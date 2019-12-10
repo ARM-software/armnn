@@ -34,295 +34,292 @@ bool DefaultLayerSupport(const char* func,
 namespace armnn
 {
 
-bool LayerSupportBase::IsAbsSupported(const TensorInfo &input,
-                                      const TensorInfo &output,
+bool LayerSupportBase::IsAbsSupported(const TensorInfo& /*input*/,
+                                      const TensorInfo& /*output*/,
                                       Optional<std::string &> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsActivationSupported(const TensorInfo& input,
-                                             const TensorInfo& output,
-                                             const ActivationDescriptor& descriptor,
+bool LayerSupportBase::IsActivationSupported(const TensorInfo& /*input*/,
+                                             const TensorInfo& /*output*/,
+                                             const ActivationDescriptor& /*descriptor*/,
                                              Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsAdditionSupported(const TensorInfo& input0,
-                                           const TensorInfo& input1,
-                                           const TensorInfo& output,
+bool LayerSupportBase::IsAdditionSupported(const TensorInfo& /*input0*/,
+                                           const TensorInfo& /*input1*/,
+                                           const TensorInfo& /*output*/,
                                            Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsArgMinMaxSupported(const armnn::TensorInfo &input, const armnn::TensorInfo &output,
-                                            const armnn::ArgMinMaxDescriptor& descriptor,
+bool LayerSupportBase::IsArgMinMaxSupported(const armnn::TensorInfo &/*input*/,
+                                            const armnn::TensorInfo &/*output*/,
+                                            const armnn::ArgMinMaxDescriptor& /*descriptor*/,
                                             armnn::Optional<std::string &> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsBatchNormalizationSupported(const TensorInfo& input,
-                                                     const TensorInfo& output,
-                                                     const TensorInfo& mean,
-                                                     const TensorInfo& var,
-                                                     const TensorInfo& beta,
-                                                     const TensorInfo& gamma,
-                                                     const BatchNormalizationDescriptor& descriptor,
+bool LayerSupportBase::IsBatchNormalizationSupported(const TensorInfo& /*input*/,
+                                                     const TensorInfo& /*output*/,
+                                                     const TensorInfo& /*mean*/,
+                                                     const TensorInfo& /*var*/,
+                                                     const TensorInfo& /*beta*/,
+                                                     const TensorInfo& /*gamma*/,
+                                                     const BatchNormalizationDescriptor& /*descriptor*/,
                                                      Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsBatchToSpaceNdSupported(const TensorInfo& input,
-                                                 const TensorInfo& output,
-                                                 const BatchToSpaceNdDescriptor& descriptor,
+bool LayerSupportBase::IsBatchToSpaceNdSupported(const TensorInfo& /*input*/,
+                                                 const TensorInfo& /*output*/,
+                                                 const BatchToSpaceNdDescriptor& /*descriptor*/,
                                                  Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsComparisonSupported(const TensorInfo& input0,
-                                             const TensorInfo& input1,
-                                             const TensorInfo& output,
-                                             const ComparisonDescriptor& descriptor,
+bool LayerSupportBase::IsComparisonSupported(const TensorInfo& /*input0*/,
+                                             const TensorInfo& /*input1*/,
+                                             const TensorInfo& /*output*/,
+                                             const ComparisonDescriptor& /*descriptor*/,
                                              Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsConcatSupported(const std::vector<const TensorInfo*> inputs,
-                                         const TensorInfo& output,
-                                         const OriginsDescriptor& descriptor,
+bool LayerSupportBase::IsConcatSupported(const std::vector<const TensorInfo*> /*inputs*/,
+                                         const TensorInfo& /*output*/,
+                                         const OriginsDescriptor& /*descriptor*/,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsConstantSupported(const TensorInfo& output,
+bool LayerSupportBase::IsConstantSupported(const TensorInfo& /*output*/,
                                            Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsConvertFp16ToFp32Supported(const TensorInfo& input,
-                                                    const TensorInfo& output,
+bool LayerSupportBase::IsConvertFp16ToFp32Supported(const TensorInfo& /*input*/,
+                                                    const TensorInfo& /*output*/,
                                                     Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsConvertFp32ToFp16Supported(const TensorInfo& input,
-                                                    const TensorInfo& output,
+bool LayerSupportBase::IsConvertFp32ToFp16Supported(const TensorInfo& /*input*/,
+                                                    const TensorInfo& /*output*/,
                                                     Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsConvolution2dSupported(const TensorInfo& input,
-                                                const TensorInfo& output,
-                                                const Convolution2dDescriptor& descriptor,
-                                                const TensorInfo& weights,
-                                                const Optional<TensorInfo>& biases,
+bool LayerSupportBase::IsConvolution2dSupported(const TensorInfo& /*input*/,
+                                                const TensorInfo& /*output*/,
+                                                const Convolution2dDescriptor& /*descriptor*/,
+                                                const TensorInfo& /*weights*/,
+                                                const Optional<TensorInfo>& /*biases*/,
                                                 Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsDebugSupported(const TensorInfo& input,
-                                        const TensorInfo& output,
+bool LayerSupportBase::IsDebugSupported(const TensorInfo& /*input*/,
+                                        const TensorInfo& /*output*/,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsDepthToSpaceSupported(const TensorInfo& input,
-                                               const TensorInfo& output,
-                                               const DepthToSpaceDescriptor& descriptor,
+bool LayerSupportBase::IsDepthToSpaceSupported(const TensorInfo& /*input*/,
+                                               const TensorInfo& /*output*/,
+                                               const DepthToSpaceDescriptor& /*descriptor*/,
                                                Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsDepthwiseConvolutionSupported(const TensorInfo& input,
-                                                       const TensorInfo& output,
-                                                       const DepthwiseConvolution2dDescriptor& descriptor,
-                                                       const TensorInfo& weights,
-                                                       const Optional<TensorInfo>& biases,
+bool LayerSupportBase::IsDepthwiseConvolutionSupported(const TensorInfo& /*input*/,
+                                                       const TensorInfo& /*output*/,
+                                                       const DepthwiseConvolution2dDescriptor& /*descriptor*/,
+                                                       const TensorInfo& /*weights*/,
+                                                       const Optional<TensorInfo>& /*biases*/,
                                                        Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsDequantizeSupported(const TensorInfo& input,
-                                             const TensorInfo& output,
+bool LayerSupportBase::IsDequantizeSupported(const TensorInfo& /*input*/,
+                                             const TensorInfo& /*output*/,
                                              Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsDetectionPostProcessSupported(const TensorInfo& boxEncodings,
-                                                       const TensorInfo& scores,
-                                                       const TensorInfo& anchors,
-                                                       const TensorInfo& detectionBoxes,
-                                                       const TensorInfo& detectionClasses,
-                                                       const TensorInfo& detectionScores,
-                                                       const TensorInfo& numDetections,
-                                                       const DetectionPostProcessDescriptor& descriptor,
+bool LayerSupportBase::IsDetectionPostProcessSupported(const TensorInfo& /*boxEncodings*/,
+                                                       const TensorInfo& /*scores*/,
+                                                       const TensorInfo& /*anchors*/,
+                                                       const TensorInfo& /*detectionBoxes*/,
+                                                       const TensorInfo& /*detectionClasses*/,
+                                                       const TensorInfo& /*detectionScores*/,
+                                                       const TensorInfo& /*numDetections*/,
+                                                       const DetectionPostProcessDescriptor& /*descriptor*/,
                                                        Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& input,
-                                                              const TensorInfo& output,
-                                                              const DepthwiseConvolution2dDescriptor& descriptor,
-                                                              const TensorInfo& weights,
-                                                              const Optional<TensorInfo>& biases,
+bool LayerSupportBase::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& /*input*/,
+                                                              const TensorInfo& /*output*/,
+                                                              const DepthwiseConvolution2dDescriptor& /*descriptor*/,
+                                                              const TensorInfo& /*weights*/,
+                                                              const Optional<TensorInfo>& /*biases*/,
                                                               Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsDivisionSupported(const TensorInfo& input0,
-                                           const TensorInfo& input1,
-                                           const TensorInfo& output,
+bool LayerSupportBase::IsDivisionSupported(const TensorInfo& /*input0*/,
+                                           const TensorInfo& /*input1*/,
+                                           const TensorInfo& /*output*/,
                                            Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsEqualSupported(const armnn::TensorInfo& input0,
-                                        const armnn::TensorInfo& input1,
-                                        const armnn::TensorInfo& output,
+bool LayerSupportBase::IsEqualSupported(const armnn::TensorInfo& /*input0*/,
+                                        const armnn::TensorInfo& /*input1*/,
+                                        const armnn::TensorInfo& /*output*/,
                                         armnn::Optional<std::string &> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsFakeQuantizationSupported(const TensorInfo& input,
-                                                   const FakeQuantizationDescriptor& descriptor,
+bool LayerSupportBase::IsFakeQuantizationSupported(const TensorInfo& /*input*/,
+                                                   const FakeQuantizationDescriptor& /*descriptor*/,
                                                    Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsFloorSupported(const TensorInfo& input,
-                                        const TensorInfo& output,
+bool LayerSupportBase::IsFloorSupported(const TensorInfo& /*input*/,
+                                        const TensorInfo& /*output*/,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsFullyConnectedSupported(const TensorInfo& input,
-                                                 const TensorInfo& output,
-                                                 const TensorInfo& weights,
-                                                 const TensorInfo& biases,
-                                                 const FullyConnectedDescriptor& descriptor,
+bool LayerSupportBase::IsFullyConnectedSupported(const TensorInfo& /*input*/,
+                                                 const TensorInfo& /*output*/,
+                                                 const TensorInfo& /*weights*/,
+                                                 const TensorInfo& /*biases*/,
+                                                 const FullyConnectedDescriptor& /*descriptor*/,
                                                  Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsGatherSupported(const armnn::TensorInfo& input0,
-                                         const armnn::TensorInfo& input1,
-                                         const armnn::TensorInfo& output,
+bool LayerSupportBase::IsGatherSupported(const armnn::TensorInfo& /*input0*/,
+                                         const armnn::TensorInfo& /*input1*/,
+                                         const armnn::TensorInfo& /*output*/,
                                          armnn::Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsGreaterSupported(const TensorInfo& input0,
-                                          const TensorInfo& input1,
-                                          const TensorInfo& output,
+bool LayerSupportBase::IsGreaterSupported(const TensorInfo& /*input0*/,
+                                          const TensorInfo& /*input1*/,
+                                          const TensorInfo& /*output*/,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsInputSupported(const TensorInfo& input,
+bool LayerSupportBase::IsInputSupported(const TensorInfo& /*input*/,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsInstanceNormalizationSupported(const TensorInfo& input,
-                                                        const TensorInfo& output,
-                                                        const InstanceNormalizationDescriptor& descriptor,
+bool LayerSupportBase::IsInstanceNormalizationSupported(const TensorInfo& /*input*/,
+                                                        const TensorInfo& /*output*/,
+                                                        const InstanceNormalizationDescriptor& /*descriptor*/,
                                                         Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsL2NormalizationSupported(const TensorInfo& input,
-                                                  const TensorInfo& output,
-                                                  const L2NormalizationDescriptor& descriptor,
+bool LayerSupportBase::IsL2NormalizationSupported(const TensorInfo& /*input*/,
+                                                  const TensorInfo& /*output*/,
+                                                  const L2NormalizationDescriptor& /*descriptor*/,
                                                   Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsLogSoftmaxSupported(const TensorInfo& input,
-                                             const TensorInfo& output,
-                                             const LogSoftmaxDescriptor& descriptor,
+bool LayerSupportBase::IsLogSoftmaxSupported(const TensorInfo& /*input*/,
+                                             const TensorInfo& /*output*/,
+                                             const LogSoftmaxDescriptor& /*descriptor*/,
                                              Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsLstmSupported(const TensorInfo& input,
-                                       const TensorInfo& outputStateIn,
-                                       const TensorInfo& cellStateIn,
-                                       const TensorInfo& scratchBuffer,
-                                       const TensorInfo& outputStateOut,
-                                       const TensorInfo& cellStateOut,
-                                       const TensorInfo& output,
-                                       const LstmDescriptor& descriptor,
-                                       const LstmInputParamsInfo& paramsInfo,
+bool LayerSupportBase::IsLstmSupported(const TensorInfo& /*input*/,
+                                       const TensorInfo& /*outputStateIn*/,
+                                       const TensorInfo& /*cellStateIn*/,
+                                       const TensorInfo& /*scratchBuffer*/,
+                                       const TensorInfo& /*outputStateOut*/,
+                                       const TensorInfo& /*cellStateOut*/,
+                                       const TensorInfo& /*output*/,
+                                       const LstmDescriptor& /*descriptor*/,
+                                       const LstmInputParamsInfo& /*paramsInfo*/,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsMaximumSupported(const TensorInfo& input0,
-                                          const TensorInfo& input1,
-                                          const TensorInfo& output,
+bool LayerSupportBase::IsMaximumSupported(const TensorInfo& /*input0*/,
+                                          const TensorInfo& /*input1*/,
+                                          const TensorInfo& /*output*/,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsMeanSupported(const TensorInfo& input,
-                                       const TensorInfo& output,
-                                       const MeanDescriptor& descriptor,
+bool LayerSupportBase::IsMeanSupported(const TensorInfo& /*input*/,
+                                       const TensorInfo& /*output*/,
+                                       const MeanDescriptor& /*descriptor*/,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsMemCopySupported(const armnn::TensorInfo& input,
-                                          const armnn::TensorInfo& output,
-                                          armnn::Optional<std::string &> reasonIfUnsupported) const
+bool LayerSupportBase::IsMemCopySupported(const armnn::TensorInfo& /*input*/,
+                                          const armnn::TensorInfo& /*output*/,
+                                          armnn::Optional<std::string &> /*reasonIfUnsupported*/) const
 {
-    boost::ignore_unused(input);
-    boost::ignore_unused(output);
     return true;
 }
 
-bool LayerSupportBase::IsMemImportSupported(const armnn::TensorInfo& input,
-                                            const armnn::TensorInfo& output,
-                                            armnn::Optional<std::string &> reasonIfUnsupported) const
+bool LayerSupportBase::IsMemImportSupported(const armnn::TensorInfo& /*input*/,
+                                            const armnn::TensorInfo& /*output*/,
+                                            armnn::Optional<std::string &> /*reasonIfUnsupported*/) const
 {
-    boost::ignore_unused(input);
-    boost::ignore_unused(output);
     return true;
 }
 
-bool LayerSupportBase::IsMergeSupported(const TensorInfo& input0,
-                                        const TensorInfo& input1,
-                                        const TensorInfo& output,
+bool LayerSupportBase::IsMergeSupported(const TensorInfo& /*input0*/,
+                                        const TensorInfo& /*input1*/,
+                                        const TensorInfo& /*output*/,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
@@ -336,180 +333,180 @@ bool LayerSupportBase::IsMergerSupported(const std::vector<const TensorInfo*> in
     return IsConcatSupported(inputs, output, descriptor, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsMinimumSupported(const TensorInfo& input0,
-                                          const TensorInfo& input1,
-                                          const TensorInfo& output,
+bool LayerSupportBase::IsMinimumSupported(const TensorInfo& /*input0*/,
+                                          const TensorInfo& /*input1*/,
+                                          const TensorInfo& /*output*/,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsMultiplicationSupported(const TensorInfo& input0,
-                                                 const TensorInfo& input1,
-                                                 const TensorInfo& output,
+bool LayerSupportBase::IsMultiplicationSupported(const TensorInfo& /*input0*/,
+                                                 const TensorInfo& /*input1*/,
+                                                 const TensorInfo& /*output*/,
                                                  Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsNormalizationSupported(const TensorInfo& input,
-                                                const TensorInfo& output,
-                                                const NormalizationDescriptor& descriptor,
+bool LayerSupportBase::IsNormalizationSupported(const TensorInfo& /*input*/,
+                                                const TensorInfo& /*output*/,
+                                                const NormalizationDescriptor& /*descriptor*/,
                                                 Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsOutputSupported(const TensorInfo& output,
+bool LayerSupportBase::IsOutputSupported(const TensorInfo& /*output*/,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsPadSupported(const TensorInfo& input,
-                                      const TensorInfo& output,
-                                      const PadDescriptor& descriptor,
+bool LayerSupportBase::IsPadSupported(const TensorInfo& /*input*/,
+                                      const TensorInfo& /*output*/,
+                                      const PadDescriptor& /*descriptor*/,
                                       Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsPermuteSupported(const TensorInfo& input,
-                                          const TensorInfo& output,
-                                          const PermuteDescriptor& descriptor,
+bool LayerSupportBase::IsPermuteSupported(const TensorInfo& /*input*/,
+                                          const TensorInfo& /*output*/,
+                                          const PermuteDescriptor& /*descriptor*/,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsPooling2dSupported(const TensorInfo& input,
-                                            const TensorInfo& output,
-                                            const Pooling2dDescriptor& descriptor,
+bool LayerSupportBase::IsPooling2dSupported(const TensorInfo& /*input*/,
+                                            const TensorInfo& /*output*/,
+                                            const Pooling2dDescriptor& /*descriptor*/,
                                             Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsPreCompiledSupported(const TensorInfo& input,
-                                              const PreCompiledDescriptor& descriptor,
+bool LayerSupportBase::IsPreCompiledSupported(const TensorInfo& /*input*/,
+                                              const PreCompiledDescriptor& /*descriptor*/,
                                               Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsPreluSupported(const TensorInfo& input,
-                                        const TensorInfo& alpha,
-                                        const TensorInfo& output,
+bool LayerSupportBase::IsPreluSupported(const TensorInfo& /*input*/,
+                                        const TensorInfo& /*alpha*/,
+                                        const TensorInfo& /*output*/,
                                         Optional<std::string &> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsQuantizeSupported(const armnn::TensorInfo& input,
-                                           const armnn::TensorInfo& output,
+bool LayerSupportBase::IsQuantizeSupported(const armnn::TensorInfo& /*input*/,
+                                           const armnn::TensorInfo& /*output*/,
                                            armnn::Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsQuantizedLstmSupported(const TensorInfo& input,
-                                                const TensorInfo& previousCellStateIn,
-                                                const TensorInfo& previousOutputIn,
-                                                const TensorInfo& cellStateOut,
-                                                const TensorInfo& output,
-                                                const QuantizedLstmInputParamsInfo& paramsInfo,
+bool LayerSupportBase::IsQuantizedLstmSupported(const TensorInfo& /*input*/,
+                                                const TensorInfo& /*previousCellStateIn*/,
+                                                const TensorInfo& /*previousOutputIn*/,
+                                                const TensorInfo& /*cellStateOut*/,
+                                                const TensorInfo& /*output*/,
+                                                const QuantizedLstmInputParamsInfo& /*paramsInfo*/,
                                                 Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsReshapeSupported(const TensorInfo& input,
-                                          const ReshapeDescriptor& descriptor,
+bool LayerSupportBase::IsReshapeSupported(const TensorInfo& /*input*/,
+                                          const ReshapeDescriptor& /*descriptor*/,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsResizeBilinearSupported(const TensorInfo& input,
-                                                 const TensorInfo& output,
+bool LayerSupportBase::IsResizeBilinearSupported(const TensorInfo& /*input*/,
+                                                 const TensorInfo& /*output*/,
                                                  Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsResizeSupported(const TensorInfo& input,
-                                         const TensorInfo& output,
-                                         const ResizeDescriptor& descriptor,
+bool LayerSupportBase::IsResizeSupported(const TensorInfo& /*input*/,
+                                         const TensorInfo& /*output*/,
+                                         const ResizeDescriptor& /*descriptor*/,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsRsqrtSupported(const TensorInfo &input,
-                                        const TensorInfo &output,
+bool LayerSupportBase::IsRsqrtSupported(const TensorInfo &/*input*/,
+                                        const TensorInfo &/*output*/,
                                         Optional<std::string &> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsSliceSupported(const TensorInfo& input,
-                                        const TensorInfo& output,
-                                        const SliceDescriptor& descriptor,
+bool LayerSupportBase::IsSliceSupported(const TensorInfo& /*input*/,
+                                        const TensorInfo& /*output*/,
+                                        const SliceDescriptor& /*descriptor*/,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsSoftmaxSupported(const TensorInfo& input,
-                                          const TensorInfo& output,
-                                          const SoftmaxDescriptor& descriptor,
+bool LayerSupportBase::IsSoftmaxSupported(const TensorInfo& /*input*/,
+                                          const TensorInfo& /*output*/,
+                                          const SoftmaxDescriptor& /*descriptor*/,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
-
-bool LayerSupportBase::IsSpaceToBatchNdSupported(const TensorInfo& input,
-                                                 const TensorInfo& output,
-                                                 const SpaceToBatchNdDescriptor& descriptor,
+/**/
+bool LayerSupportBase::IsSpaceToBatchNdSupported(const TensorInfo& /*input*/,
+                                                 const TensorInfo& /*output*/,
+                                                 const SpaceToBatchNdDescriptor& /*descriptor*/,
                                                  Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsSpaceToDepthSupported(const TensorInfo& input,
-                                               const TensorInfo& output,
-                                               const SpaceToDepthDescriptor& descriptor,
+bool LayerSupportBase::IsSpaceToDepthSupported(const TensorInfo& /*input*/,
+                                               const TensorInfo& /*output*/,
+                                               const SpaceToDepthDescriptor& /*descriptor*/,
                                                Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsSplitterSupported(const TensorInfo& input,
-                                           const ViewsDescriptor& descriptor,
+bool LayerSupportBase::IsSplitterSupported(const TensorInfo& /*input*/,
+                                           const ViewsDescriptor& /*descriptor*/,
                                            Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsSplitterSupported(const TensorInfo& input,
-                                           const std::vector<std::reference_wrapper<TensorInfo>>& outputs,
-                                           const ViewsDescriptor& descriptor,
+bool LayerSupportBase::IsSplitterSupported(const TensorInfo& /*input*/,
+                                           const std::vector<std::reference_wrapper<TensorInfo>>& /*outputs*/,
+                                           const ViewsDescriptor& /*descriptor*/,
                                            Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsStackSupported(const std::vector<const TensorInfo*>& inputs,
-                                        const TensorInfo& output,
-                                        const StackDescriptor& descriptor,
+bool LayerSupportBase::IsStackSupported(const std::vector<const TensorInfo*>& /*inputs*/,
+                                        const TensorInfo& /*output*/,
+                                        const StackDescriptor& /*descriptor*/,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsStandInSupported(const std::vector<const TensorInfo*>& inputs,
-                                          const std::vector<const TensorInfo*>& outputs,
-                                          const StandInDescriptor& descriptor,
+bool LayerSupportBase::IsStandInSupported(const std::vector<const TensorInfo*>& /*inputs*/,
+                                          const std::vector<const TensorInfo*>& /*outputs*/,
+                                          const StandInDescriptor& /*descriptor*/,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
     if (reasonIfUnsupported)
@@ -523,36 +520,36 @@ bool LayerSupportBase::IsStandInSupported(const std::vector<const TensorInfo*>& 
     return false;
 }
 
-bool LayerSupportBase::IsStridedSliceSupported(const TensorInfo& input,
-                                               const TensorInfo& output,
-                                               const StridedSliceDescriptor& descriptor,
+bool LayerSupportBase::IsStridedSliceSupported(const TensorInfo& /*input*/,
+                                               const TensorInfo& /*output*/,
+                                               const StridedSliceDescriptor& /*descriptor*/,
                                                Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsSubtractionSupported(const TensorInfo& input0,
-                                              const TensorInfo& input1,
-                                              const TensorInfo& output,
+bool LayerSupportBase::IsSubtractionSupported(const TensorInfo& /*input0*/,
+                                              const TensorInfo& /*input1*/,
+                                              const TensorInfo& /*output*/,
                                               Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsSwitchSupported(const TensorInfo& input0,
-                                         const TensorInfo& input1,
-                                         const TensorInfo& output0,
-                                         const TensorInfo& output1,
+bool LayerSupportBase::IsSwitchSupported(const TensorInfo& /*input0*/,
+                                         const TensorInfo& /*input1*/,
+                                         const TensorInfo& /*output0*/,
+                                         const TensorInfo& /*output1*/,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool LayerSupportBase::IsTransposeConvolution2dSupported(const TensorInfo& input,
-                                                         const TensorInfo& output,
-                                                         const TransposeConvolution2dDescriptor& descriptor,
-                                                         const TensorInfo& weights,
-                                                         const Optional<TensorInfo>& biases,
+bool LayerSupportBase::IsTransposeConvolution2dSupported(const TensorInfo& /*input*/,
+                                                         const TensorInfo& /*output*/,
+                                                         const TransposeConvolution2dDescriptor& /*descriptor*/,
+                                                         const TensorInfo& /*weights*/,
+                                                         const Optional<TensorInfo>& /*biases*/,
                                                          Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);

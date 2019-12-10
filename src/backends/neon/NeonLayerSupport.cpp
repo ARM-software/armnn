@@ -66,8 +66,10 @@ namespace armnn
 namespace
 {
 
-bool IsNeonBackendSupported(Optional<std::string&> reasonIfUnsupported)
+template< typename ... Args>
+bool IsNeonBackendSupported(Optional<std::string&> reasonIfUnsupported, Args... args)
 {
+    boost::ignore_unused((args)...);
 #if defined(ARMCOMPUTENEON_ENABLED)
     return true;
 #else
@@ -111,7 +113,7 @@ inline bool IsWorkloadSupported(FuncType& func, Optional<std::string&> reasonIfU
     return IsWorkloadSupported(func, reasonIfUnsupported, __VA_ARGS__);
 #else
 #define FORWARD_WORKLOAD_VALIDATE_FUNC(func, reasonIfUnsupported, ...) \
-    return IsNeonBackendSupported(reasonIfUnsupported);
+    return IsNeonBackendSupported(reasonIfUnsupported, __VA_ARGS__);
 #endif
 
 #if defined(ARMCOMPUTENEON_ENABLED)
@@ -427,7 +429,7 @@ bool NeonLayerSupport::IsGreaterSupported(const armnn::TensorInfo& input0,
 bool NeonLayerSupport::IsInputSupported(const TensorInfo& input,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
-    return IsNeonBackendSupported(reasonIfUnsupported);
+    return IsNeonBackendSupported(reasonIfUnsupported, input);
 }
 
 bool NeonLayerSupport::IsInstanceNormalizationSupported(const TensorInfo& input,
@@ -545,7 +547,7 @@ bool NeonLayerSupport::IsNormalizationSupported(const TensorInfo& input,
 bool NeonLayerSupport::IsOutputSupported(const TensorInfo& output,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
-    return IsNeonBackendSupported(reasonIfUnsupported);
+    return IsNeonBackendSupported(reasonIfUnsupported, output);
 }
 
 bool NeonLayerSupport::IsPadSupported(const TensorInfo& input,
@@ -721,6 +723,7 @@ bool NeonLayerSupport::IsSplitterSupported(const TensorInfo& input,
                                        *splitAxis.begin());
     }
 #endif
+    boost::ignore_unused(descriptor);
     for (auto output : outputs)
     {
         if (!input.IsTypeSpaceMatch(output)) // Cannot use sub-tensors if the types are not same space

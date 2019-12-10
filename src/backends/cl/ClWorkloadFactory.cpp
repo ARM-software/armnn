@@ -23,6 +23,7 @@
 #include <arm_compute/runtime/CL/CLBufferAllocator.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
 
+#include <boost/core/ignore_unused.hpp>
 #include <boost/polymorphic_cast.hpp>
 #include <boost/format.hpp>
 
@@ -84,6 +85,7 @@ ClWorkloadFactory::ClWorkloadFactory(const std::shared_ptr<ClMemoryManager>& mem
 std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
                                                                      const bool IsMemoryManaged) const
 {
+    boost::ignore_unused(IsMemoryManaged);
     std::unique_ptr<ClTensorHandle> tensorHandle = std::make_unique<ClTensorHandle>(tensorInfo);
     tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
 
@@ -94,6 +96,7 @@ std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const Tenso
                                                                      DataLayout dataLayout,
                                                                      const bool IsMemoryManaged) const
 {
+    boost::ignore_unused(IsMemoryManaged);
     std::unique_ptr<ClTensorHandle> tensorHandle = std::make_unique<ClTensorHandle>(tensorInfo, dataLayout);
     tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
 

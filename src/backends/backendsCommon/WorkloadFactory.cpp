@@ -1074,358 +1074,358 @@ bool IWorkloadFactory::IsLayerSupported(const IConnectableLayer& connectableLaye
 }
 
 // Default Implementations
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
-                                                       const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateAbs(const AbsQueueDescriptor& /*descriptor*/,
+                                                       const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
-                                                              const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& /*descriptor*/,
+                                                              const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
-                                                            const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& /*descriptor*/,
+                                                            const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateArgMinMax(const ArgMinMaxQueueDescriptor& descriptor,
-                                                             const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateArgMinMax(const ArgMinMaxQueueDescriptor& /*descriptor*/,
+                                                             const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateBatchNormalization(
-    const BatchNormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
+    const BatchNormalizationQueueDescriptor& /*descriptor*/, const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
-                                                                  const WorkloadInfo& Info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& /*desc*/,
+                                                                  const WorkloadInfo& /*Info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateComparison(const ComparisonQueueDescriptor& descriptor,
-                                                              const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateComparison(const ComparisonQueueDescriptor& /*descriptor*/,
+                                                              const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateConcat(const ConcatQueueDescriptor& descriptor,
-                                                          const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateConcat(const ConcatQueueDescriptor& /*descriptor*/,
+                                                          const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,
-                                                            const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& /*descriptor*/,
+                                                            const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvertFp16ToFp32(const ConvertFp16ToFp32QueueDescriptor& descriptor,
-                                                                     const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvertFp16ToFp32(const ConvertFp16ToFp32QueueDescriptor& /*desc*/,
+                                                                     const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvertFp32ToFp16(const ConvertFp32ToFp16QueueDescriptor& descriptor,
-                                                                     const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvertFp32ToFp16(const ConvertFp32ToFp16QueueDescriptor& /*desc*/,
+                                                                     const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvolution2d(const Convolution2dQueueDescriptor& descriptor,
-                                                                 const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvolution2d(const Convolution2dQueueDescriptor& /*descriptor*/,
+                                                                 const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,
-                                                         const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateDebug(const DebugQueueDescriptor& /*descriptor*/,
+                                                         const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateDepthToSpace(const DepthToSpaceQueueDescriptor& descriptor,
-                                                                const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateDepthToSpace(const DepthToSpaceQueueDescriptor& /*descriptor*/,
+                                                                const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateDepthwiseConvolution2d(
-    const DepthwiseConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
+    const DepthwiseConvolution2dQueueDescriptor& /*descriptor*/, const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateDequantize(
-    const DequantizeQueueDescriptor& descriptor, const WorkloadInfo& info) const
+    const DequantizeQueueDescriptor& /*descriptor*/, const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateDetectionPostProcess(
-    const DetectionPostProcessQueueDescriptor& descriptor, const WorkloadInfo& info) const
+    const DetectionPostProcessQueueDescriptor& /*descriptor*/, const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateDivision(const DivisionQueueDescriptor& descriptor,
-                                                            const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateDivision(const DivisionQueueDescriptor& /*descriptor*/,
+                                                            const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
-                                                         const WorkloadInfo& Info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateEqual(const EqualQueueDescriptor& /*descriptor*/,
+                                                         const WorkloadInfo& /*Info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateFakeQuantization(const FakeQuantizationQueueDescriptor& descriptor,
-                                                                    const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateFakeQuantization(const FakeQuantizationQueueDescriptor& /*desc*/,
+                                                                    const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,
-                                                         const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateFloor(const FloorQueueDescriptor& /*descriptor*/,
+                                                         const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateFullyConnected(const FullyConnectedQueueDescriptor& descriptor,
-                                                                  const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateFullyConnected(const FullyConnectedQueueDescriptor& /*descriptor*/,
+                                                                  const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateGather(const GatherQueueDescriptor& descriptor,
-                                                          const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateGather(const GatherQueueDescriptor& /*descriptor*/,
+                                                          const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& /*descriptor*/,
+                                                           const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateInstanceNormalization(
-    const InstanceNormalizationQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
+    const InstanceNormalizationQueueDescriptor& /*descriptor*/,
+    const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
-                                                                   const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateL2Normalization(const L2NormalizationQueueDescriptor& /*desc*/,
+                                                                   const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateLogSoftmax(const LogSoftmaxQueueDescriptor& descriptor,
-                                                              const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateLogSoftmax(const LogSoftmaxQueueDescriptor& /*descriptor*/,
+                                                              const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateLstm(const LstmQueueDescriptor& descriptor,
-                                                        const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateLstm(const LstmQueueDescriptor& /*descriptor*/,
+                                                        const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateMaximum(const MaximumQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateMaximum(const MaximumQueueDescriptor& /*descriptor*/,
+                                                           const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateMean(const MeanQueueDescriptor& descriptor,
-                                                        const WorkloadInfo& Info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateMean(const MeanQueueDescriptor& /*descriptor*/,
+                                                        const WorkloadInfo& /*Info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateMemCopy(const MemCopyQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateMemCopy(const MemCopyQueueDescriptor& /*descriptor*/,
+                                                           const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateMemImport(const MemImportQueueDescriptor& descriptor,
-                                                             const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateMemImport(const MemImportQueueDescriptor& /*descriptor*/,
+                                                             const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateMerge(const MergeQueueDescriptor& descriptor,
-                                                         const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateMerge(const MergeQueueDescriptor& /*descriptor*/,
+                                                         const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
-                                                          const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateMerger(const MergerQueueDescriptor& /*descriptor*/,
+                                                          const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateMinimum(const MinimumQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateMinimum(const MinimumQueueDescriptor& /*descriptor*/,
+                                                           const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateMultiplication(const MultiplicationQueueDescriptor& descriptor,
-                                                                  const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateMultiplication(const MultiplicationQueueDescriptor& /*descriptor*/,
+                                                                  const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateNormalization(const NormalizationQueueDescriptor& descriptor,
-                                                                 const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateNormalization(const NormalizationQueueDescriptor& /*descriptor*/,
+                                                                 const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateOutput(const OutputQueueDescriptor& descriptor,
-                                                          const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateOutput(const OutputQueueDescriptor& /*descriptor*/,
+                                                          const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreatePad(const PadQueueDescriptor& descriptor,
-                                                       const WorkloadInfo& Info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreatePad(const PadQueueDescriptor& /*descriptor*/,
+                                                       const WorkloadInfo& /*Info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& /*descriptor*/,
+                                                           const WorkloadInfo&/**/ /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
-                                                             const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& /*descriptor*/,
+                                                             const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreatePreCompiled(const PreCompiledQueueDescriptor& descriptor,
-                                                               const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreatePreCompiled(const PreCompiledQueueDescriptor& /*descriptor*/,
+                                                               const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreatePrelu(const PreluQueueDescriptor &descriptor,
-                                                         const WorkloadInfo &info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreatePrelu(const PreluQueueDescriptor &/*descriptor*/,
+                                                         const WorkloadInfo &/*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateQuantize(const QuantizeQueueDescriptor& descriptor,
-                                                            const WorkloadInfo& Info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateQuantize(const QuantizeQueueDescriptor& /*descriptor*/,
+                                                            const WorkloadInfo& /*Info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateQuantizedLstm(const QuantizedLstmQueueDescriptor& descriptor,
-                                                                 const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateQuantizedLstm(const QuantizedLstmQueueDescriptor& /*descriptor*/,
+                                                                 const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& /*descriptor*/,
+                                                           const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateResizeBilinear(const ResizeBilinearQueueDescriptor& descriptor,
-                                                                  const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateResizeBilinear(const ResizeBilinearQueueDescriptor& /*descriptor*/,
+                                                                  const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateResize(const ResizeQueueDescriptor& descriptor,
-                                                            const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateResize(const ResizeQueueDescriptor& /*descriptor*/,
+                                                            const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
-                                                         const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& /*descriptor*/,
+                                                         const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateSlice(const SliceQueueDescriptor& descriptor,
-                                                         const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateSlice(const SliceQueueDescriptor& /*descriptor*/,
+                                                         const WorkloadInfo& /*info*/) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+/**/
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& /*descriptor*/,
+                                                           const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& /*descriptor*/,
+                                                            const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
-                                                            const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& /*descriptor*/,
+                                                                  const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
-                                                                  const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateSpaceToDepth(const SpaceToDepthQueueDescriptor& /*descriptor*/,
+                                                                const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateSpaceToDepth(const SpaceToDepthQueueDescriptor& descriptor,
-                                                                const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateStack(const StackQueueDescriptor& /*descriptor*/,
+                                                         const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateStack(const StackQueueDescriptor& descriptor,
-                                                         const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateStridedSlice(const StridedSliceQueueDescriptor& /*descriptor*/,
+                                                                const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateStridedSlice(const StridedSliceQueueDescriptor& descriptor,
-                                                                const WorkloadInfo& Info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateSubtraction(const SubtractionQueueDescriptor& /*descriptor*/,
+                                                               const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateSubtraction(const SubtractionQueueDescriptor& descriptor,
-                                                               const WorkloadInfo& info) const
-{
-    return std::unique_ptr<IWorkload>();
-}
-
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateSwitch(const SwitchQueueDescriptor& descriptor,
-                                                          const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateSwitch(const SwitchQueueDescriptor& /*descriptor*/,
+                                                          const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateTransposeConvolution2d(
-    const TransposeConvolution2dQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
+    const TransposeConvolution2dQueueDescriptor& /*descriptor*/,
+    const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }

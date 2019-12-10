@@ -2554,7 +2554,7 @@ void SwitchQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                               "output_1");
 }
 
-void PreCompiledQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+void PreCompiledQueueDescriptor::Validate(const WorkloadInfo& /*workloadInfo*/) const
 {
     // This is internally generated so it should not need validation.
 }

@@ -155,6 +155,8 @@ void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
                           float* detectionScores,
                           float* numDetections)
 {
+    boost::ignore_unused(anchorsInfo, detectionClassesInfo, detectionScoresInfo, numDetectionsInfo);
+
     // Transform center-size format which is (ycenter, xcenter, height, width) to box-corner format,
     // which represents the lower left corner and the upper right corner (ymin, xmin, ymax, xmax)
     std::vector<float> boxCorners(boxEncodingsInfo.GetNumElements());

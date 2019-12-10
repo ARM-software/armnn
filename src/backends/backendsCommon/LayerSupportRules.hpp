@@ -55,7 +55,7 @@ struct Rule
 };
 
 template<typename T>
-bool AllTypesAreEqualImpl(T t)
+bool AllTypesAreEqualImpl(T)
 {
     return true;
 }

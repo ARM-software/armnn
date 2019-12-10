@@ -10,7 +10,7 @@ namespace armnn
 
 ARMNN_NO_DEPRECATE_WARN_BEGIN
 IBackendInternal::ISubGraphConverterPtr IBackendInternal::CreateSubGraphConverter(
-    const std::shared_ptr<SubGraph>& subGraph) const
+    const std::shared_ptr<SubGraph>& /*subGrapg*/) const
 {
     return ISubGraphConverterPtr{};
 }
@@ -20,7 +20,7 @@ IBackendInternal::Optimizations IBackendInternal::GetOptimizations() const
     return Optimizations{};
 }
 
-IBackendInternal::SubGraphUniquePtr IBackendInternal::OptimizeSubGraph(const SubGraph& subGraph,
+IBackendInternal::SubGraphUniquePtr IBackendInternal::OptimizeSubGraph(const SubGraph& /*subGraph*/,
                                                                        bool& optimizationAttempted) const
 {
     optimizationAttempted = false;
@@ -34,7 +34,7 @@ IMemoryManagerUniquePtr IBackendInternal::CreateMemoryManager() const
 }
 
 IBackendInternal::IWorkloadFactoryPtr IBackendInternal::CreateWorkloadFactory(
-    class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry) const
+    class TensorHandleFactoryRegistry& /*tensorHandleFactoryRegistry*/) const
 {
     return IWorkloadFactoryPtr{};
 }

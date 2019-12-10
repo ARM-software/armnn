@@ -7,6 +7,8 @@
 
 #include <armnn/backends/IBackendInternal.hpp>
 
+#include <boost/core/ignore_unused.hpp>
+
 constexpr const char* TestDynamicBackendId()
 {
 #if defined(VALID_TEST_DYNAMIC_BACKEND_1)
@@ -63,6 +65,7 @@ public:
     }
     IWorkloadFactoryPtr CreateWorkloadFactory(const IMemoryManagerSharedPtr& memoryManager) const override
     {
+        boost::ignore_unused(memoryManager);
         return IWorkloadFactoryPtr{};
     }
     ILayerSupportSharedPtr GetLayerSupport() const override

@@ -88,7 +88,7 @@ const BackendId& MockBackend::GetIdStatic()
 }
 
 IBackendInternal::IWorkloadFactoryPtr MockBackend::CreateWorkloadFactory(
-    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager) const
+    const IBackendInternal::IMemoryManagerSharedPtr& /*memoryManager*/) const
 {
     return IWorkloadFactoryPtr{};
 }

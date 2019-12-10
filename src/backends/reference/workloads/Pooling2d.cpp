@@ -84,7 +84,7 @@ namespace
         {
             case PoolingAlgorithm::Max:
             {
-                return [](float & accumulated, float kernelSize) {};
+                return [](float & /*accumulated*/, float /*kernelSize*/) {};
             }
 
             case PoolingAlgorithm::Average:

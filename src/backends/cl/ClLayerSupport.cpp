@@ -88,8 +88,10 @@ bool IsMatchingStride(uint32_t actualStride)
     return IsMatchingStride<FirstStride>(actualStride) || IsMatchingStride<SecondStride, ValidStrides...>(actualStride);
 }
 
-bool IsClBackendSupported(Optional<std::string&> reasonIfUnsupported)
+template<typename ... Args>
+bool IsClBackendSupported(Optional<std::string&> reasonIfUnsupported, Args... args)
 {
+    boost::ignore_unused(reasonIfUnsupported, (args)...);
 #if defined(ARMCOMPUTECL_ENABLED)
     return true;
 #else
@@ -124,7 +126,7 @@ inline bool IsWorkloadSupported(FuncType&& func, Optional<std::string&> reasonIf
     return IsWorkloadSupported(func, reasonIfUnsupported, __VA_ARGS__);
 #else
 #define FORWARD_WORKLOAD_VALIDATE_FUNC(func, reasonIfUnsupported, ...) \
-    return IsClBackendSupported(reasonIfUnsupported);
+    return IsClBackendSupported(reasonIfUnsupported, __VA_ARGS__);
 #endif
 
 template<typename FloatFunc, typename Uint8Func, typename ... Params>
@@ -461,7 +463,7 @@ bool ClLayerSupport::IsGreaterSupported(const TensorInfo& input0,
 bool ClLayerSupport::IsInputSupported(const TensorInfo& input,
                                       Optional<std::string&> reasonIfUnsupported) const
 {
-    return IsClBackendSupported(reasonIfUnsupported);
+    return IsClBackendSupported(reasonIfUnsupported, input);
 }
 
 bool ClLayerSupport::IsInstanceNormalizationSupported(const TensorInfo& input,
@@ -579,7 +581,7 @@ bool ClLayerSupport::IsNormalizationSupported(const TensorInfo& input,
 bool ClLayerSupport::IsOutputSupported(const TensorInfo& output,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
-    return IsClBackendSupported(reasonIfUnsupported);
+    return IsClBackendSupported(reasonIfUnsupported, output);
 }
 
 bool ClLayerSupport::IsPadSupported(const TensorInfo& input,
@@ -758,6 +760,7 @@ bool ClLayerSupport::IsSplitterSupported(const TensorInfo& input,
                                        *splitAxis.begin());
     }
 #endif
+    boost::ignore_unused(descriptor);
     for (auto output : outputs)
     {
         if (!input.IsTypeSpaceMatch(output)) // Cannot use sub-tensors if the types are not same space

@@ -414,6 +414,7 @@ struct LayerTypePolicy<armnn::LayerType::name, DataType> \
     static std::unique_ptr<armnn::IWorkload> MakeDummyWorkload(armnn::IWorkloadFactory *factory, \
         unsigned int nIn, unsigned int nOut) \
     { \
+        boost::ignore_unused(factory, nIn, nOut); \
         return std::unique_ptr<armnn::IWorkload>(); \
     } \
 };

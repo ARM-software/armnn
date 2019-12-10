@@ -77,19 +77,21 @@ bool RefWorkloadFactory::IsLayerSupported(const Layer& layer,
 }
 
 std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                                      const bool IsMemoryManaged) const
+                                                                      const bool isMemoryManaged) const
 {
     // For Ref it is okay to make the TensorHandle memory managed as it can also store a pointer
     // to unmanaged memory. This also ensures memory alignment.
+    boost::ignore_unused(isMemoryManaged);
     return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
 }
 
 std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
                                                                       DataLayout dataLayout,
-                                                                      const bool IsMemoryManaged) const
+                                                                      const bool isMemoryManaged) const
 {
     // For Ref it is okay to make the TensorHandle memory managed as it can also store a pointer
     // to unmanaged memory. This also ensures memory alignment.
+    boost::ignore_unused(isMemoryManaged, dataLayout);
     return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
 }
 
@@ -218,6 +220,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDivision(const DivisionQueu
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
+    boost::ignore_unused(descriptor);
     ComparisonQueueDescriptor comparisonDescriptor;
     comparisonDescriptor.m_Parameters.m_Operation = ComparisonOperation::Equal;
 
@@ -253,6 +256,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGather(const GatherQueueDes
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {
+    boost::ignore_unused(descriptor);
     ComparisonQueueDescriptor comparisonDescriptor;
     comparisonDescriptor.m_Parameters.m_Operation = ComparisonOperation::Greater;
 
@@ -410,8 +414,8 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePooling2d(const Pooling2dQu
     return std::make_unique<RefPooling2dWorkload>(descriptor, info);
 }
 
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePreCompiled(const PreCompiledQueueDescriptor& descriptor,
-                                                                 const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePreCompiled(const PreCompiledQueueDescriptor& /*descriptor*/,
+                                                                 const WorkloadInfo& /*info*/) const
 {
     return nullptr;
 }

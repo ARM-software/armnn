@@ -648,6 +648,8 @@ bool RefLayerSupport::IsDetectionPostProcessSupported(const TensorInfo& boxEncod
                                                       const DetectionPostProcessDescriptor& descriptor,
                                                       Optional<std::string&> reasonIfUnsupported) const
 {
+    boost::ignore_unused(anchors, detectionBoxes, detectionClasses, detectionScores, numDetections, descriptor);
+
     bool supported = true;
 
     std::array<DataType,3> supportedInputTypes =
@@ -863,8 +865,8 @@ bool RefLayerSupport::IsGreaterSupported(const TensorInfo& input0,
                                  reasonIfUnsupported);
 }
 
-bool RefLayerSupport::IsInputSupported(const TensorInfo& input,
-                                       Optional<std::string&> reasonIfUnsupported) const
+bool RefLayerSupport::IsInputSupported(const TensorInfo& /*input*/,
+                                       Optional<std::string&> /*reasonIfUnsupported*/) const
 {
     return true;
 }
@@ -1301,8 +1303,8 @@ bool RefLayerSupport::IsNormalizationSupported(const TensorInfo& input,
     return supported;
 }
 
-bool RefLayerSupport::IsOutputSupported(const TensorInfo& output,
-                                        Optional<std::string&> reasonIfUnsupported) const
+bool RefLayerSupport::IsOutputSupported(const TensorInfo& /*output*/,
+                                        Optional<std::string&> /*reasonIfUnsupported*/) const
 {
     return true;
 }
@@ -1470,6 +1472,7 @@ bool RefLayerSupport::IsResizeSupported(const TensorInfo& input,
                                         const ResizeDescriptor& descriptor,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
+    boost::ignore_unused(descriptor);
     bool supported = true;
     std::array<DataType,4> supportedTypes =
     {
@@ -1524,7 +1527,7 @@ bool RefLayerSupport::IsSliceSupported(const TensorInfo& input,
                                        const SliceDescriptor& descriptor,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(descriptor);
+    boost::ignore_unused(descriptor);
     bool supported = true;
 
     std::array<DataType, 3> supportedTypes =
@@ -1551,7 +1554,7 @@ bool RefLayerSupport::IsSoftmaxSupported(const TensorInfo& input,
                                          const SoftmaxDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(output);
+    boost::ignore_unused(descriptor);
     bool supported = true;
     std::array<DataType,4> supportedTypes =
     {
@@ -1578,7 +1581,7 @@ bool RefLayerSupport::IsSpaceToBatchNdSupported(const TensorInfo& input,
                                                 const SpaceToBatchNdDescriptor& descriptor,
                                                 Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(output);
+    boost::ignore_unused(descriptor);
     bool supported = true;
     std::array<DataType,4> supportedTypes =
     {
@@ -1811,6 +1814,7 @@ bool RefLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
                                                         const Optional<TensorInfo>& biases,
                                                         Optional<std::string&> reasonIfUnsupported) const
 {
+    boost::ignore_unused(descriptor);
     bool supported = true;
 
     std::array<DataType,4> supportedTypes =

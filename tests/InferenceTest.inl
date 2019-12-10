@@ -79,6 +79,7 @@ struct ClassifierResultProcessor : public boost::static_visitor<>
 
     void operator()(const std::vector<int>& values)
     {
+        boost::ignore_unused(values);
         BOOST_ASSERT_MSG(false, "Non-float predictions output not supported.");
     }
 

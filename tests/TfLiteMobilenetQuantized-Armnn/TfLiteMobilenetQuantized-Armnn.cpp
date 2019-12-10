@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
                      "input",                             // input tensor name
                      "MobilenetV1/Predictions/Reshape_1", // output tensor name
                      indices,                             // vector of indices to select which images to validate
-                     [&imageSet](const char* dataDir, const ModelType & model) {
+                     [&imageSet](const char* dataDir, const ModelType &) {
                          // we need to get the input quantization parameters from
                          // the parsed model
                          return DatabaseType(

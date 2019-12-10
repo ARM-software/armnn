@@ -32,6 +32,8 @@ public:
 
     virtual TestCaseResult ProcessResult(const InferenceTestOptions& options) override
     {
+        boost::ignore_unused(options);
+
         using Boost3dArray = boost::multi_array<float, 3>;
 
         const std::vector<float>& output = boost::get<std::vector<float>>(this->GetOutputs()[0]);

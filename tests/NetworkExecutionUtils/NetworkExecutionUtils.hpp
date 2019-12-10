@@ -732,6 +732,7 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
                const bool enableProfiling, const bool enableFp16TurboMode, const double& thresholdTime,
                const bool printIntermediate, bool enableLayerDetails = false, bool parseUnuspported = false)
 {
+    boost::ignore_unused(runtime);
     std::string modelFormat;
     std::string modelPath;
     std::string inputNames;

@@ -9,7 +9,7 @@
 #include <armnn/TypesUtils.hpp>
 #include "InferenceModel.hpp"
 
-
+#include <boost/core/ignore_unused.hpp>
 #include <boost/program_options.hpp>
 
 
@@ -91,8 +91,15 @@ class IInferenceTestCaseProvider
 public:
     virtual ~IInferenceTestCaseProvider() {}
 
-    virtual void AddCommandLineOptions(boost::program_options::options_description& options) {};
-    virtual bool ProcessCommandLineOptions(const InferenceTestOptions &commonOptions) { return true; };
+    virtual void AddCommandLineOptions(boost::program_options::options_description& options)
+    {
+        boost::ignore_unused(options);
+    };
+    virtual bool ProcessCommandLineOptions(const InferenceTestOptions &commonOptions)
+    {
+        boost::ignore_unused(commonOptions);
+        return true;
+    };
     virtual std::unique_ptr<IInferenceTestCase> GetTestCase(unsigned int testCaseId) = 0;
     virtual bool OnInferenceTestFinished() { return true; };
 };

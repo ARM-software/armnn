@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
                      "input",                   // input tensor name
                      "vgg_16/fc8/squeezed",     // output tensor name
                      { 0, 1, 2 },               // test images to test with as above
-                     [&imageSet](const char* dataDir, const ModelType & model) {
+                     [&imageSet](const char* dataDir, const ModelType &) {
                          // we need to get the input quantization parameters from
                          // the parsed model
                          return DatabaseType(

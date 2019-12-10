@@ -33,6 +33,8 @@ public:
 
     TestCaseResult ProcessResult(const InferenceTestOptions& options) override
     {
+        boost::ignore_unused(options);
+
         const std::vector<float>& output1 = boost::get<std::vector<float>>(this->GetOutputs()[0]); // bounding boxes
         BOOST_ASSERT(output1.size() == k_OutputSize1);
 

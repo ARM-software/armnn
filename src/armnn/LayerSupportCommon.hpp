@@ -70,6 +70,7 @@ bool FalseFunc(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 template<typename ... Params>
 bool FalseFuncF16(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
+    boost::ignore_unused(params...);
     SetValueChecked(reasonIfUnsupported, "Layer is not supported with float16 data type");
     return false;
 }
@@ -77,6 +78,7 @@ bool FalseFuncF16(Optional<std::string&> reasonIfUnsupported, Params&&... params
 template<typename ... Params>
 bool FalseFuncF32(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
+    boost::ignore_unused(params...);
     SetValueChecked(reasonIfUnsupported, "Layer is not supported with float32 data type");
     return false;
 }
@@ -84,6 +86,7 @@ bool FalseFuncF32(Optional<std::string&> reasonIfUnsupported, Params&&... params
 template<typename ... Params>
 bool FalseFuncU8(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
+    boost::ignore_unused(params...);
     SetValueChecked(reasonIfUnsupported, "Layer is not supported with 8-bit data type");
     return false;
 }
@@ -91,6 +94,7 @@ bool FalseFuncU8(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 template<typename ... Params>
 bool FalseFuncI32(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
+    boost::ignore_unused(params...);
     SetValueChecked(reasonIfUnsupported, "Layer is not supported with int32 data type");
     return false;
 }
@@ -98,6 +102,7 @@ bool FalseFuncI32(Optional<std::string&> reasonIfUnsupported, Params&&... params
 template<typename ... Params>
 bool FalseInputFuncF32(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
+    boost::ignore_unused(params...);
     SetValueChecked(reasonIfUnsupported, "Layer is not supported with float32 data type input");
     return false;
 }
@@ -105,6 +110,7 @@ bool FalseInputFuncF32(Optional<std::string&> reasonIfUnsupported, Params&&... p
 template<typename ... Params>
 bool FalseInputFuncF16(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
+    boost::ignore_unused(params...);
     SetValueChecked(reasonIfUnsupported, "Layer is not supported with float16 data type input");
     return false;
 }
@@ -112,6 +118,7 @@ bool FalseInputFuncF16(Optional<std::string&> reasonIfUnsupported, Params&&... p
 template<typename ... Params>
 bool FalseOutputFuncF32(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
+    boost::ignore_unused(params...);
     SetValueChecked(reasonIfUnsupported, "Layer is not supported with float32 data type output");
     return false;
 }
@@ -119,6 +126,7 @@ bool FalseOutputFuncF32(Optional<std::string&> reasonIfUnsupported, Params&&... 
 template<typename ... Params>
 bool FalseOutputFuncF16(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
+    boost::ignore_unused(params...);
     SetValueChecked(reasonIfUnsupported, "Layer is not supported with float16 data type output");
     return false;
 }

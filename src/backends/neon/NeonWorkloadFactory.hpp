@@ -97,9 +97,6 @@ public:
     std::unique_ptr<IWorkload> CreateEqual(const EqualQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override;
 
-    std::unique_ptr<IWorkload> CreateFakeQuantization(const FakeQuantizationQueueDescriptor& descriptor,
-                                                      const WorkloadInfo& info) const override;
-
     std::unique_ptr<IWorkload> CreateFloor(const FloorQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override;
 
@@ -192,9 +189,6 @@ public:
 
     std::unique_ptr<IWorkload> CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                              const WorkloadInfo& info) const override;
-
-    std::unique_ptr<IWorkload> CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
-                                                    const WorkloadInfo& info) const override;
 
     std::unique_ptr<IWorkload> CreateSpaceToDepth(const SpaceToDepthQueueDescriptor& descriptor,
                                                   const WorkloadInfo& info) const override;

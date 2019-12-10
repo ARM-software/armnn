@@ -95,9 +95,6 @@ public:
     std::unique_ptr<IWorkload> CreateEqual(const EqualQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override;
 
-    std::unique_ptr<IWorkload> CreateFakeQuantization(const FakeQuantizationQueueDescriptor& descriptor,
-                                                      const WorkloadInfo& info) const override;
-
     std::unique_ptr<IWorkload> CreateFloor(const FloorQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override;
 

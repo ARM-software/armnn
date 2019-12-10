@@ -260,13 +260,6 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateEqual(const EqualQueueDescri
     return CreateComparison(comparisonDescriptor, info);
 }
 
-std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFakeQuantization(
-    const FakeQuantizationQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-}
-
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {

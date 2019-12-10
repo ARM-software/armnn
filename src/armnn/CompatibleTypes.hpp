@@ -12,7 +12,7 @@ namespace armnn
 {
 
 template<typename T>
-bool CompatibleTypes(DataType dataType)
+bool CompatibleTypes(DataType)
 {
     return false;
 }

@@ -176,6 +176,7 @@ BOOST_FIXTURE_TEST_CASE(ParseSplit, InputFirstSplitFixture)
 struct SplitLastDimFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     SplitLastDimFixture(bool withDimZero=false) {
+        boost::ignore_unused(withDimZero);
         m_Prototext = R"(
         node {
           name: "Placeholder"

@@ -225,13 +225,6 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateEqual(const EqualQueueDesc
     return CreateComparison(comparisonDescriptor, info);
 }
 
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFakeQuantization(
-    const FakeQuantizationQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {
@@ -439,12 +432,6 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSoftmax(const SoftmaxQueue
 {
     return MakeWorkloadHelper<NeonSoftmaxFloatWorkload, NeonSoftmaxUint8Workload>(
         descriptor, info, m_MemoryManager->GetIntraLayerManager());
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
-                                                                     const WorkloadInfo& info) const
-{
-    return nullptr;
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSpaceToDepth(

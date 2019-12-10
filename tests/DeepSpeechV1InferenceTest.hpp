@@ -8,6 +8,7 @@
 #include "DeepSpeechV1Database.hpp"
 
 #include <boost/assert.hpp>
+#include <boost/core/ignore_unused.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 
@@ -36,6 +37,7 @@ public:
 
     TestCaseResult ProcessResult(const InferenceTestOptions& options) override
     {
+        boost::ignore_unused(options);
         const std::vector<float>& output1 = boost::get<std::vector<float>>(this->GetOutputs()[0]); // logits
         BOOST_ASSERT(output1.size() == k_OutputSize1);
 

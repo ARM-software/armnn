@@ -88,7 +88,6 @@ void RefMemoryManager::Pool::Reserve(unsigned int numBytes)
 void RefMemoryManager::Pool::Acquire()
 {
     BOOST_ASSERT_MSG(!m_Pointer, "RefMemoryManager::Pool::Acquire() called when memory already acquired");
-    BOOST_ASSERT(m_Size >= 0);
     m_Pointer = ::operator new(size_t(m_Size));
 }
 

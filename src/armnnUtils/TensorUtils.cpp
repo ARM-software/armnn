@@ -114,7 +114,6 @@ unsigned int GetNumElementsBetween(const TensorShape& shape,
                                    const unsigned int firstAxisInclusive,
                                    const unsigned int lastAxisExclusive)
 {
-    BOOST_ASSERT(0 <= firstAxisInclusive);
     BOOST_ASSERT(firstAxisInclusive <= lastAxisExclusive);
     BOOST_ASSERT(lastAxisExclusive <= shape.GetNumDimensions());
     unsigned int count = 1;
@@ -141,7 +140,6 @@ unsigned int GetUnsignedAxis(const unsigned int inputDimension, const int axis)
 unsigned int GetNumElementsAfter(const armnn::TensorShape& shape, unsigned int axis)
 {
     unsigned int numDim = shape.GetNumDimensions();
-    BOOST_ASSERT(0 >= axis);
     BOOST_ASSERT(axis <= numDim - 1);
     unsigned int count = 1;
     for (unsigned int i = axis; i < numDim; i++)

@@ -74,6 +74,7 @@ LayerTestResult<T, NumDims> ResizeTestImpl(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const ResizeTestParams& params)
 {
+    boost::ignore_unused(memoryManager);
     armnn::TensorInfo inputInfo(params.m_InputShape, ArmnnType);
     armnn::TensorInfo outputInfo(params.m_OutputShape, ArmnnType);
 

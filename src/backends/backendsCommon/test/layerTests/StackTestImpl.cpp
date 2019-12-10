@@ -31,6 +31,7 @@ LayerTestResult<T, outputDimLength> StackTestHelper(
         const std::vector<std::vector<T>>& inputData,
         const std::vector<T>& outputExpectedData)
 {
+    boost::ignore_unused(memoryManager);
     unsigned int numInputs = static_cast<unsigned int>(inputData.size());
     std::vector<boost::multi_array<T, outputDimLength-1>> inputs;
     for (unsigned int i = 0; i < numInputs; ++i)

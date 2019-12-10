@@ -24,6 +24,7 @@ LayerTestResult<T, 2> Pad2dTestCommon(
     int32_t qOffset,
     const float customPaddingValue)
 {
+    boost::ignore_unused(memoryManager);
     const armnn::TensorShape inputShape{ 3, 3 };
     const armnn::TensorShape outputShape{ 7, 7 };
 
@@ -95,6 +96,7 @@ LayerTestResult<T, 3> Pad3dTestCommon(
     float qScale,
     int32_t qOffset)
 {
+    boost::ignore_unused(memoryManager);
     const armnn::TensorShape inputShape{ 2, 2, 2 };
     const armnn::TensorShape outputShape{ 3, 5, 6 };
 
@@ -178,6 +180,7 @@ LayerTestResult<T, 4> Pad4dTestCommon(
     float qScale,
     int32_t qOffset)
 {
+    boost::ignore_unused(memoryManager);
     const armnn::TensorShape inputShape{ 2, 2, 3, 2 };
     const armnn::TensorShape outputShape{ 4, 5, 7, 4 };
 

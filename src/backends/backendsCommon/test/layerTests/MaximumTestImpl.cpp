@@ -19,6 +19,7 @@ std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::MaximumQueueDescriptor>(
 LayerTestResult<float, 4> MaximumSimpleTest(armnn::IWorkloadFactory& workloadFactory,
                                            const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
+    boost::ignore_unused(memoryManager);
     const unsigned int width        = 2u;
     const unsigned int height       = 2u;
     const unsigned int channelCount = 2u;

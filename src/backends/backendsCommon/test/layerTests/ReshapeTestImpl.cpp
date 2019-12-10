@@ -23,6 +23,7 @@ LayerTestResult<T, NumDims> SimpleReshapeTestImpl(
     const std::vector<T>& inputData,
     const std::vector<T>& outputExpectedData)
 {
+    boost::ignore_unused(memoryManager);
     auto input = MakeTensor<T, NumDims>(inputTensorInfo, inputData);
 
     LayerTestResult<T, NumDims> ret(outputTensorInfo);

@@ -66,6 +66,7 @@ LayerTestResult<T, n> SimpleSoftmaxBaseTestImpl(
     const std::vector<float>& inputData,
     int axis = 1)
 {
+    boost::ignore_unused(memoryManager);
     using std::exp;
 
     const float qScale = 1.f / 256.f;

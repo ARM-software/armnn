@@ -401,6 +401,7 @@ LayerTestResult<float,4> CompareMultiplicationTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory)
 {
+    boost::ignore_unused(memoryManager);
     const unsigned int width = 16;
     const unsigned int height = 32;
     const unsigned int channelCount = 2;

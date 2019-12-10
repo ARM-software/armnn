@@ -37,6 +37,7 @@ LayerTestResult<T, 4> BoundedReLuTestCommon(
     unsigned int inputChannels,
     unsigned int inputBatchSize)
 {
+    boost::ignore_unused(memoryManager);
     unsigned int outputWidth = inputWidth;
     unsigned int outputHeight = inputHeight;
     unsigned int outputChannels = inputChannels;
@@ -245,6 +246,7 @@ boost::multi_array<float, 4> BoundedReLuRandomInputTest(
     float upperBound,
     const armnn::ActivationDescriptor& activationDescriptor)
 {
+    boost::ignore_unused(memoryManager);
     const armnn::TensorInfo inputTensorInfo = BoundedReLuRandomInputTestTraits::GetInputTensorInfo();
     const armnn::TensorInfo outputTensorInfo = BoundedReLuRandomInputTestTraits::GetOutputTensorInfo();
 
@@ -309,6 +311,7 @@ LayerTestResult<T,4> ConstantLinearActivationTestCommon(
     float qScale = 0.0f,
     int32_t qOffset = 0)
 {
+    boost::ignore_unused(memoryManager);
     unsigned int inputHeight    = 20;
     unsigned int inputWidth     = 17;
     unsigned int inputChannels  = 3;
@@ -400,6 +403,7 @@ LayerTestResult<T, 4> SimpleActivationTest(
     int32_t outOffset,
     const std::vector<float>& outputExpectedData)
 {
+    boost::ignore_unused(memoryManager);
     constexpr static unsigned int inputWidth = 16u;
     constexpr static unsigned int inputHeight = 1u;
     constexpr static unsigned int inputChannels = 1u;
@@ -790,6 +794,7 @@ LayerTestResult<float, 5> SqrtNNTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
+    boost::ignore_unused(memoryManager);
     const int inputDataSize = 120;
     std::vector<float> inputData(inputDataSize);
 
@@ -1023,6 +1028,7 @@ LayerTestResult<T,4> CompareActivationTestImpl(
     float qScale = 0.0f,
     int32_t qOffset = 0)
 {
+    boost::ignore_unused(memoryManager);
     unsigned int width     = 17;
     unsigned int height    = 29;
     unsigned int channels  = 2;

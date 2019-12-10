@@ -218,6 +218,7 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     uint32_t dilationX = 1,
     uint32_t dilationY = 1)
 {
+    boost::ignore_unused(memoryManager);
     unsigned int inputHeight   = boost::numeric_cast<unsigned int>(originalInput.shape()[2]);
     unsigned int inputWidth    = boost::numeric_cast<unsigned int>(originalInput.shape()[3]);
     unsigned int inputChannels = boost::numeric_cast<unsigned int>(originalInput.shape()[1]);
@@ -381,6 +382,7 @@ LayerTestResult<T, 4> SimpleConvolution2dNhwcTestImpl(
     uint32_t strideX  = 1,
     uint32_t strideY  = 1)
 {
+    boost::ignore_unused(qScale, qOffset);
     unsigned int inputNum       = boost::numeric_cast<unsigned int>(input.shape()[0]);
     unsigned int inputChannels  = boost::numeric_cast<unsigned int>(input.shape()[3]);
     unsigned int inputHeight    = boost::numeric_cast<unsigned int>(input.shape()[1]);
@@ -586,6 +588,7 @@ LayerTestResult<T, 4> SimpleConvolution2d3x3NhwcTestCommon(
     bool biasEnabled,
     armnn::DataLayout dataLayout)
 {
+    boost::ignore_unused(biasEnabled);
     // Use common single-batch 5x5 image.
 
     armnn::TensorInfo inputDesc({1, 3, 4, 1}, ArmnnType);
@@ -638,6 +641,8 @@ LayerTestResult<T, 4> SimpleConvolution2d3x3Stride2x2TestCommon(
         bool biasEnabled,
         const armnn::DataLayout& dataLayout)
 {
+    boost::ignore_unused(biasEnabled);
+
     // Input is a single-batch, 1 channel, 5x5 image.
     armnn::TensorInfo inputDesc({1, 5, 5, 1}, ArmnnType);
     boost::multi_array<T, 4> input = MakeTensor<T, 4>(inputDesc,

@@ -18,6 +18,7 @@ LayerTestResult<float, 4> SimpleConvertFp16ToFp32Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
+    boost::ignore_unused(memoryManager);
     using namespace half_float::literal;
 
     const armnn::TensorInfo inputTensorInfo({1, 3, 2, 3}, armnn::DataType::Float16);

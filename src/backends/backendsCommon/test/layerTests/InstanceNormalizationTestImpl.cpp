@@ -35,6 +35,7 @@ LayerTestResult<T, 4> InstanceNormTestImpl(
     float qScale = 0.0f,
     int32_t qOffset = 0)
 {
+    boost::ignore_unused(memoryManager);
     auto inputTensor = MakeTensor<T, 4>(inputTensorInfo,
                                         armnnUtils::QuantizedVector<T>(inputValues, qScale, qOffset));
 

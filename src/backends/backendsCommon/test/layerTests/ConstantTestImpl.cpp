@@ -29,6 +29,7 @@ LayerTestResult<T, 4> ConstantTestImpl(
     float qScale,
     int32_t qOffset)
 {
+    boost::ignore_unused(memoryManager);
     constexpr unsigned int inputWidth = 3;
     constexpr unsigned int inputHeight = 4;
     constexpr unsigned int inputChannels = 3;

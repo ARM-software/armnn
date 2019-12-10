@@ -32,6 +32,7 @@ LayerTestResult<T, 4> SpaceToBatchNdTestImpl(
     const float qScale = 1.0f,
     const int32_t qOffset = 0)
 {
+    boost::ignore_unused(memoryManager);
     const armnn::PermutationVector NCHWToNHWC = {0, 3, 1, 2};
     if (descriptor.m_Parameters.m_DataLayout == armnn::DataLayout::NHWC)
     {

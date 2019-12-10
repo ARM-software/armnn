@@ -25,6 +25,7 @@ LayerTestResult<T, 2> Abs2dTestCommon(
     const std::vector<float>& inputValues,
     const std::vector<float>& expectedOutputValues)
 {
+    boost::ignore_unused(memoryManager);
     auto inputTensor = MakeTensor<T, 2>(inputTensorInfo, ConvertToDataType<ArmnnType>(inputValues,inputTensorInfo));
 
     LayerTestResult<T, 2> result(outputTensorInfo);
@@ -108,6 +109,8 @@ LayerTestResult<T, 3> Abs3dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
+    boost::ignore_unused(memoryManager);
+
     const armnn::TensorShape inputShape{ 3, 1, 2 };
     const armnn::TensorShape outputShape{ 3, 1, 2 };
 

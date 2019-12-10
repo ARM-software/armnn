@@ -33,6 +33,7 @@ LayerTestResult<T, 4> L2NormalizationTestImpl(
     const armnn::DataLayout layout,
     float epsilon = 1e-12f)
 {
+    boost::ignore_unused(memoryManager);
     const armnn::TensorInfo inputTensorInfo(inputOutputTensorShape, ArmnnType, scale, offset);
     const armnn::TensorInfo outputTensorInfo(inputOutputTensorShape, ArmnnType, outScale, outOffset);
 

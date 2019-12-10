@@ -37,6 +37,7 @@ LayerTestResult<T, NumDims> LogSoftmaxTestImpl(
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
+    boost::ignore_unused(memoryManager);
     LayerTestResult<T, NumDims> result(outputInfo);
     result.outputExpected =
         MakeTensor<T, NumDims>(outputInfo, armnnUtils::QuantizedVector<T>(expectedOutputValues, qScale, qOffset));

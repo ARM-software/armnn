@@ -38,6 +38,7 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
     const boost::multi_array<T, 4>& input,
     const boost::multi_array<T, 4>& outputExpected)
 {
+    boost::ignore_unused(memoryManager);
     const armnn::DataLayout dataLayout = descriptor.m_DataLayout;
     const armnnUtils::DataLayoutIndexed dimensionIndices = dataLayout;
     auto heightIndex = dimensionIndices.GetHeightIndex();
@@ -739,6 +740,7 @@ LayerTestResult<T, 4> ComparePooling2dTestCommon(
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
+    boost::ignore_unused(memoryManager);
     const unsigned int inputWidth = 16;
     const unsigned int inputHeight = 32;
     const unsigned int channelCount = 2;

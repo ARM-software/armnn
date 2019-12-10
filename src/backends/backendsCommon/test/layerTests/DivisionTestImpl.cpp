@@ -20,6 +20,7 @@ LayerTestResult<float, 4> DivisionByZeroTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
+    boost::ignore_unused(memoryManager);
     const unsigned int width        = 2u;
     const unsigned int height       = 2u;
     const unsigned int channelCount = 2u;

@@ -52,6 +52,7 @@ void TransposeConvolution2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
                                     const TensorData<T>& weights,
                                     const armnn::Optional<TensorData<BT>>& biases)
 {
+    boost::ignore_unused(memoryManager);
     using namespace armnn;
 
     VerifyInputTensorData(input, "input");

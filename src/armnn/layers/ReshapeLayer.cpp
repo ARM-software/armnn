@@ -18,11 +18,10 @@ ReshapeLayer::ReshapeLayer(const ReshapeDescriptor& param, const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> ReshapeLayer::CreateWorkload(const Graph& graph,
-    const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> ReshapeLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     ReshapeQueueDescriptor descriptor;
-    return factory.CreateReshape(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateReshape(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ReshapeLayer* ReshapeLayer::Clone(Graph& graph) const
@@ -32,6 +31,7 @@ ReshapeLayer* ReshapeLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> ReshapeLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
+    boost::ignore_unused(inputShapes);
     return std::vector<TensorShape>({ m_Param.m_TargetShape });
 }
 

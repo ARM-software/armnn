@@ -18,11 +18,10 @@ InstanceNormalizationLayer::InstanceNormalizationLayer(const InstanceNormalizati
 {
 }
 
-std::unique_ptr<IWorkload> InstanceNormalizationLayer::CreateWorkload(const Graph& graph,
-    const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> InstanceNormalizationLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     InstanceNormalizationQueueDescriptor descriptor;
-    return factory.CreateInstanceNormalization(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateInstanceNormalization(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 InstanceNormalizationLayer* InstanceNormalizationLayer::Clone(Graph& graph) const

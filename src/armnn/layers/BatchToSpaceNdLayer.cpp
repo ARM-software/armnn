@@ -28,12 +28,11 @@ BatchToSpaceNdLayer::BatchToSpaceNdLayer(const armnn::BatchToSpaceNdDescriptor& 
 {
 }
 
-std::unique_ptr<IWorkload> BatchToSpaceNdLayer::CreateWorkload(const Graph& graph,
-                                                               const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> BatchToSpaceNdLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     BatchToSpaceNdQueueDescriptor descriptor;
 
-    return factory.CreateBatchToSpaceNd(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateBatchToSpaceNd(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 BatchToSpaceNdLayer* BatchToSpaceNdLayer::Clone(Graph& graph) const

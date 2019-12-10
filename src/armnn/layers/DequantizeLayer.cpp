@@ -16,12 +16,12 @@ DequantizeLayer::DequantizeLayer(const char* name)
     : Layer(1, 1, LayerType::Dequantize, name)
 {}
 
-std::unique_ptr<IWorkload> DequantizeLayer::CreateWorkload(const Graph& graph,
+std::unique_ptr<IWorkload> DequantizeLayer::CreateWorkload(
                                                            const IWorkloadFactory& factory) const
 {
     DequantizeQueueDescriptor descriptor;
 
-    return factory.CreateDequantize(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateDequantize(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 DequantizeLayer* DequantizeLayer::Clone(Graph& graph) const

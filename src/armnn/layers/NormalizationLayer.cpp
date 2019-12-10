@@ -18,10 +18,10 @@ NormalizationLayer::NormalizationLayer(const NormalizationDescriptor& param, con
 {
 }
 
-std::unique_ptr<IWorkload> NormalizationLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> NormalizationLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     NormalizationQueueDescriptor descriptor;
-    return factory.CreateNormalization(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateNormalization(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 NormalizationLayer* NormalizationLayer::Clone(Graph& graph) const

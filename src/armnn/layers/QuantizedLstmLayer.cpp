@@ -18,8 +18,7 @@ QuantizedLstmLayer::QuantizedLstmLayer(const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> QuantizedLstmLayer::CreateWorkload(const Graph& graph,
-                                                              const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> QuantizedLstmLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     QuantizedLstmQueueDescriptor descriptor;
 
@@ -39,7 +38,7 @@ std::unique_ptr<IWorkload> QuantizedLstmLayer::CreateWorkload(const Graph& graph
     descriptor.m_CellBias       = m_QuantizedLstmParameters.m_CellBias.get();
     descriptor.m_OutputGateBias = m_QuantizedLstmParameters.m_OutputGateBias.get();
 
-    return factory.CreateQuantizedLstm(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateQuantizedLstm(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 QuantizedLstmLayer* QuantizedLstmLayer::Clone(Graph& graph) const

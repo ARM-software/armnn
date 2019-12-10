@@ -9,6 +9,8 @@
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
+#include <boost/core/ignore_unused.hpp>
+
 namespace armnn
 {
 
@@ -16,8 +18,7 @@ DebugLayer::DebugLayer(const char* name)
     : Layer(1, 1, LayerType::Debug, name)
 {}
 
-std::unique_ptr<IWorkload> DebugLayer::CreateWorkload(const Graph& graph,
-                                                      const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> DebugLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     const Layer& prevLayer = GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer();
 
@@ -26,7 +27,7 @@ std::unique_ptr<IWorkload> DebugLayer::CreateWorkload(const Graph& graph,
     descriptor.m_LayerName = prevLayer.GetNameStr();
     descriptor.m_SlotIndex = GetInputSlot(0).GetConnectedOutputSlot()->CalculateIndexOnOwner();
 
-    return factory.CreateDebug(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateDebug(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 DebugLayer* DebugLayer::Clone(Graph& graph) const
@@ -52,6 +53,7 @@ void DebugLayer::ValidateTensorShapesFromInputs()
 void DebugLayer::Accept(ILayerVisitor& visitor) const
 {
     // by design debug layers are never in input graphs
+    boost::ignore_unused(visitor);
     throw armnn::Exception("DebugLayer should never appear in an input graph");
 }
 

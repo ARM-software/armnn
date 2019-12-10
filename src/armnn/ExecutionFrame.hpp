@@ -21,7 +21,7 @@ public:
 
     virtual IExecutionFrame* ExecuteWorkloads(IExecutionFrame* previousFrame) = 0;
     virtual void PostAllocationConfigure() {};
-    virtual void RegisterDebugCallback(const DebugCallbackFunction& func) {};
+    virtual void RegisterDebugCallback(const DebugCallbackFunction&) {};
 };
 
 class ExecutionFrame: public IExecutionFrame

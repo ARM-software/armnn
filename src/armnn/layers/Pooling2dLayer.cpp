@@ -24,10 +24,10 @@ Pooling2dLayer::Pooling2dLayer(const Pooling2dDescriptor& param, const char* nam
 {
 }
 
-std::unique_ptr<IWorkload> Pooling2dLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> Pooling2dLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     Pooling2dQueueDescriptor descriptor;
-    return factory.CreatePooling2d(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreatePooling2d(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 Pooling2dLayer* Pooling2dLayer::Clone(Graph& graph) const
@@ -57,8 +57,7 @@ std::vector<TensorShape> Pooling2dLayer::InferOutputShapes(const std::vector<Ten
         BOOST_ASSERT_MSG(m_Param.m_StrideX!=0 && m_Param.m_StrideY!=0,
                          "Stride can only be zero when performing global pooling");
 
-        auto CalcSize = [](auto inSize, auto lowPad, auto highPad, auto poolSize, auto stride, auto padMethod,
-                           auto outputShapeRounding)
+        auto CalcSize = [](auto inSize, auto lowPad, auto highPad, auto poolSize, auto stride, auto outputShapeRounding)
             {
                 unsigned int readSize = inSize + lowPad + highPad - poolSize;
                 float div = static_cast<float>(readSize) / static_cast<float>(stride);
@@ -87,9 +86,9 @@ std::vector<TensorShape> Pooling2dLayer::InferOutputShapes(const std::vector<Ten
             };
 
         outWidth = CalcSize(inWidth, m_Param.m_PadLeft, m_Param.m_PadRight, m_Param.m_PoolWidth, m_Param.m_StrideX,
-                            m_Param.m_PaddingMethod, m_Param.m_OutputShapeRounding);
-        outHeight= CalcSize(inHeight, m_Param.m_PadTop, m_Param.m_PadBottom, m_Param.m_PoolHeight, m_Param.m_StrideY,
-                            m_Param.m_PaddingMethod, m_Param.m_OutputShapeRounding);
+                            m_Param.m_OutputShapeRounding);
+        outHeight = CalcSize(inHeight, m_Param.m_PadTop, m_Param.m_PadBottom, m_Param.m_PoolHeight, m_Param.m_StrideY,
+                            m_Param.m_OutputShapeRounding);
     }
     unsigned int outChannels = inChannels;
     unsigned int outBatchSize = inBatchSize;

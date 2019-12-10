@@ -15,6 +15,8 @@
 
 #include <numeric>
 
+#include <boost/core/ignore_unused.hpp>
+
 using namespace armnnUtils;
 
 namespace armnn
@@ -24,18 +26,18 @@ SpaceToDepthLayer::SpaceToDepthLayer(const SpaceToDepthDescriptor param, const c
     : LayerWithParameters(1, 1, LayerType::SpaceToDepth, param, name)
 {}
 
-std::unique_ptr<IWorkload> SpaceToDepthLayer::CreateWorkload(const Graph& graph,
-                                                             const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> SpaceToDepthLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     SpaceToDepthQueueDescriptor descriptor;
     descriptor.m_Parameters.m_BlockSize  = m_Param.m_BlockSize;
     descriptor.m_Parameters.m_DataLayout = m_Param.m_DataLayout;
 
-    return factory.CreateSpaceToDepth(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateSpaceToDepth(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 SpaceToDepthLayer* SpaceToDepthLayer::Clone(Graph& graph) const
 {
+    boost::ignore_unused(graph);
     return CloneBase<SpaceToDepthLayer>(graph, m_Param, GetName());
 }
 

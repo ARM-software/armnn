@@ -19,11 +19,10 @@ AdditionLayer::AdditionLayer(const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> AdditionLayer::CreateWorkload(const Graph& graph,
-                                                         const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> AdditionLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     AdditionQueueDescriptor descriptor;
-    return factory.CreateAddition(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateAddition(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 AdditionLayer* AdditionLayer::Clone(Graph& graph) const

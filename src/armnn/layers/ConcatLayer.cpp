@@ -19,7 +19,7 @@ ConcatLayer::ConcatLayer(const OriginsDescriptor& param, const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> ConcatLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> ConcatLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     ConcatQueueDescriptor descriptor;
 
@@ -31,7 +31,7 @@ std::unique_ptr<IWorkload> ConcatLayer::CreateWorkload(const Graph& graph, const
             std::vector<unsigned int>(m_Param.GetViewOrigin(i), m_Param.GetViewOrigin(i) + m_Param.GetNumDimensions()));
     }
 
-    return factory.CreateConcat(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateConcat(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 template<typename FactoryType>

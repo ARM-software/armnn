@@ -46,7 +46,7 @@ void Convolution2dLayer::SerializeLayerParameters(ParameterStringifyFunction& fn
     LayerWithParameters<Convolution2dDescriptor>::SerializeLayerParameters(fn);
 }
 
-std::unique_ptr<IWorkload> Convolution2dLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> Convolution2dLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     // on this level constant data should not be released..
     BOOST_ASSERT_MSG(m_Weight != nullptr, "Convolution2dLayer: Weights data should not be null.");
@@ -60,7 +60,7 @@ std::unique_ptr<IWorkload> Convolution2dLayer::CreateWorkload(const Graph& graph
         BOOST_ASSERT_MSG(m_Bias != nullptr, "Convolution2dLayer: Bias data should not be null.");
         descriptor.m_Bias = m_Bias.get();
     }
-    return factory.CreateConvolution2d(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateConvolution2d(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 Convolution2dLayer* Convolution2dLayer::Clone(Graph& graph) const

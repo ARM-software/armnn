@@ -217,7 +217,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
             }
         default:
             {
-                auto workload = layer->CreateWorkload(m_OptimizedNetwork->GetGraph(), workloadFactory);
+                auto workload = layer->CreateWorkload(workloadFactory);
 
                 if (!workload)
                 {

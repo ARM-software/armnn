@@ -11,7 +11,7 @@ namespace armnn
 {
 
 /// NOTE: this is an abstract class to encapsulate the element wise operations, it does not implement:
-/// std::unique_ptr<IWorkload> Layer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const = 0;
+/// std::unique_ptr<IWorkload> Layer::CreateWorkload(const IWorkloadFactory& factory) const = 0;
 /// Layer* Clone(Graph& graph) const = 0;
 class ElementwiseBaseLayer : public Layer
 {

@@ -16,9 +16,9 @@ MergeLayer::MergeLayer(const char* name)
     : Layer(2, 1, LayerType::Merge, name)
 {}
 
-std::unique_ptr<IWorkload> MergeLayer::CreateWorkload(const Graph& graph,
-                                                      const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> MergeLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
+    boost::ignore_unused(factory);
     return nullptr;
 }
 

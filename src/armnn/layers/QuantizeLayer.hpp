@@ -17,8 +17,7 @@ class ILayerVisitor;
 class QuantizeLayer : public Layer
 {
 public:
-    virtual std::unique_ptr<IWorkload> CreateWorkload(const Graph& graph,
-                                                      const IWorkloadFactory& factory) const override;
+    virtual std::unique_ptr<IWorkload> CreateWorkload(const IWorkloadFactory& factory) const override;
 
     Layer* Clone(Graph& graph) const override;
 

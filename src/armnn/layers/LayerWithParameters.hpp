@@ -40,10 +40,10 @@ protected:
 
     /// Helper function to reduce duplication in *Layer::CreateWorkload.
     template <typename QueueDescriptor>
-    WorkloadInfo PrepInfoAndDesc(QueueDescriptor& descriptor, const Graph& graph) const
+    WorkloadInfo PrepInfoAndDesc(QueueDescriptor& descriptor) const
     {
         descriptor.m_Parameters = m_Param;
-        return Layer::PrepInfoAndDesc(descriptor, graph);
+        return Layer::PrepInfoAndDesc(descriptor);
     }
 
     /// The parameters for the layer (not including tensor-valued weights etc.).

@@ -18,10 +18,10 @@ SoftmaxLayer::SoftmaxLayer(const SoftmaxDescriptor &param, const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> SoftmaxLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> SoftmaxLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     SoftmaxQueueDescriptor descriptor;
-    return factory.CreateSoftmax(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateSoftmax(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 SoftmaxLayer* SoftmaxLayer::Clone(Graph& graph) const

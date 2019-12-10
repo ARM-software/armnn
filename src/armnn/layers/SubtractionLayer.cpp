@@ -19,11 +19,10 @@ SubtractionLayer::SubtractionLayer(const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> SubtractionLayer::CreateWorkload(const Graph& graph,
-                                                            const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> SubtractionLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     SubtractionQueueDescriptor descriptor;
-    return factory.CreateSubtraction(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateSubtraction(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 SubtractionLayer* SubtractionLayer::Clone(Graph& graph) const

@@ -24,12 +24,13 @@ MemImportLayer* MemImportLayer::Clone(Graph& graph) const
     return CloneBase<MemImportLayer>(graph, GetName());
 }
 
-std::unique_ptr<IWorkload> MemImportLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> MemImportLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
+    boost::ignore_unused(factory);
     MemImportQueueDescriptor descriptor;
 
     //This is different from other workloads. Does not get created by the workload factory.
-    return std::make_unique<ImportMemGenericWorkload>(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return std::make_unique<ImportMemGenericWorkload>(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 void MemImportLayer::ValidateTensorShapesFromInputs()
@@ -48,6 +49,7 @@ void MemImportLayer::ValidateTensorShapesFromInputs()
 
 void MemImportLayer::Accept(ILayerVisitor& visitor) const
 {
+    boost::ignore_unused(visitor);
     throw armnn::Exception("MemImportLayer should not appear in an input graph");
 }
 

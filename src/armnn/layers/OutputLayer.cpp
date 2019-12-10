@@ -9,6 +9,8 @@
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
+#include <boost/core/ignore_unused.hpp>
+
 namespace armnn
 {
 
@@ -17,8 +19,9 @@ OutputLayer::OutputLayer(LayerBindingId id, const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> OutputLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> OutputLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
+    boost::ignore_unused(factory);
     return nullptr;
 }
 

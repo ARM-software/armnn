@@ -18,7 +18,7 @@ SplitterLayer::SplitterLayer(const ViewsDescriptor& param, const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> SplitterLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> SplitterLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     SplitterQueueDescriptor descriptor;
 
@@ -29,7 +29,7 @@ std::unique_ptr<IWorkload> SplitterLayer::CreateWorkload(const Graph& graph, con
             std::vector<unsigned int>(m_Param.GetViewOrigin(i), m_Param.GetViewOrigin(i) + m_Param.GetNumDimensions()));
     }
 
-    return factory.CreateSplitter(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateSplitter(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 template<typename FactoryType>
@@ -127,6 +127,7 @@ SplitterLayer* SplitterLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> SplitterLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
+    boost::ignore_unused(inputShapes);
     BOOST_ASSERT(inputShapes.size() ==  m_Param.GetNumViews());
     std::vector<TensorShape> outShapes;
     //Output shapes must match View shapes.

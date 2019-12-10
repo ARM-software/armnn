@@ -18,8 +18,7 @@ BatchNormalizationLayer::BatchNormalizationLayer(const armnn::BatchNormalization
 {
 }
 
-std::unique_ptr<IWorkload> BatchNormalizationLayer::CreateWorkload(const Graph& graph,
-                                                                   const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> BatchNormalizationLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     // on this level constant data should not be released..
     BOOST_ASSERT_MSG(m_Mean != nullptr, "BatchNormalizationLayer: Mean data should not be null.");
@@ -34,7 +33,7 @@ std::unique_ptr<IWorkload> BatchNormalizationLayer::CreateWorkload(const Graph& 
     descriptor.m_Beta = m_Beta.get();
     descriptor.m_Gamma = m_Gamma.get();
 
-    return factory.CreateBatchNormalization(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateBatchNormalization(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 BatchNormalizationLayer* BatchNormalizationLayer::Clone(Graph& graph) const

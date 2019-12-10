@@ -9,6 +9,8 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/Optional.hpp>
 
+#include <boost/core/ignore_unused.hpp>
+
 namespace armnn
 {
 
@@ -52,12 +54,16 @@ bool IsSupportedForDataTypeGeneric(Optional<std::string&> reasonIfUnsupported,
 template<typename ... Params>
 bool TrueFunc(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
+    boost::ignore_unused(reasonIfUnsupported);
+    boost::ignore_unused(params...);
     return true;
 }
 
 template<typename ... Params>
 bool FalseFunc(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
+    boost::ignore_unused(reasonIfUnsupported);
+    boost::ignore_unused(params...);
     return false;
 }
 

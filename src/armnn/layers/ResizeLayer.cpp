@@ -23,11 +23,10 @@ ResizeLayer::ResizeLayer(const ResizeDescriptor& param, const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> ResizeLayer::CreateWorkload(const Graph& graph,
-                                                       const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> ResizeLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     ResizeQueueDescriptor descriptor;
-    return factory.CreateResize(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateResize(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ResizeLayer* ResizeLayer::Clone(Graph& graph) const

@@ -18,11 +18,10 @@ GatherLayer::GatherLayer(const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> GatherLayer::CreateWorkload(const armnn::Graph& graph,
-                                                       const armnn::IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> GatherLayer::CreateWorkload(const armnn::IWorkloadFactory& factory) const
 {
     GatherQueueDescriptor descriptor;
-    return factory.CreateGather(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateGather(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 GatherLayer* GatherLayer::Clone(Graph& graph) const

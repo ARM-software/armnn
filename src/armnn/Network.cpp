@@ -545,7 +545,8 @@ ITensorHandleFactory::FactoryId CalculateSlotOptionForOutput(BackendsMap& backen
                                                             OutputSlot& slot,
                                                             TensorHandleFactoryRegistry& registry)
 {
-   return ITensorHandleFactory::DeferredFactoryId;
+    boost::ignore_unused(backends, slot, registry);
+    return ITensorHandleFactory::DeferredFactoryId;
 }
 
 // For all handle factories supported on the source backend, we wish to find the one which requires the fewest copies

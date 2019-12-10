@@ -19,8 +19,7 @@ FullyConnectedLayer::FullyConnectedLayer(const FullyConnectedDescriptor& param, 
 {
 }
 
-std::unique_ptr<IWorkload> FullyConnectedLayer::CreateWorkload(const Graph& graph,
-                                                               const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> FullyConnectedLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     // on this level constant data should not be released..
     BOOST_ASSERT_MSG(m_Weight != nullptr, "FullyConnectedLayer: Weights data should not be null.");
@@ -33,7 +32,7 @@ std::unique_ptr<IWorkload> FullyConnectedLayer::CreateWorkload(const Graph& grap
         BOOST_ASSERT_MSG(m_Bias != nullptr, "FullyConnectedLayer: Bias data should not be null.");
         descriptor.m_Bias = m_Bias.get();
     }
-    return factory.CreateFullyConnected(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateFullyConnected(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 FullyConnectedLayer* FullyConnectedLayer::Clone(Graph& graph) const

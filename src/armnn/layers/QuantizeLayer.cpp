@@ -16,11 +16,10 @@ QuantizeLayer::QuantizeLayer(const char* name)
 : Layer(1, 1, LayerType::Quantize, name)
 {}
 
-std::unique_ptr<IWorkload> QuantizeLayer::CreateWorkload(const Graph& graph,
-                                                         const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> QuantizeLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     QuantizeQueueDescriptor descriptor;
-    WorkloadInfo info = PrepInfoAndDesc(descriptor, graph);
+    WorkloadInfo info = PrepInfoAndDesc(descriptor);
     return factory.CreateQuantize(descriptor, info);
 }
 

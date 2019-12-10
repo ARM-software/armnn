@@ -19,11 +19,10 @@ MultiplicationLayer::MultiplicationLayer(const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> MultiplicationLayer::CreateWorkload(const Graph& graph,
-                                                               const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> MultiplicationLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     MultiplicationQueueDescriptor descriptor;
-    return factory.CreateMultiplication(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateMultiplication(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 MultiplicationLayer* MultiplicationLayer::Clone(Graph& graph) const

@@ -23,11 +23,10 @@ SliceLayer::SliceLayer(const SliceDescriptor& param, const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> SliceLayer::CreateWorkload(const Graph& graph,
-                                                      const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> SliceLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     SliceQueueDescriptor descriptor;
-    return factory.CreateSlice(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateSlice(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 SliceLayer* SliceLayer::Clone(Graph& graph) const
@@ -51,6 +50,7 @@ void SliceLayer::ValidateTensorShapesFromInputs()
 
 std::vector<TensorShape> SliceLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
+    boost::ignore_unused(inputShapes);
     BOOST_ASSERT(inputShapes.size() == 1);
 
     TensorShape outputShape(boost::numeric_cast<unsigned int>(m_Param.m_Size.size()), m_Param.m_Size.data());

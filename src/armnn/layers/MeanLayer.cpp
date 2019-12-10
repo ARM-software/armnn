@@ -19,14 +19,13 @@ MeanLayer::MeanLayer(const armnn::MeanDescriptor& param, const char* name)
     : LayerWithParameters(1, 1, LayerType::Mean, param, name)
 {}
 
-std::unique_ptr<IWorkload> MeanLayer::CreateWorkload(const armnn::Graph& graph,
-                                                     const armnn::IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> MeanLayer::CreateWorkload(const armnn::IWorkloadFactory& factory) const
 {
     MeanQueueDescriptor descriptor;
     descriptor.m_Parameters.m_Axis = m_Param.m_Axis;
     descriptor.m_Parameters.m_KeepDims = m_Param.m_KeepDims;
 
-    return factory.CreateMean(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateMean(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 MeanLayer* MeanLayer::Clone(Graph& graph) const

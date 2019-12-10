@@ -19,11 +19,10 @@ RsqrtLayer::RsqrtLayer(const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> RsqrtLayer::CreateWorkload(const Graph& graph,
-                                                      const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> RsqrtLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     RsqrtQueueDescriptor descriptor;
-    return factory.CreateRsqrt(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateRsqrt(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 RsqrtLayer* RsqrtLayer::Clone(Graph& graph) const

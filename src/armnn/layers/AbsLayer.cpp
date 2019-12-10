@@ -19,11 +19,10 @@ AbsLayer::AbsLayer(const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> AbsLayer::CreateWorkload(const Graph& graph,
-                                                    const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> AbsLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     AbsQueueDescriptor descriptor;
-    return factory.CreateAbs(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateAbs(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 AbsLayer* AbsLayer::Clone(Graph& graph) const

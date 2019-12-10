@@ -17,8 +17,7 @@ public:
     /// @param [in] graph The graph where this layer can be found.
     /// @param [in] factory The workload factory which will create the workload.
     /// @return A pointer to the created workload, or nullptr if not created.
-    virtual std::unique_ptr<IWorkload> CreateWorkload(const Graph&            graph,
-                                                      const IWorkloadFactory& factory) const override;
+    virtual std::unique_ptr<IWorkload> CreateWorkload(const IWorkloadFactory& factory) const override;
 
     /// Set the outputs to be appropriate sub tensors of the input if sub tensors are supported
     /// otherwise creates tensor handlers by default. Ignores parameters for Output type.

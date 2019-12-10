@@ -24,8 +24,7 @@ TransposeConvolution2dLayer::TransposeConvolution2dLayer(const TransposeConvolut
 {
 }
 
-std::unique_ptr<IWorkload> TransposeConvolution2dLayer::CreateWorkload(const Graph& graph,
-                                                                       const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> TransposeConvolution2dLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     BOOST_ASSERT_MSG(m_Weight != nullptr, "TransposeConvolution2dLayer: Weights data should not be null.");
 
@@ -38,7 +37,7 @@ std::unique_ptr<IWorkload> TransposeConvolution2dLayer::CreateWorkload(const Gra
         descriptor.m_Bias = m_Bias.get();
     }
 
-    return factory.CreateTransposeConvolution2d(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateTransposeConvolution2d(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 TransposeConvolution2dLayer* TransposeConvolution2dLayer::Clone(Graph& graph) const

@@ -19,11 +19,10 @@ DivisionLayer::DivisionLayer(const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> DivisionLayer::CreateWorkload(const Graph& graph,
-                                                         const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> DivisionLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     DivisionQueueDescriptor descriptor;
-    return factory.CreateDivision(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateDivision(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 DivisionLayer* DivisionLayer::Clone(Graph& graph) const

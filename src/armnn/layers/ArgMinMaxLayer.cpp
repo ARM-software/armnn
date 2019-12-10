@@ -21,11 +21,10 @@ ArgMinMaxLayer::ArgMinMaxLayer(const ArgMinMaxDescriptor& param, const char* nam
 {
 }
 
-std::unique_ptr<IWorkload> ArgMinMaxLayer::CreateWorkload(const Graph& graph,
-    const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> ArgMinMaxLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     ArgMinMaxQueueDescriptor descriptor;
-    return factory.CreateArgMinMax(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateArgMinMax(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ArgMinMaxLayer* ArgMinMaxLayer::Clone(Graph& graph) const

@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateGpuDeviceSupportLayerNoFallback)
     {
         BOOST_CHECK(layer->GetBackendId() == armnn::Compute::GpuAcc);
         BOOST_CHECK_NO_THROW(
-            layer->CreateWorkload(static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph(), fact));
+            layer->CreateWorkload(fact));
     }
 }
 

@@ -22,14 +22,13 @@ DepthToSpaceLayer::DepthToSpaceLayer(const DepthToSpaceDescriptor& param, const 
     : LayerWithParameters(1, 1, LayerType::DepthToSpace, param, name)
 {}
 
-std::unique_ptr<IWorkload> DepthToSpaceLayer::CreateWorkload(const Graph& graph,
-                                                             const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> DepthToSpaceLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     DepthToSpaceQueueDescriptor descriptor;
     descriptor.m_Parameters.m_BlockSize  = m_Param.m_BlockSize;
     descriptor.m_Parameters.m_DataLayout = m_Param.m_DataLayout;
 
-    return factory.CreateDepthToSpace(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateDepthToSpace(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 DepthToSpaceLayer* DepthToSpaceLayer::Clone(Graph& graph) const

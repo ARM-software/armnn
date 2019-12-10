@@ -19,8 +19,7 @@ StridedSliceLayer::StridedSliceLayer(const armnn::StridedSliceDescriptor& param,
 {
 }
 
-std::unique_ptr<IWorkload> StridedSliceLayer::CreateWorkload(const Graph& graph,
-                                                             const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> StridedSliceLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     StridedSliceQueueDescriptor descriptor;
 
@@ -35,7 +34,7 @@ std::unique_ptr<IWorkload> StridedSliceLayer::CreateWorkload(const Graph& graph,
     descriptor.m_Parameters.m_NewAxisMask    = m_Param.m_NewAxisMask;
     descriptor.m_Parameters.m_ShrinkAxisMask = m_Param.m_ShrinkAxisMask;
 
-    return factory.CreateStridedSlice(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateStridedSlice(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 StridedSliceLayer* StridedSliceLayer::Clone(Graph& graph) const

@@ -18,10 +18,10 @@ namespace armnn
 LogSoftmaxLayer::LogSoftmaxLayer(const LogSoftmaxDescriptor &param, const char* name)
     : LayerWithParameters(1, 1, LayerType::LogSoftmax, param, name) {}
 
-std::unique_ptr<IWorkload> LogSoftmaxLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> LogSoftmaxLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     LogSoftmaxQueueDescriptor descriptor;
-    return factory.CreateLogSoftmax(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateLogSoftmax(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 LogSoftmaxLayer* LogSoftmaxLayer::Clone(Graph& graph) const

@@ -18,7 +18,7 @@ LstmLayer::LstmLayer(const LstmDescriptor& param, const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> LstmLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> LstmLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     LstmQueueDescriptor descriptor;
 
@@ -68,7 +68,7 @@ std::unique_ptr<IWorkload> LstmLayer::CreateWorkload(const Graph& graph, const I
         descriptor.m_OutputLayerNormWeights = m_LayerNormParameters.m_OutputLayerNormWeights.get();
     }
 
-    return factory.CreateLstm(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateLstm(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 LstmLayer* LstmLayer::Clone(Graph& graph) const

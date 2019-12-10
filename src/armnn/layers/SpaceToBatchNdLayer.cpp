@@ -24,18 +24,18 @@ SpaceToBatchNdLayer::SpaceToBatchNdLayer(const SpaceToBatchNdDescriptor param, c
     : LayerWithParameters(1, 1, LayerType::SpaceToBatchNd, param, name)
 {}
 
-std::unique_ptr<IWorkload> SpaceToBatchNdLayer::CreateWorkload(const Graph& graph,
-                                                               const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> SpaceToBatchNdLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
-    SpaceToBatchNdQueueDescriptor descriptor;
+   SpaceToBatchNdQueueDescriptor descriptor;
     descriptor.m_Parameters.m_BlockShape = m_Param.m_BlockShape;
     descriptor.m_Parameters.m_PadList = m_Param.m_PadList;
 
-    return factory.CreateSpaceToBatchNd(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateSpaceToBatchNd(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 SpaceToBatchNdLayer* SpaceToBatchNdLayer::Clone(Graph& graph) const
 {
+    boost::ignore_unused(graph);
     return CloneBase<SpaceToBatchNdLayer>(graph, m_Param, GetName());
 }
 

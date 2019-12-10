@@ -19,11 +19,10 @@ MinimumLayer::MinimumLayer(const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> MinimumLayer::CreateWorkload(const Graph& graph,
-                                                        const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> MinimumLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     MinimumQueueDescriptor descriptor;
-    return factory.CreateMinimum(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateMinimum(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 MinimumLayer* MinimumLayer::Clone(Graph& graph) const

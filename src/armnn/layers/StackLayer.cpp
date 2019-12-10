@@ -19,10 +19,10 @@ StackLayer::StackLayer(const StackDescriptor& param, const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> StackLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> StackLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     StackQueueDescriptor descriptor;
-    return factory.CreateStack(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateStack(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 StackLayer* StackLayer::Clone(Graph& graph) const
@@ -32,6 +32,8 @@ StackLayer* StackLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> StackLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
+    boost::ignore_unused(inputShapes);
+
     const TensorShape& inputShape = m_Param.m_InputShape;
     const unsigned int inputNumDimensions = inputShape.GetNumDimensions();
     const unsigned int axis = m_Param.m_Axis;

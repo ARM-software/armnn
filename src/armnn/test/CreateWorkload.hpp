@@ -30,9 +30,9 @@ using namespace std;
 
 // Calls CreateWorkload for a layer, and checks the returned pointer is of the correct type.
 template<typename Workload>
-std::unique_ptr<Workload> MakeAndCheckWorkload(Layer& layer, Graph& graph, const IWorkloadFactory& factory)
+std::unique_ptr<Workload> MakeAndCheckWorkload(Layer& layer, const IWorkloadFactory& factory)
 {
-    std::unique_ptr<IWorkload> workload = layer.CreateWorkload(graph, factory);
+    std::unique_ptr<IWorkload> workload = layer.CreateWorkload(factory);
     BOOST_TEST(workload.get() == boost::polymorphic_downcast<Workload*>(workload.get()),
                "Cannot convert to derived class");
     std::string reasonIfUnsupported;
@@ -84,7 +84,7 @@ std::unique_ptr<ActivationWorkload> CreateActivationWorkloadTest(armnn::IWorkloa
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<ActivationWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<ActivationWorkload>(*layer, factory);
 
     ActivationQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
@@ -120,7 +120,7 @@ std::unique_ptr<WorkloadType> CreateElementwiseWorkloadTest(armnn::IWorkloadFact
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<WorkloadType>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<WorkloadType>(*layer, factory);
 
     DescriptorType queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 2);
@@ -147,7 +147,7 @@ std::unique_ptr<WorkloadType> CreateElementwiseUnaryWorkloadTest(armnn::IWorkloa
     Connect(layer, output, tensorInfo, 0, 0);
     CreateTensorHandles(graph, factory);
 
-    auto workload = MakeAndCheckWorkload<WorkloadType>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<WorkloadType>(*layer, factory);
     DescriptorType queueDescriptor = workload->GetData();
 
     BOOST_TEST(queueDescriptor.m_Inputs.size()  == 1);
@@ -199,7 +199,7 @@ std::unique_ptr<BatchNormalizationWorkloadType> CreateBatchNormalizationWorkload
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<BatchNormalizationWorkloadType>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<BatchNormalizationWorkloadType>(*layer, factory);
     BatchNormalizationQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Parameters.m_Eps == 0.05f);
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
@@ -252,7 +252,7 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadTest(armnn::IW
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<Convolution2dWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<Convolution2dWorkload>(*layer, factory);
 
     Convolution2dQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Parameters.m_StrideX == 2);
@@ -358,7 +358,7 @@ std::unique_ptr<LstmWorkload> CreateLstmWorkloadTest(armnn::IWorkloadFactory& fa
     CreateTensorHandles(graph, factory);
 
     // make the workload and check it
-    auto workload = MakeAndCheckWorkload<LstmWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<LstmWorkload>(*layer, factory);
     LstmQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Parameters.m_ActivationFunc == 4);
     BOOST_TEST(queueDescriptor.m_Parameters.m_ClippingThresCell == 0.0f);
@@ -487,7 +487,7 @@ std::unique_ptr<QuantizedLstmWorkload> CreateQuantizedLstmWorkloadTest(armnn::IW
     CreateTensorHandles(graph, factory);
 
     // Create workload and check layer support
-    auto workload = MakeAndCheckWorkload<QuantizedLstmWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<QuantizedLstmWorkload>(*layer, factory);
     QuantizedLstmQueueDescriptor queueDescriptor = workload->GetData();
 
     // Validate input/output sizes
@@ -548,7 +548,7 @@ std::unique_ptr<Convolution2dWorkload> CreateDirectConvolution2dWorkloadTest(arm
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<Convolution2dWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<Convolution2dWorkload>(*layer, factory);
 
     Convolution2dQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Parameters.m_StrideX == 1);
@@ -605,7 +605,7 @@ std::unique_ptr<DepthwiseConvolution2dFloat32Workload> CreateDepthwiseConvolutio
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<DepthwiseConvolution2dFloat32Workload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<DepthwiseConvolution2dFloat32Workload>(*layer, factory);
 
     DepthwiseConvolution2dQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Parameters.m_StrideX == 1);
@@ -654,7 +654,7 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWorkloadTest(armnn::
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<FullyConnectedWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<FullyConnectedWorkload>(*layer, factory);
 
     FullyConnectedQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Parameters.m_BiasEnabled == true);
@@ -703,7 +703,7 @@ std::unique_ptr<NormalizationWorkload> CreateNormalizationWorkloadTest(armnn::IW
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<NormalizationWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<NormalizationWorkload>(*layer, factory);
 
     NormalizationQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST((queueDescriptor.m_Parameters.m_NormChannelType == NormalizationAlgorithmChannel::Across));
@@ -755,7 +755,7 @@ std::unique_ptr<Pooling2dWorkload> CreatePooling2dWorkloadTest(armnn::IWorkloadF
     CreateTensorHandles(graph, factory);
 
     // Make the workload and checks it
-    auto workload = MakeAndCheckWorkload<Pooling2dWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<Pooling2dWorkload>(*layer, factory);
 
     Pooling2dQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST((queueDescriptor.m_Parameters.m_PoolType == PoolingAlgorithm::Average));
@@ -801,7 +801,7 @@ std::unique_ptr<SoftmaxWorkload> CreateSoftmaxWorkloadTest(armnn::IWorkloadFacto
     CreateTensorHandles(graph, factory);
 
     // Make the workload and checks it.
-    auto workload = MakeAndCheckWorkload<SoftmaxWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<SoftmaxWorkload>(*layer, factory);
 
     SoftmaxQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
@@ -850,7 +850,7 @@ std::unique_ptr<SplitterWorkload>
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<SplitterWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<SplitterWorkload>(*layer, factory);
 
     SplitterQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
@@ -927,9 +927,9 @@ std::pair<std::unique_ptr<SplitterWorkload>, std::unique_ptr<ConcatWorkload>>
     CreateTensorHandles(graph, factory);
     BOOST_TEST_CHECKPOINT("created tensor handles");
 
-    auto workloadSplitter = MakeAndCheckWorkload<SplitterWorkload>(*splitter, graph, factory);
+    auto workloadSplitter = MakeAndCheckWorkload<SplitterWorkload>(*splitter, factory);
     BOOST_TEST_CHECKPOINT("created splitter workload");
-    auto workloadConcat = MakeAndCheckWorkload<ConcatWorkload>(*concat, graph, factory);
+    auto workloadConcat = MakeAndCheckWorkload<ConcatWorkload>(*concat, factory);
     BOOST_TEST_CHECKPOINT("created concat workload");
 
     return {std::move(workloadSplitter), std::move(workloadConcat)};
@@ -994,11 +994,11 @@ void CreateSplitterMultipleInputsOneOutputWorkloadTest(armnn::IWorkloadFactory& 
 
     CreateTensorHandles(graph, factory);
 
-    auto workloadSplitter = MakeAndCheckWorkload<SplitterWorkload>(*splitter, graph, factory);
-    auto workloadActiv0_0 = MakeAndCheckWorkload<ActivationWorkload>(*activ0_0, graph, factory);
-    auto workloadActiv0_1 = MakeAndCheckWorkload<ActivationWorkload>(*activ0_1, graph, factory);
-    auto workloadActiv1_0 = MakeAndCheckWorkload<ActivationWorkload>(*activ1_0, graph, factory);
-    auto workloadActiv1_1 = MakeAndCheckWorkload<ActivationWorkload>(*activ1_1, graph, factory);
+    auto workloadSplitter = MakeAndCheckWorkload<SplitterWorkload>(*splitter, factory);
+    auto workloadActiv0_0 = MakeAndCheckWorkload<ActivationWorkload>(*activ0_0, factory);
+    auto workloadActiv0_1 = MakeAndCheckWorkload<ActivationWorkload>(*activ0_1, factory);
+    auto workloadActiv1_0 = MakeAndCheckWorkload<ActivationWorkload>(*activ1_0, factory);
+    auto workloadActiv1_1 = MakeAndCheckWorkload<ActivationWorkload>(*activ1_1, factory);
 
     wlSplitter = std::move(workloadSplitter);
     wlActiv0_0 = std::move(workloadActiv0_0);
@@ -1047,7 +1047,7 @@ std::unique_ptr<ResizeWorkload> CreateResizeBilinearWorkloadTest(armnn::IWorkloa
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<ResizeWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<ResizeWorkload>(*layer, factory);
 
     auto queueDescriptor = workload->GetData();
     BOOST_CHECK(queueDescriptor.m_Inputs.size()  == 1);
@@ -1077,7 +1077,7 @@ std::unique_ptr<RsqrtWorkload> CreateRsqrtWorkloadTest(armnn::IWorkloadFactory& 
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<RsqrtWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<RsqrtWorkload>(*layer, factory);
 
     RsqrtQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
@@ -1106,7 +1106,7 @@ std::unique_ptr<BatchToSpaceNdWorkload> CreateBatchToSpaceNdWorkloadTest(armnn::
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<BatchToSpaceNdWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<BatchToSpaceNdWorkload>(*layer, factory);
 
     BatchToSpaceNdQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
@@ -1142,7 +1142,7 @@ std::unique_ptr<L2NormalizationWorkload> CreateL2NormalizationWorkloadTest(armnn
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<L2NormalizationWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<L2NormalizationWorkload>(*layer, factory);
 
     L2NormalizationQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
@@ -1175,7 +1175,7 @@ std::unique_ptr<ReshapeWorkload> CreateReshapeWorkloadTest(armnn::IWorkloadFacto
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<ReshapeWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<ReshapeWorkload>(*layer, factory);
 
     ReshapeQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
@@ -1204,7 +1204,7 @@ std::unique_ptr<ConvertFp16ToFp32Float32Workload> CreateConvertFp16ToFp32Workloa
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<ConvertFp16ToFp32Float32Workload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<ConvertFp16ToFp32Float32Workload>(*layer, factory);
 
     ConvertFp16ToFp32QueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
@@ -1233,7 +1233,7 @@ std::unique_ptr<ConvertFp32ToFp16Float16Workload> CreateConvertFp32ToFp16Workloa
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<ConvertFp32ToFp16Float16Workload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<ConvertFp32ToFp16Float16Workload>(*layer, factory);
 
     ConvertFp32ToFp16QueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
@@ -1264,7 +1264,7 @@ std::unique_ptr<MeanWorkload> CreateMeanWorkloadTest(armnn::IWorkloadFactory& fa
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<MeanWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<MeanWorkload>(*layer, factory);
 
     MeanQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Parameters.m_Axis == descriptor.m_Axis);
@@ -1312,7 +1312,7 @@ std::unique_ptr<ConcatWorkload> CreateConcatWorkloadTest(armnn::IWorkloadFactory
     CreateTensorHandles(graph, factory);
     BOOST_TEST_CHECKPOINT("created tensor handles");
 
-    auto workloadConcat = MakeAndCheckWorkload<ConcatWorkload>(*concat, graph, factory);
+    auto workloadConcat = MakeAndCheckWorkload<ConcatWorkload>(*concat, factory);
     BOOST_TEST_CHECKPOINT("created concat workload");
 
     return workloadConcat;
@@ -1438,7 +1438,7 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
     CreateTensorHandles(optimisedGraph, factory);
 
     // Make the workload and check it.
-    auto workload = MakeAndCheckWorkload<PreCompiledWorkload>(*preCompiledLayer, optimisedGraph, factory);
+    auto workload = MakeAndCheckWorkload<PreCompiledWorkload>(*preCompiledLayer, factory);
 
     PreCompiledQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size()  == 1);
@@ -1470,7 +1470,7 @@ std::unique_ptr<ConstantWorkload> CreateConstantWorkloadTest(armnn::IWorkloadFac
     CreateTensorHandles(graph, factory);
     BOOST_TEST_CHECKPOINT("created tensor handles");
 
-    auto workloadConstant = MakeAndCheckWorkload<ConstantWorkload>(*constant, graph, factory);
+    auto workloadConstant = MakeAndCheckWorkload<ConstantWorkload>(*constant, factory);
     BOOST_TEST_CHECKPOINT("created Constant workload");
 
     return workloadConstant;
@@ -1506,7 +1506,7 @@ std::unique_ptr<PreluWorkload> CreatePreluWorkloadTest(armnn::IWorkloadFactory& 
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it
-    auto workload = MakeAndCheckWorkload<PreluWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<PreluWorkload>(*layer, factory);
 
     PreluQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 2);
@@ -1538,7 +1538,7 @@ std::unique_ptr<SpaceToDepthWorkload> CreateSpaceToDepthWorkloadTest(armnn::IWor
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<SpaceToDepthWorkload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<SpaceToDepthWorkload>(*layer, factory);
 
     SpaceToDepthQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
@@ -1585,7 +1585,7 @@ std::unique_ptr<StackWorkload> CreateStackWorkloadTest(armnn::IWorkloadFactory& 
 
     CreateTensorHandles(graph, factory);
 
-    auto stackWorkload = MakeAndCheckWorkload<StackWorkload>(*stackLayer, graph, factory);
+    auto stackWorkload = MakeAndCheckWorkload<StackWorkload>(*stackLayer, factory);
     StackQueueDescriptor queueDescriptor = stackWorkload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size() == numInputs);
     BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);

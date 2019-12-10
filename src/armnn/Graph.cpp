@@ -434,6 +434,7 @@ void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const Subgr
     const SubgraphView::Layers& substituteSubgraphLayers = substituteSubgraph.GetLayers();
     std::for_each(substituteSubgraphLayers.begin(), substituteSubgraphLayers.end(), [&](Layer* layer)
     {
+        boost::ignore_unused(layer);
         BOOST_ASSERT_MSG(std::find(m_Layers.begin(), m_Layers.end(), layer) != m_Layers.end(),
                          "Substitute layer is not a member of graph");
     });

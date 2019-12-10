@@ -18,11 +18,10 @@ FakeQuantizationLayer::FakeQuantizationLayer(const FakeQuantizationDescriptor& p
 {
 }
 
-std::unique_ptr<IWorkload> FakeQuantizationLayer::CreateWorkload(const Graph& graph,
-                                                                const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> FakeQuantizationLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     FakeQuantizationQueueDescriptor descriptor;
-    return factory.CreateFakeQuantization(descriptor, PrepInfoAndDesc(descriptor, graph) );
+    return factory.CreateFakeQuantization(descriptor, PrepInfoAndDesc(descriptor) );
 }
 
 FakeQuantizationLayer* FakeQuantizationLayer::Clone(Graph& graph) const
@@ -46,6 +45,7 @@ void FakeQuantizationLayer::ValidateTensorShapesFromInputs()
 
 void FakeQuantizationLayer::Accept(ILayerVisitor& visitor) const
 {
+    boost::ignore_unused(visitor);
     throw armnn::Exception("FakeQuantizationLayer should not appear in an input graph");
 }
 

@@ -14,8 +14,9 @@ StandInLayer::StandInLayer(const StandInDescriptor& param, const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> StandInLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> StandInLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
+    boost::ignore_unused(factory);
     // This throws in the event that it's called. We would expect that any backend that
     // "claims" to support the StandInLayer type would actually substitute it with a PrecompiledLayer
     // during graph optimization. There is no interface on the IWorkloadFactory to create a StandInWorkload.
@@ -29,6 +30,7 @@ StandInLayer* StandInLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> StandInLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
+    boost::ignore_unused(inputShapes);
     throw Exception("Stand in layer does not support infering output shapes");
 }
 

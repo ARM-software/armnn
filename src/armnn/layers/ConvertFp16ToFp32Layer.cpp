@@ -19,11 +19,10 @@ ConvertFp16ToFp32Layer::ConvertFp16ToFp32Layer(const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> ConvertFp16ToFp32Layer::CreateWorkload(const Graph& graph,
-    const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> ConvertFp16ToFp32Layer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     ConvertFp16ToFp32QueueDescriptor descriptor;
-    return factory.CreateConvertFp16ToFp32(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateConvertFp16ToFp32(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ConvertFp16ToFp32Layer* ConvertFp16ToFp32Layer::Clone(Graph& graph) const
@@ -49,6 +48,7 @@ void ConvertFp16ToFp32Layer::Accept(ILayerVisitor& visitor) const
 {
     // these conversion layers are only inserted by the
     // optimizer and so will never be in an input graph.
+    boost::ignore_unused(visitor);
     throw armnn::Exception("ConvertFp16ToFp32Layer should never appear in an input graph");
 }
 

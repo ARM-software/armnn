@@ -17,10 +17,10 @@ ActivationLayer::ActivationLayer(const ActivationDescriptor& param, const char* 
 {
 }
 
-std::unique_ptr<IWorkload> ActivationLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> ActivationLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     ActivationQueueDescriptor descriptor;
-    return factory.CreateActivation(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateActivation(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ActivationLayer* ActivationLayer::Clone(Graph& graph) const

@@ -16,11 +16,10 @@ SwitchLayer::SwitchLayer(const char* name)
     : Layer(2, 2, LayerType::Switch, name)
 {}
 
-std::unique_ptr<IWorkload> SwitchLayer::CreateWorkload(const Graph& graph,
-                                                       const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> SwitchLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     SwitchQueueDescriptor descriptor;
-    return factory.CreateSwitch(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateSwitch(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 SwitchLayer* SwitchLayer::Clone(Graph& graph) const

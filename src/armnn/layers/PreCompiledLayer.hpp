@@ -25,8 +25,7 @@ public:
     PreCompiledLayer(const PreCompiledDescriptor& param, const char* name);
     ~PreCompiledLayer();
 
-    virtual std::unique_ptr<IWorkload> CreateWorkload(const Graph& graph,
-                                                      const IWorkloadFactory& factory) const override;
+    virtual std::unique_ptr<IWorkload> CreateWorkload(const IWorkloadFactory& factory) const override;
 
     PreCompiledLayer* Clone(Graph &graph) const override;
 

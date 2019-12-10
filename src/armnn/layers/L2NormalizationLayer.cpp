@@ -18,11 +18,10 @@ L2NormalizationLayer::L2NormalizationLayer(const L2NormalizationDescriptor& para
 {
 }
 
-std::unique_ptr<IWorkload> L2NormalizationLayer::CreateWorkload(const Graph& graph,
-    const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> L2NormalizationLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     L2NormalizationQueueDescriptor descriptor;
-    return factory.CreateL2Normalization(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateL2Normalization(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 L2NormalizationLayer* L2NormalizationLayer::Clone(Graph& graph) const

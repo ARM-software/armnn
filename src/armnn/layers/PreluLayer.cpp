@@ -18,12 +18,11 @@ PreluLayer::PreluLayer(const char* name)
     : Layer(2, 1, LayerType::Prelu, name)
 {}
 
-std::unique_ptr<IWorkload> PreluLayer::CreateWorkload(const Graph& graph,
-                                                      const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> PreluLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     PreluQueueDescriptor descriptor;
 
-    return factory.CreatePrelu(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreatePrelu(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 PreluLayer* PreluLayer::Clone(Graph& graph) const

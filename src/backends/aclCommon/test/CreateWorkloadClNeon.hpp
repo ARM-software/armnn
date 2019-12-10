@@ -87,8 +87,8 @@ void CreateMemCopyWorkloads(IWorkloadFactory& factory)
     output->CreateTensorHandles(registry, refFactory);
 
     // make the workloads and check them
-    auto workload1 = MakeAndCheckWorkload<CopyMemGenericWorkload>(*layer1, graph, factory);
-    auto workload2 = MakeAndCheckWorkload<CopyMemGenericWorkload>(*layer2, graph, refFactory);
+    auto workload1 = MakeAndCheckWorkload<CopyMemGenericWorkload>(*layer1, factory);
+    auto workload2 = MakeAndCheckWorkload<CopyMemGenericWorkload>(*layer2, refFactory);
 
     MemCopyQueueDescriptor queueDescriptor1 = workload1->GetData();
     BOOST_TEST(queueDescriptor1.m_Inputs.size() == 1);

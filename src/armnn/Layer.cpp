@@ -195,6 +195,7 @@ Layer::Layer(unsigned int numInputSlots,
 , m_BackendId()
 , m_Guid(profiling::ProfilingService::Instance().NextGuid())
 {
+    boost::ignore_unused(layout);
     m_InputSlots.reserve(numInputSlots);
     for (unsigned int i = 0; i < numInputSlots; ++i)
     {
@@ -216,7 +217,7 @@ Layer::Layer(unsigned int numInputSlots,
 {
 }
 
-void Layer::CollectWorkloadInputs(WorkloadDataCollector& dataCollector, const Graph& graph) const
+void Layer::CollectWorkloadInputs(WorkloadDataCollector& dataCollector) const
 {
     for (auto&& inputSlot : GetInputSlots())
     {
@@ -227,7 +228,7 @@ void Layer::CollectWorkloadInputs(WorkloadDataCollector& dataCollector, const Gr
     }
 }
 
-void Layer::CollectWorkloadOutputs(WorkloadDataCollector& dataCollector, const Graph& graph) const
+void Layer::CollectWorkloadOutputs(WorkloadDataCollector& dataCollector) const
 {
     for (auto&& outputHandler : m_OutputHandlers)
     {

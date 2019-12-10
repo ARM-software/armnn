@@ -17,8 +17,9 @@ InputLayer::InputLayer(LayerBindingId id, const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> InputLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> InputLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
+    boost::ignore_unused(factory);
     return nullptr;
 }
 

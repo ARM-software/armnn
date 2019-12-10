@@ -18,11 +18,10 @@ FloorLayer::FloorLayer(const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> FloorLayer::CreateWorkload(const Graph& graph,
-    const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> FloorLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     FloorQueueDescriptor descriptor;
-    return factory.CreateFloor(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateFloor(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 FloorLayer* FloorLayer::Clone(Graph& graph) const

@@ -20,12 +20,11 @@ DetectionPostProcessLayer::DetectionPostProcessLayer(const DetectionPostProcessD
 {
 }
 
-std::unique_ptr<IWorkload> DetectionPostProcessLayer::CreateWorkload(const armnn::Graph& graph,
-                                                                     const armnn::IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> DetectionPostProcessLayer::CreateWorkload(const armnn::IWorkloadFactory& factory) const
 {
     DetectionPostProcessQueueDescriptor descriptor;
     descriptor.m_Anchors = m_Anchors.get();
-    return factory.CreateDetectionPostProcess(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateDetectionPostProcess(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 DetectionPostProcessLayer* DetectionPostProcessLayer::Clone(Graph& graph) const

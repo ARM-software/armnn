@@ -28,12 +28,11 @@ PreCompiledLayer* PreCompiledLayer::Clone(Graph& graph) const
     return clone;
 }
 
-std::unique_ptr<IWorkload> PreCompiledLayer::CreateWorkload(const armnn::Graph& graph,
-                                                            const armnn::IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> PreCompiledLayer::CreateWorkload(const armnn::IWorkloadFactory& factory) const
 {
     PreCompiledQueueDescriptor descriptor;
     descriptor.m_PreCompiledObject = m_PreCompiledObject.get();
-    return factory.CreatePreCompiled(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreatePreCompiled(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 void PreCompiledLayer::ValidateTensorShapesFromInputs()
@@ -49,6 +48,7 @@ void PreCompiledLayer::SetPreCompiledObject(PreCompiledObjectPtr preCompiledObje
 
 void PreCompiledLayer::Accept(ILayerVisitor& visitor) const
 {
+    boost::ignore_unused(visitor);
     throw armnn::Exception("PreCompiledLayer should not appear in an input graph");
 }
 

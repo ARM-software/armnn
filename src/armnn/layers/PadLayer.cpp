@@ -19,13 +19,12 @@ PadLayer::PadLayer(const armnn::PadDescriptor& param, const char* name)
     : LayerWithParameters(1, 1, LayerType::Pad, param, name)
 {}
 
-std::unique_ptr<IWorkload> PadLayer::CreateWorkload(const armnn::Graph& graph,
-                                                    const armnn::IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> PadLayer::CreateWorkload(const armnn::IWorkloadFactory& factory) const
 {
     PadQueueDescriptor descriptor;
     descriptor.m_Parameters.m_PadList = m_Param.m_PadList;
 
-    return factory.CreatePad(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreatePad(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 PadLayer* PadLayer::Clone(Graph& graph) const

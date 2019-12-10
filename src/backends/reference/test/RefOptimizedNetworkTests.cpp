@@ -78,8 +78,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateCpuRefWorkloads)
     armnn::RefWorkloadFactory fact;
     for (auto&& layer : static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph())
     {
-        BOOST_CHECK_NO_THROW(
-            layer->CreateWorkload(static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph(), fact));
+        BOOST_CHECK_NO_THROW(layer->CreateWorkload(fact));
     }
 }
 

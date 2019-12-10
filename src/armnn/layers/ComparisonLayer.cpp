@@ -20,11 +20,10 @@ ComparisonLayer::ComparisonLayer(const ComparisonDescriptor& param, const char* 
 {
 }
 
-std::unique_ptr<IWorkload> ComparisonLayer::CreateWorkload(const Graph& graph,
-                                                           const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> ComparisonLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     ComparisonQueueDescriptor descriptor;
-    return factory.CreateComparison(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateComparison(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ComparisonLayer* ComparisonLayer::Clone(Graph& graph) const

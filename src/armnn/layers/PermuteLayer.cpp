@@ -22,10 +22,10 @@ PermuteLayer::PermuteLayer(const PermuteDescriptor& param, const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> PermuteLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> PermuteLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     PermuteQueueDescriptor descriptor;
-    return factory.CreatePermute(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreatePermute(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 PermuteLayer* PermuteLayer::Clone(Graph& graph) const

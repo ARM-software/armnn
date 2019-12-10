@@ -48,8 +48,7 @@ void DepthwiseConvolution2dLayer::SerializeLayerParameters(ParameterStringifyFun
     LayerWithParameters<DepthwiseConvolution2dDescriptor>::SerializeLayerParameters(fn);
 }
 
-std::unique_ptr<IWorkload> DepthwiseConvolution2dLayer::CreateWorkload(const Graph& graph,
-                                                                       const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> DepthwiseConvolution2dLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     // on this level constant data should not be released..
     BOOST_ASSERT_MSG(m_Weight != nullptr, "DepthwiseConvolution2dLayer: Weights data should not be null.");
@@ -63,7 +62,7 @@ std::unique_ptr<IWorkload> DepthwiseConvolution2dLayer::CreateWorkload(const Gra
         BOOST_ASSERT_MSG(m_Bias != nullptr, "DepthwiseConvolution2dLayer: Bias data should not be null.");
         descriptor.m_Bias = m_Bias.get();
     }
-    return factory.CreateDepthwiseConvolution2d(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateDepthwiseConvolution2d(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 DepthwiseConvolution2dLayer* DepthwiseConvolution2dLayer::Clone(Graph& graph) const

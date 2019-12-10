@@ -18,11 +18,10 @@ MaximumLayer::MaximumLayer(const char* name)
 {
 }
 
-std::unique_ptr<IWorkload> MaximumLayer::CreateWorkload(const Graph& graph,
-                                                        const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> MaximumLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     MaximumQueueDescriptor descriptor;
-    return factory.CreateMaximum(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateMaximum(descriptor, PrepInfoAndDesc(descriptor));
 }
 
 MaximumLayer* MaximumLayer::Clone(Graph& graph) const

@@ -11,7 +11,9 @@
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/WorkloadUtils.hpp>
 
+#include <boost/numeric/conversion/cast.hpp>
 #include <cl/ClLayerSupport.hpp>
 #include <cl/ClTensorHandle.hpp>
 #include <cl/ClLayerSupport.hpp>
@@ -34,9 +36,10 @@ arm_compute::Status ClStridedSliceWorkloadValidate(const TensorInfo& input,
 
     std::tie(starts, ends, strides) = SetClStridedSliceData(descriptor.m_Begin, descriptor.m_End, descriptor.m_Stride);
 
-    int32_t begin_mask = descriptor.m_BeginMask;
-    int32_t end_mask = descriptor.m_EndMask;
-    int32_t shrink_axis_mask = descriptor.m_ShrinkAxisMask;
+    auto numDimensions       = boost::numeric_cast<int>(input.GetNumDimensions());
+    int32_t begin_mask       = ConvertMaskToACLFormat(descriptor.m_BeginMask, numDimensions);
+    int32_t end_mask         = ConvertMaskToACLFormat(descriptor.m_EndMask, numDimensions);
+    int32_t shrink_axis_mask = ConvertMaskToACLFormat(descriptor.m_ShrinkAxisMask, numDimensions);
 
     return arm_compute::CLStridedSlice::validate(&aclInputInfo,
                                         &aclOutputInfo,
@@ -65,9 +68,10 @@ ClStridedSliceWorkload::ClStridedSliceWorkload(const StridedSliceQueueDescriptor
                                                             m_Data.m_Parameters.m_End,
                                                             m_Data.m_Parameters.m_Stride);
 
-    int32_t begin_mask = m_Data.m_Parameters.m_BeginMask;
-    int32_t end_mask = m_Data.m_Parameters.m_EndMask;
-    int32_t shrink_axis_mask = m_Data.m_Parameters.m_ShrinkAxisMask;
+    auto numDimensions       = boost::numeric_cast<int>(info.m_InputTensorInfos[0].GetNumDimensions());
+    int32_t begin_mask       = ConvertMaskToACLFormat(m_Data.m_Parameters.m_BeginMask, numDimensions);
+    int32_t end_mask         = ConvertMaskToACLFormat(m_Data.m_Parameters.m_EndMask, numDimensions);
+    int32_t shrink_axis_mask = ConvertMaskToACLFormat(m_Data.m_Parameters.m_ShrinkAxisMask, numDimensions);
 
     arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
     input.info()->set_data_layout(aclDataLayout);

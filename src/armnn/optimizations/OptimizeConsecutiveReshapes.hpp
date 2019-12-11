@@ -14,7 +14,7 @@ namespace optimizations
 class OptimizeConsecutiveReshapesImpl
 {
 public:
-    /// Run for every connection between a base RashapeLayer and a child ReshapeLayer.
+    /// Run for every connection between a base ReshapeLayer and a child ReshapeLayer.
     /// Inserts an equivalent ReshapeLayer that bypasses both for that connection.
     void Run(Graph& graph, InputSlot& connection) const
     {
@@ -29,12 +29,20 @@ public:
         const TensorInfo& inInfo = parentOut->GetTensorInfo();
         const TensorInfo& outInfo = child.GetOutputHandler().GetTensorInfo();
 
+        // This Optimization is only appropriate when the base ReshapeLayer is connected to the child ReshapeLayer
+        // and no other Layer.
+        if (base.GetOutputSlot(0).GetNumConnections() > 1)
+        {
+            return;
+        }
+
         if (inInfo.GetShape() != outInfo.GetShape())
         {
             // Inserts equivalent reshape before base layer.
             const std::string name = std::string("merged-") + base.GetName() + std::string("-with-") + child.GetName();
             const ReshapeDescriptor descriptor{outInfo.GetShape()};
             auto& newReshape = *graph.InsertNewLayer<ReshapeLayer>(base.GetInputSlot(0), descriptor, name.c_str());
+
             // Sets tensor info for new layer.
             newReshape.GetOutputHandler().SetTensorInfo(outInfo);
             // Reconnects base with original parent.

@@ -25,6 +25,8 @@ arm_compute::DataType GetArmComputeDataType(armnn::DataType dataType)
             return arm_compute::DataType::QASYMM8;
         case armnn::DataType::QuantisedSymm16:
             return arm_compute::DataType::QSYMM16;
+        case armnn::DataType::QuantisedSymm8:
+            return arm_compute::DataType::QSYMM8;
         case armnn::DataType::Signed32:
             return arm_compute::DataType::S32;
         case armnn::DataType::Boolean:

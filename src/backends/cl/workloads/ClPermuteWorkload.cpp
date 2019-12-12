@@ -23,7 +23,7 @@ arm_compute::Status ClPermuteWorkloadValidate(const TensorInfo& input,
     const armnn::PermutationVector& mappings = descriptor.m_DimMappings;
 
     return arm_compute::CLPermute::validate(&aclInputInfo, &aclOutputInfo,
-                                      armcomputetensorutils::BuildArmComputePermutationVector(mappings));
+                                            armcomputetensorutils::BuildArmComputePermutationVector(mappings));
 }
 
 ClPermuteWorkload::ClPermuteWorkload(const PermuteQueueDescriptor& descriptor,

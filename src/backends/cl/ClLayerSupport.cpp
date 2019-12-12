@@ -46,6 +46,7 @@
 #include "workloads/ClPermuteWorkload.hpp"
 #include "workloads/ClPooling2dWorkload.hpp"
 #include "workloads/ClPreluWorkload.hpp"
+#include "workloads/ClReshapeWorkload.hpp"
 #include "workloads/ClResizeWorkload.hpp"
 #include "workloads/ClRsqrtWorkload.hpp"
 #include "workloads/ClQuantizedLstmWorkload.hpp"
@@ -670,13 +671,12 @@ bool ClLayerSupport::IsQuantizeSupported(const TensorInfo& input,
 }
 
 bool ClLayerSupport::IsReshapeSupported(const TensorInfo& input,
+                                        const TensorInfo& output,
                                         const ReshapeDescriptor& descriptor,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(input);
     ignore_unused(descriptor);
-    ignore_unused(reasonIfUnsupported);
-    return true;
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClReshapeWorkloadValidate, reasonIfUnsupported, input, output);
 }
 
 bool ClLayerSupport::IsResizeSupported(const TensorInfo& input,

@@ -11,7 +11,7 @@
 namespace armnn
 {
 
-using ParameterStringifyFunction = std::function<void(const std::string & name, const std::string & value)>;
+using ParameterStringifyFunction = std::function<void(const std::string& name, const std::string& value)>;
 
 ///
 /// StringifyLayerParameters allows serializing layer parameters to string.
@@ -22,57 +22,142 @@ using ParameterStringifyFunction = std::function<void(const std::string & name, 
 template <typename LayerParameter>
 struct StringifyLayerParameters
 {
-    static void Serialize(ParameterStringifyFunction &, const LayerParameter &) {}
+    static void Serialize(ParameterStringifyFunction&, const LayerParameter&) {}
 };
 
 template <> struct StringifyLayerParameters<PermuteDescriptor>
 {
-    static void Serialize(ParameterStringifyFunction & fn, const PermuteDescriptor & desc);
+    static void Serialize(ParameterStringifyFunction& fn, const PermuteDescriptor& desc);
 };
 
 template <> struct StringifyLayerParameters<ReshapeDescriptor>
 {
-    static void Serialize(ParameterStringifyFunction & fn, const ReshapeDescriptor & desc);
+    static void Serialize(ParameterStringifyFunction& fn, const ReshapeDescriptor& desc);
 };
 
 template <> struct StringifyLayerParameters<ActivationDescriptor>
 {
-    static void Serialize(ParameterStringifyFunction & fn, const ActivationDescriptor & desc);
+    static void Serialize(ParameterStringifyFunction& fn, const ActivationDescriptor& desc);
 };
 
 template <> struct StringifyLayerParameters<Convolution2dDescriptor>
 {
-    static void Serialize(ParameterStringifyFunction & fn, const Convolution2dDescriptor & desc);
+    static void Serialize(ParameterStringifyFunction& fn, const Convolution2dDescriptor& desc);
 };
 
 template <> struct StringifyLayerParameters<BatchNormalizationDescriptor>
 {
-    static void Serialize(ParameterStringifyFunction & fn, const BatchNormalizationDescriptor & desc);
+    static void Serialize(ParameterStringifyFunction& fn, const BatchNormalizationDescriptor& desc);
 };
 
 template <> struct StringifyLayerParameters<DepthwiseConvolution2dDescriptor>
 {
-    static void Serialize(ParameterStringifyFunction & fn, const DepthwiseConvolution2dDescriptor & desc);
+    static void Serialize(ParameterStringifyFunction& fn, const DepthwiseConvolution2dDescriptor& desc);
 };
 
 template <> struct StringifyLayerParameters<Pooling2dDescriptor>
 {
-    static void Serialize(ParameterStringifyFunction & fn, const Pooling2dDescriptor & desc);
+    static void Serialize(ParameterStringifyFunction& fn, const Pooling2dDescriptor& desc);
 };
 
 template <> struct StringifyLayerParameters<SoftmaxDescriptor>
 {
-    static void Serialize(ParameterStringifyFunction & fn, const SoftmaxDescriptor & desc);
+    static void Serialize(ParameterStringifyFunction& fn, const SoftmaxDescriptor& desc);
 };
 
 template <> struct StringifyLayerParameters<FullyConnectedDescriptor>
 {
-    static void Serialize(ParameterStringifyFunction & fn, const FullyConnectedDescriptor & desc);
+    static void Serialize(ParameterStringifyFunction& fn, const FullyConnectedDescriptor& desc);
 };
 
 template <> struct StringifyLayerParameters<OriginsDescriptor>
 {
-    static void Serialize(ParameterStringifyFunction & fn, const OriginsDescriptor & desc);
+    static void Serialize(ParameterStringifyFunction& fn, const OriginsDescriptor& desc);
 };
 
-}
+template <> struct StringifyLayerParameters<ViewsDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const ViewsDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<DetectionPostProcessDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const DetectionPostProcessDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<NormalizationDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const NormalizationDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<L2NormalizationDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const L2NormalizationDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<BatchToSpaceNdDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const BatchToSpaceNdDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<FakeQuantizationDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const FakeQuantizationDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<ResizeBilinearDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const ResizeBilinearDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<ResizeDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const ResizeDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<SpaceToBatchNdDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const SpaceToBatchNdDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<SpaceToDepthDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const SpaceToDepthDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<LstmDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const LstmDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<MeanDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const MeanDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<PadDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const PadDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<StackDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const StackDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<StridedSliceDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const StridedSliceDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<PreCompiledDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const PreCompiledDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<TransposeConvolution2dDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const TransposeConvolution2dDescriptor& desc);
+};
+
+} // namespace armnn

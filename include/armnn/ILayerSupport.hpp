@@ -242,6 +242,7 @@ public:
                                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
     virtual bool IsReshapeSupported(const TensorInfo& input,
+                                    const TensorInfo& output,
                                     const ReshapeDescriptor& descriptor,
                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 

@@ -16,7 +16,9 @@
 namespace armnn
 {
 
-arm_compute::Status ClPermuteWorkloadValidate(const PermuteDescriptor& descriptor);
+arm_compute::Status ClPermuteWorkloadValidate(const TensorInfo& input,
+                                              const TensorInfo& output,
+                                              const PermuteDescriptor& descriptor);
 
 class ClPermuteWorkload : public BaseWorkload<PermuteQueueDescriptor>
 {

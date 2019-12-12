@@ -40,6 +40,7 @@
 #include "workloads/NeonPreluWorkload.hpp"
 #include "workloads/NeonQuantizeWorkload.hpp"
 #include "workloads/NeonQuantizedLstmWorkload.hpp"
+#include "workloads/NeonReshapeWorkload.hpp"
 #include "workloads/NeonResizeWorkload.hpp"
 #include "workloads/NeonSoftmaxBaseWorkload.hpp"
 #include "workloads/NeonSpaceToDepthWorkload.hpp"
@@ -499,14 +500,15 @@ bool NeonLayerSupport::IsQuantizedLstmSupported(const TensorInfo& input,
 }
 
 bool NeonLayerSupport::IsReshapeSupported(const TensorInfo& input,
+                                          const TensorInfo& output,
                                           const ReshapeDescriptor& descriptor,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
     ignore_unused(descriptor);
-    return IsSupportedForDataTypeNeon(reasonIfUnsupported,
-                                      input.GetDataType(),
-                                      &TrueFunc<>,
-                                      &TrueFunc<>);
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonReshapeWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output);
 }
 
 bool NeonLayerSupport::IsResizeSupported(const TensorInfo& input,

@@ -1228,9 +1228,11 @@ bool RefLayerSupport::IsQuantizeSupported(const TensorInfo& input,
 }
 
 bool RefLayerSupport::IsReshapeSupported(const TensorInfo& input,
+                                         const TensorInfo& output,
                                          const ReshapeDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
+    ignore_unused(output);
     ignore_unused(descriptor);
     // Define supported output types.
     std::array<DataType,4> supportedOutputTypes =

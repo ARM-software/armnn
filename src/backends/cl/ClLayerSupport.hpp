@@ -184,6 +184,7 @@ public:
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsReshapeSupported(const TensorInfo& input,
+                            const TensorInfo& output,
                             const ReshapeDescriptor& descriptor,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 

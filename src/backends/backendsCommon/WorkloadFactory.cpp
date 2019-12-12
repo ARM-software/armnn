@@ -712,7 +712,9 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         {
             auto cLayer = boost::polymorphic_downcast<const ReshapeLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject->IsReshapeSupported(OverrideDataType(input, dataType),
+                                                            OverrideDataType(output, dataType),
                                                             cLayer->GetParameters(),
                                                             reason);
             break;

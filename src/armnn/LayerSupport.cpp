@@ -510,11 +510,12 @@ bool IsPreluSupported(const BackendId& backend,
 
 bool IsReshapeSupported(const BackendId& backend,
                         const TensorInfo& input,
+                        const TensorInfo& output,
                         const ReshapeDescriptor& descriptor,
                         char* reasonIfUnsupported,
                         size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsReshapeSupported, input, descriptor);
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsReshapeSupported, input, output, descriptor);
 }
 
 bool IsResizeSupported(const BackendId& backend,

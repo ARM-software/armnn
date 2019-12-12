@@ -14,16 +14,16 @@
 namespace armnn
 {
 
-arm_compute::Status ClPermuteWorkloadValidate(const PermuteDescriptor& descriptor)
+arm_compute::Status ClPermuteWorkloadValidate(const TensorInfo& input,
+                                              const TensorInfo& output,
+                                              const PermuteDescriptor& descriptor)
 {
-    const armnn::PermutationVector& perm = descriptor.m_DimMappings;
+    const arm_compute::TensorInfo aclInputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(input);
+    const arm_compute::TensorInfo aclOutputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(output);
+    const armnn::PermutationVector& mappings = descriptor.m_DimMappings;
 
-    ARM_COMPUTE_RETURN_ERROR_ON_MSG(!perm.IsEqual({ 0U, 3U, 1U, 2U })
-                                    && !perm.IsEqual({ 0U, 2U, 3U, 1U })
-                                    && !perm.IsEqual({ 3U, 2U, 0U, 1U }),
-    "Only [0, 3, 1, 2], [0, 2, 3, 1] and [3, 2, 0, 1] permutations are supported");
-
-    return arm_compute::Status{};
+    return arm_compute::CLPermute::validate(&aclInputInfo, &aclOutputInfo,
+                                            armcomputetensorutils::BuildArmComputePermutationVector(mappings));
 }
 
 ClPermuteWorkload::ClPermuteWorkload(const PermuteQueueDescriptor& descriptor,

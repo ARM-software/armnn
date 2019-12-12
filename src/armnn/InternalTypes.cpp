@@ -40,6 +40,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Maximum: return "Maximum";
         case LayerType::Mean: return "Mean";
         case LayerType::MemCopy: return "MemCopy";
+        case LayerType::MemImport: return "MemImport";
         case LayerType::Merge: return "Merge";
         case LayerType::Minimum: return "Minimum";
         case LayerType::Multiplication: return "Multiplication";
@@ -50,12 +51,14 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Pooling2d: return "Pooling2d";
         case LayerType::PreCompiled: return "PreCompiled";
         case LayerType::Prelu: return "Prelu";
+        case LayerType::Quantize: return "Quantize";
         case LayerType::QuantizedLstm: return "QuantizedLstm";
         case LayerType::Reshape: return "Reshape";
-        case LayerType::Rsqrt: return "Rsqrt";
         case LayerType::Resize: return "Resize";
+        case LayerType::Rsqrt: return "Rsqrt";
         case LayerType::Softmax: return "Softmax";
         case LayerType::SpaceToBatchNd: return "SpaceToBatchNd";
+        case LayerType::SpaceToDepth: return "SpaceToDepth";
         case LayerType::Splitter: return "Splitter";
         case LayerType::Stack: return "Stack";
         case LayerType::StridedSlice: return "StridedSlice";

@@ -105,7 +105,7 @@ with previous Arm NN versions.
 
 ## The IBackendInternal interface
 
-All backends need to implement the [IBackendInternal](backendsCommon/IBackendInternal.hpp) interface.
+All backends need to implement the [IBackendInternal](../../include/armnn/backends/IBackendInternal.hpp) interface.
 The interface functions to be implemented are:
 
 ```c++
@@ -152,7 +152,7 @@ it sees fit and it keeps these objects for a short period of time. Examples:
 
 As mentioned above, all backends need to be registered through the BackendRegistry so Arm NN knows
 about them. Registration requires a unique backend ID string and a lambda function that
-returns a unique pointer to the [IBackendInternal interface](backendsCommon/IBackendInternal.hpp).
+returns a unique pointer to the [IBackendInternal interface](../../include/armnn/backends/IBackendInternal.hpp).
 
 For registering a backend only this lambda function needs to exist, not the actual backend. This
 allows dynamically creating the backend objects when they are needed.
@@ -215,7 +215,7 @@ is still in place for backward compatibility, but it's now considered deprecated
 ## The IBackendContext interface
 
 Backends may need to be notified whenever a network is loaded or unloaded. To support that, one can implement the optional
-[IBackendContext](backendsCommon/IBackendContext.hpp) interface. The framework calls the ```CreateBackendContext(...)```
+[IBackendContext](../../include/armnn/backends/IBackendContext.hpp) interface. The framework calls the ```CreateBackendContext(...)```
 method for each backend in the Runtime. If the backend returns a valid unique pointer to a backend context, then the
 runtime will hold this for its entire lifetime. It then calls the following interface functions for each stored context:
 

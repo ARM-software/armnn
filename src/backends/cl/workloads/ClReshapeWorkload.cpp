@@ -12,6 +12,15 @@
 namespace armnn
 {
 
+arm_compute::Status ClReshapeWorkloadValidate(const TensorInfo& input,
+                                              const TensorInfo& output)
+{
+    const arm_compute::TensorInfo aclInputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(input);
+    const arm_compute::TensorInfo aclOutputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(output);
+
+    return arm_compute::CLReshapeLayer::validate(&aclInputInfo, &aclOutputInfo);
+}
+
 ClReshapeWorkload::ClReshapeWorkload(const ReshapeQueueDescriptor& descriptor, const WorkloadInfo& info)
     : BaseWorkload<ReshapeQueueDescriptor>(descriptor, info)
 {

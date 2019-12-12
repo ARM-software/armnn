@@ -12,6 +12,9 @@
 namespace armnn
 {
 
+arm_compute::Status ClReshapeWorkloadValidate(const TensorInfo& input,
+                                              const TensorInfo& output);
+
 class ClReshapeWorkload : public BaseWorkload<ReshapeQueueDescriptor>
 {
 public:

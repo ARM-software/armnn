@@ -6,11 +6,18 @@
 list(APPEND armnnBackendsCommon_sources
     CpuTensorHandle.cpp
     CpuTensorHandle.hpp
+    CpuTensorHandleFwd.hpp
     DynamicBackend.cpp
+    DynamicBackend.hpp
     DynamicBackendUtils.cpp
     DynamicBackendUtils.hpp
+    IBackendContext.hpp
     IBackendInternal.cpp
+    IBackendInternal.hpp
+    IMemoryManager.hpp
+    ITensorHandle.hpp
     ITensorHandleFactory.cpp
+    ITensorHandleFactory.hpp
     LayerSupportBase.cpp
     LayerSupportBase.hpp
     LayerSupportRules.hpp
@@ -22,6 +29,7 @@ list(APPEND armnnBackendsCommon_sources
     MemSyncWorkload.cpp
     MemSyncWorkload.hpp
     OptimizationViews.cpp
+    OptimizationViews.hpp
     TensorHandleFactoryRegistry.cpp
     TensorHandleFactoryRegistry.hpp
     WorkloadDataCollector.hpp

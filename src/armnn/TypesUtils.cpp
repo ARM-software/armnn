@@ -7,6 +7,26 @@
 #include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
+namespace
+{
+/// Workaround for std:isnan() not being implemented correctly for integral types in MSVC.
+/// https://stackoverflow.com/a/56356405
+/// @{
+template <typename T, typename std::enable_if<std::is_integral<T>::value, T>::type* = nullptr>
+inline int IsNan(T x)
+{
+    // The spec defines integral types to be handled as if they were casted to doubles.
+    return std::isnan(static_cast<double>(x));
+}
+
+template <typename T, typename std::enable_if<!std::is_integral<T>::value, T>::type * = nullptr>
+inline int IsNan(T x)
+{
+    return std::isnan(x);
+}
+/// @}
+}    // namespace std
+
 template<typename QuantizedType>
 QuantizedType armnn::Quantize(float value, float scale, int32_t offset)
 {
@@ -28,7 +48,7 @@ float armnn::Dequantize(QuantizedType value, float scale, int32_t offset)
 {
     static_assert(IsQuantizedType<QuantizedType>(), "Not an integer type.");
     BOOST_ASSERT(scale != 0.f);
-    BOOST_ASSERT(!std::isnan(value));
+    BOOST_ASSERT(!IsNan(value));
     float dequantized = boost::numeric_cast<float>(value - offset) * scale;
     return dequantized;
 }

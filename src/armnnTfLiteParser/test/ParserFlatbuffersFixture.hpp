@@ -128,20 +128,18 @@ struct ParserFlatbuffersFixture
     /// Executes the network with the given input tensor and checks the result against the given output tensor.
     /// This assumes the network has a single input and a single output.
     template <std::size_t NumOutputDimensions,
-              armnn::DataType ArmnnType,
-              typename DataType = armnn::ResolveType<ArmnnType>>
+              armnn::DataType ArmnnType>
     void RunTest(size_t subgraphId,
-                 const std::vector<DataType>& inputData,
-                 const std::vector<DataType>& expectedOutputData);
+                 const std::vector<armnn::ResolveType<ArmnnType>>& inputData,
+                 const std::vector<armnn::ResolveType<ArmnnType>>& expectedOutputData);
 
     /// Executes the network with the given input tensors and checks the results against the given output tensors.
     /// This overload supports multiple inputs and multiple outputs, identified by name.
     template <std::size_t NumOutputDimensions,
-              armnn::DataType ArmnnType,
-              typename DataType = armnn::ResolveType<ArmnnType>>
+              armnn::DataType ArmnnType>
     void RunTest(size_t subgraphId,
-                 const std::map<std::string, std::vector<DataType>>& inputData,
-                 const std::map<std::string, std::vector<DataType>>& expectedOutputData);
+                 const std::map<std::string, std::vector<armnn::ResolveType<ArmnnType>>>& inputData,
+                 const std::map<std::string, std::vector<armnn::ResolveType<ArmnnType>>>& expectedOutputData);
 
     /// Multiple Inputs, Multiple Outputs w/ Variable Datatypes and different dimension sizes.
     /// Executes the network with the given input tensors and checks the results against the given output tensors.
@@ -149,12 +147,10 @@ struct ParserFlatbuffersFixture
     /// the input datatype to be different to the output
     template <std::size_t NumOutputDimensions,
               armnn::DataType ArmnnType1,
-              armnn::DataType ArmnnType2,
-              typename DataType1 = armnn::ResolveType<ArmnnType1>,
-              typename DataType2 = armnn::ResolveType<ArmnnType2>>
+              armnn::DataType ArmnnType2>
     void RunTest(size_t subgraphId,
-                 const std::map<std::string, std::vector<DataType1>>& inputData,
-                 const std::map<std::string, std::vector<DataType2>>& expectedOutputData);
+                 const std::map<std::string, std::vector<armnn::ResolveType<ArmnnType1>>>& inputData,
+                 const std::map<std::string, std::vector<armnn::ResolveType<ArmnnType2>>>& expectedOutputData);
 
 
     /// Multiple Inputs, Multiple Outputs w/ Variable Datatypes and different dimension sizes.
@@ -162,12 +158,10 @@ struct ParserFlatbuffersFixture
     /// This overload supports multiple inputs and multiple outputs, identified by name along with the allowance for
     /// the input datatype to be different to the output
     template<armnn::DataType ArmnnType1,
-             armnn::DataType ArmnnType2,
-             typename DataType1 = armnn::ResolveType<ArmnnType1>,
-             typename DataType2 = armnn::ResolveType<ArmnnType2>>
+             armnn::DataType ArmnnType2>
     void RunTest(std::size_t subgraphId,
-                 const std::map<std::string, std::vector<DataType1>>& inputData,
-                 const std::map<std::string, std::vector<DataType2>>& expectedOutputData);
+                 const std::map<std::string, std::vector<armnn::ResolveType<ArmnnType1>>>& inputData,
+                 const std::map<std::string, std::vector<armnn::ResolveType<ArmnnType2>>>& expectedOutputData);
 
     static inline std::string GenerateDetectionPostProcessJsonString(
         const armnn::DetectionPostProcessDescriptor& descriptor)
@@ -224,11 +218,10 @@ struct ParserFlatbuffersFixture
 /// Executes the network with the given input tensor and checks the result against the given output tensor.
 /// This overload assumes the network has a single input and a single output.
 template <std::size_t NumOutputDimensions,
-          armnn::DataType armnnType,
-          typename DataType>
+          armnn::DataType armnnType>
 void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
-                                       const std::vector<DataType>& inputData,
-                                       const std::vector<DataType>& expectedOutputData)
+                                       const std::vector<armnn::ResolveType<armnnType>>& inputData,
+                                       const std::vector<armnn::ResolveType<armnnType>>& expectedOutputData)
 {
     RunTest<NumOutputDimensions, armnnType>(subgraphId,
                                             { { m_SingleInputName, inputData } },
@@ -239,11 +232,10 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
 /// Executes the network with the given input tensors and checks the results against the given output tensors.
 /// This overload supports multiple inputs and multiple outputs, identified by name.
 template <std::size_t NumOutputDimensions,
-          armnn::DataType armnnType,
-          typename DataType>
+          armnn::DataType armnnType>
 void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
-                                       const std::map<std::string, std::vector<DataType>>& inputData,
-                                       const std::map<std::string, std::vector<DataType>>& expectedOutputData)
+    const std::map<std::string, std::vector<armnn::ResolveType<armnnType>>>& inputData,
+    const std::map<std::string, std::vector<armnn::ResolveType<armnnType>>>& expectedOutputData)
 {
     RunTest<NumOutputDimensions, armnnType, armnnType>(subgraphId, inputData, expectedOutputData);
 }
@@ -254,13 +246,13 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
 /// the input datatype to be different to the output
 template <std::size_t NumOutputDimensions,
           armnn::DataType armnnType1,
-          armnn::DataType armnnType2,
-          typename DataType1,
-          typename DataType2>
+          armnn::DataType armnnType2>
 void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
-                                       const std::map<std::string, std::vector<DataType1>>& inputData,
-                                       const std::map<std::string, std::vector<DataType2>>& expectedOutputData)
+    const std::map<std::string, std::vector<armnn::ResolveType<armnnType1>>>& inputData,
+    const std::map<std::string, std::vector<armnn::ResolveType<armnnType2>>>& expectedOutputData)
 {
+    using DataType2 = armnn::ResolveType<armnnType2>;
+
     // Setup the armnn input tensors from the given vectors.
     armnn::InputTensors inputTensors;
     for (auto&& it : inputData)
@@ -308,13 +300,13 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
 /// This overload supports multiple inputs and multiple outputs, identified by name along with the allowance for
 /// the input datatype to be different to the output.
 template <armnn::DataType armnnType1,
-          armnn::DataType armnnType2,
-          typename DataType1,
-          typename DataType2>
+          armnn::DataType armnnType2>
 void ParserFlatbuffersFixture::RunTest(std::size_t subgraphId,
-                                       const std::map<std::string, std::vector<DataType1>>& inputData,
-                                       const std::map<std::string, std::vector<DataType2>>& expectedOutputData)
+    const std::map<std::string, std::vector<armnn::ResolveType<armnnType1>>>& inputData,
+    const std::map<std::string, std::vector<armnn::ResolveType<armnnType2>>>& expectedOutputData)
 {
+    using DataType2 = armnn::ResolveType<armnnType2>;
+
     // Setup the armnn input tensors from the given vectors.
     armnn::InputTensors inputTensors;
     for (auto&& it : inputData)
@@ -345,7 +337,7 @@ void ParserFlatbuffersFixture::RunTest(std::size_t subgraphId,
     // Checks the results.
     for (auto&& it : expectedOutputData)
     {
-        std::vector<DataType2> out = outputStorage.at(it.first);
+        std::vector<armnn::ResolveType<armnnType2>> out = outputStorage.at(it.first);
         {
             for (unsigned int i = 0; i < out.size(); ++i)
             {

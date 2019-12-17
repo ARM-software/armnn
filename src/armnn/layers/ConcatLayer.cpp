@@ -68,9 +68,17 @@ void ConcatLayer::CreateTensors(const FactoryType& factory)
 
                 auto CreateSubTensor = [&]()
                 {
-                    // Make sure quantization parameters are in the same space
-                    if (parentInfo.IsTypeSpaceMatch(info) &&
-                        factoryId == slot->GetTensorHandleFactoryId())
+                    // Make sure:
+                    // 1) quantization parameters are in the same space
+                    // 2) the same TensorHandleFactory is used for input and Concat layer output
+                    // 3) the input does not come from a Constant layer or input layer
+                    // 4) the input is only read by this concat layer
+                    if (slot &&
+                        parentInfo.IsTypeSpaceMatch(info) && //(1)
+                        factoryId == slot->GetTensorHandleFactoryId() && //(2)
+                        slot->GetOwningLayer().GetType() != LayerType::Constant && //(3)
+                        slot->GetOwningLayer().GetType() != LayerType::Input && //(3)
+                        slot->GetNumConnections() == 1) //(4)
                     {
                         return factory.CreateSubTensorHandle(*parentTensor,
                                                              info.GetShape(),
@@ -93,7 +101,7 @@ void ConcatLayer::CreateTensors(const FactoryType& factory)
             // Ensure that ALL inputs can be substituted with valid sub-tensors
             if (subTensors.size() < numInputSlots)
             {
-                continue; // Don't optimize this Merge layer with sub-tensors
+                continue; // Don't optimize this Concat layer with sub-tensors
             }
 
             // Substitute input tensors with sub-tensors by replacing the output tensors on the connected layers.

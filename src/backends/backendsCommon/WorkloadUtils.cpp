@@ -86,17 +86,12 @@ ConstTensor ReorderWeightChannelsForAcl(const ConstTensor& weightHandle, DataLay
     unsigned int destinationWeightsChannel;
     unsigned int totalChannels = inputChannels * multiplier;
     unsigned int channelSize   = height * width;
+    unsigned int inputChannel  = 0;
 
     for (unsigned int originWeightsChannel = 0; originWeightsChannel < totalChannels; originWeightsChannel++)
     {
-        if (originWeightsChannel % inputChannels == 0)
-        {
-            destinationWeightsChannel = originWeightsChannel / inputChannels;
-        }
-        else
-        {
-            destinationWeightsChannel = (originWeightsChannel - 1) / inputChannels + multiplier;
-        }
+        inputChannel = originWeightsChannel % inputChannels;
+        destinationWeightsChannel = (originWeightsChannel - inputChannel) / inputChannels + multiplier * inputChannel;
 
         for (unsigned int i = 0; i < channelSize; i++)
         {

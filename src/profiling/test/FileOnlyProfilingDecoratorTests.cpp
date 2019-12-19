@@ -23,6 +23,16 @@ using namespace armnn;
 
 using namespace std::chrono_literals;
 
+class FileOnlyHelperService : public ProfilingService
+{
+    public:
+    // Wait for a notification from the send thread
+    bool WaitForPacketsSent(uint32_t timeout = 1000)
+    {
+        return ProfilingService::WaitForPacketSent(ProfilingService::Instance(), timeout);
+    }
+};
+
 BOOST_AUTO_TEST_SUITE(FileOnlyProfilingDecoratorTests)
 
 BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
@@ -38,6 +48,8 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
     options.m_OutgoingCaptureFile = tempPath.string();
     options.m_CapturePeriod       = 100;
 
+    FileOnlyHelperService helper;
+
     // Enable the profiling service
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -45,35 +57,24 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
     profilingService.Update();
     profilingService.Update();
 
-    uint32_t timeout = 1000; // Wait for a maximum of 1000mSec
-    uint32_t sleepTime = 2;  // in 2mSec intervals.
-    uint32_t timeSlept = 0;
 
-    // Give the profiling service sending thread time start executing and send the stream metadata.
-    while (profilingService.GetCurrentState() != ProfilingState::WaitingForAck)
-    {
-        if (timeSlept >= timeout)
-        {
-            BOOST_FAIL("Timeout: Profiling service did not switch to WaitingForAck state");
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
-        timeSlept += sleepTime;
-    }
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
 
     profilingService.Update();
-
-    timeSlept = 0;
-
-    while (profilingService.GetCurrentState() != profiling::ProfilingState::Active)
+    // First packet sent will be the SendStreamMetaDataPacket, it's possible though unlikely that it will be sent twice
+    // The second or possibly third packet will be the CounterDirectoryPacket which means the
+    // ConnectionAcknowledgedCommandHandler has set the state to active
+    uint32_t packetCount = 0;
+    while(profilingService.GetCurrentState() != ProfilingState::Active && packetCount < 3)
     {
-        if (timeSlept >= timeout)
+        if(!helper.WaitForPacketsSent())
         {
-            BOOST_FAIL("Timeout: Profiling service did not switch to Active state");
+            BOOST_FAIL("Timeout waiting for packets");
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
-        timeSlept += sleepTime;
+        packetCount++;
     }
 
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
     // Minimum test here is to check that the file was created.
     BOOST_CHECK(boost::filesystem::exists(tempPath.c_str()) == true);
 
@@ -86,13 +87,11 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
     // period should be enough to have some data in the file.
 
     // Wait for 1 collection period plus a bit of overhead..
-    std::this_thread::sleep_for(std::chrono::milliseconds(150));
+    helper.WaitForPacketsSent();
 
     // In order to flush the files we need to gracefully close the profiling service.
     options.m_EnableProfiling = false;
     profilingService.ResetExternalProfilingOptions(options, true);
-    // Wait a short time to allow the threads to clean themselves up.
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     // The output file size should be greater than 0.
     struct stat statusBuffer;

@@ -206,7 +206,7 @@ protected:
     {
         instance.m_StateMachine.TransitionToState(newState);
     }
-    void WaitForPacketSent(ProfilingService& instance, uint32_t timeout = 1000)
+    bool WaitForPacketSent(ProfilingService& instance, uint32_t timeout = 1000)
     {
         return instance.m_SendCounterPacket.WaitForPacketSent(timeout);
     }

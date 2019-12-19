@@ -936,6 +936,8 @@ void SendCounterPacket::Start(IProfilingConnection& profilingConnection)
     // no need for a mutex as the send thread can not be running at this point
     m_ReadyToRead = false;
 
+    m_PacketSent = false;
+
     // Start the send thread
     m_SendThread = std::thread(&SendCounterPacket::Send, this, std::ref(profilingConnection));
 }
@@ -1016,15 +1018,20 @@ void SendCounterPacket::Send(IProfilingConnection& profilingConnection)
             {
                 std::unique_lock<std::mutex> lock(m_WaitMutex);
 
-                m_WaitCondition.wait_for(lock, std::chrono::milliseconds(m_Timeout), [&]{ return m_ReadyToRead; });
-
+                bool timeout = m_WaitCondition.wait_for(lock,
+                                                        std::chrono::milliseconds(m_Timeout),
+                                                        [&]{ return m_ReadyToRead; });
+                // If we get notified we need to flush the buffer again
+                if(timeout)
+                {
+                    // Otherwise if we just timed out don't flush the buffer
+                    continue;
+                }
                 //reset condition variable predicate for next use
                 m_ReadyToRead = false;
             }
             // Wait condition lock scope - End
-
-            // Do not flush the buffer again
-            continue;
+            break;
         case ProfilingState::Active:
         default:
             // Wait condition lock scope - Begin
@@ -1103,13 +1110,30 @@ void SendCounterPacket::FlushBuffer(IProfilingConnection& profilingConnection, b
         // Get the next available readable buffer
         packetBuffer = m_BufferManager.GetReadableBuffer();
     }
-
     // Check whether at least a packet has been sent
     if (packetsSent && notifyWatchers)
     {
+        // Wait for the parent thread to release its mutex if necessary
+        {
+            std::lock_guard<std::mutex> lck(m_PacketSentWaitMutex);
+            m_PacketSent = true;
+        }
         // Notify to any watcher that something has been sent
         m_PacketSentWaitCondition.notify_one();
     }
+}
+
+bool SendCounterPacket::WaitForPacketSent(uint32_t timeout = 1000)
+{
+    std::unique_lock<std::mutex> lock(m_PacketSentWaitMutex);
+    // Blocks until notified that at least a packet has been sent or until timeout expires.
+    bool timedOut = m_PacketSentWaitCondition.wait_for(lock,
+                                                       std::chrono::milliseconds(timeout),
+                                                       [&] { return m_PacketSent; });
+
+    m_PacketSent = false;
+
+    return timedOut;
 }
 
 } // namespace profiling

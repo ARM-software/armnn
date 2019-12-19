@@ -166,13 +166,16 @@ bool FileOnlyProfilingConnection::WritePacket(const unsigned char* buffer, uint3
 Packet FileOnlyProfilingConnection::ReadPacket(uint32_t timeout)
 {
     std::unique_lock<std::mutex> lck(m_PacketAvailableMutex);
-    if (m_PacketQueue.empty())
+
+    // Here we are using m_PacketQueue.empty() as a predicate variable
+    // The conditional variable will wait until packetQueue is not empty or until a timeout
+    if(!m_ConditionPacketAvailable.wait_for(lck,
+                                            std::chrono::milliseconds(timeout),
+                                            [&]{return !m_PacketQueue.empty();}))
     {
-        if(m_ConditionPacketAvailable.wait_for(lck, std::chrono::milliseconds(timeout)) == std::cv_status::timeout)
-        {
-            throw armnn::TimeoutException("Thread has timed out as per requested time limit");
-        }
+        throw armnn::TimeoutException("Thread has timed out as per requested time limit");
     }
+
     Packet returnedPacket = std::move(m_PacketQueue.front());
     m_PacketQueue.pop();
     return returnedPacket;

@@ -32,6 +32,19 @@ public:
         , m_Packet()
     {}
 
+    enum class PacketType
+    {
+        StreamMetaData,
+        ConnectionAcknowledge,
+        CounterDirectory,
+        ReqCounterDirectory,
+        PeriodicCounterSelection,
+        PerJobCounterSelection,
+        TimelineMessageDirectory,
+        PeriodicCounterCapture,
+        Unknown
+    };
+
     bool IsOpen() const override
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
@@ -53,11 +66,49 @@ public:
             return false;
         }
 
+        uint32_t header = ReadUint32(buffer, 0);
+
+        uint32_t packetFamily = (header >> 26);
+        uint32_t packetId = ((header >> 16) & 1023);
+
+        PacketType packetType;
+
+        switch (packetFamily)
+        {
+            case 0:
+                packetType = packetId < 6 ? PacketType(packetId) : PacketType::Unknown;
+                break;
+            case 1:
+                packetType = packetId == 0 ? PacketType::TimelineMessageDirectory : PacketType::Unknown;
+                break;
+            case 3:
+                packetType = packetId == 0 ? PacketType::PeriodicCounterCapture : PacketType::Unknown;
+                break;
+            default:
+                packetType = PacketType::Unknown;
+        }
+
         std::lock_guard<std::mutex> lock(m_Mutex);
 
-        m_WrittenData.push_back(length);
+        m_WrittenData.push_back({ packetType, length });
         return true;
     }
+
+    long CheckForPacket(const std::pair<PacketType, uint32_t> packetInfo)
+    {
+        std::lock_guard<std::mutex> lock(m_Mutex);
+
+        if(packetInfo.second != 0)
+        {
+            return std::count(m_WrittenData.begin(), m_WrittenData.end(), packetInfo);
+        }
+        else
+        {
+            return std::count_if(m_WrittenData.begin(), m_WrittenData.end(),
+            [&packetInfo](const std::pair<PacketType, uint32_t> pair) { return packetInfo.first == pair.first; });
+        }
+    }
+
     bool WritePacket(Packet&& packet)
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
@@ -76,19 +127,11 @@ public:
         return std::move(m_Packet);
     }
 
-    std::vector<uint32_t> GetWrittenData()
+    unsigned long GetWrittenDataSize()
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
 
-        std::vector<uint32_t> writtenData = m_WrittenData;
-        m_WrittenData.clear();
-        return writtenData;
-    }
-
-    bool HasWrittenData() const
-    {
-        std::lock_guard<std::mutex> lock(m_Mutex);
-        return !m_WrittenData.empty();
+        return m_WrittenData.size();
     }
 
     void Clear()
@@ -100,7 +143,7 @@ public:
 
 private:
     bool m_IsOpen;
-    std::vector<uint32_t> m_WrittenData;
+    std::vector<std::pair<PacketType, uint32_t>> m_WrittenData;
     Packet m_Packet;
     mutable std::mutex m_Mutex;
 };

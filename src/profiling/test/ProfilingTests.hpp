@@ -153,6 +153,25 @@ private:
     std::atomic<int> m_ReadRequests;
 };
 
+class TestProfilingConnectionBadAckPacket : public TestProfilingConnectionBase
+{
+public:
+    Packet ReadPacket(uint32_t timeout) override
+    {
+        boost::ignore_unused(timeout);
+        // Connection Acknowledged Packet header (word 0, word 1 is always zero):
+        // 26:31 [6]  packet_family: Control Packet Family, value 0b000000
+        // 16:25 [10] packet_id: Packet identifier, value 0b0000000001
+        // 8:15  [8]  reserved: Reserved, value 0b00000000
+        // 0:7   [8]  reserved: Reserved, value 0b00000000
+        uint32_t packetFamily = 0;
+        uint32_t packetId     = 37;    // Wrong packet id!!!
+        uint32_t header       = ((packetFamily & 0x0000003F) << 26) | ((packetId & 0x000003FF) << 16);
+
+        return Packet(header);
+    }
+};
+
 class TestFunctorA : public CommandHandlerFunctor
 {
 public:
@@ -216,17 +235,36 @@ public:
         TransitionToState(ProfilingService::Instance(), newState);
     }
 
-    void WaitForProfilingPacketsSent(MockProfilingConnection* mockProfilingConnection, uint32_t timeout = 1000)
+    long WaitForPacketsSent(MockProfilingConnection* mockProfilingConnection,
+                            MockProfilingConnection::PacketType packetType,
+                            uint32_t length = 0,
+                            uint32_t timeout  = 1000)
     {
-        if (!mockProfilingConnection->HasWrittenData())
+        long packetCount = mockProfilingConnection->CheckForPacket({packetType, length});
+        // The first packet we receive may not be the one we are looking for, so keep looping until till we find it,
+        // or until WaitForPacketsSent times out
+        while(packetCount == 0 && timeout != 0)
         {
-            WaitForPacketSent(ProfilingService::Instance(), timeout);
-            // It's possible the wait has timed out. Check there is some data.
-            if (!mockProfilingConnection->HasWrittenData())
+            std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+            // Wait for a notification from the send thread
+            ProfilingService::WaitForPacketSent(ProfilingService::Instance(), timeout);
+
+            std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+            // We need to make sure the timeout does not reset each time we call WaitForPacketsSent
+            uint32_t elapsedTime = static_cast<uint32_t>(
+                    std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+
+            packetCount = mockProfilingConnection->CheckForPacket({packetType, length});
+
+            if (elapsedTime > timeout)
             {
-                throw RuntimeException("ProfilingTests::WaitForProfilingPacketsSent timeout waiting for packet.");
+                break;
             }
+
+            timeout -= elapsedTime;
         }
+        return packetCount;
     }
 
 private:

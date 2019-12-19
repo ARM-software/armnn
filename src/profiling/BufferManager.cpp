@@ -5,9 +5,6 @@
 
 #include "BufferManager.hpp"
 #include "PacketBuffer.hpp"
-#include "ProfilingUtils.hpp"
-
-#include <armnn/Exceptions.hpp>
 
 namespace armnn
 {
@@ -16,15 +13,10 @@ namespace profiling
 {
 
 BufferManager::BufferManager(unsigned int numberOfBuffers, unsigned int maxPacketSize)
-    : m_MaxBufferSize(maxPacketSize)
+    : m_MaxBufferSize(maxPacketSize),
+      m_NumberOfBuffers(numberOfBuffers)
 {
-    m_AvailableList.reserve(numberOfBuffers);
-    for (unsigned int i = 0; i < numberOfBuffers; ++i)
-    {
-        IPacketBufferPtr buffer = std::make_unique<PacketBuffer>(maxPacketSize);
-        m_AvailableList.emplace_back(std::move(buffer));
-    }
-    m_ReadableList.reserve(numberOfBuffers);
+    Initialize();
 }
 
 IPacketBufferPtr BufferManager::Reserve(unsigned int requestedSize, unsigned int& reservedSize)
@@ -55,7 +47,17 @@ void BufferManager::Commit(IPacketBufferPtr& packetBuffer, unsigned int size)
     readableListLock.lock();
     m_ReadableList.push_back(std::move(packetBuffer));
     readableListLock.unlock();
-    m_ReadDataAvailable.notify_one();
+}
+
+void BufferManager::Initialize()
+{
+    m_AvailableList.reserve(m_NumberOfBuffers);
+    for (unsigned int i = 0; i < m_NumberOfBuffers; ++i)
+    {
+        IPacketBufferPtr buffer = std::make_unique<PacketBuffer>(m_MaxBufferSize);
+        m_AvailableList.emplace_back(std::move(buffer));
+    }
+    m_ReadableList.reserve(m_NumberOfBuffers);
 }
 
 void BufferManager::Release(IPacketBufferPtr& packetBuffer)
@@ -65,6 +67,18 @@ void BufferManager::Release(IPacketBufferPtr& packetBuffer)
     availableListLock.lock();
     m_AvailableList.push_back(std::move(packetBuffer));
     availableListLock.unlock();
+}
+
+void BufferManager::Reset()
+{
+    //This method should only be called once all threads have been joined
+    std::lock_guard<std::mutex> readableListLock(m_ReadableMutex);
+    std::lock_guard<std::mutex> availableListLock(m_AvailableMutex);
+
+    m_AvailableList.clear();
+    m_ReadableList.clear();
+
+    Initialize();
 }
 
 IPacketBufferPtr BufferManager::GetReadableBuffer()

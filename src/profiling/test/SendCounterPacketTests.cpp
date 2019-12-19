@@ -26,7 +26,7 @@ namespace
 {
 
 // A short delay to wait for the thread to process a packet.
-uint16_t constexpr WAIT_UNTIL_READABLE_MS = 100;
+uint16_t constexpr WAIT_UNTIL_READABLE_MS = 20;
 
 void SetNotConnectedProfilingState(ProfilingStateMachine& profilingStateMachine)
 {
@@ -92,6 +92,8 @@ void SetActiveProfilingState(ProfilingStateMachine& profilingStateMachine)
 } // Anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(SendCounterPacketTests)
+
+using PacketType = MockProfilingConnection::PacketType;
 
 BOOST_AUTO_TEST_CASE(MockSendCounterPacketTest)
 {
@@ -2049,8 +2051,6 @@ BOOST_AUTO_TEST_CASE(SendThreadTest2)
 
     // To test an exact value of the "read size" in the mock buffer, wait to allow the send thread to
     // read all what's remaining in the buffer
-    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
-
     sendCounterPacket.Stop();
 
     BOOST_CHECK(mockStreamCounterBuffer.GetCommittedSize() == totalWrittenSize);
@@ -2201,7 +2201,9 @@ BOOST_AUTO_TEST_CASE(SendThreadBufferTest)
 
     sendCounterPacket.SetReadyToRead();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
+    // Join the send thread to make sure it has read the buffer
+    sendCounterPacket.Stop();
+    sendCounterPacket.Start(mockProfilingConnection);
 
     // The buffer is read by the send thread so it should not be in the readable buffer.
     auto readBuffer = bufferManager.GetReadableBuffer();
@@ -2239,7 +2241,9 @@ BOOST_AUTO_TEST_CASE(SendThreadBufferTest)
 
     sendCounterPacket.SetReadyToRead();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
+    // Join the send thread to make sure it has read the buffer
+    sendCounterPacket.Stop();
+    sendCounterPacket.Start(mockProfilingConnection);
 
     // The buffer is read by the send thread so it should not be in the readable buffer.
     readBuffer = bufferManager.GetReadableBuffer();
@@ -2280,7 +2284,9 @@ BOOST_AUTO_TEST_CASE(SendThreadBufferTest)
 
     sendCounterPacket.SetReadyToRead();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_UNTIL_READABLE_MS));
+    // Join the send thread to make sure it has read the buffer
+    sendCounterPacket.Stop();
+    sendCounterPacket.Start(mockProfilingConnection);
 
     // The buffer is read by the send thread so it should not be in the readable buffer.
     readBuffer = bufferManager.GetReadableBuffer();
@@ -2349,16 +2355,15 @@ BOOST_AUTO_TEST_CASE(SendThreadBufferTest1)
     BOOST_TEST(reservedSize == 512);
     BOOST_TEST(reservedBuffer.get());
 
-    // Check that data was actually written to the profiling connection in any order
-    const std::vector<uint32_t> writtenData = mockProfilingConnection.GetWrittenData();
-    BOOST_TEST(writtenData.size() == 3);
-    bool foundStreamMetaDataPacket =
-        std::find(writtenData.begin(), writtenData.end(), streamMetadataPacketsize) != writtenData.end();
-    bool foundCounterDirectoryPacket = std::find(writtenData.begin(), writtenData.end(), 32) != writtenData.end();
-    bool foundPeriodicCounterCapturePacket = std::find(writtenData.begin(), writtenData.end(), 28) != writtenData.end();
-    BOOST_TEST(foundStreamMetaDataPacket);
-    BOOST_TEST(foundCounterDirectoryPacket);
-    BOOST_TEST(foundPeriodicCounterCapturePacket);
+    const auto writtenDataSize = mockProfilingConnection.GetWrittenDataSize();
+    const auto metaDataPacketCount =
+            mockProfilingConnection.CheckForPacket({PacketType::StreamMetaData, streamMetadataPacketsize});
+
+    BOOST_TEST(metaDataPacketCount >= 1);
+    BOOST_TEST(mockProfilingConnection.CheckForPacket({PacketType::CounterDirectory, 32}) == 1);
+    BOOST_TEST(mockProfilingConnection.CheckForPacket({PacketType::PeriodicCounterCapture, 28}) == 1);
+    // Check that we only received the packets we expected
+    BOOST_TEST(metaDataPacketCount + 2 == writtenDataSize);
 }
 
 BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket1)
@@ -2407,10 +2412,12 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket3)
     // Wait for sendCounterPacket to join
     BOOST_CHECK_NO_THROW(sendCounterPacket.Stop());
 
-    // Check that the buffer contains at least one Stream Metadata packet
-    const std::vector<uint32_t> writtenData = mockProfilingConnection.GetWrittenData();
-    BOOST_TEST(writtenData.size() >= 1);
-    BOOST_TEST(writtenData[0] == streamMetadataPacketsize);
+    // Check that the buffer contains at least one Stream Metadata packet and no other packets
+    const auto writtenDataSize = mockProfilingConnection.GetWrittenDataSize();
+
+    BOOST_TEST(writtenDataSize >= 1);
+    BOOST_TEST(mockProfilingConnection.CheckForPacket(
+                  {PacketType::StreamMetaData, streamMetadataPacketsize}) == writtenDataSize);
 }
 
 BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket4)
@@ -2437,11 +2444,12 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket4)
     BOOST_TEST((profilingStateMachine.GetCurrentState() == ProfilingState::WaitingForAck));
 
     // Check that the buffer contains at least one Stream Metadata packet
-    const std::vector<uint32_t> writtenData = mockProfilingConnection.GetWrittenData();
-    BOOST_TEST(writtenData.size() >= 1);
-    BOOST_TEST(writtenData[0] == streamMetadataPacketsize);
+    BOOST_TEST(mockProfilingConnection.CheckForPacket({PacketType::StreamMetaData, streamMetadataPacketsize}) >= 1);
 
     mockProfilingConnection.Clear();
+
+    sendCounterPacket.Stop();
+    sendCounterPacket.Start(mockProfilingConnection);
 
     // Try triggering a new buffer read
     sendCounterPacket.SetReadyToRead();
@@ -2452,9 +2460,12 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket4)
     // Check that the profiling state is still "WaitingForAck"
     BOOST_TEST((profilingStateMachine.GetCurrentState() == ProfilingState::WaitingForAck));
 
-    // Check that the buffer contains at least one Stream Metadata packet
-    BOOST_TEST(writtenData.size() >= 1);
-    BOOST_TEST(writtenData[0] == streamMetadataPacketsize);
+    // Check that the buffer contains at least one Stream Metadata packet and no other packets
+    const auto writtenDataSize = mockProfilingConnection.GetWrittenDataSize();
+
+    BOOST_TEST(writtenDataSize >= 1);
+    BOOST_TEST(mockProfilingConnection.CheckForPacket(
+                  {PacketType::StreamMetaData, streamMetadataPacketsize}) == writtenDataSize);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

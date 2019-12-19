@@ -63,13 +63,7 @@ public:
     void Start(IProfilingConnection& profilingConnection);
     void Stop(bool rethrowSendThreadExceptions = true);
     bool IsRunning() { return m_IsRunning.load(); }
-
-    void WaitForPacketSent(uint32_t timeout = 1000)
-    {
-        std::unique_lock<std::mutex> lock(m_PacketSentWaitMutex);
-        // Blocks until notified that at least a packet has been sent or until timeout expires.
-        m_PacketSentWaitCondition.wait_for(lock, std::chrono::milliseconds(timeout));
-    }
+    bool WaitForPacketSent(uint32_t timeout);
 
 private:
     void Send(IProfilingConnection& profilingConnection);
@@ -111,6 +105,8 @@ private:
     std::atomic<bool> m_KeepRunning;
     // m_ReadyToRead will be protected by m_WaitMutex
     bool m_ReadyToRead;
+    // m_PacketSent will be protected by m_PacketSentWaitMutex
+    bool m_PacketSent;
     std::exception_ptr m_SendThreadException;
     std::mutex m_PacketSentWaitMutex;
     std::condition_variable m_PacketSentWaitCondition;

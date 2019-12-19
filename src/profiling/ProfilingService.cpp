@@ -371,6 +371,7 @@ void ProfilingService::Reset()
     m_CounterIndex.clear();
     m_CounterValues.clear();
     m_CounterDirectory.Clear();
+    m_BufferManager.Reset();
 
     // ...finally reset the profiling state machine
     m_StateMachine.Reset();
@@ -379,11 +380,12 @@ void ProfilingService::Reset()
 void ProfilingService::Stop()
 {
     // The order in which we reset/stop the components is not trivial!
-
-    // First stop the threads (Command Handler first)...
+    // First stop the producing threads
+    // Command Handler first as it is responsible for launching then Periodic Counter capture thread
     m_CommandHandler.Stop();
-    m_SendCounterPacket.Stop(false);
     m_PeriodicCounterCapture.Stop();
+    // The the consuming thread
+    m_SendCounterPacket.Stop(false);
 
     // ...then close and destroy the profiling connection...
     if (m_ProfilingConnection != nullptr && m_ProfilingConnection->IsOpen())

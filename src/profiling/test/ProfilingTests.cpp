@@ -41,6 +41,7 @@
 #include <random>
 
 using namespace armnn::profiling;
+using PacketType = MockProfilingConnection::PacketType;
 
 BOOST_AUTO_TEST_SUITE(ExternalProfiling)
 
@@ -143,7 +144,6 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandler)
     profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
     profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
 
-    // A 1mSec timeout should be enough to slow the command handler thread a little.
     CommandHandler commandHandler0(1, true, commandHandlerRegistry, packetVersionResolver);
 
     // This should start the command handler thread return the connection ack and put the profiling
@@ -184,14 +184,30 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandler)
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
     }
-    // and leave another short period for the timeout exception to be processed and the loop to break.
-    std::this_thread::sleep_for(std::chrono::milliseconds(3));
 
     // The command handler loop should have stopped after the timeout.
-    BOOST_CHECK(!commandHandler1.IsRunning());
+    // wait for the timeout exception to be processed and the loop to break.
+    uint32_t timeout   = 50;
+    uint32_t timeSlept = 0;
+    while (commandHandler1.IsRunning())
+    {
+        if (timeSlept >= timeout)
+        {
+            BOOST_FAIL("Timeout: The command handler loop did not stop after the timeout");
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        timeSlept ++;
+    }
 
     commandHandler1.Stop();
     // The state machine should never have received the ack so will still be in WaitingForAck.
+    BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::WaitingForAck);
+
+    // Now try sending a bad connection acknowledged packet
+    TestProfilingConnectionBadAckPacket testProfilingConnectionBadAckPacket;
+    commandHandler1.Start(testProfilingConnectionBadAckPacket);
+    commandHandler1.Stop();
+    // This should also not change the state machine
     BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::WaitingForAck);
 
     // Disable stop after timeout and now commandHandler1 should persist after a timeout
@@ -2362,24 +2378,8 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
     profilingService.Update();    // Start the command handler and the send thread
 
     // Wait for the Stream Metadata packet to be sent
-    helper.WaitForProfilingPacketsSent(mockProfilingConnection);
-
-    // Check that the mock profiling connection contains one Stream Metadata packet
-    const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
-    if (writtenData.size() > 1)
-    {
-        // If this thread has been blocked for some time a second or more Stream Metadata packet could have been sent.
-        // In these cases make sure all packet are of length streamMetadataPacketsize
-        for(uint32_t packetLength : writtenData)
-        {
-            BOOST_TEST(packetLength == streamMetadataPacketsize);
-        }
-    }
-    else
-    {
-        BOOST_TEST(writtenData.size() == 1);
-        BOOST_TEST(writtenData[0] == streamMetadataPacketsize);
-    }
+    BOOST_CHECK(helper.WaitForPacketsSent(
+            mockProfilingConnection, PacketType::StreamMetaData, streamMetadataPacketsize) >= 1);
 
     // Write a valid "Connection Acknowledged" packet into the mock profiling connection, to simulate a valid
     // reply from an external profiling service
@@ -2400,7 +2400,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
     mockProfilingConnection->WritePacket(std::move(connectionAcknowledgedPacket));
 
     // Wait for the counter directory packet to ensure the ConnectionAcknowledgedCommandHandler has run.
-    helper.WaitForProfilingPacketsSent(mockProfilingConnection, 5000);
+    BOOST_CHECK(helper.WaitForPacketsSent(mockProfilingConnection, PacketType::CounterDirectory) == 1);
 
     // The Connection Acknowledged Command Handler should have updated the profiling state accordingly
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
@@ -2433,16 +2433,9 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodRequestCounterDirectoryPacket)
     MockProfilingConnection* mockProfilingConnection = helper.GetMockProfilingConnection();
     BOOST_CHECK(mockProfilingConnection);
 
-    // Wait for the Stream Metadata packet the be sent
-    // (we are not testing the connection acknowledgement here so it will be ignored by this test)
-    helper.WaitForProfilingPacketsSent(mockProfilingConnection);
-
     // Force the profiling service to the "Active" state
     helper.ForceTransitionToState(ProfilingState::Active);
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
-
-    // Remove the packets received so far
-    mockProfilingConnection->Clear();
 
     // Write a valid "Request Counter Directory" packet into the mock profiling connection, to simulate a valid
     // reply from an external profiling service
@@ -2462,14 +2455,10 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodRequestCounterDirectoryPacket)
     // Write the packet to the mock profiling connection
     mockProfilingConnection->WritePacket(std::move(requestCounterDirectoryPacket));
 
-    // Wait for the Counter Directory packet to be sent
-    helper.WaitForProfilingPacketsSent(mockProfilingConnection, 5000);
-
-    // Check that the mock profiling connection contains one Counter Directory packet
-    const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
-    BOOST_TEST(writtenData.size() == 2);
-    BOOST_TEST(writtenData[0] == 427); // The size of the expected Timeline Directory packet
-    BOOST_TEST(writtenData[1] ==656); // The size of the expected Counter Directory packet
+    // Expecting one CounterDirectory Packet of length 656
+    // and one TimelineMessageDirectory packet of length 427
+    BOOST_CHECK(helper.WaitForPacketsSent(mockProfilingConnection, PacketType::CounterDirectory, 656) == 1);
+    BOOST_CHECK(helper.WaitForPacketsSent(mockProfilingConnection, PacketType::TimelineMessageDirectory, 427) == 1);
 
     // The Request Counter Directory Command Handler should not have updated the profiling state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
@@ -2501,10 +2490,6 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacketInval
     // Get the mock profiling connection
     MockProfilingConnection* mockProfilingConnection = helper.GetMockProfilingConnection();
     BOOST_CHECK(mockProfilingConnection);
-
-    // Wait for the Stream Metadata packet the be sent
-    // (we are not testing the connection acknowledgement here so it will be ignored by this test)
-    helper.WaitForProfilingPacketsSent(mockProfilingConnection);
 
     // Force the profiling service to the "Active" state
     helper.ForceTransitionToState(ProfilingState::Active);
@@ -2548,29 +2533,10 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacketInval
     // Write the packet to the mock profiling connection
     mockProfilingConnection->WritePacket(std::move(periodicCounterSelectionPacket));
 
-    // Expecting one Periodic Counter Selection packet and at least one Periodic Counter Capture packet
-    int expectedPackets = 2;
-    std::vector<uint32_t> receivedPackets;
-
-    // Keep waiting until all the expected packets have been received
-    do
-    {
-        helper.WaitForProfilingPacketsSent(mockProfilingConnection);
-        const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
-        if (writtenData.empty())
-        {
-            BOOST_ERROR("Packets should be available for reading at this point");
-            return;
-        }
-        receivedPackets.insert(receivedPackets.end(), writtenData.begin(), writtenData.end());
-        expectedPackets -= boost::numeric_cast<int>(writtenData.size());
-    } while (expectedPackets > 0);
-    BOOST_TEST(!receivedPackets.empty());
-
-    // The size of the expected Periodic Counter Selection packet
-    BOOST_TEST((std::find(receivedPackets.begin(), receivedPackets.end(), 14) != receivedPackets.end()));
-    // The size of the expected Periodic Counter Capture packet
-    BOOST_TEST((std::find(receivedPackets.begin(), receivedPackets.end(), 22) != receivedPackets.end()));
+    // Expecting one Periodic Counter Selection packet of length 14
+    // and at least one Periodic Counter Capture packet of length 22
+    BOOST_CHECK(helper.WaitForPacketsSent(mockProfilingConnection, PacketType::PeriodicCounterSelection, 14) == 1);
+    BOOST_CHECK(helper.WaitForPacketsSent(mockProfilingConnection, PacketType::PeriodicCounterCapture, 22) >= 1);
 
     // The Periodic Counter Selection Handler should not have updated the profiling state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
@@ -2605,14 +2571,11 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketNoCo
 
     // Wait for the Stream Metadata packet the be sent
     // (we are not testing the connection acknowledgement here so it will be ignored by this test)
-    helper.WaitForProfilingPacketsSent(mockProfilingConnection);
+    helper.WaitForPacketsSent(mockProfilingConnection, PacketType::StreamMetaData);
 
     // Force the profiling service to the "Active" state
     helper.ForceTransitionToState(ProfilingState::Active);
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
-
-    // Remove the packets received so far
-    mockProfilingConnection->Clear();
 
     // Write a "Periodic Counter Selection" packet into the mock profiling connection, to simulate an input from an
     // external profiling service
@@ -2632,16 +2595,15 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketNoCo
     // Write the packet to the mock profiling connection
     mockProfilingConnection->WritePacket(std::move(periodicCounterSelectionPacket));
 
-    // Wait for the Periodic Counter Selection packet to be sent
-    helper.WaitForProfilingPacketsSent(mockProfilingConnection, 5000);
+    // Wait for the Periodic Counter Selection packet of length 12 to be sent
+    // The size of the expected Periodic Counter Selection (echos the sent one)
+    BOOST_CHECK(helper.WaitForPacketsSent(mockProfilingConnection, PacketType::PeriodicCounterSelection, 12) == 1);
 
     // The Periodic Counter Selection Handler should not have updated the profiling state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
 
-    // Check that the mock profiling connection contains one Periodic Counter Selection
-    const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
-    BOOST_TEST(writtenData.size() == 1);    // Only one packet is expected (no Periodic Counter packets)
-    BOOST_TEST(writtenData[0] == 12);       // The size of the expected Periodic Counter Selection (echos the sent one)
+    // No Periodic Counter packets are expected
+    BOOST_CHECK(helper.WaitForPacketsSent(mockProfilingConnection, PacketType::PeriodicCounterCapture, 0, 0) == 0);
 
     // Reset the profiling service to stop any running thread
     options.m_EnableProfiling = false;
@@ -2671,16 +2633,13 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketSing
     MockProfilingConnection* mockProfilingConnection = helper.GetMockProfilingConnection();
     BOOST_CHECK(mockProfilingConnection);
 
-    // Wait for the Stream Metadata packet the be sent
+    // Wait for the Stream Metadata packet to be sent
     // (we are not testing the connection acknowledgement here so it will be ignored by this test)
-    helper.WaitForProfilingPacketsSent(mockProfilingConnection);
+    helper.WaitForPacketsSent(mockProfilingConnection, PacketType::StreamMetaData);
 
     // Force the profiling service to the "Active" state
     helper.ForceTransitionToState(ProfilingState::Active);
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
-
-    // Remove the packets received so far
-    mockProfilingConnection->Clear();
 
     // Write a "Periodic Counter Selection" packet into the mock profiling connection, to simulate an input from an
     // external profiling service
@@ -2715,29 +2674,10 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketSing
     // Write the packet to the mock profiling connection
     mockProfilingConnection->WritePacket(std::move(periodicCounterSelectionPacket));
 
-    // Expecting one Periodic Counter Selection packet and at least one Periodic Counter Capture packet
-    int expectedPackets = 2;
-    std::vector<uint32_t> receivedPackets;
-
-    // Keep waiting until all the expected packets have been received
-    do
-    {
-        helper.WaitForProfilingPacketsSent(mockProfilingConnection);
-        const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
-        if (writtenData.empty())
-        {
-            BOOST_ERROR("Packets should be available for reading at this point");
-            return;
-        }
-        receivedPackets.insert(receivedPackets.end(), writtenData.begin(), writtenData.end());
-        expectedPackets -= boost::numeric_cast<int>(writtenData.size());
-    } while (expectedPackets > 0);
-    BOOST_TEST(!receivedPackets.empty());
-
-    // The size of the expected Periodic Counter Selection packet (echos the sent one)
-    BOOST_TEST((std::find(receivedPackets.begin(), receivedPackets.end(), 14) != receivedPackets.end()));
-    // The size of the expected Periodic Counter Capture packet
-    BOOST_TEST((std::find(receivedPackets.begin(), receivedPackets.end(), 22) != receivedPackets.end()));
+    // Expecting one Periodic Counter Selection packet of length 14
+    // and at least one Periodic Counter Capture packet of length 22
+    BOOST_CHECK(helper.WaitForPacketsSent(mockProfilingConnection, PacketType::PeriodicCounterSelection, 14) == 1);
+    BOOST_CHECK(helper.WaitForPacketsSent(mockProfilingConnection, PacketType::PeriodicCounterCapture, 22) >= 1);
 
     // The Periodic Counter Selection Handler should not have updated the profiling state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
@@ -2771,14 +2711,11 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketMult
 
     // Wait for the Stream Metadata packet the be sent
     // (we are not testing the connection acknowledgement here so it will be ignored by this test)
-    helper.WaitForProfilingPacketsSent(mockProfilingConnection);
+    helper.WaitForPacketsSent(mockProfilingConnection, PacketType::StreamMetaData);
 
     // Force the profiling service to the "Active" state
     helper.ForceTransitionToState(ProfilingState::Active);
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
-
-    // Remove the packets received so far
-    mockProfilingConnection->Clear();
 
     // Write a "Periodic Counter Selection" packet into the mock profiling connection, to simulate an input from an
     // external profiling service
@@ -2815,29 +2752,10 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketMult
     // Write the packet to the mock profiling connection
     mockProfilingConnection->WritePacket(std::move(periodicCounterSelectionPacket));
 
-    // Expecting one Periodic Counter Selection packet and at least one Periodic Counter Capture packet
-    int expectedPackets = 2;
-    std::vector<uint32_t> receivedPackets;
-
-    // Keep waiting until all the expected packets have been received
-    do
-    {
-        helper.WaitForProfilingPacketsSent(mockProfilingConnection);
-        const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
-        if (writtenData.empty())
-        {
-            BOOST_ERROR("Packets should be available for reading at this point");
-            return;
-        }
-        receivedPackets.insert(receivedPackets.end(), writtenData.begin(), writtenData.end());
-        expectedPackets -= boost::numeric_cast<int>(writtenData.size());
-    } while (expectedPackets > 0);
-    BOOST_TEST(!receivedPackets.empty());
-
-    // The size of the expected Periodic Counter Selection packet (echos the sent one)
-    BOOST_TEST((std::find(receivedPackets.begin(), receivedPackets.end(), 16) != receivedPackets.end()));
-    // The size of the expected Periodic Counter Capture packet
-    BOOST_TEST((std::find(receivedPackets.begin(), receivedPackets.end(), 28) != receivedPackets.end()));
+    // Expecting one PeriodicCounterSelection Packet with a length of 16
+    // And at least one PeriodicCounterCapture Packet with a length of 28
+    BOOST_CHECK(helper.WaitForPacketsSent(mockProfilingConnection, PacketType::PeriodicCounterSelection, 16) == 1);
+    BOOST_CHECK(helper.WaitForPacketsSent(mockProfilingConnection, PacketType::PeriodicCounterCapture, 28) >= 1);
 
     // The Periodic Counter Selection Handler should not have updated the profiling state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
@@ -2883,7 +2801,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisconnect)
 
     // Wait for the Stream Metadata packet the be sent
     // (we are not testing the connection acknowledgement here so it will be ignored by this test)
-    helper.WaitForProfilingPacketsSent(mockProfilingConnection);
+    helper.WaitForPacketsSent(mockProfilingConnection, PacketType::StreamMetaData);
 
     // Force the profiling service to the "Active" state
     helper.ForceTransitionToState(ProfilingState::Active);
@@ -2928,14 +2846,11 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPerJobCounterSelectionPacket)
 
     // Wait for the Stream Metadata packet the be sent
     // (we are not testing the connection acknowledgement here so it will be ignored by this test)
-    helper.WaitForProfilingPacketsSent(mockProfilingConnection);
+    helper.WaitForPacketsSent(mockProfilingConnection, PacketType::StreamMetaData);
 
     // Force the profiling service to the "Active" state
     helper.ForceTransitionToState(ProfilingState::Active);
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
-
-    // Remove the packets received so far
-    mockProfilingConnection->Clear();
 
     // Write a "Per-Job Counter Selection" packet into the mock profiling connection, to simulate an input from an
     // external profiling service
@@ -2959,13 +2874,14 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPerJobCounterSelectionPacket)
     // the Per-Job Counter Selection packet gets processed by the profiling service
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
-    // The Per-Job Counter Selection packets are dropped silently, so there should be no reply coming
-    // from the profiling service
-    const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
-    BOOST_TEST(writtenData.empty());
-
     // The Per-Job Counter Selection Command Handler should not have updated the profiling state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
+
+    // The Per-Job Counter Selection packets are dropped silently, so there should be no reply coming
+    // from the profiling service
+    const auto StreamMetaDataSize = static_cast<unsigned long>(
+            helper.WaitForPacketsSent(mockProfilingConnection, PacketType::StreamMetaData, 0, 0));
+    BOOST_CHECK(StreamMetaDataSize == mockProfilingConnection->GetWrittenDataSize());
 
     // Reset the profiling service to stop any running thread
     options.m_EnableProfiling = false;
@@ -3015,6 +2931,11 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabled)
     std::stringstream ss;
     StreamRedirector streamRedirector(std::cout, ss.rdbuf());
     profilingService.Update();
+
+    // Reset the profiling service to stop any running thread
+    options.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options, true);
+
     streamRedirector.CancelRedirect();
 
     // Check that the expected error has occurred and logged to the standard output
@@ -3023,9 +2944,6 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabled)
         std::cout << ss.str();
         BOOST_FAIL("Expected string not found.");
     }
-    // Reset the profiling service to stop any running thread
-    options.m_EnableProfiling = false;
-    profilingService.ResetExternalProfilingOptions(options, true);
 }
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabledRuntime)
@@ -3049,6 +2967,10 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabledRuntime)
     StreamRedirector streamRedirector(std::cout, ss.rdbuf());
     profilingService.Update();
 
+    // Reset the profiling service to stop any running thread
+    options.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options, true);
+
     streamRedirector.CancelRedirect();
 
     // Check that the expected error has occurred and logged to the standard output
@@ -3057,9 +2979,6 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabledRuntime)
         std::cout << ss.str();
         BOOST_FAIL("Expected string not found.");
     }
-    // Reset the profiling service to stop any running thread
-    options.m_EnableProfiling = false;
-    profilingService.ResetExternalProfilingOptions(options, true);
 }
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
@@ -3072,11 +2991,6 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
     // Redirect the standard output to a local stream so that we can parse the warning message
     std::stringstream ss;
     StreamRedirector streamRedirector(std::cout, ss.rdbuf());
-
-    // Calculate the size of a Stream Metadata packet
-    std::string processName      = GetProcessName().substr(0, 60);
-    unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
-    unsigned int streamMetadataPacketsize = 118 + processNameSize;
 
     // Reset the profiling service to the uninitialized state
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
@@ -3094,34 +3008,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
     MockProfilingConnection* mockProfilingConnection = helper.GetMockProfilingConnection();
     BOOST_CHECK(mockProfilingConnection);
 
-    // Remove the packets received so far
-    mockProfilingConnection->Clear();
-
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
-    profilingService.Update();
-
-    // Wait for the Stream Metadata packet to be sent
-    helper.WaitForProfilingPacketsSent(mockProfilingConnection);
-
-    // Check that the mock profiling connection contains one Stream Metadata packet
-    const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
-    if (writtenData.size() > 1)
-    {
-        // If this thread has been blocked for some time a second or more Stream Metadata packet could have been sent.
-        // In these cases make sure all packet are of length streamMetadataPacketsize
-        for(uint32_t packetLength : writtenData)
-        {
-            BOOST_TEST(packetLength == streamMetadataPacketsize);
-        }
-    }
-    else
-    {
-        BOOST_TEST(writtenData.size() == 1);
-        BOOST_TEST(writtenData[0] == streamMetadataPacketsize);
-    }
-
-    // Write a valid "Connection Acknowledged" packet into the mock profiling connection, to simulate a valid
-    // reply from an external profiling service
 
     // Connection Acknowledged Packet header (word 0, word 1 is always zero):
     // 26:31 [6]  packet_family: Control Packet Family, value 0b000000
@@ -3134,13 +3021,16 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
 
     // Create the Connection Acknowledged Packet
     Packet connectionAcknowledgedPacket(header);
-
-    // Write the packet to the mock profiling connection
+    // Write an invalid "Connection Acknowledged" packet into the mock profiling connection, to simulate an invalid
+    // reply from an external profiling service
     mockProfilingConnection->WritePacket(std::move(connectionAcknowledgedPacket));
 
-    // Wait for a bit (must at least be the delay value of the mock profiling connection) to make sure that
-    // the Connection Acknowledged packet gets processed by the profiling service
-    std::this_thread::sleep_for(std::chrono::milliseconds(15));
+    // Start the command thread
+    profilingService.Update();
+
+    // Wait for the command thread to join
+    options.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options, true);
 
     streamRedirector.CancelRedirect();
 
@@ -3150,13 +3040,6 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
         std::cout << ss.str();
         BOOST_FAIL("Expected string not found.");
     }
-
-    // The Connection Acknowledged Command Handler should not have updated the profiling state
-    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
-
-    // Reset the profiling service to stop any running thread
-    options.m_EnableProfiling = false;
-    profilingService.ResetExternalProfilingOptions(options, true);
 }
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadRequestCounterDirectoryPacket)
@@ -3182,22 +3065,10 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadRequestCounterDirectoryPacket)
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
     profilingService.Update();    // Create the profiling connection
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
-    profilingService.Update();    // Start the command handler and the send thread
 
     // Get the mock profiling connection
     MockProfilingConnection* mockProfilingConnection = helper.GetMockProfilingConnection();
     BOOST_CHECK(mockProfilingConnection);
-
-    // Wait for the Stream Metadata packet the be sent
-    // (we are not testing the connection acknowledgement here so it will be ignored by this test)
-    helper.WaitForProfilingPacketsSent(mockProfilingConnection);
-
-    // Force the profiling service to the "Active" state
-    helper.ForceTransitionToState(ProfilingState::Active);
-    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
-
-    // Remove the packets received so far
-    mockProfilingConnection->Clear();
 
     // Write a valid "Request Counter Directory" packet into the mock profiling connection, to simulate a valid
     // reply from an external profiling service
@@ -3217,9 +3088,12 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadRequestCounterDirectoryPacket)
     // Write the packet to the mock profiling connection
     mockProfilingConnection->WritePacket(std::move(requestCounterDirectoryPacket));
 
-    // Wait for a bit (must at least be the delay value of the mock profiling connection) to make sure that
-    // the Create the Request Counter packet gets processed by the profiling service
-    std::this_thread::sleep_for(std::chrono::milliseconds(15));
+    // Start the command handler and the send thread
+    profilingService.Update();
+
+    // Reset the profiling service to stop and join any running thread
+    options.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options, true);
 
     streamRedirector.CancelRedirect();
 
@@ -3229,13 +3103,6 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadRequestCounterDirectoryPacket)
         std::cout << ss.str();
         BOOST_FAIL("Expected string not found.");
     }
-
-    // The Request Counter Directory Command Handler should not have updated the profiling state
-    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
-
-    // Reset the profiling service to stop any running thread
-    options.m_EnableProfiling = false;
-    profilingService.ResetExternalProfilingOptions(options, true);
 }
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacket)
@@ -3267,17 +3134,6 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacket)
     MockProfilingConnection* mockProfilingConnection = helper.GetMockProfilingConnection();
     BOOST_CHECK(mockProfilingConnection);
 
-    // Wait for the Stream Metadata packet the be sent
-    // (we are not testing the connection acknowledgement here so it will be ignored by this test)
-    helper.WaitForProfilingPacketsSent(mockProfilingConnection);
-
-    // Force the profiling service to the "Active" state
-    helper.ForceTransitionToState(ProfilingState::Active);
-    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
-
-    // Remove the packets received so far
-    mockProfilingConnection->Clear();
-
     // Write a "Periodic Counter Selection" packet into the mock profiling connection, to simulate an input from an
     // external profiling service
 
@@ -3295,10 +3151,11 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacket)
 
     // Write the packet to the mock profiling connection
     mockProfilingConnection->WritePacket(std::move(periodicCounterSelectionPacket));
+    profilingService.Update();
 
-    // Wait for a bit (must at least be the delay value of the mock profiling connection) to make sure that
-    // the Periodic Counter Selection packet gets processed by the profiling service
-    std::this_thread::sleep_for(std::chrono::milliseconds(7));
+    // Reset the profiling service to stop any running thread
+    options.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options, true);
 
     // Check that the expected error has occurred and logged to the standard output
     streamRedirector.CancelRedirect();
@@ -3309,13 +3166,6 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacket)
         std::cout << ss.str();
         BOOST_FAIL("Expected string not found.");
     }
-
-    // The Periodic Counter Selection Handler should not have updated the profiling state
-    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
-
-    // Reset the profiling service to stop any running thread
-    options.m_EnableProfiling = false;
-    profilingService.ResetExternalProfilingOptions(options, true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

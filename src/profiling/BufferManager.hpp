@@ -26,6 +26,8 @@ public:
 
     IPacketBufferPtr Reserve(unsigned int requestedSize, unsigned int& reservedSize) override;
 
+    void Reset();
+
     void Commit(IPacketBufferPtr& packetBuffer, unsigned int size) override;
 
     void Release(IPacketBufferPtr& packetBuffer) override;
@@ -35,8 +37,12 @@ public:
     void MarkRead(IPacketBufferPtr& packetBuffer) override;
 
 private:
+    void Initialize();
+
     // Maximum buffer size
     unsigned int m_MaxBufferSize;
+    // Number of buffers
+    unsigned int m_NumberOfBuffers;
 
     // List of available packet buffers
     std::vector<IPacketBufferPtr> m_AvailableList;
@@ -49,9 +55,6 @@ private:
 
     // Mutex for readable packet buffer list
     std::mutex m_ReadableMutex;
-
-    // Condition to notify when data is availabe to be read
-    std::condition_variable m_ReadDataAvailable;
 };
 
 } // namespace profiling

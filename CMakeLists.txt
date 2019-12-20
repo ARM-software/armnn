@@ -696,7 +696,6 @@ if(BUILD_UNIT_TESTS)
     endif()
 
     if(BUILD_TF_LITE_PARSER AND ARMNNREF)
-        enable_language(ASM)
         list(APPEND unittest_sources
              src/armnnTfLiteParser/test/Activations.cpp
              src/armnnTfLiteParser/test/Addition.cpp
@@ -738,10 +737,18 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/GetTensorIds.cpp
              src/armnnTfLiteParser/test/GetSubgraphInputsOutputs.cpp
              src/armnnTfLiteParser/test/GetInputsOutputs.cpp
-             src/armnnTfLiteParser/test/Schema.s
              )
-        set_source_files_properties(src/armnnTfLiteParser/test/Schema.s PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
-
+                
+        # Generate SchemaText.cpp file which contains the TfLite schema text as a 
+        # static C-array of bytes. This is needed at runtime for TfLite parser tests.
+        add_custom_command(
+            OUTPUT  SchemaText.cpp
+            COMMAND cp ${TF_LITE_SCHEMA_INCLUDE_PATH}/schema.fbs g_TfLiteSchemaText
+            COMMAND xxd -i g_TfLiteSchemaText SchemaText.cpp
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            DEPENDS ${TF_LITE_SCHEMA_INCLUDE_PATH}/schema.fbs 
+        )
+        list(APPEND unittest_sources ${CMAKE_CURRENT_BINARY_DIR}/SchemaText.cpp)
     endif()
 
     if(BUILD_CAFFE_PARSER AND ARMNNREF)

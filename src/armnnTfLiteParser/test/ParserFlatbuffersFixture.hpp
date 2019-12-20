@@ -101,7 +101,7 @@ struct ParserFlatbuffersFixture
 
     bool ReadStringToBinary()
     {
-        std::string schemafile(&tflite_schema_start, &tflite_schema_end);
+        std::string schemafile(g_TfLiteSchemaText, g_TfLiteSchemaText + g_TfLiteSchemaText_len);
 
         // parse schema first, so we can use it to parse the data after
         flatbuffers::Parser parser;

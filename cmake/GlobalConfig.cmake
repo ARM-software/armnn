@@ -201,7 +201,6 @@ if(BUILD_TF_LITE_PARSER)
     message(STATUS "Tf Lite generated header found at: ${TF_LITE_SCHEMA_INCLUDE_PATH}")
 
     add_definitions(-DARMNN_TF_LITE_PARSER)
-    add_definitions(-DARMNN_TF_LITE_SCHEMA_PATH="${TF_LITE_SCHEMA_INCLUDE_PATH}/schema.fbs")
 endif()
 
 if(BUILD_ARMNN_SERIALIZER)

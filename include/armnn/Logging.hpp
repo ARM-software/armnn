@@ -19,7 +19,7 @@
 #endif
 
 #include <boost/assert.hpp>
-
+#include <boost/core/ignore_unused.hpp>
 
 namespace armnn
 {
@@ -115,9 +115,10 @@ public:
 #if defined(_MSC_VER)
         OutputDebugString(s.c_str());
         OutputDebugString("\n");
-#endif
-#if defined(__ANDROID__)
+#elif defined(__ANDROID__)
         __android_log_write(ANDROID_LOG_DEBUG, "armnn", s.c_str());
+#else
+        boost::ignore_unused(s);
 #endif
     }
 };

@@ -7,15 +7,19 @@
 #include <armnn/Optional.hpp>
 #include <string>
 
+#include <boost/core/ignore_unused.hpp>
+
 namespace
 {
 
 void PassStringRef(armnn::Optional<std::string&> value)
 {
+    boost::ignore_unused(value);
 }
 
 void PassStringRefWithDefault(armnn::Optional<std::string&> value = armnn::EmptyOptional())
 {
+    boost::ignore_unused(value);
 }
 
 } // namespace <anonymous>

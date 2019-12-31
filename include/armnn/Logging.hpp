@@ -50,7 +50,7 @@ class LogSink
 public:
     virtual ~LogSink(){};
 
-    virtual void Consume(const std::string& s) = 0;
+    virtual void Consume(const std::string&) = 0;
 private:
 
 };
@@ -112,6 +112,7 @@ class DebugOutputSink : public LogSink
 public:
     void Consume(const std::string& s) override
     {
+        boost::ignore_unused(s);
 #if defined(_MSC_VER)
         OutputDebugString(s.c_str());
         OutputDebugString("\n");

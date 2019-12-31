@@ -535,7 +535,7 @@ BOOST_AUTO_TEST_CASE(DisjointGraphs)
     SubgraphViewSelector::Subgraphs subgraphs =
         SubgraphViewSelector::SelectSubgraphs(graph,
                                               // select the middle layers only
-                                              [](const Layer& l) {
+                                              [](const Layer&) {
                                                   return true;
                                               });
 

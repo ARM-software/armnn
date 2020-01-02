@@ -14,6 +14,7 @@
 #include <armnn/Conversion.hpp>
 
 #include <boost/assert.hpp>
+#include <boost/core/ignore_unused.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 namespace armnn
@@ -442,6 +443,8 @@ public:
                                    const armnn::Optional<uint16_t>& deviceUid = armnn::EmptyOptional(),
                                    const armnn::Optional<uint16_t>& counterSetUid = armnn::EmptyOptional())
     {
+        boost::ignore_unused(backendId);
+
         // Get the number of cores from the argument only
         uint16_t deviceCores = numberOfCores.has_value() ? numberOfCores.value() : 0;
 

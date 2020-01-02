@@ -91,6 +91,11 @@ int main(int argc, char* argv[])
         }
         string modelPath = modelDir + "cifar10_full_iter_60000.caffemodel";
 
+        // Create runtime
+        // This will also load dynamic backend in case that the dynamic backend path is specified
+        armnn::IRuntime::CreationOptions options;
+        armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+
         // Check if the requested backend are all valid
         std::string invalidBackends;
         if (!CheckRequestedBackendsAreValid(computeDevice, armnn::Optional<std::string&>(invalidBackends)))
@@ -99,10 +104,6 @@ int main(int argc, char* argv[])
                              << invalidBackends;
             return EXIT_FAILURE;
         }
-
-        // Create runtime
-        armnn::IRuntime::CreationOptions options;
-        armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
         // Loads networks.
         armnn::Status status;

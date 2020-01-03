@@ -95,6 +95,21 @@ void ReportWarning(const std::string& warningMessage,
     }
 }
 
+OptimizationResult ReturnWithError(OptimizationResult res,
+                                   const Layer* layer,
+                                   const BackendSettings& backendSettings,
+                                   Optional<std::vector<std::string>&> errMessages)
+{
+    std::stringstream failureMsg;
+    failureMsg << "Layer of type " << GetLayerTypeAsCString(layer->GetType())
+               << " is not supported on any preferred backend " << backendSettings.m_PreferredBackends;
+    ReportError(failureMsg.str(), errMessages);
+
+    res.m_Error = true;
+    return res;
+}
+
+
 bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string>&> errMessages)
 {
     bool noErrors = true;
@@ -130,6 +145,126 @@ bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string
     return noErrors;
 }
 
+OptimizationResult AttemptBackendAssignment(BackendSettings& backendSettings,
+                                            Graph& graph,
+                                            Layer* layer,
+                                            BackendId backend,
+                                            DataType dataTypeIn,
+                                            DataType dataTypeOut,
+                                            const std::vector<BackendId>& availablePreferredBackends,
+                                            std::string& reasonIfUnsupported,
+                                            Optional<std::vector<std::string>&> errMessages)
+{
+    OptimizationResult result;
+
+    // Helper lambda to compose meaningful error message before returning with error
+    auto ReturnError = [&](const Layer* layer)
+        {
+            return ReturnWithError(result, layer, backendSettings, errMessages);
+        };
+
+    // need to set the compute device on the layer
+    // before we can check if it is supported
+    layer->SetBackendId(backend);
+    if (!IWorkloadFactory::IsLayerSupported(*layer, EmptyOptional(), reasonIfUnsupported))
+    {
+        if (dataTypeIn == DataType::Float16 || dataTypeOut == DataType::Float16)
+        {
+            if (IWorkloadFactory::IsLayerSupported(*layer, DataType::Float32, reasonIfUnsupported)
+                && layer->GetType() != LayerType::ConvertFp32ToFp16
+                && layer->GetType() != LayerType::ConvertFp16ToFp32)
+            {
+                // Insert FP16 -> FP32 conversion layer before current layer
+                std::vector<ConvertFp16ToFp32Layer*> convertFp16ToFp32Layers;
+                if (dataTypeIn == DataType::Float16)
+                {
+                    convertFp16ToFp32Layers =
+                        InsertConvertFp16ToFp32LayersBefore(graph, *layer);
+                }
+
+                // Insert FP32 -> FP16 conversion layer after current layer
+                std::vector<ConvertFp32ToFp16Layer*> convertFp32ToFp16Layers;
+                if (dataTypeOut == DataType::Float16)
+                {
+                    convertFp32ToFp16Layers =
+                        InsertConvertFp32ToFp16LayersAfter(graph, *layer);
+                }
+
+                // Assign a supported backend to the newly introduced conversion layers
+                auto AssignFirstSupportedBackend = [&](Layer* layer, BackendId preferredBackend)
+                    {
+                        bool supportedBackendFound = false;
+                        std::string reasonIfUnsupported;
+
+                        // Try preferred backend first
+                        layer->SetBackendId(preferredBackend);
+                        if (IWorkloadFactory::IsLayerSupported(*layer,
+                                                               EmptyOptional(),
+                                                               reasonIfUnsupported))
+                        {
+                            supportedBackendFound = true;
+                        }
+                        else
+                        {
+                            for (const auto& backend : availablePreferredBackends)
+                            {
+                                // Skip preferred backend (we already determined that it is not supported)
+                                if (backend == preferredBackend)
+                                {
+                                    continue;
+                                }
+
+                                layer->SetBackendId(backend);
+                                if (IWorkloadFactory::IsLayerSupported(*layer,
+                                                                       EmptyOptional(),
+                                                                       reasonIfUnsupported))
+                                {
+                                    supportedBackendFound = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        return supportedBackendFound;
+                    };
+
+                for (ConvertFp16ToFp32Layer* convertLayer : convertFp16ToFp32Layers)
+                {
+                    if (!AssignFirstSupportedBackend(convertLayer, backend))
+                    {
+                        return ReturnError(convertLayer);
+                    }
+                }
+
+                for (ConvertFp32ToFp16Layer* convertLayer : convertFp32ToFp16Layers)
+                {
+                    if (!AssignFirstSupportedBackend(convertLayer, backend))
+                    {
+                        return ReturnError(convertLayer);
+                    }
+                }
+
+                return result;
+            }
+        }
+        std::stringstream warningMsg;
+        warningMsg << "Layer of type " << GetLayerTypeAsCString(layer->GetType())
+                   << " is not supported on requested backend " << layer->GetBackendId().Get()
+                   << " for input data type " << GetDataTypeName(dataTypeIn)
+                   << " and output data type " << GetDataTypeName(dataTypeOut)
+                   << " (reason: " << reasonIfUnsupported
+                   << "), falling back to the next backend.";
+        ReportWarning(warningMsg.str(), errMessages);
+
+        return OptimizationResult(true, false);
+    }
+    else
+    {
+        return result;
+    }
+}
+
+
 OptimizationResult AssignBackends(OptimizedNetwork* optNetObjPtr,
                                   BackendSettings& backendSettings,
                                   Graph::Iterator& firstLayer,
@@ -139,16 +274,11 @@ OptimizationResult AssignBackends(OptimizedNetwork* optNetObjPtr,
     OptimizationResult result;
 
     // Helper lambda to compose meaningful error message before returning with error
-    auto ReturnWithError = [&](const Layer* layer)
-    {
-        std::stringstream failureMsg;
-        failureMsg << "Layer of type " << GetLayerTypeAsCString(layer->GetType())
-                   << " is not supported on any preferred backend " << backendSettings.m_PreferredBackends;
-        ReportError(failureMsg.str(), errMessages);
+    auto ReturnError = [&](const Layer* layer)
+        {
+            return ReturnWithError(result, layer, backendSettings, errMessages);
+        };
 
-        result.m_Error = true;
-        return result;
-    };
 
     auto availablePreferredBackends = backendSettings.GetAvailablePreferredBackends();
     if (availablePreferredBackends.empty())
@@ -179,107 +309,59 @@ OptimizationResult AssignBackends(OptimizedNetwork* optNetObjPtr,
             result.m_Error = true;
         }
 
-        for (const auto& backend : availablePreferredBackends)
+        // First try assign layer to hint backend
+        if (layer->GetBackendHint().has_value() &&
+            backendSettings.IsBackendSupported(layer->GetBackendHint().value()) &&
+            AttemptBackendAssignment(backendSettings,
+                                     optNetObjPtr->GetGraph(),
+                                     layer,
+                                     layer->GetBackendHint().value(),
+                                     dataTypeIn,
+                                     dataTypeOut,
+                                     availablePreferredBackends,
+                                     reasonIfUnsupported,
+                                     errMessages).IsOk())
         {
-            // need to set the compute device on the layer
-            // before we can check if it is supported
-            layer->SetBackendId(backend);
-            if (!IWorkloadFactory::IsLayerSupported(*layer, EmptyOptional(), reasonIfUnsupported))
+            found = true;
+            backendSettings.m_SelectedBackends.insert(layer->GetBackendHint().value());
+        }
+        else
+        {
+            // Try assign layer to prefered list of backends
+            for (const auto& backend : availablePreferredBackends)
             {
-                if (dataTypeIn == DataType::Float16 || dataTypeOut == DataType::Float16)
+                if (layer->GetBackendHint().has_value() &&
+                    layer->GetBackendHint().value() == backend)
                 {
-                    if (IWorkloadFactory::IsLayerSupported(*layer, DataType::Float32, reasonIfUnsupported)
-                        && layer->GetType() != LayerType::ConvertFp32ToFp16
-                        && layer->GetType() != LayerType::ConvertFp16ToFp32)
-                    {
-                        // Insert FP16 -> FP32 conversion layer before current layer
-                        std::vector<ConvertFp16ToFp32Layer*> convertFp16ToFp32Layers;
-                        if (dataTypeIn == DataType::Float16)
-                        {
-                            convertFp16ToFp32Layers =
-                                InsertConvertFp16ToFp32LayersBefore(optNetObjPtr->GetGraph(), *layer);
-                        }
-
-                        // Insert FP32 -> FP16 conversion layer after current layer
-                        std::vector<ConvertFp32ToFp16Layer*> convertFp32ToFp16Layers;
-                        if (dataTypeOut == DataType::Float16)
-                        {
-                            convertFp32ToFp16Layers =
-                                InsertConvertFp32ToFp16LayersAfter(optNetObjPtr->GetGraph(), *layer);
-                        }
-
-                        // Assign a supported backend to the newly introduced conversion layers
-                        auto AssignFirstSupportedBackend = [&](Layer* layer, BackendId preferredBackend)
-                        {
-                            bool supportedBackendFound = false;
-                            std::string reasonIfUnsupported;
-
-                            // Try preferred backend first
-                            layer->SetBackendId(preferredBackend);
-                            if (IWorkloadFactory::IsLayerSupported(*layer,
-                                                                   EmptyOptional(),
-                                                                   reasonIfUnsupported))
-                            {
-                                supportedBackendFound = true;
-                            }
-                            else
-                            {
-                                for (const auto& backend : availablePreferredBackends)
-                                {
-                                    // Skip preferred backend (we already determined that it is not supported)
-                                    if (backend == preferredBackend)
-                                    {
-                                        continue;
-                                    }
-
-                                    layer->SetBackendId(backend);
-                                    if (IWorkloadFactory::IsLayerSupported(*layer,
-                                                                           EmptyOptional(),
-                                                                           reasonIfUnsupported))
-                                    {
-                                        supportedBackendFound = true;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            return supportedBackendFound;
-                        };
-
-                        for (ConvertFp16ToFp32Layer* convertLayer : convertFp16ToFp32Layers)
-                        {
-                            if (!AssignFirstSupportedBackend(convertLayer, backend))
-                            {
-                                return ReturnWithError(convertLayer);
-                            }
-                        }
-
-                        for (ConvertFp32ToFp16Layer* convertLayer : convertFp32ToFp16Layers)
-                        {
-                            if (!AssignFirstSupportedBackend(convertLayer, backend))
-                            {
-                                return ReturnWithError(convertLayer);
-                            }
-                        }
-
-                        found = true;
-                        break;
-                    }
+                    continue; //Don't re-test the backend hint
                 }
-                std::stringstream warningMsg;
-                warningMsg << "Layer of type " << GetLayerTypeAsCString(layer->GetType())
-                           << " is not supported on requested backend " << layer->GetBackendId().Get()
-                           << " for input data type " << GetDataTypeName(dataTypeIn)
-                           << " and output data type " << GetDataTypeName(dataTypeOut)
-                           << " (reason: " << reasonIfUnsupported
-                           << "), falling back to the next backend.";
-                ReportWarning(warningMsg.str(), errMessages);
-            }
-            else
-            {
-                found = true;
-                backendSettings.m_SelectedBackends.insert(backend);
-                break;
+
+                OptimizationResult res = AttemptBackendAssignment(backendSettings,
+                                                                  optNetObjPtr->GetGraph(),
+                                                                  layer,
+                                                                  backend,
+                                                                  dataTypeIn,
+                                                                  dataTypeOut,
+                                                                  availablePreferredBackends,
+                                                                  reasonIfUnsupported,
+                                                                  errMessages);
+
+                if (res.IsOk())
+                {
+                    found = true;
+                    backendSettings.m_SelectedBackends.insert(backend);
+                    break;
+                }
+                else if (res.IsError())
+                {
+                   return res;  // Cannot continue.
+                   // Note: we don't need to log the error as it would already
+                   // be logged in AttemptBackendAssignment().
+                }
+                else
+                {
+                    BOOST_ASSERT_MSG(res.IsWarningOnly(), "OptimizationResult in unexpected state.");
+                }
             }
         }
 
@@ -301,7 +383,7 @@ OptimizationResult AssignBackends(OptimizedNetwork* optNetObjPtr,
             }
             else
             {
-                return ReturnWithError(layer);
+                return ReturnError(layer);
             }
         }
     }

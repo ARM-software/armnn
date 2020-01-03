@@ -17,6 +17,7 @@
 #include <map>
 #include <memory>
 
+#include "Graph.hpp"
 #include "Layer.hpp"
 
 namespace armnn
@@ -286,10 +287,19 @@ struct OptimizationResult
     bool m_Warning;
     bool m_Error;
 
-    OptimizationResult()
-        : m_Warning(false)
-        , m_Error(false)
+    OptimizationResult(bool warning, bool error)
+        : m_Warning(warning)
+        , m_Error(error)
     {}
+
+    OptimizationResult()
+        : OptimizationResult(false, false)
+    {}
+
+    bool IsOk() const { return !m_Warning && !m_Error; }
+    bool IsWarningOnly() const { return m_Warning && !m_Error; }
+    bool IsError() const { return m_Error; }
+
 };
 
 using BackendsMap = std::map<BackendId, std::unique_ptr<class IBackendInternal>>;
@@ -301,5 +311,11 @@ OptimizationResult SelectTensorHandleStrategy(Graph& optGraph,
                                               BackendsMap& backends,
                                               TensorHandleFactoryRegistry& registry,
                                               Optional<std::vector<std::string>&> errMessages);
+
+OptimizationResult AssignBackends(OptimizedNetwork* optNetObjPtr,
+                                  BackendSettings& backendSettings,
+                                  Graph::Iterator& firstLayer,
+                                  Graph::Iterator& lastLayer,
+                                  Optional<std::vector<std::string>&> errMessages);
 
 } // namespace armnn

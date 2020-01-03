@@ -61,22 +61,38 @@ protected:
 class IConnectableLayer
 {
 public:
+    /// Returns the name of the layer
     virtual const char* GetName() const = 0;
 
+    /// Returns the number of connectable input slots
     virtual unsigned int GetNumInputSlots() const = 0;
+
+    /// Returns the number of connectable output slots
     virtual unsigned int GetNumOutputSlots() const = 0;
 
+    /// Get a const input slot handle by slot index
     virtual const IInputSlot& GetInputSlot(unsigned int index) const = 0;
+
+    /// Get the input slot handle by slot index
     virtual IInputSlot& GetInputSlot(unsigned int index) = 0;
 
+    /// Get the const output slot handle by slot index
     virtual const IOutputSlot& GetOutputSlot(unsigned int index) const = 0;
+
+    /// Get the output slot handle by slot index
     virtual IOutputSlot& GetOutputSlot(unsigned int index) = 0;
 
+    /// Infer the shape of the output(s) based on the provided input shape(s)
     virtual std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const = 0;
 
+    /// Returns the unique id of the layer
     virtual LayerGuid GetGuid() const = 0;
 
+    /// Apply a visitor to this layer
     virtual void Accept(ILayerVisitor& visitor) const = 0;
+
+    /// Provide a hint for the optimizer as to which backend to prefer for this layer
+    virtual void BackendSelectionHint(Optional<BackendId> backend) = 0;
 protected:
       /// Objects are not deletable via the handle
     ~IConnectableLayer() {}

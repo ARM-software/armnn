@@ -6,6 +6,9 @@
 #pragma once
 
 #include <armnn/BackendId.hpp>
+
+#include "DeviceSpec.hpp"
+
 #include <vector>
 
 namespace armnn

@@ -320,6 +320,13 @@ public:
     const std::list<std::string>& GetRelatedLayerNames() { return m_RelatedLayerNames; }
 
     virtual void Reparent(Graph& dest, std::list<Layer*>::const_iterator iterator) = 0;
+
+    void BackendSelectionHint(Optional<BackendId> backend) final
+    {
+        m_BackendHint = backend;
+    }
+    Optional<BackendId> GetBackendHint() const { return m_BackendHint; }
+
 protected:
     // Graph needs access to the virtual destructor.
     friend class Graph;
@@ -371,6 +378,7 @@ private:
 
     const LayerType m_Type;
     BackendId m_BackendId;
+    Optional<BackendId> m_BackendHint;
 
     /// Used for sorting.
     mutable LayerPriority m_Priority = 0;

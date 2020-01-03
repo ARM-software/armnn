@@ -193,6 +193,7 @@ Layer::Layer(unsigned int numInputSlots,
 , m_LayerName(name ? name : "")
 , m_Type(type)
 , m_BackendId()
+, m_BackendHint(EmptyOptional())
 , m_Guid(profiling::ProfilingService::Instance().NextGuid())
 {
     boost::ignore_unused(layout);

@@ -5,13 +5,20 @@
 
 #include "TestUtils.hpp"
 
+#include <BackendSettings.hpp>
 #include <Graph.hpp>
+#include <Network.hpp>
 #include <Optimizer.hpp>
 
+#include <armnn/BackendRegistry.hpp>
+#include <armnn/INetwork.hpp>
+#include <armnn/LayerVisitorBase.hpp>
 
 #include <armnnUtils/FloatingPointConverter.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/IBackendInternal.hpp>
+#include <backendsCommon/LayerSupportBase.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -614,6 +621,176 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConvolution2dLayer)
         &IsLayerOfType<armnn::InputLayer>,
         checkPadFoldedIntoConv2d,
         &IsLayerOfType<armnn::OutputLayer>));
+}
+
+
+
+
+class MockLayerSupport : public LayerSupportBase {
+public:
+    bool IsInputSupported(const TensorInfo& /*input*/,
+                          Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const override
+    {
+        return true;
+    }
+
+    bool IsOutputSupported(const TensorInfo& /*input*/,
+                           Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const override
+    {
+        return true;
+    }
+
+    bool IsActivationSupported(const TensorInfo& /*input0*/,
+                               const TensorInfo& /*output*/,
+                               const ActivationDescriptor& /*descriptor*/,
+                               Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const override
+    {
+        return true;
+    }
+};
+
+template<typename NamePolicy>
+class MockBackend : public IBackendInternal
+{
+public:
+    MockBackend()  = default;
+    ~MockBackend() = default;
+
+    static const BackendId& GetIdStatic() { return NamePolicy::GetIdStatic(); }
+    const BackendId& GetId() const override { return GetIdStatic(); }
+
+    IBackendInternal::IMemoryManagerUniquePtr CreateMemoryManager() const override { return nullptr; };
+
+    IBackendInternal::IWorkloadFactoryPtr CreateWorkloadFactory(
+        const IBackendInternal::IMemoryManagerSharedPtr&) const override { return nullptr; }
+
+    IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override
+    {
+        return nullptr;
+    }
+
+    IBackendInternal::Optimizations GetOptimizations() const override { return {}; }
+    IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override
+    {
+        return std::make_shared<MockLayerSupport>();
+    }
+
+    OptimizationViews OptimizeSubgraphView(const SubgraphView&) const override
+    {
+        return {};
+    };
+};
+
+
+BOOST_AUTO_TEST_CASE(BackendHintTest)
+{
+    class TestBackendAssignment : public LayerVisitorBase<VisitorNoThrowPolicy>
+    {
+    public:
+        void VisitInputLayer(const IConnectableLayer* layer,
+                             LayerBindingId id,
+                             const char* name = nullptr) override
+        {
+            boost::ignore_unused(id, name);
+            auto inputLayer = boost::polymorphic_downcast<const InputLayer*>(layer);
+            BOOST_TEST((inputLayer->GetBackendId() == "MockBackend"));
+        }
+
+        void VisitOutputLayer(const IConnectableLayer* layer,
+                              LayerBindingId id,
+                              const char* name = nullptr) override
+        {
+            boost::ignore_unused(id, name);
+            auto outputLayer = boost::polymorphic_downcast<const OutputLayer*>(layer);
+            BOOST_TEST((outputLayer->GetBackendId() == "MockBackend"));
+        }
+
+        void VisitActivationLayer(const IConnectableLayer* layer,
+                                  const ActivationDescriptor& activationDescriptor,
+                                  const char* name = nullptr) override
+        {
+            boost::ignore_unused(activationDescriptor, name);
+            auto activation = boost::polymorphic_downcast<const ActivationLayer*>(layer);
+            BOOST_TEST((activation->GetBackendId() == "CustomBackend"));
+        }
+    };
+
+    struct CustomPolicy
+    {
+        static const BackendId& GetIdStatic()
+        {
+            static BackendId id="CustomBackend";
+            return id;
+        }
+    };
+
+    struct MockPolicy
+    {
+        static const BackendId& GetIdStatic()
+        {
+            static BackendId id="MockBackend";
+            return id;
+        }
+    };
+
+    auto& backendRegistry = BackendRegistryInstance();
+
+    backendRegistry.Register("MockBackend", [](){
+            return std::make_unique<MockBackend<MockPolicy>>();
+        });
+
+    backendRegistry.Register("CustomBackend", [](){
+            return std::make_unique<MockBackend<CustomPolicy>>();
+        });
+
+    // Define the network
+    auto network = INetwork::Create();
+    ActivationDescriptor desc;
+    desc.m_Function = ActivationFunction::Linear;
+
+    std::unique_ptr<Graph> graph = std::make_unique<Graph>();
+    auto input = graph->AddLayer<InputLayer>(0, "input");
+    auto act = graph->AddLayer<ActivationLayer>(desc, "activation");
+    auto output = graph->AddLayer<OutputLayer>(0, "output");
+
+    BackendId customBackendId("CustomBackend");
+    act->BackendSelectionHint(customBackendId);
+
+    input->GetOutputSlot(0).Connect(act->GetInputSlot(0));
+    act->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+
+    auto optNet = IOptimizedNetworkPtr(new OptimizedNetwork(std::move(graph)), &IOptimizedNetwork::Destroy);
+
+    OptimizedNetwork* optNetObjPtr = boost::polymorphic_downcast<OptimizedNetwork*>(optNet.get());
+
+    // Get the optimized graph
+    Graph& optGraph = optNetObjPtr->GetGraph();
+
+
+    std::vector<BackendId> prefs{"MockBackend", "CustomBackend"};
+
+    BackendIdSet availableBackends = {"CustomBackend", "MockBackend"};
+    DeviceSpec spec(availableBackends);
+
+    BackendSettings backendSettings(prefs, spec);
+
+    // Assign an available backend to each layer
+    Graph::Iterator firstLayer = optGraph.begin();
+    Graph::Iterator lastLayer  = optGraph.end();
+    OptimizationResult res = AssignBackends(optNetObjPtr,
+                                            backendSettings,
+                                            firstLayer,
+                                            lastLayer,
+                                            EmptyOptional());
+
+    BOOST_TEST(res.IsOk());
+
+    TestBackendAssignment visitor;
+    for (auto it =firstLayer; it != lastLayer; ++it)
+    {
+        (*it)->Accept(visitor);
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

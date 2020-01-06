@@ -79,6 +79,25 @@ armnnSerializer::DataLayout GetFlatBufferDataLayout(armnn::DataLayout dataLayout
     }
 }
 
+armnnSerializer::UnaryOperation GetFlatBufferUnaryOperation(armnn::UnaryOperation comparisonOperation)
+{
+    switch (comparisonOperation)
+    {
+        case armnn::UnaryOperation::Abs:
+            return armnnSerializer::UnaryOperation::UnaryOperation_Abs;
+        case armnn::UnaryOperation::Rsqrt:
+            return armnnSerializer::UnaryOperation::UnaryOperation_Rsqrt;
+        case armnn::UnaryOperation::Sqrt:
+            return armnnSerializer::UnaryOperation::UnaryOperation_Sqrt;
+        case armnn::UnaryOperation::Exp:
+            return armnnSerializer::UnaryOperation::UnaryOperation_Exp;
+        case armnn::UnaryOperation::Neg:
+            return armnnSerializer::UnaryOperation::UnaryOperation_Neg;
+        default:
+            throw armnn::InvalidArgumentException("Unary operation unknown");
+    }
+}
+
 armnnSerializer::PoolingAlgorithm GetFlatBufferPoolingAlgorithm(armnn::PoolingAlgorithm poolingAlgorithm)
 {
     switch (poolingAlgorithm)

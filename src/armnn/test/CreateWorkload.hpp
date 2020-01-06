@@ -131,14 +131,15 @@ std::unique_ptr<WorkloadType> CreateElementwiseWorkloadTest(armnn::IWorkloadFact
     return workload;
 }
 
-template <typename WorkloadType,
+template <typename WorkloadType, 
           typename DescriptorType,
-          typename LayerType,
           armnn::DataType DataType>
 std::unique_ptr<WorkloadType> CreateElementwiseUnaryWorkloadTest(armnn::IWorkloadFactory & factory,
-                                                                 armnn::Graph & graph)
+                                                                 armnn::Graph & graph,
+                                                                 armnn::UnaryOperation op)
 {
-    Layer* const layer = graph.AddLayer<LayerType>("layer");
+    ElementwiseUnaryDescriptor desc = ElementwiseUnaryDescriptor(op);
+    Layer* const layer = graph.AddLayer<armnn::ElementwiseUnaryLayer>(desc, "layer");
 
     Layer* const input  = graph.AddLayer<InputLayer>(0, "input");
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
@@ -1056,34 +1057,6 @@ std::unique_ptr<ResizeWorkload> CreateResizeBilinearWorkloadTest(armnn::IWorkloa
     BOOST_CHECK(queueDescriptor.m_Parameters.m_DataLayout == dataLayout);
 
     // Returns so we can do extra, backend-specific tests.
-    return workload;
-}
-
-template <typename RsqrtWorkload, armnn::DataType DataType>
-std::unique_ptr<RsqrtWorkload> CreateRsqrtWorkloadTest(armnn::IWorkloadFactory& factory,
-                                                       armnn::Graph&  graph)
-{
-    Layer* const layer = graph.AddLayer<RsqrtLayer>("rsqrt");
-
-    // Creates extra layers.
-    Layer* const input = graph.AddLayer<InputLayer>(0, "input");
-    Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
-
-    // Connects up.
-    armnn::TensorInfo tensorInfo({1, 1}, DataType);
-
-    Connect(input, layer, tensorInfo);
-    Connect(layer, output, tensorInfo);
-
-    CreateTensorHandles(graph, factory);
-
-    // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<RsqrtWorkload>(*layer, factory);
-
-    RsqrtQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-
     return workload;
 }
 

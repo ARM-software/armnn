@@ -53,12 +53,12 @@ void RefElementwiseWorkload<Functor, ParentDescriptor, DebugString>::Execute() c
     m_Input1->Reset(m_Data.m_Inputs[1]->Map());
     m_Output->Reset(m_Data.m_Outputs[0]->Map());
 
-    ElementwiseFunction<Functor>(inShape0,
-                                 inShape1,
-                                 outShape,
-                                 *m_Input0,
-                                 *m_Input1,
-                                 *m_Output);
+    ElementwiseBinaryFunction<Functor>(inShape0,
+                                       inShape1,
+                                       outShape,
+                                       *m_Input0,
+                                       *m_Input1,
+                                       *m_Output);
 }
 
 } //namespace armnn

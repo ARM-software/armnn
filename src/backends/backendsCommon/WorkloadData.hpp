@@ -560,4 +560,9 @@ struct ComparisonQueueDescriptor : QueueDescriptorWithParameters<ComparisonDescr
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct ElementwiseUnaryQueueDescriptor : QueueDescriptorWithParameters<ElementwiseUnaryDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } // namespace armnn

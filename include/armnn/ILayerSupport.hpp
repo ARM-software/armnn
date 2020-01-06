@@ -27,6 +27,7 @@ protected:
     virtual ~ILayerSupport() {}
 
 public:
+    ARMNN_DEPRECATED_MSG("Use IsElementwiseUnarySupported instead")
     virtual bool IsAbsSupported(const TensorInfo& input,
                                 const TensorInfo& output,
                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
@@ -132,6 +133,11 @@ public:
                                      const TensorInfo& input1,
                                      const TensorInfo& output,
                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
+    virtual bool IsElementwiseUnarySupported(const TensorInfo& input,
+                                             const TensorInfo& output,
+                                             const ElementwiseUnaryDescriptor& descriptor,
+                                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
     ARMNN_DEPRECATED_MSG("Use IsComparisonSupported instead")
     virtual bool IsEqualSupported(const TensorInfo& input0,
@@ -292,6 +298,7 @@ public:
                                    const ResizeDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    ARMNN_DEPRECATED_MSG("Use IsElementwiseUnarySupported instead")
     virtual bool IsRsqrtSupported(const TensorInfo& input,
                                   const TensorInfo& output,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;

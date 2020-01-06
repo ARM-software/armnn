@@ -3,7 +3,10 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <armnn/Deprecated.hpp>
+#include <armnn/Descriptors.hpp>
 #include <armnn/Exceptions.hpp>
+#include <armnn/Types.hpp>
 
 #include <backendsCommon/LayerSupportBase.hpp>
 
@@ -193,6 +196,26 @@ bool LayerSupportBase::IsDivisionSupported(const TensorInfo& /*input0*/,
                                            Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
+bool LayerSupportBase::IsElementwiseUnarySupported(const TensorInfo& input,
+                                                   const TensorInfo& output,
+                                                   const ElementwiseUnaryDescriptor& descriptor,
+                                                   Optional<std::string&> reasonIfUnsupported) const
+{
+    if (descriptor.m_Operation == UnaryOperation::Abs)
+    {
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
+        return IsAbsSupported(input, output, reasonIfUnsupported);
+        ARMNN_NO_DEPRECATE_WARN_END
+    }
+    else if (descriptor.m_Operation == UnaryOperation::Rsqrt)
+    {
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
+        return IsRsqrtSupported(input, output, reasonIfUnsupported);
+        ARMNN_NO_DEPRECATE_WARN_END
+    }
+    return false;
 }
 
 bool LayerSupportBase::IsEqualSupported(const armnn::TensorInfo& /*input0*/,

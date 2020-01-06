@@ -38,6 +38,7 @@ public:
                                                       DataLayout dataLayout,
                                                       const bool IsMemoryManaged = true) const override;
 
+    ARMNN_DEPRECATED_MSG("Use CreateElementwiseUnary instead")
     std::unique_ptr<IWorkload> CreateAbs(const AbsQueueDescriptor& descriptor,
                                          const WorkloadInfo& info) const override;
 
@@ -91,6 +92,9 @@ public:
 
     std::unique_ptr<IWorkload> CreateDivision(const DivisionQueueDescriptor& descriptor,
                                               const WorkloadInfo& info) const override;
+
+    std::unique_ptr<IWorkload> CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
+                                                      const WorkloadInfo& info) const override;
 
     std::unique_ptr<IWorkload> CreateEqual(const EqualQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override;
@@ -178,6 +182,7 @@ public:
     std::unique_ptr<IWorkload> CreateResizeBilinear(const ResizeBilinearQueueDescriptor& descriptor,
                                                     const WorkloadInfo& info) const override;
 
+    ARMNN_DEPRECATED_MSG("Use CreateElementwiseUnary instead")
     std::unique_ptr<IWorkload> CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override;
 

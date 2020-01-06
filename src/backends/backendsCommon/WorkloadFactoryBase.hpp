@@ -106,6 +106,22 @@ public:
                                               const WorkloadInfo& /*info*/) const override
     { return nullptr; }
 
+    std::unique_ptr<IWorkload> CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
+                                                      const WorkloadInfo& info) const override
+    {
+        if (descriptor.m_Parameters.m_Operation == UnaryOperation::Abs)
+        {
+            AbsQueueDescriptor absDescriptor;
+            return CreateAbs(absDescriptor, info);
+        }
+        else if (descriptor.m_Parameters.m_Operation == UnaryOperation::Rsqrt)
+        {
+            RsqrtQueueDescriptor rsqrtDescriptor;
+            return CreateRsqrt(rsqrtDescriptor, info);
+        }
+        return nullptr;
+    }
+
     std::unique_ptr<IWorkload> CreateFakeQuantization(const FakeQuantizationQueueDescriptor& /*descriptor*/,
                                                       const WorkloadInfo& /*info*/) const override
     { return nullptr; }

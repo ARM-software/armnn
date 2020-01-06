@@ -32,6 +32,7 @@ public:
     ~QuantizerVisitor() = default;
 
     /// Functions to quantize the individual layers, overridden from ILayerVisitor
+    ARMNN_DEPRECATED_MSG("Use VisitElementwiseUnaryLayer instead")
     void VisitAbsLayer(const IConnectableLayer* layer, const char* name = nullptr) override;
 
     void VisitActivationLayer(const IConnectableLayer* layer,
@@ -78,12 +79,15 @@ public:
                                 const DepthToSpaceDescriptor& depthToSpaceDescriptor,
                                 const char* name = nullptr) override;
 
-
     void VisitDepthwiseConvolution2dLayer(const IConnectableLayer* layer,
                                           const DepthwiseConvolution2dDescriptor& desc,
                                           const ConstTensor& weights,
                                           const Optional<ConstTensor>& biases,
                                           const char* name = nullptr) override;
+
+    void VisitElementwiseUnaryLayer(const IConnectableLayer* layer,
+                                    const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
+                                    const char* name = nullptr) override;
 
     void VisitFullyConnectedLayer(const IConnectableLayer *layer,
                                   const FullyConnectedDescriptor& desc,
@@ -142,6 +146,7 @@ public:
                                   const ResizeBilinearDescriptor& resizeDesc,
                                   const char* name = nullptr) override;
 
+    ARMNN_DEPRECATED_MSG("Use VisitElementwiseUnaryLayer instead")
     void VisitRsqrtLayer(const IConnectableLayer*,
                          const char* name = nullptr) override;
 

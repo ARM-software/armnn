@@ -12,6 +12,7 @@ namespace armnn
 class NeonLayerSupport : public LayerSupportBase
 {
 public:
+    ARMNN_DEPRECATED_MSG("Use IsElementwiseUnarySupported instead")
     bool IsAbsSupported(const TensorInfo& input,
                         const TensorInfo& output,
                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
@@ -102,6 +103,11 @@ public:
                                                 const TensorInfo& weights,
                                                 const Optional<TensorInfo>& biases,
                                                 Optional<std::string&> reason = EmptyOptional()) const override;
+
+    bool IsElementwiseUnarySupported(const TensorInfo& input,
+                               const TensorInfo& output,
+                               const ElementwiseUnaryDescriptor& descriptor,
+                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsFloorSupported(const TensorInfo& input,
                           const TensorInfo& output,
@@ -224,6 +230,7 @@ public:
                                    const TensorInfo& output,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    ARMNN_DEPRECATED_MSG("Use IsElementwiseUnarySupported instead")
     bool IsRsqrtSupported(const TensorInfo& input,
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;

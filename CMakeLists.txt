@@ -244,8 +244,6 @@ list(APPEND armnn_sources
     include/armnn/Version.hpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp
-    src/armnn/layers/AbsLayer.hpp
-    src/armnn/layers/AbsLayer.cpp
     src/armnn/layers/ActivationLayer.hpp
     src/armnn/layers/ActivationLayer.cpp
     src/armnn/layers/AdditionLayer.hpp
@@ -280,6 +278,8 @@ list(APPEND armnn_sources
     src/armnn/layers/DetectionPostProcessLayer.cpp
     src/armnn/layers/ElementwiseBaseLayer.hpp
     src/armnn/layers/ElementwiseBaseLayer.cpp
+    src/armnn/layers/ElementwiseUnaryLayer.hpp
+    src/armnn/layers/ElementwiseUnaryLayer.cpp
     src/armnn/layers/FakeQuantizationLayer.hpp
     src/armnn/layers/FakeQuantizationLayer.cpp
     src/armnn/layers/FloorLayer.hpp
@@ -336,8 +336,6 @@ list(APPEND armnn_sources
     src/armnn/layers/ReshapeLayer.cpp
     src/armnn/layers/ResizeLayer.hpp
     src/armnn/layers/ResizeLayer.cpp
-    src/armnn/layers/RsqrtLayer.cpp
-    src/armnn/layers/RsqrtLayer.hpp
     src/armnn/layers/SliceLayer.cpp
     src/armnn/layers/SliceLayer.hpp
     src/armnn/layers/SoftmaxLayer.hpp

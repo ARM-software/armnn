@@ -6,12 +6,12 @@ This reference guide provides a list of layers which can be serialized currently
 
 The Arm NN SDK Serializer currently supports the following layers:
 
-* Abs
 * Activation
 * Addition
 * ArgMinMax
 * BatchToSpaceNd
 * BatchNormalization
+* Comparison
 * Concat
 * Constant
 * Convolution2d
@@ -20,6 +20,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 * Dequantize
 * DetectionPostProcess
 * Division
+* ElementwiseUnary
 * Floor
 * FullyConnected
 * Gather
@@ -43,7 +44,6 @@ The Arm NN SDK Serializer currently supports the following layers:
 * QuantizedLstm
 * Reshape
 * Resize
-* Rsqrt
 * Slice
 * Softmax
 * SpaceToBatchNd
@@ -66,3 +66,6 @@ Some layers have been deprecated and replaced by others layers. In order to main
 * Merger will deserialize as Concat
 * Greater will deserialize as Comparison
 * ResizeBilinear will deserialize as Resize
+* Abs will deserialize as ElementwiseUnary
+* Rsqrt will deserialize as ElementwiseUnary
+

@@ -16,6 +16,7 @@ struct ComparisonDescriptor;
 struct Convolution2dDescriptor;
 struct DepthwiseConvolution2dDescriptor;
 struct DetectionPostProcessDescriptor;
+struct ElementwiseUnaryDescriptor;
 struct FakeQuantizationDescriptor;
 struct FullyConnectedDescriptor;
 struct InstanceNormalizationDescriptor;

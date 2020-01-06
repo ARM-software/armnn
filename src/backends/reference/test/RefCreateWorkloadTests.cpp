@@ -717,41 +717,6 @@ BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat32Nhwc)
     RefCreateResizeBilinearTest<RefResizeWorkload, armnn::DataType::Float32>(DataLayout::NHWC);
 }
 
-template <typename RsqrtWorkloadType, armnn::DataType DataType>
-static void RefCreateRsqrtTest()
-{
-    Graph graph;
-    RefWorkloadFactory factory = GetFactory();
-
-    auto workload = CreateRsqrtWorkloadTest<RsqrtWorkloadType, DataType>(factory, graph);
-
-    // Checks that outputs are as we expect them (see definition of CreateRsqrtWorkloadTest).
-    CheckInputOutput(std::move(workload),
-                     TensorInfo({ 1, 1 }, DataType),
-                     TensorInfo({ 1, 1 }, DataType));
-
-}
-
-BOOST_AUTO_TEST_CASE(CreateRsqrtFloat32)
-{
-    RefCreateRsqrtTest<RefRsqrtWorkload, armnn::DataType::Float32>();
-}
-
-BOOST_AUTO_TEST_CASE(CreateRsqrtFloat16)
-{
-    RefCreateRsqrtTest<RefRsqrtWorkload, armnn::DataType::Float16>();
-}
-
-BOOST_AUTO_TEST_CASE(CreateRsqrtUint8)
-{
-    RefCreateRsqrtTest<RefRsqrtWorkload, armnn::DataType::QAsymmU8>();
-}
-
-BOOST_AUTO_TEST_CASE(CreateRsqrtQsymm16)
-{
-    RefCreateRsqrtTest<RefRsqrtWorkload, armnn::DataType::QSymmS16>();
-}
-
 template <typename BatchToSpaceNdWorkloadType, armnn::DataType DataType>
 static void RefCreateBatchToSpaceNdTest()
 {

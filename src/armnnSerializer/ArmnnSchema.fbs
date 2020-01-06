@@ -147,7 +147,8 @@ enum LayerType : uint {
     InstanceNormalization = 50,
     LogSoftmax = 51,
     Comparison = 52,
-    StandIn = 53
+    StandIn = 53,
+    ElementwiseUnary = 54
 }
 
 // Base layer table to be used as part of other layers
@@ -166,6 +167,7 @@ table BindableLayerBase {
 
 // Table for each layer defined below
 
+/// @deprecated Use ElementwiseUnaryLayer instead
 table AbsLayer {
     base:LayerBase;
 }
@@ -250,6 +252,23 @@ table DepthToSpaceDescriptor {
 
 table DivisionLayer {
     base:LayerBase;
+}
+
+enum UnaryOperation : byte {
+    Abs = 0,
+    Rsqrt = 1,
+    Sqrt = 2,
+    Exp = 3,
+    Neg = 4
+}
+
+table ElementwiseUnaryDescriptor {
+    operation:UnaryOperation;
+}
+
+table ElementwiseUnaryLayer {
+    base:LayerBase;
+    descriptor:ElementwiseUnaryDescriptor;
 }
 
 /// @deprecated Use ComparisonLayer instead
@@ -502,6 +521,7 @@ table PadDescriptor {
     padValue:float = 0;
 }
 
+/// @deprecated Use ElementwiseUnaryLayer instead
 table RsqrtLayer {
     base:LayerBase;
 }
@@ -798,7 +818,8 @@ union Layer {
     InstanceNormalizationLayer,
     LogSoftmaxLayer,
     ComparisonLayer,
-    StandInLayer
+    StandInLayer,
+    ElementwiseUnaryLayer
 }
 
 table AnyLayer {

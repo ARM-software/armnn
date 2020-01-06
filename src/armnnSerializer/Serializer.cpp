@@ -439,6 +439,21 @@ void SerializerVisitor::VisitDivisionLayer(const armnn::IConnectableLayer* layer
     CreateAnyLayer(fbDivisionLayer.o, serializer::Layer::Layer_DivisionLayer);
 }
 
+void SerializerVisitor::VisitElementwiseUnaryLayer(const armnn::IConnectableLayer* layer,
+                                                   const armnn::ElementwiseUnaryDescriptor& descriptor,
+                                                   const char* name)
+{
+    boost::ignore_unused(name);
+
+    auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_ElementwiseUnary);
+    auto fbDescriptor = serializer::CreateElementwiseUnaryDescriptor(
+        m_flatBufferBuilder,
+        GetFlatBufferUnaryOperation(descriptor.m_Operation));
+
+    auto fbLayer = serializer::CreateElementwiseUnaryLayer(m_flatBufferBuilder, fbBaseLayer, fbDescriptor);
+    CreateAnyLayer(fbLayer.o, serializer::Layer::Layer_ElementwiseUnaryLayer);
+}
+
 void SerializerVisitor::VisitEqualLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
     boost::ignore_unused(name);

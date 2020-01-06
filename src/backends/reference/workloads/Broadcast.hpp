@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -14,6 +14,8 @@ namespace armnn
 struct BroadcastLoop
 {
     BroadcastLoop(const TensorShape& inShape0, const TensorShape& inShape1, const TensorShape& outShape);
+
+    BroadcastLoop(const TensorShape& inShape, const TensorShape& outShape);
 
     unsigned int GetNumDimensions()
     {
@@ -53,6 +55,37 @@ struct BroadcastLoop
         // move iterator back to the start
         inData0 -= inData0Movement;
         inData1 -= inData1Movement;
+        outData -= outDataMovement;
+    }
+
+    template <typename Func, typename DecoderOp, typename EncoderOp>
+    void Unroll(Func operationFunc,
+                unsigned int dimension,
+                DecoderOp& inData,
+                EncoderOp& outData)
+    {
+        if (dimension >= GetNumDimensions())
+        {
+            outData.Set(operationFunc(inData.Get()));
+            return;
+        }
+
+        unsigned int inDataMovement = 0;
+        unsigned int outDataMovement = 0;
+
+        for (unsigned int i = 0; i < m_DimData[dimension].m_DimSize; i++)
+        {
+            Unroll(operationFunc, dimension + 1, inData, outData);
+
+            inData += m_DimData[dimension].m_Stride1;
+            outData += m_DimData[dimension].m_StrideOut;
+
+            inDataMovement += m_DimData[dimension].m_Stride1;
+            outDataMovement += m_DimData[dimension].m_StrideOut;
+        }
+
+        // move iterator back to the start
+        inData -= inDataMovement;
         outData -= outDataMovement;
     }
 

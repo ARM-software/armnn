@@ -129,10 +129,8 @@ bool NeonLayerSupport::IsAbsSupported(const TensorInfo& input,
                                       const TensorInfo& output,
                                       Optional<std::string&> reasonIfUnsupported) const
 {
-    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonAbsWorkloadValidate,
-                                   reasonIfUnsupported,
-                                   input,
-                                   output);
+    ElementwiseUnaryDescriptor descriptor(UnaryOperation::Abs);
+    return IsElementwiseUnarySupported(input, output, descriptor, reasonIfUnsupported);
 }
 
 bool NeonLayerSupport::IsActivationSupported(const TensorInfo& input,
@@ -384,6 +382,29 @@ bool NeonLayerSupport::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& 
                                    descriptor,
                                    weights,
                                    biases);
+}
+
+bool NeonLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
+                                                   const TensorInfo& output,
+                                                   const ElementwiseUnaryDescriptor& descriptor,
+                                                   Optional<std::string&> reasonIfUnsupported) const
+{
+    if (descriptor.m_Operation == UnaryOperation::Abs)
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonAbsWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       input,
+                                       output);
+    }
+    else if (descriptor.m_Operation == UnaryOperation::Rsqrt)
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonRsqrtWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       input,
+                                       output);
+    }
+
+    return false;
 }
 
 bool NeonLayerSupport::IsFloorSupported(const TensorInfo& input,
@@ -656,7 +677,8 @@ bool NeonLayerSupport::IsRsqrtSupported(const TensorInfo& input,
                                         const TensorInfo& output,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
-    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonRsqrtWorkloadValidate, reasonIfUnsupported, input, output);
+    ElementwiseUnaryDescriptor descriptor(UnaryOperation::Rsqrt);
+    return IsElementwiseUnarySupported(input, output, descriptor, reasonIfUnsupported);
 }
 
 bool NeonLayerSupport::IsSliceSupported(const TensorInfo& input,

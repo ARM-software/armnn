@@ -427,8 +427,6 @@ template<armnn::LayerType Type, armnn::DataType DataType>
 struct LayerTypePolicy;
 
 // Every entry in the armnn::LayerType enum must be accounted for below.
-DECLARE_LAYER_POLICY_1_PARAM(Abs)
-
 DECLARE_LAYER_POLICY_2_PARAM(Activation)
 
 DECLARE_LAYER_POLICY_1_PARAM(Addition)
@@ -464,6 +462,8 @@ DECLARE_LAYER_POLICY_2_PARAM(DepthwiseConvolution2d)
 DECLARE_LAYER_POLICY_1_PARAM(Dequantize)
 
 DECLARE_LAYER_POLICY_2_PARAM(DetectionPostProcess)
+
+DECLARE_LAYER_POLICY_2_PARAM(ElementwiseUnary)
 
 DECLARE_LAYER_POLICY_2_PARAM(FakeQuantization)
 
@@ -516,8 +516,6 @@ DECLARE_LAYER_POLICY_1_PARAM(Division)
 DECLARE_LAYER_POLICY_2_PARAM(Resize)
 
 DECLARE_LAYER_POLICY_2_PARAM(Reshape)
-
-DECLARE_LAYER_POLICY_1_PARAM(Rsqrt)
 
 DECLARE_LAYER_POLICY_2_PARAM(Slice)
 

@@ -14,7 +14,6 @@ char const* GetLayerTypeAsCString(LayerType type)
 {
     switch (type)
     {
-        case LayerType::Abs: return "Abs";
         case LayerType::Activation: return "Activation";
         case LayerType::Addition: return "Addition";
         case LayerType::ArgMinMax: return "ArgMinMax";
@@ -32,6 +31,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Dequantize: return "Dequantize";
         case LayerType::DetectionPostProcess: return "DetectionPostProcess";
         case LayerType::Division: return "Division";
+        case LayerType::ElementwiseUnary: return "ElementwiseUnary";
         case LayerType::FakeQuantization: return "FakeQuantization";
         case LayerType::Floor: return "Floor";
         case LayerType::FullyConnected: return "FullyConnected";
@@ -58,7 +58,6 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Quantize:  return "Quantize";
         case LayerType::QuantizedLstm: return "QuantizedLstm";
         case LayerType::Reshape: return "Reshape";
-        case LayerType::Rsqrt: return "Rsqrt";
         case LayerType::Resize: return "Resize";
         case LayerType::Slice: return "Slice";
         case LayerType::Softmax: return "Softmax";

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -26,6 +26,25 @@ BroadcastLoop::BroadcastLoop(const TensorShape& inShape0, const TensorShape& inS
 
         sIn0 *= inShape0[j];
         sIn1 *= inShape1[j];
+        sOut *= outShape[j];
+    }
+}
+
+BroadcastLoop::BroadcastLoop(const TensorShape& inShape, const TensorShape& outShape)
+: m_DimData(outShape.GetNumDimensions())
+{
+    const unsigned int numDims = GetNumDimensions();
+
+    unsigned int sIn = 1;
+    unsigned int sOut = 1;
+
+    for (unsigned int j = numDims - 1, k = 0; k < numDims ; k++, j--)
+    {
+        m_DimData[j].m_DimSize = outShape[j];
+        m_DimData[j].m_Stride1 = (inShape[j] > 1) ? sIn : 0;
+        m_DimData[j].m_StrideOut = sOut;
+
+        sIn *= inShape[j];
         sOut *= outShape[j];
     }
 }

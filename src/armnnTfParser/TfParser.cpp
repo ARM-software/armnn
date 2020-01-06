@@ -2627,7 +2627,8 @@ ParsedTfOperationPtr TfParser::ParseRsqrt(const tensorflow::NodeDef &nodeDef,
 
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
 
-    IConnectableLayer* const layer = m_Network->AddRsqrtLayer(nodeDef.name().c_str());
+    ElementwiseUnaryDescriptor descriptor(UnaryOperation::Rsqrt);
+    IConnectableLayer* const layer = m_Network->AddElementwiseUnaryLayer(descriptor, nodeDef.name().c_str());
 
     IOutputSlot& prevLayerOutputSlot = inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
     prevLayerOutputSlot.Connect(layer->GetInputSlot(0));

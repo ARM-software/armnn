@@ -80,6 +80,15 @@ enum class ComparisonOperation
     NotEqual       = 5
 };
 
+enum class UnaryOperation
+{
+    Abs   = 0,
+    Exp   = 1,
+    Sqrt  = 2,
+    Rsqrt = 3,
+    Neg   = 4
+};
+
 enum class PoolingAlgorithm
 {
     Max     = 0,

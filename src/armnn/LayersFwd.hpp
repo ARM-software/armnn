@@ -6,7 +6,6 @@
 
 #include "InternalTypes.hpp"
 
-#include "layers/AbsLayer.hpp"
 #include "layers/ActivationLayer.hpp"
 #include "layers/AdditionLayer.hpp"
 #include "layers/ArgMinMaxLayer.hpp"
@@ -24,6 +23,7 @@
 #include "layers/DequantizeLayer.hpp"
 #include "layers/DetectionPostProcessLayer.hpp"
 #include "layers/DivisionLayer.hpp"
+#include "layers/ElementwiseUnaryLayer.hpp"
 #include "layers/FakeQuantizationLayer.hpp"
 #include "layers/FloorLayer.hpp"
 #include "layers/FullyConnectedLayer.hpp"
@@ -51,7 +51,6 @@
 #include "layers/QuantizedLstmLayer.hpp"
 #include "layers/ReshapeLayer.hpp"
 #include "layers/ResizeLayer.hpp"
-#include "layers/RsqrtLayer.hpp"
 #include "layers/SliceLayer.hpp"
 #include "layers/SoftmaxLayer.hpp"
 #include "layers/SpaceToBatchNdLayer.hpp"
@@ -91,7 +90,6 @@ constexpr LayerType LayerEnumOf(const T* = nullptr);
 
 #define DECLARE_LAYER(LayerName) DECLARE_LAYER_IMPL(, LayerName)
 
-DECLARE_LAYER(Abs)
 DECLARE_LAYER(Activation)
 DECLARE_LAYER(Addition)
 DECLARE_LAYER(ArgMinMax)
@@ -109,6 +107,7 @@ DECLARE_LAYER(DepthwiseConvolution2d)
 DECLARE_LAYER(Dequantize)
 DECLARE_LAYER(DetectionPostProcess)
 DECLARE_LAYER(Division)
+DECLARE_LAYER(ElementwiseUnary)
 DECLARE_LAYER(FakeQuantization)
 DECLARE_LAYER(Floor)
 DECLARE_LAYER(FullyConnected)
@@ -136,7 +135,6 @@ DECLARE_LAYER(Quantize)
 DECLARE_LAYER(QuantizedLstm)
 DECLARE_LAYER(Reshape)
 DECLARE_LAYER(Resize)
-DECLARE_LAYER(Rsqrt)
 DECLARE_LAYER(Slice)
 DECLARE_LAYER(Softmax)
 DECLARE_LAYER(SpaceToBatchNd)

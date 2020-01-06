@@ -52,12 +52,12 @@ void RefComparisonWorkload::Execute() const
     m_Input1->Reset(m_Data.m_Inputs[1]->Map());
     m_Output->Reset(m_Data.m_Outputs[0]->Map());
 
-    using EqualFunction          = ElementwiseFunction<std::equal_to<InType>>;
-    using GreaterFunction        = ElementwiseFunction<std::greater<InType>>;
-    using GreaterOrEqualFunction = ElementwiseFunction<std::greater_equal<InType>>;
-    using LessFunction           = ElementwiseFunction<std::less<InType>>;
-    using LessOrEqualFunction    = ElementwiseFunction<std::less_equal<InType>>;
-    using NotEqualFunction       = ElementwiseFunction<std::not_equal_to<InType>>;
+    using EqualFunction          = ElementwiseBinaryFunction<std::equal_to<InType>>;
+    using GreaterFunction        = ElementwiseBinaryFunction<std::greater<InType>>;
+    using GreaterOrEqualFunction = ElementwiseBinaryFunction<std::greater_equal<InType>>;
+    using LessFunction           = ElementwiseBinaryFunction<std::less<InType>>;
+    using LessOrEqualFunction    = ElementwiseBinaryFunction<std::less_equal<InType>>;
+    using NotEqualFunction       = ElementwiseBinaryFunction<std::not_equal_to<InType>>;
 
     switch (m_Data.m_Parameters.m_Operation)
     {

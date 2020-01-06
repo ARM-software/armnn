@@ -78,6 +78,26 @@ struct ComparisonDescriptor
     ComparisonOperation m_Operation;
 };
 
+/// A ElementwiseUnaryDescriptor for the ElementwiseUnaryLayer
+struct ElementwiseUnaryDescriptor
+{
+    ElementwiseUnaryDescriptor()
+        : ElementwiseUnaryDescriptor(UnaryOperation::Abs)
+    {}
+
+    ElementwiseUnaryDescriptor(UnaryOperation operation)
+        : m_Operation(operation)
+    {}
+
+    bool operator ==(const ElementwiseUnaryDescriptor &rhs) const
+    {
+        return m_Operation == rhs.m_Operation;
+    }
+
+    /// Specifies the elementwiseUnary operation to execute
+    UnaryOperation m_Operation;
+};
+
 /// A PermuteDescriptor for the PermuteLayer.
 struct PermuteDescriptor
 {

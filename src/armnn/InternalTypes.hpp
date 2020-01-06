@@ -14,8 +14,7 @@ namespace armnn
 enum class LayerType
 {
     FirstLayer,
-    Abs = FirstLayer,
-    Activation,
+    Activation = FirstLayer,
     Addition,
     ArgMinMax,
     BatchNormalization,
@@ -32,6 +31,7 @@ enum class LayerType
     Dequantize,
     DetectionPostProcess,
     Division,
+    ElementwiseUnary,
     FakeQuantization,
     Floor,
     FullyConnected,
@@ -59,7 +59,6 @@ enum class LayerType
     QuantizedLstm,
     Reshape,
     Resize,
-    Rsqrt,
     Slice,
     Softmax,
     SpaceToBatchNd,

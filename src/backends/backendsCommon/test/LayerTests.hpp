@@ -22,6 +22,7 @@
 #include <backendsCommon/test/layerTests/DequantizeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/DetectionPostProcessTestImpl.hpp>
 #include <backendsCommon/test/layerTests/DivisionTestImpl.hpp>
+#include <backendsCommon/test/layerTests/ElementwiseUnaryTestImpl.hpp>
 #include <backendsCommon/test/layerTests/FakeQuantizationTestImpl.hpp>
 #include <backendsCommon/test/layerTests/FloorTestImpl.hpp>
 #include <backendsCommon/test/layerTests/FullyConnectedTestImpl.hpp>

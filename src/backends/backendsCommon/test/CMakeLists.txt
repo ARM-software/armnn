@@ -4,7 +4,6 @@
 #
 
 list(APPEND armnnBackendsCommonUnitTests_sources
-    AbsEndToEndTestImpl.hpp
     ActivationFixture.hpp
     ArgMinMaxEndToEndTestImpl.hpp
     BackendIdTests.cpp
@@ -19,6 +18,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     DetectionPostProcessEndToEndTestImpl.hpp
     DynamicBackendTests.cpp
     DynamicBackendTests.hpp
+    ElementwiseUnaryEndToEndTestImpl.hpp
     EndToEndTestImpl.hpp
     GatherEndToEndTestImpl.hpp
     InstanceNormalizationEndToEndTestImpl.cpp
@@ -81,6 +81,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/DivisionTestImpl.cpp
     layerTests/DivisionTestImpl.hpp
     layerTests/ElementwiseTestImpl.hpp
+    layerTests/ElementwiseUnaryTestImpl.cpp
+    layerTests/ElementwiseUnaryTestImpl.hpp
     layerTests/FakeQuantizationTestImpl.cpp
     layerTests/FakeQuantizationTestImpl.hpp
     layerTests/FloorTestImpl.cpp

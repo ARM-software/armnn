@@ -196,6 +196,13 @@ public:
         const ConstTensor& anchors,
         const char* name = nullptr) = 0;
 
+    /// Add an ElementwiseUnary layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @param desc - Descriptor for the elementwiseUnary operation.
+    /// @ return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
+                                                        const char* name = nullptr) = 0;
+
     /// Adds a fully connected layer to the network.
     /// @param fullyConnectedDescriptor - Description of the fully connected layer.
     /// @param weights - Tensor for the weights data.
@@ -297,6 +304,7 @@ public:
     /// Add absolute layer to the network.
     /// @param name - Optional name for the layer.
     /// @ return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG("Use AddElementwiseUnaryLayer instead")
     virtual IConnectableLayer* AddAbsLayer(const char* name = nullptr) = 0;
 
     /// Adds an addition layer to the network.
@@ -474,6 +482,7 @@ public:
     /// Add Reciprocal of square root layer to the network.
     /// @param name - Optional name for the layer.
     /// @ return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG("Use AddElementwiseUnaryLayer instead")
     virtual IConnectableLayer* AddRsqrtLayer(const char* name = nullptr) = 0;
 
     /// Add Gather layer to the network.

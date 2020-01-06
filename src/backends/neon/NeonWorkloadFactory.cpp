@@ -98,7 +98,12 @@ std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const Ten
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {
-    return std::make_unique<NeonAbsWorkload>(descriptor, info);
+    boost::ignore_unused(descriptor);
+
+    ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
+    elementwiseUnaryDescriptor.m_Parameters = ElementwiseUnaryDescriptor(UnaryOperation::Abs);
+
+    return CreateElementwiseUnary(elementwiseUnaryDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
@@ -211,6 +216,29 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDetectionPostProcess(
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateDivision(
     const DivisionQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
+    return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor& 
+                                                                       descriptor,
+                                                                       const WorkloadInfo& info) const
+{
+    if (descriptor.m_Parameters.m_Operation == UnaryOperation::Abs)
+    {
+        AbsQueueDescriptor absQueueDescriptor;
+        absQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
+        absQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+
+        return std::make_unique<NeonAbsWorkload>(absQueueDescriptor, info);
+    }
+    else if (descriptor.m_Parameters.m_Operation == UnaryOperation::Rsqrt)
+    {
+        RsqrtQueueDescriptor rsqrtQueueDescriptor;
+        rsqrtQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
+        rsqrtQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+
+        return std::make_unique<NeonRsqrtWorkload>(rsqrtQueueDescriptor, info);
+    }
     return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
 }
 
@@ -418,7 +446,12 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateResizeBilinear(
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor &descriptor,
                                                             const WorkloadInfo &info) const
 {
-    return std::make_unique<NeonRsqrtWorkload>(descriptor, info);
+    boost::ignore_unused(descriptor);
+
+    ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
+    elementwiseUnaryDescriptor.m_Parameters = ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt);
+
+    return CreateElementwiseUnary(elementwiseUnaryDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSlice(const SliceQueueDescriptor& descriptor,

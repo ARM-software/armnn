@@ -10,12 +10,12 @@
 namespace armnn
 {
     template<typename T>
-struct rsqrt : public std::unary_function<T, T>
+struct exp : public std::unary_function<T, T>
     {
         T
         operator () (const T&  inputData) const
         {
-            return 1 / std::sqrt(inputData);
+            return std::exp(inputData);
         }
     };
 

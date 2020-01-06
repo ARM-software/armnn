@@ -131,7 +131,12 @@ std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateSubTensorHandle(ITensorH
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
                                                         const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClAbsWorkload>(descriptor, info);
+    boost::ignore_unused(descriptor);
+
+    ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
+    elementwiseUnaryDescriptor.m_Parameters = ElementwiseUnaryDescriptor(UnaryOperation::Abs);
+
+    return CreateElementwiseUnary(elementwiseUnaryDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
@@ -247,6 +252,28 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDivision(const DivisionQueue
                                                              const WorkloadInfo& info) const
 {
     return MakeWorkload<ClDivisionFloatWorkload, NullWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
+                                                                     const WorkloadInfo& info) const
+{
+    if (descriptor.m_Parameters.m_Operation == UnaryOperation::Abs)
+    {
+        AbsQueueDescriptor absQueueDescriptor;
+        absQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
+        absQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+
+        return MakeWorkload<ClAbsWorkload>(absQueueDescriptor, info);
+    }
+    else if (descriptor.m_Parameters.m_Operation == UnaryOperation::Rsqrt)
+    {
+        RsqrtQueueDescriptor rsqrtQueueDescriptor;
+        rsqrtQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
+        rsqrtQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+
+        return MakeWorkload<ClRsqrtWorkload>(rsqrtQueueDescriptor, info);
+    }
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
@@ -450,7 +477,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateResizeBilinear(const ResizeB
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClRsqrtWorkload>(descriptor, info);
+    boost::ignore_unused(descriptor);
+
+    ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
+    elementwiseUnaryDescriptor.m_Parameters = ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt);
+
+    return CreateElementwiseUnary(elementwiseUnaryDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSlice(const SliceQueueDescriptor& descriptor,

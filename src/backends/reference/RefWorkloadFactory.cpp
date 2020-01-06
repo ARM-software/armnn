@@ -98,7 +98,11 @@ std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const Tens
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const
 {
-    return std::make_unique<RefAbsWorkload>(descriptor, info);
+    boost::ignore_unused(descriptor);
+    ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
+    elementwiseUnaryDescriptor.m_Parameters.m_Operation = UnaryOperation::Abs;
+
+    return CreateElementwiseUnary(elementwiseUnaryDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
@@ -219,6 +223,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDivision(const DivisionQueu
                                                               const WorkloadInfo& info) const
 {
     return std::make_unique<RefDivisionWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
+                                                                      const WorkloadInfo& info) const
+{
+    return std::make_unique<RefElementwiseUnaryWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
@@ -463,7 +473,11 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateResizeBilinear(const Resize
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    return std::make_unique<RefRsqrtWorkload>(descriptor, info);
+    boost::ignore_unused(descriptor);
+    ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
+    elementwiseUnaryDescriptor.m_Parameters.m_Operation = UnaryOperation::Rsqrt;
+
+    return CreateElementwiseUnary(elementwiseUnaryDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSlice(const SliceQueueDescriptor& descriptor,

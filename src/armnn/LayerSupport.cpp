@@ -570,7 +570,11 @@ bool IsRsqrtSupported(const BackendId& backend,
                       char* reasonIfUnsupported,
                       size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsRsqrtSupported, input, output);
+    FORWARD_LAYER_SUPPORT_FUNC(backend,
+                               IsElementwiseUnarySupported,
+                               input,
+                               output,
+                               ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt));
 }
 
 bool IsSoftmaxSupported(const BackendId& backend,

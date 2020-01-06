@@ -21,8 +21,8 @@ template <typename Functor, typename ParentDescriptor, typename armnn::StringMap
 class RefElementwiseWorkload : public BaseWorkload<ParentDescriptor>
 {
 public:
-    using InType = typename ElementwiseFunction<Functor>::InType;
-    using OutType = typename ElementwiseFunction<Functor>::OutType;
+    using InType = typename ElementwiseBinaryFunction<Functor>::InType;
+    using OutType = typename ElementwiseBinaryFunction<Functor>::OutType;
     using BaseWorkload<ParentDescriptor>::m_Data;
 
     RefElementwiseWorkload(const ParentDescriptor& descriptor, const WorkloadInfo& info);

@@ -68,15 +68,6 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
 
     switch(layer.GetType())
     {
-        case LayerType::Abs:
-        {
-            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsAbsSupported(OverrideDataType(input, dataType),
-                                                        OverrideDataType(output, dataType),
-                                                        reason);
-            break;
-        }
         case LayerType::Activation:
         {
             auto cLayer = boost::polymorphic_downcast<const ActivationLayer*>(&layer);
@@ -292,6 +283,19 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                                          numDetections,
                                                                          descriptor,
                                                                          reason);
+            break;
+        }
+        case LayerType::ElementwiseUnary:
+        {
+            auto cLayer = boost::polymorphic_downcast<const ElementwiseUnaryLayer*>(&layer);
+
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject->IsElementwiseUnarySupported(OverrideDataType(input, dataType),
+                                                                     OverrideDataType(output, dataType),
+                                                                     cLayer->GetParameters(),
+                                                                     reason);
             break;
         }
         case LayerType::FakeQuantization:
@@ -807,15 +811,6 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                            reason);
             break;
         }
-        case LayerType::Rsqrt:
-        {
-            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsRsqrtSupported(OverrideDataType(input, dataType),
-                                                          OverrideDataType(output, dataType),
-                                                          reason);
-            break;
-        }
         case LayerType::Slice:
         {
             auto cLayer = boost::polymorphic_downcast<const SliceLayer*>(&layer);
@@ -1178,6 +1173,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateDetectionPostProcess(
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateDivision(const DivisionQueueDescriptor& /*descriptor*/,
                                                             const WorkloadInfo& /*info*/) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor& /*desc*/,
+                                                                    const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }

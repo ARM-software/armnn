@@ -5,12 +5,12 @@
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 
-#include <backendsCommon/test/AbsEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ArgMinMaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ComparisonEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
@@ -27,7 +27,15 @@ std::vector<armnn::BackendId> defaultBackends = {armnn::Compute::GpuAcc};
 // Abs
 BOOST_AUTO_TEST_CASE(ClAbsEndToEndTestFloat32)
 {
-    AbsEndToEnd<armnn::DataType::Float32>(defaultBackends);
+    std::vector<float> expectedOutput =
+    {
+        1.f, 1.f, 1.f, 1.f, 5.f, 5.f, 5.f, 5.f,
+        3.f, 3.f, 3.f, 3.f, 4.f, 4.f, 4.f, 4.f
+    };
+
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends,
+                                                             UnaryOperation::Abs,
+                                                             expectedOutput);
 }
 
 // Constant

@@ -66,6 +66,19 @@ constexpr char const* GetComparisonOperationAsCString(ComparisonOperation operat
     }
 }
 
+constexpr char const* GetUnaryOperationAsCString(UnaryOperation operation)
+{
+    switch (operation)
+    {
+        case UnaryOperation::Abs:   return "Abs";
+        case UnaryOperation::Exp:   return "Exp";
+        case UnaryOperation::Sqrt:  return "Sqrt";
+        case UnaryOperation::Rsqrt: return "Rsqrt";
+        case UnaryOperation::Neg:   return "Neg";
+        default:                    return "Unknown";
+    }
+}
+
 constexpr char const* GetPoolingAlgorithmAsCString(PoolingAlgorithm pooling)
 {
     switch (pooling)

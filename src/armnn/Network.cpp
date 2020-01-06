@@ -967,6 +967,12 @@ IConnectableLayer* Network::AddComparisonLayer(const ComparisonDescriptor& compa
     return m_Graph->AddLayer<ComparisonLayer>(comparisonDescriptor, name);
 }
 
+IConnectableLayer* Network::AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
+                                                     const char* name)
+{
+    return m_Graph->AddLayer<ElementwiseUnaryLayer>(elementwiseUnaryDescriptor, name);
+}
+
 IConnectableLayer* Network::AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                        const ConstTensor& weights,
                                                        const Optional<ConstTensor>& biases,
@@ -1200,7 +1206,7 @@ IConnectableLayer* Network::AddMergerLayer(const MergerDescriptor& mergerDescrip
 
 IConnectableLayer* Network::AddAbsLayer(const char * name)
 {
-    return m_Graph->AddLayer<AbsLayer>(name);
+    return AddElementwiseUnaryLayer(ElementwiseUnaryDescriptor(UnaryOperation::Abs), name);
 }
 
 IConnectableLayer* Network::AddAdditionLayer(const char* name)
@@ -1475,7 +1481,7 @@ IConnectableLayer* Network::AddEqualLayer(const char* name)
 
 IConnectableLayer* Network::AddRsqrtLayer(const char * name)
 {
-    return m_Graph->AddLayer<RsqrtLayer>(name);
+    return AddElementwiseUnaryLayer(ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt), name);
 }
 
 IConnectableLayer* Network::AddGatherLayer(const char* name)

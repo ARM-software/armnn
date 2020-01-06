@@ -95,6 +95,9 @@ public:
         const ConstTensor& anchors,
         const char* name = nullptr) override;
 
+    IConnectableLayer* AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
+                                                const char* name = nullptr) override;
+
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                               const ConstTensor& weights,
                                               const Optional<ConstTensor>& biases,
@@ -137,6 +140,7 @@ public:
     IConnectableLayer* AddMergerLayer(const MergerDescriptor& mergerDescriptor,
                                       const char* name = nullptr) override;
 
+    ARMNN_DEPRECATED_MSG("Use AddElementwiseUnaryLayer instead")
     IConnectableLayer* AddAbsLayer(const char* name = nullptr) override;
 
     IConnectableLayer* AddAdditionLayer(const char* name = nullptr) override;
@@ -208,6 +212,7 @@ public:
     ARMNN_DEPRECATED_MSG("Use AddComparisonLayer instead")
     IConnectableLayer* AddEqualLayer(const char* name = nullptr) override;
 
+    ARMNN_DEPRECATED_MSG("Use AddElementwiseUnaryLayer instead")
     IConnectableLayer* AddRsqrtLayer(const char* name = nullptr) override;
 
     IConnectableLayer* AddMergeLayer(const char* name = nullptr) override;

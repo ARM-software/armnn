@@ -160,10 +160,8 @@ bool ClLayerSupport::IsAbsSupported(const TensorInfo& input,
                                     const TensorInfo& output,
                                     Optional<std::string&> reasonIfUnsupported) const
 {
-    FORWARD_WORKLOAD_VALIDATE_FUNC(ClAbsWorkloadValidate,
-                                   reasonIfUnsupported,
-                                   input,
-                                   output);
+    ElementwiseUnaryDescriptor descriptor(UnaryOperation::Abs);
+    return IsElementwiseUnarySupported(input, output, descriptor, reasonIfUnsupported);
 }
 
 bool ClLayerSupport::IsActivationSupported(const TensorInfo& input,
@@ -423,6 +421,29 @@ bool ClLayerSupport::IsDivisionSupported(const TensorInfo& input0,
                                    input0,
                                    input1,
                                    output);
+}
+
+bool ClLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
+                                                 const TensorInfo& output,
+                                                 const ElementwiseUnaryDescriptor& descriptor,
+                                                 Optional<std::string&> reasonIfUnsupported) const
+{
+    if (descriptor.m_Operation == UnaryOperation::Abs)
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(ClAbsWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       input,
+                                       output);
+    }
+    else if (descriptor.m_Operation == UnaryOperation::Rsqrt)
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(ClRsqrtWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       input,
+                                       output);
+    }
+
+    return false;
 }
 
 bool ClLayerSupport::IsFloorSupported(const TensorInfo& input,
@@ -685,7 +706,8 @@ bool ClLayerSupport::IsRsqrtSupported(const TensorInfo& input,
                                       const TensorInfo& output,
                                       Optional<std::string&> reasonIfUnsupported) const
 {
-    FORWARD_WORKLOAD_VALIDATE_FUNC(ClRsqrtWorkloadValidate, reasonIfUnsupported, input, output);
+    ElementwiseUnaryDescriptor descriptor(UnaryOperation::Rsqrt);
+    return IsElementwiseUnarySupported(input, output, descriptor, reasonIfUnsupported);
 }
 
 bool ClLayerSupport::IsSliceSupported(const TensorInfo& input,

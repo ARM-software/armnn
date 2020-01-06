@@ -2969,4 +2969,28 @@ void ComparisonQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     }
 }
 
+void ElementwiseUnaryQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"ElementwiseUnaryQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+
+    std::vector<DataType> supportedTypes =
+    {
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QAsymmU8,
+        DataType::QSymmS16
+    };
+
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+}
+
 } // namespace armnn

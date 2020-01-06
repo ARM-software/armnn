@@ -146,18 +146,16 @@ BOOST_AUTO_TEST_CASE(CreateDivisionFloat16WorkloadTest)
                                     armnn::DataType::Float16>();
 }
 
-template <typename WorkloadType,
+template <typename WorkloadType, 
           typename DescriptorType,
-          typename LayerType,
           armnn::DataType DataType>
-static void ClCreateElementwiseUnaryWorkloadTest()
+static void ClCreateElementwiseUnaryWorkloadTest(armnn::UnaryOperation op)
 {
     Graph graph;
     ClWorkloadFactory factory =
         ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
 
-    auto workload = CreateElementwiseUnaryWorkloadTest
-        <WorkloadType, DescriptorType, LayerType, DataType>(factory, graph);
+    auto workload = CreateElementwiseUnaryWorkloadTest<WorkloadType, DescriptorType, DataType>(factory, graph, op);
 
     DescriptorType queueDescriptor = workload->GetData();
 
@@ -170,10 +168,8 @@ static void ClCreateElementwiseUnaryWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateRsqrtFloat32WorkloadTest)
 {
-    ClCreateElementwiseUnaryWorkloadTest<ClRsqrtWorkload,
-                                         RsqrtQueueDescriptor,
-                                         RsqrtLayer,
-                                         armnn::DataType::Float32>();
+    ClCreateElementwiseUnaryWorkloadTest<ClRsqrtWorkload, RsqrtQueueDescriptor, armnn::DataType::Float32>(
+        UnaryOperation::Rsqrt);
 }
 
 template <typename BatchNormalizationWorkloadType, armnn::DataType DataType>

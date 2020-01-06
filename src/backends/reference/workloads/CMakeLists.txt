@@ -4,7 +4,6 @@
 #
 
 list(APPEND armnnRefBackendWorkloads_sources
-    Abs.cpp
     Abs.hpp
     ArgMinMax.cpp
     ArgMinMax.hpp
@@ -33,6 +32,7 @@ list(APPEND armnnRefBackendWorkloads_sources
     ElementwiseFunction.cpp
     ElementwiseFunction.hpp
     Encoders.hpp
+    Exp.hpp
     FullyConnected.cpp
     FullyConnected.hpp
     Gather.cpp
@@ -55,8 +55,6 @@ list(APPEND armnnRefBackendWorkloads_sources
     Pooling2d.hpp
     PreluImpl.cpp
     PreluImpl.hpp
-    RefAbsWorkload.cpp
-    RefAbsWorkload.hpp
     RefActivationWorkload.cpp
     RefActivationWorkload.hpp
     RefArgMinMaxWorkload.cpp
@@ -89,6 +87,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefDequantizeWorkload.hpp
     RefDetectionPostProcessWorkload.cpp
     RefDetectionPostProcessWorkload.hpp
+    RefElementwiseUnaryWorkload.cpp
+    RefElementwiseUnaryWorkload.hpp
     RefFakeQuantizationFloat32Workload.cpp
     RefFakeQuantizationFloat32Workload.hpp
     RefFloorWorkload.cpp
@@ -125,8 +125,6 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefResizeBilinearWorkload.hpp
     RefResizeWorkload.cpp
     RefResizeWorkload.hpp
-    RefRsqrtWorkload.cpp
-    RefRsqrtWorkload.hpp
     RefSliceWorkload.cpp
     RefSliceWorkload.hpp
     RefSoftmaxWorkload.cpp
@@ -147,7 +145,6 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefWorkloadUtils.hpp
     Resize.cpp
     Resize.hpp
-    Rsqrt.cpp
     Rsqrt.hpp
     Slice.cpp
     Slice.hpp
@@ -159,6 +156,7 @@ list(APPEND armnnRefBackendWorkloads_sources
     SpaceToDepth.cpp
     Splitter.hpp
     Splitter.cpp
+    Sqrt.hpp
     Stack.cpp
     Stack.hpp
     StridedSlice.hpp

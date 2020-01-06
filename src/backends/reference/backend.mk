@@ -21,7 +21,6 @@ BACKEND_SOURCES := \
         RefWorkloadFactory.cpp \
         RefRegistryInitializer.cpp \
         RefTensorHandleFactory.cpp \
-        workloads/Abs.cpp \
         workloads/Activation.cpp \
         workloads/ArgMinMax.cpp \
         workloads/BatchNormImpl.cpp \
@@ -43,7 +42,6 @@ BACKEND_SOURCES := \
         workloads/Pad.cpp \
         workloads/Pooling2d.cpp \
         workloads/PreluImpl.cpp \
-        workloads/RefAbsWorkload.cpp \
         workloads/RefActivationWorkload.cpp \
         workloads/RefArgMinMaxWorkload.cpp \
         workloads/RefBatchNormalizationWorkload.cpp \
@@ -60,6 +58,7 @@ BACKEND_SOURCES := \
         workloads/RefDequantizeWorkload.cpp \
         workloads/RefDetectionPostProcessWorkload.cpp \
         workloads/RefElementwiseWorkload.cpp \
+        workloads/RefElementwiseUnaryWorkload.cpp \
         workloads/RefFakeQuantizationFloat32Workload.cpp \
         workloads/RefFloorWorkload.cpp \
         workloads/RefFullyConnectedWorkload.cpp \
@@ -78,7 +77,6 @@ BACKEND_SOURCES := \
         workloads/RefReshapeWorkload.cpp \
         workloads/RefResizeBilinearWorkload.cpp \
         workloads/RefResizeWorkload.cpp \
-        workloads/RefRsqrtWorkload.cpp \
         workloads/RefSliceWorkload.cpp \
         workloads/RefSoftmaxWorkload.cpp \
         workloads/RefSpaceToBatchNdWorkload.cpp \
@@ -88,7 +86,6 @@ BACKEND_SOURCES := \
         workloads/RefSplitterWorkload.cpp \
         workloads/RefTransposeConvolution2dWorkload.cpp \
         workloads/Resize.cpp \
-        workloads/Rsqrt.cpp \
         workloads/Slice.cpp \
         workloads/SpaceToBatchNd.cpp \
         workloads/SpaceToDepth.cpp \

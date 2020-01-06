@@ -12,17 +12,29 @@ namespace armnn
 {
 
 template <typename Functor>
-struct ElementwiseFunction
+struct ElementwiseBinaryFunction
 {
     using OutType = typename Functor::result_type;
     using InType = typename Functor::first_argument_type;
 
-    ElementwiseFunction(const TensorShape& inShape0,
-                        const TensorShape& inShape1,
-                        const TensorShape& outShape,
-                        armnn::Decoder<InType>& inData0,
-                        armnn::Decoder<InType>& inData1,
-                        armnn::Encoder<OutType>& outData);
+    ElementwiseBinaryFunction(const TensorShape& inShape0,
+                              const TensorShape& inShape1,
+                              const TensorShape& outShape,
+                              Decoder<InType>& inData0,
+                              Decoder<InType>& inData1,
+                              Encoder<OutType>& outData);
+};
+
+template <typename Functor>
+struct ElementwiseUnaryFunction
+{
+    using OutType = typename Functor::result_type;
+    using InType = typename Functor::argument_type;
+
+    ElementwiseUnaryFunction(const TensorShape& inShape,
+                             const TensorShape& outShape,
+                             Decoder<InType>& inData,
+                             Encoder<OutType>& outData);
 };
 
 } //namespace armnn

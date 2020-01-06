@@ -5,7 +5,6 @@
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 
-#include <backendsCommon/test/AbsEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ArgMinMaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/BatchToSpaceNdEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ComparisonEndToEndTestImpl.hpp>
@@ -13,6 +12,7 @@
 #include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DetectionPostProcessEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp>
 #include <backendsCommon/test/GatherEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/LogSoftmaxEndToEndTestImpl.hpp>
@@ -32,17 +32,43 @@ std::vector<armnn::BackendId> defaultBackends = {armnn::Compute::CpuRef};
 // Abs
 BOOST_AUTO_TEST_CASE(RefAbsEndToEndTestFloat32)
 {
-    AbsEndToEnd<armnn::DataType::Float32>(defaultBackends);
+    std::vector<float> expectedOutput =
+    {
+        1.f, 1.f, 1.f, 1.f, 5.f, 5.f, 5.f, 5.f,
+        3.f, 3.f, 3.f, 3.f, 4.f, 4.f, 4.f, 4.f
+    };
+
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends,
+                                                             UnaryOperation::Abs,
+                                                             expectedOutput);
 }
 
 BOOST_AUTO_TEST_CASE(RefAbsEndToEndTestUint8)
 {
-    AbsEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    // Note the expected output will be implicitly quantized by the below test function
+    std::vector<float> expectedOutput =
+    {
+        1.f, 1.f, 1.f, 1.f, 5.f, 5.f, 5.f, 5.f,
+        3.f, 3.f, 3.f, 3.f, 4.f, 4.f, 4.f, 4.f
+    };
+
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends,
+                                                                     UnaryOperation::Abs,
+                                                                     expectedOutput);
 }
 
 BOOST_AUTO_TEST_CASE(RefAbsEndToEndTestInt16)
 {
-    AbsEndToEnd<armnn::DataType::QSymmS16>(defaultBackends);
+    // Note the expected output will be implicitly quantized by the below test function
+    std::vector<float> expectedOutput =
+    {
+        1.f, 1.f, 1.f, 1.f, 5.f, 5.f, 5.f, 5.f,
+        3.f, 3.f, 3.f, 3.f, 4.f, 4.f, 4.f, 4.f
+    };
+
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::QSymmS16>(defaultBackends,
+                                                                     UnaryOperation::Abs,
+                                                                     expectedOutput);
 }
 
 // Constant

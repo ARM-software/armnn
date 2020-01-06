@@ -115,9 +115,7 @@ void QuantizerVisitor::RecordLayer(const IConnectableLayer* srcLayer, IConnectab
 
 void QuantizerVisitor::VisitAbsLayer(const IConnectableLayer* layer, const char* name)
 {
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddAbsLayer(name);
-    RecordLayer(layer, newLayer);
-    SetQuantizedInputConnections(layer, newLayer);
+    VisitElementwiseUnaryLayer(layer, ElementwiseUnaryDescriptor(UnaryOperation::Abs), name);
 }
 
 void QuantizerVisitor::VisitActivationLayer(const IConnectableLayer* layer,
@@ -271,6 +269,15 @@ void QuantizerVisitor::VisitDepthwiseConvolution2dLayer(const IConnectableLayer*
                                                                                      optionalQBiases,
                                                                                      name);
 
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
+void QuantizerVisitor::VisitElementwiseUnaryLayer(const IConnectableLayer* layer,
+                                                  const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
+                                                  const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddElementwiseUnaryLayer(elementwiseUnaryDescriptor, name);
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
 }
@@ -450,12 +457,9 @@ void QuantizerVisitor::VisitResizeLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
-void QuantizerVisitor::VisitRsqrtLayer(const IConnectableLayer* layer,
-                                       const char* name)
+void QuantizerVisitor::VisitRsqrtLayer(const IConnectableLayer* layer, const char* name)
 {
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddRsqrtLayer(name);
-    RecordLayer(layer, newLayer);
-    SetQuantizedInputConnections(layer, newLayer);
+    VisitElementwiseUnaryLayer(layer, ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt), name);
 }
 
 void QuantizerVisitor::VisitSliceLayer(const IConnectableLayer* layer,

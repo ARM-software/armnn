@@ -94,6 +94,10 @@ public:
     void VisitDivisionLayer(const IConnectableLayer*,
                             const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitElementwiseUnaryLayer(const IConnectableLayer*,
+                                    const ElementwiseUnaryDescriptor&,
+                                    const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitEqualLayer(const IConnectableLayer*,
                          const char*) override { DefaultPolicy::Apply(__func__); }
 

@@ -120,7 +120,6 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/NetworkSockets.cpp \
         src/armnnUtils/Filesystem.cpp \
         src/armnnUtils/Processes.cpp \
-        src/armnn/layers/AbsLayer.cpp \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \
         src/armnn/layers/ArgMinMaxLayer.cpp \
@@ -139,6 +138,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/DetectionPostProcessLayer.cpp \
         src/armnn/layers/DivisionLayer.cpp \
         src/armnn/layers/ElementwiseBaseLayer.cpp \
+        src/armnn/layers/ElementwiseUnaryLayer.cpp \
         src/armnn/layers/FakeQuantizationLayer.cpp \
         src/armnn/layers/FloorLayer.cpp \
         src/armnn/layers/FullyConnectedLayer.cpp \
@@ -166,7 +166,6 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/QuantizedLstmLayer.cpp \
         src/armnn/layers/ReshapeLayer.cpp \
         src/armnn/layers/ResizeLayer.cpp \
-        src/armnn/layers/RsqrtLayer.cpp \
         src/armnn/layers/SliceLayer.cpp \
         src/armnn/layers/SoftmaxLayer.cpp \
         src/armnn/layers/SpaceToBatchNdLayer.cpp \

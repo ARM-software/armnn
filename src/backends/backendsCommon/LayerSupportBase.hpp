@@ -13,6 +13,7 @@ namespace armnn
 class LayerSupportBase : public ILayerSupport
 {
 public:
+    ARMNN_DEPRECATED_MSG("Use IsElementwiseUnarySupported instead")
     bool IsAbsSupported(const TensorInfo& input,
                         const TensorInfo& output,
                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
@@ -118,6 +119,11 @@ public:
                              const TensorInfo& input1,
                              const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
+    bool IsElementwiseUnarySupported(const TensorInfo& input,
+                                     const TensorInfo& output,
+                                     const ElementwiseUnaryDescriptor& descriptor,
+                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     ARMNN_DEPRECATED_MSG("Use IsComparisonSupported instead")
     bool IsEqualSupported(const TensorInfo& input0,
@@ -278,6 +284,7 @@ public:
                                    const TensorInfo& output,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    ARMNN_DEPRECATED_MSG("Use IsElementwiseUnarySupported instead")
     bool IsRsqrtSupported(const TensorInfo& input,
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;

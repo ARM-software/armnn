@@ -268,32 +268,6 @@ static std::vector<DataType> GenerateRandomData(size_t size)
 
 BOOST_AUTO_TEST_SUITE(SerializerTests)
 
-BOOST_AUTO_TEST_CASE(SerializeAbs)
-{
-    DECLARE_LAYER_VERIFIER_CLASS(Abs)
-
-    const std::string layerName("abs");
-    const armnn::TensorInfo tensorInfo({1, 2, 3}, armnn::DataType::Float32);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-
-    armnn::IConnectableLayer* const absLayer = network->AddAbsLayer(layerName.c_str());
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(absLayer->GetInputSlot(0));
-    absLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-    absLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    AbsLayerVerifier verifier(layerName, {tensorInfo}, {tensorInfo});
-    deserializedNetwork->Accept(verifier);
-}
-
 BOOST_AUTO_TEST_CASE(SerializeAddition)
 {
     DECLARE_LAYER_VERIFIER_CLASS(Addition)
@@ -2173,31 +2147,6 @@ BOOST_AUTO_TEST_CASE(EnsureResizeBilinearBackwardCompatibility)
     descriptor.m_TargetHeight = 2u;
 
     ResizeBilinearLayerVerifier verifier("resizeBilinear", { inputInfo }, { outputInfo }, descriptor);
-    deserializedNetwork->Accept(verifier);
-}
-
-BOOST_AUTO_TEST_CASE(SerializeRsqrt)
-{
-    DECLARE_LAYER_VERIFIER_CLASS(Rsqrt)
-
-    const std::string layerName("rsqrt");
-    const armnn::TensorInfo tensorInfo({ 3, 1, 2 }, armnn::DataType::Float32);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const rsqrtLayer  = network->AddRsqrtLayer(layerName.c_str());
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(rsqrtLayer->GetInputSlot(0));
-    rsqrtLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-    rsqrtLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    RsqrtLayerVerifier verifier(layerName, {tensorInfo}, {tensorInfo});
     deserializedNetwork->Accept(verifier);
 }
 

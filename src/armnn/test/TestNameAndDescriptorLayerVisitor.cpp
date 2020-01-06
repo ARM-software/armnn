@@ -86,6 +86,12 @@ armnn::ConcatDescriptor GetDescriptor<armnn::ConcatDescriptor>()
 }
 
 template<>
+armnn::ElementwiseUnaryDescriptor GetDescriptor<armnn::ElementwiseUnaryDescriptor>()
+{
+    return armnn::ElementwiseUnaryDescriptor(armnn::UnaryOperation::Abs);
+}
+
+template<>
 armnn::InstanceNormalizationDescriptor GetDescriptor<armnn::InstanceNormalizationDescriptor>()
 {
     armnn::InstanceNormalizationDescriptor descriptor;
@@ -251,6 +257,7 @@ TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(DepthToSpace)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(BatchToSpaceNd)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Comparison)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Concat)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(ElementwiseUnary)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(InstanceNormalization)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(L2Normalization)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(LogSoftmax)

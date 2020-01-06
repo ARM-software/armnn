@@ -24,6 +24,7 @@ public:
     /// function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param name - Optional name for the layer.
+    ARMNN_DEPRECATED_MSG("Use VisitElementwiseUnaryLayer instead")
     virtual void VisitAbsLayer(const IConnectableLayer* layer,
                                const char* name = nullptr) = 0;
 
@@ -167,6 +168,14 @@ public:
     /// @param name - Optional name for the layer.
     virtual void VisitDivisionLayer(const IConnectableLayer* layer,
                                     const char* name = nullptr) = 0;
+
+    /// Function a ElementwiseUnary layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param elementwiseUnaryDescriptor - Description of the layer.
+    /// @param name - Optional name for the layer.
+    virtual void VisitElementwiseUnaryLayer(const IConnectableLayer* layer,
+                                            const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
+                                            const char* name = nullptr) = 0;
 
     /// Function an Equal layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
@@ -388,6 +397,7 @@ public:
     /// function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param name - Optional name for the layer.
+    ARMNN_DEPRECATED_MSG("Use VisitElementwiseUnaryLayer instead")
     virtual void VisitRsqrtLayer(const IConnectableLayer* layer,
                                  const char* name = nullptr) = 0;
 

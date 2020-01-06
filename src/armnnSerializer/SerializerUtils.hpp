@@ -18,6 +18,8 @@ armnnSerializer::DataType GetFlatBufferDataType(armnn::DataType dataType);
 
 armnnSerializer::DataLayout GetFlatBufferDataLayout(armnn::DataLayout dataLayout);
 
+armnnSerializer::UnaryOperation GetFlatBufferUnaryOperation(armnn::UnaryOperation unaryOperation);
+
 armnnSerializer::PoolingAlgorithm GetFlatBufferPoolingAlgorithm(armnn::PoolingAlgorithm poolingAlgorithm);
 
 armnnSerializer::OutputShapeRounding GetFlatBufferOutputShapeRounding(

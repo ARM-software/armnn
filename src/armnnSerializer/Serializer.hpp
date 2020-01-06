@@ -44,6 +44,7 @@ public:
         return m_serializedLayers;
     }
 
+    ARMNN_DEPRECATED_MSG("Use VisitElementwiseUnaryLayer instead")
     void VisitAbsLayer(const armnn::IConnectableLayer* layer,
                        const char* name = nullptr) override;
 
@@ -108,6 +109,10 @@ public:
 
     void VisitDivisionLayer(const armnn::IConnectableLayer* layer,
                             const char* name = nullptr) override;
+
+    void VisitElementwiseUnaryLayer(const armnn::IConnectableLayer* layer,
+                                    const armnn::ElementwiseUnaryDescriptor& descriptor,
+                                    const char* name = nullptr) override;
 
     ARMNN_DEPRECATED_MSG("Use VisitComparisonLayer instead")
     void VisitEqualLayer(const armnn::IConnectableLayer* layer,
@@ -210,6 +215,7 @@ public:
                                   const armnn::ResizeBilinearDescriptor& resizeDescriptor,
                                   const char* name = nullptr) override;
 
+    ARMNN_DEPRECATED_MSG("Use VisitElementwiseUnaryLayer instead")
     void VisitRsqrtLayer(const armnn::IConnectableLayer* layer,
                          const char* name = nullptr) override;
 

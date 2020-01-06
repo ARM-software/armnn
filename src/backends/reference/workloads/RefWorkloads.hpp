@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "Abs.hpp"
 #include "Activation.hpp"
 #include "ArgMinMax.hpp"
 #include "BatchNormImpl.hpp"
@@ -15,7 +14,6 @@
 #include "FullyConnected.hpp"
 #include "Gather.hpp"
 #include "Pooling2d.hpp"
-#include "RefAbsWorkload.hpp"
 #include "RefActivationWorkload.hpp"
 #include "RefArgMinMaxWorkload.hpp"
 #include "RefBatchNormalizationWorkload.hpp"
@@ -33,6 +31,7 @@
 #include "RefDetectionPostProcessWorkload.hpp"
 #include "RefDequantizeWorkload.hpp"
 #include "RefElementwiseWorkload.hpp"
+#include "RefElementwiseUnaryWorkload.hpp"
 #include "RefFullyConnectedWorkload.hpp"
 #include "RefFloorWorkload.hpp"
 #include "RefFakeQuantizationFloat32Workload.hpp"
@@ -51,7 +50,6 @@
 #include "RefReshapeWorkload.hpp"
 #include "RefResizeBilinearWorkload.hpp"
 #include "RefResizeWorkload.hpp"
-#include "RefRsqrtWorkload.hpp"
 #include "RefSliceWorkload.hpp"
 #include "RefSplitterWorkload.hpp"
 #include "RefSoftmaxWorkload.hpp"

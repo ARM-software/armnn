@@ -364,6 +364,7 @@ list(APPEND armnn_sources
     src/armnn/CompatibleTypes.hpp
     src/armnn/Descriptors.cpp
     src/armnn/DeviceSpec.hpp
+    src/armnn/DllExport.hpp
     src/armnn/DynamicQuantizationVisitor.cpp
     src/armnn/DynamicQuantizationVisitor.hpp
     src/armnn/Exceptions.cpp
@@ -528,6 +529,8 @@ foreach(lib ${armnnLibraries})
 endforeach()
 
 add_library_ex(armnn SHARED ${armnn_sources})
+
+target_compile_definitions(armnn PRIVATE "ARMNN_COMPILING_DLL")
 
 target_include_directories(armnn PRIVATE src/armnn)
 target_include_directories(armnn PRIVATE src/armnnUtils)
@@ -743,15 +746,15 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/GetSubgraphInputsOutputs.cpp
              src/armnnTfLiteParser/test/GetInputsOutputs.cpp
              )
-                
-        # Generate SchemaText.cpp file which contains the TfLite schema text as a 
+
+        # Generate SchemaText.cpp file which contains the TfLite schema text as a
         # static C-array of bytes. This is needed at runtime for TfLite parser tests.
         add_custom_command(
             OUTPUT  SchemaText.cpp
             COMMAND cp ${TF_LITE_SCHEMA_INCLUDE_PATH}/schema.fbs g_TfLiteSchemaText
             COMMAND xxd -i g_TfLiteSchemaText SchemaText.cpp
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-            DEPENDS ${TF_LITE_SCHEMA_INCLUDE_PATH}/schema.fbs 
+            DEPENDS ${TF_LITE_SCHEMA_INCLUDE_PATH}/schema.fbs
         )
         list(APPEND unittest_sources ${CMAKE_CURRENT_BINARY_DIR}/SchemaText.cpp)
     endif()

@@ -7,6 +7,7 @@
 
 #include "Instrument.hpp"
 #include <chrono>
+#include "DllExport.hpp"
 
 namespace armnn
 {
@@ -59,7 +60,7 @@ public:
     using clock = std::chrono::steady_clock;
 #endif
 
-    static const std::string WALL_CLOCK_TIME;
+    ARMNN_DLLEXPORT static const std::string WALL_CLOCK_TIME;
     static const std::string WALL_CLOCK_TIME_START;
     static const std::string WALL_CLOCK_TIME_STOP;
 

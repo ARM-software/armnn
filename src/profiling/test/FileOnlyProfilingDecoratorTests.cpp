@@ -7,6 +7,7 @@
 
 #include <ProfilingService.hpp>
 #include <Runtime.hpp>
+#include <Filesystem.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 #include <boost/filesystem.hpp>
@@ -94,12 +95,10 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // The output file size should be greater than 0.
-    struct stat statusBuffer;
-    BOOST_CHECK(stat(tempPath.c_str(), &statusBuffer) == 0);
-    BOOST_CHECK(statusBuffer.st_size > 0);
+    BOOST_CHECK(armnnUtils::Filesystem::GetFileSize(tempPath.string().c_str()) > 0);
 
     // Delete the tmp file.
-    BOOST_CHECK(remove(tempPath.c_str()) == 0);
+    BOOST_CHECK(armnnUtils::Filesystem::Remove(tempPath.string().c_str()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

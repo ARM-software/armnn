@@ -10,6 +10,7 @@
 #include <EncodeVersion.hpp>
 #include <ProfilingUtils.hpp>
 #include <SendCounterPacket.hpp>
+#include <Processes.hpp>
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Conversion.hpp>
@@ -335,7 +336,8 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     offset += sizeUint32;
     BOOST_TEST(ReadUint32(readBuffer2, offset) == MAX_METADATA_PACKET_LENGTH); // max_data_len
     offset += sizeUint32;
-    BOOST_TEST(ReadUint32(readBuffer2, offset) == numeric_cast<uint32_t>(getpid())); // pid
+    int pid = armnnUtils::Processes::GetCurrentId();
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == numeric_cast<uint32_t>(pid));
     offset += sizeUint32;
     uint32_t poolOffset = 10 * sizeUint32;
     BOOST_TEST(ReadUint32(readBuffer2, offset) == (infoSize ? poolOffset : 0)); // offset_info

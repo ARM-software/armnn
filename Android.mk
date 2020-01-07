@@ -118,6 +118,8 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/TensorUtils.cpp \
         src/armnnUtils/VerificationHelpers.cpp \
         src/armnnUtils/NetworkSockets.cpp \
+        src/armnnUtils/Filesystem.cpp \
+        src/armnnUtils/Processes.cpp \
         src/armnn/layers/AbsLayer.cpp \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \

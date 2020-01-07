@@ -9,6 +9,7 @@
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Conversion.hpp>
+#include <Processes.hpp>
 
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -90,7 +91,8 @@ void SendCounterPacket::SendStreamMetaDataPacket()
         offset += sizeUint32;
         WriteUint32(writeBuffer, offset, MAX_METADATA_PACKET_LENGTH); // max_data_length
         offset += sizeUint32;
-        WriteUint32(writeBuffer, offset, numeric_cast<uint32_t>(getpid())); // pid
+        int pid = armnnUtils::Processes::GetCurrentId();
+        WriteUint32(writeBuffer, offset, numeric_cast<uint32_t>(pid)); // pid
         offset += sizeUint32;
         uint32_t poolOffset = bodySize;
         WriteUint32(writeBuffer, offset, infoSize ? poolOffset : 0); // offset_info

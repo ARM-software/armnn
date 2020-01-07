@@ -40,6 +40,10 @@ list(APPEND armnnUtils_sources
     include/armnnUtils/Permute.hpp
     include/armnnUtils/FloatingPointConverter.hpp
     include/armnnUtils/TensorUtils.hpp
+    src/armnnUtils/Filesystem.hpp
+    src/armnnUtils/Filesystem.cpp
+    src/armnnUtils/Processes.hpp
+    src/armnnUtils/Processes.cpp
     src/armnnUtils/GraphTopologicalSort.hpp
     src/armnnUtils/Half.hpp
     src/armnnUtils/Permute.cpp

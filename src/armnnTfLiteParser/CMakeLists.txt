@@ -19,7 +19,21 @@ if(BUILD_TF_LITE_PARSER)
     target_include_directories(armnnTfLiteParser SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
 
     target_link_libraries(armnnTfLiteParser ${Boost_FILESYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
-    target_link_libraries(armnnTfLiteParser armnn ${FLATBUFFERS_LIBRARY})
+
+    # If user has explicitly specified flatbuffers lib then use that,
+    # otherwise search for it based on FLATBUFFERS_BUILD_DIR
+    if (FLATBUFFERS_LIBRARY)
+        target_link_libraries(armnnTfLiteParser armnn ${FLATBUFFERS_LIBRARY})
+    else()
+        # Use PATH_SUFFIXES to help find separate libs for debug/release on Windows builds
+        find_library(FLATBUFFERS_LIBRARY_DEBUG NAMES flatbuffers
+                     HINTS ${FLATBUFFERS_BUILD_DIR}
+                     PATH_SUFFIXES "Debug")
+        find_library(FLATBUFFERS_LIBRARY_RELEASE NAMES flatbuffers
+                     HINTS ${FLATBUFFERS_BUILD_DIR}
+                     PATH_SUFFIXES "Release")
+        target_link_libraries(armnnTfLiteParser armnn debug ${FLATBUFFERS_LIBRARY_DEBUG} optimized ${FLATBUFFERS_LIBRARY_RELEASE})
+    endif()
 
     set_target_properties(armnnTfLiteParser PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION} )
 

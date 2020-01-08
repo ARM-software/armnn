@@ -37,7 +37,8 @@ void Resize(Decoder<float>&   in,
             Encoder<float>&   out,
             const TensorInfo& outputInfo,
             DataLayoutIndexed dataLayout,
-            armnn::ResizeMethod resizeMethod)
+            armnn::ResizeMethod resizeMethod,
+            bool alignCorners)
 {
     // We follow the definition of TensorFlow and AndroidNN: the top-left corner of a texel in the output
     // image is projected into the input image to figure out the interpolants and weights. Note that this
@@ -51,10 +52,14 @@ void Resize(Decoder<float>&   in,
     const unsigned int outputHeight = outputInfo.GetShape()[dataLayout.GetHeightIndex()];
     const unsigned int outputWidth = outputInfo.GetShape()[dataLayout.GetWidthIndex()];
 
+    const unsigned int sizeOffset = resizeMethod == armnn::ResizeMethod::Bilinear && alignCorners ? 1 : 0;
+
     // How much to scale pixel coordinates in the output image, to get the corresponding pixel coordinates
     // in the input image.
-    const float scaleY = boost::numeric_cast<float>(inputHeight) / boost::numeric_cast<float>(outputHeight);
-    const float scaleX = boost::numeric_cast<float>(inputWidth) / boost::numeric_cast<float>(outputWidth);
+    const float scaleY = boost::numeric_cast<float>(inputHeight - sizeOffset)
+                       / boost::numeric_cast<float>(outputHeight - sizeOffset);
+    const float scaleX = boost::numeric_cast<float>(inputWidth - sizeOffset)
+                       / boost::numeric_cast<float>(outputWidth - sizeOffset);
 
     TensorShape inputShape =  inputInfo.GetShape();
     TensorShape outputShape =  outputInfo.GetShape();

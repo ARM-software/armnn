@@ -38,7 +38,9 @@ arm_compute::Status ClResizeWorkloadValidate(const TensorInfo& input,
                                           aclInterpolationPolicy,
                                           arm_compute::BorderMode::REPLICATE,
                                           arm_compute::PixelValue(0.f),
-                                          arm_compute::SamplingPolicy::TOP_LEFT);
+                                          arm_compute::SamplingPolicy::TOP_LEFT,
+                                          true,
+                                          descriptor.m_BilinearAlignCorners);
 }
 
 ClResizeWorkload::ClResizeWorkload(const ResizeQueueDescriptor& descriptor, const WorkloadInfo& info) :
@@ -61,7 +63,9 @@ ClResizeWorkload::ClResizeWorkload(const ResizeQueueDescriptor& descriptor, cons
                             aclInterpolationPolicy,
                             arm_compute::BorderMode::REPLICATE,
                             arm_compute::PixelValue(0.f),
-                            arm_compute::SamplingPolicy::TOP_LEFT);
+                            arm_compute::SamplingPolicy::TOP_LEFT,
+                            true,
+                            descriptor.m_Parameters.m_BilinearAlignCorners);
 };
 
 void ClResizeWorkload::Execute() const

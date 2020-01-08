@@ -60,7 +60,9 @@ NeonResizeWorkload::NeonResizeWorkload(const ResizeQueueDescriptor& descriptor,
                             aclInterpolationPolicy,
                             arm_compute::BorderMode::REPLICATE,
                             arm_compute::PixelValue(0.f),
-                            arm_compute::SamplingPolicy::TOP_LEFT);
+                            arm_compute::SamplingPolicy::TOP_LEFT,
+                            true,
+                            descriptor.m_Parameters.m_BilinearAlignCorners);
 };
 
 void NeonResizeWorkload::Execute() const

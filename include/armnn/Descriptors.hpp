@@ -728,14 +728,16 @@ struct ResizeDescriptor
         , m_TargetHeight(0)
         , m_Method(ResizeMethod::NearestNeighbor)
         , m_DataLayout(DataLayout::NCHW)
+        , m_BilinearAlignCorners(false)
     {}
 
     bool operator ==(const ResizeDescriptor& rhs) const
     {
-        return m_TargetWidth  == rhs.m_TargetWidth &&
-               m_TargetHeight == rhs.m_TargetHeight &&
-               m_Method       == rhs.m_Method &&
-               m_DataLayout   == rhs.m_DataLayout;
+        return m_TargetWidth          == rhs.m_TargetWidth &&
+               m_TargetHeight         == rhs.m_TargetHeight &&
+               m_Method               == rhs.m_Method &&
+               m_DataLayout           == rhs.m_DataLayout &&
+               m_BilinearAlignCorners == rhs.m_BilinearAlignCorners;
     }
 
     /// Target width value.
@@ -747,6 +749,8 @@ struct ResizeDescriptor
     ResizeMethod m_Method;
     /// The data layout to be used (NCHW, NHWC).
     DataLayout m_DataLayout;
+    /// Aligned corners for bilinear method
+    bool m_BilinearAlignCorners;
 };
 
 

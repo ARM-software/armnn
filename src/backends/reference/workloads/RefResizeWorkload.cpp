@@ -29,7 +29,13 @@ void RefResizeWorkload::Execute() const
     std::unique_ptr<Encoder<float>> encoderPtr = MakeEncoder<float>(outputInfo, m_Data.m_Outputs[0]->Map());
     Encoder<float> &encoder = *encoderPtr;
 
-    Resize(decoder, inputInfo, encoder, outputInfo, m_Data.m_Parameters.m_DataLayout, m_Data.m_Parameters.m_Method);
+    Resize(decoder,
+           inputInfo,
+           encoder,
+           outputInfo,
+           m_Data.m_Parameters.m_DataLayout,
+           m_Data.m_Parameters.m_Method,
+           m_Data.m_Parameters.m_BilinearAlignCorners);
 }
 
 } //namespace armnn

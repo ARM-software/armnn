@@ -2004,6 +2004,11 @@ void TfLiteParser::ParseResize(size_t subgraphIndex, size_t operatorIndex, Resiz
         case ResizeMethod::Bilinear:
         {
             layerName += str(boost::format("BILINEAR:%1%:%2%") % subgraphIndex % operatorIndex);
+
+            const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+            const auto * options     = operatorPtr->builtin_options.AsResizeBilinearOptions();
+
+            desc.m_BilinearAlignCorners = options->align_corners;
             break;
         }
         case ResizeMethod::NearestNeighbor:

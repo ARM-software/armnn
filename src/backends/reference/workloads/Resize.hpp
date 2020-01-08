@@ -19,6 +19,7 @@ void Resize(Decoder<float>&               in,
             Encoder<float>&               out,
             const TensorInfo&             outputInfo,
             armnnUtils::DataLayoutIndexed dataLayout = DataLayout::NCHW,
-            ResizeMethod                  resizeMethod = ResizeMethod::NearestNeighbor);
+            ResizeMethod                  resizeMethod = ResizeMethod::NearestNeighbor,
+            bool                          alignConers = false);
 
 } // namespace armnn

@@ -6,11 +6,11 @@
 
 CMD=$( basename $0 )
 
-# For pinnning to a ref use this:
+# For pinning to a ref use this:
 DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_19_11" # Release 19.11
 #
 # For pinning to a revision use this:
-#DEFAULT_CLFRAMEWORKREVISION="94e0cf960ea6116eb57fa88d9b951f859b52c602" #COMPMID-2690 Extend Doxygen documents to include GEMM Tuner
+#DEFAULT_CLFRAMEWORKREVISION="df9701960a296cb50523017a6d956d9bd59450f9" #COMPMID-2819: Retain data layout in NESpaceToDepth and NEDepthToSpace
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

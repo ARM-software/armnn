@@ -13,6 +13,7 @@
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Conversion.hpp>
+#include <armnn/Utils.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -34,9 +35,12 @@ void SetNotConnectedProfilingState(ProfilingStateMachine& profilingStateMachine)
     {
     case ProfilingState::WaitingForAck:
         profilingStateMachine.TransitionToState(ProfilingState::Active);
+        ARMNN_FALLTHROUGH;
     case ProfilingState::Uninitialised:
+        ARMNN_FALLTHROUGH;
     case ProfilingState::Active:
         profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
+        ARMNN_FALLTHROUGH;
     case ProfilingState::NotConnected:
         return;
     default:
@@ -50,10 +54,13 @@ void SetWaitingForAckProfilingState(ProfilingStateMachine& profilingStateMachine
     switch (currentState)
     {
     case ProfilingState::Uninitialised:
+        ARMNN_FALLTHROUGH;
     case ProfilingState::Active:
         profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
+        ARMNN_FALLTHROUGH;
     case ProfilingState::NotConnected:
         profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
+        ARMNN_FALLTHROUGH;
     case ProfilingState::WaitingForAck:
         return;
     default:
@@ -68,10 +75,13 @@ void SetActiveProfilingState(ProfilingStateMachine& profilingStateMachine)
     {
     case ProfilingState::Uninitialised:
         profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
+        ARMNN_FALLTHROUGH;
     case ProfilingState::NotConnected:
         profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
+        ARMNN_FALLTHROUGH;
     case ProfilingState::WaitingForAck:
         profilingStateMachine.TransitionToState(ProfilingState::Active);
+        ARMNN_FALLTHROUGH;
     case ProfilingState::Active:
         return;
     default:

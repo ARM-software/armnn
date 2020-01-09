@@ -181,6 +181,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDebug(const DebugQueueDescr
     {
         return std::make_unique<RefDebugQSymm16Workload>(descriptor, info);
     }
+    if (IsDataType<DataType::Signed32>(info))
+    {
+        return std::make_unique<RefDebugSigned32Workload>(descriptor, info);
+    }
 
     return MakeWorkload<RefDebugFloat32Workload, RefDebugQAsymm8Workload>(descriptor, info);
 }

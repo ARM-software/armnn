@@ -496,12 +496,13 @@ bool RefLayerSupport::IsDebugSupported(const TensorInfo& input,
 {
     bool supported = true;
 
-    std::array<DataType, 4> supportedTypes =
+    std::array<DataType, 5> supportedTypes =
     {
         DataType::Float16,
         DataType::Float32,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Signed32
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,

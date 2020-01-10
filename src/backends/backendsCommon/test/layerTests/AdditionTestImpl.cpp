@@ -331,7 +331,7 @@ LayerTestResult<uint8_t, 4> AdditionBroadcastUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return AdditionBroadcastTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return AdditionBroadcastTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory, memoryManager, 2.f, 0);
 }
 
@@ -339,7 +339,7 @@ LayerTestResult<int16_t, 4> AdditionBroadcastInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return AdditionBroadcastTestImpl<armnn::DataType::QuantisedSymm16>(
+    return AdditionBroadcastTestImpl<armnn::DataType::QSymmS16>(
         workloadFactory, memoryManager, 2.f, 0);
 }
 
@@ -355,7 +355,7 @@ LayerTestResult<uint8_t, 4> AdditionBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return AdditionBroadcast1ElementTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return AdditionBroadcast1ElementTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory, memoryManager, 0.1333333f, 128);
 }
 
@@ -363,7 +363,7 @@ LayerTestResult<int16_t, 4> AdditionBroadcast1ElementInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return AdditionBroadcast1ElementTestImpl<armnn::DataType::QuantisedSymm16>(
+    return AdditionBroadcast1ElementTestImpl<armnn::DataType::QSymmS16>(
         workloadFactory, memoryManager, 0.1333333f, 0);
 }
 
@@ -392,7 +392,7 @@ LayerTestResult<uint8_t, 4> AdditionUint8Test(
         255, 186, 255, 186, 255, 214, // 2261(clamped), 1281, 2163(clamped), 1281, 2408(clamped), 1477
     });
 
-    return ElementwiseTestHelper<4, armnn::AdditionQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<4, armnn::AdditionQueueDescriptor, armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -434,7 +434,7 @@ LayerTestResult<int16_t, 4> AdditionInt16Test(
         329, 189, 315, 189, 350, 217, // 2303(clamped), 1323, 2205(clamped), 1323, 2450(clamped), 1519
     };
 
-    return ElementwiseTestHelper<4, armnn::AdditionQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::AdditionQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape0,

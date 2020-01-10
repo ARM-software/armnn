@@ -88,7 +88,7 @@ inline bool ConstantUsageFloat32Test(const std::vector<BackendId>& backends)
 
 inline bool ConstantUsageUint8Test(const std::vector<BackendId>& backends)
 {
-    TensorInfo commonTensorInfo({ 2, 3 }, DataType::QuantisedAsymm8);
+    TensorInfo commonTensorInfo({ 2, 3 }, DataType::QAsymmU8);
 
     const float scale = 0.023529f;
     const int8_t offset = -43;

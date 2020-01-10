@@ -37,8 +37,8 @@ int main(int argc, char* argv[])
 
     armnn::QuantizerOptions quantizerOptions;
     quantizerOptions.m_ActivationFormat = cmdline.GetQuantizationScheme() == "QSymm16"
-                                          ? armnn::DataType::QuantisedSymm16
-                                          : armnn::DataType::QuantisedAsymm8;
+                                          ? armnn::DataType::QSymmS16
+                                          : armnn::DataType::QAsymmU8;
 
     quantizerOptions.m_PreserveType = cmdline.HasPreservedDataType();
 

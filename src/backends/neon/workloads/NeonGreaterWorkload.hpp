@@ -31,6 +31,6 @@ private:
 };
 
 using NeonGreaterFloat32Workload = NeonGreaterWorkload<DataType::Float32>;
-using NeonGreaterUint8Workload = NeonGreaterWorkload<DataType::QuantisedAsymm8>;
+using NeonGreaterUint8Workload = NeonGreaterWorkload<DataType::QAsymmU8>;
 
 } //namespace armnn

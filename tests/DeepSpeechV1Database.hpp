@@ -83,7 +83,7 @@ inline auto ParseDataArray<armnn::DataType::Signed32>(std::istream & stream)
 }
 
 template<>
-inline auto ParseDataArray<armnn::DataType::QuantisedAsymm8>(std::istream& stream,
+inline auto ParseDataArray<armnn::DataType::QAsymmU8>(std::istream& stream,
                                                       const float& quantizationScale,
                                                       const int32_t& quantizationOffset)
 {

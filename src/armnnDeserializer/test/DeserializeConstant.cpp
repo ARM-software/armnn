@@ -143,7 +143,7 @@ struct SimpleConstantAddFixture : ConstantAddFixture
 
 BOOST_FIXTURE_TEST_CASE(SimpleConstantAddQuantisedAsymm8, SimpleConstantAddFixture)
 {
-    RunTest<2, armnn::DataType::QuantisedAsymm8>(
+    RunTest<2, armnn::DataType::QAsymmU8>(
             0,
             { 1, 2, 3, 4, 5, 6  },
             { 2, 4, 6, 8, 10, 12 });

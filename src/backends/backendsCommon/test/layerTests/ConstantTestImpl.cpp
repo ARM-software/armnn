@@ -134,26 +134,26 @@ LayerTestResult<int16_t, 4> ConstantInt16SimpleQuantizationScaleNoOffsetTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ConstantTestImpl<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.0f, 0);
+    return ConstantTestImpl<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
 LayerTestResult<uint8_t, 4> ConstantUint8SimpleQuantizationScaleNoOffsetTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ConstantTestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
+    return ConstantTestImpl<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
 LayerTestResult<uint8_t, 4> ConstantUint8CustomQuantizationScaleAndOffsetTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ConstantTestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 2e-6f, 1);
+    return ConstantTestImpl<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 2e-6f, 1);
 }
 
 LayerTestResult<int16_t, 4> ConstantInt16CustomQuantizationScaleAndOffsetTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ConstantTestImpl<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 2e-6f, 1);
+    return ConstantTestImpl<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 2e-6f, 1);
 }

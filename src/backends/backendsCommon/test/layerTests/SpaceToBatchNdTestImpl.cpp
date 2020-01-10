@@ -337,28 +337,28 @@ LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdSimpleTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdSimpleTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiChannelsUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiChannelsTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiChannelsTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiBlockUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiBlockTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiBlockTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdPaddingTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdPaddingTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<float, 4> SpaceToBatchNdSimpleNhwcFloat32Test(
@@ -421,82 +421,82 @@ LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleNhwcUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdSimpleNhwcTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdSimpleNhwcTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiChannelsNhwcUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiChannelsNhwcTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiChannelsNhwcTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiBlockNhwcUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiBlockNhwcTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiBlockNhwcTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingNhwcUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdPaddingNhwcTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdPaddingNhwcTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdSimpleUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdSimpleTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdSimpleTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdMultiChannelsUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiChannelsTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiChannelsTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdMultiBlockUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiBlockTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiBlockTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdPaddingUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdPaddingTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdPaddingTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdSimpleNhwcUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdSimpleNhwcTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdSimpleNhwcTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdMultiChannelsNhwcUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiChannelsNhwcTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiChannelsNhwcTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdMultiBlockNhwcUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiBlockNhwcTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiBlockNhwcTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdPaddingNhwcUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdPaddingNhwcTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdPaddingNhwcTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }

@@ -86,7 +86,7 @@ LayerTestResult<uint8_t, 4> MinimumBroadcast1DVectorUint8Test(
         1, 1, 2, 1, 2, 3
     };
 
-    return ElementwiseTestHelper<4, armnn::MinimumQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<4, armnn::MinimumQueueDescriptor, armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -226,7 +226,7 @@ LayerTestResult<int16_t, 4> MinimumInt16Test(
         3, 3, 3, 3, 4, 4, 4, 4
     };
 
-    return ElementwiseTestHelper<4, armnn::MinimumQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::MinimumQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape,
@@ -258,7 +258,7 @@ LayerTestResult<int16_t, 4> MinimumBroadcast1ElementInt16Test(
         2, 2, 2, 2, 2, 2
     };
 
-    return ElementwiseTestHelper<4, armnn::MinimumQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::MinimumQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -290,7 +290,7 @@ LayerTestResult<int16_t, 4> MinimumBroadcast1DVectorInt16Test(
         1, 8, 3, 1, 10, 3
     };
 
-    return ElementwiseTestHelper<4, armnn::MinimumQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::MinimumQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape0,

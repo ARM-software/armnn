@@ -246,48 +246,48 @@ LayerTestResult<float, 1> Slice1dFloat32Test(armnn::IWorkloadFactory& workloadFa
 LayerTestResult<uint8_t, 4> Slice4dUint8Test(armnn::IWorkloadFactory& workloadFactory,
                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Slice4dTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return Slice4dTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 3> Slice3dUint8Test(armnn::IWorkloadFactory& workloadFactory,
                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Slice3dTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return Slice3dTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 2> Slice2dUint8Test(armnn::IWorkloadFactory& workloadFactory,
                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Slice2dTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return Slice2dTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 1> Slice1dUint8Test(armnn::IWorkloadFactory& workloadFactory,
                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Slice1dTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return Slice1dTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 // Int16 tests
 LayerTestResult<int16_t, 4> Slice4dInt16Test(armnn::IWorkloadFactory& workloadFactory,
                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Slice4dTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return Slice4dTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 3> Slice3dInt16Test(armnn::IWorkloadFactory& workloadFactory,
                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Slice3dTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return Slice3dTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 2> Slice2dInt16Test(armnn::IWorkloadFactory& workloadFactory,
                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Slice2dTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return Slice2dTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 1> Slice1dInt16Test(armnn::IWorkloadFactory& workloadFactory,
                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Slice1dTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return Slice1dTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }

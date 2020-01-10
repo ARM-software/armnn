@@ -664,62 +664,62 @@ ResizeNearestNeighborMagTest<armnn::DataType::Float16>(
     int32_t outQuantOffset);
 
 // QAsymm8
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-ResizeBilinearNopTest<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+ResizeBilinearNopTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-SimpleResizeBilinearTest<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+SimpleResizeBilinearTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-ResizeBilinearSqMinTest<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+ResizeBilinearSqMinTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-ResizeBilinearMinTest<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+ResizeBilinearMinTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-ResizeBilinearMagTest<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+ResizeBilinearMagTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-ResizeNearestNeighborNopTest<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+ResizeNearestNeighborNopTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-SimpleResizeNearestNeighborTest<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+SimpleResizeNearestNeighborTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-ResizeNearestNeighborSqMinTest<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+ResizeNearestNeighborSqMinTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-ResizeNearestNeighborMinTest<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+ResizeNearestNeighborMinTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-ResizeNearestNeighborMagTest<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+ResizeNearestNeighborMagTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout,
@@ -729,62 +729,62 @@ ResizeNearestNeighborMagTest<armnn::DataType::QuantisedAsymm8>(
     int32_t outQuantOffset);
 
 // QSymm16
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-ResizeBilinearNopTest<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+ResizeBilinearNopTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-SimpleResizeBilinearTest<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+SimpleResizeBilinearTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-ResizeBilinearSqMinTest<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+ResizeBilinearSqMinTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-ResizeBilinearMinTest<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+ResizeBilinearMinTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-ResizeBilinearMagTest<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+ResizeBilinearMagTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-ResizeNearestNeighborNopTest<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+ResizeNearestNeighborNopTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-SimpleResizeNearestNeighborTest<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+SimpleResizeNearestNeighborTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-ResizeNearestNeighborSqMinTest<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+ResizeNearestNeighborSqMinTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-ResizeNearestNeighborMinTest<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+ResizeNearestNeighborMinTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-ResizeNearestNeighborMagTest<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+ResizeNearestNeighborMagTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout,

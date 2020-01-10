@@ -194,7 +194,7 @@ private:
         switch (dataType)
         {
             case DataType::Float32:         return "FLOAT32";
-            case DataType::QuantisedAsymm8: return "UINT8";
+            case DataType::QAsymmU8: return "UINT8";
             default:                        return "UNKNOWN";
         }
     }

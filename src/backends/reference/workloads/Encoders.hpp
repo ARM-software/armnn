@@ -30,7 +30,7 @@ inline std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void*
                 params.second,
                 params.first);
         }
-        case armnn::DataType::QuantisedAsymm8:
+        case armnn::DataType::QAsymmU8:
         {
             return std::make_unique<QASymm8Encoder>(
                 static_cast<uint8_t*>(data),
@@ -44,7 +44,7 @@ inline std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void*
                     info.GetQuantizationScale(),
                     info.GetQuantizationOffset());
         }
-        case armnn::DataType::QuantisedSymm16:
+        case armnn::DataType::QSymmS16:
         {
             return std::make_unique<QSymm16Encoder>(
                 static_cast<int16_t*>(data),

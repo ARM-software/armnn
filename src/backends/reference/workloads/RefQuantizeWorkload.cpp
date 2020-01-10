@@ -43,7 +43,7 @@ void RefQuantizeWorkload::Execute() const
 
     switch(m_TargetType)
     {
-        case DataType::QuantisedAsymm8:
+        case DataType::QAsymmU8:
         {
             QuantizeImpl<uint8_t>(input, output, m_NumElements, m_Scale, m_Offset);
             break;
@@ -53,7 +53,7 @@ void RefQuantizeWorkload::Execute() const
             QuantizeImpl<int8_t>(input, output, m_NumElements, m_Scale, m_Offset);
             break;
         }
-        case DataType::QuantisedSymm16:
+        case DataType::QSymmS16:
         {
             QuantizeImpl<int16_t>(input, output, m_NumElements, m_Scale, 0);
             break;

@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
 
     BOOST_FIXTURE_TEST_CASE(SimpleDequantizeQAsymm8, SimpleDequantizeFixtureQAsymm8)
     {
-        RunTest<2, armnn::DataType::QuantisedAsymm8 , armnn::DataType::Float32>(
+        RunTest<2, armnn::DataType::QAsymmU8 , armnn::DataType::Float32>(
                 0,
                 {{"inputTensor",  { 0u,   1u,   5u,   100u,   200u,   255u }}},
                 {{"outputTensor", { 0.0f, 1.5f, 7.5f, 150.0f, 300.0f, 382.5f }}});
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
 
     BOOST_FIXTURE_TEST_CASE(SimpleDequantizeQsymm16, SimpleDequantizeFixtureQSymm16)
     {
-        RunTest<2, armnn::DataType::QuantisedSymm16 , armnn::DataType::Float32>(
+        RunTest<2, armnn::DataType::QSymmS16 , armnn::DataType::Float32>(
                 0,
                 {{"inputTensor",  { 0,    1,    5,    32767,    -1,   -32768 }}},
                 {{"outputTensor", { 0.0f, 1.5f, 7.5f, 49150.5f, -1.5f,-49152.0f }}});

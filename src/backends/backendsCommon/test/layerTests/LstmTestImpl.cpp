@@ -1573,17 +1573,17 @@ LayerTestResult<uint8_t, 2> QuantizedLstmTestImpl(
 
     // Input/Output tensor info
     armnn::TensorInfo inputInfo({numBatches , inputSize},
-                                 armnn::DataType::QuantisedAsymm8,
+                                 armnn::DataType::QAsymmU8,
                                  inputOutputScale,
                                  inputOutputOffset);
 
     armnn::TensorInfo cellStateInfo({numBatches , outputSize},
-                                     armnn::DataType::QuantisedSymm16,
+                                     armnn::DataType::QSymmS16,
                                      cellStateScale,
                                      cellStateOffset);
 
     armnn::TensorInfo outputStateInfo({numBatches , outputSize},
-                                       armnn::DataType::QuantisedAsymm8,
+                                       armnn::DataType::QAsymmU8,
                                        inputOutputScale,
                                        inputOutputOffset);
 
@@ -1635,12 +1635,12 @@ LayerTestResult<uint8_t, 2> QuantizedLstmTestImpl(
 
     // Weights and bias tensor and quantization info
     armnn::TensorInfo inputWeightsInfo({outputSize, inputSize},
-                                        armnn::DataType::QuantisedAsymm8,
+                                        armnn::DataType::QAsymmU8,
                                         weightsScale,
                                         weightsOffset);
 
     armnn::TensorInfo recurrentWeightsInfo({outputSize, outputSize},
-                                            armnn::DataType::QuantisedAsymm8,
+                                            armnn::DataType::QAsymmU8,
                                             weightsScale,
                                             weightsOffset);
 
@@ -1965,8 +1965,8 @@ LayerTestResult<int16_t, 2> LstmLayerInt16NoCifgNoPeepholeNoProjectionTest(
     const float qScale = 1.0f;
     const int32_t qOffset = 0;
 
-    const armnn::DataType datatype = armnn::DataType::QuantisedSymm16;
-    const armnn::DataType constantDatatype = armnn::DataType::QuantisedAsymm8;
+    const armnn::DataType datatype = armnn::DataType::QSymmS16;
+    const armnn::DataType constantDatatype = armnn::DataType::QAsymmU8;
 
     armnn::TensorInfo inputDesc({2, 2}, datatype);
     boost::multi_array<int16_t , 2> input = MakeTensor<int16_t , 2>(
@@ -1995,8 +1995,8 @@ LayerTestResult<int16_t, 2> LstmLayerInt16WithCifgWithPeepholeNoProjectionTest(
     const float qScale = 1.0f;
     const int32_t qOffset = 0;
 
-    const armnn::DataType datatype = armnn::DataType::QuantisedSymm16;
-    const armnn::DataType constantDatatype = armnn::DataType::QuantisedAsymm8;
+    const armnn::DataType datatype = armnn::DataType::QSymmS16;
+    const armnn::DataType constantDatatype = armnn::DataType::QAsymmU8;
 
     armnn::TensorInfo inputDesc({ 2, 2 }, datatype);
     boost::multi_array<int16_t, 2> input =
@@ -2026,8 +2026,8 @@ LayerTestResult<int16_t, 2> LstmLayerInt16NoCifgWithPeepholeWithProjectionTest(
     const float qScale = 2.0f;
     const int32_t qOffset = 0;
 
-    const armnn::DataType datatype = armnn::DataType::QuantisedSymm16;
-    const armnn::DataType constantDatatype = armnn::DataType::QuantisedAsymm8;
+    const armnn::DataType datatype = armnn::DataType::QSymmS16;
+    const armnn::DataType constantDatatype = armnn::DataType::QAsymmU8;
 
     armnn::TensorInfo inputDesc({ 2, 5 }, datatype);
     boost::multi_array<int16_t, 2> input =
@@ -2068,7 +2068,7 @@ LayerTestResult<int16_t, 2> LstmLayerInt16NoCifgNoPeepholeNoProjectionInt16Const
     const float qScale = 1.0f;
     const int32_t qOffset = 0;
 
-    const armnn::DataType datatype = armnn::DataType::QuantisedSymm16; // datatype & constants set to QSymm16
+    const armnn::DataType datatype = armnn::DataType::QSymmS16; // datatype & constants set to QSymm16
 
     armnn::TensorInfo inputDesc({2, 2}, datatype);
     boost::multi_array<int16_t , 2> input =
@@ -2098,11 +2098,11 @@ LayerTestResult<uint8_t, 2> QuantizedLstmTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    armnn::TensorInfo inputDesc({2, 2}, armnn::DataType::QuantisedAsymm8);
+    armnn::TensorInfo inputDesc({2, 2}, armnn::DataType::QAsymmU8);
     boost::multi_array<uint8_t, 2> input = MakeTensor<uint8_t, 2>(inputDesc, std::vector<uint8_t>(
         {166, 179, 50, 150}));
 
-    armnn::TensorInfo outputDesc({2, 4}, armnn::DataType::QuantisedAsymm8);
+    armnn::TensorInfo outputDesc({2, 4}, armnn::DataType::QAsymmU8);
     boost::multi_array<uint8_t, 2> expectedOutput = MakeTensor<uint8_t, 2>(outputDesc, std::vector<uint8_t>(
         {140, 151, 146, 112, 136, 156, 142, 112 }));
 

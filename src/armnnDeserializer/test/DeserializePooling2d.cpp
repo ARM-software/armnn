@@ -141,7 +141,7 @@ BOOST_FIXTURE_TEST_CASE(Pooling2dFloat32Avg, SimpleAvgPooling2dFixture)
 
 BOOST_FIXTURE_TEST_CASE(Pooling2dQuantisedAsymm8Avg, SimpleAvgPooling2dFixture2)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(0,
+    RunTest<4, armnn::DataType::QAsymmU8>(0,
                                                 { 20, 40, 60, 80 },
                                                 { 50 });
 }
@@ -153,7 +153,7 @@ BOOST_FIXTURE_TEST_CASE(Pooling2dFloat32Max, SimpleMaxPooling2dFixture)
 
 BOOST_FIXTURE_TEST_CASE(Pooling2dQuantisedAsymm8Max, SimpleMaxPooling2dFixture2)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(0,
+    RunTest<4, armnn::DataType::QAsymmU8>(0,
                                                 { 20, 40, 60, 80 },
                                                 { 80 });
 }

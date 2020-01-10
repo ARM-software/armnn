@@ -264,12 +264,12 @@ ArgMaxSimpleTest<armnn::DataType::Float32>(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMaxSimpleTest<armnn::DataType::QuantisedAsymm8>(
+ArgMaxSimpleTest<armnn::DataType::QAsymmU8>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMaxSimpleTest<armnn::DataType::QuantisedSymm16>(
+ArgMaxSimpleTest<armnn::DataType::QSymmS16>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -284,12 +284,12 @@ ArgMinSimpleTest<armnn::DataType::Float32>(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMinSimpleTest<armnn::DataType::QuantisedAsymm8>(
+ArgMinSimpleTest<armnn::DataType::QAsymmU8>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMinSimpleTest<armnn::DataType::QuantisedSymm16>(
+ArgMinSimpleTest<armnn::DataType::QSymmS16>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -304,12 +304,12 @@ ArgMinChannelTest<armnn::DataType::Float32>(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMinChannelTest<armnn::DataType::QuantisedAsymm8>(
+ArgMinChannelTest<armnn::DataType::QAsymmU8>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMinChannelTest<armnn::DataType::QuantisedSymm16>(
+ArgMinChannelTest<armnn::DataType::QSymmS16>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -324,12 +324,12 @@ ArgMaxChannelTest<armnn::DataType::Float32>(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMaxChannelTest<armnn::DataType::QuantisedAsymm8>(
+ArgMaxChannelTest<armnn::DataType::QAsymmU8>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMaxChannelTest<armnn::DataType::QuantisedSymm16>(
+ArgMaxChannelTest<armnn::DataType::QSymmS16>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -349,7 +349,7 @@ ArgMaxHeightTest<armnn::DataType::Signed32>(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMaxHeightTest<armnn::DataType::QuantisedAsymm8>(
+ArgMaxHeightTest<armnn::DataType::QAsymmU8>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -364,6 +364,6 @@ ArgMinWidthTest<armnn::DataType::Signed32>(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMinWidthTest<armnn::DataType::QuantisedAsymm8>(
+ArgMinWidthTest<armnn::DataType::QAsymmU8>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

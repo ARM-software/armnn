@@ -30,7 +30,7 @@ void RefPermuteWorkload<DataType>::Execute() const
 
 template class RefPermuteWorkload<DataType::Float16>;
 template class RefPermuteWorkload<DataType::Float32>;
-template class RefPermuteWorkload<DataType::QuantisedAsymm8>;
-template class RefPermuteWorkload<DataType::QuantisedSymm16>;
+template class RefPermuteWorkload<DataType::QAsymmU8>;
+template class RefPermuteWorkload<DataType::QSymmS16>;
 
 } //namespace armnn

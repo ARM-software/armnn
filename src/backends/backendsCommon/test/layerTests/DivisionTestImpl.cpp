@@ -288,7 +288,7 @@ LayerTestResult<uint8_t, 4> DivisionUint8Test(
         4, 4, 4, 4,  5, 5, 5, 5
     };
 
-    return ElementwiseTestHelper<4, armnn::DivisionQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<4, armnn::DivisionQueueDescriptor, armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         shape,
@@ -314,7 +314,7 @@ LayerTestResult<uint8_t, 4> DivisionBroadcast1ElementUint8Test(
 
     std::vector<uint8_t> output = { 1, 2, 3, 4, 5, 6, 7, 8};
 
-    return ElementwiseTestHelper<4, armnn::DivisionQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<4, armnn::DivisionQueueDescriptor, armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -348,7 +348,7 @@ LayerTestResult<uint8_t, 4> DivisionBroadcast1DVectorUint8Test(
        13, 14,   15, 16,   17, 18
     };
 
-    return ElementwiseTestHelper<4, armnn::DivisionQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<4, armnn::DivisionQueueDescriptor, armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -383,7 +383,7 @@ LayerTestResult<int16_t,4> DivisionInt16Test(
         4, 4, 4, 4,  5, 5, 5, 5
     };
 
-    return ElementwiseTestHelper<4, armnn::DivisionQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::DivisionQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape,
@@ -409,7 +409,7 @@ LayerTestResult<int16_t, 4> DivisionBroadcast1ElementInt16Test(
 
     std::vector<int16_t> output = { 1, 2, 3, 4, 5, 6, 7, 8};
 
-    return ElementwiseTestHelper<4, armnn::DivisionQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::DivisionQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -443,7 +443,7 @@ LayerTestResult<int16_t, 4> DivisionBroadcast1DVectorInt16Test(
         13, 14,   15, 16,   17, 18
     };
 
-    return ElementwiseTestHelper<4, armnn::DivisionQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::DivisionQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape0,

@@ -216,7 +216,7 @@ LayerTestResult<uint8_t, 4> MultiplicationUint8Test(
     };
 
     // Scale/offset chosen to have output values out of range
-    return ElementwiseTestHelper<4, armnn::MultiplicationQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<4, armnn::MultiplicationQueueDescriptor, armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         shape,
@@ -254,7 +254,7 @@ LayerTestResult<uint8_t, 4> MultiplicationBroadcast1ElementUint8Test(
         14, 16, 18,   20, 22, 24
     };
 
-    return ElementwiseTestHelper<4, armnn::MultiplicationQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<4, armnn::MultiplicationQueueDescriptor, armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -286,7 +286,7 @@ LayerTestResult<uint8_t, 4> MultiplicationBroadcast1DVectorUint8Test(
         7, 16,  27,    10, 22, 36
     };
 
-    return ElementwiseTestHelper<4, armnn::MultiplicationQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<4, armnn::MultiplicationQueueDescriptor, armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -321,7 +321,7 @@ LayerTestResult<int16_t, 4> MultiplicationInt16Test(
         84, 104, 126, 150, 176, 204
     };
 
-    return ElementwiseTestHelper<4, armnn::MultiplicationQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::MultiplicationQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape,
@@ -353,7 +353,7 @@ LayerTestResult<int16_t, 4> MultiplicationBroadcast1ElementInt16Test(
         14, 16, 18, 20, 22, 24
     };
 
-    return ElementwiseTestHelper<4, armnn::MultiplicationQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::MultiplicationQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -385,7 +385,7 @@ LayerTestResult<int16_t, 4> MultiplicationBroadcast1DVectorInt16Test(
         7, 16, 27, 10, 22, 36
     };
 
-    return ElementwiseTestHelper<4, armnn::MultiplicationQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::MultiplicationQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape0,

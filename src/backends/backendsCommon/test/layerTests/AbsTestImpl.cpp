@@ -71,7 +71,7 @@ LayerTestResult<T, 2> Abs2dTest(
     float qScale    = 0.0625f;
     int32_t qOffset = 64;
 
-    if (ArmnnType == armnn::DataType::QuantisedSymm16)
+    if (ArmnnType == armnn::DataType::QSymmS16)
     {
         qScale  = 0.1f;
         qOffset = 0;
@@ -117,7 +117,7 @@ LayerTestResult<T, 3> Abs3dTest(
     float qScale    = 0.0625f;
     int32_t qOffset = 64;
 
-    if (ArmnnType == armnn::DataType::QuantisedSymm16)
+    if (ArmnnType == armnn::DataType::QSymmS16)
     {
         qScale  = 0.1f;
         qOffset = 0;
@@ -218,13 +218,13 @@ Abs2dTest<armnn::DataType::Float16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 2>
-Abs2dTest<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 2>
+Abs2dTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 2>
-Abs2dTest<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 2>
+Abs2dTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -238,13 +238,13 @@ Abs3dTest<armnn::DataType::Float16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 3>
-Abs3dTest<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 3>
+Abs3dTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 3>
-Abs3dTest<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 3>
+Abs3dTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 

@@ -289,7 +289,7 @@ void TensorInfo::SetQuantizationDim(const Optional<unsigned int>& quantizationDi
 
 bool TensorInfo::IsQuantized() const
 {
-    return m_DataType == DataType::QuantisedAsymm8 || m_DataType == DataType::QuantisedSymm16;
+    return m_DataType == DataType::QAsymmU8 || m_DataType == DataType::QSymmS16;
 }
 
 // ---

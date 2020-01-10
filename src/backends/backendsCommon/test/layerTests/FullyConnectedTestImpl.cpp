@@ -229,14 +229,14 @@ LayerTestResult<T, 2> FullyConnectedLargeTestCommon(
 // Explicit template specializations
 //
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 2>
-FullyConnectedTest<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 2>
+FullyConnectedTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 2>
-FullyConnectedTest<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 2>
+FullyConnectedTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled);

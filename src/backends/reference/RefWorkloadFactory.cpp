@@ -51,7 +51,7 @@ bool IsFloat16(const WorkloadInfo& info)
 
 bool IsQSymm16(const WorkloadInfo& info)
 {
-    return IsDataType<DataType::QuantisedSymm16>(info);
+    return IsDataType<DataType::QSymmS16>(info);
 }
 
 RefWorkloadFactory::RefWorkloadFactory(const std::shared_ptr<RefMemoryManager>& memoryManager)

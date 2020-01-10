@@ -27,7 +27,7 @@ LayerTestResult<uint8_t, 4> SubtractionUint8Test(
     std::vector<uint8_t> input1 = {  1,  2,  1,  2 };
     std::vector<uint8_t> output = {  3,  3,  5,  5 };
 
-    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -57,7 +57,7 @@ LayerTestResult<uint8_t, 4> SubtractionBroadcast1ElementUint8Test(
 
     std::vector<uint8_t> output = { 5, 6, 7, 8 };
 
-    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -87,7 +87,7 @@ LayerTestResult<uint8_t, 4> SubtractionBroadcastUint8Test(
 
     std::vector<uint8_t> output = { 8, 11, 12, 15 };
 
-    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -254,7 +254,7 @@ LayerTestResult<int16_t, 4> SubtractionInt16Test(
     std::vector<int16_t> input1 = {  1,  2,  1,  2 };
     std::vector<int16_t> output = {  3,  3,  5,  5 };
 
-    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape,
@@ -284,7 +284,7 @@ LayerTestResult<int16_t, 4> SubtractionBroadcast1ElementInt16Test(
 
     std::vector<int16_t> output = { 3, 4, 5, 6 };
 
-    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -314,7 +314,7 @@ LayerTestResult<int16_t, 4> SubtractionBroadcastInt16Test(
 
     std::vector<int16_t> output = { 8, 11, 12, 15 };
 
-    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape0,

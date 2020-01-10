@@ -36,7 +36,7 @@ ConstTensor CreateQuantizedConst(const ConstTensor& tensor, std::vector<uint8_t>
             BOOST_ASSERT_MSG(false, "Can't quantize unsupported data type");
     }
 
-    TensorInfo qInfo(tensor.GetInfo().GetShape(), DataType::QuantisedAsymm8, scale, offset);
+    TensorInfo qInfo(tensor.GetInfo().GetShape(), DataType::QAsymmU8, scale, offset);
     return ConstTensor(qInfo, backing);
 }
 

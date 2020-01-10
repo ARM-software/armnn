@@ -79,14 +79,14 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
                 params.second,
                 params.first);
         }
-        case DataType::QuantisedAsymm8:
+        case DataType::QAsymmU8:
         {
             return std::make_unique<QASymm8Decoder>(
                 static_cast<const uint8_t*>(data),
                 info.GetQuantizationScale(),
                 info.GetQuantizationOffset());
         }
-        case DataType::QuantisedSymm16:
+        case DataType::QSymmS16:
         {
             return std::make_unique<QSymm16Decoder>(
                 static_cast<const int16_t*>(data),

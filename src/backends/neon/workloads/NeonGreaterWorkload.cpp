@@ -44,6 +44,6 @@ void NeonGreaterWorkload<T>::Execute() const
 }
 
 template class NeonGreaterWorkload<DataType::Float32>;
-template class NeonGreaterWorkload<DataType::QuantisedAsymm8>;
+template class NeonGreaterWorkload<DataType::QAsymmU8>;
 
 } //namespace armnn

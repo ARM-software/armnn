@@ -314,54 +314,54 @@ LayerTestResult<uint8_t, 4> Debug4dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Debug4dTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return Debug4dTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 3> Debug3dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Debug3dTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return Debug3dTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 2> Debug2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Debug2dTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return Debug2dTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 1> Debug1dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Debug1dTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return Debug1dTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> Debug4dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Debug4dTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return Debug4dTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 3> Debug3dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Debug3dTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return Debug3dTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 2> Debug2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Debug2dTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return Debug2dTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 1> Debug1dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Debug1dTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return Debug1dTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }

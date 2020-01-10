@@ -206,7 +206,7 @@ void CompareConstTensor(const armnn::ConstTensor& tensor1, const armnn::ConstTen
             CompareConstTensorData<const float*>(
                 tensor1.GetMemoryArea(), tensor2.GetMemoryArea(), tensor1.GetNumElements());
             break;
-        case armnn::DataType::QuantisedAsymm8:
+        case armnn::DataType::QAsymmU8:
         case armnn::DataType::Boolean:
             CompareConstTensorData<const uint8_t*>(
                 tensor1.GetMemoryArea(), tensor2.GetMemoryArea(), tensor1.GetNumElements());
@@ -770,7 +770,7 @@ BOOST_AUTO_TEST_CASE(SerializeDequantize)
     DECLARE_LAYER_VERIFIER_CLASS(Dequantize)
 
     const std::string layerName("dequantize");
-    const armnn::TensorInfo inputInfo({ 1, 5, 2, 3 }, armnn::DataType::QuantisedAsymm8, 0.5f, 1);
+    const armnn::TensorInfo inputInfo({ 1, 5, 2, 3 }, armnn::DataType::QAsymmU8, 0.5f, 1);
     const armnn::TensorInfo outputInfo({ 1, 5, 2, 3 }, armnn::DataType::Float32);
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
@@ -1152,8 +1152,8 @@ BOOST_AUTO_TEST_CASE(SerializeGather)
     };
 
     const std::string layerName("gather");
-    armnn::TensorInfo paramsInfo({ 8 }, armnn::DataType::QuantisedAsymm8);
-    armnn::TensorInfo outputInfo({ 3 }, armnn::DataType::QuantisedAsymm8);
+    armnn::TensorInfo paramsInfo({ 8 }, armnn::DataType::QAsymmU8);
+    armnn::TensorInfo outputInfo({ 3 }, armnn::DataType::QAsymmU8);
     const armnn::TensorInfo indicesInfo({ 3 }, armnn::DataType::Signed32);
 
     paramsInfo.SetQuantizationScale(1.0f);
@@ -3994,7 +3994,7 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeQuantizedLstm)
     armnn::TensorShape inputToInputWeightsShape = {4, 2};
     std::vector<uint8_t> inputToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8};
     armnn::TensorInfo inputToInputWeightsInfo(inputToInputWeightsShape,
-                                              armnn::DataType::QuantisedAsymm8,
+                                              armnn::DataType::QAsymmU8,
                                               weightsScale,
                                               weightsOffset);
     armnn::ConstTensor inputToInputWeights(inputToInputWeightsInfo, inputToInputWeightsData);
@@ -4002,7 +4002,7 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeQuantizedLstm)
     armnn::TensorShape inputToForgetWeightsShape = {4, 2};
     std::vector<uint8_t> inputToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8};
     armnn::TensorInfo inputToForgetWeightsInfo(inputToForgetWeightsShape,
-                                               armnn::DataType::QuantisedAsymm8,
+                                               armnn::DataType::QAsymmU8,
                                                weightsScale,
                                                weightsOffset);
     armnn::ConstTensor inputToForgetWeights(inputToForgetWeightsInfo, inputToForgetWeightsData);
@@ -4010,7 +4010,7 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeQuantizedLstm)
     armnn::TensorShape inputToCellWeightsShape = {4, 2};
     std::vector<uint8_t> inputToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8};
     armnn::TensorInfo inputToCellWeightsInfo(inputToCellWeightsShape,
-                                             armnn::DataType::QuantisedAsymm8,
+                                             armnn::DataType::QAsymmU8,
                                              weightsScale,
                                              weightsOffset);
     armnn::ConstTensor inputToCellWeights(inputToCellWeightsInfo, inputToCellWeightsData);
@@ -4018,7 +4018,7 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeQuantizedLstm)
     armnn::TensorShape inputToOutputWeightsShape = {4, 2};
     std::vector<uint8_t> inputToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8};
     armnn::TensorInfo inputToOutputWeightsInfo(inputToOutputWeightsShape,
-                                               armnn::DataType::QuantisedAsymm8,
+                                               armnn::DataType::QAsymmU8,
                                                weightsScale,
                                                weightsOffset);
     armnn::ConstTensor inputToOutputWeights(inputToOutputWeightsInfo, inputToOutputWeightsData);
@@ -4027,7 +4027,7 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeQuantizedLstm)
     armnn::TensorShape recurrentToInputWeightsShape = {4, 4};
     std::vector<uint8_t> recurrentToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
     armnn::TensorInfo recurrentToInputWeightsInfo(recurrentToInputWeightsShape,
-                                                  armnn::DataType::QuantisedAsymm8,
+                                                  armnn::DataType::QAsymmU8,
                                                   weightsScale,
                                                   weightsOffset);
     armnn::ConstTensor recurrentToInputWeights(recurrentToInputWeightsInfo, recurrentToInputWeightsData);
@@ -4035,7 +4035,7 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeQuantizedLstm)
     armnn::TensorShape recurrentToForgetWeightsShape = {4, 4};
     std::vector<uint8_t> recurrentToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
     armnn::TensorInfo recurrentToForgetWeightsInfo(recurrentToForgetWeightsShape,
-                                                   armnn::DataType::QuantisedAsymm8,
+                                                   armnn::DataType::QAsymmU8,
                                                    weightsScale,
                                                    weightsOffset);
     armnn::ConstTensor recurrentToForgetWeights(recurrentToForgetWeightsInfo, recurrentToForgetWeightsData);
@@ -4043,7 +4043,7 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeQuantizedLstm)
     armnn::TensorShape recurrentToCellWeightsShape = {4, 4};
     std::vector<uint8_t> recurrentToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
     armnn::TensorInfo recurrentToCellWeightsInfo(recurrentToCellWeightsShape,
-                                                 armnn::DataType::QuantisedAsymm8,
+                                                 armnn::DataType::QAsymmU8,
                                                  weightsScale,
                                                  weightsOffset);
     armnn::ConstTensor recurrentToCellWeights(recurrentToCellWeightsInfo, recurrentToCellWeightsData);
@@ -4051,7 +4051,7 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeQuantizedLstm)
     armnn::TensorShape recurrentToOutputWeightsShape = {4, 4};
     std::vector<uint8_t> recurrentToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
     armnn::TensorInfo recurrentToOutputWeightsInfo(recurrentToOutputWeightsShape,
-                                                   armnn::DataType::QuantisedAsymm8,
+                                                   armnn::DataType::QAsymmU8,
                                                    weightsScale,
                                                    weightsOffset);
     armnn::ConstTensor recurrentToOutputWeights(recurrentToOutputWeightsInfo, recurrentToOutputWeightsData);
@@ -4114,15 +4114,15 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeQuantizedLstm)
 
     // Connect up
     armnn::TensorInfo inputTensorInfo({ batchSize, inputSize },
-                                      armnn::DataType::QuantisedAsymm8,
+                                      armnn::DataType::QAsymmU8,
                                       inputOutputScale,
                                       inputOutputOffset);
     armnn::TensorInfo cellStateTensorInfo({ batchSize, numUnits },
-                                          armnn::DataType::QuantisedSymm16,
+                                          armnn::DataType::QSymmS16,
                                           cellStateScale,
                                           cellStateOffset);
     armnn::TensorInfo outputStateTensorInfo({ batchSize, outputSize },
-                                            armnn::DataType::QuantisedAsymm8,
+                                            armnn::DataType::QAsymmU8,
                                             inputOutputScale,
                                             inputOutputOffset);
 

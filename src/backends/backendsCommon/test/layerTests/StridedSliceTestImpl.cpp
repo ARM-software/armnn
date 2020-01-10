@@ -959,42 +959,42 @@ LayerTestResult<uint8_t, 4> StridedSlice4dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSlice4dTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return StridedSlice4dTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 4> StridedSlice4dReverseUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSlice4dReverseTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return StridedSlice4dReverseTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 4> StridedSliceSimpleStrideUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSliceSimpleStrideTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return StridedSliceSimpleStrideTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 4> StridedSliceSimpleRangeMaskUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSliceSimpleRangeMaskTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return StridedSliceSimpleRangeMaskTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSliceShrinkAxisMaskTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return StridedSliceShrinkAxisMaskTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskBitPosition0Dim3Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSliceShrinkAxisMaskBitPosition0Dim3Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+    return StridedSliceShrinkAxisMaskBitPosition0Dim3Test<armnn::DataType::QAsymmU8>(workloadFactory,
                                                                                             memoryManager);
 }
 
@@ -1002,7 +1002,7 @@ LayerTestResult<uint8_t, 3> StridedSliceShrinkAxisMaskBitPosition0Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSliceShrinkAxisMaskBitPosition0Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+    return StridedSliceShrinkAxisMaskBitPosition0Test<armnn::DataType::QAsymmU8>(workloadFactory,
                                                                                         memoryManager);
 }
 
@@ -1010,7 +1010,7 @@ LayerTestResult<uint8_t, 3> StridedSliceShrinkAxisMaskBitPosition1Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSliceShrinkAxisMaskBitPosition1Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+    return StridedSliceShrinkAxisMaskBitPosition1Test<armnn::DataType::QAsymmU8>(workloadFactory,
                                                                                         memoryManager);
 }
 
@@ -1018,7 +1018,7 @@ LayerTestResult<uint8_t, 3> StridedSliceShrinkAxisMaskBitPosition2Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSliceShrinkAxisMaskBitPosition2Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+    return StridedSliceShrinkAxisMaskBitPosition2Test<armnn::DataType::QAsymmU8>(workloadFactory,
                                                                                         memoryManager);
 }
 
@@ -1026,7 +1026,7 @@ LayerTestResult<uint8_t, 3> StridedSliceShrinkAxisMaskBitPosition3Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSliceShrinkAxisMaskBitPosition3Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+    return StridedSliceShrinkAxisMaskBitPosition3Test<armnn::DataType::QAsymmU8>(workloadFactory,
                                                                                         memoryManager);
 }
 
@@ -1034,7 +1034,7 @@ LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskBitPosition0And1Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSliceShrinkAxisMaskBitPosition0And1Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+    return StridedSliceShrinkAxisMaskBitPosition0And1Test<armnn::DataType::QAsymmU8>(workloadFactory,
                                                                                             memoryManager);
 }
 
@@ -1042,7 +1042,7 @@ LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskBitPosition0And2Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSliceShrinkAxisMaskBitPosition0And2Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+    return StridedSliceShrinkAxisMaskBitPosition0And2Test<armnn::DataType::QAsymmU8>(workloadFactory,
                                                                                             memoryManager);
 }
 
@@ -1050,7 +1050,7 @@ LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskBitPosition0And3Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSliceShrinkAxisMaskBitPosition0And3Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+    return StridedSliceShrinkAxisMaskBitPosition0And3Test<armnn::DataType::QAsymmU8>(workloadFactory,
                                                                                             memoryManager);
 }
 
@@ -1058,7 +1058,7 @@ LayerTestResult<uint8_t, 1> StridedSliceShrinkAxisMaskBitPosition0And1And3Uint8T
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSliceShrinkAxisMaskBitPosition0And1And3Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+    return StridedSliceShrinkAxisMaskBitPosition0And1And3Test<armnn::DataType::QAsymmU8>(workloadFactory,
                                                                                                 memoryManager);
 }
 
@@ -1066,89 +1066,89 @@ LayerTestResult<uint8_t, 3> StridedSlice3dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSlice3dTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return StridedSlice3dTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 3> StridedSlice3dReverseUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSlice3dReverseTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return StridedSlice3dReverseTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 2> StridedSlice2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSlice2dTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return StridedSlice2dTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 2> StridedSlice2dReverseUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSlice2dReverseTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return StridedSlice2dReverseTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> StridedSlice4dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSlice4dTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return StridedSlice4dTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> StridedSlice4dReverseInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSlice4dReverseTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return StridedSlice4dReverseTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> StridedSliceSimpleStrideInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSliceSimpleStrideTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return StridedSliceSimpleStrideTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> StridedSliceSimpleRangeMaskInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSliceSimpleRangeMaskTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return StridedSliceSimpleRangeMaskTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 2> StridedSliceShrinkAxisMaskInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSliceShrinkAxisMaskTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return StridedSliceShrinkAxisMaskTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 3> StridedSlice3dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSlice3dTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return StridedSlice3dTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 3> StridedSlice3dReverseInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSlice3dReverseTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return StridedSlice3dReverseTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 2> StridedSlice2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSlice2dTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return StridedSlice2dTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 2> StridedSlice2dReverseInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return StridedSlice2dReverseTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return StridedSlice2dReverseTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }

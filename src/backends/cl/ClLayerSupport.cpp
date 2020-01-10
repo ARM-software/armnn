@@ -195,7 +195,7 @@ bool ClLayerSupport::IsArgMinMaxSupported(const TensorInfo& input,
                                           const ArgMinMaxDescriptor& descriptor,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
-    if (input.GetDataType() == DataType::QuantisedAsymm8)
+    if (input.GetDataType() == DataType::QAsymmU8)
     {
         return false;
     }

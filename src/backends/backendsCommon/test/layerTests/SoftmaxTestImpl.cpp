@@ -602,7 +602,7 @@ LayerTestResult<uint8_t,2> SimpleSoftmaxUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float beta)
 {
-    return SimpleSoftmaxTestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, beta);
+    return SimpleSoftmaxTestImpl<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, beta);
 }
 
 LayerTestResult<uint8_t,3> Simple3dSoftmaxUint8Test(
@@ -611,7 +611,7 @@ LayerTestResult<uint8_t,3> Simple3dSoftmaxUint8Test(
         float beta)
 {
     Simple3dSoftmaxOutputData data;
-    return Simple3dSoftmaxTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return Simple3dSoftmaxTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         beta,
@@ -627,7 +627,7 @@ LayerTestResult<uint8_t,4> Simple4dSoftmaxUint8Test(
 {
     Simple4dSoftmaxData data;
 
-    return Simple4dSoftmaxTestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, beta,
+    return Simple4dSoftmaxTestImpl<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, beta,
                                                                      data.inputShape, data.outputData, data.inputData);
 }
 
@@ -664,7 +664,7 @@ LayerTestResult<int16_t,2> SimpleSoftmaxUint16Test(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         float beta)
 {
-    return SimpleSoftmaxTestImpl<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, beta);
+    return SimpleSoftmaxTestImpl<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, beta);
 }
 
 LayerTestResult<int16_t,3> Simple3dSoftmaxUint16Test(
@@ -673,7 +673,7 @@ LayerTestResult<int16_t,3> Simple3dSoftmaxUint16Test(
         float beta)
 {
     Simple3dSoftmaxOutputData data;
-    return Simple3dSoftmaxTestImpl<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, beta,
+    return Simple3dSoftmaxTestImpl<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, beta,
                                                                      data.inputShape, data.outputData, data.inputData);
 }
 
@@ -684,7 +684,7 @@ LayerTestResult<int16_t,4> Simple4dSoftmaxUint16Test(
 {
     Simple4dSoftmaxData data;
 
-    return Simple4dSoftmaxTestImpl<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, beta,
+    return Simple4dSoftmaxTestImpl<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, beta,
                                                                      data.inputShape, data.outputData, data.inputData);
 }
 
@@ -704,6 +704,6 @@ LayerTestResult<uint8_t,2> CompareSoftmaxUint8Test(
     armnn::IWorkloadFactory& refWorkloadFactory,
     float beta)
 {
-    return CompareSoftmaxTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return CompareSoftmaxTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory, memoryManager, refWorkloadFactory, beta);
 }

@@ -82,17 +82,17 @@ protected:
     {
         switch (m_QuantizerOptions.m_ActivationFormat)
         {
-            case DataType::QuantisedAsymm8:
+            case DataType::QAsymmU8:
                 TestQuantizationParamsImpl(
-                    info, DataType::QuantisedAsymm8, qAsymm8Params.first, qAsymm8Params.second);
+                    info, DataType::QAsymmU8, qAsymm8Params.first, qAsymm8Params.second);
                 break;
             case DataType::QSymmS8:
                 TestQuantizationParamsImpl(
                         info, DataType::QSymmS8, qSymm8Params.first, qSymm8Params.second);
                 break;
-            case DataType::QuantisedSymm16:
+            case DataType::QSymmS16:
                 TestQuantizationParamsImpl(
-                    info, DataType::QuantisedSymm16, qSymm16Params.first, qSymm16Params.second);
+                    info, DataType::QSymmS16, qSymm16Params.first, qSymm16Params.second);
                 break;
             default:
                 throw InvalidArgumentException("Unsupported quantization target");
@@ -106,27 +106,27 @@ protected:
 
     void TestConstantQuantizationParams(const TensorInfo& info,
                                         const OffsetScalePair& params,
-                                        DataType dataType = DataType::QuantisedAsymm8)
+                                        DataType dataType = DataType::QAsymmU8)
     {
         boost::ignore_unused(dataType);
-        TestQuantizationParamsImpl(info, DataType::QuantisedAsymm8, params.first, params.second);
+        TestQuantizationParamsImpl(info, DataType::QAsymmU8, params.first, params.second);
     }
 
     void TestBiasQuantizationParams(const TensorInfo& info,
                                     const OffsetScalePair& qAsymm8Params,
                                     const OffsetScalePair& qSymm8Params,
                                     const OffsetScalePair& qSymm16Params,
-                                    DataType dataType = DataType::QuantisedAsymm8)
+                                    DataType dataType = DataType::QAsymmU8)
     {
         switch (m_QuantizerOptions.m_ActivationFormat)
         {
-            case DataType::QuantisedAsymm8:
+            case DataType::QAsymmU8:
                 TestQuantizationParamsImpl(info, dataType, qAsymm8Params.first, qAsymm8Params.second);
                 break;
             case DataType::QSymmS8:
                 TestQuantizationParamsImpl(info, dataType, qSymm8Params.first, qSymm8Params.second);
                 break;
-            case DataType::QuantisedSymm16:
+            case DataType::QSymmS16:
                 TestQuantizationParamsImpl(info, dataType, qSymm16Params.first, qSymm16Params.second);
                 break;
             default:
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE(QuantizeAddition)
     TestAdditionQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestAdditionQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -399,7 +399,7 @@ BOOST_AUTO_TEST_CASE(QuantizeAbsActivation)
     TestActivationQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestActivationQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -424,7 +424,7 @@ BOOST_AUTO_TEST_CASE(QuantizeLinearActivation)
     TestActivationQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestActivationQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -449,7 +449,7 @@ BOOST_AUTO_TEST_CASE(QuantizeReLuActivation)
     TestActivationQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestActivationQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -474,7 +474,7 @@ BOOST_AUTO_TEST_CASE(QuantizeSoftReLuActivation)
     TestActivationQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestActivationQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -524,7 +524,7 @@ BOOST_AUTO_TEST_CASE(QuantizeBoundedReluActivation)
     TestBoundedReluActivationQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestBoundedReluActivationQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -575,7 +575,7 @@ BOOST_AUTO_TEST_CASE(QuantizeTanHActivation)
     TestTanHActivationQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestTanHActivationQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -636,7 +636,7 @@ BOOST_AUTO_TEST_CASE(QuantizeLeakyReLuActivation)
     TestLeakyReLuActivationQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestLeakyReLuActivationQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -719,7 +719,7 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchNorm)
     TestBatchNormalizationQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions QQsymm16Options(DataType::QuantisedSymm16);
+    const QuantizerOptions QQsymm16Options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), QQsymm16Options)->ExportNetwork();
     TestBatchNormalizationQuantization validatorQSymm16(QQsymm16Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -784,7 +784,7 @@ BOOST_AUTO_TEST_CASE(QuantizeDepthToSpace)
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
     // test QSymm16 quantization
-    const QuantizerOptions Qsymm16Options(DataType::QuantisedSymm16);
+    const QuantizerOptions Qsymm16Options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), Qsymm16Options)->ExportNetwork();
     TestDepthToSpaceQuantization validatorQSymm16(Qsymm16Options, inputShape, outputShape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -944,7 +944,7 @@ void ValidateFullyConnectedLayer(const bool biasEnabled)
     TestFullyConnectedQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions Qsymm16Options(DataType::QuantisedSymm16);
+    const QuantizerOptions Qsymm16Options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), Qsymm16Options)->ExportNetwork();
     TestFullyConnectedQuantization validatorQSymm16(Qsymm16Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -1025,7 +1025,7 @@ void TestQuantizeConvolution2d(bool useBiases)
     TestConv2dQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions Qsymm16Options(DataType::QuantisedSymm16);
+    const QuantizerOptions Qsymm16Options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), Qsymm16Options)->ExportNetwork();
     TestConv2dQuantization validatorQSymm16(Qsymm16Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -1106,7 +1106,7 @@ void TestQuantizeDepthwiseConvolution2d(bool useBiases)
     TestDepthwiseConv2dQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions Qsymm16Options(DataType::QuantisedSymm16);
+    const QuantizerOptions Qsymm16Options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), Qsymm16Options)->ExportNetwork();
     TestDepthwiseConv2dQuantization validatorQSymm16(Qsymm16Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -1177,7 +1177,7 @@ BOOST_AUTO_TEST_CASE(QuantizeInstanceNormalization)
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
     // test QSymm16 quantization
-    const QuantizerOptions qSymm16Options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16Options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16Options)->ExportNetwork();
     TestInstanceNormalizationQuantization validatorQSymm16(qSymm16Options, tensorShape, tensorShape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -1241,7 +1241,7 @@ BOOST_AUTO_TEST_CASE(QuantizeLogSoftmax)
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
     // test QuantisedSymm16 quantization
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestLogSoftmaxQuantization validatorQSymm16(qSymm16options, tensorShape, tensorShape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -1311,7 +1311,7 @@ BOOST_AUTO_TEST_CASE(QuantizeSoftmax)
     TestSoftmaxQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestSoftmaxQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -1348,7 +1348,7 @@ BOOST_AUTO_TEST_CASE(QuantizeStandIn)
                       armnn::UnimplementedException);
 
     // test QuantisedSymm16 quantization
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     BOOST_CHECK_THROW(INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork(),
                       armnn::UnimplementedException);
 }
@@ -1434,7 +1434,7 @@ BOOST_AUTO_TEST_CASE(QuantizePermute)
     TestPermuteQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestPermuteQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -1484,7 +1484,7 @@ BOOST_AUTO_TEST_CASE(QuantizeSpaceToBatch)
     TestSpaceToBatchQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestSpaceToBatchQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -1536,7 +1536,7 @@ BOOST_AUTO_TEST_CASE(QuantizeSpaceToDepth)
     TestSpaceToDepthQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestSpaceToDepthQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -1600,7 +1600,7 @@ BOOST_AUTO_TEST_CASE(QuantizePooling2d)
     TestPooling2dQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestPooling2dQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -1666,7 +1666,7 @@ BOOST_AUTO_TEST_CASE(QuantizeConstant)
     TestConstantQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestConstantQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -1721,7 +1721,7 @@ BOOST_AUTO_TEST_CASE(QuantizeAbs)
     TestAbsQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestAbsQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -1804,7 +1804,7 @@ BOOST_AUTO_TEST_CASE(QuantizeArgMinMax)
     TestArgMinMaxQuantization validatorQSymm8(qSymm8Options, inputShape, outputShape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestArgMinMaxQuantization validatorQSymm16(qSymm16options, inputShape, outputShape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -1868,7 +1868,7 @@ BOOST_AUTO_TEST_CASE(QuantizeComparison)
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
     // test QuantisedSymm16 quantization
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestComparisonQuantization validatorQSymm16(qSymm16options, tensorShape, tensorShape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -1949,7 +1949,7 @@ BOOST_AUTO_TEST_CASE(QuantizeConcat)
     concatLayer->GetOutputSlot(0).SetTensorInfo(info);
 
     const QuantizerOptions qSymm8Options(DataType::QSymmS8);
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkQuantizerPtr quantizerPtrQAsymm8 =  INetworkQuantizer::Create(network.get());
     INetworkQuantizerPtr quantizerPtrQSymm8  =  INetworkQuantizer::Create(network.get(), qSymm8Options);
     INetworkQuantizerPtr quantizerPtrQSymm16 =  INetworkQuantizer::Create(network.get(), qSymm16options);
@@ -2026,7 +2026,7 @@ BOOST_AUTO_TEST_CASE(QuantizeReshape)
     TestReshapeQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestReshapeQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -2075,7 +2075,7 @@ BOOST_AUTO_TEST_CASE(QuantizeSplitter)
     TestSplitterQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestSplitterQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -2129,7 +2129,7 @@ BOOST_AUTO_TEST_CASE(QuantizeResize)
     TestResizeQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestResizeQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -2179,7 +2179,7 @@ BOOST_AUTO_TEST_CASE(QuantizeStridedSlice)
     TestStridedSliceQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestStridedSliceQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -2229,7 +2229,7 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchToSpace)
     TestBatchToSpaceQuantization validatorQSymm8(qSymm8Options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestBatchToSpaceQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -2343,7 +2343,7 @@ BOOST_AUTO_TEST_CASE(QuantizePrelu)
     TestPreluQuantization validatorQSymm8(qSymm8Options, inputShape, alphaShape, outputShape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestPreluQuantization validatorQSymm16(qSymm16options, inputShape, alphaShape, outputShape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -2417,7 +2417,7 @@ void TestQuantizeTransposeConvolution2d(bool useBiases)
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
     // test QSymm16 quantization
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestTransposeConvolution2dQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -2500,7 +2500,7 @@ BOOST_AUTO_TEST_CASE(QuantizeStack)
     TestStackQuantization validatorQSymm8(qSymm8Options, inputShape, inputShape);
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestStackQuantization validatorQSymm16(qSymm16options, inputShape, outputShape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -2562,7 +2562,7 @@ BOOST_AUTO_TEST_CASE(QuantizeSlice)
     VisitLayersTopologically(quantizedNetworkQSymm8.get(), validatorQSymm8);
 
     // test QSymm16 quantization
-    const QuantizerOptions qSymm16options(DataType::QuantisedSymm16);
+    const QuantizerOptions qSymm16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), qSymm16options)->ExportNetwork();
     TestSliceQuantization validatorQSymm16(qSymm16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
@@ -2679,7 +2679,7 @@ void PreserveTypeTestImpl(const DataType& dataType)
     addition->GetOutputSlot(0).SetTensorInfo(info);
 
     QuantizerOptions options = dataType == DataType::Float32 ?
-            QuantizerOptions(DataType::QuantisedAsymm8, true) : QuantizerOptions(dataType, true);
+            QuantizerOptions(DataType::QAsymmU8, true) : QuantizerOptions(dataType, true);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
     TestPreserveType validatorQAsymm8(options, dataType, shape, shape);
@@ -2695,7 +2695,7 @@ BOOST_AUTO_TEST_CASE(PreserveTypeFloat32)
 
 BOOST_AUTO_TEST_CASE(PreserveTypeQAsymm8)
 {
-    PreserveTypeTestImpl(DataType::QuantisedAsymm8);
+    PreserveTypeTestImpl(DataType::QAsymmU8);
 }
 
 BOOST_AUTO_TEST_CASE(PreserveTypeQsymm8)
@@ -2705,7 +2705,7 @@ BOOST_AUTO_TEST_CASE(PreserveTypeQsymm8)
 
 BOOST_AUTO_TEST_CASE(PreserveTypeQsymm16)
 {
-    PreserveTypeTestImpl(DataType::QuantisedSymm16);
+    PreserveTypeTestImpl(DataType::QSymmS16);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

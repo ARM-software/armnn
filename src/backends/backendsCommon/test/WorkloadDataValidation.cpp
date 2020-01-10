@@ -615,7 +615,7 @@ BOOST_AUTO_TEST_CASE(BiasPerAxisQuantization_Validate)
     const TensorShape weightShape{ cOutput, cInput,  hInput,  wInput  };
     const TensorShape biasShape  { cOutput                            };
 
-    constexpr DataType inputType  = DataType::QuantisedAsymm8;
+    constexpr DataType inputType  = DataType::QAsymmU8;
     constexpr DataType weightType = DataType::QuantizedSymm8PerAxis;
     constexpr DataType biasType   = DataType::Signed32;
 

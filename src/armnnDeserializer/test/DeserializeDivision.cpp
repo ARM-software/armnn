@@ -141,7 +141,7 @@ struct SimpleDivisionFixture2 : DivisionFixture
 
 BOOST_FIXTURE_TEST_CASE(DivisionQuantisedAsymm8, SimpleDivisionFixture)
 {
-    RunTest<2, armnn::DataType::QuantisedAsymm8>(
+    RunTest<2, armnn::DataType::QAsymmU8>(
         0,
         {{"InputLayer1", { 0, 5, 24, 21 }},
          {"InputLayer2", { 4, 1, 6,  7 }}},

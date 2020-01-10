@@ -32,7 +32,7 @@ public:
 
 using RefPadFloat32Workload = RefPadWorkload<DataType::Float32>;
 using RefPadFloat16Workload = RefPadWorkload<DataType::Float16>;
-using RefPadQAsymm8Workload = RefPadWorkload<DataType::QuantisedAsymm8>;
-using RefPadQSymm16Workload = RefPadWorkload<DataType::QuantisedSymm16>;
+using RefPadQAsymm8Workload = RefPadWorkload<DataType::QAsymmU8>;
+using RefPadQSymm16Workload = RefPadWorkload<DataType::QSymmS16>;
 
 } //namespace armnn

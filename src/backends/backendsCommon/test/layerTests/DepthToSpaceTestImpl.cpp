@@ -284,51 +284,51 @@ DepthToSpaceTest4<armnn::DataType::Float16>(
     armnn::DataLayout dataLayout);
 
 // QuantisedAsymm8
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-DepthToSpaceTest1<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+DepthToSpaceTest1<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-DepthToSpaceTest2<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+DepthToSpaceTest2<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-DepthToSpaceTest3<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+DepthToSpaceTest3<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-DepthToSpaceTest4<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+DepthToSpaceTest4<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::DataLayout dataLayout);
 
 // QuantisedSymm16
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-DepthToSpaceTest1<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+DepthToSpaceTest1<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-DepthToSpaceTest2<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+DepthToSpaceTest2<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-DepthToSpaceTest3<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+DepthToSpaceTest3<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::DataLayout dataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-DepthToSpaceTest4<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+DepthToSpaceTest4<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::DataLayout dataLayout);

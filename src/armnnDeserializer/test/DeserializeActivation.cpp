@@ -144,7 +144,7 @@ struct SimpleActivationFixture4 : ActivationFixture
 
 BOOST_FIXTURE_TEST_CASE(ActivationReluQuantisedAsymm8, SimpleActivationFixture)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+    RunTest<4, armnn::DataType::QAsymmU8>(
             0,
             {{"InputLayer", {10, 0, 2, 0}}},
             {{"OutputLayer", {10, 0, 2, 0}}});
@@ -161,7 +161,7 @@ BOOST_FIXTURE_TEST_CASE(ActivationReluFloat32, SimpleActivationFixture2)
 
 BOOST_FIXTURE_TEST_CASE(ActivationBoundedReluQuantisedAsymm8, SimpleActivationFixture3)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+    RunTest<4, armnn::DataType::QAsymmU8>(
             0,
             {{"InputLayer", {10, 0, 2, 0}}},
             {{"OutputLayer", {5, 0, 2, 0}}});

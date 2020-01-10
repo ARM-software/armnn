@@ -98,7 +98,7 @@ inline void InitializeArmComputeClTensorData(arm_compute::CLTensor& clTensor,
         case DataType::Float32:
             CopyArmComputeClTensorData(clTensor, handle->GetConstTensor<float>());
             break;
-        case DataType::QuantisedAsymm8:
+        case DataType::QAsymmU8:
             CopyArmComputeClTensorData(clTensor, handle->GetConstTensor<uint8_t>());
             break;
         case DataType::QuantizedSymm8PerAxis:

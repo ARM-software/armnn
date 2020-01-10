@@ -172,9 +172,9 @@ BOOST_AUTO_TEST_CASE(ReleaseFullyConnectedLayerConstantDataTest)
     float outputQScale = 2.0f;
 
     layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({7, 20},
-                                                          DataType::QuantisedAsymm8, inputsQScale, 0));
+                                                          DataType::QAsymmU8, inputsQScale, 0));
     layer->m_Bias   = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({7},
-                                                          GetBiasDataType(DataType::QuantisedAsymm8), inputsQScale));
+                                                          GetBiasDataType(DataType::QAsymmU8), inputsQScale));
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();
 
@@ -183,8 +183,8 @@ BOOST_AUTO_TEST_CASE(ReleaseFullyConnectedLayerConstantDataTest)
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
     // connect up
-    Connect(input, layer, TensorInfo({3, 1, 4, 5}, DataType::QuantisedAsymm8, inputsQScale));
-    Connect(layer, output, TensorInfo({3, 7}, DataType::QuantisedAsymm8, outputQScale));
+    Connect(input, layer, TensorInfo({3, 1, 4, 5}, DataType::QAsymmU8, inputsQScale));
+    Connect(layer, output, TensorInfo({3, 7}, DataType::QAsymmU8, outputQScale));
 
     // check the constants that they are not NULL
     BOOST_CHECK(layer->m_Weight != nullptr);

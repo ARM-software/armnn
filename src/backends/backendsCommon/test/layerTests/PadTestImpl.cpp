@@ -416,23 +416,23 @@ LayerTestResult<T, 4> Pad4dTestCommon(
 // Explicit template specializations
 //
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 2>
-Pad2dTestCommon<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 2>
+Pad2dTestCommon<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset,
     const float customPaddingValue);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 3>
-Pad3dTestCommon<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 3>
+Pad3dTestCommon<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-Pad4dTestCommon<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+Pad4dTestCommon<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
@@ -446,28 +446,28 @@ LayerTestResult<uint8_t, 2> PadUint82dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Pad2dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
+    return Pad2dTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
 LayerTestResult<uint8_t, 2> PadUint82dCustomPaddingTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Pad2dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0, 1.0f);
+    return Pad2dTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 1.0f, 0, 1.0f);
 }
 
 LayerTestResult<uint8_t, 3> PadUint83dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Pad3dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
+    return Pad3dTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
 LayerTestResult<uint8_t, 4> PadUint84dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Pad4dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
+    return Pad4dTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
 LayerTestResult<float, 2> PadFloat322dTest(

@@ -27,7 +27,7 @@ struct ResolveTypeImpl<DataType::Float32>
 };
 
 template<>
-struct ResolveTypeImpl<DataType::QuantisedAsymm8>
+struct ResolveTypeImpl<DataType::QAsymmU8>
 {
     using Type = uint8_t;
 };
@@ -39,7 +39,7 @@ struct ResolveTypeImpl<DataType::QSymmS8>
 };
 
 template<>
-struct ResolveTypeImpl<DataType::QuantisedSymm16>
+struct ResolveTypeImpl<DataType::QSymmS16>
 {
     using Type = int16_t;
 };

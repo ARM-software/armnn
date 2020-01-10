@@ -32,7 +32,7 @@ inline bool CompatibleTypes<Half>(DataType dataType)
 template<>
 inline bool CompatibleTypes<uint8_t>(DataType dataType)
 {
-    return dataType == DataType::Boolean || dataType == DataType::QuantisedAsymm8;
+    return dataType == DataType::Boolean || dataType == DataType::QAsymmU8;
 }
 
 template<>
@@ -44,7 +44,7 @@ inline bool CompatibleTypes<int8_t>(DataType dataType)
 template<>
 inline bool CompatibleTypes<int16_t>(DataType dataType)
 {
-    return dataType == DataType::QuantisedSymm16;
+    return dataType == DataType::QSymmS16;
 }
 
 template<>

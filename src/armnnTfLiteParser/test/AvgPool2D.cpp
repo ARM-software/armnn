@@ -98,7 +98,7 @@ struct AvgPoolLiteFixture2DOutput : AvgPool2DFixture
 
 BOOST_FIXTURE_TEST_CASE(AvgPoolLite1DOutput, AvgPoolLiteFixtureUint1DOutput)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(0, {2, 3, 5, 2 }, { 3 });
+    RunTest<4, armnn::DataType::QAsymmU8>(0, {2, 3, 5, 2 }, { 3 });
 }
 
 BOOST_FIXTURE_TEST_CASE(AvgPoolLiteFloat1DOutput, AvgPoolLiteFixtureFloat1DOutput)
@@ -108,13 +108,13 @@ BOOST_FIXTURE_TEST_CASE(AvgPoolLiteFloat1DOutput, AvgPoolLiteFixtureFloat1DOutpu
 
 BOOST_FIXTURE_TEST_CASE(AvgPoolLite2DOutput, AvgPoolLiteFixture2DOutput)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+    RunTest<4, armnn::DataType::QAsymmU8>(
         0, { 1, 2, 2, 3, 5, 6, 7, 8, 3, 2, 1, 0, 1, 2, 3, 4 }, { 4, 5, 2, 2 });
 }
 
 BOOST_FIXTURE_TEST_CASE(IncorrectDataTypeError, AvgPoolLiteFixtureFloat1DOutput)
 {
-    BOOST_CHECK_THROW((RunTest<4, armnn::DataType::QuantisedAsymm8>(0, {2, 3, 5, 2 }, { 3 })), armnn::Exception);
+    BOOST_CHECK_THROW((RunTest<4, armnn::DataType::QAsymmU8>(0, {2, 3, 5, 2 }, { 3 })), armnn::Exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

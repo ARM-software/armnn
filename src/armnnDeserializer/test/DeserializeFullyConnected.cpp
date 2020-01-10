@@ -131,7 +131,7 @@ struct FullyConnectedWithNoBiasFixture : FullyConnectedFixture
 
 BOOST_FIXTURE_TEST_CASE(FullyConnectedWithNoBias, FullyConnectedWithNoBiasFixture)
 {
-    RunTest<2, armnn::DataType::QuantisedAsymm8>(
+    RunTest<2, armnn::DataType::QAsymmU8>(
          0,
          {{"InputLayer",  { 10, 20, 30, 40 }}},
          {{"OutputLayer", { 400/2 }}});

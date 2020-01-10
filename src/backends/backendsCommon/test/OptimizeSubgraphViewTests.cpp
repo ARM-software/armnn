@@ -207,8 +207,8 @@ void CheckUntouchedSubgraph(const SubgraphView& untouchedSubgraph,
 // Creates a subgraph containing only a single unsupported layer (only convolutions are unsupported by the mock backend)
 SubgraphView::SubgraphViewPtr BuildFullyUnsupportedSubgraph1(Graph& graph, LayerNameToLayerMap& layersInGraph)
 {
-    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
-    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
+    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
 
     Pooling2dDescriptor poolingDescriptor;
     poolingDescriptor.m_PoolType      = armnn::PoolingAlgorithm::Average;
@@ -242,8 +242,8 @@ SubgraphView::SubgraphViewPtr BuildFullyUnsupportedSubgraph1(Graph& graph, Layer
 // Creates a subgraph containing only unsupported layers (only convolutions are unsupported by the mock backend)
 SubgraphView::SubgraphViewPtr BuildFullyUnsupportedSubgraph2(Graph& graph, LayerNameToLayerMap& layersInGraph)
 {
-    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
-    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
+    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
 
     Pooling2dDescriptor poolingDescriptor;
     poolingDescriptor.m_PoolType      = armnn::PoolingAlgorithm::Average;
@@ -285,9 +285,9 @@ SubgraphView::SubgraphViewPtr BuildFullyUnsupportedSubgraph2(Graph& graph, Layer
 // Creates a simple subgraph with only one convolution layer, supported by the mock backend
 SubgraphView::SubgraphViewPtr BuildFullyOptimizableSubgraph1(Graph& graph, LayerNameToLayerMap& layersInGraph)
 {
-    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
-    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
-    const TensorInfo weightInfo({ 16,  1,  1, 16 }, DataType::QuantisedAsymm8, 0.9f, 0);
+    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo weightInfo({ 16,  1,  1, 16 }, DataType::QAsymmU8, 0.9f, 0);
     const TensorInfo biasInfo  ({  1,  1,  1, 16 }, DataType::Signed32,        0.9f, 0);
 
     Convolution2dDescriptor convolutionDescriptor;
@@ -315,9 +315,9 @@ SubgraphView::SubgraphViewPtr BuildFullyOptimizableSubgraph1(Graph& graph, Layer
 // Creates a subgraph with five convolutions layers, all supported by the mock backend
 SubgraphView::SubgraphViewPtr BuildFullyOptimizableSubgraph2(Graph& graph, LayerNameToLayerMap& layersInGraph)
 {
-    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
-    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
-    const TensorInfo weightInfo({ 16,  1,  1, 16 }, DataType::QuantisedAsymm8, 0.9f, 0);
+    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo weightInfo({ 16,  1,  1, 16 }, DataType::QAsymmU8, 0.9f, 0);
     const TensorInfo biasInfo  ({  1,  1,  1, 16 }, DataType::Signed32,        0.9f, 0);
 
     Convolution2dDescriptor convolutionDescriptor;
@@ -362,9 +362,9 @@ SubgraphView::SubgraphViewPtr BuildFullyOptimizableSubgraph2(Graph& graph, Layer
 // (only convolutions are unsupported by the mock backend)
 SubgraphView::SubgraphViewPtr BuildPartiallySupportedSubgraph(Graph& graph, LayerNameToLayerMap& layersInGraph)
 {
-    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
-    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
-    const TensorInfo weightInfo({ 16,  1,  1, 16 }, DataType::QuantisedAsymm8, 0.9f, 0);
+    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo weightInfo({ 16,  1,  1, 16 }, DataType::QAsymmU8, 0.9f, 0);
     const TensorInfo biasInfo  ({  1,  1,  1, 16 }, DataType::Signed32,        0.9f, 0);
 
     Convolution2dDescriptor convolutionDescriptor;
@@ -421,9 +421,9 @@ SubgraphView::SubgraphViewPtr BuildPartiallySupportedSubgraph(Graph& graph, Laye
 // Creates a subgraph with only unoptimizable layers ("unoptimizable" is added to the layer's name)
 SubgraphView::SubgraphViewPtr BuildFullyUnoptimizableSubgraph1(Graph& graph, LayerNameToLayerMap& layersInGraph)
 {
-    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
-    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
-    const TensorInfo weightInfo({ 16,  1,  1, 16 }, DataType::QuantisedAsymm8, 0.9f, 0);
+    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo weightInfo({ 16,  1,  1, 16 }, DataType::QAsymmU8, 0.9f, 0);
     const TensorInfo biasInfo  ({  1,  1,  1, 16 }, DataType::Signed32,        0.9f, 0);
 
     Convolution2dDescriptor convolutionDescriptor;
@@ -452,9 +452,9 @@ SubgraphView::SubgraphViewPtr BuildFullyUnoptimizableSubgraph1(Graph& graph, Lay
 // Creates a subgraph with some unoptimizable layers ("unoptimizable" is added to the layer's name)
 SubgraphView::SubgraphViewPtr BuildPartiallyOptimizableSubgraph1(Graph& graph, LayerNameToLayerMap& layersInGraph)
 {
-    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
-    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
-    const TensorInfo weightInfo({ 16,  1,  1, 16 }, DataType::QuantisedAsymm8, 0.9f, 0);
+    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo weightInfo({ 16,  1,  1, 16 }, DataType::QAsymmU8, 0.9f, 0);
     const TensorInfo biasInfo  ({  1,  1,  1, 16 }, DataType::Signed32,        0.9f, 0);
 
     Convolution2dDescriptor convolutionDescriptor;
@@ -501,9 +501,9 @@ SubgraphView::SubgraphViewPtr BuildPartiallyOptimizableSubgraph1(Graph& graph, L
 // this is meant to test input slots coming from different layers
 SubgraphView::SubgraphViewPtr BuildPartiallyOptimizableSubgraph2(Graph& graph, LayerNameToLayerMap& layersInGraph)
 {
-    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
-    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QuantisedAsymm8, 1.0f, 0);
-    const TensorInfo weightInfo({ 16,  1,  1, 16 }, DataType::QuantisedAsymm8, 0.9f, 0);
+    const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo weightInfo({ 16,  1,  1, 16 }, DataType::QAsymmU8, 0.9f, 0);
     const TensorInfo biasInfo  ({  1,  1,  1, 16 }, DataType::Signed32,        0.9f, 0);
 
     Convolution2dDescriptor convolutionDescriptor;

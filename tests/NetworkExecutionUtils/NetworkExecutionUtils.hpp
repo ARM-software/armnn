@@ -145,14 +145,14 @@ auto ParseDataArray<armnn::DataType::Signed32>(std::istream & stream)
 }
 
 template<>
-auto ParseDataArray<armnn::DataType::QuantisedAsymm8>(std::istream& stream)
+auto ParseDataArray<armnn::DataType::QAsymmU8>(std::istream& stream)
 {
     return ParseArrayImpl<uint8_t>(stream,
                                    [](const std::string& s) { return boost::numeric_cast<uint8_t>(std::stoi(s)); });
 }
 
 template<>
-auto ParseDataArray<armnn::DataType::QuantisedAsymm8>(std::istream& stream,
+auto ParseDataArray<armnn::DataType::QAsymmU8>(std::istream& stream,
                                                       const float& quantizationScale,
                                                       const int32_t& quantizationOffset)
 {
@@ -309,8 +309,8 @@ void PopulateTensorWithData(TContainer& tensorData,
             const int   qOffset = qParams.value().second;
 
             tensorData = readFromFile ?
-                ParseDataArray<armnn::DataType::QuantisedAsymm8>(inputTensorFile, qScale, qOffset) :
-                GenerateDummyTensorData<armnn::DataType::QuantisedAsymm8>(numElements);
+                ParseDataArray<armnn::DataType::QAsymmU8>(inputTensorFile, qScale, qOffset) :
+                GenerateDummyTensorData<armnn::DataType::QAsymmU8>(numElements);
         }
         else
         {
@@ -328,8 +328,8 @@ void PopulateTensorWithData(TContainer& tensorData,
     else if (dataTypeStr.compare("qasymm8") == 0)
     {
          tensorData = readFromFile ?
-            ParseDataArray<armnn::DataType::QuantisedAsymm8>(inputTensorFile) :
-            GenerateDummyTensorData<armnn::DataType::QuantisedAsymm8>(numElements);
+            ParseDataArray<armnn::DataType::QAsymmU8>(inputTensorFile) :
+            GenerateDummyTensorData<armnn::DataType::QAsymmU8>(numElements);
     }
     else
     {

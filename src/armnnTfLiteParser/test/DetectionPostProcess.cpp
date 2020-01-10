@@ -220,7 +220,7 @@ BOOST_FIXTURE_TEST_CASE( ParseDetectionPostProcess, ParseDetectionPostProcessCus
         { "num_detections", numDetections}
     };
 
-    RunTest<armnn::DataType::QuantisedAsymm8, armnn::DataType::Float32>(0, input, output);
+    RunTest<armnn::DataType::QAsymmU8, armnn::DataType::Float32>(0, input, output);
 }
 
 BOOST_FIXTURE_TEST_CASE(DetectionPostProcessGraphStructureTest, ParseDetectionPostProcessCustomOptions)
@@ -288,8 +288,8 @@ BOOST_FIXTURE_TEST_CASE(DetectionPostProcessGraphStructureTest, ParseDetectionPo
     BOOST_TEST(CheckNumberOfOutputSlot(numDetectionsLayer, 0));
 
     // Check the connections
-    armnn::TensorInfo boxEncodingTensor(armnn::TensorShape({ 1, 6, 4 }), armnn::DataType::QuantisedAsymm8, 1, 1);
-    armnn::TensorInfo scoresTensor(armnn::TensorShape({ 1, 6, 3 }), armnn::DataType::QuantisedAsymm8,
+    armnn::TensorInfo boxEncodingTensor(armnn::TensorShape({ 1, 6, 4 }), armnn::DataType::QAsymmU8, 1, 1);
+    armnn::TensorInfo scoresTensor(armnn::TensorShape({ 1, 6, 3 }), armnn::DataType::QAsymmU8,
                                                       0.00999999978f, 0);
 
     armnn::TensorInfo detectionBoxesTensor(armnn::TensorShape({ 1, 3, 4 }), armnn::DataType::Float32, 0, 0);

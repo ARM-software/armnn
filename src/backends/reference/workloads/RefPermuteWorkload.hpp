@@ -29,7 +29,7 @@ public:
 
 using RefPermuteFloat16Workload = RefPermuteWorkload<DataType::Float16>;
 using RefPermuteFloat32Workload = RefPermuteWorkload<DataType::Float32>;
-using RefPermuteQAsymm8Workload = RefPermuteWorkload<DataType::QuantisedAsymm8>;
-using RefPermuteQSymm16Workload = RefPermuteWorkload<DataType::QuantisedSymm16>;
+using RefPermuteQAsymm8Workload = RefPermuteWorkload<DataType::QAsymmU8>;
+using RefPermuteQSymm16Workload = RefPermuteWorkload<DataType::QSymmS16>;
 
 } //namespace armnn

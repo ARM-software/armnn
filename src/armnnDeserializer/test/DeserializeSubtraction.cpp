@@ -148,7 +148,7 @@ struct SimpleSubtractionFixtureBroadcast : SubtractionFixture
 
 BOOST_FIXTURE_TEST_CASE(SubtractionQuantisedAsymm8, SimpleSubtractionFixture)
 {
-    RunTest<2, armnn::DataType::QuantisedAsymm8>(
+    RunTest<2, armnn::DataType::QAsymmU8>(
         0,
         {{"inputLayer1", { 4, 5, 6, 7 }},
          {"inputLayer2", { 3, 2, 1, 0 }}},

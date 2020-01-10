@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE(CreateSubtractionUint8Workload)
     NeonCreateElementwiseWorkloadTest<NeonSubtractionWorkload,
                                       SubtractionQueueDescriptor,
                                       SubtractionLayer,
-                                      DataType::QuantisedAsymm8>();
+                                      DataType::QAsymmU8>();
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationUint8Workload)
     NeonCreateElementwiseWorkloadTest<NeonMultiplicationWorkload,
                                       MultiplicationQueueDescriptor,
                                       MultiplicationLayer,
-                                      DataType::QuantisedAsymm8>();
+                                      DataType::QAsymmU8>();
 }
 
 template <typename WorkloadType,
@@ -445,12 +445,12 @@ BOOST_AUTO_TEST_CASE(CreatePooling2dFloatNhwcWorkload)
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dUint8NchwWorkload)
 {
-    NeonCreatePooling2dWorkloadTest<DataType::QuantisedAsymm8>(DataLayout::NCHW);
+    NeonCreatePooling2dWorkloadTest<DataType::QAsymmU8>(DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dUint8NhwcWorkload)
 {
-    NeonCreatePooling2dWorkloadTest<DataType::QuantisedAsymm8>(DataLayout::NHWC);
+    NeonCreatePooling2dWorkloadTest<DataType::QAsymmU8>(DataLayout::NHWC);
 }
 
 static void NeonCreatePreluWorkloadTest(const armnn::TensorShape& inputShape,
@@ -493,7 +493,7 @@ BOOST_AUTO_TEST_CASE(CreatePreluFloatWorkload)
 
 BOOST_AUTO_TEST_CASE(CreatePreluUint8Workload)
 {
-    NeonCreatePreluWorkloadTest({ 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 }, DataType::QuantisedAsymm8);
+    NeonCreatePreluWorkloadTest({ 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 }, DataType::QAsymmU8);
 }
 
 template <typename armnn::DataType DataType>
@@ -527,7 +527,7 @@ BOOST_AUTO_TEST_CASE(CreateReshapeFloatWorkload)
 
 BOOST_AUTO_TEST_CASE(CreateReshapeUint8Workload)
 {
-    NeonCreateReshapeWorkloadTest<DataType::QuantisedAsymm8>();
+    NeonCreateReshapeWorkloadTest<DataType::QAsymmU8>();
 }
 
 template <typename ResizeWorkloadType, armnn::DataType DataType>
@@ -563,7 +563,7 @@ BOOST_AUTO_TEST_CASE(CreateResizeFloat32NchwWorkload)
 
 BOOST_AUTO_TEST_CASE(CreateResizeUint8NchwWorkload)
 {
-    NeonCreateResizeWorkloadTest<NeonResizeWorkload, armnn::DataType::QuantisedAsymm8>(DataLayout::NCHW);
+    NeonCreateResizeWorkloadTest<NeonResizeWorkload, armnn::DataType::QAsymmU8>(DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreateResizeFloat32NhwcWorkload)
@@ -573,7 +573,7 @@ BOOST_AUTO_TEST_CASE(CreateResizeFloat32NhwcWorkload)
 
 BOOST_AUTO_TEST_CASE(CreateResizeUint8NhwcWorkload)
 {
-    NeonCreateResizeWorkloadTest<NeonResizeWorkload, armnn::DataType::QuantisedAsymm8>(DataLayout::NHWC);
+    NeonCreateResizeWorkloadTest<NeonResizeWorkload, armnn::DataType::QAsymmU8>(DataLayout::NHWC);
 }
 
 template <typename SoftmaxWorkloadType, typename armnn::DataType DataType>
@@ -634,12 +634,12 @@ BOOST_AUTO_TEST_CASE(CreateSpaceToDepthFloat16Workload)
 
 BOOST_AUTO_TEST_CASE(CreateSpaceToDepthQAsymm8Workload)
 {
-    NeonSpaceToDepthWorkloadTest<NeonSpaceToDepthWorkload, armnn::DataType::QuantisedAsymm8>();
+    NeonSpaceToDepthWorkloadTest<NeonSpaceToDepthWorkload, armnn::DataType::QAsymmU8>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSpaceToDepthQSymm16Workload)
 {
-    NeonSpaceToDepthWorkloadTest<NeonSpaceToDepthWorkload, armnn::DataType::QuantisedSymm16>();
+    NeonSpaceToDepthWorkloadTest<NeonSpaceToDepthWorkload, armnn::DataType::QSymmS16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterWorkload)
@@ -859,17 +859,17 @@ BOOST_AUTO_TEST_CASE(CreateConcatDim3Float32Workload)
 
 BOOST_AUTO_TEST_CASE(CreateConcatDim0Uint8Workload)
 {
-    NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 4, 3, 2, 5 }, 0);
+    NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::QAsymmU8>({ 4, 3, 2, 5 }, 0);
 }
 
 BOOST_AUTO_TEST_CASE(CreateConcatDim1Uint8Workload)
 {
-    NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 6, 2, 5 }, 1);
+    NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::QAsymmU8>({ 2, 6, 2, 5 }, 1);
 }
 
 BOOST_AUTO_TEST_CASE(CreateConcatDim3Uint8Workload)
 {
-    NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 2, 10 }, 3);
+    NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::QAsymmU8>({ 2, 3, 2, 10 }, 3);
 }
 
 template <armnn::DataType DataType>
@@ -914,7 +914,7 @@ BOOST_AUTO_TEST_CASE(CreateStackFloat16Workload)
 
 BOOST_AUTO_TEST_CASE(CreateStackUint8Workload)
 {
-    NeonCreateStackWorkloadTest<armnn::DataType::QuantisedAsymm8>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);
+    NeonCreateStackWorkloadTest<armnn::DataType::QAsymmU8>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);
 }
 
 template <typename QuantizedLstmWorkloadType>

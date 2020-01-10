@@ -43,12 +43,12 @@ armnn::INetworkPtr CreateQuantizedLstmNetwork(MultiArray input,
     int32_t cellStateOffset = 0;
 
     armnn::TensorInfo inputWeightsInfo({outputSize, inputSize},
-                                       armnn::DataType::QuantisedAsymm8,
+                                       armnn::DataType::QAsymmU8,
                                        weightsScale,
                                        weightsOffset);
 
     armnn::TensorInfo recurrentWeightsInfo({outputSize, outputSize},
-                                           armnn::DataType::QuantisedAsymm8,
+                                           armnn::DataType::QAsymmU8,
                                            weightsScale,
                                            weightsOffset);
 
@@ -121,27 +121,27 @@ armnn::INetworkPtr CreateQuantizedLstmNetwork(MultiArray input,
     armnn::IConnectableLayer* const outputStateOut  = net->AddOutputLayer(1);
 
     armnn::TensorInfo inputTensorInfo({batchSize , inputSize},
-                                      armnn::DataType::QuantisedAsymm8,
+                                      armnn::DataType::QAsymmU8,
                                       inputOutputScale,
                                       inputOutputOffset);
 
     armnn::TensorInfo cellStateInTensorInfo({batchSize , outputSize},
-                                            armnn::DataType::QuantisedSymm16,
+                                            armnn::DataType::QSymmS16,
                                             cellStateScale,
                                             cellStateOffset);
 
     armnn::TensorInfo outputStateInTensorInfo({batchSize , outputSize},
-                                              armnn::DataType::QuantisedAsymm8,
+                                              armnn::DataType::QAsymmU8,
                                               inputOutputScale,
                                               inputOutputOffset);
 
     armnn::TensorInfo cellStateOutTensorInfo({batchSize, outputSize},
-                                             armnn::DataType::QuantisedSymm16,
+                                             armnn::DataType::QSymmS16,
                                              cellStateScale,
                                              cellStateOffset);
 
     armnn::TensorInfo outputTensorInfo({batchSize, outputSize},
-                                       armnn::DataType::QuantisedAsymm8,
+                                       armnn::DataType::QAsymmU8,
                                        inputOutputScale,
                                        inputOutputOffset);
 
@@ -178,23 +178,23 @@ IsCloseEnough(T value1, T value2, T tolerance)
 void QuantizedLstmEndToEnd(const std::vector<armnn::BackendId>& backends)
 {
     std::vector<uint8_t> inputVector = {166, 179, 50, 150};
-    armnn::TensorInfo inputDesc({2, 2}, armnn::DataType::QuantisedAsymm8);
+    armnn::TensorInfo inputDesc({2, 2}, armnn::DataType::QAsymmU8);
     boost::multi_array<uint8_t, 2> input = MakeTensor<uint8_t, 2>(inputDesc, inputVector);
 
     std::vector<int16_t> cellStateInVector = {876, 1034, 955, -909, 761, 1029, 796, -1036};
-    armnn::TensorInfo cellStateInDesc({2, 4}, armnn::DataType::QuantisedSymm16);
+    armnn::TensorInfo cellStateInDesc({2, 4}, armnn::DataType::QSymmS16);
     boost::multi_array<int16_t, 2> cellStateIn = MakeTensor<int16_t, 2>(cellStateInDesc, cellStateInVector);
 
     std::vector<uint8_t> outputStateInVector = {136, 150, 140, 115, 135, 152, 138, 112};
-    armnn::TensorInfo outputStateInDesc({2, 4}, armnn::DataType::QuantisedAsymm8);
+    armnn::TensorInfo outputStateInDesc({2, 4}, armnn::DataType::QAsymmU8);
     boost::multi_array<uint8_t, 2> outputStateIn = MakeTensor<uint8_t, 2>(outputStateInDesc, outputStateInVector);
 
     std::vector<int16_t> cellStateOutVector = {1485, 1177, 1373, -1023, 1019, 1355, 1097, -1235};
-    armnn::TensorInfo cellStateOutVectorDesc({2, 4}, armnn::DataType::QuantisedSymm16);
+    armnn::TensorInfo cellStateOutVectorDesc({2, 4}, armnn::DataType::QSymmS16);
     boost::multi_array<int16_t, 2> cellStateOut = MakeTensor<int16_t, 2>(cellStateOutVectorDesc, cellStateOutVector);
 
     std::vector<uint8_t> outputStateOutVector = {140, 151, 146, 112, 136, 156, 142, 112};
-    armnn::TensorInfo outputDesc({2, 4}, armnn::DataType::QuantisedAsymm8);
+    armnn::TensorInfo outputDesc({2, 4}, armnn::DataType::QAsymmU8);
     boost::multi_array<uint8_t, 2> outputStateOut = MakeTensor<uint8_t, 2>(outputDesc, outputStateOutVector);
 
     // Builds up the structure of the network

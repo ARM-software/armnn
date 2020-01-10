@@ -100,7 +100,7 @@ struct ConcatenationFixtureNegativeDim : ConcatenationFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseConcatenationNegativeDim, ConcatenationFixtureNegativeDim)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+    RunTest<4, armnn::DataType::QAsymmU8>(
         0,
         {{"inputTensor1", { 0, 1, 2, 3 }},
         {"inputTensor2", { 4, 5, 6, 7 }}},
@@ -114,7 +114,7 @@ struct ConcatenationFixtureNCHW : ConcatenationFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseConcatenationNCHW, ConcatenationFixtureNCHW)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+    RunTest<4, armnn::DataType::QAsymmU8>(
         0,
         {{"inputTensor1", { 0, 1, 2, 3 }},
         {"inputTensor2", { 4, 5, 6, 7 }}},
@@ -128,7 +128,7 @@ struct ConcatenationFixtureNHWC : ConcatenationFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseConcatenationNHWC, ConcatenationFixtureNHWC)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+    RunTest<4, armnn::DataType::QAsymmU8>(
         0,
         {{"inputTensor1", { 0, 1, 2, 3 }},
         {"inputTensor2", { 4, 5, 6, 7 }}},
@@ -142,7 +142,7 @@ struct ConcatenationFixtureDim1 : ConcatenationFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseConcatenationDim1, ConcatenationFixtureDim1)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+    RunTest<4, armnn::DataType::QAsymmU8>(
         0,
         { { "inputTensor1", {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11,
                                12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 } },
@@ -161,7 +161,7 @@ struct ConcatenationFixtureDim3 : ConcatenationFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseConcatenationDim3, ConcatenationFixtureDim3)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+    RunTest<4, armnn::DataType::QAsymmU8>(
         0,
         { { "inputTensor1", {  0,  1,  2,  3,
                                4,  5,  6,  7,
@@ -196,7 +196,7 @@ struct ConcatenationFixture3DDim0 : ConcatenationFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseConcatenation3DDim0, ConcatenationFixture3DDim0)
 {
-    RunTest<3, armnn::DataType::QuantisedAsymm8>(
+    RunTest<3, armnn::DataType::QAsymmU8>(
         0,
         { { "inputTensor1", { 0,  1,  2,  3,  4,  5 } },
           { "inputTensor2", { 6,  7,  8,  9, 10, 11,
@@ -213,7 +213,7 @@ struct ConcatenationFixture3DDim1 : ConcatenationFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseConcatenation3DDim1, ConcatenationFixture3DDim1)
 {
-    RunTest<3, armnn::DataType::QuantisedAsymm8>(
+    RunTest<3, armnn::DataType::QAsymmU8>(
         0,
         { { "inputTensor1", { 0,  1,  2,  3,  4,  5 } },
           { "inputTensor2", { 6,  7,  8,  9, 10, 11,
@@ -230,7 +230,7 @@ struct ConcatenationFixture3DDim2 : ConcatenationFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseConcatenation3DDim2, ConcatenationFixture3DDim2)
 {
-    RunTest<3, armnn::DataType::QuantisedAsymm8>(
+    RunTest<3, armnn::DataType::QAsymmU8>(
         0,
         { { "inputTensor1", { 0,  1,  2,
                               3,  4,  5 } },

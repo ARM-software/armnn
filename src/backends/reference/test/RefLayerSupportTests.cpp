@@ -63,13 +63,13 @@ BOOST_AUTO_TEST_CASE(IsLayerSupportedFloat32Reference)
 BOOST_AUTO_TEST_CASE(IsLayerSupportedUint8Reference)
 {
     armnn::RefWorkloadFactory factory;
-    IsLayerSupportedTests<armnn::RefWorkloadFactory, armnn::DataType::QuantisedAsymm8>(&factory);
+    IsLayerSupportedTests<armnn::RefWorkloadFactory, armnn::DataType::QAsymmU8>(&factory);
 }
 
 BOOST_AUTO_TEST_CASE(IsLayerSupportedInt16Reference)
 {
     armnn::RefWorkloadFactory factory;
-    IsLayerSupportedTests<armnn::RefWorkloadFactory, armnn::DataType::QuantisedSymm16>(&factory);
+    IsLayerSupportedTests<armnn::RefWorkloadFactory, armnn::DataType::QSymmS16>(&factory);
 }
 
 BOOST_AUTO_TEST_CASE(IsConvertFp16ToFp32SupportedReference)

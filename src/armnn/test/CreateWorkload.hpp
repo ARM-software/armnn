@@ -399,12 +399,12 @@ std::unique_ptr<QuantizedLstmWorkload> CreateQuantizedLstmWorkloadTest(armnn::IW
 
     // Weights and bias tensor and quantization info
     armnn::TensorInfo inputWeightsInfo({outputSize, inputSize},
-                                       armnn::DataType::QuantisedAsymm8,
+                                       armnn::DataType::QAsymmU8,
                                        weightsScale,
                                        weightsOffset);
 
     armnn::TensorInfo recurrentWeightsInfo({outputSize, outputSize},
-                                           armnn::DataType::QuantisedAsymm8,
+                                           armnn::DataType::QAsymmU8,
                                            weightsScale,
                                            weightsOffset);
 
@@ -463,17 +463,17 @@ std::unique_ptr<QuantizedLstmWorkload> CreateQuantizedLstmWorkloadTest(armnn::IW
 
     // Input/output tensor info and quantization info
     armnn::TensorInfo inputInfo({numBatches , inputSize},
-                                armnn::DataType::QuantisedAsymm8,
+                                armnn::DataType::QAsymmU8,
                                 inputOutputScale,
                                 inputOutputOffset);
 
     armnn::TensorInfo cellStateInfo({numBatches , outputSize},
-                                    armnn::DataType::QuantisedSymm16,
+                                    armnn::DataType::QSymmS16,
                                     cellStateScale,
                                     cellStateOffset);
 
     armnn::TensorInfo outputStateInfo({numBatches , outputSize},
-                                      armnn::DataType::QuantisedAsymm8,
+                                      armnn::DataType::QAsymmU8,
                                       inputOutputScale,
                                       inputOutputOffset);
 
@@ -530,8 +530,8 @@ std::unique_ptr<Convolution2dWorkload> CreateDirectConvolution2dWorkloadTest(arm
 
     Convolution2dLayer* const layer = graph.AddLayer<Convolution2dLayer>(layerDesc, "layer");
 
-    float inputsQScale = DataType == armnn::DataType::QuantisedAsymm8 ? 1.0f : 0.0;
-    float outputQScale = DataType == armnn::DataType::QuantisedAsymm8 ? 2.0f : 0.0;
+    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
 
     layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({ 2, 3, 3, 3 }, DataType, inputsQScale));
     layer->m_Bias   = std::make_unique<ScopedCpuTensorHandle>
@@ -637,8 +637,8 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWorkloadTest(armnn::
 
     FullyConnectedLayer* const layer = graph.AddLayer<FullyConnectedLayer>(layerDesc, "layer");
 
-    float inputsQScale = DataType == armnn::DataType::QuantisedAsymm8 ? 1.0f : 0.0;
-    float outputQScale = DataType == armnn::DataType::QuantisedAsymm8 ? 2.0f : 0.0;
+    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
 
     layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({7, 20}, DataType, inputsQScale, 0));
     layer->m_Bias   = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({7}, GetBiasDataType(DataType), inputsQScale));
@@ -1361,7 +1361,7 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
 
     if (biasEnabled)
     {
-        constexpr armnn::DataType biasDataType = ( dataType == armnn::DataType::QuantisedAsymm8) ?
+        constexpr armnn::DataType biasDataType = ( dataType == armnn::DataType::QAsymmU8) ?
             armnn::DataType::Signed32 : armnn::DataType::Float32;
 
         TensorInfo biasTensorInfo(TensorShape({16}), biasDataType, 0.9f * 0.9f, 0);
@@ -1396,14 +1396,14 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
 
     // set the tensors in the network (NHWC format)
     TensorInfo inputTensorInfo(TensorShape({ 1, 16, 16, 16 }), dataType);
-    if (dataType == armnn::DataType::QuantisedAsymm8)
+    if (dataType == armnn::DataType::QAsymmU8)
     {
         inputTensorInfo.SetQuantizationOffset(0);
         inputTensorInfo.SetQuantizationScale(0.9f);
     }
 
     TensorInfo outputTensorInfo(TensorShape({1, 16, 16, 16}), dataType);
-    if (dataType == armnn::DataType::QuantisedAsymm8)
+    if (dataType == armnn::DataType::QAsymmU8)
     {
         outputTensorInfo.SetQuantizationOffset(0);
         outputTensorInfo.SetQuantizationScale(0.9f);

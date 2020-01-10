@@ -496,15 +496,15 @@ BOOST_AUTO_TEST_CASE(GatherValidateTensorShapesFromInputsMultiDimIndices)
 BOOST_AUTO_TEST_CASE(DetectionPostProcessValidateTensorShapes)
 {
     Graph graph;
-    armnn::TensorInfo boxEncodingsInfo({1, 10, 4}, DataType::QuantisedAsymm8);
-    armnn::TensorInfo scoresInfo({1, 10, 4}, DataType::QuantisedAsymm8);
+    armnn::TensorInfo boxEncodingsInfo({1, 10, 4}, DataType::QAsymmU8);
+    armnn::TensorInfo scoresInfo({1, 10, 4}, DataType::QAsymmU8);
     std::vector<uint8_t> anchorsVector(40);
-    armnn::ConstTensor anchors(armnn::TensorInfo({10, 4}, armnn::DataType::QuantisedAsymm8), anchorsVector);
+    armnn::ConstTensor anchors(armnn::TensorInfo({10, 4}, armnn::DataType::QAsymmU8), anchorsVector);
 
-    armnn::TensorInfo detectionBoxesInfo({1, 3, 4}, DataType::QuantisedAsymm8);
-    armnn::TensorInfo detectionScoresInfo({1, 3}, DataType::QuantisedAsymm8);
-    armnn::TensorInfo detectionClassesInfo({1, 3}, DataType::QuantisedAsymm8);
-    armnn::TensorInfo numDetectionInfo({1}, DataType::QuantisedAsymm8);
+    armnn::TensorInfo detectionBoxesInfo({1, 3, 4}, DataType::QAsymmU8);
+    armnn::TensorInfo detectionScoresInfo({1, 3}, DataType::QAsymmU8);
+    armnn::TensorInfo detectionClassesInfo({1, 3}, DataType::QAsymmU8);
+    armnn::TensorInfo numDetectionInfo({1}, DataType::QAsymmU8);
 
     Layer* input0 = graph.AddLayer<InputLayer>(0, "boxEncodings");
     input0->GetOutputSlot().SetTensorInfo(boxEncodingsInfo);

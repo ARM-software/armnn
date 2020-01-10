@@ -176,13 +176,13 @@ SimpleReshapeTest<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-SimpleReshapeTest<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+SimpleReshapeTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-SimpleReshapeTest<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+SimpleReshapeTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -191,12 +191,12 @@ Reshape5dTest<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 5>
-Reshape5dTest<armnn::DataType::QuantisedAsymm8>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 5>
+Reshape5dTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 5>
-Reshape5dTest<armnn::DataType::QuantisedSymm16>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 5>
+Reshape5dTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

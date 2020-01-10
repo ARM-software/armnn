@@ -56,13 +56,13 @@ std::unique_ptr<IWorkload> MakeWorkloadHelper(const QueueDescriptorType& descrip
             return MakeWorkloadForType<Float16Workload>::Func(descriptor, info, std::forward<Args>(args)...);
         case DataType::Float32:
             return MakeWorkloadForType<Float32Workload>::Func(descriptor, info, std::forward<Args>(args)...);
-        case DataType::QuantisedAsymm8:
+        case DataType::QAsymmU8:
             return MakeWorkloadForType<Uint8Workload>::Func(descriptor, info, std::forward<Args>(args)...);
         case DataType::Signed32:
             return MakeWorkloadForType<Int32Workload>::Func(descriptor, info, std::forward<Args>(args)...);
         case DataType::Boolean:
             return MakeWorkloadForType<BooleanWorkload>::Func(descriptor, info, std::forward<Args>(args)...);
-        case DataType::QuantisedSymm16:
+        case DataType::QSymmS16:
             return nullptr;
         default:
             BOOST_ASSERT_MSG(false, "Unknown DataType.");

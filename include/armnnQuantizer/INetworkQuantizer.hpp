@@ -14,7 +14,7 @@ namespace armnn
 
 struct QuantizerOptions
 {
-    QuantizerOptions() : QuantizerOptions(DataType::QuantisedAsymm8, false) {}
+    QuantizerOptions() : QuantizerOptions(DataType::QAsymmU8, false) {}
 
     QuantizerOptions(DataType activationFormat) : QuantizerOptions(activationFormat, false) {}
 

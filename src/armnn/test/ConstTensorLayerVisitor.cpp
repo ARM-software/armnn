@@ -1248,43 +1248,43 @@ BOOST_AUTO_TEST_CASE(CheckQuantizedLstmLayer)
     std::vector<uint8_t> inputToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> inputToInputWeightsDimensions = {1, 1, 3, 3};
     ConstTensor inputToInputWeights(
-            TensorInfo(4, inputToInputWeightsDimensions.data(), DataType::QuantisedAsymm8), inputToInputWeightsData);
+            TensorInfo(4, inputToInputWeightsDimensions.data(), DataType::QAsymmU8), inputToInputWeightsData);
 
     std::vector<uint8_t> inputToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
     ConstTensor inputToForgetWeights(
-            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::QuantisedAsymm8), inputToForgetWeightsData);
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::QAsymmU8), inputToForgetWeightsData);
 
     std::vector<uint8_t> inputToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
     ConstTensor inputToCellWeights(
-            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::QuantisedAsymm8), inputToCellWeightsData);
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::QAsymmU8), inputToCellWeightsData);
 
     std::vector<uint8_t> inputToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
     ConstTensor inputToOutputWeights(
-            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::QuantisedAsymm8), inputToOutputWeightsData);
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::QAsymmU8), inputToOutputWeightsData);
 
 
     std::vector<uint8_t> recurrentToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> recurrentToInputWeightsDimensions = {1, 1, 3, 3};
     ConstTensor recurrentToInputWeights(TensorInfo(
-            4, recurrentToInputWeightsDimensions.data(), DataType::QuantisedAsymm8), recurrentToInputWeightsData);
+            4, recurrentToInputWeightsDimensions.data(), DataType::QAsymmU8), recurrentToInputWeightsData);
 
     std::vector<uint8_t> recurrentToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
     ConstTensor recurrentToForgetWeights(TensorInfo(
-            4, recurrentToForgetWeightsDimensions.data(), DataType::QuantisedAsymm8), recurrentToForgetWeightsData);
+            4, recurrentToForgetWeightsDimensions.data(), DataType::QAsymmU8), recurrentToForgetWeightsData);
 
     std::vector<uint8_t> recurrentToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
     ConstTensor recurrentToCellWeights(TensorInfo(
-            4, recurrentToCellWeightsDimensions.data(), DataType::QuantisedAsymm8), recurrentToCellWeightsData);
+            4, recurrentToCellWeightsDimensions.data(), DataType::QAsymmU8), recurrentToCellWeightsData);
 
     std::vector<uint8_t> recurrentToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
     ConstTensor recurrentToOutputWeights(TensorInfo(
-            4, recurrentToOutputWeightsDimensions.data(), DataType::QuantisedAsymm8), recurrentToOutputWeightsData);
+            4, recurrentToOutputWeightsDimensions.data(), DataType::QAsymmU8), recurrentToOutputWeightsData);
 
 
     std::vector<int32_t> inputGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -1338,43 +1338,43 @@ BOOST_AUTO_TEST_CASE(CheckNamedQuantizedLstmLayer)
     std::vector<uint8_t> inputToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> inputToInputWeightsDimensions = {1, 1, 3, 3};
     ConstTensor inputToInputWeights(
-            TensorInfo(4, inputToInputWeightsDimensions.data(), DataType::QuantisedAsymm8), inputToInputWeightsData);
+            TensorInfo(4, inputToInputWeightsDimensions.data(), DataType::QAsymmU8), inputToInputWeightsData);
 
     std::vector<uint8_t> inputToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
     ConstTensor inputToForgetWeights(
-            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::QuantisedAsymm8), inputToForgetWeightsData);
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::QAsymmU8), inputToForgetWeightsData);
 
     std::vector<uint8_t> inputToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
     ConstTensor inputToCellWeights(
-            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::QuantisedAsymm8), inputToCellWeightsData);
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::QAsymmU8), inputToCellWeightsData);
 
     std::vector<uint8_t> inputToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
     ConstTensor inputToOutputWeights(
-            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::QuantisedAsymm8), inputToOutputWeightsData);
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::QAsymmU8), inputToOutputWeightsData);
 
 
     std::vector<uint8_t> recurrentToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> recurrentToInputWeightsDimensions = {1, 1, 3, 3};
     ConstTensor recurrentToInputWeights(TensorInfo(
-            4, recurrentToInputWeightsDimensions.data(), DataType::QuantisedAsymm8), recurrentToInputWeightsData);
+            4, recurrentToInputWeightsDimensions.data(), DataType::QAsymmU8), recurrentToInputWeightsData);
 
     std::vector<uint8_t> recurrentToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
     ConstTensor recurrentToForgetWeights(TensorInfo(
-            4, recurrentToForgetWeightsDimensions.data(), DataType::QuantisedAsymm8), recurrentToForgetWeightsData);
+            4, recurrentToForgetWeightsDimensions.data(), DataType::QAsymmU8), recurrentToForgetWeightsData);
 
     std::vector<uint8_t> recurrentToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
     ConstTensor recurrentToCellWeights(TensorInfo(
-            4, recurrentToCellWeightsDimensions.data(), DataType::QuantisedAsymm8), recurrentToCellWeightsData);
+            4, recurrentToCellWeightsDimensions.data(), DataType::QAsymmU8), recurrentToCellWeightsData);
 
     std::vector<uint8_t> recurrentToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
     ConstTensor recurrentToOutputWeights(TensorInfo(
-            4, recurrentToOutputWeightsDimensions.data(), DataType::QuantisedAsymm8), recurrentToOutputWeightsData);
+            4, recurrentToOutputWeightsDimensions.data(), DataType::QAsymmU8), recurrentToOutputWeightsData);
 
 
     std::vector<int32_t> inputGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};

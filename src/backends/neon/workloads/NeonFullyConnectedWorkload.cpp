@@ -72,7 +72,7 @@ NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueue
     m_FullyConnectedLayer.reset(layer.release());
 
     // Allocate
-    if (m_Data.m_Weight->GetTensorInfo().GetDataType() == DataType::QuantisedAsymm8)
+    if (m_Data.m_Weight->GetTensorInfo().GetDataType() == DataType::QAsymmU8)
     {
         InitializeArmComputeTensorData(*m_WeightsTensor, m_Data.m_Weight);
     }

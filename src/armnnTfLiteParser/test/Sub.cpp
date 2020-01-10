@@ -97,7 +97,7 @@ struct SimpleSubFixture : SubFixture
 
 BOOST_FIXTURE_TEST_CASE(SimpleSub, SimpleSubFixture)
 {
-  RunTest<2, armnn::DataType::QuantisedAsymm8>(
+  RunTest<2, armnn::DataType::QAsymmU8>(
       0,
       {{"inputTensor1", { 4, 5, 6, 7 }},
       {"inputTensor2", { 3, 2, 1, 0 }}},

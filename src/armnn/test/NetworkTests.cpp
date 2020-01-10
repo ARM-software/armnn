@@ -392,7 +392,7 @@ BOOST_AUTO_TEST_CASE(Network_AddQuantize)
             BOOST_TEST((infoIn.GetDataType() == armnn::DataType::Float32));
 
             const armnn::TensorInfo& infoOut = layer->GetOutputSlot(0).GetTensorInfo();
-            BOOST_TEST((infoOut.GetDataType() == armnn::DataType::QuantisedAsymm8));
+            BOOST_TEST((infoOut.GetDataType() == armnn::DataType::QAsymmU8));
         }
 
         bool m_Visited = false;
@@ -411,7 +411,7 @@ BOOST_AUTO_TEST_CASE(Network_AddQuantize)
     armnn::TensorInfo infoIn({3,1}, armnn::DataType::Float32);
     input->GetOutputSlot(0).SetTensorInfo(infoIn);
 
-    armnn::TensorInfo infoOut({3,1}, armnn::DataType::QuantisedAsymm8);
+    armnn::TensorInfo infoOut({3,1}, armnn::DataType::QAsymmU8);
     quantize->GetOutputSlot(0).SetTensorInfo(infoOut);
 
     Test testQuantize;

@@ -179,7 +179,7 @@ struct SimpleSplitFixtureUint8 : SplitFixture
 BOOST_FIXTURE_TEST_CASE(ParseAxisOneSplitTwoUint8, SimpleSplitFixtureUint8)
 {
 
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+    RunTest<4, armnn::DataType::QAsymmU8>(
         0,
         { {"inputTensor", { 1, 2, 3, 4, 5, 6, 7, 8,
                             9, 10, 11, 12, 13, 14, 15, 16 } } },
@@ -196,7 +196,7 @@ struct SimpleSplitAxisThreeFixtureUint8 : SplitFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseAxisThreeSplitTwoUint8, SimpleSplitAxisThreeFixtureUint8)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+    RunTest<4, armnn::DataType::QAsymmU8>(
         0,
         { {"inputTensor", { 1, 2, 3, 4, 5, 6, 7, 8,
                             9, 10, 11, 12, 13, 14, 15, 16 } } },
@@ -213,7 +213,7 @@ struct SimpleSplit2DFixtureUint8 : SplitFixture
 
 BOOST_FIXTURE_TEST_CASE(SimpleSplit2DUint8, SimpleSplit2DFixtureUint8)
 {
-    RunTest<2, armnn::DataType::QuantisedAsymm8>(
+    RunTest<2, armnn::DataType::QAsymmU8>(
             0,
             { {"inputTensor", { 1, 2, 3, 4, 5, 6, 7, 8 } } },
             { {"outputTensor1", { 1, 2, 3, 4 } },
@@ -229,7 +229,7 @@ struct SimpleSplit3DFixtureUint8 : SplitFixture
 
 BOOST_FIXTURE_TEST_CASE(SimpleSplit3DUint8, SimpleSplit3DFixtureUint8)
 {
-    RunTest<3, armnn::DataType::QuantisedAsymm8>(
+    RunTest<3, armnn::DataType::QAsymmU8>(
         0,
         { {"inputTensor", { 1, 2, 3, 4, 5, 6, 7, 8,
                             9, 10, 11, 12, 13, 14, 15, 16 } } },

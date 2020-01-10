@@ -408,7 +408,7 @@ LayerTestResult<uint8_t, 4> EqualSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_SimpleTestData,
@@ -419,7 +419,7 @@ LayerTestResult<uint8_t, 4> EqualBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_Broadcast1ElementTestData,
@@ -430,7 +430,7 @@ LayerTestResult<uint8_t, 4> EqualBroadcast1dVectorUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_Broadcast1dVectorTestData,
@@ -507,7 +507,7 @@ LayerTestResult<uint8_t, 4> GreaterSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_SimpleTestData,
@@ -518,7 +518,7 @@ LayerTestResult<uint8_t, 4> GreaterBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_Broadcast1ElementTestData,
@@ -529,7 +529,7 @@ LayerTestResult<uint8_t, 4> GreaterBroadcast1dVectorUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_Broadcast1dVectorTestData,
@@ -607,7 +607,7 @@ LayerTestResult<uint8_t, 4> GreaterOrEqualSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_SimpleTestData,
@@ -618,7 +618,7 @@ LayerTestResult<uint8_t, 4> GreaterOrEqualBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_Broadcast1ElementTestData,
@@ -629,7 +629,7 @@ LayerTestResult<uint8_t, 4> GreaterOrEqualBroadcast1dVectorUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_Broadcast1dVectorTestData,
@@ -706,7 +706,7 @@ LayerTestResult<uint8_t, 4> LessSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_SimpleTestData,
@@ -717,7 +717,7 @@ LayerTestResult<uint8_t, 4> LessBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_Broadcast1ElementTestData,
@@ -728,7 +728,7 @@ LayerTestResult<uint8_t, 4> LessBroadcast1dVectorUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_Broadcast1dVectorTestData,
@@ -806,7 +806,7 @@ LayerTestResult<uint8_t, 4> LessOrEqualSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_SimpleTestData,
@@ -817,7 +817,7 @@ LayerTestResult<uint8_t, 4> LessOrEqualBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_Broadcast1ElementTestData,
@@ -828,7 +828,7 @@ LayerTestResult<uint8_t, 4> LessOrEqualBroadcast1dVectorUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_Broadcast1dVectorTestData,
@@ -906,7 +906,7 @@ LayerTestResult<uint8_t, 4> NotEqualSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_SimpleTestData,
@@ -917,7 +917,7 @@ LayerTestResult<uint8_t, 4> NotEqualBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_Broadcast1ElementTestData,
@@ -928,7 +928,7 @@ LayerTestResult<uint8_t, 4> NotEqualBroadcast1dVectorUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ComparisonTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         s_Broadcast1dVectorTestData,

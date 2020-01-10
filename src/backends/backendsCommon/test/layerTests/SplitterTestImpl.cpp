@@ -341,14 +341,14 @@ std::vector<LayerTestResult<uint8_t,3>> SplitterUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SplitterTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
+    return SplitterTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
 std::vector<LayerTestResult<int16_t,3>> SplitterInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SplitterTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.0f, 0);
+    return SplitterTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
 LayerTestResult<float, 3> CopyViaSplitterFloat32Test(
@@ -369,12 +369,12 @@ LayerTestResult<uint8_t, 3> CopyViaSplitterUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return CopyViaSplitterTestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
+    return CopyViaSplitterTestImpl<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
 LayerTestResult<int16_t, 3> CopyViaSplitterInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return CopyViaSplitterTestImpl<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.0f, 0);
+    return CopyViaSplitterTestImpl<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 1.0f, 0);
 }

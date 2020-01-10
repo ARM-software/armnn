@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include "BackendId.hpp"
 #include "Exceptions.hpp"
+#include "Deprecated.hpp"
 
 namespace armnn
 {
@@ -32,12 +33,15 @@ enum class DataType
 {
     Float16 = 0,
     Float32 = 1,
-    QuantisedAsymm8 = 2,
+    QAsymmU8 = 2,
     Signed32 = 3,
     Boolean = 4,
-    QuantisedSymm16 = 5,
+    QSymmS16 = 5,
     QuantizedSymm8PerAxis = 6,
-    QSymmS8 = 7
+    QSymmS8 = 7,
+
+    QuantisedAsymm8 ARMNN_DEPRECATED_MSG("Use DataType::QAsymmU8 instead.") = QAsymmU8,
+    QuantisedSymm16 ARMNN_DEPRECATED_MSG("Use DataType::QSymmS16 instead.") = QSymmS16
 };
 
 enum class DataLayout

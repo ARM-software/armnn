@@ -134,14 +134,14 @@ LayerTestResult<float, 4> DequantizeSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return DequantizeSimpleTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return DequantizeSimpleTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<float, 4> DequantizeOffsetUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return DequantizeOffsetTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return DequantizeOffsetTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<float, 4> DequantizeSimpleInt8Test(
@@ -155,14 +155,14 @@ LayerTestResult<float, 4> DequantizeSimpleInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return DequantizeSimpleTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return DequantizeSimpleTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<armnn::Half, 4> DequantizeSimpleUint8ToFp16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return DequantizeSimpleTest<armnn::DataType::QuantisedAsymm8, armnn::DataType::Float16>(workloadFactory,
+    return DequantizeSimpleTest<armnn::DataType::QAsymmU8, armnn::DataType::Float16>(workloadFactory,
                                                                                             memoryManager);
 }
 
@@ -177,6 +177,6 @@ LayerTestResult<armnn::Half, 4> DequantizeSimpleInt16ToFp16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return DequantizeSimpleTest<armnn::DataType::QuantisedSymm16, armnn::DataType::Float16>(workloadFactory,
+    return DequantizeSimpleTest<armnn::DataType::QSymmS16, armnn::DataType::Float16>(workloadFactory,
                                                                                             memoryManager);
 }

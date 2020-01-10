@@ -261,14 +261,14 @@ BOOST_AUTO_TEST_CASE(IVGCVSW_1929_QuantizedSoftmaxIssue)
 
     input->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo(
             armnn::TensorShape({ 1, 5 }),
-            armnn::DataType::QuantisedAsymm8,
+            armnn::DataType::QAsymmU8,
             1.0f/255,
             0
     ));
 
     softmax->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo(
             armnn::TensorShape({ 1, 5 }),
-            armnn::DataType::QuantisedAsymm8
+            armnn::DataType::QAsymmU8
     ));
 
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};

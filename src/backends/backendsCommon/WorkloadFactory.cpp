@@ -347,8 +347,8 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                         biasInfoPtr = &dummyFloat32Bias;
                         break;
                     }
-                    case DataType::QuantisedAsymm8:
-                    case DataType::QuantisedSymm16:
+                    case DataType::QAsymmU8:
+                    case DataType::QSymmS16:
                     {
                         biasInfoPtr = &dummyQA8Bias;
                         break;

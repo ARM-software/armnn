@@ -112,7 +112,7 @@ struct SimplePadFixture : PadFixture
 
 BOOST_FIXTURE_TEST_CASE(SimplePadQuantisedAsymm8, SimplePadFixture)
 {
-    RunTest<3, armnn::DataType::QuantisedAsymm8>(0,
+    RunTest<3, armnn::DataType::QAsymmU8>(0,
                                                  {
                                                     0, 4, 2, 5, 6, 1, 5, 2
                                                  },

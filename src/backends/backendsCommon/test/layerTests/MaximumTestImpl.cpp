@@ -238,7 +238,7 @@ LayerTestResult<uint8_t, 4> MaximumUint8Test(
         4, 4, 4, 4, 5, 5, 5, 5
     };
 
-    return ElementwiseTestHelper<4, armnn::MaximumQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<4, armnn::MaximumQueueDescriptor, armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         shape,
@@ -270,7 +270,7 @@ LayerTestResult<uint8_t, 4> MaximumBroadcast1ElementUint8Test(
         7, 8, 9, 10, 11, 12
     };
 
-    return ElementwiseTestHelper<4, armnn::MaximumQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<4, armnn::MaximumQueueDescriptor, armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -301,7 +301,7 @@ LayerTestResult<uint8_t, 4> MaximumBroadcast1DVectorUint8Test(
         7, 10, 9, 10, 11, 12
     };
 
-    return ElementwiseTestHelper<4, armnn::MaximumQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<4, armnn::MaximumQueueDescriptor, armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -327,7 +327,7 @@ LayerTestResult<int16_t, 4> MaximumInt16Test(
     std::vector<int16_t> output({ 2, 2, 2, 2, 6, 6, 6, 6,
                                   4, 4, 4, 4, 5, 5, 5, 5 });
 
-    return ElementwiseTestHelper<4, armnn::MaximumQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::MaximumQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape,
@@ -359,7 +359,7 @@ LayerTestResult<int16_t, 4> MaximumBroadcast1ElementInt16Test(
         7, 8, 9, 10, 11, 12
     };
 
-    return ElementwiseTestHelper<4, armnn::MaximumQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::MaximumQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -391,7 +391,7 @@ LayerTestResult<int16_t, 4> MaximumBroadcast1DVectorInt16Test(
         7, 10, 9, 10, 11, 12
     };
 
-    return ElementwiseTestHelper<4, armnn::MaximumQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+    return ElementwiseTestHelper<4, armnn::MaximumQueueDescriptor, armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         shape0,

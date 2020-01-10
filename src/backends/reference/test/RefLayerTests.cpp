@@ -79,19 +79,19 @@ ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3Nhwc,
                      false,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3Uint8,
-                     Convolution2d3x3Dilation3x3Test<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     Convolution2d3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3NhwcUint8,
-                     Convolution2d3x3Dilation3x3Test<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     Convolution2d3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3Int16,
-                     Convolution2d3x3Dilation3x3Test<DataType::QuantisedSymm16, DataType::Signed32>,
+                     Convolution2d3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3NhwcInt16,
-                     Convolution2d3x3Dilation3x3Test<DataType::QuantisedSymm16, DataType::Signed32>,
+                     Convolution2d3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
 
@@ -104,19 +104,19 @@ ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3Nhwc,
                      false,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3Uint8,
-                     Convolution2d2x3x3Dilation3x3Test<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     Convolution2d2x3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3NhwcUint8,
-                     Convolution2d2x3x3Dilation3x3Test<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     Convolution2d2x3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3Int16,
-                     Convolution2d2x3x3Dilation3x3Test<DataType::QuantisedSymm16, DataType::Signed32>,
+                     Convolution2d2x3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3NhwcInt16,
-                     Convolution2d2x3x3Dilation3x3Test<DataType::QuantisedSymm16, DataType::Signed32>,
+                     Convolution2d2x3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
 
@@ -129,19 +129,19 @@ ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3Nhwc,
                      false,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3Uint8,
-                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3NhwcUint8,
-                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3Int16,
-                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::QuantisedSymm16, DataType::Signed32>,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3NhwcInt16,
-                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::QuantisedSymm16, DataType::Signed32>,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
 
@@ -180,19 +180,19 @@ ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3Nhwc,
                      false,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3Uint8,
-                     DepthwiseConvolution2d3x3Dilation3x3Test<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     DepthwiseConvolution2d3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3NhwcUint8,
-                     DepthwiseConvolution2d3x3Dilation3x3Test<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     DepthwiseConvolution2d3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3Int16,
-                     DepthwiseConvolution2d3x3Dilation3x3Test<DataType::QuantisedSymm16, DataType::Signed32>,
+                     DepthwiseConvolution2d3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3NhwcInt16,
-                     DepthwiseConvolution2d3x3Dilation3x3Test<DataType::QuantisedSymm16, DataType::Signed32>,
+                     DepthwiseConvolution2d3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
 
@@ -205,19 +205,19 @@ ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3Nhwc,
                      false,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3Uint8,
-                     DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3NhwcUint8,
-                     DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3Int16,
-                     DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QuantisedSymm16, DataType::Signed32>,
+                     DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3NhwcInt16,
-                     DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QuantisedSymm16, DataType::Signed32>,
+                     DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dMult4,
@@ -465,11 +465,11 @@ ARMNN_AUTO_TEST_CASE(TanhInt16, TanhInt16Test)
 
 // Fully Connected
 ARMNN_AUTO_TEST_CASE(SimpleFullyConnected, FullyConnectedFloat32Test, false, false)
-ARMNN_AUTO_TEST_CASE(FullyConnectedUint8, FullyConnectedTest<DataType::QuantisedAsymm8>, false)
-ARMNN_AUTO_TEST_CASE(FullyConnectedQSymm16, FullyConnectedTest<DataType::QuantisedSymm16>, false)
+ARMNN_AUTO_TEST_CASE(FullyConnectedUint8, FullyConnectedTest<DataType::QAsymmU8>, false)
+ARMNN_AUTO_TEST_CASE(FullyConnectedQSymm16, FullyConnectedTest<DataType::QSymmS16>, false)
 ARMNN_AUTO_TEST_CASE(SimpleFullyConnectedWithBias, FullyConnectedFloat32Test, true, false)
-ARMNN_AUTO_TEST_CASE(FullyConnectedBiasedUint8, FullyConnectedTest<DataType::QuantisedAsymm8>, true)
-ARMNN_AUTO_TEST_CASE(FullyConnectedBiasedQSymm16, FullyConnectedTest<DataType::QuantisedSymm16>, true)
+ARMNN_AUTO_TEST_CASE(FullyConnectedBiasedUint8, FullyConnectedTest<DataType::QAsymmU8>, true)
+ARMNN_AUTO_TEST_CASE(FullyConnectedBiasedQSymm16, FullyConnectedTest<DataType::QSymmS16>, true)
 ARMNN_AUTO_TEST_CASE(SimpleFullyConnectedWithTranspose, FullyConnectedFloat32Test, false, true)
 
 ARMNN_AUTO_TEST_CASE(FullyConnectedLarge, FullyConnectedLargeTest, false)
@@ -493,9 +493,9 @@ ARMNN_AUTO_TEST_CASE(ConcatUint8, ConcatUint8Test)
 ARMNN_AUTO_TEST_CASE(ConcatUint8DifferentQParams, ConcatUint8DifferentQParamsTest)
 ARMNN_AUTO_TEST_CASE(ConcatUint16, ConcatUint16Test)
 ARMNN_AUTO_TEST_CASE(ConcatUint8DifferentInputOutputQParam,
-                     ConcatDifferentInputOutputQParamTest<DataType::QuantisedAsymm8>, true)
+                     ConcatDifferentInputOutputQParamTest<DataType::QAsymmU8>, true)
 ARMNN_AUTO_TEST_CASE(ConcatInt16DifferentInputOutputQParam,
-                     ConcatDifferentInputOutputQParamTest<DataType::QuantisedSymm16>, true)
+                     ConcatDifferentInputOutputQParamTest<DataType::QSymmS16>, true)
 
 // Add
 ARMNN_AUTO_TEST_CASE(SimpleAdd, AdditionTest)
@@ -681,10 +681,10 @@ ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearFloat16,
                      SimpleResizeBilinearTest<DataType::Float16>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearUint8,
-                     SimpleResizeBilinearTest<DataType::QuantisedAsymm8>,
+                     SimpleResizeBilinearTest<DataType::QAsymmU8>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearUint16,
-                     SimpleResizeBilinearTest<DataType::QuantisedSymm16>,
+                     SimpleResizeBilinearTest<DataType::QSymmS16>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearNop,
                      ResizeBilinearNopTest<DataType::Float32>,
@@ -693,10 +693,10 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearNopFloat16,
                      ResizeBilinearNopTest<DataType::Float16>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearNopUint8,
-                     ResizeBilinearNopTest<DataType::QuantisedAsymm8>,
+                     ResizeBilinearNopTest<DataType::QAsymmU8>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(esizeBilinearNopUint16,
-                     SimpleResizeBilinearTest<DataType::QuantisedSymm16>,
+                     SimpleResizeBilinearTest<DataType::QSymmS16>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMin,
                      ResizeBilinearSqMinTest<DataType::Float32>,
@@ -705,10 +705,10 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinFloat16,
                      ResizeBilinearSqMinTest<DataType::Float16>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinUint8,
-                     ResizeBilinearSqMinTest<DataType::QuantisedAsymm8>,
+                     ResizeBilinearSqMinTest<DataType::QAsymmU8>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinUint16,
-                     SimpleResizeBilinearTest<DataType::QuantisedSymm16>,
+                     SimpleResizeBilinearTest<DataType::QSymmS16>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMin,
                      ResizeBilinearMinTest<DataType::Float32>,
@@ -717,10 +717,10 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearMinFloat16,
                      ResizeBilinearMinTest<DataType::Float16>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMinUint8,
-                     ResizeBilinearMinTest<DataType::QuantisedAsymm8>,
+                     ResizeBilinearMinTest<DataType::QAsymmU8>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMinUint16,
-                     SimpleResizeBilinearTest<DataType::QuantisedSymm16>,
+                     SimpleResizeBilinearTest<DataType::QSymmS16>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMag,
                      ResizeBilinearMagTest<DataType::Float32>,
@@ -729,10 +729,10 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearMagFloat16,
                      ResizeBilinearMagTest<DataType::Float16>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMagUint8,
-                     ResizeBilinearMagTest<DataType::QuantisedAsymm8>,
+                     ResizeBilinearMagTest<DataType::QAsymmU8>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMagUint16,
-                     SimpleResizeBilinearTest<DataType::QuantisedSymm16>,
+                     SimpleResizeBilinearTest<DataType::QSymmS16>,
                      DataLayout::NCHW)
 
 // Resize Bilinear - NHWC
@@ -743,10 +743,10 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearNopNhwcFloat16,
                      ResizeBilinearNopTest<DataType::Float16>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearNopUint8Nhwc,
-                     ResizeBilinearNopTest<DataType::QuantisedAsymm8>,
+                     ResizeBilinearNopTest<DataType::QAsymmU8>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearNopUint16Nhwc,
-                     ResizeBilinearNopTest<DataType::QuantisedSymm16>,
+                     ResizeBilinearNopTest<DataType::QSymmS16>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearNhwc,
                      SimpleResizeBilinearTest<DataType::Float32>,
@@ -755,10 +755,10 @@ ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearNhwcFloat16,
                      SimpleResizeBilinearTest<DataType::Float16>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearUint8Nhwc,
-                     SimpleResizeBilinearTest<DataType::QuantisedAsymm8>,
+                     SimpleResizeBilinearTest<DataType::QAsymmU8>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearUint16Nhwc,
-                     ResizeBilinearNopTest<DataType::QuantisedSymm16>,
+                     ResizeBilinearNopTest<DataType::QSymmS16>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinNhwc,
                      ResizeBilinearSqMinTest<DataType::Float32>,
@@ -767,10 +767,10 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinNhwcFloat16,
                      ResizeBilinearSqMinTest<DataType::Float16>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinUint8Nhwc,
-                     ResizeBilinearSqMinTest<DataType::QuantisedAsymm8>,
+                     ResizeBilinearSqMinTest<DataType::QAsymmU8>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinUint16Nhwc,
-                     ResizeBilinearNopTest<DataType::QuantisedSymm16>,
+                     ResizeBilinearNopTest<DataType::QSymmS16>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMinNhwc,
                      ResizeBilinearMinTest<DataType::Float32>,
@@ -779,10 +779,10 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearMinNhwcFloat16,
                      ResizeBilinearMinTest<DataType::Float16>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMinUint8Nhwc,
-                     ResizeBilinearMinTest<DataType::QuantisedAsymm8>,
+                     ResizeBilinearMinTest<DataType::QAsymmU8>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMinUint16Nhwc,
-                     ResizeBilinearNopTest<DataType::QuantisedSymm16>,
+                     ResizeBilinearNopTest<DataType::QSymmS16>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMagNhwc,
                      ResizeBilinearMagTest<DataType::Float32>,
@@ -791,10 +791,10 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearMagNhwcFloat16,
                      ResizeBilinearMagTest<DataType::Float16>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMagUint8Nhwc,
-                     ResizeBilinearMagTest<DataType::QuantisedAsymm8>,
+                     ResizeBilinearMagTest<DataType::QAsymmU8>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMagUint16Nhwc,
-                     ResizeBilinearNopTest<DataType::QuantisedSymm16>,
+                     ResizeBilinearNopTest<DataType::QSymmS16>,
                      DataLayout::NHWC)
 
 // Resize NearestNeighbor - NCHW
@@ -802,46 +802,46 @@ ARMNN_AUTO_TEST_CASE(SimpleResizeNearestNeighbor,
                      SimpleResizeNearestNeighborTest<DataType::Float32>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(SimpleResizeNearestNeighborUint8,
-                     SimpleResizeNearestNeighborTest<DataType::QuantisedAsymm8>,
+                     SimpleResizeNearestNeighborTest<DataType::QAsymmU8>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(SimpleResizeNearestNeighborUint16,
-                     SimpleResizeNearestNeighborTest<DataType::QuantisedSymm16>,
+                     SimpleResizeNearestNeighborTest<DataType::QSymmS16>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborNop,
                      ResizeNearestNeighborNopTest<DataType::Float32>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborNopUint8,
-                     ResizeNearestNeighborNopTest<DataType::QuantisedAsymm8>,
+                     ResizeNearestNeighborNopTest<DataType::QAsymmU8>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(esizeNearestNeighborNopUint16,
-                     SimpleResizeNearestNeighborTest<DataType::QuantisedSymm16>,
+                     SimpleResizeNearestNeighborTest<DataType::QSymmS16>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborSqMin,
                      ResizeNearestNeighborSqMinTest<DataType::Float32>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborSqMinUint8,
-                     ResizeNearestNeighborSqMinTest<DataType::QuantisedAsymm8>,
+                     ResizeNearestNeighborSqMinTest<DataType::QAsymmU8>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborSqMinUint16,
-                     SimpleResizeNearestNeighborTest<DataType::QuantisedSymm16>,
+                     SimpleResizeNearestNeighborTest<DataType::QSymmS16>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMin,
                      ResizeNearestNeighborMinTest<DataType::Float32>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMinUint8,
-                     ResizeNearestNeighborMinTest<DataType::QuantisedAsymm8>,
+                     ResizeNearestNeighborMinTest<DataType::QAsymmU8>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMinUint16,
-                     SimpleResizeNearestNeighborTest<DataType::QuantisedSymm16>,
+                     SimpleResizeNearestNeighborTest<DataType::QSymmS16>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMag,
                      ResizeNearestNeighborMagTest<DataType::Float32>,
                      DataLayout::NCHW, 0.10f, 50, 0.11f, 20)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagUint8,
-                     ResizeNearestNeighborMagTest<DataType::QuantisedAsymm8>,
+                     ResizeNearestNeighborMagTest<DataType::QAsymmU8>,
                      DataLayout::NCHW, 0.10f, 50, 0.11f, 20)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagUint16,
-                     SimpleResizeNearestNeighborTest<DataType::QuantisedSymm16>,
+                     SimpleResizeNearestNeighborTest<DataType::QSymmS16>,
                      DataLayout::NCHW)
 
 // Resize NearestNeighbor - NHWC
@@ -849,46 +849,46 @@ ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborNopNhwc,
                      ResizeNearestNeighborNopTest<DataType::Float32>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborNopUint8Nhwc,
-                     ResizeNearestNeighborNopTest<DataType::QuantisedAsymm8>,
+                     ResizeNearestNeighborNopTest<DataType::QAsymmU8>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborNopUint16Nhwc,
-                     ResizeNearestNeighborNopTest<DataType::QuantisedSymm16>,
+                     ResizeNearestNeighborNopTest<DataType::QSymmS16>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(SimpleResizeNearestNeighborNhwc,
                      SimpleResizeNearestNeighborTest<DataType::Float32>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(SimpleResizeNearestNeighborUint8Nhwc,
-                     SimpleResizeNearestNeighborTest<DataType::QuantisedAsymm8>,
+                     SimpleResizeNearestNeighborTest<DataType::QAsymmU8>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(SimpleResizeNearestNeighborUint16Nhwc,
-                     ResizeNearestNeighborNopTest<DataType::QuantisedSymm16>,
+                     ResizeNearestNeighborNopTest<DataType::QSymmS16>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborSqMinNhwc,
                      ResizeNearestNeighborSqMinTest<DataType::Float32>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborSqMinUint8Nhwc,
-                     ResizeNearestNeighborSqMinTest<DataType::QuantisedAsymm8>,
+                     ResizeNearestNeighborSqMinTest<DataType::QAsymmU8>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborSqMinUint16Nhwc,
-                     ResizeNearestNeighborNopTest<DataType::QuantisedSymm16>,
+                     ResizeNearestNeighborNopTest<DataType::QSymmS16>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMinNhwc,
                      ResizeNearestNeighborMinTest<DataType::Float32>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMinUint8Nhwc,
-                     ResizeNearestNeighborMinTest<DataType::QuantisedAsymm8>,
+                     ResizeNearestNeighborMinTest<DataType::QAsymmU8>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMinUint16Nhwc,
-                     ResizeNearestNeighborNopTest<DataType::QuantisedSymm16>,
+                     ResizeNearestNeighborNopTest<DataType::QSymmS16>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagNhwc,
                      ResizeNearestNeighborMagTest<DataType::Float32>,
                      DataLayout::NHWC, 0.10f, 50, 0.11f, 20)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagUint8Nhwc,
-                     ResizeNearestNeighborMagTest<DataType::QuantisedAsymm8>,
+                     ResizeNearestNeighborMagTest<DataType::QAsymmU8>,
                      DataLayout::NHWC, 0.10f, 50, 0.11f, 20)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagUint16Nhwc,
-                     ResizeNearestNeighborNopTest<DataType::QuantisedSymm16>,
+                     ResizeNearestNeighborNopTest<DataType::QSymmS16>,
                      DataLayout::NHWC)
 
 // Fake Quantization
@@ -952,10 +952,10 @@ ARMNN_AUTO_TEST_CASE(PadUint82dCustomPadding, PadUint82dCustomPaddingTest)
 ARMNN_AUTO_TEST_CASE(PadUint83d, PadUint83dTest)
 ARMNN_AUTO_TEST_CASE(PadUint84d, PadUint84dTest)
 
-ARMNN_AUTO_TEST_CASE(Pad2dQSymm16, Pad2dTestCommon<DataType::QuantisedSymm16>, 2.0f, 0, 0.0f)
-ARMNN_AUTO_TEST_CASE(Pad2dQSymm16CustomPadding, Pad2dTestCommon<DataType::QuantisedSymm16>, 2.0f, 0, 1.0f)
-ARMNN_AUTO_TEST_CASE(Pad3dQSymm16, Pad3dTestCommon<DataType::QuantisedSymm16>, 2.0f, 0)
-ARMNN_AUTO_TEST_CASE(Pad4dQSymm16, Pad4dTestCommon<DataType::QuantisedSymm16>, 2.0f, 0)
+ARMNN_AUTO_TEST_CASE(Pad2dQSymm16, Pad2dTestCommon<DataType::QSymmS16>, 2.0f, 0, 0.0f)
+ARMNN_AUTO_TEST_CASE(Pad2dQSymm16CustomPadding, Pad2dTestCommon<DataType::QSymmS16>, 2.0f, 0, 1.0f)
+ARMNN_AUTO_TEST_CASE(Pad3dQSymm16, Pad3dTestCommon<DataType::QSymmS16>, 2.0f, 0)
+ARMNN_AUTO_TEST_CASE(Pad4dQSymm16, Pad4dTestCommon<DataType::QSymmS16>, 2.0f, 0)
 
 // Constant
 ARMNN_AUTO_TEST_CASE(Constant, ConstantTest)
@@ -1011,12 +1011,12 @@ ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim3Uint8, Concat4dDiffShapeDim3Uint8Test,
 // Floor
 ARMNN_AUTO_TEST_CASE(SimpleFloor, SimpleFloorTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(SimpleFloorFloat16, SimpleFloorTest<DataType::Float16>)
-ARMNN_AUTO_TEST_CASE(SimpleFloorQuantisedSymm16, SimpleFloorTest<DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(SimpleFloorQuantisedSymm16, SimpleFloorTest<DataType::QSymmS16>)
 
 // Reshape
 ARMNN_AUTO_TEST_CASE(SimpleReshapeFloat32, SimpleReshapeTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(SimpleReshapeQuantisedAsymm8, SimpleReshapeTest<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(SimpleReshapeQuantisedSymm16, SimpleReshapeTest<DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(SimpleReshapeQuantisedAsymm8, SimpleReshapeTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(SimpleReshapeQuantisedSymm16, SimpleReshapeTest<DataType::QSymmS16>)
 ARMNN_AUTO_TEST_CASE(Reshape5d, Reshape5dTest<DataType::Float32>)
 
 // Rsqrt
@@ -1026,24 +1026,24 @@ ARMNN_AUTO_TEST_CASE(RsqrtZero, RsqrtZeroTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(RsqrtNegative, RsqrtNegativeTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(Rsqrt2dFloat16, Rsqrt2dTest<DataType::Float16>)
 ARMNN_AUTO_TEST_CASE(Rsqrt3dFloat16, Rsqrt3dTest<DataType::Float16>)
-ARMNN_AUTO_TEST_CASE(Rsqrt2dQuantisedAsymm8, Rsqrt2dTest<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(Rsqrt3dQuantisedAsymm8, Rsqrt3dTest<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(Rsqrt2dQuantisedSymm16, Rsqrt2dTest<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(Rsqrt3dQuantisedSymm16, Rsqrt3dTest<DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(Rsqrt2dQuantisedAsymm8, Rsqrt2dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(Rsqrt3dQuantisedAsymm8, Rsqrt3dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(Rsqrt2dQuantisedSymm16, Rsqrt2dTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(Rsqrt3dQuantisedSymm16, Rsqrt3dTest<DataType::QSymmS16>)
 
 // Permute
 ARMNN_AUTO_TEST_CASE(SimplePermuteFloat32, SimplePermuteTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet1Test, PermuteValueSet1Test<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet2Test, PermuteValueSet2Test<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet3Test, PermuteValueSet3Test<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(SimplePermuteQASymm8, SimplePermuteTest<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(PermuteQASymm8ValueSet1Test, PermuteValueSet1Test<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(PermuteQASymm8ValueSet2Test, PermuteValueSet2Test<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(PermuteQASymm8ValueSet3Test, PermuteValueSet3Test<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(SimplePermuteQSymm16, SimplePermuteTest<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(PermuteQSymm16ValueSet1Test, PermuteValueSet1Test<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(PermuteQSymm16ValueSet2Test, PermuteValueSet2Test<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(PermuteQSymm16ValueSet3Test, PermuteValueSet3Test<DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(SimplePermuteQASymm8, SimplePermuteTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(PermuteQASymm8ValueSet1Test, PermuteValueSet1Test<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(PermuteQASymm8ValueSet2Test, PermuteValueSet2Test<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(PermuteQASymm8ValueSet3Test, PermuteValueSet3Test<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(SimplePermuteQSymm16, SimplePermuteTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(PermuteQSymm16ValueSet1Test, PermuteValueSet1Test<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(PermuteQSymm16ValueSet2Test, PermuteValueSet2Test<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(PermuteQSymm16ValueSet3Test, PermuteValueSet3Test<DataType::QSymmS16>)
 
 // Lstm
 BOOST_AUTO_TEST_CASE(LstmUtilsZeroVector) {
@@ -1090,21 +1090,21 @@ ARMNN_AUTO_TEST_CASE(MeanVts1Float32, MeanVts1Test<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(MeanVts2Float32, MeanVts2Test<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(MeanVts3Float32, MeanVts3Test<DataType::Float32>)
 
-ARMNN_AUTO_TEST_CASE(MeanSimpleQuantisedAsymm8, MeanSimpleTest<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(MeanSimpleAxisQuantisedAsymm8, MeanSimpleAxisTest<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(MeanKeepDimsQuantisedAsymm8, MeanKeepDimsTest<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(MeanMultipleDimsQuantisedAsymm8, MeanMultipleDimsTest<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(MeanVts1QuantisedAsymm8, MeanVts1Test<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(MeanVts2QuantisedAsymm8, MeanVts2Test<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(MeanVts3QuantisedAsymm8, MeanVts3Test<DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(MeanSimpleQuantisedAsymm8, MeanSimpleTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(MeanSimpleAxisQuantisedAsymm8, MeanSimpleAxisTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(MeanKeepDimsQuantisedAsymm8, MeanKeepDimsTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(MeanMultipleDimsQuantisedAsymm8, MeanMultipleDimsTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(MeanVts1QuantisedAsymm8, MeanVts1Test<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(MeanVts2QuantisedAsymm8, MeanVts2Test<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(MeanVts3QuantisedAsymm8, MeanVts3Test<DataType::QAsymmU8>)
 
-ARMNN_AUTO_TEST_CASE(MeanSimpleQuantisedSymm16, MeanSimpleTest<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(MeanSimpleAxisQuantisedSymm16, MeanSimpleAxisTest<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(MeanKeepDimsQuantisedSymm16, MeanKeepDimsTest<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(MeanMultipleDimsQuantisedSymm16, MeanMultipleDimsTest<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(MeanVts1QuantisedSymm16, MeanVts1Test<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(MeanVts2QuantisedSymm16, MeanVts2Test<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(MeanVts3QuantisedSymm16, MeanVts3Test<DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(MeanSimpleQuantisedSymm16, MeanSimpleTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(MeanSimpleAxisQuantisedSymm16, MeanSimpleAxisTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(MeanKeepDimsQuantisedSymm16, MeanKeepDimsTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(MeanMultipleDimsQuantisedSymm16, MeanMultipleDimsTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(MeanVts1QuantisedSymm16, MeanVts1Test<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(MeanVts2QuantisedSymm16, MeanVts2Test<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(MeanVts3QuantisedSymm16, MeanVts3Test<DataType::QSymmS16>)
 
 ARMNN_AUTO_TEST_CASE(AdditionAfterMaxPool, AdditionAfterMaxPoolTest)
 
@@ -1123,15 +1123,15 @@ ARMNN_AUTO_TEST_CASE(ArgMaxChannelSigned32, ArgMaxChannelTest<DataType::Signed32
 ARMNN_AUTO_TEST_CASE(ArgMaxHeightSigned32, ArgMaxHeightTest<DataType::Signed32>)
 ARMNN_AUTO_TEST_CASE(ArgMinWidthSigned32, ArgMinWidthTest<DataType::Signed32>)
 
-ARMNN_AUTO_TEST_CASE(ArgMaxSimpleQuantisedAsymm8, ArgMaxSimpleTest<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(ArgMinSimpleQuantisedAsymm8, ArgMinSimpleTest<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(ArgMinChannelQuantisedAsymm8, ArgMinChannelTest<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(ArgMaxChannelQuantisedAsymm8, ArgMaxChannelTest<DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(ArgMaxSimpleQuantisedAsymm8, ArgMaxSimpleTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(ArgMinSimpleQuantisedAsymm8, ArgMinSimpleTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(ArgMinChannelQuantisedAsymm8, ArgMinChannelTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(ArgMaxChannelQuantisedAsymm8, ArgMaxChannelTest<DataType::QAsymmU8>)
 
-ARMNN_AUTO_TEST_CASE(ArgMaxSimpleQuantisedSymm16, ArgMaxSimpleTest<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(ArgMinSimpleQuantisedSymm16, ArgMinSimpleTest<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(ArgMinChannelQuantisedSymm16, ArgMinChannelTest<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(ArgMaxChannelQuantisedSymm16, ArgMaxChannelTest<DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(ArgMaxSimpleQuantisedSymm16, ArgMaxSimpleTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(ArgMinSimpleQuantisedSymm16, ArgMinSimpleTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(ArgMinChannelQuantisedSymm16, ArgMinChannelTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(ArgMaxChannelQuantisedSymm16, ArgMaxChannelTest<DataType::QSymmS16>)
 
 // Space To Batch Nd
 ARMNN_AUTO_TEST_CASE(SpaceToBatchNdSimpleFloat32, SpaceToBatchNdSimpleFloat32Test)
@@ -1191,21 +1191,21 @@ ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcFloat16_5, BatchToSpaceNdNhwcTest5<DataTy
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcFloat16_6, BatchToSpaceNdNhwcTest6<DataType::Float16>)
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcFloat16_7, BatchToSpaceNdNhwcTest7<DataType::Float16>)
 
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint1,  BatchToSpaceNdNhwcTest1<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint2,  BatchToSpaceNdNhwcTest2<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint3,  BatchToSpaceNdNhwcTest3<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint4,  BatchToSpaceNdNhwcTest4<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint5,  BatchToSpaceNdNhwcTest5<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint6,  BatchToSpaceNdNhwcTest6<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint7,  BatchToSpaceNdNhwcTest7<DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint1,  BatchToSpaceNdNhwcTest1<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint2,  BatchToSpaceNdNhwcTest2<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint3,  BatchToSpaceNdNhwcTest3<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint4,  BatchToSpaceNdNhwcTest4<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint5,  BatchToSpaceNdNhwcTest5<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint6,  BatchToSpaceNdNhwcTest6<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint7,  BatchToSpaceNdNhwcTest7<DataType::QAsymmU8>)
 
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_1,  BatchToSpaceNdNhwcTest1<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_2,  BatchToSpaceNdNhwcTest2<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_3,  BatchToSpaceNdNhwcTest3<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_4,  BatchToSpaceNdNhwcTest4<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_5,  BatchToSpaceNdNhwcTest5<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_6,  BatchToSpaceNdNhwcTest6<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_7,  BatchToSpaceNdNhwcTest7<DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_1,  BatchToSpaceNdNhwcTest1<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_2,  BatchToSpaceNdNhwcTest2<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_3,  BatchToSpaceNdNhwcTest3<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_4,  BatchToSpaceNdNhwcTest4<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_5,  BatchToSpaceNdNhwcTest5<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_6,  BatchToSpaceNdNhwcTest6<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_7,  BatchToSpaceNdNhwcTest7<DataType::QSymmS16>)
 
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwFloat16_1, BatchToSpaceNdNchwTest1<DataType::Float16>)
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwFloat16_2, BatchToSpaceNdNchwTest2<DataType::Float16>)
@@ -1215,21 +1215,21 @@ ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwFloat16_5, BatchToSpaceNdNchwTest5<DataTy
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwFloat16_6, BatchToSpaceNdNchwTest6<DataType::Float16>)
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwFloat16_7, BatchToSpaceNdNchwTest7<DataType::Float16>)
 
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint1,  BatchToSpaceNdNchwTest1<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint2,  BatchToSpaceNdNchwTest2<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint3,  BatchToSpaceNdNchwTest3<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint4,  BatchToSpaceNdNchwTest4<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint5,  BatchToSpaceNdNchwTest5<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint6,  BatchToSpaceNdNchwTest6<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint7,  BatchToSpaceNdNchwTest7<DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint1,  BatchToSpaceNdNchwTest1<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint2,  BatchToSpaceNdNchwTest2<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint3,  BatchToSpaceNdNchwTest3<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint4,  BatchToSpaceNdNchwTest4<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint5,  BatchToSpaceNdNchwTest5<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint6,  BatchToSpaceNdNchwTest6<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint7,  BatchToSpaceNdNchwTest7<DataType::QAsymmU8>)
 
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_1,  BatchToSpaceNdNchwTest1<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_2,  BatchToSpaceNdNchwTest2<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_3,  BatchToSpaceNdNchwTest3<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_4,  BatchToSpaceNdNchwTest4<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_5,  BatchToSpaceNdNchwTest5<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_6,  BatchToSpaceNdNchwTest6<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_7,  BatchToSpaceNdNchwTest7<DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_1,  BatchToSpaceNdNchwTest1<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_2,  BatchToSpaceNdNchwTest2<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_3,  BatchToSpaceNdNchwTest3<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_4,  BatchToSpaceNdNchwTest4<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_5,  BatchToSpaceNdNchwTest5<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_6,  BatchToSpaceNdNchwTest6<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_7,  BatchToSpaceNdNchwTest7<DataType::QSymmS16>)
 
 // DepthToSpace
 ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwFloat32_1, DepthToSpaceTest1<DataType::Float32>, DataLayout::NCHW);
@@ -1242,15 +1242,15 @@ ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwFloat16_2, DepthToSpaceTest2<DataType::Floa
 ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwFloat16_3, DepthToSpaceTest3<DataType::Float16>, DataLayout::NCHW);
 ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwFloat16_4, DepthToSpaceTest4<DataType::Float16>, DataLayout::NCHW);
 
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwUint8_1, DepthToSpaceTest1<DataType::QuantisedAsymm8>, DataLayout::NCHW);
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwUint8_2, DepthToSpaceTest2<DataType::QuantisedAsymm8>, DataLayout::NCHW);
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwUint8_3, DepthToSpaceTest3<DataType::QuantisedAsymm8>, DataLayout::NCHW);
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwUint8_4, DepthToSpaceTest4<DataType::QuantisedAsymm8>, DataLayout::NCHW);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwUint8_1, DepthToSpaceTest1<DataType::QAsymmU8>, DataLayout::NCHW);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwUint8_2, DepthToSpaceTest2<DataType::QAsymmU8>, DataLayout::NCHW);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwUint8_3, DepthToSpaceTest3<DataType::QAsymmU8>, DataLayout::NCHW);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwUint8_4, DepthToSpaceTest4<DataType::QAsymmU8>, DataLayout::NCHW);
 
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwInt16_1, DepthToSpaceTest1<DataType::QuantisedSymm16>, DataLayout::NCHW);
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwInt16_2, DepthToSpaceTest2<DataType::QuantisedSymm16>, DataLayout::NCHW);
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwInt16_3, DepthToSpaceTest3<DataType::QuantisedSymm16>, DataLayout::NCHW);
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwInt16_4, DepthToSpaceTest4<DataType::QuantisedSymm16>, DataLayout::NCHW);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwInt16_1, DepthToSpaceTest1<DataType::QSymmS16>, DataLayout::NCHW);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwInt16_2, DepthToSpaceTest2<DataType::QSymmS16>, DataLayout::NCHW);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwInt16_3, DepthToSpaceTest3<DataType::QSymmS16>, DataLayout::NCHW);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNchwInt16_4, DepthToSpaceTest4<DataType::QSymmS16>, DataLayout::NCHW);
 
 ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcFloat32_1, DepthToSpaceTest1<DataType::Float32>, DataLayout::NHWC);
 ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcFloat32_2, DepthToSpaceTest2<DataType::Float32>, DataLayout::NHWC);
@@ -1262,15 +1262,15 @@ ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcFloat16_2, DepthToSpaceTest2<DataType::Floa
 ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcFloat16_3, DepthToSpaceTest3<DataType::Float16>, DataLayout::NHWC);
 ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcFloat16_4, DepthToSpaceTest4<DataType::Float16>, DataLayout::NHWC);
 
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcUint8_1, DepthToSpaceTest1<DataType::QuantisedAsymm8>, DataLayout::NHWC);
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcUint8_2, DepthToSpaceTest2<DataType::QuantisedAsymm8>, DataLayout::NHWC);
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcUint8_3, DepthToSpaceTest3<DataType::QuantisedAsymm8>, DataLayout::NHWC);
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcUint8_4, DepthToSpaceTest4<DataType::QuantisedAsymm8>, DataLayout::NHWC);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcUint8_1, DepthToSpaceTest1<DataType::QAsymmU8>, DataLayout::NHWC);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcUint8_2, DepthToSpaceTest2<DataType::QAsymmU8>, DataLayout::NHWC);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcUint8_3, DepthToSpaceTest3<DataType::QAsymmU8>, DataLayout::NHWC);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcUint8_4, DepthToSpaceTest4<DataType::QAsymmU8>, DataLayout::NHWC);
 
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcInt16_1, DepthToSpaceTest1<DataType::QuantisedSymm16>, DataLayout::NHWC);
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcInt16_2, DepthToSpaceTest2<DataType::QuantisedSymm16>, DataLayout::NHWC);
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcInt16_3, DepthToSpaceTest3<DataType::QuantisedSymm16>, DataLayout::NHWC);
-ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcInt16_4, DepthToSpaceTest4<DataType::QuantisedSymm16>, DataLayout::NHWC);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcInt16_1, DepthToSpaceTest1<DataType::QSymmS16>, DataLayout::NHWC);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcInt16_2, DepthToSpaceTest2<DataType::QSymmS16>, DataLayout::NHWC);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcInt16_3, DepthToSpaceTest3<DataType::QSymmS16>, DataLayout::NHWC);
+ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcInt16_4, DepthToSpaceTest4<DataType::QSymmS16>, DataLayout::NHWC);
 
 // SpaceToDepth
 ARMNN_AUTO_TEST_CASE(SpaceToDepthNchwAsymmQ8, SpaceToDepthNchwAsymmQ8Test)
@@ -1381,10 +1381,10 @@ ARMNN_AUTO_TEST_CASE(Abs3d, Abs3dTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(AbsZero, AbsZeroTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(Abs2dFloat16, Abs2dTest<DataType::Float16>)
 ARMNN_AUTO_TEST_CASE(Abs3dFloat16, Abs3dTest<DataType::Float16>)
-ARMNN_AUTO_TEST_CASE(Abs2dQuantisedAsymm8, Abs2dTest<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(Abs3dQuantisedAsymm8, Abs3dTest<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(Abs2dQuantisedSymm16, Abs2dTest<DataType::QuantisedSymm16>)
-ARMNN_AUTO_TEST_CASE(Abs3dQuantisedSymm16, Abs3dTest<DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(Abs2dQuantisedAsymm8, Abs2dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(Abs3dQuantisedAsymm8, Abs3dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(Abs2dQuantisedSymm16, Abs2dTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(Abs3dQuantisedSymm16, Abs3dTest<DataType::QSymmS16>)
 
 // Detection PostProcess
 BOOST_AUTO_TEST_CASE(DetectionPostProcessRegularNmsFloat)
@@ -1398,22 +1398,22 @@ BOOST_AUTO_TEST_CASE(DetectionPostProcessFastNmsFloat)
 BOOST_AUTO_TEST_CASE(DetectionPostProcessRegularNmsUint8)
 {
     DetectionPostProcessRegularNmsQuantizedTest<
-        RefWorkloadFactory, DataType::QuantisedAsymm8>();
+        RefWorkloadFactory, DataType::QAsymmU8>();
 }
 BOOST_AUTO_TEST_CASE(DetectionPostProcessFastNmsUint8)
 {
     DetectionPostProcessRegularNmsQuantizedTest<
-        RefWorkloadFactory, DataType::QuantisedAsymm8>();
+        RefWorkloadFactory, DataType::QAsymmU8>();
 }
 BOOST_AUTO_TEST_CASE(DetectionPostProcessRegularNmsInt16)
 {
     DetectionPostProcessRegularNmsQuantizedTest<
-        RefWorkloadFactory, DataType::QuantisedSymm16>();
+        RefWorkloadFactory, DataType::QSymmS16>();
 }
 BOOST_AUTO_TEST_CASE(DetectionPostProcessFastNmsInt16)
 {
     DetectionPostProcessFastNmsQuantizedTest<
-        RefWorkloadFactory, DataType::QuantisedSymm16>();
+        RefWorkloadFactory, DataType::QSymmS16>();
 }
 
 // Dequantize
@@ -1434,8 +1434,8 @@ ARMNN_AUTO_TEST_CASE(QuantizeClampInt16, QuantizeClampInt16Test)
 // PReLU
 ARMNN_AUTO_TEST_CASE(PreluFloat32, PreluTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(PreluFloat16, PreluTest<DataType::Float16>)
-ARMNN_AUTO_TEST_CASE(PreluUint8,   PreluTest<DataType::QuantisedAsymm8>)
-ARMNN_AUTO_TEST_CASE(PreluInt16,   PreluTest<DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(PreluUint8,   PreluTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(PreluInt16,   PreluTest<DataType::QSymmS16>)
 
 // Slice
 ARMNN_AUTO_TEST_CASE(Slice4dFloat32, Slice4dFloat32Test)
@@ -1463,19 +1463,19 @@ ARMNN_AUTO_TEST_CASE(SimpleTransposeConvolution2dFloatNhwc,
                      true,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(SimpleTransposeConvolution2dUint8Nchw,
-                     SimpleTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     SimpleTransposeConvolution2dTest<DataType::QAsymmU8, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(SimpleTransposeConvolution2dUint8Nhwc,
-                     SimpleTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     SimpleTransposeConvolution2dTest<DataType::QAsymmU8, DataType::Signed32>,
                      true,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(SimpleTransposeConvolution2dInt16Nchw,
-                     SimpleTransposeConvolution2dTest<DataType::QuantisedSymm16, DataType::Signed32>,
+                     SimpleTransposeConvolution2dTest<DataType::QSymmS16, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(SimpleTransposeConvolution2dInt16Nhwc,
-                     SimpleTransposeConvolution2dTest<DataType::QuantisedSymm16, DataType::Signed32>,
+                     SimpleTransposeConvolution2dTest<DataType::QSymmS16, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 
@@ -1488,19 +1488,19 @@ ARMNN_AUTO_TEST_CASE(UnbiasedSimpleTransposeConvolution2dFloatNhwc,
                      true,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(UnbiasedSimpleTransposeConvolution2dUint8Nchw,
-                     SimpleTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     SimpleTransposeConvolution2dTest<DataType::QAsymmU8, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(UnbiasedSimpleTransposeConvolution2dUint8Nhwc,
-                     SimpleTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     SimpleTransposeConvolution2dTest<DataType::QAsymmU8, DataType::Signed32>,
                      true,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(UnbiasedSimpleTransposeConvolution2dInt16Nchw,
-                     SimpleTransposeConvolution2dTest<DataType::QuantisedSymm16, DataType::Signed32>,
+                     SimpleTransposeConvolution2dTest<DataType::QSymmS16, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(UnbiasedSimpleTransposeConvolution2dInt16Nhwc,
-                     SimpleTransposeConvolution2dTest<DataType::QuantisedSymm16, DataType::Signed32>,
+                     SimpleTransposeConvolution2dTest<DataType::QSymmS16, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 
@@ -1513,19 +1513,19 @@ ARMNN_AUTO_TEST_CASE(PaddedTransposeConvolution2dFloatNhwc,
                      true,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(PaddedTransposeConvolution2dUint8Nchw,
-                     PaddedTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     PaddedTransposeConvolution2dTest<DataType::QAsymmU8, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(PaddedTransposeConvolution2dUint8Nhwc,
-                     PaddedTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     PaddedTransposeConvolution2dTest<DataType::QAsymmU8, DataType::Signed32>,
                      true,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(PaddedTransposeConvolution2dInt16Nchw,
-                     PaddedTransposeConvolution2dTest<DataType::QuantisedSymm16, DataType::Signed32>,
+                     PaddedTransposeConvolution2dTest<DataType::QSymmS16, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(PaddedTransposeConvolution2dInt16Nhwc,
-                     PaddedTransposeConvolution2dTest<DataType::QuantisedSymm16, DataType::Signed32>,
+                     PaddedTransposeConvolution2dTest<DataType::QSymmS16, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 
@@ -1538,19 +1538,19 @@ ARMNN_AUTO_TEST_CASE(UnbiasedPaddedTransposeConvolution2dFloatNhwc,
                      true,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(UnbiasedPaddedTransposeConvolution2dUint8Nchw,
-                     PaddedTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     PaddedTransposeConvolution2dTest<DataType::QAsymmU8, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(UnbiasedPaddedTransposeConvolution2dUint8Nhwc,
-                     PaddedTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     PaddedTransposeConvolution2dTest<DataType::QAsymmU8, DataType::Signed32>,
                      true,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(UnbiasedPaddedTransposeConvolution2dInt16Nchw,
-                     PaddedTransposeConvolution2dTest<DataType::QuantisedSymm16, DataType::Signed32>,
+                     PaddedTransposeConvolution2dTest<DataType::QSymmS16, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(UnbiasedPaddedTransposeConvolution2dInt16Nhwc,
-                     PaddedTransposeConvolution2dTest<DataType::QuantisedSymm16, DataType::Signed32>,
+                     PaddedTransposeConvolution2dTest<DataType::QSymmS16, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 
@@ -1563,19 +1563,19 @@ ARMNN_AUTO_TEST_CASE(StridedTransposeConvolution2dFloatNhwc,
                      true,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(StridedTransposeConvolution2dUint8Nchw,
-                     StridedTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     StridedTransposeConvolution2dTest<DataType::QAsymmU8, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(StridedTransposeConvolution2dUint8Nhwc,
-                     StridedTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     StridedTransposeConvolution2dTest<DataType::QAsymmU8, DataType::Signed32>,
                      true,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(StridedTransposeConvolution2dInt16Nchw,
-                     StridedTransposeConvolution2dTest<DataType::QuantisedSymm16, DataType::Signed32>,
+                     StridedTransposeConvolution2dTest<DataType::QSymmS16, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(StridedTransposeConvolution2dInt16Nhwc,
-                     StridedTransposeConvolution2dTest<DataType::QuantisedSymm16, DataType::Signed32>,
+                     StridedTransposeConvolution2dTest<DataType::QSymmS16, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 
@@ -1588,19 +1588,19 @@ ARMNN_AUTO_TEST_CASE(UnbiasedStridedTransposeConvolution2dFloatNhwc,
                      true,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(UnbiasedStridedTransposeConvolution2dUint8Nchw,
-                     StridedTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     StridedTransposeConvolution2dTest<DataType::QAsymmU8, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(UnbiasedStridedTransposeConvolution2dUint8Nhwc,
-                     StridedTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     StridedTransposeConvolution2dTest<DataType::QAsymmU8, DataType::Signed32>,
                      true,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(UnbiasedStridedTransposeConvolution2dInt16Nchw,
-                     StridedTransposeConvolution2dTest<DataType::QuantisedSymm16, DataType::Signed32>,
+                     StridedTransposeConvolution2dTest<DataType::QSymmS16, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(UnbiasedStridedTransposeConvolution2dInt16Nhwc,
-                     StridedTransposeConvolution2dTest<DataType::QuantisedSymm16, DataType::Signed32>,
+                     StridedTransposeConvolution2dTest<DataType::QSymmS16, DataType::Signed32>,
                      true,
                      DataLayout::NCHW)
 
@@ -1611,16 +1611,16 @@ ARMNN_AUTO_TEST_CASE(MultiChannelTransposeConvolution2dFloatNhwc,
                      MultiChannelTransposeConvolution2dTest<DataType::Float32, DataType::Float32>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(MultiChannelTransposeConvolution2dUint8Nchw,
-                     MultiChannelTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     MultiChannelTransposeConvolution2dTest<DataType::QAsymmU8, DataType::Signed32>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(MultiChannelTransposeConvolution2dUint8Nhwc,
-                     MultiChannelTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     MultiChannelTransposeConvolution2dTest<DataType::QAsymmU8, DataType::Signed32>,
                      DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(MultiChannelTransposeConvolution2dInt16Nchw,
-                     MultiChannelTransposeConvolution2dTest<DataType::QuantisedSymm16, DataType::Signed32>,
+                     MultiChannelTransposeConvolution2dTest<DataType::QSymmS16, DataType::Signed32>,
                      DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(MultiChannelTransposeConvolution2dInt16Nhwc,
-                     MultiChannelTransposeConvolution2dTest<DataType::QuantisedSymm16, DataType::Signed32>,
+                     MultiChannelTransposeConvolution2dTest<DataType::QSymmS16, DataType::Signed32>,
                      DataLayout::NCHW)
 
 ARMNN_AUTO_TEST_CASE(TransposeConvolution2dPerAxisQuantTestNchw,

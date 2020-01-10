@@ -145,7 +145,7 @@ struct SimpleMultiplicationFixture2 : MultiplicationFixture
 
 BOOST_FIXTURE_TEST_CASE(MultiplicationQuantisedAsymm8, SimpleMultiplicationFixture)
 {
-  RunTest<2, armnn::DataType::QuantisedAsymm8>(
+  RunTest<2, armnn::DataType::QAsymmU8>(
       0,
       {{"InputLayer1", { 0, 1, 2, 3 }},
       {"InputLayer2", { 4, 5, 6, 7 }}},

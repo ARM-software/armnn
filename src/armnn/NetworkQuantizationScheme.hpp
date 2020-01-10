@@ -58,7 +58,7 @@ struct QAsymm8QuantizationScheme : IQuantizationScheme
 
     int NumBits() const override { return 8; }
 
-    DataType GetDataType() const override { return DataType::QuantisedAsymm8; }
+    DataType GetDataType() const override { return DataType::QAsymmU8; }
 };
 
 struct QSymmS8QuantizationScheme : IQuantizationScheme
@@ -119,7 +119,7 @@ struct QSymm16QuantizationScheme : IQuantizationScheme
 
     int NumBits() const override { return 16; }
 
-    DataType GetDataType() const override { return DataType::QuantisedSymm16; }
+    DataType GetDataType() const override { return DataType::QSymmS16; }
 };
 
 } // namespace armnn

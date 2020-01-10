@@ -225,7 +225,7 @@ public:
         }
         else if (m_OutputType == "qasymm8")
         {
-            return armnn::DataType::QuantisedAsymm8;
+            return armnn::DataType::QAsymmU8;
         }
         else
         {
@@ -272,7 +272,7 @@ int main(int argc, char* argv[])
                 imageDataContainers.push_back(PrepareImageTensor<int>(
                     imagePath, newWidth, newHeight, normParams, batchSize, outputLayout));
                 break;
-            case armnn::DataType::QuantisedAsymm8:
+            case armnn::DataType::QAsymmU8:
                 imageDataContainers.push_back(PrepareImageTensor<uint8_t>(
                     imagePath, newWidth, newHeight, normParams, batchSize, outputLayout));
                 break;

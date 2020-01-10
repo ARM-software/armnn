@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_SUITE(Utils)
 BOOST_AUTO_TEST_CASE(DataTypeSize)
 {
     BOOST_TEST(armnn::GetDataTypeSize(armnn::DataType::Float32) == 4);
-    BOOST_TEST(armnn::GetDataTypeSize(armnn::DataType::QuantisedAsymm8) == 1);
+    BOOST_TEST(armnn::GetDataTypeSize(armnn::DataType::QAsymmU8) == 1);
     BOOST_TEST(armnn::GetDataTypeSize(armnn::DataType::Signed32) == 4);
     BOOST_TEST(armnn::GetDataTypeSize(armnn::DataType::Boolean) == 1);
 }

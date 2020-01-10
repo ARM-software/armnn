@@ -85,7 +85,7 @@ struct SqueezeFixtureWithSqueezeDims : SqueezeFixture
 BOOST_FIXTURE_TEST_CASE(ParseSqueezeWithSqueezeDims, SqueezeFixtureWithSqueezeDims)
 {
     SetupSingleInputSingleOutput("inputTensor", "outputTensor");
-    RunTest<3, armnn::DataType::QuantisedAsymm8>(0, { 1, 2, 3, 4 }, { 1, 2, 3, 4 });
+    RunTest<3, armnn::DataType::QAsymmU8>(0, { 1, 2, 3, 4 }, { 1, 2, 3, 4 });
     BOOST_TEST((m_Parser->GetNetworkOutputBindingInfo(0, "outputTensor").second.GetShape()
         == armnn::TensorShape({2,2,1})));
 
@@ -99,7 +99,7 @@ struct SqueezeFixtureWithoutSqueezeDims : SqueezeFixture
 BOOST_FIXTURE_TEST_CASE(ParseSqueezeWithoutSqueezeDims, SqueezeFixtureWithoutSqueezeDims)
 {
     SetupSingleInputSingleOutput("inputTensor", "outputTensor");
-    RunTest<2, armnn::DataType::QuantisedAsymm8>(0, { 1, 2, 3, 4 }, { 1, 2, 3, 4 });
+    RunTest<2, armnn::DataType::QAsymmU8>(0, { 1, 2, 3, 4 }, { 1, 2, 3, 4 });
     BOOST_TEST((m_Parser->GetNetworkOutputBindingInfo(0, "outputTensor").second.GetShape()
         == armnn::TensorShape({2,2})));
 }

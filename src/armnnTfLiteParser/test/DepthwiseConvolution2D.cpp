@@ -133,7 +133,7 @@ struct DepthwiseConvolution2dSameFixture : DepthwiseConvolution2dFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DSame, DepthwiseConvolution2dSameFixture)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+    RunTest<4, armnn::DataType::QAsymmU8>(
         0,
         { 0, 1, 2,
           3, 4, 5,
@@ -160,7 +160,7 @@ struct DepthwiseConvolution2dValidFixture : DepthwiseConvolution2dFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DValid, DepthwiseConvolution2dValidFixture)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+    RunTest<4, armnn::DataType::QAsymmU8>(
         0,
         { 0, 1, 2,
           3, 4, 5,
@@ -185,7 +185,7 @@ struct DepthwiseConvolution2dSameBiasFixture : DepthwiseConvolution2dFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DSameBias, DepthwiseConvolution2dSameBiasFixture)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+    RunTest<4, armnn::DataType::QAsymmU8>(
         0,
         { 0, 1, 2,
           3, 4, 5,

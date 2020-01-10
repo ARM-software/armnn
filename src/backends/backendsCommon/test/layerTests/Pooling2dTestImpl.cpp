@@ -1366,7 +1366,7 @@ LayerTestResult<uint8_t, 4> SimpleMaxPooling2dSize2x2Stride2x2Uint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool forceNoPadding)
 {
-    return SimpleMaxPooling2dSize2x2Stride2x2TestCommon<armnn::DataType::QuantisedAsymm8>(
+    return SimpleMaxPooling2dSize2x2Stride2x2TestCommon<armnn::DataType::QAsymmU8>(
         workloadFactory, memoryManager, forceNoPadding, 3.0f, -5);
 }
 
@@ -1375,7 +1375,7 @@ LayerTestResult<int16_t, 4> SimpleMaxPooling2dSize2x2Stride2x2Int16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool forceNoPadding)
 {
-    return SimpleMaxPooling2dSize2x2Stride2x2TestCommon<armnn::DataType::QuantisedSymm16>(
+    return SimpleMaxPooling2dSize2x2Stride2x2TestCommon<armnn::DataType::QSymmS16>(
             workloadFactory, memoryManager, forceNoPadding);
 }
 
@@ -1393,7 +1393,7 @@ LayerTestResult<uint8_t, 4> SimpleMaxPooling2dSize3x3Stride2x4Uint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool forceNoPadding)
 {
-    return SimpleMaxPooling2dSize3x3Stride2x4TestCommon<armnn::DataType::QuantisedAsymm8>(
+    return SimpleMaxPooling2dSize3x3Stride2x4TestCommon<armnn::DataType::QAsymmU8>(
         workloadFactory, memoryManager, forceNoPadding, 0.1f, 128);
 }
 
@@ -1402,7 +1402,7 @@ LayerTestResult<int16_t, 4> SimpleMaxPooling2dSize3x3Stride2x4Int16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool forceNoPadding)
 {
-    return SimpleMaxPooling2dSize3x3Stride2x4TestCommon<armnn::DataType::QuantisedSymm16>(
+    return SimpleMaxPooling2dSize3x3Stride2x4TestCommon<armnn::DataType::QSymmS16>(
             workloadFactory, memoryManager, forceNoPadding);
 }
 
@@ -1419,7 +1419,7 @@ LayerTestResult<uint8_t, 4> SimpleMaxPooling2dUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout)
 {
-    return SimpleMaxPooling2dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, dataLayout);
+    return SimpleMaxPooling2dTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, dataLayout);
 }
 
 LayerTestResult<int16_t, 4> SimpleMaxPooling2dInt16Test(
@@ -1427,7 +1427,7 @@ LayerTestResult<int16_t, 4> SimpleMaxPooling2dInt16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout)
 {
-    return SimpleMaxPooling2dTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, dataLayout);
+    return SimpleMaxPooling2dTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, dataLayout);
 }
 LayerTestResult<float, 4> IgnorePaddingSimpleMaxPooling2dTest(
     armnn::IWorkloadFactory& workloadFactory,
@@ -1440,7 +1440,7 @@ LayerTestResult<uint8_t, 4> IgnorePaddingSimpleMaxPooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleMaxPooling2dTestCommon<armnn::DataType::QuantisedAsymm8>(
+    return IgnorePaddingSimpleMaxPooling2dTestCommon<armnn::DataType::QAsymmU8>(
             workloadFactory, memoryManager, 1.0f, -5);
 }
 
@@ -1448,7 +1448,7 @@ LayerTestResult<int16_t, 4> IgnorePaddingSimpleMaxPooling2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleMaxPooling2dTestCommon<armnn::DataType::QuantisedSymm16>(
+    return IgnorePaddingSimpleMaxPooling2dTestCommon<armnn::DataType::QSymmS16>(
             workloadFactory, memoryManager);
 }
 
@@ -1463,7 +1463,7 @@ LayerTestResult<uint8_t, 4> IgnorePaddingMaxPooling2dSize3Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingMaxPooling2dSize3TestCommon<armnn::DataType::QuantisedAsymm8>(
+    return IgnorePaddingMaxPooling2dSize3TestCommon<armnn::DataType::QAsymmU8>(
             workloadFactory, memoryManager, 1.0f, -5);
 }
 
@@ -1471,7 +1471,7 @@ LayerTestResult<int16_t, 4> IgnorePaddingMaxPooling2dSize3Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingMaxPooling2dSize3TestCommon<armnn::DataType::QuantisedSymm16>(
+    return IgnorePaddingMaxPooling2dSize3TestCommon<armnn::DataType::QSymmS16>(
             workloadFactory, memoryManager);
 }
 
@@ -1488,7 +1488,7 @@ LayerTestResult<uint8_t, 4> SimpleAveragePooling2dUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout)
 {
-    return SimpleAveragePooling2dTestCommon<armnn::DataType::QuantisedAsymm8>(
+    return SimpleAveragePooling2dTestCommon<armnn::DataType::QAsymmU8>(
         workloadFactory, memoryManager, dataLayout, 0.5, -1);
 }
 
@@ -1497,7 +1497,7 @@ LayerTestResult<int16_t, 4> SimpleAveragePooling2dInt16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout)
 {
-    return SimpleAveragePooling2dTestCommon<armnn::DataType::QuantisedSymm16>(
+    return SimpleAveragePooling2dTestCommon<armnn::DataType::QSymmS16>(
             workloadFactory, memoryManager, dataLayout);
 }
 
@@ -1521,7 +1521,7 @@ LayerTestResult<uint8_t, 4> LargeTensorsAveragePooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return LargeTensorsAveragePooling2dTestCommon<armnn::DataType::QuantisedAsymm8>(
+    return LargeTensorsAveragePooling2dTestCommon<armnn::DataType::QAsymmU8>(
         workloadFactory, memoryManager, 0.5, -1);
 }
 
@@ -1529,7 +1529,7 @@ LayerTestResult<int16_t, 4> LargeTensorsAveragePooling2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return LargeTensorsAveragePooling2dTestCommon<armnn::DataType::QuantisedSymm16>(
+    return LargeTensorsAveragePooling2dTestCommon<armnn::DataType::QSymmS16>(
             workloadFactory, memoryManager);
 }
 LayerTestResult<float, 4> IgnorePaddingSimpleAveragePooling2dTest(
@@ -1543,7 +1543,7 @@ LayerTestResult<uint8_t, 4> IgnorePaddingSimpleAveragePooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleAveragePooling2dTestCommon<armnn::DataType::QuantisedAsymm8>(
+    return IgnorePaddingSimpleAveragePooling2dTestCommon<armnn::DataType::QAsymmU8>(
             workloadFactory, memoryManager);
 }
 
@@ -1551,7 +1551,7 @@ LayerTestResult<int16_t, 4> IgnorePaddingSimpleAveragePooling2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleAveragePooling2dTestCommon<armnn::DataType::QuantisedSymm16>(
+    return IgnorePaddingSimpleAveragePooling2dTestCommon<armnn::DataType::QSymmS16>(
             workloadFactory, memoryManager);
 }
 
@@ -1567,7 +1567,7 @@ LayerTestResult<uint8_t, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingUint8Tes
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon<armnn::DataType::QuantisedAsymm8>(
+    return IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon<armnn::DataType::QAsymmU8>(
             workloadFactory, memoryManager);
 }
 
@@ -1575,7 +1575,7 @@ LayerTestResult<int16_t, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingInt16Tes
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon<armnn::DataType::QuantisedSymm16>(
+    return IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon<armnn::DataType::QSymmS16>(
             workloadFactory, memoryManager);
 }
 
@@ -1590,7 +1590,7 @@ LayerTestResult<uint8_t, 4> IgnorePaddingAveragePooling2dSize3Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingAveragePooling2dSize3TestCommon<armnn::DataType::QuantisedAsymm8>(
+    return IgnorePaddingAveragePooling2dSize3TestCommon<armnn::DataType::QAsymmU8>(
             workloadFactory, memoryManager);
 }
 
@@ -1598,7 +1598,7 @@ LayerTestResult<int16_t, 4> IgnorePaddingAveragePooling2dSize3Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingAveragePooling2dSize3TestCommon<armnn::DataType::QuantisedSymm16>(
+    return IgnorePaddingAveragePooling2dSize3TestCommon<armnn::DataType::QSymmS16>(
             workloadFactory, memoryManager);
 }
 
@@ -1615,7 +1615,7 @@ LayerTestResult<uint8_t, 4> SimpleL2Pooling2dUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout)
 {
-    return SimpleL2Pooling2dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, dataLayout);
+    return SimpleL2Pooling2dTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, dataLayout);
 }
 
 LayerTestResult<int16_t, 4> SimpleL2Pooling2dInt16Test(
@@ -1623,7 +1623,7 @@ LayerTestResult<int16_t, 4> SimpleL2Pooling2dInt16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout)
 {
-    return SimpleL2Pooling2dTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, dataLayout);
+    return SimpleL2Pooling2dTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, dataLayout);
 }
 
 LayerTestResult<float, 4> L2Pooling2dSize3Stride1Test(
@@ -1637,14 +1637,14 @@ LayerTestResult<uint8_t, 4> L2Pooling2dSize3Stride1Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize3Stride1TestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return L2Pooling2dSize3Stride1TestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> L2Pooling2dSize3Stride1Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize3Stride1TestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return L2Pooling2dSize3Stride1TestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<float, 4> L2Pooling2dSize3Stride3Test(
@@ -1658,14 +1658,14 @@ LayerTestResult<uint8_t, 4> L2Pooling2dSize3Stride3Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize3Stride3TestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return L2Pooling2dSize3Stride3TestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> L2Pooling2dSize3Stride3Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize3Stride3TestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return L2Pooling2dSize3Stride3TestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 LayerTestResult<float, 4> L2Pooling2dSize3Stride4Test(
     armnn::IWorkloadFactory& workloadFactory,
@@ -1678,14 +1678,14 @@ LayerTestResult<uint8_t, 4> L2Pooling2dSize3Stride4Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize3Stride4TestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return L2Pooling2dSize3Stride4TestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> L2Pooling2dSize3Stride4Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize3Stride4TestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return L2Pooling2dSize3Stride4TestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<float, 4> L2Pooling2dSize7Test(
@@ -1699,14 +1699,14 @@ LayerTestResult<uint8_t, 4> L2Pooling2dSize7Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize7TestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return L2Pooling2dSize7TestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> L2Pooling2dSize7Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize7TestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return L2Pooling2dSize7TestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<float, 4> L2Pooling2dSize9Test(
@@ -1720,14 +1720,14 @@ LayerTestResult<uint8_t, 4> L2Pooling2dSize9Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize9TestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return L2Pooling2dSize9TestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> L2Pooling2dSize9Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize9TestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return L2Pooling2dSize9TestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 LayerTestResult<float, 4> IgnorePaddingSimpleL2Pooling2dTest(
     armnn::IWorkloadFactory& workloadFactory,
@@ -1740,14 +1740,14 @@ LayerTestResult<uint8_t, 4> IgnorePaddingSimpleL2Pooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleL2Pooling2dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return IgnorePaddingSimpleL2Pooling2dTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> IgnorePaddingSimpleL2Pooling2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleL2Pooling2dTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return IgnorePaddingSimpleL2Pooling2dTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<float, 4> IgnorePaddingL2Pooling2dSize3Test(
@@ -1761,14 +1761,14 @@ LayerTestResult<uint8_t, 4> IgnorePaddingL2Pooling2dSize3Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingL2Pooling2dSize3TestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return IgnorePaddingL2Pooling2dSize3TestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> IgnorePaddingL2Pooling2dSize3Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingL2Pooling2dSize3TestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return IgnorePaddingL2Pooling2dSize3TestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<float, 4> AsymmetricNonSquarePooling2dTest(
@@ -1782,14 +1782,14 @@ LayerTestResult<uint8_t, 4> AsymmetricNonSquarePooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return AsymmetricNonSquarePooling2dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return AsymmetricNonSquarePooling2dTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 4> AsymmetricNonSquarePooling2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return AsymmetricNonSquarePooling2dTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return AsymmetricNonSquarePooling2dTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<float, 4> ComparePooling2dTest(
@@ -1808,7 +1808,7 @@ LayerTestResult<uint8_t, 4> ComparePooling2dUint8Test(
     armnn::IWorkloadFactory& refWorkloadFactory,
     armnn::PoolingAlgorithm  poolingType)
 {
-    return ComparePooling2dTestCommon<armnn::DataType::QuantisedAsymm8>(
+    return ComparePooling2dTestCommon<armnn::DataType::QAsymmU8>(
         workloadFactory, memoryManager, refWorkloadFactory, poolingType, 0.1f, 128);
 }
 
@@ -1818,6 +1818,6 @@ LayerTestResult<int16_t, 4> ComparePooling2dInt16Test(
     armnn::IWorkloadFactory& refWorkloadFactory,
     armnn::PoolingAlgorithm  poolingType)
 {
-    return ComparePooling2dTestCommon<armnn::DataType::QuantisedSymm16>(
+    return ComparePooling2dTestCommon<armnn::DataType::QSymmS16>(
             workloadFactory, memoryManager, refWorkloadFactory, poolingType);
 }

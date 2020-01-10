@@ -98,7 +98,7 @@ struct MaxPoolLiteFixtureUint2DOutput : MaxPool2DFixture
 
 BOOST_FIXTURE_TEST_CASE(MaxPoolLiteUint1DOutput, MaxPoolLiteFixtureUint1DOutput)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(0, { 2, 3, 5, 2 }, { 5 });
+    RunTest<4, armnn::DataType::QAsymmU8>(0, { 2, 3, 5, 2 }, { 5 });
 }
 
 BOOST_FIXTURE_TEST_CASE(MaxPoolLiteFloat1DOutput, MaxPoolLiteFixtureFloat1DOutput)
@@ -108,13 +108,13 @@ BOOST_FIXTURE_TEST_CASE(MaxPoolLiteFloat1DOutput, MaxPoolLiteFixtureFloat1DOutpu
 
 BOOST_FIXTURE_TEST_CASE(MaxPoolLiteUint2DOutput, MaxPoolLiteFixtureUint2DOutput)
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+    RunTest<4, armnn::DataType::QAsymmU8>(
         0, { 1, 2, 2, 3, 5, 6, 7, 8, 3, 2, 1, 0, 1, 2, 3, 4 }, { 6, 8, 3, 4 });
 }
 
 BOOST_FIXTURE_TEST_CASE(MaxPoolIncorrectDataTypeError, MaxPoolLiteFixtureFloat1DOutput)
 {
-    BOOST_CHECK_THROW((RunTest<4, armnn::DataType::QuantisedAsymm8>(0, { 2, 3, 5, 2 }, { 5 })), armnn::Exception);
+    BOOST_CHECK_THROW((RunTest<4, armnn::DataType::QAsymmU8>(0, { 2, 3, 5, 2 }, { 5 })), armnn::Exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

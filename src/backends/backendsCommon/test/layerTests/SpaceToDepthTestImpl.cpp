@@ -159,7 +159,7 @@ LayerTestResult<uint8_t, 4> SpaceToDepthNhwcAsymmQ8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToDepthSimpleTest1<armnn::DataType::QuantisedAsymm8>(
+    return SpaceToDepthSimpleTest1<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager);
 }
@@ -168,7 +168,7 @@ LayerTestResult<uint8_t, 4> SpaceToDepthNchwAsymmQ8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToDepthSimpleTest1<armnn::DataType::QuantisedAsymm8>(
+    return SpaceToDepthSimpleTest1<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         armnn::DataLayout::NCHW);
@@ -235,7 +235,7 @@ LayerTestResult<int16_t, 4> SpaceToDepthNhwcQSymm16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToDepthSimpleTest2<armnn::DataType::QuantisedSymm16>(
+    return SpaceToDepthSimpleTest2<armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager);
 }
@@ -244,7 +244,7 @@ LayerTestResult<int16_t, 4> SpaceToDepthNchwQSymm16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToDepthSimpleTest2<armnn::DataType::QuantisedSymm16>(
+    return SpaceToDepthSimpleTest2<armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         armnn::DataLayout::NCHW);

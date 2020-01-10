@@ -23,9 +23,9 @@ arm_compute::DataType GetArmComputeDataType(armnn::DataType dataType)
             return arm_compute::DataType::F16;
         case armnn::DataType::Float32:
             return arm_compute::DataType::F32;
-        case armnn::DataType::QuantisedAsymm8:
+        case armnn::DataType::QAsymmU8:
             return arm_compute::DataType::QASYMM8;
-        case armnn::DataType::QuantisedSymm16:
+        case armnn::DataType::QSymmS16:
             return arm_compute::DataType::QSYMM16;
         case armnn::DataType::QSymmS8:
             return arm_compute::DataType::QSYMM8;

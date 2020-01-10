@@ -432,7 +432,7 @@ LayerTestResult<uint8_t, 4> BatchNormUint8Test(
         2.f, 4.f
     };
 
-    return BatchNormTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return BatchNormTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         inputOutputShape,
@@ -482,7 +482,7 @@ LayerTestResult<uint8_t, 4> BatchNormUint8NhwcTest(
         6.f, 4.f
     };
 
-    return BatchNormTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return BatchNormTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         inputOutputShape, inputValues, expectedOutputValues,
@@ -524,7 +524,7 @@ LayerTestResult<int16_t, 4> BatchNormInt16Test(
         2.f, 4.f
     };
 
-    return BatchNormTestImpl<armnn::DataType::QuantisedSymm16>(
+    return BatchNormTestImpl<armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         inputOutputShape,
@@ -574,7 +574,7 @@ LayerTestResult<int16_t, 4> BatchNormInt16NhwcTest(
         6.f, 4.f
     };
 
-    return BatchNormTestImpl<armnn::DataType::QuantisedSymm16>(
+    return BatchNormTestImpl<armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         inputOutputShape,

@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_CASE(BuildArmComputeTensorInfoTest)
 {
 
     const armnn::TensorShape tensorShape = { 1, 2, 3, 4 };
-    const armnn::DataType dataType = armnn::DataType::QuantisedAsymm8;
+    const armnn::DataType dataType = armnn::DataType::QAsymmU8;
 
     const std::vector<float> quantScales = { 1.5f, 2.5f, 3.5f, 4.5f };
     const float quantScale = quantScales[0];

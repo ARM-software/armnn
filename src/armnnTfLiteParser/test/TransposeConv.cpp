@@ -118,7 +118,7 @@ struct SimpleTransposeConvFixture : TransposeConvFixture
 
 BOOST_FIXTURE_TEST_CASE( ParseSimpleTransposeConv, SimpleTransposeConvFixture )
 {
-    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+    RunTest<4, armnn::DataType::QAsymmU8>(
         0,
         {
             1, 2,

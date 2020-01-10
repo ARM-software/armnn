@@ -309,7 +309,7 @@ armnn::TensorInfo ToTensorInfo(TfLiteParser::TensorRawPtr tensorPtr, const std::
     switch (tensorPtr->type)
     {
         case tflite::TensorType_UINT8:
-            type = armnn::DataType::QuantisedAsymm8;
+            type = armnn::DataType::QAsymmU8;
             break;
         case tflite::TensorType_FLOAT32:
             type = armnn::DataType::Float32;
@@ -318,7 +318,7 @@ armnn::TensorInfo ToTensorInfo(TfLiteParser::TensorRawPtr tensorPtr, const std::
             type = armnn::DataType::QSymmS8;
             break;
         case tflite::TensorType_INT16:
-            type = armnn::DataType::QuantisedSymm16;
+            type = armnn::DataType::QSymmS16;
             break;
         case tflite::TensorType_INT32:
             type = armnn::DataType::Signed32;
@@ -2818,7 +2818,7 @@ TfLiteParser::CreateConstTensor(TensorRawPtr tensorPtr,
                                                         tensorPtr,
                                                         tensorInfo,
                                                         permutationVector);
-        case armnn::DataType::QuantisedAsymm8:
+        case armnn::DataType::QAsymmU8:
             return CreateConstTensorAndStoreData<uint8_t>(bufferPtr,
                                                           tensorPtr,
                                                           tensorInfo,

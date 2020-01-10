@@ -60,7 +60,7 @@ NormalizationParameters GetNormalizationParameters(const SupportedFrontend& mode
                 case armnn::DataType::Signed32:
                     normParams.mean = { 128.0, 128.0, 128.0 };
                     break;
-                case armnn::DataType::QuantisedAsymm8:
+                case armnn::DataType::QAsymmU8:
                 default:
                     break;
             }

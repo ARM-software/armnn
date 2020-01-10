@@ -40,7 +40,7 @@ bool IsSupportedForDataTypeGeneric(Optional<std::string&> reasonIfUnsupported,
             return float16FuncPtr(reasonIfUnsupported, std::forward<Params>(params)...);
         case DataType::Float32:
             return float32FuncPtr(reasonIfUnsupported, std::forward<Params>(params)...);
-        case DataType::QuantisedAsymm8:
+        case DataType::QAsymmU8:
             return uint8FuncPtr(reasonIfUnsupported, std::forward<Params>(params)...);
         case DataType::Signed32:
             return int32FuncPtr(reasonIfUnsupported, std::forward<Params>(params)...);

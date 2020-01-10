@@ -322,7 +322,7 @@ int main(int argc, char* argv[])
                             inputTensorDataLayout));
                         outputDataContainers = { vector<int>(outputNumElements) };
                         break;
-                    case armnn::DataType::QuantisedAsymm8:
+                    case armnn::DataType::QAsymmU8:
                         inputDataContainers.push_back(
                             PrepareImageTensor<uint8_t>(imagePath.string(),
                             inputTensorWidth, inputTensorHeight,

@@ -125,8 +125,8 @@ BOOST_AUTO_TEST_CASE(ModifyTensorInfo)
     TensorInfo info;
     info.SetShape({ 5, 6, 7, 8 });
     BOOST_TEST((info.GetShape() == TensorShape({ 5, 6, 7, 8 })));
-    info.SetDataType(DataType::QuantisedAsymm8);
-    BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
+    info.SetDataType(DataType::QAsymmU8);
+    BOOST_TEST((info.GetDataType() == DataType::QAsymmU8));
     info.SetQuantizationScale(10.0f);
     BOOST_TEST(info.GetQuantizationScale() == 10.0f);
     info.SetQuantizationOffset(5);

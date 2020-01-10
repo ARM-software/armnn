@@ -29,6 +29,6 @@ private:
 };
 
 using ClGreaterFloat32Workload = ClGreaterWorkload<DataType::Float32>;
-using ClGreaterUint8Workload = ClGreaterWorkload<DataType::QuantisedAsymm8>;
+using ClGreaterUint8Workload = ClGreaterWorkload<DataType::QAsymmU8>;
 
 } //namespace armnn

@@ -130,14 +130,14 @@ LayerTestResult<uint8_t, 4> QuantizeSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return QuantizeSimpleTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return QuantizeSimpleTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 4> QuantizeClampUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return QuantizeClampTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return QuantizeClampTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int8_t, 4> QuantizeClampInt8Test(
@@ -151,5 +151,5 @@ LayerTestResult<int16_t, 4> QuantizeClampInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return QuantizeClampTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return QuantizeClampTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
 }

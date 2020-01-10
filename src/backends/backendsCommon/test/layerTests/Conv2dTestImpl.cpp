@@ -1018,13 +1018,13 @@ LayerTestResult<T, 4> Convolution2d3x3DilationTestCommon(
     int32_t qOffset;
     switch (ArmnnType)
     {
-        case armnn::DataType::QuantisedAsymm8:
+        case armnn::DataType::QAsymmU8:
         {
             qScale = 0.1f;
             qOffset = 128;
             break;
         }
-        case armnn::DataType::QuantisedSymm16:
+        case armnn::DataType::QSymmS16:
         {
             qScale = 0.1f;
             qOffset = 0;
@@ -2304,13 +2304,13 @@ LayerTestResult<T, 4> DepthwiseConvolution2d3x3DilationTestCommon(
     int32_t qOffset;
     switch (ArmnnType)
     {
-        case armnn::DataType::QuantisedAsymm8:
+        case armnn::DataType::QAsymmU8:
         {
             qScale = 0.1f;
             qOffset = 128;
             break;
         }
-        case armnn::DataType::QuantisedSymm16:
+        case armnn::DataType::QSymmS16:
         {
             qScale = 0.1f;
             qOffset = 0;
@@ -2800,15 +2800,15 @@ Convolution2d3x3Dilation3x3Test<armnn::DataType::Float32, armnn::DataType::Float
     bool,
     armnn::DataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-Convolution2d3x3Dilation3x3Test<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+Convolution2d3x3Dilation3x3Test<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
     armnn::IWorkloadFactory&,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
     bool,
     armnn::DataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-Convolution2d3x3Dilation3x3Test<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+Convolution2d3x3Dilation3x3Test<armnn::DataType::QSymmS16, armnn::DataType::Signed32>(
     armnn::IWorkloadFactory&,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
     bool,
@@ -2821,15 +2821,15 @@ Convolution2d2x3x3Dilation3x3Test<armnn::DataType::Float32, armnn::DataType::Flo
     bool,
     armnn::DataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-Convolution2d2x3x3Dilation3x3Test<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+Convolution2d2x3x3Dilation3x3Test<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
     armnn::IWorkloadFactory&,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
     bool,
     armnn::DataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-Convolution2d2x3x3Dilation3x3Test<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+Convolution2d2x3x3Dilation3x3Test<armnn::DataType::QSymmS16, armnn::DataType::Signed32>(
     armnn::IWorkloadFactory&,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
     bool,
@@ -2842,15 +2842,15 @@ Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<armnn::DataType::Float32, arm
     bool biasEnabled,
     const armnn::DataLayout layout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
     armnn::IWorkloadFactory &workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr &memoryManager,
     bool biasEnabled,
     const armnn::DataLayout layout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<armnn::DataType::QSymmS16, armnn::DataType::Signed32>(
     armnn::IWorkloadFactory &workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr &memoryManager,
     bool biasEnabled,
@@ -2863,15 +2863,15 @@ DepthwiseConvolution2d3x3Dilation3x3Test<armnn::DataType::Float32, armnn::DataTy
         bool,
         armnn::DataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-DepthwiseConvolution2d3x3Dilation3x3Test<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+DepthwiseConvolution2d3x3Dilation3x3Test<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
         armnn::IWorkloadFactory&,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
         bool,
         armnn::DataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-DepthwiseConvolution2d3x3Dilation3x3Test<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+DepthwiseConvolution2d3x3Dilation3x3Test<armnn::DataType::QSymmS16, armnn::DataType::Signed32>(
         armnn::IWorkloadFactory&,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
         bool,
@@ -2884,15 +2884,15 @@ DepthwiseConvolution2d2x3x3Dilation3x3Test<armnn::DataType::Float32, armnn::Data
         bool,
         armnn::DataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-DepthwiseConvolution2d2x3x3Dilation3x3Test<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+DepthwiseConvolution2d2x3x3Dilation3x3Test<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
         armnn::IWorkloadFactory&,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
         bool,
         armnn::DataLayout);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
-DepthwiseConvolution2d2x3x3Dilation3x3Test<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+DepthwiseConvolution2d2x3x3Dilation3x3Test<armnn::DataType::QSymmS16, armnn::DataType::Signed32>(
         armnn::IWorkloadFactory&,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
         bool,
@@ -2932,7 +2932,7 @@ LayerTestResult<uint8_t, 4> SimpleConvolution2d3x5Uint8Test(
     bool biasEnabled,
     const armnn::DataLayout layout)
 {
-    return SimpleConvolution2d3x5TestCommon<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+    return SimpleConvolution2d3x5TestCommon<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
         workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
 }
 
@@ -2981,7 +2981,7 @@ LayerTestResult<uint8_t, 4> SimpleConvolution2d3x3Uint8Test(
     bool biasEnabled,
     const armnn::DataLayout layout)
 {
-    return SimpleConvolution2d3x3TestCommon<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+    return SimpleConvolution2d3x3TestCommon<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
         workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
 }
 
@@ -2991,7 +2991,7 @@ LayerTestResult<int16_t, 4> SimpleConvolution2d3x5QSymm16Test(
     bool biasEnabled,
     const armnn::DataLayout layout)
 {
-    return SimpleConvolution2d3x5TestCommon<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+    return SimpleConvolution2d3x5TestCommon<armnn::DataType::QSymmS16, armnn::DataType::Signed32>(
         workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
 }
 
@@ -3001,7 +3001,7 @@ LayerTestResult<int16_t, 4> SimpleConvolution2d3x3QSymm16Test(
     bool biasEnabled,
     const armnn::DataLayout layout)
 {
-    return SimpleConvolution2d3x3TestCommon<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+    return SimpleConvolution2d3x3TestCommon<armnn::DataType::QSymmS16, armnn::DataType::Signed32>(
             workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
 }
 
@@ -3038,7 +3038,7 @@ LayerTestResult<uint8_t, 4> Convolution1dUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled)
 {
-    return Convolution1dTestImpl<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+    return Convolution1dTestImpl<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
             workloadFactory, memoryManager, 0.1f, 128, biasEnabled);
 }
 
@@ -3049,7 +3049,7 @@ LayerTestResult<uint8_t, 4> Convolution2dPerAxisQuantTest(
 {
     using namespace armnn;
 
-    const DataType inputType  = DataType::QuantisedAsymm8;
+    const DataType inputType  = DataType::QAsymmU8;
     const DataType kernelType = DataType::QuantizedSymm8PerAxis;
     const DataType biasType   = DataType::Signed32;
 
@@ -3220,7 +3220,7 @@ LayerTestResult<uint8_t, 4> DepthwiseConvolution2dUint8Test(
     bool biasEnabled,
     const armnn::DataLayout layout)
 {
-    return DepthwiseConvolution2dTestImpl<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+    return DepthwiseConvolution2dTestImpl<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
         workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
 }
 
@@ -3230,7 +3230,7 @@ LayerTestResult<uint8_t, 4> DepthwiseConvolution2dDepthMul1Uint8Test(
     bool biasEnabled,
     const armnn::DataLayout layout)
 {
-    return DepthwiseConvolution2dDepthMul1TestImpl<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+    return DepthwiseConvolution2dDepthMul1TestImpl<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
         workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
 }
 
@@ -3252,7 +3252,7 @@ LayerTestResult<int16_t, 4> DepthwiseConvolution2dInt16Test(
         bool biasEnabled,
         const armnn::DataLayout layout)
 {
-    return DepthwiseConvolution2dTestImpl<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+    return DepthwiseConvolution2dTestImpl<armnn::DataType::QSymmS16, armnn::DataType::Signed32>(
         workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
 }
 
@@ -3262,7 +3262,7 @@ LayerTestResult<int16_t, 4> DepthwiseConvolution2dDepthMul1Int16Test(
                 bool biasEnabled,
                 const armnn::DataLayout layout)
 {
-    return DepthwiseConvolution2dDepthMul1TestImpl<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+    return DepthwiseConvolution2dDepthMul1TestImpl<armnn::DataType::QSymmS16, armnn::DataType::Signed32>(
         workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
 }
 
@@ -3273,7 +3273,7 @@ LayerTestResult<uint8_t, 4> DepthwiseConvolution2dPerAxisQuantTest(
 {
     using namespace armnn;
 
-    const DataType inputType  = DataType::QuantisedAsymm8;
+    const DataType inputType  = DataType::QAsymmU8;
     const DataType kernelType = DataType::QuantizedSymm8PerAxis;
     const DataType biasType   = DataType::Signed32;
 
@@ -3390,6 +3390,6 @@ LayerTestResult<uint8_t, 4> CompareDepthwiseConvolution2dUint8Test(
     armnn::IWorkloadFactory& refWorkloadFactory,
     const armnn::DataLayout layout)
 {
-    return CompareDepthwiseConvolution2dTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return CompareDepthwiseConvolution2dTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory, memoryManager, refWorkloadFactory, layout);
 }

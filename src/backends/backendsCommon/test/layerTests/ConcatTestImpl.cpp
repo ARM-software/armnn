@@ -2054,14 +2054,14 @@ LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
 // Explicit template specializations
 //
 
-template LayerTestResult<ResolveType<DataType::QuantisedAsymm8>, 3>
-ConcatDifferentInputOutputQParamTest<DataType::QuantisedAsymm8>(
+template LayerTestResult<ResolveType<DataType::QAsymmU8>, 3>
+ConcatDifferentInputOutputQParamTest<DataType::QAsymmU8>(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor);
 
-template LayerTestResult<ResolveType<DataType::QuantisedSymm16>, 3>
-ConcatDifferentInputOutputQParamTest<DataType::QuantisedSymm16>(
+template LayerTestResult<ResolveType<DataType::QSymmS16>, 3>
+ConcatDifferentInputOutputQParamTest<DataType::QSymmS16>(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor);
@@ -2362,9 +2362,9 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
     unsigned int inputChannels2 = 1;
 
     // Defines the tensor descriptors.
-    TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, DataType::QuantisedAsymm8);
-    TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, DataType::QuantisedAsymm8);
-    TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, DataType::QuantisedAsymm8);
+    TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, DataType::QAsymmU8);
+    TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, DataType::QAsymmU8);
+    TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, DataType::QAsymmU8);
 
     // Quantized input1 tensor. Range [-3, 1]
     const float inputScale1 = 0.015686f;
@@ -2507,9 +2507,9 @@ LayerTestResult<uint8_t, 3> ConcatUint8Test(
     unsigned int inputChannels2 = 1;
 
     // Defines the tensor descriptors.
-    TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, DataType::QuantisedAsymm8);
-    TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, DataType::QuantisedAsymm8);
-    TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, DataType::QuantisedAsymm8);
+    TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, DataType::QAsymmU8);
+    TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, DataType::QAsymmU8);
+    TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, DataType::QAsymmU8);
 
     // Arbitrary scale and offsets. They don't really matter as the Concat operator doesn't dequantize/quantize them.
     const float scale = 0.13497836f;
@@ -2645,9 +2645,9 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
     unsigned int inputChannels2 = 1;
 
     // Defines the tensor descriptors.
-    TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, DataType::QuantisedSymm16);
-    TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, DataType::QuantisedSymm16);
-    TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, DataType::QuantisedSymm16);
+    TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, DataType::QSymmS16);
+    TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, DataType::QSymmS16);
+    TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, DataType::QSymmS16);
 
     // Arbitrary scale and offsets. They don't really matter as the Concat operator doesn't dequantize/quantize them.
     const float scale = 0.13497836f;
@@ -2765,28 +2765,28 @@ LayerTestResult<uint8_t, 1> Concat1dUint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat1dTestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat1dTestImpl<DataType::QAsymmU8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 2> Concat2dDim0Uint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat2dDim0TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat2dDim0TestImpl<DataType::QAsymmU8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 2> Concat2dDim1Uint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat2dDim1TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat2dDim1TestImpl<DataType::QAsymmU8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 2> Concat2dDim0DiffInputDimsUint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat2dDim0DiffInputDimsTestImpl<DataType::QuantisedAsymm8>(
+    return Concat2dDim0DiffInputDimsTestImpl<DataType::QAsymmU8>(
         workloadFactory, memoryManager, 0.5f, -1);
 }
 
@@ -2794,7 +2794,7 @@ LayerTestResult<uint8_t, 2> Concat2dDim1DiffInputDimsUint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat2dDim1DiffInputDimsTestImpl<DataType::QuantisedAsymm8>(
+    return Concat2dDim1DiffInputDimsTestImpl<DataType::QAsymmU8>(
         workloadFactory, memoryManager, 0.5f, -1);
 }
 
@@ -2802,14 +2802,14 @@ LayerTestResult<uint8_t, 3> Concat3dDim0Uint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat3dDim0TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat3dDim0TestImpl<DataType::QAsymmU8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 3> Concat3dDim1Uint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat3dDim1TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat3dDim1TestImpl<DataType::QAsymmU8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 3> Concat3dDim2Uint8Test(
@@ -2817,7 +2817,7 @@ LayerTestResult<uint8_t, 3> Concat3dDim2Uint8Test(
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor)
 {
-    return Concat3dDim2TestImpl<DataType::QuantisedAsymm8>(
+    return Concat3dDim2TestImpl<DataType::QAsymmU8>(
         workloadFactory, memoryManager, useSubtensor, 0.5f, -1);
 }
 
@@ -2825,14 +2825,14 @@ LayerTestResult<uint8_t, 3> Concat3dDim0DiffInputDimsUint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat3dDim0TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat3dDim0TestImpl<DataType::QAsymmU8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 3> Concat3dDim1DiffInputDimsUint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat3dDim1DiffInputDimsTestImpl<DataType::QuantisedAsymm8>(
+    return Concat3dDim1DiffInputDimsTestImpl<DataType::QAsymmU8>(
         workloadFactory, memoryManager, 0.5f, -1);
 }
 
@@ -2841,7 +2841,7 @@ LayerTestResult<uint8_t, 3> Concat3dDim2DiffInputDimsUint8Test(
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor)
 {
-    return Concat3dDim2DiffInputDimsTestImpl<DataType::QuantisedAsymm8>(
+    return Concat3dDim2DiffInputDimsTestImpl<DataType::QAsymmU8>(
         workloadFactory, memoryManager, useSubtensor, 0.5f, -1);
 }
 
@@ -2849,28 +2849,28 @@ LayerTestResult<uint8_t, 4> Concat4dDim0Uint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDim0TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat4dDim0TestImpl<DataType::QAsymmU8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 4> Concat4dDim1Uint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDim1TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat4dDim1TestImpl<DataType::QAsymmU8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 4> Concat4dDim2Uint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDim2TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat4dDim2TestImpl<DataType::QAsymmU8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 4> Concat4dDim3Uint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager, bool useSubtensor)
 {
-    return Concat4dDim3TestImpl<DataType::QuantisedAsymm8>(
+    return Concat4dDim3TestImpl<DataType::QAsymmU8>(
         workloadFactory, memoryManager, 0.5f, -1, useSubtensor);
 }
 
@@ -2878,7 +2878,7 @@ LayerTestResult<uint8_t, 4> Concat4dDiffShapeDim0Uint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDiffShapeDim0TestImpl<DataType::QuantisedAsymm8>(
+    return Concat4dDiffShapeDim0TestImpl<DataType::QAsymmU8>(
         workloadFactory, memoryManager, 0.5f, -1);
 }
 
@@ -2886,7 +2886,7 @@ LayerTestResult<uint8_t, 4> Concat4dDiffShapeDim1Uint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDiffShapeDim1TestImpl<DataType::QuantisedAsymm8>(
+    return Concat4dDiffShapeDim1TestImpl<DataType::QAsymmU8>(
         workloadFactory, memoryManager, 0.5f, -1);
 }
 
@@ -2894,7 +2894,7 @@ LayerTestResult<uint8_t, 4> Concat4dDiffShapeDim2Uint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDiffShapeDim2TestImpl<DataType::QuantisedAsymm8>(
+    return Concat4dDiffShapeDim2TestImpl<DataType::QAsymmU8>(
         workloadFactory, memoryManager, 0.5f, -1);
 }
 
@@ -2903,6 +2903,6 @@ LayerTestResult<uint8_t, 4> Concat4dDiffShapeDim3Uint8Test(
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor)
 {
-    return Concat4dDiffShapeDim3TestImpl<DataType::QuantisedAsymm8>(
+    return Concat4dDiffShapeDim3TestImpl<DataType::QAsymmU8>(
         workloadFactory, memoryManager, 0.5f, -1, useSubtensor);
 }

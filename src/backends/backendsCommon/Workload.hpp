@@ -172,7 +172,7 @@ template <typename QueueDescriptor>
 using Float32Workload = TypedWorkload<QueueDescriptor, armnn::DataType::Float32>;
 
 template <typename QueueDescriptor>
-using Uint8Workload = TypedWorkload<QueueDescriptor, armnn::DataType::QuantisedAsymm8>;
+using Uint8Workload = TypedWorkload<QueueDescriptor, armnn::DataType::QAsymmU8>;
 
 template <typename QueueDescriptor>
 using Int32Workload = TypedWorkload<QueueDescriptor, armnn::DataType::Signed32>;
@@ -187,7 +187,7 @@ using BaseFloat32ComparisonWorkload = MultiTypedWorkload<QueueDescriptor,
 
 template <typename QueueDescriptor>
 using BaseUint8ComparisonWorkload = MultiTypedWorkload<QueueDescriptor,
-                                                       armnn::DataType::QuantisedAsymm8,
+                                                       armnn::DataType::QAsymmU8,
                                                        armnn::DataType::Boolean>;
 
 template <typename QueueDescriptor>
@@ -202,7 +202,7 @@ using Float32ToFloat16Workload = MultiTypedWorkload<QueueDescriptor,
 
 template <typename QueueDescriptor>
 using Uint8ToFloat32Workload = MultiTypedWorkload<QueueDescriptor,
-                                                  armnn::DataType::QuantisedAsymm8,
+                                                  armnn::DataType::QAsymmU8,
                                                   armnn::DataType::Float32>;
 
 } //namespace armnn

@@ -599,7 +599,7 @@ LayerTestResult<int16_t, 4> L2Normalization1dInt16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization1dTestCommon<armnn::DataType::QuantisedSymm16>(
+    return L2Normalization1dTestCommon<armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         1.f,
@@ -614,7 +614,7 @@ LayerTestResult<uint8_t, 4> L2Normalization1dUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization1dTestCommon<armnn::DataType::QuantisedAsymm8>(
+    return L2Normalization1dTestCommon<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         1.f,
@@ -644,7 +644,7 @@ LayerTestResult<int16_t, 4> L2Normalization2dInt16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization1dTestCommon<armnn::DataType::QuantisedSymm16>(
+    return L2Normalization1dTestCommon<armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         1.f,
@@ -659,7 +659,7 @@ LayerTestResult<uint8_t, 4> L2Normalization2dUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization1dTestCommon<armnn::DataType::QuantisedAsymm8>(
+    return L2Normalization1dTestCommon<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         1.f,
@@ -748,7 +748,7 @@ LayerTestResult<int16_t, 4> L2Normalization3dInt16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization1dTestCommon<armnn::DataType::QuantisedSymm16>(
+    return L2Normalization1dTestCommon<armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         1.f,
@@ -763,7 +763,7 @@ LayerTestResult<uint8_t, 4> L2Normalization3dUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization1dTestCommon<armnn::DataType::QuantisedAsymm8>(
+    return L2Normalization1dTestCommon<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         1.f,
@@ -793,7 +793,7 @@ LayerTestResult<int16_t, 4> L2Normalization4dInt16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization1dTestCommon<armnn::DataType::QuantisedSymm16>(
+    return L2Normalization1dTestCommon<armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
         1.f,
@@ -808,7 +808,7 @@ LayerTestResult<uint8_t, 4> L2Normalization4dUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization1dTestCommon<armnn::DataType::QuantisedAsymm8>(
+    return L2Normalization1dTestCommon<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
         1.f,

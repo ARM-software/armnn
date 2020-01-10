@@ -60,6 +60,6 @@ void ClGreaterWorkload<T>::Execute() const
 }
 
 template class ClGreaterWorkload<DataType::Float32>;
-template class ClGreaterWorkload<DataType::QuantisedAsymm8>;
+template class ClGreaterWorkload<DataType::QAsymmU8>;
 
 } //namespace armnn

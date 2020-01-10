@@ -315,14 +315,14 @@ LayerTestResult<uint8_t, 1> Gather1dParamsUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return GatherTestHelper<armnn::DataType::QuantisedAsymm8>::Gather1dParamsTestImpl(workloadFactory, memoryManager);
+    return GatherTestHelper<armnn::DataType::QAsymmU8>::Gather1dParamsTestImpl(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 1> Gather1dParamsInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return GatherTestHelper<armnn::DataType::QuantisedSymm16>::Gather1dParamsTestImpl(workloadFactory, memoryManager);
+    return GatherTestHelper<armnn::DataType::QSymmS16>::Gather1dParamsTestImpl(workloadFactory, memoryManager);
 }
 
 LayerTestResult<float, 2> GatherMultiDimParamsFloat32Test(
@@ -343,7 +343,7 @@ LayerTestResult<uint8_t, 2> GatherMultiDimParamsUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return GatherTestHelper<armnn::DataType::QuantisedAsymm8>::GatherMultiDimParamsTestImpl(
+    return GatherTestHelper<armnn::DataType::QAsymmU8>::GatherMultiDimParamsTestImpl(
         workloadFactory, memoryManager);
 }
 
@@ -351,7 +351,7 @@ LayerTestResult<int16_t, 2> GatherMultiDimParamsInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return GatherTestHelper<armnn::DataType::QuantisedSymm16>::GatherMultiDimParamsTestImpl(
+    return GatherTestHelper<armnn::DataType::QSymmS16>::GatherMultiDimParamsTestImpl(
         workloadFactory, memoryManager);
 }
 
@@ -375,7 +375,7 @@ LayerTestResult<uint8_t, 4> GatherMultiDimParamsMultiDimIndicesUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return GatherTestHelper<armnn::DataType::QuantisedAsymm8>::GatherMultiDimParamsMultiDimIndicesTestImpl(
+    return GatherTestHelper<armnn::DataType::QAsymmU8>::GatherMultiDimParamsMultiDimIndicesTestImpl(
         workloadFactory, memoryManager);
 }
 
@@ -383,6 +383,6 @@ LayerTestResult<int16_t, 4> GatherMultiDimParamsMultiDimIndicesInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return GatherTestHelper<armnn::DataType::QuantisedSymm16>::GatherMultiDimParamsMultiDimIndicesTestImpl(
+    return GatherTestHelper<armnn::DataType::QSymmS16>::GatherMultiDimParamsMultiDimIndicesTestImpl(
         workloadFactory, memoryManager);
 }

@@ -126,7 +126,7 @@ BOOST_FIXTURE_TEST_CASE(UnpackAxisZeroNumIsDefaultNotSpecified, DefaultUnpackAxi
 
 BOOST_FIXTURE_TEST_CASE(UnpackAxisZeroNumIsDefaultNotSpecifiedUint8, DefaultUnpackAxisZeroUint8Fixture)
 {
-    RunTest<2, armnn::DataType::QuantisedAsymm8>(
+    RunTest<2, armnn::DataType::QAsymmU8>(
         0,
         { {"inputTensor", { 1, 2, 3, 4, 5, 6,
                             7, 8, 9, 10, 11, 12,
@@ -165,7 +165,7 @@ BOOST_FIXTURE_TEST_CASE(UnpackLastAxisNumSix, DefaultUnpackLastAxisFixture)
 }
 
 BOOST_FIXTURE_TEST_CASE(UnpackLastAxisNumSixUint8, DefaultUnpackLastAxisUint8Fixture) {
-    RunTest<2, armnn::DataType::QuantisedAsymm8>(
+    RunTest<2, armnn::DataType::QAsymmU8>(
         0,
         {{"inputTensor", { 1, 2, 3, 4, 5, 6,
                            7, 8, 9, 10, 11, 12,

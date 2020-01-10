@@ -316,22 +316,22 @@ struct DummyLayer<armnn::QuantizedLstmLayer, void>
         m_Layer = dummyGraph.AddLayer<armnn::QuantizedLstmLayer>("");
 
         m_Layer->m_QuantizedLstmParameters.m_InputToInputWeights  = std::make_unique<armnn::ScopedCpuTensorHandle>(
-                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QAsymmU8));
         m_Layer->m_QuantizedLstmParameters.m_InputToForgetWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
-                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QAsymmU8));
         m_Layer->m_QuantizedLstmParameters.m_InputToCellWeights   = std::make_unique<armnn::ScopedCpuTensorHandle>(
-                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QAsymmU8));
         m_Layer->m_QuantizedLstmParameters.m_InputToOutputWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
-                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QAsymmU8));
 
         m_Layer->m_QuantizedLstmParameters.m_RecurrentToInputWeights  = std::make_unique<armnn::ScopedCpuTensorHandle>(
-                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QAsymmU8));
         m_Layer->m_QuantizedLstmParameters.m_RecurrentToForgetWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
-                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QAsymmU8));
         m_Layer->m_QuantizedLstmParameters.m_RecurrentToCellWeights   = std::make_unique<armnn::ScopedCpuTensorHandle>(
-                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QAsymmU8));
         m_Layer->m_QuantizedLstmParameters.m_RecurrentToOutputWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
-                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QAsymmU8));
 
         m_Layer->m_QuantizedLstmParameters.m_InputGateBias  = std::make_unique<armnn::ScopedCpuTensorHandle>(
                 armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Signed32));

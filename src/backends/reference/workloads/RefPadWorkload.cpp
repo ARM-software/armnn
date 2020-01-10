@@ -35,7 +35,7 @@ void RefPadWorkload<DataType>::Execute() const
 
 template class RefPadWorkload<DataType::Float32>;
 template class RefPadWorkload<DataType::Float16>;
-template class RefPadWorkload<DataType::QuantisedAsymm8>;
-template class RefPadWorkload<DataType::QuantisedSymm16>;
+template class RefPadWorkload<DataType::QAsymmU8>;
+template class RefPadWorkload<DataType::QSymmS16>;
 
 } //namespace armnn

@@ -147,12 +147,12 @@ std::string GetSoftmaxProfilerJson(const std::vector<armnn::BackendId>& backends
     softmax->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
     // set the tensors in the network
-    TensorInfo inputTensorInfo(TensorShape({1, 5}), DataType::QuantisedAsymm8);
+    TensorInfo inputTensorInfo(TensorShape({1, 5}), DataType::QAsymmU8);
     inputTensorInfo.SetQuantizationOffset(100);
     inputTensorInfo.SetQuantizationScale(10000.0f);
     input->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
 
-    TensorInfo outputTensorInfo(TensorShape({1, 5}), DataType::QuantisedAsymm8);
+    TensorInfo outputTensorInfo(TensorShape({1, 5}), DataType::QAsymmU8);
     outputTensorInfo.SetQuantizationOffset(0);
     outputTensorInfo.SetQuantizationScale(1.0f / 256.0f);
     softmax->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

@@ -966,16 +966,16 @@ if(BUILD_GATORD_MOCK)
 
     add_library_ex(gatordMockService STATIC ${gatord_mock_sources})
 
-    add_executable_ex(GartordMock tests/profiling/gatordmock/GatordMockMain.cpp)
+    add_executable_ex(GatordMock tests/profiling/gatordmock/GatordMockMain.cpp)
 
-    target_link_libraries(GartordMock
+    target_link_libraries(GatordMock
         armnn
         gatordMockService
         ${Boost_PROGRAM_OPTIONS_LIBRARY}
         ${Boost_SYSTEM_LIBRARY})
 
     if(Threads_FOUND AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
-        target_link_libraries(GartordMock pthread)
+        target_link_libraries(GatordMock pthread)
     endif()
 
 endif()

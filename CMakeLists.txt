@@ -65,6 +65,8 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/QuantizeHelper.hpp
     src/armnnUtils/TensorIOUtils.hpp
     src/armnnUtils/TensorUtils.cpp
+    src/armnnUtils/NetworkSockets.hpp
+    src/armnnUtils/NetworkSockets.cpp
     )
 
 add_library_ex(armnnUtils STATIC ${armnnUtils_sources})
@@ -533,6 +535,9 @@ target_include_directories(armnn PRIVATE src/profiling)
 target_link_libraries(armnn armnnUtils)
 
 target_link_libraries(armnn ${CMAKE_DL_LIBS})
+if ("${CMAKE_SYSTEM_NAME}" STREQUAL Windows) 
+    target_link_libraries(armnn Ws2_32.lib)
+endif()
 
 install(TARGETS armnn
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -963,8 +968,10 @@ if(BUILD_GATORD_MOCK)
     include_directories(${Boost_INCLUDE_DIRS} tests/profiling/timelineDecoder)
 
     add_library_ex(gatordMockService STATIC ${gatord_mock_sources})
+    target_include_directories(gatordMockService PRIVATE src/armnnUtils)
 
     add_executable_ex(GatordMock tests/profiling/gatordmock/GatordMockMain.cpp)
+    target_include_directories(GatordMock PRIVATE src/armnnUtils)
 
     target_link_libraries(GatordMock
         armnn

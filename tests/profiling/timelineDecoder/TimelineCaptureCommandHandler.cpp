@@ -122,7 +122,7 @@ void TimelineCaptureCommandHandler::ReadEvent(const unsigned char* data, uint32_
     event.m_TimeStamp = profiling::ReadUint64(data, offset);
     offset += uint64_t_size;
 
-    event.m_ThreadId = new u_int8_t[threadId_size];
+    event.m_ThreadId = new uint8_t[threadId_size];
     profiling::ReadBytes(data, offset, threadId_size, event.m_ThreadId);
     offset += threadId_size;
 

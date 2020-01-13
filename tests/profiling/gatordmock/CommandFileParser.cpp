@@ -54,7 +54,7 @@ void CommandFileParser::ParseFile(std::string CommandFile, GatordMockService& mo
             // 500000       polling period in micro seconds
             // 1 2 5 10     counter list
 
-            uint period = static_cast<uint>(std::stoul(tokens[1]));
+            uint32_t period = static_cast<uint32_t>(std::stoul(tokens[1]));
 
             std::vector<uint16_t> counters;
 
@@ -73,7 +73,7 @@ void CommandFileParser::ParseFile(std::string CommandFile, GatordMockService& mo
             // WAIT         command
             // 11000000     timeout period in micro seconds
 
-            uint timeout = static_cast<uint>(std::stoul(tokens[1]));
+            uint32_t timeout = static_cast<uint32_t>(std::stoul(tokens[1]));
 
             mockService.WaitCommand(timeout);
         }

@@ -7,10 +7,9 @@
 
 #include <cerrno>
 #include <fcntl.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/un.h>
 #include <string>
+
+using namespace armnnUtils;
 
 namespace armnn
 {
@@ -19,6 +18,7 @@ namespace profiling
 
 SocketProfilingConnection::SocketProfilingConnection()
 {
+    Sockets::Initialize();
     memset(m_Socket, 0, sizeof(m_Socket));
     // Note: we're using Linux specific SOCK_CLOEXEC flag.
     m_Socket[0].fd = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
@@ -28,7 +28,7 @@ SocketProfilingConnection::SocketProfilingConnection()
     }
 
     // Connect to the named unix domain socket.
-    struct sockaddr_un server{};
+    sockaddr_un server{};
     memset(&server, 0, sizeof(sockaddr_un));
     // As m_GatorNamespace begins with a null character we need to ignore that when getting its length.
     memcpy(server.sun_path, m_GatorNamespace, strlen(m_GatorNamespace + 1) + 1);
@@ -43,8 +43,7 @@ SocketProfilingConnection::SocketProfilingConnection()
     m_Socket[0].events = POLLIN;
 
     // Make the socket non blocking.
-    const int currentFlags = fcntl(m_Socket[0].fd, F_GETFL);
-    if (0 != fcntl(m_Socket[0].fd, F_SETFL, currentFlags | O_NONBLOCK))
+    if (!Sockets::SetNonBlocking(m_Socket[0].fd))
     {
         Close();
         throw armnn::RuntimeException(std::string("Failed to set socket as non blocking: ") + strerror(errno));
@@ -58,7 +57,7 @@ bool SocketProfilingConnection::IsOpen() const
 
 void SocketProfilingConnection::Close()
 {
-    if (close(m_Socket[0].fd) != 0)
+    if (Sockets::Close(m_Socket[0].fd) != 0)
     {
         throw armnn::RuntimeException(std::string("Cannot close stream socket: ") + strerror(errno));
     }
@@ -73,14 +72,14 @@ bool SocketProfilingConnection::WritePacket(const unsigned char* buffer, uint32_
         return false;
     }
 
-    return write(m_Socket[0].fd, buffer, length) != -1;
+    return Sockets::Write(m_Socket[0].fd, buffer, length) != -1;
 }
 
 Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
 {
     // Is there currently at least a header worth of data waiting to be read?
     int bytes_available = 0;
-    ioctl(m_Socket[0].fd, FIONREAD, &bytes_available);
+    Sockets::Ioctl(m_Socket[0].fd, FIONREAD, &bytes_available);
     if (bytes_available >= 8)
     {
         // Yes there is. Read it:
@@ -88,7 +87,7 @@ Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
     }
 
     // Poll for data on the socket or until timeout occurs
-    int pollResult = poll(m_Socket, 1, static_cast<int>(timeout));
+    int pollResult = Sockets::Poll(&m_Socket[0], 1, static_cast<int>(timeout));
 
     switch (pollResult)
     {
@@ -136,7 +135,7 @@ Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
 Packet SocketProfilingConnection::ReceivePacket()
 {
     char header[8] = {};
-    ssize_t receiveResult = recv(m_Socket[0].fd, &header, sizeof(header), 0);
+    long receiveResult = Sockets::Read(m_Socket[0].fd, &header, sizeof(header));
     // We expect 8 as the result here. 0 means EOF, socket is closed. -1 means there been some other kind of error.
     switch( receiveResult )
     {
@@ -168,10 +167,10 @@ Packet SocketProfilingConnection::ReceivePacket()
     if (dataLength > 0)
     {
         packetData = std::make_unique<unsigned char[]>(dataLength);
-        ssize_t receivedLength = recv(m_Socket[0].fd, packetData.get(), dataLength, 0);
+        long receivedLength = Sockets::Read(m_Socket[0].fd, packetData.get(), dataLength);
         if (receivedLength < 0)
         {
-            throw armnn::RuntimeException(std::string("Error occured on recv: ") + strerror(errno));
+            throw armnn::RuntimeException(std::string("Error occurred on recv: ") + strerror(errno));
         }
         if (dataLength != static_cast<uint32_t>(receivedLength))
         {

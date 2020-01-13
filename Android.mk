@@ -117,6 +117,7 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/Permute.cpp \
         src/armnnUtils/TensorUtils.cpp \
         src/armnnUtils/VerificationHelpers.cpp \
+        src/armnnUtils/NetworkSockets.cpp \
         src/armnn/layers/AbsLayer.cpp \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \

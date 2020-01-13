@@ -7,6 +7,7 @@
 
 #include <CommandHandlerRegistry.hpp>
 #include <Packet.hpp>
+#include <NetworkSockets.hpp>
 
 #include <atomic>
 #include <string>
@@ -49,8 +50,8 @@ public:
     ~GatordMockService()
     {
         // We have set SOCK_CLOEXEC on these sockets but we'll close them to be good citizens.
-        close(m_ClientConnection);
-        close(m_ListeningSocket);
+        armnnUtils::Sockets::Close(m_ClientConnection);
+        armnnUtils::Sockets::Close(m_ListeningSocket);
     }
 
     /// Establish the Unix domain socket and set it to listen for connections.
@@ -60,7 +61,7 @@ public:
 
     /// Block waiting to accept one client to connect to the UDS.
     /// @return the file descriptor of the client connection.
-    int BlockForOneClient();
+    armnnUtils::Sockets::Socket BlockForOneClient();
 
     /// Once the connection is open wait to receive the stream meta data packet from the client. Reading this
     /// packet differs from others as we need to determine endianness.
@@ -147,8 +148,8 @@ private:
     armnn::profiling::CommandHandlerRegistry& m_HandlerRegistry;
 
     bool m_EchoPackets;
-    int m_ListeningSocket;
-    int m_ClientConnection;
+    armnnUtils::Sockets::Socket m_ListeningSocket;
+    armnnUtils::Sockets::Socket m_ClientConnection;
     std::thread m_ListeningThread;
     std::atomic<bool> m_CloseReceivingThread;
 };

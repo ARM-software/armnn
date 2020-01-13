@@ -8,17 +8,15 @@
 #include <CommandHandlerRegistry.hpp>
 #include <PacketVersionResolver.hpp>
 #include <ProfilingUtils.hpp>
+#include <NetworkSockets.hpp>
 
 #include <cerrno>
 #include <fcntl.h>
 #include <iomanip>
 #include <iostream>
-#include <poll.h>
 #include <string>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <unistd.h>
+
+using namespace armnnUtils;
 
 namespace armnn
 {
@@ -28,6 +26,7 @@ namespace gatordmock
 
 bool GatordMockService::OpenListeningSocket(std::string udsNamespace)
 {
+    Sockets::Initialize();
     m_ListeningSocket = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
     if (-1 == m_ListeningSocket)
     {
@@ -56,9 +55,9 @@ bool GatordMockService::OpenListeningSocket(std::string udsNamespace)
     return true;
 }
 
-int GatordMockService::BlockForOneClient()
+Sockets::Socket GatordMockService::BlockForOneClient()
 {
-    m_ClientConnection = accept4(m_ListeningSocket, nullptr, nullptr, SOCK_CLOEXEC);
+    m_ClientConnection = Sockets::Accept(m_ListeningSocket, nullptr, nullptr, SOCK_CLOEXEC);
     if (-1 == m_ClientConnection)
     {
         std::cerr << ": Failure when waiting for a client connection: " << strerror(errno) << std::endl;
@@ -112,13 +111,14 @@ bool GatordMockService::WaitForStreamMetaData()
     // Remember we already read the pipe magic 4 bytes.
     uint32_t metaDataLength = ToUint32(&header[4], m_Endianness) - 4;
     // Read the entire packet.
-    uint8_t packetData[metaDataLength];
-    if (metaDataLength != boost::numeric_cast<uint32_t>(read(m_ClientConnection, &packetData, metaDataLength)))
+    std::vector<uint8_t> packetData(metaDataLength);
+    if (metaDataLength !=
+        boost::numeric_cast<uint32_t>(Sockets::Read(m_ClientConnection, packetData.data(), metaDataLength)))
     {
         std::cerr << ": Protocol read error. Data length mismatch." << std::endl;
         return false;
     }
-    EchoPacket(PacketDirection::ReceivedData, packetData, metaDataLength);
+    EchoPacket(PacketDirection::ReceivedData, packetData.data(), metaDataLength);
     m_StreamMetaDataVersion    = ToUint32(&packetData[0], m_Endianness);
     m_StreamMetaDataMaxDataLen = ToUint32(&packetData[4], m_Endianness);
     m_StreamMetaDataPid        = ToUint32(&packetData[8], m_Endianness);
@@ -153,10 +153,9 @@ bool GatordMockService::LaunchReceivingThread()
         std::cout << "Launching receiving thread." << std::endl;
     }
     // At this point we want to make the socket non blocking.
-    const int currentFlags = fcntl(m_ClientConnection, F_GETFL);
-    if (0 != fcntl(m_ClientConnection, F_SETFL, currentFlags | O_NONBLOCK))
+    if (!Sockets::SetNonBlocking(m_ClientConnection))
     {
-        close(m_ClientConnection);
+        Sockets::Close(m_ClientConnection);
         std::cerr << "Failed to set socket as non blocking: " << strerror(errno) << std::endl;
         return false;
     }
@@ -212,13 +211,13 @@ void GatordMockService::SendPeriodicCounterSelectionList(uint32_t period, std::v
     // should deal with it.
 }
 
-void GatordMockService::WaitCommand(uint timeout)
+void GatordMockService::WaitCommand(uint32_t timeout)
 {
     // Wait for a maximum of timeout microseconds or if the receive thread has closed.
     // There is a certain level of rounding involved in this timing.
-    uint iterations = timeout / 1000;
+    uint32_t iterations = timeout / 1000;
     std::cout << std::dec << "Wait command with timeout of " << timeout << " iterations =  " << iterations << std::endl;
-    uint count = 0;
+    uint32_t count = 0;
     while ((this->ReceiveThreadRunning() && (count < iterations)))
     {
         std::this_thread::sleep_for(std::chrono::microseconds(1000));
@@ -261,7 +260,7 @@ armnn::profiling::Packet GatordMockService::WaitForPacket(uint32_t timeoutMs)
 {
     // Is there currently more than a headers worth of data waiting to be read?
     int bytes_available;
-    ioctl(m_ClientConnection, FIONREAD, &bytes_available);
+    Sockets::Ioctl(m_ClientConnection, FIONREAD, &bytes_available);
     if (bytes_available > 8)
     {
         // Yes there is. Read it:
@@ -272,7 +271,7 @@ armnn::profiling::Packet GatordMockService::WaitForPacket(uint32_t timeoutMs)
         // No there's not. Poll for more data.
         struct pollfd pollingFd[1]{};
         pollingFd[0].fd = m_ClientConnection;
-        int pollResult  = poll(pollingFd, 1, static_cast<int>(timeoutMs));
+        int pollResult  = Sockets::Poll(pollingFd, 1, static_cast<int>(timeoutMs));
 
         switch (pollResult)
         {
@@ -362,16 +361,16 @@ bool GatordMockService::SendPacket(uint32_t packetFamily, uint32_t packetId, con
     header[0] = packetFamily << 26 | packetId << 16;
     header[1] = dataLength;
     // Add the header to the packet.
-    uint8_t packet[8 + dataLength];
-    InsertU32(header[0], packet, m_Endianness);
-    InsertU32(header[1], packet + 4, m_Endianness);
+    std::vector<uint8_t> packet(8 + dataLength);
+    InsertU32(header[0], packet.data(), m_Endianness);
+    InsertU32(header[1], packet.data() + 4, m_Endianness);
     // And the rest of the data if there is any.
     if (dataLength > 0)
     {
-        memcpy((packet + 8), data, dataLength);
+        memcpy((packet.data() + 8), data, dataLength);
     }
-    EchoPacket(PacketDirection::Sending, packet, sizeof(packet));
-    if (-1 == write(m_ClientConnection, packet, sizeof(packet)))
+    EchoPacket(PacketDirection::Sending, packet.data(), packet.size());
+    if (-1 == Sockets::Write(m_ClientConnection, packet.data(), packet.size()))
     {
         std::cerr << ": Failure when writing to client socket: " << strerror(errno) << std::endl;
         return false;
@@ -396,10 +395,10 @@ bool GatordMockService::ReadHeader(uint32_t headerAsWords[2])
 bool GatordMockService::ReadFromSocket(uint8_t* packetData, uint32_t expectedLength)
 {
     // This is a blocking read until either expectedLength has been received or an error is detected.
-    ssize_t totalBytesRead = 0;
+    long totalBytesRead = 0;
     while (boost::numeric_cast<uint32_t>(totalBytesRead) < expectedLength)
     {
-        ssize_t bytesRead = recv(m_ClientConnection, packetData, expectedLength, 0);
+        long bytesRead = Sockets::Read(m_ClientConnection, packetData, expectedLength);
         if (bytesRead < 0)
         {
             std::cerr << ": Failure when reading from client socket: " << strerror(errno) << std::endl;

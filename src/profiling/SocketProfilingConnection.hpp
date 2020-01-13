@@ -5,8 +5,8 @@
 
 #include "IProfilingConnection.hpp"
 
-#include <poll.h>
 #include <Runtime.hpp>
+#include <NetworkSockets.hpp>
 
 #pragma once
 
@@ -31,7 +31,7 @@ private:
 
     // To indicate we want to use an abstract UDS ensure the first character of the address is 0.
     const char* m_GatorNamespace = "\0gatord_namespace";
-    struct pollfd m_Socket[1]{};
+    armnnUtils::Sockets::PollFd m_Socket[1]{};
 };
 
 } // namespace profiling

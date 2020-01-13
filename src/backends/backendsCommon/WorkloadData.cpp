@@ -1284,6 +1284,7 @@ void ReshapeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     {
         DataType::Float32,
         DataType::Float16,
+        DataType::Signed32,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };

@@ -90,6 +90,7 @@ LOCAL_SRC_FILES := \
         src/armnn/Layer.cpp \
         src/armnn/LayerSupport.cpp \
         src/armnn/LoadedNetwork.cpp \
+        src/armnn/Logging.cpp \
         src/armnn/Network.cpp \
         src/armnn/NetworkUtils.cpp \
         src/armnn/Observable.cpp \

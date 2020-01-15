@@ -382,6 +382,7 @@ list(APPEND armnn_sources
     src/armnn/LayerSupport.cpp
     src/armnn/LoadedNetwork.cpp
     src/armnn/LoadedNetwork.hpp
+    src/armnn/Logging.cpp
     src/armnn/Network.cpp
     src/armnn/Network.hpp
     src/armnn/NetworkQuantizationScheme.hpp

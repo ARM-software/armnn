@@ -6,6 +6,7 @@
 
 #include <armnn/Version.hpp>
 #include <armnn/BackendRegistry.hpp>
+#include <armnn/Logging.hpp>
 
 #include <armnn/backends/IBackendContext.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>

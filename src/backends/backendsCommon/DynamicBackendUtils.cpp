@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <armnn/Logging.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
 
 #include <boost/filesystem.hpp>

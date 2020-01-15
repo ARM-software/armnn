@@ -21,6 +21,7 @@
 #include <armnn/Utils.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <armnn/BackendRegistry.hpp>
+#include <armnn/Logging.hpp>
 
 #include <ProfilingService.hpp>
 

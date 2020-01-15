@@ -12,6 +12,7 @@
 #include "HeapProfiling.hpp"
 
 #include <armnn/BackendRegistry.hpp>
+#include <armnn/Logging.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <armnn/backends/IMemoryManager.hpp>

@@ -4,17 +4,18 @@
 //
 
 #include "RefNormalizationWorkload.hpp"
-#include "RefWorkloadUtils.hpp"
-#include "Decoders.hpp"
-#include "Encoders.hpp"
 
+#include <armnn/Logging.hpp>
 #include <armnn/Tensor.hpp>
-
 #include <armnnUtils/DataLayoutIndexed.hpp>
 
 #include <Profiling.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
+
+#include "RefWorkloadUtils.hpp"
+#include "Decoders.hpp"
+#include "Encoders.hpp"
 
 using namespace armnn;
 using namespace armnnUtils;

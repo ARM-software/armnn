@@ -10,8 +10,9 @@
 #include <armnn/backends/IBackendInternal.hpp>
 
 #include <armnn/BackendId.hpp>
-#include <armnn/Utils.hpp>
+#include <armnn/Logging.hpp>
 #include <armnn/TypesUtils.hpp>
+#include <armnn/Utils.hpp>
 
 #include <boost/polymorphic_cast.hpp>
 #include <boost/assert.hpp>

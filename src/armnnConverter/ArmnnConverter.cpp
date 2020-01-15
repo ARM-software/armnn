@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 #include <armnn/ArmNN.hpp>
+#include <armnn/Logging.hpp>
 
 #if defined(ARMNN_CAFFE_PARSER)
 #include <armnnCaffeParser/ICaffeParser.hpp>

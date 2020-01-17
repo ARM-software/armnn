@@ -561,9 +561,6 @@ target_link_libraries(armnn ${Boost_THREAD_LIBRARY}
 if(ARMCOMPUTENEON OR ARMCOMPUTECL)
     target_link_libraries(armnn ${ARMCOMPUTE_LIBRARIES})
 endif()
-if(ARMCOMPUTECL)
-    target_link_libraries(armnn ${OPENCL_LIBRARIES})
-endif()
 
 if(PROFILING_BACKEND_STREAMLINE AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
     target_link_libraries(armnn pthread)

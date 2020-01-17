@@ -5,8 +5,11 @@
 
 #include "Deserializer.hpp"
 
-#include <armnn/ArmNN.hpp>
+#include <armnn/Descriptors.hpp>
 #include <armnn/Exceptions.hpp>
+#include <armnn/TypesUtils.hpp>
+#include <armnn/LstmParams.hpp>
+#include <armnn/QuantizedLstmParams.hpp>
 
 #include <armnnUtils/Permute.hpp>
 

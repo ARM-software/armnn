@@ -5,7 +5,10 @@
 
 #pragma once
 
-#include <armnn/ArmNN.hpp>
+#include <armnn/DescriptorsFwd.hpp>
+#include <armnn/TensorFwd.hpp>
+
+#include <set>
 
 namespace armnnUtils
 {

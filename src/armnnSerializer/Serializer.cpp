@@ -5,16 +5,17 @@
 
 #include "Serializer.hpp"
 
-#include "SerializerUtils.hpp"
-
-#include <armnn/ArmNN.hpp>
+#include <armnn/Descriptors.hpp>
+#include <armnn/LstmParams.hpp>
+#include <armnn/QuantizedLstmParams.hpp>
 
 #include <iostream>
 
 #include <boost/core/ignore_unused.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-
 #include <flatbuffers/util.h>
+
+#include "SerializerUtils.hpp"
 
 using namespace armnn;
 namespace fb = flatbuffers;

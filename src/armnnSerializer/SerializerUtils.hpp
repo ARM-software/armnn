@@ -4,8 +4,7 @@
 //
 #pragma once
 
-#include <armnn/ArmNN.hpp>
-
+#include <armnn/Types.hpp>
 #include <ArmnnSchema_generated.h>
 
 namespace armnnSerializer

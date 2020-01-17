@@ -5,8 +5,11 @@
 
 #include "../Serializer.hpp"
 
-#include <armnn/ArmNN.hpp>
+#include <armnn/Descriptors.hpp>
 #include <armnn/INetwork.hpp>
+#include <armnn/TypesUtils.hpp>
+#include <armnn/LstmParams.hpp>
+#include <armnn/QuantizedLstmParams.hpp>
 #include <armnnDeserializer/IDeserializer.hpp>
 
 #include <random>

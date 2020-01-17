@@ -14,7 +14,6 @@
 #include <functional>
 #include <memory>
 #include <vector>
-#include "ArmNN.hpp"
 
 namespace armnn
 {

@@ -5,8 +5,8 @@
 
 #include "GraphUtils.hpp"
 
-#include <armnn/ArmNN.hpp>
 #include <armnn/LayerVisitorBase.hpp>
+
 #include <Network.hpp>
 
 #include <boost/test/unit_test.hpp>

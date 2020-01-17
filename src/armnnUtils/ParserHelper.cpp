@@ -5,7 +5,7 @@
 
 #include "ParserHelper.hpp"
 
-// armnnUtils
+#include <armnn/Descriptors.hpp>
 #include <armnnUtils/Permute.hpp>
 
 #include <boost/format.hpp>

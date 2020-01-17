@@ -5,9 +5,11 @@
 
 #include "../ParserHelper.hpp"
 
+#include <armnn/Tensor.hpp>
+#include <armnn/Types.hpp>
+
 #include <boost/test/unit_test.hpp>
 
-#include "armnn/Types.hpp"
 
 using namespace armnn;
 using namespace armnnUtils;

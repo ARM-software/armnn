@@ -2,7 +2,6 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <armnn/ArmNN.hpp>
 #include <armnn/Logging.hpp>
 
 #if defined(ARMNN_CAFFE_PARSER)

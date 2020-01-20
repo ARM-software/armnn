@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <armnn/QuantizedLstmParams.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 

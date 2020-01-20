@@ -6,6 +6,7 @@
 
 #include "LayerCloneBase.hpp"
 
+#include <armnn/QuantizedLstmParams.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>

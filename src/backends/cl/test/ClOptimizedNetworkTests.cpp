@@ -5,7 +5,6 @@
 
 #include "ClWorkloadFactoryHelper.hpp"
 
-#include <armnn/ArmNN.hpp>
 #include <Network.hpp>
 
 #include <test/GraphUtils.hpp>

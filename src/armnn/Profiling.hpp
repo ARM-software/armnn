@@ -6,7 +6,6 @@
 
 #include "ProfilingEvent.hpp"
 
-#include "armnn/ArmNN.hpp"
 #include "armnn/IProfiler.hpp"
 
 #include "WallClockTimer.hpp"

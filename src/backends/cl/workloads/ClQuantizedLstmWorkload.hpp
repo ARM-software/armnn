@@ -5,10 +5,11 @@
 
 #pragma once
 
+#include <armnn/QuantizedLstmParams.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 
-#include <arm_compute/runtime/CL/CLFunctions.h>
+#include <arm_compute/runtime/CL/functions/CLLSTMLayerQuantized.h>
 
 namespace armnn
 {

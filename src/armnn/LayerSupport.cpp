@@ -15,7 +15,6 @@
 #include <cstring>
 #include <algorithm>
 #include <unordered_map>
-#include <armnn/ArmNN.hpp>
 
 namespace
 {

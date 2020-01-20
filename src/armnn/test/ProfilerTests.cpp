@@ -3,6 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <armnn/IRuntime.hpp>
+#include <armnn/TypesUtils.hpp>
+
 #include <boost/test/unit_test.hpp>
 #include <boost/test/tools/output_test_stream.hpp>
 #include <boost/algorithm/string.hpp>
@@ -11,7 +14,6 @@
 #include <thread>
 #include <ostream>
 
-#include <armnn/TypesUtils.hpp>
 #include <Profiling.hpp>
 
 namespace armnn

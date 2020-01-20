@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <armnn/Descriptors.hpp>
+#include <armnn/LstmParams.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 

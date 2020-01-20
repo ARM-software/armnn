@@ -5,7 +5,7 @@
 
 #include "TfLiteParser.hpp"
 
-#include <armnn/ArmNN.hpp>
+#include <armnn/Descriptors.hpp>
 #include <armnn/Exceptions.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/TypesUtils.hpp>

@@ -4,7 +4,7 @@
 //
 #include "OnnxParser.hpp"
 
-#include <armnn/ArmNN.hpp>
+#include <armnn/Descriptors.hpp>
 #include <armnn/Utils.hpp>
 #include <VerificationHelpers.hpp>
 

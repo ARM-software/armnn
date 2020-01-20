@@ -63,13 +63,14 @@ void DynamicQuantizationVisitor::RemoveDebugLayers()
     for (DebugLayer* debugLayer : m_DebugLayers)
     {
         OutputSlot& proceedingOutputSlot = *debugLayer->GetInputSlot(0).GetConnectedOutputSlot();
-        InputSlot& succeedingInputSlot = *debugLayer->GetOutputSlot(0).GetConnection(0);
         proceedingOutputSlot.Disconnect(debugLayer->GetInputSlot(0));
-        debugLayer->GetOutputSlot(0).Disconnect(succeedingInputSlot);
 
+        for (InputSlot* succeedingInputSlot : debugLayer->GetOutputSlot(0).GetConnections())
+        {
+            debugLayer->GetOutputSlot(0).Disconnect(*succeedingInputSlot);
+            proceedingOutputSlot.Connect(*succeedingInputSlot);
+        }
         m_Graph.EraseLayer(debugLayer);
-
-        proceedingOutputSlot.Connect(succeedingInputSlot);
     }
     m_DebugLayers.clear();
 }

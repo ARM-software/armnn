@@ -502,8 +502,8 @@ int MainImpl(const ExecuteNetworkParams& params,
 
             if (thresholdMinusInference < 0)
             {
-                ARMNN_LOG(fatal) << "Elapsed inference time is greater than provided threshold time.\n";
-                return EXIT_FAILURE;
+                std::string errorMessage = "Elapsed inference time is greater than provided threshold time.";
+                ARMNN_LOG(fatal) << errorMessage;
             }
         }
     }

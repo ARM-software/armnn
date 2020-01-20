@@ -8,7 +8,6 @@
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
-#include <armnn/ArmNN.hpp>
 
 #include <backendsCommon/test/ActivationFixture.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>

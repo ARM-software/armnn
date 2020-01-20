@@ -7,7 +7,6 @@
 
 #include <QuantizeHelper.hpp>
 
-#include <armnn/ArmNN.hpp>
 
 #include <backendsCommon/test/DataLayoutUtils.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>

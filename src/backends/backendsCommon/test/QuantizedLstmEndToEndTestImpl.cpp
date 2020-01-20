@@ -11,6 +11,7 @@
 #include <ResolveType.hpp>
 
 #include <armnn/INetwork.hpp>
+#include <armnn/QuantizedLstmParams.hpp>
 
 #include <test/TensorHelpers.hpp>
 

@@ -4,7 +4,6 @@
 //
 #pragma once
 
-#include <armnn/ArmNN.hpp>
 
 #include <Runtime.hpp>
 

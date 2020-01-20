@@ -5,7 +5,6 @@
 
 #include "FakeQuantizationTestImpl.hpp"
 
-#include <armnn/ArmNN.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 

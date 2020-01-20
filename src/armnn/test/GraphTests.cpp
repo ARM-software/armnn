@@ -7,7 +7,6 @@
 #include <Graph.hpp>
 #include <Layer.hpp>
 
-#include <armnn/ArmNN.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <armnn/Exceptions.hpp>
 

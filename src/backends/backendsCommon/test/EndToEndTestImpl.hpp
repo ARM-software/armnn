@@ -4,8 +4,9 @@
 //
 #pragma once
 
-#include <armnn/ArmNN.hpp>
+#include <armnn/Descriptors.hpp>
 #include <armnn/INetwork.hpp>
+#include <armnn/IRuntime.hpp>
 
 #include <Profiling.hpp>
 #include <QuantizeHelper.hpp>

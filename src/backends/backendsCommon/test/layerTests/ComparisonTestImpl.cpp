@@ -5,7 +5,6 @@
 
 #include "ComparisonTestImpl.hpp"
 
-#include <armnn/ArmNN.hpp>
 
 #include <Half.hpp>
 #include <QuantizeHelper.hpp>

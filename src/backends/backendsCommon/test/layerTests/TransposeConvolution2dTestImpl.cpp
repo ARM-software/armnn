@@ -7,7 +7,6 @@
 
 #include <QuantizeHelper.hpp>
 
-#include <armnn/ArmNN.hpp>
 
 #include <armnnUtils/Permute.hpp>
 

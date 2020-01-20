@@ -5,7 +5,6 @@
 
 #include "ConvertFp32ToFp16TestImpl.hpp"
 
-#include <armnn/ArmNN.hpp>
 
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>

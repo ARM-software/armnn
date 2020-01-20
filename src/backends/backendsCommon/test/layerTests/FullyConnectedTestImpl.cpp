@@ -5,7 +5,6 @@
 
 #include "FullyConnectedTestImpl.hpp"
 
-#include <armnn/ArmNN.hpp>
 
 #include <QuantizeHelper.hpp>
 

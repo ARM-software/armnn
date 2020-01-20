@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <armnn/ArmNN.hpp>
 
+#include <armnn/TypesUtils.hpp>
 #include <armnnUtils/FloatingPointConverter.hpp>
 
 #include <ResolveType.hpp>

@@ -5,7 +5,6 @@
 
 #include "ArgMinMaxTestImpl.hpp"
 
-#include <armnn/ArmNN.hpp>
 
 #include <backendsCommon/test/DataTypeUtils.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>

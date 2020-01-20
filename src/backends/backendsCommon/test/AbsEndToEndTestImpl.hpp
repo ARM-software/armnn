@@ -10,7 +10,6 @@
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
-#include <armnn/ArmNN.hpp>
 
 namespace
 {

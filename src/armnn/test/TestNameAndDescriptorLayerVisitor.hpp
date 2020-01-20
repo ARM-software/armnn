@@ -6,7 +6,6 @@
 
 #include "TestLayerVisitor.hpp"
 
-#include <armnn/ArmNN.hpp>
 
 #include <boost/test/unit_test.hpp>
 

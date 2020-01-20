@@ -5,7 +5,6 @@
 
 #include "NeonWorkloadFactoryHelper.hpp"
 
-#include <armnn/ArmNN.hpp>
 #include <Graph.hpp>
 #include <Network.hpp>
 

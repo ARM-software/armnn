@@ -8,7 +8,6 @@
 #include <QuantizeHelper.hpp>
 #include <armnnUtils/TensorUtils.hpp>
 
-#include <armnn/ArmNN.hpp>
 
 #include <armnnUtils/DataLayoutIndexed.hpp>
 #include <armnnUtils/Permute.hpp>

@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <armnn/ArmNN.hpp>
 #include <Graph.hpp>
 #include <Network.hpp>
 

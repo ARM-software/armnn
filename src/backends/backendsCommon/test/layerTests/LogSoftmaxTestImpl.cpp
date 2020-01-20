@@ -9,7 +9,6 @@
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
-#include <armnn/ArmNN.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <armnn/backends/IBackendInternal.hpp>

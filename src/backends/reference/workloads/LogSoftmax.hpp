@@ -5,9 +5,10 @@
 
 #pragma once
 
-#include "BaseIterator.hpp"
-
+#include <armnn/Descriptors.hpp>
 #include <armnn/Tensor.hpp>
+
+#include "BaseIterator.hpp"
 
 namespace armnn
 {

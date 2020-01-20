@@ -5,7 +5,6 @@
 
 #include "DetectionPostProcess.hpp"
 
-#include <armnn/ArmNN.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>

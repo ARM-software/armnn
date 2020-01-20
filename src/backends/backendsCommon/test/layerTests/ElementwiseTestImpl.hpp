@@ -7,7 +7,6 @@
 
 #include "LayerTestResult.hpp"
 
-#include <armnn/ArmNN.hpp>
 
 #include <ResolveType.hpp>
 

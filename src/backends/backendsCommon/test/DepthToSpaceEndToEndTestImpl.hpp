@@ -7,7 +7,6 @@
 
 #include <ResolveType.hpp>
 
-#include <armnn/ArmNN.hpp>
 
 #include <QuantizeHelper.hpp>
 

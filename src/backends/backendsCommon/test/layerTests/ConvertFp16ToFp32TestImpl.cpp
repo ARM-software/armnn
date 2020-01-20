@@ -7,7 +7,6 @@
 
 #include <Half.hpp>
 
-#include <armnn/ArmNN.hpp>
 
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>

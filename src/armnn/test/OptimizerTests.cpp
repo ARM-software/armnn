@@ -8,7 +8,6 @@
 #include <Graph.hpp>
 #include <Optimizer.hpp>
 
-#include <armnn/ArmNN.hpp>
 
 #include <armnnUtils/FloatingPointConverter.hpp>
 

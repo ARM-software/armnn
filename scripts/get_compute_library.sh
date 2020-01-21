@@ -7,10 +7,10 @@
 CMD=$( basename $0 )
 
 # For pinning to a ref use this:
-DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_19_11" # Release 19.11
+#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_19_11" # Release 19.11
 #
 # For pinning to a revision use this:
-#DEFAULT_CLFRAMEWORKREVISION="df9701960a296cb50523017a6d956d9bd59450f9" #COMPMID-2819: Retain data layout in NESpaceToDepth and NEDepthToSpace
+DEFAULT_CLFRAMEWORKREVISION="19bd412fd044197726dbd8c756dbd74a9e33fd2b" #COMPMID-3022 Fix NEON QASYMM8 Reduction Operation
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

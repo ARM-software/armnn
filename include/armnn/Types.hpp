@@ -40,8 +40,8 @@ enum class DataType
     QuantizedSymm8PerAxis = 6,
     QSymmS8 = 7,
 
-    QuantisedAsymm8 ARMNN_DEPRECATED_MSG("Use DataType::QAsymmU8 instead.") = QAsymmU8,
-    QuantisedSymm16 ARMNN_DEPRECATED_MSG("Use DataType::QSymmS16 instead.") = QSymmS16
+    QuantisedAsymm8 ARMNN_DEPRECATED_ENUM_MSG("Use DataType::QAsymmU8 instead.") = QAsymmU8,
+    QuantisedSymm16 ARMNN_DEPRECATED_ENUM_MSG("Use DataType::QSymmS16 instead.") = QSymmS16
 };
 
 enum class DataLayout

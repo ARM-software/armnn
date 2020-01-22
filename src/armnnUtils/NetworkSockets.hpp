@@ -49,9 +49,9 @@ long Write(Socket s, const void* buf, size_t len);
 
 long Read(Socket s, void* buf, size_t len);
 
-int Ioctl(Socket s, unsigned long cmd, void* arg);
+int Ioctl(Socket s, unsigned long int cmd, void* arg);
 
-int Poll(PollFd* fds, size_t numFds, int timeout);
+int Poll(PollFd* fds, nfds_t numFds, int timeout);
 
 Socket Accept(Socket s, sockaddr* addr, unsigned int* addrlen, int flags);
 

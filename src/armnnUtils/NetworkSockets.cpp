@@ -66,9 +66,11 @@ long Read(Socket s, void* buf, size_t len)
 #endif
 }
 
-int Ioctl(Socket s, unsigned long cmd, void* arg)
+int Ioctl(Socket s, unsigned long int cmd, void* arg)
 {
-#if defined(__unix__)
+#if defined(__ANDROID__)
+    return ioctl(s, static_cast<int>(cmd), arg);
+#elif defined(__unix__)
     return ioctl(s, cmd, arg);
 #elif defined(_MSC_VER)
     return ioctlsocket(s, cmd, static_cast<u_long*>(arg));
@@ -76,7 +78,7 @@ int Ioctl(Socket s, unsigned long cmd, void* arg)
 }
 
 
-int Poll(PollFd* fds, size_t numFds, int timeout)
+int Poll(PollFd* fds, nfds_t numFds, int timeout)
 {
 #if defined(__unix__)
     return poll(fds, numFds, timeout);

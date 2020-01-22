@@ -166,12 +166,14 @@ private:
         // Convenience constructors
         SupportedDataStorage(std::unique_ptr<float[]>&&   data);
         SupportedDataStorage(std::unique_ptr<uint8_t[]>&& data);
+        SupportedDataStorage(std::unique_ptr<int8_t[]>&&  data);
         SupportedDataStorage(std::unique_ptr<int32_t[]>&& data);
 
     private:
         // Pointers to the data buffers
         std::unique_ptr<float[]>   m_FloatData;
         std::unique_ptr<uint8_t[]> m_Uint8Data;
+        std::unique_ptr<int8_t[]>  m_Int8Data;
         std::unique_ptr<int32_t[]> m_Int32Data;
     };
 

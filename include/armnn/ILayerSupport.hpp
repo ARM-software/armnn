@@ -275,6 +275,11 @@ public:
                                           const QuantizedLstmInputParamsInfo& paramsInfo,
                                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    ARMNN_DEPRECATED_MSG("Use IsReshapeSupported with output tensor info argument instead")
+    virtual bool IsReshapeSupported(const TensorInfo& input,
+                                    const ReshapeDescriptor& descriptor,
+                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
     virtual bool IsReshapeSupported(const TensorInfo& input,
                                     const TensorInfo& output,
                                     const ReshapeDescriptor& descriptor,

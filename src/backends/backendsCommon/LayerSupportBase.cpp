@@ -419,11 +419,18 @@ bool LayerSupportBase::IsQuantizedLstmSupported(const TensorInfo& input,
 }
 
 bool LayerSupportBase::IsReshapeSupported(const TensorInfo& input,
-                                          const TensorInfo& output,
                                           const ReshapeDescriptor& descriptor,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
+bool LayerSupportBase::IsReshapeSupported(const TensorInfo& input,
+                                          const TensorInfo& output,
+                                          const ReshapeDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    return IsReshapeSupported(input, descriptor, reasonIfUnsupported);
 }
 
 bool LayerSupportBase::IsResizeBilinearSupported(const TensorInfo& input,

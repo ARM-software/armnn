@@ -8,8 +8,8 @@
 #include "WorkloadInfo.hpp"
 
 #include <armnn/Types.hpp>
+#include <armnn/IProfilingGuidGenerator.hpp>
 #include <Profiling.hpp>
-#include <ProfilingService.hpp>
 
 #include <algorithm>
 
@@ -45,7 +45,7 @@ public:
 
     BaseWorkload(const QueueDescriptor& descriptor, const WorkloadInfo& info)
         : m_Data(descriptor),
-          m_Guid(profiling::ProfilingService::Instance().NextGuid())
+          m_Guid(profiling::IProfilingGuidGenerator::Instance().NextGuid())
     {
         m_Data.Validate(info);
     }

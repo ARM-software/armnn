@@ -224,6 +224,7 @@ list(APPEND armnn_sources
     include/armnn/ILayerVisitor.hpp
     include/armnn/INetwork.hpp
     include/armnn/IProfiler.hpp
+    include/armnn/IProfilingGuidGenerator.hpp
     include/armnn/IRuntime.hpp
     include/armnn/LayerSupport.hpp
     include/armnn/LayerVisitorBase.hpp
@@ -467,7 +468,6 @@ list(APPEND armnn_sources
     src/profiling/IPeriodicCounterCapture.hpp
     src/profiling/IProfilingConnection.hpp
     src/profiling/IProfilingConnectionFactory.hpp
-    src/profiling/IProfilingGuidGenerator.hpp
     src/profiling/LabelsAndEventClasses.cpp
     src/profiling/LabelsAndEventClasses.hpp
     src/profiling/Packet.hpp

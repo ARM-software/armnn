@@ -14,6 +14,11 @@ namespace armnn
 namespace profiling
 {
 
+IProfilingGuidGenerator& IProfilingGuidGenerator::Instance()
+{
+    return ProfilingService::Instance();
+}
+
 void ProfilingService::ResetExternalProfilingOptions(const ExternalProfilingOptions& options,
                                                      bool resetProfilingService)
 {

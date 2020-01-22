@@ -25,6 +25,8 @@ public:
     virtual ProfilingStaticGuid GenerateStaticId(const std::string& str) = 0;
 
     virtual ~IProfilingGuidGenerator() {}
+
+    static IProfilingGuidGenerator& Instance();
 };
 
 } // namespace profiling

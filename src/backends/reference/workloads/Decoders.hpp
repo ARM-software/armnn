@@ -71,6 +71,7 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
 {
     switch(info.GetDataType())
     {
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         case armnn::DataType::QuantizedSymm8PerAxis:
         {
             std::pair<unsigned int, std::vector<float>> params = armnnUtils::GetPerAxisParams(info);
@@ -79,6 +80,7 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
                 params.second,
                 params.first);
         }
+        ARMNN_NO_DEPRECATE_WARN_END
         case DataType::QAsymmU8:
         {
             return std::make_unique<QASymm8Decoder>(
@@ -107,10 +109,21 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
         }
         case DataType::QSymmS8:
         {
-            return std::make_unique<QSymmS8Decoder>(
-            static_cast<const int8_t*>(data),
-            info.GetQuantizationScale(),
-            info.GetQuantizationOffset());
+            if (info.HasPerAxisQuantization())
+            {
+                std::pair<unsigned int, std::vector<float>> params = armnnUtils::GetPerAxisParams(info);
+                return std::make_unique<QSymm8PerAxisDecoder>(
+                    static_cast<const int8_t*>(data),
+                    params.second,
+                    params.first);
+            }
+            else
+            {
+                return std::make_unique<QSymmS8Decoder>(
+                    static_cast<const int8_t*>(data),
+                    info.GetQuantizationScale(),
+                    info.GetQuantizationOffset());
+            }
         }
         default:
         {

@@ -106,6 +106,14 @@ struct TypeIs : public Rule
     }
 };
 
+struct TypeNotPerAxisQuantized : public Rule
+{
+    TypeNotPerAxisQuantized(const TensorInfo& info)
+    {
+        m_Res = !info.IsQuantized() || !info.HasPerAxisQuantization();
+    }
+};
+
 struct BiasAndWeightsTypesMatch : public Rule
 {
     BiasAndWeightsTypesMatch(const TensorInfo& biases, const TensorInfo& weights)

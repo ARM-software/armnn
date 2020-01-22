@@ -42,7 +42,7 @@ ARMNN_NO_DEPRECATE_WARN_END
 #define ARMNN_DEPRECATED [[deprecated]]
 #define ARMNN_DEPRECATED_MSG(message) [[deprecated(message)]]
 
-#if defined(__GNUC__) && (__GNUC__ <= 6)
+#if defined(__GNUC__) && (__GNUC__ < 6)
 #   define ARMNN_DEPRECATED_ENUM
 #   define ARMNN_DEPRECATED_ENUM_MSG(message)
 #else

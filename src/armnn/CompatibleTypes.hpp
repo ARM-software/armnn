@@ -38,7 +38,9 @@ inline bool CompatibleTypes<uint8_t>(DataType dataType)
 template<>
 inline bool CompatibleTypes<int8_t>(DataType dataType)
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return dataType == DataType::QSymmS8 || dataType == DataType::QuantizedSymm8PerAxis;
+    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 template<>

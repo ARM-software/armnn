@@ -24,7 +24,7 @@ namespace armcomputetensorutils
 {
 
 /// Utility function to map an armnn::DataType to corresponding arm_compute::DataType.
-arm_compute::DataType GetArmComputeDataType(armnn::DataType dataType);
+arm_compute::DataType GetArmComputeDataType(armnn::DataType dataType, bool multiScales);
 
 /// Utility function used to set up an arm_compute::Coordinates from a vector of ArmNN Axes for reduction functions
 arm_compute::Coordinates BuildArmComputeReductionCoordinates(size_t inputDimensions,

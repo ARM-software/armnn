@@ -10,6 +10,8 @@
 #include <neon/NeonTimer.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 
+#include <armnn/Utils.hpp>
+
 #include <Half.hpp>
 
 #define ARMNN_SCOPED_PROFILING_EVENT_NEON(name) \
@@ -46,9 +48,13 @@ inline void InitializeArmComputeTensorData(arm_compute::Tensor& tensor,
         case DataType::QAsymmU8:
             CopyArmComputeTensorData(tensor, handle->GetConstTensor<uint8_t>());
             break;
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         case DataType::QuantizedSymm8PerAxis:
+            ARMNN_FALLTHROUGH;
+        case DataType::QSymmS8:
             CopyArmComputeTensorData(tensor, handle->GetConstTensor<int8_t>());
             break;
+        ARMNN_NO_DEPRECATE_WARN_END
         case DataType::Signed32:
             CopyArmComputeTensorData(tensor, handle->GetConstTensor<int32_t>());
             break;

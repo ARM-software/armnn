@@ -5,6 +5,8 @@
 
 #include <backendsCommon/WorkloadUtils.hpp>
 
+#include <armnn/Utils.hpp>
+
 namespace armnn
 {
 
@@ -167,9 +169,13 @@ armnn::ConstTensor ConvertWeightTensorFromArmnnToAcl(const ConstCpuTensorHandle*
             case DataType::QAsymmU8:
                 weightPermuted = ReorderWeightChannelsForAcl<uint8_t>(weightPermuted, dataLayout, permuteBuffer);
                 break;
+            ARMNN_NO_DEPRECATE_WARN_BEGIN
             case DataType::QuantizedSymm8PerAxis:
+                ARMNN_FALLTHROUGH;
+            case DataType::QSymmS8:
                 weightPermuted = ReorderWeightChannelsForAcl<int8_t>(weightPermuted, dataLayout, permuteBuffer);
                 break;
+            ARMNN_NO_DEPRECATE_WARN_END
             default:
                 break;
         }

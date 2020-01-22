@@ -37,7 +37,7 @@ enum class DataType
     Signed32 = 3,
     Boolean = 4,
     QSymmS16 = 5,
-    QuantizedSymm8PerAxis = 6,
+    QuantizedSymm8PerAxis ARMNN_DEPRECATED_ENUM_MSG("Per Axis property inferred by number of scales in TensorInfo") = 6,
     QSymmS8 = 7,
 
     QuantisedAsymm8 ARMNN_DEPRECATED_ENUM_MSG("Use DataType::QAsymmU8 instead.") = QAsymmU8,

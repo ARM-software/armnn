@@ -3049,7 +3049,7 @@ LayerTestResult<uint8_t, 4> Convolution2dPerAxisQuantTest(
     using namespace armnn;
 
     const DataType inputType  = DataType::QAsymmU8;
-    const DataType kernelType = DataType::QuantizedSymm8PerAxis;
+    const DataType kernelType = DataType::QSymmS8;
     const DataType biasType   = DataType::Signed32;
 
     TensorInfo inputInfo ({ 1, 3, 1, 2 }, inputType, 0.5f, 128);
@@ -3273,7 +3273,7 @@ LayerTestResult<uint8_t, 4> DepthwiseConvolution2dPerAxisQuantTest(
     using namespace armnn;
 
     const DataType inputType  = DataType::QAsymmU8;
-    const DataType kernelType = DataType::QuantizedSymm8PerAxis;
+    const DataType kernelType = DataType::QSymmS8;
     const DataType biasType   = DataType::Signed32;
 
     TensorInfo inputInfo ({ 1, 3, 3, 2 }, inputType, 0.5f, 128); // N H W C

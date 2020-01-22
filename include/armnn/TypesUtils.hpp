@@ -119,8 +119,10 @@ constexpr unsigned int GetDataTypeSize(DataType dataType)
         case DataType::Signed32:              return 4U;
         case DataType::QAsymmU8:              return 1U;
         case DataType::QSymmS8:               return 1U;
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         case DataType::QuantizedSymm8PerAxis: return 1U;
-        case DataType::QSymmS16:       return 2U;
+        ARMNN_NO_DEPRECATE_WARN_END
+        case DataType::QSymmS16:              return 2U;
         case DataType::Boolean:               return 1U;
         default:                              return 0U;
     }
@@ -167,8 +169,10 @@ constexpr const char* GetDataTypeName(DataType dataType)
         case DataType::Float32:               return "Float32";
         case DataType::QAsymmU8:              return "QAsymmU8";
         case DataType::QSymmS8:               return "QSymmS8";
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         case DataType::QuantizedSymm8PerAxis: return "QSymm8PerAxis";
-        case DataType::QSymmS16:       return "QSymm16";
+        ARMNN_NO_DEPRECATE_WARN_END
+        case DataType::QSymmS16:              return "QSymm16";
         case DataType::Signed32:              return "Signed32";
         case DataType::Boolean:               return "Boolean";
 
@@ -230,10 +234,12 @@ constexpr bool IsQuantizedType()
 
 constexpr bool IsQuantizedType(DataType dataType)
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return dataType == DataType::QAsymmU8        ||
            dataType == DataType::QSymmS8         ||
-           dataType == DataType::QSymmS16 ||
+           dataType == DataType::QSymmS16        ||
            dataType == DataType::QuantizedSymm8PerAxis;
+    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 inline std::ostream& operator<<(std::ostream& os, Status stat)

@@ -10,6 +10,8 @@
 #include <cl/OpenClTimer.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 
+#include <armnn/Utils.hpp>
+
 #include <arm_compute/runtime/CL/CLFunctions.h>
 
 #include <sstream>
@@ -101,9 +103,13 @@ inline void InitializeArmComputeClTensorData(arm_compute::CLTensor& clTensor,
         case DataType::QAsymmU8:
             CopyArmComputeClTensorData(clTensor, handle->GetConstTensor<uint8_t>());
             break;
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         case DataType::QuantizedSymm8PerAxis:
+            ARMNN_FALLTHROUGH;
+        case DataType::QSymmS8:
             CopyArmComputeClTensorData(clTensor, handle->GetConstTensor<int8_t>());
             break;
+        ARMNN_NO_DEPRECATE_WARN_END
         case DataType::Signed32:
             CopyArmComputeClTensorData(clTensor, handle->GetConstTensor<int32_t>());
             break;

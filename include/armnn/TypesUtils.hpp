@@ -77,16 +77,6 @@ constexpr char const* GetPoolingAlgorithmAsCString(PoolingAlgorithm pooling)
     }
 }
 
-constexpr char const* GetResizeMethodAsCString(ResizeMethod resizeMethod)
-{
-    switch (resizeMethod)
-    {
-        case ResizeMethod::Bilinear:        return "Bilinear";
-        case ResizeMethod::NearestNeighbor: return "NearestNeighbor";
-        default:                            return "Unknown";
-    }
-}
-
 constexpr char const* GetOutputShapeRoundingAsCString(OutputShapeRounding rounding)
 {
     switch (rounding)
@@ -96,7 +86,6 @@ constexpr char const* GetOutputShapeRoundingAsCString(OutputShapeRounding roundi
         default:                            return "Unknown";
     }
 }
-
 
 constexpr char const* GetPaddingMethodAsCString(PaddingMethod method)
 {
@@ -185,6 +174,35 @@ constexpr const char* GetDataLayoutName(DataLayout dataLayout)
     }
 }
 
+constexpr const char* GetNormalizationAlgorithmChannelAsCString(NormalizationAlgorithmChannel channel)
+{
+    switch (channel)
+    {
+        case NormalizationAlgorithmChannel::Across: return "Across";
+        case NormalizationAlgorithmChannel::Within: return "Within";
+        default:                                    return "Unknown";
+    }
+}
+
+constexpr const char* GetNormalizationAlgorithmMethodAsCString(NormalizationAlgorithmMethod method)
+{
+    switch (method)
+    {
+        case NormalizationAlgorithmMethod::LocalBrightness: return "LocalBrightness";
+        case NormalizationAlgorithmMethod::LocalContrast:   return "LocalContrast";
+        default:                                            return "Unknown";
+    }
+}
+
+constexpr const char* GetResizeMethodAsCString(ResizeMethod method)
+{
+    switch (method)
+    {
+        case ResizeMethod::Bilinear:        return "Bilinear";
+        case ResizeMethod::NearestNeighbor: return "NearestNeighbour";
+        default:                            return "Unknown";
+    }
+}
 
 template<typename T>
 struct IsHalfType

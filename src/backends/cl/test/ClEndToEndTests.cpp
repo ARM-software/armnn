@@ -398,4 +398,54 @@ BOOST_AUTO_TEST_CASE(ClArgMinAxis3Test)
     ArgMinAxis3EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
+BOOST_AUTO_TEST_CASE(ClArgMaxSimpleTestQAsymmU8)
+{
+    ArgMaxEndToEndSimple<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMinSimpleTestQAsymmU8)
+{
+    ArgMinEndToEndSimple<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMaxAxis0TestQAsymmU8)
+{
+    ArgMaxAxis0EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMinAxis0TestQAsymmU8)
+{
+    ArgMinAxis0EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMaxAxis1TestQAsymmU8)
+{
+    ArgMaxAxis1EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMinAxis1TestQAsymmU8)
+{
+    ArgMinAxis1EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMaxAxis2TestQAsymmU8)
+{
+    ArgMaxAxis2EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMinAxis2TestQAsymmU8)
+{
+    ArgMinAxis2EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMaxAxis3TestQAsymmU8)
+{
+    ArgMaxAxis3EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMinAxis3TestQAsymmU8)
+{
+    ArgMinAxis3EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

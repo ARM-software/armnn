@@ -902,6 +902,13 @@ ARMNN_AUTO_TEST_CASE(ArgMaxChannel, ArgMaxChannelTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(ArgMaxHeight, ArgMaxHeightTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(ArgMinWidth, ArgMinWidthTest<DataType::Float32>)
 
+ARMNN_AUTO_TEST_CASE(ArgMinQAsymm8, ArgMinSimpleTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(ArgMaxQAsymm8, ArgMaxSimpleTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(ArgMinChannelQAsymm8, ArgMinChannelTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(ArgMaxChannelQAsymm8, ArgMaxChannelTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(ArgMaxHeightQAsymm8, ArgMaxHeightTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(ArgMinWidthQAsymm8, ArgMinWidthTest<DataType::QAsymmU8>)
+
 #if defined(ARMNNREF_ENABLED)
 
 // The ARMNN_COMPARE_REF_AUTO_TEST_CASE and the ARMNN_COMPARE_REF_FIXTURE_TEST_CASE test units are not available

@@ -194,10 +194,6 @@ bool ClLayerSupport::IsArgMinMaxSupported(const TensorInfo& input,
                                           const ArgMinMaxDescriptor& descriptor,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
-    if (input.GetDataType() == DataType::QAsymmU8)
-    {
-        return false;
-    }
 
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClArgMinMaxWorkloadValidate,
                                    reasonIfUnsupported,

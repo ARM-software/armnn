@@ -1,0 +1,45 @@
+//
+// Copyright © 2020 Arm Ltd. All rights reserved.
+// SPDX-License-Identifier: MIT
+//
+
+#include "NeonDivisionWorkload.hpp"
+#include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+
+namespace armnn
+{
+
+arm_compute::Status NeonDivisionWorkloadValidate(const TensorInfo& input0,
+                                                const TensorInfo& input1,
+                                                const TensorInfo& output)
+{
+    const arm_compute::TensorInfo aclInput0 = armcomputetensorutils::BuildArmComputeTensorInfo(input0);
+    const arm_compute::TensorInfo aclInput1 = armcomputetensorutils::BuildArmComputeTensorInfo(input1);
+    const arm_compute::TensorInfo aclOutput = armcomputetensorutils::BuildArmComputeTensorInfo(output);
+
+    return arm_compute::NEElementwiseDivision::validate(&aclInput0,
+                                                   &aclInput1,
+                                                   &aclOutput);
+}
+
+NeonDivisionWorkload::NeonDivisionWorkload(const DivisionQueueDescriptor& descriptor,
+                                         const WorkloadInfo& info)
+    : BaseWorkload<DivisionQueueDescriptor>(descriptor, info)
+{
+    m_Data.ValidateInputsOutputs("NeonDivisionWorkload", 2, 1);
+
+    arm_compute::ITensor& input0 = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& input1 = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
+    arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+
+    m_DivLayer.configure(&input0, &input1, &output);
+}
+
+void NeonDivisionWorkload::Execute() const
+{
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonDivisionWorkload_Execute");
+    m_DivLayer.run();
+}
+
+} //namespace armnn

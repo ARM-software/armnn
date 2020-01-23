@@ -491,6 +491,12 @@ ARMNN_AUTO_TEST_CASE(SubtractionUint8, SubtractionUint8Test)
 ARMNN_AUTO_TEST_CASE(SubBroadcastUint8, SubtractionBroadcastUint8Test)
 ARMNN_AUTO_TEST_CASE(SubBroadcast1ElementUint8, SubtractionBroadcast1ElementUint8Test)
 
+// Div
+ARMNN_AUTO_TEST_CASE(SimpleDivision, DivisionTest)
+ARMNN_AUTO_TEST_CASE(DivisionByZero, DivisionByZeroTest)
+ARMNN_AUTO_TEST_CASE(DivisionBroadcast1Element, DivisionBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE(DivisionBroadcast1DVector, DivisionBroadcast1DVectorTest)
+
 // Mul
 ARMNN_AUTO_TEST_CASE(SimpleMultiplication, MultiplicationTest)
 ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1Element, MultiplicationBroadcast1ElementTest)

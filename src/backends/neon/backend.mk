@@ -45,6 +45,7 @@ BACKEND_SOURCES := \
         workloads/NeonMeanWorkload.cpp \
         workloads/NeonMinimumWorkload.cpp \
         workloads/NeonMultiplicationWorkload.cpp \
+        workloads/NeonDivisionWorkload.cpp \
         workloads/NeonNormalizationFloatWorkload.cpp \
         workloads/NeonPadWorkload.cpp \
         workloads/NeonPermuteWorkload.cpp \

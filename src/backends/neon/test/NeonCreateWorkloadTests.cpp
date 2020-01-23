@@ -181,6 +181,14 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationUint8Workload)
                                       DataType::QAsymmU8>();
 }
 
+BOOST_AUTO_TEST_CASE(CreateDivisionFloatWorkloadTest)
+{
+    NeonCreateElementwiseWorkloadTest<NeonDivisionWorkload,
+                                      DivisionQueueDescriptor,
+                                      DivisionLayer,
+                                      armnn::DataType::Float32>();
+}
+
 template <typename BatchNormalizationWorkloadType, typename armnn::DataType DataType>
 static void NeonCreateBatchNormalizationWorkloadTest(DataLayout dataLayout)
 {

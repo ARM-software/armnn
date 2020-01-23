@@ -176,6 +176,11 @@ public:
                                    const TensorInfo& output,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsDivisionSupported(const TensorInfo& input0,
+                             const TensorInfo& input1,
+                             const TensorInfo& output,
+                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsNormalizationSupported(const TensorInfo& input,
                                   const TensorInfo& output,
                                   const NormalizationDescriptor& descriptor,

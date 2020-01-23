@@ -38,6 +38,7 @@
 #include "workloads/NeonConcatWorkload.hpp"
 #include "workloads/NeonMinimumWorkload.hpp"
 #include "workloads/NeonMultiplicationWorkload.hpp"
+#include "workloads/NeonDivisionWorkload.hpp"
 #include "workloads/NeonNormalizationFloatWorkload.hpp"
 #include "workloads/NeonFullyConnectedWorkload.hpp"
 #include "workloads/NeonPadWorkload.hpp"
@@ -548,6 +549,18 @@ bool NeonLayerSupport::IsMultiplicationSupported(const TensorInfo& input0,
                                                  Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonMultiplicationWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input0,
+                                   input1,
+                                   output);
+}
+
+bool NeonLayerSupport::IsDivisionSupported(const TensorInfo& input0,
+                                           const TensorInfo& input1,
+                                           const TensorInfo& output,
+                                           Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonDivisionWorkloadValidate,
                                    reasonIfUnsupported,
                                    input0,
                                    input1,

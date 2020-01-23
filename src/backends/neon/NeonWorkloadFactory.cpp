@@ -216,10 +216,10 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDetectionPostProcess(
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateDivision(
     const DivisionQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
+    return std::make_unique<NeonDivisionWorkload>(descriptor, info);
 }
 
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor& 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor&
                                                                        descriptor,
                                                                        const WorkloadInfo& info) const
 {

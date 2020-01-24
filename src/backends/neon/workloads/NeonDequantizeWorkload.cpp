@@ -7,6 +7,8 @@
 
 #include "NeonWorkloadUtils.hpp"
 
+#include <arm_compute/runtime/NEON/functions/NEDequantizationLayer.h>
+
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <neon/NeonTensorHandle.hpp>
@@ -33,9 +35,10 @@ NeonDequantizeWorkload::NeonDequantizeWorkload(const DequantizeQueueDescriptor& 
     arm_compute::ITensor& input = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_Layer.reset(new arm_compute::NEDequantizationLayer());
-    m_Layer->configure(&input, &output);
-    m_Layer->prepare();
+    std::unique_ptr<arm_compute::NEDequantizationLayer> layer(new arm_compute::NEDequantizationLayer());
+    layer->configure(&input, &output);
+    layer->prepare();
+    m_Layer.reset(layer.release());
 }
 
 void NeonDequantizeWorkload::Execute() const

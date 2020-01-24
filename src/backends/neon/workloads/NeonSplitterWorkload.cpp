@@ -5,13 +5,14 @@
 
 #include "NeonSplitterWorkload.hpp"
 
-#include "NeonWorkloadUtils.hpp"
+#include <arm_compute/runtime/NEON/functions/NESplit.h>
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <neon/NeonTensorHandle.hpp>
 
+#include "NeonWorkloadUtils.hpp"
 
 namespace armnn
 {
@@ -83,7 +84,7 @@ NeonSplitterWorkload::NeonSplitterWorkload(const SplitterQueueDescriptor& descri
     }
 
     // Create the layer function
-    m_Layer.reset(new arm_compute::NESplit());
+    std::unique_ptr<arm_compute::NESplit> layer(new arm_compute::NESplit());
 
     // Configure input and output tensors
     std::set<unsigned int> splitAxis = ComputeSplitAxis(descriptor.m_Parameters, m_Data.m_Inputs[0]->GetShape());
@@ -93,10 +94,11 @@ NeonSplitterWorkload::NeonSplitterWorkload(const SplitterQueueDescriptor& descri
     }
 
     unsigned int aclAxis = CalcAclAxis(descriptor.m_Parameters.GetNumDimensions(), *splitAxis.begin());
-    m_Layer->configure(&input, aclOutputs, aclAxis);
+    layer->configure(&input, aclOutputs, aclAxis);
 
     // Prepare
-    m_Layer->prepare();
+    layer->prepare();
+    m_Layer.reset(layer.release());
 }
 
 void NeonSplitterWorkload::Execute() const

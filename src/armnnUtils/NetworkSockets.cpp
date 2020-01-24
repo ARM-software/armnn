@@ -88,7 +88,7 @@ int Poll(PollFd* fds, nfds_t numFds, int timeout)
 }
 
 
-armnnUtils::Sockets::Socket Accept(Socket s, sockaddr* addr, unsigned int* addrlen, int flags)
+armnnUtils::Sockets::Socket Accept(Socket s, sockaddr* addr, socklen_t* addrlen, int flags)
 {
 #if defined(__unix__)
     return accept4(s, addr, addrlen, flags);

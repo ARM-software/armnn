@@ -10,7 +10,7 @@ namespace armnnUtils
 namespace Filesystem
 {
 
-long GetFileSize(const char* path);
+long long GetFileSize(const char* path);
 
 bool Remove(const char* path);
 

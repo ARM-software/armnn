@@ -53,7 +53,7 @@ int Ioctl(Socket s, unsigned long int cmd, void* arg);
 
 int Poll(PollFd* fds, nfds_t numFds, int timeout);
 
-Socket Accept(Socket s, sockaddr* addr, unsigned int* addrlen, int flags);
+Socket Accept(Socket s, sockaddr* addr, socklen_t* addrlen, int flags);
 
 }
 }

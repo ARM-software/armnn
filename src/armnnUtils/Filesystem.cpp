@@ -18,15 +18,22 @@ namespace armnnUtils
 namespace Filesystem
 {
 
-long GetFileSize(const char* path)
+long long GetFileSize(const char* path)
 {
-#if defined(__unix__)
+#if defined(__ANDROID__)
     struct stat statusBuffer;
     if (stat(path, & statusBuffer) != 0)
     {
         return -1;
     }
     return statusBuffer.st_size;
+#elif defined(__unix__)
+    struct stat statusBuffer;
+    if (stat(path, & statusBuffer) != 0)
+    {
+        return -1;
+    }
+    return static_cast<long long>(statusBuffer.st_size);
 #elif defined(_MSC_VER)
     WIN32_FILE_ATTRIBUTE_DATA attr;
     if (::GetFileAttributesEx(path, GetFileExInfoStandard, &attr) == 0)

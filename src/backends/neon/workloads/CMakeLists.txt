@@ -80,6 +80,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonSoftmaxFloatWorkload.hpp
     NeonSoftmaxUint8Workload.cpp
     NeonSoftmaxUint8Workload.hpp
+    NeonSpaceToBatchNdWorkload.cpp
+    NeonSpaceToBatchNdWorkload.hpp
     NeonSpaceToDepthWorkload.cpp
     NeonSpaceToDepthWorkload.hpp
     NeonSplitterWorkload.cpp

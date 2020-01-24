@@ -50,6 +50,7 @@
 #include "workloads/NeonRsqrtWorkload.hpp"
 #include "workloads/NeonSliceWorkload.hpp"
 #include "workloads/NeonSoftmaxBaseWorkload.hpp"
+#include "workloads/NeonSpaceToBatchNdWorkload.hpp"
 #include "workloads/NeonSpaceToDepthWorkload.hpp"
 #include "workloads/NeonSplitterWorkload.hpp"
 #include "workloads/NeonStackWorkload.hpp"
@@ -701,10 +702,22 @@ bool NeonLayerSupport::IsSoftmaxSupported(const TensorInfo& input,
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonSoftmaxWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
 }
 
+bool NeonLayerSupport::IsSpaceToBatchNdSupported(const TensorInfo& input,
+                                                 const TensorInfo& output,
+                                                 const SpaceToBatchNdDescriptor& descriptor,
+                                                 Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonSpaceToBatchNdWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
+}
+
 bool NeonLayerSupport::IsSpaceToDepthSupported(const TensorInfo& input,
-                                              const TensorInfo& output,
-                                              const SpaceToDepthDescriptor& descriptor,
-                                              Optional<std::string&> reasonIfUnsupported) const
+                                               const TensorInfo& output,
+                                               const SpaceToDepthDescriptor& descriptor,
+                                               Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonSpaceToDepthWorkloadValidate,
                                    reasonIfUnsupported,

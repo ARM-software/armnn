@@ -467,8 +467,14 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSoftmax(const SoftmaxQueue
         descriptor, info, m_MemoryManager->GetIntraLayerManager());
 }
 
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSpaceToDepth(
-    const armnn::SpaceToDepthQueueDescriptor& descriptor, const armnn::WorkloadInfo& info) const
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
+                                                                     const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonSpaceToBatchNdWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSpaceToDepth(const SpaceToDepthQueueDescriptor& descriptor,
+                                                                   const WorkloadInfo& info) const
 {
     return std::make_unique<NeonSpaceToDepthWorkload>(descriptor, info);
 }

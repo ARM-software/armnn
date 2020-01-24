@@ -195,6 +195,9 @@ public:
     std::unique_ptr<IWorkload> CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                              const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
+                                                    const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateSpaceToDepth(const SpaceToDepthQueueDescriptor& descriptor,
                                                   const WorkloadInfo& info) const override;
 

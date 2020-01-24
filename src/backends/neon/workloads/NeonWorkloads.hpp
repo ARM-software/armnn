@@ -41,6 +41,7 @@
 #include "NeonSliceWorkload.hpp"
 #include "NeonSoftmaxFloatWorkload.hpp"
 #include "NeonSoftmaxUint8Workload.hpp"
+#include "NeonSpaceToBatchNdWorkload.hpp"
 #include "NeonSpaceToDepthWorkload.hpp"
 #include "NeonSplitterWorkload.hpp"
 #include "NeonStackWorkload.hpp"

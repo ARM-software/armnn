@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "ISendTimelinePacket.hpp"
+#include "armnn/profiling/ISendTimelinePacket.hpp"
 #include <armnn/Types.hpp>
 
 namespace armnn

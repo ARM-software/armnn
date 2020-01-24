@@ -6,6 +6,7 @@
 #pragma once
 
 #include <armnn/Exceptions.hpp>
+#include <armnn/profiling/ISendTimelinePacket.hpp>
 
 #include "ICounterDirectory.hpp"
 #include "IPacketBuffer.hpp"
@@ -16,8 +17,8 @@
 #include <cstring>
 #include <memory>
 #include <string>
-#include <vector>
 #include <thread>
+#include <vector>
 
 namespace armnn
 {
@@ -195,14 +196,6 @@ enum class TimelinePacketStatus
     Ok,
     Error,
     BufferExhaustion
-};
-
-enum class ProfilingRelationshipType
-{
-    RetentionLink,    /// Head retains(parents) Tail
-    ExecutionLink,    /// Head execution start depends on Tail execution completion
-    DataLink,         /// Head uses data of Tail
-    LabelLink         /// Head uses label Tail (Tail MUST be a guid of a label).
 };
 
 uint32_t CalculateSizeOfPaddedSwString(const std::string& str);

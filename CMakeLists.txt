@@ -242,6 +242,8 @@ list(APPEND armnn_sources
     include/armnn/TypesUtils.hpp
     include/armnn/Utils.hpp
     include/armnn/Version.hpp
+    include/armnn/profiling/IProfilingGuidGenerator.hpp
+    include/armnn/profiling/ISendTimelinePacket.hpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp
     src/armnn/layers/ActivationLayer.hpp
@@ -468,12 +470,10 @@ list(APPEND armnn_sources
     src/profiling/ICounterDirectory.hpp
     src/profiling/ICounterValues.hpp
     src/profiling/ISendCounterPacket.hpp
-    src/profiling/ISendTimelinePacket.hpp
     src/profiling/IPacketBuffer.hpp
     src/profiling/IPeriodicCounterCapture.hpp
     src/profiling/IProfilingConnection.hpp
     src/profiling/IProfilingConnectionFactory.hpp
-    src/profiling/IProfilingGuidGenerator.hpp
     src/profiling/LabelsAndEventClasses.cpp
     src/profiling/LabelsAndEventClasses.hpp
     src/profiling/Packet.hpp

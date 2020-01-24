@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "IProfilingGuidGenerator.hpp"
+#include "armnn/profiling/IProfilingGuidGenerator.hpp"
 
 #include <functional>
 

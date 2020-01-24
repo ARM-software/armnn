@@ -7,7 +7,7 @@
 
 #include "CommandHandlerFunctor.hpp"
 #include "ISendCounterPacket.hpp"
-#include "ISendTimelinePacket.hpp"
+#include "armnn/profiling/ISendTimelinePacket.hpp"
 #include "Packet.hpp"
 #include "ProfilingStateMachine.hpp"
 

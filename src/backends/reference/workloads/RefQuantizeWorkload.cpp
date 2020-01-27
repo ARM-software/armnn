@@ -50,7 +50,7 @@ void RefQuantizeWorkload::Execute() const
         }
         case DataType::QSymmS8:
         {
-            QuantizeImpl<int8_t>(input, output, m_NumElements, m_Scale, m_Offset);
+            QuantizeImpl<int8_t>(input, output, m_NumElements, m_Scale, 0);
             break;
         }
         case DataType::QSymmS16:

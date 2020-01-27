@@ -24,7 +24,8 @@ template <typename F32Workload, typename U8Workload, typename QueueDescriptorTyp
 std::unique_ptr<IWorkload> RefWorkloadFactory::MakeWorkload(const QueueDescriptorType& descriptor,
                                                             const WorkloadInfo& info) const
 {
-    return MakeWorkloadHelper<NullWorkload, F32Workload, U8Workload, NullWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkloadHelper<NullWorkload, F32Workload, U8Workload, NullWorkload, NullWorkload, NullWorkload>
+           (descriptor, info);
 }
 
 template <DataType ArmnnType>
@@ -52,6 +53,11 @@ bool IsFloat16(const WorkloadInfo& info)
 bool IsQSymm16(const WorkloadInfo& info)
 {
     return IsDataType<DataType::QSymmS16>(info);
+}
+
+bool IsQSymm8(const WorkloadInfo& info)
+{
+    return IsDataType<DataType::QSymmS8>(info);
 }
 
 RefWorkloadFactory::RefWorkloadFactory(const std::shared_ptr<RefMemoryManager>& memoryManager)
@@ -184,6 +190,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDebug(const DebugQueueDescr
     if (IsQSymm16(info))
     {
         return std::make_unique<RefDebugQSymm16Workload>(descriptor, info);
+    }
+    if (IsQSymm8(info))
+    {
+        return std::make_unique<RefDebugQSymm8Workload>(descriptor, info);
     }
     if (IsDataType<DataType::Signed32>(info))
     {
@@ -419,7 +429,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePermute(const PermuteQueueD
         return std::make_unique<RefPermuteQSymm16Workload>(descriptor, info);
     }
     return MakeWorkloadHelper<RefPermuteFloat16Workload, RefPermuteFloat32Workload, RefPermuteQAsymm8Workload,
-        NullWorkload, NullWorkload>(descriptor, info);
+        NullWorkload, NullWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,

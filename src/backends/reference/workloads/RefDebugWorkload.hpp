@@ -37,10 +37,11 @@ private:
     DebugCallbackFunction m_Callback;
 };
 
-using RefDebugFloat16Workload = RefDebugWorkload<DataType::Float16>;
-using RefDebugFloat32Workload = RefDebugWorkload<DataType::Float32>;
-using RefDebugQAsymm8Workload = RefDebugWorkload<DataType::QAsymmU8>;
-using RefDebugQSymm16Workload = RefDebugWorkload<DataType::QSymmS16>;
+using RefDebugFloat16Workload  = RefDebugWorkload<DataType::Float16>;
+using RefDebugFloat32Workload  = RefDebugWorkload<DataType::Float32>;
+using RefDebugQAsymm8Workload  = RefDebugWorkload<DataType::QAsymmU8>;
+using RefDebugQSymm16Workload  = RefDebugWorkload<DataType::QSymmS16>;
+using RefDebugQSymm8Workload   = RefDebugWorkload<DataType::QSymmS8>;
 using RefDebugSigned32Workload = RefDebugWorkload<DataType::Signed32>;
 
 } // namespace armnn

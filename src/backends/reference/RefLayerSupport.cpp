@@ -147,9 +147,10 @@ bool RefLayerSupport::IsAdditionSupported(const TensorInfo& input0,
 {
     bool supported = true;
 
-    std::array<DataType,4> supportedTypes = {
+    std::array<DataType,5> supportedTypes = {
         DataType::Float32,
         DataType::Float16,
+        DataType::QSymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -329,10 +330,11 @@ bool RefLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inp
     ignore_unused(descriptor);
 
     bool supported = true;
-    std::array<DataType,4> supportedTypes =
+    std::array<DataType,5> supportedTypes =
     {
             DataType::Float32,
             DataType::Float16,
+            DataType::QSymmS8,
             DataType::QAsymmU8,
             DataType::QSymmS16
     };
@@ -355,11 +357,12 @@ bool RefLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inp
 bool RefLayerSupport::IsConstantSupported(const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
-    std::array<DataType,4> supportedTypes =
+    std::array<DataType,5> supportedTypes =
     {
         DataType::Float32,
         DataType::Signed32,
         DataType::QAsymmU8,
+        DataType::QSymmS8,
         DataType::QSymmS16
     };
 
@@ -417,22 +420,23 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported types.
-    std::array<DataType,4> supportedTypes =
+    std::array<DataType,5> supportedTypes =
     {
         DataType::Float32,
         DataType::Float16,
         DataType::QAsymmU8,
+        DataType::QSymmS8,
         DataType::QSymmS16
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
-                                  "Reference convolution2d: input is not a supported type.");
+                                  "Reference Convolution2d: input is not a supported type.");
 
     supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
-                                  "Reference convolution2d: output is not a supported type.");
+                                  "Reference Convolution2d: output is not a supported type.");
 
     supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
-                                  "Reference convolution2d: input and output types mismatched.");
+                                  "Reference Convolution2d: input and output types mismatched.");
 
     const DataType inputType = input.GetDataType();
     if (inputType == DataType::QAsymmU8)
@@ -447,15 +451,15 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
         ARMNN_NO_DEPRECATE_WARN_END
 
         supported &= CheckSupportRule(TypeAnyOf(weights, supportedWeightTypes), reasonIfUnsupported,
-                                      "Reference convolution2d: weights type not supported for quantized input.");
+                                      "Reference Convolution2d: weights type not supported for quantized input.");
     }
     else
     {
         supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
-                                      "Reference convolution2d: weights is not a supported type.");
+                                      "Reference Convolution2d: weights is not a supported type.");
 
         supported &= CheckSupportRule(TypesAreEqual(input, weights), reasonIfUnsupported,
-                                      "Reference convolution2d: input and weights types mismatched.");
+                                      "Reference Convolution2d: input and weights types mismatched.");
     }
 
     if (biases.has_value())
@@ -468,7 +472,7 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
         };
 
         supported &= CheckSupportRule(TypeAnyOf(biases.value(), biasesSupportedTypes), reasonIfUnsupported,
-                                      "Reference convolution2d: biases is not a supported type.");
+                                      "Reference Convolution2d: biases is not a supported type.");
     }
     ignore_unused(descriptor);
 
@@ -481,23 +485,24 @@ bool RefLayerSupport::IsDebugSupported(const TensorInfo& input,
 {
     bool supported = true;
 
-    std::array<DataType, 5> supportedTypes =
+    std::array<DataType, 6> supportedTypes =
     {
         DataType::Float16,
         DataType::Float32,
         DataType::QAsymmU8,
+        DataType::QSymmS8,
         DataType::QSymmS16,
         DataType::Signed32
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
-                                  "Reference debug: input type not supported");
+                                  "Reference for Debug layer: input type not supported");
 
     supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
-                                  "Reference debug: output type not supported");
+                                  "Reference for Debug layer: output type not supported");
 
     supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
-                                  "Reference debug: input and output types are mismatched");
+                                  "Reference for Debug layer: input and output types are mismatched");
 
     return supported;
 }
@@ -612,7 +617,10 @@ bool RefLayerSupport::IsDequantizeSupported(const TensorInfo& input,
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedInputTypes), reasonIfUnsupported,
-                                  "Reference dequantize: input type not supported.");
+                                  "Reference for Dequantize layer: input type not supported.");
+
+    supported &= CheckSupportRule( TypeNotPerAxisQuantized(input), reasonIfUnsupported,
+                                    "Reference for Dequantize layer: per-axis quantized input not support .");
 
     supported &= CheckSupportRule(TypeNotPerAxisQuantized(input), reasonIfUnsupported,
                                   "Reference dequantize: per-axis quantized input not support .");
@@ -623,10 +631,11 @@ bool RefLayerSupport::IsDequantizeSupported(const TensorInfo& input,
     };
 
     supported &= CheckSupportRule(TypeAnyOf(output, supportedOutputTypes), reasonIfUnsupported,
-                                  "Reference dequantize: output type not supported.");
+                                  "Reference for Dequantize layer: output type not supported.");
 
     supported &= CheckSupportRule(ShapesAreSameTotalSize(input, output), reasonIfUnsupported,
-                                  "Reference dequantize: input and output shapes have different num total elements.");
+                                  "Reference for Dequantize layer: input/output shapes have different num total "
+                                  "elements.");
 
     return supported;
 }
@@ -1104,9 +1113,10 @@ bool RefLayerSupport::IsMaximumSupported(const TensorInfo& input0,
 {
     bool supported = true;
 
-    std::array<DataType,4> supportedTypes = {
+    std::array<DataType,5> supportedTypes = {
         DataType::Float32,
         DataType::Float16,
+        DataType::QSymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1270,9 +1280,10 @@ bool RefLayerSupport::IsMultiplicationSupported(const TensorInfo& input0,
 {
     bool supported = true;
 
-    std::array<DataType,4> supportedTypes = {
+    std::array<DataType,5> supportedTypes = {
         DataType::Float32,
         DataType::Float16,
+        DataType::QSymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1428,8 +1439,9 @@ bool RefLayerSupport::IsQuantizeSupported(const TensorInfo& input,
    bool supported = true;
 
     // Define supported input types.
-    std::array<DataType,1> supportedInputTypes = {
-        DataType::Float32,
+    std::array<DataType,2> supportedInputTypes = {
+        DataType::QSymmS8,
+        DataType::Float32
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedInputTypes), reasonIfUnsupported,
@@ -1458,12 +1470,13 @@ bool RefLayerSupport::IsReshapeSupported(const TensorInfo& input,
     ignore_unused(output);
     ignore_unused(descriptor);
     // Define supported output types.
-    std::array<DataType,5> supportedOutputTypes =
+    std::array<DataType,6> supportedOutputTypes =
     {
         DataType::Float32,
         DataType::Float16,
         DataType::Signed32,
         DataType::QAsymmU8,
+        DataType::QSymmS8,
         DataType::QSymmS16
     };
     return CheckSupportRule(TypeAnyOf(input, supportedOutputTypes), reasonIfUnsupported,
@@ -1502,10 +1515,11 @@ bool RefLayerSupport::IsResizeSupported(const TensorInfo& input,
 {
     boost::ignore_unused(descriptor);
     bool supported = true;
-    std::array<DataType,4> supportedTypes =
+    std::array<DataType,5> supportedTypes =
     {
         DataType::Float32,
         DataType::Float16,
+        DataType::QSymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };

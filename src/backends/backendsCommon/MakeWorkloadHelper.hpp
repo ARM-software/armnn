@@ -41,7 +41,7 @@ struct MakeWorkloadForType<NullWorkload>
 // Makes a workload for one the specified types based on the data type requirements of the tensorinfo.
 // Specify type void as the WorkloadType for unsupported DataType/WorkloadType combos.
 template <typename Float16Workload, typename Float32Workload, typename Uint8Workload, typename Int32Workload,
-          typename BooleanWorkload, typename QueueDescriptorType, typename... Args>
+          typename BooleanWorkload, typename Int8Workload, typename QueueDescriptorType, typename... Args>
 std::unique_ptr<IWorkload> MakeWorkloadHelper(const QueueDescriptorType& descriptor,
                                               const WorkloadInfo& info,
                                               Args&&... args)
@@ -58,6 +58,8 @@ std::unique_ptr<IWorkload> MakeWorkloadHelper(const QueueDescriptorType& descrip
             return MakeWorkloadForType<Float32Workload>::Func(descriptor, info, std::forward<Args>(args)...);
         case DataType::QAsymmU8:
             return MakeWorkloadForType<Uint8Workload>::Func(descriptor, info, std::forward<Args>(args)...);
+        case DataType::QSymmS8:
+            return MakeWorkloadForType<Int8Workload>::Func(descriptor, info, std::forward<Args>(args)...);
         case DataType::Signed32:
             return MakeWorkloadForType<Int32Workload>::Func(descriptor, info, std::forward<Args>(args)...);
         case DataType::Boolean:
@@ -72,14 +74,14 @@ std::unique_ptr<IWorkload> MakeWorkloadHelper(const QueueDescriptorType& descrip
 
 // Makes a workload for one the specified types based on the data type requirements of the tensorinfo.
 // Calling this method is the equivalent of calling the five typed MakeWorkload method with <FloatWorkload,
-// FloatWorkload, Uint8Workload, NullWorkload, NullWorkload>.
+// FloatWorkload, Uint8Workload, NullWorkload, NullWorkload, NullWorkload>.
 // Specify type void as the WorkloadType for unsupported DataType/WorkloadType combos.
 template <typename FloatWorkload, typename Uint8Workload, typename QueueDescriptorType, typename... Args>
 std::unique_ptr<IWorkload> MakeWorkloadHelper(const QueueDescriptorType& descriptor,
                                               const WorkloadInfo& info,
                                               Args&&... args)
 {
-    return MakeWorkloadHelper<FloatWorkload, FloatWorkload, Uint8Workload, NullWorkload, NullWorkload>(
+    return MakeWorkloadHelper<FloatWorkload, FloatWorkload, Uint8Workload, NullWorkload, NullWorkload, NullWorkload>(
         descriptor,
         info,
         std::forward<Args>(args)...);

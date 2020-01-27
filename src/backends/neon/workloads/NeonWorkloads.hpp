@@ -10,6 +10,7 @@
 #include "NeonDivisionWorkload.hpp"
 #include "NeonArgMinMaxWorkload.hpp"
 #include "NeonBatchNormalizationWorkload.hpp"
+#include "NeonBatchToSpaceNdWorkload.hpp"
 #include "NeonConstantWorkload.hpp"
 #include "NeonConvertFp16ToFp32Workload.hpp"
 #include "NeonConvertFp32ToFp16Workload.hpp"

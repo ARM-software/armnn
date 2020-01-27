@@ -24,6 +24,7 @@
 #include "workloads/NeonActivationWorkload.hpp"
 #include "workloads/NeonArgMinMaxWorkload.hpp"
 #include "workloads/NeonBatchNormalizationWorkload.hpp"
+#include "workloads/NeonBatchToSpaceNdWorkload.hpp"
 #include "workloads/NeonConvolution2dWorkload.hpp"
 #include "workloads/NeonDepthToSpaceWorkload.hpp"
 #include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
@@ -190,6 +191,18 @@ bool NeonLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
                                    var,
                                    beta,
                                    gamma,
+                                   descriptor);
+}
+
+bool NeonLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
+                                                 const TensorInfo& output,
+                                                 const BatchToSpaceNdDescriptor& descriptor,
+                                                 Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonBatchToSpaceNdWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
                                    descriptor);
 }
 

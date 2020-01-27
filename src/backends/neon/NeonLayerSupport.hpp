@@ -41,6 +41,11 @@ public:
                                        const BatchNormalizationDescriptor& descriptor,
                                        Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsBatchToSpaceNdSupported(const TensorInfo& input,
+                                   const TensorInfo& output,
+                                   const BatchToSpaceNdDescriptor& descriptor,
+                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsComparisonSupported(const TensorInfo& input0,
                                const TensorInfo& input1,
                                const TensorInfo& output,

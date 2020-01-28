@@ -18,7 +18,7 @@ armnn::Graph dummyGraph;
 template<armnn::DataType DataType>
 armnn::TensorInfo MakeDummyTensorInfo()
 {
-    return armnn::TensorInfo({2,2,2,2}, DataType);
+    return armnn::TensorInfo({2,2,2,2}, DataType, 1.0, 0);
 }
 
 

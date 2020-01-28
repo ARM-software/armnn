@@ -32,34 +32,31 @@ set(RefBackendFiles ${RefBackendBaseFiles} ${RefBackendWorloadFiles})
 # Remove the file that contains the static backend registration
 list(REMOVE_ITEM RefBackendFiles ${RefBackendPath}/RefRegistryInitializer.cpp)
 
-if("${CMAKE_SYSTEM_NAME}" STREQUAL Android)
-    # Set the common backend source path
-    set(CommonBackendPath ${PROJECT_SOURCE_DIR}/../../../src/backends/backendsCommon)
-    # Source files of the common backend
-    file(GLOB CommonBackendFiles ${CommonBackendPath}/*.cpp)
+# Set the common backend source path
+set(CommonBackendPath ${PROJECT_SOURCE_DIR}/../../../src/backends/backendsCommon)
+# Source files of the common backend
+file(GLOB CommonBackendFiles ${CommonBackendPath}/*.cpp)
 
-    set(ArmnnPath ${PROJECT_SOURCE_DIR}/../../../src/armnn)
-    file(GLOB ArmnnFiles ${ArmnnPath}/*.cpp)
+set(ArmnnPath ${PROJECT_SOURCE_DIR}/../../../src/armnn)
+file(GLOB ArmnnFiles ${ArmnnPath}/*.cpp)
 
-    file(GLOB LayerFiles ${ArmnnPath}/layers/*cpp)
-    file(GLOB OptimizationFIles ${ArmnnPath}/optimizations/*.cpp)
-    file(GLOB ArmnnBaseFiles ${ArmnnPath}/*cpp)
+file(GLOB LayerFiles ${ArmnnPath}/layers/*cpp)
+file(GLOB OptimizationFIles ${ArmnnPath}/optimizations/*.cpp)
+file(GLOB ArmnnBaseFiles ${ArmnnPath}/*cpp)
+list(REMOVE_ITEM LayerFiles ${ArmnnPath}/layers/AbsLayer.cpp)
+list(REMOVE_ITEM LayerFiles ${ArmnnPath}/layers/RsqrtLayer.cpp)
 
-    set(ArmnnFiles ${ArmnnBaseFiles} ${LayerFiles} ${OptimizationFIles})
+set(ArmnnFiles ${ArmnnBaseFiles} ${LayerFiles} ${OptimizationFIles})
 
-    set(ArmnnUtilsPath ${PROJECT_SOURCE_DIR}/../../../src/armnnUtils)
-    file(GLOB ArmnnUtilsFiles ${ArmnnUtilsPath}/*cpp)
+set(ArmnnUtilsPath ${PROJECT_SOURCE_DIR}/../../../src/armnnUtils)
+file(GLOB ArmnnUtilsFiles ${ArmnnUtilsPath}/*cpp)
 
-    set(ProfilingPath ${PROJECT_SOURCE_DIR}/../../../src/profiling)
-    file(GLOB ProfilingFiles ${ProfilingPath}/*cpp)
+set(ProfilingPath ${PROJECT_SOURCE_DIR}/../../../src/profiling)
+file(GLOB ProfilingFiles ${ProfilingPath}/*cpp)
 
-    add_library(Arm_CpuRef_backend MODULE
-        ${armnnRefDynamicBackend_sources} ${RefBackendFiles} ${CommonBackendFiles}
-        ${ArmnnFiles} ${ArmnnUtilsFiles} ${ProfilingFiles})
-else()
-    # Create the shared object
-    add_library(Arm_CpuRef_backend MODULE ${armnnRefDynamicBackend_sources} ${RefBackendFiles})
-endif()
+add_library(Arm_CpuRef_backend MODULE
+    ${armnnRefDynamicBackend_sources} ${RefBackendFiles} ${CommonBackendFiles}
+    ${ArmnnFiles} ${ArmnnUtilsFiles} ${ProfilingFiles})
 
 target_include_directories(Arm_CpuRef_backend PRIVATE ${PROJECT_SOURCE_DIR}/../../../include)
 target_include_directories(Arm_CpuRef_backend PRIVATE ${PROJECT_SOURCE_DIR}/../../../third-party) # for half

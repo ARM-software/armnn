@@ -14,6 +14,8 @@
 #include <optimizations/Optimization.hpp>
 
 #include "IBackendContext.hpp"
+#include "armnn/backends/profiling/IBackendProfiling.hpp"
+#include "armnn/backends/profiling/IBackendProfilingContext.hpp"
 #include "IMemoryManager.hpp"
 #include "ITensorHandleFactory.hpp"
 #include "OptimizationViews.hpp"
@@ -77,6 +79,8 @@ public:
 
     using IWorkloadFactoryPtr = std::unique_ptr<IWorkloadFactory>;
     using IBackendContextPtr = std::unique_ptr<IBackendContext>;
+    // This is the bridge between backend and backend profiling we'll keep it in the backend namespace.
+    using IBackendProfilingContextPtr = std::unique_ptr<armnn::profiling::IBackendProfilingContext>;
     using OptimizationPtr = std::unique_ptr<Optimization>;
     using Optimizations = std::vector<OptimizationPtr>;
     using ILayerSupportSharedPtr = std::shared_ptr<ILayerSupport>;
@@ -112,6 +116,10 @@ public:
         class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry) const;
 
     virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const;
+
+    // Context specifically used for profiling interaction from backends.
+    virtual IBackendProfilingContextPtr CreateBackendProfilingContext(const IRuntime::CreationOptions& creationOptions,
+        armnn::profiling::IBackendProfiling& backendProfiling) const;
 
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
 

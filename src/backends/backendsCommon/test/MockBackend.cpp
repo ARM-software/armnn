@@ -98,6 +98,12 @@ IBackendInternal::IBackendContextPtr MockBackend::CreateBackendContext(const IRu
     return IBackendContextPtr{};
 }
 
+IBackendInternal::IBackendProfilingContextPtr MockBackend::CreateBackendProfilingContext(
+    const IRuntime::CreationOptions&, armnn::profiling::IBackendProfiling&) const
+{
+    return IBackendProfilingContextPtr{};
+}
+
 IBackendInternal::IMemoryManagerUniquePtr MockBackend::CreateMemoryManager() const
 {
     return IMemoryManagerUniquePtr{};

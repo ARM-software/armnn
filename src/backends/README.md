@@ -113,6 +113,8 @@ The interface functions to be implemented are:
     virtual IWorkloadFactoryPtr CreateWorkloadFactory(
             const IMemoryManagerSharedPtr& memoryManager = nullptr) const = 0;
     virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const = 0;
+    virtual IBackendProfilingContextPtr CreateBackendProfilingContext(const IRuntime::CreationOptions& creationOptions,
+            armnn::profiling::IBackendProfiling& backendProfiling) const = 0;
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
     virtual Optimizations GetOptimizations() const = 0;
     virtual SubgraphUniquePtr OptimizeSubgraph(const SubgraphView& subgraph, bool& optimizationAttempted) const;

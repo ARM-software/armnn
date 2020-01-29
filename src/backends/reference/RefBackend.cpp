@@ -16,7 +16,6 @@
 
 #include <Optimizer.hpp>
 
-#include <boost/cast.hpp>
 #include <boost/polymorphic_pointer_cast.hpp>
 
 namespace armnn
@@ -47,6 +46,12 @@ IBackendInternal::IWorkloadFactoryPtr RefBackend::CreateWorkloadFactory(
 IBackendInternal::IBackendContextPtr RefBackend::CreateBackendContext(const IRuntime::CreationOptions&) const
 {
     return IBackendContextPtr{};
+}
+
+IBackendInternal::IBackendProfilingContextPtr RefBackend::CreateBackendProfilingContext(
+    const IRuntime::CreationOptions&, armnn::profiling::IBackendProfiling&) const
+{
+    return IBackendProfilingContextPtr{};
 }
 
 IBackendInternal::IMemoryManagerUniquePtr RefBackend::CreateMemoryManager() const

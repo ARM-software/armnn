@@ -61,6 +61,13 @@ IBackendInternal::IBackendContextPtr NeonBackend::CreateBackendContext(const IRu
     return IBackendContextPtr{};
 }
 
+IBackendInternal::IBackendProfilingContextPtr NeonBackend::CreateBackendProfilingContext(
+    const IRuntime::CreationOptions&,
+    armnn::profiling::IBackendProfiling&) const
+{
+    return IBackendProfilingContextPtr{};
+}
+
 IBackendInternal::Optimizations NeonBackend::GetOptimizations() const
 {
     return Optimizations{};

@@ -44,6 +44,12 @@ IBackendInternal::IBackendContextPtr IBackendInternal::CreateBackendContext(cons
     return IBackendContextPtr{};
 }
 
+IBackendInternal::IBackendProfilingContextPtr IBackendInternal::CreateBackendProfilingContext(
+    const IRuntime::CreationOptions&, armnn::profiling::IBackendProfiling&) const
+{
+    return IBackendProfilingContextPtr{};
+}
+
 // Default implementation of OptimizeSubgraphView for backward compatibility with the old API.
 // Override this method with a custom optimization implementation.
 OptimizationViews IBackendInternal::OptimizeSubgraphView(const SubgraphView& subgraph) const

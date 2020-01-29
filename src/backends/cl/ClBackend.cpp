@@ -74,6 +74,13 @@ ClBackend::CreateBackendContext(const IRuntime::CreationOptions& options) const
     return IBackendContextPtr{new ClBackendContext{options}};
 }
 
+IBackendInternal::IBackendProfilingContextPtr ClBackend::CreateBackendProfilingContext(
+    const IRuntime::CreationOptions&,
+    armnn::profiling::IBackendProfiling&) const
+{
+    return IBackendProfilingContextPtr{};
+}
+
 IBackendInternal::Optimizations ClBackend::GetOptimizations() const
 {
     return Optimizations{};

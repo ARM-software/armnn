@@ -12,6 +12,8 @@ list(APPEND armnnBackendsAPI_sources
      IMemoryManager.hpp
      ITensorHandle.hpp
      OptimizationViews.hpp
+     profiling/IBackendProfiling.hpp
+     profiling/IBackendProfilingContext.hpp
 )
 
 add_library(armnnBackendsAPI OBJECT ${armnnBackendsAPI_sources})

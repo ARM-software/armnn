@@ -243,9 +243,5 @@ inline TensorShape GetShape(const arm_compute::TensorShape& shape)
     return GetTensorShape(shape, 1U);
 }
 
-bool IsQuantMultiplierSupported(const TensorInfo& input,
-                                const TensorInfo& output,
-                                const TensorInfo& weights);
-
 } // namespace armcomputetensorutils
 } // namespace armnn

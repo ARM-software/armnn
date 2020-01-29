@@ -119,14 +119,6 @@ inline bool IsWorkloadSupported(FuncType& func, Optional<std::string&> reasonIfU
 #define FORWARD_WORKLOAD_VALIDATE_FUNC(func, reasonIfUnsupported, ...) \
     return IsNeonBackendSupported(reasonIfUnsupported, __VA_ARGS__);
 #endif
-
-#if defined(ARMCOMPUTENEON_ENABLED)
-#define IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights) \
-armcomputetensorutils::IsQuantMultiplierSupported(input, output, weights)
-#else
-#define IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights) true
-#endif
-
 } // anonymous namespace
 
 bool NeonLayerSupport::IsAbsSupported(const TensorInfo& input,
@@ -299,11 +291,6 @@ bool NeonLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
                                                 const Optional<TensorInfo>& biases,
                                                 Optional<std::string&> reasonIfUnsupported) const
 {
-    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
-    {
-        return false;
-    }
-
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonConvolution2dWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
@@ -332,11 +319,6 @@ bool NeonLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                                        const Optional<TensorInfo>& biases,
                                                        Optional<std::string&> reasonIfUnsupported) const
 {
-    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
-    {
-        return false;
-    }
-
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonDepthwiseConvolutionWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
@@ -386,11 +368,6 @@ bool NeonLayerSupport::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& 
                                                               const Optional<TensorInfo>& biases,
                                                               Optional<std::string&> reasonIfUnsupported) const
 {
-    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
-    {
-        return false;
-    }
-
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonDepthwiseConvolutionWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
@@ -841,11 +818,6 @@ bool NeonLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input
                                                          const Optional<TensorInfo>& biases,
                                                          Optional<std::string&> reasonIfUnsupported) const
 {
-    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
-    {
-        return false;
-    }
-
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonTransposeConvolution2dWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,

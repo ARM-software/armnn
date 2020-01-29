@@ -147,14 +147,6 @@ bool IsSupportedForDataTypeCl(Optional<std::string&> reasonIfUnsupported,
                                       &FalseFunc<>,
                                       std::forward<Params>(params)...);
 }
-
-#if defined(ARMCOMPUTECL_ENABLED)
-#define IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights) \
-armcomputetensorutils::IsQuantMultiplierSupported(input, output, weights)
-#else
-#define IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights) true
-#endif
-
 } // anonymous namespace
 
 bool ClLayerSupport::IsAbsSupported(const TensorInfo& input,
@@ -329,11 +321,6 @@ bool ClLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
                                               const Optional<TensorInfo>& biases,
                                               Optional<std::string&> reasonIfUnsupported) const
 {
-    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
-    {
-        return false;
-    }
-
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClConvolution2dWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
@@ -372,11 +359,6 @@ bool ClLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                                      const Optional<TensorInfo>& biases,
                                                      Optional<std::string&> reasonIfUnsupported) const
 {
-    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
-    {
-        return false;
-    }
-
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClDepthwiseConvolutionWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
@@ -393,11 +375,6 @@ bool ClLayerSupport::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& in
                                                             const Optional<TensorInfo>& biases,
                                                             Optional<std::string&> reasonIfUnsupported) const
 {
-    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
-    {
-        return false;
-    }
-
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClDepthwiseConvolutionWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
@@ -833,11 +810,6 @@ bool ClLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
                                                        const Optional<TensorInfo>& biases,
                                                        Optional<std::string&> reasonIfUnsupported) const
 {
-    if (!IS_QUANT_MULTIPLIER_SUPPORTED(input, output, weights))
-    {
-        return false;
-    }
-
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClTransposeConvolution2dWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,

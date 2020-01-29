@@ -237,32 +237,5 @@ arm_compute::PixelValue GetPixelValue(arm_compute::ITensor& input, float pixelVa
     }
 }
 
-bool IsQuantMultiplierSupported(const TensorInfo& input,
-                                const TensorInfo& output,
-                                const TensorInfo& weights)
-{
-    constexpr float maxQuantMultiplier = 1.0f;
-    if (weights.HasMultipleQuantizationScales())
-    {
-        for (float weightScale : weights.GetQuantizationScales())
-        {
-            if ((input.GetQuantizationScale() * weightScale) / output.GetQuantizationScale() > maxQuantMultiplier)
-            {
-                return false;
-            }
-        }
-    }
-    else
-    {
-        if ((input.GetQuantizationScale() * weights.GetQuantizationScale()) /
-            output.GetQuantizationScale() > maxQuantMultiplier)
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 } // namespace armcomputetensorutils
 } // namespace armnn

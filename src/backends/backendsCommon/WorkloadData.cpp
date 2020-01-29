@@ -2199,7 +2199,10 @@ void QuantizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     std::vector<DataType> supportedTypes =
     {
         DataType::Float32,
-        DataType::Float16
+        DataType::Float16,
+        DataType::QSymmS8,
+        DataType::QAsymmU8,
+        DataType::QSymmS16
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);

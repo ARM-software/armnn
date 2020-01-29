@@ -1439,9 +1439,12 @@ bool RefLayerSupport::IsQuantizeSupported(const TensorInfo& input,
    bool supported = true;
 
     // Define supported input types.
-    std::array<DataType,2> supportedInputTypes = {
+    std::array<DataType,5> supportedInputTypes = {
         DataType::QSymmS8,
-        DataType::Float32
+        DataType::Float32,
+        DataType::QAsymmU8,
+        DataType::QSymmS8,
+        DataType::QSymmS16
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedInputTypes), reasonIfUnsupported,

@@ -10,6 +10,7 @@
 #include <CommandHandlerRegistry.hpp>
 #include <ConnectionAcknowledgedCommandHandler.hpp>
 #include <CounterDirectory.hpp>
+#include <CounterIdMap.hpp>
 #include <EncodeVersion.hpp>
 #include <Holder.hpp>
 #include <ICounterValues.hpp>
@@ -3166,6 +3167,45 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacket)
         std::cout << ss.str();
         BOOST_FAIL("Expected string not found.");
     }
+}
+BOOST_AUTO_TEST_CASE(CheckCounterIdMap)
+{
+    CounterIdMap counterIdMap;
+    BOOST_CHECK_THROW(counterIdMap.GetBackendId(0), armnn::Exception);
+    BOOST_CHECK_THROW(counterIdMap.GetGlobalId(0, armnn::profiling::BACKEND_ID), armnn::Exception);
+
+    uint16_t globalCounterIds = 0;
+
+    armnn::BackendId cpuRefId(armnn::Compute::CpuRef);
+    armnn::BackendId cpuAccId(armnn::Compute::CpuAcc);
+
+    std::vector<uint16_t> cpuRefCounters = {0, 1, 2, 3};
+    std::vector<uint16_t> cpuAccCounters = {0, 1};
+
+    for (uint16_t backendCounterId : cpuRefCounters)
+    {
+        counterIdMap.RegisterMapping(globalCounterIds, backendCounterId, cpuRefId);
+        ++globalCounterIds;
+    }
+    for (uint16_t backendCounterId : cpuAccCounters)
+    {
+        counterIdMap.RegisterMapping(globalCounterIds, backendCounterId, cpuAccId);
+        ++globalCounterIds;
+    }
+
+    BOOST_CHECK(counterIdMap.GetBackendId(0) == (std::pair<uint16_t, armnn::BackendId>(0, cpuRefId)));
+    BOOST_CHECK(counterIdMap.GetBackendId(1) == (std::pair<uint16_t, armnn::BackendId>(1, cpuRefId)));
+    BOOST_CHECK(counterIdMap.GetBackendId(2) == (std::pair<uint16_t, armnn::BackendId>(2, cpuRefId)));
+    BOOST_CHECK(counterIdMap.GetBackendId(3) == (std::pair<uint16_t, armnn::BackendId>(3, cpuRefId)));
+    BOOST_CHECK(counterIdMap.GetBackendId(4) == (std::pair<uint16_t, armnn::BackendId>(0, cpuAccId)));
+    BOOST_CHECK(counterIdMap.GetBackendId(5) == (std::pair<uint16_t, armnn::BackendId>(1, cpuAccId)));
+
+    BOOST_CHECK(counterIdMap.GetGlobalId(0, cpuRefId) == 0);
+    BOOST_CHECK(counterIdMap.GetGlobalId(1, cpuRefId) == 1);
+    BOOST_CHECK(counterIdMap.GetGlobalId(2, cpuRefId) == 2);
+    BOOST_CHECK(counterIdMap.GetGlobalId(3, cpuRefId) == 3);
+    BOOST_CHECK(counterIdMap.GetGlobalId(0, cpuAccId) == 4);
+    BOOST_CHECK(counterIdMap.GetGlobalId(1, cpuAccId) == 5);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

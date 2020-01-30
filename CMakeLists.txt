@@ -459,6 +459,8 @@ list(APPEND armnn_sources
     src/profiling/ConnectionAcknowledgedCommandHandler.hpp
     src/profiling/CounterDirectory.cpp
     src/profiling/CounterDirectory.hpp
+    src/profiling/CounterIdMap.cpp
+    src/profiling/CounterIdMap.hpp
     src/profiling/DirectoryCaptureCommandHandler.cpp
     src/profiling/DirectoryCaptureCommandHandler.hpp
     src/profiling/EncodeVersion.hpp

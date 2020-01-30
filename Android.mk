@@ -184,6 +184,7 @@ LOCAL_SRC_FILES := \
         src/profiling/CommandHandlerRegistry.cpp \
         src/profiling/ConnectionAcknowledgedCommandHandler.cpp \
         src/profiling/CounterDirectory.cpp \
+        src/profiling/CounterIdMap.cpp \
         src/profiling/DirectoryCaptureCommandHandler.cpp \
         src/profiling/FileOnlyProfilingConnection.cpp \
         src/profiling/Holder.cpp \

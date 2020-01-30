@@ -9,6 +9,7 @@
 #include "CommandHandler.hpp"
 #include "ConnectionAcknowledgedCommandHandler.hpp"
 #include "CounterDirectory.hpp"
+#include "CounterIdMap.hpp"
 #include "ICounterValues.hpp"
 #include "PeriodicCounterCapture.hpp"
 #include "PeriodicCounterSelectionCommandHandler.hpp"
@@ -61,12 +62,16 @@ public:
     // Disconnects the profiling service from the external server
     void Disconnect();
 
-    // Getters for the profiling service state
     const ICounterDirectory& GetCounterDirectory() const;
     ProfilingState GetCurrentState() const;
     bool IsCounterRegistered(uint16_t counterUid) const override;
     uint32_t GetCounterValue(uint16_t counterUid) const override;
     uint16_t GetCounterCount() const override;
+    // counter global/backend mapping functions
+    const ICounterMappings& GetCounterMappings() const;
+    IRegisterCounterMapping& GetCounterMappingRegistrar();
+
+    // Getters for the profiling service state
     bool IsProfilingEnabled();
 
     // Setters for the profiling service state
@@ -105,6 +110,7 @@ private:
     // Profiling service components
     ExternalProfilingOptions m_Options;
     CounterDirectory m_CounterDirectory;
+    CounterIdMap m_CounterIdMap;
     IProfilingConnectionFactoryPtr m_ProfilingConnectionFactory;
     IProfilingConnectionPtr m_ProfilingConnection;
     ProfilingStateMachine m_StateMachine;

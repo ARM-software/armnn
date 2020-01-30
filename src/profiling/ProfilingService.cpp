@@ -209,6 +209,16 @@ uint32_t ProfilingService::GetCounterValue(uint16_t counterUid) const
     return counterValuePtr->load(std::memory_order::memory_order_relaxed);
 }
 
+const ICounterMappings& ProfilingService::GetCounterMappings() const
+{
+    return m_CounterIdMap;
+}
+
+IRegisterCounterMapping& ProfilingService::GetCounterMappingRegistrar()
+{
+    return m_CounterIdMap;
+}
+
 void ProfilingService::SetCounterValue(uint16_t counterUid, uint32_t value)
 {
     CheckCounterUid(counterUid);

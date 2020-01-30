@@ -36,7 +36,7 @@ class FileOnlyHelperService : public ProfilingService
 
 BOOST_AUTO_TEST_SUITE(FileOnlyProfilingDecoratorTests)
 
-BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
+BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd, * boost::unit_test::disabled())
 {
     // Create a temporary file name.
     boost::filesystem::path tempPath = boost::filesystem::temp_directory_path();

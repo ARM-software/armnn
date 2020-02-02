@@ -39,29 +39,31 @@ struct CounterStatus
 class IRegisterBackendCounters
 {
 public:
-    uint16_t RegisterCategory(const std::string& categoryName,
-                              const Optional<uint16_t>& deviceUid     = EmptyOptional(),
-                              const Optional<uint16_t>& counterSetUid = EmptyOptional());
+    virtual void RegisterCategory(const std::string& categoryName,
+                                  const Optional<uint16_t>& deviceUid     = EmptyOptional(),
+                                  const Optional<uint16_t>& counterSetUid = EmptyOptional()) = 0;
 
-    uint16_t RegisterDevice(const std::string& deviceName,
-                            uint16_t cores                                  = 0,
-                            const Optional<std::string>& parentCategoryName = EmptyOptional());
+    virtual uint16_t RegisterDevice(const std::string& deviceName,
+                                    uint16_t cores = 0,
+                                    const Optional<std::string>& parentCategoryName = EmptyOptional()) = 0;
 
-    uint16_t RegisterCounterSet(const std::string& counterSetName,
-                                uint16_t count                                  = 0,
-                                const Optional<std::string>& parentCategoryName = EmptyOptional());
+    virtual uint16_t RegisterCounterSet(const std::string& counterSetName,
+                                        uint16_t count = 0,
+                                        const Optional<std::string>& parentCategoryName = EmptyOptional()) = 0;
 
-    uint16_t RegisterCounter(const uint16_t uid,
-                             const std::string& parentCategoryName,
-                             uint16_t counterClass,
-                             uint16_t interpolation,
-                             double multiplier,
-                             const std::string& name,
-                             const std::string& description,
-                             const Optional<std::string>& units      = EmptyOptional(),
-                             const Optional<uint16_t>& numberOfCores = EmptyOptional(),
-                             const Optional<uint16_t>& deviceUid     = EmptyOptional(),
-                             const Optional<uint16_t>& counterSetUid = EmptyOptional());
+    virtual uint16_t RegisterCounter(const uint16_t uid,
+                                     const std::string& parentCategoryName,
+                                     uint16_t counterClass,
+                                     uint16_t interpolation,
+                                     double multiplier,
+                                     const std::string& name,
+                                     const std::string& description,
+                                     const Optional<std::string>& units      = EmptyOptional(),
+                                     const Optional<uint16_t>& numberOfCores = EmptyOptional(),
+                                     const Optional<uint16_t>& deviceUid     = EmptyOptional(),
+                                     const Optional<uint16_t>& counterSetUid = EmptyOptional()) = 0;
+
+    virtual ~IRegisterBackendCounters() {}
 };
 
 class IBackendProfiling
@@ -74,7 +76,7 @@ public:
     virtual ~IBackendProfiling()
     {}
 
-    IRegisterBackendCounters GetCounterRegistrationInterface(uint16_t currentMaxGlobalCounterID);
+    IRegisterBackendCounters& GetCounterRegistrationInterface(uint16_t currentMaxGlobalCounterID);
 
     ISendTimelinePacket& GetSendTimelinePacket();
 

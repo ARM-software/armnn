@@ -21,6 +21,12 @@ void CounterIdMap::RegisterMapping(uint16_t globalCounterId,
     m_BackendCounterIdMap[backendIdPair] = globalCounterId;
 }
 
+void CounterIdMap::Reset()
+{
+    m_GlobalCounterIdMap.clear();
+    m_BackendCounterIdMap.clear();
+}
+
 uint16_t CounterIdMap::GetGlobalId(uint16_t backendCounterId, const armnn::BackendId& backendId) const
 {
     std::pair<uint16_t, armnn::BackendId> backendIdPair(backendCounterId, backendId);

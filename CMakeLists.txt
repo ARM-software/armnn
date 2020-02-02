@@ -470,6 +470,7 @@ list(APPEND armnn_sources
     src/profiling/Holder.hpp
     src/profiling/IBufferManager.hpp
     src/profiling/ICounterDirectory.hpp
+    src/profiling/ICounterRegistry.hpp
     src/profiling/ICounterValues.hpp
     src/profiling/ISendCounterPacket.hpp
     src/profiling/IPacketBuffer.hpp
@@ -500,6 +501,8 @@ list(APPEND armnn_sources
     src/profiling/ProfilingStateMachine.hpp
     src/profiling/ProfilingUtils.cpp
     src/profiling/ProfilingUtils.hpp
+    src/profiling/RegisterBackendCounters.cpp
+    src/profiling/RegisterBackendCounters.hpp
     src/profiling/RequestCounterDirectoryCommandHandler.cpp
     src/profiling/RequestCounterDirectoryCommandHandler.hpp
     src/profiling/SendCounterPacket.cpp

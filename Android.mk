@@ -199,6 +199,7 @@ LOCAL_SRC_FILES := \
         src/profiling/ProfilingService.cpp \
         src/profiling/ProfilingStateMachine.cpp \
         src/profiling/ProfilingUtils.cpp \
+        src/profiling/RegisterBackendCounters.cpp \
         src/profiling/RequestCounterDirectoryCommandHandler.cpp \
         src/profiling/SendCounterPacket.cpp \
         src/profiling/SendTimelinePacket.cpp \

@@ -40,6 +40,7 @@
 #include <limits>
 #include <map>
 #include <random>
+#include <RegisterBackendCounters.hpp>
 
 using namespace armnn::profiling;
 using PacketType = MockProfilingConnection::PacketType;
@@ -3168,6 +3169,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacket)
         BOOST_FAIL("Expected string not found.");
     }
 }
+
 BOOST_AUTO_TEST_CASE(CheckCounterIdMap)
 {
     CounterIdMap counterIdMap;
@@ -3206,6 +3208,55 @@ BOOST_AUTO_TEST_CASE(CheckCounterIdMap)
     BOOST_CHECK(counterIdMap.GetGlobalId(3, cpuRefId) == 3);
     BOOST_CHECK(counterIdMap.GetGlobalId(0, cpuAccId) == 4);
     BOOST_CHECK(counterIdMap.GetGlobalId(1, cpuAccId) == 5);
+}
+
+BOOST_AUTO_TEST_CASE(CheckRegisterBackendCounters)
+{
+    uint16_t globalCounterIds = armnn::profiling::INFERENCES_RUN;
+    armnn::BackendId cpuRefId(armnn::Compute::CpuRef);
+
+    RegisterBackendCounters registerBackendCounters(globalCounterIds, cpuRefId);
+
+    // Reset the profiling service to the uninitialized state
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_EnableProfiling          = true;
+    ProfilingService& profilingService = ProfilingService::Instance();
+    profilingService.ResetExternalProfilingOptions(options, true);
+
+    BOOST_CHECK(profilingService.GetCounterDirectory().GetCategories().empty());
+    registerBackendCounters.RegisterCategory("categoryOne");
+    auto categoryOnePtr = profilingService.GetCounterDirectory().GetCategory("categoryOne");
+    BOOST_CHECK(categoryOnePtr);
+
+    BOOST_CHECK(profilingService.GetCounterDirectory().GetDevices().empty());
+    globalCounterIds = registerBackendCounters.RegisterDevice("deviceOne");
+    auto deviceOnePtr = profilingService.GetCounterDirectory().GetDevice(globalCounterIds);
+    BOOST_CHECK(deviceOnePtr);
+    BOOST_CHECK(deviceOnePtr->m_Name == "deviceOne");
+
+    BOOST_CHECK(profilingService.GetCounterDirectory().GetCounterSets().empty());
+    globalCounterIds = registerBackendCounters.RegisterCounterSet("counterSetOne");
+    auto counterSetOnePtr = profilingService.GetCounterDirectory().GetCounterSet(globalCounterIds);
+    BOOST_CHECK(counterSetOnePtr);
+    BOOST_CHECK(counterSetOnePtr->m_Name == "counterSetOne");
+
+    uint16_t newGlobalCounterId = registerBackendCounters.RegisterCounter(0,
+                                                                          "categoryOne",
+                                                                          0,
+                                                                          0,
+                                                                          1.f,
+                                                                          "CounterOne",
+                                                                          "first test counter");
+    BOOST_CHECK(newGlobalCounterId = armnn::profiling::INFERENCES_RUN + 1);
+    uint16_t mappedGlobalId = profilingService.GetCounterMappings().GetGlobalId(0, cpuRefId);
+    BOOST_CHECK(mappedGlobalId == newGlobalCounterId);
+    auto backendMapping = profilingService.GetCounterMappings().GetBackendId(newGlobalCounterId);
+    BOOST_CHECK(backendMapping.first == 0);
+    BOOST_CHECK(backendMapping.second == cpuRefId);
+
+    // Reset the profiling service to stop any running thread
+    options.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options, true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

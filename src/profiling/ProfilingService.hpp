@@ -10,6 +10,7 @@
 #include "ConnectionAcknowledgedCommandHandler.hpp"
 #include "CounterDirectory.hpp"
 #include "CounterIdMap.hpp"
+#include "ICounterRegistry.hpp"
 #include "ICounterValues.hpp"
 #include "PeriodicCounterCapture.hpp"
 #include "PeriodicCounterSelectionCommandHandler.hpp"
@@ -63,13 +64,14 @@ public:
     void Disconnect();
 
     const ICounterDirectory& GetCounterDirectory() const;
+    ICounterRegistry& GetCounterRegistry();
     ProfilingState GetCurrentState() const;
     bool IsCounterRegistered(uint16_t counterUid) const override;
     uint32_t GetCounterValue(uint16_t counterUid) const override;
     uint16_t GetCounterCount() const override;
     // counter global/backend mapping functions
     const ICounterMappings& GetCounterMappings() const;
-    IRegisterCounterMapping& GetCounterMappingRegistrar();
+    IRegisterCounterMapping& GetCounterMappingRegistry();
 
     // Getters for the profiling service state
     bool IsProfilingEnabled();

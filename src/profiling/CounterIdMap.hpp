@@ -26,6 +26,7 @@ public:
     virtual void RegisterMapping(uint16_t globalCounterId,
                                  uint16_t backendCounterId,
                                  const armnn::BackendId& backendId) = 0;
+    virtual void Reset() = 0;
     virtual ~IRegisterCounterMapping() {}
 };
 
@@ -38,6 +39,7 @@ public:
     void RegisterMapping(uint16_t globalCounterId,
                          uint16_t backendCounterId,
                          const armnn::BackendId& backendId) override;
+    void Reset() override;
     uint16_t GetGlobalId(uint16_t backendCounterId, const armnn::BackendId& backendId) const override;
     const std::pair<uint16_t, armnn::BackendId>& GetBackendId(uint16_t globalCounterId) const override;
 private:

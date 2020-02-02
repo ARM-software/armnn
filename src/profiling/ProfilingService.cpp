@@ -186,6 +186,11 @@ const ICounterDirectory& ProfilingService::GetCounterDirectory() const
     return m_CounterDirectory;
 }
 
+ICounterRegistry& ProfilingService::GetCounterRegistry()
+{
+    return m_CounterDirectory;
+}
+
 ProfilingState ProfilingService::GetCurrentState() const
 {
     return m_StateMachine.GetCurrentState();
@@ -214,7 +219,7 @@ const ICounterMappings& ProfilingService::GetCounterMappings() const
     return m_CounterIdMap;
 }
 
-IRegisterCounterMapping& ProfilingService::GetCounterMappingRegistrar()
+IRegisterCounterMapping& ProfilingService::GetCounterMappingRegistry()
 {
     return m_CounterIdMap;
 }
@@ -381,6 +386,7 @@ void ProfilingService::Reset()
     m_CounterIndex.clear();
     m_CounterValues.clear();
     m_CounterDirectory.Clear();
+    m_CounterIdMap.Reset();
     m_BufferManager.Reset();
 
     // ...finally reset the profiling state machine

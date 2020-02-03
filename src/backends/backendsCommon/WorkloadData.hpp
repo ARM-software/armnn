@@ -31,7 +31,8 @@ struct QueueDescriptor
     std::vector<ITensorHandle*> m_Outputs;
 
     void ValidateInputsOutputs(const std::string& descName,
-        unsigned int numExpectedIn, unsigned int numExpectedOut) const;
+                               unsigned int numExpectedIn,
+                               unsigned int numExpectedOut) const;
 
 
 protected:

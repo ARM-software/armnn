@@ -307,6 +307,10 @@ if(DYNAMIC_BACKEND_PATHS)
     add_definitions(-DARMNN_DYNAMIC_BACKEND_ENABLED)
 endif()
 
+if(SAMPLE_DYNAMIC_BACKEND)
+    add_definitions(-DSAMPLE_DYNAMIC_BACKEND_ENABLED)
+endif()
+
 # Streamline annotate
 if(PROFILING_BACKEND_STREAMLINE)
     include_directories("${GATOR_ROOT}/annotate")

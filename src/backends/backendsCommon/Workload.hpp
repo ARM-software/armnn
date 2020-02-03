@@ -7,7 +7,7 @@
 #include "WorkloadData.hpp"
 #include "WorkloadInfo.hpp"
 
-#include <armnn/Types.hpp>
+#include <armnn/backends/IWorkload.hpp>
 #include <Profiling.hpp>
 #include <ProfilingService.hpp>
 
@@ -15,20 +15,6 @@
 
 namespace armnn
 {
-
-/// Workload interface to enqueue a layer computation.
-class IWorkload
-{
-public:
-    virtual ~IWorkload() {}
-
-    virtual void PostAllocationConfigure() = 0;
-    virtual void Execute() const = 0;
-
-    virtual profiling::ProfilingGuid GetGuid() const = 0;
-
-    virtual void RegisterDebugCallback(const DebugCallbackFunction& /*func*/) {}
-};
 
 // NullWorkload used to denote an unsupported workload when used by the MakeWorkload<> template
 // in the various workload factories.

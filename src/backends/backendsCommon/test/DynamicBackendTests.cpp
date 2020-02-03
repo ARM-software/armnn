@@ -71,4 +71,9 @@ ARMNN_SIMPLE_TEST_CASE(CreateReferenceDynamicBackend, CreateReferenceDynamicBack
 
 #endif
 
+#if defined(SAMPLE_DYNAMIC_BACKEND_ENABLED)
+ARMNN_SIMPLE_TEST_CASE(CreateSampleDynamicBackend, CreateSampleDynamicBackendTestImpl);
+ARMNN_SIMPLE_TEST_CASE(SampleDynamicBackendEndToEnd, SampleDynamicBackendEndToEndTestImpl);
+#endif
+
 BOOST_AUTO_TEST_SUITE_END()

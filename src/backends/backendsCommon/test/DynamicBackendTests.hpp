@@ -19,7 +19,6 @@
 
 #include <string>
 #include <memory>
-#include <string>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
@@ -1437,4 +1436,124 @@ void CreateReferenceDynamicBackendTestImpl()
     BOOST_TEST(workload.get() == boost::polymorphic_downcast<RefConvolution2dWorkload*>(workload.get()));
 }
 
+#endif
+
+#if defined(SAMPLE_DYNAMIC_BACKEND_ENABLED)
+void CreateSampleDynamicBackendTestImpl()
+{
+    using namespace armnn;
+
+    // Using the path override in CreationOptions to load the reference dynamic backend
+    IRuntime::CreationOptions creationOptions;
+    IRuntimePtr runtime = IRuntime::Create(creationOptions);
+
+    const BackendRegistry& backendRegistry = BackendRegistryInstance();
+    BOOST_TEST(backendRegistry.Size() >= 1);
+
+    BackendIdSet backendIds = backendRegistry.GetBackendIds();
+    BOOST_TEST((backendIds.find("SampleDynamic") != backendIds.end()));
+
+    const DeviceSpec& deviceSpec = *boost::polymorphic_downcast<const DeviceSpec*>(&runtime->GetDeviceSpec());
+    BackendIdSet supportedBackendIds = deviceSpec.GetSupportedBackends();
+    BOOST_TEST(supportedBackendIds.size()>= 1);
+    BOOST_TEST((supportedBackendIds.find("SampleDynamic") != supportedBackendIds.end()));
+
+    // Get the factory function
+    auto sampleDynamicBackendFactoryFunction = backendRegistry.GetFactory("SampleDynamic");
+    BOOST_TEST((sampleDynamicBackendFactoryFunction != nullptr));
+
+    // Use the factory function to create an instance of the dynamic backend
+    IBackendInternalUniquePtr sampleDynamicBackend = sampleDynamicBackendFactoryFunction();
+    BOOST_TEST((sampleDynamicBackend != nullptr));
+    BOOST_TEST((sampleDynamicBackend->GetId() == "SampleDynamic"));
+
+    // Test the backend instance by querying the layer support
+    IBackendInternal::ILayerSupportSharedPtr sampleLayerSupport = sampleDynamicBackend->GetLayerSupport();
+    BOOST_TEST((sampleLayerSupport != nullptr));
+
+    TensorShape inputShape {  1, 16, 16, 16 };
+    TensorShape outputShape{  1, 16, 16, 16 };
+    TensorShape weightShape{ 16,  1,  1, 16 };
+    TensorInfo inputInfo (inputShape,  DataType::Float32);
+    TensorInfo outputInfo(outputShape, DataType::Float32);
+    TensorInfo weightInfo(weightShape, DataType::Float32);
+    Convolution2dDescriptor convolution2dDescriptor;
+    bool sampleConvolution2dSupported =
+            sampleLayerSupport->IsConvolution2dSupported(inputInfo,
+                                                         outputInfo,
+                                                         convolution2dDescriptor,
+                                                         weightInfo,
+                                                         EmptyOptional());
+    BOOST_TEST(!sampleConvolution2dSupported);
+
+    // Test the backend instance by creating a workload
+    IBackendInternal::IWorkloadFactoryPtr sampleWorkloadFactory = sampleDynamicBackend->CreateWorkloadFactory();
+    BOOST_TEST((sampleWorkloadFactory != nullptr));
+
+    // Create dummy settings for the workload
+    AdditionQueueDescriptor additionQueueDescriptor;
+    WorkloadInfo workloadInfo
+    {
+        { inputInfo, inputInfo },
+        { outputInfo }
+    };
+
+    // Create a addition workload
+    auto workload = sampleWorkloadFactory->CreateAddition(additionQueueDescriptor, workloadInfo);
+    BOOST_TEST((workload != nullptr));
+}
+
+void SampleDynamicBackendEndToEndTestImpl()
+{
+    using namespace armnn;
+    using namespace boost::filesystem;
+    // Create runtime in which test will run
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
+
+    IConnectableLayer* input0 = net->AddInputLayer(0);
+    IConnectableLayer* input1 = net->AddInputLayer(1);
+    IConnectableLayer* add = net->AddAdditionLayer();
+    IConnectableLayer* output = net->AddOutputLayer(0);
+
+    input0->GetOutputSlot(0).Connect(add->GetInputSlot(0));
+    input1->GetOutputSlot(0).Connect(add->GetInputSlot(1));
+    add->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    TensorInfo tensorInfo(TensorShape({2, 1}), DataType::Float32);
+    input0->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    input1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    add->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    // optimize the network
+    IOptimizedNetworkPtr optNet = Optimize(*net, {"SampleDynamic"}, runtime->GetDeviceSpec());
+
+    // Loads it into the runtime.
+    NetworkId netId;
+    runtime->LoadNetwork(netId, std::move(optNet));
+
+    std::vector<float> input0Data{ 5.0f, 3.0f };
+    std::vector<float> input1Data{ 10.0f, 8.0f };
+    std::vector<float> expectedOutputData{ 15.0f, 11.0f };
+    std::vector<float> outputData(2);
+
+    InputTensors inputTensors
+        {
+            {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), input0Data.data())},
+            {1,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), input1Data.data())}
+        };
+    OutputTensors outputTensors
+        {
+            {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data())}
+        };
+
+    // Does the inference.
+    runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
+
+    // Checks the results.
+    BOOST_TEST(outputData == expectedOutputData);
+}
 #endif

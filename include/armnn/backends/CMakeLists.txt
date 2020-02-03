@@ -8,10 +8,12 @@ list(APPEND armnnBackendsAPI_sources
      DynamicBackend.hpp
      IBackendInternal.hpp
      IBackendContext.hpp
-     ITensorHandleFactory.hpp
      IMemoryManager.hpp
      ITensorHandle.hpp
+     ITensorHandleFactory.hpp
+     IWorkload.hpp
      OptimizationViews.hpp
+     WorkloadInfo.hpp
      profiling/IBackendProfiling.hpp
      profiling/IBackendProfilingContext.hpp
 )

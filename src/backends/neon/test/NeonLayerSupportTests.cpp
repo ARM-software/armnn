@@ -41,6 +41,13 @@ BOOST_AUTO_TEST_CASE(IsLayerSupportedUint8Neon)
     IsLayerSupportedTests<armnn::NeonWorkloadFactory, armnn::DataType::QAsymmU8>(&factory);
 }
 
+BOOST_AUTO_TEST_CASE(IsLayerSupportedInt8Neon)
+{
+    armnn::NeonWorkloadFactory factory =
+        NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
+    IsLayerSupportedTests<armnn::NeonWorkloadFactory, armnn::DataType::QSymmS8>(&factory);
+}
+
 BOOST_AUTO_TEST_CASE(IsConvertFp16ToFp32SupportedNeon)
 {
     std::string reasonIfUnsupported;

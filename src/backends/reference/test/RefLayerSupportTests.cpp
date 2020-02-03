@@ -66,6 +66,12 @@ BOOST_AUTO_TEST_CASE(IsLayerSupportedUint8Reference)
     IsLayerSupportedTests<armnn::RefWorkloadFactory, armnn::DataType::QAsymmU8>(&factory);
 }
 
+BOOST_AUTO_TEST_CASE(IsLayerSupportedInt8Reference)
+{
+    armnn::RefWorkloadFactory factory;
+    IsLayerSupportedTests<armnn::RefWorkloadFactory, armnn::DataType::QSymmS8>(&factory);
+}
+
 BOOST_AUTO_TEST_CASE(IsLayerSupportedInt16Reference)
 {
     armnn::RefWorkloadFactory factory;

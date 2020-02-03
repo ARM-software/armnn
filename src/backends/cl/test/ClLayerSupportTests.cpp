@@ -43,6 +43,13 @@ BOOST_FIXTURE_TEST_CASE(IsLayerSupportedUint8Cl, ClContextControlFixture)
     IsLayerSupportedTests<armnn::ClWorkloadFactory, armnn::DataType::QAsymmU8>(&factory);
 }
 
+BOOST_FIXTURE_TEST_CASE(IsLayerSupportedInt8Cl, ClContextControlFixture)
+{
+    armnn::ClWorkloadFactory factory =
+        ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
+    IsLayerSupportedTests<armnn::ClWorkloadFactory, armnn::DataType::QSymmS8>(&factory);
+}
+
 BOOST_FIXTURE_TEST_CASE(IsConvertFp16ToFp32SupportedCl, ClContextControlFixture)
 {
     std::string reasonIfUnsupported;

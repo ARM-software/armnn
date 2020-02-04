@@ -136,78 +136,77 @@ ClBackendContext::ClBackendContext(const IRuntime::CreationOptions& options)
     auto tuningLevel = defaultTuningLevel;
     m_TuningFile = "";
 
-
     arm_compute::CLTuner* tuner = nullptr;
-    if (m_TuningFile.empty() == false)
+    bool useLegacyTunerAPI = options.m_GpuAccTunedParameters.get() != nullptr;
+    if (useLegacyTunerAPI)
     {
-        bool useLegacyTunerAPI = options.m_GpuAccTunedParameters.get() != nullptr;
-        if (useLegacyTunerAPI)
-        {
-            auto clTunerParams = boost::polymorphic_downcast<ClTunedParameters*>(
-                                    options.m_GpuAccTunedParameters.get());
-            auto clTuner = &clTunerParams->m_Tuner;
+        auto clTunerParams = boost::polymorphic_downcast<ClTunedParameters*>(
+                                options.m_GpuAccTunedParameters.get());
+        auto clTuner = &clTunerParams->m_Tuner;
 
-            if (clTuner)
-            {
-                auto ConvertTuningLevel = [](IGpuAccTunedParameters::TuningLevel level)
-                    {
-                        switch(level)
-                        {
-                            case IGpuAccTunedParameters::TuningLevel::Rapid:
-                                return arm_compute::CLTunerMode::RAPID;
-                            case IGpuAccTunedParameters::TuningLevel::Normal:
-                                return arm_compute::CLTunerMode::NORMAL;
-                            case IGpuAccTunedParameters::TuningLevel::Exhaustive:
-                                return arm_compute::CLTunerMode::EXHAUSTIVE;
-                            default:
-                            {
-                                BOOST_ASSERT_MSG(false, "Tuning level not recognised.");
-                                return arm_compute::CLTunerMode::NORMAL;
-                            }
-                        }
-                    };
-
-                clTuner->set_tuner_mode(ConvertTuningLevel(clTunerParams->m_TuningLevel));
-                clTuner->set_tune_new_kernels(
-                    clTunerParams->m_Mode == armnn::IGpuAccTunedParameters::Mode::UpdateTunedParameters);
-            }
-        }
-        else //New backend options API
+        if (clTuner)
         {
-            ParseOptions(options.m_BackendOptions, "GpuAcc", [&](std::string name, const BackendOptions::Var& value)
+            auto ConvertTuningLevel = [](IGpuAccTunedParameters::TuningLevel level)
                 {
-                    if (name == "KernelProfilingEnabled")
+                    switch(level)
                     {
-                        kernelProfiling |= ParseBoolean(value, false);
-                    } else if (name == "TuningFile")
-                    {
-                        m_TuningFile = ParseFile(value, "");
-                    } else if (name == "TuningLevel")
-                    {
-                        tuningLevel = ParseTuningLevel(value, defaultTuningLevel);
+                        case IGpuAccTunedParameters::TuningLevel::Rapid:
+                            return arm_compute::CLTunerMode::RAPID;
+                        case IGpuAccTunedParameters::TuningLevel::Normal:
+                            return arm_compute::CLTunerMode::NORMAL;
+                        case IGpuAccTunedParameters::TuningLevel::Exhaustive:
+                            return arm_compute::CLTunerMode::EXHAUSTIVE;
+                        default:
+                        {
+                            BOOST_ASSERT_MSG(false, "Tuning level not recognised.");
+                            return arm_compute::CLTunerMode::NORMAL;
+                        }
                     }
-                });
+                };
 
-            // Create the tuner, in tuning mode initially.
-            m_Tuner = std::make_unique<arm_compute::CLTuner>(true);
-
-            switch (tuningLevel)
+            clTuner->set_tuner_mode(ConvertTuningLevel(clTunerParams->m_TuningLevel));
+            clTuner->set_tune_new_kernels(
+                clTunerParams->m_Mode == armnn::IGpuAccTunedParameters::Mode::UpdateTunedParameters);
+        }
+    }
+    else //New backend options API
+    {
+        ParseOptions(options.m_BackendOptions, "GpuAcc", [&](std::string name, const BackendOptions::Var& value)
             {
-                case TuningLevel::Rapid:
-                    m_Tuner->set_tuner_mode(arm_compute::CLTunerMode::RAPID);
-                    break;
-                case TuningLevel::Normal:
-                    m_Tuner->set_tuner_mode(arm_compute::CLTunerMode::NORMAL);
-                    break;
-                case TuningLevel::Exhaustive:
-                    m_Tuner->set_tuner_mode(arm_compute::CLTunerMode::EXHAUSTIVE);
-                    break;
-                case TuningLevel::None:
-                default:
-                    m_Tuner->set_tune_new_kernels(false); // Turn of tuning. Set to "use" only mode.
-                    break;
-            }
+                if (name == "KernelProfilingEnabled")
+                {
+                    kernelProfiling |= ParseBoolean(value, false);
+                } else if (name == "TuningFile")
+                {
+                    m_TuningFile = ParseFile(value, "");
+                } else if (name == "TuningLevel")
+                {
+                    tuningLevel = ParseTuningLevel(value, defaultTuningLevel);
+                }
+            });
 
+        // Create the tuner, in tuning mode initially.
+        m_Tuner = std::make_unique<arm_compute::CLTuner>(true);
+
+        switch (tuningLevel)
+        {
+            case TuningLevel::Rapid:
+                m_Tuner->set_tuner_mode(arm_compute::CLTunerMode::RAPID);
+                break;
+            case TuningLevel::Normal:
+                m_Tuner->set_tuner_mode(arm_compute::CLTunerMode::NORMAL);
+                break;
+            case TuningLevel::Exhaustive:
+                m_Tuner->set_tuner_mode(arm_compute::CLTunerMode::EXHAUSTIVE);
+                break;
+            case TuningLevel::None:
+            default:
+                m_Tuner->set_tune_new_kernels(false); // Turn of tuning. Set to "use" only mode.
+                break;
+        }
+
+        if (!m_TuningFile.empty())
+        {
             try
             {
                 m_Tuner->load_from_file(m_TuningFile.c_str());

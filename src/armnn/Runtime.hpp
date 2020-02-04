@@ -73,8 +73,6 @@ public:
     virtual void RegisterDebugCallback(NetworkId networkId, const DebugCallbackFunction& func) override;
 
     /// Creates a runtime for workload execution.
-    /// May throw a ClRuntimeUnavailableException if @a defaultComputeDevice requires a CL runtime but
-    /// it cannot be setup for some reason.
     Runtime(const CreationOptions& options);
 
     ~Runtime();

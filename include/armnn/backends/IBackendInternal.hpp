@@ -115,9 +115,16 @@ public:
     virtual IWorkloadFactoryPtr CreateWorkloadFactory(
         class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry) const;
 
+    /// Create the runtime context of the backend
+    ///
+    /// Implementations may return a default-constructed IBackendContextPtr if
+    /// no context is needed at runtime.
+    /// Implementations must throw BackendUnavailableException if the backend
+    /// cannot be used (for example, necessary accelerator hardware is not present).
+    /// The default implementation always returns a default-constructed pointer.
     virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const;
 
-    // Context specifically used for profiling interaction from backends.
+    /// Create context specifically used for profiling interaction from backends.
     virtual IBackendProfilingContextPtr CreateBackendProfilingContext(const IRuntime::CreationOptions& creationOptions,
         armnn::profiling::IBackendProfiling& backendProfiling) const;
 

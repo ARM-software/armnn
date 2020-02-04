@@ -14,6 +14,9 @@ namespace armnn
 class DeviceSpec : public IDeviceSpec
 {
 public:
+    DeviceSpec()
+    {}
+
     DeviceSpec(const BackendIdSet& supportedBackends)
         : m_SupportedBackends{supportedBackends} {}
 
@@ -48,7 +51,6 @@ public:
     }
 
 private:
-    DeviceSpec() = delete;
     BackendIdSet m_SupportedBackends;
     BackendIdSet m_DynamicBackends;
 };

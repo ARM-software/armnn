@@ -64,10 +64,17 @@ private:
     std::string m_Message;
 };
 
-class ClRuntimeUnavailableException : public Exception
+/// Class for non-fatal exceptions raised while initialising a backend
+class BackendUnavailableException : public Exception
 {
 public:
     using Exception::Exception;
+};
+
+class ClRuntimeUnavailableException : public BackendUnavailableException
+{
+public:
+    using BackendUnavailableException::BackendUnavailableException;
 };
 
 class InvalidArgumentException : public Exception

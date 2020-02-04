@@ -153,7 +153,6 @@ const std::shared_ptr<IProfiler> Runtime::GetProfiler(NetworkId networkId) const
 
 Runtime::Runtime(const CreationOptions& options)
     : m_NetworkIdCounter(0)
-    , m_DeviceSpec{BackendRegistryInstance().GetBackendIds()}
 {
     ARMNN_LOG(info) << "ArmNN v" << ARMNN_VERSION << "\n";
 
@@ -164,12 +163,11 @@ Runtime::Runtime(const CreationOptions& options)
     // goes through the backend registry
     LoadDynamicBackends(options.m_DynamicBackendsPath);
 
+    BackendIdSet supportedBackends;
     for (const auto& id : BackendRegistryInstance().GetBackendIds())
     {
         // Store backend contexts for the supported ones
-        const BackendIdSet& supportedBackends = m_DeviceSpec.GetSupportedBackends();
-        if (supportedBackends.find(id) != supportedBackends.end())
-        {
+        try {
             auto factoryFun = BackendRegistryInstance().GetFactory(id);
             auto backend = factoryFun();
             BOOST_ASSERT(backend.get() != nullptr);
@@ -182,8 +180,15 @@ Runtime::Runtime(const CreationOptions& options)
             {
                 m_BackendContexts.emplace(std::make_pair(id, std::move(context)));
             }
+            supportedBackends.emplace(id);
         }
+        catch (const BackendUnavailableException&)
+        {
+            // Ignore backends which are unavailable
+        }
+
     }
+    m_DeviceSpec.AddSupportedBackends(supportedBackends);
 }
 
 Runtime::~Runtime()

@@ -41,10 +41,27 @@ public:
         return std::make_unique<SampleDynamicWorkloadFactory>();
     }
 
+    IBackendInternal::IWorkloadFactoryPtr CreateWorkloadFactory(
+        class TensorHandleFactoryRegistry& /*tensorHandleFactoryRegistry*/) const override
+    {
+        return IWorkloadFactoryPtr{};
+    }
+
+    IBackendInternal::IBackendProfilingContextPtr CreateBackendProfilingContext(
+        const IRuntime::CreationOptions&, armnn::profiling::IBackendProfiling&) const override
+    {
+        return IBackendProfilingContextPtr{};
+    }
+
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override
     {
         static ILayerSupportSharedPtr layerSupport{new SampleDynamicLayerSupport};
         return layerSupport;
+    }
+
+    std::vector<ITensorHandleFactory::FactoryId> GetHandleFactoryPreferences() const override
+    {
+        return std::vector<ITensorHandleFactory::FactoryId>();
     }
 
     IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override
@@ -60,7 +77,6 @@ public:
 
         return optimizationViews;
     }
-
 };
 
 } // namespace armnn

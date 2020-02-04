@@ -8,6 +8,13 @@ project(sample-dynamic)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+if("${CMAKE_SYSTEM_NAME}" STREQUAL Android)
+    add_definitions("-DBOOST_ALL_NO_LIB") # Turn off auto-linking as we specify the libs manually
+    find_package(Boost REQUIRED COMPONENTS system filesystem)
+    include_directories(SYSTEM "${Boost_INCLUDE_DIRS}")
+    link_directories(${Boost_LIBRARY_DIRS})
+endif()
+
 list(APPEND armnnSampleDynamicBackend_sources
         SampleDynamicAdditionWorkload.cpp
         SampleDynamicAdditionWorkload.hpp
@@ -32,3 +39,8 @@ target_include_directories(Arm_SampleDynamic_backend PRIVATE ${PROJECT_SOURCE_DI
 target_include_directories(Arm_SampleDynamic_backend PRIVATE ${PROJECT_SOURCE_DIR}/../../../src/backends)
 target_include_directories(Arm_SampleDynamic_backend PRIVATE ${PROJECT_SOURCE_DIR}/../../../src/profiling)
 
+if("${CMAKE_SYSTEM_NAME}" STREQUAL Android)
+    target_include_directories(Arm_SampleDynamic_backend PRIVATE ${Boost_INCLUDE_DIRS})
+    target_link_libraries(Arm_SampleDynamic_backend ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
+    target_link_libraries(Arm_SampleDynamic_backend ${ARMNN_PATH})
+endif()

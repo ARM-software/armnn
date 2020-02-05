@@ -515,6 +515,8 @@ list(APPEND armnn_sources
     src/profiling/TimelinePacketWriterFactory.hpp
     src/profiling/TimelineUtilityMethods.cpp
     src/profiling/TimelineUtilityMethods.hpp
+    src/profiling/backends/BackendProfiling.cpp
+    src/profiling/backends/BackendProfiling.hpp
     third-party/half/half.hpp
     )
 

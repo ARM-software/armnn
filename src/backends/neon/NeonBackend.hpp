@@ -27,8 +27,8 @@ public:
         class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry) const override;
 
     IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override;
-    IBackendInternal::IBackendProfilingContextPtr CreateBackendProfilingContext(const IRuntime::CreationOptions&,
-        armnn::profiling::IBackendProfiling&) const override;
+    IBackendInternal::IBackendProfilingContextPtr CreateBackendProfilingContext(
+        const IRuntime::CreationOptions&, IBackendProfilingPtr& backendProfiling) override;
     IBackendInternal::Optimizations GetOptimizations() const override;
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override;
 

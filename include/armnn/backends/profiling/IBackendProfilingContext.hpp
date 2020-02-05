@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include "IBackendProfiling.hpp"
 #include <armnn/IRuntime.hpp>
 #include <vector>
 

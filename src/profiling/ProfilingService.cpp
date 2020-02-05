@@ -391,6 +391,7 @@ void ProfilingService::Reset()
 
     // ...finally reset the profiling state machine
     m_StateMachine.Reset();
+    m_BackendProfilingContexts.clear();
 }
 
 void ProfilingService::Stop()

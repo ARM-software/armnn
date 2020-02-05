@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include <boost/polymorphic_cast.hpp>
+#include <backends/BackendProfiling.hpp>
 
 using namespace armnn;
 using namespace std;
@@ -181,6 +182,19 @@ Runtime::Runtime(const CreationOptions& options)
                 m_BackendContexts.emplace(std::make_pair(id, std::move(context)));
             }
             supportedBackends.emplace(id);
+
+            unique_ptr<armnn::profiling::IBackendProfiling> profilingIface =
+                std::make_unique<armnn::profiling::BackendProfiling>(armnn::profiling::BackendProfiling(
+                    options, armnn::profiling::ProfilingService::Instance(), id));
+
+            // Backends may also provide a profiling context. Ask for it now.
+            auto profilingContext = backend->CreateBackendProfilingContext(options, profilingIface);
+            // Backends that don't support profiling will return a null profiling context.
+            if (profilingContext)
+            {
+                // Pass the context onto the profiling service.
+                armnn::profiling::ProfilingService::Instance().AddBackendProfilingContext(id, profilingContext);
+            }
         }
         catch (const BackendUnavailableException&)
         {
@@ -230,9 +244,11 @@ Runtime::~Runtime()
         }
     }
 
+
     // Clear all dynamic backends.
     DynamicBackendUtils::DeregisterDynamicBackends(m_DeviceSpec.GetDynamicBackends());
     m_DeviceSpec.ClearDynamicBackends();
+    m_BackendContexts.clear();
 }
 
 LoadedNetwork* Runtime::GetLoadedNetworkPtr(NetworkId networkId) const

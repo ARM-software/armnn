@@ -205,7 +205,8 @@ LOCAL_SRC_FILES := \
         src/profiling/SendTimelinePacket.cpp \
         src/profiling/SocketProfilingConnection.cpp \
         src/profiling/TimelinePacketWriterFactory.cpp \
-        src/profiling/TimelineUtilityMethods.cpp
+        src/profiling/TimelineUtilityMethods.cpp \
+        src/profiling/backends/BackendProfiling.cpp
 
 LOCAL_STATIC_LIBRARIES := \
         armnn-arm_compute \

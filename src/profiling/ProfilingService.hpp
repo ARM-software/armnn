@@ -22,6 +22,7 @@
 #include "SendCounterPacket.hpp"
 #include "SendTimelinePacket.hpp"
 #include "TimelinePacketWriterFactory.hpp"
+#include <armnn/backends/profiling/IBackendProfilingContext.hpp>
 
 namespace armnn
 {
@@ -62,6 +63,13 @@ public:
 
     // Disconnects the profiling service from the external server
     void Disconnect();
+
+    // Store a profiling context returned from a backend that support profiling.
+    void AddBackendProfilingContext(const BackendId backendId,
+        std::shared_ptr<armnn::profiling::IBackendProfilingContext> profilingContext)
+    {
+        m_BackendProfilingContexts.emplace(backendId, std::move(profilingContext));
+    }
 
     const ICounterDirectory& GetCounterDirectory() const;
     ICounterRegistry& GetCounterRegistry();
@@ -132,6 +140,8 @@ private:
     PerJobCounterSelectionCommandHandler m_PerJobCounterSelectionCommandHandler;
     ProfilingGuidGenerator m_GuidGenerator;
     TimelinePacketWriterFactory m_TimelinePacketWriterFactory;
+    std::unordered_map<BackendId,
+        std::shared_ptr<armnn::profiling::IBackendProfilingContext>> m_BackendProfilingContexts;
 
 protected:
     // Default constructor/destructor kept protected for testing

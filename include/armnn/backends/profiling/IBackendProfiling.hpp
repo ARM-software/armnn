@@ -68,27 +68,25 @@ public:
 
 class IBackendProfiling
 {
-protected:
-    IBackendProfiling(const IRuntime::CreationOptions&)
-    {}
-
 public:
     virtual ~IBackendProfiling()
     {}
 
-    IRegisterBackendCounters& GetCounterRegistrationInterface(uint16_t currentMaxGlobalCounterID);
+    virtual std::unique_ptr<IRegisterBackendCounters>
+        GetCounterRegistrationInterface(uint16_t currentMaxGlobalCounterID) = 0;
 
-    ISendTimelinePacket& GetSendTimelinePacket();
+    virtual std::unique_ptr<ISendTimelinePacket> GetSendTimelinePacket() = 0;
 
-    IProfilingGuidGenerator& GetProfilingGuidGenerator();
+    virtual IProfilingGuidGenerator& GetProfilingGuidGenerator() = 0;
 
-    void ReportCounters(const std::vector<Timestamp>& counterValues);
+    virtual void ReportCounters(const std::vector<Timestamp>& counterValues) = 0;
 
-    CounterStatus GetCounterStatus(uint16_t backendCounterId);
+    virtual CounterStatus GetCounterStatus(uint16_t backendCounterId) = 0;
 
-    std::vector<CounterStatus> GetActiveCounters();
+    virtual std::vector<CounterStatus> GetActiveCounters() = 0;
 
-    bool IsProfilingEnabled() const;
+    virtual bool IsProfilingEnabled() const = 0;
+
 };
 }    // namespace profiling
 }    // namespace armnn

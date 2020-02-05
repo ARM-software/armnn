@@ -45,7 +45,7 @@ IBackendInternal::IBackendContextPtr IBackendInternal::CreateBackendContext(cons
 }
 
 IBackendInternal::IBackendProfilingContextPtr IBackendInternal::CreateBackendProfilingContext(
-    const IRuntime::CreationOptions&, armnn::profiling::IBackendProfiling&) const
+    const IRuntime::CreationOptions&, IBackendProfilingPtr&)
 {
     return IBackendProfilingContextPtr{};
 }

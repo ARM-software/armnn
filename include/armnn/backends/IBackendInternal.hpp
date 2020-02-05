@@ -80,7 +80,8 @@ public:
     using IWorkloadFactoryPtr = std::unique_ptr<IWorkloadFactory>;
     using IBackendContextPtr = std::unique_ptr<IBackendContext>;
     // This is the bridge between backend and backend profiling we'll keep it in the backend namespace.
-    using IBackendProfilingContextPtr = std::unique_ptr<armnn::profiling::IBackendProfilingContext>;
+    using IBackendProfilingContextPtr = std::shared_ptr<armnn::profiling::IBackendProfilingContext>;
+    using IBackendProfilingPtr = std::unique_ptr<armnn::profiling::IBackendProfiling>;
     using OptimizationPtr = std::unique_ptr<Optimization>;
     using Optimizations = std::vector<OptimizationPtr>;
     using ILayerSupportSharedPtr = std::shared_ptr<ILayerSupport>;
@@ -126,7 +127,7 @@ public:
 
     /// Create context specifically used for profiling interaction from backends.
     virtual IBackendProfilingContextPtr CreateBackendProfilingContext(const IRuntime::CreationOptions& creationOptions,
-        armnn::profiling::IBackendProfiling& backendProfiling) const;
+                                                                      IBackendProfilingPtr& backendProfiling);
 
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
 

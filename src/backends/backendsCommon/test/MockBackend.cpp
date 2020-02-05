@@ -99,7 +99,7 @@ IBackendInternal::IBackendContextPtr MockBackend::CreateBackendContext(const IRu
 }
 
 IBackendInternal::IBackendProfilingContextPtr MockBackend::CreateBackendProfilingContext(
-    const IRuntime::CreationOptions&, armnn::profiling::IBackendProfiling&) const
+    const IRuntime::CreationOptions&, IBackendProfilingPtr&)
 {
     return IBackendProfilingContextPtr{};
 }

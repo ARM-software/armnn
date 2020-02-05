@@ -7,7 +7,8 @@
 
 #include <backendsCommon/Workload.hpp>
 
-#include <arm_compute/runtime/CL/CLFunctions.h>
+#include <arm_compute/core/Error.h>
+#include <arm_compute/runtime/IFunction.h>
 
 #include <functional>
 
@@ -26,7 +27,7 @@ public:
     void Execute() const override;
 
 private:
-    mutable std::unique_ptr<arm_compute::CLSplit> m_Layer;
+    std::unique_ptr<arm_compute::IFunction> m_Layer;
 };
 
 } //namespace armnn

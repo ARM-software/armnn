@@ -7,7 +7,8 @@
 
 #include <backendsCommon/Workload.hpp>
 
-#include <arm_compute/runtime/CL/CLFunctions.h>
+#include <arm_compute/core/Error.h>
+#include <arm_compute/runtime/IFunction.h>
 
 namespace armnn
 {
@@ -24,7 +25,7 @@ public:
     void Execute() const override;
 
 private:
-    mutable std::unique_ptr<arm_compute::CLConcatenateLayer> m_Layer;
+    mutable std::unique_ptr<arm_compute::IFunction> m_Layer;
 };
 
 } //namespace armnn

@@ -7,8 +7,6 @@
 
 #include <backendsCommon/Workload.hpp>
 
-#include <arm_compute/runtime/CL/CLFunctions.h>
-
 namespace armnn
 {
 class ClConstantWorkload : public BaseWorkload<ConstantQueueDescriptor>

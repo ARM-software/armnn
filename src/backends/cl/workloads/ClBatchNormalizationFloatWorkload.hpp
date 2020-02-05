@@ -7,7 +7,8 @@
 
 #include <backendsCommon/Workload.hpp>
 
-#include <arm_compute/runtime/CL/CLFunctions.h>
+#include <arm_compute/runtime/CL/CLTensor.h>
+#include <arm_compute/runtime/CL/functions/CLBatchNormalizationLayer.h>
 
 namespace armnn
 {

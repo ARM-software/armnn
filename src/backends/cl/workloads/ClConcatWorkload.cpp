@@ -10,6 +10,7 @@
 #include <cl/ClLayerSupport.hpp>
 
 #include <arm_compute/core/Types.h>
+#include <arm_compute/runtime/CL/functions/CLConcatenateLayer.h>
 
 #include <boost/polymorphic_pointer_cast.hpp>
 
@@ -78,14 +79,15 @@ ClConcatWorkload::ClConcatWorkload(const ConcatQueueDescriptor& descriptor, cons
                                                                          m_Data.m_Outputs[0])->GetTensor();
 
     // Create the layer function
-    m_Layer.reset(new arm_compute::CLConcatenateLayer());
+    auto layer = std::make_unique<arm_compute::CLConcatenateLayer>();
 
     // Configure input and output tensors
     size_t aclAxis = CalcAxis(descriptor.m_Parameters);
-    m_Layer->configure(aclInputs, &output, aclAxis);
+    layer->configure(aclInputs, &output, aclAxis);
 
     // Prepare
-    m_Layer->prepare();
+    layer->prepare();
+    m_Layer = std::move(layer);
 }
 
 void ClConcatWorkload::Execute() const

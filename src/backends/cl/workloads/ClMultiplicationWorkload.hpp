@@ -7,7 +7,7 @@
 
 #include <backendsCommon/Workload.hpp>
 
-#include <arm_compute/runtime/CL/CLFunctions.h>
+#include <arm_compute/runtime/CL/functions/CLPixelWiseMultiplication.h>
 
 namespace armnn
 {

@@ -12,7 +12,8 @@
 
 #include <armnn/Utils.hpp>
 
-#include <arm_compute/runtime/CL/CLFunctions.h>
+#include <arm_compute/runtime/CL/CLTensor.h>
+#include <arm_compute/runtime/IFunction.h>
 
 #include <sstream>
 

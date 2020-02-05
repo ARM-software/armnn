@@ -279,7 +279,7 @@ if(ARMCOMPUTECL)
     link_libraries(-L${ARMCOMPUTE_BUILD_DIR}/opencl-1.2-stubs)
     set(OPENCL_LIBRARIES OpenCL)
 
-    include_directories(${OPENCL_INCLUDE})
+    include_directories(SYSTEM ${OPENCL_INCLUDE})
 
     # Add preprocessor definition for ARM Compute OpenCL
     add_definitions(-DARMCOMPUTECL_ENABLED)

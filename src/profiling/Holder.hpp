@@ -33,6 +33,7 @@ public:
     void SetCounterIds(const std::vector<uint16_t>& counterIds);
     uint32_t GetCapturePeriod() const;
     const std::vector<uint16_t>& GetCounterIds() const;
+    bool IsCounterIdInCaptureData(uint16_t counterId);
 
 private:
     uint32_t m_CapturePeriod;

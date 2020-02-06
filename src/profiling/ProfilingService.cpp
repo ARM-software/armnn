@@ -224,6 +224,16 @@ IRegisterCounterMapping& ProfilingService::GetCounterMappingRegistry()
     return m_CounterIdMap;
 }
 
+CaptureData ProfilingService::GetCaptureData()
+{
+    return m_Holder.GetCaptureData();
+}
+
+void ProfilingService::SetCaptureData(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds)
+{
+    m_Holder.SetCaptureData(capturePeriod, counterIds);
+}
+
 void ProfilingService::SetCounterValue(uint16_t counterUid, uint32_t value)
 {
     CheckCounterUid(counterUid);

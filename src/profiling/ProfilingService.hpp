@@ -84,6 +84,9 @@ public:
     // Getters for the profiling service state
     bool IsProfilingEnabled();
 
+    CaptureData GetCaptureData();
+    void SetCaptureData(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds);
+
     // Setters for the profiling service state
     void SetCounterValue(uint16_t counterUid, uint32_t value) override;
     uint32_t AddCounterValue(uint16_t counterUid, uint32_t value) override;

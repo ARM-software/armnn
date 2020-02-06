@@ -5,6 +5,7 @@
 
 #include "ProfilingTests.hpp"
 
+#include <backends/BackendProfiling.hpp>
 #include <CommandHandler.hpp>
 #include <CommandHandlerKey.hpp>
 #include <CommandHandlerRegistry.hpp>
@@ -20,6 +21,7 @@
 #include <PeriodicCounterSelectionCommandHandler.hpp>
 #include <ProfilingStateMachine.hpp>
 #include <ProfilingUtils.hpp>
+#include <RegisterBackendCounters.hpp>
 #include <RequestCounterDirectoryCommandHandler.hpp>
 #include <Runtime.hpp>
 #include <SocketProfilingConnection.hpp>
@@ -40,7 +42,7 @@
 #include <limits>
 #include <map>
 #include <random>
-#include <RegisterBackendCounters.hpp>
+
 
 using namespace armnn::profiling;
 using PacketType = MockProfilingConnection::PacketType;
@@ -3257,6 +3259,143 @@ BOOST_AUTO_TEST_CASE(CheckRegisterBackendCounters)
     // Reset the profiling service to stop any running thread
     options.m_EnableProfiling = false;
     profilingService.ResetExternalProfilingOptions(options, true);
+}
+
+BOOST_AUTO_TEST_CASE(CheckCounterStatusQuery)
+{
+    armnn::IRuntime::CreationOptions options;
+    options.m_ProfilingOptions.m_EnableProfiling = true;
+
+    // Reset the profiling service to the uninitialized state
+    ProfilingService& profilingService = ProfilingService::Instance();
+    profilingService.ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
+
+    const armnn::BackendId cpuRefId(armnn::Compute::CpuRef);
+    const armnn::BackendId cpuAccId(armnn::Compute::CpuAcc);
+
+    // Create BackendProfiling for each backend
+    BackendProfiling backendProfilingCpuRef(options, profilingService, cpuRefId);
+    BackendProfiling backendProfilingCpuAcc(options, profilingService, cpuAccId);
+
+    uint16_t initialNumGlobalCounterIds = armnn::profiling::INFERENCES_RUN;
+
+    // Create RegisterBackendCounters for CpuRef
+    RegisterBackendCounters registerBackendCountersCpuRef(initialNumGlobalCounterIds, cpuRefId);
+
+    // Create 'testCategory' in CounterDirectory (backend agnostic)
+    BOOST_CHECK(profilingService.GetCounterDirectory().GetCategories().empty());
+    registerBackendCountersCpuRef.RegisterCategory("testCategory");
+    auto categoryOnePtr = profilingService.GetCounterDirectory().GetCategory("testCategory");
+    BOOST_CHECK(categoryOnePtr);
+
+    // Counters:
+    // Global | Local | Backend
+    //    5   |   0   | CpuRef
+    //    6   |   1   | CpuRef
+    //    7   |   1   | CpuAcc
+
+    std::vector<uint16_t> cpuRefCounters = {0, 1};
+    std::vector<uint16_t> cpuAccCounters = {0};
+
+    // Register the backend counters for CpuRef and validate GetGlobalId and GetBackendId
+    uint16_t currentNumGlobalCounterIds = registerBackendCountersCpuRef.RegisterCounter(
+            0, "testCategory", 0, 0, 1.f, "CpuRefCounter0", "Zeroth CpuRef Counter");
+    BOOST_CHECK(currentNumGlobalCounterIds == initialNumGlobalCounterIds + 1);
+    uint16_t mappedGlobalId = profilingService.GetCounterMappings().GetGlobalId(0, cpuRefId);
+    BOOST_CHECK(mappedGlobalId == currentNumGlobalCounterIds);
+    auto backendMapping = profilingService.GetCounterMappings().GetBackendId(currentNumGlobalCounterIds);
+    BOOST_CHECK(backendMapping.first == 0);
+    BOOST_CHECK(backendMapping.second == cpuRefId);
+
+    currentNumGlobalCounterIds = registerBackendCountersCpuRef.RegisterCounter(
+            1, "testCategory", 0, 0, 1.f, "CpuRefCounter1", "First CpuRef Counter");
+    BOOST_CHECK(currentNumGlobalCounterIds == initialNumGlobalCounterIds + 2);
+    mappedGlobalId = profilingService.GetCounterMappings().GetGlobalId(1, cpuRefId);
+    BOOST_CHECK(mappedGlobalId == currentNumGlobalCounterIds);
+    backendMapping = profilingService.GetCounterMappings().GetBackendId(currentNumGlobalCounterIds);
+    BOOST_CHECK(backendMapping.first == 1);
+    BOOST_CHECK(backendMapping.second == cpuRefId);
+
+    // Create RegisterBackendCounters for CpuAcc
+    RegisterBackendCounters registerBackendCountersCpuAcc(currentNumGlobalCounterIds, cpuAccId);
+
+    // Register the backend counter for CpuAcc and validate GetGlobalId and GetBackendId
+    currentNumGlobalCounterIds = registerBackendCountersCpuAcc.RegisterCounter(
+            0, "testCategory", 0, 0, 1.f, "CpuAccCounter0", "Zeroth CpuAcc Counter");
+    BOOST_CHECK(currentNumGlobalCounterIds == initialNumGlobalCounterIds + 3);
+    mappedGlobalId = profilingService.GetCounterMappings().GetGlobalId(0, cpuAccId);
+    BOOST_CHECK(mappedGlobalId == currentNumGlobalCounterIds);
+    backendMapping = profilingService.GetCounterMappings().GetBackendId(currentNumGlobalCounterIds);
+    BOOST_CHECK(backendMapping.first == 0);
+    BOOST_CHECK(backendMapping.second == cpuAccId);
+
+    // Create vectors for active counters
+    const std::vector<uint16_t> activeGlobalCounterIds = {5}; // CpuRef(0) activated
+    const std::vector<uint16_t> newActiveGlobalCounterIds = {6, 7}; // CpuRef(0) and CpuAcc(1) activated
+
+    const uint32_t capturePeriod = 200;
+    const uint32_t newCapturePeriod = 100;
+
+    // Set capture period and active counters in CaptureData
+    profilingService.SetCaptureData(capturePeriod, activeGlobalCounterIds);
+
+    // Get vector of active counters for CpuRef and CpuAcc backends
+    std::vector<CounterStatus> cpuRefCounterStatus = backendProfilingCpuRef.GetActiveCounters();
+    std::vector<CounterStatus> cpuAccCounterStatus = backendProfilingCpuAcc.GetActiveCounters();
+    BOOST_CHECK_EQUAL(cpuRefCounterStatus.size(), 1);
+    BOOST_CHECK_EQUAL(cpuAccCounterStatus.size(), 0);
+
+    // Check active CpuRef counter
+    BOOST_CHECK_EQUAL(cpuRefCounterStatus[0].m_GlobalCounterId, activeGlobalCounterIds[0]);
+    BOOST_CHECK_EQUAL(cpuRefCounterStatus[0].m_BackendCounterId, cpuRefCounters[0]);
+    BOOST_CHECK_EQUAL(cpuRefCounterStatus[0].m_SamplingRateInMicroseconds, capturePeriod);
+    BOOST_CHECK_EQUAL(cpuRefCounterStatus[0].m_Enabled, true);
+
+    // Check inactive CpuRef counter
+    CounterStatus inactiveCpuRefCounter = backendProfilingCpuRef.GetCounterStatus(cpuRefCounters[1]);
+    BOOST_CHECK_EQUAL(inactiveCpuRefCounter.m_GlobalCounterId, 6);
+    BOOST_CHECK_EQUAL(inactiveCpuRefCounter.m_BackendCounterId, cpuRefCounters[1]);
+    BOOST_CHECK_EQUAL(inactiveCpuRefCounter.m_SamplingRateInMicroseconds, 0);
+    BOOST_CHECK_EQUAL(inactiveCpuRefCounter.m_Enabled, false);
+
+    // Check inactive CpuAcc counter
+    CounterStatus inactiveCpuAccCounter = backendProfilingCpuAcc.GetCounterStatus(cpuAccCounters[0]);
+    BOOST_CHECK_EQUAL(inactiveCpuAccCounter.m_GlobalCounterId, 7);
+    BOOST_CHECK_EQUAL(inactiveCpuAccCounter.m_BackendCounterId, cpuAccCounters[0]);
+    BOOST_CHECK_EQUAL(inactiveCpuAccCounter.m_SamplingRateInMicroseconds, 0);
+    BOOST_CHECK_EQUAL(inactiveCpuAccCounter.m_Enabled, false);
+
+    // Set new capture period and new active counters in CaptureData
+    profilingService.SetCaptureData(newCapturePeriod, newActiveGlobalCounterIds);
+
+    // Get vector of active counters for CpuRef and CpuAcc backends
+    cpuRefCounterStatus = backendProfilingCpuRef.GetActiveCounters();
+    cpuAccCounterStatus = backendProfilingCpuAcc.GetActiveCounters();
+    BOOST_CHECK_EQUAL(cpuRefCounterStatus.size(), 1);
+    BOOST_CHECK_EQUAL(cpuAccCounterStatus.size(), 1);
+
+    // Check active CpuRef counter
+    BOOST_CHECK_EQUAL(cpuRefCounterStatus[0].m_GlobalCounterId, newActiveGlobalCounterIds[0]);
+    BOOST_CHECK_EQUAL(cpuRefCounterStatus[0].m_BackendCounterId, cpuRefCounters[1]);
+    BOOST_CHECK_EQUAL(cpuRefCounterStatus[0].m_SamplingRateInMicroseconds, newCapturePeriod);
+    BOOST_CHECK_EQUAL(cpuRefCounterStatus[0].m_Enabled, true);
+
+    // Check active CpuAcc counter
+    BOOST_CHECK_EQUAL(cpuAccCounterStatus[0].m_GlobalCounterId, newActiveGlobalCounterIds[1]);
+    BOOST_CHECK_EQUAL(cpuAccCounterStatus[0].m_BackendCounterId, cpuAccCounters[0]);
+    BOOST_CHECK_EQUAL(cpuAccCounterStatus[0].m_SamplingRateInMicroseconds, newCapturePeriod);
+    BOOST_CHECK_EQUAL(cpuAccCounterStatus[0].m_Enabled, true);
+
+    // Check inactive CpuRef counter
+    inactiveCpuRefCounter = backendProfilingCpuRef.GetCounterStatus(cpuRefCounters[0]);
+    BOOST_CHECK_EQUAL(inactiveCpuRefCounter.m_GlobalCounterId, 5);
+    BOOST_CHECK_EQUAL(inactiveCpuRefCounter.m_BackendCounterId, cpuRefCounters[0]);
+    BOOST_CHECK_EQUAL(inactiveCpuRefCounter.m_SamplingRateInMicroseconds, 0);
+    BOOST_CHECK_EQUAL(inactiveCpuRefCounter.m_Enabled, false);
+
+    // Reset the profiling service to stop any running thread
+    options.m_ProfilingOptions.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

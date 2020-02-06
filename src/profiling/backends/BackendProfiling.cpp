@@ -15,7 +15,7 @@ namespace profiling
 std::unique_ptr<IRegisterBackendCounters>
     BackendProfiling::GetCounterRegistrationInterface(uint16_t currentMaxGlobalCounterID)
 {
-    return std::make_unique<RegisterBackendCounters>(RegisterBackendCounters(currentMaxGlobalCounterID, m_backendId));
+    return std::make_unique<RegisterBackendCounters>(RegisterBackendCounters(currentMaxGlobalCounterID, m_BackendId));
 }
 
 std::unique_ptr<ISendTimelinePacket> BackendProfiling::GetSendTimelinePacket()
@@ -29,14 +29,43 @@ IProfilingGuidGenerator& BackendProfiling::GetProfilingGuidGenerator()
     return m_ProfilingService;
 }
 
-CounterStatus BackendProfiling::GetCounterStatus(uint16_t)
+CounterStatus BackendProfiling::GetCounterStatus(uint16_t backendCounterId)
 {
-    return CounterStatus();
+    uint16_t globalCounterId = m_ProfilingService.GetCounterMappings().GetGlobalId(backendCounterId, m_BackendId);
+    CaptureData captureData = m_ProfilingService.GetCaptureData();
+
+    CounterStatus counterStatus(backendCounterId, globalCounterId, false, 0);
+
+    if (captureData.IsCounterIdInCaptureData(globalCounterId))
+    {
+        counterStatus.m_Enabled = true;
+        counterStatus.m_SamplingRateInMicroseconds = captureData.GetCapturePeriod();
+    }
+
+    return counterStatus;
 }
 
 std::vector<CounterStatus> BackendProfiling::GetActiveCounters()
 {
-    return std::vector<CounterStatus>();
+    CaptureData captureData = m_ProfilingService.GetCaptureData();
+
+    const std::vector<uint16_t>& globalCounterIds = captureData.GetCounterIds();
+    std::vector<CounterStatus> activeCounterIds;
+
+    for (auto globalCounterId : globalCounterIds) {
+        // Get pair of local counterId and backendId using globalCounterId
+        const std::pair<uint16_t, armnn::BackendId>& backendCounterIdPair =
+                ProfilingService::Instance().GetCounterMappings().GetBackendId(globalCounterId);
+        if (backendCounterIdPair.second == m_BackendId)
+        {
+            activeCounterIds.emplace_back(backendCounterIdPair.first,
+                                          globalCounterId,
+                                          true,
+                                          captureData.GetCapturePeriod());
+        }
+    }
+
+    return activeCounterIds;
 }
 
 bool BackendProfiling::IsProfilingEnabled() const

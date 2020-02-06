@@ -30,6 +30,14 @@ struct Timestamp
 
 struct CounterStatus
 {
+    CounterStatus(uint16_t backendCounterId,
+                  uint16_t globalCounterId,
+                  bool enabled,
+                  uint32_t samplingRateInMicroseconds)
+                  : m_BackendCounterId(backendCounterId),
+                    m_GlobalCounterId(globalCounterId),
+                    m_Enabled(enabled),
+                    m_SamplingRateInMicroseconds(samplingRateInMicroseconds) {}
     uint16_t m_BackendCounterId;
     uint16_t m_GlobalCounterId;
     bool     m_Enabled;
@@ -73,7 +81,7 @@ public:
     {}
 
     virtual std::unique_ptr<IRegisterBackendCounters>
-        GetCounterRegistrationInterface(uint16_t currentMaxGlobalCounterID) = 0;
+            GetCounterRegistrationInterface(uint16_t currentMaxGlobalCounterID) = 0;
 
     virtual std::unique_ptr<ISendTimelinePacket> GetSendTimelinePacket() = 0;
 
@@ -88,5 +96,7 @@ public:
     virtual bool IsProfilingEnabled() const = 0;
 
 };
+
 }    // namespace profiling
+
 }    // namespace armnn

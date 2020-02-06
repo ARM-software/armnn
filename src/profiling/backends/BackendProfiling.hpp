@@ -3,7 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <ProfilingService.hpp>
+#pragma once
+
+#include "ProfilingService.hpp"
 #include <armnn/backends/profiling/IBackendProfiling.hpp>
 
 namespace armnn
@@ -15,17 +17,18 @@ namespace profiling
 class BackendProfiling : public IBackendProfiling
 {
 public:
-    BackendProfiling(const IRuntime::CreationOptions& options, ProfilingService& profilingService, const BackendId& id)
-        : m_options(options)
-        , m_ProfilingService(profilingService)
-        , m_backendId(id)
-    {}
+    BackendProfiling(const IRuntime::CreationOptions& options,
+                     ProfilingService& profilingService,
+                     const BackendId& backendId)
+            : m_Options(options),
+              m_ProfilingService(profilingService),
+              m_BackendId(backendId) {}
 
     ~BackendProfiling()
     {}
 
     std::unique_ptr<IRegisterBackendCounters>
-        GetCounterRegistrationInterface(uint16_t currentMaxGlobalCounterID) override;
+            GetCounterRegistrationInterface(uint16_t currentMaxGlobalCounterID) override;
 
     std::unique_ptr<ISendTimelinePacket> GetSendTimelinePacket() override;
 
@@ -41,9 +44,9 @@ public:
     bool IsProfilingEnabled() const override;
 
 private:
-    IRuntime::CreationOptions m_options;
+    IRuntime::CreationOptions m_Options;
     ProfilingService& m_ProfilingService;
-    BackendId m_backendId;
+    BackendId m_BackendId;
 };
 }    // namespace profiling
 }    // namespace armnn

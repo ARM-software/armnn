@@ -46,6 +46,19 @@ CaptureData Holder::GetCaptureData() const
     return m_CaptureData;
 }
 
+bool CaptureData::IsCounterIdInCaptureData(uint16_t counterId)
+{
+    for (auto m_CounterId : m_CounterIds) {
+        if (m_CounterId == counterId)
+        {
+            return true;
+        }
+    }
+
+    // Return false by default unless counterId is found
+    return false;
+}
+
 void Holder::SetCaptureData(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds)
 {
     std::lock_guard<std::mutex> lockGuard(m_CaptureThreadMutex);

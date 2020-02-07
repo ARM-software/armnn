@@ -26,7 +26,7 @@ struct IQuantizationScheme
     virtual ~IQuantizationScheme() {}
 };
 
-struct QAsymm8QuantizationScheme : IQuantizationScheme
+struct QAsymmU8QuantizationScheme : IQuantizationScheme
 {
     OffsetScalePair ComputeScheme(double min, double max) const override
     {
@@ -59,6 +59,42 @@ struct QAsymm8QuantizationScheme : IQuantizationScheme
     int NumBits() const override { return 8; }
 
     DataType GetDataType() const override { return DataType::QAsymmU8; }
+};
+
+struct QAsymmS8QuantizationScheme : IQuantizationScheme
+{
+    OffsetScalePair ComputeScheme(double min, double max) const override
+    {
+        if (min > max)
+        {
+            throw InvalidArgumentException("min > max will result in invalid quantization.");
+        }
+
+        double highest = (1 << NumBits()) - 1;
+
+        min = std::min(0.0, min); // min <= 0.0
+        max = std::max(0.0, max); // max >= 0.0
+
+        // To avoid dividing by zero when quantizing a zero filled tensor
+        if (min == 0.0 && max == 0.0)
+        {
+            max = 1.0;
+        }
+
+        // Assumes quantization range [0-255]
+        double scale = (max-min) / highest ;
+        double offset = - min / scale;
+
+        //Clamp 0 to Highest
+        offset = std::max(0.0, std::min(highest, offset));
+
+        //-128 on offset to cast to signed range
+        return std::make_pair(static_cast<float>(scale), static_cast<int>(std::round(offset)-128));
+    }
+
+    int NumBits() const override { return 8; }
+
+    DataType GetDataType() const override { return DataType::QAsymmS8; }
 };
 
 struct QSymmS8QuantizationScheme : IQuantizationScheme
@@ -109,10 +145,6 @@ struct QSymm16QuantizationScheme : IQuantizationScheme
         double extent = std::max(std::abs(min), std::abs(max));
         double scale = extent / highest;
 
-        if(scale == 0.000457777642)
-        {
-            return std::make_pair(static_cast<float>(scale), 0);
-        }
         return std::make_pair(static_cast<float>(scale), 0);
 
     }

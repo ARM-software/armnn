@@ -143,6 +143,20 @@ LayerTestResult<float, 4> DequantizeOffsetUint8Test(
     return DequantizeOffsetTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
 }
 
+LayerTestResult<float, 4> DequantizeSimpleAsymmInt8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return DequantizeSimpleTest<armnn::DataType::QAsymmS8>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 4> DequantizeOffsetAsymmInt8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return DequantizeOffsetTest<armnn::DataType::QAsymmS8>(workloadFactory, memoryManager);
+}
+
 LayerTestResult<float, 4> DequantizeSimpleInt8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)

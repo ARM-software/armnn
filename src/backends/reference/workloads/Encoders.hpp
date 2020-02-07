@@ -32,6 +32,13 @@ inline std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void*
                 params.first);
         }
         ARMNN_NO_DEPRECATE_WARN_END
+        case armnn::DataType::QAsymmS8:
+        {
+            return std::make_unique<QASymmS8Encoder>(
+                static_cast<int8_t*>(data),
+                info.GetQuantizationScale(),
+                info.GetQuantizationOffset());
+        }
         case armnn::DataType::QAsymmU8:
         {
             return std::make_unique<QASymm8Encoder>(

@@ -2201,13 +2201,15 @@ void QuantizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::Float32,
         DataType::Float16,
         DataType::QSymmS8,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
 
-    if (outputTensorInfo.GetDataType() != DataType::QAsymmU8 &&
+    if (outputTensorInfo.GetDataType() != DataType::QAsymmS8 &&
+        outputTensorInfo.GetDataType() != DataType::QAsymmU8 &&
         outputTensorInfo.GetDataType() != DataType::QSymmS8 &&
         outputTensorInfo.GetDataType() != DataType::QSymmS16)
     {

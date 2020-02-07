@@ -118,6 +118,7 @@ constexpr unsigned int GetDataTypeSize(DataType dataType)
         case DataType::Float32:
         case DataType::Signed32:              return 4U;
         case DataType::QAsymmU8:              return 1U;
+        case DataType::QAsymmS8:              return 1U;
         case DataType::QSymmS8:               return 1U;
         ARMNN_NO_DEPRECATE_WARN_BEGIN
         case DataType::QuantizedSymm8PerAxis: return 1U;
@@ -236,6 +237,7 @@ constexpr bool IsQuantizedType(DataType dataType)
 {
     ARMNN_NO_DEPRECATE_WARN_BEGIN
     return dataType == DataType::QAsymmU8        ||
+           dataType == DataType::QAsymmS8        ||
            dataType == DataType::QSymmS8         ||
            dataType == DataType::QSymmS16        ||
            dataType == DataType::QuantizedSymm8PerAxis;

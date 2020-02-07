@@ -23,6 +23,8 @@ arm_compute::DataType GetArmComputeDataType(armnn::DataType dataType, bool multi
             return arm_compute::DataType::F16;
         case armnn::DataType::Float32:
             return arm_compute::DataType::F32;
+        case armnn::DataType::QAsymmS8:
+            return arm_compute::DataType::QASYMM8_SIGNED;
         case armnn::DataType::QAsymmU8:
             return arm_compute::DataType::QASYMM8;
         case armnn::DataType::QSymmS16:

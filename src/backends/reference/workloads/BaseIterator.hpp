@@ -137,6 +137,25 @@ private:
     const int32_t m_Offset;
 };
 
+class QASymmS8Decoder : public TypedIterator<const int8_t, Decoder<float>>
+{
+public:
+    QASymmS8Decoder(const int8_t* data, const float scale, const int32_t offset)
+        : TypedIterator(data), m_Scale(scale), m_Offset(offset) {}
+
+    QASymmS8Decoder(const float scale, const int32_t offset)
+        : QASymmS8Decoder(nullptr, scale, offset) {}
+
+    float Get() const override
+    {
+        return armnn::Dequantize(*m_Iterator, m_Scale, m_Offset);
+    }
+
+private:
+    const float m_Scale;
+    const int32_t m_Offset;
+};
+
 class QSymmS8Decoder : public TypedIterator<const int8_t, Decoder<float>>
 {
 public:
@@ -252,6 +271,30 @@ public:
     void Set(float right) override
     {
         *m_Iterator = armnn::Quantize<uint8_t>(right, m_Scale, m_Offset);
+    }
+
+    float Get() const override
+    {
+        return armnn::Dequantize(*m_Iterator, m_Scale, m_Offset);
+    }
+
+private:
+    const float m_Scale;
+    const int32_t m_Offset;
+};
+
+class QASymmS8Encoder : public TypedIterator<int8_t, Encoder<float>>
+{
+public:
+    QASymmS8Encoder(int8_t* data, const float scale, const int32_t offset)
+        : TypedIterator(data), m_Scale(scale), m_Offset(offset) {}
+
+    QASymmS8Encoder(const float scale, const int32_t offset)
+        : QASymmS8Encoder(nullptr, scale, offset) {}
+
+    void Set(float right) override
+    {
+        *m_Iterator = armnn::Quantize<int8_t>(right, m_Scale, m_Offset);
     }
 
     float Get() const override

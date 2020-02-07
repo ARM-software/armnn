@@ -81,6 +81,13 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
                 params.first);
         }
         ARMNN_NO_DEPRECATE_WARN_END
+        case DataType::QAsymmS8:
+        {
+            return std::make_unique<QASymmS8Decoder>(
+                static_cast<const int8_t*>(data),
+                info.GetQuantizationScale(),
+                info.GetQuantizationOffset());
+        }
         case DataType::QAsymmU8:
         {
             return std::make_unique<QASymm8Decoder>(

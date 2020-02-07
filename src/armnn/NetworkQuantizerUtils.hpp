@@ -33,7 +33,7 @@ void QuantizeConstant(const srcType* src, uint8_t* dst, size_t numElements, floa
         max = std::max(max, src[i]);
     }
 
-    QAsymm8QuantizationScheme quantizationScheme;
+    QAsymmU8QuantizationScheme quantizationScheme;
     OffsetScalePair qParams = quantizationScheme.ComputeScheme(min, max);
     scale = qParams.first;
     offset = qParams.second;

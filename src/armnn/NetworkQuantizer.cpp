@@ -161,7 +161,10 @@ INetworkPtr NetworkQuantizer::ExportNetwork()
     switch (m_Options.m_ActivationFormat)
     {
         case DataType::QAsymmU8:
-            quantizationScheme = std::make_unique<QAsymm8QuantizationScheme>();
+            quantizationScheme = std::make_unique<QAsymmU8QuantizationScheme>();
+            break;
+        case DataType::QAsymmS8:
+            quantizationScheme = std::make_unique<QAsymmS8QuantizationScheme>();
             break;
         case DataType::QSymmS8:
             quantizationScheme = std::make_unique<QSymmS8QuantizationScheme>();

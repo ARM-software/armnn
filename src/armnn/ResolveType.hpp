@@ -33,6 +33,12 @@ struct ResolveTypeImpl<DataType::QAsymmU8>
 };
 
 template<>
+struct ResolveTypeImpl<DataType::QAsymmS8>
+{
+    using Type = int8_t;
+};
+
+template<>
 struct ResolveTypeImpl<DataType::QSymmS8>
 {
     using Type = int8_t;

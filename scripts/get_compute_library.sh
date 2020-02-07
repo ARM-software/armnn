@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_19_11" # Release 19.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="4bce11548268b9a10b0f06eff3cff9ae06d5b9dd" #COMPMID-3063: Address Custom Convolution failures
+DEFAULT_CLFRAMEWORKREVISION="c971cf1034a61875c8e8c87d48634cbfac3865fd" #COMPMID-3090: Fail NEON/ColorConvert/RGBtoU8
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

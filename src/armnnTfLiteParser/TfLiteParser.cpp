@@ -315,7 +315,14 @@ armnn::TensorInfo ToTensorInfo(TfLiteParser::TensorRawPtr tensorPtr, const std::
             type = armnn::DataType::Float32;
             break;
         case tflite::TensorType_INT8:
-            type = armnn::DataType::QSymmS8;
+            if (tensorPtr->quantization->zero_point.size() == 1 && tensorPtr->quantization->zero_point[0] != 0)
+            {
+                type = armnn::DataType::QAsymmS8;
+            }
+            else
+            {
+                type = armnn::DataType::QSymmS8;
+            }
             break;
         case tflite::TensorType_INT16:
             type = armnn::DataType::QSymmS16;
@@ -359,7 +366,7 @@ armnn::TensorInfo ToTensorInfo(TfLiteParser::TensorRawPtr tensorPtr, const std::
             if (tensorPtr->quantization->zero_point.size() == 1)
             {
                 // NOTE: we lose precision here when converting from 64 bit to 32
-                //       but this is what we support at the monent in ArmNN
+                //       but this is what we support at the moment in ArmNN
                 quantizationOffset = boost::numeric_cast<int32_t>(tensorPtr->quantization->zero_point[0]);
             }
 

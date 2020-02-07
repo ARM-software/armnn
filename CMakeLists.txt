@@ -89,7 +89,7 @@ if(BUILD_CAFFE_PARSER)
         )
     # The generated Caffe protobuf .cc file is not warning clean and we can't fix them.
     if(COMPILER_IS_GNU_LIKE)
-        set_source_files_properties(${CAFFE_GENERATED_SOURCES}/caffe/proto/caffe.pb.cc PROPERTIES COMPILE_FLAGS "-Wno-conversion -Wno-sign-conversion")
+        set_source_files_properties(${CAFFE_GENERATED_SOURCES}/caffe/proto/caffe.pb.cc PROPERTIES COMPILE_FLAGS "-Wno-unused-variable -Wno-unused-parameter -Wno-conversion -Wno-sign-conversion")
     endif()
 
     add_library_ex(armnnCaffeParser SHARED ${armnn_caffe_parser_sources})

@@ -369,6 +369,13 @@ void ProfilingService::Initialize()
         BOOST_ASSERT(inferencesRunCounter);
         InitializeCounterValue(inferencesRunCounter->m_Uid);
     }
+    // Register the backend counters
+    uint16_t maxGlobalCounterId = armnn::profiling::INFERENCES_RUN;
+    for (auto&& profilingContext : m_BackendProfilingContexts)
+    {
+        BOOST_ASSERT(profilingContext.second != nullptr);
+        maxGlobalCounterId = profilingContext.second->RegisterCounters(maxGlobalCounterId);
+    }
 }
 
 void ProfilingService::InitializeCounterValue(uint16_t counterUid)

@@ -91,9 +91,9 @@ public:
 
     OutputSlot(const OutputSlot&) = delete;
     OutputSlot& operator=(const OutputSlot&) = delete;
+    OutputSlot& operator=(OutputSlot&&) = delete;
 
     OutputSlot(OutputSlot&&) = default;
-    OutputSlot& operator=(OutputSlot&&) = default;
 
     ~OutputSlot()
     {

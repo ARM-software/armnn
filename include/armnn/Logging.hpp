@@ -79,8 +79,9 @@ struct ScopedRecord
 
     ScopedRecord(const ScopedRecord&) = delete;
     ScopedRecord& operator=(const ScopedRecord&) = delete;
+    ScopedRecord& operator=(ScopedRecord&&) = delete;
+
     ScopedRecord(ScopedRecord&& other) = default;
-    ScopedRecord& operator=(ScopedRecord&&) = default;
 
     template<typename Streamable>
     ScopedRecord& operator<<(const Streamable& s)

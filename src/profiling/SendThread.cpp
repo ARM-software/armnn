@@ -156,7 +156,7 @@ void SendThread::Send(IProfilingConnection& profilingConnection)
                 std::unique_lock<std::mutex> lock(m_WaitMutex);
 
                 bool timeout = m_WaitCondition.wait_for(lock,
-                                                        std::chrono::milliseconds(m_Timeout),
+                                                        std::chrono::milliseconds(std::max(m_Timeout, 1000)),
                                                         [&]{ return m_ReadyToRead; });
                 // If we get notified we need to flush the buffer again
                 if(timeout)

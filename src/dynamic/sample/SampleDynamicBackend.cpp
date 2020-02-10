@@ -48,7 +48,7 @@ public:
     }
 
     IBackendInternal::IBackendProfilingContextPtr CreateBackendProfilingContext(
-        const IRuntime::CreationOptions&, armnn::profiling::IBackendProfiling&) const override
+        const IRuntime::CreationOptions&, IBackendProfilingPtr&) override
     {
         return IBackendProfilingContextPtr{};
     }

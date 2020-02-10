@@ -109,7 +109,7 @@ void ProfilingService::Update()
         m_CommandHandler.Stop();
 
         // Stop the send thread (if running)
-        m_SendCounterPacket.Stop(false);
+        m_SendThread.Stop(false);
 
         // Stop the periodic counter capture thread (if running)
         m_PeriodicCounterCapture.Stop();
@@ -143,7 +143,7 @@ void ProfilingService::Update()
 
         // Start the send thread, while in "WaitingForAck" state it'll send out a "Stream MetaData" packet waiting for
         // a valid "Connection Acknowledged" packet confirming the connection
-        m_SendCounterPacket.Start(*m_ProfilingConnection);
+        m_SendThread.Start(*m_ProfilingConnection);
 
         // The connection acknowledged command handler will automatically transition the state to "Active" once a
         // valid "Connection Acknowledged" packet has been received
@@ -419,7 +419,7 @@ void ProfilingService::Stop()
     m_CommandHandler.Stop();
     m_PeriodicCounterCapture.Stop();
     // The the consuming thread
-    m_SendCounterPacket.Stop(false);
+    m_SendThread.Stop(false);
 
     // ...then close and destroy the profiling connection...
     if (m_ProfilingConnection != nullptr && m_ProfilingConnection->IsOpen())

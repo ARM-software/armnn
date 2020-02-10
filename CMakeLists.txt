@@ -469,10 +469,12 @@ list(APPEND armnn_sources
     src/profiling/Holder.cpp
     src/profiling/Holder.hpp
     src/profiling/IBufferManager.hpp
+    src/profiling/IConsumer.hpp
     src/profiling/ICounterDirectory.hpp
     src/profiling/ICounterRegistry.hpp
     src/profiling/ICounterValues.hpp
     src/profiling/ISendCounterPacket.hpp
+    src/profiling/ISendThread.hpp
     src/profiling/IPacketBuffer.hpp
     src/profiling/IPeriodicCounterCapture.hpp
     src/profiling/IProfilingConnection.hpp
@@ -507,6 +509,8 @@ list(APPEND armnn_sources
     src/profiling/RequestCounterDirectoryCommandHandler.hpp
     src/profiling/SendCounterPacket.cpp
     src/profiling/SendCounterPacket.hpp
+    src/profiling/SendThread.cpp
+    src/profiling/SendThread.hpp
     src/profiling/SendTimelinePacket.cpp
     src/profiling/SendTimelinePacket.hpp
     src/profiling/SocketProfilingConnection.cpp

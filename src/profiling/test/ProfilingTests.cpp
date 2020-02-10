@@ -26,6 +26,7 @@
 #include <Runtime.hpp>
 #include <SocketProfilingConnection.hpp>
 #include <SendCounterPacket.hpp>
+#include <SendThread.hpp>
 #include <SendTimelinePacket.hpp>
 
 #include <armnn/Conversion.hpp>
@@ -135,7 +136,8 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandler)
     TestProfilingConnectionArmnnError testProfilingConnectionArmnnError;
     CounterDirectory counterDirectory;
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendThread sendThread(profilingStateMachine, mockBuffer, sendCounterPacket);
     SendTimelinePacket sendTimelinePacket(mockBuffer);
 
     ConnectionAcknowledgedCommandHandler connectionAcknowledgedCommandHandler(0, 1, 4194304, counterDirectory,
@@ -1766,7 +1768,8 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     TestCaptureThread captureThread;
     TestReadCounterValues readCounterValues;
     MockBufferManager mockBuffer(512);
-    SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendThread sendThread(profilingStateMachine, mockBuffer, sendCounterPacket);
 
     uint32_t sizeOfUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
     uint32_t sizeOfUint16 = numeric_cast<uint32_t>(sizeof(uint16_t));
@@ -1896,7 +1899,8 @@ BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
     BOOST_CHECK(profilingState.GetCurrentState() == ProfilingState::Uninitialised);
     CounterDirectory counterDirectory;
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(profilingState, mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendThread sendThread(profilingState, mockBuffer, sendCounterPacket);
     SendTimelinePacket sendTimelinePacket(mockBuffer);
 
     ConnectionAcknowledgedCommandHandler commandHandler(packetFamilyId, connectionPacketId, version, counterDirectory,
@@ -2158,7 +2162,8 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
     std::vector<uint16_t> captureIds2;
 
     MockBufferManager mockBuffer(512);
-    SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendThread sendThread(profilingStateMachine, mockBuffer, sendCounterPacket);
 
     std::vector<uint16_t> counterIds;
     CaptureReader captureReader(2);
@@ -2216,7 +2221,8 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
     ProfilingStateMachine profilingStateMachine;
     CounterDirectory counterDirectory;
     MockBufferManager mockBuffer1(1024);
-    SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer1);
+    SendCounterPacket sendCounterPacket(mockBuffer1);
+    SendThread sendThread(profilingStateMachine, mockBuffer1, sendCounterPacket);
     MockBufferManager mockBuffer2(1024);
     SendTimelinePacket sendTimelinePacket(mockBuffer2);
     RequestCounterDirectoryCommandHandler commandHandler(familyId, packetId, version, counterDirectory,
@@ -2277,7 +2283,8 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
     ProfilingStateMachine profilingStateMachine;
     CounterDirectory counterDirectory;
     MockBufferManager mockBuffer1(1024);
-    SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer1);
+    SendCounterPacket sendCounterPacket(mockBuffer1);
+    SendThread sendThread(profilingStateMachine, mockBuffer1, sendCounterPacket);
     MockBufferManager mockBuffer2(1024);
     SendTimelinePacket sendTimelinePacket(mockBuffer2);
     RequestCounterDirectoryCommandHandler commandHandler(familyId, packetId, version, counterDirectory,

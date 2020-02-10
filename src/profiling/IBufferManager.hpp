@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "IConsumer.hpp"
 #include "IPacketBuffer.hpp"
 
 #include <memory>
@@ -24,13 +25,17 @@ public:
 
     virtual IPacketBufferPtr Reserve(unsigned int requestedSize, unsigned int& reservedSize) = 0;
 
-    virtual void Commit(IPacketBufferPtr& packetBuffer, unsigned int size) = 0;
+    virtual void Commit(IPacketBufferPtr& packetBuffer, unsigned int size, bool notifyConsumer = true) = 0;
 
     virtual void Release(IPacketBufferPtr& packetBuffer) = 0;
 
     virtual IPacketBufferPtr GetReadableBuffer() = 0;
 
     virtual void MarkRead(IPacketBufferPtr& packetBuffer) = 0;
+
+    virtual void SetConsumer(IConsumer* consumer) = 0;
+
+    virtual void FlushReadList() = 0;
 };
 
 } // namespace profiling

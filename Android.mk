@@ -202,6 +202,7 @@ LOCAL_SRC_FILES := \
         src/profiling/RegisterBackendCounters.cpp \
         src/profiling/RequestCounterDirectoryCommandHandler.cpp \
         src/profiling/SendCounterPacket.cpp \
+        src/profiling/SendThread.cpp \
         src/profiling/SendTimelinePacket.cpp \
         src/profiling/SocketProfilingConnection.cpp \
         src/profiling/TimelinePacketWriterFactory.cpp \

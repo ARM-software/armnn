@@ -99,9 +99,6 @@ void PeriodicCounterCapture::Capture(const IReadCounterValues& readCounterValues
         // Write a Periodic Counter Capture packet to the Counter Stream Buffer
         m_SendCounterPacket.SendPeriodicCounterCapturePacket(timestamp, values);
 
-        // Notify the Send Thread that new data is available in the Counter Stream Buffer
-        m_SendCounterPacket.SetReadyToRead();
-
         // Wait the indicated capture period (microseconds)
         std::this_thread::sleep_for(std::chrono::microseconds(currentCaptureData.GetCapturePeriod()));
 

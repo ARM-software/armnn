@@ -8,14 +8,8 @@
 #include "IBufferManager.hpp"
 #include "ICounterDirectory.hpp"
 #include "ISendCounterPacket.hpp"
-#include "IProfilingConnection.hpp"
-#include "ProfilingStateMachine.hpp"
 #include "ProfilingUtils.hpp"
 
-#include <atomic>
-#include <condition_variable>
-#include <mutex>
-#include <thread>
 #include <type_traits>
 
 namespace armnn
@@ -33,19 +27,9 @@ public:
     using EventRecord           = std::vector<uint32_t>;
     using IndexValuePairsVector = std::vector<std::pair<uint16_t, uint32_t>>;
 
-    SendCounterPacket(ProfilingStateMachine& profilingStateMachine, IBufferManager& buffer, int timeout = 1000)
-        : m_StateMachine(profilingStateMachine)
-        , m_BufferManager(buffer)
-        , m_Timeout(timeout)
-        , m_IsRunning(false)
-        , m_KeepRunning(false)
-        , m_SendThreadException(nullptr)
+    SendCounterPacket(IBufferManager& buffer)
+        : m_BufferManager(buffer)
     {}
-    ~SendCounterPacket()
-    {
-        // Don't rethrow when destructing the object
-        Stop(false);
-    }
 
     void SendStreamMetaDataPacket() override;
 
@@ -56,18 +40,9 @@ public:
     void SendPeriodicCounterSelectionPacket(uint32_t capturePeriod,
                                             const std::vector<uint16_t>& selectedCounterIds) override;
 
-    void SetReadyToRead() override;
-
     static const unsigned int PIPE_MAGIC = 0x45495434;
 
-    void Start(IProfilingConnection& profilingConnection);
-    void Stop(bool rethrowSendThreadExceptions = true);
-    bool IsRunning() { return m_IsRunning.load(); }
-    bool WaitForPacketSent(uint32_t timeout);
-
 private:
-    void Send(IProfilingConnection& profilingConnection);
-
     template <typename ExceptionType>
     void CancelOperationAndThrow(const std::string& errorMessage)
     {
@@ -80,7 +55,7 @@ private:
     {
         if (std::is_same<ExceptionType, armnn::profiling::BufferExhaustion>::value)
         {
-            SetReadyToRead();
+            m_BufferManager.FlushReadList();
         }
 
         if (writerBuffer != nullptr)
@@ -93,23 +68,7 @@ private:
         throw ExceptionType(errorMessage);
     }
 
-    void FlushBuffer(IProfilingConnection& profilingConnection, bool notifyWatchers = true);
-
-    ProfilingStateMachine& m_StateMachine;
     IBufferManager& m_BufferManager;
-    int m_Timeout;
-    std::mutex m_WaitMutex;
-    std::condition_variable m_WaitCondition;
-    std::thread m_SendThread;
-    std::atomic<bool> m_IsRunning;
-    std::atomic<bool> m_KeepRunning;
-    // m_ReadyToRead will be protected by m_WaitMutex
-    bool m_ReadyToRead;
-    // m_PacketSent will be protected by m_PacketSentWaitMutex
-    bool m_PacketSent;
-    std::exception_ptr m_SendThreadException;
-    std::mutex m_PacketSentWaitMutex;
-    std::condition_variable m_PacketSentWaitCondition;
 
 protected:
     // Helper methods, protected for testing

@@ -20,6 +20,7 @@
 #include "ProfilingStateMachine.hpp"
 #include "RequestCounterDirectoryCommandHandler.hpp"
 #include "SendCounterPacket.hpp"
+#include "SendThread.hpp"
 #include "SendTimelinePacket.hpp"
 #include "TimelinePacketWriterFactory.hpp"
 #include <armnn/backends/profiling/IBackendProfilingContext.hpp>
@@ -134,6 +135,7 @@ private:
     CommandHandler m_CommandHandler;
     BufferManager m_BufferManager;
     SendCounterPacket m_SendCounterPacket;
+    SendThread m_SendThread;
     SendTimelinePacket m_SendTimelinePacket;
     Holder m_Holder;
     PeriodicCounterCapture m_PeriodicCounterCapture;
@@ -163,7 +165,8 @@ protected:
                            m_CommandHandlerRegistry,
                            m_PacketVersionResolver)
         , m_BufferManager()
-        , m_SendCounterPacket(m_StateMachine, m_BufferManager)
+        , m_SendCounterPacket(m_BufferManager)
+        , m_SendThread(m_StateMachine, m_BufferManager, m_SendCounterPacket)
         , m_SendTimelinePacket(m_BufferManager)
         , m_PeriodicCounterCapture(m_Holder, m_SendCounterPacket, *this)
         , m_ConnectionAcknowledgedCommandHandler(0,
@@ -229,7 +232,7 @@ protected:
     }
     bool WaitForPacketSent(ProfilingService& instance, uint32_t timeout = 1000)
     {
-        return instance.m_SendCounterPacket.WaitForPacketSent(timeout);
+        return instance.m_SendThread.WaitForPacketSent(timeout);
     }
 
     BufferManager& GetBufferManager(ProfilingService& instance)

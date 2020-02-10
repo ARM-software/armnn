@@ -41,9 +41,6 @@ void ConnectionAcknowledgedCommandHandler::operator()(const Packet& packet)
         m_SendCounterPacket.SendCounterDirectoryPacket(m_CounterDirectory);
         m_SendTimelinePacket.SendTimelineMessageDirectoryPackage();
 
-        // Notify the Send Thread that new data is available in the Counter Stream Buffer
-        m_SendCounterPacket.SetReadyToRead();
-
         break;
     case ProfilingState::Active:
         return; // NOP

@@ -40,13 +40,18 @@ IPacketBufferPtr BufferManager::Reserve(unsigned int requestedSize, unsigned int
     return buffer;
 }
 
-void BufferManager::Commit(IPacketBufferPtr& packetBuffer, unsigned int size)
+void BufferManager::Commit(IPacketBufferPtr& packetBuffer, unsigned int size, bool notifyConsumer)
 {
     std::unique_lock<std::mutex> readableListLock(m_ReadableMutex, std::defer_lock);
     packetBuffer->Commit(size);
     readableListLock.lock();
     m_ReadableList.push_back(std::move(packetBuffer));
     readableListLock.unlock();
+
+    if (notifyConsumer)
+    {
+        FlushReadList();
+    }
 }
 
 void BufferManager::Initialize()
@@ -101,6 +106,20 @@ void BufferManager::MarkRead(IPacketBufferPtr& packetBuffer)
     availableListLock.lock();
     m_AvailableList.push_back(std::move(packetBuffer));
     availableListLock.unlock();
+}
+
+void BufferManager::SetConsumer(IConsumer* consumer)
+{
+    m_Consumer = consumer;
+}
+
+void BufferManager::FlushReadList()
+{
+    // notify consumer that packet is ready to read
+    if (m_Consumer != nullptr)
+    {
+        m_Consumer->SetReadyToRead();
+    }
 }
 
 } // namespace profiling

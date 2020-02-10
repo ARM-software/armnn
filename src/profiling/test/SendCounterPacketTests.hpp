@@ -6,6 +6,7 @@
 #pragma once
 
 #include <SendCounterPacket.hpp>
+#include <SendThread.hpp>
 #include <ProfilingUtils.hpp>
 #include <IProfilingConnectionFactory.hpp>
 
@@ -16,6 +17,11 @@
 #include <boost/assert.hpp>
 #include <boost/core/ignore_unused.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 
 namespace armnn
 {
@@ -210,10 +216,15 @@ public:
         return std::move(m_Buffer);
     }
 
-    void Commit(IPacketBufferPtr& packetBuffer, unsigned int size) override
+    void Commit(IPacketBufferPtr& packetBuffer, unsigned int size, bool notifyConsumer = true) override
     {
         packetBuffer->Commit(size);
         m_Buffer = std::move(packetBuffer);
+
+        if (notifyConsumer)
+        {
+            FlushReadList();
+        }
     }
 
     IPacketBufferPtr GetReadableBuffer() override
@@ -233,9 +244,27 @@ public:
         m_Buffer = std::move(packetBuffer);
     }
 
+    void SetConsumer(IConsumer* consumer) override
+   {
+        if (consumer != nullptr)
+        {
+            m_Consumer = consumer;
+        }
+   }
+
+    void FlushReadList() override
+    {
+        // notify consumer that packet is ready to read
+        if (m_Consumer != nullptr)
+        {
+            m_Consumer->SetReadyToRead();
+        }
+    }
+
 private:
     unsigned int m_BufferSize;
     IPacketBufferPtr m_Buffer;
+    IConsumer* m_Consumer = nullptr;
 };
 
 class MockStreamCounterBuffer : public IBufferManager
@@ -264,13 +293,18 @@ public:
         return std::make_unique<MockPacketBuffer>(requestedSize);
     }
 
-    void Commit(IPacketBufferPtr& packetBuffer, unsigned int size) override
+    void Commit(IPacketBufferPtr& packetBuffer, unsigned int size, bool notifyConsumer = true) override
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
 
         packetBuffer->Commit(size);
         m_BufferList.push_back(std::move(packetBuffer));
         m_CommittedSize += size;
+
+        if (notifyConsumer)
+        {
+            FlushReadList();
+        }
     }
 
     void Release(IPacketBufferPtr& packetBuffer) override
@@ -302,6 +336,23 @@ public:
         packetBuffer->MarkRead();
     }
 
+    void SetConsumer(IConsumer* consumer) override
+    {
+        if (consumer != nullptr)
+        {
+            m_Consumer = consumer;
+        }
+    }
+
+    void FlushReadList() override
+    {
+        // notify consumer that packet is ready to read
+        if (m_Consumer != nullptr)
+        {
+            m_Consumer->SetReadyToRead();
+        }
+    }
+
     unsigned int GetCommittedSize() const { return m_CommittedSize; }
     unsigned int GetReadableSize()  const { return m_ReadableSize;  }
     unsigned int GetReadSize()      const { return m_ReadSize;      }
@@ -324,6 +375,9 @@ private:
 
     // The total size of the buffers that has already been read
     unsigned int m_ReadSize;
+
+    // Consumer thread to notify packet is ready to read
+    IConsumer* m_Consumer = nullptr;
 };
 
 class MockSendCounterPacket : public ISendCounterPacket
@@ -337,7 +391,7 @@ public:
         unsigned int reserved = 0;
         IPacketBufferPtr buffer = m_BufferManager.Reserve(1024, reserved);
         memcpy(buffer->GetWritableData(), message.c_str(), static_cast<unsigned int>(message.size()) + 1);
-        m_BufferManager.Commit(buffer, reserved);
+        m_BufferManager.Commit(buffer, reserved, false);
     }
 
     void SendCounterDirectoryPacket(const ICounterDirectory& counterDirectory) override
@@ -374,8 +428,6 @@ public:
         memcpy(buffer->GetWritableData(), message.c_str(), static_cast<unsigned int>(message.size()) + 1);
         m_BufferManager.Commit(buffer, reserved);
     }
-
-    void SetReadyToRead() override {}
 
 private:
     IBufferManager& m_BufferManager;
@@ -596,8 +648,8 @@ private:
 class SendCounterPacketTest : public SendCounterPacket
 {
 public:
-    SendCounterPacketTest(ProfilingStateMachine& profilingStateMachine, IBufferManager& buffer)
-        : SendCounterPacket(profilingStateMachine, buffer)
+    SendCounterPacketTest(IBufferManager& buffer)
+        : SendCounterPacket(buffer)
     {}
 
     bool CreateDeviceRecordTest(const DevicePtr& device,

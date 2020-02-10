@@ -8,6 +8,7 @@
 #include "Packet.hpp"
 #include "CommandHandlerFunctor.hpp"
 #include "Holder.hpp"
+#include "ProfilingStateMachine.hpp"
 #include "SendCounterPacket.hpp"
 #include "IPeriodicCounterCapture.hpp"
 #include "ICounterValues.hpp"

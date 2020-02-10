@@ -6,6 +6,7 @@
 #pragma once
 
 #include "IBufferManager.hpp"
+#include "IConsumer.hpp"
 
 #include <condition_variable>
 #include <mutex>
@@ -28,13 +29,20 @@ public:
 
     void Reset();
 
-    void Commit(IPacketBufferPtr& packetBuffer, unsigned int size) override;
+    void Commit(IPacketBufferPtr& packetBuffer, unsigned int size, bool notifyConsumer = true) override;
 
     void Release(IPacketBufferPtr& packetBuffer) override;
 
     IPacketBufferPtr GetReadableBuffer() override;
 
     void MarkRead(IPacketBufferPtr& packetBuffer) override;
+
+    /// Set Consumer on the buffer manager to be notified when there is a Commit
+    /// Can only be one consumer
+    void SetConsumer(IConsumer* consumer) override;
+
+    /// Notify the Consumer buffer can be read
+    void FlushReadList() override;
 
 private:
     void Initialize();
@@ -55,6 +63,9 @@ private:
 
     // Mutex for readable packet buffer list
     std::mutex m_ReadableMutex;
+
+    // Consumer thread to notify packet is ready to read
+    IConsumer* m_Consumer = nullptr;
 };
 
 } // namespace profiling

@@ -135,14 +135,46 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     -DPROTOBUF_LIBRARY_DEBUG=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.15.0.1 \
     -DPROTOBUF_LIBRARY_RELEASE=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.15.0.1
     ```
+
+* If you want to include standalone sample dynamic backend tests, add the argument to enable the tests and the dynamic backend path to the CMake command:
+    ```bash
+    -DSAMPLE_DYNAMIC_BACKEND=1 \
+    -DDYNAMIC_BACKEND_PATHS=$SAMPLE_DYNAMIC_BACKEND_PATH
+    ```
 * Run the build
     ```bash
     make -j32
     ```
 
+#### <a name="buildStandaloneBackend">Build Standalone Sample Dynamic Backend</a>
+* The sample dynamic backend is located in armnn/src/dynamic/sample
+    ```bash
+    mkdir build
+    cd build
+    ```
+
+* Use CMake to configure your build environment, update the following script and run it from the armnn/src/dynamic/sample/build directory to set up the armNN build:
+    ```bash
+    #!/bin/bash
+    CXX=aarch64-linux-gnu-g++ \
+    CC=aarch64-linux-gnu-gcc \
+    cmake .. \
+    -DCMAKE_CXX_FLAGS=--std=c++14 \
+    -DBOOST_ROOT=$HOME/armnn-devenv/boost_arm64_install/ \
+    -DBoost_SYSTEM_LIBRARY=$HOME/armnn-devenv/boost_arm64_install/lib/libboost_system.a \
+    -DBoost_FILESYSTEM_LIBRARY=$HOME/armnn-devenv/boost_arm64_install/lib/libboost_filesystem.a \
+    -DARMNN_PATH=$HOME/armnn-devenv/armnn/build/libarmnn.so
+    ```
+
+* Run the build
+    ```bash
+    make
+    ```
+
 #### <a name="unittests">Run Unit Tests</a>
 * Copy the build folder to an arm64 linux machine
 * Copy the libprotobuf.so.15.0.1 library file to the build folder
+* If you enable the standalone sample dynamic tests, also copy libArm_SampleDynamic_backend.so library file to the folder specified as $SAMPLE_DYNAMIC_BACKEND_PATH when you build ArmNN 
 * cd to the build folder on your arm64 machine and set your LD_LIBRARY_PATH to its current location:
     ```
     cd build/

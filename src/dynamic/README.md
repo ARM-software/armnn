@@ -10,14 +10,38 @@ The details of how to add dynamic backends can be found in [src/backends/README.
 
 ## Standalone dynamic backend example
 
-The source code includes an example that is used to generate a dynamic implementation of the reference backend 
-is provided at
+The source code includes an example that is used to generate a simple dynamic backend and is provided at
 
-[RefDynamicBackend.hpp](./reference/RefDynamicBackend.hpp)
-[RefDynamicBackend.cpp](./reference/RefDynamicBackend.cpp)
+[SampleDynamicBackend.hpp](./sample/SampleDynamicBackend.hpp)
+[SampleDynamicBackend.cpp](./sample/SampleDynamicBackend.cpp)
+
+The details of how to create backends can be found in [src/backends/README.md](../backends/README.md).
 
 The makefile used for building the standalone reference dynamic backend is also provided:
-[CMakeLists.txt](./reference/CMakeLists.txt)
+[CMakeLists.txt](./sample/CMakeLists.txt)
+
+### Standalone dynamic backend build
+
+The easiest way to build a standalone sample dynamic backend is to build using environment configured compiler
+and specify the Arm NN path and Boost path to the CMake command:
+
+```shell
+cd ${DYNAMIC_BACKEND_DIR}
+mkdir build
+cd build
+cmake -DBOOST_ROOT=${BOOST_PATH} \
+      -DBoost_SYSTEM_LIBRARY=${BOOST_PATH}/lib/libboost_system.a \
+      -DBoost_FILESYSTEM_LIBRARY=${BOOST_PATH}/lib/libboost_filesystem.a \
+      -DARMNN_PATH=${ARMNN_PAH}/libarmnn.so ..
+```
+
+Then run the build
+
+```shell
+make
+```
+
+The library will be created in ${DYNAMIC_BACKEND_DIR}/build.
 
 
 ## Dynamic backend loading paths
@@ -28,6 +52,12 @@ A list of (absolute) paths can be specified at compile-time by setting a define 
 
 ```shell
 -DDYNAMIC_BACKEND_PATHS="PATH_1:PATH_2...:PATH_N"
+```
+
+Example for setting the path to the sample standalone dynamic backend built from the previous step:
+
+```shell
+-DDYNAMIC_BACKEND_PATHS=${DYNAMIC_BACKEND_DIR}/build
 ```
 
 The paths will be processed in the same order as they are indicated in the macro.

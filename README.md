@@ -24,7 +24,7 @@ Arm NN is written using portable C++14 and the build system uses [CMake](https:/
 
 The armnn/tests directory contains tests used during Arm NN development. Many of them depend on third-party IP, model protobufs and image files not distributed with Arm NN. The dependencies of some of the tests are available freely on the Internet, for those who wish to experiment.
 
-The 'armnn/samples' directory contains SimpleSample.cpp, a very basic example of the ArmNN SDK API in use.
+The 'armnn/samples' directory contains SimpleSample.cpp, a very basic example of the ArmNN SDK API in use, and DynamicSample.cpp, a very basic example of using the ArmNN SDK API with the standalone sample dynamic backend.
 
 The 'ExecuteNetwork' program, in armnn/tests/ExecuteNetwork, has no additional dependencies beyond those required by Arm NN and the model parsers. It takes any model and any input tensor, and simply prints out the output tensor. Run it with no arguments to see command-line help.
 

@@ -169,6 +169,7 @@ constexpr const char* GetDataTypeName(DataType dataType)
         case DataType::Float16:               return "Float16";
         case DataType::Float32:               return "Float32";
         case DataType::QAsymmU8:              return "QAsymmU8";
+        case DataType::QAsymmS8:              return "QAsymmS8";
         case DataType::QSymmS8:               return "QSymmS8";
         ARMNN_NO_DEPRECATE_WARN_BEGIN
         case DataType::QuantizedSymm8PerAxis: return "QSymm8PerAxis";
@@ -233,15 +234,19 @@ constexpr bool IsQuantizedType()
     return std::is_integral<T>::value;
 }
 
-constexpr bool IsQuantizedType(DataType dataType)
+constexpr bool IsQuantized8BitType(DataType dataType)
 {
     ARMNN_NO_DEPRECATE_WARN_BEGIN
     return dataType == DataType::QAsymmU8        ||
            dataType == DataType::QAsymmS8        ||
            dataType == DataType::QSymmS8         ||
-           dataType == DataType::QSymmS16        ||
            dataType == DataType::QuantizedSymm8PerAxis;
     ARMNN_NO_DEPRECATE_WARN_END
+}
+
+constexpr bool IsQuantizedType(DataType dataType)
+{
+    return dataType == DataType::QSymmS16 || IsQuantized8BitType(dataType);
 }
 
 inline std::ostream& operator<<(std::ostream& os, Status stat)

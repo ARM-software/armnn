@@ -45,17 +45,22 @@ bool IsDataType(const WorkloadInfo& info)
     return false;
 }
 
+bool IsSigned32(const WorkloadInfo& info)
+{
+    return IsDataType<DataType::Signed32>(info);
+}
+
 bool IsFloat16(const WorkloadInfo& info)
 {
     return IsDataType<DataType::Float16>(info);
 }
 
-bool IsQSymm16(const WorkloadInfo& info)
+bool IsQSymmS16(const WorkloadInfo& info)
 {
     return IsDataType<DataType::QSymmS16>(info);
 }
 
-bool IsQSymm8(const WorkloadInfo& info)
+bool IsQSymmS8(const WorkloadInfo& info)
 {
     return IsDataType<DataType::QSymmS8>(info);
 }
@@ -187,20 +192,20 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDebug(const DebugQueueDescr
     {
         return std::make_unique<RefDebugFloat16Workload>(descriptor, info);
     }
-    if (IsQSymm16(info))
+    if (IsQSymmS16(info))
     {
-        return std::make_unique<RefDebugQSymm16Workload>(descriptor, info);
+        return std::make_unique<RefDebugQSymmS16Workload>(descriptor, info);
     }
-    if (IsQSymm8(info))
+    if (IsQSymmS8(info))
     {
-        return std::make_unique<RefDebugQSymm8Workload>(descriptor, info);
+        return std::make_unique<RefDebugQSymmS8Workload>(descriptor, info);
     }
-    if (IsDataType<DataType::Signed32>(info))
+    if (IsSigned32(info))
     {
         return std::make_unique<RefDebugSigned32Workload>(descriptor, info);
     }
 
-    return MakeWorkload<RefDebugFloat32Workload, RefDebugQAsymm8Workload>(descriptor, info);
+    return MakeWorkload<RefDebugFloat32Workload, RefDebugQAsymmU8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDepthToSpace(const DepthToSpaceQueueDescriptor& descriptor,
@@ -410,7 +415,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateOutput(const OutputQueueDes
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePad(const PadQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const
 {
-    if (IsQSymm16(info))
+    if (IsQSymmS16(info))
     {
         return std::make_unique<RefPadQSymm16Workload>(descriptor, info);
     }
@@ -424,7 +429,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePad(const PadQueueDescripto
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {
-    if (IsQSymm16(info))
+    if (IsQSymmS16(info))
     {
         return std::make_unique<RefPermuteQSymm16Workload>(descriptor, info);
     }

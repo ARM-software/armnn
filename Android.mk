@@ -210,7 +210,7 @@ LOCAL_SRC_FILES := \
         src/profiling/backends/BackendProfiling.cpp
 
 LOCAL_STATIC_LIBRARIES := \
-        armnn-arm_compute \
+        arm_compute_library \
         libboost_log \
         libboost_system \
         libboost_thread \
@@ -354,7 +354,7 @@ LOCAL_STATIC_LIBRARIES := \
         libboost_unit_test_framework \
         libboost_thread \
         libboost_filesystem \
-        armnn-arm_compute
+        arm_compute_library
 
 LOCAL_WHOLE_STATIC_LIBRARIES := libarmnn
 

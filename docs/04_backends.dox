@@ -1,4 +1,4 @@
-/// Copyright (c) 2017 ARM Limited.
+/// Copyright (c) 2020 ARM Limited.
 ///
 /// SPDX-License-Identifier: MIT
 ///
@@ -433,7 +433,7 @@ Layer Support API and the Workload Factory.
 At the end of test, the runtime object goes out of scope and the dynamic backend instance is automatically destroyed, and the handle to
 the shared object is closed.
 
-<br/><br/><br/><br/><br/>
+<br/><br/><br/><br/>
 
 @section S13_dynamic_backend_guide Standalone Dynamic Backend Developer Guide
 

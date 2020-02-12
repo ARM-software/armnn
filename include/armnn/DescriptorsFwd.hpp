@@ -46,7 +46,7 @@ struct ViewsDescriptor;
 using ConcatDescriptor       = OriginsDescriptor;
 using DepthToSpaceDescriptor = SpaceToDepthDescriptor;
 using LogSoftmaxDescriptor   = SoftmaxDescriptor;
-// MergerDescriptor is deprecated, use ConcatDescriptor instead
+/// MergerDescriptor is deprecated, use ConcatDescriptor instead
 using MergerDescriptor       = OriginsDescriptor;
 using SplitterDescriptor     = ViewsDescriptor;
 

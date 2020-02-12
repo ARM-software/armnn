@@ -27,7 +27,7 @@ private:
     };
 public:
 
-    // Very basic type safe variant
+    /// Very basic type safe variant
     class Var
     {
 
@@ -39,7 +39,7 @@ public:
         explicit Var(const char* s) : m_Vals(s), m_Type(VarTypes::String) {};
         explicit Var(std::string s) : m_Vals(s), m_Type(VarTypes::String) {};
 
-        //Disallow implicit conversions from types not explicitly allowed below.
+        /// Disallow implicit conversions from types not explicitly allowed below.
         template<typename DisallowedType>
         Var(DisallowedType)
         {
@@ -161,7 +161,7 @@ public:
             String,
         };
 
-        // Union of potential type values.
+        /// Union of potential type values.
         union Vals
         {
             int i;

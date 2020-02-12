@@ -9,30 +9,30 @@
 #include <cstring>
 #include <type_traits>
 
-// Optional is a drop in replacement for std::optional until we migrate
-// to c++-17. Only a subset of the optional features are implemented that
-// we intend to use in ArmNN.
+/// Optional is a drop in replacement for std::optional until we migrate
+/// to c++-17. Only a subset of the optional features are implemented that
+/// we intend to use in ArmNN.
 
-// There are two distinct implementations here:
-//
-//   1, for normal constructable/destructable types and reference types
-//   2, for reference types
+/// There are two distinct implementations here:
+///
+///   1, for normal constructable/destructable types and reference types
+///   2, for reference types
 
-// The std::optional features we support are:
-//
-// - has_value() and operator bool() to tell if the optional has a value
-// - value() returns a reference to the held object
-//
+/// The std::optional features we support are:
+///
+/// - has_value() and operator bool() to tell if the optional has a value
+/// - value() returns a reference to the held object
+///
 
 namespace armnn
 {
 
-// EmptyOptional is used to initialize the Optional class in case we want
-// to have default value for an Optional in a function declaration.
+/// EmptyOptional is used to initialize the Optional class in case we want
+/// to have default value for an Optional in a function declaration.
 struct EmptyOptional {};
 
-// Disambiguation tag that can be passed to the constructor to indicate that
-// the contained object should be constructed in-place
+/// Disambiguation tag that can be passed to the constructor to indicate that
+/// the contained object should be constructed in-place
 struct ConstructInPlace
 {
     explicit ConstructInPlace() = default;
@@ -40,8 +40,8 @@ struct ConstructInPlace
 
 #define CONSTRUCT_IN_PLACE armnn::ConstructInPlace{}
 
-// OptionalBase is the common functionality between reference and non-reference
-// optional types.
+/// OptionalBase is the common functionality between reference and non-reference
+/// optional types.
 class OptionalBase
 {
 public:
@@ -72,11 +72,11 @@ protected:
     bool m_HasValue;
 };
 
-//
-// The default implementation is the non-reference case. This
-// has an unsigned char array for storing the optional value which
-// is in-place constructed there.
-//
+///
+/// The default implementation is the non-reference case. This
+/// has an unsigned char array for storing the optional value which
+/// is in-place constructed there.
+///
 template <bool IsReference, typename T>
 class OptionalReferenceSwitch : public OptionalBase
 {
@@ -182,11 +182,11 @@ private:
     alignas(alignof(T)) unsigned char m_Storage[sizeof(T)];
 };
 
-//
-// This is the special case for reference types. This holds a pointer
-// to the referenced type. This doesn't own the referenced memory and
-// it never calls delete on the pointer.
-//
+///
+/// This is the special case for reference types. This holds a pointer
+/// to the referenced type. This doesn't own the referenced memory and
+/// it never calls delete on the pointer.
+///
 template <typename T>
 class OptionalReferenceSwitch<true, T> : public OptionalBase
 {
@@ -298,8 +298,8 @@ public:
     }
 };
 
-// Utility template that constructs an object of type T in-place and wraps
-// it inside an Optional<T> object
+/// Utility template that constructs an object of type T in-place and wraps
+/// it inside an Optional<T> object
 template<typename T, class... Args>
 Optional<T> MakeOptional(Args&&... args)
 {

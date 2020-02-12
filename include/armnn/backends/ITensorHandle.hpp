@@ -61,7 +61,7 @@ public:
     /// \return a TensorShape filled with the number of elements for each dimension.
     virtual TensorShape GetShape() const = 0;
 
-    // Testing support to be able to verify and set tensor data content
+    /// Testing support to be able to verify and set tensor data content
     virtual void CopyOutTo(void* memory) const = 0;
     virtual void CopyInFrom(const void* memory) = 0;
 

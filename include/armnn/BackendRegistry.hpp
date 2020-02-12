@@ -48,7 +48,7 @@ public:
 protected:
     using FactoryStorage = std::unordered_map<BackendId, FactoryFunction>;
 
-    // For testing only
+    /// For testing only
     static void Swap(BackendRegistry& instance, FactoryStorage& other);
 
 private:

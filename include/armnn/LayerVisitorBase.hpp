@@ -20,7 +20,7 @@ struct VisitorNoThrowPolicy
     static void Apply(const std::string&) {}
 };
 
-// Visitor base class with empty implementations.
+/// Visitor base class with empty implementations.
 template<typename DefaultPolicy>
 class LayerVisitorBase : public ILayerVisitor
 {

@@ -48,12 +48,12 @@ class Exception : public std::exception
 public:
     explicit Exception(const std::string& message);
 
-    // exception with context
+    /// exception with context
     explicit Exception(const std::string& message,
                        const CheckLocation& location);
 
-    // preserving previous exception context
-    // and adding local context information
+    /// preserving previous exception context
+    /// and adding local context information
     explicit Exception(const Exception& other,
                        const std::string& message,
                        const CheckLocation& location);

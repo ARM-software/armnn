@@ -177,8 +177,8 @@ public:
     MemoryType GetMemoryArea() const { return m_MemoryArea; }
 
 protected:
-    // Protected destructor to stop users from making these
-    // (could still new one on the heap and then leak it...)
+    /// Protected destructor to stop users from making these
+    /// (could still new one on the heap and then leak it...)
     ~BaseTensor() {}
 
     MemoryType m_MemoryArea;

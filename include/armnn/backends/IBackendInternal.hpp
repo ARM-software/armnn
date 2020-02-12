@@ -68,18 +68,18 @@ inline std::ostream& operator<<(std::ostream& os, const BackendVersion& backendV
 class IBackendInternal : public IBackend
 {
 protected:
-    // Creation must be done through a specific
-    // backend interface.
+    /// Creation must be done through a specific
+    /// backend interface.
     IBackendInternal() = default;
 
 public:
-    // Allow backends created by the factory function
-    // to be destroyed through IBackendInternal.
+    /// Allow backends created by the factory function
+    /// to be destroyed through IBackendInternal.
     ~IBackendInternal() override = default;
 
     using IWorkloadFactoryPtr = std::unique_ptr<IWorkloadFactory>;
     using IBackendContextPtr = std::unique_ptr<IBackendContext>;
-    // This is the bridge between backend and backend profiling we'll keep it in the backend namespace.
+    /// This is the bridge between backend and backend profiling we'll keep it in the backend namespace.
     using IBackendProfilingContextPtr = std::shared_ptr<armnn::profiling::IBackendProfilingContext>;
     using IBackendProfilingPtr = std::unique_ptr<armnn::profiling::IBackendProfiling>;
     using OptimizationPtr = std::unique_ptr<Optimization>;

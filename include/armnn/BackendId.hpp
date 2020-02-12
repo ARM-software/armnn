@@ -14,10 +14,10 @@
 namespace armnn
 {
 
-//
-// The Compute enum is now deprecated and it is now
-// being replaced by BackendId
-//
+///
+/// The Compute enum is now deprecated and it is now
+/// being replaced by BackendId
+///
 enum class Compute
 {
     Undefined = 0,
@@ -111,8 +111,8 @@ public:
         return m_Id == other.m_Id;
     }
 
-    // comparison against objects from which the
-    // BackendId can be constructed
+    /// comparison against objects from which the
+    /// BackendId can be constructed
     template <typename O>
     bool operator==(const O& other) const
     {
@@ -147,9 +147,9 @@ private:
 namespace std
 {
 
-// make BackendId compatible with std hashtables by reusing the hash
-// function for strings.
-// Note this must come *before* the first use of unordered_set<BackendId>.
+/// make BackendId compatible with std hashtables by reusing the hash
+/// function for strings.
+/// Note this must come *before* the first use of unordered_set<BackendId>.
 template <>
 struct hash<armnn::BackendId>
 {

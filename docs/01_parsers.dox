@@ -1,4 +1,4 @@
-/// Copyright (c) 2017 ARM Limited.
+/// Copyright (c) 2020 ARM Limited.
 ///
 /// SPDX-License-Identifier: MIT
 ///
@@ -37,15 +37,13 @@ This reference guide provides a list of Caffe layers the Arm NN SDK currently su
 ## Although some other neural networks might work, Arm tests the Arm NN SDK with Caffe implementations of the following neural networks:
 
 - AlexNet.
+- Cifar10.
 - Inception-BN.
 - Resnet_50, Resnet_101 and Resnet_152.
 - VGG_CNN_S, VGG_16 and VGG_19.
 - Yolov1_tiny.
 - Lenet.
 - MobileNetv1.
-
-using these datasets:
-- Cifar10.
 
 ## The Arm NN SDK supports the following machine learning layers for Caffe networks:
 
@@ -86,7 +84,7 @@ The Arm NN SDK ONNX parser currently only supports fp32 operators.
 
 - Add
   - See the ONNX [Add documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Add) for more information
--AveragePool
+- AveragePool
   - See the ONNX [AveragePool documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#AveragePool) for more information.
 - Constant
   - See the ONNX [Constant documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Constant) for more information.
@@ -209,7 +207,7 @@ The Arm NN SDK TensorFlow parser currently only supports fp32 operators.
 - placeholder
   - See the TensorFlow [placeholder documentation](https://www.tensorflow.org/api_docs/python/tf/placeholder) for more information.
 - reduce_mean
-  -See the TensorFlow [reduce_mean documentation](https://www.tensorflow.org/api_docs/python/tf/reduce_mean) for more information.
+  - See the TensorFlow [reduce_mean documentation](https://www.tensorflow.org/api_docs/python/tf/reduce_mean) for more information.
 - relu
   - See the TensorFlow [relu documentation](https://www.tensorflow.org/api_docs/python/tf/nn/relu) for more information.
 - relu6
@@ -288,3 +286,4 @@ More machine learning operators will be supported in future releases.
 
 **/
 }
+

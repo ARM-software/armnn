@@ -17,7 +17,7 @@ namespace armnn
 
 constexpr unsigned int MaxNumOfTensorDimensions = 5U;
 
-// The lowest performance data capture interval we support is 10 miliseconds.
+/// The lowest performance data capture interval we support is 10 miliseconds.
 constexpr unsigned int LOWEST_CAPTURE_PERIOD = 10000u;
 
 /// @enum Status enumeration
@@ -308,7 +308,7 @@ struct ProfilingStaticGuid : public ProfilingGuid
 
 namespace std
 {
-// make ProfilingGuid hashable
+/// make ProfilingGuid hashable
 template<>
 struct hash<armnn::profiling::ProfilingGuid>
 {
@@ -318,7 +318,7 @@ struct hash<armnn::profiling::ProfilingGuid>
     }
 };
 
-// make ProfilingDynamicGuid hashable
+/// make ProfilingDynamicGuid hashable
 template<>
 struct hash<armnn::profiling::ProfilingDynamicGuid>
 {
@@ -328,7 +328,7 @@ struct hash<armnn::profiling::ProfilingDynamicGuid>
     }
 };
 
-// make ProfilingStaticGuid hashable
+/// make ProfilingStaticGuid hashable
 template<>
 struct hash<armnn::profiling::ProfilingStaticGuid>
 {

@@ -19,8 +19,8 @@ class ITensorHandleFactory
 {
 public:
     using FactoryId = std::string;
-    static const FactoryId LegacyFactoryId;   // Use the workload factory to create the tensor handle
-    static const FactoryId DeferredFactoryId; // Some TensorHandleFactory decisions are deferred to run-time
+    static const FactoryId LegacyFactoryId;   /// Use the workload factory to create the tensor handle
+    static const FactoryId DeferredFactoryId; /// Some TensorHandleFactory decisions are deferred to run-time
 
     virtual ~ITensorHandleFactory() {}
 
@@ -33,9 +33,9 @@ public:
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                               DataLayout dataLayout) const = 0;
 
-    // Utility Functions for backends which require TensorHandles to have unmanaged memory.
-    // These should be overloaded if required to facilitate direct import of input tensors
-    // and direct export of output tensors.
+    /// Utility Functions for backends which require TensorHandles to have unmanaged memory.
+    /// These should be overloaded if required to facilitate direct import of input tensors
+    /// and direct export of output tensors.
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                               const bool IsMemoryManaged) const
     {

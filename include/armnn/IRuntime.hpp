@@ -50,11 +50,11 @@ public:
         /// It will also be updated with new tuned parameters if it is configured to do so.
         std::shared_ptr<IGpuAccTunedParameters> m_GpuAccTunedParameters;
 
-        // Setting this flag will allow the user to obtain GPU profiling information from the runtime.
+        /// Setting this flag will allow the user to obtain GPU profiling information from the runtime.
         bool m_EnableGpuProfiling;
 
-        // Setting this value will override the paths set by the DYNAMIC_BACKEND_PATHS compiler directive
-        // Only a single path is allowed for the override
+        /// Setting this value will override the paths set by the DYNAMIC_BACKEND_PATHS compiler directive
+        /// Only a single path is allowed for the override
         std::string m_DynamicBackendsPath;
 
         struct ExternalProfilingOptions
@@ -78,6 +78,7 @@ public:
         /// Pass backend specific options.
         ///
         /// For example, to enable GpuAcc tuning add the following
+        /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.cpp
         /// m_BackendOption.emplace_back(
         ///     BackendOptions{"GpuAcc",
         ///       {
@@ -85,16 +86,19 @@ public:
         ///         {"TuningFile", filename}
         ///       }
         ///     });
+        /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         /// Execute representative workloads through the runtime to generate tuning data.
         /// The tuning file is written once the runtime is destroyed
 
         /// To execute with the tuning data, start up with just the tuning file specified.
+        /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.cpp
         /// m_BackendOption.emplace_back(
         ///     BackendOptions{"GpuAcc",
         ///       {
         ///         {"TuningFile", filename}
         ///       }
         ///     });
+        /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         /// The following backend options are available:
         /// GpuAcc:

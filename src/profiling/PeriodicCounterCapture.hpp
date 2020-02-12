@@ -10,10 +10,12 @@
 #include "Packet.hpp"
 #include "SendCounterPacket.hpp"
 #include "ICounterValues.hpp"
+#include "CounterIdMap.hpp"
 
 #include <atomic>
 #include <mutex>
 #include <thread>
+#include <armnn/backends/profiling/IBackendProfilingContext.hpp>
 
 namespace armnn
 {
@@ -24,12 +26,20 @@ namespace profiling
 class PeriodicCounterCapture final : public IPeriodicCounterCapture
 {
 public:
-    PeriodicCounterCapture(const Holder& data, ISendCounterPacket& packet, const IReadCounterValues& readCounterValue)
-        : m_CaptureDataHolder(data)
-        , m_IsRunning(false)
-        , m_KeepRunning(false)
-        , m_ReadCounterValues(readCounterValue)
-        , m_SendCounterPacket(packet)
+    PeriodicCounterCapture(const Holder& data,
+                           ISendCounterPacket& packet,
+                           const IReadCounterValues& readCounterValue,
+                           const ICounterMappings& counterIdMap,
+                           const std::unordered_map<armnn::BackendId,
+                                   std::shared_ptr<armnn::profiling::IBackendProfilingContext>>&
+                           backendProfilingContexts)
+            : m_CaptureDataHolder(data)
+            , m_IsRunning(false)
+            , m_KeepRunning(false)
+            , m_ReadCounterValues(readCounterValue)
+            , m_SendCounterPacket(packet)
+            , m_CounterIdMap(counterIdMap)
+            , m_BackendProfilingContext(backendProfilingContexts)
     {}
     ~PeriodicCounterCapture() { Stop(); }
 
@@ -40,6 +50,8 @@ public:
 private:
     CaptureData ReadCaptureData();
     void Capture(const IReadCounterValues& readCounterValues);
+    void DispatchPeriodicCounterCapturePacket(
+            const armnn::BackendId& backendId, const std::vector<Timestamp>& timestampValues);
 
     const Holder&             m_CaptureDataHolder;
     bool                      m_IsRunning;
@@ -47,6 +59,9 @@ private:
     std::thread               m_PeriodCaptureThread;
     const IReadCounterValues& m_ReadCounterValues;
     ISendCounterPacket&       m_SendCounterPacket;
+    const ICounterMappings&   m_CounterIdMap;
+    const std::unordered_map<armnn::BackendId,
+            std::shared_ptr<armnn::profiling::IBackendProfilingContext>>& m_BackendProfilingContext;
 };
 
 } // namespace profiling

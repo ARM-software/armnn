@@ -13,6 +13,8 @@
 #include <armnn/backends/IBackendInternal.hpp>
 #include <armnn/backends/OptimizationViews.hpp>
 #include <backendsCommon/LayerSupportBase.hpp>
+#include <armnn/backends/profiling/IBackendProfiling.hpp>
+#include <backends/BackendProfiling.hpp>
 
 namespace armnn
 {
@@ -53,6 +55,7 @@ class MockBackendProfilingContext : public profiling::IBackendProfilingContext
 public:
     MockBackendProfilingContext(IBackendInternal::IBackendProfilingPtr& backendProfiling)
         : m_BackendProfiling(backendProfiling)
+        , m_CapturePeriod(0)
     {}
 
     ~MockBackendProfilingContext() = default;
@@ -81,19 +84,42 @@ public:
             return nextMaxGlobalCounterId;
     }
 
-    void ActivateCounters(uint32_t, const std::vector<uint16_t>&)
-    {}
+    Optional<std::string> ActivateCounters(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds)
+    {
+        if ( capturePeriod == 0 || counterIds.size() == 0)
+        {
+            m_ActiveCounters.clear();
+        }
+        else if (capturePeriod == 15939u)
+        {
+            return armnn::Optional<std::string>("ActivateCounters example test error");
+        }
+        m_CapturePeriod = capturePeriod;
+        m_ActiveCounters = counterIds;
+        return armnn::Optional<std::string>();
+    }
 
     std::vector<profiling::Timestamp> ReportCounterValues()
     {
-        return std::vector<profiling::Timestamp>();
+        std::vector<profiling::CounterValue> counterValues;
+
+        for(auto counterId : m_ActiveCounters)
+        {
+            counterValues.emplace_back(profiling::CounterValue{counterId, counterId+1u});
+        }
+
+        uint64_t timestamp = m_CapturePeriod;
+        return  {profiling::Timestamp{timestamp, counterValues}};
     }
 
     void EnableProfiling(bool)
     {}
 
 private:
+
     IBackendInternal::IBackendProfilingPtr& m_BackendProfiling;
+    uint32_t m_CapturePeriod;
+    std::vector<uint16_t> m_ActiveCounters;
 };
 
 class MockBackend : public IBackendInternal

@@ -406,7 +406,7 @@ public:
     }
 
     void SendPeriodicCounterCapturePacket(uint64_t timestamp,
-                                          const std::vector<std::pair<uint16_t, uint32_t>>& values) override
+                                          const std::vector<CounterValue>& values) override
     {
         boost::ignore_unused(timestamp, values);
 

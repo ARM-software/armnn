@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <armnn/backends/profiling/IBackendProfiling.hpp>
 #include "ICounterDirectory.hpp"
 
 namespace armnn
@@ -16,7 +17,7 @@ namespace profiling
 class ISendCounterPacket
 {
 public:
-    using IndexValuePairsVector = std::vector<std::pair<uint16_t, uint32_t>>;
+    using IndexValuePairsVector = std::vector<CounterValue>;
 
     virtual ~ISendCounterPacket() {}
 

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <armnn/BackendId.hpp>
 #include "Holder.hpp"
 
 namespace armnn
@@ -13,10 +14,16 @@ namespace profiling
 
 CaptureData& CaptureData::operator=(const CaptureData& other)
 {
-    m_CapturePeriod = other.m_CapturePeriod;
-    m_CounterIds    = other.m_CounterIds;
+    m_CapturePeriod  = other.m_CapturePeriod;
+    m_CounterIds     = other.m_CounterIds;
+    m_ActiveBackends = other.m_ActiveBackends;
 
     return *this;
+}
+
+void CaptureData::SetActiveBackends(const std::set<armnn::BackendId>& activeBackends)
+{
+    m_ActiveBackends = activeBackends;
 }
 
 void CaptureData::SetCapturePeriod(uint32_t capturePeriod)
@@ -27,6 +34,11 @@ void CaptureData::SetCapturePeriod(uint32_t capturePeriod)
 void CaptureData::SetCounterIds(const std::vector<uint16_t>& counterIds)
 {
     m_CounterIds = counterIds;
+}
+
+const std::set<armnn::BackendId>& CaptureData::GetActiveBackends() const
+{
+    return m_ActiveBackends;
 }
 
 uint32_t CaptureData::GetCapturePeriod() const
@@ -59,12 +71,16 @@ bool CaptureData::IsCounterIdInCaptureData(uint16_t counterId)
     return false;
 }
 
-void Holder::SetCaptureData(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds)
+void Holder::SetCaptureData(uint32_t capturePeriod,
+                            const std::vector<uint16_t>& counterIds,
+                            const std::set<armnn::BackendId>& activeBackends)
 {
     std::lock_guard<std::mutex> lockGuard(m_CaptureThreadMutex);
 
     m_CaptureData.SetCapturePeriod(capturePeriod);
     m_CaptureData.SetCounterIds(counterIds);
+    m_CaptureData.SetActiveBackends(activeBackends);
+
 }
 
 } // namespace profiling

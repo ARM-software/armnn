@@ -101,13 +101,48 @@ void PeriodicCounterSelectionCommandHandler::operator()(const Packet& packet)
                 // Invalid counter UID, ignore it and continue
                 continue;
             }
-
             // The counter is valid
-            validCounterIds.push_back(counterId);
+            validCounterIds.emplace_back(counterId);
         }
 
-        // Set the capture data with only the valid counter UIDs
-        m_CaptureDataHolder.SetCaptureData(capturePeriod, validCounterIds);
+        std::sort(validCounterIds.begin(), validCounterIds.end());
+
+        auto backendIdStart = std::find_if(validCounterIds.begin(), validCounterIds.end(), [&](uint16_t& counterId)
+        {
+            return counterId > m_MaxArmCounterId;
+        });
+
+        std::set<armnn::BackendId> activeBackends;
+        std::set<uint16_t> backendCounterIds = std::set<uint16_t>(backendIdStart, validCounterIds.end());
+
+        if (m_BackendCounterMap.size() != 0)
+        {
+            std::set<uint16_t> newCounterIds;
+            std::set<uint16_t> unusedCounterIds;
+
+            // Get any backend counter ids that is in backendCounterIds but not in m_PrevBackendCounterIds
+            std::set_difference(backendCounterIds.begin(), backendCounterIds.end(),
+                                m_PrevBackendCounterIds.begin(), m_PrevBackendCounterIds.end(),
+                                std::inserter(newCounterIds, newCounterIds.begin()));
+
+            // Get any backend counter ids that is in m_PrevBackendCounterIds but not in backendCounterIds
+            std::set_difference(m_PrevBackendCounterIds.begin(), m_PrevBackendCounterIds.end(),
+                                backendCounterIds.begin(), backendCounterIds.end(),
+                                std::inserter(unusedCounterIds, unusedCounterIds.begin()));
+
+            activeBackends = ProcessBackendCounterIds(capturePeriod, newCounterIds, unusedCounterIds);
+        }
+        else
+        {
+            activeBackends = ProcessBackendCounterIds(capturePeriod, backendCounterIds, {});
+        }
+
+        // save the new backend counter ids for next time
+        m_PrevBackendCounterIds = backendCounterIds;
+
+
+        // Set the capture data with only the valid armnn counter UIDs
+        m_CaptureDataHolder.SetCaptureData(capturePeriod, {validCounterIds.begin(), backendIdStart}, activeBackends);
 
         // Echo back the Periodic Counter Selection packet to the Counter Stream Buffer
         m_SendCounterPacket.SendPeriodicCounterSelectionPacket(capturePeriod, validCounterIds);
@@ -129,6 +164,68 @@ void PeriodicCounterSelectionCommandHandler::operator()(const Packet& packet)
         throw RuntimeException(boost::str(boost::format("Unknown profiling service state: %1%")
                                           % static_cast<int>(currentState)));
     }
+}
+
+std::set<armnn::BackendId> PeriodicCounterSelectionCommandHandler::ProcessBackendCounterIds(
+                                                                      const u_int32_t capturePeriod,
+                                                                      std::set<uint16_t> newCounterIds,
+                                                                      std::set<uint16_t> unusedCounterIds)
+{
+    std::set<armnn::BackendId> changedBackends;
+    std::set<armnn::BackendId> activeBackends = m_CaptureDataHolder.GetCaptureData().GetActiveBackends();
+
+    for (uint16_t counterId : newCounterIds)
+    {
+        auto backendId = m_CounterIdMap.GetBackendId(counterId);
+        m_BackendCounterMap[backendId.second].emplace_back(backendId.first);
+        changedBackends.insert(backendId.second);
+    }
+    // Add any new backends to active backends
+    activeBackends.insert(changedBackends.begin(), changedBackends.end());
+
+    for (uint16_t counterId : unusedCounterIds)
+    {
+        auto backendId = m_CounterIdMap.GetBackendId(counterId);
+        std::vector<uint16_t>& backendCounters = m_BackendCounterMap[backendId.second];
+
+        backendCounters.erase(std::remove(backendCounters.begin(), backendCounters.end(), backendId.first));
+
+        if(backendCounters.size() == 0)
+        {
+            // If a backend has no counters associated with it we remove it from active backends and
+            // send a capture period of zero with an empty vector, this will deactivate all the backends counters
+            activeBackends.erase(backendId.second);
+            ActivateBackedCounters(backendId.second, 0, {});
+        }
+        else
+        {
+            changedBackends.insert(backendId.second);
+        }
+    }
+
+    // If the capture period remains the same we only need to update the backends who's counters have changed
+    if(capturePeriod == m_PrevCapturePeriod)
+    {
+        for (auto backend : changedBackends)
+        {
+            ActivateBackedCounters(backend, capturePeriod, m_BackendCounterMap[backend]);
+        }
+    }
+    // Otherwise update all the backends with the new capture period and any new/unused counters
+    else
+    {
+        for (auto backend : m_BackendCounterMap)
+        {
+            ActivateBackedCounters(backend.first, capturePeriod, backend.second);
+        }
+        if(capturePeriod == 0)
+        {
+            activeBackends = {};
+        }
+        m_PrevCapturePeriod = capturePeriod;
+    }
+
+    return activeBackends;
 }
 
 } // namespace profiling

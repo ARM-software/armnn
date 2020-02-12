@@ -238,9 +238,11 @@ CaptureData ProfilingService::GetCaptureData()
     return m_Holder.GetCaptureData();
 }
 
-void ProfilingService::SetCaptureData(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds)
+void ProfilingService::SetCaptureData(uint32_t capturePeriod,
+                                      const std::vector<uint16_t>& counterIds,
+                                      const std::set<BackendId>& activeBackends)
 {
-    m_Holder.SetCaptureData(capturePeriod, counterIds);
+    m_Holder.SetCaptureData(capturePeriod, counterIds, activeBackends);
 }
 
 void ProfilingService::SetCounterValue(uint16_t counterUid, uint32_t value)

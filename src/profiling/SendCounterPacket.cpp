@@ -850,9 +850,9 @@ void SendCounterPacket::SendPeriodicCounterCapturePacket(uint64_t timestamp, con
     offset += uint64_t_size;
     for (const auto& pair: values)
     {
-        WriteUint16(writeBuffer, offset, pair.first);
+        WriteUint16(writeBuffer, offset, pair.counterId);
         offset += uint16_t_size;
-        WriteUint32(writeBuffer, offset, pair.second);
+        WriteUint32(writeBuffer, offset, pair.counterValue);
         offset += uint32_t_size;
     }
 

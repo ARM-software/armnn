@@ -36,6 +36,7 @@ static const uint16_t NETWORK_UNLOADS       =   1;
 static const uint16_t REGISTERED_BACKENDS   =   2;
 static const uint16_t UNREGISTERED_BACKENDS =   3;
 static const uint16_t INFERENCES_RUN        =   4;
+static const uint16_t MAX_ARMNN_COUNTER = INFERENCES_RUN;
 
 class ProfilingService : public IReadWriteCounterValues, public IProfilingGuidGenerator
 {
@@ -83,7 +84,9 @@ public:
     bool IsProfilingEnabled();
 
     CaptureData GetCaptureData();
-    void SetCaptureData(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds);
+    void SetCaptureData(uint32_t capturePeriod,
+                        const std::vector<uint16_t>& counterIds,
+                        const std::set<BackendId>& activeBackends);
 
     // Setters for the profiling service state
     void SetCounterValue(uint16_t counterUid, uint32_t value) override;
@@ -143,7 +146,7 @@ private:
     ProfilingGuidGenerator m_GuidGenerator;
     TimelinePacketWriterFactory m_TimelinePacketWriterFactory;
     std::unordered_map<BackendId,
-        std::shared_ptr<armnn::profiling::IBackendProfilingContext>> m_BackendProfilingContexts;
+    std::shared_ptr<armnn::profiling::IBackendProfilingContext>> m_BackendProfilingContexts;
     uint16_t m_MaxGlobalCounterId;
 
 protected:
@@ -166,7 +169,7 @@ protected:
         , m_SendCounterPacket(m_BufferManager)
         , m_SendThread(m_StateMachine, m_BufferManager, m_SendCounterPacket)
         , m_SendTimelinePacket(m_BufferManager)
-        , m_PeriodicCounterCapture(m_Holder, m_SendCounterPacket, *this)
+        , m_PeriodicCounterCapture(m_Holder, m_SendCounterPacket, *this, m_CounterIdMap, m_BackendProfilingContexts)
         , m_ConnectionAcknowledgedCommandHandler(0,
                                                  1,
                                                  m_PacketVersionResolver.ResolvePacketVersion(0, 1).GetEncodedValue(),
@@ -184,7 +187,10 @@ protected:
         , m_PeriodicCounterSelectionCommandHandler(0,
                                                    4,
                                                    m_PacketVersionResolver.ResolvePacketVersion(0, 4).GetEncodedValue(),
+                                                   m_BackendProfilingContexts,
+                                                   m_CounterIdMap,
                                                    m_Holder,
+                                                   MAX_ARMNN_COUNTER,
                                                    m_PeriodicCounterCapture,
                                                    *this,
                                                    m_SendCounterPacket,

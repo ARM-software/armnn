@@ -25,7 +25,7 @@ public:
     using DeviceRecord          = std::vector<uint32_t>;
     using CounterSetRecord      = std::vector<uint32_t>;
     using EventRecord           = std::vector<uint32_t>;
-    using IndexValuePairsVector = std::vector<std::pair<uint16_t, uint32_t>>;
+    using IndexValuePairsVector = std::vector<CounterValue>;
 
     SendCounterPacket(IBufferManager& buffer)
         : m_BufferManager(buffer)

@@ -536,7 +536,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingStateMachine)
 
 void CaptureDataWriteThreadImpl(Holder& holder, uint32_t capturePeriod, const std::vector<uint16_t>& counterIds)
 {
-    holder.SetCaptureData(capturePeriod, counterIds);
+    holder.SetCaptureData(capturePeriod, counterIds, {});
 }
 
 void CaptureDataReadThreadImpl(const Holder& holder, CaptureData& captureData)
@@ -1764,6 +1764,9 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     const uint32_t packetId = 0x40000;
 
     uint32_t version = 1;
+    const std::unordered_map<armnn::BackendId,
+            std::shared_ptr<armnn::profiling::IBackendProfilingContext>> backendProfilingContext;
+    CounterIdMap counterIdMap;
     Holder holder;
     TestCaptureThread captureThread;
     TestReadCounterValues readCounterValues;
@@ -1790,7 +1793,8 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
 
     Packet packetA(packetId, dataLength1, uniqueData1);
 
-    PeriodicCounterSelectionCommandHandler commandHandler(familyId, packetId, version, holder, captureThread,
+    PeriodicCounterSelectionCommandHandler commandHandler(familyId, packetId, version, backendProfilingContext,
+                                                          counterIdMap, holder, 10000u, captureThread,
                                                           readCounterValues, sendCounterPacket, profilingStateMachine);
 
     profilingStateMachine.TransitionToState(ProfilingState::Uninitialised);
@@ -2157,6 +2161,9 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
 
     ProfilingStateMachine profilingStateMachine;
 
+    const std::unordered_map<armnn::BackendId,
+            std::shared_ptr<armnn::profiling::IBackendProfilingContext>> backendProfilingContext;
+    CounterIdMap counterIdMap;
     Holder data;
     std::vector<uint16_t> captureIds1 = { 0, 1 };
     std::vector<uint16_t> captureIds2;
@@ -2172,11 +2179,12 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
     unsigned int valueB   = 15;
     unsigned int numSteps = 5;
 
-    PeriodicCounterCapture periodicCounterCapture(std::ref(data), std::ref(sendCounterPacket), captureReader);
+    PeriodicCounterCapture periodicCounterCapture(std::ref(data), std::ref(sendCounterPacket), captureReader,
+                                                  counterIdMap, backendProfilingContext);
 
     for (unsigned int i = 0; i < numSteps; ++i)
     {
-        data.SetCaptureData(1, captureIds1);
+        data.SetCaptureData(1, captureIds1, {});
         captureReader.SetCounterValue(0, valueA * (i + 1));
         captureReader.SetCounterValue(1, valueB * (i + 1));
 
@@ -3344,7 +3352,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterStatusQuery)
     const uint32_t newCapturePeriod = 100;
 
     // Set capture period and active counters in CaptureData
-    profilingService.SetCaptureData(capturePeriod, activeGlobalCounterIds);
+    profilingService.SetCaptureData(capturePeriod, activeGlobalCounterIds, {});
 
     // Get vector of active counters for CpuRef and CpuAcc backends
     std::vector<CounterStatus> cpuRefCounterStatus = backendProfilingCpuRef.GetActiveCounters();
@@ -3373,7 +3381,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterStatusQuery)
     BOOST_CHECK_EQUAL(inactiveCpuAccCounter.m_Enabled, false);
 
     // Set new capture period and new active counters in CaptureData
-    profilingService.SetCaptureData(newCapturePeriod, newActiveGlobalCounterIds);
+    profilingService.SetCaptureData(newCapturePeriod, newActiveGlobalCounterIds, {});
 
     // Get vector of active counters for CpuRef and CpuAcc backends
     cpuRefCounterStatus = backendProfilingCpuRef.GetActiveCounters();

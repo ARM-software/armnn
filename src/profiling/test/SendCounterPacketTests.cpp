@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(MockSendCounterPacketTest)
     mockBuffer.MarkRead(packetBuffer);
 
     uint64_t timestamp = 0;
-    std::vector<std::pair<uint16_t, uint32_t>> indexValuePairs;
+    std::vector<CounterValue> indexValuePairs;
 
     mockSendCounterPacket.SendPeriodicCounterCapturePacket(timestamp, indexValuePairs);
 
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterCapturePacketTest)
 
     auto captureTimestamp = std::chrono::steady_clock::now();
     uint64_t time =  static_cast<uint64_t >(captureTimestamp.time_since_epoch().count());
-    std::vector<std::pair<uint16_t, uint32_t>> indexValuePairs;
+    std::vector<CounterValue> indexValuePairs;
 
     BOOST_CHECK_THROW(sendPacket1.SendPeriodicCounterCapturePacket(time, indexValuePairs),
                       BufferExhaustion);
@@ -242,11 +242,11 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterCapturePacketTest)
     SendCounterPacket sendPacket3(mockBuffer3);
 
     indexValuePairs.reserve(5);
-    indexValuePairs.emplace_back(std::make_pair<uint16_t, uint32_t >(0, 100));
-    indexValuePairs.emplace_back(std::make_pair<uint16_t, uint32_t >(1, 200));
-    indexValuePairs.emplace_back(std::make_pair<uint16_t, uint32_t >(2, 300));
-    indexValuePairs.emplace_back(std::make_pair<uint16_t, uint32_t >(3, 400));
-    indexValuePairs.emplace_back(std::make_pair<uint16_t, uint32_t >(4, 500));
+    indexValuePairs.emplace_back(CounterValue{0, 100});
+    indexValuePairs.emplace_back(CounterValue{1, 200});
+    indexValuePairs.emplace_back(CounterValue{2, 300});
+    indexValuePairs.emplace_back(CounterValue{3, 400});
+    indexValuePairs.emplace_back(CounterValue{4, 500});
     sendPacket3.SendPeriodicCounterCapturePacket(time, indexValuePairs);
     auto readBuffer3 = mockBuffer3.GetReadableBuffer();
 

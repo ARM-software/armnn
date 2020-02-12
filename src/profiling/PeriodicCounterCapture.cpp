@@ -55,6 +55,24 @@ CaptureData PeriodicCounterCapture::ReadCaptureData()
     return m_CaptureDataHolder.GetCaptureData();
 }
 
+void PeriodicCounterCapture::DispatchPeriodicCounterCapturePacket(
+    const armnn::BackendId& backendId, const std::vector<Timestamp>& timestampValues)
+{
+    // Report counter values
+    for (const auto timestampInfo : timestampValues)
+    {
+        std::vector<CounterValue> backendCounterValues = timestampInfo.counterValues;
+        for_each(backendCounterValues.begin(), backendCounterValues.end(), [&](CounterValue& backendCounterValue)
+        {
+            // translate the counterId to globalCounterId
+            backendCounterValue.counterId = m_CounterIdMap.GetGlobalId(backendCounterValue.counterId, backendId);
+        });
+
+        // Send Periodic Counter Capture Packet for the Timestamp
+        m_SendCounterPacket.SendPeriodicCounterCapturePacket(timestampInfo.timestamp, backendCounterValues);
+    }
+}
+
 void PeriodicCounterCapture::Capture(const IReadCounterValues& readCounterValues)
 {
     do
@@ -62,46 +80,56 @@ void PeriodicCounterCapture::Capture(const IReadCounterValues& readCounterValues
         // Check if the current capture data indicates that there's data capture
         auto currentCaptureData = ReadCaptureData();
         const std::vector<uint16_t>& counterIds = currentCaptureData.GetCounterIds();
+        const uint32_t capturePeriod = currentCaptureData.GetCapturePeriod();
 
-        if (currentCaptureData.GetCapturePeriod() == 0 || counterIds.empty())
+        if (capturePeriod == 0)
         {
-            // No data capture, wait the indicated capture period (milliseconds)
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            // No data capture, wait the indicated capture period (milliseconds), if it is not zero
+            std::this_thread::sleep_for(std::chrono::milliseconds(50u));
             continue;
         }
 
-        std::vector<std::pair<uint16_t, uint32_t>> values;
-        auto numCounters = counterIds.size();
-        values.reserve(numCounters);
-
-        // Create a vector of pairs of CounterIndexes and Values
-        for (uint16_t index = 0; index < numCounters; ++index)
+        if(counterIds.size() != 0)
         {
-            auto requestedId = counterIds[index];
-            uint32_t counterValue = 0;
-            try
+            std::vector<CounterValue> counterValues;
+
+            auto numCounters = counterIds.size();
+            counterValues.reserve(numCounters);
+
+            // Create a vector of pairs of CounterIndexes and Values
+            for (uint16_t index = 0; index < numCounters; ++index)
             {
-                counterValue = readCounterValues.GetCounterValue(requestedId);
+                auto requestedId = counterIds[index];
+                uint32_t counterValue = 0;
+                try
+                {
+                    counterValue = readCounterValues.GetCounterValue(requestedId);
+                }
+                catch (const Exception& e)
+                {
+                    // Report the error and continue
+                    ARMNN_LOG(warning) << "An error has occurred when getting a counter value: "
+                                       << e.what();
+                    continue;
+                }
+
+                counterValues.emplace_back(CounterValue {requestedId, counterValue });
             }
-            catch (const Exception& e)
-            {
-                // Report the error and continue
-                ARMNN_LOG(warning) << "An error has occurred when getting a counter value: "
-                                           << e.what();
-                continue;
-            }
-            values.emplace_back(std::make_pair(requestedId, counterValue));
+
+            // Send Periodic Counter Capture Packet for the Timestamp
+            m_SendCounterPacket.SendPeriodicCounterCapturePacket(GetTimestamp(), counterValues);
         }
 
-        // Take a timestamp
-        uint64_t timestamp = GetTimestamp();
-
-        // Write a Periodic Counter Capture packet to the Counter Stream Buffer
-        m_SendCounterPacket.SendPeriodicCounterCapturePacket(timestamp, values);
+        // Report counter values for each active backend
+        auto activeBackends = currentCaptureData.GetActiveBackends();
+        for_each(activeBackends.begin(), activeBackends.end(), [&](const armnn::BackendId& backendId)
+        {
+            DispatchPeriodicCounterCapturePacket(
+                backendId, m_BackendProfilingContext.at(backendId)->ReportCounterValues());
+        });
 
         // Wait the indicated capture period (microseconds)
-        std::this_thread::sleep_for(std::chrono::microseconds(currentCaptureData.GetCapturePeriod()));
-
+        std::this_thread::sleep_for(std::chrono::microseconds(capturePeriod));
     }
     while (m_KeepRunning.load());
 }

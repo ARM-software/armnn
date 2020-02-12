@@ -1,0 +1,290 @@
+/// Copyright (c) 2017 ARM Limited.
+///
+/// SPDX-License-Identifier: MIT
+///
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+///
+/// The above copyright notice and this permission notice shall be included in all
+/// copies or substantial portions of the Software.
+///
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+/// SOFTWARE.
+///
+
+namespace armnn
+{
+/**
+@page parsers Parsers
+
+@tableofcontents
+@section S4_caffe_parser ArmNN Caffe Parser
+
+`armnnCaffeParser` is a library for loading neural networks defined in Caffe protobuf files into the Arm NN runtime.
+
+##Caffe layers supported by the Arm NN SDK
+This reference guide provides a list of Caffe layers the Arm NN SDK currently supports.
+
+## Although some other neural networks might work, Arm tests the Arm NN SDK with Caffe implementations of the following neural networks:
+
+- AlexNet.
+- Inception-BN.
+- Resnet_50, Resnet_101 and Resnet_152.
+- VGG_CNN_S, VGG_16 and VGG_19.
+- Yolov1_tiny.
+- Lenet.
+- MobileNetv1.
+
+using these datasets:
+- Cifar10.
+
+## The Arm NN SDK supports the following machine learning layers for Caffe networks:
+
+- BatchNorm, in inference mode.
+- Convolution, excluding the Dilation Size, Weight Filler, Bias Filler, Engine, Force nd_im2col, and Axis parameters.
+  Caffe doesn't support depthwise convolution, the equivalent layer is implemented through the notion of groups. ArmNN supports groups this way:
+  - when group=1, it is a normal conv2d
+  - when group=#input_channels, we can replace it by a depthwise convolution
+  - when group>1 && group<#input_channels, we need to split the input into the given number of groups, apply a separate convolution and then merge the results
+- Concat, along the channel dimension only.
+- Dropout, in inference mode.
+- Element wise, excluding the coefficient parameter.
+- Inner Product, excluding the Weight Filler, Bias Filler, Engine, and Axis parameters.
+- Input.
+- Local Response Normalisation (LRN), excluding the Engine parameter.
+- Pooling, excluding the Stochastic Pooling and Engine parameters.
+- ReLU.
+- Scale.
+- Softmax, excluding the Axis and Engine parameters.
+- Split.
+
+More machine learning layers will be supported in future releases.
+
+Please note that certain deprecated Caffe features are not supported by the armnnCaffeParser. If you think that Arm NN should be able to load your model according to the list of supported layers, but you are getting strange error messages, then try upgrading your model to the latest format using Caffe, either by saving it to a new file or using the upgrade utilities in `caffe/tools`.
+<br/><br/><br/><br/>
+
+@section S5_onnx_parser ArmNN Onnx Parser
+
+`armnnOnnxParser` is a library for loading neural networks defined in ONNX protobuf files into the Arm NN runtime.
+
+## ONNX operators that the Arm NN SDK supports
+
+This reference guide provides a list of ONNX operators the Arm NN SDK currently supports.
+
+The Arm NN SDK ONNX parser currently only supports fp32 operators.
+
+## Fully supported
+
+- Add
+  - See the ONNX [Add documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Add) for more information
+-AveragePool
+  - See the ONNX [AveragePool documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#AveragePool) for more information.
+- Constant
+  - See the ONNX [Constant documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Constant) for more information.
+- GlobalAveragePool
+  - See the ONNX [GlobalAveragePool documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#GlobalAveragePool) for more information.
+- MaxPool
+  - See the ONNX [max_pool documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#MaxPool) for more information.
+- Relu
+  - See the ONNX [Relu documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Relu) for more information.
+- Reshape
+  - See the ONNX [Reshape documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Reshape) for more information.
+
+## Partially supported
+
+- Conv
+  - The parser only supports 2D convolutions with a dilation rate of [1, 1] and group = 1 or group = #Nb_of_channel (depthwise convolution)
+    See the ONNX [Conv documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Conv) for more information.
+- BatchNormalization
+  - The parser does not support training mode. See the ONNX [BatchNormalization documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#BatchNormalization) for more information.
+- MatMul
+  - The parser only supports constant weights in a fully connected layer.
+
+## Tested networks
+
+Arm tested these operators with the following ONNX fp32 neural networks:
+- Simple MNIST. See the ONNX [MNIST documentation](https://github.com/onnx/models/tree/master/mnist) for more information.
+- Mobilenet_v2. See the ONNX [MobileNet documentation](https://github.com/onnx/models/tree/master/models/image_classification/mobilenet) for more information.
+
+More machine learning operators will be supported in future releases.
+<br/><br/><br/><br/>
+
+@section S6_tf_lite_parser ArmNN Tf Lite Parser
+
+`armnnTfLiteParser` is a library for loading neural networks defined by TensorFlow Lite FlatBuffers files
+into the Arm NN runtime.
+
+## TensorFlow Lite operators that the Arm NN SDK supports
+
+This reference guide provides a list of TensorFlow Lite operators the Arm NN SDK currently supports.
+
+## Fully supported
+
+The Arm NN SDK TensorFlow Lite parser currently supports the following operators:
+
+- ADD
+- AVERAGE_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- BATCH_TO_SPACE
+- CONCATENATION, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- DEPTHWISE_CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- FULLY_CONNECTED, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- LOGISTIC
+- L2_NORMALIZATION
+- MAX_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- MAXIMUM
+- MEAN
+- MINIMUM
+- MUL
+- PACK
+- PAD
+- RELU
+- RELU6
+- RESHAPE
+- RESIZE_BILINEAR
+- SLICE
+- SOFTMAX
+- SPACE_TO_BATCH
+- SPLIT
+- SQUEEZE
+- STRIDED_SLICE
+- SUB
+- TANH
+- TRANSPOSE
+- TRANSPOSE_CONV
+- UNPACK
+
+## Custom Operator
+
+- TFLite_Detection_PostProcess
+
+## Tested networks
+
+Arm tested these operators with the following TensorFlow Lite neural network:
+- [Quantized MobileNet](http://download.tensorflow.org/models/mobilenet_v1_2018_02_22/mobilenet_v1_1.0_224_quant.tgz)
+- [Quantized SSD MobileNet](http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_quantized_300x300_coco14_sync_2018_07_18.tar.gz)
+- DeepSpeech v1 converted from [TensorFlow model](https://github.com/mozilla/DeepSpeech/releases/tag/v0.4.1)
+- DeepSpeaker
+
+More machine learning operators will be supported in future releases.
+<br/><br/><br/><br/>
+
+@section S7_tf_parser ArmNN Tensorflow Parser
+
+`armnnTfParser` is a library for loading neural networks defined by TensorFlow protobuf files into the Arm NN runtime.
+
+## TensorFlow operators that the Arm NN SDK supports
+
+This reference guide provides a list of TensorFlow operators the Arm NN SDK currently supports.
+
+The Arm NN SDK TensorFlow parser currently only supports fp32 operators.
+
+## Fully supported
+
+- avg_pool
+  - See the TensorFlow [avg_pool documentation](https://www.tensorflow.org/api_docs/python/tf/nn/avg_pool) for more information.
+- bias_add
+  - See the TensorFlow [bias_add documentation](https://www.tensorflow.org/api_docs/python/tf/nn/bias_add) for more information.
+- conv2d
+  - See the TensorFlow [conv2d documentation](https://www.tensorflow.org/api_docs/python/tf/nn/conv2d) for more information.
+- expand_dims
+  - See the TensorFlow [expand_dims documentation](https://www.tensorflow.org/api_docs/python/tf/expand_dims) for more information.
+- gather
+  - See the TensorFlow [gather documentation](https://www.tensorflow.org/api_docs/python/tf/gather) for more information.
+- identity
+  - See the TensorFlow [identity documentation](https://www.tensorflow.org/api_docs/python/tf/identity) for more information.
+- local_response_normalization
+  - See the TensorFlow [local_response_normalization documentation](https://www.tensorflow.org/api_docs/python/tf/nn/local_response_normalization)  for more information.
+- max_pool
+  - See the TensorFlow [max_pool documentation](https://www.tensorflow.org/api_docs/python/tf/nn/max_pool) for more information.
+- placeholder
+  - See the TensorFlow [placeholder documentation](https://www.tensorflow.org/api_docs/python/tf/placeholder) for more information.
+- reduce_mean
+  -See the TensorFlow [reduce_mean documentation](https://www.tensorflow.org/api_docs/python/tf/reduce_mean) for more information.
+- relu
+  - See the TensorFlow [relu documentation](https://www.tensorflow.org/api_docs/python/tf/nn/relu) for more information.
+- relu6
+  - See the TensorFlow [relu6 documentation](https://www.tensorflow.org/api_docs/python/tf/nn/relu6) for more information.
+- rsqrt
+  - See the TensorFlow [rsqrt documentation](https://www.tensorflow.org/api_docs/python/tf/math/rsqrt) for more information.
+- shape
+  - See the TensorFlow [shape documentation](https://www.tensorflow.org/api_docs/python/tf/shape) for more information.
+- sigmoid
+  - See the TensorFlow [sigmoid documentation](https://www.tensorflow.org/api_docs/python/tf/sigmoid) for more information.
+- softplus
+  - See the TensorFlow [softplus documentation](https://www.tensorflow.org/api_docs/python/tf/nn/softplus) for more information.
+- squeeze
+  - See the TensorFlow [squeeze documentation](https://www.tensorflow.org/api_docs/python/tf/squeeze) for more information.
+- tanh
+  - See the TensorFlow [tanh documentation](https://www.tensorflow.org/api_docs/python/tf/tanh) for more information.
+
+## Partially supported
+
+- add
+  - The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [add operator documentation](https://www.tensorflow.org/api_docs/python/tf/add) for more information.
+- add_n
+  - The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [add operator documentation](https://www.tensorflow.org/api_docs/python/tf/add_n) for more information.
+- concat
+  - Arm NN supports concatenation along the channel dimension for data formats NHWC and NCHW.
+- constant
+  - The parser does not support the optional `shape` argument. It always infers the shape of the output tensor from `value`. See the TensorFlow [constant documentation](https://www.tensorflow.org/api_docs/python/tf/constant) for further information.
+- depthwise_conv2d_native
+  - The parser only supports a dilation rate of (1,1,1,1). See the TensorFlow [depthwise_conv2d_native documentation](https://www.tensorflow.org/api_docs/python/tf/nn/depthwise_conv2d_native) for more information.
+- equal
+  - The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of 4D and 1D tensors. See the TensorFlow [equal operator documentation](https://www.tensorflow.org/api_docs/python/tf/math/equal) for more information.
+- fused_batch_norm
+  - The parser does not support training outputs. See the TensorFlow [fused_batch_norm documentation](https://www.tensorflow.org/api_docs/python/tf/nn/fused_batch_norm) for more information.
+- greater
+  - The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of 4D and 1D tensors. See the TensorFlow [greater operator documentation](https://www.tensorflow.org/api_docs/python/tf/math/greater) for more information.
+- matmul
+  - The parser only supports constant weights in a fully connected layer. See the TensorFlow [matmul documentation](https://www.tensorflow.org/api_docs/python/tf/matmul) for more information.
+- maximum
+  where maximum is used in one of the following ways
+  - max(mul(a, x), x)
+  - max(mul(x, a), x)
+  - max(x, mul(a, x))
+  - max(x, mul(x, a)
+  This is interpreted as a ActivationLayer with a LeakyRelu activation function. Any other usage of max will result in the insertion of a simple maximum layer. The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting). See the TensorFlow [maximum documentation](https://www.tensorflow.org/api_docs/python/tf/maximum) for more information.
+- minimum
+  - The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of 4D and 1D tensors. See the TensorFlow [minimum operator documentation](https://www.tensorflow.org/api_docs/python/tf/math/minimum) for more information.
+- multiply
+  - The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [multiply documentation](https://www.tensorflow.org/api_docs/python/tf/multiply) for more information.
+- pad
+  - Only supports tf.pad function with mode = 'CONSTANT' and constant_values = 0. See the TensorFlow [pad documentation](https://www.tensorflow.org/api_docs/python/tf/pad) for more information.
+- realdiv
+  - The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [realdiv documentation](https://www.tensorflow.org/api_docs/python/tf/realdiv) for more information.
+- reshape
+  - The parser does not support reshaping to or from 4D. See the TensorFlow [reshape documentation](https://www.tensorflow.org/api_docs/python/tf/reshape) for more information.
+- resize_images
+  - The parser only supports `ResizeMethod.BILINEAR` with `align_corners=False`. See the TensorFlow [resize_images documentation](https://www.tensorflow.org/api_docs/python/tf/image/resize_images) for more information.
+- softmax
+  - The parser only supports 2D inputs and does not support selecting the `softmax` dimension. See the TensorFlow [softmax documentation](https://www.tensorflow.org/api_docs/python/tf/nn/softmax) for more information.
+- split
+  - Arm NN supports split along the channel dimension for data formats NHWC and NCHW.
+- subtract
+  - The parser does not support all forms of broadcasting [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [subtract documentation](https://www.tensorflow.org/api_docs/python/tf/math/subtract) for more information.
+
+## Tested networks
+
+Arm tests these operators with the following TensorFlow fp32 neural networks:
+- Lenet
+- mobilenet_v1_1.0_224. The Arm NN SDK only supports the non-quantized version of the network. See the [MobileNet_v1 documentation](https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet_v1.md) for more information on quantized networks.
+- inception_v3. The Arm NN SDK only supports the official inception_v3 transformed model. See the TensorFlow documentation on [preparing models for mobile deployment](https://www.tensorflow.org/mobile/prepare_models) for more information on how to transform the inception_v3 network.
+
+Using these datasets:
+- Cifar10
+- Simple MNIST. For more information check out the [tutorial](https://developer.arm.com/technologies/machine-learning-on-arm/developer-material/how-to-guides/deploying-a-tensorflow-mnist-model-on-arm-nn) on the Arm Developer portal.
+
+More machine learning operators will be supported in future releases.
+
+**/
+}

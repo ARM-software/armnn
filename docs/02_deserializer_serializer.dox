@@ -1,0 +1,182 @@
+/// Copyright (c) 2017 ARM Limited.
+///
+/// SPDX-License-Identifier: MIT
+///
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+///
+/// The above copyright notice and this permission notice shall be included in all
+/// copies or substantial portions of the Software.
+///
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+/// SOFTWARE.
+///
+
+namespace armnn
+{
+/**
+@page serializers The ArmNN Serializer and Deserializer
+@tableofcontents
+
+@section S8_serializer The ArmNN Serializer
+
+The `armnnSerializer` is a library for serializing an Arm NN network to a stream.
+
+## The layers that ArmNN SDK Serializer currently supports.
+
+This reference guide provides a list of layers which can be serialized currently by the Arm NN SDK.
+
+## Fully supported
+
+The Arm NN SDK Serializer currently supports the following layers:
+
+- Activation
+- Addition
+- ArgMinMax
+- BatchToSpaceNd
+- BatchNormalization
+- Comparison
+- Concat
+- Constant
+- Convolution2d
+- DepthToSpace
+- DepthwiseConvolution2d
+- Dequantize
+- DetectionPostProcess
+- Division
+- ElementwiseUnary
+- Floor
+- FullyConnected
+- Gather
+- Input
+- InstanceNormalization
+- L2Normalization
+- LogSoftmax
+- Lstm
+- Maximum
+- Mean
+- Merge
+- Minimum
+- Multiplication
+- Normalization
+- Output
+- Pad
+- Permute
+- Pooling2d
+- Prelu
+- Quantize
+- QuantizedLstm
+- Reshape
+- Resize
+- Slice
+- Softmax
+- SpaceToBatchNd
+- SpaceToDepth
+- Splitter
+- Stack
+- StandIn
+- StridedSlice
+- Subtraction
+- Switch
+- TransposeConvolution2d
+
+More machine learning layers will be supported in future releases.
+
+## Deprecated layers
+
+Some layers have been deprecated and replaced by others layers. In order to maintain backward compatibility, serializations of these deprecated layers will deserialize to the layers that have replaced them, as follows:
+
+- Equal will deserialize as Comparison
+- Merger will deserialize as Concat
+- Greater will deserialize as Comparison
+- ResizeBilinear will deserialize as Resize
+- Abs will deserialize as ElementwiseUnary
+- Rsqrt will deserialize as ElementwiseUnary
+<br/><br/><br/><br/>
+
+@section S9_deserializer The ArmNN Deserializer
+
+The `armnnDeserializer` is a library for loading neural networks defined by Arm NN FlatBuffers files
+into the Arm NN runtime.
+
+## The layers that ArmNN SDK Deserializer currently supports.
+
+This reference guide provides a list of layers which can be deserialized currently by the Arm NN SDK.
+
+## Fully supported
+
+The Arm NN SDK Deserialize parser currently supports the following layers:
+
+- Abs
+- Activation
+- Addition
+- ArgMinMax
+- BatchToSpaceNd
+- BatchNormalization
+- Concat
+- Comparison
+- Constant
+- Convolution2d
+- DepthToSpace
+- DepthwiseConvolution2d
+- Dequantize
+- DetectionPostProcess
+- Division
+- Floor
+- FullyConnected
+- Gather
+- Input
+- InstanceNormalization
+- L2Normalization
+- LogSoftmax
+- Lstm
+- Maximum
+- Mean
+- Merge
+- Minimum
+- Multiplication
+- Normalization
+- Output
+- Pad
+- Permute
+- Pooling2d
+- Prelu
+- Quantize
+- QuantizedLstm
+- Reshape
+- Rsqrt
+- Slice
+- Softmax
+- SpaceToBatchNd
+- SpaceToDepth
+- Splitter
+- Stack
+- StandIn
+- StridedSlice
+- Subtraction
+- Switch
+- TransposeConvolution2d
+- Resize
+
+More machine learning layers will be supported in future releases.
+
+## Deprecated layers
+
+Some layers have been deprecated and replaced by others layers. In order to maintain backward compatibility, serializations of these deprecated layers will deserialize to the layers that have replaced them, as follows:
+
+- Equal will deserialize as Comparison
+- Merger will deserialize as Concat
+- Greater will deserialize as Comparison
+- ResizeBilinear will deserialize as Resize
+
+**/
+}

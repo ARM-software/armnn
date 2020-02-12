@@ -1,0 +1,826 @@
+/// Copyright (c) 2017 ARM Limited.
+///
+/// SPDX-License-Identifier: MIT
+///
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+///
+/// The above copyright notice and this permission notice shall be included in all
+/// copies or substantial portions of the Software.
+///
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+/// SOFTWARE.
+///
+
+
+namespace armnn{
+/** @mainpage Introduction
+
+@tableofcontents
+@section S0_1_armnn ArmNN
+
+Arm NN is a key component of the [machine learning platform](https://mlplatform.org/), which is part of the [Linaro Machine Intelligence Initiative](https://www.linaro.org/news/linaro-announces-launch-of-machine-intelligence-initiative/). For more information on the machine learning platform and Arm NN, see: <https://mlplatform.org/>, also there is further Arm NN information available from <https://developer.arm.com/products/processors/machine-learning/arm-nn>
+
+There is a getting started guide here using TensorFlow: <https://developer.arm.com/technologies/machine-learning-on-arm/developer-material/how-to-guides/configuring-the-arm-nn-sdk-build-environment-for-tensorflow>
+
+There is a getting started guide here using TensorFlow Lite: <https://developer.arm.com/technologies/machine-learning-on-arm/developer-material/how-to-guides/configuring-the-arm-nn-sdk-build-environment-for-tensorflow-lite>
+
+There is a getting started guide here using Caffe: <https://developer.arm.com/technologies/machine-learning-on-arm/developer-material/how-to-guides/configuring-the-arm-nn-sdk-build-environment-for-caffe>
+
+There is a getting started guide here using ONNX: <https://developer.arm.com/technologies/machine-learning-on-arm/developer-material/how-to-guides/configuring-the-arm-nn-sdk-build-environment-for-onnx>
+
+There is a guide for backend development <a href="backends.xhtml">here</a>.
+<br/><br/><br/><br/>
+
+@section S1_license License
+
+Arm NN is provided under the [MIT](https://spdx.org/licenses/MIT.html) license.
+
+__**MIT License**__
+
+Copyright (c) 2017-2020 ARM Limited.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+Individual files contain the following tag instead of the full license text.
+
+    SPDX-License-Identifier: MIT
+
+This enables machine processing of license information based on the SPDX License Identifiers that are available [here](http://spdx.org/licenses/)
+<br/><br/><br/><br/>
+
+@section S2_1_contributions Contributor Guide
+
+The Arm NN project is open for external contributors and welcomes contributions. Arm NN is licensed under the [MIT license](https://spdx.org/licenses/MIT.html) and all accepted contributions must have the same license. For more details on contributing to Arm NN see the [Contributing page](https://mlplatform.org/contributing/) on the [MLPlatform.org](https://mlplatform.org/) website.
+
+@subsection S2_1_dco Developer Certificate of Origin (DCO)
+
+Before the Arm NN project accepts your contribution, you need to certify its origin and give us your permission.  To manage this process we use Developer Certificate of Origin (DCO) V1.1 (https://developercertificate.org/).
+
+To indicate that you agree to the the terms of the DCO, you "sign off" your contribution by adding a line with your name and e-mail address to every git commit message:
+
+Signed-off-by: John Doe <john.doe@example.org>
+
+You must use your real name, no pseudonyms or anonymous contributions are accepted.
+
+@subsection S2_2_releases Releases
+
+Official Arm NN releases are published through the official [Arm NN Github repository](https://github.com/ARM-software/armnn).
+
+@subsection S2_3_development_repository Developer Repository
+
+The Arm NN development repository is hosted on the [mlplatform.org git repository](https://git.mlplatform.org/ml/armnn.git/) hosted by [Linaro](https://www.linaro.org/).
+
+@subsection S2_4_code_review Code Review
+
+Contributions must go through code review. Code reviews are performed through the [mlplatform.org Gerrit server](https://review.mlplatform.org). Contributors need to signup to this Gerrit server with their GitHub account
+credentials.
+
+Only reviewed contributions can go to the master branch of Arm NN.
+
+@subsection S2_5_continuous_integration Continuous Integration
+
+Contributions to Arm NN go through testing at the Arm CI system. All unit, integration and regression tests must pass before a contribution gets merged to the Arm NN master branch.
+
+@subsection S2_6_communications Communications
+
+We encourage all Arm NN developers to subscribe to the [Arm NN developer mailing list](https://lists.linaro.org/mailman/listinfo/armnn-dev).
+<br/><br/><br/><br/>
+
+
+
+
+
+
+
+
+
+@section S3_build_instructions Build Instructions
+
+Arm tests the build system of Arm NN with the following build environments:
+
+* Android NDK
+* Cross compilation from x86_64 Ubuntu to arm64 Linux
+* Native compilation under aarch64 Debian 9
+
+
+Arm NN is written using portable C++14 and the build system uses [CMake](https://cmake.org/), therefore it is possible to build for a wide variety of target platforms, from a wide variety of host environments.
+
+The armnn/tests directory contains tests used during Arm NN development. Many of them depend on third-party IP, model protobufs and image files not distributed with Arm NN. The dependencies of some of the tests are available freely on the Internet, for those who wish to experiment.
+
+The 'armnn/samples' directory contains SimpleSample.cpp, a very basic example of the ArmNN SDK API in use.
+
+The 'ExecuteNetwork' program, in armnn/tests/ExecuteNetwork, has no additional dependencies beyond those required by Arm NN and the model parsers. It takes any model and any input tensor, and simply prints out the output tensor. Run it with no arguments to see command-line help.
+
+The 'ArmnnConverter' program, in armnn/src/armnnConverter, has no additional dependencies beyond those required by Arm NN and the model parsers. It takes a model in TensorFlow format and produces a serialized model in Arm NN format. Run it with no arguments to see command-line help. Note that this program can only convert models for which all operations are supported by the serialization tool [src/armnnSerializer](src/armnnSerializer/README.md).
+
+The 'ArmnnQuantizer' program, in armnn/src/armnnQuantizer, has no additional dependencies beyond those required by Arm NN and the model parsers. It takes a 32-bit float network and converts it into a quantized asymmetric 8-bit or quantized symmetric 16-bit network.
+Static quantization is supported by default but dynamic quantization can be enabled if CSV file of raw input tensors is specified. Run it with no arguments to see command-line help.
+
+\Note  note that Arm NN needs to be built against a particular version of [ARM's Compute Library](https://github.com/ARM-software/ComputeLibrary). The get_compute_library.sh in the scripts subdirectory will clone the compute library from the review.mlplatform.org github repository into a directory alongside armnn named 'clframework' and checks out the correct revision.
+<br/><br/><br/><br/>
+
+@subsection S3_1_android_ndk_build_guide How to use the Android NDK to build ArmNN
+
+<ul>
+    <li>  [Introduction](#introduction) </li>
+    <li>  [Download the Android NDK and make a standalone toolchain](#downloadNDK) </li>
+    <li>  [Build the Boost C++ libraries](#buildBoost) </li>
+    <li>  [Build the Compute Library](#buildCL) </li>
+    <li>  [Build Google's Protobuf library](#buildProtobuf) </li>
+    <li>  [Download TensorFlow](#downloadTF) </li>
+    <li>  [Build ArmNN](#buildArmNN) </li>
+    <li>  [Run ArmNN UnitTests on an Android device](#runArmNNUnitTests) </li>
+</ul>
+
+## <a name="introduction">Introduction</a>
+These are step by step instructions for using the Android NDK to build ArmNN.
+They have been tested on a clean install of Ubuntu 18.04, and should also work with other OS versions.
+The instructions show how to build the ArmNN core library and the optional TensorFlow parser.
+All downloaded or generated files will be saved inside the `~/armnn-devenv` directory.
+
+
+## <a name="downloadNDK">Download the Android NDK and make a standalone toolchain</a>
+
+### Download the Android NDK from [the official website](https://developer.android.com/ndk/downloads/index.html):
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+     mkdir -p ~/armnn-devenv/toolchains
+     cd ~/armnn-devenv/toolchains
+
+     #For Mac OS, change the NDK download link accordingly.
+     wget https://dl.google.com/android/repository/android-ndk-r17b-linux-x86_64.zip
+     unzip android-ndk-r17b-linux-x86_64.zip
+     export NDK=~/armnn-devenv/toolchains/android-ndk-r17b
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	 You may want to append `export NDK=~/armnn-devenv/toolchains/android-ndk-r17b` to your `~/.bashrc` (or `~/.bash_profile` in Mac OS).
+
+### Make a standalone toolchain:
+
+	 (Requires python if not previously installed: `sudo apt install python`)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+   # Create an arm64 API 26 libc++ toolchain.
+   $NDK/build/tools/make_standalone_toolchain.py \
+       --arch arm64 \
+       --api 26 \
+       --stl=libc++ \
+       --install-dir=$HOME/armnn-devenv/toolchains/aarch64-android-r17b
+   export PATH=$HOME/armnn-devenv/toolchains/aarch64-android-r17b/bin:$PATH
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	 You may want to append `export PATH=$HOME/armnn-devenv/toolchains/aarch64-android-r17b/bin:$PATH` to your `~/.bashrc` (or `~/.bash_profile` in Mac OS).
+
+## <a name="buildBoost">Build the Boost C++ libraries</a>
+
+### Download Boost version 1.64:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+   mkdir ~/armnn-devenv/boost
+   cd ~/armnn-devenv/boost
+   wget https://dl.bintray.com/boostorg/release/1.64.0/source/boost_1_64_0.tar.bz2
+   tar xvf boost_1_64_0.tar.bz2
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Build:
+
+	(Requires gcc if not previously installed: `sudo apt install gcc`)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+	echo "using gcc : arm : aarch64-linux-android-clang++ ;" > $HOME/armnn-devenv/boost/user-config.jam
+	cd ~/armnn-devenv/boost/boost_1_64_0
+	./bootstrap.sh --prefix=$HOME/armnn-devenv/boost/install
+	./b2 install --user-config=$HOME/armnn-devenv/boost/user-config.jam \
+     toolset=gcc-arm link=static cxxflags=-fPIC --with-filesystem \
+	 --with-test --with-log --with-program_options -j16
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## <a name="buildCL">Build the Compute Library</a>
+
+### Clone the Compute Library:
+
+	(Requires Git if not previously installed: `sudo apt install git`)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+	cd ~/armnn-devenv
+	git clone https://github.com/ARM-software/ComputeLibrary.git
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Build:
+
+	(Requires SCons if not previously installed: `sudo apt install scons`)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+	cd ComputeLibrary
+	scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" \
+	 benchmark_tests=0 validation_tests=0 os=android -j16
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## <a name="buildProtobuf">Build Google's Protobuf library</a>
+
+### Clone protobuf:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+	mkdir ~/armnn-devenv/google
+	cd ~/armnn-devenv/google
+	git clone https://github.com/google/protobuf.git
+	cd protobuf
+	git checkout -b v3.5.2 v3.5.2
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Build a native (x86) version of the protobuf libraries and compiler (protoc):
+
+	(Requires cUrl, autoconf, llibtool, and other build dependencies if not previously installed: `sudo apt install curl autoconf libtool build-essential g++`)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+	./autogen.sh
+	mkdir x86_build
+	cd x86_build
+	../configure --prefix=$HOME/armnn-devenv/google/x86_pb_install
+	make install -j16
+	cd ..
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Build the arm64 version of the protobuf libraries:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+ 	mkdir arm64_build
+ 	cd arm64_build
+ 	CC=aarch64-linux-android-clang \
+ 	  CXX=aarch64-linux-android-clang++ \
+	  CFLAGS="-fPIE -fPIC" LDFLAGS="-pie -llog" \
+       ../configure --host=aarch64-linux-android \
+       --prefix=$HOME/armnn-devenv/google/arm64_pb_install \
+       --with-protoc=$HOME/armnn-devenv/google/x86_pb_install/bin/protoc
+ 	make install -j16
+	cd ..
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## <a name="downloadTF">Download TensorFlow</a>
+### Clone TensorFlow source code:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+	cd ~/armnn-devenv/google/
+	git clone https://github.com/tensorflow/tensorflow.git
+    cd tensorflow/
+    git checkout a0043f9262dc1b0e7dc4bdf3a7f0ef0bebc4891e
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	You need tensorflow/contrib/makefile/tf_proto_files.txt from TensorFlow to generate TensorFlow protobuf definitions. This file is not available in TensorFlow master branch.
+
+## <a name="buildArmNN">Build ArmNN</a>
+
+### Clone ArmNN source code:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+	cd ~/armnn-devenv/
+	git clone https://github.com/ARM-software/armnn.git
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Generate TensorFlow protobuf definitions:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+	cd ~/armnn-devenv/google/tensorflow
+	~/armnn-devenv/armnn/scripts/generate_tensorflow_protobuf.sh \
+	 $HOME/armnn-devenv/google/tf_pb $HOME/armnn-devenv/google/x86_pb_install
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Build ArmNN:
+
+ 	(Requires CMake if not previously installed: `sudo apt install cmake`)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+	  mkdir ~/armnn-devenv/armnn/build
+	  cd ~/armnn-devenv/armnn/build
+      CXX=aarch64-linux-android-clang++ \
+	  CC=aarch64-linux-android-clang \
+	  CXX_FLAGS="-fPIE -fPIC" \
+	  cmake .. \
+      -DCMAKE_SYSTEM_NAME=Android \
+      -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a \
+      -DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=$HOME/armnn-devenv/toolchains/aarch64-android-r17b/ \
+      -DCMAKE_EXE_LINKER_FLAGS="-pie -llog" \
+      -DARMCOMPUTE_ROOT=$HOME/armnn-devenv/ComputeLibrary/ \
+      -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build \
+      -DBOOST_ROOT=$HOME/armnn-devenv/boost/install/ \
+      -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
+      -DTF_GENERATED_SOURCES=$HOME/armnn-devenv/google/tf_pb/ -DBUILD_TF_PARSER=1 \
+      -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/arm64_pb_install/
+	  make -j16
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## <a name="runArmNNUnitTests">Run the ArmNN unit tests on an Android device</a>
+
+
+### Push the build results to an Android device and make symbolic links for shared libraries:
+  Currently adb version we have used for testing is 1.0.41.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+	adb push libarmnnTfParser.so /data/local/tmp/
+	adb push libarmnn.so /data/local/tmp/
+	adb push UnitTests /data/local/tmp/
+	adb push $NDK/sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_shared.so /data/local/tmp/
+	adb push $HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so /data/local/tmp/libprotobuf.so.15.0.1
+	adb shell 'ln -s libprotobuf.so.15.0.1 /data/local/tmp/libprotobuf.so.15'
+	adb shell 'ln -s libprotobuf.so.15.0.1 /data/local/tmp/libprotobuf.so'
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Push the files needed for the unit tests (they are a mix of files, directories and symbolic links):
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/testSharedObject
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/testSharedObject/* /data/local/tmp/src/backends/backendsCommon/test/testSharedObject/
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/testDynamicBackend
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/testDynamicBackend/* /data/local/tmp/src/backends/backendsCommon/test/testDynamicBackend/
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath1
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath1/* /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath1/
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath2/Arm_CpuAcc_backend.so /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2/
+	adb shell ln -s Arm_CpuAcc_backend.so /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2/Arm_CpuAcc_backend.so.1
+	adb shell ln -s Arm_CpuAcc_backend.so.1 /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2/Arm_CpuAcc_backend.so.1.2
+	adb shell ln -s Arm_CpuAcc_backend.so.1.2 /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2/Arm_CpuAcc_backend.so.1.2.3
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath2/Arm_GpuAcc_backend.so /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2/
+	adb shell ln -s nothing /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2/Arm_no_backend.so
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath3
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath5
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath5/* /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath5/
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath6
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath6/* /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath6/
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath7
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath9
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath9/* /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath9/
+
+	adb shell mkdir -p /data/local/tmp/src/backends/dynamic/reference
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/dynamic/reference/Arm_CpuRef_backend.so /data/local/tmp/src/backends/dynamic/reference/
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Run ArmNN unit tests:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+	adb shell 'LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/UnitTests'
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	If libarmnnUtils.a is present in `~/armnn-devenv/armnn/build/` and the unit tests run without failure then the build was successful.
+<br/><br/><br/><br/>
+
+@subsection S3_2_cross_compilations_build_guide  Cross Compilation Build Guide
+
+<ul>
+    <li>  [Introduction](#introduction) </li>
+    <li>  [Cross-compiling ToolChain](#installCCT) </li>
+    <li>  [Build and install Google's Protobuf library](#buildProtobuf) </li>
+    <li>  [Build Caffe for x86_64](#buildCaffe) </li>
+    <li>  [Build Boost library for arm64](#installBaarch) </li>
+    <li>  [Build Compute Library](#buildCL) </li>
+    <li>  [Build ArmNN](#buildANN) </li>
+    <li>  [Run Unit Tests](#unittests) </li>
+    <li>  [Troubleshooting and Errors](#troubleshooting) </li>
+</ul>
+
+
+## <a name="introduction">Introduction</a>
+These are the step by step instructions on Cross-Compiling ArmNN under an x86_64 system to target an Arm64 system. This build flow has been tested with Ubuntu 16.04.
+The instructions show how to build the ArmNN core library and the Boost, Protobuf, Caffe and Compute Libraries necessary for compilation.
+
+## <a name="installCCT">Cross-compiling ToolChain</a>
+
+### Install the standard cross-compilation libraries for arm64:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    sudo apt install crossbuild-essential-arm64
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## <a name="buildProtobuf">Build and install Google's Protobuf library</a>
+
+### Get protobuf-all-3.5.1.tar.gz from [here](https://github.com/protocolbuffers/protobuf/releases/tag/v3.5.1).
+
+### Extract:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    tar -zxvf protobuf-all-3.5.1.tar.gz
+    cd protobuf-3.5.1
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Build a native (x86_64) version of the protobuf libraries and compiler (protoc):
+  (Requires cUrl, autoconf, llibtool, and other build dependencies if not previously installed: sudo apt install curl autoconf libtool build-essential g++)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    mkdir x86_64_build
+    cd x86_64_build
+    ../configure --prefix=$HOME/armnn-devenv/google/x86_64_pb_install
+    make install -j16
+    cd ..
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Build the arm64 version of the protobuf libraries:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    mkdir arm64_build
+    cd arm64_build
+    CC=aarch64-linux-gnu-gcc \
+    CXX=aarch64-linux-gnu-g++ \
+    ../configure --host=aarch64-linux \
+    --prefix=$HOME/armnn-devenv/google/arm64_pb_install \
+    --with-protoc=$HOME/armnn-devenv/google/x86_64_pb_install/bin/protoc
+    make install -j16
+    cd ..
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## <a name="buildCaffe">Build Caffe for x86_64</a>
+
+### Ubuntu 16.04 installation. These steps are taken from the full Caffe installation documentation [here](http://caffe.berkeleyvision.org/install_apt.html)
+
+### Install dependencies:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    sudo apt-get install libleveldb-dev libsnappy-dev libopencv-dev libhdf5-serial-dev
+    sudo apt-get install --no-install-recommends libboost-all-dev
+    sudo apt-get install libgflags-dev libgoogle-glog-dev liblmdb-dev
+    sudo apt-get install libopenblas-dev
+    sudo apt-get install libatlas-base-dev
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Download Caffe-Master from [here](https://github.com/BVLC/caffe).
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    git clone https://github.com/BVLC/caffe.git
+    cd caffe
+    cp Makefile.config.example Makefile.config
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Adjust Makefile.config as necessary for your environment, for example:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    #CPU only version:
+    CPU_ONLY := 1
+
+    #Add hdf5 and protobuf include and library directories (Replace $HOME with explicit /home/username dir):
+    INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial/ $HOME/armnn-devenv/google/x86_64_pb_install/include/
+    LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu/hdf5/serial/ $HOME/armnn-devenv/google/x86_64_pb_install/lib/
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Setup environment:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    export PATH=$HOME/armnn-devenv/google/x86_64_pb_install/bin/:$PATH
+    export LD_LIBRARY_PATH=$HOME/armnn-devenv/google/x86_64_pb_install/lib/:$LD_LIBRARY_PATH
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Compilation with Make:
+
+~~~~~~~~~~~~~~~~.sh
+
+    make all
+    make test
+    make runtest
+
+~~~~~~~~~~~~~~~~
+
+    These should all run without errors
+### caffe.pb.h and caffe.pb.cc will be needed when building ArmNN's Caffe Parser
+
+## <a name="installBaarch">Build Boost library for arm64</a>
+
+### Build Boost library for arm64
+    Download Boost version 1.64 from [here](http://www.boost.org/doc/libs/1_64_0/more/getting_started/unix-variants.html).
+    Using any version of Boost greater than 1.64 will fail to build ArmNN, due to different dependency issues.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+    tar -zxvf boost_1_64_0.tar.gz
+    cd boost_1_64_0
+    echo "using gcc : arm : aarch64-linux-gnu-g++ ;" > user_config.jam
+    ./bootstrap.sh --prefix=$HOME/armnn-devenv/boost_arm64_install
+    ./b2 install toolset=gcc-arm link=static cxxflags=-fPIC --with-filesystem --with-test --with-log --with-program_options -j32 --user-config=user_config.jam
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## <a name="buildCL">Build Compute Library</a>
+
+### Building the Arm Compute Library:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    git clone https://github.com/ARM-software/ComputeLibrary.git
+    cd ComputeLibrary/
+    scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" -j8 internal_only=0
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## <a name="buildANN">Build ArmNN</a>
+
+### Compile ArmNN for arm64:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    git clone https://github.com/ARM-software/armnn.git
+    cd armnn
+    mkdir build
+    cd build
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Use CMake to configure your build environment, update the following script and run it from the armnn/build directory to set up the armNN build:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    #!/bin/bash
+    CXX=aarch64-linux-gnu-g++ \
+    CC=aarch64-linux-gnu-gcc \
+    cmake .. \
+    -DARMCOMPUTE_ROOT=$HOME/armnn-devenv/ComputeLibrary \
+    -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build/ \
+    -DBOOST_ROOT=$HOME/armnn-devenv/boost_arm64_install/ \
+    -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
+    -DCAFFE_GENERATED_SOURCES=$HOME/armnn-devenv/caffe/build/src \
+    -DBUILD_CAFFE_PARSER=1 \
+    -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/x86_64_pb_install/ \
+    -DPROTOBUF_LIBRARY_DEBUG=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.15.0.1 \
+    -DPROTOBUF_LIBRARY_RELEASE=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.15.0.1
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Run the build
+
+~~~~~~~~~~~~~.sh
+
+    make -j32
+
+~~~~~~~~~~~~~
+
+## <a name="unittests">Run Unit Tests</a>
+
+### Copy the build folder to an arm64 linux machine
+
+### Copy the libprotobuf.so.15.0.1 library file to the build folder
+
+### cd to the build folder on your arm64 machine and set your LD_LIBRARY_PATH to its current location:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    cd build/
+    export LD_LIBRARY_PATH=`pwd`
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Create a symbolic link to libprotobuf.so.15.0.1:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    ln -s libprotobuf.so.15.0.1 ./libprotobuf.so.15
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Run the UnitTests:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    ./UnitTests
+    Running 567 test cases...
+
+    *** No errors detected
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## <a name="troubleshooting">Troubleshooting and Errors:</a>
+## Error adding symbols: File in wrong format
+
+### When building armNN:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    /usr/local/lib/libboost_log.a: error adding symbols: File in wrong format
+    collect2: error: ld returned 1 exit status
+    CMakeFiles/armnn.dir/build.make:4028: recipe for target 'libarmnn.so' failed
+    make[2]: *** [libarmnn.so] Error 1
+    CMakeFiles/Makefile2:105: recipe for target 'CMakeFiles/armnn.dir/all' failed
+    make[1]: *** [CMakeFiles/armnn.dir/all] Error 2
+    Makefile:127: recipe for target 'all' failed
+    make: *** [all] Error 2
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Boost libraries are not compiled for the correct architecture, try recompiling for arm64
+
+## Virtual memory exhausted
+### When compiling the boost libraries:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    virtual memory exhausted: Cannot allocate memory
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Not enough memory available to compile. Increase the amount of RAM or swap space available.
+
+
+## Unrecognized command line option '-m64'
+
+### When compiling the boost libraries:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    aarch64-linux-gnu-g++: error: unrecognized command line option ‘-m64’
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Clean the boost library directory before trying to build with a different architecture:
+
+~~~~~~~~~~~~~~~~~~~.sh
+
+    sudo ./b2 clean
+
+~~~~~~~~~~~~~~~~~~~
+
+### It should show the following for arm64:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    - 32-bit                   : no
+    - 64-bit                   : yes
+    - arm                      : yes
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+## Missing libz.so.1
+
+### When compiling armNN:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    /usr/lib/gcc-cross/aarch64-linux-gnu/5/../../../../aarch64-linux-gnu/bin/ld: warning: libz.so.1, needed by /home/<username>/armNN/usr/lib64/libprotobuf.so.15.0.0, not found (try using -rpath or -rpath-link)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Missing arm64 libraries for libz.so.1, these can be added by adding a second architecture to dpkg and explicitly installing them:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    sudo dpkg --add-architecture arm64
+    sudo apt-get install zlib1g:arm64
+    sudo apt-get update
+    sudo ldconfig
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### If apt-get update returns 404 errors for arm64 repos refer to section 5 below.
+
+### Alternatively the missing arm64 version of libz.so.1 can be downloaded and installed from a .deb package [here](https://launchpad.net/ubuntu/wily/arm64/zlib1g/1:1.2.8.dfsg-2ubuntu4)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    sudo dpkg -i zlib1g_1.2.8.dfsg-2ubuntu4_arm64.deb
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Unable to install arm64 packages after adding arm64 architecture
+
+### Using sudo apt-get update should add all of the required repos for arm64 but if it does not or you are getting 404 errors the following instructions can be used to add the repos manually:
+
+### From stackoverflow [here](https://askubuntu.com/questions/430705/how-to-use-apt-get-to-download-multi-arch-library/430718).
+
+### Open /etc/apt/sources.list with your preferred text editor.
+
+### Mark all the current (default) repos as \[arch=<current_os_arch>], e.g.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ xenial main restricted
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Then add the following:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    deb [arch=arm64] http://ports.ubuntu.com/ xenial main restricted
+    deb [arch=arm64] http://ports.ubuntu.com/ xenial-updates main restricted
+    deb [arch=arm64] http://ports.ubuntu.com/ xenial universe
+    deb [arch=arm64] http://ports.ubuntu.com/ xenial-updates universe
+    deb [arch=arm64] http://ports.ubuntu.com/ xenial multiverse
+    deb [arch=arm64] http://ports.ubuntu.com/ xenial-updates multiverse
+    deb [arch=arm64] http://ports.ubuntu.com/ xenial-backports main restricted universe multiverse
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Update and install again:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    sudo apt-get install zlib1g:arm64
+    sudo apt-get update
+    sudo ldconfig
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Undefined references to google::protobuf:: functions
+
+### When compiling armNN there are multiple errors of the following type:
+    ```
+    libarmnnCaffeParser.so: undefined reference to `google::protobuf:*
+    ```
+### Missing or out of date protobuf compilation libraries.
+    Use the command 'protoc --version' to check which version of protobuf is available (version 3.5.1 is required).
+    Follow the instructions above to install protobuf 3.5.1
+    Note this will require you to recompile Caffe for x86_64
+
+## Errors on strict-aliasing rules when compiling the Compute Library
+
+### When compiling the Compute Library there are multiple errors on strict-aliasing rules:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    cc1plus: error: unrecognized command line option ‘-Wno-implicit-fallthrough’ [-Werror]
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Add Werror=0 to the scons command:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+
+    scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" -j8 internal_only=0 Werror=0
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**/
+}

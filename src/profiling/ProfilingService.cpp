@@ -181,6 +181,15 @@ void ProfilingService::Disconnect()
     }
 }
 
+// Store a profiling context returned from a backend that support profiling, and register its counters
+void ProfilingService::AddBackendProfilingContext(const BackendId backendId,
+    std::shared_ptr<armnn::profiling::IBackendProfilingContext> profilingContext)
+{
+    BOOST_ASSERT(profilingContext != nullptr);
+    // Register the backend counters
+    m_MaxGlobalCounterId = profilingContext->RegisterCounters(m_MaxGlobalCounterId);
+    m_BackendProfilingContexts.emplace(backendId, std::move(profilingContext));
+}
 const ICounterDirectory& ProfilingService::GetCounterDirectory() const
 {
     return m_CounterDirectory;
@@ -369,13 +378,6 @@ void ProfilingService::Initialize()
         BOOST_ASSERT(inferencesRunCounter);
         InitializeCounterValue(inferencesRunCounter->m_Uid);
     }
-    // Register the backend counters
-    uint16_t maxGlobalCounterId = armnn::profiling::INFERENCES_RUN;
-    for (auto&& profilingContext : m_BackendProfilingContexts)
-    {
-        BOOST_ASSERT(profilingContext.second != nullptr);
-        maxGlobalCounterId = profilingContext.second->RegisterCounters(maxGlobalCounterId);
-    }
 }
 
 void ProfilingService::InitializeCounterValue(uint16_t counterUid)
@@ -409,6 +411,7 @@ void ProfilingService::Reset()
     // ...finally reset the profiling state machine
     m_StateMachine.Reset();
     m_BackendProfilingContexts.clear();
+    m_MaxGlobalCounterId = armnn::profiling::INFERENCES_RUN;
 }
 
 void ProfilingService::Stop()

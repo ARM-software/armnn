@@ -564,6 +564,7 @@ void FullyUnsupporteSubgraphTestImpl1()
     BOOST_TEST(Contains(layersInGraph, "pooling layer"));
 
     // Create a mock backend object
+    MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
     BOOST_TEST((backendObjPtr != nullptr));
 
@@ -629,6 +630,7 @@ void FullyUnsupporteSubgraphTestImpl2()
     BOOST_TEST(Contains(layersInGraph, "pooling3 layer"));
 
     // Create a mock backend object
+    MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
     BOOST_TEST((backendObjPtr != nullptr));
 
@@ -704,6 +706,7 @@ void FullyOptimizableSubgraphTestImpl1()
     BOOST_TEST(Contains(layersInGraph, "conv layer"));
 
     // Create a mock backend object
+    MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
     BOOST_TEST((backendObjPtr != nullptr));
 
@@ -772,6 +775,7 @@ void FullyOptimizableSubgraphTestImpl2()
     BOOST_TEST(Contains(layersInGraph, "conv5 layer"));
 
     // Create a mock backend object
+    MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
     BOOST_TEST((backendObjPtr != nullptr));
 
@@ -857,6 +861,7 @@ void PartiallySupportedSubgraphTestImpl()
     BOOST_TEST(Contains(layersInGraph, "pooling3 layer"));
 
     // Create a mock backend object
+    MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
     BOOST_TEST((backendObjPtr != nullptr));
 
@@ -982,6 +987,7 @@ void FullyUnoptimizableSubgraphTestImpl1()
     BOOST_TEST(Contains(layersInGraph, "conv layer unoptimizable"));
 
     // Create a mock backend object
+    MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
     BOOST_TEST((backendObjPtr != nullptr));
 
@@ -1049,6 +1055,7 @@ void PartiallyOptimizableSubgraphTestImpl1()
     BOOST_TEST(Contains(layersInGraph, "conv5 layer"));
 
     // Create a mock backend object
+    MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
     BOOST_TEST((backendObjPtr != nullptr));
 
@@ -1181,6 +1188,7 @@ void PartiallyOptimizableSubgraphTestImpl2()
     BOOST_TEST(Contains(layersInGraph, "add layer"));
 
     // Create a mock backend object
+    MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
     BOOST_TEST((backendObjPtr != nullptr));
 

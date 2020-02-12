@@ -7,6 +7,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     ActivationFixture.hpp
     ArgMinMaxEndToEndTestImpl.hpp
     BackendIdTests.cpp
+    BackendProfilingTests.cpp
     BackendRegistryTests.cpp
     CommonTestUtils.cpp
     CommonTestUtils.hpp

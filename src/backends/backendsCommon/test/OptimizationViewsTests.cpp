@@ -199,6 +199,7 @@ BOOST_AUTO_TEST_CASE(OptimizeViewsValidateDeviceMockBackend)
     input1->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo({ 1, 1, 4, 4 }, armnn::DataType::Float32));
     addition->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo({ 1, 1, 4, 4 }, armnn::DataType::Float32));
 
+    armnn::MockBackendInitialiser initialiser;
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 

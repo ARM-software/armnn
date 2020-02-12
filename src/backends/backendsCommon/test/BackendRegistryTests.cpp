@@ -72,6 +72,7 @@ BOOST_AUTO_TEST_CASE(TestRegistryHelper)
 
     factoryFunction();
     BOOST_TEST(called == true);
+    BackendRegistryInstance().Deregister("HelloWorld");
 }
 
 BOOST_AUTO_TEST_CASE(TestDirectCallToRegistry)
@@ -99,6 +100,7 @@ BOOST_AUTO_TEST_CASE(TestDirectCallToRegistry)
 
     factoryFunction();
     BOOST_TEST(called == true);
+    BackendRegistryInstance().Deregister("HelloWorld");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

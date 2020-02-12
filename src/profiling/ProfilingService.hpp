@@ -67,10 +67,7 @@ public:
 
     // Store a profiling context returned from a backend that support profiling.
     void AddBackendProfilingContext(const BackendId backendId,
-        std::shared_ptr<armnn::profiling::IBackendProfilingContext> profilingContext)
-    {
-        m_BackendProfilingContexts.emplace(backendId, std::move(profilingContext));
-    }
+        std::shared_ptr<armnn::profiling::IBackendProfilingContext> profilingContext);
 
     const ICounterDirectory& GetCounterDirectory() const;
     ICounterRegistry& GetCounterRegistry();
@@ -147,6 +144,7 @@ private:
     TimelinePacketWriterFactory m_TimelinePacketWriterFactory;
     std::unordered_map<BackendId,
         std::shared_ptr<armnn::profiling::IBackendProfilingContext>> m_BackendProfilingContexts;
+    uint16_t m_MaxGlobalCounterId;
 
 protected:
     // Default constructor/destructor kept protected for testing
@@ -196,6 +194,7 @@ protected:
                                                  m_PacketVersionResolver.ResolvePacketVersion(0, 5).GetEncodedValue(),
                                                  m_StateMachine)
         , m_TimelinePacketWriterFactory(m_BufferManager)
+        , m_MaxGlobalCounterId(armnn::profiling::INFERENCES_RUN)
     {
         // Register the "Connection Acknowledged" command handler
         m_CommandHandlerRegistry.RegisterFunctor(&m_ConnectionAcknowledgedCommandHandler);

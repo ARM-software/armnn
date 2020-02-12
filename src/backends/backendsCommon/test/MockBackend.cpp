@@ -5,6 +5,7 @@
 
 #include "MockBackend.hpp"
 #include "MockBackendId.hpp"
+#include "armnn/backends/profiling/IBackendProfilingContext.hpp"
 
 #include <armnn/BackendRegistry.hpp>
 
@@ -66,19 +67,25 @@ bool IsLayerOptimizable(const armnn::Layer& layer)
 namespace armnn
 {
 
-namespace
+MockBackendInitialiser::MockBackendInitialiser()
 {
+    BackendRegistryInstance().Register(MockBackend::GetIdStatic(),
+                                       []()
+                                       {
+                                           return IBackendInternalUniquePtr(new MockBackend);
+                                       });
+}
 
-static BackendRegistry::StaticRegistryInitializer g_RegisterHelper
+MockBackendInitialiser::~MockBackendInitialiser()
 {
-    BackendRegistryInstance(),
-    MockBackend::GetIdStatic(),
-    []()
+    try
     {
-        return IBackendInternalUniquePtr(new MockBackend);
+        BackendRegistryInstance().Deregister(MockBackend::GetIdStatic());
     }
-};
-
+    catch (...)
+    {
+        std::cerr << "could not deregister mock backend" << std::endl;
+    }
 }
 
 const BackendId& MockBackend::GetIdStatic()
@@ -99,9 +106,13 @@ IBackendInternal::IBackendContextPtr MockBackend::CreateBackendContext(const IRu
 }
 
 IBackendInternal::IBackendProfilingContextPtr MockBackend::CreateBackendProfilingContext(
-    const IRuntime::CreationOptions&, IBackendProfilingPtr&)
+    const IRuntime::CreationOptions& options, IBackendProfilingPtr& backendProfiling)
 {
-    return IBackendProfilingContextPtr{};
+    boost::ignore_unused(options);
+    IBackendInternal::IBackendProfilingContextPtr context =
+        std::make_shared<MockBackendProfilingContext>(MockBackendProfilingContext(backendProfiling));
+    MockBackendProfilingService::Instance().SetProfilingContextPtr(context);
+    return context;
 }
 
 IBackendInternal::IMemoryManagerUniquePtr MockBackend::CreateMemoryManager() const

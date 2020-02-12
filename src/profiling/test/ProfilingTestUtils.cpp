@@ -359,6 +359,8 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     // Create runtime in which test will run
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
+    armnn::profiling::ProfilingService& profilingService = armnn::profiling::ProfilingService::Instance();
+    profilingService.ConfigureProfilingService(options.m_ProfilingOptions, true);
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
     // build up the structure of the network

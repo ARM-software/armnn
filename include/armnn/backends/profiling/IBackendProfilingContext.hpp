@@ -15,17 +15,13 @@ namespace profiling
 
 class IBackendProfilingContext
 {
-protected:
-    IBackendProfilingContext(const IRuntime::CreationOptions&)
-    {}
-
 public:
     virtual ~IBackendProfilingContext()
     {}
-    virtual uint16_t RegisterCounters(uint16_t currentMaxGlobalCounterID);
-    virtual void ActivateCounters(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds);
-    virtual std::vector<Timestamp> ReportCounterValues();
-    virtual void EnableProfiling(bool flag);
+    virtual uint16_t RegisterCounters(uint16_t currentMaxGlobalCounterID) = 0;
+    virtual void ActivateCounters(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds) = 0;
+    virtual std::vector<Timestamp> ReportCounterValues() = 0;
+    virtual void EnableProfiling(bool flag) = 0;
 };
 
 using IBackendProfilingContextUniquePtr = std::unique_ptr<IBackendProfilingContext>;

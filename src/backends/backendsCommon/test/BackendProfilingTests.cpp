@@ -16,6 +16,7 @@
 
 #include <armnn/BackendId.hpp>
 #include <armnn/Logging.hpp>
+#include <armnn/profiling/ISendTimelinePacket.hpp>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -440,6 +441,71 @@ BOOST_AUTO_TEST_CASE(TestBackendCounterLogging)
     SetLogFilter(armnn::LogSeverity::Fatal);
 
     BOOST_CHECK(boost::contains(ss.str(), "ActivateCounters example test error"));
+}
+
+BOOST_AUTO_TEST_CASE(BackendProfilingContextGetSendTimelinePacket)
+{
+    // Reset the profiling service to the uninitialized state
+    armnn::IRuntime::CreationOptions options;
+    options.m_ProfilingOptions.m_EnableProfiling = true;
+    armnn::profiling::ProfilingService& profilingService = armnn::profiling::ProfilingService::Instance();
+    profilingService.ConfigureProfilingService(options.m_ProfilingOptions, true);
+
+    armnn::MockBackendInitialiser initialiser;
+    // Create a runtime. During this the mock backend will be registered and context returned.
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+    armnn::MockBackendProfilingService mockProfilingService = armnn::MockBackendProfilingService::Instance();
+    armnn::MockBackendProfilingContext *mockBackEndProfilingContext = mockProfilingService.GetContext();
+    // Check that there is a valid context set.
+    BOOST_CHECK(mockBackEndProfilingContext);
+    armnn::IBackendInternal::IBackendProfilingPtr& backendProfilingIface =
+        mockBackEndProfilingContext->GetBackendProfiling();
+    BOOST_CHECK(backendProfilingIface);
+
+    // Now for the meat of the test. We're just going to send a random packet and make sure there
+    // are no exceptions or errors. The sending of packets is already tested in SendTimelinePacketTests.
+    std::unique_ptr<armnn::profiling::ISendTimelinePacket> timelinePacket =
+        backendProfilingIface->GetSendTimelinePacket();
+    // Send TimelineEntityClassBinaryPacket
+    const uint64_t entityBinaryPacketProfilingGuid = 123456u;
+    timelinePacket->SendTimelineEntityBinaryPacket(entityBinaryPacketProfilingGuid);
+    timelinePacket->Commit();
+
+    // Reset the profiling servie after the test.
+    options.m_ProfilingOptions.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
+}
+
+BOOST_AUTO_TEST_CASE(GetProfilingGuidGenerator)
+{
+    // Reset the profiling service to the uninitialized state
+    armnn::IRuntime::CreationOptions options;
+    options.m_ProfilingOptions.m_EnableProfiling = true;
+    armnn::profiling::ProfilingService& profilingService = armnn::profiling::ProfilingService::Instance();
+    profilingService.ConfigureProfilingService(options.m_ProfilingOptions, true);
+
+    armnn::MockBackendInitialiser initialiser;
+    // Create a runtime. During this the mock backend will be registered and context returned.
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+    armnn::MockBackendProfilingService mockProfilingService = armnn::MockBackendProfilingService::Instance();
+    armnn::MockBackendProfilingContext *mockBackEndProfilingContext = mockProfilingService.GetContext();
+    // Check that there is a valid context set.
+    BOOST_CHECK(mockBackEndProfilingContext);
+    armnn::IBackendInternal::IBackendProfilingPtr& backendProfilingIface =
+        mockBackEndProfilingContext->GetBackendProfiling();
+    BOOST_CHECK(backendProfilingIface);
+
+    // Get the Guid generator and check the getting two Guid's results in the second being greater than the first.
+    armnn::profiling::IProfilingGuidGenerator& guidGenerator = backendProfilingIface->GetProfilingGuidGenerator();
+    BOOST_CHECK(backendProfilingIface);
+    const armnn::profiling::ProfilingDynamicGuid& firstGuid = guidGenerator.NextGuid();
+    BOOST_CHECK(firstGuid);
+    const armnn::profiling::ProfilingDynamicGuid& secondGuid = guidGenerator.NextGuid();
+    BOOST_CHECK(secondGuid > firstGuid);
+
+    // Reset the profiling servie after the test.
+    options.m_ProfilingOptions.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

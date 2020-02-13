@@ -5,16 +5,16 @@
 
 #pragma once
 
+#include "MockBackendId.hpp"
 #include "armnn/backends/profiling/IBackendProfiling.hpp"
 #include "armnn/backends/profiling/IBackendProfilingContext.hpp"
-#include "MockBackendId.hpp"
 
 #include <LayerSupportCommon.hpp>
 #include <armnn/backends/IBackendInternal.hpp>
 #include <armnn/backends/OptimizationViews.hpp>
-#include <backendsCommon/LayerSupportBase.hpp>
 #include <armnn/backends/profiling/IBackendProfiling.hpp>
 #include <backends/BackendProfiling.hpp>
+#include <backendsCommon/LayerSupportBase.hpp>
 
 namespace armnn
 {
@@ -26,35 +26,11 @@ public:
     ~MockBackendInitialiser();
 };
 
-class MockBackendProfilingService
-{
-public:
-    // Getter for the singleton instance
-    static MockBackendProfilingService& Instance()
-    {
-        static MockBackendProfilingService instance;
-        return instance;
-    }
-
-    armnn::profiling::IBackendProfilingContext* GetContext()
-    {
-        return m_sharedContext.get();
-    }
-
-    void SetProfilingContextPtr(IBackendInternal::IBackendProfilingContextPtr& shared)
-    {
-        m_sharedContext = shared;
-    }
-
-private:
-    IBackendInternal::IBackendProfilingContextPtr m_sharedContext;
-};
-
 class MockBackendProfilingContext : public profiling::IBackendProfilingContext
 {
 public:
     MockBackendProfilingContext(IBackendInternal::IBackendProfilingPtr& backendProfiling)
-        : m_BackendProfiling(backendProfiling)
+        : m_BackendProfiling(std::move(backendProfiling))
         , m_CapturePeriod(0)
     {}
 
@@ -70,23 +46,23 @@ public:
         std::unique_ptr<profiling::IRegisterBackendCounters> counterRegistrar =
             m_BackendProfiling->GetCounterRegistrationInterface(currentMaxGlobalCounterId);
 
-            std::string categoryName("MockCounters");
-            counterRegistrar->RegisterCategory(categoryName);
-            uint16_t nextMaxGlobalCounterId = counterRegistrar->RegisterCounter(
-                0, categoryName, 0, 0, 1.f, "Mock Counter One", "Some notional counter");
+        std::string categoryName("MockCounters");
+        counterRegistrar->RegisterCategory(categoryName);
+        uint16_t nextMaxGlobalCounterId =
+            counterRegistrar->RegisterCounter(0, categoryName, 0, 0, 1.f, "Mock Counter One", "Some notional counter");
 
-            nextMaxGlobalCounterId = counterRegistrar->RegisterCounter(
-                1, categoryName, 0, 0, 1.f, "Mock Counter Two", "Another notional counter");
+        nextMaxGlobalCounterId = counterRegistrar->RegisterCounter(1, categoryName, 0, 0, 1.f, "Mock Counter Two",
+                                                                   "Another notional counter");
 
-            std::string units("microseconds");
-            nextMaxGlobalCounterId = counterRegistrar->RegisterCounter(
-                2, categoryName, 0, 0, 1.f, "Mock MultiCore Counter", "A dummy four core counter", units, 4);
-            return nextMaxGlobalCounterId;
+        std::string units("microseconds");
+        nextMaxGlobalCounterId = counterRegistrar->RegisterCounter(2, categoryName, 0, 0, 1.f, "Mock MultiCore Counter",
+                                                                   "A dummy four core counter", units, 4);
+        return nextMaxGlobalCounterId;
     }
 
     Optional<std::string> ActivateCounters(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds)
     {
-        if ( capturePeriod == 0 || counterIds.size() == 0)
+        if (capturePeriod == 0 || counterIds.size() == 0)
         {
             m_ActiveCounters.clear();
         }
@@ -94,7 +70,7 @@ public:
         {
             return armnn::Optional<std::string>("ActivateCounters example test error");
         }
-        m_CapturePeriod = capturePeriod;
+        m_CapturePeriod  = capturePeriod;
         m_ActiveCounters = counterIds;
         return armnn::Optional<std::string>();
     }
@@ -103,23 +79,46 @@ public:
     {
         std::vector<profiling::CounterValue> counterValues;
 
-        for(auto counterId : m_ActiveCounters)
+        for (auto counterId : m_ActiveCounters)
         {
-            counterValues.emplace_back(profiling::CounterValue{counterId, counterId+1u});
+            counterValues.emplace_back(profiling::CounterValue{ counterId, counterId + 1u });
         }
 
         uint64_t timestamp = m_CapturePeriod;
-        return  {profiling::Timestamp{timestamp, counterValues}};
+        return { profiling::Timestamp{ timestamp, counterValues } };
     }
 
     void EnableProfiling(bool)
     {}
 
 private:
-
-    IBackendInternal::IBackendProfilingPtr& m_BackendProfiling;
+    IBackendInternal::IBackendProfilingPtr m_BackendProfiling;
     uint32_t m_CapturePeriod;
     std::vector<uint16_t> m_ActiveCounters;
+};
+
+class MockBackendProfilingService
+{
+public:
+    // Getter for the singleton instance
+    static MockBackendProfilingService& Instance()
+    {
+        static MockBackendProfilingService instance;
+        return instance;
+    }
+
+    MockBackendProfilingContext* GetContext()
+    {
+        return m_sharedContext.get();
+    }
+
+    void SetProfilingContextPtr(std::shared_ptr<MockBackendProfilingContext> shared)
+    {
+        m_sharedContext = shared;
+    }
+
+private:
+    std::shared_ptr<MockBackendProfilingContext> m_sharedContext;
 };
 
 class MockBackend : public IBackendInternal

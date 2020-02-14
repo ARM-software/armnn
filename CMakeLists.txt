@@ -711,6 +711,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/Split.cpp
             src/armnnTfParser/test/Squeeze.cpp
             src/armnnTfParser/test/Sub.cpp
+            src/armnnTfParser/test/StridedSlice.cpp
             )
 
     endif()

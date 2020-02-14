@@ -25,4 +25,9 @@ void CalculateReducedOutputTensoInfo(const armnn::TensorInfo& inputTensorInfo,
                                      bool keepDims,
                                      armnn::TensorInfo& outputTensorInfo);
 
+/// Create output tensor info for a StridedSlice operator
+void CalculateStridedSliceOutputTensorInfo(const armnn::TensorInfo& inputTensorInfo,
+                                           const armnn::StridedSliceDescriptor& desc,
+                                           armnn::TensorInfo& outputTensorInfo);
+
 } // namespace armnnUtils

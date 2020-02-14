@@ -12,9 +12,10 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
+namespace {
 // helper for setting the dimensions in prototxt
 void dimsHelper(const std::vector<int>& dims, std::string& text){
-    for(u_int i=0; i<dims.size(); ++i){
+    for(u_int i = 0; i < dims.size(); ++i) {
         text.append(R"(dim {
       size: )");
         text.append(std::to_string(dims[i]));
@@ -25,11 +26,11 @@ void dimsHelper(const std::vector<int>& dims, std::string& text){
 
 // helper for converting from integer to octal representation
 void octalHelper(const std::vector<int>& indicesContent, std::string& text){
-    for (unsigned int i = 0; i < indicesContent.size(); ++i)
-    {
+    for(unsigned int i = 0; i < indicesContent.size(); ++i) {
         text.append(armnnUtils::ConvertInt32ToOctalString(static_cast<int>(indicesContent[i])));
     }
 }
+} // namespace
 
 struct GatherFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {

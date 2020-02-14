@@ -32,6 +32,8 @@ arm_compute::Status ClQuantizeWorkloadValidate(const TensorInfo& input,
 ClQuantizeWorkload::ClQuantizeWorkload(const QuantizeQueueDescriptor& descriptor, const WorkloadInfo& info)
     : BaseWorkload<QuantizeQueueDescriptor>(descriptor, info)
 {
+    m_Data.ValidateInputsOutputs("ClQuantizeWorkload", 1, 1);
+
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 

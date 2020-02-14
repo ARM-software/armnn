@@ -59,6 +59,7 @@ std::unique_ptr<IWorkload> MakeWorkloadHelper(const QueueDescriptorType& descrip
         case DataType::QAsymmU8:
             return MakeWorkloadForType<Uint8Workload>::Func(descriptor, info, std::forward<Args>(args)...);
         case DataType::QSymmS8:
+        case DataType::QAsymmS8:
             return MakeWorkloadForType<Int8Workload>::Func(descriptor, info, std::forward<Args>(args)...);
         case DataType::Signed32:
             return MakeWorkloadForType<Int32Workload>::Func(descriptor, info, std::forward<Args>(args)...);

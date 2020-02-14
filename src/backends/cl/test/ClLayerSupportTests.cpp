@@ -36,14 +36,21 @@ BOOST_FIXTURE_TEST_CASE(IsLayerSupportedFloat32Cl, ClContextControlFixture)
     IsLayerSupportedTests<armnn::ClWorkloadFactory, armnn::DataType::Float32>(&factory);
 }
 
-BOOST_FIXTURE_TEST_CASE(IsLayerSupportedUint8Cl, ClContextControlFixture)
+BOOST_FIXTURE_TEST_CASE(IsLayerSupportedQAsymmU8Cl, ClContextControlFixture)
 {
     armnn::ClWorkloadFactory factory =
         ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
     IsLayerSupportedTests<armnn::ClWorkloadFactory, armnn::DataType::QAsymmU8>(&factory);
 }
 
-BOOST_FIXTURE_TEST_CASE(IsLayerSupportedInt8Cl, ClContextControlFixture)
+BOOST_FIXTURE_TEST_CASE(IsLayerSupportedQAsymmS8Cl, ClContextControlFixture)
+{
+    armnn::ClWorkloadFactory factory =
+        ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
+    IsLayerSupportedTests<armnn::ClWorkloadFactory, armnn::DataType::QAsymmS8>(&factory);
+}
+
+BOOST_FIXTURE_TEST_CASE(IsLayerSupportedQSymmS8Cl, ClContextControlFixture)
 {
     armnn::ClWorkloadFactory factory =
         ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());

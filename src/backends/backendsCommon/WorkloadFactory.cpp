@@ -352,6 +352,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                         break;
                     }
                     case DataType::QAsymmU8:
+                    case DataType::QAsymmS8:
                     case DataType::QSymmS8:
                     case DataType::QSymmS16:
                     {

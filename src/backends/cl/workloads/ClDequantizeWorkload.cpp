@@ -32,6 +32,8 @@ ClDequantizeWorkload::ClDequantizeWorkload(const DequantizeQueueDescriptor& desc
                                            const WorkloadInfo& workloadInfo)
                                            : BaseWorkload<DequantizeQueueDescriptor>(descriptor, workloadInfo)
 {
+    m_Data.ValidateInputsOutputs("ClDequantizeWorkload", 1, 1);
+
     arm_compute::ICLTensor& input = boost::polymorphic_pointer_downcast<IClTensorHandle>(
             m_Data.m_Inputs[0])->GetTensor();
 

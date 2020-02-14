@@ -438,7 +438,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreatePrelu(const PreluQueueDescri
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateQuantize(const QuantizeQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClQuantizeWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClQuantizeWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateQuantizedLstm(const QuantizedLstmQueueDescriptor& descriptor,

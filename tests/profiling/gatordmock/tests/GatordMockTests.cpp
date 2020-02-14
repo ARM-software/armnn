@@ -11,7 +11,7 @@
 #include <StreamMetadataCommandHandler.hpp>
 #include <TimelineDirectoryCaptureCommandHandler.hpp>
 
-#include <test/SendCounterPacketTests.hpp>
+#include <test/ProfilingMocks.hpp>
 
 #include <boost/cast.hpp>
 #include <boost/test/test_tools.hpp>

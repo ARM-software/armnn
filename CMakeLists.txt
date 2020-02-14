@@ -649,6 +649,7 @@ if(BUILD_UNIT_TESTS)
         src/profiling/test/FileOnlyProfilingDecoratorTests.cpp
         src/profiling/test/ProfilingConnectionDumpToFileDecoratorTests.cpp
         src/profiling/test/ProfilingGuidTest.cpp
+        src/profiling/test/ProfilingMocks.hpp
         src/profiling/test/ProfilingTests.cpp
         src/profiling/test/ProfilingTests.hpp
         src/profiling/test/ProfilingTestUtils.cpp

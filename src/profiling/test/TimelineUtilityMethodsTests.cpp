@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "SendCounterPacketTests.hpp"
+#include "ProfilingMocks.hpp"
 #include "ProfilingTestUtils.hpp"
 
 #include <SendTimelinePacket.hpp>

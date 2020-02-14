@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "ProfilingService.hpp"
+#include "IProfilingService.hpp"
 #include <armnn/backends/profiling/IBackendProfiling.hpp>
 
 namespace armnn
@@ -18,7 +18,7 @@ class BackendProfiling : public IBackendProfiling
 {
 public:
     BackendProfiling(const IRuntime::CreationOptions& options,
-                     ProfilingService& profilingService,
+                     IProfilingService& profilingService,
                      const BackendId& backendId)
             : m_Options(options),
               m_ProfilingService(profilingService),
@@ -34,8 +34,7 @@ public:
 
     IProfilingGuidGenerator& GetProfilingGuidGenerator() override;
 
-    void ReportCounters(const std::vector<Timestamp>&) override
-    {}
+    void ReportCounters(const std::vector<Timestamp>&) override;
 
     CounterStatus GetCounterStatus(uint16_t backendCounterId) override;
 
@@ -45,7 +44,7 @@ public:
 
 private:
     IRuntime::CreationOptions m_Options;
-    ProfilingService& m_ProfilingService;
+    IProfilingService& m_ProfilingService;
     BackendId m_BackendId;
 };
 }    // namespace profiling

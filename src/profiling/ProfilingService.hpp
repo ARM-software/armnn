@@ -12,6 +12,7 @@
 #include "CounterIdMap.hpp"
 #include "ICounterRegistry.hpp"
 #include "ICounterValues.hpp"
+#include "IProfilingService.hpp"
 #include "PeriodicCounterCapture.hpp"
 #include "PeriodicCounterSelectionCommandHandler.hpp"
 #include "PerJobCounterSelectionCommandHandler.hpp"
@@ -38,7 +39,7 @@ static const uint16_t UNREGISTERED_BACKENDS =   3;
 static const uint16_t INFERENCES_RUN        =   4;
 static const uint16_t MAX_ARMNN_COUNTER = INFERENCES_RUN;
 
-class ProfilingService : public IReadWriteCounterValues, public IProfilingGuidGenerator
+class ProfilingService : public IReadWriteCounterValues, public IProfilingService
 {
 public:
     using ExternalProfilingOptions = IRuntime::CreationOptions::ExternalProfilingOptions;
@@ -77,13 +78,13 @@ public:
     uint32_t GetCounterValue(uint16_t counterUid) const override;
     uint16_t GetCounterCount() const override;
     // counter global/backend mapping functions
-    const ICounterMappings& GetCounterMappings() const;
+    const ICounterMappings& GetCounterMappings() const override;
     IRegisterCounterMapping& GetCounterMappingRegistry();
 
     // Getters for the profiling service state
-    bool IsProfilingEnabled();
+    bool IsProfilingEnabled() const override;
 
-    CaptureData GetCaptureData();
+    CaptureData GetCaptureData() override;
     void SetCaptureData(uint32_t capturePeriod,
                         const std::vector<uint16_t>& counterIds,
                         const std::set<BackendId>& activeBackends);
@@ -100,7 +101,12 @@ public:
     /// Create a ProfilingStaticGuid based on a hash of the string
     ProfilingStaticGuid GenerateStaticId(const std::string& str) override;
 
-    std::unique_ptr<ISendTimelinePacket> GetSendTimelinePacket() const;
+    std::unique_ptr<ISendTimelinePacket> GetSendTimelinePacket() const override;
+
+    ISendCounterPacket& GetSendCounterPacket() override
+    {
+        return m_SendCounterPacket;
+    }
 
     /// Check if the profiling is enabled
     bool IsEnabled() { return m_Options.m_EnableProfiling; }

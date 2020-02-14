@@ -29,6 +29,24 @@ IProfilingGuidGenerator& BackendProfiling::GetProfilingGuidGenerator()
     return m_ProfilingService;
 }
 
+void BackendProfiling::ReportCounters(const std::vector<Timestamp>& timestamps)
+{
+    for (const auto timestampInfo : timestamps)
+    {
+        std::vector<CounterValue> backendCounterValues = timestampInfo.counterValues;
+        for_each(backendCounterValues.begin(), backendCounterValues.end(), [&](CounterValue& backendCounterValue)
+        {
+            // translate the counterId to globalCounterId
+            backendCounterValue.counterId = m_ProfilingService.GetCounterMappings().GetGlobalId(
+                backendCounterValue.counterId, m_BackendId);
+        });
+
+        // Send Periodic Counter Capture Packet for the Timestamp
+        m_ProfilingService.GetSendCounterPacket().SendPeriodicCounterCapturePacket(
+            timestampInfo.timestamp, backendCounterValues);
+    }
+}
+
 CounterStatus BackendProfiling::GetCounterStatus(uint16_t backendCounterId)
 {
     uint16_t globalCounterId = m_ProfilingService.GetCounterMappings().GetGlobalId(backendCounterId, m_BackendId);

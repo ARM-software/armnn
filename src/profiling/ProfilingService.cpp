@@ -30,7 +30,7 @@ void ProfilingService::ResetExternalProfilingOptions(const ExternalProfilingOpti
     }
 }
 
-bool ProfilingService::IsProfilingEnabled()
+bool ProfilingService::IsProfilingEnabled() const
 {
     return m_Options.m_EnableProfiling;
 }

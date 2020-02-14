@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "SendCounterPacketTests.hpp"
+#include "ProfilingMocks.hpp"
 
 #include <armnn/Logging.hpp>
 

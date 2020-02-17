@@ -178,8 +178,49 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
       -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
       -DTF_GENERATED_SOURCES=$HOME/armnn-devenv/google/tf_pb/ -DBUILD_TF_PARSER=1 \
       -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/arm64_pb_install/
-	make -j16
 	```
+
+	To include standalone sample dynamic backend tests, add the argument to enable the tests and the dynamic backend path to the CMake command:
+
+    ```bash
+    -DSAMPLE_DYNAMIC_BACKEND=1 \
+    -DDYNAMIC_BACKEND_PATHS=$SAMPLE_DYNAMIC_BACKEND_PATH
+    ```
+    Where $SAMPLE_DYNAMIC_BACKEND_PATH is the path where libArm_SampleDynamic_backend.so library file is pushed
+
+ * Run the build
+    ```bash
+    make -j16
+    ```
+
+#### <a name="buildStandaloneBackend">Build Standalone Sample Dynamic Backend</a>
+* The sample dynamic backend is located in armnn/src/dynamic/sample
+    ```bash
+    mkdir build
+    cd build
+    ```
+
+* Use CMake to configure the build environment, update the following script and run it from the armnn/src/dynamic/sample/build directory to set up the armNN build:
+    ```bash
+    #!/bin/bash
+    CXX=aarch64-linux-android-clang++ \
+    CC=aarch64-linux-android-clang \
+    CXX_FLAGS="-fPIE -fPIC" \
+    cmake \
+    -DCMAKE_SYSTEM_NAME=Android \
+    -DCMAKE_CXX_FLAGS=--std=c++14 \
+    -DCMAKE_EXE_LINKER_FLAGS="-pie -llog" \
+    -DCMAKE_MODULE_LINKER_FLAGS="-llog" \
+    -DBOOST_ROOT=$HOME/armnn-devenv/boost/install \
+    -DBoost_SYSTEM_LIBRARY=$HOME/armnn-devenv/boost/install/lib/libboost_system.a \
+    -DBoost_FILESYSTEM_LIBRARY=$HOME/armnn-devenv/boost/install/lib/libboost_filesystem.a \
+    -DARMNN_PATH=$HOME/armnn-devenv/armnn/build/libarmnn.so ..
+    ```
+
+* Run the build
+    ```bash
+    make
+    ```
 
 #### <a name="runArmNNUnitTests">Run the ArmNN unit tests on an Android device</a>
 
@@ -232,6 +273,14 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 
 	adb shell mkdir -p /data/local/tmp/src/backends/dynamic/reference
 	adb push -p ~/armnn-devenv/armnn/build/src/backends/dynamic/reference/Arm_CpuRef_backend.so /data/local/tmp/src/backends/dynamic/reference/
+	```
+
+	If the standalone sample dynamic tests are enabled, also push libArm_SampleDynamic_backend.so library file to the folder specified as $SAMPLE_DYNAMIC_BACKEND_PATH when ArmNN is built.
+	This is the example when $SAMPLE_DYNAMIC_BACKEND_PATH is specified as /data/local/tmp/dynamic/sample/:
+
+	```bash
+	adb shell mkdir -p /data/local/tmp/dynamic/sample/
+	adb push -p ${WORKING_DIR}/armnn/src/dynamic/sample/build/libArm_SampleDynamic_backend.so /data/local/tmp/dynamic/sample/
 	```
 
 * Run ArmNN unit tests:

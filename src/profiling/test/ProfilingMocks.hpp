@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Holder.hpp>
 #include <IProfilingConnectionFactory.hpp>
 #include <IProfilingService.hpp>
 #include <ProfilingGuidGenerator.hpp>
@@ -645,6 +646,74 @@ private:
     Devices     m_Devices;
     CounterSets m_CounterSets;
     Counters    m_Counters;
+};
+
+class MockProfilingService : public IProfilingService, public IRegisterCounterMapping
+{
+public:
+    MockProfilingService(MockBufferManager& mockBufferManager,
+                         bool isProfilingEnabled,
+                         const CaptureData& captureData) :
+        m_SendCounterPacket(mockBufferManager),
+        m_IsProfilingEnabled(isProfilingEnabled),
+        m_CaptureData(captureData) {}
+
+    /// Return the next random Guid in the sequence
+    ProfilingDynamicGuid NextGuid() override
+    {
+        return m_GuidGenerator.NextGuid();
+    }
+
+    /// Create a ProfilingStaticGuid based on a hash of the string
+    ProfilingStaticGuid GenerateStaticId(const std::string& str) override
+    {
+        return m_GuidGenerator.GenerateStaticId(str);
+    }
+
+    std::unique_ptr<ISendTimelinePacket> GetSendTimelinePacket() const override
+    {
+        return nullptr;
+    }
+
+    const ICounterMappings& GetCounterMappings() const override
+    {
+        return m_CounterMapping;
+    }
+
+    ISendCounterPacket& GetSendCounterPacket() override
+    {
+        return m_SendCounterPacket;
+    }
+
+    bool IsProfilingEnabled() const override
+    {
+        return m_IsProfilingEnabled;
+    }
+
+    CaptureData GetCaptureData() override
+    {
+        CaptureData copy(m_CaptureData);
+        return copy;
+    }
+
+    void RegisterMapping(uint16_t globalCounterId,
+                         uint16_t backendCounterId,
+                         const armnn::BackendId& backendId) override
+    {
+        m_CounterMapping.RegisterMapping(globalCounterId, backendCounterId, backendId);
+    }
+
+    void Reset() override
+    {
+        m_CounterMapping.Reset();
+    }
+
+private:
+    ProfilingGuidGenerator m_GuidGenerator;
+    CounterIdMap m_CounterMapping;
+    SendCounterPacket m_SendCounterPacket;
+    bool m_IsProfilingEnabled;
+    CaptureData m_CaptureData;
 };
 
 } // namespace profiling

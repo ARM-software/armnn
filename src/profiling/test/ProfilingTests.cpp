@@ -3413,4 +3413,63 @@ BOOST_AUTO_TEST_CASE(CheckCounterStatusQuery)
     profilingService.ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
 }
 
+BOOST_AUTO_TEST_CASE(CheckRegisterCounters)
+{
+    armnn::Runtime::CreationOptions options;
+    options.m_ProfilingOptions.m_EnableProfiling = true;
+    MockBufferManager mockBuffer(1024);
+    CaptureData captureData;
+    MockProfilingService mockProfilingService(
+        mockBuffer, options.m_ProfilingOptions.m_EnableProfiling, captureData);
+    armnn::BackendId cpuRefId(armnn::Compute::CpuRef);
+
+    mockProfilingService.RegisterMapping(6, 0, cpuRefId);
+    mockProfilingService.RegisterMapping(7, 1, cpuRefId);
+    mockProfilingService.RegisterMapping(8, 2, cpuRefId);
+
+    armnn::profiling::BackendProfiling backendProfiling(options,
+                                                        mockProfilingService,
+                                                        cpuRefId);
+
+    armnn::profiling::Timestamp timestamp;
+    timestamp.timestamp = 1000998;
+    timestamp.counterValues.emplace_back(0, 700);
+    timestamp.counterValues.emplace_back(2, 93);
+    std::vector<armnn::profiling::Timestamp> timestamps;
+    timestamps.push_back(timestamp);
+    backendProfiling.ReportCounters(timestamps);
+
+    auto readBuffer = mockBuffer.GetReadableBuffer();
+
+    uint32_t headerWord0 = ReadUint32(readBuffer, 0);
+    uint32_t headerWord1 = ReadUint32(readBuffer, 4);
+    uint64_t readTimestamp = ReadUint64(readBuffer, 8);
+
+    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 3); // packet family
+    BOOST_TEST(((headerWord0 >> 19) & 0x0000007F) == 0); // packet class
+    BOOST_TEST(((headerWord0 >> 16) & 0x00000007) == 0); // packet type
+    BOOST_TEST(headerWord1 == 20);                       // data length
+    BOOST_TEST(1000998 == readTimestamp);                // capture period
+
+    uint32_t offset = 16;
+    // Check Counter Index
+    uint16_t readIndex = ReadUint16(readBuffer, offset);
+    BOOST_TEST(6 == readIndex);
+
+    // Check Counter Value
+    offset += 2;
+    uint32_t readValue = ReadUint32(readBuffer, offset);
+    BOOST_TEST(700 == readValue);
+
+    // Check Counter Index
+    offset += 4;
+    readIndex = ReadUint16(readBuffer, offset);
+    BOOST_TEST(8 == readIndex);
+
+    // Check Counter Value
+    offset += 2;
+    readValue = ReadUint32(readBuffer, offset);
+    BOOST_TEST(93 == readValue);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

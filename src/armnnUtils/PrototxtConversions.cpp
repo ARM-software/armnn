@@ -4,6 +4,7 @@
 //
 
 #include "PrototxtConversions.hpp"
+#include "armnn/Tensor.hpp"
 
 #include <boost/format.hpp>
 
@@ -29,4 +30,17 @@ std::string ConvertInt32ToOctalString(int value)
     return returnString;
 }
 
+/// Converts an TensorShape into Prototxt representation
+std::string ConvertTensorShapeToString(const armnn::TensorShape& shape)
+{
+    std::stringstream ss;
+    for (unsigned int i = 0 ; i < shape.GetNumDimensions() ; i++)
+    {
+        ss << "dim {\n";
+        ss << "size: " << std::to_string(shape[i]) << "\n";
+        ss << "}\n";
+    }
+    return ss.str();
+
+}
 } // namespace armnnUtils

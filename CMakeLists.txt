@@ -713,6 +713,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/Stack.cpp
             src/armnnTfParser/test/Sub.cpp
             src/armnnTfParser/test/StridedSlice.cpp
+            src/armnnTfParser/test/Transpose.cpp
             )
 
     endif()

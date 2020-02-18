@@ -12,8 +12,8 @@
 #define CONCAT_MACRO(a, b, c) a ## b ## c
 
 // ArmNN version components
-#define ARMNN_MAJOR_VERSION 19
-#define ARMNN_MINOR_VERSION 11
+#define ARMNN_MAJOR_VERSION 20
+#define ARMNN_MINOR_VERSION 02
 #define ARMNN_PATCH_VERSION 00
 
 // ARMNN_VERSION: "YYYYMMPP"

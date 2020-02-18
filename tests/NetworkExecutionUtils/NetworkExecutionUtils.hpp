@@ -198,11 +198,15 @@ void RemoveDuplicateDevices(std::vector<armnn::BackendId>& computeDevices)
 
 struct TensorPrinter : public boost::static_visitor<>
 {
-    TensorPrinter(const std::string& binding, const armnn::TensorInfo& info, const std::string& outputTensorFile)
+    TensorPrinter(const std::string& binding,
+                  const armnn::TensorInfo& info,
+                  const std::string& outputTensorFile,
+                  bool dequantizeOutput)
         : m_OutputBinding(binding)
         , m_Scale(info.GetQuantizationScale())
         , m_Offset(info.GetQuantizationOffset())
         , m_OutputTensorFile(outputTensorFile)
+        , m_DequantizeOutput(dequantizeOutput)
     {}
 
     void operator()(const std::vector<float>& values)
@@ -216,16 +220,24 @@ struct TensorPrinter : public boost::static_visitor<>
 
     void operator()(const std::vector<uint8_t>& values)
     {
-        auto& scale = m_Scale;
-        auto& offset = m_Offset;
-        std::vector<float> dequantizedValues;
-        ForEachValue(values, [&scale, &offset, &dequantizedValues](uint8_t value)
+        if(m_DequantizeOutput)
+        {
+            auto& scale = m_Scale;
+            auto& offset = m_Offset;
+            std::vector<float> dequantizedValues;
+            ForEachValue(values, [&scale, &offset, &dequantizedValues](uint8_t value)
             {
                 auto dequantizedValue = armnn::Dequantize(value, scale, offset);
                 printf("%f ", dequantizedValue);
                 dequantizedValues.push_back(dequantizedValue);
             });
-        WriteToFile(dequantizedValues);
+            WriteToFile(dequantizedValues);
+        }
+        else
+        {
+            const std::vector<int> intValues(values.begin(), values.end());
+            operator()(intValues);
+        }
     }
 
     void operator()(const std::vector<int>& values)
@@ -273,6 +285,7 @@ private:
     float m_Scale=0.0f;
     int m_Offset=0;
     std::string m_OutputTensorFile;
+    bool m_DequantizeOutput = false;
 };
 
 
@@ -363,6 +376,7 @@ struct ExecuteNetworkParams
     std::vector<string>           m_OutputTypes;
     std::vector<string>           m_OutputNames;
     std::vector<string>           m_OutputTensorFiles;
+    bool                          m_DequantizeOutput;
     bool                          m_EnableProfiling;
     bool                          m_EnableFp16TurboMode;
     double                        m_ThresholdTime;
@@ -484,7 +498,10 @@ int MainImpl(const ExecuteNetworkParams& params,
             const armnn::TensorInfo& infoOut = infosOut[i].second;
             auto outputTensorFile = params.m_OutputTensorFiles.empty() ? "" : params.m_OutputTensorFiles[i];
 
-            TensorPrinter printer(inferenceModelParams.m_OutputBindings[i], infoOut, outputTensorFile);
+            TensorPrinter printer(inferenceModelParams.m_OutputBindings[i],
+                                  infoOut,
+                                  outputTensorFile,
+                                  params.m_DequantizeOutput);
             boost::apply_visitor(printer, outputDataContainers[i]);
         }
 
@@ -529,6 +546,7 @@ int RunTest(const std::string& format,
             const std::string& outputTypes,
             const std::string& outputNames,
             const std::string& outputTensorFiles,
+            bool dequantizeOuput,
             bool enableProfiling,
             bool enableFp16TurboMode,
             const double& thresholdTime,
@@ -652,6 +670,7 @@ int RunTest(const std::string& format,
     params.m_OutputTypes              = outputTypesVector;
     params.m_OutputNames              = outputNamesVector;
     params.m_OutputTensorFiles        = outputTensorFilesVector;
+    params.m_DequantizeOutput         = dequantizeOuput;
     params.m_EnableProfiling          = enableProfiling;
     params.m_EnableFp16TurboMode      = enableFp16TurboMode;
     params.m_ThresholdTime            = thresholdTime;
@@ -787,6 +806,10 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
          "Accepted values (float, int or qasymm8).")
         ("output-name,o", po::value(&outputNames),
          "Identifier of the output tensors in the network separated by comma.")
+        ("dequantize-output,l",po::bool_switch()->default_value(false),
+         "If this option is enabled, all quantized outputs will be dequantized to float. "
+         "If unset, default to not get dequantized. "
+         "Accepted values (true or false)")
         ("write-outputs-to-file,w", po::value(&outputTensorFiles),
          "Comma-separated list of output file paths keyed with the binding-id of the output slot. "
          "If left empty (the default), the output tensors will not be written to a file.");
@@ -826,6 +849,7 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
 
     // Get the value of the switch arguments.
     bool quantizeInput = vm["quantize-input"].as<bool>();
+    bool dequantizeOutput = vm["dequantize-output"].as<bool>();
 
     // Get the preferred order of compute devices.
     std::vector<armnn::BackendId> computeDevices = vm["compute"].as<std::vector<armnn::BackendId>>();
@@ -844,6 +868,6 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
 
     return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
                    inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames, outputTensorFiles,
-                   enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate, subgraphId,
+                   dequantizeOutput, enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate, subgraphId,
                    enableLayerDetails, parseUnuspported);
 }

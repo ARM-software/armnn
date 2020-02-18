@@ -83,6 +83,10 @@ int main(int argc, const char* argv[])
              "The type of the output tensors in the network separated by comma. "
              "If unset, defaults to \"float\" for all defined outputs. "
              "Accepted values (float, int or qasymm8).")
+            ("dequantize-output,l",po::bool_switch()->default_value(false),
+             "If this option is enabled, all quantized outputs will be dequantized to float. "
+             "If unset, default to not get dequantized. "
+             "Accepted values (true or false)")
             ("output-name,o", po::value(&outputNames),
              "Identifier of the output tensors in the network separated by comma.")
             ("write-outputs-to-file,w", po::value(&outputTensorFiles),
@@ -153,6 +157,7 @@ int main(int argc, const char* argv[])
     bool enableLayerDetails = vm["visualize-optimized-model"].as<bool>();
     bool enableFp16TurboMode = vm["fp16-turbo-mode"].as<bool>();
     bool quantizeInput = vm["quantize-input"].as<bool>();
+    bool dequantizeOutput = vm["dequantize-output"].as<bool>();
     bool printIntermediate = vm["print-intermediate-layers"].as<bool>();
     bool enableExternalProfiling = vm["enable-external-profiling"].as<bool>();
     bool fileOnlyExternalProfiling = vm["file-only-external-profiling"].as<bool>();
@@ -270,7 +275,7 @@ int main(int argc, const char* argv[])
 
         return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
                        inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
-                       outputTensorFiles, enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate,
-                       subgraphId, enableLayerDetails, parseUnsupported, runtime);
+                       outputTensorFiles, dequantizeOutput, enableProfiling, enableFp16TurboMode, thresholdTime,
+                       printIntermediate, subgraphId, enableLayerDetails, parseUnsupported, runtime);
     }
 }

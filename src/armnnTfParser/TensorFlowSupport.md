@@ -163,6 +163,10 @@ Arm NN supports split along the channel dimension for data formats NHWC and NCHW
 
 The parser does not support all forms of broadcasting [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [subtract documentation](https://www.tensorflow.org/api_docs/python/tf/math/subtract) for more information.
 
+**stack**
+
+See the TensorFlow [stack documentation](https://www.tensorflow.org/api_docs/python/tf/stack) for more information.
+
 ## Tested networks
 
 Arm tests these operators with the following TensorFlow fp32 neural networks:

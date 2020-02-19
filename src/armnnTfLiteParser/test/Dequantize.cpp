@@ -103,16 +103,16 @@ BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
                 {{"outputTensor", { 0.0f, 1.5f, 7.5f, 49150.5f, -1.5f,-49152.0f }}});
     }
 
-    struct SimpleDequantizeFixtureQSymmS8 : DequantizeFixture
+    struct SimpleDequantizeFixtureQAsymmS8 : DequantizeFixture
     {
-        SimpleDequantizeFixtureQSymmS8() : DequantizeFixture("[ 1, 6 ]",
+        SimpleDequantizeFixtureQAsymmS8() : DequantizeFixture("[ 1, 6 ]",
                                                              "[ 1, 6 ]",
                                                              "INT8") {}
     };
 
-    BOOST_FIXTURE_TEST_CASE(SimpleDequantizeQSymmS8, SimpleDequantizeFixtureQSymmS8)
+    BOOST_FIXTURE_TEST_CASE(SimpleDequantizeQAsymmS8, SimpleDequantizeFixtureQAsymmS8)
     {
-        RunTest<2, armnn::DataType::QSymmS8 , armnn::DataType::Float32>(
+        RunTest<2, armnn::DataType::QAsymmS8 , armnn::DataType::Float32>(
                 0,
                 {{"inputTensor",  { 0,    1,    5,    127,    -128,   -1 }}},
                 {{"outputTensor", { 0.0f, 1.5f, 7.5f, 190.5f, -192.0f, -1.5f }}});

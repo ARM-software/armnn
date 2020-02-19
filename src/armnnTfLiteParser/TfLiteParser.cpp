@@ -316,7 +316,7 @@ armnn::TensorInfo ToTensorInfo(TfLiteParser::TensorRawPtr tensorPtr, const std::
             type = armnn::DataType::Float32;
             break;
         case tflite::TensorType_INT8:
-            if (tensorPtr->quantization->zero_point.size() == 1 && tensorPtr->quantization->zero_point[0] != 0)
+            if (tensorPtr->quantization->zero_point.size() == 1)
             {
                 // Per-tensor
                 type = armnn::DataType::QAsymmS8;
@@ -398,7 +398,6 @@ armnn::TensorInfo ToTensorInfo(TfLiteParser::TensorRawPtr tensorPtr, const std::
                               quantizationScales,
                               dimensionMappings[boost::numeric_cast<unsigned int>(
                               tensorPtr->quantization->quantized_dimension)]);
-
             return result;
         }
     }
@@ -2896,6 +2895,11 @@ TfLiteParser::CreateConstTensor(TensorRawPtr tensorPtr,
                                                           tensorInfo,
                                                           permutationVector);
         case armnn::DataType::QSymmS8:
+            return CreateConstTensorAndStoreData<int8_t>(bufferPtr,
+                                                         tensorPtr,
+                                                         tensorInfo,
+                                                         permutationVector);
+        case armnn::DataType::QAsymmS8:
             return CreateConstTensorAndStoreData<int8_t>(bufferPtr,
                                                          tensorPtr,
                                                          tensorInfo,

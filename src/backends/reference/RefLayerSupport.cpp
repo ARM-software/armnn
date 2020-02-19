@@ -82,7 +82,6 @@ bool RefLayerSupport::IsActivationSupported(const TensorInfo& input,
     std::array<DataType,6> supportedTypes = {
         DataType::Float32,
         DataType::Float16,
-        DataType::QSymmS8,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
@@ -147,7 +146,6 @@ bool RefLayerSupport::IsAdditionSupported(const TensorInfo& input0,
     std::array<DataType,6> supportedTypes = {
         DataType::Float32,
         DataType::Float16,
-        DataType::QSymmS8,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
@@ -332,8 +330,8 @@ bool RefLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inp
     {
             DataType::Float32,
             DataType::Float16,
-            DataType::QSymmS8,
             DataType::QAsymmU8,
+            DataType::QAsymmS8,
             DataType::QSymmS16
     };
 
@@ -355,11 +353,12 @@ bool RefLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inp
 bool RefLayerSupport::IsConstantSupported(const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
-    std::array<DataType,5> supportedTypes =
+    std::array<DataType,6> supportedTypes =
     {
         DataType::Float32,
         DataType::Signed32,
         DataType::QAsymmU8,
+        DataType::QAsymmS8,
         DataType::QSymmS8,
         DataType::QSymmS16
     };
@@ -1120,7 +1119,7 @@ bool RefLayerSupport::IsMaximumSupported(const TensorInfo& input0,
     std::array<DataType,5> supportedTypes = {
         DataType::Float32,
         DataType::Float16,
-        DataType::QSymmS8,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1284,11 +1283,11 @@ bool RefLayerSupport::IsMultiplicationSupported(const TensorInfo& input0,
 {
     bool supported = true;
 
-    std::array<DataType,5> supportedTypes = {
+    std::array<DataType,6> supportedTypes = {
         DataType::Float32,
         DataType::Float16,
-        DataType::QSymmS8,
         DataType::QAsymmU8,
+        DataType::QAsymmS8,
         DataType::QSymmS16
     };
 
@@ -1416,11 +1415,10 @@ bool RefLayerSupport::IsPooling2dSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported output and inputs types.
-    std::array<DataType,6> supportedTypes =
+    std::array<DataType,5> supportedTypes =
     {
         DataType::Float32,
         DataType::Float16,
-        DataType::QSymmS8,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
@@ -1488,7 +1486,6 @@ bool RefLayerSupport::IsReshapeSupported(const TensorInfo& input,
         DataType::Signed32,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS8,
         DataType::QSymmS16
     };
 
@@ -1532,8 +1529,8 @@ bool RefLayerSupport::IsResizeSupported(const TensorInfo& input,
     {
         DataType::Float32,
         DataType::Float16,
-        DataType::QSymmS8,
         DataType::QAsymmU8,
+        DataType::QAsymmS8,
         DataType::QSymmS16
     };
 

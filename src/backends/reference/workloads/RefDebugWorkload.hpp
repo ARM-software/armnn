@@ -40,6 +40,7 @@ private:
 using RefDebugFloat16Workload   = RefDebugWorkload<DataType::Float16>;
 using RefDebugFloat32Workload   = RefDebugWorkload<DataType::Float32>;
 using RefDebugQAsymmU8Workload  = RefDebugWorkload<DataType::QAsymmU8>;
+using RefDebugQAsymmS8Workload  = RefDebugWorkload<DataType::QAsymmS8>;
 using RefDebugQSymmS16Workload  = RefDebugWorkload<DataType::QSymmS16>;
 using RefDebugQSymmS8Workload   = RefDebugWorkload<DataType::QSymmS8>;
 using RefDebugSigned32Workload  = RefDebugWorkload<DataType::Signed32>;

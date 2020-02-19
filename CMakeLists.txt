@@ -249,6 +249,7 @@ list(APPEND armnn_sources
     include/armnn/profiling/ISendTimelinePacket.hpp
     include/armnn/utility/Assert.hpp
     include/armnn/utility/IgnoreUnused.hpp
+    include/armnn/utility/NumericCast.hpp
     include/armnn/utility/PolymorphicDowncast.hpp
     profiling/common/include/SocketConnectionException.hpp
     src/armnn/layers/LayerCloneBase.hpp

@@ -1045,8 +1045,7 @@ void AdditionQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::Float16,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS16,
-        DataType::QSymmS8
+        DataType::QSymmS16
     };
 
     ValidateDataTypes(inputTensorInfo0, supportedTypes, descriptorName);
@@ -1079,7 +1078,7 @@ void MultiplicationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
     {
         DataType::Float32,
         DataType::QAsymmU8,
-        DataType::QSymmS8,
+        DataType::QAsymmS8,
         DataType::QSymmS16,
         DataType::Float16
     };
@@ -1389,8 +1388,8 @@ void ResizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     {
         DataType::Float16,
         DataType::Float32,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS8,
         DataType::QSymmS16
     };
 
@@ -1543,6 +1542,7 @@ void ConstantQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::Float16,
         DataType::Signed32,
         DataType::QAsymmU8,
+        DataType::QAsymmS8,
         DataType::QSymmS8,
         DataType::QSymmS16
     };
@@ -1570,8 +1570,7 @@ void ReshapeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::Signed32,
         DataType::QSymmS16,
         DataType::QAsymmS8,
-        DataType::QAsymmU8,
-        DataType::QSymmS8
+        DataType::QAsymmU8
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
@@ -2114,8 +2113,8 @@ void MaximumQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::Float16,
         DataType::Float32,
         DataType::Signed32,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS8,
         DataType::QSymmS16
     };
 

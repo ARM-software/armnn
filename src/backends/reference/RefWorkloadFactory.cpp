@@ -65,6 +65,16 @@ bool IsQSymmS8(const WorkloadInfo& info)
     return IsDataType<DataType::QSymmS8>(info);
 }
 
+bool IsQAsymmS8(const WorkloadInfo& info)
+{
+    return IsDataType<DataType::QAsymmS8>(info);
+}
+
+bool IsQAsymmU8(const WorkloadInfo& info)
+{
+    return IsDataType<DataType::QAsymmU8>(info);
+}
+
 RefWorkloadFactory::RefWorkloadFactory(const std::shared_ptr<RefMemoryManager>& memoryManager)
     : m_MemoryManager(memoryManager)
 {
@@ -199,6 +209,14 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDebug(const DebugQueueDescr
     if (IsQSymmS8(info))
     {
         return std::make_unique<RefDebugQSymmS8Workload>(descriptor, info);
+    }
+    if (IsQAsymmU8(info))
+    {
+        return std::make_unique<RefDebugQAsymmU8Workload>(descriptor, info);
+    }
+    if (IsQAsymmS8(info))
+    {
+        return std::make_unique<RefDebugQAsymmS8Workload>(descriptor, info);
     }
     if (IsSigned32(info))
     {

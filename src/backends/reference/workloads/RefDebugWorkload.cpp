@@ -47,6 +47,7 @@ void RefDebugWorkload<DataType>::RegisterDebugCallback(const DebugCallbackFuncti
 template class RefDebugWorkload<DataType::Float16>;
 template class RefDebugWorkload<DataType::Float32>;
 template class RefDebugWorkload<DataType::QAsymmU8>;
+template class RefDebugWorkload<DataType::QAsymmS8>;
 template class RefDebugWorkload<DataType::QSymmS16>;
 template class RefDebugWorkload<DataType::QSymmS8>;
 template class RefDebugWorkload<DataType::Signed32>;

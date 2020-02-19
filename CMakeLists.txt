@@ -249,6 +249,7 @@ list(APPEND armnn_sources
     include/armnn/profiling/ISendTimelinePacket.hpp
     include/armnn/utility/Assert.hpp
     include/armnn/utility/IgnoreUnused.hpp
+    include/armnn/utility/PolymorphicDowncast.hpp
     profiling/common/include/SocketConnectionException.hpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp
@@ -648,6 +649,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/TestNameAndDescriptorLayerVisitor.cpp
         src/armnn/test/TestUtils.cpp
         src/armnn/test/TestUtils.hpp
+        src/armnn/test/UtilityTests.cpp
         src/armnn/test/UnitTests.cpp
         src/armnn/test/UnitTests.hpp
         src/armnn/test/UtilsTests.cpp

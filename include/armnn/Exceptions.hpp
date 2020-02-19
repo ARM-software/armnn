@@ -143,6 +143,13 @@ public:
     using Exception::Exception;
 };
 
+class PolymorphicDowncastException : public Exception
+{
+public:
+    using Exception::Exception;
+};
+
+
 template <typename ExceptionType>
 void ConditionalThrow(bool condition, const std::string& message)
 {
@@ -151,6 +158,16 @@ void ConditionalThrow(bool condition, const std::string& message)
         throw ExceptionType(message);
     }
 }
+
+template <typename ExceptionType>
+void ConditionalThrow(bool condition)
+{
+    if (!condition)
+    {
+        throw ExceptionType();
+    }
+}
+
 
 ///
 /// ComparedType must support:

@@ -115,6 +115,7 @@ ifeq ($(ARMNN_REF_ENABLED),1)
 # Include the source files for the CL backend tests
 
 BACKEND_TEST_SOURCES := \
+        test/ArgMinMaxTests.cpp \
         test/RefCreateWorkloadTests.cpp \
         test/RefDetectionPostProcessTests.cpp \
         test/RefEndToEndTests.cpp \
@@ -123,7 +124,8 @@ BACKEND_TEST_SOURCES := \
         test/RefLayerTests.cpp \
         test/RefMemoryManagerTests.cpp \
         test/RefOptimizedNetworkTests.cpp \
-        test/RefRuntimeTests.cpp
+        test/RefRuntimeTests.cpp \
+        test/RefTensorHandleTests.cpp
 else
 
 # ARMNN_REF_ENABLED == 0

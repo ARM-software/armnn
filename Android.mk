@@ -324,22 +324,61 @@ endif # PLATFORM_VERSION == Q or later
 
 LOCAL_SRC_FILES := \
         $(ARMNN_BACKEND_TEST_SOURCES) \
+        src/armnn/test/ConstTensorLayerVisitor.cpp \
+        src/armnn/test/CsvReaderTest.cpp \
         src/armnn/test/EndToEndTest.cpp \
+        src/armnn/ExecutionFrame.cpp \
+        src/armnn/test/ExecutionFrameTest.cpp \
+        src/armnn/test/FloatingPointConverterTest.cpp \
+        src/armnn/test/FlowControl.cpp \
         src/armnn/test/GraphTests.cpp \
         src/armnn/test/GraphUtils.cpp \
         src/armnn/test/InferOutputTests.cpp \
         src/armnn/test/InstrumentTests.cpp \
+        src/armnnUtils/ModelAccuracyChecker.cpp \
+        src/armnn/test/ModelAccuracyCheckerTest.cpp \
         src/armnn/test/NetworkTests.cpp \
         src/armnn/test/ObservableTest.cpp \
+        src/armnn/test/optimizations/ConvertConstantsFloatToHalfTests.cpp \
+        src/armnn/test/optimizations/ConvertConstantsHalfToFloatTests.cpp \
+        src/armnn/test/optimizations/Fp32NetworkToFp16ConverterTests.cpp \
+        src/armnn/test/optimizations/InsertDebugLayerTests.cpp \
+        src/armnn/test/optimizations/MovePermuteUpTests.cpp \
+        src/armnn/test/optimizations/OptimizeConsecutiveReshapesTests.cpp \
+        src/armnn/test/optimizations/OptimizeInverseConversionsTests.cpp \
+        src/armnn/test/optimizations/OptimizeInversePermutesTests.cpp \
+        src/armnn/test/optimizations/PermuteAndBatchToSpaceAsDepthToSpaceTests.cpp \
+        src/armnn/test/optimizations/PermuteAsReshapeTests.cpp \
+        src/armnn/test/optimizations/SquashEqualSiblingsTests.cpp \
+        src/armnn/test/OptimizerTests.cpp \
         src/armnn/test/OptionalTest.cpp \
+        src/armnn/test/ProfilerTests.cpp \
         src/armnn/test/ProfilingEventTest.cpp \
+        src/armnnUtils/PrototxtConversions.cpp \
+        src/armnnUtils/test/PrototxtConversionsTest.cpp \
         src/armnn/test/SubgraphViewTests.cpp \
         src/armnn/test/TensorHandleStrategyTest.cpp \
         src/armnn/test/TensorTest.cpp \
+        src/armnn/test/TestInputOutputLayerVisitor.cpp \
+        src/armnn/test/TestLayerVisitor.cpp \
+        src/armnn/test/TestNameAndDescriptorLayerVisitor.cpp \
+        src/armnn/test/TestNameOnlyLayerVisitor.cpp \
         src/armnn/test/TestUtils.cpp \
         src/armnn/test/UnitTests.cpp \
         src/armnn/test/UtilsTests.cpp \
-        src/profiling/test/ProfilingTestUtils.cpp
+        src/armnnUtils/test/ParserHelperTest.cpp \
+        src/armnnUtils/test/QuantizeHelperTest.cpp \
+        src/armnnUtils/test/TensorUtilsTest.cpp \
+        src/profiling/test/BufferTests.cpp \
+        src/profiling/test/FileOnlyProfilingDecoratorTests.cpp \
+        src/profiling/test/ProfilingConnectionDumpToFileDecoratorTests.cpp \
+        src/profiling/test/ProfilingGuidTest.cpp \
+        src/profiling/test/ProfilingTests.cpp \
+        src/profiling/test/ProfilingTestUtils.cpp \
+        src/profiling/test/SendCounterPacketTests.cpp \
+        src/profiling/test/SendTimelinePacketTests.cpp \
+        src/profiling/test/TimelinePacketTests.cpp \
+        src/profiling/test/TimelineUtilityMethodsTests.cpp
 
 ifeq ($(ARMNN_REF_ENABLED),1)
 LOCAL_SRC_FILES += \

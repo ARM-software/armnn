@@ -17,7 +17,7 @@ class IExecutionFrame
 {
 
 public:
-    ~IExecutionFrame() {}
+    virtual ~IExecutionFrame() {}
 
     virtual IExecutionFrame* ExecuteWorkloads(IExecutionFrame* previousFrame) = 0;
     virtual void PostAllocationConfigure() {};

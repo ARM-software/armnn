@@ -8,7 +8,7 @@
 #include <backendsCommon/Workload.hpp>
 
 #include <arm_compute/core/Error.h>
-#include <arm_compute/runtime/CPP/functions/CPPDetectionPostProcessLayer.h>
+#include <arm_compute/runtime/NEON/functions/NEDetectionPostProcessLayer.h>
 
 namespace armnn
 {
@@ -31,7 +31,7 @@ public:
     virtual void Execute() const override;
 
 private:
-    mutable arm_compute::CPPDetectionPostProcessLayer m_Func;
+    mutable arm_compute::NEDetectionPostProcessLayer m_Func;
 
     std::unique_ptr<arm_compute::Tensor> m_Anchors;
 

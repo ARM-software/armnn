@@ -62,7 +62,7 @@ arm_compute::Status NeonDetectionPostProcessValidate(const TensorInfo& boxEncodi
     arm_compute::TensorInfo aclNumDetections =
         armcomputetensorutils::BuildArmComputeTensorInfo(numDetections);
 
-    return arm_compute::CPPDetectionPostProcessLayer::validate(
+    return arm_compute::NEDetectionPostProcessLayer::validate(
             &aclBoxEncodings,
             &aclScores,
             &aclAnchors,

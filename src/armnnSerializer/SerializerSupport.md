@@ -44,6 +44,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 * QuantizedLstm
 * Reshape
 * Resize
+* ResizeBilinear
 * Slice
 * Softmax
 * SpaceToBatchNd

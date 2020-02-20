@@ -18,6 +18,8 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 
 * DEPTHWISE_CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 
+* DEQUANTIZE
+
 * FULLY_CONNECTED, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 
 * LOGISTIC
@@ -38,6 +40,8 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 
 * PAD
 
+* QUANTIZE
+
 * RELU
 
 * RELU6
@@ -45,6 +49,8 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 * RESHAPE
 
 * RESIZE_BILINEAR
+
+* RESIZE_NEAREST_NEIGHBOR
 
 * SLICE
 

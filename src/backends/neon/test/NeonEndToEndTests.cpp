@@ -513,7 +513,7 @@ BOOST_AUTO_TEST_CASE(NeonArgMinAxis3TestQuantisedAsymm8)
     ArgMinAxis3EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonDetectionPostProcessRegularNmsTest)
+BOOST_AUTO_TEST_CASE(NeonDetectionPostProcessRegularNmsTest, * boost::unit_test::disabled())
 {
     std::vector<float> boxEncodings({
                                         0.0f, 0.0f, 0.0f, 0.0f,
@@ -550,7 +550,7 @@ inline void QuantizeData(uint8_t* quant, const float* dequant, const TensorInfo&
     }
 }
 
-BOOST_AUTO_TEST_CASE(NeonDetectionPostProcessRegularNmsUint8Test)
+BOOST_AUTO_TEST_CASE(NeonDetectionPostProcessRegularNmsUint8Test, * boost::unit_test::disabled())
 {
     armnn::TensorInfo boxEncodingsInfo({ 1, 6, 4 }, armnn::DataType::Float32);
     armnn::TensorInfo scoresInfo({ 1, 6, 3 }, armnn::DataType::Float32);
@@ -599,7 +599,7 @@ BOOST_AUTO_TEST_CASE(NeonDetectionPostProcessRegularNmsUint8Test)
                                                                              1.0f, 1, 0.01f, 0, 0.5f, 0);
 }
 
-BOOST_AUTO_TEST_CASE(NeonDetectionPostProcessFastNmsTest)
+BOOST_AUTO_TEST_CASE(NeonDetectionPostProcessFastNmsTest, * boost::unit_test::disabled())
 {
     std::vector<float> boxEncodings({
                                         0.0f, 0.0f, 0.0f, 0.0f,
@@ -628,7 +628,7 @@ BOOST_AUTO_TEST_CASE(NeonDetectionPostProcessFastNmsTest)
     DetectionPostProcessFastNmsEndToEnd<armnn::DataType::Float32>(defaultBackends, boxEncodings, scores, anchors);
 }
 
-BOOST_AUTO_TEST_CASE(RefDetectionPostProcessFastNmsUint8Test)
+BOOST_AUTO_TEST_CASE(NeonDetectionPostProcessFastNmsUint8Test, * boost::unit_test::disabled())
 {
     armnn::TensorInfo boxEncodingsInfo({ 1, 6, 4 }, armnn::DataType::Float32);
     armnn::TensorInfo scoresInfo({ 1, 6, 3 }, armnn::DataType::Float32);

@@ -45,57 +45,41 @@ void TimelineCaptureCommandHandler::ParseData(const armnn::profiling::Packet& pa
 
 void TimelineCaptureCommandHandler::ReadLabel(const unsigned char* data, uint32_t offset)
 {
-    Label label;
+    ITimelineDecoder::Label label;
     label.m_Guid = profiling::ReadUint64(data, offset);
     offset += uint64_t_size;
 
     uint32_t nameLength = profiling::ReadUint32(data, offset);
     offset += uint32_t_size;
 
-    label.m_Name = new char[nameLength];
-    for (uint32_t i = 0; i< nameLength; ++i)
+    for (uint32_t i = 0; i < nameLength-1; ++i)
     {
-        label.m_Name[i] = static_cast<char>(profiling::ReadUint8(data, offset + i));
+        label.m_Name += static_cast<char>(profiling::ReadUint8(data, offset + i));
     }
-
-    CreateLabel(label, m_Model);
-
-    if (!m_QuietOperation)
-    {
-        printLabels();
-    }
+    m_TimelineDecoder.CreateLabel(label);
 }
 
 void TimelineCaptureCommandHandler::ReadEntity(const unsigned char* data, uint32_t offset)
 {
-    Entity entity;
+    ITimelineDecoder::Entity entity;
     entity.m_Guid = profiling::ReadUint64(data, offset);
 
-    CreateEntity(entity, m_Model);
-
-    if (!m_QuietOperation)
-    {
-        printEntities();
-    }
+    m_TimelineDecoder.CreateEntity(entity);
 }
 
 void TimelineCaptureCommandHandler::ReadEventClass(const unsigned char* data, uint32_t offset)
 {
-    EventClass eventClass;
+    ITimelineDecoder::EventClass eventClass;
     eventClass.m_Guid = profiling::ReadUint64(data, offset);
 
-    CreateEventClass(eventClass, m_Model);
-
-    if (!m_QuietOperation)
-    {
-        printEventClasses();
-    }
+    m_TimelineDecoder.CreateEventClass(eventClass);
 }
 
 void TimelineCaptureCommandHandler::ReadRelationship(const unsigned char* data, uint32_t offset)
 {
-    Relationship relationship;
-    relationship.m_RelationshipType = static_cast<RelationshipType>(profiling::ReadUint32(data, offset));
+    ITimelineDecoder::Relationship relationship;
+    relationship.m_RelationshipType =
+        static_cast<ITimelineDecoder::RelationshipType>(profiling::ReadUint32(data, offset));
     offset += uint32_t_size;
 
     relationship.m_Guid = profiling::ReadUint64(data, offset);
@@ -106,193 +90,34 @@ void TimelineCaptureCommandHandler::ReadRelationship(const unsigned char* data, 
 
     relationship.m_TailGuid = profiling::ReadUint64(data, offset);
 
-    CreateRelationship(relationship, m_Model);
-
-    if (!m_QuietOperation)
-    {
-        printRelationships();
-    }
+    m_TimelineDecoder.CreateRelationship(relationship);
 }
-
-
 
 void TimelineCaptureCommandHandler::ReadEvent(const unsigned char* data, uint32_t offset)
 {
-    Event event;
+    ITimelineDecoder::Event event;
     event.m_TimeStamp = profiling::ReadUint64(data, offset);
     offset += uint64_t_size;
 
-    event.m_ThreadId = new uint8_t[threadId_size];
-    profiling::ReadBytes(data, offset, threadId_size, event.m_ThreadId);
-    offset += threadId_size;
+    if (m_ThreadIdSize == 4)
+    {
+        event.m_ThreadId = profiling::ReadUint32(data, offset);
+    }
+    else if (m_ThreadIdSize == 8)
+    {
+        event.m_ThreadId = profiling::ReadUint64(data, offset);
+    }
+
+    offset += m_ThreadIdSize;
 
     event.m_Guid = profiling::ReadUint64(data, offset);
 
-    CreateEvent(event, m_Model);
-
-    if (!m_QuietOperation)
-    {
-        printEvents();
-    }
+    m_TimelineDecoder.CreateEvent(event);
 }
 
 void TimelineCaptureCommandHandler::operator()(const profiling::Packet& packet)
 {
     ParseData(packet);
-}
-
-void TimelineCaptureCommandHandler::printLabels()
-{
-    std::string header;
-
-    header.append(profiling::CentreAlignFormatting("guid", 12));
-    header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("value", 30));
-    header.append("\n");
-
-    std::cout << "\n" << "\n";
-    std::cout << profiling::CentreAlignFormatting("LABELS", static_cast<int>(header.size()));
-    std::cout << "\n";
-    std::cout << std::string(header.size(), '=') << "\n";
-    std::cout << header;
-
-    for (uint32_t i = 0; i < m_Model->m_LabelCount; ++i)
-    {
-        std::string body;
-
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model->m_Labels[i]->m_Guid), 12));
-        body.append(" | ");
-        body.append(profiling::CentreAlignFormatting(m_Model->m_Labels[i]->m_Name, 30));
-        body.append("\n");
-
-        std::cout << std::string(body.size(), '-') << "\n";
-        std::cout<< body;
-    }
-}
-
-void TimelineCaptureCommandHandler::printEntities()
-{
-    std::string header;
-    header.append(profiling::CentreAlignFormatting("guid", 12));
-    header.append("\n");
-
-    std::cout << "\n" << "\n";
-    std::cout << profiling::CentreAlignFormatting("ENTITIES", static_cast<int>(header.size()));
-    std::cout << "\n";
-    std::cout << std::string(header.size(), '=') << "\n";
-    std::cout << header;
-
-    for (uint32_t i = 0; i < m_Model->m_EntityCount; ++i)
-    {
-        std::string body;
-
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model->m_Entities[i]->m_Guid), 12));
-        body.append("\n");
-
-        std::cout << std::string(body.size(), '-') << "\n";
-        std::cout<< body;
-    }
-}
-
-void TimelineCaptureCommandHandler::printEventClasses()
-{
-    std::string header;
-    header.append(profiling::CentreAlignFormatting("guid", 12));
-    header.append("\n");
-
-    std::cout << "\n" << "\n";
-    std::cout << profiling::CentreAlignFormatting("EVENT CLASSES", static_cast<int>(header.size()));
-    std::cout << "\n";
-    std::cout << std::string(header.size(), '=') << "\n";
-    std::cout << header;
-
-    for (uint32_t i = 0; i < m_Model->m_EventClassCount; ++i)
-    {
-        std::string body;
-
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model->m_EventClasses[i]->m_Guid), 12));
-        body.append("\n");
-
-        std::cout << std::string(body.size(), '-') << "\n";
-        std::cout<< body;
-    }
-}
-
-void TimelineCaptureCommandHandler::printRelationships()
-{
-    std::string header;
-    header.append(profiling::CentreAlignFormatting("relationshipType", 20));
-    header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("relationshipGuid", 20));
-    header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("headGuid", 12));
-    header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("tailGuid", 12));
-    header.append("\n");
-
-    std::cout << "\n" << "\n";
-    std::cout << profiling::CentreAlignFormatting("RELATIONSHIPS", static_cast<int>(header.size()));
-    std::cout << "\n";
-    std::cout << std::string(header.size(), '=') << "\n";
-    std::cout << header;
-
-    for (uint32_t i = 0; i < m_Model->m_RelationshipCount; ++i)
-    {
-        std::string body;
-
-        body.append(
-                profiling::CentreAlignFormatting(std::to_string(m_Model->m_Relationships[i]->m_RelationshipType), 20));
-        body.append(" | ");
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model->m_Relationships[i]->m_Guid), 20));
-        body.append(" | ");
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model->m_Relationships[i]->m_HeadGuid), 12));
-        body.append(" | ");
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model->m_Relationships[i]->m_TailGuid), 12));
-        body.append(" | ");
-        body.append("\n");
-
-        std::cout << std::string(body.size(), '-') << "\n";
-        std::cout<< body;
-    }
-}
-
-void TimelineCaptureCommandHandler::printEvents()
-{
-    std::string header;
-
-    header.append(profiling::CentreAlignFormatting("timestamp", 12));
-    header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("threadId", 12));
-    header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("eventGuid", 12));
-    header.append("\n");
-
-    std::cout << "\n" << "\n";
-    std::cout << profiling::CentreAlignFormatting("EVENTS", static_cast<int>(header.size()));
-    std::cout << "\n";
-    std::cout << std::string(header.size(), '=') << "\n";
-    std::cout << header;
-
-    for (uint32_t i = 0; i < m_Model->m_EventCount; ++i)
-    {
-        std::string body;
-
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model->m_Events[i]->m_TimeStamp), 12));
-        body.append(" | ");
-
-        std::string threadId;
-        for(uint32_t j =0; j< threadId_size; j++)
-        {
-            threadId += static_cast<char>(m_Model->m_Events[i]->m_ThreadId[j]);
-        }
-        body.append(profiling::CentreAlignFormatting(threadId, 12));
-        body.append(" | ");
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model->m_Events[i]->m_Guid), 12));
-        body.append("\n");
-
-        std::cout << std::string(body.size(), '-') << "\n";
-        std::cout<< body;
-    }
 }
 
 } //namespace gatordmock

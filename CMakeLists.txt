@@ -973,13 +973,13 @@ if(BUILD_GATORD_MOCK)
         tests/profiling/gatordmock/PeriodicCounterSelectionResponseHandler.hpp
         tests/profiling/gatordmock/StreamMetadataCommandHandler.cpp
         tests/profiling/gatordmock/StreamMetadataCommandHandler.hpp
-        tests/profiling/timelineDecoder/ITimelineDecoder.h
+        tests/profiling/timelineDecoder/ITimelineDecoder.hpp
         tests/profiling/timelineDecoder/TimelineCaptureCommandHandler.cpp
         tests/profiling/timelineDecoder/TimelineCaptureCommandHandler.hpp
         tests/profiling/timelineDecoder/TimelineDecoder.cpp
+        tests/profiling/timelineDecoder/TimelineDecoder.hpp
         tests/profiling/timelineDecoder/TimelineDirectoryCaptureCommandHandler.cpp
         tests/profiling/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp
-        tests/profiling/timelineDecoder/tests/TimelineTestFunctions.hpp
         )
 
     include_directories(${Boost_INCLUDE_DIRS} src/profiling)

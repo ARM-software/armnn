@@ -3,164 +3,283 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ITimelineDecoder.h"
+#include "TimelineDecoder.hpp"
 
-ErrorCode CreateEntity(const Entity entity, Model* model)
+#include <ProfilingUtils.hpp>
+
+#include <iostream>
+namespace armnn
 {
-    if (model == nullptr || model->m_EntityCb == nullptr)
+TimelineDecoder::ErrorCode TimelineDecoder::CreateEntity(const Entity &entity)
+{
+    if (m_OnNewEntityCallback == nullptr)
     {
         return ErrorCode::ErrorCode_Fail;
     }
-    model->m_EntityCb(entity, model);
+    m_OnNewEntityCallback(m_Model, entity);
+
     return ErrorCode::ErrorCode_Success;
 }
 
-ErrorCode CreateEventClass(const EventClass eventClass, Model* model)
+TimelineDecoder::ErrorCode TimelineDecoder::CreateEventClass(const EventClass &eventClass)
 {
-    if (model == nullptr || model->m_EventClassCb == nullptr)
+    if (m_OnNewEventClassCallback == nullptr)
     {
         return ErrorCode::ErrorCode_Fail;
     }
-    model->m_EventClassCb(eventClass, model);
+    m_OnNewEventClassCallback(m_Model, eventClass);
+
     return ErrorCode::ErrorCode_Success;
 }
 
-ErrorCode CreateEvent(const Event event, Model* model)
+TimelineDecoder::ErrorCode TimelineDecoder::CreateEvent(const Event &event)
 {
-    if (model == nullptr || model->m_EventCb == nullptr)
+    if (m_OnNewEventCallback == nullptr)
     {
         return ErrorCode::ErrorCode_Fail;
     }
-    model->m_EventCb(event, model);
+    m_OnNewEventCallback(m_Model, event);
+
     return ErrorCode::ErrorCode_Success;
 }
 
-ErrorCode CreateLabel(const Label label, Model* model)
+TimelineDecoder::ErrorCode TimelineDecoder::CreateLabel(const Label &label)
 {
-    if (model == nullptr || model->m_LabelCb == nullptr)
+    if (m_OnNewLabelCallback == nullptr)
     {
         return ErrorCode::ErrorCode_Fail;
     }
-    model->m_LabelCb(label, model);
+    m_OnNewLabelCallback(m_Model, label);
+
     return ErrorCode::ErrorCode_Success;
 }
 
-ErrorCode CreateRelationship(Relationship relationship, Model* model)
+TimelineDecoder::ErrorCode TimelineDecoder::CreateRelationship(const Relationship &relationship)
 {
-    if (model == nullptr || model->m_RelationshipCb == nullptr)
+    if (m_OnNewRelationshipCallback == nullptr)
     {
         return ErrorCode::ErrorCode_Fail;
     }
-    model->m_RelationshipCb(relationship, model);
+    m_OnNewRelationshipCallback(m_Model, relationship);
     return ErrorCode::ErrorCode_Success;
 }
 
-ErrorCode SetEntityCallback(OnNewEntityCallback cb, Model* model)
+const TimelineDecoder::Model &TimelineDecoder::GetModel()
 {
-    if (cb == nullptr || model == nullptr)
+    return m_Model;
+}
+
+TimelineDecoder::ErrorCode TimelineDecoder::SetEntityCallback(OnNewEntityCallback cb)
+{
+    if (cb == nullptr)
     {
         return ErrorCode::ErrorCode_Fail;
     }
-    model->m_EntityCb = cb;
+    m_OnNewEntityCallback = cb;
     return ErrorCode::ErrorCode_Success;
 }
 
-ErrorCode SetEventClassCallback(OnNewEventClassCallback cb, Model* model)
+TimelineDecoder::ErrorCode TimelineDecoder::SetEventClassCallback(OnNewEventClassCallback cb)
 {
-    if (cb == nullptr || model == nullptr)
+    if (cb == nullptr)
     {
         return ErrorCode::ErrorCode_Fail;
     }
-    model->m_EventClassCb = cb;
+    m_OnNewEventClassCallback = cb;
     return ErrorCode::ErrorCode_Success;
 }
 
-ErrorCode SetEventCallback(OnNewEventCallback cb, Model* model)
+TimelineDecoder::ErrorCode TimelineDecoder::SetEventCallback(OnNewEventCallback cb)
 {
-    if (cb == nullptr || model == nullptr)
+    if (cb == nullptr)
     {
         return ErrorCode::ErrorCode_Fail;
     }
-    model->m_EventCb = cb;
+    m_OnNewEventCallback = cb;
     return ErrorCode::ErrorCode_Success;
 }
 
-ErrorCode SetLabelCallback(OnNewLabelCallback cb, Model* model)
+TimelineDecoder::ErrorCode TimelineDecoder::SetLabelCallback(OnNewLabelCallback cb)
 {
-    if (cb == nullptr || model == nullptr)
+    if (cb == nullptr)
     {
         return ErrorCode::ErrorCode_Fail;
     }
-    model->m_LabelCb = cb;
+    m_OnNewLabelCallback = cb;
     return ErrorCode::ErrorCode_Success;
 }
 
-ErrorCode SetRelationshipCallback(OnNewRelationshipCallback cb, Model* model)
+TimelineDecoder::ErrorCode TimelineDecoder::SetRelationshipCallback(OnNewRelationshipCallback cb)
 {
-    if (cb == nullptr || model == nullptr)
+    if (cb == nullptr)
     {
         return ErrorCode::ErrorCode_Fail;
     }
-    model->m_RelationshipCb = cb;
+    m_OnNewRelationshipCallback = cb;
     return ErrorCode::ErrorCode_Success;
 }
 
-ErrorCode CreateModel(Model** model)
+void TimelineDecoder::print()
 {
-    Model* modelPtr = new Model;
-
-    modelPtr->m_EntityCount = 0;
-    modelPtr->m_EventClassCount = 0;
-    modelPtr->m_EventCount = 0;
-    modelPtr->m_LabelCount = 0;
-    modelPtr->m_RelationshipCount = 0;
-
-    *model = modelPtr;
-    return ErrorCode::ErrorCode_Success;
+    printLabels();
+    printEntities();
+    printEventClasses();
+    printEvents();
+    printRelationships();
 }
 
-ErrorCode DestroyModel(Model** model)
+void TimelineDecoder::printLabels()
 {
-    if (*model == nullptr)
+    std::string header;
+
+    header.append(profiling::CentreAlignFormatting("guid", 12));
+    header.append(" | ");
+    header.append(profiling::CentreAlignFormatting("value", 30));
+    header.append("\n");
+
+    std::cout << "\n" << "\n";
+    std::cout << profiling::CentreAlignFormatting("LABELS", static_cast<int>(header.size()));
+    std::cout << "\n";
+    std::cout << std::string(header.size(), '=') << "\n";
+    std::cout << header;
+
+    for (uint32_t i = 0; i < m_Model.m_Labels.size(); ++i)
     {
-        return ErrorCode::ErrorCode_Fail;
+        std::string body;
+
+        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_Labels[i].m_Guid), 12));
+        body.append(" | ");
+        body.append(profiling::CentreAlignFormatting(m_Model.m_Labels[i].m_Name, 30));
+        body.append("\n");
+
+        std::cout << std::string(body.size(), '-') << "\n";
+        std::cout << body;
     }
+}
 
-    Model* modelPtr = *model;
+void TimelineDecoder::printEntities()
+{
+    std::string header;
+    header.append(profiling::CentreAlignFormatting("guid", 12));
+    header.append("\n");
 
-    for (uint32_t i = 0; i < modelPtr->m_EntityCount; ++i)
+    std::cout << "\n" << "\n";
+    std::cout << profiling::CentreAlignFormatting("ENTITIES", static_cast<int>(header.size()));
+    std::cout << "\n";
+    std::cout << std::string(header.size(), '=') << "\n";
+    std::cout << header;
+
+    for (uint32_t i = 0; i < m_Model.m_Entities.size(); ++i)
     {
-        delete modelPtr->m_Entities[i];
-    }
+        std::string body;
 
-    for (uint32_t i = 0; i < modelPtr->m_EventClassCount; ++i)
+        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_Entities[i].m_Guid), 12));
+        body.append("\n");
+
+        std::cout << std::string(body.size(), '-') << "\n";
+        std::cout << body;
+    }
+}
+
+void TimelineDecoder::printEventClasses()
+{
+    std::string header;
+    header.append(profiling::CentreAlignFormatting("guid", 12));
+    header.append("\n");
+
+    std::cout << "\n" << "\n";
+    std::cout << profiling::CentreAlignFormatting("EVENT CLASSES", static_cast<int>(header.size()));
+    std::cout << "\n";
+    std::cout << std::string(header.size(), '=') << "\n";
+    std::cout << header;
+
+    for (uint32_t i = 0; i < m_Model.m_EventClasses.size(); ++i)
     {
-        delete modelPtr->m_EventClasses[i];
-    }
+        std::string body;
 
-    for (uint32_t i = 0; i < modelPtr->m_EventCount; ++i)
+        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_EventClasses[i].m_Guid), 12));
+        body.append("\n");
+
+        std::cout << std::string(body.size(), '-') << "\n";
+        std::cout << body;
+    }
+}
+
+void TimelineDecoder::printEvents()
+{
+    std::string header;
+
+    header.append(profiling::CentreAlignFormatting("timestamp", 12));
+    header.append(" | ");
+    header.append(profiling::CentreAlignFormatting("threadId", 12));
+    header.append(" | ");
+    header.append(profiling::CentreAlignFormatting("eventGuid", 12));
+    header.append("\n");
+
+    std::cout << "\n" << "\n";
+    std::cout << profiling::CentreAlignFormatting("EVENTS", static_cast<int>(header.size()));
+    std::cout << "\n";
+    std::cout << std::string(header.size(), '=') << "\n";
+    std::cout << header;
+
+    for (uint32_t i = 0; i < m_Model.m_Events.size(); ++i)
     {
-        delete[] modelPtr->m_Events[i]->m_ThreadId;
-        delete modelPtr->m_Events[i];
-    }
+        std::string body;
 
-    for (uint32_t i = 0; i < modelPtr->m_LabelCount; ++i)
+        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_Events[i].m_TimeStamp), 12));
+        body.append(" | ");
+
+        std::stringstream ss;
+        ss << m_Model.m_Events[i].m_ThreadId;
+        std::string threadId = ss.str();;
+
+        body.append(profiling::CentreAlignFormatting(threadId, 12));
+        body.append(" | ");
+        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_Events[i].m_Guid), 12));
+        body.append("\n");
+
+        std::cout << std::string(body.size(), '-') << "\n";
+        std::cout << body;
+    }
+}
+
+void TimelineDecoder::printRelationships()
+{
+    std::string header;
+    header.append(profiling::CentreAlignFormatting("relationshipType", 20));
+    header.append(" | ");
+    header.append(profiling::CentreAlignFormatting("relationshipGuid", 20));
+    header.append(" | ");
+    header.append(profiling::CentreAlignFormatting("headGuid", 12));
+    header.append(" | ");
+    header.append(profiling::CentreAlignFormatting("tailGuid", 12));
+    header.append("\n");
+
+    std::cout << "\n" << "\n";
+    std::cout << profiling::CentreAlignFormatting("RELATIONSHIPS", static_cast<int>(header.size()));
+    std::cout << "\n";
+    std::cout << std::string(header.size(), '=') << "\n";
+    std::cout << header;
+
+    for (uint32_t i = 0; i < m_Model.m_Relationships.size(); ++i)
     {
-        delete[] modelPtr->m_Labels[i]->m_Name;
-        delete modelPtr->m_Labels[i];
+        std::string body;
+
+        body.append(
+                profiling::CentreAlignFormatting(std::to_string(static_cast<unsigned int>
+                                                                (m_Model.m_Relationships[i].m_RelationshipType)),
+                                                 20));
+        body.append(" | ");
+        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_Relationships[i].m_Guid), 20));
+        body.append(" | ");
+        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_Relationships[i].m_HeadGuid), 12));
+        body.append(" | ");
+        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_Relationships[i].m_TailGuid), 12));
+        body.append(" | ");
+        body.append("\n");
+
+        std::cout << std::string(body.size(), '-') << "\n";
+        std::cout << body;
     }
-
-    for (uint32_t i = 0; i < modelPtr->m_RelationshipCount; ++i)
-    {
-        delete modelPtr->m_Relationships[i];
-    }
-
-    delete[] modelPtr->m_Entities;
-    delete[] modelPtr->m_EventClasses;
-    delete[] modelPtr->m_Events;
-    delete[] modelPtr->m_Labels;
-    delete[] modelPtr->m_Relationships;
-
-    delete modelPtr;
-    return ErrorCode::ErrorCode_Success;
+}
 }

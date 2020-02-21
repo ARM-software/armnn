@@ -5,9 +5,7 @@
 
 #include "../TimelineCaptureCommandHandler.hpp"
 #include "../TimelineDirectoryCaptureCommandHandler.hpp"
-#include "../ITimelineDecoder.h"
-#include "../TimelineModel.h"
-#include "TimelineTestFunctions.hpp"
+#include "timelineDecoder/TimelineDecoder.hpp"
 
 #include <CommandHandlerFunctor.hpp>
 #include <ProfilingService.hpp>
@@ -43,6 +41,31 @@ void SendTimelinePacketToCommandHandler(const unsigned char* packetBuffer,
     BOOST_CHECK(std::memcmp(packetBuffer + offset, packet.GetData(), packet.GetLength()) == 0);
 
     CommandHandler(packet);
+}
+
+void PushEntity(TimelineDecoder::Model& model, const ITimelineDecoder::Entity entity)
+{
+    model.m_Entities.emplace_back(entity);
+}
+
+void PushEventClass(TimelineDecoder::Model& model, const ITimelineDecoder::EventClass eventClass)
+{
+    model.m_EventClasses.emplace_back(eventClass);
+}
+
+void PushEvent(TimelineDecoder::Model& model, const ITimelineDecoder::Event event)
+{
+    model.m_Events.emplace_back(event);
+}
+
+void PushLabel(TimelineDecoder::Model& model, const ITimelineDecoder::Label label)
+{
+    model.m_Labels.emplace_back(label);
+}
+
+void PushRelationship(TimelineDecoder::Model& model, const ITimelineDecoder::Relationship relationship)
+{
+    model.m_Relationships.emplace_back(relationship);
 }
 
 BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
@@ -116,8 +139,7 @@ BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
 
 BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
 {
-    uint32_t threadId_size = sizeof(std::thread::id);
-
+    unsigned int threadIdSize = sizeof(std::thread::id);
     profiling::BufferManager bufferManager(50);
     profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
 
@@ -126,33 +148,49 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
 
     profiling::PacketVersionResolver packetVersionResolver;
 
-    Model* modelPtr;
-    CreateModel(&modelPtr);
+    TimelineDecoder timelineDecoder;
+    const TimelineDecoder::Model& model = timelineDecoder.GetModel();
 
     gatordmock::TimelineCaptureCommandHandler timelineCaptureCommandHandler(
-        1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), modelPtr, true);
+        1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder, threadIdSize);
 
-    BOOST_CHECK(SetEntityCallback(PushEntity, modelPtr)             == ErrorCode_Success);
-    BOOST_CHECK(SetEventClassCallback(PushEventClass, modelPtr)     == ErrorCode_Success);
-    BOOST_CHECK(SetEventCallback(PushEvent, modelPtr)               == ErrorCode_Success);
-    BOOST_CHECK(SetLabelCallback(PushLabel, modelPtr)               == ErrorCode_Success);
-    BOOST_CHECK(SetRelationshipCallback(PushRelationship, modelPtr) == ErrorCode_Success);
+    BOOST_CHECK(timelineDecoder.SetEntityCallback(PushEntity) == ITimelineDecoder::ErrorCode::ErrorCode_Success);
+    BOOST_CHECK(
+        timelineDecoder.SetEventClassCallback(PushEventClass )== ITimelineDecoder::ErrorCode::ErrorCode_Success);
+    BOOST_CHECK(timelineDecoder.SetEventCallback(PushEvent) == ITimelineDecoder::ErrorCode::ErrorCode_Success);
+    BOOST_CHECK(timelineDecoder.SetLabelCallback(PushLabel) == ITimelineDecoder::ErrorCode::ErrorCode_Success);
+    BOOST_CHECK(
+        timelineDecoder.SetRelationshipCallback(PushRelationship) == ITimelineDecoder::ErrorCode::ErrorCode_Success);
 
-    const uint64_t entityGuid = 22222u;
+    const uint64_t entityGuid = 111111u ;
+    const uint64_t eventClassGuid = 22222u;
+    const uint64_t timestamp = 33333u;
+    const uint64_t eventGuid = 44444u;
 
-    const uint64_t eventClassGuid = 33333u;
+    const std::thread::id threadId = std::this_thread::get_id();
 
-    const uint64_t timestamp = 111111u;
-    const uint64_t eventGuid = 55555u;
+    // need to do a bit of work here to extract the value from threadId
+    unsigned char* uCharThreadId = new unsigned char[threadIdSize]();;
+    uint64_t uint64ThreadId;
 
-    const std::thread::id threadId = std::this_thread::get_id();;
+    profiling::WriteBytes(uCharThreadId, 0, &threadId, threadIdSize);
 
-    const uint64_t labelGuid = 11111u;
+    if (threadIdSize == 4)
+    {
+        uint64ThreadId =  profiling::ReadUint32(uCharThreadId, 0);
+    }
+    else if (threadIdSize == 8)
+    {
+        uint64ThreadId =  profiling::ReadUint64(uCharThreadId, 0);
+    }
+    delete[] uCharThreadId;
+
+    const uint64_t labelGuid = 66666u;
     std::string labelName = "test_label";
 
-    const uint64_t relationshipGuid = 44444u;
-    const uint64_t headGuid = 111111u;
-    const uint64_t tailGuid = 222222u;
+    const uint64_t relationshipGuid = 77777u;
+    const uint64_t headGuid = 888888u;
+    const uint64_t tailGuid = 999999u;
 
     for (int i = 0; i < 10; ++i)
     {
@@ -191,30 +229,24 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
                                            timelineCaptureCommandHandler);
     }
 
-    for (int i = 0; i < 10; ++i)
+    for (unsigned long i = 0; i < 10; ++i)
     {
-        BOOST_CHECK(modelPtr->m_Entities[i]->m_Guid == entityGuid);
+        BOOST_CHECK(model.m_Entities[i].m_Guid == entityGuid);
 
-        BOOST_CHECK(modelPtr->m_EventClasses[i]->m_Guid == eventClassGuid);
+        BOOST_CHECK(model.m_EventClasses[i].m_Guid == eventClassGuid);
 
-        BOOST_CHECK(modelPtr->m_Events[i]->m_TimeStamp == timestamp);
+        BOOST_CHECK(model.m_Events[i].m_TimeStamp == timestamp);
+        BOOST_CHECK(model.m_Events[i].m_ThreadId == uint64ThreadId);
+        BOOST_CHECK(model.m_Events[i].m_Guid == eventGuid);
 
-        std::vector<uint8_t> readThreadId(threadId_size, 0);
-        profiling::ReadBytes(modelPtr->m_Events[i]->m_ThreadId, 0, threadId_size, readThreadId.data());
-        BOOST_CHECK(readThreadId == threadId);
+        BOOST_CHECK(model.m_Labels[i].m_Guid == labelGuid);
+        BOOST_CHECK(model.m_Labels[i].m_Name == labelName);
 
-        BOOST_CHECK(modelPtr->m_Events[i]->m_Guid == eventGuid);
-
-        BOOST_CHECK(modelPtr->m_Labels[i]->m_Guid == labelGuid);
-        BOOST_CHECK(std::string(modelPtr->m_Labels[i]->m_Name) == labelName);
-
-        BOOST_CHECK(modelPtr->m_Relationships[i]->m_RelationshipType == RelationshipType::DataLink);
-        BOOST_CHECK(modelPtr->m_Relationships[i]->m_Guid == relationshipGuid);
-        BOOST_CHECK(modelPtr->m_Relationships[i]->m_HeadGuid == headGuid);
-        BOOST_CHECK(modelPtr->m_Relationships[i]->m_TailGuid == tailGuid);
+        BOOST_CHECK(model.m_Relationships[i].m_RelationshipType == ITimelineDecoder::RelationshipType::DataLink);
+        BOOST_CHECK(model.m_Relationships[i].m_Guid == relationshipGuid);
+        BOOST_CHECK(model.m_Relationships[i].m_HeadGuid == headGuid);
+        BOOST_CHECK(model.m_Relationships[i].m_TailGuid == tailGuid);
     }
-
-    DestroyModel(&modelPtr);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

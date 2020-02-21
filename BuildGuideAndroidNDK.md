@@ -286,7 +286,7 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 * Run ArmNN unit tests:
 
 	```bash
-	adb shell 'export LD_LIBRARY_PATH=/data/local/tmp:/vendor/lib64:/vendor/lib64/egl /data/local/tmp/UnitTests'
+	adb shell 'LD_LIBRARY_PATH=/data/local/tmp:/vendor/lib64:/vendor/lib64/egl /data/local/tmp/UnitTests'
 	```
 
 	If libarmnnUtils.a is present in `~/armnn-devenv/armnn/build/` and the unit tests run without failure then the build was successful.

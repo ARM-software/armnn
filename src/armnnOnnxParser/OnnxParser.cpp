@@ -234,15 +234,26 @@ armnn::TensorInfo ToTensorInfo(const onnx::ValueInfoProto& info)
       shapeDims.push_back(CHECKED_NON_NEGATIVE(CHECKED_INT32(onnxShape.dim(i).dim_value())));
   }
 
+  if (shapeDims.empty())
+  {
+      shapeDims.push_back(1);
+  }
+
   return ToTensorInfo(info.name(), shapeDims, info.type().tensor_type().elem_type());
 }
 
 armnn::TensorInfo ToTensorInfo(const onnx::TensorProto& tensor)
 {
   std::vector<unsigned int> shapeDims;
+
   for (auto dim: tensor.dims())
   {
       shapeDims.push_back(CHECKED_NON_NEGATIVE(CHECKED_INT32(dim)));
+  }
+
+  if (shapeDims.empty())
+  {
+      shapeDims.push_back(1);
   }
 
   return ToTensorInfo(tensor.name(), shapeDims, tensor.data_type());
@@ -624,7 +635,7 @@ void OnnxParser::LoadGraph()
         const std::string& operation = node.op_type();
 
         // check which layers we handled already (add and matmul fused as FC)
-        if(operation == "MatMul" )
+        if (operation == "MatMul" )
         {
             if(m_OutputsFusedAndUsed[nodeIndex].inputForNodes != m_OutputsFusedAndUsed[nodeIndex].fusedWithNodes.size())
             {
@@ -881,7 +892,6 @@ void OnnxParser::CreateConstantLayer(const std::string& tensorName, const std::s
 void OnnxParser::ParseConstant(const onnx::NodeProto& node)
 {
     CHECK_VALID_SIZE(static_cast<size_t>(node.attribute_size()), 1);
-
     if (!node.attribute(0).has_t())
     {
         throw ParseException(boost::str(
@@ -897,9 +907,10 @@ void OnnxParser::ParseConstant(const onnx::NodeProto& node)
 
     //Register this as a m_ConstParam so we know we can use it as a constant param in future layers.
     m_TensorsInfo[node.output(0)].m_tensor = std::make_unique<const onnx::TensorProto>(onnxTensor);
+    m_TensorsInfo[node.output(0)].m_info = std::make_unique<TensorInfo>(ToTensorInfo(onnxTensor));
+    m_TensorsInfo[node.output(0)].m_dtype = static_cast<onnx::TensorProto::DataType>(onnxTensor.data_type());
 
     CreateConstantLayer(node.output(0), node.name());
-
 }
 
 void OnnxParser::ParseMaxPool(const onnx::NodeProto& node)
@@ -1505,11 +1516,9 @@ void OnnxParser::ParseAdd(const onnx::NodeProto& node)
 
      // register the input connection -> for constant inputs, we need to make a newDim constant layer
      if(m_TensorsInfo[inputs.first].isConstant()) {
-
          CreateConstantLayer(inputs.first, boost::str(boost::format("Add:constant_of_%1%") % node.input(0)));
      }
      if(m_TensorsInfo[inputs.second].isConstant()) {
-
          CreateConstantLayer(inputs.second, boost::str(boost::format("Add:constant_of_%1%") % node.input(1)));
      }
      RegisterInputSlots(layer, {inputs.first, inputs.second});
@@ -1653,16 +1662,16 @@ void OnnxParser::RegisterOutputSlots(IConnectableLayer* layer, const std::vector
             m_TensorConnections[tensorId] = TensorSlots();
         }
 
-        TensorSlots & tensorSlots = m_TensorConnections[tensorId];
+        TensorSlots& tensorSlots = m_TensorConnections[tensorId];
 
         // assuming there is only one producer for that tensor
         if (tensorSlots.outputSlot != nullptr)
         {
             throw ParseException(boost::str(
                     boost::format("Another layer has already registered itself as the producer of "
-                                  "tensor:%2% %3%") %
-                                   tensorId %
-                                   CHECK_LOCATION().AsString()));
+                                  "tensor:%1% %2%")
+                                  % tensorId
+                                  % CHECK_LOCATION().AsString()));
         }
         tensorSlots.outputSlot = slot;
     }

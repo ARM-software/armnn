@@ -54,10 +54,10 @@ public:
     static ModelPtr LoadModelFromTextFile(const char * fileName);
     static ModelPtr LoadModelFromString(const std::string& inputString);
 
-    ///Retrieve inputs names
+    /// Retrieve inputs names
     static std::vector<std::string> GetInputs(ModelPtr& model);
 
-    ///Retrieve outputs names
+    /// Retrieve outputs names
     static std::vector<std::string> GetOutputs(ModelPtr& model);
 
 private:
@@ -65,7 +65,7 @@ private:
     /// Parses a ModelProto loaded into memory from one of the other CreateNetwork*
     armnn::INetworkPtr CreateNetworkFromModel(onnx::ModelProto& model);
 
-    ///Parse every node and make the connection between the resulting tensors
+    /// Parse every node and make the connection between the resulting tensors
     void LoadGraph();
 
     void SetupInfo(const google::protobuf::RepeatedPtrField<onnx::ValueInfoProto >* list);
@@ -136,10 +136,10 @@ private:
     /// The network we're building. Gets cleared after it is passed to the user
     armnn::INetworkPtr m_Network;
 
-    ///Ptr to the graph we're building the network from
+    /// Ptr to the graph we're building the network from
     GraphPtr m_Graph;
 
-    ///Map of the information for every tensor
+    /// Map of the information for every tensor
     struct OnnxTensor
     {
         std::unique_ptr<armnn::TensorInfo>          m_info;
@@ -148,7 +148,6 @@ private:
 
         OnnxTensor() : m_info(nullptr), m_tensor(nullptr), m_dtype(onnx::TensorProto::FLOAT) { }
         bool isConstant() { return m_tensor != nullptr; }
-
     };
 
     std::unordered_map<std::string, OnnxTensor> m_TensorsInfo;
@@ -166,10 +165,10 @@ private:
 
         TensorSlots() : outputSlot(nullptr) { }
     };
-    ///Map of the tensor names to their connections for the connections of the layers of the graph
+    /// Map of the tensor names to their connections for the connections of the layers of the graph
     std::unordered_map<std::string, TensorSlots> m_TensorConnections;
 
-    //Map of the tensor names to their node and index in graph.node()
+    /// Map of the tensor names to their node and index in graph.node()
     std::unordered_map<std::string, std::pair<const onnx::NodeProto*, int>> m_OutputsMap;
 
     /// Number of times a specific node (identified by his index number) was used as input

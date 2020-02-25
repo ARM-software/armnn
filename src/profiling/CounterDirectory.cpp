@@ -18,9 +18,7 @@ namespace armnn
 namespace profiling
 {
 
-const Category* CounterDirectory::RegisterCategory(const std::string& categoryName,
-                                                   const Optional<uint16_t>& deviceUid,
-                                                   const Optional<uint16_t>& counterSetUid)
+const Category* CounterDirectory::RegisterCategory(const std::string& categoryName)
 {
     // Check that the given category name is valid
     if (categoryName.empty() ||
@@ -37,38 +35,8 @@ const Category* CounterDirectory::RegisterCategory(const std::string& categoryNa
                                % categoryName));
     }
 
-    // Check that a device with the given (optional) UID is already registered
-    uint16_t deviceUidValue = deviceUid.has_value() ? deviceUid.value() : 0;
-    if (deviceUidValue > 0)
-    {
-        // Check that the (optional) device is already registered
-        if (!IsDeviceRegistered(deviceUidValue))
-        {
-            throw InvalidArgumentException(
-                        boost::str(boost::format("Trying to connect a category (\"%1%\") to a device that is "
-                                                 "not registered (UID %2%)")
-                                   % categoryName
-                                   % deviceUidValue));
-        }
-    }
-
-    // Check that a counter set with the given (optional) UID is already registered
-    uint16_t counterSetUidValue = counterSetUid.has_value() ? counterSetUid.value() : 0;
-    if (counterSetUidValue > 0)
-    {
-        // Check that the (optional) counter set is already registered
-        if (!IsCounterSetRegistered(counterSetUidValue))
-        {
-            throw InvalidArgumentException(
-                        boost::str(boost::format("Trying to connect a category (name: \"%1%\") to a counter set "
-                                                 "that is not registered (UID: %2%)")
-                                   % categoryName
-                                   % counterSetUidValue));
-        }
-    }
-
     // Create the category
-    CategoryPtr category = std::make_unique<Category>(categoryName, deviceUidValue, counterSetUidValue);
+    CategoryPtr category = std::make_unique<Category>(categoryName);
     BOOST_ASSERT(category);
 
     // Get the raw category pointer
@@ -100,12 +68,7 @@ const Device* CounterDirectory::RegisterDevice(const std::string& deviceName,
                                % deviceName));
     }
 
-    // Peek the next UID, do not get an actual valid UID just now as we don't want to waste a good UID in case
-    // the registration fails. We'll get a proper one once we're sure that the device can be registered
-    uint16_t deviceUidPeek = GetNextUid(true);
-
     // Check that a category with the given (optional) parent category name is already registered
-    Category* parentCategoryPtr = nullptr;
     if (parentCategoryName.has_value())
     {
         // Get the (optional) parent category name
@@ -129,32 +92,10 @@ const Device* CounterDirectory::RegisterDevice(const std::string& deviceName,
                                    % deviceName
                                    % parentCategoryNameValue));
         }
-
-        // Get the parent category
-        const CategoryPtr& parentCategory = *categoryIt;
-        BOOST_ASSERT(parentCategory);
-
-        // Check that the given parent category is not already connected to another device
-        if (parentCategory->m_DeviceUid != 0 && parentCategory->m_DeviceUid != deviceUidPeek)
-        {
-            throw InvalidArgumentException(
-                        boost::str(boost::format("Trying to connect a device (UID: %1%) to a parent category that is "
-                                                 "already connected to a different device "
-                                                 "(category \"%2%\" connected to device %3%)")
-                                   % deviceUidPeek
-                                   % parentCategoryNameValue
-                                   % parentCategory->m_DeviceUid));
-        }
-
-        // The parent category can be associated to the device that is about to be registered.
-        // Get the raw pointer to the parent category (to be used later when the device is actually been
-        // registered, to make sure that the category is associated to an existing device)
-        parentCategoryPtr = parentCategory.get();
     }
 
     // Get the device UID
     uint16_t deviceUid = GetNextUid();
-    BOOST_ASSERT(deviceUid == deviceUidPeek);
 
     // Create the device
     DevicePtr device = std::make_unique<Device>(deviceUid, deviceName, cores);
@@ -166,13 +107,6 @@ const Device* CounterDirectory::RegisterDevice(const std::string& deviceName,
 
     // Register the device
     m_Devices.insert(std::make_pair(deviceUid, std::move(device)));
-
-    // Connect the device to the parent category, if required
-    if (parentCategoryPtr)
-    {
-        // Set the device UID in the parent category
-        parentCategoryPtr->m_DeviceUid = deviceUid;
-    }
 
     return devicePtr;
 }
@@ -201,7 +135,6 @@ const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counte
     uint16_t counterSetUidPeek = GetNextUid(true);
 
     // Check that a category with the given (optional) parent category name is already registered
-    Category* parentCategoryPtr = nullptr;
     if (parentCategoryName.has_value())
     {
         // Get the (optional) parent category name
@@ -225,27 +158,6 @@ const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counte
                                    % counterSetUidPeek
                                    % parentCategoryNameValue));
         }
-
-        // Get the parent category
-        const CategoryPtr& parentCategory = *it;
-        BOOST_ASSERT(parentCategory);
-
-        // Check that the given parent category is not already connected to another counter set
-        if (parentCategory->m_CounterSetUid != 0 && parentCategory->m_CounterSetUid != counterSetUidPeek)
-        {
-            throw InvalidArgumentException(
-                        boost::str(boost::format("Trying to connect a counter set (UID: %1%) to a parent category "
-                                                 "that is already connected to a different counter set "
-                                                 "(category \"%2%\" connected to counter set %3%)")
-                                   % counterSetUidPeek
-                                   % parentCategoryNameValue
-                                   % parentCategory->m_CounterSetUid));
-        }
-
-        // The parent category can be associated to the counter set that is about to be registered.
-        // Get the raw pointer to the parent category (to be used later when the counter set is actually been
-        // registered, to make sure that the category is associated to an existing counter set)
-        parentCategoryPtr = parentCategory.get();
     }
 
     // Get the counter set UID
@@ -262,13 +174,6 @@ const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counte
 
     // Register the counter set
     m_CounterSets.insert(std::make_pair(counterSetUid, std::move(counterSet)));
-
-    // Connect the counter set to the parent category, if required
-    if (parentCategoryPtr)
-    {
-        // Set the counter set UID in the parent category
-        parentCategoryPtr->m_CounterSetUid = counterSetUid;
-    }
 
     return counterSetPtr;
 }
@@ -381,7 +286,7 @@ const Counter* CounterDirectory::RegisterCounter(const BackendId& backendId,
 
     // Get the number of cores (this call may throw)
     uint16_t deviceUidValue = deviceUid.has_value() ? deviceUid.value() : 0;
-    uint16_t deviceCores = GetNumberOfCores(numberOfCores, deviceUidValue, parentCategory);
+    uint16_t deviceCores = GetNumberOfCores(numberOfCores, deviceUidValue);
 
     // Get the counter UIDs and calculate the max counter UID
     std::vector<uint16_t> counterUids = GetNextCounterUids(uid, deviceCores);
@@ -599,19 +504,14 @@ CountersIt CounterDirectory::FindCounter(const std::string& counterName) const
 }
 
 uint16_t CounterDirectory::GetNumberOfCores(const Optional<uint16_t>& numberOfCores,
-                                            uint16_t deviceUid,
-                                            const CategoryPtr& parentCategory)
+                                            uint16_t deviceUid)
 {
-    BOOST_ASSERT(parentCategory);
-
     // To get the number of cores, apply the following rules:
     //
     // 1. If numberOfCores is set then take it as the deviceCores value
     // 2. If numberOfCores is not set then check to see if this counter is directly associated with a device,
     //    if so then that devices number of cores is taken as the deviceCores value
-    // 3. If neither of the above is set then look at the category to see if it has a device associated with it,
-    //    if it does then take that device's numberOfCores as the deviceCores value
-    // 4. If none of the above holds then set deviceCores to zero
+    // 3. If none of the above holds then set deviceCores to zero
 
     // 1. If numberOfCores is set then take it as the deviceCores value
     if (numberOfCores.has_value())
@@ -642,30 +542,7 @@ uint16_t CounterDirectory::GetNumberOfCores(const Optional<uint16_t>& numberOfCo
         return device->m_Cores;
     }
 
-    // 3. If neither of the above is set then look at the category to see if it has a device associated with it,
-    //    if it does then take that device's numberOfCores as the deviceCores value
-    uint16_t parentCategoryDeviceUid = parentCategory->m_DeviceUid;
-    if (parentCategoryDeviceUid > 0)
-    {
-        // Check that the device associated to the parent category is already registered
-        auto deviceIt = FindDevice(parentCategoryDeviceUid);
-        if (deviceIt == m_Devices.end())
-        {
-            throw InvalidArgumentException(
-                        boost::str(boost::format("Trying to get the number of cores from a device that is "
-                                                 "not registered (device UID %1%)")
-                                   % parentCategoryDeviceUid));
-        }
-
-        // Get the associated device
-        const DevicePtr& device = deviceIt->second;
-        BOOST_ASSERT(device);
-
-        // Get the number of cores of the device associated to the parent category
-        return device->m_Cores;
-    }
-
-    // 4. If none of the above holds then set deviceCores to zero
+    // 3. If none of the above holds then set deviceCores to zero
     return 0;
 }
 

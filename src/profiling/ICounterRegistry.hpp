@@ -20,9 +20,7 @@ public:
     virtual ~ICounterRegistry() {}
 
     // Register profiling objects
-    virtual const Category*   RegisterCategory  (const std::string& categoryName,
-                                                 const Optional<uint16_t>& deviceUid,
-                                                 const Optional<uint16_t>& counterSetUid) = 0;
+    virtual const Category*   RegisterCategory  (const std::string& categoryName) = 0;
 
     virtual const Device*     RegisterDevice    (const std::string& deviceName,
                                                  uint16_t cores,

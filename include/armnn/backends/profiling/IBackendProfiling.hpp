@@ -49,9 +49,7 @@ struct CounterStatus
 class IRegisterBackendCounters
 {
 public:
-    virtual void RegisterCategory(const std::string& categoryName,
-                                  const Optional<uint16_t>& deviceUid     = EmptyOptional(),
-                                  const Optional<uint16_t>& counterSetUid = EmptyOptional()) = 0;
+    virtual void RegisterCategory(const std::string& categoryName) = 0;
 
     virtual uint16_t RegisterDevice(const std::string& deviceName,
                                     uint16_t cores = 0,

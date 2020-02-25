@@ -27,9 +27,7 @@ public:
 
     ~RegisterBackendCounters() = default;
 
-    void RegisterCategory(const std::string& categoryName,
-                          const Optional<uint16_t>& deviceUid     = EmptyOptional(),
-                          const Optional<uint16_t>& counterSetUid = EmptyOptional()) override;
+    void RegisterCategory(const std::string& categoryName) override;
 
     uint16_t RegisterDevice(const std::string& deviceName,
                             uint16_t cores = 0,

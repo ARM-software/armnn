@@ -49,10 +49,8 @@ class Category final
 {
 public:
     // Constructors
-    Category(const std::string& name, uint16_t deviceUid, uint16_t counterSetUid)
+    Category(const std::string& name)
         : m_Name(name)
-        , m_DeviceUid(deviceUid)
-        , m_CounterSetUid(counterSetUid)
     {}
 
     // Fields
@@ -60,8 +58,6 @@ public:
 
     // Connections
     std::vector<uint16_t> m_Counters;      // The UIDs of the counters associated with this category
-    uint16_t              m_DeviceUid;     // Optional, set to zero if the counter is not associated with a device
-    uint16_t              m_CounterSetUid; // Optional, set to zero if the counter is not associated with a counter set
 };
 
 class Device final

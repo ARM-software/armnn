@@ -1014,18 +1014,10 @@ void PrintCategoryDetails(const std::unique_ptr<Category>& category,
 
     categoryHeader.append(CentreAlignFormatting("Name", 20));
     categoryHeader.append(" | ");
-    categoryHeader.append(CentreAlignFormatting("Device", 12));
-    categoryHeader.append(" | ");
-    categoryHeader.append(CentreAlignFormatting("Counter set UID:", 16));
-    categoryHeader.append(" | ");
     categoryHeader.append(CentreAlignFormatting("Event Count", 14));
     categoryHeader.append("\n");
 
     categoryBody.append(CentreAlignFormatting(category->m_Name, 20));
-    categoryBody.append(" | ");
-    categoryBody.append(CentreAlignFormatting(std::to_string(category->m_DeviceUid), 12));
-    categoryBody.append(" | ");
-    categoryBody.append(CentreAlignFormatting(std::to_string(category->m_CounterSetUid), 16));
     categoryBody.append(" | ");
     categoryBody.append(CentreAlignFormatting(std::to_string(category->m_Counters.size()), 14));
 

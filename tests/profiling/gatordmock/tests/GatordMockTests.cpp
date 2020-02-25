@@ -243,8 +243,6 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
             if (receivedCategory->m_Name.compare(category->m_Name) == 0)
             {
                 // We've found the matching category.
-                BOOST_CHECK(category->m_DeviceUid == receivedCategory->m_DeviceUid);
-                BOOST_CHECK(category->m_CounterSetUid == receivedCategory->m_CounterSetUid);
                 // Now look at the interiors of the counters. Start by sorting them.
                 std::sort(category->m_Counters.begin(), category->m_Counters.end());
                 std::sort(receivedCategory->m_Counters.begin(), receivedCategory->m_Counters.end());

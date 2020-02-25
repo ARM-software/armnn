@@ -443,18 +443,10 @@ public:
     ~MockCounterDirectory() = default;
 
     // Register profiling objects
-    const Category* RegisterCategory(const std::string& categoryName,
-                                     const armnn::Optional<uint16_t>& deviceUid = armnn::EmptyOptional(),
-                                     const armnn::Optional<uint16_t>& counterSetUid = armnn::EmptyOptional())
+    const Category* RegisterCategory(const std::string& categoryName)
     {
-        // Get the device UID
-        uint16_t deviceUidValue = deviceUid.has_value() ? deviceUid.value() : 0;
-
-        // Get the counter set UID
-        uint16_t counterSetUidValue = counterSetUid.has_value() ? counterSetUid.value() : 0;
-
         // Create the category
-        CategoryPtr category = std::make_unique<Category>(categoryName, deviceUidValue, counterSetUidValue);
+        CategoryPtr category = std::make_unique<Category>(categoryName);
         BOOST_ASSERT(category);
 
         // Get the raw category pointer
@@ -468,8 +460,7 @@ public:
     }
 
     const Device* RegisterDevice(const std::string& deviceName,
-                                 uint16_t cores = 0,
-                                 const armnn::Optional<std::string>& parentCategoryName = armnn::EmptyOptional())
+                                 uint16_t cores = 0)
     {
         // Get the device UID
         uint16_t deviceUid = GetNextUid();
@@ -485,22 +476,12 @@ public:
         // Register the device
         m_Devices.insert(std::make_pair(deviceUid, std::move(device)));
 
-        // Connect the counter set to the parent category, if required
-        if (parentCategoryName.has_value())
-        {
-            // Set the counter set UID in the parent category
-            Category* parentCategory = const_cast<Category*>(GetCategory(parentCategoryName.value()));
-            BOOST_ASSERT(parentCategory);
-            parentCategory->m_DeviceUid = deviceUid;
-        }
-
         return devicePtr;
     }
 
     const CounterSet* RegisterCounterSet(
             const std::string& counterSetName,
-            uint16_t count = 0,
-            const armnn::Optional<std::string>& parentCategoryName = armnn::EmptyOptional())
+            uint16_t count = 0)
     {
         // Get the counter set UID
         uint16_t counterSetUid = GetNextUid();
@@ -515,15 +496,6 @@ public:
 
         // Register the counter set
         m_CounterSets.insert(std::make_pair(counterSetUid, std::move(counterSet)));
-
-        // Connect the counter set to the parent category, if required
-        if (parentCategoryName.has_value())
-        {
-            // Set the counter set UID in the parent category
-            Category* parentCategory = const_cast<Category*>(GetCategory(parentCategoryName.value()));
-            BOOST_ASSERT(parentCategory);
-            parentCategory->m_CounterSetUid = counterSetUid;
-        }
 
         return counterSetPtr;
     }

@@ -182,20 +182,11 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
 
     const std::string& categoryName = category->m_Name;
     const std::vector<uint16_t> categoryCounters = category->m_Counters;
-    uint16_t deviceUid = category->m_DeviceUid;
-    uint16_t counterSetUid = category->m_CounterSetUid;
 
     BOOST_ASSERT(!categoryName.empty());
 
     // Utils
     size_t uint32_t_size = sizeof(uint32_t);
-
-    // Category record word 0:
-    // 16:31 [16] device: the uid of a device element which identifies some hardware device that
-    //                    the category belongs to
-    // 0:15  [16] counter_set: the uid of a counter_set the category is associated with
-    uint32_t categoryRecordWord0 = (static_cast<uint32_t>(deviceUid) << 16) |
-                                   (static_cast<uint32_t>(counterSetUid));
 
     // Category record word 1:
     // 16:31 [16] event_count: number of events belonging to this category
@@ -252,7 +243,7 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
     uint32_t categoryRecordWord3 = numeric_cast<uint32_t>(eventRecordOffsets.size() * uint32_t_size);
 
     // Calculate the size in words of the category record
-    size_t categoryRecordSize = 4u + // The size of the fixed part (device + counter_set + event_count + reserved +
+    size_t categoryRecordSize = 3u + // The size of the fixed part (device + counter_set + event_count + reserved +
                                      // event_pointer_table_offset + name_offset)
                                 eventRecordOffsets.size() + // The size of the variable part (the event pointer table +
                                 categoryNameBuffer.size() + // and the category name including the null-terminator +
@@ -263,11 +254,10 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
 
     ARMNN_NO_CONVERSION_WARN_BEGIN
     // Create the category record
-    categoryRecord[0] = categoryRecordWord0; // device + counter_set
-    categoryRecord[1] = categoryRecordWord1; // event_count + reserved
-    categoryRecord[2] = categoryRecordWord2; // event_pointer_table_offset
-    categoryRecord[3] = categoryRecordWord3; // name_offset
-    auto offset = categoryRecord.begin() + 4u;
+    categoryRecord[0] = categoryRecordWord1; // event_count + reserved
+    categoryRecord[1] = categoryRecordWord2; // event_pointer_table_offset
+    categoryRecord[2] = categoryRecordWord3; // name_offset
+    auto offset = categoryRecord.begin() + 3u;
     std::copy(eventRecordOffsets.begin(), eventRecordOffsets.end(), offset); // event_pointer_table
     offset += eventRecordOffsets.size();
     std::copy(categoryNameBuffer.begin(), categoryNameBuffer.end(), offset); // name

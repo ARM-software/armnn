@@ -153,18 +153,6 @@ void DirectoryCaptureCommandHandler::ReadCategoryRecords(const unsigned char* co
     {
         uint32_t categoryRecordOffset = offset + categoryOffsets[categoryIndex];
 
-        // Category record word 0:
-        // 0:15  The deviceUid of a counter_set the category is associated with.
-        // Set to zero if the category is NOT associated with a counter set.
-        uint16_t counterSetUid = profiling::ReadUint16(data, categoryRecordOffset);
-        categoryRecordOffset += uint16_t_size;
-
-        // 16:31 The deviceUid of a device element which identifies some hardware device that the category belongs to.
-        // Set to zero if the category is NOT associated with a device
-        uint16_t deviceUid = profiling::ReadUint16(data, categoryRecordOffset);
-
-        categoryRecordOffset += uint16_t_size;
-
         // Category record word 1:
         // 0:15 Reserved, value 0x0000.
         categoryRecordOffset += uint16_t_size;
@@ -197,7 +185,7 @@ void DirectoryCaptureCommandHandler::ReadCategoryRecords(const unsigned char* co
         categoryRecordOffset += uint32_t_size;
 
         const Category* category = m_CounterDirectory.RegisterCategory(
-            GetStringNameFromBuffer(data, categoryRecordOffset + nameOffset), deviceUid, counterSetUid);
+            GetStringNameFromBuffer(data, categoryRecordOffset + nameOffset));
         for (auto& counter : eventRecords)
         {
             const Counter* registeredCounter = m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,

@@ -62,7 +62,8 @@ enum class ActivationFunction
     LeakyReLu   = 6,
     Abs         = 7,
     Sqrt        = 8,
-    Square      = 9
+    Square      = 9,
+    Elu         = 10
 };
 
 enum class ArgMinMaxFunction

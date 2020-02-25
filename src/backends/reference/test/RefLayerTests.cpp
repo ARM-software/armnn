@@ -462,6 +462,10 @@ ARMNN_AUTO_TEST_CASE(Tanh, TanhTest)
 ARMNN_AUTO_TEST_CASE(TanhUint8, TanhUint8Test)
 ARMNN_AUTO_TEST_CASE(TanhInt16, TanhInt16Test)
 
+// Elu Activation
+ARMNN_AUTO_TEST_CASE(Elu, EluTest)
+ARMNN_AUTO_TEST_CASE(EluUint8, EluUint8Test)
+ARMNN_AUTO_TEST_CASE(EluInt16, EluInt16Test)
 
 // Fully Connected
 ARMNN_AUTO_TEST_CASE(SimpleFullyConnected, FullyConnectedFloat32Test, false, false)

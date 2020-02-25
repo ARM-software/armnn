@@ -46,6 +46,8 @@ serializer::ActivationFunction GetFlatBufferActivationFunction(armnn::Activation
             return serializer::ActivationFunction::ActivationFunction_Sqrt;
         case armnn::ActivationFunction::Square:
             return serializer::ActivationFunction::ActivationFunction_Square;
+        case armnn::ActivationFunction::Elu:
+            return serializer::ActivationFunction::ActivationFunction_Elu;
         default:
             return serializer::ActivationFunction::ActivationFunction_Sigmoid;
     }

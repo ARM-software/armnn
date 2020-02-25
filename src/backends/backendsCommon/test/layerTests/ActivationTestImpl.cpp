@@ -1016,6 +1016,64 @@ LayerTestResult<int16_t, 4> TanhInt16Test(
 }
 
 
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> EluTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float qScale,
+        int32_t qOffset)
+{
+    std::vector<float> inputData = {
+            -0.1f, -0.2f, -0.3f, -0.4f,
+            0.1f,  0.2f,  0.3f,  0.4f,
+            -1.0f, -2.0f, -3.0f, -4.0f,
+            1.0f,  2.0f,  3.0f,  4.0f
+    };
+
+
+    const float a = 0.01f;
+    // Calculate output values for input.
+    auto f = [a](float value)
+    {
+        return (value >= 0) ? value : a * (expf(value) - 1);
+    };
+    std::vector<float> outputExpectedData(inputData.size());
+    std::transform(inputData.begin(), inputData.end(), outputExpectedData.begin(), f);
+
+    return SimpleActivationTest<ArmnnType>(workloadFactory,
+                                           memoryManager,
+                                           armnn::ActivationFunction::Elu,
+                                           a,
+                                           0.0f,
+                                           qScale,
+                                           qOffset,
+                                           inputData,
+                                           qScale,
+                                           qOffset,
+                                           outputExpectedData);
+}
+
+LayerTestResult<float, 4> EluTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return EluTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+LayerTestResult<uint8_t, 4> EluUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return EluTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 0.1f, 64);
+}
+
+LayerTestResult<int16_t, 4> EluInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return EluTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T,4> CompareActivationTestImpl(

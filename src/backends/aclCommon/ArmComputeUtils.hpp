@@ -65,6 +65,7 @@ ConvertActivationFunctionToAclActivationFunction(ActivationFunction armnnFunctio
         case ActivationFunction::Sqrt:          return AclActivationFunction::SQRT;
         case ActivationFunction::Square:        return AclActivationFunction::SQUARE;
         case ActivationFunction::TanH:          return AclActivationFunction::TANH;
+        case ActivationFunction::Elu:           return AclActivationFunction::ELU;
         default:                                throw InvalidArgumentException("Unsupported activation function");
     }
 }

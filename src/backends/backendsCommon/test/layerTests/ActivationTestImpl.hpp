@@ -149,6 +149,22 @@ LayerTestResult<int16_t, 4> LeakyReLuInt16Test(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 //
+// Elu
+//
+
+LayerTestResult<float, 4> EluTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 4> EluUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<int16_t, 4> EluInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+//
 // Abs
 //
 

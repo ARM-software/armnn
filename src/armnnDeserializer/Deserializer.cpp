@@ -421,6 +421,8 @@ armnn::ActivationFunction ToActivationFunction(armnnSerializer::ActivationFuncti
             return armnn::ActivationFunction::Sqrt;
         case armnnSerializer::ActivationFunction_Square:
             return armnn::ActivationFunction::Square;
+        case armnnSerializer::ActivationFunction_Elu:
+            return armnn::ActivationFunction::Elu;
         default:
             return armnn::ActivationFunction::Sigmoid;
     }

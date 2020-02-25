@@ -69,6 +69,11 @@ float Activation(float in,
             output = a * tanhf(b * in);
             break;
         }
+        case ActivationFunction::Elu:
+        {
+            output = (in >= 0) ? in : a * (expf(in) - 1);
+            break;
+        }
         default:
         {
             throw InvalidArgumentException("Unsupported activation function");

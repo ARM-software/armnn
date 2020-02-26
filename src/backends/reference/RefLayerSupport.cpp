@@ -109,6 +109,7 @@ bool RefLayerSupport::IsActivationSupported(const TensorInfo& input,
                 case ActivationFunction::Abs:
                 case ActivationFunction::BoundedReLu:
                 case ActivationFunction::Elu:
+                case ActivationFunction::HardSwish:
                 case ActivationFunction::LeakyReLu:
                 case ActivationFunction::Linear:
                 case ActivationFunction::ReLu:

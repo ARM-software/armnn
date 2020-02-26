@@ -1076,6 +1076,69 @@ LayerTestResult<int16_t, 4> EluInt16Test(
 
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> HardSwishTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
+{
+    std::vector<float> inputData = {
+        -0.1f, -0.2f, -0.3f, -0.4f,
+        0.1f,  0.2f,  0.3f,  0.4f,
+        -1.0f, -2.0f, -3.0f, -4.0f,
+        1.0f,  2.0f,  3.0f,  4.0f
+    };
+    // Calculate output values for input.
+    auto f = [](float x)
+        {
+            // Break down the calculation to help with verification.
+            // hard_swish(x) = x * relu6(x+3) / 6
+            // relu6(x) = min(max(x,0),6)
+            float reLu6_step1 = std::max((x + 3),0.0f);
+            float reLu6Complete = std::min(reLu6_step1, 6.0f);
+            float hardSwish_step1 = x * reLu6Complete;
+            float result = hardSwish_step1 / 6;
+            return result;
+        };
+    std::vector<float> outputExpectedData(inputData.size());
+    std::transform(inputData.begin(), inputData.end(), outputExpectedData.begin(), f);
+
+    return SimpleActivationTest<ArmnnType>(workloadFactory,
+                                           memoryManager,
+                                           armnn::ActivationFunction::HardSwish,
+                                           0.f,
+                                           0.f,
+                                           qScale,
+                                           qOffset,
+                                           inputData,
+                                           qScale,
+                                           qOffset,
+                                           outputExpectedData);
+}
+
+LayerTestResult<float, 4> HardSwishTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return HardSwishTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+LayerTestResult<uint8_t, 4> HardSwishUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return HardSwishTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 0.1f, 64);
+}
+
+LayerTestResult<int16_t, 4> HardSwishInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return HardSwishTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T,4> CompareActivationTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

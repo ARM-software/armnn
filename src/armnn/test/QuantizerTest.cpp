@@ -762,6 +762,61 @@ BOOST_AUTO_TEST_CASE(QuantizeELuActivation)
     TestEluActivationQuantization validatorQSymmS16(qSymmS16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymmS16.get(), validatorQSymmS16);
 }
+BOOST_AUTO_TEST_CASE(QuantizeHardSwishActivation)
+{
+    class TestHardSwishActivationQuantization : public TestQuantization
+    {
+    public:
+        TestHardSwishActivationQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+            : TestQuantization(inputShape, outputShape) {}
+
+        TestHardSwishActivationQuantization(const QuantizerOptions& options,
+                                      const TensorShape& inputShape,
+                                      const TensorShape& outputShape)
+            : TestQuantization(options, inputShape, outputShape) {}
+
+        void VisitActivationLayer(const IConnectableLayer* layer,
+                                  const ActivationDescriptor& descriptor,
+                                  const char* name = nullptr) override
+        {
+            boost::ignore_unused(descriptor, name);
+            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+            // Based off default static range [-15.0f, 15.0f]
+            TestQuantizationParams(
+                info, {30.0f / g_AsymmU8QuantizationBase, 128},
+                {30.0f / g_AsymmS8QuantizationBase, 0},
+                {15.0f / g_SymmS8QuantizationBase,  0},
+                {15.0f / g_SymmS16QuantizationBase, 0});
+        }
+    };
+
+    ActivationDescriptor descriptor;
+    descriptor.m_Function = ActivationFunction::HardSwish;
+
+    const TensorShape shape{1U};
+    INetworkPtr network = CreateNetworkWithActivationLayer(descriptor, shape);
+
+    INetworkPtr quantizedNetworkQAsymmU8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestHardSwishActivationQuantization validatorQAsymmU8(shape, shape);
+    VisitLayersTopologically(quantizedNetworkQAsymmU8.get(), validatorQAsymmU8);
+
+    const QuantizerOptions qAsymmS8Options(DataType::QAsymmS8);
+    INetworkPtr quantizedNetworkQAsymmS8 = INetworkQuantizer::Create(network.get(), qAsymmS8Options)->ExportNetwork();
+    TestHardSwishActivationQuantization validatorQAsymmS8(qAsymmS8Options, shape, shape);
+    VisitLayersTopologically(quantizedNetworkQAsymmS8.get(), validatorQAsymmS8);
+
+    const QuantizerOptions qSymmS8Options(DataType::QSymmS8);
+    INetworkPtr quantizedNetworkQSymmS8 = INetworkQuantizer::Create(network.get(), qSymmS8Options)->ExportNetwork();
+    TestHardSwishActivationQuantization validatorQSymmS8(qSymmS8Options, shape, shape);
+    VisitLayersTopologically(quantizedNetworkQSymmS8.get(), validatorQSymmS8);
+
+    const QuantizerOptions qSymmS16options(DataType::QSymmS16);
+    INetworkPtr quantizedNetworkQSymmS16 = INetworkQuantizer::Create(network.get(), qSymmS16options)->ExportNetwork();
+    TestHardSwishActivationQuantization validatorQSymmS16(qSymmS16options, shape, shape);
+    VisitLayersTopologically(quantizedNetworkQSymmS16.get(), validatorQSymmS16);
+}
+
 
 BOOST_AUTO_TEST_CASE(QuantizeBatchNorm)
 {

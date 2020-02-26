@@ -9,6 +9,7 @@
 
 namespace armnn
 {
+
 float Activation(float in,
                  ActivationFunction function,
                  float a,
@@ -72,6 +73,13 @@ float Activation(float in,
         case ActivationFunction::Elu:
         {
             output = (in >= 0) ? in : a * (expf(in) - 1);
+            break;
+        }
+        case ActivationFunction::HardSwish:
+        {
+            // hard_swish(x) = x * relu6(x+3) / 6
+            // relu6(x) = min(max(x,0),6)
+            output = in * (std::min(std::max((in + 3),0.0f),6.0f)) / 6;
             break;
         }
         default:

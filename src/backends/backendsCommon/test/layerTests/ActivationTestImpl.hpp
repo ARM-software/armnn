@@ -217,6 +217,22 @@ LayerTestResult<int16_t, 4> SquareInt16Test(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 //
+// HardSwish
+//
+
+LayerTestResult<float, 4> HardSwishTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 4> HardSwishUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<int16_t, 4> HardSwishInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+//
 // Other
 //
 

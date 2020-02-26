@@ -57,13 +57,14 @@ enum class ActivationFunction
     TanH        = 1,
     Linear      = 2,
     ReLu        = 3,
-    BoundedReLu = 4, ///< min(a, max(b, input))
+    BoundedReLu = 4, ///< min(a, max(b, input)) ReLu1 & ReLu6.
     SoftReLu    = 5,
     LeakyReLu   = 6,
     Abs         = 7,
     Sqrt        = 8,
     Square      = 9,
-    Elu         = 10
+    Elu         = 10,
+    HardSwish   = 11
 };
 
 enum class ArgMinMaxFunction

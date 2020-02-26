@@ -466,6 +466,10 @@ ARMNN_AUTO_TEST_CASE(TanhInt16, TanhInt16Test)
 ARMNN_AUTO_TEST_CASE(Elu, EluTest)
 ARMNN_AUTO_TEST_CASE(EluUint8, EluUint8Test)
 ARMNN_AUTO_TEST_CASE(EluInt16, EluInt16Test)
+// HardSwish Activation
+ARMNN_AUTO_TEST_CASE(HardSwish, HardSwishTest)
+ARMNN_AUTO_TEST_CASE(HardSwishUint8, HardSwishUint8Test)
+ARMNN_AUTO_TEST_CASE(HardSwishInt16, HardSwishInt16Test)
 
 // Fully Connected
 ARMNN_AUTO_TEST_CASE(SimpleFullyConnected, FullyConnectedFloat32Test, false, false)

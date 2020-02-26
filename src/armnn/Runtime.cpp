@@ -192,8 +192,16 @@ Runtime::Runtime(const CreationOptions& options)
             // Backends that don't support profiling will return a null profiling context.
             if (profilingContext)
             {
-                // Pass the context onto the profiling service.
-                armnn::profiling::ProfilingService::Instance().AddBackendProfilingContext(id, profilingContext);
+                // Enable profiling on the backend and assert that it returns true
+                if(profilingContext->EnableProfiling(true))
+                {
+                    // Pass the context onto the profiling service.
+                    armnn::profiling::ProfilingService::Instance().AddBackendProfilingContext(id, profilingContext);
+                }
+                else
+                {
+                    throw BackendProfilingException("Unable to enable profiling on Backend Id: " + id.Get());
+                }
             }
         }
         catch (const BackendUnavailableException&)

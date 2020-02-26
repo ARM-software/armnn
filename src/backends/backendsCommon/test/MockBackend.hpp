@@ -88,8 +88,10 @@ public:
         return { profiling::Timestamp{ timestamp, counterValues } };
     }
 
-    void EnableProfiling(bool)
-    {}
+    bool EnableProfiling(bool)
+    {
+        return true;
+    }
 
 private:
     IBackendInternal::IBackendProfilingPtr m_BackendProfiling;

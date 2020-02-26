@@ -137,6 +137,12 @@ class TimeoutException : public Exception
     using Exception::Exception;
 };
 
+class BackendProfilingException : public Exception
+{
+public:
+    using Exception::Exception;
+};
+
 template <typename ExceptionType>
 void ConditionalThrow(bool condition, const std::string& message)
 {

@@ -5,8 +5,6 @@
 
 #include "TimelineDirectoryCaptureCommandHandler.hpp"
 
-#include <ProfilingUtils.hpp>
-
 #include <iostream>
 #include <string>
 
@@ -15,7 +13,7 @@ using namespace armnn::profiling;
 namespace armnn
 {
 
-namespace gatordmock
+namespace timelinedecoder
 {
 
 void TimelineDirectoryCaptureCommandHandler::ParseData(const armnn::profiling::Packet& packet)

@@ -4,11 +4,12 @@
 //
 
 #include "TimelineDecoder.hpp"
-
-#include <ProfilingUtils.hpp>
+#include "../profiling/ProfilingUtils.hpp"
 
 #include <iostream>
 namespace armnn
+{
+namespace timelinedecoder
 {
 TimelineDecoder::ErrorCode TimelineDecoder::CreateEntity(const Entity &entity)
 {
@@ -281,5 +282,6 @@ void TimelineDecoder::printRelationships()
         std::cout << std::string(body.size(), '-') << "\n";
         std::cout << body;
     }
+}
 }
 }

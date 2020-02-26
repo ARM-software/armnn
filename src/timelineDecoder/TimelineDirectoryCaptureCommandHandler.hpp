@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 #include <CommandHandlerFunctor.hpp>
 #include <Packet.hpp>
 #include <PacketBuffer.hpp>
@@ -14,7 +13,7 @@
 namespace armnn
 {
 
-namespace gatordmock
+namespace timelinedecoder
 {
 
 class TimelineDirectoryCaptureCommandHandler : public profiling::CommandHandlerFunctor

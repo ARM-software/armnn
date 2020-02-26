@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "../TimelineCaptureCommandHandler.hpp"
-#include "../TimelineDirectoryCaptureCommandHandler.hpp"
-#include "timelineDecoder/TimelineDecoder.hpp"
+#include <TimelineCaptureCommandHandler.hpp>
+#include <TimelineDirectoryCaptureCommandHandler.hpp>
+#include <TimelineDecoder.hpp>
 
 #include <CommandHandlerFunctor.hpp>
 #include <ProfilingService.hpp>
@@ -18,6 +18,7 @@
 BOOST_AUTO_TEST_SUITE(TimelineDecoderTests)
 
 using namespace armnn;
+using namespace timelinedecoder;
 
 void SendTimelinePacketToCommandHandler(const unsigned char* packetBuffer,
                                         profiling::CommandHandlerFunctor &CommandHandler)
@@ -83,7 +84,7 @@ BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
 
     profiling::PacketVersionResolver packetVersionResolver;
 
-    gatordmock::TimelineDirectoryCaptureCommandHandler timelineDirectoryCaptureCommandHandler(
+    TimelineDirectoryCaptureCommandHandler timelineDirectoryCaptureCommandHandler(
             1, 0, packetVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue(), true);
 
     sendTimelinePacket->SendTimelineMessageDirectoryPackage();
@@ -151,12 +152,12 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
     TimelineDecoder timelineDecoder;
     const TimelineDecoder::Model& model = timelineDecoder.GetModel();
 
-    gatordmock::TimelineCaptureCommandHandler timelineCaptureCommandHandler(
+    TimelineCaptureCommandHandler timelineCaptureCommandHandler(
         1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder, threadIdSize);
 
     BOOST_CHECK(timelineDecoder.SetEntityCallback(PushEntity) == ITimelineDecoder::ErrorCode::ErrorCode_Success);
     BOOST_CHECK(
-        timelineDecoder.SetEventClassCallback(PushEventClass )== ITimelineDecoder::ErrorCode::ErrorCode_Success);
+        timelineDecoder.SetEventClassCallback(PushEventClass) == ITimelineDecoder::ErrorCode::ErrorCode_Success);
     BOOST_CHECK(timelineDecoder.SetEventCallback(PushEvent) == ITimelineDecoder::ErrorCode::ErrorCode_Success);
     BOOST_CHECK(timelineDecoder.SetLabelCallback(PushLabel) == ITimelineDecoder::ErrorCode::ErrorCode_Success);
     BOOST_CHECK(

@@ -9,6 +9,7 @@
 #include <GatordMockService.hpp>
 #include <PeriodicCounterCaptureCommandHandler.hpp>
 #include <StreamMetadataCommandHandler.hpp>
+
 #include <TimelineDirectoryCaptureCommandHandler.hpp>
 
 #include <test/ProfilingMocks.hpp>
@@ -127,7 +128,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     profiling::DirectoryCaptureCommandHandler directoryCaptureCommandHandler(
         0, 2, packetVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), true);
 
-    gatordmock::TimelineDirectoryCaptureCommandHandler timelineDirectoryCaptureCommandHandler(
+    timelinedecoder::TimelineDirectoryCaptureCommandHandler timelineDirectoryCaptureCommandHandler(
         1, 0, packetVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue(), true);
 
     // Register different derived functors

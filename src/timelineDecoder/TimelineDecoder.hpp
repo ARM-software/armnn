@@ -4,9 +4,12 @@
 //
 #pragma once
 
-#include "ITimelineDecoder.hpp"
+#include "armnn/profiling/ITimelineDecoder.hpp"
 #include <vector>
+
 namespace armnn
+{
+namespace timelinedecoder
 {
 class TimelineDecoder : public ITimelineDecoder
 {
@@ -60,4 +63,6 @@ private:
     void printRelationships();
     void printEvents();
 };
+
+}
 }

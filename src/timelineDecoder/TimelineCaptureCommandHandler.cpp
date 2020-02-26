@@ -5,17 +5,16 @@
 
 #include "TimelineCaptureCommandHandler.hpp"
 
-#include <iostream>
 #include <string>
 
 namespace armnn
 {
 
-namespace gatordmock
+namespace timelinedecoder
 {
 
 //Array of member functions, the array index matches the decl_id
-const TimelineCaptureCommandHandler::ReadFunction TimelineCaptureCommandHandler::m_ReadFunctions[5]
+const TimelineCaptureCommandHandler::ReadFunction TimelineCaptureCommandHandler::m_ReadFunctions[]
 {
     &TimelineCaptureCommandHandler::ReadLabel,              // Label decl_id = 0
     &TimelineCaptureCommandHandler::ReadEntity,             // Entity decl_id = 1

@@ -5,16 +5,16 @@
 
 #pragma once
 
-#include "ITimelineDecoder.hpp"
-
 #include <CommandHandlerFunctor.hpp>
+#include "armnn/profiling/ITimelineDecoder.hpp"
+
 #include <Packet.hpp>
 #include <ProfilingUtils.hpp>
 
 namespace armnn
 {
 
-namespace gatordmock
+namespace timelinedecoder
 {
 
 class TimelineCaptureCommandHandler : public profiling::CommandHandlerFunctor

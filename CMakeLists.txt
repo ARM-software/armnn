@@ -864,7 +864,7 @@ if(BUILD_UNIT_TESTS)
     if(BUILD_GATORD_MOCK)
         list(APPEND unittest_sources
             tests/profiling/gatordmock/tests/GatordMockTests.cpp
-            tests/profiling/timelineDecoder/tests/TimelineTests.cpp
+            src/timelineDecoder/tests/TimelineTests.cpp
             )
     endif()
 
@@ -900,6 +900,7 @@ if(BUILD_UNIT_TESTS)
 
     if(BUILD_GATORD_MOCK)
         target_link_libraries(UnitTests gatordMockService)
+        target_link_libraries(UnitTests timelineDecoder)
     endif()
 
     if(BUILD_TF_LITE_PARSER)
@@ -967,6 +968,8 @@ if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD
 endif()
 
 if(BUILD_GATORD_MOCK)
+    add_subdirectory(src/timelineDecoder)
+
     set(gatord_mock_sources)
     list(APPEND gatord_mock_sources
         tests/profiling/gatordmock/CommandFileParser.hpp
@@ -981,19 +984,9 @@ if(BUILD_GATORD_MOCK)
         tests/profiling/gatordmock/PeriodicCounterSelectionResponseHandler.hpp
         tests/profiling/gatordmock/StreamMetadataCommandHandler.cpp
         tests/profiling/gatordmock/StreamMetadataCommandHandler.hpp
-        tests/profiling/timelineDecoder/ITimelineDecoder.hpp
-        tests/profiling/timelineDecoder/TimelineCaptureCommandHandler.cpp
-        tests/profiling/timelineDecoder/TimelineCaptureCommandHandler.hpp
-        tests/profiling/timelineDecoder/TimelineDecoder.cpp
-        tests/profiling/timelineDecoder/TimelineDecoder.hpp
-        tests/profiling/timelineDecoder/TimelineDirectoryCaptureCommandHandler.cpp
-        tests/profiling/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp
         )
 
-    include_directories(${Boost_INCLUDE_DIRS} src/profiling)
-    include_directories(${Boost_INCLUDE_DIRS} tests/profiling)
-    include_directories(${Boost_INCLUDE_DIRS} tests/profiling/gatordmock)
-    include_directories(${Boost_INCLUDE_DIRS} tests/profiling/timelineDecoder)
+    include_directories(src/timelineDecoder src/profiling tests/profiling tests/profiling/gatordmock)
 
     add_library_ex(gatordMockService STATIC ${gatord_mock_sources})
     target_include_directories(gatordMockService PRIVATE src/armnnUtils)

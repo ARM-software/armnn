@@ -11,6 +11,7 @@
 #include <StreamMetadataCommandHandler.hpp>
 
 #include <TimelineDirectoryCaptureCommandHandler.hpp>
+#include <TimelineDecoder.hpp>
 
 #include <test/ProfilingMocks.hpp>
 
@@ -21,7 +22,7 @@
 BOOST_AUTO_TEST_SUITE(GatordMockTests)
 
 using namespace armnn;
-using namespace std::this_thread;    // sleep_for, sleep_until
+using namespace std::this_thread;
 using namespace std::chrono_literals;
 
 BOOST_AUTO_TEST_CASE(CounterCaptureHandlingTest)
@@ -118,6 +119,9 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     // Create the Command Handler Registry
     profiling::CommandHandlerRegistry registry;
 
+    timelinedecoder::TimelineDecoder timelineDecoder;
+    timelineDecoder.SetDefaultCallbacks();
+
     // Update with derived functors
     gatordmock::StreamMetadataCommandHandler streamMetadataCommandHandler(
         0, 0, packetVersionResolver.ResolvePacketVersion(0, 0).GetEncodedValue(), true);
@@ -128,18 +132,29 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     profiling::DirectoryCaptureCommandHandler directoryCaptureCommandHandler(
         0, 2, packetVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), true);
 
+    timelinedecoder::TimelineCaptureCommandHandler timelineCaptureCommandHandler(
+            1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder);
+
     timelinedecoder::TimelineDirectoryCaptureCommandHandler timelineDirectoryCaptureCommandHandler(
-        1, 0, packetVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue(), true);
+        1, 0, packetVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue(),
+        timelineCaptureCommandHandler, true);
 
     // Register different derived functors
     registry.RegisterFunctor(&streamMetadataCommandHandler);
     registry.RegisterFunctor(&counterCaptureCommandHandler);
     registry.RegisterFunctor(&directoryCaptureCommandHandler);
     registry.RegisterFunctor(&timelineDirectoryCaptureCommandHandler);
+
     // Setup the mock service to bind to the UDS.
     std::string udsNamespace = "gatord_namespace";
-    gatordmock::GatordMockService mockService(registry, false);
-    mockService.OpenListeningSocket(udsNamespace);
+
+    armnnUtils::Sockets::Initialize();
+    armnnUtils::Sockets::Socket listeningSocket = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+
+    if (!gatordmock::GatordMockService::OpenListeningSocket(listeningSocket, udsNamespace))
+    {
+        BOOST_FAIL("Failed to open Listening Socket");
+    }
 
     // Enable the profiling service.
     armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
@@ -154,11 +169,14 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     profilingService.Update();
 
     // Connect the profiling service to the mock Gatord.
-    int clientFd = mockService.BlockForOneClient();
-    if (-1 == clientFd)
+    armnnUtils::Sockets::Socket clientSocket =
+            armnnUtils::Sockets::Accept(listeningSocket, nullptr, nullptr, SOCK_CLOEXEC);
+    if (-1 == clientSocket)
     {
         BOOST_FAIL("Failed to connect client");
     }
+
+    gatordmock::GatordMockService mockService(clientSocket, registry, false);
 
     // Give the profiling service sending thread time start executing and send the stream metadata.
     while (profilingService.GetCurrentState() != profiling::ProfilingState::WaitingForAck)
@@ -286,7 +304,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     mockService.WaitForReceivingThread();
     options.m_EnableProfiling = false;
     profilingService.ResetExternalProfilingOptions(options, true);
-
+    armnnUtils::Sockets::Close(listeningSocket);
     // Future tests here will add counters to the ProfilingService, increment values and examine
     // PeriodicCounterCapture data received. These are yet to be integrated.
 }

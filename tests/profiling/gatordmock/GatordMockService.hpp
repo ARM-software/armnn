@@ -39,10 +39,13 @@ class GatordMockService
 public:
     /// @param registry reference to a command handler registry.
     /// @param echoPackets if true the raw packets will be printed to stdout.
-    GatordMockService(armnn::profiling::CommandHandlerRegistry& registry, bool echoPackets)
-        : m_HandlerRegistry(registry)
-        , m_EchoPackets(echoPackets)
-        , m_CloseReceivingThread(false)
+    GatordMockService(armnnUtils::Sockets::Socket clientConnection,
+                      armnn::profiling::CommandHandlerRegistry& registry,
+                      bool echoPackets)
+            : m_ClientConnection(clientConnection)
+            , m_HandlerRegistry(registry)
+            , m_EchoPackets(echoPackets)
+            , m_CloseReceivingThread(false)
     {
         m_PacketsReceivedCount.store(0, std::memory_order_relaxed);
     }
@@ -51,17 +54,14 @@ public:
     {
         // We have set SOCK_CLOEXEC on these sockets but we'll close them to be good citizens.
         armnnUtils::Sockets::Close(m_ClientConnection);
-        armnnUtils::Sockets::Close(m_ListeningSocket);
     }
 
     /// Establish the Unix domain socket and set it to listen for connections.
     /// @param udsNamespace the namespace (socket address) associated with the listener.
     /// @return true only if the socket has been correctly setup.
-    bool OpenListeningSocket(std::string udsNamespace);
-
-    /// Block waiting to accept one client to connect to the UDS.
-    /// @return the file descriptor of the client connection.
-    armnnUtils::Sockets::Socket BlockForOneClient();
+    static bool OpenListeningSocket(armnnUtils::Sockets::Socket listeningSocket,
+                                    const std::string udsNamespace,
+                                    const int numOfConnections = 1);
 
     /// Once the connection is open wait to receive the stream meta data packet from the client. Reading this
     /// packet differs from others as we need to determine endianness.
@@ -118,6 +118,8 @@ public:
 private:
     void ReceiveLoop(GatordMockService& mockService);
 
+    int MainLoop(armnn::profiling::CommandHandlerRegistry& registry, armnnUtils::Sockets::Socket m_ClientConnection);
+
     /// Block on the client connection until a complete packet has been received. This is a placeholder function to
     /// enable early testing of the tool.
     /// @return true if a valid packet has been received.
@@ -145,11 +147,10 @@ private:
     uint32_t m_StreamMetaDataMaxDataLen;
     uint32_t m_StreamMetaDataPid;
 
+    armnnUtils::Sockets::Socket m_ClientConnection;
     armnn::profiling::CommandHandlerRegistry& m_HandlerRegistry;
 
     bool m_EchoPackets;
-    armnnUtils::Sockets::Socket m_ListeningSocket;
-    armnnUtils::Sockets::Socket m_ClientConnection;
     std::thread m_ListeningThread;
     std::atomic<bool> m_CloseReceivingThread;
 };

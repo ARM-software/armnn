@@ -83,8 +83,13 @@ BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
 
     profiling::PacketVersionResolver packetVersionResolver;
 
+    TimelineDecoder timelineDecoder;
+    TimelineCaptureCommandHandler timelineCaptureCommandHandler(
+            1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder);
+
     TimelineDirectoryCaptureCommandHandler timelineDirectoryCaptureCommandHandler(
-            1, 0, packetVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue(), true);
+            1, 0, packetVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue(),
+            timelineCaptureCommandHandler, true);
 
     sendTimelinePacket->SendTimelineMessageDirectoryPackage();
     sendTimelinePacket->Commit();
@@ -150,6 +155,7 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
 
     TimelineDecoder timelineDecoder;
     const TimelineDecoder::Model& model = timelineDecoder.GetModel();
+
 
     TimelineCaptureCommandHandler timelineCaptureCommandHandler(
         1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder, threadIdSize);

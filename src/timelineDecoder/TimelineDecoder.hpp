@@ -39,12 +39,13 @@ public:
 
     const Model& GetModel();
 
-
     TimelineStatus SetEntityCallback(const OnNewEntityCallback);
     TimelineStatus SetEventClassCallback(const OnNewEventClassCallback);
     TimelineStatus SetEventCallback(const OnNewEventCallback);
     TimelineStatus SetLabelCallback(const OnNewLabelCallback);
     TimelineStatus SetRelationshipCallback(const OnNewRelationshipCallback);
+
+    void SetDefaultCallbacks();
 
     void print();
 

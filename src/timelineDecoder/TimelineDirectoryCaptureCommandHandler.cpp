@@ -4,6 +4,7 @@
 //
 
 #include "TimelineDirectoryCaptureCommandHandler.hpp"
+#include "TimelineCaptureCommandHandler.hpp"
 
 #include <iostream>
 #include <string>
@@ -41,6 +42,8 @@ void TimelineDirectoryCaptureCommandHandler::ParseData(const armnn::profiling::P
     {
         m_SwTraceMessages.push_back(profiling::ReadSwTraceMessage(data, offset));
     }
+
+    m_TimelineCaptureCommandHandler.SetThreadIdSize(m_SwTraceHeader.m_ThreadIdBytes);
 }
 
 void TimelineDirectoryCaptureCommandHandler::Print()

@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <CommandHandlerFunctor.hpp>
 #include "armnn/profiling/ITimelineDecoder.hpp"
 
+#include <CommandHandlerFunctor.hpp>
 #include <Packet.hpp>
 #include <ProfilingUtils.hpp>
 
@@ -31,11 +31,11 @@ public:
                                   uint32_t packetId,
                                   uint32_t version,
                                   ITimelineDecoder& timelineDecoder,
-                                  uint32_t threadId_size)
-        : CommandHandlerFunctor(familyId, packetId, version),
-          m_TimelineDecoder(timelineDecoder),
-          m_ThreadIdSize(threadId_size),
-          m_PacketLength(0)
+                                  uint32_t threadIdSize = 0)
+        : CommandHandlerFunctor(familyId, packetId, version)
+        , m_TimelineDecoder(timelineDecoder)
+        , m_ThreadIdSize(threadIdSize)
+        , m_PacketLength(0)
     {}
 
     void operator()(const armnn::profiling::Packet& packet) override;
@@ -46,12 +46,13 @@ public:
     void ReadRelationship(const unsigned char* data, uint32_t& offset);
     void ReadEvent(const unsigned char* data, uint32_t& offset);
 
+    void SetThreadIdSize(uint32_t size);
+
 private:
     void ParseData(const armnn::profiling::Packet& packet);
 
     ITimelineDecoder& m_TimelineDecoder;
-
-    const uint32_t            m_ThreadIdSize;
+    uint32_t m_ThreadIdSize;
     unsigned int              m_PacketLength;
     static const ReadFunction m_ReadFunctions[];
 

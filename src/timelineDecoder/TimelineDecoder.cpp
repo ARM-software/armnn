@@ -4,13 +4,14 @@
 //
 
 #include "TimelineDecoder.hpp"
-#include "../profiling/ProfilingUtils.hpp"
-
+#include <ProfilingUtils.hpp>
 #include <iostream>
+
 namespace armnn
 {
 namespace timelinedecoder
 {
+
 TimelineDecoder::TimelineStatus TimelineDecoder::CreateEntity(const Entity &entity)
 {
     if (m_OnNewEntityCallback == nullptr)
@@ -118,6 +119,34 @@ TimelineDecoder::TimelineStatus TimelineDecoder::SetRelationshipCallback(OnNewRe
     }
     m_OnNewRelationshipCallback = cb;
     return TimelineStatus::TimelineStatus_Success;
+}
+
+void TimelineDecoder::SetDefaultCallbacks()
+{
+    SetEntityCallback([](Model& model, const ITimelineDecoder::Entity entity)
+    {
+        model.m_Entities.emplace_back(entity);
+    });
+
+    SetEventClassCallback([](Model& model, const ITimelineDecoder::EventClass eventClass)
+    {
+        model.m_EventClasses.emplace_back(eventClass);
+    });
+
+    SetEventCallback([](Model& model, const ITimelineDecoder::Event event)
+    {
+        model.m_Events.emplace_back(event);
+    });
+
+    SetLabelCallback([](Model& model, const ITimelineDecoder::Label label)
+    {
+        model.m_Labels.emplace_back(label);
+    });
+
+    SetRelationshipCallback([](Model& model, const ITimelineDecoder::Relationship relationship)
+    {
+        model.m_Relationships.emplace_back(relationship);
+    });
 }
 
 void TimelineDecoder::print()

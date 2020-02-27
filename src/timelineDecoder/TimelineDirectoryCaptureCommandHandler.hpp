@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include <CommandHandlerFunctor.hpp>
+
+#include <TimelineCaptureCommandHandler.hpp>
 #include <Packet.hpp>
 #include <PacketBuffer.hpp>
 #include <ProfilingUtils.hpp>
@@ -26,8 +27,10 @@ public:
     TimelineDirectoryCaptureCommandHandler(uint32_t familyId,
                                            uint32_t packetId,
                                            uint32_t version,
+                                           TimelineCaptureCommandHandler& timelineCaptureCommandHandler,
                                            bool quietOperation = false)
         : CommandHandlerFunctor(familyId, packetId, version)
+        , m_TimelineCaptureCommandHandler(timelineCaptureCommandHandler)
         , m_QuietOperation(quietOperation)
     {}
 
@@ -40,6 +43,7 @@ private:
     void ParseData(const armnn::profiling::Packet& packet);
     void Print();
 
+    TimelineCaptureCommandHandler& m_TimelineCaptureCommandHandler;
     bool m_QuietOperation;
 };
 

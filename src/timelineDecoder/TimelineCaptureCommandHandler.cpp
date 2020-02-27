@@ -6,7 +6,7 @@
 #include "TimelineCaptureCommandHandler.hpp"
 
 #include <string>
-
+#include <armnn/Logging.hpp>
 namespace armnn
 {
 
@@ -28,7 +28,15 @@ void TimelineCaptureCommandHandler::ParseData(const armnn::profiling::Packet& pa
     uint32_t offset = 0;
     m_PacketLength = packet.GetLength();
 
-    if ( m_PacketLength < 8 )
+    // We are expecting TimelineDirectoryCaptureCommandHandler to set the thread id size
+    // if it not set in the constructor
+    if (m_ThreadIdSize == 0)
+    {
+        ARMNN_LOG(error) << "TimelineCaptureCommandHandler: m_ThreadIdSize has not been set";
+        return;
+    }
+
+    if (packet.GetLength() < 8)
     {
         return;
     }
@@ -123,6 +131,11 @@ void TimelineCaptureCommandHandler::ReadEvent(const unsigned char* data, uint32_
     offset += uint64_t_size;
 
     m_TimelineDecoder.CreateEvent(event);
+}
+
+void TimelineCaptureCommandHandler::SetThreadIdSize(uint32_t size)
+{
+    m_ThreadIdSize = size;
 }
 
 void TimelineCaptureCommandHandler::operator()(const profiling::Packet& packet)

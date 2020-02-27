@@ -24,11 +24,11 @@ namespace armnn
 namespace gatordmock
 {
 
-bool GatordMockService::OpenListeningSocket(std::string udsNamespace)
+bool GatordMockService::OpenListeningSocket(armnnUtils::Sockets::Socket listeningSocket,
+                                            const std::string udsNamespace,
+                                            const int numOfConnections)
 {
-    Sockets::Initialize();
-    m_ListeningSocket = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-    if (-1 == m_ListeningSocket)
+    if (-1 == listeningSocket)
     {
         std::cerr << ": Socket construction failed: " << strerror(errno) << std::endl;
         return false;
@@ -41,29 +41,18 @@ bool GatordMockService::OpenListeningSocket(std::string udsNamespace)
     udsAddress.sun_family = AF_UNIX;
 
     // Bind the socket to the UDS namespace.
-    if (-1 == bind(m_ListeningSocket, reinterpret_cast<const sockaddr*>(&udsAddress), sizeof(sockaddr_un)))
+    if (-1 == bind(listeningSocket, reinterpret_cast<const sockaddr*>(&udsAddress), sizeof(sockaddr_un)))
     {
         std::cerr << ": Binding on socket failed: " << strerror(errno) << std::endl;
         return false;
     }
-    // Listen for 1 connection.
-    if (-1 == listen(m_ListeningSocket, 1))
+    // Listen for 10 connections.
+    if (-1 == listen(listeningSocket, numOfConnections))
     {
         std::cerr << ": Listen call on socket failed: " << strerror(errno) << std::endl;
         return false;
     }
     return true;
-}
-
-Sockets::Socket GatordMockService::BlockForOneClient()
-{
-    m_ClientConnection = Sockets::Accept(m_ListeningSocket, nullptr, nullptr, SOCK_CLOEXEC);
-    if (-1 == m_ClientConnection)
-    {
-        std::cerr << ": Failure when waiting for a client connection: " << strerror(errno) << std::endl;
-        return -1;
-    }
-    return m_ClientConnection;
 }
 
 bool GatordMockService::WaitForStreamMetaData()

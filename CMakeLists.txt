@@ -1002,7 +1002,7 @@ if(BUILD_GATORD_MOCK)
         tests/profiling/gatordmock/StreamMetadataCommandHandler.hpp
         )
 
-    include_directories(src/profiling tests/profiling tests/profiling/gatordmock)
+    include_directories(src/profiling tests/profiling tests/profiling/gatordmock src/timelineDecoder)
 
     add_library_ex(gatordMockService STATIC ${gatord_mock_sources})
     target_include_directories(gatordMockService PRIVATE src/armnnUtils)
@@ -1012,6 +1012,7 @@ if(BUILD_GATORD_MOCK)
 
     target_link_libraries(GatordMock
         armnn
+        timelineDecoder
         gatordMockService
         ${Boost_PROGRAM_OPTIONS_LIBRARY}
         ${Boost_SYSTEM_LIBRARY})

@@ -3,60 +3,67 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "../../../src/profiling/PacketVersionResolver.hpp"
-#include "../../../src/profiling/PeriodicCounterSelectionCommandHandler.hpp"
+#include "PacketVersionResolver.hpp"
 #include "CommandFileParser.hpp"
 #include "CommandLineProcessor.hpp"
 #include "DirectoryCaptureCommandHandler.hpp"
 #include "GatordMockService.hpp"
 #include "PeriodicCounterCaptureCommandHandler.hpp"
 #include "PeriodicCounterSelectionResponseHandler.hpp"
+#include <TimelineDecoder.hpp>
+#include <TimelineDirectoryCaptureCommandHandler.hpp>
+#include <TimelineCaptureCommandHandler.hpp>
 
 #include <iostream>
 #include <string>
+#include <NetworkSockets.hpp>
+#include <signal.h>
 
-int main(int argc, char* argv[])
+using namespace armnn;
+using namespace gatordmock;
+
+// Used to capture ctrl-c so we can close any remaining sockets before exit
+static volatile bool run = true;
+void exit_capture(int signum)
 {
-    // Process command line arguments
-    armnn::gatordmock::CommandLineProcessor cmdLine;
-    if (!cmdLine.ProcessCommandLine(argc, argv))
-    {
-        return EXIT_FAILURE;
-    }
+    IgnoreUnused(signum);
+    run = false;
+}
 
-    armnn::profiling::PacketVersionResolver packetVersionResolver;
+bool CreateMockService(armnnUtils::Sockets::Socket clientConnection, std::string commandFile, bool isEchoEnabled)
+{
+    profiling::PacketVersionResolver packetVersionResolver;
     // Create the Command Handler Registry
-    armnn::profiling::CommandHandlerRegistry registry;
+    profiling::CommandHandlerRegistry registry;
+
+    timelinedecoder::TimelineDecoder timelineDecoder;
+    timelineDecoder.SetDefaultCallbacks();
 
     // This functor will receive back the selection response packet.
-    armnn::gatordmock::PeriodicCounterSelectionResponseHandler periodicCounterSelectionResponseHandler(
-        0, 4, packetVersionResolver.ResolvePacketVersion(0, 4).GetEncodedValue());
+    PeriodicCounterSelectionResponseHandler periodicCounterSelectionResponseHandler(
+            0, 4, packetVersionResolver.ResolvePacketVersion(0, 4).GetEncodedValue());
     // This functor will receive the counter data.
-    armnn::gatordmock::PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler(
-        3, 0, packetVersionResolver.ResolvePacketVersion(3, 0).GetEncodedValue());
+    PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler(
+            3, 0, packetVersionResolver.ResolvePacketVersion(3, 0).GetEncodedValue());
 
-    armnn::profiling::DirectoryCaptureCommandHandler directoryCaptureCommandHandler(
-        0, 2, packetVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), false);
+    profiling::DirectoryCaptureCommandHandler directoryCaptureCommandHandler(
+            0, 2, packetVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), false);
+
+    timelinedecoder::TimelineCaptureCommandHandler timelineCaptureCommandHandler(
+            1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder);
+
+    timelinedecoder::TimelineDirectoryCaptureCommandHandler timelineDirectoryCaptureCommandHandler(
+            1, 0, packetVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue(),
+            timelineCaptureCommandHandler, false);
 
     // Register different derived functors
     registry.RegisterFunctor(&periodicCounterSelectionResponseHandler);
     registry.RegisterFunctor(&counterCaptureCommandHandler);
     registry.RegisterFunctor(&directoryCaptureCommandHandler);
+    registry.RegisterFunctor(&timelineDirectoryCaptureCommandHandler);
+    registry.RegisterFunctor(&timelineCaptureCommandHandler);
 
-    armnn::gatordmock::GatordMockService mockService(registry, cmdLine.IsEchoEnabled());
-
-    if (!mockService.OpenListeningSocket(cmdLine.GetUdsNamespace()))
-    {
-        return EXIT_FAILURE;
-    }
-    std::cout << "Bound to UDS namespace: \\0" << cmdLine.GetUdsNamespace() << std::endl;
-
-    // Wait for a single connection.
-    if (-1 == mockService.BlockForOneClient())
-    {
-        return EXIT_FAILURE;
-    }
-    std::cout << "Client connection established." << std::endl;
+    GatordMockService mockService(clientConnection, registry, isEchoEnabled);
 
     // Send receive the strweam metadata and send connection ack.
     if (!mockService.WaitForStreamMetaData())
@@ -69,11 +76,60 @@ int main(int argc, char* argv[])
     mockService.LaunchReceivingThread();
 
     // Process the SET and WAIT command from the file.
-    armnn::gatordmock::CommandFileParser commandLineParser;
-    commandLineParser.ParseFile(cmdLine.GetCommandFile(), mockService);
+    CommandFileParser commandLineParser;
+    commandLineParser.ParseFile(commandFile, mockService);
 
     // Once we've finished processing the file wait for the receiving thread to close.
     mockService.WaitForReceivingThread();
 
+    if(isEchoEnabled)
+    {
+        timelineDecoder.print();
+    }
+
     return EXIT_SUCCESS;
+}
+
+int main(int argc, char* argv[])
+{
+    // We need to capture ctrl-c so we can close any remaining sockets before exit
+    signal(SIGINT, exit_capture);
+
+    // Process command line arguments
+    CommandLineProcessor cmdLine;
+    if (!cmdLine.ProcessCommandLine(argc, argv))
+    {
+        return EXIT_FAILURE;
+    }
+
+    std::vector<std::thread> threads;
+    std::string commandFile = cmdLine.GetCommandFile();
+
+    armnnUtils::Sockets::Initialize();
+    armnnUtils::Sockets::Socket listeningSocket = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+
+    if (!GatordMockService::OpenListeningSocket(listeningSocket, cmdLine.GetUdsNamespace(), 10))
+    {
+        return EXIT_FAILURE;
+    }
+    std::cout << "Bound to UDS namespace: \\0" << cmdLine.GetUdsNamespace() << std::endl;
+
+    // make the socket non-blocking so we can exit the loop
+    armnnUtils::Sockets::SetNonBlocking(listeningSocket);
+    while (run)
+    {
+        armnnUtils::Sockets::Socket clientConnection =
+                armnnUtils::Sockets::Accept(listeningSocket, nullptr, nullptr, SOCK_CLOEXEC);
+
+        if (clientConnection > 0)
+        {
+            threads.emplace_back(
+                    std::thread(CreateMockService, clientConnection, commandFile, cmdLine.IsEchoEnabled()));
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100u));
+    }
+
+    armnnUtils::Sockets::Close(listeningSocket);
+    std::for_each(threads.begin(), threads.end(), [](std::thread& t){t.join();});
 }

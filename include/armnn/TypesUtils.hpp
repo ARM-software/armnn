@@ -116,6 +116,7 @@ constexpr unsigned int GetDataTypeSize(DataType dataType)
 {
     switch (dataType)
     {
+        case DataType::BFloat16:
         case DataType::Float16:               return 2U;
         case DataType::Float32:
         case DataType::Signed32:              return 4U;
@@ -179,6 +180,7 @@ constexpr const char* GetDataTypeName(DataType dataType)
         case DataType::QSymmS16:              return "QSymm16";
         case DataType::Signed32:              return "Signed32";
         case DataType::Boolean:               return "Boolean";
+        case DataType::BFloat16:              return "BFloat16";
 
         default:
             return "Unknown";

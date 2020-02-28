@@ -41,6 +41,7 @@ list(APPEND armnnUtils_sources
     include/armnnUtils/FloatingPointConverter.hpp
     include/armnnUtils/TensorUtils.hpp
     include/armnnUtils/Transpose.hpp
+    src/armnnUtils/BFloat16.hpp
     src/armnnUtils/Filesystem.hpp
     src/armnnUtils/Filesystem.cpp
     src/armnnUtils/Processes.hpp

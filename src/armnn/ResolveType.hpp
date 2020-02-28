@@ -6,6 +6,7 @@
 #pragma once
 
 #include "armnn/Types.hpp"
+#include "BFloat16.hpp"
 #include "Half.hpp"
 
 namespace armnn
@@ -60,6 +61,12 @@ template<>
 struct ResolveTypeImpl<DataType::Boolean>
 {
     using Type = uint8_t;
+};
+
+template<>
+struct ResolveTypeImpl<DataType::BFloat16>
+{
+    using Type = BFloat16;
 };
 
 template<DataType DT>

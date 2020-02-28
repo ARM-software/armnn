@@ -85,6 +85,25 @@ BOOST_AUTO_TEST_CASE(HalfType)
     BOOST_CHECK((GetDataTypeName(armnn::DataType::Float16) == std::string("Float16")));
 }
 
+BOOST_AUTO_TEST_CASE(BFloatType)
+{
+    armnn::BFloat16 a = 16256;
+
+    // Test BFloat16 type
+    BOOST_CHECK_EQUAL(sizeof(a), 2);
+
+    // Test utility function returns correct type.
+    using ResolvedType = armnn::ResolveType<armnn::DataType::BFloat16>;
+    constexpr bool isBFloat16Type = std::is_same<armnn::BFloat16, ResolvedType>::value;
+    BOOST_CHECK(isBFloat16Type);
+
+    //Test utility functions return correct size
+    BOOST_CHECK(GetDataTypeSize(armnn::DataType::BFloat16) == 2);
+
+    //Test utility functions return correct name
+    BOOST_CHECK((GetDataTypeName(armnn::DataType::BFloat16) == std::string("BFloat16")));
+}
+
 BOOST_AUTO_TEST_CASE(GraphTopologicalSortSimpleTest)
 {
     std::map<int, std::vector<int>> graph;

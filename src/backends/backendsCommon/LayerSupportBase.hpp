@@ -353,6 +353,12 @@ public:
         const TensorInfo& weights,
         const Optional<TensorInfo>& biases,
         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
+    bool IsTransposeSupported(const TensorInfo& input,
+                              const TensorInfo& output,
+                              const TransposeDescriptor& descriptor,
+                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
 };
 
 } // namespace armnn

@@ -160,4 +160,9 @@ template <> struct StringifyLayerParameters<TransposeConvolution2dDescriptor>
     static void Serialize(ParameterStringifyFunction& fn, const TransposeConvolution2dDescriptor& desc);
 };
 
+template <> struct StringifyLayerParameters<TransposeDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const TransposeDescriptor& desc);
+};
+
 } // namespace armnn

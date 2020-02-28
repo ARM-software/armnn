@@ -1526,6 +1526,12 @@ IConnectableLayer* Network::AddTransposeConvolution2dLayer(const TransposeConvol
     return layer;
 }
 
+IConnectableLayer* Network::AddTransposeLayer(const TransposeDescriptor& transposeDescriptor,
+                                              const char* name)
+{
+    return m_Graph->AddLayer<TransposeLayer>(transposeDescriptor, name);
+}
+
 IConnectableLayer* Network::AddStackLayer(const StackDescriptor& stackDescriptor,
                                           const char* name)
 {

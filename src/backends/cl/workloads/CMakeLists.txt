@@ -96,6 +96,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClSubtractionWorkload.hpp
     ClTransposeConvolution2dWorkload.cpp
     ClTransposeConvolution2dWorkload.hpp
+    ClTransposeWorkload.cpp
+    ClTransposeWorkload.hpp
     ClWorkloads.hpp
     ClWorkloadUtils.hpp
 )

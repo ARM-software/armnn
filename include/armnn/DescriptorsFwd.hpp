@@ -40,6 +40,7 @@ struct StackDescriptor;
 struct StandInDescriptor;
 struct StridedSliceDescriptor;
 struct TransposeConvolution2dDescriptor;
+struct TransposeDescriptor;
 struct ViewsDescriptor;
 
 using ConcatDescriptor       = OriginsDescriptor;

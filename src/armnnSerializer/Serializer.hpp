@@ -270,6 +270,10 @@ public:
                                           const armnn::Optional<armnn::ConstTensor>& biases,
                                           const char* = nullptr) override;
 
+    void VisitTransposeLayer(const armnn::IConnectableLayer* layer,
+                             const armnn::TransposeDescriptor& descriptor,
+                             const char* name = nullptr) override;
+
 private:
 
     /// Creates the Input Slots and Output Slots and LayerBase for the layer.

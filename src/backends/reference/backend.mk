@@ -85,6 +85,7 @@ BACKEND_SOURCES := \
         workloads/RefStridedSliceWorkload.cpp \
         workloads/RefSplitterWorkload.cpp \
         workloads/RefTransposeConvolution2dWorkload.cpp \
+        workloads/RefTransposeWorkload.cpp \
         workloads/Resize.cpp \
         workloads/Slice.cpp \
         workloads/SpaceToBatchNd.cpp \

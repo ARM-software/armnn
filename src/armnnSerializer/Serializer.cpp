@@ -1301,6 +1301,33 @@ void SerializerVisitor::VisitTransposeConvolution2dLayer(
     CreateAnyLayer(fbLayer.o, serializer::Layer::Layer_TransposeConvolution2dLayer);
 }
 
+void SerializerVisitor::VisitTransposeLayer(const armnn::IConnectableLayer* layer,
+                                            const armnn::TransposeDescriptor& descriptor,
+                                            const char* name)
+{
+    boost::ignore_unused(name);
+
+    // Create FlatBuffer BaseLayer
+    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Transpose);
+
+    std::vector<unsigned int> dimMappings;
+    for (unsigned int i=0; i<descriptor.m_DimMappings.GetSize(); ++i)
+    {
+        dimMappings.push_back(descriptor.m_DimMappings[i]);
+    }
+
+    auto flatBufferDesc = serializer::CreateTransposeDescriptor(m_flatBufferBuilder,
+                                                                m_flatBufferBuilder.CreateVector(dimMappings));
+
+    // Create the FlatBuffer TransposeLayer
+    auto flatBufferLayer = serializer::CreateTransposeLayer(m_flatBufferBuilder,
+                                                            flatBufferBaseLayer,
+                                                            flatBufferDesc);
+
+    // Add the AnyLayer to the FlatBufferLayers
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_TransposeLayer);
+}
+
 void SerializerVisitor::VisitQuantizedLstmLayer(const armnn::IConnectableLayer* layer,
                                                 const armnn::QuantizedLstmInputParams& params,
                                                 const char* name)

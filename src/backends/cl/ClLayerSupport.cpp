@@ -60,6 +60,7 @@
 #include "workloads/ClStridedSliceWorkload.hpp"
 #include "workloads/ClSubtractionWorkload.hpp"
 #include "workloads/ClTransposeConvolution2dWorkload.hpp"
+#include "workloads/ClTransposeWorkload.hpp"
 #endif
 
 using namespace boost;
@@ -817,6 +818,14 @@ bool ClLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
                                    descriptor,
                                    weights,
                                    biases);
+}
+
+bool ClLayerSupport::IsTransposeSupported(const TensorInfo& input,
+                                          const TensorInfo& output,
+                                          const TransposeDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClTransposeWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
 }
 
 } // namespace armnn

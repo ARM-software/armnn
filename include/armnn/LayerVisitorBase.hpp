@@ -246,6 +246,10 @@ public:
                                           const Optional<ConstTensor>&,
                                           const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitTransposeLayer(const IConnectableLayer*,
+                             const TransposeDescriptor&,
+                             const char*) override { DefaultPolicy::Apply(__func__); }
+
 };
 
 } // namespace armnn

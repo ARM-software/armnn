@@ -2501,6 +2501,34 @@ BOOST_AUTO_TEST_CASE(SerializeSwitch)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeTranspose)
+{
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Transpose)
+
+    const std::string layerName("transpose");
+    const armnn::TensorInfo inputTensorInfo({4, 3, 2, 1}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo({1, 2, 3, 4}, armnn::DataType::Float32);
+
+    armnn::TransposeDescriptor descriptor(armnn::PermutationVector({3, 2, 1, 0}));
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const transposeLayer = network->AddTransposeLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(transposeLayer->GetInputSlot(0));
+    transposeLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    transposeLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    TransposeLayerVerifier verifier(layerName, {inputTensorInfo}, {outputTensorInfo}, descriptor);
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeTransposeConvolution2d)
 {
     using Descriptor = armnn::TransposeConvolution2dDescriptor;

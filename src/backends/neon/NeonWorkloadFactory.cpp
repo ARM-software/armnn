@@ -503,6 +503,12 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateSubtraction(
     return std::make_unique<NeonSubtractionWorkload>(descriptor, info);
 }
 
+std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateTranspose(const TransposeQueueDescriptor& descriptor,
+                                                                       const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonTransposeWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateTransposeConvolution2d(
     const TransposeConvolution2dQueueDescriptor &descriptor,
     const WorkloadInfo &info) const

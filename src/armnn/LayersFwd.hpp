@@ -62,6 +62,7 @@
 #include "layers/SubtractionLayer.hpp"
 #include "layers/SwitchLayer.hpp"
 #include "layers/TransposeConvolution2dLayer.hpp"
+#include "layers/TransposeLayer.hpp"
 
 namespace armnn
 {
@@ -145,6 +146,7 @@ DECLARE_LAYER(StandIn)
 DECLARE_LAYER(StridedSlice)
 DECLARE_LAYER(Subtraction)
 DECLARE_LAYER(Switch)
+DECLARE_LAYER(Transpose)
 DECLARE_LAYER(TransposeConvolution2d)
 
 }

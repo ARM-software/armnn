@@ -149,7 +149,8 @@ enum LayerType : uint {
     LogSoftmax = 51,
     Comparison = 52,
     StandIn = 53,
-    ElementwiseUnary = 54
+    ElementwiseUnary = 54,
+    Transpose = 55
 }
 
 // Base layer table to be used as part of other layers
@@ -732,6 +733,15 @@ table TransposeConvolution2dDescriptor {
     dataLayout:DataLayout = NCHW;
 }
 
+table TransposeLayer {
+    base:LayerBase;
+    descriptor:TransposeDescriptor;
+}
+
+table TransposeDescriptor {
+    dimMappings:[uint];
+}
+
 table ResizeLayer {
     base:LayerBase;
     descriptor:ResizeDescriptor;
@@ -820,7 +830,8 @@ union Layer {
     LogSoftmaxLayer,
     ComparisonLayer,
     StandInLayer,
-    ElementwiseUnaryLayer
+    ElementwiseUnaryLayer,
+    TransposeLayer
 }
 
 table AnyLayer {

@@ -40,6 +40,7 @@ list(APPEND armnnUtils_sources
     include/armnnUtils/Permute.hpp
     include/armnnUtils/FloatingPointConverter.hpp
     include/armnnUtils/TensorUtils.hpp
+    include/armnnUtils/Transpose.hpp
     src/armnnUtils/Filesystem.hpp
     src/armnnUtils/Filesystem.cpp
     src/armnnUtils/Processes.hpp
@@ -69,6 +70,7 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/QuantizeHelper.hpp
     src/armnnUtils/TensorIOUtils.hpp
     src/armnnUtils/TensorUtils.cpp
+    src/armnnUtils/Transpose.cpp
     src/armnnUtils/NetworkSockets.hpp
     src/armnnUtils/NetworkSockets.cpp
     )
@@ -360,6 +362,8 @@ list(APPEND armnn_sources
     src/armnn/layers/SwitchLayer.hpp
     src/armnn/layers/TransposeConvolution2dLayer.cpp
     src/armnn/layers/TransposeConvolution2dLayer.hpp
+    src/armnn/layers/TransposeLayer.hpp
+    src/armnn/layers/TransposeLayer.cpp
     src/armnn/BackendRegistry.cpp
     src/armnn/BackendSettings.hpp
     src/armnn/BackendHelper.cpp

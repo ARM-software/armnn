@@ -120,6 +120,7 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/NetworkSockets.cpp \
         src/armnnUtils/Filesystem.cpp \
         src/armnnUtils/Processes.cpp \
+        src/armnnUtils/Transpose.cpp \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \
         src/armnn/layers/ArgMinMaxLayer.cpp \
@@ -177,6 +178,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/SubtractionLayer.cpp \
         src/armnn/layers/SwitchLayer.cpp \
         src/armnn/layers/TransposeConvolution2dLayer.cpp \
+        src/armnn/layers/TransposeLayer.cpp \
         src/profiling/BufferManager.cpp \
         src/profiling/CommandHandler.cpp \
         src/profiling/CommandHandlerFunctor.cpp \

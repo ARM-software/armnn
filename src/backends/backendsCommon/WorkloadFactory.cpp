@@ -1023,6 +1023,17 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                           reason);
             break;
         }
+        case LayerType::Transpose:
+        {
+            auto cLayer = boost::polymorphic_downcast<const TransposeLayer*>(&layer);
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject->IsTransposeSupported(OverrideDataType(input, dataType),
+                                                              OverrideDataType(output, dataType),
+                                                              cLayer->GetParameters(),
+                                                              reason);
+            break;
+        }
         case LayerType::TransposeConvolution2d:
         {
             auto cLayer = boost::polymorphic_downcast<const TransposeConvolution2dLayer*>(&layer);
@@ -1315,7 +1326,7 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreatePad(const PadQueueDescriptor&
 }
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& /*descriptor*/,
-                                                           const WorkloadInfo&/**/ /*info*/) const
+                                                           const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
@@ -1379,7 +1390,7 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateSlice(const SliceQueueDescrip
 {
     return std::unique_ptr<IWorkload>();
 }
-/**/
+
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& /*descriptor*/,
                                                            const WorkloadInfo& /*info*/) const
 {
@@ -1424,6 +1435,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateSubtraction(const Subtraction
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateSwitch(const SwitchQueueDescriptor& /*descriptor*/,
                                                           const WorkloadInfo& /*info*/) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateTranspose(const TransposeQueueDescriptor& /*descriptor*/,
+                                                             const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }

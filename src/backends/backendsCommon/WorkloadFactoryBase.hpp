@@ -266,6 +266,10 @@ public:
                                             const WorkloadInfo& /*info*/) const override
     { return nullptr; }
 
+    std::unique_ptr<IWorkload> CreateTranspose(const TransposeQueueDescriptor& /*descriptor*/,
+                                               const WorkloadInfo& /*info*/) const override
+    { return nullptr; }
+
     std::unique_ptr<IWorkload> CreateTransposeConvolution2d(const TransposeConvolution2dQueueDescriptor& /*descriptor*/,
                                                             const WorkloadInfo& /*info*/) const override
     { return nullptr; }

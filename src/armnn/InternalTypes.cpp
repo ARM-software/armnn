@@ -70,6 +70,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Subtraction: return "Subtraction";
         case LayerType::Switch: return "Switch";
         case LayerType::TransposeConvolution2d: return "TransposeConvolution2d";
+        case LayerType::Transpose: return "Transpose";
         default:
             BOOST_ASSERT_MSG(false, "Unknown layer type");
             return "Unknown";

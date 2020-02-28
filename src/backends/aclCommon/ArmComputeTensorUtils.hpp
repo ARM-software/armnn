@@ -60,6 +60,9 @@ arm_compute::NormalizationLayerInfo BuildArmComputeNormalizationLayerInfo(const 
 /// Utility function used to setup an arm_compute::PermutationVector object from an armnn::PermutationVector.
 arm_compute::PermutationVector BuildArmComputePermutationVector(const armnn::PermutationVector& vector);
 
+/// Utility function used to setup an arm_compute::PermutationVector object from an armnn::PermutationVector.
+arm_compute::PermutationVector BuildArmComputeTransposeVector(const armnn::PermutationVector& vector);
+
 /// Utility function used to setup an arm_compute::Size2D object from width and height values.
 arm_compute::Size2D BuildArmComputeSize2D(const unsigned int width, const unsigned int height);
 

@@ -494,6 +494,14 @@ public:
                                                   const Optional<ConstTensor>& biases,
                                                   const char* name = nullptr) = 0;
 
+    /// Function that a transpose  layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param transposeDescriptor - TransposeDescriptor to configure the transpose.
+    /// @param name - Optional name for the layer.
+    virtual void VisitTransposeLayer(const IConnectableLayer* layer,
+                                     const TransposeDescriptor& transposeDescriptor,
+                                     const char* name = nullptr) = 0;
+
     virtual void StartVisit() {}
     virtual void FinishVisit() {}
 

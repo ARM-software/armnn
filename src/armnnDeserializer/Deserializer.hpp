@@ -128,6 +128,7 @@ private:
     void ParseStridedSlice(GraphPtr graph, unsigned int layerIndex);
     void ParseSubtraction(GraphPtr graph, unsigned int layerIndex);
     void ParseSwitch(GraphPtr graph, unsigned int layerIndex);
+    void ParseTranspose(GraphPtr graph, unsigned int layerIndex);
     void ParseTransposeConvolution2d(GraphPtr graph, unsigned int layerIndex);
 
     void RegisterInputSlots(GraphPtr graph, uint32_t layerIndex,

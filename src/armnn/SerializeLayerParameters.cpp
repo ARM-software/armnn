@@ -491,4 +491,24 @@ void StringifyLayerParameters<TransposeConvolution2dDescriptor>::Serialize(
     fn("DataLayout", GetDataLayoutName(desc.m_DataLayout));
 }
 
+void StringifyLayerParameters<TransposeDescriptor>::Serialize(ParameterStringifyFunction& fn,
+                                                              const TransposeDescriptor& desc)
+{
+    std::stringstream ss;
+    ss <<  "[";
+    bool addComma = false;
+    for (auto it : desc.m_DimMappings)
+    {
+        if (addComma)
+        {
+            ss << ",";
+        }
+        ss << it;
+        addComma = true;
+    }
+    ss << "]";
+
+    fn("DimMappings",ss.str());
+}
+
 } // namespace armnn

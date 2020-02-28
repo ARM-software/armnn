@@ -187,6 +187,10 @@ public:
                                           const Optional<ConstTensor>& biases,
                                           const char* name = nullptr) override;
 
+    void VisitTransposeLayer(const IConnectableLayer* layer,
+                             const TransposeDescriptor& descriptor,
+                             const char* name = nullptr) override;
+
     /// Extract the quantized network
     INetworkPtr RetrieveFinalNetwork() { return std::move(m_QuantizedNetwork); }
 

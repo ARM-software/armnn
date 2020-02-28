@@ -59,6 +59,7 @@
 #include "workloads/NeonStridedSliceWorkload.hpp"
 #include "workloads/NeonSubtractionWorkload.hpp"
 #include "workloads/NeonTransposeConvolution2dWorkload.hpp"
+#include "workloads/NeonTransposeWorkload.hpp"
 #endif
 
 using namespace boost;
@@ -801,6 +802,14 @@ bool NeonLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input
                                    descriptor,
                                    weights,
                                    biases);
+}
+
+bool NeonLayerSupport::IsTransposeSupported(const TensorInfo& input,
+                                            const TensorInfo& output,
+                                            const TransposeDescriptor& descriptor,
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonTransposeWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
 }
 
 } // namespace armnn

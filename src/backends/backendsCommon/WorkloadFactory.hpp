@@ -235,6 +235,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateSwitch(const SwitchQueueDescriptor& descriptor,
                                                     const WorkloadInfo& Info) const;
 
+    virtual std::unique_ptr<IWorkload> CreateTranspose(const TransposeQueueDescriptor& descriptor,
+                                                       const WorkloadInfo& info) const;
+
     virtual std::unique_ptr<IWorkload> CreateTransposeConvolution2d(
         const TransposeConvolution2dQueueDescriptor& descriptor,
         const WorkloadInfo& info) const;

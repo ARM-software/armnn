@@ -58,6 +58,7 @@
 #include "RefStridedSliceWorkload.hpp"
 #include "RefSpaceToDepthWorkload.hpp"
 #include "RefTransposeConvolution2dWorkload.hpp"
+#include "RefTransposeWorkload.hpp"
 #include "RefWorkloadUtils.hpp"
 #include "Resize.hpp"
 #include "Softmax.hpp"

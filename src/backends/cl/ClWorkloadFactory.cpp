@@ -534,6 +534,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSubtraction(const Subtractio
     return MakeWorkload<ClSubtractionWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateTranspose(const TransposeQueueDescriptor& descriptor,
+                                                              const WorkloadInfo& info) const
+{
+    return MakeWorkload<ClTransposeWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateTransposeConvolution2d(
     const TransposeConvolution2dQueueDescriptor& descriptor,
     const WorkloadInfo& info) const

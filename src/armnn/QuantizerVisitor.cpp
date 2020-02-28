@@ -561,4 +561,13 @@ void QuantizerVisitor::VisitTransposeConvolution2dLayer(const IConnectableLayer*
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitTransposeLayer(const IConnectableLayer* layer,
+                                           const TransposeDescriptor& transposeDescriptor,
+                                           const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddTransposeLayer(transposeDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 } //namespace armnn

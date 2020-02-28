@@ -561,6 +561,17 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSubtraction(const Subtracti
     return std::make_unique<RefSubtractionWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateTranspose(const TransposeQueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const
+{
+    if (IsQSymmS16(info))
+    {
+        return std::make_unique<RefTransposeQSymm16Workload>(descriptor, info);
+    }
+    return MakeWorkloadHelper<RefTransposeFloat16Workload, RefTransposeFloat32Workload, RefTransposeQAsymm8Workload,
+            NullWorkload, NullWorkload, NullWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateTransposeConvolution2d(
     const TransposeConvolution2dQueueDescriptor& descriptor,
     const WorkloadInfo& info) const

@@ -141,6 +141,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefStridedSliceWorkload.hpp
     RefTransposeConvolution2dWorkload.cpp
     RefTransposeConvolution2dWorkload.hpp
+    RefTransposeWorkload.cpp
+    RefTransposeWorkload.hpp
     RefWorkloads.hpp
     RefWorkloadUtils.hpp
     Resize.cpp

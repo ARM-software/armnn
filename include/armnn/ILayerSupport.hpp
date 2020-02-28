@@ -369,6 +369,11 @@ public:
         const Optional<TensorInfo>& biases,
         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    virtual bool IsTransposeSupported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      const TransposeDescriptor& descriptor,
+                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
 }; // class ILayerSupport
 
 using ILayerSupportSharedPtr = std::shared_ptr<ILayerSupport>;

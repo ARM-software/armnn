@@ -213,6 +213,9 @@ public:
     std::unique_ptr<IWorkload> CreateSubtraction(const SubtractionQueueDescriptor& descriptor,
                                                  const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateTranspose(const TransposeQueueDescriptor& descriptor,
+                                               const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateTransposeConvolution2d(const TransposeConvolution2dQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const override;
 

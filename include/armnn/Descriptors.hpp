@@ -1119,4 +1119,25 @@ struct TransposeConvolution2dDescriptor
     DataLayout m_DataLayout;
 };
 
+/// A TransposeDescriptor for the TransposeLayer.
+struct TransposeDescriptor
+{
+    TransposeDescriptor()
+            : m_DimMappings{}
+    {}
+
+    TransposeDescriptor(const PermutationVector& dimMappings)
+            : m_DimMappings(dimMappings)
+    {}
+
+    bool operator ==(const TransposeDescriptor &rhs) const
+    {
+        return m_DimMappings.IsEqual(rhs.m_DimMappings);
+    }
+
+    /// @brief Indicates how to translate tensor elements from a given source into the target destination, when
+    /// source and target potentially have different memory layouts e.g. {0U, 3U, 1U, 2U}.
+    PermutationVector m_DimMappings;
+};
+
 } // namespace armnn

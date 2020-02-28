@@ -98,6 +98,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonSubtractionWorkload.hpp
     NeonTransposeConvolution2dWorkload.cpp
     NeonTransposeConvolution2dWorkload.hpp
+    NeonTransposeWorkload.cpp
+    NeonTransposeWorkload.hpp
     NeonWorkloads.hpp
     NeonWorkloadUtils.hpp
 )

@@ -579,4 +579,12 @@ bool LayerSupportBase::IsTransposeConvolution2dSupported(const TensorInfo& /*inp
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsTransposeSupported(const TensorInfo& /*input*/,
+                                            const TensorInfo& /*output*/,
+                                            const TransposeDescriptor& /*descriptor*/,
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 } // namespace armnn

@@ -214,7 +214,34 @@ arm_compute::PermutationVector BuildArmComputePermutationVector(const armnn::Per
     {
         aclPerm.set(i - start, perm[i] - start);
     }
+    return aclPerm;
+}
 
+arm_compute::PermutationVector BuildArmComputeTransposeVector(const armnn::PermutationVector& perm)
+{
+    arm_compute::PermutationVector aclPerm;
+    std::map<unsigned int, unsigned int> permuteMappings;
+    for (unsigned int i = 0; i < perm.GetSize(); ++i)
+    {
+        permuteMappings[perm[i]] = i;
+    }
+
+    std::vector<unsigned int> permuteVector;
+    for (unsigned int i = 0; i < perm.GetSize(); ++i)
+    {
+        permuteVector.push_back(permuteMappings.at(i));
+    }
+
+    unsigned int start = 0;
+    while ((start < perm.GetSize()) && (start == permuteVector[start]))
+    {
+        ++start;
+    }
+
+    for (unsigned int i = start; i < perm.GetSize(); ++i)
+    {
+        aclPerm.set(i - start, permuteVector[i] - start);
+    }
     return aclPerm;
 }
 

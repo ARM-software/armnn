@@ -2680,6 +2680,35 @@ void TransposeConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
     ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
+void TransposeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"TransposeQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const PermutationVector& mapping = m_Parameters.m_DimMappings;
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, mapping.GetSize(), "input");
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, mapping.GetSize(), "output");
+
+    for (unsigned int i = 0u; i < mapping.GetSize(); ++i)
+    {
+        if (inputTensorInfo.GetShape()[mapping[i]] != outputTensorInfo.GetShape()[i])
+        {
+            throw InvalidArgumentException(descriptorName + ": src dimension " + to_string(mapping[i]) +
+                                           " (=" + to_string(inputTensorInfo.GetShape()[mapping[i]]) + ") " +
+                                           "must match dst dimension " + to_string(i) +
+                                           " (=" + to_string(outputTensorInfo.GetShape()[i]) + ")");
+        }
+    }
+
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+}
+
 void QuantizedLstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     const std::string descriptorName{"QuantizedLstmQueueDescriptor"};

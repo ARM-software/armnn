@@ -226,6 +226,9 @@ public:
                                                       const Optional<ConstTensor>& biases,
                                                       const char* name = nullptr) override;
 
+    IConnectableLayer* AddTransposeLayer(const TransposeDescriptor& transposeDescriptor,
+                                         const char* name = nullptr) override;
+
     IConnectableLayer* AddStackLayer(const StackDescriptor& stackDescriptor,
                                      const char* name = nullptr) override;
 

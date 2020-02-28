@@ -511,13 +511,19 @@ public:
                                                               const Optional<ConstTensor>& biases,
                                                               const char* name = nullptr) = 0;
 
+    /// Adds a transpose layer to the network.
+    /// @param transposeDescriptor - TransposeDescriptor to configure the transpose.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddTransposeLayer(const TransposeDescriptor& transposeDescriptor,
+                                                 const char* name = nullptr) = 0;
+
     /// Adds a stack layer to the network.
     /// @param descriptor - Description of the stack layer.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
     virtual IConnectableLayer* AddStackLayer(const StackDescriptor& descriptor,
                                              const char* name = nullptr) = 0;
-
 
     /// Add a stand-in layer for a type unknown to the Arm NN framework.
     /// Note: Due to the nature of this layer, no validation can be performed by the framework.

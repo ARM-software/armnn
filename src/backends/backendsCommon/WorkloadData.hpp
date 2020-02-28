@@ -504,6 +504,11 @@ struct TransposeConvolution2dQueueDescriptor : QueueDescriptorWithParameters<Tra
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct TransposeQueueDescriptor : QueueDescriptorWithParameters<TransposeDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 struct QuantizedLstmQueueDescriptor : QueueDescriptor
 {
     QuantizedLstmQueueDescriptor()

@@ -1388,9 +1388,10 @@ bool RefLayerSupport::IsPermuteSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported output and inputs types.
-    std::array<DataType,3> supportedTypes =
+    std::array<DataType, 4> supportedTypes =
     {
         DataType::Float32,
+        DataType::Float16,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1908,6 +1909,35 @@ bool RefLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
         supported &= CheckSupportRule(TypeAnyOf(biases.value(), biasesSupportedTypes), reasonIfUnsupported,
                                       "Reference TransposeConvolution2d: biases is not a supported type.");
     }
+
+    return supported;
+}
+
+bool RefLayerSupport::IsTransposeSupported(const TensorInfo& input,
+                                           const TensorInfo& output,
+                                           const TransposeDescriptor& descriptor,
+                                           Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(descriptor);
+    bool supported = true;
+
+    // Define supported output and inputs types.
+    std::array<DataType, 4> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QAsymmU8,
+        DataType::QSymmS16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference transpose: input is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference transpose: output is not a supported type.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference transpose: input and output types are mismatched.");
 
     return supported;
 }

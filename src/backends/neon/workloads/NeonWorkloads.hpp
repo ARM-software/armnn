@@ -50,3 +50,4 @@
 #include "NeonStridedSliceWorkload.hpp"
 #include "NeonSubtractionWorkload.hpp"
 #include "NeonTransposeConvolution2dWorkload.hpp"
+#include "NeonTransposeWorkload.hpp"

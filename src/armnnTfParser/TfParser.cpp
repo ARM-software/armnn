@@ -10,6 +10,7 @@
 
 #include <armnnUtils/Permute.hpp>
 #include <armnnUtils/DataLayoutIndexed.hpp>
+#include <armnnUtils/Transpose.hpp>
 
 #include <GraphTopologicalSort.hpp>
 #include <ParserHelper.hpp>
@@ -2084,26 +2085,19 @@ ParsedTfOperationPtr TfParser::ParseTranspose(const tensorflow::NodeDef& nodeDef
     std::vector<int32_t> permuteVectorData;
     permuteVectorInput->GetConstTensor(permuteVectorData);
 
-    std::vector<unsigned int>      armnnPermuteVectorData(permuteVectorData.size());
-    std::vector<int32_t>::iterator it;
-
-    for (unsigned int i = 0u; i < permuteVectorData.size(); ++i)
-    {
-        it                        = std::find(permuteVectorData.begin(), permuteVectorData.end(), i);
-        armnnPermuteVectorData[i] = static_cast<unsigned int>(std::distance(permuteVectorData.begin(), it));
-    }
+    std::vector<unsigned int>      armnnPermuteVectorData(permuteVectorData.begin(), permuteVectorData.end());
 
     const auto permutationVector = PermutationVector(armnnPermuteVectorData.data(), permuteVectorInfo.GetNumElements());
-    const auto desc              = PermuteDescriptor(permutationVector);
+    const auto desc              = TransposeDescriptor(permutationVector);
 
-    auto* layer = m_Network->AddPermuteLayer(desc, nodeDef.name().c_str());
+    auto* layer = m_Network->AddTransposeLayer(desc, nodeDef.name().c_str());
     BOOST_ASSERT(layer);
 
     input0Slot->Connect(layer->GetInputSlot(0));
 
     const auto&       input0Info = input0Slot->GetTensorInfo();
     armnn::TensorInfo outputInfo {input0Info};
-    outputInfo.SetShape(armnnUtils::Permuted(input0Info.GetShape(), desc.m_DimMappings));
+    outputInfo.SetShape(armnnUtils::TransposeTensorShape(input0Info.GetShape(), desc.m_DimMappings));
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);

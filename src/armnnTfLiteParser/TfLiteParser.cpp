@@ -1011,7 +1011,7 @@ void TfLiteParser::ParseTranspose(size_t subgraphIndex, size_t operatorIndex)
     armnn::IConnectableLayer* layer = nullptr;
     auto layerName = boost::str(boost::format("Transpose:%1%:%2%") % subgraphIndex % operatorIndex);
 
-    PermuteDescriptor desc;
+    TransposeDescriptor desc;
 
     if (inputs.size() == 2)
     {
@@ -1020,23 +1020,12 @@ void TfLiteParser::ParseTranspose(size_t subgraphIndex, size_t operatorIndex)
         auto numPermVecElements = permuteTensorInfo.GetNumElements();
         std::vector<unsigned int> permuteShape(numPermVecElements);
         ::memcpy(permuteShape.data(), permuteBufferPtr->data.data(), permuteTensorInfo.GetNumBytes());
+        PermutationVector permutationVector(permuteShape.data(), permuteTensorInfo.GetNumElements());
 
-        // permuteShape assumes Tf/Np permute vectors, we must translate to armnn expected form
-        // to do so we find the perm vector which would invert what a tf perm vector would do (ex 3,0,1,2 -> 1,2,3,0)
-        std::vector<unsigned int> armnnPermuteShape(numPermVecElements);
-        std::vector<unsigned int>::iterator it;
-        for (unsigned int i = 0u; i < numPermVecElements; ++i)
-        {
-            it = std::find(permuteShape.begin(), permuteShape.end(), i);
-            armnnPermuteShape[i] = static_cast<unsigned int>(std::distance(permuteShape.begin(), it));
-        }
-
-        PermutationVector permutationVector(armnnPermuteShape.data(), permuteTensorInfo.GetNumElements());
-
-        desc = PermuteDescriptor(permutationVector);
+        desc = TransposeDescriptor(permutationVector);
     }
 
-    layer = m_Network->AddPermuteLayer(desc, layerName.c_str());
+    layer = m_Network->AddTransposeLayer(desc, layerName.c_str());
 
     BOOST_ASSERT(layer != nullptr);
 

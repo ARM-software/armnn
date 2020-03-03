@@ -7,10 +7,10 @@
 CMD=$( basename $0 )
 
 # For pinning to a ref use this:
-DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
+#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-#DEFAULT_CLFRAMEWORKREVISION="c971cf1034a61875c8e8c87d48634cbfac3865fd" #COMPMID-3090: Fail NEON/ColorConvert/RGBtoU8
+DEFAULT_CLFRAMEWORKREVISION="fec13b8e20dc9d71d729f750633fa52c3a8a0036" #COMPMID-3069: Update android nn build script
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

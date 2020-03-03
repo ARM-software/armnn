@@ -247,6 +247,7 @@ list(APPEND armnn_sources
     include/armnn/Version.hpp
     include/armnn/profiling/IProfilingGuidGenerator.hpp
     include/armnn/profiling/ISendTimelinePacket.hpp
+    profiling/common/include/SocketConnectionException.hpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp
     src/armnn/layers/ActivationLayer.hpp

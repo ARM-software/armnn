@@ -209,6 +209,7 @@ if(BUILD_ARMNN_SERIALIZER)
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/profiling)
 
 # ARM Compute
 # Note that ARM Compute has a different folder layout depending on the branch but also on

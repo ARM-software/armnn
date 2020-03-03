@@ -5,6 +5,8 @@
 
 #include "SocketProfilingConnection.hpp"
 
+#include "common/include/SocketConnectionException.hpp"
+
 #include <cerrno>
 #include <fcntl.h>
 #include <string>
@@ -24,7 +26,10 @@ SocketProfilingConnection::SocketProfilingConnection()
     m_Socket[0].fd = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
     if (m_Socket[0].fd == -1)
     {
-        throw armnn::RuntimeException(std::string("Socket construction failed: ") + strerror(errno));
+        throw armnnProfiling::SocketConnectionException(
+            std::string("SocketProfilingConnection: Socket construction failed: ")  + strerror(errno),
+            m_Socket[0].fd,
+            errno);
     }
 
     // Connect to the named unix domain socket.
@@ -36,7 +41,10 @@ SocketProfilingConnection::SocketProfilingConnection()
     if (0 != connect(m_Socket[0].fd, reinterpret_cast<const sockaddr*>(&server), sizeof(sockaddr_un)))
     {
         Close();
-        throw armnn::RuntimeException(std::string("Cannot connect to stream socket: ") + strerror(errno));
+        throw armnnProfiling::SocketConnectionException(
+            std::string("SocketProfilingConnection: Cannot connect to stream socket: ")  + strerror(errno),
+            m_Socket[0].fd,
+            errno);
     }
 
     // Our socket will only be interested in polling reads.
@@ -46,7 +54,10 @@ SocketProfilingConnection::SocketProfilingConnection()
     if (!Sockets::SetNonBlocking(m_Socket[0].fd))
     {
         Close();
-        throw armnn::RuntimeException(std::string("Failed to set socket as non blocking: ") + strerror(errno));
+        throw armnnProfiling::SocketConnectionException(
+            std::string("SocketProfilingConnection: Failed to set socket as non blocking: ")  + strerror(errno),
+            m_Socket[0].fd,
+            errno);
     }
 }
 
@@ -59,7 +70,10 @@ void SocketProfilingConnection::Close()
 {
     if (Sockets::Close(m_Socket[0].fd) != 0)
     {
-        throw armnn::RuntimeException(std::string("Cannot close stream socket: ") + strerror(errno));
+        throw armnnProfiling::SocketConnectionException(
+            std::string("SocketProfilingConnection: Cannot close stream socket: ")  + strerror(errno),
+            m_Socket[0].fd,
+            errno);
     }
 
     memset(m_Socket, 0, sizeof(m_Socket));
@@ -92,10 +106,13 @@ Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
     switch (pollResult)
     {
     case -1: // Error
-        throw armnn::RuntimeException(std::string("Read failure from socket: ") + strerror(errno));
+        throw armnnProfiling::SocketConnectionException(
+            std::string("SocketProfilingConnection: Error occured while reading from socket: ") + strerror(errno),
+            m_Socket[0].fd,
+            errno);
 
     case 0: // Timeout
-        throw TimeoutException("Timeout while reading from socket");
+        throw TimeoutException("SocketProfilingConnection: Timeout while reading from socket");
 
     default: // Normal poll return but it could still contain an error signal
         // Check if the socket reported an error
@@ -105,18 +122,26 @@ Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
             {
                 // This is an unrecoverable error.
                 Close();
-                throw armnn::RuntimeException(std::string("Error while polling receiving socket: POLLNVAL"));
+                throw armnnProfiling::SocketConnectionException(
+                    std::string("SocketProfilingConnection: Error occured while polling receiving socket: POLLNVAL."),
+                    m_Socket[0].fd);
             }
             if (m_Socket[0].revents == POLLERR)
             {
-                throw armnn::RuntimeException(std::string("Error while polling receiving socket: POLLERR: ") +
-                                              strerror(errno));
+                throw armnnProfiling::SocketConnectionException(
+                    std::string(
+                        "SocketProfilingConnection: Error occured while polling receiving socket: POLLERR: ")
+                        + strerror(errno),
+                    m_Socket[0].fd,
+                    errno);
             }
             if (m_Socket[0].revents == POLLHUP)
             {
                 // This is an unrecoverable error.
                 Close();
-                throw armnn::RuntimeException(std::string("Connection closed by remote client: POLLHUP"));
+                throw armnnProfiling::SocketConnectionException(
+                    std::string("SocketProfilingConnection: Connection closed by remote client: POLLHUP."),
+                    m_Socket[0].fd);
             }
         }
 
@@ -125,7 +150,8 @@ Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
         {
             // This is a corner case. The socket as been woken up but not with any data.
             // We'll throw a timeout exception to loop around again.
-            throw armnn::TimeoutException("File descriptor was polled but no data was available to receive.");
+            throw armnn::TimeoutException(
+                "SocketProfilingConnection: File descriptor was polled but no data was available to receive.");
         }
 
         return ReceivePacket();
@@ -142,15 +168,23 @@ Packet SocketProfilingConnection::ReceivePacket()
         case 0:
             // Socket has closed.
             Close();
-            throw armnn::RuntimeException("Remote socket has closed the connection.");
+            throw armnnProfiling::SocketConnectionException(
+                std::string("SocketProfilingConnection: Remote socket has closed the connection."),
+                m_Socket[0].fd);
         case -1:
             // There's been a socket error. We will presume it's unrecoverable.
             Close();
-            throw armnn::RuntimeException(std::string("Error occured on recv: ") + strerror(errno));
+            throw armnnProfiling::SocketConnectionException(
+                std::string("SocketProfilingConnection: Error occured while reading the packet: ") + strerror(errno),
+                m_Socket[0].fd,
+                errno);
         default:
             if (receiveResult < 8)
             {
-                throw armnn::RuntimeException("The received packet did not contains a valid MIPE header");
+                 throw armnnProfiling::SocketConnectionException(
+                     std::string(
+                         "SocketProfilingConnection: The received packet did not contains a valid PIPE header."),
+                     m_Socket[0].fd);
             }
             break;
     }
@@ -170,12 +204,17 @@ Packet SocketProfilingConnection::ReceivePacket()
         long receivedLength = Sockets::Read(m_Socket[0].fd, packetData.get(), dataLength);
         if (receivedLength < 0)
         {
-            throw armnn::RuntimeException(std::string("Error occurred on recv: ") + strerror(errno));
+            throw armnnProfiling::SocketConnectionException(
+                std::string("SocketProfilingConnection: Error occured while reading the packet: ")  + strerror(errno),
+                m_Socket[0].fd,
+                errno);
         }
         if (dataLength != static_cast<uint32_t>(receivedLength))
         {
             // What do we do here if we can't read in a full packet?
-            throw armnn::RuntimeException("Invalid MIPE packet");
+            throw armnnProfiling::SocketConnectionException(
+                std::string("SocketProfilingConnection: Invalid PIPE packet."),
+                m_Socket[0].fd);
         }
     }
 

@@ -7,6 +7,7 @@
 
 #include <armnn/BackendId.hpp>
 #include <armnn/Logging.hpp>
+#include <common/include/SocketConnectionException.hpp>
 
 #include <boost/format.hpp>
 
@@ -127,6 +128,11 @@ void ProfilingService::Update()
         {
             ARMNN_LOG(warning) << "An error has occurred when creating the profiling connection: "
                                        << e.what();
+        }
+        catch (const armnnProfiling::SocketConnectionException& e)
+        {
+            ARMNN_LOG(warning) << "An error has occurred when creating the profiling connection ["
+                                       << e.what() << "] on socket [" << e.GetSocketFd() << "].";
         }
 
         // Move to the next state

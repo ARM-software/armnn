@@ -9,6 +9,7 @@
 #include <CommandHandler.hpp>
 #include <CommandHandlerKey.hpp>
 #include <CommandHandlerRegistry.hpp>
+#include <common/include/SocketConnectionException.hpp>
 #include <ConnectionAcknowledgedCommandHandler.hpp>
 #include <CounterDirectory.hpp>
 #include <CounterIdMap.hpp>
@@ -1888,10 +1889,25 @@ BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
     BOOST_CHECK_THROW(differentCommandHandler(packetB), armnn::Exception);
 }
 
-BOOST_AUTO_TEST_CASE(CheckSocketProfilingConnection)
+BOOST_AUTO_TEST_CASE(CheckSocketConnectionException)
 {
-    // Check that creating a SocketProfilingConnection results in an exception as the Gator UDS doesn't exist.
-    BOOST_CHECK_THROW(new SocketProfilingConnection(), armnn::Exception);
+    // Check that creating a SocketProfilingConnection armnnProfiling in an exception as the Gator UDS doesn't exist.
+    BOOST_CHECK_THROW(new SocketProfilingConnection(), armnnProfiling::SocketConnectionException);
+}
+
+BOOST_AUTO_TEST_CASE(CheckSocketConnectionException2)
+{
+    try
+    {
+        new SocketProfilingConnection();
+    }
+    catch (armnnProfiling::SocketConnectionException& ex)
+    {
+        BOOST_CHECK(ex.GetSocketFd() == 0);
+        BOOST_CHECK(ex.GetErrorNo() == 111);
+        BOOST_CHECK(ex.what()
+                    == std::string("SocketProfilingConnection: Cannot connect to stream socket: Connection refused"));
+    }
 }
 
 BOOST_AUTO_TEST_CASE(SwTraceIsValidCharTest)

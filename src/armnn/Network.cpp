@@ -910,13 +910,18 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     // Perform optimisation passes
     using namespace optimizations;
     Optimizer::Pass(optGraph, MakeOptimizations(SquashEqualPermuteSiblings(),
+                                                SquashEqualTransposeSiblings(),
                                                 SquashEqualReshapeSiblings(),
                                                 OptimizeInversePermutes(),
+                                                OptimizeInverseTransposes(),
                                                 MovePermuteUp(),
+                                                MoveTransposeUp(),
                                                 PermuteAsReshape(),
+                                                TransposeAsReshape(),
                                                 OptimizeConsecutiveReshapes(),
                                                 FoldPadIntoConvolution2d(),
-                                                PermuteAndBatchToSpaceAsDepthToSpace()));
+                                                PermuteAndBatchToSpaceAsDepthToSpace(),
+                                                TransposeAndBatchToSpaceAsDepthToSpace()));
 
     // Infer the tensor infos for all output slots. Throws an exception on failure
     optGraph.InferTensorInfos();

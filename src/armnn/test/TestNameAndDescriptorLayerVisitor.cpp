@@ -247,6 +247,12 @@ armnn::StridedSliceDescriptor GetDescriptor<armnn::StridedSliceDescriptor>()
     return descriptor;
 }
 
+template<>
+armnn::TransposeDescriptor GetDescriptor<armnn::TransposeDescriptor>()
+{
+    return armnn::TransposeDescriptor({ 0, 1, 2, 3 });
+}
+
 } // anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(TestNameAndDescriptorLayerVisitor)
@@ -275,5 +281,6 @@ TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(SpaceToDepth)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Splitter)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Stack)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(StridedSlice)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Transpose)
 
 BOOST_AUTO_TEST_SUITE_END()

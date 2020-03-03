@@ -64,6 +64,8 @@ protected:
 };
 
 using SquashEqualPermuteSiblings = OptimizeForConnection<Layer, PermuteLayer, SquashEqualSiblingsImpl<PermuteLayer>>;
+using SquashEqualTransposeSiblings = OptimizeForConnection<Layer, TransposeLayer,
+    SquashEqualSiblingsImpl<TransposeLayer>>;
 using SquashEqualReshapeSiblings = OptimizeForConnection<Layer, ReshapeLayer, SquashEqualSiblingsImpl<ReshapeLayer>>;
 
 } // namespace optimizations

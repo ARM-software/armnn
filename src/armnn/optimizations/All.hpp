@@ -4,14 +4,16 @@
 //
 #pragma once
 
+#include "AddDebug.hpp"
 #include "ConvertConstants.hpp"
+#include "ConvertFp32NetworkToFp16.hpp"
+#include "FoldPadIntoConvolution2d.hpp"
+#include "MovePermuteUp.hpp"
+#include "MoveTransposeUp.hpp"
+#include "OptimizeConsecutiveReshapes.hpp"
+#include "OptimizeInverseConversions.hpp"
 #include "OptimizeInversePermutes.hpp"
 #include "PermuteAsReshape.hpp"
-#include "OptimizeConsecutiveReshapes.hpp"
-#include "SquashEqualSiblings.hpp"
-#include "MovePermuteUp.hpp"
-#include "OptimizeInverseConversions.hpp"
-#include "ConvertFp32NetworkToFp16.hpp"
-#include "AddDebug.hpp"
-#include "FoldPadIntoConvolution2d.hpp"
 #include "PermuteAndBatchToSpaceAsDepthToSpace.hpp"
+#include "SquashEqualSiblings.hpp"
+#include "TransposeAsReshape.hpp"

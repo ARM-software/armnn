@@ -13,6 +13,7 @@ namespace armnn
 namespace optimizations
 {
 
+template <typename PermuteType>
 class OptimizeInversePermutesImpl
 {
 public:
@@ -22,9 +23,9 @@ public:
     {
         boost::ignore_unused(graph);
         Layer& base = connection.GetConnectedOutputSlot()->GetOwningLayer();
-        auto child = boost::polymorphic_downcast<PermuteLayer*>(&connection.GetOwningLayer());
+        auto child = boost::polymorphic_downcast<PermuteType*>(&connection.GetOwningLayer());
 
-        if (child->IsInverse(*boost::polymorphic_downcast<PermuteLayer*>(&base)))
+        if (child->IsInverse(*boost::polymorphic_downcast<PermuteType*>(&base)))
         {
             // Bypass both layers. Child will be removed as it's left unconnected.
             // Base layer will be removed if left unconnected.
@@ -37,7 +38,10 @@ protected:
     ~OptimizeInversePermutesImpl() = default;
 };
 
-using OptimizeInversePermutes = OptimizeForConnection<PermuteLayer, PermuteLayer, OptimizeInversePermutesImpl>;
+using OptimizeInversePermutes = OptimizeForConnection<PermuteLayer, PermuteLayer,
+    OptimizeInversePermutesImpl<PermuteLayer>>;
+using OptimizeInverseTransposes = OptimizeForConnection<TransposeLayer, TransposeLayer,
+    OptimizeInversePermutesImpl<TransposeLayer>>;
 
 } // namespace optimizations
 } // namespace armnn

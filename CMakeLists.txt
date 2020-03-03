@@ -441,12 +441,12 @@ list(APPEND armnn_sources
     src/armnn/optimizations/ConvertFp32NetworkToFp16.hpp
     src/armnn/optimizations/FoldPadIntoConvolution2d.hpp
     src/armnn/optimizations/MovePermuteUp.hpp
+    src/armnn/optimizations/MoveTransposeUp.hpp
     src/armnn/optimizations/Optimization.hpp
     src/armnn/optimizations/OptimizeConsecutiveReshapes.hpp
     src/armnn/optimizations/OptimizeInverseConversions.hpp
     src/armnn/optimizations/OptimizeInversePermutes.hpp
     src/armnn/optimizations/PermuteAndBatchToSpaceAsDepthToSpace.hpp
-    src/armnn/optimizations/PermuteAndBatchToSpaceAsDepthToSpace.cpp
     src/armnn/optimizations/PermuteAsReshape.hpp
     src/armnn/optimizations/SquashEqualSiblings.hpp
     src/profiling/BufferManager.cpp
@@ -619,12 +619,14 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/optimizations/Fp32NetworkToFp16ConverterTests.cpp
         src/armnn/test/optimizations/InsertDebugLayerTests.cpp
         src/armnn/test/optimizations/MovePermuteUpTests.cpp
+        src/armnn/test/optimizations/MoveTransposeUpTests.cpp
         src/armnn/test/optimizations/OptimizeConsecutiveReshapesTests.cpp
         src/armnn/test/optimizations/OptimizeInverseConversionsTests.cpp
         src/armnn/test/optimizations/OptimizeInversePermutesTests.cpp
         src/armnn/test/optimizations/PermuteAndBatchToSpaceAsDepthToSpaceTests.cpp
         src/armnn/test/optimizations/PermuteAsReshapeTests.cpp
         src/armnn/test/optimizations/SquashEqualSiblingsTests.cpp
+        src/armnn/test/optimizations/TransposeAsReshapeTests.cpp
         src/armnn/test/OptionalTest.cpp
         src/armnn/test/ProfilerTests.cpp
         src/armnn/test/ProfilingEventTest.cpp

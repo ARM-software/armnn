@@ -95,7 +95,6 @@ LOCAL_SRC_FILES := \
         src/armnn/NetworkUtils.cpp \
         src/armnn/Observable.cpp \
         src/armnn/Optimizer.cpp \
-        src/armnn/optimizations/PermuteAndBatchToSpaceAsDepthToSpace.cpp \
         src/armnn/OutputHandler.cpp \
         src/armnn/ProfilingEvent.cpp \
         src/armnn/Profiling.cpp \
@@ -352,6 +351,7 @@ LOCAL_SRC_FILES := \
         src/armnn/test/optimizations/PermuteAndBatchToSpaceAsDepthToSpaceTests.cpp \
         src/armnn/test/optimizations/PermuteAsReshapeTests.cpp \
         src/armnn/test/optimizations/SquashEqualSiblingsTests.cpp \
+        src/armnn/test/optimizations/TransposeAsReshapeTests.cpp \
         src/armnn/test/OptimizerTests.cpp \
         src/armnn/test/OptionalTest.cpp \
         src/armnn/test/ProfilerTests.cpp \

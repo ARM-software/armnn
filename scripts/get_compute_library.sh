@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="fec13b8e20dc9d71d729f750633fa52c3a8a0036" #COMPMID-3069: Update android nn build script
+DEFAULT_CLFRAMEWORKREVISION="adb3291dda4e56de1af10e783b787445d6587a38" #COMPMID-3100 Fuse bias addition with fully connected layer NEON
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

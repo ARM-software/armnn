@@ -1120,7 +1120,6 @@ void BatchNormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInf
     ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
 
     ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
-    ValidateTensorQuantizationSpace(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
     ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 
     ValidatePointer(m_Mean,     descriptorName, "mean");

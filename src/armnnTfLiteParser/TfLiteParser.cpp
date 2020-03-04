@@ -2454,17 +2454,6 @@ void TfLiteParser::ParseSplit(size_t subgraphIndex, size_t operatorIndex)
     BOOST_ASSERT(axisTensorInfo.GetNumElements() == 1);
     const unsigned int splitDim = axisData[0];
 
-    // Armnn supports split along the channel dimension for data formats NHWC and NCHW.
-    if (splitDim == 0 || splitDim == 2)
-    {
-        throw ParseException(
-            boost::str(
-                boost::format(
-                    "Dimension %1% for split is not supported by Armnn. %2%")
-                    % splitDim
-                    % CHECK_LOCATION().AsString()));
-    }
-
     auto inputDimSize = inputTensorInfo.GetNumDimensions();
     if (inputDimSize > MaxNumOfTensorDimensions)
     {

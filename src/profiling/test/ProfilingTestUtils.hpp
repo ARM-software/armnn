@@ -18,25 +18,29 @@ using namespace armnn::profiling;
 
 inline unsigned int OffsetToNextWord(unsigned int numberOfBytes);
 
-void VerifyTimelineLabelBinaryPacket(Optional<ProfilingGuid> guid,
-                                     const std::string& label,
-                                     const unsigned char* readableData,
-                                     unsigned int& offset);
+void VerifyTimelineHeaderBinary(const unsigned char* readableData,
+                                unsigned int& offset,
+                                uint32_t packetDataLength);
 
-void VerifyTimelineEventClassBinaryPacket(ProfilingGuid guid,
+void VerifyTimelineLabelBinaryPacketData(Optional<ProfilingGuid> guid,
+                                         const std::string& label,
+                                         const unsigned char* readableData,
+                                         unsigned int& offset);
+
+void VerifyTimelineEventClassBinaryPacketData(ProfilingGuid guid,
+                                              const unsigned char* readableData,
+                                              unsigned int& offset);
+
+void VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType relationshipType,
+                                                Optional<ProfilingGuid> relationshipGuid,
+                                                Optional<ProfilingGuid> headGuid,
+                                                Optional<ProfilingGuid> tailGuid,
+                                                const unsigned char* readableData,
+                                                unsigned int& offset);
+
+void VerifyTimelineEntityBinaryPacketData(Optional<ProfilingGuid> guid,
                                           const unsigned char* readableData,
                                           unsigned int& offset);
-
-void VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType relationshipType,
-                                            Optional<ProfilingGuid> relationshipGuid,
-                                            Optional<ProfilingGuid> headGuid,
-                                            Optional<ProfilingGuid> tailGuid,
-                                            const unsigned char* readableData,
-                                            unsigned int& offset);
-
-void VerifyTimelineEntityBinaryPacket(Optional<ProfilingGuid> guid,
-                                      const unsigned char* readableData,
-                                      unsigned int& offset);
 
 void VerifyTimelineEventBinaryPacket(Optional<uint64_t> timestamp,
                                      Optional<std::thread::id> threadId,

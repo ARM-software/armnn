@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     BOOST_CHECK(swTraceMessage.m_ArgNames[2] == "eventGuid");
 }
 
-BOOST_AUTO_TEST_CASE(SendTimelineEntityPlusEventClassBinaryPacketTest)
+BOOST_AUTO_TEST_CASE(SendTimelineEntityWithEventClassPacketTest)
 {
     MockBufferManager bufferManager(40);
     TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
@@ -159,23 +159,26 @@ BOOST_AUTO_TEST_CASE(SendTimelineEntityPlusEventClassBinaryPacketTest)
     unsigned int offset = 0;
 
     // Reading TimelineEntityClassBinaryPacket
-    uint32_t entityBinaryPacketHeaderWord0 = ReadUint32(packetBuffer, offset);
-    uint32_t entityBinaryPacketFamily = (entityBinaryPacketHeaderWord0 >> 26) & 0x0000003F;
-    uint32_t entityBinaryPacketClass  = (entityBinaryPacketHeaderWord0 >> 19) & 0x0000007F;
-    uint32_t entityBinaryPacketType   = (entityBinaryPacketHeaderWord0 >> 16) & 0x00000007;
+    uint32_t entityBinaryPacketHeaderWord0  = ReadUint32(packetBuffer, offset);
+    uint32_t entityBinaryPacketFamily       = (entityBinaryPacketHeaderWord0 >> 26) & 0x0000003F;
+    uint32_t entityBinaryPacketClass        = (entityBinaryPacketHeaderWord0 >> 19) & 0x0000007F;
+    uint32_t entityBinaryPacketType         = (entityBinaryPacketHeaderWord0 >> 16) & 0x00000007;
     uint32_t entityBinaryPacketStreamId     = (entityBinaryPacketHeaderWord0 >>  0) & 0x00000007;
 
-    BOOST_CHECK(entityBinaryPacketFamily == 1);
-    BOOST_CHECK(entityBinaryPacketClass  == 0);
-    BOOST_CHECK(entityBinaryPacketType   == 1);
+    BOOST_CHECK(entityBinaryPacketFamily       == 1);
+    BOOST_CHECK(entityBinaryPacketClass        == 0);
+    BOOST_CHECK(entityBinaryPacketType         == 1);
     BOOST_CHECK(entityBinaryPacketStreamId     == 0);
 
     offset += uint32_t_size;
-    uint32_t entityBinaryPacketHeaderWord1 = ReadUint32(packetBuffer, offset);
+
+    uint32_t entityBinaryPacketHeaderWord1      = ReadUint32(packetBuffer, offset);
+
     uint32_t entityBinaryPacketSequenceNumbered = (entityBinaryPacketHeaderWord1 >> 24) & 0x00000001;
     uint32_t entityBinaryPacketDataLength       = (entityBinaryPacketHeaderWord1 >>  0) & 0x00FFFFFF;
+
     BOOST_CHECK(entityBinaryPacketSequenceNumbered == 0);
-    BOOST_CHECK(entityBinaryPacketDataLength       == 12);
+    BOOST_CHECK(entityBinaryPacketDataLength       == 24);
 
     // Check the decl_id
     offset += uint32_t_size;
@@ -191,25 +194,7 @@ BOOST_AUTO_TEST_CASE(SendTimelineEntityPlusEventClassBinaryPacketTest)
 
     // Reading TimelineEventClassBinaryPacket
     offset += uint64_t_size;
-    uint32_t eventClassBinaryPacketHeaderWord0 = ReadUint32(packetBuffer, offset);
-    uint32_t eventClassBinaryPacketFamily = (eventClassBinaryPacketHeaderWord0 >> 26) & 0x0000003F;
-    uint32_t eventClassBinaryPacketClass  = (eventClassBinaryPacketHeaderWord0 >> 19) & 0x0000007F;
-    uint32_t eventClassBinaryPacketType   = (eventClassBinaryPacketHeaderWord0 >> 16) & 0x00000007;
-    uint32_t eventClassBinaryPacketStreamId     = (eventClassBinaryPacketHeaderWord0 >>  0) & 0x00000007;
 
-    BOOST_CHECK(eventClassBinaryPacketFamily == 1);
-    BOOST_CHECK(eventClassBinaryPacketClass  == 0);
-    BOOST_CHECK(eventClassBinaryPacketType   == 1);
-    BOOST_CHECK(eventClassBinaryPacketStreamId     == 0);
-
-    offset += uint32_t_size;
-    uint32_t eventClassBinaryPacketHeaderWord1 = ReadUint32(packetBuffer, offset);
-    uint32_t eventClassBinaryPacketSequenceNumbered = (eventClassBinaryPacketHeaderWord1 >> 24) & 0x00000001;
-    uint32_t eventClassBinaryPacketDataLength       = (eventClassBinaryPacketHeaderWord1 >>  0) & 0x00FFFFFF;
-    BOOST_CHECK(eventClassBinaryPacketSequenceNumbered == 0);
-    BOOST_CHECK(eventClassBinaryPacketDataLength       == 12);
-
-    offset += uint32_t_size;
     uint32_t eventClassDeclId = ReadUint32(packetBuffer, offset);
     BOOST_CHECK(eventClassDeclId == uint32_t(2));
 
@@ -221,7 +206,7 @@ BOOST_AUTO_TEST_CASE(SendTimelineEntityPlusEventClassBinaryPacketTest)
     bufferManager.MarkRead(packetBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(SendTimelinePacketTests1)
+BOOST_AUTO_TEST_CASE(SendEventClassAfterTimelineEntityPacketTest)
 {
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);

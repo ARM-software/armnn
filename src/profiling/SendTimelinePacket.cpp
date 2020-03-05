@@ -19,11 +19,35 @@ void SendTimelinePacket::Commit()
         return;
     }
 
+    if (!m_DirectoryPackage)
+    {
+        // Datalength should be Offset minus the two header words
+        m_PacketDataLength = m_Offset - m_uint32_t_size * 2;
+        // Reset offset to prepend header with full packet datalength
+        m_Offset = 0;
+
+        // Add header before commit
+        m_PacketHeader = CreateTimelinePacketHeader(1,0,1,0,0,m_PacketDataLength);
+
+        // Write the timeline binary packet header to the buffer
+        WriteUint32(m_WriteBuffer->GetWritableData(), m_Offset, m_PacketHeader.first);
+        m_Offset += m_uint32_t_size;
+        WriteUint32(m_WriteBuffer->GetWritableData(), m_Offset, m_PacketHeader.second);
+
+        m_BufferManager.Commit(m_WriteBuffer, m_PacketDataLength + m_uint32_t_size * 2);
+
+    }
+    else
+    {
+        m_DirectoryPackage = false;
+        m_BufferManager.Commit(m_WriteBuffer, m_Offset);
+    }
+
     // Commit the message
-    m_BufferManager.Commit(m_WriteBuffer, m_Offset);
     m_WriteBuffer.reset(nullptr);
-    m_Offset = 0;
-    m_BufferSize = 0;
+    // Reset offset to start after prepended header
+    m_Offset = 8;
+    m_RemainingBufferSize = 0;
 }
 
 void SendTimelinePacket::ReserveBuffer()
@@ -45,12 +69,18 @@ void SendTimelinePacket::ReserveBuffer()
         throw BufferExhaustion("No space left on buffer", CHECK_LOCATION());
     }
 
-    m_BufferSize = reserved;
+    if (m_DirectoryPackage)
+    {
+        m_RemainingBufferSize = reserved;
+        return;
+    }
+    // Account for the header size which is added at Commit()
+    m_RemainingBufferSize = reserved - 8;
 }
 
 void SendTimelinePacket::SendTimelineEntityBinaryPacket(uint64_t profilingGuid)
 {
-    ForwardWriteBinaryFunction(WriteTimelineEntityBinaryPacket,
+    ForwardWriteBinaryFunction(WriteTimelineEntityBinary,
                                profilingGuid);
 }
 
@@ -58,7 +88,7 @@ void SendTimelinePacket::SendTimelineEventBinaryPacket(uint64_t timestamp,
                                                        std::thread::id threadId,
                                                        uint64_t profilingGuid)
 {
-    ForwardWriteBinaryFunction(WriteTimelineEventBinaryPacket,
+    ForwardWriteBinaryFunction(WriteTimelineEventBinary,
                                timestamp,
                                threadId,
                                profilingGuid);
@@ -66,7 +96,7 @@ void SendTimelinePacket::SendTimelineEventBinaryPacket(uint64_t timestamp,
 
 void SendTimelinePacket::SendTimelineEventClassBinaryPacket(uint64_t profilingGuid)
 {
-    ForwardWriteBinaryFunction(WriteTimelineEventClassBinaryPacket,
+    ForwardWriteBinaryFunction(WriteTimelineEventClassBinary,
                                profilingGuid);
 }
 
@@ -82,7 +112,7 @@ void SendTimelinePacket::SendTimelineRelationshipBinaryPacket(ProfilingRelations
                                                               uint64_t headGuid,
                                                               uint64_t tailGuid)
 {
-    ForwardWriteBinaryFunction(WriteTimelineRelationshipBinaryPacket,
+    ForwardWriteBinaryFunction(WriteTimelineRelationshipBinary,
                                relationshipType,
                                relationshipGuid,
                                headGuid,
@@ -93,13 +123,17 @@ void SendTimelinePacket::SendTimelineMessageDirectoryPackage()
 {
     try
     {
+        // Flag to Reserve & Commit() that a DirectoryPackage is being sent
+        m_DirectoryPackage = true;
         // Reserve buffer if it hasn't already been reserved
         ReserveBuffer();
-
         // Write to buffer
         unsigned int numberOfBytesWritten = 0;
+        // Offset is initialised to 8
+        m_Offset = 0;
+
         TimelinePacketStatus result = WriteTimelineMessageDirectoryPackage(&m_WriteBuffer->GetWritableData()[m_Offset],
-                                                                           m_BufferSize,
+                                                                           m_RemainingBufferSize,
                                                                            numberOfBytesWritten);
         if (result != armnn::profiling::TimelinePacketStatus::Ok)
         {
@@ -108,7 +142,7 @@ void SendTimelinePacket::SendTimelineMessageDirectoryPackage()
 
         // Commit the message
         m_Offset     += numberOfBytesWritten;
-        m_BufferSize -= numberOfBytesWritten;
+        m_RemainingBufferSize -= numberOfBytesWritten;
         Commit();
     }
     catch (...)

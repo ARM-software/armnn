@@ -31,20 +31,20 @@ public:
     using OnNewLabelCallback        =  void (*)(Model &, const Label);
     using OnNewRelationshipCallback =  void (*)(Model &, const Relationship);
 
-    virtual ErrorCode CreateEntity(const Entity &) override;
-    virtual ErrorCode CreateEventClass(const EventClass &) override;
-    virtual ErrorCode CreateEvent(const Event &) override;
-    virtual ErrorCode CreateLabel(const Label &) override;
-    virtual ErrorCode CreateRelationship(const Relationship &) override;
+    virtual TimelineStatus CreateEntity(const Entity &) override;
+    virtual TimelineStatus CreateEventClass(const EventClass &) override;
+    virtual TimelineStatus CreateEvent(const Event &) override;
+    virtual TimelineStatus CreateLabel(const Label &) override;
+    virtual TimelineStatus CreateRelationship(const Relationship &) override;
 
     const Model& GetModel();
 
 
-    ErrorCode SetEntityCallback(const OnNewEntityCallback);
-    ErrorCode SetEventClassCallback(const OnNewEventClassCallback);
-    ErrorCode SetEventCallback(const OnNewEventCallback);
-    ErrorCode SetLabelCallback(const OnNewLabelCallback);
-    ErrorCode SetRelationshipCallback(const OnNewRelationshipCallback);
+    TimelineStatus SetEntityCallback(const OnNewEntityCallback);
+    TimelineStatus SetEventClassCallback(const OnNewEventClassCallback);
+    TimelineStatus SetEventCallback(const OnNewEventCallback);
+    TimelineStatus SetLabelCallback(const OnNewLabelCallback);
+    TimelineStatus SetRelationshipCallback(const OnNewRelationshipCallback);
 
     void print();
 

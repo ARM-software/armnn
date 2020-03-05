@@ -31,7 +31,6 @@ void SendTimelinePacketToCommandHandler(const unsigned char* packetBuffer,
     offset += uint32_t_size;
     header[1] = profiling::ReadUint32(packetBuffer, offset);
     offset += uint32_t_size;
-
     uint32_t PacketDataLength  = header[1] & 0x00FFFFFF;
 
     auto uniquePacketData = std::make_unique<unsigned char[]>(PacketDataLength);
@@ -155,15 +154,14 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
     TimelineCaptureCommandHandler timelineCaptureCommandHandler(
         1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder, threadIdSize);
 
-    BOOST_CHECK(timelineDecoder.SetEntityCallback(PushEntity) == ITimelineDecoder::ErrorCode::ErrorCode_Success);
-    BOOST_CHECK(
-        timelineDecoder.SetEventClassCallback(PushEventClass) == ITimelineDecoder::ErrorCode::ErrorCode_Success);
-    BOOST_CHECK(timelineDecoder.SetEventCallback(PushEvent) == ITimelineDecoder::ErrorCode::ErrorCode_Success);
-    BOOST_CHECK(timelineDecoder.SetLabelCallback(PushLabel) == ITimelineDecoder::ErrorCode::ErrorCode_Success);
-    BOOST_CHECK(
-        timelineDecoder.SetRelationshipCallback(PushRelationship) == ITimelineDecoder::ErrorCode::ErrorCode_Success);
+    using Status = ITimelineDecoder::TimelineStatus;
+    BOOST_CHECK(timelineDecoder.SetEntityCallback(PushEntity)             == Status::TimelineStatus_Success);
+    BOOST_CHECK(timelineDecoder.SetEventClassCallback(PushEventClass)     == Status::TimelineStatus_Success);
+    BOOST_CHECK(timelineDecoder.SetEventCallback(PushEvent)               == Status::TimelineStatus_Success);
+    BOOST_CHECK(timelineDecoder.SetLabelCallback(PushLabel)               == Status::TimelineStatus_Success);
+    BOOST_CHECK(timelineDecoder.SetRelationshipCallback(PushRelationship) == Status::TimelineStatus_Success);
 
-    const uint64_t entityGuid = 111111u ;
+    const uint64_t entityGuid = 111111u;
     const uint64_t eventClassGuid = 22222u;
     const uint64_t timestamp = 33333u;
     const uint64_t eventGuid = 44444u;

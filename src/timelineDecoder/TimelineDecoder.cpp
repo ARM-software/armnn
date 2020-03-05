@@ -11,58 +11,58 @@ namespace armnn
 {
 namespace timelinedecoder
 {
-TimelineDecoder::ErrorCode TimelineDecoder::CreateEntity(const Entity &entity)
+TimelineDecoder::TimelineStatus TimelineDecoder::CreateEntity(const Entity &entity)
 {
     if (m_OnNewEntityCallback == nullptr)
     {
-        return ErrorCode::ErrorCode_Fail;
+        return TimelineStatus::TimelineStatus_Fail;
     }
     m_OnNewEntityCallback(m_Model, entity);
 
-    return ErrorCode::ErrorCode_Success;
+    return TimelineStatus::TimelineStatus_Success;
 }
 
-TimelineDecoder::ErrorCode TimelineDecoder::CreateEventClass(const EventClass &eventClass)
+TimelineDecoder::TimelineStatus TimelineDecoder::CreateEventClass(const EventClass &eventClass)
 {
     if (m_OnNewEventClassCallback == nullptr)
     {
-        return ErrorCode::ErrorCode_Fail;
+        return TimelineStatus::TimelineStatus_Fail;
     }
     m_OnNewEventClassCallback(m_Model, eventClass);
 
-    return ErrorCode::ErrorCode_Success;
+    return TimelineStatus::TimelineStatus_Success;
 }
 
-TimelineDecoder::ErrorCode TimelineDecoder::CreateEvent(const Event &event)
+TimelineDecoder::TimelineStatus TimelineDecoder::CreateEvent(const Event &event)
 {
     if (m_OnNewEventCallback == nullptr)
     {
-        return ErrorCode::ErrorCode_Fail;
+        return TimelineStatus::TimelineStatus_Fail;
     }
     m_OnNewEventCallback(m_Model, event);
 
-    return ErrorCode::ErrorCode_Success;
+    return TimelineStatus::TimelineStatus_Success;
 }
 
-TimelineDecoder::ErrorCode TimelineDecoder::CreateLabel(const Label &label)
+TimelineDecoder::TimelineStatus TimelineDecoder::CreateLabel(const Label &label)
 {
     if (m_OnNewLabelCallback == nullptr)
     {
-        return ErrorCode::ErrorCode_Fail;
+        return TimelineStatus::TimelineStatus_Fail;
     }
     m_OnNewLabelCallback(m_Model, label);
 
-    return ErrorCode::ErrorCode_Success;
+    return TimelineStatus::TimelineStatus_Success;
 }
 
-TimelineDecoder::ErrorCode TimelineDecoder::CreateRelationship(const Relationship &relationship)
+TimelineDecoder::TimelineStatus TimelineDecoder::CreateRelationship(const Relationship &relationship)
 {
     if (m_OnNewRelationshipCallback == nullptr)
     {
-        return ErrorCode::ErrorCode_Fail;
+        return TimelineStatus::TimelineStatus_Fail;
     }
     m_OnNewRelationshipCallback(m_Model, relationship);
-    return ErrorCode::ErrorCode_Success;
+    return TimelineStatus::TimelineStatus_Success;
 }
 
 const TimelineDecoder::Model &TimelineDecoder::GetModel()
@@ -70,54 +70,54 @@ const TimelineDecoder::Model &TimelineDecoder::GetModel()
     return m_Model;
 }
 
-TimelineDecoder::ErrorCode TimelineDecoder::SetEntityCallback(OnNewEntityCallback cb)
+TimelineDecoder::TimelineStatus TimelineDecoder::SetEntityCallback(OnNewEntityCallback cb)
 {
     if (cb == nullptr)
     {
-        return ErrorCode::ErrorCode_Fail;
+        return TimelineStatus::TimelineStatus_Fail;
     }
     m_OnNewEntityCallback = cb;
-    return ErrorCode::ErrorCode_Success;
+    return TimelineStatus::TimelineStatus_Success;
 }
 
-TimelineDecoder::ErrorCode TimelineDecoder::SetEventClassCallback(OnNewEventClassCallback cb)
+TimelineDecoder::TimelineStatus TimelineDecoder::SetEventClassCallback(OnNewEventClassCallback cb)
 {
     if (cb == nullptr)
     {
-        return ErrorCode::ErrorCode_Fail;
+        return TimelineStatus::TimelineStatus_Fail;
     }
     m_OnNewEventClassCallback = cb;
-    return ErrorCode::ErrorCode_Success;
+    return TimelineStatus::TimelineStatus_Success;
 }
 
-TimelineDecoder::ErrorCode TimelineDecoder::SetEventCallback(OnNewEventCallback cb)
+TimelineDecoder::TimelineStatus TimelineDecoder::SetEventCallback(OnNewEventCallback cb)
 {
     if (cb == nullptr)
     {
-        return ErrorCode::ErrorCode_Fail;
+        return TimelineStatus::TimelineStatus_Fail;
     }
     m_OnNewEventCallback = cb;
-    return ErrorCode::ErrorCode_Success;
+    return TimelineStatus::TimelineStatus_Success;
 }
 
-TimelineDecoder::ErrorCode TimelineDecoder::SetLabelCallback(OnNewLabelCallback cb)
+TimelineDecoder::TimelineStatus TimelineDecoder::SetLabelCallback(OnNewLabelCallback cb)
 {
     if (cb == nullptr)
     {
-        return ErrorCode::ErrorCode_Fail;
+        return TimelineStatus::TimelineStatus_Fail;
     }
     m_OnNewLabelCallback = cb;
-    return ErrorCode::ErrorCode_Success;
+    return TimelineStatus::TimelineStatus_Success;
 }
 
-TimelineDecoder::ErrorCode TimelineDecoder::SetRelationshipCallback(OnNewRelationshipCallback cb)
+TimelineDecoder::TimelineStatus TimelineDecoder::SetRelationshipCallback(OnNewRelationshipCallback cb)
 {
     if (cb == nullptr)
     {
-        return ErrorCode::ErrorCode_Fail;
+        return TimelineStatus::TimelineStatus_Fail;
     }
     m_OnNewRelationshipCallback = cb;
-    return ErrorCode::ErrorCode_Success;
+    return TimelineStatus::TimelineStatus_Success;
 }
 
 void TimelineDecoder::print()

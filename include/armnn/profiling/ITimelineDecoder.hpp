@@ -13,10 +13,10 @@ class ITimelineDecoder
 
 public:
 
-    enum class ErrorCode
+    enum class TimelineStatus
     {
-        ErrorCode_Success,
-        ErrorCode_Fail
+        TimelineStatus_Success,
+        TimelineStatus_Fail
     };
 
     enum class RelationshipType
@@ -60,9 +60,9 @@ public:
 
     virtual ~ITimelineDecoder() = default;
 
-    virtual ErrorCode CreateEntity(const Entity&) = 0;
-    virtual ErrorCode CreateEventClass(const EventClass&) = 0;
-    virtual ErrorCode CreateEvent(const Event&) = 0;
-    virtual ErrorCode CreateLabel(const Label&) = 0;
-    virtual ErrorCode CreateRelationship(const Relationship&) = 0;
+    virtual TimelineStatus CreateEntity(const Entity&) = 0;
+    virtual TimelineStatus CreateEventClass(const EventClass&) = 0;
+    virtual TimelineStatus CreateEvent(const Event&) = 0;
+    virtual TimelineStatus CreateLabel(const Label&) = 0;
+    virtual TimelineStatus CreateRelationship(const Relationship&) = 0;
 };

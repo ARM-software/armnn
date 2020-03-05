@@ -454,14 +454,14 @@ std::pair<uint32_t, uint32_t> CreateTimelineMessagePacketHeader(unsigned int dat
 TimelinePacketStatus WriteTimelineLabelBinaryPacket(uint64_t profilingGuid,
                                                     const std::string& label,
                                                     unsigned char* buffer,
-                                                    unsigned int bufferSize,
+                                                    unsigned int remainingBufferSize,
                                                     unsigned int& numberOfBytesWritten)
 {
     // Initialize the output value
     numberOfBytesWritten = 0;
 
     // Check that the given buffer is valid
-    if (buffer == nullptr || bufferSize == 0)
+    if (buffer == nullptr || remainingBufferSize == 0)
     {
         return TimelinePacketStatus::BufferExhaustion;
     }
@@ -486,27 +486,14 @@ TimelinePacketStatus WriteTimelineLabelBinaryPacket(uint64_t profilingGuid,
                                                  uint64_t_size +   // Profiling GUID
                                                  swTraceLabelSize; // Label
 
-    // Calculate the timeline binary packet size (in bytes)
-    unsigned int timelineLabelPacketSize = 2 * uint32_t_size +            // Header (2 words)
-                                           timelineLabelPacketDataLength; // decl_Id + Profiling GUID + label
-
     // Check whether the timeline binary packet fits in the given buffer
-    if (timelineLabelPacketSize > bufferSize)
+    if (timelineLabelPacketDataLength > remainingBufferSize)
     {
         return TimelinePacketStatus::BufferExhaustion;
     }
 
-    // Create packet header
-    std::pair<uint32_t, uint32_t> packetHeader = CreateTimelineMessagePacketHeader(timelineLabelPacketDataLength);
-
     // Initialize the offset for writing in the buffer
     unsigned int offset = 0;
-
-    // Write the timeline binary packet header to the buffer
-    WriteUint32(buffer, offset, packetHeader.first);
-    offset += uint32_t_size;
-    WriteUint32(buffer, offset, packetHeader.second);
-    offset += uint32_t_size;
 
     // Write decl_Id to the buffer
     WriteUint32(buffer, offset, 0u);
@@ -522,21 +509,21 @@ TimelinePacketStatus WriteTimelineLabelBinaryPacket(uint64_t profilingGuid,
     }
 
     // Update the number of bytes written
-    numberOfBytesWritten = timelineLabelPacketSize;
+    numberOfBytesWritten = timelineLabelPacketDataLength;
 
     return TimelinePacketStatus::Ok;
 }
 
-TimelinePacketStatus WriteTimelineEntityBinaryPacket(uint64_t profilingGuid,
-                                                     unsigned char* buffer,
-                                                     unsigned int bufferSize,
-                                                     unsigned int& numberOfBytesWritten)
+TimelinePacketStatus WriteTimelineEntityBinary(uint64_t profilingGuid,
+                                               unsigned char* buffer,
+                                               unsigned int remainingBufferSize,
+                                               unsigned int& numberOfBytesWritten)
 {
     // Initialize the output value
     numberOfBytesWritten = 0;
 
     // Check that the given buffer is valid
-    if (buffer == nullptr || bufferSize == 0)
+    if (buffer == nullptr || remainingBufferSize == 0)
     {
         return TimelinePacketStatus::BufferExhaustion;
     }
@@ -546,30 +533,16 @@ TimelinePacketStatus WriteTimelineEntityBinaryPacket(uint64_t profilingGuid,
     unsigned int uint64_t_size = sizeof(uint64_t);
 
     // Calculate the length of the data (in bytes)
-    unsigned int timelineEntityPacketDataLength = uint32_t_size + uint64_t_size;  // decl_id + Profiling GUID
-
-
-    // Calculate the timeline binary packet size (in bytes)
-    unsigned int timelineEntityPacketSize = 2 * uint32_t_size +             // Header (2 words)
-                                            timelineEntityPacketDataLength; // Profiling GUID
+    unsigned int timelineEntityDataLength = uint32_t_size + uint64_t_size;  // decl_id + Profiling GUID
 
     // Check whether the timeline binary packet fits in the given buffer
-    if (timelineEntityPacketSize > bufferSize)
+    if (timelineEntityDataLength > remainingBufferSize)
     {
         return TimelinePacketStatus::BufferExhaustion;
     }
 
-    // Create packet header
-    std::pair<uint32_t, uint32_t> packetHeader = CreateTimelineMessagePacketHeader(timelineEntityPacketDataLength);
-
     // Initialize the offset for writing in the buffer
     unsigned int offset = 0;
-
-    // Write the timeline binary packet header to the buffer
-    WriteUint32(buffer, offset, packetHeader.first);
-    offset += uint32_t_size;
-    WriteUint32(buffer, offset, packetHeader.second);
-    offset += uint32_t_size;
 
     // Write the decl_Id to the buffer
     WriteUint32(buffer, offset, 1u);
@@ -579,24 +552,24 @@ TimelinePacketStatus WriteTimelineEntityBinaryPacket(uint64_t profilingGuid,
     WriteUint64(buffer, offset, profilingGuid); // Profiling GUID
 
     // Update the number of bytes written
-    numberOfBytesWritten = timelineEntityPacketSize;
+    numberOfBytesWritten = timelineEntityDataLength;
 
     return TimelinePacketStatus::Ok;
 }
 
-TimelinePacketStatus WriteTimelineRelationshipBinaryPacket(ProfilingRelationshipType relationshipType,
-                                                           uint64_t relationshipGuid,
-                                                           uint64_t headGuid,
-                                                           uint64_t tailGuid,
-                                                           unsigned char* buffer,
-                                                           unsigned int bufferSize,
-                                                           unsigned int& numberOfBytesWritten)
+TimelinePacketStatus WriteTimelineRelationshipBinary(ProfilingRelationshipType relationshipType,
+                                                     uint64_t relationshipGuid,
+                                                     uint64_t headGuid,
+                                                     uint64_t tailGuid,
+                                                     unsigned char* buffer,
+                                                     unsigned int remainingBufferSize,
+                                                     unsigned int& numberOfBytesWritten)
 {
     // Initialize the output value
     numberOfBytesWritten = 0;
 
     // Check that the given buffer is valid
-    if (buffer == nullptr || bufferSize == 0)
+    if (buffer == nullptr || remainingBufferSize == 0)
     {
         return TimelinePacketStatus::BufferExhaustion;
     }
@@ -606,31 +579,17 @@ TimelinePacketStatus WriteTimelineRelationshipBinaryPacket(ProfilingRelationship
     unsigned int uint64_t_size = sizeof(uint64_t);
 
     // Calculate the length of the data (in bytes)
-    unsigned int timelineRelationshipPacketDataLength = uint32_t_size * 2 + // decl_id + Relationship Type
-                                                        uint64_t_size * 3; // Relationship GUID + Head GUID + tail GUID
+    unsigned int timelineRelationshipDataLength = uint32_t_size * 2 + // decl_id + Relationship Type
+                                                  uint64_t_size * 3;  // Relationship GUID + Head GUID + tail GUID
 
-    // Calculate the timeline binary packet size (in bytes)
-    unsigned int timelineRelationshipPacketSize = 2 * uint32_t_size + // Header (2 words)
-                                                  timelineRelationshipPacketDataLength;
-
-    // Check whether the timeline binary packet fits in the given buffer
-    if (timelineRelationshipPacketSize > bufferSize)
+    // Check whether the timeline binary fits in the given buffer
+    if (timelineRelationshipDataLength > remainingBufferSize)
     {
         return TimelinePacketStatus::BufferExhaustion;
     }
 
-    // Create packet header
-    uint32_t dataLength = boost::numeric_cast<uint32_t>(timelineRelationshipPacketDataLength);
-    std::pair<uint32_t, uint32_t> packetHeader = CreateTimelineMessagePacketHeader(dataLength);
-
     // Initialize the offset for writing in the buffer
     unsigned int offset = 0;
-
-    // Write the timeline binary packet header to the buffer
-    WriteUint32(buffer, offset, packetHeader.first);
-    offset += uint32_t_size;
-    WriteUint32(buffer, offset, packetHeader.second);
-    offset += uint32_t_size;
 
     uint32_t relationshipTypeUint = 0;
 
@@ -652,7 +611,7 @@ TimelinePacketStatus WriteTimelineRelationshipBinaryPacket(ProfilingRelationship
             throw InvalidArgumentException("Unknown relationship type given.");
     }
 
-    // Write the timeline binary packet payload to the buffer
+    // Write the timeline binary payload to the buffer
     // decl_id of the timeline message
     uint32_t declId = 3;
     WriteUint32(buffer, offset, declId); // decl_id
@@ -666,20 +625,20 @@ TimelinePacketStatus WriteTimelineRelationshipBinaryPacket(ProfilingRelationship
     WriteUint64(buffer, offset, tailGuid); // tail of relationship GUID
 
     // Update the number of bytes written
-    numberOfBytesWritten = timelineRelationshipPacketSize;
+    numberOfBytesWritten = timelineRelationshipDataLength;
 
     return TimelinePacketStatus::Ok;
 }
 
 TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
-                                                          unsigned int bufferSize,
+                                                          unsigned int remainingBufferSize,
                                                           unsigned int& numberOfBytesWritten)
 {
     // Initialize the output value
     numberOfBytesWritten = 0;
 
     // Check that the given buffer is valid
-    if (buffer == nullptr || bufferSize == 0)
+    if (buffer == nullptr || remainingBufferSize == 0)
     {
         return TimelinePacketStatus::BufferExhaustion;
     }
@@ -747,7 +706,7 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
                                                dataLength;         // Payload
 
     // Check whether the timeline directory binary packet fits in the given buffer
-    if (timelineDirectoryPacketSize > bufferSize)
+    if (timelineDirectoryPacketSize > remainingBufferSize)
     {
         return TimelinePacketStatus::BufferExhaustion;
     }
@@ -799,16 +758,16 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
     return TimelinePacketStatus::Ok;
 }
 
-TimelinePacketStatus WriteTimelineEventClassBinaryPacket(uint64_t profilingGuid,
-                                                         unsigned char* buffer,
-                                                         unsigned int bufferSize,
-                                                         unsigned int& numberOfBytesWritten)
+TimelinePacketStatus WriteTimelineEventClassBinary(uint64_t profilingGuid,
+                                                   unsigned char* buffer,
+                                                   unsigned int remainingBufferSize,
+                                                   unsigned int& numberOfBytesWritten)
 {
     // Initialize the output value
     numberOfBytesWritten = 0;
 
     // Check that the given buffer is valid
-    if (buffer == nullptr || bufferSize == 0)
+    if (buffer == nullptr || remainingBufferSize == 0)
     {
         return TimelinePacketStatus::BufferExhaustion;
     }
@@ -821,53 +780,39 @@ TimelinePacketStatus WriteTimelineEventClassBinaryPacket(uint64_t profilingGuid,
     uint32_t declId = 2;
 
     // Calculate the length of the data (in bytes)
-    unsigned int packetBodySize = uint32_t_size + uint64_t_size; // decl_id + Profiling GUID
+    unsigned int dataSize = uint32_t_size + uint64_t_size; // decl_id + Profiling GUID
 
-    // Calculate the timeline binary packet size (in bytes)
-    unsigned int packetSize = 2 * uint32_t_size + // Header (2 words)
-                              packetBodySize;     // Body
-
-    // Check whether the timeline binary packet fits in the given buffer
-    if (packetSize > bufferSize)
+    // Check whether the timeline binary fits in the given buffer
+    if (dataSize > remainingBufferSize)
     {
         return TimelinePacketStatus::BufferExhaustion;
     }
 
-    // Create packet header
-    std::pair<uint32_t, uint32_t> packetHeader = CreateTimelineMessagePacketHeader(packetBodySize);
-
     // Initialize the offset for writing in the buffer
     unsigned int offset = 0;
 
-    // Write the timeline binary packet header to the buffer
-    WriteUint32(buffer, offset, packetHeader.first);
-    offset += uint32_t_size;
-    WriteUint32(buffer, offset, packetHeader.second);
-    offset += uint32_t_size;
-
-    // Write the timeline binary packet payload to the buffer
+    // Write the timeline binary payload to the buffer
     WriteUint32(buffer, offset, declId);        // decl_id
     offset += uint32_t_size;
     WriteUint64(buffer, offset, profilingGuid); // Profiling GUID
 
     // Update the number of bytes written
-    numberOfBytesWritten = packetSize;
+    numberOfBytesWritten = dataSize;
 
     return TimelinePacketStatus::Ok;
 }
 
-TimelinePacketStatus WriteTimelineEventBinaryPacket(uint64_t timestamp,
-                                                    std::thread::id threadId,
-                                                    uint64_t profilingGuid,
-                                                    unsigned char* buffer,
-                                                    unsigned int bufferSize,
-                                                    unsigned int& numberOfBytesWritten)
+TimelinePacketStatus WriteTimelineEventBinary(uint64_t timestamp,
+                                              std::thread::id threadId,
+                                              uint64_t profilingGuid,
+                                              unsigned char* buffer,
+                                              unsigned int remainingBufferSize,
+                                              unsigned int& numberOfBytesWritten)
 {
     // Initialize the output value
     numberOfBytesWritten = 0;
-
     // Check that the given buffer is valid
-    if (buffer == nullptr || bufferSize == 0)
+    if (buffer == nullptr || remainingBufferSize == 0)
     {
         return TimelinePacketStatus::BufferExhaustion;
     }
@@ -881,34 +826,21 @@ TimelinePacketStatus WriteTimelineEventBinaryPacket(uint64_t timestamp,
     uint32_t declId = 4;
 
     // Calculate the length of the data (in bytes)
-    unsigned int timelineEventPacketDataLength = uint32_t_size + // decl_id
-                                                 uint64_t_size + // Timestamp
-                                                 threadId_size + // Thread id
-                                                 uint64_t_size;  // Profiling GUID
-
-    // Calculate the timeline binary packet size (in bytes)
-    unsigned int timelineEventPacketSize = 2 * uint32_t_size +            // Header (2 words)
-                                           timelineEventPacketDataLength; // Timestamp + thread id + profiling GUID
+    unsigned int timelineEventDataLength = uint32_t_size + // decl_id
+                                           uint64_t_size + // Timestamp
+                                           threadId_size + // Thread id
+                                           uint64_t_size;  // Profiling GUID
 
     // Check whether the timeline binary packet fits in the given buffer
-    if (timelineEventPacketSize > bufferSize)
+    if (timelineEventDataLength > remainingBufferSize)
     {
         return TimelinePacketStatus::BufferExhaustion;
     }
 
-    // Create packet header
-    std::pair<uint32_t, uint32_t> packetHeader = CreateTimelineMessagePacketHeader(timelineEventPacketDataLength);
-
     // Initialize the offset for writing in the buffer
     unsigned int offset = 0;
 
-    // Write the timeline binary packet header to the buffer
-    WriteUint32(buffer, offset, packetHeader.first);
-    offset += uint32_t_size;
-    WriteUint32(buffer, offset, packetHeader.second);
-    offset += uint32_t_size;
-
-    // Write the timeline binary packet payload to the buffer
+    // Write the timeline binary payload to the buffer
     WriteUint32(buffer, offset, declId); // decl_id
     offset += uint32_t_size;
     WriteUint64(buffer, offset, timestamp); // Timestamp
@@ -917,9 +849,8 @@ TimelinePacketStatus WriteTimelineEventBinaryPacket(uint64_t timestamp,
     offset += threadId_size;
     WriteUint64(buffer, offset, profilingGuid); // Profiling GUID
     offset += uint64_t_size;
-
     // Update the number of bytes written
-    numberOfBytesWritten = timelineEventPacketSize;
+    numberOfBytesWritten = timelineEventDataLength;
 
     return TimelinePacketStatus::Ok;
 }

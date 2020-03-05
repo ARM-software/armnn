@@ -25,8 +25,8 @@ public:
     SendTimelinePacket(IBufferManager& bufferManager)
       : m_BufferManager(bufferManager)
       , m_WriteBuffer(nullptr)
-      , m_Offset(0u)
-      , m_BufferSize(0u)
+      , m_Offset(8u)
+      , m_RemainingBufferSize(0u)
     {}
 
     /// Commits the current buffer and reset the member variables
@@ -59,13 +59,20 @@ private:
     template <typename Func, typename ... Params>
     void ForwardWriteBinaryFunction(Func& func, Params&& ... params);
 
-    IBufferManager& m_BufferManager;
+    IBufferManager&  m_BufferManager;
     IPacketBufferPtr m_WriteBuffer;
-    unsigned int m_Offset;
-    unsigned int m_BufferSize;
+    unsigned int     m_Offset;
+    unsigned int     m_RemainingBufferSize;
+
+    const unsigned int m_uint32_t_size = sizeof(uint32_t);
+
+    std::pair<uint32_t, uint32_t> m_PacketHeader;
+    uint32_t                      m_PacketDataLength;
+
+    bool m_DirectoryPackage = false;
 };
 
-template <typename Func, typename ... Params>
+template<typename Func, typename ... Params>
 void SendTimelinePacket::ForwardWriteBinaryFunction(Func& func, Params&& ... params)
 {
     try
@@ -73,30 +80,31 @@ void SendTimelinePacket::ForwardWriteBinaryFunction(Func& func, Params&& ... par
         ReserveBuffer();
         BOOST_ASSERT(m_WriteBuffer);
         unsigned int numberOfBytesWritten = 0;
-        while (true)
+        // Header will be prepended to the buffer on Commit()
+        while ( true )
         {
             TimelinePacketStatus result = func(std::forward<Params>(params)...,
                                                &m_WriteBuffer->GetWritableData()[m_Offset],
-                                               m_BufferSize,
+                                               m_RemainingBufferSize,
                                                numberOfBytesWritten);
-            switch (result)
+            switch ( result )
             {
-            case TimelinePacketStatus::BufferExhaustion:
-                Commit();
-                ReserveBuffer();
-                continue;
+                case TimelinePacketStatus::BufferExhaustion:
+                    Commit();
+                    ReserveBuffer();
+                    continue;
 
-            case TimelinePacketStatus::Error:
-                throw RuntimeException("Error processing while sending TimelineBinaryPacket", CHECK_LOCATION());
+                case TimelinePacketStatus::Error:
+                    throw RuntimeException("Error processing while sending TimelineBinaryPacket",
+                                           CHECK_LOCATION());
 
-            default:
-                m_Offset     += numberOfBytesWritten;
-                m_BufferSize -= numberOfBytesWritten;
-                return;
+                default:m_Offset += numberOfBytesWritten;
+                    m_RemainingBufferSize -= numberOfBytesWritten;
+                    return;
             }
         }
     }
-    catch (...)
+    catch ( ... )
     {
         throw RuntimeException("Error processing while sending TimelineBinaryPacket", CHECK_LOCATION());
     }

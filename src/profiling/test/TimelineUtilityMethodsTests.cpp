@@ -42,31 +42,34 @@ BOOST_AUTO_TEST_CASE(CreateTypedLabelTest)
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
     BOOST_CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_CHECK(size == 116);
+    BOOST_CHECK(size == 100);
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
 
     // Utils
     unsigned int offset = 0;
 
-    // First packet sent: TimelineLabelBinaryPacket
-    VerifyTimelineLabelBinaryPacket(EmptyOptional(), entityName, readableData, offset);
+    // Verify Header
+    VerifyTimelineHeaderBinary(readableData, offset, 92);
 
-    // Second packet sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
-                                           EmptyOptional(),
-                                           entityGuid,
-                                           EmptyOptional(),
-                                           readableData,
-                                           offset);
+    // First dataset sent: TimelineLabelBinaryPacket
+    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), entityName, readableData, offset);
 
-    // Third packet sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
-                                           EmptyOptional(),
-                                           EmptyOptional(),
-                                           labelTypeGuid,
-                                           readableData,
-                                           offset);
+    // Second dataset sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               EmptyOptional(),
+                                               entityGuid,
+                                               EmptyOptional(),
+                                               readableData,
+                                               offset);
+
+    // Third dataset sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               EmptyOptional(),
+                                               EmptyOptional(),
+                                               labelTypeGuid,
+                                               readableData,
+                                               offset);
 
     // Mark the buffer as read
     mockBufferManager.MarkRead(readableBuffer);
@@ -87,81 +90,86 @@ BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
     BOOST_CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_TEST(size == 388);
+    BOOST_TEST(size == 300);
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
 
     // Utils
     unsigned int offset = 0;
 
+    // Verify Header
+    VerifyTimelineHeaderBinary(readableData, offset, 292);
+
     // First "well-known" label: NAME
-    VerifyTimelineLabelBinaryPacket(LabelsAndEventClasses::NAME_GUID,
-                                    LabelsAndEventClasses::NAME_LABEL,
-                                    readableData,
-                                    offset);
+    VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::NAME_GUID,
+                                        LabelsAndEventClasses::NAME_LABEL,
+                                        readableData,
+                                        offset);
 
     // Second "well-known" label: TYPE
-    VerifyTimelineLabelBinaryPacket(LabelsAndEventClasses::TYPE_GUID,
-                                    LabelsAndEventClasses::TYPE_LABEL,
-                                    readableData,
-                                    offset);
+    VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::TYPE_GUID,
+                                        LabelsAndEventClasses::TYPE_LABEL,
+                                        readableData,
+                                        offset);
 
     // Third "well-known" label: INDEX
-    VerifyTimelineLabelBinaryPacket(LabelsAndEventClasses::INDEX_GUID,
-                                    LabelsAndEventClasses::INDEX_LABEL,
-                                    readableData,
-                                    offset);
+    VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::INDEX_GUID,
+                                        LabelsAndEventClasses::INDEX_LABEL,
+                                        readableData,
+                                        offset);
 
     // Forth "well-known" label: BACKENDID
-    VerifyTimelineLabelBinaryPacket(LabelsAndEventClasses::BACKENDID_GUID,
-                                    LabelsAndEventClasses::BACKENDID_LABEL,
-                                    readableData,
-                                    offset);
+    VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::BACKENDID_GUID,
+                                        LabelsAndEventClasses::BACKENDID_LABEL,
+                                        readableData,
+                                        offset);
 
     // Well-known types
     // Layer
-    VerifyTimelineLabelBinaryPacket(LabelsAndEventClasses::LAYER_GUID,
-                                    LabelsAndEventClasses::LAYER,
-                                    readableData,
-                                    offset);
+    VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::LAYER_GUID,
+                                        LabelsAndEventClasses::LAYER,
+                                        readableData,
+                                        offset);
 
     // Workload
-    VerifyTimelineLabelBinaryPacket(LabelsAndEventClasses::WORKLOAD_GUID,
-                                    LabelsAndEventClasses::WORKLOAD,
-                                    readableData,
-                                    offset);
+    VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::WORKLOAD_GUID,
+                                        LabelsAndEventClasses::WORKLOAD,
+                                        readableData,
+                                        offset);
 
     // Network
-    VerifyTimelineLabelBinaryPacket(LabelsAndEventClasses::NETWORK_GUID,
-                                    LabelsAndEventClasses::NETWORK,
-                                    readableData,
-                                    offset);
+    VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::NETWORK_GUID,
+                                        LabelsAndEventClasses::NETWORK,
+                                        readableData,
+                                        offset);
 
     // Connection
-    VerifyTimelineLabelBinaryPacket(LabelsAndEventClasses::CONNECTION_GUID,
-                                    LabelsAndEventClasses::CONNECTION,
-                                    readableData,
-                                    offset);
+    VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::CONNECTION_GUID,
+                                        LabelsAndEventClasses::CONNECTION,
+                                        readableData,
+                                        offset);
+
     // Inference
-    VerifyTimelineLabelBinaryPacket(LabelsAndEventClasses::INFERENCE_GUID,
-                                    LabelsAndEventClasses::INFERENCE,
-                                    readableData,
-                                    offset);
+    VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::INFERENCE_GUID,
+                                        LabelsAndEventClasses::INFERENCE,
+                                        readableData,
+                                        offset);
+
     // Workload Execution
-    VerifyTimelineLabelBinaryPacket(LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
-                                    LabelsAndEventClasses::WORKLOAD_EXECUTION,
-                                    readableData,
-                                    offset);
+    VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
+                                        LabelsAndEventClasses::WORKLOAD_EXECUTION,
+                                        readableData,
+                                        offset);
 
     // First "well-known" event class: START OF LIFE
-    VerifyTimelineEventClassBinaryPacket(LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
-                                         readableData,
-                                         offset);
+    VerifyTimelineEventClassBinaryPacketData(LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
+                                             readableData,
+                                             offset);
 
     // Second "well-known" event class: END OF LIFE
-    VerifyTimelineEventClassBinaryPacket(LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
-                                         readableData,
-                                         offset);
+    VerifyTimelineEventClassBinaryPacketData(LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
+                                             readableData,
+                                             offset);
 
     // Mark the buffer as read
     mockBufferManager.MarkRead(readableBuffer);
@@ -202,61 +210,64 @@ BOOST_AUTO_TEST_CASE(CreateNamedTypedChildEntityTest)
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
     BOOST_CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_CHECK(size == 292);
+    BOOST_CHECK(size == 236);
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
 
     // Utils
     unsigned int offset = 0;
 
-    // First packet sent: TimelineEntityBinaryPacket
-    VerifyTimelineEntityBinaryPacket(EmptyOptional(), readableData, offset);
+    // Verify Header
+    VerifyTimelineHeaderBinary(readableData, offset, 228);
 
-    // Second packet sent: TimelineLabelBinaryPacket
-    VerifyTimelineLabelBinaryPacket(EmptyOptional(), entityName, readableData, offset);
+    // First dataset sent: TimelineEntityBinaryPacket
+    VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
 
-    // Third packet sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
-                                           EmptyOptional(),
-                                           EmptyOptional(),
-                                           EmptyOptional(),
-                                           readableData,
-                                           offset);
+    // Second dataset sent: TimelineLabelBinaryPacket
+    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), entityName, readableData, offset);
 
-    // Fourth packet sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
-                                           EmptyOptional(),
-                                           EmptyOptional(),
-                                           LabelsAndEventClasses::NAME_GUID,
-                                           readableData,
-                                           offset);
+    // Third dataset sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               EmptyOptional(),
+                                               EmptyOptional(),
+                                               EmptyOptional(),
+                                               readableData,
+                                               offset);
 
-    // Fifth packet sent: TimelineLabelBinaryPacket
-    VerifyTimelineLabelBinaryPacket(EmptyOptional(), entityType, readableData, offset);
+    // Fourth dataset sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               EmptyOptional(),
+                                               EmptyOptional(),
+                                               LabelsAndEventClasses::NAME_GUID,
+                                               readableData,
+                                               offset);
 
-    // Sixth packet sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
-                                           EmptyOptional(),
-                                           EmptyOptional(),
-                                           EmptyOptional(),
-                                           readableData,
-                                           offset);
+    // Fifth dataset sent: TimelineLabelBinaryPacket
+    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), entityType, readableData, offset);
 
-    // Seventh packet sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
-                                           EmptyOptional(),
-                                           EmptyOptional(),
-                                           LabelsAndEventClasses::TYPE_GUID,
-                                           readableData,
-                                           offset);
+    // Sixth dataset sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               EmptyOptional(),
+                                               EmptyOptional(),
+                                               EmptyOptional(),
+                                               readableData,
+                                               offset);
 
-    // Eighth packet sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
-                                           EmptyOptional(),
-                                           parentEntityGuid,
-                                           EmptyOptional(),
-                                           readableData,
-                                           offset);
+    // Seventh dataset sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               EmptyOptional(),
+                                               EmptyOptional(),
+                                               LabelsAndEventClasses::TYPE_GUID,
+                                               readableData,
+                                               offset);
+
+    // Eighth dataset sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
+                                               EmptyOptional(),
+                                               parentEntityGuid,
+                                               EmptyOptional(),
+                                               readableData,
+                                               offset);
 
     // Mark the buffer as read
     mockBufferManager.MarkRead(readableBuffer);
@@ -336,55 +347,58 @@ BOOST_AUTO_TEST_CASE(CreateNameTypeEntityTest)
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
     BOOST_CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_CHECK(size == 244);
+    BOOST_CHECK(size == 196);
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
 
     // Utils
     unsigned int offset = 0;
 
-    // First packet sent: TimelineEntityBinaryPacket
-    VerifyTimelineEntityBinaryPacket(guid, readableData, offset);
+    // Verify Header
+    VerifyTimelineHeaderBinary(readableData, offset, 188);
+
+    // First dataset sent: TimelineEntityBinaryPacket
+    VerifyTimelineEntityBinaryPacketData(guid, readableData, offset);
 
     // Packets for Name Entity
-    // First packet sent: TimelineLabelBinaryPacket
-    VerifyTimelineLabelBinaryPacket(EmptyOptional(), entityName, readableData, offset);
+    // First dataset sent: TimelineLabelBinaryPacket
+    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), entityName, readableData, offset);
 
-    // Second packet sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
-                                           EmptyOptional(),
-                                           EmptyOptional(),
-                                           EmptyOptional(),
-                                           readableData,
-                                           offset);
+    // Second dataset sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               EmptyOptional(),
+                                               EmptyOptional(),
+                                               EmptyOptional(),
+                                               readableData,
+                                               offset);
 
-    // Third packet sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
-                                           EmptyOptional(),
-                                           EmptyOptional(),
-                                           LabelsAndEventClasses::NAME_GUID,
-                                           readableData,
-                                           offset);
+    // Third dataset sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               EmptyOptional(),
+                                               EmptyOptional(),
+                                               LabelsAndEventClasses::NAME_GUID,
+                                               readableData,
+                                               offset);
 
     // Packets for Type Entity
-    // First packet sent: TimelineLabelBinaryPacket
-    VerifyTimelineLabelBinaryPacket(EmptyOptional(), entityType, readableData, offset);
+    // First dataset sent: TimelineLabelBinaryPacket
+    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), entityType, readableData, offset);
 
-    // Second packet sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
-                                           EmptyOptional(),
-                                           EmptyOptional(),
-                                           EmptyOptional(),
-                                           readableData,
-                                           offset);
+    // Second dataset sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               EmptyOptional(),
+                                               EmptyOptional(),
+                                               EmptyOptional(),
+                                               readableData,
+                                               offset);
 
-    // Third packet sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
-                                           EmptyOptional(),
-                                           EmptyOptional(),
-                                           LabelsAndEventClasses::TYPE_GUID,
-                                           readableData,
-                                           offset);
+    // Third dataset sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               EmptyOptional(),
+                                               EmptyOptional(),
+                                               LabelsAndEventClasses::TYPE_GUID,
+                                               readableData,
+                                               offset);
 
     // Mark the buffer as read
     mockBufferManager.MarkRead(readableBuffer);
@@ -411,31 +425,34 @@ BOOST_AUTO_TEST_CASE(RecordEventTest)
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
     BOOST_CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_CHECK(size == 116);
+    BOOST_CHECK(size == 100);
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
 
     // Utils
     unsigned int offset = 0;
 
-    // First packet sent: TimelineEntityBinaryPacket
+    // Verify Header
+    VerifyTimelineHeaderBinary(readableData, offset, 92);
+
+    // First dataset sent: TimelineEntityBinaryPacket
     VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
 
-    // Second packet sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::ExecutionLink,
-                                           EmptyOptional(),
-                                           entityGuid,
-                                           EmptyOptional(),
-                                           readableData,
-                                           offset);
+    // Second dataset sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
+                                               EmptyOptional(),
+                                               entityGuid,
+                                               EmptyOptional(),
+                                               readableData,
+                                               offset);
 
-    // Third packet sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::DataLink,
-                                           EmptyOptional(),
-                                           eventGuid,
-                                           eventClassGuid,
-                                           readableData,
-                                           offset);
+    // Third dataset sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::DataLink,
+                                               EmptyOptional(),
+                                               eventGuid,
+                                               eventClassGuid,
+                                               readableData,
+                                               offset);
 
     // Mark the buffer as read
     mockBufferManager.MarkRead(readableBuffer);

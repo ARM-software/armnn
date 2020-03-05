@@ -183,6 +183,13 @@ uint16_t ReadUint16(unsigned const char* buffer, unsigned int offset);
 
 uint8_t ReadUint8(unsigned const char* buffer, unsigned int offset);
 
+std::pair<uint32_t, uint32_t> CreateTimelinePacketHeader(uint32_t packetFamily,
+                                                         uint32_t packetClass,
+                                                         uint32_t packetType,
+                                                         uint32_t streamId,
+                                                         uint32_t sequenceNumbered,
+                                                         uint32_t dataLength);
+
 std::string GetSoftwareInfo();
 
 std::string GetSoftwareVersion();
@@ -208,34 +215,34 @@ TimelinePacketStatus WriteTimelineLabelBinaryPacket(uint64_t profilingGuid,
                                                     unsigned int bufferSize,
                                                     unsigned int& numberOfBytesWritten);
 
-TimelinePacketStatus WriteTimelineEntityBinaryPacket(uint64_t profilingGuid,
+TimelinePacketStatus WriteTimelineEntityBinary(uint64_t profilingGuid,
+                                               unsigned char* buffer,
+                                               unsigned int bufferSize,
+                                               unsigned int& numberOfBytesWritten);
+
+TimelinePacketStatus WriteTimelineRelationshipBinary(ProfilingRelationshipType relationshipType,
+                                                     uint64_t relationshipGuid,
+                                                     uint64_t headGuid,
+                                                     uint64_t tailGuid,
                                                      unsigned char* buffer,
                                                      unsigned int bufferSize,
                                                      unsigned int& numberOfBytesWritten);
-
-TimelinePacketStatus WriteTimelineRelationshipBinaryPacket(ProfilingRelationshipType relationshipType,
-                                                           uint64_t relationshipGuid,
-                                                           uint64_t headGuid,
-                                                           uint64_t tailGuid,
-                                                           unsigned char* buffer,
-                                                           unsigned int bufferSize,
-                                                           unsigned int& numberOfBytesWritten);
 
 TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
                                                           unsigned int bufferSize,
                                                           unsigned int& numberOfBytesWritten);
 
-TimelinePacketStatus WriteTimelineEventClassBinaryPacket(uint64_t profilingGuid,
-                                                         unsigned char* buffer,
-                                                         unsigned int bufferSize,
-                                                         unsigned int& numberOfBytesWritten);
+TimelinePacketStatus WriteTimelineEventClassBinary(uint64_t profilingGuid,
+                                                   unsigned char* buffer,
+                                                   unsigned int bufferSize,
+                                                   unsigned int& numberOfBytesWritten);
 
-TimelinePacketStatus WriteTimelineEventBinaryPacket(uint64_t timestamp,
-                                                    std::thread::id threadId,
-                                                    uint64_t profilingGuid,
-                                                    unsigned char* buffer,
-                                                    unsigned int bufferSize,
-                                                    unsigned int& numberOfBytesWritten);
+TimelinePacketStatus WriteTimelineEventBinary(uint64_t timestamp,
+                                              std::thread::id threadId,
+                                              uint64_t profilingGuid,
+                                              unsigned char* buffer,
+                                              unsigned int bufferSize,
+                                              unsigned int& numberOfBytesWritten);
 
 std::string CentreAlignFormatting(const std::string& stringToPass, const int spacingWidth);
 

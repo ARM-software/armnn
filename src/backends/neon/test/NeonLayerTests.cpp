@@ -414,20 +414,41 @@ ARMNN_AUTO_TEST_CASE(UNSUPPORTED_IgnorePaddingL2Pooling2dSize3Uint8, IgnorePaddi
 // Activation
 ARMNN_AUTO_TEST_CASE(ConstantLinearActivation, ConstantLinearActivationTest)
 
-// ReLu
+// Sigmoid Activation / Logistic
+ARMNN_AUTO_TEST_CASE(SimpleSigmoid, SimpleSigmoidTest)
+ARMNN_AUTO_TEST_CASE(SimpleSigmoidUint8, SimpleSigmoidUint8Test)
+
+// BoundedReLU Activation
+ARMNN_AUTO_TEST_CASE(ReLu1, BoundedReLuUpperAndLowerBoundTest)
+ARMNN_AUTO_TEST_CASE(ReLu6, BoundedReLuUpperBoundOnlyTest)
 ARMNN_AUTO_TEST_CASE(ReLu1Uint8, BoundedReLuUint8UpperAndLowerBoundTest)
 ARMNN_AUTO_TEST_CASE(ReLu6Uint8, BoundedReLuUint8UpperBoundOnlyTest)
 
-// Elu Activation
-ARMNN_AUTO_TEST_CASE(Elu, EluTest)
+// ReLU Activation
+ARMNN_AUTO_TEST_CASE(ReLu, ReLuTest)
+ARMNN_AUTO_TEST_CASE(ReLuUint8, ReLuUint8Test)
 
-// Sigmoid
-ARMNN_AUTO_TEST_CASE(SimpleSigmoid, SimpleSigmoidTest)
-ARMNN_AUTO_TEST_CASE(SimpleSigmoidUint8, SimpleSigmoidUint8Test)
+// SoftReLU Activation
+ARMNN_AUTO_TEST_CASE(SoftReLu, SoftReLuTest)
+
+// LeakyReLU Activation
+ARMNN_AUTO_TEST_CASE(LeakyReLu, LeakyReLuTest)
+
+// Abs Activation
+ARMNN_AUTO_TEST_CASE(Abs, AbsTest)
 
 // Sqrt Activation
 ARMNN_AUTO_TEST_CASE(Sqrt, SqrtTest)
 ARMNN_AUTO_TEST_CASE(SqrtNN, SqrtNNTest)
+
+// Square Activation
+ARMNN_AUTO_TEST_CASE(Square, SquareTest)
+
+// Tanh Activation
+ARMNN_AUTO_TEST_CASE(Tanh, TanhTest)
+
+// Elu Activation
+ARMNN_AUTO_TEST_CASE(Elu, EluTest)
 
 // Softmax
 ARMNN_AUTO_TEST_CASE(SimpleSoftmaxBeta1, SimpleSoftmaxTest, 1.0f)
@@ -1102,8 +1123,8 @@ ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareMultiplicationWithReference, CompareMult
 
 ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareBatchNorm, CompareBatchNormTest)
 
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(ReLu1, CompareBoundedReLuTest, 1.0f, -1.0f)
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(ReLu6, CompareBoundedReLuTest, 6.0f, 0.0f)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareReLu1, CompareBoundedReLuTest, 1.0f, -1.0f)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareReLu6, CompareBoundedReLuTest, 6.0f, 0.0f)
 
 // ============================================================================
 // FIXTURE tests
@@ -1139,6 +1160,9 @@ ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareSqrtActivationWithReference, Positive
 
 ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareSquareActivationWithReference, ActivationFixture,
                                     CompareActivationTest, ActivationFunction::Square, 5u)
+
+ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareEluActivationWithReference, ActivationFixture,
+                                    CompareActivationTest, ActivationFunction::Elu, 5u)
 
 #endif
 

@@ -36,18 +36,41 @@ using FactoryType = ClWorkloadFactory;
 // Activation
 ARMNN_AUTO_TEST_CASE(ConstantLinearActivation, ConstantLinearActivationTest)
 
+// Sigmoid Activation / Logistic
+ARMNN_AUTO_TEST_CASE(SimpleSigmoid, SimpleSigmoidTest)
+ARMNN_AUTO_TEST_CASE(SimpleSigmoidUint8, SimpleSigmoidUint8Test)
+
+// BoundedReLU Activation
+ARMNN_AUTO_TEST_CASE(ReLu1, BoundedReLuUpperAndLowerBoundTest)
+ARMNN_AUTO_TEST_CASE(ReLu6, BoundedReLuUpperBoundOnlyTest)
 ARMNN_AUTO_TEST_CASE(ReLu1Uint8, BoundedReLuUint8UpperAndLowerBoundTest)
 ARMNN_AUTO_TEST_CASE(ReLu6Uint8, BoundedReLuUint8UpperBoundOnlyTest)
 
-// Elu Activation
-ARMNN_AUTO_TEST_CASE(Elu, EluTest)
+// ReLU Activation
+ARMNN_AUTO_TEST_CASE(ReLu, ReLuTest)
+ARMNN_AUTO_TEST_CASE(ReLuUint8, ReLuUint8Test)
 
-ARMNN_AUTO_TEST_CASE(Logistic, SimpleSigmoidTest)
-ARMNN_AUTO_TEST_CASE(LogisticUint8, SimpleSigmoidUint8Test)
+// SoftReLU Activation
+ARMNN_AUTO_TEST_CASE(SoftReLu, SoftReLuTest)
+
+// LeakyReLU Activation
+ARMNN_AUTO_TEST_CASE(LeakyReLu, LeakyReLuTest)
+
+// Abs Activation
+ARMNN_AUTO_TEST_CASE(Abs, AbsTest)
 
 // Sqrt Activation
 ARMNN_AUTO_TEST_CASE(Sqrt, SqrtTest)
 ARMNN_AUTO_TEST_CASE(SqrtNN, SqrtNNTest)
+
+// Square Activation
+ARMNN_AUTO_TEST_CASE(Square, SquareTest)
+
+// Tanh Activation
+ARMNN_AUTO_TEST_CASE(Tanh, TanhTest)
+
+// Elu Activation
+ARMNN_AUTO_TEST_CASE(Elu, EluTest)
 
 // Batch To Space
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcFloat321, BatchToSpaceNdNhwcTest1<DataType::Float32>)
@@ -1012,6 +1035,9 @@ ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareSqrtActivationWithReference, Positive
 
 ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareSquareActivationWithReference, ActivationFixture,
                                     CompareActivationTest, ActivationFunction::Square, 5u)
+
+ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareEluActivationWithReference, ActivationFixture,
+                                    CompareActivationTest, ActivationFunction::Elu, 5u)
 
 #endif
 

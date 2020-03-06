@@ -6,7 +6,7 @@
 #pragma once
 
 #include <ostream>
-#include <math.h>
+#include <cmath>
 #include <stdint.h>
 
 namespace armnn

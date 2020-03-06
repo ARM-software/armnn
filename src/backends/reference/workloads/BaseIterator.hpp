@@ -194,6 +194,23 @@ private:
     const int32_t m_Offset;
 };
 
+class BFloat16Decoder : public TypedIterator<const BFloat16, Decoder<float>>
+{
+public:
+    BFloat16Decoder(const BFloat16* data)
+        : TypedIterator(data) {}
+
+    BFloat16Decoder()
+        : BFloat16Decoder(nullptr) {}
+
+    float Get() const override
+    {
+        float val = 0.f;
+        armnnUtils::FloatingPointConverter::ConvertBFloat16ToFloat32(m_Iterator, 1, &val);
+        return val;
+    }
+};
+
 class Float16Decoder : public TypedIterator<const Half, Decoder<float>>
 {
 public:
@@ -353,6 +370,28 @@ public:
 private:
     const float m_Scale;
     const int32_t m_Offset;
+};
+
+class BFloat16Encoder : public TypedIterator<armnn::BFloat16, Encoder<float>>
+{
+public:
+    BFloat16Encoder(armnn::BFloat16* data)
+        : TypedIterator(data) {}
+
+    BFloat16Encoder()
+        : BFloat16Encoder(nullptr) {}
+
+    void Set(float right) override
+    {
+        armnnUtils::FloatingPointConverter::ConvertFloat32ToBFloat16(&right, 1, m_Iterator);
+    }
+
+    float Get() const override
+    {
+        float val = 0.f;
+        armnnUtils::FloatingPointConverter::ConvertBFloat16ToFloat32(m_Iterator, 1, &val);
+        return val;
+    }
 };
 
 class Float16Encoder : public TypedIterator<Half, Encoder<float>>

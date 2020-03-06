@@ -75,6 +75,10 @@ inline std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void*
         {
             return std::make_unique<Int32Encoder>(static_cast<int32_t*>(data));
         }
+        case armnn::DataType::BFloat16:
+        {
+            return std::make_unique<BFloat16Encoder>(static_cast<armnn::BFloat16*>(data));
+        }
         case armnn::DataType::Float16:
         {
             return std::make_unique<Float16Encoder>(static_cast<Half*>(data));

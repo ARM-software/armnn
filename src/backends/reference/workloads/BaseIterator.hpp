@@ -5,14 +5,13 @@
 
 #pragma once
 
-
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <armnnUtils/FloatingPointConverter.hpp>
 
 #include <ResolveType.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 namespace armnn
 {
@@ -107,7 +106,7 @@ public:
 
     TypedIterator& SetIndex(unsigned int index, unsigned int axisIndex = 0) override
     {
-        boost::ignore_unused(axisIndex);
+        IgnoreUnused(axisIndex);
         BOOST_ASSERT(m_Iterator);
         m_Iterator = m_Start + index;
         return *this;

@@ -4,12 +4,11 @@
 //
 #pragma once
 
-#include <armnn/Optional.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
-
 #include "RefMemoryManager.hpp"
 
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/Optional.hpp>
+#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 
 namespace armnn
@@ -48,7 +47,7 @@ public:
                                                          TensorShape const& subTensorShape,
                                                          unsigned int const* subTensorOrigin) const override
     {
-        boost::ignore_unused(parent, subTensorShape, subTensorOrigin);
+        IgnoreUnused(parent, subTensorShape, subTensorOrigin);
         return nullptr;
     }
 

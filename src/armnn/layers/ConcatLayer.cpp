@@ -130,7 +130,7 @@ void ConcatLayer::CreateTensorHandles(const TensorHandleFactoryRegistry& registr
                                       const IWorkloadFactory& workloadFactory,
                                       const bool IsMemoryManaged)
 {
-    boost::ignore_unused(IsMemoryManaged);
+    IgnoreUnused(IsMemoryManaged);
     OutputSlot& slot = GetOutputSlot(0);
     ITensorHandleFactory::FactoryId factoryId = slot.GetTensorHandleFactoryId();
 

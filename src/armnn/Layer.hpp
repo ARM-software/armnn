@@ -17,6 +17,7 @@
 #include <armnn/Types.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/INetwork.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <algorithm>
 #include <memory>
@@ -27,7 +28,6 @@
 #include <list>
 
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/cast.hpp>
 
 namespace armnn

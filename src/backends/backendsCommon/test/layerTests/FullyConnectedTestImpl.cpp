@@ -34,7 +34,7 @@ LayerTestResult<T, 2> SimpleFullyConnectedTestImpl(
         bool biasEnabled,
         bool transposeWeights)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 

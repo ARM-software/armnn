@@ -6,6 +6,7 @@
 
 #include "ProfilingEvent.hpp"
 
+#include <armnn/utility/IgnoreUnused.hpp>
 #include "armnn/IProfiler.hpp"
 
 #include "WallClockTimer.hpp"
@@ -16,8 +17,6 @@
 #include <vector>
 #include <stack>
 #include <map>
-
-#include <boost/core/ignore_unused.hpp>
 
 namespace armnn
 {
@@ -141,7 +140,7 @@ private:
 
     void ConstructNextInVector(std::vector<InstrumentPtr>& instruments)
     {
-        boost::ignore_unused(instruments);
+        IgnoreUnused(instruments);
     }
 
     template<typename Arg, typename... Args>

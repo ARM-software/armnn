@@ -158,8 +158,8 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryLeak)
 
     // These are needed because VALGRIND_COUNT_LEAKS is a macro that assigns to the parameters
     // so they are assigned to, but still considered unused, causing a warning.
-    boost::ignore_unused(dubious);
-    boost::ignore_unused(suppressed);
+    IgnoreUnused(dubious);
+    IgnoreUnused(suppressed);
 }
 #endif // WITH_VALGRIND
 

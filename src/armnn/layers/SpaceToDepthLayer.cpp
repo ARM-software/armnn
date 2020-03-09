@@ -7,15 +7,13 @@
 #include "LayerCloneBase.hpp"
 
 #include <armnn/TypesUtils.hpp>
-
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnnUtils/DataLayoutIndexed.hpp>
 
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <numeric>
-
-#include <boost/core/ignore_unused.hpp>
 
 using namespace armnnUtils;
 
@@ -37,7 +35,7 @@ std::unique_ptr<IWorkload> SpaceToDepthLayer::CreateWorkload(const IWorkloadFact
 
 SpaceToDepthLayer* SpaceToDepthLayer::Clone(Graph& graph) const
 {
-    boost::ignore_unused(graph);
+    IgnoreUnused(graph);
     return CloneBase<SpaceToDepthLayer>(graph, m_Param, GetName());
 }
 

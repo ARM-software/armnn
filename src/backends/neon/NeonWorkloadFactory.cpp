@@ -10,6 +10,7 @@
 #include <Layer.hpp>
 
 #include <armnn/Utils.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/MakeWorkloadHelper.hpp>
@@ -19,7 +20,6 @@
 #include <neon/workloads/NeonWorkloadUtils.hpp>
 #include <neon/workloads/NeonWorkloads.hpp>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/polymorphic_cast.hpp>
 
 namespace armnn
@@ -98,7 +98,7 @@ std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const Ten
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {
-    boost::ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
 
     ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
     elementwiseUnaryDescriptor.m_Parameters = ElementwiseUnaryDescriptor(UnaryOperation::Abs);
@@ -245,7 +245,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateElementwiseUnary(const Ele
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {
-    boost::ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
 
     ComparisonQueueDescriptor comparisonDescriptor;
     comparisonDescriptor.m_Parameters = ComparisonDescriptor(ComparisonOperation::Equal);
@@ -275,7 +275,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateGather(const armnn::Gather
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
                                                               const WorkloadInfo& info) const
 {
-    boost::ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
 
     ComparisonQueueDescriptor comparisonDescriptor;
     comparisonDescriptor.m_Parameters = ComparisonDescriptor(ComparisonOperation::Greater);
@@ -446,7 +446,7 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateResizeBilinear(
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor &descriptor,
                                                             const WorkloadInfo &info) const
 {
-    boost::ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
 
     ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
     elementwiseUnaryDescriptor.m_Parameters = ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt);

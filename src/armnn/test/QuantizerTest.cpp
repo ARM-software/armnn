@@ -3,15 +3,6 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <armnn/INetwork.hpp>
-#include <armnn/LayerVisitorBase.hpp>
-#include <armnn/Tensor.hpp>
-#include <armnn/Types.hpp>
-
-#include <armnnQuantizer/INetworkQuantizer.hpp>
-
-#include <QuantizeHelper.hpp>
-
 #include "../Graph.hpp"
 #include "../Network.hpp"
 #include "../NetworkQuantizerUtils.hpp"
@@ -19,7 +10,14 @@
 #include "../RangeTracker.hpp"
 #include "../../armnnQuantizer/CommandLineProcessor.hpp"
 
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/INetwork.hpp>
+#include <armnn/LayerVisitorBase.hpp>
+#include <armnn/Tensor.hpp>
+#include <armnn/Types.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
+#include <armnnQuantizer/INetworkQuantizer.hpp>
+#include <QuantizeHelper.hpp>
+
 #include <boost/test/unit_test.hpp>
 
 #include <unordered_map>
@@ -58,7 +56,7 @@ public:
                          LayerBindingId id,
                          const char* name = nullptr) override
     {
-        boost::ignore_unused(id, name);
+        IgnoreUnused(id, name);
         const TensorInfo& info = layer->GetOutputSlot(0).GetTensorInfo();
         BOOST_TEST(m_InputShape == info.GetShape());
         // Based off current default [-15.0f, 15.0f]
@@ -72,7 +70,7 @@ public:
                           LayerBindingId id,
                           const char* name = nullptr) override
     {
-        boost::ignore_unused(id, name);
+        IgnoreUnused(id, name);
         const TensorInfo& info = layer->GetInputSlot(0).GetConnection()->GetTensorInfo();
         BOOST_TEST(m_OutputShape == info.GetShape());
     }
@@ -116,7 +114,7 @@ protected:
                                         const OffsetScalePair& params,
                                         DataType dataType = DataType::QAsymmU8)
     {
-        boost::ignore_unused(dataType);
+        IgnoreUnused(dataType);
         TestQuantizationParamsImpl(info, dataType, params.first, params.second);
     }
 
@@ -212,7 +210,7 @@ public:
     void VisitAdditionLayer(const IConnectableLayer* layer,
                             const char* name = nullptr) override
     {
-        boost::ignore_unused(name);
+        IgnoreUnused(name);
         TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
         // Based off default static range [-20.0f, 20.0f]
@@ -282,7 +280,7 @@ public:
                               const ActivationDescriptor& descriptor,
                               const char* name = nullptr) override
     {
-        boost::ignore_unused(descriptor, name);
+        IgnoreUnused(descriptor, name);
 
         TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
@@ -385,7 +383,7 @@ BOOST_AUTO_TEST_CASE(InputOutputLayerDynamicQuant)
                                       LayerBindingId id,
                                       const char* name = nullptr) override
         {
-            boost::ignore_unused(id, name);
+            IgnoreUnused(id, name);
             const TensorInfo& info = layer->GetInputSlot(0).GetConnection()->GetTensorInfo();
             BOOST_CHECK_MESSAGE(info.GetDataType() == m_DataType,
                                 std::string(armnn::GetDataTypeName(info.GetDataType()))
@@ -543,7 +541,7 @@ BOOST_AUTO_TEST_CASE(QuantizeBoundedReluActivation)
                                   const ActivationDescriptor& descriptor,
                                   const char* name = nullptr) override
         {
-            boost::ignore_unused(descriptor, name);
+            IgnoreUnused(descriptor, name);
             TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
             // Based off default static range [0.0f, 3.5f]
@@ -599,7 +597,7 @@ BOOST_AUTO_TEST_CASE(QuantizeTanHActivation)
                                   const ActivationDescriptor& descriptor,
                                   const char* name = nullptr) override
         {
-            boost::ignore_unused(descriptor, name);
+            IgnoreUnused(descriptor, name);
             TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
             // Based off default static range [-1.0f, 1.0f]
@@ -654,7 +652,7 @@ public:
                               const ActivationDescriptor& descriptor,
                               const char* name = nullptr) override
     {
-        boost::ignore_unused(descriptor, name);
+        IgnoreUnused(descriptor, name);
         TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
         // Based off default static range [-5.0f, 15.0f]
@@ -725,7 +723,7 @@ BOOST_AUTO_TEST_CASE(QuantizeELuActivation)
                                   const ActivationDescriptor& descriptor,
                                   const char* name = nullptr) override
         {
-            boost::ignore_unused(descriptor, name);
+            IgnoreUnused(descriptor, name);
             TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
             // Based off default static range [-15.0f, 15.0f]
@@ -779,7 +777,7 @@ BOOST_AUTO_TEST_CASE(QuantizeHardSwishActivation)
                                   const ActivationDescriptor& descriptor,
                                   const char* name = nullptr) override
         {
-            boost::ignore_unused(descriptor, name);
+            IgnoreUnused(descriptor, name);
             TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
             // Based off default static range [-15.0f, 15.0f]
@@ -839,7 +837,7 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchNorm)
                                           const ConstTensor& gamma,
                                           const char* name = nullptr) override
         {
-            boost::ignore_unused(desc, name);
+            IgnoreUnused(desc, name);
             TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
             // Based off default static range [-15.0f, 15.0f]
@@ -924,7 +922,7 @@ BOOST_AUTO_TEST_CASE(QuantizeDepthToSpace)
                                             const DepthToSpaceDescriptor& desc,
                                             const char* name = nullptr)
         {
-            boost::ignore_unused(desc, name);
+            IgnoreUnused(desc, name);
             const TensorInfo& info = layer->GetOutputSlot(0).GetTensorInfo();
 
             const OffsetScalePair qAsymmU8Params{ 30.0f / g_AsymmU8QuantizationBase, 128 };
@@ -1116,7 +1114,7 @@ void ValidateFullyConnectedLayer(const bool biasEnabled)
                                       const Optional<ConstTensor>& biases,
                                       const char* name = nullptr) override
         {
-            boost::ignore_unused(desc, name);
+            IgnoreUnused(desc, name);
             TestQuantizationOnLayersWithBiases(layer, weights, biases);
         }
     };
@@ -1173,7 +1171,7 @@ void TestQuantizeConvolution2d(bool useBiases)
                                      const Optional<ConstTensor>& biases,
                                      const char *name = nullptr) override
         {
-            boost::ignore_unused(convolution2dDescriptor, name);
+            IgnoreUnused(convolution2dDescriptor, name);
             TestQuantizationOnLayersWithBiases(layer, weights, biases);
         }
     };
@@ -1259,7 +1257,7 @@ void TestQuantizeDepthwiseConvolution2d(bool useBiases)
                                               const Optional<ConstTensor>& biases,
                                               const char *name = nullptr) override
         {
-            boost::ignore_unused(convolution2dDescriptor, name);
+            IgnoreUnused(convolution2dDescriptor, name);
             TestQuantizationOnLayersWithBiases(layer, weights, biases);
         }
     };
@@ -1343,7 +1341,7 @@ BOOST_AUTO_TEST_CASE(QuantizeInstanceNormalization)
                                                      const InstanceNormalizationDescriptor& descriptor,
                                                      const char* name = nullptr)
         {
-            boost::ignore_unused(descriptor, name);
+            IgnoreUnused(descriptor, name);
             const TensorInfo& info = layer->GetOutputSlot(0).GetTensorInfo();
 
             const OffsetScalePair qAsymmU8Params{ 30.0f / g_AsymmU8QuantizationBase, 128 };
@@ -1411,7 +1409,7 @@ BOOST_AUTO_TEST_CASE(QuantizeLogSoftmax)
                                   const SoftmaxDescriptor& descriptor,
                                   const char* name = nullptr) override
         {
-            boost::ignore_unused(descriptor, name);
+            IgnoreUnused(descriptor, name);
             TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
             const OffsetScalePair qAsymmU8Params{ 30.0f / g_AsymmU8QuantizationBase, 128 };
@@ -1503,7 +1501,7 @@ BOOST_AUTO_TEST_CASE(QuantizeSoftmax)
                                const SoftmaxDescriptor& descriptor,
                                const char* name = nullptr) override
         {
-            boost::ignore_unused(descriptor, name);
+            IgnoreUnused(descriptor, name);
             TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
             // Based off default static range [0.0f, 1.0f]
@@ -1636,7 +1634,7 @@ BOOST_AUTO_TEST_CASE(QuantizePermute)
                                const PermuteDescriptor& desc,
                                const char* name = nullptr) override
         {
-            boost::ignore_unused(desc, name);
+            IgnoreUnused(desc, name);
             CheckForwardedQuantizationSettings(layer);
         }
     };
@@ -1691,7 +1689,7 @@ BOOST_AUTO_TEST_CASE(QuantizeSpaceToBatch)
                                       const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
                                       const char* name = nullptr) override
         {
-            boost::ignore_unused(spaceToBatchNdDescriptor, name);
+            IgnoreUnused(spaceToBatchNdDescriptor, name);
             CheckForwardedQuantizationSettings(layer);
         }
     };
@@ -1804,7 +1802,7 @@ BOOST_AUTO_TEST_CASE(QuantizePooling2d)
                                  const Pooling2dDescriptor& desc,
                                  const char* name = nullptr) override
         {
-            boost::ignore_unused(desc, name);
+            IgnoreUnused(desc, name);
             CheckForwardedQuantizationSettings(layer);
         }
     };
@@ -1873,7 +1871,7 @@ BOOST_AUTO_TEST_CASE(QuantizeConstant)
                                 const ConstTensor& input,
                                 const char* name = nullptr) override
         {
-            boost::ignore_unused(input, name);
+            IgnoreUnused(input, name);
             TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
             // Based off the range of values in the const tensor used for the test: [-2.0f, 6.0f]
@@ -1946,20 +1944,20 @@ BOOST_AUTO_TEST_CASE(QuantizeArgMinMax)
                              LayerBindingId id,
                              const char* name = nullptr) override
         {
-            boost::ignore_unused(layer, id, name);
+            IgnoreUnused(layer, id, name);
         }
 
         void VisitOutputLayer(const IConnectableLayer* layer,
                               LayerBindingId id,
                               const char* name = nullptr) override
         {
-            boost::ignore_unused(layer, id, name);
+            IgnoreUnused(layer, id, name);
         }
         void VisitArgMinMaxLayer(const IConnectableLayer* layer,
                                  const ArgMinMaxDescriptor& argMinMaxDescriptor,
                                  const char* name = nullptr) override
         {
-                boost::ignore_unused(argMinMaxDescriptor, name);
+                IgnoreUnused(argMinMaxDescriptor, name);
                 TensorInfo outputInfo = layer->GetOutputSlot(0).GetTensorInfo();
 
                 TestQuantizationParams(outputInfo,
@@ -2034,7 +2032,7 @@ BOOST_AUTO_TEST_CASE(QuantizeComparison)
                                   const ComparisonDescriptor& descriptor,
                                   const char* name = nullptr) override
         {
-            boost::ignore_unused(descriptor, name);
+            IgnoreUnused(descriptor, name);
             TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
             const OffsetScalePair qAsymmU8Params{ 30.0f / g_AsymmU8QuantizationBase, 128 };
@@ -2106,19 +2104,19 @@ BOOST_AUTO_TEST_CASE(QuantizeConcat)
                              LayerBindingId id,
                              const char* name = nullptr) override
         {
-            boost::ignore_unused(layer, id, name);
+            IgnoreUnused(layer, id, name);
         }
         void VisitOutputLayer(const IConnectableLayer* layer,
                               LayerBindingId id,
                               const char* name = nullptr) override
         {
-            boost::ignore_unused(layer, id, name);
+            IgnoreUnused(layer, id, name);
         }
         void VisitConcatLayer(const IConnectableLayer* layer,
                               const OriginsDescriptor& originsDescriptor,
                               const char* name = nullptr) override
         {
-            boost::ignore_unused(originsDescriptor, name);
+            IgnoreUnused(originsDescriptor, name);
             TensorInfo outputInfo = layer->GetOutputSlot(0).GetTensorInfo();
             TestQuantizationParams(
                 outputInfo, {60.8f / g_AsymmU8QuantizationBase, 65},
@@ -2214,7 +2212,7 @@ BOOST_AUTO_TEST_CASE(QuantizeReshape)
                                        const ReshapeDescriptor& reshapeDescriptor,
                                        const char* name = nullptr) override
         {
-            boost::ignore_unused(reshapeDescriptor, name);
+            IgnoreUnused(reshapeDescriptor, name);
             CheckForwardedQuantizationSettings(layer);
         }
     };
@@ -2269,7 +2267,7 @@ BOOST_AUTO_TEST_CASE(QuantizeSplitter)
                                         const SplitterDescriptor& desc,
                                         const char* name = nullptr)
         {
-            boost::ignore_unused(desc, name);
+            IgnoreUnused(desc, name);
             CheckForwardedQuantizationSettings(layer);
         }
     };
@@ -2325,7 +2323,7 @@ BOOST_AUTO_TEST_CASE(QuantizeResize)
                                       const ResizeDescriptor& resizeDescriptor,
                                       const char* name = nullptr) override
         {
-            boost::ignore_unused(resizeDescriptor, name);
+            IgnoreUnused(resizeDescriptor, name);
             CheckForwardedQuantizationSettings(layer);
         }
     };
@@ -2382,7 +2380,7 @@ BOOST_AUTO_TEST_CASE(QuantizeStridedSlice)
                                             const StridedSliceDescriptor& desc,
                                             const char* name = nullptr)
         {
-            boost::ignore_unused(desc, name);
+            IgnoreUnused(desc, name);
             CheckForwardedQuantizationSettings(layer);
         }
     };
@@ -2437,7 +2435,7 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchToSpace)
                                       const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
                                       const char* name = nullptr) override
         {
-            boost::ignore_unused(batchToSpaceNdDescriptor, name);
+            IgnoreUnused(batchToSpaceNdDescriptor, name);
             CheckForwardedQuantizationSettings(layer);
         }
     };
@@ -2499,7 +2497,7 @@ BOOST_AUTO_TEST_CASE(QuantizePrelu)
                              LayerBindingId id,
                              const char* name = nullptr) override
         {
-            boost::ignore_unused(id, name);
+            IgnoreUnused(id, name);
             const TensorInfo& info = layer->GetOutputSlot(0).GetTensorInfo();
 
             switch (id)
@@ -2526,7 +2524,7 @@ BOOST_AUTO_TEST_CASE(QuantizePrelu)
                               LayerBindingId id,
                               const char* name = nullptr) override
         {
-            boost::ignore_unused(id, name);
+            IgnoreUnused(id, name);
             const TensorInfo& info = layer->GetInputSlot(0).GetConnection()->GetTensorInfo();
             BOOST_TEST(m_OutputShape == info.GetShape());
         }
@@ -2534,7 +2532,7 @@ BOOST_AUTO_TEST_CASE(QuantizePrelu)
         void VisitPreluLayer(const IConnectableLayer* layer,
                              const char* name = nullptr) override
         {
-            boost::ignore_unused(name);
+            IgnoreUnused(name);
             const TensorInfo& info = layer->GetOutputSlot(0).GetTensorInfo();
             TestQuantizationParams(info,
                                    { 30.0f / g_AsymmU8QuantizationBase, 128 }, // QASymmU8
@@ -2617,7 +2615,7 @@ void TestQuantizeTransposeConvolution2d(bool useBiases)
                                               const Optional<ConstTensor>& biases,
                                               const char *name = nullptr) override
         {
-            boost::ignore_unused(descriptor, name);
+            IgnoreUnused(descriptor, name);
             TestQuantizationOnLayersWithBiases(layer, weights, biases);
         }
     };
@@ -2704,20 +2702,20 @@ BOOST_AUTO_TEST_CASE(QuantizeStack)
                              LayerBindingId id,
                              const char* name = nullptr) override
         {
-            boost::ignore_unused(layer, id, name);
+            IgnoreUnused(layer, id, name);
         }
         void VisitOutputLayer(const IConnectableLayer* layer,
                               LayerBindingId id,
                               const char* name = nullptr) override
         {
-            boost::ignore_unused(layer, id, name);
+            IgnoreUnused(layer, id, name);
         }
 
         void VisitStackLayer(const IConnectableLayer* layer,
                              const StackDescriptor& descriptor,
                              const char* name = nullptr) override
         {
-            boost::ignore_unused(descriptor, name);
+            IgnoreUnused(descriptor, name);
             TensorInfo outputInfo = layer->GetOutputSlot(0).GetTensorInfo();
 
             TestQuantizationParams(outputInfo,
@@ -2784,7 +2782,7 @@ BOOST_AUTO_TEST_CASE(QuantizeSlice)
                                      const SliceDescriptor& desc,
                                      const char* name = nullptr)
         {
-            boost::ignore_unused(desc, name);
+            IgnoreUnused(desc, name);
             const TensorInfo& info = layer->GetOutputSlot(0).GetTensorInfo();
 
             const OffsetScalePair qAsymmU8Params{ 30.0f / g_AsymmU8QuantizationBase, 128 };
@@ -2876,7 +2874,7 @@ public:
                          LayerBindingId id,
                          const char* name = nullptr) override
     {
-        boost::ignore_unused(id, name);
+        IgnoreUnused(id, name);
         const TensorInfo& info = layer->GetOutputSlot(0).GetTensorInfo();
         BOOST_TEST(GetDataTypeName(info.GetDataType()) == GetDataTypeName(m_DataType));
         BOOST_TEST(m_InputShape == info.GetShape());
@@ -2886,7 +2884,7 @@ public:
                           LayerBindingId id,
                           const char* name = nullptr) override
     {
-        boost::ignore_unused(id, name);
+        IgnoreUnused(id, name);
         const TensorInfo& info = layer->GetInputSlot(0).GetConnection()->GetTensorInfo();
         BOOST_TEST(GetDataTypeName(info.GetDataType()) == GetDataTypeName(m_DataType));
         BOOST_TEST(m_OutputShape == info.GetShape());
@@ -2895,14 +2893,14 @@ public:
     void VisitQuantizeLayer(const IConnectableLayer* layer,
                             const char* name = nullptr) override
     {
-        boost::ignore_unused(layer, name);
+        IgnoreUnused(layer, name);
         m_VisitedQuantizeLayer = true;
     }
 
     void VisitDequantizeLayer(const IConnectableLayer* layer,
                               const char* name = nullptr) override
     {
-        boost::ignore_unused(layer, name);
+        IgnoreUnused(layer, name);
         m_VisitedDequantizeLayer = true;
     }
 

@@ -196,7 +196,7 @@ Layer::Layer(unsigned int numInputSlots,
 , m_BackendHint(EmptyOptional())
 , m_Guid(profiling::ProfilingService::Instance().NextGuid())
 {
-    boost::ignore_unused(layout);
+    IgnoreUnused(layout);
     m_InputSlots.reserve(numInputSlots);
     for (unsigned int i = 0; i < numInputSlots; ++i)
     {

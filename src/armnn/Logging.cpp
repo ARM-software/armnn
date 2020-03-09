@@ -2,9 +2,9 @@
 // Copyright © 2019 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include <armnn/Logging.hpp>
-
-
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/Utils.hpp>
 
 #if defined(_MSC_VER)
@@ -20,7 +20,6 @@
 #endif
 
 #include <boost/assert.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <iostream>
 
 namespace armnn
@@ -107,14 +106,14 @@ class DebugOutputSink : public LogSink
 public:
     void Consume(const std::string& s) override
     {
-        boost::ignore_unused(s);
+        IgnoreUnused(s);
 #if defined(_MSC_VER)
         OutputDebugString(s.c_str());
         OutputDebugString("\n");
 #elif defined(__ANDROID__)
         __android_log_write(ANDROID_LOG_DEBUG, "armnn", s.c_str());
 #else
-        boost::ignore_unused(s);
+        IgnoreUnused(s);
 #endif
     }
 };

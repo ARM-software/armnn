@@ -77,7 +77,7 @@ public:
 
     bool WritePacket(const unsigned char* buffer, uint32_t length) override
     {
-        boost::ignore_unused(buffer, length);
+        IgnoreUnused(buffer, length);
 
         return false;
     }
@@ -139,7 +139,7 @@ public:
 
     Packet ReadPacket(uint32_t timeout) override
     {
-        boost::ignore_unused(timeout);
+        IgnoreUnused(timeout);
         ++m_ReadRequests;
         throw armnn::Exception("Simulate a non-timeout error");
     }
@@ -158,7 +158,7 @@ class TestProfilingConnectionBadAckPacket : public TestProfilingConnectionBase
 public:
     Packet ReadPacket(uint32_t timeout) override
     {
-        boost::ignore_unused(timeout);
+        IgnoreUnused(timeout);
         // Connection Acknowledged Packet header (word 0, word 1 is always zero):
         // 26:31 [6]  packet_family: Control Packet Family, value 0b000000
         // 16:25 [10] packet_id: Packet identifier, value 0b0000000001
@@ -181,7 +181,7 @@ public:
 
     void operator()(const Packet& packet) override
     {
-        boost::ignore_unused(packet);
+        IgnoreUnused(packet);
         m_Count++;
     }
 

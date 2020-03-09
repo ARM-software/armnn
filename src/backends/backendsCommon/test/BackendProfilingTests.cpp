@@ -14,6 +14,7 @@
 #include "ProfilingUtils.hpp"
 #include "RequestCounterDirectoryCommandHandler.hpp"
 
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/BackendId.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/profiling/ISendTimelinePacket.hpp>
@@ -56,7 +57,7 @@ public:
     /// Create and write a CounterDirectoryPacket from the parameters to the buffer.
     virtual void SendCounterDirectoryPacket(const ICounterDirectory& counterDirectory)
     {
-        boost::ignore_unused(counterDirectory);
+        armnn::IgnoreUnused(counterDirectory);
     }
 
     /// Create and write a PeriodicCounterCapturePacket from the parameters to the buffer.
@@ -69,8 +70,8 @@ public:
     virtual void SendPeriodicCounterSelectionPacket(uint32_t capturePeriod,
                                                     const std::vector<uint16_t>& selectedCounterIds)
     {
-        boost::ignore_unused(capturePeriod);
-        boost::ignore_unused(selectedCounterIds);
+        armnn::IgnoreUnused(capturePeriod);
+        armnn::IgnoreUnused(selectedCounterIds);
     }
 
     std::vector<Timestamp> GetTimestamps()

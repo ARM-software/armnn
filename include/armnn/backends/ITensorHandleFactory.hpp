@@ -5,12 +5,12 @@
 
 #pragma once
 
+#include "ITensorHandle.hpp"
+
 #include <armnn/IRuntime.hpp>
 #include <armnn/MemorySources.hpp>
 #include <armnn/Types.hpp>
-#include "ITensorHandle.hpp"
-
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace armnn
 {
@@ -39,7 +39,7 @@ public:
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                               const bool IsMemoryManaged) const
     {
-        boost::ignore_unused(IsMemoryManaged);
+        IgnoreUnused(IsMemoryManaged);
         return CreateTensorHandle(tensorInfo);
     }
 
@@ -47,7 +47,7 @@ public:
                                                               DataLayout dataLayout,
                                                               const bool IsMemoryManaged) const
     {
-        boost::ignore_unused(IsMemoryManaged);
+        IgnoreUnused(IsMemoryManaged);
         return CreateTensorHandle(tensorInfo, dataLayout);
     }
 

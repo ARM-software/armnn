@@ -691,7 +691,7 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
                              LayerBindingId id,
                              const char* name = nullptr) override
         {
-            boost::ignore_unused(id, name);
+            IgnoreUnused(id, name);
             auto inputLayer = boost::polymorphic_downcast<const InputLayer*>(layer);
             BOOST_TEST((inputLayer->GetBackendId() == "MockBackend"));
         }
@@ -700,7 +700,7 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
                               LayerBindingId id,
                               const char* name = nullptr) override
         {
-            boost::ignore_unused(id, name);
+            IgnoreUnused(id, name);
             auto outputLayer = boost::polymorphic_downcast<const OutputLayer*>(layer);
             BOOST_TEST((outputLayer->GetBackendId() == "MockBackend"));
         }
@@ -709,7 +709,7 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
                                   const ActivationDescriptor& activationDescriptor,
                                   const char* name = nullptr) override
         {
-            boost::ignore_unused(activationDescriptor, name);
+            IgnoreUnused(activationDescriptor, name);
             auto activation = boost::polymorphic_downcast<const ActivationLayer*>(layer);
             BOOST_TEST((activation->GetBackendId() == "CustomBackend"));
         }

@@ -311,7 +311,7 @@ const IWorkloadFactory& LoadedNetwork::GetWorkloadFactory(const Layer& layer) co
     std::string reasonIfUnsupported;
     BOOST_ASSERT_MSG(IWorkloadFactory::IsLayerSupported(layer, {}, reasonIfUnsupported),
         "Factory does not support layer");
-    boost::ignore_unused(reasonIfUnsupported);
+    IgnoreUnused(reasonIfUnsupported);
     return *workloadFactory;
 }
 

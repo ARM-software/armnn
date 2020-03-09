@@ -13,7 +13,7 @@ ExecutionFrame::ExecutionFrame() {}
 
 IExecutionFrame* ExecutionFrame::ExecuteWorkloads(IExecutionFrame* previousFrame)
 {
-    boost::ignore_unused(previousFrame);
+    IgnoreUnused(previousFrame);
     for (auto& workload: m_WorkloadQueue)
     {
         workload->Execute();

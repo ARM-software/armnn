@@ -34,6 +34,7 @@
 #include <armnn/Types.hpp>
 
 #include <armnn/Utils.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -1697,7 +1698,7 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     {
         bool IsCounterRegistered(uint16_t counterUid) const override
         {
-            boost::ignore_unused(counterUid);
+            armnn::IgnoreUnused(counterUid);
             return true;
         }
         uint16_t GetCounterCount() const override
@@ -1706,7 +1707,7 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
         }
         uint32_t GetCounterValue(uint16_t counterUid) const override
         {
-            boost::ignore_unused(counterUid);
+            armnn::IgnoreUnused(counterUid);
             return 0;
         }
     };
@@ -2092,7 +2093,7 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
         //not used
         bool IsCounterRegistered(uint16_t counterUid) const override
         {
-            boost::ignore_unused(counterUid);
+            armnn::IgnoreUnused(counterUid);
             return false;
         }
 

@@ -22,6 +22,7 @@
 #include <armnn/TypesUtils.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Logging.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <ProfilingService.hpp>
 
@@ -628,7 +629,7 @@ ITensorHandleFactory::FactoryId CalculateSlotOptionForOutput(BackendsMap& backen
                                                             OutputSlot& slot,
                                                             TensorHandleFactoryRegistry& registry)
 {
-    boost::ignore_unused(backends, slot, registry);
+    IgnoreUnused(backends, slot, registry);
     return ITensorHandleFactory::DeferredFactoryId;
 }
 

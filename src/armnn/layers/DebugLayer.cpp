@@ -8,8 +8,7 @@
 
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace armnn
 {
@@ -53,7 +52,7 @@ void DebugLayer::ValidateTensorShapesFromInputs()
 void DebugLayer::Accept(ILayerVisitor& visitor) const
 {
     // by design debug layers are never in input graphs
-    boost::ignore_unused(visitor);
+    IgnoreUnused(visitor);
     throw armnn::Exception("DebugLayer should never appear in an input graph");
 }
 

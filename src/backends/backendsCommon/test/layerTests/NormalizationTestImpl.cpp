@@ -24,7 +24,7 @@ LayerTestResult<float,4> SimpleNormalizationTestImpl(
     armnn::NormalizationAlgorithmChannel normChannel,
     armnn::NormalizationAlgorithmMethod normMethod)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     const unsigned int inputHeight = 2;
     const unsigned int inputWidth = 2;
     const unsigned int inputChannels = 1;

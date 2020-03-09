@@ -142,7 +142,7 @@ LstmNoCifgNoPeepholeNoProjectionTestImpl(
         int32_t qOffset = 0,
         armnn::DataType constantDataType = armnn::DataType::Float32)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     unsigned int batchSize = boost::numeric_cast<unsigned int>(input.shape()[0]);
     unsigned int inputSize = boost::numeric_cast<unsigned int>(input.shape()[1]);
     unsigned int outputSize = boost::numeric_cast<unsigned int>(outputExpected.shape()[1]);
@@ -345,7 +345,7 @@ LstmLayerNoCifgWithPeepholeWithProjectionTestImpl(armnn::IWorkloadFactory& workl
                                                   int32_t qOffset = 0,
                                                   armnn::DataType constantDataType = armnn::DataType::Float32)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     unsigned int batchSize = 2;
     unsigned int outputSize = 16;
     unsigned int inputSize = 5;
@@ -1060,7 +1060,7 @@ LayerTestResult<T, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
         int32_t qOffset = 0,
         armnn::DataType constantDataType = armnn::DataType::Float32)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     bool cifgEnabled = true;
     bool peepholeEnabled = true;
     bool projectionEnabled = false;
@@ -1285,7 +1285,7 @@ LstmLayerNoCifgWithPeepholeWithProjectionWithLayerNormTestImpl(armnn::IWorkloadF
                                                   int32_t qOffset = 0,
                                                   armnn::DataType constantDataType = armnn::DataType::Float32)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     unsigned int batchSize = 2;
     unsigned int outputSize = 3;
     unsigned int inputSize = 5;
@@ -1552,7 +1552,7 @@ LayerTestResult<uint8_t, 2> QuantizedLstmTestImpl(
     const boost::multi_array<uint8_t, 2>& input,
     const boost::multi_array<uint8_t, 2>& outputExpected)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     auto numBatches = boost::numeric_cast<unsigned int>(input.shape()[0]);
     auto inputSize = boost::numeric_cast<unsigned int>(input.shape()[1]);
     auto outputSize = boost::numeric_cast<unsigned int>(outputExpected.shape()[1]);

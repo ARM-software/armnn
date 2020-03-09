@@ -6,7 +6,7 @@
 #include "NeonTensorHandleFactory.hpp"
 #include "NeonTensorHandle.hpp"
 
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace armnn
 {

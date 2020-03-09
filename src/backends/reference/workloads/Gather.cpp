@@ -8,8 +8,8 @@
 #include "RefWorkloadUtils.hpp"
 
 #include <backendsCommon/WorkloadData.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 namespace armnn
@@ -22,7 +22,7 @@ void Gather(const TensorInfo& paramsInfo,
             const int32_t* indices,
             Encoder<float>& output)
 {
-    boost::ignore_unused(outputInfo);
+    IgnoreUnused(outputInfo);
     const TensorShape& paramsShape = paramsInfo.GetShape();
 
     unsigned int paramsProduct = 1;

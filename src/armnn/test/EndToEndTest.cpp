@@ -6,8 +6,8 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/IRuntime.hpp>
 #include <armnn/INetwork.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <set>

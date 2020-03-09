@@ -31,7 +31,7 @@ LayerTestResult<T, OutputDim> GatherTestImpl(
     const std::vector<int32_t>& indicesData,
     const std::vector<T>& outputData)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     auto params  = MakeTensor<T, ParamsDim>(paramsInfo, paramsData);
     auto indices = MakeTensor<int32_t, IndicesDim>(indicesInfo, indicesData);
 

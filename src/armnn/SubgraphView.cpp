@@ -6,8 +6,9 @@
 #include "SubgraphView.hpp"
 #include "Graph.hpp"
 
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
+#include <boost/numeric/conversion/cast.hpp>
 #include <utility>
 
 namespace armnn
@@ -24,7 +25,7 @@ void AssertIfNullsOrDuplicates(const C& container, const std::string& errorMessa
     std::for_each(container.begin(), container.end(), [&duplicateSet, &errorMessage](const T& i)
     {
         // Ignore unused for release builds
-        boost::ignore_unused(errorMessage);
+        IgnoreUnused(errorMessage);
 
         // Check if the item is valid
         BOOST_ASSERT_MSG(i, errorMessage.c_str());

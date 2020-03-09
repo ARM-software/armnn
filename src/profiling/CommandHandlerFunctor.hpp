@@ -3,19 +3,19 @@
 // SPDX-License-Identifier: MIT
 //
 
+#pragma once
+
 #include "Packet.hpp"
 
-#include <cstdint>
+#include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/core/ignore_unused.hpp>
+#include <cstdint>
 
 namespace armnn
 {
 
 namespace profiling
 {
-
-#pragma once
 
 class CommandHandlerFunctor
 {

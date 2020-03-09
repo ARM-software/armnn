@@ -6,11 +6,11 @@
 #include "LogSoftmax.hpp"
 
 #include <armnnUtils/TensorUtils.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <cmath>
 
 #include <boost/assert.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 namespace
@@ -37,7 +37,7 @@ void LogSoftmax(Decoder<float>& input,
     bool axisIsValid = ValidateAxis(descriptor.m_Axis, numDimensions);
     BOOST_ASSERT_MSG(axisIsValid,
         "Axis index is not in range [-numDimensions, numDimensions).");
-    boost::ignore_unused(axisIsValid);
+    IgnoreUnused(axisIsValid);
 
     unsigned int uAxis = descriptor.m_Axis < 0  ?
         numDimensions - boost::numeric_cast<unsigned int>(std::abs(descriptor.m_Axis)) :

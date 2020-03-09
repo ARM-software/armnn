@@ -8,8 +8,7 @@
 
 #include <backendsCommon/WorkloadFactoryBase.hpp>
 #include <aclCommon/BaseMemoryManager.hpp>
-
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace armnn
 {

@@ -24,7 +24,7 @@ LayerTestResult<T, 4> PreluTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
 
     armnn::TensorInfo inputTensorInfo ({ 1, 2, 2, 3 }, ArmnnType);
     armnn::TensorInfo alphaTensorInfo ({ 1, 1, 1, 3 }, ArmnnType);

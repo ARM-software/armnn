@@ -6,7 +6,7 @@
 #include "DynamicQuantizationVisitor.hpp"
 #include "NetworkUtils.hpp"
 
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/Descriptors.hpp>
 #include <armnn/Types.hpp>
 
@@ -85,7 +85,7 @@ void DynamicQuantizationVisitor::VisitNonCalibratedLayers() {
 
 void DynamicQuantizationVisitor::VisitAdditionLayer(const IConnectableLayer* layer, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
     SetRange(layer, 0, -20.f, 20.f);
     AddToCalibratedLayers(layer);
 }
@@ -98,12 +98,12 @@ void DynamicQuantizationVisitor::VisitBatchNormalizationLayer(const IConnectable
                                                               const ConstTensor& gamma,
                                                               const char* name)
 {
-    boost::ignore_unused(desc);
-    boost::ignore_unused(mean);
-    boost::ignore_unused(variance);
-    boost::ignore_unused(beta);
-    boost::ignore_unused(gamma);
-    boost::ignore_unused(name);
+    IgnoreUnused(desc);
+    IgnoreUnused(mean);
+    IgnoreUnused(variance);
+    IgnoreUnused(beta);
+    IgnoreUnused(gamma);
+    IgnoreUnused(name);
     SetRange(layer, 0, -15.0f, 15.0f);
     AddToCalibratedLayers(layer);
 }
@@ -114,10 +114,10 @@ void DynamicQuantizationVisitor::VisitConvolution2dLayer(const IConnectableLayer
                                                          const Optional<ConstTensor>& biases,
                                                          const char* name)
 {
-    boost::ignore_unused(convolution2dDescriptor);
-    boost::ignore_unused(weights);
-    boost::ignore_unused(biases);
-    boost::ignore_unused(name);
+    IgnoreUnused(convolution2dDescriptor);
+    IgnoreUnused(weights);
+    IgnoreUnused(biases);
+    IgnoreUnused(name);
     SetRange(layer, 0, -15.0f, 15.0f);
     AddToCalibratedLayers(layer);
 }
@@ -128,10 +128,10 @@ void DynamicQuantizationVisitor::VisitDepthwiseConvolution2dLayer(const IConnect
                                                                   const Optional<ConstTensor>& biases,
                                                                   const char* name)
 {
-    boost::ignore_unused(desc);
-    boost::ignore_unused(weights);
-    boost::ignore_unused(biases);
-    boost::ignore_unused(name);
+    IgnoreUnused(desc);
+    IgnoreUnused(weights);
+    IgnoreUnused(biases);
+    IgnoreUnused(name);
     SetRange(layer, 0, -15.0f, 15.0f);
     AddToCalibratedLayers(layer);
 }
@@ -140,7 +140,7 @@ void DynamicQuantizationVisitor::VisitActivationLayer(const IConnectableLayer* l
                                                       const ActivationDescriptor& activationDescriptor,
                                                       const char* name)
 {
-    boost::ignore_unused(name, activationDescriptor);
+    IgnoreUnused(name, activationDescriptor);
     switch (activationDescriptor.m_Function)
     {
         // Range is 0, 15 for Abs, Linear, ReLu and Soft ReLu
@@ -172,10 +172,10 @@ void DynamicQuantizationVisitor::VisitFullyConnectedLayer(const IConnectableLaye
                                                           const Optional<ConstTensor>& biases,
                                                           const char *name)
 {
-    boost::ignore_unused(desc);
-    boost::ignore_unused(weights);
-    boost::ignore_unused(biases);
-    boost::ignore_unused(name);
+    IgnoreUnused(desc);
+    IgnoreUnused(weights);
+    IgnoreUnused(biases);
+    IgnoreUnused(name);
     SetRange(layer, 0, -15.0f, 15.0f);
     AddToCalibratedLayers(layer);
 }
@@ -184,8 +184,8 @@ void DynamicQuantizationVisitor::VisitPermuteLayer(const IConnectableLayer* laye
                                                    const PermuteDescriptor& permuteDescriptor,
                                                    const char* name)
 {
-    boost::ignore_unused(permuteDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(permuteDescriptor);
+    IgnoreUnused(name);
     AddToNonCalibratedLayers(layer);
 }
 
@@ -193,8 +193,8 @@ void DynamicQuantizationVisitor::VisitSpaceToBatchNdLayer(const IConnectableLaye
                                                           const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
                                                           const char* name)
 {
-    boost::ignore_unused(spaceToBatchNdDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(spaceToBatchNdDescriptor);
+    IgnoreUnused(name);
     AddToNonCalibratedLayers(layer);
 }
 
@@ -202,8 +202,8 @@ void DynamicQuantizationVisitor::VisitPooling2dLayer(const IConnectableLayer* la
                                                      const Pooling2dDescriptor& pooling2dDescriptor,
                                                      const char* name)
 {
-    boost::ignore_unused(pooling2dDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(pooling2dDescriptor);
+    IgnoreUnused(name);
     AddToNonCalibratedLayers(layer);
 }
 
@@ -211,8 +211,8 @@ void DynamicQuantizationVisitor::VisitSoftmaxLayer(const IConnectableLayer* laye
                                                    const SoftmaxDescriptor& softmaxDescriptor,
                                                    const char* name)
 {
-    boost::ignore_unused(softmaxDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(softmaxDescriptor);
+    IgnoreUnused(name);
     SetRange(layer, 0, 0.f, 1.f);
     AddToCalibratedLayers(layer);
 }
@@ -221,7 +221,7 @@ void DynamicQuantizationVisitor::VisitConstantLayer(const IConnectableLayer* lay
                                                     const ConstTensor& input,
                                                     const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     if (input.GetDataType() != DataType::Float32)
     {
@@ -249,8 +249,8 @@ void DynamicQuantizationVisitor::VisitConcatLayer(const IConnectableLayer* layer
                                                   const ConcatDescriptor& originsDescriptor,
                                                   const char* name)
 {
-    boost::ignore_unused(name);
-    boost::ignore_unused(originsDescriptor);
+    IgnoreUnused(name);
+    IgnoreUnused(originsDescriptor);
     float min = std::numeric_limits<float>::max();
     float max = std::numeric_limits<float>::lowest();
     for (unsigned int i = 0; i < layer->GetNumInputSlots(); ++i)
@@ -270,8 +270,8 @@ void DynamicQuantizationVisitor::VisitReshapeLayer(const IConnectableLayer* laye
                                                    const ReshapeDescriptor& reshapeDescriptor,
                                                    const char* name)
 {
-    boost::ignore_unused(reshapeDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(reshapeDescriptor);
+    IgnoreUnused(name);
     AddToNonCalibratedLayers(layer);
 }
 
@@ -279,8 +279,8 @@ void DynamicQuantizationVisitor::VisitSplitterLayer(const IConnectableLayer* lay
                                                     const SplitterDescriptor& splitterDescriptor,
                                                     const char* name)
 {
-    boost::ignore_unused(splitterDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(splitterDescriptor);
+    IgnoreUnused(name);
     AddToNonCalibratedLayers(layer);
 }
 
@@ -288,8 +288,8 @@ void DynamicQuantizationVisitor::VisitResizeBilinearLayer(const IConnectableLaye
                                                           const ResizeBilinearDescriptor& resizeDesc,
                                                           const char* name)
 {
-    boost::ignore_unused(resizeDesc);
-    boost::ignore_unused(name);
+    IgnoreUnused(resizeDesc);
+    IgnoreUnused(name);
     AddToNonCalibratedLayers(layer);
 }
 
@@ -297,8 +297,8 @@ void DynamicQuantizationVisitor::VisitStridedSliceLayer(const IConnectableLayer*
                                                         const StridedSliceDescriptor& stridedSliceDescriptor,
                                                         const char* name)
 {
-    boost::ignore_unused(stridedSliceDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(stridedSliceDescriptor);
+    IgnoreUnused(name);
     AddToNonCalibratedLayers(layer);
 }
 
@@ -306,23 +306,23 @@ void DynamicQuantizationVisitor::VisitBatchToSpaceNdLayer(const IConnectableLaye
                                                           const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
                                                           const char* name)
 {
-    boost::ignore_unused(batchToSpaceNdDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(batchToSpaceNdDescriptor);
+    IgnoreUnused(name);
     AddToNonCalibratedLayers(layer);
 }
 
 void DynamicQuantizationVisitor::VisitInputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name)
 {
-    boost::ignore_unused(id);
-    boost::ignore_unused(name);
+    IgnoreUnused(id);
+    IgnoreUnused(name);
     SetRange(layer, 0, -0.0f, 0.0f);
     AddToCalibratedLayers(layer);
 }
 
 void DynamicQuantizationVisitor::VisitOutputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name)
 {
-    boost::ignore_unused(id);
-    boost::ignore_unused(name);
+    IgnoreUnused(id);
+    IgnoreUnused(name);
     AddToNonCalibratedLayers(layer);
     m_OutputLayers.push_back(id);
 }

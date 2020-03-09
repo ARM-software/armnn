@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/TypesUtils.hpp>
 
 #include <Half.hpp>
@@ -13,7 +14,6 @@
 #include <iterator>
 #include <vector>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 namespace armnnUtils
@@ -38,13 +38,13 @@ struct SelectiveQuantizer<T, false>
 {
     static T Quantize(float value, float scale, int32_t offset)
     {
-        boost::ignore_unused(scale, offset);
+        armnn::IgnoreUnused(scale, offset);
         return value;
     }
 
     static float Dequantize(T value, float scale, int32_t offset)
     {
-        boost::ignore_unused(scale, offset);
+        armnn::IgnoreUnused(scale, offset);
         return value;
     }
 };
@@ -54,13 +54,13 @@ struct SelectiveQuantizer<armnn::Half, false>
 {
     static armnn::Half Quantize(float value, float scale, int32_t offset)
     {
-        boost::ignore_unused(scale, offset);
+        armnn::IgnoreUnused(scale, offset);
         return armnn::Half(value);
     }
 
     static float Dequantize(armnn::Half value, float scale, int32_t offset)
     {
-        boost::ignore_unused(scale, offset);
+        armnn::IgnoreUnused(scale, offset);
         return value;
     }
 };

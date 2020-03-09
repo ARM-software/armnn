@@ -5,7 +5,7 @@
 
 #include "StaticRangeVisitor.hpp"
 
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/Descriptors.hpp>
 #include <armnn/Types.hpp>
 
@@ -31,7 +31,7 @@ void StaticRangeVisitor::ForwardParentParameters(const IConnectableLayer* layer)
 
 void StaticRangeVisitor::VisitAdditionLayer(const IConnectableLayer* layer, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
     SetRange(layer, 0, -20.f, 20.f);
 }
 
@@ -43,12 +43,12 @@ void StaticRangeVisitor::VisitBatchNormalizationLayer(const IConnectableLayer* l
                                                       const ConstTensor& gamma,
                                                       const char* name)
 {
-    boost::ignore_unused(desc);
-    boost::ignore_unused(mean);
-    boost::ignore_unused(variance);
-    boost::ignore_unused(beta);
-    boost::ignore_unused(gamma);
-    boost::ignore_unused(name);
+    IgnoreUnused(desc);
+    IgnoreUnused(mean);
+    IgnoreUnused(variance);
+    IgnoreUnused(beta);
+    IgnoreUnused(gamma);
+    IgnoreUnused(name);
     SetRange(layer, 0, -15.0f, 15.0f);
 }
 
@@ -58,10 +58,10 @@ void StaticRangeVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
                                                  const Optional<ConstTensor>& biases,
                                                  const char* name)
 {
-    boost::ignore_unused(convolution2dDescriptor);
-    boost::ignore_unused(weights);
-    boost::ignore_unused(biases);
-    boost::ignore_unused(name);
+    IgnoreUnused(convolution2dDescriptor);
+    IgnoreUnused(weights);
+    IgnoreUnused(biases);
+    IgnoreUnused(name);
     SetRange(layer, 0, -15.0f, 15.0f);
 }
 
@@ -71,10 +71,10 @@ void StaticRangeVisitor::VisitDepthwiseConvolution2dLayer(const IConnectableLaye
                                                           const Optional<ConstTensor>& biases,
                                                           const char* name)
 {
-    boost::ignore_unused(desc);
-    boost::ignore_unused(weights);
-    boost::ignore_unused(biases);
-    boost::ignore_unused(name);
+    IgnoreUnused(desc);
+    IgnoreUnused(weights);
+    IgnoreUnused(biases);
+    IgnoreUnused(name);
     SetRange(layer, 0, -15.0f, 15.0f);
 }
 
@@ -82,7 +82,7 @@ void StaticRangeVisitor::VisitActivationLayer(const IConnectableLayer* layer,
                                               const ActivationDescriptor& activationDescriptor,
                                               const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
     switch (activationDescriptor.m_Function)
     {
         // Range is 0, 15 for Abs, Linear, ReLu and Soft ReLu
@@ -113,10 +113,10 @@ void StaticRangeVisitor::VisitFullyConnectedLayer(const IConnectableLayer *layer
                                                   const Optional<ConstTensor>& biases,
                                                   const char *name)
 {
-    boost::ignore_unused(desc);
-    boost::ignore_unused(weights);
-    boost::ignore_unused(biases);
-    boost::ignore_unused(name);
+    IgnoreUnused(desc);
+    IgnoreUnused(weights);
+    IgnoreUnused(biases);
+    IgnoreUnused(name);
     SetRange(layer, 0, -15.0f, 15.0f);
 }
 
@@ -124,8 +124,8 @@ void StaticRangeVisitor::VisitPermuteLayer(const IConnectableLayer* layer,
                                            const PermuteDescriptor& permuteDescriptor,
                                            const char* name)
 {
-    boost::ignore_unused(permuteDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(permuteDescriptor);
+    IgnoreUnused(name);
     ForwardParentParameters(layer);
 }
 
@@ -133,8 +133,8 @@ void StaticRangeVisitor::VisitSpaceToBatchNdLayer(const IConnectableLayer* layer
                                                   const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
                                                   const char* name)
 {
-    boost::ignore_unused(spaceToBatchNdDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(spaceToBatchNdDescriptor);
+    IgnoreUnused(name);
     ForwardParentParameters(layer);
 }
 
@@ -142,8 +142,8 @@ void StaticRangeVisitor::VisitPooling2dLayer(const IConnectableLayer* layer,
                                              const Pooling2dDescriptor& pooling2dDescriptor,
                                              const char* name)
 {
-    boost::ignore_unused(pooling2dDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(pooling2dDescriptor);
+    IgnoreUnused(name);
     ForwardParentParameters(layer);
 }
 
@@ -151,8 +151,8 @@ void StaticRangeVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
                                            const SoftmaxDescriptor& softmaxDescriptor,
                                            const char* name)
 {
-    boost::ignore_unused(softmaxDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(softmaxDescriptor);
+    IgnoreUnused(name);
     SetRange(layer, 0, 0.f, 1.f);
 }
 
@@ -160,8 +160,8 @@ void StaticRangeVisitor::VisitConcatLayer(const IConnectableLayer* layer,
                                           const OriginsDescriptor& originsDescriptor,
                                           const char* name)
 {
-    boost::ignore_unused(originsDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(originsDescriptor);
+    IgnoreUnused(name);
     float min = std::numeric_limits<float>::max();
     float max = std::numeric_limits<float>::lowest();
     for (unsigned int i = 0; i < layer->GetNumInputSlots(); ++i)
@@ -180,7 +180,7 @@ void StaticRangeVisitor::VisitConstantLayer(const IConnectableLayer* layer,
                                             const ConstTensor& input,
                                             const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     if (input.GetDataType() != DataType::Float32)
     {
@@ -208,8 +208,8 @@ void StaticRangeVisitor::VisitReshapeLayer(const IConnectableLayer* layer,
                                            const ReshapeDescriptor& reshapeDescriptor,
                                            const char* name)
 {
-    boost::ignore_unused(reshapeDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(reshapeDescriptor);
+    IgnoreUnused(name);
     ForwardParentParameters(layer);
 }
 
@@ -217,8 +217,8 @@ void StaticRangeVisitor::VisitSplitterLayer(const IConnectableLayer* layer,
                                             const SplitterDescriptor& splitterDescriptor,
                                             const char* name)
 {
-    boost::ignore_unused(splitterDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(splitterDescriptor);
+    IgnoreUnused(name);
     ForwardParentParameters(layer);
 }
 
@@ -226,8 +226,8 @@ void StaticRangeVisitor::VisitResizeBilinearLayer(const IConnectableLayer* layer
                                                   const ResizeBilinearDescriptor& resizeDesc,
                                                   const char* name)
 {
-    boost::ignore_unused(resizeDesc);
-    boost::ignore_unused(name);
+    IgnoreUnused(resizeDesc);
+    IgnoreUnused(name);
     ForwardParentParameters(layer);
 }
 
@@ -235,8 +235,8 @@ void StaticRangeVisitor::VisitResizeLayer(const IConnectableLayer* layer,
                                           const ResizeDescriptor& resizeDescriptor,
                                           const char* name)
 {
-    boost::ignore_unused(resizeDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(resizeDescriptor);
+    IgnoreUnused(name);
     ForwardParentParameters(layer);
 }
 
@@ -244,8 +244,8 @@ void StaticRangeVisitor::VisitStridedSliceLayer(const IConnectableLayer* layer,
                                                 const StridedSliceDescriptor& stridedSliceDescriptor,
                                                 const char* name)
 {
-    boost::ignore_unused(stridedSliceDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(stridedSliceDescriptor);
+    IgnoreUnused(name);
     ForwardParentParameters(layer);
 }
 
@@ -253,8 +253,8 @@ void StaticRangeVisitor::VisitBatchToSpaceNdLayer(const IConnectableLayer* layer
                                                   const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
                                                   const char* name)
 {
-    boost::ignore_unused(batchToSpaceNdDescriptor);
-    boost::ignore_unused(name);
+    IgnoreUnused(batchToSpaceNdDescriptor);
+    IgnoreUnused(name);
     ForwardParentParameters(layer);
 }
 

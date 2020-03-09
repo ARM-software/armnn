@@ -6,7 +6,7 @@
 
 #include "Optimization.hpp"
 
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace armnn
 {
@@ -21,7 +21,7 @@ public:
     /// Bypasses both layers for that connection if one is the inverse of the other.
     void Run(Graph& graph, InputSlot& connection) const
     {
-        boost::ignore_unused(graph);
+        IgnoreUnused(graph);
         Layer& base = connection.GetConnectedOutputSlot()->GetOwningLayer();
         auto child = boost::polymorphic_downcast<PermuteType*>(&connection.GetOwningLayer());
 

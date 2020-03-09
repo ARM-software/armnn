@@ -5,6 +5,7 @@
 #include "Profiling.hpp"
 
 #include <armnn/BackendId.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include "JsonPrinter.hpp"
 
@@ -20,7 +21,7 @@
 #include <stack>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
+
 namespace armnn
 {
 
@@ -223,7 +224,7 @@ void Profiler::EndEvent(Event* event)
     m_Parents.pop();
 
     Event* parent = m_Parents.empty() ? nullptr : m_Parents.top();
-    boost::ignore_unused(parent);
+    IgnoreUnused(parent);
     BOOST_ASSERT(event->GetParentEvent() == parent);
 
 #if ARMNN_STREAMLINE_ENABLED

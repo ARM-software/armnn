@@ -7,7 +7,7 @@
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include "../Deserializer.hpp"
 
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <string>
 #include <iostream>
@@ -22,7 +22,7 @@ struct AddFixture : public ParserFlatbuffersSerializeFixture
                         const std::string & dataType,
                         const std::string & activation="NONE")
     {
-        boost::ignore_unused(activation);
+        armnn::IgnoreUnused(activation);
         m_JsonString = R"(
         {
                 inputIds: [0, 1],

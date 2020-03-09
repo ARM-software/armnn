@@ -16,10 +16,11 @@
 
 #include <Network.hpp>
 
+#include <armnn/utility/IgnoreUnused.hpp>
+
 #include <vector>
 #include <string>
 
-#include <boost/core/ignore_unused.hpp>
 
 using namespace armnn;
 
@@ -44,20 +45,20 @@ public:
                                                          TensorShape const& subTensorShape,
                                                          unsigned int const* subTensorOrigin) const override
     {
-        boost::ignore_unused(parent, subTensorShape, subTensorOrigin);
+        IgnoreUnused(parent, subTensorShape, subTensorOrigin);
         return nullptr;
     }
 
     std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo) const override
     {
-        boost::ignore_unused(tensorInfo);
+        IgnoreUnused(tensorInfo);
         return nullptr;
     }
 
     std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                       DataLayout dataLayout) const override
     {
-        boost::ignore_unused(tensorInfo, dataLayout);
+        IgnoreUnused(tensorInfo, dataLayout);
         return nullptr;
     }
 
@@ -85,20 +86,20 @@ public:
                                                          TensorShape const& subTensorShape,
                                                          unsigned int const* subTensorOrigin) const override
     {
-        boost::ignore_unused(parent, subTensorShape, subTensorOrigin);
+        IgnoreUnused(parent, subTensorShape, subTensorOrigin);
         return nullptr;
     }
 
     std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo) const override
     {
-        boost::ignore_unused(tensorInfo);
+        IgnoreUnused(tensorInfo);
         return nullptr;
     }
 
     std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                       DataLayout dataLayout) const override
     {
-        boost::ignore_unused(tensorInfo, dataLayout);
+        IgnoreUnused(tensorInfo, dataLayout);
         return nullptr;
     }
 
@@ -123,7 +124,7 @@ public:
 
     IWorkloadFactoryPtr CreateWorkloadFactory(const IMemoryManagerSharedPtr& memoryManager = nullptr) const override
     {
-        boost::ignore_unused(memoryManager);
+        IgnoreUnused(memoryManager);
         return IWorkloadFactoryPtr{};
     }
 
@@ -164,7 +165,7 @@ public:
 
     IWorkloadFactoryPtr CreateWorkloadFactory(const IMemoryManagerSharedPtr& memoryManager = nullptr) const override
     {
-        boost::ignore_unused(memoryManager);
+        IgnoreUnused(memoryManager);
         return IWorkloadFactoryPtr{};
     }
 
@@ -202,7 +203,7 @@ public:
 
     IWorkloadFactoryPtr CreateWorkloadFactory(const IMemoryManagerSharedPtr& memoryManager = nullptr) const override
     {
-        boost::ignore_unused(memoryManager);
+        IgnoreUnused(memoryManager);
         return IWorkloadFactoryPtr{};
     }
 
@@ -239,7 +240,7 @@ public:
 
     IWorkloadFactoryPtr CreateWorkloadFactory(const IMemoryManagerSharedPtr& memoryManager = nullptr) const override
     {
-        boost::ignore_unused(memoryManager);
+        IgnoreUnused(memoryManager);
         return IWorkloadFactoryPtr{};
     }
 

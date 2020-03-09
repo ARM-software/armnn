@@ -10,7 +10,7 @@
 
 #include <backendsCommon/LayerSupportBase.hpp>
 
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace
 {

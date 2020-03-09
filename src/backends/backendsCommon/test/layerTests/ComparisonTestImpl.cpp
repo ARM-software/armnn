@@ -43,7 +43,7 @@ LayerTestResult<uint8_t, NumDims> ComparisonTestImpl(
     float outQuantScale,
     int outQuantOffset)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     BOOST_ASSERT(shape0.GetNumDimensions() == NumDims);
     armnn::TensorInfo inputTensorInfo0(shape0, ArmnnInType, quantScale0, quantOffset0);
 

@@ -4,12 +4,13 @@
 //
 #pragma once
 
+#include "InferenceModel.hpp"
+
 #include <armnn/ArmNN.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/TypesUtils.hpp>
-#include "InferenceModel.hpp"
+#include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/program_options.hpp>
 
 
@@ -93,11 +94,11 @@ public:
 
     virtual void AddCommandLineOptions(boost::program_options::options_description& options)
     {
-        boost::ignore_unused(options);
+        IgnoreUnused(options);
     };
     virtual bool ProcessCommandLineOptions(const InferenceTestOptions &commonOptions)
     {
-        boost::ignore_unused(commonOptions);
+        IgnoreUnused(commonOptions);
         return true;
     };
     virtual std::unique_ptr<IInferenceTestCase> GetTestCase(unsigned int testCaseId) = 0;

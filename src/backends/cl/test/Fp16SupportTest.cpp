@@ -11,8 +11,8 @@
 #include <Graph.hpp>
 #include <Optimizer.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <set>

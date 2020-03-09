@@ -47,7 +47,7 @@ void ConvertFp32ToFp16Layer::Accept(ILayerVisitor& visitor) const
 {
     // These conversion layers are only inserted by the
     // optimizer and so will never be in an input graph.
-    boost::ignore_unused(visitor);
+    IgnoreUnused(visitor);
     throw armnn::Exception("ConvertFp32ToFp16Layer should never appear in an input graph");
 }
 

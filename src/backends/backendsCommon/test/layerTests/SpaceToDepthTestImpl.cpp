@@ -31,7 +31,7 @@ LayerTestResult<T, 4> SpaceToDepthTestImpl(
     const float qScale = 1.0f,
     const int32_t qOffset = 0)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     const armnn::PermutationVector NHWCToNCHW = {0, 2, 3, 1};
 
     if (descriptor.m_Parameters.m_DataLayout == armnn::DataLayout::NCHW)

@@ -40,7 +40,7 @@ void FileOnlyProfilingConnection::Close()
 
 bool FileOnlyProfilingConnection::WaitForStreamMeta(const unsigned char* buffer, uint32_t length)
 {
-    boost::ignore_unused(length);
+    IgnoreUnused(length);
 
     // The first word, stream_metadata_identifer, should always be 0.
     if (ToUint32(buffer, TargetEndianness::BeWire) != 0)

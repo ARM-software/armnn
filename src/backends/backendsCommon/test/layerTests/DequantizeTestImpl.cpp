@@ -26,7 +26,7 @@ LayerTestResult<T1, Dim> DequantizeTestImpl(
         const std::vector<T1>& expectedOutputData,
         armnn::DequantizeQueueDescriptor descriptor)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     boost::multi_array<T, Dim> input = MakeTensor<T, Dim>(inputTensorInfo, inputData);
 
     LayerTestResult<T1, Dim> ret(outputTensorInfo);

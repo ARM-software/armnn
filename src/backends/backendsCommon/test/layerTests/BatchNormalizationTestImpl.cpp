@@ -8,7 +8,7 @@
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
-
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnnUtils/DataLayoutIndexed.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
@@ -36,7 +36,7 @@ LayerTestResult<T, 4> BatchNormTestImpl(
     int32_t qOffset,
     armnn::DataLayout dataLayout)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     armnn::TensorInfo inputTensorInfo(inputOutputTensorShape, ArmnnType);
     armnn::TensorInfo outputTensorInfo(inputOutputTensorShape, ArmnnType);
 
@@ -115,7 +115,7 @@ LayerTestResult<T,4> BatchNormTestNhwcImpl(
     float qScale,
     int32_t qOffset)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
 
     const unsigned int width    = 2;
     const unsigned int height   = 3;
@@ -589,7 +589,7 @@ LayerTestResult<float,4> CompareBatchNormTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     const unsigned int width     = 2;
     const unsigned int height    = 3;
     const unsigned int channels  = 5;

@@ -5,6 +5,9 @@
 
 #include "SubgraphViewSelector.hpp"
 #include "Graph.hpp"
+
+#include <armnn/utility/IgnoreUnused.hpp>
+
 #include <boost/assert.hpp>
 #include <algorithm>
 #include <map>
@@ -78,14 +81,14 @@ public:
             {
                 size_t numErased = a->m_Dependants.erase(this);
                 BOOST_ASSERT(numErased == 1);
-                boost::ignore_unused(numErased);
+                IgnoreUnused(numErased);
                 a->m_Dependants.insert(m_Parent);
             }
             for (PartialSubgraph* a : m_Dependants)
             {
                 size_t numErased = a->m_Antecedents.erase(this);
                 BOOST_ASSERT(numErased == 1);
-                boost::ignore_unused(numErased);
+                IgnoreUnused(numErased);
                 a->m_Antecedents.insert(m_Parent);
             }
 

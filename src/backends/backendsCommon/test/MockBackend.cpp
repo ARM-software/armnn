@@ -108,7 +108,7 @@ IBackendInternal::IBackendContextPtr MockBackend::CreateBackendContext(const IRu
 IBackendInternal::IBackendProfilingContextPtr MockBackend::CreateBackendProfilingContext(
     const IRuntime::CreationOptions& options, IBackendProfilingPtr& backendProfiling)
 {
-    boost::ignore_unused(options);
+    IgnoreUnused(options);
     std::shared_ptr<armnn::MockBackendProfilingContext> context =
         std::make_shared<MockBackendProfilingContext>(backendProfiling);
     MockBackendProfilingService::Instance().SetProfilingContextPtr(context);

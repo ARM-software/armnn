@@ -17,7 +17,7 @@ LayerTestResult<float, 2> FakeQuantizationTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     constexpr unsigned int width = 2;
     constexpr unsigned int height = 3;
 

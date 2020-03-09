@@ -104,7 +104,7 @@ void SplitterLayer::CreateTensorHandles(const TensorHandleFactoryRegistry& regis
                                         const IWorkloadFactory& workloadFactory,
                                         const bool IsMemoryManaged)
 {
-    boost::ignore_unused(IsMemoryManaged);
+    IgnoreUnused(IsMemoryManaged);
     OutputSlot& slot = GetOutputSlot(0);
     ITensorHandleFactory::FactoryId factoryId = slot.GetTensorHandleFactoryId();
 
@@ -127,7 +127,7 @@ SplitterLayer* SplitterLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> SplitterLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    boost::ignore_unused(inputShapes);
+    IgnoreUnused(inputShapes);
     BOOST_ASSERT(inputShapes.size() ==  m_Param.GetNumViews());
     std::vector<TensorShape> outShapes;
     //Output shapes must match View shapes.

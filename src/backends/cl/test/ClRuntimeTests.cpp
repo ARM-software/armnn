@@ -9,8 +9,8 @@
 
 #include <backendsCommon/test/RuntimeTestImpl.hpp>
 #include <test/ProfilingTestUtils.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/test/unit_test.hpp>
 
 #ifdef WITH_VALGRIND
@@ -144,8 +144,8 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryUsage)
 
     // These are needed because VALGRIND_COUNT_LEAKS is a macro that assigns to the parameters
     // so they are assigned to, but still considered unused, causing a warning.
-    boost::ignore_unused(dubious);
-    boost::ignore_unused(suppressed);
+    IgnoreUnused(dubious);
+    IgnoreUnused(suppressed);
 }
 #endif
 

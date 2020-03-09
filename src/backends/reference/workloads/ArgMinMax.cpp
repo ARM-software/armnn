@@ -15,7 +15,7 @@ namespace armnn
 void ArgMinMax(Decoder<float>& in, int32_t* out, const TensorInfo& inputTensorInfo,
                const TensorInfo& outputTensorInfo, ArgMinMaxFunction function, int axis)
 {
-    boost::ignore_unused(outputTensorInfo);
+    IgnoreUnused(outputTensorInfo);
 
     unsigned int uAxis = armnnUtils::GetUnsignedAxis(inputTensorInfo.GetNumDimensions(), axis);
 

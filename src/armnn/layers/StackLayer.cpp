@@ -32,7 +32,7 @@ StackLayer* StackLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> StackLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    boost::ignore_unused(inputShapes);
+    IgnoreUnused(inputShapes);
 
     const TensorShape& inputShape = m_Param.m_InputShape;
     const unsigned int inputNumDimensions = inputShape.GetNumDimensions();

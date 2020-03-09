@@ -16,7 +16,7 @@ LayerTestResult<T, 4> SimpleFloorTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     armnn::TensorInfo inputTensorInfo({1, 3, 2, 3}, ArmnnType);
     inputTensorInfo.SetQuantizationScale(0.1f);
 

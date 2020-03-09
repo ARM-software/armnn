@@ -48,7 +48,7 @@ void PreCompiledLayer::SetPreCompiledObject(PreCompiledObjectPtr preCompiledObje
 
 void PreCompiledLayer::Accept(ILayerVisitor& visitor) const
 {
-    boost::ignore_unused(visitor);
+    IgnoreUnused(visitor);
     throw armnn::Exception("PreCompiledLayer should not appear in an input graph");
 }
 

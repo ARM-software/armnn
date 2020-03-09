@@ -13,8 +13,7 @@
 
 #include <InternalTypes.hpp>
 #include <LayerSupportCommon.hpp>
-
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #if defined(ARMCOMPUTENEON_ENABLED)
 #include <aclCommon/ArmComputeUtils.hpp>
@@ -62,8 +61,6 @@
 #include "workloads/NeonTransposeWorkload.hpp"
 #endif
 
-using namespace boost;
-
 namespace armnn
 {
 
@@ -73,7 +70,7 @@ namespace
 template< typename ... Args>
 bool IsNeonBackendSupported(Optional<std::string&> reasonIfUnsupported, Args... args)
 {
-    boost::ignore_unused(reasonIfUnsupported, (args)...);
+    IgnoreUnused(reasonIfUnsupported, (args)...);
 #if defined(ARMCOMPUTENEON_ENABLED)
     return true;
 #else
@@ -134,7 +131,7 @@ bool NeonLayerSupport::IsActivationSupported(const TensorInfo& input,
                                              const ActivationDescriptor& descriptor,
                                              Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonActivationWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
@@ -268,9 +265,9 @@ bool NeonLayerSupport::IsConvertFp16ToFp32Supported(const TensorInfo& input,
                                                     const TensorInfo& output,
                                                     Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(input);
-    ignore_unused(output);
-    ignore_unused(reasonIfUnsupported);
+    armnn::IgnoreUnused(input);
+    armnn::IgnoreUnused(output);
+    armnn::IgnoreUnused(reasonIfUnsupported);
     return true;
 }
 
@@ -278,9 +275,9 @@ bool NeonLayerSupport::IsConvertFp32ToFp16Supported(const TensorInfo& input,
                                                     const TensorInfo& output,
                                                     Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(input);
-    ignore_unused(output);
-    ignore_unused(reasonIfUnsupported);
+    armnn::IgnoreUnused(input);
+    armnn::IgnoreUnused(output);
+    armnn::IgnoreUnused(reasonIfUnsupported);
     return true;
 }
 
@@ -381,7 +378,7 @@ bool NeonLayerSupport::IsFloorSupported(const TensorInfo& input,
                                         const TensorInfo& output,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(output);
+    armnn::IgnoreUnused(output);
     return IsNeonBackendSupported(reasonIfUnsupported) &&
            IsSupportedForDataTypeGeneric(reasonIfUnsupported,
                                          input.GetDataType(),
@@ -622,7 +619,7 @@ bool NeonLayerSupport::IsReshapeSupported(const TensorInfo& input,
                                           const ReshapeDescriptor& descriptor,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(descriptor);
+    armnn::IgnoreUnused(descriptor);
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonReshapeWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
@@ -712,7 +709,7 @@ bool NeonLayerSupport::IsSplitterSupported(const TensorInfo& input,
                                            const ViewsDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(descriptor);
+    armnn::IgnoreUnused(descriptor);
     return IsSupportedForDataTypeNeon(reasonIfUnsupported,
                                       input.GetDataType(),
                                       &TrueFunc<>,
@@ -740,7 +737,7 @@ bool NeonLayerSupport::IsSplitterSupported(const TensorInfo& input,
                                        *splitAxis.begin());
     }
 #endif
-    boost::ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
     for (auto output : outputs)
     {
         if (!input.IsTypeSpaceMatch(output)) // Cannot use sub-tensors if the types are not same space

@@ -126,7 +126,7 @@ template<typename T> void PermuteTensorData(
     const T * inputData,
     std::vector<T>& outputData)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     BOOST_ASSERT_MSG(inputData != nullptr, "inputData must not be null");
     if (inputData == nullptr)
     {
@@ -178,7 +178,7 @@ template<typename T> void PermuteInputsForConcat(
     unsigned int & concatDim,
     TensorInfo & outputTensorInfo)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     BOOST_ASSERT_MSG(inputTensorInfos.size() > 1,
         "Expecting more than one tensor to be concatenated here");
 
@@ -1918,7 +1918,7 @@ LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
 
     // Defines the tensor descriptors.
     TensorInfo outputTensorInfo({ 3, 6, 3 }, ArmnnType);
@@ -2073,7 +2073,7 @@ LayerTestResult<float,3> ConcatTest(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
 
     unsigned int outputWidth = 3;
     unsigned int outputHeight = 6;
@@ -2346,7 +2346,7 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
 
     unsigned int outputWidth = 3;
     unsigned int outputHeight = 6;
@@ -2491,7 +2491,7 @@ LayerTestResult<uint8_t, 3> ConcatUint8Test(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
 
     unsigned int outputWidth = 3;
     unsigned int outputHeight = 6;
@@ -2629,7 +2629,7 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
         IWorkloadFactory& workloadFactory,
         const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
 
     unsigned int outputWidth = 3;
     unsigned int outputHeight = 6;

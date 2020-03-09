@@ -102,7 +102,7 @@ std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const Tens
 {
     // For Ref it is okay to make the TensorHandle memory managed as it can also store a pointer
     // to unmanaged memory. This also ensures memory alignment.
-    boost::ignore_unused(isMemoryManaged);
+    IgnoreUnused(isMemoryManaged);
     return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
 }
 
@@ -112,14 +112,14 @@ std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const Tens
 {
     // For Ref it is okay to make the TensorHandle memory managed as it can also store a pointer
     // to unmanaged memory. This also ensures memory alignment.
-    boost::ignore_unused(isMemoryManaged, dataLayout);
+    IgnoreUnused(isMemoryManaged, dataLayout);
     return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const
 {
-    boost::ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
     ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
     elementwiseUnaryDescriptor.m_Parameters.m_Operation = UnaryOperation::Abs;
 
@@ -267,7 +267,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateElementwiseUnary(const Elem
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    boost::ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
     ComparisonQueueDescriptor comparisonDescriptor;
     comparisonDescriptor.m_Parameters.m_Operation = ComparisonOperation::Equal;
 
@@ -303,7 +303,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGather(const GatherQueueDes
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {
-    boost::ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
     ComparisonQueueDescriptor comparisonDescriptor;
     comparisonDescriptor.m_Parameters.m_Operation = ComparisonOperation::Greater;
 
@@ -506,7 +506,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateResizeBilinear(const Resize
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    boost::ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
     ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
     elementwiseUnaryDescriptor.m_Parameters.m_Operation = UnaryOperation::Rsqrt;
 

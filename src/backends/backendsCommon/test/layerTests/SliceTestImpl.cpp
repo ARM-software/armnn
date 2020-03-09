@@ -29,7 +29,7 @@ LayerTestResult<T, NumDims> SliceTestImpl(
     const float qScale = 1.0f,
     const int qOffset = 0)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     if(armnn::IsQuantizedType<T>())
     {
         inputInfo.SetQuantizationScale(qScale);

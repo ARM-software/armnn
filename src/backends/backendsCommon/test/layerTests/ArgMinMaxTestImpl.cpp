@@ -26,7 +26,7 @@ LayerTestResult<int32_t, 3> ArgMinMaxTestCommon(
         const std::vector<int32_t>& outputData,
         int axis = 3)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     auto inputTensor = MakeTensor<T, 4>(inputTensorInfo, ConvertToDataType<ArmnnType>(inputData, inputTensorInfo));
 
     LayerTestResult<int32_t, 3> result(outputTensorInfo);

@@ -11,6 +11,7 @@
 #include <ResolveType.hpp>
 
 #include <armnnUtils/DataLayoutIndexed.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
@@ -18,7 +19,6 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/cast.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include <utility>
 
@@ -1298,7 +1298,7 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
     armnn::Graph& graph,
     bool biasEnabled = false)
 {
-    boost::ignore_unused(graph);
+    IgnoreUnused(graph);
 
     // To create a PreCompiled layer, create a network and Optimize it.
     armnn::Network net;

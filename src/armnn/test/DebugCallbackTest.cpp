@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(RuntimeRegisterDebugCallback)
     std::vector<unsigned int> slotIndexes;
     auto mockCallback = [&](LayerGuid guid, unsigned int slotIndex, ITensorHandle* tensor)
     {
-        boost::ignore_unused(guid);
+        IgnoreUnused(guid);
         slotIndexes.push_back(slotIndex);
         tensorShapes.push_back(tensor->GetShape());
         callCount++;

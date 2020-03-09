@@ -29,7 +29,7 @@ LayerTestResult<T, 4> DepthToSpaceTestImpl(
     const float qScale = 1.0f,
     const int32_t qOffset = 0)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     if (descriptor.m_Parameters.m_DataLayout == armnn::DataLayout::NCHW)
     {
         PermuteTensorNhwcToNchw<float>(inputInfo, inputData);

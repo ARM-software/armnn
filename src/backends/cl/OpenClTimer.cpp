@@ -5,10 +5,11 @@
 
 #include "OpenClTimer.hpp"
 
+#include <armnn/utility/IgnoreUnused.hpp>
+
 #include <string>
 #include <sstream>
 
-#include <boost/core/ignore_unused.hpp>
 
 namespace armnn
 {
@@ -31,7 +32,7 @@ void OpenClTimer::Start()
                                 const cl_event * event_wait_list,
                                 cl_event *       event)
         {
-            boost::ignore_unused(event);
+            IgnoreUnused(event);
             cl_int retVal = 0;
 
             // Get the name of the kernel

@@ -31,9 +31,9 @@ struct MakeWorkloadForType<NullWorkload>
                                               const WorkloadInfo& info,
                                               Args&&... args)
     {
-        boost::ignore_unused(descriptor);
-        boost::ignore_unused(info);
-        boost::ignore_unused(args...);
+        IgnoreUnused(descriptor);
+        IgnoreUnused(info);
+        IgnoreUnused(args...);
         return nullptr;
     }
 };

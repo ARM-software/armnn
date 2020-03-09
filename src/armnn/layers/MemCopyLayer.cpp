@@ -26,7 +26,7 @@ MemCopyLayer* MemCopyLayer::Clone(Graph& graph) const
 
 std::unique_ptr<IWorkload> MemCopyLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
-    boost::ignore_unused(factory);
+    IgnoreUnused(factory);
     MemCopyQueueDescriptor descriptor;
 
     //This is different from other workloads. Does not get created by the workload factory.
@@ -49,7 +49,7 @@ void MemCopyLayer::ValidateTensorShapesFromInputs()
 
 void MemCopyLayer::Accept(ILayerVisitor& visitor) const
 {
-    boost::ignore_unused(visitor);
+    IgnoreUnused(visitor);
     throw armnn::Exception("MemCopyLayer should not appear in an input graph");
 }
 

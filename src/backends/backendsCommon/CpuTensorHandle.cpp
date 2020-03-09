@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 #include <armnn/Exceptions.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 

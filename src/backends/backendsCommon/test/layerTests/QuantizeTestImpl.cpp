@@ -29,7 +29,7 @@ LayerTestResult<T, Dim> QuantizeTestImpl(
     const std::vector<T>& expectedOutputData,
     armnn::QuantizeQueueDescriptor descriptor)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     boost::multi_array<float, Dim> input = MakeTensor<float, Dim>(inputTensorInfo, inputData);
 
     LayerTestResult<T, Dim> ret(outputTensorInfo);

@@ -55,11 +55,11 @@ void CopyTensorContentsGeneric(const ITensorHandle* srcTensor, ITensorHandle* ds
     TensorShape srcStrides      = srcTensor->GetStrides();
     const TensorShape& srcShape = srcTensor->GetShape();
     const auto srcSize          = srcTensor->GetStrides()[0] * srcShape[0];
-    boost::ignore_unused(srcSize);  // Only used for asserts
+    IgnoreUnused(srcSize);  // Only used for asserts
     TensorShape dstStrides      = dstTensor->GetStrides();
     const TensorShape& dstShape = dstTensor->GetShape();
     const auto dstSize          = dstTensor->GetStrides()[0] * dstShape[0];
-    boost::ignore_unused(dstSize);  // Only used for asserts
+    IgnoreUnused(dstSize);  // Only used for asserts
 
     size_t srcDepth    = 1;
     size_t srcBatches  = 1;

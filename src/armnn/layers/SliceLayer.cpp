@@ -50,7 +50,7 @@ void SliceLayer::ValidateTensorShapesFromInputs()
 
 std::vector<TensorShape> SliceLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    boost::ignore_unused(inputShapes);
+    IgnoreUnused(inputShapes);
     BOOST_ASSERT(inputShapes.size() == 1);
 
     TensorShape outputShape(boost::numeric_cast<unsigned int>(m_Param.m_Size.size()), m_Param.m_Size.data());

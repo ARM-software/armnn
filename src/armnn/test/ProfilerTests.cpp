@@ -5,6 +5,7 @@
 
 #include <armnn/IRuntime.hpp>
 #include <armnn/TypesUtils.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/tools/output_test_stream.hpp>
@@ -309,7 +310,7 @@ BOOST_AUTO_TEST_CASE(ProfilerJsonPrinter)
     profiler->Print(json);
 
     std::string output = buffer.str();
-    boost::ignore_unused(output);
+    armnn::IgnoreUnused(output);
 
     // Disable profiling here to not print out anything on stdout.
     profiler->EnableProfiling(false);

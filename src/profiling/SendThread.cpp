@@ -13,7 +13,6 @@
 
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include <cstring>
 

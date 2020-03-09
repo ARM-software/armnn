@@ -9,13 +9,14 @@
 
 #include <LeakChecking.hpp>
 
+#include <armnn/utility/IgnoreUnused.hpp>
+
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
 
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/polymorphic_cast.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 namespace cl
 {
@@ -33,7 +34,7 @@ ClContextControl::ClContextControl(arm_compute::CLTuner *tuner,
     , m_ProfilingEnabled(profilingEnabled)
 {
     // Ignore m_ProfilingEnabled if unused to avoid compiling problems when ArmCompute is disabled.
-    boost::ignore_unused(m_ProfilingEnabled);
+    IgnoreUnused(m_ProfilingEnabled);
 
     try
     {

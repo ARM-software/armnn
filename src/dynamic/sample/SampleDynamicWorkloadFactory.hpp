@@ -33,7 +33,7 @@ public:
                                                          TensorShape const& subTensorShape,
                                                          unsigned int const* subTensorOrigin) const override
     {
-        boost::ignore_unused(parent, subTensorShape, subTensorOrigin);
+        IgnoreUnused(parent, subTensorShape, subTensorOrigin);
         return nullptr;
     }
 

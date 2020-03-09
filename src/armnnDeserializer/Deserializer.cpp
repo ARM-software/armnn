@@ -13,13 +13,13 @@
 
 #include <armnnUtils/Permute.hpp>
 #include <armnnUtils/Transpose.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <ParserHelper.hpp>
 #include <VerificationHelpers.hpp>
 
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/format.hpp>
@@ -743,7 +743,7 @@ INetworkPtr Deserializer::CreateNetworkFromGraph(GraphPtr graph)
 BindingPointInfo Deserializer::GetNetworkInputBindingInfo(unsigned int layerIndex,
                                                           const std::string& name) const
 {
-    boost::ignore_unused(layerIndex);
+    IgnoreUnused(layerIndex);
     for (auto inputBinding : m_InputBindings)
     {
         if (inputBinding.first == name)
@@ -761,7 +761,7 @@ BindingPointInfo Deserializer::GetNetworkInputBindingInfo(unsigned int layerInde
 BindingPointInfo Deserializer::GetNetworkOutputBindingInfo(unsigned int layerIndex,
                                                                 const std::string& name) const
 {
-    boost::ignore_unused(layerIndex);
+    IgnoreUnused(layerIndex);
     for (auto outputBinding : m_OutputBindings)
     {
         if (outputBinding.first == name)
@@ -1805,7 +1805,7 @@ void Deserializer::ParsePermute(GraphPtr graph, unsigned int layerIndex)
 armnn::Pooling2dDescriptor Deserializer::GetPoolingDescriptor(Deserializer::PoolingDescriptor pooling2dDesc,
                                                               unsigned int layerIndex)
 {
-    boost::ignore_unused(layerIndex);
+    IgnoreUnused(layerIndex);
     armnn::Pooling2dDescriptor desc;
 
     switch (pooling2dDesc->poolType())
@@ -2157,7 +2157,7 @@ armnn::NormalizationDescriptor Deserializer::GetNormalizationDescriptor(
     Deserializer::NormalizationDescriptorPtr normalizationDescriptor,
     unsigned int layerIndex)
 {
-    boost::ignore_unused(layerIndex);
+    IgnoreUnused(layerIndex);
     armnn::NormalizationDescriptor desc;
 
     switch (normalizationDescriptor->normChannelType())

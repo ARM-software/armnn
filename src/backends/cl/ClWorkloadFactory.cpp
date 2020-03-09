@@ -9,6 +9,7 @@
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Utils.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/MakeWorkloadHelper.hpp>
@@ -23,7 +24,6 @@
 #include <arm_compute/runtime/CL/CLBufferAllocator.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/polymorphic_cast.hpp>
 #include <boost/format.hpp>
 
@@ -85,7 +85,7 @@ ClWorkloadFactory::ClWorkloadFactory(const std::shared_ptr<ClMemoryManager>& mem
 std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
                                                                      const bool IsMemoryManaged) const
 {
-    boost::ignore_unused(IsMemoryManaged);
+    IgnoreUnused(IsMemoryManaged);
     std::unique_ptr<ClTensorHandle> tensorHandle = std::make_unique<ClTensorHandle>(tensorInfo);
     tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
 
@@ -96,7 +96,7 @@ std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const Tenso
                                                                      DataLayout dataLayout,
                                                                      const bool IsMemoryManaged) const
 {
-    boost::ignore_unused(IsMemoryManaged);
+    IgnoreUnused(IsMemoryManaged);
     std::unique_ptr<ClTensorHandle> tensorHandle = std::make_unique<ClTensorHandle>(tensorInfo, dataLayout);
     tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
 
@@ -131,7 +131,7 @@ std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateSubTensorHandle(ITensorH
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
                                                         const WorkloadInfo& info) const
 {
-    boost::ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
 
     ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
     elementwiseUnaryDescriptor.m_Parameters = ElementwiseUnaryDescriptor(UnaryOperation::Abs);
@@ -279,7 +279,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateElementwiseUnary(const Eleme
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {
-    boost::ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
 
     ComparisonQueueDescriptor comparisonDescriptor;
     comparisonDescriptor.m_Parameters = ComparisonDescriptor(ComparisonOperation::Equal);
@@ -308,7 +308,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateGather(const GatherQueueDesc
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {
-    boost::ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
 
     ComparisonQueueDescriptor comparisonDescriptor;
     comparisonDescriptor.m_Parameters = ComparisonDescriptor(ComparisonOperation::Greater);
@@ -477,7 +477,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateResizeBilinear(const ResizeB
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {
-    boost::ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
 
     ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
     elementwiseUnaryDescriptor.m_Parameters = ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt);

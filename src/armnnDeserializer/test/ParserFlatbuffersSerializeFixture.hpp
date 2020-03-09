@@ -6,21 +6,20 @@
 #pragma once
 
 #include "SchemaSerialize.hpp"
-
-#include <armnn/IRuntime.hpp>
-#include <armnnDeserializer/IDeserializer.hpp>
-
-#include <boost/core/ignore_unused.hpp>
-#include <boost/assert.hpp>
-#include <boost/format.hpp>
-
-#include <ResolveType.hpp>
 #include "test/TensorHelpers.hpp"
 
 #include "flatbuffers/idl.h"
 #include "flatbuffers/util.h"
 
 #include <ArmnnSchema_generated.h>
+#include <armnn/IRuntime.hpp>
+#include <armnnDeserializer/IDeserializer.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
+#include <ResolveType.hpp>
+
+#include <boost/assert.hpp>
+#include <boost/format.hpp>
+
 
 using armnnDeserializer::IDeserializer;
 using TensorRawPtr = armnnSerializer::TensorInfo*;
@@ -155,7 +154,7 @@ struct ParserFlatbuffersSerializeFixture
                       armnnSerializer::TensorInfo tensorType, const std::string& name,
                       const float scale, const int64_t zeroPoint)
     {
-        boost::ignore_unused(name);
+        armnn::IgnoreUnused(name);
         BOOST_CHECK_EQUAL(shapeSize, tensors->dimensions()->size());
         BOOST_CHECK_EQUAL_COLLECTIONS(shape.begin(), shape.end(),
                                       tensors->dimensions()->begin(), tensors->dimensions()->end());

@@ -25,7 +25,7 @@ LayerTestResult<T, 4> SimplePermuteTestImpl(
         const std::vector<T>& inputData,
         const std::vector<T>& outputExpectedData)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     auto input = MakeTensor<T, 4>(inputTensorInfo, inputData);
 
     LayerTestResult<T, 4> ret(outputTensorInfo);

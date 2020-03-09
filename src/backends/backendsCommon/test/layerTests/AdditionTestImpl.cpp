@@ -165,7 +165,7 @@ LayerTestResult<T, 4> AdditionBroadcastTestImpl(
     float qScale,
     int32_t qOffset)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     armnn::TensorInfo inputTensorInfo1 = armnn::TensorInfo({1, 3, 2, 1}, ArmnnType);
     armnn::TensorInfo inputTensorInfo2 = armnn::TensorInfo({1, 1, 2, 3}, ArmnnType);
     armnn::TensorInfo outputTensorInfo = armnn::TensorInfo({1, 3, 2, 3}, ArmnnType);
@@ -248,7 +248,7 @@ LayerTestResult<T, 4> AdditionBroadcast1ElementTestImpl(
     float qScale,
     int32_t qOffset)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     armnn::TensorInfo inputTensorInfo1 = armnn::TensorInfo({1, 3, 2, 3}, ArmnnType);
     armnn::TensorInfo inputTensorInfo2 = armnn::TensorInfo({1, 1, 1, 1}, ArmnnType);
     armnn::TensorInfo outputTensorInfo = armnn::TensorInfo({1, 3, 2, 3}, ArmnnType);
@@ -455,7 +455,7 @@ LayerTestResult<float, 4> AdditionAfterMaxPoolTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
 
     // Create Initial Tensor
     // 1, 2, 3
@@ -563,7 +563,7 @@ LayerTestResult<float,4> CompareAdditionTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     unsigned int batchSize = 4;
     unsigned int channels  = 1;
     unsigned int height    = 2;

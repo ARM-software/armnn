@@ -4,9 +4,9 @@
 //
 #include "InferenceTestImage.hpp"
 
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
+
 #include <boost/format.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <array>
@@ -314,7 +314,7 @@ std::vector<float> GetImageDataInArmNnLayoutAsNormalizedFloats(ImageChannelLayou
     return GetImageDataInArmNnLayoutAsFloats(layout, image,
         [](ImageChannel channel, float value)
         {
-            boost::ignore_unused(channel);
+            armnn::IgnoreUnused(channel);
             return value / 255.f;
         });
 }

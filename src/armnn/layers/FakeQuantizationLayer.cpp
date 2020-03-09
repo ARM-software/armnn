@@ -45,7 +45,7 @@ void FakeQuantizationLayer::ValidateTensorShapesFromInputs()
 
 void FakeQuantizationLayer::Accept(ILayerVisitor& visitor) const
 {
-    boost::ignore_unused(visitor);
+    IgnoreUnused(visitor);
     throw armnn::Exception("FakeQuantizationLayer should not appear in an input graph");
 }
 

@@ -35,7 +35,7 @@ std::unique_ptr<IWorkload> SpaceToBatchNdLayer::CreateWorkload(const IWorkloadFa
 
 SpaceToBatchNdLayer* SpaceToBatchNdLayer::Clone(Graph& graph) const
 {
-    boost::ignore_unused(graph);
+    IgnoreUnused(graph);
     return CloneBase<SpaceToBatchNdLayer>(graph, m_Param, GetName());
 }
 

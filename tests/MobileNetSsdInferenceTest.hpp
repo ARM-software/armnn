@@ -7,6 +7,8 @@
 #include "InferenceTest.hpp"
 #include "MobileNetSsdDatabase.hpp"
 
+#include <armnn/utility/IgnoreUnused.hpp>
+
 #include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
@@ -33,7 +35,7 @@ public:
 
     TestCaseResult ProcessResult(const InferenceTestOptions& options) override
     {
-        boost::ignore_unused(options);
+        armnn::IgnoreUnused(options);
 
         const std::vector<float>& output1 = boost::get<std::vector<float>>(this->GetOutputs()[0]); // bounding boxes
         BOOST_ASSERT(output1.size() == k_OutputSize1);

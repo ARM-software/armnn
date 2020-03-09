@@ -297,7 +297,7 @@ private:
         graph.m_Layers.erase(layerIt);
 
         const size_t numErased = graph.m_PosInGraphMap.erase(this);
-        boost::ignore_unused(numErased);
+        IgnoreUnused(numErased);
         BOOST_ASSERT(numErased == 1);
     }
 
@@ -355,7 +355,7 @@ public:
     ~LayerInGraph() override
     {
         const size_t numErased = m_Graph->m_InputIds.erase(GetBindingId());
-        boost::ignore_unused(numErased);
+        IgnoreUnused(numErased);
         BOOST_ASSERT(numErased == 1);
     }
 };
@@ -381,7 +381,7 @@ public:
     ~LayerInGraph() override
     {
         const size_t numErased = m_Graph->m_OutputIds.erase(GetBindingId());
-        boost::ignore_unused(numErased);
+        IgnoreUnused(numErased);
         BOOST_ASSERT(numErased == 1);
     }
 };

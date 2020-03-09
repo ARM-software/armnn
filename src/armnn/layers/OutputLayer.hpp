@@ -28,7 +28,7 @@ public:
                                      const IWorkloadFactory& factory,
                                      const bool IsMemoryManaged = true) override
     {
-        boost::ignore_unused(registry, factory, IsMemoryManaged);
+        IgnoreUnused(registry, factory, IsMemoryManaged);
     }
 
     /// Creates a dynamically-allocated copy of this layer.

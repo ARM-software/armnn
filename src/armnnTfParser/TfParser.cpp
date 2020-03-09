@@ -11,6 +11,7 @@
 #include <armnnUtils/Permute.hpp>
 #include <armnnUtils/DataLayoutIndexed.hpp>
 #include <armnnUtils/Transpose.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <GraphTopologicalSort.hpp>
 #include <ParserHelper.hpp>
@@ -21,7 +22,6 @@
 #include <tensorflow/core/framework/graph.pb.h>
 
 #include <boost/format.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/polymorphic_cast.hpp>
@@ -732,7 +732,7 @@ IConnectableLayer* TfParser::CreateAdditionLayer(
 
 ParsedTfOperationPtr TfParser::ParseAddN(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     uint32_t numberOfInputs = ReadMandatoryNodeUint32Attribute(nodeDef, "N");
     if (numberOfInputs < 2)
     {
@@ -812,7 +812,7 @@ ParsedTfOperationPtr TfParser::ParseAddN(const tensorflow::NodeDef& nodeDef, con
 
 ParsedTfOperationPtr TfParser::ParseAdd(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
 
     // If one of the inputs is a MatMul and the other is a const, then we handle both nodes
@@ -842,7 +842,7 @@ ParsedTfOperationPtr TfParser::ParseAdd(const tensorflow::NodeDef& nodeDef, cons
 
 ParsedTfOperationPtr TfParser::ParseBiasAdd(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     return AddAdditionLayer(nodeDef, true);
 }
 
@@ -873,7 +873,7 @@ private:
 
 ParsedTfOperationPtr TfParser::ParseIdentity(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
     // Any requests for the output slots of this node should be forwarded to the node connected as input.
     return std::make_unique<ParsedIdentityTfOperation>(this, nodeDef, inputs[0].m_IndexedValue);
@@ -1067,7 +1067,7 @@ struct InvokeParseFunction
 
 ParsedTfOperationPtr TfParser::ParseConst(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     BOOST_ASSERT(nodeDef.op() == "Const");
 
     if (nodeDef.attr().count("value") == 0)
@@ -1204,7 +1204,7 @@ unsigned int TfParser::GetConstInputIndex(const std::vector<OutputOfParsedTfOper
 ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
     IOutputSlot& inputSlot = inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
     TensorInfo inputTensorInfo = inputSlot.GetTensorInfo();
@@ -1346,7 +1346,7 @@ ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParseDepthwiseConv2D(const tensorflow::NodeDef& nodeDef,
                                                     const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
     IOutputSlot& inputSlot = inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
     TensorInfo inputTensorInfo = inputSlot.GetTensorInfo();
@@ -1542,7 +1542,7 @@ TensorInfo OutputShapeOfExpandDims(const tensorflow::NodeDef& nodeDef, TensorInf
 
 ParsedTfOperationPtr TfParser::ParseExpandDims(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
 
     IOutputSlot& prevLayerOutputSlot = inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
@@ -1563,7 +1563,7 @@ ParsedTfOperationPtr TfParser::ParseExpandDims(const tensorflow::NodeDef& nodeDe
 ParsedTfOperationPtr TfParser::ParseFusedBatchNorm(const tensorflow::NodeDef& nodeDef,
                                                    const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 5);
 
     if (!HasParsedConstTensor<float>(inputs[1].m_IndexedValue->GetNode().name()))
@@ -1712,7 +1712,7 @@ bool TfParser::IsSupportedLeakyReluPattern(const tensorflow::NodeDef& mulNodeDef
 ParsedTfOperationPtr TfParser::ParseMaximum(const tensorflow::NodeDef& nodeDef,
                                             const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
     if (inputs.size() != 2)
     {
@@ -1850,7 +1850,7 @@ ParsedTfOperationPtr TfParser::ProcessElementwiseLayer(
 ParsedTfOperationPtr TfParser::ParseGather(const tensorflow::NodeDef& nodeDef,
                                            const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
     IOutputSlot& params = inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
     IOutputSlot& indices = inputs[1].m_IndexedValue->ResolveArmnnOutputSlot(inputs[1].m_Index);
@@ -1887,7 +1887,7 @@ ParsedTfOperationPtr TfParser::ParseGather(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParseGreater(const tensorflow::NodeDef& nodeDef,
                                             const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> inputLayers = ProcessElementwiseInputSlots(nodeDef, "Greater");
     IOutputSlot* input0Slot = inputLayers.first;
     IOutputSlot* input1Slot = inputLayers.second;
@@ -1901,7 +1901,7 @@ ParsedTfOperationPtr TfParser::ParseGreater(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParseEqual(const tensorflow::NodeDef& nodeDef,
                                           const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> inputLayers = ProcessElementwiseInputSlots(nodeDef, "Equal");
     IOutputSlot* input0Slot = inputLayers.first;
     IOutputSlot* input1Slot = inputLayers.second;
@@ -1915,7 +1915,7 @@ ParsedTfOperationPtr TfParser::ParseEqual(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParseMinimum(const tensorflow::NodeDef& nodeDef,
                                             const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> inputLayers = ProcessElementwiseInputSlots(nodeDef, "Minimum");
     IOutputSlot* input0Slot = inputLayers.first;
     IOutputSlot* input1Slot = inputLayers.second;
@@ -1927,7 +1927,7 @@ ParsedTfOperationPtr TfParser::ParseMinimum(const tensorflow::NodeDef& nodeDef,
 
 ParsedTfOperationPtr TfParser::ParseSub(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
 
     IOutputSlot* input0Slot = &inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
@@ -1967,7 +1967,7 @@ ParsedTfOperationPtr TfParser::ParseSub(const tensorflow::NodeDef& nodeDef, cons
 
 ParsedTfOperationPtr TfParser::ParseStack(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfConstNodeDef> nodes = GetTfInputNodes(nodeDef);
 
     unsigned int numInputs = static_cast<unsigned int>(nodes.size());
@@ -2058,7 +2058,7 @@ ParsedTfOperationPtr TfParser::ParseStack(const tensorflow::NodeDef& nodeDef, co
 
 ParsedTfOperationPtr TfParser::ParseTranspose(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
 
     auto inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
     const auto inputCount = inputs.size();
@@ -2157,7 +2157,7 @@ TensorInfo CalculatePaddedOutputTensorInfo(const TensorInfo& inputTensorInfo,
 ParsedTfOperationPtr TfParser::ParsePad(const tensorflow::NodeDef& nodeDef,
                                         const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     // input consists of:
     // input[0] the tensor which will be padded
     // input[1] the tensor holding the padding values
@@ -2232,7 +2232,7 @@ ParsedTfOperationPtr TfParser::ParsePad(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParseConcat(const tensorflow::NodeDef& nodeDef,
                                            const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfConstNodeDef> nodes = GetTfInputNodes(nodeDef);
 
     // In tensorflow, we have the last input of the Concat layer as the axis for concatenation.
@@ -2318,7 +2318,7 @@ ParsedTfOperationPtr TfParser::ParseConcat(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParseShape(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     // Note: the Shape layer is handled in a special way, because:
     //        1. ARMNN doesn't support int32 tensors which it outputs.
     //        2. ARMNN works with statically shaped tensors which are known at parse time.
@@ -2361,7 +2361,7 @@ ParsedTfOperationPtr TfParser::ParseShape(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParseReshape(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
     ParsedTfOperation* inputNode = inputs[0].m_IndexedValue;
 
@@ -2400,7 +2400,7 @@ ParsedTfOperationPtr TfParser::ParseReshape(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParseResizeBilinear(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
 
     if (!HasParsedConstTensor<int32_t>(inputs[1].m_IndexedValue->GetNode().name()))
@@ -2539,7 +2539,7 @@ TensorInfo OutputShapeOfSqueeze(const tensorflow::NodeDef& nodeDef, TensorInfo i
 
 ParsedTfOperationPtr TfParser::ParseSqueeze(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
 
     IOutputSlot& prevLayerOutputSlot = inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
@@ -2559,7 +2559,7 @@ ParsedTfOperationPtr TfParser::ParseSqueeze(const tensorflow::NodeDef& nodeDef, 
 
 ParsedTfOperationPtr TfParser::ParseLrn(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
 
     NormalizationDescriptor normalizationDescriptor;
@@ -2605,7 +2605,7 @@ public:
 
 ParsedTfOperationPtr TfParser::ParseMatMul(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
 
     // Defers the creation of the layer (see ParsedMatMulTfOperation).
     return std::make_unique<ParsedMatMulTfOperation>(this, nodeDef);
@@ -2613,7 +2613,7 @@ ParsedTfOperationPtr TfParser::ParseMatMul(const tensorflow::NodeDef& nodeDef, c
 
 ParsedTfOperationPtr TfParser::ParseMean(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
     IOutputSlot& inputSlot = inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
     TensorInfo inputTensorInfo = inputSlot.GetTensorInfo();
@@ -2688,7 +2688,7 @@ public:
 
 ParsedTfOperationPtr TfParser::ParseMul(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
 
     return std::make_unique<ParsedMulTfOperation>(this, nodeDef);
 }
@@ -2696,7 +2696,7 @@ ParsedTfOperationPtr TfParser::ParseMul(const tensorflow::NodeDef& nodeDef, cons
 ParsedTfOperationPtr TfParser::ParsePlaceholder(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
 
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 0);
 
@@ -2725,14 +2725,14 @@ ParsedTfOperationPtr TfParser::ParsePlaceholder(const tensorflow::NodeDef& nodeD
 
 ParsedTfOperationPtr TfParser::ParseRealDiv(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
     return AddRealDivLayer(nodeDef);
 }
 
 ParsedTfOperationPtr TfParser::ParseRelu(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
 
     ActivationDescriptor activationDesc;
     activationDesc.m_Function = ActivationFunction::ReLu;
@@ -2742,7 +2742,7 @@ ParsedTfOperationPtr TfParser::ParseRelu(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParseRelu6(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
 
     ActivationDescriptor activationDesc;
     activationDesc.m_Function = ActivationFunction::BoundedReLu;
@@ -2755,7 +2755,7 @@ ParsedTfOperationPtr TfParser::ParseRelu6(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParseSigmoid(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
 
     ActivationDescriptor activationDesc;
     activationDesc.m_Function = ActivationFunction::Sigmoid;
@@ -2766,7 +2766,7 @@ ParsedTfOperationPtr TfParser::ParseSigmoid(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParseRsqrt(const tensorflow::NodeDef &nodeDef,
     const tensorflow::GraphDef &graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
 
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
 
@@ -2783,7 +2783,7 @@ ParsedTfOperationPtr TfParser::ParseRsqrt(const tensorflow::NodeDef &nodeDef,
 ParsedTfOperationPtr TfParser::ParseSoftmax(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
 
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
 
@@ -2800,7 +2800,7 @@ ParsedTfOperationPtr TfParser::ParseSoftmax(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParseSplit(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
 
     std::vector<OutputOfConstNodeDef> nodes = GetTfInputNodes(nodeDef);
     unsigned int numInputs = static_cast<unsigned int>(nodes.size());
@@ -2895,7 +2895,7 @@ ParsedTfOperationPtr TfParser::ParseSplit(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParseSoftplus(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
 
     ActivationDescriptor activationDesc;
     activationDesc.m_Function = ActivationFunction::SoftReLu;
@@ -2906,7 +2906,7 @@ ParsedTfOperationPtr TfParser::ParseSoftplus(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParseStridedSlice(const tensorflow::NodeDef& nodeDef,
                                                  const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
 
     std::vector<OutputOfConstNodeDef> nodes = GetTfInputNodes(nodeDef);
     unsigned int numInputs = static_cast<unsigned int>(nodes.size());
@@ -2953,7 +2953,7 @@ ParsedTfOperationPtr TfParser::ParseStridedSlice(const tensorflow::NodeDef& node
 
 ParsedTfOperationPtr TfParser::ParseTanh(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
 
     ActivationDescriptor activationDesc;
     activationDesc.m_Function = ActivationFunction::TanH;
@@ -2991,7 +2991,7 @@ ParsedTfOperationPtr TfParser::ParseAvgPool(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParsePooling2d(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef, PoolingAlgorithm pooltype)
 {
-    boost::ignore_unused(graphDef);
+    IgnoreUnused(graphDef);
 
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
     IOutputSlot& inputSlot = inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);

@@ -6,6 +6,7 @@
 
 #include "LayerCloneBase.hpp"
 
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
@@ -31,7 +32,7 @@ ReshapeLayer* ReshapeLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> ReshapeLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    boost::ignore_unused(inputShapes);
+    IgnoreUnused(inputShapes);
     return std::vector<TensorShape>({ m_Param.m_TargetShape });
 }
 

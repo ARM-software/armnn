@@ -3,9 +3,12 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "armnnTfParser/ITfParser.hpp"
 #include "ParserPrototxtFixture.hpp"
+
+#include <armnn/utility/IgnoreUnused.hpp>
+
+#include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
@@ -176,7 +179,7 @@ BOOST_FIXTURE_TEST_CASE(ParseSplit, InputFirstSplitFixture)
 struct SplitLastDimFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     SplitLastDimFixture(bool withDimZero=false) {
-        boost::ignore_unused(withDimZero);
+        armnn::IgnoreUnused(withDimZero);
         m_Prototext = R"(
         node {
           name: "Placeholder"

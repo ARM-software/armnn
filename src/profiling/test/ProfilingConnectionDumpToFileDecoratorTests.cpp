@@ -5,11 +5,11 @@
 
 #include "../ProfilingConnectionDumpToFileDecorator.hpp"
 #include <Runtime.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <fstream>
 #include <sstream>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/unit_test.hpp>
@@ -49,14 +49,14 @@ public:
 
     bool WritePacket(const unsigned char* buffer, uint32_t length) override
     {
-        boost::ignore_unused(buffer);
-        boost::ignore_unused(length);
+        armnn::IgnoreUnused(buffer);
+        armnn::IgnoreUnused(length);
         return true;
     }
 
     Packet ReadPacket(uint32_t timeout) override
     {
-        boost::ignore_unused(timeout);
+        armnn::IgnoreUnused(timeout);
         return std::move(*m_Packet);
     }
 

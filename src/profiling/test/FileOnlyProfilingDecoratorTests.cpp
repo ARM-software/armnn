@@ -8,8 +8,8 @@
 #include <ProfilingService.hpp>
 #include <Runtime.hpp>
 #include <Filesystem.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/unit_test.hpp>

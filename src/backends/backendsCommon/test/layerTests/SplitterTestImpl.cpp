@@ -24,7 +24,7 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(
     float qScale = 0.0f,
     int32_t qOffset = 0)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     unsigned int inputWidth = 5;
     unsigned int inputHeight = 6;
     unsigned int inputChannels = 3;
@@ -257,7 +257,7 @@ LayerTestResult<T, 3> CopyViaSplitterTestImpl(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale, int32_t qOffset)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     const armnn::TensorInfo tensorInfo({ 3, 6, 5 }, ArmnnType, qScale, qOffset);
     auto input = MakeTensor<T, 3>(
         tensorInfo,

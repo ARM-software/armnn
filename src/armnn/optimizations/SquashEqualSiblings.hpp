@@ -6,7 +6,7 @@
 
 #include "Optimization.hpp"
 
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace armnn
 {
@@ -23,7 +23,7 @@ public:
     /// the child layer, so the siblings are left unconnected (and later removed).
     void Run(Graph& graph, InputSlot& connection) const
     {
-        boost::ignore_unused(graph);
+        IgnoreUnused(graph);
         auto& child = connection.GetOwningLayer();
 
         if (!child.IsOutputUnconnected())

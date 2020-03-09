@@ -4,8 +4,8 @@
 //
 
 #include <QuantizeHelper.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <vector>
@@ -18,7 +18,7 @@ namespace
 template<typename T>
 bool IsFloatIterFunc(T iter)
 {
-    boost::ignore_unused(iter);
+    armnn::IgnoreUnused(iter);
     return armnnUtils::IsFloatingPointIterator<T>::value;
 }
 

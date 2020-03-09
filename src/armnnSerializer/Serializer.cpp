@@ -8,10 +8,10 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/LstmParams.hpp>
 #include <armnn/QuantizedLstmParams.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <iostream>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <flatbuffers/util.h>
 
@@ -86,7 +86,7 @@ uint32_t SerializerVisitor::GetSerializedId(armnn::LayerGuid guid)
 // Build FlatBuffer for Input Layer
 void SerializerVisitor::VisitInputLayer(const armnn::IConnectableLayer* layer, LayerBindingId id, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferInputBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Input);
@@ -108,7 +108,7 @@ void SerializerVisitor::VisitInputLayer(const armnn::IConnectableLayer* layer, L
 // Build FlatBuffer for Output Layer
 void SerializerVisitor::VisitOutputLayer(const armnn::IConnectableLayer* layer, LayerBindingId id, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferOutputBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Output);
@@ -128,7 +128,7 @@ void SerializerVisitor::VisitOutputLayer(const armnn::IConnectableLayer* layer, 
 
 void SerializerVisitor::VisitAbsLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Abs);
     auto flatBufferAbsLayer  = serializer::CreateAbsLayer(m_flatBufferBuilder, flatBufferBaseLayer);
 
@@ -140,7 +140,7 @@ void SerializerVisitor::VisitActivationLayer(const armnn::IConnectableLayer* lay
                                              const armnn::ActivationDescriptor& descriptor,
                                              const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Activation);
@@ -163,7 +163,7 @@ void SerializerVisitor::VisitActivationLayer(const armnn::IConnectableLayer* lay
 // Build FlatBuffer for Addition Layer
 void SerializerVisitor::VisitAdditionLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferAdditionBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Addition);
@@ -180,7 +180,7 @@ void SerializerVisitor::VisitArgMinMaxLayer(const armnn::IConnectableLayer *laye
                                             const armnn::ArgMinMaxDescriptor& descriptor,
                                             const char *name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_ArgMinMax);
@@ -203,7 +203,7 @@ void SerializerVisitor::VisitBatchToSpaceNdLayer(const armnn::IConnectableLayer*
                                                  const armnn::BatchToSpaceNdDescriptor& descriptor,
                                                  const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_BatchToSpaceNd);
@@ -237,7 +237,7 @@ void SerializerVisitor::VisitBatchNormalizationLayer(const armnn::IConnectableLa
                                                      const armnn::ConstTensor& gamma,
                                                      const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbBatchNormalizationBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_BatchNormalization);
     auto fbBatchNormalizationDescriptor = serializer::CreateBatchNormalizationDescriptor(
@@ -264,7 +264,7 @@ void SerializerVisitor::VisitComparisonLayer(const armnn::IConnectableLayer* lay
                                              const armnn::ComparisonDescriptor& descriptor,
                                              const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Comparison);
     auto fbDescriptor = serializer::CreateComparisonDescriptor(
@@ -280,7 +280,7 @@ void SerializerVisitor::VisitConstantLayer(const armnn::IConnectableLayer* layer
                                            const armnn::ConstTensor& input,
                                            const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferConstantBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Constant);
@@ -303,7 +303,7 @@ void SerializerVisitor::VisitConvolution2dLayer(const armnn::IConnectableLayer* 
                                                 const armnn::Optional<armnn::ConstTensor>& biases,
                                                 const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Convolution2d);
@@ -342,7 +342,7 @@ void SerializerVisitor::VisitDepthToSpaceLayer(const armnn::IConnectableLayer* l
                                                const armnn::DepthToSpaceDescriptor& descriptor,
                                                const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_DepthToSpace);
     auto fbDescriptor = CreateDepthToSpaceDescriptor(m_flatBufferBuilder,
@@ -360,7 +360,7 @@ void SerializerVisitor::VisitDepthwiseConvolution2dLayer(const armnn::IConnectab
                                                          const armnn::Optional<armnn::ConstTensor>& biases,
                                                          const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_DepthwiseConvolution2d);
     auto fbDescriptor = CreateDepthwiseConvolution2dDescriptor(m_flatBufferBuilder,
@@ -394,7 +394,7 @@ void SerializerVisitor::VisitDepthwiseConvolution2dLayer(const armnn::IConnectab
 void SerializerVisitor::VisitDequantizeLayer(const armnn::IConnectableLayer* layer,
                                              const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbDequantizeBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Dequantize);
     auto fbDequantizeLayer     = serializer::CreateDequantizeLayer(m_flatBufferBuilder, fbDequantizeBaseLayer);
@@ -407,7 +407,7 @@ void SerializerVisitor::VisitDetectionPostProcessLayer(const armnn::IConnectable
                                                        const armnn::ConstTensor& anchors,
                                                        const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_DetectionPostProcess);
     auto fbDescriptor = CreateDetectionPostProcessDescriptor(m_flatBufferBuilder,
@@ -435,7 +435,7 @@ void SerializerVisitor::VisitDetectionPostProcessLayer(const armnn::IConnectable
 
 void SerializerVisitor::VisitDivisionLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbDivisionBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Division);
     auto fbDivisionLayer     = serializer::CreateDivisionLayer(m_flatBufferBuilder, fbDivisionBaseLayer);
@@ -447,7 +447,7 @@ void SerializerVisitor::VisitElementwiseUnaryLayer(const armnn::IConnectableLaye
                                                    const armnn::ElementwiseUnaryDescriptor& descriptor,
                                                    const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_ElementwiseUnary);
     auto fbDescriptor = serializer::CreateElementwiseUnaryDescriptor(
@@ -460,7 +460,7 @@ void SerializerVisitor::VisitElementwiseUnaryLayer(const armnn::IConnectableLaye
 
 void SerializerVisitor::VisitEqualLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Equal);
     auto fbEqualLayer = serializer::CreateEqualLayer(m_flatBufferBuilder, fbBaseLayer);
@@ -470,7 +470,7 @@ void SerializerVisitor::VisitEqualLayer(const armnn::IConnectableLayer* layer, c
 
 void SerializerVisitor::VisitFloorLayer(const armnn::IConnectableLayer *layer, const char *name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto flatBufferFloorBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Floor);
     auto flatBufferFloorLayer = serializer::CreateFloorLayer(m_flatBufferBuilder, flatBufferFloorBaseLayer);
@@ -480,7 +480,7 @@ void SerializerVisitor::VisitFloorLayer(const armnn::IConnectableLayer *layer, c
 
 void SerializerVisitor::VisitGatherLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbGatherBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Gather);
     auto flatBufferLayer   = serializer::CreateGatherLayer(m_flatBufferBuilder, fbGatherBaseLayer);
@@ -490,7 +490,7 @@ void SerializerVisitor::VisitGatherLayer(const armnn::IConnectableLayer* layer, 
 
 void SerializerVisitor::VisitGreaterLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbGreaterBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Greater);
     auto fbGreaterLayer = serializer::CreateGreaterLayer(m_flatBufferBuilder, fbGreaterBaseLayer);
@@ -503,7 +503,7 @@ void SerializerVisitor::VisitInstanceNormalizationLayer(
     const armnn::InstanceNormalizationDescriptor& instanceNormalizationDescriptor,
     const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbDescriptor = serializer::CreateInstanceNormalizationDescriptor(
             m_flatBufferBuilder,
@@ -522,7 +522,7 @@ void SerializerVisitor::VisitL2NormalizationLayer(const armnn::IConnectableLayer
                                                   const armnn::L2NormalizationDescriptor& l2NormalizationDescriptor,
                                                   const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto fbBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_L2Normalization);
@@ -543,7 +543,7 @@ void SerializerVisitor::VisitLogSoftmaxLayer(const armnn::IConnectableLayer* lay
                                              const armnn::LogSoftmaxDescriptor& logSoftmaxDescriptor,
                                              const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferLogSoftmaxBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_LogSoftmax);
@@ -568,7 +568,7 @@ void SerializerVisitor::VisitLstmLayer(const armnn::IConnectableLayer* layer,
                                        const armnn::LstmInputParams& params,
                                        const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbLstmBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Lstm);
 
@@ -673,7 +673,7 @@ void SerializerVisitor::VisitLstmLayer(const armnn::IConnectableLayer* layer,
 
 void SerializerVisitor::VisitMaximumLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbMaximumBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Maximum);
     auto fbMaximumLayer     = serializer::CreateMaximumLayer(m_flatBufferBuilder, fbMaximumBaseLayer);
@@ -685,7 +685,7 @@ void SerializerVisitor::VisitMeanLayer(const armnn::IConnectableLayer* layer,
                                        const armnn::MeanDescriptor& descriptor,
                                        const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbMeanBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Mean);
     auto fbMeanDescriptor = serializer::CreateMeanDescriptor(m_flatBufferBuilder,
@@ -701,7 +701,7 @@ void SerializerVisitor::VisitMeanLayer(const armnn::IConnectableLayer* layer,
 
 void SerializerVisitor::VisitMinimumLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbMinimumBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Minimum);
     auto fbMinimumLayer     = serializer::CreateMinimumLayer(m_flatBufferBuilder, fbMinimumBaseLayer);
@@ -711,7 +711,7 @@ void SerializerVisitor::VisitMinimumLayer(const armnn::IConnectableLayer* layer,
 
 void SerializerVisitor::VisitMergeLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbMergeBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Merge);
     auto fbMergeLayer     = serializer::CreateMergeLayer(m_flatBufferBuilder, fbMergeBaseLayer);
@@ -730,7 +730,7 @@ void SerializerVisitor::VisitConcatLayer(const armnn::IConnectableLayer* layer,
                                          const armnn::ConcatDescriptor& concatDescriptor,
                                          const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto flatBufferConcatBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Concat);
 
@@ -763,7 +763,7 @@ void SerializerVisitor::VisitConcatLayer(const armnn::IConnectableLayer* layer,
 
 void SerializerVisitor::VisitMultiplicationLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbMultiplicationBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Multiplication);
     auto fbMultiplicationLayer     = serializer::CreateMultiplicationLayer(m_flatBufferBuilder,
@@ -776,7 +776,7 @@ void SerializerVisitor::VisitPadLayer(const armnn::IConnectableLayer* layer,
                                       const armnn::PadDescriptor& padDescriptor,
                                       const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Pad);
 
@@ -802,7 +802,7 @@ void SerializerVisitor::VisitPermuteLayer(const armnn::IConnectableLayer* layer,
                                           const armnn::PermuteDescriptor& permuteDescriptor,
                                           const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferPermuteBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Permute);
@@ -830,7 +830,7 @@ void SerializerVisitor::VisitReshapeLayer(const armnn::IConnectableLayer* layer,
                                           const armnn::ReshapeDescriptor& reshapeDescriptor,
                                           const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferReshapeBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Reshape);
@@ -856,7 +856,7 @@ void SerializerVisitor::VisitResizeBilinearLayer(const armnn::IConnectableLayer*
                                                  const armnn::ResizeBilinearDescriptor& resizeDescriptor,
                                                  const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_ResizeBilinear);
 
@@ -877,7 +877,7 @@ void SerializerVisitor::VisitResizeLayer(const armnn::IConnectableLayer* layer,
                                          const armnn::ResizeDescriptor& resizeDescriptor,
                                          const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Resize);
 
@@ -897,7 +897,7 @@ void SerializerVisitor::VisitResizeLayer(const armnn::IConnectableLayer* layer,
 
 void SerializerVisitor::VisitRsqrtLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbRsqrtBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Rsqrt);
     auto fbRsqrtLayer     = serializer::CreateRsqrtLayer(m_flatBufferBuilder, fbRsqrtBaseLayer);
@@ -909,7 +909,7 @@ void SerializerVisitor::VisitSliceLayer(const armnn::IConnectableLayer* layer,
                                         const armnn::SliceDescriptor& sliceDescriptor,
                                         const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbSliceBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Slice);
     auto fbSliceDescriptor = CreateSliceDescriptor(m_flatBufferBuilder,
@@ -926,7 +926,7 @@ void SerializerVisitor::VisitSoftmaxLayer(const armnn::IConnectableLayer* layer,
                                           const armnn::SoftmaxDescriptor& softmaxDescriptor,
                                           const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferSoftmaxBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Softmax);
@@ -948,7 +948,7 @@ void SerializerVisitor::VisitPooling2dLayer(const armnn::IConnectableLayer* laye
                                             const armnn::Pooling2dDescriptor& pooling2dDescriptor,
                                             const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbPooling2dBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Pooling2d);
     auto fbPooling2dDescriptor = serializer::CreatePooling2dDescriptor(
@@ -976,7 +976,7 @@ void SerializerVisitor::VisitPooling2dLayer(const armnn::IConnectableLayer* laye
 void SerializerVisitor::VisitPreluLayer(const armnn::IConnectableLayer* layer,
                                         const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferPreluBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Prelu);
@@ -990,7 +990,7 @@ void SerializerVisitor::VisitPreluLayer(const armnn::IConnectableLayer* layer,
 
 void SerializerVisitor::VisitQuantizeLayer(const armnn::IConnectableLayer *layer, const char *name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbQuantizeBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Quantize);
     auto fbQuantizeLayer = serializer::CreateQuantizeLayer(m_flatBufferBuilder,
@@ -1005,7 +1005,7 @@ void SerializerVisitor::VisitFullyConnectedLayer(const armnn::IConnectableLayer*
                                                  const armnn::Optional<armnn::ConstTensor>& biases,
                                                  const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_FullyConnected);
@@ -1042,7 +1042,7 @@ void SerializerVisitor::VisitSpaceToBatchNdLayer(const armnn::IConnectableLayer*
                                                  const armnn::SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
                                                  const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_SpaceToBatchNd);
@@ -1073,7 +1073,7 @@ void SerializerVisitor::VisitSpaceToDepthLayer(const armnn::IConnectableLayer* l
                                                const armnn::SpaceToDepthDescriptor& spaceToDepthDescriptor,
                                                const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto flatBufferBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_SpaceToDepth);
     auto flatBufferDescriptor =
@@ -1093,7 +1093,7 @@ void SerializerVisitor::VisitSplitterLayer(const armnn::IConnectableLayer* layer
                                            const armnn::ViewsDescriptor& viewsDescriptor,
                                            const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer ViewOrigins
     std::vector<flatbuffers::Offset<UintVector>> flatBufferViewOrigins;
@@ -1159,7 +1159,7 @@ void SerializerVisitor::VisitNormalizationLayer(const armnn::IConnectableLayer* 
                                                 const armnn::NormalizationDescriptor& descriptor,
                                                 const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbNormalizationBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Normalization);
 
@@ -1184,7 +1184,7 @@ void SerializerVisitor::VisitStackLayer(const armnn::IConnectableLayer* layer,
                                         const armnn::StackDescriptor& stackDescriptor,
                                         const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto stackBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Stack);
 
@@ -1207,7 +1207,7 @@ void SerializerVisitor::VisitStandInLayer(const armnn::IConnectableLayer *layer,
                                           const armnn::StandInDescriptor& standInDescriptor,
                                           const char *name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbDescriptor = serializer::CreateStandInDescriptor(m_flatBufferBuilder,
                                                             standInDescriptor.m_NumInputs,
@@ -1223,7 +1223,7 @@ void SerializerVisitor::VisitStridedSliceLayer(const armnn::IConnectableLayer* l
                                                const armnn::StridedSliceDescriptor& stridedSliceDescriptor,
                                                const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_StridedSlice);
 
@@ -1248,7 +1248,7 @@ void SerializerVisitor::VisitStridedSliceLayer(const armnn::IConnectableLayer* l
 
 void SerializerVisitor::VisitSubtractionLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbSubtractionBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Subtraction);
     auto fbSubtractionLayer = serializer::CreateSubtractionLayer(m_flatBufferBuilder, fbSubtractionBaseLayer);
@@ -1258,7 +1258,7 @@ void SerializerVisitor::VisitSubtractionLayer(const armnn::IConnectableLayer* la
 
 void SerializerVisitor::VisitSwitchLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbSwitchBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Switch);
     auto fbSwitchLayer = serializer::CreateSwitchLayer(m_flatBufferBuilder, fbSwitchBaseLayer);
@@ -1273,7 +1273,7 @@ void SerializerVisitor::VisitTransposeConvolution2dLayer(
     const armnn::Optional<armnn::ConstTensor>& biases,
     const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Convolution2d);
     auto fbDescriptor = CreateTransposeConvolution2dDescriptor(m_flatBufferBuilder,
@@ -1307,7 +1307,7 @@ void SerializerVisitor::VisitTransposeLayer(const armnn::IConnectableLayer* laye
                                             const armnn::TransposeDescriptor& descriptor,
                                             const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     // Create FlatBuffer BaseLayer
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Transpose);
@@ -1334,7 +1334,7 @@ void SerializerVisitor::VisitQuantizedLstmLayer(const armnn::IConnectableLayer* 
                                                 const armnn::QuantizedLstmInputParams& params,
                                                 const char* name)
 {
-    boost::ignore_unused(name);
+    IgnoreUnused(name);
 
     auto fbQuantizedLstmBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_QuantizedLstm);
 

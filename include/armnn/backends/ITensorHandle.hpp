@@ -5,8 +5,7 @@
 #pragma once
 
 #include <armnn/MemorySources.hpp>
-
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace armnn
 {
@@ -75,7 +74,7 @@ public:
     /// \return true on success or false on failure
     virtual bool Import(void* memory, MemorySource source)
     {
-        boost::ignore_unused(memory, source);
+        IgnoreUnused(memory, source);
         return false;
     };
 };

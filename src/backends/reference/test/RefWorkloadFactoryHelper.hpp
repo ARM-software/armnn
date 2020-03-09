@@ -25,7 +25,7 @@ struct WorkloadFactoryHelper<armnn::RefWorkloadFactory>
     static armnn::RefWorkloadFactory GetFactory(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager = nullptr)
     {
-        boost::ignore_unused(memoryManager);
+        IgnoreUnused(memoryManager);
         return armnn::RefWorkloadFactory();
     }
 };

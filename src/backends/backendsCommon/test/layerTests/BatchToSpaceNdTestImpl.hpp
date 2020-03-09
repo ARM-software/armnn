@@ -39,7 +39,7 @@ LayerTestResult<T, OutputDim> BatchToSpaceNdHelper(
         float scale = 1.0f,
         int32_t offset = 0)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
 
     armnn::TensorInfo inputTensorInfo(InputDim, inputShape, ArmnnType);
     armnn::TensorInfo outputTensorInfo(OutputDim, outputShape, ArmnnType);

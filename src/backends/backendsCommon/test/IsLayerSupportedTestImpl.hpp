@@ -8,7 +8,7 @@
 
 #include <backendsCommon/WorkloadFactory.hpp>
 
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace
 {
@@ -414,7 +414,7 @@ struct LayerTypePolicy<armnn::LayerType::name, DataType> \
     static std::unique_ptr<armnn::IWorkload> MakeDummyWorkload(armnn::IWorkloadFactory *factory, \
         unsigned int nIn, unsigned int nOut) \
     { \
-        boost::ignore_unused(factory, nIn, nOut); \
+        IgnoreUnused(factory, nIn, nOut); \
         return std::unique_ptr<armnn::IWorkload>(); \
     } \
 };
@@ -559,7 +559,7 @@ unsigned int GetNumOutputs(const armnn::Layer& layer)
 template<>
 unsigned int GetNumInputs<armnn::LayerType::Concat>(const armnn::Layer& layer)
 {
-    boost::ignore_unused(layer);
+    IgnoreUnused(layer);
     return 2;
 }
 
@@ -613,7 +613,7 @@ bool IsLayerSupportedTest(FactoryType *factory, Tag<Type>)
         }
         catch(const armnn::InvalidArgumentException& e)
         {
-            boost::ignore_unused(e);
+            IgnoreUnused(e);
             // This is ok since we throw InvalidArgumentException when creating the dummy workload.
             return true;
         }
@@ -644,12 +644,12 @@ bool IsLayerSupportedTest(FactoryType *factory, Tag<Type>)
         // InvalidArgumentException or UnimplementedException.
         catch(const armnn::InvalidArgumentException& e)
         {
-            boost::ignore_unused(e);
+            IgnoreUnused(e);
             return true;
         }
         catch(const armnn::UnimplementedException& e)
         {
-            boost::ignore_unused(e);
+            IgnoreUnused(e);
             return true;
         }
         catch(const std::exception& e)

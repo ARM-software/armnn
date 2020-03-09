@@ -6,13 +6,12 @@
 #include "ClLayerSupport.hpp"
 #include "ClBackendId.hpp"
 
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/Descriptors.hpp>
 #include <armnn/BackendRegistry.hpp>
 
 #include <InternalTypes.hpp>
 #include <LayerSupportCommon.hpp>
-
-#include <boost/core/ignore_unused.hpp>
 
 #if defined(ARMCOMPUTECL_ENABLED)
 #include <aclCommon/ArmComputeUtils.hpp>
@@ -63,7 +62,6 @@
 #include "workloads/ClTransposeWorkload.hpp"
 #endif
 
-using namespace boost;
 
 namespace armnn
 {
@@ -93,7 +91,7 @@ bool IsMatchingStride(uint32_t actualStride)
 template<typename ... Args>
 bool IsClBackendSupported(Optional<std::string&> reasonIfUnsupported, Args... args)
 {
-    boost::ignore_unused(reasonIfUnsupported, (args)...);
+    IgnoreUnused(reasonIfUnsupported, (args)...);
 #if defined(ARMCOMPUTECL_ENABLED)
     return true;
 #else
@@ -649,7 +647,7 @@ bool ClLayerSupport::IsReshapeSupported(const TensorInfo& input,
                                         const ReshapeDescriptor& descriptor,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClReshapeWorkloadValidate, reasonIfUnsupported, input, output);
 }
 
@@ -728,7 +726,7 @@ bool ClLayerSupport::IsSplitterSupported(const TensorInfo& input,
                                          const ViewsDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
     return IsSupportedForDataTypeCl(reasonIfUnsupported,
                                     input.GetDataType(),
                                     &TrueFunc<>,
@@ -756,7 +754,7 @@ bool ClLayerSupport::IsSplitterSupported(const TensorInfo& input,
                                        *splitAxis.begin());
     }
 #endif
-    boost::ignore_unused(descriptor);
+    IgnoreUnused(descriptor);
     for (auto output : outputs)
     {
         if (!input.IsTypeSpaceMatch(output)) // Cannot use sub-tensors if the types are not same space

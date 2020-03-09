@@ -28,7 +28,7 @@ void RefStridedSliceWorkload::Execute() const
     DataType outputDataType = outputInfo.GetDataType();
 
     BOOST_ASSERT(inputDataType == outputDataType);
-    boost::ignore_unused(outputDataType);
+    IgnoreUnused(outputDataType);
 
     StridedSlice(inputInfo,
                  m_Data.m_Parameters,

@@ -7,6 +7,8 @@
 #include "InferenceTest.hpp"
 #include "YoloDatabase.hpp"
 
+#include <armnn/utility/IgnoreUnused.hpp>
+
 #include <algorithm>
 #include <array>
 #include <utility>
@@ -32,7 +34,7 @@ public:
 
     virtual TestCaseResult ProcessResult(const InferenceTestOptions& options) override
     {
-        boost::ignore_unused(options);
+        armnn::IgnoreUnused(options);
 
         using Boost3dArray = boost::multi_array<float, 3>;
 

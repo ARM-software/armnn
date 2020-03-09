@@ -6,10 +6,9 @@
 
 #include "LayerCloneBase.hpp"
 
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-
-#include <boost/core/ignore_unused.hpp>
 
 namespace armnn
 {
@@ -21,7 +20,7 @@ OutputLayer::OutputLayer(LayerBindingId id, const char* name)
 
 std::unique_ptr<IWorkload> OutputLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
-    boost::ignore_unused(factory);
+    IgnoreUnused(factory);
     return nullptr;
 }
 

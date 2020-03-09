@@ -5,8 +5,9 @@
 
 #include "Slice.hpp"
 
+#include <armnn/utility/IgnoreUnused.hpp>
+
 #include <boost/assert.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 namespace armnn
@@ -72,7 +73,7 @@ void Slice(const TensorInfo& inputInfo,
     const unsigned char* input = reinterpret_cast<const unsigned char*>(inputData);
     unsigned char* output      = reinterpret_cast<unsigned char*>(outputData);
 
-    boost::ignore_unused(dim0);
+    IgnoreUnused(dim0);
     for (unsigned int idx0 = begin0; idx0 < begin0 + size0; ++idx0)
     {
         for (unsigned int idx1 = begin1; idx1 < begin1 + size1; ++idx1)

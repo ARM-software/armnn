@@ -8,8 +8,8 @@
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Conversion.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
 namespace armnn
@@ -191,7 +191,7 @@ const Counter* CounterDirectory::RegisterCounter(const BackendId& backendId,
                                                  const Optional<uint16_t>& deviceUid,
                                                  const Optional<uint16_t>& counterSetUid)
 {
-    boost::ignore_unused(backendId);
+    IgnoreUnused(backendId);
 
     // Check that the given parent category name is valid
     if (parentCategoryName.empty() ||

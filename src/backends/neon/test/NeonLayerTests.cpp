@@ -219,7 +219,7 @@ DepthwiseConvolution2dDescriptor MakeDepthwiseConv2dDesc(uint32_t strideX, uint3
     uint32_t depthMultiplier = 1, uint32_t padLeft = 0, uint32_t padRight = 0,
     uint32_t padTop = 0, uint32_t padBottom = 0)
 {
-    boost::ignore_unused(depthMultiplier);
+    IgnoreUnused(depthMultiplier);
 
     DepthwiseConvolution2dDescriptor desc;
 

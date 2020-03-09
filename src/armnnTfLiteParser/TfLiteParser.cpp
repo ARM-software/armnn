@@ -9,7 +9,7 @@
 #include <armnn/Exceptions.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/TypesUtils.hpp>
-#include <boost/filesystem.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 // armnnUtils:
 #include <armnnUtils/Permute.hpp>
@@ -22,10 +22,10 @@
 
 #include <flatbuffers/flexbuffers.h>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <boost/filesystem.hpp>
 
 #include <fstream>
 #include <algorithm>
@@ -426,7 +426,7 @@ CreateConstTensorImpl(TfLiteParser::BufferRawPtr bufferPtr,
                       armnn::TensorInfo& tensorInfo,
                       armnn::Optional<armnn::PermutationVector&> permutationVector)
 {
-    boost::ignore_unused(tensorPtr);
+    IgnoreUnused(tensorPtr);
     BOOST_ASSERT_MSG(tensorPtr != nullptr, "tensorPtr is null");
     BOOST_ASSERT_MSG(bufferPtr != nullptr,
         boost::str(
@@ -1827,7 +1827,7 @@ void TfLiteParser::ParseActivation(size_t subgraphIndex, size_t operatorIndex, A
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
     const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    boost::ignore_unused(operatorPtr);
+    IgnoreUnused(operatorPtr);
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(inputs.size(), 1);

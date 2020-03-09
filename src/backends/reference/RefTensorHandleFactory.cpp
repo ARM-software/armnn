@@ -6,7 +6,7 @@
 #include "RefTensorHandleFactory.hpp"
 #include "RefTensorHandle.hpp"
 
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace armnn
 {
@@ -23,7 +23,7 @@ std::unique_ptr<ITensorHandle> RefTensorHandleFactory::CreateSubTensorHandle(ITe
                                                                              TensorShape const& subTensorShape,
                                                                              unsigned int const* subTensorOrigin) const
 {
-    boost::ignore_unused(parent, subTensorShape, subTensorOrigin);
+    IgnoreUnused(parent, subTensorShape, subTensorOrigin);
     return nullptr;
 }
 
@@ -35,7 +35,7 @@ std::unique_ptr<ITensorHandle> RefTensorHandleFactory::CreateTensorHandle(const 
 std::unique_ptr<ITensorHandle> RefTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
                                                                           DataLayout dataLayout) const
 {
-    boost::ignore_unused(dataLayout);
+    IgnoreUnused(dataLayout);
     return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager, m_ImportFlags);
 }
 

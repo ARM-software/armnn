@@ -20,7 +20,7 @@ LayerTestResult<float, 4> MinimumBroadcast1ElementTest1(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    boost::ignore_unused(memoryManager);
+    IgnoreUnused(memoryManager);
     unsigned int shape0[] = { 1, 2, 2, 2 };
     unsigned int shape1[] = { 1, 1, 1, 1 };
 

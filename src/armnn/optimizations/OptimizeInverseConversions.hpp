@@ -6,7 +6,7 @@
 
 #include "Optimization.hpp"
 
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace armnn
 {
@@ -20,7 +20,7 @@ public:
     /// Fp16ToFp32 followed by Fp32ToFp16 or vice-versa.
     void Run(Graph& graph, InputSlot& connection) const
     {
-        boost::ignore_unused(graph);
+        IgnoreUnused(graph);
         Layer& base  = connection.GetConnectedOutputSlot()->GetOwningLayer();
         Layer& child = connection.GetOwningLayer();
 

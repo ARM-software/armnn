@@ -3,17 +3,17 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "../Serializer.hpp"
+
 #include <armnn/Descriptors.hpp>
 #include <armnn/INetwork.hpp>
 #include <armnn/IRuntime.hpp>
 #include <armnnDeserializer/IDeserializer.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
-#include "../Serializer.hpp"
+#include <boost/test/unit_test.hpp>
 
 #include <sstream>
-
-#include <boost/core/ignore_unused.hpp>
-#include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(SerializerTests)
 
@@ -24,7 +24,7 @@ public:
                               const armnn::ActivationDescriptor& activationDescriptor,
                               const char* name) override
     {
-        boost::ignore_unused(layer, activationDescriptor);
+        IgnoreUnused(layer, activationDescriptor);
         BOOST_TEST(name == "activation");
     }
 };

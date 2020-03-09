@@ -5,7 +5,7 @@
 
 #include "PacketVersionResolver.hpp"
 
-#include <boost/core/ignore_unused.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace armnn
 {
@@ -54,7 +54,7 @@ bool PacketKey::operator!=(const PacketKey& rhs) const
 
 Version PacketVersionResolver::ResolvePacketVersion(uint32_t familyId, uint32_t packetId) const
 {
-    boost::ignore_unused(familyId, packetId);
+    IgnoreUnused(familyId, packetId);
     // NOTE: For now every packet specification is at version 1.0.0
     return Version(1, 0, 0);
 }

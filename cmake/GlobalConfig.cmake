@@ -22,6 +22,7 @@ option(TF_LITE_GENERATED_PATH "Tensorflow lite generated C++ schema location" OF
 option(FLATBUFFERS_ROOT "Location where the flatbuffers 'include' and 'lib' folders to be found" Off)
 option(DYNAMIC_BACKEND_PATHS "Colon seperated list of paths where to load the dynamic backends from" "")
 option(BUILD_GATORD_MOCK "Build the Gatord simulator for external profiling testing." ON)
+option(BUILD_TIMELINE_DECODER "Build the Timeline Decoder for external profiling." ON)
 option(SHARED_BOOST "Use dynamic linking for boost libraries" OFF)
 
 include(SelectLibraryConfigurations)

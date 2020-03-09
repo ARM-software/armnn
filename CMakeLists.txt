@@ -868,8 +868,13 @@ if(BUILD_UNIT_TESTS)
     if(BUILD_GATORD_MOCK)
         list(APPEND unittest_sources
             tests/profiling/gatordmock/tests/GatordMockTests.cpp
-            src/timelineDecoder/tests/TimelineTests.cpp
             )
+    endif()
+
+    if(BUILD_TIMELINE_DECODER)
+        list(APPEND unittest_sources
+             src/timelineDecoder/tests/TimelineTests.cpp
+             )
     endif()
 
     foreach(lib ${armnnUnitTestLibraries})
@@ -882,6 +887,7 @@ if(BUILD_UNIT_TESTS)
     target_include_directories(UnitTests PRIVATE src/armnnUtils)
     target_include_directories(UnitTests PRIVATE src/backends)
     target_include_directories(UnitTests PRIVATE src/profiling)
+    target_include_directories(UnitTests PRIVATE src/timelineDecoder)
 
     if(VALGRIND_FOUND)
         if(HEAP_PROFILING OR LEAK_CHECKING)
@@ -904,6 +910,9 @@ if(BUILD_UNIT_TESTS)
 
     if(BUILD_GATORD_MOCK)
         target_link_libraries(UnitTests gatordMockService)
+    endif()
+
+    if(BUILD_TIMELINE_DECODER)
         target_link_libraries(UnitTests timelineDecoder)
     endif()
 
@@ -990,7 +999,7 @@ if(BUILD_GATORD_MOCK)
         tests/profiling/gatordmock/StreamMetadataCommandHandler.hpp
         )
 
-    include_directories(src/timelineDecoder src/profiling tests/profiling tests/profiling/gatordmock)
+    include_directories(src/profiling tests/profiling tests/profiling/gatordmock)
 
     add_library_ex(gatordMockService STATIC ${gatord_mock_sources})
     target_include_directories(gatordMockService PRIVATE src/armnnUtils)

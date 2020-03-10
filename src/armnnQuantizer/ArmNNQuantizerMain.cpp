@@ -36,9 +36,19 @@ int main(int argc, char* argv[])
     inputFileStream.close();
 
     armnn::QuantizerOptions quantizerOptions;
-    quantizerOptions.m_ActivationFormat = cmdline.GetQuantizationScheme() == "QSymm16"
-                                          ? armnn::DataType::QSymmS16
-                                          : armnn::DataType::QAsymmU8;
+
+    if (cmdline.GetQuantizationScheme() == "QAsymmS8")
+    {
+        quantizerOptions.m_ActivationFormat = armnn::DataType::QAsymmS8;
+    }
+    else if (cmdline.GetQuantizationScheme() == "QSymmS16")
+    {
+        quantizerOptions.m_ActivationFormat = armnn::DataType::QSymmS16;
+    }
+    else
+    {
+        quantizerOptions.m_ActivationFormat = armnn::DataType::QAsymmU8;
+    }
 
     quantizerOptions.m_PreserveType = cmdline.HasPreservedDataType();
 

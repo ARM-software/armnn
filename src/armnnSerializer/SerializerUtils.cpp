@@ -58,6 +58,8 @@ armnnSerializer::DataType GetFlatBufferDataType(armnn::DataType dataType)
             return armnnSerializer::DataType::DataType_Signed32;
         case armnn::DataType::QSymmS16:
             return armnnSerializer::DataType::DataType_QSymmS16;
+        case armnn::DataType::QAsymmS8:
+            return armnnSerializer::DataType::DataType_QAsymmS8;
         case armnn::DataType::QAsymmU8:
             return armnnSerializer::DataType::DataType_QAsymmU8;
         case armnn::DataType::Boolean:

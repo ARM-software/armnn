@@ -67,8 +67,10 @@ bool ValidateQuantizationScheme(const std::string& scheme)
         return false;
     }
 
-    std::vector<std::string> supportedSchemes = {
-        "QAsymm8",
+    std::vector<std::string> supportedSchemes =
+    {
+        "QAsymmS8",
+        "QAsymmU8",
         "QSymm16"
     };
 
@@ -93,8 +95,10 @@ bool CommandLineProcessor::ProcessCommandLine(int argc, char* argv[])
                 ("help,h", "Display help messages")
                 ("infile,f", po::value<std::string>(&m_InputFileName)->required(),
                              "Input file containing float 32 ArmNN Input Graph")
-                ("scheme,s", po::value<std::string>(&m_QuantizationScheme)->default_value("QAsymm8"),
-                              "Quantization scheme, \"QAsymm8\" or \"QSymm16\", default value QAsymm8")
+                ("scheme,s", po::value<std::string>(&m_QuantizationScheme)->default_value("QAsymmU8"),
+                              "Quantization scheme,"
+                              " \"QAsymmU8\" or \"QAsymmS8\" or \"QSymm16\","
+                              " default value QAsymmU8")
                 ("csvfile,c", po::value<std::string>(&m_CsvFileName)->default_value(""),
                              "CSV file containing paths for RAW input tensors")
                 ("preserve-data-type,p", po::bool_switch(&m_PreserveDataType)->default_value(false),

@@ -505,6 +505,9 @@ armnn::TensorInfo ToTensorInfo(Deserializer::TensorRawPtr tensorPtr)
 
     switch (tensorPtr->dataType())
     {
+        case DataType_QAsymmS8:
+            type = armnn::DataType::QAsymmS8;
+            break;
         case DataType_QuantisedAsymm8:
         case DataType_QAsymmU8:
             type = armnn::DataType::QAsymmU8;

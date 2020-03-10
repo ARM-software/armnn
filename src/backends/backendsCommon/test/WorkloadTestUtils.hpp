@@ -98,6 +98,8 @@ inline armnn::Optional<armnn::DataType> GetBiasTypeFromWeightsType(armnn::Option
         case armnn::DataType::Float16:
         case armnn::DataType::Float32:
             return weightsType;
+        case armnn::DataType::QAsymmS8:
+            return armnn::DataType::Signed32;
         case armnn::DataType::QAsymmU8:
             return armnn::DataType::Signed32;
         case armnn::DataType::QSymmS16:

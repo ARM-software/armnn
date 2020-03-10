@@ -254,6 +254,14 @@ if(ARMCOMPUTENEON OR ARMCOMPUTECL)
         find_library(ARMCOMPUTE_CORE_LIBRARY_DEBUG NAMES arm_compute_core-static)
         find_library(ARMCOMPUTE_CORE_LIBRARY_RELEASE NAMES arm_compute_core-static)
 
+        # In case it wasn't there, try the dynamic libraries
+        # This case will get used in a linux setup where the Compute Library
+        # has been installed in a standard system library path as a dynamic library
+        find_library(ARMCOMPUTE_LIBRARY_DEBUG NAMES arm_compute)
+        find_library(ARMCOMPUTE_LIBRARY_RELEASE NAMES arm_compute)
+        find_library(ARMCOMPUTE_CORE_LIBRARY_DEBUG NAMES arm_compute_core)
+        find_library(ARMCOMPUTE_CORE_LIBRARY_RELEASE NAMES arm_compute_core)
+
         set(ARMCOMPUTE_LIBRARIES
             debug ${ARMCOMPUTE_LIBRARY_DEBUG} ${ARMCOMPUTE_CORE_LIBRARY_DEBUG}
             optimized ${ARMCOMPUTE_LIBRARY_RELEASE} ${ARMCOMPUTE_CORE_LIBRARY_RELEASE} )

@@ -5,6 +5,7 @@
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 
+#include <backendsCommon/test/ActivationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ArgMinMaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ComparisonEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
@@ -205,6 +206,16 @@ BOOST_AUTO_TEST_CASE(DequantizeEndToEndSimpleTest)
 BOOST_AUTO_TEST_CASE(DequantizeEndToEndOffsetTest)
 {
     DequantizeEndToEndOffset<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonEluEndToEndTestFloat32)
+{
+    EluEndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonEluEndToEndTestFloat16)
+{
+    EluEndToEndTest<armnn::DataType::Float16>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(NeonPreluEndToEndFloat32Test)

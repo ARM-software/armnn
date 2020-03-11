@@ -21,6 +21,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     DynamicBackendTests.hpp
     ElementwiseUnaryEndToEndTestImpl.hpp
     EndToEndTestImpl.hpp
+    ActivationEndToEndTestImpl.hpp
     GatherEndToEndTestImpl.hpp
     InstanceNormalizationEndToEndTestImpl.cpp
     InstanceNormalizationEndToEndTestImpl.hpp

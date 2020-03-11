@@ -25,15 +25,23 @@ struct ActivationDescriptor
         , m_B(0)
     {}
 
+    ActivationDescriptor(armnn::ActivationFunction activation,
+                         float a = 0,
+                         float b = 0)
+            : m_Function(activation)
+            , m_A(a)
+            , m_B(b)
+    {}
+
     bool operator ==(const ActivationDescriptor &rhs) const
     {
         return m_Function == rhs.m_Function && m_A == rhs.m_B && m_B == rhs.m_B;
     }
 
     /// @brief The activation function to use
-    /// (Sigmoid, TanH, Linear, ReLu, BoundedReLu, SoftReLu, LeakyReLu, Abs, Sqrt, Square).
+    /// (Sigmoid, TanH, Linear, ReLu, BoundedReLu, SoftReLu, LeakyReLu, Abs, Sqrt, Square, Elu).
     ActivationFunction m_Function;
-    /// Alpha upper bound value used by the activation functions. (BoundedReLu, Linear, TanH).
+    /// Alpha upper bound value used by the activation functions. (BoundedReLu, Linear, TanH, Elu).
     float              m_A;
     /// Beta lower bound value used by the activation functions. (BoundedReLu, Linear, TanH).
     float              m_B;

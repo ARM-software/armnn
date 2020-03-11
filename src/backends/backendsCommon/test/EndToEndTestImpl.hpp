@@ -107,7 +107,7 @@ inline bool ConstantUsageUint8Test(const std::vector<BackendId>& backends)
 
 // Utility template for comparing tensor elements
 template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
-bool Compare(T a, T b)
+bool Compare(T a, T b, float tolerance = 0.000001f)
 {
     if (ArmnnType == DataType::Boolean)
     {
@@ -119,7 +119,6 @@ bool Compare(T a, T b)
 
     // NOTE: All other types can be cast to float and compared with
     // a certain level of tolerance
-    constexpr float tolerance = 0.000001f;
     return std::fabs(static_cast<float>(a) - static_cast<float>(b)) <= tolerance;
 }
 
@@ -143,7 +142,8 @@ template<DataType ArmnnIType, DataType ArmnnOType,
 void EndToEndLayerTestImpl(INetworkPtr network,
                            const std::map<int, std::vector<TInput>>& inputTensorData,
                            const std::map<int, std::vector<TOutput>>& expectedOutputData,
-                           std::vector<BackendId> backends)
+                           std::vector<BackendId> backends,
+                           float tolerance = 0.000001f)
 {
     // Create runtime in which test will run
     IRuntime::CreationOptions options;
@@ -184,7 +184,7 @@ void EndToEndLayerTestImpl(INetworkPtr network,
         std::vector<TOutput> out = outputStorage.at(it.first);
         for (unsigned int i = 0; i < out.size(); ++i)
         {
-            BOOST_CHECK(Compare<ArmnnOType>(it.second[i], out[i]) == true);
+            BOOST_CHECK(Compare<ArmnnOType>(it.second[i], out[i], tolerance) == true);
         }
     }
 }

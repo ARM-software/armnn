@@ -5,6 +5,7 @@
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 
+#include <backendsCommon/test/ActivationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ArgMinMaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/BatchToSpaceNdEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ComparisonEndToEndTestImpl.hpp>
@@ -548,6 +549,36 @@ BOOST_AUTO_TEST_CASE(RefConcatEndToEndDim3Test)
 BOOST_AUTO_TEST_CASE(RefConcatEndToEndDim3Uint8Test)
 {
     ConcatDim3EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefEluEndToEndTestFloat32)
+{
+    EluEndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefEluEndToEndTestFloat16)
+{
+    EluEndToEndTest<armnn::DataType::Float16>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefEluEndToEndTestBFloat16)
+{
+    EluEndToEndTest<armnn::DataType::BFloat16>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefEluEndToEndTestQAsymmS8)
+{
+    EluEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefEluEndToEndTestQAsymmU8)
+{
+    EluEndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefEluEndToEndTestQSymmS16)
+{
+    EluEndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefGatherFloatTest)

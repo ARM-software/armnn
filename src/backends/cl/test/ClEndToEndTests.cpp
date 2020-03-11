@@ -5,6 +5,7 @@
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 
+#include <backendsCommon/test/ActivationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ArgMinMaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ComparisonEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
@@ -129,6 +130,16 @@ BOOST_AUTO_TEST_CASE(DequantizeEndToEndOffsetTest)
 BOOST_AUTO_TEST_CASE(ClStridedSliceInvalidSliceEndToEndTest)
 {
     StridedSliceInvalidSliceEndToEndTest(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClEluEndToEndTestFloat32)
+{
+    EluEndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClEluEndToEndTestFloat16)
+{
+    EluEndToEndTest<armnn::DataType::Float16>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(ClGreaterSimpleEndToEndTest)

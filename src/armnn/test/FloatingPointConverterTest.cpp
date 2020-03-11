@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(TestConvertFloat32ToBFloat16)
     for (size_t i = 0; i < numFloats; i++)
     {
         armnn::BFloat16 actual = convertedBuffer[i];
-        BOOST_CHECK_EQUAL(expectedResult[i], actual.val());
+        BOOST_CHECK_EQUAL(expectedResult[i], actual.Val());
     }
 }
 

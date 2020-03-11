@@ -69,7 +69,7 @@ void FloatingPointConverter::ConvertBFloat16ToFloat32(const void* srcBFloat16Buf
 
     for (size_t i = 0; i < numElements; i++)
     {
-        dstFloat32Buffer[i] = bf16[i].toFloat32();
+        dstFloat32Buffer[i] = bf16[i].ToFloat32();
     }
 }
 

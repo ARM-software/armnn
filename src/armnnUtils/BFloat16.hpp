@@ -15,39 +15,39 @@ class BFloat16
 {
 public:
     BFloat16()
-    : value(0)
+    : m_Value(0)
     {}
 
     explicit BFloat16(uint16_t v)
-    : value(v)
+    : m_Value(v)
     {}
 
     explicit BFloat16(float v)
     {
-        value = float32ToBFloat16(v).val();
+        m_Value = Float32ToBFloat16(v).Val();
     }
 
     BFloat16& operator=(float v)
     {
-        value = float32ToBFloat16(v).val();
+        m_Value = Float32ToBFloat16(v).Val();
         return *this;
     }
 
     bool operator==(const BFloat16& r) const
     {
-        return value == r.val();
+        return m_Value == r.Val();
     }
 
     bool operator==(const float& r) const
     {
-        return toFloat32() == r;
+        return ToFloat32() == r;
     }
 
-    static BFloat16 float32ToBFloat16(const float v)
+    static BFloat16 Float32ToBFloat16(const float v)
     {
         if (std::isnan(v))
         {
-            return nan();
+            return Nan();
         }
         else
         {
@@ -78,43 +78,43 @@ public:
         }
     }
 
-    float toFloat32() const
+    float ToFloat32() const
     {
-        const uint32_t u32 = static_cast<const uint32_t>(value << 16u);
+        const uint32_t u32 = static_cast<const uint32_t>(m_Value << 16u);
         const float* f32 = reinterpret_cast<const float*>(&u32);
         return *f32;
     }
 
-    uint16_t val() const
+    uint16_t Val() const
     {
-        return value;
+        return m_Value;
     }
 
-    static BFloat16 max()
+    static BFloat16 Max()
     {
         uint16_t max = 0x7F7F;
         return BFloat16(max);
     }
 
-    static BFloat16 nan()
+    static BFloat16 Nan()
     {
         uint16_t nan = 0x7FC0;
         return BFloat16(nan);
     }
 
-    static BFloat16 inf()
+    static BFloat16 Inf()
     {
         uint16_t infVal = 0x7F80;
         return BFloat16(infVal);
     }
 
 private:
-    uint16_t value;
+    uint16_t m_Value;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const BFloat16& b)
 {
-    os << b.toFloat32() << "(0x" << std::hex << b.val() << ")";
+    os << b.ToFloat32() << "(0x" << std::hex << b.Val() << ")";
     return os;
 }
 

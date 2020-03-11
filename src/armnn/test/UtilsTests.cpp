@@ -95,19 +95,19 @@ BOOST_AUTO_TEST_CASE(BFloatType)
     // Test BFloat16 type
     BOOST_CHECK_EQUAL(sizeof(a), 2);
     BOOST_CHECK_EQUAL(a, b);
-    BOOST_CHECK_EQUAL(a.val(), v);
+    BOOST_CHECK_EQUAL(a.Val(), v);
     BOOST_CHECK_EQUAL(a, 1.0f);
     BOOST_CHECK_EQUAL(zero, 0.0f);
 
     // Infinity
     float infFloat = std::numeric_limits<float>::infinity();
     armnn::BFloat16 infBF(infFloat);
-    BOOST_CHECK_EQUAL(infBF, armnn::BFloat16::inf());
+    BOOST_CHECK_EQUAL(infBF, armnn::BFloat16::Inf());
 
     // NaN
     float nan = std::numeric_limits<float>::quiet_NaN();
     armnn::BFloat16 nanBF(nan);
-    BOOST_CHECK_EQUAL(nanBF, armnn::BFloat16::nan());
+    BOOST_CHECK_EQUAL(nanBF, armnn::BFloat16::Nan());
 
     // Test utility function returns correct type.
     using ResolvedType = armnn::ResolveType<armnn::DataType::BFloat16>;
@@ -124,49 +124,49 @@ BOOST_AUTO_TEST_CASE(BFloatType)
 BOOST_AUTO_TEST_CASE(Float32ToBFloat16Test)
 {
     // LSB = 0, R = 0 -> round down
-    armnn::BFloat16 roundDown0 = armnn::BFloat16::float32ToBFloat16(1.704735E38f); // 0x7F004000
-    BOOST_CHECK_EQUAL(roundDown0.val(), 0x7F00);
+    armnn::BFloat16 roundDown0 = armnn::BFloat16::Float32ToBFloat16(1.704735E38f); // 0x7F004000
+    BOOST_CHECK_EQUAL(roundDown0.Val(), 0x7F00);
     // LSB = 1, R = 0 -> round down
-    armnn::BFloat16 roundDown1 = armnn::BFloat16::float32ToBFloat16(9.18355E-41f); // 0x00010000
-    BOOST_CHECK_EQUAL(roundDown1.val(), 0x0001);
+    armnn::BFloat16 roundDown1 = armnn::BFloat16::Float32ToBFloat16(9.18355E-41f); // 0x00010000
+    BOOST_CHECK_EQUAL(roundDown1.Val(), 0x0001);
     // LSB = 0, R = 1 all 0 -> round down
-    armnn::BFloat16 roundDown2 = armnn::BFloat16::float32ToBFloat16(1.14794E-40f); // 0x00014000
-    BOOST_CHECK_EQUAL(roundDown2.val(), 0x0001);
+    armnn::BFloat16 roundDown2 = armnn::BFloat16::Float32ToBFloat16(1.14794E-40f); // 0x00014000
+    BOOST_CHECK_EQUAL(roundDown2.Val(), 0x0001);
     // LSB = 1, R = 1 -> round up
-    armnn::BFloat16 roundUp = armnn::BFloat16::float32ToBFloat16(-2.0234377f); // 0xC0018001
-    BOOST_CHECK_EQUAL(roundUp.val(), 0xC002);
+    armnn::BFloat16 roundUp = armnn::BFloat16::Float32ToBFloat16(-2.0234377f); // 0xC0018001
+    BOOST_CHECK_EQUAL(roundUp.Val(), 0xC002);
     // LSB = 0, R = 1 -> round up
-    armnn::BFloat16 roundUp1 = armnn::BFloat16::float32ToBFloat16(4.843037E-35f); // 0x0680C000
-    BOOST_CHECK_EQUAL(roundUp1.val(), 0x0681);
+    armnn::BFloat16 roundUp1 = armnn::BFloat16::Float32ToBFloat16(4.843037E-35f); // 0x0680C000
+    BOOST_CHECK_EQUAL(roundUp1.Val(), 0x0681);
     // Max positive value -> infinity
-    armnn::BFloat16 maxPositive = armnn::BFloat16::float32ToBFloat16(3.4028235E38f); // 0x7F7FFFFF
-    BOOST_CHECK_EQUAL(maxPositive, armnn::BFloat16::inf());
+    armnn::BFloat16 maxPositive = armnn::BFloat16::Float32ToBFloat16(3.4028235E38f); // 0x7F7FFFFF
+    BOOST_CHECK_EQUAL(maxPositive, armnn::BFloat16::Inf());
     // Max negative value -> -infinity
-    armnn::BFloat16 maxNeg = armnn::BFloat16::float32ToBFloat16(-3.4028235E38f); // 0xFF7FFFFF
-    BOOST_CHECK_EQUAL(maxNeg.val(), 0xFF80);
+    armnn::BFloat16 maxNeg = armnn::BFloat16::Float32ToBFloat16(-3.4028235E38f); // 0xFF7FFFFF
+    BOOST_CHECK_EQUAL(maxNeg.Val(), 0xFF80);
     // Min positive value
-    armnn::BFloat16 minPositive = armnn::BFloat16::float32ToBFloat16(1.1754942E-38f); // 0x007FFFFF
-    BOOST_CHECK_EQUAL(minPositive.val(), 0x0080);
+    armnn::BFloat16 minPositive = armnn::BFloat16::Float32ToBFloat16(1.1754942E-38f); // 0x007FFFFF
+    BOOST_CHECK_EQUAL(minPositive.Val(), 0x0080);
     // Min negative value
-    armnn::BFloat16 minNeg = armnn::BFloat16::float32ToBFloat16(-1.1754942E-38f); // 0x807FFFFF
-    BOOST_CHECK_EQUAL(minNeg.val(), 0x8080);
+    armnn::BFloat16 minNeg = armnn::BFloat16::Float32ToBFloat16(-1.1754942E-38f); // 0x807FFFFF
+    BOOST_CHECK_EQUAL(minNeg.Val(), 0x8080);
 }
 
 BOOST_AUTO_TEST_CASE(BFloat16ToFloat32Test)
 {
     armnn::BFloat16 bf0(1.5f);
-    BOOST_CHECK_EQUAL(bf0.toFloat32(), 1.5f);
+    BOOST_CHECK_EQUAL(bf0.ToFloat32(), 1.5f);
     armnn::BFloat16 bf1(-5.525308E-25f);
-    BOOST_CHECK_EQUAL(bf1.toFloat32(), -5.525308E-25f);
+    BOOST_CHECK_EQUAL(bf1.ToFloat32(), -5.525308E-25f);
     armnn::BFloat16 bf2(-2.0625f);
-    BOOST_CHECK_EQUAL(bf2.toFloat32(), -2.0625f);
+    BOOST_CHECK_EQUAL(bf2.ToFloat32(), -2.0625f);
     uint16_t v = 32639;
     armnn::BFloat16 bf3(v);
-    BOOST_CHECK_EQUAL(bf3.toFloat32(), 3.3895314E38f);
+    BOOST_CHECK_EQUAL(bf3.ToFloat32(), 3.3895314E38f);
     // Infinity
-    BOOST_CHECK_EQUAL(armnn::BFloat16::inf().toFloat32(), std::numeric_limits<float>::infinity());
+    BOOST_CHECK_EQUAL(armnn::BFloat16::Inf().ToFloat32(), std::numeric_limits<float>::infinity());
     // NaN
-    BOOST_CHECK(std::isnan(armnn::BFloat16::nan().toFloat32()));
+    BOOST_CHECK(std::isnan(armnn::BFloat16::Nan().ToFloat32()));
 }
 
 BOOST_AUTO_TEST_CASE(GraphTopologicalSortSimpleTest)

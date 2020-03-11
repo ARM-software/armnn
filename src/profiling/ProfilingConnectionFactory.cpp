@@ -18,6 +18,12 @@ namespace profiling
 std::unique_ptr<IProfilingConnection> ProfilingConnectionFactory::GetProfilingConnection(
     const Runtime::CreationOptions::ExternalProfilingOptions& options) const
 {
+    // Before proceed to create the IProfilingConnection, check if the file format is supported
+    if (!(options.m_FileFormat == "binary"))
+    {
+        throw armnn::UnimplementedException("Unsupported profiling file format, only binary is supported");
+    }
+
     // We can create 3 different types of IProfilingConnection.
     // 1: If no relevant options are specified then a SocketProfilingConnection is returned.
     // 2: If both incoming and outgoing capture files are specified then a SocketProfilingConnection decorated by a

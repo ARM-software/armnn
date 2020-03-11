@@ -33,6 +33,7 @@ int main(int argc, const char* argv[])
     std::string outgoingCaptureFile;
     std::string incomingCaptureFile;
     uint32_t counterCapturePeriod;
+    std::string fileFormat;
 
     double thresholdTime = 0.0;
 
@@ -114,6 +115,8 @@ int main(int argc, const char* argv[])
              "If enabled then the 'file-only' test mode of external profiling will be enabled")
             ("counter-capture-period,u", po::value<uint32_t>(&counterCapturePeriod)->default_value(150u),
              "If profiling is enabled in 'file-only' mode this is the capture period that will be used in the test")
+            ("file-format,ff", po::value(&fileFormat),
+             "If profiling is enabled specifies the output file format")
             ("parse-unsupported", po::bool_switch()->default_value(false),
                 "Add unsupported operators as stand-in layers (where supported by parser)");
     }
@@ -187,13 +190,14 @@ int main(int argc, const char* argv[])
 
         // Create runtime
         armnn::IRuntime::CreationOptions options;
-        options.m_EnableGpuProfiling = enableProfiling;
-        options.m_DynamicBackendsPath = dynamicBackendsPath;
-        options.m_ProfilingOptions.m_EnableProfiling = enableExternalProfiling;
+        options.m_EnableGpuProfiling                     = enableProfiling;
+        options.m_DynamicBackendsPath                    = dynamicBackendsPath;
+        options.m_ProfilingOptions.m_EnableProfiling     = enableExternalProfiling;
         options.m_ProfilingOptions.m_IncomingCaptureFile = incomingCaptureFile;
         options.m_ProfilingOptions.m_OutgoingCaptureFile = outgoingCaptureFile;
-        options.m_ProfilingOptions.m_FileOnly = fileOnlyExternalProfiling;
-        options.m_ProfilingOptions.m_CapturePeriod = counterCapturePeriod;
+        options.m_ProfilingOptions.m_FileOnly            = fileOnlyExternalProfiling;
+        options.m_ProfilingOptions.m_CapturePeriod       = counterCapturePeriod;
+        options.m_ProfilingOptions.m_FileFormat          = fileFormat;
         std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(options));
 
         const std::string executableName("ExecuteNetwork");
@@ -271,6 +275,7 @@ int main(int argc, const char* argv[])
         options.m_ProfilingOptions.m_OutgoingCaptureFile = outgoingCaptureFile;
         options.m_ProfilingOptions.m_FileOnly            = fileOnlyExternalProfiling;
         options.m_ProfilingOptions.m_CapturePeriod       = counterCapturePeriod;
+        options.m_ProfilingOptions.m_FileFormat          = fileFormat;
         std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(options));
 
         return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,

@@ -3448,4 +3448,41 @@ BOOST_AUTO_TEST_CASE(CheckRegisterCounters)
     BOOST_TEST(93 == readValue);
 }
 
+BOOST_AUTO_TEST_CASE(CheckFileFormat) {
+    // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
+    LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
+
+    // Create profiling options.
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_EnableProfiling = true;
+    // Check the default value set to binary
+    BOOST_CHECK(options.m_FileFormat == "binary");
+
+    // Change file format to an unsupported value
+    options.m_FileFormat = "json";
+    // Enable the profiling service
+    armnn::profiling::ProfilingService profilingService;
+    profilingService.ResetExternalProfilingOptions(options, true);
+    // Start the command handler and the send thread
+    profilingService.Update();
+    BOOST_CHECK(profilingService.GetCurrentState()==ProfilingState::NotConnected);
+
+    // Redirect the output to a local stream so that we can parse the warning message
+    std::stringstream ss;
+    StreamRedirector streamRedirector(std::cout, ss.rdbuf());
+
+    // When Update is called and the current state is ProfilingState::NotConnected
+    // an exception will be raised from GetProfilingConnection and displayed as warning in the output local stream
+    profilingService.Update();
+
+    streamRedirector.CancelRedirect();
+
+    // Check that the expected error has occurred and logged to the standard output
+    if (!boost::contains(ss.str(), "Unsupported profiling file format, only binary is supported"))
+    {
+        std::cout << ss.str();
+        BOOST_FAIL("Expected string not found.");
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -420,68 +420,76 @@ int main(int argc, const char* argv[])
 
     ArmnnConverter converter(modelPath, inputNames, inputTensorShapes, outputNames, outputPath, isModelBinary);
 
-    if (modelFormat.find("caffe") != std::string::npos)
+    try
     {
+        if (modelFormat.find("caffe") != std::string::npos)
+        {
 #if defined(ARMNN_CAFFE_PARSER)
-        if (!converter.CreateNetwork<armnnCaffeParser::ICaffeParser>())
-        {
-            ARMNN_LOG(fatal) << "Failed to load model from file";
-            return EXIT_FAILURE;
-        }
+            if (!converter.CreateNetwork<armnnCaffeParser::ICaffeParser>())
+            {
+                ARMNN_LOG(fatal) << "Failed to load model from file";
+                return EXIT_FAILURE;
+            }
 #else
-        ARMNN_LOG(fatal) << "Not built with Caffe parser support.";
-        return EXIT_FAILURE;
+            ARMNN_LOG(fatal) << "Not built with Caffe parser support.";
+            return EXIT_FAILURE;
 #endif
-    }
-    else if (modelFormat.find("onnx") != std::string::npos)
-    {
+        }
+        else if (modelFormat.find("onnx") != std::string::npos)
+        {
 #if defined(ARMNN_ONNX_PARSER)
-        if (!converter.CreateNetwork<armnnOnnxParser::IOnnxParser>())
-        {
-            ARMNN_LOG(fatal) << "Failed to load model from file";
-            return EXIT_FAILURE;
-        }
+            if (!converter.CreateNetwork<armnnOnnxParser::IOnnxParser>())
+            {
+                ARMNN_LOG(fatal) << "Failed to load model from file";
+                return EXIT_FAILURE;
+            }
 #else
-        ARMNN_LOG(fatal) << "Not built with Onnx parser support.";
-        return EXIT_FAILURE;
+            ARMNN_LOG(fatal) << "Not built with Onnx parser support.";
+            return EXIT_FAILURE;
 #endif
-    }
-    else if (modelFormat.find("tensorflow") != std::string::npos)
-    {
+        }
+        else if (modelFormat.find("tensorflow") != std::string::npos)
+        {
 #if defined(ARMNN_TF_PARSER)
-        if (!converter.CreateNetwork<armnnTfParser::ITfParser>())
-        {
-            ARMNN_LOG(fatal) << "Failed to load model from file";
-            return EXIT_FAILURE;
-        }
+            if (!converter.CreateNetwork<armnnTfParser::ITfParser>())
+            {
+                ARMNN_LOG(fatal) << "Failed to load model from file";
+                return EXIT_FAILURE;
+            }
 #else
-        ARMNN_LOG(fatal) << "Not built with Tensorflow parser support.";
-        return EXIT_FAILURE;
+            ARMNN_LOG(fatal) << "Not built with Tensorflow parser support.";
+            return EXIT_FAILURE;
 #endif
-    }
-    else if (modelFormat.find("tflite") != std::string::npos)
-    {
+        }
+        else if (modelFormat.find("tflite") != std::string::npos)
+        {
 #if defined(ARMNN_TF_LITE_PARSER)
-        if (!isModelBinary)
-        {
-            ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat << "'. Only 'binary' format supported \
-              for tflite files";
-            return EXIT_FAILURE;
-        }
+            if (!isModelBinary)
+            {
+                ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat << "'. Only 'binary' format supported \
+                  for tflite files";
+                return EXIT_FAILURE;
+            }
 
-        if (!converter.CreateNetwork<armnnTfLiteParser::ITfLiteParser>())
+            if (!converter.CreateNetwork<armnnTfLiteParser::ITfLiteParser>())
+            {
+                ARMNN_LOG(fatal) << "Failed to load model from file";
+                return EXIT_FAILURE;
+            }
+#else
+            ARMNN_LOG(fatal) << "Not built with TfLite parser support.";
+            return EXIT_FAILURE;
+#endif
+        }
+        else
         {
-            ARMNN_LOG(fatal) << "Failed to load model from file";
+            ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat << "'";
             return EXIT_FAILURE;
         }
-#else
-        ARMNN_LOG(fatal) << "Not built with TfLite parser support.";
-        return EXIT_FAILURE;
-#endif
     }
-    else
+    catch(armnn::Exception& e)
     {
-        ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat << "'";
+        ARMNN_LOG(fatal) << "Failed to load model from file: " << e.what();
         return EXIT_FAILURE;
     }
 

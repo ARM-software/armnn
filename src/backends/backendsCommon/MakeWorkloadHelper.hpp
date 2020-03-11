@@ -52,6 +52,7 @@ std::unique_ptr<IWorkload> MakeWorkloadHelper(const QueueDescriptorType& descrip
 
     switch (dataType)
     {
+
         case DataType::Float16:
             return MakeWorkloadForType<Float16Workload>::Func(descriptor, info, std::forward<Args>(args)...);
         case DataType::Float32:
@@ -65,6 +66,7 @@ std::unique_ptr<IWorkload> MakeWorkloadHelper(const QueueDescriptorType& descrip
             return MakeWorkloadForType<Int32Workload>::Func(descriptor, info, std::forward<Args>(args)...);
         case DataType::Boolean:
             return MakeWorkloadForType<BooleanWorkload>::Func(descriptor, info, std::forward<Args>(args)...);
+        case DataType::BFloat16:
         case DataType::QSymmS16:
             return nullptr;
         default:

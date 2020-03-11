@@ -28,6 +28,7 @@ void RefPermuteWorkload<DataType>::Execute() const
                         src->Map(), dst->Map(), sizeof(T));
 }
 
+template class RefPermuteWorkload<DataType::BFloat16>;
 template class RefPermuteWorkload<DataType::Float16>;
 template class RefPermuteWorkload<DataType::Float32>;
 template class RefPermuteWorkload<DataType::QAsymmU8>;

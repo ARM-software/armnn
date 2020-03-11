@@ -325,6 +325,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
 
             TensorInfo biasInfo;
             const TensorInfo * biasInfoPtr = nullptr;
+            static const TensorInfo dummyBFloat16Bias(TensorShape({1,1,1,1}), DataType::BFloat16);
             static const TensorInfo dummyFloat16Bias(TensorShape({1,1,1,1}), DataType::Float16);
             static const TensorInfo dummyFloat32Bias(TensorShape({1,1,1,1}), DataType::Float32);
             static const TensorInfo dummyQA8Bias(TensorShape({1,1,1,1}), DataType::Signed32);
@@ -341,6 +342,11 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                 // If biases are not enabled pass a dummy tensorinfo for the validation
                 switch(input.GetDataType())
                 {
+                    case DataType::BFloat16:
+                    {
+                        biasInfoPtr = &dummyBFloat16Bias;
+                        break;
+                    }
                     case DataType::Float16:
                     {
                         biasInfoPtr = &dummyFloat16Bias;

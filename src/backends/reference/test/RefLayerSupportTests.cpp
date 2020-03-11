@@ -48,6 +48,12 @@ BOOST_AUTO_TEST_CASE(IsLayerSupportedReferenceAddition)
     BOOST_CHECK(supportChecker.IsAdditionSupported(in0, in1, out, reasonNotSupported));
 }
 
+BOOST_AUTO_TEST_CASE(IsLayerSupportedBFloat16Reference)
+{
+    armnn::RefWorkloadFactory factory;
+    IsLayerSupportedTests<armnn::RefWorkloadFactory, armnn::DataType::BFloat16>(&factory);
+}
+
 BOOST_AUTO_TEST_CASE(IsLayerSupportedFloat16Reference)
 {
     armnn::RefWorkloadFactory factory;

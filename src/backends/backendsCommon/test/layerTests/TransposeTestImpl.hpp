@@ -72,27 +72,31 @@ LayerTestResult<T, 4> SimpleTransposeTest(
     outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
+    float qScale = 0.5f;
+    int32_t qOffset = 5;
     if(armnn::IsQuantizedType<T>())
     {
-        inputTensorInfo.SetQuantizationScale(0.5f);
-        inputTensorInfo.SetQuantizationOffset(5);
-        outputTensorInfo.SetQuantizationScale(0.5f);
-        outputTensorInfo.SetQuantizationOffset(5);
+        inputTensorInfo.SetQuantizationScale(qScale);
+        inputTensorInfo.SetQuantizationOffset(qOffset);
+        outputTensorInfo.SetQuantizationScale(qScale);
+        outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    std::vector<T> input = std::vector<T>(
+    std::vector<T> input = armnnUtils::QuantizedVector<T>(
     {
         1, 2,
         3, 4,
         5, 6,
         7, 8
-    });
+    },
+    qScale, qOffset);
 
-    std::vector<T> outputExpected = std::vector<T>(
+    std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>(
     {
         1, 5, 2, 6,
         3, 7, 4, 8
-    });
+    },
+    qScale, qOffset);
 
     return SimpleTransposeTestImpl<T>(workloadFactory, memoryManager,
                                     descriptor, inputTensorInfo,
@@ -117,28 +121,32 @@ LayerTestResult<T, 4> TransposeValueSet1Test(
     outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
+    float qScale = 0.5f;
+    int32_t qOffset = 5;
     if(armnn::IsQuantizedType<T>())
     {
-        inputTensorInfo.SetQuantizationScale(0.5f);
-        inputTensorInfo.SetQuantizationOffset(5);
-        outputTensorInfo.SetQuantizationScale(0.5f);
-        outputTensorInfo.SetQuantizationOffset(5);
+        inputTensorInfo.SetQuantizationScale(qScale);
+        inputTensorInfo.SetQuantizationOffset(qOffset);
+        outputTensorInfo.SetQuantizationScale(qScale);
+        outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    std::vector<T> input = std::vector<T>(
+    std::vector<T> input = armnnUtils::QuantizedVector<T>(
     {
          1,  2,  3,
         11, 12, 13,
         21, 22, 23,
         31, 32, 33
-    });
+    },
+    qScale, qOffset);
 
-    std::vector<T> outputExpected = std::vector<T>(
+    std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>(
     {
         1, 11, 21, 31,
         2, 12, 22, 32,
         3, 13, 23, 33
-    });
+    },
+    qScale, qOffset);
 
     return SimpleTransposeTestImpl<T>(workloadFactory, memoryManager,
                                     descriptor, inputTensorInfo,
@@ -163,28 +171,32 @@ LayerTestResult<T, 4> TransposeValueSet2Test(
     outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
+    float qScale = 0.5f;
+    int32_t qOffset = 5;
     if(armnn::IsQuantizedType<T>())
     {
-        inputTensorInfo.SetQuantizationScale(0.5f);
-        inputTensorInfo.SetQuantizationOffset(5);
-        outputTensorInfo.SetQuantizationScale(0.5f);
-        outputTensorInfo.SetQuantizationOffset(5);
+        inputTensorInfo.SetQuantizationScale(qScale);
+        inputTensorInfo.SetQuantizationOffset(qOffset);
+        outputTensorInfo.SetQuantizationScale(qScale);
+        outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    std::vector<T> input = std::vector<T>(
+    std::vector<T> input = armnnUtils::QuantizedVector<T>(
     {
         1, 11, 21, 31,
         2, 12, 22, 32,
         3, 13, 23, 33
-    });
+    },
+    qScale, qOffset);
 
-    std::vector<T> outputExpected = std::vector<T>(
+    std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>(
     {
          1,  2,  3,
         11, 12, 13,
         21, 22, 23,
         31, 32, 33,
-    });
+    },
+    qScale, qOffset);
 
     return SimpleTransposeTestImpl<T>(workloadFactory, memoryManager,
                                     descriptor, inputTensorInfo,
@@ -209,15 +221,17 @@ LayerTestResult<T, 4> TransposeValueSet3Test(
     outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
+    float qScale = 0.5f;
+    int32_t qOffset = 5;
     if(armnn::IsQuantizedType<T>())
     {
-        inputTensorInfo.SetQuantizationScale(0.5f);
-        inputTensorInfo.SetQuantizationOffset(5);
-        outputTensorInfo.SetQuantizationScale(0.5f);
-        outputTensorInfo.SetQuantizationOffset(5);
+        inputTensorInfo.SetQuantizationScale(qScale);
+        inputTensorInfo.SetQuantizationOffset(qOffset);
+        outputTensorInfo.SetQuantizationScale(qScale);
+        outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    std::vector<T> input = std::vector<T>(
+    std::vector<T> input = armnnUtils::QuantizedVector<T>(
     {
          1,  2,  3,
         11, 12, 13,
@@ -225,14 +239,16 @@ LayerTestResult<T, 4> TransposeValueSet3Test(
         31, 32, 33,
         41, 42, 43,
         51, 52, 53
-    });
+    },
+    qScale, qOffset);
 
-    std::vector<T> outputExpected = std::vector<T>(
+    std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>(
     {
         1, 11, 21, 31, 41, 51,
         2, 12, 22, 32, 42, 52,
         3, 13, 23, 33, 43, 53
-    });
+    },
+    qScale, qOffset);
 
     return SimpleTransposeTestImpl<T>(workloadFactory, memoryManager,
                                       descriptor, inputTensorInfo,

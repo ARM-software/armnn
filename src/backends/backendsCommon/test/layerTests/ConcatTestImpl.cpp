@@ -2342,6 +2342,13 @@ LayerTestResult<Half, 3> ConcatFloat16Test(
     return Concat3dDim1TestImpl<DataType::Float16>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
+LayerTestResult<BFloat16, 3> ConcatBFloat16Test(
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Concat3dDim1TestImpl<DataType::BFloat16>(workloadFactory, memoryManager, 0.0f, 0);
+}
+
 LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
     IWorkloadFactory& workloadFactory,
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)

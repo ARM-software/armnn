@@ -27,6 +27,7 @@ void RefTransposeWorkload<DataType>::Execute() const
     armnnUtils::Transpose(GetTensorInfo(src).GetShape(), mappings, src->Map(), dst->Map(), sizeof(T));
 }
 
+template class RefTransposeWorkload<DataType::BFloat16>;
 template class RefTransposeWorkload<DataType::Float16>;
 template class RefTransposeWorkload<DataType::Float32>;
 template class RefTransposeWorkload<DataType::QAsymmU8>;

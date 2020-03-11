@@ -27,6 +27,17 @@ public:
         m_Value = Float32ToBFloat16(v).Val();
     }
 
+    operator float() const
+    {
+        return ToFloat32();
+    }
+
+    BFloat16& operator=(const BFloat16& other)
+    {
+        m_Value = other.Val();
+        return *this;
+    }
+
     BFloat16& operator=(float v)
     {
         m_Value = Float32ToBFloat16(v).Val();
@@ -36,11 +47,6 @@ public:
     bool operator==(const BFloat16& r) const
     {
         return m_Value == r.Val();
-    }
-
-    bool operator==(const float& r) const
-    {
-        return ToFloat32() == r;
     }
 
     static BFloat16 Float32ToBFloat16(const float v)

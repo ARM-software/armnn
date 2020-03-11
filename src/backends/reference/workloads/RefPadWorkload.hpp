@@ -30,6 +30,7 @@ public:
     void Execute() const override;
 };
 
+using RefPadBFloat16Workload = RefPadWorkload<DataType::BFloat16>;
 using RefPadFloat32Workload = RefPadWorkload<DataType::Float32>;
 using RefPadFloat16Workload = RefPadWorkload<DataType::Float16>;
 using RefPadQAsymm8Workload = RefPadWorkload<DataType::QAsymmU8>;

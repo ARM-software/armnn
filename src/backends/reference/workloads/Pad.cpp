@@ -152,6 +152,13 @@ void Pad(const TensorInfo& inputInfo,
     }
 }
 
+template void Pad<BFloat16>(const TensorInfo& inputInfo,
+                            const TensorInfo& outputInfo,
+                            std::vector<std::pair<unsigned int, unsigned int>> m_PadList,
+                            const BFloat16* inputData,
+                            BFloat16* outData,
+                            const float padValue);
+
 template void Pad<float>(const TensorInfo& inputInfo,
                          const TensorInfo& outputInfo,
                          std::vector<std::pair<unsigned int, unsigned int>> m_PadList,

@@ -27,6 +27,7 @@ public:
     void Execute() const override;
 };
 
+using RefTransposeBFloat16Workload = RefTransposeWorkload<DataType::BFloat16>;
 using RefTransposeFloat16Workload = RefTransposeWorkload<DataType::Float16>;
 using RefTransposeFloat32Workload = RefTransposeWorkload<DataType::Float32>;
 using RefTransposeQAsymm8Workload = RefTransposeWorkload<DataType::QAsymmU8>;

@@ -95,6 +95,7 @@ inline armnn::Optional<armnn::DataType> GetBiasTypeFromWeightsType(armnn::Option
 
     switch(weightsType.value())
     {
+        case armnn::DataType::BFloat16:
         case armnn::DataType::Float16:
         case armnn::DataType::Float32:
             return weightsType;

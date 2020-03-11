@@ -33,6 +33,7 @@ void RefPadWorkload<DataType>::Execute() const
     Pad(inputInfo, outputInfo, m_Data.m_Parameters.m_PadList, inputData, outputData, m_Data.m_Parameters.m_PadValue);
 }
 
+template class RefPadWorkload<DataType::BFloat16>;
 template class RefPadWorkload<DataType::Float32>;
 template class RefPadWorkload<DataType::Float16>;
 template class RefPadWorkload<DataType::QAsymmU8>;

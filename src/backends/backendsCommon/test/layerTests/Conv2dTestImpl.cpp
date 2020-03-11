@@ -2791,6 +2791,12 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
 //
 // Explicit template specializations
 //
+template LayerTestResult<armnn::ResolveType<armnn::DataType::BFloat16>, 4>
+Convolution2d3x3Dilation3x3Test<armnn::DataType::BFloat16, armnn::DataType::BFloat16>(
+    armnn::IWorkloadFactory&,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+    bool,
+    armnn::DataLayout);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
 Convolution2d3x3Dilation3x3Test<armnn::DataType::Float32, armnn::DataType::Float32>(
@@ -2820,6 +2826,13 @@ Convolution2d2x3x3Dilation3x3Test<armnn::DataType::Float32, armnn::DataType::Flo
     bool,
     armnn::DataLayout);
 
+template LayerTestResult<armnn::ResolveType<armnn::DataType::BFloat16>, 4>
+Convolution2d2x3x3Dilation3x3Test<armnn::DataType::BFloat16, armnn::DataType::BFloat16>(
+    armnn::IWorkloadFactory&,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+    bool,
+    armnn::DataLayout);
+
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
 Convolution2d2x3x3Dilation3x3Test<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
     armnn::IWorkloadFactory&,
@@ -2833,6 +2846,13 @@ Convolution2d2x3x3Dilation3x3Test<armnn::DataType::QSymmS16, armnn::DataType::Si
     const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
     bool,
     armnn::DataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::BFloat16>, 4>
+Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<armnn::DataType::BFloat16, armnn::DataType::BFloat16>(
+    armnn::IWorkloadFactory &workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr &memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
 Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<armnn::DataType::Float32, armnn::DataType::Float32>(
@@ -2855,6 +2875,13 @@ Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<armnn::DataType::QSymmS16, ar
     bool biasEnabled,
     const armnn::DataLayout layout);
 
+template LayerTestResult<armnn::ResolveType<armnn::DataType::BFloat16>, 4>
+DepthwiseConvolution2d3x3Dilation3x3Test<armnn::DataType::BFloat16, armnn::DataType::BFloat16>(
+        armnn::IWorkloadFactory&,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+        bool,
+        armnn::DataLayout);
+
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
 DepthwiseConvolution2d3x3Dilation3x3Test<armnn::DataType::Float32, armnn::DataType::Float32>(
         armnn::IWorkloadFactory&,
@@ -2871,6 +2898,13 @@ DepthwiseConvolution2d3x3Dilation3x3Test<armnn::DataType::QAsymmU8, armnn::DataT
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
 DepthwiseConvolution2d3x3Dilation3x3Test<armnn::DataType::QSymmS16, armnn::DataType::Signed32>(
+        armnn::IWorkloadFactory&,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+        bool,
+        armnn::DataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::BFloat16>, 4>
+DepthwiseConvolution2d2x3x3Dilation3x3Test<armnn::DataType::BFloat16, armnn::DataType::BFloat16>(
         armnn::IWorkloadFactory&,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
         bool,
@@ -2897,8 +2931,22 @@ DepthwiseConvolution2d2x3x3Dilation3x3Test<armnn::DataType::QSymmS16, armnn::Dat
         bool,
         armnn::DataLayout);
 
+template LayerTestResult<armnn::ResolveType<armnn::DataType::BFloat16>, 4>
+DepthwiseConvolution2dMult4Test<armnn::DataType::BFloat16, armnn::DataType::BFloat16>(
+        armnn::IWorkloadFactory &workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr &memoryManager,
+        bool biasEnabled,
+        const armnn::DataLayout layout);
+
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
 DepthwiseConvolution2dMult4Test<armnn::DataType::Float32, armnn::DataType::Float32>(
+        armnn::IWorkloadFactory &workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr &memoryManager,
+        bool biasEnabled,
+        const armnn::DataLayout layout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::BFloat16>, 4>
+DepthwiseConvolution2dMult2Test<armnn::DataType::BFloat16, armnn::DataType::BFloat16>(
         armnn::IWorkloadFactory &workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr &memoryManager,
         bool biasEnabled,

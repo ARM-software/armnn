@@ -8,6 +8,7 @@
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/TypesUtils.hpp>
 
+#include <BFloat16.hpp>
 #include <Half.hpp>
 
 #include <initializer_list>
@@ -59,6 +60,22 @@ struct SelectiveQuantizer<armnn::Half, false>
     }
 
     static float Dequantize(armnn::Half value, float scale, int32_t offset)
+    {
+        armnn::IgnoreUnused(scale, offset);
+        return value;
+    }
+};
+
+template<>
+struct SelectiveQuantizer<armnn::BFloat16, false>
+{
+    static armnn::BFloat16 Quantize(float value, float scale, int32_t offset)
+    {
+        armnn::IgnoreUnused(scale, offset);
+        return armnn::BFloat16(value);
+    }
+
+    static float Dequantize(armnn::BFloat16 value, float scale, int32_t offset)
     {
         armnn::IgnoreUnused(scale, offset);
         return value;

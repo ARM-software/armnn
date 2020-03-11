@@ -70,6 +70,14 @@ ARMNN_AUTO_TEST_CASE(SimpleConvolution2dAsymmetricPaddingNhwc,
 
 ARMNN_AUTO_TEST_CASE(SimpleConvolution2dSquareNhwc, SimpleConvolution2d3x3NhwcTest, false)
 
+ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3BFloat16,
+                     Convolution2d3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
+                     false,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3NhwcBFloat16,
+                     Convolution2d3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
+                     false,
+                     DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3,
                      Convolution2d3x3Dilation3x3Test<DataType::Float32, DataType::Float32>,
                      false,
@@ -95,6 +103,14 @@ ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3NhwcInt16,
                      false,
                      DataLayout::NHWC)
 
+ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3BFloat16,
+                     Convolution2d2x3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
+                     false,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3NhwcBFloat16,
+                     Convolution2d2x3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
+                     false,
+                     DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3,
                      Convolution2d2x3x3Dilation3x3Test<DataType::Float32, DataType::Float32>,
                      false,
@@ -120,6 +136,14 @@ ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3NhwcInt16,
                      false,
                      DataLayout::NHWC)
 
+ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3BFloat16,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::BFloat16, DataType::BFloat16>,
+                     false,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3NhwcBFloat16,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::BFloat16, DataType::BFloat16>,
+                     false,
+                     DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3,
                      Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::Float32, DataType::Float32>,
                      false,
@@ -179,6 +203,14 @@ ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3Nhwc,
                      DepthwiseConvolution2d3x3Dilation3x3Test<DataType::Float32, DataType::Float32>,
                      false,
                      DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3BFloat16,
+                     DepthwiseConvolution2d3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
+                     false,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3NhwcBFloat16,
+                     DepthwiseConvolution2d3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
+                     false,
+                     DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3Uint8,
                      DepthwiseConvolution2d3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
@@ -204,6 +236,14 @@ ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3Nhwc,
                      DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::Float32, DataType::Float32>,
                      false,
                      DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3BFloat16,
+                     DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
+                     false,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3NhwcBFloat16,
+                     DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
+                     false,
+                     DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3Uint8,
                      DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
@@ -226,6 +266,14 @@ ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dMult4,
                      armnn::DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dMult2,
                      DepthwiseConvolution2dMult2Test<armnn::DataType::Float32, armnn::DataType::Float32>,
+                     false,
+                     armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dMult4BFloat16,
+                     DepthwiseConvolution2dMult4Test<armnn::DataType::BFloat16, armnn::DataType::BFloat16>,
+                     false,
+                     armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dMult2BFloat16,
+                     DepthwiseConvolution2dMult2Test<armnn::DataType::BFloat16, armnn::DataType::BFloat16>,
                      false,
                      armnn::DataLayout::NCHW)
 
@@ -496,6 +544,7 @@ ARMNN_AUTO_TEST_CASE(CopyViaSplitterInt16, CopyViaSplitterInt16Test)
 
 // Concat
 ARMNN_AUTO_TEST_CASE(SimpleConcat, ConcatTest)
+ARMNN_AUTO_TEST_CASE(ConcatBFloat16, ConcatBFloat16Test)
 ARMNN_AUTO_TEST_CASE(ConcatFloat16, ConcatFloat16Test)
 ARMNN_AUTO_TEST_CASE(ConcatUint8, ConcatUint8Test)
 ARMNN_AUTO_TEST_CASE(ConcatUint8DifferentQParams, ConcatUint8DifferentQParamsTest)
@@ -950,6 +999,11 @@ ARMNN_AUTO_TEST_CASE(LogSoftmaxFloat16_3, LogSoftmaxTest3<DataType::Float16>)
 ARMNN_AUTO_TEST_CASE(LogSoftmaxFloat16_4, LogSoftmaxTest4<DataType::Float16>)
 
 // Pad
+ARMNN_AUTO_TEST_CASE(PadBFloat162d, PadBFloat162dTest)
+ARMNN_AUTO_TEST_CASE(PadBFloat162dCustomPadding, PadBFloat162dCustomPaddingTest)
+ARMNN_AUTO_TEST_CASE(PadBFloat163d, PadBFloat163dTest)
+ARMNN_AUTO_TEST_CASE(PadBFloat164d, PadBFloat164dTest)
+
 ARMNN_AUTO_TEST_CASE(PadFloat322d, PadFloat322dTest)
 ARMNN_AUTO_TEST_CASE(PadFloat322dCustomPadding, PadFloat322dCustomPaddingTest)
 ARMNN_AUTO_TEST_CASE(PadFloat323d, PadFloat323dTest)
@@ -1040,6 +1094,10 @@ ARMNN_AUTO_TEST_CASE(Rsqrt2dQuantisedSymm16, Rsqrt2dTest<DataType::QSymmS16>)
 ARMNN_AUTO_TEST_CASE(Rsqrt3dQuantisedSymm16, Rsqrt3dTest<DataType::QSymmS16>)
 
 // Permute
+ARMNN_AUTO_TEST_CASE(SimplePermuteBFloat16, SimplePermuteTest<DataType::BFloat16>)
+ARMNN_AUTO_TEST_CASE(PermuteBFloat16ValueSet1Test, PermuteValueSet1Test<DataType::BFloat16>)
+ARMNN_AUTO_TEST_CASE(PermuteBFloat16ValueSet2Test, PermuteValueSet2Test<DataType::BFloat16>)
+ARMNN_AUTO_TEST_CASE(PermuteBFloat16ValueSet3Test, PermuteValueSet3Test<DataType::BFloat16>)
 ARMNN_AUTO_TEST_CASE(SimplePermuteFloat32, SimplePermuteTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet1Test, PermuteValueSet1Test<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet2Test, PermuteValueSet2Test<DataType::Float32>)
@@ -1465,6 +1523,10 @@ ARMNN_AUTO_TEST_CASE(Slice2dInt16, Slice2dInt16Test)
 ARMNN_AUTO_TEST_CASE(Slice1dInt16, Slice1dInt16Test)
 
 // Transpose
+ARMNN_AUTO_TEST_CASE(SimpleTransposeBFloat16, SimpleTransposeTest<DataType::BFloat16>)
+ARMNN_AUTO_TEST_CASE(TransposeBFloat16ValueSet1Test, TransposeValueSet1Test<DataType::BFloat16>)
+ARMNN_AUTO_TEST_CASE(TransposeBFloat16ValueSet2Test, TransposeValueSet2Test<DataType::BFloat16>)
+ARMNN_AUTO_TEST_CASE(TransposeBFloat16ValueSet3Test, TransposeValueSet3Test<DataType::BFloat16>)
 ARMNN_AUTO_TEST_CASE(SimpleTransposeFloat32, SimpleTransposeTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(TransposeFloat32ValueSet1Test, TransposeValueSet1Test<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(TransposeFloat32ValueSet2Test, TransposeValueSet2Test<DataType::Float32>)

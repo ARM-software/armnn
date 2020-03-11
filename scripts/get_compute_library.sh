@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="adb3291dda4e56de1af10e783b787445d6587a38" #COMPMID-3100 Fuse bias addition with fully connected layer NEON
+DEFAULT_CLFRAMEWORKREVISION="1c2ff950071c5b4fd6e83487083d23c96637545f" #COMPMID-3266: Remove Tracepoint files from Android.bp file
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

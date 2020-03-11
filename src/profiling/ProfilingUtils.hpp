@@ -108,7 +108,10 @@ bool StringToSwTraceString(const std::string& s, std::vector<uint32_t>& outputBu
     // Prepare the output buffer
     size_t s_size        = s.size() + 1;    // The size of the string (in chars) plus the null-terminator
     size_t uint32_t_size = sizeof(uint32_t);
-    size_t outBufferSize = 1 + s_size / uint32_t_size + (s_size % uint32_t_size != 0 ? 1 : 0);
+    // Output buffer size = StringLength (32 bit) + amount of complete 32bit words that fit into the string
+    //                      + an additional 32bit word if there are remaining chars to complete the string
+    //                      (The rest of the 32bit word is then filled with the NULL terminator)
+    size_t outBufferSize = 1 + (s_size / uint32_t_size) + (s_size % uint32_t_size != 0 ? 1 : 0);
     outputBuffer.resize(outBufferSize, '\0');
 
     // Write the SWTrace string to the output buffer

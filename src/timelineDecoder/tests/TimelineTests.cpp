@@ -248,4 +248,109 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
     }
 }
 
+BOOST_AUTO_TEST_CASE(TimelineCaptureTestMultipleStringsInBuffer)
+{
+    unsigned int                           threadIdSize = sizeof(std::thread::id);
+    profiling::BufferManager               bufferManager(50);
+    profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
+
+    std::unique_ptr<profiling::ISendTimelinePacket> sendTimelinePacket =
+                                                        timelinePacketWriterFactory.GetSendTimelinePacket();
+
+    profiling::PacketVersionResolver packetVersionResolver;
+
+    TimelineDecoder timelineDecoder;
+    const TimelineDecoder::Model& model = timelineDecoder.GetModel();
+
+    TimelineCaptureCommandHandler timelineCaptureCommandHandler(
+        1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder, threadIdSize);
+
+    using Status = ITimelineDecoder::TimelineStatus;
+    BOOST_CHECK(timelineDecoder.SetEntityCallback(PushEntity) == Status::TimelineStatus_Success);
+    BOOST_CHECK(timelineDecoder.SetEventClassCallback(PushEventClass) == Status::TimelineStatus_Success);
+    BOOST_CHECK(timelineDecoder.SetEventCallback(PushEvent) == Status::TimelineStatus_Success);
+    BOOST_CHECK(timelineDecoder.SetLabelCallback(PushLabel) == Status::TimelineStatus_Success);
+    BOOST_CHECK(timelineDecoder.SetRelationshipCallback(PushRelationship) == Status::TimelineStatus_Success);
+
+    const uint64_t entityGuid     = 111111u;
+    const uint64_t eventClassGuid = 22222u;
+    const uint64_t timestamp      = 33333u;
+    const uint64_t eventGuid      = 44444u;
+
+    const std::thread::id threadId = std::this_thread::get_id();
+
+    // need to do a bit of work here to extract the value from threadId
+    unsigned char* uCharThreadId = new unsigned char[threadIdSize]();;
+    uint64_t uint64ThreadId;
+
+    profiling::WriteBytes(uCharThreadId, 0, &threadId, threadIdSize);
+
+    if ( threadIdSize == 4 )
+    {
+        uint64ThreadId = profiling::ReadUint32(uCharThreadId, 0);
+    } else if ( threadIdSize == 8 )
+    {
+        uint64ThreadId = profiling::ReadUint64(uCharThreadId, 0);
+    }
+    delete[] uCharThreadId;
+
+    const uint64_t labelGuid  = 66666u;
+    std::string    labelName  = "test_label";
+    std::string    labelName2 = "test_label2";
+    std::string    labelName3 = "test_label32";
+
+    const uint64_t relationshipGuid = 77777u;
+    const uint64_t headGuid         = 888888u;
+    const uint64_t tailGuid         = 999999u;
+
+    // Check with multiple messages in the same buffer
+    for ( int i = 0; i < 9; ++i )
+    {
+        // Send entity
+        sendTimelinePacket->SendTimelineEntityBinaryPacket(entityGuid);
+        // Send event class
+        sendTimelinePacket->SendTimelineEventClassBinaryPacket(eventClassGuid);
+        // Send event
+        sendTimelinePacket->SendTimelineEventBinaryPacket(timestamp, threadId, eventGuid);
+        // Send label
+        sendTimelinePacket->SendTimelineLabelBinaryPacket(labelGuid, labelName);
+        sendTimelinePacket->SendTimelineLabelBinaryPacket(labelGuid, labelName2);
+        sendTimelinePacket->SendTimelineLabelBinaryPacket(labelGuid, labelName3);
+        // Send relationship
+        profiling::ProfilingRelationshipType relationshipType = profiling::ProfilingRelationshipType::DataLink;
+        sendTimelinePacket->SendTimelineRelationshipBinaryPacket(relationshipType,
+                                                                 relationshipGuid,
+                                                                 headGuid,
+                                                                 tailGuid);
+    }
+
+    sendTimelinePacket->Commit();
+    SendTimelinePacketToCommandHandler(bufferManager.GetReadableBuffer()->GetReadableData(),
+                                       timelineCaptureCommandHandler);
+
+    for ( unsigned long i = 0; i < 9; ++i )
+    {
+        BOOST_CHECK(model.m_Entities[i].m_Guid == entityGuid);
+
+        BOOST_CHECK(model.m_EventClasses[i].m_Guid == eventClassGuid);
+
+        BOOST_CHECK(model.m_Labels[i].m_Guid == labelGuid);
+
+        BOOST_CHECK(model.m_Events[i].m_TimeStamp == timestamp);
+        BOOST_CHECK(model.m_Events[i].m_ThreadId == uint64ThreadId);
+        BOOST_CHECK(model.m_Events[i].m_Guid == eventGuid);
+
+        BOOST_CHECK(model.m_Relationships[i].m_RelationshipType == ITimelineDecoder::RelationshipType::DataLink);
+        BOOST_CHECK(model.m_Relationships[i].m_Guid == relationshipGuid);
+        BOOST_CHECK(model.m_Relationships[i].m_HeadGuid == headGuid);
+        BOOST_CHECK(model.m_Relationships[i].m_TailGuid == tailGuid);
+    }
+    for ( unsigned long i = 0; i < 9; i += 3 )
+    {
+        BOOST_CHECK(model.m_Labels[i].m_Name == labelName);
+        BOOST_CHECK(model.m_Labels[i+1].m_Name == labelName2);
+        BOOST_CHECK(model.m_Labels[i+2].m_Name == labelName3);
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

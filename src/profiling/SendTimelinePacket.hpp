@@ -98,7 +98,8 @@ void SendTimelinePacket::ForwardWriteBinaryFunction(Func& func, Params&& ... par
                     throw RuntimeException("Error processing while sending TimelineBinaryPacket",
                                            CHECK_LOCATION());
 
-                default:m_Offset += numberOfBytesWritten;
+                default:
+                    m_Offset += numberOfBytesWritten;
                     m_RemainingBufferSize -= numberOfBytesWritten;
                     return;
             }

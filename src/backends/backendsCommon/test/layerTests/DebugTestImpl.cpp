@@ -309,6 +309,34 @@ LayerTestResult<float, 1> Debug1dFloat32Test(
     return Debug1dTest<armnn::DataType::Float32>(workloadFactory, memoryManager);
 }
 
+LayerTestResult<armnn::BFloat16, 4> Debug4dBFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Debug4dTest<armnn::DataType::BFloat16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<armnn::BFloat16, 3> Debug3dBFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Debug3dTest<armnn::DataType::BFloat16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<armnn::BFloat16, 2> Debug2dBFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Debug2dTest<armnn::DataType::BFloat16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<armnn::BFloat16, 1> Debug1dBFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Debug1dTest<armnn::DataType::BFloat16>(workloadFactory, memoryManager);
+}
+
 LayerTestResult<uint8_t, 4> Debug4dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)

@@ -37,6 +37,7 @@ private:
     DebugCallbackFunction m_Callback;
 };
 
+using RefDebugBFloat16Workload   = RefDebugWorkload<DataType::BFloat16>;
 using RefDebugFloat16Workload   = RefDebugWorkload<DataType::Float16>;
 using RefDebugFloat32Workload   = RefDebugWorkload<DataType::Float32>;
 using RefDebugQAsymmU8Workload  = RefDebugWorkload<DataType::QAsymmU8>;

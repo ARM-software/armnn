@@ -7,6 +7,8 @@
 
 #include "LayerTestResult.hpp"
 
+#include <BFloat16.hpp>
+
 #include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
@@ -23,6 +25,22 @@ LayerTestResult<float, 2> Debug2dFloat32Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 LayerTestResult<float, 1> Debug1dFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::BFloat16, 4> Debug4dBFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::BFloat16, 3> Debug3dBFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::BFloat16, 2> Debug2dBFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::BFloat16, 1> Debug1dBFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 

@@ -1417,6 +1417,11 @@ ARMNN_AUTO_TEST_CASE(Debug3dFloat32, Debug3dFloat32Test)
 ARMNN_AUTO_TEST_CASE(Debug2dFloat32, Debug2dFloat32Test)
 ARMNN_AUTO_TEST_CASE(Debug1dFloat32, Debug1dFloat32Test)
 
+ARMNN_AUTO_TEST_CASE(Debug4dBFloat16, Debug4dBFloat16Test)
+ARMNN_AUTO_TEST_CASE(Debug3dBFloat16, Debug3dBFloat16Test)
+ARMNN_AUTO_TEST_CASE(Debug2dBFloat16, Debug2dBFloat16Test)
+ARMNN_AUTO_TEST_CASE(Debug1dBFloat16, Debug1dBFloat16Test)
+
 ARMNN_AUTO_TEST_CASE(Debug4dUint8, Debug4dUint8Test)
 ARMNN_AUTO_TEST_CASE(Debug3dUint8, Debug3dUint8Test)
 ARMNN_AUTO_TEST_CASE(Debug2dUint8, Debug2dUint8Test)

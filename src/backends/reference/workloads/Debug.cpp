@@ -5,6 +5,7 @@
 
 #include "Debug.hpp"
 
+#include <BFloat16.hpp>
 #include <Half.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
@@ -87,6 +88,12 @@ void Debug(const TensorInfo& inputInfo,
 
     std::cout << " }" << std::endl;
 }
+
+template void Debug<BFloat16>(const TensorInfo& inputInfo,
+                          const BFloat16* inputData,
+                          LayerGuid guid,
+                          const std::string& layerName,
+                          unsigned int slotIndex);
 
 template void Debug<Half>(const TensorInfo& inputInfo,
                           const Half* inputData,

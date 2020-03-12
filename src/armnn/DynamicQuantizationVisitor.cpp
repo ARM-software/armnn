@@ -83,9 +83,28 @@ void DynamicQuantizationVisitor::VisitNonCalibratedLayers() {
     }
 }
 
-void DynamicQuantizationVisitor::VisitAdditionLayer(const IConnectableLayer* layer, const char* name)
+void DynamicQuantizationVisitor::VisitAdditionLayer(const IConnectableLayer* layer,
+                                                    const char* name)
 {
     IgnoreUnused(name);
+    SetRange(layer, 0, -20.f, 20.f);
+    AddToCalibratedLayers(layer);
+}
+
+void DynamicQuantizationVisitor::VisitAbsLayer(const IConnectableLayer* layer,
+                                               const char* name)
+{
+    IgnoreUnused(name);
+    SetRange(layer, 0, -20.f, 20.f);
+    AddToCalibratedLayers(layer);
+}
+
+void DynamicQuantizationVisitor::VisitArgMinMaxLayer(const IConnectableLayer* layer,
+                                                     const ArgMinMaxDescriptor& desc,
+                                                     const char* name)
+{
+    IgnoreUnused(name);
+    IgnoreUnused(desc);
     SetRange(layer, 0, -20.f, 20.f);
     AddToCalibratedLayers(layer);
 }
@@ -103,6 +122,16 @@ void DynamicQuantizationVisitor::VisitBatchNormalizationLayer(const IConnectable
     IgnoreUnused(variance);
     IgnoreUnused(beta);
     IgnoreUnused(gamma);
+    IgnoreUnused(name);
+    SetRange(layer, 0, -15.0f, 15.0f);
+    AddToCalibratedLayers(layer);
+}
+
+void DynamicQuantizationVisitor::VisitNormalizationLayer(const IConnectableLayer* layer,
+                                 const NormalizationDescriptor& desc,
+                                 const char* name)
+{
+    IgnoreUnused(desc);
     IgnoreUnused(name);
     SetRange(layer, 0, -15.0f, 15.0f);
     AddToCalibratedLayers(layer);

@@ -16,14 +16,26 @@ namespace armnn
 {
 
 /// Visitor class to establish min/max ranges based on the type of the layer
-class DynamicQuantizationVisitor : public LayerVisitorBase<VisitorNoThrowPolicy>
+class DynamicQuantizationVisitor : public LayerVisitorBase<VisitorThrowingPolicy>
 {
 public:
     DynamicQuantizationVisitor(RangeTracker& rangeTracker, Graph& graph);
     ~DynamicQuantizationVisitor() = default;
 
     /// Functions to set the Range on a per-layer-type basis
-    void VisitAdditionLayer(const IConnectableLayer* layer, const char* name = nullptr) override;
+    void VisitAbsLayer(const IConnectableLayer* layer,
+                       const char* name = nullptr) override;
+
+    void VisitAdditionLayer(const IConnectableLayer* layer,
+                            const char* name = nullptr) override;
+
+    void VisitArgMinMaxLayer(const IConnectableLayer* layer,
+                             const ArgMinMaxDescriptor& desc,
+                             const char* name = nullptr) override;
+
+    void VisitNormalizationLayer(const IConnectableLayer* layer,
+                                 const NormalizationDescriptor& desc,
+                                 const char* name = nullptr) override ;
 
     void VisitBatchNormalizationLayer(const IConnectableLayer* layer,
                                       const BatchNormalizationDescriptor& desc,

@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="1c2ff950071c5b4fd6e83487083d23c96637545f" #COMPMID-3266: Remove Tracepoint files from Android.bp file
+DEFAULT_CLFRAMEWORKREVISION="6800117df3be825f0ec5c6cc71c4377322f51b99" #COMPMID-3221: (DATA_UPDATE) add graph example for EDSR
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

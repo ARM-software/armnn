@@ -1210,6 +1210,11 @@ BOOST_AUTO_TEST_CASE(RefExportOutputWithSeveralOutputSlotConnectionsTest)
     ExportOutputWithSeveralOutputSlotConnectionsTest(defaultBackends);
 }
 
+BOOST_AUTO_TEST_CASE(RefStridedSliceInvalidSliceEndToEndTest)
+{
+    StridedSliceInvalidSliceEndToEndTest(defaultBackends);
+}
+
 #endif
 
 BOOST_AUTO_TEST_SUITE_END()

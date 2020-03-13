@@ -513,6 +513,11 @@ BOOST_AUTO_TEST_CASE(NeonArgMinAxis3TestQuantisedAsymm8)
     ArgMinAxis3EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
 }
 
+BOOST_AUTO_TEST_CASE(NeonStridedSliceInvalidSliceEndToEndTest)
+{
+    StridedSliceInvalidSliceEndToEndTest(defaultBackends);
+}
+
 BOOST_AUTO_TEST_CASE(NeonDetectionPostProcessRegularNmsTest, * boost::unit_test::disabled())
 {
     std::vector<float> boxEncodings({

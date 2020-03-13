@@ -52,14 +52,20 @@ std::vector<TensorShape> StridedSliceLayer::InferOutputShapes(
 
     for (unsigned int i = 0; i < inputShape.GetNumDimensions(); i++)
     {
-        if (m_Param.m_ShrinkAxisMask & (1 << i))
-        {
-            continue;
-        }
-
         int stride = m_Param.m_Stride[i];
         int start = m_Param.GetStartForAxis(inputShape, i);
         int stop = m_Param.GetStopForAxis(inputShape, i, start);
+
+        if (m_Param.m_ShrinkAxisMask & (1 << i))
+        {
+            // Don't take a slice from an axis being shrunk
+            if (m_Param.m_End[i] >= 2)
+            {
+                throw LayerValidationException(
+                    "StridedSlice: Attempting to take slice from an axis being shrunk");
+            }
+            continue;
+        }
 
         int newSize = stride > 0 ? ((stop - start) + stride - 1) / stride :
                                    ((start - stop) - stride - 1) / -stride;

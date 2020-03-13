@@ -126,6 +126,11 @@ BOOST_AUTO_TEST_CASE(DequantizeEndToEndOffsetTest)
     DequantizeEndToEndOffset<armnn::DataType::QAsymmU8>(defaultBackends);
 }
 
+BOOST_AUTO_TEST_CASE(ClStridedSliceInvalidSliceEndToEndTest)
+{
+    StridedSliceInvalidSliceEndToEndTest(defaultBackends);
+}
+
 BOOST_AUTO_TEST_CASE(ClGreaterSimpleEndToEndTest)
 {
     const std::vector<uint8_t> expectedOutput({ 0, 0, 0, 0,  1, 1, 1, 1,

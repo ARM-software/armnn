@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="6800117df3be825f0ec5c6cc71c4377322f51b99" #COMPMID-3221: (DATA_UPDATE) add graph example for EDSR
+DEFAULT_CLFRAMEWORKREVISION="470bc1eea65560d13001e60a7f7b22b12ec89bbc" #COMPMID-3069: Improve compilation time by removing regex from test framework headers
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

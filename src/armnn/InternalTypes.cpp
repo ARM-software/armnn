@@ -22,6 +22,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Comparison: return "Comparison";
         case LayerType::Concat: return "Concat";
         case LayerType::Constant: return "Constant";
+        case LayerType::ConvertBf16ToFp32: return "ConvertBf16ToFp32";
         case LayerType::ConvertFp16ToFp32: return "ConvertFp16ToFp32";
         case LayerType::ConvertFp32ToFp16: return "ConvertFp32ToFp16";
         case LayerType::Convolution2d: return "Convolution2d";

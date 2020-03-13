@@ -376,6 +376,21 @@ bool RefLayerSupport::IsConstantSupported(const TensorInfo& output,
                                   "Reference constant: output is not a supported type.");
 }
 
+bool RefLayerSupport::IsConvertBf16ToFp32Supported(const TensorInfo& input,
+                                                   const TensorInfo& output,
+                                                   Optional<std::string&> reasonIfUnsupported) const
+{
+    bool supported = true;
+
+    supported &= CheckSupportRule(TypeIs(input, DataType::BFloat16), reasonIfUnsupported,
+                                  "Reference for ConvertBf16ToFp32 layer: input type not supported");
+
+    supported &= CheckSupportRule(TypeIs(output, DataType::Float32), reasonIfUnsupported,
+                                  "Reference for ConvertBf16ToFp32 layer: output type not supported");
+
+    return supported;
+}
+
 bool RefLayerSupport::IsConvertFp16ToFp32Supported(const TensorInfo& input,
                                                    const TensorInfo& output,
                                                    Optional<std::string&> reasonIfUnsupported) const

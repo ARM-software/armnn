@@ -68,6 +68,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/ConstantTestImpl.hpp
     layerTests/Conv2dTestImpl.cpp
     layerTests/Conv2dTestImpl.hpp
+    layerTests/ConvertBf16ToFp32TestImpl.cpp
+    layerTests/ConvertBf16ToFp32TestImpl.hpp
     layerTests/ConvertFp16ToFp32TestImpl.cpp
     layerTests/ConvertFp16ToFp32TestImpl.hpp
     layerTests/ConvertFp32ToFp16TestImpl.cpp

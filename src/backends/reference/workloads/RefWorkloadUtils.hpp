@@ -12,6 +12,7 @@
 
 #include <reference/RefTensorHandle.hpp>
 
+#include <BFloat16.hpp>
 #include <Half.hpp>
 #include <boost/polymorphic_cast.hpp>
 
@@ -66,6 +67,12 @@ template <typename PayloadType>
 Half* GetOutputTensorDataHalf(unsigned int idx, const PayloadType& data)
 {
     return GetOutputTensorData<Half>(idx, data);
+}
+
+template <typename PayloadType>
+const BFloat16* GetInputTensorDataBFloat16(unsigned int idx, const PayloadType& data)
+{
+    return GetInputTensorData<BFloat16>(idx, data);
 }
 
 ////////////////////////////////////////////

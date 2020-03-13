@@ -69,6 +69,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefConcatWorkload.hpp
     RefConstantWorkload.cpp
     RefConstantWorkload.hpp
+    RefConvertBf16ToFp32Workload.cpp
+    RefConvertBf16ToFp32Workload.hpp
     RefConvertFp16ToFp32Workload.cpp
     RefConvertFp16ToFp32Workload.hpp
     RefConvertFp32ToFp16Workload.cpp

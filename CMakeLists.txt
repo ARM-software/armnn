@@ -272,6 +272,8 @@ list(APPEND armnn_sources
     src/armnn/layers/ConstantLayer.cpp
     src/armnn/layers/Convolution2dLayer.hpp
     src/armnn/layers/Convolution2dLayer.cpp
+    src/armnn/layers/ConvertBf16ToFp32Layer.cpp
+    src/armnn/layers/ConvertBf16ToFp32Layer.hpp
     src/armnn/layers/ConvertFp16ToFp32Layer.hpp
     src/armnn/layers/ConvertFp16ToFp32Layer.cpp
     src/armnn/layers/ConvertFp32ToFp16Layer.hpp

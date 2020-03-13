@@ -79,6 +79,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateConstant(const ConstantQueueDescriptor& descriptor,
                                                       const WorkloadInfo& info) const;
 
+    virtual std::unique_ptr<IWorkload> CreateConvertBf16ToFp32(const ConvertBf16ToFp32QueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const;
+
     virtual std::unique_ptr<IWorkload> CreateConvertFp16ToFp32(const ConvertFp16ToFp32QueueDescriptor& descriptor,
                                                                const WorkloadInfo& info) const;
 

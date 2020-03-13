@@ -407,6 +407,11 @@ struct LstmQueueDescriptor : QueueDescriptorWithParameters<LstmDescriptor>
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct ConvertBf16ToFp32QueueDescriptor : QueueDescriptor
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 struct ConvertFp16ToFp32QueueDescriptor : QueueDescriptor
 {
     void Validate(const WorkloadInfo& workloadInfo) const;

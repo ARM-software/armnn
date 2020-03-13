@@ -22,6 +22,7 @@ enum class LayerType
     Comparison,
     Concat,
     Constant,
+    ConvertBf16ToFp32,
     ConvertFp16ToFp32,
     ConvertFp32ToFp16,
     Convolution2d,

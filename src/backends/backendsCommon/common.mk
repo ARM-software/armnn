@@ -44,6 +44,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/ConcatTestImpl.cpp \
     test/layerTests/ConstantTestImpl.cpp \
     test/layerTests/Conv2dTestImpl.cpp \
+    test/layerTests/ConvertBf16ToFp32TestImpl.cpp \
     test/layerTests/ConvertFp16ToFp32TestImpl.cpp \
     test/layerTests/ConvertFp32ToFp16TestImpl.cpp \
     test/layerTests/DebugTestImpl.cpp \

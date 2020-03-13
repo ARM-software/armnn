@@ -22,6 +22,7 @@
 #include "RefConvolution2dWorkload.hpp"
 #include "RefConstantWorkload.hpp"
 #include "RefConcatWorkload.hpp"
+#include "RefConvertBf16ToFp32Workload.hpp"
 #include "RefConvertFp16ToFp32Workload.hpp"
 #include "RefConvertFp32ToFp16Workload.hpp"
 #include "RefDebugWorkload.hpp"

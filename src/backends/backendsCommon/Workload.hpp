@@ -177,6 +177,11 @@ using BaseUint8ComparisonWorkload = MultiTypedWorkload<QueueDescriptor,
                                                        armnn::DataType::Boolean>;
 
 template <typename QueueDescriptor>
+using BFloat16ToFloat32Workload = MultiTypedWorkload<QueueDescriptor,
+                                                     armnn::DataType::BFloat16,
+                                                     armnn::DataType::Float32>;
+
+template <typename QueueDescriptor>
 using Float16ToFloat32Workload = MultiTypedWorkload<QueueDescriptor,
                                                     armnn::DataType::Float16,
                                                     armnn::DataType::Float32>;

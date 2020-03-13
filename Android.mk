@@ -132,6 +132,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/ConcatLayer.cpp \
         src/armnn/layers/ConstantLayer.cpp \
         src/armnn/layers/Convolution2dLayer.cpp \
+        src/armnn/layers/ConvertBf16ToFp32Layer.cpp \
         src/armnn/layers/ConvertFp16ToFp32Layer.cpp \
         src/armnn/layers/ConvertFp32ToFp16Layer.cpp \
         src/armnn/layers/DebugLayer.cpp \

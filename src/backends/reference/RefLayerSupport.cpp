@@ -411,6 +411,21 @@ bool RefLayerSupport::IsConvertFp16ToFp32Supported(const TensorInfo& input,
                                           &FalseFuncU8<>));
 }
 
+bool RefLayerSupport::IsConvertFp32ToBf16Supported(const TensorInfo& input,
+                                                   const TensorInfo& output,
+                                                   Optional<std::string&> reasonIfUnsupported) const
+{
+    bool supported = true;
+
+    supported &= CheckSupportRule(TypeIs(input, DataType::Float32), reasonIfUnsupported,
+                                  "Reference for ConvertFp32ToBf16 layer: input type not supported");
+
+    supported &= CheckSupportRule(TypeIs(output, DataType::BFloat16), reasonIfUnsupported,
+                                  "Reference for ConvertFp32ToBf16 layer: output type not supported");
+
+    return supported;
+}
+
 bool RefLayerSupport::IsConvertFp32ToFp16Supported(const TensorInfo& input,
                                                    const TensorInfo& output,
                                                    Optional<std::string&> reasonIfUnsupported) const

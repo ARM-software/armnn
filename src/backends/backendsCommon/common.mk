@@ -46,6 +46,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/Conv2dTestImpl.cpp \
     test/layerTests/ConvertBf16ToFp32TestImpl.cpp \
     test/layerTests/ConvertFp16ToFp32TestImpl.cpp \
+    test/layerTests/ConvertFp32ToBf16TestImpl.cpp \
     test/layerTests/ConvertFp32ToFp16TestImpl.cpp \
     test/layerTests/DebugTestImpl.cpp \
     test/layerTests/DepthToSpaceTestImpl.cpp \

@@ -15,7 +15,6 @@ class ConvertFp16ToFp32Layer : public Layer
 {
 public:
     /// Makes a workload for the ConvertFp16ToFp32 type.
-    /// @param [in] graph The graph where this layer can be found.
     /// @param [in] factory The workload factory which will create the workload.
     /// @return A pointer to the created workload, or nullptr if not created.
     virtual std::unique_ptr<IWorkload> CreateWorkload(const IWorkloadFactory& factory) const override;

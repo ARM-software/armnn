@@ -182,6 +182,11 @@ using BFloat16ToFloat32Workload = MultiTypedWorkload<QueueDescriptor,
                                                      armnn::DataType::Float32>;
 
 template <typename QueueDescriptor>
+using Float32ToBFloat16Workload = MultiTypedWorkload<QueueDescriptor,
+                                                     armnn::DataType::Float32,
+                                                     armnn::DataType::BFloat16>;
+
+template <typename QueueDescriptor>
 using Float16ToFloat32Workload = MultiTypedWorkload<QueueDescriptor,
                                                     armnn::DataType::Float16,
                                                     armnn::DataType::Float32>;

@@ -75,6 +75,12 @@ const BFloat16* GetInputTensorDataBFloat16(unsigned int idx, const PayloadType& 
     return GetInputTensorData<BFloat16>(idx, data);
 }
 
+template <typename PayloadType>
+BFloat16* GetOutputTensorDataBFloat16(unsigned int idx, const PayloadType& data)
+{
+    return GetOutputTensorData<BFloat16>(idx, data);
+}
+
 ////////////////////////////////////////////
 /// u8 helpers
 ////////////////////////////////////////////

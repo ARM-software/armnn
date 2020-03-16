@@ -2039,6 +2039,29 @@ void ConvertBf16ToFp32QueueDescriptor::Validate(const WorkloadInfo& workloadInfo
     ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
+void ConvertFp32ToBf16QueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"ConvertFp32ToBf16QueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    if (inputTensorInfo.GetDataType() != DataType::Float32)
+    {
+        throw InvalidArgumentException(descriptorName + ": Input tensor type must be Float32.");
+    }
+
+    if (outputTensorInfo.GetDataType() != DataType::BFloat16)
+    {
+        throw InvalidArgumentException(descriptorName + ": Output tensor type must be BFloat16.");
+    }
+
+    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+}
+
 void ConvertFp32ToFp16QueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     const std::string descriptorName{"ConvertFp32ToFp16QueueDescriptor"};

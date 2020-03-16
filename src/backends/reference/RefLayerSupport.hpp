@@ -68,6 +68,10 @@ public:
                                       const TensorInfo& output,
                                       Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsConvertFp32ToBf16Supported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsConvertFp32ToFp16Supported(const TensorInfo& input,
                                       const TensorInfo& output,
                                       Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;

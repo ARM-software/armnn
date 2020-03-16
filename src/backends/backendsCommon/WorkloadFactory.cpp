@@ -173,6 +173,13 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
             result = layerSupportObject->IsConvertFp16ToFp32Supported(input, output, reason);
             break;
         }
+        case LayerType::ConvertFp32ToBf16:
+        {
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject->IsConvertFp32ToBf16Supported(input, output, reason);
+            break;
+        }
         case LayerType::ConvertFp32ToFp16:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
@@ -1158,6 +1165,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvertBf16ToFp32(const Conve
 }
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvertFp16ToFp32(const ConvertFp16ToFp32QueueDescriptor& /*desc*/,
+                                                                     const WorkloadInfo& /*info*/) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvertFp32ToBf16(const ConvertFp32ToBf16QueueDescriptor& /*desc*/,
                                                                      const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();

@@ -276,6 +276,8 @@ list(APPEND armnn_sources
     src/armnn/layers/ConvertBf16ToFp32Layer.hpp
     src/armnn/layers/ConvertFp16ToFp32Layer.hpp
     src/armnn/layers/ConvertFp16ToFp32Layer.cpp
+    src/armnn/layers/ConvertFp32ToBf16Layer.hpp
+    src/armnn/layers/ConvertFp32ToBf16Layer.cpp
     src/armnn/layers/ConvertFp32ToFp16Layer.hpp
     src/armnn/layers/ConvertFp32ToFp16Layer.cpp
     src/armnn/layers/DebugLayer.hpp

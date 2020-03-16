@@ -125,6 +125,14 @@ bool LayerSupportBase::IsConvertFp16ToFp32Supported(const TensorInfo& /*input*/,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsConvertFp32ToBf16Supported(const TensorInfo& /*input*/,
+                                                    const TensorInfo& /*output*/,
+                                                    Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
+
 bool LayerSupportBase::IsConvertFp32ToFp16Supported(const TensorInfo& /*input*/,
                                                     const TensorInfo& /*output*/,
                                                     Optional<std::string&> reasonIfUnsupported) const

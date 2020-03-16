@@ -16,6 +16,7 @@
 #include "layers/ConstantLayer.hpp"
 #include "layers/ConvertBf16ToFp32Layer.hpp"
 #include "layers/ConvertFp16ToFp32Layer.hpp"
+#include "layers/ConvertFp32ToBf16Layer.hpp"
 #include "layers/ConvertFp32ToFp16Layer.hpp"
 #include "layers/Convolution2dLayer.hpp"
 #include "layers/DebugLayer.hpp"
@@ -102,6 +103,7 @@ DECLARE_LAYER(Concat)
 DECLARE_LAYER(Constant)
 DECLARE_LAYER(ConvertBf16ToFp32)
 DECLARE_LAYER(ConvertFp16ToFp32)
+DECLARE_LAYER(ConvertFp32ToBf16)
 DECLARE_LAYER(ConvertFp32ToFp16)
 DECLARE_LAYER(Convolution2d)
 DECLARE_LAYER(Debug)

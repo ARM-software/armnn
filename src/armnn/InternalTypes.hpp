@@ -24,6 +24,7 @@ enum class LayerType
     Constant,
     ConvertBf16ToFp32,
     ConvertFp16ToFp32,
+    ConvertFp32ToBf16,
     ConvertFp32ToFp16,
     Convolution2d,
     Debug,

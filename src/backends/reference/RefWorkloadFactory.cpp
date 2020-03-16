@@ -194,6 +194,13 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvertFp16ToFp32(
     return std::make_unique<RefConvertFp16ToFp32Workload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvertFp32ToBf16(
+    const ConvertFp32ToBf16QueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return std::make_unique<RefConvertFp32ToBf16Workload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvertFp32ToFp16(
     const ConvertFp32ToFp16QueueDescriptor& descriptor,
     const WorkloadInfo& info) const

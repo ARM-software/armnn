@@ -1944,12 +1944,6 @@ void TfLiteParser::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
     std::vector<int32_t> targetShape;
     if (inputs.size() > 1 && inputs[1] != nullptr)
     {
-        if (options != nullptr)
-        {
-            ARMNN_THROW_PARSE_EXCEPTION("Target shape defined in reshape parameters and input tensor. "
-                                        "Only one method expected");
-        }
-
         if (inputs[1]->is_variable)
         {
             ARMNN_THROW_PARSE_EXCEPTION( "Target shapes defined in non-const input tensors is not supported");
@@ -1970,6 +1964,14 @@ void TfLiteParser::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
         for (int i=0; i < inputs[1]->shape[0]; i++)
         {
             targetShape.push_back(vals[i]);
+        }
+
+        if (options != nullptr &&
+            options->new_shape.empty() == false &&
+            options->new_shape != targetShape)
+        {
+            ARMNN_THROW_PARSE_EXCEPTION("Target shape defined in reshape parameters and as input tensor but "
+                                        "the values do not match");
         }
     }
     else

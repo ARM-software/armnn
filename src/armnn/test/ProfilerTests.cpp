@@ -57,6 +57,8 @@ void RegisterUnregisterProfilerSingleThreadImpl(bool &res)
 
     // Check that the profiler has been un-registered for this thread.
     res &= !profilerManager.GetProfiler();
+
+    armnn::ProfilerManager::GetInstance().RegisterProfiler(nullptr);
 }
 
 } // namespace
@@ -351,6 +353,7 @@ BOOST_AUTO_TEST_CASE(ProfilerJsonPrinter)
                               "unit\": \"us\"\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n}\n");
 
     BOOST_CHECK(output == blessedOutput);
+    armnn::ProfilerManager::GetInstance().RegisterProfiler(nullptr);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

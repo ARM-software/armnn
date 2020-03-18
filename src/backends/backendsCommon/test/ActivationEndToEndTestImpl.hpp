@@ -32,6 +32,8 @@ float GetActivationTolerance(const armnn::ActivationFunction& activationFunction
         // The following values are taken from ArmComputeLibrary/tests/validation/CL/ActivationLayer.cpp
         case ActivationFunction::Elu:
             return (dataType == DataType::Float16 ? 0.01f : 0.00001f);
+        case ActivationFunction::HardSwish:
+            return (dataType == DataType::Float16 ? 0.01f : defaultTolerance);
         default:
             return defaultTolerance;
     }
@@ -123,7 +125,7 @@ void EluEndToEndTest(const std::vector<BackendId>& backends)
                                         1.0f,  2.0f,  3.0f, 4.0f };
 
     std::vector<float> floatExpectedOutputData{ -0.86466471676f,  -0.63212055882f,  -0.0f, 0.0f,
-                                                 1.0f          ,             2.0f,   3.0f, 4.0f };
+                                                 1.0f          ,   2.0f          ,   3.0f, 4.0f };
 
     float qScale = 1.0f;
     int32_t qOffset = 0;
@@ -131,6 +133,35 @@ void EluEndToEndTest(const std::vector<BackendId>& backends)
     armnn::TensorInfo outputInfo({ 2, 2, 2, 1 }, ArmnnType, qScale, qOffset);
 
     armnn::ActivationDescriptor descriptor(ActivationFunction::Elu, 1.0);
+
+    ActivationEndToEndImpl<ArmnnType>(backends,
+                                      floatInputData,
+                                      floatExpectedOutputData,
+                                      inputInfo,
+                                      outputInfo,
+                                      descriptor);
+}
+
+/** Executes an end to end test for HardSwish activation with specific input and expected-output data
+ *
+ * @tparam ArmnnType  The armnn data type for the input and expected-output data
+ * @param backends  The backends on which to run the test
+ */
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+void HardSwishEndToEndTest(const std::vector<BackendId>& backends)
+{
+    std::vector<float> floatInputData{ -2.0f, -1.0f, -0.5f, 0.0f,
+                                       1.0f,  2.0f,  3.0f, 4.0f };
+
+    std::vector<float> floatExpectedOutputData{ -0.33333333333f,  -0.33333333333f, -0.208333f, 0.0f,
+                                                 0.66666666667f,   1.66666666667f,  3.0f     , 4.0f };
+
+    float qScale = 1.0f;
+    int32_t qOffset = 0;
+    armnn::TensorInfo inputInfo({ 2, 2, 2, 1 }, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputInfo({ 2, 2, 2, 1 }, ArmnnType, qScale, qOffset);
+
+    armnn::ActivationDescriptor descriptor(ActivationFunction::HardSwish, 1.0);
 
     ActivationEndToEndImpl<ArmnnType>(backends,
                                       floatInputData,

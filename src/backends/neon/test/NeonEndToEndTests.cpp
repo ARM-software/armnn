@@ -218,6 +218,27 @@ BOOST_AUTO_TEST_CASE(NeonEluEndToEndTestFloat16)
     EluEndToEndTest<armnn::DataType::Float16>(defaultBackends);
 }
 
+// HardSwish
+BOOST_AUTO_TEST_CASE(NeonHardSwishEndToEndTestFloat32)
+{
+    HardSwishEndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonHardSwishEndToEndTestFloat16)
+{
+    HardSwishEndToEndTest<armnn::DataType::Float16>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonHardSwishEndToEndTestQAsymmS8)
+{
+    HardSwishEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonHardSwishEndToEndTestQAsymmU8)
+{
+    HardSwishEndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
 BOOST_AUTO_TEST_CASE(NeonPreluEndToEndFloat32Test)
 {
     PreluEndToEndNegativeTest<armnn::DataType::Float32>(defaultBackends);

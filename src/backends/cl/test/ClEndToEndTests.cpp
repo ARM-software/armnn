@@ -182,6 +182,32 @@ BOOST_AUTO_TEST_CASE(ClGreaterBroadcastEndToEndUint8Test)
                                                                   expectedOutput);
 }
 
+// HardSwish
+BOOST_AUTO_TEST_CASE(ClHardSwishEndToEndTestFloat32)
+{
+    HardSwishEndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClHardSwishEndToEndTestFloat16)
+{
+    HardSwishEndToEndTest<armnn::DataType::Float16>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClHardSwishEndToEndTestQAsymmS8)
+{
+    HardSwishEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClHardSwishEndToEndTestQAsymmU8)
+{
+    HardSwishEndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClHardSwishEndToEndTestQSymmS16)
+{
+    HardSwishEndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
 // InstanceNormalization
 BOOST_AUTO_TEST_CASE(ClInstanceNormalizationNhwcEndToEndTest1)
 {

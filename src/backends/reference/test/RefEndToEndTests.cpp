@@ -837,6 +837,37 @@ BOOST_AUTO_TEST_CASE(RefDetectionPostProcessFastNmsUint8Test)
                                                                           1.0f, 1, 0.01f, 0, 0.5f, 0);
 }
 
+// HardSwish
+BOOST_AUTO_TEST_CASE(RefHardSwishEndToEndTestFloat32)
+{
+    HardSwishEndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefHardSwishEndToEndTestFloat16)
+{
+    HardSwishEndToEndTest<armnn::DataType::Float16>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefHardSwishEndToEndTestBFloat16)
+{
+HardSwishEndToEndTest<armnn::DataType::BFloat16>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefHardSwishEndToEndTestQAsymmS8)
+{
+    HardSwishEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefHardSwishEndToEndTestQAsymmU8)
+{
+    HardSwishEndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefHardSwishEndToEndTestQSymmS16)
+{
+    HardSwishEndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
 // LogSoftmax
 BOOST_AUTO_TEST_CASE(RefLogSoftmaxEndToEndTest)
 {

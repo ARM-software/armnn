@@ -14,6 +14,8 @@
 
 #include <armnn/backends/DynamicBackend.hpp>
 
+#include <ProfilingService.hpp>
+
 #include <mutex>
 #include <unordered_map>
 
@@ -80,6 +82,8 @@ public:
 private:
     friend void RuntimeLoadedNetworksReserve(armnn::Runtime* runtime); // See RuntimeTests.cpp
 
+    friend profiling::ProfilingService& GetProfilingService(armnn::Runtime* runtime); // See RuntimeTests.cpp
+
     int GenerateNetworkId();
 
     LoadedNetwork* GetLoadedNetworkPtr(NetworkId networkId) const;
@@ -109,6 +113,9 @@ private:
 
     /// List of dynamic backends loaded in the runtime
     std::vector<DynamicBackendPtr> m_DynamicBackends;
+
+    /// Profiling Service Instance
+    profiling::ProfilingService m_ProfilingService;
 };
 
 } // namespace armnn

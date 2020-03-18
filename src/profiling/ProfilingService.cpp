@@ -17,6 +17,18 @@ namespace armnn
 namespace profiling
 {
 
+ProfilingGuidGenerator ProfilingService::m_GuidGenerator;
+
+ProfilingDynamicGuid ProfilingService::GetNextGuid()
+{
+    return m_GuidGenerator.NextGuid();
+}
+
+ProfilingStaticGuid ProfilingService::GetStaticId(const std::string& str)
+{
+    return m_GuidGenerator.GenerateStaticId(str);
+}
+
 void ProfilingService::ResetExternalProfilingOptions(const ExternalProfilingOptions& options,
                                                      bool resetProfilingService)
 {
@@ -285,12 +297,12 @@ uint32_t ProfilingService::IncrementCounterValue(uint16_t counterUid)
 
 ProfilingDynamicGuid ProfilingService::NextGuid()
 {
-    return m_GuidGenerator.NextGuid();
+    return ProfilingService::GetNextGuid();
 }
 
 ProfilingStaticGuid ProfilingService::GenerateStaticId(const std::string& str)
 {
-    return m_GuidGenerator.GenerateStaticId(str);
+    return ProfilingService::GetStaticId(str);
 }
 
 std::unique_ptr<ISendTimelinePacket> ProfilingService::GetSendTimelinePacket() const

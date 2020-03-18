@@ -23,11 +23,13 @@ BOOST_AUTO_TEST_SUITE(TimelineUtilityMethodsTests)
 BOOST_AUTO_TEST_CASE(CreateTypedLabelTest)
 {
     MockBufferManager mockBufferManager(1024);
+    ProfilingService  profilingService;
+
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
-    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
+    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket, profilingService);
 
     // Generate first guid to ensure that the named typed entity guid is not 0 on local single test.
-    ProfilingService::Instance().NextGuid();
+    profilingService.NextGuid();
 
     ProfilingGuid entityGuid(123);
     const std::string entityName = "some entity";
@@ -78,8 +80,9 @@ BOOST_AUTO_TEST_CASE(CreateTypedLabelTest)
 BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
 {
     MockBufferManager mockBufferManager(1024);
+    ProfilingService  profilingService;
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
-    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
+    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket, profilingService);
 
     BOOST_CHECK_NO_THROW(timelineUtilityMethods.SendWellKnownLabelsAndEventClasses());
 
@@ -178,8 +181,9 @@ BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
 BOOST_AUTO_TEST_CASE(CreateNamedTypedChildEntityTest)
 {
     MockBufferManager mockBufferManager(1024);
+    ProfilingService  profilingService;
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
-    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
+    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket, profilingService);
 
     ProfilingDynamicGuid childEntityGuid(0);
     ProfilingGuid parentEntityGuid(123);
@@ -187,7 +191,7 @@ BOOST_AUTO_TEST_CASE(CreateNamedTypedChildEntityTest)
     const std::string entityType = "some type";
 
     // Generate first guid to ensure that the named typed entity guid is not 0 on local single test.
-    ProfilingService::Instance().NextGuid();
+    profilingService.NextGuid();
 
     BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedChildEntity(parentEntityGuid, "", entityType),
                       InvalidArgumentException);
@@ -276,11 +280,12 @@ BOOST_AUTO_TEST_CASE(CreateNamedTypedChildEntityTest)
 BOOST_AUTO_TEST_CASE(DeclareLabelTest)
 {
     MockBufferManager mockBufferManager(1024);
+    ProfilingService  profilingService;
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
-    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
+    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket, profilingService);
 
     // Generate first guid to ensure that the named typed entity guid is not 0 on local single test.
-    ProfilingService::Instance().NextGuid();
+    profilingService.NextGuid();
 
     // Try declaring an invalid (empty) label
     BOOST_CHECK_THROW(timelineUtilityMethods.DeclareLabel(""), InvalidArgumentException);
@@ -304,8 +309,9 @@ BOOST_AUTO_TEST_CASE(DeclareLabelTest)
 BOOST_AUTO_TEST_CASE(CreateNameTypeEntityInvalidTest)
 {
     MockBufferManager mockBufferManager(1024);
+    ProfilingService  profilingService;
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
-    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
+    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket, profilingService);
 
     // Invalid name
     BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedEntity("", "Type"), InvalidArgumentException);
@@ -313,7 +319,7 @@ BOOST_AUTO_TEST_CASE(CreateNameTypeEntityInvalidTest)
     // Invalid type
     BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedEntity("Name", ""), InvalidArgumentException);
 
-    ProfilingDynamicGuid guid = ProfilingService::Instance().NextGuid();
+    ProfilingDynamicGuid guid = profilingService.NextGuid();
 
     // CreatedNamedTypedEntity with Guid - Invalid name
     BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedEntity(guid, "", "Type"),
@@ -328,14 +334,15 @@ BOOST_AUTO_TEST_CASE(CreateNameTypeEntityInvalidTest)
 BOOST_AUTO_TEST_CASE(CreateNameTypeEntityTest)
 {
     MockBufferManager mockBufferManager(1024);
+    ProfilingService  profilingService;
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
-    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
+    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket, profilingService);
 
     const std::string entityName = "Entity0";
     const std::string entityType = "Type0";
 
     // Generate first guid to ensure that the named typed entity guid is not 0 on local single test.
-    ProfilingService::Instance().NextGuid();
+    profilingService.NextGuid();
 
     ProfilingDynamicGuid guid = timelineUtilityMethods.CreateNamedTypedEntity(entityName, entityType);
     BOOST_CHECK(guid != ProfilingGuid(0));
@@ -407,10 +414,11 @@ BOOST_AUTO_TEST_CASE(CreateNameTypeEntityTest)
 BOOST_AUTO_TEST_CASE(RecordEventTest)
 {
     MockBufferManager mockBufferManager(1024);
+    ProfilingService  profilingService;
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
-    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
+    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket, profilingService);
     // Generate first guid to ensure that the named typed entity guid is not 0 on local single test.
-    ProfilingService::Instance().NextGuid();
+    profilingService.NextGuid();
 
     ProfilingGuid entityGuid(123);
     ProfilingStaticGuid eventClassGuid(456);

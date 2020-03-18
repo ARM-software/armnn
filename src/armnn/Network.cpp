@@ -1023,8 +1023,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
 }
 
 Network::Network()
-: m_Graph(std::make_unique<Graph>()),
-  m_Guid(profiling::ProfilingService::Instance().NextGuid())
+: m_Graph(std::make_unique<Graph>())
 {
 }
 
@@ -1680,8 +1679,7 @@ void Network::Accept(ILayerVisitor& visitor) const
 }
 
 OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)
-    : m_Graph(std::move(graph)),
-      m_Guid(profiling::ProfilingService::Instance().NextGuid())
+    : m_Graph(std::move(graph)), m_Guid(profiling::ProfilingService::GetNextGuid())
 {
 }
 

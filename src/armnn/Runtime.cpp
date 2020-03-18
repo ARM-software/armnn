@@ -11,8 +11,6 @@
 #include <armnn/backends/IBackendContext.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
 
-#include <ProfilingService.hpp>
-
 #include <iostream>
 
 #include <boost/polymorphic_cast.hpp>
@@ -75,7 +73,8 @@ Status Runtime::LoadNetwork(NetworkId& networkIdOut,
     unique_ptr<LoadedNetwork> loadedNetwork = LoadedNetwork::MakeLoadedNetwork(
         std::unique_ptr<OptimizedNetwork>(boost::polymorphic_downcast<OptimizedNetwork*>(rawNetwork)),
         errorMessage,
-        networkProperties);
+        networkProperties,
+        m_ProfilingService);
 
     if (!loadedNetwork)
     {
@@ -94,9 +93,9 @@ Status Runtime::LoadNetwork(NetworkId& networkIdOut,
         context.second->AfterLoadNetwork(networkIdOut);
     }
 
-    if (profiling::ProfilingService::Instance().IsProfilingEnabled())
+    if (m_ProfilingService.IsProfilingEnabled())
     {
-        profiling::ProfilingService::Instance().IncrementCounterValue(armnn::profiling::NETWORK_LOADS);
+        m_ProfilingService.IncrementCounterValue(armnn::profiling::NETWORK_LOADS);
     }
 
     return Status::Success;
@@ -125,9 +124,10 @@ Status Runtime::UnloadNetwork(NetworkId networkId)
             ARMNN_LOG(warning) << "WARNING: Runtime::UnloadNetwork(): " << networkId << " not found!";
             return Status::Failure;
         }
-        if (profiling::ProfilingService::Instance().IsProfilingEnabled())
+
+        if (m_ProfilingService.IsProfilingEnabled())
         {
-            profiling::ProfilingService::Instance().IncrementCounterValue(armnn::profiling::NETWORK_UNLOADS);
+            m_ProfilingService.IncrementCounterValue(armnn::profiling::NETWORK_UNLOADS);
         }
     }
 
@@ -158,7 +158,7 @@ Runtime::Runtime(const CreationOptions& options)
     ARMNN_LOG(info) << "ArmNN v" << ARMNN_VERSION << "\n";
 
     // pass configuration info to the profiling service
-    armnn::profiling::ProfilingService::Instance().ConfigureProfilingService(options.m_ProfilingOptions);
+    m_ProfilingService.ConfigureProfilingService(options.m_ProfilingOptions);
 
     // Load any available/compatible dynamic backend before the runtime
     // goes through the backend registry
@@ -185,7 +185,7 @@ Runtime::Runtime(const CreationOptions& options)
 
             unique_ptr<armnn::profiling::IBackendProfiling> profilingIface =
                 std::make_unique<armnn::profiling::BackendProfiling>(armnn::profiling::BackendProfiling(
-                    options, armnn::profiling::ProfilingService::Instance(), id));
+                    options, m_ProfilingService, id));
 
             // Backends may also provide a profiling context. Ask for it now.
             auto profilingContext = backend->CreateBackendProfilingContext(options, profilingIface);
@@ -196,7 +196,7 @@ Runtime::Runtime(const CreationOptions& options)
                 if(profilingContext->EnableProfiling(true))
                 {
                     // Pass the context onto the profiling service.
-                    armnn::profiling::ProfilingService::Instance().AddBackendProfilingContext(id, profilingContext);
+                    m_ProfilingService.AddBackendProfilingContext(id, profilingContext);
                 }
                 else
                 {

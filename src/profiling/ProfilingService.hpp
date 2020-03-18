@@ -48,114 +48,6 @@ public:
     using CounterIndices = std::vector<std::atomic<uint32_t>*>;
     using CounterValues = std::list<std::atomic<uint32_t>>;
 
-    // Getter for the singleton instance
-    static ProfilingService& Instance()
-    {
-        static ProfilingService instance;
-        return instance;
-    }
-
-    // Resets the profiling options, optionally clears the profiling service entirely
-    void ResetExternalProfilingOptions(const ExternalProfilingOptions& options, bool resetProfilingService = false);
-    ProfilingState ConfigureProfilingService(const ExternalProfilingOptions& options,
-                                             bool resetProfilingService = false);
-
-
-    // Updates the profiling service, making it transition to a new state if necessary
-    void Update();
-
-    // Disconnects the profiling service from the external server
-    void Disconnect();
-
-    // Store a profiling context returned from a backend that support profiling.
-    void AddBackendProfilingContext(const BackendId backendId,
-        std::shared_ptr<armnn::profiling::IBackendProfilingContext> profilingContext);
-
-    const ICounterDirectory& GetCounterDirectory() const;
-    ICounterRegistry& GetCounterRegistry();
-    ProfilingState GetCurrentState() const;
-    bool IsCounterRegistered(uint16_t counterUid) const override;
-    uint32_t GetCounterValue(uint16_t counterUid) const override;
-    uint16_t GetCounterCount() const override;
-    // counter global/backend mapping functions
-    const ICounterMappings& GetCounterMappings() const override;
-    IRegisterCounterMapping& GetCounterMappingRegistry();
-
-    // Getters for the profiling service state
-    bool IsProfilingEnabled() const override;
-
-    CaptureData GetCaptureData() override;
-    void SetCaptureData(uint32_t capturePeriod,
-                        const std::vector<uint16_t>& counterIds,
-                        const std::set<BackendId>& activeBackends);
-
-    // Setters for the profiling service state
-    void SetCounterValue(uint16_t counterUid, uint32_t value) override;
-    uint32_t AddCounterValue(uint16_t counterUid, uint32_t value) override;
-    uint32_t SubtractCounterValue(uint16_t counterUid, uint32_t value) override;
-    uint32_t IncrementCounterValue(uint16_t counterUid) override;
-
-    // IProfilingGuidGenerator functions
-    /// Return the next random Guid in the sequence
-    ProfilingDynamicGuid NextGuid() override;
-    /// Create a ProfilingStaticGuid based on a hash of the string
-    ProfilingStaticGuid GenerateStaticId(const std::string& str) override;
-
-    std::unique_ptr<ISendTimelinePacket> GetSendTimelinePacket() const override;
-
-    ISendCounterPacket& GetSendCounterPacket() override
-    {
-        return m_SendCounterPacket;
-    }
-
-    /// Check if the profiling is enabled
-    bool IsEnabled() { return m_Options.m_EnableProfiling; }
-
-private:
-    // Copy/move constructors/destructors and copy/move assignment operators are deleted
-    ProfilingService(const ProfilingService&) = delete;
-    ProfilingService(ProfilingService&&) = delete;
-    ProfilingService& operator=(const ProfilingService&) = delete;
-    ProfilingService& operator=(ProfilingService&&) = delete;
-
-    // Initialization/reset functions
-    void Initialize();
-    void InitializeCounterValue(uint16_t counterUid);
-    void Reset();
-    void Stop();
-
-    // Helper function
-    void CheckCounterUid(uint16_t counterUid) const;
-
-    // Profiling service components
-    ExternalProfilingOptions m_Options;
-    CounterDirectory m_CounterDirectory;
-    CounterIdMap m_CounterIdMap;
-    IProfilingConnectionFactoryPtr m_ProfilingConnectionFactory;
-    IProfilingConnectionPtr m_ProfilingConnection;
-    ProfilingStateMachine m_StateMachine;
-    CounterIndices m_CounterIndex;
-    CounterValues m_CounterValues;
-    CommandHandlerRegistry m_CommandHandlerRegistry;
-    PacketVersionResolver m_PacketVersionResolver;
-    CommandHandler m_CommandHandler;
-    BufferManager m_BufferManager;
-    SendCounterPacket m_SendCounterPacket;
-    SendThread m_SendThread;
-    SendTimelinePacket m_SendTimelinePacket;
-    Holder m_Holder;
-    PeriodicCounterCapture m_PeriodicCounterCapture;
-    ConnectionAcknowledgedCommandHandler m_ConnectionAcknowledgedCommandHandler;
-    RequestCounterDirectoryCommandHandler m_RequestCounterDirectoryCommandHandler;
-    PeriodicCounterSelectionCommandHandler m_PeriodicCounterSelectionCommandHandler;
-    PerJobCounterSelectionCommandHandler m_PerJobCounterSelectionCommandHandler;
-    ProfilingGuidGenerator m_GuidGenerator;
-    TimelinePacketWriterFactory m_TimelinePacketWriterFactory;
-    std::unordered_map<BackendId,
-    std::shared_ptr<armnn::profiling::IBackendProfilingContext>> m_BackendProfilingContexts;
-    uint16_t m_MaxGlobalCounterId;
-
-protected:
     // Default constructor/destructor kept protected for testing
     ProfilingService()
         : m_Options()
@@ -220,7 +112,116 @@ protected:
         // Register the "Per-Job Counter Selection" command handler
         m_CommandHandlerRegistry.RegisterFunctor(&m_PerJobCounterSelectionCommandHandler);
     }
+
     ~ProfilingService();
+
+    // Resets the profiling options, optionally clears the profiling service entirely
+    void ResetExternalProfilingOptions(const ExternalProfilingOptions& options, bool resetProfilingService = false);
+    ProfilingState ConfigureProfilingService(const ExternalProfilingOptions& options,
+                                             bool resetProfilingService = false);
+
+
+    // Updates the profiling service, making it transition to a new state if necessary
+    void Update();
+
+    // Disconnects the profiling service from the external server
+    void Disconnect();
+
+    // Store a profiling context returned from a backend that support profiling.
+    void AddBackendProfilingContext(const BackendId backendId,
+        std::shared_ptr<armnn::profiling::IBackendProfilingContext> profilingContext);
+
+    const ICounterDirectory& GetCounterDirectory() const;
+    ICounterRegistry& GetCounterRegistry();
+    ProfilingState GetCurrentState() const;
+    bool IsCounterRegistered(uint16_t counterUid) const override;
+    uint32_t GetCounterValue(uint16_t counterUid) const override;
+    uint16_t GetCounterCount() const override;
+    // counter global/backend mapping functions
+    const ICounterMappings& GetCounterMappings() const override;
+    IRegisterCounterMapping& GetCounterMappingRegistry();
+
+    // Getters for the profiling service state
+    bool IsProfilingEnabled() const override;
+
+    CaptureData GetCaptureData() override;
+    void SetCaptureData(uint32_t capturePeriod,
+                        const std::vector<uint16_t>& counterIds,
+                        const std::set<BackendId>& activeBackends);
+
+    // Setters for the profiling service state
+    void SetCounterValue(uint16_t counterUid, uint32_t value) override;
+    uint32_t AddCounterValue(uint16_t counterUid, uint32_t value) override;
+    uint32_t SubtractCounterValue(uint16_t counterUid, uint32_t value) override;
+    uint32_t IncrementCounterValue(uint16_t counterUid) override;
+
+    // IProfilingGuidGenerator functions
+    /// Return the next random Guid in the sequence
+    ProfilingDynamicGuid NextGuid() override;
+    /// Create a ProfilingStaticGuid based on a hash of the string
+    ProfilingStaticGuid GenerateStaticId(const std::string& str) override;
+
+    std::unique_ptr<ISendTimelinePacket> GetSendTimelinePacket() const override;
+
+    ISendCounterPacket& GetSendCounterPacket() override
+    {
+        return m_SendCounterPacket;
+    }
+
+    /// Check if the profiling is enabled
+    bool IsEnabled() { return m_Options.m_EnableProfiling; }
+
+    static ProfilingDynamicGuid GetNextGuid();
+
+    static ProfilingStaticGuid GetStaticId(const std::string& str);
+
+private:
+    //Copy/move constructors/destructors and copy/move assignment operators are deleted
+    ProfilingService(const ProfilingService&) = delete;
+    ProfilingService(ProfilingService&&) = delete;
+    ProfilingService& operator=(const ProfilingService&) = delete;
+    ProfilingService& operator=(ProfilingService&&) = delete;
+
+    // Initialization/reset functions
+    void Initialize();
+    void InitializeCounterValue(uint16_t counterUid);
+    void Reset();
+    void Stop();
+
+    // Helper function
+    void CheckCounterUid(uint16_t counterUid) const;
+
+    // Profiling service components
+    ExternalProfilingOptions m_Options;
+    CounterDirectory m_CounterDirectory;
+    CounterIdMap m_CounterIdMap;
+    IProfilingConnectionFactoryPtr m_ProfilingConnectionFactory;
+    IProfilingConnectionPtr m_ProfilingConnection;
+    ProfilingStateMachine m_StateMachine;
+    CounterIndices m_CounterIndex;
+    CounterValues m_CounterValues;
+    CommandHandlerRegistry m_CommandHandlerRegistry;
+    PacketVersionResolver m_PacketVersionResolver;
+    CommandHandler m_CommandHandler;
+    BufferManager m_BufferManager;
+    SendCounterPacket m_SendCounterPacket;
+    SendThread m_SendThread;
+    SendTimelinePacket m_SendTimelinePacket;
+    Holder m_Holder;
+    PeriodicCounterCapture m_PeriodicCounterCapture;
+    ConnectionAcknowledgedCommandHandler m_ConnectionAcknowledgedCommandHandler;
+    RequestCounterDirectoryCommandHandler m_RequestCounterDirectoryCommandHandler;
+    PeriodicCounterSelectionCommandHandler m_PeriodicCounterSelectionCommandHandler;
+    PerJobCounterSelectionCommandHandler m_PerJobCounterSelectionCommandHandler;
+
+    TimelinePacketWriterFactory m_TimelinePacketWriterFactory;
+    std::unordered_map<BackendId,
+    std::shared_ptr<armnn::profiling::IBackendProfilingContext>> m_BackendProfilingContexts;
+    uint16_t m_MaxGlobalCounterId;
+
+    static ProfilingGuidGenerator m_GuidGenerator;
+
+protected:
 
     // Protected methods for testing
     void SwapProfilingConnectionFactory(ProfilingService& instance,

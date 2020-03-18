@@ -59,13 +59,15 @@ namespace profiling
 class ProfilingServiceRuntimeHelper : public ProfilingService
 {
 public:
-    ProfilingServiceRuntimeHelper() = default;
+    ProfilingServiceRuntimeHelper(ProfilingService& profilingService)
+    : m_ProfilingService(profilingService) {}
     ~ProfilingServiceRuntimeHelper() = default;
 
     BufferManager& GetProfilingBufferManager()
     {
-        return GetBufferManager(ProfilingService::Instance());
+        return GetBufferManager(m_ProfilingService);
     }
+    armnn::profiling::ProfilingService& m_ProfilingService;
 };
 
 } // namespace profiling

@@ -20,7 +20,6 @@
 #include <backendsCommon/MemSyncWorkload.hpp>
 
 #include <LabelsAndEventClasses.hpp>
-#include <ProfilingService.hpp>
 
 #include <boost/polymorphic_cast.hpp>
 #include <boost/assert.hpp>
@@ -84,7 +83,8 @@ void AddWorkloadStructure(std::unique_ptr<TimelineUtilityMethods>& timelineUtils
 
 std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
                                                                 std::string& errorMessage,
-                                                                const INetworkProperties& networkProperties)
+                                                                const INetworkProperties& networkProperties,
+                                                                profiling::ProfilingService&  profilingService)
 {
     std::unique_ptr<LoadedNetwork> loadedNetwork;
 
@@ -98,7 +98,7 @@ std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<
 
     try
     {
-        loadedNetwork.reset(new LoadedNetwork(std::move(net), networkProperties));
+        loadedNetwork.reset(new LoadedNetwork(std::move(net), networkProperties, profilingService));
     }
     catch (const armnn::RuntimeException& error)
     {
@@ -117,10 +117,12 @@ std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<
 }
 
 LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
-                             const INetworkProperties& networkProperties) :
+                             const INetworkProperties& networkProperties,
+                             profiling::ProfilingService&  profilingService) :
                              m_OptimizedNetwork(std::move(net)),
                              m_IsImportEnabled(networkProperties.m_ImportEnabled),
-                             m_IsExportEnabled(networkProperties.m_ExportEnabled)
+                             m_IsExportEnabled(networkProperties.m_ExportEnabled),
+                             m_ProfilingService(profilingService)
 {
     // Create a profiler and register it for the current thread.
     m_Profiler = std::make_shared<Profiler>();
@@ -191,7 +193,8 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
     }
 
     ProfilingGuid networkGuid = m_OptimizedNetwork->GetGuid();
-    std::unique_ptr<TimelineUtilityMethods> timelineUtils = TimelineUtilityMethods::GetTimelineUtils();
+    std::unique_ptr<TimelineUtilityMethods> timelineUtils =
+                        TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
     if (timelineUtils)
     {
         timelineUtils->CreateTypedEntity(networkGuid, LabelsAndEventClasses::NETWORK_GUID);
@@ -449,8 +452,9 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
         EnqueueOutput(*outputLayer, pin.GetTensorHandle(), pin.GetTensorInfo());
     }
 
-    std::unique_ptr<TimelineUtilityMethods> timelineUtils = TimelineUtilityMethods::GetTimelineUtils();
-    ProfilingGuid inferenceGuid = ProfilingService::Instance().NextGuid();
+    std::unique_ptr<TimelineUtilityMethods> timelineUtils =
+                        TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
+    ProfilingGuid inferenceGuid = m_ProfilingService.GetNextGuid();
     if (timelineUtils)
     {
         // Add inference timeline trace if profiling is enabled.
@@ -463,9 +467,9 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
     bool executionSucceeded = true;
 
     {
-        if (profiling::ProfilingService::Instance().IsProfilingEnabled())
+        if (m_ProfilingService.IsProfilingEnabled())
         {
-            profiling::ProfilingService::Instance().IncrementCounterValue(armnn::profiling::INFERENCES_RUN);
+            m_ProfilingService.IncrementCounterValue(armnn::profiling::INFERENCES_RUN);
         }
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Execute");
         ARMNN_SCOPED_HEAP_PROFILING("Executing");
@@ -535,7 +539,8 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
 
         BOOST_ASSERT_MSG(inputWorkload, "No input workload created");
 
-        std::unique_ptr<TimelineUtilityMethods> timelineUtils = TimelineUtilityMethods::GetTimelineUtils();
+        std::unique_ptr<TimelineUtilityMethods> timelineUtils =
+                            TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
         if (timelineUtils)
         {
             // Add Input Workload to the post-optimisation network structure
@@ -627,7 +632,8 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
             std::make_unique<CopyMemGenericWorkload>(outputQueueDescriptor, info);
         BOOST_ASSERT_MSG(outputWorkload, "No output workload created");
 
-        std::unique_ptr<TimelineUtilityMethods> timelineUtils = TimelineUtilityMethods::GetTimelineUtils();
+        std::unique_ptr<TimelineUtilityMethods> timelineUtils =
+                                TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
         if (timelineUtils)
         {
             // Add Output Workload to the post-optimisation network structure

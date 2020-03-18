@@ -31,7 +31,7 @@ public:
 
     BaseWorkload(const QueueDescriptor& descriptor, const WorkloadInfo& info)
         : m_Data(descriptor),
-          m_Guid(profiling::ProfilingService::Instance().NextGuid())
+          m_Guid(profiling::ProfilingService::GetNextGuid())
     {
         m_Data.Validate(info);
     }

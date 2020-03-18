@@ -30,6 +30,11 @@ void RuntimeLoadedNetworksReserve(armnn::Runtime* runtime)
     runtime->m_LoadedNetworks.reserve(1);
 }
 
+profiling::ProfilingService& GetProfilingService(armnn::Runtime* runtime)
+{
+    return runtime->m_ProfilingService;
+}
+
 }
 
 BOOST_AUTO_TEST_SUITE(Runtime)
@@ -327,7 +332,7 @@ BOOST_AUTO_TEST_CASE(ProfilingDisable)
 
     // Create runtime in which the test will run
     armnn::IRuntime::CreationOptions options;
-    armnn::IRuntimePtr               runtime(armnn::IRuntime::Create(options));
+    armnn::Runtime runtime(options);
 
     // build up the structure of the network
     INetworkPtr net(INetwork::Create());
@@ -348,13 +353,13 @@ BOOST_AUTO_TEST_CASE(ProfilingDisable)
 
     // optimize the network
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    IOptimizedNetworkPtr          optNet   = Optimize(*net, backends, runtime->GetDeviceSpec());
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime.GetDeviceSpec());
 
     // Load it into the runtime. It should succeed.
     armnn::NetworkId netId;
-    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
+    BOOST_TEST(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
 
-    profiling::ProfilingServiceRuntimeHelper profilingServiceHelper;
+    profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
     profiling::BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
     auto readableBuffer = bufferManager.GetReadableBuffer();
 
@@ -370,7 +375,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     // Create runtime in which the test will run
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
-    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+    armnn::Runtime runtime(options);
 
     // build up the structure of the network
     INetworkPtr net(INetwork::Create());
@@ -390,15 +395,15 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
 
     // optimize the network
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    IOptimizedNetworkPtr          optNet   = Optimize(*net, backends, runtime->GetDeviceSpec());
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime.GetDeviceSpec());
 
     ProfilingGuid optNetGuid = optNet->GetGuid();
 
     // Load it into the runtime. It should succeed.
     armnn::NetworkId netId;
-    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
+    BOOST_TEST(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
 
-    profiling::ProfilingServiceRuntimeHelper profilingServiceHelper;
+    profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
     profiling::BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
     auto readableBuffer = bufferManager.GetReadableBuffer();
 
@@ -681,15 +686,15 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
 
     InputTensors  inputTensors
     {
-        { 0, ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data()) }
+        {0, ConstTensor(runtime.GetInputTensorInfo(netId, 0), inputData.data())}
     };
     OutputTensors outputTensors
     {
-        { 0, Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data()) }
+        {0, Tensor(runtime.GetOutputTensorInfo(netId, 0), outputData.data())}
     };
 
     // Does the inference.
-    runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
+    runtime.EnqueueWorkload(netId, inputTensors, outputTensors);
 
     // Get readable buffer for inference timeline
     auto inferenceReadableBuffer = bufferManager.GetReadableBuffer();

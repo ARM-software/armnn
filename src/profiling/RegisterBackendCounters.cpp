@@ -59,7 +59,7 @@ uint16_t RegisterBackendCounters::RegisterCounter(const uint16_t uid,
                                                                    counterSetUid);
     m_CurrentMaxGlobalCounterID = counterPtr->m_MaxCounterUid;
     // register mappings
-    IRegisterCounterMapping& counterIdMap = ProfilingService::Instance().GetCounterMappingRegistry();
+    IRegisterCounterMapping& counterIdMap = m_ProfilingService.GetCounterMappingRegistry();
     uint16_t globalCounterId = counterPtr->m_Uid;
     if (globalCounterId == counterPtr->m_MaxCounterUid)
     {

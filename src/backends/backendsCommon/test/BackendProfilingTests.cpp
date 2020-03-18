@@ -14,6 +14,8 @@
 #include "ProfilingUtils.hpp"
 #include "RequestCounterDirectoryCommandHandler.hpp"
 
+#include <Runtime.hpp>
+
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/BackendId.hpp>
 #include <armnn/Logging.hpp>
@@ -113,17 +115,16 @@ BOOST_AUTO_TEST_CASE(BackendProfilingCounterRegisterMockBackendTest)
 {
     // Reset the profiling service to the uninitialized state
     armnn::IRuntime::CreationOptions options;
-    options.m_ProfilingOptions.m_EnableProfiling = true;
-    armnn::profiling::ProfilingService& profilingService = armnn::profiling::ProfilingService::Instance();
-    profilingService.ConfigureProfilingService(options.m_ProfilingOptions, true);
+    options.m_ProfilingOptions.m_EnableProfiling = true;;
 
     armnn::MockBackendInitialiser initialiser;
     // Create a runtime
-    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+//    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+    armnn::Runtime runtime(options);
 
     // Check if the MockBackends 3 dummy counters {0, 1, 2-5 (four cores)} are registered
     armnn::BackendId mockId = armnn::MockBackendId();
-    const armnn::profiling::ICounterMappings& counterMap = profilingService.GetCounterMappings();
+    const armnn::profiling::ICounterMappings& counterMap = GetProfilingService(&runtime).GetCounterMappings();
     BOOST_CHECK(counterMap.GetGlobalId(0, mockId) == 5);
     BOOST_CHECK(counterMap.GetGlobalId(1, mockId) == 6);
     BOOST_CHECK(counterMap.GetGlobalId(2, mockId) == 7);
@@ -131,7 +132,7 @@ BOOST_AUTO_TEST_CASE(BackendProfilingCounterRegisterMockBackendTest)
     BOOST_CHECK(counterMap.GetGlobalId(4, mockId) == 9);
     BOOST_CHECK(counterMap.GetGlobalId(5, mockId) == 10);
     options.m_ProfilingOptions.m_EnableProfiling = false;
-    profilingService.ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
+    GetProfilingService(&runtime).ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
 }
 
 BOOST_AUTO_TEST_CASE(TestBackendCounters)
@@ -149,7 +150,7 @@ BOOST_AUTO_TEST_CASE(TestBackendCounters)
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
 
-    armnn::profiling::ProfilingService& profilingService = armnn::profiling::ProfilingService::Instance();
+    armnn::profiling::ProfilingService profilingService;
 
     std::unique_ptr<armnn::profiling::IBackendProfiling> cpuBackendProfilingPtr =
             std::make_unique<BackendProfiling>(options, profilingService, cpuAccId);
@@ -397,7 +398,7 @@ BOOST_AUTO_TEST_CASE(TestBackendCounterLogging)
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
 
-    armnn::profiling::ProfilingService& profilingService = armnn::profiling::ProfilingService::Instance();
+    armnn::profiling::ProfilingService profilingService;
 
     std::unique_ptr<armnn::profiling::IBackendProfiling> cpuBackendProfilingPtr =
             std::make_unique<BackendProfiling>(options, profilingService, cpuAccId);
@@ -449,7 +450,7 @@ BOOST_AUTO_TEST_CASE(BackendProfilingContextGetSendTimelinePacket)
     // Reset the profiling service to the uninitialized state
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
-    armnn::profiling::ProfilingService& profilingService = armnn::profiling::ProfilingService::Instance();
+    armnn::profiling::ProfilingService profilingService;
     profilingService.ConfigureProfilingService(options.m_ProfilingOptions, true);
 
     armnn::MockBackendInitialiser initialiser;
@@ -482,8 +483,6 @@ BOOST_AUTO_TEST_CASE(GetProfilingGuidGenerator)
     // Reset the profiling service to the uninitialized state
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
-    armnn::profiling::ProfilingService& profilingService = armnn::profiling::ProfilingService::Instance();
-    profilingService.ConfigureProfilingService(options.m_ProfilingOptions, true);
 
     armnn::MockBackendInitialiser initialiser;
     // Create a runtime. During this the mock backend will be registered and context returned.
@@ -506,7 +505,6 @@ BOOST_AUTO_TEST_CASE(GetProfilingGuidGenerator)
 
     // Reset the profiling servie after the test.
     options.m_ProfilingOptions.m_EnableProfiling = false;
-    profilingService.ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

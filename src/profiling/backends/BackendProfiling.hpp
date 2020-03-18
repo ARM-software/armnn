@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "IProfilingService.hpp"
+#include "ProfilingService.hpp"
 #include <armnn/backends/profiling/IBackendProfiling.hpp>
 
 namespace armnn
@@ -18,7 +18,7 @@ class BackendProfiling : public IBackendProfiling
 {
 public:
     BackendProfiling(const IRuntime::CreationOptions& options,
-                     IProfilingService& profilingService,
+                     ProfilingService& profilingService,
                      const BackendId& backendId)
             : m_Options(options),
               m_ProfilingService(profilingService),
@@ -44,7 +44,7 @@ public:
 
 private:
     IRuntime::CreationOptions m_Options;
-    IProfilingService& m_ProfilingService;
+    ProfilingService& m_ProfilingService;
     BackendId m_BackendId;
 };
 }    // namespace profiling

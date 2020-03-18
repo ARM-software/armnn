@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     // Enable the profiling service.
     armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling                     = true;
-    profiling::ProfilingService& profilingService = profiling::ProfilingService::Instance();
+    armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Bring the profiling service to the "WaitingForAck" state

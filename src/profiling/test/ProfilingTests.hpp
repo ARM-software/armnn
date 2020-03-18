@@ -204,13 +204,15 @@ class SwapProfilingConnectionFactoryHelper : public ProfilingService
 public:
     using MockProfilingConnectionFactoryPtr = std::unique_ptr<MockProfilingConnectionFactory>;
 
-    SwapProfilingConnectionFactoryHelper()
+    SwapProfilingConnectionFactoryHelper(armnn::profiling::ProfilingService& profilingService)
         : ProfilingService()
+        , m_ProfilingService(profilingService)
         , m_MockProfilingConnectionFactory(new MockProfilingConnectionFactory())
         , m_BackupProfilingConnectionFactory(nullptr)
+
     {
         BOOST_CHECK(m_MockProfilingConnectionFactory);
-        SwapProfilingConnectionFactory(ProfilingService::Instance(),
+        SwapProfilingConnectionFactory(m_ProfilingService,
                                        m_MockProfilingConnectionFactory.get(),
                                        m_BackupProfilingConnectionFactory);
         BOOST_CHECK(m_BackupProfilingConnectionFactory);
@@ -219,20 +221,20 @@ public:
     {
         BOOST_CHECK(m_BackupProfilingConnectionFactory);
         IProfilingConnectionFactory* temp = nullptr;
-        SwapProfilingConnectionFactory(ProfilingService::Instance(),
+        SwapProfilingConnectionFactory(m_ProfilingService,
                                        m_BackupProfilingConnectionFactory,
                                        temp);
     }
 
     MockProfilingConnection* GetMockProfilingConnection()
     {
-        IProfilingConnection* profilingConnection = GetProfilingConnection(ProfilingService::Instance());
+        IProfilingConnection* profilingConnection = GetProfilingConnection(m_ProfilingService);
         return boost::polymorphic_downcast<MockProfilingConnection*>(profilingConnection);
     }
 
     void ForceTransitionToState(ProfilingState newState)
     {
-        TransitionToState(ProfilingService::Instance(), newState);
+        TransitionToState(m_ProfilingService, newState);
     }
 
     long WaitForPacketsSent(MockProfilingConnection* mockProfilingConnection,
@@ -247,7 +249,7 @@ public:
         {
             std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
             // Wait for a notification from the send thread
-            ProfilingService::WaitForPacketSent(ProfilingService::Instance(), timeout);
+            ProfilingService::WaitForPacketSent(m_ProfilingService, timeout);
 
             std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
@@ -268,6 +270,7 @@ public:
     }
 
 private:
+    armnn::profiling::ProfilingService& m_ProfilingService;
     MockProfilingConnectionFactoryPtr m_MockProfilingConnectionFactory;
     IProfilingConnectionFactory* m_BackupProfilingConnectionFactory;
 };

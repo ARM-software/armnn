@@ -397,18 +397,18 @@ BOOST_AUTO_TEST_CASE(GetGuidsFromProfilingService)
 {
     armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling = true;
-    ProfilingService& profilingService = ProfilingService::Instance();
+    armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
-    ProfilingStaticGuid staticGuid = profilingService.GenerateStaticId("dummy");
+    ProfilingStaticGuid staticGuid = profilingService.GetStaticId("dummy");
     std::hash<std::string> hasher;
     uint64_t hash = static_cast<uint64_t>(hasher("dummy"));
     ProfilingStaticGuid expectedStaticValue(hash | MIN_STATIC_GUID);
     BOOST_CHECK(staticGuid == expectedStaticValue);
-    ProfilingDynamicGuid dynamicGuid = profilingService.NextGuid();
+    ProfilingDynamicGuid dynamicGuid = profilingService.GetNextGuid();
     uint64_t dynamicGuidValue = static_cast<uint64_t>(dynamicGuid);
     ++dynamicGuidValue;
     ProfilingDynamicGuid expectedDynamicValue(dynamicGuidValue);
-    dynamicGuid = profilingService.NextGuid();
+    dynamicGuid = profilingService.GetNextGuid();
     BOOST_CHECK(dynamicGuid == expectedDynamicValue);
 }
 
@@ -416,7 +416,7 @@ BOOST_AUTO_TEST_CASE(GetTimelinePackerWriterFromProfilingService)
 {
     armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling = true;
-    ProfilingService& profilingService = ProfilingService::Instance();
+    armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     std::unique_ptr<ISendTimelinePacket> writer = profilingService.GetSendTimelinePacket();

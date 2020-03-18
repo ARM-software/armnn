@@ -30,8 +30,9 @@ class FileOnlyHelperService : public ProfilingService
     // Wait for a notification from the send thread
     bool WaitForPacketsSent(uint32_t timeout = 1000)
     {
-        return ProfilingService::WaitForPacketSent(ProfilingService::Instance(), timeout);
+        return ProfilingService::WaitForPacketSent(m_ProfilingService, timeout);
     }
+    armnn::profiling::ProfilingService m_ProfilingService;
 };
 
 BOOST_AUTO_TEST_SUITE(FileOnlyProfilingDecoratorTests)
@@ -52,7 +53,7 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd, * boost::unit_test::disabled
     FileOnlyHelperService helper;
 
     // Enable the profiling service
-    ProfilingService& profilingService = ProfilingService::Instance();
+    armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
     // Bring the profiling service to the "WaitingForAck" state
     profilingService.Update();

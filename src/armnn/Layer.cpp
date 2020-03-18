@@ -194,7 +194,7 @@ Layer::Layer(unsigned int numInputSlots,
 , m_Type(type)
 , m_BackendId()
 , m_BackendHint(EmptyOptional())
-, m_Guid(profiling::ProfilingService::Instance().NextGuid())
+, m_Guid(profiling::ProfilingService::GetNextGuid())
 {
     IgnoreUnused(layout);
     m_InputSlots.reserve(numInputSlots);

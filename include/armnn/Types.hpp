@@ -252,6 +252,8 @@ static constexpr uint64_t MIN_STATIC_GUID = 1llu << 63;
 class ProfilingGuid
 {
 public:
+    ProfilingGuid() : m_Guid(0) {}
+
     ProfilingGuid(uint64_t guid) : m_Guid(guid) {}
 
     operator uint64_t() const { return m_Guid; }

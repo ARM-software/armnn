@@ -9,6 +9,7 @@
 #include <armnn/Descriptors.hpp>
 #include <LabelsAndEventClasses.hpp>
 #include <ProfilingService.hpp>
+#include <Runtime.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -78,7 +79,8 @@ void VerifyTimelineLabelBinaryPacketData(Optional<ProfilingGuid> guid,
     }
     else
     {
-        BOOST_CHECK(readProfilingGuid == ProfilingService::Instance().GenerateStaticId(label));
+        armnn::profiling::ProfilingService profilingService;
+        BOOST_CHECK(readProfilingGuid == profilingService.GetStaticId(label));
     }
 
     // Check the SWTrace label
@@ -294,9 +296,8 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     // Create runtime in which test will run
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
-    armnn::profiling::ProfilingService& profilingService = armnn::profiling::ProfilingService::Instance();
-    profilingService.ConfigureProfilingService(options.m_ProfilingOptions, true);
-    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+//    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+    armnn::Runtime runtime(options);
 
     // build up the structure of the network
     INetworkPtr net(INetwork::Create());
@@ -354,15 +355,15 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
 
     // optimize the network
     std::vector<armnn::BackendId> backends = { backendId };
-    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime.GetDeviceSpec());
 
     ProfilingGuid optNetGuid = optNet->GetGuid();
 
     // Load it into the runtime. It should success.
     armnn::NetworkId netId;
-    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
+    BOOST_TEST(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
 
-    profiling::ProfilingServiceRuntimeHelper profilingServiceHelper;
+    profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
     profiling::BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
     auto readableBuffer = bufferManager.GetReadableBuffer();
 
@@ -762,15 +763,15 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
 
     InputTensors inputTensors
         {
-            { 0, ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data()) }
+        {0, ConstTensor(runtime.GetInputTensorInfo(netId, 0), inputData.data())}
         };
     OutputTensors outputTensors
         {
-            { 0, Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data()) }
+        {0, Tensor(runtime.GetOutputTensorInfo(netId, 0), outputData.data())}
         };
 
     // Does the inference.
-    runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
+    runtime.EnqueueWorkload(netId, inputTensors, outputTensors);
 
     // Get readable buffer for inference timeline
     auto inferenceReadableBuffer = bufferManager.GetReadableBuffer();

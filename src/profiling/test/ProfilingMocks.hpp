@@ -7,7 +7,7 @@
 
 #include <Holder.hpp>
 #include <IProfilingConnectionFactory.hpp>
-#include <IProfilingService.hpp>
+#include <ProfilingService.hpp>
 #include <ProfilingGuidGenerator.hpp>
 #include <ProfilingUtils.hpp>
 #include <SendCounterPacket.hpp>
@@ -620,7 +620,7 @@ private:
     Counters    m_Counters;
 };
 
-class MockProfilingService : public IProfilingService, public IRegisterCounterMapping
+class MockProfilingService : public ProfilingService
 {
 public:
     MockProfilingService(MockBufferManager& mockBufferManager,
@@ -670,12 +670,12 @@ public:
 
     void RegisterMapping(uint16_t globalCounterId,
                          uint16_t backendCounterId,
-                         const armnn::BackendId& backendId) override
+                         const armnn::BackendId& backendId)
     {
         m_CounterMapping.RegisterMapping(globalCounterId, backendCounterId, backendId);
     }
 
-    void Reset() override
+    void Reset()
     {
         m_CounterMapping.Reset();
     }

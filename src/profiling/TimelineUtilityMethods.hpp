@@ -5,7 +5,9 @@
 
 #pragma once
 
+#include "ProfilingService.hpp"
 #include "armnn/profiling/ISendTimelinePacket.hpp"
+
 #include <armnn/Types.hpp>
 
 namespace armnn
@@ -20,13 +22,14 @@ public:
 
     // static factory method which will return a pointer to a timelie utility methods
     // object if profiling is enabled. Otherwise will return a null unique_ptr
-    static std::unique_ptr<TimelineUtilityMethods> GetTimelineUtils();
+    static std::unique_ptr<TimelineUtilityMethods> GetTimelineUtils(ProfilingService& profilingService);
 
-    TimelineUtilityMethods(std::unique_ptr<ISendTimelinePacket>& sendTimelinePacket)
-        : m_SendTimelinePacket(std::move(sendTimelinePacket)) {}
+    TimelineUtilityMethods(
+        std::unique_ptr<ISendTimelinePacket>& sendTimelinePacket, ProfilingService& profilingService)
+        : m_SendTimelinePacket(std::move(sendTimelinePacket)), m_ProfilingService(profilingService) {}
 
     TimelineUtilityMethods(TimelineUtilityMethods&& other)
-        : m_SendTimelinePacket(std::move(other.m_SendTimelinePacket)) {}
+        : m_SendTimelinePacket(std::move(other.m_SendTimelinePacket)), m_ProfilingService(other.m_ProfilingService) {}
 
     TimelineUtilityMethods(const TimelineUtilityMethods& other) = delete;
 
@@ -89,6 +92,7 @@ public:
 
 private:
     std::unique_ptr<ISendTimelinePacket> m_SendTimelinePacket;
+    profiling::ProfilingService&  m_ProfilingService;
 };
 
 } // namespace profiling

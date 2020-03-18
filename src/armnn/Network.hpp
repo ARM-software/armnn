@@ -35,8 +35,6 @@ public:
 
     Status PrintGraph() override;
 
-    profiling::ProfilingGuid GetGuid() const final { return m_Guid; };
-
     IConnectableLayer* AddInputLayer(LayerBindingId id, const char* name=nullptr) override;
 
     IConnectableLayer* AddArgMinMaxLayer(const ArgMinMaxDescriptor& desc,
@@ -259,7 +257,6 @@ private:
         const char* name);
 
     std::unique_ptr<Graph> m_Graph;
-    profiling::ProfilingGuid m_Guid;
 };
 
 class OptimizedNetwork final : public IOptimizedNetwork

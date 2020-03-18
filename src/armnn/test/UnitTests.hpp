@@ -70,6 +70,8 @@ void RunTestFunction(const char* testName, TFuncPtr testFunction, Args... args)
 
     auto testResult = (*testFunction)(workloadFactory, memoryManager, args...);
     CompareTestResultIfSupported(testName, testResult);
+
+    armnn::ProfilerManager::GetInstance().RegisterProfiler(nullptr);
 }
 
 #define ARMNN_SIMPLE_TEST_CASE(TestName, TestFunction) \

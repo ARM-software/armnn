@@ -1,8 +1,0 @@
-//
-// Copyright © 2017 ARM Ltd. All rights reserved.
-// SPDX-License-Identifier: MIT
-//
-
-// Dummy Android.bp file to keep backward compatibility with previous
-// build systems/environments.
-

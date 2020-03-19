@@ -7,6 +7,7 @@
 
 #include <armnn/INetwork.hpp>
 #include <Graph.hpp>
+#include <Runtime.hpp>
 
 void Connect(armnn::IConnectableLayer* from, armnn::IConnectableLayer* to, const armnn::TensorInfo& tensorInfo,
              unsigned int fromIndex = 0, unsigned int toIndex = 0);
@@ -47,3 +48,10 @@ bool CheckRelatedLayers(armnn::Graph& graph, const std::list<std::string>& testR
 
     return true;
 }
+
+namespace armnn
+{
+
+profiling::ProfilingService& GetProfilingService(armnn::Runtime* runtime);
+
+} // namespace armnn

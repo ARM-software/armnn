@@ -14,7 +14,7 @@
 #include "ProfilingUtils.hpp"
 #include "RequestCounterDirectoryCommandHandler.hpp"
 
-#include <Runtime.hpp>
+#include <test/TestUtils.hpp>
 
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/BackendId.hpp>
@@ -119,7 +119,6 @@ BOOST_AUTO_TEST_CASE(BackendProfilingCounterRegisterMockBackendTest)
 
     armnn::MockBackendInitialiser initialiser;
     // Create a runtime
-//    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
     armnn::Runtime runtime(options);
 
     // Check if the MockBackends 3 dummy counters {0, 1, 2-5 (four cores)} are registered

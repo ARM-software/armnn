@@ -21,6 +21,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "RuntimeTests.hpp"
+#include "TestUtils.hpp"
 
 namespace armnn
 {
@@ -28,11 +29,6 @@ namespace armnn
 void RuntimeLoadedNetworksReserve(armnn::Runtime* runtime)
 {
     runtime->m_LoadedNetworks.reserve(1);
-}
-
-profiling::ProfilingService& GetProfilingService(armnn::Runtime* runtime)
-{
-    return runtime->m_ProfilingService;
 }
 
 }

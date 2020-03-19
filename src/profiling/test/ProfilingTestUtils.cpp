@@ -9,7 +9,8 @@
 #include <armnn/Descriptors.hpp>
 #include <LabelsAndEventClasses.hpp>
 #include <ProfilingService.hpp>
-#include <Runtime.hpp>
+
+#include <test/TestUtils.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -296,7 +297,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     // Create runtime in which test will run
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
-//    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
     armnn::Runtime runtime(options);
 
     // build up the structure of the network

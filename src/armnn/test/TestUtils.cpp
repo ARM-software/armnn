@@ -18,3 +18,13 @@ void Connect(armnn::IConnectableLayer* from, armnn::IConnectableLayer* to, const
     from->GetOutputSlot(fromIndex).Connect(to->GetInputSlot(toIndex));
     from->GetOutputSlot(fromIndex).SetTensorInfo(tensorInfo);
 }
+
+namespace armnn
+{
+
+profiling::ProfilingService& GetProfilingService(armnn::Runtime* runtime)
+{
+    return runtime->m_ProfilingService;
+}
+
+}

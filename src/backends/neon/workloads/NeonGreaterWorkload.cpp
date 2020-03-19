@@ -23,9 +23,8 @@ arm_compute::Status NeonGreaterWorkloadValidate(const TensorInfo& input0,
                                             &aclOutput);
 }
 
-template <DataType T>
-NeonGreaterWorkload<T>::NeonGreaterWorkload(const GreaterQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : MultiTypedWorkload<GreaterQueueDescriptor, T, DataType::Boolean>(descriptor, info)
+NeonGreaterWorkload::NeonGreaterWorkload(const GreaterQueueDescriptor& descriptor, const WorkloadInfo& info)
+    : BaseWorkload<GreaterQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonGreaterWorkload", 2, 1);
 
@@ -36,14 +35,10 @@ NeonGreaterWorkload<T>::NeonGreaterWorkload(const GreaterQueueDescriptor& descri
     m_GreaterLayer.configure(&input0, &input1, &output);
 }
 
-template <DataType T>
-void NeonGreaterWorkload<T>::Execute() const
+void NeonGreaterWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonGreaterWorkload_Execute");
     m_GreaterLayer.run();
 }
-
-template class NeonGreaterWorkload<DataType::Float32>;
-template class NeonGreaterWorkload<DataType::QAsymmU8>;
 
 } //namespace armnn

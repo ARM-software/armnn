@@ -178,8 +178,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateComparison(const ComparisonQ
         GreaterQueueDescriptor greaterQueueDescriptor;
         greaterQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
         greaterQueueDescriptor.m_Outputs = descriptor.m_Outputs;
-
-        return MakeWorkload<ClGreaterFloat32Workload, ClGreaterUint8Workload>(greaterQueueDescriptor, info);
+        return MakeWorkload<ClGreaterWorkload>(greaterQueueDescriptor, info);
     }
     return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
 }

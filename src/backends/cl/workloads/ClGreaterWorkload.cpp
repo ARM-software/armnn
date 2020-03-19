@@ -38,10 +38,8 @@ arm_compute::Status ClGreaterWorkloadValidate(const TensorInfo& input0,
     return aclStatus;
 }
 
-template<DataType T>
-ClGreaterWorkload<T>::ClGreaterWorkload(const GreaterQueueDescriptor& descriptor,
-                                        const WorkloadInfo& info)
-    : MultiTypedWorkload<GreaterQueueDescriptor, T, DataType::Boolean>(descriptor, info)
+ClGreaterWorkload::ClGreaterWorkload(const GreaterQueueDescriptor& descriptor, const WorkloadInfo& info)
+    : BaseWorkload<GreaterQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClGreaterWorkload", 2, 1);
 
@@ -52,14 +50,10 @@ ClGreaterWorkload<T>::ClGreaterWorkload(const GreaterQueueDescriptor& descriptor
     m_GreaterLayer.configure(&input0, &input1, &output, arm_compute::ComparisonOperation::Greater);
 }
 
-template<DataType T>
-void ClGreaterWorkload<T>::Execute() const
+void ClGreaterWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClGreaterWorkload_Execute");
     RunClFunction(m_GreaterLayer, CHECK_LOCATION());
 }
-
-template class ClGreaterWorkload<DataType::Float32>;
-template class ClGreaterWorkload<DataType::QAsymmU8>;
 
 } //namespace armnn

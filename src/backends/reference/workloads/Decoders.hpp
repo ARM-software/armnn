@@ -136,6 +136,10 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
                     info.GetQuantizationOffset());
             }
         }
+        case armnn::DataType::Boolean:
+        {
+            return std::make_unique<BooleanDecoder>(static_cast<const uint8_t*>(data));
+        }
         default:
         {
             BOOST_ASSERT_MSG(false, "Unsupported Data Type!");

@@ -144,8 +144,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateComparison(const Compariso
         GreaterQueueDescriptor greaterQueueDescriptor;
         greaterQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
         greaterQueueDescriptor.m_Outputs = descriptor.m_Outputs;
-
-        return MakeWorkloadHelper<NeonGreaterFloat32Workload, NeonGreaterUint8Workload>(greaterQueueDescriptor, info);
+        return std::make_unique<NeonGreaterWorkload>(greaterQueueDescriptor, info);
     }
     return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
 }

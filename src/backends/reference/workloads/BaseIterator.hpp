@@ -275,6 +275,22 @@ public:
     }
 };
 
+class BooleanDecoder : public TypedIterator<const uint8_t, Decoder<float>>
+{
+public:
+    BooleanDecoder(const uint8_t* data)
+            : TypedIterator(data) {}
+
+    BooleanDecoder()
+            : BooleanDecoder(nullptr) {}
+
+    float Get() const override
+    {
+        return *m_Iterator;
+    }
+
+};
+
 class QASymm8Encoder : public TypedIterator<uint8_t, Encoder<float>>
 {
 public:

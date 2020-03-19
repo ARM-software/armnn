@@ -302,14 +302,15 @@ bool RefLayerSupport::IsComparisonSupported(const TensorInfo& input0,
                                             Optional<std::string&> reasonIfUnsupported) const
 {
     IgnoreUnused(descriptor);
-
-    std::array<DataType, 5> supportedInputTypes =
+    std::array<DataType, 7> supportedInputTypes =
     {
+        DataType::Boolean,
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Signed32
     };
 
     bool supported = true;

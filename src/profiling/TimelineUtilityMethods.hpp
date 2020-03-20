@@ -39,7 +39,7 @@ public:
 
     ~TimelineUtilityMethods() = default;
 
-    void SendWellKnownLabelsAndEventClasses();
+    static void SendWellKnownLabelsAndEventClasses(ISendTimelinePacket& timelinePacket);
 
     ProfilingDynamicGuid CreateNamedTypedEntity(const std::string& name, const std::string& type);
 

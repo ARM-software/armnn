@@ -80,13 +80,10 @@ BOOST_AUTO_TEST_CASE(CreateTypedLabelTest)
 BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
 {
     MockBufferManager mockBufferManager(1024);
-    std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
-    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
+    ProfilingService  profilingService;
+    SendTimelinePacket sendTimelinePacket(mockBufferManager);
 
-    BOOST_CHECK_NO_THROW(timelineUtilityMethods.SendWellKnownLabelsAndEventClasses());
-
-    // Commit all packets at once
-    timelineUtilityMethods.Commit();
+    BOOST_CHECK_NO_THROW(TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses(sendTimelinePacket));
 
     // Get the readable buffer
     auto readableBuffer = mockBufferManager.GetReadableBuffer();

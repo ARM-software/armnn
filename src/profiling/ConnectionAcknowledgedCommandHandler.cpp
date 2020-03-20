@@ -4,6 +4,7 @@
 //
 
 #include "ConnectionAcknowledgedCommandHandler.hpp"
+#include "TimelineUtilityMethods.hpp"
 
 #include <armnn/Exceptions.hpp>
 
@@ -40,6 +41,8 @@ void ConnectionAcknowledgedCommandHandler::operator()(const Packet& packet)
         // Send the counter directory packet.
         m_SendCounterPacket.SendCounterDirectoryPacket(m_CounterDirectory);
         m_SendTimelinePacket.SendTimelineMessageDirectoryPackage();
+
+        TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses(m_SendTimelinePacket);
 
         break;
     case ProfilingState::Active:

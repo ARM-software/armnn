@@ -25,11 +25,11 @@ public:
     static std::unique_ptr<TimelineUtilityMethods> GetTimelineUtils(ProfilingService& profilingService);
 
     TimelineUtilityMethods(
-        std::unique_ptr<ISendTimelinePacket>& sendTimelinePacket, ProfilingService& profilingService)
-        : m_SendTimelinePacket(std::move(sendTimelinePacket)), m_ProfilingService(profilingService) {}
+        std::unique_ptr<ISendTimelinePacket>& sendTimelinePacket)
+        : m_SendTimelinePacket(std::move(sendTimelinePacket)) {}
 
     TimelineUtilityMethods(TimelineUtilityMethods&& other)
-        : m_SendTimelinePacket(std::move(other.m_SendTimelinePacket)), m_ProfilingService(other.m_ProfilingService) {}
+        : m_SendTimelinePacket(std::move(other.m_SendTimelinePacket)) {}
 
     TimelineUtilityMethods(const TimelineUtilityMethods& other) = delete;
 
@@ -92,7 +92,6 @@ public:
 
 private:
     std::unique_ptr<ISendTimelinePacket> m_SendTimelinePacket;
-    profiling::ProfilingService&  m_ProfilingService;
 };
 
 } // namespace profiling

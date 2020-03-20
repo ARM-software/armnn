@@ -17,7 +17,7 @@ std::unique_ptr<TimelineUtilityMethods> TimelineUtilityMethods::GetTimelineUtils
     if (profilingService.IsProfilingEnabled())
     {
         std::unique_ptr<ISendTimelinePacket> sendTimelinepacket = profilingService.GetSendTimelinePacket();
-        return std::make_unique<TimelineUtilityMethods>(sendTimelinepacket, profilingService);
+        return std::make_unique<TimelineUtilityMethods>(sendTimelinepacket);
     }
     else
     {
@@ -91,7 +91,7 @@ ProfilingDynamicGuid TimelineUtilityMethods::CreateNamedTypedEntity(const std::s
     }
 
     // Generate dynamic GUID of the entity
-    ProfilingDynamicGuid entityGuid = m_ProfilingService.GetNextGuid();
+    ProfilingDynamicGuid entityGuid = profiling::ProfilingService::GetNextGuid();
 
     CreateNamedTypedEntity(entityGuid, name, type);
 
@@ -154,7 +154,7 @@ ProfilingStaticGuid TimelineUtilityMethods::DeclareLabel(const std::string& labe
     }
 
     // Generate a static GUID for the given label name
-    ProfilingStaticGuid labelGuid = m_ProfilingService.GetStaticId(labelName);
+    ProfilingStaticGuid labelGuid = profiling::ProfilingService::GetStaticId(labelName);
 
     // Send the new label to the external profiling service, this call throws in case of error
     m_SendTimelinePacket->SendTimelineLabelBinaryPacket(labelGuid, labelName);
@@ -177,7 +177,7 @@ void TimelineUtilityMethods::MarkEntityWithLabel(ProfilingGuid entityGuid,
     ProfilingStaticGuid labelGuid = DeclareLabel(labelName);
 
     // Generate a GUID for the label relationship
-    ProfilingDynamicGuid relationshipGuid = m_ProfilingService.GetNextGuid();
+    ProfilingDynamicGuid relationshipGuid = profiling::ProfilingService::GetNextGuid();
 
     // Send the new label link to the external profiling service, this call throws in case of error
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
@@ -186,7 +186,7 @@ void TimelineUtilityMethods::MarkEntityWithLabel(ProfilingGuid entityGuid,
                                                                labelGuid);
 
     // Generate a GUID for the label relationship
-    ProfilingDynamicGuid relationshipLabelGuid = m_ProfilingService.GetNextGuid();
+    ProfilingDynamicGuid relationshipLabelGuid = profiling::ProfilingService::GetNextGuid();
 
     // Send the new label link to the external profiling service, this call throws in case of error
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
@@ -199,7 +199,7 @@ void TimelineUtilityMethods::MarkEntityWithType(ProfilingGuid entityGuid,
                                                 ProfilingStaticGuid typeNameGuid)
 {
     // Generate a GUID for the label relationship
-    ProfilingDynamicGuid relationshipGuid = m_ProfilingService.GetNextGuid();
+    ProfilingDynamicGuid relationshipGuid = profiling::ProfilingService::GetNextGuid();
 
     // Send the new label link to the external profiling service, this call throws in case of error
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
@@ -208,7 +208,7 @@ void TimelineUtilityMethods::MarkEntityWithType(ProfilingGuid entityGuid,
                                                                typeNameGuid);
 
     // Generate a GUID for the label relationship
-    ProfilingDynamicGuid relationshipLabelGuid = m_ProfilingService.GetNextGuid();
+    ProfilingDynamicGuid relationshipLabelGuid = profiling::ProfilingService::GetNextGuid();
 
     // Send the new label link to the external profiling service, this call throws in case of error
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
@@ -249,7 +249,7 @@ ProfilingDynamicGuid TimelineUtilityMethods::CreateNamedTypedChildEntity(Profili
     ProfilingDynamicGuid childEntityGuid = CreateNamedTypedEntity(entityName, entityType);
 
     // Generate a GUID for the retention link relationship
-    ProfilingDynamicGuid retentionLinkGuid = m_ProfilingService.GetNextGuid();
+    ProfilingDynamicGuid retentionLinkGuid = profiling::ProfilingService::GetNextGuid();
 
     // Send the new retention link to the external profiling service, this call throws in case of error
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
@@ -283,7 +283,7 @@ void TimelineUtilityMethods::CreateNamedTypedChildEntity(ProfilingGuid childEnti
     CreateNamedTypedEntity(childEntityGuid, entityName, entityType);
 
     // Generate a GUID for the retention link relationship
-    ProfilingDynamicGuid retentionLinkGuid = m_ProfilingService.GetNextGuid();
+    ProfilingDynamicGuid retentionLinkGuid = profiling::ProfilingService::GetNextGuid();
 
     // Send the new retention link to the external profiling service, this call throws in case of error
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
@@ -308,7 +308,7 @@ void TimelineUtilityMethods::CreateNamedTypedChildEntity(ProfilingGuid childEnti
     CreateNamedTypedEntity(childEntityGuid, entityName, typeGuid);
 
     // Generate a GUID for the retention link relationship
-    ProfilingDynamicGuid retentionLinkGuid = m_ProfilingService.GetNextGuid();
+    ProfilingDynamicGuid retentionLinkGuid = profiling::ProfilingService::GetNextGuid();
 
     // Send the new retention link to the external profiling service, this call throws in case of error
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
@@ -322,7 +322,7 @@ ProfilingDynamicGuid TimelineUtilityMethods::CreateRelationship(ProfilingRelatio
                                                                 ProfilingGuid tailGuid)
 {
     // Generate a GUID for the relationship
-    ProfilingDynamicGuid relationshipGuid = m_ProfilingService.GetNextGuid();
+    ProfilingDynamicGuid relationshipGuid = profiling::ProfilingService::GetNextGuid();
 
     // Send the new retention link to the external profiling service, this call throws in case of error
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(relationshipType,
@@ -337,7 +337,7 @@ ProfilingDynamicGuid TimelineUtilityMethods::CreateConnectionRelationship(Profil
                                                                           ProfilingGuid tailGuid)
 {
     // Generate a GUID for the relationship
-    ProfilingDynamicGuid relationshipGuid = m_ProfilingService.GetNextGuid();
+    ProfilingDynamicGuid relationshipGuid = profiling::ProfilingService::GetNextGuid();
 
     // Send the new retention link to the external profiling service, this call throws in case of error
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(relationshipType,
@@ -367,13 +367,13 @@ ProfilingDynamicGuid TimelineUtilityMethods::RecordEvent(ProfilingGuid entityGui
     std::thread::id threadId = std::this_thread::get_id();
 
     // Generate a GUID for the event
-    ProfilingDynamicGuid eventGuid = m_ProfilingService.GetNextGuid();
+    ProfilingDynamicGuid eventGuid = profiling::ProfilingService::GetNextGuid();
 
     // Send the new timeline event to the external profiling service, this call throws in case of error
     m_SendTimelinePacket->SendTimelineEventBinaryPacket(timestamp, threadId, eventGuid);
 
     // Generate a GUID for the execution link
-    ProfilingDynamicGuid executionLinkId = m_ProfilingService.GetNextGuid();
+    ProfilingDynamicGuid executionLinkId = profiling::ProfilingService::GetNextGuid();
 
     // Send the new execution link to the external profiling service, this call throws in case of error
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::ExecutionLink,
@@ -382,7 +382,7 @@ ProfilingDynamicGuid TimelineUtilityMethods::RecordEvent(ProfilingGuid entityGui
                                                                eventGuid);
 
     // Generate a GUID for the data relationship link
-    ProfilingDynamicGuid eventClassLinkId = m_ProfilingService.GetNextGuid();
+    ProfilingDynamicGuid eventClassLinkId = profiling::ProfilingService::GetNextGuid();
 
     // Send the new data relationship link to the external profiling service, this call throws in case of error
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::DataLink,
@@ -396,7 +396,7 @@ ProfilingDynamicGuid TimelineUtilityMethods::RecordEvent(ProfilingGuid entityGui
 ProfilingDynamicGuid TimelineUtilityMethods::RecordWorkloadInferenceAndStartOfLifeEvent(ProfilingGuid workloadGuid,
                                                                                         ProfilingGuid inferenceGuid)
 {
-    ProfilingDynamicGuid workloadInferenceGuid = m_ProfilingService.GetNextGuid();
+    ProfilingDynamicGuid workloadInferenceGuid = profiling::ProfilingService::GetNextGuid();
     CreateTypedEntity(workloadInferenceGuid, LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID);
     CreateRelationship(ProfilingRelationshipType::RetentionLink, inferenceGuid, workloadInferenceGuid);
     CreateRelationship(ProfilingRelationshipType::RetentionLink, workloadGuid, workloadInferenceGuid);

@@ -308,6 +308,82 @@ struct DummyLayer<armnn::LstmLayer>
 {
 };
 
+template <typename QLstmLayerType>
+struct DummyQLstmLayer
+{
+    DummyQLstmLayer()
+    {
+        typename QLstmLayerType::DescriptorType desc;
+        desc.m_CifgEnabled = false;
+        desc.m_PeepholeEnabled = true;
+        desc.m_ProjectionEnabled = true;
+        desc.m_LayerNormEnabled = true;
+
+        m_Layer = dummyGraph.AddLayer<QLstmLayerType>(armnn::QLstmDescriptor(), "qLstm");
+
+        // Basic params
+        m_Layer->m_BasicParameters.m_InputToForgetWeights     = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS8));
+        m_Layer->m_BasicParameters.m_InputToCellWeights       = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS8));
+        m_Layer->m_BasicParameters.m_InputToOutputWeights     = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS8));
+
+        m_Layer->m_BasicParameters.m_RecurrentToForgetWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS8));
+        m_Layer->m_BasicParameters.m_RecurrentToCellWeights   = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS8));
+        m_Layer->m_BasicParameters.m_RecurrentToOutputWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS8));
+
+        m_Layer->m_BasicParameters.m_ForgetGateBias           = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Signed32));
+        m_Layer->m_BasicParameters.m_CellBias                 = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Signed32));
+        m_Layer->m_BasicParameters.m_OutputGateBias           = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Signed32));
+
+        // CIFG optional params
+        m_Layer->m_CifgParameters.m_InputToInputWeights     = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS8));
+        m_Layer->m_CifgParameters.m_RecurrentToInputWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS8));
+        m_Layer->m_CifgParameters.m_InputGateBias           = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Signed32));
+
+        // Projection optional params
+        m_Layer->m_ProjectionParameters.m_ProjectionWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS8));
+        m_Layer->m_ProjectionParameters.m_ProjectionBias    = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Signed32));
+
+        // Peephole optional params
+        m_Layer->m_PeepholeParameters.m_CellToInputWeights  = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS16));
+        m_Layer->m_PeepholeParameters.m_CellToForgetWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS16));
+        m_Layer->m_PeepholeParameters.m_CellToOutputWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS16));
+
+        // Layer normalization optional params
+        m_Layer->m_LayerNormParameters.m_InputLayerNormWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS16));
+        m_Layer->m_LayerNormParameters.m_ForgetLayerNormWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS16));
+        m_Layer->m_LayerNormParameters.m_CellLayerNormWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS16));
+        m_Layer->m_LayerNormParameters.m_OutputLayerNormWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS16));
+    }
+
+    ~DummyQLstmLayer()
+    {
+        dummyGraph.EraseLayer(m_Layer);
+    }
+
+    armnn::QLstmLayer* m_Layer;
+};
+
 template<>
 struct DummyLayer<armnn::QuantizedLstmLayer, void>
 {
@@ -512,6 +588,8 @@ DECLARE_LAYER_POLICY_2_PARAM(Pooling2d)
 DECLARE_LAYER_POLICY_2_PARAM(PreCompiled)
 
 DECLARE_LAYER_POLICY_1_PARAM(Prelu)
+
+DECLARE_LAYER_POLICY_2_PARAM(QLstm)
 
 DECLARE_LAYER_POLICY_1_PARAM(QuantizedLstm)
 

@@ -483,6 +483,23 @@ bool IsQuantizeSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsQuantizeSupported, input, output);
 }
 
+bool IsQLstmSupported(const BackendId& backend,
+                      const TensorInfo& input,
+                      const TensorInfo& previousOutputIn,
+                      const TensorInfo& previousCellStateIn,
+                      const TensorInfo& outputStateOut,
+                      const TensorInfo& cellStateOut,
+                      const TensorInfo& output,
+                      const QLstmDescriptor& descriptor,
+                      const LstmInputParamsInfo& paramsInfo,
+                      char* reasonIfUnsupported,
+                      size_t reasonIfUnsupportedMaxLength)
+
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsQLstmSupported, input, previousOutputIn, previousCellStateIn,
+                               outputStateOut, cellStateOut, output, descriptor, paramsInfo);
+}
+
 bool IsQuantizedLstmSupported(const BackendId& backend,
                               const TensorInfo& input,
                               const TensorInfo& previousCellStateIn,

@@ -107,6 +107,104 @@ void TestLstmLayerVisitor::CheckInputParameters(const LstmInputParams& inputPara
     CheckConstTensorPtrs("CellBias", m_InputParams.m_CellBias, inputParams.m_CellBias);
 }
 
+void TestQLstmLayerVisitor::CheckConstTensorPtrs(const std::string& name,
+                                                 const ConstTensor* expected,
+                                                 const ConstTensor* actual)
+{
+    if (expected == nullptr)
+    {
+        BOOST_CHECK_MESSAGE(actual == nullptr, name + " actual should have been a nullptr");
+    }
+    else
+    {
+        BOOST_CHECK_MESSAGE(actual != nullptr, name + " actual should have been set");
+        if (actual != nullptr)
+        {
+            CheckConstTensors(*expected, *actual);
+        }
+    }
+}
+
+void TestQLstmLayerVisitor::CheckDescriptor(const QLstmDescriptor& descriptor)
+{
+    BOOST_CHECK(m_Descriptor.m_CellClip == descriptor.m_CellClip);
+    BOOST_CHECK(m_Descriptor.m_ProjectionClip == descriptor.m_ProjectionClip);
+    BOOST_CHECK(m_Descriptor.m_CifgEnabled == descriptor.m_CifgEnabled);
+    BOOST_CHECK(m_Descriptor.m_PeepholeEnabled == descriptor.m_PeepholeEnabled);
+    BOOST_CHECK(m_Descriptor.m_ProjectionEnabled == descriptor.m_ProjectionEnabled);
+}
+
+void TestQLstmLayerVisitor::CheckInputParameters(const LstmInputParams& inputParams)
+{
+    CheckConstTensorPtrs("InputToInputWeights",
+                         m_InputParams.m_InputToInputWeights,
+                         inputParams.m_InputToInputWeights);
+
+    CheckConstTensorPtrs("InputToForgetWeights",
+                         m_InputParams.m_InputToForgetWeights,
+                         inputParams.m_InputToForgetWeights);
+
+    CheckConstTensorPtrs("InputToCellWeights",
+                         m_InputParams.m_InputToCellWeights,
+                         inputParams.m_InputToCellWeights);
+
+    CheckConstTensorPtrs("InputToOutputWeights",
+                         m_InputParams.m_InputToOutputWeights,
+                         inputParams.m_InputToOutputWeights);
+
+    CheckConstTensorPtrs("RecurrentToInputWeights",
+                         m_InputParams.m_RecurrentToInputWeights,
+                         inputParams.m_RecurrentToInputWeights);
+
+    CheckConstTensorPtrs("RecurrentToForgetWeights",
+                         m_InputParams.m_RecurrentToForgetWeights,
+                         inputParams.m_RecurrentToForgetWeights);
+
+    CheckConstTensorPtrs("RecurrentToCellWeights",
+                         m_InputParams.m_RecurrentToCellWeights,
+                         inputParams.m_RecurrentToCellWeights);
+
+    CheckConstTensorPtrs("RecurrentToOutputWeights",
+                         m_InputParams.m_RecurrentToOutputWeights,
+                         inputParams.m_RecurrentToOutputWeights);
+
+    CheckConstTensorPtrs("CellToInputWeights",
+                         m_InputParams.m_CellToInputWeights,
+                         inputParams.m_CellToInputWeights);
+
+    CheckConstTensorPtrs("CellToForgetWeights",
+                         m_InputParams.m_CellToForgetWeights,
+                         inputParams.m_CellToForgetWeights);
+
+    CheckConstTensorPtrs("CellToOutputWeights",
+                         m_InputParams.m_CellToOutputWeights,
+                         inputParams.m_CellToOutputWeights);
+
+    CheckConstTensorPtrs("ProjectionWeights", m_InputParams.m_ProjectionWeights, inputParams.m_ProjectionWeights);
+    CheckConstTensorPtrs("ProjectionBias", m_InputParams.m_ProjectionBias, inputParams.m_ProjectionBias);
+
+    CheckConstTensorPtrs("InputGateBias",  m_InputParams.m_InputGateBias,  inputParams.m_InputGateBias);
+    CheckConstTensorPtrs("ForgetGateBias", m_InputParams.m_ForgetGateBias, inputParams.m_ForgetGateBias);
+    CheckConstTensorPtrs("CellBias",       m_InputParams.m_CellBias,       inputParams.m_CellBias);
+    CheckConstTensorPtrs("OutputGateBias", m_InputParams.m_OutputGateBias, inputParams.m_OutputGateBias);
+
+    CheckConstTensorPtrs("InputLayerNormWeights",
+                         m_InputParams.m_InputLayerNormWeights,
+                         inputParams.m_InputLayerNormWeights);
+
+    CheckConstTensorPtrs("ForgetLayerNormWeights",
+                         m_InputParams.m_ForgetLayerNormWeights,
+                         inputParams.m_ForgetLayerNormWeights);
+
+    CheckConstTensorPtrs("CellLayerNormWeights",
+                         m_InputParams.m_CellLayerNormWeights,
+                         inputParams.m_CellLayerNormWeights);
+
+    CheckConstTensorPtrs("OutputLayerNormWeights",
+                         m_InputParams.m_OutputLayerNormWeights,
+                         inputParams.m_OutputLayerNormWeights);
+}
+
 void TestQuantizedLstmLayerVisitor::CheckConstTensorPtrs(const std::string& name,
                                                          const ConstTensor* expected,
                                                          const ConstTensor* actual)
@@ -891,7 +989,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerCifgDisabled)
 
     Network net;
 
-    IConnectableLayer *const layer = net.AddLstmLayer(descriptor, params, layerName);
+    IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params, layerName);
     layer->Accept(visitor);
 }
 
@@ -978,7 +1076,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerPeephole)
 
     Network net;
 
-    IConnectableLayer *const layer = net.AddLstmLayer(descriptor, params);
+    IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params);
     layer->Accept(visitor);
 }
 
@@ -1065,7 +1163,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerPeephole)
 
     Network net;
 
-    IConnectableLayer *const layer = net.AddLstmLayer(descriptor, params, layerName);
+    IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params, layerName);
     layer->Accept(visitor);
 }
 
@@ -1152,7 +1250,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerProjection)
 
     Network net;
 
-    IConnectableLayer *const layer = net.AddLstmLayer(descriptor, params);
+    IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params);
     layer->Accept(visitor);
 }
 
@@ -1239,52 +1337,713 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerProjection)
 
     Network net;
 
-    IConnectableLayer *const layer = net.AddLstmLayer(descriptor, params, layerName);
+    IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params, layerName);
     layer->Accept(visitor);
 }
+
+BOOST_AUTO_TEST_CASE(CheckQLstmLayerBasic)
+{
+    QLstmDescriptor descriptor;
+    descriptor.m_ProjectionClip = 0.5f;
+    descriptor.m_CellClip = 0.3f;
+    descriptor.m_CifgEnabled = true;
+
+    // Basic params ONLY
+    std::vector<uint8_t> inputToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToForgetWeights(
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::QSymmS8), inputToForgetWeightsData);
+
+    std::vector<uint8_t> inputToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToCellWeights(
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::QSymmS8), inputToCellWeightsData);
+
+    std::vector<uint8_t> inputToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToOutputWeights(
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::QSymmS8), inputToOutputWeightsData);
+
+    std::vector<uint8_t> recurrentToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToForgetWeights(TensorInfo(
+            4, recurrentToForgetWeightsDimensions.data(), DataType::QSymmS8), recurrentToForgetWeightsData);
+
+    std::vector<uint8_t> recurrentToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToCellWeights(TensorInfo(
+            4, recurrentToCellWeightsDimensions.data(), DataType::QSymmS8), recurrentToCellWeightsData);
+
+    std::vector<uint8_t> recurrentToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToOutputWeights(TensorInfo(
+            4, recurrentToOutputWeightsDimensions.data(), DataType::QSymmS8), recurrentToOutputWeightsData);
+
+    std::vector<int32_t> forgetGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor forgetGateBias(TensorInfo(
+            4, forgetGateBiasDimensions.data(), DataType::Signed32), forgetGateBiasData);
+
+    std::vector<int32_t> cellBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
+    ConstTensor cellBias(TensorInfo(
+            4, cellBiasDimensions.data(), DataType::Signed32), cellBiasData);
+
+    std::vector<int32_t> outputGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor outputGateBias(TensorInfo(
+            4, outputGateBiasDimensions.data(), DataType::Signed32), outputGateBiasData);
+
+    LstmInputParams params;
+    params.m_InputToForgetWeights     = &inputToForgetWeights;
+    params.m_InputToCellWeights       = &inputToCellWeights;
+    params.m_InputToOutputWeights     = &inputToOutputWeights;
+    params.m_RecurrentToForgetWeights = &recurrentToForgetWeights;
+    params.m_RecurrentToCellWeights   = &recurrentToCellWeights;
+    params.m_RecurrentToOutputWeights = &recurrentToOutputWeights;
+    params.m_ForgetGateBias           = &forgetGateBias;
+    params.m_CellBias                 = &cellBias;
+    params.m_OutputGateBias           = &outputGateBias;
+
+    TestQLstmLayerVisitor visitor(descriptor, params);
+
+    Network net;
+
+    IConnectableLayer* const layer = net.AddQLstmLayer(descriptor, params);
+    layer->Accept(visitor);
+}
+
+BOOST_AUTO_TEST_CASE(CheckNamedQLstmLayerBasic)
+{
+    const char* layerName = "QLstmLayer";
+    QLstmDescriptor descriptor;
+    descriptor.m_ProjectionClip = 0.5f;
+    descriptor.m_CellClip = 0.3f;
+    descriptor.m_CifgEnabled = true;
+
+    // Basic params ONLY
+    std::vector<uint8_t> inputToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToForgetWeights(
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::QSymmS8), inputToForgetWeightsData);
+
+    std::vector<uint8_t> inputToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToCellWeights(
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::QSymmS8), inputToCellWeightsData);
+
+    std::vector<uint8_t> inputToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToOutputWeights(
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::QSymmS8), inputToOutputWeightsData);
+
+    std::vector<uint8_t> recurrentToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToForgetWeights(TensorInfo(
+            4, recurrentToForgetWeightsDimensions.data(), DataType::QSymmS8), recurrentToForgetWeightsData);
+
+    std::vector<uint8_t> recurrentToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToCellWeights(TensorInfo(
+            4, recurrentToCellWeightsDimensions.data(), DataType::QSymmS8), recurrentToCellWeightsData);
+
+    std::vector<uint8_t> recurrentToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToOutputWeights(TensorInfo(
+            4, recurrentToOutputWeightsDimensions.data(), DataType::QSymmS8), recurrentToOutputWeightsData);
+
+    std::vector<int32_t> forgetGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor forgetGateBias(TensorInfo(
+            4, forgetGateBiasDimensions.data(), DataType::Signed32), forgetGateBiasData);
+
+    std::vector<int32_t> cellBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
+    ConstTensor cellBias(TensorInfo(
+            4, cellBiasDimensions.data(), DataType::Signed32), cellBiasData);
+
+    std::vector<int32_t> outputGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor outputGateBias(TensorInfo(
+            4, outputGateBiasDimensions.data(), DataType::Signed32), outputGateBiasData);
+
+    LstmInputParams params;
+    params.m_InputToForgetWeights     = &inputToForgetWeights;
+    params.m_InputToCellWeights       = &inputToCellWeights;
+    params.m_InputToOutputWeights     = &inputToOutputWeights;
+    params.m_RecurrentToForgetWeights = &recurrentToForgetWeights;
+    params.m_RecurrentToCellWeights   = &recurrentToCellWeights;
+    params.m_RecurrentToOutputWeights = &recurrentToOutputWeights;
+    params.m_ForgetGateBias           = &forgetGateBias;
+    params.m_CellBias                 = &cellBias;
+    params.m_OutputGateBias           = &outputGateBias;
+
+    TestQLstmLayerVisitor visitor(descriptor, params, layerName);
+
+    Network net;
+
+    IConnectableLayer* const layer = net.AddQLstmLayer(descriptor, params, layerName);
+    layer->Accept(visitor);
+}
+
+BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgDisabled)
+{
+    QLstmDescriptor descriptor;
+    descriptor.m_ProjectionClip = 0.5f;
+    descriptor.m_CellClip = 0.3f;
+    descriptor.m_CifgEnabled = false;
+
+    // Basic params
+    std::vector<uint8_t> inputToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToForgetWeights(
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::QSymmS8), inputToForgetWeightsData);
+
+    std::vector<uint8_t> inputToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToCellWeights(
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::QSymmS8), inputToCellWeightsData);
+
+    std::vector<uint8_t> inputToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToOutputWeights(
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::QSymmS8), inputToOutputWeightsData);
+
+    std::vector<uint8_t> recurrentToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToForgetWeights(TensorInfo(
+            4, recurrentToForgetWeightsDimensions.data(), DataType::QSymmS8), recurrentToForgetWeightsData);
+
+    std::vector<uint8_t> recurrentToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToCellWeights(TensorInfo(
+            4, recurrentToCellWeightsDimensions.data(), DataType::QSymmS8), recurrentToCellWeightsData);
+
+    std::vector<uint8_t> recurrentToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToOutputWeights(TensorInfo(
+            4, recurrentToOutputWeightsDimensions.data(), DataType::QSymmS8), recurrentToOutputWeightsData);
+
+    std::vector<int32_t> forgetGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor forgetGateBias(TensorInfo(
+            4, forgetGateBiasDimensions.data(), DataType::Signed32), forgetGateBiasData);
+
+    std::vector<int32_t> cellBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
+    ConstTensor cellBias(TensorInfo(
+            4, cellBiasDimensions.data(), DataType::Signed32), cellBiasData);
+
+    std::vector<int32_t> outputGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor outputGateBias(TensorInfo(
+            4, outputGateBiasDimensions.data(), DataType::Signed32), outputGateBiasData);
+
+    // CIFG disabled params
+    std::vector<uint8_t> inputToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToInputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToInputWeights(
+            TensorInfo(4, inputToInputWeightsDimensions.data(), DataType::QSymmS8), inputToInputWeightsData);
+
+    std::vector<uint8_t> recurrentToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToInputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToInputWeights(TensorInfo(
+            4, recurrentToInputWeightsDimensions.data(), DataType::QSymmS8), recurrentToInputWeightsData);
+
+    std::vector<int32_t> inputGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor inputGateBias(
+            TensorInfo(4, inputGateBiasDimensions.data(), DataType::Signed32), inputGateBiasData);
+
+    LstmInputParams params;
+
+    // Basic params
+    params.m_InputToForgetWeights     = &inputToForgetWeights;
+    params.m_InputToCellWeights       = &inputToCellWeights;
+    params.m_InputToOutputWeights     = &inputToOutputWeights;
+    params.m_RecurrentToForgetWeights = &recurrentToForgetWeights;
+    params.m_RecurrentToCellWeights   = &recurrentToCellWeights;
+    params.m_RecurrentToOutputWeights = &recurrentToOutputWeights;
+    params.m_ForgetGateBias           = &forgetGateBias;
+    params.m_CellBias                 = &cellBias;
+    params.m_OutputGateBias           = &outputGateBias;
+
+    // CIFG disabled params
+    params.m_InputToInputWeights     = &inputToInputWeights;
+    params.m_RecurrentToInputWeights = &recurrentToInputWeights;
+    params.m_InputGateBias           = &inputGateBias;
+
+    TestQLstmLayerVisitor visitor(descriptor, params);
+
+    Network net;
+
+    IConnectableLayer* const layer = net.AddQLstmLayer(descriptor, params);
+    layer->Accept(visitor);
+}
+
+BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgDisabledPeepholeEnabled)
+{
+    QLstmDescriptor descriptor;
+    descriptor.m_ProjectionClip = 0.5f;
+    descriptor.m_CellClip = 0.3f;
+    descriptor.m_CifgEnabled = false;
+    descriptor.m_PeepholeEnabled = true;
+
+    // Basic params
+    std::vector<uint8_t> inputToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToForgetWeights(
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::QSymmS8), inputToForgetWeightsData);
+
+    std::vector<uint8_t> inputToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToCellWeights(
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::QSymmS8), inputToCellWeightsData);
+
+    std::vector<uint8_t> inputToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToOutputWeights(
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::QSymmS8), inputToOutputWeightsData);
+
+    std::vector<uint8_t> recurrentToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToForgetWeights(TensorInfo(
+            4, recurrentToForgetWeightsDimensions.data(), DataType::QSymmS8), recurrentToForgetWeightsData);
+
+    std::vector<uint8_t> recurrentToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToCellWeights(TensorInfo(
+            4, recurrentToCellWeightsDimensions.data(), DataType::QSymmS8), recurrentToCellWeightsData);
+
+    std::vector<uint8_t> recurrentToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToOutputWeights(TensorInfo(
+            4, recurrentToOutputWeightsDimensions.data(), DataType::QSymmS8), recurrentToOutputWeightsData);
+
+    std::vector<int32_t> forgetGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor forgetGateBias(TensorInfo(
+            4, forgetGateBiasDimensions.data(), DataType::Signed32), forgetGateBiasData);
+
+    std::vector<int32_t> cellBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
+    ConstTensor cellBias(TensorInfo(
+            4, cellBiasDimensions.data(), DataType::Signed32), cellBiasData);
+
+    std::vector<int32_t> outputGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor outputGateBias(TensorInfo(
+            4, outputGateBiasDimensions.data(), DataType::Signed32), outputGateBiasData);
+
+    // CIFG disabled params
+    std::vector<uint8_t> inputToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToInputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToInputWeights(
+            TensorInfo(4, inputToInputWeightsDimensions.data(), DataType::QSymmS8), inputToInputWeightsData);
+
+    std::vector<uint8_t> recurrentToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToInputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToInputWeights(TensorInfo(
+            4, recurrentToInputWeightsDimensions.data(), DataType::QSymmS8), recurrentToInputWeightsData);
+
+    std::vector<int32_t> inputGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor inputGateBias(
+            TensorInfo(4, inputGateBiasDimensions.data(), DataType::Signed32), inputGateBiasData);
+
+    // Peephole enabled, CIFG disabled params
+    std::vector<int16_t> cellToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> cellToInputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor cellToInputWeights(
+            TensorInfo(4, cellToInputWeightsDimensions.data(), DataType::QSymmS16), cellToInputWeightsData);
+
+    std::vector<int16_t> cellToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> cellToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor cellToForgetWeights(
+            TensorInfo(4, cellToForgetWeightsDimensions.data(), DataType::QSymmS16), cellToForgetWeightsData);
+
+    std::vector<int16_t> cellToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> cellToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor cellToOutputWeights(
+            TensorInfo(4, cellToOutputWeightsDimensions.data(), DataType::QSymmS16), cellToOutputWeightsData);
+
+    LstmInputParams params;
+
+    // Basic params
+    params.m_InputToForgetWeights     = &inputToForgetWeights;
+    params.m_InputToCellWeights       = &inputToCellWeights;
+    params.m_InputToOutputWeights     = &inputToOutputWeights;
+    params.m_RecurrentToForgetWeights = &recurrentToForgetWeights;
+    params.m_RecurrentToCellWeights   = &recurrentToCellWeights;
+    params.m_RecurrentToOutputWeights = &recurrentToOutputWeights;
+    params.m_ForgetGateBias           = &forgetGateBias;
+    params.m_CellBias                 = &cellBias;
+    params.m_OutputGateBias           = &outputGateBias;
+
+    // CIFG disabled params
+    params.m_InputToInputWeights     = &inputToInputWeights;
+    params.m_RecurrentToInputWeights = &recurrentToInputWeights;
+    params.m_InputGateBias           = &inputGateBias;
+
+    // Peephole enabled, CIFG disabled params
+    params.m_CellToInputWeights  = &cellToInputWeights;
+    params.m_CellToForgetWeights = &cellToForgetWeights;
+    params.m_CellToOutputWeights = &cellToOutputWeights;
+
+    TestQLstmLayerVisitor visitor(descriptor, params);
+
+    Network net;
+
+    IConnectableLayer* const layer = net.AddQLstmLayer(descriptor, params);
+    layer->Accept(visitor);
+}
+
+BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgEnabledPeepholeEnabled)
+{
+    QLstmDescriptor descriptor;
+    descriptor.m_ProjectionClip = 0.5f;
+    descriptor.m_CellClip = 0.3f;
+    descriptor.m_CifgEnabled = true;
+    descriptor.m_PeepholeEnabled = true;
+
+    // Basic params
+    std::vector<uint8_t> inputToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToForgetWeights(
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::QSymmS8), inputToForgetWeightsData);
+
+    std::vector<uint8_t> inputToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToCellWeights(
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::QSymmS8), inputToCellWeightsData);
+
+    std::vector<uint8_t> inputToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToOutputWeights(
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::QSymmS8), inputToOutputWeightsData);
+
+    std::vector<uint8_t> recurrentToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToForgetWeights(TensorInfo(
+            4, recurrentToForgetWeightsDimensions.data(), DataType::QSymmS8), recurrentToForgetWeightsData);
+
+    std::vector<uint8_t> recurrentToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToCellWeights(TensorInfo(
+            4, recurrentToCellWeightsDimensions.data(), DataType::QSymmS8), recurrentToCellWeightsData);
+
+    std::vector<uint8_t> recurrentToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToOutputWeights(TensorInfo(
+            4, recurrentToOutputWeightsDimensions.data(), DataType::QSymmS8), recurrentToOutputWeightsData);
+
+    std::vector<int32_t> forgetGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor forgetGateBias(TensorInfo(
+            4, forgetGateBiasDimensions.data(), DataType::Signed32), forgetGateBiasData);
+
+    std::vector<int32_t> cellBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
+    ConstTensor cellBias(TensorInfo(
+            4, cellBiasDimensions.data(), DataType::Signed32), cellBiasData);
+
+    std::vector<int32_t> outputGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor outputGateBias(TensorInfo(
+            4, outputGateBiasDimensions.data(), DataType::Signed32), outputGateBiasData);
+
+    // Peephole enabled and CIFG enabled params
+    std::vector<int16_t> cellToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> cellToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor cellToForgetWeights(
+            TensorInfo(4, cellToForgetWeightsDimensions.data(), DataType::QSymmS16), cellToForgetWeightsData);
+
+    std::vector<int16_t> cellToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> cellToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor cellToOutputWeights(
+            TensorInfo(4, cellToOutputWeightsDimensions.data(), DataType::QSymmS16), cellToOutputWeightsData);
+
+    LstmInputParams params;
+
+    // Basic params
+    params.m_InputToForgetWeights     = &inputToForgetWeights;
+    params.m_InputToCellWeights       = &inputToCellWeights;
+    params.m_InputToOutputWeights     = &inputToOutputWeights;
+    params.m_RecurrentToForgetWeights = &recurrentToForgetWeights;
+    params.m_RecurrentToCellWeights   = &recurrentToCellWeights;
+    params.m_RecurrentToOutputWeights = &recurrentToOutputWeights;
+    params.m_ForgetGateBias           = &forgetGateBias;
+    params.m_CellBias                 = &cellBias;
+    params.m_OutputGateBias           = &outputGateBias;
+
+    // Peephole enabled and CIFG enabled params
+    params.m_CellToForgetWeights = &cellToForgetWeights;
+    params.m_CellToOutputWeights = &cellToOutputWeights;
+
+    TestQLstmLayerVisitor visitor(descriptor, params);
+
+    Network net;
+
+    IConnectableLayer* const layer = net.AddQLstmLayer(descriptor, params);
+    layer->Accept(visitor);
+}
+
+BOOST_AUTO_TEST_CASE(CheckQLstmLayerProjectionEnabled)
+{
+    QLstmDescriptor descriptor;
+    descriptor.m_ProjectionClip = 0.5f;
+    descriptor.m_CellClip = 0.3f;
+    descriptor.m_CifgEnabled = true;
+    descriptor.m_ProjectionEnabled = true;
+
+    // Basic params ONLY
+    std::vector<uint8_t> inputToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToForgetWeights(
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::QSymmS8), inputToForgetWeightsData);
+
+    std::vector<uint8_t> inputToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToCellWeights(
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::QSymmS8), inputToCellWeightsData);
+
+    std::vector<uint8_t> inputToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToOutputWeights(
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::QSymmS8), inputToOutputWeightsData);
+
+    std::vector<uint8_t> recurrentToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToForgetWeights(TensorInfo(
+            4, recurrentToForgetWeightsDimensions.data(), DataType::QSymmS8), recurrentToForgetWeightsData);
+
+    std::vector<uint8_t> recurrentToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToCellWeights(TensorInfo(
+            4, recurrentToCellWeightsDimensions.data(), DataType::QSymmS8), recurrentToCellWeightsData);
+
+    std::vector<uint8_t> recurrentToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToOutputWeights(TensorInfo(
+            4, recurrentToOutputWeightsDimensions.data(), DataType::QSymmS8), recurrentToOutputWeightsData);
+
+    std::vector<int32_t> forgetGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor forgetGateBias(TensorInfo(
+            4, forgetGateBiasDimensions.data(), DataType::Signed32), forgetGateBiasData);
+
+    std::vector<int32_t> cellBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
+    ConstTensor cellBias(TensorInfo(
+            4, cellBiasDimensions.data(), DataType::Signed32), cellBiasData);
+
+    std::vector<int32_t> outputGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor outputGateBias(TensorInfo(
+            4, outputGateBiasDimensions.data(), DataType::Signed32), outputGateBiasData);
+
+    // Projection enabled params
+    std::vector<uint8_t> projectionWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> projectionWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor projectionWeights(TensorInfo(
+            4, projectionWeightsDimensions.data(), DataType::QSymmS8), projectionWeightsData);
+
+    std::vector<int32_t> projectionBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> projectionBiasDimensions = {1, 1, 3, 3};
+    ConstTensor projectionBias(TensorInfo(
+            4, projectionBiasDimensions.data(), DataType::Signed32), projectionBiasData);
+
+    LstmInputParams params;
+
+    // Basic params
+    params.m_InputToForgetWeights     = &inputToForgetWeights;
+    params.m_InputToCellWeights       = &inputToCellWeights;
+    params.m_InputToOutputWeights     = &inputToOutputWeights;
+    params.m_RecurrentToForgetWeights = &recurrentToForgetWeights;
+    params.m_RecurrentToCellWeights   = &recurrentToCellWeights;
+    params.m_RecurrentToOutputWeights = &recurrentToOutputWeights;
+    params.m_ForgetGateBias           = &forgetGateBias;
+    params.m_CellBias                 = &cellBias;
+    params.m_OutputGateBias           = &outputGateBias;
+
+    // Projection enabled params
+    params.m_ProjectionWeights = &projectionWeights;
+    params.m_ProjectionBias    = &projectionBias;
+
+    TestQLstmLayerVisitor visitor(descriptor, params);
+
+    Network net;
+
+    IConnectableLayer* const layer = net.AddQLstmLayer(descriptor, params);
+    layer->Accept(visitor);
+}
+
+BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgDisabledLayerNormEnabled)
+{
+    QLstmDescriptor descriptor;
+    descriptor.m_ProjectionClip = 0.5f;
+    descriptor.m_CellClip = 0.3f;
+    descriptor.m_CifgEnabled = false;
+    descriptor.m_LayerNormEnabled = true;
+
+    // Basic params
+    std::vector<uint8_t> inputToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToForgetWeights(
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::QSymmS8), inputToForgetWeightsData);
+
+    std::vector<uint8_t> inputToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToCellWeights(
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::QSymmS8), inputToCellWeightsData);
+
+    std::vector<uint8_t> inputToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToOutputWeights(
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::QSymmS8), inputToOutputWeightsData);
+
+    std::vector<uint8_t> recurrentToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToForgetWeights(TensorInfo(
+            4, recurrentToForgetWeightsDimensions.data(), DataType::QSymmS8), recurrentToForgetWeightsData);
+
+    std::vector<uint8_t> recurrentToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToCellWeights(TensorInfo(
+            4, recurrentToCellWeightsDimensions.data(), DataType::QSymmS8), recurrentToCellWeightsData);
+
+    std::vector<uint8_t> recurrentToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToOutputWeights(TensorInfo(
+            4, recurrentToOutputWeightsDimensions.data(), DataType::QSymmS8), recurrentToOutputWeightsData);
+
+    std::vector<int32_t> forgetGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor forgetGateBias(TensorInfo(
+            4, forgetGateBiasDimensions.data(), DataType::Signed32), forgetGateBiasData);
+
+    std::vector<int32_t> cellBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
+    ConstTensor cellBias(TensorInfo(
+            4, cellBiasDimensions.data(), DataType::Signed32), cellBiasData);
+
+    std::vector<int32_t> outputGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor outputGateBias(TensorInfo(
+            4, outputGateBiasDimensions.data(), DataType::Signed32), outputGateBiasData);
+
+    // CIFG disabled params
+    std::vector<uint8_t> inputToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputToInputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputToInputWeights(
+            TensorInfo(4, inputToInputWeightsDimensions.data(), DataType::QSymmS8), inputToInputWeightsData);
+
+    std::vector<uint8_t> recurrentToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> recurrentToInputWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor recurrentToInputWeights(TensorInfo(
+            4, recurrentToInputWeightsDimensions.data(), DataType::QSymmS8), recurrentToInputWeightsData);
+
+    std::vector<int32_t> inputGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputGateBiasDimensions = {1, 1, 3, 3};
+    ConstTensor inputGateBias(
+            TensorInfo(4, inputGateBiasDimensions.data(), DataType::Signed32), inputGateBiasData);
+
+    // Layer Norm enabled, CIFG disabled params
+    std::vector<int16_t> inputLayerNormWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> inputLayerNormWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor inputLayerNormWeights(
+            TensorInfo(4, inputLayerNormWeightsDimensions.data(), DataType::QSymmS16), inputLayerNormWeightsData);
+
+    std::vector<int16_t> forgetLayerNormWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> forgetLayerNormWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor forgetLayerNormWeights(
+            TensorInfo(4, forgetLayerNormWeightsDimensions.data(), DataType::QSymmS16), forgetLayerNormWeightsData);
+
+    std::vector<int16_t> cellLayerNormWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> cellLayerNormWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor cellLayerNormWeights(
+            TensorInfo(4, cellLayerNormWeightsDimensions.data(), DataType::QSymmS16), cellLayerNormWeightsData);
+
+    std::vector<int16_t> outputLayerNormWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<unsigned int> outputLayerNormWeightsDimensions = {1, 1, 3, 3};
+    ConstTensor outputLayerNormWeights(
+            TensorInfo(4, outputLayerNormWeightsDimensions.data(), DataType::QSymmS16), outputLayerNormWeightsData);
+
+    LstmInputParams params;
+
+    // Basic params
+    params.m_InputToForgetWeights     = &inputToForgetWeights;
+    params.m_InputToCellWeights       = &inputToCellWeights;
+    params.m_InputToOutputWeights     = &inputToOutputWeights;
+    params.m_RecurrentToForgetWeights = &recurrentToForgetWeights;
+    params.m_RecurrentToCellWeights   = &recurrentToCellWeights;
+    params.m_RecurrentToOutputWeights = &recurrentToOutputWeights;
+    params.m_ForgetGateBias           = &forgetGateBias;
+    params.m_CellBias                 = &cellBias;
+    params.m_OutputGateBias           = &outputGateBias;
+
+    // CIFG disabled params
+    params.m_InputToInputWeights     = &inputToInputWeights;
+    params.m_RecurrentToInputWeights = &recurrentToInputWeights;
+    params.m_InputGateBias           = &inputGateBias;
+
+    // Layer Norm enabled, CIFG disabled params
+    params.m_InputLayerNormWeights  = &inputLayerNormWeights;
+    params.m_ForgetLayerNormWeights = &forgetLayerNormWeights;
+    params.m_CellLayerNormWeights   = &cellLayerNormWeights;
+    params.m_OutputLayerNormWeights = &outputLayerNormWeights;
+
+    TestQLstmLayerVisitor visitor(descriptor, params);
+
+    Network net;
+
+    IConnectableLayer* const layer = net.AddQLstmLayer(descriptor, params);
+    layer->Accept(visitor);
+}
+
 
 BOOST_AUTO_TEST_CASE(CheckQuantizedLstmLayer)
 {
     std::vector<uint8_t> inputToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> inputToInputWeightsDimensions = {1, 1, 3, 3};
     ConstTensor inputToInputWeights(
-            TensorInfo(4, inputToInputWeightsDimensions.data(), DataType::QAsymmU8), inputToInputWeightsData);
+            TensorInfo(4, inputToInputWeightsDimensions.data(), DataType::QSymmS8), inputToInputWeightsData);
 
     std::vector<uint8_t> inputToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
     ConstTensor inputToForgetWeights(
-            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::QAsymmU8), inputToForgetWeightsData);
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::QSymmS8), inputToForgetWeightsData);
 
     std::vector<uint8_t> inputToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
     ConstTensor inputToCellWeights(
-            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::QAsymmU8), inputToCellWeightsData);
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::QSymmS8), inputToCellWeightsData);
 
     std::vector<uint8_t> inputToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
     ConstTensor inputToOutputWeights(
-            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::QAsymmU8), inputToOutputWeightsData);
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::QSymmS8), inputToOutputWeightsData);
 
 
     std::vector<uint8_t> recurrentToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> recurrentToInputWeightsDimensions = {1, 1, 3, 3};
     ConstTensor recurrentToInputWeights(TensorInfo(
-            4, recurrentToInputWeightsDimensions.data(), DataType::QAsymmU8), recurrentToInputWeightsData);
+            4, recurrentToInputWeightsDimensions.data(), DataType::QSymmS8), recurrentToInputWeightsData);
 
     std::vector<uint8_t> recurrentToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
     ConstTensor recurrentToForgetWeights(TensorInfo(
-            4, recurrentToForgetWeightsDimensions.data(), DataType::QAsymmU8), recurrentToForgetWeightsData);
+            4, recurrentToForgetWeightsDimensions.data(), DataType::QSymmS8), recurrentToForgetWeightsData);
 
     std::vector<uint8_t> recurrentToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
     ConstTensor recurrentToCellWeights(TensorInfo(
-            4, recurrentToCellWeightsDimensions.data(), DataType::QAsymmU8), recurrentToCellWeightsData);
+            4, recurrentToCellWeightsDimensions.data(), DataType::QSymmS8), recurrentToCellWeightsData);
 
     std::vector<uint8_t> recurrentToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
     ConstTensor recurrentToOutputWeights(TensorInfo(
-            4, recurrentToOutputWeightsDimensions.data(), DataType::QAsymmU8), recurrentToOutputWeightsData);
+            4, recurrentToOutputWeightsDimensions.data(), DataType::QSymmS8), recurrentToOutputWeightsData);
 
 
     std::vector<int32_t> inputGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};

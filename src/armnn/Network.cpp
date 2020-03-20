@@ -1670,6 +1670,147 @@ IConnectableLayer* Network::AddQuantizedLstmLayer(const QuantizedLstmInputParams
     return layer;
 }
 
+IConnectableLayer* Network::AddQLstmLayer(const QLstmDescriptor&  descriptor,
+                                          const LstmInputParams& params,
+                                          const char* name)
+{
+    const auto layer = m_Graph->AddLayer<QLstmLayer>(descriptor, name);
+
+    // QLstm Basic Parameters
+    layer->m_BasicParameters.m_InputToForgetWeights =
+            std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputToForgetWeights));
+    layer->m_BasicParameters.m_InputToCellWeights =
+            std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputToCellWeights));
+    layer->m_BasicParameters.m_InputToOutputWeights =
+            std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputToOutputWeights));
+    layer->m_BasicParameters.m_RecurrentToForgetWeights =
+            std::make_unique<ScopedCpuTensorHandle>(*(params.m_RecurrentToForgetWeights));
+    layer->m_BasicParameters.m_RecurrentToCellWeights =
+            std::make_unique<ScopedCpuTensorHandle>(*(params.m_RecurrentToCellWeights));
+    layer->m_BasicParameters.m_RecurrentToOutputWeights =
+            std::make_unique<ScopedCpuTensorHandle>(*(params.m_RecurrentToOutputWeights));
+    layer->m_BasicParameters.m_ForgetGateBias =
+            std::make_unique<ScopedCpuTensorHandle>(*(params.m_ForgetGateBias));
+    layer->m_BasicParameters.m_CellBias =
+            std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellBias));
+    layer->m_BasicParameters.m_OutputGateBias =
+            std::make_unique<ScopedCpuTensorHandle>(*(params.m_OutputGateBias));
+
+    // QLstm Cifg parameters
+    if(!descriptor.m_CifgEnabled)
+    {
+        if(params.m_InputToInputWeights == nullptr)
+        {
+            throw InvalidArgumentException("AddQLstmLayer: Input To Input Weights cannot be NULL");
+        }
+
+        if(params.m_RecurrentToInputWeights == nullptr)
+        {
+            throw InvalidArgumentException(
+                    "AddQLstmLayer: Recurrent To Input Weights cannot be NULL");
+        }
+
+        if(params.m_InputGateBias == nullptr)
+        {
+            throw InvalidArgumentException("AddQLstmLayer: Input Gate Bias cannot be NULL");
+        }
+
+        layer->m_CifgParameters.m_InputToInputWeights =
+                std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputToInputWeights));
+        layer->m_CifgParameters.m_RecurrentToInputWeights =
+                std::make_unique<ScopedCpuTensorHandle>(*(params.m_RecurrentToInputWeights));
+        layer->m_CifgParameters.m_InputGateBias =
+                std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputGateBias));
+    }
+
+    // QLstm Projection parameters
+    if(descriptor.m_ProjectionEnabled)
+    {
+        if(params.m_ProjectionWeights == nullptr)
+        {
+            throw InvalidArgumentException("AddQLstmLayer: Projection Weights cannot be NULL");
+        }
+
+        if(params.m_ProjectionBias == nullptr)
+        {
+            throw InvalidArgumentException("AddQLstmLayer: Projection Biases cannot be NULL");
+        }
+
+        layer->m_ProjectionParameters.m_ProjectionWeights =
+                std::make_unique<ScopedCpuTensorHandle>(*(params.m_ProjectionWeights));
+        layer->m_ProjectionParameters.m_ProjectionBias =
+                std::make_unique<ScopedCpuTensorHandle>(*(params.m_ProjectionBias));
+    }
+
+    // QLstm Peephole params
+    if(descriptor.m_PeepholeEnabled)
+    {
+        if(params.m_CellToForgetWeights == nullptr)
+        {
+            throw InvalidArgumentException("AddQLstmLayer: Cell To Forget Weights cannot be NULL");
+        }
+
+        if(params.m_CellToOutputWeights == nullptr)
+        {
+            throw InvalidArgumentException("AddQLstmLayer: Cell To Output Weights cannot be NULL");
+        }
+
+        if(!descriptor.m_CifgEnabled)
+        {
+            if(params.m_CellToInputWeights == nullptr)
+            {
+                throw InvalidArgumentException("AddQLstmLayer: Cell To Input Weights cannot be NULL");
+            }
+
+            layer->m_PeepholeParameters.m_CellToInputWeights =
+                    std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellToInputWeights));
+        }
+
+        layer->m_PeepholeParameters.m_CellToForgetWeights =
+                std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellToForgetWeights));
+        layer->m_PeepholeParameters.m_CellToOutputWeights =
+                std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellToOutputWeights));
+    }
+
+    // QLstm Layer Normalization params
+    if(descriptor.m_LayerNormEnabled)
+    {
+        if(params.m_ForgetLayerNormWeights == nullptr)
+        {
+            throw InvalidArgumentException("AddQLstmLayer: Forget layer normalization weights cannot be NULL");
+        }
+
+        if(params.m_CellLayerNormWeights == nullptr)
+        {
+            throw InvalidArgumentException("AddQLstmLayer: Cell layer normalization weights cannot be NULL");
+        }
+
+        if(params.m_OutputLayerNormWeights == nullptr)
+        {
+            throw InvalidArgumentException("AddQLstmLayer: Output layer normalization weights cannot be NULL");
+        }
+
+        if(!descriptor.m_CifgEnabled)
+        {
+            if(params.m_InputLayerNormWeights == nullptr)
+            {
+                throw InvalidArgumentException("AddQLstmLayer: Input layer normalization weights cannot be NULL");
+            }
+
+            layer->m_LayerNormParameters.m_InputLayerNormWeights =
+                    std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputLayerNormWeights));
+        }
+
+        layer->m_LayerNormParameters.m_ForgetLayerNormWeights =
+                std::make_unique<ScopedCpuTensorHandle>(*(params.m_ForgetLayerNormWeights));
+        layer->m_LayerNormParameters.m_CellLayerNormWeights =
+                std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellLayerNormWeights));
+        layer->m_LayerNormParameters.m_OutputLayerNormWeights =
+                std::make_unique<ScopedCpuTensorHandle>(*(params.m_OutputLayerNormWeights));
+    }
+    return layer;
+}
+
 void Network::Accept(ILayerVisitor& visitor) const
 {
     for (auto layer : GetGraph())

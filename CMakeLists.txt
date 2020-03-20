@@ -338,6 +338,8 @@ list(APPEND armnn_sources
     src/armnn/layers/Pooling2dLayer.cpp
     src/armnn/layers/QuantizeLayer.cpp
     src/armnn/layers/QuantizeLayer.hpp
+    src/armnn/layers/QLstmLayer.hpp
+    src/armnn/layers/QLstmLayer.cpp
     src/armnn/layers/QuantizedLstmLayer.hpp
     src/armnn/layers/QuantizedLstmLayer.cpp
     src/armnn/layers/DivisionLayer.cpp

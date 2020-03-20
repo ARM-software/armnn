@@ -447,6 +447,19 @@ bool LayerSupportBase::IsQuantizeSupported(const armnn::TensorInfo& /*input*/,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsQLstmSupported(const TensorInfo& /*input*/,
+                                        const TensorInfo& /*previousOutputIn*/,
+                                        const TensorInfo& /*previousCellStateIn*/,
+                                        const TensorInfo& /*outputStateOut*/,
+                                        const TensorInfo& /*cellStateOut*/,
+                                        const TensorInfo& /*output*/,
+                                        const QLstmDescriptor& /*descriptor*/,
+                                        const LstmInputParamsInfo& /*paramsInfo*/,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsQuantizedLstmSupported(const TensorInfo& /*input*/,
                                                 const TensorInfo& /*previousCellStateIn*/,
                                                 const TensorInfo& /*previousOutputIn*/,

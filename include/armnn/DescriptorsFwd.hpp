@@ -29,6 +29,7 @@ struct PadDescriptor;
 struct PermuteDescriptor;
 struct Pooling2dDescriptor;
 struct PreCompiledDescriptor;
+struct QLstmDescriptor;
 struct ReshapeDescriptor;
 struct ResizeBilinearDescriptor;
 struct ResizeDescriptor;

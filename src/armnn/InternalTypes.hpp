@@ -58,6 +58,7 @@ enum class LayerType
     PreCompiled,
     Prelu,
     Quantize,
+    QLstm,
     QuantizedLstm,
     Reshape,
     Resize,

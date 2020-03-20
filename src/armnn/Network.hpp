@@ -234,6 +234,10 @@ public:
     IConnectableLayer* AddStandInLayer(const StandInDescriptor& descriptor,
                                        const char* name = nullptr) override;
 
+    IConnectableLayer* AddQLstmLayer(const QLstmDescriptor& descriptor,
+                                     const LstmInputParams& params,
+                                     const char* name = nullptr) override;
+
     IConnectableLayer* AddQuantizedLstmLayer(const QuantizedLstmInputParams& params,
                                              const char* name = nullptr) override;
 

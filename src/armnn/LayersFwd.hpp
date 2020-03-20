@@ -50,6 +50,7 @@
 #include "layers/PreCompiledLayer.hpp"
 #include "layers/PreluLayer.hpp"
 #include "layers/QuantizeLayer.hpp"
+#include "layers/QLstmLayer.hpp"
 #include "layers/QuantizedLstmLayer.hpp"
 #include "layers/ReshapeLayer.hpp"
 #include "layers/ResizeLayer.hpp"
@@ -137,6 +138,7 @@ DECLARE_LAYER(Pooling2d)
 DECLARE_LAYER(PreCompiled)
 DECLARE_LAYER(Prelu)
 DECLARE_LAYER(Quantize)
+DECLARE_LAYER(QLstm)
 DECLARE_LAYER(QuantizedLstm)
 DECLARE_LAYER(Reshape)
 DECLARE_LAYER(Resize)

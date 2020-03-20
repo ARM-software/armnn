@@ -360,6 +360,16 @@ public:
     virtual void VisitQuantizeLayer(const IConnectableLayer* layer,
                                     const char* name = nullptr) = 0;
 
+    /// Function a QLstm layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param descriptor - Parameters controlling the operation of the QLstm operation.
+    /// @param params - The weights and biases for the layer
+    /// @param name - Optional name for the layer.
+    virtual void VisitQLstmLayer(const IConnectableLayer* layer,
+                                 const QLstmDescriptor& descriptor,
+                                 const LstmInputParams& params,
+                                 const char* name = nullptr) = 0;
+
     /// Function a QuantizedLstm layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param params - The weights and biases for the Quantized LSTM cell

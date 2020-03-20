@@ -555,6 +555,15 @@ public:
     virtual IConnectableLayer* AddQuantizedLstmLayer(const QuantizedLstmInputParams& params,
                                                      const char* name = nullptr) = 0;
 
+    /// Add a QLstm layer to the network
+    /// @param descriptor - Parameters for the QLstm operation
+    /// @param params - Weights and biases for the layer
+    /// @param name - Optional name for the layer
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddQLstmLayer(const QLstmDescriptor& descriptor,
+                                             const LstmInputParams& params,
+                                             const char* name = nullptr) = 0;
+
     virtual void Accept(ILayerVisitor& visitor) const = 0;
 
 protected:

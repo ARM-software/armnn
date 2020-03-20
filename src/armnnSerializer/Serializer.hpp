@@ -201,6 +201,11 @@ public:
     void VisitQuantizeLayer(const armnn::IConnectableLayer* layer,
                             const char* name = nullptr) override;
 
+    void VisitQLstmLayer(const armnn::IConnectableLayer* layer,
+                         const armnn::QLstmDescriptor& descriptor,
+                         const armnn::LstmInputParams& params,
+                         const char* name = nullptr) override;
+
     void VisitQuantizedLstmLayer(const armnn::IConnectableLayer* layer,
                                  const armnn::QuantizedLstmInputParams& params,
                                  const char* name = nullptr) override;

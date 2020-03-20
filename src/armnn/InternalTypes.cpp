@@ -58,6 +58,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::PreCompiled: return "PreCompiled";
         case LayerType::Prelu: return "Prelu";
         case LayerType::Quantize:  return "Quantize";
+        case LayerType::QLstm: return "QLstm";
         case LayerType::QuantizedLstm: return "QuantizedLstm";
         case LayerType::Reshape: return "Reshape";
         case LayerType::Resize: return "Resize";

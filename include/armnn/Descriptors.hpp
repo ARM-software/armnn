@@ -1083,6 +1083,66 @@ struct PreCompiledDescriptor
     unsigned int m_NumOutputSlots;
 };
 
+/// A QLstmDescriptor for the QLstmLayer.
+struct QLstmDescriptor
+{
+    QLstmDescriptor()
+            : m_CellClip(0.0)
+            , m_ProjectionClip(0.0)
+            , m_CifgEnabled(true)
+            , m_PeepholeEnabled(false)
+            , m_ProjectionEnabled(false)
+            , m_LayerNormEnabled(false)
+            , m_InputIntermediateScale(0.0)
+            , m_ForgetIntermediateScale(0.0)
+            , m_CellIntermediateScale(0.0)
+            , m_OutputIntermediateScale(0.0)
+            , m_HiddenStateZeroPoint(0)
+            , m_HiddenStateScale(0.0)
+    {}
+
+    bool operator ==(const QLstmDescriptor& rhs) const
+    {
+        return m_CellClip          == rhs.m_CellClip &&
+               m_ProjectionClip    == rhs.m_ProjectionClip &&
+               m_CifgEnabled       == rhs.m_CifgEnabled &&
+               m_PeepholeEnabled   == rhs.m_PeepholeEnabled &&
+               m_ProjectionEnabled == rhs.m_ProjectionEnabled &&
+               m_LayerNormEnabled  == rhs.m_LayerNormEnabled &&
+               m_InputIntermediateScale == rhs.m_InputIntermediateScale &&
+               m_ForgetIntermediateScale == rhs.m_ForgetIntermediateScale &&
+               m_CellIntermediateScale == rhs.m_CellIntermediateScale &&
+               m_OutputIntermediateScale == rhs.m_OutputIntermediateScale &&
+               m_HiddenStateZeroPoint == rhs.m_HiddenStateZeroPoint &&
+               m_HiddenStateScale == rhs.m_HiddenStateScale;
+    }
+
+    /// Clipping threshold value for the cell state
+    float m_CellClip;
+    /// Clipping threshold value for the projection
+    float m_ProjectionClip;
+    /// Enable/disable CIFG (coupled input & forget gate).
+    bool m_CifgEnabled;
+    /// Enable/disable peephole
+    bool m_PeepholeEnabled;
+    /// Enable/disable the projection layer
+    bool m_ProjectionEnabled;
+    /// Enable/disable layer normalization
+    bool m_LayerNormEnabled;
+    /// Input intermediate quantization scale
+    float m_InputIntermediateScale;
+    /// Forget intermediate quantization scale
+    float m_ForgetIntermediateScale;
+    /// Cell intermediate quantization scale
+    float m_CellIntermediateScale;
+    /// Output intermediate quantization scale
+    float m_OutputIntermediateScale;
+    /// Hidden State zero point
+    int32_t m_HiddenStateZeroPoint;
+    /// Hidden State quantization scale
+    float m_HiddenStateScale;
+};
+
 /// A TransposeConvolution2dDescriptor for the TransposeConvolution2dLayer.
 struct TransposeConvolution2dDescriptor
 {

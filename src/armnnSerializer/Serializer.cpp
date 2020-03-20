@@ -1330,6 +1330,16 @@ void SerializerVisitor::VisitTransposeLayer(const armnn::IConnectableLayer* laye
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_TransposeLayer);
 }
 
+void SerializerVisitor::VisitQLstmLayer(const armnn::IConnectableLayer* layer,
+                                        const armnn::QLstmDescriptor& descriptor,
+                                        const armnn::LstmInputParams& params,
+                                        const char* name)
+{
+    IgnoreUnused(layer, descriptor, params, name);
+
+    throw UnimplementedException("SerializerVisitor::VisitQLstmLayer not yet implemented");
+}
+
 void SerializerVisitor::VisitQuantizedLstmLayer(const armnn::IConnectableLayer* layer,
                                                 const armnn::QuantizedLstmInputParams& params,
                                                 const char* name)

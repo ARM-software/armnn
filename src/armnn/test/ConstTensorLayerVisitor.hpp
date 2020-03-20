@@ -221,6 +221,38 @@ private:
     LstmInputParams m_InputParams;
 };
 
+class TestQLstmLayerVisitor : public TestLayerVisitor
+{
+public:
+    explicit TestQLstmLayerVisitor(const QLstmDescriptor& descriptor,
+                                   const LstmInputParams& params,
+                                   const char* name = nullptr)
+            : TestLayerVisitor(name)
+            , m_Descriptor(descriptor)
+            , m_InputParams(params)
+    {}
+
+    void VisitQLstmLayer(const IConnectableLayer* layer,
+                         const QLstmDescriptor& descriptor,
+                         const LstmInputParams& params,
+                         const char* name = nullptr)
+    {
+        CheckLayerPointer(layer);
+        CheckLayerName(name);
+        CheckDescriptor(descriptor);
+        CheckInputParameters(params);
+    }
+
+protected:
+    void CheckDescriptor(const QLstmDescriptor& descriptor);
+    void CheckInputParameters(const LstmInputParams& inputParams);
+    void CheckConstTensorPtrs(const std::string& name, const ConstTensor* expected, const ConstTensor* actual);
+
+private:
+    QLstmDescriptor m_Descriptor;
+    LstmInputParams m_InputParams;
+};
+
 
 class TestQuantizedLstmLayerVisitor : public TestLayerVisitor
 {

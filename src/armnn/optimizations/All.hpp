@@ -6,6 +6,7 @@
 
 #include "AddDebug.hpp"
 #include "ConvertConstants.hpp"
+#include "ConvertFp32NetworkToBf16.hpp"
 #include "ConvertFp32NetworkToFp16.hpp"
 #include "FoldPadIntoConvolution2d.hpp"
 #include "MovePermuteUp.hpp"

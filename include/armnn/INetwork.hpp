@@ -591,18 +591,28 @@ struct OptimizerOptions
     OptimizerOptions()
         : m_ReduceFp32ToFp16(false)
         , m_Debug(false)
+        , m_ReduceFp32ToBf16(false)
     {}
 
-    OptimizerOptions(bool reduceFp32ToFp16, bool debug)
+    OptimizerOptions(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16 = false)
         : m_ReduceFp32ToFp16(reduceFp32ToFp16)
         , m_Debug(debug)
-    {}
+        , m_ReduceFp32ToBf16(reduceFp32ToBf16)
+    {
+        if (m_ReduceFp32ToFp16 && m_ReduceFp32ToBf16)
+        {
+            throw InvalidArgumentException("BFloat16 and Float16 optimization cannot be enabled at the same time.");
+        }
+    }
 
     // Reduce Fp32 data to Fp16 for faster processing
     bool m_ReduceFp32ToFp16;
 
     // Add debug data for easier troubleshooting
     bool m_Debug;
+
+    // Reduce Fp32 data to Bf16 for faster processing
+    bool m_ReduceFp32ToBf16;
 };
 
 /// Create an optimized version of the network

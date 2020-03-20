@@ -347,8 +347,10 @@ LOCAL_SRC_FILES := \
         src/armnn/test/ModelAccuracyCheckerTest.cpp \
         src/armnn/test/NetworkTests.cpp \
         src/armnn/test/ObservableTest.cpp \
+        src/armnn/test/optimizations/ConvertConstantsBFloatTests.cpp \
         src/armnn/test/optimizations/ConvertConstantsFloatToHalfTests.cpp \
         src/armnn/test/optimizations/ConvertConstantsHalfToFloatTests.cpp \
+        src/armnn/test/optimizations/Fp32NetworkToBf16ConverterTests.cpp \
         src/armnn/test/optimizations/Fp32NetworkToFp16ConverterTests.cpp \
         src/armnn/test/optimizations/InsertDebugLayerTests.cpp \
         src/armnn/test/optimizations/MovePermuteUpTests.cpp \

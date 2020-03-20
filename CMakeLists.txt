@@ -450,6 +450,7 @@ list(APPEND armnn_sources
     src/armnn/optimizations/AddDebug.hpp
     src/armnn/optimizations/All.hpp
     src/armnn/optimizations/ConvertConstants.hpp
+    src/armnn/optimizations/ConvertFp32NetworkToBf16.hpp
     src/armnn/optimizations/ConvertFp32NetworkToFp16.hpp
     src/armnn/optimizations/FoldPadIntoConvolution2d.hpp
     src/armnn/optimizations/MovePermuteUp.hpp
@@ -626,8 +627,10 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/NetworkTests.cpp
         src/armnn/test/ObservableTest.cpp
         src/armnn/test/OptimizerTests.cpp
+        src/armnn/test/optimizations/ConvertConstantsBFloatTests.cpp
         src/armnn/test/optimizations/ConvertConstantsFloatToHalfTests.cpp
         src/armnn/test/optimizations/ConvertConstantsHalfToFloatTests.cpp
+        src/armnn/test/optimizations/Fp32NetworkToBf16ConverterTests.cpp
         src/armnn/test/optimizations/Fp32NetworkToFp16ConverterTests.cpp
         src/armnn/test/optimizations/InsertDebugLayerTests.cpp
         src/armnn/test/optimizations/MovePermuteUpTests.cpp

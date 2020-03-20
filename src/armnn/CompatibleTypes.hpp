@@ -5,8 +5,10 @@
 
 #pragma once
 
-#include "armnn/Types.hpp"
-#include "Half.hpp"
+#include <armnn/Types.hpp>
+
+#include <BFloat16.hpp>
+#include <Half.hpp>
 
 namespace armnn
 {
@@ -27,6 +29,12 @@ template<>
 inline bool CompatibleTypes<Half>(DataType dataType)
 {
     return dataType == DataType::Float16;
+}
+
+template<>
+inline bool CompatibleTypes<BFloat16>(DataType dataType)
+{
+    return dataType == DataType::BFloat16;
 }
 
 template<>

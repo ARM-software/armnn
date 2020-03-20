@@ -248,6 +248,86 @@ OptimizationResult AttemptBackendAssignment(BackendSettings& backendSettings,
                 return result;
             }
         }
+        else if (dataTypeIn == DataType::BFloat16 || dataTypeOut == DataType::BFloat16)
+        {
+            if (IWorkloadFactory::IsLayerSupported(*layer, DataType::Float32, reasonIfUnsupported)
+                && layer->GetType() != LayerType::ConvertFp32ToBf16
+                && layer->GetType() != LayerType::ConvertBf16ToFp32)
+            {
+                // Insert BF16 -> FP32 conversion layer before current layer
+                std::vector<ConvertBf16ToFp32Layer*> convertBf16ToFp32Layers;
+                if (dataTypeIn == DataType::BFloat16)
+                {
+                    convertBf16ToFp32Layers =
+                        InsertConvertBf16ToFp32LayersBefore(graph, *layer);
+                }
+
+                // Insert FP32 -> BF16 conversion layer after current layer
+                std::vector<ConvertFp32ToBf16Layer*> convertFp32ToBf16Layers;
+                if (dataTypeOut == DataType::BFloat16)
+                {
+                    convertFp32ToBf16Layers =
+                        InsertConvertFp32ToBf16LayersAfter(graph, *layer);
+                }
+
+                // Assign a supported backend to the newly introduced conversion layers
+                auto AssignFirstSupportedBackend = [&](Layer* layer, BackendId preferredBackend)
+                    {
+                        bool supportedBackendFound = false;
+                        std::string reasonIfUnsupported;
+
+                        // Try preferred backend first
+                        layer->SetBackendId(preferredBackend);
+                        if (IWorkloadFactory::IsLayerSupported(*layer,
+                                                               EmptyOptional(),
+                                                               reasonIfUnsupported))
+                        {
+                            supportedBackendFound = true;
+                        }
+                        else
+                        {
+                            for (const auto& backend : availablePreferredBackends)
+                            {
+                                // Skip preferred backend (we already determined that it is not supported)
+                                if (backend == preferredBackend)
+                                {
+                                    continue;
+                                }
+
+                                layer->SetBackendId(backend);
+                                if (IWorkloadFactory::IsLayerSupported(*layer,
+                                                                       EmptyOptional(),
+                                                                       reasonIfUnsupported))
+                                {
+                                    supportedBackendFound = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        return supportedBackendFound;
+                    };
+
+                for (ConvertBf16ToFp32Layer* convertLayer : convertBf16ToFp32Layers)
+                {
+                    if (!AssignFirstSupportedBackend(convertLayer, backend))
+                    {
+                        return ReturnError(convertLayer);
+                    }
+                }
+
+                for (ConvertFp32ToBf16Layer* convertLayer : convertFp32ToBf16Layers)
+                {
+                    if (!AssignFirstSupportedBackend(convertLayer, backend))
+                    {
+                        return ReturnError(convertLayer);
+                    }
+                }
+
+                return result;
+            }
+        }
+
         std::stringstream warningMsg;
         warningMsg << "Layer of type " << GetLayerTypeAsCString(layer->GetType())
                    << " is not supported on requested backend " << layer->GetBackendId().Get()
@@ -898,6 +978,11 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
         throw armnn::InvalidArgumentException("Invoked Optimize with no backends specified");
     }
 
+    if (options.m_ReduceFp32ToFp16 && options.m_ReduceFp32ToBf16)
+    {
+        throw InvalidArgumentException("BFloat16 and Float16 optimization cannot be enabled at the same time.");
+    }
+
     const Network& network = *boost::polymorphic_downcast<const Network*>(&inNetwork);
     std::unique_ptr<Graph> graph = std::make_unique<Graph>(network.GetGraph());
 
@@ -932,6 +1017,13 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     {
         Optimizer::Pass(optGraph, MakeOptimizations(Fp32NetworkToFp16Converter()));
         Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
+    }
+
+    // If Fp32 to Bf16 optimization is set convert Fp32 network to Bf16
+    if (options.m_ReduceFp32ToBf16)
+    {
+        Optimizer::Pass(optGraph, MakeOptimizations(Fp32NetworkToBf16Converter()));
+        Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToBFloat()));
     }
 
     // Initialize backend settings

@@ -115,7 +115,7 @@ int main(int argc, const char* argv[])
              "If enabled then the 'file-only' test mode of external profiling will be enabled")
             ("counter-capture-period,u", po::value<uint32_t>(&counterCapturePeriod)->default_value(150u),
              "If profiling is enabled in 'file-only' mode this is the capture period that will be used in the test")
-            ("file-format,ff", po::value(&fileFormat),
+            ("file-format", po::value(&fileFormat),
              "If profiling is enabled specifies the output file format")
             ("parse-unsupported", po::bool_switch()->default_value(false),
                 "Add unsupported operators as stand-in layers (where supported by parser)");

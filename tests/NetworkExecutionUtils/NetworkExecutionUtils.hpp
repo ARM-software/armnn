@@ -379,6 +379,7 @@ struct ExecuteNetworkParams
     bool                          m_DequantizeOutput;
     bool                          m_EnableProfiling;
     bool                          m_EnableFp16TurboMode;
+    bool                          m_EnableBf16TurboMode;
     double                        m_ThresholdTime;
     bool                          m_PrintIntermediate;
     size_t                        m_SubgraphId;
@@ -424,6 +425,7 @@ int MainImpl(const ExecuteNetworkParams& params,
 
         inferenceModelParams.m_SubgraphId          = params.m_SubgraphId;
         inferenceModelParams.m_EnableFp16TurboMode = params.m_EnableFp16TurboMode;
+        inferenceModelParams.m_EnableBf16TurboMode = params.m_EnableBf16TurboMode;
 
         InferenceModel<TParser, TDataType> model(inferenceModelParams,
                                                  params.m_EnableProfiling,
@@ -549,6 +551,7 @@ int RunTest(const std::string& format,
             bool dequantizeOuput,
             bool enableProfiling,
             bool enableFp16TurboMode,
+            bool enableBf16TurboMode,
             const double& thresholdTime,
             bool printIntermediate,
             const size_t subgraphId,
@@ -673,6 +676,7 @@ int RunTest(const std::string& format,
     params.m_DequantizeOutput         = dequantizeOuput;
     params.m_EnableProfiling          = enableProfiling;
     params.m_EnableFp16TurboMode      = enableFp16TurboMode;
+    params.m_EnableBf16TurboMode      = enableBf16TurboMode;
     params.m_ThresholdTime            = thresholdTime;
     params.m_PrintIntermediate        = printIntermediate;
     params.m_SubgraphId               = subgraphId;
@@ -748,8 +752,9 @@ int RunTest(const std::string& format,
 }
 
 int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IRuntime>& runtime,
-               const bool enableProfiling, const bool enableFp16TurboMode, const double& thresholdTime,
-               const bool printIntermediate, bool enableLayerDetails = false, bool parseUnuspported = false)
+               const bool enableProfiling, const bool enableFp16TurboMode, const bool enableBf16TurboMode,
+               const double& thresholdTime, const bool printIntermediate, bool enableLayerDetails = false,
+               bool parseUnuspported = false)
 {
     IgnoreUnused(runtime);
     std::string modelFormat;
@@ -868,6 +873,6 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
 
     return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
                    inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames, outputTensorFiles,
-                   dequantizeOutput, enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate, subgraphId,
-                   enableLayerDetails, parseUnuspported);
+                   dequantizeOutput, enableProfiling, enableFp16TurboMode, enableBf16TurboMode,
+                   thresholdTime, printIntermediate, subgraphId, enableLayerDetails, parseUnuspported);
 }

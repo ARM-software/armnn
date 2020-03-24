@@ -97,6 +97,8 @@ int main(int argc, const char* argv[])
              "Enables built in profiler. If unset, defaults to off.")
             ("visualize-optimized-model,v", po::bool_switch()->default_value(false),
              "Enables built optimized model visualizer. If unset, defaults to off.")
+            ("bf16-turbo-mode", po::bool_switch()->default_value(false), "If this option is enabled, FP32 layers, "
+             "weights and biases will be converted to BFloat16 where the backend supports it")
             ("fp16-turbo-mode,h", po::bool_switch()->default_value(false), "If this option is enabled, FP32 layers, "
              "weights and biases will be converted to FP16 where the backend supports it")
             ("threshold-time,r", po::value<double>(&thresholdTime)->default_value(0.0),
@@ -158,6 +160,7 @@ int main(int argc, const char* argv[])
     bool concurrent = vm["concurrent"].as<bool>();
     bool enableProfiling = vm["event-based-profiling"].as<bool>();
     bool enableLayerDetails = vm["visualize-optimized-model"].as<bool>();
+    bool enableBf16TurboMode = vm["bf16-turbo-mode"].as<bool>();
     bool enableFp16TurboMode = vm["fp16-turbo-mode"].as<bool>();
     bool quantizeInput = vm["quantize-input"].as<bool>();
     bool dequantizeOutput = vm["dequantize-output"].as<bool>();
@@ -165,6 +168,12 @@ int main(int argc, const char* argv[])
     bool enableExternalProfiling = vm["enable-external-profiling"].as<bool>();
     bool fileOnlyExternalProfiling = vm["file-only-external-profiling"].as<bool>();
     bool parseUnsupported = vm["parse-unsupported"].as<bool>();
+
+    if (enableBf16TurboMode && enableFp16TurboMode)
+    {
+        ARMNN_LOG(fatal) << "BFloat16 and Float16 turbo mode cannot be enabled at the same time.";
+        return EXIT_FAILURE;
+    }
 
 
     // Check whether we have to load test cases from a file.
@@ -213,8 +222,8 @@ int main(int argc, const char* argv[])
             {
                 testCase.values.insert(testCase.values.begin(), executableName);
                 results.push_back(std::async(std::launch::async, RunCsvTest, std::cref(testCase), std::cref(runtime),
-                                             enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate,
-                                             enableLayerDetails, parseUnsupported));
+                                             enableProfiling, enableFp16TurboMode, enableBf16TurboMode, thresholdTime,
+                                             printIntermediate, enableLayerDetails, parseUnsupported));
             }
 
             // Check results
@@ -233,7 +242,7 @@ int main(int argc, const char* argv[])
             {
                 testCase.values.insert(testCase.values.begin(), executableName);
                 if (RunCsvTest(testCase, runtime, enableProfiling,
-                               enableFp16TurboMode, thresholdTime, printIntermediate,
+                               enableFp16TurboMode, enableBf16TurboMode, thresholdTime, printIntermediate,
                                enableLayerDetails, parseUnsupported) != EXIT_SUCCESS)
                 {
                     return EXIT_FAILURE;
@@ -280,7 +289,7 @@ int main(int argc, const char* argv[])
 
         return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
                        inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
-                       outputTensorFiles, dequantizeOutput, enableProfiling, enableFp16TurboMode, thresholdTime,
-                       printIntermediate, subgraphId, enableLayerDetails, parseUnsupported, runtime);
+                       outputTensorFiles, dequantizeOutput, enableProfiling, enableFp16TurboMode, enableBf16TurboMode,
+                       thresholdTime, printIntermediate, subgraphId, enableLayerDetails, parseUnsupported, runtime);
     }
 }

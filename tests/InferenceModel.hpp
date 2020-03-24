@@ -91,6 +91,7 @@ struct Params
     bool                            m_IsModelBinary;
     bool                            m_VisualizePostOptimizationModel;
     bool                            m_EnableFp16TurboMode;
+    bool                            m_EnableBf16TurboMode;
     bool                            m_PrintIntermediateLayers;
     bool                            m_ParseUnsupported;
 
@@ -100,6 +101,7 @@ struct Params
         , m_IsModelBinary(true)
         , m_VisualizePostOptimizationModel(false)
         , m_EnableFp16TurboMode(false)
+        , m_EnableBf16TurboMode(false)
         , m_PrintIntermediateLayers(false)
         , m_ParseUnsupported(false)
     {}
@@ -328,6 +330,7 @@ public:
         std::string m_DynamicBackendsPath;
         bool m_VisualizePostOptimizationModel;
         bool m_EnableFp16TurboMode;
+        bool m_EnableBf16TurboMode;
         std::string m_Labels;
 
         std::vector<armnn::BackendId> GetComputeDevicesAsBackendIds()
@@ -365,7 +368,10 @@ public:
                 "The file will have the same name as the model with the .dot extention.")
             ("fp16-turbo-mode", po::value<bool>(&options.m_EnableFp16TurboMode)->default_value(false),
                 "If this option is enabled FP32 layers, weights and biases will be converted "
-                "to FP16 where the backend supports it.");
+                "to FP16 where the backend supports it.")
+            ("bf16-turbo-mode", po::value<bool>(&options.m_EnableBf16TurboMode)->default_value(false),
+                "If this option is enabled FP32 layers, weights and biases will be converted "
+                "to BF16 where the backend supports it.");
     }
 
     InferenceModel(const Params& params,
@@ -401,6 +407,7 @@ public:
 
             armnn::OptimizerOptions options;
             options.m_ReduceFp32ToFp16 = params.m_EnableFp16TurboMode;
+            options.m_ReduceFp32ToBf16 = params.m_EnableBf16TurboMode;
             options.m_Debug = params.m_PrintIntermediateLayers;
 
             optNet = armnn::Optimize(*network, params.m_ComputeDevices, m_Runtime->GetDeviceSpec(), options);

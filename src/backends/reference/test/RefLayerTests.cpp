@@ -1737,4 +1737,16 @@ ARMNN_AUTO_TEST_CASE(StackOutput3DInputs3, StackOutput3DInputs3Float32Test)
 ARMNN_AUTO_TEST_CASE(StackOutput5D,        StackOutput5DFloat32Test)
 ARMNN_AUTO_TEST_CASE(StackFloat16,         StackFloat16Test)
 
+// Neg
+ARMNN_AUTO_TEST_CASE(Neg2d, Neg2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Neg3d, Neg3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(NegZero, NegZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(NegNegative, NegNegativeTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Neg2dFloat16, Neg2dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE(Neg3dFloat16, Neg3dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE(Neg2dQuantisedAsymm8, Neg2dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(Neg3dQuantisedAsymm8, Neg3dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(Neg2dQuantisedSymm16, Neg2dTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(Neg3dQuantisedSymm16, Neg3dTest<DataType::QSymmS16>)
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -47,6 +47,7 @@ BACKEND_SOURCES := \
         workloads/ClMeanWorkload.cpp \
         workloads/ClMinimumWorkload.cpp \
         workloads/ClMultiplicationWorkload.cpp \
+        workloads/ClNegWorkload.cpp \
         workloads/ClNormalizationFloatWorkload.cpp \
         workloads/ClPadWorkload.cpp \
         workloads/ClPermuteWorkload.cpp \

@@ -54,6 +54,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClMinimumWorkload.hpp
     ClMultiplicationWorkload.cpp
     ClMultiplicationWorkload.hpp
+    ClNegWorkload.cpp
+    ClNegWorkload.hpp
     ClNormalizationFloatWorkload.cpp
     ClNormalizationFloatWorkload.hpp
     ClPadWorkload.cpp

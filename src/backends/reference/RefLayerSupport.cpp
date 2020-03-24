@@ -774,13 +774,14 @@ bool RefLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
 {
     IgnoreUnused(descriptor);
 
-    std::array<DataType, 5> supportedTypes =
+    std::array<DataType, 6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Signed32
     };
 
     bool supported = true;

@@ -272,6 +272,10 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateElementwiseUnary(const Eleme
 
         return MakeWorkload<ClRsqrtWorkload>(rsqrtQueueDescriptor, info);
     }
+    else if (descriptor.m_Parameters.m_Operation == UnaryOperation::Neg)
+    {
+        return MakeWorkload<ClNegWorkload>(descriptor, info);
+    }
     return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
 }
 

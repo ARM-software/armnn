@@ -218,9 +218,8 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateDivision(
     return std::make_unique<NeonDivisionWorkload>(descriptor, info);
 }
 
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor&
-                                                                       descriptor,
-                                                                       const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateElementwiseUnary(
+    const ElementwiseUnaryQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
     if (descriptor.m_Parameters.m_Operation == UnaryOperation::Abs)
     {
@@ -237,6 +236,10 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateElementwiseUnary(const Ele
         rsqrtQueueDescriptor.m_Outputs = descriptor.m_Outputs;
 
         return std::make_unique<NeonRsqrtWorkload>(rsqrtQueueDescriptor, info);
+    }
+    else if (descriptor.m_Parameters.m_Operation == UnaryOperation::Neg)
+    {
+        return std::make_unique<NeonNegWorkload>(descriptor, info);
     }
     return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
 }

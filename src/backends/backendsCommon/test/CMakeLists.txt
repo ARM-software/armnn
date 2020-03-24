@@ -113,6 +113,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/MinimumTestImpl.hpp
     layerTests/MultiplicationTestImpl.cpp
     layerTests/MultiplicationTestImpl.hpp
+    layerTests/NegTestImpl.cpp
+    layerTests/NegTestImpl.hpp
     layerTests/NormalizationTestImpl.cpp
     layerTests/NormalizationTestImpl.hpp
     layerTests/PadTestImpl.cpp

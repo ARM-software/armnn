@@ -40,6 +40,7 @@
 #include "workloads/ClConcatWorkload.hpp"
 #include "workloads/ClMinimumWorkload.hpp"
 #include "workloads/ClMultiplicationWorkload.hpp"
+#include "workloads/ClNegWorkload.hpp"
 #include "workloads/ClNormalizationFloatWorkload.hpp"
 #include "workloads/ClPadWorkload.hpp"
 #include "workloads/ClPermuteWorkload.hpp"
@@ -411,6 +412,13 @@ bool ClLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
     else if (descriptor.m_Operation == UnaryOperation::Rsqrt)
     {
         FORWARD_WORKLOAD_VALIDATE_FUNC(ClRsqrtWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       input,
+                                       output);
+    }
+    else if (descriptor.m_Operation == UnaryOperation::Neg)
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(ClNegWorkloadValidate,
                                        reasonIfUnsupported,
                                        input,
                                        output);

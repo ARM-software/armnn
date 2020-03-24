@@ -38,6 +38,7 @@
 #include "workloads/NeonMinimumWorkload.hpp"
 #include "workloads/NeonMultiplicationWorkload.hpp"
 #include "workloads/NeonDivisionWorkload.hpp"
+#include "workloads/NeonNegWorkload.hpp"
 #include "workloads/NeonNormalizationFloatWorkload.hpp"
 #include "workloads/NeonFullyConnectedWorkload.hpp"
 #include "workloads/NeonPadWorkload.hpp"
@@ -366,6 +367,13 @@ bool NeonLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
     else if (descriptor.m_Operation == UnaryOperation::Rsqrt)
     {
         FORWARD_WORKLOAD_VALIDATE_FUNC(NeonRsqrtWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       input,
+                                       output);
+    }
+    else if (descriptor.m_Operation == UnaryOperation::Neg)
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonNegWorkloadValidate,
                                        reasonIfUnsupported,
                                        input,
                                        output);

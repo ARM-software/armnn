@@ -56,6 +56,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonMultiplicationWorkload.hpp
     NeonDivisionWorkload.cpp
     NeonDivisionWorkload.hpp
+    NeonNegWorkload.cpp
+    NeonNegWorkload.hpp
     NeonNormalizationFloatWorkload.cpp
     NeonNormalizationFloatWorkload.hpp
     NeonPadWorkload.cpp

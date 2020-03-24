@@ -37,6 +37,7 @@
 #include <backendsCommon/test/layerTests/MeanTestImpl.hpp>
 #include <backendsCommon/test/layerTests/MinimumTestImpl.hpp>
 #include <backendsCommon/test/layerTests/MultiplicationTestImpl.hpp>
+#include <backendsCommon/test/layerTests/NegTestImpl.hpp>
 #include <backendsCommon/test/layerTests/NormalizationTestImpl.hpp>
 #include <backendsCommon/test/layerTests/PadTestImpl.hpp>
 #include <backendsCommon/test/layerTests/PermuteTestImpl.hpp>

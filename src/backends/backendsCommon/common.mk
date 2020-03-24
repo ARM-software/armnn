@@ -64,6 +64,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/MaximumTestImpl.cpp \
     test/layerTests/MinimumTestImpl.cpp \
     test/layerTests/MultiplicationTestImpl.cpp \
+    test/layerTests/NegTestImpl.cpp \
     test/layerTests/NormalizationTestImpl.cpp \
     test/layerTests/PadTestImpl.cpp \
     test/layerTests/Pooling2dTestImpl.cpp \

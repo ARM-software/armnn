@@ -31,6 +31,7 @@
 #include "NeonConcatWorkload.hpp"
 #include "NeonMinimumWorkload.hpp"
 #include "NeonMultiplicationWorkload.hpp"
+#include "NeonNegWorkload.hpp"
 #include "NeonNormalizationFloatWorkload.hpp"
 #include "NeonPadWorkload.hpp"
 #include "NeonPermuteWorkload.hpp"

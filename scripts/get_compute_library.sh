@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="6cd1c9bc312b65137da52a973489ba6a0f0180e3" #COMPMID-3277: (3RDPARTY_UPDATE) fix build issue related to constructors
+DEFAULT_CLFRAMEWORKREVISION="689c968239180eda4263e34c3d450093d4a0450d" #COMPMID-2967 Add support for QASYMM8_SIGNED in CLGEMMLowpQuantizeDownInt32ToUint8ScaleKernel
 
 
 usage() {

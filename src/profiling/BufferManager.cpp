@@ -45,7 +45,7 @@ void BufferManager::Commit(IPacketBufferPtr& packetBuffer, unsigned int size, bo
     std::unique_lock<std::mutex> readableListLock(m_ReadableMutex, std::defer_lock);
     packetBuffer->Commit(size);
     readableListLock.lock();
-    m_ReadableList.push_back(std::move(packetBuffer));
+    m_ReadableList.push(std::move(packetBuffer));
     readableListLock.unlock();
 
     if (notifyConsumer)
@@ -62,7 +62,6 @@ void BufferManager::Initialize()
         IPacketBufferPtr buffer = std::make_unique<PacketBuffer>(m_MaxBufferSize);
         m_AvailableList.emplace_back(std::move(buffer));
     }
-    m_ReadableList.reserve(m_NumberOfBuffers);
 }
 
 void BufferManager::Release(IPacketBufferPtr& packetBuffer)
@@ -81,7 +80,7 @@ void BufferManager::Reset()
     std::lock_guard<std::mutex> availableListLock(m_AvailableMutex);
 
     m_AvailableList.clear();
-    m_ReadableList.clear();
+    std::queue<IPacketBufferPtr>().swap(m_ReadableList);
 
     Initialize();
 }
@@ -91,8 +90,8 @@ IPacketBufferPtr BufferManager::GetReadableBuffer()
     std::unique_lock<std::mutex> readableListLock(m_ReadableMutex);
     if (!m_ReadableList.empty())
     {
-        IPacketBufferPtr buffer = std::move(m_ReadableList.back());
-        m_ReadableList.pop_back();
+        IPacketBufferPtr buffer = std::move(m_ReadableList.front());
+        m_ReadableList.pop();
         readableListLock.unlock();
         return buffer;
     }

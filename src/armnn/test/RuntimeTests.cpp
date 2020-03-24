@@ -692,17 +692,17 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     // Does the inference.
     runtime.EnqueueWorkload(netId, inputTensors, outputTensors);
 
-    // Get readable buffer for inference timeline
-    auto inferenceReadableBuffer = bufferManager.GetReadableBuffer();
-    BOOST_CHECK(inferenceReadableBuffer != nullptr);
+    // Get readable buffer for input workload
+    auto  inputReadableBuffer = bufferManager.GetReadableBuffer();
+    BOOST_CHECK(inputReadableBuffer != nullptr);
 
     // Get readable buffer for output workload
     auto outputReadableBuffer = bufferManager.GetReadableBuffer();
     BOOST_CHECK(outputReadableBuffer != nullptr);
 
-    // Get readable buffer for input workload
-    auto inputReadableBuffer = bufferManager.GetReadableBuffer();
-    BOOST_CHECK(inputReadableBuffer != nullptr);
+    // Get readable buffer for inference timeline
+    auto inferenceReadableBuffer = bufferManager.GetReadableBuffer();
+    BOOST_CHECK(inferenceReadableBuffer != nullptr);
 
     // Validate input workload data
     size = inputReadableBuffer->GetSize();

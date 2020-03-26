@@ -692,7 +692,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterValues)
     ProfilingService* profilingServicePtr = &profilingService;
     std::vector<std::thread> writers;
 
-    for (int i = 0; i < 100; ++i)
+    for (int i = 0; i < 10; ++i)
     {
         // Increment and decrement the first counter
         writers.push_back(std::thread(&ProfilingService::IncrementCounterValue,
@@ -719,7 +719,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterValues)
     BOOST_CHECK(counterValue ==
                (profilingService.GetCounterValue(armnn::profiling::UNREGISTERED_BACKENDS)
                - profilingService.GetCounterValue(armnn::profiling::REGISTERED_BACKENDS)));
-    BOOST_CHECK(profilingService.GetCounterValue(armnn::profiling::INFERENCES_RUN) == 500);
+    BOOST_CHECK(profilingService.GetCounterValue(armnn::profiling::INFERENCES_RUN) == 50);
 
     BOOST_CHECK_NO_THROW(profilingService.SetCounterValue(armnn::profiling::UNREGISTERED_BACKENDS, 4));
     BOOST_CHECK_NO_THROW(counterValue = profilingService.GetCounterValue(armnn::profiling::UNREGISTERED_BACKENDS));

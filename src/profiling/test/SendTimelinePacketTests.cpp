@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE(SendEventClassAfterTimelineEntityPacketTest)
 {
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
-    unsigned int threadId_size = sizeof(std::thread::id);
+    unsigned int threadId_size = sizeof(std::thread::id); // Is platform dependent
 
     MockBufferManager bufferManager(512);
     TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE(SendEventClassAfterTimelineEntityPacketTest)
     uint32_t eventBinaryPacketSequenceNumbered = (eventBinaryPacketHeaderWord1 >> 24) & 0x00000001;
     uint32_t eventBinaryPacketDataLength       = (eventBinaryPacketHeaderWord1 >>  0) & 0x00FFFFFF;
     BOOST_CHECK(eventBinaryPacketSequenceNumbered == 0);
-    BOOST_CHECK(eventBinaryPacketDataLength       == 28);
+    BOOST_CHECK(eventBinaryPacketDataLength == 20 + threadId_size);
 
     // Check the decl_id
     offset += uint32_t_size;

@@ -739,11 +739,12 @@ BOOST_AUTO_TEST_CASE(TimelineEventPacketTestFullConstructionOfData)
                                                            boost::numeric_cast<unsigned int>(buffer.size()),
                                                            numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
-    BOOST_CHECK(numberOfBytesWritten == 28);
 
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
-    unsigned int threadId_size = sizeof(std::thread::id);
+    unsigned int threadId_size = sizeof(std::thread::id); // Is platform dependent
+
+    BOOST_CHECK(numberOfBytesWritten == 20 + threadId_size);
 
     unsigned int offset = 0;
     // Check the decl_id

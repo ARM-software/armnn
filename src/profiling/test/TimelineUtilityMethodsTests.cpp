@@ -429,7 +429,9 @@ BOOST_AUTO_TEST_CASE(RecordEventTest)
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
     BOOST_CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_CHECK(size == 100);
+    unsigned int threadId_size = sizeof(std::thread::id); // Is platform dependent
+    BOOST_CHECK(size == 92 + threadId_size);
+
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
 
@@ -437,7 +439,7 @@ BOOST_AUTO_TEST_CASE(RecordEventTest)
     unsigned int offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 92);
+    VerifyTimelineHeaderBinary(readableData, offset, 84 + threadId_size);
 
     // First dataset sent: TimelineEntityBinaryPacket
     VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);

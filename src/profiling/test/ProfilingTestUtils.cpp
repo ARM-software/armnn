@@ -909,7 +909,9 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
 
     // Validate inference data
     size = inferenceReadableBuffer->GetSize();
-    BOOST_CHECK(size == 1596);
+
+    unsigned int threadId_size = sizeof(std::thread::id); // Is platform dependent
+    BOOST_CHECK(size == 1516 + 10 * threadId_size);
 
     readableData = inferenceReadableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
@@ -917,7 +919,7 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 1588);
+    VerifyTimelineHeaderBinary(readableData, offset, 1508 + 10 * threadId_size);
 
     // Inference timeline trace
     // Inference entity

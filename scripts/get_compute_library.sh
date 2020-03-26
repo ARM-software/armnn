@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="51a9558d484e812707a776efceef18b93698cec9" #Add Tizen platform support
+DEFAULT_CLFRAMEWORKREVISION="1b14c75c0d591c4abe4d2d41b7e4e165fbf58382" #Add support for QASYMM8_SIGNED in CLGEMMLowpQuantizeDownInt32ToUint8ScaleByFloatKernel
 
 
 usage() {

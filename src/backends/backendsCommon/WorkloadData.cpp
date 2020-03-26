@@ -26,10 +26,9 @@ DataType GetBiasDataType(DataType inputDataType)
 {
     switch (inputDataType)
     {
-        case DataType::BFloat16:
-            return DataType::BFloat16;
         case DataType::Float16:
             return DataType::Float16;
+        case DataType::BFloat16:
         case DataType::Float32:
             return DataType::Float32;
         case DataType::QAsymmS8:
@@ -1009,7 +1008,20 @@ void FullyConnectedQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
-    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+
+    // For FullyConnected, we allow to have BFloat16 input with Float32 output for optimization.
+    if (inputTensorInfo.GetDataType() == DataType::BFloat16)
+    {
+        if (outputTensorInfo.GetDataType() != DataType::BFloat16 && outputTensorInfo.GetDataType() != DataType::Float32)
+        {
+            throw InvalidArgumentException(descriptorName  + ": " + " Output tensor type must be BFloat16 or Float32 "
+                                           "for BFloat16 input.");
+        }
+    }
+    else
+    {
+        ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+    }
 }
 
 void NormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
@@ -1206,7 +1218,20 @@ void Convolution2dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) co
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
-    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+
+    // For Convolution2d, we allow to have BFloat16 input with Float32 output for optimization.
+    if (inputTensorInfo.GetDataType() == DataType::BFloat16)
+    {
+        if (outputTensorInfo.GetDataType() != DataType::BFloat16 && outputTensorInfo.GetDataType() != DataType::Float32)
+        {
+            throw InvalidArgumentException(descriptorName  + ": " + " Output tensor type must be BFloat16 or Float32 "
+                                           "for BFloat16 input.");
+        }
+    }
+    else
+    {
+        ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+    }
 }
 
 void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

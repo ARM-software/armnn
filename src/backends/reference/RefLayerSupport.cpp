@@ -474,8 +474,20 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
     supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
                                   "Reference Convolution2d: output is not a supported type.");
 
-    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+    // For Convolution2d, we allow to have BFloat16 input with Float32 output for optimization.
+    if (input.GetDataType() == DataType::BFloat16)
+    {
+        if (output.GetDataType() != DataType::BFloat16 && output.GetDataType() != DataType::Float32)
+        {
+            reasonIfUnsupported.value() += "Output tensor type must be BFloat16 or Float32 for BFloat16 input.\n";
+            supported = false;
+        }
+    }
+    else
+    {
+        supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
                                   "Reference Convolution2d: input and output types mismatched.");
+    }
 
     const DataType inputType = input.GetDataType();
     if (IsQuantized8BitType(inputType))
@@ -882,11 +894,23 @@ bool RefLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
     supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
                                   "Reference Fully Connected: output type not supported.");
 
-    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
-                                  "Reference Fully Connected: input and output types mismatched.");
-
     supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
                                   "Reference Fully Connected: weights type not supported.");
+
+    // For FullyConnected, we allow to have BFloat16 input with Float32 output for optimization.
+    if (input.GetDataType() == DataType::BFloat16)
+    {
+        if (output.GetDataType() != DataType::BFloat16 && output.GetDataType() != DataType::Float32)
+        {
+            reasonIfUnsupported.value() += "Output tensor type must be BFloat16 or Float32 for BFloat16 input.\n";
+            supported = false;
+        }
+    }
+    else
+    {
+        supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference Fully Connected: input and output types mismatched.");
+    }
 
     ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::array<DataType, 3> supportedWeightTypes =

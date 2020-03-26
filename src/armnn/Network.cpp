@@ -1020,10 +1020,11 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     }
 
     // If Fp32 to Bf16 optimization is set convert Fp32 network to Bf16
+    // Convert input of Convolution2d and FullyConnected from Fp32 to Bf16
+    // Only Constant weight of Convolution2d and FullyConnected are converted from Fp32 to Bf16
     if (options.m_ReduceFp32ToBf16)
     {
         Optimizer::Pass(optGraph, MakeOptimizations(Fp32NetworkToBf16Converter()));
-        Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToBFloat()));
     }
 
     // Initialize backend settings

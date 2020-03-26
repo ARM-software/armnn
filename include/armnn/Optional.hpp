@@ -274,6 +274,7 @@ public:
 
     Optional() noexcept : BaseSwitch{} {}
     Optional(const T& value) : BaseSwitch{value} {}
+    Optional& operator=(const Optional& other) = default;
     Optional(EmptyOptional empty) : BaseSwitch{empty} {}
     Optional(const Optional& other) : BaseSwitch{other} {}
     Optional(const BaseSwitch& other) : BaseSwitch{other} {}

@@ -18,6 +18,8 @@ public:
     : m_Value(0)
     {}
 
+    BFloat16(const BFloat16& v) = default;
+
     explicit BFloat16(uint16_t v)
     : m_Value(v)
     {}
@@ -32,11 +34,7 @@ public:
         return ToFloat32();
     }
 
-    BFloat16& operator=(const BFloat16& other)
-    {
-        m_Value = other.Val();
-        return *this;
-    }
+    BFloat16& operator=(const BFloat16& other) = default;
 
     BFloat16& operator=(float v)
     {
@@ -74,7 +72,7 @@ public:
             // Mark the LSB
             const uint16_t lsb = u16 & 0x0001;
             // Mark the error to be truncate (the rest of 16 bits of FP32)
-            const uint16_t error = static_cast<const uint16_t>((*u32 & 0x0000FFFF));
+            const uint16_t error = static_cast<uint16_t>((*u32 & 0x0000FFFF));
             if ((error > 0x8000 || (error == 0x8000 && lsb == 1)))
             {
                 u16++;
@@ -86,7 +84,7 @@ public:
 
     float ToFloat32() const
     {
-        const uint32_t u32 = static_cast<const uint32_t>(m_Value << 16u);
+        const uint32_t u32 = static_cast<uint32_t>(m_Value << 16u);
         const float* f32 = reinterpret_cast<const float*>(&u32);
         return *f32;
     }

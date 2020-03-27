@@ -16,6 +16,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClBatchNormalizationFloatWorkload.hpp
     ClBatchToSpaceNdWorkload.cpp
     ClBatchToSpaceNdWorkload.hpp
+    ClComparisonWorkload.cpp
+    ClComparisonWorkload.hpp
     ClConcatWorkload.cpp
     ClConcatWorkload.hpp
     ClConstantWorkload.cpp
@@ -38,8 +40,6 @@ list(APPEND armnnClBackendWorkloads_sources
     ClFloorFloatWorkload.hpp
     ClFullyConnectedWorkload.cpp
     ClFullyConnectedWorkload.hpp
-    ClGreaterWorkload.cpp
-    ClGreaterWorkload.hpp
     ClInstanceNormalizationWorkload.cpp
     ClInstanceNormalizationWorkload.hpp
     ClL2NormalizationFloatWorkload.cpp

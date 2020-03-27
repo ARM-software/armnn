@@ -22,6 +22,7 @@
 #include "workloads/ClArgMinMaxWorkload.hpp"
 #include "workloads/ClBatchNormalizationFloatWorkload.hpp"
 #include "workloads/ClBatchToSpaceNdWorkload.hpp"
+#include "workloads/ClComparisonWorkload.hpp"
 #include "workloads/ClConvertFp16ToFp32Workload.hpp"
 #include "workloads/ClConvertFp32ToFp16Workload.hpp"
 #include "workloads/ClConvolution2dWorkload.hpp"
@@ -31,7 +32,6 @@
 #include "workloads/ClDivisionFloatWorkload.hpp"
 #include "workloads/ClFloorFloatWorkload.hpp"
 #include "workloads/ClFullyConnectedWorkload.hpp"
-#include "workloads/ClGreaterWorkload.hpp"
 #include "workloads/ClInstanceNormalizationWorkload.hpp"
 #include "workloads/ClL2NormalizationFloatWorkload.hpp"
 #include "workloads/ClLstmFloatWorkload.hpp"
@@ -232,16 +232,12 @@ bool ClLayerSupport::IsComparisonSupported(const TensorInfo& input0,
                                            const ComparisonDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported) const
 {
-    if (descriptor.m_Operation == ComparisonOperation::Greater)
-    {
-        FORWARD_WORKLOAD_VALIDATE_FUNC(ClGreaterWorkloadValidate,
-                                       reasonIfUnsupported,
-                                       input0,
-                                       input1,
-                                       output);
-    }
-
-    return false;
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClComparisonWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input0,
+                                   input1,
+                                   output,
+                                   descriptor);
 }
 
 bool ClLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inputs,

@@ -173,14 +173,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateBatchToSpaceNd(const BatchTo
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateComparison(const ComparisonQueueDescriptor& descriptor,
                                                                const WorkloadInfo& info) const
 {
-    if (descriptor.m_Parameters.m_Operation == ComparisonOperation::Greater)
-    {
-        GreaterQueueDescriptor greaterQueueDescriptor;
-        greaterQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
-        greaterQueueDescriptor.m_Outputs = descriptor.m_Outputs;
-        return MakeWorkload<ClGreaterWorkload>(greaterQueueDescriptor, info);
-    }
-    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClComparisonWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConcat(const ConcatQueueDescriptor& descriptor,

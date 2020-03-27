@@ -78,6 +78,20 @@ ConvertActivationDescriptorToAclActivationLayerInfo(const ActivationDescriptor& 
         actDesc.m_A, actDesc.m_B);
 }
 
+inline arm_compute::ComparisonOperation ConvertComparisonOperationToAcl(const ComparisonDescriptor& descriptor)
+{
+    switch (descriptor.m_Operation)
+    {
+        case ComparisonOperation::Greater:         return arm_compute::ComparisonOperation::Greater;
+        case ComparisonOperation::GreaterOrEqual:  return arm_compute::ComparisonOperation::GreaterEqual;
+        case ComparisonOperation::Less:            return arm_compute::ComparisonOperation::Less;
+        case ComparisonOperation::LessOrEqual:     return arm_compute::ComparisonOperation::LessEqual;
+        case ComparisonOperation::Equal:           return arm_compute::ComparisonOperation::Equal;
+        case ComparisonOperation::NotEqual:        return arm_compute::ComparisonOperation::NotEqual;
+        default:                                   throw InvalidArgumentException("Unsupported comparison function");
+    }
+}
+
 inline arm_compute::PoolingType ConvertPoolingAlgorithmToAclPoolingType(PoolingAlgorithm poolingAlgorithm)
 {
     using arm_compute::PoolingType;

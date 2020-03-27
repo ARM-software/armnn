@@ -657,7 +657,7 @@ ARMNN_AUTO_TEST_CASE(LessSimpleUint8,            LessSimpleUint8Test)
 ARMNN_AUTO_TEST_CASE(LessBroadcast1ElementUint8, LessBroadcast1ElementUint8Test)
 ARMNN_AUTO_TEST_CASE(LessBroadcast1dVectorUint8, LessBroadcast1dVectorUint8Test)
 
-// GreaterOrEqual
+// LessOrEqual
 ARMNN_AUTO_TEST_CASE(LessOrEqualSimple,            LessOrEqualSimpleTest)
 ARMNN_AUTO_TEST_CASE(LessOrEqualBroadcast1Element, LessOrEqualBroadcast1ElementTest)
 ARMNN_AUTO_TEST_CASE(LessOrEqualBroadcast1dVector, LessOrEqualBroadcast1dVectorTest)

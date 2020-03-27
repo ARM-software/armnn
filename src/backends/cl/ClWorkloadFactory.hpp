@@ -96,6 +96,7 @@ public:
     std::unique_ptr<IWorkload> CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
                                                       const WorkloadInfo& info) const override;
 
+    ARMNN_DEPRECATED_MSG("Use CreateComparison instead")
     std::unique_ptr<IWorkload> CreateEqual(const EqualQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override;
 
@@ -108,6 +109,7 @@ public:
     std::unique_ptr<IWorkload> CreateGather(const GatherQueueDescriptor& descriptor,
                                             const WorkloadInfo& info) const override;
 
+    ARMNN_DEPRECATED_MSG("Use CreateComparison instead")
     std::unique_ptr<IWorkload> CreateGreater(const GreaterQueueDescriptor& descriptor,
                                              const WorkloadInfo& info) const override;
 

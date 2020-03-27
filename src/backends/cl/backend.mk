@@ -28,6 +28,7 @@ BACKEND_SOURCES := \
         workloads/ClArgMinMaxWorkload.cpp \
         workloads/ClBatchNormalizationFloatWorkload.cpp \
         workloads/ClBatchToSpaceNdWorkload.cpp \
+        workloads/ClComparisonWorkload.cpp \
         workloads/ClConcatWorkload.cpp \
         workloads/ClConstantWorkload.cpp \
         workloads/ClConvertFp16ToFp32Workload.cpp \
@@ -39,7 +40,6 @@ BACKEND_SOURCES := \
         workloads/ClDivisionFloatWorkload.cpp \
         workloads/ClFloorFloatWorkload.cpp \
         workloads/ClFullyConnectedWorkload.cpp \
-        workloads/ClGreaterWorkload.cpp \
         workloads/ClInstanceNormalizationWorkload.cpp \
         workloads/ClL2NormalizationFloatWorkload.cpp \
         workloads/ClLstmFloatWorkload.cpp \

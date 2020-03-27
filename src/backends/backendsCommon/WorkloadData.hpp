@@ -443,6 +443,7 @@ struct MinimumQueueDescriptor : QueueDescriptor
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+// Deprecated use ComparisonQueueDescriptor instead
 struct GreaterQueueDescriptor : QueueDescriptor
 {
     void Validate(const WorkloadInfo& workloadInfo) const;

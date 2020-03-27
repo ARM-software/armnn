@@ -214,6 +214,10 @@ void CompareConstTensor(const armnn::ConstTensor& tensor1, const armnn::ConstTen
             CompareConstTensorData<const uint8_t*>(
                 tensor1.GetMemoryArea(), tensor2.GetMemoryArea(), tensor1.GetNumElements());
             break;
+        case armnn::DataType::QSymmS8:
+            CompareConstTensorData<const int8_t*>(
+                tensor1.GetMemoryArea(), tensor2.GetMemoryArea(), tensor1.GetNumElements());
+            break;
         case armnn::DataType::Signed32:
             CompareConstTensorData<const int32_t*>(
                 tensor1.GetMemoryArea(), tensor2.GetMemoryArea(), tensor1.GetNumElements());
@@ -621,6 +625,100 @@ BOOST_AUTO_TEST_CASE(SerializeConvolution2d)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeConvolution2dWithPerAxisParams)
+{
+    using Descriptor = armnn::Convolution2dDescriptor;
+    class Convolution2dLayerVerifier : public LayerVerifierBaseWithDescriptor<Descriptor>
+    {
+    public:
+        Convolution2dLayerVerifier(const std::string& layerName,
+                                   const std::vector<armnn::TensorInfo>& inputInfos,
+                                   const std::vector<armnn::TensorInfo>& outputInfos,
+                                   const Descriptor& descriptor,
+                                   const armnn::ConstTensor& weights,
+                                   const armnn::Optional<armnn::ConstTensor>& biases)
+            : LayerVerifierBaseWithDescriptor<Descriptor>(layerName, inputInfos, outputInfos, descriptor)
+            , m_Weights(weights)
+            , m_Biases(biases) {}
+
+        void VisitConvolution2dLayer(const armnn::IConnectableLayer* layer,
+                                     const Descriptor& descriptor,
+                                     const armnn::ConstTensor& weights,
+                                     const armnn::Optional<armnn::ConstTensor>& biases,
+                                     const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+
+            // check weights
+            CompareConstTensor(weights, m_Weights);
+
+            // check biases
+            BOOST_CHECK(biases.has_value() == descriptor.m_BiasEnabled);
+            BOOST_CHECK(biases.has_value() == m_Biases.has_value());
+
+            if (biases.has_value() && m_Biases.has_value())
+            {
+                CompareConstTensor(biases.value(), m_Biases.value());
+            }
+        }
+
+    private:
+        armnn::ConstTensor                  m_Weights;
+        armnn::Optional<armnn::ConstTensor> m_Biases;
+    };
+
+    using namespace armnn;
+
+    const std::string layerName("convolution2dWithPerAxis");
+    const TensorInfo inputInfo ({ 1, 3, 1, 2 }, DataType::QAsymmU8, 0.55f, 128);
+    const TensorInfo outputInfo({ 1, 3, 1, 3 }, DataType::QAsymmU8, 0.75f, 128);
+
+    const std::vector<float> quantScales{ 0.75f, 0.65f, 0.85f };
+    constexpr unsigned int quantDimension = 0;
+
+    const TensorInfo kernelInfo({ 3, 1, 1, 2 }, DataType::QSymmS8, quantScales, quantDimension);
+
+    const std::vector<float> biasQuantScales{ 0.25f, 0.50f, 0.75f };
+    const TensorInfo biasInfo({ 3 }, DataType::Signed32, biasQuantScales, quantDimension);
+
+    std::vector<int8_t> kernelData = GenerateRandomData<int8_t>(kernelInfo.GetNumElements());
+    armnn::ConstTensor weights(kernelInfo, kernelData);
+    std::vector<int32_t> biasData = GenerateRandomData<int32_t>(biasInfo.GetNumElements());
+    armnn::ConstTensor biases(biasInfo, biasData);
+
+    Convolution2dDescriptor descriptor;
+    descriptor.m_StrideX     = 1;
+    descriptor.m_StrideY     = 1;
+    descriptor.m_PadLeft     = 0;
+    descriptor.m_PadRight    = 0;
+    descriptor.m_PadTop      = 0;
+    descriptor.m_PadBottom   = 0;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_DataLayout  = armnn::DataLayout::NHWC;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const convLayer   =
+        network->AddConvolution2dLayer(descriptor,
+                                       weights,
+                                       armnn::Optional<armnn::ConstTensor>(biases),
+                                       layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
+    convLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    Convolution2dLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, descriptor, weights, biases);
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeDepthToSpace)
 {
     DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(DepthToSpace)
@@ -717,6 +815,102 @@ BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2d)
     descriptor.m_StrideY     = 2;
     descriptor.m_DilationX   = 2;
     descriptor.m_DilationY   = 2;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_DataLayout  = armnn::DataLayout::NHWC;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const depthwiseConvLayer =
+        network->AddDepthwiseConvolution2dLayer(descriptor,
+                                                weights,
+                                                armnn::Optional<armnn::ConstTensor>(biases),
+                                                layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(depthwiseConvLayer->GetInputSlot(0));
+    depthwiseConvLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    depthwiseConvLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    DepthwiseConvolution2dLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, descriptor, weights, biases);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2dWithPerAxisParams)
+{
+    using Descriptor = armnn::DepthwiseConvolution2dDescriptor;
+    class DepthwiseConvolution2dLayerVerifier : public LayerVerifierBaseWithDescriptor<Descriptor>
+    {
+    public:
+        DepthwiseConvolution2dLayerVerifier(const std::string& layerName,
+                                            const std::vector<armnn::TensorInfo>& inputInfos,
+                                            const std::vector<armnn::TensorInfo>& outputInfos,
+                                            const Descriptor& descriptor,
+                                            const armnn::ConstTensor& weights,
+                                            const armnn::Optional<armnn::ConstTensor>& biases) :
+            LayerVerifierBaseWithDescriptor<Descriptor>(layerName, inputInfos, outputInfos, descriptor),
+            m_Weights(weights),
+            m_Biases(biases) {}
+
+        void VisitDepthwiseConvolution2dLayer(const armnn::IConnectableLayer* layer,
+                                              const Descriptor& descriptor,
+                                              const armnn::ConstTensor& weights,
+                                              const armnn::Optional<armnn::ConstTensor>& biases,
+                                              const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+
+            // check weights
+            CompareConstTensor(weights, m_Weights);
+
+            // check biases
+            BOOST_CHECK(biases.has_value() == descriptor.m_BiasEnabled);
+            BOOST_CHECK(biases.has_value() == m_Biases.has_value());
+
+            if (biases.has_value() && m_Biases.has_value())
+            {
+                CompareConstTensor(biases.value(), m_Biases.value());
+            }
+        }
+
+    private:
+        armnn::ConstTensor                      m_Weights;
+        armnn::Optional<armnn::ConstTensor>     m_Biases;
+    };
+
+    using namespace armnn;
+
+    const std::string layerName("depwiseConvolution2dWithPerAxis");
+    const TensorInfo inputInfo ({ 1, 3, 3, 2 }, DataType::QAsymmU8, 0.55f, 128);
+    const TensorInfo outputInfo({ 1, 2, 2, 4 }, DataType::QAsymmU8, 0.75f, 128);
+
+    const std::vector<float> quantScales{ 0.75f, 0.80f, 0.90f, 0.95f };
+    const unsigned int quantDimension = 0;
+    TensorInfo kernelInfo({ 2, 2, 2, 2 }, DataType::QSymmS8, quantScales, quantDimension);
+
+    const std::vector<float> biasQuantScales{ 0.25f, 0.35f, 0.45f, 0.55f };
+    constexpr unsigned int biasQuantDimension = 0;
+    TensorInfo biasInfo({ 4 }, DataType::Signed32, biasQuantScales, biasQuantDimension);
+
+    std::vector<int8_t> kernelData = GenerateRandomData<int8_t>(kernelInfo.GetNumElements());
+    armnn::ConstTensor weights(kernelInfo, kernelData);
+    std::vector<int32_t> biasData = GenerateRandomData<int32_t>(biasInfo.GetNumElements());
+    armnn::ConstTensor biases(biasInfo, biasData);
+
+    DepthwiseConvolution2dDescriptor descriptor;
+    descriptor.m_StrideX     = 1;
+    descriptor.m_StrideY     = 1;
+    descriptor.m_PadLeft     = 0;
+    descriptor.m_PadRight    = 0;
+    descriptor.m_PadTop      = 0;
+    descriptor.m_PadBottom   = 0;
+    descriptor.m_DilationX   = 1;
+    descriptor.m_DilationY   = 1;
     descriptor.m_BiasEnabled = true;
     descriptor.m_DataLayout  = armnn::DataLayout::NHWC;
 

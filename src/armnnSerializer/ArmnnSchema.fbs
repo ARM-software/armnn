@@ -38,7 +38,8 @@ enum DataType : byte {
     QuantisedSymm16 = 5, // deprecated
     QAsymmU8 = 6,
     QSymmS16 = 7,
-    QAsymmS8 = 8
+    QAsymmS8 = 8,
+    QSymmS8 = 9
 }
 
 enum DataLayout : byte {
@@ -54,8 +55,10 @@ enum ResizeMethod: byte {
 table TensorInfo {
     dimensions:[uint];
     dataType:DataType;
-    quantizationScale:float = 1.0;
+    quantizationScale:float = 1.0; // @deprecated Use quantizationScales instead
     quantizationOffset:int = 0;
+    quantizationScales:[float];
+    quantizationDim:uint;
 }
 
 struct Connection {

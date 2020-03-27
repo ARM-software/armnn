@@ -293,6 +293,9 @@ private:
     flatbuffers::Offset<armnnSerializer::ConstTensor> CreateConstTensorInfo(
             const armnn::ConstTensor& constTensor);
 
+    /// Creates the serializer TensorInfo for the armnn TensorInfo.
+    flatbuffers::Offset<TensorInfo>  CreateTensorInfo(const armnn::TensorInfo& tensorInfo);
+
     template <typename T>
     flatbuffers::Offset<flatbuffers::Vector<T>> CreateDataVector(const void* memory, unsigned int size);
 

@@ -508,6 +508,9 @@ armnn::TensorInfo ToTensorInfo(Deserializer::TensorRawPtr tensorPtr)
         case DataType_QAsymmS8:
             type = armnn::DataType::QAsymmS8;
             break;
+        case DataType_QSymmS8:
+            type = armnn::DataType::QSymmS8;
+            break;
         case DataType_QuantisedAsymm8:
         case DataType_QAsymmU8:
             type = armnn::DataType::QAsymmU8;
@@ -539,12 +542,29 @@ armnn::TensorInfo ToTensorInfo(Deserializer::TensorRawPtr tensorPtr)
                             location.AsString()));
         }
     }
-    float quantizationScale = tensorPtr->quantizationScale();
-    int32_t quantizationOffset = tensorPtr->quantizationOffset();
+
 
     auto dimensions = tensorPtr->dimensions();
     unsigned int size = dimensions->size();
     std::vector<unsigned int> outputDims(dimensions->begin(), dimensions->begin() + size);
+
+    auto quantizationScales = tensorPtr->quantizationScales();
+
+    if (quantizationScales)
+    {
+        unsigned int quantizationScalesSize = quantizationScales->size();
+        std::vector<float> scales(quantizationScales->begin(), quantizationScales->begin() + quantizationScalesSize);
+        unsigned int quantizationDim = tensorPtr->quantizationDim();
+        armnn::TensorInfo result(size,
+                                 outputDims.data(),
+                                 type,
+                                 scales,
+                                 quantizationDim);
+        return result;
+    }
+
+    float quantizationScale = tensorPtr->quantizationScale();
+    int32_t quantizationOffset = tensorPtr->quantizationOffset();
 
     // two statements (on purpose) for easier debugging:
     armnn::TensorInfo result(size,

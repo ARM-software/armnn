@@ -10,8 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="1b14c75c0d591c4abe4d2d41b7e4e165fbf58382" #Add support for QASYMM8_SIGNED in CLGEMMLowpQuantizeDownInt32ToUint8ScaleByFloatKernel
-
+DEFAULT_CLFRAMEWORKREVISION="4b869532f8b2aa7f02aa55c4f4813e994ea2df68" #COMPMID-2966 Add support for QASYMM8_SIGNED in NEGEMMLowpQuantizeDownInt32ToUint8ScaleKernel
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

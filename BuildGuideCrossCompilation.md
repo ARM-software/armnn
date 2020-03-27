@@ -42,8 +42,8 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     ```
     mkdir arm64_build
     cd arm64_build
-    CC=aarch64-linux-gnu-gcc \
-    CXX=aarch64-linux-gnu-g++ \
+    export CC=aarch64-linux-gnu-gcc \
+    export CXX=aarch64-linux-gnu-g++ \
     ../configure --host=aarch64-linux \
     --prefix=$HOME/armnn-devenv/google/arm64_pb_install \
     --with-protoc=$HOME/armnn-devenv/google/x86_64_pb_install/bin/protoc
@@ -122,8 +122,8 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 * Use CMake to configure your build environment, update the following script and run it from the armnn/build directory to set up the armNN build:
     ```bash
     #!/bin/bash
-    CXX=aarch64-linux-gnu-g++ \
-    CC=aarch64-linux-gnu-gcc \
+    export CXX=aarch64-linux-gnu-g++ \
+    export CC=aarch64-linux-gnu-gcc \
     cmake .. \
     -DARMCOMPUTE_ROOT=$HOME/armnn-devenv/ComputeLibrary \
     -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build/ \
@@ -156,8 +156,8 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 * Use CMake to configure your build environment, update the following script and run it from the armnn/src/dynamic/sample/build directory to set up the armNN build:
     ```bash
     #!/bin/bash
-    CXX=aarch64-linux-gnu-g++ \
-    CC=aarch64-linux-gnu-gcc \
+    export CXX=aarch64-linux-gnu-g++ \
+    export CC=aarch64-linux-gnu-gcc \
     cmake .. \
     -DCMAKE_CXX_FLAGS=--std=c++14 \
     -DBOOST_ROOT=$HOME/armnn-devenv/boost_arm64_install/ \

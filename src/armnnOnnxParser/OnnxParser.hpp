@@ -106,6 +106,7 @@ private:
     void ParseReshape(const onnx::NodeProto& nodeProto);
 
     void ParseActivation(const onnx::NodeProto& nodeProto, const armnn::ActivationFunction func);
+    void ParseClip(const onnx::NodeProto& nodeProto);
     void ParseSigmoid(const onnx::NodeProto& nodeProto);
     void ParseTanh(const onnx::NodeProto& nodeProto);
     void ParseRelu(const onnx::NodeProto& nodeProto);

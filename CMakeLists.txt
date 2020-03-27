@@ -822,6 +822,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnOnnxParser/test/Constructor.cpp
             src/armnnOnnxParser/test/CreateNetwork.cpp
             src/armnnOnnxParser/test/ProtoxtFixture.cpp
+            src/armnnOnnxParser/test/Clip.cpp
             src/armnnOnnxParser/test/Const.cpp
             src/armnnOnnxParser/test/Pooling.cpp
             src/armnnOnnxParser/test/Reshape.cpp

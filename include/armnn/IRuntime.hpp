@@ -10,6 +10,7 @@
 #include "Tensor.hpp"
 #include "Types.hpp"
 #include "TypesUtils.hpp"
+#include "profiling/ILocalPacketHandler.hpp"
 
 #include <memory>
 
@@ -61,21 +62,23 @@ public:
         {
             ExternalProfilingOptions()
                 : m_EnableProfiling(false)
+                , m_TimelineEnabled(false)
                 , m_OutgoingCaptureFile("")
                 , m_IncomingCaptureFile("")
                 , m_FileOnly(false)
                 , m_CapturePeriod(LOWEST_CAPTURE_PERIOD)
                 , m_FileFormat("binary")
-                , m_TimelineEnabled(false)
+                , m_LocalPacketHandlers()
             {}
 
             bool        m_EnableProfiling;
+            bool        m_TimelineEnabled;
             std::string m_OutgoingCaptureFile;
             std::string m_IncomingCaptureFile;
             bool        m_FileOnly;
             uint32_t    m_CapturePeriod;
             std::string m_FileFormat;
-            bool        m_TimelineEnabled;
+            std::vector<armnn::profiling::ILocalPacketHandlerSharedPtr> m_LocalPacketHandlers;
         };
         ExternalProfilingOptions m_ProfilingOptions;
 

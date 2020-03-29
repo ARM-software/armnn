@@ -5,6 +5,8 @@
 
 #include "ProfilingUtils.hpp"
 
+#include "common/include/ProfilingException.hpp"
+
 #include <armnn/Version.hpp>
 
 #include <WallClockTimer.hpp>
@@ -1050,6 +1052,33 @@ uint64_t GetTimestamp()
     auto timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(clock::now().time_since_epoch());
 
     return static_cast<uint64_t>(timestamp.count());
+}
+
+Packet ReceivePacket(const unsigned char* buffer, uint32_t length)
+{
+    if (buffer == nullptr)
+    {
+        throw armnnProfiling::ProfilingException("data buffer is nullptr");
+    }
+    if (length < 8)
+    {
+        throw armnnProfiling::ProfilingException("length of data buffer is less than 8");
+    }
+
+    uint32_t metadataIdentifier = 0;
+    std::memcpy(&metadataIdentifier, buffer, sizeof(metadataIdentifier));
+
+    uint32_t dataLength = 0;
+    std::memcpy(&dataLength, buffer + 4u, sizeof(dataLength));
+
+    std::unique_ptr<unsigned char[]> packetData;
+    if (dataLength > 0)
+    {
+        packetData = std::make_unique<unsigned char[]>(dataLength);
+        std::memcpy(packetData.get(), buffer + 8u, dataLength);
+    }
+
+    return Packet(metadataIdentifier, dataLength, packetData);
 }
 
 } // namespace profiling

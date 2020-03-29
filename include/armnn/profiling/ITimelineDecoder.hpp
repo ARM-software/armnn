@@ -27,6 +27,18 @@ public:
         LabelLink      /// Head uses label Tail (Tail MUST be a guid of a label).
     };
 
+    static char const* GetRelationshipAsCString(RelationshipType rType)
+    {
+        switch (rType)
+        {
+            case RelationshipType::RetentionLink: return "RetentionLink";
+            case RelationshipType::ExecutionLink: return "ExecutionLink";
+            case RelationshipType::DataLink: return "DataLink";
+            case RelationshipType::LabelLink: return "LabelLink";
+            default: return "Unknown";
+        }
+    }
+
     struct Entity
     {
         uint64_t m_Guid;

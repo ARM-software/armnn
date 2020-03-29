@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Packet.hpp"
+#include <armnn/profiling/ILocalPacketHandler.hpp>
 
 #include <cstdint>
 

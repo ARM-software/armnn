@@ -3,12 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "../FileOnlyProfilingConnection.hpp"
-
+#include <armnn/utility/IgnoreUnused.hpp>
+#include <FileOnlyProfilingConnection.hpp>
+#include <Filesystem.hpp>
+#include <NullProfilingConnection.hpp>
 #include <ProfilingService.hpp>
 #include <Runtime.hpp>
-#include <Filesystem.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
+#include "PrintPacketHeaderHandler.hpp"
+#include "TestTimelinePacketHandler.hpp"
 
 #include <boost/filesystem.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -37,11 +39,67 @@ class FileOnlyHelperService : public ProfilingService
 
 BOOST_AUTO_TEST_SUITE(FileOnlyProfilingDecoratorTests)
 
+std::string UniqueFileName()
+{
+    std::time_t t = std::time(nullptr);
+    char mbstr[100];
+    std::strftime(mbstr, sizeof(mbstr), "%Y_%m_%d_%H_%M_%S_", std::localtime(&t));
+    std::stringstream ss;
+    ss << mbstr;
+    ss << t;
+    ss << ".bin";
+    return ss.str();
+}
+
+BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
+{
+    // Create a temporary file name.
+    boost::filesystem::path tempPath = boost::filesystem::temp_directory_path();
+    boost::filesystem::path tempFile = UniqueFileName();
+    tempPath                         = tempPath / tempFile;
+    armnn::Runtime::CreationOptions creationOptions;
+    creationOptions.m_ProfilingOptions.m_EnableProfiling     = true;
+    creationOptions.m_ProfilingOptions.m_FileOnly            = true;
+    creationOptions.m_ProfilingOptions.m_CapturePeriod       = 100;
+    creationOptions.m_ProfilingOptions.m_TimelineEnabled     = true;
+    ILocalPacketHandlerSharedPtr localPacketHandlerPtr = std::make_shared<TestTimelinePacketHandler>();
+    creationOptions.m_ProfilingOptions.m_LocalPacketHandlers.push_back(localPacketHandlerPtr);
+
+    armnn::Runtime runtime(creationOptions);
+
+    // Load a simple network
+    // build up the structure of the network
+    INetworkPtr net(INetwork::Create());
+
+    IConnectableLayer* input = net->AddInputLayer(0, "input");
+
+    NormalizationDescriptor descriptor;
+    IConnectableLayer* normalize = net->AddNormalizationLayer(descriptor, "normalization");
+
+    IConnectableLayer* output = net->AddOutputLayer(0, "output");
+
+    input->GetOutputSlot(0).Connect(normalize->GetInputSlot(0));
+    normalize->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
+    normalize->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
+
+    // optimize the network
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime.GetDeviceSpec());
+
+    // Load it into the runtime. It should succeed.
+    armnn::NetworkId netId;
+    BOOST_TEST(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
+
+    static_cast<TestTimelinePacketHandler*>(localPacketHandlerPtr.get())->WaitOnInferenceCompletion(3000);
+}
+
 BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd, * boost::unit_test::disabled())
 {
     // Create a temporary file name.
     boost::filesystem::path tempPath = boost::filesystem::temp_directory_path();
-    boost::filesystem::path tempFile = boost::filesystem::unique_path();
+    boost::filesystem::path tempFile = UniqueFileName();
     tempPath                         = tempPath / tempFile;
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling     = true;

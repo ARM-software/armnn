@@ -10,6 +10,7 @@
 
 #include "ICounterDirectory.hpp"
 #include "IPacketBuffer.hpp"
+#include "Packet.hpp"
 
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -255,6 +256,8 @@ class BufferExhaustion : public armnn::Exception
 };
 
 uint64_t GetTimestamp();
+
+Packet ReceivePacket(const unsigned char* buffer, uint32_t length);
 
 } // namespace profiling
 

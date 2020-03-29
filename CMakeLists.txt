@@ -252,6 +252,7 @@ list(APPEND armnn_sources
     include/armnn/utility/NumericCast.hpp
     include/armnn/utility/PolymorphicDowncast.hpp
     include/armnn/utility/StringUtils.hpp
+    profiling/common/include/ProfilingException.hpp
     profiling/common/include/SocketConnectionException.hpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp
@@ -505,6 +506,7 @@ list(APPEND armnn_sources
     src/profiling/IProfilingConnectionFactory.hpp
     src/profiling/LabelsAndEventClasses.cpp
     src/profiling/LabelsAndEventClasses.hpp
+    src/profiling/NullProfilingConnection.hpp
     src/profiling/Packet.hpp
     src/profiling/PacketBuffer.cpp
     src/profiling/PacketBuffer.hpp
@@ -575,7 +577,7 @@ target_include_directories(armnn PRIVATE src/profiling)
 target_link_libraries(armnn armnnUtils)
 
 target_link_libraries(armnn ${CMAKE_DL_LIBS})
-if ("${CMAKE_SYSTEM_NAME}" STREQUAL Windows) 
+if ("${CMAKE_SYSTEM_NAME}" STREQUAL Windows)
     target_link_libraries(armnn Ws2_32.lib)
 endif()
 
@@ -676,6 +678,8 @@ if(BUILD_UNIT_TESTS)
         src/armnnUtils/test/TensorUtilsTest.cpp
         src/profiling/test/BufferTests.cpp
         src/profiling/test/FileOnlyProfilingDecoratorTests.cpp
+        src/profiling/test/PrintPacketHeaderHandler.cpp
+        src/profiling/test/PrintPacketHeaderHandler.hpp
         src/profiling/test/ProfilingConnectionDumpToFileDecoratorTests.cpp
         src/profiling/test/ProfilingGuidTest.cpp
         src/profiling/test/ProfilingMocks.hpp
@@ -685,6 +689,10 @@ if(BUILD_UNIT_TESTS)
         src/profiling/test/ProfilingTestUtils.hpp
         src/profiling/test/SendCounterPacketTests.cpp
         src/profiling/test/SendCounterPacketTests.hpp
+        src/profiling/test/TestTimelinePacketHandler.cpp
+        src/profiling/test/TestTimelinePacketHandler.hpp
+        src/profiling/test/TimelineModel.cpp
+        src/profiling/test/TimelineModel.hpp
         src/profiling/test/SendTimelinePacketTests.cpp
         src/profiling/test/TimelinePacketTests.cpp
         src/profiling/test/TimelineUtilityMethodsTests.cpp
@@ -998,7 +1006,7 @@ if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD
         ${Boost_FILESYSTEM_LIBRARY}
         ${Boost_PROGRAM_OPTIONS_LIBRARY})
     addDllCopyCommands(ArmnnConverter)
-endif()
+  endif()
 
 if(BUILD_TIMELINE_DECODER)
     add_subdirectory(src/timelineDecoder)

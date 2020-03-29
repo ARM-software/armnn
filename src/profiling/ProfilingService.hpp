@@ -14,6 +14,7 @@
 #include "DeactivateTimelineReportingCommandHandler.hpp"
 #include "ICounterRegistry.hpp"
 #include "ICounterValues.hpp"
+#include <armnn/profiling/ILocalPacketHandler.hpp>
 #include "IProfilingService.hpp"
 #include "IReportStructure.hpp"
 #include "PeriodicCounterCapture.hpp"
@@ -207,6 +208,7 @@ public:
         return m_TimelineReporting;
     }
 
+    void AddLocalPacketHandler(ILocalPacketHandlerSharedPtr localPacketHandler);
 private:
     //Copy/move constructors/destructors and copy/move assignment operators are deleted
     ProfilingService(const ProfilingService&) = delete;

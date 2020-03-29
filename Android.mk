@@ -10,6 +10,7 @@ OPENCL_HEADER_PATH := $(LOCAL_PATH)/../clframework/include
 NN_HEADER_PATH := $(LOCAL_PATH)/../../../../frameworks/ml/nn/runtime/include
 ARMNN_HEADER_PATH := $(LOCAL_PATH)/include
 ARMNN_PROFILING_INCLUDE_PATH := $(LOCAL_PATH)/profiling
+ARMNN_TIMELINE_DECODER_INCLUDE_PATH := $(LOCAL_PATH)/src/timelineDecoder
 ARMNN_MAIN_HEADER_PATH := $(LOCAL_PATH)/src
 ARMNN_SOURCE_HEADER_PATH := $(LOCAL_PATH)/src/armnn
 ARMNN_SOURCE_UTILS_HEADER_PATH := $(LOCAL_PATH)/src/armnnUtils
@@ -66,6 +67,7 @@ LOCAL_EXPORT_C_INCLUDES := \
         $(ARMNN_MAIN_HEADER_PATH) \
         $(ARMNN_SOURCE_HEADER_PATH) \
         $(ARMNN_PROFILING_INCLUDE_PATH) \
+        $(ARMNN_TIMELINE_DECODER_INCLUDE_PATH) \
         $(ARMNN_SOURCE_UTILS_HEADER_PATH) \
         $(ARMNN_PROFILING_HEADER_PATH) \
         $(ARMNN_BACKENDS_HEADER_PATH)
@@ -75,6 +77,7 @@ LOCAL_C_INCLUDES := \
         $(NN_HEADER_PATH) \
         $(ARMNN_HEADER_PATH) \
         $(ARMNN_PROFILING_INCLUDE_PATH) \
+        $(ARMNN_TIMELINE_DECODER_INCLUDE_PATH) \
         $(ARMNN_MAIN_HEADER_PATH) \
         $(ARMNN_SOURCE_HEADER_PATH) \
         $(ARMNN_SOURCE_UTILS_HEADER_PATH) \
@@ -193,8 +196,8 @@ LOCAL_SRC_FILES := \
         src/profiling/ConnectionAcknowledgedCommandHandler.cpp \
         src/profiling/CounterDirectory.cpp \
         src/profiling/CounterIdMap.cpp \
-        src/profiling/DirectoryCaptureCommandHandler.cpp \
         src/profiling/DeactivateTimelineReportingCommandHandler.cpp \
+        src/profiling/DirectoryCaptureCommandHandler.cpp \
         src/profiling/FileOnlyProfilingConnection.cpp \
         src/profiling/Holder.cpp \
         src/profiling/LabelsAndEventClasses.cpp \
@@ -216,7 +219,10 @@ LOCAL_SRC_FILES := \
         src/profiling/SocketProfilingConnection.cpp \
         src/profiling/TimelinePacketWriterFactory.cpp \
         src/profiling/TimelineUtilityMethods.cpp \
-        src/profiling/backends/BackendProfiling.cpp
+        src/profiling/backends/BackendProfiling.cpp \
+        src/timelineDecoder/TimelineCaptureCommandHandler.cpp \
+        src/timelineDecoder/TimelineDecoder.cpp \
+        src/timelineDecoder/TimelineDirectoryCaptureCommandHandler.cpp
 
 LOCAL_STATIC_LIBRARIES := \
         arm_compute_library \
@@ -299,6 +305,7 @@ LOCAL_C_INCLUDES := \
         $(NN_HEADER_PATH) \
         $(ARMNN_HEADER_PATH) \
         $(ARMNN_PROFILING_INCLUDE_PATH) \
+        $(ARMNN_TIMELINE_DECODER_INCLUDE_PATH) \
         $(ARMNN_MAIN_HEADER_PATH) \
         $(ARMNN_SOURCE_HEADER_PATH) \
         $(ARMNN_SOURCE_UTILS_HEADER_PATH) \
@@ -384,12 +391,15 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/test/TensorUtilsTest.cpp \
         src/profiling/test/BufferTests.cpp \
         src/profiling/test/FileOnlyProfilingDecoratorTests.cpp \
+        src/profiling/test/PrintPacketHeaderHandler.cpp \
         src/profiling/test/ProfilingConnectionDumpToFileDecoratorTests.cpp \
         src/profiling/test/ProfilingGuidTest.cpp \
         src/profiling/test/ProfilingTests.cpp \
         src/profiling/test/ProfilingTestUtils.cpp \
         src/profiling/test/SendCounterPacketTests.cpp \
         src/profiling/test/SendTimelinePacketTests.cpp \
+        src/profiling/test/TestTimelinePacketHandler.cpp \
+        src/profiling/test/TimelineModel.cpp \
         src/profiling/test/TimelinePacketTests.cpp \
         src/profiling/test/TimelineUtilityMethodsTests.cpp
 

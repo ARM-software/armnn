@@ -242,7 +242,7 @@ public:
                             uint32_t length = 0,
                             uint32_t timeout  = 1000)
     {
-        long packetCount = mockProfilingConnection->CheckForPacket({packetType, length});
+        long packetCount = mockProfilingConnection->CheckForPacket({ packetType, length });
         // The first packet we receive may not be the one we are looking for, so keep looping until till we find it,
         // or until WaitForPacketsSent times out
         while(packetCount == 0 && timeout != 0)

@@ -181,9 +181,33 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
     BOOST_ASSERT(category);
 
     const std::string& categoryName = category->m_Name;
-    const std::vector<uint16_t> categoryCounters = category->m_Counters;
-
     BOOST_ASSERT(!categoryName.empty());
+
+    // Remove any duplicate counters
+    std::vector<uint16_t> categoryCounters;
+    for (size_t counterIndex = 0; counterIndex < category->m_Counters.size(); ++counterIndex)
+    {
+        uint16_t counterUid = category->m_Counters.at(counterIndex);
+        auto it = counters.find(counterUid);
+        if (it == counters.end())
+        {
+            errorMessage = boost::str(boost::format("Counter (%1%) not found in category (%2%)")
+                                      % counterUid % category->m_Name );
+            return false;
+        }
+
+        const CounterPtr& counter = it->second;
+
+        if (counterUid == counter->m_MaxCounterUid)
+        {
+            categoryCounters.emplace_back(counterUid);
+        }
+    }
+    if (categoryCounters.empty())
+    {
+        errorMessage = boost::str(boost::format("No valid counters found in category (%1%)")% categoryName);
+        return false;
+    }
 
     // Utils
     size_t uint32_t_size = sizeof(uint32_t);
@@ -203,7 +227,7 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
     std::vector<uint32_t> categoryNameBuffer;
     if (!StringToSwTraceString<SwTraceNameCharPolicy>(categoryName, categoryNameBuffer))
     {
-        errorMessage = boost::str(boost::format("Cannot convert the name of category \"%1%\" to an SWTrace namestring")
+        errorMessage = boost::str(boost::format("Cannot convert the name of category (%1%) to an SWTrace namestring")
                                   % categoryName);
         return false;
     }
@@ -221,7 +245,6 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
     {
         uint16_t counterUid = categoryCounters.at(counterIndex);
         auto it = counters.find(counterUid);
-        BOOST_ASSERT(it != counters.end());
         const CounterPtr& counter = it->second;
 
         EventRecord& eventRecord = eventRecords.at(eventRecordIndex);
@@ -299,7 +322,7 @@ bool SendCounterPacket::CreateDeviceRecord(const DevicePtr& device,
     std::vector<uint32_t> deviceNameBuffer;
     if (!StringToSwTraceString<SwTraceCharPolicy>(deviceName, deviceNameBuffer))
     {
-        errorMessage = boost::str(boost::format("Cannot convert the name of device %1% (\"%2%\") to an SWTrace string")
+        errorMessage = boost::str(boost::format("Cannot convert the name of device %1% (%2%) to an SWTrace string")
                                   % deviceUid
                                   % deviceName);
         return false;
@@ -349,7 +372,7 @@ bool SendCounterPacket::CreateCounterSetRecord(const CounterSetPtr& counterSet,
     std::vector<uint32_t> counterSetNameBuffer;
     if (!StringToSwTraceString<SwTraceNameCharPolicy>(counterSet->m_Name, counterSetNameBuffer))
     {
-        errorMessage = boost::str(boost::format("Cannot convert the name of counter set %1% (\"%2%\") to "
+        errorMessage = boost::str(boost::format("Cannot convert the name of counter set %1% (%2%) to "
                                                 "an SWTrace namestring")
                                   % counterSetUid
                                   % counterSetName);
@@ -441,7 +464,7 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
     std::vector<uint32_t> counterNameBuffer;
     if (!StringToSwTraceString<SwTraceCharPolicy>(counterName, counterNameBuffer))
     {
-        errorMessage = boost::str(boost::format("Cannot convert the name of counter %1% (name: \"%2%\") "
+        errorMessage = boost::str(boost::format("Cannot convert the name of counter %1% (name: %2%) "
                                                 "to an SWTrace string")
                                   % counterUid
                                   % counterName);
@@ -457,7 +480,7 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
     std::vector<uint32_t> counterDescriptionBuffer;
     if (!StringToSwTraceString<SwTraceCharPolicy>(counterDescription, counterDescriptionBuffer))
     {
-        errorMessage = boost::str(boost::format("Cannot convert the description of counter %1% (description: \"%2%\") "
+        errorMessage = boost::str(boost::format("Cannot convert the description of counter %1% (description: %2%) "
                                                 "to an SWTrace string")
                                   % counterUid
                                   % counterName);
@@ -481,7 +504,7 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
         // Convert the counter units into a SWTrace namestring
         if (!StringToSwTraceString<SwTraceNameCharPolicy>(counterUnits, counterUnitsBuffer))
         {
-            errorMessage = boost::str(boost::format("Cannot convert the units of counter %1% (units: \"%2%\") "
+            errorMessage = boost::str(boost::format("Cannot convert the units of counter %1% (units: %2%) "
                                                     "to an SWTrace string")
                                       % counterUid
                                       % counterName);

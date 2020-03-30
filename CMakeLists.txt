@@ -462,6 +462,8 @@ list(APPEND armnn_sources
     src/armnn/optimizations/PermuteAndBatchToSpaceAsDepthToSpace.hpp
     src/armnn/optimizations/PermuteAsReshape.hpp
     src/armnn/optimizations/SquashEqualSiblings.hpp
+    src/profiling/ActivateTimelineReportingCommandHandler.cpp
+    src/profiling/ActivateTimelineReportingCommandHandler.hpp
     src/profiling/BufferManager.cpp
     src/profiling/BufferManager.hpp
     src/profiling/CommandHandler.cpp
@@ -478,6 +480,8 @@ list(APPEND armnn_sources
     src/profiling/CounterDirectory.hpp
     src/profiling/CounterIdMap.cpp
     src/profiling/CounterIdMap.hpp
+    src/profiling/DeactivateTimelineReportingCommandHandler.cpp
+    src/profiling/DeactivateTimelineReportingCommandHandler.hpp
     src/profiling/DirectoryCaptureCommandHandler.cpp
     src/profiling/DirectoryCaptureCommandHandler.hpp
     src/profiling/EncodeVersion.hpp
@@ -490,6 +494,8 @@ list(APPEND armnn_sources
     src/profiling/ICounterDirectory.hpp
     src/profiling/ICounterRegistry.hpp
     src/profiling/ICounterValues.hpp
+    src/profiling/INotifyBackends.hpp
+    src/profiling/IReportStructure.hpp
     src/profiling/ISendCounterPacket.hpp
     src/profiling/ISendThread.hpp
     src/profiling/IPacketBuffer.hpp

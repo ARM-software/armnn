@@ -5,14 +5,17 @@
 
 #pragma once
 
+#include "ActivateTimelineReportingCommandHandler.hpp"
 #include "BufferManager.hpp"
 #include "CommandHandler.hpp"
 #include "ConnectionAcknowledgedCommandHandler.hpp"
 #include "CounterDirectory.hpp"
 #include "CounterIdMap.hpp"
+#include "DeactivateTimelineReportingCommandHandler.hpp"
 #include "ICounterRegistry.hpp"
 #include "ICounterValues.hpp"
 #include "IProfilingService.hpp"
+#include "IReportStructure.hpp"
 #include "PeriodicCounterCapture.hpp"
 #include "PeriodicCounterSelectionCommandHandler.hpp"
 #include "PerJobCounterSelectionCommandHandler.hpp"
@@ -24,6 +27,7 @@
 #include "SendThread.hpp"
 #include "SendTimelinePacket.hpp"
 #include "TimelinePacketWriterFactory.hpp"
+#include "INotifyBackends.hpp"
 #include <armnn/backends/profiling/IBackendProfilingContext.hpp>
 
 namespace armnn
@@ -32,14 +36,14 @@ namespace armnn
 namespace profiling
 {
 // Static constants describing ArmNN's counter UID's
-static const uint16_t NETWORK_LOADS         =   0;
-static const uint16_t NETWORK_UNLOADS       =   1;
-static const uint16_t REGISTERED_BACKENDS   =   2;
-static const uint16_t UNREGISTERED_BACKENDS =   3;
-static const uint16_t INFERENCES_RUN        =   4;
-static const uint16_t MAX_ARMNN_COUNTER = INFERENCES_RUN;
+static const uint16_t NETWORK_LOADS         = 0;
+static const uint16_t NETWORK_UNLOADS       = 1;
+static const uint16_t REGISTERED_BACKENDS   = 2;
+static const uint16_t UNREGISTERED_BACKENDS = 3;
+static const uint16_t INFERENCES_RUN        = 4;
+static const uint16_t MAX_ARMNN_COUNTER     = INFERENCES_RUN;
 
-class ProfilingService : public IReadWriteCounterValues, public IProfilingService
+class ProfilingService : public IReadWriteCounterValues, public IProfilingService, public INotifyBackends
 {
 public:
     using ExternalProfilingOptions = IRuntime::CreationOptions::ExternalProfilingOptions;
@@ -47,10 +51,12 @@ public:
     using IProfilingConnectionPtr = std::unique_ptr<IProfilingConnection>;
     using CounterIndices = std::vector<std::atomic<uint32_t>*>;
     using CounterValues = std::list<std::atomic<uint32_t>>;
+    using BackendProfilingContext = std::unordered_map<BackendId,
+                                                       std::shared_ptr<armnn::profiling::IBackendProfilingContext>>;
 
-    // Default constructor/destructor kept protected for testing
-    ProfilingService()
+    ProfilingService(Optional<IReportStructure&> reportStructure = EmptyOptional())
         : m_Options()
+        , m_TimelineReporting(false)
         , m_CounterDirectory()
         , m_ProfilingConnectionFactory(new ProfilingConnectionFactory())
         , m_ProfilingConnection()
@@ -97,6 +103,22 @@ public:
                                                  5,
                                                  m_PacketVersionResolver.ResolvePacketVersion(0, 5).GetEncodedValue(),
                                                  m_StateMachine)
+        , m_ActivateTimelineReportingCommandHandler(0,
+                                                    6,
+                                                    m_PacketVersionResolver.ResolvePacketVersion(0, 6)
+                                                                           .GetEncodedValue(),
+                                                    m_SendTimelinePacket,
+                                                    m_StateMachine,
+                                                    reportStructure,
+                                                    m_TimelineReporting,
+                                                    *this)
+        , m_DeactivateTimelineReportingCommandHandler(0,
+                                                      7,
+                                                      m_PacketVersionResolver.ResolvePacketVersion(0, 7)
+                                                                             .GetEncodedValue(),
+                                                      m_TimelineReporting,
+                                                      m_StateMachine,
+                                                      *this)
         , m_TimelinePacketWriterFactory(m_BufferManager)
         , m_MaxGlobalCounterId(armnn::profiling::INFERENCES_RUN)
     {
@@ -111,6 +133,10 @@ public:
 
         // Register the "Per-Job Counter Selection" command handler
         m_CommandHandlerRegistry.RegisterFunctor(&m_PerJobCounterSelectionCommandHandler);
+
+        m_CommandHandlerRegistry.RegisterFunctor(&m_ActivateTimelineReportingCommandHandler);
+
+        m_CommandHandlerRegistry.RegisterFunctor(&m_DeactivateTimelineReportingCommandHandler);
     }
 
     ~ProfilingService();
@@ -130,6 +156,9 @@ public:
     // Store a profiling context returned from a backend that support profiling.
     void AddBackendProfilingContext(const BackendId backendId,
         std::shared_ptr<armnn::profiling::IBackendProfilingContext> profilingContext);
+
+    // Enable the recording of timeline events and entities
+    void NotifyBackendsForTimelineReporting() override;
 
     const ICounterDirectory& GetCounterDirectory() const;
     ICounterRegistry& GetCounterRegistry();
@@ -168,12 +197,14 @@ public:
         return m_SendCounterPacket;
     }
 
-    /// Check if the profiling is enabled
-    bool IsEnabled() { return m_Options.m_EnableProfiling; }
-
     static ProfilingDynamicGuid GetNextGuid();
 
     static ProfilingStaticGuid GetStaticId(const std::string& str);
+
+    bool IsTimelineReportingEnabled()
+    {
+        return m_TimelineReporting;
+    }
 
 private:
     //Copy/move constructors/destructors and copy/move assignment operators are deleted
@@ -192,32 +223,37 @@ private:
     void CheckCounterUid(uint16_t counterUid) const;
 
     // Profiling service components
-    ExternalProfilingOptions m_Options;
-    CounterDirectory m_CounterDirectory;
-    CounterIdMap m_CounterIdMap;
+    ExternalProfilingOptions       m_Options;
+    std::atomic<bool>              m_TimelineReporting;
+    CounterDirectory               m_CounterDirectory;
+    CounterIdMap                   m_CounterIdMap;
     IProfilingConnectionFactoryPtr m_ProfilingConnectionFactory;
-    IProfilingConnectionPtr m_ProfilingConnection;
-    ProfilingStateMachine m_StateMachine;
-    CounterIndices m_CounterIndex;
-    CounterValues m_CounterValues;
-    CommandHandlerRegistry m_CommandHandlerRegistry;
-    PacketVersionResolver m_PacketVersionResolver;
-    CommandHandler m_CommandHandler;
-    BufferManager m_BufferManager;
-    SendCounterPacket m_SendCounterPacket;
-    SendThread m_SendThread;
-    SendTimelinePacket m_SendTimelinePacket;
+    IProfilingConnectionPtr        m_ProfilingConnection;
+    ProfilingStateMachine          m_StateMachine;
+    CounterIndices                 m_CounterIndex;
+    CounterValues                  m_CounterValues;
+    CommandHandlerRegistry         m_CommandHandlerRegistry;
+    PacketVersionResolver          m_PacketVersionResolver;
+    CommandHandler                 m_CommandHandler;
+    BufferManager                  m_BufferManager;
+    SendCounterPacket              m_SendCounterPacket;
+    SendThread                     m_SendThread;
+    SendTimelinePacket             m_SendTimelinePacket;
+
     Holder m_Holder;
+
     PeriodicCounterCapture m_PeriodicCounterCapture;
-    ConnectionAcknowledgedCommandHandler m_ConnectionAcknowledgedCommandHandler;
-    RequestCounterDirectoryCommandHandler m_RequestCounterDirectoryCommandHandler;
-    PeriodicCounterSelectionCommandHandler m_PeriodicCounterSelectionCommandHandler;
-    PerJobCounterSelectionCommandHandler m_PerJobCounterSelectionCommandHandler;
+
+    ConnectionAcknowledgedCommandHandler      m_ConnectionAcknowledgedCommandHandler;
+    RequestCounterDirectoryCommandHandler     m_RequestCounterDirectoryCommandHandler;
+    PeriodicCounterSelectionCommandHandler    m_PeriodicCounterSelectionCommandHandler;
+    PerJobCounterSelectionCommandHandler      m_PerJobCounterSelectionCommandHandler;
+    ActivateTimelineReportingCommandHandler   m_ActivateTimelineReportingCommandHandler;
+    DeactivateTimelineReportingCommandHandler m_DeactivateTimelineReportingCommandHandler;
 
     TimelinePacketWriterFactory m_TimelinePacketWriterFactory;
-    std::unordered_map<BackendId,
-    std::shared_ptr<armnn::profiling::IBackendProfilingContext>> m_BackendProfilingContexts;
-    uint16_t m_MaxGlobalCounterId;
+    BackendProfilingContext     m_BackendProfilingContexts;
+    uint16_t                    m_MaxGlobalCounterId;
 
     static ProfilingGuidGenerator m_GuidGenerator;
 

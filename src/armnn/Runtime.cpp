@@ -152,10 +152,31 @@ const std::shared_ptr<IProfiler> Runtime::GetProfiler(NetworkId networkId) const
     return nullptr;
 }
 
+void Runtime::ReportStructure() // armnn::profiling::IProfilingService& profilingService as param
+{
+    // No-op for the time being, but this may be useful in future to have the profilingService available
+    // if (profilingService.IsProfilingEnabled()){}
+
+    LoadedNetworks::iterator it = m_LoadedNetworks.begin();
+    while (it != m_LoadedNetworks.end())
+    {
+        auto& loadedNetwork = it->second;
+        loadedNetwork->SendNetworkStructure();
+        // Increment the Iterator to point to next entry
+        it++;
+    }
+}
+
 Runtime::Runtime(const CreationOptions& options)
-    : m_NetworkIdCounter(0)
+    : m_NetworkIdCounter(0),
+      m_ProfilingService(*this)
 {
     ARMNN_LOG(info) << "ArmNN v" << ARMNN_VERSION << "\n";
+
+    if ( options.m_ProfilingOptions.m_TimelineEnabled && !options.m_ProfilingOptions.m_EnableProfiling )
+    {
+        throw RuntimeException("It is not possible to enable timeline reporting without profiling being enabled");
+    }
 
     // pass configuration info to the profiling service
     m_ProfilingService.ConfigureProfilingService(options.m_ProfilingOptions);

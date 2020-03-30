@@ -96,17 +96,8 @@ void WriteBytes(const IPacketBufferPtr& packetBuffer, unsigned int offset,  cons
 uint32_t ConstructHeader(uint32_t packetFamily,
                          uint32_t packetId)
 {
-    return ((packetFamily & 0x3F) << 26)|
-           ((packetId & 0x3FF) << 16);
-}
-
-uint32_t ConstructHeader(uint32_t packetFamily,
-                         uint32_t packetClass,
-                         uint32_t packetType)
-{
-    return ((packetFamily & 0x3F) << 26)|
-           ((packetClass & 0x3FF) << 19)|
-           ((packetType & 0x3FFF) << 16);
+    return (( packetFamily & 0x0000003F ) << 26 )|
+           (( packetId & 0x000003FF )     << 16 );
 }
 
 void WriteUint64(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset, uint64_t value)

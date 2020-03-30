@@ -34,6 +34,7 @@ void ProfilingService::ResetExternalProfilingOptions(const ExternalProfilingOpti
 {
     // Update the profiling options
     m_Options = options;
+    m_TimelineReporting = options.m_TimelineEnabled;
 
     // Check if the profiling service needs to be reset
     if (resetProfilingService)
@@ -431,7 +432,7 @@ void ProfilingService::Reset()
     // ...finally reset the profiling state machine
     m_StateMachine.Reset();
     m_BackendProfilingContexts.clear();
-    m_MaxGlobalCounterId = armnn::profiling::INFERENCES_RUN;
+    m_MaxGlobalCounterId = armnn::profiling::MAX_ARMNN_COUNTER;
 }
 
 void ProfilingService::Stop()
@@ -463,11 +464,22 @@ inline void ProfilingService::CheckCounterUid(uint16_t counterUid) const
     }
 }
 
+void ProfilingService::NotifyBackendsForTimelineReporting()
+{
+    BackendProfilingContext::iterator it = m_BackendProfilingContexts.begin();
+    while (it != m_BackendProfilingContexts.end())
+    {
+        auto& backendProfilingContext = it->second;
+        backendProfilingContext->EnableTimelineReporting(m_TimelineReporting);
+        // Increment the Iterator to point to next entry
+        it++;
+    }
+}
+
 ProfilingService::~ProfilingService()
 {
     Stop();
 }
-
 } // namespace profiling
 
 } // namespace armnn

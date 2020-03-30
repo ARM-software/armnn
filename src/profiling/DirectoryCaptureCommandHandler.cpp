@@ -281,7 +281,8 @@ std::vector<CounterDirectoryEventRecord> DirectoryCaptureCommandHandler::ReadEve
 
         eventRecords[i].m_CounterDescription = GetStringNameFromBuffer(data, eventRecordOffset + descriptionOffset);
 
-        eventRecords[i].m_CounterUnits = GetStringNameFromBuffer(data, eventRecordOffset + unitsOffset);
+        eventRecords[i].m_CounterUnits = unitsOffset == 0 ? Optional<std::string>() :
+                GetStringNameFromBuffer(data, eventRecordOffset + unitsOffset);
     }
 
     return eventRecords;

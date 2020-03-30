@@ -263,6 +263,43 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
     }
 }
 
+void LoadedNetwork::SendNetworkStructure()
+{
+    Graph& order = m_OptimizedNetwork->GetGraph().TopologicalSort();
+    ProfilingGuid networkGuid = m_OptimizedNetwork->GetGuid();
+
+    std::unique_ptr<TimelineUtilityMethods> timelineUtils =
+                        TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
+
+    timelineUtils->CreateTypedEntity(networkGuid, LabelsAndEventClasses::NETWORK_GUID);
+
+    for (auto&& layer : order)
+    {
+        // Add layer to the post-optimisation network structure
+        AddLayerStructure(timelineUtils, *layer, networkGuid);
+        switch (layer->GetType())
+        {
+        case LayerType::Input:
+        case LayerType::Output:
+        {
+            // Inputs and outputs are treated in a special way - see EnqueueInput() and EnqueueOutput().
+            break;
+        }
+        default:
+            {
+            for (auto& workload : m_WorkloadQueue)
+            {
+                // Add workload to the post-optimisation network structure
+                AddWorkloadStructure(timelineUtils, workload, *layer);
+            }
+            break;
+            }
+        }
+    }
+    // Commit to send the post-optimisation network structure
+    timelineUtils->Commit();
+}
+
 TensorInfo LoadedNetwork::GetInputTensorInfo(LayerBindingId layerId) const
 {
     for (auto&& inputLayer : m_OptimizedNetwork->GetGraph().GetInputLayers())

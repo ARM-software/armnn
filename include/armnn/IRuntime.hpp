@@ -66,6 +66,7 @@ public:
                 , m_FileOnly(false)
                 , m_CapturePeriod(LOWEST_CAPTURE_PERIOD)
                 , m_FileFormat("binary")
+                , m_TimelineEnabled(false)
             {}
 
             bool        m_EnableProfiling;
@@ -74,6 +75,7 @@ public:
             bool        m_FileOnly;
             uint32_t    m_CapturePeriod;
             std::string m_FileFormat;
+            bool        m_TimelineEnabled;
         };
         ExternalProfilingOptions m_ProfilingOptions;
 

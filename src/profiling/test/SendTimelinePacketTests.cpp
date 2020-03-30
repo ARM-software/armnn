@@ -15,6 +15,7 @@
 #include <LabelsAndEventClasses.hpp>
 
 #include <functional>
+#include <Runtime.hpp>
 
 using namespace armnn::profiling;
 
@@ -395,10 +396,12 @@ BOOST_AUTO_TEST_CASE(SendTimelinePacketTests3)
 
 BOOST_AUTO_TEST_CASE(GetGuidsFromProfilingService)
 {
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling = true;
-    armnn::profiling::ProfilingService profilingService;
-    profilingService.ResetExternalProfilingOptions(options, true);
+    armnn::IRuntime::CreationOptions options;
+    options.m_ProfilingOptions.m_EnableProfiling = true;
+    armnn::Runtime runtime(options);
+    armnn::profiling::ProfilingService profilingService(runtime);
+
+    profilingService.ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
     ProfilingStaticGuid staticGuid = profilingService.GetStaticId("dummy");
     std::hash<std::string> hasher;
     uint64_t hash = static_cast<uint64_t>(hasher("dummy"));

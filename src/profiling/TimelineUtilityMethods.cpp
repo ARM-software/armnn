@@ -14,7 +14,7 @@ namespace profiling
 
 std::unique_ptr<TimelineUtilityMethods> TimelineUtilityMethods::GetTimelineUtils(ProfilingService& profilingService)
 {
-    if (profilingService.IsProfilingEnabled())
+    if (profilingService.GetCurrentState() == ProfilingState::Active && profilingService.IsTimelineReportingEnabled())
     {
         std::unique_ptr<ISendTimelinePacket> sendTimelinepacket = profilingService.GetSendTimelinePacket();
         return std::make_unique<TimelineUtilityMethods>(sendTimelinepacket);

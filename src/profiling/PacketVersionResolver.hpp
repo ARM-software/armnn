@@ -33,6 +33,9 @@ private:
     uint32_t m_PacketId;
 };
 
+static const PacketKey ActivateTimeLinePacket(0 , 6);
+static const PacketKey DectivateTimeLinePacket(0 , 7);
+
 class PacketVersionResolver final
 {
 public:

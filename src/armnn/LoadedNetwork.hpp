@@ -56,6 +56,8 @@ public:
 
     void RegisterDebugCallback(const DebugCallbackFunction& func);
 
+    void SendNetworkStructure();
+
 private:
     void AllocateWorkingMemory();
 

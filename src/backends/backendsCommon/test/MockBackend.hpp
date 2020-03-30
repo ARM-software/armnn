@@ -32,6 +32,7 @@ public:
     MockBackendProfilingContext(IBackendInternal::IBackendProfilingPtr& backendProfiling)
         : m_BackendProfiling(std::move(backendProfiling))
         , m_CapturePeriod(0)
+        , m_IsTimelineEnabled(true)
     {}
 
     ~MockBackendProfilingContext() = default;
@@ -93,10 +94,22 @@ public:
         return true;
     }
 
+    bool EnableTimelineReporting(bool isEnabled)
+    {
+        m_IsTimelineEnabled = isEnabled;
+        return isEnabled;
+    }
+
+    bool TimelineReportingEnabled()
+    {
+        return m_IsTimelineEnabled;
+    }
+
 private:
     IBackendInternal::IBackendProfilingPtr m_BackendProfiling;
     uint32_t m_CapturePeriod;
     std::vector<uint16_t> m_ActiveCounters;
+    bool m_IsTimelineEnabled;
 };
 
 class MockBackendProfilingService

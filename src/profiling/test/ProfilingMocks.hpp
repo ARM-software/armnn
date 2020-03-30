@@ -51,6 +51,8 @@ public:
         PerJobCounterSelection,
         TimelineMessageDirectory,
         PeriodicCounterCapture,
+        ActivateTimelineReporting,
+        DeactivateTimelineReporting,
         Unknown
     };
 
@@ -85,7 +87,7 @@ public:
         switch (packetFamily)
         {
             case 0:
-                packetType = packetId < 6 ? PacketType(packetId) : PacketType::Unknown;
+                packetType = packetId < 8 ? PacketType(packetId) : PacketType::Unknown;
                 break;
             case 1:
                 packetType = packetId == 0 ? PacketType::TimelineMessageDirectory : PacketType::Unknown;
@@ -628,7 +630,8 @@ public:
                          const CaptureData& captureData) :
         m_SendCounterPacket(mockBufferManager),
         m_IsProfilingEnabled(isProfilingEnabled),
-        m_CaptureData(captureData) {}
+        m_CaptureData(captureData)
+    {}
 
     /// Return the next random Guid in the sequence
     ProfilingDynamicGuid NextGuid() override
@@ -682,10 +685,10 @@ public:
 
 private:
     ProfilingGuidGenerator m_GuidGenerator;
-    CounterIdMap m_CounterMapping;
-    SendCounterPacket m_SendCounterPacket;
-    bool m_IsProfilingEnabled;
-    CaptureData m_CaptureData;
+    CounterIdMap           m_CounterMapping;
+    SendCounterPacket      m_SendCounterPacket;
+    bool                   m_IsProfilingEnabled;
+    CaptureData            m_CaptureData;
 };
 
 } // namespace profiling

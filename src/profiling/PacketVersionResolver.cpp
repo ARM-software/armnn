@@ -54,8 +54,17 @@ bool PacketKey::operator!=(const PacketKey& rhs) const
 
 Version PacketVersionResolver::ResolvePacketVersion(uint32_t familyId, uint32_t packetId) const
 {
-    IgnoreUnused(familyId, packetId);
-    // NOTE: For now every packet specification is at version 1.0.0
+    const PacketKey packetKey(familyId, packetId);
+
+    if( packetKey == ActivateTimeLinePacket )
+    {
+        return Version(1, 1, 0);
+    }
+    if( packetKey == DectivateTimeLinePacket )
+    {
+        return Version(1, 1, 0);
+    }
+
     return Version(1, 0, 0);
 }
 

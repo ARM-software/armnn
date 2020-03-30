@@ -371,7 +371,15 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     // Create runtime in which the test will run
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
+    options.m_ProfilingOptions.m_TimelineEnabled = true;
+
     armnn::Runtime runtime(options);
+    GetProfilingService(&runtime).ResetExternalProfilingOptions(options.m_ProfilingOptions, false);
+
+    profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
+    profilingServiceHelper.ForceTransitionToState(ProfilingState::NotConnected);
+    profilingServiceHelper.ForceTransitionToState(ProfilingState::WaitingForAck);
+    profilingServiceHelper.ForceTransitionToState(ProfilingState::Active);
 
     // build up the structure of the network
     INetworkPtr net(INetwork::Create());
@@ -399,7 +407,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     armnn::NetworkId netId;
     BOOST_TEST(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
 
-    profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
     profiling::BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
     auto readableBuffer = bufferManager.GetReadableBuffer();
 

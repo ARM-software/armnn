@@ -13,6 +13,15 @@
 #include <string>
 #include <thread>
 
+#include <TimelineDecoder.hpp>
+#include <DirectoryCaptureCommandHandler.hpp>
+#include <TimelineCaptureCommandHandler.hpp>
+#include <TimelineDirectoryCaptureCommandHandler.hpp>
+#include "PeriodicCounterCaptureCommandHandler.hpp"
+#include "StreamMetadataCommandHandler.hpp"
+
+#include "PacketVersionResolver.hpp"
+
 namespace armnn
 {
 
@@ -39,15 +48,33 @@ class GatordMockService
 public:
     /// @param registry reference to a command handler registry.
     /// @param echoPackets if true the raw packets will be printed to stdout.
-    GatordMockService(armnnUtils::Sockets::Socket clientConnection,
-                      armnn::profiling::CommandHandlerRegistry& registry,
-                      bool echoPackets)
+    GatordMockService(armnnUtils::Sockets::Socket clientConnection, bool echoPackets)
             : m_ClientConnection(clientConnection)
-            , m_HandlerRegistry(registry)
+            , m_PacketsReceivedCount(0)
             , m_EchoPackets(echoPackets)
             , m_CloseReceivingThread(false)
+            , m_PacketVersionResolver()
+            , m_HandlerRegistry()
+            , m_TimelineDecoder()
+            , m_StreamMetadataCommandHandler(
+                    0, 0, m_PacketVersionResolver.ResolvePacketVersion(0, 0).GetEncodedValue(), true)
+            , m_CounterCaptureCommandHandler(
+                    0, 4, m_PacketVersionResolver.ResolvePacketVersion(0, 4).GetEncodedValue(), true)
+            , m_DirectoryCaptureCommandHandler(
+                    0, 2, m_PacketVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), true)
+            , m_TimelineCaptureCommandHandler(
+                    1, 1, m_PacketVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), m_TimelineDecoder)
+            , m_TimelineDirectoryCaptureCommandHandler(
+                    1, 0, m_PacketVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue(),
+                    m_TimelineCaptureCommandHandler, true)
     {
-        m_PacketsReceivedCount.store(0, std::memory_order_relaxed);
+        m_TimelineDecoder.SetDefaultCallbacks();
+
+        m_HandlerRegistry.RegisterFunctor(&m_StreamMetadataCommandHandler);
+        m_HandlerRegistry.RegisterFunctor(&m_CounterCaptureCommandHandler);
+        m_HandlerRegistry.RegisterFunctor(&m_DirectoryCaptureCommandHandler);
+        m_HandlerRegistry.RegisterFunctor(&m_TimelineDirectoryCaptureCommandHandler);
+        m_HandlerRegistry.RegisterFunctor(&m_TimelineCaptureCommandHandler);
     }
 
     ~GatordMockService()
@@ -73,6 +100,12 @@ public:
 
     /// Send a request counter directory packet back to the client.
     void SendRequestCounterDir();
+
+    /// Send a activate timeline packet back to the client.
+    void SendActivateTimelinePacket();
+
+    /// Send a deactivate timeline packet back to the client.
+    void SendDeactivateTimelinePacket();
 
     /// Start the thread that will receive all packets and print them nicely to stdout.
     bool LaunchReceivingThread();
@@ -115,6 +148,22 @@ public:
         return m_StreamMetaDataPid;
     }
 
+    profiling::DirectoryCaptureCommandHandler& GetDirectoryCaptureCommandHandler()
+    {
+        return m_DirectoryCaptureCommandHandler;
+    }
+
+    timelinedecoder::TimelineDecoder& GetTimelineDecoder()
+    {
+        return m_TimelineDecoder;
+    }
+
+    timelinedecoder::TimelineDirectoryCaptureCommandHandler& GetTimelineDirectoryCaptureCommandHandler()
+    {
+        return m_TimelineDirectoryCaptureCommandHandler;
+    }
+
+
 private:
     void ReceiveLoop(GatordMockService& mockService);
 
@@ -141,18 +190,30 @@ private:
 
     static const uint32_t PIPE_MAGIC = 0x45495434;
 
-    std::atomic<uint32_t> m_PacketsReceivedCount;
     TargetEndianness m_Endianness;
     uint32_t m_StreamMetaDataVersion;
     uint32_t m_StreamMetaDataMaxDataLen;
     uint32_t m_StreamMetaDataPid;
 
     armnnUtils::Sockets::Socket m_ClientConnection;
-    armnn::profiling::CommandHandlerRegistry& m_HandlerRegistry;
+    std::atomic<uint32_t> m_PacketsReceivedCount;
 
     bool m_EchoPackets;
     std::thread m_ListeningThread;
     std::atomic<bool> m_CloseReceivingThread;
+
+    profiling::PacketVersionResolver m_PacketVersionResolver;
+    profiling::CommandHandlerRegistry m_HandlerRegistry;
+
+    timelinedecoder::TimelineDecoder m_TimelineDecoder;
+
+    gatordmock::StreamMetadataCommandHandler m_StreamMetadataCommandHandler;
+    gatordmock::PeriodicCounterCaptureCommandHandler m_CounterCaptureCommandHandler;
+
+    profiling::DirectoryCaptureCommandHandler m_DirectoryCaptureCommandHandler;
+
+    timelinedecoder::TimelineCaptureCommandHandler m_TimelineCaptureCommandHandler;
+    timelinedecoder::TimelineDirectoryCaptureCommandHandler m_TimelineDirectoryCaptureCommandHandler;
 };
 }    // namespace gatordmock
 

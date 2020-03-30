@@ -3,16 +3,10 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "PacketVersionResolver.hpp"
 #include "CommandFileParser.hpp"
 #include "CommandLineProcessor.hpp"
-#include "DirectoryCaptureCommandHandler.hpp"
 #include "GatordMockService.hpp"
-#include "PeriodicCounterCaptureCommandHandler.hpp"
-#include "PeriodicCounterSelectionResponseHandler.hpp"
 #include <TimelineDecoder.hpp>
-#include <TimelineDirectoryCaptureCommandHandler.hpp>
-#include <TimelineCaptureCommandHandler.hpp>
 
 #include <iostream>
 #include <string>
@@ -32,38 +26,7 @@ void exit_capture(int signum)
 
 bool CreateMockService(armnnUtils::Sockets::Socket clientConnection, std::string commandFile, bool isEchoEnabled)
 {
-    profiling::PacketVersionResolver packetVersionResolver;
-    // Create the Command Handler Registry
-    profiling::CommandHandlerRegistry registry;
-
-    timelinedecoder::TimelineDecoder timelineDecoder;
-    timelineDecoder.SetDefaultCallbacks();
-
-    // This functor will receive back the selection response packet.
-    PeriodicCounterSelectionResponseHandler periodicCounterSelectionResponseHandler(
-            0, 4, packetVersionResolver.ResolvePacketVersion(0, 4).GetEncodedValue());
-    // This functor will receive the counter data.
-    PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler(
-            3, 0, packetVersionResolver.ResolvePacketVersion(3, 0).GetEncodedValue());
-
-    profiling::DirectoryCaptureCommandHandler directoryCaptureCommandHandler(
-            0, 2, packetVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), false);
-
-    timelinedecoder::TimelineCaptureCommandHandler timelineCaptureCommandHandler(
-            1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder);
-
-    timelinedecoder::TimelineDirectoryCaptureCommandHandler timelineDirectoryCaptureCommandHandler(
-            1, 0, packetVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue(),
-            timelineCaptureCommandHandler, false);
-
-    // Register different derived functors
-    registry.RegisterFunctor(&periodicCounterSelectionResponseHandler);
-    registry.RegisterFunctor(&counterCaptureCommandHandler);
-    registry.RegisterFunctor(&directoryCaptureCommandHandler);
-    registry.RegisterFunctor(&timelineDirectoryCaptureCommandHandler);
-    registry.RegisterFunctor(&timelineCaptureCommandHandler);
-
-    GatordMockService mockService(clientConnection, registry, isEchoEnabled);
+    GatordMockService mockService(clientConnection, isEchoEnabled);
 
     // Send receive the strweam metadata and send connection ack.
     if (!mockService.WaitForStreamMetaData())
@@ -81,11 +44,6 @@ bool CreateMockService(armnnUtils::Sockets::Socket clientConnection, std::string
 
     // Once we've finished processing the file wait for the receiving thread to close.
     mockService.WaitForReceivingThread();
-
-    if(isEchoEnabled)
-    {
-        timelineDecoder.print();
-    }
 
     return EXIT_SUCCESS;
 }

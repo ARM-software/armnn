@@ -131,8 +131,28 @@ void GatordMockService::SendRequestCounterDir()
     {
         std::cout << "Sending connection acknowledgement." << std::endl;
     }
-    // The connection ack packet is an empty data packet with packetId == 1.
+    // The request counter directory packet is an empty data packet with packetId == 3.
     SendPacket(0, 3, nullptr, 0);
+}
+
+void GatordMockService::SendActivateTimelinePacket()
+{
+    if (m_EchoPackets)
+    {
+        std::cout << "Sending activate timeline packet." << std::endl;
+    }
+    // The activate timeline packet is an empty data packet with packetId == 6.
+    SendPacket(0, 6, nullptr, 0);
+}
+
+void GatordMockService::SendDeactivateTimelinePacket()
+{
+    if (m_EchoPackets)
+    {
+        std::cout << "Sending deactivate timeline packet." << std::endl;
+    }
+    // The deactivate timeline packet is an empty data packet with packetId == 7.
+    SendPacket(0, 7, nullptr, 0);
 }
 
 bool GatordMockService::LaunchReceivingThread()
@@ -164,6 +184,11 @@ void GatordMockService::WaitForReceivingThread()
     {
         // Wait for the receiving thread to complete operations
         m_ListeningThread.join();
+    }
+
+    if(m_EchoPackets)
+    {
+        m_TimelineDecoder.print();
     }
 }
 

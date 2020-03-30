@@ -4,6 +4,7 @@
 //
 
 #include "ProfilingTests.hpp"
+#include "ProfilingTestUtils.hpp"
 
 #include <backends/BackendProfiling.hpp>
 #include <CommandHandler.hpp>
@@ -1823,6 +1824,132 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     BOOST_TEST(period == armnn::LOWEST_CAPTURE_PERIOD);    // capture period
 }
 
+BOOST_AUTO_TEST_CASE(CheckTimelineActivationAndDeactivation)
+{
+    class TestReportStructure : public IReportStructure
+    {
+        public:
+        virtual void ReportStructure() override
+        {
+            m_ReportStructureCalled = true;
+        }
+
+        bool m_ReportStructureCalled = false;
+    };
+
+    class TestNotifyBackends : public INotifyBackends
+    {
+        public:
+        TestNotifyBackends() : m_timelineReporting(false) {}
+        virtual void NotifyBackendsForTimelineReporting() override
+        {
+            m_TestNotifyBackendsCalled = m_timelineReporting.load();
+        }
+
+        bool m_TestNotifyBackendsCalled = false;
+        std::atomic<bool> m_timelineReporting;
+    };
+
+    PacketVersionResolver packetVersionResolver;
+
+    BufferManager bufferManager(512);
+    SendTimelinePacket sendTimelinePacket(bufferManager);
+    ProfilingStateMachine stateMachine;
+    TestReportStructure testReportStructure;
+    TestNotifyBackends testNotifyBackends;
+
+    profiling::ActivateTimelineReportingCommandHandler activateTimelineReportingCommandHandler(0,
+                                                           6,
+                                                           packetVersionResolver.ResolvePacketVersion(0, 6)
+                                                           .GetEncodedValue(),
+                                                           sendTimelinePacket,
+                                                           stateMachine,
+                                                           testReportStructure,
+                                                           testNotifyBackends.m_timelineReporting,
+                                                           testNotifyBackends);
+
+    // Write an "ActivateTimelineReporting" packet into the mock profiling connection, to simulate an input from an
+    // external profiling service
+    const uint32_t packetFamily1 = 0;
+    const uint32_t packetId1     = 6;
+    uint32_t packetHeader1 = ConstructHeader(packetFamily1, packetId1);
+
+    // Create the ActivateTimelineReportingPacket
+    Packet ActivateTimelineReportingPacket(packetHeader1); // Length == 0
+
+    BOOST_CHECK_THROW(
+            activateTimelineReportingCommandHandler.operator()(ActivateTimelineReportingPacket), armnn::Exception);
+
+    stateMachine.TransitionToState(ProfilingState::NotConnected);
+    BOOST_CHECK_THROW(
+            activateTimelineReportingCommandHandler.operator()(ActivateTimelineReportingPacket), armnn::Exception);
+
+    stateMachine.TransitionToState(ProfilingState::WaitingForAck);
+    BOOST_CHECK_THROW(
+            activateTimelineReportingCommandHandler.operator()(ActivateTimelineReportingPacket), armnn::Exception);
+
+    stateMachine.TransitionToState(ProfilingState::Active);
+    activateTimelineReportingCommandHandler.operator()(ActivateTimelineReportingPacket);
+
+    BOOST_CHECK(testReportStructure.m_ReportStructureCalled);
+    BOOST_CHECK(testNotifyBackends.m_TestNotifyBackendsCalled);
+    BOOST_CHECK(testNotifyBackends.m_timelineReporting.load());
+
+    DeactivateTimelineReportingCommandHandler deactivateTimelineReportingCommandHandler(0,
+                                                  7,
+                                                  packetVersionResolver.ResolvePacketVersion(0, 7).GetEncodedValue(),
+                                                  testNotifyBackends.m_timelineReporting,
+                                                  stateMachine,
+                                                  testNotifyBackends);
+
+    const uint32_t packetFamily2 = 0;
+    const uint32_t packetId2     = 7;
+    uint32_t packetHeader2 = ConstructHeader(packetFamily2, packetId2);
+
+    // Create the DeactivateTimelineReportingPacket
+    Packet deactivateTimelineReportingPacket(packetHeader2); // Length == 0
+
+    stateMachine.Reset();
+    BOOST_CHECK_THROW(
+            deactivateTimelineReportingCommandHandler.operator()(deactivateTimelineReportingPacket), armnn::Exception);
+
+    stateMachine.TransitionToState(ProfilingState::NotConnected);
+    BOOST_CHECK_THROW(
+            deactivateTimelineReportingCommandHandler.operator()(deactivateTimelineReportingPacket), armnn::Exception);
+
+    stateMachine.TransitionToState(ProfilingState::WaitingForAck);
+    BOOST_CHECK_THROW(
+            deactivateTimelineReportingCommandHandler.operator()(deactivateTimelineReportingPacket), armnn::Exception);
+
+    stateMachine.TransitionToState(ProfilingState::Active);
+    deactivateTimelineReportingCommandHandler.operator()(deactivateTimelineReportingPacket);
+
+    BOOST_CHECK(!testNotifyBackends.m_TestNotifyBackendsCalled);
+    BOOST_CHECK(!testNotifyBackends.m_timelineReporting.load());
+}
+
+BOOST_AUTO_TEST_CASE(CheckProfilingServiceNotActive)
+{
+    using namespace armnn;
+    using namespace armnn::profiling;
+
+    // Create runtime in which the test will run
+    armnn::IRuntime::CreationOptions options;
+    options.m_ProfilingOptions.m_EnableProfiling = true;
+
+    armnn::Runtime runtime(options);
+    profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
+    profilingServiceHelper.ForceTransitionToState(ProfilingState::NotConnected);
+    profilingServiceHelper.ForceTransitionToState(ProfilingState::WaitingForAck);
+    profilingServiceHelper.ForceTransitionToState(ProfilingState::Active);
+
+    profiling::BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
+    auto readableBuffer = bufferManager.GetReadableBuffer();
+
+    // Profiling is enabled, the post-optimisation structure should be created
+    BOOST_CHECK(readableBuffer == nullptr);
+}
+
 BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
 {
     using boost::numeric_cast;
@@ -3395,8 +3522,7 @@ BOOST_AUTO_TEST_CASE(CheckRegisterCounters)
     MockBufferManager mockBuffer(1024);
 
     CaptureData captureData;
-    MockProfilingService mockProfilingService(
-        mockBuffer, options.m_ProfilingOptions.m_EnableProfiling, captureData);
+    MockProfilingService mockProfilingService(mockBuffer, options.m_ProfilingOptions.m_EnableProfiling, captureData);
     armnn::BackendId cpuRefId(armnn::Compute::CpuRef);
 
     mockProfilingService.RegisterMapping(6, 0, cpuRefId);

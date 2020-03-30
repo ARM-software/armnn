@@ -5,7 +5,6 @@
 
 #include "MockBackend.hpp"
 #include "MockBackendId.hpp"
-#include "armnn/backends/profiling/IBackendProfilingContext.hpp"
 
 #include <armnn/BackendRegistry.hpp>
 

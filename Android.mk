@@ -184,6 +184,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/SwitchLayer.cpp \
         src/armnn/layers/TransposeConvolution2dLayer.cpp \
         src/armnn/layers/TransposeLayer.cpp \
+        src/profiling/ActivateTimelineReportingCommandHandler.cpp \
         src/profiling/BufferManager.cpp \
         src/profiling/CommandHandler.cpp \
         src/profiling/CommandHandlerFunctor.cpp \
@@ -193,6 +194,7 @@ LOCAL_SRC_FILES := \
         src/profiling/CounterDirectory.cpp \
         src/profiling/CounterIdMap.cpp \
         src/profiling/DirectoryCaptureCommandHandler.cpp \
+        src/profiling/DeactivateTimelineReportingCommandHandler.cpp \
         src/profiling/FileOnlyProfilingConnection.cpp \
         src/profiling/Holder.cpp \
         src/profiling/LabelsAndEventClasses.cpp \

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ProfilingUtils.hpp"
+#include "Runtime.hpp"
 
 #include <armnn/BackendId.hpp>
 #include <armnn/Optional.hpp>
@@ -68,6 +69,11 @@ public:
         return GetBufferManager(m_ProfilingService);
     }
     armnn::profiling::ProfilingService& m_ProfilingService;
+
+    void ForceTransitionToState(ProfilingState newState)
+    {
+        TransitionToState(m_ProfilingService, newState);
+    }
 };
 
 } // namespace profiling

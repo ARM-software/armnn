@@ -1172,7 +1172,7 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
     BOOST_CHECK(counterDirectory.GetCategoryCount() == 2);
     BOOST_CHECK(category2);
 
-    uint16_t numberOfCores = 3;
+    uint16_t numberOfCores = 4;
 
     // Register a counter associated to "category1"
     const Counter* counter1 = nullptr;
@@ -1186,7 +1186,7 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
                                                                      "counter1description",
                                                                      std::string("counter1units"),
                                                                      numberOfCores));
-    BOOST_CHECK(counterDirectory.GetCounterCount() == 3);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 4);
     BOOST_CHECK(counter1);
 
     // Register a counter associated to "category1"
@@ -1203,7 +1203,7 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
                                                                      armnn::EmptyOptional(),
                                                                      device2->m_Uid,
                                                                      0));
-    BOOST_CHECK(counterDirectory.GetCounterCount() == 4);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 5);
     BOOST_CHECK(counter2);
 
     // Register a counter associated to "category2"
@@ -1217,7 +1217,7 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
                                                                      "counter3",
                                                                      "counter3description",
                                                                      armnn::EmptyOptional(),
-                                                                     5,
+                                                                     numberOfCores,
                                                                      device2->m_Uid,
                                                                      counterSet1->m_Uid));
     BOOST_CHECK(counterDirectory.GetCounterCount() == 9);
@@ -1236,7 +1236,7 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
     uint32_t packetHeaderWord1 = ReadUint32(readBuffer, 4);
     BOOST_TEST(((packetHeaderWord0 >> 26) & 0x3F) == 0);  // packet_family
     BOOST_TEST(((packetHeaderWord0 >> 16) & 0x3FF) == 2); // packet_id
-    BOOST_TEST(packetHeaderWord1 == 928);                 // data_length
+    BOOST_TEST(packetHeaderWord1 == 432);                 // data_length
 
     // Check the body header
     uint32_t bodyHeaderWord0 = ReadUint32(readBuffer,  8);
@@ -1269,7 +1269,7 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
     uint32_t categoryRecordOffset0 = ReadUint32(readBuffer, 44);
     uint32_t categoryRecordOffset1 = ReadUint32(readBuffer, 48);
     BOOST_TEST(categoryRecordOffset0 ==  64); // Category record offset for "category1"
-    BOOST_TEST(categoryRecordOffset1 == 472); // Category record offset for "category2"
+    BOOST_TEST(categoryRecordOffset1 == 168); // Category record offset for "category2"
 
     // Get the device record pool offset
     uint32_t uint32_t_size = sizeof(uint32_t);
@@ -1584,7 +1584,8 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
         const Category* category = counterDirectory.GetCategory(categoryRecord.name);
         BOOST_CHECK(category);
         BOOST_CHECK(category->m_Name == categoryRecord.name);
-        BOOST_CHECK(category->m_Counters.size() == categoryRecord.event_count);
+        BOOST_CHECK(category->m_Counters.size() == categoryRecord.event_count + static_cast<size_t>(numberOfCores) -1);
+        BOOST_CHECK(category->m_Counters.size() == categoryRecord.event_count + static_cast<size_t>(numberOfCores) -1);
 
         // Check that the event records are correct
         for (const EventRecord& eventRecord : categoryRecord.event_records)

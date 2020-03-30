@@ -139,14 +139,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateBatchToSpaceNd(const Batch
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateComparison(const ComparisonQueueDescriptor& descriptor,
                                                                  const WorkloadInfo& info) const
 {
-    if (descriptor.m_Parameters.m_Operation == ComparisonOperation::Greater)
-    {
-        GreaterQueueDescriptor greaterQueueDescriptor;
-        greaterQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
-        greaterQueueDescriptor.m_Outputs = descriptor.m_Outputs;
-        return std::make_unique<NeonGreaterWorkload>(greaterQueueDescriptor, info);
-    }
-    return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
+    return std::make_unique<NeonComparisonWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConcat(const ConcatQueueDescriptor& descriptor,

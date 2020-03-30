@@ -24,11 +24,11 @@
 #include "workloads/NeonArgMinMaxWorkload.hpp"
 #include "workloads/NeonBatchNormalizationWorkload.hpp"
 #include "workloads/NeonBatchToSpaceNdWorkload.hpp"
+#include "workloads/NeonComparisonWorkload.hpp"
 #include "workloads/NeonConvolution2dWorkload.hpp"
 #include "workloads/NeonDepthToSpaceWorkload.hpp"
 #include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
 #include "workloads/NeonDequantizeWorkload.hpp"
-#include "workloads/NeonGreaterWorkload.hpp"
 #include "workloads/NeonInstanceNormalizationWorkload.hpp"
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
 #include "workloads/NeonLstmFloatWorkload.hpp"
@@ -202,16 +202,13 @@ bool NeonLayerSupport::IsComparisonSupported(const TensorInfo& input0,
                                              const ComparisonDescriptor& descriptor,
                                              Optional<std::string&> reasonIfUnsupported) const
 {
-    if (descriptor.m_Operation == ComparisonOperation::Greater)
-    {
-        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonGreaterWorkloadValidate,
-                                       reasonIfUnsupported,
-                                       input0,
-                                       input1,
-                                       output);
-    }
 
-    return false;
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonComparisonWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input0,
+                                   input1,
+                                   output,
+                                   descriptor);
 }
 
 bool NeonLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inputs,

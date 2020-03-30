@@ -259,7 +259,7 @@ struct QuantizeQueueDescriptor : QueueDescriptor
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
-// Equal layer workload data
+// Deprecated use ComparisonQueueDescriptor instead
 struct EqualQueueDescriptor : QueueDescriptor
 {
     void Validate(const WorkloadInfo& workloadInfo) const;

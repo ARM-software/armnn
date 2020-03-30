@@ -27,6 +27,7 @@ BACKEND_SOURCES := \
         workloads/NeonArgMinMaxWorkload.cpp \
         workloads/NeonBatchNormalizationWorkload.cpp \
         workloads/NeonBatchToSpaceNdWorkload.cpp \
+        workloads/NeonComparisonWorkload.cpp \
         workloads/NeonConcatWorkload.cpp \
         workloads/NeonConstantWorkload.cpp \
         workloads/NeonConvertFp16ToFp32Workload.cpp \
@@ -38,7 +39,6 @@ BACKEND_SOURCES := \
         workloads/NeonDetectionPostProcessWorkload.cpp \
         workloads/NeonFloorFloatWorkload.cpp \
         workloads/NeonFullyConnectedWorkload.cpp \
-        workloads/NeonGreaterWorkload.cpp \
         workloads/NeonInstanceNormalizationWorkload.cpp \
         workloads/NeonL2NormalizationFloatWorkload.cpp \
         workloads/NeonLstmFloatWorkload.cpp \

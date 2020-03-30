@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="4b869532f8b2aa7f02aa55c4f4813e994ea2df68" #COMPMID-2966 Add support for QASYMM8_SIGNED in NEGEMMLowpQuantizeDownInt32ToUint8ScaleKernel
+DEFAULT_CLFRAMEWORKREVISION="9f2403ff462c3725a03df68484dc43df6f011ab0" #COMPMID-3237: Add support for QSYMM16 ArithmeticSubtraction on NEON
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

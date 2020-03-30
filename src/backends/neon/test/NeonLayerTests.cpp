@@ -509,6 +509,12 @@ ARMNN_AUTO_TEST_CASE(ConcatUint8, ConcatUint8Test)
 ARMNN_AUTO_TEST_CASE(ConcatUint8DifferentInputOutputQParam,
                      ConcatDifferentInputOutputQParamTest<DataType::QAsymmU8>, false)
 
+// Convert from BFloat16 to Float32
+ARMNN_AUTO_TEST_CASE(ConvertBf16ToFp32, ConvertBf16ToFp32Test)
+
+// Convert from Float32 to BFloat16
+ARMNN_AUTO_TEST_CASE(ConvertFp32ToBf16, ConvertFp32ToBf16Test)
+
 // Fully Connected
 ARMNN_AUTO_TEST_CASE(SimpleFullyConnected, FullyConnectedFloat32Test, false, false)
 ARMNN_AUTO_TEST_CASE(SimpleFullyConnectedWithBias, FullyConnectedFloat32Test, true, false)

@@ -154,11 +154,25 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConstant(const ConstantQue
     return std::make_unique<NeonConstantWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvertBf16ToFp32(
+    const ConvertBf16ToFp32QueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonConvertBf16ToFp32Workload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvertFp16ToFp32(
     const ConvertFp16ToFp32QueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
     return std::make_unique<NeonConvertFp16ToFp32Workload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvertFp32ToBf16(
+    const ConvertFp32ToBf16QueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonConvertFp32ToBf16Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvertFp32ToFp16(

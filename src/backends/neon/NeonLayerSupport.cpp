@@ -259,7 +259,27 @@ bool NeonLayerSupport::IsConstantSupported(const TensorInfo& output,
                                       &TrueFunc<>);
 }
 
+bool NeonLayerSupport::IsConvertBf16ToFp32Supported(const TensorInfo& input,
+                                                    const TensorInfo& output,
+                                                    Optional<std::string&> reasonIfUnsupported) const
+{
+    armnn::IgnoreUnused(input);
+    armnn::IgnoreUnused(output);
+    armnn::IgnoreUnused(reasonIfUnsupported);
+    return true;
+}
+
 bool NeonLayerSupport::IsConvertFp16ToFp32Supported(const TensorInfo& input,
+                                                    const TensorInfo& output,
+                                                    Optional<std::string&> reasonIfUnsupported) const
+{
+    armnn::IgnoreUnused(input);
+    armnn::IgnoreUnused(output);
+    armnn::IgnoreUnused(reasonIfUnsupported);
+    return true;
+}
+
+bool NeonLayerSupport::IsConvertFp32ToBf16Supported(const TensorInfo& input,
                                                     const TensorInfo& output,
                                                     Optional<std::string&> reasonIfUnsupported) const
 {

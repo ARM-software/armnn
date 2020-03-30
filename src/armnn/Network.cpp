@@ -146,6 +146,30 @@ bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string
     return noErrors;
 }
 
+template <typename LayerT>
+LayerT* ConvertBf16ToFp32Weight(Layer* l)
+{
+    LayerT* layer = boost::polymorphic_downcast<LayerT*>(l);
+    if ((layer->GetType() == LayerType::Convolution2d || layer->GetType() == LayerType::FullyConnected)
+         && layer->m_Weight)
+    {
+        const TensorInfo& info = layer->m_Weight->GetTensorInfo();
+
+        if (info.GetDataType() == DataType::BFloat16)
+        {
+            std::vector<float> newValues(info.GetNumElements());
+
+            armnnUtils::FloatingPointConverter::ConvertBFloat16ToFloat32(
+                layer->m_Weight->template GetTensor<armnn::BFloat16>(), info.GetNumElements(), newValues.data());
+
+            TensorInfo newInfo(info.GetShape(), DataType::Float32);
+            ConstTensor newInput(newInfo, newValues);
+            layer->m_Weight.reset(new ScopedCpuTensorHandle(newInput));
+        }
+    }
+    return layer;
+}
+
 OptimizationResult AttemptBackendAssignment(BackendSettings& backendSettings,
                                             Graph& graph,
                                             Layer* layer,
@@ -260,6 +284,14 @@ OptimizationResult AttemptBackendAssignment(BackendSettings& backendSettings,
                 {
                     convertBf16ToFp32Layers =
                         InsertConvertBf16ToFp32LayersBefore(graph, *layer);
+                    if (layer->GetType() == LayerType::Convolution2d)
+                    {
+                        ConvertBf16ToFp32Weight<Convolution2dLayer>(layer);
+                    }
+                    else if (layer->GetType() == LayerType::FullyConnected)
+                    {
+                        ConvertBf16ToFp32Weight<FullyConnectedLayer>(layer);
+                    }
                 }
 
                 // Insert FP32 -> BF16 conversion layer after current layer

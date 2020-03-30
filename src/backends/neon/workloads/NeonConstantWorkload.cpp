@@ -6,6 +6,7 @@
 #include "NeonConstantWorkload.hpp"
 
 #include <arm_compute/core/Types.h>
+#include <BFloat16.hpp>
 #include <Half.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <neon/NeonTensorHandle.hpp>
@@ -46,6 +47,11 @@ void NeonConstantWorkload::Execute() const
 
         switch (computeDataType)
         {
+            case arm_compute::DataType::BFLOAT16:
+            {
+                CopyArmComputeITensorData(data.m_LayerOutput->GetConstTensor<BFloat16>(), output);
+                break;
+            }
             case arm_compute::DataType::F16:
             {
                 CopyArmComputeITensorData(data.m_LayerOutput->GetConstTensor<Half>(), output);

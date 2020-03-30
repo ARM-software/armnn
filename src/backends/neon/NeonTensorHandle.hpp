@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include <BFloat16.hpp>
 #include <Half.hpp>
 
 #include <aclCommon/ArmComputeTensorHandle.hpp>
@@ -176,6 +177,10 @@ private:
                 armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
                                                                  static_cast<uint8_t*>(memory));
                 break;
+            case arm_compute::DataType::BFLOAT16:
+                armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
+                                                                 static_cast<armnn::BFloat16*>(memory));
+                break;
             case arm_compute::DataType::F16:
                 armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
                                                                  static_cast<armnn::Half*>(memory));
@@ -208,6 +213,10 @@ private:
             case arm_compute::DataType::U8:
             case arm_compute::DataType::QASYMM8:
                 armcomputetensorutils::CopyArmComputeITensorData(static_cast<const uint8_t*>(memory),
+                                                                 this->GetTensor());
+                break;
+            case arm_compute::DataType::BFLOAT16:
+                armcomputetensorutils::CopyArmComputeITensorData(static_cast<const armnn::BFloat16*>(memory),
                                                                  this->GetTensor());
                 break;
             case arm_compute::DataType::F16:

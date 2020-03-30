@@ -17,6 +17,8 @@ arm_compute::DataType GetArmComputeDataType(armnn::DataType dataType, bool multi
 {
     switch(dataType)
     {
+        case armnn::DataType::BFloat16:
+            return arm_compute::DataType::BFLOAT16;
         case armnn::DataType::Boolean:
             return arm_compute::DataType::U8;
         case armnn::DataType::Float16:

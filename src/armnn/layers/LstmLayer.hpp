@@ -30,8 +30,6 @@ struct LstmOptCifgParameters
     /// A unique pointer to represent 2D weights tensor with dimensions [input_size, num_units].
     std::unique_ptr<ScopedCpuTensorHandle> m_RecurrentToInputWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_CellToInputWeights;
-    /// A unique pointer to represent 1D weights tensor with dimensions [num_units].
     std::unique_ptr<ScopedCpuTensorHandle> m_InputGateBias;
 };
 
@@ -45,6 +43,8 @@ struct LstmOptProjectionParameters
 
 struct LstmOptPeepholeParameters
 {
+    /// A unique pointer to represent 1D weights tensor with dimensions [num_units].
+    std::unique_ptr<ScopedCpuTensorHandle> m_CellToInputWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units].
     std::unique_ptr<ScopedCpuTensorHandle> m_CellToForgetWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units].

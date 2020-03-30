@@ -78,13 +78,10 @@ void CreateLSTMLayerHelper(Graph &graph, bool CifgEnabled)
                 (TensorInfo({ numUnits, inputSize }, DataType::Float32));
         layer->m_CifgParameters.m_RecurrentToInputWeights = std::make_unique<ScopedCpuTensorHandle>
                 (TensorInfo({ numUnits, outputSize }, DataType::Float32));
-        layer->m_CifgParameters.m_CellToInputWeights = std::make_unique<ScopedCpuTensorHandle>
-                (TensorInfo({ numUnits }, DataType::Float32));
         layer->m_CifgParameters.m_InputGateBias = std::make_unique<ScopedCpuTensorHandle>
                 (TensorInfo({ numUnits }, DataType::Float32));
         layer->m_CifgParameters.m_InputToInputWeights->Allocate();
         layer->m_CifgParameters.m_RecurrentToInputWeights->Allocate();
-        layer->m_CifgParameters.m_CellToInputWeights->Allocate();
         layer->m_CifgParameters.m_InputGateBias->Allocate();
     }
 
@@ -100,6 +97,12 @@ void CreateLSTMLayerHelper(Graph &graph, bool CifgEnabled)
 
     if (layerDesc.m_PeepholeEnabled)
     {
+        if (!layerDesc.m_CifgEnabled)
+        {
+            layer->m_PeepholeParameters.m_CellToInputWeights = std::make_unique<ScopedCpuTensorHandle>
+                    (TensorInfo({ numUnits }, DataType::Float32));
+            layer->m_PeepholeParameters.m_CellToInputWeights->Allocate();
+        }
         layer->m_PeepholeParameters.m_CellToForgetWeights = std::make_unique<ScopedCpuTensorHandle>
                 (TensorInfo({ numUnits }, DataType::Float32));
         layer->m_PeepholeParameters.m_CellToOutputWeights = std::make_unique<ScopedCpuTensorHandle>

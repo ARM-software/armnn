@@ -1520,27 +1520,24 @@ IConnectableLayer* Network::AddLstmLayer(const LstmDescriptor&  descriptor,
     {
         if(params.m_InputToInputWeights == nullptr)
         {
-            throw InvalidArgumentException("AddLstmLayer: Input To Input Weights cannot be NULL");
+            throw InvalidArgumentException("AddLstmLayer: Input To Input Weights cannot be NULL "
+                                           "when CIFG is disabled.");
         }
         if(params.m_RecurrentToInputWeights == nullptr)
         {
             throw InvalidArgumentException(
-                    "AddLstmLayer: Recurrent To Input Weights cannot be NULL");
+                    "AddLstmLayer: Recurrent To Input Weights cannot be NULL "
+                    "when CIFG is disabled.");
         }
         if(params.m_InputGateBias == nullptr)
         {
-            throw InvalidArgumentException("AddLstmLayer: Input Gate Bias cannot be NULL");
+            throw InvalidArgumentException("AddLstmLayer: Input Gate Bias cannot be NULL "
+                                           "when CIFG is disabled.");
         }
         layer->m_CifgParameters.m_InputToInputWeights =
             std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputToInputWeights));
         layer->m_CifgParameters.m_RecurrentToInputWeights =
             std::make_unique<ScopedCpuTensorHandle>(*(params.m_RecurrentToInputWeights));
-        // In the VTS tests, cell-to-input weights may be null, even if the other CIFG params are not.
-        if(params.m_CellToInputWeights != nullptr)
-        {
-            layer->m_CifgParameters.m_CellToInputWeights =
-                    std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellToInputWeights));
-        }
         layer->m_CifgParameters.m_InputGateBias =
             std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputGateBias));
     }
@@ -1550,7 +1547,8 @@ IConnectableLayer* Network::AddLstmLayer(const LstmDescriptor&  descriptor,
     {
         if(params.m_ProjectionWeights == nullptr)
         {
-            throw InvalidArgumentException("AddLstmLayer: Projection Weights cannot be NULL");
+            throw InvalidArgumentException("AddLstmLayer: Projection Weights cannot be NULL "
+                                           "when projection is enabled.");
         }
         layer->m_ProjectionParameters.m_ProjectionWeights =
             std::make_unique<ScopedCpuTensorHandle>(*(params.m_ProjectionWeights));
@@ -1564,14 +1562,29 @@ IConnectableLayer* Network::AddLstmLayer(const LstmDescriptor&  descriptor,
     //Lstm Peephole params
     if(descriptor.m_PeepholeEnabled)
     {
+        if(!descriptor.m_CifgEnabled)
+        {
+            if(params.m_CellToInputWeights == nullptr)
+            {
+                throw InvalidArgumentException("AddLstmLayer: Cell To Input Weights cannot be NULL "
+                                               "when Peephole is enabled and CIFG disabled.");
+            }
+
+            layer->m_PeepholeParameters.m_CellToInputWeights =
+                std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellToInputWeights));
+        }
+
         if(params.m_CellToForgetWeights == nullptr)
         {
-            throw InvalidArgumentException("AddLstmLayer: Cell To Forget Weights cannot be NULL");
+            throw InvalidArgumentException("AddLstmLayer: Cell To Forget Weights cannot be NULL "
+                                           "when Peephole is enabled.");
         }
         if(params.m_CellToOutputWeights == nullptr)
         {
-            throw InvalidArgumentException("AddLstmLayer: Cell To Output Weights cannot be NULL");
+            throw InvalidArgumentException("AddLstmLayer: Cell To Output Weights cannot be NULL "
+                                           "when Peephole is enabled.");
         }
+
         layer->m_PeepholeParameters.m_CellToForgetWeights =
             std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellToForgetWeights));
         layer->m_PeepholeParameters.m_CellToOutputWeights =
@@ -1585,7 +1598,8 @@ IConnectableLayer* Network::AddLstmLayer(const LstmDescriptor&  descriptor,
         {
             if(params.m_InputLayerNormWeights == nullptr)
             {
-                throw InvalidArgumentException("AddLstmLayer: Input layer normalization weights cannot be NULL");
+                throw InvalidArgumentException("AddLstmLayer: Input layer normalization weights cannot be NULL "
+                                               "when layer normalization is enabled and CIFG disabled.");
             }
             layer->m_LayerNormParameters.m_InputLayerNormWeights =
                     std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputLayerNormWeights));
@@ -1593,15 +1607,18 @@ IConnectableLayer* Network::AddLstmLayer(const LstmDescriptor&  descriptor,
 
         if(params.m_ForgetLayerNormWeights == nullptr)
         {
-            throw InvalidArgumentException("AddLstmLayer: Forget layer normalization weights cannot be NULL");
+            throw InvalidArgumentException("AddLstmLayer: Forget layer normalization weights cannot be NULL "
+                                           "when layer normalization is enabled.");
         }
         if(params.m_CellLayerNormWeights == nullptr)
         {
-            throw InvalidArgumentException("AddLstmLayer: Cell layer normalization weights cannot be NULL");
+            throw InvalidArgumentException("AddLstmLayer: Cell layer normalization weights cannot be NULL "
+                                           "when layer normalization is enabled.");
         }
         if(params.m_OutputLayerNormWeights == nullptr)
         {
-            throw InvalidArgumentException("AddLstmLayer: Output layer normalization weights cannot be NULL");
+            throw InvalidArgumentException("AddLstmLayer: Output layer normalization weights cannot be NULL "
+                                           "when layer normalization is enabled.");
         }
         layer->m_LayerNormParameters.m_ForgetLayerNormWeights =
                 std::make_unique<ScopedCpuTensorHandle>(*(params.m_ForgetLayerNormWeights));

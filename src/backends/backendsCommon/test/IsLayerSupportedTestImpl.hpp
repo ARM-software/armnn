@@ -288,8 +288,6 @@ struct DummyLstmLayer
                 armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
         m_Layer->m_CifgParameters.m_RecurrentToInputWeights    = std::make_unique<armnn::ScopedCpuTensorHandle>(
                 armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
-        m_Layer->m_CifgParameters.m_CellToInputWeights         = std::make_unique<armnn::ScopedCpuTensorHandle>(
-                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
         m_Layer->m_CifgParameters.m_InputGateBias              = std::make_unique<armnn::ScopedCpuTensorHandle>(
                 armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
     }

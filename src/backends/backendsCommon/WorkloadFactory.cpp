@@ -529,12 +529,6 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                 optRecurrentToInputWeights =
                     OverrideDataType(cLayer->m_CifgParameters.m_RecurrentToInputWeights->GetTensorInfo(), dataType);
                 paramsInfo.m_RecurrentToInputWeights = &optRecurrentToInputWeights;
-                if (cLayer->m_CifgParameters.m_CellToInputWeights != nullptr)
-                {
-                    optCellToInputWeights =
-                        OverrideDataType(cLayer->m_CifgParameters.m_CellToInputWeights->GetTensorInfo(), dataType);
-                    paramsInfo.m_CellToInputWeights = &optCellToInputWeights;
-                }
                 optInputGateBias =
                        OverrideDataType(cLayer->m_CifgParameters.m_InputGateBias->GetTensorInfo(), dataType);
                 paramsInfo.m_InputGateBias = &optInputGateBias;
@@ -555,6 +549,13 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
 
             if(descriptor.m_PeepholeEnabled)
             {
+                if(!descriptor.m_CifgEnabled)
+                {
+                    optCellToInputWeights =
+                            OverrideDataType(cLayer->m_PeepholeParameters.m_CellToInputWeights->GetTensorInfo(),
+                                             dataType);
+                    paramsInfo.m_CellToInputWeights = &optCellToInputWeights;
+                }
                 optCellToForgetWeights =
                     OverrideDataType(cLayer->m_PeepholeParameters.m_CellToForgetWeights->GetTensorInfo(), dataType);
                 paramsInfo.m_CellToForgetWeights = &optCellToForgetWeights;

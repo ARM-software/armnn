@@ -58,11 +58,12 @@ std::vector<TensorShape> StridedSliceLayer::InferOutputShapes(
 
         if (m_Param.m_ShrinkAxisMask & (1 << i))
         {
-            // Don't take a slice from an axis being shrunk
-            if (m_Param.m_End[i] >= 2)
+            // If the difference between the start point and the end point of the slice on an axis being shrunk
+            // is greater than 1 then throw an error as the output will not be large enough to hold the slice
+            if (((m_Param.m_Begin[i] - m_Param.m_End[i]) > 1) || ((m_Param.m_Begin[i] - m_Param.m_End[i]) < -1))
             {
                 throw LayerValidationException(
-                    "StridedSlice: Attempting to take slice from an axis being shrunk");
+                    "StridedSlice: Attempting to take a larger slice than can fit in inferred output");
             }
             continue;
         }

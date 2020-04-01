@@ -172,6 +172,12 @@ ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3NhwcInt16,
 ARMNN_AUTO_TEST_CASE(Convolution2dPerAxisQuantTestNchw, Convolution2dPerAxisQuantTest, DataLayout::NCHW);
 ARMNN_AUTO_TEST_CASE(Convolution2dPerAxisQuantTestNhwc, Convolution2dPerAxisQuantTest, DataLayout::NHWC);
 
+ARMNN_AUTO_TEST_CASE(Convolution2d3x3Stride2x2Bf16, Convolution2d3x3Stride2x2BFloat16Test, false, DataLayout::NHWC);
+ARMNN_AUTO_TEST_CASE(Convolution2d3x3Stride2x2BFloat16SmallValue,
+                     Convolution2d3x3Stride2x2BFloat16SmallValueTest,
+                     false,
+                     DataLayout::NHWC);
+
 // Depthwise Convolution
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d, DepthwiseConvolution2dTest, true, DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dUint8, DepthwiseConvolution2dUint8Test, true, DataLayout::NCHW)

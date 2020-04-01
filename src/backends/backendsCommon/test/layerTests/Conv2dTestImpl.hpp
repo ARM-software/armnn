@@ -116,6 +116,18 @@ LayerTestResult<uint8_t, 4> Convolution2dPerAxisQuantTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout);
 
+LayerTestResult<float, 4> Convolution2d3x3Stride2x2BFloat16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        bool biasEnabled,
+        const armnn::DataLayout& dataLayout);
+
+LayerTestResult<float, 4> Convolution2d3x3Stride2x2BFloat16SmallValueTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        bool biasEnabled,
+        const armnn::DataLayout& dataLayout);
+
 //
 // DepthwiseConvolution2d
 //

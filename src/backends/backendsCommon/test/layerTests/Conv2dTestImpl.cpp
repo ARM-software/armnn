@@ -363,14 +363,15 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
 }
 
 template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType,
-         typename T = armnn::ResolveType<ArmnnType>, typename B = armnn::ResolveType<ArmnnBType>>
-LayerTestResult<T, 4> SimpleConvolution2dNhwcTestImpl(
+         typename T = armnn::ResolveType<ArmnnType>, typename B = armnn::ResolveType<ArmnnBType>,
+         armnn::DataType OutType = ArmnnType, typename O = armnn::ResolveType<OutType>>
+LayerTestResult<O, 4> SimpleConvolution2dNhwcTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const boost::multi_array<T, 4>& input,
     const boost::multi_array<T, 4>& kernel,
     const boost::multi_array<B, 1>& bias,
-    const boost::multi_array<T, 4>& outputExpected,
+    const boost::multi_array<O, 4>& outputExpected,
     const armnn::DataLayout dataLayout,
     float qScale,
     int32_t qOffset,
@@ -402,7 +403,7 @@ LayerTestResult<T, 4> SimpleConvolution2dNhwcTestImpl(
     // Creates the tensors.
     armnn::TensorInfo inputTensorInfo({inputNum, inputHeight, inputWidth, inputChannels}, ArmnnType);
     armnn::TensorInfo outputTensorInfo({outputNum, outputHeight, outputWidth, outputChannels},
-                                       ArmnnType);
+                                       OutType);
     armnn::TensorInfo kernelDesc({kernelChanMul, kernelHeight, kernelWidth, kernelChannels}, ArmnnType);
     armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, ArmnnBType);
 
@@ -412,11 +413,11 @@ LayerTestResult<T, 4> SimpleConvolution2dNhwcTestImpl(
     auto batchedInput = MakeTensor<T, 4>(inputTensorInfo, inputData);
 
     // Construct the output data, with bias applied, as appropriate.
-    std::vector<T> outputData;
+    std::vector<O> outputData;
     outputData.assign(outputExpected.data(), outputExpected.data() + outputHeight*outputWidth*outputChannels);
 
-    LayerTestResult<T, 4> ret(outputTensorInfo);
-    ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
+    LayerTestResult<O, 4> ret(outputTensorInfo);
+    ret.outputExpected = MakeTensor<O, 4>(outputTensorInfo, outputData);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -1370,6 +1371,222 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(
     CopyDataFromITensorHandle(&ret.outputExpected[0][0][0][0], outputHandleRef.get());
 
     return ret;
+}
+
+LayerTestResult<float, 4> Convolution2d3x3Stride2x2BFloat16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        bool biasEnabled,
+        const armnn::DataLayout& dataLayout)
+{
+    // BFloat16 input and weight, Float32 output
+    armnn::IgnoreUnused(biasEnabled);
+
+    // Input is a single-batch, 1 channel, 5x5 image.
+    armnn::TensorInfo inputDesc({1, 5, 5, 1}, armnn::DataType::BFloat16);
+
+    std::vector<armnn::BFloat16> inputValues = armnnUtils::QuantizedVector<armnn::BFloat16>(
+        {
+            10.0367984f,  // 10.0625
+             2.0380895f,  // 2.03125
+            15.0420157f,  // 15.0625
+            22.0675631f,  // 22.125
+             8.0938920f,  // 8.125
+             5.0476106f,  // 5.0625
+            80.1035490f,  // 80
+           100.1260370f,  // 100
+            55.0461647f,  // 55
+           120.0883828f,  // 120
+             9.1159540f,  // 9.125
+            90.0498519f,  // 90
+           200.0104630f,  // 200
+            30.0154114f,  // 30
+            75.00137681f, // 75
+            30.0344238f,  // 30
+            25.0356445f,  // 25
+           130.0495605f,  // 130
+            60.0683594f,  // 60
+            35.0991211f,  // 35
+             8.0461426f,  // 8.0625
+            12.0996094f,  // 12.125
+            98.1269530f,  // 98
+           125.0393066f,  // 125
+             5.103516f    // 5.0937
+       },
+        1.0f, 0);
+
+    auto input = MakeTensor<armnn::BFloat16, 4>(inputDesc, inputValues);
+
+    // Use a 3x3 kernel.
+    armnn::TensorInfo kernelDesc({1, 3, 3, 1}, armnn::DataType::BFloat16);
+
+    std::vector<armnn::BFloat16> kernelValues = armnnUtils::QuantizedVector<armnn::BFloat16>(
+        {
+            -0.126184f, // -0.125977
+            -0.150468f, // -0.150391
+            -0.101412f, // -0.101562
+            -0.0586369f,// -0.0585938
+            -0.0865864f,// -0.0864258
+            -0.0435089f,// -0.043457
+            0.0347555f, // 0.034668
+            0.0323111f, // 0.0322266
+            0.0385381f  // 0.0385742
+         },
+        1.0f, 0);
+
+    auto kernel = MakeTensor<armnn::BFloat16, 4>(kernelDesc, kernelValues);
+
+    // Expected output is a single-batch, 1 channel, 3x3 image.
+    armnn::TensorInfo outputDesc({1, 3, 3, 1}, armnn::DataType::Float32);
+
+    // Expected output (with results if calculated as FP32 in the comments)
+    const std::vector<float> outputData =
+        {
+            2.296875f, //  2.29240716
+            5.75f,     //  5.75851926
+            3.78125f,  //  3.79855026
+            -11.625f,  // -11.65498118
+            -47.25f,   // -47.27316893
+            -30.0f,    // -30.04771684
+            -8.25f,    //  -8.28126168
+            -43.5f,    // -43.46531337
+            -20.625f   // -20.63477281
+        };
+
+    boost::multi_array<float, 4> expectedOutput = MakeTensor<float, 4>(outputDesc, outputData);
+
+    uint32_t padLeft = 1;
+    uint32_t padTop = 1;
+    uint32_t padRight = 1;
+    uint32_t padBottom = 1;
+    uint32_t strideX  = 2;
+    uint32_t strideY  = 2;
+
+    return SimpleConvolution2dNhwcTestImpl
+        <armnn::DataType::BFloat16, armnn::DataType::Float32, armnn::BFloat16, float, armnn::DataType::Float32, float>(
+        workloadFactory,
+        memoryManager,
+        input,
+        kernel,
+        boost::multi_array<float, 1>(),
+        expectedOutput,
+        dataLayout,
+        1.0f,
+        0,
+        padLeft,
+        padTop,
+        padRight,
+        padBottom,
+        strideX,
+        strideY);
+}
+
+LayerTestResult<float, 4> Convolution2d3x3Stride2x2BFloat16SmallValueTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        bool biasEnabled,
+        const armnn::DataLayout& dataLayout)
+{
+    // BFloat16 input and weight, Float32 output
+    armnn::IgnoreUnused(biasEnabled);
+
+    // Input is a single-batch, 1 channel, 5x5 image.
+    armnn::TensorInfo inputDesc({1, 5, 5, 1}, armnn::DataType::BFloat16);
+
+    std::vector<armnn::BFloat16> inputValues = armnnUtils::QuantizedVector<armnn::BFloat16>(
+        {
+            0.0367984f,  // 0.0368652
+            0.0380895f,  // 0.0380859
+            0.0420157f,  // 0.0419922
+            0.0675631f,  // 0.0673828
+            0.0938920f,  // 0.09375
+            0.0476106f,  // 0.0476074
+            0.1035490f,  // 0.103516
+            0.1260370f,  // 0.125977
+            0.0461647f,  // 0.0461426
+            0.0883828f,  // 0.0883789
+            0.1159540f,  // 0.115723
+            0.0498519f,  // 0.0498047
+            0.0104630f,  // 0.010437
+            0.0154114f,  // 0.0154419
+            0.00137681f, // 0.00137329
+            0.0344238f,  // 0.0344616
+            0.0356445f,  // 0.0355693
+            0.0495605f,  // 0.0495018
+            0.0683594f,  // 0.0683308
+            0.0991211f,  // 0.0988837
+            0.0461426f,  // 0.0461838
+            0.0996094f,  // 0.0997546
+            0.1269530f,  // 0.127099
+            0.0393066f,  // 0.0392791
+            0.103516f    // 0.103641
+       },
+        1.0f, 0);
+
+    auto input = MakeTensor<armnn::BFloat16, 4>(inputDesc, inputValues);
+
+    // Use a 3x3 kernel.
+    armnn::TensorInfo kernelDesc({1, 3, 3, 1}, armnn::DataType::BFloat16);
+
+    std::vector<armnn::BFloat16> kernelValues = armnnUtils::QuantizedVector<armnn::BFloat16>(
+        {
+            -0.126184f, // -0.125977
+            -0.150468f, // -0.150391
+            -0.101412f, // -0.101562
+            -0.0586369f,// -0.0585938
+            -0.0865864f,// -0.0864258
+            -0.0435089f,// -0.043457
+            0.0347555f, // 0.034668
+            0.0323111f, // 0.0322266
+            0.0385381f  // 0.0385742
+         },
+        1.0f, 0);
+
+    auto kernel = MakeTensor<armnn::BFloat16, 4>(kernelDesc, kernelValues);
+
+    // Expected output is a single-batch, 1 channel, 3x3 image.
+    armnn::TensorInfo outputDesc({1, 3, 3, 1}, armnn::DataType::Float32);
+
+    // Expected output (with results if calculated as FP32 in the comments)
+    const std::vector<float> outputData =
+        {
+             0.000686645508f, // 0.000685
+             0.000640869141f, // 0.000639
+            -0.00759887695f,  // -0.007631
+            -0.02734375f,     // -0.027388
+            -0.0356445312f,   // -0.035737
+            -0.0145874023f,   // -0.014568
+            -0.0170898438f,   // -0.017124
+            -0.0373535156f,   // -0.037431
+            -0.0346679688f    // -0.034808
+        };
+
+    boost::multi_array<float, 4> expectedOutput = MakeTensor<float, 4>(outputDesc, outputData);
+
+    uint32_t padLeft = 1;
+    uint32_t padTop = 1;
+    uint32_t padRight = 1;
+    uint32_t padBottom = 1;
+    uint32_t strideX  = 2;
+    uint32_t strideY  = 2;
+
+    return SimpleConvolution2dNhwcTestImpl
+        <armnn::DataType::BFloat16, armnn::DataType::Float32, armnn::BFloat16, float, armnn::DataType::Float32, float>(
+        workloadFactory,
+        memoryManager,
+        input,
+        kernel,
+        boost::multi_array<float, 1>(),
+        expectedOutput,
+        dataLayout,
+        1.0f,
+        0,
+        padLeft,
+        padTop,
+        padRight,
+        padBottom,
+        strideX,
+        strideY);
 }
 
 //

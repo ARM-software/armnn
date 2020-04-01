@@ -41,7 +41,7 @@ void DebugLayer::ValidateTensorShapesFromInputs()
     std::vector<TensorShape> inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    ARMNN_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "DebugLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",

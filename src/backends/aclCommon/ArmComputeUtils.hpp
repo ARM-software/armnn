@@ -6,10 +6,9 @@
 
 #include <armnn/Descriptors.hpp>
 #include <armnn/Tensor.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <arm_compute/core/Types.h>
-
-#include <boost/assert.hpp>
 
 namespace armnn
 {
@@ -161,7 +160,7 @@ inline unsigned int ComputeSoftmaxAclAxis(const SoftmaxDescriptor& softmaxDesc, 
 
    unsigned int dim = tensor.GetNumDimensions();
 
-    BOOST_ASSERT(dim != 0);
+    ARMNN_ASSERT(dim != 0);
 
     // Currently ArmNN support axis 1.
     return dim - 1;

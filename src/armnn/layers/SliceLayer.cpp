@@ -12,7 +12,6 @@
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
-#include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 namespace armnn
@@ -40,7 +39,7 @@ void SliceLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    ARMNN_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
             "SliceLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
@@ -51,7 +50,7 @@ void SliceLayer::ValidateTensorShapesFromInputs()
 std::vector<TensorShape> SliceLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
     IgnoreUnused(inputShapes);
-    BOOST_ASSERT(inputShapes.size() == 1);
+    ARMNN_ASSERT(inputShapes.size() == 1);
 
     TensorShape outputShape(boost::numeric_cast<unsigned int>(m_Param.m_Size.size()), m_Param.m_Size.data());
 

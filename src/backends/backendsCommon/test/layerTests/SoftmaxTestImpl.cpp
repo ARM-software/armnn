@@ -104,7 +104,7 @@ LayerTestResult<T, n> SimpleSoftmaxBaseTestImpl(
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), input.origin());
 
-    BOOST_ASSERT(workload);
+    ARMNN_ASSERT(workload);
 
     ExecuteWorkload(*workload, memoryManager);
 

@@ -38,7 +38,7 @@ arm_compute::Status ClTransposeConvolution2dWorkloadValidate(const TensorInfo& i
 
     if (descriptor.m_BiasEnabled)
     {
-        BOOST_ASSERT(biases.has_value());
+        ARMNN_ASSERT(biases.has_value());
 
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         optionalAclBiasesInfo = &aclBiasesInfo;

@@ -6,8 +6,7 @@
 #include "RefWorkloadUtils.hpp"
 #include <backendsCommon/WorkloadData.hpp>
 #include <armnn/Tensor.hpp>
-
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 #include "Splitter.hpp"
 
 #include <cmath>
@@ -47,7 +46,7 @@ void Split(const SplitterQueueDescriptor& data)
 
             //Split view extents are defined by the size of (the corresponding) input tensor.
             const TensorInfo& outputInfo = GetTensorInfo(data.m_Outputs[viewIdx]);
-            BOOST_ASSERT(outputInfo.GetNumDimensions() == inputInfo.GetNumDimensions());
+            ARMNN_ASSERT(outputInfo.GetNumDimensions() == inputInfo.GetNumDimensions());
 
             // Check all dimensions to see if this element is inside the given input view.
             bool insideView = true;

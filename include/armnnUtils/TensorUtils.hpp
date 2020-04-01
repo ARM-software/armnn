@@ -7,8 +7,6 @@
 
 #include <armnn/TypesUtils.hpp>
 
-#include <boost/assert.hpp>
-
 namespace armnnUtils
 {
 armnn::TensorShape GetTensorShape(unsigned int numberOfBatches,

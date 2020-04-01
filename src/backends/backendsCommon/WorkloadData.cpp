@@ -40,7 +40,7 @@ DataType GetBiasDataType(DataType inputDataType)
         case DataType::QSymmS16:
             return DataType::Signed32;
         default:
-            BOOST_ASSERT_MSG(false, "Invalid input data type");
+            ARMNN_ASSERT_MSG(false, "Invalid input data type");
             return DataType::Float32;
     }
 }

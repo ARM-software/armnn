@@ -14,10 +14,10 @@
 #include <ArmnnSchema_generated.h>
 #include <armnn/IRuntime.hpp>
 #include <armnnDeserializer/IDeserializer.hpp>
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <ResolveType.hpp>
 
-#include <boost/assert.hpp>
 #include <boost/format.hpp>
 
 
@@ -96,10 +96,10 @@ struct ParserFlatbuffersSerializeFixture
         flatbuffers::Parser parser;
 
         bool ok = parser.Parse(schemafile.c_str());
-        BOOST_ASSERT_MSG(ok, "Failed to parse schema file");
+        ARMNN_ASSERT_MSG(ok, "Failed to parse schema file");
 
         ok &= parser.Parse(m_JsonString.c_str());
-        BOOST_ASSERT_MSG(ok, "Failed to parse json input");
+        ARMNN_ASSERT_MSG(ok, "Failed to parse json input");
 
         if (!ok)
         {

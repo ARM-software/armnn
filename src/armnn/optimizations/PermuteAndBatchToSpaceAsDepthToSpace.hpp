@@ -22,7 +22,7 @@ public:
     {
         // Validate base layer (the Permute) is compatible
         Layer& base = connection.GetConnectedOutputSlot()->GetOwningLayer();
-        BOOST_ASSERT(base.GetType() == LayerType::Permute || base.GetType() == LayerType::Transpose);
+        ARMNN_ASSERT(base.GetType() == LayerType::Permute || base.GetType() == LayerType::Transpose);
         const TensorInfo& inputInfo = base.GetInputSlot(0).GetConnection()->GetTensorInfo();
         const TensorInfo& intermediateInfo = base.GetOutputSlot(0).GetTensorInfo();
         if (intermediateInfo.GetNumDimensions() != 4)
@@ -39,7 +39,7 @@ public:
 
         // Validate child layer (the BatchToSpace) is compatible
         Layer& child = connection.GetOwningLayer();
-        BOOST_ASSERT(child.GetType() == LayerType::BatchToSpaceNd);
+        ARMNN_ASSERT(child.GetType() == LayerType::BatchToSpaceNd);
         const TensorInfo& outputInfo = child.GetOutputSlot(0).GetTensorInfo();
         const BatchToSpaceNdDescriptor& batchToSpaceDesc = static_cast<BatchToSpaceNdLayer&>(child).GetParameters();
         if (batchToSpaceDesc.m_DataLayout != DataLayout::NHWC)

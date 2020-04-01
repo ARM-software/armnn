@@ -8,8 +8,7 @@
 #include "InternalTypes.hpp"
 #include "armnn/Exceptions.hpp"
 #include <armnn/TypesUtils.hpp>
-
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 namespace armnn
 {
@@ -22,12 +21,12 @@ ElementwiseBaseLayer::ElementwiseBaseLayer(unsigned int numInputSlots, unsigned 
 
 std::vector<TensorShape> ElementwiseBaseLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    BOOST_ASSERT(inputShapes.size() == 2);
+    ARMNN_ASSERT(inputShapes.size() == 2);
     auto& input0 = inputShapes[0];
     auto& input1 = inputShapes[1];
 
     // Get the max of the inputs.
-    BOOST_ASSERT(input0.GetNumDimensions() == input1.GetNumDimensions());
+    ARMNN_ASSERT(input0.GetNumDimensions() == input1.GetNumDimensions());
     unsigned int numDims = input0.GetNumDimensions();
     std::vector<unsigned int> dims(numDims);
 
@@ -38,7 +37,7 @@ std::vector<TensorShape> ElementwiseBaseLayer::InferOutputShapes(const std::vect
 
 #if !NDEBUG
         // Validate inputs are broadcast compatible.
-        BOOST_ASSERT_MSG(dim0 == dim1 || dim0 == 1 || dim1 == 1,
+        ARMNN_ASSERT_MSG(dim0 == dim1 || dim0 == 1 || dim1 == 1,
                          "Dimensions should either match or one should be of size 1.");
 #endif
 
@@ -57,7 +56,7 @@ void ElementwiseBaseLayer::ValidateTensorShapesFromInputs()
         GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape()
     });
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    ARMNN_ASSERT(inferredShapes.size() == 1);
 
     std::string msg = GetLayerTypeAsCString(GetType());
     msg += "Layer: TensorShape set on OutputSlot[0] does not match the inferred shape.";

@@ -14,7 +14,7 @@
 
 #include <algorithm>
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 namespace armnn
 {
@@ -30,7 +30,7 @@ public:
     template <typename T>
     const T* GetConstTensor() const
     {
-        BOOST_ASSERT(CompatibleTypes<T>(GetTensorInfo().GetDataType()));
+        ARMNN_ASSERT(CompatibleTypes<T>(GetTensorInfo().GetDataType()));
         return reinterpret_cast<const T*>(m_Memory);
     }
 
@@ -59,8 +59,8 @@ protected:
 
 private:
     // Only used for testing
-    void CopyOutTo(void *) const override { BOOST_ASSERT_MSG(false, "Unimplemented"); }
-    void CopyInFrom(const void*) override { BOOST_ASSERT_MSG(false, "Unimplemented"); }
+    void CopyOutTo(void *) const override { ARMNN_ASSERT_MSG(false, "Unimplemented"); }
+    void CopyInFrom(const void*) override { ARMNN_ASSERT_MSG(false, "Unimplemented"); }
 
     ConstCpuTensorHandle(const ConstCpuTensorHandle& other) = delete;
     ConstCpuTensorHandle& operator=(const ConstCpuTensorHandle& other) = delete;
@@ -79,7 +79,7 @@ public:
     template <typename T>
     T* GetTensor() const
     {
-        BOOST_ASSERT(CompatibleTypes<T>(GetTensorInfo().GetDataType()));
+        ARMNN_ASSERT(CompatibleTypes<T>(GetTensorInfo().GetDataType()));
         return reinterpret_cast<T*>(m_MutableMemory);
     }
 

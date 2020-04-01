@@ -336,7 +336,7 @@ TensorInfo GetInputTensorInfo(const Network* network)
 {
     for (auto&& inputLayer : network->GetGraph().GetInputLayers())
     {
-        BOOST_ASSERT_MSG(inputLayer->GetNumOutputSlots() == 1, "Input layer should have exactly 1 output slot");
+        ARMNN_ASSERT_MSG(inputLayer->GetNumOutputSlots() == 1, "Input layer should have exactly 1 output slot");
         return inputLayer->GetOutputSlot(0).GetTensorInfo();
     }
     throw InvalidArgumentException("Network has no input layers");

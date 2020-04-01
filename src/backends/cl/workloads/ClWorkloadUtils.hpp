@@ -90,7 +90,7 @@ inline auto SetClSliceData(const std::vector<unsigned int>& m_begin,
 inline void InitializeArmComputeClTensorData(arm_compute::CLTensor& clTensor,
                                              const ConstCpuTensorHandle* handle)
 {
-    BOOST_ASSERT(handle);
+    ARMNN_ASSERT(handle);
 
     armcomputetensorutils::InitialiseArmComputeTensorEmpty(clTensor);
     switch(handle->GetTensorInfo().GetDataType())
@@ -116,7 +116,7 @@ inline void InitializeArmComputeClTensorData(arm_compute::CLTensor& clTensor,
             CopyArmComputeClTensorData(clTensor, handle->GetConstTensor<int32_t>());
             break;
         default:
-            BOOST_ASSERT_MSG(false, "Unexpected tensor type.");
+            ARMNN_ASSERT_MSG(false, "Unexpected tensor type.");
     }
 };
 

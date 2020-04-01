@@ -7,8 +7,6 @@
 
 #include "RefWorkloadUtils.hpp"
 
-#include <boost/assert.hpp>
-
 namespace armnn
 {
 

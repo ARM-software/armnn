@@ -24,7 +24,7 @@ public:
         Layer& base  = connection.GetConnectedOutputSlot()->GetOwningLayer();
         Layer& child = connection.GetOwningLayer();
 
-        BOOST_ASSERT((base.GetType() == LayerType::ConvertFp16ToFp32 &&
+        ARMNN_ASSERT((base.GetType() == LayerType::ConvertFp16ToFp32 &&
                      child.GetType() == LayerType::ConvertFp32ToFp16) ||
                      (base.GetType() == LayerType::ConvertFp32ToFp16 &&
                      child.GetType() == LayerType::ConvertFp16ToFp32));

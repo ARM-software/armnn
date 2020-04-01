@@ -36,7 +36,7 @@ void Gather(const TensorInfo& paramsInfo,
     {
         unsigned int indx = boost::numeric_cast<unsigned int>(indices[i]);
 
-        BOOST_ASSERT(indices[i] >= 0 && indx < paramsShape[0]);
+        ARMNN_ASSERT(indices[i] >= 0 && indx < paramsShape[0]);
 
         unsigned int startOffset = indx * paramsProduct;
         unsigned int endOffset = startOffset + paramsProduct;
@@ -51,7 +51,7 @@ void Gather(const TensorInfo& paramsInfo,
         }
     }
 
-    BOOST_ASSERT(outIndex == outputInfo.GetNumElements());
+    ARMNN_ASSERT(outIndex == outputInfo.GetNumElements());
 }
 
 } //namespace armnn

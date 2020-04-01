@@ -6,11 +6,11 @@
 #include "LogSoftmax.hpp"
 
 #include <armnnUtils/TensorUtils.hpp>
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
 #include <cmath>
 
-#include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 namespace
@@ -35,7 +35,7 @@ void LogSoftmax(Decoder<float>& input,
     const unsigned int numDimensions = inputInfo.GetNumDimensions();
 
     bool axisIsValid = ValidateAxis(descriptor.m_Axis, numDimensions);
-    BOOST_ASSERT_MSG(axisIsValid,
+    ARMNN_ASSERT_MSG(axisIsValid,
         "Axis index is not in range [-numDimensions, numDimensions).");
     IgnoreUnused(axisIsValid);
 

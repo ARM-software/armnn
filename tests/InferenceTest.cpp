@@ -4,11 +4,12 @@
 //
 #include "InferenceTest.hpp"
 
+#include <armnn/utility/Assert.hpp>
+
 #include "../src/armnn/Profiling.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/filesystem/path.hpp>
-#include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -55,7 +56,7 @@ bool ParseCommandLine(int argc, char** argv, IInferenceTestCaseProvider& testCas
         // Coverity points out that default_value(...) can throw a bad_lexical_cast,
         // and that desc.add_options() can throw boost::io::too_few_args.
         // They really won't in any of these cases.
-        BOOST_ASSERT_MSG(false, "Caught unexpected exception");
+        ARMNN_ASSERT_MSG(false, "Caught unexpected exception");
         std::cerr << "Fatal internal error: " << e.what() << std::endl;
         return false;
     }
@@ -228,7 +229,7 @@ bool InferenceTest(const InferenceTestOptions& params,
             success = false;
             break;
         default:
-            BOOST_ASSERT_MSG(false, "Unexpected TestCaseResult");
+            ARMNN_ASSERT_MSG(false, "Unexpected TestCaseResult");
             return false;
         }
     }

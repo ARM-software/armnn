@@ -10,11 +10,10 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <armnn/ILayerVisitor.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <utility>
 #include <limits>
-
-#include <boost/assert.hpp>
 
 namespace armnn
 {
@@ -22,8 +21,8 @@ namespace armnn
 template<typename srcType>
 void QuantizeConstant(const srcType* src, uint8_t* dst, size_t numElements, float& scale, int& offset)
 {
-    BOOST_ASSERT(src);
-    BOOST_ASSERT(dst);
+    ARMNN_ASSERT(src);
+    ARMNN_ASSERT(dst);
 
     float min = std::numeric_limits<srcType>::max();
     float max = std::numeric_limits<srcType>::lowest();

@@ -31,14 +31,14 @@ void SwitchLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(2, CHECK_LOCATION());
 
-    BOOST_ASSERT_MSG(GetNumOutputSlots() == 2, "SwitchLayer: The layer should return 2 outputs.");
+    ARMNN_ASSERT_MSG(GetNumOutputSlots() == 2, "SwitchLayer: The layer should return 2 outputs.");
 
     // Assuming first input is the Input and second input is the Constant
     std::vector<TensorShape> inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
         GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape() });
 
-    BOOST_ASSERT(inferredShapes.size() == 2);
+    ARMNN_ASSERT(inferredShapes.size() == 2);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "SwitchLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",

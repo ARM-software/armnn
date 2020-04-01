@@ -6,6 +6,7 @@
 #pragma once
 
 #include <armnn/Tensor.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <boost/multi_array.hpp>
 
@@ -14,7 +15,7 @@
 template <std::size_t n>
 boost::array<unsigned int, n> GetTensorShapeAsArray(const armnn::TensorInfo& tensorInfo)
 {
-    BOOST_ASSERT_MSG(n == tensorInfo.GetNumDimensions(),
+    ARMNN_ASSERT_MSG(n == tensorInfo.GetNumDimensions(),
         "Attempting to construct a shape array of mismatching size");
 
     boost::array<unsigned int, n> shape;

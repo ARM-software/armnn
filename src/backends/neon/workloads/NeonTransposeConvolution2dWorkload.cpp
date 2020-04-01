@@ -38,7 +38,7 @@ arm_compute::Status NeonTransposeConvolution2dWorkloadValidate(const TensorInfo&
 
     if (descriptor.m_BiasEnabled)
     {
-        BOOST_ASSERT(biases.has_value());
+        ARMNN_ASSERT(biases.has_value());
 
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         optionalAclBiasesInfo = &aclBiasesInfo;
@@ -81,7 +81,7 @@ NeonTransposeConvolution2dWorkload::NeonTransposeConvolution2dWorkload(
     m_Layer = std::make_unique<arm_compute::NEDeconvolutionLayer>(memoryManager);
     m_Layer->configure(&input, m_KernelTensor.get(), m_BiasTensor.get(), &output, padStrideInfo);
 
-    BOOST_ASSERT(m_Layer);
+    ARMNN_ASSERT(m_Layer);
 
     InitializeArmComputeTensorData(*m_KernelTensor, m_Data.m_Weight);
 

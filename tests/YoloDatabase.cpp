@@ -12,7 +12,6 @@
 #include <tuple>
 #include <utility>
 
-#include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 

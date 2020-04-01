@@ -16,9 +16,9 @@ namespace armnn
 /// Computes the softmax function on some inputs, into outputs, with a shape given by tensorInfo.
 void Softmax(Decoder<float>& in, Encoder<float>& out, const TensorInfo& inputTensorInfo, float beta, int axis)
 {
-    BOOST_ASSERT_MSG(axis < static_cast<int>(inputTensorInfo.GetNumDimensions()),
+    ARMNN_ASSERT_MSG(axis < static_cast<int>(inputTensorInfo.GetNumDimensions()),
                      "Required axis index greater than number of dimensions.");
-    BOOST_ASSERT_MSG(axis >= -static_cast<int>(inputTensorInfo.GetNumDimensions()),
+    ARMNN_ASSERT_MSG(axis >= -static_cast<int>(inputTensorInfo.GetNumDimensions()),
                      "Required axis index lower than negative of the number of dimensions");
 
     unsigned int uAxis = axis < 0  ?

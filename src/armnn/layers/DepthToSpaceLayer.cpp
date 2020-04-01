@@ -38,7 +38,7 @@ DepthToSpaceLayer* DepthToSpaceLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> DepthToSpaceLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    BOOST_ASSERT(inputShapes.size() == 1);
+    ARMNN_ASSERT(inputShapes.size() == 1);
 
     TensorShape inputShape = inputShapes[0];
     TensorShape outputShape(inputShape);
@@ -64,7 +64,7 @@ void DepthToSpaceLayer::ValidateTensorShapesFromInputs()
     std::vector<TensorShape> inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    ARMNN_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "DepthToSpaceLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",

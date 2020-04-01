@@ -11,6 +11,7 @@
 #include <armnn/TensorFwd.hpp>
 #include <armnn/NetworkFwd.hpp>
 #include <armnn/Exceptions.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <list>
 #include <map>
@@ -18,7 +19,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include <boost/assert.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 
 namespace armnn
@@ -115,8 +115,8 @@ public:
             otherLayer->Reparent(*this, m_Layers.end());
         });
 
-        BOOST_ASSERT(other.m_PosInGraphMap.empty());
-        BOOST_ASSERT(other.m_Layers.empty());
+        ARMNN_ASSERT(other.m_PosInGraphMap.empty());
+        ARMNN_ASSERT(other.m_Layers.empty());
 
         return *this;
     }
@@ -298,7 +298,7 @@ private:
 
         const size_t numErased = graph.m_PosInGraphMap.erase(this);
         IgnoreUnused(numErased);
-        BOOST_ASSERT(numErased == 1);
+        ARMNN_ASSERT(numErased == 1);
     }
 
 protected:
@@ -356,7 +356,7 @@ public:
     {
         const size_t numErased = m_Graph->m_InputIds.erase(GetBindingId());
         IgnoreUnused(numErased);
-        BOOST_ASSERT(numErased == 1);
+        ARMNN_ASSERT(numErased == 1);
     }
 };
 
@@ -382,14 +382,14 @@ public:
     {
         const size_t numErased = m_Graph->m_OutputIds.erase(GetBindingId());
         IgnoreUnused(numErased);
-        BOOST_ASSERT(numErased == 1);
+        ARMNN_ASSERT(numErased == 1);
     }
 };
 
 inline Graph::Iterator Graph::GetPosInGraph(Layer& layer)
 {
     auto it = m_PosInGraphMap.find(&layer);
-    BOOST_ASSERT(it != m_PosInGraphMap.end());
+    ARMNN_ASSERT(it != m_PosInGraphMap.end());
     return it->second;
 }
 
@@ -429,7 +429,7 @@ inline LayerT* Graph::InsertNewLayer(OutputSlot& insertAfter, Args&&... args)
     const Iterator pos = std::next(GetPosInGraph(owningLayer));
     LayerT* const layer = new LayerInGraph<LayerT>(*this, pos, std::forward<Args>(args)...);
 
-    BOOST_ASSERT(layer->GetNumInputSlots() == 1);
+    ARMNN_ASSERT(layer->GetNumInputSlots() == 1);
 
     insertAfter.MoveAllConnections(layer->GetOutputSlot());
     insertAfter.Connect(layer->GetInputSlot(0));
@@ -449,7 +449,7 @@ inline void Graph::EraseLayer(Iterator pos)
 template <typename LayerT>
 inline void Graph::EraseLayer(LayerT*& layer)
 {
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
     EraseLayer(GetPosInGraph(*layer));
     layer = nullptr;
 }

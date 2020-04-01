@@ -44,7 +44,7 @@ void MeanLayer::ValidateTensorShapesFromInputs()
 
     const TensorInfo& input = GetInputSlot(0).GetConnection()->GetTensorInfo();
 
-    BOOST_ASSERT_MSG(input.GetNumDimensions() > 0 && input.GetNumDimensions() <= 4,
+    ARMNN_ASSERT_MSG(input.GetNumDimensions() > 0 && input.GetNumDimensions() <= 4,
                      "MeanLayer: Mean supports up to 4D input.");
 
     unsigned int rank = input.GetNumDimensions();

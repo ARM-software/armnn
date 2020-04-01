@@ -192,7 +192,7 @@ Runtime::Runtime(const CreationOptions& options)
         try {
             auto factoryFun = BackendRegistryInstance().GetFactory(id);
             auto backend = factoryFun();
-            BOOST_ASSERT(backend.get() != nullptr);
+            ARMNN_ASSERT(backend.get() != nullptr);
 
             auto context = backend->CreateBackendContext(options);
 

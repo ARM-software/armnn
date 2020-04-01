@@ -348,7 +348,7 @@ bool RefLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inp
                                   "Reference concatenation: output type not supported");
     for (const TensorInfo* input : inputs)
     {
-        BOOST_ASSERT(input != nullptr);
+        ARMNN_ASSERT(input != nullptr);
         supported &= CheckSupportRule(TypeAnyOf(*input, supportedTypes), reasonIfUnsupported,
             "Reference concatenation: input type not supported");
 
@@ -1864,7 +1864,7 @@ bool RefLayerSupport::IsStackSupported(const std::vector<const TensorInfo*>& inp
                                   "Reference stack: output type not supported");
     for (const TensorInfo* input : inputs)
     {
-        BOOST_ASSERT(input != nullptr);
+        ARMNN_ASSERT(input != nullptr);
         supported &= CheckSupportRule(TypeAnyOf(*input, supportedTypes), reasonIfUnsupported,
             "Reference stack: input type not supported");
 

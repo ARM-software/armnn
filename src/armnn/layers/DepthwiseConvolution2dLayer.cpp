@@ -51,7 +51,7 @@ void DepthwiseConvolution2dLayer::SerializeLayerParameters(ParameterStringifyFun
 std::unique_ptr<IWorkload> DepthwiseConvolution2dLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     // on this level constant data should not be released..
-    BOOST_ASSERT_MSG(m_Weight != nullptr, "DepthwiseConvolution2dLayer: Weights data should not be null.");
+    ARMNN_ASSERT_MSG(m_Weight != nullptr, "DepthwiseConvolution2dLayer: Weights data should not be null.");
 
     DepthwiseConvolution2dQueueDescriptor descriptor;
 
@@ -59,7 +59,7 @@ std::unique_ptr<IWorkload> DepthwiseConvolution2dLayer::CreateWorkload(const IWo
 
     if (m_Param.m_BiasEnabled)
     {
-        BOOST_ASSERT_MSG(m_Bias != nullptr, "DepthwiseConvolution2dLayer: Bias data should not be null.");
+        ARMNN_ASSERT_MSG(m_Bias != nullptr, "DepthwiseConvolution2dLayer: Bias data should not be null.");
         descriptor.m_Bias = m_Bias.get();
     }
     return factory.CreateDepthwiseConvolution2d(descriptor, PrepInfoAndDesc(descriptor));
@@ -81,11 +81,11 @@ DepthwiseConvolution2dLayer* DepthwiseConvolution2dLayer::Clone(Graph& graph) co
 std::vector<TensorShape>
 DepthwiseConvolution2dLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    BOOST_ASSERT(inputShapes.size() == 2);
+    ARMNN_ASSERT(inputShapes.size() == 2);
     const TensorShape& inputShape  = inputShapes[0];
     const TensorShape& filterShape = inputShapes[1];
 
-    BOOST_ASSERT_MSG(inputShape.GetNumDimensions() == 4, "Convolutions will always have 4D input.");
+    ARMNN_ASSERT_MSG(inputShape.GetNumDimensions() == 4, "Convolutions will always have 4D input.");
 
     DataLayoutIndexed dataLayoutIndex(m_Param.m_DataLayout);
 
@@ -124,14 +124,14 @@ void DepthwiseConvolution2dLayer::ValidateTensorShapesFromInputs()
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     // on this level constant data should not be released..
-    BOOST_ASSERT_MSG(m_Weight != nullptr, "DepthwiseConvolution2dLayer: Weights data should not be null.");
+    ARMNN_ASSERT_MSG(m_Weight != nullptr, "DepthwiseConvolution2dLayer: Weights data should not be null.");
 
     auto inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
         m_Weight->GetTensorInfo().GetShape()
      });
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    ARMNN_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "DepthwiseConvolution2dLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",

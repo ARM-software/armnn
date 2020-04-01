@@ -39,7 +39,7 @@ void NeonConstantWorkload::Execute() const
     {
         const ConstantQueueDescriptor& data = this->m_Data;
 
-        BOOST_ASSERT(data.m_LayerOutput != nullptr);
+        ARMNN_ASSERT(data.m_LayerOutput != nullptr);
         arm_compute::ITensor& output =
             boost::polymorphic_downcast<NeonTensorHandle*>(data.m_Outputs[0])->GetTensor();
         arm_compute::DataType computeDataType =
@@ -69,7 +69,7 @@ void NeonConstantWorkload::Execute() const
             }
             default:
             {
-                BOOST_ASSERT_MSG(false, "Unknown data type");
+                ARMNN_ASSERT_MSG(false, "Unknown data type");
                 break;
             }
         }

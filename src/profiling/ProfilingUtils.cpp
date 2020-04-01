@@ -9,7 +9,7 @@
 
 #include <WallClockTimer.hpp>
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -88,7 +88,7 @@ std::vector<uint16_t> GetNextCounterUids(uint16_t firstUid, uint16_t cores)
 
 void WriteBytes(const IPacketBufferPtr& packetBuffer, unsigned int offset,  const void* value, unsigned int valueSize)
 {
-    BOOST_ASSERT(packetBuffer);
+    ARMNN_ASSERT(packetBuffer);
 
     WriteBytes(packetBuffer->GetWritableData(), offset, value, valueSize);
 }
@@ -102,36 +102,36 @@ uint32_t ConstructHeader(uint32_t packetFamily,
 
 void WriteUint64(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset, uint64_t value)
 {
-    BOOST_ASSERT(packetBuffer);
+    ARMNN_ASSERT(packetBuffer);
 
     WriteUint64(packetBuffer->GetWritableData(), offset, value);
 }
 
 void WriteUint32(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint32_t value)
 {
-    BOOST_ASSERT(packetBuffer);
+    ARMNN_ASSERT(packetBuffer);
 
     WriteUint32(packetBuffer->GetWritableData(), offset, value);
 }
 
 void WriteUint16(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint16_t value)
 {
-    BOOST_ASSERT(packetBuffer);
+    ARMNN_ASSERT(packetBuffer);
 
     WriteUint16(packetBuffer->GetWritableData(), offset, value);
 }
 
 void WriteUint8(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint8_t value)
 {
-    BOOST_ASSERT(packetBuffer);
+    ARMNN_ASSERT(packetBuffer);
 
     WriteUint8(packetBuffer->GetWritableData(), offset, value);
 }
 
 void WriteBytes(unsigned char* buffer, unsigned int offset, const void* value, unsigned int valueSize)
 {
-    BOOST_ASSERT(buffer);
-    BOOST_ASSERT(value);
+    ARMNN_ASSERT(buffer);
+    ARMNN_ASSERT(value);
 
     for (unsigned int i = 0; i < valueSize; i++, offset++)
     {
@@ -141,7 +141,7 @@ void WriteBytes(unsigned char* buffer, unsigned int offset, const void* value, u
 
 void WriteUint64(unsigned char* buffer, unsigned int offset, uint64_t value)
 {
-    BOOST_ASSERT(buffer);
+    ARMNN_ASSERT(buffer);
 
     buffer[offset]     = static_cast<unsigned char>(value & 0xFF);
     buffer[offset + 1] = static_cast<unsigned char>((value >> 8) & 0xFF);
@@ -155,7 +155,7 @@ void WriteUint64(unsigned char* buffer, unsigned int offset, uint64_t value)
 
 void WriteUint32(unsigned char* buffer, unsigned int offset, uint32_t value)
 {
-    BOOST_ASSERT(buffer);
+    ARMNN_ASSERT(buffer);
 
     buffer[offset]     = static_cast<unsigned char>(value & 0xFF);
     buffer[offset + 1] = static_cast<unsigned char>((value >> 8) & 0xFF);
@@ -165,7 +165,7 @@ void WriteUint32(unsigned char* buffer, unsigned int offset, uint32_t value)
 
 void WriteUint16(unsigned char* buffer, unsigned int offset, uint16_t value)
 {
-    BOOST_ASSERT(buffer);
+    ARMNN_ASSERT(buffer);
 
     buffer[offset]     = static_cast<unsigned char>(value & 0xFF);
     buffer[offset + 1] = static_cast<unsigned char>((value >> 8) & 0xFF);
@@ -173,50 +173,50 @@ void WriteUint16(unsigned char* buffer, unsigned int offset, uint16_t value)
 
 void WriteUint8(unsigned char* buffer, unsigned int offset, uint8_t value)
 {
-    BOOST_ASSERT(buffer);
+    ARMNN_ASSERT(buffer);
 
     buffer[offset] = static_cast<unsigned char>(value);
 }
 
 void ReadBytes(const IPacketBufferPtr& packetBuffer, unsigned int offset, unsigned int valueSize, uint8_t outValue[])
 {
-    BOOST_ASSERT(packetBuffer);
+    ARMNN_ASSERT(packetBuffer);
 
     ReadBytes(packetBuffer->GetReadableData(), offset, valueSize, outValue);
 }
 
 uint64_t ReadUint64(const IPacketBufferPtr& packetBuffer, unsigned int offset)
 {
-    BOOST_ASSERT(packetBuffer);
+    ARMNN_ASSERT(packetBuffer);
 
     return ReadUint64(packetBuffer->GetReadableData(), offset);
 }
 
 uint32_t ReadUint32(const IPacketBufferPtr& packetBuffer, unsigned int offset)
 {
-    BOOST_ASSERT(packetBuffer);
+    ARMNN_ASSERT(packetBuffer);
 
     return ReadUint32(packetBuffer->GetReadableData(), offset);
 }
 
 uint16_t ReadUint16(const IPacketBufferPtr& packetBuffer, unsigned int offset)
 {
-    BOOST_ASSERT(packetBuffer);
+    ARMNN_ASSERT(packetBuffer);
 
     return ReadUint16(packetBuffer->GetReadableData(), offset);
 }
 
 uint8_t ReadUint8(const IPacketBufferPtr& packetBuffer, unsigned int offset)
 {
-    BOOST_ASSERT(packetBuffer);
+    ARMNN_ASSERT(packetBuffer);
 
     return ReadUint8(packetBuffer->GetReadableData(), offset);
 }
 
 void ReadBytes(const unsigned char* buffer, unsigned int offset, unsigned int valueSize, uint8_t outValue[])
 {
-    BOOST_ASSERT(buffer);
-    BOOST_ASSERT(outValue);
+    ARMNN_ASSERT(buffer);
+    ARMNN_ASSERT(outValue);
 
     for (unsigned int i = 0; i < valueSize; i++, offset++)
     {
@@ -226,7 +226,7 @@ void ReadBytes(const unsigned char* buffer, unsigned int offset, unsigned int va
 
 uint64_t ReadUint64(const unsigned char* buffer, unsigned int offset)
 {
-    BOOST_ASSERT(buffer);
+    ARMNN_ASSERT(buffer);
 
     uint64_t value = 0;
     value  = static_cast<uint64_t>(buffer[offset]);
@@ -243,7 +243,7 @@ uint64_t ReadUint64(const unsigned char* buffer, unsigned int offset)
 
 uint32_t ReadUint32(const unsigned char* buffer, unsigned int offset)
 {
-    BOOST_ASSERT(buffer);
+    ARMNN_ASSERT(buffer);
 
     uint32_t value = 0;
     value  = static_cast<uint32_t>(buffer[offset]);
@@ -255,7 +255,7 @@ uint32_t ReadUint32(const unsigned char* buffer, unsigned int offset)
 
 uint16_t ReadUint16(const unsigned char* buffer, unsigned int offset)
 {
-    BOOST_ASSERT(buffer);
+    ARMNN_ASSERT(buffer);
 
     uint32_t value = 0;
     value  = static_cast<uint32_t>(buffer[offset]);
@@ -265,7 +265,7 @@ uint16_t ReadUint16(const unsigned char* buffer, unsigned int offset)
 
 uint8_t ReadUint8(const unsigned char* buffer, unsigned int offset)
 {
-    BOOST_ASSERT(buffer);
+    ARMNN_ASSERT(buffer);
 
     return buffer[offset];
 }
@@ -310,7 +310,7 @@ uint32_t CalculateSizeOfPaddedSwString(const std::string& str)
 // Read TimelineMessageDirectoryPacket from given IPacketBuffer and offset
 SwTraceMessage ReadSwTraceMessage(const unsigned char* packetBuffer, unsigned int& offset)
 {
-    BOOST_ASSERT(packetBuffer);
+    ARMNN_ASSERT(packetBuffer);
 
     unsigned int uint32_t_size = sizeof(uint32_t);
 

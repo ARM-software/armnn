@@ -5,7 +5,6 @@
 
 #include "DotSerializer.hpp"
 
-#include <boost/assert.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <sstream>
 #include <cstring>

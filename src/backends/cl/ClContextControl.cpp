@@ -9,12 +9,12 @@
 
 #include <LeakChecking.hpp>
 
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
 
-#include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/polymorphic_cast.hpp>
 
@@ -59,11 +59,11 @@ ClContextControl::ClContextControl(arm_compute::CLTuner *tuner,
 
     // Removes the use of global CL context.
     cl::Context::setDefault(cl::Context{});
-    BOOST_ASSERT(cl::Context::getDefault()() == NULL);
+    ARMNN_ASSERT(cl::Context::getDefault()() == NULL);
 
     // Removes the use of global CL command queue.
     cl::CommandQueue::setDefault(cl::CommandQueue{});
-    BOOST_ASSERT(cl::CommandQueue::getDefault()() == NULL);
+    ARMNN_ASSERT(cl::CommandQueue::getDefault()() == NULL);
 
     // Always load the OpenCL runtime.
     LoadOpenClRuntime();

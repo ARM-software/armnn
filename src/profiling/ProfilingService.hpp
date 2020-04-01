@@ -264,8 +264,8 @@ protected:
                                         IProfilingConnectionFactory* other,
                                         IProfilingConnectionFactory*& backup)
     {
-        BOOST_ASSERT(instance.m_ProfilingConnectionFactory);
-        BOOST_ASSERT(other);
+        ARMNN_ASSERT(instance.m_ProfilingConnectionFactory);
+        ARMNN_ASSERT(other);
 
         backup = instance.m_ProfilingConnectionFactory.release();
         instance.m_ProfilingConnectionFactory.reset(other);

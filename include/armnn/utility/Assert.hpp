@@ -12,7 +12,7 @@ namespace armnn
 
 #ifndef NDEBUG
 #   define ARMNN_ASSERT(COND) assert(COND)
-#   define ARMNN_ASSERT_MSG(COND, MSG) assert(COND && MSG)
+#   define ARMNN_ASSERT_MSG(COND, MSG) assert((COND) && MSG)
 #else
 #   define ARMNN_ASSERT(COND)
 #   define ARMNN_ASSERT_MSG(COND, MSG)

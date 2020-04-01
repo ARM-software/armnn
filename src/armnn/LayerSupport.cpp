@@ -10,7 +10,7 @@
 
 #include <armnn/backends/IBackendInternal.hpp>
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <cstring>
 #include <algorithm>
@@ -144,7 +144,7 @@ bool IsConcatSupported(const BackendId& backend,
                        char* reasonIfUnsupported,
                        size_t reasonIfUnsupportedMaxLength)
 {
-    BOOST_ASSERT(inputs.size() > 0);
+    ARMNN_ASSERT(inputs.size() > 0);
 
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsConcatSupported, inputs, output, descriptor);
 }
@@ -418,7 +418,7 @@ bool IsMergerSupported(const BackendId& backend,
                        char* reasonIfUnsupported,
                        size_t reasonIfUnsupportedMaxLength)
 {
-    BOOST_ASSERT(inputs.size() > 0);
+    ARMNN_ASSERT(inputs.size() > 0);
 
     ARMNN_NO_DEPRECATE_WARN_BEGIN
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsMergerSupported, inputs, output, descriptor);

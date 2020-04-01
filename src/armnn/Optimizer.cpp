@@ -28,7 +28,7 @@ void Optimizer::Pass(Graph& graph, const Optimizations& optimizations)
         --it;
         for (auto&& optimization : optimizations)
         {
-            BOOST_ASSERT(*it);
+            ARMNN_ASSERT(*it);
             optimization->Run(graph, **it);
 
             if ((*it)->IsOutputUnconnected())

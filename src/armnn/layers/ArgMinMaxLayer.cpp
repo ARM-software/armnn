@@ -34,7 +34,7 @@ ArgMinMaxLayer* ArgMinMaxLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> ArgMinMaxLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    BOOST_ASSERT(inputShapes.size() == 1);
+    ARMNN_ASSERT(inputShapes.size() == 1);
 
     TensorShape inputShape = inputShapes[0];
     auto inputNumDimensions = inputShape.GetNumDimensions();
@@ -42,7 +42,7 @@ std::vector<TensorShape> ArgMinMaxLayer::InferOutputShapes(const std::vector<Ten
     auto axis = m_Param.m_Axis;
     auto unsignedAxis = armnnUtils::GetUnsignedAxis(inputNumDimensions, axis);
 
-    BOOST_ASSERT(unsignedAxis <= inputNumDimensions);
+    ARMNN_ASSERT(unsignedAxis <= inputNumDimensions);
 
     // 1D input shape results in scalar output
     if (inputShape.GetNumDimensions() == 1)
@@ -75,7 +75,7 @@ void ArgMinMaxLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    ARMNN_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
             "ArgMinMaxLayer: TensorShape set on OutputSlot does not match the inferred shape.",

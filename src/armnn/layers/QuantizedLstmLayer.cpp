@@ -78,7 +78,7 @@ QuantizedLstmLayer* QuantizedLstmLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> QuantizedLstmLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    BOOST_ASSERT(inputShapes.size() == 3);
+    ARMNN_ASSERT(inputShapes.size() == 3);
 
     // Get input values for validation
     unsigned int numBatches = inputShapes[0][0];
@@ -102,34 +102,34 @@ void QuantizedLstmLayer::ValidateTensorShapesFromInputs()
         GetInputSlot(2).GetConnection()->GetTensorInfo().GetShape()  // previousOutputIn
     });
 
-    BOOST_ASSERT(inferredShapes.size() == 2);
+    ARMNN_ASSERT(inferredShapes.size() == 2);
 
     // Check weights and bias for nullptr
-    BOOST_ASSERT_MSG(m_QuantizedLstmParameters.m_InputToInputWeights != nullptr,
+    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_InputToInputWeights != nullptr,
                      "QuantizedLstmLayer: m_QuantizedLstmParameters.m_InputToInputWeights should not be null.");
-    BOOST_ASSERT_MSG(m_QuantizedLstmParameters.m_InputToForgetWeights != nullptr,
+    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_InputToForgetWeights != nullptr,
                      "QuantizedLstmLayer: m_QuantizedLstmParameters.m_InputToForgetWeights should not be null.");
-    BOOST_ASSERT_MSG(m_QuantizedLstmParameters.m_InputToCellWeights != nullptr,
+    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_InputToCellWeights != nullptr,
                      "QuantizedLstmLayer: m_QuantizedLstmParameters.m_InputToCellWeights should not be null.");
-    BOOST_ASSERT_MSG(m_QuantizedLstmParameters.m_InputToOutputWeights != nullptr,
+    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_InputToOutputWeights != nullptr,
                      "QuantizedLstmLayer: m_QuantizedLstmParameters.m_InputToOutputWeights should not be null.");
 
-    BOOST_ASSERT_MSG(m_QuantizedLstmParameters.m_RecurrentToInputWeights != nullptr,
+    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_RecurrentToInputWeights != nullptr,
                      "QuantizedLstmLayer: m_QuantizedLstmParameters.m_RecurrentToInputWeights should not be null.");
-    BOOST_ASSERT_MSG(m_QuantizedLstmParameters.m_RecurrentToForgetWeights != nullptr,
+    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_RecurrentToForgetWeights != nullptr,
                      "QuantizedLstmLayer: m_QuantizedLstmParameters.m_RecurrentToForgetWeights should not be null.");
-    BOOST_ASSERT_MSG(m_QuantizedLstmParameters.m_RecurrentToCellWeights != nullptr,
+    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_RecurrentToCellWeights != nullptr,
                      "QuantizedLstmLayer: m_QuantizedLstmParameters.m_RecurrentToCellWeights should not be null.");
-    BOOST_ASSERT_MSG(m_QuantizedLstmParameters.m_RecurrentToOutputWeights != nullptr,
+    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_RecurrentToOutputWeights != nullptr,
                      "QuantizedLstmLayer: m_QuantizedLstmParameters.m_RecurrentToOutputWeights should not be null.");
 
-    BOOST_ASSERT_MSG(m_QuantizedLstmParameters.m_InputGateBias != nullptr,
+    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_InputGateBias != nullptr,
                      "QuantizedLstmLayer: m_QuantizedLstmParameters.m_InputGateBias should not be null.");
-    BOOST_ASSERT_MSG(m_QuantizedLstmParameters.m_ForgetGateBias != nullptr,
+    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_ForgetGateBias != nullptr,
                      "QuantizedLstmLayer: m_QuantizedLstmParameters.m_ForgetGateBias should not be null.");
-    BOOST_ASSERT_MSG(m_QuantizedLstmParameters.m_CellBias != nullptr,
+    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_CellBias != nullptr,
                      "QuantizedLstmLayer: m_QuantizedLstmParameters.m_CellBias should not be null.");
-    BOOST_ASSERT_MSG(m_QuantizedLstmParameters.m_OutputGateBias != nullptr,
+    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_OutputGateBias != nullptr,
                      "QuantizedLstmLayer: m_QuantizedLstmParameters.m_OutputGateBias should not be null.");
 
     // Check output TensorShape(s) match inferred shape

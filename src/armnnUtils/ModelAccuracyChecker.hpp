@@ -7,7 +7,7 @@
 
 #include <algorithm>
 #include <armnn/Types.hpp>
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <cstddef>
 #include <functional>

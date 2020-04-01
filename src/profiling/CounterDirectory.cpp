@@ -8,6 +8,7 @@
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Conversion.hpp>
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
 #include <boost/format.hpp>
@@ -37,11 +38,11 @@ const Category* CounterDirectory::RegisterCategory(const std::string& categoryNa
 
     // Create the category
     CategoryPtr category = std::make_unique<Category>(categoryName);
-    BOOST_ASSERT(category);
+    ARMNN_ASSERT(category);
 
     // Get the raw category pointer
     const Category* categoryPtr = category.get();
-    BOOST_ASSERT(categoryPtr);
+    ARMNN_ASSERT(categoryPtr);
 
     // Register the category
     m_Categories.insert(std::move(category));
@@ -99,11 +100,11 @@ const Device* CounterDirectory::RegisterDevice(const std::string& deviceName,
 
     // Create the device
     DevicePtr device = std::make_unique<Device>(deviceUid, deviceName, cores);
-    BOOST_ASSERT(device);
+    ARMNN_ASSERT(device);
 
     // Get the raw device pointer
     const Device* devicePtr = device.get();
-    BOOST_ASSERT(devicePtr);
+    ARMNN_ASSERT(devicePtr);
 
     // Register the device
     m_Devices.insert(std::make_pair(deviceUid, std::move(device)));
@@ -162,15 +163,15 @@ const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counte
 
     // Get the counter set UID
     uint16_t counterSetUid = GetNextUid();
-    BOOST_ASSERT(counterSetUid == counterSetUidPeek);
+    ARMNN_ASSERT(counterSetUid == counterSetUidPeek);
 
     // Create the counter set
     CounterSetPtr counterSet = std::make_unique<CounterSet>(counterSetUid, counterSetName, count);
-    BOOST_ASSERT(counterSet);
+    ARMNN_ASSERT(counterSet);
 
     // Get the raw counter set pointer
     const CounterSet* counterSetPtr = counterSet.get();
-    BOOST_ASSERT(counterSetPtr);
+    ARMNN_ASSERT(counterSetPtr);
 
     // Register the counter set
     m_CounterSets.insert(std::make_pair(counterSetUid, std::move(counterSet)));
@@ -251,14 +252,14 @@ const Counter* CounterDirectory::RegisterCounter(const BackendId& backendId,
 
     // Get the parent category
     const CategoryPtr& parentCategory = *categoryIt;
-    BOOST_ASSERT(parentCategory);
+    ARMNN_ASSERT(parentCategory);
 
     // Check that a counter with the given name is not already registered within the parent category
     const std::vector<uint16_t>& parentCategoryCounters = parentCategory->m_Counters;
     for (uint16_t parentCategoryCounterUid : parentCategoryCounters)
     {
         const Counter* parentCategoryCounter = GetCounter(parentCategoryCounterUid);
-        BOOST_ASSERT(parentCategoryCounter);
+        ARMNN_ASSERT(parentCategoryCounter);
 
         if (parentCategoryCounter->m_Name == name)
         {
@@ -290,7 +291,7 @@ const Counter* CounterDirectory::RegisterCounter(const BackendId& backendId,
 
     // Get the counter UIDs and calculate the max counter UID
     std::vector<uint16_t> counterUids = GetNextCounterUids(uid, deviceCores);
-    BOOST_ASSERT(!counterUids.empty());
+    ARMNN_ASSERT(!counterUids.empty());
     uint16_t maxCounterUid = deviceCores <= 1 ? counterUids.front() : counterUids.back();
 
     // Get the counter units
@@ -308,11 +309,11 @@ const Counter* CounterDirectory::RegisterCounter(const BackendId& backendId,
                                                    unitsValue,
                                                    deviceUidValue,
                                                    counterSetUidValue);
-    BOOST_ASSERT(counter);
+    ARMNN_ASSERT(counter);
 
     // Get the raw counter pointer
     const Counter* counterPtr = counter.get();
-    BOOST_ASSERT(counterPtr);
+    ARMNN_ASSERT(counterPtr);
 
     // Process multiple counters if necessary
     for (uint16_t counterUid : counterUids)
@@ -336,7 +337,7 @@ const Category* CounterDirectory::GetCategory(const std::string& categoryName) c
     }
 
     const Category* category = it->get();
-    BOOST_ASSERT(category);
+    ARMNN_ASSERT(category);
 
     return category;
 }
@@ -350,8 +351,8 @@ const Device* CounterDirectory::GetDevice(uint16_t deviceUid) const
     }
 
     const Device* device = it->second.get();
-    BOOST_ASSERT(device);
-    BOOST_ASSERT(device->m_Uid == deviceUid);
+    ARMNN_ASSERT(device);
+    ARMNN_ASSERT(device->m_Uid == deviceUid);
 
     return device;
 }
@@ -365,8 +366,8 @@ const CounterSet* CounterDirectory::GetCounterSet(uint16_t counterSetUid) const
     }
 
     const CounterSet* counterSet = it->second.get();
-    BOOST_ASSERT(counterSet);
-    BOOST_ASSERT(counterSet->m_Uid == counterSetUid);
+    ARMNN_ASSERT(counterSet);
+    ARMNN_ASSERT(counterSet->m_Uid == counterSetUid);
 
     return counterSet;
 }
@@ -380,9 +381,9 @@ const Counter* CounterDirectory::GetCounter(uint16_t counterUid) const
     }
 
     const Counter* counter = it->second.get();
-    BOOST_ASSERT(counter);
-    BOOST_ASSERT(counter->m_Uid <= counterUid);
-    BOOST_ASSERT(counter->m_Uid <= counter->m_MaxCounterUid);
+    ARMNN_ASSERT(counter);
+    ARMNN_ASSERT(counter->m_Uid <= counterUid);
+    ARMNN_ASSERT(counter->m_Uid <= counter->m_MaxCounterUid);
 
     return counter;
 }
@@ -449,7 +450,7 @@ CategoriesIt CounterDirectory::FindCategory(const std::string& categoryName) con
 {
     return std::find_if(m_Categories.begin(), m_Categories.end(), [&categoryName](const CategoryPtr& category)
     {
-        BOOST_ASSERT(category);
+        ARMNN_ASSERT(category);
 
         return category->m_Name == categoryName;
     });
@@ -464,8 +465,8 @@ DevicesIt CounterDirectory::FindDevice(const std::string& deviceName) const
 {
     return std::find_if(m_Devices.begin(), m_Devices.end(), [&deviceName](const auto& pair)
     {
-        BOOST_ASSERT(pair.second);
-        BOOST_ASSERT(pair.second->m_Uid == pair.first);
+        ARMNN_ASSERT(pair.second);
+        ARMNN_ASSERT(pair.second->m_Uid == pair.first);
 
         return pair.second->m_Name == deviceName;
     });
@@ -480,8 +481,8 @@ CounterSetsIt CounterDirectory::FindCounterSet(const std::string& counterSetName
 {
     return std::find_if(m_CounterSets.begin(), m_CounterSets.end(), [&counterSetName](const auto& pair)
     {
-        BOOST_ASSERT(pair.second);
-        BOOST_ASSERT(pair.second->m_Uid == pair.first);
+        ARMNN_ASSERT(pair.second);
+        ARMNN_ASSERT(pair.second->m_Uid == pair.first);
 
         return pair.second->m_Name == counterSetName;
     });
@@ -496,8 +497,8 @@ CountersIt CounterDirectory::FindCounter(const std::string& counterName) const
 {
     return std::find_if(m_Counters.begin(), m_Counters.end(), [&counterName](const auto& pair)
     {
-        BOOST_ASSERT(pair.second);
-        BOOST_ASSERT(pair.second->m_Uid == pair.first);
+        ARMNN_ASSERT(pair.second);
+        ARMNN_ASSERT(pair.second->m_Uid == pair.first);
 
         return pair.second->m_Name == counterName;
     });
@@ -536,7 +537,7 @@ uint16_t CounterDirectory::GetNumberOfCores(const Optional<uint16_t>& numberOfCo
 
         // Get the associated device
         const DevicePtr& device = deviceIt->second;
-        BOOST_ASSERT(device);
+        ARMNN_ASSERT(device);
 
         // Get the number of cores of the associated device
         return device->m_Cores;

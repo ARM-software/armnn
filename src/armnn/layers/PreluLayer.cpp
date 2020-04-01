@@ -34,7 +34,7 @@ PreluLayer* PreluLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> PreluLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    BOOST_ASSERT(inputShapes.size() == 2);
+    ARMNN_ASSERT(inputShapes.size() == 2);
 
     const TensorShape& inputShape = inputShapes[0];
     const TensorShape& alphaShape = inputShapes[1];
@@ -42,8 +42,8 @@ std::vector<TensorShape> PreluLayer::InferOutputShapes(const std::vector<TensorS
     const unsigned int inputShapeDimensions = inputShape.GetNumDimensions();
     const unsigned int alphaShapeDimensions = alphaShape.GetNumDimensions();
 
-    BOOST_ASSERT(inputShapeDimensions > 0);
-    BOOST_ASSERT(alphaShapeDimensions > 0);
+    ARMNN_ASSERT(inputShapeDimensions > 0);
+    ARMNN_ASSERT(alphaShapeDimensions > 0);
 
     // The size of the output is the maximum size along each dimension of the input operands,
     // it starts with the trailing dimensions, and works its way forward
@@ -63,7 +63,7 @@ std::vector<TensorShape> PreluLayer::InferOutputShapes(const std::vector<TensorS
         unsigned int alphaDimension = alphaShape[boost::numeric_cast<unsigned int>(alphaShapeIndex)];
 
         // Check that the inputs are broadcast compatible
-        BOOST_ASSERT_MSG(inputDimension == alphaDimension || inputDimension == 1 || alphaDimension == 1,
+        ARMNN_ASSERT_MSG(inputDimension == alphaDimension || inputDimension == 1 || alphaDimension == 1,
                          "PreluLayer: Dimensions should either match or one should be of size 1");
 
         outputShape[outputShapeIndex] = std::max(inputDimension, alphaDimension);
@@ -104,7 +104,7 @@ void PreluLayer::ValidateTensorShapesFromInputs()
         GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape()
     });
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    ARMNN_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "PreluLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",

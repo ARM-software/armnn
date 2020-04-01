@@ -9,7 +9,7 @@
 
 #include <armnn/Types.hpp>
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 using namespace armnnUtils;
 
@@ -42,11 +42,11 @@ void BatchToSpaceNd(const DataLayoutIndexed& dataLayout,
 {
     TensorShape inputShape = inputTensorInfo.GetShape();
 
-    BOOST_ASSERT_MSG(inputShape.GetNumDimensions() == 4, "Expected Input with 4 Dimensions");
+    ARMNN_ASSERT_MSG(inputShape.GetNumDimensions() == 4, "Expected Input with 4 Dimensions");
 
     TensorShape outputShape = outputTensorInfo.GetShape();
 
-    BOOST_ASSERT_MSG(outputShape.GetNumDimensions() == 4, "Expected Output with 4 Dimensions");
+    ARMNN_ASSERT_MSG(outputShape.GetNumDimensions() == 4, "Expected Output with 4 Dimensions");
 
     const unsigned int inputBatchSize = inputShape[0];
     const unsigned int channels = inputShape[dataLayout.GetChannelsIndex()];
@@ -55,12 +55,12 @@ void BatchToSpaceNd(const DataLayoutIndexed& dataLayout,
     const unsigned int outputHeight = outputShape[dataLayout.GetHeightIndex()];
     const unsigned int outputWidth = outputShape[dataLayout.GetWidthIndex()];
 
-    BOOST_ASSERT_MSG(blockShape.size() > 0, "BlockShape must contain 1 or more entries");
+    ARMNN_ASSERT_MSG(blockShape.size() > 0, "BlockShape must contain 1 or more entries");
 
     const unsigned int blockShapeHeight = blockShape[0];
     const unsigned int blockShapeWidth = blockShape[1];
 
-    BOOST_ASSERT_MSG(cropsData.size() > 0, "Crops must contain 1 or more entries");
+    ARMNN_ASSERT_MSG(cropsData.size() > 0, "Crops must contain 1 or more entries");
 
     const unsigned int cropsTop = cropsData[0].first;
     const unsigned int cropsLeft = cropsData[1].first;

@@ -1212,9 +1212,9 @@ LayerTestResult<T,4> CompareActivationTestImpl(
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, outputHandleRef.get());
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateActivation(data, info);
-    BOOST_ASSERT(workload != nullptr);
+    ARMNN_ASSERT(workload != nullptr);
     std::unique_ptr<armnn::IWorkload> workloadRef = refWorkloadFactory.CreateActivation(refData, refInfo);
-    BOOST_ASSERT(workloadRef != nullptr);
+    ARMNN_ASSERT(workloadRef != nullptr);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

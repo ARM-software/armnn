@@ -7,13 +7,13 @@
 #include "InferenceTest.hpp"
 #include "YoloDatabase.hpp"
 
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
 #include <algorithm>
 #include <array>
 #include <utility>
 
-#include <boost/assert.hpp>
 #include <boost/multi_array.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 
@@ -39,7 +39,7 @@ public:
         using Boost3dArray = boost::multi_array<float, 3>;
 
         const std::vector<float>& output = boost::get<std::vector<float>>(this->GetOutputs()[0]);
-        BOOST_ASSERT(output.size() == YoloOutputSize);
+        ARMNN_ASSERT(output.size() == YoloOutputSize);
 
         constexpr Boost3dArray::index gridSize = 7;
         constexpr Boost3dArray::index numClasses = 20;
@@ -96,7 +96,7 @@ public:
                 }
             }
         }
-        BOOST_ASSERT(output.data() + YoloOutputSize == outputPtr);
+        ARMNN_ASSERT(output.data() + YoloOutputSize == outputPtr);
 
         std::vector<YoloDetectedObject> detectedObjects;
         detectedObjects.reserve(gridSize * gridSize * numScales * numClasses);

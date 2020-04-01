@@ -7,10 +7,10 @@
 #include "../TfLiteParser.hpp"
 
 #include <armnn/LayerVisitorBase.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <layers/StandInLayer.hpp>
 
-#include <boost/assert.hpp>
 #include <boost/polymorphic_cast.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -78,10 +78,10 @@ public:
         , m_StandInLayerVerifier(inputInfos, outputInfos)
     {
         const unsigned int numInputs = boost::numeric_cast<unsigned int>(inputInfos.size());
-        BOOST_ASSERT(numInputs > 0);
+        ARMNN_ASSERT(numInputs > 0);
 
         const unsigned int numOutputs = boost::numeric_cast<unsigned int>(outputInfos.size());
-        BOOST_ASSERT(numOutputs > 0);
+        ARMNN_ASSERT(numOutputs > 0);
 
         m_JsonString = R"(
             {

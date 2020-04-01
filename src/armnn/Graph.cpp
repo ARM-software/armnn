@@ -13,9 +13,9 @@
 #include <armnn/Logging.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <armnn/Utils.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <boost/polymorphic_cast.hpp>
-#include <boost/assert.hpp>
 #include <boost/format.hpp>
 
 #include <unordered_map>
@@ -142,7 +142,7 @@ Status Graph::SerializeToDot(std::ostream& stream)
 Status Graph::AllocateDynamicBuffers()
 {
     // Layers must be sorted in topological order
-    BOOST_ASSERT(m_LayersInOrder);
+    ARMNN_ASSERT(m_LayersInOrder);
 
     std::unordered_set<const ITensorHandle*> preallocatedTensors;
     std::unordered_map<const ITensorHandle*, unsigned int> handleReferenceCounts;
@@ -268,7 +268,7 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
     auto MayNeedCompatibilityLayer = [](const Layer& layer)
     {
         // All layers should have been associated with a valid compute device at this point.
-        BOOST_ASSERT(layer.GetBackendId() != Compute::Undefined);
+        ARMNN_ASSERT(layer.GetBackendId() != Compute::Undefined);
         // Does not need another compatibility layer if a copy or import layer is already present.
         return layer.GetType() != LayerType::MemCopy &&
                layer.GetType() != LayerType::MemImport;
@@ -282,7 +282,7 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
 
     ForEachLayer([this, &backends, &registry, MayNeedCompatibilityLayer, IsCompatibilityStrategy](Layer* srcLayer)
     {
-        BOOST_ASSERT(srcLayer);
+        ARMNN_ASSERT(srcLayer);
 
         if (!MayNeedCompatibilityLayer(*srcLayer))
         {
@@ -299,10 +299,10 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
             for (unsigned int srcConnectionIndex = 0; srcConnectionIndex < srcConnections.size(); srcConnectionIndex++)
             {
                 InputSlot* dstInputSlot = srcConnections[srcConnectionIndex];
-                BOOST_ASSERT(dstInputSlot);
+                ARMNN_ASSERT(dstInputSlot);
 
                 EdgeStrategy strategy = srcEdgeStrategies[srcConnectionIndex];
-                BOOST_ASSERT_MSG(strategy != EdgeStrategy::Undefined,
+                ARMNN_ASSERT_MSG(strategy != EdgeStrategy::Undefined,
                                  "Undefined memory strategy found while adding copy layers for compatibility");
 
                 const Layer& dstLayer = dstInputSlot->GetOwningLayer();
@@ -325,7 +325,7 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
                     }
                     else
                     {
-                        BOOST_ASSERT_MSG(strategy == EdgeStrategy::ExportToTarget, "Invalid edge strategy found.");
+                        ARMNN_ASSERT_MSG(strategy == EdgeStrategy::ExportToTarget, "Invalid edge strategy found.");
                         compLayer = InsertNewLayer<MemImportLayer>(*dstInputSlot, compLayerName.c_str());
                     }
 
@@ -395,7 +395,7 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
 
 void Graph::SubstituteSubgraph(SubgraphView& subgraph, IConnectableLayer* substituteLayer)
 {
-    BOOST_ASSERT(substituteLayer != nullptr);
+    ARMNN_ASSERT(substituteLayer != nullptr);
 
     ReplaceSubgraphConnections(subgraph, substituteLayer);
     EraseSubgraphLayers(subgraph);
@@ -420,7 +420,7 @@ void Graph::SubstituteSubgraph(SubgraphView& subgraph, const SubgraphView& subst
 
 void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, IConnectableLayer* substituteLayer)
 {
-    BOOST_ASSERT(substituteLayer != nullptr);
+    ARMNN_ASSERT(substituteLayer != nullptr);
 
     // Create a new sub-graph with only the given layer, using
     // the given sub-graph as a reference of which parent graph to use
@@ -430,13 +430,13 @@ void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, IConnectabl
 
 void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const SubgraphView& substituteSubgraph)
 {
-    BOOST_ASSERT_MSG(!substituteSubgraph.GetLayers().empty(), "New sub-graph used for substitution must not be empty");
+    ARMNN_ASSERT_MSG(!substituteSubgraph.GetLayers().empty(), "New sub-graph used for substitution must not be empty");
 
     const SubgraphView::Layers& substituteSubgraphLayers = substituteSubgraph.GetLayers();
     std::for_each(substituteSubgraphLayers.begin(), substituteSubgraphLayers.end(), [&](Layer* layer)
     {
         IgnoreUnused(layer);
-        BOOST_ASSERT_MSG(std::find(m_Layers.begin(), m_Layers.end(), layer) != m_Layers.end(),
+        ARMNN_ASSERT_MSG(std::find(m_Layers.begin(), m_Layers.end(), layer) != m_Layers.end(),
                          "Substitute layer is not a member of graph");
     });
 
@@ -449,8 +449,8 @@ void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const Subgr
     const SubgraphView::InputSlots& substituteSubgraphInputSlots = substituteSubgraph.GetInputSlots();
     const SubgraphView::OutputSlots& substituteSubgraphOutputSlots = substituteSubgraph.GetOutputSlots();
 
-    BOOST_ASSERT(subgraphNumInputSlots == substituteSubgraphInputSlots.size());
-    BOOST_ASSERT(subgraphNumOutputSlots == substituteSubgraphOutputSlots.size());
+    ARMNN_ASSERT(subgraphNumInputSlots == substituteSubgraphInputSlots.size());
+    ARMNN_ASSERT(subgraphNumOutputSlots == substituteSubgraphOutputSlots.size());
 
     // Disconnect the sub-graph and replace it with the substitute sub-graph
 
@@ -458,14 +458,14 @@ void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const Subgr
     for (unsigned int inputSlotIdx = 0; inputSlotIdx < subgraphNumInputSlots; ++inputSlotIdx)
     {
         InputSlot* subgraphInputSlot = subgraphInputSlots.at(inputSlotIdx);
-        BOOST_ASSERT(subgraphInputSlot);
+        ARMNN_ASSERT(subgraphInputSlot);
 
         IOutputSlot* connectedOutputSlot = subgraphInputSlot->GetConnection();
-        BOOST_ASSERT(connectedOutputSlot);
+        ARMNN_ASSERT(connectedOutputSlot);
         connectedOutputSlot->Disconnect(*subgraphInputSlot);
 
         IInputSlot* substituteInputSlot = substituteSubgraphInputSlots.at(inputSlotIdx);
-        BOOST_ASSERT(substituteInputSlot);
+        ARMNN_ASSERT(substituteInputSlot);
         connectedOutputSlot->Connect(*substituteInputSlot);
     }
 
@@ -473,10 +473,10 @@ void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const Subgr
     for(unsigned int outputSlotIdx = 0; outputSlotIdx < subgraphNumOutputSlots; ++outputSlotIdx)
     {
         OutputSlot* subgraphOutputSlot = subgraphOutputSlots.at(outputSlotIdx);
-        BOOST_ASSERT(subgraphOutputSlot);
+        ARMNN_ASSERT(subgraphOutputSlot);
 
         OutputSlot* substituteOutputSlot = substituteSubgraphOutputSlots.at(outputSlotIdx);
-        BOOST_ASSERT(substituteOutputSlot);
+        ARMNN_ASSERT(substituteOutputSlot);
         subgraphOutputSlot->MoveAllConnections(*substituteOutputSlot);
     }
 }

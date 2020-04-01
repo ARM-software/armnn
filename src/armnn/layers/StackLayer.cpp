@@ -38,7 +38,7 @@ std::vector<TensorShape> StackLayer::InferOutputShapes(const std::vector<TensorS
     const unsigned int inputNumDimensions = inputShape.GetNumDimensions();
     const unsigned int axis = m_Param.m_Axis;
 
-    BOOST_ASSERT(axis <= inputNumDimensions);
+    ARMNN_ASSERT(axis <= inputNumDimensions);
 
     std::vector<unsigned int> dimensionSizes(inputNumDimensions + 1, 0);
     for (unsigned int i = 0; i < axis; ++i)
@@ -84,7 +84,7 @@ void StackLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShapes = InferOutputShapes(inputShapes);
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    ARMNN_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "StackLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",

@@ -64,7 +64,7 @@ std::vector<std::string>
 // Remove any preceding and trailing character specified in the characterSet.
 std::string Strip(const std::string& originalString, const std::string& characterSet)
 {
-    BOOST_ASSERT(!characterSet.empty());
+    ARMNN_ASSERT(!characterSet.empty());
     const std::size_t firstFound = originalString.find_first_not_of(characterSet);
     const std::size_t lastFound  = originalString.find_last_not_of(characterSet);
     // Return empty if the originalString is empty or the originalString contains only to-be-striped characters

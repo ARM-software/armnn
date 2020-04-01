@@ -11,7 +11,6 @@
 #include <armnnUtils/Permute.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/assert.hpp>
 #include <boost/format.hpp>
 
 #include <iostream>

@@ -17,8 +17,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/assert.hpp>
-
 namespace armnn
 {
 

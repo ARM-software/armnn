@@ -49,7 +49,7 @@ arm_compute::Status NeonDepthwiseConvolutionWorkloadValidate(const TensorInfo& i
 
     if (descriptor.m_BiasEnabled)
     {
-        BOOST_ASSERT(biases.has_value());
+        ARMNN_ASSERT(biases.has_value());
 
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         optionalAclBiasesInfo = &aclBiasesInfo;
@@ -127,7 +127,7 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
                                                         arm_compute::ActivationLayerInfo(),
                                                         aclDilationInfo);
 
-    BOOST_ASSERT(m_pDepthwiseConvolutionLayer);
+    ARMNN_ASSERT(m_pDepthwiseConvolutionLayer);
 
     ScopedCpuTensorHandle weightsPermutedHandle(weightPermuted);
     InitializeArmComputeTensorData(*m_KernelTensor, &weightsPermutedHandle);
@@ -144,7 +144,7 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
 void NeonDepthwiseConvolutionWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonDepthwiseConvolutionWorkload_Execute");
-    BOOST_ASSERT(m_pDepthwiseConvolutionLayer);
+    ARMNN_ASSERT(m_pDepthwiseConvolutionLayer);
 
     m_pDepthwiseConvolutionLayer->run();
 }

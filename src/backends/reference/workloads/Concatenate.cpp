@@ -38,7 +38,7 @@ void Concatenate(const ConcatQueueDescriptor &data)
 
             //Split view extents are defined by the size of (the corresponding) input tensor.
             const TensorInfo& inputInfo = GetTensorInfo(data.m_Inputs[viewIdx]);
-            BOOST_ASSERT(inputInfo.GetNumDimensions() == outputInfo0.GetNumDimensions());
+            ARMNN_ASSERT(inputInfo.GetNumDimensions() == outputInfo0.GetNumDimensions());
 
             // Check all dimensions to see if this element is inside the given input view.
             bool insideView = true;

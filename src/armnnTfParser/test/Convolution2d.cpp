@@ -152,7 +152,7 @@ struct Convolution2dFixture : public armnnUtils::ParserPrototxtFixture<armnnTfPa
                            "} \n");
 
         // Manual height computation based on stride parameter.
-        BOOST_ASSERT_MSG(stride == 1 || stride == 2, "Add support for strides other than 1 or 2.");
+        ARMNN_ASSERT_MSG(stride == 1 || stride == 2, "Add support for strides other than 1 or 2.");
         std::array<unsigned int, 4> dims;
         if (dataLayout == "NHWC")
         {

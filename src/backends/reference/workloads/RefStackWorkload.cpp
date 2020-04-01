@@ -26,7 +26,7 @@ void RefStackWorkload::Execute() const
     if (!m_Data.m_Parameters.m_Axis)
     {
         float* output = GetOutputTensorData<float>(0, m_Data);
-        BOOST_ASSERT(output != nullptr);
+        ARMNN_ASSERT(output != nullptr);
 
         unsigned int numInputs = m_Data.m_Parameters.m_NumInputs;
         unsigned int inputLength = GetTensorInfo(m_Data.m_Inputs[0]).GetNumElements();

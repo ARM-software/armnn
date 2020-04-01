@@ -4,10 +4,10 @@
 //
 #include "InferenceTest.hpp"
 
+#include <armnn/utility/Assert.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/filesystem/path.hpp>
-#include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -80,7 +80,7 @@ struct ClassifierResultProcessor : public boost::static_visitor<>
     void operator()(const std::vector<int>& values)
     {
         IgnoreUnused(values);
-        BOOST_ASSERT_MSG(false, "Non-float predictions output not supported.");
+        ARMNN_ASSERT_MSG(false, "Non-float predictions output not supported.");
     }
 
     ResultMap& GetResultMap() { return m_ResultMap; }
@@ -360,9 +360,9 @@ int ClassifierInferenceTestMain(int argc,
                                 const armnn::TensorShape* inputTensorShape)
 
 {
-    BOOST_ASSERT(modelFilename);
-    BOOST_ASSERT(inputBindingName);
-    BOOST_ASSERT(outputBindingName);
+    ARMNN_ASSERT(modelFilename);
+    ARMNN_ASSERT(inputBindingName);
+    ARMNN_ASSERT(outputBindingName);
 
     return InferenceTestMain(argc, argv, defaultTestCaseIds,
         [=]

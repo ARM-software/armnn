@@ -4,6 +4,7 @@
 //
 #include "InferenceTestImage.hpp"
 
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
 #include <boost/format.hpp>
@@ -165,7 +166,7 @@ std::tuple<uint8_t, uint8_t, uint8_t> InferenceTestImage::GetPixelAs3Channels(un
 
     const unsigned int pixelOffset = x * GetNumChannels() + y * GetWidth() * GetNumChannels();
     const uint8_t* const pixelData = m_Data.data() + pixelOffset;
-    BOOST_ASSERT(pixelData <= (m_Data.data() + GetSizeInBytes()));
+    ARMNN_ASSERT(pixelData <= (m_Data.data() + GetSizeInBytes()));
 
     std::array<uint8_t, 3> outPixelData;
     outPixelData.fill(0);

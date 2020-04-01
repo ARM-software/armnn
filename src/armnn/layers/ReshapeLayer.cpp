@@ -42,7 +42,7 @@ void ReshapeLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShapes = InferOutputShapes({  });
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    ARMNN_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "ReshapeLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",

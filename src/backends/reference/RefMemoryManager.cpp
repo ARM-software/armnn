@@ -4,7 +4,7 @@
 //
 #include "RefMemoryManager.hpp"
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <algorithm>
 
@@ -35,7 +35,7 @@ RefMemoryManager::Pool* RefMemoryManager::Manage(unsigned int numBytes)
 
 void RefMemoryManager::Allocate(RefMemoryManager::Pool* pool)
 {
-    BOOST_ASSERT(pool);
+    ARMNN_ASSERT(pool);
     m_FreePools.push_back(pool);
 }
 
@@ -75,25 +75,25 @@ RefMemoryManager::Pool::~Pool()
 
 void* RefMemoryManager::Pool::GetPointer()
 {
-    BOOST_ASSERT_MSG(m_Pointer, "RefMemoryManager::Pool::GetPointer() called when memory not acquired");
+    ARMNN_ASSERT_MSG(m_Pointer, "RefMemoryManager::Pool::GetPointer() called when memory not acquired");
     return m_Pointer;
 }
 
 void RefMemoryManager::Pool::Reserve(unsigned int numBytes)
 {
-    BOOST_ASSERT_MSG(!m_Pointer, "RefMemoryManager::Pool::Reserve() cannot be called after memory acquired");
+    ARMNN_ASSERT_MSG(!m_Pointer, "RefMemoryManager::Pool::Reserve() cannot be called after memory acquired");
     m_Size = std::max(m_Size, numBytes);
 }
 
 void RefMemoryManager::Pool::Acquire()
 {
-    BOOST_ASSERT_MSG(!m_Pointer, "RefMemoryManager::Pool::Acquire() called when memory already acquired");
+    ARMNN_ASSERT_MSG(!m_Pointer, "RefMemoryManager::Pool::Acquire() called when memory already acquired");
     m_Pointer = ::operator new(size_t(m_Size));
 }
 
 void RefMemoryManager::Pool::Release()
 {
-    BOOST_ASSERT_MSG(m_Pointer, "RefMemoryManager::Pool::Release() called when memory not acquired");
+    ARMNN_ASSERT_MSG(m_Pointer, "RefMemoryManager::Pool::Release() called when memory not acquired");
     ::operator delete(m_Pointer);
     m_Pointer = nullptr;
 }

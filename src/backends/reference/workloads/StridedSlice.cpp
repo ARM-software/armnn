@@ -7,7 +7,8 @@
 
 #include <ResolveType.hpp>
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
+
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <cstring>
@@ -20,12 +21,12 @@ namespace
 
 void PadParams(StridedSliceDescriptor& p, unsigned int dimCount)
 {
-    BOOST_ASSERT_MSG(dimCount <= 4, "Expected input with at most 4 dimensions");
+    ARMNN_ASSERT_MSG(dimCount <= 4, "Expected input with at most 4 dimensions");
 
     const unsigned int beginIndicesCount =
         boost::numeric_cast<unsigned int>(p.m_Begin.size());
 
-    BOOST_ASSERT(dimCount >= beginIndicesCount);
+    ARMNN_ASSERT(dimCount >= beginIndicesCount);
     const unsigned int padCount = dimCount - beginIndicesCount;
 
     p.m_Begin.resize(dimCount);

@@ -16,7 +16,7 @@ void Dequantize(Decoder<float>& inputDecoder,
                 const TensorInfo& outputInfo)
 {
     IgnoreUnused(outputInfo);
-    BOOST_ASSERT(inputInfo.GetNumElements() == outputInfo.GetNumElements());
+    ARMNN_ASSERT(inputInfo.GetNumElements() == outputInfo.GetNumElements());
     for (unsigned int i = 0; i < inputInfo.GetNumElements(); i++)
     {
         // inputDecoder.Get() dequantizes the data element from whatever

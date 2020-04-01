@@ -5,7 +5,7 @@
 
 #include "ComparisonTestImpl.hpp"
 
-
+#include <armnn/utility/Assert.hpp>
 #include <Half.hpp>
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
@@ -17,8 +17,6 @@
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
 #include <test/TensorHelpers.hpp>
-
-#include <boost/assert.hpp>
 
 namespace
 {
@@ -44,13 +42,13 @@ LayerTestResult<uint8_t, NumDims> ComparisonTestImpl(
     int outQuantOffset)
 {
     IgnoreUnused(memoryManager);
-    BOOST_ASSERT(shape0.GetNumDimensions() == NumDims);
+    ARMNN_ASSERT(shape0.GetNumDimensions() == NumDims);
     armnn::TensorInfo inputTensorInfo0(shape0, ArmnnInType, quantScale0, quantOffset0);
 
-    BOOST_ASSERT(shape1.GetNumDimensions() == NumDims);
+    ARMNN_ASSERT(shape1.GetNumDimensions() == NumDims);
     armnn::TensorInfo inputTensorInfo1(shape1, ArmnnInType, quantScale1, quantOffset1);
 
-    BOOST_ASSERT(outShape.GetNumDimensions() == NumDims);
+    ARMNN_ASSERT(outShape.GetNumDimensions() == NumDims);
     armnn::TensorInfo outputTensorInfo(outShape, armnn::DataType::Boolean, outQuantScale, outQuantOffset);
 
     auto input0 = MakeTensor<InType, NumDims>(inputTensorInfo0, values0);

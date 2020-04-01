@@ -5,6 +5,8 @@
 #include "armnn/Descriptors.hpp"
 #include "armnn/Logging.hpp"
 
+#include <armnn/utility/Assert.hpp>
+
 #include <algorithm>
 #include <array>
 #include <vector>
@@ -195,7 +197,7 @@ const uint32_t* OriginsDescriptor::GetViewOrigin(uint32_t idx) const
 // Reorders the viewOrigins in accordance with the indices presented in newOrdering array.
 void OriginsDescriptor::ReorderOrigins(unsigned int*  newOrdering, unsigned int numNewOrdering)
 {
-    BOOST_ASSERT_MSG(m_NumViews == numNewOrdering, "number of views must match number of "
+    ARMNN_ASSERT_MSG(m_NumViews == numNewOrdering, "number of views must match number of "
         "elements in the new ordering array");
     std::vector<uint32_t*> viewOrigins(&m_ViewOrigins[0], &m_ViewOrigins[m_NumViews]);
 

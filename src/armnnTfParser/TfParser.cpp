@@ -468,7 +468,7 @@ public:
 
     IOutputSlot& ResolveArmnnOutputSlot(unsigned int tfOutputIndex) override
     {
-        BOOST_ASSERT(m_Layer);
+        ARMNN_ASSERT(m_Layer);
         // Assumes one-to-one mapping between Tf and armnn output slots.
         unsigned int armnnOutputSlotIdx = tfOutputIndex;
         if (armnnOutputSlotIdx >= m_Layer->GetNumOutputSlots())
@@ -858,7 +858,7 @@ public:
 
     virtual IOutputSlot& ResolveArmnnOutputSlot(unsigned int tfOutputIndex) override
     {
-        BOOST_ASSERT(m_Representative);
+        ARMNN_ASSERT(m_Representative);
         return m_Representative->ResolveArmnnOutputSlot(tfOutputIndex);
     }
 
@@ -892,12 +892,12 @@ public:
         m_Storage(tensorData, tensorData + tensorInfo.GetNumElements()),
         m_TensorInfo(tensorInfo)
     {
-        BOOST_ASSERT(GetDataTypeSize(tensorInfo.GetDataType()) == sizeof(T));
+        ARMNN_ASSERT(GetDataTypeSize(tensorInfo.GetDataType()) == sizeof(T));
     }
 
     void CreateLayerDeferred() override
     {
-        BOOST_ASSERT(m_Layer == nullptr);
+        ARMNN_ASSERT(m_Layer == nullptr);
         m_Layer = m_Parser->m_Network->AddConstantLayer(ConstTensor(m_TensorInfo, m_Storage), m_Node.name().c_str());
         m_Layer->GetOutputSlot(0).SetTensorInfo(m_TensorInfo);
     }
@@ -1068,7 +1068,7 @@ struct InvokeParseFunction
 ParsedTfOperationPtr TfParser::ParseConst(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
-    BOOST_ASSERT(nodeDef.op() == "Const");
+    ARMNN_ASSERT(nodeDef.op() == "Const");
 
     if (nodeDef.attr().count("value") == 0)
     {
@@ -1467,7 +1467,7 @@ ParsedTfOperationPtr TfParser::ParseDepthwiseConv2D(const tensorflow::NodeDef& n
 
 TensorInfo OutputShapeOfExpandDims(const tensorflow::NodeDef& nodeDef, TensorInfo inputTensorInfo)
 {
-    BOOST_ASSERT(nodeDef.op() == "ExpandDims");
+    ARMNN_ASSERT(nodeDef.op() == "ExpandDims");
 
     if (inputTensorInfo.GetNumDimensions() > 4) {
         throw ParseException(
@@ -1679,10 +1679,10 @@ bool TfParser::IsSupportedLeakyReluPattern(const tensorflow::NodeDef& mulNodeDef
         size_t otherLayerIndex = (alphaLayerIndex == 0 ? 1 : 0);
         std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(mulNodeDef, 2);
 
-        BOOST_ASSERT(inputs.size() == 2);
-        BOOST_ASSERT((otherLayerIndex == 0 || alphaLayerIndex == 0));
-        BOOST_ASSERT((otherLayerIndex == 1 || alphaLayerIndex == 1));
-        BOOST_ASSERT(((otherLayerIndex + alphaLayerIndex) == 1));
+        ARMNN_ASSERT(inputs.size() == 2);
+        ARMNN_ASSERT((otherLayerIndex == 0 || alphaLayerIndex == 0));
+        ARMNN_ASSERT((otherLayerIndex == 1 || alphaLayerIndex == 1));
+        ARMNN_ASSERT(((otherLayerIndex + alphaLayerIndex) == 1));
 
         if (inputs[otherLayerIndex].m_IndexedValue->GetNode().name() == otherNodeDef.name())
         {
@@ -1744,7 +1744,7 @@ ParsedTfOperationPtr TfParser::ParseMaximum(const tensorflow::NodeDef& nodeDef,
         IsSupportedLeakyReluPattern(inputNode1, 0, inputs[0], &outputOfLeakyRelu, desc) ||
         IsSupportedLeakyReluPattern(inputNode1, 1, inputs[0], &outputOfLeakyRelu, desc))
     {
-        BOOST_ASSERT(outputOfLeakyRelu != nullptr);
+        ARMNN_ASSERT(outputOfLeakyRelu != nullptr);
 
         IConnectableLayer* const layer = m_Network->AddActivationLayer(desc, nodeDef.name().c_str());
         outputOfLeakyRelu->Connect(layer->GetInputSlot(0));
@@ -2091,7 +2091,7 @@ ParsedTfOperationPtr TfParser::ParseTranspose(const tensorflow::NodeDef& nodeDef
     const auto desc              = TransposeDescriptor(permutationVector);
 
     auto* layer = m_Network->AddTransposeLayer(desc, nodeDef.name().c_str());
-    BOOST_ASSERT(layer);
+    ARMNN_ASSERT(layer);
 
     input0Slot->Connect(layer->GetInputSlot(0));
 
@@ -2462,7 +2462,7 @@ ParsedTfOperationPtr TfParser::ParseResizeBilinear(const tensorflow::NodeDef& no
 
 TensorInfo OutputShapeOfSqueeze(const tensorflow::NodeDef& nodeDef, TensorInfo inputTensorInfo)
 {
-    BOOST_ASSERT(nodeDef.op() == "Squeeze");
+    ARMNN_ASSERT(nodeDef.op() == "Squeeze");
     tensorflow::DataType tfDataType = ReadMandatoryNodeTypeAttribute(nodeDef, "T");
 
     DataType type;
@@ -2598,7 +2598,7 @@ public:
 
     void CreateLayerDeferred() override
     {
-        BOOST_ASSERT(m_Layer == nullptr);
+        ARMNN_ASSERT(m_Layer == nullptr);
         m_Layer = m_Parser->AddFullyConnectedLayer(m_Node, nullptr, m_Node.name().c_str());
     }
 };
@@ -2681,7 +2681,7 @@ public:
 
     void CreateLayerDeferred() override
     {
-        BOOST_ASSERT(m_Layer == nullptr);
+        ARMNN_ASSERT(m_Layer == nullptr);
         m_Layer = m_Parser->AddMultiplicationLayer(m_Node);
     }
 };
@@ -3393,7 +3393,7 @@ IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& m
     }
     layer = m_Network->AddFullyConnectedLayer(desc, weights, optionalBiases, armnnLayerName);
 
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     inputNode->ResolveArmnnOutputSlot(inputIdx).Connect(layer->GetInputSlot(0));
     unsigned int batches = inputNode->ResolveArmnnOutputSlot(inputIdx).GetTensorInfo().GetShape()[0];

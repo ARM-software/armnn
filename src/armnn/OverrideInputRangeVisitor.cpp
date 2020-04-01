@@ -9,8 +9,6 @@
 
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/assert.hpp>
-
 namespace armnn
 {
 

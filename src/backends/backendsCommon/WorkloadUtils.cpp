@@ -13,8 +13,8 @@ namespace armnn
 armnn::ConstTensor PermuteTensor(const ConstCpuTensorHandle* tensor,
                                  const PermutationVector& permutationVector, void* permuteBuffer)
 {
-    BOOST_ASSERT_MSG(tensor, "Invalid input tensor");
-    BOOST_ASSERT_MSG(permuteBuffer, "Invalid permute buffer");
+    ARMNN_ASSERT_MSG(tensor, "Invalid input tensor");
+    ARMNN_ASSERT_MSG(permuteBuffer, "Invalid permute buffer");
 
     TensorInfo tensorInfo = tensor->GetTensorInfo();
 
@@ -133,8 +133,8 @@ armnn::ConstTensor ConvertWeightTensorFromArmnnToAcl(const ConstCpuTensorHandle*
                                                      DataLayout dataLayout,
                                                      void* permuteBuffer)
 {
-    BOOST_ASSERT_MSG(weightTensor, "Invalid input tensor");
-    BOOST_ASSERT_MSG(permuteBuffer, "Invalid permute buffer");
+    ARMNN_ASSERT_MSG(weightTensor, "Invalid input tensor");
+    ARMNN_ASSERT_MSG(permuteBuffer, "Invalid permute buffer");
 
     auto multiplier    = weightTensor->GetTensorInfo().GetShape()[0];
     auto inputChannels = weightTensor->GetTensorInfo().GetShape()[1];

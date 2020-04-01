@@ -13,6 +13,7 @@
 
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Logging.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
@@ -22,7 +23,6 @@
 #include <LabelsAndEventClasses.hpp>
 
 #include <boost/polymorphic_cast.hpp>
-#include <boost/assert.hpp>
 #include <boost/format.hpp>
 
 namespace armnn
@@ -55,7 +55,7 @@ void AddLayerStructure(std::unique_ptr<TimelineUtilityMethods>& timelineUtils,
     for (auto&& input : layer.GetInputSlots())
     {
         const IOutputSlot* source = input.GetConnectedOutputSlot();
-        BOOST_ASSERT(source != NULL);
+        ARMNN_ASSERT(source != NULL);
         timelineUtils->CreateConnectionRelationship(ProfilingRelationshipType::RetentionLink,
                                                     source->GetOwningLayerGuid(),
                                                     layer.GetGuid());
@@ -304,7 +304,7 @@ TensorInfo LoadedNetwork::GetInputTensorInfo(LayerBindingId layerId) const
 {
     for (auto&& inputLayer : m_OptimizedNetwork->GetGraph().GetInputLayers())
     {
-        BOOST_ASSERT_MSG(inputLayer->GetNumOutputSlots() == 1, "Input layer should have exactly 1 output slot");
+        ARMNN_ASSERT_MSG(inputLayer->GetNumOutputSlots() == 1, "Input layer should have exactly 1 output slot");
         if (inputLayer->GetBindingId() == layerId)
         {
             return inputLayer->GetOutputSlot(0).GetTensorInfo();
@@ -318,8 +318,8 @@ TensorInfo LoadedNetwork::GetOutputTensorInfo(LayerBindingId layerId) const
 {
     for (auto&& outputLayer : m_OptimizedNetwork->GetGraph().GetOutputLayers())
     {
-        BOOST_ASSERT_MSG(outputLayer->GetNumInputSlots() == 1, "Output layer should have exactly 1 input slot");
-        BOOST_ASSERT_MSG(outputLayer->GetInputSlot(0).GetConnection(), "Input slot on Output layer must be connected");
+        ARMNN_ASSERT_MSG(outputLayer->GetNumInputSlots() == 1, "Output layer should have exactly 1 input slot");
+        ARMNN_ASSERT_MSG(outputLayer->GetInputSlot(0).GetConnection(), "Input slot on Output layer must be connected");
         if (outputLayer->GetBindingId() == layerId)
         {
             return outputLayer->GetInputSlot(0).GetConnection()->GetTensorInfo();
@@ -346,10 +346,10 @@ const IWorkloadFactory& LoadedNetwork::GetWorkloadFactory(const Layer& layer) co
 
     workloadFactory = it->second.first.get();
 
-    BOOST_ASSERT_MSG(workloadFactory, "No workload factory");
+    ARMNN_ASSERT_MSG(workloadFactory, "No workload factory");
 
     std::string reasonIfUnsupported;
-    BOOST_ASSERT_MSG(IWorkloadFactory::IsLayerSupported(layer, {}, reasonIfUnsupported),
+    ARMNN_ASSERT_MSG(IWorkloadFactory::IsLayerSupported(layer, {}, reasonIfUnsupported),
         "Factory does not support layer");
     IgnoreUnused(reasonIfUnsupported);
     return *workloadFactory;
@@ -540,11 +540,11 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
     inputQueueDescriptor.m_Inputs.push_back(tensorHandle);
     info.m_InputTensorInfos.push_back(tensorInfo);
 
-    BOOST_ASSERT_MSG(layer.GetNumOutputSlots() == 1, "Can only handle Input Layer with one output");
+    ARMNN_ASSERT_MSG(layer.GetNumOutputSlots() == 1, "Can only handle Input Layer with one output");
     const OutputHandler& handler = layer.GetOutputHandler();
     const TensorInfo& outputTensorInfo = handler.GetTensorInfo();
     ITensorHandle* outputTensorHandle = handler.GetData();
-    BOOST_ASSERT_MSG(outputTensorHandle != nullptr,
+    ARMNN_ASSERT_MSG(outputTensorHandle != nullptr,
                      "Data should have been allocated.");
     inputQueueDescriptor.m_Outputs.push_back(outputTensorHandle);
     info.m_OutputTensorInfos.push_back(outputTensorInfo);
@@ -574,7 +574,7 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
         // Create a mem copy workload for input since we did not import
         std::unique_ptr<IWorkload> inputWorkload = std::make_unique<CopyMemGenericWorkload>(inputQueueDescriptor, info);
 
-        BOOST_ASSERT_MSG(inputWorkload, "No input workload created");
+        ARMNN_ASSERT_MSG(inputWorkload, "No input workload created");
 
         std::unique_ptr<TimelineUtilityMethods> timelineUtils =
                             TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
@@ -607,14 +607,14 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
     outputQueueDescriptor.m_Outputs.push_back(tensorHandle);
     info.m_OutputTensorInfos.push_back(tensorInfo);
 
-    BOOST_ASSERT_MSG(layer.GetNumInputSlots() == 1, "Output Layer should have exactly one input.");
+    ARMNN_ASSERT_MSG(layer.GetNumInputSlots() == 1, "Output Layer should have exactly one input.");
 
     // Gets the output handler from the previous node.
     const OutputHandler& outputHandler = layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetOutputHandler();
 
     const TensorInfo& inputTensorInfo = outputHandler.GetTensorInfo();
     ITensorHandle* inputTensorHandle = outputHandler.GetData();
-    BOOST_ASSERT_MSG(inputTensorHandle != nullptr, "Data should have been allocated.");
+    ARMNN_ASSERT_MSG(inputTensorHandle != nullptr, "Data should have been allocated.");
 
     // Try import the output tensor.
     // Note: We can only import the output pointer if all of the following  hold true:
@@ -641,7 +641,7 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
                     syncDesc.m_Inputs.push_back(inputTensorHandle);
                     info.m_InputTensorInfos.push_back(inputTensorInfo);
                     auto syncWorkload = std::make_unique<SyncMemGenericWorkload>(syncDesc, info);
-                    BOOST_ASSERT_MSG(syncWorkload, "No sync workload created");
+                    ARMNN_ASSERT_MSG(syncWorkload, "No sync workload created");
                     m_OutputQueue.push_back(move(syncWorkload));
                 }
                 else
@@ -667,7 +667,7 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
 
         std::unique_ptr<IWorkload> outputWorkload =
             std::make_unique<CopyMemGenericWorkload>(outputQueueDescriptor, info);
-        BOOST_ASSERT_MSG(outputWorkload, "No output workload created");
+        ARMNN_ASSERT_MSG(outputWorkload, "No output workload created");
 
         std::unique_ptr<TimelineUtilityMethods> timelineUtils =
                                 TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);

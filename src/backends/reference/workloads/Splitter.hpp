@@ -8,7 +8,7 @@
 #include "RefWorkloadUtils.hpp"
 #include <backendsCommon/WorkloadData.hpp>
 #include <armnn/Tensor.hpp>
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 namespace armnn
 {
@@ -38,7 +38,7 @@ void Splitter(const SplitterQueueDescriptor& data)
 
             //Split view extents are defined by the size of (the corresponding) input tensor.
             const TensorInfo& outputInfo = GetTensorInfo(data.m_Outputs[viewIdx]);
-            BOOST_ASSERT(outputInfo.GetNumDimensions() == inputInfo0.GetNumDimensions());
+            ARMNN_ASSERT(outputInfo.GetNumDimensions() == inputInfo0.GetNumDimensions());
 
             // Check all dimensions to see if this element is inside the given input view.
             bool insideView = true;
@@ -67,10 +67,10 @@ void Splitter(const SplitterQueueDescriptor& data)
 
                 //We are within the view, to copy input data to the output corresponding to this view.
                 DataType* outputData = GetOutputTensorData<DataType>(viewIdx, data);
-                BOOST_ASSERT(outputData);
+                ARMNN_ASSERT(outputData);
 
                 const DataType* inputData = GetInputTensorData<DataType>(0, data);
-                BOOST_ASSERT(inputData);
+                ARMNN_ASSERT(inputData);
 
                 outputData[outIndex] = inputData[index];
             }

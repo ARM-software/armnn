@@ -245,7 +245,7 @@ std::vector<DebugLayer*> InsertDebugLayerAfter(Graph& graph, Layer& layer)
             graph.InsertNewLayer<DebugLayer>(*outputSlot, debugName.c_str());
 
         // Sets output tensor info for the debug layer.
-        BOOST_ASSERT(debugLayer->GetInputSlot(0).GetConnectedOutputSlot() == &(*outputSlot));
+        ARMNN_ASSERT(debugLayer->GetInputSlot(0).GetConnectedOutputSlot() == &(*outputSlot));
         TensorInfo debugInfo = debugLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
 
         debugLayer->GetOutputSlot().SetTensorInfo(debugInfo);

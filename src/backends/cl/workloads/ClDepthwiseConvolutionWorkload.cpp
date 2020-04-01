@@ -45,7 +45,7 @@ arm_compute::Status ClDepthwiseConvolutionWorkloadValidate(const TensorInfo& inp
 
     if (descriptor.m_BiasEnabled)
     {
-        BOOST_ASSERT(biases.has_value());
+        ARMNN_ASSERT(biases.has_value());
 
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         optionalAclBiasesInfo = &aclBiasesInfo;
@@ -125,7 +125,7 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
         arm_compute::ActivationLayerInfo(),
         aclDilationInfo);
 
-    BOOST_ASSERT(m_DepthwiseConvolutionLayer);
+    ARMNN_ASSERT(m_DepthwiseConvolutionLayer);
 
     ScopedCpuTensorHandle weightsPermutedHandle(weightPermuted);
     InitializeArmComputeClTensorData(*m_KernelTensor, &weightsPermutedHandle);
@@ -148,7 +148,7 @@ void ClDepthwiseConvolutionWorkload::FreeUnusedTensors()
 void ClDepthwiseConvolutionWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClDepthwiseConvolutionWorkload_Execute");
-    BOOST_ASSERT(m_DepthwiseConvolutionLayer);
+    ARMNN_ASSERT(m_DepthwiseConvolutionLayer);
 
     RunClFunction(*m_DepthwiseConvolutionLayer, CHECK_LOCATION());
 }

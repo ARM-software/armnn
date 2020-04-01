@@ -9,7 +9,7 @@
 
 #include <armnnUtils/DataLayoutIndexed.hpp>
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 namespace armnn
 {
@@ -25,7 +25,7 @@ public:
         , m_Data(data)
         , m_DataLayout(dataLayout)
     {
-        BOOST_ASSERT(m_Shape.GetNumDimensions() == 4);
+        ARMNN_ASSERT(m_Shape.GetNumDimensions() == 4);
     }
 
     DataType& Get(unsigned int b, unsigned int c, unsigned int h, unsigned int w) const

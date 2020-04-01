@@ -13,8 +13,9 @@
 #include "GraphTopologicalSort.hpp"
 #include "VerificationHelpers.hpp"
 
+#include <armnn/utility/Assert.hpp>
+
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/assert.hpp>
 #include <boost/format.hpp>
 
 // Caffe
@@ -363,7 +364,7 @@ vector<const LayerParameter*> CaffeParserBase::GetInputs(const LayerParameter& l
 
 void CaffeParserBase::ParseInputLayer(const LayerParameter& layerParam)
 {
-    BOOST_ASSERT(layerParam.type() == "Input");
+    ARMNN_ASSERT(layerParam.type() == "Input");
     ValidateNumInputsOutputs(layerParam, 0, 1);
 
     const InputParameter& param = layerParam.input_param();
@@ -421,7 +422,7 @@ void CaffeParserBase::AddConvLayerWithSplits(const caffe::LayerParameter& layerP
                                              unsigned int kernelW,
                                              unsigned int kernelH)
 {
-    BOOST_ASSERT(layerParam.type() == "Convolution");
+    ARMNN_ASSERT(layerParam.type() == "Convolution");
     ValidateNumInputsOutputs(layerParam, 1, 1);
 
     ConvolutionParameter convParam = layerParam.convolution_param();
@@ -429,8 +430,8 @@ void CaffeParserBase::AddConvLayerWithSplits(const caffe::LayerParameter& layerP
     const unsigned int numGroups = convParam.has_group() ? convParam.group() : 1;
 
     // asusme these were already verified by the caller ParseConvLayer() function
-    BOOST_ASSERT(numGroups < inputShape.dim(1));
-    BOOST_ASSERT(numGroups > 1);
+    ARMNN_ASSERT(numGroups < inputShape.dim(1));
+    ARMNN_ASSERT(numGroups > 1);
 
     // Handle grouping
     armnn::IOutputSlot& inputConnection = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0));
@@ -613,7 +614,7 @@ void CaffeParserBase::AddConvLayerWithDepthwiseConv(const caffe::LayerParameter&
                                                     unsigned int kernelW,
                                                     unsigned int kernelH)
 {
-    BOOST_ASSERT(layerParam.type() == "Convolution");
+    ARMNN_ASSERT(layerParam.type() == "Convolution");
     ValidateNumInputsOutputs(layerParam, 1, 1);
 
     ConvolutionParameter convParam  = layerParam.convolution_param();
@@ -711,7 +712,7 @@ void CaffeParserBase::ParseConvLayer(const LayerParameter& layerParam)
     // Not Available ArmNN Interface Parameters
     // * Rounding policy;
 
-    BOOST_ASSERT(layerParam.type() == "Convolution");
+    ARMNN_ASSERT(layerParam.type() == "Convolution");
     ValidateNumInputsOutputs(layerParam, 1, 1);
 
     ConvolutionParameter convParam = layerParam.convolution_param();

@@ -7,9 +7,9 @@
 #include "InferenceTest.hpp"
 #include "DeepSpeechV1Database.hpp"
 
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 
@@ -40,13 +40,13 @@ public:
     {
         armnn::IgnoreUnused(options);
         const std::vector<float>& output1 = boost::get<std::vector<float>>(this->GetOutputs()[0]); // logits
-        BOOST_ASSERT(output1.size() == k_OutputSize1);
+        ARMNN_ASSERT(output1.size() == k_OutputSize1);
 
         const std::vector<float>& output2 = boost::get<std::vector<float>>(this->GetOutputs()[1]); // new_state_c
-        BOOST_ASSERT(output2.size() == k_OutputSize2);
+        ARMNN_ASSERT(output2.size() == k_OutputSize2);
 
         const std::vector<float>& output3 = boost::get<std::vector<float>>(this->GetOutputs()[2]); // new_state_h
-        BOOST_ASSERT(output3.size() == k_OutputSize3);
+        ARMNN_ASSERT(output3.size() == k_OutputSize3);
 
         // Check each output to see whether it is the expected value
         for (unsigned int j = 0u; j < output1.size(); j++)

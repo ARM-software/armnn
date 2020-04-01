@@ -22,6 +22,7 @@
 #include <armnn/TypesUtils.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Logging.hpp>
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
 #include <ProfilingService.hpp>
@@ -33,7 +34,6 @@
 #include <vector>
 #include <algorithm>
 
-#include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/converter_policies.hpp>
 #include <boost/cast.hpp>
@@ -473,7 +473,7 @@ OptimizationResult AssignBackends(OptimizedNetwork* optNetObjPtr,
                 }
                 else
                 {
-                    BOOST_ASSERT_MSG(res.IsWarningOnly(), "OptimizationResult in unexpected state.");
+                    ARMNN_ASSERT_MSG(res.IsWarningOnly(), "OptimizationResult in unexpected state.");
                 }
             }
         }
@@ -527,7 +527,7 @@ BackendsMap CreateSupportedBackends(TensorHandleFactoryRegistry& handleFactoryRe
     {
         auto backendFactory = backendRegistry.GetFactory(selectedBackend);
         auto backendObjPtr = backendFactory();
-        BOOST_ASSERT(backendObjPtr);
+        ARMNN_ASSERT(backendObjPtr);
 
         backendObjPtr->RegisterTensorHandleFactories(handleFactoryRegistry);
 
@@ -542,7 +542,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
                                              BackendsMap& backends,
                                              Optional<std::vector<std::string>&> errMessages)
 {
-    BOOST_ASSERT(optNetObjPtr);
+    ARMNN_ASSERT(optNetObjPtr);
 
     OptimizationResult result;
 
@@ -553,7 +553,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
     for (auto&& selectedBackend : backendSettings.m_SelectedBackends)
     {
         auto backendObjPtr = backends.find(selectedBackend)->second.get();
-        BOOST_ASSERT(backendObjPtr);
+        ARMNN_ASSERT(backendObjPtr);
 
         // Select sub-graphs based on backend
         SubgraphViewSelector::Subgraphs subgraphs =
@@ -576,7 +576,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
         {
             // Try to optimize the current sub-graph
             OptimizationViews optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraph);
-            BOOST_ASSERT(optimizationViews.Validate(*subgraph));
+            ARMNN_ASSERT(optimizationViews.Validate(*subgraph));
 
             // Optimization attempted, check the resulting optimized sub-graph
             for (auto& substitution : optimizationViews.GetSubstitutions())
@@ -589,7 +589,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
                 // Assign the current backend to the optimized sub-graph
                 std::for_each(replacementSubgraph.begin(), replacementSubgraph.end(), [&selectedBackend](Layer* l)
                     {
-                        BOOST_ASSERT(l);
+                        ARMNN_ASSERT(l);
                         l->SetBackendId(selectedBackend);
                     });
             }
@@ -660,7 +660,7 @@ ITensorHandleFactory::FactoryId CalculateSlotOptionForInput(BackendsMap& backend
                                                             TensorHandleFactoryRegistry& registry)
 {
     Layer& layer = slot.GetOwningLayer();
-    BOOST_ASSERT(layer.GetType() == LayerType::Input);
+    ARMNN_ASSERT(layer.GetType() == LayerType::Input);
 
     // Explicitly select the tensorhandle factory for InputLayer because the rules for it are slightly different. It
     // doesn't matter which backend it is assigned to because they all use the same implementation, which
@@ -686,7 +686,7 @@ ITensorHandleFactory::FactoryId CalculateSlotOptionForInput(BackendsMap& backend
         const Layer& connectedLayer = connection->GetOwningLayer();
 
         auto toBackend = backends.find(connectedLayer.GetBackendId());
-        BOOST_ASSERT_MSG(toBackend != backends.end(), "Backend id not found for the connected layer");
+        ARMNN_ASSERT_MSG(toBackend != backends.end(), "Backend id not found for the connected layer");
 
         if (!toBackend->second.get()->SupportsTensorAllocatorAPI())
         {
@@ -802,7 +802,7 @@ ITensorHandleFactory::FactoryId CalculateSlotOption(BackendsMap& backends,
         const Layer& connectedLayer = connection->GetOwningLayer();
 
         auto toBackend = backends.find(connectedLayer.GetBackendId());
-        BOOST_ASSERT_MSG(toBackend != backends.end(), "Backend id not found for the connected layer");
+        ARMNN_ASSERT_MSG(toBackend != backends.end(), "Backend id not found for the connected layer");
 
         auto dstPrefs = toBackend->second.get()->GetHandleFactoryPreferences();
         for (auto&& src : srcPrefs)
@@ -863,7 +863,7 @@ EdgeStrategy CalculateEdgeStrategy(BackendsMap& backends,
                                    TensorHandleFactoryRegistry& registry)
 {
     auto toBackend = backends.find(connectedLayer.GetBackendId());
-    BOOST_ASSERT_MSG(toBackend != backends.end(), "Backend id not found for the connected layer");
+    ARMNN_ASSERT_MSG(toBackend != backends.end(), "Backend id not found for the connected layer");
 
     auto dstPrefs = toBackend->second.get()->GetHandleFactoryPreferences();
 
@@ -942,11 +942,11 @@ OptimizationResult SelectTensorHandleStrategy(Graph& optGraph,
 
     optGraph.ForEachLayer([&backends, &registry, &result, &errMessages](Layer* layer)
     {
-        BOOST_ASSERT(layer);
+        ARMNN_ASSERT(layer);
 
         // Lets make sure the backend is in our list of supported backends. Something went wrong during backend
         // assignment if this check fails
-        BOOST_ASSERT(backends.find(layer->GetBackendId()) != backends.end());
+        ARMNN_ASSERT(backends.find(layer->GetBackendId()) != backends.end());
 
         // Check each output separately
         for (unsigned int slotIdx = 0; slotIdx < layer->GetNumOutputSlots(); slotIdx++)
@@ -1132,7 +1132,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     {
         auto factoryFun = BackendRegistryInstance().GetFactory(chosenBackend);
         auto backendPtr = factoryFun();
-        BOOST_ASSERT(backendPtr.get() != nullptr);
+        ARMNN_ASSERT(backendPtr.get() != nullptr);
 
         ARMNN_NO_DEPRECATE_WARN_BEGIN
         auto backendSpecificOptimizations = backendPtr->GetOptimizations();

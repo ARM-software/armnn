@@ -70,7 +70,7 @@ std::unique_ptr<IWorkload> MakeWorkloadHelper(const QueueDescriptorType& descrip
         case DataType::QSymmS16:
             return nullptr;
         default:
-            BOOST_ASSERT_MSG(false, "Unknown DataType.");
+            ARMNN_ASSERT_MSG(false, "Unknown DataType.");
             return nullptr;
     }
 }

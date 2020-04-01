@@ -6,9 +6,10 @@
 #include "NeonTimer.hpp"
 #include "NeonInterceptorScheduler.hpp"
 
+#include <armnn/utility/Assert.hpp>
+
 #include <memory>
 
-#include <boost/assert.hpp>
 #include <boost/format.hpp>
 
 namespace armnn
@@ -21,7 +22,7 @@ static thread_local auto g_Interceptor = std::make_shared<NeonInterceptorSchedul
 void NeonTimer::Start()
 {
     m_Kernels.clear();
-    BOOST_ASSERT(g_Interceptor->GetKernels() == nullptr);
+    ARMNN_ASSERT(g_Interceptor->GetKernels() == nullptr);
     g_Interceptor->SetKernels(&m_Kernels);
 
     m_RealSchedulerType = arm_compute::Scheduler::get_type();

@@ -7,6 +7,7 @@
 #include "ClContextControl.hpp"
 
 #include <armnn/Logging.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <arm_compute/core/CL/OpenCL.h>
 #include <arm_compute/core/CL/CLKernelLibrary.h>
@@ -184,7 +185,7 @@ ClBackendContext::ClBackendContext(const IRuntime::CreationOptions& options)
                             return TuningLevel::Exhaustive;
                         default:
                         {
-                            BOOST_ASSERT_MSG(false, "Tuning level not recognised.");
+                            ARMNN_ASSERT_MSG(false, "Tuning level not recognised.");
                             return TuningLevel::None;
                         }
                     }

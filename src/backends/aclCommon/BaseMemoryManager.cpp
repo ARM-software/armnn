@@ -19,7 +19,7 @@ namespace armnn
 BaseMemoryManager::BaseMemoryManager(std::unique_ptr<arm_compute::IAllocator> alloc,
                                      MemoryAffinity memoryAffinity)
 {
-    BOOST_ASSERT(alloc);
+    ARMNN_ASSERT(alloc);
     m_Allocator = std::move(alloc);
 
     m_IntraLayerMemoryMgr = CreateArmComputeMemoryManager(memoryAffinity);
@@ -51,30 +51,30 @@ void BaseMemoryManager::Acquire()
     static const size_t s_NumPools = 1;
 
     // Allocate memory pools for intra-layer memory manager
-    BOOST_ASSERT(m_IntraLayerMemoryMgr);
+    ARMNN_ASSERT(m_IntraLayerMemoryMgr);
     m_IntraLayerMemoryMgr->populate(*m_Allocator, s_NumPools);
 
     // Allocate memory pools for inter-layer memory manager
-    BOOST_ASSERT(m_InterLayerMemoryMgr);
+    ARMNN_ASSERT(m_InterLayerMemoryMgr);
     m_InterLayerMemoryMgr->populate(*m_Allocator, s_NumPools);
 
     // Acquire inter-layer memory group. NOTE: This has to come after allocating the pools
-    BOOST_ASSERT(m_InterLayerMemoryGroup);
+    ARMNN_ASSERT(m_InterLayerMemoryGroup);
     m_InterLayerMemoryGroup->acquire();
 }
 
 void BaseMemoryManager::Release()
 {
     // Release inter-layer memory group. NOTE: This has to come before releasing the pools
-    BOOST_ASSERT(m_InterLayerMemoryGroup);
+    ARMNN_ASSERT(m_InterLayerMemoryGroup);
     m_InterLayerMemoryGroup->release();
 
     // Release memory pools managed by intra-layer memory manager
-    BOOST_ASSERT(m_IntraLayerMemoryMgr);
+    ARMNN_ASSERT(m_IntraLayerMemoryMgr);
     m_IntraLayerMemoryMgr->clear();
 
     // Release memory pools managed by inter-layer memory manager
-    BOOST_ASSERT(m_InterLayerMemoryMgr);
+    ARMNN_ASSERT(m_InterLayerMemoryMgr);
     m_InterLayerMemoryMgr->clear();
 }
 #else

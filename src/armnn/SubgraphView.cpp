@@ -28,10 +28,10 @@ void AssertIfNullsOrDuplicates(const C& container, const std::string& errorMessa
         IgnoreUnused(errorMessage);
 
         // Check if the item is valid
-        BOOST_ASSERT_MSG(i, errorMessage.c_str());
+        ARMNN_ASSERT_MSG(i, errorMessage.c_str());
 
         // Check if a duplicate has been found
-        BOOST_ASSERT_MSG(duplicateSet.find(i) == duplicateSet.end(), errorMessage.c_str());
+        ARMNN_ASSERT_MSG(duplicateSet.find(i) == duplicateSet.end(), errorMessage.c_str());
 
         duplicateSet.insert(i);
     });

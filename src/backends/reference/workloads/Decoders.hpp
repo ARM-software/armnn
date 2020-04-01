@@ -10,7 +10,7 @@
 #include <armnnUtils/FloatingPointConverter.hpp>
 #include <armnnUtils/TensorUtils.hpp>
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 namespace armnn
 {
@@ -142,7 +142,7 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
         }
         default:
         {
-            BOOST_ASSERT_MSG(false, "Unsupported Data Type!");
+            ARMNN_ASSERT_MSG(false, "Unsupported Data Type!");
             break;
         }
     }

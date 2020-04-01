@@ -7,7 +7,7 @@
 #include <armnn/Logging.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/assert.hpp>
+
 #include <fstream>
 #include <vector>
 

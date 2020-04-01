@@ -5,8 +5,8 @@
 
 #include "DetectionPostProcess.hpp"
 
+#include <armnn/utility/Assert.hpp>
 
-#include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <algorithm>
@@ -213,8 +213,8 @@ void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
         // xmax
         boxCorners[indexW] = xCentre + halfW;
 
-        BOOST_ASSERT(boxCorners[indexY] < boxCorners[indexH]);
-        BOOST_ASSERT(boxCorners[indexX] < boxCorners[indexW]);
+        ARMNN_ASSERT(boxCorners[indexY] < boxCorners[indexH]);
+        ARMNN_ASSERT(boxCorners[indexX] < boxCorners[indexW]);
     }
 
     unsigned int numClassesWithBg = desc.m_NumClasses + 1;

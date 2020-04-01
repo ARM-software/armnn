@@ -62,7 +62,7 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
                 m_CommandHandlerRegistry.GetFunctor(packet.GetPacketFamily(), 
                                                     packet.GetPacketId(), 
                                                     version.GetEncodedValue());
-            BOOST_ASSERT(commandHandlerFunctor);
+            ARMNN_ASSERT(commandHandlerFunctor);
             commandHandlerFunctor->operator()(packet);
         }
         catch (const armnn::TimeoutException&)

@@ -9,7 +9,7 @@
 
 #include <armnn/Types.hpp>
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <cstring>
 
@@ -24,10 +24,10 @@ void RefConstantWorkload::PostAllocationConfigure()
 {
     const ConstantQueueDescriptor& data = this->m_Data;
 
-    BOOST_ASSERT(data.m_LayerOutput != nullptr);
+    ARMNN_ASSERT(data.m_LayerOutput != nullptr);
 
     const TensorInfo& outputInfo = GetTensorInfo(data.m_Outputs[0]);
-    BOOST_ASSERT(data.m_LayerOutput->GetTensorInfo().GetNumBytes() == outputInfo.GetNumBytes());
+    ARMNN_ASSERT(data.m_LayerOutput->GetTensorInfo().GetNumBytes() == outputInfo.GetNumBytes());
 
     memcpy(GetOutputTensorData<void>(0, data), data.m_LayerOutput->GetConstTensor<void>(),
         outputInfo.GetNumBytes());

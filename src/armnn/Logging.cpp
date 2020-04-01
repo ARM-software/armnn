@@ -6,6 +6,7 @@
 #include <armnn/Logging.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/Utils.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #if defined(_MSC_VER)
 #ifndef NOMINMAX
@@ -19,7 +20,6 @@
 #include <android/log.h>
 #endif
 
-#include <boost/assert.hpp>
 #include <iostream>
 
 namespace armnn
@@ -54,7 +54,7 @@ void SetLogFilter(LogSeverity level)
             SimpleLogger<LogSeverity::Fatal>::Get().Enable(true);
             break;
         default:
-            BOOST_ASSERT(false);
+            ARMNN_ASSERT(false);
     }
 }
 

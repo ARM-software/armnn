@@ -111,7 +111,7 @@ void ConcatLayer::CreateTensors(const FactoryType& factory)
                 OutputSlot* slot = currentLayer->GetInputSlot(i).GetConnectedOutputSlot();
                 OutputHandler& outputHandler = slot->GetOutputHandler();
 
-                BOOST_ASSERT_MSG(subTensor, "ConcatLayer: Expected a valid sub-tensor for substitution.");
+                ARMNN_ASSERT_MSG(subTensor, "ConcatLayer: Expected a valid sub-tensor for substitution.");
                 outputHandler.SetData(std::move(subTensor));
 
                 Layer& inputLayer = slot->GetOwningLayer();
@@ -141,7 +141,7 @@ void ConcatLayer::CreateTensorHandles(const TensorHandleFactoryRegistry& registr
     else
     {
         ITensorHandleFactory* handleFactory = registry.GetFactory(factoryId);
-        BOOST_ASSERT(handleFactory);
+        ARMNN_ASSERT(handleFactory);
         CreateTensors(*handleFactory);
     }
 }
@@ -153,7 +153,7 @@ ConcatLayer* ConcatLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> ConcatLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    BOOST_ASSERT(inputShapes.size() == m_Param.GetNumViews());
+    ARMNN_ASSERT(inputShapes.size() == m_Param.GetNumViews());
 
     unsigned int numDims = m_Param.GetNumDimensions();
     for (unsigned int i=0; i< inputShapes.size(); i++)
@@ -259,7 +259,7 @@ void ConcatLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShapes = InferOutputShapes(inputShapes);
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    ARMNN_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "ConcatLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",

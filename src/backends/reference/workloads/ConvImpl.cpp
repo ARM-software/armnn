@@ -5,7 +5,7 @@
 
 #include "ConvImpl.hpp"
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <cmath>
 #include <limits>
@@ -15,7 +15,7 @@ namespace armnn
 
 QuantizedMultiplierSmallerThanOne::QuantizedMultiplierSmallerThanOne(float multiplier)
 {
-    BOOST_ASSERT(multiplier >= 0.0f && multiplier < 1.0f);
+    ARMNN_ASSERT(multiplier >= 0.0f && multiplier < 1.0f);
     if (multiplier == 0.0f)
     {
         m_Multiplier = 0;
@@ -26,14 +26,14 @@ QuantizedMultiplierSmallerThanOne::QuantizedMultiplierSmallerThanOne(float multi
         const double q = std::frexp(multiplier, &m_RightShift);
         m_RightShift = -m_RightShift;
         int64_t qFixed = static_cast<int64_t>(std::round(q * (1ll << 31)));
-        BOOST_ASSERT(qFixed <= (1ll << 31));
+        ARMNN_ASSERT(qFixed <= (1ll << 31));
         if (qFixed == (1ll << 31))
         {
             qFixed /= 2;
             --m_RightShift;
         }
-        BOOST_ASSERT(m_RightShift >= 0);
-        BOOST_ASSERT(qFixed <= std::numeric_limits<int32_t>::max());
+        ARMNN_ASSERT(m_RightShift >= 0);
+        ARMNN_ASSERT(qFixed <= std::numeric_limits<int32_t>::max());
         m_Multiplier = static_cast<int32_t>(qFixed);
     }
 }
@@ -61,7 +61,7 @@ int32_t QuantizedMultiplierSmallerThanOne::SaturatingRoundingDoublingHighMul(int
 
 int32_t QuantizedMultiplierSmallerThanOne::RoundingDivideByPOT(int32_t x, int exponent)
 {
-    BOOST_ASSERT(exponent >= 0 && exponent <= 31);
+    ARMNN_ASSERT(exponent >= 0 && exponent <= 31);
     int32_t mask = (1 << exponent) - 1;
     int32_t remainder = x & mask;
     int32_t threshold = (mask >> 1) + (x < 0 ? 1 : 0);

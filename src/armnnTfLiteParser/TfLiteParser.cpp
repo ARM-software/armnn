@@ -9,6 +9,7 @@
 #include <armnn/Exceptions.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/TypesUtils.hpp>
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
 // armnnUtils:
@@ -22,7 +23,6 @@
 
 #include <flatbuffers/flexbuffers.h>
 
-#include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/filesystem.hpp>
@@ -131,11 +131,11 @@ void CheckTensor(const TfLiteParser::ModelPtr & model,
 {
     // not checking model, because I assume CHECK_MODEL already run
     // and checked that. An assert would do.
-    BOOST_ASSERT_MSG(model.get() != nullptr, "Expecting a valid model in this function");
+    ARMNN_ASSERT_MSG(model.get() != nullptr, "Expecting a valid model in this function");
 
     // also subgraph index should be checked by CHECK_MODEL so
     // I only add an assert here
-    BOOST_ASSERT_MSG(subgraphIndex < model->subgraphs.size(), "Expecting a valid subgraph index");
+    ARMNN_ASSERT_MSG(subgraphIndex < model->subgraphs.size(), "Expecting a valid subgraph index");
 
     // the tensor index is the only one to check here
     if (tensorIndex >= model->subgraphs[subgraphIndex]->tensors.size())
@@ -435,8 +435,8 @@ CreateConstTensorImpl(TfLiteParser::BufferRawPtr bufferPtr,
                       armnn::Optional<armnn::PermutationVector&> permutationVector)
 {
     IgnoreUnused(tensorPtr);
-    BOOST_ASSERT_MSG(tensorPtr != nullptr, "tensorPtr is null");
-    BOOST_ASSERT_MSG(bufferPtr != nullptr,
+    ARMNN_ASSERT_MSG(tensorPtr != nullptr, "tensorPtr is null");
+    ARMNN_ASSERT_MSG(bufferPtr != nullptr,
         boost::str(
             boost::format("Buffer for buffer:%1% is null") % tensorPtr->buffer).c_str());
 
@@ -543,12 +543,12 @@ void TfLiteParser::AddBroadcastReshapeLayer(size_t subgraphIndex,
                                             IConnectableLayer *layer)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     const auto & subgraphPtr = m_Model->subgraphs[subgraphIndex];
     const auto & operatorPtr = subgraphPtr->operators[operatorIndex];
 
-    BOOST_ASSERT(operatorPtr->inputs.size() > 1);
+    ARMNN_ASSERT(operatorPtr->inputs.size() > 1);
 
     uint32_t reshapedInputId = CHECKED_NON_NEGATIVE(operatorPtr->inputs[0]);
     TensorRawPtr tensorPtr = subgraphPtr->tensors[reshapedInputId].get();
@@ -612,7 +612,7 @@ INetworkPtr TfLiteParser::CreateNetworkFromBinary(const std::vector<uint8_t> & b
 INetworkPtr TfLiteParser::CreateNetworkFromModel()
 {
     m_Network = INetwork::Create();
-    BOOST_ASSERT(m_Model.get() != nullptr);
+    ARMNN_ASSERT(m_Model.get() != nullptr);
 
     bool failedToCreate = false;
     std::stringstream errors;
@@ -710,8 +710,8 @@ void TfLiteParser::RegisterProducerOfTensor(size_t subgraphIndex,
                                             armnn::IOutputSlot* slot)
 {
     CHECK_TENSOR(m_Model, subgraphIndex, tensorIndex);
-    BOOST_ASSERT(m_SubgraphConnections.size() > subgraphIndex);
-    BOOST_ASSERT(m_SubgraphConnections[subgraphIndex].size() > tensorIndex);
+    ARMNN_ASSERT(m_SubgraphConnections.size() > subgraphIndex);
+    ARMNN_ASSERT(m_SubgraphConnections[subgraphIndex].size() > tensorIndex);
 
     TensorSlots & tensorSlots = m_SubgraphConnections[subgraphIndex][tensorIndex];
 
@@ -734,8 +734,8 @@ void TfLiteParser::RegisterConsumerOfTensor(size_t subgraphIndex,
                                             armnn::IInputSlot* slot)
 {
     CHECK_TENSOR(m_Model, subgraphIndex, tensorIndex);
-    BOOST_ASSERT(m_SubgraphConnections.size() > subgraphIndex);
-    BOOST_ASSERT(m_SubgraphConnections[subgraphIndex].size() > tensorIndex);
+    ARMNN_ASSERT(m_SubgraphConnections.size() > subgraphIndex);
+    ARMNN_ASSERT(m_SubgraphConnections[subgraphIndex].size() > tensorIndex);
 
     TensorSlots & tensorSlots = m_SubgraphConnections[subgraphIndex][tensorIndex];
     tensorSlots.inputSlots.push_back(slot);
@@ -878,7 +878,7 @@ void TfLiteParser::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
                                                  layerName.c_str());
     }
 
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -965,7 +965,7 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
                                                           EmptyOptional(),
                                                           layerName.c_str());
     }
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -994,7 +994,7 @@ void TfLiteParser::ParseDequantize(size_t subgraphIndex, size_t operatorIndex)
     auto layerName = boost::str(boost::format("Dequantize:%1%:%2%") % subgraphIndex % operatorIndex);
 
     IConnectableLayer* layer = m_Network->AddDequantizeLayer(layerName.c_str());
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1035,7 +1035,7 @@ void TfLiteParser::ParseTranspose(size_t subgraphIndex, size_t operatorIndex)
 
     layer = m_Network->AddTransposeLayer(desc, layerName.c_str());
 
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1104,7 +1104,7 @@ void TfLiteParser::ParseTransposeConv(size_t subgraphIndex, size_t operatorIndex
                                                       EmptyOptional(),
                                                       layerName.c_str());
 
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1185,7 +1185,7 @@ void TfLiteParser::ParseL2Normalization(size_t subgraphIndex, size_t operatorInd
     auto layerName = boost::str(boost::format("L2Normalization:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddL2NormalizationLayer(desc, layerName.c_str());
 
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1292,7 +1292,7 @@ void TfLiteParser::ParsePool(size_t subgraphIndex,
                 boost::str(boost::format("MaxPool2D:%1%:%2%") % subgraphIndex % operatorIndex);
             break;
         default:
-            BOOST_ASSERT_MSG(false, "Unsupported Pooling Algorithm");
+            ARMNN_ASSERT_MSG(false, "Unsupported Pooling Algorithm");
     }
 
     Pooling2dDescriptor desc;
@@ -1324,7 +1324,7 @@ void TfLiteParser::ParsePool(size_t subgraphIndex,
 
     IConnectableLayer* layer = m_Network->AddPooling2dLayer(desc, layerName.c_str());
 
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1798,7 +1798,7 @@ void TfLiteParser::ParseQuantize(size_t subgraphIndex, size_t operatorIndex)
     auto layerName = boost::str(boost::format("Quantize:%1%:%2%") % subgraphIndex % operatorIndex);
 
     IConnectableLayer* layer = m_Network->AddQuantizeLayer(layerName.c_str());
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -2125,7 +2125,7 @@ void TfLiteParser::ParseConcatenation(size_t subgraphIndex, size_t operatorIndex
     auto layerName = boost::str(boost::format("Concatenation:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddConcatLayer(concatDescriptor, layerName.c_str());
 
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -2198,7 +2198,7 @@ void TfLiteParser::ParseFullyConnected(size_t subgraphIndex, size_t operatorInde
                                                   EmptyOptional(),
                                                   layerName.c_str());
     }
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
 
@@ -2305,7 +2305,7 @@ void TfLiteParser::ParseDetectionPostProcess(size_t subgraphIndex, size_t operat
     IConnectableLayer* layer = m_Network->AddDetectionPostProcessLayer(desc, anchorTensorAndData.first,
                                                                        layerName.c_str());
 
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     // The model does not specify the output shapes.
     // The output shapes are calculated from the max_detection and max_classes_per_detection.
@@ -2362,7 +2362,7 @@ void TfLiteParser::ParsePack(size_t subgraphIndex, size_t operatorIndex)
     auto layerName = boost::str(boost::format("Pack:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddStackLayer(desc, layerName.c_str());
 
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -2504,7 +2504,7 @@ void TfLiteParser::ParseSplit(size_t subgraphIndex, size_t operatorIndex)
     std::vector<unsigned int> axisData(axisTensorInfo.GetNumElements());
     ::memcpy(axisData.data(), axisBufferPtr->data.data(), axisTensorInfo.GetNumBytes());
 
-    BOOST_ASSERT(axisTensorInfo.GetNumElements() == 1);
+    ARMNN_ASSERT(axisTensorInfo.GetNumElements() == 1);
     const unsigned int splitDim = axisData[0];
 
     auto inputDimSize = inputTensorInfo.GetNumDimensions();
@@ -2764,7 +2764,7 @@ void TfLiteParser::RegisterInputSlots(size_t subgraphIndex,
                                       const std::vector<unsigned int>& tensorIndexes)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
     if (tensorIndexes.size() != layer->GetNumInputSlots())
     {
         throw ParseException(
@@ -2791,7 +2791,7 @@ void TfLiteParser::RegisterOutputSlots(size_t subgraphIndex,
                                        const std::vector<unsigned int>& tensorIndexes)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
     if (tensorIndexes.size() != layer->GetNumOutputSlots())
     {
         throw ParseException(

@@ -7,6 +7,7 @@
 
 #include <armnn/ArmNN.hpp>
 #include <armnn/BackendRegistry.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #if defined(ARMNN_SERIALIZER)
 #include "armnnDeserializer/IDeserializer.hpp"
@@ -179,7 +180,7 @@ public:
                                      std::vector<armnn::BindingPointInfo>& outputBindings)
     {
         auto parser(IParser::Create());
-        BOOST_ASSERT(parser);
+        ARMNN_ASSERT(parser);
 
         armnn::INetworkPtr network{nullptr, [](armnn::INetwork *){}};
 

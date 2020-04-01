@@ -21,8 +21,8 @@ public:
         Layer& base = connection.GetConnectedOutputSlot()->GetOwningLayer();
         Layer& child = connection.GetOwningLayer();
 
-        BOOST_ASSERT(base.GetType() == LayerType::Reshape);
-        BOOST_ASSERT(child.GetType() == LayerType::Reshape);
+        ARMNN_ASSERT(base.GetType() == LayerType::Reshape);
+        ARMNN_ASSERT(child.GetType() == LayerType::Reshape);
 
         OutputSlot* parentOut = base.GetInputSlot(0).GetConnectedOutputSlot();
 

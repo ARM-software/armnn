@@ -24,15 +24,15 @@ QuantizerVisitor::QuantizerVisitor(const RangeTracker& rangeTracker,
 void QuantizerVisitor::SetQuantizedInputConnections(const IConnectableLayer* srcLayer,
                                                     IConnectableLayer* quantizedLayer)
 {
-    BOOST_ASSERT(srcLayer);
+    ARMNN_ASSERT(srcLayer);
     for (unsigned int i = 0; i < srcLayer->GetNumInputSlots(); i++)
     {
         const IInputSlot& srcInputSlot = srcLayer->GetInputSlot(i);
         const InputSlot* inputSlot = boost::polymorphic_downcast<const InputSlot*>(&srcInputSlot);
-        BOOST_ASSERT(inputSlot);
+        ARMNN_ASSERT(inputSlot);
         const OutputSlot* outputSlot = inputSlot->GetConnectedOutputSlot();
 
-        BOOST_ASSERT(outputSlot);
+        ARMNN_ASSERT(outputSlot);
         unsigned int slotIdx = outputSlot->CalculateIndexOnOwner();
         Layer& layerToFind = outputSlot->GetOwningLayer();
 
@@ -40,7 +40,7 @@ void QuantizerVisitor::SetQuantizedInputConnections(const IConnectableLayer* src
         if (found == m_OriginalToQuantizedGuidMap.end())
         {
             // Error in graph traversal order
-            BOOST_ASSERT_MSG(false, "Error in graph traversal");
+            ARMNN_ASSERT_MSG(false, "Error in graph traversal");
             return;
         }
 
@@ -68,13 +68,13 @@ ConstTensor QuantizerVisitor::CreateQuantizedBias(const IConnectableLayer* srcLa
                                                   const Optional<ConstTensor>& biases,
                                                   std::vector<int32_t>& backing)
 {
-    BOOST_ASSERT(srcLayer);
+    ARMNN_ASSERT(srcLayer);
     const IInputSlot& srcInputSlot = srcLayer->GetInputSlot(0);
     auto inputSlot = boost::polymorphic_downcast<const InputSlot*>(&srcInputSlot);
-    BOOST_ASSERT(inputSlot);
+    ARMNN_ASSERT(inputSlot);
     const OutputSlot* outputSlot = inputSlot->GetConnectedOutputSlot();
 
-    BOOST_ASSERT(outputSlot);
+    ARMNN_ASSERT(outputSlot);
     unsigned int slotIdx = outputSlot->CalculateIndexOnOwner();
     Layer& layerToFind = outputSlot->GetOwningLayer();
 
@@ -82,7 +82,7 @@ ConstTensor QuantizerVisitor::CreateQuantizedBias(const IConnectableLayer* srcLa
     if (found == m_OriginalToQuantizedGuidMap.end())
     {
         // Error in graph traversal order
-        BOOST_ASSERT_MSG(false, "Error in graph traversal");
+        ARMNN_ASSERT_MSG(false, "Error in graph traversal");
         return biases.value();
     }
 

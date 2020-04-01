@@ -19,7 +19,7 @@ namespace armnn
 
 void InputSlot::Insert(Layer& layer)
 {
-    BOOST_ASSERT(layer.GetNumOutputSlots() == 1);
+    ARMNN_ASSERT(layer.GetNumOutputSlots() == 1);
 
     OutputSlot* const prevSlot = GetConnectedOutputSlot();
 
@@ -29,7 +29,7 @@ void InputSlot::Insert(Layer& layer)
         prevSlot->Disconnect(*this);
 
         // Connects inserted layer to parent.
-        BOOST_ASSERT(layer.GetNumInputSlots() == 1);
+        ARMNN_ASSERT(layer.GetNumInputSlots() == 1);
         int idx = prevSlot->Connect(layer.GetInputSlot(0));
         prevSlot->SetEdgeStrategy(boost::numeric_cast<unsigned int>(idx), EdgeStrategy::Undefined);
 
@@ -72,7 +72,7 @@ bool OutputSlot::IsTensorInfoSet() const
 
 bool OutputSlot::ValidateTensorShape(const TensorShape& shape) const
 {
-    BOOST_ASSERT_MSG(IsTensorInfoSet(), "TensorInfo must be set in order to validate the shape.");
+    ARMNN_ASSERT_MSG(IsTensorInfoSet(), "TensorInfo must be set in order to validate the shape.");
     return shape == m_OutputHandler.GetTensorInfo().GetShape();
 }
 
@@ -113,7 +113,7 @@ void OutputSlot::MoveAllConnections(OutputSlot& destination)
 {
     while (GetNumConnections() > 0)
     {
-        BOOST_ASSERT_MSG(m_EdgeStrategies[0] == EdgeStrategy::Undefined,
+        ARMNN_ASSERT_MSG(m_EdgeStrategies[0] == EdgeStrategy::Undefined,
             "Cannot move connections once memory strategies have be established.");
 
         InputSlot& connection = *GetConnection(0);
@@ -131,7 +131,7 @@ unsigned int OutputSlot::CalculateIndexOnOwner() const
             return i;
         }
     }
-    BOOST_ASSERT_MSG(false, "Did not find slot on owner.");
+    ARMNN_ASSERT_MSG(false, "Did not find slot on owner.");
     return 0; // Error
 }
 
@@ -223,7 +223,7 @@ void Layer::CollectWorkloadInputs(WorkloadDataCollector& dataCollector) const
     for (auto&& inputSlot : GetInputSlots())
     {
         // The graph must be well-formed at this point.
-        BOOST_ASSERT(inputSlot.GetConnection());
+        ARMNN_ASSERT(inputSlot.GetConnection());
         const OutputHandler& outputHandler = inputSlot.GetConnectedOutputSlot()->GetOutputHandler();
         dataCollector.Push(outputHandler.GetData(), outputHandler.GetTensorInfo());
     }
@@ -255,7 +255,7 @@ void Layer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
         else
         {
             ITensorHandleFactory* handleFactory = registry.GetFactory(factoryId);
-            BOOST_ASSERT(handleFactory);
+            ARMNN_ASSERT(handleFactory);
             handler.CreateTensorHandles(*handleFactory, IsMemoryManaged);
         }
     }
@@ -337,7 +337,7 @@ LayerPriority Layer::GetPriority() const
 
 void Layer::VerifyLayerConnections(unsigned int expectedConnections, const CheckLocation& location) const
 {
-    BOOST_ASSERT(GetNumInputSlots() == expectedConnections);
+    ARMNN_ASSERT(GetNumInputSlots() == expectedConnections);
 
     for (unsigned int i=0; i<expectedConnections; ++i)
     {
@@ -370,8 +370,8 @@ void Layer::VerifyLayerConnections(unsigned int expectedConnections, const Check
 
 std::vector<TensorShape> Layer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    BOOST_ASSERT(GetNumInputSlots() != 0);
-    BOOST_ASSERT(GetNumOutputSlots() != 0);
+    ARMNN_ASSERT(GetNumInputSlots() != 0);
+    ARMNN_ASSERT(GetNumOutputSlots() != 0);
 
     // By default we return what we got, meaning the output shape(s) are the same as the input(s).
     // This only works if the number of inputs and outputs are the same. Since we are in the Layer

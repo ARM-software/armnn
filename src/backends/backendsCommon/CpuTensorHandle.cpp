@@ -118,8 +118,8 @@ void ScopedCpuTensorHandle::CopyFrom(const ScopedCpuTensorHandle& other)
 
 void ScopedCpuTensorHandle::CopyFrom(const void* srcMemory, unsigned int numBytes)
 {
-    BOOST_ASSERT(GetTensor<void>() == nullptr);
-    BOOST_ASSERT(GetTensorInfo().GetNumBytes() == numBytes);
+    ARMNN_ASSERT(GetTensor<void>() == nullptr);
+    ARMNN_ASSERT(GetTensorInfo().GetNumBytes() == numBytes);
 
     if (srcMemory)
     {

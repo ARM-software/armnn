@@ -194,7 +194,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
             const TensorInfo input  = OverrideDataType(layer.GetInputSlot(0).GetConnection()->GetTensorInfo(),
                                                        dataType);
             const TensorInfo output = OverrideDataType(layer.GetOutputSlot(0).GetTensorInfo(), dataType);
-            BOOST_ASSERT(cLayer->m_Weight.get() != nullptr);
+            ARMNN_ASSERT(cLayer->m_Weight.get() != nullptr);
 
             const Convolution2dDescriptor& descriptor  = cLayer->GetParameters();
 
@@ -244,7 +244,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
             const TensorInfo& input = OverrideDataType(layer.GetInputSlot(0).GetConnection()->GetTensorInfo(),
                                                        dataType);
             const TensorInfo& output = OverrideDataType(layer.GetOutputSlot(0).GetTensorInfo(), dataType);
-            BOOST_ASSERT(cLayer->m_Weight.get() != nullptr);
+            ARMNN_ASSERT(cLayer->m_Weight.get() != nullptr);
 
             const DepthwiseConvolution2dDescriptor& descriptor = cLayer->GetParameters();
 
@@ -335,7 +335,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
             auto cLayer = boost::polymorphic_downcast<const FullyConnectedLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            BOOST_ASSERT(cLayer->m_Weight.get() != nullptr);
+            ARMNN_ASSERT(cLayer->m_Weight.get() != nullptr);
 
             TensorInfo biasInfo;
             const TensorInfo * biasInfoPtr = nullptr;
@@ -347,7 +347,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
             const FullyConnectedDescriptor& descriptor = cLayer->GetParameters();
             if (descriptor.m_BiasEnabled)
             {
-                BOOST_ASSERT(cLayer->m_Bias.get() != nullptr);
+                ARMNN_ASSERT(cLayer->m_Bias.get() != nullptr);
                 biasInfo = OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType));
                 biasInfoPtr = &biasInfo;
             }
@@ -381,7 +381,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                     }
                     default:
                     {
-                        BOOST_ASSERT_MSG(false, "Unexpected bias type");
+                        ARMNN_ASSERT_MSG(false, "Unexpected bias type");
                     }
                 }
             }
@@ -1156,12 +1156,12 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
             Optional<TensorInfo> biases;
             if (descriptor.m_BiasEnabled)
             {
-                BOOST_ASSERT(cLayer->m_Bias.get() != nullptr);
+                ARMNN_ASSERT(cLayer->m_Bias.get() != nullptr);
                 biases = OverrideDataType(cLayer->m_Bias->GetTensorInfo(),
                                           GetBiasTypeFromWeightsType(dataType));
             }
 
-            BOOST_ASSERT(cLayer->m_Weight.get() != nullptr);
+            ARMNN_ASSERT(cLayer->m_Weight.get() != nullptr);
             const TensorInfo weights = OverrideDataType(cLayer->m_Weight->GetTensorInfo(), dataType);
 
             result = layerSupportObject->IsTransposeConvolution2dSupported(input,
@@ -1175,7 +1175,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         default:
         {
-            BOOST_ASSERT_MSG(false, "WorkloadFactory did not recognise type of layer.");
+            ARMNN_ASSERT_MSG(false, "WorkloadFactory did not recognise type of layer.");
             reason.value() = "Unrecognised layer type";
             result = false;
             break;

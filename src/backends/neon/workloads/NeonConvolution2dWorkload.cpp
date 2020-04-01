@@ -37,7 +37,7 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
 
     if (descriptor.m_BiasEnabled)
     {
-        BOOST_ASSERT(biases.has_value());
+        ARMNN_ASSERT(biases.has_value());
 
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         optionalAclBiasesInfo = &aclBiasesInfo;
@@ -97,7 +97,7 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
 
     m_ConvolutionLayer.reset(convolutionLayer.release());
 
-    BOOST_ASSERT(m_ConvolutionLayer);
+    ARMNN_ASSERT(m_ConvolutionLayer);
 
     InitializeArmComputeTensorData(*m_KernelTensor, m_Data.m_Weight);
 

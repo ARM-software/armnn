@@ -32,7 +32,7 @@ RefFullyConnectedWorkload::RefFullyConnectedWorkload(
 void RefFullyConnectedWorkload::PostAllocationConfigure()
 {
     const TensorInfo& inputInfo = GetTensorInfo(m_Data.m_Inputs[0]);
-    BOOST_ASSERT(inputInfo.GetNumDimensions() > 1);
+    ARMNN_ASSERT(inputInfo.GetNumDimensions() > 1);
     m_InputShape = inputInfo.GetShape();
     m_InputDecoder = MakeDecoder<float>(inputInfo);
 

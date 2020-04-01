@@ -44,8 +44,8 @@ RefTensorHandle::~RefTensorHandle()
 
 void RefTensorHandle::Manage()
 {
-    BOOST_ASSERT_MSG(!m_Pool, "RefTensorHandle::Manage() called twice");
-    BOOST_ASSERT_MSG(!m_UnmanagedMemory, "RefTensorHandle::Manage() called after Allocate()");
+    ARMNN_ASSERT_MSG(!m_Pool, "RefTensorHandle::Manage() called twice");
+    ARMNN_ASSERT_MSG(!m_UnmanagedMemory, "RefTensorHandle::Manage() called after Allocate()");
 
     m_Pool = m_MemoryManager->Manage(m_TensorInfo.GetNumBytes());
 }
@@ -84,7 +84,7 @@ void* RefTensorHandle::GetPointer() const
     }
     else
     {
-        BOOST_ASSERT_MSG(m_Pool, "RefTensorHandle::GetPointer called on unmanaged, unallocated tensor handle");
+        ARMNN_ASSERT_MSG(m_Pool, "RefTensorHandle::GetPointer called on unmanaged, unallocated tensor handle");
         return m_MemoryManager->GetPointer(m_Pool);
     }
 }
@@ -92,14 +92,14 @@ void* RefTensorHandle::GetPointer() const
 void RefTensorHandle::CopyOutTo(void* dest) const
 {
     const void *src = GetPointer();
-    BOOST_ASSERT(src);
+    ARMNN_ASSERT(src);
     memcpy(dest, src, m_TensorInfo.GetNumBytes());
 }
 
 void RefTensorHandle::CopyInFrom(const void* src)
 {
     void *dest = GetPointer();
-    BOOST_ASSERT(dest);
+    ARMNN_ASSERT(dest);
     memcpy(dest, src, m_TensorInfo.GetNumBytes());
 }
 

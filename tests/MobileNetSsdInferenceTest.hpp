@@ -7,9 +7,9 @@
 #include "InferenceTest.hpp"
 #include "MobileNetSsdDatabase.hpp"
 
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 
@@ -38,16 +38,16 @@ public:
         armnn::IgnoreUnused(options);
 
         const std::vector<float>& output1 = boost::get<std::vector<float>>(this->GetOutputs()[0]); // bounding boxes
-        BOOST_ASSERT(output1.size() == k_OutputSize1);
+        ARMNN_ASSERT(output1.size() == k_OutputSize1);
 
         const std::vector<float>& output2 = boost::get<std::vector<float>>(this->GetOutputs()[1]); // classes
-        BOOST_ASSERT(output2.size() == k_OutputSize2);
+        ARMNN_ASSERT(output2.size() == k_OutputSize2);
 
         const std::vector<float>& output3 = boost::get<std::vector<float>>(this->GetOutputs()[2]); // scores
-        BOOST_ASSERT(output3.size() == k_OutputSize3);
+        ARMNN_ASSERT(output3.size() == k_OutputSize3);
 
         const std::vector<float>& output4 = boost::get<std::vector<float>>(this->GetOutputs()[3]); // valid detections
-        BOOST_ASSERT(output4.size() == k_OutputSize4);
+        ARMNN_ASSERT(output4.size() == k_OutputSize4);
 
         const size_t numDetections = boost::numeric_cast<size_t>(output4[0]);
 

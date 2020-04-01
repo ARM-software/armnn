@@ -8,7 +8,7 @@
 #include <armnnUtils/DataLayoutIndexed.hpp>
 #include <armnnUtils/Permute.hpp>
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 using namespace armnnUtils;
 
@@ -22,7 +22,7 @@ void DepthToSpace(const TensorInfo& inputInfo,
                   unsigned int dataTypeSize)
 {
     const unsigned int blockSize = descriptor.m_BlockSize;
-    BOOST_ASSERT(blockSize != 0u);
+    ARMNN_ASSERT(blockSize != 0u);
 
     const TensorShape& inputShape = inputInfo.GetShape();
     const unsigned int batches = inputShape[0];

@@ -21,10 +21,10 @@ BatchNormalizationLayer::BatchNormalizationLayer(const armnn::BatchNormalization
 std::unique_ptr<IWorkload> BatchNormalizationLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     // on this level constant data should not be released..
-    BOOST_ASSERT_MSG(m_Mean != nullptr, "BatchNormalizationLayer: Mean data should not be null.");
-    BOOST_ASSERT_MSG(m_Variance != nullptr, "BatchNormalizationLayer: Variance data should not be null.");
-    BOOST_ASSERT_MSG(m_Beta != nullptr, "BatchNormalizationLayer: Beta data should not be null.");
-    BOOST_ASSERT_MSG(m_Gamma != nullptr, "BatchNormalizationLayer: Gamma data should not be null.");
+    ARMNN_ASSERT_MSG(m_Mean != nullptr, "BatchNormalizationLayer: Mean data should not be null.");
+    ARMNN_ASSERT_MSG(m_Variance != nullptr, "BatchNormalizationLayer: Variance data should not be null.");
+    ARMNN_ASSERT_MSG(m_Beta != nullptr, "BatchNormalizationLayer: Beta data should not be null.");
+    ARMNN_ASSERT_MSG(m_Gamma != nullptr, "BatchNormalizationLayer: Gamma data should not be null.");
 
     BatchNormalizationQueueDescriptor descriptor;
 
@@ -54,7 +54,7 @@ void BatchNormalizationLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    ARMNN_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "BatchNormalizationLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",

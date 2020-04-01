@@ -23,7 +23,7 @@ namespace
 
 bool IsLayerSupported(const armnn::Layer* layer)
 {
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     armnn::LayerType layerType = layer->GetType();
     switch (layerType)
@@ -47,7 +47,7 @@ bool IsLayerSupported(const armnn::Layer& layer)
 
 bool IsLayerOptimizable(const armnn::Layer* layer)
 {
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
 
     // A Layer is not optimizable if its name contains "unoptimizable"
     const std::string layerName(layer->GetName());
@@ -191,7 +191,7 @@ OptimizationViews MockBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                       supportedSubgraphs.end(),
                       [&optimizationViews](const SubgraphView::SubgraphViewPtr& supportedSubgraph)
         {
-            BOOST_ASSERT(supportedSubgraph != nullptr);
+            ARMNN_ASSERT(supportedSubgraph != nullptr);
 
             PreCompiledLayer* preCompiledLayer =
                 optimizationViews.GetGraph().AddLayer<PreCompiledLayer>(
@@ -228,7 +228,7 @@ OptimizationViews MockBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                       unsupportedSubgraphs.end(),
                       [&optimizationViews](const SubgraphView::SubgraphViewPtr& unsupportedSubgraph)
         {
-            BOOST_ASSERT(unsupportedSubgraph != nullptr);
+            ARMNN_ASSERT(unsupportedSubgraph != nullptr);
 
             optimizationViews.AddFailedSubgraph(SubgraphView(*unsupportedSubgraph));
         });
@@ -256,7 +256,7 @@ OptimizationViews MockBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                       untouchedSubgraphs.end(),
                       [&optimizationViews](const SubgraphView::SubgraphViewPtr& untouchedSubgraph)
         {
-            BOOST_ASSERT(untouchedSubgraph != nullptr);
+            ARMNN_ASSERT(untouchedSubgraph != nullptr);
 
             optimizationViews.AddUntouchedSubgraph(SubgraphView(*untouchedSubgraph));
         });

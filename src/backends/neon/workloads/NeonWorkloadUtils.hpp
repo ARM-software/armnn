@@ -35,7 +35,7 @@ void CopyArmComputeTensorData(arm_compute::Tensor& dstTensor, const T* srcData)
 inline void InitializeArmComputeTensorData(arm_compute::Tensor& tensor,
                                            const ConstCpuTensorHandle* handle)
 {
-    BOOST_ASSERT(handle);
+    ARMNN_ASSERT(handle);
 
     switch(handle->GetTensorInfo().GetDataType())
     {
@@ -59,7 +59,7 @@ inline void InitializeArmComputeTensorData(arm_compute::Tensor& tensor,
             CopyArmComputeTensorData(tensor, handle->GetConstTensor<int32_t>());
             break;
         default:
-            BOOST_ASSERT_MSG(false, "Unexpected tensor type.");
+            ARMNN_ASSERT_MSG(false, "Unexpected tensor type.");
     }
 };
 

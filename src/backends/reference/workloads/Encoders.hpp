@@ -9,7 +9,7 @@
 
 #include <armnnUtils/TensorUtils.hpp>
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 namespace armnn
 {
@@ -89,7 +89,7 @@ inline std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void*
         }
         default:
         {
-            BOOST_ASSERT_MSG(false, "Unsupported target Data Type!");
+            ARMNN_ASSERT_MSG(false, "Unsupported target Data Type!");
             break;
         }
     }
@@ -107,7 +107,7 @@ inline std::unique_ptr<Encoder<bool>> MakeEncoder(const TensorInfo& info, void* 
         }
         default:
         {
-            BOOST_ASSERT_MSG(false, "Cannot encode from boolean. Not supported target Data Type!");
+            ARMNN_ASSERT_MSG(false, "Cannot encode from boolean. Not supported target Data Type!");
             break;
         }
     }

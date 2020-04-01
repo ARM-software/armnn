@@ -5,8 +5,6 @@
 
 #include "NeonInterceptorScheduler.hpp"
 
-#include <boost/assert.hpp>
-
 namespace armnn{
 
 NeonInterceptorScheduler::NeonInterceptorScheduler(arm_compute::IScheduler &realScheduler)

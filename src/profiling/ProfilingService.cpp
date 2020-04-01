@@ -134,7 +134,7 @@ void ProfilingService::Update()
         try
         {
             // Setup the profiling connection
-            BOOST_ASSERT(m_ProfilingConnectionFactory);
+            ARMNN_ASSERT(m_ProfilingConnectionFactory);
             m_ProfilingConnection = m_ProfilingConnectionFactory->GetProfilingConnection(m_Options);
         }
         catch (const Exception& e)
@@ -155,7 +155,7 @@ void ProfilingService::Update()
                                                                           // "NotConnected" state
         break;
     case ProfilingState::WaitingForAck:
-        BOOST_ASSERT(m_ProfilingConnection);
+        ARMNN_ASSERT(m_ProfilingConnection);
 
         // Start the command thread
         m_CommandHandler.Start(*m_ProfilingConnection);
@@ -204,7 +204,7 @@ void ProfilingService::Disconnect()
 void ProfilingService::AddBackendProfilingContext(const BackendId backendId,
     std::shared_ptr<armnn::profiling::IBackendProfilingContext> profilingContext)
 {
-    BOOST_ASSERT(profilingContext != nullptr);
+    ARMNN_ASSERT(profilingContext != nullptr);
     // Register the backend counters
     m_MaxGlobalCounterId = profilingContext->RegisterCounters(m_MaxGlobalCounterId);
     m_BackendProfilingContexts.emplace(backendId, std::move(profilingContext));
@@ -238,7 +238,7 @@ uint32_t ProfilingService::GetCounterValue(uint16_t counterUid) const
 {
     CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
-    BOOST_ASSERT(counterValuePtr);
+    ARMNN_ASSERT(counterValuePtr);
     return counterValuePtr->load(std::memory_order::memory_order_relaxed);
 }
 
@@ -268,7 +268,7 @@ void ProfilingService::SetCounterValue(uint16_t counterUid, uint32_t value)
 {
     CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
-    BOOST_ASSERT(counterValuePtr);
+    ARMNN_ASSERT(counterValuePtr);
     counterValuePtr->store(value, std::memory_order::memory_order_relaxed);
 }
 
@@ -276,7 +276,7 @@ uint32_t ProfilingService::AddCounterValue(uint16_t counterUid, uint32_t value)
 {
     CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
-    BOOST_ASSERT(counterValuePtr);
+    ARMNN_ASSERT(counterValuePtr);
     return counterValuePtr->fetch_add(value, std::memory_order::memory_order_relaxed);
 }
 
@@ -284,7 +284,7 @@ uint32_t ProfilingService::SubtractCounterValue(uint16_t counterUid, uint32_t va
 {
     CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
-    BOOST_ASSERT(counterValuePtr);
+    ARMNN_ASSERT(counterValuePtr);
     return counterValuePtr->fetch_sub(value, std::memory_order::memory_order_relaxed);
 }
 
@@ -292,7 +292,7 @@ uint32_t ProfilingService::IncrementCounterValue(uint16_t counterUid)
 {
     CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
-    BOOST_ASSERT(counterValuePtr);
+    ARMNN_ASSERT(counterValuePtr);
     return counterValuePtr->operator++(std::memory_order::memory_order_relaxed);
 }
 
@@ -332,7 +332,7 @@ void ProfilingService::Initialize()
                                                    "Network loads",
                                                    "The number of networks loaded at runtime",
                                                    std::string("networks"));
-        BOOST_ASSERT(loadedNetworksCounter);
+        ARMNN_ASSERT(loadedNetworksCounter);
         InitializeCounterValue(loadedNetworksCounter->m_Uid);
     }
     // Register a counter for the number of unloaded networks
@@ -348,7 +348,7 @@ void ProfilingService::Initialize()
                                                    "Network unloads",
                                                    "The number of networks unloaded at runtime",
                                                    std::string("networks"));
-        BOOST_ASSERT(unloadedNetworksCounter);
+        ARMNN_ASSERT(unloadedNetworksCounter);
         InitializeCounterValue(unloadedNetworksCounter->m_Uid);
     }
     // Register a counter for the number of registered backends
@@ -364,7 +364,7 @@ void ProfilingService::Initialize()
                                                    "Backends registered",
                                                    "The number of registered backends",
                                                    std::string("backends"));
-        BOOST_ASSERT(registeredBackendsCounter);
+        ARMNN_ASSERT(registeredBackendsCounter);
         InitializeCounterValue(registeredBackendsCounter->m_Uid);
     }
     // Register a counter for the number of registered backends
@@ -380,7 +380,7 @@ void ProfilingService::Initialize()
                                                    "Backends unregistered",
                                                    "The number of unregistered backends",
                                                    std::string("backends"));
-        BOOST_ASSERT(unregisteredBackendsCounter);
+        ARMNN_ASSERT(unregisteredBackendsCounter);
         InitializeCounterValue(unregisteredBackendsCounter->m_Uid);
     }
     // Register a counter for the number of inferences run
@@ -396,7 +396,7 @@ void ProfilingService::Initialize()
                                                    "Inferences run",
                                                    "The number of inferences run",
                                                    std::string("inferences"));
-        BOOST_ASSERT(inferencesRunCounter);
+        ARMNN_ASSERT(inferencesRunCounter);
         InitializeCounterValue(inferencesRunCounter->m_Uid);
     }
 }

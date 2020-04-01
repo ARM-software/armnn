@@ -9,7 +9,7 @@
 #include "armnn/profiling/ISendTimelinePacket.hpp"
 #include "ProfilingUtils.hpp"
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <memory>
 
@@ -78,7 +78,7 @@ void SendTimelinePacket::ForwardWriteBinaryFunction(Func& func, Params&& ... par
     try
     {
         ReserveBuffer();
-        BOOST_ASSERT(m_WriteBuffer);
+        ARMNN_ASSERT(m_WriteBuffer);
         unsigned int numberOfBytesWritten = 0;
         // Header will be prepended to the buffer on Commit()
         while ( true )

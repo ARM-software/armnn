@@ -33,7 +33,7 @@ void ClConstantWorkload::Execute() const
     {
         const ConstantQueueDescriptor& data = this->m_Data;
 
-        BOOST_ASSERT(data.m_LayerOutput != nullptr);
+        ARMNN_ASSERT(data.m_LayerOutput != nullptr);
         arm_compute::CLTensor& output = static_cast<ClTensorHandle*>(data.m_Outputs[0])->GetTensor();
         arm_compute::DataType computeDataType = static_cast<ClTensorHandle*>(data.m_Outputs[0])->GetDataType();
 
@@ -56,7 +56,7 @@ void ClConstantWorkload::Execute() const
             }
             default:
             {
-                BOOST_ASSERT_MSG(false, "Unknown data type");
+                ARMNN_ASSERT_MSG(false, "Unknown data type");
                 break;
             }
         }

@@ -5,7 +5,6 @@
 #pragma once
 
 #include <armnn/Optional.hpp>
-#include <boost/assert.hpp>
 
 #include <functional>
 #include <map>

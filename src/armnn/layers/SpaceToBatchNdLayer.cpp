@@ -41,7 +41,7 @@ SpaceToBatchNdLayer* SpaceToBatchNdLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> SpaceToBatchNdLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    BOOST_ASSERT(inputShapes.size() == 1);
+    ARMNN_ASSERT(inputShapes.size() == 1);
 
     TensorShape inputShape = inputShapes[0];
     TensorShape outputShape(inputShape);
@@ -73,7 +73,7 @@ void SpaceToBatchNdLayer::ValidateTensorShapesFromInputs()
     std::vector<TensorShape> inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    ARMNN_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "SpaceToBatchNdLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",

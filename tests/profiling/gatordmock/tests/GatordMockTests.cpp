@@ -98,11 +98,11 @@ BOOST_AUTO_TEST_CASE(CounterCaptureHandlingTest)
     commandHandler(packet1);
     commandHandler(packet2);
 
-    BOOST_ASSERT(commandHandler.m_CurrentPeriodValue == 5000);
+    ARMNN_ASSERT(commandHandler.m_CurrentPeriodValue == 5000);
 
     for (size_t i = 0; i < commandHandler.m_CounterCaptureValues.m_Uids.size(); ++i)
     {
-        BOOST_ASSERT(commandHandler.m_CounterCaptureValues.m_Uids[i] == i);
+        ARMNN_ASSERT(commandHandler.m_CounterCaptureValues.m_Uids[i] == i);
     }
 }
 

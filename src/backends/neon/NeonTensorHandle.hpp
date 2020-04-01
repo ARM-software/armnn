@@ -7,6 +7,8 @@
 #include <BFloat16.hpp>
 #include <Half.hpp>
 
+#include <armnn/utility/Assert.hpp>
+
 #include <aclCommon/ArmComputeTensorHandle.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
@@ -61,7 +63,7 @@ public:
         // If we have enabled Importing, don't manage the tensor
         if (!m_IsImportEnabled)
         {
-            BOOST_ASSERT(m_MemoryGroup != nullptr);
+            ARMNN_ASSERT(m_MemoryGroup != nullptr);
             m_MemoryGroup->manage(&m_Tensor);
         }
     }

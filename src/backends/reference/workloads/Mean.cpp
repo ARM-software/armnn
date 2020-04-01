@@ -128,7 +128,7 @@ void Mean(const armnn::TensorInfo& inputInfo,
     for (unsigned int idx = 0; idx < numResolvedAxis; ++idx)
     {
         unsigned int current = inputDims[resolvedAxis[idx]];
-        BOOST_ASSERT(boost::numeric_cast<float>(current) <
+        ARMNN_ASSERT(boost::numeric_cast<float>(current) <
               (std::numeric_limits<float>::max() / boost::numeric_cast<float>(numElementsInAxis)));
         numElementsInAxis *= current;
     }

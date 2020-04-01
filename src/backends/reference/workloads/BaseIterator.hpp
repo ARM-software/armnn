@@ -5,13 +5,12 @@
 
 #pragma once
 
-#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/TypesUtils.hpp>
+#include <armnn/utility/Assert.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnnUtils/FloatingPointConverter.hpp>
 
 #include <ResolveType.hpp>
-
-#include <boost/assert.hpp>
 
 namespace armnn
 {
@@ -78,28 +77,28 @@ public:
 
     TypedIterator& operator++() override
     {
-        BOOST_ASSERT(m_Iterator);
+        ARMNN_ASSERT(m_Iterator);
         ++m_Iterator;
         return *this;
     }
 
     TypedIterator& operator+=(const unsigned int increment) override
     {
-        BOOST_ASSERT(m_Iterator);
+        ARMNN_ASSERT(m_Iterator);
         m_Iterator += increment;
         return *this;
     }
 
     TypedIterator& operator-=(const unsigned int increment) override
     {
-        BOOST_ASSERT(m_Iterator);
+        ARMNN_ASSERT(m_Iterator);
         m_Iterator -= increment;
         return *this;
     }
 
     TypedIterator& operator[](const unsigned int index) override
     {
-        BOOST_ASSERT(m_Iterator);
+        ARMNN_ASSERT(m_Iterator);
         m_Iterator = m_Start + index;
         return *this;
     }
@@ -107,7 +106,7 @@ public:
     TypedIterator& SetIndex(unsigned int index, unsigned int axisIndex = 0) override
     {
         IgnoreUnused(axisIndex);
-        BOOST_ASSERT(m_Iterator);
+        ARMNN_ASSERT(m_Iterator);
         m_Iterator = m_Start + index;
         return *this;
     }
@@ -504,7 +503,7 @@ public:
     // This should be called to set index for per-axis Encoder/Decoder
     PerAxisIterator& SetIndex(unsigned int index, unsigned int axisIndex) override
     {
-         BOOST_ASSERT(m_Iterator);
+         ARMNN_ASSERT(m_Iterator);
          m_Iterator = m_Start + index;
          m_AxisIndex = axisIndex;
          return *this;
@@ -519,7 +518,7 @@ public:
 
     PerAxisIterator& operator++() override
     {
-        BOOST_ASSERT(m_Iterator);
+        ARMNN_ASSERT(m_Iterator);
         ++m_Iterator;
         m_AxisIndex = static_cast<unsigned int>(*m_Iterator) % m_AxisFactor;
         return *this;
@@ -527,7 +526,7 @@ public:
 
     PerAxisIterator& operator+=(const unsigned int increment) override
     {
-        BOOST_ASSERT(m_Iterator);
+        ARMNN_ASSERT(m_Iterator);
         m_Iterator += increment;
         m_AxisIndex = static_cast<unsigned int>(*m_Iterator) % m_AxisFactor;
         return *this;
@@ -535,7 +534,7 @@ public:
 
     PerAxisIterator& operator-=(const unsigned int decrement) override
     {
-        BOOST_ASSERT(m_Iterator);
+        ARMNN_ASSERT(m_Iterator);
         m_Iterator -= decrement;
         m_AxisIndex = static_cast<unsigned int>(*m_Iterator) % m_AxisFactor;
         return *this;
@@ -543,7 +542,7 @@ public:
 
     PerAxisIterator& operator[](const unsigned int index) override
     {
-        BOOST_ASSERT(m_Iterator);
+        ARMNN_ASSERT(m_Iterator);
         m_Iterator = m_Start + index;
         m_AxisIndex = static_cast<unsigned int>(*m_Iterator) % m_AxisFactor;
         return *this;

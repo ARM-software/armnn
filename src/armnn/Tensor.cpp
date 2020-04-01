@@ -8,7 +8,8 @@
 #include "armnn/Exceptions.hpp"
 #include "armnn/TypesUtils.hpp"
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
+
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <sstream>
@@ -252,7 +253,7 @@ float TensorInfo::GetQuantizationScale() const
         return 1.0f;
     }
 
-    BOOST_ASSERT(!HasMultipleQuantizationScales());
+    ARMNN_ASSERT(!HasMultipleQuantizationScales());
     return m_Quantization.m_Scales[0];
 }
 

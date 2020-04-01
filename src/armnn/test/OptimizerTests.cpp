@@ -203,8 +203,8 @@ BOOST_AUTO_TEST_CASE(InsertConvertersTest)
     {
         if(layer->GetType()==LayerType::Floor || layer->GetType() == LayerType::Addition)
         {
-            BOOST_ASSERT(layer->GetOutputSlot(0).GetTensorInfo().GetDataType() == DataType::Float16);
-            BOOST_ASSERT(layer->GetDataType() == DataType::Float16);
+            ARMNN_ASSERT(layer->GetOutputSlot(0).GetTensorInfo().GetDataType() == DataType::Float16);
+            ARMNN_ASSERT(layer->GetDataType() == DataType::Float16);
         }
     }
 
@@ -223,18 +223,18 @@ BOOST_AUTO_TEST_CASE(InsertConvertersTest)
     {
         if (layer->GetType()==LayerType::Floor || layer->GetType() == LayerType::Addition)
         {
-            BOOST_ASSERT(layer->GetOutputSlot(0).GetTensorInfo().GetDataType() == DataType::Float32);
-            BOOST_ASSERT(layer->GetDataType() == DataType::Float32);
+            ARMNN_ASSERT(layer->GetOutputSlot(0).GetTensorInfo().GetDataType() == DataType::Float32);
+            ARMNN_ASSERT(layer->GetDataType() == DataType::Float32);
         }
         else if (layer->GetType() == LayerType::ConvertFp16ToFp32)
         {
-            BOOST_ASSERT(layer->GetOutputSlot(0).GetTensorInfo().GetDataType() == DataType::Float32);
-            BOOST_ASSERT(layer->GetDataType() == DataType::Float16);
+            ARMNN_ASSERT(layer->GetOutputSlot(0).GetTensorInfo().GetDataType() == DataType::Float32);
+            ARMNN_ASSERT(layer->GetDataType() == DataType::Float16);
         }
         else if (layer->GetType() == LayerType::ConvertFp32ToFp16)
         {
-            BOOST_ASSERT(layer->GetOutputSlot(0).GetTensorInfo().GetDataType() == DataType::Float16);
-            BOOST_ASSERT(layer->GetDataType() == DataType::Float32);
+            ARMNN_ASSERT(layer->GetOutputSlot(0).GetTensorInfo().GetDataType() == DataType::Float16);
+            ARMNN_ASSERT(layer->GetDataType() == DataType::Float32);
         }
     }
 

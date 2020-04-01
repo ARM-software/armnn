@@ -5,10 +5,10 @@
 #pragma once
 
 #include <armnn/Tensor.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <QuantizeHelper.hpp>
 
-#include <boost/assert.hpp>
 #include <boost/multi_array.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
@@ -192,7 +192,7 @@ boost::multi_array<T, n> MakeTensor(const armnn::TensorInfo& tensorInfo)
 template <typename T, std::size_t n>
 boost::multi_array<T, n> MakeTensor(const armnn::TensorInfo& tensorInfo, const std::vector<T>& flat)
 {
-    BOOST_ASSERT_MSG(flat.size() == tensorInfo.GetNumElements(), "Wrong number of components supplied to tensor");
+    ARMNN_ASSERT_MSG(flat.size() == tensorInfo.GetNumElements(), "Wrong number of components supplied to tensor");
 
     std::array<unsigned int, n> shape;
 

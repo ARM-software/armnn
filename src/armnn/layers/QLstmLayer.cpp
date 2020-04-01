@@ -150,7 +150,7 @@ QLstmLayer* QLstmLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> QLstmLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    BOOST_ASSERT(inputShapes.size() == 3);
+    ARMNN_ASSERT(inputShapes.size() == 3);
 
     // Get input values for validation
     unsigned int batchSize = inputShapes[0][0];
@@ -176,35 +176,35 @@ void QLstmLayer::ValidateTensorShapesFromInputs()
         GetInputSlot(2).GetConnection()->GetTensorInfo().GetShape() //  previousCellStateIn
     });
 
-    BOOST_ASSERT(inferredShapes.size() == 3);
+    ARMNN_ASSERT(inferredShapes.size() == 3);
 
     // Check if the weights are nullptr for basic params
-    BOOST_ASSERT_MSG(m_BasicParameters.m_InputToForgetWeights != nullptr,
+    ARMNN_ASSERT_MSG(m_BasicParameters.m_InputToForgetWeights != nullptr,
             "QLstmLayer: m_BasicParameters.m_InputToForgetWeights should not be null.");
-    BOOST_ASSERT_MSG(m_BasicParameters.m_InputToCellWeights != nullptr,
+    ARMNN_ASSERT_MSG(m_BasicParameters.m_InputToCellWeights != nullptr,
             "QLstmLayer: m_BasicParameters.m_InputToCellWeights should not be null.");
-    BOOST_ASSERT_MSG(m_BasicParameters.m_InputToOutputWeights != nullptr,
+    ARMNN_ASSERT_MSG(m_BasicParameters.m_InputToOutputWeights != nullptr,
             "QLstmLayer: m_BasicParameters.m_InputToOutputWeights should not be null.");
-    BOOST_ASSERT_MSG(m_BasicParameters.m_RecurrentToForgetWeights != nullptr,
+    ARMNN_ASSERT_MSG(m_BasicParameters.m_RecurrentToForgetWeights != nullptr,
             "QLstmLayer: m_BasicParameters.m_RecurrentToForgetWeights should not be null.");
-    BOOST_ASSERT_MSG(m_BasicParameters.m_RecurrentToCellWeights != nullptr,
+    ARMNN_ASSERT_MSG(m_BasicParameters.m_RecurrentToCellWeights != nullptr,
             "QLstmLayer: m_BasicParameters.m_RecurrentToCellWeights should not be null.");
-    BOOST_ASSERT_MSG(m_BasicParameters.m_RecurrentToOutputWeights != nullptr,
+    ARMNN_ASSERT_MSG(m_BasicParameters.m_RecurrentToOutputWeights != nullptr,
             "QLstmLayer: m_BasicParameters.m_RecurrentToOutputWeights should not be null.");
-    BOOST_ASSERT_MSG(m_BasicParameters.m_ForgetGateBias != nullptr,
+    ARMNN_ASSERT_MSG(m_BasicParameters.m_ForgetGateBias != nullptr,
             "QLstmLayer: m_BasicParameters.m_ForgetGateBias should not be null.");
-    BOOST_ASSERT_MSG(m_BasicParameters.m_CellBias != nullptr,
+    ARMNN_ASSERT_MSG(m_BasicParameters.m_CellBias != nullptr,
             "QLstmLayer: m_BasicParameters.m_CellBias should not be null.");
-    BOOST_ASSERT_MSG(m_BasicParameters.m_OutputGateBias != nullptr,
+    ARMNN_ASSERT_MSG(m_BasicParameters.m_OutputGateBias != nullptr,
             "QLstmLayer: m_BasicParameters.m_OutputGateBias should not be null.");
 
     if (!m_Param.m_CifgEnabled)
     {
-        BOOST_ASSERT_MSG(m_CifgParameters.m_InputToInputWeights != nullptr,
+        ARMNN_ASSERT_MSG(m_CifgParameters.m_InputToInputWeights != nullptr,
                 "QLstmLayer: m_CifgParameters.m_InputToInputWeights should not be null.");
-        BOOST_ASSERT_MSG(m_CifgParameters.m_RecurrentToInputWeights != nullptr,
+        ARMNN_ASSERT_MSG(m_CifgParameters.m_RecurrentToInputWeights != nullptr,
                 "QLstmLayer: m_CifgParameters.m_RecurrentToInputWeights should not be null.");
-        BOOST_ASSERT_MSG(m_CifgParameters.m_InputGateBias != nullptr,
+        ARMNN_ASSERT_MSG(m_CifgParameters.m_InputGateBias != nullptr,
                 "QLstmLayer: m_CifgParameters.m_InputGateBias should not be null.");
 
         ConditionalThrowIfNotEqual<LayerValidationException>(
@@ -214,12 +214,12 @@ void QLstmLayer::ValidateTensorShapesFromInputs()
     }
     else
     {
-        BOOST_ASSERT_MSG(m_CifgParameters.m_InputToInputWeights == nullptr,
+        ARMNN_ASSERT_MSG(m_CifgParameters.m_InputToInputWeights == nullptr,
                 "QLstmLayer: m_CifgParameters.m_InputToInputWeights should not have a value when CIFG is enabled.");
-        BOOST_ASSERT_MSG(m_CifgParameters.m_RecurrentToInputWeights == nullptr,
+        ARMNN_ASSERT_MSG(m_CifgParameters.m_RecurrentToInputWeights == nullptr,
                 "QLstmLayer: m_CifgParameters.m_RecurrentToInputWeights should "
                              "not have a value when CIFG is enabled.");
-        BOOST_ASSERT_MSG(m_CifgParameters.m_InputGateBias == nullptr,
+        ARMNN_ASSERT_MSG(m_CifgParameters.m_InputGateBias == nullptr,
                 "QLstmLayer: m_CifgParameters.m_InputGateBias should not have a value when CIFG is enabled.");
 
         ConditionalThrowIfNotEqual<LayerValidationException>(
@@ -230,23 +230,23 @@ void QLstmLayer::ValidateTensorShapesFromInputs()
 
     if (m_Param.m_ProjectionEnabled)
     {
-        BOOST_ASSERT_MSG(m_ProjectionParameters.m_ProjectionWeights != nullptr,
+        ARMNN_ASSERT_MSG(m_ProjectionParameters.m_ProjectionWeights != nullptr,
                          "QLstmLayer: m_ProjectionParameters.m_ProjectionWeights should not be null.");
-        BOOST_ASSERT_MSG(m_ProjectionParameters.m_ProjectionBias != nullptr,
+        ARMNN_ASSERT_MSG(m_ProjectionParameters.m_ProjectionBias != nullptr,
                          "QLstmLayer: m_ProjectionParameters.m_ProjectionBias should not be null.");
     }
 
     if (m_Param.m_PeepholeEnabled)
     {
         if (!m_Param.m_CifgEnabled) {
-            BOOST_ASSERT_MSG(m_PeepholeParameters.m_CellToInputWeights != nullptr,
+            ARMNN_ASSERT_MSG(m_PeepholeParameters.m_CellToInputWeights != nullptr,
                     "QLstmLayer: m_PeepholeParameters.m_CellToInputWeights should not be null "
                     "when Peephole is enabled and CIFG is disabled.");
         }
 
-        BOOST_ASSERT_MSG(m_PeepholeParameters.m_CellToForgetWeights != nullptr,
+        ARMNN_ASSERT_MSG(m_PeepholeParameters.m_CellToForgetWeights != nullptr,
                          "QLstmLayer: m_PeepholeParameters.m_CellToForgetWeights should not be null.");
-        BOOST_ASSERT_MSG(m_PeepholeParameters.m_CellToOutputWeights != nullptr,
+        ARMNN_ASSERT_MSG(m_PeepholeParameters.m_CellToOutputWeights != nullptr,
                          "QLstmLayer: m_PeepholeParameters.m_CellToOutputWeights should not be null.");
     }
 
@@ -263,14 +263,14 @@ void QLstmLayer::ValidateTensorShapesFromInputs()
     {
         if(!m_Param.m_CifgEnabled)
         {
-            BOOST_ASSERT_MSG(m_LayerNormParameters.m_InputLayerNormWeights != nullptr,
+            ARMNN_ASSERT_MSG(m_LayerNormParameters.m_InputLayerNormWeights != nullptr,
                              "QLstmLayer: m_LayerNormParameters.m_InputLayerNormWeights should not be null.");
         }
-        BOOST_ASSERT_MSG(m_LayerNormParameters.m_ForgetLayerNormWeights != nullptr,
+        ARMNN_ASSERT_MSG(m_LayerNormParameters.m_ForgetLayerNormWeights != nullptr,
                          "QLstmLayer: m_LayerNormParameters.m_ForgetLayerNormWeights should not be null.");
-        BOOST_ASSERT_MSG(m_LayerNormParameters.m_CellLayerNormWeights != nullptr,
+        ARMNN_ASSERT_MSG(m_LayerNormParameters.m_CellLayerNormWeights != nullptr,
                          "QLstmLayer: m_LayerNormParameters.m_CellLayerNormWeights should not be null.");
-        BOOST_ASSERT_MSG(m_LayerNormParameters.m_OutputLayerNormWeights != nullptr,
+        ARMNN_ASSERT_MSG(m_LayerNormParameters.m_OutputLayerNormWeights != nullptr,
                          "QLstmLayer: m_LayerNormParameters.m_UutputLayerNormWeights should not be null.");
     }
 }

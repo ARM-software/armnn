@@ -11,6 +11,7 @@
 #include <armnn/IRuntime.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <armnn/BackendRegistry.hpp>
+#include <armnn/utility/Assert.hpp>
 
 #include <armnnTfLiteParser/ITfLiteParser.hpp>
 
@@ -19,7 +20,6 @@
 #include <test/TensorHelpers.hpp>
 
 #include <boost/filesystem.hpp>
-#include <boost/assert.hpp>
 #include <boost/format.hpp>
 
 #include "flatbuffers/idl.h"
@@ -107,10 +107,10 @@ struct ParserFlatbuffersFixture
         flatbuffers::Parser parser;
 
         bool ok = parser.Parse(schemafile.c_str());
-        BOOST_ASSERT_MSG(ok, "Failed to parse schema file");
+        ARMNN_ASSERT_MSG(ok, "Failed to parse schema file");
 
         ok &= parser.Parse(m_JsonString.c_str());
-        BOOST_ASSERT_MSG(ok, "Failed to parse json input");
+        ARMNN_ASSERT_MSG(ok, "Failed to parse json input");
 
         if (!ok)
         {

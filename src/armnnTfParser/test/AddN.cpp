@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include "armnnTfParser/ITfParser.hpp"
@@ -19,7 +19,7 @@ struct AddNFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITf
 {
     AddNFixture(const std::vector<armnn::TensorShape> inputShapes, unsigned int numberOfInputs)
     {
-        BOOST_ASSERT(inputShapes.size() == numberOfInputs);
+        ARMNN_ASSERT(inputShapes.size() == numberOfInputs);
         m_Prototext = "";
         for (unsigned int i = 0; i < numberOfInputs; i++)
         {

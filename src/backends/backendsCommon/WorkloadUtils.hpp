@@ -168,8 +168,8 @@ void CopyTensorContentsGeneric(const ITensorHandle* srcTensor, ITensorHandle* ds
                 auto dstPtrChannel = dstData;
                 for (unsigned int w = 0; w < copyWidth; ++w)
                 {
-                    BOOST_ASSERT(srcData >= srcDataStart && srcData + copyLength <= srcDataStart + srcSize);
-                    BOOST_ASSERT(dstData >= dstDataStart && dstData + copyLength <= dstDataStart + dstSize);
+                    ARMNN_ASSERT(srcData >= srcDataStart && srcData + copyLength <= srcDataStart + srcSize);
+                    ARMNN_ASSERT(dstData >= dstDataStart && dstData + copyLength <= dstDataStart + dstSize);
                     copy(dstData, srcData, copyLength);
                     dstData += dstWidthStride;
                     srcData += srcWidthStride;

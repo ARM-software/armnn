@@ -16,9 +16,9 @@
 #include <armnn/Exceptions.hpp>
 #include <armnn/Optional.hpp>
 #include <armnn/Conversion.hpp>
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <atomic>
@@ -449,11 +449,11 @@ public:
     {
         // Create the category
         CategoryPtr category = std::make_unique<Category>(categoryName);
-        BOOST_ASSERT(category);
+        ARMNN_ASSERT(category);
 
         // Get the raw category pointer
         const Category* categoryPtr = category.get();
-        BOOST_ASSERT(categoryPtr);
+        ARMNN_ASSERT(categoryPtr);
 
         // Register the category
         m_Categories.insert(std::move(category));
@@ -469,11 +469,11 @@ public:
 
         // Create the device
         DevicePtr device = std::make_unique<Device>(deviceUid, deviceName, cores);
-        BOOST_ASSERT(device);
+        ARMNN_ASSERT(device);
 
         // Get the raw device pointer
         const Device* devicePtr = device.get();
-        BOOST_ASSERT(devicePtr);
+        ARMNN_ASSERT(devicePtr);
 
         // Register the device
         m_Devices.insert(std::make_pair(deviceUid, std::move(device)));
@@ -490,11 +490,11 @@ public:
 
         // Create the counter set
         CounterSetPtr counterSet = std::make_unique<CounterSet>(counterSetUid, counterSetName, count);
-        BOOST_ASSERT(counterSet);
+        ARMNN_ASSERT(counterSet);
 
         // Get the raw counter set pointer
         const CounterSet* counterSetPtr = counterSet.get();
-        BOOST_ASSERT(counterSetPtr);
+        ARMNN_ASSERT(counterSetPtr);
 
         // Register the counter set
         m_CounterSets.insert(std::make_pair(counterSetUid, std::move(counterSet)));
@@ -528,7 +528,7 @@ public:
 
         // Get the counter UIDs and calculate the max counter UID
         std::vector<uint16_t> counterUids = GetNextCounterUids(uid, deviceCores);
-        BOOST_ASSERT(!counterUids.empty());
+        ARMNN_ASSERT(!counterUids.empty());
         uint16_t maxCounterUid = deviceCores <= 1 ? counterUids.front() : counterUids.back();
 
         // Get the counter units
@@ -546,18 +546,18 @@ public:
                                                        unitsValue,
                                                        deviceUidValue,
                                                        counterSetUidValue);
-        BOOST_ASSERT(counter);
+        ARMNN_ASSERT(counter);
 
         // Get the raw counter pointer
         const Counter* counterPtr = counter.get();
-        BOOST_ASSERT(counterPtr);
+        ARMNN_ASSERT(counterPtr);
 
         // Process multiple counters if necessary
         for (uint16_t counterUid : counterUids)
         {
             // Connect the counter to the parent category
             Category* parentCategory = const_cast<Category*>(GetCategory(parentCategoryName));
-            BOOST_ASSERT(parentCategory);
+            ARMNN_ASSERT(parentCategory);
             parentCategory->m_Counters.push_back(counterUid);
 
             // Register the counter
@@ -584,7 +584,7 @@ public:
     {
         auto it = std::find_if(m_Categories.begin(), m_Categories.end(), [&name](const CategoryPtr& category)
         {
-            BOOST_ASSERT(category);
+            ARMNN_ASSERT(category);
 
             return category->m_Name == name;
         });

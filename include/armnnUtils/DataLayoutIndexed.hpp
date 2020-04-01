@@ -8,7 +8,7 @@
 #include <armnn/Types.hpp>
 #include <armnn/Tensor.hpp>
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 namespace armnnUtils
 {
@@ -28,12 +28,12 @@ public:
                                  unsigned int batchIndex, unsigned int channelIndex,
                                  unsigned int heightIndex, unsigned int widthIndex) const
     {
-        BOOST_ASSERT( batchIndex < shape[0] || ( shape[0] == 0 && batchIndex == 0 ) );
-        BOOST_ASSERT( channelIndex < shape[m_ChannelsIndex] ||
+        ARMNN_ASSERT( batchIndex < shape[0] || ( shape[0] == 0 && batchIndex == 0 ) );
+        ARMNN_ASSERT( channelIndex < shape[m_ChannelsIndex] ||
                     ( shape[m_ChannelsIndex] == 0 && channelIndex == 0) );
-        BOOST_ASSERT( heightIndex < shape[m_HeightIndex] ||
+        ARMNN_ASSERT( heightIndex < shape[m_HeightIndex] ||
                     ( shape[m_HeightIndex] == 0 && heightIndex == 0) );
-        BOOST_ASSERT( widthIndex < shape[m_WidthIndex] ||
+        ARMNN_ASSERT( widthIndex < shape[m_WidthIndex] ||
                     ( shape[m_WidthIndex] == 0 && widthIndex == 0) );
 
         /// Offset the given indices appropriately depending on the data layout

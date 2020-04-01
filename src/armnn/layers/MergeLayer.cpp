@@ -36,7 +36,7 @@ void MergeLayer::ValidateTensorShapesFromInputs()
         GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape(),
     });
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    ARMNN_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "MergeLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
@@ -46,7 +46,7 @@ void MergeLayer::ValidateTensorShapesFromInputs()
 
 std::vector<TensorShape> MergeLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    BOOST_ASSERT(inputShapes.size() == 2);
+    ARMNN_ASSERT(inputShapes.size() == 2);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "MergeLayer: TensorShapes set on inputs do not match",

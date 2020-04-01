@@ -42,7 +42,7 @@ arm_compute::DataType GetArmComputeDataType(armnn::DataType dataType, bool multi
         case armnn::DataType::Signed32:
             return arm_compute::DataType::S32;
         default:
-            BOOST_ASSERT_MSG(false, "Unknown data type");
+            ARMNN_ASSERT_MSG(false, "Unknown data type");
             return arm_compute::DataType::UNKNOWN;
     }
 }

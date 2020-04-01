@@ -13,6 +13,7 @@
 
 #include <armnnUtils/Permute.hpp>
 #include <armnnUtils/Transpose.hpp>
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
 #include <ParserHelper.hpp>
@@ -20,7 +21,6 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
-#include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -725,7 +725,7 @@ Deserializer::GraphPtr Deserializer::LoadGraphFromBinary(const uint8_t* binaryCo
 INetworkPtr Deserializer::CreateNetworkFromGraph(GraphPtr graph)
 {
     m_Network = INetwork::Create();
-    BOOST_ASSERT(graph != nullptr);
+    ARMNN_ASSERT(graph != nullptr);
     unsigned int layerIndex = 0;
     for (AnyLayer const* layer : *graph->layers())
     {
@@ -883,7 +883,7 @@ void Deserializer::SetupInputLayers(GraphPtr graph)
 
         // GetBindingLayerInfo expect the index to be index in the vector not index property on each layer base
         LayerBindingId bindingId = GetBindingLayerInfo(graph, inputLayerIndex);
-        BOOST_ASSERT_MSG(baseLayer->layerName()->c_str(), "Input has no name.");
+        ARMNN_ASSERT_MSG(baseLayer->layerName()->c_str(), "Input has no name.");
 
         IConnectableLayer* inputLayer =
             m_Network->AddInputLayer(bindingId, baseLayer->layerName()->c_str());
@@ -922,7 +922,7 @@ void Deserializer::SetupOutputLayers(GraphPtr graph)
 
         // GetBindingLayerInfo expect the index to be index in the vector not index property on each layer base
         LayerBindingId bindingId = GetBindingLayerInfo(graph, outputLayerIndex);
-        BOOST_ASSERT_MSG(baseLayer->layerName()->c_str(), "Input has no name.");
+        ARMNN_ASSERT_MSG(baseLayer->layerName()->c_str(), "Input has no name.");
 
         IConnectableLayer* outputLayer =
             m_Network->AddOutputLayer(bindingId, baseLayer->layerName()->c_str());
@@ -944,7 +944,7 @@ void Deserializer::RegisterOutputSlots(GraphPtr graph,
                                        IConnectableLayer* layer)
 {
     CHECK_LAYERS(graph, 0, layerIndex);
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
     LayerBaseRawPtr baseLayer = GetBaseLayer(graph, layerIndex);
     if (baseLayer->outputSlots()->size() != layer->GetNumOutputSlots())
     {
@@ -971,7 +971,7 @@ void Deserializer::RegisterInputSlots(GraphPtr graph,
                                       armnn::IConnectableLayer* layer)
 {
     CHECK_LAYERS(graph, 0, layerIndex);
-    BOOST_ASSERT(layer != nullptr);
+    ARMNN_ASSERT(layer != nullptr);
     LayerBaseRawPtr baseLayer = GetBaseLayer(graph, layerIndex);
     if (baseLayer->inputSlots()->size() != layer->GetNumInputSlots())
     {
@@ -1845,7 +1845,7 @@ armnn::Pooling2dDescriptor Deserializer::GetPoolingDescriptor(Deserializer::Pool
         }
         default:
         {
-            BOOST_ASSERT_MSG(false, "Unsupported pooling algorithm");
+            ARMNN_ASSERT_MSG(false, "Unsupported pooling algorithm");
         }
     }
 
@@ -1863,7 +1863,7 @@ armnn::Pooling2dDescriptor Deserializer::GetPoolingDescriptor(Deserializer::Pool
         }
         default:
         {
-            BOOST_ASSERT_MSG(false, "Unsupported output shape rounding");
+            ARMNN_ASSERT_MSG(false, "Unsupported output shape rounding");
         }
     }
 
@@ -1881,7 +1881,7 @@ armnn::Pooling2dDescriptor Deserializer::GetPoolingDescriptor(Deserializer::Pool
         }
         default:
         {
-            BOOST_ASSERT_MSG(false, "Unsupported padding method");
+            ARMNN_ASSERT_MSG(false, "Unsupported padding method");
         }
     }
 
@@ -1899,7 +1899,7 @@ armnn::Pooling2dDescriptor Deserializer::GetPoolingDescriptor(Deserializer::Pool
         }
         default:
         {
-            BOOST_ASSERT_MSG(false, "Unsupported data layout");
+            ARMNN_ASSERT_MSG(false, "Unsupported data layout");
         }
     }
 
@@ -2197,7 +2197,7 @@ armnn::NormalizationDescriptor Deserializer::GetNormalizationDescriptor(
         }
         default:
         {
-            BOOST_ASSERT_MSG(false, "Unsupported normalization channel type");
+            ARMNN_ASSERT_MSG(false, "Unsupported normalization channel type");
         }
     }
 
@@ -2215,7 +2215,7 @@ armnn::NormalizationDescriptor Deserializer::GetNormalizationDescriptor(
         }
         default:
         {
-            BOOST_ASSERT_MSG(false, "Unsupported normalization method type");
+            ARMNN_ASSERT_MSG(false, "Unsupported normalization method type");
         }
     }
 
@@ -2233,7 +2233,7 @@ armnn::NormalizationDescriptor Deserializer::GetNormalizationDescriptor(
         }
         default:
         {
-            BOOST_ASSERT_MSG(false, "Unsupported data layout");
+            ARMNN_ASSERT_MSG(false, "Unsupported data layout");
         }
     }
 

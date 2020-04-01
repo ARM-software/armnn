@@ -26,14 +26,14 @@ TransposeConvolution2dLayer::TransposeConvolution2dLayer(const TransposeConvolut
 
 std::unique_ptr<IWorkload> TransposeConvolution2dLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
-    BOOST_ASSERT_MSG(m_Weight != nullptr, "TransposeConvolution2dLayer: Weights data should not be null.");
+    ARMNN_ASSERT_MSG(m_Weight != nullptr, "TransposeConvolution2dLayer: Weights data should not be null.");
 
     TransposeConvolution2dQueueDescriptor descriptor;
     descriptor.m_Weight = m_Weight.get();
 
     if (m_Param.m_BiasEnabled)
     {
-        BOOST_ASSERT_MSG(m_Bias != nullptr, "TransposeConvolution2dLayer: Bias data should not be null.");
+        ARMNN_ASSERT_MSG(m_Bias != nullptr, "TransposeConvolution2dLayer: Bias data should not be null.");
         descriptor.m_Bias = m_Bias.get();
     }
 
@@ -57,11 +57,11 @@ TransposeConvolution2dLayer* TransposeConvolution2dLayer::Clone(Graph& graph) co
 std::vector<TensorShape> TransposeConvolution2dLayer::InferOutputShapes(
     const std::vector<TensorShape>& inputShapes) const
 {
-    BOOST_ASSERT(inputShapes.size() == 2);
+    ARMNN_ASSERT(inputShapes.size() == 2);
     const TensorShape& inputShape  = inputShapes[0];
     const TensorShape& kernelShape = inputShapes[1];
 
-    BOOST_ASSERT_MSG(inputShape.GetNumDimensions() == 4, "Transpose convolutions will always have 4D input");
+    ARMNN_ASSERT_MSG(inputShape.GetNumDimensions() == 4, "Transpose convolutions will always have 4D input");
 
     DataLayoutIndexed dataLayoutIndex(m_Param.m_DataLayout);
 
@@ -82,8 +82,8 @@ std::vector<TensorShape> TransposeConvolution2dLayer::InferOutputShapes(
     unsigned int kernelElements = kernelShape[0] * kernelShape[dataLayoutIndex.GetChannelsIndex()];
     unsigned int inputElements  = batches * inputShape[dataLayoutIndex.GetChannelsIndex()];
 
-    BOOST_ASSERT_MSG(inputElements != 0, "Invalid number of input elements");
-    BOOST_ASSERT_MSG(kernelElements % inputElements == 0, "Invalid number of elements");
+    ARMNN_ASSERT_MSG(inputElements != 0, "Invalid number of input elements");
+    ARMNN_ASSERT_MSG(kernelElements % inputElements == 0, "Invalid number of elements");
 
     unsigned int channels =  kernelElements / inputElements;
 
@@ -98,13 +98,13 @@ void TransposeConvolution2dLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(1, CHECK_LOCATION());
 
-    BOOST_ASSERT_MSG(m_Weight != nullptr, "TransposeConvolution2dLayer: Weight data cannot be null.");
+    ARMNN_ASSERT_MSG(m_Weight != nullptr, "TransposeConvolution2dLayer: Weight data cannot be null.");
 
     auto inferredShapes = InferOutputShapes({
          GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
          m_Weight->GetTensorInfo().GetShape() });
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    ARMNN_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "TransposeConvolution2dLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",

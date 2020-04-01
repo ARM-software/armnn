@@ -115,7 +115,7 @@ void SplitterLayer::CreateTensorHandles(const TensorHandleFactoryRegistry& regis
     else
     {
         ITensorHandleFactory* handleFactory = registry.GetFactory(factoryId);
-        BOOST_ASSERT(handleFactory);
+        ARMNN_ASSERT(handleFactory);
         CreateTensors(*handleFactory);
     }
 }
@@ -128,7 +128,7 @@ SplitterLayer* SplitterLayer::Clone(Graph& graph) const
 std::vector<TensorShape> SplitterLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
     IgnoreUnused(inputShapes);
-    BOOST_ASSERT(inputShapes.size() ==  m_Param.GetNumViews());
+    ARMNN_ASSERT(inputShapes.size() ==  m_Param.GetNumViews());
     std::vector<TensorShape> outShapes;
     //Output shapes must match View shapes.
     for (unsigned int viewIdx = 0; viewIdx < m_Param.GetNumViews(); viewIdx++)
@@ -150,7 +150,7 @@ void SplitterLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShapes = InferOutputShapes(views);
 
-    BOOST_ASSERT(inferredShapes.size() == m_Param.GetNumViews());
+    ARMNN_ASSERT(inferredShapes.size() == m_Param.GetNumViews());
 
     for (unsigned int viewIdx = 0; viewIdx < m_Param.GetNumViews(); viewIdx++)
     {

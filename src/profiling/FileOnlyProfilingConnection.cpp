@@ -111,7 +111,7 @@ bool FileOnlyProfilingConnection::SendCounterSelectionPacket()
 
 bool FileOnlyProfilingConnection::WritePacket(const unsigned char* buffer, uint32_t length)
 {
-    BOOST_ASSERT(buffer);
+    ARMNN_ASSERT(buffer);
 
     // Read Header and determine case
     uint32_t outgoingHeaderAsWords[2];

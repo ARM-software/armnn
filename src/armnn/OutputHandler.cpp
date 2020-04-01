@@ -9,8 +9,6 @@
 #include <backendsCommon/WorkloadDataCollector.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
-#include <boost/assert.hpp>
-
 namespace armnn
 {
 

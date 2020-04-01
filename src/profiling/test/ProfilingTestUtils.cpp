@@ -31,7 +31,7 @@ void VerifyTimelineHeaderBinary(const unsigned char* readableData,
                                 unsigned int& offset,
                                 uint32_t packetDataLength)
 {
-    BOOST_ASSERT(readableData);
+    ARMNN_ASSERT(readableData);
 
     // Utils
     unsigned int uint32_t_size = sizeof(uint32_t);
@@ -60,7 +60,7 @@ void VerifyTimelineLabelBinaryPacketData(Optional<ProfilingGuid> guid,
                                          const unsigned char* readableData,
                                          unsigned int& offset)
 {
-    BOOST_ASSERT(readableData);
+    ARMNN_ASSERT(readableData);
 
     // Utils
     unsigned int uint32_t_size = sizeof(uint32_t);
@@ -101,7 +101,7 @@ void VerifyTimelineEventClassBinaryPacketData(ProfilingGuid guid,
                                               const unsigned char* readableData,
                                               unsigned int& offset)
 {
-    BOOST_ASSERT(readableData);
+    ARMNN_ASSERT(readableData);
 
     // Utils
     unsigned int uint32_t_size = sizeof(uint32_t);
@@ -127,7 +127,7 @@ void VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType relati
                                             const unsigned char* readableData,
                                             unsigned int& offset)
 {
-    BOOST_ASSERT(readableData);
+    ARMNN_ASSERT(readableData);
 
     uint32_t relationshipTypeUint = 0;
     switch (relationshipType)
@@ -205,7 +205,7 @@ void VerifyTimelineEntityBinaryPacketData(Optional<ProfilingGuid> guid,
                                           const unsigned char* readableData,
                                           unsigned int& offset)
 {
-    BOOST_ASSERT(readableData);
+    ARMNN_ASSERT(readableData);
 
     // Utils
     unsigned int uint32_t_size = sizeof(uint32_t);
@@ -238,7 +238,7 @@ void VerifyTimelineEventBinaryPacket(Optional<uint64_t> timestamp,
                                      const unsigned char* readableData,
                                      unsigned int& offset)
 {
-    BOOST_ASSERT(readableData);
+    ARMNN_ASSERT(readableData);
 
     // Utils
     unsigned int uint32_t_size = sizeof(uint32_t);

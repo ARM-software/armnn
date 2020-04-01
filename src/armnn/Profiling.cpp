@@ -5,6 +5,7 @@
 #include "Profiling.hpp"
 
 #include <armnn/BackendId.hpp>
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
 #include "JsonPrinter.hpp"
@@ -45,7 +46,7 @@ constexpr bool g_WriteReportToStdOutOnProfilerDestruction = false;
 Measurement FindMeasurement(const std::string& name, const Event* event)
 {
 
-    BOOST_ASSERT(event != nullptr);
+    ARMNN_ASSERT(event != nullptr);
 
     // Search though the measurements.
     for (const auto& measurement : event->GetMeasurements())
@@ -63,7 +64,7 @@ Measurement FindMeasurement(const std::string& name, const Event* event)
 
 std::vector<Measurement> FindKernelMeasurements(const Event* event)
 {
-    BOOST_ASSERT(event != nullptr);
+    ARMNN_ASSERT(event != nullptr);
 
     std::vector<Measurement> measurements;
 
@@ -219,13 +220,13 @@ void Profiler::EndEvent(Event* event)
 {
     event->Stop();
 
-    BOOST_ASSERT(!m_Parents.empty());
-    BOOST_ASSERT(event == m_Parents.top());
+    ARMNN_ASSERT(!m_Parents.empty());
+    ARMNN_ASSERT(event == m_Parents.top());
     m_Parents.pop();
 
     Event* parent = m_Parents.empty() ? nullptr : m_Parents.top();
     IgnoreUnused(parent);
-    BOOST_ASSERT(event->GetParentEvent() == parent);
+    ARMNN_ASSERT(event->GetParentEvent() == parent);
 
 #if ARMNN_STREAMLINE_ENABLED
     ANNOTATE_CHANNEL_END(uint32_t(m_Parents.size()));
@@ -287,7 +288,7 @@ void ExtractJsonObjects(unsigned int inferenceIndex,
                         JsonChildObject& parentObject,
                         std::map<const Event*, std::vector<const Event*>> descendantsMap)
 {
-    BOOST_ASSERT(parentEvent);
+    ARMNN_ASSERT(parentEvent);
     std::vector<Measurement> instrumentMeasurements = parentEvent->GetMeasurements();
     unsigned int childIdx=0;
     for(size_t measurementIndex = 0; measurementIndex < instrumentMeasurements.size(); ++measurementIndex, ++childIdx)
@@ -299,7 +300,7 @@ void ExtractJsonObjects(unsigned int inferenceIndex,
             measurementObject.SetUnit(instrumentMeasurements[measurementIndex].m_Unit);
             measurementObject.SetType(JsonObjectType::Measurement);
 
-            BOOST_ASSERT(parentObject.NumChildren() == childIdx);
+            ARMNN_ASSERT(parentObject.NumChildren() == childIdx);
             parentObject.AddChild(measurementObject);
         }
 

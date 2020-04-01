@@ -5,7 +5,7 @@
 
 #include "InternalTypes.hpp"
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 
 namespace armnn
 {
@@ -75,7 +75,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::TransposeConvolution2d: return "TransposeConvolution2d";
         case LayerType::Transpose: return "Transpose";
         default:
-            BOOST_ASSERT_MSG(false, "Unknown layer type");
+            ARMNN_ASSERT_MSG(false, "Unknown layer type");
             return "Unknown";
     }
 }

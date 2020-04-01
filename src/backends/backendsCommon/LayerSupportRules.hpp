@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
 #include <algorithm>
 
 namespace armnn
@@ -30,7 +30,7 @@ inline armnn::Optional<armnn::DataType> GetBiasTypeFromWeightsType(armnn::Option
         case armnn::DataType::QAsymmS8:
             return armnn::DataType::Signed32;
         default:
-            BOOST_ASSERT_MSG(false, "GetBiasTypeFromWeightsType(): Unsupported data type.");
+            ARMNN_ASSERT_MSG(false, "GetBiasTypeFromWeightsType(): Unsupported data type.");
     }
     return armnn::EmptyOptional();
 }

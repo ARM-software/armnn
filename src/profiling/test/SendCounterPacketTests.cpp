@@ -536,7 +536,7 @@ BOOST_AUTO_TEST_CASE(CreateEventRecordTest)
                                                          counterUnits,
                                                          deviceUid,
                                                          counterSetUid);
-    BOOST_ASSERT(counter);
+    ARMNN_ASSERT(counter);
 
     // Create an event record
     SendCounterPacket::EventRecord eventRecord;
@@ -656,7 +656,7 @@ BOOST_AUTO_TEST_CASE(CreateEventRecordNoUnitsTest)
                                                          "",
                                                          deviceUid,
                                                          counterSetUid);
-    BOOST_ASSERT(counter);
+    ARMNN_ASSERT(counter);
 
     // Create an event record
     SendCounterPacket::EventRecord eventRecord;
@@ -761,7 +761,7 @@ BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest1)
                                                          counterUnits,
                                                          deviceUid,
                                                          counterSetUid);
-    BOOST_ASSERT(counter);
+    ARMNN_ASSERT(counter);
 
     // Create an event record
     SendCounterPacket::EventRecord eventRecord;
@@ -800,7 +800,7 @@ BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest2)
                                                          counterUnits,
                                                          deviceUid,
                                                          counterSetUid);
-    BOOST_ASSERT(counter);
+    ARMNN_ASSERT(counter);
 
     // Create an event record
     SendCounterPacket::EventRecord eventRecord;
@@ -839,7 +839,7 @@ BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest3)
                                                          counterUnits,
                                                          deviceUid,
                                                          counterSetUid);
-    BOOST_ASSERT(counter);
+    ARMNN_ASSERT(counter);
 
     // Create an event record
     SendCounterPacket::EventRecord eventRecord;
@@ -859,7 +859,7 @@ BOOST_AUTO_TEST_CASE(CreateCategoryRecordTest)
     // Create a category for testing
     const std::string categoryName = "some_category";
     const CategoryPtr category = std::make_unique<Category>(categoryName);
-    BOOST_ASSERT(category);
+    ARMNN_ASSERT(category);
     category->m_Counters = { 11u, 23u, 5670u };
 
     // Create a collection of counters
@@ -903,9 +903,9 @@ BOOST_AUTO_TEST_CASE(CreateCategoryRecordTest)
     Counter* counter1 = counters.find(11)->second.get();
     Counter* counter2 = counters.find(23)->second.get();
     Counter* counter3 = counters.find(5670)->second.get();
-    BOOST_ASSERT(counter1);
-    BOOST_ASSERT(counter2);
-    BOOST_ASSERT(counter3);
+    ARMNN_ASSERT(counter1);
+    ARMNN_ASSERT(counter2);
+    ARMNN_ASSERT(counter3);
     uint16_t categoryEventCount = boost::numeric_cast<uint16_t>(counters.size());
 
     // Create a category record

@@ -362,7 +362,7 @@ armnn::profiling::Packet GatordMockService::ReceivePacket()
 
     profiling::CommandHandlerFunctor* commandHandlerFunctor =
         m_HandlerRegistry.GetFunctor(packetRx.GetPacketFamily(), packetRx.GetPacketId(), version.GetEncodedValue());
-    BOOST_ASSERT(commandHandlerFunctor);
+    ARMNN_ASSERT(commandHandlerFunctor);
     commandHandlerFunctor->operator()(packetRx);
     return packetRx;
 }

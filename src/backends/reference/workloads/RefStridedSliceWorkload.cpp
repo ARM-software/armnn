@@ -27,7 +27,7 @@ void RefStridedSliceWorkload::Execute() const
     DataType inputDataType  = inputInfo.GetDataType();
     DataType outputDataType = outputInfo.GetDataType();
 
-    BOOST_ASSERT(inputDataType == outputDataType);
+    ARMNN_ASSERT(inputDataType == outputDataType);
     IgnoreUnused(outputDataType);
 
     StridedSlice(inputInfo,

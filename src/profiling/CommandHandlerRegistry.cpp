@@ -5,7 +5,8 @@
 
 #include "CommandHandlerRegistry.hpp"
 
-#include <boost/assert.hpp>
+#include <armnn/utility/Assert.hpp>
+
 #include <boost/format.hpp>
 
 namespace armnn
@@ -19,7 +20,7 @@ void CommandHandlerRegistry::RegisterFunctor(CommandHandlerFunctor* functor,
                                              uint32_t packetId,
                                              uint32_t version)
 {
-    BOOST_ASSERT_MSG(functor, "Provided functor should not be a nullptr");
+    ARMNN_ASSERT_MSG(functor, "Provided functor should not be a nullptr");
 
     CommandHandlerKey key(familyId, packetId, version);
     registry[key] = functor;
@@ -27,7 +28,7 @@ void CommandHandlerRegistry::RegisterFunctor(CommandHandlerFunctor* functor,
 
 void CommandHandlerRegistry::RegisterFunctor(CommandHandlerFunctor* functor)
 {
-    BOOST_ASSERT_MSG(functor, "Provided functor should not be a nullptr");
+    ARMNN_ASSERT_MSG(functor, "Provided functor should not be a nullptr");
 
     RegisterFunctor(functor, functor->GetFamilyId(), functor->GetPacketId(), functor->GetVersion());
 }

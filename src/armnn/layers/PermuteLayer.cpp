@@ -35,7 +35,7 @@ PermuteLayer* PermuteLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> PermuteLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    BOOST_ASSERT(inputShapes.size() == 1);
+    ARMNN_ASSERT(inputShapes.size() == 1);
     const TensorShape& inShape = inputShapes[0];
     return std::vector<TensorShape> ({armnnUtils::Permuted(inShape, m_Param.m_DimMappings)});
 }
@@ -46,7 +46,7 @@ void PermuteLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    ARMNN_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "PermuteLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",

@@ -939,13 +939,14 @@ bool RefLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
     if (descriptor.m_BiasEnabled)
     {
         // Defined supported types for bias
-        std::array<DataType, 4>
+        std::array<DataType, 5>
         supportedBiasTypes =
         {
             DataType::BFloat16,
             DataType::Float32,
             DataType::Float16,
-            DataType::Signed32
+            DataType::Signed32,
+            DataType::QAsymmS8
         };
 
         supported &= CheckSupportRule(TypeAnyOf(biases, supportedBiasTypes), reasonIfUnsupported,

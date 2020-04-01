@@ -883,6 +883,7 @@ if(BUILD_UNIT_TESTS)
 
     if(BUILD_TIMELINE_DECODER)
         list(APPEND unittest_sources
+             src/timelineDecoder/tests/JSONTimelineDecoderTests.cpp
              src/timelineDecoder/tests/TimelineTests.cpp
              )
     endif()

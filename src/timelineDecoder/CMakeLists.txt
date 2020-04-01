@@ -9,6 +9,8 @@ if(BUILD_TIMELINE_DECODER)
             ../../include/armnn/profiling/ITimelineDecoder.hpp
             TimelineCaptureCommandHandler.cpp
             TimelineCaptureCommandHandler.hpp
+            JSONTimelineDecoder.cpp
+            JSONTimelineDecoder.hpp
             TimelineDecoder.cpp
             TimelineDecoder.hpp
             TimelineDirectoryCaptureCommandHandler.cpp

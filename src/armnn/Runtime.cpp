@@ -10,10 +10,10 @@
 
 #include <armnn/backends/IBackendContext.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <iostream>
 
-#include <boost/polymorphic_cast.hpp>
 #include <backends/BackendProfiling.hpp>
 
 using namespace armnn;
@@ -34,7 +34,7 @@ IRuntimePtr IRuntime::Create(const CreationOptions& options)
 
 void IRuntime::Destroy(IRuntime* runtime)
 {
-    delete boost::polymorphic_downcast<Runtime*>(runtime);
+    delete PolymorphicDowncast<Runtime*>(runtime);
 }
 
 int Runtime::GenerateNetworkId()
@@ -71,7 +71,7 @@ Status Runtime::LoadNetwork(NetworkId& networkIdOut,
     }
 
     unique_ptr<LoadedNetwork> loadedNetwork = LoadedNetwork::MakeLoadedNetwork(
-        std::unique_ptr<OptimizedNetwork>(boost::polymorphic_downcast<OptimizedNetwork*>(rawNetwork)),
+        std::unique_ptr<OptimizedNetwork>(PolymorphicDowncast<OptimizedNetwork*>(rawNetwork)),
         errorMessage,
         networkProperties,
         m_ProfilingService);

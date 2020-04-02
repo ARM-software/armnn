@@ -4,9 +4,11 @@
 //
 
 #include "Network.hpp"
+#include "NetworkQuantizerUtils.hpp"
 #include "QuantizerVisitor.hpp"
 #include "StaticRangeVisitor.hpp"
-#include "NetworkQuantizerUtils.hpp"
+
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 namespace armnn
 {
@@ -28,7 +30,7 @@ void QuantizerVisitor::SetQuantizedInputConnections(const IConnectableLayer* src
     for (unsigned int i = 0; i < srcLayer->GetNumInputSlots(); i++)
     {
         const IInputSlot& srcInputSlot = srcLayer->GetInputSlot(i);
-        const InputSlot* inputSlot = boost::polymorphic_downcast<const InputSlot*>(&srcInputSlot);
+        const InputSlot* inputSlot = PolymorphicDowncast<const InputSlot*>(&srcInputSlot);
         ARMNN_ASSERT(inputSlot);
         const OutputSlot* outputSlot = inputSlot->GetConnectedOutputSlot();
 
@@ -70,7 +72,7 @@ ConstTensor QuantizerVisitor::CreateQuantizedBias(const IConnectableLayer* srcLa
 {
     ARMNN_ASSERT(srcLayer);
     const IInputSlot& srcInputSlot = srcLayer->GetInputSlot(0);
-    auto inputSlot = boost::polymorphic_downcast<const InputSlot*>(&srcInputSlot);
+    auto inputSlot = PolymorphicDowncast<const InputSlot*>(&srcInputSlot);
     ARMNN_ASSERT(inputSlot);
     const OutputSlot* outputSlot = inputSlot->GetConnectedOutputSlot();
 

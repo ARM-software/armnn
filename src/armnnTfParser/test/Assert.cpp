@@ -7,6 +7,8 @@
 #include "ParserPrototxtFixture.hpp"
 #include "test/GraphUtils.hpp"
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
+
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
@@ -100,7 +102,7 @@ BOOST_FIXTURE_TEST_CASE(AssertSimpleGraphStructureTest, AssertSimpleFixture)
 {
     auto optimized = SetupOptimizedNetwork({ { "Placeholder", { 1, 1, 1, 4 } } }, { "Add" });
 
-    auto optimizedNetwork = boost::polymorphic_downcast<armnn::OptimizedNetwork*>(optimized.get());
+    auto optimizedNetwork = armnn::PolymorphicDowncast<armnn::OptimizedNetwork*>(optimized.get());
     auto graph = optimizedNetwork->GetGraph();
 
     BOOST_TEST((graph.GetNumInputs() == 1));
@@ -256,7 +258,7 @@ BOOST_FIXTURE_TEST_CASE(AssertGraphStructureTest, AssertFixture)
                                              { "Input1", { 1, 1, 2, 2 } } },
                                            { "Output" });
 
-    auto optimizedNetwork = boost::polymorphic_downcast<armnn::OptimizedNetwork*>(optimized.get());
+    auto optimizedNetwork = armnn::PolymorphicDowncast<armnn::OptimizedNetwork*>(optimized.get());
     auto graph = optimizedNetwork->GetGraph();
 
     BOOST_TEST((graph.GetNumInputs() == 2));

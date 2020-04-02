@@ -6,6 +6,8 @@
 
 #include "LayerWithParameters.hpp"
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
+
 namespace armnn
 {
 
@@ -43,7 +45,7 @@ public:
     bool IsInverse(const Layer& other) const
     {
         return (other.GetType() == LayerType::Transpose) &&
-            GetPermutation().IsInverse(boost::polymorphic_downcast<const TransposeLayer*>(&other)->GetPermutation());
+            GetPermutation().IsInverse(PolymorphicDowncast<const TransposeLayer*>(&other)->GetPermutation());
     }
 
     /// Indicates if the other layer received is equal to this one.
@@ -52,7 +54,7 @@ public:
     bool IsEqual(const Layer& other) const
     {
         return (other.GetType() == LayerType::Transpose) &&
-               GetPermutation().IsEqual(boost::polymorphic_downcast<const TransposeLayer*>(&other)->GetPermutation());
+               GetPermutation().IsEqual(PolymorphicDowncast<const TransposeLayer*>(&other)->GetPermutation());
     }
 
     void Accept(ILayerVisitor& visitor) const override;

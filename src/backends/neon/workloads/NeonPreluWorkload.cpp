@@ -5,7 +5,9 @@
 
 #include "NeonPreluWorkload.hpp"
 #include "NeonWorkloadUtils.hpp"
+
 #include <aclCommon/ArmComputeUtils.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <arm_compute/runtime/NEON/functions/NEPReluLayer.h>
 
@@ -31,9 +33,9 @@ NeonPreluWorkload::NeonPreluWorkload(const PreluQueueDescriptor& descriptor,
 {
     m_Data.ValidateInputsOutputs("NeonPreluWorkload", 1, 1);
 
-    arm_compute::ITensor& input = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& alpha = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
-    arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& input = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& alpha = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
+    arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     auto layer = std::make_unique<arm_compute::NEPReluLayer>();
     layer->configure(&input, &alpha, &output);

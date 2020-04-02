@@ -12,6 +12,7 @@
 #include <armnnUtils/DataLayoutIndexed.hpp>
 #include <armnnUtils/Transpose.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <GraphTopologicalSort.hpp>
 #include <ParserHelper.hpp>
@@ -22,10 +23,8 @@
 #include <tensorflow/core/framework/graph.pb.h>
 
 #include <boost/format.hpp>
-#include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/polymorphic_cast.hpp>
-
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <numeric>
 
 using namespace armnnUtils;
@@ -1220,7 +1219,7 @@ ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
                     % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<float>* weightNode =
-        boost::polymorphic_downcast<ParsedConstTfOperation<float> *>(inputs[1].m_IndexedValue);
+        PolymorphicDowncast<ParsedConstTfOperation<float> *>(inputs[1].m_IndexedValue);
 
     std::string paddingString = ReadMandatoryNodeStringAttribute(nodeDef, "padding");
     std::string dataFormat = ReadMandatoryNodeStringAttribute(nodeDef, "data_format");
@@ -1364,7 +1363,7 @@ ParsedTfOperationPtr TfParser::ParseDepthwiseConv2D(const tensorflow::NodeDef& n
     }
 
     ParsedConstTfOperation<float>* weightNode =
-        boost::polymorphic_downcast<ParsedConstTfOperation<float> *>(inputs[1].m_IndexedValue);
+        PolymorphicDowncast<ParsedConstTfOperation<float> *>(inputs[1].m_IndexedValue);
 
     std::string paddingString = ReadMandatoryNodeStringAttribute(nodeDef, "padding");
     std::string dataFormat = ReadMandatoryNodeStringAttribute(nodeDef, "data_format");
@@ -1578,7 +1577,7 @@ ParsedTfOperationPtr TfParser::ParseFusedBatchNorm(const tensorflow::NodeDef& no
                     % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<float>* scaleNode =
-        boost::polymorphic_downcast<ParsedConstTfOperation<float> *>(inputs[1].m_IndexedValue);
+        PolymorphicDowncast<ParsedConstTfOperation<float> *>(inputs[1].m_IndexedValue);
 
     if (!HasParsedConstTensor<float>(inputs[2].m_IndexedValue->GetNode().name()))
     {
@@ -1592,7 +1591,7 @@ ParsedTfOperationPtr TfParser::ParseFusedBatchNorm(const tensorflow::NodeDef& no
                     % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<float>* offsetNode =
-        boost::polymorphic_downcast<ParsedConstTfOperation<float> *>(inputs[2].m_IndexedValue);
+        PolymorphicDowncast<ParsedConstTfOperation<float> *>(inputs[2].m_IndexedValue);
 
     if (!HasParsedConstTensor<float>(inputs[3].m_IndexedValue->GetNode().name()))
     {
@@ -1606,7 +1605,7 @@ ParsedTfOperationPtr TfParser::ParseFusedBatchNorm(const tensorflow::NodeDef& no
                     % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<float>* meanNode =
-        boost::polymorphic_downcast<ParsedConstTfOperation<float> *>(inputs[3].m_IndexedValue);
+        PolymorphicDowncast<ParsedConstTfOperation<float> *>(inputs[3].m_IndexedValue);
 
     if (!HasParsedConstTensor<float>(inputs[4].m_IndexedValue->GetNode().name()))
     {
@@ -1620,7 +1619,7 @@ ParsedTfOperationPtr TfParser::ParseFusedBatchNorm(const tensorflow::NodeDef& no
                     % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<float>* varianceNode =
-        boost::polymorphic_downcast<ParsedConstTfOperation<float> *>(inputs[4].m_IndexedValue);
+        PolymorphicDowncast<ParsedConstTfOperation<float> *>(inputs[4].m_IndexedValue);
 
     const std::string dataFormat = ReadOptionalNodeStringAttribute(nodeDef, "data_format", "NHWC");
     CHECK_DATA_FORMAT(nodeDef, dataFormat, "FusedBatchNorm");
@@ -1689,7 +1688,7 @@ bool TfParser::IsSupportedLeakyReluPattern(const tensorflow::NodeDef& mulNodeDef
             if (HasParsedConstTensor<float>(inputs[alphaLayerIndex].m_IndexedValue->GetNode().name()))
             {
                 ParsedConstTfOperation<float>* alpha =
-                    boost::polymorphic_downcast<ParsedConstTfOperation<float> *>(
+                    PolymorphicDowncast<ParsedConstTfOperation<float> *>(
                         inputs[alphaLayerIndex].m_IndexedValue);
 
                 std::vector<float> const_data;
@@ -2079,7 +2078,7 @@ ParsedTfOperationPtr TfParser::ParseTranspose(const tensorflow::NodeDef& nodeDef
 
     const auto  constInput         = inputs[GetConstInputIndex(inputs)];
     auto*       permuteVectorInput =
-        boost::polymorphic_downcast<ParsedConstTfOperation<int32_t>*>(constInput.m_IndexedValue);
+        PolymorphicDowncast<ParsedConstTfOperation<int32_t>*>(constInput.m_IndexedValue);
     const auto& permuteVectorInfo  = permuteVectorInput->GetTensorInfo();
 
     std::vector<int32_t> permuteVectorData;
@@ -2177,7 +2176,7 @@ ParsedTfOperationPtr TfParser::ParsePad(const tensorflow::NodeDef& nodeDef,
 
     }
     ParsedConstTfOperation<int32_t>* paddingTensorOp =
-            boost::polymorphic_downcast<ParsedConstTfOperation<int32_t>*>(inputs[1].m_IndexedValue);
+            PolymorphicDowncast<ParsedConstTfOperation<int32_t>*>(inputs[1].m_IndexedValue);
 
     std::vector<int32_t> paddingTensorData;
     ConstTensor paddingTensor = paddingTensorOp->GetConstTensor(paddingTensorData);
@@ -2244,7 +2243,7 @@ ParsedTfOperationPtr TfParser::ParseConcat(const tensorflow::NodeDef& nodeDef,
     unsigned int index = GetConstInputIndex(inputs);
     // Get the axis tensor data
     ParsedConstTfOperation<int32_t>* shapeNode =
-            boost::polymorphic_downcast<ParsedConstTfOperation<int32_t>*>(inputs[index].m_IndexedValue);
+            PolymorphicDowncast<ParsedConstTfOperation<int32_t>*>(inputs[index].m_IndexedValue);
 
     std::vector<int32_t> axisTensorData;
     shapeNode->GetConstTensor(axisTensorData);
@@ -2377,7 +2376,7 @@ ParsedTfOperationPtr TfParser::ParseReshape(const tensorflow::NodeDef& nodeDef,
                     % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<int32_t>* shapeNode =
-        boost::polymorphic_downcast<ParsedConstTfOperation<int32_t>*>(inputs[1].m_IndexedValue);
+        PolymorphicDowncast<ParsedConstTfOperation<int32_t>*>(inputs[1].m_IndexedValue);
 
     armnn::IOutputSlot& prevLayerOutputSlot = inputNode->ResolveArmnnOutputSlot(inputs[0].m_Index);
     TensorInfo inputTensorInfo = prevLayerOutputSlot.GetTensorInfo();
@@ -2415,7 +2414,7 @@ ParsedTfOperationPtr TfParser::ParseResizeBilinear(const tensorflow::NodeDef& no
                     % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<int32_t>* sizeNode =
-        boost::polymorphic_downcast<ParsedConstTfOperation<int32_t>*>(inputs[1].m_IndexedValue);
+        PolymorphicDowncast<ParsedConstTfOperation<int32_t>*>(inputs[1].m_IndexedValue);
 
     // Checks the align_corners attribute is not set.
     if (ReadOptionalNodeBoolAttribute(nodeDef, "align_corners", false))
@@ -2630,7 +2629,7 @@ ParsedTfOperationPtr TfParser::ParseMean(const tensorflow::NodeDef& nodeDef, con
     bool keepDims = ReadMandatoryNodeBoolAttribute(nodeDef, "keep_dims");
 
     ParsedConstTfOperation<int32_t>* axisNode =
-             boost::polymorphic_downcast<ParsedConstTfOperation<int32_t>*>(inputs[1].m_IndexedValue);
+             PolymorphicDowncast<ParsedConstTfOperation<int32_t>*>(inputs[1].m_IndexedValue);
 
     const TensorInfo& axisTensorInfo = axisNode->GetTensorInfo();
 
@@ -2810,7 +2809,7 @@ ParsedTfOperationPtr TfParser::ParseSplit(const tensorflow::NodeDef& nodeDef,
     unsigned int index = GetConstInputIndex(inputs);
     // Get the axis tensor data
     ParsedConstTfOperation<int32_t>* shapeNode =
-                boost::polymorphic_downcast<ParsedConstTfOperation<int32_t>*>(inputs[index].m_IndexedValue);
+                PolymorphicDowncast<ParsedConstTfOperation<int32_t>*>(inputs[index].m_IndexedValue);
 
     std::vector<int32_t> axisTensorData;
     shapeNode->GetConstTensor(axisTensorData);
@@ -2913,17 +2912,17 @@ ParsedTfOperationPtr TfParser::ParseStridedSlice(const tensorflow::NodeDef& node
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, numInputs);
 
     ParsedConstTfOperation<int32_t>* beginNode =
-            boost::polymorphic_downcast<ParsedConstTfOperation<int32_t> *>(inputs[1].m_IndexedValue);
+            PolymorphicDowncast<ParsedConstTfOperation<int32_t> *>(inputs[1].m_IndexedValue);
     std::vector<int32_t> beginTensorData;
     beginNode->GetConstTensor(beginTensorData);
 
     ParsedConstTfOperation<int32_t>* endNode =
-            boost::polymorphic_downcast<ParsedConstTfOperation<int32_t> *>(inputs[2].m_IndexedValue);
+            PolymorphicDowncast<ParsedConstTfOperation<int32_t> *>(inputs[2].m_IndexedValue);
     std::vector<int32_t> endTensorData;
     endNode->GetConstTensor(endTensorData);
 
     ParsedConstTfOperation<int32_t>* stridesNode =
-            boost::polymorphic_downcast<ParsedConstTfOperation<int32_t> *>(inputs[3].m_IndexedValue);
+            PolymorphicDowncast<ParsedConstTfOperation<int32_t> *>(inputs[3].m_IndexedValue);
     std::vector<int32_t> stridesTensorData;
     stridesNode->GetConstTensor(stridesTensorData);
 
@@ -3311,11 +3310,11 @@ IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& m
         // Finds our inputs.
         if (HasParsedConstTensor<float>(addInputs[0].m_IndexedValue->GetNode().name()))
         {
-            biasNode = boost::polymorphic_downcast<ParsedConstTfOperation<float>*>(addInputs[0].m_IndexedValue);
+            biasNode = PolymorphicDowncast<ParsedConstTfOperation<float>*>(addInputs[0].m_IndexedValue);
         }
         else if (HasParsedConstTensor<float>(addInputs[1].m_IndexedValue->GetNode().name()))
         {
-            biasNode = boost::polymorphic_downcast<ParsedConstTfOperation<float>*>(addInputs[1].m_IndexedValue);
+            biasNode = PolymorphicDowncast<ParsedConstTfOperation<float>*>(addInputs[1].m_IndexedValue);
         }
         else
         {
@@ -3339,13 +3338,13 @@ IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& m
     std::vector<OutputOfParsedTfOperation> mulInputs = GetInputParsedTfOperationsChecked(matMulNodeDef, 2);
     if (HasParsedConstTensor<float>(mulInputs[0].m_IndexedValue->GetNode().name()))
     {
-        weightNode = boost::polymorphic_downcast<ParsedConstTfOperation<float>*>(mulInputs[0].m_IndexedValue);
+        weightNode = PolymorphicDowncast<ParsedConstTfOperation<float>*>(mulInputs[0].m_IndexedValue);
         inputNode = mulInputs[1].m_IndexedValue;
         inputIdx = mulInputs[1].m_Index;
     }
     else if (HasParsedConstTensor<float>(mulInputs[1].m_IndexedValue->GetNode().name()))
     {
-        weightNode = boost::polymorphic_downcast<ParsedConstTfOperation<float>*>(mulInputs[1].m_IndexedValue);
+        weightNode = PolymorphicDowncast<ParsedConstTfOperation<float>*>(mulInputs[1].m_IndexedValue);
         inputNode = mulInputs[0].m_IndexedValue;
         inputIdx = mulInputs[0].m_Index;
     }

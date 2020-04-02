@@ -4,7 +4,9 @@
 //
 
 #include "NeonMinimumWorkload.hpp"
+
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 
 namespace armnn
@@ -29,9 +31,9 @@ NeonMinimumWorkload::NeonMinimumWorkload(const MinimumQueueDescriptor& descripto
 {
     m_Data.ValidateInputsOutputs("NeonMinimumWorkload", 2, 1);
 
-    arm_compute::ITensor& input0 = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& input1 = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
-    arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& input0 = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& input1 = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
+    arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     m_MinLayer.configure(&input0, &input1, &output);
 }

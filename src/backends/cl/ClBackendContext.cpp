@@ -8,13 +8,12 @@
 
 #include <armnn/Logging.hpp>
 #include <armnn/utility/Assert.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <arm_compute/core/CL/OpenCL.h>
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
 #include <arm_compute/runtime/CL/CLTunerTypes.h>
-
-#include <boost/polymorphic_cast.hpp>
 
 namespace armnn
 {
@@ -161,7 +160,7 @@ ClBackendContext::ClBackendContext(const IRuntime::CreationOptions& options)
     bool useLegacyTunerAPI = options.m_GpuAccTunedParameters.get() != nullptr;
     if (useLegacyTunerAPI)
     {
-        auto clTunerParams = boost::polymorphic_downcast<ClTunedParameters*>(
+        auto clTunerParams = PolymorphicDowncast<ClTunedParameters*>(
                                 options.m_GpuAccTunedParameters.get());
         tuner = &clTunerParams->m_Tuner;
 

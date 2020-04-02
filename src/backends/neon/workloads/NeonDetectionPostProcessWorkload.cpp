@@ -9,8 +9,7 @@
 
 #include <aclCommon/ArmComputeTensorHandle.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
-
-#include <boost/cast.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 namespace armnn
 {
@@ -85,7 +84,7 @@ NeonDetectionPostProcessWorkload::NeonDetectionPostProcessWorkload(
 
     auto AclTensorRef = [](ITensorHandle* tensor) -> arm_compute::ITensor&
         {
-            return boost::polymorphic_downcast<IAclTensorHandle*>(tensor)->GetTensor();
+            return PolymorphicDowncast<IAclTensorHandle*>(tensor)->GetTensor();
         };
 
     arm_compute::ITensor& boxEncodings  = AclTensorRef(m_Data.m_Inputs[0]);

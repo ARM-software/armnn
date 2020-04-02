@@ -6,15 +6,12 @@
 #pragma once
 
 #include <armnn/BackendRegistry.hpp>
-#include <armnn/ILayerSupport.hpp>
-
 #include <armnn/backends/DynamicBackend.hpp>
-
-#include <backendsCommon/DynamicBackendUtils.hpp>
+#include <armnn/ILayerSupport.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
-
+#include <backendsCommon/DynamicBackendUtils.hpp>
 #include <reference/workloads/RefConvolution2dWorkload.hpp>
-
 #include <Runtime.hpp>
 
 #include <string>
@@ -1212,7 +1209,7 @@ void RuntimeEmptyTestImpl()
     IRuntime::CreationOptions creationOptions;
     IRuntimePtr runtime = IRuntime::Create(creationOptions);
 
-    const DeviceSpec& deviceSpec = *boost::polymorphic_downcast<const DeviceSpec*>(&runtime->GetDeviceSpec());
+    const DeviceSpec& deviceSpec = *PolymorphicDowncast<const DeviceSpec*>(&runtime->GetDeviceSpec());
     BackendIdSet supportedBackendIds = deviceSpec.GetSupportedBackends();
     BOOST_TEST(supportedBackendIds.empty());
 
@@ -1253,7 +1250,7 @@ void RuntimeDynamicBackendsTestImpl()
         BOOST_TEST((backendIds.find(expectedRegisteredbackendId) != backendIds.end()));
     }
 
-    const DeviceSpec& deviceSpec = *boost::polymorphic_downcast<const DeviceSpec*>(&runtime->GetDeviceSpec());
+    const DeviceSpec& deviceSpec = *PolymorphicDowncast<const DeviceSpec*>(&runtime->GetDeviceSpec());
     BackendIdSet supportedBackendIds = deviceSpec.GetSupportedBackends();
     BOOST_TEST(supportedBackendIds.size() == expectedRegisteredbackendIds.size());
     for (const BackendId& expectedRegisteredbackendId : expectedRegisteredbackendIds)
@@ -1294,7 +1291,7 @@ void RuntimeDuplicateDynamicBackendsTestImpl()
         BOOST_TEST((backendIds.find(expectedRegisteredbackendId) != backendIds.end()));
     }
 
-    const DeviceSpec& deviceSpec = *boost::polymorphic_downcast<const DeviceSpec*>(&runtime->GetDeviceSpec());
+    const DeviceSpec& deviceSpec = *PolymorphicDowncast<const DeviceSpec*>(&runtime->GetDeviceSpec());
     BackendIdSet supportedBackendIds = deviceSpec.GetSupportedBackends();
     BOOST_TEST(supportedBackendIds.size() == expectedRegisteredbackendIds.size());
     for (const BackendId& expectedRegisteredbackendId : expectedRegisteredbackendIds)
@@ -1323,7 +1320,7 @@ void RuntimeInvalidDynamicBackendsTestImpl()
     const BackendRegistry& backendRegistry = BackendRegistryInstance();
     BOOST_TEST(backendRegistry.Size() == 0);
 
-    const DeviceSpec& deviceSpec = *boost::polymorphic_downcast<const DeviceSpec*>(&runtime->GetDeviceSpec());
+    const DeviceSpec& deviceSpec = *PolymorphicDowncast<const DeviceSpec*>(&runtime->GetDeviceSpec());
     BackendIdSet supportedBackendIds = deviceSpec.GetSupportedBackends();
     BOOST_TEST(supportedBackendIds.empty());
 }
@@ -1343,7 +1340,7 @@ void RuntimeInvalidOverridePathTestImpl()
     const BackendRegistry& backendRegistry = BackendRegistryInstance();
     BOOST_TEST(backendRegistry.Size() == 0);
 
-    const DeviceSpec& deviceSpec = *boost::polymorphic_downcast<const DeviceSpec*>(&runtime->GetDeviceSpec());
+    const DeviceSpec& deviceSpec = *PolymorphicDowncast<const DeviceSpec*>(&runtime->GetDeviceSpec());
     BackendIdSet supportedBackendIds = deviceSpec.GetSupportedBackends();
     BOOST_TEST(supportedBackendIds.empty());
 }
@@ -1382,7 +1379,7 @@ void CreateReferenceDynamicBackendTestImpl()
     BackendIdSet backendIds = backendRegistry.GetBackendIds();
     BOOST_TEST((backendIds.find("CpuRef") != backendIds.end()));
 
-    const DeviceSpec& deviceSpec = *boost::polymorphic_downcast<const DeviceSpec*>(&runtime->GetDeviceSpec());
+    const DeviceSpec& deviceSpec = *PolymorphicDowncast<const DeviceSpec*>(&runtime->GetDeviceSpec());
     BackendIdSet supportedBackendIds = deviceSpec.GetSupportedBackends();
     BOOST_TEST(supportedBackendIds.size() == 1);
     BOOST_TEST((supportedBackendIds.find("CpuRef") != supportedBackendIds.end()));
@@ -1433,7 +1430,7 @@ void CreateReferenceDynamicBackendTestImpl()
     // Create a convolution workload with the dummy settings
     auto workload = referenceWorkloadFactory->CreateConvolution2d(convolution2dQueueDescriptor, workloadInfo);
     BOOST_TEST((workload != nullptr));
-    BOOST_TEST(workload.get() == boost::polymorphic_downcast<RefConvolution2dWorkload*>(workload.get()));
+    BOOST_TEST(workload.get() == PolymorphicDowncast<RefConvolution2dWorkload*>(workload.get()));
 }
 
 #endif
@@ -1453,7 +1450,7 @@ void CreateSampleDynamicBackendTestImpl()
     BackendIdSet backendIds = backendRegistry.GetBackendIds();
     BOOST_TEST((backendIds.find("SampleDynamic") != backendIds.end()));
 
-    const DeviceSpec& deviceSpec = *boost::polymorphic_downcast<const DeviceSpec*>(&runtime->GetDeviceSpec());
+    const DeviceSpec& deviceSpec = *PolymorphicDowncast<const DeviceSpec*>(&runtime->GetDeviceSpec());
     BackendIdSet supportedBackendIds = deviceSpec.GetSupportedBackends();
     BOOST_TEST(supportedBackendIds.size()>= 1);
     BOOST_TEST((supportedBackendIds.find("SampleDynamic") != supportedBackendIds.end()));

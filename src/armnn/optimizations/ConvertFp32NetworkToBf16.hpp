@@ -7,6 +7,8 @@
 #include "NetworkUtils.hpp"
 #include "Optimization.hpp"
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
+
 namespace armnn
 {
 namespace optimizations
@@ -15,7 +17,7 @@ namespace optimizations
 template <typename LayerT>
 inline LayerT* ConvertWeight(Layer* l)
 {
-    LayerT* layer = boost::polymorphic_downcast<LayerT*>(l);
+    LayerT* layer = PolymorphicDowncast<LayerT*>(l);
     if ((layer->GetType() == LayerType::Convolution2d || layer->GetType() == LayerType::FullyConnected)
          && layer->m_Weight)
     {

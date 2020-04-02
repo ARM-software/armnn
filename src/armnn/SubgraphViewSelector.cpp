@@ -8,6 +8,7 @@
 
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <algorithm>
 #include <map>
@@ -267,7 +268,7 @@ void ForEachLayerInput(LayerSelectionInfo::LayerInfoContainer& layerInfos,
 
     for (auto inputSlot : layer.GetInputSlots())
     {
-        auto connectedInput = boost::polymorphic_downcast<OutputSlot*>(inputSlot.GetConnection());
+        auto connectedInput = PolymorphicDowncast<OutputSlot*>(inputSlot.GetConnection());
         ARMNN_ASSERT_MSG(connectedInput, "Dangling input slot detected.");
         Layer& inputLayer = connectedInput->GetOwningLayer();
 

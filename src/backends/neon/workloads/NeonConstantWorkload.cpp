@@ -9,6 +9,7 @@
 #include <BFloat16.hpp>
 #include <Half.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <neon/NeonTensorHandle.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/Workload.hpp>
@@ -41,9 +42,9 @@ void NeonConstantWorkload::Execute() const
 
         ARMNN_ASSERT(data.m_LayerOutput != nullptr);
         arm_compute::ITensor& output =
-            boost::polymorphic_downcast<NeonTensorHandle*>(data.m_Outputs[0])->GetTensor();
+            PolymorphicDowncast<NeonTensorHandle*>(data.m_Outputs[0])->GetTensor();
         arm_compute::DataType computeDataType =
-            boost::polymorphic_downcast<NeonTensorHandle*>(data.m_Outputs[0])->GetDataType();
+            PolymorphicDowncast<NeonTensorHandle*>(data.m_Outputs[0])->GetDataType();
 
         switch (computeDataType)
         {

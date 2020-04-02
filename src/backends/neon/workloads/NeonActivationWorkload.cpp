@@ -5,7 +5,9 @@
 
 #include "NeonActivationWorkload.hpp"
 #include "NeonWorkloadUtils.hpp"
+
 #include <aclCommon/ArmComputeUtils.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <arm_compute/runtime/NEON/functions/NEActivationLayer.h>
 
@@ -36,8 +38,8 @@ NeonActivationWorkload::NeonActivationWorkload(const ActivationQueueDescriptor& 
     const arm_compute::ActivationLayerInfo activationLayerInfo =
         ConvertActivationDescriptorToAclActivationLayerInfo(m_Data.m_Parameters);
 
-    arm_compute::ITensor& input = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& input = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     auto layer = std::make_unique<arm_compute::NEActivationLayer>();
     layer->configure(&input, &output, activationLayerInfo);

@@ -7,6 +7,8 @@
 
 #include <armnn/Utils.hpp>
 
+#include <boost/numeric/conversion/cast.hpp>
+
 namespace armnn
 {
 

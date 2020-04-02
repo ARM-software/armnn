@@ -5,6 +5,7 @@
 
 #include <test/CreateWorkload.hpp>
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <reference/RefTensorHandle.hpp>
 #include <reference/RefWorkloadFactory.hpp>
 #include <reference/workloads/RefWorkloads.hpp>
@@ -16,8 +17,8 @@ template<typename Workload>
 void CheckInputOutput(std::unique_ptr<Workload> workload, const TensorInfo& inputInfo, const TensorInfo& outputInfo)
 {
     auto queueDescriptor = workload->GetData();
-    auto inputHandle  = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Inputs[0]);
-    auto outputHandle = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    auto inputHandle  = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Outputs[0]);
     BOOST_TEST((inputHandle->GetTensorInfo() == inputInfo));
     BOOST_TEST((outputHandle->GetTensorInfo() == outputInfo));
 }
@@ -29,9 +30,9 @@ void CheckInputsOutput(std::unique_ptr<Workload> workload,
                        const TensorInfo&         outputInfo)
 {
     auto queueDescriptor = workload->GetData();
-    auto inputHandle0     = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Inputs[0]);
-    auto inputHandle1     = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Inputs[1]);
-    auto outputHandle    = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    auto inputHandle0     = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto inputHandle1     = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Inputs[1]);
+    auto outputHandle    = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Outputs[0]);
     BOOST_TEST((inputHandle0->GetTensorInfo() == inputInfo0));
     BOOST_TEST((inputHandle1->GetTensorInfo() == inputInfo1));
     BOOST_TEST((outputHandle->GetTensorInfo() == outputInfo));
@@ -538,16 +539,16 @@ static void RefCreateSplitterWorkloadTest()
 
     // Checks that outputs are as we expect them (see definition of CreateSplitterWorkloadTest).
     SplitterQueueDescriptor queueDescriptor = workload->GetData();
-    auto inputHandle = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto inputHandle = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Inputs[0]);
     BOOST_TEST((inputHandle->GetTensorInfo() == TensorInfo({ 5, 7, 7 }, DataType)));
 
-    auto outputHandle0 = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    auto outputHandle0 = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Outputs[0]);
     BOOST_TEST((outputHandle0->GetTensorInfo() == TensorInfo({ 1, 7, 7 }, DataType)));
 
-    auto outputHandle1 = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Outputs[1]);
+    auto outputHandle1 = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Outputs[1]);
     BOOST_TEST((outputHandle1->GetTensorInfo() == TensorInfo({ 2, 7, 7 }, DataType)));
 
-    auto outputHandle2 = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Outputs[2]);
+    auto outputHandle2 = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Outputs[2]);
     BOOST_TEST((outputHandle2->GetTensorInfo() == TensorInfo({ 2, 7, 7 }, DataType)));
 }
 
@@ -910,7 +911,7 @@ static void RefCreateConstantWorkloadTest(const armnn::TensorShape& outputShape)
 
     // Check output is as expected
     auto queueDescriptor = workload->GetData();
-    auto outputHandle = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    auto outputHandle = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Outputs[0]);
     BOOST_TEST((outputHandle->GetTensorInfo() == TensorInfo(outputShape, DataType)));
 }
 
@@ -950,7 +951,7 @@ static void RefCreatePreluWorkloadTest(const armnn::TensorShape& inputShape,
 
     // Check output is as expected
     auto queueDescriptor = workload->GetData();
-    auto outputHandle = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    auto outputHandle = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Outputs[0]);
     BOOST_TEST((outputHandle->GetTensorInfo() == TensorInfo(outputShape, dataType)));
 }
 
@@ -1054,10 +1055,10 @@ static void RefCreateStackWorkloadTest(const armnn::TensorShape& inputShape,
     StackQueueDescriptor queueDescriptor = workload->GetData();
     for (unsigned int i = 0; i < numInputs; ++i)
     {
-        auto inputHandle = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Inputs[i]);
+        auto inputHandle = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Inputs[i]);
         BOOST_TEST((inputHandle->GetTensorInfo() == TensorInfo(inputShape, DataType)));
     }
-    auto outputHandle = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    auto outputHandle = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Outputs[0]);
     BOOST_TEST((outputHandle->GetTensorInfo() == TensorInfo(outputShape, DataType)));
 }
 

@@ -15,6 +15,7 @@
 #include <armnn/LayerVisitorBase.hpp>
 
 #include <armnnUtils/FloatingPointConverter.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/IBackendInternal.hpp>
@@ -695,7 +696,7 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
                              const char* name = nullptr) override
         {
             IgnoreUnused(id, name);
-            auto inputLayer = boost::polymorphic_downcast<const InputLayer*>(layer);
+            auto inputLayer = PolymorphicDowncast<const InputLayer*>(layer);
             BOOST_TEST((inputLayer->GetBackendId() == "MockBackend"));
         }
 
@@ -704,7 +705,7 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
                               const char* name = nullptr) override
         {
             IgnoreUnused(id, name);
-            auto outputLayer = boost::polymorphic_downcast<const OutputLayer*>(layer);
+            auto outputLayer = PolymorphicDowncast<const OutputLayer*>(layer);
             BOOST_TEST((outputLayer->GetBackendId() == "MockBackend"));
         }
 
@@ -713,7 +714,7 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
                                   const char* name = nullptr) override
         {
             IgnoreUnused(activationDescriptor, name);
-            auto activation = boost::polymorphic_downcast<const ActivationLayer*>(layer);
+            auto activation = PolymorphicDowncast<const ActivationLayer*>(layer);
             BOOST_TEST((activation->GetBackendId() == "CustomBackend"));
         }
     };
@@ -765,7 +766,7 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
 
     auto optNet = IOptimizedNetworkPtr(new OptimizedNetwork(std::move(graph)), &IOptimizedNetwork::Destroy);
 
-    OptimizedNetwork* optNetObjPtr = boost::polymorphic_downcast<OptimizedNetwork*>(optNet.get());
+    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
 
     // Get the optimized graph
     Graph& optGraph = optNetObjPtr->GetGraph();

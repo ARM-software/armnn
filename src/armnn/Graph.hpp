@@ -12,6 +12,7 @@
 #include <armnn/NetworkFwd.hpp>
 #include <armnn/Exceptions.hpp>
 #include <armnn/utility/Assert.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <list>
 #include <map>
@@ -32,7 +33,7 @@ public:
     template <typename LayerType>
     static LayerType* PtrCast(Layer* const layer)
     {
-        return boost::polymorphic_downcast<LayerType*>(layer);
+        return PolymorphicDowncast<LayerType*>(layer);
     }
 
     template <typename Func>

@@ -8,6 +8,7 @@
 #include "NeonWorkloadUtils.hpp"
 
 #include <aclCommon/ArmComputeUtils.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <arm_compute/runtime/NEON/functions/NEL2NormalizeLayer.h>
 
@@ -33,8 +34,8 @@ NeonL2NormalizationFloatWorkload::NeonL2NormalizationFloatWorkload(const L2Norma
 {
     m_Data.ValidateInputsOutputs("NeonL2NormalizationFloatWorkload", 1, 1);
 
-    arm_compute::ITensor& input = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& input = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
     input.info()->set_data_layout(aclDataLayout);

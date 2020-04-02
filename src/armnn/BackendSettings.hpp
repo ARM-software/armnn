@@ -5,9 +5,10 @@
 
 #pragma once
 
-#include <armnn/BackendId.hpp>
-
 #include "DeviceSpec.hpp"
+
+#include <armnn/BackendId.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <vector>
 
@@ -84,7 +85,7 @@ private:
         m_PreferredBackends = preferredBackends;
 
         // Obtain list of supported backends
-        const DeviceSpec& spec = *boost::polymorphic_downcast<const DeviceSpec*>(&deviceSpec);
+        const DeviceSpec& spec = *PolymorphicDowncast<const DeviceSpec*>(&deviceSpec);
         m_SupportedBackends = spec.GetSupportedBackends();
     }
 

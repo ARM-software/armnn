@@ -8,7 +8,7 @@
 #include <backendsCommon/MemCopyWorkload.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 
-#include <boost/cast.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <cstring>
 
@@ -27,9 +27,9 @@ void GatherTensorHandlePairs(const MemCopyQueueDescriptor& descriptor,
 
     for (unsigned int i = 0; i < numInputs; ++i)
     {
-        SrcTensorHandleType* const srcTensorHandle = boost::polymorphic_downcast<SrcTensorHandleType*>(
+        SrcTensorHandleType* const srcTensorHandle = PolymorphicDowncast<SrcTensorHandleType*>(
             descriptor.m_Inputs[i]);
-        DstTensorHandleType* const dstTensorHandle = boost::polymorphic_downcast<DstTensorHandleType*>(
+        DstTensorHandleType* const dstTensorHandle = PolymorphicDowncast<DstTensorHandleType*>(
             descriptor.m_Outputs[i]);
 
         tensorHandlePairs.emplace_back(srcTensorHandle, dstTensorHandle);

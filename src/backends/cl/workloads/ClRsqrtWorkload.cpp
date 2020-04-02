@@ -8,6 +8,7 @@
 #include "ClWorkloadUtils.hpp"
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <cl/ClTensorHandle.hpp>
 
@@ -29,8 +30,8 @@ ClRsqrtWorkload::ClRsqrtWorkload(const RsqrtQueueDescriptor& descriptor, const W
 {
     m_Data.ValidateInputsOutputs("ClRsqrtWorkload", 1, 1);
 
-    arm_compute::ICLTensor& input  = boost::polymorphic_downcast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ICLTensor& output = boost::polymorphic_downcast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ICLTensor& input  = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     m_RsqrtLayer.configure(&input, &output);
 }

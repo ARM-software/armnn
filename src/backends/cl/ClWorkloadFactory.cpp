@@ -10,6 +10,7 @@
 #include <armnn/Exceptions.hpp>
 #include <armnn/Utils.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/MakeWorkloadHelper.hpp>
@@ -24,7 +25,6 @@
 #include <arm_compute/runtime/CL/CLBufferAllocator.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
 
-#include <boost/polymorphic_cast.hpp>
 #include <boost/format.hpp>
 
 namespace armnn
@@ -125,7 +125,7 @@ std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateSubTensorHandle(ITensorH
     }
 
     return std::make_unique<ClSubTensorHandle>(
-        boost::polymorphic_downcast<IClTensorHandle*>(&parent), shape, coords);
+        PolymorphicDowncast<IClTensorHandle*>(&parent), shape, coords);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,

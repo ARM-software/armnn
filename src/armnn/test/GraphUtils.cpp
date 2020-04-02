@@ -5,6 +5,8 @@
 
 #include "GraphUtils.hpp"
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
+
 bool GraphHasNamedLayer(const armnn::Graph& graph, const std::string& name)
 {
     for (auto&& layer : graph)
@@ -52,7 +54,7 @@ bool IsConnected(armnn::Layer* srcLayer, armnn::Layer* destLayer,
     const unsigned int numConnections = outputSlot.GetNumConnections();
     for (unsigned int c = 0; c < numConnections; ++c)
     {
-        auto inputSlot = boost::polymorphic_downcast<const armnn::InputSlot*>(outputSlot.GetConnection(c));
+        auto inputSlot = armnn::PolymorphicDowncast<const armnn::InputSlot*>(outputSlot.GetConnection(c));
         if (inputSlot->GetOwningLayer().GetNameStr() == destLayer->GetNameStr() &&
             inputSlot->GetSlotIndex() == destSlot)
         {

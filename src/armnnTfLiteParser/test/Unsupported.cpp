@@ -8,10 +8,10 @@
 
 #include <armnn/LayerVisitorBase.hpp>
 #include <armnn/utility/Assert.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <layers/StandInLayer.hpp>
 
-#include <boost/polymorphic_cast.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <sstream>
@@ -47,7 +47,7 @@ public:
         BOOST_CHECK(descriptor.m_NumOutputs    == numOutputs);
         BOOST_CHECK(layer->GetNumOutputSlots() == numOutputs);
 
-        const StandInLayer* standInLayer = boost::polymorphic_downcast<const StandInLayer*>(layer);
+        const StandInLayer* standInLayer = PolymorphicDowncast<const StandInLayer*>(layer);
         for (unsigned int i = 0u; i < numInputs; ++i)
         {
             const OutputSlot* connectedSlot = standInLayer->GetInputSlot(i).GetConnectedOutputSlot();

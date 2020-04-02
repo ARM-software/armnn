@@ -7,6 +7,7 @@
 #include "Graph.hpp"
 
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
 #include <utility>
@@ -74,20 +75,20 @@ SubgraphView::SubgraphView(SubgraphView&& subgraph)
 SubgraphView::SubgraphView(IConnectableLayer* layer)
     : m_InputSlots{}
     , m_OutputSlots{}
-    , m_Layers{boost::polymorphic_downcast<Layer*>(layer)}
+    , m_Layers{PolymorphicDowncast<Layer*>(layer)}
 {
     unsigned int numInputSlots = layer->GetNumInputSlots();
     m_InputSlots.resize(numInputSlots);
     for (unsigned int i = 0; i < numInputSlots; i++)
     {
-        m_InputSlots.at(i) = boost::polymorphic_downcast<InputSlot*>(&(layer->GetInputSlot(i)));
+        m_InputSlots.at(i) = PolymorphicDowncast<InputSlot*>(&(layer->GetInputSlot(i)));
     }
 
     unsigned int numOutputSlots = layer->GetNumOutputSlots();
     m_OutputSlots.resize(numOutputSlots);
     for (unsigned int i = 0; i < numOutputSlots; i++)
     {
-        m_OutputSlots.at(i) = boost::polymorphic_downcast<OutputSlot*>(&(layer->GetOutputSlot(i)));
+        m_OutputSlots.at(i) = PolymorphicDowncast<OutputSlot*>(&(layer->GetOutputSlot(i)));
     }
 
     CheckSubgraph();

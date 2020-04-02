@@ -10,7 +10,6 @@
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <cl/ClTensorHandle.hpp>
-#include <boost/polymorphic_pointer_cast.hpp>
 
 namespace armnn
 {

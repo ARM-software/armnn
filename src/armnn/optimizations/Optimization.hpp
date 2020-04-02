@@ -7,6 +7,8 @@
 #include "Graph.hpp"
 #include "LayersFwd.hpp"
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
+
 namespace armnn
 {
 
@@ -37,7 +39,7 @@ public:
     {
         if (base.GetType() == LayerEnumOf<BaseType>())
         {
-            Wrapped::Run(graph, *boost::polymorphic_downcast<BaseType*>(&base));
+            Wrapped::Run(graph, *PolymorphicDowncast<BaseType*>(&base));
         }
     }
 

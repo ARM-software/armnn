@@ -11,6 +11,7 @@
 
 #include <armnn/Utils.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/MakeWorkloadHelper.hpp>
@@ -69,7 +70,7 @@ std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateSubTensorHandle(ITenso
     }
 
     return std::make_unique<NeonSubTensorHandle>(
-        boost::polymorphic_downcast<IAclTensorHandle*>(&parent), shape, coords);
+        PolymorphicDowncast<IAclTensorHandle*>(&parent), shape, coords);
 }
 
 std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,

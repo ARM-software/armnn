@@ -7,6 +7,7 @@
 #include "Optimization.hpp"
 
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 namespace armnn
 {
@@ -23,9 +24,9 @@ public:
     {
         IgnoreUnused(graph);
         Layer& base = connection.GetConnectedOutputSlot()->GetOwningLayer();
-        auto child = boost::polymorphic_downcast<PermuteType*>(&connection.GetOwningLayer());
+        auto child = PolymorphicDowncast<PermuteType*>(&connection.GetOwningLayer());
 
-        if (child->IsInverse(*boost::polymorphic_downcast<PermuteType*>(&base)))
+        if (child->IsInverse(*PolymorphicDowncast<PermuteType*>(&base)))
         {
             // Bypass both layers. Child will be removed as it's left unconnected.
             // Base layer will be removed if left unconnected.

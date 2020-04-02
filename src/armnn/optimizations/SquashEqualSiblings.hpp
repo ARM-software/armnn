@@ -7,6 +7,7 @@
 #include "Optimization.hpp"
 
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 namespace armnn
 {
@@ -32,7 +33,7 @@ public:
 
             if (baseOutput.GetNumConnections() > 1)
             {
-                auto& comparableChild = *boost::polymorphic_downcast<Comparable*>(&child);
+                auto& comparableChild = *PolymorphicDowncast<Comparable*>(&child);
 
                 Layer* lowestPriorityChild = &child;
                 for (auto&& it : baseOutput.GetConnections())

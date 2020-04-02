@@ -8,15 +8,13 @@
 #include "CpuTensorHandle.hpp"
 
 #include <armnn/backends/ITensorHandle.hpp>
-
 #include <armnn/Tensor.hpp>
-
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnnUtils/Permute.hpp>
 
 #include <Half.hpp>
 #include <Profiling.hpp>
 
-#include <boost/cast.hpp>
 
 namespace armnn
 {
@@ -198,9 +196,9 @@ void GatherTensorHandlePairs(const DescriptorType& descriptor,
     for (unsigned int i = 0; i < numInputs; ++i)
     {
         SrcTensorHandleType* const srcTensorHandle =
-            boost::polymorphic_downcast<SrcTensorHandleType*>(descriptor.m_Inputs[i]);
+            PolymorphicDowncast<SrcTensorHandleType*>(descriptor.m_Inputs[i]);
         DstTensorHandleType* const dstTensorHandle =
-            boost::polymorphic_downcast<DstTensorHandleType*>(descriptor.m_Outputs[i]);
+            PolymorphicDowncast<DstTensorHandleType*>(descriptor.m_Outputs[i]);
 
         tensorHandlePairs.emplace_back(srcTensorHandle, dstTensorHandle);
     }

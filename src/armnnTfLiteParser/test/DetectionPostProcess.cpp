@@ -4,15 +4,15 @@
 //
 
 #include "../TfLiteParser.hpp"
-
-#include <boost/test/unit_test.hpp>
-#include "test/GraphUtils.hpp"
-
 #include "ParserFlatbuffersFixture.hpp"
 #include "ParserPrototxtFixture.hpp"
 #include "ParserHelper.hpp"
+#include "test/GraphUtils.hpp"
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <QuantizeHelper.hpp>
+
+#include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
 
@@ -241,7 +241,7 @@ BOOST_FIXTURE_TEST_CASE(DetectionPostProcessGraphStructureTest, ParseDetectionPo
 
     auto optimized = Optimize(*network, { armnn::Compute::CpuRef }, m_Runtime->GetDeviceSpec());
 
-    auto optimizedNetwork = boost::polymorphic_downcast<armnn::OptimizedNetwork*>(optimized.get());
+    auto optimizedNetwork = armnn::PolymorphicDowncast<armnn::OptimizedNetwork*>(optimized.get());
     auto graph = optimizedNetwork->GetGraph();
 
     // Check the number of layers in the graph

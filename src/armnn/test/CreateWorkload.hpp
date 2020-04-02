@@ -12,6 +12,7 @@
 
 #include <armnnUtils/DataLayoutIndexed.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
@@ -34,7 +35,7 @@ template<typename Workload>
 std::unique_ptr<Workload> MakeAndCheckWorkload(Layer& layer, const IWorkloadFactory& factory)
 {
     std::unique_ptr<IWorkload> workload = layer.CreateWorkload(factory);
-    BOOST_TEST(workload.get() == boost::polymorphic_downcast<Workload*>(workload.get()),
+    BOOST_TEST(workload.get() == PolymorphicDowncast<Workload*>(workload.get()),
                "Cannot convert to derived class");
     std::string reasonIfUnsupported;
     layer.SetBackendId(factory.GetBackendId());

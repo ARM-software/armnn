@@ -8,12 +8,12 @@
 #include "ProfilingMocks.hpp"
 
 #include <armnn/Logging.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <CommandHandlerFunctor.hpp>
 #include <IProfilingConnection.hpp>
 #include <ProfilingService.hpp>
 
-#include <boost/polymorphic_cast.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <chrono>
@@ -229,7 +229,7 @@ public:
     MockProfilingConnection* GetMockProfilingConnection()
     {
         IProfilingConnection* profilingConnection = GetProfilingConnection(m_ProfilingService);
-        return boost::polymorphic_downcast<MockProfilingConnection*>(profilingConnection);
+        return PolymorphicDowncast<MockProfilingConnection*>(profilingConnection);
     }
 
     void ForceTransitionToState(ProfilingState newState)

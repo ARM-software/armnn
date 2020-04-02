@@ -10,6 +10,7 @@
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnnUtils/TensorUtils.hpp>
 
 #include <arm_compute/runtime/NEON/functions/NEArgMinMaxLayer.h>
@@ -54,8 +55,8 @@ NeonArgMinMaxWorkload::NeonArgMinMaxWorkload(const ArgMinMaxQueueDescriptor& des
                                              const WorkloadInfo& info)
         : BaseWorkload<ArgMinMaxQueueDescriptor>(descriptor, info)
 {
-    arm_compute::ITensor& input = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& input = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     auto numDims = info.m_InputTensorInfos[0].GetNumDimensions();
     auto unsignedAxis = armnnUtils::GetUnsignedAxis(numDims, m_Data.m_Parameters.m_Axis);

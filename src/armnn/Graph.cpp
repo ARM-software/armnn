@@ -15,7 +15,6 @@
 #include <armnn/Utils.hpp>
 #include <armnn/utility/Assert.hpp>
 
-#include <boost/polymorphic_cast.hpp>
 #include <boost/format.hpp>
 
 #include <unordered_map>

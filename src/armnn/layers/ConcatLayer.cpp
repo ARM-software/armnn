@@ -6,6 +6,7 @@
 #include "LayerCloneBase.hpp"
 
 #include <armnn/TypesUtils.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
@@ -118,7 +119,7 @@ void ConcatLayer::CreateTensors(const FactoryType& factory)
                 if (inputLayer.GetType() == LayerType::Concat)
                 {
                     // Continue with the substitution if the connected inputs are also concat layers
-                    m_ConcatLayers.push(boost::polymorphic_downcast<ConcatLayer*>(&inputLayer));
+                    m_ConcatLayers.push(PolymorphicDowncast<ConcatLayer*>(&inputLayer));
                 }
                 ++i;
             }

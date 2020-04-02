@@ -6,6 +6,8 @@
 
 #include "LayerWithParameters.hpp"
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
+
 namespace armnn
 {
 
@@ -39,7 +41,7 @@ public:
     bool IsEqual(const Layer& other) const
     {
         return (other.GetType() == LayerType::Reshape) &&
-               m_Param.m_TargetShape == boost::polymorphic_downcast<const ReshapeLayer*>(&other)->m_Param.m_TargetShape;
+               m_Param.m_TargetShape == PolymorphicDowncast<const ReshapeLayer*>(&other)->m_Param.m_TargetShape;
     }
 
     void Accept(ILayerVisitor& visitor) const override;

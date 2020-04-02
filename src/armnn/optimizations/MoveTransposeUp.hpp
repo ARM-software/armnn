@@ -6,6 +6,7 @@
 
 #include "Optimization.hpp"
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnnUtils/Transpose.hpp>
 
 namespace armnn
@@ -29,7 +30,7 @@ public:
 
             if (CanMoveTransposeToInputs(base))
             {
-                auto transpose = boost::polymorphic_downcast<TransposeLayer*>(&connection.GetOwningLayer());
+                auto transpose = PolymorphicDowncast<TransposeLayer*>(&connection.GetOwningLayer());
                 const PermutationVector& perm = transpose->GetPermutation();
 
                 // Inserts an equivalent transpose before every input of the base layer.

@@ -30,11 +30,11 @@ namespace armnn
 
 
 template<typename DestType, typename SourceType>
-DestType polymorphic_downcast(SourceType value)
+DestType PolymorphicDowncast(SourceType value)
 {
     static_assert(std::is_pointer<SourceType>::value &&
                   std::is_pointer<DestType>::value,
-                  "polymorphic_downcast only works with pointer types.");
+                  "PolymorphicDowncast only works with pointer types.");
 
     ARMNN_POLYMORPHIC_CAST_CHECK(dynamic_cast<DestType>(value) == static_cast<DestType>(value));
     return static_cast<DestType>(value);

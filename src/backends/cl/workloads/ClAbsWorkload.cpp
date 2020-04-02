@@ -7,6 +7,8 @@
 
 #include "ClWorkloadUtils.hpp"
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
+
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
 #include <cl/ClTensorHandle.hpp>
@@ -29,8 +31,8 @@ ClAbsWorkload::ClAbsWorkload(const AbsQueueDescriptor& descriptor, const Workloa
 {
     m_Data.ValidateInputsOutputs("ClAbsWorkload", 1, 1);
 
-    arm_compute::ICLTensor& input  = boost::polymorphic_downcast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ICLTensor& output = boost::polymorphic_downcast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ICLTensor& input  = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     m_AbsLayer.configure(&input, &output);
 }

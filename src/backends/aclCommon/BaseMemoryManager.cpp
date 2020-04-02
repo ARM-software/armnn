@@ -10,7 +10,6 @@
 #include "arm_compute/runtime/OffsetLifetimeManager.h"
 #endif
 
-#include <boost/polymorphic_cast.hpp>
 
 namespace armnn
 {

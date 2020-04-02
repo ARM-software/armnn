@@ -7,6 +7,8 @@
 
 #include "Optimization.hpp"
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
+
 namespace armnn
 {
 namespace optimizations
@@ -24,8 +26,8 @@ public:
         ARMNN_ASSERT(base.GetType() == LayerType::Pad);
         ARMNN_ASSERT(child.GetType() == LayerType::Convolution2d);
 
-        PadLayer* padLayer = boost::polymorphic_downcast<PadLayer*>(&base);
-        Convolution2dLayer* convolution2dLayer = boost::polymorphic_downcast<Convolution2dLayer*>(&child);
+        PadLayer* padLayer = PolymorphicDowncast<PadLayer*>(&base);
+        Convolution2dLayer* convolution2dLayer = PolymorphicDowncast<Convolution2dLayer*>(&child);
 
         OutputSlot* parentOut = base.GetInputSlot(0).GetConnectedOutputSlot();
         const TensorInfo& outInfo = child.GetOutputHandler().GetTensorInfo();

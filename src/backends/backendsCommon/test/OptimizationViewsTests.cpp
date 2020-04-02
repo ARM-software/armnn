@@ -3,15 +3,19 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
-#include <Graph.hpp>
-#include <SubgraphView.hpp>
-#include <SubgraphViewSelector.hpp>
-#include <armnn/backends/OptimizationViews.hpp>
-#include <Network.hpp>
 
 #include "CommonTestUtils.hpp"
 #include "MockBackend.hpp"
+
+#include <armnn/backends/OptimizationViews.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
+#include <Graph.hpp>
+#include <Network.hpp>
+#include <SubgraphView.hpp>
+#include <SubgraphViewSelector.hpp>
+
+#include <boost/test/unit_test.hpp>
+
 
 using namespace armnn;
 
@@ -208,7 +212,7 @@ BOOST_AUTO_TEST_CASE(OptimizeViewsValidateDeviceMockBackend)
     BOOST_CHECK(optNet);
 
     // Check the optimised graph
-    OptimizedNetwork* optNetObjPtr = boost::polymorphic_downcast<OptimizedNetwork*>(optNet.get());
+    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
     CheckLayers(optNetObjPtr->GetGraph());
 }
 

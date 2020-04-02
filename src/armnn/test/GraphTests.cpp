@@ -9,6 +9,7 @@
 
 #include <armnn/TypesUtils.hpp>
 #include <armnn/Exceptions.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
 
@@ -274,7 +275,7 @@ static std::vector<Edge> GetEdgeList(const armnn::Graph& graph)
             const unsigned int numConnections = outputSlot.GetNumConnections();
             for (unsigned int c = 0; c < numConnections; ++c)
             {
-                auto inputSlot = boost::polymorphic_downcast<const armnn::InputSlot*>(outputSlot.GetConnection(c));
+                auto inputSlot = armnn::PolymorphicDowncast<const armnn::InputSlot*>(outputSlot.GetConnection(c));
                 edges.emplace_back(srcLayer, &inputSlot->GetOwningLayer());
             }
         }

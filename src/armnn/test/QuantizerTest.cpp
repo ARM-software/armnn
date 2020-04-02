@@ -15,6 +15,7 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnnQuantizer/INetworkQuantizer.hpp>
 #include <QuantizeHelper.hpp>
 
@@ -190,7 +191,7 @@ private:
 
 void VisitLayersTopologically(const INetwork* inputNetwork, ILayerVisitor& visitor)
 {
-    auto network = boost::polymorphic_downcast<const Network*>(inputNetwork);
+    auto network = PolymorphicDowncast<const Network*>(inputNetwork);
     auto graph = network->GetGraph().TopologicalSort();
 
     VisitLayers(graph, visitor);
@@ -346,7 +347,7 @@ BOOST_AUTO_TEST_CASE(InputOutputLayerDynamicQuant)
 {
     INetworkPtr network = CreateNetworkWithInputOutputLayers();
 
-    armnn::TensorInfo tensorInfo = GetInputTensorInfo(boost::polymorphic_downcast<const Network*>(network.get()));
+    armnn::TensorInfo tensorInfo = GetInputTensorInfo(PolymorphicDowncast<const Network*>(network.get()));
 
     // Outliers -56 and 98
     std::vector<float> inputData({0, 0, 0, -56, 98, 0, 0, 0});
@@ -3033,12 +3034,12 @@ BOOST_AUTO_TEST_CASE(TestConnectionPreservationAfterDynamicQuant)
     reLULayer2->GetOutputSlot(0).SetTensorInfo(TensorInfo(TensorShape({1, 2, 2, 1}), DataType::Float32));
     addLayer1->GetOutputSlot(0).SetTensorInfo(TensorInfo(TensorShape({1, 2, 2, 1}), DataType::Float32));
 
-    TestConnectionPreservation visitor1(boost::polymorphic_downcast<const Network*>(network.get())->GetGraph());
+    TestConnectionPreservation visitor1(PolymorphicDowncast<const Network*>(network.get())->GetGraph());
     VisitLayersTopologically(network.get(), visitor1);
 
     armnn::INetworkQuantizerPtr quantizer = armnn::INetworkQuantizer::Create(network.get());
 
-    armnn::TensorInfo tensorInfo = GetInputTensorInfo(boost::polymorphic_downcast<const Network*>(network.get()));
+    armnn::TensorInfo tensorInfo = GetInputTensorInfo(PolymorphicDowncast<const Network*>(network.get()));
 
     std::vector<float> inputData({0, 2, 0, 4});
     armnn::ConstTensor inputTensor(tensorInfo, inputData.data());
@@ -3049,7 +3050,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionPreservationAfterDynamicQuant)
 
     INetworkPtr quantNetwork = quantizer->ExportNetwork();
 
-    TestConnectionPreservation visitor2(boost::polymorphic_downcast<const Network*>(quantNetwork.get())->GetGraph());
+    TestConnectionPreservation visitor2(PolymorphicDowncast<const Network*>(quantNetwork.get())->GetGraph());
     VisitLayersTopologically(quantNetwork.get(), visitor2);
 }
 

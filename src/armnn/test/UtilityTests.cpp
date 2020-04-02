@@ -45,12 +45,12 @@ BOOST_AUTO_TEST_CASE(PolymorphicDowncast)
     Base* base1 = &child1;
     auto ptr1 = dynamic_cast<Child1*>(base1);
     BOOST_CHECK(ptr1 != nullptr);
-    BOOST_CHECK_NO_THROW(polymorphic_downcast<Child1*>(base1));
-    BOOST_CHECK(polymorphic_downcast<Child1*>(base1) == ptr1);
+    BOOST_CHECK_NO_THROW(armnn::PolymorphicDowncast<Child1*>(base1));
+    BOOST_CHECK(armnn::PolymorphicDowncast<Child1*>(base1) == ptr1);
 
     auto ptr2 = dynamic_cast<Child2*>(base1);
     BOOST_CHECK(ptr2 == nullptr);
-    BOOST_CHECK_THROW(polymorphic_downcast<Child2*>(base1), std::bad_cast);
+    BOOST_CHECK_THROW(armnn::PolymorphicDowncast<Child2*>(base1), std::bad_cast);
 
     armnn::IgnoreUnused(ptr1, ptr2);
 }

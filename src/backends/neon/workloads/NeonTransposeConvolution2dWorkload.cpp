@@ -9,6 +9,7 @@
 #include <Profiling.hpp>
 
 #include <armnn/Types.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
@@ -60,8 +61,8 @@ NeonTransposeConvolution2dWorkload::NeonTransposeConvolution2dWorkload(
 {
     m_Data.ValidateInputsOutputs("NeonTransposeConvolution2dWorkload", 1, 1);
 
-    arm_compute::ITensor& input  = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& input  = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
     input.info()->set_data_layout(aclDataLayout);

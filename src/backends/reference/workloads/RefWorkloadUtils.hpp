@@ -9,12 +9,12 @@
 
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <reference/RefTensorHandle.hpp>
 
 #include <BFloat16.hpp>
 #include <Half.hpp>
-#include <boost/polymorphic_cast.hpp>
 
 namespace armnn
 {
@@ -27,7 +27,7 @@ inline const TensorInfo& GetTensorInfo(const ITensorHandle* tensorHandle)
 {
     // We know that reference workloads use RefTensorHandles for inputs and outputs
     const RefTensorHandle* refTensorHandle =
-        boost::polymorphic_downcast<const RefTensorHandle*>(tensorHandle);
+        PolymorphicDowncast<const RefTensorHandle*>(tensorHandle);
     return refTensorHandle->GetTensorInfo();
 }
 

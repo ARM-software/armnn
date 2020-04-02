@@ -7,11 +7,11 @@
 #include "ClTensorHandleFactory.hpp"
 #include "ClTensorHandle.hpp"
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
+
 #include <arm_compute/runtime/CL/CLTensor.h>
 #include <arm_compute/core/Coordinates.h>
 #include <arm_compute/runtime/CL/CLSubTensor.h>
-
-#include <boost/polymorphic_cast.hpp>
 
 
 namespace armnn
@@ -42,7 +42,7 @@ std::unique_ptr<ITensorHandle> ClTensorHandleFactory::CreateSubTensorHandle(ITen
     }
 
     return std::make_unique<ClSubTensorHandle>(
-            boost::polymorphic_downcast<IClTensorHandle *>(&parent), shape, coords);
+            PolymorphicDowncast<IClTensorHandle *>(&parent), shape, coords);
 }
 
 std::unique_ptr<ITensorHandle> ClTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const

@@ -22,7 +22,6 @@
 
 #include <LabelsAndEventClasses.hpp>
 
-#include <boost/polymorphic_cast.hpp>
 #include <boost/format.hpp>
 
 namespace armnn

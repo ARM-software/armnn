@@ -7,9 +7,9 @@
 
 #include "NeonWorkloadUtils.hpp"
 
-#include <arm_compute/runtime/NEON/functions/NEReshapeLayer.h>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
-#include <boost/polymorphic_cast.hpp>
+#include <arm_compute/runtime/NEON/functions/NEReshapeLayer.h>
 
 namespace armnn
 {
@@ -29,8 +29,8 @@ NeonReshapeWorkload::NeonReshapeWorkload(const ReshapeQueueDescriptor& descripto
 {
     m_Data.ValidateInputsOutputs("NeonReshapeWorkload", 1, 1);
 
-    arm_compute::ITensor& input = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& input = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     auto layer = std::make_unique<arm_compute::NEReshapeLayer>();
     layer->configure(&input, &output);

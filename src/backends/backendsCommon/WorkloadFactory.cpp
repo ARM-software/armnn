@@ -10,6 +10,7 @@
 #include <armnn/LayerSupport.hpp>
 #include <armnn/ILayerSupport.hpp>
 #include <armnn/BackendRegistry.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <backendsCommon/WorkloadFactory.hpp>
 #include <armnn/backends/IBackendInternal.hpp>
@@ -18,7 +19,6 @@
 
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
-#include <boost/cast.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 
 #include <cstring>
@@ -49,7 +49,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
 {
     Optional<std::string&> reason = outReasonIfUnsupported;
     bool result;
-    const Layer& layer = *(boost::polymorphic_downcast<const Layer*>(&connectableLayer));
+    const Layer& layer = *(PolymorphicDowncast<const Layer*>(&connectableLayer));
 
     auto const& backendRegistry = BackendRegistryInstance();
     if (!backendRegistry.IsBackendRegistered(backendId))
@@ -70,7 +70,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
     {
         case LayerType::Activation:
         {
-            auto cLayer = boost::polymorphic_downcast<const ActivationLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const ActivationLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject->IsActivationSupported(
@@ -94,7 +94,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::ArgMinMax:
         {
-            auto cLayer = boost::polymorphic_downcast<const ArgMinMaxLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const ArgMinMaxLayer*>(&layer);
             const ArgMinMaxDescriptor& descriptor = cLayer->GetParameters();
 
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
@@ -108,7 +108,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::BatchNormalization:
         {
-            auto cLayer = boost::polymorphic_downcast<const BatchNormalizationLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const BatchNormalizationLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             const TensorInfo& mean = cLayer->m_Mean->GetTensorInfo();
@@ -130,7 +130,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            auto cLayer = boost::polymorphic_downcast<const BatchToSpaceNdLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const BatchToSpaceNdLayer*>(&layer);
 
             result = layerSupportObject->IsBatchToSpaceNdSupported(OverrideDataType(input, dataType),
                                                                    OverrideDataType(output, dataType),
@@ -140,7 +140,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Comparison:
         {
-            auto cLayer = boost::polymorphic_downcast<const ComparisonLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const ComparisonLayer*>(&layer);
 
             const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
@@ -189,7 +189,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Convolution2d:
         {
-            auto cLayer = boost::polymorphic_downcast<const Convolution2dLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const Convolution2dLayer*>(&layer);
 
             const TensorInfo input  = OverrideDataType(layer.GetInputSlot(0).GetConnection()->GetTensorInfo(),
                                                        dataType);
@@ -227,7 +227,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::DepthToSpace:
         {
-            auto cLayer = boost::polymorphic_downcast<const DepthToSpaceLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const DepthToSpaceLayer*>(&layer);
 
             const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
@@ -240,7 +240,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::DepthwiseConvolution2d:
         {
-            auto cLayer = boost::polymorphic_downcast<const DepthwiseConvolution2dLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const DepthwiseConvolution2dLayer*>(&layer);
             const TensorInfo& input = OverrideDataType(layer.GetInputSlot(0).GetConnection()->GetTensorInfo(),
                                                        dataType);
             const TensorInfo& output = OverrideDataType(layer.GetOutputSlot(0).GetTensorInfo(), dataType);
@@ -277,7 +277,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::DetectionPostProcess:
         {
-            auto cLayer = boost::polymorphic_downcast<const DetectionPostProcessLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const DetectionPostProcessLayer*>(&layer);
             const TensorInfo& boxEncodings = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& scores = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& anchors = cLayer->m_Anchors->GetTensorInfo();
@@ -301,7 +301,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::ElementwiseUnary:
         {
-            auto cLayer = boost::polymorphic_downcast<const ElementwiseUnaryLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const ElementwiseUnaryLayer*>(&layer);
 
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
@@ -314,7 +314,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::FakeQuantization:
         {
-            auto cLayer = boost::polymorphic_downcast<const FakeQuantizationLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const FakeQuantizationLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             result = layerSupportObject->IsFakeQuantizationSupported(OverrideDataType(input, dataType),
                                                                      cLayer->GetParameters(),
@@ -332,7 +332,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::FullyConnected:
         {
-            auto cLayer = boost::polymorphic_downcast<const FullyConnectedLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const FullyConnectedLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             ARMNN_ASSERT(cLayer->m_Weight.get() != nullptr);
@@ -414,7 +414,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::InstanceNormalization:
         {
-            auto cLayer = boost::polymorphic_downcast<const InstanceNormalizationLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const InstanceNormalizationLayer*>(&layer);
             const InstanceNormalizationDescriptor& descriptor = cLayer->GetParameters();
 
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
@@ -429,7 +429,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::L2Normalization:
         {
-            auto cLayer = boost::polymorphic_downcast<const L2NormalizationLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const L2NormalizationLayer*>(&layer);
             const L2NormalizationDescriptor& descriptor = cLayer->GetParameters();
 
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
@@ -444,7 +444,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::LogSoftmax:
         {
-            auto cLayer = boost::polymorphic_downcast<const LogSoftmaxLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const LogSoftmaxLayer*>(&layer);
 
             const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
@@ -457,7 +457,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Lstm:
         {
-            auto cLayer = boost::polymorphic_downcast<const LstmLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const LstmLayer*>(&layer);
             const LstmDescriptor& descriptor = cLayer->GetParameters();
 
             // All inputs.
@@ -645,7 +645,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Concat:
         {
-            auto cLayer = boost::polymorphic_downcast<const ConcatLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const ConcatLayer*>(&layer);
 
             // Get vector of all inputs.
             auto getTensorInfo = [&dataType](const InputSlot& slot)
@@ -685,7 +685,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Normalization:
         {
-            auto cLayer = boost::polymorphic_downcast<const NormalizationLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const NormalizationLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject->IsNormalizationSupported(OverrideDataType(input, dataType),
@@ -702,7 +702,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Permute:
         {
-            auto cLayer = boost::polymorphic_downcast<const PermuteLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const PermuteLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject->IsPermuteSupported(OverrideDataType(input, dataType),
@@ -713,7 +713,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Pad:
         {
-            auto cLayer = boost::polymorphic_downcast<const PadLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const PadLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject->IsPadSupported(
@@ -725,7 +725,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Pooling2d:
         {
-            auto cLayer = boost::polymorphic_downcast<const Pooling2dLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const Pooling2dLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject->IsPooling2dSupported(OverrideDataType(input, dataType),
@@ -736,7 +736,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::PreCompiled:
         {
-            auto cLayer = boost::polymorphic_downcast<const PreCompiledLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const PreCompiledLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             result = layerSupportObject->IsPreCompiledSupported(OverrideDataType(input, dataType),
                                                                 cLayer->GetParameters(),
@@ -752,7 +752,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::QLstm:
         {
-            auto cLayer = boost::polymorphic_downcast<const QLstmLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const QLstmLayer*>(&layer);
             const QLstmDescriptor& descriptor = cLayer->GetParameters();
 
             // Inputs
@@ -840,7 +840,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::QuantizedLstm:
         {
-            auto cLayer = boost::polymorphic_downcast<const QuantizedLstmLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const QuantizedLstmLayer*>(&layer);
 
             // Inputs
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
@@ -904,7 +904,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Reshape:
         {
-            auto cLayer = boost::polymorphic_downcast<const ReshapeLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const ReshapeLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject->IsReshapeSupported(OverrideDataType(input, dataType),
@@ -915,7 +915,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Resize:
         {
-            auto cLayer = boost::polymorphic_downcast<const ResizeLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const ResizeLayer*>(&layer);
             const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject->IsResizeSupported(OverrideDataType(input, dataType),
@@ -926,7 +926,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Slice:
         {
-            auto cLayer = boost::polymorphic_downcast<const SliceLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const SliceLayer*>(&layer);
 
             const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
@@ -939,7 +939,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Softmax:
         {
-            auto cLayer = boost::polymorphic_downcast<const SoftmaxLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const SoftmaxLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject->IsSoftmaxSupported(OverrideDataType(input, dataType),
@@ -950,7 +950,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::SpaceToBatchNd:
         {
-            auto cLayer = boost::polymorphic_downcast<const SpaceToBatchNdLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const SpaceToBatchNdLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject->IsSpaceToBatchNdSupported(OverrideDataType(input, dataType),
@@ -961,7 +961,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::SpaceToDepth:
         {
-            auto cLayer = boost::polymorphic_downcast<const SpaceToDepthLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const SpaceToDepthLayer*>(&layer);
 
             const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
@@ -974,7 +974,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Splitter:
         {
-            auto cLayer = boost::polymorphic_downcast<const SplitterLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const SplitterLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
 
             // Get vector of all outputs.
@@ -996,7 +996,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Stack:
         {
-            auto cLayer = boost::polymorphic_downcast<const StackLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const StackLayer*>(&layer);
 
             // Get vector of all inputs.
             auto getTensorInfo = [&dataType](const InputSlot& slot)
@@ -1023,7 +1023,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::StandIn:
         {
-            auto cLayer = boost::polymorphic_downcast<const StandInLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const StandInLayer*>(&layer);
 
             // Get vector of all inputs.
             auto getTensorInfoIn = [&dataType](const InputSlot& slot)
@@ -1064,7 +1064,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::StridedSlice:
         {
-            auto cLayer = boost::polymorphic_downcast<const StridedSliceLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const StridedSliceLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject->IsStridedSliceSupported(OverrideDataType(input, dataType),
@@ -1100,7 +1100,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Mean:
         {
-            auto cLayer = boost::polymorphic_downcast<const MeanLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const MeanLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject->IsMeanSupported(
@@ -1134,7 +1134,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::Transpose:
         {
-            auto cLayer = boost::polymorphic_downcast<const TransposeLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const TransposeLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject->IsTransposeSupported(OverrideDataType(input, dataType),
@@ -1145,7 +1145,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         }
         case LayerType::TransposeConvolution2d:
         {
-            auto cLayer = boost::polymorphic_downcast<const TransposeConvolution2dLayer*>(&layer);
+            auto cLayer = PolymorphicDowncast<const TransposeConvolution2dLayer*>(&layer);
 
             const TensorInfo input  = OverrideDataType(layer.GetInputSlot(0).GetConnection()->GetTensorInfo(),
                                                        dataType);
@@ -1188,7 +1188,7 @@ bool IWorkloadFactory::IsLayerSupported(const IConnectableLayer& connectableLaye
                                         Optional<DataType> dataType,
                                         std::string& outReasonIfUnsupported)
 {
-    auto layer = boost::polymorphic_downcast<const Layer*>(&connectableLayer);
+    auto layer = PolymorphicDowncast<const Layer*>(&connectableLayer);
     return IsLayerSupported(layer->GetBackendId(), connectableLayer, dataType, outReasonIfUnsupported);
 }
 

@@ -7,6 +7,7 @@
 #include "NeonTensorHandle.hpp"
 
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 namespace armnn
 {
@@ -36,7 +37,7 @@ std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateSubTensorHandle(IT
     }
 
     return std::make_unique<NeonSubTensorHandle>(
-            boost::polymorphic_downcast<IAclTensorHandle*>(&parent), shape, coords);
+            PolymorphicDowncast<IAclTensorHandle*>(&parent), shape, coords);
 }
 
 std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const

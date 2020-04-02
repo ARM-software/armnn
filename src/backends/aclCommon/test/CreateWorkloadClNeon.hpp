@@ -6,6 +6,7 @@
 
 #include <test/CreateWorkload.hpp>
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
 #include <reference/RefWorkloadFactory.hpp>
 #include <reference/RefTensorHandle.hpp>
@@ -93,8 +94,8 @@ void CreateMemCopyWorkloads(IWorkloadFactory& factory)
     MemCopyQueueDescriptor queueDescriptor1 = workload1->GetData();
     BOOST_TEST(queueDescriptor1.m_Inputs.size() == 1);
     BOOST_TEST(queueDescriptor1.m_Outputs.size() == 1);
-    auto inputHandle1  = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor1.m_Inputs[0]);
-    auto outputHandle1 = boost::polymorphic_downcast<IComputeTensorHandle*>(queueDescriptor1.m_Outputs[0]);
+    auto inputHandle1  = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor1.m_Inputs[0]);
+    auto outputHandle1 = PolymorphicDowncast<IComputeTensorHandle*>(queueDescriptor1.m_Outputs[0]);
     BOOST_TEST((inputHandle1->GetTensorInfo() == TensorInfo({2, 3}, DataType::Float32)));
     BOOST_TEST(CompareTensorHandleShape<IComputeTensorHandle>(outputHandle1, {2, 3}));
 
@@ -102,8 +103,8 @@ void CreateMemCopyWorkloads(IWorkloadFactory& factory)
     MemCopyQueueDescriptor queueDescriptor2 = workload2->GetData();
     BOOST_TEST(queueDescriptor2.m_Inputs.size() == 1);
     BOOST_TEST(queueDescriptor2.m_Outputs.size() == 1);
-    auto inputHandle2  = boost::polymorphic_downcast<IComputeTensorHandle*>(queueDescriptor2.m_Inputs[0]);
-    auto outputHandle2 = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor2.m_Outputs[0]);
+    auto inputHandle2  = PolymorphicDowncast<IComputeTensorHandle*>(queueDescriptor2.m_Inputs[0]);
+    auto outputHandle2 = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor2.m_Outputs[0]);
     BOOST_TEST(CompareTensorHandleShape<IComputeTensorHandle>(inputHandle2, {2, 3}));
     BOOST_TEST((outputHandle2->GetTensorInfo() == TensorInfo({2, 3}, DataType::Float32)));
 }

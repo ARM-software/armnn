@@ -6,8 +6,9 @@
 #include "DynamicQuantizationVisitor.hpp"
 #include "NetworkUtils.hpp"
 
-#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/Descriptors.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnn/Types.hpp>
 
 #include <limits>
@@ -52,7 +53,7 @@ void DynamicQuantizationVisitor::FinishVisit()
     for (const IConnectableLayer* layer : m_LayersToCalibrate)
     {
         std::vector<DebugLayer*> newDebugLayers = InsertDebugLayerAfter(
-            m_Graph, *boost::polymorphic_downcast<Layer*>(const_cast<IConnectableLayer*>(layer)));
+            m_Graph, *PolymorphicDowncast<Layer*>(const_cast<IConnectableLayer*>(layer)));
         // record them so we can take them out again efficiently afterward
         m_DebugLayers.insert(std::end(m_DebugLayers), std::begin(newDebugLayers), std::end(newDebugLayers));
     }

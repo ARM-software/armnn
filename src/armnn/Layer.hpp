@@ -18,16 +18,16 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/INetwork.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <algorithm>
+#include <functional>
+#include <iostream>
+#include <list>
 #include <memory>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <functional>
-#include <list>
 
-#include <boost/numeric/conversion/cast.hpp>
 #include <boost/cast.hpp>
 
 namespace armnn
@@ -145,12 +145,12 @@ public:
 
     int Connect(IInputSlot& destination) override
     {
-        return Connect(*boost::polymorphic_downcast<InputSlot*>(&destination));
+        return Connect(*PolymorphicDowncast<InputSlot*>(&destination));
     }
 
     void Disconnect(IInputSlot& slot) override
     {
-        return Disconnect(*boost::polymorphic_downcast<InputSlot*>(&slot));
+        return Disconnect(*PolymorphicDowncast<InputSlot*>(&slot));
     }
 
     unsigned int CalculateIndexOnOwner() const override;

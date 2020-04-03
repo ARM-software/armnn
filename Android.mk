@@ -421,7 +421,7 @@ LOCAL_SHARED_LIBRARIES := \
         android.hidl.allocator@1.0 \
         android.hidl.memory@1.0
 
-ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
+ifeq ($(ARMNN_INCLUDE_LIBOPENCL),1)
 LOCAL_SHARED_LIBRARIES += \
         libOpenCL
 endif

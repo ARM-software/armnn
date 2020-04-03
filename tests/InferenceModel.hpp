@@ -27,7 +27,6 @@
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/variant.hpp>
 
 #include <algorithm>

@@ -10,6 +10,8 @@
 #include <ProfilingUtils.hpp>
 #include <NetworkSockets.hpp>
 
+#include <armnn/utility/Assert.hpp>
+
 #include <cerrno>
 #include <fcntl.h>
 #include <iomanip>

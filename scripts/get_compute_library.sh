@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="4df2cf3177129d10500d30056bf8404418f703d6" #COMPMID-3315: Allow only QASYMM8 data type for EDSR graph example.
+DEFAULT_CLFRAMEWORKREVISION="8abbabd6ad946441c8ef1a03896fa98f7801af1f" #COMPMID-3233 Extend gemm tuner in the doxygen documentation.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

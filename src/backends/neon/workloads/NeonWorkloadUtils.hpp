@@ -52,6 +52,7 @@ inline void InitializeArmComputeTensorData(arm_compute::Tensor& tensor,
         case DataType::QuantizedSymm8PerAxis:
             ARMNN_FALLTHROUGH;
         case DataType::QSymmS8:
+        case DataType::QAsymmS8:
             CopyArmComputeTensorData(tensor, handle->GetConstTensor<int8_t>());
             break;
         ARMNN_NO_DEPRECATE_WARN_END

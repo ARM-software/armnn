@@ -179,6 +179,10 @@ private:
                 armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
                                                                  static_cast<uint8_t*>(memory));
                 break;
+            case arm_compute::DataType::QASYMM8_SIGNED:
+                armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
+                                                                 static_cast<int8_t*>(memory));
+                break;
             case arm_compute::DataType::BFLOAT16:
                 armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
                                                                  static_cast<armnn::BFloat16*>(memory));
@@ -215,6 +219,10 @@ private:
             case arm_compute::DataType::U8:
             case arm_compute::DataType::QASYMM8:
                 armcomputetensorutils::CopyArmComputeITensorData(static_cast<const uint8_t*>(memory),
+                                                                 this->GetTensor());
+                break;
+            case arm_compute::DataType::QASYMM8_SIGNED:
+                armcomputetensorutils::CopyArmComputeITensorData(static_cast<const int8_t*>(memory),
                                                                  this->GetTensor());
                 break;
             case arm_compute::DataType::BFLOAT16:
@@ -305,6 +313,10 @@ private:
                 armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
                                                                  static_cast<uint8_t*>(memory));
                 break;
+            case arm_compute::DataType::QASYMM8_SIGNED:
+                armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
+                                                                 static_cast<int8_t*>(memory));
+                break;
             case arm_compute::DataType::S16:
             case arm_compute::DataType::QSYMM16:
                 armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
@@ -333,6 +345,10 @@ private:
             case arm_compute::DataType::U8:
             case arm_compute::DataType::QASYMM8:
                 armcomputetensorutils::CopyArmComputeITensorData(static_cast<const uint8_t*>(memory),
+                                                                 this->GetTensor());
+                break;
+            case arm_compute::DataType::QASYMM8_SIGNED:
+                armcomputetensorutils::CopyArmComputeITensorData(static_cast<const int8_t*>(memory),
                                                                  this->GetTensor());
                 break;
             case arm_compute::DataType::S16:

@@ -140,7 +140,6 @@ void PeriodicCounterSelectionCommandHandler::operator()(const Packet& packet)
         // save the new backend counter ids for next time
         m_PrevBackendCounterIds = backendCounterIds;
 
-
         // Set the capture data with only the valid armnn counter UIDs
         m_CaptureDataHolder.SetCaptureData(capturePeriod, {validCounterIds.begin(), backendIdStart}, activeBackends);
 
@@ -168,8 +167,8 @@ void PeriodicCounterSelectionCommandHandler::operator()(const Packet& packet)
 
 std::set<armnn::BackendId> PeriodicCounterSelectionCommandHandler::ProcessBackendCounterIds(
                                                                       const u_int32_t capturePeriod,
-                                                                      std::set<uint16_t> newCounterIds,
-                                                                      std::set<uint16_t> unusedCounterIds)
+                                                                      const std::set<uint16_t> newCounterIds,
+                                                                      const std::set<uint16_t> unusedCounterIds)
 {
     std::set<armnn::BackendId> changedBackends;
     std::set<armnn::BackendId> activeBackends = m_CaptureDataHolder.GetCaptureData().GetActiveBackends();

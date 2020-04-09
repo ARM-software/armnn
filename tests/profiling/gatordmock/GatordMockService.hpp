@@ -57,16 +57,16 @@ public:
             , m_HandlerRegistry()
             , m_TimelineDecoder()
             , m_StreamMetadataCommandHandler(
-                    0, 0, m_PacketVersionResolver.ResolvePacketVersion(0, 0).GetEncodedValue(), true)
+                    0, 0, m_PacketVersionResolver.ResolvePacketVersion(0, 0).GetEncodedValue(), !echoPackets)
             , m_CounterCaptureCommandHandler(
-                    0, 4, m_PacketVersionResolver.ResolvePacketVersion(0, 4).GetEncodedValue(), true)
+                    0, 4, m_PacketVersionResolver.ResolvePacketVersion(0, 4).GetEncodedValue(), !echoPackets)
             , m_DirectoryCaptureCommandHandler(
-                    0, 2, m_PacketVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), true)
+                    0, 2, m_PacketVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), !echoPackets)
             , m_TimelineCaptureCommandHandler(
                     1, 1, m_PacketVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), m_TimelineDecoder)
             , m_TimelineDirectoryCaptureCommandHandler(
                     1, 0, m_PacketVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue(),
-                    m_TimelineCaptureCommandHandler, true)
+                    m_TimelineCaptureCommandHandler, !echoPackets)
     {
         m_TimelineDecoder.SetDefaultCallbacks();
 

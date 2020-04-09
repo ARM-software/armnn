@@ -80,7 +80,8 @@ public:
                                                  m_CounterDirectory,
                                                  m_SendCounterPacket,
                                                  m_SendTimelinePacket,
-                                                 m_StateMachine)
+                                                 m_StateMachine,
+                                                 m_BackendProfilingContexts)
         , m_RequestCounterDirectoryCommandHandler(0,
                                                   3,
                                                   m_PacketVersionResolver.ResolvePacketVersion(0, 3).GetEncodedValue(),

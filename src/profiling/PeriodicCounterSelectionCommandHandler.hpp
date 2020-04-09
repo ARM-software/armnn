@@ -37,7 +37,7 @@ public:
                                            uint32_t version,
                                            const std::unordered_map<BackendId,
                                                    std::shared_ptr<armnn::profiling::IBackendProfilingContext>>&
-                                           backendProfilingContext,
+                                                   backendProfilingContexts,
                                            const ICounterMappings& counterIdMap,
                                            Holder& captureDataHolder,
                                            const uint16_t maxArmnnCounterId,
@@ -46,7 +46,7 @@ public:
                                            ISendCounterPacket& sendCounterPacket,
                                            const ProfilingStateMachine& profilingStateMachine)
         : CommandHandlerFunctor(familyId, packetId, version)
-        , m_BackendProfilingContext(backendProfilingContext)
+        , m_BackendProfilingContexts(backendProfilingContexts)
         , m_CounterIdMap(counterIdMap)
         , m_CaptureDataHolder(captureDataHolder)
         , m_MaxArmCounterId(maxArmnnCounterId)
@@ -66,7 +66,7 @@ private:
 
     std::unordered_map<armnn::BackendId, std::vector<uint16_t>> m_BackendCounterMap;
     const std::unordered_map<BackendId,
-          std::shared_ptr<armnn::profiling::IBackendProfilingContext>>& m_BackendProfilingContext;
+          std::shared_ptr<armnn::profiling::IBackendProfilingContext>>& m_BackendProfilingContexts;
     const ICounterMappings& m_CounterIdMap;
     Holder& m_CaptureDataHolder;
     const uint16_t m_MaxArmCounterId;
@@ -82,7 +82,7 @@ private:
                                 const std::vector<uint16_t> counterIds)
     {
         Optional<std::string> errorMsg =
-                m_BackendProfilingContext.at(backendId)->ActivateCounters(capturePeriod, counterIds);
+                m_BackendProfilingContexts.at(backendId)->ActivateCounters(capturePeriod, counterIds);
 
         if(errorMsg.has_value())
         {
@@ -92,8 +92,8 @@ private:
     }
     void ParseData(const Packet& packet, CaptureData& captureData);
     std::set<armnn::BackendId> ProcessBackendCounterIds(const u_int32_t capturePeriod,
-                                                        std::set<uint16_t> newCounterIds,
-                                                        std::set<uint16_t> unusedCounterIds);
+                                                        const std::set<uint16_t> newCounterIds,
+                                                        const std::set<uint16_t> unusedCounterIds);
 
 };
 

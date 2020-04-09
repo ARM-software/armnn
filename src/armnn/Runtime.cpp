@@ -178,9 +178,6 @@ Runtime::Runtime(const CreationOptions& options)
         throw RuntimeException("It is not possible to enable timeline reporting without profiling being enabled");
     }
 
-    // pass configuration info to the profiling service
-    m_ProfilingService.ConfigureProfilingService(options.m_ProfilingOptions);
-
     // Load any available/compatible dynamic backend before the runtime
     // goes through the backend registry
     LoadDynamicBackends(options.m_DynamicBackendsPath);
@@ -213,24 +210,19 @@ Runtime::Runtime(const CreationOptions& options)
             // Backends that don't support profiling will return a null profiling context.
             if (profilingContext)
             {
-                // Enable profiling on the backend and assert that it returns true
-                if(profilingContext->EnableProfiling(true))
-                {
-                    // Pass the context onto the profiling service.
-                    m_ProfilingService.AddBackendProfilingContext(id, profilingContext);
-                }
-                else
-                {
-                    throw BackendProfilingException("Unable to enable profiling on Backend Id: " + id.Get());
-                }
+                // Pass the context onto the profiling service.
+                m_ProfilingService.AddBackendProfilingContext(id, profilingContext);
             }
         }
         catch (const BackendUnavailableException&)
         {
             // Ignore backends which are unavailable
         }
-
     }
+
+    // pass configuration info to the profiling service
+    m_ProfilingService.ConfigureProfilingService(options.m_ProfilingOptions);
+
     m_DeviceSpec.AddSupportedBackends(supportedBackends);
 }
 
@@ -272,7 +264,6 @@ Runtime::~Runtime()
                       << std::endl;
         }
     }
-
 
     // Clear all dynamic backends.
     DynamicBackendUtils::DeregisterDynamicBackends(m_DeviceSpec.GetDynamicBackends());

@@ -39,7 +39,7 @@ public:
             , m_ReadCounterValues(readCounterValue)
             , m_SendCounterPacket(packet)
             , m_CounterIdMap(counterIdMap)
-            , m_BackendProfilingContext(backendProfilingContexts)
+            , m_BackendProfilingContexts(backendProfilingContexts)
     {}
     ~PeriodicCounterCapture() { Stop(); }
 
@@ -61,7 +61,7 @@ private:
     ISendCounterPacket&       m_SendCounterPacket;
     const ICounterMappings&   m_CounterIdMap;
     const std::unordered_map<armnn::BackendId,
-            std::shared_ptr<armnn::profiling::IBackendProfilingContext>>& m_BackendProfilingContext;
+            std::shared_ptr<armnn::profiling::IBackendProfilingContext>>& m_BackendProfilingContexts;
 };
 
 } // namespace profiling

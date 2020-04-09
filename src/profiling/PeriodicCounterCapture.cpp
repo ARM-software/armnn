@@ -125,7 +125,7 @@ void PeriodicCounterCapture::Capture(const IReadCounterValues& readCounterValues
         for_each(activeBackends.begin(), activeBackends.end(), [&](const armnn::BackendId& backendId)
         {
             DispatchPeriodicCounterCapturePacket(
-                backendId, m_BackendProfilingContext.at(backendId)->ReportCounterValues());
+                backendId, m_BackendProfilingContexts.at(backendId)->ReportCounterValues());
         });
 
         // Wait the indicated capture period (microseconds)

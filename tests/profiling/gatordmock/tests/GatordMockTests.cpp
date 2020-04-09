@@ -443,8 +443,11 @@ BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
     WaitFor([&](){return timelineDecoder.GetModel().m_EventClasses.size() >= 2;},
             "MockGatord did not receive well known timeline labels");
 
+    WaitFor([&](){return timelineDecoder.GetModel().m_Entities.size() >= 1;},
+            "MockGatord did not receive mock backend test entity");
+
     // Packets we expect from SendWellKnownLabelsAndEventClassesTest
-    BOOST_CHECK(timelineDecoder.GetModel().m_Entities.size() == 0);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Entities.size() == 1);
     BOOST_CHECK(timelineDecoder.GetModel().m_EventClasses.size()  == 2);
     BOOST_CHECK(timelineDecoder.GetModel().m_Labels.size()  == 10);
     BOOST_CHECK(timelineDecoder.GetModel().m_Relationships.size()  == 0);
@@ -471,7 +474,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
             "MockGatord did not receive well known timeline labels");
 
     // Packets we expect from SendWellKnownLabelsAndEventClassesTest * 2 and the loaded model
-    BOOST_CHECK(timelineDecoder.GetModel().m_Entities.size() == 5);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Entities.size() == 6);
     BOOST_CHECK(timelineDecoder.GetModel().m_EventClasses.size()  == 4);
     BOOST_CHECK(timelineDecoder.GetModel().m_Labels.size()  == 24);
     BOOST_CHECK(timelineDecoder.GetModel().m_Relationships.size()  == 28);

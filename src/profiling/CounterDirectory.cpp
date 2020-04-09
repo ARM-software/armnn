@@ -498,7 +498,7 @@ CountersIt CounterDirectory::FindCounter(const std::string& counterName) const
     return std::find_if(m_Counters.begin(), m_Counters.end(), [&counterName](const auto& pair)
     {
         ARMNN_ASSERT(pair.second);
-        ARMNN_ASSERT(pair.second->m_Uid == pair.first);
+        ARMNN_ASSERT(pair.first >= pair.second->m_Uid && pair.first <= pair.second->m_MaxCounterUid);
 
         return pair.second->m_Name == counterName;
     });

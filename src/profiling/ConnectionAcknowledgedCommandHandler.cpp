@@ -41,8 +41,20 @@ void ConnectionAcknowledgedCommandHandler::operator()(const Packet& packet)
         // Send the counter directory packet.
         m_SendCounterPacket.SendCounterDirectoryPacket(m_CounterDirectory);
         m_SendTimelinePacket.SendTimelineMessageDirectoryPackage();
-
         TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses(m_SendTimelinePacket);
+
+        if(m_BackendProfilingContext.has_value())
+        {
+            for (auto backendContext : m_BackendProfilingContext.value())
+            {
+                // Enable profiling on the backend and assert that it returns true
+                if(!backendContext.second->EnableProfiling(true))
+                {
+                    throw BackendProfilingException(
+                            "Unable to enable profiling on Backend Id: " + backendContext.first.Get());
+                }
+            }
+        }
 
         break;
     case ProfilingState::Active:

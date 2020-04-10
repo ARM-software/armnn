@@ -10,13 +10,11 @@
 #include "RefTensorHandleFactory.hpp"
 
 #include <armnn/BackendRegistry.hpp>
-
 #include <armnn/backends/IBackendContext.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <Optimizer.hpp>
-
-#include <boost/polymorphic_pointer_cast.hpp>
 
 namespace armnn
 {
@@ -30,7 +28,7 @@ const BackendId& RefBackend::GetIdStatic()
 IBackendInternal::IWorkloadFactoryPtr RefBackend::CreateWorkloadFactory(
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager) const
 {
-    return std::make_unique<RefWorkloadFactory>(boost::polymorphic_pointer_downcast<RefMemoryManager>(memoryManager));
+    return std::make_unique<RefWorkloadFactory>(PolymorphicPointerDowncast<RefMemoryManager>(memoryManager));
 }
 
 IBackendInternal::IWorkloadFactoryPtr RefBackend::CreateWorkloadFactory(
@@ -40,7 +38,7 @@ IBackendInternal::IWorkloadFactoryPtr RefBackend::CreateWorkloadFactory(
 
     tensorHandleFactoryRegistry.RegisterMemoryManager(memoryManager);
 
-    return std::make_unique<RefWorkloadFactory>(boost::polymorphic_pointer_downcast<RefMemoryManager>(memoryManager));
+    return std::make_unique<RefWorkloadFactory>(PolymorphicPointerDowncast<RefMemoryManager>(memoryManager));
 }
 
 IBackendInternal::IBackendContextPtr RefBackend::CreateBackendContext(const IRuntime::CreationOptions&) const

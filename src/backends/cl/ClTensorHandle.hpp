@@ -9,14 +9,14 @@
 
 #include <Half.hpp>
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
+
 #include <arm_compute/runtime/CL/CLTensor.h>
 #include <arm_compute/runtime/CL/CLSubTensor.h>
 #include <arm_compute/runtime/IMemoryGroup.h>
 #include <arm_compute/runtime/MemoryGroup.h>
 #include <arm_compute/core/TensorShape.h>
 #include <arm_compute/core/Coordinates.h>
-
-#include <boost/polymorphic_pointer_cast.hpp>
 
 namespace armnn
 {
@@ -71,7 +71,7 @@ public:
 
     virtual void SetMemoryGroup(const std::shared_ptr<arm_compute::IMemoryGroup>& memoryGroup) override
     {
-        m_MemoryGroup = boost::polymorphic_pointer_downcast<arm_compute::MemoryGroup>(memoryGroup);
+        m_MemoryGroup = PolymorphicPointerDowncast<arm_compute::MemoryGroup>(memoryGroup);
     }
 
     TensorShape GetStrides() const override

@@ -21,8 +21,6 @@
 #include <neon/workloads/NeonWorkloadUtils.hpp>
 #include <neon/workloads/NeonWorkloads.hpp>
 
-#include <boost/polymorphic_cast.hpp>
-
 namespace armnn
 {
 

@@ -11,6 +11,7 @@
 
 #include <aclCommon/ArmComputeTensorHandle.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <arm_compute/runtime/MemoryGroup.h>
 #include <arm_compute/runtime/IMemoryGroup.h>
@@ -18,8 +19,6 @@
 #include <arm_compute/runtime/SubTensor.h>
 #include <arm_compute/core/TensorShape.h>
 #include <arm_compute/core/Coordinates.h>
-
-#include <boost/polymorphic_pointer_cast.hpp>
 
 namespace armnn
 {
@@ -77,7 +76,7 @@ public:
 
     virtual void SetMemoryGroup(const std::shared_ptr<arm_compute::IMemoryGroup>& memoryGroup) override
     {
-        m_MemoryGroup = boost::polymorphic_pointer_downcast<arm_compute::MemoryGroup>(memoryGroup);
+        m_MemoryGroup = PolymorphicPointerDowncast<arm_compute::MemoryGroup>(memoryGroup);
     }
 
     virtual const void* Map(bool /* blocking = true */) const override

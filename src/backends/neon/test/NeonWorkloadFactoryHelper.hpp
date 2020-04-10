@@ -7,12 +7,11 @@
 
 #include <armnn/backends/IBackendInternal.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/test/WorkloadFactoryHelper.hpp>
 
 #include <neon/NeonBackend.hpp>
 #include <neon/NeonWorkloadFactory.hpp>
-
-#include <boost/polymorphic_pointer_cast.hpp>
 
 namespace
 {
@@ -30,7 +29,7 @@ struct WorkloadFactoryHelper<armnn::NeonWorkloadFactory>
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
     {
         return armnn::NeonWorkloadFactory(
-            boost::polymorphic_pointer_downcast<armnn::NeonMemoryManager>(memoryManager));
+            armnn::PolymorphicPointerDowncast<armnn::NeonMemoryManager>(memoryManager));
     }
 };
 

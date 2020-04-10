@@ -16,12 +16,13 @@
 #include <armnn/backends/IBackendContext.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
+
 #include <Optimizer.hpp>
 
 #include <arm_compute/runtime/Allocator.h>
 
 #include <boost/cast.hpp>
-#include <boost/polymorphic_pointer_cast.hpp>
 
 namespace armnn
 {
@@ -42,7 +43,7 @@ IBackendInternal::IWorkloadFactoryPtr NeonBackend::CreateWorkloadFactory(
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager) const
 {
     return std::make_unique<NeonWorkloadFactory>(
-        boost::polymorphic_pointer_downcast<NeonMemoryManager>(memoryManager));
+        PolymorphicPointerDowncast<NeonMemoryManager>(memoryManager));
 }
 
 IBackendInternal::IWorkloadFactoryPtr NeonBackend::CreateWorkloadFactory(
@@ -53,7 +54,7 @@ IBackendInternal::IWorkloadFactoryPtr NeonBackend::CreateWorkloadFactory(
 
     tensorHandleFactoryRegistry.RegisterMemoryManager(memoryManager);
     return std::make_unique<NeonWorkloadFactory>(
-        boost::polymorphic_pointer_downcast<NeonMemoryManager>(memoryManager));
+        PolymorphicPointerDowncast<NeonMemoryManager>(memoryManager));
 }
 
 IBackendInternal::IBackendContextPtr NeonBackend::CreateBackendContext(const IRuntime::CreationOptions&) const

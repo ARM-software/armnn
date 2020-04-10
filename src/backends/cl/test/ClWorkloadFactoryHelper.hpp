@@ -7,12 +7,11 @@
 
 #include <armnn/backends/IBackendInternal.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/test/WorkloadFactoryHelper.hpp>
 
 #include <cl/ClBackend.hpp>
 #include <cl/ClWorkloadFactory.hpp>
-
-#include <boost/polymorphic_pointer_cast.hpp>
 
 namespace
 {
@@ -29,7 +28,7 @@ struct WorkloadFactoryHelper<armnn::ClWorkloadFactory>
     static armnn::ClWorkloadFactory GetFactory(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
     {
-        return armnn::ClWorkloadFactory(boost::polymorphic_pointer_downcast<armnn::ClMemoryManager>(memoryManager));
+        return armnn::ClWorkloadFactory(armnn::PolymorphicPointerDowncast<armnn::ClMemoryManager>(memoryManager));
     }
 };
 

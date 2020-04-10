@@ -16,7 +16,6 @@
 #include <arm_compute/runtime/CL/CLScheduler.h>
 
 #include <boost/format.hpp>
-#include <boost/polymorphic_cast.hpp>
 
 namespace cl
 {

@@ -17,11 +17,11 @@
 #include <armnn/backends/IBackendContext.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
 
+#include <armnn/utility/PolymorphicDowncast.hpp>
+
 #include <Optimizer.hpp>
 
 #include <arm_compute/runtime/CL/CLBufferAllocator.h>
-
-#include <boost/polymorphic_pointer_cast.hpp>
 
 namespace armnn
 {
@@ -41,7 +41,7 @@ IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager) const
 {
     return std::make_unique<ClWorkloadFactory>(
-        boost::polymorphic_pointer_downcast<ClMemoryManager>(memoryManager));
+        PolymorphicPointerDowncast<ClMemoryManager>(memoryManager));
 }
 
 IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
@@ -52,7 +52,7 @@ IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
     registry.RegisterMemoryManager(memoryManager);
 
     return std::make_unique<ClWorkloadFactory>(
-            boost::polymorphic_pointer_downcast<ClMemoryManager>(memoryManager));
+            PolymorphicPointerDowncast<ClMemoryManager>(memoryManager));
 }
 
 std::vector<ITensorHandleFactory::FactoryId> ClBackend::GetHandleFactoryPreferences() const

@@ -5,6 +5,7 @@
 #include "ClStackWorkload.hpp"
 #include "ClWorkloadUtils.hpp"
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <cl/ClTensorHandle.hpp>
 #include <cl/ClLayerSupport.hpp>
@@ -12,7 +13,6 @@
 #include <arm_compute/core/Types.h>
 
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/polymorphic_pointer_cast.hpp>
 
 namespace armnn
 {
@@ -51,10 +51,10 @@ ClStackWorkload::ClStackWorkload(const StackQueueDescriptor& descriptor, const W
     std::vector<arm_compute::ICLTensor*> aclInputs;
     for (auto input : m_Data.m_Inputs)
     {
-        arm_compute::ICLTensor& aclInput = boost::polymorphic_pointer_downcast<IClTensorHandle>(input)->GetTensor();
+        arm_compute::ICLTensor& aclInput = armnn::PolymorphicPointerDowncast<IClTensorHandle>(input)->GetTensor();
         aclInputs.emplace_back(&aclInput);
     }
-    arm_compute::ICLTensor& output = boost::polymorphic_pointer_downcast<IClTensorHandle>(
+    arm_compute::ICLTensor& output = armnn::PolymorphicPointerDowncast<IClTensorHandle>(
                                                                          m_Data.m_Outputs[0])->GetTensor();
 
     m_Layer.reset(new arm_compute::CLStackLayer());

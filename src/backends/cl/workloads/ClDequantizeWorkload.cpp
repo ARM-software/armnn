@@ -7,14 +7,13 @@
 #include "ClWorkloadUtils.hpp"
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <arm_compute/core/Types.h>
 
 #include <cl/ClLayerSupport.hpp>
 #include <cl/ClTensorHandle.hpp>
-
-#include <boost/polymorphic_pointer_cast.hpp>
 
 namespace armnn
 {
@@ -34,10 +33,10 @@ ClDequantizeWorkload::ClDequantizeWorkload(const DequantizeQueueDescriptor& desc
 {
     m_Data.ValidateInputsOutputs("ClDequantizeWorkload", 1, 1);
 
-    arm_compute::ICLTensor& input = boost::polymorphic_pointer_downcast<IClTensorHandle>(
+    arm_compute::ICLTensor& input = armnn::PolymorphicPointerDowncast<IClTensorHandle>(
             m_Data.m_Inputs[0])->GetTensor();
 
-    arm_compute::ICLTensor& output = boost::polymorphic_pointer_downcast<IClTensorHandle>(
+    arm_compute::ICLTensor& output = armnn::PolymorphicPointerDowncast<IClTensorHandle>(
             m_Data.m_Outputs[0])->GetTensor();
 
     m_Layer.reset(new arm_compute::CLDequantizationLayer());

@@ -6,6 +6,8 @@
 #include "NeonSpaceToBatchNdWorkload.hpp"
 
 #include "NeonWorkloadUtils.hpp"
+
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <ResolveType.hpp>
 
 namespace armnn
@@ -44,9 +46,9 @@ NeonSpaceToBatchNdWorkload::NeonSpaceToBatchNdWorkload(const SpaceToBatchNdQueue
     m_Data.ValidateInputsOutputs("NESpaceToBatchNdWorkload", 1, 1);
 
     arm_compute::ITensor& input  =
-            boost::polymorphic_pointer_downcast<IAclTensorHandle>(m_Data.m_Inputs[0])->GetTensor();
+            PolymorphicPointerDowncast<IAclTensorHandle>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& output =
-            boost::polymorphic_pointer_downcast<IAclTensorHandle>(m_Data.m_Outputs[0])->GetTensor();
+            PolymorphicPointerDowncast<IAclTensorHandle>(m_Data.m_Outputs[0])->GetTensor();
 
     // ArmNN blockShape is [H, W] Cl asks for W, H
     int32_t blockHeight = boost::numeric_cast<int32_t>(m_Data.m_Parameters.m_BlockShape[0]);

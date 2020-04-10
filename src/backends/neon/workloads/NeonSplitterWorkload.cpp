@@ -80,7 +80,7 @@ NeonSplitterWorkload::NeonSplitterWorkload(const SplitterQueueDescriptor& descri
     std::vector<arm_compute::ITensor *> aclOutputs;
     for (auto output : m_Data.m_Outputs)
     {
-        arm_compute::ITensor& aclOutput  = boost::polymorphic_pointer_downcast<IAclTensorHandle>(output)->GetTensor();
+        arm_compute::ITensor& aclOutput  = PolymorphicPointerDowncast<IAclTensorHandle>(output)->GetTensor();
         aclOutputs.emplace_back(&aclOutput);
     }
 

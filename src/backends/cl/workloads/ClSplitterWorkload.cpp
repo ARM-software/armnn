@@ -10,6 +10,7 @@
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <arm_compute/runtime/CL/functions/CLSplit.h>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <cl/ClTensorHandle.hpp>
 
@@ -74,13 +75,13 @@ ClSplitterWorkload::ClSplitterWorkload(const SplitterQueueDescriptor& descriptor
         return;
     }
 
-    arm_compute::ICLTensor& input = boost::polymorphic_pointer_downcast<IClTensorHandle>(
+    arm_compute::ICLTensor& input = armnn::PolymorphicPointerDowncast<IClTensorHandle>(
             m_Data.m_Inputs[0])->GetTensor();
 
     std::vector<arm_compute::ICLTensor *> aclOutputs;
     for (auto output : m_Data.m_Outputs)
     {
-        arm_compute::ICLTensor& aclOutput  = boost::polymorphic_pointer_downcast<IClTensorHandle>(output)->GetTensor();
+        arm_compute::ICLTensor& aclOutput  = armnn::PolymorphicPointerDowncast<IClTensorHandle>(output)->GetTensor();
         aclOutputs.emplace_back(&aclOutput);
     }
 

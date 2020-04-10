@@ -20,6 +20,7 @@
 #include "ClExpWorkload.hpp"
 #include "ClFloorFloatWorkload.hpp"
 #include "ClFullyConnectedWorkload.hpp"
+#include "ClGatherWorkload.hpp"
 #include "ClInstanceNormalizationWorkload.hpp"
 #include "ClL2NormalizationFloatWorkload.hpp"
 #include "ClLstmFloatWorkload.hpp"

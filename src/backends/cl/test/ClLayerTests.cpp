@@ -465,6 +465,12 @@ ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcInt16_4, DepthToSpaceTest4<DataType::QSymmS
 // Floor
 ARMNN_AUTO_TEST_CASE(SimpleFloor, SimpleFloorTest<DataType::Float32>)
 
+// Gather
+ARMNN_AUTO_TEST_CASE(Gather1dParamsFloat32, Gather1dParamsFloat32Test)
+ARMNN_AUTO_TEST_CASE(Gather1dParamsUint8, Gather1dParamsUint8Test)
+ARMNN_AUTO_TEST_CASE(GatherMultiDimParamsFloat32, GatherMultiDimParamsFloat32Test)
+ARMNN_AUTO_TEST_CASE(GatherMultiDimParamsUint8, GatherMultiDimParamsUint8Test)
+
 // Reshape
 ARMNN_AUTO_TEST_CASE(SimpleReshapeFloat32, SimpleReshapeTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(SimpleReshapeInt8, SimpleReshapeTest<DataType::QAsymmS8>)

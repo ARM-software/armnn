@@ -42,6 +42,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClFloorFloatWorkload.hpp
     ClFullyConnectedWorkload.cpp
     ClFullyConnectedWorkload.hpp
+    ClGatherWorkload.cpp
+    ClGatherWorkload.hpp
     ClInstanceNormalizationWorkload.cpp
     ClInstanceNormalizationWorkload.hpp
     ClL2NormalizationFloatWorkload.cpp

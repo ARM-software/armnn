@@ -5,7 +5,6 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/core/lightweight_test.hpp>
-#include <boost/polymorphic_cast.hpp>
 
 #define ARMNN_POLYMORPHIC_CAST_TESTABLE
 #define ARMNN_NUMERIC_CAST_TESTABLE
@@ -51,6 +50,80 @@ BOOST_AUTO_TEST_CASE(PolymorphicDowncast)
     auto ptr2 = dynamic_cast<Child2*>(base1);
     BOOST_CHECK(ptr2 == nullptr);
     BOOST_CHECK_THROW(armnn::PolymorphicDowncast<Child2*>(base1), std::bad_cast);
+
+    armnn::IgnoreUnused(ptr1, ptr2);
+}
+
+
+BOOST_AUTO_TEST_CASE(PolymorphicPointerDowncast_SharedPointer)
+{
+    using namespace armnn;
+    class Base
+    {
+    public:
+        virtual ~Base(){}
+        float v;
+    };
+
+    class Child1 : public Base
+    {
+    public:
+        int j;
+    };
+
+    class Child2 : public Base
+    {
+    public:
+        char b;
+    };
+
+    std::shared_ptr<Base> base1 = std::make_shared<Child1>();
+
+    std::shared_ptr<Child1> ptr1 = std::static_pointer_cast<Child1>(base1);
+    BOOST_CHECK(ptr1);
+    BOOST_CHECK_NO_THROW(armnn::PolymorphicPointerDowncast<Child1>(base1));
+    BOOST_CHECK(armnn::PolymorphicPointerDowncast<Child1>(base1) == ptr1);
+
+    auto ptr2 = std::dynamic_pointer_cast<Child2>(base1);
+    BOOST_CHECK(!ptr2);
+    BOOST_CHECK_THROW(armnn::PolymorphicPointerDowncast<Child2>(base1), std::bad_cast);
+
+    armnn::IgnoreUnused(ptr1, ptr2);
+}
+
+
+BOOST_AUTO_TEST_CASE(PolymorphicPointerDowncast_BuildInPointer)
+{
+    using namespace armnn;
+    class Base
+    {
+    public:
+        virtual ~Base(){}
+        float v;
+    };
+
+    class Child1 : public Base
+    {
+    public:
+        int j;
+    };
+
+    class Child2 : public Base
+    {
+    public:
+        char b;
+    };
+
+    Child1 child1;
+    Base* base1 = &child1;
+    auto ptr1 = dynamic_cast<Child1*>(base1);
+    BOOST_CHECK(ptr1 != nullptr);
+    BOOST_CHECK_NO_THROW(armnn::PolymorphicPointerDowncast<Child1>(base1));
+    BOOST_CHECK(armnn::PolymorphicPointerDowncast<Child1>(base1) == ptr1);
+
+    auto ptr2 = dynamic_cast<Child2*>(base1);
+    BOOST_CHECK(ptr2 == nullptr);
+    BOOST_CHECK_THROW(armnn::PolymorphicPointerDowncast<Child2>(base1), std::bad_cast);
 
     armnn::IgnoreUnused(ptr1, ptr2);
 }

@@ -44,6 +44,7 @@
 #include "workloads/NeonNegWorkload.hpp"
 #include "workloads/NeonNormalizationFloatWorkload.hpp"
 #include "workloads/NeonFullyConnectedWorkload.hpp"
+#include "workloads/NeonGatherWorkload.hpp"
 #include "workloads/NeonPadWorkload.hpp"
 #include "workloads/NeonPermuteWorkload.hpp"
 #include "workloads/NeonPooling2dWorkload.hpp"
@@ -433,6 +434,18 @@ bool NeonLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
                                    weights,
                                    biases,
                                    descriptor);
+}
+
+bool NeonLayerSupport::IsGatherSupported(const TensorInfo& input0,
+                                         const TensorInfo& input1,
+                                         const TensorInfo& output,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonGatherWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input0,
+                                   input1,
+                                   output);
 }
 
 bool NeonLayerSupport::IsGreaterSupported(const armnn::TensorInfo& input0,

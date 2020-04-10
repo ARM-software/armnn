@@ -123,6 +123,11 @@ public:
                                    const FullyConnectedDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsGatherSupported(const TensorInfo& input0,
+                           const TensorInfo& input1,
+                           const TensorInfo& output,
+                           Optional<std::string&> reasonIfUnsupported) const override;
+
     ARMNN_DEPRECATED_MSG("Use IsComparisonSupported instead")
     bool IsGreaterSupported(const TensorInfo& input0,
                             const TensorInfo& input1,

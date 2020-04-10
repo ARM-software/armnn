@@ -26,6 +26,7 @@
 #include "NeonExpWorkload.hpp"
 #include "NeonFloorFloatWorkload.hpp"
 #include "NeonFullyConnectedWorkload.hpp"
+#include "NeonGatherWorkload.hpp"
 #include "NeonInstanceNormalizationWorkload.hpp"
 #include "NeonL2NormalizationFloatWorkload.hpp"
 #include "NeonLstmFloatWorkload.hpp"

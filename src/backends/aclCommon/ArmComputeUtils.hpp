@@ -186,4 +186,19 @@ inline std::set<unsigned int> ComputeSplitAxis(const armnn::SplitterDescriptor& 
     return splitAxis;
 }
 
+/// Function to convert ArmNN axis (left to right) to ACL axis (right to left) ranging from [-dim, dim)
+inline int ComputeAclAxis(const int& armnnAxis, const armnn::TensorInfo& tensor)
+{
+    int dim = static_cast<int>(tensor.GetNumDimensions());
+
+    ARMNN_ASSERT(dim != 0);
+    ARMNN_ASSERT((-1 * dim) <= armnnAxis);
+    ARMNN_ASSERT(armnnAxis < dim);
+
+    int sign = (armnnAxis < 0) ? -1 : 1;
+    int aclAxis = sign * dim - 1  - armnnAxis;
+
+    return aclAxis;
+}
+
 } // namespace armnn

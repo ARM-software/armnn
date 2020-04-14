@@ -13,7 +13,7 @@
 
 #### <a name="introduction">Introduction</a>
 These are the step by step instructions on Cross-Compiling ArmNN under an x86_64 system to target an Arm64 system. This build flow has been tested with Ubuntu 16.04.
-The instructions show how to build the ArmNN core library and the Boost, Protobuf, Caffe and Compute Libraries necessary for compilation.
+The instructions show how to build the ArmNN core library and the Boost, Protobuf, Caffe, Tensorflow, Tflite, Flatbuffer and Compute Libraries necessary for compilation.
 
 #### <a name="installCCT">Cross-compiling ToolChain</a>
 * Install the standard cross-compilation libraries for arm64:
@@ -23,11 +23,13 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 
 #### <a name="buildProtobuf">Build and install Google's Protobuf library</a>
 
-* Get protobuf-all-3.5.1.tar.gz from here: https://github.com/protocolbuffers/protobuf/releases/tag/v3.5.1
-* Extract:
+## We support protobuf version 3.5.2
+* Get protobuf from here: https://github.com/protocolbuffers/protobuf : 
     ```bash
-    tar -zxvf protobuf-all-3.5.1.tar.gz
-    cd protobuf-3.5.1
+    git clone -b v3.5.2 https://github.com/google/protobuf.git protobuf
+    cd protobuf
+    git submodule update --init --recursive
+    ./autogen
     ```
 * Build a native (x86_64) version of the protobuf libraries and compiler (protoc):
   (Requires cUrl, autoconf, llibtool, and other build dependencies if not previously installed: sudo apt install curl autoconf libtool build-essential g++)
@@ -110,6 +112,60 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" -j8 internal_only=0
     ```
 
+#### <a name="buildtf">Build Tensorflow</a>
+* Building Tensorflow version 1.15:
+    '''bash
+    git clone https://github.com/tensorflow/tensorflow.git
+    cd tensorflow/
+    git checkout 590d6eef7e91a6a7392c8ffffb7b58f2e0c8bc6b
+    ../armnn/scripts/generate_tensorflow_protobuf.sh ../tensorflow-protobuf ../google/x86_64_pb_install
+    '''
+
+#### <"a name=buildflatbuffer">Build Flatbuffer</a>
+* Building Flatbuffer version 1.10.0
+    '''bash
+    wget -O flatbuffers-1.10.0.tar.gz https://github.com/google/flatbuffers/archive/v1.10.0.tar.gz
+    tar xf flatbuffers-1.10.0.tar.gz
+    cd flatbuffers-1.10.0
+    rm -f CMakeCache.txt
+    mkdir build
+    cd build
+    cmake .. -DFLATBUFFERS_BUILD_FLATC=1 \
+	     -DCMAKE_INSTALL_PREFIX:PATH=$<DIRECTORY_PATH> \
+	     -DFLATBUFFERS_BUILD_TESTS=0
+    make all install
+    '''
+* Build arm64 version of flatbuffer
+    '''bash
+    mkdir build-arm64
+    cd build-arm64
+    cmake .. -DCMAKE_C_COMPILER=/usr/bin/aarch64-linux-gnu-gcc \
+	     -DCMAKE_CXX_COMPILER=/usr/bin/aarch64-linux-gnu-g++ \
+	     -DFLATBUFFERS_BUILD_FLATC=1 \
+	     -DCMAKE_INSTALL_PREFIX:PATH=$<DIRECTORY_PATH> \
+	     -DFLATBUFFERS_BUILD_TESTS=0
+    make all install
+    '''
+
+#### <a name="buildingONNX">Build Onnx</a>
+* Building Onnx
+    '''bash
+    git clone https://github.com/onnx/onnx.git
+    cd onnx
+    git fetch https://github.com/onnx/onnx.git f612532843bd8e24efeab2815e45b436479cc9ab && git checkout FETCH_HEAD
+    export LD_LIBRARY_PATH=$<DIRECTORY_PATH>/protobuf-host/lib:$LD_LIBRARY_PATH
+    ../google/x86_64_pb_install/bin/protoc onnx/onnx.proto --proto_path=. --proto_path=../google/x86_64_pb_install/include --cpp_out ../onnx
+    '''
+
+#### <a name="buildingtflite">Build TfLite</a>
+* Building TfLite
+    '''bash
+    mkdir tflite
+    cd tflite
+    cp ../tensorflow/tensorflow/lite/schema/schema.fbs .
+    ../flatbuffers-1.10.0/build/flatc -c --gen-object-api --reflect-types --reflect-names schema.fbs
+    '''
+
 #### <a name="buildANN">Build ArmNN</a>
 * Compile ArmNN for arm64:
     ```bash
@@ -131,6 +187,15 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
     -DCAFFE_GENERATED_SOURCES=$HOME/armnn-devenv/caffe/build/src \
     -DBUILD_CAFFE_PARSER=1 \
+    -DONNX_GENERATED_SOURCES=$HOME/onnx \
+    -DBUILD_ONNX_PARSER=1 \
+    -DTF_GENERATED_SOURCES=$HOME/tensorflow-protobuf \
+    -DBUILD_TF_PARSER=1 \
+    -DBUILD_TF_LITE_PARSER=1 \
+    -DTF_LITE_GENERATED_PATH=$HOME/tflite \
+    -DFLATBUFFERS_ROOT=$HOME/flatbuffers-arm64 \
+    -DFLATC_DIR=$HOME/flatbuffers-1.10.0/build \
+    -DPROTOBUF_ROOT=$HOME/google/x86_64_pb_install \
     -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/x86_64_pb_install/ \
     -DPROTOBUF_LIBRARY_DEBUG=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.15.0.1 \
     -DPROTOBUF_LIBRARY_RELEASE=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.15.0.1
@@ -284,8 +349,8 @@ https://askubuntu.com/questions/430705/how-to-use-apt-get-to-download-multi-arch
     libarmnnCaffeParser.so: undefined reference to `google::protobuf:*
     ```
 * Missing or out of date protobuf compilation libraries.
-    Use the command 'protoc --version' to check which version of protobuf is available (version 3.5.1 is required).
-    Follow the instructions above to install protobuf 3.5.1
+    Use the command 'protoc --version' to check which version of protobuf is available (version 3.5.2 is required).
+    Follow the instructions above to install protobuf 3.5.2
     Note this will require you to recompile Caffe for x86_64
 
 ##

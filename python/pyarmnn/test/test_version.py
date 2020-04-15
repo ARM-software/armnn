@@ -1,4 +1,5 @@
 # Copyright © 2020 Arm Ltd. All rights reserved.
+# Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 import os
 import importlib
@@ -17,7 +18,7 @@ def test_dev_version():
 
     importlib.reload(v)
 
-    assert "20.2.0.dev1" == v.__version__
+    assert "21.0.0.dev1" == v.__version__
 
     del os.environ["PYARMNN_DEV_VER"]
     del v
@@ -29,7 +30,7 @@ def test_arm_version_not_affected():
 
     importlib.reload(v)
 
-    assert "20200200" == v.__arm_ml_version__
+    assert "21.0.0" == v.__arm_ml_version__
 
     del os.environ["PYARMNN_DEV_VER"]
     del v

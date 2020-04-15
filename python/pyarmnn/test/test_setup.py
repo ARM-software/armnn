@@ -1,4 +1,5 @@
 # Copyright © 2020 Arm Ltd. All rights reserved.
+# Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 import os
 import sys
@@ -86,15 +87,15 @@ def test_gcc_serch_path():
 
 
 def test_armnn_version():
-    check_armnn_version('20190800', '20190800')
+    check_armnn_version('21.0.0', '21.0.0')
 
 
 def test_incorrect_armnn_version():
     with pytest.raises(AssertionError) as err:
-        check_armnn_version('20190800', '20190500')
+        check_armnn_version('21.0.0', '21.1.0')
 
-    assert 'Expected ArmNN version is 201905 but installed ArmNN version is 201908' in str(err.value)
+    assert 'Expected ArmNN version is 21.1.0 but installed ArmNN version is 21.0.0' in str(err.value)
 
 
 def test_armnn_version_patch_does_not_matter():
-    check_armnn_version('20190800', '20190801')
+    check_armnn_version('21.0.0', '21.0.1')

@@ -1,5 +1,6 @@
 #
-# Copyright © 2017 Arm Ltd. All rights reserved.
+# Copyright © 2020 Arm Ltd. All rights reserved.
+# Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 #
 cmake_minimum_required (VERSION 3.0.2) # 3.0.2 required for return() statement used in AddDllCopyCommands.cmake
@@ -1084,4 +1085,8 @@ if(BUILD_GATORD_MOCK)
         target_link_libraries(GatordMock ${CMAKE_THREAD_LIBS_INIT})
     endif()
 
+endif()
+
+if (BUILD_PYTHON_WHL OR BUILD_PYTHON_SRC)
+    add_subdirectory(python/pyarmnn)
 endif()

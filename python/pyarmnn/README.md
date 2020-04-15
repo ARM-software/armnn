@@ -122,6 +122,18 @@ results = ann.workload_tensors_to_ndarray(output_tensors)
 print(results)
 ```
 
+#### Examples
+
+To further explore PyArmNN API there are several examples provided in the examples folder running classification on an image. To run them first install the dependencies:
+ ```bash
+$ pip install -r examples/requirements.txt
+```
+Afterwards simply execute the example scripts, e.g.:
+ ```bash
+$ python tflite_mobilenetv1_quantized.py
+```
+All resources are downloaded during execution, so if you do not have access to the internet, you may need to download these manually. `example_utils.py` contains code shared between the examples. 
+
 # Setup development environment
 
 Before, proceeding to the next steps, make sure that:

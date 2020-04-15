@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
 # Copyright © 2020 Arm Ltd. All rights reserved.
 # SPDX-License-Identifier: MIT
 """Generate PyArmNN documentation."""
+
 import os
 import tarfile
 

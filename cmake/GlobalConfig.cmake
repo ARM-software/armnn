@@ -1,3 +1,8 @@
+#
+# Copyright © 2020 Arm Ltd. All rights reserved.
+# Copyright 2020 NXP
+# SPDX-License-Identifier: MIT
+#
 option(BUILD_CAFFE_PARSER "Build Caffe parser" OFF)
 option(BUILD_TF_PARSER "Build Tensorflow parser" OFF)
 option(BUILD_ONNX_PARSER "Build Onnx parser" OFF)
@@ -25,6 +30,8 @@ option(BUILD_GATORD_MOCK "Build the Gatord simulator for external profiling test
 option(BUILD_TIMELINE_DECODER "Build the Timeline Decoder for external profiling." ON)
 option(SHARED_BOOST "Use dynamic linking for boost libraries" OFF)
 option(BUILD_BASE_PIPE_SERVER "Build the server to handle external profiling pipe traffic" ON)
+option(BUILD_PYTHON_WHL "Build Python wheel package" OFF)
+option(BUILD_PYTHON_SRC "Build Python source package" OFF)
 
 include(SelectLibraryConfigurations)
 
@@ -374,6 +381,31 @@ endif()
 
 if(NOT BUILD_ARMNN_QUANTIZER)
     message(STATUS "ArmNN Quantizer support is disabled")
+endif()
+
+if(NOT BUILD_PYTHON_WHL)
+    message(STATUS "PyArmNN wheel package is disabled")
+endif()
+
+if(NOT BUILD_PYTHON_SRC)
+    message(STATUS "PyArmNN source package is disabled")
+endif()
+
+if(BUILD_PYTHON_WHL OR BUILD_PYTHON_SRC)
+    find_package(PythonInterp 3 REQUIRED)
+    if(NOT ${PYTHONINTERP_FOUND})
+        message(FATAL_ERROR "Python 3.x required to build PyArmNN, but not found")
+    endif()
+
+    find_package(PythonLibs 3 REQUIRED)
+    if(NOT ${PYTHONLIBS_FOUND})
+        message(FATAL_ERROR "Python 3.x development package required to build PyArmNN, but not found")
+    endif()
+
+    find_package(SWIG 4 REQUIRED)
+    if(NOT ${SWIG_FOUND})
+        message(FATAL_ERROR "SWIG 4.x requried to build PyArmNN, but not found")
+    endif()
 endif()
 
 # ArmNN source files required for all build options

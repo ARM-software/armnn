@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Copyright 2020 NXP
+# SPDX-License-Identifier: MIT
 """Downloads and extracts resources for unit tests.
 
 It is mandatory to run this script prior to running unit tests. Resources are stored as a tar.gz or a tar.bz2 archive and

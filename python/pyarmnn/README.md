@@ -12,14 +12,102 @@ The [SWIG](http://www.swig.org/) project is used to generate the Arm NN python s
 The following diagram shows the conceptual architecture of this library:
 ![PyArmNN](./images/pyarmnn.png)
 
+# Setup development environment
+
+Before, proceeding to the next steps, make sure that:
+
+1. You have Python 3.6+ installed system-side. The package is not compatible with older Python versions.
+2. You have python3.6-dev installed system-side. This contains header files needed to build PyArmNN extension module.
+3. In case you build Python from sources manually, make sure that the following libraries are installed and available in you system:
+``python3.6-dev build-essential checkinstall libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev``
+4. Install SWIG 4.x. Only 3.x version is typically available in Linux package managers, so you will have to build it and install it from sources. It can be downloaded from the [SWIG project website](http://www.swig.org/download.html) or from [SWIG GitHub](https://github.com/swig/swig). To install it follow the guide on [SWIG GitHub](https://github.com/swig/swig/wiki/Getting-Started).
+
+## Setup virtual environment
+
+Now you can proceed with setting up workspace. It is recommended to create a python virtual environment, so you do not pollute your working folder:
+```bash
+python -m venv env
+source env/bin/activate
+```
+
+You may run into missing python modules such as *wheel*. Make sure to install those using pip:
+```bash
+pip install wheel
+```
+
+## Build python distr
+
+Python supports source and binary distribution packages.
+
+Source distr contains setup.py script that is executed on the users machine during package installation.
+When preparing binary distr (wheel), setup.py is executed on the build machine and the resulting package contains only the result
+of the build (generated files and resources, test results etc).
+
+In our case, PyArmNN depends on Arm NN installation. Thus, binary distr will be linked with
+the local build machine libraries and runtime.
+
+There are 2 ways to build the python packages. Either directly using the python scripts or using CMake.
+
+### CMake build
+
+The recommended aproach is to build PyArmNN together with Arm NN by adding the following options to your CMake command:
+```
+-DBUILD_PYTHON_SRC=1
+-DBUILD_PYTHON_WHL=1
+```
+This will build either the source package or the wheel or both. Current project headers and build libraries will be used, so there is no need to provide them.
+
+SWIG is required to generate the wrappers. If CMake did not find the executable during the configure step or it has found an older version, you may provide it manually:
+```
+-DSWIG_EXECUTABLE=<path_to_swig_executable>
+```
+
+After the build finishes, you will find the python packages in `<build_folder>/python/pyarmnn/dist`.
+
+### Standalone build
+
+PyArmNN can also be built using the provided python scripts only. The advantage of that is that you may use prebuilt Arm NN libraries and it is generally much faster if you do not want to build all the Arm NN libraries.
+
+##### 1. Set environment:
+
+*ARMNN_INCLUDE* and *ARMNN_LIB* are mandatory and should point to Arm NN includes and libraries against which you will be generating the wrappers. *SWIG_EXECUTABLE* should only be set if you have multiple versions of SWIG installed or you used a custom location for your installation:
+```bash
+$ export SWIG_EXECUTABLE=<path_to_swig>
+$ export ARMNN_INCLUDE=<path_to_armnn_include>
+$ export ARMNN_LIB=<path_to_armnn_libraries>
+``` 
+
+##### 2. Clean and build SWIG wrappers:
+
+```bash
+$ python setup.py clean --all
+$ python swig_generate.py -v
+$ python setup.py build_ext --inplace
+```
+This step will put all generated files under `./src/pyarmnn/_generated` folder and can be used repeatedly to re-generate the wrappers.
+
+##### 4. Build the source package
+
+```bash
+$ python setup.py sdist
+```
+As the result you will get `./dist/pyarmnn-21.0.0.tar.gz` file. As you can see it is platform independent.
+
+##### 5. Build the binary package
+
+```bash
+$ python setup.py bdist_wheel
+```
+As the result you will get something like `./dist/pyarmnn-21.0.0-cp36-cp36m-linux_x86_64.whl` file. As you can see it is platform dependent.
+
 # PyArmNN installation
 
 PyArmNN can be distributed as a source package or a binary package (wheel).
 
 Binary package is platform dependent, the name of the package will indicate the platform it was built for, e.g.:
 
-* Linux x86 64bit machine: pyarmnn-20.2.0-cp36-cp36m-*linux_x86_64*.whl
-* Linux Aarch 64 bit machine: pyarmnn-20.2.0-cp36-cp36m-*linux_aarch64*.whl
+* Linux x86 64bit machine: pyarmnn-21.0.0-cp36-cp36m-*linux_x86_64*.whl
+* Linux Aarch 64 bit machine: pyarmnn-21.0.0-cp36-cp36m-*linux_aarch64*.whl
 
 The source package is platform independent but installation involves compilation of Arm NN python extension. You will need to have g++ compatible with C++ 14 standard and a python development library installed on the build machine.
 
@@ -37,7 +125,7 @@ $ gcc --print-search-dirs
 ```
 Install PyArmNN from binary by pointing to the wheel file:
 ```bash
-$ pip install /path/to/pyarmnn-20.2.0-cp36-cp36m-linux_aarch64.whl
+$ pip install /path/to/pyarmnn-21.0.0-cp36-cp36m-linux_aarch64.whl
 ```
 
 ## Installing from source package
@@ -54,7 +142,7 @@ $ export  ARMNN_INCLUDE=/path/to/headers
 
 Install PyArmNN as follows:
 ```bash
-$ pip install /path/to/pyarmnn-20.2.0.tar.gz
+$ pip install /path/to/pyarmnn-21.0.0.tar.gz
 ```
 
 If PyArmNN installation script fails to find Arm NN libraries it will raise an error like this
@@ -68,7 +156,7 @@ $ pip show pyarmnn
 You can also verify it by running the following and getting output similar to below:
 ```bash
 $ python -c "import pyarmnn as ann;print(ann.GetVersion())"
-'20200200'
+'21.0.0'
 ```
 
 # PyArmNN API overview
@@ -132,31 +220,17 @@ Afterwards simply execute the example scripts, e.g.:
  ```bash
 $ python tflite_mobilenetv1_quantized.py
 ```
-All resources are downloaded during execution, so if you do not have access to the internet, you may need to download these manually. `example_utils.py` contains code shared between the examples. 
+All resources are downloaded during execution, so if you do not have access to the internet, you may need to download these manually. `example_utils.py` contains code shared between the examples.
 
-# Setup development environment
+## Tox for automation
 
-Before, proceeding to the next steps, make sure that:
-
-1. You have Python 3.6+ installed system-side. The package is not compatible with older Python versions.
-2. You have python3.6-dev installed system-side. This contains header files needed to build PyArmNN extension module.
-3. In case you build Python from sources manually, make sure that the following libraries are installed and available in you system:
-``python3.6-dev build-essential checkinstall libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev``
-4. install SWIG,  swig must be version 4.*
-
-## Setup virtual environment
-Now you can proceed with setting up workspace:
-
-1. Set environment variables ARMNN_LIB (pointing to Arm NN libraries) and ARMNN_INCLUDE (pointing to Arm NN headers)
-2. Create development env using script ``source init_devenv.sh``
-
-## Generating SWIG wrappers
-Before building package or running tests you need to generate SWIG wrappers based on the interface files.
-It can be done with tox target 'gen':
+To make things easier *tox* is available for automating individual tasks or running multiple commands at once such as generating wrappers, running unit tests using multiple python versions or generating documentation. To run it use:
 
 ```bash
-$ tox -e gen
+$ tox <task_name>
 ```
+
+See *tox.ini* for the list of tasks. You may also modify it for your own purposes. To dive deeper into tox read through https://tox.readthedocs.io/en/latest/
 
 ## Running unit-tests
 
@@ -174,50 +248,3 @@ or run tox which will do both:
 ```bash
 $ tox
 ```
-
-## Build python distr
-
-Python supports source and binary distribution packages.
-
-Source distr contains setup.py script that is executed on the users machine during package installation.
-When preparing binary distr (wheel), setup.py is executed on the build machine and the resulting package contains only the result
-of the build (generated files and resources, test results etc).
-
-In our case, PyArmNN depends on Arm NN installation. Thus, binary distr will be linked with
-the local build machine libraries and runtime.
-
-### Source distr
-
-```bash
-$ python setup.py clean --all
-$ python setup.py sdist
-```
-
-As the result you will get `./dist/pyarmnn-20.2.0.tar.gz` file. As you can see it is platform independent.
-
-### Wheel
-
-```bash
-$ export ARMNN_LIB=...
-$ export ARMNN_INCLUDE=...
-$ python setup.py clean --all
-$ python setup.py bdist_wheel
-```
-
-As the result you will get something like `./dist/pyarmnn-20.2.0-cp36-cp36m-linux_x86_64.whl` file. As you can see it is platform dependent.
-This command will launch extension build thus you need to have SWIG wrappers generated before running it.
-
-## Regenerate SWIG stubs inplace
-
-If you need to regenerate wrappers based on the new swig interfaces files, you will need to clean existing build folders
-first and then rebuild extension:
-```bash
-$ python setup.py clean --all
-```
-```bash
-$ export ARMNN_LIB=/path/to/armnn/lib
-$ export ARMNN_INCLUDE=/path/to/armnn/include
-$ python setup.py build_ext --inplace
-```
-It will put all generated files under ./src/pyarmnn/_generated folder.
-Thus, this command can be used to re-generate new extensions in development env.

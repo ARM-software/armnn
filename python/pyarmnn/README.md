@@ -155,19 +155,24 @@ Before building package or running tests you need to generate SWIG wrappers base
 It can be done with tox target 'gen':
 
 ```bash
-tox -e gen
+$ tox -e gen
 ```
 
 ## Running unit-tests
 
-Execute command from the project root dir:
+Download resources required to run unit tests by executing the script in the scripts folder:
 
+```
+$ python ./scripts/download_test_resources.py
+```
+
+The script will download an archive from the Linaro server and extract it. A folder `test/testdata/shared` will be created. Execute `pytest` from the project root dir:
+```bash
+$ python -m pytest test/ -v
+```
+or run tox which will do both:
 ```bash
 $ tox
-```
-or
-```bash
-$ pytest -v
 ```
 
 ## Build python distr

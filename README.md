@@ -6,7 +6,7 @@ There is a getting started guide here using TensorFlow: <https://developer.arm.c
 
 There is a getting started guide here using TensorFlow Lite: <https://developer.arm.com/solutions/machine-learning-on-arm/developer-material/how-to-guides/configuring-the-arm-nn-sdk-build-environment-for-tensorflow-lite>
 
-There is a getting started guide here using Caffe: <https://developer.arm.com/solutions/machine-learning-on-arm/developer-material/how-to-guides/configuring-the-arm-nn-sdk-build-environment-for-caffe>
+There is a getting started guide here using Caffe: <https://developer.arm.com/solutions/machine-learning-on-arm/developer-material/how-to-guides/configure-the-arm-nn-sdk-build-environment-for-caffe>
 
 There is a getting started guide here using ONNX: <https://developer.arm.com/solutions/machine-learning-on-arm/developer-material/how-to-guides/configuring-the-arm-nn-sdk-build-environment-for-onnx>
 

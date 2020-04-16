@@ -26,6 +26,46 @@ namespace std {
 #pragma SWIG nowarn=SWIGWARN_PARSE_NESTED_CLASS
 
 %{
+typedef armnn::IRuntime::CreationOptions::ExternalProfilingOptions ExternalProfilingOptions;
+%}
+
+struct ExternalProfilingOptions
+{
+    %feature("docstring",
+    "
+    Structure for holding ExternalProfiling options.
+
+    Contains:
+        m_EnableProfiling (bool): If set enables profiling in armnn
+
+        m_OutgoingCaptureFile (string): If specified the outgoing external profiling packets will be captured
+                                        in this file, in the specified format
+
+        m_IncomingCaptureFile (string): If specified the incoming external profiling packets will be
+                                        captured in this file
+
+        m_FileOnly (bool): If enabled, then the 'file-only' test mode of external profiling will be enabled
+
+        m_CapturePeriod (uint32_t): If profiling is enabled in 'file-only' mode this is the
+                                    capture period that will be used in the test
+
+        m_FileFormat (string): If profiling is enabled, this specifies the output file format
+
+        m_TimelineEnabled: Set if timeline reporting is enabled or not
+
+            ") ExternalProfilingOptions;
+
+    ExternalProfilingOptions();
+    bool        m_EnableProfiling;
+    std::string m_OutgoingCaptureFile;
+    std::string m_IncomingCaptureFile;
+    bool        m_FileOnly;
+    uint32_t    m_CapturePeriod;
+    std::string m_FileFormat;
+    bool        m_TimelineEnabled;
+};
+
+%{
 typedef armnn::IRuntime::CreationOptions CreationOptions;
 %}
 
@@ -46,12 +86,15 @@ struct CreationOptions
         m_DynamicBackendsPath (string): Setting this value will override the paths set by the DYNAMIC_BACKEND_PATHS
                                         compiler directive. Only a single path is allowed for the override.
 
+        m_ProfilingOptions (ExternalProfilingOptions): Struct to set the profiling options
+
     ") CreationOptions;
 
     CreationOptions();
     std::shared_ptr<armnn::IGpuAccTunedParameters> m_GpuAccTunedParameters;
     bool m_EnableGpuProfiling;
     std::string m_DynamicBackendsPath;
+    ExternalProfilingOptions m_ProfilingOptions;
 };
 
 namespace armnn

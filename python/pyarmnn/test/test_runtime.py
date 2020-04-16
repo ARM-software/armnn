@@ -14,6 +14,7 @@ def random_runtime(shared_data_folder):
     network = parser.CreateNetworkFromBinaryFile(os.path.join(shared_data_folder, 'mock_model.tflite'))
     preferred_backends = [ann.BackendId('CpuRef')]
     options = ann.CreationOptions()
+
     runtime = ann.IRuntime(options)
 
     graphs_count = parser.GetSubgraphCount()
@@ -95,7 +96,6 @@ def test_python_disowns_network(random_runtime):
 
     assert not opt_network.thisown
 
-
 def test_load_network(random_runtime):
     preferred_backends = random_runtime[0]
     network = random_runtime[1]
@@ -107,6 +107,40 @@ def test_load_network(random_runtime):
     net_id, messages = runtime.LoadNetwork(opt_network)
     assert "" == messages
     assert net_id == 0
+
+def test_create_runtime_with_external_profiling_enabled():
+
+    options = ann.CreationOptions()
+
+    options.m_ProfilingOptions.m_FileOnly = True
+    options.m_ProfilingOptions.m_EnableProfiling = True
+    options.m_ProfilingOptions.m_OutgoingCaptureFile = "/tmp/outgoing.txt"
+    options.m_ProfilingOptions.m_IncomingCaptureFile = "/tmp/incoming.txt"
+    options.m_ProfilingOptions.m_TimelineEnabled = True
+    options.m_ProfilingOptions.m_CapturePeriod = 1000
+    options.m_ProfilingOptions.m_FileFormat = "JSON"
+
+    runtime = ann.IRuntime(options)
+
+    assert runtime is not None
+
+def test_create_runtime_with_external_profiling_enabled_invalid_options():
+
+    options = ann.CreationOptions()
+
+    options.m_ProfilingOptions.m_FileOnly = True
+    options.m_ProfilingOptions.m_EnableProfiling = False
+    options.m_ProfilingOptions.m_OutgoingCaptureFile = "/tmp/outgoing.txt"
+    options.m_ProfilingOptions.m_IncomingCaptureFile = "/tmp/incoming.txt"
+    options.m_ProfilingOptions.m_TimelineEnabled = True
+    options.m_ProfilingOptions.m_CapturePeriod = 1000
+    options.m_ProfilingOptions.m_FileFormat = "JSON"
+
+    with pytest.raises(RuntimeError) as err:
+        runtime = ann.IRuntime(options)
+
+    expected_error_message = "It is not possible to enable timeline reporting without profiling being enabled"
+    assert expected_error_message in str(err.value)
 
 
 def test_load_network_properties_provided(random_runtime):

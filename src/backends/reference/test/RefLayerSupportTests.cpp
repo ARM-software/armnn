@@ -14,7 +14,6 @@
 #include <backendsCommon/test/IsLayerSupportedTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
-#include <boost/algorithm/string/trim.hpp>
 
 #include <string>
 
@@ -231,9 +230,9 @@ BOOST_AUTO_TEST_CASE(IsLayerNotSupportedMeanDimensionsReference)
 
     BOOST_CHECK(!result);
 
-    boost::algorithm::trim(reasonIfUnsupported);
-    BOOST_CHECK_EQUAL(reasonIfUnsupported,
-                      "Reference Mean: Expected 4 dimensions but got 2 dimensions instead, for the 'output' tensor.");
+    BOOST_CHECK(reasonIfUnsupported.find(
+        "Reference Mean: Expected 4 dimensions but got 2 dimensions instead, for the 'output' tensor.")
+        != std::string::npos);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

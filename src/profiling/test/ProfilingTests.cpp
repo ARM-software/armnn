@@ -37,7 +37,6 @@
 #include <armnn/Utils.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/algorithm/string.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <cstdint>
@@ -3054,7 +3053,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabled)
     streamRedirector.CancelRedirect();
 
     // Check that the expected error has occurred and logged to the standard output
-    if (!boost::contains(ss.str(), "Cannot connect to stream socket: Connection refused"))
+    if (ss.str().find("Cannot connect to stream socket: Connection refused") == std::string::npos)
     {
         std::cout << ss.str();
         BOOST_FAIL("Expected string not found.");
@@ -3089,7 +3088,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabledRuntime)
     streamRedirector.CancelRedirect();
 
     // Check that the expected error has occurred and logged to the standard output
-    if (!boost::contains(ss.str(), "Cannot connect to stream socket: Connection refused"))
+    if (ss.str().find("Cannot connect to stream socket: Connection refused") == std::string::npos)
     {
         std::cout << ss.str();
         BOOST_FAIL("Expected string not found.");
@@ -3152,7 +3151,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
     streamRedirector.CancelRedirect();
 
     // Check that the expected error has occurred and logged to the standard output
-    if (!boost::contains(ss.str(), "Functor with requested PacketId=37 and Version=4194304 does not exist"))
+    if (ss.str().find("Functor with requested PacketId=37 and Version=4194304 does not exist") == std::string::npos)
     {
         std::cout << ss.str();
         BOOST_FAIL("Expected string not found.");
@@ -3216,7 +3215,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadRequestCounterDirectoryPacket)
     streamRedirector.CancelRedirect();
 
     // Check that the expected error has occurred and logged to the standard output
-    if (!boost::contains(ss.str(), "Functor with requested PacketId=123 and Version=4194304 does not exist"))
+    if (ss.str().find("Functor with requested PacketId=123 and Version=4194304 does not exist") == std::string::npos)
     {
         std::cout << ss.str();
         BOOST_FAIL("Expected string not found.");
@@ -3280,7 +3279,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacket)
     streamRedirector.CancelRedirect();
 
     // Check that the expected error has occurred and logged to the standard output
-    if (!boost::contains(ss.str(), "Functor with requested PacketId=999 and Version=4194304 does not exist"))
+    if (ss.str().find("Functor with requested PacketId=999 and Version=4194304 does not exist") == std::string::npos)
     {
         std::cout << ss.str();
         BOOST_FAIL("Expected string not found.");
@@ -3604,7 +3603,7 @@ BOOST_AUTO_TEST_CASE(CheckFileFormat) {
     streamRedirector.CancelRedirect();
 
     // Check that the expected error has occurred and logged to the standard output
-    if (!boost::contains(ss.str(), "Unsupported profiling file format, only binary is supported"))
+    if (ss.str().find("Unsupported profiling file format, only binary is supported") == std::string::npos)
     {
         std::cout << ss.str();
         BOOST_FAIL("Expected string not found.");

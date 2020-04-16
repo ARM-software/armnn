@@ -21,7 +21,6 @@
 #include <armnn/Logging.hpp>
 #include <armnn/profiling/ISendTimelinePacket.hpp>
 
-#include <boost/algorithm/string.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/unit_test.hpp>
 #include <vector>
@@ -441,7 +440,7 @@ BOOST_AUTO_TEST_CASE(TestBackendCounterLogging)
     periodicCounterCapture.Stop();
     SetLogFilter(armnn::LogSeverity::Fatal);
 
-    BOOST_CHECK(boost::contains(ss.str(), "ActivateCounters example test error"));
+    BOOST_CHECK(ss.str().find("ActivateCounters example test error") != std::string::npos);
 }
 
 BOOST_AUTO_TEST_CASE(BackendProfilingContextGetSendTimelinePacket)

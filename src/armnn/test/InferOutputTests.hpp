@@ -14,7 +14,6 @@
 #include <layers/PreluLayer.hpp>
 #include <layers/StackLayer.hpp>
 
-#include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
 
 void ArgMinMaxInferOutputShapeImpl(const armnn::ArgMinMaxDescriptor       descriptor,

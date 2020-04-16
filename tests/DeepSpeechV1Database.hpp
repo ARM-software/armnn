@@ -30,17 +30,7 @@ std::vector<T> ParseArrayImpl(std::istream& stream, TParseElementFunc parseEleme
     std::string line;
     while (std::getline(stream, line))
     {
-        std::vector<std::string> tokens;
-        try
-        {
-            // Coverity fix: boost::split() may throw an exception of type boost::bad_function_call.
-            boost::split(tokens, line, boost::algorithm::is_any_of(chars), boost::token_compress_on);
-        }
-        catch (const std::exception& e)
-        {
-            ARMNN_LOG(error) << "An error occurred when splitting tokens: " << e.what();
-            continue;
-        }
+        std::vector<std::string> tokens = armnn::stringUtils::StringTokenizer(line, chars);
         for (const std::string& token : tokens)
         {
             if (!token.empty()) // See https://stackoverflow.com/questions/10437406/

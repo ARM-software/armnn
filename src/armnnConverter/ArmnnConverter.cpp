@@ -21,10 +21,9 @@
 #endif
 
 #include <HeapProfiling.hpp>
+#include "armnn/utility/StringUtils.hpp"
 
 #include <boost/format.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
 #include <boost/program_options.hpp>
 
 #include <cstdlib>
@@ -43,17 +42,7 @@ armnn::TensorShape ParseTensorShape(std::istream& stream)
 
     while (std::getline(stream, line))
     {
-        std::vector<std::string> tokens;
-        try
-        {
-            // Coverity fix: boost::split() may throw an exception of type boost::bad_function_call.
-            boost::split(tokens, line, boost::algorithm::is_any_of(","), boost::token_compress_on);
-        }
-        catch (const std::exception& e)
-        {
-            ARMNN_LOG(error) << "An error occurred when splitting tokens: " << e.what();
-            continue;
-        }
+        std::vector<std::string> tokens = armnn::stringUtils::StringTokenizer(line, ",");
         for (const std::string& token : tokens)
         {
             if (!token.empty())

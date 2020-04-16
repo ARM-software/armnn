@@ -7,7 +7,6 @@
 #include <armnn/utility/Assert.hpp>
 
 #include "../src/armnn/Profiling.hpp"
-#include <boost/algorithm/string.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/format.hpp>

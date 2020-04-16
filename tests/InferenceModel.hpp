@@ -22,7 +22,7 @@
 #include <HeapProfiling.hpp>
 #include <TensorIOUtils.hpp>
 
-#include <boost/algorithm/string/join.hpp>
+#include "armnn/utility/StringUtils.hpp"
 #include <boost/exception/exception.hpp>
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/format.hpp>
@@ -354,7 +354,7 @@ public:
             ("model-dir,m", po::value<std::string>(&options.m_ModelDir)->required(),
                 "Path to directory containing model files (.caffemodel/.prototxt/.tflite)")
             ("compute,c", po::value<std::vector<std::string>>(&options.m_ComputeDevices)->
-                default_value(defaultComputes, boost::algorithm::join(defaultComputes, ", "))->
+                default_value(defaultComputes, armnn::stringUtils::StringConcat(defaultComputes, ", "))->
                 multitoken(), backendsMessage.c_str())
             ("dynamic-backends-path,b", po::value(&options.m_DynamicBackendsPath),
                 "Path where to load any available dynamic backend from. "

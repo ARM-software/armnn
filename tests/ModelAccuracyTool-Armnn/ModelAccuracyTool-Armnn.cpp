@@ -8,7 +8,6 @@
 #include "ModelAccuracyChecker.hpp"
 #include "armnnDeserializer/IDeserializer.hpp"
 
-#include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <boost/range/iterator_range.hpp>

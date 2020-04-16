@@ -4,8 +4,8 @@
 //
 
 #include "DotSerializer.hpp"
+#include "armnn/utility/StringUtils.hpp"
 
-#include <boost/algorithm/string/replace.hpp>
 #include <sstream>
 #include <cstring>
 
@@ -26,8 +26,8 @@ std::string Indent(int numSpaces)
 
 std::string Escape(std::string s)
 {
-    boost::replace_all(s, "<", "\\<");
-    boost::replace_all(s, ">", "\\>");
+    armnn::stringUtils::StringReplaceAll(s, "<", "\\<");
+    armnn::stringUtils::StringReplaceAll(s, ">", "\\>");
     return s;
 }
 

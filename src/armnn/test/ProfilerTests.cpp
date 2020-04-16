@@ -9,7 +9,6 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/tools/output_test_stream.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <memory>
 #include <thread>
@@ -231,21 +230,21 @@ BOOST_AUTO_TEST_CASE(WriteEventResults)
         BOOST_TEST(!output.is_empty(false));
 
         // output should contain event name 'test'
-        BOOST_CHECK(boost::contains(output.str(), "test"));
+        BOOST_CHECK(output.str().find("test") != std::string::npos);
 
         // output should contain headers
-        BOOST_CHECK(boost::contains(output.str(), "Event Sequence - Name"));
-        BOOST_CHECK(boost::contains(output.str(), "Event Stats - Name"));
-        BOOST_CHECK(boost::contains(output.str(), "Total"));
-        BOOST_CHECK(boost::contains(output.str(), "Device"));
+        BOOST_CHECK(output.str().find("Event Sequence - Name") != std::string::npos);
+        BOOST_CHECK(output.str().find("Event Stats - Name") != std::string::npos);
+        BOOST_CHECK(output.str().find("Total") != std::string::npos);
+        BOOST_CHECK(output.str().find("Device") != std::string::npos);
         // output should contain compute device 'CpuAcc'
-        BOOST_CHECK(boost::contains(output.str(), "CpuAcc"));
+        BOOST_CHECK(output.str().find("CpuAcc") != std::string::npos);
         // output should not contain un-readable numbers
-        BOOST_CHECK(!(boost::contains(output.str(), "e+")));
+        BOOST_CHECK(output.str().find("e+") == std::string::npos);
         // output should not contain un-readable numbers
-        BOOST_CHECK(!(boost::contains(output.str(), "+")));
+        BOOST_CHECK(output.str().find("+") == std::string::npos);
         // output should not contain zero value
-        BOOST_CHECK(!(boost::contains(output.str(), " 0 ")));
+        BOOST_CHECK(output.str().find(" 0 ") == std::string::npos);
     }
 
     // Disable profiling here to not print out anything on stdout.

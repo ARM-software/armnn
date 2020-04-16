@@ -4,7 +4,6 @@
 //
 #include "ModelAccuracyChecker.hpp"
 
-#include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <boost/filesystem.hpp>

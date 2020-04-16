@@ -8,8 +8,6 @@
 #include "UnitTests.hpp"
 #include <armnn/Logging.hpp>
 
-#include <boost/algorithm/string.hpp>
-
 struct ConfigureLoggingFixture
 {
     ConfigureLoggingFixture()
@@ -103,12 +101,12 @@ BOOST_AUTO_TEST_CASE(LoggerTest)
 
     }
 
-    BOOST_CHECK(boost::contains(ss.str(), "Trace: My trace message; -2"));
-    BOOST_CHECK(boost::contains(ss.str(), "Debug: My debug message; -1"));
-    BOOST_CHECK(boost::contains(ss.str(), "Info: My info message; 0"));
-    BOOST_CHECK(boost::contains(ss.str(), "Warning: My warning message; 1"));
-    BOOST_CHECK(boost::contains(ss.str(), "Error: My error message; 2"));
-    BOOST_CHECK(boost::contains(ss.str(), "Fatal: My fatal message; 3"));
+    BOOST_CHECK(ss.str().find("Trace: My trace message; -2") != std::string::npos);
+    BOOST_CHECK(ss.str().find("Debug: My debug message; -1") != std::string::npos);
+    BOOST_CHECK(ss.str().find("Info: My info message; 0") != std::string::npos);
+    BOOST_CHECK(ss.str().find("Warning: My warning message; 1") != std::string::npos);
+    BOOST_CHECK(ss.str().find("Error: My error message; 2") != std::string::npos);
+    BOOST_CHECK(ss.str().find("Fatal: My fatal message; 3") != std::string::npos);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -251,6 +251,7 @@ list(APPEND armnn_sources
     include/armnn/utility/IgnoreUnused.hpp
     include/armnn/utility/NumericCast.hpp
     include/armnn/utility/PolymorphicDowncast.hpp
+    include/armnn/utility/StringUtils.hpp
     profiling/common/include/SocketConnectionException.hpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp

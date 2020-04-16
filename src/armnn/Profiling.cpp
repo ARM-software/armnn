@@ -21,8 +21,6 @@
 #include <map>
 #include <stack>
 
-#include <boost/algorithm/string.hpp>
-
 namespace armnn
 {
 

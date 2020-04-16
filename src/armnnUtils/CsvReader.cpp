@@ -4,8 +4,8 @@
 //
 
 #include "CsvReader.hpp"
+#include "armnn/utility/StringUtils.hpp"
 
-#include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <fstream>
@@ -24,7 +24,7 @@ CsvRow ParseLine(const std::string& csvLine)
 
     for (const auto &token : tokenizer)
     {
-        entry.values.push_back(boost::trim_copy(token));
+        entry.values.push_back(armnn::stringUtils::StringTrimCopy(token));
     }
     return entry;
 }

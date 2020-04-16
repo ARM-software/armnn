@@ -5,9 +5,9 @@
 
 #include <armnn/Logging.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
+#include "armnn/utility/StringUtils.hpp"
 
 #include <boost/filesystem.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <regex>
 
@@ -110,11 +110,10 @@ std::vector<std::string> DynamicBackendUtils::GetBackendPathsImpl(const std::str
     }
 
     std::unordered_set<std::string> uniqueBackendPaths;
-    std::vector<std::string> tempBackendPaths;
     std::vector<std::string> validBackendPaths;
 
     // Split the given list of paths
-    boost::split(tempBackendPaths, backendPaths, boost::is_any_of(":"));
+    std::vector<std::string> tempBackendPaths = armnn::stringUtils::StringTokenizer(backendPaths, ":");
 
     for (const std::string& path : tempBackendPaths)
     {

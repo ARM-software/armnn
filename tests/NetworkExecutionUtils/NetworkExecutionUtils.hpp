@@ -26,9 +26,6 @@
 #include <Profiling.hpp>
 #include <ResolveType.hpp>
 
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
 #include <boost/program_options.hpp>
 #include <boost/variant.hpp>
 
@@ -53,17 +50,7 @@ std::vector<T> ParseArrayImpl(std::istream& stream, TParseElementFunc parseEleme
     std::string line;
     while (std::getline(stream, line))
     {
-        std::vector<std::string> tokens;
-        try
-        {
-            // Coverity fix: boost::split() may throw an exception of type boost::bad_function_call.
-            boost::split(tokens, line, boost::algorithm::is_any_of(chars), boost::token_compress_on);
-        }
-        catch (const std::exception& e)
-        {
-            ARMNN_LOG(error) << "An error occurred when splitting tokens: " << e.what();
-            continue;
-        }
+        std::vector<std::string> tokens = armnn::stringUtils::StringTokenizer(line, chars);
         for (const std::string& token : tokens)
         {
             if (!token.empty()) // See https://stackoverflow.com/questions/10437406/
@@ -174,7 +161,8 @@ std::vector<unsigned int> ParseArray(std::istream& stream)
 std::vector<std::string> ParseStringList(const std::string & inputString, const char * delimiter)
 {
     std::stringstream stream(inputString);
-    return ParseArrayImpl<std::string>(stream, [](const std::string& s) { return boost::trim_copy(s); }, delimiter);
+    return ParseArrayImpl<std::string>(stream, [](const std::string& s) {
+           return armnn::stringUtils::StringTrimCopy(s); }, delimiter);
 }
 
 void RemoveDuplicateDevices(std::vector<armnn::BackendId>& computeDevices)
@@ -559,8 +547,8 @@ int RunTest(const std::string& format,
             bool parseUnsupported = false,
             const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
-    std::string modelFormat = boost::trim_copy(format);
-    std::string modelPath = boost::trim_copy(path);
+    std::string modelFormat = armnn::stringUtils::StringTrimCopy(format);
+    std::string modelPath = armnn::stringUtils::StringTrimCopy(path);
     std::vector<std::string> inputNamesVector = ParseStringList(inputNames, ",");
     std::vector<std::string> inputTensorShapesVector = ParseStringList(inputTensorShapesStr, ":");
     std::vector<std::string> inputTensorDataFilePathsVector = ParseStringList(

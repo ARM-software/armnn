@@ -4,6 +4,7 @@
 //
 
 #include "JsonPrinterTestImpl.hpp"
+#include "armnn/utility/StringUtils.hpp"
 
 #include <Profiling.hpp>
 
@@ -11,7 +12,6 @@
 #include <armnn/IRuntime.hpp>
 #include <armnn/INetwork.hpp>
 
-#include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <sstream>
@@ -62,7 +62,7 @@ std::vector<double> ExtractMeasurements(const std::string& exp)
         {
             try
             {
-                boost::trim_if(numberString, boost::is_any_of("\t,\n"));
+                armnn::stringUtils::StringTrim(numberString, "\t,\n");
                 numbers.push_back(std::stod(numberString));
             }
             catch (std::invalid_argument const& e)
@@ -77,7 +77,7 @@ std::vector<double> ExtractMeasurements(const std::string& exp)
         {
             try
             {
-                boost::trim_if(numberString, boost::is_any_of("\t,\n"));
+                armnn::stringUtils::StringTrim(numberString, "\t,\n");
                 numbers.push_back(std::stod(numberString));
             }
             catch (std::invalid_argument const& e)
@@ -212,8 +212,9 @@ inline void ValidateProfilerJson(std::string& result)
         std::vector<std::string> sectionVector = ExtractSections(result);
         for (size_t i = 0; i < sectionVector.size(); ++i)
         {
-            if (boost::contains(sectionVector[i], "\"ArmNN\":")
-                || boost::contains(sectionVector[i], "\"inference_measurements\":"))
+
+            if (sectionVector[i].find("\"ArmNN\":") != std::string::npos
+                || sectionVector[i].find("\"inference_measurements\":") != std::string::npos)
             {
                 sectionVector.erase(sectionVector.begin() + static_cast<int>(i));
             }
@@ -221,10 +222,10 @@ inline void ValidateProfilerJson(std::string& result)
         BOOST_CHECK(!sectionVector.empty());
 
         BOOST_CHECK(std::all_of(sectionVector.begin(), sectionVector.end(),
-                                [](std::string i) { return boost::contains(i, "\"raw\":"); }));
+                                [](std::string i) { return (i.find("\"raw\":") != std::string::npos); }));
 
         BOOST_CHECK(std::all_of(sectionVector.begin(), sectionVector.end(),
-                                [](std::string i) { return boost::contains(i, "\"unit\":"); }));
+                                [](std::string i) { return (i.find("\"unit\":") != std::string::npos); }));
     }
 
     // remove the time measurements as they vary from test to test
@@ -234,8 +235,8 @@ inline void ValidateProfilerJson(std::string& result)
     result.erase(std::remove_if (result.begin(),result.end(),
                                  [](char c) { return c == '\t'; }), result.end());
 
-    BOOST_CHECK(boost::contains(result, "ArmNN"));
-    BOOST_CHECK(boost::contains(result, "inference_measurements"));
+    BOOST_CHECK(result.find("ArmNN") != std::string::npos);
+    BOOST_CHECK(result.find("inference_measurements") != std::string::npos);
 
     // ensure no spare parenthesis present in print output
     BOOST_CHECK(AreParenthesesMatching(result));
@@ -252,12 +253,11 @@ void RunSoftmaxProfilerJsonPrinterTest(const std::vector<armnn::BackendId>& back
     const armnn::BackendId& firstBackend = backends.at(0);
     if (firstBackend == armnn::Compute::GpuAcc)
     {
-        BOOST_CHECK(boost::contains(result,
-            "OpenClKernelTimer/: softmax_layer_max_shift_exp_sum_quantized_serial GWS[,,]"));
+        BOOST_CHECK(result.find("OpenClKernelTimer/: softmax_layer_max_shift_exp_sum_quantized_serial GWS[,,]")
+                    != std::string::npos);
     }
     else if (firstBackend == armnn::Compute::CpuAcc)
     {
-        BOOST_CHECK(boost::contains(result,
-            "NeonKernelTimer/: NEFillBorderKernel"));
+        BOOST_CHECK(result.find("NeonKernelTimer/: NEFillBorderKernel") != std::string::npos);
     }
 }

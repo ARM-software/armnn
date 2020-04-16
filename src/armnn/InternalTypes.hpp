@@ -8,74 +8,83 @@
 
 #include <array>
 
+
+/// This list uses X macro technique.
+/// See https://en.wikipedia.org/wiki/X_Macro for more info
+#define LIST_OF_LAYER_TYPE \
+    X(Activation) \
+    X(Addition) \
+    X(ArgMinMax) \
+    X(BatchNormalization) \
+    X(BatchToSpaceNd) \
+    X(Comparison) \
+    X(Concat) \
+    X(Constant) \
+    X(ConvertBf16ToFp32) \
+    X(ConvertFp16ToFp32) \
+    X(ConvertFp32ToBf16) \
+    X(ConvertFp32ToFp16) \
+    X(Convolution2d) \
+    X(Debug) \
+    X(DepthToSpace) \
+    X(DepthwiseConvolution2d) \
+    X(Dequantize) \
+    X(DetectionPostProcess) \
+    X(Division) \
+    X(ElementwiseUnary) \
+    X(FakeQuantization) \
+    X(Floor) \
+    X(FullyConnected) \
+    X(Gather) \
+    X(Input) \
+    X(InstanceNormalization) \
+    X(L2Normalization) \
+    X(LogSoftmax) \
+    X(Lstm) \
+    X(QLstm) \
+    X(Maximum) \
+    X(Mean) \
+    X(MemCopy) \
+    X(MemImport) \
+    X(Merge) \
+    X(Minimum) \
+    X(Multiplication) \
+    X(Normalization) \
+    X(Output) \
+    X(Pad) \
+    X(Permute) \
+    X(Pooling2d) \
+    X(PreCompiled) \
+    X(Prelu) \
+    X(Quantize) \
+    X(QuantizedLstm) \
+    X(Reshape) \
+    X(Resize) \
+    X(Slice) \
+    X(Softmax) \
+    X(SpaceToBatchNd) \
+    X(SpaceToDepth) \
+    X(Splitter) \
+    X(Stack) \
+    X(StandIn) \
+    X(StridedSlice) \
+    X(Subtraction) \
+    X(Switch) \
+    X(Transpose) \
+    X(TransposeConvolution2d)
+
+/// When adding a new layer, adapt also the LastLayer enum value in the
+/// enum class LayerType below
 namespace armnn
 {
 
 enum class LayerType
 {
-    FirstLayer,
-    Activation = FirstLayer,
-    Addition,
-    ArgMinMax,
-    BatchNormalization,
-    BatchToSpaceNd,
-    Comparison,
-    Concat,
-    Constant,
-    ConvertBf16ToFp32,
-    ConvertFp16ToFp32,
-    ConvertFp32ToBf16,
-    ConvertFp32ToFp16,
-    Convolution2d,
-    Debug,
-    DepthToSpace,
-    DepthwiseConvolution2d,
-    Dequantize,
-    DetectionPostProcess,
-    Division,
-    ElementwiseUnary,
-    FakeQuantization,
-    Floor,
-    FullyConnected,
-    Gather,
-    Input,
-    InstanceNormalization,
-    L2Normalization,
-    LogSoftmax,
-    Lstm,
-    Maximum,
-    Mean,
-    MemCopy,
-    MemImport,
-    Merge,
-    Minimum,
-    Multiplication,
-    Normalization,
-    Output,
-    Pad,
-    Permute,
-    Pooling2d,
-    PreCompiled,
-    Prelu,
-    Quantize,
-    QLstm,
-    QuantizedLstm,
-    Reshape,
-    Resize,
-    Slice,
-    Softmax,
-    SpaceToBatchNd,
-    SpaceToDepth,
-    Splitter,
-    Stack,
-    StandIn,
-    StridedSlice,
-    Subtraction,
-    Switch,
-    TransposeConvolution2d,
-    // Last layer goes here.
-    LastLayer,
-    Transpose = LastLayer
+#define X(name) name,
+  LIST_OF_LAYER_TYPE
+#undef X
+  FirstLayer = Activation,
+  LastLayer = TransposeConvolution2d
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

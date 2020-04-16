@@ -8,6 +8,7 @@
 #include "armnn/profiling/IProfilingGuidGenerator.hpp"
 
 #include <functional>
+#include <mutex>
 
 namespace armnn
 {
@@ -24,6 +25,7 @@ public:
     /// Return the next random Guid in the sequence
     inline ProfilingDynamicGuid NextGuid() override
     {
+        std::lock_guard<std::mutex> sequencelock(m_SequenceMutex);
         ProfilingDynamicGuid guid(m_Sequence);
         m_Sequence++;
         if (m_Sequence >= MIN_STATIC_GUID)
@@ -42,8 +44,9 @@ public:
     }
 
 private:
-    uint64_t m_Sequence;
     std::hash<std::string> m_Hash;
+    uint64_t m_Sequence;
+    std::mutex m_SequenceMutex;
 };
 
 } // namespace profiling

@@ -12,6 +12,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/format.hpp>
+#include <thread>
 
 using namespace armnn::profiling;
 
@@ -122,6 +123,30 @@ BOOST_AUTO_TEST_CASE(DynamicGuidGeneratorTest)
         ProfilingDynamicGuid guid = generator.NextGuid();
         CheckDynamicGuid(guid, i);
     }
+}
+
+BOOST_AUTO_TEST_CASE (ProfilingGuidThreadTest)
+{
+    ProfilingGuidGenerator profilingGuidGenerator;
+
+    auto guidGenerator = [&profilingGuidGenerator]()
+    {
+        for (int i = 0; i < 1000; ++i)
+        {
+            profilingGuidGenerator.NextGuid();
+        }
+    };
+
+    std::thread t1(guidGenerator);
+    std::thread t2(guidGenerator);
+    std::thread t3(guidGenerator);
+
+    t1.join();
+    t2.join();
+    t3.join();
+
+    uint64_t guid = profilingGuidGenerator.NextGuid();
+    BOOST_CHECK(guid == 3000u);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -1047,9 +1047,9 @@ uint64_t GetTimestamp()
 #endif
 
     // Take a timestamp
-    auto timestamp = clock::now();
+    auto timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(clock::now().time_since_epoch());
 
-    return static_cast<uint64_t>(timestamp.time_since_epoch().count());
+    return static_cast<uint64_t>(timestamp.count());
 }
 
 } // namespace profiling

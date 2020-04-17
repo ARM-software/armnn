@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="8abbabd6ad946441c8ef1a03896fa98f7801af1f" #COMPMID-3233 Extend gemm tuner in the doxygen documentation.
+DEFAULT_CLFRAMEWORKREVISION="b7f4a95c4bf27b4507e5b3b9278c249b1feefe36" #Add uint8 quantization example for NEON.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

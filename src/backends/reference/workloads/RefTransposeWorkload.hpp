@@ -30,6 +30,7 @@ public:
 using RefTransposeBFloat16Workload = RefTransposeWorkload<DataType::BFloat16>;
 using RefTransposeFloat16Workload = RefTransposeWorkload<DataType::Float16>;
 using RefTransposeFloat32Workload = RefTransposeWorkload<DataType::Float32>;
+using RefTransposeQAsymmS8Workload = RefTransposeWorkload<DataType::QAsymmS8>;
 using RefTransposeQAsymm8Workload = RefTransposeWorkload<DataType::QAsymmU8>;
 using RefTransposeQSymm16Workload = RefTransposeWorkload<DataType::QSymmS16>;
 

@@ -671,6 +671,13 @@ SimpleTransposeConvolution2dTest<armnn::DataType::Float32, armnn::DataType::Floa
     bool biasEnabled,
     const armnn::DataLayout layout);
 
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+SimpleTransposeConvolution2dTest<armnn::DataType::QAsymmS8, armnn::DataType::Signed32>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout);
+
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
 SimpleTransposeConvolution2dTest<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
     armnn::IWorkloadFactory& workloadFactory,
@@ -687,6 +694,13 @@ SimpleTransposeConvolution2dTest<armnn::DataType::QSymmS16, armnn::DataType::Sig
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
 PaddedTransposeConvolution2dTest<armnn::DataType::Float32, armnn::DataType::Float32>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+PaddedTransposeConvolution2dTest<armnn::DataType::QAsymmS8, armnn::DataType::Signed32>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled,
@@ -713,6 +727,13 @@ StridedTransposeConvolution2dTest<armnn::DataType::Float32, armnn::DataType::Flo
     bool biasEnabled,
     const armnn::DataLayout layout);
 
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+StridedTransposeConvolution2dTest<armnn::DataType::QAsymmS8, armnn::DataType::Signed32>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout);
+
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
 StridedTransposeConvolution2dTest<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
     armnn::IWorkloadFactory& workloadFactory,
@@ -729,6 +750,12 @@ StridedTransposeConvolution2dTest<armnn::DataType::QSymmS16, armnn::DataType::Si
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
 MultiChannelTransposeConvolution2dTest<armnn::DataType::Float32, armnn::DataType::Float32>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout layout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+MultiChannelTransposeConvolution2dTest<armnn::DataType::QAsymmS8, armnn::DataType::Signed32>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout);

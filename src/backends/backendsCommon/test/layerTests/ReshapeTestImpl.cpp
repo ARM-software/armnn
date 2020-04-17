@@ -176,6 +176,11 @@ SimpleReshapeTest<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+SimpleReshapeTest<armnn::DataType::QAsymmS8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
 SimpleReshapeTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
@@ -188,6 +193,11 @@ SimpleReshapeTest<armnn::DataType::QSymmS16>(
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 5>
 Reshape5dTest<armnn::DataType::Float32>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 5>
+Reshape5dTest<armnn::DataType::QAsymmS8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 

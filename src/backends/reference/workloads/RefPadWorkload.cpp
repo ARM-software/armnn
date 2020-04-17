@@ -36,6 +36,7 @@ void RefPadWorkload<DataType>::Execute() const
 template class RefPadWorkload<DataType::BFloat16>;
 template class RefPadWorkload<DataType::Float32>;
 template class RefPadWorkload<DataType::Float16>;
+template class RefPadWorkload<DataType::QAsymmS8>;
 template class RefPadWorkload<DataType::QAsymmU8>;
 template class RefPadWorkload<DataType::QSymmS16>;
 

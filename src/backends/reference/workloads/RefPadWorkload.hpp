@@ -31,9 +31,10 @@ public:
 };
 
 using RefPadBFloat16Workload = RefPadWorkload<DataType::BFloat16>;
-using RefPadFloat32Workload = RefPadWorkload<DataType::Float32>;
-using RefPadFloat16Workload = RefPadWorkload<DataType::Float16>;
-using RefPadQAsymm8Workload = RefPadWorkload<DataType::QAsymmU8>;
-using RefPadQSymm16Workload = RefPadWorkload<DataType::QSymmS16>;
+using RefPadFloat32Workload =  RefPadWorkload<DataType::Float32>;
+using RefPadFloat16Workload =  RefPadWorkload<DataType::Float16>;
+using RefPadQAsymmS8Workload = RefPadWorkload<DataType::QAsymmS8>;
+using RefPadQAsymm8Workload =  RefPadWorkload<DataType::QAsymmU8>;
+using RefPadQSymm16Workload =  RefPadWorkload<DataType::QSymmS16>;
 
 } //namespace armnn

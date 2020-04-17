@@ -30,6 +30,7 @@ void RefTransposeWorkload<DataType>::Execute() const
 template class RefTransposeWorkload<DataType::BFloat16>;
 template class RefTransposeWorkload<DataType::Float16>;
 template class RefTransposeWorkload<DataType::Float32>;
+template class RefTransposeWorkload<DataType::QAsymmS8>;
 template class RefTransposeWorkload<DataType::QAsymmU8>;
 template class RefTransposeWorkload<DataType::QSymmS16>;
 

@@ -181,10 +181,11 @@ bool RefLayerSupport::IsArgMinMaxSupported(const armnn::TensorInfo &input, const
 {
     IgnoreUnused(descriptor);
 
-    std::array<DataType, 5> supportedTypes =
+    std::array<DataType, 6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16,
         DataType::Signed32
@@ -211,11 +212,12 @@ bool RefLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
 {
     IgnoreUnused(descriptor);
 
-    std::array<DataType, 5> supportedTypes =
+    std::array<DataType, 6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -260,11 +262,12 @@ bool RefLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
     std::string outputTensorStr = "output";
 
     // Define supported types.
-    std::array<DataType,5> supportedTypes =
+    std::array<DataType,6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -302,12 +305,13 @@ bool RefLayerSupport::IsComparisonSupported(const TensorInfo& input0,
                                             Optional<std::string&> reasonIfUnsupported) const
 {
     IgnoreUnused(descriptor);
-    std::array<DataType, 7> supportedInputTypes =
+    std::array<DataType, 8> supportedInputTypes =
     {
         DataType::Boolean,
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16,
         DataType::Signed32
@@ -339,8 +343,8 @@ bool RefLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inp
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
-        DataType::QAsymmU8,
         DataType::QAsymmS8,
+        DataType::QAsymmU8,
         DataType::QSymmS16
     };
 
@@ -366,11 +370,11 @@ bool RefLayerSupport::IsConstantSupported(const TensorInfo& output,
     {
         DataType::BFloat16,
         DataType::Float32,
-        DataType::Signed32,
-        DataType::QAsymmU8,
         DataType::QAsymmS8,
+        DataType::QAsymmU8,
         DataType::QSymmS8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Signed32
     };
 
     return CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
@@ -462,8 +466,8 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
-        DataType::QAsymmU8,
         DataType::QAsymmS8,
+        DataType::QAsymmU8,
         DataType::QSymmS8,
         DataType::QSymmS16
     };
@@ -495,9 +499,9 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
         ARMNN_NO_DEPRECATE_WARN_BEGIN
         std::array<DataType, 4> supportedWeightTypes =
         {
+            DataType::QAsymmS8,
             DataType::QAsymmU8,
             DataType::QSymmS8,
-            DataType::QAsymmS8,
             DataType::QuantizedSymm8PerAxis // deprecated
         };
         ARMNN_NO_DEPRECATE_WARN_END
@@ -543,8 +547,8 @@ bool RefLayerSupport::IsDebugSupported(const TensorInfo& input,
         DataType::BFloat16,
         DataType::Float16,
         DataType::Float32,
-        DataType::QAsymmU8,
         DataType::QAsymmS8,
+        DataType::QAsymmU8,
         DataType::QSymmS8,
         DataType::QSymmS16,
         DataType::Signed32
@@ -570,11 +574,12 @@ bool RefLayerSupport::IsDepthToSpaceSupported(const TensorInfo& input,
     IgnoreUnused(descriptor);
     bool supported = true;
 
-    std::array<DataType,5> supportedTypes =
+    std::array<DataType,6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -598,6 +603,7 @@ bool RefLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                                       const Optional<TensorInfo>& biases,
                                                       Optional<std::string&> reasonIfUnsupported) const
 {
+    IgnoreUnused(descriptor);
     bool supported = true;
 
     // Define supported types.
@@ -606,9 +612,9 @@ bool RefLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
-        DataType::QSymmS8,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
+        DataType::QSymmS8,
         DataType::QSymmS16
     };
 
@@ -621,21 +627,22 @@ bool RefLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
     supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
                                   "Reference DepthwiseConvolution2d: input and output types mismatched.");
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::array<DataType, 3> supportedWeightTypes =
-        {
-            DataType::QAsymmU8,
-            DataType::QSymmS8,
-            DataType::QuantizedSymm8PerAxis // deprecated
-        };
-    ARMNN_NO_DEPRECATE_WARN_END
-
     const DataType inputType = input.GetDataType();
     if (IsQuantized8BitType(inputType))
     {
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
+        std::array<DataType, 4> supportedWeightTypes =
+                {
+                        DataType::QAsymmS8,
+                        DataType::QAsymmU8,
+                        DataType::QSymmS8,
+                        DataType::QuantizedSymm8PerAxis // deprecated
+                };
+        ARMNN_NO_DEPRECATE_WARN_END
 
         supported &= CheckSupportRule(TypeAnyOf(weights, supportedWeightTypes), reasonIfUnsupported,
-                                      "Reference convolution2d: weights type not supported for quantized input.");
+                                       "Reference DepthwiseConvolution2d: weights type not supported for "
+                                       "quantized input.");
     }
     else
     {
@@ -658,7 +665,6 @@ bool RefLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
         supported &= CheckSupportRule(TypeAnyOf(biases.value(), biasesSupportedTypes), reasonIfUnsupported,
                                       "Reference DepthwiseConvolution2d: biases is not a supported type.");
     }
-    IgnoreUnused(descriptor);
 
     return supported;
 
@@ -716,10 +722,11 @@ bool RefLayerSupport::IsDetectionPostProcessSupported(const TensorInfo& boxEncod
 
     bool supported = true;
 
-    std::array<DataType,4> supportedInputTypes =
+    std::array<DataType,5> supportedInputTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -750,10 +757,11 @@ bool RefLayerSupport::IsDivisionSupported(const TensorInfo& input0,
 {
     bool supported = true;
 
-    std::array<DataType,5> supportedTypes = {
+    std::array<DataType,6> supportedTypes = {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -786,11 +794,12 @@ bool RefLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
 {
     IgnoreUnused(descriptor);
 
-    std::array<DataType, 6> supportedTypes =
+    std::array<DataType, 7> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16,
         DataType::Signed32
@@ -883,8 +892,8 @@ bool RefLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
-        DataType::QAsymmU8,
         DataType::QAsymmS8,
+        DataType::QAsymmU8,
         DataType::QSymmS16
     };
 
@@ -913,8 +922,9 @@ bool RefLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
     }
 
     ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::array<DataType, 3> supportedWeightTypes =
+    std::array<DataType, 4> supportedWeightTypes =
     {
+            DataType::QAsymmS8,
             DataType::QAsymmU8,
             DataType::QSymmS8,
             DataType::QuantizedSymm8PerAxis // deprecated
@@ -969,11 +979,12 @@ bool RefLayerSupport::IsGatherSupported(const armnn::TensorInfo& input0,
                                         armnn::Optional<std::string&> reasonIfUnsupported) const
 {
     bool supported = true;
-    std::array<DataType,5> supportedTypes =
+    std::array<DataType,6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1050,11 +1061,12 @@ bool RefLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
 {
     IgnoreUnused(descriptor);
     // Define supported types
-    std::array<DataType, 5> supportedTypes =
+    std::array<DataType, 6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1261,11 +1273,12 @@ bool RefLayerSupport::IsMeanSupported(const TensorInfo& input,
     std::string meanLayerStr = "Mean";
     std::string outputTensorStr = "output";
 
-    std::array<DataType,5> supportedTypes =
+    std::array<DataType,6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1328,11 +1341,12 @@ bool RefLayerSupport::IsMemCopySupported(const TensorInfo &input,
 {
     bool supported = true;
 
-    std::array<DataType,6> supportedTypes =
+    std::array<DataType,7> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16,
         DataType::Boolean
@@ -1357,10 +1371,11 @@ bool RefLayerSupport::IsMinimumSupported(const TensorInfo& input0,
 {
     bool supported = true;
 
-    std::array<DataType,5> supportedTypes = {
+    std::array<DataType,6> supportedTypes = {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1397,8 +1412,8 @@ bool RefLayerSupport::IsMultiplicationSupported(const TensorInfo& input0,
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
-        DataType::QAsymmU8,
         DataType::QAsymmS8,
+        DataType::QAsymmU8,
         DataType::QSymmS16
     };
 
@@ -1431,11 +1446,12 @@ bool RefLayerSupport::IsNormalizationSupported(const TensorInfo& input,
     IgnoreUnused(descriptor);
 
     // Define supported types
-    std::array<DataType, 5> supportedTypes =
+    std::array<DataType, 6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float16,
         DataType::Float32,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1470,11 +1486,12 @@ bool RefLayerSupport::IsPadSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported output and inputs types.
-    std::array<DataType,5> supportedTypes =
+    std::array<DataType,6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1500,11 +1517,12 @@ bool RefLayerSupport::IsPermuteSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported output and inputs types.
-    std::array<DataType, 5> supportedTypes =
+    std::array<DataType, 6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1574,8 +1592,8 @@ bool RefLayerSupport::IsQuantizeSupported(const TensorInfo& input,
 
     // Define supported output types.
     std::array<DataType,4> supportedOutputTypes = {
-        DataType::QAsymmU8,
         DataType::QAsymmS8,
+        DataType::QAsymmU8,
         DataType::QSymmS8,
         DataType::QSymmS16
     };
@@ -1616,11 +1634,12 @@ bool RefLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
                                                 Optional<std::string&> reasonIfUnsupported) const
 {
     bool supported = true;
-    std::array<DataType,5> supportedTypes =
+    std::array<DataType,6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1649,8 +1668,8 @@ bool RefLayerSupport::IsResizeSupported(const TensorInfo& input,
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
-        DataType::QAsymmU8,
         DataType::QAsymmS8,
+        DataType::QAsymmU8,
         DataType::QSymmS16
     };
 
@@ -1684,10 +1703,11 @@ bool RefLayerSupport::IsSliceSupported(const TensorInfo& input,
     IgnoreUnused(descriptor);
     bool supported = true;
 
-    std::array<DataType, 4> supportedTypes =
+    std::array<DataType, 5> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1741,11 +1761,12 @@ bool RefLayerSupport::IsSpaceToBatchNdSupported(const TensorInfo& input,
 {
     IgnoreUnused(descriptor);
     bool supported = true;
-    std::array<DataType,5> supportedTypes =
+    std::array<DataType,6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1771,11 +1792,12 @@ bool RefLayerSupport::IsSpaceToDepthSupported(const TensorInfo& input,
     IgnoreUnused(descriptor);
     bool supported = true;
 
-    std::array<DataType,5> supportedTypes =
+    std::array<DataType,6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1798,11 +1820,12 @@ bool RefLayerSupport::IsSplitterSupported(const TensorInfo& input,
 {
     IgnoreUnused(descriptor);
     bool supported = true;
-    std::array<DataType,5> supportedTypes =
+    std::array<DataType,6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1820,11 +1843,12 @@ bool RefLayerSupport::IsSplitterSupported(const TensorInfo& input,
 {
     IgnoreUnused(descriptor);
     bool supported = true;
-    std::array<DataType,5> supportedTypes =
+    std::array<DataType,6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1851,11 +1875,12 @@ bool RefLayerSupport::IsStackSupported(const std::vector<const TensorInfo*>& inp
     IgnoreUnused(descriptor);
 
     bool supported = true;
-    std::array<DataType,5> supportedTypes =
+    std::array<DataType,6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1883,10 +1908,11 @@ bool RefLayerSupport::IsStridedSliceSupported(const TensorInfo& input,
     IgnoreUnused(descriptor);
     bool supported = true;
 
-    std::array<DataType,4> supportedTypes =
+    std::array<DataType,5> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1910,10 +1936,11 @@ bool RefLayerSupport::IsSubtractionSupported(const TensorInfo& input0,
 {
     bool supported = true;
 
-    std::array<DataType,5> supportedTypes = {
+    std::array<DataType,6> supportedTypes = {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1946,11 +1973,12 @@ bool RefLayerSupport::IsPreluSupported(const TensorInfo& input,
 {
     bool supported = true;
 
-    std::array<DataType, 5> supportedTypes
+    std::array<DataType, 6> supportedTypes
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };
@@ -1983,12 +2011,14 @@ bool RefLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
     IgnoreUnused(descriptor);
     bool supported = true;
 
-    std::array<DataType,5> supportedTypes =
+    std::array<DataType,7> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
+        DataType::QSymmS8,
         DataType::QSymmS16
     };
 
@@ -2003,11 +2033,12 @@ bool RefLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
 
 
     const DataType inputType = input.GetDataType();
-    if (inputType == DataType::QAsymmU8)
+    if (IsQuantized8BitType(inputType))
     {
         ARMNN_NO_DEPRECATE_WARN_BEGIN
-        std::array<DataType, 3> supportedWeightTypes =
+        std::array<DataType, 4> supportedWeightTypes =
         {
+            DataType::QAsymmS8,
             DataType::QAsymmU8,
             DataType::QSymmS8,
             DataType::QuantizedSymm8PerAxis //Deprecated
@@ -2052,11 +2083,12 @@ bool RefLayerSupport::IsTransposeSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported output and inputs types.
-    std::array<DataType, 5> supportedTypes =
+    std::array<DataType, 6> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };

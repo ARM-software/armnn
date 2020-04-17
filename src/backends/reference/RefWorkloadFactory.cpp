@@ -468,6 +468,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePad(const PadQueueDescripto
     {
         return std::make_unique<RefPadBFloat16Workload>(descriptor, info);
     }
+    else if (IsQAsymmS8(info))
+    {
+        return std::make_unique<RefPadQAsymmS8Workload>(descriptor, info);
+    }
     return MakeWorkload<RefPadFloat32Workload, RefPadQAsymm8Workload>(descriptor, info);
 }
 
@@ -481,6 +485,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePermute(const PermuteQueueD
     else if (IsBFloat16(info))
     {
         return std::make_unique<RefPermuteBFloat16Workload>(descriptor, info);
+    }
+    else if (IsQAsymmS8(info))
+    {
+        return std::make_unique<RefPermuteQAsymmS8Workload>(descriptor, info);
     }
     return MakeWorkloadHelper<RefPermuteFloat16Workload, RefPermuteFloat32Workload, RefPermuteQAsymm8Workload,
         NullWorkload, NullWorkload, NullWorkload>(descriptor, info);
@@ -602,6 +610,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateTranspose(const TransposeQu
     else if (IsBFloat16(info))
     {
         return std::make_unique<RefTransposeBFloat16Workload>(descriptor, info);
+    }
+    else if (IsQAsymmS8(info))
+    {
+        return std::make_unique<RefTransposeQAsymmS8Workload>(descriptor, info);
     }
     return MakeWorkloadHelper<RefTransposeFloat16Workload, RefTransposeFloat32Workload, RefTransposeQAsymm8Workload,
             NullWorkload, NullWorkload, NullWorkload>(descriptor, info);

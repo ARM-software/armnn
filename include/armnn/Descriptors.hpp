@@ -737,6 +737,7 @@ struct ResizeDescriptor
         , m_Method(ResizeMethod::NearestNeighbor)
         , m_DataLayout(DataLayout::NCHW)
         , m_BilinearAlignCorners(false)
+        , m_HalfPixelCenters(false)
     {}
 
     bool operator ==(const ResizeDescriptor& rhs) const
@@ -745,7 +746,8 @@ struct ResizeDescriptor
                m_TargetHeight         == rhs.m_TargetHeight &&
                m_Method               == rhs.m_Method &&
                m_DataLayout           == rhs.m_DataLayout &&
-               m_BilinearAlignCorners == rhs.m_BilinearAlignCorners;
+               m_BilinearAlignCorners == rhs.m_BilinearAlignCorners &&
+               m_HalfPixelCenters     == rhs.m_HalfPixelCenters;
     }
 
     /// Target width value.
@@ -759,6 +761,8 @@ struct ResizeDescriptor
     DataLayout m_DataLayout;
     /// Aligned corners for bilinear method
     bool m_BilinearAlignCorners;
+    /// Half Pixel Centers
+    bool m_HalfPixelCenters;
 };
 
 

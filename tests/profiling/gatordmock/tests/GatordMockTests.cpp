@@ -4,10 +4,10 @@
 //
 
 #include <CommandHandlerRegistry.hpp>
+#include <ConnectionHandler.hpp>
 #include <DirectoryCaptureCommandHandler.hpp>
-#include <GatordMockService.hpp>
+#include <gatordmock/GatordMockService.hpp>
 #include <LabelsAndEventClasses.hpp>
-#include <PeriodicCounterCaptureCommandHandler.hpp>
 #include <ProfilingService.hpp>
 #include <TimelinePacketWriterFactory.hpp>
 
@@ -20,6 +20,7 @@
 #include <boost/cast.hpp>
 #include <boost/test/test_tools.hpp>
 #include <boost/test/unit_test_suite.hpp>
+
 
 BOOST_AUTO_TEST_SUITE(GatordMockTests)
 
@@ -229,13 +230,9 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     // Setup the mock service to bind to the UDS.
     std::string udsNamespace = "gatord_namespace";
 
-    armnnUtils::Sockets::Initialize();
-    armnnUtils::Sockets::Socket listeningSocket = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+    BOOST_CHECK_NO_THROW(armnnProfiling::ConnectionHandler connectionHandler(udsNamespace, false));
 
-    if (!gatordmock::GatordMockService::OpenListeningSocket(listeningSocket, udsNamespace))
-    {
-        BOOST_FAIL("Failed to open Listening Socket");
-    }
+    armnnProfiling::ConnectionHandler connectionHandler(udsNamespace, false);
 
     // Enable the profiling service.
     armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
@@ -251,15 +248,11 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     BOOST_CHECK(profilingService.GetCurrentState() == profiling::ProfilingState::NotConnected);
     profilingService.Update();
 
-    // Connect the profiling service to the mock Gatord.
-    armnnUtils::Sockets::Socket clientSocket =
-            armnnUtils::Sockets::Accept(listeningSocket, nullptr, nullptr, SOCK_CLOEXEC);
-    if (-1 == clientSocket)
-    {
-        BOOST_FAIL("Failed to connect client");
-    }
+    // Connect the profiling service
+    auto basePipeServer = connectionHandler.GetNewBasePipeServer(false);
 
-    gatordmock::GatordMockService mockService(clientSocket, false);
+    // Connect the profiling service to the mock Gatord.
+    gatordmock::GatordMockService mockService(std::move(basePipeServer), false);
 
     timelinedecoder::TimelineDecoder& timelineDecoder = mockService.GetTimelineDecoder();
     profiling::DirectoryCaptureCommandHandler& directoryCaptureCommandHandler =
@@ -377,7 +370,6 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     mockService.WaitForReceivingThread();
     options.m_EnableProfiling = false;
     profilingService.ResetExternalProfilingOptions(options, true);
-    armnnUtils::Sockets::Close(listeningSocket);
     // Future tests here will add counters to the ProfilingService, increment values and examine
     // PeriodicCounterCapture data received. These are yet to be integrated.
 }
@@ -388,22 +380,15 @@ BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
     // Setup the mock service to bind to the UDS.
     std::string udsNamespace = "gatord_namespace";
 
-    armnnUtils::Sockets::Initialize();
-    armnnUtils::Sockets::Socket listeningSocket = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-
-    if (!gatordmock::GatordMockService::OpenListeningSocket(listeningSocket, udsNamespace))
-    {
-        BOOST_FAIL("Failed to open Listening Socket");
-    }
+    armnnProfiling::ConnectionHandler connectionHandler(udsNamespace, false);
 
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
     options.m_ProfilingOptions.m_TimelineEnabled = true;
     armnn::Runtime runtime(options);
 
-    armnnUtils::Sockets::Socket clientConnection;
-    clientConnection = armnnUtils::Sockets::Accept(listeningSocket, nullptr, nullptr, SOCK_CLOEXEC);
-    gatordmock::GatordMockService mockService(clientConnection, false);
+    auto basePipeServer = connectionHandler.GetNewBasePipeServer(false);
+    gatordmock::GatordMockService mockService(std::move(basePipeServer), false);
 
     // Read the stream metadata on the mock side.
     if (!mockService.WaitForStreamMetaData())
@@ -484,8 +469,6 @@ BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
     BOOST_CHECK(timelineDecoder.GetModel().m_Events.size()  == 0);
 
     mockService.WaitForReceivingThread();
-    armnnUtils::Sockets::Close(listeningSocket);
-
     GetProfilingService(&runtime).Disconnect();
 }
 

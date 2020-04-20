@@ -905,6 +905,12 @@ if(BUILD_UNIT_TESTS)
              )
     endif()
 
+    if(BUILD_BASE_PIPE_SERVER)
+        list(APPEND unittest_sources
+                profiling/server/src/basePipeServer/tests/BasePipeServerTests.cpp
+                )
+    endif()
+
     foreach(lib ${armnnUnitTestLibraries})
         message(STATUS "Adding object library dependency to UnitTests: ${lib}")
         list(APPEND unittest_sources $<TARGET_OBJECTS:${lib}>)
@@ -970,6 +976,10 @@ if(BUILD_UNIT_TESTS)
         target_link_libraries(UnitTests armnnOnnxParser)
     endif()
 
+    if(BUILD_BASE_PIPE_SERVER)
+        target_link_libraries(UnitTests armnnBasePipeServer)
+    endif()
+
     addDllCopyCommands(UnitTests)
 endif()
 
@@ -1008,8 +1018,20 @@ if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD
     addDllCopyCommands(ArmnnConverter)
   endif()
 
+if(BUILD_BASE_PIPE_SERVER)
+    add_subdirectory(profiling/server/src/basePipeServer)
+endif()
+
 if(BUILD_TIMELINE_DECODER)
     add_subdirectory(src/timelineDecoder)
+endif()
+
+if(BUILD_GATORD_MOCK AND NOT BUILD_BASE_PIPE_SERVER)
+    message(ERROR, "In order to build GatordMock you must set BUILD_BASE_PIPE_SERVER = YES")
+endif()
+
+if(BUILD_GATORD_MOCK AND NOT BUILD_TIMELINE_DECODER)
+    message(ERROR, "In order to build GatordMock you must set BUILD_TIMELINE_DECODER = YES")
 endif()
 
 if(BUILD_GATORD_MOCK)
@@ -1030,7 +1052,7 @@ if(BUILD_GATORD_MOCK)
         tests/profiling/gatordmock/StubCommandHandler.hpp
         )
 
-    include_directories(src/profiling tests/profiling tests/profiling/gatordmock src/timelineDecoder)
+    include_directories(src/profiling src/timelineDecoder profiling/server/src/basePipeServer tests/profiling)
 
     add_library_ex(gatordMockService STATIC ${gatord_mock_sources})
     target_include_directories(gatordMockService PRIVATE src/armnnUtils)
@@ -1040,6 +1062,7 @@ if(BUILD_GATORD_MOCK)
 
     target_link_libraries(GatordMock
         armnn
+        armnnBasePipeServer
         timelineDecoder
         gatordMockService
         ${Boost_PROGRAM_OPTIONS_LIBRARY}

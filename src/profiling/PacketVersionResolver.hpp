@@ -34,7 +34,7 @@ private:
 };
 
 static const PacketKey ActivateTimeLinePacket(0 , 6);
-static const PacketKey DectivateTimeLinePacket(0 , 7);
+static const PacketKey DeactivateTimeLinePacket(0 , 7);
 
 class PacketVersionResolver final
 {

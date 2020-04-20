@@ -5,12 +5,10 @@
 
 #include "CommandFileParser.hpp"
 #include "CommandLineProcessor.hpp"
+#include <ConnectionHandler.hpp>
 #include "GatordMockService.hpp"
-#include <TimelineDecoder.hpp>
 
-#include <iostream>
 #include <string>
-#include <NetworkSockets.hpp>
 #include <signal.h>
 
 using namespace armnn;
@@ -24,11 +22,13 @@ void exit_capture(int signum)
     run = false;
 }
 
-bool CreateMockService(armnnUtils::Sockets::Socket clientConnection, std::string commandFile, bool isEchoEnabled)
+bool CreateMockService(std::unique_ptr<armnnProfiling::BasePipeServer> basePipeServer,
+                       std::string commandFile,
+                       bool isEchoEnabled)
 {
-    GatordMockService mockService(clientConnection, isEchoEnabled);
+    GatordMockService mockService(std::move(basePipeServer), isEchoEnabled);
 
-    // Send receive the strweam metadata and send connection ack.
+    // Send receive the stream metadata and send connection ack.
     if (!mockService.WaitForStreamMetaData())
     {
         return EXIT_FAILURE;
@@ -63,31 +63,21 @@ int main(int argc, char* argv[])
     std::vector<std::thread> threads;
     std::string commandFile = cmdLine.GetCommandFile();
 
-    armnnUtils::Sockets::Initialize();
-    armnnUtils::Sockets::Socket listeningSocket = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-
-    if (!GatordMockService::OpenListeningSocket(listeningSocket, cmdLine.GetUdsNamespace(), 10))
-    {
-        return EXIT_FAILURE;
-    }
-    std::cout << "Bound to UDS namespace: \\0" << cmdLine.GetUdsNamespace() << std::endl;
-
     // make the socket non-blocking so we can exit the loop
-    armnnUtils::Sockets::SetNonBlocking(listeningSocket);
+    armnnProfiling::ConnectionHandler connectionHandler(cmdLine.GetUdsNamespace(), true);
+
     while (run)
     {
-        armnnUtils::Sockets::Socket clientConnection =
-                armnnUtils::Sockets::Accept(listeningSocket, nullptr, nullptr, SOCK_CLOEXEC);
+        auto basePipeServer = connectionHandler.GetNewBasePipeServer(cmdLine.IsEchoEnabled());
 
-        if (clientConnection > 0)
+        if (basePipeServer != nullptr)
         {
             threads.emplace_back(
-                    std::thread(CreateMockService, clientConnection, commandFile, cmdLine.IsEchoEnabled()));
+                    std::thread(CreateMockService, std::move(basePipeServer), commandFile, cmdLine.IsEchoEnabled()));
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(100u));
     }
 
-    armnnUtils::Sockets::Close(listeningSocket);
     std::for_each(threads.begin(), threads.end(), [](std::thread& t){t.join();});
 }

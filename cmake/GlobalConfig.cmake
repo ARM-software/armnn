@@ -24,6 +24,7 @@ option(DYNAMIC_BACKEND_PATHS "Colon seperated list of paths where to load the dy
 option(BUILD_GATORD_MOCK "Build the Gatord simulator for external profiling testing." ON)
 option(BUILD_TIMELINE_DECODER "Build the Timeline Decoder for external profiling." ON)
 option(SHARED_BOOST "Use dynamic linking for boost libraries" OFF)
+option(BUILD_BASE_PIPE_SERVER "Build the server to handle external profiling pipe traffic" ON)
 
 include(SelectLibraryConfigurations)
 

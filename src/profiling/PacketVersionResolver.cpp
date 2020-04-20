@@ -60,7 +60,7 @@ Version PacketVersionResolver::ResolvePacketVersion(uint32_t familyId, uint32_t 
     {
         return Version(1, 1, 0);
     }
-    if( packetKey == DectivateTimeLinePacket )
+    if( packetKey == DeactivateTimeLinePacket )
     {
         return Version(1, 1, 0);
     }

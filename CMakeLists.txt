@@ -820,20 +820,21 @@ if(BUILD_UNIT_TESTS)
 
     if(BUILD_ONNX_PARSER AND ARMNNREF)
         list(APPEND unittest_sources
-            src/armnnOnnxParser/test/Constructor.cpp
-            src/armnnOnnxParser/test/CreateNetwork.cpp
-            src/armnnOnnxParser/test/ProtoxtFixture.cpp
+            src/armnnOnnxParser/test/Addition.cpp
+            src/armnnOnnxParser/test/BatchNorm.cpp
             src/armnnOnnxParser/test/Clip.cpp
             src/armnnOnnxParser/test/Const.cpp
-            src/armnnOnnxParser/test/Pooling.cpp
-            src/armnnOnnxParser/test/Reshape.cpp
-            src/armnnOnnxParser/test/Relu.cpp
+            src/armnnOnnxParser/test/Constructor.cpp
             src/armnnOnnxParser/test/Conv2D.cpp
-            src/armnnOnnxParser/test/Addition.cpp
+            src/armnnOnnxParser/test/CreateNetwork.cpp
+            src/armnnOnnxParser/test/DepthConv.cpp
+            src/armnnOnnxParser/test/Flatten.cpp
             src/armnnOnnxParser/test/FullyConnected.cpp
             src/armnnOnnxParser/test/GetInputsOutputs.cpp
-            src/armnnOnnxParser/test/BatchNorm.cpp
-            src/armnnOnnxParser/test/DepthConv.cpp
+            src/armnnOnnxParser/test/Pooling.cpp
+            src/armnnOnnxParser/test/ProtoxtFixture.cpp
+            src/armnnOnnxParser/test/Relu.cpp
+            src/armnnOnnxParser/test/Reshape.cpp
             )
     endif()
 

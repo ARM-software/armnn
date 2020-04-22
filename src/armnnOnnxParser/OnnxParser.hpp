@@ -89,21 +89,14 @@ private:
     std::pair<std::string, std::string> AddPrepareBroadcast(const std::string& input0, const std::string& input1);
     void PrependForBroadcast(const std::string& outputName, const std::string& input0, const std::string& input1);
 
+    void AddConvLayerWithDepthwiseConv(const onnx::NodeProto& node, const armnn::Convolution2dDescriptor& convDesc);
+    void AddFullyConnected(const onnx::NodeProto& matmulNode, const onnx::NodeProto* addNode = nullptr);
+    void AddPoolingLayer(const onnx::NodeProto& nodeProto, armnn::Pooling2dDescriptor& desc);
+
     void CreateConstantLayer(const std::string& tensorName, const std::string& layerName);
     void CreateReshapeLayer(const std::string& inputName,
                             const std::string& outputName,
                             const std::string& layerName);
-
-    void ParseBatchNormalization(const onnx::NodeProto& node);
-    void ParseConstant(const onnx::NodeProto& nodeProto);
-
-    void ParseMaxPool(const onnx::NodeProto& nodeProto);
-    void ParseAveragePool(const onnx::NodeProto& nodeProto);
-    void ParseGlobalAveragePool(const onnx::NodeProto& node);
-
-    void AddPoolingLayer(const onnx::NodeProto& nodeProto, armnn::Pooling2dDescriptor& desc);
-
-    void ParseReshape(const onnx::NodeProto& nodeProto);
 
     void ParseActivation(const onnx::NodeProto& nodeProto, const armnn::ActivationFunction func);
     void ParseClip(const onnx::NodeProto& nodeProto);
@@ -112,11 +105,15 @@ private:
     void ParseRelu(const onnx::NodeProto& nodeProto);
     void ParseLeakyRelu(const onnx::NodeProto& nodeProto);
 
-    void AddConvLayerWithDepthwiseConv(const onnx::NodeProto& node, const armnn::Convolution2dDescriptor& convDesc);
-    void ParseConv(const onnx::NodeProto& nodeProto);
-
     void ParseAdd(const onnx::NodeProto& nodeProto);
-    void AddFullyConnected(const onnx::NodeProto& matmulNode, const onnx::NodeProto* addNode = nullptr);
+    void ParseAveragePool(const onnx::NodeProto& nodeProto);
+    void ParseBatchNormalization(const onnx::NodeProto& node);
+    void ParseConstant(const onnx::NodeProto& nodeProto);
+    void ParseConv(const onnx::NodeProto& nodeProto);
+    void ParseFlatten(const onnx::NodeProto& node);
+    void ParseGlobalAveragePool(const onnx::NodeProto& node);
+    void ParseMaxPool(const onnx::NodeProto& nodeProto);
+    void ParseReshape(const onnx::NodeProto& nodeProto);
 
     void RegisterInputSlots(armnn::IConnectableLayer* layer, const std::vector<std::string>& tensorIndexes);
     void RegisterOutputSlots(armnn::IConnectableLayer* layer, const std::vector<std::string>& tensorIndexes);
@@ -184,5 +181,6 @@ private:
     };
 
     std::vector<UsageSummary> m_OutputsFusedAndUsed;
+
 };
 }

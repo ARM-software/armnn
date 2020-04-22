@@ -16,38 +16,38 @@ namespace stringUtils
 
 /// Function to take a string and a list of delimiters and split the string into tokens based on those delimiters
 /// This assumes that tokens are also to be split by newlines
-/// Enabling token compression causes this to ignore multiple concurrent delimiters
+/// Enabling tokenCompression merges adjacent delimiters together, preventing empty tokens
 inline std::vector<std::string> StringTokenizer(const std::string& str,
                                                 const char* delimiters,
                                                 bool tokenCompression = true)
 {
     std::stringstream stringStream(str);
     std::string line;
-    std::vector<std::string> wordVector;
+    std::vector<std::string> tokenVector;
     while (std::getline(stringStream, line))
     {
         std::size_t prev = 0;
         std::size_t pos;
         while ((pos = line.find_first_of(delimiters, prev)) != std::string::npos)
         {
+            // Ignore adjacent tokens
             if (pos > prev)
             {
-                // If token compression is enabled ignore delimiters that are next to each other
-                if (tokenCompression && (pos - prev == 1))
-                {
-                    prev = pos + 1;
-                    continue;
-                }
-                wordVector.push_back(line.substr(prev, pos - prev));
+                tokenVector.push_back(line.substr(prev, pos - prev));
+            }
+            // Unless token compression is disabled
+            else if (!tokenCompression)
+            {
+                tokenVector.push_back(line.substr(prev, pos - prev));
             }
             prev = pos + 1;
         }
         if (prev < line.length())
         {
-            wordVector.push_back(line.substr(prev, std::string::npos));
+            tokenVector.push_back(line.substr(prev, std::string::npos));
         }
     }
-    return wordVector;
+    return tokenVector;
 }
 
 // Set of 3 utility functions for trimming std::strings

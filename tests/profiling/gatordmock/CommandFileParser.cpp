@@ -33,9 +33,28 @@ void CommandFileParser::ParseFile(std::string CommandFile, GatordMockService& mo
         if (tokens.size() > 0)
         {
             std::string command = tokens[0];
-            if (command == "LIST")
+            if (command == "DISABLE")
             {
-                // Expected format for the SET command
+                // Send a deactivate timeline packet
+                // Expected format for the ENABLE command
+                //
+                //      DISABLE
+                //
+                mockService.SendDeactivateTimelinePacket();
+            }
+            else if (command == "ENABLE")
+            {
+                // Send aa activate timeline packet
+                // Expected format for the ENABLE command
+                //
+                //      ENABLE
+                //
+                mockService.SendActivateTimelinePacket();
+            }
+            else if (command == "LIST")
+            {
+                // Request the Counter Directory
+                // Expected format for the LIST command
                 //
                 //      LIST
                 //
@@ -44,6 +63,7 @@ void CommandFileParser::ParseFile(std::string CommandFile, GatordMockService& mo
             }
             if (command == "SET")
             {
+                // Send a periodic counter selection packet
                 // Expected format for the SET command
                 //
                 //      SET 500000 1 2 5 10
@@ -72,13 +92,14 @@ void CommandFileParser::ParseFile(std::string CommandFile, GatordMockService& mo
             }
             else if (command == "WAIT")
             {
-                // Expected format for the SET command
+                // Wait for an interval of time in microseconds
+                // Expected format for the WAIT command
                 //
                 //      WAIT 11000000
                 //
                 // This breaks down to:
                 // WAIT         command
-                // 11000000     timeout period in micro seconds
+                // 11000000     timeout period in microseconds
                 if (tokens.size() > 1) // minimum of 2 tokens.
                 {
                     uint32_t timeout = static_cast<uint32_t>(std::stoul(tokens[1]));

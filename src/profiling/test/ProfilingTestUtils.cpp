@@ -14,6 +14,26 @@
 
 #include <boost/test/unit_test.hpp>
 
+uint32_t GetStreamMetaDataPacketSize()
+{
+    uint32_t sizeUint32 = sizeof(uint32_t);
+    uint32_t payloadSize = 0;
+    payloadSize += boost::numeric_cast<uint32_t>(GetSoftwareInfo().size()) + 1;
+    payloadSize += boost::numeric_cast<uint32_t>(GetHardwareVersion().size()) + 1;
+    payloadSize += boost::numeric_cast<uint32_t>(GetSoftwareVersion().size()) + 1;
+    payloadSize += boost::numeric_cast<uint32_t>(GetProcessName().size()) + 1;
+
+    // Add packetVersionEntries
+    payloadSize += 6 * 2 * sizeUint32;
+    // Add packetVersionCountSize
+    payloadSize += sizeUint32;
+
+    uint32_t headerSize = 2 * sizeUint32;
+    uint32_t bodySize = 10 * sizeUint32;
+
+    return headerSize + bodySize + payloadSize;
+}
+
 inline unsigned int OffsetToNextWord(unsigned int numberOfBytes)
 {
     unsigned int uint32_t_size = sizeof(uint32_t);

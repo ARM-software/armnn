@@ -10,7 +10,6 @@
 #include <armnn/Conversion.hpp>
 #include <Processes.hpp>
 #include <armnn/utility/Assert.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -34,15 +33,12 @@ void SendCounterPacket::SendStreamMetaDataPacket()
     std::string softwareVersion(GetSoftwareVersion());
     std::string processName = GetProcessName().substr(0, 60);
 
-    uint32_t infoSize = numeric_cast<uint32_t>(info.size()) > 0 ? numeric_cast<uint32_t>(info.size()) + 1 : 0;
-    uint32_t hardwareVersionSize = numeric_cast<uint32_t>(hardwareVersion.size()) > 0 ?
-                                   numeric_cast<uint32_t>(hardwareVersion.size()) + 1 : 0;
-    uint32_t softwareVersionSize = numeric_cast<uint32_t>(softwareVersion.size()) > 0 ?
-                                   numeric_cast<uint32_t>(softwareVersion.size()) + 1 : 0;
-    uint32_t processNameSize = numeric_cast<uint32_t>(processName.size()) > 0 ?
-                               numeric_cast<uint32_t>(processName.size()) + 1 : 0;
+    uint32_t infoSize =            numeric_cast<uint32_t>(info.size()) + 1;
+    uint32_t hardwareVersionSize = numeric_cast<uint32_t>(hardwareVersion.size()) + 1;
+    uint32_t softwareVersionSize = numeric_cast<uint32_t>(softwareVersion.size()) + 1;
+    uint32_t processNameSize =     numeric_cast<uint32_t>(processName.size()) + 1;
 
-    uint32_t sizeUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
+    uint32_t sizeUint32 = sizeof(uint32_t);
 
     uint32_t headerSize = 2 * sizeUint32;
     uint32_t bodySize = 10 * sizeUint32;
@@ -95,19 +91,19 @@ void SendCounterPacket::SendStreamMetaDataPacket()
         WriteUint32(writeBuffer, offset, numeric_cast<uint32_t>(pid)); // pid
         offset += sizeUint32;
         uint32_t poolOffset = bodySize;
-        WriteUint32(writeBuffer, offset, infoSize ? poolOffset : 0); // offset_info
+        WriteUint32(writeBuffer, offset, poolOffset); // offset_info
         offset += sizeUint32;
         poolOffset += infoSize;
-        WriteUint32(writeBuffer, offset, hardwareVersionSize ? poolOffset : 0); // offset_hw_version
+        WriteUint32(writeBuffer, offset, poolOffset); // offset_hw_version
         offset += sizeUint32;
         poolOffset += hardwareVersionSize;
-        WriteUint32(writeBuffer, offset, softwareVersionSize ? poolOffset : 0); // offset_sw_version
+        WriteUint32(writeBuffer, offset, poolOffset); // offset_sw_version
         offset += sizeUint32;
         poolOffset += softwareVersionSize;
-        WriteUint32(writeBuffer, offset, processNameSize ? poolOffset : 0); // offset_process_name
+        WriteUint32(writeBuffer, offset, poolOffset); // offset_process_name
         offset += sizeUint32;
         poolOffset += processNameSize;
-        WriteUint32(writeBuffer, offset, packetVersionEntries ? poolOffset : 0); // offset_packet_version_table
+        WriteUint32(writeBuffer, offset, poolOffset); // offset_packet_version_table
         offset += sizeUint32;
         WriteUint32(writeBuffer, offset, 0); // reserved
         offset += sizeUint32;
@@ -120,23 +116,12 @@ void SendCounterPacket::SendStreamMetaDataPacket()
             offset += infoSize;
         }
 
-        if (hardwareVersionSize)
-        {
-            memcpy(&writeBuffer->GetWritableData()[offset], hardwareVersion.c_str(), hardwareVersionSize);
-            offset += hardwareVersionSize;
-        }
-
-        if (softwareVersionSize)
-        {
-            memcpy(&writeBuffer->GetWritableData()[offset], softwareVersion.c_str(), softwareVersionSize);
-            offset += softwareVersionSize;
-        }
-
-        if (processNameSize)
-        {
-            memcpy(&writeBuffer->GetWritableData()[offset], processName.c_str(), processNameSize);
-            offset += processNameSize;
-        }
+        memcpy(&writeBuffer->GetWritableData()[offset], hardwareVersion.c_str(), hardwareVersionSize);
+        offset += hardwareVersionSize;
+        memcpy(&writeBuffer->GetWritableData()[offset], softwareVersion.c_str(), softwareVersionSize);
+        offset += softwareVersionSize;
+        memcpy(&writeBuffer->GetWritableData()[offset], processName.c_str(), processNameSize);
+        offset += processNameSize;
 
         if (packetVersionEntries)
         {

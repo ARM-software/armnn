@@ -2458,10 +2458,7 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
 {
-    // Calculate the size of a Stream Metadata packet
-    std::string processName      = GetProcessName().substr(0, 60);
-    unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
-    unsigned int streamMetadataPacketsize = 118 + processNameSize;
+    unsigned int streamMetadataPacketsize = GetStreamMetaDataPacketSize();
 
     // Reset the profiling service to the uninitialized state
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;

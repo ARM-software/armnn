@@ -4,6 +4,7 @@
 //
 
 #include "ProfilingMocks.hpp"
+#include "ProfilingTestUtils.hpp"
 #include "SendCounterPacketTests.hpp"
 
 #include <BufferManager.hpp>
@@ -298,14 +299,10 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
 
     std::string processName = GetProcessName().substr(0, 60);
 
-    uint32_t infoSize = numeric_cast<uint32_t>(GetSoftwareInfo().size()) > 0 ?
-                        numeric_cast<uint32_t>(GetSoftwareInfo().size()) + 1 : 0;
-    uint32_t hardwareVersionSize = numeric_cast<uint32_t>(GetHardwareVersion().size()) > 0 ?
-                                   numeric_cast<uint32_t>(GetHardwareVersion().size()) + 1 : 0;
-    uint32_t softwareVersionSize = numeric_cast<uint32_t>(GetSoftwareVersion().size()) > 0 ?
-                                   numeric_cast<uint32_t>(GetSoftwareVersion().size()) + 1 : 0;
-    uint32_t processNameSize = numeric_cast<uint32_t>(processName.size()) > 0 ?
-                               numeric_cast<uint32_t>(processName.size()) + 1 : 0;
+    uint32_t infoSize =            numeric_cast<uint32_t>(GetSoftwareInfo().size()) + 1;
+    uint32_t hardwareVersionSize = numeric_cast<uint32_t>(GetHardwareVersion().size()) + 1;
+    uint32_t softwareVersionSize = numeric_cast<uint32_t>(GetSoftwareVersion().size()) + 1;
+    uint32_t processNameSize =     numeric_cast<uint32_t>(processName.size()) + 1;
 
     uint32_t packetEntries = 6;
 
@@ -337,19 +334,19 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     BOOST_TEST(ReadUint32(readBuffer2, offset) == numeric_cast<uint32_t>(pid));
     offset += sizeUint32;
     uint32_t poolOffset = 10 * sizeUint32;
-    BOOST_TEST(ReadUint32(readBuffer2, offset) == (infoSize ? poolOffset : 0)); // offset_info
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == poolOffset); // offset_info
     offset += sizeUint32;
     poolOffset += infoSize;
-    BOOST_TEST(ReadUint32(readBuffer2, offset) == (hardwareVersionSize ? poolOffset : 0)); // offset_hw_version
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == poolOffset); // offset_hw_version
     offset += sizeUint32;
     poolOffset += hardwareVersionSize;
-    BOOST_TEST(ReadUint32(readBuffer2, offset) == (softwareVersionSize ? poolOffset : 0)); // offset_sw_version
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == poolOffset); // offset_sw_version
     offset += sizeUint32;
     poolOffset += softwareVersionSize;
-    BOOST_TEST(ReadUint32(readBuffer2, offset) == (processNameSize ? poolOffset : 0)); // offset_process_name
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == poolOffset); // offset_process_name
     offset += sizeUint32;
     poolOffset += processNameSize;
-    BOOST_TEST(ReadUint32(readBuffer2, offset) == (packetEntries ? poolOffset : 0)); // offset_packet_version_table
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == poolOffset); // offset_packet_version_table
     offset += sizeUint32;
     BOOST_TEST(ReadUint32(readBuffer2, offset) == 0); // reserved
 
@@ -1785,11 +1782,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest1)
     CounterDirectory counterDirectory;
     sendCounterPacket.SendStreamMetaDataPacket();
 
-    // Get the size of the Stream Metadata Packet
-    std::string processName = GetProcessName().substr(0, 60);
-    unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
-    unsigned int streamMetadataPacketsize = 118 + processNameSize;
-    totalWrittenSize += streamMetadataPacketsize;
+    totalWrittenSize += GetStreamMetaDataPacketSize();
 
     sendThread.SetReadyToRead();
 
@@ -1899,11 +1892,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest2)
     CounterDirectory counterDirectory;
     sendCounterPacket.SendStreamMetaDataPacket();
 
-    // Get the size of the Stream Metadata Packet
-    std::string processName = GetProcessName().substr(0, 60);
-    unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
-    unsigned int streamMetadataPacketsize = 118 + processNameSize;
-    totalWrittenSize += streamMetadataPacketsize;
+    totalWrittenSize += GetStreamMetaDataPacketSize();
 
     sendThread.SetReadyToRead();
 
@@ -2018,11 +2007,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest3)
     CounterDirectory counterDirectory;
     sendCounterPacket.SendStreamMetaDataPacket();
 
-    // Get the size of the Stream Metadata Packet
-    std::string processName = GetProcessName().substr(0, 60);
-    unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
-    unsigned int streamMetadataPacketsize = 118 + processNameSize;
-    totalWrittenSize += streamMetadataPacketsize;
+    totalWrittenSize += GetStreamMetaDataPacketSize();
 
     sendThread.SetReadyToRead();
     sendCounterPacket.SendCounterDirectoryPacket(counterDirectory);
@@ -2116,9 +2101,7 @@ BOOST_AUTO_TEST_CASE(SendCounterPacketTestWithSendThread)
     SendThread sendThread(profilingStateMachine, bufferManager, sendCounterPacket, -1);
     sendThread.Start(mockProfilingConnection);
 
-    std::string processName = GetProcessName().substr(0, 60);
-    unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
-    unsigned int streamMetadataPacketsize = 118 + processNameSize;
+    unsigned int streamMetadataPacketsize = GetStreamMetaDataPacketSize();
 
     sendThread.Stop();
 
@@ -2173,9 +2156,7 @@ BOOST_AUTO_TEST_CASE(SendThreadBufferTest)
     auto packetBuffer = bufferManager.GetReadableBuffer();
     BOOST_TEST(packetBuffer.get());
 
-    std::string processName = GetProcessName().substr(0, 60);
-    unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
-    unsigned int streamMetadataPacketsize = 118 + processNameSize;
+    unsigned int streamMetadataPacketsize = GetStreamMetaDataPacketSize();
     BOOST_TEST(packetBuffer->GetSize() == streamMetadataPacketsize);
 
     // Recommit to be read by sendCounterPacket
@@ -2249,10 +2230,7 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket3)
     ProfilingStateMachine profilingStateMachine;
     SetWaitingForAckProfilingState(profilingStateMachine);
 
-    // Calculate the size of a Stream Metadata packet
-    std::string processName = GetProcessName().substr(0, 60);
-    unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
-    unsigned int streamMetadataPacketsize = 118 + processNameSize;
+    unsigned int streamMetadataPacketsize = GetStreamMetaDataPacketSize();
 
     MockProfilingConnection mockProfilingConnection;
     BufferManager bufferManager(3, 1024);
@@ -2277,10 +2255,7 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket4)
     ProfilingStateMachine profilingStateMachine;
     SetWaitingForAckProfilingState(profilingStateMachine);
 
-    // Calculate the size of a Stream Metadata packet
-    std::string processName = GetProcessName().substr(0, 60);
-    unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
-    unsigned int streamMetadataPacketsize = 118 + processNameSize;
+    unsigned int streamMetadataPacketsize = GetStreamMetaDataPacketSize();
 
     MockProfilingConnection mockProfilingConnection;
     BufferManager bufferManager(3, 1024);

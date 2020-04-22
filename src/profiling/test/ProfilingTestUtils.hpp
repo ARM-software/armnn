@@ -17,6 +17,8 @@
 using namespace armnn;
 using namespace armnn::profiling;
 
+uint32_t GetStreamMetaDataPacketSize();
+
 inline unsigned int OffsetToNextWord(unsigned int numberOfBytes);
 
 void VerifyTimelineHeaderBinary(const unsigned char* readableData,

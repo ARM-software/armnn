@@ -1000,9 +1000,11 @@ if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD
     addDllCopyCommands(ArmnnConverter)
 endif()
 
-if(BUILD_GATORD_MOCK)
+if(BUILD_TIMELINE_DECODER)
     add_subdirectory(src/timelineDecoder)
+endif()
 
+if(BUILD_GATORD_MOCK)
     set(gatord_mock_sources)
     list(APPEND gatord_mock_sources
         tests/profiling/gatordmock/CommandFileParser.hpp

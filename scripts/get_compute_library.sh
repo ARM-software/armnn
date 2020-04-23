@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="d1d7722cfc5ee130115d8d195068a98b16102a21" #COMPMID-3314: Enable OpenMP in the reference tests.
+DEFAULT_CLFRAMEWORKREVISION="b70770ee65ccce71a74e73df55fcaeac3cb9d0d7" #COMPMID-3069: Requantize in int32_t in RELUs of NEActivationLayerKernel.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

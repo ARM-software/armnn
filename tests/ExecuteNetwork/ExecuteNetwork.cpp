@@ -109,6 +109,8 @@ int main(int argc, const char* argv[])
              "If this option is enabled, the output of every graph layer will be printed.")
             ("enable-external-profiling,a", po::bool_switch()->default_value(false),
              "If enabled external profiling will be switched on")
+            ("timeline-profiling", po::bool_switch()->default_value(false),
+             "If enabled timeline profiling will be switched on, requires external profiling")
             ("outgoing-capture-file,j", po::value(&outgoingCaptureFile),
              "If specified the outgoing external profiling packets will be captured in this binary file")
             ("incoming-capture-file,k", po::value(&incomingCaptureFile),
@@ -168,6 +170,7 @@ int main(int argc, const char* argv[])
     bool enableExternalProfiling = vm["enable-external-profiling"].as<bool>();
     bool fileOnlyExternalProfiling = vm["file-only-external-profiling"].as<bool>();
     bool parseUnsupported = vm["parse-unsupported"].as<bool>();
+    bool timelineEnabled = vm["timeline-profiling"].as<bool>();
 
     if (enableBf16TurboMode && enableFp16TurboMode)
     {
@@ -175,6 +178,23 @@ int main(int argc, const char* argv[])
         return EXIT_FAILURE;
     }
 
+    // Create runtime
+    armnn::IRuntime::CreationOptions options;
+    options.m_EnableGpuProfiling                     = enableProfiling;
+    options.m_DynamicBackendsPath                    = dynamicBackendsPath;
+    options.m_ProfilingOptions.m_EnableProfiling     = enableExternalProfiling;
+    options.m_ProfilingOptions.m_IncomingCaptureFile = incomingCaptureFile;
+    options.m_ProfilingOptions.m_OutgoingCaptureFile = outgoingCaptureFile;
+    options.m_ProfilingOptions.m_FileOnly            = fileOnlyExternalProfiling;
+    options.m_ProfilingOptions.m_CapturePeriod       = counterCapturePeriod;
+    options.m_ProfilingOptions.m_FileFormat          = fileFormat;
+    options.m_ProfilingOptions.m_TimelineEnabled     = timelineEnabled;
+
+    if (timelineEnabled && !enableExternalProfiling)
+    {
+        ARMNN_LOG(fatal) << "Timeline profiling requires external profiling to be turned on";
+        return EXIT_FAILURE;
+    }
 
     // Check whether we have to load test cases from a file.
     if (CheckOption(vm, "test-cases"))
@@ -196,17 +216,7 @@ int main(int argc, const char* argv[])
             ARMNN_LOG(fatal) << "Given file \"" << testCasesFile << "\" has no test cases";
             return EXIT_FAILURE;
         }
-
         // Create runtime
-        armnn::IRuntime::CreationOptions options;
-        options.m_EnableGpuProfiling                     = enableProfiling;
-        options.m_DynamicBackendsPath                    = dynamicBackendsPath;
-        options.m_ProfilingOptions.m_EnableProfiling     = enableExternalProfiling;
-        options.m_ProfilingOptions.m_IncomingCaptureFile = incomingCaptureFile;
-        options.m_ProfilingOptions.m_OutgoingCaptureFile = outgoingCaptureFile;
-        options.m_ProfilingOptions.m_FileOnly            = fileOnlyExternalProfiling;
-        options.m_ProfilingOptions.m_CapturePeriod       = counterCapturePeriod;
-        options.m_ProfilingOptions.m_FileFormat          = fileFormat;
         std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(options));
 
         const std::string executableName("ExecuteNetwork");
@@ -276,15 +286,6 @@ int main(int argc, const char* argv[])
             return EXIT_FAILURE;
         }
         // Create runtime
-        armnn::IRuntime::CreationOptions options;
-        options.m_EnableGpuProfiling                     = enableProfiling;
-        options.m_DynamicBackendsPath                    = dynamicBackendsPath;
-        options.m_ProfilingOptions.m_EnableProfiling     = enableExternalProfiling;
-        options.m_ProfilingOptions.m_IncomingCaptureFile = incomingCaptureFile;
-        options.m_ProfilingOptions.m_OutgoingCaptureFile = outgoingCaptureFile;
-        options.m_ProfilingOptions.m_FileOnly            = fileOnlyExternalProfiling;
-        options.m_ProfilingOptions.m_CapturePeriod       = counterCapturePeriod;
-        options.m_ProfilingOptions.m_FileFormat          = fileFormat;
         std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(options));
 
         return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,

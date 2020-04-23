@@ -151,6 +151,13 @@ void TimelineDecoder::SetDefaultCallbacks()
 
 void TimelineDecoder::print()
 {
+    if (m_Model.m_Labels.empty() && m_Model.m_Entities.empty() && m_Model.m_EventClasses.empty() &&
+        m_Model.m_Events.empty() && m_Model.m_Relationships.empty())
+    {
+        std::cout << "No timeline packets received" << std::endl;
+        return;
+    }
+
     printLabels();
     printEntities();
     printEventClasses();

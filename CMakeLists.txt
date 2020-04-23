@@ -1019,6 +1019,7 @@ if(BUILD_GATORD_MOCK)
         tests/profiling/gatordmock/PeriodicCounterSelectionResponseHandler.hpp
         tests/profiling/gatordmock/StreamMetadataCommandHandler.cpp
         tests/profiling/gatordmock/StreamMetadataCommandHandler.hpp
+        tests/profiling/gatordmock/StubCommandHandler.hpp
         )
 
     include_directories(src/profiling tests/profiling tests/profiling/gatordmock src/timelineDecoder)

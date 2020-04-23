@@ -239,7 +239,9 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
 
     // Enable the profiling service.
     armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling                     = true;
+    options.m_EnableProfiling = true;
+    options.m_TimelineEnabled = true;
+
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
@@ -396,6 +398,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
 
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
+    options.m_ProfilingOptions.m_TimelineEnabled = true;
     armnn::Runtime runtime(options);
 
     armnnUtils::Sockets::Socket clientConnection;

@@ -40,8 +40,12 @@ void ConnectionAcknowledgedCommandHandler::operator()(const Packet& packet)
         m_StateMachine.TransitionToState(ProfilingState::Active);
         // Send the counter directory packet.
         m_SendCounterPacket.SendCounterDirectoryPacket(m_CounterDirectory);
-        m_SendTimelinePacket.SendTimelineMessageDirectoryPackage();
-        TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses(m_SendTimelinePacket);
+
+        if (m_TimelineEnabled)
+        {
+            m_SendTimelinePacket.SendTimelineMessageDirectoryPackage();
+            TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses(m_SendTimelinePacket);
+        }
 
         if(m_BackendProfilingContext.has_value())
         {

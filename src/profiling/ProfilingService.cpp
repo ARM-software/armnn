@@ -35,6 +35,7 @@ void ProfilingService::ResetExternalProfilingOptions(const ExternalProfilingOpti
     // Update the profiling options
     m_Options = options;
     m_TimelineReporting = options.m_TimelineEnabled;
+    m_ConnectionAcknowledgedCommandHandler.setTimelineEnabled(options.m_TimelineEnabled);
 
     // Check if the profiling service needs to be reset
     if (resetProfilingService)

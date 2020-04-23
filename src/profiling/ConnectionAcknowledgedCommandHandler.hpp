@@ -44,12 +44,18 @@ public:
 
     void operator()(const Packet& packet) override;
 
+    void setTimelineEnabled(bool timelineEnabled)
+    {
+        m_TimelineEnabled = timelineEnabled;
+    }
+
 private:
     const ICounterDirectory& m_CounterDirectory;
     ISendCounterPacket&      m_SendCounterPacket;
     ISendTimelinePacket&     m_SendTimelinePacket;
     ProfilingStateMachine&   m_StateMachine;
     Optional<BackendProfilingContexts> m_BackendProfilingContext;
+    bool m_TimelineEnabled = false;
 };
 
 } // namespace profiling

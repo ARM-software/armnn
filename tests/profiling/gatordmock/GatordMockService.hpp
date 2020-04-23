@@ -21,6 +21,7 @@
 #include "StreamMetadataCommandHandler.hpp"
 
 #include "PacketVersionResolver.hpp"
+#include "StubCommandHandler.hpp"
 
 namespace armnn
 {
@@ -56,10 +57,12 @@ public:
             , m_PacketVersionResolver()
             , m_HandlerRegistry()
             , m_TimelineDecoder()
-            , m_StreamMetadataCommandHandler(
-                    0, 0, m_PacketVersionResolver.ResolvePacketVersion(0, 0).GetEncodedValue(), !echoPackets)
             , m_CounterCaptureCommandHandler(
                     0, 4, m_PacketVersionResolver.ResolvePacketVersion(0, 4).GetEncodedValue(), !echoPackets)
+            , m_StreamMetadataCommandHandler(
+                    0, 0, m_PacketVersionResolver.ResolvePacketVersion(0, 0).GetEncodedValue(), !echoPackets)
+            // This stub lets us ignore any counter capture packets we receive without throwing an error
+            , m_StubCommandHandler(3, 0, m_PacketVersionResolver.ResolvePacketVersion(0, 3).GetEncodedValue())
             , m_DirectoryCaptureCommandHandler(
                     0, 2, m_PacketVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), !echoPackets)
             , m_TimelineCaptureCommandHandler(
@@ -70,8 +73,9 @@ public:
     {
         m_TimelineDecoder.SetDefaultCallbacks();
 
-        m_HandlerRegistry.RegisterFunctor(&m_StreamMetadataCommandHandler);
         m_HandlerRegistry.RegisterFunctor(&m_CounterCaptureCommandHandler);
+        m_HandlerRegistry.RegisterFunctor(&m_StreamMetadataCommandHandler);
+        m_HandlerRegistry.RegisterFunctor(&m_StubCommandHandler);
         m_HandlerRegistry.RegisterFunctor(&m_DirectoryCaptureCommandHandler);
         m_HandlerRegistry.RegisterFunctor(&m_TimelineDirectoryCaptureCommandHandler);
         m_HandlerRegistry.RegisterFunctor(&m_TimelineCaptureCommandHandler);
@@ -207,8 +211,9 @@ private:
 
     timelinedecoder::TimelineDecoder m_TimelineDecoder;
 
-    gatordmock::StreamMetadataCommandHandler m_StreamMetadataCommandHandler;
     gatordmock::PeriodicCounterCaptureCommandHandler m_CounterCaptureCommandHandler;
+    gatordmock::StreamMetadataCommandHandler m_StreamMetadataCommandHandler;
+    gatordmock::StubCommandHandler m_StubCommandHandler;
 
     profiling::DirectoryCaptureCommandHandler m_DirectoryCaptureCommandHandler;
 

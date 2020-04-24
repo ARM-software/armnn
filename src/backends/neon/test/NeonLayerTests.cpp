@@ -1096,8 +1096,11 @@ ARMNN_AUTO_TEST_CASE(MultiChannelTransposeConvolution2dUint8Nhwc,
 // Abs
 ARMNN_AUTO_TEST_CASE(Abs2d, Abs2dTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(Abs3d, Abs3dTest<DataType::Float32>)
-
 ARMNN_AUTO_TEST_CASE(AbsZero, AbsZeroTest<DataType::Float32>)
+
+ARMNN_AUTO_TEST_CASE(Abs2dSigned32, Abs2dTest<DataType::Signed32>)
+ARMNN_AUTO_TEST_CASE(Abs3dSigned32, Abs3dTest<DataType::Signed32>)
+ARMNN_AUTO_TEST_CASE(AbsZeroSigned32, AbsZeroTest<DataType::Signed32>)
 
 // Rsqrt
 ARMNN_AUTO_TEST_CASE(Rsqrt2d, Rsqrt2dTest<DataType::Float32>)

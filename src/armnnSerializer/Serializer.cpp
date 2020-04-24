@@ -1472,14 +1472,7 @@ flatbuffers::Offset<serializer::ConstTensor>
             break;
         }
         case armnn::DataType::Float16:
-        {
-            auto fbVector = CreateDataVector<int16_t>(constTensor.GetMemoryArea(), constTensor.GetNumBytes());
-            flatbuffers::Offset<serializer::ShortData> flatBuffersData = serializer::CreateShortData(
-                    m_flatBufferBuilder,
-                    fbVector);
-            fbPayload = flatBuffersData.o;
-            break;
-        }
+        case armnn::DataType::BFloat16:
         case armnn::DataType::QSymmS16:
         {
             auto fbVector = CreateDataVector<int16_t>(constTensor.GetMemoryArea(), constTensor.GetNumBytes());
@@ -1490,6 +1483,7 @@ flatbuffers::Offset<serializer::ConstTensor>
             break;
         }
         case armnn::DataType::QSymmS8:
+        case armnn::DataType::QAsymmS8:
         case armnn::DataType::QAsymmU8:
         case armnn::DataType::Boolean:
         default:

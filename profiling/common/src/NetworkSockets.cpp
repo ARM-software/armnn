@@ -52,7 +52,7 @@ long Write(Socket s, const void* buf, size_t len)
 #if defined(__unix__)
     return write(s, buf, len);
 #elif defined(_MSC_VER)
-    return send(s, static_cast<const char*>(buf), len, 0);
+    return send(s, static_cast<const char*>(buf), static_cast<int>(len), 0);
 #endif
 }
 
@@ -62,7 +62,7 @@ long Read(Socket s, void* buf, size_t len)
 #if defined(__unix__)
     return read(s, buf, len);
 #elif defined(_MSC_VER)
-    return recv(s, static_cast<char*>(buf), len, 0);
+    return recv(s, static_cast<char*>(buf), static_cast<int>(len), 0);
 #endif
 }
 

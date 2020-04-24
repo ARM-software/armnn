@@ -378,7 +378,7 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
 
                     // Recalculate the connection index on the previous layer as we have just inserted into it.
                     const std::vector<InputSlot*>& newSourceConnections = srcOutputSlot.GetConnections();
-                    long newSrcConnectionIndex = std::distance(newSourceConnections.begin(),
+                    auto newSrcConnectionIndex = std::distance(newSourceConnections.begin(),
                                                                std::find(newSourceConnections.begin(),
                                                                          newSourceConnections.end(),
                                                                          &compLayer->GetInputSlot(0)));

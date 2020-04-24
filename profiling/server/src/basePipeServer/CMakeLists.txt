@@ -24,6 +24,11 @@ if(BUILD_BASE_PIPE_SERVER)
     set_target_properties(armnnBasePipeServer PROPERTIES VERSION ${GENERIC_LIB_VERSION}
                           SOVERSION ${GENERIC_LIB_SOVERSION})
 
+    target_link_libraries(armnnBasePipeServer armnn)
+    if ("${CMAKE_SYSTEM_NAME}" STREQUAL Windows)
+        target_link_libraries(armnnBasePipeServer Ws2_32.lib)
+    endif()
+
     install(TARGETS armnnBasePipeServer
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

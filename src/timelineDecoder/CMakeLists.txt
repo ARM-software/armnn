@@ -28,6 +28,8 @@ if(BUILD_TIMELINE_DECODER)
     set_target_properties(timelineDecoder PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
     set_target_properties(timelineDecoder PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION} )
 
+    target_link_libraries(timelineDecoder armnn)
+
     install(TARGETS timelineDecoder
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

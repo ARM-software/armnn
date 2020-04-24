@@ -1081,7 +1081,7 @@ if(BUILD_GATORD_MOCK)
                           ${Boost_SYSTEM_LIBRARY})
 
     if(Threads_FOUND AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
-        target_link_libraries(GatordMock pthread)
+        target_link_libraries(GatordMock ${CMAKE_THREAD_LIBS_INIT})
     endif()
 
 endif()

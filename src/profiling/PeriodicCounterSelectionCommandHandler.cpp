@@ -166,7 +166,7 @@ void PeriodicCounterSelectionCommandHandler::operator()(const Packet& packet)
 }
 
 std::set<armnn::BackendId> PeriodicCounterSelectionCommandHandler::ProcessBackendCounterIds(
-                                                                      const u_int32_t capturePeriod,
+                                                                      const uint32_t capturePeriod,
                                                                       const std::set<uint16_t> newCounterIds,
                                                                       const std::set<uint16_t> unusedCounterIds)
 {

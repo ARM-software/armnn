@@ -8,6 +8,8 @@
 #include <stdexcept>
 #include <string>
 
+#include "NetworkSockets.hpp"
+
 namespace armnnProfiling
 {
 
@@ -15,11 +17,11 @@ namespace armnnProfiling
 class SocketConnectionException : public std::exception
 {
 public:
-    explicit SocketConnectionException(const std::string& message, int socket)
+    explicit SocketConnectionException(const std::string& message, armnnUtils::Sockets::Socket socket)
     : m_Message(message), m_Socket(socket), m_ErrNo(-1)
     {};
 
-    explicit SocketConnectionException(const std::string& message, int socket, int errNo)
+    explicit SocketConnectionException(const std::string& message, armnnUtils::Sockets::Socket socket, int errNo)
     : m_Message(message), m_Socket(socket), m_ErrNo(errNo)
     {};
 
@@ -31,7 +33,7 @@ public:
 
     /// @return - Socket File Descriptor of SocketProfilingConnection
     ///           or '-1', an invalid file descriptor
-    int GetSocketFd() const noexcept
+    armnnUtils::Sockets::Socket GetSocketFd() const noexcept
     {
         return m_Socket;
     }
@@ -44,7 +46,7 @@ public:
 
 private:
     std::string m_Message;
-    int m_Socket;
+    armnnUtils::Sockets::Socket m_Socket;
     int m_ErrNo;
 };
 

@@ -91,7 +91,7 @@ private:
         }
     }
     void ParseData(const Packet& packet, CaptureData& captureData);
-    std::set<armnn::BackendId> ProcessBackendCounterIds(const u_int32_t capturePeriod,
+    std::set<armnn::BackendId> ProcessBackendCounterIds(const uint32_t capturePeriod,
                                                         const std::set<uint16_t> newCounterIds,
                                                         const std::set<uint16_t> unusedCounterIds);
 

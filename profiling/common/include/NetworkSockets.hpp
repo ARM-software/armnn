@@ -34,6 +34,8 @@ using PollFd = pollfd;
 
 using Socket = SOCKET;
 using PollFd = WSAPOLLFD;
+using nfds_t = int;
+using socklen_t = int;
 #define SOCK_CLOEXEC 0
 
 #endif

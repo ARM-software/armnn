@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="b70770ee65ccce71a74e73df55fcaeac3cb9d0d7" #COMPMID-3069: Requantize in int32_t in RELUs of NEActivationLayerKernel.
+DEFAULT_CLFRAMEWORKREVISION="2b84be544e4a27f7e8e80827e9c85c8f0d58b4ce" #COMPMID-3280: Make all ML primitives for CL use the new interface - Part 2.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

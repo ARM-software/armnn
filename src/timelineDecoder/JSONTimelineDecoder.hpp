@@ -9,6 +9,8 @@
 
 #include <map>
 #include <vector>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 
 namespace armnn
 {
@@ -63,7 +65,10 @@ public:
 
 private:
     Model m_Model;
-    std::string outputJSONFile = "/tmp/output.json";
+    boost::filesystem::path fileDir = boost::filesystem::temp_directory_path();
+    boost::filesystem::path p{fileDir / boost::filesystem::unique_path("output.json")};
+
+    std::string outputJSONFile = p.string();
 
     void HandleRetentionLink(const Relationship& relationship);
     void HandleLabelLink(const Relationship& relationship);

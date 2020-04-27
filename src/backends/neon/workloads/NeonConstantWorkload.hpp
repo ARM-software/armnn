@@ -9,6 +9,7 @@
 
 namespace armnn
 {
+arm_compute::Status NeonConstantWorkloadValidate(const TensorInfo& output);
 
 class NeonConstantWorkload : public BaseWorkload<ConstantQueueDescriptor>
 {

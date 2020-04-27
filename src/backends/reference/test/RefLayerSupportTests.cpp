@@ -235,4 +235,41 @@ BOOST_AUTO_TEST_CASE(IsLayerNotSupportedMeanDimensionsReference)
         != std::string::npos);
 }
 
+BOOST_AUTO_TEST_CASE(IsConstantSupportedRef)
+{
+    std::string reasonIfUnsupported;
+
+    bool result = IsConstantLayerSupportedTests<armnn::RefWorkloadFactory,
+            armnn::DataType::Float16>(reasonIfUnsupported);
+    BOOST_CHECK(!result);
+
+    result = IsConstantLayerSupportedTests<armnn::RefWorkloadFactory,
+            armnn::DataType::Float32>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::RefWorkloadFactory,
+            armnn::DataType::QAsymmU8>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::RefWorkloadFactory,
+            armnn::DataType::Boolean>(reasonIfUnsupported);
+    BOOST_CHECK(!result);
+
+    result = IsConstantLayerSupportedTests<armnn::RefWorkloadFactory,
+            armnn::DataType::QSymmS16>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::RefWorkloadFactory,
+            armnn::DataType::QSymmS8>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::RefWorkloadFactory,
+            armnn::DataType::QAsymmS8>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::RefWorkloadFactory,
+            armnn::DataType::BFloat16>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

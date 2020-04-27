@@ -5,10 +5,13 @@
 
 #pragma once
 
+#include <arm_compute/core/Error.h>
 #include <backendsCommon/Workload.hpp>
 
 namespace armnn
 {
+arm_compute::Status ClConstantWorkloadValidate(const TensorInfo& output);
+
 class ClConstantWorkload : public BaseWorkload<ConstantQueueDescriptor>
 {
 public:

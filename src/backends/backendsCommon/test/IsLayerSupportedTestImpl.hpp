@@ -882,5 +882,22 @@ bool IsMeanLayerNotSupportedTests(std::string& reasonIfUnsupported)
     return result;
 }
 
+template<typename FactoryType, armnn::DataType OutputDataType>
+bool IsConstantLayerSupportedTests(std::string& reasonIfUnsupported)
+{
+    armnn::Graph graph;
+
+    armnn::Layer* const layer = graph.AddLayer<armnn::ConstantLayer>("ConstantLayerName");
+    armnn::Layer* const output = graph.AddLayer<armnn::OutputLayer>(0, "OutputLayerName");
+
+    armnn::TensorInfo outputTensorInfo({1, 1}, OutputDataType);
+
+    layer->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+    layer->GetOutputHandler(0).SetTensorInfo(outputTensorInfo);
+
+    bool result = FactoryType::IsLayerSupported(*layer, OutputDataType, reasonIfUnsupported);
+
+    return result;
+}
 
 } //namespace

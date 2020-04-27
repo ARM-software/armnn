@@ -131,4 +131,41 @@ BOOST_FIXTURE_TEST_CASE(IsMeanSupportedCl, ClContextControlFixture)
     BOOST_CHECK(result);
 }
 
+BOOST_AUTO_TEST_CASE(IsConstantSupportedCl)
+{
+    std::string reasonIfUnsupported;
+
+    bool result = IsConstantLayerSupportedTests<armnn::ClWorkloadFactory,
+            armnn::DataType::Float16>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::ClWorkloadFactory,
+            armnn::DataType::Float32>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::ClWorkloadFactory,
+            armnn::DataType::QAsymmU8>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::ClWorkloadFactory,
+            armnn::DataType::Boolean>(reasonIfUnsupported);
+    BOOST_CHECK(!result);
+
+    result = IsConstantLayerSupportedTests<armnn::ClWorkloadFactory,
+            armnn::DataType::QSymmS16>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::ClWorkloadFactory,
+            armnn::DataType::QSymmS8>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::ClWorkloadFactory,
+            armnn::DataType::QAsymmS8>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::ClWorkloadFactory,
+            armnn::DataType::BFloat16>(reasonIfUnsupported);
+    BOOST_CHECK(!result);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

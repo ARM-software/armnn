@@ -25,6 +25,7 @@
 #include "workloads/NeonBatchNormalizationWorkload.hpp"
 #include "workloads/NeonBatchToSpaceNdWorkload.hpp"
 #include "workloads/NeonComparisonWorkload.hpp"
+#include "workloads/NeonConstantWorkload.hpp"
 #include "workloads/NeonConvolution2dWorkload.hpp"
 #include "workloads/NeonDepthToSpaceWorkload.hpp"
 #include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
@@ -253,10 +254,9 @@ bool NeonLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> in
 bool NeonLayerSupport::IsConstantSupported(const TensorInfo& output,
                                            Optional<std::string&> reasonIfUnsupported) const
 {
-    return IsSupportedForDataTypeNeon(reasonIfUnsupported,
-                                      output.GetDataType(),
-                                      &TrueFunc<>,
-                                      &TrueFunc<>);
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonConstantWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   output);
 }
 
 bool NeonLayerSupport::IsConvertBf16ToFp32Supported(const TensorInfo& input,

@@ -85,4 +85,41 @@ BOOST_AUTO_TEST_CASE(IsMeanSupportedNeon)
     BOOST_CHECK(result);
 }
 
+BOOST_AUTO_TEST_CASE(IsConstantSupportedNeon)
+{
+    std::string reasonIfUnsupported;
+
+    bool result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
+            armnn::DataType::Float16>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
+            armnn::DataType::Float32>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
+            armnn::DataType::QAsymmU8>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
+            armnn::DataType::Boolean>(reasonIfUnsupported);
+    BOOST_CHECK(!result);
+
+    result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
+            armnn::DataType::QSymmS16>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
+            armnn::DataType::QSymmS8>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
+            armnn::DataType::QAsymmS8>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+
+    result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
+            armnn::DataType::BFloat16>(reasonIfUnsupported);
+    BOOST_CHECK(result);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -23,6 +23,7 @@
 #include "workloads/ClBatchNormalizationFloatWorkload.hpp"
 #include "workloads/ClBatchToSpaceNdWorkload.hpp"
 #include "workloads/ClComparisonWorkload.hpp"
+#include "workloads/ClConstantWorkload.hpp"
 #include "workloads/ClConvertFp16ToFp32Workload.hpp"
 #include "workloads/ClConvertFp32ToFp16Workload.hpp"
 #include "workloads/ClConvolution2dWorkload.hpp"
@@ -284,10 +285,9 @@ bool ClLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inpu
 bool ClLayerSupport::IsConstantSupported(const TensorInfo& output,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
-    return IsSupportedForDataTypeCl(reasonIfUnsupported,
-                                    output.GetDataType(),
-                                    &TrueFunc<>,
-                                    &TrueFunc<>);
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClConstantWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   output);
 }
 
 bool ClLayerSupport::IsConvertFp16ToFp32Supported(const TensorInfo& input,

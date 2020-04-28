@@ -7,6 +7,7 @@
 #include "NeonBackendId.hpp"
 
 #include <armnn/Descriptors.hpp>
+#include <armnn/Exceptions.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
 #include <armnn/BackendRegistry.hpp>
@@ -24,6 +25,7 @@
 #include "workloads/NeonArgMinMaxWorkload.hpp"
 #include "workloads/NeonBatchNormalizationWorkload.hpp"
 #include "workloads/NeonBatchToSpaceNdWorkload.hpp"
+#include "workloads/NeonExpWorkload.hpp"
 #include "workloads/NeonComparisonWorkload.hpp"
 #include "workloads/NeonConstantWorkload.hpp"
 #include "workloads/NeonConvolution2dWorkload.hpp"
@@ -374,29 +376,31 @@ bool NeonLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
                                                    const ElementwiseUnaryDescriptor& descriptor,
                                                    Optional<std::string&> reasonIfUnsupported) const
 {
-    if (descriptor.m_Operation == UnaryOperation::Abs)
+    switch(descriptor.m_Operation)
     {
-        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonAbsWorkloadValidate,
-                                       reasonIfUnsupported,
-                                       input,
-                                       output);
+        case UnaryOperation::Abs:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(NeonAbsWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
+        case UnaryOperation::Exp:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(NeonExpWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
+        case UnaryOperation::Neg:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(NeonNegWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
+        case UnaryOperation::Rsqrt:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(NeonRsqrtWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
+        default:
+            return false;
     }
-    else if (descriptor.m_Operation == UnaryOperation::Rsqrt)
-    {
-        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonRsqrtWorkloadValidate,
-                                       reasonIfUnsupported,
-                                       input,
-                                       output);
-    }
-    else if (descriptor.m_Operation == UnaryOperation::Neg)
-    {
-        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonNegWorkloadValidate,
-                                       reasonIfUnsupported,
-                                       input,
-                                       output);
-    }
-
-    return false;
 }
 
 bool NeonLayerSupport::IsFloorSupported(const TensorInfo& input,

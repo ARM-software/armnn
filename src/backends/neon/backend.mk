@@ -39,6 +39,7 @@ BACKEND_SOURCES := \
         workloads/NeonDepthwiseConvolutionWorkload.cpp \
         workloads/NeonDequantizeWorkload.cpp \
         workloads/NeonDetectionPostProcessWorkload.cpp \
+        workloads/NeonExpWorkload.cpp \
         workloads/NeonFloorFloatWorkload.cpp \
         workloads/NeonFullyConnectedWorkload.cpp \
         workloads/NeonInstanceNormalizationWorkload.cpp \

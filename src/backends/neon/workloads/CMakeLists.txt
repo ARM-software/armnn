@@ -40,6 +40,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonDequantizeWorkload.hpp
     NeonDetectionPostProcessWorkload.cpp
     NeonDetectionPostProcessWorkload.hpp
+    NeonExpWorkload.cpp
+    NeonExpWorkload.hpp
     NeonFloorFloatWorkload.cpp
     NeonFloorFloatWorkload.hpp
     NeonFullyConnectedWorkload.cpp
@@ -110,7 +112,7 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonWorkloadUtils.hpp
 )
 
-add_library(armnnNeonBackendWorkloads OBJECT ${armnnNeonBackendWorkloads_sources})
+add_library(armnnNeonBackendWorkloads OBJECT ${armnnNeonBackendWorkloads_sources} NeonExpWorkload.cpp NeonExpWorkload.hpp)
 target_include_directories(armnnNeonBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnNeonBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
 target_include_directories(armnnNeonBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)

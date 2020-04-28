@@ -102,6 +102,7 @@ private:
     void ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseDequantize(size_t subgraphIndex, size_t operatorIndex);
     void ParseDetectionPostProcess(size_t subgraphIndex, size_t operatorIndex);
+    void ParseExp(size_t subgraphIndex, size_t operatorIndex);
     void ParseFullyConnected(size_t subgraphIndex, size_t operatorIndex);
     void ParseLogistic(size_t subgraphIndex, size_t operatorIndex);
     void ParseL2Normalization(size_t subgraphIndex, size_t operatorIndex);
@@ -124,6 +125,7 @@ private:
     void ParseSoftmax(size_t subgraphIndex, size_t operatorIndex);
     void ParseSpaceToBatchND(size_t subgraphIndex, size_t operatorIndex);
     void ParseSplit(size_t subgraphIndex, size_t operatorIndex);
+    void ParseSplitV(size_t subgraphIndex, size_t operatorIndex);
     void ParseSqueeze(size_t subgraphIndex, size_t operatorIndex);
     void ParseStridedSlice(size_t subgraphIndex, size_t operatorIndex);
     void ParseSub(size_t subgraphIndex, size_t operatorIndex);

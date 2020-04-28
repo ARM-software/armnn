@@ -11,6 +11,7 @@
 #include <armnn/TypesUtils.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 // armnnUtils:
 #include <armnnUtils/Permute.hpp>
@@ -499,6 +500,7 @@ TfLiteParser::TfLiteParser(const Optional<ITfLiteParser::TfLiteParserOptions>& o
     m_ParserFunctions[tflite::BuiltinOperator_CUSTOM]                  = &TfLiteParser::ParseCustomOperator;
     m_ParserFunctions[tflite::BuiltinOperator_DEPTHWISE_CONV_2D]       = &TfLiteParser::ParseDepthwiseConv2D;
     m_ParserFunctions[tflite::BuiltinOperator_DEQUANTIZE]              = &TfLiteParser::ParseDequantize;
+    m_ParserFunctions[tflite::BuiltinOperator_EXP]                     = &TfLiteParser::ParseExp;
     m_ParserFunctions[tflite::BuiltinOperator_FULLY_CONNECTED]         = &TfLiteParser::ParseFullyConnected;
     m_ParserFunctions[tflite::BuiltinOperator_LOGISTIC]                = &TfLiteParser::ParseLogistic;
     m_ParserFunctions[tflite::BuiltinOperator_L2_NORMALIZATION]        = &TfLiteParser::ParseL2Normalization;
@@ -519,6 +521,7 @@ TfLiteParser::TfLiteParser(const Optional<ITfLiteParser::TfLiteParserOptions>& o
     m_ParserFunctions[tflite::BuiltinOperator_SOFTMAX]                 = &TfLiteParser::ParseSoftmax;
     m_ParserFunctions[tflite::BuiltinOperator_SPACE_TO_BATCH_ND]       = &TfLiteParser::ParseSpaceToBatchND;
     m_ParserFunctions[tflite::BuiltinOperator_SPLIT]                   = &TfLiteParser::ParseSplit;
+    m_ParserFunctions[tflite::BuiltinOperator_SPLIT_V]                 = &TfLiteParser::ParseSplitV;
     m_ParserFunctions[tflite::BuiltinOperator_SQUEEZE]                 = &TfLiteParser::ParseSqueeze;
     m_ParserFunctions[tflite::BuiltinOperator_STRIDED_SLICE]           = &TfLiteParser::ParseStridedSlice;
     m_ParserFunctions[tflite::BuiltinOperator_SUB]                     = &TfLiteParser::ParseSub;
@@ -994,6 +997,33 @@ void TfLiteParser::ParseDequantize(size_t subgraphIndex, size_t operatorIndex)
     auto layerName = boost::str(boost::format("Dequantize:%1%:%2%") % subgraphIndex % operatorIndex);
 
     IConnectableLayer* layer = m_Network->AddDequantizeLayer(layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, outputTensorIndexes);
+}
+
+void TfLiteParser::ParseExp(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = boost::str(boost::format("Exp:%1%:%2%") % subgraphIndex % operatorIndex);
+
+    ElementwiseUnaryDescriptor desc;
+    desc.m_Operation = UnaryOperation::Exp;
+    IConnectableLayer* layer = m_Network->AddElementwiseUnaryLayer(desc, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
@@ -2550,6 +2580,159 @@ void TfLiteParser::ParseSplit(size_t subgraphIndex, size_t operatorIndex)
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[1]});
+
+    for (unsigned int k = 0; k < layer->GetNumOutputSlots(); ++k)
+    {
+        armnn::TensorInfo tensorInfo = ToTensorInfo(outputs[k]);
+        layer->GetOutputSlot(k).SetTensorInfo(tensorInfo);
+    }
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, outputTensorIndexes);
+}
+
+unsigned int ComputeWrappedIndex(int idx, unsigned int numDimsIn)
+{
+    int numDims = armnn::numeric_cast<int>(numDimsIn);
+    int v = idx < 0 ? numDims + idx : idx;
+    ARMNN_ASSERT(v >= 0);
+    ARMNN_ASSERT(v < numDims);
+
+    return static_cast<unsigned int>(v);
+}
+
+void TfLiteParser::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 3);
+
+    auto& inputTensor = inputs[0];
+    auto& splitsTensor = inputs[1];
+    auto& axisTensor = inputs[2];
+
+    armnn::TensorInfo inputTensorInfo = ToTensorInfo(inputTensor);
+    armnn::TensorInfo splitsInfo      = ToTensorInfo(splitsTensor);
+    armnn::TensorInfo axisTensorInfo  = ToTensorInfo(axisTensor);
+    ARMNN_ASSERT(axisTensorInfo.GetNumElements() == 1);
+
+    // Inputs
+    auto inputDimSize = inputTensorInfo.GetNumDimensions();
+    if (inputDimSize > MaxNumOfTensorDimensions)
+    {
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "The number of dimensions: %1% for input tensors of the "
+                    "split op cannot be greater than %2% %3%")
+                % inputTensorInfo.GetNumDimensions()
+                % MaxNumOfTensorDimensions
+                % CHECK_LOCATION().AsString()));
+    }
+
+    // Get split axis
+    BufferRawPtr axisBufferPtr = GetBuffer(m_Model, axisTensor->buffer);
+    std::vector<int> axisData(axisTensorInfo.GetNumElements());
+    ::memcpy(axisData.data(), axisBufferPtr->data.data(), axisTensorInfo.GetNumBytes());
+    const unsigned int splitDim = ComputeWrappedIndex(axisData[0], inputTensorInfo.GetNumDimensions());
+
+
+    // Set split sizes
+    const auto * options = operatorPtr->builtin_options.AsSplitOptions();
+    CHECK_VALID_SIZE(splitsInfo.GetNumDimensions(), 1);
+    unsigned int numSplits = 0;
+    std::vector<int> splitsData(0);
+    if (options)
+    {
+        numSplits = CHECKED_NON_NEGATIVE(options->num_splits);
+        splitsData.resize(numSplits);
+
+        if (inputTensorInfo.GetShape()[splitDim] % numSplits != 0)
+        {
+            throw ParseException("Number of splits must evenly divide the split axis");
+        }
+        unsigned int splitSize = inputTensorInfo.GetShape()[splitDim] / numSplits;
+        for (auto& split : splitsData)
+        {
+            split = numeric_cast<int>(splitSize);
+        }
+    }
+    else
+    {
+        numSplits = splitsInfo.GetShape()[0];
+        splitsData.resize(numSplits);
+
+        BufferRawPtr splitsBufferPtr = GetBuffer(m_Model, splitsTensor->buffer);
+        ::memcpy(splitsData.data(), splitsBufferPtr->data.data(), splitsInfo.GetNumBytes());
+
+        int numInferred = 0;
+        int specifiedSizes = 0;
+        unsigned int inferIdx = 0;
+        unsigned int idx = 0;
+        for (auto split : splitsData)
+        {
+            if (split < 0)
+            {
+                numInferred++;
+                inferIdx = idx;
+            }
+            else
+            {
+                specifiedSizes += split;
+            }
+            idx++;
+        }
+
+        if (numInferred > 0)
+        {
+            if (numInferred > 1)
+            {
+                throw ParseException("Cannot infer split size for more than one split");
+            }
+            splitsData[inferIdx] = numeric_cast<int>(inputTensorInfo.GetShape()[splitDim]) - specifiedSizes;
+        }
+    }
+
+    if (numSplits <=0)
+    {
+        throw ParseException("SplitV has invalid number of splits");
+    }
+
+    //Ouput size validation
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), numSplits);
+
+    // Setup Armnn descriptor
+    SplitterDescriptor splitDesc(numSplits, inputDimSize);
+    unsigned int accumSplit = 0;
+    for (unsigned int j = 0; j < numSplits; ++j)
+    {
+        unsigned int splitSize = numeric_cast<unsigned int>(splitsData[j]);
+
+        // Set the size of the views.
+        for (unsigned int dimIdx = 0; dimIdx < inputTensorInfo.GetNumDimensions(); ++dimIdx)
+        {
+            unsigned int dimSize = inputTensorInfo.GetShape()[dimIdx];
+            if (dimIdx == splitDim)
+            {
+                dimSize = splitSize;
+            }
+            splitDesc.SetViewSize(j, dimIdx, dimSize);
+        }
+
+        splitDesc.SetViewOriginCoord(j, splitDim, accumSplit);
+        accumSplit += splitSize;
+    }
+
+    auto layerName = boost::str(boost::format("Split:%1%:%2%") % subgraphIndex % operatorIndex);
+    IConnectableLayer* layer = m_Network->AddSplitterLayer(splitDesc, layerName.c_str());
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
 
     for (unsigned int k = 0; k < layer->GetNumOutputSlots(); ++k)
     {

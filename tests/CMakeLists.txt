@@ -209,6 +209,15 @@ if (BUILD_TF_LITE_PARSER)
         ImagePreprocessor.hpp
         ImagePreprocessor.cpp)
     TfLiteParserTest(TfLiteMnasNet-Armnn "${TfLiteMnasNet-Armnn_sources}")
+
+
+    set(TfLiteYoloV3Big-Armnn_sources
+        TfLiteYoloV3Big-Armnn/NMS.cpp
+        TfLiteYoloV3Big-Armnn/NMS.hpp
+        TfLiteYoloV3Big-Armnn/TfLiteYoloV3Big-Armnn.cpp
+        ImagePreprocessor.hpp
+        ImagePreprocessor.cpp)
+    TfLiteParserTest(TfLiteYoloV3Big-Armnn "${TfLiteYoloV3Big-Armnn_sources}")
 endif()
 
 if (BUILD_ONNX_PARSER)

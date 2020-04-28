@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="2b84be544e4a27f7e8e80827e9c85c8f0d58b4ce" #COMPMID-3280: Make all ML primitives for CL use the new interface - Part 2.
+DEFAULT_CLFRAMEWORKREVISION="55c0c0c9559c08baed7f1c783404b83dff8c8e89" #COMPMID-3291: Test improvement for CLWeightsReshapeKernel.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

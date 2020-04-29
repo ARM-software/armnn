@@ -1255,6 +1255,9 @@ ARMNN_AUTO_TEST_CASE(LstmLayerInt16NoCifgWithPeepholeWithProjection,
 ARMNN_AUTO_TEST_CASE(LstmLayerInt16NoCifgNoPeepholeNoProjectionInt16Constant,
                      LstmLayerInt16NoCifgNoPeepholeNoProjectionInt16ConstantTest)
 
+// QLstm
+ARMNN_AUTO_TEST_CASE(QLstm, QLstmTest)
+
 // Convert from BFloat16 to Float32
 ARMNN_AUTO_TEST_CASE(ConvertBf16ToFp32, ConvertBf16ToFp32Test)
 

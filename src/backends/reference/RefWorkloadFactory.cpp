@@ -512,6 +512,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePrelu(const PreluQueueDescr
     return std::make_unique<RefPreluWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateQLstm(const QLstmQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
+{
+    return std::make_unique<RefQLstmWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateQuantize(const QuantizeQueueDescriptor& descriptor,
                                                               const WorkloadInfo& info) const
 {

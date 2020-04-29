@@ -1573,6 +1573,30 @@ bool RefLayerSupport::IsPooling2dSupported(const TensorInfo& input,
     return supported;
 }
 
+bool RefLayerSupport::IsQLstmSupported(const TensorInfo& input,
+                                       const TensorInfo& previousOutputIn,
+                                       const TensorInfo& previousCellStateIn,
+                                       const TensorInfo& outputStateOut,
+                                       const TensorInfo& cellStateOut,
+                                       const TensorInfo& output,
+                                       const QLstmDescriptor& descriptor,
+                                       const LstmInputParamsInfo& paramsInfo,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input);
+    IgnoreUnused(previousOutputIn);
+    IgnoreUnused(previousCellStateIn);
+    IgnoreUnused(outputStateOut);
+    IgnoreUnused(cellStateOut);
+    IgnoreUnused(output);
+    IgnoreUnused(descriptor);
+    IgnoreUnused(paramsInfo);
+
+    IgnoreUnused(reasonIfUnsupported);
+
+    return true;
+}
+
 bool RefLayerSupport::IsQuantizeSupported(const TensorInfo& input,
                                           const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported) const

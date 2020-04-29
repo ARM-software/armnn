@@ -75,6 +75,7 @@ BACKEND_SOURCES := \
         workloads/RefPermuteWorkload.cpp \
         workloads/RefPooling2dWorkload.cpp \
         workloads/RefPreluWorkload.cpp \
+        workloads/RefQLstmWorkload.cpp \
         workloads/RefQuantizeWorkload.cpp \
         workloads/RefReshapeWorkload.cpp \
         workloads/RefResizeBilinearWorkload.cpp \

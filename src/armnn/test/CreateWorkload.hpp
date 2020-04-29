@@ -516,6 +516,167 @@ std::unique_ptr<QuantizedLstmWorkload> CreateQuantizedLstmWorkloadTest(armnn::IW
     return workload;
 }
 
+template <typename QLstmWorkload>
+std::unique_ptr<QLstmWorkload> CreateQLstmWorkloadTest(armnn::IWorkloadFactory& factory,
+                                                       armnn::Graph& graph)
+{
+    QLstmDescriptor layerDesc;
+    layerDesc.m_CifgEnabled       = true;
+    layerDesc.m_PeepholeEnabled   = false;
+    layerDesc.m_ProjectionEnabled = false;
+    layerDesc.m_LayerNormEnabled  = true;
+
+    layerDesc.m_CellClip       = 0.0f;
+    layerDesc.m_ProjectionClip = 0.0f;
+
+    layerDesc.m_HiddenStateZeroPoint = 0;
+    layerDesc.m_HiddenStateScale     = 0.007f;
+
+    layerDesc.m_InputIntermediateScale  = 0.007059f;
+    layerDesc.m_ForgetIntermediateScale = 0.007812f;
+    layerDesc.m_CellIntermediateScale   = 0.007059f;
+    layerDesc.m_OutputIntermediateScale = 0.007812f;
+
+    QLstmLayer* const layer = graph.AddLayer<QLstmLayer>(layerDesc, "qLstm");
+
+    unsigned int numBatches = 2;
+    unsigned int inputSize  = 4;
+    unsigned int numUnits   = 4;
+    unsigned int outputSize = 4;
+
+    // Scale/Offset quantization info
+    float inputScale    = 0.0078125f;
+    int32_t inputOffset = 0;
+
+    // if (!projectionEnabled) outputScale == hiddenStateScale
+    float outputScale    = layerDesc.m_HiddenStateScale;
+    int32_t outputOffset = layerDesc.m_HiddenStateZeroPoint;
+
+    float cellStateScale    = 3.05176e-05f;
+    int32_t cellStateOffset = 0;
+
+    float weightsScale    = 0.00784314f;
+    int32_t weightsOffset = 0;
+
+    float layerNormScale    = 3.05182e-05f;
+    int32_t layerNormOffset = 0;
+
+    float biasScale    = layerNormScale / 1024;
+    int32_t biasOffset = 0;
+
+    // Weights and bias tensor and quantization info
+    armnn::TensorInfo inputWeightsInfo({outputSize, inputSize},
+                                       armnn::DataType::QSymmS8,
+                                       weightsScale,
+                                       weightsOffset);
+
+    armnn::TensorInfo recurrentWeightsInfo({outputSize, outputSize},
+                                           armnn::DataType::QSymmS8,
+                                           weightsScale,
+                                           weightsOffset);
+
+    armnn::TensorInfo biasInfo({outputSize}, armnn::DataType::Signed32, biasScale, biasOffset);
+
+    armnn::TensorInfo layerNormWeightsInfo({numUnits}, armnn::DataType::QSymmS16, layerNormScale, layerNormOffset);
+
+    // Create and allocate tensors
+    layer->m_BasicParameters.m_InputToForgetWeights = std::make_unique<ScopedCpuTensorHandle>(inputWeightsInfo);
+    layer->m_BasicParameters.m_InputToCellWeights = std::make_unique<ScopedCpuTensorHandle>(inputWeightsInfo);
+    layer->m_BasicParameters.m_InputToOutputWeights = std::make_unique<ScopedCpuTensorHandle>(inputWeightsInfo);
+
+    layer->m_BasicParameters.m_RecurrentToForgetWeights =
+            std::make_unique<ScopedCpuTensorHandle>(recurrentWeightsInfo);
+    layer->m_BasicParameters.m_RecurrentToCellWeights =
+            std::make_unique<ScopedCpuTensorHandle>(recurrentWeightsInfo);
+    layer->m_BasicParameters.m_RecurrentToOutputWeights =
+            std::make_unique<ScopedCpuTensorHandle>(recurrentWeightsInfo);
+
+    layer->m_BasicParameters.m_ForgetGateBias = std::make_unique<ScopedCpuTensorHandle>(biasInfo);
+    layer->m_BasicParameters.m_CellBias = std::make_unique<ScopedCpuTensorHandle>(biasInfo);
+    layer->m_BasicParameters.m_OutputGateBias = std::make_unique<ScopedCpuTensorHandle>(biasInfo);
+
+    layer->m_LayerNormParameters.m_ForgetLayerNormWeights =
+            std::make_unique<ScopedCpuTensorHandle>(layerNormWeightsInfo);
+    layer->m_LayerNormParameters.m_CellLayerNormWeights =
+            std::make_unique<ScopedCpuTensorHandle>(layerNormWeightsInfo);
+    layer->m_LayerNormParameters.m_OutputLayerNormWeights =
+            std::make_unique<ScopedCpuTensorHandle>(layerNormWeightsInfo);
+
+    layer->m_BasicParameters.m_InputToForgetWeights->Allocate();
+    layer->m_BasicParameters.m_InputToCellWeights->Allocate();
+    layer->m_BasicParameters.m_InputToOutputWeights->Allocate();
+
+    layer->m_BasicParameters.m_RecurrentToForgetWeights->Allocate();
+    layer->m_BasicParameters.m_RecurrentToCellWeights->Allocate();
+    layer->m_BasicParameters.m_RecurrentToOutputWeights->Allocate();
+
+    layer->m_BasicParameters.m_ForgetGateBias->Allocate();
+    layer->m_BasicParameters.m_CellBias->Allocate();
+    layer->m_BasicParameters.m_OutputGateBias->Allocate();
+
+    layer->m_LayerNormParameters.m_ForgetLayerNormWeights->Allocate();
+    layer->m_LayerNormParameters.m_CellLayerNormWeights->Allocate();
+    layer->m_LayerNormParameters.m_OutputLayerNormWeights->Allocate();
+
+    // Input and output layers
+    Layer* const input = graph.AddLayer<InputLayer>(0, "input");
+    Layer* const outputStateIn = graph.AddLayer<InputLayer>(1, "outputStateIn");
+    Layer* const cellStateIn = graph.AddLayer<InputLayer>(2, "cellStateIn");
+
+    Layer* const outputStateOut = graph.AddLayer<OutputLayer>(0, "outputStateOut");
+    Layer* const cellStateOut = graph.AddLayer<OutputLayer>(1, "cellStateOut");
+    Layer* const output = graph.AddLayer<OutputLayer>(2, "output");
+
+    // Input/Output tensor info
+    armnn::TensorInfo inputInfo({numBatches , inputSize},
+                                armnn::DataType::QAsymmS8,
+                                inputScale,
+                                inputOffset);
+
+    armnn::TensorInfo cellStateInfo({numBatches , numUnits},
+                                    armnn::DataType::QSymmS16,
+                                    cellStateScale,
+                                    cellStateOffset);
+
+    armnn::TensorInfo outputStateInfo({numBatches , outputSize},
+                                      armnn::DataType::QAsymmS8,
+                                      outputScale,
+                                      outputOffset);
+
+    // Connect layers to slots
+    Connect(input, layer, inputInfo, 0, 0);
+    Connect(outputStateIn, layer, outputStateInfo, 0, 1);
+    Connect(cellStateIn, layer, cellStateInfo, 0, 2);
+
+    Connect(layer, outputStateOut, outputStateInfo, 0, 0);
+    Connect(layer, cellStateOut, cellStateInfo, 1, 0);
+    Connect(layer, output, outputStateInfo, 2, 0);
+
+    CreateTensorHandles(graph, factory);
+
+    // Create and check workload
+    auto workload = MakeAndCheckWorkload<QLstmWorkload>(*layer, factory);
+    QLstmQueueDescriptor queueDescriptor = workload->GetData();
+    BOOST_TEST(queueDescriptor.m_Parameters.m_CellClip == 0.0f);
+    BOOST_TEST(queueDescriptor.m_Parameters.m_ProjectionClip == 0.0f);
+    BOOST_TEST(queueDescriptor.m_Inputs.size() == 3);
+    BOOST_TEST(queueDescriptor.m_Outputs.size() == 3);
+
+    BOOST_TEST((queueDescriptor.m_InputToForgetWeights->GetTensorInfo() == inputWeightsInfo));
+    BOOST_TEST((queueDescriptor.m_InputToCellWeights->GetTensorInfo() == inputWeightsInfo));
+    BOOST_TEST((queueDescriptor.m_InputToOutputWeights->GetTensorInfo() == inputWeightsInfo));
+
+    BOOST_TEST((queueDescriptor.m_RecurrentToForgetWeights->GetTensorInfo() == recurrentWeightsInfo));
+    BOOST_TEST((queueDescriptor.m_RecurrentToCellWeights->GetTensorInfo() == recurrentWeightsInfo));
+    BOOST_TEST((queueDescriptor.m_RecurrentToOutputWeights->GetTensorInfo() == recurrentWeightsInfo));
+
+    BOOST_TEST((queueDescriptor.m_ForgetGateBias->GetTensorInfo() == biasInfo));
+    BOOST_TEST((queueDescriptor.m_CellBias->GetTensorInfo() == biasInfo));
+    BOOST_TEST((queueDescriptor.m_OutputGateBias->GetTensorInfo() == biasInfo));
+
+    return workload;
+}
+
 template <typename Convolution2dWorkload, armnn::DataType DataType>
 std::unique_ptr<Convolution2dWorkload> CreateDirectConvolution2dWorkloadTest(armnn::IWorkloadFactory& factory,
                                                                        armnn::Graph&            graph)

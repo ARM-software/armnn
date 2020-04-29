@@ -48,6 +48,7 @@
 #include "RefPermuteWorkload.hpp"
 #include "RefPadWorkload.hpp"
 #include "RefPreluWorkload.hpp"
+#include "RefQLstmWorkload.hpp"
 #include "RefQuantizeWorkload.hpp"
 #include "RefReshapeWorkload.hpp"
 #include "RefResizeBilinearWorkload.hpp"

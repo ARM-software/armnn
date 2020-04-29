@@ -58,3 +58,11 @@ LayerTestResult<int16_t, 2> LstmLayerInt16NoCifgNoPeepholeNoProjectionInt16Const
 LayerTestResult<uint8_t, 2> QuantizedLstmTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+//
+// QLstm
+//
+
+LayerTestResult<int8_t, 2> QLstmTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

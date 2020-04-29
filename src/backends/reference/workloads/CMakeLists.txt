@@ -123,6 +123,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefPreluWorkload.hpp
     RefQuantizeWorkload.cpp
     RefQuantizeWorkload.hpp
+    RefQLstmWorkload.cpp
+    RefQLstmWorkload.hpp
     RefReshapeWorkload.cpp
     RefReshapeWorkload.hpp
     RefResizeBilinearWorkload.cpp

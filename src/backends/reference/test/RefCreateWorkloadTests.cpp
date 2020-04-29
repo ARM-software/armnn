@@ -1089,4 +1089,33 @@ BOOST_AUTO_TEST_CASE(CreateStackUint16Workload)
     RefCreateStackWorkloadTest<armnn::DataType::QSymmS16>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);
 }
 
+template <typename QLstmWorkloadType>
+static void RefCreateQLstmWorkloadTest()
+{
+    Graph graph;
+    RefWorkloadFactory factory;
+
+    auto workload = CreateQLstmWorkloadTest<QLstmWorkloadType>(factory, graph);
+
+    armnn::TensorInfo inputInfo({2 , 4}, armnn::DataType::QAsymmS8, 0.0078125f, 0);
+
+    armnn::TensorInfo cellStateInfo({2 , 4}, armnn::DataType::QSymmS16, 3.05176e-05f, 0);
+
+    armnn::TensorInfo outputInfo({2 , 4}, armnn::DataType::QAsymmS8, 0.007f, 0);
+
+    QLstmQueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto cellStateOutHandle = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Outputs[1]);
+    auto outputHandle = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Outputs[2]);
+
+    BOOST_TEST((inputHandle->GetTensorInfo() == inputInfo));
+    BOOST_TEST((cellStateOutHandle->GetTensorInfo() == cellStateInfo));
+    BOOST_TEST((outputHandle->GetTensorInfo() == outputInfo));
+}
+
+BOOST_AUTO_TEST_CASE(CreateQLstmWorkloadTest)
+{
+    RefCreateQLstmWorkloadTest<RefQLstmWorkload>();
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -5,6 +5,8 @@
 
 #include "BasePipeServer.hpp"
 
+#include "common/include/Constants.hpp"
+
 #include <iostream>
 #include <boost/cast.hpp>
 #include <vector>
@@ -65,11 +67,11 @@ bool BasePipeServer::WaitForStreamMetaData()
     EchoPacket(PacketDirection::ReceivedData, pipeMagic, 4);
 
     // Before we interpret the length we need to read the pipe_magic word to determine endianness.
-    if (ToUint32(&pipeMagic[0], TargetEndianness::BeWire) == PIPE_MAGIC)
+    if (ToUint32(&pipeMagic[0], TargetEndianness::BeWire) == armnnProfiling::PIPE_MAGIC)
     {
         m_Endianness = TargetEndianness::BeWire;
     }
-    else if (ToUint32(&pipeMagic[0], TargetEndianness::LeWire) == PIPE_MAGIC)
+    else if (ToUint32(&pipeMagic[0], TargetEndianness::LeWire) == armnnProfiling::PIPE_MAGIC)
     {
         m_Endianness = TargetEndianness::LeWire;
     }

@@ -7,6 +7,7 @@
 #include "PacketVersionResolver.hpp"
 
 #include <armnn/Exceptions.hpp>
+#include <common/include/Constants.hpp>
 
 #include <algorithm>
 #include <boost/numeric/conversion/cast.hpp>
@@ -59,11 +60,11 @@ bool FileOnlyProfilingConnection::WaitForStreamMeta(const unsigned char* buffer,
     }
 
     // Before we interpret the length we need to read the pipe_magic word to determine endianness.
-    if (ToUint32(buffer + 8, TargetEndianness::BeWire) == PIPE_MAGIC)
+    if (ToUint32(buffer + 8, TargetEndianness::BeWire) == armnnProfiling::PIPE_MAGIC)
     {
         m_Endianness = TargetEndianness::BeWire;
     }
-    else if (ToUint32(buffer + 8, TargetEndianness::LeWire) == PIPE_MAGIC)
+    else if (ToUint32(buffer + 8, TargetEndianness::LeWire) == armnnProfiling::PIPE_MAGIC)
     {
         m_Endianness = TargetEndianness::LeWire;
     }

@@ -10,6 +10,7 @@
 #include <armnn/Conversion.hpp>
 #include <Processes.hpp>
 #include <armnn/utility/Assert.hpp>
+#include <common/include/Constants.hpp>
 
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -23,8 +24,6 @@ namespace profiling
 {
 
 using boost::numeric_cast;
-
-const unsigned int SendCounterPacket::PIPE_MAGIC;
 
 void SendCounterPacket::SendStreamMetaDataPacket()
 {
@@ -81,7 +80,7 @@ void SendCounterPacket::SendStreamMetaDataPacket()
         // Packet body
 
         offset += sizeUint32;
-        WriteUint32(writeBuffer, offset, PIPE_MAGIC); // pipe_magic
+        WriteUint32(writeBuffer, offset, armnnProfiling::PIPE_MAGIC); // pipe_magic
         offset += sizeUint32;
         WriteUint32(writeBuffer, offset, EncodeVersion(1, 0, 0)); // stream_metadata_version
         offset += sizeUint32;

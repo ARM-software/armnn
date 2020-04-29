@@ -18,6 +18,9 @@
 #include <armnn/Conversion.hpp>
 #include <armnn/Utils.hpp>
 
+#include <common/include/Constants.hpp>
+
+
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -324,7 +327,7 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     BOOST_TEST(headerWord1 == totalLength - (2 * sizeUint32)); // data length
 
     uint32_t offset = sizeUint32 * 2;
-    BOOST_TEST(ReadUint32(readBuffer2, offset) == SendCounterPacket::PIPE_MAGIC); // pipe_magic
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == armnnProfiling::PIPE_MAGIC); // pipe_magic
     offset += sizeUint32;
     BOOST_TEST(ReadUint32(readBuffer2, offset) == EncodeVersion(1, 0, 0)); // stream_metadata_version
     offset += sizeUint32;

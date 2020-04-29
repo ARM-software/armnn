@@ -252,7 +252,7 @@ list(APPEND armnn_sources
     include/armnn/utility/StringUtils.hpp
     profiling/common/include/ProfilingException.hpp
     profiling/common/include/SocketConnectionException.hpp
-    profiling/common/include/NetworkSockets.hpp
+    profiling/common/include/Constants.hpp
     profiling/common/src/NetworkSockets.cpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp

@@ -40,8 +40,6 @@ public:
     void SendPeriodicCounterSelectionPacket(uint32_t capturePeriod,
                                             const std::vector<uint16_t>& selectedCounterIds) override;
 
-    static const unsigned int PIPE_MAGIC = 0x45495434;
-
 private:
     template <typename ExceptionType>
     void CancelOperationAndThrow(const std::string& errorMessage)

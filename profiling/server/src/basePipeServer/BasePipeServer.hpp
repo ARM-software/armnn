@@ -107,7 +107,6 @@ private:
     armnnUtils::Sockets::Socket m_ClientConnection;
     bool m_EchoPackets;
     TargetEndianness m_Endianness;
-    static const uint32_t PIPE_MAGIC = 0x45495434;
 
     uint32_t m_StreamMetaDataVersion;
     uint32_t m_StreamMetaDataMaxDataLen;

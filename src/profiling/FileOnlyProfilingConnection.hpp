@@ -94,8 +94,6 @@ private:
     void ForwardPacketToHandlers(Packet& packet);
     void ServiceLocalHandlers();
 
-    static const uint32_t PIPE_MAGIC = 0x45495434;
-
     Runtime::CreationOptions::ExternalProfilingOptions m_Options;
     bool m_QuietOp;
     std::vector<uint16_t> m_IdList;

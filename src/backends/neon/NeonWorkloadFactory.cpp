@@ -274,8 +274,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFloor(const FloorQueueDesc
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateFullyConnected(
     const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkloadHelper<NeonFullyConnectedWorkload, NeonFullyConnectedWorkload>(
-        descriptor, info, m_MemoryManager->GetIntraLayerManager());
+    return std::make_unique<NeonFullyConnectedWorkload>(descriptor, info, m_MemoryManager->GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateGather(const armnn::GatherQueueDescriptor& descriptor,

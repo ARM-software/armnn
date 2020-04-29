@@ -968,6 +968,9 @@ bool RefLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
         supported &= CheckSupportRule(BiasAndWeightsTypesCompatible(weights, supportedBiasTypes), reasonIfUnsupported,
                                       "Reference Fully Connected: bias type inferred from weights is incompatible.");
 
+        supported &= CheckSupportRule(TensorNumDimensionsAreCorrect(biases, 1U), reasonIfUnsupported,
+                                      "Reference Fully Connected: bias must have 1 dimension.");
+
     }
 
     return supported;

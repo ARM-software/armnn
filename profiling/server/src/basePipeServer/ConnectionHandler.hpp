@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "../../../../src/armnnUtils/NetworkSockets.hpp"
 #include "BasePipeServer.hpp"
 #include <string>
 

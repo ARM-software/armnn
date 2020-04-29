@@ -3,11 +3,12 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "BasePipeServer.hpp"
+
 #include <iostream>
 #include <boost/cast.hpp>
 #include <vector>
 #include <iomanip>
-#include "BasePipeServer.hpp"
 
 using namespace armnnUtils;
 

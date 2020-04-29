@@ -8,7 +8,7 @@
 #include <CommandHandlerRegistry.hpp>
 #include <PacketVersionResolver.hpp>
 #include <ProfilingUtils.hpp>
-#include <NetworkSockets.hpp>
+#include <common/include/NetworkSockets.hpp>
 
 #include <armnn/utility/Assert.hpp>
 

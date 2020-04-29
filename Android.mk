@@ -86,6 +86,7 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_SRC_FILES := \
         $(ARMNN_BACKEND_SOURCES) \
+        profiling/common/src/NetworkSockets.cpp \
         src/armnn/BackendHelper.cpp \
         src/armnn/BackendRegistry.cpp \
         src/armnn/Descriptors.cpp \
@@ -122,7 +123,6 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/Permute.cpp \
         src/armnnUtils/TensorUtils.cpp \
         src/armnnUtils/VerificationHelpers.cpp \
-        src/armnnUtils/NetworkSockets.cpp \
         src/armnnUtils/Filesystem.cpp \
         src/armnnUtils/Processes.cpp \
         src/armnnUtils/Transpose.cpp \

@@ -5,12 +5,12 @@
 
 #pragma once
 
-//#include <NetworkSockets>
-#include <string>
-#include <atomic>
-#include "../../../../src/armnnUtils/NetworkSockets.hpp"
+#include "common/include/NetworkSockets.hpp"
 #include "../../../../src/profiling/Packet.hpp"
 #include "common/include/SocketConnectionException.hpp"
+
+#include <string>
+#include <atomic>
 
 namespace armnnProfiling
 {

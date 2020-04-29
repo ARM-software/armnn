@@ -72,8 +72,6 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/TensorIOUtils.hpp
     src/armnnUtils/TensorUtils.cpp
     src/armnnUtils/Transpose.cpp
-    src/armnnUtils/NetworkSockets.hpp
-    src/armnnUtils/NetworkSockets.cpp
     )
 
 add_library_ex(armnnUtils STATIC ${armnnUtils_sources})
@@ -254,6 +252,8 @@ list(APPEND armnn_sources
     include/armnn/utility/StringUtils.hpp
     profiling/common/include/ProfilingException.hpp
     profiling/common/include/SocketConnectionException.hpp
+    profiling/common/include/NetworkSockets.hpp
+    profiling/common/src/NetworkSockets.cpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp
     src/armnn/layers/ActivationLayer.hpp

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "NetworkSockets.hpp"
+#include "common/include/NetworkSockets.hpp"
 
 #if defined(__unix__)
 #include <unistd.h>

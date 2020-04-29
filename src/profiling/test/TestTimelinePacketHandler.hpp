@@ -66,7 +66,7 @@ public:
 
     const TimelineModel& GetTimelineModel() const {return m_TimelineModel;}
 
-    virtual void SetConnection(IProfilingConnection* profilingConnection) override // ILocalPacketHandler
+    virtual void SetConnection(IInternalProfilingConnection* profilingConnection) override // ILocalPacketHandler
     {
         m_Connection = profilingConnection;
     }
@@ -74,7 +74,7 @@ public:
 private:
     void ProcessDirectoryPacket(const Packet& packet);
     void ProcessMessagePacket(const Packet& packet);
-    IProfilingConnection* m_Connection;
+    IInternalProfilingConnection* m_Connection;
     std::mutex m_InferenceCompletedMutex;
     std::condition_variable m_InferenceCompletedConditionVariable;
     bool m_InferenceCompleted;

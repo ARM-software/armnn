@@ -17,9 +17,32 @@ namespace armnn
 
 namespace profiling
 {
+
+enum class TargetEndianness
+{
+    BeWire,
+    LeWire
+};
+
 // forward declare to prevent a circular dependency
 class Packet;
-class IProfilingConnection;
+
+// the handlers need to be able to do two
+// things to service the FileOnlyProfilingConnection
+// and any other implementation of IProfilingConnection
+// set the endianness and write a packet back i.e.
+// return a packet and close the connection
+class IInternalProfilingConnection
+{
+public:
+    virtual ~IInternalProfilingConnection() {};
+
+    virtual void SetEndianess(const TargetEndianness& endianness) = 0;
+
+    virtual void ReturnPacket(Packet& packet) = 0;
+
+    virtual void Close() = 0;
+};
 
 class ILocalPacketHandler
 {
@@ -37,7 +60,8 @@ public:
 
     /// Set a profiling connection on the handler. Only need to implement this
     /// function if the handler will be writing data back to the profiled application.
-    virtual void SetConnection(IProfilingConnection* profilingConnection) {armnn::IgnoreUnused(profilingConnection);}
+    virtual void SetConnection(IInternalProfilingConnection* profilingConnection)
+    {armnn::IgnoreUnused(profilingConnection);}
 };
 
 using ILocalPacketHandlerPtr = std::unique_ptr<ILocalPacketHandler>;

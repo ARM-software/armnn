@@ -49,8 +49,11 @@ std::string UniqueFileName()
 
 BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
 {
-    // This test requires the CpuRef backend to be enabled
-    if(!BackendRegistryInstance().IsBackendRegistered("CpuRef"))
+    // This test requires at least one backend registry to be enabled
+    // which can execute a NormalizationLayer
+    if (BackendRegistryInstance().IsBackendRegistered(GetComputeDeviceAsCString(armnn::Compute::CpuRef)) ||
+        BackendRegistryInstance().IsBackendRegistered(GetComputeDeviceAsCString(armnn::Compute::CpuAcc)) ||
+        BackendRegistryInstance().IsBackendRegistered(GetComputeDeviceAsCString(armnn::Compute::GpuAcc)))
     {
         return;
     }
@@ -87,12 +90,29 @@ BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
     normalize->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
 
     // optimize the network
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends =
+            { armnn::Compute::CpuRef, armnn::Compute::CpuAcc, armnn::Compute::GpuAcc };
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime.GetDeviceSpec());
 
     // Load it into the runtime. It should succeed.
     armnn::NetworkId netId;
     BOOST_TEST(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
+
+    // Creates structures for input & output.
+    std::vector<float> inputData(16);
+    std::vector<float> outputData(16);
+
+    InputTensors  inputTensors
+    {
+        {0, ConstTensor(runtime.GetInputTensorInfo(netId, 0), inputData.data())}
+    };
+    OutputTensors outputTensors
+    {
+        {0, Tensor(runtime.GetOutputTensorInfo(netId, 0), outputData.data())}
+    };
+
+    // Does the inference.
+    runtime.EnqueueWorkload(netId, inputTensors, outputTensors);
 
     static_cast<TestTimelinePacketHandler*>(localPacketHandlerPtr.get())->WaitOnInferenceCompletion(3000);
 }

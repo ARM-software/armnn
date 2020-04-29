@@ -20,6 +20,8 @@ class Packet
 public:
     Packet()
         : m_Header(0)
+        , m_PacketFamily(0)
+        , m_PacketId(0)
         , m_Length(0)
         , m_Data(nullptr)
     {}

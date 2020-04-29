@@ -25,43 +25,54 @@ namespace armnn
 namespace profiling
 {
 
-enum class TargetEndianness
-{
-    BeWire,
-    LeWire
-};
+// forward declaration
+class FileOnlyProfilingConnection;
 
-enum class PackageActivity
-{
-    StreamMetaData,
-    CounterDirectory,
-    Unknown
-};
-
-class FileOnlyProfilingConnection : public IProfilingConnection
+class StreamMetaDataProcessor : public ILocalPacketHandler
 {
 public:
-    FileOnlyProfilingConnection(const Runtime::CreationOptions::ExternalProfilingOptions& options,
-                                const bool quietOp = true)
+    explicit StreamMetaDataProcessor(FileOnlyProfilingConnection* fileOnlyProfilingConnection) :
+            m_FileOnlyProfilingConnection(fileOnlyProfilingConnection),
+            m_MetaDataPacketHeader(ConstructHeader(0, 0)) {};
+
+    std::vector<uint32_t> GetHeadersAccepted() override;
+
+    void HandlePacket(const Packet& packet) override;
+
+private:
+    FileOnlyProfilingConnection* m_FileOnlyProfilingConnection;
+    uint32_t m_MetaDataPacketHeader;
+
+    static uint32_t ToUint32(const unsigned char* data, TargetEndianness endianness);
+};
+
+class FileOnlyProfilingConnection : public IProfilingConnection, public IInternalProfilingConnection
+{
+public:
+    explicit FileOnlyProfilingConnection(const Runtime::CreationOptions::ExternalProfilingOptions& options)
         : m_Options(options)
-        , m_QuietOp(quietOp)
-        , m_Endianness(TargetEndianness::LeWire)    // Set a sensible default. WaitForStreamMeta will set a real value.
+        , m_Endianness(TargetEndianness::LeWire)    // Set a sensible default.
+                                                    // StreamMetaDataProcessor will set a real value.
         , m_IsRunning(false)
         , m_KeepRunning(false)
         , m_Timeout(1000)
     {
-        for (ILocalPacketHandlerSharedPtr localPacketHandler : options.m_LocalPacketHandlers)
+        // add the StreamMetaDataProcessor
+        auto streamMetaDataProcessor = std::make_shared<StreamMetaDataProcessor>(this);
+        AddLocalPacketHandler(streamMetaDataProcessor);
+        // and any additional ones added by the users
+        for (const ILocalPacketHandlerSharedPtr& localPacketHandler : options.m_LocalPacketHandlers)
         {
             AddLocalPacketHandler(localPacketHandler);
         }
-        if (!options.m_LocalPacketHandlers.empty())
+        if (!m_PacketHandlers.empty())
         {
             StartProcessingThread();
         }
         // NOTE: could add timeout to the external profiling options
     };
 
-    ~FileOnlyProfilingConnection();
+    ~FileOnlyProfilingConnection() override;
 
     bool IsOpen() const override;
 
@@ -73,21 +84,18 @@ public:
     // Sending a packet back to ArmNN.
     Packet ReadPacket(uint32_t timeout) override;
 
+    void SetEndianess(const TargetEndianness& endianness) override //IInternalProfilingConnection
+    {
+        m_Endianness = endianness;
+    }
+
+    void ReturnPacket(Packet& packet) override; //IInternalProfilingConnection
+
 private:
     void AddLocalPacketHandler(ILocalPacketHandlerSharedPtr localPacketHandler);
     void StartProcessingThread();
     void ClearReadableList();
     void DispatchPacketToHandlers(const Packet& packet);
-
-    bool WaitForStreamMeta(const unsigned char* buffer, uint32_t length);
-
-    uint32_t ToUint32(const unsigned char* data, TargetEndianness endianness);
-
-    void SendConnectionAck();
-
-    bool SendCounterSelectionPacket();
-
-    PackageActivity GetPackageActivity(const Packet& packet, uint32_t headerAsWords[2]);
 
     void Fail(const std::string& errorMessage);
 
@@ -95,8 +103,6 @@ private:
     void ServiceLocalHandlers();
 
     Runtime::CreationOptions::ExternalProfilingOptions m_Options;
-    bool m_QuietOp;
-    std::vector<uint16_t> m_IdList;
     std::queue<Packet> m_PacketQueue;
     TargetEndianness m_Endianness;
 

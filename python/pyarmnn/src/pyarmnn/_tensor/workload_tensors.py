@@ -5,6 +5,7 @@ This file contains functions relating to WorkloadTensors.
 WorkloadTensors are the inputTensors and outputTensors that are consumed by IRuntime.EnqueueWorkload.
 """
 from typing import Union, List, Tuple
+import logging
 
 import numpy as np
 
@@ -121,6 +122,6 @@ def workload_tensors_to_ndarray(workload_tensors: List[Tuple[int, Union[Tensor, 
     arrays = []
     for index, (_, tensor) in enumerate(workload_tensors):
         arrays.append(tensor.get_memory_area().reshape(list(tensor.GetShape())))
-        print("Workload tensor {} shape: {}".format(index, tensor.GetShape()))
+        logging.info("Workload tensor {} shape: {}".format(index, tensor.GetShape()))
 
     return arrays

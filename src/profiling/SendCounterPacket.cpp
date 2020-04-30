@@ -539,14 +539,15 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
     using namespace boost::numeric;
 
     // Get the amount of data that needs to be put into the packet
-    uint16_t categoryCount    = counterDirectory.GetCategoryCount();
-    uint16_t deviceCount      = counterDirectory.GetDeviceCount();
-    uint16_t counterSetCount  = counterDirectory.GetCounterSetCount();
+    const uint16_t categoryCount    = counterDirectory.GetCategoryCount();
+    const uint16_t deviceCount      = counterDirectory.GetDeviceCount();
+    const uint16_t counterSetCount  = counterDirectory.GetCounterSetCount();
 
     // Utils
-    size_t uint32_t_size = sizeof(uint32_t);
-    size_t packetHeaderSize = 2u;
-    size_t bodyHeaderSize = 6u;
+    const size_t uint32_t_size = sizeof(uint32_t);
+    const size_t packetHeaderSize = 2u;
+    const size_t bodyHeaderSize = 6u;
+    const uint32_t bodyHeaderSizeBytes = bodyHeaderSize * uint32_t_size;
 
     // Initialize the offset for the pointer tables
     uint32_t pointerTableOffset = 0;
@@ -653,18 +654,18 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
 
 
     // Calculate the length in words of the counter directory packet's data (excludes the packet header size)
-    size_t counterDirectoryPacketDataLength =
-            bodyHeaderSize +                 // The size of the body header
-            deviceRecordOffsets.size() +     // The size of the device records pointer table
-            counterSetRecordOffsets.size() + // The size of counter set pointer table
-            categoryRecordOffsets.size() +   // The size of category records pointer table
-            deviceRecordsSize +              // The total size of the device records
-            counterSetRecordsSize +          // The total size of the counter set records
-            categoryRecordsSize;             // The total size of the category records
+    const size_t counterDirectoryPacketDataLength =
+                 bodyHeaderSize +                 // The size of the body header
+                 deviceRecordOffsets.size() +     // The size of the device records pointer table
+                 counterSetRecordOffsets.size() + // The size of counter set pointer table
+                 categoryRecordOffsets.size() +   // The size of category records pointer table
+                 deviceRecordsSize +              // The total size of the device records
+                 counterSetRecordsSize +          // The total size of the counter set records
+                 categoryRecordsSize;             // The total size of the category records
 
     // Calculate the size in words of the counter directory packet (the data length plus the packet header size)
-    size_t counterDirectoryPacketSize = packetHeaderSize +                // The size of the packet header
-                                        counterDirectoryPacketDataLength; // The data length
+    const size_t counterDirectoryPacketSize = packetHeaderSize +                // The size of the packet header
+                                              counterDirectoryPacketDataLength; // The data length
 
 
     // Allocate the necessary space for the counter directory packet
@@ -701,39 +702,40 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
     // Body header word 0:
     // 16:31 [16] device_records_count: number of entries in the device_records_pointer_table
     // 0:15  [16] reserved: all zeros
-    uint32_t bodyHeaderWord0 = static_cast<uint32_t>(deviceCount) << 16;
+    const uint32_t bodyHeaderWord0 = static_cast<uint32_t>(deviceCount) << 16;
 
     // Body header word 1:
     // 0:31 [32] device_records_pointer_table_offset: offset to the device_records_pointer_table
-    uint32_t bodyHeaderWord1 = 0; // The offset is always zero here, as the device record pointer table field is always
-                                  // the first item in the pool
+    const uint32_t bodyHeaderWord1 = bodyHeaderSizeBytes; // The offset is always the bodyHeaderSize,
+                                                          // as the device record pointer table field
+                                                          // is always the first item in the pool
 
     // Body header word 2:
     // 16:31 [16] counter_set_count: number of entries in the counter_set_pointer_table
     // 0:15  [16] reserved: all zeros
-    uint32_t bodyHeaderWord2 = static_cast<uint32_t>(counterSetCount) << 16;
+    const uint32_t bodyHeaderWord2 = static_cast<uint32_t>(counterSetCount) << 16;
 
     // Body header word 3:
     // 0:31 [32] counter_set_pointer_table_offset: offset to the counter_set_pointer_table
-    uint32_t bodyHeaderWord3 =
-            numeric_cast<uint32_t>(deviceRecordOffsets.size() * uint32_t_size); // The size of the device records
-                                                                                // pointer table
-
+    const uint32_t bodyHeaderWord3 =
+                   numeric_cast<uint32_t>(deviceRecordOffsets.size() * uint32_t_size // The size of the
+                                          + bodyHeaderSizeBytes);                    // device records pointer table
 
     // Body header word 4:
     // 16:31 [16] categories_count: number of entries in the categories_pointer_table
     // 0:15  [16] reserved: all zeros
-    uint32_t bodyHeaderWord4 = static_cast<uint32_t>(categoryCount) << 16;
+    const uint32_t bodyHeaderWord4 = static_cast<uint32_t>(categoryCount) << 16;
 
     // Body header word 3:
     // 0:31 [32] categories_pointer_table_offset: offset to the categories_pointer_table
-    uint32_t bodyHeaderWord5 =
-            numeric_cast<uint32_t>(deviceRecordOffsets.size() * uint32_t_size +     // The size of the device records
-                                   counterSetRecordOffsets.size() * uint32_t_size); // pointer table, plus the size of
-                                                                                    // the counter set pointer table
+    const uint32_t bodyHeaderWord5 =
+                   numeric_cast<uint32_t>(
+                       deviceRecordOffsets.size() * uint32_t_size +     // The size of the device records
+                       counterSetRecordOffsets.size() * uint32_t_size   // pointer table, plus the size of
+                       +  bodyHeaderSizeBytes);                         // the counter set pointer table
 
     // Create the body header
-    uint32_t bodyHeader[6]
+    const uint32_t bodyHeader[bodyHeaderSize]
     {
         bodyHeaderWord0, // device_records_count + reserved
         bodyHeaderWord1, // device_records_pointer_table_offset

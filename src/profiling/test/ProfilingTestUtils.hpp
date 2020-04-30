@@ -17,6 +17,8 @@
 using namespace armnn;
 using namespace armnn::profiling;
 
+const static uint32_t bodyHeaderSize = 6;
+
 uint32_t GetStreamMetaDataPacketSize();
 
 inline unsigned int OffsetToNextWord(unsigned int numberOfBytes);

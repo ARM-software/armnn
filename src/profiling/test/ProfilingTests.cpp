@@ -2390,7 +2390,7 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
     RequestCounterDirectoryCommandHandler commandHandler(familyId, packetId, version, counterDirectory,
                                                          sendCounterPacket, sendTimelinePacket, profilingStateMachine);
     const uint32_t header = (packetId & 0x000003FF) << 16;
-    Packet packet(header);
+    const Packet packet(header);
 
     const Device* device = counterDirectory.RegisterDevice("deviceA", 1);
     BOOST_CHECK(device != nullptr);
@@ -2413,42 +2413,44 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
 
     auto readBuffer1 = mockBuffer1.GetReadableBuffer();
 
-    uint32_t header1Word0 = ReadUint32(readBuffer1, 0);
-    uint32_t header1Word1 = ReadUint32(readBuffer1, 4);
+    const uint32_t header1Word0 = ReadUint32(readBuffer1, 0);
+    const uint32_t header1Word1 = ReadUint32(readBuffer1, 4);
 
     BOOST_TEST(((header1Word0 >> 26) & 0x0000003F) == 0); // packet family
     BOOST_TEST(((header1Word0 >> 16) & 0x000003FF) == 2); // packet id
     BOOST_TEST(header1Word1 == 236);                      // data length
 
-    uint32_t bodyHeader1Word0      = ReadUint32(readBuffer1, 8);
-    uint32_t bodyHeader1Word1      = ReadUint32(readBuffer1, 12);
-    uint32_t bodyHeader1Word2      = ReadUint32(readBuffer1, 16);
-    uint32_t bodyHeader1Word3      = ReadUint32(readBuffer1, 20);
-    uint32_t bodyHeader1Word4      = ReadUint32(readBuffer1, 24);
-    uint32_t bodyHeader1Word5      = ReadUint32(readBuffer1, 28);
-    uint16_t deviceRecordCount     = numeric_cast<uint16_t>(bodyHeader1Word0 >> 16);
-    uint16_t counterSetRecordCount = numeric_cast<uint16_t>(bodyHeader1Word2 >> 16);
-    uint16_t categoryRecordCount   = numeric_cast<uint16_t>(bodyHeader1Word4 >> 16);
-    BOOST_TEST(deviceRecordCount == 1);     // device_records_count
-    BOOST_TEST(bodyHeader1Word1 == 0);      // device_records_pointer_table_offset
-    BOOST_TEST(counterSetRecordCount == 1); // counter_set_count
-    BOOST_TEST(bodyHeader1Word3 == 4);      // counter_set_pointer_table_offset
-    BOOST_TEST(categoryRecordCount == 1);   // categories_count
-    BOOST_TEST(bodyHeader1Word5 == 8);      // categories_pointer_table_offset
+    const uint32_t bodyHeaderSizeBytes = bodyHeaderSize * sizeof(uint32_t);
 
-    uint32_t deviceRecordOffset = ReadUint32(readBuffer1, 32);
+    const uint32_t bodyHeader1Word0      = ReadUint32(readBuffer1, 8);
+    const uint32_t bodyHeader1Word1      = ReadUint32(readBuffer1, 12);
+    const uint32_t bodyHeader1Word2      = ReadUint32(readBuffer1, 16);
+    const uint32_t bodyHeader1Word3      = ReadUint32(readBuffer1, 20);
+    const uint32_t bodyHeader1Word4      = ReadUint32(readBuffer1, 24);
+    const uint32_t bodyHeader1Word5      = ReadUint32(readBuffer1, 28);
+    const uint16_t deviceRecordCount     = numeric_cast<uint16_t>(bodyHeader1Word0 >> 16);
+    const uint16_t counterSetRecordCount = numeric_cast<uint16_t>(bodyHeader1Word2 >> 16);
+    const uint16_t categoryRecordCount   = numeric_cast<uint16_t>(bodyHeader1Word4 >> 16);
+    BOOST_TEST(deviceRecordCount == 1);                      // device_records_count
+    BOOST_TEST(bodyHeader1Word1 == 0 + bodyHeaderSizeBytes);      // device_records_pointer_table_offset
+    BOOST_TEST(counterSetRecordCount == 1);                  // counter_set_count
+    BOOST_TEST(bodyHeader1Word3 == 4 + bodyHeaderSizeBytes);      // counter_set_pointer_table_offset
+    BOOST_TEST(categoryRecordCount == 1);                    // categories_count
+    BOOST_TEST(bodyHeader1Word5 == 8 + bodyHeaderSizeBytes);      // categories_pointer_table_offset
+
+    const uint32_t deviceRecordOffset = ReadUint32(readBuffer1, 32);
     BOOST_TEST(deviceRecordOffset == 0);
 
-    uint32_t counterSetRecordOffset = ReadUint32(readBuffer1, 36);
+    const uint32_t counterSetRecordOffset = ReadUint32(readBuffer1, 36);
     BOOST_TEST(counterSetRecordOffset == 20);
 
-    uint32_t categoryRecordOffset = ReadUint32(readBuffer1, 40);
+    const uint32_t categoryRecordOffset = ReadUint32(readBuffer1, 40);
     BOOST_TEST(categoryRecordOffset == 44);
 
     auto readBuffer2 = mockBuffer2.GetReadableBuffer();
 
-    uint32_t header2Word0 = ReadUint32(readBuffer2, 0);
-    uint32_t header2Word1 = ReadUint32(readBuffer2, 4);
+    const uint32_t header2Word0 = ReadUint32(readBuffer2, 0);
+    const uint32_t header2Word1 = ReadUint32(readBuffer2, 4);
 
     // Timeline message directory packet
     BOOST_TEST(((header2Word0 >> 26) & 0x0000003F) == 1); // packet family

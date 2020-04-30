@@ -1229,52 +1229,52 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
     auto readBuffer = mockBuffer.GetReadableBuffer();
 
     // Check the packet header
-    uint32_t packetHeaderWord0 = ReadUint32(readBuffer, 0);
-    uint32_t packetHeaderWord1 = ReadUint32(readBuffer, 4);
+    const uint32_t packetHeaderWord0 = ReadUint32(readBuffer, 0);
+    const uint32_t packetHeaderWord1 = ReadUint32(readBuffer, 4);
     BOOST_TEST(((packetHeaderWord0 >> 26) & 0x3F) == 0);  // packet_family
     BOOST_TEST(((packetHeaderWord0 >> 16) & 0x3FF) == 2); // packet_id
     BOOST_TEST(packetHeaderWord1 == 432);                 // data_length
 
     // Check the body header
-    uint32_t bodyHeaderWord0 = ReadUint32(readBuffer,  8);
-    uint32_t bodyHeaderWord1 = ReadUint32(readBuffer, 12);
-    uint32_t bodyHeaderWord2 = ReadUint32(readBuffer, 16);
-    uint32_t bodyHeaderWord3 = ReadUint32(readBuffer, 20);
-    uint32_t bodyHeaderWord4 = ReadUint32(readBuffer, 24);
-    uint32_t bodyHeaderWord5 = ReadUint32(readBuffer, 28);
-    uint16_t deviceRecordCount     = static_cast<uint16_t>(bodyHeaderWord0 >> 16);
-    uint16_t counterSetRecordCount = static_cast<uint16_t>(bodyHeaderWord2 >> 16);
-    uint16_t categoryRecordCount   = static_cast<uint16_t>(bodyHeaderWord4 >> 16);
-    BOOST_TEST(deviceRecordCount == 2);     // device_records_count
-    BOOST_TEST(bodyHeaderWord1 == 0);       // device_records_pointer_table_offset
-    BOOST_TEST(counterSetRecordCount == 1); // counter_set_count
-    BOOST_TEST(bodyHeaderWord3 == 8);       // counter_set_pointer_table_offset
-    BOOST_TEST(categoryRecordCount == 2);   // categories_count
-    BOOST_TEST(bodyHeaderWord5 == 12);      // categories_pointer_table_offset
+    const uint32_t bodyHeaderWord0 = ReadUint32(readBuffer,  8);
+    const uint32_t bodyHeaderWord1 = ReadUint32(readBuffer, 12);
+    const uint32_t bodyHeaderWord2 = ReadUint32(readBuffer, 16);
+    const uint32_t bodyHeaderWord3 = ReadUint32(readBuffer, 20);
+    const uint32_t bodyHeaderWord4 = ReadUint32(readBuffer, 24);
+    const uint32_t bodyHeaderWord5 = ReadUint32(readBuffer, 28);
+    const uint16_t deviceRecordCount     = static_cast<uint16_t>(bodyHeaderWord0 >> 16);
+    const uint16_t counterSetRecordCount = static_cast<uint16_t>(bodyHeaderWord2 >> 16);
+    const uint16_t categoryRecordCount   = static_cast<uint16_t>(bodyHeaderWord4 >> 16);
+    BOOST_TEST(deviceRecordCount == 2);                      // device_records_count
+    BOOST_TEST(bodyHeaderWord1 == bodyHeaderSize * 4);           // device_records_pointer_table_offset
+    BOOST_TEST(counterSetRecordCount == 1);                  // counter_set_count
+    BOOST_TEST(bodyHeaderWord3 == 8 + bodyHeaderSize * 4);       // counter_set_pointer_table_offset
+    BOOST_TEST(categoryRecordCount == 2);                    // categories_count
+    BOOST_TEST(bodyHeaderWord5 == 12 + bodyHeaderSize * 4);      // categories_pointer_table_offset
 
     // Check the device records pointer table
-    uint32_t deviceRecordOffset0 = ReadUint32(readBuffer, 32);
-    uint32_t deviceRecordOffset1 = ReadUint32(readBuffer, 36);
+    const uint32_t deviceRecordOffset0 = ReadUint32(readBuffer, 32);
+    const uint32_t deviceRecordOffset1 = ReadUint32(readBuffer, 36);
     BOOST_TEST(deviceRecordOffset0 ==  0); // Device record offset for "device1"
     BOOST_TEST(deviceRecordOffset1 == 20); // Device record offset for "device2"
 
     // Check the counter set pointer table
-    uint32_t counterSetRecordOffset0 = ReadUint32(readBuffer, 40);
+    const uint32_t counterSetRecordOffset0 = ReadUint32(readBuffer, 40);
     BOOST_TEST(counterSetRecordOffset0 == 40); // Counter set record offset for "counterset1"
 
     // Check the category pointer table
-    uint32_t categoryRecordOffset0 = ReadUint32(readBuffer, 44);
-    uint32_t categoryRecordOffset1 = ReadUint32(readBuffer, 48);
+    const uint32_t categoryRecordOffset0 = ReadUint32(readBuffer, 44);
+    const uint32_t categoryRecordOffset1 = ReadUint32(readBuffer, 48);
     BOOST_TEST(categoryRecordOffset0 ==  64); // Category record offset for "category1"
     BOOST_TEST(categoryRecordOffset1 == 168); // Category record offset for "category2"
 
     // Get the device record pool offset
-    uint32_t uint32_t_size = sizeof(uint32_t);
-    uint32_t packetBodyPoolOffset = 2u * uint32_t_size +                    // packet_header
-                                    6u * uint32_t_size +                    // body_header
-                                    deviceRecordCount * uint32_t_size +     // Size of device_records_pointer_table
-                                    counterSetRecordCount * uint32_t_size + // Size of counter_set_pointer_table
-                                    categoryRecordCount * uint32_t_size;    // Size of categories_pointer_table
+    const uint32_t uint32_t_size = sizeof(uint32_t);
+    const uint32_t packetBodyPoolOffset = 2u * uint32_t_size +                   // packet_header
+                                          bodyHeaderWord1 +                      // body_header
+                                          deviceRecordCount * uint32_t_size +    // Size of device_records_pointer_table
+                                          counterSetRecordCount * uint32_t_size  // Size of counter_set_pointer_table
+                                          + categoryRecordCount * uint32_t_size; // Size of categories_pointer_table
 
     // Device record structure/collection used for testing
     struct DeviceRecord
@@ -1286,22 +1286,21 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
         std::string name;
     };
     std::vector<DeviceRecord> deviceRecords;
-    uint32_t deviceRecordsPointerTableOffset = 2u * uint32_t_size + // packet_header
-                                               6u * uint32_t_size + // body_header
-                                               bodyHeaderWord1;     // device_records_pointer_table_offset
+    const uint32_t deviceRecordsPointerTableOffset = 2u * uint32_t_size + // packet_header
+                                                     bodyHeaderWord1;     // device_records_pointer_table_offset
 
     const unsigned char* readData = readBuffer->GetReadableData();
 
     for (uint32_t i = 0; i < deviceRecordCount; i++)
     {
         // Get the device record offset
-        uint32_t deviceRecordOffset = ReadUint32(readBuffer, deviceRecordsPointerTableOffset + i * uint32_t_size);
+        const uint32_t deviceRecordOffset = ReadUint32(readBuffer, deviceRecordsPointerTableOffset + i * uint32_t_size);
 
         // Collect the data for the device record
-        uint32_t deviceRecordWord0 = ReadUint32(readBuffer,
-                                                packetBodyPoolOffset + deviceRecordOffset + 0 * uint32_t_size);
-        uint32_t deviceRecordWord1 = ReadUint32(readBuffer,
-                                                packetBodyPoolOffset + deviceRecordOffset + 1 * uint32_t_size);
+        const uint32_t deviceRecordWord0 = ReadUint32(readBuffer,
+                                                      packetBodyPoolOffset + deviceRecordOffset + 0 * uint32_t_size);
+        const uint32_t deviceRecordWord1 = ReadUint32(readBuffer,
+                                                      packetBodyPoolOffset + deviceRecordOffset + 1 * uint32_t_size);
         DeviceRecord deviceRecord;
         deviceRecord.uid = static_cast<uint16_t>(deviceRecordWord0 >> 16); // uid
         deviceRecord.cores = static_cast<uint16_t>(deviceRecordWord0);     // cores
@@ -1345,20 +1344,21 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
         std::string name;
     };
     std::vector<CounterSetRecord> counterSetRecords;
-    uint32_t counterSetRecordsPointerTableOffset = 2u * uint32_t_size + // packet_header
-                                                   6u * uint32_t_size + // body_header
-                                                   bodyHeaderWord3;     // counter_set_pointer_table_offset
+    const uint32_t counterSetRecordsPointerTableOffset = 2u * uint32_t_size + // packet_header
+                                                         bodyHeaderWord3;     // counter_set_pointer_table_offset
     for (uint32_t i = 0; i < counterSetRecordCount; i++)
     {
         // Get the counter set record offset
-        uint32_t counterSetRecordOffset = ReadUint32(readBuffer,
-                                                     counterSetRecordsPointerTableOffset + i * uint32_t_size);
+        const uint32_t counterSetRecordOffset = ReadUint32(readBuffer,
+                                                           counterSetRecordsPointerTableOffset + i * uint32_t_size);
 
         // Collect the data for the counter set record
-        uint32_t counterSetRecordWord0 = ReadUint32(readBuffer,
-                                                    packetBodyPoolOffset + counterSetRecordOffset + 0 * uint32_t_size);
-        uint32_t counterSetRecordWord1 = ReadUint32(readBuffer,
-                                                    packetBodyPoolOffset + counterSetRecordOffset + 1 * uint32_t_size);
+        const uint32_t counterSetRecordWord0 = ReadUint32(readBuffer,
+                                                          packetBodyPoolOffset + counterSetRecordOffset +
+                                                          0 * uint32_t_size);
+        const uint32_t counterSetRecordWord1 = ReadUint32(readBuffer,
+                                                          packetBodyPoolOffset + counterSetRecordOffset +
+                                                          1 * uint32_t_size);
         CounterSetRecord counterSetRecord;
         counterSetRecord.uid = static_cast<uint16_t>(counterSetRecordWord0 >> 16); // uid
         counterSetRecord.count = static_cast<uint16_t>(counterSetRecordWord0);     // count
@@ -1424,21 +1424,24 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
         std::vector<EventRecord> event_records;
     };
     std::vector<CategoryRecord> categoryRecords;
-    uint32_t categoryRecordsPointerTableOffset = 2u * uint32_t_size + // packet_header
-                                                 6u * uint32_t_size + // body_header
-                                                 bodyHeaderWord5;     // categories_pointer_table_offset
+    const uint32_t categoryRecordsPointerTableOffset = 2u * uint32_t_size + // packet_header
+                                                       bodyHeaderWord5;    // categories_pointer_table_offset
     for (uint32_t i = 0; i < categoryRecordCount; i++)
     {
         // Get the category record offset
-        uint32_t categoryRecordOffset = ReadUint32(readBuffer, categoryRecordsPointerTableOffset + i * uint32_t_size);
+        const uint32_t categoryRecordOffset = ReadUint32(readBuffer, categoryRecordsPointerTableOffset +
+                                                         i * uint32_t_size);
 
         // Collect the data for the category record
-        uint32_t categoryRecordWord1 = ReadUint32(readBuffer,
-                                                  packetBodyPoolOffset + categoryRecordOffset + 0 * uint32_t_size);
-        uint32_t categoryRecordWord2 = ReadUint32(readBuffer,
-                                                  packetBodyPoolOffset + categoryRecordOffset + 1 * uint32_t_size);
-        uint32_t categoryRecordWord3 = ReadUint32(readBuffer,
-                                                  packetBodyPoolOffset + categoryRecordOffset + 2 * uint32_t_size);
+        const uint32_t categoryRecordWord1 = ReadUint32(readBuffer,
+                                                        packetBodyPoolOffset + categoryRecordOffset +
+                                                        0 * uint32_t_size);
+        const uint32_t categoryRecordWord2 = ReadUint32(readBuffer,
+                                                        packetBodyPoolOffset + categoryRecordOffset +
+                                                        1 * uint32_t_size);
+        const uint32_t categoryRecordWord3 = ReadUint32(readBuffer,
+                                                        packetBodyPoolOffset + categoryRecordOffset +
+                                                        2 * uint32_t_size);
         CategoryRecord categoryRecord;
         categoryRecord.event_count = static_cast<uint16_t>(categoryRecordWord1 >> 16); // event_count
         categoryRecord.event_pointer_table_offset = categoryRecordWord2;               // event_pointer_table_offset
@@ -1477,20 +1480,27 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
             categoryRecord.event_pointer_table[eventIndex] = eventRecordOffset;
 
             // Collect the data for the event record
-            uint32_t eventRecordWord0  = ReadUint32(readBuffer,
-                                                    categoryRecordPoolOffset + eventRecordOffset + 0 * uint32_t_size);
-            uint32_t eventRecordWord1  = ReadUint32(readBuffer,
-                                                    categoryRecordPoolOffset + eventRecordOffset + 1 * uint32_t_size);
-            uint32_t eventRecordWord2  = ReadUint32(readBuffer,
-                                                    categoryRecordPoolOffset + eventRecordOffset + 2 * uint32_t_size);
-            uint64_t eventRecordWord34 = ReadUint64(readBuffer,
-                                                    categoryRecordPoolOffset + eventRecordOffset + 3 * uint32_t_size);
-            uint32_t eventRecordWord5 =  ReadUint32(readBuffer,
-                                                    categoryRecordPoolOffset + eventRecordOffset + 5 * uint32_t_size);
-            uint32_t eventRecordWord6 = ReadUint32(readBuffer,
-                                                   categoryRecordPoolOffset + eventRecordOffset + 6 * uint32_t_size);
-            uint32_t eventRecordWord7 = ReadUint32(readBuffer,
-                                                   categoryRecordPoolOffset + eventRecordOffset + 7 * uint32_t_size);
+            const uint32_t eventRecordWord0  = ReadUint32(readBuffer,
+                                                          categoryRecordPoolOffset + eventRecordOffset +
+                                                          0 * uint32_t_size);
+            const uint32_t eventRecordWord1  = ReadUint32(readBuffer,
+                                                          categoryRecordPoolOffset + eventRecordOffset +
+                                                          1 * uint32_t_size);
+            const uint32_t eventRecordWord2  = ReadUint32(readBuffer,
+                                                          categoryRecordPoolOffset + eventRecordOffset +
+                                                          2 * uint32_t_size);
+            const uint64_t eventRecordWord34 = ReadUint64(readBuffer,
+                                                          categoryRecordPoolOffset + eventRecordOffset +
+                                                          3 * uint32_t_size);
+            const uint32_t eventRecordWord5 =  ReadUint32(readBuffer,
+                                                          categoryRecordPoolOffset + eventRecordOffset +
+                                                          5 * uint32_t_size);
+            const uint32_t eventRecordWord6 = ReadUint32(readBuffer,
+                                                         categoryRecordPoolOffset + eventRecordOffset +
+                                                         6 * uint32_t_size);
+            const uint32_t eventRecordWord7 = ReadUint32(readBuffer,
+                                                         categoryRecordPoolOffset + eventRecordOffset +
+                                                         7 * uint32_t_size);
             EventRecord eventRecord;
             eventRecord.counter_uid = static_cast<uint16_t>(eventRecordWord0);                     // counter_uid
             eventRecord.max_counter_uid = static_cast<uint16_t>(eventRecordWord0 >> 16);           // max_counter_uid

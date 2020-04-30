@@ -474,8 +474,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSlice(const SliceQueueDesc
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                                               const WorkloadInfo& info) const
 {
-    return MakeWorkloadHelper<NeonSoftmaxFloatWorkload, NeonSoftmaxUint8Workload>(
-        descriptor, info, m_MemoryManager->GetIntraLayerManager());
+    return std::make_unique<NeonSoftmaxWorkload>(descriptor, info, m_MemoryManager->GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,

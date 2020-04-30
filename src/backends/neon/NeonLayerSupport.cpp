@@ -54,7 +54,7 @@
 #include "workloads/NeonResizeWorkload.hpp"
 #include "workloads/NeonRsqrtWorkload.hpp"
 #include "workloads/NeonSliceWorkload.hpp"
-#include "workloads/NeonSoftmaxBaseWorkload.hpp"
+#include "workloads/NeonSoftmaxWorkload.hpp"
 #include "workloads/NeonSpaceToBatchNdWorkload.hpp"
 #include "workloads/NeonSpaceToDepthWorkload.hpp"
 #include "workloads/NeonSplitterWorkload.hpp"

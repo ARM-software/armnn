@@ -799,6 +799,17 @@ std::unique_ptr<SoftmaxWorkload> CreateSoftmaxWorkloadTest(armnn::IWorkloadFacto
 
     // Connect up
     armnn::TensorInfo tensorInfo({4, 1}, DataType);
+    if (DataType == armnn::DataType::QAsymmU8)
+    {
+        tensorInfo.SetQuantizationOffset(0);
+        tensorInfo.SetQuantizationScale(1.f / 256);
+    }
+    else if (DataType == armnn::DataType::QAsymmS8)
+    {
+        tensorInfo.SetQuantizationOffset(-128);
+        tensorInfo.SetQuantizationScale(1.f / 256);
+    }
+
     Connect(input, layer, tensorInfo);
     Connect(layer, output, tensorInfo);
     CreateTensorHandles(graph, factory);

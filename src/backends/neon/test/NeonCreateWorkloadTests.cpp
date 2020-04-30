@@ -582,20 +582,41 @@ static void NeonCreateSoftmaxWorkloadTest()
     SoftmaxQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle  = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo({4, 1}, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo({4, 1}, DataType)));
+    armnn::TensorInfo tensorInfo({4, 1}, DataType);
+    if (DataType == armnn::DataType::QAsymmU8)
+    {
+        tensorInfo.SetQuantizationOffset(0);
+        tensorInfo.SetQuantizationScale(1.f / 256);
+    }
+    else if (DataType == armnn::DataType::QAsymmS8)
+    {
+        tensorInfo.SetQuantizationOffset(-128);
+        tensorInfo.SetQuantizationScale(1.f / 256);
+    }
+    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, tensorInfo));
+    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, tensorInfo));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateSoftmaxFloat16Workload)
 {
-    NeonCreateSoftmaxWorkloadTest<NeonSoftmaxFloatWorkload, DataType::Float16>();
+    NeonCreateSoftmaxWorkloadTest<NeonSoftmaxWorkload, DataType::Float16>();
 }
 #endif
 
 BOOST_AUTO_TEST_CASE(CreateSoftmaxFloatWorkload)
 {
-    NeonCreateSoftmaxWorkloadTest<NeonSoftmaxFloatWorkload, DataType::Float32>();
+    NeonCreateSoftmaxWorkloadTest<NeonSoftmaxWorkload, DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSoftmaxQAsymmU8Workload)
+{
+    NeonCreateSoftmaxWorkloadTest<NeonSoftmaxWorkload, DataType::QAsymmU8>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSoftmaxQAsymmS8Workload)
+{
+    NeonCreateSoftmaxWorkloadTest<NeonSoftmaxWorkload, DataType::QAsymmS8>();
 }
 
 template <typename SpaceToDepthWorkloadType, typename armnn::DataType DataType>

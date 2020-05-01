@@ -2439,13 +2439,13 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
     BOOST_TEST(bodyHeader1Word5 == 8 + bodyHeaderSizeBytes);      // categories_pointer_table_offset
 
     const uint32_t deviceRecordOffset = ReadUint32(readBuffer1, 32);
-    BOOST_TEST(deviceRecordOffset == 0);
+    BOOST_TEST(deviceRecordOffset == 12);
 
     const uint32_t counterSetRecordOffset = ReadUint32(readBuffer1, 36);
-    BOOST_TEST(counterSetRecordOffset == 20);
+    BOOST_TEST(counterSetRecordOffset == 28);
 
     const uint32_t categoryRecordOffset = ReadUint32(readBuffer1, 40);
-    BOOST_TEST(categoryRecordOffset == 44);
+    BOOST_TEST(categoryRecordOffset == 48);
 
     auto readBuffer2 = mockBuffer2.GetReadableBuffer();
 

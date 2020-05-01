@@ -28,21 +28,21 @@ const unsigned int SendCounterPacket::PIPE_MAGIC;
 
 void SendCounterPacket::SendStreamMetaDataPacket()
 {
-    std::string info(GetSoftwareInfo());
-    std::string hardwareVersion(GetHardwareVersion());
-    std::string softwareVersion(GetSoftwareVersion());
-    std::string processName = GetProcessName().substr(0, 60);
+    const std::string info(GetSoftwareInfo());
+    const std::string hardwareVersion(GetHardwareVersion());
+    const std::string softwareVersion(GetSoftwareVersion());
+    const std::string processName = GetProcessName().substr(0, 60);
 
-    uint32_t infoSize =            numeric_cast<uint32_t>(info.size()) + 1;
-    uint32_t hardwareVersionSize = numeric_cast<uint32_t>(hardwareVersion.size()) + 1;
-    uint32_t softwareVersionSize = numeric_cast<uint32_t>(softwareVersion.size()) + 1;
-    uint32_t processNameSize =     numeric_cast<uint32_t>(processName.size()) + 1;
+    const uint32_t infoSize =            numeric_cast<uint32_t>(info.size()) + 1;
+    const uint32_t hardwareVersionSize = numeric_cast<uint32_t>(hardwareVersion.size()) + 1;
+    const uint32_t softwareVersionSize = numeric_cast<uint32_t>(softwareVersion.size()) + 1;
+    const uint32_t processNameSize =     numeric_cast<uint32_t>(processName.size()) + 1;
 
-    uint32_t sizeUint32 = sizeof(uint32_t);
+    const uint32_t sizeUint32 = sizeof(uint32_t);
 
-    uint32_t headerSize = 2 * sizeUint32;
-    uint32_t bodySize = 10 * sizeUint32;
-    uint32_t packetVersionCountSize = sizeUint32;
+    const uint32_t headerSize = 2 * sizeUint32;
+    const uint32_t bodySize = 10 * sizeUint32;
+    const uint32_t packetVersionCountSize = sizeUint32;
 
     // Supported Packets
     // Stream metadata packet            (packet family=0; packet id=0)
@@ -51,13 +51,13 @@ void SendCounterPacket::SendStreamMetaDataPacket()
     // Request Counter Directory packet  (packet family=0, packet id=3)
     // Periodic Counter Selection packet (packet family=0, packet id=4)
     // Periodic Counter Capture packet   (packet family=1, packet class=0, type=0)
-    uint32_t packetVersionEntries = 6;
+    const uint32_t packetVersionEntries = 6;
 
-    uint32_t payloadSize = numeric_cast<uint32_t>(infoSize + hardwareVersionSize + softwareVersionSize +
+    const uint32_t payloadSize = numeric_cast<uint32_t>(infoSize + hardwareVersionSize + softwareVersionSize +
                                                   processNameSize + packetVersionCountSize +
                                                   (packetVersionEntries * 2 * sizeUint32));
 
-    uint32_t totalSize = headerSize + bodySize + payloadSize;
+    const uint32_t totalSize = headerSize + bodySize + payloadSize;
     uint32_t offset = 0;
     uint32_t reserved = 0;
 
@@ -196,18 +196,7 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
     }
 
     // Utils
-    size_t uint32_t_size = sizeof(uint32_t);
-
-    // Category record word 1:
-    // 16:31 [16] event_count: number of events belonging to this category
-    // 0:15  [16] reserved: all zeros
-    uint32_t categoryRecordWord1 = static_cast<uint32_t>(categoryCounters.size()) << 16;
-
-    // Category record word 2:
-    // 0:31 [32] event_pointer_table_offset: offset from the beginning of the category data pool to
-    //                                       the event_pointer_table
-    uint32_t categoryRecordWord2 = 0; // The offset is always zero here, as the event pointer table field is always
-                                      // the first item in the pool
+    const size_t uint32_t_size = sizeof(uint32_t);
 
     // Convert the device name into a SWTrace namestring
     std::vector<uint32_t> categoryNameBuffer;
@@ -218,8 +207,18 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
         return false;
     }
 
+    // Category record word 1:
+    // 16:31 [16] event_count: number of events belonging to this category
+    // 0:15  [16] reserved: all zeros
+    const uint32_t categoryRecordWord1 = static_cast<uint32_t>(categoryCounters.size()) << 16;
+
+    // Category record word 2:
+    // 0:31 [32] event_pointer_table_offset: offset from the beginning of the category data pool to
+    //                                       the event_pointer_table
+    const uint32_t categoryRecordWord2 = static_cast<uint32_t>(3u * uint32_t_size);
+
     // Process the event records
-    size_t counterCount = categoryCounters.size();
+    const size_t counterCount = categoryCounters.size();
     std::vector<EventRecord> eventRecords(counterCount);
     std::vector<uint32_t> eventRecordOffsets(counterCount, 0);
     size_t eventRecordsSize = 0;
@@ -249,14 +248,14 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
 
     // Category record word 3:
     // 0:31 [32] name_offset (offset from the beginning of the category data pool to the name field)
-    uint32_t categoryRecordWord3 = numeric_cast<uint32_t>(eventRecordOffsets.size() * uint32_t_size);
+    const uint32_t categoryRecordWord3 = numeric_cast<uint32_t>((3u + eventRecordOffsets.size()) * uint32_t_size);
 
     // Calculate the size in words of the category record
-    size_t categoryRecordSize = 3u + // The size of the fixed part (device + counter_set + event_count + reserved +
-                                     // event_pointer_table_offset + name_offset)
-                                eventRecordOffsets.size() + // The size of the variable part (the event pointer table +
-                                categoryNameBuffer.size() + // and the category name including the null-terminator +
-                                eventRecordsSize;           // the event records)
+    const size_t categoryRecordSize = 3u +// The size of the fixed part (device + counter_set + event_count +
+                                          // reserved + event_pointer_table_offset + name_offset)
+                                      eventRecordOffsets.size() + // The size of the variable part (
+                                      categoryNameBuffer.size() + // the event pointer table + the category name
+                                      eventRecordsSize;           // including the null-terminator + the event records)
 
     // Allocate the necessary space for the category record
     categoryRecord.resize(categoryRecordSize);
@@ -296,13 +295,13 @@ bool SendCounterPacket::CreateDeviceRecord(const DevicePtr& device,
     // Device record word 0:
     // 16:31 [16] uid: the unique identifier for the device
     // 0:15  [16] cores: the number of individual streams of counters for one or more cores of some device
-    uint32_t deviceRecordWord0 = (static_cast<uint32_t>(deviceUid) << 16) |
+    const uint32_t deviceRecordWord0 = (static_cast<uint32_t>(deviceUid) << 16) |
                                  (static_cast<uint32_t>(deviceCores));
 
     // Device record word 1:
     // 0:31 [32] name_offset: offset from the beginning of the device record pool to the name field
-    uint32_t deviceRecordWord1 = 0; // The offset is always zero here, as the name field is always
-                                    // the first (and only) item in the pool
+    const uint32_t deviceRecordWord1 = 2u; // The offset is always two here, as the name field is always
+                                           // the first (and only) item in the pool and there are two device words
 
     // Convert the device name into a SWTrace string
     std::vector<uint32_t> deviceNameBuffer;
@@ -315,7 +314,7 @@ bool SendCounterPacket::CreateDeviceRecord(const DevicePtr& device,
     }
 
     // Calculate the size in words of the device record
-    size_t deviceRecordSize = 2u + // The size of the fixed part (uid + cores + name_offset)
+    const size_t deviceRecordSize = 2u + // The size of the fixed part (uid + cores + name_offset)
                               deviceNameBuffer.size(); // The size of the variable part (the device name including
                                                        // the null-terminator)
 
@@ -346,13 +345,13 @@ bool SendCounterPacket::CreateCounterSetRecord(const CounterSetPtr& counterSet,
     // Counter set record word 0:
     // 16:31 [16] uid: the unique identifier for the counter_set
     // 0:15  [16] count: the number of counters which can be active in this set at any one time
-    uint32_t counterSetRecordWord0 = (static_cast<uint32_t>(counterSetUid) << 16) |
-                                     (static_cast<uint32_t>(counterSetCount));
+    const uint32_t counterSetRecordWord0 = (static_cast<uint32_t>(counterSetUid) << 16) |
+                                           (static_cast<uint32_t>(counterSetCount));
 
     // Counter set record word 1:
     // 0:31 [32] name_offset: offset from the beginning of the counter set pool to the name field
-    uint32_t counterSetRecordWord1 = 0; // The offset is always zero here, as the name field is always
-                                        // the first (and only) item in the pool
+    const uint32_t counterSetRecordWord1 = 2u; // The offset is always two here, as the name field is always
+                                               // the first (and only) item in the pool after the two counter set words
 
     // Convert the device name into a SWTrace namestring
     std::vector<uint32_t> counterSetNameBuffer;
@@ -366,9 +365,9 @@ bool SendCounterPacket::CreateCounterSetRecord(const CounterSetPtr& counterSet,
     }
 
     // Calculate the size in words of the counter set record
-    size_t counterSetRecordSize = 2u + // The size of the fixed part (uid + cores + name_offset)
-                                  counterSetNameBuffer.size(); // The size of the variable part (the counter set name
-                                                               // including the null-terminator)
+    const size_t counterSetRecordSize = 2u + // The size of the fixed part (uid + cores + name_offset)
+                                        counterSetNameBuffer.size(); // The size of the variable part (the counter set
+                                                                     // name including the null-terminator)
 
     // Allocate the space for the counter set record
     counterSetRecord.resize(counterSetRecordSize);
@@ -406,7 +405,13 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
     ARMNN_ASSERT(counterMultiplier);
 
     // Utils
-    size_t uint32_t_size = sizeof(uint32_t);
+    const size_t uint32_t_size = sizeof(uint32_t);
+    // eventRecordBlockSize is the size of the fixed part
+    // (counter_uid + max_counter_uid + device +
+    // counter_set + class + interpolation +
+    // multiplier + name_offset + description_offset +
+    // units_offset)
+    const size_t eventRecordBlockSize = 8u;
 
     // Event record word 0:
     // 16:31 [16] max_counter_uid: if the device this event is associated with has more than one core and there
@@ -415,22 +420,22 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
     //                             If there is only a single core then this value will be the same as
     //                             the counter_uid value
     // 0:15  [16] count_uid: unique ID for the counter. Must be unique across all counters in all categories
-    uint32_t eventRecordWord0 = (static_cast<uint32_t>(maxCounterUid) << 16) |
-                                (static_cast<uint32_t>(counterUid));
+    const uint32_t eventRecordWord0 = (static_cast<uint32_t>(maxCounterUid) << 16) |
+                                      (static_cast<uint32_t>(counterUid));
 
     // Event record word 1:
     // 16:31 [16] device: UID of the device this event is associated with. Set to zero if the event is NOT
     //                    associated with a device
     // 0:15  [16] counter_set: UID of the counter_set this event is associated with. Set to zero if the event
     //                         is NOT associated with a counter_set
-    uint32_t eventRecordWord1 = (static_cast<uint32_t>(deviceUid) << 16) |
-                                (static_cast<uint32_t>(counterSetUid));
+    const uint32_t eventRecordWord1 = (static_cast<uint32_t>(deviceUid) << 16) |
+                                      (static_cast<uint32_t>(counterSetUid));
 
     // Event record word 2:
     // 16:31 [16] class: type describing how to treat each data point in a stream of data points
     // 0:15  [16] interpolation: type describing how to interpolate each data point in a stream of data points
-    uint32_t eventRecordWord2 = (static_cast<uint32_t>(counterClass) << 16) |
-                                (static_cast<uint32_t>(counterInterpolation));
+    const uint32_t eventRecordWord2 = (static_cast<uint32_t>(counterClass) << 16) |
+                                      (static_cast<uint32_t>(counterInterpolation));
 
     // Event record word 3-4:
     // 0:63 [64] multiplier: internal data stream is represented as integer values, this allows scaling of
@@ -438,13 +443,12 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
     uint32_t multiplier[2] = { 0u, 0u };
     ARMNN_ASSERT(sizeof(counterMultiplier) == sizeof(multiplier));
     std::memcpy(multiplier, &counterMultiplier, sizeof(multiplier));
-    uint32_t eventRecordWord3 = multiplier[0];
-    uint32_t eventRecordWord4 = multiplier[1];
+    const uint32_t eventRecordWord3 = multiplier[0];
+    const uint32_t eventRecordWord4 = multiplier[1];
 
     // Event record word 5:
     // 0:31 [32] name_offset: offset from the beginning of the event record pool to the name field
-    uint32_t eventRecordWord5 = 0; // The offset is always zero here, as the name field is always
-                                   // the first item in the pool
+    const uint32_t eventRecordWord5 = static_cast<uint32_t>(eventRecordBlockSize * uint32_t_size);
 
     // Convert the counter name into a SWTrace string
     std::vector<uint32_t> counterNameBuffer;
@@ -460,7 +464,8 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
     // Event record word 6:
     // 0:31 [32] description_offset: offset from the beginning of the event record pool to the description field
     // The size of the name buffer in bytes
-    uint32_t eventRecordWord6 = numeric_cast<uint32_t>(counterNameBuffer.size() * uint32_t_size);
+    uint32_t eventRecordWord6 =
+            static_cast<uint32_t>((counterNameBuffer.size() + eventRecordBlockSize) * uint32_t_size);
 
     // Convert the counter description into a SWTrace string
     std::vector<uint32_t> counterDescriptionBuffer;
@@ -478,9 +483,10 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
     //                         An offset value of zero indicates this field is not provided
     bool includeUnits = !counterUnits.empty();
     // The size of the description buffer in bytes
-    uint32_t eventRecordWord7 = includeUnits ?
+    const uint32_t eventRecordWord7 = includeUnits ?
                                 eventRecordWord6 +
-                                numeric_cast<uint32_t>(counterDescriptionBuffer.size() * uint32_t_size) :
+                                numeric_cast<uint32_t>(counterDescriptionBuffer.size()
+                                * uint32_t_size) :
                                 0;
 
     // Convert the counter units into a SWTrace namestring (optional)
@@ -499,13 +505,10 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
     }
 
     // Calculate the size in words of the event record
-    size_t eventRecordSize = 8u + // The size of the fixed part (counter_uid + max_counter_uid + device +
-                                  //                             counter_set + class + interpolation +
-                                  //                             multiplier + name_offset + description_offset +
-                                  //                             units_offset)
-                             counterNameBuffer.size() +        // The size of the variable part (the counter name,
-                             counterDescriptionBuffer.size() + // description and units including the null-terminator)
-                             counterUnitsBuffer.size();
+    const size_t eventRecordSize = eventRecordBlockSize +
+                                   counterNameBuffer.size() +        // The size of the variable part (the counter name,
+                                   counterDescriptionBuffer.size() + // description and units
+                                   counterUnitsBuffer.size();        // including the null-terminator)
 
     // Allocate the space for the event record
     eventRecord.resize(eventRecordSize);
@@ -563,6 +566,10 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
     size_t deviceRecordsSize = 0;
     size_t deviceIndex = 0;
     size_t deviceRecordOffsetIndex = 0;
+
+    pointerTableOffset = numeric_cast<uint32_t>(deviceCount     * uint32_t_size +
+                                                counterSetCount * uint32_t_size +
+                                                categoryCount   * uint32_t_size);
     for (auto it = devices.begin(); it != devices.end(); it++)
     {
         const DevicePtr& device = it->second;
@@ -596,6 +603,8 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
     size_t counterSetRecordsSize = 0;
     size_t counterSetIndex = 0;
     size_t counterSetRecordOffsetIndex = 0;
+
+    pointerTableOffset -= numeric_cast<uint32_t>(deviceCount * uint32_t_size);
     for (auto it = counterSets.begin(); it != counterSets.end(); it++)
     {
         const CounterSetPtr& counterSet = it->second;
@@ -629,6 +638,8 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
     size_t categoryRecordsSize = 0;
     size_t categoryIndex = 0;
     size_t categoryRecordOffsetIndex = 0;
+
+    pointerTableOffset -= numeric_cast<uint32_t>(counterSetCount * uint32_t_size);
     for (auto it = categories.begin(); it != categories.end(); it++)
     {
         const CategoryPtr& category = *it;
@@ -651,8 +662,6 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
         categoryRecordOffsetIndex++;
     }
 
-
-
     // Calculate the length in words of the counter directory packet's data (excludes the packet header size)
     const size_t counterDirectoryPacketDataLength =
                  bodyHeaderSize +                 // The size of the body header
@@ -666,7 +675,6 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
     // Calculate the size in words of the counter directory packet (the data length plus the packet header size)
     const size_t counterDirectoryPacketSize = packetHeaderSize +                // The size of the packet header
                                               counterDirectoryPacketDataLength; // The data length
-
 
     // Allocate the necessary space for the counter directory packet
     std::vector<uint32_t> counterDirectoryPacket(counterDirectoryPacketSize, 0);

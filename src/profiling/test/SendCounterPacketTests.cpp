@@ -427,7 +427,7 @@ BOOST_AUTO_TEST_CASE(CreateDeviceRecordTest)
     };
     BOOST_CHECK(deviceRecordWord0[0] == deviceUid); // uid
     BOOST_CHECK(deviceRecordWord0[1] == deviceCores); // cores
-    BOOST_CHECK(deviceRecord[1] == 0); // name_offset
+    BOOST_CHECK(deviceRecord[1] == 2); // name_offset
     BOOST_CHECK(deviceRecord[2] == deviceName.size() + 1); // The length of the SWTrace string (name)
     BOOST_CHECK(std::memcmp(deviceRecord.data() + 3, deviceName.data(), deviceName.size()) == 0); // name
 }
@@ -480,7 +480,7 @@ BOOST_AUTO_TEST_CASE(CreateCounterSetRecordTest)
     };
     BOOST_CHECK(counterSetRecordWord0[0] == counterSetUid); // uid
     BOOST_CHECK(counterSetRecordWord0[1] == counterSetCount); // cores
-    BOOST_CHECK(counterSetRecord[1] == 0); // name_offset
+    BOOST_CHECK(counterSetRecord[1] == 2); // name_offset
     BOOST_CHECK(counterSetRecord[2] == counterSetName.size() + 1); // The length of the SWTrace string (name)
     BOOST_CHECK(std::memcmp(counterSetRecord.data() + 3, counterSetName.data(), counterSetName.size()) == 0); // name
 }
@@ -564,33 +564,39 @@ BOOST_AUTO_TEST_CASE(CreateEventRecordTest)
         eventRecord[3],
         eventRecord[4]
     };
+
     BOOST_CHECK(eventRecordWord0[0] == maxCounterUid); // max_counter_uid
     BOOST_CHECK(eventRecordWord0[1] == counterUid); // counter_uid
     BOOST_CHECK(eventRecordWord1[0] == deviceUid); // device
+
     BOOST_CHECK(eventRecordWord1[1] == counterSetUid); // counter_set
     BOOST_CHECK(eventRecordWord2[0] == counterClass); // class
     BOOST_CHECK(eventRecordWord2[1] == counterInterpolation); // interpolation
     BOOST_CHECK(std::memcmp(eventRecordWord34, &counterMultiplier, sizeof(counterMultiplier)) == 0); // multiplier
 
     ARMNN_NO_CONVERSION_WARN_BEGIN
-    uint32_t counterNameOffset = 0; // The name is the first item in pool
+    uint32_t eventRecordBlockSize = 8u * sizeof(uint32_t);
+    uint32_t counterNameOffset = eventRecordBlockSize; // The name is the first item in pool
     uint32_t counterDescriptionOffset = counterNameOffset + // Counter name offset
                                         4u + // Counter name length (uint32_t)
                                         counterName.size() + // 18u
                                         1u + // Null-terminator
                                         1u; // Rounding to the next word
+
     size_t counterUnitsOffset = counterDescriptionOffset + // Counter description offset
                                 4u + // Counter description length (uint32_t)
                                 counterDescription.size() + // 21u
                                 1u + // Null-terminator
-                                2u; // Rounding to the next word
+                                2u;  // Rounding to the next word
+
     ARMNN_NO_CONVERSION_WARN_END
 
     BOOST_CHECK(eventRecord[5] == counterNameOffset); // name_offset
     BOOST_CHECK(eventRecord[6] == counterDescriptionOffset); // description_offset
     BOOST_CHECK(eventRecord[7] == counterUnitsOffset); // units_offset
 
-    auto eventRecordPool = reinterpret_cast<unsigned char*>(eventRecord.data() + 8u); // The start of the pool
+    // Offsets are relative to the start of the eventRecord
+    auto eventRecordPool = reinterpret_cast<unsigned char*>(eventRecord.data());
     size_t uint32_t_size = sizeof(uint32_t);
 
     // The length of the SWTrace string (name)
@@ -693,7 +699,8 @@ BOOST_AUTO_TEST_CASE(CreateEventRecordNoUnitsTest)
     BOOST_CHECK(std::memcmp(eventRecordWord34, &counterMultiplier, sizeof(counterMultiplier)) == 0); // multiplier
 
     ARMNN_NO_CONVERSION_WARN_BEGIN
-    uint32_t counterNameOffset = 0; // The name is the first item in pool
+    uint32_t eventRecordBlockSize = 8u * sizeof(uint32_t);
+    uint32_t counterNameOffset = eventRecordBlockSize; // The name is the first item in pool
     uint32_t counterDescriptionOffset = counterNameOffset + // Counter name offset
                                         4u + // Counter name length (uint32_t)
                                         counterName.size() + // 18u
@@ -705,7 +712,8 @@ BOOST_AUTO_TEST_CASE(CreateEventRecordNoUnitsTest)
     BOOST_CHECK(eventRecord[6] == counterDescriptionOffset); // description_offset
     BOOST_CHECK(eventRecord[7] == 0); // units_offset
 
-    auto eventRecordPool = reinterpret_cast<unsigned char*>(eventRecord.data() + 8u); // The start of the pool
+    // Offsets are relative to the start of the eventRecord
+    auto eventRecordPool = reinterpret_cast<unsigned char*>(eventRecord.data());
     size_t uint32_t_size = sizeof(uint32_t);
 
     // The length of the SWTrace string (name)
@@ -926,15 +934,16 @@ BOOST_AUTO_TEST_CASE(CreateCategoryRecordTest)
     size_t uint32_t_size = sizeof(uint32_t);
 
     ARMNN_NO_CONVERSION_WARN_BEGIN
-    uint32_t eventPointerTableOffset = 0; // The event pointer table is the first item in pool
+    uint32_t categoryRecordBlockSize = 3u * uint32_t_size;
+    uint32_t eventPointerTableOffset = categoryRecordBlockSize; // The event pointer table is the first item in pool
     uint32_t categoryNameOffset = eventPointerTableOffset + // Event pointer table offset
                                   categoryEventCount * uint32_t_size; // The size of the event pointer table
     ARMNN_NO_CONVERSION_WARN_END
 
     BOOST_CHECK(categoryRecord[1] == eventPointerTableOffset); // event_pointer_table_offset
     BOOST_CHECK(categoryRecord[2] == categoryNameOffset); // name_offset
-
-    auto categoryRecordPool = reinterpret_cast<unsigned char*>(categoryRecord.data() + 3u); // The start of the pool
+    // Offsets are relative to the start of the category record
+    auto categoryRecordPool = reinterpret_cast<unsigned char*>(categoryRecord.data());
 
     // The event pointer table
     uint32_t eventRecord0Offset = categoryRecordPool[eventPointerTableOffset + 0 * uint32_t_size];
@@ -960,60 +969,71 @@ BOOST_AUTO_TEST_CASE(CreateCategoryRecordTest)
 
     // Counter1 UID and max counter UID
     uint16_t eventRecord0Word0[2] = { 0u, 0u };
-    std::memcpy(eventRecord0Word0, categoryRecordPool + eventRecord0Offset, sizeof(eventRecord0Word0));
+    std::memcpy(eventRecord0Word0, categoryRecordPool + categoryRecordBlockSize + eventRecord0Offset,
+                sizeof(eventRecord0Word0));
     BOOST_CHECK(eventRecord0Word0[0] == counter1->m_Uid);
     BOOST_CHECK(eventRecord0Word0[1] == counter1->m_MaxCounterUid);
 
     // Counter1 name
     uint32_t counter1NameOffset = 0;
-    std::memcpy(&counter1NameOffset, categoryRecordPool + eventRecord0Offset + 5u * uint32_t_size, uint32_t_size);
+    std::memcpy(&counter1NameOffset, categoryRecordPool  + eventRecord0Offset + 5u * uint32_t_size, uint32_t_size);
     BOOST_CHECK(counter1NameOffset == 0);
     // The length of the SWTrace string (name)
-    BOOST_CHECK(categoryRecordPool[eventRecord0Offset + // Offset to the event record
-                                   8u * uint32_t_size + // Offset to the event record pool
-                                   counter1NameOffset   // Offset to the name of the counter
+    BOOST_CHECK(categoryRecordPool[eventRecord0Offset +       // Offset to the event record
+                                   categoryRecordBlockSize  + // Offset to the end of the category record block
+                                   8u * uint32_t_size +       // Offset to the event record pool
+                                   counter1NameOffset         // Offset to the name of the counter
                                   ] == counter1->m_Name.size() + 1); // The length of the name including the
                                                                      // null-terminator
     // The counter1 name
-    BOOST_CHECK(std::memcmp(categoryRecordPool + // The beginning of the category pool
-                            eventRecord0Offset + // Offset to the event record
-                            8u * uint32_t_size + // Offset to the event record pool
-                            counter1NameOffset + // Offset to the name of the counter
-                            uint32_t_size,       // The length of the name
+    BOOST_CHECK(std::memcmp(categoryRecordPool +      // The beginning of the category pool
+                            categoryRecordBlockSize + // Offset to the end of the category record block
+                            eventRecord0Offset +      // Offset to the event record
+                            8u * uint32_t_size +      // Offset to the event record pool
+                            counter1NameOffset +      // Offset to the name of the counter
+                            uint32_t_size,            // The length of the name
                             counter1->m_Name.data(),
                             counter1->m_Name.size()) == 0); // name
     // The null-terminator at the end of the counter1 name
-    BOOST_CHECK(categoryRecordPool[eventRecord0Offset +    // Offset to the event record
-                                   8u * uint32_t_size +    // Offset to the event record pool
-                                   counter1NameOffset +    // Offset to the name of the counter
-                                   uint32_t_size +         // The length of the name
-                                   counter1->m_Name.size() // The name of the counter
+    BOOST_CHECK(categoryRecordPool[eventRecord0Offset +      // Offset to the event record
+                                   categoryRecordBlockSize + // Offset to the end of the category record block
+                                   8u * uint32_t_size +      // Offset to the event record pool
+                                   counter1NameOffset +      // Offset to the name of the counter
+                                   uint32_t_size +           // The length of the name
+                                   counter1->m_Name.size()   // The name of the counter
                                    ] == '\0');
 
     // Counter2 name
     uint32_t counter2NameOffset = 0;
-    std::memcpy(&counter2NameOffset, categoryRecordPool + eventRecord1Offset + 5u * uint32_t_size, uint32_t_size);
-    BOOST_CHECK(counter2NameOffset == 0);
+    std::memcpy(&counter2NameOffset, categoryRecordPool +
+                                     categoryRecordBlockSize +
+                                     eventRecord1Offset +
+                                     5u * uint32_t_size,
+                                     uint32_t_size);
+    BOOST_CHECK(counter2NameOffset == 8u * uint32_t_size );
     // The length of the SWTrace string (name)
+
     BOOST_CHECK(categoryRecordPool[eventRecord1Offset + // Offset to the event record
-                                   8u * uint32_t_size + // Offset to the event record pool
+                                   categoryRecordBlockSize +
                                    counter2NameOffset   // Offset to the name of the counter
                                   ] == counter2->m_Name.size() + 1); // The length of the name including the
                                                                      // null-terminator
     // The counter2 name
-    BOOST_CHECK(std::memcmp(categoryRecordPool + // The beginning of the category pool
-                            eventRecord1Offset + // Offset to the event record
-                            8u * uint32_t_size + // Offset to the event record pool
-                            counter2NameOffset + // Offset to the name of the counter
-                            uint32_t_size,       // The length of the name
+    BOOST_CHECK(std::memcmp(categoryRecordPool +      // The beginning of the category pool
+                            categoryRecordBlockSize + // Offset to the end of the category record block
+                            eventRecord1Offset +      // Offset to the event record
+                            counter2NameOffset +      // Offset to the name of the counter
+                            uint32_t_size,            // The length of the name
                             counter2->m_Name.data(),
                             counter2->m_Name.size()) == 0); // name
+
+
     // The null-terminator at the end of the counter2 name
-    BOOST_CHECK(categoryRecordPool[eventRecord1Offset +    // Offset to the event record
-                                   8u * uint32_t_size +    // Offset to the event record pool
-                                   counter2NameOffset +    // Offset to the name of the counter
-                                   uint32_t_size +         // The length of the name
-                                   counter2->m_Name.size() // The name of the counter
+    BOOST_CHECK(categoryRecordPool[eventRecord1Offset +      // Offset to the event record
+                                   categoryRecordBlockSize + // Offset to the end of the category record block
+                                   counter2NameOffset +      // Offset to the name of the counter
+                                   uint32_t_size +           // The length of the name
+                                   counter2->m_Name.size()   // The name of the counter
                                    ] == '\0');
 
     // Counter3 name
@@ -1022,12 +1042,14 @@ BOOST_AUTO_TEST_CASE(CreateCategoryRecordTest)
     BOOST_CHECK(counter3NameOffset == 0);
     // The length of the SWTrace string (name)
     BOOST_CHECK(categoryRecordPool[eventRecord2Offset + // Offset to the event record
+                                   categoryRecordBlockSize +
                                    8u * uint32_t_size + // Offset to the event record pool
                                    counter3NameOffset   // Offset to the name of the counter
                                   ] == counter3->m_Name.size() + 1); // The length of the name including the
                                                                      // null-terminator
     // The counter3 name
     BOOST_CHECK(std::memcmp(categoryRecordPool + // The beginning of the category pool
+                            categoryRecordBlockSize +
                             eventRecord2Offset + // Offset to the event record
                             8u * uint32_t_size + // Offset to the event record pool
                             counter3NameOffset + // Offset to the name of the counter
@@ -1036,6 +1058,7 @@ BOOST_AUTO_TEST_CASE(CreateCategoryRecordTest)
                             counter3->m_Name.size()) == 0); // name
     // The null-terminator at the end of the counter3 name
     BOOST_CHECK(categoryRecordPool[eventRecord2Offset +    // Offset to the event record
+                                   categoryRecordBlockSize +
                                    8u * uint32_t_size +    // Offset to the event record pool
                                    counter3NameOffset +    // Offset to the name of the counter
                                    uint32_t_size +         // The length of the name
@@ -1255,26 +1278,22 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
     // Check the device records pointer table
     const uint32_t deviceRecordOffset0 = ReadUint32(readBuffer, 32);
     const uint32_t deviceRecordOffset1 = ReadUint32(readBuffer, 36);
-    BOOST_TEST(deviceRecordOffset0 ==  0); // Device record offset for "device1"
-    BOOST_TEST(deviceRecordOffset1 == 20); // Device record offset for "device2"
+    BOOST_TEST(deviceRecordOffset0 == 20); // Device record offset for "device1"
+    BOOST_TEST(deviceRecordOffset1 == 40); // Device record offset for "device2"
 
     // Check the counter set pointer table
     const uint32_t counterSetRecordOffset0 = ReadUint32(readBuffer, 40);
-    BOOST_TEST(counterSetRecordOffset0 == 40); // Counter set record offset for "counterset1"
+    BOOST_TEST(counterSetRecordOffset0 == 52); // Counter set record offset for "counterset1"
 
     // Check the category pointer table
     const uint32_t categoryRecordOffset0 = ReadUint32(readBuffer, 44);
     const uint32_t categoryRecordOffset1 = ReadUint32(readBuffer, 48);
-    BOOST_TEST(categoryRecordOffset0 ==  64); // Category record offset for "category1"
-    BOOST_TEST(categoryRecordOffset1 == 168); // Category record offset for "category2"
+    BOOST_TEST(categoryRecordOffset0 ==  72); // Category record offset for "category1"
+    BOOST_TEST(categoryRecordOffset1 == 176); // Category record offset for "category2"
 
     // Get the device record pool offset
     const uint32_t uint32_t_size = sizeof(uint32_t);
-    const uint32_t packetBodyPoolOffset = 2u * uint32_t_size +                   // packet_header
-                                          bodyHeaderWord1 +                      // body_header
-                                          deviceRecordCount * uint32_t_size +    // Size of device_records_pointer_table
-                                          counterSetRecordCount * uint32_t_size  // Size of counter_set_pointer_table
-                                          + categoryRecordCount * uint32_t_size; // Size of categories_pointer_table
+    const uint32_t packetHeaderSize = 2u * uint32_t_size;
 
     // Device record structure/collection used for testing
     struct DeviceRecord
@@ -1286,30 +1305,41 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
         std::string name;
     };
     std::vector<DeviceRecord> deviceRecords;
-    const uint32_t deviceRecordsPointerTableOffset = 2u * uint32_t_size + // packet_header
+    const uint32_t deviceRecordsPointerTableOffset = packetHeaderSize +
                                                      bodyHeaderWord1;     // device_records_pointer_table_offset
 
     const unsigned char* readData = readBuffer->GetReadableData();
 
+    uint32_t offset = 0;
+    std::vector<uint32_t> data(800);
+
+    for (uint32_t i = 0; i < 800; i+=uint32_t_size)
+    {
+        data[i] = ReadUint32(readBuffer, offset);
+        offset += uint32_t_size;
+    }
+
+    std::vector<uint32_t> deviceRecordOffsets(deviceRecordCount);
+     offset = deviceRecordsPointerTableOffset;
+    for (uint32_t i = 0; i < deviceRecordCount; ++i)
+    {
+        // deviceRecordOffset is relative to the start of the deviceRecordsPointerTable
+        deviceRecordOffsets[i] = ReadUint32(readBuffer, offset) + deviceRecordsPointerTableOffset;
+        offset += uint32_t_size;
+    }
+
     for (uint32_t i = 0; i < deviceRecordCount; i++)
     {
-        // Get the device record offset
-        const uint32_t deviceRecordOffset = ReadUint32(readBuffer, deviceRecordsPointerTableOffset + i * uint32_t_size);
-
         // Collect the data for the device record
-        const uint32_t deviceRecordWord0 = ReadUint32(readBuffer,
-                                                      packetBodyPoolOffset + deviceRecordOffset + 0 * uint32_t_size);
-        const uint32_t deviceRecordWord1 = ReadUint32(readBuffer,
-                                                      packetBodyPoolOffset + deviceRecordOffset + 1 * uint32_t_size);
+        const uint32_t deviceRecordWord0 = ReadUint32(readBuffer, deviceRecordOffsets[i] + 0 * uint32_t_size);
+        const uint32_t deviceRecordWord1 = ReadUint32(readBuffer, deviceRecordOffsets[i] + 1 * uint32_t_size);
         DeviceRecord deviceRecord;
         deviceRecord.uid = static_cast<uint16_t>(deviceRecordWord0 >> 16); // uid
         deviceRecord.cores = static_cast<uint16_t>(deviceRecordWord0);     // cores
         deviceRecord.name_offset = deviceRecordWord1;                      // name_offset
 
-        uint32_t deviceRecordPoolOffset = packetBodyPoolOffset +    // Packet body offset
-                                          deviceRecordOffset +      // Device record offset
-                                          2 * uint32_t_size +       // Device record header
-                                          deviceRecord.name_offset; // Device name offset
+        uint32_t deviceRecordPoolOffset = deviceRecordOffsets[i] +                  // Packet body offset
+                                          deviceRecord.name_offset * uint32_t_size; // Device name offset
         uint32_t deviceRecordNameLength = ReadUint32(readBuffer, deviceRecordPoolOffset);
         deviceRecord.name_length = deviceRecordNameLength; // name_length
         unsigned char deviceRecordNameNullTerminator = // name null-terminator
@@ -1334,6 +1364,7 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
         BOOST_CHECK(device->m_Name  == deviceRecord.name);
     }
 
+
     // Counter set record structure/collection used for testing
     struct CounterSetRecord
     {
@@ -1346,28 +1377,29 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
     std::vector<CounterSetRecord> counterSetRecords;
     const uint32_t counterSetRecordsPointerTableOffset = 2u * uint32_t_size + // packet_header
                                                          bodyHeaderWord3;     // counter_set_pointer_table_offset
+
+    offset = counterSetRecordsPointerTableOffset;
+    std::vector<uint32_t> counterSetRecordOffsets(counterSetRecordCount);
+
+    for (uint32_t i = 0; i < counterSetRecordCount; ++i)
+    {
+        // counterSetRecordOffset is relative to the start of the dcounterSetRecordsPointerTable
+        counterSetRecordOffsets[i] = ReadUint32(readBuffer, offset) + counterSetRecordsPointerTableOffset;
+        offset += uint32_t_size;
+    }
+
     for (uint32_t i = 0; i < counterSetRecordCount; i++)
     {
-        // Get the counter set record offset
-        const uint32_t counterSetRecordOffset = ReadUint32(readBuffer,
-                                                           counterSetRecordsPointerTableOffset + i * uint32_t_size);
-
         // Collect the data for the counter set record
-        const uint32_t counterSetRecordWord0 = ReadUint32(readBuffer,
-                                                          packetBodyPoolOffset + counterSetRecordOffset +
-                                                          0 * uint32_t_size);
-        const uint32_t counterSetRecordWord1 = ReadUint32(readBuffer,
-                                                          packetBodyPoolOffset + counterSetRecordOffset +
-                                                          1 * uint32_t_size);
+        const uint32_t counterSetRecordWord0 = ReadUint32(readBuffer, counterSetRecordOffsets[i] + 0 * uint32_t_size);
+        const uint32_t counterSetRecordWord1 = ReadUint32(readBuffer, counterSetRecordOffsets[i] + 1 * uint32_t_size);
         CounterSetRecord counterSetRecord;
         counterSetRecord.uid = static_cast<uint16_t>(counterSetRecordWord0 >> 16); // uid
         counterSetRecord.count = static_cast<uint16_t>(counterSetRecordWord0);     // count
         counterSetRecord.name_offset = counterSetRecordWord1;                      // name_offset
 
-        uint32_t counterSetRecordPoolOffset = packetBodyPoolOffset +        // Packet body offset
-                                              counterSetRecordOffset +      // Counter set record offset
-                                              2 * uint32_t_size +           // Counter set record header
-                                              counterSetRecord.name_offset; // Counter set name offset
+        uint32_t counterSetRecordPoolOffset = counterSetRecordOffsets[i]  +                 // Packet body offset
+                                              counterSetRecord.name_offset * uint32_t_size; // Counter set name offset
         uint32_t counterSetRecordNameLength = ReadUint32(readBuffer, counterSetRecordPoolOffset);
         counterSetRecord.name_length = counterSetRecordNameLength; // name_length
         unsigned char counterSetRecordNameNullTerminator = // name null-terminator
@@ -1426,37 +1458,33 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
     std::vector<CategoryRecord> categoryRecords;
     const uint32_t categoryRecordsPointerTableOffset = 2u * uint32_t_size + // packet_header
                                                        bodyHeaderWord5;    // categories_pointer_table_offset
+
+    offset = categoryRecordsPointerTableOffset;
+    std::vector<uint32_t> categoryRecordOffsets(categoryRecordCount);
+    for (uint32_t i = 0; i < categoryRecordCount; ++i)
+    {
+        // categoryRecordOffset is relative to the start of the categoryRecordsPointerTable
+        categoryRecordOffsets[i] = ReadUint32(readBuffer, offset) + categoryRecordsPointerTableOffset;
+        offset += uint32_t_size;
+    }
+
     for (uint32_t i = 0; i < categoryRecordCount; i++)
     {
-        // Get the category record offset
-        const uint32_t categoryRecordOffset = ReadUint32(readBuffer, categoryRecordsPointerTableOffset +
-                                                         i * uint32_t_size);
-
         // Collect the data for the category record
-        const uint32_t categoryRecordWord1 = ReadUint32(readBuffer,
-                                                        packetBodyPoolOffset + categoryRecordOffset +
-                                                        0 * uint32_t_size);
-        const uint32_t categoryRecordWord2 = ReadUint32(readBuffer,
-                                                        packetBodyPoolOffset + categoryRecordOffset +
-                                                        1 * uint32_t_size);
-        const uint32_t categoryRecordWord3 = ReadUint32(readBuffer,
-                                                        packetBodyPoolOffset + categoryRecordOffset +
-                                                        2 * uint32_t_size);
+        const uint32_t categoryRecordWord1 = ReadUint32(readBuffer, categoryRecordOffsets[i] + 0 * uint32_t_size);
+        const uint32_t categoryRecordWord2 = ReadUint32(readBuffer, categoryRecordOffsets[i] + 1 * uint32_t_size);
+        const uint32_t categoryRecordWord3 = ReadUint32(readBuffer, categoryRecordOffsets[i] + 2 * uint32_t_size);
         CategoryRecord categoryRecord;
         categoryRecord.event_count = static_cast<uint16_t>(categoryRecordWord1 >> 16); // event_count
         categoryRecord.event_pointer_table_offset = categoryRecordWord2;               // event_pointer_table_offset
         categoryRecord.name_offset = categoryRecordWord3;                              // name_offset
 
-        uint32_t categoryRecordPoolOffset = packetBodyPoolOffset +      // Packet body offset
-                                            categoryRecordOffset +      // Category record offset
-                                            3 * uint32_t_size;          // Category record header
-
         uint32_t categoryRecordNameLength = ReadUint32(readBuffer,
-                                                       categoryRecordPoolOffset + categoryRecord.name_offset);
+                                                       categoryRecordOffsets[i] + categoryRecord.name_offset);
         categoryRecord.name_length = categoryRecordNameLength; // name_length
         unsigned char categoryRecordNameNullTerminator =
                 ReadUint8(readBuffer,
-                          categoryRecordPoolOffset +
+                          categoryRecordOffsets[i] +
                           categoryRecord.name_offset +
                           uint32_t_size +
                           categoryRecordNameLength - 1); // name null-terminator
@@ -1464,43 +1492,35 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
         std::vector<unsigned char> categoryRecordNameBuffer(categoryRecord.name_length - 1);
         std::memcpy(categoryRecordNameBuffer.data(),
                     readData +
-                    categoryRecordPoolOffset +
+                    categoryRecordOffsets[i] +
                     categoryRecord.name_offset +
                     uint32_t_size,
                     categoryRecordNameBuffer.size());
         categoryRecord.name.assign(categoryRecordNameBuffer.begin(), categoryRecordNameBuffer.end()); // name
 
         categoryRecord.event_pointer_table.resize(categoryRecord.event_count);
+        offset = categoryRecordOffsets[i] + categoryRecord.event_pointer_table_offset;
+        for (uint32_t eventOffsetIndex = 0; eventOffsetIndex < categoryRecord.event_count; ++eventOffsetIndex)
+        {
+            // eventRecordOffset is relative to the start of the event pointer table
+            categoryRecord.event_pointer_table[eventOffsetIndex] = ReadUint32(readBuffer, offset) +
+                                                                   categoryRecordOffsets[i] +
+                                                                   categoryRecord.event_pointer_table_offset;
+            offset += uint32_t_size;
+        }
+
         for (uint32_t eventIndex = 0; eventIndex < categoryRecord.event_count; eventIndex++)
         {
-            uint32_t eventRecordOffset = ReadUint32(readBuffer,
-                                                    categoryRecordPoolOffset +
-                                                    categoryRecord.event_pointer_table_offset +
-                                                    eventIndex * uint32_t_size);
-            categoryRecord.event_pointer_table[eventIndex] = eventRecordOffset;
-
+            const uint32_t eventOffset = categoryRecord.event_pointer_table[eventIndex];
             // Collect the data for the event record
-            const uint32_t eventRecordWord0  = ReadUint32(readBuffer,
-                                                          categoryRecordPoolOffset + eventRecordOffset +
-                                                          0 * uint32_t_size);
-            const uint32_t eventRecordWord1  = ReadUint32(readBuffer,
-                                                          categoryRecordPoolOffset + eventRecordOffset +
-                                                          1 * uint32_t_size);
-            const uint32_t eventRecordWord2  = ReadUint32(readBuffer,
-                                                          categoryRecordPoolOffset + eventRecordOffset +
-                                                          2 * uint32_t_size);
-            const uint64_t eventRecordWord34 = ReadUint64(readBuffer,
-                                                          categoryRecordPoolOffset + eventRecordOffset +
-                                                          3 * uint32_t_size);
-            const uint32_t eventRecordWord5 =  ReadUint32(readBuffer,
-                                                          categoryRecordPoolOffset + eventRecordOffset +
-                                                          5 * uint32_t_size);
-            const uint32_t eventRecordWord6 = ReadUint32(readBuffer,
-                                                         categoryRecordPoolOffset + eventRecordOffset +
-                                                         6 * uint32_t_size);
-            const uint32_t eventRecordWord7 = ReadUint32(readBuffer,
-                                                         categoryRecordPoolOffset + eventRecordOffset +
-                                                         7 * uint32_t_size);
+            const uint32_t eventRecordWord0  = ReadUint32(readBuffer, eventOffset + 0 * uint32_t_size);
+            const uint32_t eventRecordWord1  = ReadUint32(readBuffer, eventOffset + 1 * uint32_t_size);
+            const uint32_t eventRecordWord2  = ReadUint32(readBuffer, eventOffset + 2 * uint32_t_size);
+            const uint64_t eventRecordWord34 = ReadUint64(readBuffer, eventOffset + 3 * uint32_t_size);
+            const uint32_t eventRecordWord5  = ReadUint32(readBuffer, eventOffset + 5 * uint32_t_size);
+            const uint32_t eventRecordWord6  = ReadUint32(readBuffer, eventOffset + 6 * uint32_t_size);
+            const uint32_t eventRecordWord7  = ReadUint32(readBuffer, eventOffset + 7 * uint32_t_size);
+
             EventRecord eventRecord;
             eventRecord.counter_uid = static_cast<uint16_t>(eventRecordWord0);                     // counter_uid
             eventRecord.max_counter_uid = static_cast<uint16_t>(eventRecordWord0 >> 16);           // max_counter_uid
@@ -1513,16 +1533,11 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
             eventRecord.description_offset = static_cast<uint32_t>(eventRecordWord6);              // description_offset
             eventRecord.units_offset = static_cast<uint32_t>(eventRecordWord7);                    // units_offset
 
-            uint32_t eventRecordPoolOffset = categoryRecordPoolOffset + // Category record pool offset
-                                             eventRecordOffset +        // Event record offset
-                                             8 * uint32_t_size;         // Event record header
-
-            uint32_t eventRecordNameLength = ReadUint32(readBuffer,
-                                                        eventRecordPoolOffset + eventRecord.name_offset);
+            uint32_t eventRecordNameLength = ReadUint32(readBuffer, eventOffset + eventRecord.name_offset);
             eventRecord.name_length = eventRecordNameLength; // name_length
             unsigned char eventRecordNameNullTerminator =
                     ReadUint8(readBuffer,
-                              eventRecordPoolOffset +
+                              eventOffset +
                               eventRecord.name_offset +
                               uint32_t_size +
                               eventRecordNameLength - 1); // name null-terminator
@@ -1530,18 +1545,18 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
             std::vector<unsigned char> eventRecordNameBuffer(eventRecord.name_length - 1);
             std::memcpy(eventRecordNameBuffer.data(),
                         readData +
-                        eventRecordPoolOffset +
+                        eventOffset +
                         eventRecord.name_offset +
                         uint32_t_size,
                         eventRecordNameBuffer.size());
             eventRecord.name.assign(eventRecordNameBuffer.begin(), eventRecordNameBuffer.end()); // name
 
             uint32_t eventRecordDescriptionLength = ReadUint32(readBuffer,
-                                                               eventRecordPoolOffset + eventRecord.description_offset);
+                                                               eventOffset + eventRecord.description_offset);
             eventRecord.description_length = eventRecordDescriptionLength; // description_length
             unsigned char eventRecordDescriptionNullTerminator =
                     ReadUint8(readBuffer,
-                              eventRecordPoolOffset +
+                              eventOffset +
                               eventRecord.description_offset +
                               uint32_t_size +
                               eventRecordDescriptionLength - 1); // description null-terminator
@@ -1549,7 +1564,7 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
             std::vector<unsigned char> eventRecordDescriptionBuffer(eventRecord.description_length - 1);
             std::memcpy(eventRecordDescriptionBuffer.data(),
                         readData +
-                        eventRecordPoolOffset +
+                        eventOffset +
                         eventRecord.description_offset +
                         uint32_t_size,
                         eventRecordDescriptionBuffer.size());
@@ -1559,11 +1574,11 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
             if (eventRecord.units_offset > 0)
             {
                 uint32_t eventRecordUnitsLength = ReadUint32(readBuffer,
-                                                             eventRecordPoolOffset + eventRecord.units_offset);
+                                                             eventOffset + eventRecord.units_offset);
                 eventRecord.units_length = eventRecordUnitsLength; // units_length
                 unsigned char eventRecordUnitsNullTerminator =
                         ReadUint8(readBuffer,
-                                  eventRecordPoolOffset +
+                                  eventOffset +
                                   eventRecord.units_offset +
                                   uint32_t_size +
                                   eventRecordUnitsLength - 1); // units null-terminator
@@ -1571,7 +1586,7 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
                 std::vector<unsigned char> eventRecordUnitsBuffer(eventRecord.units_length - 1);
                 std::memcpy(eventRecordUnitsBuffer.data(),
                             readData +
-                            eventRecordPoolOffset +
+                            eventOffset +
                             eventRecord.units_offset +
                             uint32_t_size,
                             eventRecordUnitsBuffer.size());

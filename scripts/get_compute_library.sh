@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="359c48eaf251cbb84b523e5a67a099c739482e6c" #COMPMID-3379: Add support for QASYMM8_SIGNED in NEScale.
+DEFAULT_CLFRAMEWORKREVISION="6f7585b21a13f4792ef1a55ac943997491ba8aec" #COMPMID-3441: Nightly failed due to NEScale QASYMM8_SIGNED output wrong result
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

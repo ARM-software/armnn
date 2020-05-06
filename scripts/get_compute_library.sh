@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="6f7585b21a13f4792ef1a55ac943997491ba8aec" #COMPMID-3441: Nightly failed due to NEScale QASYMM8_SIGNED output wrong result
+DEFAULT_CLFRAMEWORKREVISION="77b8859688c333bca35ebc8ca4d0b2652f480c4a" #COMPMID-3443: Android R CTS 1.3 QASYMM8_SIGNED failure with MEAN on CpuAcc.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

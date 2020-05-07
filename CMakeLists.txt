@@ -250,6 +250,7 @@ list(APPEND armnn_sources
     include/armnn/utility/NumericCast.hpp
     include/armnn/utility/PolymorphicDowncast.hpp
     include/armnn/utility/StringUtils.hpp
+    profiling/common/include/Packet.hpp
     profiling/common/include/ProfilingException.hpp
     profiling/common/include/SocketConnectionException.hpp
     profiling/common/include/Constants.hpp
@@ -507,7 +508,6 @@ list(APPEND armnn_sources
     src/profiling/LabelsAndEventClasses.cpp
     src/profiling/LabelsAndEventClasses.hpp
     src/profiling/NullProfilingConnection.hpp
-    src/profiling/Packet.hpp
     src/profiling/PacketBuffer.cpp
     src/profiling/PacketBuffer.hpp
     src/profiling/PacketVersionResolver.cpp
@@ -921,7 +921,6 @@ if(BUILD_UNIT_TESTS)
     target_include_directories(UnitTests PRIVATE src/armnnUtils)
     target_include_directories(UnitTests PRIVATE src/backends)
     target_include_directories(UnitTests PRIVATE src/profiling)
-    target_include_directories(UnitTests PRIVATE src/timelineDecoder)
 
     if(VALGRIND_FOUND)
         if(HEAP_PROFILING OR LEAK_CHECKING)
@@ -1052,21 +1051,33 @@ if(BUILD_GATORD_MOCK)
         tests/profiling/gatordmock/StubCommandHandler.hpp
         )
 
-    include_directories(src/profiling src/timelineDecoder profiling/server/src/basePipeServer tests/profiling)
-
     add_library_ex(gatordMockService STATIC ${gatord_mock_sources})
-    target_include_directories(gatordMockService PRIVATE src/armnnUtils)
+
+    target_include_directories(gatordMockService PRIVATE profiling/common/include
+                                                         profiling/server/src/basePipeServer
+                                                         src/armnnUtils
+                                                         src/profiling
+                                                         src/timelineDecoder)
+
+    if(BUILD_UNIT_TESTS)
+        target_include_directories(UnitTests PRIVATE tests/profiling/gatordmock)
+        target_include_directories(UnitTests PRIVATE src/backends/backendsCommon/test)
+    endif()
 
     add_executable_ex(GatordMock tests/profiling/gatordmock/GatordMockMain.cpp)
-    target_include_directories(GatordMock PRIVATE src/armnnUtils)
+
+    target_include_directories(GatordMock PRIVATE profiling/common/include
+                                                  profiling/server/src/basePipeServer
+                                                  src/profiling
+                                                  src/timelineDecoder)
 
     target_link_libraries(GatordMock
-        armnn
-        armnnBasePipeServer
-        timelineDecoder
-        gatordMockService
-        ${Boost_PROGRAM_OPTIONS_LIBRARY}
-        ${Boost_SYSTEM_LIBRARY})
+                          armnn
+                          armnnBasePipeServer
+                          timelineDecoder
+                          gatordMockService
+                          ${Boost_PROGRAM_OPTIONS_LIBRARY}
+                          ${Boost_SYSTEM_LIBRARY})
 
     if(Threads_FOUND AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
         target_link_libraries(GatordMock pthread)

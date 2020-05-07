@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "../ConnectionHandler.hpp"
+#include <ConnectionHandler.hpp>
 
 #include <SocketProfilingConnection.hpp>
 #include <Processes.hpp>

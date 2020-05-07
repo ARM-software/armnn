@@ -7,11 +7,14 @@
 
 #include "CommandHandlerFunctor.hpp"
 #include "ProfilingStateMachine.hpp"
-#include "Packet.hpp"
 #include "SendTimelinePacket.hpp"
 #include "IReportStructure.hpp"
-#include "armnn/Optional.hpp"
 #include "INotifyBackends.hpp"
+
+#include "armnn/Optional.hpp"
+
+#include "common/include/Packet.hpp"
+
 
 namespace armnn
 {

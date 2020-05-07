@@ -8,7 +8,7 @@
 #include <armnn/profiling/ILocalPacketHandler.hpp>
 #include "DirectoryCaptureCommandHandler.hpp"
 #include "IProfilingConnection.hpp"
-#include "Packet.hpp"
+#include "common/include/Packet.hpp"
 #include "ProfilingUtils.hpp"
 #include "Runtime.hpp"
 

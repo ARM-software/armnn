@@ -6,7 +6,7 @@
 #pragma once
 
 #include <armnn/profiling/ILocalPacketHandler.hpp>
-#include "Packet.hpp"
+#include <Packet.hpp>
 
 namespace armnn
 {

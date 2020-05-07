@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include "common/include/NetworkSockets.hpp"
-#include "../../../../src/profiling/Packet.hpp"
-#include "common/include/SocketConnectionException.hpp"
+#include <NetworkSockets.hpp>
+#include <Packet.hpp>
+#include <SocketConnectionException.hpp>
 
 #include <string>
 #include <atomic>

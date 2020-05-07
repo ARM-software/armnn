@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "armnn/profiling/ITimelineDecoder.hpp"
+#include <armnn/profiling/ITimelineDecoder.hpp>
 
 #include <map>
 #include <vector>

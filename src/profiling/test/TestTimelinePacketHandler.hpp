@@ -7,7 +7,8 @@
 
 #include <armnn/profiling/ILocalPacketHandler.hpp>
 #include <armnn/profiling/ITimelineDecoder.hpp>
-#include "Packet.hpp"
+#include <Packet.hpp>
+
 #include "ProfilingUtils.hpp"
 #include "TimelineCaptureCommandHandler.hpp"
 #include "TimelineDirectoryCaptureCommandHandler.hpp"

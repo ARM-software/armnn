@@ -5,7 +5,7 @@
 
 #include "PeriodicCounterSelectionResponseHandler.hpp"
 
-#include "../../../src/profiling/ProfilingUtils.hpp"
+#include <ProfilingUtils.hpp>
 
 #include <iostream>
 

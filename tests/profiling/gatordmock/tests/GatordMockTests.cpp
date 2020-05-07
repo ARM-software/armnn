@@ -6,7 +6,7 @@
 #include <CommandHandlerRegistry.hpp>
 #include <ConnectionHandler.hpp>
 #include <DirectoryCaptureCommandHandler.hpp>
-#include <gatordmock/GatordMockService.hpp>
+#include <GatordMockService.hpp>
 #include <LabelsAndEventClasses.hpp>
 #include <ProfilingService.hpp>
 #include <TimelinePacketWriterFactory.hpp>
@@ -15,7 +15,8 @@
 #include <TimelineDecoder.hpp>
 
 #include <Runtime.hpp>
-#include "../../src/backends/backendsCommon/test/MockBackend.hpp"
+
+#include <MockBackend.hpp>
 
 #include <boost/cast.hpp>
 #include <boost/test/test_tools.hpp>

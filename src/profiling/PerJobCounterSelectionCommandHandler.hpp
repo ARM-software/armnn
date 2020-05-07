@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "Packet.hpp"
+#include "common/include/Packet.hpp"
 #include "CommandHandlerFunctor.hpp"
 #include "ProfilingStateMachine.hpp"
 

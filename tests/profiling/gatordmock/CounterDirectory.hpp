@@ -9,7 +9,7 @@
 #include "GatordMockService.hpp"
 #include "MockUtils.hpp"
 
-#include "Packet.hpp"
+#include <Packet.hpp>
 #include "CommandHandlerFunctor.hpp"
 #include "SendCounterPacket.hpp"
 #include "IPeriodicCounterCapture.hpp"

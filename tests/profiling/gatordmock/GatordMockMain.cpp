@@ -5,8 +5,9 @@
 
 #include "CommandFileParser.hpp"
 #include "CommandLineProcessor.hpp"
-#include <ConnectionHandler.hpp>
 #include "GatordMockService.hpp"
+
+#include <ConnectionHandler.hpp>
 
 #include <string>
 #include <signal.h>

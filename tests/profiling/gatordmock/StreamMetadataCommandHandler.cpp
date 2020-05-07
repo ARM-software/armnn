@@ -7,9 +7,6 @@
 
 #include <ProfilingUtils.hpp>
 
-#include <boost/cast.hpp>
-
-#include <sstream>
 #include <iostream>
 
 using namespace armnn::profiling;

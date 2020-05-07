@@ -4,6 +4,7 @@
 //
 #include <armnn/ArmNN.hpp>
 #include <armnn/TypesUtils.hpp>
+#include <armnn/utility/Timer.hpp>
 
 #if defined(ARMNN_SERIALIZER)
 #include "armnnDeserializer/IDeserializer.hpp"
@@ -378,7 +379,8 @@ struct ExecuteNetworkParams
 
 template<typename TParser, typename TDataType>
 int MainImpl(const ExecuteNetworkParams& params,
-             const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
+             const std::shared_ptr<armnn::IRuntime>& runtime = nullptr,
+             size_t iterations = 1)
 {
     using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
 
@@ -473,44 +475,47 @@ int MainImpl(const ExecuteNetworkParams& params,
             }
         }
 
-        // model.Run returns the inference time elapsed in EnqueueWorkload (in milliseconds)
-        auto inference_duration = model.Run(inputDataContainers, outputDataContainers);
-
-        if (params.m_GenerateTensorData)
+        for (size_t x = 0; x < iterations; x++)
         {
-            ARMNN_LOG(warning) << "The input data was generated, note that the output will not be useful";
-        }
+            // model.Run returns the inference time elapsed in EnqueueWorkload (in milliseconds)
+            auto inference_duration = model.Run(inputDataContainers, outputDataContainers);
 
-        // Print output tensors
-        const auto& infosOut = model.GetOutputBindingInfos();
-        for (size_t i = 0; i < numOutputs; i++)
-        {
-            const armnn::TensorInfo& infoOut = infosOut[i].second;
-            auto outputTensorFile = params.m_OutputTensorFiles.empty() ? "" : params.m_OutputTensorFiles[i];
-
-            TensorPrinter printer(inferenceModelParams.m_OutputBindings[i],
-                                  infoOut,
-                                  outputTensorFile,
-                                  params.m_DequantizeOutput);
-            boost::apply_visitor(printer, outputDataContainers[i]);
-        }
-
-        ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)
-                                << std::fixed << inference_duration.count() << " ms";
-
-        // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
-        if (params.m_ThresholdTime != 0.0)
-        {
-            ARMNN_LOG(info) << "Threshold time: " << std::setprecision(2)
-                                    << std::fixed << params.m_ThresholdTime << " ms";
-            auto thresholdMinusInference = params.m_ThresholdTime - inference_duration.count();
-            ARMNN_LOG(info) << "Threshold time - Inference time: " << std::setprecision(2)
-                                    << std::fixed << thresholdMinusInference << " ms" << "\n";
-
-            if (thresholdMinusInference < 0)
+            if (params.m_GenerateTensorData)
             {
-                std::string errorMessage = "Elapsed inference time is greater than provided threshold time.";
-                ARMNN_LOG(fatal) << errorMessage;
+                ARMNN_LOG(warning) << "The input data was generated, note that the output will not be useful";
+            }
+
+            // Print output tensors
+            const auto& infosOut = model.GetOutputBindingInfos();
+            for (size_t i = 0; i < numOutputs; i++)
+            {
+                const armnn::TensorInfo& infoOut = infosOut[i].second;
+                auto outputTensorFile = params.m_OutputTensorFiles.empty() ? "" : params.m_OutputTensorFiles[i];
+
+                TensorPrinter printer(inferenceModelParams.m_OutputBindings[i],
+                                    infoOut,
+                                    outputTensorFile,
+                                    params.m_DequantizeOutput);
+                boost::apply_visitor(printer, outputDataContainers[i]);
+            }
+
+            ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)
+                                    << std::fixed << inference_duration.count() << " ms\n";
+
+            // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
+            if (params.m_ThresholdTime != 0.0)
+            {
+                ARMNN_LOG(info) << "Threshold time: " << std::setprecision(2)
+                                        << std::fixed << params.m_ThresholdTime << " ms";
+                auto thresholdMinusInference = params.m_ThresholdTime - inference_duration.count();
+                ARMNN_LOG(info) << "Threshold time - Inference time: " << std::setprecision(2)
+                                        << std::fixed << thresholdMinusInference << " ms" << "\n";
+
+                if (thresholdMinusInference < 0)
+                {
+                    std::string errorMessage = "Elapsed inference time is greater than provided threshold time.";
+                    ARMNN_LOG(fatal) << errorMessage;
+                }
             }
         }
     }
@@ -545,6 +550,7 @@ int RunTest(const std::string& format,
             const size_t subgraphId,
             bool enableLayerDetails = false,
             bool parseUnsupported = false,
+            const size_t iterations = 1,
             const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
     std::string modelFormat = armnn::stringUtils::StringTrimCopy(format);
@@ -682,34 +688,34 @@ int RunTest(const std::string& format,
     if (modelFormat.find("armnn") != std::string::npos)
     {
 #if defined(ARMNN_SERIALIZER)
-    return MainImpl<armnnDeserializer::IDeserializer, float>(params, runtime);
+        return MainImpl<armnnDeserializer::IDeserializer, float>(params, runtime, iterations);
 #else
         ARMNN_LOG(fatal) << "Not built with serialization support.";
-    return EXIT_FAILURE;
+        return EXIT_FAILURE;
 #endif
     }
     else if (modelFormat.find("caffe") != std::string::npos)
     {
 #if defined(ARMNN_CAFFE_PARSER)
-        return MainImpl<armnnCaffeParser::ICaffeParser, float>(params, runtime);
+        return MainImpl<armnnCaffeParser::ICaffeParser, float>(params, runtime, iterations);
 #else
         ARMNN_LOG(fatal) << "Not built with Caffe parser support.";
         return EXIT_FAILURE;
 #endif
     }
     else if (modelFormat.find("onnx") != std::string::npos)
-{
+    {
 #if defined(ARMNN_ONNX_PARSER)
-    return MainImpl<armnnOnnxParser::IOnnxParser, float>(params, runtime);
+        return MainImpl<armnnOnnxParser::IOnnxParser, float>(params, runtime, iterations);
 #else
         ARMNN_LOG(fatal) << "Not built with Onnx parser support.";
-    return EXIT_FAILURE;
+        return EXIT_FAILURE;
 #endif
     }
     else if (modelFormat.find("tensorflow") != std::string::npos)
     {
 #if defined(ARMNN_TF_PARSER)
-        return MainImpl<armnnTfParser::ITfParser, float>(params, runtime);
+        return MainImpl<armnnTfParser::ITfParser, float>(params, runtime, iterations);
 #else
         ARMNN_LOG(fatal) << "Not built with Tensorflow parser support.";
         return EXIT_FAILURE;
@@ -720,21 +726,21 @@ int RunTest(const std::string& format,
 #if defined(ARMNN_TF_LITE_PARSER)
         if (! isModelBinary)
         {
-            ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat << "'. Only 'binary' format supported \
-              for tflite files";
+            ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat
+                << "'. Only 'binary' format supported for tflite files";
             return EXIT_FAILURE;
         }
-        return MainImpl<armnnTfLiteParser::ITfLiteParser, float>(params, runtime);
+        return MainImpl<armnnTfLiteParser::ITfLiteParser, float>(params, runtime, iterations);
 #else
-        ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat <<
-            "'. Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'";
+        ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat
+            << "'. Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'";
         return EXIT_FAILURE;
 #endif
     }
     else
     {
-        ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat <<
-                                 "'. Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'";
+        ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat
+            << "'. Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'";
         return EXIT_FAILURE;
     }
 }
@@ -864,3 +870,57 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
                    dequantizeOutput, enableProfiling, enableFp16TurboMode, enableBf16TurboMode,
                    thresholdTime, printIntermediate, subgraphId, enableLayerDetails, parseUnuspported);
 }
+
+#if defined(ARMCOMPUTECL_ENABLED)
+int RunCLTuning(const std::string& tuningPath,
+            const int tuningLevel,
+            const std::string& modelFormat,
+            const std::string& inputTensorShapes,
+            const vector<armnn::BackendId>& computeDevices,
+            const std::string& dynamicBackendsPath,
+            const std::string& modelPath,
+            const std::string& inputNames,
+            const std::string& inputTensorDataFilePaths,
+            const std::string& inputTypes,
+            bool quantizeInput,
+            const std::string& outputTypes,
+            const std::string& outputNames,
+            const std::string& outputTensorFiles,
+            bool dequantizeOutput,
+            bool enableProfiling,
+            bool enableFp16TurboMode,
+            bool enableBf16TurboMode,
+            const double& thresholdTime,
+            bool printIntermediate,
+            const size_t subgraphId,
+            bool enableLayerDetails = false,
+            bool parseUnsupported = false)
+{
+    armnn::IRuntime::CreationOptions options;
+    options.m_BackendOptions.emplace_back(
+        armnn::BackendOptions
+        {
+            "GpuAcc",
+            {
+                {"TuningLevel", tuningLevel},
+                {"TuningFile", tuningPath.c_str()},
+                {"KernelProfilingEnabled", enableProfiling}
+            }
+        }
+    );
+
+    std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(options));
+    const auto start_time = armnn::GetTimeNow();
+
+    ARMNN_LOG(info) << "Tuning run...\n";
+    int state = RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
+                        inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
+                        outputTensorFiles, dequantizeOutput, enableProfiling, enableFp16TurboMode, enableBf16TurboMode,
+                        thresholdTime, printIntermediate, subgraphId, enableLayerDetails, parseUnsupported, 1, runtime);
+
+    ARMNN_LOG(info) << "Tuning time: " << std::setprecision(2)
+                    << std::fixed << armnn::GetTimeDuration(start_time).count() << " ms\n";
+
+    return state;
+}
+#endif

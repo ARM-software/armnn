@@ -6,6 +6,8 @@
 #pragma once
 
 #include <armnn/ArmNN.hpp>
+#include <armnn/Logging.hpp>
+#include <armnn/utility/Timer.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/utility/Assert.hpp>
 
@@ -31,7 +33,6 @@
 #include <boost/variant.hpp>
 
 #include <algorithm>
-#include <chrono>
 #include <iterator>
 #include <fstream>
 #include <map>
@@ -399,7 +400,11 @@ public:
             throw armnn::Exception("Some backend IDs are invalid: " + invalidBackends);
         }
 
+        const auto parsing_start_time = armnn::GetTimeNow();
         armnn::INetworkPtr network = CreateNetworkImpl<IParser>::Create(params, m_InputBindings, m_OutputBindings);
+
+        ARMNN_LOG(info) << "Network parsing time: " << std::setprecision(2)
+                        << std::fixed << armnn::GetTimeDuration(parsing_start_time).count() << " ms\n";
 
         armnn::IOptimizedNetworkPtr optNet{nullptr, [](armnn::IOptimizedNetwork*){}};
         {
@@ -410,7 +415,12 @@ public:
             options.m_ReduceFp32ToBf16 = params.m_EnableBf16TurboMode;
             options.m_Debug = params.m_PrintIntermediateLayers;
 
+            const auto optimization_start_time = armnn::GetTimeNow();
             optNet = armnn::Optimize(*network, params.m_ComputeDevices, m_Runtime->GetDeviceSpec(), options);
+
+            ARMNN_LOG(info) << "Optimization time: " << std::setprecision(2)
+                            << std::fixed << armnn::GetTimeDuration(optimization_start_time).count() << " ms\n";
+
             if (!optNet)
             {
                 throw armnn::Exception("Optimize returned nullptr");
@@ -494,13 +504,13 @@ public:
         }
 
         // Start timer to record inference time in EnqueueWorkload (in milliseconds)
-        const auto start_time = GetCurrentTime();
+        const auto start_time = armnn::GetTimeNow();
 
         armnn::Status ret = m_Runtime->EnqueueWorkload(m_NetworkIdentifier,
                                                        MakeInputTensors(inputContainers),
                                                        MakeOutputTensors(outputContainers));
 
-        const auto end_time = GetCurrentTime();
+        const auto duration = armnn::GetTimeDuration(start_time);
 
         // if profiling is enabled print out the results
         if (profiler && profiler->IsProfilingEnabled())
@@ -514,7 +524,7 @@ public:
         }
         else
         {
-            return std::chrono::duration<double, std::milli>(end_time - start_time);
+            return duration;
         }
     }
 
@@ -584,17 +594,4 @@ private:
     {
         return armnnUtils::MakeOutputTensors(m_OutputBindings, outputDataContainers);
     }
-
-    std::chrono::high_resolution_clock::time_point GetCurrentTime()
-    {
-        return std::chrono::high_resolution_clock::now();
-    }
-
-    std::chrono::duration<double, std::milli> GetTimeDuration(
-            std::chrono::high_resolution_clock::time_point& start_time,
-            std::chrono::high_resolution_clock::time_point& end_time)
-    {
-        return std::chrono::duration<double, std::milli>(end_time - start_time);
-    }
-
 };

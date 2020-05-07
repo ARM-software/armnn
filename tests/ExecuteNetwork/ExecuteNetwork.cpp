@@ -35,6 +35,10 @@ int main(int argc, const char* argv[])
     uint32_t counterCapturePeriod;
     std::string fileFormat;
 
+    size_t iterations = 1;
+    int tuningLevel = 0;
+    std::string tuningPath;
+
     double thresholdTime = 0.0;
 
     size_t subgraphId = 0;
@@ -121,6 +125,14 @@ int main(int argc, const char* argv[])
              "If profiling is enabled in 'file-only' mode this is the capture period that will be used in the test")
             ("file-format", po::value(&fileFormat)->default_value("binary"),
              "If profiling is enabled specifies the output file format")
+            ("iterations", po::value<size_t>(&iterations)->default_value(1),
+             "Number of iterations to run the network for, default is set to 1")
+            ("tuning-path", po::value(&tuningPath),
+            "Path to tuning file. Enables use of CL tuning")
+            ("tuning-level", po::value<int>(&tuningLevel)->default_value(0),
+             "Sets the tuning level which enables a tuning run which will update/create a tuning file. "
+             "Available options are: 1 (Rapid), 2 (Normal), 3 (Exhaustive). "
+             "Requires tuning-path to be set, default is set to 0 (No tuning run)")
             ("parse-unsupported", po::bool_switch()->default_value(false),
                 "Add unsupported operators as stand-in layers (where supported by parser)");
     }
@@ -275,6 +287,33 @@ int main(int argc, const char* argv[])
         // Remove duplicates from the list of compute devices.
         RemoveDuplicateDevices(computeDevices);
 
+#if defined(ARMCOMPUTECL_ENABLED)
+        std::shared_ptr<armnn::IGpuAccTunedParameters> tuned_params;
+
+        if (tuningPath != "")
+        {
+            if (tuningLevel != 0)
+            {
+                RunCLTuning(tuningPath, tuningLevel, modelFormat, inputTensorShapes, computeDevices,
+                    dynamicBackendsPath, modelPath, inputNames, inputTensorDataFilePaths, inputTypes, quantizeInput,
+                    outputTypes, outputNames, outputTensorFiles, dequantizeOutput, enableProfiling,
+                    enableFp16TurboMode, enableBf16TurboMode, thresholdTime, printIntermediate, subgraphId,
+                    enableLayerDetails, parseUnsupported);
+            }
+            ARMNN_LOG(info) << "Using tuning params: " << tuningPath << "\n";
+            options.m_BackendOptions.emplace_back(
+                armnn::BackendOptions
+                {
+                    "GpuAcc",
+                    {
+                        {"TuningLevel", 0},
+                        {"TuningFile", tuningPath.c_str()},
+                        {"KernelProfilingEnabled", enableProfiling}
+                    }
+                }
+            );
+        }
+#endif
         try
         {
             CheckOptionDependencies(vm);
@@ -288,9 +327,9 @@ int main(int argc, const char* argv[])
         // Create runtime
         std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(options));
 
-        return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
-                       inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
-                       outputTensorFiles, dequantizeOutput, enableProfiling, enableFp16TurboMode, enableBf16TurboMode,
-                       thresholdTime, printIntermediate, subgraphId, enableLayerDetails, parseUnsupported, runtime);
+        return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath,
+            inputNames, inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
+            outputTensorFiles, dequantizeOutput, enableProfiling, enableFp16TurboMode, enableBf16TurboMode,
+            thresholdTime, printIntermediate, subgraphId, enableLayerDetails, parseUnsupported, iterations, runtime);
     }
 }

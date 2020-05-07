@@ -7,6 +7,7 @@
 #include <armnn/Version.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Logging.hpp>
+#include <armnn/utility/Timer.hpp>
 
 #include <armnn/backends/IBackendContext.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
@@ -171,6 +172,7 @@ Runtime::Runtime(const CreationOptions& options)
     : m_NetworkIdCounter(0),
       m_ProfilingService(*this)
 {
+    const auto start_time = armnn::GetTimeNow();
     ARMNN_LOG(info) << "ArmNN v" << ARMNN_VERSION << "\n";
 
     if ( options.m_ProfilingOptions.m_TimelineEnabled && !options.m_ProfilingOptions.m_EnableProfiling )
@@ -225,10 +227,14 @@ Runtime::Runtime(const CreationOptions& options)
     m_ProfilingService.ConfigureProfilingService(options.m_ProfilingOptions);
 
     m_DeviceSpec.AddSupportedBackends(supportedBackends);
+
+    ARMNN_LOG(info) << "Initialization time: " << std::setprecision(2)
+                    << std::fixed << armnn::GetTimeDuration(start_time).count() << " ms\n";
 }
 
 Runtime::~Runtime()
 {
+    const auto start_time = armnn::GetTimeNow();
     std::vector<int> networkIDs;
     try
     {
@@ -272,6 +278,8 @@ Runtime::~Runtime()
     m_BackendContexts.clear();
 
     BackendRegistryInstance().SetProfilingService(armnn::EmptyOptional());
+    ARMNN_LOG(info) << "Shutdown time: " << std::setprecision(2)
+                    << std::fixed << armnn::GetTimeDuration(start_time).count() << " ms\n";
 }
 
 LoadedNetwork* Runtime::GetLoadedNetworkPtr(NetworkId networkId) const

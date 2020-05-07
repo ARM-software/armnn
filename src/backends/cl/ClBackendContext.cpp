@@ -79,7 +79,7 @@ TuningLevel ParseTuningLevel(const BackendOptions::Var& value, TuningLevel defau
 {
     if (value.IsInt())
     {
-        int v = value.IsInt();
+        int v = value.AsInt();
         if (v > static_cast<int>(TuningLevel::Exhaustive) ||
             v < static_cast<int>(TuningLevel::None))
         {
@@ -218,18 +218,18 @@ ClBackendContext::ClBackendContext(const IRuntime::CreationOptions& options)
 
         ConfigureTuner(*(m_Tuner.get()), tuningLevel);
 
-        if (!m_TuningFile.empty())
+        if (!m_TuningFile.empty() && tuningLevel == TuningLevel::None)
         {
             try
             {
                 m_Tuner->load_from_file(m_TuningFile.c_str());
-            } catch (const std::exception& e)
+            }
+            catch (const std::exception& e)
             {
                 ARMNN_LOG(warning) << "Could not load GpuAcc tuner data file.";
             }
-
-            tuner = m_Tuner.get();
         }
+        tuner = m_Tuner.get();
     }
 
     m_ClContextControlWrapper = std::make_unique<ClContextControlWrapper>(

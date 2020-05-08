@@ -35,6 +35,8 @@ Static quantization is supported by default but dynamic quantization can be enab
 
 Note that Arm NN needs to be built against a particular version of [ARM's Compute Library](https://github.com/ARM-software/ComputeLibrary). The get_compute_library.sh in the scripts subdirectory will clone the compute library from the review.mlplatform.org github repository into a directory alongside armnn named 'clframework' and checks out the correct revision.
 
+For FAQs and troubleshooting advice, see [FAQ.md](docs/FAQ.md)
+
 ### License
 
 Arm NN is provided under the [MIT](https://spdx.org/licenses/MIT.html) license.

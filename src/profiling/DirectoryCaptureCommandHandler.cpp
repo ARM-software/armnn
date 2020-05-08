@@ -230,21 +230,21 @@ std::vector<CounterDirectoryEventRecord> DirectoryCaptureCommandHandler::ReadEve
         // Event record word 1:
         // 0:15  [16] counter_set: UID of the counter_set this event is associated with. Set to zero if the event
         //                         is NOT associated with a counter_set
-        eventRecords[i].m_DeviceUid = profiling::ReadUint16(data, eventRecordOffset);
+        eventRecords[i].m_CounterSetUid  = profiling::ReadUint16(data, eventRecordOffset);
         eventRecordOffset += uint16_t_size;
 
         // 16:31 [16] device: UID of the device this event is associated with. Set to zero if the event is NOT
         //                    associated with a device
-        eventRecords[i].m_CounterSetUid = profiling::ReadUint16(data, eventRecordOffset);
+        eventRecords[i].m_DeviceUid = profiling::ReadUint16(data, eventRecordOffset);
         eventRecordOffset += uint16_t_size;
 
         // Event record word 2:
         // 0:15  [16] interpolation: type describing how to interpolate each data point in a stream of data points
-        eventRecords[i].m_CounterClass = profiling::ReadUint16(data, eventRecordOffset);
+        eventRecords[i].m_CounterInterpolation = profiling::ReadUint16(data, eventRecordOffset);
         eventRecordOffset += uint16_t_size;
 
         // 16:31 [16] class: type describing how to treat each data point in a stream of data points
-        eventRecords[i].m_CounterInterpolation = profiling::ReadUint16(data, eventRecordOffset);
+        eventRecords[i].m_CounterClass = profiling::ReadUint16(data, eventRecordOffset);
         eventRecordOffset += uint16_t_size;
 
         // Event record word 3-4:

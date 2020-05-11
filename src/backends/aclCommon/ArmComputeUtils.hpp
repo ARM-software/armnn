@@ -150,7 +150,8 @@ inline arm_compute::InterpolationPolicy ConvertResizeMethodToAclInterpolationPol
     }
 }
 
-inline unsigned int ComputeSoftmaxAclAxis(const SoftmaxDescriptor& softmaxDesc, const armnn::TensorInfo& tensor)
+template<typename T>
+inline T ComputeSoftmaxAclAxis(const SoftmaxDescriptor& softmaxDesc, const armnn::TensorInfo& tensor)
 {
     // Detect the Android default value of -1 and return the ACL default value of 1.
     if (softmaxDesc.m_Axis == -1)
@@ -163,7 +164,7 @@ inline unsigned int ComputeSoftmaxAclAxis(const SoftmaxDescriptor& softmaxDesc, 
     ARMNN_ASSERT(dim != 0);
 
     // Currently ArmNN support axis 1.
-    return dim - 1;
+    return static_cast<T>(dim) - 1;
 }
 
 inline std::set<unsigned int> ComputeSplitAxis(const armnn::SplitterDescriptor& desc, const TensorShape& input)

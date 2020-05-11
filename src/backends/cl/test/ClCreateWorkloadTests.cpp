@@ -569,19 +569,41 @@ static void ClSoftmaxWorkloadTest()
     auto inputHandle = PolymorphicDowncast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = PolymorphicDowncast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
+    armnn::TensorInfo tensorInfo({4, 1}, DataType);
+    if (DataType == armnn::DataType::QAsymmU8)
+    {
+        tensorInfo.SetQuantizationOffset(0);
+        tensorInfo.SetQuantizationScale(1.f / 256);
+    }
+    else if (DataType == armnn::DataType::QAsymmS8)
+    {
+        tensorInfo.SetQuantizationOffset(-128);
+        tensorInfo.SetQuantizationScale(1.f / 256);
+    }
+
     BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {4, 1}));
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {4, 1}));
 }
 
 
-BOOST_AUTO_TEST_CASE(CreateSoftmaxFloatWorkloadTest)
+BOOST_AUTO_TEST_CASE(CreateSoftmaxFloat32WorkloadTest)
 {
-    ClSoftmaxWorkloadTest<ClSoftmaxFloatWorkload, armnn::DataType::Float32>();
+    ClSoftmaxWorkloadTest<ClSoftmaxWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSoftmaxFloat16WorkloadTest)
 {
-    ClSoftmaxWorkloadTest<ClSoftmaxFloatWorkload, armnn::DataType::Float16>();
+    ClSoftmaxWorkloadTest<ClSoftmaxWorkload, armnn::DataType::Float16>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSoftmaxQAsymmU8Workload)
+{
+    ClSoftmaxWorkloadTest<ClSoftmaxWorkload, armnn::DataType::QAsymmU8>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSoftmaxQAsymmS8Workload)
+{
+    ClSoftmaxWorkloadTest<ClSoftmaxWorkload, armnn::DataType::QAsymmS8>();
 }
 
 template <typename armnn::DataType DataType>

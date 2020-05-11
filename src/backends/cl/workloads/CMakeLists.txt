@@ -78,12 +78,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClRsqrtWorkload.hpp
     ClSliceWorkload.cpp
     ClSliceWorkload.hpp
-    ClSoftmaxBaseWorkload.cpp
-    ClSoftmaxBaseWorkload.hpp
-    ClSoftmaxFloatWorkload.cpp
-    ClSoftmaxFloatWorkload.hpp
-    ClSoftmaxUint8Workload.cpp
-    ClSoftmaxUint8Workload.hpp
+    ClSoftmaxWorkload.cpp
+    ClSoftmaxWorkload.hpp
     ClSpaceToBatchNdWorkload.hpp
     ClSpaceToBatchNdWorkload.cpp
     ClSpaceToDepthWorkload.cpp

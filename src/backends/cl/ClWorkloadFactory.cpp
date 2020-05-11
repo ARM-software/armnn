@@ -490,8 +490,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSlice(const SliceQueueDescri
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClSoftmaxFloatWorkload, ClSoftmaxUint8Workload>(descriptor, info,
-                                                                        m_MemoryManager->GetIntraLayerManager());
+    return std::make_unique<ClSoftmaxWorkload>(descriptor, info, m_MemoryManager->GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,

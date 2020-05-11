@@ -53,7 +53,7 @@
 #include "workloads/ClQuantizedLstmWorkload.hpp"
 #include "workloads/ClQuantizeWorkload.hpp"
 #include "workloads/ClSliceWorkload.hpp"
-#include "workloads/ClSoftmaxBaseWorkload.hpp"
+#include "workloads/ClSoftmaxWorkload.hpp"
 #include "workloads/ClSpaceToBatchNdWorkload.hpp"
 #include "workloads/ClSpaceToDepthWorkload.hpp"
 #include "workloads/ClSplitterWorkload.hpp"

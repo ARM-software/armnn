@@ -14,11 +14,13 @@ namespace profiling
 ProfilingGuidGenerator LabelsAndEventClasses::m_GuidGenerator;
 
 // Labels (string value + GUID)
+std::string LabelsAndEventClasses::EMPTY_LABEL("");
 std::string LabelsAndEventClasses::NAME_LABEL("name");
 std::string LabelsAndEventClasses::TYPE_LABEL("type");
 std::string LabelsAndEventClasses::INDEX_LABEL("index");
 std::string LabelsAndEventClasses::BACKENDID_LABEL("backendId");
 
+ProfilingStaticGuid LabelsAndEventClasses::EMPTY_GUID(0);
 ProfilingStaticGuid LabelsAndEventClasses::NAME_GUID(
     m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::NAME_LABEL));
 ProfilingStaticGuid LabelsAndEventClasses::TYPE_GUID(

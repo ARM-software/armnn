@@ -185,15 +185,7 @@ void TimelineUtilityMethods::MarkEntityWithLabel(ProfilingGuid entityGuid,
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
                                                                relationshipGuid,
                                                                entityGuid,
-                                                               labelGuid);
-
-    // Generate a GUID for the label relationship
-    ProfilingDynamicGuid relationshipLabelGuid = profiling::ProfilingService::GetNextGuid();
-
-    // Send the new label link to the external profiling service, this call throws in case of error
-    m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
-                                                               relationshipLabelGuid,
-                                                               relationshipGuid,
+                                                               labelGuid,
                                                                labelTypeGuid);
 }
 
@@ -207,15 +199,7 @@ void TimelineUtilityMethods::MarkEntityWithType(ProfilingGuid entityGuid,
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
                                                                relationshipGuid,
                                                                entityGuid,
-                                                               typeNameGuid);
-
-    // Generate a GUID for the label relationship
-    ProfilingDynamicGuid relationshipLabelGuid = profiling::ProfilingService::GetNextGuid();
-
-    // Send the new label link to the external profiling service, this call throws in case of error
-    m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
-                                                               relationshipLabelGuid,
-                                                               relationshipGuid,
+                                                               typeNameGuid,
                                                                LabelsAndEventClasses::TYPE_GUID);
 }
 
@@ -257,7 +241,8 @@ ProfilingDynamicGuid TimelineUtilityMethods::CreateNamedTypedChildEntity(Profili
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
                                                                retentionLinkGuid,
                                                                parentEntityGuid,
-                                                               childEntityGuid);
+                                                               childEntityGuid,
+                                                               LabelsAndEventClasses::EMPTY_GUID);
 
     return childEntityGuid;
 }
@@ -291,7 +276,8 @@ void TimelineUtilityMethods::CreateNamedTypedChildEntity(ProfilingGuid childEnti
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
                                                                retentionLinkGuid,
                                                                parentEntityGuid,
-                                                               childEntityGuid);
+                                                               childEntityGuid,
+                                                               LabelsAndEventClasses::EMPTY_GUID);
 }
 
 void TimelineUtilityMethods::CreateNamedTypedChildEntity(ProfilingGuid childEntityGuid,
@@ -316,7 +302,8 @@ void TimelineUtilityMethods::CreateNamedTypedChildEntity(ProfilingGuid childEnti
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
                                                                retentionLinkGuid,
                                                                parentEntityGuid,
-                                                               childEntityGuid);
+                                                               childEntityGuid,
+                                                               LabelsAndEventClasses::EMPTY_GUID);
 }
 
 ProfilingDynamicGuid TimelineUtilityMethods::CreateRelationship(ProfilingRelationshipType relationshipType,
@@ -330,7 +317,8 @@ ProfilingDynamicGuid TimelineUtilityMethods::CreateRelationship(ProfilingRelatio
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(relationshipType,
                                                                relationshipGuid,
                                                                headGuid,
-                                                               tailGuid);
+                                                               tailGuid,
+                                                               LabelsAndEventClasses::EMPTY_GUID);
     return relationshipGuid;
 }
 
@@ -345,7 +333,8 @@ ProfilingDynamicGuid TimelineUtilityMethods::CreateConnectionRelationship(Profil
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(relationshipType,
                                                                relationshipGuid,
                                                                headGuid,
-                                                               tailGuid);
+                                                               tailGuid,
+                                                               LabelsAndEventClasses::EMPTY_GUID);
 
     MarkEntityWithType(relationshipGuid, LabelsAndEventClasses::CONNECTION_GUID);
     return relationshipGuid;
@@ -381,14 +370,6 @@ ProfilingDynamicGuid TimelineUtilityMethods::RecordEvent(ProfilingGuid entityGui
     m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::ExecutionLink,
                                                                executionLinkId,
                                                                entityGuid,
-                                                               eventGuid);
-
-    // Generate a GUID for the data relationship link
-    ProfilingDynamicGuid eventClassLinkId = profiling::ProfilingService::GetNextGuid();
-
-    // Send the new data relationship link to the external profiling service, this call throws in case of error
-    m_SendTimelinePacket->SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::DataLink,
-                                                               eventClassLinkId,
                                                                eventGuid,
                                                                eventClassGuid);
 

@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(CreateTypedLabelTest)
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
     BOOST_CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_CHECK(size == 100);
+    BOOST_CHECK(size == 76);
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
 
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(CreateTypedLabelTest)
     unsigned int offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 92);
+    VerifyTimelineHeaderBinary(readableData, offset, 68);
 
     // First dataset sent: TimelineLabelBinaryPacket
     VerifyTimelineLabelBinaryPacketData(EmptyOptional(), entityName, readableData, offset);
@@ -61,13 +61,6 @@ BOOST_AUTO_TEST_CASE(CreateTypedLabelTest)
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                entityGuid,
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Third dataset sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
                                                EmptyOptional(),
                                                labelTypeGuid,
                                                readableData,
@@ -210,7 +203,7 @@ BOOST_AUTO_TEST_CASE(CreateNamedTypedChildEntityTest)
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
     BOOST_CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_CHECK(size == 236);
+    BOOST_CHECK(size == 196);
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
 
@@ -218,7 +211,7 @@ BOOST_AUTO_TEST_CASE(CreateNamedTypedChildEntityTest)
     unsigned int offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 228);
+    VerifyTimelineHeaderBinary(readableData, offset, 188);
 
     // First dataset sent: TimelineEntityBinaryPacket
     VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
@@ -229,13 +222,6 @@ BOOST_AUTO_TEST_CASE(CreateNamedTypedChildEntityTest)
     // Third dataset sent: TimelineRelationshipBinaryPacket
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Fourth dataset sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::NAME_GUID,
@@ -250,21 +236,16 @@ BOOST_AUTO_TEST_CASE(CreateNamedTypedChildEntityTest)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Seventh dataset sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
+
 
     // Eighth dataset sent: TimelineRelationshipBinaryPacket
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
                                                parentEntityGuid,
+                                               EmptyOptional(),
                                                EmptyOptional(),
                                                readableData,
                                                offset);
@@ -350,7 +331,7 @@ BOOST_AUTO_TEST_CASE(CreateNameTypeEntityTest)
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
     BOOST_CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_CHECK(size == 196);
+    BOOST_CHECK(size == 148);
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
 
@@ -358,7 +339,7 @@ BOOST_AUTO_TEST_CASE(CreateNameTypeEntityTest)
     unsigned int offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 188);
+    VerifyTimelineHeaderBinary(readableData, offset, 140);
 
     // First dataset sent: TimelineEntityBinaryPacket
     VerifyTimelineEntityBinaryPacketData(guid, readableData, offset);
@@ -370,13 +351,6 @@ BOOST_AUTO_TEST_CASE(CreateNameTypeEntityTest)
     // Second dataset sent: TimelineRelationshipBinaryPacket
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Third dataset sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::NAME_GUID,
@@ -392,16 +366,10 @@ BOOST_AUTO_TEST_CASE(CreateNameTypeEntityTest)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Third dataset sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
+
 
     // Mark the buffer as read
     mockBufferManager.MarkRead(readableBuffer);
@@ -430,7 +398,7 @@ BOOST_AUTO_TEST_CASE(RecordEventTest)
     BOOST_CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
 
-    BOOST_CHECK(size == 92 + ThreadIdSize);
+    BOOST_CHECK(size == 68 + ThreadIdSize);
 
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
@@ -439,7 +407,7 @@ BOOST_AUTO_TEST_CASE(RecordEventTest)
     unsigned int offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 84 + ThreadIdSize);
+    VerifyTimelineHeaderBinary(readableData, offset, 60 + ThreadIdSize);
 
     // First dataset sent: TimelineEntityBinaryPacket
     VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
@@ -448,13 +416,6 @@ BOOST_AUTO_TEST_CASE(RecordEventTest)
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
                                                EmptyOptional(),
                                                entityGuid,
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Third dataset sent: TimelineRelationshipBinaryPacket
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::DataLink,
-                                               EmptyOptional(),
                                                eventGuid,
                                                eventClassGuid,
                                                readableData,

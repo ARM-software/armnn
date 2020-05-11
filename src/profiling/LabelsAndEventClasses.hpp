@@ -20,10 +20,12 @@ class LabelsAndEventClasses
 {
 public:
     // Labels (string value + GUID)
+    ARMNN_DLLEXPORT static std::string EMPTY_LABEL;
     ARMNN_DLLEXPORT static std::string NAME_LABEL;
     ARMNN_DLLEXPORT static std::string TYPE_LABEL;
     ARMNN_DLLEXPORT static std::string INDEX_LABEL;
     ARMNN_DLLEXPORT static std::string BACKENDID_LABEL;
+    ARMNN_DLLEXPORT static ProfilingStaticGuid EMPTY_GUID;
     ARMNN_DLLEXPORT static ProfilingStaticGuid NAME_GUID;
     ARMNN_DLLEXPORT static ProfilingStaticGuid TYPE_GUID;
     ARMNN_DLLEXPORT static ProfilingStaticGuid INDEX_GUID;

@@ -229,6 +229,7 @@ TimelinePacketStatus WriteTimelineRelationshipBinary(ProfilingRelationshipType r
                                                      uint64_t relationshipGuid,
                                                      uint64_t headGuid,
                                                      uint64_t tailGuid,
+                                                     uint64_t attributeGuid,
                                                      unsigned char* buffer,
                                                      unsigned int bufferSize,
                                                      unsigned int& numberOfBytesWritten);

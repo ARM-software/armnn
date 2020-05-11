@@ -110,13 +110,15 @@ void SendTimelinePacket::SendTimelineLabelBinaryPacket(uint64_t profilingGuid, c
 void SendTimelinePacket::SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType relationshipType,
                                                               uint64_t relationshipGuid,
                                                               uint64_t headGuid,
-                                                              uint64_t tailGuid)
+                                                              uint64_t tailGuid,
+                                                              uint64_t attributeGuid)
 {
     ForwardWriteBinaryFunction(WriteTimelineRelationshipBinary,
                                relationshipType,
                                relationshipGuid,
                                headGuid,
-                               tailGuid);
+                               tailGuid,
+                               attributeGuid);
 }
 
 void SendTimelinePacket::SendTimelineMessageDirectoryPackage()

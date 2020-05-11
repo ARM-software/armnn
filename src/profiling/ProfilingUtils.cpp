@@ -553,6 +553,7 @@ TimelinePacketStatus WriteTimelineRelationshipBinary(ProfilingRelationshipType r
                                                      uint64_t relationshipGuid,
                                                      uint64_t headGuid,
                                                      uint64_t tailGuid,
+                                                     uint64_t attributeGuid,
                                                      unsigned char* buffer,
                                                      unsigned int remainingBufferSize,
                                                      unsigned int& numberOfBytesWritten)
@@ -572,7 +573,8 @@ TimelinePacketStatus WriteTimelineRelationshipBinary(ProfilingRelationshipType r
 
     // Calculate the length of the data (in bytes)
     unsigned int timelineRelationshipDataLength = uint32_t_size * 2 + // decl_id + Relationship Type
-                                                  uint64_t_size * 3;  // Relationship GUID + Head GUID + tail GUID
+                                                  uint64_t_size * 4;  // Relationship GUID + Head GUID +
+                                                                      // tail GUID + attributeGuid
 
     // Check whether the timeline binary fits in the given buffer
     if (timelineRelationshipDataLength > remainingBufferSize)
@@ -615,6 +617,9 @@ TimelinePacketStatus WriteTimelineRelationshipBinary(ProfilingRelationshipType r
     WriteUint64(buffer, offset, headGuid); // head of relationship GUID
     offset += uint64_t_size;
     WriteUint64(buffer, offset, tailGuid); // tail of relationship GUID
+    offset += uint64_t_size;
+    WriteUint64(buffer, offset, attributeGuid); // attribute of relationship GUID
+
 
     // Update the number of bytes written
     numberOfBytesWritten = timelineRelationshipDataLength;

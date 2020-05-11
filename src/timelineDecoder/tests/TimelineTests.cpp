@@ -227,7 +227,8 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
         sendTimelinePacket->SendTimelineRelationshipBinaryPacket(relationshipType,
                                                                  relationshipGuid,
                                                                  headGuid,
-                                                                 tailGuid);
+                                                                 tailGuid,
+                                                                 0);
         sendTimelinePacket->Commit();
         SendTimelinePacketToCommandHandler(bufferManager.GetReadableBuffer()->GetReadableData(),
                                            timelineCaptureCommandHandler);
@@ -327,7 +328,8 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTestMultipleStringsInBuffer)
         sendTimelinePacket->SendTimelineRelationshipBinaryPacket(relationshipType,
                                                                  relationshipGuid,
                                                                  headGuid,
-                                                                 tailGuid);
+                                                                 tailGuid,
+                                                                 0);
     }
 
     sendTimelinePacket->Commit();

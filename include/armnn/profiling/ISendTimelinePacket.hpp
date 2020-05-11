@@ -53,7 +53,8 @@ public:
     virtual void SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType relationshipType,
                                                       uint64_t relationshipGuid,
                                                       uint64_t headGuid,
-                                                      uint64_t tailGuid) = 0;
+                                                      uint64_t tailGuid,
+                                                      uint64_t attributeGuid) = 0;
 };
 
 }    // namespace profiling

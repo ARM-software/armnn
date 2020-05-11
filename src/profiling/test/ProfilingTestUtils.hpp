@@ -40,6 +40,7 @@ void VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType relati
                                                 Optional<ProfilingGuid> relationshipGuid,
                                                 Optional<ProfilingGuid> headGuid,
                                                 Optional<ProfilingGuid> tailGuid,
+                                                Optional<ProfilingGuid> attributeGuid,
                                                 const unsigned char* readableData,
                                                 unsigned int& offset);
 

@@ -414,7 +414,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     BOOST_CHECK(readableBuffer != nullptr);
 
     unsigned int size = readableBuffer->GetSize();
-    BOOST_CHECK(size == 1068);
+    BOOST_CHECK(size == 852);
 
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
@@ -422,7 +422,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     unsigned int offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 1060);
+    VerifyTimelineHeaderBinary(readableData, offset, 844);
 
     // Post-optimisation network
     // Network entity
@@ -434,13 +434,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                optNetGuid,
                                                LabelsAndEventClasses::NETWORK_GUID,
-                                               readableData,
-                                               offset);
-
-    // Type label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
@@ -457,13 +450,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                input->GetGuid(),
                                                EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Name label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
@@ -472,13 +458,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                input->GetGuid(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Type label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
@@ -489,6 +468,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                optNetGuid,
                                                input->GetGuid(),
+                                               EmptyOptional(),
                                                readableData,
                                                offset);
 
@@ -504,13 +484,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                normalize->GetGuid(),
                                                EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Name label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
@@ -519,13 +492,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                normalize->GetGuid(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Type label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
@@ -536,6 +502,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                optNetGuid,
                                                normalize->GetGuid(),
+                                               EmptyOptional(),
                                                readableData,
                                                offset);
 
@@ -544,6 +511,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                input->GetGuid(),
                                                normalize->GetGuid(),
+                                               EmptyOptional(),
                                                readableData,
                                                offset);
 
@@ -552,13 +520,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::CONNECTION_GUID,
-                                               readableData,
-                                               offset);
-
-    // Type label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
@@ -570,13 +531,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Type label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
@@ -591,13 +545,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // BackendId label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::BACKENDID_GUID,
                                                readableData,
                                                offset);
@@ -606,6 +553,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
                                                normalize->GetGuid(),
+                                               EmptyOptional(),
                                                EmptyOptional(),
                                                readableData,
                                                offset);
@@ -622,13 +570,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                output->GetGuid(),
                                                EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Name label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
@@ -637,13 +578,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                output->GetGuid(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Type label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
@@ -654,6 +588,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                optNetGuid,
                                                output->GetGuid(),
+                                               EmptyOptional(),
                                                readableData,
                                                offset);
 
@@ -662,6 +597,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                normalize->GetGuid(),
                                                output->GetGuid(),
+                                               EmptyOptional(),
                                                readableData,
                                                offset);
 
@@ -670,13 +606,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::CONNECTION_GUID,
-                                               readableData,
-                                               offset);
-
-    // Type label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
@@ -713,7 +642,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
 
     // Validate input workload data
     size = inputReadableBuffer->GetSize();
-    BOOST_CHECK(size == 204);
+    BOOST_CHECK(size == 164);
 
     readableData = inputReadableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
@@ -721,7 +650,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 196);
+    VerifyTimelineHeaderBinary(readableData, offset, 156);
 
     // Input workload
     // Input workload entity
@@ -730,13 +659,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Type label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
@@ -749,13 +671,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     // Entity - BackendId relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // BackendId label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::BACKENDID_GUID,
@@ -767,6 +682,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                input->GetGuid(),
                                                EmptyOptional(),
+                                               EmptyOptional(),
                                                readableData,
                                                offset);
 
@@ -774,7 +690,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
 
     // Validate output workload data
     size = outputReadableBuffer->GetSize();
-    BOOST_CHECK(size == 204);
+    BOOST_CHECK(size == 164);
 
     readableData = outputReadableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
@@ -782,7 +698,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 196);
+    VerifyTimelineHeaderBinary(readableData, offset, 156);
 
     // Output workload
     // Output workload entity
@@ -791,13 +707,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Type label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
@@ -812,13 +721,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // BackendId label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::BACKENDID_GUID,
                                                readableData,
                                                offset);
@@ -828,6 +730,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                output->GetGuid(),
                                                EmptyOptional(),
+                                               EmptyOptional(),
                                                readableData,
                                                offset);
 
@@ -835,7 +738,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
 
     // Validate inference data
     size = inferenceReadableBuffer->GetSize();
-    BOOST_CHECK(size == 1208 + 8 * ThreadIdSize);
+    BOOST_CHECK(size == 976 + 8 * ThreadIdSize);
 
     readableData = inferenceReadableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
@@ -843,7 +746,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 1200 + 8 * ThreadIdSize);
+    VerifyTimelineHeaderBinary(readableData, offset, 968 + 8 * ThreadIdSize);
 
     // Inference timeline trace
     // Inference entity
@@ -854,13 +757,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::INFERENCE_GUID,
-                                               readableData,
-                                               offset);
-
-    // Type label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
@@ -869,6 +765,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
                                                optNetGuid,
+                                               EmptyOptional(),
                                                EmptyOptional(),
                                                readableData,
                                                offset);
@@ -880,13 +777,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     // Inference - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Event - event class relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::DataLink,
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
@@ -903,13 +793,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
-                                               readableData,
-                                               offset);
-
-    // Type label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
@@ -919,11 +802,13 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
+                                               EmptyOptional(),
                                                readableData,
                                                offset);
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
+                                               EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
@@ -939,13 +824,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Event - event class relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::DataLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
@@ -957,13 +835,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     // Input workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Event - event class relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::DataLink,
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
@@ -979,13 +850,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
-                                               readableData,
-                                               offset);
-
-    // Type label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
@@ -995,11 +859,13 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
+                                               EmptyOptional(),
                                                readableData,
                                                offset);
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
+                                               EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
@@ -1015,13 +881,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Event - event class relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::DataLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
@@ -1033,13 +892,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     // Normalize workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Event - event class relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::DataLink,
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
@@ -1055,13 +907,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
-                                               readableData,
-                                               offset);
-
-    // Type label relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
@@ -1071,11 +916,13 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
+                                               EmptyOptional(),
                                                readableData,
                                                offset);
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
+                                               EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
@@ -1091,16 +938,10 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Event - event class relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::DataLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
+
 
     // End of Normalize workload execution life
     // Event packet - timeline, threadId, eventGuid
@@ -1109,13 +950,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     // Output workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Event - event class relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::DataLink,
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
@@ -1129,13 +963,6 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     // Inference - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Event - event class relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::DataLink,
                                                EmptyOptional(),
                                                EmptyOptional(),
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,

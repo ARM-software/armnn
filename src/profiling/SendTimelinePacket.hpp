@@ -51,7 +51,8 @@ public:
     virtual void SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType relationshipType,
                                                       uint64_t relationshipGuid,
                                                       uint64_t headGuid,
-                                                      uint64_t tailGuid) override;
+                                                      uint64_t tailGuid,
+                                                      uint64_t attributeGuid) override;
 private:
     /// Reserves maximum packet size from buffer
     void ReserveBuffer();

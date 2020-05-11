@@ -68,6 +68,7 @@ public:
         uint64_t m_Guid;
         uint64_t m_HeadGuid;
         uint64_t m_TailGuid;
+        uint64_t m_AttributeGuid;
     };
 
     virtual ~ITimelineDecoder() = default;

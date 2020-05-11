@@ -107,6 +107,10 @@ void TimelineCaptureCommandHandler::ReadRelationship(const unsigned char* data, 
 
     relationship.m_TailGuid = profiling::ReadUint64(data, offset);
     offset += uint64_t_size;
+
+    relationship.m_AttributeGuid = profiling::ReadUint64(data, offset);
+    offset += uint64_t_size;
+
     m_TimelineDecoder.CreateRelationship(relationship);
 }
 

@@ -471,7 +471,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
     BOOST_CHECK(timelineDecoder.GetModel().m_Entities.size() == 6);
     BOOST_CHECK(timelineDecoder.GetModel().m_EventClasses.size()  == 4);
     BOOST_CHECK(timelineDecoder.GetModel().m_Labels.size()  == 24);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Relationships.size()  == 28);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Relationships.size()  == 17);
     BOOST_CHECK(timelineDecoder.GetModel().m_Events.size()  == 0);
 
     mockService.WaitForReceivingThread();

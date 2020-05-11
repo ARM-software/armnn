@@ -122,11 +122,13 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketNullBufferTest)
     const uint64_t relationshipGuid = 123456u;
     const uint64_t headGuid = 234567u;
     const uint64_t tailGuid = 345678u;
+    const uint64_t attributeGuid = 876345u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineRelationshipBinary(relationshipType,
                                                                   relationshipGuid,
                                                                   headGuid,
                                                                   tailGuid,
+                                                                  attributeGuid,
                                                                   nullptr,
                                                                   512u,
                                                                   numberOfBytesWritten);
@@ -142,11 +144,13 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketZeroBufferSizeTest)
     const uint64_t relationshipGuid = 123456u;
     const uint64_t headGuid = 234567u;
     const uint64_t tailGuid = 345678u;
+    const uint64_t attributeGuid = 876345u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineRelationshipBinary(relationshipType,
                                                                   relationshipGuid,
                                                                   headGuid,
                                                                   tailGuid,
+                                                                  attributeGuid,
                                                                   buffer.data(),
                                                                   0,
                                                                   numberOfBytesWritten);
@@ -162,12 +166,14 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketSmallBufferSizeTest)
     const uint64_t relationshipGuid = 123456u;
     const uint64_t headGuid = 234567u;
     const uint64_t tailGuid = 345678u;
+    const uint64_t attributeGuid = 876345u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result =
                              WriteTimelineRelationshipBinary(relationshipType,
                                                              relationshipGuid,
                                                              headGuid,
                                                              tailGuid,
+                                                             attributeGuid,
                                                              buffer.data(),
                                                              boost::numeric_cast<unsigned int>(buffer.size()),
                                                              numberOfBytesWritten);
@@ -182,12 +188,15 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketInvalidRelationTest)
     const uint64_t relationshipGuid = 123456u;
     const uint64_t headGuid = 234567u;
     const uint64_t tailGuid = 345678u;
+    const uint64_t attributeGuid = 876345u;
+
     unsigned int numberOfBytesWritten = 789u;
 
     BOOST_CHECK_THROW(WriteTimelineRelationshipBinary(relationshipType,
                                                       relationshipGuid,
                                                       headGuid,
                                                       tailGuid,
+                                                      attributeGuid,
                                                       buffer.data(),
                                                       boost::numeric_cast<unsigned int>(buffer.size()),
                                                       numberOfBytesWritten),
@@ -204,17 +213,19 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketTestDataConstruction)
     const uint64_t relationshipGuid = 123456u;
     const uint64_t headGuid = 234567u;
     const uint64_t tailGuid = 345678u;
+    const uint64_t attributeGuid = 876345u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result =
                              WriteTimelineRelationshipBinary(relationshipType,
                                                              relationshipGuid,
                                                              headGuid,
                                                              tailGuid,
+                                                             attributeGuid,
                                                              buffer.data(),
                                                              boost::numeric_cast<unsigned int>(buffer.size()),
                                                              numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
-    BOOST_CHECK(numberOfBytesWritten == 32);
+    BOOST_CHECK(numberOfBytesWritten == 40);
 
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
@@ -244,6 +255,11 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketTestDataConstruction)
     offset += uint64_t_size;
     uint64_t readTailGuid = ReadUint64(buffer.data(), offset);
     BOOST_CHECK(readTailGuid == tailGuid);
+
+    // Check the attribute GUID
+    offset += uint64_t_size;
+    uint64_t readAttributeGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readAttributeGuid == attributeGuid);
 }
 
 BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketExecutionLinkTestDataConstruction)
@@ -254,17 +270,19 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketExecutionLinkTestDataConstruction
     const uint64_t relationshipGuid = 123456u;
     const uint64_t headGuid = 234567u;
     const uint64_t tailGuid = 345678u;
+    const uint64_t attributeGuid = 876345u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result =
                              WriteTimelineRelationshipBinary(relationshipType,
                                                              relationshipGuid,
                                                              headGuid,
                                                              tailGuid,
+                                                             attributeGuid,
                                                              buffer.data(),
                                                              boost::numeric_cast<unsigned int>(buffer.size()),
                                                              numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
-    BOOST_CHECK(numberOfBytesWritten == 32);
+    BOOST_CHECK(numberOfBytesWritten == 40);
 
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
@@ -292,6 +310,11 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketExecutionLinkTestDataConstruction
     offset += uint64_t_size;
     uint64_t readTailGuid = ReadUint64(buffer.data(), offset);
     BOOST_CHECK(readTailGuid == tailGuid);
+
+    // Check the attribute GUID
+    offset += uint64_t_size;
+    uint64_t readAttributeGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readAttributeGuid == attributeGuid);
 }
 
 
@@ -303,17 +326,19 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketDataLinkTestDataConstruction)
     const uint64_t relationshipGuid = 123456u;
     const uint64_t headGuid = 234567u;
     const uint64_t tailGuid = 345678u;
+    const uint64_t attributeGuid = 876345u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result =
                              WriteTimelineRelationshipBinary(relationshipType,
                                                              relationshipGuid,
                                                              headGuid,
                                                              tailGuid,
+                                                             attributeGuid,
                                                              buffer.data(),
                                                              boost::numeric_cast<unsigned int>(buffer.size()),
                                                              numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
-    BOOST_CHECK(numberOfBytesWritten == 32);
+    BOOST_CHECK(numberOfBytesWritten == 40);
 
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
@@ -341,6 +366,11 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketDataLinkTestDataConstruction)
     offset += uint64_t_size;
     uint64_t readTailGuid = ReadUint64(buffer.data(), offset);
     BOOST_CHECK(readTailGuid == tailGuid);
+
+    // Check the attribute GUID
+    offset += uint64_t_size;
+    uint64_t readAttributeGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readAttributeGuid == attributeGuid);
 }
 
 
@@ -352,17 +382,19 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketLabelLinkTestDataConstruction)
     const uint64_t relationshipGuid = 123456u;
     const uint64_t headGuid = 234567u;
     const uint64_t tailGuid = 345678u;
+    const uint64_t attributeGuid = 876345u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result =
                              WriteTimelineRelationshipBinary(relationshipType,
                                                              relationshipGuid,
                                                              headGuid,
                                                              tailGuid,
+                                                             attributeGuid,
                                                              buffer.data(),
                                                              boost::numeric_cast<unsigned int>(buffer.size()),
                                                              numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
-    BOOST_CHECK(numberOfBytesWritten == 32);
+    BOOST_CHECK(numberOfBytesWritten == 40);
 
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
@@ -391,6 +423,11 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketLabelLinkTestDataConstruction)
     offset += uint64_t_size;
     uint64_t readTailGuid = ReadUint64(buffer.data(), offset);
     BOOST_CHECK(readTailGuid == tailGuid);
+
+    // Check the attribute GUID
+    offset += uint64_t_size;
+    uint64_t readAttributeGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readAttributeGuid == attributeGuid);
 }
 
 BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTestNoBuffer)

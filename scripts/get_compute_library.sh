@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="2886c757389c0ccca20a8689daf8180a730ecbc9" #COMPMID-3459: Updated heuristic in CLGEMMReshapedOnlyRHSKernel.
+DEFAULT_CLFRAMEWORKREVISION="6f8b17dedb7b53b550e6210fd1c78c3a3e086271" #[ONCPUML-7] arm_compute support for ND parallelism.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

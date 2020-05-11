@@ -73,7 +73,7 @@ void PeriodicCounterCapture::DispatchPeriodicCounterCapturePacket(
     }
 }
 
-void PeriodicCounterCapture::Capture(const IReadCounterValues& readCounterValues)
+void PeriodicCounterCapture::Capture(IReadCounterValues& readCounterValues)
 {
     do
     {
@@ -103,7 +103,7 @@ void PeriodicCounterCapture::Capture(const IReadCounterValues& readCounterValues
                 uint32_t counterValue = 0;
                 try
                 {
-                    counterValue = readCounterValues.GetCounterValue(requestedId);
+                    counterValue = readCounterValues.GetDeltaCounterValue(requestedId);
                 }
                 catch (const Exception& e)
                 {

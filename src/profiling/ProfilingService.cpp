@@ -235,12 +235,22 @@ bool ProfilingService::IsCounterRegistered(uint16_t counterUid) const
     return counterUid < m_CounterIndex.size();
 }
 
-uint32_t ProfilingService::GetCounterValue(uint16_t counterUid) const
+uint32_t ProfilingService::GetAbsoluteCounterValue(uint16_t counterUid) const
 {
     CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
     ARMNN_ASSERT(counterValuePtr);
     return counterValuePtr->load(std::memory_order::memory_order_relaxed);
+}
+
+uint32_t ProfilingService::GetDeltaCounterValue(uint16_t counterUid)
+{
+    CheckCounterUid(counterUid);
+    std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
+    ARMNN_ASSERT(counterValuePtr);
+    const uint32_t counterValue = counterValuePtr->load(std::memory_order::memory_order_relaxed);
+    SubtractCounterValue(counterUid, counterValue);
+    return counterValue;
 }
 
 const ICounterMappings& ProfilingService::GetCounterMappings() const
@@ -327,7 +337,7 @@ void ProfilingService::Initialize()
                 m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
                                                    armnn::profiling::NETWORK_LOADS,
                                                    "ArmNN_Runtime",
-                                                   1,
+                                                   0,
                                                    0,
                                                    1.f,
                                                    "Network loads",
@@ -343,7 +353,7 @@ void ProfilingService::Initialize()
                 m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
                                                    armnn::profiling::NETWORK_UNLOADS,
                                                    "ArmNN_Runtime",
-                                                   1,
+                                                   0,
                                                    0,
                                                    1.f,
                                                    "Network unloads",
@@ -359,7 +369,7 @@ void ProfilingService::Initialize()
                 m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
                                                    armnn::profiling::REGISTERED_BACKENDS,
                                                    "ArmNN_Runtime",
-                                                   1,
+                                                   0,
                                                    0,
                                                    1.f,
                                                    "Backends registered",
@@ -375,7 +385,7 @@ void ProfilingService::Initialize()
                 m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
                                                    armnn::profiling::UNREGISTERED_BACKENDS,
                                                    "ArmNN_Runtime",
-                                                   1,
+                                                   0,
                                                    0,
                                                    1.f,
                                                    "Backends unregistered",
@@ -391,7 +401,7 @@ void ProfilingService::Initialize()
                 m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
                                                    armnn::profiling::INFERENCES_RUN,
                                                    "ArmNN_Runtime",
-                                                   1,
+                                                   0,
                                                    0,
                                                    1.f,
                                                    "Inferences run",

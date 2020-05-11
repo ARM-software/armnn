@@ -41,7 +41,11 @@ class ReadCounterVals : public IReadCounterValues
     {
         return 1;
     }
-    virtual uint32_t GetCounterValue(uint16_t counterUid) const override
+    virtual uint32_t GetAbsoluteCounterValue(uint16_t counterUid) const override
+    {
+        return counterUid;
+    }
+    virtual uint32_t GetDeltaCounterValue(uint16_t counterUid) override
     {
         return counterUid;
     }

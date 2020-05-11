@@ -20,7 +20,8 @@ public:
 
     virtual bool IsCounterRegistered(uint16_t counterUid) const = 0;
     virtual uint16_t GetCounterCount() const = 0;
-    virtual uint32_t GetCounterValue(uint16_t counterUid) const = 0;
+    virtual uint32_t GetAbsoluteCounterValue(uint16_t counterUid) const = 0;
+    virtual uint32_t GetDeltaCounterValue(uint16_t counterUid) = 0;
 };
 
 class IWriteCounterValues

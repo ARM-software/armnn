@@ -141,7 +141,8 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd, * boost::unit_test::disabled
     // Increment a counter.
     BOOST_CHECK(profilingService.IsCounterRegistered(0) == true);
     profilingService.IncrementCounterValue(0);
-    BOOST_CHECK(profilingService.GetCounterValue(0) > 0);
+    BOOST_CHECK(profilingService.GetAbsoluteCounterValue(0) > 0);
+    BOOST_CHECK(profilingService.GetDeltaCounterValue(0) > 0);
 
     // At this point the profiling service is active and we've activated all the counters. Waiting a collection
     // period should be enough to have some data in the file.

@@ -28,7 +28,7 @@ class PeriodicCounterCapture final : public IPeriodicCounterCapture
 public:
     PeriodicCounterCapture(const Holder& data,
                            ISendCounterPacket& packet,
-                           const IReadCounterValues& readCounterValue,
+                           IReadCounterValues& readCounterValue,
                            const ICounterMappings& counterIdMap,
                            const std::unordered_map<armnn::BackendId,
                                    std::shared_ptr<armnn::profiling::IBackendProfilingContext>>&
@@ -49,7 +49,7 @@ public:
 
 private:
     CaptureData ReadCaptureData();
-    void Capture(const IReadCounterValues& readCounterValues);
+    void Capture(IReadCounterValues& readCounterValues);
     void DispatchPeriodicCounterCapturePacket(
             const armnn::BackendId& backendId, const std::vector<Timestamp>& timestampValues);
 
@@ -57,7 +57,7 @@ private:
     bool                      m_IsRunning;
     std::atomic<bool>         m_KeepRunning;
     std::thread               m_PeriodCaptureThread;
-    const IReadCounterValues& m_ReadCounterValues;
+    IReadCounterValues&       m_ReadCounterValues;
     ISendCounterPacket&       m_SendCounterPacket;
     const ICounterMappings&   m_CounterIdMap;
     const std::unordered_map<armnn::BackendId,

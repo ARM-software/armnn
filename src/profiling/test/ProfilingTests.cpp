@@ -687,43 +687,98 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterValues)
     const Counters& counters                  = counterDirectory.GetCounters();
     BOOST_CHECK(!counters.empty());
 
-    // Get the UID of the first counter for testing;
-
-    ProfilingService* profilingServicePtr = &profilingService;
     std::vector<std::thread> writers;
 
-    for (int i = 0; i < 10; ++i)
+    BOOST_CHECK(!counters.empty());
+
+    // Test GetAbsoluteCounterValue
+    for (int i = 0; i < 4; ++i)
     {
-        // Increment and decrement the first counter
-        writers.push_back(std::thread(&ProfilingService::IncrementCounterValue,
-                          profilingServicePtr,
-                          armnn::profiling::REGISTERED_BACKENDS));
-
-        writers.push_back(std::thread(&ProfilingService::IncrementCounterValue,
-                          profilingServicePtr,
-                          armnn::profiling::UNREGISTERED_BACKENDS));
-
-        // Add 10 and subtract 5 from the first counter
-        writers.push_back(std::thread(&ProfilingService::AddCounterValue,
-                          profilingServicePtr,
-                          armnn::profiling::INFERENCES_RUN,
-                          10));
-        writers.push_back(std::thread(&ProfilingService::SubtractCounterValue,
-                          profilingServicePtr,
-                          armnn::profiling::INFERENCES_RUN,
-                          5));
+        // Increment and decrement the INFERENCES_RUN counter 250 times
+        writers.push_back(std::thread([&profilingService]()
+                                      {
+                                          for (int i = 0; i < 250; ++i)
+                                          {
+                                              profilingService.IncrementCounterValue(INFERENCES_RUN);
+                                          }
+                                      }));
+        // Add 10 to the INFERENCES_RUN counter 200 times
+        writers.push_back(std::thread([&profilingService]()
+                                      {
+                                          for (int i = 0; i < 200; ++i)
+                                          {
+                                              profilingService.AddCounterValue(INFERENCES_RUN, 10);
+                                          }
+                                      }));
+        // Subtract 5 from the INFERENCES_RUN counter 200 times
+        writers.push_back(std::thread([&profilingService]()
+                                      {
+                                          for (int i = 0; i < 200; ++i)
+                                          {
+                                              profilingService.SubtractCounterValue(INFERENCES_RUN, 5);
+                                          }
+                                      }));
     }
+
     std::for_each(writers.begin(), writers.end(), mem_fn(&std::thread::join));
 
-    uint32_t counterValue = 0;
-    BOOST_CHECK(counterValue ==
-               (profilingService.GetCounterValue(armnn::profiling::UNREGISTERED_BACKENDS)
-               - profilingService.GetCounterValue(armnn::profiling::REGISTERED_BACKENDS)));
-    BOOST_CHECK(profilingService.GetCounterValue(armnn::profiling::INFERENCES_RUN) == 50);
+    uint32_t absoluteCounterValue = 0;
 
-    BOOST_CHECK_NO_THROW(profilingService.SetCounterValue(armnn::profiling::UNREGISTERED_BACKENDS, 4));
-    BOOST_CHECK_NO_THROW(counterValue = profilingService.GetCounterValue(armnn::profiling::UNREGISTERED_BACKENDS));
-    BOOST_CHECK(counterValue == 4);
+    BOOST_CHECK_NO_THROW(absoluteCounterValue = profilingService.GetAbsoluteCounterValue(INFERENCES_RUN));
+    BOOST_CHECK(absoluteCounterValue = 5000);
+
+    // Test SetCounterValue
+    BOOST_CHECK_NO_THROW(profilingService.SetCounterValue(INFERENCES_RUN, 0));
+    BOOST_CHECK_NO_THROW(absoluteCounterValue = profilingService.GetAbsoluteCounterValue(INFERENCES_RUN));
+    BOOST_CHECK(absoluteCounterValue == 0);
+
+    // Test GetDeltaCounterValue
+    writers.clear();
+    uint32_t deltaCounterValue = 0;
+    //Start a reading thread to randomly read the INFERENCES_RUN counter value
+    std::thread reader([&profilingService](uint32_t& deltaCounterValue)
+                       {
+                           for (int i = 0; i < 300; ++i)
+                           {
+                               deltaCounterValue += profilingService.GetDeltaCounterValue(INFERENCES_RUN);
+                           }
+                       }, std::ref(deltaCounterValue));
+
+    for (int i = 0; i < 4; ++i)
+    {
+        // Increment and decrement the INFERENCES_RUN counter 250 times
+        writers.push_back(std::thread([&profilingService]()
+                                      {
+                                          for (int i = 0; i < 250; ++i)
+                                          {
+                                              profilingService.IncrementCounterValue(INFERENCES_RUN);
+                                          }
+                                      }));
+        // Add 10 to the INFERENCES_RUN counter 200 times
+        writers.push_back(std::thread([&profilingService]()
+                                      {
+                                          for (int i = 0; i < 200; ++i)
+                                          {
+                                              profilingService.AddCounterValue(INFERENCES_RUN, 10);
+                                          }
+                                      }));
+        // Subtract 5 from the INFERENCES_RUN counter 200 times
+        writers.push_back(std::thread([&profilingService]()
+                                      {
+                                          for (int i = 0; i < 200; ++i)
+                                          {
+                                              profilingService.SubtractCounterValue(INFERENCES_RUN, 5);
+                                          }
+                                      }));
+    }
+
+    std::for_each(writers.begin(), writers.end(), mem_fn(&std::thread::join));
+    reader.join();
+
+    // Do one last read in case the reader stopped early
+    deltaCounterValue += profilingService.GetDeltaCounterValue(INFERENCES_RUN);
+    BOOST_CHECK(deltaCounterValue == 5000);
+
     // Reset the profiling service to stop any running thread
     options.m_EnableProfiling = false;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -1705,7 +1760,12 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
         {
             return 0;
         }
-        uint32_t GetCounterValue(uint16_t counterUid) const override
+        uint32_t GetAbsoluteCounterValue(uint16_t counterUid) const override
+        {
+            armnn::IgnoreUnused(counterUid);
+            return 0;
+        }
+        uint32_t GetDeltaCounterValue(uint16_t counterUid) override
         {
             armnn::IgnoreUnused(counterUid);
             return 0;
@@ -2228,7 +2288,16 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
             return m_CounterSize;
         }
 
-        uint32_t GetCounterValue(uint16_t counterUid) const override
+        uint32_t GetAbsoluteCounterValue(uint16_t counterUid) const override
+        {
+            if (counterUid > m_CounterSize)
+            {
+                BOOST_FAIL("Invalid counter Uid");
+            }
+            return m_Data.at(counterUid).load();
+        }
+
+        uint32_t GetDeltaCounterValue(uint16_t counterUid)  override
         {
             if (counterUid > m_CounterSize)
             {

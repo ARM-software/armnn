@@ -166,7 +166,8 @@ public:
     ICounterRegistry& GetCounterRegistry();
     ProfilingState GetCurrentState() const;
     bool IsCounterRegistered(uint16_t counterUid) const override;
-    uint32_t GetCounterValue(uint16_t counterUid) const override;
+    uint32_t GetAbsoluteCounterValue(uint16_t counterUid) const override;
+    uint32_t GetDeltaCounterValue(uint16_t counterUid) override;
     uint16_t GetCounterCount() const override;
     // counter global/backend mapping functions
     const ICounterMappings& GetCounterMappings() const override;

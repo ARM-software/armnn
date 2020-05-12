@@ -773,6 +773,10 @@ ARMNN_AUTO_TEST_CASE(LstmLayerFloat32NoCifgWithPeepholeWithProjection,
 ARMNN_AUTO_TEST_CASE(LstmLayerFloat32NoCifgWithPeepholeWithProjectionWithLayerNorm,
                      LstmLayerFloat32NoCifgWithPeepholeWithProjectionWithLayerNormTest)
 
+// QLstm
+ARMNN_AUTO_TEST_CASE(QLstm, QLstmTest)
+
+// QuantizedLstm
 ARMNN_AUTO_TEST_CASE(QuantizedLstm, QuantizedLstmTest)
 
 // Mean

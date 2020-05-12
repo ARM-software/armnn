@@ -28,6 +28,8 @@ namespace armnn
 namespace profiling
 {
 
+constexpr unsigned int ThreadIdSize = sizeof(std::thread::id); // Is platform dependent
+
 struct SwTraceHeader
 {
     uint8_t m_StreamVersion;

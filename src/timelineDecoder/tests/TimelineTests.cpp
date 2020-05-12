@@ -73,7 +73,6 @@ BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
     uint32_t uint8_t_size  = sizeof(uint8_t);
     uint32_t uint32_t_size = sizeof(uint32_t);
     uint32_t uint64_t_size = sizeof(uint64_t);
-    uint32_t threadId_size = sizeof(std::thread::id);
 
     profiling::BufferManager bufferManager(5);
     profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
@@ -107,7 +106,7 @@ BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
     BOOST_CHECK(readPointerBytes == uint64_t_size);
     offset += uint8_t_size;
     uint8_t readThreadIdBytes = ReadUint8(packetBuffer, offset);
-    BOOST_CHECK(readThreadIdBytes == threadId_size);
+    BOOST_CHECK(readThreadIdBytes == armnn::profiling::ThreadIdSize);
     offset += uint8_t_size;
 
     uint32_t declarationSize = profiling::ReadUint32(packetBuffer, offset);
@@ -144,7 +143,6 @@ BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
 
 BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
 {
-    unsigned int threadIdSize = sizeof(std::thread::id);
     profiling::BufferManager bufferManager(50);
     profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
 
@@ -158,7 +156,8 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
 
 
     TimelineCaptureCommandHandler timelineCaptureCommandHandler(
-        1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder, threadIdSize);
+        1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder,
+        armnn::profiling::ThreadIdSize);
 
     using Status = ITimelineDecoder::TimelineStatus;
     BOOST_CHECK(timelineDecoder.SetEntityCallback(PushEntity)             == Status::TimelineStatus_Success);
@@ -175,16 +174,16 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
     const std::thread::id threadId = std::this_thread::get_id();
 
     // need to do a bit of work here to extract the value from threadId
-    unsigned char* uCharThreadId = new unsigned char[threadIdSize]();;
+    unsigned char* uCharThreadId = new unsigned char[armnn::profiling::ThreadIdSize]();;
     uint64_t uint64ThreadId;
 
-    profiling::WriteBytes(uCharThreadId, 0, &threadId, threadIdSize);
+    profiling::WriteBytes(uCharThreadId, 0, &threadId, armnn::profiling::ThreadIdSize);
 
-    if (threadIdSize == 4)
+    if (armnn::profiling::ThreadIdSize == 4)
     {
         uint64ThreadId =  profiling::ReadUint32(uCharThreadId, 0);
     }
-    else if (threadIdSize == 8)
+    else if (armnn::profiling::ThreadIdSize == 8)
     {
         uint64ThreadId =  profiling::ReadUint64(uCharThreadId, 0);
     }
@@ -256,7 +255,6 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
 
 BOOST_AUTO_TEST_CASE(TimelineCaptureTestMultipleStringsInBuffer)
 {
-    unsigned int                           threadIdSize = sizeof(std::thread::id);
     profiling::BufferManager               bufferManager(50);
     profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
 
@@ -269,7 +267,8 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTestMultipleStringsInBuffer)
     const TimelineDecoder::Model& model = timelineDecoder.GetModel();
 
     TimelineCaptureCommandHandler timelineCaptureCommandHandler(
-        1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder, threadIdSize);
+        1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder,
+        armnn::profiling::ThreadIdSize);
 
     using Status = ITimelineDecoder::TimelineStatus;
     BOOST_CHECK(timelineDecoder.SetEntityCallback(PushEntity) == Status::TimelineStatus_Success);
@@ -286,15 +285,16 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTestMultipleStringsInBuffer)
     const std::thread::id threadId = std::this_thread::get_id();
 
     // need to do a bit of work here to extract the value from threadId
-    unsigned char* uCharThreadId = new unsigned char[threadIdSize]();;
+    unsigned char* uCharThreadId = new unsigned char[armnn::profiling::ThreadIdSize]();
     uint64_t uint64ThreadId;
 
-    profiling::WriteBytes(uCharThreadId, 0, &threadId, threadIdSize);
+    profiling::WriteBytes(uCharThreadId, 0, &threadId, armnn::profiling::ThreadIdSize);
 
-    if ( threadIdSize == 4 )
+    if ( armnn::profiling::ThreadIdSize == 4 )
     {
         uint64ThreadId = profiling::ReadUint32(uCharThreadId, 0);
-    } else if ( threadIdSize == 8 )
+    } 
+    else if ( armnn::profiling::ThreadIdSize == 8 )
     {
         uint64ThreadId = profiling::ReadUint64(uCharThreadId, 0);
     }

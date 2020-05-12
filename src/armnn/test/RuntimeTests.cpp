@@ -835,8 +835,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
 
     // Validate inference data
     size = inferenceReadableBuffer->GetSize();
-    unsigned int threadId_size = sizeof(std::thread::id); // Is platform dependent
-    BOOST_CHECK(size == 1208 + 8 * threadId_size);
+    BOOST_CHECK(size == 1208 + 8 * ThreadIdSize);
 
     readableData = inferenceReadableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
@@ -844,7 +843,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 1200 + 8 * threadId_size);
+    VerifyTimelineHeaderBinary(readableData, offset, 1200 + 8 * ThreadIdSize);
 
     // Inference timeline trace
     // Inference entity

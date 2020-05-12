@@ -35,7 +35,6 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     unsigned int uint8_t_size  = sizeof(uint8_t);
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
-    unsigned int threadId_size = sizeof(std::thread::id);
 
     // Check the packet header
     unsigned int offset = 0;
@@ -65,7 +64,7 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     BOOST_CHECK(readPointerBytes == uint64_t_size);
     offset += uint8_t_size;
     uint8_t readThreadIdBytes = ReadUint8(packetBuffer, offset);
-    BOOST_CHECK(readThreadIdBytes == threadId_size);
+    BOOST_CHECK(readThreadIdBytes == ThreadIdSize);
 
     offset += uint8_t_size;
     uint32_t DeclCount = ReadUint32(packetBuffer, offset);
@@ -211,7 +210,6 @@ BOOST_AUTO_TEST_CASE(SendEventClassAfterTimelineEntityPacketTest)
 {
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
-    unsigned int threadId_size = sizeof(std::thread::id); // Is platform dependent
 
     MockBufferManager bufferManager(512);
     TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
@@ -338,7 +336,7 @@ BOOST_AUTO_TEST_CASE(SendEventClassAfterTimelineEntityPacketTest)
     uint32_t eventBinaryPacketSequenceNumbered = (eventBinaryPacketHeaderWord1 >> 24) & 0x00000001;
     uint32_t eventBinaryPacketDataLength       = (eventBinaryPacketHeaderWord1 >>  0) & 0x00FFFFFF;
     BOOST_CHECK(eventBinaryPacketSequenceNumbered == 0);
-    BOOST_CHECK(eventBinaryPacketDataLength == 20 + threadId_size);
+    BOOST_CHECK(eventBinaryPacketDataLength == 20 + ThreadIdSize);
 
     // Check the decl_id
     offset += uint32_t_size;
@@ -352,12 +350,12 @@ BOOST_AUTO_TEST_CASE(SendEventClassAfterTimelineEntityPacketTest)
 
     // Check the thread id
     offset += uint64_t_size;
-    std::vector<uint8_t> readThreadId(threadId_size, 0);
-    ReadBytes(packetBuffer, offset, threadId_size, readThreadId.data());
+    std::vector<uint8_t> readThreadId(ThreadIdSize, 0);
+    ReadBytes(packetBuffer, offset, ThreadIdSize, readThreadId.data());
     BOOST_CHECK(readThreadId == threadId);
 
     // Check the profiling GUID
-    offset += threadId_size;
+    offset += ThreadIdSize;
     readProfilingGuid = ReadUint64(packetBuffer, offset);
     BOOST_CHECK(readProfilingGuid == eventProfilingGuid);
 }

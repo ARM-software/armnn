@@ -263,7 +263,6 @@ void VerifyTimelineEventBinaryPacket(Optional<uint64_t> timestamp,
     // Utils
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
-    unsigned int threadId_size = sizeof(std::thread::id);
 
     // Reading TimelineEventBinaryPacket
     // Check the decl_id
@@ -284,8 +283,8 @@ void VerifyTimelineEventBinaryPacket(Optional<uint64_t> timestamp,
 
     // Check the thread id
     offset += uint64_t_size;
-    std::vector<uint8_t> readThreadId(threadId_size, 0);
-    ReadBytes(readableData, offset, threadId_size, readThreadId.data());
+    std::vector<uint8_t> readThreadId(ThreadIdSize, 0);
+    ReadBytes(readableData, offset, ThreadIdSize, readThreadId.data());
     if (threadId.has_value())
     {
         BOOST_CHECK(readThreadId == threadId.value());
@@ -296,7 +295,7 @@ void VerifyTimelineEventBinaryPacket(Optional<uint64_t> timestamp,
     }
 
     // Check the event GUID
-    offset += threadId_size;
+    offset += ThreadIdSize;
     uint64_t readEventGuid = ReadUint64(readableData, offset);
     if (eventGuid.has_value())
     {
@@ -936,8 +935,7 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     // Validate inference data
     size = inferenceReadableBuffer->GetSize();
 
-    unsigned int threadId_size = sizeof(std::thread::id); // Is platform dependent
-    BOOST_CHECK(size == 1516 + 10 * threadId_size);
+    BOOST_CHECK(size == 1516 + 10 * ThreadIdSize);
 
     readableData = inferenceReadableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
@@ -945,7 +943,7 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 1508 + 10 * threadId_size);
+    VerifyTimelineHeaderBinary(readableData, offset, 1508 + 10 * ThreadIdSize);
 
     // Inference timeline trace
     // Inference entity

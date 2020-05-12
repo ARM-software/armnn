@@ -429,7 +429,6 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTestFullConstruction)
     unsigned int uint8_t_size  = sizeof(uint8_t);
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
-    unsigned int threadId_size = sizeof(std::thread::id);
 
     // Check the packet header
     unsigned int offset = 0;
@@ -459,7 +458,7 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTestFullConstruction)
     BOOST_CHECK(readPointerBytes == uint64_t_size);
     offset += uint8_t_size;
     uint8_t readThreadIdBytes = ReadUint8(buffer.data(), offset);
-    BOOST_CHECK(readThreadIdBytes == threadId_size);
+    BOOST_CHECK(readThreadIdBytes == ThreadIdSize);
 
     // Check the number of declarations
     offset += uint8_t_size;
@@ -742,9 +741,7 @@ BOOST_AUTO_TEST_CASE(TimelineEventPacketTestFullConstructionOfData)
 
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
-    unsigned int threadId_size = sizeof(std::thread::id); // Is platform dependent
-
-    BOOST_CHECK(numberOfBytesWritten == 20 + threadId_size);
+    BOOST_CHECK(numberOfBytesWritten == 20 + ThreadIdSize);
 
     unsigned int offset = 0;
     // Check the decl_id
@@ -758,12 +755,12 @@ BOOST_AUTO_TEST_CASE(TimelineEventPacketTestFullConstructionOfData)
 
     // Check the thread id
     offset += uint64_t_size;
-    std::vector<uint8_t> readThreadId(threadId_size, 0);
-    ReadBytes(buffer.data(), offset, threadId_size, readThreadId.data());
+    std::vector<uint8_t> readThreadId(ThreadIdSize, 0);
+    ReadBytes(buffer.data(), offset, ThreadIdSize, readThreadId.data());
     BOOST_CHECK(readThreadId == threadId);
 
     // Check the profiling GUID
-    offset += threadId_size;
+    offset += ThreadIdSize;
     uint64_t readProfilingGuid = ReadUint64(buffer.data(), offset);
     BOOST_CHECK(readProfilingGuid == profilingGuid);
 }

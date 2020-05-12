@@ -640,7 +640,6 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
     unsigned int uint8_t_size  = sizeof(uint8_t);
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
-    unsigned int threadId_size = sizeof(std::thread::id);
 
     // The payload/data of the packet consists of swtrace event definitions encoded according
     // to the swtrace directory specification. The messages being the five defined below:
@@ -719,7 +718,7 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
     // Write the stream header
     uint8_t streamVersion = 4;
     uint8_t pointerBytes  = boost::numeric_cast<uint8_t>(uint64_t_size); // All GUIDs are uint64_t
-    uint8_t threadIdBytes = boost::numeric_cast<uint8_t>(threadId_size);
+    uint8_t threadIdBytes = boost::numeric_cast<uint8_t>(ThreadIdSize);
     switch (threadIdBytes)
     {
     case 4: // Typically Windows and Android
@@ -813,7 +812,6 @@ TimelinePacketStatus WriteTimelineEventBinary(uint64_t timestamp,
     // Utils
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
-    unsigned int threadId_size = sizeof(std::thread::id);
 
     // decl_id of the timeline message
     uint32_t declId = 4;
@@ -821,7 +819,7 @@ TimelinePacketStatus WriteTimelineEventBinary(uint64_t timestamp,
     // Calculate the length of the data (in bytes)
     unsigned int timelineEventDataLength = uint32_t_size + // decl_id
                                            uint64_t_size + // Timestamp
-                                           threadId_size + // Thread id
+                                           ThreadIdSize +  // Thread id
                                            uint64_t_size;  // Profiling GUID
 
     // Check whether the timeline binary packet fits in the given buffer
@@ -838,8 +836,8 @@ TimelinePacketStatus WriteTimelineEventBinary(uint64_t timestamp,
     offset += uint32_t_size;
     WriteUint64(buffer, offset, timestamp); // Timestamp
     offset += uint64_t_size;
-    WriteBytes(buffer, offset, &threadId, threadId_size); // Thread id
-    offset += threadId_size;
+    WriteBytes(buffer, offset, &threadId, ThreadIdSize); // Thread id
+    offset += ThreadIdSize;
     WriteUint64(buffer, offset, profilingGuid); // Profiling GUID
     offset += uint64_t_size;
     // Update the number of bytes written

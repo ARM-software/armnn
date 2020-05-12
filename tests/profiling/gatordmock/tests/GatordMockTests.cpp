@@ -377,6 +377,11 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
 
 BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
 {
+    // This test requires the CpuRef backend to be enabled
+    if(!BackendRegistryInstance().IsBackendRegistered("CpuRef"))
+    {
+        return;
+    }
     armnn::MockBackendInitialiser initialiser;
     // Setup the mock service to bind to the UDS.
     std::string udsNamespace = "gatord_namespace";

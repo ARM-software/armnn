@@ -3,10 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <armnn/utility/IgnoreUnused.hpp>
-#include <FileOnlyProfilingConnection.hpp>
 #include <Filesystem.hpp>
-#include <NullProfilingConnection.hpp>
 #include <ProfilingService.hpp>
 #include <Runtime.hpp>
 #include "PrintPacketHeaderHandler.hpp"
@@ -17,7 +14,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include <cstdio>
-#include <fstream>
 #include <sstream>
 #include <sys/stat.h>
 
@@ -53,6 +49,12 @@ std::string UniqueFileName()
 
 BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
 {
+    // This test requires the CpuRef backend to be enabled
+    if(!BackendRegistryInstance().IsBackendRegistered("CpuRef"))
+    {
+        return;
+    }
+
     // Create a temporary file name.
     boost::filesystem::path tempPath = boost::filesystem::temp_directory_path();
     boost::filesystem::path tempFile = UniqueFileName();

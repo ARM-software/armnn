@@ -59,6 +59,9 @@ inline void InitializeArmComputeTensorData(arm_compute::Tensor& tensor,
         case DataType::Signed32:
             CopyArmComputeTensorData(tensor, handle->GetConstTensor<int32_t>());
             break;
+        case DataType::QSymmS16:
+            CopyArmComputeTensorData(tensor, handle->GetConstTensor<int16_t>());
+            break;
         default:
             ARMNN_ASSERT_MSG(false, "Unexpected tensor type.");
     }

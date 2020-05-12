@@ -39,6 +39,7 @@
 #include "NeonPermuteWorkload.hpp"
 #include "NeonPooling2dWorkload.hpp"
 #include "NeonPreluWorkload.hpp"
+#include "NeonQLstmWorkload.hpp"
 #include "NeonQuantizedLstmWorkload.hpp"
 #include "NeonQuantizeWorkload.hpp"
 #include "NeonReshapeWorkload.hpp"

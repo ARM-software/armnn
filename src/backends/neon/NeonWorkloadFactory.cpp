@@ -415,6 +415,12 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePrelu(const armnn::
     return std::make_unique<NeonPreluWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateQLstm(const QLstmQueueDescriptor& descriptor,
+                                                            const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonQLstmWorkload>(descriptor, info);
+}
+
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateQuantize(const QuantizeQueueDescriptor& descriptor,
                                                                       const WorkloadInfo& info) const
 {

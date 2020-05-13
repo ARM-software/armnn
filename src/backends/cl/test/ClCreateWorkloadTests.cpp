@@ -1035,6 +1035,34 @@ BOOST_AUTO_TEST_CASE(CreateStackUint8Workload)
     ClCreateStackWorkloadTest<armnn::DataType::QAsymmU8>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);
 }
 
+
+template <typename QLstmWorkloadType>
+static void ClCreateQLstmWorkloadTest()
+{
+    Graph graph;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
+
+    auto workload = CreateQLstmWorkloadTest<QLstmWorkloadType>(factory, graph);
+    QLstmQueueDescriptor queueDescriptor = workload->GetData();
+
+    IAclTensorHandle* inputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    BOOST_TEST((inputHandle->GetShape() == TensorShape({2, 4})));
+    BOOST_TEST((inputHandle->GetDataType() == arm_compute::DataType::QASYMM8_SIGNED));
+
+    IAclTensorHandle* cellStateOutHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[1]);
+    BOOST_TEST((cellStateOutHandle->GetShape() == TensorShape({2, 4})));
+    BOOST_TEST((cellStateOutHandle->GetDataType() == arm_compute::DataType::QSYMM16));
+
+    IAclTensorHandle* outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[2]);
+    BOOST_TEST((outputHandle->GetShape() == TensorShape({2, 4})));
+    BOOST_TEST((outputHandle->GetDataType() == arm_compute::DataType::QASYMM8_SIGNED));
+}
+
+BOOST_AUTO_TEST_CASE(CreateQLstmWorkloadTest)
+{
+    ClCreateQLstmWorkloadTest<ClQLstmWorkload>();
+}
+
 template <typename QuantizedLstmWorkloadType>
 static void ClCreateQuantizedLstmWorkloadTest()
 {

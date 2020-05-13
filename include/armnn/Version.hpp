@@ -8,17 +8,17 @@
 /// Macro utils
 #define STRINGIFY_VALUE(s) STRINGIFY_MACRO(s)
 #define STRINGIFY_MACRO(s) #s
-#define CONCAT_VALUE(a, b, c) CONCAT_MACRO(a, b, c)
-#define CONCAT_MACRO(a, b, c) a ## b ## c
 
 // ArmNN version components
-#define ARMNN_MAJOR_VERSION 20
-#define ARMNN_MINOR_VERSION 02
-#define ARMNN_PATCH_VERSION 00
+#define ARMNN_MAJOR_VERSION 21
+#define ARMNN_MINOR_VERSION 0
+#define ARMNN_PATCH_VERSION 0
 
-/// ARMNN_VERSION: "YYYYMMPP"
+/// ARMNN_VERSION: "X.Y.Z"
 /// where:
-///   YYYY = 4-digit year number
-///   MM   = 2-digit month number
-///   PP   = 2-digit patch number
-#define ARMNN_VERSION "20" STRINGIFY_VALUE(CONCAT_VALUE(ARMNN_MAJOR_VERSION, ARMNN_MINOR_VERSION, ARMNN_PATCH_VERSION))
+///   X = Major version number
+///   Y = Minor version number
+///   Z = Patch version number
+#define ARMNN_VERSION STRINGIFY_VALUE(ARMNN_MAJOR_VERSION) "." \
+                      STRINGIFY_VALUE(ARMNN_MINOR_VERSION) "." \
+                      STRINGIFY_VALUE(ARMNN_PATCH_VERSION)

@@ -47,11 +47,12 @@
 #include "workloads/ClPermuteWorkload.hpp"
 #include "workloads/ClPooling2dWorkload.hpp"
 #include "workloads/ClPreluWorkload.hpp"
+#include "workloads/ClQLstmWorkload.hpp"
+#include "workloads/ClQuantizedLstmWorkload.hpp"
+#include "workloads/ClQuantizeWorkload.hpp"
 #include "workloads/ClReshapeWorkload.hpp"
 #include "workloads/ClResizeWorkload.hpp"
 #include "workloads/ClRsqrtWorkload.hpp"
-#include "workloads/ClQuantizedLstmWorkload.hpp"
-#include "workloads/ClQuantizeWorkload.hpp"
 #include "workloads/ClSliceWorkload.hpp"
 #include "workloads/ClSoftmaxWorkload.hpp"
 #include "workloads/ClSpaceToBatchNdWorkload.hpp"
@@ -616,6 +617,40 @@ bool ClLayerSupport::IsPreluSupported(const armnn::TensorInfo &input,
                                       armnn::Optional<std::string &> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClPreluWorkloadValidate, reasonIfUnsupported, input, alpha, output);
+}
+
+bool ClLayerSupport::IsQLstmSupported(const TensorInfo& input,
+                                      const TensorInfo& previousOutputIn,
+                                      const TensorInfo& previousCellStateIn,
+                                      const TensorInfo& outputStateOut,
+                                      const TensorInfo& cellStateOut,
+                                      const TensorInfo& output,
+                                      const QLstmDescriptor& descriptor,
+                                      const LstmInputParamsInfo& paramsInfo,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    if (input.GetDataType()               == armnn::DataType::QAsymmS8 &&
+        previousOutputIn.GetDataType()    == armnn::DataType::QAsymmS8 &&
+        previousCellStateIn.GetDataType() == armnn::DataType::QSymmS16 &&
+        outputStateOut.GetDataType()      == armnn::DataType::QAsymmS8 &&
+        cellStateOut.GetDataType()        == armnn::DataType::QSymmS16 &&
+        output.GetDataType()              == armnn::DataType::QAsymmS8)
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(ClQLstmWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       input,
+                                       previousCellStateIn,
+                                       previousOutputIn,
+                                       cellStateOut,
+                                       outputStateOut,
+                                       output,
+                                       descriptor,
+                                       paramsInfo);
+    }
+    else
+    {
+        return false;
+    }
 }
 
 bool ClLayerSupport::IsQuantizedLstmSupported(const TensorInfo& input,

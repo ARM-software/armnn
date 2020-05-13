@@ -111,6 +111,9 @@ inline void InitializeArmComputeClTensorData(arm_compute::CLTensor& clTensor,
         case DataType::QSymmS8:
             CopyArmComputeClTensorData(clTensor, handle->GetConstTensor<int8_t>());
             break;
+        case DataType::QSymmS16:
+            CopyArmComputeClTensorData(clTensor, handle->GetConstTensor<int16_t>());
+            break;
         ARMNN_NO_DEPRECATE_WARN_END
         case DataType::Signed32:
             CopyArmComputeClTensorData(clTensor, handle->GetConstTensor<int32_t>());

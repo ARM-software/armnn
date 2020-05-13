@@ -232,7 +232,7 @@ uint16_t ProfilingService::GetCounterCount() const
 
 bool ProfilingService::IsCounterRegistered(uint16_t counterUid) const
 {
-    return counterUid < m_CounterIndex.size();
+    return m_CounterDirectory.IsCounterRegistered(counterUid);
 }
 
 uint32_t ProfilingService::GetAbsoluteCounterValue(uint16_t counterUid) const

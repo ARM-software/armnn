@@ -24,6 +24,7 @@ public:
     using NormalizationDescriptorPtr = const armnnSerializer::NormalizationDescriptor *;
     using LstmDescriptorPtr = const armnnSerializer::LstmDescriptor *;
     using LstmInputParamsPtr = const armnnSerializer::LstmInputParams *;
+    using QLstmDescriptorPtr = const armnnSerializer::QLstmDescriptor *;
     using QunatizedLstmInputParamsPtr = const armnnSerializer::QuantizedLstmInputParams *;
     using TensorRawPtrVector = std::vector<TensorRawPtr>;
     using LayerRawPtr = const armnnSerializer::LayerBase *;
@@ -62,6 +63,7 @@ public:
     static armnn::LstmDescriptor GetLstmDescriptor(LstmDescriptorPtr lstmDescriptor);
     static armnn::LstmInputParams GetLstmInputParams(LstmDescriptorPtr lstmDescriptor,
                                                      LstmInputParamsPtr lstmInputParams);
+    static armnn::QLstmDescriptor GetQLstmDescriptor(QLstmDescriptorPtr qLstmDescriptorPtr);
     static armnn::TensorInfo OutputShapeOfReshape(const armnn::TensorInfo & inputTensorInfo,
                                                   const std::vector<uint32_t> & targetDimsIn);
 
@@ -113,6 +115,7 @@ private:
     void ParsePermute(GraphPtr graph, unsigned int layerIndex);
     void ParsePooling2d(GraphPtr graph, unsigned int layerIndex);
     void ParsePrelu(GraphPtr graph, unsigned int layerIndex);
+    void ParseQLstm(GraphPtr graph, unsigned int layerIndex);
     void ParseQuantize(GraphPtr graph, unsigned int layerIndex);
     void ParseReshape(GraphPtr graph, unsigned int layerIndex);
     void ParseResize(GraphPtr graph, unsigned int layerIndex);

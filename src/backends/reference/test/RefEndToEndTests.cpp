@@ -18,6 +18,7 @@
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/LogSoftmaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
+#include <backendsCommon/test/QLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ResizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
@@ -1233,6 +1234,11 @@ BOOST_AUTO_TEST_CASE(RefArgMinAxis3Uint8Test)
 {
 
     ArgMinAxis3EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefQLstmEndToEndTest)
+{
+    QLstmEndToEnd(defaultBackends);
 }
 
 #if !defined(__ANDROID__)

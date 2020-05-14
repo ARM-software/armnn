@@ -39,6 +39,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     OptimizeSubgraphViewTests.cpp
     OptimizationViewsTests.cpp
     PreluEndToEndTestImpl.hpp
+    QLstmEndToEndTestImpl.cpp
+    QLstmEndToEndTestImpl.hpp
     QuantizedLstmEndToEndTestImpl.cpp
     QuantizedLstmEndToEndTestImpl.hpp
     ResizeEndToEndTestImpl.hpp

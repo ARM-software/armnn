@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="4efe5dc9b39a87eface43e7468e08279976ae9ef" # COMPMID-3484: Regression in Transpose convolution Android R CTS test.
+DEFAULT_CLFRAMEWORKREVISION="f401c74a963a1ce2e188cd20269650063c1d483c" #COMPMID-3483: Refactor NEDepthwiseConvolutionLayerNativeKernel.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

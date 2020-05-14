@@ -46,10 +46,6 @@ public:
                     permLayer.GetOutputHandler().SetTensorInfo(permOutInfo);
                 }
 
-                // Sets permuted output tensor info
-                const TensorInfo& childOutInfo = permute->GetOutputHandler().GetTensorInfo();
-                base.GetOutputHandler().SetTensorInfo(childOutInfo);
-
                 // Bypasses permute. It will be removed as it's left unconnected.
                 permute->GetOutputSlot().MoveAllConnections(base.GetOutputSlot());
             }

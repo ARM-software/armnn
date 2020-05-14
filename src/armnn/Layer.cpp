@@ -119,6 +119,7 @@ void OutputSlot::MoveAllConnections(OutputSlot& destination)
         InputSlot& connection = *GetConnection(0);
         Disconnect(connection);
         destination.Connect(connection);
+        destination.GetOutputHandler().SetTensorInfo(GetOutputHandler().GetTensorInfo());
     }
 }
 

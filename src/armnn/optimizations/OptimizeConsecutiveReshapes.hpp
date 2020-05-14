@@ -43,8 +43,6 @@ public:
             const ReshapeDescriptor descriptor{outInfo.GetShape()};
             auto& newReshape = *graph.InsertNewLayer<ReshapeLayer>(base.GetInputSlot(0), descriptor, name.c_str());
 
-            // Sets tensor info for new layer.
-            newReshape.GetOutputHandler().SetTensorInfo(outInfo);
             // Parent is now the new layer.
             parentOut = &newReshape.GetOutputSlot();
         }

@@ -25,7 +25,6 @@ public:
             const ReshapeDescriptor descriptor{outInfo.GetShape()};
             // Inserts NewLayer so layers don't need to be re-sorted.
             auto reshape = graph.InsertNewLayer<ReshapeLayer>(transpose.GetInputSlot(0), descriptor, name.c_str());
-            reshape->GetOutputHandler().SetTensorInfo(outInfo);
 
             // Bypass transpose. It will be deleted since it's left unconnected.
             transpose.GetOutputSlot().MoveAllConnections(reshape->GetOutputSlot());

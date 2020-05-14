@@ -90,7 +90,6 @@ public:
         auto& depthToSpace = *graph.InsertNewLayer<DepthToSpaceLayer>(base.GetInputSlot(0),
                                                                       depthToSpaceDesc,
                                                                       name.c_str());
-        depthToSpace.GetOutputHandler().SetTensorInfo(outputInfo);
 
         // Moves connections from child output to new layer.
         // Child layer will be removed as it's left unconnected.

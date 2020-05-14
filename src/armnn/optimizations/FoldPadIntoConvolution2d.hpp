@@ -30,7 +30,6 @@ public:
         Convolution2dLayer* convolution2dLayer = PolymorphicDowncast<Convolution2dLayer*>(&child);
 
         OutputSlot* parentOut = base.GetInputSlot(0).GetConnectedOutputSlot();
-        const TensorInfo& outInfo = child.GetOutputHandler().GetTensorInfo();
 
         const std::string name = std::string("folded-") + base.GetName() + std::string("-into-") + child.GetName();
         Convolution2dDescriptor descriptor = convolution2dLayer->GetParameters();
@@ -59,7 +58,6 @@ public:
         auto& newConv2dLayer = *graph.InsertNewLayer<Convolution2dLayer>(base.GetInputSlot(0),
                                                                          descriptor,
                                                                          name.c_str());
-        newConv2dLayer.GetOutputHandler().SetTensorInfo(outInfo);
 
         // Copy weights and bias to the new convolution layer
         ARMNN_ASSERT_MSG(convolution2dLayer->m_Weight != nullptr,

@@ -46,10 +46,6 @@ public:
                     permLayer.GetOutputHandler().SetTensorInfo(permOutInfo);
                 }
 
-                // Sets transposed output tensor info
-                const TensorInfo& childOutInfo = transpose->GetOutputHandler().GetTensorInfo();
-                base.GetOutputHandler().SetTensorInfo(childOutInfo);
-
                 // Bypasses transpose. It will be removed as it's left unconnected.
                 transpose->GetOutputSlot().MoveAllConnections(base.GetOutputSlot());
             }

@@ -25,7 +25,6 @@ public:
             const ReshapeDescriptor descriptor{outInfo.GetShape()};
             // Inserts NewLayer so layers don't need to be re-sorted.
             auto reshape = graph.InsertNewLayer<ReshapeLayer>(permute.GetInputSlot(0), descriptor, name.c_str());
-            reshape->GetOutputHandler().SetTensorInfo(outInfo);
 
             // Bypass permute. It will be deleted since it's left unconnected.
             permute.GetOutputSlot().MoveAllConnections(reshape->GetOutputSlot());

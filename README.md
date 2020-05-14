@@ -12,6 +12,8 @@ There is a getting started guide here using ONNX: <https://developer.arm.com/sol
 
 There is a guide for backend development: [Backend development guide](src/backends/README.md)
 
+API Documentation is available at https://github.com/ARM-software/armnn/wiki/Documentation.
+
 ### Build Instructions
 
 Arm tests the build system of Arm NN with the following build environments:

@@ -76,8 +76,8 @@ The parser only supports constant weights in a fully connected layer.
 
 Arm tested these operators with the following ONNX fp32 neural networks:
 
-* Simple MNIST. See the ONNX [MNIST documentation](https://github.com/onnx/models/tree/master/mnist) for more information.
+* Mobilenet_v2. See the ONNX [MobileNet documentation](https://github.com/onnx/models/tree/master/vision/classification/mobilenet) for more information.
 
-* Mobilenet_v2. See the ONNX [MobileNet documentation](https://github.com/onnx/models/tree/master/models/image_classification/mobilenet) for more information.
+* Simple MNIST. This is no longer directly documented by ONNX. The model and test data may be downloaded [from the ONNX model zoo](https://onnxzoo.blob.core.windows.net/models/opset_8/mnist/mnist.tar.gz).
 
-More machine learning operators will be supported in future releases.
+More machine learning operators will be supported in future releases as time allows. If you require specific operator support contribution are welcome.

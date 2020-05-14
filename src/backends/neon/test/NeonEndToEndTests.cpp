@@ -15,6 +15,7 @@
 #include <backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
+#include <backendsCommon/test/QLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
@@ -712,6 +713,11 @@ BOOST_AUTO_TEST_CASE(NeonDetectionPostProcessFastNmsUint8Test, * boost::unit_tes
     DetectionPostProcessFastNmsEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, qBoxEncodings,
                                                                           qScores, qAnchors,
                                                                           1.0f, 1, 0.01f, 0, 0.5f, 0);
+}
+
+BOOST_AUTO_TEST_CASE(NeonQLstmEndToEndTest)
+{
+    QLstmEndToEnd(defaultBackends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

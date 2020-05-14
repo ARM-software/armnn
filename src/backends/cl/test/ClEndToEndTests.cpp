@@ -14,6 +14,7 @@
 #include <backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
+#include <backendsCommon/test/QLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
@@ -488,6 +489,11 @@ BOOST_AUTO_TEST_CASE(ClArgMaxAxis3TestQAsymmU8)
 BOOST_AUTO_TEST_CASE(ClArgMinAxis3TestQAsymmU8)
 {
     ArgMinAxis3EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClQLstmEndToEndTest)
+{
+    QLstmEndToEnd(defaultBackends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

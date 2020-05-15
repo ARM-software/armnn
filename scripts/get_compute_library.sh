@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_02" # Release 20.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="f401c74a963a1ce2e188cd20269650063c1d483c" #COMPMID-3483: Refactor NEDepthwiseConvolutionLayerNativeKernel.
+DEFAULT_CLFRAMEWORKREVISION="090502887d87f52d28e98e90c0e17c582b9e63d6" #COMPMID-3069: Align graph convolution implementation for CL and NEON..
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

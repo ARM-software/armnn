@@ -24,9 +24,7 @@ def mock_profiler(shared_data_folder):
 
 
 def test_inference_exec(mock_profiler):
-    preferred_backends = [ann.BackendId('CpuRef'), ann.BackendId('CpuAcc'),
-                          ann.BackendId('GpuAcc'), ann.BackendId('EthosNAcc')]
-    profiling_data_obj = ann.get_profiling_data(mock_profiler, preferred_backends)
+    profiling_data_obj = ann.get_profiling_data(mock_profiler)
 
     assert (len(profiling_data_obj.inference_data) > 0)
     assert (len(profiling_data_obj.per_workload_execution_data) > 0)
@@ -62,9 +60,7 @@ def test_inference_exec(mock_profiler):
                                                                   'EthosNSomeMock4dWorkload_Execute_#8')
                                                                  ])
 def test_profiler_workloads(mock_profiler, exec_times, unit, backend, workload):
-    preferred_backends = [ann.BackendId('CpuRef'), ann.BackendId('CpuAcc'),
-                          ann.BackendId('GpuAcc'), ann.BackendId('EthosNAcc')]
-    profiling_data_obj = ann.get_profiling_data(mock_profiler, preferred_backends)
+    profiling_data_obj = ann.get_profiling_data(mock_profiler)
 
     work_load_exec = profiling_data_obj.per_workload_execution_data[workload]
     assert work_load_exec["execution_time"] == exec_times

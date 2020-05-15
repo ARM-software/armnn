@@ -430,7 +430,7 @@ BOOST_AUTO_TEST_CASE(CreateDeviceRecordTest)
     };
     BOOST_CHECK(deviceRecordWord0[0] == deviceUid); // uid
     BOOST_CHECK(deviceRecordWord0[1] == deviceCores); // cores
-    BOOST_CHECK(deviceRecord[1] == 2); // name_offset
+    BOOST_CHECK(deviceRecord[1] == 8); // name_offset
     BOOST_CHECK(deviceRecord[2] == deviceName.size() + 1); // The length of the SWTrace string (name)
     BOOST_CHECK(std::memcmp(deviceRecord.data() + 3, deviceName.data(), deviceName.size()) == 0); // name
 }
@@ -483,7 +483,7 @@ BOOST_AUTO_TEST_CASE(CreateCounterSetRecordTest)
     };
     BOOST_CHECK(counterSetRecordWord0[0] == counterSetUid); // uid
     BOOST_CHECK(counterSetRecordWord0[1] == counterSetCount); // cores
-    BOOST_CHECK(counterSetRecord[1] == 2); // name_offset
+    BOOST_CHECK(counterSetRecord[1] == 8); // name_offset
     BOOST_CHECK(counterSetRecord[2] == counterSetName.size() + 1); // The length of the SWTrace string (name)
     BOOST_CHECK(std::memcmp(counterSetRecord.data() + 3, counterSetName.data(), counterSetName.size()) == 0); // name
 }
@@ -1342,7 +1342,7 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
         deviceRecord.name_offset = deviceRecordWord1;                      // name_offset
 
         uint32_t deviceRecordPoolOffset = deviceRecordOffsets[i] +                  // Packet body offset
-                                          deviceRecord.name_offset * uint32_t_size; // Device name offset
+                                          deviceRecord.name_offset; // Device name offset
         uint32_t deviceRecordNameLength = ReadUint32(readBuffer, deviceRecordPoolOffset);
         deviceRecord.name_length = deviceRecordNameLength; // name_length
         unsigned char deviceRecordNameNullTerminator = // name null-terminator
@@ -1402,7 +1402,7 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
         counterSetRecord.name_offset = counterSetRecordWord1;                      // name_offset
 
         uint32_t counterSetRecordPoolOffset = counterSetRecordOffsets[i]  +                 // Packet body offset
-                                              counterSetRecord.name_offset * uint32_t_size; // Counter set name offset
+                                              counterSetRecord.name_offset; // Counter set name offset
         uint32_t counterSetRecordNameLength = ReadUint32(readBuffer, counterSetRecordPoolOffset);
         counterSetRecord.name_length = counterSetRecordNameLength; // name_length
         unsigned char counterSetRecordNameNullTerminator = // name null-terminator

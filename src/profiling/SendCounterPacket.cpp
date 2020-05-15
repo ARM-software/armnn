@@ -299,7 +299,7 @@ bool SendCounterPacket::CreateDeviceRecord(const DevicePtr& device,
 
     // Device record word 1:
     // 0:31 [32] name_offset: offset from the beginning of the device record pool to the name field
-    const uint32_t deviceRecordWord1 = 2u; // The offset is always two here, as the name field is always
+    const uint32_t deviceRecordWord1 = 8u; // The offset is always eight here, as the name field is always
                                            // the first (and only) item in the pool and there are two device words
 
     // Convert the device name into a SWTrace string
@@ -349,7 +349,7 @@ bool SendCounterPacket::CreateCounterSetRecord(const CounterSetPtr& counterSet,
 
     // Counter set record word 1:
     // 0:31 [32] name_offset: offset from the beginning of the counter set pool to the name field
-    const uint32_t counterSetRecordWord1 = 2u; // The offset is always two here, as the name field is always
+    const uint32_t counterSetRecordWord1 = 8u; // The offset is always eight here, as the name field is always
                                                // the first (and only) item in the pool after the two counter set words
 
     // Convert the device name into a SWTrace namestring

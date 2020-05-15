@@ -11,7 +11,7 @@
 #include "ICounterDirectory.hpp"
 #include "IPacketBuffer.hpp"
 
-#include "common/include/Packet.hpp"
+#include <Packet.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
 

@@ -26,5 +26,6 @@ target_include_directories(Arm_CpuRef_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/
 target_include_directories(Arm_CpuRef_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
 target_include_directories(Arm_CpuRef_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(Arm_CpuRef_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(Arm_CpuRef_backend PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 set_target_properties(Arm_CpuRef_backend PROPERTIES PREFIX "")
 target_link_libraries(Arm_CpuRef_backend armnn)

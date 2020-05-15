@@ -6,7 +6,7 @@
 #pragma once
 
 #include "CounterIdMap.hpp"
-#include "common/include/Packet.hpp"
+#include <Packet.hpp>
 #include "CommandHandlerFunctor.hpp"
 #include "Holder.hpp"
 #include "ProfilingStateMachine.hpp"

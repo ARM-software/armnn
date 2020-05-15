@@ -8,7 +8,7 @@
 #include "CommandHandlerFunctor.hpp"
 #include "ISendCounterPacket.hpp"
 #include "armnn/profiling/ISendTimelinePacket.hpp"
-#include "common/include/Packet.hpp"
+#include <Packet.hpp>
 #include "ProfilingStateMachine.hpp"
 
 namespace armnn

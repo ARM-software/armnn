@@ -13,7 +13,7 @@
 
 #include "armnn/Optional.hpp"
 
-#include "common/include/Packet.hpp"
+#include <Packet.hpp>
 
 
 namespace armnn

@@ -168,6 +168,7 @@ target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 
 # Dummy shared object for testing.
 # This is a simple library used to test the utility functions that will be used to handle the shared objects.
@@ -195,6 +196,7 @@ target_compile_definitions(ValidTestDynamicBackend PRIVATE -DVALID_TEST_DYNAMIC_
 target_include_directories(ValidTestDynamicBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(ValidTestDynamicBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(ValidTestDynamicBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(ValidTestDynamicBackend PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(ValidTestDynamicBackend armnn)
 set_target_properties(ValidTestDynamicBackend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
 
@@ -203,6 +205,7 @@ target_compile_definitions(InvalidTestDynamicBackend1 PRIVATE -DINVALID_TEST_DYN
 target_include_directories(InvalidTestDynamicBackend1 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(InvalidTestDynamicBackend1 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(InvalidTestDynamicBackend1 PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(InvalidTestDynamicBackend1 PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(InvalidTestDynamicBackend1 armnn)
 set_target_properties(InvalidTestDynamicBackend1 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
 
@@ -211,6 +214,7 @@ target_compile_definitions(InvalidTestDynamicBackend2 PRIVATE -DINVALID_TEST_DYN
 target_include_directories(InvalidTestDynamicBackend2 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(InvalidTestDynamicBackend2 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(InvalidTestDynamicBackend2 PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(InvalidTestDynamicBackend2 PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(InvalidTestDynamicBackend2 armnn)
 set_target_properties(InvalidTestDynamicBackend2 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
 
@@ -219,6 +223,7 @@ target_compile_definitions(InvalidTestDynamicBackend3 PRIVATE -DINVALID_TEST_DYN
 target_include_directories(InvalidTestDynamicBackend3 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(InvalidTestDynamicBackend3 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(InvalidTestDynamicBackend3 PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(InvalidTestDynamicBackend3 PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(InvalidTestDynamicBackend3 armnn)
 set_target_properties(InvalidTestDynamicBackend3 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
 
@@ -227,6 +232,7 @@ target_compile_definitions(InvalidTestDynamicBackend4 PRIVATE -DINVALID_TEST_DYN
 target_include_directories(InvalidTestDynamicBackend4 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(InvalidTestDynamicBackend4 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(InvalidTestDynamicBackend4 PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(InvalidTestDynamicBackend4 PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(InvalidTestDynamicBackend4 armnn)
 set_target_properties(InvalidTestDynamicBackend4 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
 
@@ -235,6 +241,7 @@ target_compile_definitions(InvalidTestDynamicBackend5 PRIVATE -DINVALID_TEST_DYN
 target_include_directories(InvalidTestDynamicBackend5 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(InvalidTestDynamicBackend5 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(InvalidTestDynamicBackend5 PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(InvalidTestDynamicBackend5 PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(InvalidTestDynamicBackend5 armnn)
 set_target_properties(InvalidTestDynamicBackend5 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
 
@@ -243,6 +250,7 @@ target_compile_definitions(InvalidTestDynamicBackend6 PRIVATE -DINVALID_TEST_DYN
 target_include_directories(InvalidTestDynamicBackend6 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(InvalidTestDynamicBackend6 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(InvalidTestDynamicBackend6 PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(InvalidTestDynamicBackend6 PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(InvalidTestDynamicBackend6 armnn)
 set_target_properties(InvalidTestDynamicBackend6 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
 
@@ -251,6 +259,7 @@ target_compile_definitions(InvalidTestDynamicBackend7 PRIVATE -DINVALID_TEST_DYN
 target_include_directories(InvalidTestDynamicBackend7 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(InvalidTestDynamicBackend7 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(InvalidTestDynamicBackend7 PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(InvalidTestDynamicBackend7 PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(InvalidTestDynamicBackend7 armnn)
 set_target_properties(InvalidTestDynamicBackend7 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
 
@@ -298,6 +307,7 @@ target_compile_definitions(Arm_TestValid2_backend PRIVATE -DVALID_TEST_DYNAMIC_B
 target_include_directories(Arm_TestValid2_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(Arm_TestValid2_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(Arm_TestValid2_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(Arm_TestValid2_backend PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(Arm_TestValid2_backend armnn)
 set_target_properties(Arm_TestValid2_backend PROPERTIES PREFIX "")
 set_target_properties(Arm_TestValid2_backend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath5)
@@ -309,6 +319,7 @@ target_compile_definitions(Arm_TestValid3_backend PRIVATE -DVALID_TEST_DYNAMIC_B
 target_include_directories(Arm_TestValid3_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(Arm_TestValid3_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(Arm_TestValid3_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(Arm_TestValid3_backend PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(Arm_TestValid3_backend armnn)
 set_target_properties(Arm_TestValid3_backend PROPERTIES PREFIX "")
 set_target_properties(Arm_TestValid3_backend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath5)
@@ -318,6 +329,7 @@ target_compile_definitions(Arm_TestInvalid8_backend PRIVATE -DINVALID_TEST_DYNAM
 target_include_directories(Arm_TestInvalid8_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(Arm_TestInvalid8_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(Arm_TestInvalid8_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(Arm_TestInvalid8_backend PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(Arm_TestInvalid8_backend armnn)
 set_target_properties(Arm_TestInvalid8_backend PROPERTIES PREFIX "")
 set_target_properties(Arm_TestInvalid8_backend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath5)
@@ -327,6 +339,7 @@ target_compile_definitions(Arm_TestValid4_backend PRIVATE -DVALID_TEST_DYNAMIC_B
 target_include_directories(Arm_TestValid4_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(Arm_TestValid4_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(Arm_TestValid4_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(Arm_TestValid4_backend PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(Arm_TestValid4_backend armnn)
 set_target_properties(Arm_TestValid4_backend PROPERTIES PREFIX "")
 set_target_properties(Arm_TestValid4_backend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath6)
@@ -336,6 +349,7 @@ target_compile_definitions(Arm_TestValid5_backend PRIVATE -DVALID_TEST_DYNAMIC_B
 target_include_directories(Arm_TestValid5_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(Arm_TestValid5_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(Arm_TestValid5_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(Arm_TestValid5_backend PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(Arm_TestValid5_backend armnn)
 set_target_properties(Arm_TestValid5_backend PROPERTIES PREFIX "")
 set_target_properties(Arm_TestValid5_backend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath6)
@@ -345,6 +359,7 @@ target_compile_definitions(Arm_TestInvalid9_backend PRIVATE -DINVALID_TEST_DYNAM
 target_include_directories(Arm_TestInvalid9_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(Arm_TestInvalid9_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(Arm_TestInvalid9_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(Arm_TestInvalid9_backend PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(Arm_TestInvalid9_backend armnn)
 set_target_properties(Arm_TestInvalid9_backend PROPERTIES PREFIX "")
 set_target_properties(Arm_TestInvalid9_backend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath6)
@@ -354,6 +369,7 @@ target_compile_definitions(Arm_TestInvalid10_backend PRIVATE -DINVALID_TEST_DYNA
 target_include_directories(Arm_TestInvalid10_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(Arm_TestInvalid10_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(Arm_TestInvalid10_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(Arm_TestInvalid10_backend PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(Arm_TestInvalid10_backend armnn)
 set_target_properties(Arm_TestInvalid10_backend PROPERTIES PREFIX "")
 set_target_properties(Arm_TestInvalid10_backend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath9)
@@ -363,6 +379,7 @@ target_compile_definitions(Arm_TestInvalid11_backend PRIVATE -DINVALID_TEST_DYNA
 target_include_directories(Arm_TestInvalid11_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(Arm_TestInvalid11_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(Arm_TestInvalid11_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(Arm_TestInvalid11_backend PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_link_libraries(Arm_TestInvalid11_backend armnn)
 set_target_properties(Arm_TestInvalid11_backend PROPERTIES PREFIX "")
 set_target_properties(Arm_TestInvalid11_backend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath9)

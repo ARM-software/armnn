@@ -23,3 +23,4 @@ target_include_directories(armnnRefBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR
 target_include_directories(armnnRefBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
 target_include_directories(armnnRefBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(armnnRefBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+target_include_directories(armnnRefBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)

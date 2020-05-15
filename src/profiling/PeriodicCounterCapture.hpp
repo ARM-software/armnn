@@ -7,7 +7,7 @@
 
 #include "IPeriodicCounterCapture.hpp"
 #include "Holder.hpp"
-#include "common/include/Packet.hpp"
+#include <Packet.hpp>
 #include "SendCounterPacket.hpp"
 #include "ICounterValues.hpp"
 #include "CounterIdMap.hpp"

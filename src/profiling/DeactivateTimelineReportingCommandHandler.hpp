@@ -6,7 +6,7 @@
 #pragma once
 
 #include "CommandHandlerFunctor.hpp"
-#include "common/include/Packet.hpp"
+#include <Packet.hpp>
 #include "ProfilingStateMachine.hpp"
 #include "INotifyBackends.hpp"
 

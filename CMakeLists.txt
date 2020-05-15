@@ -573,6 +573,7 @@ target_include_directories(armnn PRIVATE src/armnn)
 target_include_directories(armnn PRIVATE src/armnnUtils)
 target_include_directories(armnn PRIVATE src/backends)
 target_include_directories(armnn PRIVATE src/profiling)
+target_include_directories(armnn PRIVATE profiling/common/include)
 
 target_link_libraries(armnn armnnUtils)
 

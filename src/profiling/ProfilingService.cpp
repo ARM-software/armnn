@@ -377,6 +377,10 @@ void ProfilingService::Initialize()
                                                    std::string("backends"));
         ARMNN_ASSERT(registeredBackendsCounter);
         InitializeCounterValue(registeredBackendsCounter->m_Uid);
+
+        // Due to backends being registered before the profiling service becomes active,
+        // we need to set the counter to the correct value here
+        SetCounterValue(armnn::profiling::REGISTERED_BACKENDS, static_cast<uint32_t>(BackendRegistryInstance().Size()));
     }
     // Register a counter for the number of registered backends
     if (!m_CounterDirectory.IsCounterRegistered("Backends unregistered"))

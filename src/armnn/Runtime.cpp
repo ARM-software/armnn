@@ -220,6 +220,7 @@ Runtime::Runtime(const CreationOptions& options)
         }
     }
 
+    BackendRegistryInstance().SetProfilingService(m_ProfilingService);
     // pass configuration info to the profiling service
     m_ProfilingService.ConfigureProfilingService(options.m_ProfilingOptions);
 
@@ -269,6 +270,8 @@ Runtime::~Runtime()
     DynamicBackendUtils::DeregisterDynamicBackends(m_DeviceSpec.GetDynamicBackends());
     m_DeviceSpec.ClearDynamicBackends();
     m_BackendContexts.clear();
+
+    BackendRegistryInstance().SetProfilingService(armnn::EmptyOptional());
 }
 
 LoadedNetwork* Runtime::GetLoadedNetworkPtr(NetworkId networkId) const

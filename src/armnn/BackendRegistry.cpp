@@ -5,6 +5,7 @@
 
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Exceptions.hpp>
+#include <ProfilingService.hpp>
 
 namespace armnn
 {
@@ -24,11 +25,25 @@ void BackendRegistry::Register(const BackendId& id, BackendRegistry::FactoryFunc
             CHECK_LOCATION());
     }
     m_Factories[id] = factory;
+
+    if (m_ProfilingService.has_value())
+    {
+        if (m_ProfilingService.has_value() && m_ProfilingService.value().IsProfilingEnabled())
+        {
+            m_ProfilingService.value().IncrementCounterValue(armnn::profiling::REGISTERED_BACKENDS);
+        }
+    }
+
 }
 
 void BackendRegistry::Deregister(const BackendId& id)
 {
     m_Factories.erase(id);
+
+    if (m_ProfilingService.has_value() && m_ProfilingService.value().IsProfilingEnabled())
+    {
+        m_ProfilingService.value().IncrementCounterValue(armnn::profiling::UNREGISTERED_BACKENDS);
+    }
 }
 
 bool BackendRegistry::IsBackendRegistered(const BackendId& id) const
@@ -84,6 +99,11 @@ std::string BackendRegistry::GetBackendIdsAsString() const
 void BackendRegistry::Swap(BackendRegistry& instance, BackendRegistry::FactoryStorage& other)
 {
     std::swap(instance.m_Factories, other);
+}
+
+void BackendRegistry::SetProfilingService(armnn::Optional<profiling::ProfilingService&> profilingService)
+{
+    m_ProfilingService = profilingService;
 }
 
 

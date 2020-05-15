@@ -6,6 +6,7 @@
 
 #include <armnn/Types.hpp>
 #include <armnn/BackendId.hpp>
+#include <armnn/Optional.hpp>
 
 #include <memory>
 #include <unordered_map>
@@ -14,6 +15,10 @@
 namespace armnn
 {
 
+namespace profiling
+{
+    class ProfilingService;
+}
 class IBackendInternal;
 using IBackendInternalUniquePtr = std::unique_ptr<IBackendInternal>;
 
@@ -29,6 +34,7 @@ public:
     size_t Size() const;
     BackendIdSet GetBackendIds() const;
     std::string GetBackendIdsAsString() const;
+    void SetProfilingService(armnn::Optional<profiling::ProfilingService&> profilingService);
 
     BackendRegistry() {}
     virtual ~BackendRegistry() {}
@@ -56,6 +62,7 @@ private:
     BackendRegistry& operator=(const BackendRegistry&) = delete;
 
     FactoryStorage m_Factories;
+    armnn::Optional<profiling::ProfilingService&> m_ProfilingService;
 };
 
 BackendRegistry& BackendRegistryInstance();

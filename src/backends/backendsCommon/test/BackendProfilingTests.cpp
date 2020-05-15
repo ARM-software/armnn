@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(BackendProfilingCounterRegisterMockBackendTest)
 {
     // Reset the profiling service to the uninitialized state
     armnn::IRuntime::CreationOptions options;
-    options.m_ProfilingOptions.m_EnableProfiling = true;;
+    options.m_ProfilingOptions.m_EnableProfiling = true;
 
     armnn::MockBackendInitialiser initialiser;
     // Create a runtime

@@ -232,8 +232,6 @@ void QLstmLayer::ValidateTensorShapesFromInputs()
     {
         ARMNN_ASSERT_MSG(m_ProjectionParameters.m_ProjectionWeights != nullptr,
                          "QLstmLayer: m_ProjectionParameters.m_ProjectionWeights should not be null.");
-        ARMNN_ASSERT_MSG(m_ProjectionParameters.m_ProjectionBias != nullptr,
-                         "QLstmLayer: m_ProjectionParameters.m_ProjectionBias should not be null.");
     }
 
     if (m_Param.m_PeepholeEnabled)

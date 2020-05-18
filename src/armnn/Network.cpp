@@ -1874,15 +1874,16 @@ IConnectableLayer* Network::AddQLstmLayer(const QLstmDescriptor&  descriptor,
             throw InvalidArgumentException("AddQLstmLayer: Projection Weights cannot be NULL");
         }
 
-        if(params.m_ProjectionBias == nullptr)
-        {
-            throw InvalidArgumentException("AddQLstmLayer: Projection Biases cannot be NULL");
-        }
-
         layer->m_ProjectionParameters.m_ProjectionWeights =
                 std::make_unique<ScopedCpuTensorHandle>(*(params.m_ProjectionWeights));
-        layer->m_ProjectionParameters.m_ProjectionBias =
-                std::make_unique<ScopedCpuTensorHandle>(*(params.m_ProjectionBias));
+
+        // Projection bias is optional even if projection is enabled
+        if(params.m_ProjectionWeights != nullptr)
+        {
+            layer->m_ProjectionParameters.m_ProjectionBias =
+                    std::make_unique<ScopedCpuTensorHandle>(*(params.m_ProjectionBias));
+        }
+
     }
 
     // QLstm Peephole params

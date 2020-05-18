@@ -795,7 +795,12 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
             if(descriptor.m_ProjectionEnabled)
             {
                 paramsInfo.m_ProjectionWeights = &cLayer->m_ProjectionParameters.m_ProjectionWeights->GetTensorInfo();
-                paramsInfo.m_ProjectionBias = &cLayer->m_ProjectionParameters.m_ProjectionBias->GetTensorInfo();
+
+                // Projection bias is optional even if projection is enabled
+                if (cLayer->m_ProjectionParameters.m_ProjectionBias != nullptr)
+                {
+                    paramsInfo.m_ProjectionBias = &cLayer->m_ProjectionParameters.m_ProjectionBias->GetTensorInfo();
+                }
             }
 
             if(descriptor.m_PeepholeEnabled)

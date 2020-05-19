@@ -48,7 +48,7 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 
 * Build:
 
-	(Requires gcc if not previously installed: `sudo apt install gcc`)
+	(Requires clang if not previously installed: `sudo apt-get install clang`)
 	```bash
 	echo "using clang : arm : aarch64-linux-android<Android_API>-clang++ ;" > $HOME/armnn-devenv/boost/user-config.jam
 	cd ~/armnn-devenv/boost/boost_1_64_0
@@ -69,11 +69,22 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 	git clone https://github.com/ARM-software/ComputeLibrary.git
 	```
 
+* Checkout ComputeLibrary branch:
+        ```bash
+        cd ComputeLibrary
+        git checkout <branch_name>
+        git pull
+        ```
+        For example, if you want to checkout release branch of 20.02:
+        ```bash
+        git checkout branches/arm_compute_20_02
+        git pull
+        ```
+
 * Build:
 
 	(Requires SCons if not previously installed: `sudo apt install scons`)
 	```bash
-	cd ComputeLibrary
 	scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" \
 	 benchmark_tests=0 validation_tests=0 os=android -j16
 	```
@@ -139,6 +150,20 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 	cd ~/armnn-devenv/
 	git clone https://github.com/ARM-software/armnn.git
 	```
+
+* Checkout ArmNN branch:
+
+        ```bash
+        cd armnn
+        git checkout <branch_name>
+        git pull
+        ```
+
+        For example, if you want to checkout release branch of 20.02:
+        ```bash
+        git checkout branches/armnn_20_02
+        git pull
+        ```
 
 * Generate TensorFlow protobuf definitions:
 

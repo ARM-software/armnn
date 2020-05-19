@@ -109,8 +109,16 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     ```bash
     git clone https://github.com/ARM-software/ComputeLibrary.git
     cd ComputeLibrary/
+    git checkout <branch_name>
+    git pull
     scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" -j8 internal_only=0
     ```
+
+    For example, if you want to checkout release branch of 20.02:
+        ```bash
+        git checkout branches/arm_compute_20_02
+        git pull
+        ```
 
 #### <a name="buildtf">Build Tensorflow</a>
 * Building Tensorflow version 1.15:
@@ -171,9 +179,17 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     ```bash
     git clone https://github.com/ARM-software/armnn.git
     cd armnn
+    git checkout <branch_name>
+    git pull
     mkdir build
     cd build
     ```
+
+    For example, if you want to checkout release branch of 20.02:
+        ```bash
+        git checkout branches/armnn_20_02
+        git pull
+        ```
 
 * Use CMake to configure your build environment, update the following script and run it from the armnn/build directory to set up the armNN build:
     ```bash

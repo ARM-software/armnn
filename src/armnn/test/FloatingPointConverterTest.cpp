@@ -69,8 +69,8 @@ BOOST_AUTO_TEST_CASE(TestConvertFloat32ToBFloat16)
                            -1.1800863E-38f,// 0x80808001 round up
                            4.843037E-35f,  // 0x0680C000 round up
                            3.9999998f,     // 0x407FFFFF round up
-                           3.4028235E38f,  // 0x7F7FFFFF max positive value
-                           -3.4028235E38f, // 0xFF7FFFFF max negative value
+                           std::numeric_limits<float>::max(),    // 0x7F7FFFFF max positive value
+                           std::numeric_limits<float>::lowest(), // 0xFF7FFFFF max negative value
                            1.1754942E-38f, // 0x007FFFFF min positive value
                            -1.1754942E-38f // 0x807FFFFF min negative value
                           };

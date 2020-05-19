@@ -139,10 +139,10 @@ BOOST_AUTO_TEST_CASE(Float32ToBFloat16Test)
     armnn::BFloat16 roundUp1 = armnn::BFloat16::Float32ToBFloat16(4.843037E-35f); // 0x0680C000
     BOOST_CHECK_EQUAL(roundUp1.Val(), 0x0681);
     // Max positive value -> infinity
-    armnn::BFloat16 maxPositive = armnn::BFloat16::Float32ToBFloat16(3.4028235E38f); // 0x7F7FFFFF
+    armnn::BFloat16 maxPositive = armnn::BFloat16::Float32ToBFloat16(std::numeric_limits<float>::max()); // 0x7F7FFFFF
     BOOST_CHECK_EQUAL(maxPositive, armnn::BFloat16::Inf());
     // Max negative value -> -infinity
-    armnn::BFloat16 maxNeg = armnn::BFloat16::Float32ToBFloat16(-3.4028235E38f); // 0xFF7FFFFF
+    armnn::BFloat16 maxNeg = armnn::BFloat16::Float32ToBFloat16(std::numeric_limits<float>::lowest()); // 0xFF7FFFFF
     BOOST_CHECK_EQUAL(maxNeg.Val(), 0xFF80);
     // Min positive value
     armnn::BFloat16 minPositive = armnn::BFloat16::Float32ToBFloat16(1.1754942E-38f); // 0x007FFFFF

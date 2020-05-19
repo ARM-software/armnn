@@ -1113,7 +1113,7 @@ static void RefCreateQLstmWorkloadTest()
     BOOST_TEST((outputHandle->GetTensorInfo() == outputInfo));
 }
 
-BOOST_AUTO_TEST_CASE(CreateQLstmWorkloadTest)
+BOOST_AUTO_TEST_CASE(CreateQLstmWorkload)
 {
     RefCreateQLstmWorkloadTest<RefQLstmWorkload>();
 }

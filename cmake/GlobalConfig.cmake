@@ -238,6 +238,11 @@ if(ARMCOMPUTENEON OR ARMCOMPUTECL)
         # We link to the static variant so that customers don't need to find and build a compatible version of clframework.
         # First try the folders specified ARMCOMPUTE_BUILD_DIR (with PATH_SUFFIXES for
         # Windows builds)
+        if ((NOT DEFINED ARMCOMPUTE_BUILD_DIR) AND (DEFINED ARMCOMPUTE_ROOT))
+            # Default build directory for ComputeLibrary is under the root
+            set(ARMCOMPUTE_BUILD_DIR ${ARMCOMPUTE_ROOT}/build)
+        endif()
+
         find_library(ARMCOMPUTE_LIBRARY_DEBUG NAMES arm_compute-static
                      PATHS ${ARMCOMPUTE_BUILD_DIR}
                      PATH_SUFFIXES "Debug"

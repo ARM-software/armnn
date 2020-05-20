@@ -12,6 +12,17 @@ Signed-off-by: John Doe <john.doe@example.org>
 
 You must use your real name, no pseudonyms or anonymous contributions are accepted.
 
+## In File Copyright Notice
+
+In each source file, include the following copyright notice:
+
+//
+// Copyright © <years additions were made to project> <your name> and Contributors. All rights reserved.
+// SPDX-License-Identifier: MIT
+//
+
+Note: if an existing file does not conform, update it when you next modify it, as convenient.
+
 ## Releases
 
 Official Arm NN releases are published through the official [Arm NN Github repository](https://github.com/ARM-software/armnn).

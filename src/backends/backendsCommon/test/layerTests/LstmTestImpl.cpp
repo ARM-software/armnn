@@ -160,28 +160,28 @@ LstmNoCifgNoPeepholeNoProjectionTestImpl(
 
     LayerTestResult<T, 2> ret(outputTensorInfo);
 
-    std::vector<float> inputVector;
+    std::vector<T> inputVector;
     inputVector.assign(input.data(), input.data() + (batchSize * inputSize));
-    auto inputTensor = MakeTensor<float,2>(inputTensorInfo, inputVector);
+    auto inputTensor = MakeTensor<T,2>(inputTensorInfo, inputVector);
 
-    std::vector<float> cellStateInVector(batchSize * numUnits, 0.f);
-    auto cellStateInTensor = MakeTensor<float,2>(cellStateInTensorInfo, cellStateInVector);
+    std::vector<T> cellStateInVector(batchSize * numUnits, T());
+    auto cellStateInTensor = MakeTensor<T,2>(cellStateInTensorInfo, cellStateInVector);
 
-    std::vector<float> outputStateInVector(batchSize * outputSize, 0.f);
-    auto outputStateInTensor = MakeTensor<float,2>(outputStateInTensorInfo, outputStateInVector);
+    std::vector<T> outputStateInVector(batchSize * outputSize, T());
+    auto outputStateInTensor = MakeTensor<T,2>(outputStateInTensorInfo, outputStateInVector);
 
-    std::vector<float> scratchBufferVector(batchSize * numUnits * 4, 0.f);
-    auto scratchBufferTensor = MakeTensor<float,2>(scratchBufferTensorInfo, scratchBufferVector);
+    std::vector<T> scratchBufferVector(batchSize * numUnits * 4, T());
+    auto scratchBufferTensor = MakeTensor<T,2>(scratchBufferTensorInfo, scratchBufferVector);
 
-    std::vector<float> outputStateOutVector(batchSize * outputSize, 0.f);
-    auto outputStateOutTensor = MakeTensor<float,2>(outputStateOutTensorInfo, outputStateOutVector);
+    std::vector<T> outputStateOutVector(batchSize * outputSize, T());
+    auto outputStateOutTensor = MakeTensor<T,2>(outputStateOutTensorInfo, outputStateOutVector);
 
-    std::vector<float> cellStateOutVector(batchSize * numUnits, 0.f);
-    auto cellStateOutTensor = MakeTensor<float,2>(cellStateOutTensorInfo, cellStateOutVector);
+    std::vector<T> cellStateOutVector(batchSize * numUnits, T());
+    auto cellStateOutTensor = MakeTensor<T,2>(cellStateOutTensorInfo, cellStateOutVector);
 
-    std::vector<float> outputVector;
+    std::vector<T> outputVector;
     outputVector.assign(outputExpected.data(), outputExpected.data() + (batchSize * outputSize));
-    ret.outputExpected = MakeTensor<float, 2>(outputTensorInfo, outputVector);
+    ret.outputExpected = MakeTensor<T, 2>(outputTensorInfo, outputVector);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> cellStateInHandle =
@@ -363,28 +363,28 @@ LstmLayerNoCifgWithPeepholeWithProjectionTestImpl(armnn::IWorkloadFactory& workl
 
     LayerTestResult<T, 2> ret(outputTensorInfo);
 
-    std::vector<float> inputVector;
+    std::vector<T> inputVector;
     inputVector.assign(input.data(), input.data() + (batchSize * inputSize));
-    auto inputTensor = MakeTensor<float,2>(inputTensorInfo, inputVector);
+    auto inputTensor = MakeTensor<T,2>(inputTensorInfo, inputVector);
 
-    std::vector<float> cellStateInVector(batchSize * numUnits, 0.f);
-    auto cellStateInTensor = MakeTensor<float,2>(cellStateInTensorInfo, cellStateInVector);
+    std::vector<T> cellStateInVector(batchSize * numUnits, T());
+    auto cellStateInTensor = MakeTensor<T,2>(cellStateInTensorInfo, cellStateInVector);
 
-    std::vector<float> outputStateInVector(batchSize * outputSize, 0.f);
-    auto outputStateInTensor = MakeTensor<float,2>(outputStateInTensorInfo, outputStateInVector);
+    std::vector<T> outputStateInVector(batchSize * outputSize, T());
+    auto outputStateInTensor = MakeTensor<T,2>(outputStateInTensorInfo, outputStateInVector);
 
-    std::vector<float> scratchBufferVector(batchSize * numUnits * 4, 0.f);
-    auto scratchBufferTensor = MakeTensor<float,2>(scratchBufferTensorInfo, scratchBufferVector);
+    std::vector<T> scratchBufferVector(batchSize * numUnits * 4, T());
+    auto scratchBufferTensor = MakeTensor<T,2>(scratchBufferTensorInfo, scratchBufferVector);
 
-    std::vector<float> outputStateOutVector(batchSize * outputSize, 0.f);
-    auto outputStateOutTensor = MakeTensor<float,2>(outputStateOutTensorInfo, outputStateOutVector);
+    std::vector<T> outputStateOutVector(batchSize * outputSize, T());
+    auto outputStateOutTensor = MakeTensor<T,2>(outputStateOutTensorInfo, outputStateOutVector);
 
-    std::vector<float> cellStateOutVector(batchSize * numUnits, 0.f);
-    auto cellStateOutTensor = MakeTensor<float,2>(cellStateOutTensorInfo, cellStateOutVector);
+    std::vector<T> cellStateOutVector(batchSize * numUnits, T());
+    auto cellStateOutTensor = MakeTensor<T,2>(cellStateOutTensorInfo, cellStateOutVector);
 
-    std::vector<float> outputVector;
+    std::vector<T> outputVector;
     outputVector.assign(outputExpected.data(), outputExpected.data() + (batchSize * outputSize));
-    ret.outputExpected = MakeTensor<float, 2>(outputTensorInfo, outputVector);
+    ret.outputExpected = MakeTensor<T, 2>(outputTensorInfo, outputVector);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> cellStateInHandle =
@@ -1195,27 +1195,27 @@ LayerTestResult<T, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
 
 
     // List of outputs
-    std::vector<float> scratchBufferVector(batchSize * scratchBufferSize, 0.f);
-    auto scratchBufferTensor = MakeTensor<float,2>(scratchBufferTensorInfo, scratchBufferVector);
+    std::vector<T> scratchBufferVector(batchSize * scratchBufferSize, T());
+    auto scratchBufferTensor = MakeTensor<T,2>(scratchBufferTensorInfo, scratchBufferVector);
     LayerTestResult<T, 2> ret0(scratchBufferTensorInfo);
 
     // Output state for a certain time step
-    std::vector<float> outputStateOutVector(batchSize * outputSize, 0.f);
-    auto outputStateOutTensor = MakeTensor<float,2>(outputStateOutTensorInfo, outputStateOutVector);
+    std::vector<T> outputStateOutVector(batchSize * outputSize, T());
+    auto outputStateOutTensor = MakeTensor<T,2>(outputStateOutTensorInfo, outputStateOutVector);
     LayerTestResult<T, 2> ret1(outputStateOutTensorInfo);
 
     // Cell state for a certain time step
-    std::vector<float> cellStateOutVector(batchSize * cellSize, 0.f);
-    auto cellStateOutTensor = MakeTensor<float,2>(cellStateOutTensorInfo, cellStateOutVector);
+    std::vector<T> cellStateOutVector(batchSize * cellSize, T());
+    auto cellStateOutTensor = MakeTensor<T,2>(cellStateOutTensorInfo, cellStateOutVector);
     LayerTestResult<T, 2> ret2(cellStateOutTensorInfo);
 
     // Output for a certain time step
-    std::vector<float> outputVector(batchSize * outputSize, 0.f);
-    auto outputTensor = MakeTensor<float, 2>(outputTensorInfo, outputVector);
-    std::vector<float> outputData;
+    std::vector<T> outputVector(batchSize * outputSize, T());
+    auto outputTensor = MakeTensor<T, 2>(outputTensorInfo, outputVector);
+    std::vector<T> outputData;
     outputData.assign(outputExpected.data(), outputExpected.data() + batchSize*outputSize);
     LayerTestResult<T, 2> ret3(outputTensorInfo);
-    ret3.outputExpected = MakeTensor<float, 2>(outputTensorInfo, outputData);
+    ret3.outputExpected = MakeTensor<T, 2>(outputTensorInfo, outputData);
 
     // Prepare the inputs and outputs for the workload
     std::unique_ptr<armnn::ITensorHandle> inputHandle =

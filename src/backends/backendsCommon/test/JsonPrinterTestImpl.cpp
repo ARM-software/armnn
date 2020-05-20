@@ -65,7 +65,7 @@ std::vector<double> ExtractMeasurements(const std::string& exp)
                 armnn::stringUtils::StringTrim(numberString, "\t,\n");
                 numbers.push_back(std::stod(numberString));
             }
-            catch (std::invalid_argument const& e)
+            catch (std::invalid_argument const&)
             {
                 BOOST_FAIL("Could not convert measurements to double: " + numberString);
             }
@@ -80,7 +80,7 @@ std::vector<double> ExtractMeasurements(const std::string& exp)
                 armnn::stringUtils::StringTrim(numberString, "\t,\n");
                 numbers.push_back(std::stod(numberString));
             }
-            catch (std::invalid_argument const& e)
+            catch (std::invalid_argument const&)
             {
                 BOOST_FAIL("Could not convert measurements to double: " + numberString);
             }

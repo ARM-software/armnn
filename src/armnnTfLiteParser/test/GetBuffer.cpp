@@ -120,7 +120,7 @@ BOOST_FIXTURE_TEST_CASE(GetBufferCheckParseException, GetBufferFixture)
 {
     //Check if armnn::ParseException thrown when invalid buffer index used
     TfLiteParser::ModelPtr model = TfLiteParser::LoadModelFromBinary(m_GraphBinary.data(), m_GraphBinary.size());
-    BOOST_CHECK_THROW(TfLiteParser::GetBuffer(model, 4)->data.empty(), armnn::Exception);
+    BOOST_CHECK_THROW(TfLiteParser::GetBuffer(model, 4), armnn::Exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

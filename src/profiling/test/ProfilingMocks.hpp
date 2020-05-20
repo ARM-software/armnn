@@ -111,12 +111,12 @@ public:
 
         if(packetInfo.second != 0)
         {
-            return std::count(m_WrittenData.begin(), m_WrittenData.end(), packetInfo);
+            return static_cast<long>(std::count(m_WrittenData.begin(), m_WrittenData.end(), packetInfo));
         }
         else
         {
-            return std::count_if(m_WrittenData.begin(), m_WrittenData.end(),
-            [&packetInfo](const std::pair<PacketType, uint32_t> pair) { return packetInfo.first == pair.first; });
+            return static_cast<long>(std::count_if(m_WrittenData.begin(), m_WrittenData.end(),
+            [&packetInfo](const std::pair<PacketType, uint32_t> pair) { return packetInfo.first == pair.first; }));
         }
     }
 
@@ -142,7 +142,7 @@ public:
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
 
-        return m_WrittenData.size();
+        return static_cast<unsigned long>(m_WrittenData.size());
     }
 
     void Clear()

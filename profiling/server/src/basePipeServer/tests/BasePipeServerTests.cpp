@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(BasePipeServerTest)
     unsigned int readBufferSize = packetBuffer->GetSize();
 
     BOOST_TEST(readBuffer);
-    BOOST_TEST(readBufferSize > 0);
+    BOOST_TEST(readBufferSize > 0u);
 
     socketProfilingConnection.WritePacket(readBuffer,readBufferSize);
     bufferManager.MarkRead(packetBuffer);
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(BasePipeServerTest)
     readBufferSize = packetBuffer->GetSize();
 
     BOOST_TEST(readBuffer);
-    BOOST_TEST(readBufferSize > 0);
+    BOOST_TEST(readBufferSize > 0u);
 
     socketProfilingConnection.WritePacket(readBuffer,readBufferSize);
     bufferManager.MarkRead(packetBuffer);

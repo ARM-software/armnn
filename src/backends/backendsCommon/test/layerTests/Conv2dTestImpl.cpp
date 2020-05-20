@@ -76,7 +76,7 @@ boost::multi_array<T, 1> GetBias2(bool biasEnabled, float qScale)
     if(biasEnabled)
     {
         armnn::TensorInfo biasDesc({static_cast<unsigned int>(Bias2.size())}, ArmnnType);
-        boost::multi_array<T, 1> bias = MakeTensor<T, 1>(biasDesc, QuantizedVector<T>(Bias2, qScale, 0.0f));
+        boost::multi_array<T, 1> bias = MakeTensor<T, 1>(biasDesc, QuantizedVector<T>(Bias2, qScale, 0));
         return bias;
     }
     else
@@ -92,7 +92,7 @@ boost::multi_array<T, 1> GetBias4(bool biasEnabled, float qScale)
     if(biasEnabled)
     {
         armnn::TensorInfo biasDesc({static_cast<unsigned int>(Bias4.size())}, ArmnnType);
-        boost::multi_array<T, 1> bias = MakeTensor<T, 1>(biasDesc, QuantizedVector<T>(Bias4, qScale, 0.0f));
+        boost::multi_array<T, 1> bias = MakeTensor<T, 1>(biasDesc, QuantizedVector<T>(Bias4, qScale, 0));
         return bias;
     }
     else
@@ -108,7 +108,7 @@ boost::multi_array<T, 1> GetBias8(bool biasEnabled, float qScale)
     if(biasEnabled)
     {
         armnn::TensorInfo biasDesc({static_cast<unsigned int>(Bias4.size())}, ArmnnType);
-        boost::multi_array<T, 1> bias = MakeTensor<T, 1>(biasDesc, QuantizedVector<T>(Bias8, qScale, 0.0f));
+        boost::multi_array<T, 1> bias = MakeTensor<T, 1>(biasDesc, QuantizedVector<T>(Bias8, qScale, 0));
         return bias;
     }
     else

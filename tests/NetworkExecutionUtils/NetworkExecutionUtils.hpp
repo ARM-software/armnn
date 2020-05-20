@@ -637,7 +637,8 @@ int RunTest(const std::string& format,
             try
             {
                 // Coverity fix: An exception of type armnn::InvalidArgumentException is thrown and never caught.
-                inputTensorShapes.push_back(std::make_unique<armnn::TensorShape>(dims.size(), dims.data()));
+                inputTensorShapes.push_back(
+                    std::make_unique<armnn::TensorShape>(static_cast<unsigned int>(dims.size()), dims.data()));
             }
             catch (const armnn::InvalidArgumentException& e)
             {

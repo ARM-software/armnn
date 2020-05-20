@@ -4,7 +4,6 @@
 //
 
 #include <boost/test/unit_test.hpp>
-#include <boost/core/lightweight_test.hpp>
 
 #define ARMNN_POLYMORPHIC_CAST_TESTABLE
 #define ARMNN_NUMERIC_CAST_TESTABLE

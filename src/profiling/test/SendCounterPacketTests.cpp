@@ -2273,7 +2273,7 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket3)
     // Check that the buffer contains at least one Stream Metadata packet and no other packets
     const auto writtenDataSize = mockProfilingConnection.GetWrittenDataSize();
 
-    BOOST_TEST(writtenDataSize >= 1);
+    BOOST_TEST(writtenDataSize >= 1u);
     BOOST_TEST(mockProfilingConnection.CheckForPacket(
                   {PacketType::StreamMetaData, streamMetadataPacketsize}) == writtenDataSize);
 }
@@ -2319,7 +2319,7 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket4)
     // Check that the buffer contains at least one Stream Metadata packet and no other packets
     const auto writtenDataSize = mockProfilingConnection.GetWrittenDataSize();
 
-    BOOST_TEST(writtenDataSize >= 1);
+    BOOST_TEST(writtenDataSize >= 1u);
     BOOST_TEST(mockProfilingConnection.CheckForPacket(
                   {PacketType::StreamMetaData, streamMetadataPacketsize}) == writtenDataSize);
 }

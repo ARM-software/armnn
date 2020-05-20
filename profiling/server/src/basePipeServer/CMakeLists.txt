@@ -24,6 +24,8 @@ if(BUILD_BASE_PIPE_SERVER)
     set_target_properties(armnnBasePipeServer PROPERTIES VERSION ${GENERIC_LIB_VERSION}
                           SOVERSION ${GENERIC_LIB_SOVERSION})
 
+    target_include_directories(armnnBasePipeServer PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
+
     target_link_libraries(armnnBasePipeServer armnn)
     if ("${CMAKE_SYSTEM_NAME}" STREQUAL Windows)
         target_link_libraries(armnnBasePipeServer Ws2_32.lib)

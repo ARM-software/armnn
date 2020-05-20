@@ -16,6 +16,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #elif defined(_MSC_VER)
+#include <WindowsWrapper.hpp>
 #include <winsock2.h>
 #include <afunix.h>
 #endif

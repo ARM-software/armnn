@@ -9,11 +9,7 @@
 #include <armnn/utility/Assert.hpp>
 
 #if defined(_MSC_VER)
-#ifndef NOMINMAX
-#define NOMINMAX // Prevent definition of min/max macros that interfere with std::min/max
-#endif
-#include <Windows.h>
-#undef TIME_MS  // Windows.h defines this but we don't need it and it interferes with our definition in Instrument.hpp
+#include <WindowsWrapper.hpp>
 #endif
 
 #if defined(__ANDROID__)

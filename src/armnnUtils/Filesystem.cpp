@@ -9,8 +9,7 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #elif defined(_MSC_VER)
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+#include "WindowsWrapper.hpp"
 #endif
 
 namespace armnnUtils

@@ -73,6 +73,7 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/TensorIOUtils.hpp
     src/armnnUtils/TensorUtils.cpp
     src/armnnUtils/Transpose.cpp
+    src/armnnUtils/WindowsWrapper.hpp
     )
 
 add_library_ex(armnnUtils STATIC ${armnnUtils_sources})
@@ -255,6 +256,7 @@ list(APPEND armnn_sources
     profiling/common/include/ProfilingException.hpp
     profiling/common/include/SocketConnectionException.hpp
     profiling/common/include/Constants.hpp
+    profiling/common/include/NetworkSockets.hpp
     profiling/common/src/NetworkSockets.cpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp
@@ -1076,6 +1078,7 @@ if(BUILD_GATORD_MOCK)
 
     target_include_directories(GatordMock PRIVATE profiling/common/include
                                                   profiling/server/src/basePipeServer
+                                                  src/armnnUtils
                                                   src/profiling
                                                   src/timelineDecoder)
 

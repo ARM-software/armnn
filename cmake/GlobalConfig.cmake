@@ -68,7 +68,7 @@ if(COMPILER_IS_GNU_LIKE)
 elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 	# Disable C4996 (use of deprecated identifier) due to https://developercommunity.visualstudio.com/content/problem/252574/deprecated-compilation-warning-for-virtual-overrid.html
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /wd4996")
-    add_definitions(-DNOMINMAX=1 -DNO_STRICT=1)
+    add_definitions(-DNO_STRICT=1)
 endif()
 if("${CMAKE_SYSTEM_NAME}" STREQUAL Android)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -llog")

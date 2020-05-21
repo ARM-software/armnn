@@ -1,4 +1,4 @@
-#Caffe layers supported by the Arm NN SDK
+# Caffe layers supported by the Arm NN SDK
 This reference guide provides a list of Caffe layers the Arm NN SDK currently supports.
 
 Although some other neural networks might work, Arm tests the Arm NN SDK with Caffe implementations of the following neural networks: 

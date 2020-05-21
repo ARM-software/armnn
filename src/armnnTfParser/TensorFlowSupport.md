@@ -78,6 +78,10 @@ See the TensorFlow [squeeze documentation](https://www.tensorflow.org/api_docs/p
 
 See the TensorFlow [tanh documentation](https://www.tensorflow.org/api_docs/python/tf/tanh) for more information.
 
+**transpose**
+
+See the TensorFlow [transpose documentation](https://www.tensorflow.org/api_docs/python/tf/transpose) for more information.
+
 ## Partially supported
 
 **add**

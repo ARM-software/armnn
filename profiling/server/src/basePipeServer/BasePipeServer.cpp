@@ -11,6 +11,7 @@
 #include <boost/cast.hpp>
 #include <vector>
 #include <iomanip>
+#include <string.h>
 
 using namespace armnnUtils;
 

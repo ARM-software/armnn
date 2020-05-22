@@ -81,7 +81,7 @@ inline auto ParseDataArray<armnn::DataType::QAsymmU8>(std::istream& stream,
                                    [&quantizationScale, &quantizationOffset](const std::string & s)
                                    {
                                        return boost::numeric_cast<uint8_t>(
-                                               armnn::Quantize<u_int8_t>(std::stof(s),
+                                               armnn::Quantize<uint8_t>(std::stof(s),
                                                                          quantizationScale,
                                                                          quantizationOffset));
                                    });

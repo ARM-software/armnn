@@ -1074,7 +1074,8 @@ void AdditionQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::Float16,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Signed32
     };
 
     ValidateDataTypes(inputTensorInfo0, supportedTypes, descriptorName);
@@ -1110,7 +1111,8 @@ void MultiplicationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
         DataType::Float32,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Signed32
     };
 
     ValidateDataTypes(inputTensorInfo0, supportedTypes, descriptorName);
@@ -2161,7 +2163,8 @@ void DivisionQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::Float32,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Signed32
     };
 
     ValidateDataTypes(inputTensorInfo0, supportedTypes, descriptorName);
@@ -2194,7 +2197,8 @@ void SubtractionQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) cons
         DataType::Float32,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Signed32,
     };
 
     ValidateDataTypes(inputTensorInfo0, supportedTypes, descriptorName);

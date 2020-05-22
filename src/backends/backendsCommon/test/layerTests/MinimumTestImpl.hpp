@@ -47,3 +47,15 @@ LayerTestResult<int16_t, 4> MinimumBroadcast1ElementInt16Test(
 LayerTestResult<int16_t, 4> MinimumBroadcast1DVectorInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<int32_t , 4> MinimumInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<int32_t, 4> MinimumBroadcast1ElementInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<int32_t, 4> MinimumBroadcast1DVectorInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

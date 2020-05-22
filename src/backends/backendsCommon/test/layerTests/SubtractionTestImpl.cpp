@@ -324,3 +324,84 @@ LayerTestResult<int16_t, 4> SubtractionBroadcastInt16Test(
         shape0,
         output);
 }
+
+LayerTestResult<int32_t, 4> SubtractionInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape[] = { 1, 1, 2, 2 };
+
+    std::vector<int32_t> input0 = { 5, 6, 7, 8 };
+    std::vector<int32_t> input1 = { 1, 2, 1, 2 };
+    std::vector<int32_t> output = { 4, 4, 6, 6 };
+
+    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::Signed32>(
+        workloadFactory,
+        memoryManager,
+        shape,
+        input0,
+        1.0f,
+        0,
+        shape,
+        input1,
+        1.0f,
+        0,
+        shape,
+        output,
+        1.0f,
+        0);
+}
+
+LayerTestResult<int32_t, 4> SubtractionBroadcast1ElementInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 1, 2, 2 };
+    const unsigned int shape1[] = { 1, 1, 1, 1 };
+
+    std::vector<int32_t> input0 = { 5, 6, 7, 8 };
+
+    std::vector<int32_t> input1 = { 2 };
+
+    std::vector<int32_t> output = { 3, 4, 5, 6 };
+
+    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::Signed32>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        1.0f,
+        0,
+        shape1,
+        input1,
+        1.0f,
+        0,
+        shape0,
+        output,
+        1.0f,
+        0);
+}
+
+LayerTestResult<int32_t, 4> SubtractionBroadcastInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 1, 2, 2 };
+    const unsigned int shape1[] = { 1, 1, 2, 1 };
+
+    std::vector<int32_t> input0 = { 10, 12, 14, 16 };
+
+    std::vector<int32_t> input1 = { 2, 1 };
+
+    std::vector<int32_t> output = { 8, 11, 12, 15 };
+
+    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::Signed32>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        shape1,
+        input1,
+        shape0,
+        output);
+}

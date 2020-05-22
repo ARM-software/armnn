@@ -59,3 +59,15 @@ LayerTestResult<int16_t, 4> SubtractionBroadcast1ElementInt16Test(
 LayerTestResult<int16_t, 4> SubtractionBroadcastInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<int32_t, 4> SubtractionInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<int32_t, 4> SubtractionBroadcast1ElementInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<int32_t, 4> SubtractionBroadcastInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

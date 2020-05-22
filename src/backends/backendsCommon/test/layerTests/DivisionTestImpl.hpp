@@ -63,3 +63,15 @@ LayerTestResult<int16_t, 4> DivisionBroadcast1ElementInt16Test(
 LayerTestResult<int16_t, 4> DivisionBroadcast1DVectorInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<int32_t,4> DivisionInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<int32_t, 4> DivisionBroadcast1ElementInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<int32_t, 4> DivisionBroadcast1DVectorInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

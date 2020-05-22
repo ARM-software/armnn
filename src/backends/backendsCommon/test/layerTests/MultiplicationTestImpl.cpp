@@ -396,6 +396,105 @@ LayerTestResult<int16_t, 4> MultiplicationBroadcast1DVectorInt16Test(
         output);
 }
 
+LayerTestResult<int32_t, 4> MultiplicationInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape[] = { 1, 2, 2, 3 };
+
+    std::vector<int32_t> input0 =
+    {
+        6,   7,  8,  9, 10, 11,
+        12, 13, 14, 15, 16, 17
+    };
+
+    std::vector<int32_t> input1 =
+    {
+        1, 2, 3,  4,  5,  6,
+        7, 8, 9, 10, 11, 12
+    };
+
+    std::vector<int32_t> output =
+    {
+        6,   14,  24,  36,  50,  66,
+        84, 104, 126, 150, 176, 204
+    };
+
+    return ElementwiseTestHelper<4, armnn::MultiplicationQueueDescriptor, armnn::DataType::Signed32>(
+        workloadFactory,
+        memoryManager,
+        shape,
+        input0,
+        shape,
+        input1,
+        shape,
+        output);
+}
+
+LayerTestResult<int32_t, 4> MultiplicationBroadcast1ElementInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 1, 1, 1 };
+
+    std::vector<int32_t> input0 =
+    {
+        1, 2, 3,  4,  5,  6,
+        7, 8, 9, 10, 11, 12
+    };
+
+    std::vector<int32_t> input1 = { 2 };
+
+    std::vector<int32_t> output =
+    {
+        2,   4,  6,  8, 10, 12,
+        14, 16, 18, 20, 22, 24
+    };
+
+    return ElementwiseTestHelper<4, armnn::MultiplicationQueueDescriptor, armnn::DataType::Signed32>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        shape1,
+        input1,
+        shape0,
+        output);
+}
+
+LayerTestResult<int32_t, 4> MultiplicationBroadcast1DVectorInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 1, 1, 3 };
+
+    std::vector<int32_t> input0 =
+    {
+        1, 2, 3,  4,  5,  6,
+        7, 8, 9, 10, 11, 12
+    };
+
+    std::vector<int32_t> input1 = { 1, 2, 3 };
+
+    std::vector<int32_t> output =
+    {
+        1,  4,  9,  4, 10, 18,
+        7, 16, 27, 10, 22, 36
+    };
+
+    return ElementwiseTestHelper<4, armnn::MultiplicationQueueDescriptor, armnn::DataType::Signed32>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        shape1,
+        input1,
+        shape0,
+        output);
+}
+
 LayerTestResult<float,4> CompareMultiplicationTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

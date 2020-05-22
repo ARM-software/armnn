@@ -614,6 +614,10 @@ ARMNN_AUTO_TEST_CASE(AdditionInt16, AdditionInt16Test)
 ARMNN_AUTO_TEST_CASE(AddBroadcastInt16, AdditionBroadcastInt16Test)
 ARMNN_AUTO_TEST_CASE(AddBroadcast1ElementInt16, AdditionBroadcast1ElementInt16Test)
 
+ARMNN_AUTO_TEST_CASE(AdditionInt32, AdditionInt32Test)
+ARMNN_AUTO_TEST_CASE(AddBroadcastInt32, AdditionBroadcastInt32Test)
+ARMNN_AUTO_TEST_CASE(AddBroadcast1ElementInt32, AdditionBroadcast1ElementInt32Test)
+
 // Sub
 ARMNN_AUTO_TEST_CASE(SimpleSub, SubtractionTest)
 ARMNN_AUTO_TEST_CASE(SubBroadcast1Element, SubtractionBroadcast1ElementTest)
@@ -630,6 +634,10 @@ ARMNN_AUTO_TEST_CASE(SubBroadcast1ElementUint8, SubtractionBroadcast1ElementUint
 ARMNN_AUTO_TEST_CASE(SubtractionInt16, SubtractionInt16Test)
 ARMNN_AUTO_TEST_CASE(SubBroadcastInt16, SubtractionBroadcastInt16Test)
 ARMNN_AUTO_TEST_CASE(SubBroadcast1ElementInt16, SubtractionBroadcast1ElementInt16Test)
+
+ARMNN_AUTO_TEST_CASE(SubtractionInt32, SubtractionInt32Test)
+ARMNN_AUTO_TEST_CASE(SubBroadcastInt32, SubtractionBroadcastInt32Test)
+ARMNN_AUTO_TEST_CASE(SubBroadcast1ElementInt32, SubtractionBroadcast1ElementInt32Test)
 
 // Div
 ARMNN_AUTO_TEST_CASE(SimpleDivision, DivisionTest)
@@ -650,6 +658,10 @@ ARMNN_AUTO_TEST_CASE(DivisionUint8Broadcast1DVector, DivisionBroadcast1DVectorUi
 ARMNN_AUTO_TEST_CASE(DivisionInt16, DivisionInt16Test)
 ARMNN_AUTO_TEST_CASE(DivisionInt16Broadcast1Element, DivisionBroadcast1ElementInt16Test)
 ARMNN_AUTO_TEST_CASE(DivisionInt16Broadcast1DVector, DivisionBroadcast1DVectorInt16Test)
+
+ARMNN_AUTO_TEST_CASE(DivisionInt32, DivisionInt32Test)
+ARMNN_AUTO_TEST_CASE(DivisionInt32Broadcast1Element, DivisionBroadcast1ElementInt32Test)
+ARMNN_AUTO_TEST_CASE(DivisionInt32Broadcast1DVector, DivisionBroadcast1DVectorInt32Test)
 
 // Equal
 ARMNN_AUTO_TEST_CASE(EqualSimple,            EqualSimpleTest)
@@ -742,6 +754,9 @@ ARMNN_AUTO_TEST_CASE(MaximumBroadcast1DVectorUint8, MaximumBroadcast1DVectorUint
 ARMNN_AUTO_TEST_CASE(MaximumInt16, MaximumInt16Test)
 ARMNN_AUTO_TEST_CASE(MaximumBroadcast1ElementInt16, MaximumBroadcast1ElementInt16Test)
 ARMNN_AUTO_TEST_CASE(MaximumBroadcast1DVectorInt16, MaximumBroadcast1DVectorInt16Test)
+ARMNN_AUTO_TEST_CASE(MaximumInt32, MaximumInt32Test)
+ARMNN_AUTO_TEST_CASE(MaximumBroadcast1ElementInt32, MaximumBroadcast1ElementInt32Test)
+ARMNN_AUTO_TEST_CASE(MaximumBroadcast1DVectorInt32, MaximumBroadcast1DVectorInt32Test)
 
 // Min
 ARMNN_AUTO_TEST_CASE(SimpleMinimum1, MinimumBroadcast1ElementTest1)
@@ -753,6 +768,9 @@ ARMNN_AUTO_TEST_CASE(MinimumBroadcast1DVectorFloat16, MinimumBroadcast1DVectorFl
 ARMNN_AUTO_TEST_CASE(MinimumInt16, MinimumInt16Test)
 ARMNN_AUTO_TEST_CASE(MinimumBroadcast1ElementInt16, MinimumBroadcast1ElementInt16Test)
 ARMNN_AUTO_TEST_CASE(MinimumBroadcast1DVectorInt16, MinimumBroadcast1DVectorInt16Test)
+ARMNN_AUTO_TEST_CASE(MinimumInt32, MinimumInt32Test)
+ARMNN_AUTO_TEST_CASE(MinimumBroadcast1ElementInt32, MinimumBroadcast1ElementInt32Test)
+ARMNN_AUTO_TEST_CASE(MinimumBroadcast1DVectorInt32, MinimumBroadcast1DVectorInt32Test)
 
 // Mul
 ARMNN_AUTO_TEST_CASE(SimpleMultiplication, MultiplicationTest)
@@ -764,6 +782,9 @@ ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1DVectorUint8, MultiplicationBroadca
 ARMNN_AUTO_TEST_CASE(MultiplicationInt16, MultiplicationInt16Test)
 ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1ElementInt16, MultiplicationBroadcast1ElementInt16Test)
 ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1DVectorInt16, MultiplicationBroadcast1DVectorInt16Test)
+ARMNN_AUTO_TEST_CASE(MultiplicationInt32, MultiplicationInt32Test)
+ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1ElementInt32, MultiplicationBroadcast1ElementInt32Test)
+ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1DVectorInt32, MultiplicationBroadcast1DVectorInt32Test)
 ARMNN_AUTO_TEST_CASE(Multiplication5d, Multiplication5dTest)
 
 // Batch Norm

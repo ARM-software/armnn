@@ -343,6 +343,14 @@ LayerTestResult<int16_t, 4> AdditionBroadcastInt16Test(
         workloadFactory, memoryManager, 2.f, 0);
 }
 
+LayerTestResult<int32_t, 4> AdditionBroadcastInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return AdditionBroadcastTestImpl<armnn::DataType::Signed32>(
+            workloadFactory, memoryManager, 1.f, 0);
+}
+
 LayerTestResult<float, 4> AdditionBroadcast1ElementTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -365,6 +373,14 @@ LayerTestResult<int16_t, 4> AdditionBroadcast1ElementInt16Test(
 {
     return AdditionBroadcast1ElementTestImpl<armnn::DataType::QSymmS16>(
         workloadFactory, memoryManager, 0.1333333f, 0);
+}
+
+LayerTestResult<int32_t, 4> AdditionBroadcast1ElementInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return AdditionBroadcast1ElementTestImpl<armnn::DataType::Signed32>(
+            workloadFactory, memoryManager, 1.f, 0);
 }
 
 LayerTestResult<uint8_t, 4> AdditionUint8Test(
@@ -448,6 +464,48 @@ LayerTestResult<int16_t, 4> AdditionInt16Test(
         shape0,
         output,
         7.0f,
+        0);
+}
+
+LayerTestResult<int32_t, 4> AdditionInt32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 2, 2, 3 };
+
+    std::vector<int32_t> input0 =
+    {
+        63,  35,  77,  70,  56, 112, //  441, 245,  539,  490,  392, 184
+        203,  28, 252, 168, 245,  91  // 1421, 196, 1764, 1176, 1715, 637
+    };
+
+    std::vector<int32_t> input1 =
+    {
+        21,   7, 175, 231, 175, 210, // 126,   28, 1204, 1596, 1204, 1449
+        126, 161,  63,  21, 105, 126  // 861, 1106,  420,  126,  714,  861
+    };
+
+    std::vector<int32_t> output =
+    {
+        84,  42, 252, 301, 231, 322, //  588,  294, 1764, 2107(clamped), 1617, 2254(clamped)
+        329, 189, 315, 189, 350, 217, // 2303(clamped), 1323, 2205(clamped), 1323, 2450(clamped), 1519
+    };
+
+    return ElementwiseTestHelper<4, armnn::AdditionQueueDescriptor, armnn::DataType::Signed32>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        1.0f,
+        0,
+        shape1,
+        input1,
+        1.0f,
+        0,
+        shape0,
+        output,
+        1.0f,
         0);
 }
 

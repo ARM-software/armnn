@@ -3116,7 +3116,7 @@ void QLstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         if (m_ProjectionBias)
         {
             auto projectionBiasInfo = m_ProjectionBias->GetTensorInfo();
-            ValidateTensorNumDimNumElem(projectionBiasInfo, 1, numUnits, "ProjectionBias");
+            ValidateTensorNumDimNumElem(projectionBiasInfo, 1, outputSize, "ProjectionBias");
             ValidateDataTypes(projectionBiasInfo, biasSupportedTypes, descriptorName);
         }
 

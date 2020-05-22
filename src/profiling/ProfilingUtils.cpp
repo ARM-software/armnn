@@ -284,8 +284,7 @@ std::string GetHardwareVersion()
 
 std::string GetSoftwareVersion()
 {
-    std::string armnnVersion(ARMNN_VERSION);
-    std::string result = "Armnn " + armnnVersion.substr(2,2) + "." + armnnVersion.substr(4,2);
+    std::string result = "Armnn " + std::to_string(ARMNN_MAJOR_VERSION) + "." + std::to_string(ARMNN_MINOR_VERSION);
     return result;
 }
 

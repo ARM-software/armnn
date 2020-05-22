@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_SUITE(TensorflowParser)
 namespace {
 // helper for setting the dimensions in prototxt
 void shapeHelper(const armnn::TensorShape& shape, std::string& text){
-    for(u_int i = 0; i < shape.GetNumDimensions(); ++i) {
+    for(unsigned int i = 0; i < shape.GetNumDimensions(); ++i) {
         text.append(R"(dim {
       size: )");
         text.append(std::to_string(shape[i]));

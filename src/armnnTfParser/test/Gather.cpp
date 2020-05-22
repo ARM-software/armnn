@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_SUITE(TensorflowParser)
 namespace {
 // helper for setting the dimensions in prototxt
 void dimsHelper(const std::vector<int>& dims, std::string& text){
-    for(u_int i = 0; i < dims.size(); ++i) {
+    for(unsigned int i = 0; i < dims.size(); ++i) {
         text.append(R"(dim {
       size: )");
         text.append(std::to_string(dims[i]));

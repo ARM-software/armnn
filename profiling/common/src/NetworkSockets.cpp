@@ -8,6 +8,8 @@
 #if defined(__unix__)
 #include <unistd.h>
 #include <fcntl.h>
+#include <armnn/Conversion.hpp>
+
 #endif
 
 namespace armnnUtils
@@ -68,10 +70,10 @@ long Read(Socket s, void* buf, size_t len)
 
 int Ioctl(Socket s, unsigned long int cmd, void* arg)
 {
-#if defined(__ANDROID__)
+#if defined(__unix__)
+    ARMNN_NO_CONVERSION_WARN_BEGIN
     return ioctl(s, static_cast<int>(cmd), arg);
-#elif defined(__unix__)
-    return ioctl(s, cmd, arg);
+    ARMNN_NO_CONVERSION_WARN_END
 #elif defined(_MSC_VER)
     return ioctlsocket(s, cmd, static_cast<u_long*>(arg));
 #endif

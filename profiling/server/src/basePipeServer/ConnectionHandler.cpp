@@ -4,6 +4,8 @@
 //
 #include "ConnectionHandler.hpp"
 
+#include <string.h>
+
 using namespace armnnUtils;
 
 namespace armnnProfiling

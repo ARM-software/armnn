@@ -181,9 +181,10 @@ bool RefLayerSupport::IsArgMinMaxSupported(const armnn::TensorInfo &input, const
 {
     IgnoreUnused(descriptor);
 
-    std::array<DataType, 6> supportedTypes =
+    std::array<DataType, 7> supportedTypes =
     {
         DataType::BFloat16,
+        DataType::Float16,
         DataType::Float32,
         DataType::QAsymmS8,
         DataType::QAsymmU8,

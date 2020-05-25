@@ -189,4 +189,6 @@ Arm tests these operators with the following TensorFlow fp32 neural networks:
 
 * inception_v3. The Arm NN SDK only supports the official inception_v3 transformed model. See the TensorFlow documentation on [preparing models for mobile deployment](https://www.tensorflow.org/mobile/prepare_models) for more information on how to transform the inception_v3 network.
 
+* ResNet v2 50 implementation from the [TF Slim model zoo](https://github.com/tensorflow/models/tree/master/research/slim)
+
 More machine learning operators will be supported in future releases.

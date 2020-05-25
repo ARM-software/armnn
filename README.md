@@ -50,6 +50,13 @@ Individual files contain the following tag instead of the full license text.
 
 This enables machine processing of license information based on the SPDX License Identifiers that are available here: http://spdx.org/licenses/
 
+TPIP used by Arm NN:
+
+| Name | License (SPDX ID) |
+|------|-------------------|
+| half | MIT               |
+| stb  | MIT               |
+
 ### Contributions
 
 The Arm NN project welcomes contributions. For more details on contributing to Arm NN see the [Contributing page](https://mlplatform.org/contributing/) on the [MLPlatform.org](https://mlplatform.org/) website, or see the [Contributor Guide](ContributorGuide.md).

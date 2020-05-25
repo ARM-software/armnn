@@ -11,6 +11,7 @@ Although some other neural networks might work, Arm tests the Arm NN SDK with Ca
 - Yolov1_tiny.
 - Lenet.
 - MobileNetv1.
+- SqueezeNet v1.0 and SqueezeNet v1.1
 
 The Arm NN SDK supports the following machine learning layers for Caffe networks:
 

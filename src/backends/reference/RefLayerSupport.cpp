@@ -366,9 +366,10 @@ bool RefLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inp
 bool RefLayerSupport::IsConstantSupported(const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
-    std::array<DataType,7> supportedTypes =
+    std::array<DataType,8> supportedTypes =
     {
         DataType::BFloat16,
+        DataType::Float16,
         DataType::Float32,
         DataType::QAsymmS8,
         DataType::QAsymmU8,

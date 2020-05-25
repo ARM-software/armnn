@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_CASE(IsConstantSupportedRef)
 
     bool result = IsConstantLayerSupportedTests<armnn::RefWorkloadFactory,
             armnn::DataType::Float16>(reasonIfUnsupported);
-    BOOST_CHECK(!result);
+    BOOST_CHECK(result);
 
     result = IsConstantLayerSupportedTests<armnn::RefWorkloadFactory,
             armnn::DataType::Float32>(reasonIfUnsupported);

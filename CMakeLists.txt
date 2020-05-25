@@ -769,6 +769,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/DepthwiseConvolution2D.cpp
              src/armnnTfLiteParser/test/Dequantize.cpp
              src/armnnTfLiteParser/test/DetectionPostProcess.cpp
+             src/armnnTfLiteParser/test/Div.cpp
              src/armnnTfLiteParser/test/Exp.cpp
              src/armnnTfLiteParser/test/FullyConnected.cpp
              src/armnnTfLiteParser/test/L2Normalization.cpp

@@ -529,7 +529,7 @@ TfLiteParser::TfLiteParser(const Optional<ITfLiteParser::TfLiteParserOptions>& o
     m_ParserFunctions[tflite::BuiltinOperator_TRANSPOSE]               = &TfLiteParser::ParseTranspose;
     m_ParserFunctions[tflite::BuiltinOperator_TRANSPOSE_CONV]          = &TfLiteParser::ParseTransposeConv;
     m_ParserFunctions[tflite::BuiltinOperator_UNPACK]                  = &TfLiteParser::ParseUnpack;
-
+    m_ParserFunctions[tflite::BuiltinOperator_DIV]                     = &TfLiteParser::ParseDiv;
     // register supported custom operators
     m_CustomParserFunctions["TFLite_Detection_PostProcess"]      = &TfLiteParser::ParseDetectionPostProcess;
 }
@@ -1648,6 +1648,44 @@ void TfLiteParser::ParseSub(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = boost::str(boost::format("Sub:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddSubtractionLayer(layerName.c_str());
+
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    if (inputTensorInfo.GetNumDimensions() != input1TensorInfo.GetNumDimensions())
+    {
+        AddBroadcastReshapeLayer(subgraphIndex, operatorIndex, layer);
+    }
+    else
+    {
+        RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
+    }
+
+    layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParseDiv(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto * options = operatorPtr->builtin_options.AsDivOptions();
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
+    armnn::TensorInfo input1TensorInfo = ToTensorInfo(inputs[1]);
+
+    auto layerName = boost::str(boost::format("Div:%1%:%2%") % subgraphIndex % operatorIndex);
+    IConnectableLayer* layer = m_Network->AddDivisionLayer(layerName.c_str());
 
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

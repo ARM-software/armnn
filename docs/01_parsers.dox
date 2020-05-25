@@ -157,6 +157,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - CONCATENATION, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - DEPTHWISE_CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- DIV
 - EXP
 - FULLY_CONNECTED, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - LOGISTIC

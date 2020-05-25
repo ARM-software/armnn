@@ -129,6 +129,7 @@ private:
     void ParseSqueeze(size_t subgraphIndex, size_t operatorIndex);
     void ParseStridedSlice(size_t subgraphIndex, size_t operatorIndex);
     void ParseSub(size_t subgraphIndex, size_t operatorIndex);
+    void ParseDiv(size_t subgraphIndex, size_t operatorIndex);
     void ParseTanH(size_t subgraphIndex, size_t operatorIndex);
     void ParseTranspose(size_t subgraphIndex, size_t operatorIndex);
     void ParseTransposeConv(size_t subgraphIndex, size_t operatorIndex);

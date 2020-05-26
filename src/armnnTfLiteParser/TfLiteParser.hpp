@@ -112,6 +112,7 @@ private:
     void ParseMean(size_t subgraphIndex, size_t operatorIndex);
     void ParseMinimum(size_t subgraphIndex, size_t operatorIndex);
     void ParseMul(size_t subgraphIndex, size_t operatorIndex);
+    void ParseNeg(size_t subgraphIndex, size_t operatorIndex);
     void ParsePack(size_t subgraphIndex, size_t operatorIndex);
     void ParsePad(size_t subgraphIndex, size_t operatorIndex);
     void ParsePool(size_t subgraphIndex, size_t operatorIndex, armnn::PoolingAlgorithm algorithm);

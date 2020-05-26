@@ -168,6 +168,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - MEAN
 - MINIMUM
 - MUL
+- NEG
 - PACK
 - PAD
 - RELU

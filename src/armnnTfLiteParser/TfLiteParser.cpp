@@ -510,6 +510,7 @@ TfLiteParser::TfLiteParser(const Optional<ITfLiteParser::TfLiteParserOptions>& o
     m_ParserFunctions[tflite::BuiltinOperator_MEAN]                    = &TfLiteParser::ParseMean;
     m_ParserFunctions[tflite::BuiltinOperator_MINIMUM]                 = &TfLiteParser::ParseMinimum;
     m_ParserFunctions[tflite::BuiltinOperator_MUL]                     = &TfLiteParser::ParseMul;
+    m_ParserFunctions[tflite::BuiltinOperator_NEG]                     = &TfLiteParser::ParseNeg;
     m_ParserFunctions[tflite::BuiltinOperator_PACK]                    = &TfLiteParser::ParsePack;
     m_ParserFunctions[tflite::BuiltinOperator_PAD]                     = &TfLiteParser::ParsePad;
     m_ParserFunctions[tflite::BuiltinOperator_QUANTIZE]                = &TfLiteParser::ParseQuantize;
@@ -1817,6 +1818,31 @@ void TfLiteParser::ParseMean(size_t subgraphIndex, size_t operatorIndex)
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParseNeg(size_t subgraphIndex, size_t operatorIndex)
+{
+  CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+  auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+  CHECK_VALID_SIZE(inputs.size(), 1);
+
+  auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+  CHECK_VALID_SIZE(outputs.size(), 1);
+
+  auto layerName = boost::str(boost::format("Neg:%1%:%2%") % subgraphIndex % operatorIndex);
+  armnn::ElementwiseUnaryDescriptor descriptor(armnn::UnaryOperation::Neg);
+  IConnectableLayer* layer = m_Network->AddElementwiseUnaryLayer(descriptor, layerName.c_str());
+  ARMNN_ASSERT(layer != nullptr);
+
+  TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+  layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+  auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+  RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+  auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+  RegisterOutputSlots(subgraphIndex, operatorIndex, layer, outputTensorIndexes);
 }
 
 void TfLiteParser::ParsePad(size_t subgraphIndex, size_t operatorIndex)

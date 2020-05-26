@@ -2683,7 +2683,7 @@ void TfLiteParser::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
     const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-
+    const auto * options = operatorPtr->builtin_options.AsSplitVOptions();
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(inputs.size(), 3);
@@ -2717,66 +2717,67 @@ void TfLiteParser::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
     ::memcpy(axisData.data(), axisBufferPtr->data.data(), axisTensorInfo.GetNumBytes());
     const unsigned int splitDim = ComputeWrappedIndex(axisData[0], inputTensorInfo.GetNumDimensions());
 
-
     // Set split sizes
-    const auto * options = operatorPtr->builtin_options.AsSplitOptions();
     CHECK_VALID_SIZE(splitsInfo.GetNumDimensions(), 1);
-    unsigned int numSplits = 0;
     std::vector<int> splitsData(0);
-    if (options)
+    unsigned int numSplits{0};
+
+    if(options)
     {
         numSplits = CHECKED_NON_NEGATIVE(options->num_splits);
-        splitsData.resize(numSplits);
-
-        if (inputTensorInfo.GetShape()[splitDim] % numSplits != 0)
-        {
-            throw ParseException("Number of splits must evenly divide the split axis");
-        }
-        unsigned int splitSize = inputTensorInfo.GetShape()[splitDim] / numSplits;
-        for (auto& split : splitsData)
-        {
-            split = numeric_cast<int>(splitSize);
-        }
     }
     else
     {
-        numSplits = splitsInfo.GetShape()[0];
-        splitsData.resize(numSplits);
-
-        BufferRawPtr splitsBufferPtr = GetBuffer(m_Model, splitsTensor->buffer);
-        ::memcpy(splitsData.data(), splitsBufferPtr->data.data(), splitsInfo.GetNumBytes());
-
-        int numInferred = 0;
-        int specifiedSizes = 0;
-        unsigned int inferIdx = 0;
-        unsigned int idx = 0;
-        for (auto split : splitsData)
-        {
-            if (split < 0)
-            {
-                numInferred++;
-                inferIdx = idx;
-            }
-            else
-            {
-                specifiedSizes += split;
-            }
-            idx++;
-        }
-
-        if (numInferred > 0)
-        {
-            if (numInferred > 1)
-            {
-                throw ParseException("Cannot infer split size for more than one split");
-            }
-            splitsData[inferIdx] = numeric_cast<int>(inputTensorInfo.GetShape()[splitDim]) - specifiedSizes;
-        }
+        numSplits = splitsInfo.GetNumElements();
     }
 
     if (numSplits <=0)
     {
         throw ParseException("SplitV has invalid number of splits");
+    }
+
+    splitsData.resize(numSplits);
+    BufferRawPtr splitsBufferPtr = GetBuffer(m_Model, splitsTensor->buffer);
+    unsigned int idx{0};
+
+    for(auto& split: splitsData)
+    {
+        split = splitsBufferPtr->data[idx];
+        idx++;
+    }
+
+    idx = 0;
+    int numInferred{0};
+    unsigned int inferIdx{0};
+    int splitSum{0};
+    for (auto split : splitsData)
+    {
+        if (split < 0)
+        {
+            numInferred++;
+            inferIdx = idx;
+        }
+        else
+        {
+            splitSum += split;
+        }
+        idx++;
+    }
+    // Check for inferred Axis
+    if (numInferred == 0)
+    {
+        if (splitSum != numeric_cast<int>(inputTensorInfo.GetShape()[splitDim]))
+        {
+            throw ParseException("SplitV split_sizes does not sum to the dimension of value along split_dim.");
+        }
+    }
+    else if (numInferred == 1)
+    {
+        splitsData[inferIdx] = numeric_cast<int>(inputTensorInfo.GetShape()[splitDim]) - splitSum;
+    }
+    else
+    {
+        throw ParseException("Cannot infer split size for more than one split");
     }
 
     //Ouput size validation
@@ -2805,7 +2806,7 @@ void TfLiteParser::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
         accumSplit += splitSize;
     }
 
-    auto layerName = boost::str(boost::format("Split:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = boost::str(boost::format("SplitV:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddSplitterLayer(splitDesc, layerName.c_str());
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));

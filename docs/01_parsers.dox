@@ -179,6 +179,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - SOFTMAX
 - SPACE_TO_BATCH
 - SPLIT
+- SPLIT_V
 - SQUEEZE
 - STRIDED_SLICE
 - SUB

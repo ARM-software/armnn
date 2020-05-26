@@ -793,6 +793,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/SpaceToBatchND.cpp
              src/armnnTfLiteParser/test/Slice.cpp
              src/armnnTfLiteParser/test/Split.cpp
+             src/armnnTfLiteParser/test/SplitV.cpp
              src/armnnTfLiteParser/test/Squeeze.cpp
              src/armnnTfLiteParser/test/StridedSlice.cpp
              src/armnnTfLiteParser/test/Sub.cpp

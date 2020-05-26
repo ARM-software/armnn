@@ -89,6 +89,8 @@ void TimelineCaptureCommandHandler::ReadEventClass(const unsigned char* data, ui
     ITimelineDecoder::EventClass eventClass;
     eventClass.m_Guid = profiling::ReadUint64(data, offset);
     offset += uint64_t_size;
+    eventClass.m_NameGuid = profiling::ReadUint64(data, offset);
+    offset += uint64_t_size;
     m_TimelineDecoder.CreateEventClass(eventClass);
 }
 

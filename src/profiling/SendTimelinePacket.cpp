@@ -94,10 +94,11 @@ void SendTimelinePacket::SendTimelineEventBinaryPacket(uint64_t timestamp,
                                profilingGuid);
 }
 
-void SendTimelinePacket::SendTimelineEventClassBinaryPacket(uint64_t profilingGuid)
+void SendTimelinePacket::SendTimelineEventClassBinaryPacket(uint64_t profilingGuid, uint64_t nameGuid)
 {
     ForwardWriteBinaryFunction(WriteTimelineEventClassBinary,
-                               profilingGuid);
+                               profilingGuid,
+                               nameGuid);
 }
 
 void SendTimelinePacket::SendTimelineLabelBinaryPacket(uint64_t profilingGuid, const std::string& label)

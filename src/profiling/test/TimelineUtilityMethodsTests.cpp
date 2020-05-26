@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
     BOOST_CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_TEST(size == 300);
+    BOOST_TEST(size == 376);
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
 
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
     unsigned int offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 292);
+    VerifyTimelineHeaderBinary(readableData, offset, 368);
 
     // First "well-known" label: NAME
     VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::NAME_GUID,
@@ -154,12 +154,24 @@ BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
                                         offset);
 
     // First "well-known" event class: START OF LIFE
+    VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS_NAME_GUID,
+                                        LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS_NAME,
+                                        readableData,
+                                        offset);
+
     VerifyTimelineEventClassBinaryPacketData(LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
+                                             LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS_NAME_GUID,
                                              readableData,
                                              offset);
 
     // Second "well-known" event class: END OF LIFE
+    VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS_NAME_GUID,
+                                        LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS_NAME,
+                                        readableData,
+                                        offset);
+
     VerifyTimelineEventClassBinaryPacketData(LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
+                                             LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS_NAME_GUID,
                                              readableData,
                                              offset);
 

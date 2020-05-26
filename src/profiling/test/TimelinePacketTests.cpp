@@ -645,8 +645,10 @@ BOOST_AUTO_TEST_CASE(TimelineEntityPacketTestFullConstructionOfData)
 BOOST_AUTO_TEST_CASE(TimelineEventClassTestNoBuffer)
 {
     const uint64_t profilingGuid = 123456u;
+    const uint64_t profilingNameGuid = 3345u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEventClassBinary(profilingGuid,
+                                                                profilingNameGuid,
                                                                 nullptr,
                                                                 512u,
                                                                 numberOfBytesWritten);
@@ -659,8 +661,10 @@ BOOST_AUTO_TEST_CASE(TimelineEventClassTestBufferExhaustionZeroValue)
     std::vector<unsigned char> buffer(512, 0);
 
     const uint64_t profilingGuid = 123456u;
+    const uint64_t profilingNameGuid = 3345u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEventClassBinary(profilingGuid,
+                                                                profilingNameGuid,
                                                                 buffer.data(),
                                                                 0,
                                                                 numberOfBytesWritten);
@@ -673,8 +677,10 @@ BOOST_AUTO_TEST_CASE(TimelineEventClassTestBufferExhaustionFixedValue)
     std::vector<unsigned char> buffer(10, 0);
 
     const uint64_t profilingGuid = 123456u;
+    const uint64_t profilingNameGuid = 5564u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEventClassBinary(profilingGuid,
+                                                                profilingNameGuid,
                                                                 buffer.data(),
                                                                 boost::numeric_cast<unsigned int>(buffer.size()),
                                                                 numberOfBytesWritten);
@@ -687,15 +693,18 @@ BOOST_AUTO_TEST_CASE(TimelineEventClassTestFullConstructionOfData)
     std::vector<unsigned char> buffer(512, 0);
 
     const uint64_t profilingGuid = 123456u;
+    const uint64_t profilingNameGuid = 654321u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEventClassBinary(profilingGuid,
+                                                                profilingNameGuid,
                                                                 buffer.data(),
                                                                 boost::numeric_cast<unsigned int>(buffer.size()),
                                                                 numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
-    BOOST_CHECK(numberOfBytesWritten == 12);
+    BOOST_CHECK(numberOfBytesWritten == 20);
 
     unsigned int uint32_t_size = sizeof(uint32_t);
+    unsigned int uint64_t_size = sizeof(uint64_t);
 
     unsigned int offset = 0;
     // Check the decl_id
@@ -706,6 +715,10 @@ BOOST_AUTO_TEST_CASE(TimelineEventClassTestFullConstructionOfData)
     offset += uint32_t_size;
     uint64_t readProfilingGuid = ReadUint64(buffer.data(), offset);
     BOOST_CHECK(readProfilingGuid == profilingGuid);
+
+    offset += uint64_t_size;
+    uint64_t readProfilingNameGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readProfilingNameGuid == profilingNameGuid);
 }
 
 BOOST_AUTO_TEST_CASE(TimelineEventPacketTestNoBuffer)

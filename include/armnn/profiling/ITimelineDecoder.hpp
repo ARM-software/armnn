@@ -47,6 +47,7 @@ public:
     struct EventClass
     {
         uint64_t m_Guid;
+        uint64_t m_NameGuid;
     };
 
     struct Event

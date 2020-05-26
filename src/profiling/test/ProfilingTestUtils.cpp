@@ -118,6 +118,7 @@ void VerifyTimelineLabelBinaryPacketData(Optional<ProfilingGuid> guid,
 }
 
 void VerifyTimelineEventClassBinaryPacketData(ProfilingGuid guid,
+                                              ProfilingGuid nameGuid,
                                               const unsigned char* readableData,
                                               unsigned int& offset)
 {
@@ -135,6 +136,10 @@ void VerifyTimelineEventClassBinaryPacketData(ProfilingGuid guid,
     offset += uint32_t_size;
     uint64_t readProfilingGuid = ReadUint64(readableData, offset);
     BOOST_CHECK(readProfilingGuid == guid);
+
+    offset += uint64_t_size;
+    uint64_t readProfiilngNameGuid = ReadUint64(readableData, offset);
+    BOOST_CHECK(readProfiilngNameGuid == nameGuid);
 
     // Update the offset to allow parsing to be continued after this function returns
     offset += uint64_t_size;

@@ -31,49 +31,55 @@ void TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses(ISendTimelinePac
 {
     // Send the "name" label, this call throws in case of error
     timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::NAME_GUID,
-                                                        LabelsAndEventClasses::NAME_LABEL);
+                                                 LabelsAndEventClasses::NAME_LABEL);
 
     // Send the "type" label, this call throws in case of error
     timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::TYPE_GUID,
-                                                        LabelsAndEventClasses::TYPE_LABEL);
+                                                 LabelsAndEventClasses::TYPE_LABEL);
 
     // Send the "index" label, this call throws in case of error
     timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::INDEX_GUID,
-                                                        LabelsAndEventClasses::INDEX_LABEL);
+                                                 LabelsAndEventClasses::INDEX_LABEL);
 
     // Send the "backendId" label, this call throws in case of error
     timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::BACKENDID_GUID,
-                                                        LabelsAndEventClasses::BACKENDID_LABEL);
+                                                 LabelsAndEventClasses::BACKENDID_LABEL);
 
     // Send the "layer" label, this call throws in case of error
     timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::LAYER_GUID,
-                                                        LabelsAndEventClasses::LAYER);
+                                                 LabelsAndEventClasses::LAYER);
 
     // Send the "workload" label, this call throws in case of error
     timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::WORKLOAD_GUID,
-                                                        LabelsAndEventClasses::WORKLOAD);
+                                                 LabelsAndEventClasses::WORKLOAD);
 
     // Send the "network" label, this call throws in case of error
     timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::NETWORK_GUID,
-                                                        LabelsAndEventClasses::NETWORK);
+                                                 LabelsAndEventClasses::NETWORK);
 
     // Send the "connection" label, this call throws in case of error
     timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::CONNECTION_GUID,
-                                                        LabelsAndEventClasses::CONNECTION);
+                                                 LabelsAndEventClasses::CONNECTION);
 
     // Send the "inference" label, this call throws in case of error
     timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::INFERENCE_GUID,
-                                                        LabelsAndEventClasses::INFERENCE);
+                                                 LabelsAndEventClasses::INFERENCE);
 
     // Send the "workload_execution" label, this call throws in case of error
     timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
-                                                        LabelsAndEventClasses::WORKLOAD_EXECUTION);
+                                                 LabelsAndEventClasses::WORKLOAD_EXECUTION);
 
     // Send the "start of life" event class, this call throws in case of error
-    timelinePacket.SendTimelineEventClassBinaryPacket(LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
+    timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS_NAME_GUID,
+                                                 LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS_NAME);
+    timelinePacket.SendTimelineEventClassBinaryPacket(LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
+                                                      LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS_NAME_GUID);
 
     // Send the "end of life" event class, this call throws in case of error
-    timelinePacket.SendTimelineEventClassBinaryPacket(LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
+    timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS_NAME_GUID,
+                                                 LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS_NAME);
+    timelinePacket.SendTimelineEventClassBinaryPacket(LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
+                                                      LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS_NAME_GUID);
 
     timelinePacket.Commit();
 }

@@ -39,7 +39,7 @@ public:
     void SendTimelineEventBinaryPacket(uint64_t timestamp, std::thread::id threadId, uint64_t profilingGuid) override;
 
     /// Create and write a TimelineEventClassBinaryPacket from the parameters to the buffer.
-    void SendTimelineEventClassBinaryPacket(uint64_t profilingGuid) override;
+    void SendTimelineEventClassBinaryPacket(uint64_t profilingGuid, uint64_t nameGuid) override;
 
     /// Create and write a TimelineLabelBinaryPacket from the parameters to the buffer.
     void SendTimelineLabelBinaryPacket(uint64_t profilingGuid, const std::string& label) override;

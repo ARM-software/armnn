@@ -239,6 +239,7 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
                                                           unsigned int& numberOfBytesWritten);
 
 TimelinePacketStatus WriteTimelineEventClassBinary(uint64_t profilingGuid,
+                                                   uint64_t nameGuid,
                                                    unsigned char* buffer,
                                                    unsigned int bufferSize,
                                                    unsigned int& numberOfBytesWritten);

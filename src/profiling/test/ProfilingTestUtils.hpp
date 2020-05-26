@@ -33,6 +33,7 @@ void VerifyTimelineLabelBinaryPacketData(Optional<ProfilingGuid> guid,
                                          unsigned int& offset);
 
 void VerifyTimelineEventClassBinaryPacketData(ProfilingGuid guid,
+                                              ProfilingGuid nameGuid,
                                               const unsigned char* readableData,
                                               unsigned int& offset);
 

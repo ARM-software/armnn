@@ -41,7 +41,7 @@ public:
         SendTimelineEventBinaryPacket(uint64_t timestamp, std::thread::id threadId, uint64_t profilingGuid) = 0;
 
     /// Create and write a TimelineEventClassBinaryPacket from the parameters to the buffer.
-    virtual void SendTimelineEventClassBinaryPacket(uint64_t profilingGuid) = 0;
+    virtual void SendTimelineEventClassBinaryPacket(uint64_t profilingGuid, uint64_t nameGuid) = 0;
 
     /// Create and write a TimelineLabelBinaryPacket from the parameters to the buffer.
     virtual void SendTimelineLabelBinaryPacket(uint64_t profilingGuid, const std::string& label) = 0;

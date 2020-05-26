@@ -52,8 +52,16 @@ ProfilingStaticGuid LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID(
     m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::WORKLOAD_EXECUTION));
 
 // Event Class GUIDs
+// Start of Life (SOL)
+std::string LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS_NAME("start_of_life");
+ProfilingStaticGuid LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS_NAME_GUID(
+    m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS_NAME));
 ProfilingStaticGuid LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS(
     m_GuidGenerator.GenerateStaticId("ARMNN_PROFILING_SOL"));
+// End of Life (EOL)
+std::string LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS_NAME("end_of_life");
+ProfilingStaticGuid LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS_NAME_GUID(
+    m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS_NAME));
 ProfilingStaticGuid LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS(
     m_GuidGenerator.GenerateStaticId("ARMNN_PROFILING_EOL"));
 

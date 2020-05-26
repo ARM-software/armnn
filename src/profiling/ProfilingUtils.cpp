@@ -755,6 +755,7 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
 }
 
 TimelinePacketStatus WriteTimelineEventClassBinary(uint64_t profilingGuid,
+                                                   uint64_t nameGuid,
                                                    unsigned char* buffer,
                                                    unsigned int remainingBufferSize,
                                                    unsigned int& numberOfBytesWritten)
@@ -776,7 +777,7 @@ TimelinePacketStatus WriteTimelineEventClassBinary(uint64_t profilingGuid,
     uint32_t declId = 2;
 
     // Calculate the length of the data (in bytes)
-    unsigned int dataSize = uint32_t_size + uint64_t_size; // decl_id + Profiling GUID
+    unsigned int dataSize = uint32_t_size + (uint64_t_size * 2); // decl_id + Profiling GUID + Name GUID
 
     // Check whether the timeline binary fits in the given buffer
     if (dataSize > remainingBufferSize)
@@ -791,6 +792,8 @@ TimelinePacketStatus WriteTimelineEventClassBinary(uint64_t profilingGuid,
     WriteUint32(buffer, offset, declId);        // decl_id
     offset += uint32_t_size;
     WriteUint64(buffer, offset, profilingGuid); // Profiling GUID
+    offset += uint64_t_size;
+    WriteUint64(buffer, offset, nameGuid); // Name GUID
 
     // Update the number of bytes written
     numberOfBytesWritten = dataSize;

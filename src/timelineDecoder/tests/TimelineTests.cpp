@@ -168,6 +168,7 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
 
     const uint64_t entityGuid = 111111u;
     const uint64_t eventClassGuid = 22222u;
+    const uint64_t eventClassNameGuid = 22322u;
     const uint64_t timestamp = 33333u;
     const uint64_t eventGuid = 44444u;
 
@@ -205,7 +206,7 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
                                            timelineCaptureCommandHandler);
 
         // Send event class
-        sendTimelinePacket->SendTimelineEventClassBinaryPacket(eventClassGuid);
+        sendTimelinePacket->SendTimelineEventClassBinaryPacket(eventClassGuid, eventClassNameGuid);
         sendTimelinePacket->Commit();
         SendTimelinePacketToCommandHandler(bufferManager.GetReadableBuffer()->GetReadableData(),
                                            timelineCaptureCommandHandler);
@@ -278,10 +279,11 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTestMultipleStringsInBuffer)
     BOOST_CHECK(timelineDecoder.SetLabelCallback(PushLabel) == Status::TimelineStatus_Success);
     BOOST_CHECK(timelineDecoder.SetRelationshipCallback(PushRelationship) == Status::TimelineStatus_Success);
 
-    const uint64_t entityGuid     = 111111u;
-    const uint64_t eventClassGuid = 22222u;
-    const uint64_t timestamp      = 33333u;
-    const uint64_t eventGuid      = 44444u;
+    const uint64_t entityGuid         = 111111u;
+    const uint64_t eventClassGuid     = 22222u;
+    const uint64_t eventClassNameGuid = 22322u;
+    const uint64_t timestamp          = 33333u;
+    const uint64_t eventGuid          = 44444u;
 
     const std::thread::id threadId = std::this_thread::get_id();
 
@@ -316,7 +318,7 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTestMultipleStringsInBuffer)
         // Send entity
         sendTimelinePacket->SendTimelineEntityBinaryPacket(entityGuid);
         // Send event class
-        sendTimelinePacket->SendTimelineEventClassBinaryPacket(eventClassGuid);
+        sendTimelinePacket->SendTimelineEventClassBinaryPacket(eventClassGuid, eventClassNameGuid);
         // Send event
         sendTimelinePacket->SendTimelineEventBinaryPacket(timestamp, threadId, eventGuid);
         // Send label

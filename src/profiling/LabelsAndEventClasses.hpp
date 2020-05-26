@@ -46,8 +46,14 @@ public:
     ARMNN_DLLEXPORT static ProfilingStaticGuid WORKLOAD_EXECUTION_GUID;
 
     // Event Class GUIDs
+    // Start of Life (SOL)
     ARMNN_DLLEXPORT static ProfilingStaticGuid ARMNN_PROFILING_SOL_EVENT_CLASS;
+    ARMNN_DLLEXPORT static std::string ARMNN_PROFILING_SOL_EVENT_CLASS_NAME;
+    ARMNN_DLLEXPORT static ProfilingStaticGuid ARMNN_PROFILING_SOL_EVENT_CLASS_NAME_GUID;
+    // End of Life (EOL)
     ARMNN_DLLEXPORT static ProfilingStaticGuid ARMNN_PROFILING_EOL_EVENT_CLASS;
+    ARMNN_DLLEXPORT static std::string ARMNN_PROFILING_EOL_EVENT_CLASS_NAME;
+    ARMNN_DLLEXPORT static ProfilingStaticGuid ARMNN_PROFILING_EOL_EVENT_CLASS_NAME_GUID;
 
 private:
     static ProfilingGuidGenerator m_GuidGenerator;

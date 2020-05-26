@@ -59,7 +59,6 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 * Subtraction
 * Switch
 * TransposeConvolution2d
-* Resize
 
 More machine learning layers will be supported in future releases.
 

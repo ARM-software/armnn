@@ -2088,7 +2088,7 @@ BOOST_AUTO_TEST_CASE(CheckSocketConnectionException2)
     {
         new SocketProfilingConnection();
     }
-    catch (armnnProfiling::SocketConnectionException& ex)
+    catch (const armnnProfiling::SocketConnectionException& ex)
     {
         BOOST_CHECK(ex.GetSocketFd() == 0);
         BOOST_CHECK(ex.GetErrorNo() == 111);

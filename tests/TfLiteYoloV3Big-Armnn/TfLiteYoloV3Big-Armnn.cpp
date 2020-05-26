@@ -28,17 +28,17 @@ static const int LOAD_NETWORK_ERROR = -4;
 static const int LOAD_IMAGE_ERROR = -5;
 static const int GENERAL_ERROR = -100;
 
-#define CHECK_OK(v)                                 \
-    do {                                            \
-        try {                                       \
-            auto r_local = v;                       \
-            if (r_local != 0) { return r_local;}    \
-        }                                           \
-        catch(armnn::Exception e)                                  \
-        { \
-            ARMNN_LOG(error) << "Oops: " << e.what(); \
-            return GENERAL_ERROR; \
-        }                 \
+#define CHECK_OK(v)                                     \
+    do {                                                \
+        try {                                           \
+            auto r_local = v;                           \
+            if (r_local != 0) { return r_local;}        \
+        }                                               \
+        catch (const armnn::Exception& e)               \
+        {                                               \
+            ARMNN_LOG(error) << "Oops: " << e.what();   \
+            return GENERAL_ERROR;                       \
+        }                                               \
     } while(0)
 
 

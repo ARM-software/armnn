@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
             {
                 optimizedNet = armnn::Optimize(*network, computeDevice, runtime->GetDeviceSpec());
             }
-            catch (armnn::Exception& e)
+            catch (const armnn::Exception& e)
             {
                 std::stringstream message;
                 message << "armnn::Exception ("<<e.what()<<") caught from optimize.";
@@ -216,7 +216,7 @@ int main(int argc, char* argv[])
         ARMNN_LOG(info) << "Multiple networks inference ran successfully!";
         return 0;
     }
-    catch (armnn::Exception const& e)
+    catch (const armnn::Exception& e)
     {
         // Coverity fix: BOOST_LOG_TRIVIAL (typically used to report errors) may throw an
         // exception of type std::length_error.

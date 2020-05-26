@@ -519,7 +519,7 @@ int MainImpl(const ExecuteNetworkParams& params,
             }
         }
     }
-    catch (armnn::Exception const& e)
+    catch (const armnn::Exception& e)
     {
         ARMNN_LOG(fatal) << "Armnn Error: " << e.what();
         return EXIT_FAILURE;

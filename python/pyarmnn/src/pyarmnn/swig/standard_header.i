@@ -23,7 +23,7 @@
 %exception{
     try {
         $action
-    } catch (armnn::Exception &e) {
+    } catch (const armnn::Exception& e) {
         SWIG_exception(SWIG_RuntimeError, const_cast<char*>(e.what()));
     }
 };
@@ -31,7 +31,7 @@
 %exception __getitem__ {
     try {
         $action
-    } catch (armnn::InvalidArgumentException &e) {
+    } catch (const armnn::InvalidArgumentException &e) {
         SWIG_exception(SWIG_ValueError, const_cast<char*>(e.what()));
     } catch (const std::out_of_range &e) {
         SWIG_exception(SWIG_IndexError, const_cast<char*>(e.what()));
@@ -43,7 +43,7 @@
 %exception __setitem__ {
     try {
         $action
-    } catch (armnn::InvalidArgumentException &e) {
+    } catch (const armnn::InvalidArgumentException &e) {
         SWIG_exception(SWIG_ValueError, const_cast<char*>(e.what()));
     } catch (const std::out_of_range &e) {
         SWIG_exception(SWIG_IndexError, const_cast<char*>(e.what()));

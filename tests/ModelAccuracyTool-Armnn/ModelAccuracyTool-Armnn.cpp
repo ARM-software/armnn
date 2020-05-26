@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
         {
             optimizedNet = armnn::Optimize(*network, computeDevice, runtime->GetDeviceSpec());
         }
-        catch (armnn::Exception& e)
+        catch (const armnn::Exception& e)
         {
             std::stringstream message;
             message << "armnn::Exception (" << e.what() << ") caught from optimize.";
@@ -367,7 +367,7 @@ int main(int argc, char* argv[])
         ARMNN_LOG(info) << "Accuracy Tool ran successfully!";
         return 0;
     }
-    catch (armnn::Exception const & e)
+    catch (const armnn::Exception& e)
     {
         // Coverity fix: BOOST_LOG_TRIVIAL (typically used to report errors) may throw an
         // exception of type std::length_error.
@@ -375,7 +375,7 @@ int main(int argc, char* argv[])
         std::cerr << "Armnn Error: " << e.what() << std::endl;
         return 1;
     }
-    catch (const std::exception & e)
+    catch (const std::exception& e)
     {
         // Coverity fix: various boost exceptions can be thrown by methods called by this test.
         std::cerr << "WARNING: ModelAccuracyTool-Armnn: An error has occurred when running the "

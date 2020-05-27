@@ -17,6 +17,7 @@
 #include "ClDepthwiseConvolutionWorkload.hpp"
 #include "ClDequantizeWorkload.hpp"
 #include "ClDivisionFloatWorkload.hpp"
+#include "ClExpWorkload.hpp"
 #include "ClFloorFloatWorkload.hpp"
 #include "ClFullyConnectedWorkload.hpp"
 #include "ClInstanceNormalizationWorkload.hpp"

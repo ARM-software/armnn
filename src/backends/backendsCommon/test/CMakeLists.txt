@@ -91,6 +91,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/ElementwiseTestImpl.hpp
     layerTests/ElementwiseUnaryTestImpl.cpp
     layerTests/ElementwiseUnaryTestImpl.hpp
+    layerTests/ExpTestImpl.cpp
+    layerTests/ExpTestImpl.hpp
     layerTests/FakeQuantizationTestImpl.cpp
     layerTests/FakeQuantizationTestImpl.hpp
     layerTests/FloorTestImpl.cpp

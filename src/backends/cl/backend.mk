@@ -38,6 +38,7 @@ BACKEND_SOURCES := \
         workloads/ClDepthwiseConvolutionWorkload.cpp \
         workloads/ClDequantizeWorkload.cpp \
         workloads/ClDivisionFloatWorkload.cpp \
+        workloads/ClExpWorkload.cpp \
         workloads/ClFloorFloatWorkload.cpp \
         workloads/ClFullyConnectedWorkload.cpp \
         workloads/ClInstanceNormalizationWorkload.cpp \

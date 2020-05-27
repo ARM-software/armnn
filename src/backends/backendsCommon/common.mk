@@ -54,6 +54,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/DequantizeTestImpl.cpp \
     test/layerTests/DivisionTestImpl.cpp \
     test/layerTests/ElementwiseUnaryTestImpl.cpp \
+    test/layerTests/ExpTestImpl.cpp \
     test/layerTests/FakeQuantizationTestImpl.cpp \
     test/layerTests/FloorTestImpl.cpp \
     test/layerTests/FullyConnectedTestImpl.cpp \

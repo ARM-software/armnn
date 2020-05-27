@@ -31,6 +31,7 @@
 #include "workloads/ClDepthwiseConvolutionWorkload.hpp"
 #include "workloads/ClDequantizeWorkload.hpp"
 #include "workloads/ClDivisionFloatWorkload.hpp"
+#include "workloads/ClExpWorkload.hpp"
 #include "workloads/ClFloorFloatWorkload.hpp"
 #include "workloads/ClFullyConnectedWorkload.hpp"
 #include "workloads/ClInstanceNormalizationWorkload.hpp"
@@ -399,29 +400,31 @@ bool ClLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
                                                  const ElementwiseUnaryDescriptor& descriptor,
                                                  Optional<std::string&> reasonIfUnsupported) const
 {
-    if (descriptor.m_Operation == UnaryOperation::Abs)
+    switch(descriptor.m_Operation)
     {
-        FORWARD_WORKLOAD_VALIDATE_FUNC(ClAbsWorkloadValidate,
-                                       reasonIfUnsupported,
-                                       input,
-                                       output);
+        case UnaryOperation::Abs:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(ClAbsWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
+        case UnaryOperation::Exp:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(ClExpWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
+        case UnaryOperation::Neg:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(ClNegWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
+        case UnaryOperation::Rsqrt:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(ClRsqrtWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
+        default:
+            return false;
     }
-    else if (descriptor.m_Operation == UnaryOperation::Rsqrt)
-    {
-        FORWARD_WORKLOAD_VALIDATE_FUNC(ClRsqrtWorkloadValidate,
-                                       reasonIfUnsupported,
-                                       input,
-                                       output);
-    }
-    else if (descriptor.m_Operation == UnaryOperation::Neg)
-    {
-        FORWARD_WORKLOAD_VALIDATE_FUNC(ClNegWorkloadValidate,
-                                       reasonIfUnsupported,
-                                       input,
-                                       output);
-    }
-
-    return false;
 }
 
 bool ClLayerSupport::IsFloorSupported(const TensorInfo& input,

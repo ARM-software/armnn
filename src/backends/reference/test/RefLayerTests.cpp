@@ -2008,4 +2008,18 @@ ARMNN_AUTO_TEST_CASE(Neg3dQuantisedAsymm8, Neg3dTest<DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_CASE(Neg2dQuantisedSymm16, Neg2dTest<DataType::QSymmS16>)
 ARMNN_AUTO_TEST_CASE(Neg3dQuantisedSymm16, Neg3dTest<DataType::QSymmS16>)
 
+// Exp
+ARMNN_AUTO_TEST_CASE(Exp2d, Exp2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Exo3d, Exp3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(ExpZero, ExpZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(ExpNegative, ExpNegativeTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Exp2dFloat16, Exp2dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE(Exp3dFloat16, Exp3dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE(Exp2dQuantisedAsymmS8, Exp2dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE(Exp3dQuantisedAsymmS8, Exp3dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE(Exp2dQuantisedAsymm8, Exp2dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(Exp3dQuantisedAsymm8, Exp3dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(Exp2dQuantisedSymm16, Exp2dTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(Exp3dQuantisedSymm16, Exp3dTest<DataType::QSymmS16>)
+
 BOOST_AUTO_TEST_SUITE_END()

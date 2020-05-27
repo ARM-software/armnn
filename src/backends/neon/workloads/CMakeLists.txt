@@ -110,7 +110,7 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonWorkloadUtils.hpp
 )
 
-add_library(armnnNeonBackendWorkloads OBJECT ${armnnNeonBackendWorkloads_sources} NeonExpWorkload.cpp NeonExpWorkload.hpp)
+add_library(armnnNeonBackendWorkloads OBJECT ${armnnNeonBackendWorkloads_sources})
 target_include_directories(armnnNeonBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnNeonBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
 target_include_directories(armnnNeonBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)

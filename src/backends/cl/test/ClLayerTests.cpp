@@ -1119,6 +1119,14 @@ ARMNN_AUTO_TEST_CASE(NegNegative, NegNegativeTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(Neg2dFloat16, Neg2dTest<DataType::Float16>)
 ARMNN_AUTO_TEST_CASE(Neg3dFloat16, Neg3dTest<DataType::Float16>)
 
+// Exp
+ARMNN_AUTO_TEST_CASE(Exp2d, Exp2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Exo3d, Exp3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(ExpZero, ExpZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(ExpNegative, ExpNegativeTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Exp2dFloat16, Exp2dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE(Exp3dFloat16, Exp3dTest<DataType::Float16>)
+
 #if defined(ARMNNREF_ENABLED)
 
 // The ARMNN_COMPARE_REF_AUTO_TEST_CASE and the ARMNN_COMPARE_REF_FIXTURE_TEST_CASE test units are not available

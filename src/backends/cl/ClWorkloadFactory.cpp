@@ -249,27 +249,31 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDivision(const DivisionQueue
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
                                                                      const WorkloadInfo& info) const
 {
-    if (descriptor.m_Parameters.m_Operation == UnaryOperation::Abs)
+    switch(descriptor.m_Parameters.m_Operation)
     {
-        AbsQueueDescriptor absQueueDescriptor;
-        absQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
-        absQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+        case UnaryOperation::Abs:
+             {
+                 AbsQueueDescriptor absQueueDescriptor;
+                 absQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
+                 absQueueDescriptor.m_Outputs = descriptor.m_Outputs;
 
-        return MakeWorkload<ClAbsWorkload>(absQueueDescriptor, info);
-    }
-    else if (descriptor.m_Parameters.m_Operation == UnaryOperation::Rsqrt)
-    {
-        RsqrtQueueDescriptor rsqrtQueueDescriptor;
-        rsqrtQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
-        rsqrtQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+                 return  std::make_unique<ClAbsWorkload>(absQueueDescriptor, info);
+             }
+        case UnaryOperation::Exp:
+            return std::make_unique<ClExpWorkload>(descriptor, info);
+        case UnaryOperation::Neg:
+            return std::make_unique<ClNegWorkload>(descriptor, info);
+        case UnaryOperation::Rsqrt:
+             {
+                 RsqrtQueueDescriptor rsqrtQueueDescriptor;
+                 rsqrtQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
+                 rsqrtQueueDescriptor.m_Outputs = descriptor.m_Outputs;
 
-        return MakeWorkload<ClRsqrtWorkload>(rsqrtQueueDescriptor, info);
+                 return std::make_unique<ClRsqrtWorkload>(rsqrtQueueDescriptor, info);
+             }
+        default:
+            return nullptr;
     }
-    else if (descriptor.m_Parameters.m_Operation == UnaryOperation::Neg)
-    {
-        return MakeWorkload<ClNegWorkload>(descriptor, info);
-    }
-    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,

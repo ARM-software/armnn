@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
     BOOST_CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_TEST(size == 376);
+    BOOST_TEST(size == 432);
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
 
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
     unsigned int offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 368);
+    VerifyTimelineHeaderBinary(readableData, offset, 424);
 
     // First "well-known" label: NAME
     VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::NAME_GUID,
@@ -113,6 +113,18 @@ BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
     // Forth "well-known" label: BACKENDID
     VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::BACKENDID_GUID,
                                         LabelsAndEventClasses::BACKENDID_LABEL,
+                                        readableData,
+                                        offset);
+
+    // Fifth "well-known" label: CHILD
+    VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::CHILD_GUID,
+                                        LabelsAndEventClasses::CHILD_LABEL,
+                                        readableData,
+                                        offset);
+
+    // Sixth "well-known" label: EXECUTION_OF
+    VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::EXECUTION_OF_GUID,
+                                        LabelsAndEventClasses::EXECUTION_OF_LABEL,
                                         readableData,
                                         offset);
 

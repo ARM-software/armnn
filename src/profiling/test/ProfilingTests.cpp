@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -141,10 +141,12 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandler)
     SendCounterPacket sendCounterPacket(mockBuffer);
     SendThread sendThread(profilingStateMachine, mockBuffer, sendCounterPacket);
     SendTimelinePacket sendTimelinePacket(mockBuffer);
+    MockProfilingServiceStatus mockProfilingServiceStatus;
 
     ConnectionAcknowledgedCommandHandler connectionAcknowledgedCommandHandler(0, 1, 4194304, counterDirectory,
                                                                               sendCounterPacket, sendTimelinePacket,
-                                                                              profilingStateMachine);
+                                                                              profilingStateMachine,
+                                                                              mockProfilingServiceStatus);
     CommandHandlerRegistry commandHandlerRegistry;
 
     commandHandlerRegistry.RegisterFunctor(&connectionAcknowledgedCommandHandler);
@@ -2043,9 +2045,16 @@ BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
     SendCounterPacket sendCounterPacket(mockBuffer);
     SendThread sendThread(profilingState, mockBuffer, sendCounterPacket);
     SendTimelinePacket sendTimelinePacket(mockBuffer);
+    MockProfilingServiceStatus mockProfilingServiceStatus;
 
-    ConnectionAcknowledgedCommandHandler commandHandler(packetFamilyId, connectionPacketId, version, counterDirectory,
-                                                        sendCounterPacket, sendTimelinePacket, profilingState);
+    ConnectionAcknowledgedCommandHandler commandHandler(packetFamilyId,
+                                                        connectionPacketId,
+                                                        version,
+                                                        counterDirectory,
+                                                        sendCounterPacket,
+                                                        sendTimelinePacket,
+                                                        profilingState,
+                                                        mockProfilingServiceStatus);
 
     // command handler received packet on ProfilingState::Uninitialised
     BOOST_CHECK_THROW(commandHandler(packetA), armnn::Exception);
@@ -2070,9 +2079,14 @@ BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
     Packet packetB(differentPacketId, dataLength1, uniqueData1);
     profilingState.TransitionToState(ProfilingState::NotConnected);
     profilingState.TransitionToState(ProfilingState::WaitingForAck);
-    ConnectionAcknowledgedCommandHandler differentCommandHandler(packetFamilyId, differentPacketId, version,
-                                                                 counterDirectory, sendCounterPacket,
-                                                                 sendTimelinePacket, profilingState);
+    ConnectionAcknowledgedCommandHandler differentCommandHandler(packetFamilyId,
+                                                                 differentPacketId,
+                                                                 version,
+                                                                 counterDirectory,
+                                                                 sendCounterPacket,
+                                                                 sendTimelinePacket,
+                                                                 profilingState,
+                                                                 mockProfilingServiceStatus);
     BOOST_CHECK_THROW(differentCommandHandler(packetB), armnn::Exception);
 }
 
@@ -2439,7 +2453,7 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
     // Timeline message directory packet
     BOOST_TEST(((header2Word0 >> 26) & 0x0000003F) == 1); // packet family
     BOOST_TEST(((header2Word0 >> 16) & 0x000003FF) == 0); // packet id
-    BOOST_TEST(header2Word1 == 419);                      // data length
+    BOOST_TEST(header2Word1 == 443);                      // data length
 }
 
 BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
@@ -2524,7 +2538,7 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
     // Timeline message directory packet
     BOOST_TEST(((header2Word0 >> 26) & 0x0000003F) == 1); // packet family
     BOOST_TEST(((header2Word0 >> 16) & 0x000003FF) == 0); // packet id
-    BOOST_TEST(header2Word1 == 419);                      // data length
+    BOOST_TEST(header2Word1 == 443);                      // data length
 }
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
@@ -2635,9 +2649,9 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodRequestCounterDirectoryPacket)
     mockProfilingConnection->WritePacket(std::move(requestCounterDirectoryPacket));
 
     // Expecting one CounterDirectory Packet of length 652
-    // and one TimelineMessageDirectory packet of length 427
+    // and one TimelineMessageDirectory packet of length 451
     BOOST_CHECK(helper.WaitForPacketsSent(mockProfilingConnection, PacketType::CounterDirectory, 652) == 1);
-    BOOST_CHECK(helper.WaitForPacketsSent(mockProfilingConnection, PacketType::TimelineMessageDirectory, 427) == 1);
+    BOOST_CHECK(helper.WaitForPacketsSent(mockProfilingConnection, PacketType::TimelineMessageDirectory, 451) == 1);
 
     // The Request Counter Directory Command Handler should not have updated the profiling state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);

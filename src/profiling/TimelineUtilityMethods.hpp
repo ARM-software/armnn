@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -71,7 +71,8 @@ public:
 
     ProfilingDynamicGuid CreateRelationship(ProfilingRelationshipType relationshipType,
                                             ProfilingGuid headGuid,
-                                            ProfilingGuid tailGuid);
+                                            ProfilingGuid tailGuid,
+                                            ProfilingGuid relationshipCategory);
 
     ProfilingDynamicGuid CreateConnectionRelationship(ProfilingRelationshipType relationshipType,
                                                       ProfilingGuid headGuid,

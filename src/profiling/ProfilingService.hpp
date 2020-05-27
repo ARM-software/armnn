@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -82,6 +82,7 @@ public:
                                                  m_SendCounterPacket,
                                                  m_SendTimelinePacket,
                                                  m_StateMachine,
+                                                 *this,
                                                  m_BackendProfilingContexts)
         , m_RequestCounterDirectoryCommandHandler(0,
                                                   3,
@@ -123,6 +124,7 @@ public:
                                                       *this)
         , m_TimelinePacketWriterFactory(m_BufferManager)
         , m_MaxGlobalCounterId(armnn::profiling::INFERENCES_RUN)
+        , m_ServiceActive(false)
     {
         // Register the "Connection Acknowledged" command handler
         m_CommandHandlerRegistry.RegisterFunctor(&m_ConnectionAcknowledgedCommandHandler);
@@ -193,6 +195,7 @@ public:
     /// Create a ProfilingStaticGuid based on a hash of the string
     ProfilingStaticGuid GenerateStaticId(const std::string& str) override;
 
+
     std::unique_ptr<ISendTimelinePacket> GetSendTimelinePacket() const override;
 
     ISendCounterPacket& GetSendCounterPacket() override
@@ -204,12 +207,18 @@ public:
 
     static ProfilingStaticGuid GetStaticId(const std::string& str);
 
+    void ResetGuidGenerator();
+
     bool IsTimelineReportingEnabled()
     {
         return m_TimelineReporting;
     }
 
     void AddLocalPacketHandler(ILocalPacketHandlerSharedPtr localPacketHandler);
+
+    void NotifyProfilingServiceActive() override; // IProfilingServiceStatus
+    void WaitForProfilingServiceActivation(unsigned int timeout) override; // IProfilingServiceStatus
+
 private:
     //Copy/move constructors/destructors and copy/move assignment operators are deleted
     ProfilingService(const ProfilingService&) = delete;
@@ -260,6 +269,11 @@ private:
     uint16_t                    m_MaxGlobalCounterId;
 
     static ProfilingGuidGenerator m_GuidGenerator;
+
+    // Signalling to let external actors know when service is active or not
+    std::mutex m_ServiceActiveMutex;
+    std::condition_variable m_ServiceActiveConditionVariable;
+    bool m_ServiceActive;
 
 protected:
 

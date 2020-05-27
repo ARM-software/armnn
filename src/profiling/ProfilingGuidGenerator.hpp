@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -41,6 +41,13 @@ public:
     {
         uint64_t staticHash = m_Hash(str) | MIN_STATIC_GUID;
         return ProfilingStaticGuid(staticHash);
+    }
+
+    /// Reset the generator back to zero. Used mainly for test.
+    inline void Reset()
+    {
+        std::lock_guard<std::mutex> sequencelock(m_SequenceMutex);
+        m_Sequence = 0;
     }
 
 private:

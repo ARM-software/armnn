@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "Runtime.hpp"
@@ -225,6 +225,11 @@ Runtime::Runtime(const CreationOptions& options)
     BackendRegistryInstance().SetProfilingService(m_ProfilingService);
     // pass configuration info to the profiling service
     m_ProfilingService.ConfigureProfilingService(options.m_ProfilingOptions);
+    if (options.m_ProfilingOptions.m_EnableProfiling)
+    {
+        // try to wait for the profiling service to initialise
+        m_ProfilingService.WaitForProfilingServiceActivation(3000);
+    }
 
     m_DeviceSpec.AddSupportedBackends(supportedBackends);
 

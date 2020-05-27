@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,6 +7,7 @@
 
 #include <Holder.hpp>
 #include <IProfilingConnectionFactory.hpp>
+#include <IProfilingServiceStatus.hpp>
 #include <ProfilingService.hpp>
 #include <ProfilingGuidGenerator.hpp>
 #include <ProfilingUtils.hpp>
@@ -689,6 +690,13 @@ private:
     SendCounterPacket      m_SendCounterPacket;
     bool                   m_IsProfilingEnabled;
     CaptureData            m_CaptureData;
+};
+
+class MockProfilingServiceStatus : public IProfilingServiceStatus
+{
+public:
+    void NotifyProfilingServiceActive() override {}
+    void WaitForProfilingServiceActivation(unsigned int timeout) override { IgnoreUnused(timeout); }
 };
 
 } // namespace profiling

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -74,8 +74,8 @@ void AddWorkloadStructure(std::unique_ptr<TimelineUtilityMethods>& timelineUtils
     // Link the workload to the layer
     timelineUtils->CreateRelationship(ProfilingRelationshipType::RetentionLink,
                                       layer.GetGuid(),
-                                      workload->GetGuid());
-
+                                      workload->GetGuid(),
+                                      LabelsAndEventClasses::CHILD_GUID);
 }
 
 } // anonymous
@@ -496,7 +496,10 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
         // Add inference timeline trace if profiling is enabled.
         ProfilingGuid networkGuid = m_OptimizedNetwork->GetGuid();
         timelineUtils->CreateTypedEntity(inferenceGuid, LabelsAndEventClasses::INFERENCE_GUID);
-        timelineUtils->CreateRelationship(ProfilingRelationshipType::RetentionLink, networkGuid, inferenceGuid);
+        timelineUtils->CreateRelationship(ProfilingRelationshipType::RetentionLink,
+                                          networkGuid,
+                                          inferenceGuid,
+                                          LabelsAndEventClasses::EXECUTION_OF_GUID);
         timelineUtils->RecordEvent(inferenceGuid, LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
     }
 

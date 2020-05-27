@@ -96,8 +96,7 @@ void SendTimelinePacket::ForwardWriteBinaryFunction(Func& func, Params&& ... par
                     continue;
 
                 case TimelinePacketStatus::Error:
-                    throw RuntimeException("Error processing while sending TimelineBinaryPacket",
-                                           CHECK_LOCATION());
+                    throw RuntimeException("Error processing while sending TimelineBinaryPacket", CHECK_LOCATION());
 
                 default:
                     m_Offset += numberOfBytesWritten;
@@ -106,9 +105,23 @@ void SendTimelinePacket::ForwardWriteBinaryFunction(Func& func, Params&& ... par
             }
         }
     }
+    catch (const RuntimeException& ex)
+    {
+        // don't swallow in the catch all block
+        throw ex;
+    }
+    catch (const BufferExhaustion& ex)
+    {
+        // ditto
+        throw ex;
+    }
+    catch (const Exception& ex)
+    {
+        throw ex;
+    }
     catch ( ... )
     {
-        throw RuntimeException("Error processing while sending TimelineBinaryPacket", CHECK_LOCATION());
+        throw RuntimeException("Unknown Exception thrown while sending TimelineBinaryPacket", CHECK_LOCATION());
     }
 }
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -19,6 +19,8 @@ std::string LabelsAndEventClasses::NAME_LABEL("name");
 std::string LabelsAndEventClasses::TYPE_LABEL("type");
 std::string LabelsAndEventClasses::INDEX_LABEL("index");
 std::string LabelsAndEventClasses::BACKENDID_LABEL("backendId");
+std::string LabelsAndEventClasses::CHILD_LABEL("child");
+std::string LabelsAndEventClasses::EXECUTION_OF_LABEL("execution_of");
 
 ProfilingStaticGuid LabelsAndEventClasses::EMPTY_GUID(0);
 ProfilingStaticGuid LabelsAndEventClasses::NAME_GUID(
@@ -29,6 +31,10 @@ ProfilingStaticGuid LabelsAndEventClasses::INDEX_GUID(
     m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::INDEX_LABEL));
 ProfilingStaticGuid LabelsAndEventClasses::BACKENDID_GUID(
     m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::BACKENDID_LABEL));
+ProfilingStaticGuid LabelsAndEventClasses::CHILD_GUID(
+    m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::CHILD_LABEL));
+ProfilingStaticGuid LabelsAndEventClasses::EXECUTION_OF_GUID(
+    m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::EXECUTION_OF_LABEL));
 
 // Common types
 std::string LabelsAndEventClasses::LAYER("layer");

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,6 +7,7 @@
 
 #include "CounterIdMap.hpp"
 #include "Holder.hpp"
+#include "IProfilingServiceStatus.hpp"
 #include "ISendCounterPacket.hpp"
 #include "ProfilingGuidGenerator.hpp"
 
@@ -16,7 +17,7 @@ namespace armnn
 namespace profiling
 {
 
-class IProfilingService : public IProfilingGuidGenerator
+class IProfilingService : public IProfilingGuidGenerator, public IProfilingServiceStatus
 {
 public:
     virtual ~IProfilingService() {};

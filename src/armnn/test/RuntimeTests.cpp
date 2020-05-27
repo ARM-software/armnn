@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -414,7 +414,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     BOOST_CHECK(readableBuffer != nullptr);
 
     unsigned int size = readableBuffer->GetSize();
-    BOOST_CHECK(size == 852);
+    BOOST_CHECK(size == 772);
 
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
@@ -422,12 +422,13 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     unsigned int offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 844);
+    VerifyTimelineHeaderBinary(readableData, offset, 764);
+    BOOST_TEST_MESSAGE("HEADER OK");
 
     // Post-optimisation network
     // Network entity
-    VerifyTimelineEntityBinaryPacketData(optNetGuid, readableData, offset
-                                        );
+    VerifyTimelineEntityBinaryPacketData(optNetGuid, readableData, offset);
+    BOOST_TEST_MESSAGE("NETWORK ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -437,178 +438,187 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("NETWORK TYPE RELATIONSHIP OK");
 
     // Input layer
     // Input layer entity
     VerifyTimelineEntityBinaryPacketData(input->GetGuid(), readableData, offset);
+    BOOST_TEST_MESSAGE("INPUT ENTITY OK");
 
     // Name Entity
-    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), "input", readableData, offset);
+    ProfilingGuid inputLabelGuid = VerifyTimelineLabelBinaryPacketData(EmptyOptional(), "input", readableData, offset);
+    BOOST_TEST_MESSAGE("INPUT NAME LABEL OK");
 
     // Entity - Name relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                input->GetGuid(),
-                                               EmptyOptional(),
+                                               inputLabelGuid,
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INPUT NAME RELATIONSHIP OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                input->GetGuid(),
-                                               EmptyOptional(),
+                                               LabelsAndEventClasses::LAYER_GUID,
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INPUT TYPE RELATIONSHIP OK");
 
     // Network - Input layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
                                                optNetGuid,
                                                input->GetGuid(),
-                                               EmptyOptional(),
+                                               LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("NETWORK - INPUT CHILD RELATIONSHIP OK");
 
     // Normalization layer
     // Normalization layer entity
     VerifyTimelineEntityBinaryPacketData(normalize->GetGuid(), readableData, offset);
+    BOOST_TEST_MESSAGE("NORMALIZATION LAYER ENTITY OK");
 
     // Name entity
-    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), "normalization", readableData, offset);
+    ProfilingGuid normalizationLayerNameGuid = VerifyTimelineLabelBinaryPacketData(
+        EmptyOptional(), "normalization", readableData, offset);
+    BOOST_TEST_MESSAGE("NORMALIZATION LAYER NAME LABEL OK");
 
     // Entity - Name relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                normalize->GetGuid(),
-                                               EmptyOptional(),
+                                               normalizationLayerNameGuid,
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("NORMALIZATION LAYER NAME RELATIONSHIP OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                normalize->GetGuid(),
-                                               EmptyOptional(),
+                                               LabelsAndEventClasses::LAYER_GUID,
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("NORMALIZATION LAYER TYPE RELATIONSHIP OK");
 
     // Network - Normalize layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
                                                optNetGuid,
                                                normalize->GetGuid(),
-                                               EmptyOptional(),
+                                               LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("NETWORK - NORMALIZATION LAYER CHILD RELATIONSHIP OK");
 
     // Input layer - Normalize layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
                                                input->GetGuid(),
                                                normalize->GetGuid(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Entity - Type relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::CONNECTION_GUID,
-                                               LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INPUT - NORMALIZATION LAYER CONNECTION OK");
 
     // Normalization workload
     // Normalization workload entity
-    VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
+    ProfilingGuid normalizationWorkloadGuid = VerifyTimelineEntityBinaryPacketData(
+        EmptyOptional(), readableData, offset);
+    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               normalizationWorkloadGuid,
+                                               LabelsAndEventClasses::WORKLOAD_GUID,
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD TYPE RELATIONSHIP OK");
 
     // BackendId entity
-    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), "CpuRef", readableData, offset);
+    ProfilingGuid cpuRefLabelGuid = VerifyTimelineLabelBinaryPacketData(
+        EmptyOptional(), "CpuRef", readableData, offset);
+    BOOST_TEST_MESSAGE("CPUREF LABEL OK");
 
     // Entity - BackendId relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               normalizationWorkloadGuid,
+                                               cpuRefLabelGuid,
                                                LabelsAndEventClasses::BACKENDID_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD BACKEND ID RELATIONSHIP OK");
 
     // Normalize layer - Normalize workload relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
                                                normalize->GetGuid(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               normalizationWorkloadGuid,
+                                               LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("NORMALIZATION LAYER - WORKLOAD CHILD RELATIONSHIP OK");
 
     // Output layer
     // Output layer entity
     VerifyTimelineEntityBinaryPacketData(output->GetGuid(), readableData, offset);
+    BOOST_TEST_MESSAGE("OUTPUT LAYER ENTITY OK");
 
     // Name entity
-    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), "output", readableData, offset);
+    ProfilingGuid outputLabelGuid = VerifyTimelineLabelBinaryPacketData(
+        EmptyOptional(), "output", readableData, offset);
+    BOOST_TEST_MESSAGE("OUTPUT LAYER NAME LABEL OK");
 
     // Entity - Name relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                output->GetGuid(),
-                                               EmptyOptional(),
+                                               outputLabelGuid,
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("OUTPUT LAYER NAME RELATIONSHIP OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
                                                output->GetGuid(),
-                                               EmptyOptional(),
+                                               LabelsAndEventClasses::LAYER_GUID,
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("OUTPUT LAYER TYPE RELATIONSHIP OK");
 
     // Network - Output layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
                                                optNetGuid,
                                                output->GetGuid(),
-                                               EmptyOptional(),
+                                               LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("NETWORK - OUTPUT LAYER CHILD RELATIONSHIP OK");
 
     // Normalize layer - Output layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
                                                normalize->GetGuid(),
                                                output->GetGuid(),
-                                               EmptyOptional(),
-                                               readableData,
-                                               offset);
-
-    // Entity - Type relationship
-    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
                                                LabelsAndEventClasses::CONNECTION_GUID,
-                                               LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("NORMALIZE LAYER - OUTPUT LAYER CONNECTION OK");
 
     bufferManager.MarkRead(readableBuffer);
 
@@ -651,40 +661,47 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
 
     // Verify Header
     VerifyTimelineHeaderBinary(readableData, offset, 156);
+    BOOST_TEST_MESSAGE("INPUT WORKLOAD HEADER OK");
 
     // Input workload
     // Input workload entity
-    VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
+    ProfilingGuid inputWorkloadGuid = VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
+    BOOST_TEST_MESSAGE("INPUT WORKLOAD ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               inputWorkloadGuid,
+                                               LabelsAndEventClasses::WORKLOAD_GUID,
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INPUT WORKLOAD TYPE RELATIONSHIP OK");
 
     // BackendId entity
-    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), "CpuRef", readableData, offset);
+    ProfilingGuid CpuRefLabelGuid = VerifyTimelineLabelBinaryPacketData(
+        EmptyOptional(), "CpuRef", readableData, offset);
+    BOOST_TEST_MESSAGE("CPUREF LABEL OK (INPUT WORKLOAD)");
 
     // Entity - BackendId relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               inputWorkloadGuid,
+                                               CpuRefLabelGuid,
                                                LabelsAndEventClasses::BACKENDID_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INPUT WORKLOAD BACKEND ID RELATIONSHIP OK");
 
     // Input layer - Input workload relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
                                                input->GetGuid(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               inputWorkloadGuid,
+                                               LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INPUT LAYER - INPUT WORKLOAD CHILD RELATIONSHIP OK");
 
     bufferManager.MarkRead(inputReadableBuffer);
 
@@ -699,40 +716,46 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
 
     // Verify Header
     VerifyTimelineHeaderBinary(readableData, offset, 156);
+    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD HEADER OK");
 
     // Output workload
     // Output workload entity
-    VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
+    ProfilingGuid outputWorkloadGuid = VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
+    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               outputWorkloadGuid,
+                                               LabelsAndEventClasses::WORKLOAD_GUID,
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD TYPE RELATIONSHIP OK");
 
     // BackendId entity
     VerifyTimelineLabelBinaryPacketData(EmptyOptional(), "CpuRef", readableData, offset);
+    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD CPU REF LABEL OK");
 
     // Entity - BackendId relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               outputWorkloadGuid,
+                                               CpuRefLabelGuid,
                                                LabelsAndEventClasses::BACKENDID_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD BACKEND ID RELATIONSHIP OK");
 
     // Output layer - Output workload relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
                                                output->GetGuid(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               outputWorkloadGuid,
+                                               LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("OUTPUT LAYER - OUTPUT WORKLOAD CHILD RELATIONSHIP OK");
 
     bufferManager.MarkRead(outputReadableBuffer);
 
@@ -747,227 +770,267 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
 
     // Verify Header
     VerifyTimelineHeaderBinary(readableData, offset, 968 + 8 * ThreadIdSize);
+    BOOST_TEST_MESSAGE("INFERENCE HEADER OK");
 
     // Inference timeline trace
     // Inference entity
-    VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
+    ProfilingGuid inferenceGuid = VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
+    BOOST_TEST_MESSAGE("INFERENCE ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
+                                               inferenceGuid,
                                                LabelsAndEventClasses::INFERENCE_GUID,
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INFERENCE TYPE RELATIONSHIP OK");
 
     // Network - Inference relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
                                                optNetGuid,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               inferenceGuid,
+                                               LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("NETWORK - INFERENCE EXECUTION_OF RELATIONSHIP OK");
 
     // Start Inference life
     // Event packet - timeline, threadId, eventGuid
-    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+    ProfilingGuid inferenceEventGuid = VerifyTimelineEventBinaryPacket(
+        EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+    BOOST_TEST_MESSAGE("INFERENCE START OF LIFE EVENT OK");
 
     // Inference - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               inferenceGuid,
+                                               inferenceEventGuid,
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INFERENCE START OF LIFE RELATIONSHIP OK");
 
     // Execution
     // Input workload execution
     // Input workload execution entity
-    VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
+    ProfilingGuid inputWorkloadExecutionGuid = VerifyTimelineEntityBinaryPacketData(
+        EmptyOptional(), readableData, offset);
+    BOOST_TEST_MESSAGE("INPUT WORKLOAD EXECUTION ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
+                                               inputWorkloadExecutionGuid,
                                                LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INPUT WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
 
     // Inference - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               inferenceGuid,
+                                               inputWorkloadExecutionGuid,
+                                               LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INFERENCE - INPUT WORKLOAD EXECUTION CHILD RELATIONSHIP OK");
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               inputWorkloadGuid,
+                                               inputWorkloadExecutionGuid,
+                                               LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INPUT WORKLOAD - INPUT WORKLOAD EXECUTION RELATIONSHIP OK");
 
     // Start Input workload execution life
     // Event packet - timeline, threadId, eventGuid
-    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+    ProfilingGuid inputWorkloadExecutionSOLEventId = VerifyTimelineEventBinaryPacket(
+        EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
 
     // Input workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               inputWorkloadExecutionGuid,
+                                               inputWorkloadExecutionSOLEventId,
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INPUT WORKLOAD EXECUTION - START OF LIFE EVENT RELATIONSHIP OK");
 
     // End of Input workload execution life
     // Event packet - timeline, threadId, eventGuid
-    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+    ProfilingGuid inputWorkloadExecutionEOLEventId = VerifyTimelineEventBinaryPacket(
+        EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
 
     // Input workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               inputWorkloadExecutionGuid,
+                                               inputWorkloadExecutionEOLEventId,
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INPUT WORKLOAD EXECUTION - END OF LIFE EVENT RELATIONSHIP OK");
 
     // Normalize workload execution
     // Normalize workload execution entity
-    VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
+    ProfilingGuid normalizeWorkloadExecutionGuid = VerifyTimelineEntityBinaryPacketData(
+        EmptyOptional(), readableData, offset);
+    BOOST_TEST_MESSAGE("NORMALIZE WORKLOAD EXECUTION ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
+                                               normalizeWorkloadExecutionGuid,
                                                LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("NORMALIZE WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
 
     // Inference - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               inferenceGuid,
+                                               normalizeWorkloadExecutionGuid,
+                                               LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INFERENCE - NORMALIZE WORKLOAD EXECUTION CHILD RELATIONSHIP OK");
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               normalizationWorkloadGuid,
+                                               normalizeWorkloadExecutionGuid,
+                                               LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD - NORMALIZATION WORKLOAD EXECUTION RELATIONSHIP OK");
 
     // Start Normalize workload execution life
     // Event packet - timeline, threadId, eventGuid
-    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+    ProfilingGuid normalizationWorkloadExecutionSOLEventGuid = VerifyTimelineEventBinaryPacket(
+        EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD EXECUTION START OF LIFE EVENT OK");
 
     // Normalize workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               normalizeWorkloadExecutionGuid,
+                                               normalizationWorkloadExecutionSOLEventGuid,
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD EXECUTION START OF LIFE RELATIONSHIP OK");
 
     // End of Normalize workload execution life
     // Event packet - timeline, threadId, eventGuid
-    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+    ProfilingGuid normalizationWorkloadExecutionEOLEventGuid = VerifyTimelineEventBinaryPacket(
+        EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD EXECUTION END OF LIFE EVENT OK");
 
     // Normalize workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               normalizeWorkloadExecutionGuid,
+                                               normalizationWorkloadExecutionEOLEventGuid,
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD EXECUTION END OF LIFE RELATIONSHIP OK");
 
     // Output workload execution
     // Output workload execution entity
-    VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
+    ProfilingGuid outputWorkloadExecutionGuid = VerifyTimelineEntityBinaryPacketData(
+        EmptyOptional(), readableData, offset);
+    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD EXECUTION ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
+                                               outputWorkloadExecutionGuid,
                                                LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
 
     // Inference - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               inferenceGuid,
+                                               outputWorkloadExecutionGuid,
+                                               LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INFERENCE - OUTPUT WORKLOAD EXECUTION CHILD RELATIONSHIP OK");
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               outputWorkloadGuid,
+                                               outputWorkloadExecutionGuid,
+                                               LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
+     BOOST_TEST_MESSAGE("OUTPUT WORKLOAD - OUTPUT WORKLOAD EXECUTION EXECUTION_OF RELATIONSHIP OK");
 
     // Start Output workload execution life
     // Event packet - timeline, threadId, eventGuid
-    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+    ProfilingGuid outputWorkloadExecutionSOLEventGuid = VerifyTimelineEventBinaryPacket(
+        EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD EXECUTION START OF LIFE EVENT OK");
 
     // Output workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               outputWorkloadExecutionGuid,
+                                               outputWorkloadExecutionSOLEventGuid,
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-
+    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD EXECUTION - START OF LIFE EVENT RELATIONSHIP OK");
 
     // End of Normalize workload execution life
     // Event packet - timeline, threadId, eventGuid
-    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+    ProfilingGuid outputWorkloadExecutionEOLEventGuid = VerifyTimelineEventBinaryPacket(
+        EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD EXECUTION END OF LIFE EVENT OK");
 
     // Output workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               outputWorkloadExecutionGuid,
+                                               outputWorkloadExecutionEOLEventGuid,
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD EXECUTION - END OF LIFE EVENT RELATIONSHIP OK");
 
     // End of Inference life
     // Event packet - timeline, threadId, eventGuid
-    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+    ProfilingGuid inferenceEOLEventGuid = VerifyTimelineEventBinaryPacket(
+        EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+    BOOST_TEST_MESSAGE("INFERENCE END OF LIFE EVENT OK");
 
     // Inference - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
                                                EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               inferenceGuid,
+                                               inferenceEOLEventGuid,
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
+    BOOST_TEST_MESSAGE("INFERENCE - END OF LIFE EVENT RELATIONSHIP OK");
 
     bufferManager.MarkRead(inferenceReadableBuffer);
 }

@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     uint32_t sequenceNumbered = (packetHeaderWord1 >> 24) & 0x00000001;
     uint32_t dataLength       = (packetHeaderWord1 >>  0) & 0x00FFFFFF;
     BOOST_CHECK(sequenceNumbered ==  0);
-    BOOST_CHECK(dataLength       == 419);
+    BOOST_CHECK(dataLength       == 443);
 
     offset += uint32_t_size;
     uint8_t readStreamVersion = ReadUint8(packetBuffer, offset);
@@ -98,26 +98,30 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     BOOST_CHECK(swTraceMessage.m_Id == 2);
     BOOST_CHECK(swTraceMessage.m_Name == "declareEventClass");
     BOOST_CHECK(swTraceMessage.m_UiName == "declare event class");
-    BOOST_CHECK(swTraceMessage.m_ArgTypes.size() == 1);
+    BOOST_CHECK(swTraceMessage.m_ArgTypes.size() == 2);
     BOOST_CHECK(swTraceMessage.m_ArgTypes[0] == 'p');
-    BOOST_CHECK(swTraceMessage.m_ArgNames.size() == 1);
+    BOOST_CHECK(swTraceMessage.m_ArgTypes[1] == 'p');
+    BOOST_CHECK(swTraceMessage.m_ArgNames.size() == 2);
     BOOST_CHECK(swTraceMessage.m_ArgNames[0] == "guid");
+    BOOST_CHECK(swTraceMessage.m_ArgNames[1] == "nameGuid");
 
     swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
 
     BOOST_CHECK(swTraceMessage.m_Id == 3);
     BOOST_CHECK(swTraceMessage.m_Name == "declareRelationship");
     BOOST_CHECK(swTraceMessage.m_UiName == "declare relationship");
-    BOOST_CHECK(swTraceMessage.m_ArgTypes.size() == 4);
+    BOOST_CHECK(swTraceMessage.m_ArgTypes.size() == 5);
     BOOST_CHECK(swTraceMessage.m_ArgTypes[0] == 'I');
     BOOST_CHECK(swTraceMessage.m_ArgTypes[1] == 'p');
     BOOST_CHECK(swTraceMessage.m_ArgTypes[2] == 'p');
     BOOST_CHECK(swTraceMessage.m_ArgTypes[3] == 'p');
-    BOOST_CHECK(swTraceMessage.m_ArgNames.size() == 4);
+    BOOST_CHECK(swTraceMessage.m_ArgTypes[4] == 'p');
+    BOOST_CHECK(swTraceMessage.m_ArgNames.size() == 5);
     BOOST_CHECK(swTraceMessage.m_ArgNames[0] == "relationshipType");
     BOOST_CHECK(swTraceMessage.m_ArgNames[1] == "relationshipGuid");
     BOOST_CHECK(swTraceMessage.m_ArgNames[2] == "headGuid");
     BOOST_CHECK(swTraceMessage.m_ArgNames[3] == "tailGuid");
+    BOOST_CHECK(swTraceMessage.m_ArgNames[4] == "attributeGuid");
 
     swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
 
@@ -403,7 +407,7 @@ BOOST_AUTO_TEST_CASE(SendTimelinePacketTests3)
     const uint64_t eventClassBinaryPacketNameGuid = 8845u;
     BOOST_CHECK_THROW(sendTimelinePacket->SendTimelineEventClassBinaryPacket(
                       eventClassBinaryPacketProfilingGuid, eventClassBinaryPacketNameGuid),
-                      armnn::RuntimeException);
+                      armnn::profiling::BufferExhaustion);
 }
 
 BOOST_AUTO_TEST_CASE(GetGuidsFromProfilingService)

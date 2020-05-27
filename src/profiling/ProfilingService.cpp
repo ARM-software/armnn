@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -27,6 +27,11 @@ ProfilingDynamicGuid ProfilingService::GetNextGuid()
 ProfilingStaticGuid ProfilingService::GetStaticId(const std::string& str)
 {
     return m_GuidGenerator.GenerateStaticId(str);
+}
+
+void ProfilingService::ResetGuidGenerator()
+{
+    m_GuidGenerator.Reset();
 }
 
 void ProfilingService::ResetExternalProfilingOptions(const ExternalProfilingOptions& options,
@@ -452,6 +457,10 @@ void ProfilingService::Reset()
 
 void ProfilingService::Stop()
 {
+    {   // only lock when we are updating the inference completed variable
+        std::unique_lock<std::mutex> lck(m_ServiceActiveMutex);
+        m_ServiceActive = false;
+    }
     // The order in which we reset/stop the components is not trivial!
     // First stop the producing threads
     // Command Handler first as it is responsible for launching then Periodic Counter capture thread
@@ -489,6 +498,39 @@ void ProfilingService::NotifyBackendsForTimelineReporting()
         // Increment the Iterator to point to next entry
         it++;
     }
+}
+
+void ProfilingService::NotifyProfilingServiceActive()
+{
+    {   // only lock when we are updating the inference completed variable
+        std::unique_lock<std::mutex> lck(m_ServiceActiveMutex);
+        m_ServiceActive = true;
+    }
+    m_ServiceActiveConditionVariable.notify_one();
+}
+
+void ProfilingService::WaitForProfilingServiceActivation(unsigned int timeout)
+{
+    std::unique_lock<std::mutex> lck(m_ServiceActiveMutex);
+
+    auto start = std::chrono::high_resolution_clock::now();
+    // Here we we will go back to sleep after a spurious wake up if
+    // m_InferenceCompleted is not yet true.
+    if (!m_ServiceActiveConditionVariable.wait_for(lck,
+                                                   std::chrono::milliseconds(timeout),
+                                                   [&]{return m_ServiceActive == true;}))
+    {
+        if (m_ServiceActive == true)
+        {
+            return;
+        }
+        auto finish = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> elapsed = finish - start;
+        std::stringstream ss;
+        ss << "Timed out waiting on profiling service activation for " << elapsed.count() << " ms";
+        ARMNN_LOG(warning) << ss.str();
+    }
+    return;
 }
 
 ProfilingService::~ProfilingService()

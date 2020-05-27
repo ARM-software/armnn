@@ -1,10 +1,11 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "TestTimelinePacketHandler.hpp"
 #include "IProfilingConnection.hpp"
+#include <LabelsAndEventClasses.hpp>
 
 #include <armnn/utility/IgnoreUnused.hpp>
 
@@ -98,19 +99,13 @@ ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateEntity(const Enti
 ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateEventClass(
     const ITimelineDecoder::EventClass& eventClass)
 {
-    // for the moment terminate the run here so we can get this code
-    // onto master prior to a major re-organisation
-    if (m_PacketHandler != nullptr)
-    {
-        m_PacketHandler->SetInferenceComplete();
-    }
-    IgnoreUnused(eventClass);
+    m_TimelineModel.AddEventClass(eventClass);
     return ITimelineDecoder::TimelineStatus::TimelineStatus_Success;
 }
 
 ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateEvent(const ITimelineDecoder::Event& event)
 {
-    IgnoreUnused(event);
+    m_TimelineModel.AddEvent(event);
     return ITimelineDecoder::TimelineStatus::TimelineStatus_Success;
 }
 
@@ -124,6 +119,20 @@ ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateRelationship(
     const ITimelineDecoder::Relationship& relationship)
 {
     m_TimelineModel.AddRelationship(relationship);
+    // check to see if this is an execution link to an inference of event class end of life
+    // if so the inference has completed so send out a notification...
+    if (relationship.m_RelationshipType == RelationshipType::ExecutionLink &&
+        m_TimelineModel.IsInferenceGuid(relationship.m_HeadGuid))
+    {
+        ProfilingStaticGuid attributeGuid(relationship.m_AttributeGuid);
+        if (attributeGuid == armnn::profiling::LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS)
+        {
+            if (m_PacketHandler != nullptr)
+            {
+                m_PacketHandler->SetInferenceComplete();
+            }
+        }
+    }
     return ITimelineDecoder::TimelineStatus::TimelineStatus_Success;
 }
 

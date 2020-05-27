@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,6 +7,7 @@
 
 #include <armnn/backends/profiling/IBackendProfilingContext.hpp>
 #include "CommandHandlerFunctor.hpp"
+#include "IProfilingServiceStatus.hpp"
 #include "ISendCounterPacket.hpp"
 #include "armnn/profiling/ISendTimelinePacket.hpp"
 #include <Packet.hpp>
@@ -32,12 +33,14 @@ public:
                                          ISendCounterPacket& sendCounterPacket,
                                          ISendTimelinePacket& sendTimelinePacket,
                                          ProfilingStateMachine& profilingStateMachine,
+                                         IProfilingServiceStatus& profilingServiceStatus,
                                          Optional<BackendProfilingContexts> backendProfilingContexts = EmptyOptional())
         : CommandHandlerFunctor(familyId, packetId, version)
         , m_CounterDirectory(counterDirectory)
         , m_SendCounterPacket(sendCounterPacket)
         , m_SendTimelinePacket(sendTimelinePacket)
         , m_StateMachine(profilingStateMachine)
+        , m_ProfilingServiceStatus(profilingServiceStatus)
         , m_BackendProfilingContext(backendProfilingContexts)
     {}
 
@@ -53,6 +56,7 @@ private:
     ISendCounterPacket&      m_SendCounterPacket;
     ISendTimelinePacket&     m_SendTimelinePacket;
     ProfilingStateMachine&   m_StateMachine;
+    IProfilingServiceStatus& m_ProfilingServiceStatus;
     Optional<BackendProfilingContexts> m_BackendProfilingContext;
     bool m_TimelineEnabled = false;
 };

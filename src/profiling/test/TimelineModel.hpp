@@ -1,13 +1,15 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include <armnn/profiling/ITimelineDecoder.hpp>
+#include <common/include/ProfilingException.hpp>
 
 #include <map>
+#include <sstream>
 #include <vector>
 
 namespace armnn
@@ -18,11 +20,76 @@ namespace profiling
 using LabelMap = std::map<uint64_t, ITimelineDecoder::Label>;
 using Attribute = std::pair<std::string, std::string>;
 using Attributes = std::map<std::string, Attribute>;
+class Entity;
+class Connection
+{
+public:
+    Connection(uint64_t guid, Entity* head, Entity* tail) :
+        m_Guid(guid), m_HeadEntity(head), m_TailEntity(tail)
+    {
+        if (head == nullptr)
+        {
+            std::stringstream ss;
+            ss << "connection [" << guid << "] head cannot be null";
+            throw armnnProfiling::ProfilingException(ss.str());
+        }
+        if (tail == nullptr)
+        {
+            std::stringstream ss;
+            ss << "connection [" << guid << "] tail cannot be null";
+            throw armnnProfiling::ProfilingException(ss.str());
+        }
+    }
+
+    uint64_t GetGuid() const {return m_Guid;}
+    const Entity* GetHead() const {return m_HeadEntity;}
+    const Entity* GetTail() const {return m_TailEntity;}
+private:
+    uint64_t m_Guid;
+    Entity* m_HeadEntity;
+    Entity* m_TailEntity;
+};
+class EventClassObj
+{
+public:
+    EventClassObj(uint64_t guid, const std::string& name) : m_Guid(guid), m_Name(name) {}
+    uint64_t GetGuid() const {return m_Guid;}
+    const std::string& GetName() const {return m_Name;}
+private:
+    uint64_t m_Guid;
+    std::string m_Name;
+};
+class EventObj
+{
+public:
+    EventObj(uint64_t guid, uint64_t timestamp, uint64_t threadId) :
+        m_Guid(guid), m_TimeStamp(timestamp), m_ThreadId(threadId) {}
+    uint64_t GetGuid() const {return m_Guid;}
+    uint64_t GetTimeStamp() const {return m_TimeStamp;}
+    uint64_t GetThreadId() const {return m_ThreadId;}
+    void SetEventClass(EventClassObj* evtClass) {m_EventClass = evtClass;}
+    std::string GetEventClass()
+    {
+        if (m_EventClass == nullptr)
+        {
+            return "";
+        }
+        else
+        {
+            return m_EventClass->GetName();
+        }
+    }
+private:
+    uint64_t m_Guid;
+    uint64_t m_TimeStamp;
+    uint64_t m_ThreadId;
+    EventClassObj* m_EventClass;
+};
 class Entity
 {
 public:
     Entity(uint64_t guid) : m_Guid(guid) {}
-    uint64_t GetGuid() {return m_Guid;}
+    uint64_t GetGuid() const {return m_Guid;}
     void AddChild(Entity* child)
     {
         if (child != nullptr)
@@ -35,10 +102,36 @@ public:
         Attribute attr(type, value);
         m_Attributes.emplace(type, attr);
     }
+    void AddConnection(const Connection& connection)
+    {
+        m_Connections.push_back(connection);
+    }
+    void AddExecution(Entity* execution)
+    {
+        if (execution != nullptr)
+        {
+            m_Executions.push_back(execution);
+        }
+    }
+    void AddEvent(EventObj* event)
+    {
+        if (event != nullptr)
+        {
+            m_Events.push_back(event);
+        }
+    }
+    const Attributes& GetAttributes() const {return m_Attributes;}
+    const std::vector<Entity*>& GetChildren() const {return m_Children;}
+    const std::vector<Connection>& GetConnections() const {return m_Connections;}
+    const std::vector<Entity*>& GetExecutions() const {return m_Executions;}
+    const std::vector<EventObj*>& GetEvents() const {return m_Events;}
 private:
     uint64_t m_Guid;
     Attributes m_Attributes;
     std::vector<Entity*> m_Children;
+    std::vector<Connection> m_Connections;
+    std::vector<Entity*> m_Executions;
+    std::vector<EventObj*> m_Events;
 };
 using Entities = std::map<uint64_t, Entity>;
 struct ModelRelationship
@@ -48,19 +141,48 @@ struct ModelRelationship
     std::vector<Entity*> m_RelatedEntities;
 };
 using Relationships = std::map<uint64_t, ModelRelationship>;
+using EventClasses = std::map<uint64_t, EventClassObj>;
+using Events = std::map<uint64_t, EventObj>;
 class TimelineModel
 {
 public:
     void AddLabel(const ITimelineDecoder::Label& label);
+    std::string* FindLabel(uint64_t guid);
     void AddEntity(uint64_t guid);
-    Entity* findEntity(uint64_t id);
+    Entity* FindEntity(uint64_t id);
     void AddRelationship(const ITimelineDecoder::Relationship& relationship);
-    ModelRelationship* findRelationship(uint64_t id);
+    ModelRelationship* FindRelationship(uint64_t id);
+    const LabelMap& GetLabelMap() const {return m_LabelMap;}
+    const Entities& GetEntities() const {return m_Entities;}
+    const std::vector<armnnProfiling::ProfilingException>& GetErrors() const {return m_Errors;}
+    bool IsInferenceGuid(uint64_t guid) const;
+    void AddEventClass(const ITimelineDecoder::EventClass& eventClass);
+    const EventClasses& GetEventClasses() const {return m_EventClasses;}
+    EventClassObj* FindEventClass(uint64_t id);
+    void AddEvent(const ITimelineDecoder::Event& event);
+    EventObj* FindEvent(uint64_t id);
 private:
     LabelMap m_LabelMap;
     Entities m_Entities;
     Relationships m_Relationships;
+    std::vector<armnnProfiling::ProfilingException> m_Errors;
+    std::vector<uint64_t> m_InferenceGuids;
+    EventClasses m_EventClasses;
+    Events m_Events;
+
+    void HandleLabelLink(const ITimelineDecoder::Relationship& relationship);
+    void HandleConnection(const ITimelineDecoder::Relationship& relationship);
+    void HandleChild(const ITimelineDecoder::Relationship& relationship);
+    void HandleExecutionOf(const ITimelineDecoder::Relationship& relationship);
+    void HandleExecutionLink(const ITimelineDecoder::Relationship& relationship);
 };
+
+std::vector<std::string> GetModelDescription(const TimelineModel& model);
+std::string GetEntityDescription(const Entity& entity);
+std::string GetChildDescription(Entity* entity);
+std::string GetConnectionDescription(const Connection& connection);
+std::string GetExecutionDescription(Entity* execution);
+std::string GetEventDescription(EventObj* event);
 
 } // namespace profiling
 

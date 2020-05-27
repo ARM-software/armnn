@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -47,7 +47,7 @@ void ConnectionAcknowledgedCommandHandler::operator()(const Packet& packet)
             TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses(m_SendTimelinePacket);
         }
 
-        if(m_BackendProfilingContext.has_value())
+        if (m_BackendProfilingContext.has_value())
         {
             for (auto backendContext : m_BackendProfilingContext.value())
             {
@@ -60,6 +60,9 @@ void ConnectionAcknowledgedCommandHandler::operator()(const Packet& packet)
             }
         }
 
+        // At this point signal any external processes waiting on the profiling system
+        // to come up that profiling is fully active
+        m_ProfilingServiceStatus.NotifyProfilingServiceActive();
         break;
     case ProfilingState::Active:
         return; // NOP

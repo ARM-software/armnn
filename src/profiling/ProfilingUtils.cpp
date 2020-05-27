@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -652,17 +652,17 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
     // |-----------|---------------------|-----------------------|-------------|-------------------------------------|
     // |    0      |   declareLabel      |   declare label       |    ps       |  guid,value                         |
     // |    1      |   declareEntity     |   declare entity      |    p        |  guid                               |
-    // |    2      | declareEventClass   |  declare event class  |    p        |  guid                               |
-    // |    3      | declareRelationship | declare relationship  |    Ippp     |  relationshipType,relationshipGuid, |
-    // |           |                     |                       |             |  headGuid,tailGuid                  |
+    // |    2      | declareEventClass   |  declare event class  |    pp       |  guid,nameGuid                      |
+    // |    3      | declareRelationship | declare relationship  |    Ipppp    |  relationshipType,relationshipGuid, |
+    // |           |                     |                       |             |  headGuid,tailGuid,attributeGuid    |
     // |    4      |   declareEvent      |   declare event       |    @tp      |  timestamp,threadId,eventGuid       |
     std::vector<std::vector<std::string>> timelineDirectoryMessages
     {
         { "0", "declareLabel", "declare label", "ps", "guid,value" },
         { "1", "declareEntity", "declare entity", "p", "guid" },
-        { "2", "declareEventClass", "declare event class", "p", "guid" },
-        { "3", "declareRelationship", "declare relationship", "Ippp",
-          "relationshipType,relationshipGuid,headGuid,tailGuid" },
+        { "2", "declareEventClass", "declare event class", "pp", "guid,nameGuid" },
+        { "3", "declareRelationship", "declare relationship", "Ipppp",
+          "relationshipType,relationshipGuid,headGuid,tailGuid,attributeGuid" },
         { "4", "declareEvent", "declare event", "@tp", "timestamp,threadId,eventGuid" }
     };
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -44,6 +44,14 @@ void TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses(ISendTimelinePac
     // Send the "backendId" label, this call throws in case of error
     timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::BACKENDID_GUID,
                                                  LabelsAndEventClasses::BACKENDID_LABEL);
+
+    // Send the "child" label, this call throws in case of error
+    timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::CHILD_GUID,
+                                                 LabelsAndEventClasses::CHILD_LABEL);
+
+    // Send the "execution_of" label, this call throws in case of error
+    timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::EXECUTION_OF_GUID,
+                                                 LabelsAndEventClasses::EXECUTION_OF_LABEL);
 
     // Send the "layer" label, this call throws in case of error
     timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::LAYER_GUID,
@@ -283,7 +291,7 @@ void TimelineUtilityMethods::CreateNamedTypedChildEntity(ProfilingGuid childEnti
                                                                retentionLinkGuid,
                                                                parentEntityGuid,
                                                                childEntityGuid,
-                                                               LabelsAndEventClasses::EMPTY_GUID);
+                                                               LabelsAndEventClasses::CHILD_GUID);
 }
 
 void TimelineUtilityMethods::CreateNamedTypedChildEntity(ProfilingGuid childEntityGuid,
@@ -309,12 +317,13 @@ void TimelineUtilityMethods::CreateNamedTypedChildEntity(ProfilingGuid childEnti
                                                                retentionLinkGuid,
                                                                parentEntityGuid,
                                                                childEntityGuid,
-                                                               LabelsAndEventClasses::EMPTY_GUID);
+                                                               LabelsAndEventClasses::CHILD_GUID);
 }
 
 ProfilingDynamicGuid TimelineUtilityMethods::CreateRelationship(ProfilingRelationshipType relationshipType,
                                                                 ProfilingGuid headGuid,
-                                                                ProfilingGuid tailGuid)
+                                                                ProfilingGuid tailGuid,
+                                                                ProfilingGuid relationshipCategory)
 {
     // Generate a GUID for the relationship
     ProfilingDynamicGuid relationshipGuid = profiling::ProfilingService::GetNextGuid();
@@ -324,7 +333,7 @@ ProfilingDynamicGuid TimelineUtilityMethods::CreateRelationship(ProfilingRelatio
                                                                relationshipGuid,
                                                                headGuid,
                                                                tailGuid,
-                                                               LabelsAndEventClasses::EMPTY_GUID);
+                                                               relationshipCategory);
     return relationshipGuid;
 }
 
@@ -340,9 +349,7 @@ ProfilingDynamicGuid TimelineUtilityMethods::CreateConnectionRelationship(Profil
                                                                relationshipGuid,
                                                                headGuid,
                                                                tailGuid,
-                                                               LabelsAndEventClasses::EMPTY_GUID);
-
-    MarkEntityWithType(relationshipGuid, LabelsAndEventClasses::CONNECTION_GUID);
+                                                               LabelsAndEventClasses::CONNECTION_GUID);
     return relationshipGuid;
 }
 
@@ -387,8 +394,14 @@ ProfilingDynamicGuid TimelineUtilityMethods::RecordWorkloadInferenceAndStartOfLi
 {
     ProfilingDynamicGuid workloadInferenceGuid = profiling::ProfilingService::GetNextGuid();
     CreateTypedEntity(workloadInferenceGuid, LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID);
-    CreateRelationship(ProfilingRelationshipType::RetentionLink, inferenceGuid, workloadInferenceGuid);
-    CreateRelationship(ProfilingRelationshipType::RetentionLink, workloadGuid, workloadInferenceGuid);
+    CreateRelationship(ProfilingRelationshipType::RetentionLink,
+                       inferenceGuid,
+                       workloadInferenceGuid,
+                       LabelsAndEventClasses::CHILD_GUID);
+    CreateRelationship(ProfilingRelationshipType::RetentionLink,
+                       workloadGuid,
+                       workloadInferenceGuid,
+                       LabelsAndEventClasses::EXECUTION_OF_GUID);
     RecordEvent(workloadInferenceGuid, LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
     return workloadInferenceGuid;
 }

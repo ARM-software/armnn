@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -25,11 +25,15 @@ public:
     ARMNN_DLLEXPORT static std::string TYPE_LABEL;
     ARMNN_DLLEXPORT static std::string INDEX_LABEL;
     ARMNN_DLLEXPORT static std::string BACKENDID_LABEL;
+    ARMNN_DLLEXPORT static std::string CHILD_LABEL;
+    ARMNN_DLLEXPORT static std::string EXECUTION_OF_LABEL;
     ARMNN_DLLEXPORT static ProfilingStaticGuid EMPTY_GUID;
     ARMNN_DLLEXPORT static ProfilingStaticGuid NAME_GUID;
     ARMNN_DLLEXPORT static ProfilingStaticGuid TYPE_GUID;
     ARMNN_DLLEXPORT static ProfilingStaticGuid INDEX_GUID;
     ARMNN_DLLEXPORT static ProfilingStaticGuid BACKENDID_GUID;
+    ARMNN_DLLEXPORT static ProfilingStaticGuid CHILD_GUID;
+    ARMNN_DLLEXPORT static ProfilingStaticGuid EXECUTION_OF_GUID;
 
     // Common types
     ARMNN_DLLEXPORT static std::string LAYER;

@@ -1,12 +1,14 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include <Filesystem.hpp>
+#include <LabelsAndEventClasses.hpp>
 #include <ProfilingService.hpp>
-#include <Runtime.hpp>
+#include "ProfilingTestUtils.hpp"
 #include "PrintPacketHeaderHandler.hpp"
+#include <Runtime.hpp>
 #include "TestTimelinePacketHandler.hpp"
 
 #include <boost/filesystem.hpp>
@@ -51,9 +53,7 @@ BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
 {
     // This test requires at least one backend registry to be enabled
     // which can execute a NormalizationLayer
-    if (BackendRegistryInstance().IsBackendRegistered(GetComputeDeviceAsCString(armnn::Compute::CpuRef)) ||
-        BackendRegistryInstance().IsBackendRegistered(GetComputeDeviceAsCString(armnn::Compute::CpuAcc)) ||
-        BackendRegistryInstance().IsBackendRegistered(GetComputeDeviceAsCString(armnn::Compute::GpuAcc)))
+    if (!HasSuitableBackendRegistered())
     {
         return;
     }
@@ -71,6 +71,8 @@ BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
     creationOptions.m_ProfilingOptions.m_LocalPacketHandlers.push_back(localPacketHandlerPtr);
 
     armnn::Runtime runtime(creationOptions);
+    // ensure the GUID generator is reset to zero
+    GetProfilingService(&runtime).ResetGuidGenerator();
 
     // Load a simple network
     // build up the structure of the network
@@ -115,6 +117,52 @@ BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
     runtime.EnqueueWorkload(netId, inputTensors, outputTensors);
 
     static_cast<TestTimelinePacketHandler*>(localPacketHandlerPtr.get())->WaitOnInferenceCompletion(3000);
+
+    const TimelineModel& model =
+        static_cast<TestTimelinePacketHandler*>(localPacketHandlerPtr.get())->GetTimelineModel();
+
+    for (auto& error : model.GetErrors())
+    {
+        std::cout << error.what() << std::endl;
+    }
+    BOOST_TEST(model.GetErrors().empty());
+    std::vector<std::string> desc = GetModelDescription(model);
+    std::vector<std::string> expectedOutput;
+    expectedOutput.push_back("Entity [0] name = input type = layer");
+    expectedOutput.push_back("   connection [14] from entity [0] to entity [1]");
+    expectedOutput.push_back("   child: Entity [23] backendId = CpuRef type = workload");
+    expectedOutput.push_back("Entity [1] name = normalization type = layer");
+    expectedOutput.push_back("   connection [22] from entity [1] to entity [2]");
+    expectedOutput.push_back("   child: Entity [15] backendId = CpuRef type = workload");
+    expectedOutput.push_back("Entity [2] name = output type = layer");
+    expectedOutput.push_back("   child: Entity [27] backendId = CpuRef type = workload");
+    expectedOutput.push_back("Entity [6] type = network");
+    expectedOutput.push_back("   child: Entity [0] name = input type = layer");
+    expectedOutput.push_back("   child: Entity [1] name = normalization type = layer");
+    expectedOutput.push_back("   child: Entity [2] name = output type = layer");
+    expectedOutput.push_back("   execution: Entity [31] type = inference");
+    expectedOutput.push_back("Entity [15] backendId = CpuRef type = workload");
+    expectedOutput.push_back("   execution: Entity [44] type = workload_execution");
+    expectedOutput.push_back("Entity [23] backendId = CpuRef type = workload");
+    expectedOutput.push_back("   execution: Entity [36] type = workload_execution");
+    expectedOutput.push_back("Entity [27] backendId = CpuRef type = workload");
+    expectedOutput.push_back("   execution: Entity [52] type = workload_execution");
+    expectedOutput.push_back("Entity [31] type = inference");
+    expectedOutput.push_back("   child: Entity [36] type = workload_execution");
+    expectedOutput.push_back("   child: Entity [44] type = workload_execution");
+    expectedOutput.push_back("   child: Entity [52] type = workload_execution");
+    expectedOutput.push_back("   event: [34] class [start_of_life]");
+    expectedOutput.push_back("   event: [60] class [end_of_life]");
+    expectedOutput.push_back("Entity [36] type = workload_execution");
+    expectedOutput.push_back("   event: [40] class [start_of_life]");
+    expectedOutput.push_back("   event: [42] class [end_of_life]");
+    expectedOutput.push_back("Entity [44] type = workload_execution");
+    expectedOutput.push_back("   event: [48] class [start_of_life]");
+    expectedOutput.push_back("   event: [50] class [end_of_life]");
+    expectedOutput.push_back("Entity [52] type = workload_execution");
+    expectedOutput.push_back("   event: [56] class [start_of_life]");
+    expectedOutput.push_back("   event: [58] class [end_of_life]");
+    BOOST_TEST(CompareOutput(desc, expectedOutput));
 }
 
 BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd, * boost::unit_test::disabled())

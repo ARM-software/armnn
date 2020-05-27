@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -461,7 +461,7 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTestFullConstruction)
                                                                        numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
 
-    BOOST_CHECK(numberOfBytesWritten == 427);
+    BOOST_CHECK(numberOfBytesWritten == 451);
 
     unsigned int uint8_t_size  = sizeof(uint8_t);
     unsigned int uint32_t_size = sizeof(uint32_t);
@@ -484,7 +484,7 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTestFullConstruction)
     uint32_t sequenceNumbered = (packetHeaderWord1 >> 24) & 0x00000001;
     uint32_t dataLength       = (packetHeaderWord1 >>  0) & 0x00FFFFFF;
     BOOST_CHECK(sequenceNumbered ==  0);
-    BOOST_CHECK(dataLength       == 419);
+    BOOST_CHECK(dataLength       == 443);
 
     // Check the stream header
     offset += uint32_t_size;

@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -27,10 +27,10 @@ void VerifyTimelineHeaderBinary(const unsigned char* readableData,
                                 unsigned int& offset,
                                 uint32_t packetDataLength);
 
-void VerifyTimelineLabelBinaryPacketData(Optional<ProfilingGuid> guid,
-                                         const std::string& label,
-                                         const unsigned char* readableData,
-                                         unsigned int& offset);
+ProfilingGuid VerifyTimelineLabelBinaryPacketData(Optional<ProfilingGuid> guid,
+                                                  const std::string& label,
+                                                  const unsigned char* readableData,
+                                                  unsigned int& offset);
 
 void VerifyTimelineEventClassBinaryPacketData(ProfilingGuid guid,
                                               ProfilingGuid nameGuid,
@@ -45,17 +45,23 @@ void VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType relati
                                                 const unsigned char* readableData,
                                                 unsigned int& offset);
 
-void VerifyTimelineEntityBinaryPacketData(Optional<ProfilingGuid> guid,
-                                          const unsigned char* readableData,
-                                          unsigned int& offset);
+ProfilingGuid VerifyTimelineEntityBinaryPacketData(Optional<ProfilingGuid> guid,
+                                                   const unsigned char* readableData,
+                                                   unsigned int& offset);
 
-void VerifyTimelineEventBinaryPacket(Optional<uint64_t> timestamp,
-                                     Optional<std::thread::id> threadId,
-                                     Optional<ProfilingGuid> eventGuid,
-                                     const unsigned char* readableData,
-                                     unsigned int& offset);
+ProfilingGuid VerifyTimelineEventBinaryPacket(Optional<uint64_t> timestamp,
+                                              Optional<std::thread::id> threadId,
+                                              Optional<ProfilingGuid> eventGuid,
+                                              const unsigned char* readableData,
+                                              unsigned int& offset);
 
 void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId);
+
+// returns true if a CpuRef, CpuAcc or GpuAcc
+// backend is registered
+bool HasSuitableBackendRegistered();
+
+bool CompareOutput(std::vector<std::string> output, std::vector<std::string> expectedOutput);
 
 namespace armnn
 {

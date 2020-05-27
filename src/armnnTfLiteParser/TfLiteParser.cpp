@@ -502,6 +502,7 @@ TfLiteParser::TfLiteParser(const Optional<ITfLiteParser::TfLiteParserOptions>& o
     m_ParserFunctions[tflite::BuiltinOperator_DEQUANTIZE]              = &TfLiteParser::ParseDequantize;
     m_ParserFunctions[tflite::BuiltinOperator_EXP]                     = &TfLiteParser::ParseExp;
     m_ParserFunctions[tflite::BuiltinOperator_FULLY_CONNECTED]         = &TfLiteParser::ParseFullyConnected;
+    m_ParserFunctions[tflite::BuiltinOperator_LEAKY_RELU]              = &TfLiteParser::ParseLeakyRelu;
     m_ParserFunctions[tflite::BuiltinOperator_LOGISTIC]                = &TfLiteParser::ParseLogistic;
     m_ParserFunctions[tflite::BuiltinOperator_L2_NORMALIZATION]        = &TfLiteParser::ParseL2Normalization;
     m_ParserFunctions[tflite::BuiltinOperator_MAX_POOL_2D]             = &TfLiteParser::ParseMaxPool2D;
@@ -1888,6 +1889,11 @@ void TfLiteParser::ParseRelu6(size_t subgraphIndex, size_t operatorIndex)
     ParseActivation(subgraphIndex,operatorIndex, ActivationFunction::BoundedReLu);
 }
 
+void TfLiteParser::ParseLeakyRelu(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseActivation(subgraphIndex,operatorIndex, ActivationFunction::LeakyReLu);
+}
+
 void TfLiteParser::ParseLogistic(size_t subgraphIndex, size_t operatorIndex)
 {
     ParseActivation(subgraphIndex,operatorIndex,ActivationFunction::Sigmoid);
@@ -1939,6 +1945,13 @@ void TfLiteParser::ParseActivation(size_t subgraphIndex, size_t operatorIndex, A
             layerName += str(boost::format("TANH:%1%:%2%") % subgraphIndex % operatorIndex);
             activationDesc.m_A = 1.0f;
             activationDesc.m_B = 1.0f;
+            break;
+        }
+        case ActivationFunction::LeakyReLu:
+        {
+            layerName += str(boost::format("LEAKYRELU:%1%:%2%") % subgraphIndex % operatorIndex);
+            const auto * options = operatorPtr->builtin_options.AsLeakyReluOptions();
+            activationDesc.m_A = options->alpha;
             break;
         }
         default:

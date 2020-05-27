@@ -14,6 +14,8 @@ There is a guide for backend development: [Backend development guide](src/backen
 
 API Documentation is available at https://github.com/ARM-software/armnn/wiki/Documentation.
 
+Dox files to generate Arm NN doxygen files can be found at armnn/docs/. Following generation the xhtml files can be found at armnn/documentation/
+
 ### Build Instructions
 
 Arm tests the build system of Arm NN with the following build environments:

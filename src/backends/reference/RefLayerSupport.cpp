@@ -986,14 +986,15 @@ bool RefLayerSupport::IsGatherSupported(const armnn::TensorInfo& input0,
                                         armnn::Optional<std::string&> reasonIfUnsupported) const
 {
     bool supported = true;
-    std::array<DataType,6> supportedTypes =
+    std::array<DataType,7> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Signed32
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input0, supportedTypes), reasonIfUnsupported,
@@ -2008,15 +2009,14 @@ bool RefLayerSupport::IsPreluSupported(const TensorInfo& input,
 {
     bool supported = true;
 
-    std::array<DataType, 7> supportedTypes
+    std::array<DataType, 6> supportedTypes
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS16,
-        DataType::Signed32,
+        DataType::QSymmS16
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,

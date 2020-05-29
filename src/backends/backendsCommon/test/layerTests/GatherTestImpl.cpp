@@ -324,6 +324,13 @@ LayerTestResult<int16_t, 1> Gather1dParamsInt16Test(
     return GatherTestHelper<armnn::DataType::QSymmS16>::Gather1dParamsTestImpl(workloadFactory, memoryManager);
 }
 
+LayerTestResult<int32_t, 1> Gather1dParamsInt32Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return GatherTestHelper<armnn::DataType::Signed32>::Gather1dParamsTestImpl(workloadFactory, memoryManager);
+}
+
 LayerTestResult<float, 2> GatherMultiDimParamsFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -352,6 +359,14 @@ LayerTestResult<int16_t, 2> GatherMultiDimParamsInt16Test(
 {
     return GatherTestHelper<armnn::DataType::QSymmS16>::GatherMultiDimParamsTestImpl(
         workloadFactory, memoryManager);
+}
+
+LayerTestResult<int32_t, 2> GatherMultiDimParamsInt32Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return GatherTestHelper<armnn::DataType::Signed32>::GatherMultiDimParamsTestImpl(
+            workloadFactory, memoryManager);
 }
 
 LayerTestResult<float, 4> GatherMultiDimParamsMultiDimIndicesFloat32Test(
@@ -384,4 +399,12 @@ LayerTestResult<int16_t, 4> GatherMultiDimParamsMultiDimIndicesInt16Test(
 {
     return GatherTestHelper<armnn::DataType::QSymmS16>::GatherMultiDimParamsMultiDimIndicesTestImpl(
         workloadFactory, memoryManager);
+}
+
+LayerTestResult<int32_t, 4> GatherMultiDimParamsMultiDimIndicesInt32Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return GatherTestHelper<armnn::DataType::Signed32>::GatherMultiDimParamsMultiDimIndicesTestImpl(
+            workloadFactory, memoryManager);
 }

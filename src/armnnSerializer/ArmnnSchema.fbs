@@ -558,6 +558,8 @@ table ResizeBilinearDescriptor {
     targetWidth:uint;
     targetHeight:uint;
     dataLayout:DataLayout;
+    alignCorners:bool;
+    halfPixelCenters:bool;
 }
 
 table SliceLayer {
@@ -817,6 +819,8 @@ table ResizeDescriptor {
     targetWidth:uint;
     method:ResizeMethod = NearestNeighbor;
     dataLayout:DataLayout;
+    alignCorners:bool;
+    halfPixelCenters:bool;
 }
 
 table StackLayer {

@@ -2206,6 +2206,8 @@ BOOST_AUTO_TEST_CASE(SerializeResize)
     desc.m_TargetWidth  = 4;
     desc.m_TargetHeight = 2;
     desc.m_Method       = armnn::ResizeMethod::NearestNeighbor;
+    desc.m_AlignCorners = true;
+    desc.m_HalfPixelCenters = true;
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
@@ -2241,10 +2243,12 @@ public:
     {
         VerifyNameAndConnections(layer, name);
 
-        BOOST_CHECK(descriptor.m_Method       == armnn::ResizeMethod::Bilinear);
-        BOOST_CHECK(descriptor.m_TargetWidth  == m_Descriptor.m_TargetWidth);
-        BOOST_CHECK(descriptor.m_TargetHeight == m_Descriptor.m_TargetHeight);
-        BOOST_CHECK(descriptor.m_DataLayout   == m_Descriptor.m_DataLayout);
+        BOOST_CHECK(descriptor.m_Method             == armnn::ResizeMethod::Bilinear);
+        BOOST_CHECK(descriptor.m_TargetWidth        == m_Descriptor.m_TargetWidth);
+        BOOST_CHECK(descriptor.m_TargetHeight       == m_Descriptor.m_TargetHeight);
+        BOOST_CHECK(descriptor.m_DataLayout         == m_Descriptor.m_DataLayout);
+        BOOST_CHECK(descriptor.m_AlignCorners       == m_Descriptor.m_AlignCorners);
+        BOOST_CHECK(descriptor.m_HalfPixelCenters   == m_Descriptor.m_HalfPixelCenters);
     }
 
     void VisitResizeBilinearLayer(const armnn::IConnectableLayer*,
@@ -2267,6 +2271,8 @@ BOOST_AUTO_TEST_CASE(SerializeResizeBilinear)
     armnn::ResizeBilinearDescriptor desc;
     desc.m_TargetWidth  = 4u;
     desc.m_TargetHeight = 2u;
+    desc.m_AlignCorners = true;
+    desc.m_HalfPixelCenters = true;
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);

@@ -35,7 +35,7 @@ void RefResizeWorkload::Execute() const
            outputInfo,
            m_Data.m_Parameters.m_DataLayout,
            m_Data.m_Parameters.m_Method,
-           m_Data.m_Parameters.m_BilinearAlignCorners);
+           m_Data.m_Parameters.m_AlignCorners);
 }
 
 } //namespace armnn

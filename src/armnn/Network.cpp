@@ -1458,10 +1458,12 @@ IConnectableLayer* Network::AddResizeBilinearLayer(const ResizeBilinearDescripto
                                                    const char* name)
 {
     ResizeDescriptor resizeDescriptor;
-    resizeDescriptor.m_Method       = ResizeMethod::Bilinear;
-    resizeDescriptor.m_DataLayout   = descriptor.m_DataLayout;
-    resizeDescriptor.m_TargetWidth  = descriptor.m_TargetWidth;
-    resizeDescriptor.m_TargetHeight = descriptor.m_TargetHeight;
+    resizeDescriptor.m_Method           = ResizeMethod::Bilinear;
+    resizeDescriptor.m_DataLayout       = descriptor.m_DataLayout;
+    resizeDescriptor.m_TargetWidth      = descriptor.m_TargetWidth;
+    resizeDescriptor.m_TargetHeight     = descriptor.m_TargetHeight;
+    resizeDescriptor.m_AlignCorners     = descriptor.m_AlignCorners;
+    resizeDescriptor.m_HalfPixelCenters = descriptor.m_HalfPixelCenters;
 
     return m_Graph->AddLayer<ResizeLayer>(resizeDescriptor, name);
 }

@@ -864,7 +864,9 @@ void SerializerVisitor::VisitResizeBilinearLayer(const armnn::IConnectableLayer*
         CreateResizeBilinearDescriptor(m_flatBufferBuilder,
                                        resizeDescriptor.m_TargetWidth,
                                        resizeDescriptor.m_TargetHeight,
-                                       GetFlatBufferDataLayout(resizeDescriptor.m_DataLayout));
+                                       GetFlatBufferDataLayout(resizeDescriptor.m_DataLayout),
+                                       resizeDescriptor.m_AlignCorners,
+                                       resizeDescriptor.m_HalfPixelCenters);
 
     auto flatBufferLayer = serializer::CreateResizeBilinearLayer(m_flatBufferBuilder,
                                                                  flatBufferBaseLayer,
@@ -886,7 +888,9 @@ void SerializerVisitor::VisitResizeLayer(const armnn::IConnectableLayer* layer,
                                    resizeDescriptor.m_TargetHeight,
                                    resizeDescriptor.m_TargetWidth,
                                    GetFlatBufferResizeMethod(resizeDescriptor.m_Method),
-                                   GetFlatBufferDataLayout(resizeDescriptor.m_DataLayout));
+                                   GetFlatBufferDataLayout(resizeDescriptor.m_DataLayout),
+                                   resizeDescriptor.m_AlignCorners,
+                                   resizeDescriptor.m_HalfPixelCenters);
 
     auto flatBufferLayer = serializer::CreateResizeLayer(m_flatBufferBuilder,
                                                          flatBufferBaseLayer,

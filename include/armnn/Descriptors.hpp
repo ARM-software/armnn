@@ -718,6 +718,8 @@ struct ResizeBilinearDescriptor
         : m_TargetWidth(0)
         , m_TargetHeight(0)
         , m_DataLayout(DataLayout::NCHW)
+        , m_AlignCorners(false)
+        , m_HalfPixelCenters(false)
     {}
 
     /// Target width value.
@@ -726,6 +728,10 @@ struct ResizeBilinearDescriptor
     uint32_t          m_TargetHeight;
     /// The data layout to be used (NCHW, NHWC).
     DataLayout m_DataLayout;
+    /// Aligned corners
+    bool m_AlignCorners;
+    /// Half Pixel Centers
+    bool m_HalfPixelCenters;
 };
 
 /// A ResizeDescriptor for the ResizeLayer.
@@ -736,7 +742,7 @@ struct ResizeDescriptor
         , m_TargetHeight(0)
         , m_Method(ResizeMethod::NearestNeighbor)
         , m_DataLayout(DataLayout::NCHW)
-        , m_BilinearAlignCorners(false)
+        , m_AlignCorners(false)
         , m_HalfPixelCenters(false)
     {}
 
@@ -746,7 +752,7 @@ struct ResizeDescriptor
                m_TargetHeight         == rhs.m_TargetHeight &&
                m_Method               == rhs.m_Method &&
                m_DataLayout           == rhs.m_DataLayout &&
-               m_BilinearAlignCorners == rhs.m_BilinearAlignCorners &&
+               m_AlignCorners         == rhs.m_AlignCorners &&
                m_HalfPixelCenters     == rhs.m_HalfPixelCenters;
     }
 
@@ -759,8 +765,8 @@ struct ResizeDescriptor
     ResizeMethod m_Method;
     /// The data layout to be used (NCHW, NHWC).
     DataLayout m_DataLayout;
-    /// Aligned corners for bilinear method
-    bool m_BilinearAlignCorners;
+    /// Aligned corners
+    bool m_AlignCorners;
     /// Half Pixel Centers
     bool m_HalfPixelCenters;
 };

@@ -2045,6 +2045,8 @@ void Deserializer::ParseResize(GraphPtr graph, unsigned int layerIndex)
     descriptor.m_TargetHeight = flatBufferDescriptor->targetHeight();
     descriptor.m_Method = ToResizeMethod(flatBufferDescriptor->method());
     descriptor.m_DataLayout = ToDataLayout(flatBufferDescriptor->dataLayout());
+    descriptor.m_AlignCorners = flatBufferDescriptor->alignCorners();
+    descriptor.m_HalfPixelCenters = flatBufferDescriptor->halfPixelCenters();
 
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddResizeLayer(descriptor, layerName.c_str());
@@ -2073,6 +2075,8 @@ void Deserializer::ParseResizeBilinear(GraphPtr graph, unsigned int layerIndex)
     descriptor.m_TargetHeight = flatBufferDescriptor->targetHeight();
     descriptor.m_Method       = armnn::ResizeMethod::Bilinear;
     descriptor.m_DataLayout   = ToDataLayout(flatBufferDescriptor->dataLayout());
+    descriptor.m_AlignCorners = flatBufferDescriptor->alignCorners();
+    descriptor.m_HalfPixelCenters = flatBufferDescriptor->halfPixelCenters();
 
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddResizeLayer(descriptor, layerName.c_str());

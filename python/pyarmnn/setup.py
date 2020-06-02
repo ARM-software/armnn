@@ -34,7 +34,7 @@ def check_armnn_version(*args):
 
 __current_dir = os.path.dirname(os.path.realpath(__file__))
 
-exec(open(os.path.join(__current_dir, 'src', 'pyarmnn', '_version.py')).read())
+exec(open(os.path.join(__current_dir, 'src', 'pyarmnn', '_version.py'), encoding="utf-8").read())
 
 
 class ExtensionPriorityBuilder(build_py):

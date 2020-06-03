@@ -660,7 +660,7 @@ struct ReshapeDescriptor
         m_Method (int): The Interpolation method to use (`ResizeMethod_Bilinear`, `ResizeMethod_NearestNeighbor`).
                         Default: `ResizeMethod_NearestNeighbor`.
         m_DataLayout (int): The data layout to be used (`DataLayout_NCHW`, `DataLayout_NHWC`). Default: `DataLayout_NCHW`.
-        m_BilinearAlignCorners (bool):  Align corners or not when resizing bilinearly. If True, corner pixel values are preserved after resizing.
+        m_AlignCorners (bool):  Align corners or not when resizing. If True, corner pixel values are preserved after resizing.
                                         Default: False
 
     ") ResizeDescriptor;
@@ -672,7 +672,7 @@ struct ResizeDescriptor
     uint32_t m_TargetHeight;
     ResizeMethod m_Method;
     DataLayout m_DataLayout;
-    bool m_BilinearAlignCorners;
+    bool m_AlignCorners;
 
     bool operator ==(const ResizeDescriptor& rhs) const;
 };

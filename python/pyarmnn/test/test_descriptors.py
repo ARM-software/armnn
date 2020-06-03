@@ -270,7 +270,7 @@ def test_resize_descriptor_default_values():
     assert desc.m_TargetHeight == 0
     assert desc.m_Method == ann.ResizeMethod_NearestNeighbor
     assert desc.m_DataLayout == ann.DataLayout_NCHW
-    assert desc.m_BilinearAlignCorners == False
+    assert desc.m_AlignCorners == False
 
 
 def test_spacetobatchnd_descriptor_default_values():

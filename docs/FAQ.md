@@ -20,3 +20,8 @@ Segmentation fault following a failed call to armnn::Optimize using CpuRef backe
 In some error scenarios of calls to armnn::Optimize a null pointer may be returned. This contravenes the function documentation however, it can happen. Users are advised to check the value returned from the function as a precaution.
 
 If you encounter this problem and are able to isolate it consider contributing a solution.
+
+Adding or removing -Dxxx options when building ArmNN does not always work.
+---------------------------------------------------------
+
+ArmNN uses CMake for build configuration. CMake uses a cumulative cache of user options. That is, setting a value once on a cmake command line will be persisted until either you explicitly change the value or delete the cache. To delete the cache in ArmNN you must delete the build directory.

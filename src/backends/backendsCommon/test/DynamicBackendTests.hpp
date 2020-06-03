@@ -1439,11 +1439,15 @@ void CreateReferenceDynamicBackendTestImpl()
 void CreateSampleDynamicBackendTestImpl()
 {
     using namespace armnn;
-
     // Using the path override in CreationOptions to load the reference dynamic backend
     IRuntime::CreationOptions creationOptions;
-    IRuntimePtr runtime = IRuntime::Create(creationOptions);
+    // If m_DynamicBackendsPath is an empty string then we know this test will fail.
+    if(creationOptions.m_DynamicBackendsPath.empty())
+    {
+        BOOST_FAIL("No dynamic backends paths have been set. Ensure DYNAMIC_BACKEND_PATHS is set at compile time.");
+    }
 
+    IRuntimePtr runtime = IRuntime::Create(creationOptions);
     const BackendRegistry& backendRegistry = BackendRegistryInstance();
     BOOST_TEST(backendRegistry.Size() >= 1);
 
@@ -1506,6 +1510,12 @@ void SampleDynamicBackendEndToEndTestImpl()
     using namespace boost::filesystem;
     // Create runtime in which test will run
     IRuntime::CreationOptions options;
+    // If m_DynamicBackendsPath is an empty string then we know this test will fail.
+    if(options.m_DynamicBackendsPath.empty())
+    {
+        BOOST_FAIL("No dynamic backends paths have been set. Ensure DYNAMIC_BACKEND_PATHS is set at compile time.");
+    }
+
     IRuntimePtr runtime(IRuntime::Create(options));
 
     // Builds up the structure of the network.

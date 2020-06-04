@@ -156,7 +156,8 @@ enum LayerType : uint {
     StandIn = 53,
     ElementwiseUnary = 54,
     Transpose = 55,
-    QLstm = 56
+    QLstm = 56,
+    Fill = 57
 }
 
 // Base layer table to be used as part of other layers
@@ -282,6 +283,15 @@ table ElementwiseUnaryLayer {
 /// @deprecated Use ComparisonLayer instead
 table EqualLayer {
     base:LayerBase;
+}
+
+table FillLayer {
+    base:LayerBase;
+    descriptor:FillDescriptor;
+}
+
+table FillDescriptor {
+    value:float;
 }
 
 table FloorLayer{
@@ -901,7 +911,8 @@ union Layer {
     StandInLayer,
     ElementwiseUnaryLayer,
     TransposeLayer,
-    QLstmLayer
+    QLstmLayer,
+    FillLayer
 }
 
 table AnyLayer {

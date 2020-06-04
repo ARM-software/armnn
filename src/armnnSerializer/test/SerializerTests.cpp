@@ -1199,6 +1199,35 @@ BOOST_AUTO_TEST_CASE(EnsureEqualBackwardCompatibility)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeFill)
+{
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Fill)
+
+    const std::string layerName("fill");
+    const armnn::TensorInfo inputInfo({4}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({1, 3, 3, 1}, armnn::DataType::Float32);
+
+    armnn::FillDescriptor descriptor(1.0f);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const fillLayer = network->AddFillLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(fillLayer->GetInputSlot(0));
+    fillLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    fillLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    FillLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, descriptor);
+
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeFloor)
 {
     DECLARE_LAYER_VERIFIER_CLASS(Floor)

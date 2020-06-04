@@ -22,6 +22,7 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 * DetectionPostProcess
 * Division
 * ElementwiseUnary
+* Fill
 * Floor
 * FullyConnected
 * Gather

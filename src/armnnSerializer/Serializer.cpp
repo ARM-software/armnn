@@ -472,10 +472,15 @@ void SerializerVisitor::VisitFillLayer(const armnn::IConnectableLayer* layer,
                                        const armnn::FillDescriptor& fillDescriptor,
                                        const char* name)
 {
-    throw UnimplementedException("SerializerVisitor::VisitFillLayer is not implemented");
     IgnoreUnused(name);
-    IgnoreUnused(layer);
-    IgnoreUnused(fillDescriptor);
+
+    auto fbFillBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Fill);
+
+    auto fbDescriptor = serializer::CreateFillDescriptor(m_flatBufferBuilder, fillDescriptor.m_Value);
+
+    auto fbFillLayer = serializer::CreateFillLayer(m_flatBufferBuilder, fbFillBaseLayer, fbDescriptor);
+
+    CreateAnyLayer(fbFillLayer.o, serializer::Layer::Layer_FillLayer);
 }
 
 void SerializerVisitor::VisitFloorLayer(const armnn::IConnectableLayer *layer, const char *name)

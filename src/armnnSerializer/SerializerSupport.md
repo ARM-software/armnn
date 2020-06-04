@@ -21,6 +21,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 * DetectionPostProcess
 * Division
 * ElementwiseUnary
+* Fill
 * Floor
 * FullyConnected
 * Gather

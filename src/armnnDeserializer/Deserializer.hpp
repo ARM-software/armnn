@@ -96,6 +96,7 @@ private:
     void ParseDivision(GraphPtr graph, unsigned int layerIndex);
     void ParseElementwiseUnary(GraphPtr graph, unsigned int layerIndex);
     void ParseEqual(GraphPtr graph, unsigned int layerIndex);
+    void ParseFill(GraphPtr graph, unsigned int layerIndex);
     void ParseFloor(GraphPtr graph, unsigned int layerIndex);
     void ParseFullyConnected(GraphPtr graph, unsigned int layerIndex);
     void ParseGather(GraphPtr graph, unsigned int layerIndex);

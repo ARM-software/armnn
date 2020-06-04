@@ -881,6 +881,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/DeserializeConvolution2d.cpp
             src/armnnDeserializer/test/DeserializeDepthToSpace.cpp
             src/armnnDeserializer/test/DeserializeDivision.cpp
+            src/armnnDeserializer/test/DeserializeFill.cpp
             src/armnnDeserializer/test/DeserializeFloor.cpp
             src/armnnDeserializer/test/DeserializeFullyConnected.cpp
             src/armnnDeserializer/test/DeserializeGather.cpp

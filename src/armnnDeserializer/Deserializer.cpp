@@ -204,6 +204,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_ElementwiseUnaryLayer]       = &Deserializer::ParseElementwiseUnary;
     m_ParserFunctions[Layer_EqualLayer]                  = &Deserializer::ParseEqual;
     m_ParserFunctions[Layer_FullyConnectedLayer]         = &Deserializer::ParseFullyConnected;
+    m_ParserFunctions[Layer_FillLayer]                   = &Deserializer::ParseFill;
     m_ParserFunctions[Layer_FloorLayer]                  = &Deserializer::ParseFloor;
     m_ParserFunctions[Layer_GatherLayer]                 = &Deserializer::ParseGather;
     m_ParserFunctions[Layer_GreaterLayer]                = &Deserializer::ParseGreater;
@@ -283,6 +284,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_EqualLayer()->base();
         case Layer::Layer_FullyConnectedLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_FullyConnectedLayer()->base();
+        case Layer::Layer_FillLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_FillLayer()->base();
         case Layer::Layer_FloorLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_FloorLayer()->base();
         case Layer::Layer_GatherLayer:
@@ -1423,6 +1426,27 @@ void Deserializer::ParseEqual(GraphPtr graph, unsigned int layerIndex)
     auto layerName = GetLayerName(graph, layerIndex);
     armnn::ComparisonDescriptor descriptor(armnn::ComparisonOperation::Equal);
     IConnectableLayer* layer = m_Network->AddComparisonLayer(descriptor, layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseFill(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_LOCATION();
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    armnn::FillDescriptor descriptor(1.0f);
+    IConnectableLayer* layer = m_Network->AddFillLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

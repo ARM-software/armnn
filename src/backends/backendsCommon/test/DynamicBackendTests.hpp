@@ -1436,24 +1436,32 @@ void CreateReferenceDynamicBackendTestImpl()
 #endif
 
 #if defined(SAMPLE_DYNAMIC_BACKEND_ENABLED)
+
+void CheckSampleDynamicBackendLoaded()
+{
+    using namespace armnn;
+    // At this point we expect DYNAMIC_BACKEND_PATHS to include a path to where libArm_SampleDynamic_backend.so is.
+    // If it hasn't been loaded there's no point continuing with the rest of the tests.
+    BackendIdSet backendIds = BackendRegistryInstance().GetBackendIds();
+    if (backendIds.find("SampleDynamic") == backendIds.end())
+    {
+        std::string message = "The SampleDynamic backend has not been loaded. This may be a build configuration error. "
+                              "Ensure a DYNAMIC_BACKEND_PATHS was set at compile time to the location of "
+                              "libArm_SampleDynamic_backend.so. "
+                              "To disable this test recompile with: -DSAMPLE_DYNAMIC_BACKEND_ENABLED=0";
+        BOOST_FAIL(message);
+    }
+}
+
 void CreateSampleDynamicBackendTestImpl()
 {
     using namespace armnn;
     // Using the path override in CreationOptions to load the reference dynamic backend
     IRuntime::CreationOptions creationOptions;
-    // If m_DynamicBackendsPath is an empty string then we know this test will fail.
-    if(creationOptions.m_DynamicBackendsPath.empty())
-    {
-        BOOST_FAIL("No dynamic backends paths have been set. Ensure DYNAMIC_BACKEND_PATHS is set at compile time.");
-    }
-
     IRuntimePtr runtime = IRuntime::Create(creationOptions);
     const BackendRegistry& backendRegistry = BackendRegistryInstance();
     BOOST_TEST(backendRegistry.Size() >= 1);
-
-    BackendIdSet backendIds = backendRegistry.GetBackendIds();
-    BOOST_TEST((backendIds.find("SampleDynamic") != backendIds.end()));
-
+    CheckSampleDynamicBackendLoaded();
     const DeviceSpec& deviceSpec = *PolymorphicDowncast<const DeviceSpec*>(&runtime->GetDeviceSpec());
     BackendIdSet supportedBackendIds = deviceSpec.GetSupportedBackends();
     BOOST_TEST(supportedBackendIds.size()>= 1);
@@ -1510,14 +1518,8 @@ void SampleDynamicBackendEndToEndTestImpl()
     using namespace boost::filesystem;
     // Create runtime in which test will run
     IRuntime::CreationOptions options;
-    // If m_DynamicBackendsPath is an empty string then we know this test will fail.
-    if(options.m_DynamicBackendsPath.empty())
-    {
-        BOOST_FAIL("No dynamic backends paths have been set. Ensure DYNAMIC_BACKEND_PATHS is set at compile time.");
-    }
-
     IRuntimePtr runtime(IRuntime::Create(options));
-
+    CheckSampleDynamicBackendLoaded();
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 

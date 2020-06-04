@@ -89,6 +89,10 @@ public:
                                     const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
                                     const char* name = nullptr) override;
 
+    void VisitFillLayer(const IConnectableLayer* layer,
+                        const FillDescriptor& desc,
+                        const char* name) override;
+
     void VisitFullyConnectedLayer(const IConnectableLayer *layer,
                                   const FullyConnectedDescriptor& desc,
                                   const ConstTensor& weights,

@@ -284,6 +284,15 @@ void QuantizerVisitor::VisitElementwiseUnaryLayer(const IConnectableLayer* layer
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitFillLayer(const IConnectableLayer* layer,
+                                      const FillDescriptor& desc,
+                                      const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddFillLayer(desc, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitFullyConnectedLayer(const IConnectableLayer *layer,
                                                 const FullyConnectedDescriptor& desc,
                                                 const ConstTensor& weights,

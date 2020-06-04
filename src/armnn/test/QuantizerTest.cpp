@@ -1143,6 +1143,77 @@ void ValidateFullyConnectedLayer(const bool biasEnabled)
     VisitLayersTopologically(quantizedNetworkQSymmS16.get(), validatorQSymmS16);
 }
 
+BOOST_AUTO_TEST_CASE(QuantizeFill)
+{
+    class TestFillQuantization : public TestQuantization
+    {
+    public:
+        TestFillQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestQuantization(inputShape, outputShape) {}
+
+        TestFillQuantization(const QuantizerOptions& options,
+                             const TensorShape& inputShape,
+                             const TensorShape& outputShape)
+        : TestQuantization(options, inputShape, outputShape) {}
+
+        virtual void VisitFillLayer(const IConnectableLayer* layer,
+                                    const FillDescriptor& desc,
+                                    const char* name = nullptr)
+        {
+            IgnoreUnused(desc, name);
+            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+            const OffsetScalePair qAsymmU8Params{ 30.0f / g_AsymmU8QuantizationBase, 128 };
+            const OffsetScalePair qAsymmS8Params { 30.0f / g_AsymmS8QuantizationBase,  0};
+            const OffsetScalePair qSymmS8Params { 15.0f / g_SymmS8QuantizationBase,  0};
+            const OffsetScalePair qSymmS16Params{ 15.0f / g_SymmS16QuantizationBase, 0 };
+
+            TestQuantizationParams(info, qAsymmU8Params, qAsymmS8Params, qSymmS8Params, qSymmS16Params);
+        }
+    };
+
+    const TensorShape tensorShape{ 1U };
+    const TensorInfo tensorInfo(tensorShape, DataType::Float32);
+
+    INetworkPtr network = INetwork::Create();
+
+    FillDescriptor descriptor;
+    descriptor.m_Value = 1;
+
+    IConnectableLayer* inputLayer = network->AddInputLayer(0);
+    IConnectableLayer* fillLayer = network->AddFillLayer(descriptor);
+    IConnectableLayer* outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(fillLayer->GetInputSlot(0));
+    fillLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    fillLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    // test QAsymmU8 quantization
+    INetworkPtr quantizedNetworkQAsymmU8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestFillQuantization validatorQAsymmU8(tensorShape, tensorShape);
+    VisitLayersTopologically(quantizedNetworkQAsymmU8.get(), validatorQAsymmU8);
+
+    // test QAsymmS8 quantization
+    const QuantizerOptions qAsymmS8Options(DataType::QAsymmS8);
+    INetworkPtr quantizedNetworkQAsymmS8 = INetworkQuantizer::Create(network.get(), qAsymmS8Options)->ExportNetwork();
+    TestFillQuantization validatorQAsymmS8(qAsymmS8Options, tensorShape, tensorShape);
+    VisitLayersTopologically(quantizedNetworkQAsymmS8.get(), validatorQAsymmS8);
+
+    // test QSymmS8 quantization
+    const QuantizerOptions qSymmS8Options(DataType::QSymmS8);
+    INetworkPtr quantizedNetworkQSymmS8 = INetworkQuantizer::Create(network.get(), qSymmS8Options)->ExportNetwork();
+    TestFillQuantization validatorQSymmS8(qSymmS8Options, tensorShape, tensorShape);
+    VisitLayersTopologically(quantizedNetworkQSymmS8.get(), validatorQSymmS8);
+
+    // test QuantisedSymmS16 quantization
+    const QuantizerOptions qSymmS16options(DataType::QSymmS16);
+    INetworkPtr quantizedNetworkQSymmS16 = INetworkQuantizer::Create(network.get(), qSymmS16options)->ExportNetwork();
+    TestFillQuantization validatorQSymmS16(qSymmS16options, tensorShape, tensorShape);
+    VisitLayersTopologically(quantizedNetworkQSymmS16.get(), validatorQSymmS16);
+}
+
 BOOST_AUTO_TEST_CASE(QuantizeFullyConnected)
 {
     ValidateFullyConnectedLayer(false);

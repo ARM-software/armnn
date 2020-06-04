@@ -5,18 +5,16 @@
 
 #pragma once
 
-#include "armnn/DescriptorsFwd.hpp"
 #include "armnn/Tensor.hpp"
 
-#include <vector>
+#include <backendsCommon/Workload.hpp>
+#include <backendsCommon/WorkloadData.hpp>
 
 namespace armnn
 {
-template <typename T>
+
 void Pad(const TensorInfo& inputInfo,
          const TensorInfo& outputInfo,
-         std::vector<std::pair<unsigned int, unsigned int>> m_padList,
-         const T* inputData,
-         T* outData,
-         const float padValue);
+         const PadQueueDescriptor& data);
+
 } //namespace armnn

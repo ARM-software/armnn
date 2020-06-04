@@ -456,23 +456,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateOutput(const OutputQueueDes
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePad(const PadQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const
 {
-    if (IsQSymmS16(info))
-    {
-        return std::make_unique<RefPadQSymm16Workload>(descriptor, info);
-    }
-    else if (IsFloat16(info))
-    {
-        return std::make_unique<RefPadFloat16Workload>(descriptor, info);
-    }
-    else if (IsBFloat16(info))
-    {
-        return std::make_unique<RefPadBFloat16Workload>(descriptor, info);
-    }
-    else if (IsQAsymmS8(info))
-    {
-        return std::make_unique<RefPadQAsymmS8Workload>(descriptor, info);
-    }
-    return MakeWorkload<RefPadFloat32Workload, RefPadQAsymm8Workload>(descriptor, info);
+    return std::make_unique<RefPadWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,

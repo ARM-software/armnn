@@ -525,3 +525,31 @@ LayerTestResult<armnn::BFloat16, 4> PadBFloat164dTest(
 {
     return Pad4dTestCommon<armnn::DataType::BFloat16>(workloadFactory, memoryManager, 0.0f, 0);
 }
+
+LayerTestResult<int8_t, 2> PadInt82dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Pad2dTestCommon<armnn::DataType::QSymmS8>(workloadFactory, memoryManager, 1.0f, 0);
+}
+
+LayerTestResult<int8_t, 2> PadInt82dCustomPaddingTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Pad2dTestCommon<armnn::DataType::QSymmS8>(workloadFactory, memoryManager, 1.0f, 0, 1.0f);
+}
+
+LayerTestResult<int8_t, 3> PadInt83dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Pad3dTestCommon<armnn::DataType::QSymmS8>(workloadFactory, memoryManager, 1.0f, 0);
+}
+
+LayerTestResult<int8_t, 4> PadInt84dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Pad4dTestCommon<armnn::DataType::QSymmS8>(workloadFactory, memoryManager, 1.0f, 0);
+}

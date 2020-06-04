@@ -1146,6 +1146,11 @@ ARMNN_AUTO_TEST_CASE(Pad2dQSymm16CustomPadding, Pad2dTestCommon<DataType::QSymmS
 ARMNN_AUTO_TEST_CASE(Pad3dQSymm16, Pad3dTestCommon<DataType::QSymmS16>, 2.0f, 0)
 ARMNN_AUTO_TEST_CASE(Pad4dQSymm16, Pad4dTestCommon<DataType::QSymmS16>, 2.0f, 0)
 
+ARMNN_AUTO_TEST_CASE(PadInt82d, PadInt82dTest)
+ARMNN_AUTO_TEST_CASE(PadInt82dCustomPadding, PadInt82dCustomPaddingTest)
+ARMNN_AUTO_TEST_CASE(PadInt83d, PadInt83dTest)
+ARMNN_AUTO_TEST_CASE(PadInt84d, PadInt84dTest)
+
 // Constant
 ARMNN_AUTO_TEST_CASE(Constant, ConstantTest)
 ARMNN_AUTO_TEST_CASE(ConstantUint8, ConstantUint8CustomQuantizationScaleAndOffsetTest)

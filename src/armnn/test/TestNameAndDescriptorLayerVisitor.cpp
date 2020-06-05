@@ -92,6 +92,12 @@ armnn::ElementwiseUnaryDescriptor GetDescriptor<armnn::ElementwiseUnaryDescripto
 }
 
 template<>
+armnn::FillDescriptor GetDescriptor<armnn::FillDescriptor>()
+{
+    return armnn::FillDescriptor(1);
+}
+
+template<>
 armnn::InstanceNormalizationDescriptor GetDescriptor<armnn::InstanceNormalizationDescriptor>()
 {
     armnn::InstanceNormalizationDescriptor descriptor;
@@ -264,6 +270,7 @@ TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(BatchToSpaceNd)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Comparison)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Concat)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(ElementwiseUnary)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Fill)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(InstanceNormalization)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(L2Normalization)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(LogSoftmax)

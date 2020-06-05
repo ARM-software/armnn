@@ -213,9 +213,16 @@ public:
     /// Add an ElementwiseUnary layer to the network.
     /// @param name - Optional name for the layer.
     /// @param desc - Descriptor for the elementwiseUnary operation.
-    /// @ return - Interface for configuring the layer.
+    /// @return - Interface for configuring the layer.
     virtual IConnectableLayer* AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
                                                         const char* name = nullptr) = 0;
+
+    /// Add an Fill layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @param fillDescriptor - Descriptor for the fill operation.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddFillLayer(const FillDescriptor& fillDescriptor,
+                                            const char* name = nullptr) = 0;
 
     /// Adds a fully connected layer to the network.
     /// @param fullyConnectedDescriptor - Description of the fully connected layer.

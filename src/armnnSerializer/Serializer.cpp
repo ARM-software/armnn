@@ -468,6 +468,16 @@ void SerializerVisitor::VisitEqualLayer(const armnn::IConnectableLayer* layer, c
     CreateAnyLayer(fbEqualLayer.o, serializer::Layer::Layer_EqualLayer);
 }
 
+void SerializerVisitor::VisitFillLayer(const armnn::IConnectableLayer* layer,
+                                       const armnn::FillDescriptor& fillDescriptor,
+                                       const char* name)
+{
+    throw UnimplementedException("SerializerVisitor::VisitFillLayer is not implemented");
+    IgnoreUnused(name);
+    IgnoreUnused(layer);
+    IgnoreUnused(fillDescriptor);
+}
+
 void SerializerVisitor::VisitFloorLayer(const armnn::IConnectableLayer *layer, const char *name)
 {
     IgnoreUnused(name);

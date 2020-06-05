@@ -97,6 +97,9 @@ public:
     IConnectableLayer* AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
                                                 const char* name = nullptr) override;
 
+    IConnectableLayer* AddFillLayer(const FillDescriptor& fillDescriptor,
+                                    const char* name = nullptr) override;
+
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                               const ConstTensor& weights,
                                               const Optional<ConstTensor>& biases,

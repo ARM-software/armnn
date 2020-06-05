@@ -137,6 +137,19 @@ struct ArgMinMaxQueueDescriptor : QueueDescriptorWithParameters<ArgMinMaxDescrip
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+// Fill layer workload data.
+struct FillQueueDescriptor : QueueDescriptorWithParameters<FillDescriptor>
+{
+    FillQueueDescriptor()
+        : m_Value(nullptr)
+    {
+    }
+
+    const ConstCpuTensorHandle* m_Value;
+
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 // Fully connected layer workload data.
 struct FullyConnectedQueueDescriptor : QueueDescriptorWithParameters<FullyConnectedDescriptor>
 {

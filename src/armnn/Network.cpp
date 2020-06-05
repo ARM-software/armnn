@@ -1186,6 +1186,12 @@ IConnectableLayer* Network::AddElementwiseUnaryLayer(const ElementwiseUnaryDescr
     return m_Graph->AddLayer<ElementwiseUnaryLayer>(elementwiseUnaryDescriptor, name);
 }
 
+IConnectableLayer* Network::AddFillLayer(const FillDescriptor& fillDescriptor,
+                                         const char* name)
+{
+    return m_Graph->AddLayer<FillLayer>(fillDescriptor, name);
+}
+
 IConnectableLayer* Network::AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                        const ConstTensor& weights,
                                                        const Optional<ConstTensor>& biases,

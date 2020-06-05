@@ -27,6 +27,7 @@
 #include "layers/DivisionLayer.hpp"
 #include "layers/ElementwiseUnaryLayer.hpp"
 #include "layers/FakeQuantizationLayer.hpp"
+#include "layers/FillLayer.hpp"
 #include "layers/FloorLayer.hpp"
 #include "layers/FullyConnectedLayer.hpp"
 #include "layers/GatherLayer.hpp"
@@ -115,6 +116,7 @@ DECLARE_LAYER(DetectionPostProcess)
 DECLARE_LAYER(Division)
 DECLARE_LAYER(ElementwiseUnary)
 DECLARE_LAYER(FakeQuantization)
+DECLARE_LAYER(Fill)
 DECLARE_LAYER(Floor)
 DECLARE_LAYER(FullyConnected)
 DECLARE_LAYER(Gather)

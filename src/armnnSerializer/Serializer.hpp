@@ -121,6 +121,10 @@ public:
     void VisitEqualLayer(const armnn::IConnectableLayer* layer,
                          const char* name = nullptr) override;
 
+    void VisitFillLayer(const armnn::IConnectableLayer* layer,
+                        const armnn::FillDescriptor& fillDescriptor,
+                        const char* name = nullptr) override;
+
     void VisitFloorLayer(const armnn::IConnectableLayer *layer,
                          const char *name = nullptr) override;
 

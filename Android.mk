@@ -151,6 +151,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/ElementwiseBaseLayer.cpp \
         src/armnn/layers/ElementwiseUnaryLayer.cpp \
         src/armnn/layers/FakeQuantizationLayer.cpp \
+        src/armnn/layers/FillLayer.cpp \
         src/armnn/layers/FloorLayer.cpp \
         src/armnn/layers/FullyConnectedLayer.cpp \
         src/armnn/layers/GatherLayer.cpp \

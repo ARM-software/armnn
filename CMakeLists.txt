@@ -302,6 +302,8 @@ list(APPEND armnn_sources
     src/armnn/layers/ElementwiseUnaryLayer.cpp
     src/armnn/layers/FakeQuantizationLayer.hpp
     src/armnn/layers/FakeQuantizationLayer.cpp
+    src/armnn/layers/FillLayer.hpp
+    src/armnn/layers/FillLayer.cpp
     src/armnn/layers/FloorLayer.hpp
     src/armnn/layers/FloorLayer.cpp
     src/armnn/layers/FullyConnectedLayer.hpp

@@ -248,6 +248,14 @@ bool LayerSupportBase::IsFakeQuantizationSupported(const TensorInfo& /*input*/,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsFillSupported(const TensorInfo& /*input*/,
+                                       const TensorInfo& /*output*/,
+                                       const FillDescriptor& /*descriptor*/,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsFloorSupported(const TensorInfo& /*input*/,
                                         const TensorInfo& /*output*/,
                                         Optional<std::string&> reasonIfUnsupported) const

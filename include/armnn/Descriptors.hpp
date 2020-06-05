@@ -711,6 +711,25 @@ struct FakeQuantizationDescriptor
     float m_Max;
 };
 
+/// A FillDescriptor for the FillLayer
+struct FillDescriptor
+{
+    FillDescriptor()
+    : m_Value(0)
+    {}
+
+    FillDescriptor(const float& value)
+    : m_Value(value)
+    {}
+
+    bool operator ==(const FillDescriptor& rhs) const
+    {
+        return m_Value == rhs.m_Value;
+    }
+
+    float m_Value;
+};
+
 /// A ResizeBilinearDescriptor for the ResizeBilinearLayer.
 struct ResizeBilinearDescriptor
 {

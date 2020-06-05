@@ -312,6 +312,20 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                                      reason);
             break;
         }
+        case LayerType::Fill:
+        {
+            auto cLayer = PolymorphicDowncast<const FillLayer*>(&layer);
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            const FillDescriptor& descriptor = cLayer->GetParameters();
+
+            result = layerSupportObject->IsFillSupported(
+                OverrideDataType(input, dataType),
+                OverrideDataType(output, dataType),
+                descriptor,
+                reason);
+            break;
+        }
         case LayerType::FakeQuantization:
         {
             auto cLayer = PolymorphicDowncast<const FakeQuantizationLayer*>(&layer);
@@ -1332,6 +1346,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateEqual(const EqualQueueDescrip
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateFakeQuantization(const FakeQuantizationQueueDescriptor& /*desc*/,
                                                                     const WorkloadInfo& /*info*/) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateFill(const FillQueueDescriptor& /*descriptor*/,
+                                                        const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }

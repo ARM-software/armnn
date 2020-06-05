@@ -101,6 +101,10 @@ public:
     void VisitEqualLayer(const IConnectableLayer*,
                          const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitFillLayer(const IConnectableLayer*,
+                        const FillDescriptor&,
+                        const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitFloorLayer(const IConnectableLayer*,
                          const char*) override { DefaultPolicy::Apply(__func__); }
 

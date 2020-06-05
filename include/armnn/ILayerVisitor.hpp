@@ -184,6 +184,14 @@ public:
     virtual void VisitEqualLayer(const IConnectableLayer* layer,
                                  const char* name = nullptr) = 0;
 
+    /// Function a fill layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param fillDescriptor - Description of the layer
+    /// @param name - Optional name for the layer.
+    virtual void VisitFillLayer(const IConnectableLayer* layer,
+                                const FillDescriptor& fillDescriptor,
+                                const char* name = nullptr) = 0;
+
     /// Function a floor layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param name - Optional name for the layer.

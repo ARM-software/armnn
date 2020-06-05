@@ -966,6 +966,29 @@ void StackQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                                  "output");
 }
 
+void FillQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"FillQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumDimensions(inputTensorInfo, descriptorName, 1, "input");
+
+    std::vector<DataType> supportedTypes =
+    {
+        DataType::BFloat16,
+        DataType::Float32,
+        DataType::Float16,
+        DataType::Signed32
+    };
+
+    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
+}
+
 void FullyConnectedQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     const std::string descriptorName{"FullyConnectedQueueDescriptor"};

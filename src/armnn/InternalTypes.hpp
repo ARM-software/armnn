@@ -33,6 +33,7 @@
     X(Division) \
     X(ElementwiseUnary) \
     X(FakeQuantization) \
+    X(Fill) \
     X(Floor) \
     X(FullyConnected) \
     X(Gather) \

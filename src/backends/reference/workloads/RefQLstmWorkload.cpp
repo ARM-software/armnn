@@ -146,6 +146,7 @@ void RefQLstmWorkload::Execute() const
     std::vector<int16_t> forgetGateData(stateTensorSize);
     std::vector<int16_t> outputGateData(stateTensorSize);
     std::vector<int32_t> hiddenStateData(stateTensorSize);
+    std::vector<int16_t> outputInt16Data(numBatches * outputSize);
 
     armnn::TensorInfo inputGateInfo(
             {numBatches , numUnits}, armnn::DataType::QSymmS16, m_Data.m_Parameters.m_InputIntermediateScale, 0);
@@ -159,6 +160,10 @@ void RefQLstmWorkload::Execute() const
                                       armnn::DataType::QAsymmS8,
                                       m_Data.m_Parameters.m_HiddenStateScale,
                                       m_Data.m_Parameters.m_HiddenStateZeroPoint);
+    armnn::TensorInfo outputInt16Info({numBatches , outputSize},
+                                      armnn::DataType::QSymmS16,
+                                      outputInfo.GetQuantizationScale(),
+                                      outputInfo.GetQuantizationOffset());
 
     // Decoders/Encoders for internal states
     std::unique_ptr<Decoder<float>> inputGateDecoder =
@@ -182,6 +187,12 @@ void RefQLstmWorkload::Execute() const
             MakeEncoder<float>(outputGateInfo, outputGateData.data());
     std::unique_ptr<Encoder<float>> hiddenStateEncoder =
             MakeEncoder<float>(hiddenStateInfo, hiddenStateData.data());
+
+    // Int16 used to accumulate output to prevent overflowing (after Projection MatMul)
+    std::unique_ptr<Decoder<float>> outputInt16Decoder =
+            MakeDecoder<float>(outputInt16Info, outputInt16Data.data());
+    std::unique_ptr<Encoder<float>> outputInt16Encoder =
+            MakeEncoder<float>(outputInt16Info, outputInt16Data.data());
 
     // Create decoders for optional params if they are enabled
     if (!cifgEnabled)
@@ -494,12 +505,13 @@ void RefQLstmWorkload::Execute() const
     {
         if (m_ProjectionBiasTensor)
         {
-            VectorBatchVectorAssign(*projectionBiasDecoder,
-                                    outputSize, numBatches, *outputEncoder);
+            VectorBatchVectorAssign(*projectionBiasDecoder, outputSize, numBatches, *outputInt16Encoder);
         }
 
-        MatrixBatchVectorMultiplyAccumulate(*projectionWeightsDecoder,
-                                            outputSize, numUnits, *hiddenStateDecoder, numBatches, *outputEncoder);
+        MatrixBatchVectorMultiplyAccumulate(*projectionWeightsDecoder, outputSize, numUnits, *hiddenStateDecoder,
+                                            numBatches, *outputInt16Encoder);
+
+        CopyVector(*outputInt16Decoder, numBatches * outputSize, *outputEncoder);
 
         if (m_Data.m_Parameters.m_ProjectionClip > 0.0)
         {

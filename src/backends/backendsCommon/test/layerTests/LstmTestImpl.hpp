@@ -66,3 +66,11 @@ LayerTestResult<uint8_t, 2> QuantizedLstmTest(
 LayerTestResult<int8_t, 2> QLstmTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<int8_t, 2> QLstmTest1(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<int8_t, 2> QLstmTest2(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

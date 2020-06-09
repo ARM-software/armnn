@@ -35,8 +35,10 @@ std::unique_ptr<IWorkload> PreCompiledLayer::CreateWorkload(const armnn::IWorklo
     return factory.CreatePreCompiled(descriptor, PrepInfoAndDesc(descriptor));
 }
 
-void PreCompiledLayer::ValidateTensorShapesFromInputs()
+void PreCompiledLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     // NOTE: since the PreCompiledLayer is an internal layer created from a valid SubgraphView,
     // we do not need to validate its input shapes
 }

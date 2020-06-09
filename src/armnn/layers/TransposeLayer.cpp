@@ -40,8 +40,10 @@ std::vector<TensorShape> TransposeLayer::InferOutputShapes(const std::vector<Ten
     return std::vector<TensorShape> ({armnnUtils::TransposeTensorShape(inShape, m_Param.m_DimMappings)});
 }
 
-void TransposeLayer::ValidateTensorShapesFromInputs()
+void TransposeLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

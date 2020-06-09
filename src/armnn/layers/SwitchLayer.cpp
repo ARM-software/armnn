@@ -27,8 +27,10 @@ SwitchLayer* SwitchLayer::Clone(Graph& graph) const
     return CloneBase<SwitchLayer>(graph, GetName());
 }
 
-void SwitchLayer::ValidateTensorShapesFromInputs()
+void SwitchLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(2, CHECK_LOCATION());
 
     ARMNN_ASSERT_MSG(GetNumOutputSlots() == 2, "SwitchLayer: The layer should return 2 outputs.");

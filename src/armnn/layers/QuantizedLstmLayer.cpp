@@ -91,8 +91,10 @@ std::vector<TensorShape> QuantizedLstmLayer::InferOutputShapes(const std::vector
     return outShapes;
 }
 
-void QuantizedLstmLayer::ValidateTensorShapesFromInputs()
+void QuantizedLstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(3, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes(

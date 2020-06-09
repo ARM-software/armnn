@@ -277,7 +277,8 @@ public:
 
     void VerifyLayerConnections(unsigned int expectedConnections, const CheckLocation& location) const;
 
-    virtual void ValidateTensorShapesFromInputs() = 0;
+    virtual void ValidateTensorShapesFromInputs(
+                    ShapeInferenceMethod shapeInferenceMethod = ShapeInferenceMethod::ValidateOnly) = 0;
 
     std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
 

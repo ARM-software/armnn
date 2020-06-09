@@ -28,8 +28,10 @@ ActivationLayer* ActivationLayer::Clone(Graph& graph) const
     return CloneBase<ActivationLayer>(graph, m_Param, GetName());
 }
 
-void ActivationLayer::ValidateTensorShapesFromInputs()
+void ActivationLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

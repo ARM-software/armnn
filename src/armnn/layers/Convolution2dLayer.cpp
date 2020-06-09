@@ -112,8 +112,10 @@ std::vector<TensorShape> Convolution2dLayer::InferOutputShapes(const std::vector
     return std::vector<TensorShape>({ tensorShape });
 }
 
-void Convolution2dLayer::ValidateTensorShapesFromInputs()
+void Convolution2dLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     // check if we m_Weight data is not nullptr

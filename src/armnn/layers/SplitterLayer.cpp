@@ -139,8 +139,10 @@ std::vector<TensorShape> SplitterLayer::InferOutputShapes(const std::vector<Tens
     return outShapes;
 }
 
-void SplitterLayer::ValidateTensorShapesFromInputs()
+void SplitterLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     std::vector<TensorShape> views;
     for (unsigned int viewIdx = 0; viewIdx < m_Param.GetNumViews(); viewIdx++)
     {

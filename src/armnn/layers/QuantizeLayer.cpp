@@ -29,8 +29,10 @@ Layer* QuantizeLayer::Clone(Graph& graph) const
     return clone;
 }
 
-void QuantizeLayer::ValidateTensorShapesFromInputs()
+void QuantizeLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

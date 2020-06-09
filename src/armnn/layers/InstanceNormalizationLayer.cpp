@@ -29,8 +29,10 @@ InstanceNormalizationLayer* InstanceNormalizationLayer::Clone(Graph& graph) cons
     return CloneBase<InstanceNormalizationLayer>(graph, m_Param, GetName());
 }
 
-void InstanceNormalizationLayer::ValidateTensorShapesFromInputs()
+void InstanceNormalizationLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

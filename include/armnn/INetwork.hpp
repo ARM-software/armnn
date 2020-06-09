@@ -599,12 +599,15 @@ struct OptimizerOptions
         : m_ReduceFp32ToFp16(false)
         , m_Debug(false)
         , m_ReduceFp32ToBf16(false)
+        , m_shapeInferenceMethod(armnn::ShapeInferenceMethod::ValidateOnly)
     {}
 
-    OptimizerOptions(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16 = false)
+    OptimizerOptions(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16 = false,
+                     ShapeInferenceMethod shapeInferenceMethod = armnn::ShapeInferenceMethod::ValidateOnly)
         : m_ReduceFp32ToFp16(reduceFp32ToFp16)
         , m_Debug(debug)
         , m_ReduceFp32ToBf16(reduceFp32ToBf16)
+        , m_shapeInferenceMethod(shapeInferenceMethod)
     {
         if (m_ReduceFp32ToFp16 && m_ReduceFp32ToBf16)
         {
@@ -620,6 +623,9 @@ struct OptimizerOptions
 
     // Reduce Fp32 data to Bf16 for faster processing
     bool m_ReduceFp32ToBf16;
+
+    // Infer output size when not available
+    ShapeInferenceMethod m_shapeInferenceMethod;
 };
 
 /// Create an optimized version of the network

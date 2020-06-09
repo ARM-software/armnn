@@ -29,8 +29,10 @@ L2NormalizationLayer* L2NormalizationLayer::Clone(Graph& graph) const
     return CloneBase<L2NormalizationLayer>(graph, m_Param, GetName());
 }
 
-void L2NormalizationLayer::ValidateTensorShapesFromInputs()
+void L2NormalizationLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

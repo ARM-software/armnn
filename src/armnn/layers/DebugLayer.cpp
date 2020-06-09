@@ -34,8 +34,10 @@ DebugLayer* DebugLayer::Clone(Graph& graph) const
     return CloneBase<DebugLayer>(graph, GetName());
 }
 
-void DebugLayer::ValidateTensorShapesFromInputs()
+void DebugLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes({

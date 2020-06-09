@@ -29,7 +29,8 @@ public:
 
     PreCompiledLayer* Clone(Graph &graph) const override;
 
-    void ValidateTensorShapesFromInputs() override;
+    void ValidateTensorShapesFromInputs(
+            ShapeInferenceMethod shapeInferenceMethod = ShapeInferenceMethod::ValidateOnly) override;
 
     void SetPreCompiledObject(PreCompiledObjectPtr preCompiledObject);
 

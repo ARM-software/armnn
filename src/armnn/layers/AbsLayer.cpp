@@ -30,8 +30,10 @@ AbsLayer* AbsLayer::Clone(Graph& graph) const
     return CloneBase<AbsLayer>(graph, GetName());
 }
 
-void AbsLayer::ValidateTensorShapesFromInputs()
+void AbsLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

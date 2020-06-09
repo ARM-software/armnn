@@ -48,8 +48,10 @@ BatchNormalizationLayer* BatchNormalizationLayer::Clone(Graph& graph) const
     return std::move(layer);
 }
 
-void BatchNormalizationLayer::ValidateTensorShapesFromInputs()
+void BatchNormalizationLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

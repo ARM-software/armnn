@@ -69,8 +69,10 @@ std::vector<TensorShape> ArgMinMaxLayer::InferOutputShapes(const std::vector<Ten
     return std::vector<TensorShape>({ outputShape });
 }
 
-void ArgMinMaxLayer::ValidateTensorShapesFromInputs()
+void ArgMinMaxLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

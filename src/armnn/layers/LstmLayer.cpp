@@ -163,8 +163,10 @@ std::vector<TensorShape> LstmLayer::InferOutputShapes(const std::vector<TensorSh
     return outShapes;
 }
 
-void LstmLayer::ValidateTensorShapesFromInputs()
+void LstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(3, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes( {

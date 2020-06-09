@@ -242,8 +242,10 @@ std::vector<TensorShape> ConcatLayer::InferOutputShapes(const std::vector<Tensor
     return std::vector<TensorShape>({ TensorShape({numDims, extentMax.data()}) });
 }
 
-void ConcatLayer::ValidateTensorShapesFromInputs()
+void ConcatLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     // Validates Concat layer.
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "ConcatLayer: Num Inputs must match num views.",

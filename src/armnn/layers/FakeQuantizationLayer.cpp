@@ -29,8 +29,10 @@ FakeQuantizationLayer* FakeQuantizationLayer::Clone(Graph& graph) const
     return CloneBase<FakeQuantizationLayer>(graph, m_Param, GetName());
 }
 
-void FakeQuantizationLayer::ValidateTensorShapesFromInputs()
+void FakeQuantizationLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

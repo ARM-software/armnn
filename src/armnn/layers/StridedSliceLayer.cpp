@@ -80,8 +80,10 @@ std::vector<TensorShape> StridedSliceLayer::InferOutputShapes(
         TensorShape(boost::numeric_cast<unsigned int>(outputShape.size()), &outputShape[0]) });
 }
 
-void StridedSliceLayer::ValidateTensorShapesFromInputs()
+void StridedSliceLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape()});

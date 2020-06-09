@@ -200,7 +200,7 @@ public:
     void SubstituteSubgraph(SubgraphView& subgraph, IConnectableLayer* substituteLayer);
     void SubstituteSubgraph(SubgraphView& subgraph, const SubgraphView& substituteSubgraph);
 
-    void InferTensorInfos();
+    void InferTensorInfos(ShapeInferenceMethod shapeInferenceMethod = ShapeInferenceMethod::ValidateOnly);
 
     void AttachObservable(IGraphObservable* const observable, GraphEvent notifyOnEvent) {
         m_Views[notifyOnEvent].emplace_back(observable);

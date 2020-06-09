@@ -28,8 +28,10 @@ InputLayer* InputLayer::Clone(Graph& graph) const
     return CloneBase<InputLayer>(graph, GetBindingId(), GetName());
 }
 
-void InputLayer::ValidateTensorShapesFromInputs()
+void InputLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     //The input layer should already have it's inputs set during graph building phase in the driver/parser.
     ConditionalThrow<LayerValidationException>(GetOutputSlot(0).IsTensorInfoSet(),
                                                "InputLayer should already have the TensorInfo set.");

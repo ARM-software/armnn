@@ -29,8 +29,10 @@ SoftmaxLayer* SoftmaxLayer::Clone(Graph& graph) const
     return CloneBase<SoftmaxLayer>(graph, m_Param, GetName());
 }
 
-void SoftmaxLayer::ValidateTensorShapesFromInputs()
+void SoftmaxLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

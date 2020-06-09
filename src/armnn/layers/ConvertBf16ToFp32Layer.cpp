@@ -30,8 +30,10 @@ ConvertBf16ToFp32Layer* ConvertBf16ToFp32Layer::Clone(Graph& graph) const
     return CloneBase<ConvertBf16ToFp32Layer>(graph, GetName());
 }
 
-void ConvertBf16ToFp32Layer::ValidateTensorShapesFromInputs()
+void ConvertBf16ToFp32Layer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

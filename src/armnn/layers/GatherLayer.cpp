@@ -29,8 +29,10 @@ GatherLayer* GatherLayer::Clone(Graph& graph) const
     return CloneBase<GatherLayer>(graph, GetName());
 }
 
-void GatherLayer::ValidateTensorShapesFromInputs()
+void GatherLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(2, CHECK_LOCATION());
 
     const TensorInfo& params = GetInputSlot(0).GetConnection()->GetTensorInfo();

@@ -38,8 +38,10 @@ MeanLayer* MeanLayer::Clone(Graph& graph) const
     return std::move(layer);
 }
 
-void MeanLayer::ValidateTensorShapesFromInputs()
+void MeanLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorInfo& input = GetInputSlot(0).GetConnection()->GetTensorInfo();

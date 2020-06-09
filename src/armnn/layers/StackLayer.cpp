@@ -58,8 +58,10 @@ std::vector<TensorShape> StackLayer::InferOutputShapes(const std::vector<TensorS
     return std::vector<TensorShape>({ targetShape });
 }
 
-void StackLayer::ValidateTensorShapesFromInputs()
+void StackLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     // Validates Stack layer.
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "StackLayer: Num Input Slots must match Num Inputs.",

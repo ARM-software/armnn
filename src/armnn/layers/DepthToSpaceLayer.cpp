@@ -57,8 +57,10 @@ std::vector<TensorShape> DepthToSpaceLayer::InferOutputShapes(const std::vector<
     return std::vector<TensorShape>({ outputShape });
 }
 
-void DepthToSpaceLayer::ValidateTensorShapesFromInputs()
+void DepthToSpaceLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes({

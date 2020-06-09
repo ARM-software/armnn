@@ -55,8 +55,10 @@ std::vector<TensorShape> ComparisonLayer::InferOutputShapes(const std::vector<Te
     return std::vector<TensorShape>({ TensorShape(numDims, dims.data()) });
 }
 
-void ComparisonLayer::ValidateTensorShapesFromInputs()
+void ComparisonLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(2, CHECK_LOCATION());
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes({

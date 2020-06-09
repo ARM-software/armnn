@@ -29,8 +29,10 @@ FloorLayer* FloorLayer::Clone(Graph& graph) const
     return CloneBase<FloorLayer>(graph, GetName());
 }
 
-void FloorLayer::ValidateTensorShapesFromInputs()
+void FloorLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

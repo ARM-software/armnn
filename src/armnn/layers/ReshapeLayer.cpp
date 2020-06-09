@@ -36,8 +36,10 @@ std::vector<TensorShape> ReshapeLayer::InferOutputShapes(const std::vector<Tenso
     return std::vector<TensorShape>({ m_Param.m_TargetShape });
 }
 
-void ReshapeLayer::ValidateTensorShapesFromInputs()
+void ReshapeLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({  });

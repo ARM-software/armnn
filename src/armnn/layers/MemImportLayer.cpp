@@ -33,8 +33,10 @@ std::unique_ptr<IWorkload> MemImportLayer::CreateWorkload(const IWorkloadFactory
     return std::make_unique<ImportMemGenericWorkload>(descriptor, PrepInfoAndDesc(descriptor));
 }
 
-void MemImportLayer::ValidateTensorShapesFromInputs()
+void MemImportLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

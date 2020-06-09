@@ -61,8 +61,10 @@ std::vector<TensorShape> FullyConnectedLayer::InferOutputShapes(const std::vecto
     return std::vector<TensorShape>({ TensorShape({batches, weightShape[dimIdx]})});
 }
 
-void FullyConnectedLayer::ValidateTensorShapesFromInputs()
+void FullyConnectedLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     // check if we m_Weight data is not nullptr

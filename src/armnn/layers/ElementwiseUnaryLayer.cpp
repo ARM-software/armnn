@@ -40,8 +40,10 @@ std::vector<TensorShape> ElementwiseUnaryLayer::InferOutputShapes(const std::vec
     return std::vector<TensorShape>({ input });
 }
 
-void ElementwiseUnaryLayer::ValidateTensorShapesFromInputs()
+void ElementwiseUnaryLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes({

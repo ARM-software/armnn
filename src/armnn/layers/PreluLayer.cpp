@@ -94,8 +94,10 @@ std::vector<TensorShape> PreluLayer::InferOutputShapes(const std::vector<TensorS
     return { outputShape };
 }
 
-void PreluLayer::ValidateTensorShapesFromInputs()
+void PreluLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(2, CHECK_LOCATION());
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes(

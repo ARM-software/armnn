@@ -100,8 +100,10 @@ std::vector<TensorShape> Pooling2dLayer::InferOutputShapes(const std::vector<Ten
     return std::vector<TensorShape>({ tensorShape });
 }
 
-void Pooling2dLayer::ValidateTensorShapesFromInputs()
+void Pooling2dLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

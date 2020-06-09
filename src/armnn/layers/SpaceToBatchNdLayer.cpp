@@ -66,8 +66,10 @@ std::vector<TensorShape> SpaceToBatchNdLayer::InferOutputShapes(const std::vecto
     return std::vector<TensorShape>({ outputShape });
 }
 
-void SpaceToBatchNdLayer::ValidateTensorShapesFromInputs()
+void SpaceToBatchNdLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes({

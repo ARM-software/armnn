@@ -165,8 +165,10 @@ std::vector<TensorShape> QLstmLayer::InferOutputShapes(const std::vector<TensorS
     return outShapes;
 }
 
-void QLstmLayer::ValidateTensorShapesFromInputs()
+void QLstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(3, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes(

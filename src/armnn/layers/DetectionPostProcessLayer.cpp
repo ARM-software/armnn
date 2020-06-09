@@ -34,8 +34,10 @@ DetectionPostProcessLayer* DetectionPostProcessLayer::Clone(Graph& graph) const
     return std::move(layer);
 }
 
-void DetectionPostProcessLayer::ValidateTensorShapesFromInputs()
+void DetectionPostProcessLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(2, CHECK_LOCATION());
 
     // on this level constant data should not be released.

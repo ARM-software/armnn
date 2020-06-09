@@ -29,8 +29,10 @@ DequantizeLayer* DequantizeLayer::Clone(Graph& graph) const
     return CloneBase<DequantizeLayer>(graph, GetName());
 }
 
-void DequantizeLayer::ValidateTensorShapesFromInputs()
+void DequantizeLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes({

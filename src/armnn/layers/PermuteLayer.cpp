@@ -40,8 +40,10 @@ std::vector<TensorShape> PermuteLayer::InferOutputShapes(const std::vector<Tenso
     return std::vector<TensorShape> ({armnnUtils::Permuted(inShape, m_Param.m_DimMappings)});
 }
 
-void PermuteLayer::ValidateTensorShapesFromInputs()
+void PermuteLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

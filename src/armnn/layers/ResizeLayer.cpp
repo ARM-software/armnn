@@ -58,8 +58,10 @@ std::vector<TensorShape> ResizeLayer::InferOutputShapes(const std::vector<Tensor
     return std::vector<TensorShape>({ tensorShape });
 }
 
-void ResizeLayer::ValidateTensorShapesFromInputs()
+void ResizeLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

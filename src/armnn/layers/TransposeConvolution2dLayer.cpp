@@ -103,8 +103,10 @@ std::vector<TensorShape> TransposeConvolution2dLayer::InferOutputShapes(
     return std::vector<TensorShape>({ tensorShape });
 }
 
-void TransposeConvolution2dLayer::ValidateTensorShapesFromInputs()
+void TransposeConvolution2dLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     ARMNN_ASSERT_MSG(m_Weight != nullptr, "TransposeConvolution2dLayer: Weight data cannot be null.");

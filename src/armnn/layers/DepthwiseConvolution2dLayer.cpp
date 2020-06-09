@@ -119,8 +119,10 @@ DepthwiseConvolution2dLayer::InferOutputShapes(const std::vector<TensorShape>& i
     return std::vector<TensorShape>{ tensorShape };
 }
 
-void DepthwiseConvolution2dLayer::ValidateTensorShapesFromInputs()
+void DepthwiseConvolution2dLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     // on this level constant data should not be released..

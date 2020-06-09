@@ -29,8 +29,10 @@ LogSoftmaxLayer* LogSoftmaxLayer::Clone(Graph& graph) const
     return CloneBase<LogSoftmaxLayer>(graph, m_Param, GetName());
 }
 
-void LogSoftmaxLayer::ValidateTensorShapesFromInputs()
+void LogSoftmaxLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

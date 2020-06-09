@@ -33,8 +33,10 @@ SliceLayer* SliceLayer::Clone(Graph& graph) const
     return CloneBase<SliceLayer>(graph, m_Param, GetName());
 }
 
-void SliceLayer::ValidateTensorShapesFromInputs()
+void SliceLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

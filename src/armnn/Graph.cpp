@@ -489,7 +489,7 @@ void Graph::EraseSubgraphLayers(SubgraphView &subgraph)
     subgraph.Clear();
 }
 
-void Graph::InferTensorInfos()
+void Graph::InferTensorInfos(ShapeInferenceMethod shapeInferenceMethod)
 {
     for (auto&& layer : TopologicalSort())
     {
@@ -512,7 +512,7 @@ void Graph::InferTensorInfos()
                 throw LayerValidationException("All inputs must have the TensorInfo set at this point.");
             }
         }
-        layer->ValidateTensorShapesFromInputs();
+        layer->ValidateTensorShapesFromInputs(shapeInferenceMethod);
     }
 }
 

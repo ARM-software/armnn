@@ -29,8 +29,10 @@ FillLayer* FillLayer::Clone(Graph& graph) const
     return CloneBase<FillLayer>(graph, m_Param, GetName());
 }
 
-void FillLayer::ValidateTensorShapesFromInputs()
+void FillLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes( { GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });

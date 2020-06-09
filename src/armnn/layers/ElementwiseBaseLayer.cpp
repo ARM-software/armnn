@@ -47,8 +47,10 @@ std::vector<TensorShape> ElementwiseBaseLayer::InferOutputShapes(const std::vect
     return std::vector<TensorShape>({ TensorShape(numDims, dims.data()) });
 }
 
-void ElementwiseBaseLayer::ValidateTensorShapesFromInputs()
+void ElementwiseBaseLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     VerifyLayerConnections(2, CHECK_LOCATION());
 
     auto inferredShapes = InferOutputShapes({

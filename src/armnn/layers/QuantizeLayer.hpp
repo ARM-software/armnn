@@ -21,7 +21,8 @@ public:
 
     Layer* Clone(Graph& graph) const override;
 
-    void ValidateTensorShapesFromInputs() override;
+    void ValidateTensorShapesFromInputs(
+            ShapeInferenceMethod shapeInferenceMethod = ShapeInferenceMethod::ValidateOnly) override;
 
     void Accept(ILayerVisitor& visitor) const override;
 

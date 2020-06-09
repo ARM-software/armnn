@@ -29,8 +29,10 @@ OutputLayer* OutputLayer::Clone(Graph& graph) const
     return CloneBase<OutputLayer>(graph, GetBindingId(), GetName());
 }
 
-void OutputLayer::ValidateTensorShapesFromInputs()
+void OutputLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
+    IgnoreUnused(shapeInferenceMethod);
+
     // Just validates that the input is connected.
     ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection() != nullptr,
                                                "OutputLayer: Input slot must be connected.");

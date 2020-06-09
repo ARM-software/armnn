@@ -619,9 +619,6 @@ INetworkPtr TfLiteParser::CreateNetworkFromModel()
     m_Network = INetwork::Create();
     ARMNN_ASSERT(m_Model.get() != nullptr);
 
-    bool failedToCreate = false;
-    std::stringstream errors;
-
     if (m_Model->subgraphs.size() != 1)
     {
         throw ParseException(
@@ -632,65 +629,52 @@ INetworkPtr TfLiteParser::CreateNetworkFromModel()
     }
 
     size_t subgraphIndex = 0;
-    for (SubgraphPtr const & subgraph : m_Model->subgraphs)
+    size_t operatorIndex = 0;
+    try
     {
-        m_SubgraphConnections.emplace_back(subgraph->tensors.size());
-
-        size_t operatorIndex = 0;
-        for (OperatorPtr const & op : subgraph->operators)
+        for (SubgraphPtr const& subgraph : m_Model->subgraphs)
         {
-            try
+            m_SubgraphConnections.emplace_back(subgraph->tensors.size());
+            for (OperatorPtr const& op : subgraph->operators)
             {
-                auto const & opCodePtr = m_Model->operator_codes[op->opcode_index];
+                auto const& opCodePtr = m_Model->operator_codes[op->opcode_index];
                 auto builtinCode = opCodePtr->builtin_code;
 
                 if (builtinCode > tflite::BuiltinOperator_MAX)
                 {
-                    throw ParseException(
-                            boost::str(
-                                    boost::format("Operator code %1% is out of range 0-%2%. "
-                                                  "subgraph:%3% operator idx:%4%. %5%") %
-                                                  builtinCode %
-                                                  tflite::BuiltinOperator_MAX %
-                                                  subgraphIndex %
-                                                  operatorIndex %
-                                                  CHECK_LOCATION().AsString()));
+                    throw ParseException(boost::str(boost::format("Operator code %1% is out of range 0-%2%. "
+                                                                  "subgraph:%3% operator idx:%4%. %5%") %
+                                                    builtinCode % tflite::BuiltinOperator_MAX % subgraphIndex %
+                                                    operatorIndex % CHECK_LOCATION().AsString()));
                 }
 
                 // lookup and call the parser function
-                auto & parserFunction = m_ParserFunctions[builtinCode];
+                auto& parserFunction = m_ParserFunctions[builtinCode];
                 (this->*parserFunction)(subgraphIndex, operatorIndex);
+                ++operatorIndex;
             }
-            catch (const ParseException& e)
-            {
-                failedToCreate = true;
-                std::stringstream errorString;
 
-                errorString << "Failed to parse operator #" << operatorIndex
-                            << " within subgraph #" << subgraphIndex
-                            << " error: " << e.what();
-                ARMNN_LOG(error) << errorString.str();
+            SetupInputLayers(subgraphIndex);
+            SetupOutputLayers(subgraphIndex);
+            SetupConstantLayers(subgraphIndex);
 
-                errors << errorString.str() << "\n";
-            }
-            ++operatorIndex;
+            ++subgraphIndex;
+            operatorIndex = 0;
         }
-
-        SetupInputLayers(subgraphIndex);
-        SetupOutputLayers(subgraphIndex);
-        SetupConstantLayers(subgraphIndex);
-
-        ++subgraphIndex;
     }
-
-    if (failedToCreate)
+    catch (const ParseException& e)
     {
-        // we can skip everything and let the outer exception handler deal with the error
+        std::stringstream errorString;
+        errorString << "Failed to parse operator #" << operatorIndex << " within subgraph #"
+                    << subgraphIndex << " error: " << e.what();
+        ARMNN_LOG(error) << errorString.str();
+        std::stringstream errors;
+        errors << errorString.str() << "\n";
         throw ParseException(errors.str());
     }
 
     // establish the connections from the layer outputs to the inputs of the subsequent layers
-    for (size_t subgraphIndex = 0; subgraphIndex < m_SubgraphConnections.size(); ++subgraphIndex)
+    for (subgraphIndex = 0; subgraphIndex < m_SubgraphConnections.size(); ++subgraphIndex)
     {
         for (size_t tensorIndex = 0; tensorIndex < m_SubgraphConnections[subgraphIndex].size(); ++tensorIndex)
         {

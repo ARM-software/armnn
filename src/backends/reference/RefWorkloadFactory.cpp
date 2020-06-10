@@ -549,6 +549,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateQuantize(const QuantizeQueu
     return std::make_unique<RefQuantizeWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateRank(const RankQueueDescriptor& descriptor,
+                                                          const WorkloadInfo& info) const
+{
+    return std::make_unique<RefRankWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {

@@ -180,6 +180,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/QLstmLayer.cpp \
         src/armnn/layers/QuantizeLayer.cpp \
         src/armnn/layers/QuantizedLstmLayer.cpp \
+        src/armnn/layers/RankLayer.cpp \
         src/armnn/layers/ReshapeLayer.cpp \
         src/armnn/layers/ResizeLayer.cpp \
         src/armnn/layers/SliceLayer.cpp \

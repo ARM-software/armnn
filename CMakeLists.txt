@@ -1,5 +1,5 @@
 #
-# Copyright © 2020 Arm Ltd. All rights reserved.
+# Copyright © 2020 Arm Ltd. and Contributors All rights reserved.
 # Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 #
@@ -354,6 +354,8 @@ list(APPEND armnn_sources
     src/armnn/layers/PreCompiledLayer.cpp
     src/armnn/layers/PreluLayer.hpp
     src/armnn/layers/PreluLayer.cpp
+    src/armnn/layers/RankLayer.hpp
+    src/armnn/layers/RankLayer.cpp
     src/armnn/layers/ReshapeLayer.hpp
     src/armnn/layers/ReshapeLayer.cpp
     src/armnn/layers/ResizeLayer.hpp
@@ -894,6 +896,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/DeserializePad.cpp
             src/armnnDeserializer/test/DeserializePermute.cpp
             src/armnnDeserializer/test/DeserializePooling2d.cpp
+            src/armnnDeserializer/test/DeserializeRank.cpp
             src/armnnDeserializer/test/DeserializeReshape.cpp
             src/armnnDeserializer/test/DeserializeResizeBilinear.cpp
             src/armnnDeserializer/test/DeserializeRsqrt.cpp

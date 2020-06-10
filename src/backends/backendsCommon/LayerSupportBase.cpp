@@ -488,6 +488,13 @@ bool LayerSupportBase::IsQuantizedLstmSupported(const TensorInfo&, // input
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsRankSupported(const TensorInfo&, // input
+                                       const TensorInfo&,  // output
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsReshapeSupported(const TensorInfo&, // input
                                           const TensorInfo&, // output
                                           const ReshapeDescriptor&, // descriptor

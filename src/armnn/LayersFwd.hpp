@@ -53,6 +53,7 @@
 #include "layers/QuantizeLayer.hpp"
 #include "layers/QLstmLayer.hpp"
 #include "layers/QuantizedLstmLayer.hpp"
+#include "layers/RankLayer.hpp"
 #include "layers/ReshapeLayer.hpp"
 #include "layers/ResizeLayer.hpp"
 #include "layers/SliceLayer.hpp"
@@ -142,6 +143,7 @@ DECLARE_LAYER(Prelu)
 DECLARE_LAYER(Quantize)
 DECLARE_LAYER(QLstm)
 DECLARE_LAYER(QuantizedLstm)
+DECLARE_LAYER(Rank)
 DECLARE_LAYER(Reshape)
 DECLARE_LAYER(Resize)
 DECLARE_LAYER(Slice)

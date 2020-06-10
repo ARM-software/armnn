@@ -1651,6 +1651,21 @@ bool RefLayerSupport::IsQuantizeSupported(const TensorInfo& input,
     return supported;
 }
 
+bool RefLayerSupport::IsRankSupported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input);
+    // Define supported output types.
+    std::array<DataType,1> supportedOutputTypes =
+    {
+        DataType::Signed32,
+    };
+
+    return CheckSupportRule(TypeAnyOf(output, supportedOutputTypes), reasonIfUnsupported,
+           "Reference rank: input type not supported.");
+}
+
 bool RefLayerSupport::IsReshapeSupported(const TensorInfo& input,
                                          const TensorInfo& output,
                                          const ReshapeDescriptor& descriptor,

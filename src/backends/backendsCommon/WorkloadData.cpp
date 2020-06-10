@@ -3515,4 +3515,33 @@ void ElementwiseUnaryQueueDescriptor::Validate(const WorkloadInfo& workloadInfo)
     ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
+void RankQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"RankQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 1, "output");
+    ValidateTensorNumElements(outputTensorInfo, descriptorName, 1, "output");
+
+    std::vector<DataType> supportedTypes =
+    {
+        DataType::BFloat16,
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QAsymmS8,
+        DataType::QAsymmU8,
+        DataType::QSymmS8,
+        DataType::QSymmS16,
+        DataType::Signed32
+    };
+
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateDataTypes(outputTensorInfo, { DataType::Signed32 }, descriptorName);
+}
+
 } // namespace armnn

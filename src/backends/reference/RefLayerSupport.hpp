@@ -265,6 +265,10 @@ public:
                           const LstmInputParamsInfo& paramsInfo,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsRankSupported(const TensorInfo& input,
+                         const TensorInfo& output,
+                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsReshapeSupported(const TensorInfo& input,
                             const TensorInfo& output,
                             const ReshapeDescriptor& descriptor,

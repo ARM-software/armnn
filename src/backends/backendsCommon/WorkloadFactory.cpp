@@ -13,15 +13,12 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <backendsCommon/WorkloadFactory.hpp>
-#include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
 
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
 #include <boost/iterator/transform_iterator.hpp>
 
-#include <cstring>
 #include <sstream>
 
 namespace armnn
@@ -924,6 +921,15 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                          reason);
             break;
         }
+        case LayerType::Rank:
+        {
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject->IsRankSupported(OverrideDataType(input, dataType),
+                                                         OverrideDataType(output, dataType),
+                                                         reason);
+            break;
+        }
         case LayerType::Reshape:
         {
             auto cLayer = PolymorphicDowncast<const ReshapeLayer*>(&layer);
@@ -1512,6 +1518,11 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateQLstm(const QLstmQueueDescrip
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateQuantizedLstm(const QuantizedLstmQueueDescriptor& /*descriptor*/,
                                                                  const WorkloadInfo& /*info*/) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateRank(const RankQueueDescriptor& /*descriptor*/,
+                                                        const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -60,6 +60,7 @@
     X(Quantize) \
     X(QuantizedLstm) \
     X(Reshape) \
+    X(Rank) \
     X(Resize) \
     X(Slice) \
     X(Softmax) \

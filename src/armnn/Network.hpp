@@ -160,6 +160,8 @@ public:
                                                   const ConstTensor&                  gamma,
                                                   const char*                         name = nullptr) override;
 
+    IConnectableLayer* AddRankLayer(const char* name = nullptr) override;
+
     ARMNN_DEPRECATED_MSG("Use AddResizeLayer instead")
     IConnectableLayer* AddResizeBilinearLayer(const ResizeBilinearDescriptor& resizeDesc,
                                               const char* name = nullptr) override;

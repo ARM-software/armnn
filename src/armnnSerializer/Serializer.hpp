@@ -219,6 +219,9 @@ public:
                                  const armnn::QuantizedLstmInputParams& params,
                                  const char* name = nullptr) override;
 
+    void VisitRankLayer(const armnn::IConnectableLayer* layer,
+                        const char* name = nullptr) override;
+
     void VisitReshapeLayer(const armnn::IConnectableLayer* layer,
                            const armnn::ReshapeDescriptor& reshapeDescriptor,
                            const char* name = nullptr) override;

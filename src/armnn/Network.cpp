@@ -1460,6 +1460,11 @@ IConnectableLayer* Network::AddBatchNormalizationLayer(const BatchNormalizationD
     return layer;
 }
 
+IConnectableLayer* Network::AddRankLayer(const char* name)
+{
+    return m_Graph->AddLayer<RankLayer>(name);
+}
+
 IConnectableLayer* Network::AddResizeBilinearLayer(const ResizeBilinearDescriptor& descriptor,
                                                    const char* name)
 {

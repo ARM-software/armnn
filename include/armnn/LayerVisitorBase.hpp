@@ -201,6 +201,9 @@ public:
                                  const QuantizedLstmInputParams&,
                                  const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitRankLayer(const IConnectableLayer*,
+                        const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitReshapeLayer(const IConnectableLayer*,
                            const ReshapeDescriptor&,
                            const char*) override { DefaultPolicy::Apply(__func__); }

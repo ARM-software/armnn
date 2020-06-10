@@ -2,7 +2,6 @@
 // Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-
 #include "Serializer.hpp"
 
 #include <armnn/Descriptors.hpp>
@@ -851,6 +850,16 @@ void SerializerVisitor::VisitPermuteLayer(const armnn::IConnectableLayer* layer,
     CreateAnyLayer(flatBufferPermuteLayer.o, serializer::Layer::Layer_PermuteLayer);
 }
 
+// Build FlatBuffer for Rank Layer
+void SerializerVisitor::VisitRankLayer(const armnn::IConnectableLayer* layer,
+                                       const char* name)
+{
+    IgnoreUnused(name);
+    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Rank);
+    auto flatBufferRankLayer = serializer::CreateRankLayer(m_flatBufferBuilder, flatBufferBaseLayer);
+
+    CreateAnyLayer(flatBufferRankLayer.o, serializer::Layer::Layer_RankLayer);
+}
 // Build FlatBuffer for Reshape Layer
 void SerializerVisitor::VisitReshapeLayer(const armnn::IConnectableLayer* layer,
                                           const armnn::ReshapeDescriptor& reshapeDescriptor,
@@ -1584,7 +1593,9 @@ flatbuffers::Offset<TensorInfo>  SerializerVisitor::CreateTensorInfo(const armnn
                                          tensorInfo.GetQuantizationScales()[0],
                                          tensorInfo.GetQuantizationOffset(),
                                          m_flatBufferBuilder.CreateVector(tensorInfo.GetQuantizationScales()),
-                                         tensorInfo.GetQuantizationDim().value());
+                                         tensorInfo.GetQuantizationDim().value(),
+                                         static_cast<unsigned int>
+                                         (tensorInfo.GetShape().GetDimensionality()));
         return flatBufferTensorInfo;
     }
 
@@ -1593,7 +1604,11 @@ flatbuffers::Offset<TensorInfo>  SerializerVisitor::CreateTensorInfo(const armnn
                                                              m_flatBufferBuilder.CreateVector(shape),
                                                              GetFlatBufferDataType(tensorInfo.GetDataType()),
                                                              tensorInfo.GetQuantizationScale(),
-                                                             tensorInfo.GetQuantizationOffset());
+                                                             tensorInfo.GetQuantizationOffset(),
+                                                             0,
+                                                             0,
+                                                             static_cast<unsigned int>
+                                                             (tensorInfo.GetShape().GetDimensionality()));
     return flatBufferTensorInfo;
 }
 

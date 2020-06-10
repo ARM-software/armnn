@@ -59,6 +59,7 @@ table TensorInfo {
     quantizationOffset:int = 0;
     quantizationScales:[float];
     quantizationDim:uint;
+    dimensionality:uint = 1;
 }
 
 struct Connection {
@@ -157,7 +158,8 @@ enum LayerType : uint {
     ElementwiseUnary = 54,
     Transpose = 55,
     QLstm = 56,
-    Fill = 57
+    Fill = 57,
+    Rank = 58
 }
 
 // Base layer table to be used as part of other layers
@@ -859,6 +861,10 @@ table StandInLayer {
     descriptor:StandInDescriptor;
 }
 
+table RankLayer {
+    base:LayerBase;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -917,7 +923,8 @@ union Layer {
     ElementwiseUnaryLayer,
     TransposeLayer,
     QLstmLayer,
-    FillLayer
+    FillLayer,
+    RankLayer
 }
 
 table AnyLayer {

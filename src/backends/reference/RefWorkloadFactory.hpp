@@ -209,6 +209,9 @@ public:
     std::unique_ptr<IWorkload> CreateQuantize(const QuantizeQueueDescriptor& descriptor,
                                               const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateRank(const RankQueueDescriptor& descriptor,
+                                          const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateReshape(const ReshapeQueueDescriptor& descriptor,
                                              const WorkloadInfo& info) const override;
 

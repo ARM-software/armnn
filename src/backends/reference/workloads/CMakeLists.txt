@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Arm Ltd. All rights reserved.
+# Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -129,6 +129,7 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefQuantizeWorkload.hpp
     RefQLstmWorkload.cpp
     RefQLstmWorkload.hpp
+    RefRankWorkload.hpp
     RefReshapeWorkload.cpp
     RefReshapeWorkload.hpp
     RefResizeBilinearWorkload.cpp

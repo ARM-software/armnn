@@ -290,6 +290,11 @@ struct BatchNormalizationQueueDescriptor : QueueDescriptorWithParameters<BatchNo
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct RankQueueDescriptor : QueueDescriptor
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 struct ResizeBilinearQueueDescriptor : QueueDescriptorWithParameters<ResizeBilinearDescriptor>
 {
     void Validate(const WorkloadInfo& workloadInfo) const;

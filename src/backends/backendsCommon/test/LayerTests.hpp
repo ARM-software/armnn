@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -46,6 +46,7 @@
 #include <backendsCommon/test/layerTests/Pooling2dTestImpl.hpp>
 #include <backendsCommon/test/layerTests/PreluTestImpl.hpp>
 #include <backendsCommon/test/layerTests/QuantizeTestImpl.hpp>
+#include <backendsCommon/test/layerTests/RankTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ReshapeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ResizeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/RsqrtTestImpl.hpp>

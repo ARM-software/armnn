@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -225,6 +225,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_QLstmLayer]                  = &Deserializer::ParseQLstm;
     m_ParserFunctions[Layer_QuantizeLayer]               = &Deserializer::ParseQuantize;
     m_ParserFunctions[Layer_QuantizedLstmLayer]          = &Deserializer::ParseQuantizedLstm;
+    m_ParserFunctions[Layer_RankLayer]                   = &Deserializer::ParseRank;
     m_ParserFunctions[Layer_ReshapeLayer]                = &Deserializer::ParseReshape;
     m_ParserFunctions[Layer_ResizeBilinearLayer]         = &Deserializer::ParseResizeBilinear;
     m_ParserFunctions[Layer_ResizeLayer]                 = &Deserializer::ParseResize;
@@ -331,6 +332,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_QuantizeLayer()->base();
         case Layer::Layer_QuantizedLstmLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_QuantizedLstmLayer()->base();
+        case Layer::Layer_RankLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_RankLayer()->base();
         case Layer::Layer_ReshapeLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_ReshapeLayer()->base();
         case Layer::Layer_ResizeBilinearLayer:
@@ -545,6 +548,16 @@ armnn::TensorInfo ToTensorInfo(Deserializer::TensorRawPtr tensorPtr)
         }
     }
 
+    if (tensorPtr->dimensionality() == static_cast<unsigned int>(Dimensionality::Scalar))
+    {
+        float quantizationScale = tensorPtr->quantizationScale();
+        int32_t quantizationOffset = tensorPtr->quantizationOffset();
+
+        return armnn::TensorInfo(armnn::TensorShape{armnn::Dimensionality::Scalar},
+                                 type,
+                                 quantizationScale,
+                                 quantizationOffset);
+    }
 
     auto dimensions = tensorPtr->dimensions();
     unsigned int size = dimensions->size();
@@ -2006,6 +2019,26 @@ armnn::TensorInfo Deserializer::OutputShapeOfReshape(const armnn::TensorInfo& in
     reshapeInfo.SetShape(outputShape);
 
     return reshapeInfo;
+}
+
+void Deserializer::ParseRank(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    Deserializer::TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    Deserializer::TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddRankLayer( layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
 }
 
 void Deserializer::ParseReshape(GraphPtr graph, unsigned int layerIndex)

@@ -352,6 +352,11 @@ public:
         const ConstTensor& gamma,
         const char* name = nullptr) = 0;
 
+    /// Adds a rank layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddRankLayer(const char* name = nullptr) = 0;
+
     /// Adds a resize bilinear layer to the network.
     /// @param resizeDesc - Parameters for the resize operation.
     /// @param name - Optional name for the layer.

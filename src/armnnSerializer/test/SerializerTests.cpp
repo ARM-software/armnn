@@ -2202,6 +2202,32 @@ BOOST_AUTO_TEST_CASE(SerializeQuantize)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeRank)
+{
+    DECLARE_LAYER_VERIFIER_CLASS(Rank)
+
+    const std::string layerName("rank");
+    const armnn::TensorInfo inputInfo({1, 9}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({1}, armnn::DataType::Signed32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const rankLayer = network->AddRankLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(rankLayer->GetInputSlot(0));
+    rankLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    rankLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    RankLayerVerifier verifier(layerName, {inputInfo}, {outputInfo});
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeReshape)
 {
     DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Reshape)

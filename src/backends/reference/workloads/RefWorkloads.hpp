@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -51,6 +51,7 @@
 #include "RefPreluWorkload.hpp"
 #include "RefQLstmWorkload.hpp"
 #include "RefQuantizeWorkload.hpp"
+#include "RefRankWorkload.hpp"
 #include "RefReshapeWorkload.hpp"
 #include "RefResizeBilinearWorkload.hpp"
 #include "RefResizeWorkload.hpp"

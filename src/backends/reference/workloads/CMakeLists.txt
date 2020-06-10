@@ -33,6 +33,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     ElementwiseFunction.hpp
     Encoders.hpp
     Exp.hpp
+    Fill.cpp
+    Fill.hpp
     FullyConnected.cpp
     FullyConnected.hpp
     Gather.cpp
@@ -95,6 +97,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefElementwiseUnaryWorkload.hpp
     RefFakeQuantizationFloat32Workload.cpp
     RefFakeQuantizationFloat32Workload.hpp
+    RefFillWorkload.cpp
+    RefFillWorkload.hpp
     RefFloorWorkload.cpp
     RefFloorWorkload.hpp
     RefFullyConnectedWorkload.cpp

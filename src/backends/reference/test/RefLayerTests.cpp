@@ -1202,6 +1202,10 @@ ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim1Uint8, Concat4dDiffShapeDim1Uint8Test)
 ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim2Uint8, Concat4dDiffShapeDim2Uint8Test)
 ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim3Uint8, Concat4dDiffShapeDim3Uint8Test, true)
 
+// Fill
+ARMNN_AUTO_TEST_CASE(SimpleFill, SimpleFillTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(SimpleFillF16, SimpleFillTest<DataType::Float16>)
+
 // Floor
 ARMNN_AUTO_TEST_CASE(SimpleFloor, SimpleFloorTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(SimpleFloorFloat16, SimpleFloorTest<DataType::Float16>)

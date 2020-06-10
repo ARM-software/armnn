@@ -27,6 +27,7 @@
 #include <backendsCommon/test/layerTests/ElementwiseUnaryTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ExpTestImpl.hpp>
 #include <backendsCommon/test/layerTests/FakeQuantizationTestImpl.hpp>
+#include <backendsCommon/test/layerTests/FillTestImpl.hpp>
 #include <backendsCommon/test/layerTests/FloorTestImpl.hpp>
 #include <backendsCommon/test/layerTests/FullyConnectedTestImpl.hpp>
 #include <backendsCommon/test/layerTests/GatherTestImpl.hpp>

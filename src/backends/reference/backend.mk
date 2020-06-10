@@ -32,6 +32,7 @@ BACKEND_SOURCES := \
         workloads/DetectionPostProcess.cpp \
         workloads/Dequantize.cpp \
         workloads/ElementwiseFunction.cpp \
+        workloads/Fill.cpp \
         workloads/FullyConnected.cpp \
         workloads/Gather.cpp \
         workloads/InstanceNorm.cpp \
@@ -62,6 +63,7 @@ BACKEND_SOURCES := \
         workloads/RefElementwiseWorkload.cpp \
         workloads/RefElementwiseUnaryWorkload.cpp \
         workloads/RefFakeQuantizationFloat32Workload.cpp \
+        workloads/RefFillWorkload.cpp \
         workloads/RefFloorWorkload.cpp \
         workloads/RefFullyConnectedWorkload.cpp \
         workloads/RefGatherWorkload.cpp \

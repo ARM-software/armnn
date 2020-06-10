@@ -857,6 +857,28 @@ bool RefLayerSupport::IsFakeQuantizationSupported(const TensorInfo& input,
     return supported;
 }
 
+bool RefLayerSupport::IsFillSupported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      const FillDescriptor& descriptor,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(descriptor);
+    IgnoreUnused(output);
+
+    bool supported = true;
+
+    std::array<DataType,2> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::Float16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference Fill: input type not supported.");
+
+    return supported;
+}
+
 bool RefLayerSupport::IsFloorSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        Optional<std::string&> reasonIfUnsupported) const

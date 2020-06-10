@@ -7,6 +7,7 @@
 #include <backendsCommon/MemCopyWorkload.hpp>
 #include <backendsCommon/MemImportWorkload.hpp>
 #include <backendsCommon/MakeWorkloadHelper.hpp>
+#include <reference/workloads/RefFillWorkload.hpp>
 #include "RefWorkloadFactory.hpp"
 #include "RefBackendId.hpp"
 #include "workloads/RefWorkloads.hpp"
@@ -297,11 +298,16 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateEqual(const EqualQueueDescr
     return CreateComparison(comparisonDescriptor, info);
 }
 
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFakeQuantization(
-    const FakeQuantizationQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFakeQuantization(const FakeQuantizationQueueDescriptor& descriptor,
+                                                                      const WorkloadInfo& info) const
 {
     return MakeWorkload<RefFakeQuantizationFloat32Workload, NullWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFill(const FillQueueDescriptor& descriptor,
+                                                          const WorkloadInfo& info) const
+{
+    return std::make_unique<RefFillWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,

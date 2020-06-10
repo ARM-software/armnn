@@ -140,13 +140,6 @@ struct ArgMinMaxQueueDescriptor : QueueDescriptorWithParameters<ArgMinMaxDescrip
 // Fill layer workload data.
 struct FillQueueDescriptor : QueueDescriptorWithParameters<FillDescriptor>
 {
-    FillQueueDescriptor()
-        : m_Value(nullptr)
-    {
-    }
-
-    const ConstCpuTensorHandle* m_Value;
-
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 

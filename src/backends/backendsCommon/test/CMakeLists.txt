@@ -95,6 +95,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/ExpTestImpl.hpp
     layerTests/FakeQuantizationTestImpl.cpp
     layerTests/FakeQuantizationTestImpl.hpp
+    layerTests/FillTestImpl.cpp
+    layerTests/FillTestImpl.hpp
     layerTests/FloorTestImpl.cpp
     layerTests/FloorTestImpl.hpp
     layerTests/FullyConnectedTestImpl.cpp

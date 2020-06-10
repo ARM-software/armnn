@@ -34,6 +34,7 @@
 #include "RefDequantizeWorkload.hpp"
 #include "RefElementwiseWorkload.hpp"
 #include "RefElementwiseUnaryWorkload.hpp"
+#include "RefFillWorkload.hpp"
 #include "RefFullyConnectedWorkload.hpp"
 #include "RefFloorWorkload.hpp"
 #include "RefFakeQuantizationFloat32Workload.hpp"

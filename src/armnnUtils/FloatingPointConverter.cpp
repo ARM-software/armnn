@@ -20,7 +20,7 @@ void FloatingPointConverter::ConvertFloat32To16(const float* srcFloat32Buffer,
     ARMNN_ASSERT(srcFloat32Buffer != nullptr);
     ARMNN_ASSERT(dstFloat16Buffer != nullptr);
 
-    armnn::Half* pHalf = reinterpret_cast<armnn::Half*>(dstFloat16Buffer);
+    armnn::Half* pHalf = static_cast<armnn::Half*>(dstFloat16Buffer);
 
     for (size_t i = 0; i < numElements; i++)
     {
@@ -35,7 +35,7 @@ void FloatingPointConverter::ConvertFloat16To32(const void* srcFloat16Buffer,
     ARMNN_ASSERT(srcFloat16Buffer != nullptr);
     ARMNN_ASSERT(dstFloat32Buffer != nullptr);
 
-    const armnn::Half* pHalf = reinterpret_cast<const armnn::Half*>(srcFloat16Buffer);
+    const armnn::Half* pHalf = static_cast<const armnn::Half*>(srcFloat16Buffer);
 
     for (size_t i = 0; i < numElements; i++)
     {
@@ -50,7 +50,7 @@ void FloatingPointConverter::ConvertFloat32ToBFloat16(const float* srcFloat32Buf
     ARMNN_ASSERT(srcFloat32Buffer != nullptr);
     ARMNN_ASSERT(dstBFloat16Buffer != nullptr);
 
-    armnn::BFloat16* bf16 = reinterpret_cast<armnn::BFloat16*>(dstBFloat16Buffer);
+    armnn::BFloat16* bf16 = static_cast<armnn::BFloat16*>(dstBFloat16Buffer);
 
     for (size_t i = 0; i < numElements; i++)
     {
@@ -65,7 +65,7 @@ void FloatingPointConverter::ConvertBFloat16ToFloat32(const void* srcBFloat16Buf
     ARMNN_ASSERT(srcBFloat16Buffer != nullptr);
     ARMNN_ASSERT(dstFloat32Buffer != nullptr);
 
-    const armnn::BFloat16* bf16 = reinterpret_cast<const armnn::BFloat16*>(srcBFloat16Buffer);
+    const armnn::BFloat16* bf16 = static_cast<const armnn::BFloat16*>(srcBFloat16Buffer);
 
     for (size_t i = 0; i < numElements; i++)
     {

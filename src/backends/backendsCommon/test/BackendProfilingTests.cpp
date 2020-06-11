@@ -499,9 +499,7 @@ BOOST_AUTO_TEST_CASE(GetProfilingGuidGenerator)
 
     // Get the Guid generator and check the getting two Guid's results in the second being greater than the first.
     armnn::profiling::IProfilingGuidGenerator& guidGenerator = backendProfilingIface->GetProfilingGuidGenerator();
-    BOOST_CHECK(backendProfilingIface);
     const armnn::profiling::ProfilingDynamicGuid& firstGuid = guidGenerator.NextGuid();
-    BOOST_CHECK(firstGuid);
     const armnn::profiling::ProfilingDynamicGuid& secondGuid = guidGenerator.NextGuid();
     BOOST_CHECK(secondGuid > firstGuid);
 

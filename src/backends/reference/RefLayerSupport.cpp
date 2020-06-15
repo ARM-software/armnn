@@ -947,30 +947,11 @@ bool RefLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
                                   "Reference Fully Connected: input and output types mismatched.");
     }
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::array<DataType, 4> supportedWeightTypes =
-    {
-            DataType::QAsymmS8,
-            DataType::QAsymmU8,
-            DataType::QSymmS8,
-            DataType::QuantizedSymm8PerAxis // deprecated
-    };
-    ARMNN_NO_DEPRECATE_WARN_END
+    supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
+                                  "Reference Fully Connected: weights is not a supported type.");
 
-    if (IsQuantized8BitType(input.GetDataType()))
-    {
-
-        supported &= CheckSupportRule(TypeAnyOf(weights, supportedWeightTypes), reasonIfUnsupported,
-                                      "Reference Fully Connected: weights type not supported for quantized input.");
-    }
-    else
-    {
-        supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
-                                      "Reference Fully Connected: weights is not a supported type.");
-
-        supported &= CheckSupportRule(TypesAreEqual(input, weights), reasonIfUnsupported,
-                                      "Reference Fully Connected: input and weights types mismatched.");
-    }
+    supported &= CheckSupportRule(TypesAreEqual(input, weights), reasonIfUnsupported,
+                                  "Reference Fully Connected: input and weights types mismatched.");
 
     if (descriptor.m_BiasEnabled)
     {

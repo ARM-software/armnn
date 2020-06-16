@@ -108,8 +108,8 @@ std::string GetBasePath(const std::string& basePath)
 
     path programLocation = boost::dll::program_location().parent_path();
     path sharedObjectPath = programLocation.append(basePath);
-    BOOST_CHECK(exists(sharedObjectPath));
-
+    BOOST_CHECK_MESSAGE(exists(sharedObjectPath), "Base path for shared objects does not exist: " +
+                                                   sharedObjectPath.string());
     return sharedObjectPath.string();
 }
 
@@ -344,6 +344,11 @@ void CreateValidDynamicBackendObjectTestImpl()
     using namespace armnn;
 
     std::string testSubDirectory = GetTestSubDirectory(g_TestDynamicBackendSubDir);
+
+    // We expect this path to exists so we can load a valid dynamic backend.
+    BOOST_CHECK_MESSAGE(boost::filesystem::exists(testSubDirectory),
+                       "Base path for shared objects does not exist: " + testSubDirectory);
+
     std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestValidTestDynamicBackendFileName);
 
     void* sharedObjectHandle = nullptr;

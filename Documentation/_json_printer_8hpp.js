@@ -1,9 +1,0 @@
-var _json_printer_8hpp =
-[
-    [ "JsonChildObject", "structarmnn_1_1_json_child_object.xhtml", "structarmnn_1_1_json_child_object" ],
-    [ "JsonPrinter", "classarmnn_1_1_json_printer.xhtml", "classarmnn_1_1_json_printer" ],
-    [ "JsonObjectType", "_json_printer_8hpp.xhtml#a4e2dd387ba6f0dc5164b4cdf8de3262a", [
-      [ "Measurement", "_json_printer_8hpp.xhtml#a4e2dd387ba6f0dc5164b4cdf8de3262aa911842b19d8b2f9bbed8cfe909d52975", null ],
-      [ "Event", "_json_printer_8hpp.xhtml#a4e2dd387ba6f0dc5164b4cdf8de3262aaa4ecfc70574394990cf17bd83df499f7", null ]
-    ] ]
-];

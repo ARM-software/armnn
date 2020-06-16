@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_05" # Release 20.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="c26179810823bb36375111f4a5485a6475fc97c5" #COMPMID-3363: Create ScaleKernelInfo.
+DEFAULT_CLFRAMEWORKREVISION="980a9168b81d778f4902973b4920b54c103907e0" #COMPMID-3177: Remove padding from NEBatchNormalizationLayer.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

@@ -59,7 +59,7 @@ public:
     void SendNetworkStructure();
 
 private:
-    void AllocateWorkingMemory();
+    void AllocateWorkingMemory(std::lock_guard<std::mutex>& lock);
 
     LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
                   const INetworkProperties& networkProperties,

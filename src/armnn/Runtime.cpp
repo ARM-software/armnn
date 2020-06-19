@@ -308,6 +308,7 @@ Status Runtime::EnqueueWorkload(NetworkId networkId,
                                 const InputTensors& inputTensors,
                                 const OutputTensors& outputTensors)
 {
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "EnqueueWorkload");
     LoadedNetwork* loadedNetwork = GetLoadedNetworkPtr(networkId);
 
     static thread_local NetworkId lastId = networkId;

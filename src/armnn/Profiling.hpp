@@ -115,7 +115,7 @@ public:
     using InstrumentPtr = std::unique_ptr<Instrument>;
 
     template<typename... Args>
-    ScopedProfilingEvent(const BackendId& backendId, const std::string& name, Args... args)
+    ScopedProfilingEvent(const BackendId& backendId, const std::string& name, Args&&... args)
         : m_Event(nullptr)
         , m_Profiler(ProfilerManager::GetInstance().GetProfiler())
     {
@@ -123,7 +123,7 @@ public:
         {
             std::vector<InstrumentPtr> instruments(0);
             instruments.reserve(sizeof...(args)); //One allocation
-            ConstructNextInVector(instruments, args...);
+            ConstructNextInVector(instruments, std::forward<Args>(args)...);
             m_Event = m_Profiler->BeginEvent(backendId, name, std::move(instruments));
         }
     }
@@ -144,10 +144,10 @@ private:
     }
 
     template<typename Arg, typename... Args>
-    void ConstructNextInVector(std::vector<InstrumentPtr>& instruments, Arg arg, Args... args)
+    void ConstructNextInVector(std::vector<InstrumentPtr>& instruments, Arg&& arg, Args&&... args)
     {
-        instruments.emplace_back(std::make_unique<Arg>(arg));
-        ConstructNextInVector(instruments, args...);
+        instruments.emplace_back(std::make_unique<Arg>(std::forward<Arg>(arg)));
+        ConstructNextInVector(instruments, std::forward<Args>(args)...);
     }
 
     Event* m_Event;       ///< Event to track

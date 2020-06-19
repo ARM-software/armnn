@@ -35,7 +35,8 @@ void RefResizeWorkload::Execute() const
            outputInfo,
            m_Data.m_Parameters.m_DataLayout,
            m_Data.m_Parameters.m_Method,
-           m_Data.m_Parameters.m_AlignCorners);
+           m_Data.m_Parameters.m_AlignCorners,
+           m_Data.m_Parameters.m_HalfPixelCenters);
 }
 
 } //namespace armnn

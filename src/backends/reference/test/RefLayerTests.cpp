@@ -873,6 +873,12 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearMagUint8,
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMagUint16,
                      SimpleResizeBilinearTest<DataType::QSymmS16>,
                      DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeBilinear,
+                     HalfPixelCentersResizeBilinearTest<DataType::Float32>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeBilinear,
+                     AlignCornersResizeBilinearTest<DataType::Float32>,
+                     DataLayout::NCHW)
 
 // Resize Bilinear - NHWC
 ARMNN_AUTO_TEST_CASE(ResizeBilinearNopNhwc,
@@ -1011,6 +1017,12 @@ ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagUint8,
                      DataLayout::NCHW, 0.10f, 50, 0.11f, 20)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagUint16,
                      SimpleResizeNearestNeighborTest<DataType::QSymmS16>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeNearestNeighbour,
+                     HalfPixelCentersResizeNearestNeighbourTest<DataType::Float32>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeNearestNeighbour,
+                     AlignCornersResizeNearestNeighbourTest<DataType::Float32>,
                      DataLayout::NCHW)
 
 // Resize NearestNeighbor - NHWC

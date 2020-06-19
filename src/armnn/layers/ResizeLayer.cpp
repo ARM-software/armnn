@@ -50,6 +50,11 @@ std::vector<TensorShape> ResizeLayer::InferOutputShapes(const std::vector<Tensor
         TensorShape( { outBatch, outHeight, outWidth, outChannels } ) :
         TensorShape( { outBatch, outChannels, outHeight, outWidth });
 
+    if (m_Param.m_HalfPixelCenters && m_Param.m_AlignCorners)
+    {
+        throw LayerValidationException("ResizeLayer: AlignCorners cannot be true when HalfPixelCenters is true");
+    }
+
     return std::vector<TensorShape>({ tensorShape });
 }
 

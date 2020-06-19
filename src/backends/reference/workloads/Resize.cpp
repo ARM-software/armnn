@@ -30,6 +30,36 @@ inline double EuclideanDistance(float Xa, float Ya, const unsigned int Xb, const
     return std::sqrt(pow(Xa - boost::numeric_cast<float>(Xb), 2) + pow(Ya - boost::numeric_cast<float>(Yb), 2));
 }
 
+inline float CalculateResizeScale(const unsigned int& InputSize,
+                                  const unsigned int& OutputSize,
+                                  const bool& AlignCorners)
+{
+    return (AlignCorners && OutputSize > 1)
+            ?  boost::numeric_cast<float>(InputSize - 1) / boost::numeric_cast<float>(OutputSize - 1)
+            :  boost::numeric_cast<float>(InputSize) / boost::numeric_cast<float>(OutputSize);
+}
+
+inline float PixelScaler(const unsigned int& Pixel,
+                         const float& Scale,
+                         const bool& HalfPixelCenters,
+                         armnn::ResizeMethod& resizeMethod)
+{
+    // For Half Pixel Centers the Top Left texel is assumed to be at 0.5,0.5
+    if (HalfPixelCenters && resizeMethod == armnn::ResizeMethod::Bilinear)
+    {
+        return (static_cast<float>(Pixel) + 0.5f) * Scale - 0.5f;
+    }
+    // Nearest Neighbour doesn't need to have 0.5f trimmed off as it will floor the values later
+    else if (HalfPixelCenters && resizeMethod == armnn::ResizeMethod::NearestNeighbor)
+    {
+        return (static_cast<float>(Pixel) + 0.5f) * Scale;
+    }
+    else
+    {
+        return static_cast<float>(Pixel) * Scale;
+    }
+}
+
 }// anonymous namespace
 
 void Resize(Decoder<float>&   in,
@@ -38,8 +68,12 @@ void Resize(Decoder<float>&   in,
             const TensorInfo& outputInfo,
             DataLayoutIndexed dataLayout,
             armnn::ResizeMethod resizeMethod,
-            bool alignCorners)
+            bool alignCorners,
+            bool halfPixelCenters)
 {
+    // alignCorners and halfPixelCenters cannot both be true
+    ARMNN_ASSERT(!(alignCorners && halfPixelCenters));
+
     // We follow the definition of TensorFlow and AndroidNN: the top-left corner of a texel in the output
     // image is projected into the input image to figure out the interpolants and weights. Note that this
     // will yield different results than if projecting the centre of output texels.
@@ -52,14 +86,10 @@ void Resize(Decoder<float>&   in,
     const unsigned int outputHeight = outputInfo.GetShape()[dataLayout.GetHeightIndex()];
     const unsigned int outputWidth = outputInfo.GetShape()[dataLayout.GetWidthIndex()];
 
-    const unsigned int sizeOffset = resizeMethod == armnn::ResizeMethod::Bilinear && alignCorners ? 1 : 0;
-
     // How much to scale pixel coordinates in the output image, to get the corresponding pixel coordinates
     // in the input image.
-    const float scaleY = boost::numeric_cast<float>(inputHeight - sizeOffset)
-                       / boost::numeric_cast<float>(outputHeight - sizeOffset);
-    const float scaleX = boost::numeric_cast<float>(inputWidth - sizeOffset)
-                       / boost::numeric_cast<float>(outputWidth - sizeOffset);
+    const float scaleY = CalculateResizeScale(inputHeight, outputHeight, alignCorners);
+    const float scaleX = CalculateResizeScale(inputWidth, outputWidth, alignCorners);
 
     TensorShape inputShape =  inputInfo.GetShape();
     TensorShape outputShape =  outputInfo.GetShape();
@@ -71,11 +101,13 @@ void Resize(Decoder<float>&   in,
             for (unsigned int y = 0; y < outputHeight; ++y)
             {
                 // Corresponding real-valued height coordinate in input image.
-                const float iy = boost::numeric_cast<float>(y) * scaleY;
+                float iy = PixelScaler(y, scaleY, halfPixelCenters, resizeMethod);
 
                 // Discrete height coordinate of top-left texel (in the 2x2 texel area used for interpolation).
-                const float fiy = floorf(iy);
-                const unsigned int y0 = boost::numeric_cast<unsigned int>(fiy);
+                const float fiy = (resizeMethod == armnn::ResizeMethod::NearestNeighbor && alignCorners) ?
+                                  roundf(iy) : floorf(iy);
+                // Pixel scaling a value with Half Pixel Centers can be negative, if so set to 0
+                const unsigned int y0 = static_cast<unsigned int>(std::max(fiy, 0.0f));
 
                 // Interpolation weight (range [0,1]).
                 const float yw = iy - fiy;
@@ -83,16 +115,31 @@ void Resize(Decoder<float>&   in,
                 for (unsigned int x = 0; x < outputWidth; ++x)
                 {
                     // Real-valued and discrete width coordinates in input image.
-                    const float ix = boost::numeric_cast<float>(x) * scaleX;
-                    const float fix = floorf(ix);
-                    const unsigned int x0 = boost::numeric_cast<unsigned int>(fix);
+                    float ix = PixelScaler(x, scaleX, halfPixelCenters, resizeMethod);
+
+                    // Nearest Neighbour uses rounding to align to corners
+                    const float fix = resizeMethod == armnn::ResizeMethod::NearestNeighbor && alignCorners ?
+                                      roundf(ix) : floorf(ix);
+                    // Pixel scaling a value with Half Pixel Centers can be negative, if so set to 0
+                    const unsigned int x0 = static_cast<unsigned int>(std::max(fix, 0.0f));
 
                     // Interpolation weight (range [0,1]).
                     const float xw = ix - fix;
 
+                    unsigned int x1;
+                    unsigned int y1;
+                    // Half Pixel Centers uses the scaling to compute a weighted parameter for nearby pixels
+                    if (halfPixelCenters)
+                    {
+                        x1 = std::min(static_cast<unsigned int>(std::ceil(ix)), inputWidth - 1u);
+                        y1 = std::min(static_cast<unsigned int>(std::ceil(iy)), inputHeight - 1u);
+                    }
                     // Discrete width/height coordinates of texels below and to the right of (x0, y0).
-                    const unsigned int x1 = std::min(x0 + 1, inputWidth - 1u);
-                    const unsigned int y1 = std::min(y0 + 1, inputHeight - 1u);
+                    else
+                    {
+                        x1 = std::min(x0 + 1, inputWidth - 1u);
+                        y1 = std::min(y0 + 1, inputHeight - 1u);
+                    }
 
                     float interpolatedValue;
                     switch (resizeMethod)

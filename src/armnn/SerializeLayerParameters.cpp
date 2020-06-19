@@ -293,6 +293,8 @@ void StringifyLayerParameters<ResizeBilinearDescriptor>::Serialize(ParameterStri
     fn("TargetWidth", std::to_string(desc.m_TargetWidth));
     fn("TargetHeight", std::to_string(desc.m_TargetHeight));
     fn("DataLayout", GetDataLayoutName(desc.m_DataLayout));
+    fn("AlignCorners", std::to_string(desc.m_AlignCorners));
+    fn("HalfPixelCenters", std::to_string(desc.m_HalfPixelCenters));
 }
 
 void StringifyLayerParameters<ResizeDescriptor>::Serialize(ParameterStringifyFunction& fn,
@@ -302,6 +304,8 @@ void StringifyLayerParameters<ResizeDescriptor>::Serialize(ParameterStringifyFun
     fn("TargetHeight", std::to_string(desc.m_TargetHeight));
     fn("ResizeMethod", GetResizeMethodAsCString(desc.m_Method));
     fn("DataLayout", GetDataLayoutName(desc.m_DataLayout));
+    fn("AlignCorners", std::to_string(desc.m_AlignCorners));
+    fn("HalfPixelCenters", std::to_string(desc.m_HalfPixelCenters));
 }
 
 void StringifyLayerParameters<SpaceToBatchNdDescriptor>::Serialize(ParameterStringifyFunction& fn,

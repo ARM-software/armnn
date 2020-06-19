@@ -29,7 +29,9 @@ struct ResizeTestParams
         , m_InQuantScale(1.0f)
         , m_InQuantOffset(0)
         , m_OutQuantScale(1.0f)
-        , m_OutQuantOffset(0) {}
+        , m_OutQuantOffset(0)
+        , m_AlignCorners(false)
+        , m_HalfPixelCenters(false) {}
 
     armnn::ResizeMethod m_ResizeMethod;
     armnn::DataLayout   m_DataLayout;
@@ -45,6 +47,9 @@ struct ResizeTestParams
 
     float               m_OutQuantScale;
     int32_t             m_OutQuantOffset;
+
+    bool m_AlignCorners;
+    bool m_HalfPixelCenters;
 
     void SetInQuantParams(float quantScale, int32_t quantOffset)
     {
@@ -111,6 +116,8 @@ LayerTestResult<T, NumDims> ResizeTestImpl(
     armnn::ResizeQueueDescriptor descriptor;
     descriptor.m_Parameters.m_Method     = params.m_ResizeMethod;
     descriptor.m_Parameters.m_DataLayout = params.m_DataLayout;
+    descriptor.m_Parameters.m_AlignCorners = params.m_AlignCorners;
+    descriptor.m_Parameters.m_HalfPixelCenters = params.m_HalfPixelCenters;
 
     armnnUtils::DataLayoutIndexed dataLayoutIndexed(params.m_DataLayout);
     descriptor.m_Parameters.m_TargetWidth  = params.m_OutputShape[dataLayoutIndexed.GetWidthIndex()];
@@ -528,6 +535,129 @@ LayerTestResult<T, 4> ResizeNearestNeighborMagTest(
     return ResizeTestImpl<4, ArmnnType>(workloadFactory, memoryManager, testParams);
 }
 
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<T, 4> HalfPixelCentersResizeBilinearTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout dataLayout)
+{
+    ResizeTestParams testParams;
+    testParams.m_ResizeMethod = armnn::ResizeMethod::Bilinear;
+    testParams.m_DataLayout   = dataLayout;
+    testParams.m_HalfPixelCenters = true;
+
+    testParams.m_InputShape  = { 2, 1, 2, 2 };
+    testParams.m_OutputShape = { 2, 1, 3, 3 };
+
+    testParams.m_InputData =
+    {
+          1.0f, 2.0f,
+          3.0f, 4.0f,
+
+          1.0f, 2.0f,
+          3.0f, 4.0f
+    };
+
+    testParams.m_ExpectedOutputData =
+    {
+          1.0f, 1.5f, 2.0f,
+          2.0f, 2.5f, 3.0f,
+          3.0f, 3.5f, 4.0f,
+
+          1.0f, 1.5f, 2.0f,
+          2.0f, 2.5f, 3.0f,
+          3.0f, 3.5f, 4.0f,
+    };
+
+    return ResizeTestImpl<4, ArmnnType>(workloadFactory, memoryManager, testParams);
+}
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<T, 4> AlignCornersResizeBilinearTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout dataLayout)
+{
+    ResizeTestParams testParams;
+    testParams.m_ResizeMethod = armnn::ResizeMethod::Bilinear;
+    testParams.m_DataLayout   = dataLayout;
+    testParams.m_AlignCorners = true;
+
+    testParams.m_InputShape  = { 1, 1, 2, 2 };
+    testParams.m_OutputShape = { 1, 1, 1, 1 };
+
+    testParams.m_InputData =
+    {
+          1.0f, 2.0f,
+          3.0f, 4.0f,
+    };
+
+    testParams.m_ExpectedOutputData =
+    {
+          1.0f
+    };
+
+    return ResizeTestImpl<4, ArmnnType>(workloadFactory, memoryManager, testParams);
+}
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<T, 4> HalfPixelCentersResizeNearestNeighbourTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout dataLayout)
+{
+    ResizeTestParams testParams;
+    testParams.m_ResizeMethod = armnn::ResizeMethod::NearestNeighbor;
+    testParams.m_DataLayout   = dataLayout;
+    testParams.m_HalfPixelCenters = true;
+
+    testParams.m_InputShape  = { 1, 1, 2, 5 };
+    testParams.m_OutputShape = { 1, 1, 2, 2 };
+
+    testParams.m_InputData =
+    {
+          1.0f, 2.0f, 3.0f, 4.0f, 5.0f,
+
+          1.0f, 2.0f, 3.0f, 4.0f, 5.0f
+    };
+
+    testParams.m_ExpectedOutputData =
+    {
+          2.0f, 4.0f,
+          2.0f, 4.0f
+    };
+
+    return ResizeTestImpl<4, ArmnnType>(workloadFactory, memoryManager, testParams);
+}
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<T, 4> AlignCornersResizeNearestNeighbourTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout dataLayout)
+{
+    ResizeTestParams testParams;
+    testParams.m_ResizeMethod = armnn::ResizeMethod::NearestNeighbor;
+    testParams.m_DataLayout   = dataLayout;
+    testParams.m_AlignCorners = true;
+
+    testParams.m_InputShape  = { 1, 1, 2, 2 };
+    testParams.m_OutputShape = { 1, 1, 1, 1 };
+
+    testParams.m_InputData =
+    {
+          1.0f, 2.0f,
+          3.0f, 4.0f,
+    };
+
+    testParams.m_ExpectedOutputData =
+    {
+          1.0f
+    };
+
+    return ResizeTestImpl<4, ArmnnType>(workloadFactory, memoryManager, testParams);
+}
+
 //
 // Explicit template instantiations
 //
@@ -596,6 +726,30 @@ ResizeNearestNeighborMagTest<armnn::DataType::Float32>(
     int32_t inQuantOffset,
     float outQuantScale,
     int32_t outQuantOffset);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
+HalfPixelCentersResizeBilinearTest<armnn::DataType::Float32>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout dataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
+AlignCornersResizeBilinearTest<armnn::DataType::Float32>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout dataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
+HalfPixelCentersResizeNearestNeighbourTest<armnn::DataType::Float32>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout dataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
+AlignCornersResizeNearestNeighbourTest<armnn::DataType::Float32>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout dataLayout);
 
 // Float16
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 4>

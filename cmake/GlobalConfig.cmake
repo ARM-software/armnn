@@ -131,6 +131,10 @@ find_package(Boost 1.59 REQUIRED COMPONENTS unit_test_framework system filesyste
 include_directories(SYSTEM "${Boost_INCLUDE_DIRS}")
 link_directories(${Boost_LIBRARY_DIRS})
 
+# cxxopts (Alternative to boost::program_options)
+find_path(CXXOPTS_INCLUDE cxxopts/cxxopts.hpp PATHS third-party)
+include_directories(SYSTEM "${CXXOPTS_INCLUDE}")
+
 # pthread
 find_package (Threads)
 

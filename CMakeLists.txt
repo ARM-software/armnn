@@ -553,6 +553,7 @@ list(APPEND armnn_sources
     src/profiling/backends/BackendProfiling.cpp
     src/profiling/backends/BackendProfiling.hpp
     third-party/half/half.hpp
+    third-party/cxxopts/cxxopts.hpp
     )
 
 # Files used for Streamline-based profiling backend

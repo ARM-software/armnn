@@ -83,9 +83,18 @@ std::vector<TensorShape> TransposeConvolution2dLayer::InferOutputShapes(
     unsigned int inputElements  = batches * inputShape[dataLayoutIndex.GetChannelsIndex()];
 
     ARMNN_ASSERT_MSG(inputElements != 0, "Invalid number of input elements");
-    ARMNN_ASSERT_MSG(kernelElements % inputElements == 0, "Invalid number of elements");
 
-    unsigned int channels =  kernelElements / inputElements;
+    unsigned int channels;
+    if (kernelElements >= inputElements)
+    {
+        ARMNN_ASSERT_MSG(kernelElements % inputElements == 0 , "Invalid number of elements");
+        channels = kernelElements / inputElements;
+    }
+    else
+    {
+        ARMNN_ASSERT_MSG(inputElements % kernelElements == 0 , "Invalid number of elements");
+        channels = kernelShape[0];
+    }
 
     TensorShape tensorShape = m_Param.m_DataLayout == armnn::DataLayout::NHWC ?
          TensorShape( { batches, hOutput, wOutput, channels } ) :

@@ -149,4 +149,22 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
     return nullptr;
 }
 
+template<>
+inline std::unique_ptr<Decoder<int32_t>> MakeDecoder(const TensorInfo& info, const void* data)
+{
+    switch(info.GetDataType())
+    {
+        case DataType::Signed32:
+        {
+            return std::make_unique<Int32ToInt32tDecoder>(static_cast<const int32_t*>(data));
+        }
+        default:
+        {
+            ARMNN_ASSERT_MSG(false, "Unsupported Data Type!");
+            break;
+        }
+    }
+    return nullptr;
+}
+
 } //namespace armnn

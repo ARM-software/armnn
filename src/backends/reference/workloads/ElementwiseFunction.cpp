@@ -46,6 +46,13 @@ template struct armnn::ElementwiseBinaryFunction<std::divides<float>>;
 template struct armnn::ElementwiseBinaryFunction<armnn::maximum<float>>;
 template struct armnn::ElementwiseBinaryFunction<armnn::minimum<float>>;
 
+template struct armnn::ElementwiseBinaryFunction<std::plus<int32_t>>;
+template struct armnn::ElementwiseBinaryFunction<std::minus<int32_t>>;
+template struct armnn::ElementwiseBinaryFunction<std::multiplies<int32_t>>;
+template struct armnn::ElementwiseBinaryFunction<std::divides<int32_t>>;
+template struct armnn::ElementwiseBinaryFunction<armnn::maximum<int32_t>>;
+template struct armnn::ElementwiseBinaryFunction<armnn::minimum<int32_t>>;
+
 // Comparison
 template struct armnn::ElementwiseBinaryFunction<std::equal_to<float>>;
 template struct armnn::ElementwiseBinaryFunction<std::greater<float>>;

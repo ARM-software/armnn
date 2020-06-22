@@ -114,4 +114,22 @@ inline std::unique_ptr<Encoder<bool>> MakeEncoder(const TensorInfo& info, void* 
     return nullptr;
 }
 
+template<>
+inline std::unique_ptr<Encoder<int32_t>> MakeEncoder(const TensorInfo& info, void* data)
+{
+    switch(info.GetDataType())
+    {
+        case DataType::Signed32:
+        {
+            return std::make_unique<Int32ToInt32tEncoder>(static_cast<int32_t*>(data));
+        }
+        default:
+        {
+            ARMNN_ASSERT_MSG(false, "Unsupported Data Type!");
+            break;
+        }
+    }
+    return nullptr;
+}
+
 } //namespace armnn

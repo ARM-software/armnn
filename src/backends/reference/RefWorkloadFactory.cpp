@@ -141,7 +141,14 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateActivation(const Activation
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
                                                               const WorkloadInfo& info) const
 {
-    return std::make_unique<RefAdditionWorkload>(descriptor, info);
+    if (info.m_InputTensorInfos[0].GetDataType() == armnn::DataType::Signed32)
+    {
+        return std::make_unique<RefAdditionWorkload<int32_t>>(descriptor, info);
+    }
+    else
+    {
+        return std::make_unique<RefAdditionWorkload<float>>(descriptor, info);
+    }
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateArgMinMax(const ArgMinMaxQueueDescriptor& descriptor,
@@ -279,7 +286,14 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDetectionPostProcess(
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDivision(const DivisionQueueDescriptor& descriptor,
                                                               const WorkloadInfo& info) const
 {
-    return std::make_unique<RefDivisionWorkload>(descriptor, info);
+    if (info.m_InputTensorInfos[0].GetDataType() == armnn::DataType::Signed32)
+    {
+        return std::make_unique<RefDivisionWorkload<int32_t>>(descriptor, info);
+    }
+    else
+    {
+        return std::make_unique<RefDivisionWorkload<float>>(descriptor, info);
+    }
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
@@ -387,7 +401,14 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateLstm(const LstmQueueDescrip
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMaximum(const MaximumQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {
-    return std::make_unique<RefMaximumWorkload>(descriptor, info);
+    if (info.m_InputTensorInfos[0].GetDataType() == armnn::DataType::Signed32)
+    {
+        return std::make_unique<RefMaximumWorkload<int32_t>>(descriptor, info);
+    }
+    else
+    {
+        return std::make_unique<RefMaximumWorkload<float>>(descriptor, info);
+    }
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMean(const MeanQueueDescriptor& descriptor,
@@ -425,13 +446,27 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMerger(const MergerQueueDes
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMinimum(const MinimumQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {
-    return std::make_unique<RefMinimumWorkload>(descriptor, info);
+    if (info.m_InputTensorInfos[0].GetDataType() == armnn::DataType::Signed32)
+    {
+        return std::make_unique<RefMinimumWorkload<int32_t>>(descriptor, info);
+    }
+    else
+    {
+        return std::make_unique<RefMinimumWorkload<float>>(descriptor, info);
+    }
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMultiplication(const MultiplicationQueueDescriptor& descriptor,
                                                                     const WorkloadInfo& info) const
 {
-    return std::make_unique<RefMultiplicationWorkload>(descriptor, info);
+    if (info.m_InputTensorInfos[0].GetDataType() == armnn::DataType::Signed32)
+    {
+        return std::make_unique<RefMultiplicationWorkload<int32_t>>(descriptor, info);
+    }
+    else
+    {
+        return std::make_unique<RefMultiplicationWorkload<float>>(descriptor, info);
+    }
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateNormalization(const NormalizationQueueDescriptor& descriptor,
@@ -593,7 +628,14 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateStridedSlice(const StridedS
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSubtraction(const SubtractionQueueDescriptor& descriptor,
                                                                  const WorkloadInfo& info) const
 {
-    return std::make_unique<RefSubtractionWorkload>(descriptor, info);
+    if (info.m_InputTensorInfos[0].GetDataType() == armnn::DataType::Signed32)
+    {
+        return std::make_unique<RefSubtractionWorkload<int32_t>>(descriptor, info);
+    }
+    else
+    {
+        return std::make_unique<RefSubtractionWorkload<float>>(descriptor, info);
+    }
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateTranspose(const TransposeQueueDescriptor& descriptor,

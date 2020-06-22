@@ -274,6 +274,21 @@ public:
     }
 };
 
+class Int32ToInt32tDecoder : public TypedIterator<const int32_t, Decoder<int32_t>>
+{
+public:
+    Int32ToInt32tDecoder(const int32_t* data)
+            : TypedIterator(data){}
+
+    Int32ToInt32tDecoder()
+            : Int32ToInt32tDecoder(nullptr) {}
+
+    int32_t Get() const override
+    {
+        return *m_Iterator;
+    }
+};
+
 class BooleanDecoder : public TypedIterator<const uint8_t, Decoder<float>>
 {
 public:
@@ -467,6 +482,26 @@ public:
     float Get() const override
     {
         return static_cast<float>(*m_Iterator);
+    }
+};
+
+class Int32ToInt32tEncoder : public TypedIterator<int32_t, Encoder<int32_t>>
+{
+public:
+    Int32ToInt32tEncoder(int32_t* data)
+        : TypedIterator(data){}
+
+    Int32ToInt32tEncoder()
+        : Int32ToInt32tEncoder(nullptr) {}
+
+    void Set(int32_t right) override
+    {
+        *m_Iterator = right;
+    }
+
+    int32_t Get() const override
+    {
+        return *m_Iterator;
     }
 };
 

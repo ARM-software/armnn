@@ -67,7 +67,15 @@ template class armnn::RefElementwiseWorkload<std::plus<float>,
                                             armnn::AdditionQueueDescriptor,
                                             armnn::StringMapping::RefAdditionWorkload_Execute>;
 
+template class armnn::RefElementwiseWorkload<std::plus<int32_t>,
+                                            armnn::AdditionQueueDescriptor,
+                                            armnn::StringMapping::RefAdditionWorkload_Execute>;
+
 template class armnn::RefElementwiseWorkload<std::minus<float>,
+                                            armnn::SubtractionQueueDescriptor,
+                                            armnn::StringMapping::RefSubtractionWorkload_Execute>;
+
+template class armnn::RefElementwiseWorkload<std::minus<int32_t>,
                                             armnn::SubtractionQueueDescriptor,
                                             armnn::StringMapping::RefSubtractionWorkload_Execute>;
 
@@ -75,7 +83,15 @@ template class armnn::RefElementwiseWorkload<std::multiplies<float>,
                                             armnn::MultiplicationQueueDescriptor,
                                             armnn::StringMapping::RefMultiplicationWorkload_Execute>;
 
+template class armnn::RefElementwiseWorkload<std::multiplies<int32_t>,
+                                            armnn::MultiplicationQueueDescriptor,
+                                            armnn::StringMapping::RefMultiplicationWorkload_Execute>;
+
 template class armnn::RefElementwiseWorkload<std::divides<float>,
+                                            armnn::DivisionQueueDescriptor,
+                                            armnn::StringMapping::RefDivisionWorkload_Execute>;
+
+template class armnn::RefElementwiseWorkload<std::divides<int32_t>,
                                             armnn::DivisionQueueDescriptor,
                                             armnn::StringMapping::RefDivisionWorkload_Execute>;
 
@@ -83,6 +99,14 @@ template class armnn::RefElementwiseWorkload<armnn::maximum<float>,
                                             armnn::MaximumQueueDescriptor,
                                             armnn::StringMapping::RefMaximumWorkload_Execute>;
 
+template class armnn::RefElementwiseWorkload<armnn::maximum<int32_t>,
+                                            armnn::MaximumQueueDescriptor,
+                                            armnn::StringMapping::RefMaximumWorkload_Execute>;
+
 template class armnn::RefElementwiseWorkload<armnn::minimum<float>,
+                                            armnn::MinimumQueueDescriptor,
+                                            armnn::StringMapping::RefMinimumWorkload_Execute>;
+
+template class armnn::RefElementwiseWorkload<armnn::minimum<int32_t>,
                                             armnn::MinimumQueueDescriptor,
                                             armnn::StringMapping::RefMinimumWorkload_Execute>;

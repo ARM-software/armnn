@@ -35,33 +35,39 @@ private:
     std::unique_ptr<Encoder<OutType>> m_Output;
 };
 
+template <typename DataType = float>
 using RefAdditionWorkload =
-    RefElementwiseWorkload<std::plus<float>,
+    RefElementwiseWorkload<std::plus<DataType>,
                           AdditionQueueDescriptor,
                           StringMapping::RefAdditionWorkload_Execute>;
 
+template <typename DataType = float>
 using RefSubtractionWorkload =
-    RefElementwiseWorkload<std::minus<float>,
+    RefElementwiseWorkload<std::minus<DataType>,
                           SubtractionQueueDescriptor,
                           StringMapping::RefSubtractionWorkload_Execute>;
 
+template <typename DataType = float>
 using RefMultiplicationWorkload =
-    RefElementwiseWorkload<std::multiplies<float>,
+    RefElementwiseWorkload<std::multiplies<DataType>,
                           MultiplicationQueueDescriptor,
                           StringMapping::RefMultiplicationWorkload_Execute>;
 
+template <typename DataType = float>
 using RefDivisionWorkload =
-    RefElementwiseWorkload<std::divides<float>,
+    RefElementwiseWorkload<std::divides<DataType>,
                           DivisionQueueDescriptor,
                           StringMapping::RefDivisionWorkload_Execute>;
 
+template <typename DataType = float>
 using RefMaximumWorkload =
-    RefElementwiseWorkload<armnn::maximum<float>,
+    RefElementwiseWorkload<armnn::maximum<DataType>,
                           MaximumQueueDescriptor,
                           StringMapping::RefMaximumWorkload_Execute>;
 
+template <typename DataType = float>
 using RefMinimumWorkload =
-    RefElementwiseWorkload<armnn::minimum<float>,
+    RefElementwiseWorkload<armnn::minimum<DataType>,
                           MinimumQueueDescriptor,
                           StringMapping::RefMinimumWorkload_Execute>;
 

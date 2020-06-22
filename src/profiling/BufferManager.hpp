@@ -51,7 +51,9 @@ private:
     // Maximum buffer size
     unsigned int m_MaxBufferSize;
     // Number of buffers
-    unsigned int m_NumberOfBuffers;
+    const unsigned int m_NumberOfBuffers;
+    const unsigned int m_MaxNumberOfBuffers;
+    unsigned int m_CurrentNumberOfBuffers;
 
     // List of available packet buffers
     std::vector<IPacketBufferPtr> m_AvailableList;

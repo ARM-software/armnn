@@ -64,9 +64,13 @@ void SendTimelinePacket::ReserveBuffer()
     m_WriteBuffer = m_BufferManager.Reserve(MAX_METADATA_PACKET_LENGTH, reserved);
 
     // Check if there is enough space in the buffer
-    if (m_WriteBuffer == nullptr || reserved < m_Offset)
+    if (m_WriteBuffer == nullptr)
     {
-        throw BufferExhaustion("No space left on buffer", CHECK_LOCATION());
+        throw BufferExhaustion("No free buffers left", CHECK_LOCATION());
+    }
+    if (reserved < m_Offset)
+    {
+        throw BufferExhaustion("Reserved space too small for use", CHECK_LOCATION());
     }
 
     if (m_DirectoryPackage)

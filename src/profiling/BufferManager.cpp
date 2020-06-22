@@ -14,7 +14,9 @@ namespace profiling
 
 BufferManager::BufferManager(unsigned int numberOfBuffers, unsigned int maxPacketSize)
     : m_MaxBufferSize(maxPacketSize),
-      m_NumberOfBuffers(numberOfBuffers)
+      m_NumberOfBuffers(numberOfBuffers),
+      m_MaxNumberOfBuffers(numberOfBuffers * 3),
+      m_CurrentNumberOfBuffers(numberOfBuffers)
 {
     Initialize();
 }
@@ -30,8 +32,21 @@ IPacketBufferPtr BufferManager::Reserve(unsigned int requestedSize, unsigned int
     availableListLock.lock();
     if (m_AvailableList.empty())
     {
-        availableListLock.unlock();
-        return nullptr;
+        if (m_CurrentNumberOfBuffers < m_MaxNumberOfBuffers)
+        {
+            // create a temporary overflow/surge buffer and hand it back
+            m_CurrentNumberOfBuffers++;
+            availableListLock.unlock();
+            IPacketBufferPtr buffer = std::make_unique<PacketBuffer>(m_MaxBufferSize);
+            reservedSize = requestedSize;
+            return buffer;
+        }
+        else
+        {
+            // we have totally busted the limit. call a halt to new memory allocations.
+            availableListLock.unlock();
+            return nullptr;
+        }
     }
     IPacketBufferPtr buffer = std::move(m_AvailableList.back());
     m_AvailableList.pop_back();
@@ -57,6 +72,7 @@ void BufferManager::Commit(IPacketBufferPtr& packetBuffer, unsigned int size, bo
 void BufferManager::Initialize()
 {
     m_AvailableList.reserve(m_NumberOfBuffers);
+    m_CurrentNumberOfBuffers = m_NumberOfBuffers;
     for (unsigned int i = 0; i < m_NumberOfBuffers; ++i)
     {
         IPacketBufferPtr buffer = std::make_unique<PacketBuffer>(m_MaxBufferSize);
@@ -69,7 +85,19 @@ void BufferManager::Release(IPacketBufferPtr& packetBuffer)
     std::unique_lock<std::mutex> availableListLock(m_AvailableMutex, std::defer_lock);
     packetBuffer->Release();
     availableListLock.lock();
-    m_AvailableList.push_back(std::move(packetBuffer));
+    if (m_AvailableList.size() <= m_NumberOfBuffers)
+    {
+        m_AvailableList.push_back(std::move(packetBuffer));
+    }
+    else
+    {
+        // we have been handed a temporary overflow/surge buffer get rid of it
+        packetBuffer->Destroy();
+        if (m_CurrentNumberOfBuffers > m_NumberOfBuffers)
+        {
+            --m_CurrentNumberOfBuffers;
+        }
+    }
     availableListLock.unlock();
 }
 
@@ -103,7 +131,19 @@ void BufferManager::MarkRead(IPacketBufferPtr& packetBuffer)
     std::unique_lock<std::mutex> availableListLock(m_AvailableMutex, std::defer_lock);
     packetBuffer->MarkRead();
     availableListLock.lock();
-    m_AvailableList.push_back(std::move(packetBuffer));
+    if (m_AvailableList.size() <= m_NumberOfBuffers)
+    {
+        m_AvailableList.push_back(std::move(packetBuffer));
+    }
+    else
+    {
+        // we have been handed a temporary overflow/surge buffer get rid of it
+        packetBuffer->Destroy();
+        if (m_CurrentNumberOfBuffers > m_NumberOfBuffers)
+        {
+            --m_CurrentNumberOfBuffers;
+        }
+    }
     availableListLock.unlock();
 }
 

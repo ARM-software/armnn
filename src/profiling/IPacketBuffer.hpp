@@ -35,6 +35,10 @@ public:
     virtual void Release() = 0;
 
     virtual unsigned char* GetWritableData() = 0;
+
+    /// release the memory held and reset internal point to null.
+    /// After this function is invoked the PacketBuffer is unusable.
+    virtual void Destroy() = 0;
 };
 
 using IPacketBufferPtr = std::unique_ptr<IPacketBuffer>;

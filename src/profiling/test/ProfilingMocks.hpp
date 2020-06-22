@@ -193,6 +193,8 @@ public:
 
     unsigned char* GetWritableData() override { return m_Data.get(); }
 
+    void Destroy() override {m_Data.reset(nullptr); m_Size = 0; m_MaxSize =0;}
+
 private:
     unsigned int m_MaxSize;
     unsigned int m_Size;

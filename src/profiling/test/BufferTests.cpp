@@ -146,6 +146,21 @@ BOOST_AUTO_TEST_CASE(BufferExhaustionTest)
     BOOST_TEST(packetBuffer.get());
 
     // Cannot reserve buffer when buffer is not available
+    // NOTE: because the buffer manager now has surge capacity of
+    //       initial size * 3 we should be able to reserve three
+    //       buffers before exhaustion
+    packetBuffer = bufferManager.Reserve(512, reservedSize);
+
+    // Successfully reserved the second buffer with requested size
+    BOOST_TEST(reservedSize == 512);
+    BOOST_TEST(packetBuffer.get());
+
+    packetBuffer = bufferManager.Reserve(512, reservedSize);
+
+    // Successfully reserved the third buffer with requested size
+    BOOST_TEST(reservedSize == 512);
+    BOOST_TEST(packetBuffer.get());
+
     auto reservedBuffer = bufferManager.Reserve(512, reservedSize);
     BOOST_TEST(reservedSize == 0);
     BOOST_TEST(!reservedBuffer.get());
@@ -175,6 +190,19 @@ BOOST_AUTO_TEST_CASE(BufferReserveMultipleTest)
     BOOST_TEST(reservedSize2 == 512);
     BOOST_TEST(packetBuffer2.get());
 
+    // NOTE: the buffer now has a surge capacity of initial size * 3
+    //       so we can grab 9 of them prior to exhaustion now
+    for (unsigned int i = 0; i < 6 ; ++i)
+    {
+        // grab another six buffers to exhaust the surge capacity
+        unsigned int reservedSize = 0;
+        auto packetBuffer = bufferManager.Reserve(512, reservedSize);
+
+        // Successfully reserved the third buffer with requested size
+        BOOST_TEST(reservedSize == 512);
+        BOOST_TEST(packetBuffer.get());
+    }
+
     // Cannot reserve when buffer is not available
     unsigned int reservedSize3 = 0;
     auto reservedBuffer = bufferManager.Reserve(512, reservedSize3);
@@ -198,6 +226,20 @@ BOOST_AUTO_TEST_CASE(BufferReleaseTest)
     // Successfully reserved the buffer with requested size
     BOOST_TEST(reservedSize1 == 128);
     BOOST_TEST(packetBuffer1.get());
+
+    // NOTE: now that we have a surge capacity of up to
+    //       initial size * 3 we need to allocate four more
+    //       buffers to exhaust the manager
+    for (unsigned int i = 0; i < 4 ; ++i)
+    {
+        // grab another six buffers to exhaust the surge capacity
+        unsigned int reservedSize = 0;
+        auto packetBuffer = bufferManager.Reserve(512, reservedSize);
+
+        // Successfully reserved the third buffer with requested size
+        BOOST_TEST(reservedSize == 512);
+        BOOST_TEST(packetBuffer.get());
+    }
 
     // Cannot reserve when buffer is not available
     unsigned int reservedSize2 = 0;
@@ -228,6 +270,20 @@ BOOST_AUTO_TEST_CASE(BufferCommitTest)
 
     BOOST_TEST(reservedSize1 == 128);
     BOOST_TEST(packetBuffer1.get());
+
+    // NOTE: now that we have a surge capacity of up to
+    //       initial size * 3 we need to allocate four more
+    //       buffers to exhaust the manager
+    for (unsigned int i = 0; i < 4 ; ++i)
+    {
+        // grab another six buffers to exhaust the surge capacity
+        unsigned int reservedSize = 0;
+        auto packetBuffer = bufferManager.Reserve(512, reservedSize);
+
+        // Successfully reserved the third buffer with requested size
+        BOOST_TEST(reservedSize == 512);
+        BOOST_TEST(packetBuffer.get());
+    }
 
     unsigned int reservedSize2 = 0;
     auto reservedBuffer = bufferManager.Reserve(512, reservedSize2);
@@ -262,6 +318,20 @@ BOOST_AUTO_TEST_CASE(BufferMarkReadTest)
 
     BOOST_TEST(reservedSize1 == 128);
     BOOST_TEST(packetBuffer1.get());
+
+    // NOTE: now that we have a surge capacity of up to
+    //       initial size * 3 we need to allocate four more
+    //       buffers to exhaust the manager
+    for (unsigned int i = 0; i < 4 ; ++i)
+    {
+        // grab another six buffers to exhaust the surge capacity
+        unsigned int reservedSize = 0;
+        auto packetBuffer = bufferManager.Reserve(512, reservedSize);
+
+        // Successfully reserved the third buffer with requested size
+        BOOST_TEST(reservedSize == 512);
+        BOOST_TEST(packetBuffer.get());
+    }
 
     // Cannot reserve when buffer is not available
     unsigned int reservedSize2 = 0;

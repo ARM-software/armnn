@@ -34,6 +34,8 @@ public:
 
     unsigned char* GetWritableData() override;
 
+    void Destroy() override;
+
 private:
     unsigned int m_MaxSize;
     unsigned int m_Size;

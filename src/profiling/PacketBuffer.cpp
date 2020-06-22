@@ -55,6 +55,13 @@ unsigned char* PacketBuffer::GetWritableData()
     return m_Data.get();
 }
 
+void PacketBuffer::Destroy()
+{
+    m_Data.reset(nullptr);
+    m_Size = 0;
+    m_MaxSize = 0;
+}
+
 } // namespace profiling
 
 } // namespace armnn

@@ -267,6 +267,8 @@ arm_compute::PixelValue GetPixelValue(arm_compute::ITensor& input, float pixelVa
         case arm_compute::DataType::QASYMM8_SIGNED:
         case arm_compute::DataType::QSYMM8_PER_CHANNEL:
             return arm_compute::PixelValue(static_cast<int8_t>(pixelValue));
+        case arm_compute::DataType::S32:
+            return arm_compute::PixelValue(static_cast<int32_t>(pixelValue));
         default:
             throw InvalidArgumentException("Unsupported DataType: [" +
                                            std::to_string(static_cast<int>(input.info()->data_type())) + "]");

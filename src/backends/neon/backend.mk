@@ -40,6 +40,7 @@ BACKEND_SOURCES := \
         workloads/NeonDequantizeWorkload.cpp \
         workloads/NeonDetectionPostProcessWorkload.cpp \
         workloads/NeonExpWorkload.cpp \
+        workloads/NeonFillWorkload.cpp \
         workloads/NeonFloorFloatWorkload.cpp \
         workloads/NeonFullyConnectedWorkload.cpp \
         workloads/NeonGatherWorkload.cpp \

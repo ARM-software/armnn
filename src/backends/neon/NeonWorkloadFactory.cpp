@@ -265,6 +265,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateEqual(const EqualQueueDesc
     return CreateComparison(comparisonDescriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFill(const FillQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonFillWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {

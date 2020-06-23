@@ -867,10 +867,11 @@ bool RefLayerSupport::IsFillSupported(const TensorInfo& input,
 
     bool supported = true;
 
-    std::array<DataType,2> supportedTypes =
+    std::array<DataType,3> supportedTypes =
     {
         DataType::Float32,
-        DataType::Float16
+        DataType::Float16,
+        DataType::Signed32
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,

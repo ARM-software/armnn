@@ -405,6 +405,14 @@ bool NeonLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
     }
 }
 
+bool NeonLayerSupport::IsFillSupported(const TensorInfo&,
+                                       const TensorInfo&,
+                                       const FillDescriptor&,
+                                       Optional<std::string&>) const
+{
+    return true;
+}
+
 bool NeonLayerSupport::IsFloorSupported(const TensorInfo& input,
                                         const TensorInfo& output,
                                         Optional<std::string&> reasonIfUnsupported) const

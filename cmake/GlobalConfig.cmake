@@ -135,6 +135,10 @@ link_directories(${Boost_LIBRARY_DIRS})
 find_path(CXXOPTS_INCLUDE cxxopts/cxxopts.hpp PATHS third-party)
 include_directories(SYSTEM "${CXXOPTS_INCLUDE}")
 
+# ghc (Alternative to boost::filesystem)
+find_path(GHC_INCLUDE ghc/filesystem.hpp PATHS third-party)
+include_directories(SYSTEM "${GHC_INCLUDE}")
+
 # pthread
 find_package (Threads)
 

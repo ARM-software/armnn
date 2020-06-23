@@ -59,6 +59,7 @@ TPIP used by Arm NN:
 | half    | MIT               |
 | stb     | MIT               |
 | cxxopts | MIT               |
+| ghc     | MIT               |
 
 ### Contributions
 

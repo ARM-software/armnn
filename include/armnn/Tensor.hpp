@@ -23,31 +23,130 @@ public:
     /// Empty (invalid) constructor.
     TensorShape();
 
-    TensorShape(unsigned int numDimensions);
+    /// Constructor for TensorShape
+    /// @param numDimensions - Tensor rank.
+    /// @param initDimensionsSpecificity (optional) - value to initialize the specificity of each dimension size.
+    explicit TensorShape(unsigned int numDimensions, bool initDimensionsSpecificity = true);
 
+    /// Constructor for TensorShape
+    /// @param numDimensions - Tensor rank.
+    /// @param dimensionSizes - Size of each of dimension.
     TensorShape(unsigned int numDimensions, const unsigned int* dimensionSizes);
 
+    /// Constructor for TensorShape
+    /// @param dimensionSizeList - Size of each of dimension.
     TensorShape(std::initializer_list<unsigned int> dimensionSizeList);
 
+    /// Copy Constructor for TensorShape
+    /// @param other - TensorShape to copy from.
     TensorShape(const TensorShape& other);
 
+    /// Constructor for TensorShape
+    /// @param numDimensions - Tensor rank.
+    /// @param dimensionSizes - Size of each of dimension.
+    /// @param dimensionsSpecificity - Flags to indicate which dimension has its size specified.
+    TensorShape(unsigned int numDimensions, const unsigned int* dimensionSizes, const bool* dimensionsSpecificity);
+
+    /// Constructor for TensorShape
+    /// @param dimensionSizeList - Size of each of dimension.
+    /// @param dimensionsSpecificityList - Flags to indicate which dimension size is specified.
+    TensorShape(std::initializer_list<unsigned int> dimensionSizeList,
+                std::initializer_list<bool> dimensionsSpecificityList);
+
+    /// Constructor for TensorShape
+    /// @param dimensionality - Parameter to indicate if the Tensor is a Scalar, a Tensor of known dimensionality
+    /// or a Tensor of unknown dimensionality.
+    explicit TensorShape(Dimensionality dimensionality);
+
+    /// Assignation function
+    /// @param other - TensorShape to copy from.
     TensorShape& operator=(const TensorShape& other);
 
+    /// Read only operator
+    /// @param i - Dimension index.
     unsigned int operator[](unsigned int i) const;
 
+    /// Read and write operator
+    /// @param i - Dimension index.
     unsigned int& operator[](unsigned int i);
 
+    /// Equality comparison operator
+    /// @param other - TensorShape to compare with.
     bool operator==(const TensorShape& other) const;
+
+    /// Inequality comparison operator
+    /// @param other - TensorShape to compare with.
     bool operator!=(const TensorShape& other) const;
 
-    unsigned int GetNumDimensions() const { return m_NumDimensions; }
+    /// Function that returns the tensor rank.
+    /// @return - Tensor rank.
+    unsigned int GetNumDimensions() const;
+
+    /// Function that calculates the tensor elements by multiplying all dimension size which are Specified.
+    /// @return - Total number of elements in the tensor.
     unsigned int GetNumElements() const;
 
-private:
-    std::array<unsigned int, MaxNumOfTensorDimensions> m_Dimensions;
-    unsigned int m_NumDimensions;
+    /// Function that returns the tensor type.
+    /// @return - Parameter to indicate if the Tensor is a scalar, a Tensor of known dimensionality or
+    /// a Tensor of unknown dimensionality
+    Dimensionality GetDimensionality() const { return m_Dimensionality; }
 
+    /// Gets information about if the dimension size has been specified or not
+    /// @param i - Dimension index.
+    /// @return - Flag to indicate if the dimension "i" has a specified size.
+    bool GetDimensionSpecificity(unsigned int i) const;
+
+    /// Sets the tensor rank and therefore the Dimensionality is set to Specified if it was not.
+    /// @param numDimensions - Tensor rank.
+    /// @param initDimensionsSpecificity (optional) - value to initialize the specificity of each dimension size.
+    void SetNumDimensions(unsigned int numDimensions, bool initDimensionsSpecificity = false);
+
+    /// Sets the size of the indicated dimension and Specificity for that dimension is set to true.
+    /// @param i - Dimension index.
+    /// @param dimensionSize - size of one dimension.
+    void SetDimensionSize(unsigned int i, unsigned int dimensionSize);
+
+    /// Checks if there is at least one dimension not specified. AND of all array elements.
+    /// @return - True when all dimension sizes are specified. False when at least one dimension size is not specified.
+    bool AreAllDimensionsSpecified() const;
+
+    /// Checks if there is at least one dimension specified. OR of all array elements.
+    /// @return - True at least one dimension sizes is specified. False when all dimension sizes are not specified.
+    bool IsAtLeastOneDimensionSpecified() const;
+
+private:
+    /// Array of the dimension sizes.
+    std::array<unsigned int, MaxNumOfTensorDimensions> m_Dimensions{};
+
+    /// Array of flags to indicate if the size of each of the dimensions is specified or not
+    std::array<bool, MaxNumOfTensorDimensions> m_DimensionsSpecificity = {true};
+
+    /// Tensor rank
+    unsigned int m_NumDimensions{};
+
+    /// Tensor type: Specified, NotSpecified or Scalar.
+    Dimensionality m_Dimensionality = Dimensionality::Specified;
+
+    /// Checks if the dimension index given is within range.
+    /// @param i - Dimension index.
     void CheckDimensionIndex(unsigned int i) const;
+
+    /// Checks if the tensor rank given is within range.
+    /// @param numDimensions - Tensor rank.
+    static void CheckValidNumDimensions(unsigned int numDimensions) ;
+
+    /// Checks if the size of the dimension index given is specified.
+    /// @param i - Dimension index.
+    void CheckDimensionSpecified(unsigned int i) const;
+
+    /// Checks if this is a scalar.
+    void CheckScalar() const;
+
+    /// Checks if the number of dimensions is unknown, i.e. rank is unspecified.
+    void CheckUnspecifiedNumDimensions() const;
+
+    /// Checks if the number of dimensions is known, i.e. rank is specified.
+    void CheckSpecifiedNumDimensions() const;
 };
 
 class TensorInfo

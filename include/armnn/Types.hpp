@@ -106,6 +106,13 @@ enum class ResizeMethod
     NearestNeighbor = 1
 };
 
+enum class Dimensionality
+{
+    NotSpecified = 0,
+    Specified    = 1,
+    Scalar       = 2
+};
+
 ///
 /// The padding method modifies the output of pooling layers.
 /// In both supported methods, the values are ignored (they are

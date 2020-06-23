@@ -4,6 +4,8 @@
 //
 #include <boost/test/unit_test.hpp>
 #include <armnn/Tensor.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
+
 
 namespace armnn
 {
@@ -135,12 +137,16 @@ BOOST_AUTO_TEST_CASE(ModifyTensorInfo)
 
 BOOST_AUTO_TEST_CASE(TensorShapeOperatorBrackets)
 {
+    const TensorShape constShape({0,1,2,3});
     TensorShape shape({0,1,2,3});
+
     // Checks version of operator[] which returns an unsigned int.
     BOOST_TEST(shape[2] == 2);
-    // Checks the version of operator[] which returns a reference.
     shape[2] = 20;
     BOOST_TEST(shape[2] == 20);
+
+    // Checks the version of operator[] which returns a reference.
+    BOOST_TEST(constShape[2] == 2);
 }
 
 BOOST_AUTO_TEST_CASE(TensorInfoPerAxisQuantization)
@@ -177,4 +183,201 @@ BOOST_AUTO_TEST_CASE(TensorInfoPerAxisQuantization)
     BOOST_CHECK(tensorInfo1.GetQuantizationDim().value() == 1);
 }
 
+BOOST_AUTO_TEST_CASE(TensorShape_scalar)
+{
+    float mutableDatum = 3.1416f;
+
+    const armnn::TensorShape shape  (armnn::Dimensionality::Scalar );
+    armnn::TensorInfo        info   ( shape, DataType::Float32 );
+    const armnn::Tensor      tensor ( info, &mutableDatum );
+
+    BOOST_CHECK(armnn::Dimensionality::Scalar == shape.GetDimensionality());
+    float scalarValue = *reinterpret_cast<float*>(tensor.GetMemoryArea());
+    BOOST_CHECK_MESSAGE(mutableDatum == scalarValue, "Scalar value is " << scalarValue);
+
+    armnn::TensorShape shape_equal;
+    armnn::TensorShape shape_different;
+    shape_equal = shape;
+    BOOST_TEST(shape_equal == shape);
+    BOOST_TEST(shape_different != shape);
+    BOOST_CHECK_MESSAGE(1 == shape.GetNumElements(), "Number of elements is " << shape.GetNumElements());
+    BOOST_CHECK_MESSAGE(1 == shape.GetNumDimensions(), "Number of dimensions is " << shape.GetNumDimensions());
+    BOOST_CHECK(true == shape.GetDimensionSpecificity(0));
+    BOOST_CHECK(shape.AreAllDimensionsSpecified());
+    BOOST_CHECK(shape.IsAtLeastOneDimensionSpecified());
+
+    BOOST_TEST(1 == shape[0]);
+    BOOST_TEST(1 == tensor.GetShape()[0]);
+    BOOST_TEST(1 == tensor.GetInfo().GetShape()[0]);
+    BOOST_CHECK_THROW( shape[1], InvalidArgumentException );
+
+    float newMutableDatum  = 42.f;
+    std::memcpy(tensor.GetMemoryArea(), &newMutableDatum, sizeof(float));
+    scalarValue = *reinterpret_cast<float*>(tensor.GetMemoryArea());
+    BOOST_CHECK_MESSAGE(newMutableDatum == scalarValue, "Scalar value is " << scalarValue);
+}
+
+BOOST_AUTO_TEST_CASE(TensorShape_DynamicTensorType1_unknownNumberDimensions)
+{
+    float       mutableDatum  = 3.1416f;
+
+    armnn::TensorShape shape  (armnn::Dimensionality::NotSpecified );
+    armnn::TensorInfo  info   ( shape, DataType::Float32 );
+    armnn::Tensor      tensor ( info, &mutableDatum );
+
+    BOOST_CHECK(armnn::Dimensionality::NotSpecified == shape.GetDimensionality());
+    BOOST_CHECK_THROW( shape[0], InvalidArgumentException );
+    BOOST_CHECK_THROW( shape.GetNumElements(), InvalidArgumentException );
+    BOOST_CHECK_THROW( shape.GetNumDimensions(), InvalidArgumentException );
+
+    armnn::TensorShape shape_equal;
+    armnn::TensorShape shape_different;
+    shape_equal = shape;
+    BOOST_TEST(shape_equal == shape);
+    BOOST_TEST(shape_different != shape);
+}
+
+BOOST_AUTO_TEST_CASE(TensorShape_DynamicTensorType1_unknownAllDimensionsSizes)
+{
+    float       mutableDatum  = 3.1416f;
+
+    armnn::TensorShape shape  ( 3, false );
+    armnn::TensorInfo  info   ( shape, DataType::Float32 );
+    armnn::Tensor      tensor ( info, &mutableDatum );
+
+    BOOST_CHECK(armnn::Dimensionality::Specified == shape.GetDimensionality());
+    BOOST_CHECK_MESSAGE(0 == shape.GetNumElements(), "Number of elements is " << shape.GetNumElements());
+    BOOST_CHECK_MESSAGE(3 == shape.GetNumDimensions(), "Number of dimensions is " << shape.GetNumDimensions());
+    BOOST_CHECK(false == shape.GetDimensionSpecificity(0));
+    BOOST_CHECK(false == shape.GetDimensionSpecificity(1));
+    BOOST_CHECK(false == shape.GetDimensionSpecificity(2));
+    BOOST_CHECK(!shape.AreAllDimensionsSpecified());
+    BOOST_CHECK(!shape.IsAtLeastOneDimensionSpecified());
+
+    armnn::TensorShape shape_equal;
+    armnn::TensorShape shape_different;
+    shape_equal = shape;
+    BOOST_TEST(shape_equal == shape);
+    BOOST_TEST(shape_different != shape);
+}
+
+BOOST_AUTO_TEST_CASE(TensorShape_DynamicTensorType1_unknownSomeDimensionsSizes)
+{
+    std::vector<float> mutableDatum  { 42.f, 42.f, 42.f,
+                                       0.0f, 0.1f, 0.2f };
+
+    armnn::TensorShape shape         ( {2, 0, 3}, {true, false, true} );
+    armnn::TensorInfo  info          ( shape, DataType::Float32 );
+    armnn::Tensor      tensor        ( info, &mutableDatum );
+
+    BOOST_CHECK(armnn::Dimensionality::Specified == shape.GetDimensionality());
+    BOOST_CHECK_MESSAGE(6 == shape.GetNumElements(), "Number of elements is " << shape.GetNumElements());
+    BOOST_CHECK_MESSAGE(3 == shape.GetNumDimensions(), "Number of dimensions is " << shape.GetNumDimensions());
+    BOOST_CHECK(true  == shape.GetDimensionSpecificity(0));
+    BOOST_CHECK(false == shape.GetDimensionSpecificity(1));
+    BOOST_CHECK(true  == shape.GetDimensionSpecificity(2));
+    BOOST_CHECK(!shape.AreAllDimensionsSpecified());
+    BOOST_CHECK(shape.IsAtLeastOneDimensionSpecified());
+
+    BOOST_CHECK_THROW(shape[1], InvalidArgumentException);
+    BOOST_CHECK_THROW(tensor.GetShape()[1], InvalidArgumentException);
+    BOOST_CHECK_THROW(tensor.GetInfo().GetShape()[1], InvalidArgumentException);
+
+    BOOST_TEST(2 == shape[0]);
+    BOOST_TEST(2 == tensor.GetShape()[0]);
+    BOOST_TEST(2 == tensor.GetInfo().GetShape()[0]);
+    BOOST_CHECK_THROW( shape[1], InvalidArgumentException );
+
+    BOOST_TEST(3 == shape[2]);
+    BOOST_TEST(3 == tensor.GetShape()[2]);
+    BOOST_TEST(3 == tensor.GetInfo().GetShape()[2]);
+
+    armnn::TensorShape shape_equal;
+    armnn::TensorShape shape_different;
+    shape_equal = shape;
+    BOOST_TEST(shape_equal == shape);
+    BOOST_TEST(shape_different != shape);
+}
+
+BOOST_AUTO_TEST_CASE(TensorShape_DynamicTensorType1_transitionFromUnknownToKnownDimensionsSizes)
+{
+    std::vector<float> mutableDatum  { 42.f, 42.f, 42.f,
+                                       0.0f, 0.1f, 0.2f };
+
+    armnn::TensorShape shape         (armnn::Dimensionality::NotSpecified );
+    armnn::TensorInfo  info          ( shape, DataType::Float32 );
+    armnn::Tensor      tensor        ( info, &mutableDatum );
+
+    // Specify the number of dimensions
+    shape.SetNumDimensions(3);
+    BOOST_CHECK(armnn::Dimensionality::Specified == shape.GetDimensionality());
+    BOOST_CHECK_MESSAGE(3 == shape.GetNumDimensions(), "Number of dimensions is " << shape.GetNumDimensions());
+    BOOST_CHECK(false == shape.GetDimensionSpecificity(0));
+    BOOST_CHECK(false == shape.GetDimensionSpecificity(1));
+    BOOST_CHECK(false == shape.GetDimensionSpecificity(2));
+    BOOST_CHECK(!shape.AreAllDimensionsSpecified());
+    BOOST_CHECK(!shape.IsAtLeastOneDimensionSpecified());
+
+    // Specify dimension 0 and 2.
+    shape.SetDimensionSize(0, 2);
+    shape.SetDimensionSize(2, 3);
+    BOOST_CHECK_MESSAGE(3 == shape.GetNumDimensions(), "Number of dimensions is " << shape.GetNumDimensions());
+    BOOST_CHECK_MESSAGE(6 == shape.GetNumElements(), "Number of elements is " << shape.GetNumElements());
+    BOOST_CHECK(true  == shape.GetDimensionSpecificity(0));
+    BOOST_CHECK(false == shape.GetDimensionSpecificity(1));
+    BOOST_CHECK(true  == shape.GetDimensionSpecificity(2));
+    BOOST_CHECK(!shape.AreAllDimensionsSpecified());
+    BOOST_CHECK(shape.IsAtLeastOneDimensionSpecified());
+
+    info.SetShape(shape);
+    armnn::Tensor tensor2( info, &mutableDatum );
+    BOOST_TEST(2 == shape[0]);
+    BOOST_TEST(2 == tensor2.GetShape()[0]);
+    BOOST_TEST(2 == tensor2.GetInfo().GetShape()[0]);
+
+    BOOST_CHECK_THROW(shape[1], InvalidArgumentException);
+    BOOST_CHECK_THROW(tensor.GetShape()[1], InvalidArgumentException);
+    BOOST_CHECK_THROW(tensor.GetInfo().GetShape()[1], InvalidArgumentException);
+
+    BOOST_TEST(3 == shape[2]);
+    BOOST_TEST(3 == tensor2.GetShape()[2]);
+    BOOST_TEST(3 == tensor2.GetInfo().GetShape()[2]);
+
+    armnn::TensorShape shape_equal;
+    armnn::TensorShape shape_different;
+    shape_equal = shape;
+    BOOST_TEST(shape_equal == shape);
+    BOOST_TEST(shape_different != shape);
+
+    // Specify dimension 1.
+    shape.SetDimensionSize(1, 5);
+    BOOST_CHECK_MESSAGE(3 == shape.GetNumDimensions(), "Number of dimensions is " << shape.GetNumDimensions());
+    BOOST_CHECK_MESSAGE(30 == shape.GetNumElements(), "Number of elements is " << shape.GetNumElements());
+    BOOST_CHECK(true  == shape.GetDimensionSpecificity(0));
+    BOOST_CHECK(true  == shape.GetDimensionSpecificity(1));
+    BOOST_CHECK(true  == shape.GetDimensionSpecificity(2));
+    BOOST_CHECK(shape.AreAllDimensionsSpecified());
+    BOOST_CHECK(shape.IsAtLeastOneDimensionSpecified());
+}
+
+BOOST_AUTO_TEST_CASE(Tensor_emptyConstructors)
+{
+    auto shape = armnn::TensorShape();
+    BOOST_CHECK_MESSAGE( 0 == shape.GetNumDimensions(), "Number of dimensions is " << shape.GetNumDimensions());
+    BOOST_CHECK_MESSAGE( 0 == shape.GetNumElements(), "Number of elements is " << shape.GetNumElements());
+    BOOST_CHECK( armnn::Dimensionality::Specified == shape.GetDimensionality());
+    BOOST_CHECK( shape.AreAllDimensionsSpecified());
+    BOOST_CHECK_THROW( shape[0], InvalidArgumentException );
+
+    auto tensor = armnn::Tensor();
+    BOOST_CHECK_MESSAGE( 0 == tensor.GetNumDimensions(), "Number of dimensions is " << tensor.GetNumDimensions());
+    BOOST_CHECK_MESSAGE( 0 == tensor.GetNumElements(), "Number of elements is " << tensor.GetNumElements());
+    BOOST_CHECK_MESSAGE( 0 == tensor.GetShape().GetNumDimensions(), "Number of dimensions is " <<
+                        tensor.GetShape().GetNumDimensions());
+    BOOST_CHECK_MESSAGE( 0 == tensor.GetShape().GetNumElements(), "Number of dimensions is " <<
+                        tensor.GetShape().GetNumElements());
+    BOOST_CHECK( armnn::Dimensionality::Specified == tensor.GetShape().GetDimensionality());
+    BOOST_CHECK( tensor.GetShape().AreAllDimensionsSpecified());
+    BOOST_CHECK_THROW( tensor.GetShape()[0], InvalidArgumentException );
+}
 BOOST_AUTO_TEST_SUITE_END()

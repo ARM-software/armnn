@@ -8,6 +8,7 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/Exceptions.hpp>
 #include <armnn/Logging.hpp>
+#include <armnn/Tensor.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
@@ -484,6 +485,41 @@ bool CheckShape(const armnn::TensorShape& actual, const std::vector<int32_t>& ex
     return true;
 }
 
+void CheckMatchingQuantization(const TensorInfo& first,
+                               const TensorInfo& second,
+                               const std::string& descName,
+                               std::string const& firstName,
+                               std::string const& secondName)
+{
+    if (!first.IsQuantized() ||
+        !second.IsQuantized())
+    {
+        // Not a quantized type, ignore the validation
+        return;
+    }
+
+    DataType firstDataType  = first.GetDataType();
+    DataType secondDataType = second.GetDataType();
+
+    if (firstDataType != secondDataType)
+    {
+        throw InvalidArgumentException(descName + ": " + firstName + " and " + secondName +
+                                       " must be of the same quantized type, " +
+                                       firstName + " is " + GetDataTypeName(firstDataType) + ", " +
+                                       secondName + " is " + GetDataTypeName(secondDataType));
+    }
+
+    if (!first.IsTypeSpaceMatch(second))
+    {
+        throw InvalidArgumentException(descName + ": " + firstName + " and " + secondName +
+                                       " must have the same quantization space, " +
+                                       firstName + " has offset " + std::to_string(first.GetQuantizationOffset()) +
+                                       " and scale " + std::to_string(first.GetQuantizationScale()) + ", " +
+                                       secondName + " has offset " + std::to_string(second.GetQuantizationOffset()) +
+                                       " and scale " + std::to_string(second.GetQuantizationScale()));
+    }
+}
+
 } // <anonymous>
 
 TfLiteParser::TfLiteParser(const Optional<ITfLiteParser::TfLiteParserOptions>& options)
@@ -794,6 +830,8 @@ void TfLiteParser::ParseUnsupportedOperator(size_t subgraphIndex, size_t operato
 
     // Add a non-executable StandInLayer as a placeholder for any unsupported operator
     IConnectableLayer* layer = m_Network->AddStandInLayer(descriptor, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+
     for (unsigned int i = 0u; i < numOutputs; ++i)
     {
         layer->GetOutputSlot(i).SetTensorInfo(ToTensorInfo(outputs[i]));
@@ -1038,9 +1076,7 @@ void TfLiteParser::ParseTranspose(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    armnn::IConnectableLayer* layer = nullptr;
     auto layerName = boost::str(boost::format("Transpose:%1%:%2%") % subgraphIndex % operatorIndex);
-
     TransposeDescriptor desc;
 
     if (inputs.size() == 2)
@@ -1055,11 +1091,12 @@ void TfLiteParser::ParseTranspose(size_t subgraphIndex, size_t operatorIndex)
         desc = TransposeDescriptor(permutationVector);
     }
 
-    layer = m_Network->AddTransposeLayer(desc, layerName.c_str());
+    TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
 
+    IConnectableLayer* layer = m_Network->AddTransposeLayer(desc, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
-
-    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -1200,11 +1237,14 @@ void TfLiteParser::ParseBatchToSpaceND(size_t subgraphIndex, size_t operatorInde
     desc.m_Crops = crops;
     desc.m_DataLayout = armnn::DataLayout::NHWC;
 
-    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
-
     auto layerName = boost::str(boost::format("BatchToSpaceND:%1%:%2%") % subgraphIndex % operatorIndex);
-    IConnectableLayer* layer = m_Network->AddBatchToSpaceNdLayer(desc, layerName.c_str());
 
+    TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
+
+    IConnectableLayer* layer = m_Network->AddBatchToSpaceNdLayer(desc, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -1256,13 +1296,17 @@ void TfLiteParser::ParseMaximum(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
-    armnn::TensorInfo input1TensorInfo = ToTensorInfo(inputs[1]);
-
     auto layerName = boost::str(boost::format("Maximum:%1%:%2%") % subgraphIndex % operatorIndex);
-    IConnectableLayer* layer = m_Network->AddMaximumLayer(layerName.c_str());
+
+    TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
+    TensorInfo input1TensorInfo = ToTensorInfo(inputs[1]);
+    CheckMatchingQuantization(inputTensorInfo, input1TensorInfo, layerName, "Input 0", "Input 1");
 
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
+
+    IConnectableLayer* layer = m_Network->AddMaximumLayer(layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -1289,13 +1333,17 @@ void TfLiteParser::ParseMinimum(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
-    armnn::TensorInfo input1TensorInfo = ToTensorInfo(inputs[1]);
-
     auto layerName = boost::str(boost::format("Minimum:%1%:%2%") % subgraphIndex % operatorIndex);
-    IConnectableLayer* layer = m_Network->AddMinimumLayer(layerName.c_str());
+
+    TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
+    TensorInfo input1TensorInfo = ToTensorInfo(inputs[1]);
+    CheckMatchingQuantization(inputTensorInfo, input1TensorInfo, layerName, "Input 0", "Input 1");
 
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
+
+    IConnectableLayer* layer = m_Network->AddMinimumLayer(layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -1366,11 +1414,11 @@ void TfLiteParser::ParsePool(size_t subgraphIndex,
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    IConnectableLayer* layer = m_Network->AddPooling2dLayer(desc, layerName.c_str());
-
-    ARMNN_ASSERT(layer != nullptr);
-
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
+
+    IConnectableLayer* layer = m_Network->AddPooling2dLayer(desc, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // register the input connection slots for the layer, connections are made after all layers have been created
@@ -1411,9 +1459,12 @@ void TfLiteParser::ParseSlice(size_t subgraphIndex, size_t operatorIndex)
     desc = SliceDescriptor(begin, size);
 
     auto layerName = boost::str(boost::format("Slice:%1%:%2%") % subgraphIndex % operatorIndex);
-    IConnectableLayer* const layer = m_Network->AddSliceLayer(desc, layerName.c_str());
 
-    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
+
+    IConnectableLayer* const layer = m_Network->AddSliceLayer(desc, layerName.c_str());
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // register the input connection slots for the layer, connections are made after all layers have been created
@@ -1490,11 +1541,14 @@ void TfLiteParser::ParseSpaceToBatchND(size_t subgraphIndex, size_t operatorInde
     desc.m_PadList = padList;
     desc.m_DataLayout = armnn::DataLayout::NHWC;
 
-    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
-
     auto layerName = boost::str(boost::format("SpaceToBatchND:%1%:%2%") % subgraphIndex % operatorIndex);
-    IConnectableLayer* layer = m_Network->AddSpaceToBatchNdLayer(desc, layerName.c_str());
 
+    TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
+
+    IConnectableLayer* layer = m_Network->AddSpaceToBatchNdLayer(desc, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -1568,17 +1622,19 @@ void TfLiteParser::ParseSqueeze(size_t subgraphIndex, size_t operatorIndex)
 
     const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
     const auto * options = operatorPtr->builtin_options.AsSqueezeOptions();
+    auto layerName = boost::str(boost::format("Squeeze:%1%:%2%") % subgraphIndex % operatorIndex);
 
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     armnn::TensorInfo outputTensorInfo =
         TfLiteParser::OutputShapeOfSqueeze(AsUnsignedVector(options->squeeze_dims),
                                            inputTensorInfo);
+    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
 
     ReshapeDescriptor reshapeDesc;
     reshapeDesc.m_TargetShape = outputTensorInfo.GetShape();
 
-    auto layerName = boost::str(boost::format("Squeeze:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddReshapeLayer(reshapeDesc, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -1633,6 +1689,7 @@ void TfLiteParser::ParseStridedSlice(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = boost::str(boost::format("StridedSlice:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddStridedSliceLayer(desc, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1662,6 +1719,7 @@ void TfLiteParser::ParseSub(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = boost::str(boost::format("Sub:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddSubtractionLayer(layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
 
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1700,6 +1758,7 @@ void TfLiteParser::ParseDiv(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = boost::str(boost::format("Div:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddDivisionLayer(layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
 
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1738,6 +1797,7 @@ void TfLiteParser::ParseAdd(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = boost::str(boost::format("Add:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddAdditionLayer(layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
 
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1776,6 +1836,7 @@ void TfLiteParser::ParseMul(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = boost::str(boost::format("Mul:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddMultiplicationLayer(layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
 
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1822,6 +1883,7 @@ void TfLiteParser::ParseMean(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = boost::str(boost::format("Mean:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddMeanLayer(desc, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
 
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
@@ -1880,9 +1942,13 @@ void TfLiteParser::ParsePad(size_t subgraphIndex, size_t operatorIndex)
     }
 
     auto layerName = boost::str(boost::format("Pad:%1%:%2%") % subgraphIndex % operatorIndex);
-    IConnectableLayer* layer = m_Network->AddPadLayer(desc, layerName.c_str());
 
+    TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
+
+    IConnectableLayer* layer = m_Network->AddPadLayer(desc, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -2056,9 +2122,11 @@ void TfLiteParser::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
 
     const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
     const auto * options = operatorPtr->builtin_options.AsReshapeOptions();
+    auto layerName = boost::str(boost::format("Reshape:%1%:%2%") % subgraphIndex % operatorIndex);
 
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     armnn::TensorInfo actualOutputTensorInfo  = ToTensorInfo(outputs[0]);
+    CheckMatchingQuantization(inputTensorInfo, actualOutputTensorInfo, layerName, "Input 0", "Output 0");
 
     std::vector<int32_t> targetShape;
     if (inputs.size() > 1 && inputs[1] != nullptr)
@@ -2124,8 +2192,8 @@ void TfLiteParser::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
     ReshapeDescriptor reshapeDesc;
     reshapeDesc.m_TargetShape = reshapeOutputTensorInfo.GetShape();
 
-    auto layerName = boost::str(boost::format("Reshape:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddReshapeLayer(reshapeDesc, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
     layer->GetOutputSlot(0).SetTensorInfo(reshapeOutputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -2196,9 +2264,12 @@ void TfLiteParser::ParseResize(size_t subgraphIndex, size_t operatorIndex, Resiz
         }
     }
 
-    IConnectableLayer* layer = m_Network->AddResizeLayer(desc, layerName.c_str());
-
+    TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
+
+    IConnectableLayer* layer = m_Network->AddResizeLayer(desc, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -2242,15 +2313,16 @@ void TfLiteParser::ParseConcatenation(size_t subgraphIndex, size_t operatorIndex
     }
 
     auto layerName = boost::str(boost::format("Concatenation:%1%:%2%") % subgraphIndex % operatorIndex);
+
+    TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
+
     IConnectableLayer* layer = m_Network->AddConcatLayer(concatDescriptor, layerName.c_str());
-
     ARMNN_ASSERT(layer != nullptr);
-
-    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
-    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes});
 
     // add fused activation layer
@@ -2566,6 +2638,7 @@ void TfLiteParser::ParseUnpack(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = boost::str(boost::format("Unpack:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddSplitterLayer(splitDesc, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
 
     TensorShape splitOutShape = TensorShape(static_cast<unsigned int>(unpackDimSizes.size()),
                                             unpackDimSizes.data());
@@ -2666,6 +2739,7 @@ void TfLiteParser::ParseSplit(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = boost::str(boost::format("Split:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddSplitterLayer(splitDesc, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[1]});
@@ -2813,6 +2887,7 @@ void TfLiteParser::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = boost::str(boost::format("SplitV:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddSplitterLayer(splitDesc, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});

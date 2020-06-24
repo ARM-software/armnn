@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <ghc/filesystem.hpp>
+namespace fs = ghc::filesystem;
+
 namespace armnnUtils
 {
 namespace Filesystem

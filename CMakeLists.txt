@@ -552,8 +552,9 @@ list(APPEND armnn_sources
     src/profiling/TimelineUtilityMethods.hpp
     src/profiling/backends/BackendProfiling.cpp
     src/profiling/backends/BackendProfiling.hpp
-    third-party/half/half.hpp
     third-party/cxxopts/cxxopts.hpp
+    third-party/ghc/filesystem.hpp
+    third-party/half/half.hpp
     )
 
 # Files used for Streamline-based profiling backend

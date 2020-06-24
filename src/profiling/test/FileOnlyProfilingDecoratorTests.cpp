@@ -59,9 +59,9 @@ BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
     }
 
     // Create a temporary file name.
-    boost::filesystem::path tempPath = boost::filesystem::temp_directory_path();
-    boost::filesystem::path tempFile = UniqueFileName();
-    tempPath                         = tempPath / tempFile;
+    fs::path tempPath = fs::temp_directory_path();
+    fs::path tempFile = UniqueFileName();
+    tempPath          = tempPath / tempFile;
     armnn::Runtime::CreationOptions creationOptions;
     creationOptions.m_ProfilingOptions.m_EnableProfiling     = true;
     creationOptions.m_ProfilingOptions.m_FileOnly            = true;
@@ -170,67 +170,94 @@ BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
     BOOST_TEST(CompareOutput(desc, expectedOutput));
 }
 
-BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd, * boost::unit_test::disabled())
+BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
 {
-    // Create a temporary file name.
-    boost::filesystem::path tempPath = boost::filesystem::temp_directory_path();
-    boost::filesystem::path tempFile = UniqueFileName();
-    tempPath                         = tempPath / tempFile;
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling     = true;
-    options.m_FileOnly            = true;
-    options.m_IncomingCaptureFile = "";
-    options.m_OutgoingCaptureFile = tempPath.string();
-    options.m_CapturePeriod       = 100;
-
-    FileOnlyHelperService helper;
-
-    // Enable the profiling service
-    armnn::profiling::ProfilingService profilingService;
-    profilingService.ResetExternalProfilingOptions(options, true);
-    // Bring the profiling service to the "WaitingForAck" state
-    profilingService.Update();
-    profilingService.Update();
-
-
-    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
-
-    profilingService.Update();
-    // First packet sent will be the SendStreamMetaDataPacket, it's possible though unlikely that it will be sent twice
-    // The second or possibly third packet will be the CounterDirectoryPacket which means the
-    // ConnectionAcknowledgedCommandHandler has set the state to active
-    uint32_t packetCount = 0;
-    while(profilingService.GetCurrentState() != ProfilingState::Active && packetCount < 3)
+    // This test requires at least one backend registry to be enabled
+    // which can execute a NormalizationLayer
+    if (!HasSuitableBackendRegistered())
     {
-        if(!helper.WaitForPacketsSent())
-        {
-            BOOST_FAIL("Timeout waiting for packets");
-        }
-        packetCount++;
+        return;
     }
 
-    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
-    // Minimum test here is to check that the file was created.
-    BOOST_CHECK(boost::filesystem::exists(tempPath.c_str()) == true);
+    // Create a temporary file name.
+    fs::path tempPath = fs::temp_directory_path();
+    fs::path tempFile = UniqueFileName();
+    tempPath          = tempPath / tempFile;
+    armnn::Runtime::CreationOptions options;
+    options.m_ProfilingOptions.m_EnableProfiling     = true;
+    options.m_ProfilingOptions.m_FileOnly            = true;
+    options.m_ProfilingOptions.m_IncomingCaptureFile = "";
+    options.m_ProfilingOptions.m_OutgoingCaptureFile = tempPath.string();
+    options.m_ProfilingOptions.m_CapturePeriod       = 100;
+    options.m_ProfilingOptions.m_TimelineEnabled     = true;
 
-    // Increment a counter.
-    BOOST_CHECK(profilingService.IsCounterRegistered(0) == true);
-    profilingService.IncrementCounterValue(0);
-    BOOST_CHECK(profilingService.GetAbsoluteCounterValue(0) > 0);
-    BOOST_CHECK(profilingService.GetDeltaCounterValue(0) > 0);
+    ILocalPacketHandlerSharedPtr localPacketHandlerPtr = std::make_shared<TestTimelinePacketHandler>();
+    options.m_ProfilingOptions.m_LocalPacketHandlers.push_back(localPacketHandlerPtr);
 
-    // At this point the profiling service is active and we've activated all the counters. Waiting a collection
-    // period should be enough to have some data in the file.
+    // Make sure the file does not exist at this point
+    BOOST_CHECK(armnnUtils::Filesystem::GetFileSize(tempPath.string().c_str()) == -1);
 
-    // Wait for 1 collection period plus a bit of overhead..
-    helper.WaitForPacketsSent();
+    armnn::Runtime runtime(options);
+    // ensure the GUID generator is reset to zero
+    GetProfilingService(&runtime).ResetGuidGenerator();
+
+    // Load a simple network
+    // build up the structure of the network
+    INetworkPtr net(INetwork::Create());
+
+    IConnectableLayer* input = net->AddInputLayer(0, "input");
+
+    ElementwiseUnaryDescriptor descriptor(UnaryOperation::Sqrt);
+    IConnectableLayer* normalize = net->AddElementwiseUnaryLayer(descriptor, "normalization");
+
+    IConnectableLayer* output = net->AddOutputLayer(0, "output");
+
+    input->GetOutputSlot(0).Connect(normalize->GetInputSlot(0));
+    normalize->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
+    normalize->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
+
+    // optimize the network
+    std::vector<armnn::BackendId> backends =
+            { armnn::Compute::CpuRef, armnn::Compute::CpuAcc, armnn::Compute::GpuAcc };
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime.GetDeviceSpec());
+
+    // Load it into the runtime. It should succeed.
+    armnn::NetworkId netId;
+    BOOST_TEST(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
+
+    // Creates structures for input & output.
+    std::vector<float> inputData(16);
+    std::vector<float> outputData(16);
+    for (unsigned int i = 0; i < 16; ++i)
+    {
+        inputData[i] = 9.0;
+        outputData[i] = 3.0;
+    }
+
+    InputTensors  inputTensors
+    {
+        {0, ConstTensor(runtime.GetInputTensorInfo(netId, 0), inputData.data())}
+    };
+    OutputTensors outputTensors
+    {
+        {0, Tensor(runtime.GetOutputTensorInfo(netId, 0), outputData.data())}
+    };
+
+    // Does the inference.
+    runtime.EnqueueWorkload(netId, inputTensors, outputTensors);
+
+    static_cast<TestTimelinePacketHandler*>(localPacketHandlerPtr.get())->WaitOnInferenceCompletion(3000);
 
     // In order to flush the files we need to gracefully close the profiling service.
-    options.m_EnableProfiling = false;
-    profilingService.ResetExternalProfilingOptions(options, true);
+    options.m_ProfilingOptions.m_EnableProfiling = false;
+    GetProfilingService(&runtime).ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
 
     // The output file size should be greater than 0.
     BOOST_CHECK(armnnUtils::Filesystem::GetFileSize(tempPath.string().c_str()) > 0);
+
+    // NOTE: would be an interesting exercise to take this file and decode it
 
     // Delete the tmp file.
     BOOST_CHECK(armnnUtils::Filesystem::Remove(tempPath.string().c_str()));

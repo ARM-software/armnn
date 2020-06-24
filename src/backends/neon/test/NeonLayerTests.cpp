@@ -1224,6 +1224,7 @@ ARMNN_AUTO_TEST_CASE(ExpNegative, ExpNegativeTest<DataType::Float32>)
 // Fill
 ARMNN_AUTO_TEST_CASE(SimpleFill, SimpleFillTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(SimpleFillF16, SimpleFillTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE(SimpleFillS32, SimpleFillTest<DataType::Signed32>)
 
 #if defined(ARMNNREF_ENABLED)
 

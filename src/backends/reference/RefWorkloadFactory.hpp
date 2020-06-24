@@ -130,7 +130,7 @@ public:
                                                       const WorkloadInfo& info) const override;
 
     std::unique_ptr<IWorkload> CreateFill(const FillQueueDescriptor& descriptor,
-                                                      const WorkloadInfo& info) const override;
+                                          const WorkloadInfo& info) const override;
 
     std::unique_ptr<IWorkload> CreateFloor(const FloorQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override;

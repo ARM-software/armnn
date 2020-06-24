@@ -18,6 +18,7 @@
 #include "ClDequantizeWorkload.hpp"
 #include "ClDivisionFloatWorkload.hpp"
 #include "ClExpWorkload.hpp"
+#include "ClFillWorkload.hpp"
 #include "ClFloorFloatWorkload.hpp"
 #include "ClFullyConnectedWorkload.hpp"
 #include "ClGatherWorkload.hpp"

@@ -32,6 +32,7 @@
 #include "workloads/ClDequantizeWorkload.hpp"
 #include "workloads/ClDivisionFloatWorkload.hpp"
 #include "workloads/ClExpWorkload.hpp"
+#include "workloads/ClFillWorkload.hpp"
 #include "workloads/ClFloorFloatWorkload.hpp"
 #include "workloads/ClFullyConnectedWorkload.hpp"
 #include "workloads/ClGatherWorkload.hpp"
@@ -426,6 +427,14 @@ bool ClLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
         default:
             return false;
     }
+}
+
+bool ClLayerSupport::IsFillSupported(const TensorInfo&,
+                                     const TensorInfo&,
+                                     const FillDescriptor&,
+                                     Optional<std::string&>) const
+{
+    return true;
 }
 
 bool ClLayerSupport::IsFloorSupported(const TensorInfo& input,

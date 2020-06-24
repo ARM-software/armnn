@@ -39,6 +39,7 @@ BACKEND_SOURCES := \
         workloads/ClDequantizeWorkload.cpp \
         workloads/ClDivisionFloatWorkload.cpp \
         workloads/ClExpWorkload.cpp \
+        workloads/ClFillWorkload.cpp \
         workloads/ClFloorFloatWorkload.cpp \
         workloads/ClFullyConnectedWorkload.cpp \
         workloads/ClGatherWorkload.cpp \

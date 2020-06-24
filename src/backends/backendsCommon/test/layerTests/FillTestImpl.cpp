@@ -68,3 +68,8 @@ template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 4>
 SimpleFillTest<armnn::DataType::Float16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Signed32>, 4>
+SimpleFillTest<armnn::DataType::Signed32>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

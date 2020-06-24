@@ -287,6 +287,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateEqual(const EqualQueueDescri
     return CreateComparison(comparisonDescriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFill(const FillQueueDescriptor& descriptor,
+                                                         const WorkloadInfo& info) const
+{
+    return std::make_unique<ClFillWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {

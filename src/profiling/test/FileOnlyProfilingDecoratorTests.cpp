@@ -80,8 +80,8 @@ BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
 
     IConnectableLayer* input = net->AddInputLayer(0, "input");
 
-    NormalizationDescriptor descriptor;
-    IConnectableLayer* normalize = net->AddNormalizationLayer(descriptor, "normalization");
+    ElementwiseUnaryDescriptor descriptor(UnaryOperation::Sqrt);
+    IConnectableLayer* normalize = net->AddElementwiseUnaryLayer(descriptor, "normalization");
 
     IConnectableLayer* output = net->AddOutputLayer(0, "output");
 
@@ -103,6 +103,11 @@ BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
     // Creates structures for input & output.
     std::vector<float> inputData(16);
     std::vector<float> outputData(16);
+    for (unsigned int i = 0; i < 16; ++i)
+    {
+        inputData[i] = 9.0;
+        outputData[i] = 3.0;
+    }
 
     InputTensors  inputTensors
     {

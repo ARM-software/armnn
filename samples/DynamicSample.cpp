@@ -9,8 +9,8 @@
 
 #include <iostream>
 
-/// A simple example of using the ArmNN SDK API. In this sample, the users single input number is multiplied by 1.0f
-/// using a fully connected layer with a single neuron to produce an output number that is the same as the input.
+/// A simple example of using the ArmNN SDK API with the standalone sample dynamic backend.
+/// In this example, an addition layer is used to add 2 input tensors to produce a result output tensor.
 int main()
 {
     using namespace armnn;

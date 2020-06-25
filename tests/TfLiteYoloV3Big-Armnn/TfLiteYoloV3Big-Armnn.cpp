@@ -2,8 +2,7 @@
 // Copyright © 2020 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-//#include "../InferenceTest.hpp"
-//#include "../ImagePreprocessor.hpp"
+
 #include "armnnTfLiteParser/ITfLiteParser.hpp"
 
 #include "NMS.hpp"
@@ -15,9 +14,13 @@
 #include <armnn/Logging.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
+#include <cxxopts/cxxopts.hpp>
+#include <ghc/filesystem.hpp>
+
 #include <chrono>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <stdlib.h>
 
 using namespace armnnTfLiteParser;
 using namespace armnn;
@@ -175,23 +178,143 @@ std::vector<float> LoadImage(const char* filename)
     return image;
 }
 
+
+bool ValidateFilePath(std::string& file)
+{
+    if (!ghc::filesystem::exists(file))
+    {
+        std::cerr << "Given file path " << file << " does not exist" << std::endl;
+        return false;
+    }
+    if (!ghc::filesystem::is_regular_file(file))
+    {
+        std::cerr << "Given file path " << file << " is not a regular file" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+
+struct ParseArgs
+{
+    ParseArgs(int ac, char *av[]) : options{"TfLiteYoloV3Big-Armnn",
+                                            "Executes YoloV3Big using ArmNN. YoloV3Big consists "
+                                            "of 3 parts: A backbone TfLite model, a detector TfLite "
+                                            "model, and None Maximum Suppression. All parts are "
+                                            "executed successively."}
+    {
+        options.add_options()
+                ("b,backbone-path",
+                 "File path where the TfLite model for the yoloV3big backbone "
+                 "can be found e.g. mydir/yoloV3big_backbone.tflite",
+                 cxxopts::value<std::string>())
+
+                ("d,detector-path",
+                 "File path where the TfLite model for the yoloV3big "
+                 "detector can be found e.g.'mydir/yoloV3big_detector.tflite'",
+                 cxxopts::value<std::string>())
+
+                ("h,help", "Produce help message")
+
+                ("i,image-path",
+                 "File path to a 1080x1920 jpg image that should be "
+                 "processed e.g. 'mydir/example_img_180_1920.jpg'",
+                 cxxopts::value<std::string>())
+
+                ("B,preferred-backends-backbone",
+                 "Defines the preferred backends to run the backbone model "
+                 "of yoloV3big e.g. 'GpuAcc,CpuRef' -> GpuAcc will be tried "
+                 "first before falling back to CpuRef. NOTE: Backends are passed "
+                 "as comma separated list without whitespaces.",
+                 cxxopts::value<std::vector<std::string>>()->default_value("GpuAcc,CpuRef"))
+
+                ("D,preferred-backends-detector",
+                 "Defines the preferred backends to run the detector model "
+                 "of yoloV3big e.g. 'CpuAcc,CpuRef' -> CpuAcc will be tried "
+                 "first before falling back to CpuRef. NOTE: Backends are passed "
+                 "as comma separated list without whitespaces.",
+                 cxxopts::value<std::vector<std::string>>()->default_value("CpuAcc,CpuRef"));
+
+        auto result = options.parse(ac, av);
+
+        if (result.count("help"))
+        {
+            std::cout << options.help() << "\n";
+            exit(EXIT_SUCCESS);
+        }
+
+        backboneDir = GetPathArgument(result, "backbone-path");
+        detectorDir = GetPathArgument(result, "detector-path");
+        imageDir    = GetPathArgument(result, "image-path");
+
+        prefBackendsBackbone = GetBackendIDs(result["preferred-backends-backbone"].as<std::vector<std::string>>());
+        LogBackendsInfo(prefBackendsBackbone, "Backbone");
+        prefBackendsDetector = GetBackendIDs(result["preferred-backends-detector"].as<std::vector<std::string>>());
+        LogBackendsInfo(prefBackendsDetector, "detector");
+    }
+
+    /// Takes a vector of backend strings and returns a vector of backendIDs
+    std::vector<BackendId> GetBackendIDs(const std::vector<std::string>& backendStrings)
+    {
+        std::vector<BackendId> backendIDs;
+        for (const auto& b : backendStrings)
+        {
+            backendIDs.push_back(BackendId(b));
+        }
+        return backendIDs;
+    }
+
+    /// Verifies if the program argument with the name argName contains a valid file path.
+    /// Returns the valid file path string if given argument is associated a valid file path.
+    /// Otherwise throws an exception.
+    std::string GetPathArgument(cxxopts::ParseResult& result, std::string&& argName)
+    {
+        if (result.count(argName))
+        {
+            std::string fileDir = result[argName].as<std::string>();
+            if (!ValidateFilePath(fileDir))
+            {
+                throw cxxopts::option_syntax_exception("Argument given to backbone-path is not a valid file path");
+            }
+            return fileDir;
+        }
+        else
+        {
+            throw cxxopts::missing_argument_exception(argName);
+        }
+    }
+
+    /// Log info about assigned backends
+    void LogBackendsInfo(std::vector<BackendId>& backends, std::string&& modelName)
+    {
+        std::string info;
+        info = "Preferred backends for " + modelName + " set to [ ";
+        for (auto const &backend : backends)
+        {
+            info = info + std::string(backend) + " ";
+        }
+        ARMNN_LOG(info) << info << "]";
+    }
+
+    // Member variables
+    std::string backboneDir;
+    std::string detectorDir;
+    std::string imageDir;
+
+    std::vector<BackendId> prefBackendsBackbone;
+    std::vector<BackendId> prefBackendsDetector;
+
+    cxxopts::Options options;
+};
+
 int main(int argc, char* argv[])
 {
-    if (argc != 3)
-    {
-        ARMNN_LOG(error) << "Expected arguments: {PathToModels} {PathToData}";
-    }
-    std::string modelsPath(argv[1]);
-    std::string imagePath(argv[2]);
-
-    std::string backboneModelFile = modelsPath + "yolov3_1080_1920_backbone_int8.tflite";
-    std::string detectorModelFile = modelsPath + "yolov3_1080_1920_detector_fp32.tflite";
-    std::string imageFile = imagePath + "1080_1920.jpg";
-
-    // Configure the logging
+    // Configure logging
     SetAllLoggingSinks(true, true, true);
     SetLogFilter(LogSeverity::Trace);
 
+    // Check and get given program arguments
+    ParseArgs progArgs = ParseArgs(argc, argv);
 
     // Create runtime
     IRuntime::CreationOptions runtimeOptions; // default
@@ -209,7 +332,7 @@ int main(int argc, char* argv[])
     // Load backbone model
     ARMNN_LOG(info) << "Loading backbone...";
     NetworkId backboneId;
-    CHECK_OK(LoadModel(backboneModelFile.c_str(), *parser, *runtime, backboneId, {"GpuAcc", "CpuRef"}));
+    CHECK_OK(LoadModel(progArgs.backboneDir.c_str(), *parser, *runtime, backboneId, progArgs.prefBackendsBackbone));
     auto inputId = parser->GetNetworkInputBindingInfo(0, "inputs");
     auto bbOut0Id = parser->GetNetworkOutputBindingInfo(0, "input_to_detector_1");
     auto bbOut1Id = parser->GetNetworkOutputBindingInfo(0, "input_to_detector_2");
@@ -220,7 +343,7 @@ int main(int argc, char* argv[])
     // Load detector model
     ARMNN_LOG(info) << "Loading detector...";
     NetworkId detectorId;
-    CHECK_OK(LoadModel(detectorModelFile.c_str(), *parser, *runtime, detectorId, {"CpuAcc", "CpuRef"}));
+    CHECK_OK(LoadModel(progArgs.detectorDir.c_str(), *parser, *runtime, detectorId, progArgs.prefBackendsDetector));
     auto detectIn0Id = parser->GetNetworkInputBindingInfo(0, "input_to_detector_1");
     auto detectIn1Id = parser->GetNetworkInputBindingInfo(0, "input_to_detector_2");
     auto detectIn2Id = parser->GetNetworkInputBindingInfo(0, "input_to_detector_3");
@@ -229,12 +352,11 @@ int main(int argc, char* argv[])
 
     // Load input from file
     ARMNN_LOG(info) << "Loading test image...";
-    auto image = LoadImage(imageFile.c_str());
+    auto image = LoadImage(progArgs.imageDir.c_str());
     if (image.empty())
     {
         return LOAD_IMAGE_ERROR;
     }
-
 
     // Allocate the intermediate tensors
     std::vector<float> intermediateMem0(bbOut0Id.second.GetNumElements());

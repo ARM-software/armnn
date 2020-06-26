@@ -149,6 +149,11 @@ public:
     using Exception::Exception;
 };
 
+class NullPointerException : public Exception
+{
+public:
+    using Exception::Exception;
+};
 
 template <typename ExceptionType>
 void ConditionalThrow(bool condition, const std::string& message)

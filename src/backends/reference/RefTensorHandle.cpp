@@ -13,19 +13,20 @@ RefTensorHandle::RefTensorHandle(const TensorInfo &tensorInfo, std::shared_ptr<R
     m_Pool(nullptr),
     m_UnmanagedMemory(nullptr),
     m_ImportFlags(static_cast<MemorySourceFlags>(MemorySource::Undefined)),
-    m_Imported(false)
+    m_Imported(false),
+    m_IsImportEnabled(false)
 {
 
 }
 
-RefTensorHandle::RefTensorHandle(const TensorInfo& tensorInfo, std::shared_ptr<RefMemoryManager> &memoryManager,
+RefTensorHandle::RefTensorHandle(const TensorInfo& tensorInfo,
                                  MemorySourceFlags importFlags)
                                  : m_TensorInfo(tensorInfo),
-                                   m_MemoryManager(memoryManager),
                                    m_Pool(nullptr),
                                    m_UnmanagedMemory(nullptr),
                                    m_ImportFlags(importFlags),
-                                   m_Imported(false)
+                                   m_Imported(false),
+                                   m_IsImportEnabled(true)
 {
 
 }
@@ -44,30 +45,38 @@ RefTensorHandle::~RefTensorHandle()
 
 void RefTensorHandle::Manage()
 {
-    ARMNN_ASSERT_MSG(!m_Pool, "RefTensorHandle::Manage() called twice");
-    ARMNN_ASSERT_MSG(!m_UnmanagedMemory, "RefTensorHandle::Manage() called after Allocate()");
+    if (!m_IsImportEnabled)
+    {
+        ARMNN_ASSERT_MSG(!m_Pool, "RefTensorHandle::Manage() called twice");
+        ARMNN_ASSERT_MSG(!m_UnmanagedMemory, "RefTensorHandle::Manage() called after Allocate()");
 
-    m_Pool = m_MemoryManager->Manage(m_TensorInfo.GetNumBytes());
+        m_Pool = m_MemoryManager->Manage(m_TensorInfo.GetNumBytes());
+    }
 }
 
 void RefTensorHandle::Allocate()
 {
-    if (!m_UnmanagedMemory)
+    // If import is enabled, do not allocate the tensor
+    if (!m_IsImportEnabled)
     {
-        if (!m_Pool)
+
+        if (!m_UnmanagedMemory)
         {
-            // unmanaged
-            m_UnmanagedMemory = ::operator new(m_TensorInfo.GetNumBytes());
+            if (!m_Pool)
+            {
+                // unmanaged
+                m_UnmanagedMemory = ::operator new(m_TensorInfo.GetNumBytes());
+            }
+            else
+            {
+                m_MemoryManager->Allocate(m_Pool);
+            }
         }
         else
         {
-            m_MemoryManager->Allocate(m_Pool);
+            throw InvalidArgumentException("RefTensorHandle::Allocate Trying to allocate a RefTensorHandle"
+                                           "that already has allocated memory.");
         }
-    }
-    else
-    {
-        throw InvalidArgumentException("RefTensorHandle::Allocate Trying to allocate a RefTensorHandle"
-                                       "that already has allocated memory.");
     }
 }
 
@@ -82,10 +91,13 @@ void* RefTensorHandle::GetPointer() const
     {
         return m_UnmanagedMemory;
     }
+    else if (m_Pool)
+    {
+        return m_MemoryManager->GetPointer(m_Pool);
+    }
     else
     {
-        ARMNN_ASSERT_MSG(m_Pool, "RefTensorHandle::GetPointer called on unmanaged, unallocated tensor handle");
-        return m_MemoryManager->GetPointer(m_Pool);
+        throw NullPointerException("RefTensorHandle::GetPointer called on unmanaged, unallocated tensor handle");
     }
 }
 
@@ -105,10 +117,9 @@ void RefTensorHandle::CopyInFrom(const void* src)
 
 bool RefTensorHandle::Import(void* memory, MemorySource source)
 {
-
     if (m_ImportFlags & static_cast<MemorySourceFlags>(source))
     {
-        if (source == MemorySource::Malloc)
+        if (m_IsImportEnabled && source == MemorySource::Malloc)
         {
             // Check memory alignment
             constexpr uintptr_t alignment = sizeof(size_t);

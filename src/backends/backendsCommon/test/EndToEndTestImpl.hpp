@@ -719,6 +719,11 @@ inline void ExportOutputWithSeveralOutputSlotConnectionsTest(std::vector<Backend
     std::vector<float> outputData0(4);
     std::vector<float> outputData1(4);
 
+    std::vector<float> expectedOutput
+    {
+         1.0f, 4.0f, 9.0f, 16.0f
+    };
+
     InputTensors inputTensors
     {
         {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())},
@@ -764,6 +769,12 @@ inline void ExportOutputWithSeveralOutputSlotConnectionsTest(std::vector<Backend
     // Contains CopyMemGeneric
     found = dump.find("CopyMemGeneric");
     BOOST_TEST(found != std::string::npos);
+
+    // Check that the outputs are correct
+    BOOST_CHECK_EQUAL_COLLECTIONS(outputData0.begin(), outputData0.end(),
+                                  expectedOutput.begin(), expectedOutput.end());
+    BOOST_CHECK_EQUAL_COLLECTIONS(outputData1.begin(), outputData1.end(),
+                                  expectedOutput.begin(), expectedOutput.end());
 }
 
 inline void StridedSliceInvalidSliceEndToEndTest(std::vector<BackendId> backends)

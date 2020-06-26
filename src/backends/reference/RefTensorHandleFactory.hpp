@@ -33,6 +33,13 @@ public:
     std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                       DataLayout dataLayout) const override;
 
+    std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                      const bool IsMemoryManaged) const override;
+
+    std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                      DataLayout dataLayout,
+                                                      const bool IsMemoryManaged) const override;
+
     static const FactoryId& GetIdStatic();
 
     const FactoryId& GetId() const override;

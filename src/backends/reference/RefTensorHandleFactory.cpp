@@ -29,14 +29,42 @@ std::unique_ptr<ITensorHandle> RefTensorHandleFactory::CreateSubTensorHandle(ITe
 
 std::unique_ptr<ITensorHandle> RefTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
 {
-    return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager, m_ImportFlags);
+    return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
 }
 
 std::unique_ptr<ITensorHandle> RefTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
                                                                           DataLayout dataLayout) const
 {
     IgnoreUnused(dataLayout);
-    return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager, m_ImportFlags);
+    return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
+}
+
+std::unique_ptr<ITensorHandle> RefTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                                          const bool IsMemoryManaged) const
+{
+    if (IsMemoryManaged)
+    {
+        return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
+    }
+    else
+    {
+        return std::make_unique<RefTensorHandle>(tensorInfo, m_ImportFlags);
+    }
+}
+
+std::unique_ptr<ITensorHandle> RefTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                                          DataLayout dataLayout,
+                                                                          const bool IsMemoryManaged) const
+{
+    IgnoreUnused(dataLayout);
+    if (IsMemoryManaged)
+    {
+        return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
+    }
+    else
+    {
+        return std::make_unique<RefTensorHandle>(tensorInfo, m_ImportFlags);
+    }
 }
 
 const FactoryId& RefTensorHandleFactory::GetId() const

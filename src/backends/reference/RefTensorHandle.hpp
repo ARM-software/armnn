@@ -17,8 +17,7 @@ class RefTensorHandle : public ITensorHandle
 public:
     RefTensorHandle(const TensorInfo& tensorInfo, std::shared_ptr<RefMemoryManager> &memoryManager);
 
-    RefTensorHandle(const TensorInfo& tensorInfo, std::shared_ptr<RefMemoryManager> &memoryManager,
-                    MemorySourceFlags importFlags);
+    RefTensorHandle(const TensorInfo& tensorInfo, MemorySourceFlags importFlags);
 
     ~RefTensorHandle();
 
@@ -73,9 +72,10 @@ private:
 
     std::shared_ptr<RefMemoryManager> m_MemoryManager;
     RefMemoryManager::Pool* m_Pool;
-    mutable void *m_UnmanagedMemory;
+    mutable void* m_UnmanagedMemory;
     MemorySourceFlags m_ImportFlags;
     bool m_Imported;
+    bool m_IsImportEnabled;
 };
 
 }

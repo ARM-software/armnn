@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -24,7 +24,8 @@ class TimelineCaptureCommandHandler :
     uint32_t uint32_t_size = sizeof(uint32_t);
     uint32_t uint64_t_size = sizeof(uint64_t);
 
-    using ReadFunction = void (TimelineCaptureCommandHandler::*)(const unsigned char*, uint32_t&);
+    using ReadFunction = ITimelineDecoder::TimelineStatus (TimelineCaptureCommandHandler::*)(
+        const unsigned char*, uint32_t&);
 
 public:
     TimelineCaptureCommandHandler(uint32_t familyId,
@@ -40,16 +41,17 @@ public:
 
     void operator()(const armnn::profiling::Packet& packet) override;
 
-    void ReadLabel(const unsigned char* data, uint32_t& offset);
-    void ReadEntity(const unsigned char* data, uint32_t& offset);
-    void ReadEventClass(const unsigned char* data, uint32_t& offset);
-    void ReadRelationship(const unsigned char* data, uint32_t& offset);
-    void ReadEvent(const unsigned char* data, uint32_t& offset);
 
     void SetThreadIdSize(uint32_t size);
 
 private:
     void ParseData(const armnn::profiling::Packet& packet);
+
+    ITimelineDecoder::TimelineStatus ReadLabel(const unsigned char* data, uint32_t& offset);
+    ITimelineDecoder::TimelineStatus ReadEntity(const unsigned char* data, uint32_t& offset);
+    ITimelineDecoder::TimelineStatus ReadEventClass(const unsigned char* data, uint32_t& offset);
+    ITimelineDecoder::TimelineStatus ReadRelationship(const unsigned char* data, uint32_t& offset);
+    ITimelineDecoder::TimelineStatus ReadEvent(const unsigned char* data, uint32_t& offset);
 
     ITimelineDecoder& m_TimelineDecoder;
     uint32_t m_ThreadIdSize;

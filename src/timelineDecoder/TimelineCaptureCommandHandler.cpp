@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -22,6 +22,16 @@ const TimelineCaptureCommandHandler::ReadFunction TimelineCaptureCommandHandler:
     &TimelineCaptureCommandHandler::ReadRelationship,       // Relationship decl_id = 3
     &TimelineCaptureCommandHandler::ReadEvent               // Event decl_id = 4
 };
+
+void TimelineCaptureCommandHandler::SetThreadIdSize(uint32_t size)
+{
+    m_ThreadIdSize = size;
+}
+
+void TimelineCaptureCommandHandler::operator()(const profiling::Packet& packet)
+{
+    ParseData(packet);
+}
 
 void TimelineCaptureCommandHandler::ParseData(const armnn::profiling::Packet& packet)
 {
@@ -50,11 +60,17 @@ void TimelineCaptureCommandHandler::ParseData(const armnn::profiling::Packet& pa
         declId = profiling::ReadUint32(data, offset);
         offset += uint32_t_size;
 
-        (this->*m_ReadFunctions[declId])(data, offset);
+        ITimelineDecoder::TimelineStatus status = (this->*m_ReadFunctions[declId])(data, offset);
+        if (status == ITimelineDecoder::TimelineStatus::TimelineStatus_Fail)
+        {
+            ARMNN_LOG(error) << "Decode of timeline message type [" << declId <<
+                                "] at offset [" << offset << "] failed";
+            break;
+        }
     }
 }
 
-void TimelineCaptureCommandHandler::ReadLabel(const unsigned char* data, uint32_t& offset)
+ITimelineDecoder::TimelineStatus TimelineCaptureCommandHandler::ReadLabel(const unsigned char* data, uint32_t& offset)
 {
     ITimelineDecoder::Label label;
     label.m_Guid = profiling::ReadUint64(data, offset);
@@ -73,28 +89,31 @@ void TimelineCaptureCommandHandler::ReadLabel(const unsigned char* data, uint32_
     uint32_t uint32WordAmount = (nameLength / uint32_t_size) + (nameLength % uint32_t_size != 0 ? 1 : 0);
     offset += uint32WordAmount * uint32_t_size;
 
-    m_TimelineDecoder.CreateLabel(label);
+    return m_TimelineDecoder.CreateLabel(label);
 }
 
-void TimelineCaptureCommandHandler::ReadEntity(const unsigned char* data, uint32_t& offset)
+ITimelineDecoder::TimelineStatus TimelineCaptureCommandHandler::ReadEntity(
+        const unsigned char* data, uint32_t& offset)
 {
     ITimelineDecoder::Entity entity;
     entity.m_Guid = profiling::ReadUint64(data, offset);
     offset += uint64_t_size;
-    m_TimelineDecoder.CreateEntity(entity);
+    return m_TimelineDecoder.CreateEntity(entity);
 }
 
-void TimelineCaptureCommandHandler::ReadEventClass(const unsigned char* data, uint32_t& offset)
+ITimelineDecoder::TimelineStatus TimelineCaptureCommandHandler::ReadEventClass(
+    const unsigned char* data, uint32_t& offset)
 {
     ITimelineDecoder::EventClass eventClass;
     eventClass.m_Guid = profiling::ReadUint64(data, offset);
     offset += uint64_t_size;
     eventClass.m_NameGuid = profiling::ReadUint64(data, offset);
     offset += uint64_t_size;
-    m_TimelineDecoder.CreateEventClass(eventClass);
+    return m_TimelineDecoder.CreateEventClass(eventClass);
 }
 
-void TimelineCaptureCommandHandler::ReadRelationship(const unsigned char* data, uint32_t& offset)
+ITimelineDecoder::TimelineStatus TimelineCaptureCommandHandler::ReadRelationship(
+    const unsigned char* data, uint32_t& offset)
 {
     ITimelineDecoder::Relationship relationship;
     relationship.m_RelationshipType =
@@ -113,10 +132,11 @@ void TimelineCaptureCommandHandler::ReadRelationship(const unsigned char* data, 
     relationship.m_AttributeGuid = profiling::ReadUint64(data, offset);
     offset += uint64_t_size;
 
-    m_TimelineDecoder.CreateRelationship(relationship);
+    return m_TimelineDecoder.CreateRelationship(relationship);
 }
 
-void TimelineCaptureCommandHandler::ReadEvent(const unsigned char* data, uint32_t& offset)
+ITimelineDecoder::TimelineStatus TimelineCaptureCommandHandler::ReadEvent(
+    const unsigned char* data, uint32_t& offset)
 {
     ITimelineDecoder::Event event;
     event.m_TimeStamp = profiling::ReadUint64(data, offset);
@@ -136,17 +156,7 @@ void TimelineCaptureCommandHandler::ReadEvent(const unsigned char* data, uint32_
     event.m_Guid = profiling::ReadUint64(data, offset);
     offset += uint64_t_size;
 
-    m_TimelineDecoder.CreateEvent(event);
-}
-
-void TimelineCaptureCommandHandler::SetThreadIdSize(uint32_t size)
-{
-    m_ThreadIdSize = size;
-}
-
-void TimelineCaptureCommandHandler::operator()(const profiling::Packet& packet)
-{
-    ParseData(packet);
+    return m_TimelineDecoder.CreateEvent(event);
 }
 
 } //namespace gatordmock

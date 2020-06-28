@@ -25,3 +25,7 @@ Adding or removing -Dxxx options when building ArmNN does not always work.
 ---------------------------------------------------------
 
 ArmNN uses CMake for build configuration. CMake uses a cumulative cache of user options. That is, setting a value once on a cmake command line will be persisted until either you explicitly change the value or delete the cache. To delete the cache in ArmNN you must delete the build directory.
+
+Many DynamicBackendTests fail with "Base path for shared objects does not exist".
+---------------------------------------------------------
+This problem most commonly occurs when the compile and runtime environments for the unit tests differ. These dynamic backend tests rely on a set of test files and directories at runtime. These files are created by default during the cmake build. At runtime the tests will look for these files in src/backends/backendsCommon/test/ relative to where the Unittests executable was built. The usual solution to to copy these files and directories into the new unit test execution environment. You can also specify a new root path for these files by adding a command line parameter to the Unittests executable: Unittests -- --dynamic-backend-build-dir "new path"

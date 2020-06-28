@@ -19,8 +19,12 @@
 #include <memory>
 
 #include <boost/test/unit_test.hpp>
-#include <boost/dll.hpp>
 
+#if !defined(DYNAMIC_BACKEND_BUILD_DIR)
+#define DYNAMIC_BACKEND_BUILD_DIR fs::path("./")
+#endif
+
+static std::string g_TestDirCLI                             = "--dynamic-backend-build-dir";
 static std::string g_TestBaseDir                            = "src/backends/backendsCommon/test/";
 
 static std::string g_TestSharedObjectSubDir                 = "testSharedObject/";
@@ -105,11 +109,47 @@ private:
 std::string GetBasePath(const std::string& basePath)
 {
     using namespace fs;
-
-    path programLocation = boost::dll::program_location().parent_path().c_str();
+    // What we're looking for here is the location of the UnitTests executable.
+    // In the normal build environment there are a series of files and
+    // directories created by cmake. If the executable has been relocated they
+    // may not be there. The search hierarchy is:
+    // * User specified --dynamic-backend-build-dir
+    // * Compile time value of DYNAMIC_BACKEND_BUILD_DIR.
+    // * Arg0 location.
+    // * Fall back value of current directory.
+    path programLocation = DYNAMIC_BACKEND_BUILD_DIR;
+    // Look for the specific argument --dynamic-backend-build-dir?
+    if (boost::unit_test::framework::master_test_suite().argc == 3)
+    {
+        // Boost custom arguments begin after a '--' on the command line.
+        if (g_TestDirCLI.compare(boost::unit_test::framework::master_test_suite().argv[1]) == 0)
+        {
+            // Then the next argument is the path.
+            programLocation = boost::unit_test::framework::master_test_suite().argv[2];
+        }
+    }
+    else
+    {
+        // Start by checking if DYNAMIC_BACKEND_BUILD_DIR value exist.
+        if (!exists(programLocation))
+        {
+            // That doesn't exist try looking at arg[0].
+            path arg0Path(boost::unit_test::framework::master_test_suite().argv[0]);
+            arg0Path.remove_filename();
+            path arg0SharedObjectPath(arg0Path);
+            arg0SharedObjectPath.append(basePath);
+            if (exists(arg0SharedObjectPath))
+            {
+                // Yeah arg0 worked.
+                programLocation = arg0Path;
+            }
+        }
+    }
+    // This is the base path from the build where the test libraries were built.
     path sharedObjectPath = programLocation.append(basePath);
-    BOOST_CHECK_MESSAGE(exists(sharedObjectPath), "Base path for shared objects does not exist: " +
-                                                   sharedObjectPath.string());
+    BOOST_REQUIRE_MESSAGE(exists(sharedObjectPath), "Base path for shared objects does not exist: " +
+                          sharedObjectPath.string() + "\nTo specify the root of this base path on the " +
+                          "command line add: \'-- --dynamic-backend-build-dir <path>\'");
     return sharedObjectPath.string();
 }
 
@@ -724,29 +764,29 @@ void GetSharedObjectsTestImpl()
         testDynamicBackendsSubDir4
     };
     std::vector<std::string> sharedObjects = DynamicBackendUtils::GetSharedObjects(backendPaths);
-    std::vector<std::string> expectedSharedObjects
+    std::vector<fs::path> expectedSharedObjects
     {
-        testDynamicBackendsSubDir1 + "Arm123_GpuAcc_backend.so",      // Digits in vendor name are allowed
-        testDynamicBackendsSubDir1 + "Arm_GpuAcc456_backend.so",      // Digits in backend id are allowed
-        testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so",         // Basic backend name
-        testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.1",       // Single field version number
-        testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.1.2",     // Multiple field version number
-        testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.1.2.3",   // Multiple field version number
-        testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.10.1.27", // Multiple digit version
-        testDynamicBackendsSubDir2 + "Arm_CpuAcc_backend.so",         // Duplicate symlinks removed
-        testDynamicBackendsSubDir2 + "Arm_GpuAcc_backend.so"          // Duplicates on different paths are allowed
+        path(testDynamicBackendsSubDir1 + "Arm123_GpuAcc_backend.so"),      // Digits in vendor name are allowed
+        path(testDynamicBackendsSubDir1 + "Arm_GpuAcc456_backend.so"),      // Digits in backend id are allowed
+        path(testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so"),         // Basic backend name
+        path(testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.1"),       // Single field version number
+        path(testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.1.2"),     // Multiple field version number
+        path(testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.1.2.3"),   // Multiple field version number
+        path(testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.10.1.27"), // Multiple digit version
+        path(testDynamicBackendsSubDir2 + "Arm_CpuAcc_backend.so"),         // Duplicate symlinks removed
+        path(testDynamicBackendsSubDir2 + "Arm_GpuAcc_backend.so")          // Duplicates on different paths are allowed
     };
 
     BOOST_TEST(sharedObjects.size() == expectedSharedObjects.size());
-    BOOST_TEST(sharedObjects[0] == expectedSharedObjects[0]);
-    BOOST_TEST(sharedObjects[1] == expectedSharedObjects[1]);
-    BOOST_TEST(sharedObjects[2] == expectedSharedObjects[2]);
-    BOOST_TEST(sharedObjects[3] == expectedSharedObjects[3]);
-    BOOST_TEST(sharedObjects[4] == expectedSharedObjects[4]);
-    BOOST_TEST(sharedObjects[5] == expectedSharedObjects[5]);
-    BOOST_TEST(sharedObjects[6] == expectedSharedObjects[6]);
-    BOOST_TEST(sharedObjects[7] == expectedSharedObjects[7]);
-    BOOST_TEST(sharedObjects[8] == expectedSharedObjects[8]);
+    BOOST_TEST(fs::equivalent(path(sharedObjects[0]), expectedSharedObjects[0]));
+    BOOST_TEST(fs::equivalent(path(sharedObjects[1]), expectedSharedObjects[1]));
+    BOOST_TEST(fs::equivalent(path(sharedObjects[2]), expectedSharedObjects[2]));
+    BOOST_TEST(fs::equivalent(path(sharedObjects[3]), expectedSharedObjects[3]));
+    BOOST_TEST(fs::equivalent(path(sharedObjects[4]), expectedSharedObjects[4]));
+    BOOST_TEST(fs::equivalent(path(sharedObjects[5]), expectedSharedObjects[5]));
+    BOOST_TEST(fs::equivalent(path(sharedObjects[6]), expectedSharedObjects[6]));
+    BOOST_TEST(fs::equivalent(path(sharedObjects[7]), expectedSharedObjects[7]));
+    BOOST_TEST(fs::equivalent(path(sharedObjects[8]), expectedSharedObjects[8]));
 }
 
 void CreateDynamicBackendsTestImpl()

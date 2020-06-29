@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 #include "CsvReader.hpp"
+#include "armnn/Optional.hpp"
+#include <Filesystem.hpp>
 
 #include <boost/test/unit_test.hpp>
 
 #include <iostream>
 #include <string>
-#include <boost/filesystem.hpp>
-#include <boost/optional.hpp>
 
 using namespace armnnUtils;
 
@@ -29,11 +29,10 @@ struct TestHelper {
 
     std::string CreateTempCsvFile()
     {
-        boost::filesystem::path fileDir = boost::filesystem::temp_directory_path();
-        boost::filesystem::path p{fileDir / boost::filesystem::unique_path("%%%%-%%%%-%%%%.csv")};
+        fs::path p = armnnUtils::Filesystem::NamedTempFile("Armnn-CreateTempCsvFileTest-TempFile.csv");
         try
         {
-            boost::filesystem::ofstream ofs{p};
+            std::ofstream ofs{p};
             ofs << "airplane, bicycle , bird , \"m,o,n,k,e,y\"\n";
             ofs << "banana, shoe, \"ice\"";
             ofs.close();
@@ -63,17 +62,17 @@ struct TestHelper {
         {
             try
             {
-                boost::filesystem::remove(*m_CsvFile);
+                fs::remove(m_CsvFile.value());
             }
             catch (std::exception &e)
             {
-                std::cerr << "Unable to delete file [" << *m_CsvFile << "] : " << e.what() << std::endl;
+                std::cerr << "Unable to delete file [" << m_CsvFile.value() << "] : " << e.what() << std::endl;
                 BOOST_TEST(false);
             }
         }
     }
 
-    boost::optional<boost::filesystem::path> m_CsvFile;
+    armnn::Optional<fs::path> m_CsvFile;
 };
 }
 

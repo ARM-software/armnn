@@ -3,9 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
+#include <Filesystem.hpp>
 #include <boost/program_options.hpp>
 
 #include <algorithm>
@@ -35,13 +33,13 @@ public:
             dir += "/";
         }
 
-        if (!boost::filesystem::exists(dir))
+        if (!fs::exists(dir))
         {
             std::cerr << "Directory [" << dir << "] does not exist" << std::endl;
             return false;
         }
 
-        if (!boost::filesystem::is_directory(dir))
+        if (!fs::is_directory(dir))
         {
             std::cerr << "Given directory [" << dir << "] is not a directory" << std::endl;
             return false;
@@ -58,20 +56,20 @@ public:
             return false;
         }
 
-        if (boost::filesystem::exists(outputFileName))
+        if (fs::exists(outputFileName))
         {
             std::cerr << "Output file [" << outputFileName << "] already exists" << std::endl;
             return false;
         }
 
-        if (boost::filesystem::is_directory(outputFileName))
+        if (fs::is_directory(outputFileName))
         {
             std::cerr << "Output file [" << outputFileName << "] is a directory" << std::endl;
             return false;
         }
 
-        boost::filesystem::path outputPath(outputFileName);
-        if (!boost::filesystem::exists(outputPath.parent_path()))
+        fs::path outputPath(outputFileName);
+        if (!fs::exists(outputPath.parent_path()))
         {
             std::cerr << "Directory [" << outputPath.parent_path().c_str() << "] does not exist" << std::endl;
             return false;
@@ -171,8 +169,6 @@ int main(int argc, char* argv[])
     {
         return -1;
     }
-
-    namespace fs = boost::filesystem;
 
     const std::string fileFormat(".raw");
 

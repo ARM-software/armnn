@@ -5,13 +5,12 @@
 #include "InferenceTest.hpp"
 
 #include <armnn/utility/Assert.hpp>
+#include <Filesystem.hpp>
 
 #include "../src/armnn/Profiling.hpp"
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/filesystem/path.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
-#include <boost/filesystem/operations.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -102,13 +101,13 @@ bool ValidateDirectory(std::string& dir)
         dir += "/";
     }
 
-    if (!boost::filesystem::exists(dir))
+    if (!fs::exists(dir))
     {
         std::cerr << "Given directory " << dir << " does not exist" << std::endl;
         return false;
     }
 
-    if (!boost::filesystem::is_directory(dir))
+    if (!fs::is_directory(dir))
     {
         std::cerr << "Given directory [" << dir << "] is not a directory" << std::endl;
         return false;

@@ -11,7 +11,6 @@
 #include <Runtime.hpp>
 #include "TestTimelinePacketHandler.hpp"
 
-#include <boost/filesystem.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -37,18 +36,6 @@ class FileOnlyHelperService : public ProfilingService
 
 BOOST_AUTO_TEST_SUITE(FileOnlyProfilingDecoratorTests)
 
-std::string UniqueFileName()
-{
-    std::time_t t = std::time(nullptr);
-    char mbstr[100];
-    std::strftime(mbstr, sizeof(mbstr), "%Y_%m_%d_%H_%M_%S_", std::localtime(&t));
-    std::stringstream ss;
-    ss << mbstr;
-    ss << t;
-    ss << ".bin";
-    return ss.str();
-}
-
 BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
 {
     // This test requires at least one backend registry to be enabled
@@ -58,10 +45,8 @@ BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
         return;
     }
 
-    // Create a temporary file name.
-    fs::path tempPath = fs::temp_directory_path();
-    fs::path tempFile = UniqueFileName();
-    tempPath          = tempPath / tempFile;
+    // Enable m_FileOnly but also provide ILocalPacketHandler which should consume the packets.
+    // This won't dump anything to file.
     armnn::Runtime::CreationOptions creationOptions;
     creationOptions.m_ProfilingOptions.m_EnableProfiling     = true;
     creationOptions.m_ProfilingOptions.m_FileOnly            = true;
@@ -180,9 +165,7 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
     }
 
     // Create a temporary file name.
-    fs::path tempPath = fs::temp_directory_path();
-    fs::path tempFile = UniqueFileName();
-    tempPath          = tempPath / tempFile;
+    fs::path tempPath = armnnUtils::Filesystem::NamedTempFile("DumpOutgoingValidFileEndToEnd_CaptureFile.txt");
     armnn::Runtime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling     = true;
     options.m_ProfilingOptions.m_FileOnly            = true;
@@ -195,7 +178,7 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
     options.m_ProfilingOptions.m_LocalPacketHandlers.push_back(localPacketHandlerPtr);
 
     // Make sure the file does not exist at this point
-    BOOST_CHECK(armnnUtils::Filesystem::GetFileSize(tempPath.string().c_str()) == -1);
+    BOOST_CHECK(!fs::exists(tempPath));
 
     armnn::Runtime runtime(options);
     // ensure the GUID generator is reset to zero
@@ -255,12 +238,12 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
     GetProfilingService(&runtime).ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
 
     // The output file size should be greater than 0.
-    BOOST_CHECK(armnnUtils::Filesystem::GetFileSize(tempPath.string().c_str()) > 0);
+    BOOST_CHECK(fs::file_size(tempPath) > 0);
 
     // NOTE: would be an interesting exercise to take this file and decode it
 
     // Delete the tmp file.
-    BOOST_CHECK(armnnUtils::Filesystem::Remove(tempPath.string().c_str()));
+    BOOST_CHECK(fs::remove(tempPath));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

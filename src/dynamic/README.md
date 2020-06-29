@@ -31,7 +31,6 @@ mkdir build
 cd build
 cmake -DBOOST_ROOT=${BOOST_PATH} \
       -DBoost_SYSTEM_LIBRARY=${BOOST_PATH}/lib/libboost_system.a \
-      -DBoost_FILESYSTEM_LIBRARY=${BOOST_PATH}/lib/libboost_filesystem.a \
       -DARMNN_PATH=${ARMNN_PATH}/libarmnn.so ..
 ```
 

@@ -6,6 +6,8 @@
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
+#include <Filesystem.hpp>
+
 using armnnTfLiteParser::TfLiteParser;
 using ModelPtr = TfLiteParser::ModelPtr;
 using SubgraphPtr = TfLiteParser::SubgraphPtr;
@@ -196,8 +198,8 @@ BOOST_FIXTURE_TEST_CASE(LoadModelFromBinary, LoadModelFixture)
 
 BOOST_FIXTURE_TEST_CASE(LoadModelFromFile, LoadModelFixture)
 {
-    using namespace boost::filesystem;
-    std::string fname = unique_path(temp_directory_path() / "%%%%-%%%%-%%%%.tflite").string();
+    using namespace fs;
+    fs::path fname = armnnUtils::Filesystem::NamedTempFile("Armnn-tfLite-LoadModelFromFile-TempFile.csv");
     bool saved = flatbuffers::SaveFile(fname.c_str(),
                                        reinterpret_cast<char *>(m_GraphBinary.data()),
                                        m_GraphBinary.size(), true);

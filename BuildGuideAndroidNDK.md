@@ -54,7 +54,7 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 	cd ~/armnn-devenv/boost/boost_1_64_0
 	./bootstrap.sh --prefix=$HOME/armnn-devenv/boost/install
 	./b2 install --user-config=$HOME/armnn-devenv/boost/user-config.jam \
-     toolset=clang-arm link=static cxxflags=-fPIC --with-filesystem \
+     toolset=clang-arm link=static cxxflags=-fPIC \
 	 --with-test --with-log --with-program_options -j16
     ```
  Note: You can specify the 'Android_API' version you want. For example, if your ANDROID_API is 27 then the compiler will be aarch64-linux-android27-clang++.
@@ -230,7 +230,6 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
     -DCMAKE_MODULE_LINKER_FLAGS="-llog" \
     -DBOOST_ROOT=$HOME/armnn-devenv/boost/install \
     -DBoost_SYSTEM_LIBRARY=$HOME/armnn-devenv/boost/install/lib/libboost_system.a \
-    -DBoost_FILESYSTEM_LIBRARY=$HOME/armnn-devenv/boost/install/lib/libboost_filesystem.a \
     -DARMNN_PATH=$HOME/armnn-devenv/armnn/build/libarmnn.so ..
     ```
 

@@ -6,10 +6,8 @@
 
 #include <armnn/utility/Assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/filesystem/path.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
-#include <boost/filesystem/operations.hpp>
 
 #include <fstream>
 #include <iostream>

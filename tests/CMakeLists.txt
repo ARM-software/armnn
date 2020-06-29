@@ -29,7 +29,6 @@ if(BUILD_CAFFE_PARSER)
         target_link_libraries(${testName} ${CMAKE_THREAD_LIBS_INIT})
         target_link_libraries(${testName}
             ${Boost_SYSTEM_LIBRARY}
-            ${Boost_FILESYSTEM_LIBRARY}
             ${Boost_PROGRAM_OPTIONS_LIBRARY})
         addDllCopyCommands(${testName})
     endmacro()
@@ -96,7 +95,6 @@ if(BUILD_TF_PARSER)
         target_link_libraries(${testName} ${CMAKE_THREAD_LIBS_INIT})
         target_link_libraries(${testName}
             ${Boost_SYSTEM_LIBRARY}
-            ${Boost_FILESYSTEM_LIBRARY}
             ${Boost_PROGRAM_OPTIONS_LIBRARY})
         addDllCopyCommands(${testName})
     endmacro()
@@ -144,7 +142,6 @@ if (BUILD_TF_LITE_PARSER)
         target_link_libraries(${testName} ${CMAKE_THREAD_LIBS_INIT})
         target_link_libraries(${testName}
             ${Boost_SYSTEM_LIBRARY}
-            ${Boost_FILESYSTEM_LIBRARY}
             ${Boost_PROGRAM_OPTIONS_LIBRARY})
         addDllCopyCommands(${testName})
     endmacro()
@@ -232,7 +229,6 @@ if (BUILD_ONNX_PARSER)
         target_link_libraries(${testName} ${CMAKE_THREAD_LIBS_INIT})
         target_link_libraries(${testName}
             ${Boost_SYSTEM_LIBRARY}
-            ${Boost_FILESYSTEM_LIBRARY}
             ${Boost_PROGRAM_OPTIONS_LIBRARY})
         addDllCopyCommands(${testName})
     endmacro()
@@ -280,7 +276,6 @@ if (BUILD_ARMNN_SERIALIZER OR BUILD_CAFFE_PARSER OR BUILD_TF_PARSER OR BUILD_TF_
     target_link_libraries(ExecuteNetwork ${CMAKE_THREAD_LIBS_INIT})
     target_link_libraries(ExecuteNetwork
         ${Boost_SYSTEM_LIBRARY}
-        ${Boost_FILESYSTEM_LIBRARY}
         ${Boost_PROGRAM_OPTIONS_LIBRARY})
     addDllCopyCommands(ExecuteNetwork)
 endif()
@@ -305,7 +300,6 @@ if(BUILD_ACCURACY_TOOL)
         endif()
         target_link_libraries(${executorName}
                 ${Boost_SYSTEM_LIBRARY}
-                ${Boost_FILESYSTEM_LIBRARY}
                 ${Boost_PROGRAM_OPTIONS_LIBRARY})
         addDllCopyCommands(${executorName})
     endmacro()
@@ -328,7 +322,6 @@ if(BUILD_ARMNN_QUANTIZER)
         target_link_libraries(${executorName} ${CMAKE_THREAD_LIBS_INIT})
         target_link_libraries(${executorName}
                 ${Boost_SYSTEM_LIBRARY}
-                ${Boost_FILESYSTEM_LIBRARY}
                 ${Boost_PROGRAM_OPTIONS_LIBRARY})
         addDllCopyCommands(${executorName})
     endmacro()
@@ -349,5 +342,6 @@ if(BUILD_ARMNN_QUANTIZER)
             ImageCSVFileGenerator/ImageCSVFileGenerator.cpp)
 
     add_executable_ex(ImageCSVFileGenerator ${ImageCSVFileGenerator_sources})
+    target_include_directories(ImageCSVFileGenerator PRIVATE ../src/armnnUtils)
     ImageTensorExecutor(ImageCSVFileGenerator)
 endif()

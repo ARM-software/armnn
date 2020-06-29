@@ -6,8 +6,6 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <boost/filesystem.hpp>
-#include <boost/optional.hpp>
 #include <boost/variant.hpp>
 #include <iostream>
 #include <string>

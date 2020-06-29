@@ -7,7 +7,6 @@
 
 #include <armnn/Logging.hpp>
 
-#include <boost/filesystem.hpp>
 #include <map>
 #include <vector>
 

@@ -11,6 +11,7 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
+#include <Filesystem.hpp>
 #include <reference/workloads/RefConvolution2dWorkload.hpp>
 #include <Runtime.hpp>
 
@@ -18,7 +19,6 @@
 #include <memory>
 
 #include <boost/test/unit_test.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/dll.hpp>
 
 static std::string g_TestBaseDir                            = "src/backends/backendsCommon/test/";
@@ -104,9 +104,9 @@ private:
 
 std::string GetBasePath(const std::string& basePath)
 {
-    using namespace boost::filesystem;
+    using namespace fs;
 
-    path programLocation = boost::dll::program_location().parent_path();
+    path programLocation = boost::dll::program_location().parent_path().c_str();
     path sharedObjectPath = programLocation.append(basePath);
     BOOST_CHECK_MESSAGE(exists(sharedObjectPath), "Base path for shared objects does not exist: " +
                                                    sharedObjectPath.string());
@@ -125,7 +125,7 @@ std::string GetDynamicBackendsBasePath()
 
 std::string GetTestSubDirectory(const std::string& subdir)
 {
-    using namespace boost::filesystem;
+    using namespace fs;
 
     std::string testDynamicBackendsBaseDir = GetTestDirectoryBasePath();
     path testDynamicBackendsBasePath(testDynamicBackendsBaseDir);
@@ -137,7 +137,7 @@ std::string GetTestSubDirectory(const std::string& subdir)
 
 std::string GetTestSubDirectory(const std::string& basePath, const std::string& subdir)
 {
-    using namespace boost::filesystem;
+    using namespace fs;
 
     path testDynamicBackendsBasePath(basePath);
     path testDynamicBackendsSubDir = testDynamicBackendsBasePath.append(subdir);
@@ -148,7 +148,7 @@ std::string GetTestSubDirectory(const std::string& basePath, const std::string& 
 
 std::string GetTestFilePath(const std::string& directory, const std::string& fileName)
 {
-    using namespace boost::filesystem;
+    using namespace fs;
 
     path directoryPath(directory);
     path fileNamePath = directoryPath.append(fileName);
@@ -346,7 +346,7 @@ void CreateValidDynamicBackendObjectTestImpl()
     std::string testSubDirectory = GetTestSubDirectory(g_TestDynamicBackendSubDir);
 
     // We expect this path to exists so we can load a valid dynamic backend.
-    BOOST_CHECK_MESSAGE(boost::filesystem::exists(testSubDirectory),
+    BOOST_CHECK_MESSAGE(fs::exists(testSubDirectory),
                        "Base path for shared objects does not exist: " + testSubDirectory);
 
     std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestValidTestDynamicBackendFileName);
@@ -560,7 +560,7 @@ void CreateDynamicBackendObjectInvalidInterface7TestImpl()
 void GetBackendPathsTestImpl()
 {
     using namespace armnn;
-    using namespace boost::filesystem;
+    using namespace fs;
 
     // The test covers four directories:
     // <unit test path>/src/backends/backendsCommon/test/
@@ -640,7 +640,7 @@ void GetBackendPathsTestImpl()
 void GetBackendPathsOverrideTestImpl()
 {
     using namespace armnn;
-    using namespace boost::filesystem;
+    using namespace fs;
 
     std::string subDir1 = GetTestSubDirectory(g_TestDynamicBackendsSubDir1);
     std::string subDir4 = GetTestSubDirectory(g_TestDynamicBackendsSubDir4);
@@ -661,7 +661,7 @@ void GetBackendPathsOverrideTestImpl()
 void GetSharedObjectsTestImpl()
 {
     using namespace armnn;
-    using namespace boost::filesystem;
+    using namespace fs;
 
     // The test covers four directories:
     // <unit test path>/src/backends/backendsCommon/test/
@@ -752,7 +752,7 @@ void GetSharedObjectsTestImpl()
 void CreateDynamicBackendsTestImpl()
 {
     using namespace armnn;
-    using namespace boost::filesystem;
+    using namespace fs;
 
     // The test covers four directories:
     // <unit test path>/src/backends/backendsCommon/test/
@@ -839,7 +839,7 @@ void CreateDynamicBackendsAllInvalidTestImpl()
 void CreateDynamicBackendsMixedTypesTestImpl()
 {
     using namespace armnn;
-    using namespace boost::filesystem;
+    using namespace fs;
 
     std::string testDynamicBackendsSubDir5 = GetTestSubDirectory(g_TestDynamicBackendsSubDir5);
     std::string testDynamicBackendsSubDir6 = GetTestSubDirectory(g_TestDynamicBackendsSubDir6);
@@ -873,7 +873,7 @@ void CreateDynamicBackendsMixedTypesTestImpl()
 void RegisterSingleDynamicBackendTestImpl()
 {
     using namespace armnn;
-    using namespace boost::filesystem;
+    using namespace fs;
 
     // Register one valid dynamic backend
 
@@ -920,7 +920,7 @@ void RegisterSingleDynamicBackendTestImpl()
 void RegisterMultipleDynamicBackendsTestImpl()
 {
     using namespace armnn;
-    using namespace boost::filesystem;
+    using namespace fs;
 
     // Register many valid dynamic backends
 
@@ -996,7 +996,7 @@ void RegisterMultipleDynamicBackendsTestImpl()
 void RegisterMultipleInvalidDynamicBackendsTestImpl()
 {
     using namespace armnn;
-    using namespace boost::filesystem;
+    using namespace fs;
 
     // Try to register many invalid dynamic backends
 
@@ -1056,7 +1056,7 @@ void RegisterMultipleInvalidDynamicBackendsTestImpl()
 void RegisterMixedDynamicBackendsTestImpl()
 {
     using namespace armnn;
-    using namespace boost::filesystem;
+    using namespace fs;
 
     // The test covers five directories:
     // <unit test path>/src/backends/backendsCommon/test/
@@ -1226,7 +1226,7 @@ void RuntimeEmptyTestImpl()
 void RuntimeDynamicBackendsTestImpl()
 {
     using namespace armnn;
-    using namespace boost::filesystem;
+    using namespace fs;
 
     // Swapping the backend registry storage for testing
     TestBackendRegistry testBackendRegistry;
@@ -1267,7 +1267,7 @@ void RuntimeDynamicBackendsTestImpl()
 void RuntimeDuplicateDynamicBackendsTestImpl()
 {
     using namespace armnn;
-    using namespace boost::filesystem;
+    using namespace fs;
 
     // Swapping the backend registry storage for testing
     TestBackendRegistry testBackendRegistry;
@@ -1308,7 +1308,7 @@ void RuntimeDuplicateDynamicBackendsTestImpl()
 void RuntimeInvalidDynamicBackendsTestImpl()
 {
     using namespace armnn;
-    using namespace boost::filesystem;
+    using namespace fs;
 
     // Swapping the backend registry storage for testing
     TestBackendRegistry testBackendRegistry;
@@ -1357,7 +1357,7 @@ void RuntimeInvalidOverridePathTestImpl()
 void CreateReferenceDynamicBackendTestImpl()
 {
     using namespace armnn;
-    using namespace boost::filesystem;
+    using namespace fs;
 
     // Swapping the backend registry storage for testing
     TestBackendRegistry testBackendRegistry;
@@ -1520,7 +1520,6 @@ void CreateSampleDynamicBackendTestImpl()
 void SampleDynamicBackendEndToEndTestImpl()
 {
     using namespace armnn;
-    using namespace boost::filesystem;
     // Create runtime in which test will run
     IRuntime::CreationOptions options;
     IRuntimePtr runtime(IRuntime::Create(options));

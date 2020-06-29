@@ -8,7 +8,6 @@
 
 #include <string>
 #include <fstream>
-#include <boost/filesystem/fstream.hpp>
 
 namespace armnn
 {
@@ -246,7 +245,7 @@ void JSONTimelineDecoder::JSONEntity::SetParent(JSONEntity& parent)
 void JSONTimelineDecoder::PrintJSON(JSONTimelineDecoder::JSONEntity& rootEntity)
 {
     std::string jsonString = GetJSONString(rootEntity);
-    boost::filesystem::ofstream ofs{this->outputJSONFile};
+    std::ofstream ofs{this->outputJSONFile};
     ofs << jsonString;
     ofs.close();
 }

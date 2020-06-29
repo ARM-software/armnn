@@ -6,17 +6,13 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../QuantizationDataSet.hpp"
+
+#include <armnn/Optional.hpp>
+#include <Filesystem.hpp>
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <map>
-
-#define BOOST_FILESYSTEM_NO_DEPRECATED
-
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/optional/optional.hpp>
 
 
 using namespace armnnQuantizer;
@@ -36,20 +32,20 @@ struct CsvTestHelper {
 
     std::string CreateTempCsvFile(std::map<int, std::vector<float>> csvData)
     {
-        boost::filesystem::path fileDir = boost::filesystem::temp_directory_path();
-        boost::filesystem::path p{fileDir / boost::filesystem::unique_path("%%%%-%%%%-%%%%.csv")};
+        fs::path fileDir = fs::temp_directory_path();
+        fs::path p = armnnUtils::Filesystem::NamedTempFile("Armnn-QuantizationCreateTempCsvFileTest-TempFile.csv");
 
-        boost::filesystem::path tensorInput1{fileDir / boost::filesystem::unique_path("input_0_0.raw")};
-        boost::filesystem::path tensorInput2{fileDir / boost::filesystem::unique_path("input_1_0.raw")};
-        boost::filesystem::path tensorInput3{fileDir / boost::filesystem::unique_path("input_2_0.raw")};
+        fs::path tensorInput1{fileDir / "input_0_0.raw"};
+        fs::path tensorInput2{fileDir / "input_1_0.raw"};
+        fs::path tensorInput3{fileDir / "input_2_0.raw"};
 
         try
         {
-            boost::filesystem::ofstream ofs{p};
+            std::ofstream ofs{p};
 
-            boost::filesystem::ofstream ofs1{tensorInput1};
-            boost::filesystem::ofstream ofs2{tensorInput2};
-            boost::filesystem::ofstream ofs3{tensorInput3};
+            std::ofstream ofs1{tensorInput1};
+            std::ofstream ofs2{tensorInput2};
+            std::ofstream ofs3{tensorInput3};
 
 
             for(auto entry : csvData.at(0))
@@ -95,17 +91,17 @@ struct CsvTestHelper {
         {
             try
             {
-                boost::filesystem::remove(*m_CsvFile);
+                fs::remove(m_CsvFile.value());
             }
             catch (std::exception &e)
             {
-                std::cerr << "Unable to delete file [" << *m_CsvFile << "] : " << e.what() << std::endl;
+                std::cerr << "Unable to delete file [" << m_CsvFile.value() << "] : " << e.what() << std::endl;
                 BOOST_TEST(false);
             }
         }
     }
 
-    boost::optional<boost::filesystem::path> m_CsvFile;
+    armnn::Optional<fs::path> m_CsvFile;
 };
 
 

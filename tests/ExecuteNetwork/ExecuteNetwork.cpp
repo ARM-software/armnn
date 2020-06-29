@@ -212,7 +212,7 @@ int main(int argc, const char* argv[])
     if (CheckOption(vm, "test-cases"))
     {
         // Check that the file exists.
-        if (!boost::filesystem::exists(testCasesFile))
+        if (!fs::exists(testCasesFile))
         {
             ARMNN_LOG(fatal) << "Given file \"" << testCasesFile << "\" does not exist";
             return EXIT_FAILURE;

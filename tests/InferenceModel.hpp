@@ -21,6 +21,7 @@
 #include <armnnOnnxParser/IOnnxParser.hpp>
 #endif
 
+#include <Filesystem.hpp>
 #include <HeapProfiling.hpp>
 #include <TensorIOUtils.hpp>
 
@@ -29,7 +30,6 @@
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/variant.hpp>
 
 #include <algorithm>
@@ -188,9 +188,9 @@ public:
         {
             ARMNN_SCOPED_HEAP_PROFILING("Parsing");
 
-            boost::system::error_code errorCode;
-            boost::filesystem::path pathToFile(params.m_ModelPath);
-            if (!boost::filesystem::exists(pathToFile, errorCode))
+            std::error_code errorCode;
+            fs::path pathToFile(params.m_ModelPath);
+            if (!fs::exists(pathToFile, errorCode))
             {
                 throw armnn::FileNotFoundException(boost::str(
                                                    boost::format("Cannot find the file (%1%) errorCode: %2% %3%") %
@@ -429,7 +429,7 @@ public:
 
         if (params.m_VisualizePostOptimizationModel)
         {
-            boost::filesystem::path filename = params.m_ModelPath;
+            fs::path filename = params.m_ModelPath;
             filename.replace_extension("dot");
             std::fstream file(filename.c_str(), std::ios_base::out);
             optNet->SerializeToDot(file);

@@ -6,12 +6,8 @@
 #include "QuantizationDataSet.hpp"
 #include "CsvReader.hpp"
 
-#define BOOST_FILESYSTEM_NO_DEPRECATED
-
 #include <armnn/utility/IgnoreUnused.hpp>
-
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
+#include <Filesystem.hpp>
 
 namespace armnnQuantizer
 {
@@ -105,7 +101,7 @@ std::string GetFileNameFromCsvRow(std::vector<armnnUtils::CsvRow> csvRows, unsig
 {
     std::string fileName = csvRows[rowIndex].values[2];
 
-    if (!boost::filesystem::exists(fileName))
+    if (!fs::exists(fileName))
     {
         throw armnn::ParseException("File [ " + fileName + "] provided on CSV row " + std::to_string(rowIndex) +
                                     " does not exist.");

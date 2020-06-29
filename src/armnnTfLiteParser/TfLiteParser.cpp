@@ -15,6 +15,7 @@
 
 // armnnUtils:
 #include <armnnUtils/Permute.hpp>
+#include <Filesystem.hpp>
 
 #include <ParserHelper.hpp>
 #include <VerificationHelpers.hpp>
@@ -26,7 +27,6 @@
 
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/filesystem.hpp>
 
 #include <fstream>
 #include <algorithm>
@@ -2868,9 +2868,9 @@ TfLiteParser::ModelPtr TfLiteParser::LoadModelFromFile(const char * fileName)
         throw InvalidArgumentException(boost::str(boost::format("Invalid (null) file name %1%") %
                                        CHECK_LOCATION().AsString()));
     }
-    boost::system::error_code errorCode;
-    boost::filesystem::path pathToFile(fileName);
-    if (!boost::filesystem::exists(pathToFile, errorCode))
+    std::error_code errorCode;
+    fs::path pathToFile(fileName);
+    if (!fs::exists(pathToFile, errorCode))
     {
         std::string locationString = CHECK_LOCATION().AsString();
         std::string msg = boost::str(boost::format("Cannot find the file (%1%) errorCode: %2% %3%") %

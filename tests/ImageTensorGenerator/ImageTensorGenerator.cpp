@@ -7,10 +7,8 @@
 #include "../InferenceTestImage.hpp"
 #include <armnn/Logging.hpp>
 #include <armnn/TypesUtils.hpp>
+#include <Filesystem.hpp>
 
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
 #include <boost/program_options.hpp>
 #include <boost/variant.hpp>
 
@@ -37,13 +35,13 @@ public:
             return false;
         }
 
-        if (!boost::filesystem::exists(inputFileName))
+        if (!fs::exists(inputFileName))
         {
             std::cerr << "Input file [" << inputFileName << "] does not exist" << std::endl;
             return false;
         }
 
-        if (boost::filesystem::is_directory(inputFileName))
+        if (fs::is_directory(inputFileName))
         {
             std::cerr << "Input file [" << inputFileName << "] is a directory" << std::endl;
             return false;
@@ -80,20 +78,20 @@ public:
             return false;
         }
 
-        if (boost::filesystem::exists(outputFileName))
+        if (fs::exists(outputFileName))
         {
             std::cerr << "Output file [" << outputFileName << "] already exists" << std::endl;
             return false;
         }
 
-        if (boost::filesystem::is_directory(outputFileName))
+        if (fs::is_directory(outputFileName))
         {
             std::cerr << "Output file [" << outputFileName << "] is a directory" << std::endl;
             return false;
         }
 
-        boost::filesystem::path outputPath(outputFileName);
-        if (!boost::filesystem::exists(outputPath.parent_path()))
+        fs::path outputPath(outputFileName);
+        if (!fs::exists(outputPath.parent_path()))
         {
             std::cerr << "Output directory [" << outputPath.parent_path().c_str() << "] does not exist" << std::endl;
             return false;

@@ -4,13 +4,13 @@
 //
 
 #include "../ProfilingConnectionDumpToFileDecorator.hpp"
+#include <Filesystem.hpp>
 #include <Runtime.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
 #include <fstream>
 #include <sstream>
 
-#include <boost/filesystem.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -96,8 +96,7 @@ BOOST_AUTO_TEST_CASE(DumpIncomingInvalidFileIgnoreErrors)
 
 BOOST_AUTO_TEST_CASE(DumpIncomingValidFile)
 {
-    boost::filesystem::path fileName =
-        boost::filesystem::temp_directory_path() / boost::filesystem::unique_path();
+    fs::path fileName = armnnUtils::Filesystem::NamedTempFile("Armnn-DumpIncomingValidFileTest-TempFile");
 
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
     options.m_IncomingCaptureFile = fileName.string();
@@ -118,6 +117,7 @@ BOOST_AUTO_TEST_CASE(DumpIncomingValidFile)
     constexpr unsigned int bytesToSkip = 2u * sizeof(uint32_t); // skip header and packet length
     int diff = std::strncmp(data.data() + bytesToSkip, packetData, g_DataLength);
     BOOST_CHECK(diff == 0);
+    fs::remove(fileName);
 }
 
 BOOST_AUTO_TEST_CASE(DumpOutgoingInvalidFile)
@@ -144,8 +144,7 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingInvalidFileIgnoreErrors)
 
 BOOST_AUTO_TEST_CASE(DumpOutgoingValidFile)
 {
-    boost::filesystem::path fileName =
-        boost::filesystem::temp_directory_path() / boost::filesystem::unique_path();
+    fs::path fileName = armnnUtils::Filesystem::NamedTempFile("Armnn-DumpOutgoingValidFileTest-TempFile");
 
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
     options.m_IncomingCaptureFile = "";
@@ -164,6 +163,7 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFile)
     // check if the data read back from the dump file matches the original
     int diff = std::strncmp(data.data(), g_Data.data(), g_DataLength);
     BOOST_CHECK(diff == 0);
+    fs::remove(fileName);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -6,8 +6,7 @@
 #include <armnn/Logging.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
 #include "armnn/utility/StringUtils.hpp"
-
-#include <boost/filesystem.hpp>
+#include <Filesystem.hpp>
 
 #include <regex>
 
@@ -149,21 +148,21 @@ bool DynamicBackendUtils::IsPathValid(const std::string& path)
         return false;
     }
 
-    boost::filesystem::path boostPath(path);
+    fs::path fsPath(path);
 
-    if (!boost::filesystem::exists(boostPath))
+    if (!fs::exists(fsPath))
     {
         ARMNN_LOG(warning) << "WARNING: The given backend path \"" << path << "\" does not exist";
         return false;
     }
 
-    if (!boost::filesystem::is_directory(boostPath))
+    if (!fs::is_directory(fsPath))
     {
         ARMNN_LOG(warning) << "WARNING: The given backend path \"" << path << "\" is not a directory";
         return false;
     }
 
-    if (!boostPath.is_absolute())
+    if (!fsPath.is_absolute())
     {
         ARMNN_LOG(warning) << "WARNING: The given backend path \"" << path << "\" is not absolute";
         return false;
@@ -179,7 +178,7 @@ std::vector<std::string> DynamicBackendUtils::GetSharedObjects(const std::vector
 
     for (const std::string& backendPath : backendPaths)
     {
-        using namespace boost::filesystem;
+        using namespace fs;
 
         // Check if the path is valid. In case of error, IsValidPath will log an error message
         if (!IsPathValid(backendPath))

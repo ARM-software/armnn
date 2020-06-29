@@ -6,12 +6,12 @@
 #include <JSONTimelineDecoder.hpp>
 #include <TimelineCaptureCommandHandler.hpp>
 #include <TimelineDecoder.hpp>
+#include <Filesystem.hpp>
 
 #include <boost/test/test_tools.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
 #include <fstream>
-#include <boost/filesystem.hpp>
 
 BOOST_AUTO_TEST_SUITE(JSONTimelineDecoderTests)
 
@@ -797,10 +797,8 @@ BOOST_AUTO_TEST_CASE(JSONTimelineDecoderTestJSON)
 
     timelineDecoder.PrintJSON(rootEntity);
 
-    boost::filesystem::ifstream inFile;
-    boost::filesystem::path fileDir = boost::filesystem::temp_directory_path();
-    boost::filesystem::path p{fileDir / boost::filesystem::unique_path("output.json")};
-
+    fs::ifstream inFile;
+    fs::path p{fs::temp_directory_path() / "output.json"};
     inFile.open(p); //open the input file
 
     std::stringstream strStream;

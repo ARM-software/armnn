@@ -101,7 +101,7 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     cd boost_1_64_0
     echo "using gcc : arm : aarch64-linux-gnu-g++ ;" > user_config.jam
     ./bootstrap.sh --prefix=$HOME/armnn-devenv/boost_arm64_install
-    ./b2 install toolset=gcc-arm link=static cxxflags=-fPIC --with-filesystem --with-test --with-log --with-program_options -j32 --user-config=user_config.jam
+    ./b2 install toolset=gcc-arm link=static cxxflags=-fPIC --with-test --with-log --with-program_options -j32 --user-config=user_config.jam
     ```
 
 #### <a name="buildCL">Build Compute Library</a>
@@ -243,7 +243,6 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     -DCMAKE_CXX_FLAGS=--std=c++14 \
     -DBOOST_ROOT=$HOME/armnn-devenv/boost_arm64_install/ \
     -DBoost_SYSTEM_LIBRARY=$HOME/armnn-devenv/boost_arm64_install/lib/libboost_system.a \
-    -DBoost_FILESYSTEM_LIBRARY=$HOME/armnn-devenv/boost_arm64_install/lib/libboost_filesystem.a \
     -DARMNN_PATH=$HOME/armnn-devenv/armnn/build/libarmnn.so
     ```
 

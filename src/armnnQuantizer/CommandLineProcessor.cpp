@@ -4,12 +4,9 @@
 //
 
 #include "CommandLineProcessor.hpp"
-
-#define BOOST_FILESYSTEM_NO_DEPRECATED
+#include <Filesystem.hpp>
 
 #include <boost/program_options.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
 
 namespace armnnQuantizer
 {
@@ -27,13 +24,13 @@ bool ValidateOutputDirectory(std::string& dir)
         dir += "/";
     }
 
-    if (!boost::filesystem::exists(dir))
+    if (!fs::exists(dir))
     {
         std::cerr << "Output directory [" << dir << "] does not exist" << std::endl;
         return false;
     }
 
-    if (!boost::filesystem::is_directory(dir))
+    if (!fs::is_directory(dir))
     {
         std::cerr << "Given output directory [" << dir << "] is not a directory" << std::endl;
         return false;
@@ -44,13 +41,13 @@ bool ValidateOutputDirectory(std::string& dir)
 
 bool ValidateProvidedFile(const std::string& inputFileName)
 {
-    if (!boost::filesystem::exists(inputFileName))
+    if (!fs::exists(inputFileName))
     {
         std::cerr << "Provided file [" << inputFileName << "] does not exist" << std::endl;
         return false;
     }
 
-    if (boost::filesystem::is_directory(inputFileName))
+    if (fs::is_directory(inputFileName))
     {
         std::cerr << "Given file [" << inputFileName << "] is a directory" << std::endl;
         return false;
@@ -154,7 +151,7 @@ bool CommandLineProcessor::ProcessCommandLine(int argc, char* argv[])
         }
         else
         {
-            boost::filesystem::path csvFilePath(m_CsvFileName);
+            fs::path csvFilePath(m_CsvFileName);
             m_CsvFileDirectory = csvFilePath.parent_path().c_str();
         }
 
@@ -170,7 +167,7 @@ bool CommandLineProcessor::ProcessCommandLine(int argc, char* argv[])
     std::string output(m_OutputDirectory);
     output.append(m_OutputFileName);
 
-    if (boost::filesystem::exists(output))
+    if (fs::exists(output))
     {
         std::cerr << "Output file [" << output << "] already exists" << std::endl;
         return false;

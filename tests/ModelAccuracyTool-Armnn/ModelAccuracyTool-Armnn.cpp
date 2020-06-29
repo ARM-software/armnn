@@ -7,8 +7,8 @@
 #include "../InferenceTest.hpp"
 #include "ModelAccuracyChecker.hpp"
 #include "armnnDeserializer/IDeserializer.hpp"
+#include <Filesystem.hpp>
 
-#include <boost/filesystem.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <map>
@@ -49,7 +49,6 @@ int main(int argc, char* argv[])
 {
     try
     {
-        using namespace boost::filesystem;
         armnn::LogSeverity level = armnn::LogSeverity::Debug;
         armnn::ConfigureLogging(true, true, level);
 
@@ -195,8 +194,8 @@ int main(int argc, char* argv[])
         std::vector<BindingPointInfo> outputBindings = { m_OutputBindingInfo };
 
         // Load model output labels
-        if (modelOutputLabelsPath.empty() || !boost::filesystem::exists(modelOutputLabelsPath) ||
-            !boost::filesystem::is_regular_file(modelOutputLabelsPath))
+        if (modelOutputLabelsPath.empty() || !fs::exists(modelOutputLabelsPath) ||
+            !fs::is_regular_file(modelOutputLabelsPath))
         {
             ARMNN_LOG(fatal) << "Invalid model output labels path at " << modelOutputLabelsPath;
         }
@@ -225,7 +224,7 @@ int main(int argc, char* argv[])
 
         // Validate  blacklist file if it's specified
         if (!blacklistPath.empty() &&
-            !(boost::filesystem::exists(blacklistPath) && boost::filesystem::is_regular_file(blacklistPath)))
+            !(fs::exists(blacklistPath) && fs::is_regular_file(blacklistPath)))
         {
             ARMNN_LOG(fatal) << "Invalid path to blacklist file at " << blacklistPath;
             return 1;
@@ -309,7 +308,7 @@ int main(int argc, char* argv[])
                 vector<TContainer> inputDataContainers;
                 vector<TContainer> outputDataContainers;
 
-                auto imagePath = pathToDataDir / boost::filesystem::path(imageName);
+                auto imagePath = pathToDataDir / fs::path(imageName);
                 switch (inputTensorDataType)
                 {
                     case armnn::DataType::Signed32:
@@ -393,11 +392,11 @@ map<std::string, std::string> LoadValidationImageFilenamesAndLabels(const string
     // Populate imageFilenames with names of all .JPEG, .PNG images
     std::vector<std::string> imageFilenames;
     for (const auto& imageEntry :
-         boost::make_iterator_range(boost::filesystem::directory_iterator(boost::filesystem::path(imageDirectoryPath))))
+         boost::make_iterator_range(fs::directory_iterator(fs::path(imageDirectoryPath))))
     {
-        boost::filesystem::path imagePath = imageEntry.path();
+        fs::path imagePath = imageEntry.path();
         std::string imageExtension        = boost::to_upper_copy<std::string>(imagePath.extension().string());
-        if (boost::filesystem::is_regular_file(imagePath) && (imageExtension == ".JPEG" || imageExtension == ".PNG"))
+        if (fs::is_regular_file(imagePath) && (imageExtension == ".JPEG" || imageExtension == ".PNG"))
         {
             imageFilenames.push_back(imagePath.filename().string());
         }

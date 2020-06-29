@@ -13,9 +13,8 @@ namespace armnnUtils
 namespace Filesystem
 {
 
-long long GetFileSize(const char* path);
-
-bool Remove(const char* path);
+/// Returns a path to a file in the system temporary folder. If the file existed it will be deleted.
+fs::path NamedTempFile(const char* fileName);
 
 }
 }

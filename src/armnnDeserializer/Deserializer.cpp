@@ -19,7 +19,6 @@
 #include <ParserHelper.hpp>
 #include <VerificationHelpers.hpp>
 
-#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 

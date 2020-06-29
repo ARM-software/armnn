@@ -184,7 +184,6 @@ if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
             armnn
             ${Boost_SYSTEM_LIBRARY}
             ${Boost_PROGRAM_OPTIONS_LIBRARY}
-            ${Boost_FILESYSTEM_LIBRARY}
             ${Boost_THREAD_LIBRARY} )
 
     add_executable_ex(ArmnnQuantizer
@@ -196,7 +195,6 @@ if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
     target_link_libraries(ArmnnQuantizer
             ${Boost_SYSTEM_LIBRARY}
             ${Boost_PROGRAM_OPTIONS_LIBRARY}
-            ${Boost_FILESYSTEM_LIBRARY}
             ${Boost_THREAD_LIBRARY} )
 
     target_link_libraries(ArmnnQuantizer
@@ -611,7 +609,7 @@ endif()
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 target_link_libraries(armnn ${Boost_THREAD_LIBRARY}
-                            ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
+                            ${Boost_SYSTEM_LIBRARY})
 
 if(ARMCOMPUTENEON OR ARMCOMPUTECL)
     target_link_libraries(armnn ${ARMCOMPUTE_LIBRARIES})
@@ -1029,7 +1027,6 @@ if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD
     target_link_libraries(ArmnnConverter ${CMAKE_THREAD_LIBS_INIT})
     target_link_libraries(ArmnnConverter
         ${Boost_SYSTEM_LIBRARY}
-        ${Boost_FILESYSTEM_LIBRARY}
         ${Boost_PROGRAM_OPTIONS_LIBRARY})
     addDllCopyCommands(ArmnnConverter)
   endif()

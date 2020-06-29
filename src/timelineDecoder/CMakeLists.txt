@@ -17,7 +17,8 @@ if(BUILD_TIMELINE_DECODER)
         TimelineDirectoryCaptureCommandHandler.hpp)
 
     include_directories(${PROJECT_SOURCE_DIR}/src/profiling
-                        ${PROJECT_SOURCE_DIR}/profiling/common/include)
+                        ${PROJECT_SOURCE_DIR}/profiling/common/include
+                        ${PROJECT_SOURCE_DIR}/src/armnnUtils)
 
     if(BUILD_UNIT_TESTS)
       target_include_directories(UnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/timelineDecoder)

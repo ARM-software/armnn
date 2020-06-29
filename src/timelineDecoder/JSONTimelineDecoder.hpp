@@ -7,10 +7,9 @@
 
 #include <armnn/profiling/ITimelineDecoder.hpp>
 
+#include <Filesystem.hpp>
 #include <map>
 #include <vector>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem.hpp>
 
 namespace armnn
 {
@@ -65,8 +64,7 @@ public:
 
 private:
     Model m_Model;
-    boost::filesystem::path fileDir = boost::filesystem::temp_directory_path();
-    boost::filesystem::path p{fileDir / boost::filesystem::unique_path("output.json")};
+    fs::path p = armnnUtils::Filesystem::NamedTempFile("output.json");
 
     std::string outputJSONFile = p.string();
 

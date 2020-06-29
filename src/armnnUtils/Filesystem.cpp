@@ -5,51 +5,30 @@
 
 #include "Filesystem.hpp"
 
-#if defined(__unix__)
-#include <sys/stat.h>
-#include <stdio.h>
-#elif defined(_MSC_VER)
-#include "WindowsWrapper.hpp"
-#endif
-
 namespace armnnUtils
 {
 namespace Filesystem
 {
 
-long long GetFileSize(const char* path)
+/**
+ * @brief Construct a temporary file name.
+ *
+ * Given a specified file name construct a path to that file in the
+ * system temporary directory. If the file already exists it is deleted. This
+ * could throw filesystem_error exceptions.
+ *
+ * @param fileName the file name required in the temporary directory.
+ * @return path consisting of system temporary directory and file name.
+ */
+fs::path NamedTempFile(const char* fileName)
 {
-#if defined(__ANDROID__)
-    struct stat statusBuffer;
-    if (stat(path, & statusBuffer) != 0)
+    fs::path tmpDir = fs::temp_directory_path();
+    fs::path namedTempFile{tmpDir / fileName};
+    if (fs::exists(namedTempFile))
     {
-        return -1;
+        fs::remove(namedTempFile);
     }
-    return statusBuffer.st_size;
-#elif defined(__unix__)
-    struct stat statusBuffer;
-    if (stat(path, & statusBuffer) != 0)
-    {
-        return -1;
-    }
-    return static_cast<long long>(statusBuffer.st_size);
-#elif defined(_MSC_VER)
-    WIN32_FILE_ATTRIBUTE_DATA attr;
-    if (::GetFileAttributesEx(path, GetFileExInfoStandard, &attr) == 0)
-    {
-        return -1;
-    }
-    return attr.nFileSizeLow;
-#endif
-}
-
-bool Remove(const char* path)
-{
-#if defined(__unix__)
-    return remove(path) == 0;
-#elif defined(_MSC_VER)
-    return ::DeleteFile(path);
-#endif
+    return namedTempFile;
 }
 
 }

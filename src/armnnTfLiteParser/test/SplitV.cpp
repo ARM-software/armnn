@@ -121,7 +121,7 @@ struct SplitVFixture : public ParserFlatbuffersFixture
 struct SimpleSplitVAxisOneFixture : SplitVFixture
 {
     SimpleSplitVAxisOneFixture()
-        : SplitVFixture( "[ 4, 2, 2, 2 ]", "[ 1, 3 ]", "[ 2 ]","[ ]", "2",
+        : SplitVFixture( "[ 4, 2, 2, 2 ]", "[ 1, 0, 0, 0, 3, 0, 0, 0 ]", "[ 2 ]","[ ]", "2",
                          "[ 1, 2, 2, 2 ]", "[ 3, 2, 2, 2 ]", "[ 0, 0, 0, 0 ]", "FLOAT32")
     {}
 };
@@ -143,7 +143,7 @@ BOOST_FIXTURE_TEST_CASE(ParseAxisOneSplitVTwo, SimpleSplitVAxisOneFixture)
 struct SimpleSplitVAxisTwoFixture : SplitVFixture
 {
     SimpleSplitVAxisTwoFixture()
-        : SplitVFixture( "[ 2, 4, 2, 2 ]", "[ 3, 1 ]", "[ 2 ]","[ ]", "2",
+        : SplitVFixture( "[ 2, 4, 2, 2 ]", "[ 3, 0, 0, 0, 1, 0, 0, 0 ]", "[ 2 ]","[ ]", "2",
                          "[ 2, 3, 2, 2 ]", "[ 2, 1, 2, 2 ]", "[ 1, 0, 0, 0 ]", "FLOAT32")
     {}
 };
@@ -165,7 +165,7 @@ BOOST_FIXTURE_TEST_CASE(ParseAxisTwoSplitVTwo, SimpleSplitVAxisTwoFixture)
 struct SimpleSplitVAxisThreeFixture : SplitVFixture
 {
     SimpleSplitVAxisThreeFixture()
-        : SplitVFixture( "[ 2, 2, 4, 2 ]", "[ 1, 3 ]", "[ 2 ]","[ ]", "2",
+        : SplitVFixture( "[ 2, 2, 4, 2 ]", "[ 1, 0, 0, 0, 3, 0, 0, 0 ]", "[ 2 ]","[ ]", "2",
                          "[ 2, 2, 1, 2 ]", "[ 2, 2, 3, 2 ]", "[ 2, 0, 0, 0 ]", "FLOAT32")
     {}
 };
@@ -187,7 +187,7 @@ BOOST_FIXTURE_TEST_CASE(ParseAxisThreeSplitVTwo, SimpleSplitVAxisThreeFixture)
 struct SimpleSplitVAxisFourFixture : SplitVFixture
 {
     SimpleSplitVAxisFourFixture()
-        : SplitVFixture( "[ 2, 2, 2, 4 ]", "[ 3, 1 ]", "[ 2 ]","[ ]", "2",
+        : SplitVFixture( "[ 2, 2, 2, 4 ]", "[ 3, 0, 0, 0, 1, 0, 0, 0 ]", "[ 2 ]","[ ]", "2",
                          "[ 2, 2, 2, 3 ]", "[ 2, 2, 2, 1 ]", "[ 3, 0, 0, 0 ]", "FLOAT32")
     {}
 };

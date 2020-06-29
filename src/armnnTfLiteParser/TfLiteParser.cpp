@@ -2689,7 +2689,7 @@ void TfLiteParser::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
             boost::str(
                 boost::format(
                     "The number of dimensions: %1% for input tensors of the "
-                    "split op cannot be greater than %2% %3%")
+                    "SplitV op cannot be greater than %2% %3%")
                 % inputTensorInfo.GetNumDimensions()
                 % MaxNumOfTensorDimensions
                 % CHECK_LOCATION().AsString()));
@@ -2703,7 +2703,6 @@ void TfLiteParser::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
 
     // Set split sizes
     CHECK_VALID_SIZE(splitsInfo.GetNumDimensions(), 1);
-    std::vector<int> splitsData(0);
     unsigned int numSplits{0};
 
     if(options)
@@ -2720,17 +2719,11 @@ void TfLiteParser::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
         throw ParseException("SplitV has invalid number of splits");
     }
 
-    splitsData.resize(numSplits);
+    std::vector<int> splitsData(numSplits);
     BufferRawPtr splitsBufferPtr = GetBuffer(m_Model, splitsTensor->buffer);
-    unsigned int idx{0};
+    ::memcpy(splitsData.data(), splitsBufferPtr->data.data(), splitsInfo.GetNumBytes());
 
-    for(auto& split: splitsData)
-    {
-        split = splitsBufferPtr->data[idx];
-        idx++;
-    }
-
-    idx = 0;
+    unsigned int idx = 0;
     int numInferred{0};
     unsigned int inferIdx{0};
     int splitSum{0};

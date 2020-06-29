@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -447,13 +447,15 @@ bool NeonLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
 bool NeonLayerSupport::IsGatherSupported(const TensorInfo& input0,
                                          const TensorInfo& input1,
                                          const TensorInfo& output,
+                                         const GatherDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonGatherWorkloadValidate,
                                    reasonIfUnsupported,
                                    input0,
                                    input1,
-                                   output);
+                                   output,
+                                   descriptor);
 }
 
 bool NeonLayerSupport::IsGreaterSupported(const armnn::TensorInfo& input0,

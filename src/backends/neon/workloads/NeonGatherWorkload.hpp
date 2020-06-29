@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -13,7 +13,8 @@ namespace armnn
 {
 arm_compute::Status NeonGatherWorkloadValidate(const TensorInfo& input,
                                                const TensorInfo& indices,
-                                               const TensorInfo& output);
+                                               const TensorInfo& output,
+                                               const GatherDescriptor& descriptor);
 
 class NeonGatherWorkload : public BaseWorkload<GatherQueueDescriptor>
 {

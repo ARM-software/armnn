@@ -466,13 +466,15 @@ bool ClLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
 bool ClLayerSupport::IsGatherSupported(const TensorInfo& input0,
                                        const TensorInfo& input1,
                                        const TensorInfo& output,
+                                       const GatherDescriptor& descriptor,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClGatherWorkloadValidate,
                                    reasonIfUnsupported,
                                    input0,
                                    input1,
-                                   output);
+                                   output,
+                                   descriptor);
 }
 
 bool ClLayerSupport::IsGreaterSupported(const TensorInfo& input0,

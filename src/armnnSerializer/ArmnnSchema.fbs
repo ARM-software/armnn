@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -312,6 +312,11 @@ table FullyConnectedDescriptor {
 
 table GatherLayer {
     base:LayerBase;
+    descriptor:GatherDescriptor;
+}
+
+table GatherDescriptor {
+    axis:int = 0;
 }
 
 /// @deprecated Use ComparisonLayer instead

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -173,9 +173,16 @@ public:
                                            const FullyConnectedDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    ARMNN_DEPRECATED_MSG("Use IsGatherSupported with descriptor instead")
     virtual bool IsGatherSupported(const TensorInfo& input0,
                                    const TensorInfo& input1,
                                    const TensorInfo& output,
+                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
+    virtual bool IsGatherSupported(const TensorInfo& input0,
+                                   const TensorInfo& input1,
+                                   const TensorInfo& output,
+                                   const GatherDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
     ARMNN_DEPRECATED_MSG("Use IsComparisonSupported instead")

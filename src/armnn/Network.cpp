@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1724,7 +1724,14 @@ IConnectableLayer* Network::AddRsqrtLayer(const char * name)
 
 IConnectableLayer* Network::AddGatherLayer(const char* name)
 {
-    return m_Graph->AddLayer<GatherLayer>(name);
+    GatherDescriptor gatherDescriptor{};
+    return AddGatherLayer(gatherDescriptor, name);
+}
+
+IConnectableLayer* Network::AddGatherLayer(const GatherDescriptor& gatherDescriptor,
+                                           const char* name)
+{
+    return m_Graph->AddLayer<GatherLayer>(gatherDescriptor, name);
 }
 
 IConnectableLayer* Network::AddMergeLayer(const char* name)

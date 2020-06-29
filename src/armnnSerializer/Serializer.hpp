@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -134,7 +134,12 @@ public:
                                   const armnn::Optional<armnn::ConstTensor>& biases,
                                   const char* name = nullptr) override;
 
+    ARMNN_DEPRECATED_MSG("Use VisitGatherLayer with descriptor instead")
     void VisitGatherLayer(const armnn::IConnectableLayer* layer,
+                          const char* name = nullptr) override;
+
+    void VisitGatherLayer(const armnn::IConnectableLayer* layer,
+                          const armnn::GatherDescriptor& gatherDescriptor,
                           const char* name = nullptr) override;
 
     ARMNN_DEPRECATED_MSG("Use VisitComparisonLayer instead")

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -127,6 +127,7 @@ public:
     bool IsGatherSupported(const TensorInfo& input0,
                            const TensorInfo& input1,
                            const TensorInfo& output,
+                           const GatherDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported) const override;
 
     ARMNN_DEPRECATED_MSG("Use IsComparisonSupported instead")

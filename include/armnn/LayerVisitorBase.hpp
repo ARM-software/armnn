@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -114,7 +114,12 @@ public:
                                   const Optional<ConstTensor>&,
                                   const char*) override { DefaultPolicy::Apply(__func__); }
 
+    ARMNN_DEPRECATED_MSG("Use VisitGatherLayer with descriptor instead")
     void VisitGatherLayer(const IConnectableLayer*,
+                          const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitGatherLayer(const IConnectableLayer*,
+                          const GatherDescriptor&,
                           const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitGreaterLayer(const IConnectableLayer*,

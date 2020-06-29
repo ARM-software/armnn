@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -214,7 +214,16 @@ public:
     /// Function a Gather layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param name - Optional name for the layer.
+    ARMNN_DEPRECATED_MSG("Use VisitGatherLayer with descriptor instead")
     virtual void VisitGatherLayer(const IConnectableLayer* layer,
+                                  const char* name = nullptr) = 0;
+
+    /// Function a Gather layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param gatherDescriptor - Parameters for the gather operation.
+    /// @param name - Optional name for the layer.
+    virtual void VisitGatherLayer(const IConnectableLayer* layer,
+                                  const GatherDescriptor& gatherDescriptor,
                                   const char* name = nullptr) = 0;
 
     /// Function a Greater layer should call back to when its Accept(ILayerVisitor&) function is invoked.

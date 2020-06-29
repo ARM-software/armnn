@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -493,12 +493,23 @@ void SerializerVisitor::VisitFloorLayer(const armnn::IConnectableLayer *layer, c
     CreateAnyLayer(flatBufferFloorLayer.o, serializer::Layer::Layer_FloorLayer);
 }
 
-void SerializerVisitor::VisitGatherLayer(const armnn::IConnectableLayer* layer, const char* name)
+void SerializerVisitor::VisitGatherLayer(const armnn::IConnectableLayer* layer,
+                                         const char* name)
+{
+    armnn::GatherDescriptor gatherDescriptor{};
+    VisitGatherLayer(layer, gatherDescriptor, name);
+}
+
+void SerializerVisitor::VisitGatherLayer(const armnn::IConnectableLayer* layer,
+                                         const armnn::GatherDescriptor& gatherDescriptor,
+                                         const char* name)
 {
     IgnoreUnused(name);
 
+    auto fbGatherDescriptor = CreateGatherDescriptor(m_flatBufferBuilder,
+                                                     gatherDescriptor.m_Axis);
     auto fbGatherBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Gather);
-    auto flatBufferLayer   = serializer::CreateGatherLayer(m_flatBufferBuilder, fbGatherBaseLayer);
+    auto flatBufferLayer   = serializer::CreateGatherLayer(m_flatBufferBuilder, fbGatherBaseLayer, fbGatherDescriptor);
 
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_GatherLayer);
 }

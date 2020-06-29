@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -305,6 +305,7 @@ bool IsFullyConnectedSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsFullyConnectedSupported, input, output, weights, biases, descriptor);
 }
 
+ARMNN_DEPRECATED_MSG("Use IsGatherSupported with descriptor instead")
 bool IsGatherSupported(const BackendId& backend,
                        const TensorInfo& input0,
                        const TensorInfo& input1,
@@ -312,7 +313,19 @@ bool IsGatherSupported(const BackendId& backend,
                        char* reasonIfUnsupported,
                        size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsGatherSupported, input0, input1, output);
+    const GatherDescriptor descriptor{};
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsGatherSupported, input0, input1, output, descriptor);
+}
+
+bool IsGatherSupported(const BackendId& backend,
+                       const TensorInfo& input0,
+                       const TensorInfo& input1,
+                       const TensorInfo& output,
+                       const GatherDescriptor& descriptor,
+                       char* reasonIfUnsupported,
+                       size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsGatherSupported, input0, input1, output, descriptor);
 }
 
 bool IsGreaterSupported(const BackendId& backend,

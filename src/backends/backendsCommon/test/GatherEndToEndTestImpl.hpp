@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -19,9 +19,10 @@ armnn::INetworkPtr CreateGatherNetwork(const armnn::TensorInfo& paramsInfo,
 {
     armnn::INetworkPtr net(armnn::INetwork::Create());
 
+    armnn::GatherDescriptor descriptor;
     armnn::IConnectableLayer* paramsLayer = net->AddInputLayer(0);
     armnn::IConnectableLayer* indicesLayer = net->AddConstantLayer(armnn::ConstTensor(indicesInfo, indicesData));
-    armnn::IConnectableLayer* gatherLayer = net->AddGatherLayer("gather");
+    armnn::IConnectableLayer* gatherLayer = net->AddGatherLayer(descriptor, "gather");
     armnn::IConnectableLayer* outputLayer = net->AddOutputLayer(0, "output");
     Connect(paramsLayer, gatherLayer, paramsInfo, 0, 0);
     Connect(indicesLayer, gatherLayer, indicesInfo, 0, 1);

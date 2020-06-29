@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -551,7 +551,7 @@ DECLARE_LAYER_POLICY_1_PARAM(Floor)
 
 DECLARE_LAYER_POLICY_2_PARAM(FullyConnected)
 
-DECLARE_LAYER_POLICY_1_PARAM(Gather)
+DECLARE_LAYER_POLICY_2_PARAM(Gather)
 
 DECLARE_LAYER_POLICY_CUSTOM_PARAM(Input, armnn::LayerBindingId)
 

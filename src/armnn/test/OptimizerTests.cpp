@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -458,7 +458,8 @@ void CreateGatherGraph(Graph& graph, const armnn::TensorInfo& paramsInfo, const 
     Layer* input1 = graph.AddLayer<InputLayer>(1, "indices");
     input1->GetOutputSlot().SetTensorInfo(indicesInfo);
 
-    GatherLayer* layer = graph.AddLayer<GatherLayer>("gather");
+    GatherDescriptor descriptor;
+    GatherLayer* layer = graph.AddLayer<GatherLayer>(descriptor, "gather");
     layer->GetOutputSlot().SetTensorInfo(outputInfo);
 
     Layer* output = graph.AddLayer<OutputLayer>(0, "output");

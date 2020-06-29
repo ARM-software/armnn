@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -14,10 +14,11 @@ BOOST_AUTO_TEST_SUITE(Deserializer)
 
 struct GatherFixture : public ParserFlatbuffersSerializeFixture
 {
-    explicit GatherFixture(const std::string &inputShape,
-                           const std::string &indicesShape,
-                           const std::string &input1Content,
-                           const std::string &outputShape,
+    explicit GatherFixture(const std::string& inputShape,
+                           const std::string& indicesShape,
+                           const std::string& input1Content,
+                           const std::string& outputShape,
+                           const std::string& axis,
                            const std::string dataType,
                            const std::string constDataType)
     {
@@ -94,7 +95,10 @@ struct GatherFixture : public ParserFlatbuffersSerializeFixture
                                                dimensions: )" + outputShape + R"(,
                                                dataType: )" + dataType + R"(
 
-                                   }}]}
+                                   }}]},
+                                   descriptor: {
+                                       axis: )" + axis + R"(
+                                   }
                         }},
                     {
                     layer_type: "OutputLayer",
@@ -127,7 +131,7 @@ struct GatherFixture : public ParserFlatbuffersSerializeFixture
 struct SimpleGatherFixtureFloat32 : GatherFixture
 {
     SimpleGatherFixtureFloat32() : GatherFixture("[ 3, 2, 3 ]", "[ 2, 3 ]", "[1, 2, 1, 2, 1, 0]",
-                                                 "[ 2, 3, 2, 3 ]", "Float32", "IntData") {}
+                                                 "[ 2, 3, 2, 3 ]", "0", "Float32", "IntData") {}
 };
 
 BOOST_FIXTURE_TEST_CASE(GatherFloat32, SimpleGatherFixtureFloat32)

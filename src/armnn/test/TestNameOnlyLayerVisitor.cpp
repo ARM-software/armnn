@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -42,7 +42,6 @@ TEST_SUITE_NAME_ONLY_LAYER_VISITOR(Addition)
 TEST_SUITE_NAME_ONLY_LAYER_VISITOR(Dequantize)
 TEST_SUITE_NAME_ONLY_LAYER_VISITOR(Division)
 TEST_SUITE_NAME_ONLY_LAYER_VISITOR(Floor)
-TEST_SUITE_NAME_ONLY_LAYER_VISITOR(Gather)
 TEST_SUITE_NAME_ONLY_LAYER_VISITOR(Maximum)
 TEST_SUITE_NAME_ONLY_LAYER_VISITOR(Merge)
 TEST_SUITE_NAME_ONLY_LAYER_VISITOR(Minimum)

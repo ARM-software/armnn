@@ -471,7 +471,7 @@ struct RsqrtQueueDescriptor : QueueDescriptor
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
-struct GatherQueueDescriptor : QueueDescriptor
+struct GatherQueueDescriptor : QueueDescriptorWithParameters<GatherDescriptor>
 {
     void Validate(const WorkloadInfo& workloadInfo) const;
 };

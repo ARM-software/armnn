@@ -2427,8 +2427,11 @@ void Deserializer::ParseGather(GraphPtr graph, unsigned int layerIndex)
     Deserializer::TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
+    armnn::GatherDescriptor descriptor;
+    descriptor.m_Axis = graph->layers()->Get(layerIndex)->layer_as_GatherLayer()->descriptor()->axis();
+
     auto layerName = GetLayerName(graph, layerIndex);
-    IConnectableLayer* layer = m_Network->AddGatherLayer(layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddGatherLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

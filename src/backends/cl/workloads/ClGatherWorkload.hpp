@@ -13,7 +13,8 @@ namespace armnn
 {
 arm_compute::Status ClGatherWorkloadValidate(const TensorInfo& input,
                                              const TensorInfo& indices,
-                                             const TensorInfo& output);
+                                             const TensorInfo& output,
+                                             const GatherDescriptor& descriptor);
 
 class ClGatherWorkload : public BaseWorkload<GatherQueueDescriptor>
 {

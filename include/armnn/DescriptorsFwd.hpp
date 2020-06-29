@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -20,6 +20,7 @@ struct ElementwiseUnaryDescriptor;
 struct FakeQuantizationDescriptor;
 struct FillDescriptor;
 struct FullyConnectedDescriptor;
+struct GatherDescriptor;
 struct InstanceNormalizationDescriptor;
 struct L2NormalizationDescriptor;
 struct LstmDescriptor;

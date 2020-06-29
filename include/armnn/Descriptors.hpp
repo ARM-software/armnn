@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -728,6 +728,26 @@ struct FillDescriptor
     }
 
     float m_Value;
+};
+
+/// A GatherDescriptor for the GatherLayer.
+struct GatherDescriptor
+{
+    GatherDescriptor()
+        : m_Axis(0)
+    {}
+
+    GatherDescriptor(int32_t axis)
+        : m_Axis(axis)
+    {}
+
+    bool operator ==(const GatherDescriptor& rhs) const
+    {
+        return m_Axis == rhs.m_Axis;
+    }
+
+    /// The axis in params to gather indices from
+    int32_t m_Axis;
 };
 
 /// A ResizeBilinearDescriptor for the ResizeBilinearLayer.

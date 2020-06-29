@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -12,13 +12,14 @@ namespace armnn
 {
 arm_compute::Status NeonGatherWorkloadValidate(const TensorInfo& input,
                                                const TensorInfo& indices,
-                                               const TensorInfo& output)
+                                               const TensorInfo& output,
+                                               const GatherDescriptor& descriptor)
 {
     const arm_compute::TensorInfo aclInput   = BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclIndices = BuildArmComputeTensorInfo(indices);
     const arm_compute::TensorInfo aclOutput  = BuildArmComputeTensorInfo(output);
 
-    int aclAxis = ComputeAclAxis(0, input);
+    int aclAxis = ComputeAclAxis(descriptor.m_Axis, input);
 
     return arm_compute::NEGather::validate(&aclInput, &aclIndices, &aclOutput, aclAxis);
 }
@@ -33,7 +34,7 @@ NeonGatherWorkload::NeonGatherWorkload(const GatherQueueDescriptor& descriptor,
     arm_compute::ITensor& indices = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     arm_compute::ITensor& output  = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    int aclAxis = ComputeAclAxis(0, info.m_InputTensorInfos[0]);
+    int aclAxis = ComputeAclAxis(descriptor.m_Parameters.m_Axis, info.m_InputTensorInfos[0]);
 
     m_Layer.configure(&input, &indices, &output, aclAxis);
 }

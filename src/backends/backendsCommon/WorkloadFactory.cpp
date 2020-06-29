@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -414,9 +414,12 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
             const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            auto cLayer = PolymorphicDowncast<const GatherLayer*>(&layer);
+            const GatherDescriptor& descriptor = cLayer->GetParameters();
             result = layerSupportObject->IsGatherSupported(OverrideDataType(input0, dataType),
                                                            input1,
                                                            OverrideDataType(output, dataType),
+                                                           descriptor,
                                                            reason);
             break;
         }

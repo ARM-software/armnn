@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -116,7 +116,11 @@ public:
                                               const ConstTensor& biases,
                                               const char* name = nullptr) override;
 
+    ARMNN_DEPRECATED_MSG("This AddGatherLayer overload is deprecated")
     IConnectableLayer* AddGatherLayer(const char* name = nullptr) override;
+
+    IConnectableLayer* AddGatherLayer(const GatherDescriptor& gatherDescriptor,
+                                      const char* name = nullptr) override;
 
     IConnectableLayer* AddPermuteLayer(const PermuteDescriptor& permuteDescriptor,
                                        const char* name = nullptr) override;

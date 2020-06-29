@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -128,7 +128,7 @@ public:
     /// Add a Comparison layer to the network.
     /// @param name - Optional name for the layer.
     /// @param desc - Descriptor for the comparison operation.
-    /// @ return - Interface for configuring the layer.
+    /// @return - Interface for configuring the layer.
     virtual IConnectableLayer* AddComparisonLayer(const ComparisonDescriptor& comparisonDescriptor,
                                                   const char* name = nullptr) = 0;
 
@@ -324,7 +324,7 @@ public:
 
     /// Add absolute layer to the network.
     /// @param name - Optional name for the layer.
-    /// @ return - Interface for configuring the layer.
+    /// @return - Interface for configuring the layer.
     ARMNN_DEPRECATED_MSG("Use AddElementwiseUnaryLayer instead")
     virtual IConnectableLayer* AddAbsLayer(const char* name = nullptr) = 0;
 
@@ -453,13 +453,13 @@ public:
 
     /// Add a Maximum layer to the network.
     /// @param name - Optional name for the layer.
-    /// @ return - Interface for configuring the layer.
+    /// @return - Interface for configuring the layer.
     virtual IConnectableLayer* AddMaximumLayer(const char* name = nullptr) = 0;
 
     /// Add a Mean layer to the network.
     /// @param meanDescriptor - Parameters for the mean operation.
     /// @param name - Optional name for the layer.
-    /// @ return - Interface for configuring the layer.
+    /// @return - Interface for configuring the layer.
     virtual IConnectableLayer* AddMeanLayer(const MeanDescriptor& meanDescriptor, const char* name = nullptr) = 0;
 
     /// Adds a fully pad layer to the network.
@@ -485,31 +485,39 @@ public:
 
     /// Add a Minimum layer to the network.
     /// @param name - Optional name for the layer.
-    /// @ return - Interface for configuring the layer.
+    /// @return - Interface for configuring the layer.
     virtual IConnectableLayer* AddMinimumLayer(const char* name = nullptr) = 0;
 
     /// Add a Greater layer to the network.
     /// @param name - Optional name for the layer.
-    /// @ return - Interface for configuring the layer.
+    /// @return - Interface for configuring the layer.
     ARMNN_DEPRECATED_MSG("Use AddComparisonLayer instead")
     virtual IConnectableLayer* AddGreaterLayer(const char* name = nullptr) = 0;
 
     /// Add a Equal layer to the network.
     /// @param name - Optional name for the layer.
-    /// @ return - Interface for configuring the layer.
+    /// @return - Interface for configuring the layer.
     ARMNN_DEPRECATED_MSG("Use AddComparisonLayer instead")
     virtual IConnectableLayer* AddEqualLayer(const char* name = nullptr) = 0;
 
     /// Add Reciprocal of square root layer to the network.
     /// @param name - Optional name for the layer.
-    /// @ return - Interface for configuring the layer.
+    /// @return - Interface for configuring the layer.
     ARMNN_DEPRECATED_MSG("Use AddElementwiseUnaryLayer instead")
     virtual IConnectableLayer* AddRsqrtLayer(const char* name = nullptr) = 0;
 
     /// Add Gather layer to the network.
     /// @param name - Optional name for the layer.
-    /// @ return - Interface for configuring the layer.
+    /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG("Use AddGatherLayer with descriptor instead")
     virtual IConnectableLayer* AddGatherLayer(const char* name = nullptr) = 0;
+
+    /// Add Gather layer to the network.
+    /// @param descriptor - Description of the gather layer.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddGatherLayer(const GatherDescriptor& descriptor,
+                                              const char* name = nullptr) = 0;
 
     /// Adds a switch layer to the network.
     /// @param name - Optional name for the layer.

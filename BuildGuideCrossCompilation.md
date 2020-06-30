@@ -17,7 +17,7 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 
 #### <a name="installCCT">Cross-compiling ToolChain</a>
 * Install the standard cross-compilation libraries for arm64:
-    ```
+    ```bash
     sudo apt install crossbuild-essential-arm64
     ```
 
@@ -29,11 +29,11 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     git clone -b v3.5.2 https://github.com/google/protobuf.git protobuf
     cd protobuf
     git submodule update --init --recursive
-    ./autogen
+    ./autogen.sh
     ```
 * Build a native (x86_64) version of the protobuf libraries and compiler (protoc):
   (Requires cUrl, autoconf, llibtool, and other build dependencies if not previously installed: sudo apt install curl autoconf libtool build-essential g++)
-    ```
+    ```bash
     mkdir x86_64_build
     cd x86_64_build
     ../configure --prefix=$HOME/armnn-devenv/google/x86_64_pb_install
@@ -41,11 +41,11 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     cd ..
     ```
 * Build the arm64 version of the protobuf libraries:
-    ```
+    ```bash
     mkdir arm64_build
     cd arm64_build
-    export CC=aarch64-linux-gnu-gcc \
-    export CXX=aarch64-linux-gnu-g++ \
+    export CC=aarch64-linux-gnu-gcc
+    export CXX=aarch64-linux-gnu-g++
     ../configure --host=aarch64-linux \
     --prefix=$HOME/armnn-devenv/google/arm64_pb_install \
     --with-protoc=$HOME/armnn-devenv/google/x86_64_pb_install/bin/protoc
@@ -122,16 +122,16 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 
 #### <a name="buildtf">Build Tensorflow</a>
 * Building Tensorflow version 1.15:
-    '''bash
+    ```bash
     git clone https://github.com/tensorflow/tensorflow.git
     cd tensorflow/
     git checkout 590d6eef7e91a6a7392c8ffffb7b58f2e0c8bc6b
     ../armnn/scripts/generate_tensorflow_protobuf.sh ../tensorflow-protobuf ../google/x86_64_pb_install
-    '''
+    ```
 
-#### <"a name=buildflatbuffer">Build Flatbuffer</a>
+#### <a name="buildflatbuffer">Build Flatbuffer</a>
 * Building Flatbuffer version 1.10.0
-    '''bash
+    ```bash
     wget -O flatbuffers-1.10.0.tar.gz https://github.com/google/flatbuffers/archive/v1.10.0.tar.gz
     tar xf flatbuffers-1.10.0.tar.gz
     cd flatbuffers-1.10.0
@@ -142,9 +142,9 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 	     -DCMAKE_INSTALL_PREFIX:PATH=$<DIRECTORY_PATH> \
 	     -DFLATBUFFERS_BUILD_TESTS=0
     make all install
-    '''
+    ```
 * Build arm64 version of flatbuffer
-    '''bash
+    ```bash
     mkdir build-arm64
     cd build-arm64
     cmake .. -DCMAKE_C_COMPILER=/usr/bin/aarch64-linux-gnu-gcc \
@@ -153,26 +153,26 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 	     -DCMAKE_INSTALL_PREFIX:PATH=$<DIRECTORY_PATH> \
 	     -DFLATBUFFERS_BUILD_TESTS=0
     make all install
-    '''
+    ```
 
 #### <a name="buildingONNX">Build Onnx</a>
 * Building Onnx
-    '''bash
+    ```bash
     git clone https://github.com/onnx/onnx.git
     cd onnx
     git fetch https://github.com/onnx/onnx.git f612532843bd8e24efeab2815e45b436479cc9ab && git checkout FETCH_HEAD
     export LD_LIBRARY_PATH=$<DIRECTORY_PATH>/protobuf-host/lib:$LD_LIBRARY_PATH
     ../google/x86_64_pb_install/bin/protoc onnx/onnx.proto --proto_path=. --proto_path=../google/x86_64_pb_install/include --cpp_out ../onnx
-    '''
+    ```
 
 #### <a name="buildingtflite">Build TfLite</a>
 * Building TfLite
-    '''bash
+    ```bash
     mkdir tflite
     cd tflite
     cp ../tensorflow/tensorflow/lite/schema/schema.fbs .
     ../flatbuffers-1.10.0/build/flatc -c --gen-object-api --reflect-types --reflect-names schema.fbs
-    '''
+    ```
 
 #### <a name="buildANN">Build ArmNN</a>
 * Compile ArmNN for arm64:

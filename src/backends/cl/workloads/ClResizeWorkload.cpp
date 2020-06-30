@@ -33,14 +33,17 @@ arm_compute::Status ClResizeWorkloadValidate(const TensorInfo& input,
     arm_compute::InterpolationPolicy aclInterpolationPolicy =
         ConvertResizeMethodToAclInterpolationPolicy(descriptor.m_Method);
 
+    arm_compute::SamplingPolicy samplingPolicy = descriptor.m_HalfPixelCenters ? arm_compute::SamplingPolicy::CENTER :
+                                                                                 arm_compute::SamplingPolicy::TOP_LEFT;
+
     return arm_compute::CLScale::validate(&aclInputInfo,
                                           &aclOutputInfo,
-                                          aclInterpolationPolicy,
-                                          arm_compute::BorderMode::REPLICATE,
-                                          arm_compute::PixelValue(0.f),
-                                          arm_compute::SamplingPolicy::TOP_LEFT,
-                                          true,
-                                          descriptor.m_AlignCorners);
+                                          arm_compute::ScaleKernelInfo(aclInterpolationPolicy,
+                                                                       arm_compute::BorderMode::REPLICATE,
+                                                                       arm_compute::PixelValue(0.f),
+                                                                       samplingPolicy,
+                                                                       true,
+                                                                       descriptor.m_AlignCorners));
 }
 
 ClResizeWorkload::ClResizeWorkload(const ResizeQueueDescriptor& descriptor, const WorkloadInfo& info) :
@@ -58,14 +61,19 @@ ClResizeWorkload::ClResizeWorkload(const ResizeQueueDescriptor& descriptor, cons
     arm_compute::InterpolationPolicy aclInterpolationPolicy =
         ConvertResizeMethodToAclInterpolationPolicy(descriptor.m_Parameters.m_Method);
 
+    arm_compute::SamplingPolicy samplingPolicy = descriptor.m_Parameters.m_HalfPixelCenters
+                                                 ? arm_compute::SamplingPolicy::CENTER
+                                                 : arm_compute::SamplingPolicy::TOP_LEFT;
+
     m_ResizeLayer.configure(&input,
                             &output,
-                            aclInterpolationPolicy,
-                            arm_compute::BorderMode::REPLICATE,
-                            arm_compute::PixelValue(0.f),
-                            arm_compute::SamplingPolicy::TOP_LEFT,
-                            true,
-                            descriptor.m_Parameters.m_AlignCorners);
+                            arm_compute::ScaleKernelInfo(aclInterpolationPolicy,
+                                                         arm_compute::BorderMode::REPLICATE,
+                                                         arm_compute::PixelValue(0.f),
+                                                         samplingPolicy,
+                                                         true,
+                                                         descriptor.m_Parameters.m_AlignCorners));
+
 };
 
 void ClResizeWorkload::Execute() const

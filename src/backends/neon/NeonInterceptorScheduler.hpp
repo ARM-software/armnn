@@ -10,6 +10,7 @@
 #include <arm_compute/runtime/IScheduler.h>
 #include <arm_compute/runtime/Scheduler.h>
 #include <arm_compute/core/CPP/ICPPKernel.h>
+#include <arm_compute/core/experimental/Types.h>
 
 namespace armnn
 {
@@ -32,6 +33,11 @@ public:
 
     void SetKernels(NeonTimer::KernelMeasurements* kernels) { m_Kernels = kernels; }
     NeonTimer::KernelMeasurements* GetKernels() { return m_Kernels; }
+
+    void schedule_op(arm_compute::ICPPKernel *kernel,
+                     const Hints &hints,
+                     const arm_compute::InputTensorMap &inputs,
+                     const arm_compute::OutputTensorMap &outputs ) override;
 private:
     NeonTimer::KernelMeasurements* m_Kernels;
     arm_compute::IScheduler& m_RealScheduler;

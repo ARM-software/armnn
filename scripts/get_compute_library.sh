@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_05" # Release 20.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="980a9168b81d778f4902973b4920b54c103907e0" #COMPMID-3177: Remove padding from NEBatchNormalizationLayer.
+DEFAULT_CLFRAMEWORKREVISION="f3ad9513dd46fca1d6c5e4550286480fdbaba056" #COMPMID-3324: Fix paths in Android.bp
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

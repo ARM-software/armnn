@@ -52,4 +52,18 @@ void NeonInterceptorScheduler::run_tagged_workloads(std::vector<Workload> &workl
     m_Kernels->emplace_back(std::string(tag != nullptr ? tag : "Unknown"), delta.count(), Measurement::Unit::TIME_US);
 }
 
+void NeonInterceptorScheduler::schedule_op(arm_compute::ICPPKernel *kernel,
+                                           const Hints &hints,
+                                           const arm_compute::InputTensorMap &inputs,
+                                           const arm_compute::OutputTensorMap &outputs )
+{
+
+    WallClockTimer::clock::time_point startTime = WallClockTimer::clock::now();
+    m_RealScheduler.schedule_op(kernel, hints, inputs, outputs);
+    WallClockTimer::clock::time_point stopTime = WallClockTimer::clock::now();
+
+    const auto delta       = std::chrono::duration<double, std::micro>(stopTime - startTime);
+    m_Kernels->emplace_back(kernel->name(), delta.count(), Measurement::Unit::TIME_US);
+}
+
 } // namespace armnn

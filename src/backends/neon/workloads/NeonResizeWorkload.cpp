@@ -33,12 +33,18 @@ arm_compute::Status NeonResizeWorkloadValidate(const TensorInfo& input,
     arm_compute::InterpolationPolicy aclInterpolationPolicy =
             ConvertResizeMethodToAclInterpolationPolicy(descriptor.m_Method);
 
+    arm_compute::SamplingPolicy samplingPolicy = descriptor.m_HalfPixelCenters ? arm_compute::SamplingPolicy::CENTER :
+                                                                                 arm_compute::SamplingPolicy::TOP_LEFT;
+
     return arm_compute::NEScale::validate(&aclInputInfo,
                                           &aclOutputInfo,
-                                          aclInterpolationPolicy,
-                                          arm_compute::BorderMode::REPLICATE,
-                                          arm_compute::PixelValue(0.f),
-                                          arm_compute::SamplingPolicy::TOP_LEFT);
+                                          arm_compute::ScaleKernelInfo(aclInterpolationPolicy,
+                                                                       arm_compute::BorderMode::REPLICATE,
+                                                                       arm_compute::PixelValue(0.f),
+                                                                       samplingPolicy,
+                                                                       true,
+                                                                       descriptor.m_AlignCorners));
+
 }
 
 NeonResizeWorkload::NeonResizeWorkload(const ResizeQueueDescriptor& descriptor,
@@ -57,14 +63,18 @@ NeonResizeWorkload::NeonResizeWorkload(const ResizeQueueDescriptor& descriptor,
     arm_compute::InterpolationPolicy aclInterpolationPolicy =
             ConvertResizeMethodToAclInterpolationPolicy(descriptor.m_Parameters.m_Method);
 
+    arm_compute::SamplingPolicy samplingPolicy = descriptor.m_Parameters.m_HalfPixelCenters
+                                                 ? arm_compute::SamplingPolicy::CENTER
+                                                 : arm_compute::SamplingPolicy::TOP_LEFT;
+
     m_ResizeLayer.configure(&input,
                             &output,
-                            aclInterpolationPolicy,
-                            arm_compute::BorderMode::REPLICATE,
-                            arm_compute::PixelValue(0.f),
-                            arm_compute::SamplingPolicy::TOP_LEFT,
-                            true,
-                            descriptor.m_Parameters.m_AlignCorners);
+                            arm_compute::ScaleKernelInfo(aclInterpolationPolicy,
+                                                         arm_compute::BorderMode::REPLICATE,
+                                                         arm_compute::PixelValue(0.f),
+                                                         samplingPolicy,
+                                                         true,
+                                                         descriptor.m_Parameters.m_AlignCorners));
 };
 
 void NeonResizeWorkload::Execute() const

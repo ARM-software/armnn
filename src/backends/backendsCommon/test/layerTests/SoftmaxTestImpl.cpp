@@ -63,7 +63,7 @@ LayerTestResult<T, n> SimpleSoftmaxBaseTestImpl(
     const armnn::TensorShape& inputShape,
     const std::vector<float>& outputData,
     const std::vector<float>& inputData,
-    int axis = 1)
+    int axis = -1)
 {
     IgnoreUnused(memoryManager);
     using std::exp;

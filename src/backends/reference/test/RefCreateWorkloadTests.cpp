@@ -1136,9 +1136,9 @@ static void RefCreateQLstmWorkloadTest()
     armnn::TensorInfo outputInfo({2 , 4}, armnn::DataType::QAsymmS8, 0.007f, 0);
 
     QLstmQueueDescriptor queueDescriptor = workload->GetData();
-    auto inputHandle = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Inputs[0]);
-    auto cellStateOutHandle = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Outputs[1]);
-    auto outputHandle = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Outputs[2]);
+    auto inputHandle = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto cellStateOutHandle = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Outputs[1]);
+    auto outputHandle = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Outputs[2]);
 
     BOOST_TEST((inputHandle->GetTensorInfo() == inputInfo));
     BOOST_TEST((cellStateOutHandle->GetTensorInfo() == cellStateInfo));

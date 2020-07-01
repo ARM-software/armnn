@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -242,12 +242,10 @@ void JSONTimelineDecoder::JSONEntity::SetParent(JSONEntity& parent)
     parent.childEntities.push_back(GetGuid());
 }
 
-void JSONTimelineDecoder::PrintJSON(JSONTimelineDecoder::JSONEntity& rootEntity)
+void JSONTimelineDecoder::PrintJSON(JSONTimelineDecoder::JSONEntity& rootEntity, std::ostream& os)
 {
     std::string jsonString = GetJSONString(rootEntity);
-    std::ofstream ofs{this->outputJSONFile};
-    ofs << jsonString;
-    ofs.close();
+    os << jsonString;
 }
 
 std::string JSONTimelineDecoder::GetJSONString(JSONTimelineDecoder::JSONEntity& rootEntity)
@@ -375,11 +373,6 @@ uint64_t JSONTimelineDecoder::JSONEntity::GetGuid()
 const JSONTimelineDecoder::Model &JSONTimelineDecoder::GetModel()
 {
     return m_Model;
-}
-
-void JSONTimelineDecoder::SetOutgoingCaptureFile(const std::string& outgoingCaptureFile)
-{
-    this->outputJSONFile = outgoingCaptureFile;
 }
 
 void JSONTimelineDecoder::JSONEntity::SetName(std::string entityName)

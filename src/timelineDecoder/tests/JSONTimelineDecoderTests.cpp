@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -795,14 +795,23 @@ BOOST_AUTO_TEST_CASE(JSONTimelineDecoderTestJSON)
     BOOST_CHECK(jsonString.find("normalization_2: {")!=std::string::npos);
     BOOST_CHECK(jsonString.find("output_4: {")!=std::string::npos);
 
-    timelineDecoder.PrintJSON(rootEntity);
+    // Create a temporary file to write Json output to
+    fs::path tempFile = armnnUtils::Filesystem::NamedTempFile("JSONTimelineDecoderTestJSON.json");
+    // open temp file
+    std::ofstream ofs{tempFile};
+    // tell the timeline decoder to print into our temp file (you could also use std::cout)
+    timelineDecoder.PrintJSON(rootEntity, ofs);
+    // close temp file
+    ofs.close();
 
+    // Now everything in opposite order
     fs::ifstream inFile;
-    fs::path p{fs::temp_directory_path() / "output.json"};
-    inFile.open(p); //open the input file
+    //reopen the file this time for reading
+    inFile.open(tempFile);
 
     std::stringstream strStream;
     strStream << inFile.rdbuf(); //read the file
+    inFile.close();
     std::string outfileJson = strStream.str();
 
     BOOST_CHECK(outfileJson != "");
@@ -811,5 +820,8 @@ BOOST_AUTO_TEST_CASE(JSONTimelineDecoderTestJSON)
                                 "\t\t\tbackendId :CpuRef,")!=std::string::npos);
     BOOST_CHECK(outfileJson.find("normalization_2: {")!=std::string::npos);
     BOOST_CHECK(outfileJson.find("output_4: {")!=std::string::npos);
+
+    // Remove temporary file
+    fs::remove(tempFile);
 }
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -49,7 +49,7 @@ public:
         std::map<uint64_t, EventClass> eventClasses;
     };
 
-    void PrintJSON(JSONEntity& entity);
+    void PrintJSON(JSONEntity& entity, std::ostream& os);
     std::string GetJSONString(JSONEntity& rootEntity);
     std::string GetJSONEntityString(JSONEntity& entity, int& counter);
 
@@ -60,13 +60,9 @@ public:
     virtual TimelineStatus CreateRelationship(const Relationship&) override;
 
     const Model& GetModel();
-    void SetOutgoingCaptureFile(const std::string& basicString);
 
 private:
     Model m_Model;
-    fs::path p = armnnUtils::Filesystem::NamedTempFile("output.json");
-
-    std::string outputJSONFile = p.string();
 
     void HandleRetentionLink(const Relationship& relationship);
     void HandleLabelLink(const Relationship& relationship);

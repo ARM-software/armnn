@@ -21,6 +21,9 @@ const static uint32_t bodyHeaderSize = 6;
 
 uint32_t GetStreamMetaDataPacketSize();
 
+/// Returns a vector of CpuRef, CpuAcc or GpuAcc backends if they where registered
+std::vector<BackendId> GetSuitableBackendRegistered();
+
 inline unsigned int OffsetToNextWord(unsigned int numberOfBytes);
 
 void VerifyTimelineHeaderBinary(const unsigned char* readableData,
@@ -56,10 +59,6 @@ ProfilingGuid VerifyTimelineEventBinaryPacket(Optional<uint64_t> timestamp,
                                               unsigned int& offset);
 
 void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId);
-
-// returns true if a CpuRef, CpuAcc or GpuAcc
-// backend is registered
-bool HasSuitableBackendRegistered();
 
 bool CompareOutput(std::vector<std::string> output, std::vector<std::string> expectedOutput);
 

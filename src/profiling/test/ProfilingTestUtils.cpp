@@ -34,6 +34,24 @@ uint32_t GetStreamMetaDataPacketSize()
     return headerSize + bodySize + payloadSize;
 }
 
+std::vector<BackendId> GetSuitableBackendRegistered()
+{
+    std::vector<BackendId> suitableBackends;
+    if (BackendRegistryInstance().IsBackendRegistered(GetComputeDeviceAsCString(armnn::Compute::CpuRef)))
+    {
+        suitableBackends.push_back(armnn::Compute::CpuRef);
+    }
+    if (BackendRegistryInstance().IsBackendRegistered(GetComputeDeviceAsCString(armnn::Compute::CpuAcc)))
+    {
+        suitableBackends.push_back(armnn::Compute::CpuAcc);
+    }
+    if (BackendRegistryInstance().IsBackendRegistered(GetComputeDeviceAsCString(armnn::Compute::GpuAcc)))
+    {
+        suitableBackends.push_back(armnn::Compute::GpuAcc);
+    }
+    return suitableBackends;
+}
+
 inline unsigned int OffsetToNextWord(unsigned int numberOfBytes)
 {
     unsigned int uint32_t_size = sizeof(uint32_t);
@@ -1197,17 +1215,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     BOOST_TEST_MESSAGE("INFERENCE - END OF LIFE EVENT RELATIONSHIP OK");
 
     bufferManager.MarkRead(inferenceReadableBuffer);
-}
-
-bool HasSuitableBackendRegistered()
-{
-    // Only run the file only profiling unit tests on CpuRef until failure on build system can be debugged
-    if (BackendRegistryInstance().GetBackendIds().size() == 1 &&
-        BackendRegistryInstance().IsBackendRegistered(GetComputeDeviceAsCString(armnn::Compute::CpuRef)))
-    {
-        return true;
-    }
-    return false;
 }
 
 bool CompareOutput(std::vector<std::string> output, std::vector<std::string> expectedOutput)

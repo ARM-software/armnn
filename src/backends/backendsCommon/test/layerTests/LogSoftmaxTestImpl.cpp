@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -57,7 +57,7 @@ LayerTestResult<T, NumDims> LogSoftmaxTestImpl(
     auto inputTensor = MakeTensor<T, NumDims>(inputInfo, armnnUtils::QuantizedVector<T>(inputValues, qScale, qOffset));
     CopyDataToITensorHandle(inputHandle.get(), inputTensor.origin());
 
-    workload->Execute();
+    ExecuteWorkload(*workload, memoryManager);
 
     CopyDataFromITensorHandle(result.output.origin(), outputHandle.get());
 

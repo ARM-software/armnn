@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -320,6 +320,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateL2Normalization(const L2No
                                                                               m_MemoryManager->GetIntraLayerManager());
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateLogSoftmax(const LogSoftmaxQueueDescriptor& descriptor,
+                                                                 const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonLogSoftmaxWorkload>(descriptor, info, m_MemoryManager->GetIntraLayerManager());
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateLstm(const LstmQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
@@ -386,7 +392,7 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateNormalization(
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateOutput(const OutputQueueDescriptor& descriptor,
-                                                             const WorkloadInfo&        info) const
+                                                             const WorkloadInfo& info) const
 {
     return std::make_unique<CopyMemGenericWorkload>(descriptor, info);
 }
@@ -398,13 +404,13 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreatePad(const PadQueueDescript
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
-                                                                     const WorkloadInfo&           info) const
+                                                                     const WorkloadInfo& info) const
 {
     return std::make_unique<NeonPermuteWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
-                                                                       const WorkloadInfo&           info) const
+                                                                       const WorkloadInfo& info) const
 {
     return std::make_unique<NeonPooling2dWorkload>(descriptor, info);
 }

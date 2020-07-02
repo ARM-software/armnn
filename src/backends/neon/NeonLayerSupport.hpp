@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -152,6 +152,11 @@ public:
                                     const TensorInfo& output,
                                     const L2NormalizationDescriptor& descriptor,
                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
+    bool IsLogSoftmaxSupported(const TensorInfo& input,
+                               const TensorInfo& output,
+                               const LogSoftmaxDescriptor& descriptor,
+                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsLstmSupported(const TensorInfo& input,
                          const TensorInfo& outputStateIn,

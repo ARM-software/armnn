@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -130,6 +130,9 @@ public:
 
     std::unique_ptr<IWorkload> CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
                                                      const WorkloadInfo& info) const override;
+
+    std::unique_ptr<IWorkload> CreateLogSoftmax(const LogSoftmaxQueueDescriptor& descriptor,
+                                                const WorkloadInfo& info) const override;
 
     std::unique_ptr<IWorkload> CreateLstm(const LstmQueueDescriptor& descriptor,
                                           const WorkloadInfo& info) const override;

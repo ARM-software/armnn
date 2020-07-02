@@ -34,6 +34,7 @@
 #include "workloads/NeonDequantizeWorkload.hpp"
 #include "workloads/NeonInstanceNormalizationWorkload.hpp"
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
+#include "workloads/NeonLogSoftmaxWorkload.hpp"
 #include "workloads/NeonLstmFloatWorkload.hpp"
 #include "workloads/NeonMaximumWorkload.hpp"
 #include "workloads/NeonMeanWorkload.hpp"
@@ -491,6 +492,14 @@ bool NeonLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
                                                   Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonL2NormalizationWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
+}
+
+bool NeonLayerSupport::IsLogSoftmaxSupported(const TensorInfo& input,
+                                             const TensorInfo& output,
+                                             const LogSoftmaxDescriptor& descriptor,
+                                             Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonLogSoftmaxWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
 }
 
 bool NeonLayerSupport::IsLstmSupported(const TensorInfo& input,

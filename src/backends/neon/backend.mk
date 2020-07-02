@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 ARM Ltd. All rights reserved.
+# Copyright © 2017 ARM Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -46,6 +46,7 @@ BACKEND_SOURCES := \
         workloads/NeonGatherWorkload.cpp \
         workloads/NeonInstanceNormalizationWorkload.cpp \
         workloads/NeonL2NormalizationFloatWorkload.cpp \
+        workloads/NeonLogSoftmaxWorkload.cpp \
         workloads/NeonLstmFloatWorkload.cpp \
         workloads/NeonMaximumWorkload.cpp \
         workloads/NeonMeanWorkload.cpp \

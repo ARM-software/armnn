@@ -1203,37 +1203,43 @@ struct TransposeConvolution2dDescriptor
         m_StrideX(0),
         m_StrideY(0),
         m_BiasEnabled(false),
-        m_DataLayout(DataLayout::NCHW)
+        m_DataLayout(DataLayout::NCHW),
+        m_OutputShapeEnabled(false)
     {}
 
     bool operator ==(const TransposeConvolution2dDescriptor& rhs) const
     {
-        return m_PadLeft     == rhs.m_PadLeft &&
-               m_PadRight    == rhs.m_PadRight &&
-               m_PadTop      == rhs.m_PadTop &&
-               m_PadBottom   == rhs.m_PadBottom &&
-               m_StrideX     == rhs.m_StrideX &&
-               m_StrideY     == rhs.m_StrideY &&
-               m_BiasEnabled == rhs.m_BiasEnabled &&
-               m_DataLayout  == rhs.m_DataLayout;
+        return m_PadLeft            == rhs.m_PadLeft &&
+               m_PadRight           == rhs.m_PadRight &&
+               m_PadTop             == rhs.m_PadTop &&
+               m_PadBottom          == rhs.m_PadBottom &&
+               m_StrideX            == rhs.m_StrideX &&
+               m_StrideY            == rhs.m_StrideY &&
+               m_BiasEnabled        == rhs.m_BiasEnabled &&
+               m_DataLayout         == rhs.m_DataLayout &&
+               m_OutputShapeEnabled == rhs.m_OutputShapeEnabled &&
+               m_OutputShape        == rhs.m_OutputShape;
     }
 
     /// Padding left value in the width dimension.
-    uint32_t   m_PadLeft;
+    uint32_t                  m_PadLeft;
     /// Padding right value in the width dimension.
-    uint32_t   m_PadRight;
+    uint32_t                  m_PadRight;
     /// Padding top value in the height dimension.
-    uint32_t   m_PadTop;
+    uint32_t                  m_PadTop;
     /// Padding bottom value in the height dimension.
-    uint32_t   m_PadBottom;
+    uint32_t                  m_PadBottom;
     /// Stride value when proceeding through input for the width dimension.
-    uint32_t   m_StrideX;
+    uint32_t                  m_StrideX;
     /// Stride value when proceeding through input for the height dimension.
-    uint32_t   m_StrideY;
+    uint32_t                  m_StrideY;
     /// Enable/disable bias.
-    bool       m_BiasEnabled;
+    bool                      m_BiasEnabled;
     /// The data layout to be used (NCHW, NHWC).
-    DataLayout m_DataLayout;
+    DataLayout                m_DataLayout;
+    /// Output shape if it has been specified.
+    bool                      m_OutputShapeEnabled;
+    std::vector<unsigned int> m_OutputShape;
 };
 
 /// A TransposeDescriptor for the TransposeLayer.

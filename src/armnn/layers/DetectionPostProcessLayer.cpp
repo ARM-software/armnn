@@ -34,13 +34,13 @@ DetectionPostProcessLayer* DetectionPostProcessLayer::Clone(Graph& graph) const
     return std::move(layer);
 }
 
-void DetectionPostProcessLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void DetectionPostProcessLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(2, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     // on this level constant data should not be released.
     ARMNN_ASSERT_MSG(m_Anchors != nullptr, "DetectionPostProcessLayer: Anchors data should not be null.");
@@ -53,21 +53,21 @@ void DetectionPostProcessLayer::ValidateTensorShapesFromInputs(ShapeInferenceMet
     const TensorShape& inferredDetectionScores = TensorShape({ 1, detectedBoxes });
     const TensorShape& inferredNumberDetections = TensorShape({ 1 });
 
-    ValidateAndCopyShape(outputShape, inferredDetectionBoxes, shapeInferenceMethod, "DetectionPostProcessLayer");
+    ValidateAndCopyShape(outputShape, inferredDetectionBoxes, m_ShapeInferenceMethod, "DetectionPostProcessLayer");
 
     ValidateAndCopyShape(GetOutputSlot(1).GetTensorInfo().GetShape(),
                          inferredDetectionScores,
-                         shapeInferenceMethod,
+                         m_ShapeInferenceMethod,
                          "DetectionPostProcessLayer", 1);
 
     ValidateAndCopyShape(GetOutputSlot(2).GetTensorInfo().GetShape(),
                          inferredDetectionScores,
-                         shapeInferenceMethod,
+                         m_ShapeInferenceMethod,
                          "DetectionPostProcessLayer", 2);
 
     ValidateAndCopyShape(GetOutputSlot(3).GetTensorInfo().GetShape(),
                          inferredNumberDetections,
-                         shapeInferenceMethod,
+                         m_ShapeInferenceMethod,
                          "DetectionPostProcessLayer", 3);
 }
 

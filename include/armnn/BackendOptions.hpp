@@ -11,6 +11,8 @@
 namespace armnn
 {
 
+struct BackendOptions;
+using NetworkOptions = std::vector<BackendOptions>;
 
 /// Struct for the users to pass backend specific options
 struct BackendOptions

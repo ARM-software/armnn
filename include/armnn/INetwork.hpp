@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include <armnn/BackendOptions.hpp>
 #include <armnn/Deprecated.hpp>
 #include <armnn/DescriptorsFwd.hpp>
 #include <armnn/ILayerVisitor.hpp>
@@ -11,7 +12,6 @@
 #include <armnn/Optional.hpp>
 #include <armnn/TensorFwd.hpp>
 #include <armnn/Types.hpp>
-#include <armnn/Deprecated.hpp>
 
 #include <memory>
 #include <vector>
@@ -105,8 +105,8 @@ using INetworkPtr = std::unique_ptr<INetwork, void(*)(INetwork* network)>;
 class INetwork
 {
 public:
-    static INetwork* CreateRaw();
-    static INetworkPtr Create();
+    static INetwork* CreateRaw(NetworkOptions networkOptions = {});
+    static INetworkPtr Create(NetworkOptions networkOptions = {});
     static void Destroy(INetwork* network);
 
     virtual Status PrintGraph() = 0;

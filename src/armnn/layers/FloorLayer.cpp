@@ -29,18 +29,18 @@ FloorLayer* FloorLayer::Clone(Graph& graph) const
     return CloneBase<FloorLayer>(graph, GetName());
 }
 
-void FloorLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void FloorLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "FloorLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "FloorLayer");
 }
 
 void FloorLayer::Accept(ILayerVisitor& visitor) const

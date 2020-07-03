@@ -101,13 +101,13 @@ std::vector<TensorShape> TransposeConvolution2dLayer::InferOutputShapes(
     return std::vector<TensorShape>({ tensorShape });
 }
 
-void TransposeConvolution2dLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void TransposeConvolution2dLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     ARMNN_ASSERT_MSG(m_Weight != nullptr, "TransposeConvolution2dLayer: Weight data cannot be null.");
 
@@ -127,7 +127,7 @@ void TransposeConvolution2dLayer::ValidateTensorShapesFromInputs(ShapeInferenceM
 
     ARMNN_ASSERT(expectedOutputShape.size() == 1);
 
-    ValidateAndCopyShape(outputShape, expectedOutputShape[0], shapeInferenceMethod, "TransposeConvolution2dLayer");
+    ValidateAndCopyShape(outputShape, expectedOutputShape[0], m_ShapeInferenceMethod, "TransposeConvolution2dLayer");
 }
 
 Layer::ConstantTensors TransposeConvolution2dLayer::GetConstantTensorsByRef()

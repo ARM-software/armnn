@@ -242,7 +242,7 @@ std::vector<TensorShape> ConcatLayer::InferOutputShapes(const std::vector<Tensor
     return std::vector<TensorShape>({ TensorShape({numDims, extentMax.data()}) });
 }
 
-void ConcatLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void ConcatLayer::ValidateTensorShapesFromInputs()
 {
     // Validates Concat layer.
     ConditionalThrowIfNotEqual<LayerValidationException>(
@@ -254,7 +254,7 @@ void ConcatLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfer
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     std::vector<TensorShape> inputShapes;
     for (unsigned int i = 0; i < GetNumInputSlots(); ++i)
@@ -266,7 +266,7 @@ void ConcatLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfer
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "ConcatLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "ConcatLayer");
 }
 
 void ConcatLayer::Accept(ILayerVisitor& visitor) const

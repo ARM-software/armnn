@@ -29,19 +29,19 @@ L2NormalizationLayer* L2NormalizationLayer::Clone(Graph& graph) const
     return CloneBase<L2NormalizationLayer>(graph, m_Param, GetName());
 }
 
-void L2NormalizationLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void L2NormalizationLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "L2NormalizationLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "L2NormalizationLayer");
 }
 
 void L2NormalizationLayer::Accept(ILayerVisitor& visitor) const

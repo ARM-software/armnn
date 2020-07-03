@@ -69,19 +69,19 @@ std::vector<TensorShape> ArgMinMaxLayer::InferOutputShapes(const std::vector<Ten
     return std::vector<TensorShape>({ outputShape });
 }
 
-void ArgMinMaxLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void ArgMinMaxLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "ArgMinMaxLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "ArgMinMaxLayer");
 }
 
 void ArgMinMaxLayer::Accept(ILayerVisitor& visitor) const

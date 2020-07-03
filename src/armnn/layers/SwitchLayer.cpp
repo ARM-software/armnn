@@ -27,13 +27,13 @@ SwitchLayer* SwitchLayer::Clone(Graph& graph) const
     return CloneBase<SwitchLayer>(graph, GetName());
 }
 
-void SwitchLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void SwitchLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(2, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     ARMNN_ASSERT_MSG(GetNumOutputSlots() == 2, "SwitchLayer: The layer should return 2 outputs.");
 
@@ -44,10 +44,10 @@ void SwitchLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfer
 
     ARMNN_ASSERT(inferredShapes.size() == 2);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "SwitchLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "SwitchLayer");
 
     ValidateAndCopyShape(
-            GetOutputSlot(1).GetTensorInfo().GetShape(), inferredShapes[1], shapeInferenceMethod, "SwitchLayer", 1);
+            GetOutputSlot(1).GetTensorInfo().GetShape(), inferredShapes[1], m_ShapeInferenceMethod, "SwitchLayer", 1);
 }
 
 void SwitchLayer::Accept(ILayerVisitor& visitor) const

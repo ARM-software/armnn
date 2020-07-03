@@ -91,13 +91,13 @@ std::vector<TensorShape> QuantizedLstmLayer::InferOutputShapes(const std::vector
     return outShapes;
 }
 
-void QuantizedLstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void QuantizedLstmLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(3, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes(
     {
@@ -137,11 +137,11 @@ void QuantizedLstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod sha
                      "QuantizedLstmLayer: m_QuantizedLstmParameters.m_OutputGateBias should not be null.");
 
     // Check output TensorShape(s) match inferred shape
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "QuantizedLstmLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "QuantizedLstmLayer");
 
     ValidateAndCopyShape(GetOutputSlot(1).GetTensorInfo().GetShape(),
                          inferredShapes[1],
-                         shapeInferenceMethod,
+                         m_ShapeInferenceMethod,
                          "QuantizedLstmLayer",
                          1);
 }

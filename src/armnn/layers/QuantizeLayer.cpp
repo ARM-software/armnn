@@ -29,17 +29,17 @@ Layer* QuantizeLayer::Clone(Graph& graph) const
     return clone;
 }
 
-void QuantizeLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void QuantizeLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "QuantizeLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "QuantizeLayer");
 }
 
 void QuantizeLayer::Accept(ILayerVisitor& visitor) const

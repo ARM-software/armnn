@@ -58,7 +58,7 @@ std::vector<TensorShape> StackLayer::InferOutputShapes(const std::vector<TensorS
     return std::vector<TensorShape>({ targetShape });
 }
 
-void StackLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void StackLayer::ValidateTensorShapesFromInputs()
 {
     // Validates Stack layer.
     ConditionalThrowIfNotEqual<LayerValidationException>(
@@ -70,7 +70,7 @@ void StackLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfere
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     // Constructs and validates input shapes
     std::vector<TensorShape> inputShapes;
@@ -90,7 +90,7 @@ void StackLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfere
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "StackLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "StackLayer");
 }
 
 void StackLayer::Accept(ILayerVisitor& visitor) const

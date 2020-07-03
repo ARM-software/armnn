@@ -60,7 +60,7 @@ void RunShapeInferenceTest(LayerT* const layer,
 
     const unsigned int outputSize = layer->GetNumOutputSlots();
 
-    const auto runTestWithMask = [&](const bool maskPermutations[], ShapeInferenceMethod shapeInferenceMethod)
+    const auto runTestWithMask = [&](const bool maskPermutations[])
     {
         for (unsigned int i = 0; i < outputSize; ++i)
         {
@@ -68,7 +68,7 @@ void RunShapeInferenceTest(LayerT* const layer,
                                                   DataType::Float32});
         }
 
-        layer->ValidateTensorShapesFromInputs(shapeInferenceMethod);
+        layer->ValidateTensorShapesFromInputs();
 
         for (unsigned int i = 0; i < outputSize; ++i)
         {
@@ -82,10 +82,12 @@ void RunShapeInferenceTest(LayerT* const layer,
         layer->GetOutputSlot(j).SetTensorInfo({TensorShape(Dimensionality::NotSpecified), DataType::Float32});
     }
 
-    BOOST_CHECK_THROW(
-            layer->ValidateTensorShapesFromInputs(ShapeInferenceMethod::ValidateOnly), LayerValidationException);
+    layer->SetShapeInferenceMethod(ShapeInferenceMethod::ValidateOnly);
 
-    layer->ValidateTensorShapesFromInputs(ShapeInferenceMethod::InferAndValidate);
+    BOOST_CHECK_THROW(layer->ValidateTensorShapesFromInputs(), LayerValidationException);
+
+    layer->SetShapeInferenceMethod(ShapeInferenceMethod::InferAndValidate);
+    layer->ValidateTensorShapesFromInputs();
 
     for (unsigned int i = 0; i < outputSize; ++i)
     {
@@ -93,16 +95,13 @@ void RunShapeInferenceTest(LayerT* const layer,
     }
 
     // Test inference with Dimensionality::Specified and various combinations of dimensions of unknown size
-    for (unsigned int i = 0; i <= numDimensions[0]; ++i)
+    for (unsigned int i = 0; i < numDimensions[0]; ++i)
     {
-        runTestWithMask(maskPermutations[i], ShapeInferenceMethod::InferAndValidate);
+        runTestWithMask(maskPermutations[i]);
     }
 
     // maskPermutations[5] equates to all dimensions being known
-    runTestWithMask(maskPermutations[5], ShapeInferenceMethod::ValidateOnly);
-
-    BOOST_CHECK_THROW(
-            runTestWithMask(maskPermutations[5], ShapeInferenceMethod::InferAndValidate), LayerValidationException);
+    runTestWithMask(maskPermutations[5]);
 }
 
 template<typename LayerT, typename... Args>
@@ -110,11 +109,66 @@ void CreateGraphAndRunTest(const std::vector<TensorShape>& inputShapes,
                            const std::vector<std::initializer_list<unsigned int>> dimensionSizeLists,
                            Args &&... args)
 {
-    Graph graph;
+    Graph graph(true);
 
     auto layer = BuildGraph<LayerT>(&graph, inputShapes, std::forward<Args>(args)...);
 
     RunShapeInferenceTest<LayerT>(layer, dimensionSizeLists);
+}
+
+BOOST_AUTO_TEST_CASE(NetworkOptionsTest)
+{
+     BackendOptions ShapeInferenceMethodOption("ShapeInferenceMethod",
+     {
+        { "InferAndValidate", true }
+     });
+
+    INetworkPtr network = INetwork::Create({ShapeInferenceMethodOption});
+    TensorInfo tensorInfo({ 5, 7, 6, 2 }, DataType::Float32);
+
+    auto inputLayer = network->AddInputLayer(1, "inputLayer");
+    inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    ActivationDescriptor descriptor;
+    descriptor.m_Function = ActivationFunction::Abs;
+    auto activationLayer = network->AddActivationLayer(descriptor, "activation");
+
+    inputLayer->GetOutputSlot(0).Connect(activationLayer->GetInputSlot(0));
+    activationLayer->GetOutputSlot(0).SetTensorInfo({TensorShape{Dimensionality::NotSpecified}, DataType::Float32});
+
+    BOOST_CHECK_NO_THROW(activationLayer->GetOutputSlot(0).IsTensorInfoSet());
+
+    BOOST_CHECK(activationLayer->GetOutputSlot(0).GetTensorInfo() == tensorInfo);
+
+
+    ShapeInferenceMethodOption = BackendOptions("ShapeInferenceMethod",
+                                               {
+                                                       { "InferAndValidate", false }
+                                               });
+
+    network = INetwork::Create({ShapeInferenceMethodOption});
+
+    inputLayer = network->AddInputLayer(1, "inputLayer");
+    inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    activationLayer = network->AddActivationLayer(descriptor, "activation");
+
+    inputLayer->GetOutputSlot(0).Connect(activationLayer->GetInputSlot(0));
+    activationLayer->GetOutputSlot(0).SetTensorInfo({TensorShape{Dimensionality::NotSpecified}, DataType::Float32});
+
+    BOOST_CHECK_NO_THROW(activationLayer->GetOutputSlot(0).IsTensorInfoSet());
+
+    network = INetwork::Create();
+
+    inputLayer = network->AddInputLayer(1, "inputLayer");
+    inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    activationLayer = network->AddActivationLayer(descriptor, "activation");
+
+    inputLayer->GetOutputSlot(0).Connect(activationLayer->GetInputSlot(0));
+    activationLayer->GetOutputSlot(0).SetTensorInfo({TensorShape{Dimensionality::NotSpecified}, DataType::Float32});
+
+    BOOST_CHECK_NO_THROW(activationLayer->GetOutputSlot(0).IsTensorInfoSet());
 }
 
 BOOST_AUTO_TEST_CASE(AbsTest)
@@ -190,7 +244,7 @@ BOOST_AUTO_TEST_CASE(ConstantTesst)
 
     layer->GetOutputSlot(0).SetTensorInfo({{1, 1, 3, 3}, DataType::Float32});
 
-    layer->ValidateTensorShapesFromInputs(ShapeInferenceMethod::ValidateOnly);
+    layer->ValidateTensorShapesFromInputs();
 
     BOOST_CHECK(layer->GetOutputSlot(0).GetTensorInfo().GetShape() == outputShape);
 }
@@ -564,15 +618,17 @@ BOOST_AUTO_TEST_CASE(RankTest)
    layer->GetOutputSlot(0).SetTensorInfo({TensorShape(Dimensionality::NotSpecified), DataType::Float32});
 
    BOOST_CHECK_THROW(
-           layer->ValidateTensorShapesFromInputs(ShapeInferenceMethod::ValidateOnly), LayerValidationException);
+           layer->ValidateTensorShapesFromInputs(), LayerValidationException);
 
-   layer->ValidateTensorShapesFromInputs(ShapeInferenceMethod::InferAndValidate);
+   layer->SetShapeInferenceMethod(ShapeInferenceMethod::InferAndValidate);
+
+    layer->ValidateTensorShapesFromInputs();
 
    BOOST_CHECK(layer->GetOutputSlot(0).GetTensorInfo().GetShape() == expectedOutputs);
 
    layer->GetOutputSlot(0).SetTensorInfo({TensorShape(Dimensionality::Scalar), DataType::Float32});
 
-   layer->ValidateTensorShapesFromInputs(ShapeInferenceMethod::ValidateOnly);
+    layer->ValidateTensorShapesFromInputs();
 
    BOOST_CHECK(layer->GetOutputSlot(0).GetTensorInfo().GetShape() == expectedOutputs);
 }

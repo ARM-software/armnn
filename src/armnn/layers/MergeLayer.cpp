@@ -27,13 +27,13 @@ MergeLayer* MergeLayer::Clone(Graph& graph) const
     return CloneBase<MergeLayer>(graph, GetName());
 }
 
-void MergeLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void MergeLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(2, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
@@ -42,7 +42,7 @@ void MergeLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfere
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "MergeLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "MergeLayer");
 }
 
 std::vector<TensorShape> MergeLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const

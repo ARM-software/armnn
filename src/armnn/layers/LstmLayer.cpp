@@ -163,13 +163,13 @@ std::vector<TensorShape> LstmLayer::InferOutputShapes(const std::vector<TensorSh
     return outShapes;
 }
 
-void LstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void LstmLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(3, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes( {
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
@@ -208,7 +208,7 @@ void LstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferen
         ARMNN_ASSERT_MSG(m_CifgParameters.m_InputGateBias != nullptr,
                          "LstmLayer: m_CifgParameters.m_InputGateBias should not be null.");
 
-        ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "LstmLayer");
+        ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "LstmLayer");
     }
     else
     {
@@ -219,7 +219,7 @@ void LstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferen
         ARMNN_ASSERT_MSG(m_CifgParameters.m_InputGateBias == nullptr,
             "LstmLayer: m_CifgParameters.m_InputGateBias should not have a value when CIFG is enabled.");
 
-        ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "LstmLayer");
+        ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "LstmLayer");
     }
 
     if (m_Param.m_ProjectionEnabled)
@@ -243,11 +243,11 @@ void LstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferen
     }
 
     ValidateAndCopyShape(
-            GetOutputSlot(1).GetTensorInfo().GetShape(), inferredShapes[1], shapeInferenceMethod, "LstmLayer", 1);
+            GetOutputSlot(1).GetTensorInfo().GetShape(), inferredShapes[1], m_ShapeInferenceMethod, "LstmLayer", 1);
     ValidateAndCopyShape(
-            GetOutputSlot(2).GetTensorInfo().GetShape(), inferredShapes[2], shapeInferenceMethod, "LstmLayer", 2);
+            GetOutputSlot(2).GetTensorInfo().GetShape(), inferredShapes[2], m_ShapeInferenceMethod, "LstmLayer", 2);
     ValidateAndCopyShape(
-            GetOutputSlot(3).GetTensorInfo().GetShape(), inferredShapes[3], shapeInferenceMethod, "LstmLayer", 3);
+            GetOutputSlot(3).GetTensorInfo().GetShape(), inferredShapes[3], m_ShapeInferenceMethod, "LstmLayer", 3);
 
     if (m_Param.m_LayerNormEnabled)
     {

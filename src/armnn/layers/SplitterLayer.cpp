@@ -139,11 +139,11 @@ std::vector<TensorShape> SplitterLayer::InferOutputShapes(const std::vector<Tens
     return outShapes;
 }
 
-void SplitterLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void SplitterLayer::ValidateTensorShapesFromInputs()
 {
     std::for_each(BeginOutputSlots(), EndOutputSlots(), [&](OutputSlot& outputSlot)
     {
-        VerifyShapeInferenceType(outputSlot.GetTensorInfo().GetShape(), shapeInferenceMethod);
+        VerifyShapeInferenceType(outputSlot.GetTensorInfo().GetShape(), m_ShapeInferenceMethod);
     });
 
     std::vector<TensorShape> views;
@@ -161,7 +161,7 @@ void SplitterLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInf
     {
         ValidateAndCopyShape(GetOutputSlot(viewIdx).GetTensorInfo().GetShape(),
                              inferredShapes[viewIdx],
-                             shapeInferenceMethod,
+                             m_ShapeInferenceMethod,
                              "SplitterLayer",
                              viewIdx);
     }

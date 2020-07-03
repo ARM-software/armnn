@@ -94,13 +94,13 @@ std::vector<TensorShape> PreluLayer::InferOutputShapes(const std::vector<TensorS
     return { outputShape };
 }
 
-void PreluLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void PreluLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(2, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes(
     {
@@ -110,7 +110,7 @@ void PreluLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfere
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "PreluLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "PreluLayer");
 }
 
 void PreluLayer::Accept(ILayerVisitor& visitor) const

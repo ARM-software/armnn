@@ -94,19 +94,19 @@ std::vector<TensorShape> StridedSliceLayer::InferOutputShapes(
         TensorShape(boost::numeric_cast<unsigned int>(outputShape.size()), &outputShape[0]) });
 }
 
-void StridedSliceLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void StridedSliceLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes({GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape()});
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "StridedSliceLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "StridedSliceLayer");
 }
 
 void StridedSliceLayer::Accept(ILayerVisitor& visitor) const

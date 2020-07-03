@@ -55,13 +55,13 @@ std::vector<TensorShape> ComparisonLayer::InferOutputShapes(const std::vector<Te
     return std::vector<TensorShape>({ TensorShape(numDims, dims.data()) });
 }
 
-void ComparisonLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void ComparisonLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(2, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
@@ -69,7 +69,7 @@ void ComparisonLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeI
     });
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "ComparisonLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "ComparisonLayer");
 }
 
 void ComparisonLayer::Accept(ILayerVisitor& visitor) const

@@ -29,19 +29,19 @@ FakeQuantizationLayer* FakeQuantizationLayer::Clone(Graph& graph) const
     return CloneBase<FakeQuantizationLayer>(graph, m_Param, GetName());
 }
 
-void FakeQuantizationLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void FakeQuantizationLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "FakeQuantizationLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "FakeQuantizationLayer");
 }
 
 void FakeQuantizationLayer::Accept(ILayerVisitor& visitor) const

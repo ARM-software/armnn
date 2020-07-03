@@ -36,9 +36,8 @@ PadLayer* PadLayer::Clone(Graph& graph) const
     return std::move(layer);
 }
 
-void PadLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void PadLayer::ValidateTensorShapesFromInputs()
 {
-    IgnoreUnused(shapeInferenceMethod);
 
     return;
 }

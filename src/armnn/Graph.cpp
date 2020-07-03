@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -489,7 +489,7 @@ void Graph::EraseSubgraphLayers(SubgraphView &subgraph)
     subgraph.Clear();
 }
 
-void Graph::InferTensorInfos(ShapeInferenceMethod shapeInferenceMethod)
+void Graph::InferTensorInfos()
 {
     for (auto&& layer : TopologicalSort())
     {
@@ -511,8 +511,12 @@ void Graph::InferTensorInfos(ShapeInferenceMethod shapeInferenceMethod)
             {
                 throw LayerValidationException("All inputs must have the TensorInfo set at this point.");
             }
+
+            if (layer->m_ShapeInferenceMethod == ShapeInferenceMethod::ValidateOnly)
+            {
+                layer->ValidateTensorShapesFromInputs();
+            }
         }
-        layer->ValidateTensorShapesFromInputs(shapeInferenceMethod);
     }
 }
 

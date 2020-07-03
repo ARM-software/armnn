@@ -34,9 +34,8 @@ std::vector<TensorShape> StandInLayer::InferOutputShapes(const std::vector<Tenso
     throw Exception("Stand in layer does not support infering output shapes");
 }
 
-void StandInLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void StandInLayer::ValidateTensorShapesFromInputs()
 {
-    IgnoreUnused(shapeInferenceMethod);
 
     // Cannot validate this layer since no implementation details can be known by the framework
     // so do nothing here.

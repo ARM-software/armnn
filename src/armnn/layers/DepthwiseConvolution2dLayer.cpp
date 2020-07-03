@@ -119,13 +119,13 @@ DepthwiseConvolution2dLayer::InferOutputShapes(const std::vector<TensorShape>& i
     return std::vector<TensorShape>{ tensorShape };
 }
 
-void DepthwiseConvolution2dLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void DepthwiseConvolution2dLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     // on this level constant data should not be released..
     ARMNN_ASSERT_MSG(m_Weight != nullptr, "DepthwiseConvolution2dLayer: Weights data should not be null.");
@@ -137,7 +137,7 @@ void DepthwiseConvolution2dLayer::ValidateTensorShapesFromInputs(ShapeInferenceM
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "DepthwiseConvolution2dLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "DepthwiseConvolution2dLayer");
 }
 
 Layer::ConstantTensors DepthwiseConvolution2dLayer::GetConstantTensorsByRef()

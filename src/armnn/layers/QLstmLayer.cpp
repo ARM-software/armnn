@@ -165,13 +165,13 @@ std::vector<TensorShape> QLstmLayer::InferOutputShapes(const std::vector<TensorS
     return outShapes;
 }
 
-void QLstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void QLstmLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(3, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes(
     {
@@ -211,7 +211,7 @@ void QLstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfere
         ARMNN_ASSERT_MSG(m_CifgParameters.m_InputGateBias != nullptr,
                 "QLstmLayer: m_CifgParameters.m_InputGateBias should not be null.");
 
-        ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "QLstmLayer");
+        ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "QLstmLayer");
     }
     else
     {
@@ -223,7 +223,7 @@ void QLstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfere
         ARMNN_ASSERT_MSG(m_CifgParameters.m_InputGateBias == nullptr,
                 "QLstmLayer: m_CifgParameters.m_InputGateBias should not have a value when CIFG is enabled.");
 
-        ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "QLstmLayer");
+        ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "QLstmLayer");
     }
 
     if (m_Param.m_ProjectionEnabled)
@@ -247,9 +247,9 @@ void QLstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfere
     }
 
     ValidateAndCopyShape(
-            GetOutputSlot(1).GetTensorInfo().GetShape(), inferredShapes[1], shapeInferenceMethod, "QLstmLayer", 1);
+            GetOutputSlot(1).GetTensorInfo().GetShape(), inferredShapes[1], m_ShapeInferenceMethod, "QLstmLayer", 1);
     ValidateAndCopyShape(
-            GetOutputSlot(2).GetTensorInfo().GetShape(), inferredShapes[2], shapeInferenceMethod, "QLstmLayer", 2);
+            GetOutputSlot(2).GetTensorInfo().GetShape(), inferredShapes[2], m_ShapeInferenceMethod, "QLstmLayer", 2);
 
     if (m_Param.m_LayerNormEnabled)
     {

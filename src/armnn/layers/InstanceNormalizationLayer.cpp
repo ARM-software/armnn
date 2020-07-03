@@ -29,19 +29,19 @@ InstanceNormalizationLayer* InstanceNormalizationLayer::Clone(Graph& graph) cons
     return CloneBase<InstanceNormalizationLayer>(graph, m_Param, GetName());
 }
 
-void InstanceNormalizationLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void InstanceNormalizationLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "InstanceNormalizationLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "InstanceNormalizationLayer");
 }
 
 void InstanceNormalizationLayer::Accept(ILayerVisitor& visitor) const

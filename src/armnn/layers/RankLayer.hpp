@@ -20,7 +20,7 @@ class RankLayer : public Layer
 
         Layer* Clone(Graph& graph) const override;
 
-        void ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod) override;
+        void ValidateTensorShapesFromInputs() override;
 
         void Accept(ILayerVisitor& visitor) const override;
 

@@ -29,13 +29,13 @@ GatherLayer* GatherLayer::Clone(Graph& graph) const
     return CloneBase<GatherLayer>(graph, m_Param, GetName());
 }
 
-void GatherLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void GatherLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(2, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     const TensorInfo& params = GetInputSlot(0).GetConnection()->GetTensorInfo();
     const TensorInfo& indices = GetInputSlot(1).GetConnection()->GetTensorInfo();
@@ -68,7 +68,7 @@ void GatherLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfer
 
     const TensorShape& inferredShape = TensorShape(outputDim, dimSizes.data());
 
-    ValidateAndCopyShape(outputShape, inferredShape, shapeInferenceMethod, "GatherLayer");
+    ValidateAndCopyShape(outputShape, inferredShape, m_ShapeInferenceMethod, "GatherLayer");
 }
 
 void GatherLayer::Accept(ILayerVisitor& visitor) const

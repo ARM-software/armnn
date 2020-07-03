@@ -40,19 +40,19 @@ std::vector<TensorShape> PermuteLayer::InferOutputShapes(const std::vector<Tenso
     return std::vector<TensorShape> ({armnnUtils::Permuted(inShape, m_Param.m_DimMappings)});
 }
 
-void PermuteLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void PermuteLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "PermuteLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "PermuteLayer");
 }
 
 void PermuteLayer::Accept(ILayerVisitor& visitor) const

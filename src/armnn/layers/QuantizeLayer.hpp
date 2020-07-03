@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -21,8 +21,7 @@ public:
 
     Layer* Clone(Graph& graph) const override;
 
-    void ValidateTensorShapesFromInputs(
-            ShapeInferenceMethod shapeInferenceMethod = ShapeInferenceMethod::ValidateOnly) override;
+    void ValidateTensorShapesFromInputs() override;
 
     void Accept(ILayerVisitor& visitor) const override;
 

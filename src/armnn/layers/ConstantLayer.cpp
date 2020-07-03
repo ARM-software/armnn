@@ -40,9 +40,8 @@ std::vector<TensorShape> ConstantLayer::InferOutputShapes(const std::vector<Tens
     return std::vector<TensorShape>({  inputShapes[0] });
 }
 
-void ConstantLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void ConstantLayer::ValidateTensorShapesFromInputs()
 {
-    IgnoreUnused(shapeInferenceMethod);
 
     // Get the output shape from the value of the constant layer.
     TensorShape const& outShape = m_LayerOutput->GetTensorInfo().GetShape();

@@ -28,7 +28,7 @@ class Graph;
 class Network final : public INetwork
 {
 public:
-    Network();
+    Network(NetworkOptions networkOptions = {});
     ~Network();
 
     const Graph& GetGraph() const { return *m_Graph; }
@@ -268,6 +268,9 @@ private:
         const ConstTensor& weights,
         const Optional<ConstTensor>& biases,
         const char* name);
+
+    bool GetShapeInferenceMethod();
+    NetworkOptions m_NetworkOptions;
 
     std::unique_ptr<Graph> m_Graph;
 };

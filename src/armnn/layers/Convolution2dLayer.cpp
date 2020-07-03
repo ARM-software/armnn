@@ -112,13 +112,13 @@ std::vector<TensorShape> Convolution2dLayer::InferOutputShapes(const std::vector
     return std::vector<TensorShape>({ tensorShape });
 }
 
-void Convolution2dLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void Convolution2dLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     // check if we m_Weight data is not nullptr
     ARMNN_ASSERT_MSG(m_Weight != nullptr, "Convolution2dLayer: Weights data should not be null.");
@@ -129,7 +129,7 @@ void Convolution2dLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod sha
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "Convolution2dLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "Convolution2dLayer");
 }
 
 Layer::ConstantTensors Convolution2dLayer::GetConstantTensorsByRef()

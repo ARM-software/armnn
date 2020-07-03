@@ -29,16 +29,15 @@ Layer* RankLayer::Clone(Graph& graph) const
     return clone;
 }
 
-void RankLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void RankLayer::ValidateTensorShapesFromInputs()
 {
-    IgnoreUnused(shapeInferenceMethod);
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
     const TensorShape inferredShape = TensorShape(Dimensionality::Scalar);
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
-    ValidateAndCopyShape(outputShape, inferredShape, shapeInferenceMethod, "RankLayer");
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
+    ValidateAndCopyShape(outputShape, inferredShape, m_ShapeInferenceMethod, "RankLayer");
 }
 void RankLayer::Accept(ILayerVisitor& visitor) const
 {

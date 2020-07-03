@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -27,8 +27,7 @@ public:
     /// Check if the input tensor shape(s)
     /// Does nothing since cannot validate any properties of this layer.
     /// @param [in] shapeInferenceMethod Indicates if output shape shall be overwritten or just validated.
-    void ValidateTensorShapesFromInputs(
-            ShapeInferenceMethod shapeInferenceMethod = ShapeInferenceMethod::ValidateOnly) override;
+    void ValidateTensorShapesFromInputs() override;
 
     /// Empty implementation that throws Exception if called.
     /// otherwise infers the output shapes from given input shapes and layer properties.

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -17,6 +17,7 @@ LayerType* Layer::CloneBase(Graph& graph, Params&& ... params) const
 
     layer->SetBackendId(GetBackendId());
     layer->SetGuid(GetGuid());
+    layer->SetShapeInferenceMethod(m_ShapeInferenceMethod);
 
     return layer;
 }

@@ -66,20 +66,20 @@ std::vector<TensorShape> SpaceToBatchNdLayer::InferOutputShapes(const std::vecto
     return std::vector<TensorShape>({ outputShape });
 }
 
-void SpaceToBatchNdLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void SpaceToBatchNdLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "SpaceToBatchNdLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "SpaceToBatchNdLayer");
 }
 
 void SpaceToBatchNdLayer::Accept(ILayerVisitor& visitor) const

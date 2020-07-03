@@ -47,13 +47,13 @@ std::vector<TensorShape> ElementwiseBaseLayer::InferOutputShapes(const std::vect
     return std::vector<TensorShape>({ TensorShape(numDims, dims.data()) });
 }
 
-void ElementwiseBaseLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void ElementwiseBaseLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(2, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
@@ -62,7 +62,7 @@ void ElementwiseBaseLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod s
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, GetLayerTypeAsCString(GetType()));
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, GetLayerTypeAsCString(GetType()));
 }
 
 } // namespace armnn

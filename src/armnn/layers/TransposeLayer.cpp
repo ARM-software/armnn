@@ -40,19 +40,19 @@ std::vector<TensorShape> TransposeLayer::InferOutputShapes(const std::vector<Ten
     return std::vector<TensorShape> ({armnnUtils::TransposeTensorShape(inShape, m_Param.m_DimMappings)});
 }
 
-void TransposeLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void TransposeLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "TransposeLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "TransposeLayer");
 }
 
 void TransposeLayer::Accept(ILayerVisitor& visitor) const

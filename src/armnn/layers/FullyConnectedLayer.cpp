@@ -61,13 +61,11 @@ std::vector<TensorShape> FullyConnectedLayer::InferOutputShapes(const std::vecto
     return std::vector<TensorShape>({ TensorShape({batches, weightShape[dimIdx]})});
 }
 
-void FullyConnectedLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
+void FullyConnectedLayer::ValidateTensorShapesFromInputs()
 {
-    IgnoreUnused(shapeInferenceMethod);
-
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
-    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     // check if we m_Weight data is not nullptr
     ARMNN_ASSERT_MSG(m_Weight != nullptr, "FullyConnectedLayer: Weights data should not be null.");
@@ -78,7 +76,7 @@ void FullyConnectedLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod sh
     ARMNN_ASSERT(inferredShapes.size() == 1);
     ARMNN_ASSERT(inferredShapes[0].GetDimensionality() == Dimensionality::Specified);
 
-    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "FullyConnectedLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "FullyConnectedLayer");
 }
 
 Layer::ConstantTensors FullyConnectedLayer::GetConstantTensorsByRef()

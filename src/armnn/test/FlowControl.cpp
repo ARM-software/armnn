@@ -28,13 +28,18 @@ BOOST_AUTO_TEST_CASE(ErrorOnLoadNetwork)
 
     std::vector<uint8_t> falseData = {0};
     ConstTensor falseTensor(armnn::TensorInfo({1}, armnn::DataType::Boolean), falseData);
-    IConnectableLayer* constLayer = net->AddConstantLayer(falseTensor, "const");    
+    IConnectableLayer* constLayer = net->AddConstantLayer(falseTensor, "const");
     constLayer->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo({1}, armnn::DataType::Boolean));
 
     IConnectableLayer* input = net->AddInputLayer(0);
+    input->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo({1}, armnn::DataType::Boolean));
 
     IConnectableLayer* switchLayer = net->AddSwitchLayer("switch");
+    switchLayer->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo({1}, armnn::DataType::Boolean));
+    switchLayer->GetOutputSlot(1).SetTensorInfo(armnn::TensorInfo({1}, armnn::DataType::Boolean));
+
     IConnectableLayer* mergeLayer = net->AddMergeLayer("merge");
+    mergeLayer->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo({1}, armnn::DataType::Boolean));
 
     IConnectableLayer* output = net->AddOutputLayer(0);
 

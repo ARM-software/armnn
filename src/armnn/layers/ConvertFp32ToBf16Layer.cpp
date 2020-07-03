@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,18 +32,18 @@ ConvertFp32ToBf16Layer* ConvertFp32ToBf16Layer::Clone(Graph& graph) const
 
 void ConvertFp32ToBf16Layer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
-    IgnoreUnused(shapeInferenceMethod);
 
     VerifyLayerConnections(1, CHECK_LOCATION());
+
+    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+
+    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "ConvertFp32ToBf16Layer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-        GetOutputSlot(0).GetTensorInfo().GetShape(),
-        inferredShapes[0]);
+    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "LayerName");
 }
 
 void ConvertFp32ToBf16Layer::Accept(ILayerVisitor& visitor) const

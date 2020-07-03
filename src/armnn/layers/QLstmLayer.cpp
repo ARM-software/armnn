@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "QLstmLayer.hpp"
@@ -167,15 +167,17 @@ std::vector<TensorShape> QLstmLayer::InferOutputShapes(const std::vector<TensorS
 
 void QLstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
-    IgnoreUnused(shapeInferenceMethod);
-
     VerifyLayerConnections(3, CHECK_LOCATION());
+
+    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+
+    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes(
     {
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(), // input
         GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape(), // previousOutputIn
-        GetInputSlot(2).GetConnection()->GetTensorInfo().GetShape() //  previousCellStateIn
+        GetInputSlot(2).GetConnection()->GetTensorInfo().GetShape()  // previousCellStateIn
     });
 
     ARMNN_ASSERT(inferredShapes.size() == 3);
@@ -209,10 +211,7 @@ void QLstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfere
         ARMNN_ASSERT_MSG(m_CifgParameters.m_InputGateBias != nullptr,
                 "QLstmLayer: m_CifgParameters.m_InputGateBias should not be null.");
 
-        ConditionalThrowIfNotEqual<LayerValidationException>(
-                "QLstmLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-                GetOutputSlot(0).GetTensorInfo().GetShape(),
-                inferredShapes[0]);
+        ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "QLstmLayer");
     }
     else
     {
@@ -224,10 +223,7 @@ void QLstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfere
         ARMNN_ASSERT_MSG(m_CifgParameters.m_InputGateBias == nullptr,
                 "QLstmLayer: m_CifgParameters.m_InputGateBias should not have a value when CIFG is enabled.");
 
-        ConditionalThrowIfNotEqual<LayerValidationException>(
-                "QLstmLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-                GetOutputSlot(0).GetTensorInfo().GetShape(),
-                inferredShapes[0]);
+        ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "QLstmLayer");
     }
 
     if (m_Param.m_ProjectionEnabled)
@@ -250,14 +246,10 @@ void QLstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfere
                          "QLstmLayer: m_PeepholeParameters.m_CellToOutputWeights should not be null.");
     }
 
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-            "QLstmLayer: TensorShape set on OutputSlot[1] does not match the inferred shape.",
-            GetOutputSlot(1).GetTensorInfo().GetShape(),
-            inferredShapes[1]);
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-            "QLstmLayer: TensorShape set on OutputSlot[2] does not match the inferred shape.",
-            GetOutputSlot(2).GetTensorInfo().GetShape(),
-            inferredShapes[2]);
+    ValidateAndCopyShape(
+            GetOutputSlot(1).GetTensorInfo().GetShape(), inferredShapes[1], shapeInferenceMethod, "QLstmLayer", 1);
+    ValidateAndCopyShape(
+            GetOutputSlot(2).GetTensorInfo().GetShape(), inferredShapes[2], shapeInferenceMethod, "QLstmLayer", 2);
 
     if (m_Param.m_LayerNormEnabled)
     {

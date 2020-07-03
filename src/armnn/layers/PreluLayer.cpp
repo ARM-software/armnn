@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -96,9 +96,11 @@ std::vector<TensorShape> PreluLayer::InferOutputShapes(const std::vector<TensorS
 
 void PreluLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
-    IgnoreUnused(shapeInferenceMethod);
-
     VerifyLayerConnections(2, CHECK_LOCATION());
+
+    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+
+    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes(
     {
@@ -108,10 +110,7 @@ void PreluLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfere
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "PreluLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-        GetOutputSlot(0).GetTensorInfo().GetShape(),
-        inferredShapes[0]);
+    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "PreluLayer");
 }
 
 void PreluLayer::Accept(ILayerVisitor& visitor) const

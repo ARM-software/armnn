@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "QuantizedLstmLayer.hpp"
@@ -93,9 +93,11 @@ std::vector<TensorShape> QuantizedLstmLayer::InferOutputShapes(const std::vector
 
 void QuantizedLstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
-    IgnoreUnused(shapeInferenceMethod);
-
     VerifyLayerConnections(3, CHECK_LOCATION());
+
+    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+
+    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes(
     {
@@ -135,15 +137,13 @@ void QuantizedLstmLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod sha
                      "QuantizedLstmLayer: m_QuantizedLstmParameters.m_OutputGateBias should not be null.");
 
     // Check output TensorShape(s) match inferred shape
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-            "QuantizedLstmLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-            GetOutputSlot(0).GetTensorInfo().GetShape(),
-            inferredShapes[0]);
+    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "QuantizedLstmLayer");
 
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-            "QuantizedLstmLayer: TensorShape set on OutputSlot[1] does not match the inferred shape.",
-            GetOutputSlot(1).GetTensorInfo().GetShape(),
-            inferredShapes[1]);
+    ValidateAndCopyShape(GetOutputSlot(1).GetTensorInfo().GetShape(),
+                         inferredShapes[1],
+                         shapeInferenceMethod,
+                         "QuantizedLstmLayer",
+                         1);
 }
 
 Layer::ConstantTensors QuantizedLstmLayer::GetConstantTensorsByRef()

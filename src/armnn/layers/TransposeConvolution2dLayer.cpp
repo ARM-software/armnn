@@ -1,12 +1,10 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "TransposeConvolution2dLayer.hpp"
 #include "LayerCloneBase.hpp"
-
-#include <armnn/TypesUtils.hpp>
 
 #include <armnnUtils/DataLayoutIndexed.hpp>
 
@@ -105,9 +103,11 @@ std::vector<TensorShape> TransposeConvolution2dLayer::InferOutputShapes(
 
 void TransposeConvolution2dLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
-    IgnoreUnused(shapeInferenceMethod);
-
     VerifyLayerConnections(1, CHECK_LOCATION());
+
+    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+
+    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
 
     ARMNN_ASSERT_MSG(m_Weight != nullptr, "TransposeConvolution2dLayer: Weight data cannot be null.");
 
@@ -127,10 +127,7 @@ void TransposeConvolution2dLayer::ValidateTensorShapesFromInputs(ShapeInferenceM
 
     ARMNN_ASSERT(expectedOutputShape.size() == 1);
 
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "TransposeConvolution2dLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-        GetOutputSlot(0).GetTensorInfo().GetShape(),
-        expectedOutputShape[0]);
+    ValidateAndCopyShape(outputShape, expectedOutputShape[0], shapeInferenceMethod, "TransposeConvolution2dLayer");
 }
 
 Layer::ConstantTensors TransposeConvolution2dLayer::GetConstantTensorsByRef()

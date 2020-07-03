@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -121,9 +121,11 @@ DepthwiseConvolution2dLayer::InferOutputShapes(const std::vector<TensorShape>& i
 
 void DepthwiseConvolution2dLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
-    IgnoreUnused(shapeInferenceMethod);
-
     VerifyLayerConnections(1, CHECK_LOCATION());
+
+    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+
+    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
 
     // on this level constant data should not be released..
     ARMNN_ASSERT_MSG(m_Weight != nullptr, "DepthwiseConvolution2dLayer: Weights data should not be null.");
@@ -135,10 +137,7 @@ void DepthwiseConvolution2dLayer::ValidateTensorShapesFromInputs(ShapeInferenceM
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "DepthwiseConvolution2dLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-        GetOutputSlot(0).GetTensorInfo().GetShape(),
-        inferredShapes[0]);
+    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "DepthwiseConvolution2dLayer");
 }
 
 Layer::ConstantTensors DepthwiseConvolution2dLayer::GetConstantTensorsByRef()

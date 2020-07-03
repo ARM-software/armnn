@@ -347,6 +347,14 @@ protected:
         CollectWorkloadOutputs(dataCollector);
     }
 
+    void ValidateAndCopyShape(const TensorShape& outputShape,
+                              const TensorShape& inferredShape,
+                              const ShapeInferenceMethod shapeInferenceMethod,
+                              const std::string& layerName,
+                              const unsigned int outputSlotIndex = 0);
+
+    void VerifyShapeInferenceType(const TensorShape& outputShape, ShapeInferenceMethod shapeInferenceMethod);
+
     /// Helper function to reduce duplication in *Layer::CreateWorkload.
     template <typename QueueDescriptor>
     WorkloadInfo PrepInfoAndDesc(QueueDescriptor& descriptor) const

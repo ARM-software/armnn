@@ -664,6 +664,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/OptionalTest.cpp
         src/armnn/test/ProfilerTests.cpp
         src/armnn/test/ProfilingEventTest.cpp
+        src/armnn/test/ShapeInferenceTests.cpp
         src/armnn/test/SubgraphViewTests.cpp
         src/armnn/test/TensorHandleStrategyTest.cpp
         src/armnn/test/TensorHelpers.hpp

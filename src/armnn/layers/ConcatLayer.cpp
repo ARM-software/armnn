@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "ConcatLayer.hpp"
@@ -244,8 +244,6 @@ std::vector<TensorShape> ConcatLayer::InferOutputShapes(const std::vector<Tensor
 
 void ConcatLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
-    IgnoreUnused(shapeInferenceMethod);
-
     // Validates Concat layer.
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "ConcatLayer: Num Inputs must match num views.",
@@ -253,6 +251,10 @@ void ConcatLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfer
         GetNumInputSlots());
 
     VerifyLayerConnections(m_Param.GetNumViews(), CHECK_LOCATION());
+
+    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+
+    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
 
     std::vector<TensorShape> inputShapes;
     for (unsigned int i = 0; i < GetNumInputSlots(); ++i)
@@ -264,10 +266,7 @@ void ConcatLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfer
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "ConcatLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-        GetOutputSlot(0).GetTensorInfo().GetShape(),
-        inferredShapes[0]);
+    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "ConcatLayer");
 }
 
 void ConcatLayer::Accept(ILayerVisitor& visitor) const

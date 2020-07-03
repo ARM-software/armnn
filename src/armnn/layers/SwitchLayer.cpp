@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "SwitchLayer.hpp"
@@ -29,28 +29,25 @@ SwitchLayer* SwitchLayer::Clone(Graph& graph) const
 
 void SwitchLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
-    IgnoreUnused(shapeInferenceMethod);
-
     VerifyLayerConnections(2, CHECK_LOCATION());
+
+    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+
+    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
 
     ARMNN_ASSERT_MSG(GetNumOutputSlots() == 2, "SwitchLayer: The layer should return 2 outputs.");
 
     // Assuming first input is the Input and second input is the Constant
     std::vector<TensorShape> inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
-        GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape() });
+        GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape()});
 
     ARMNN_ASSERT(inferredShapes.size() == 2);
 
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "SwitchLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-        GetOutputSlot(0).GetTensorInfo().GetShape(),
-        inferredShapes[0]);
+    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "SwitchLayer");
 
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "SwitchLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-        GetOutputSlot(1).GetTensorInfo().GetShape(),
-        inferredShapes[0]);
+    ValidateAndCopyShape(
+            GetOutputSlot(1).GetTensorInfo().GetShape(), inferredShapes[1], shapeInferenceMethod, "SwitchLayer", 1);
 }
 
 void SwitchLayer::Accept(ILayerVisitor& visitor) const

@@ -396,6 +396,69 @@ std::vector<TensorShape> Layer::InferOutputShapes(const std::vector<TensorShape>
     return inputShapes;
 }
 
+void Layer::ValidateAndCopyShape(const TensorShape& outputShape,
+                                 const TensorShape& inferredShape,
+                                 const ShapeInferenceMethod shapeInferenceMethod,
+                                 const std::string& layerName,
+                                 const unsigned int outputSlotIndex)
+{
+    if (shapeInferenceMethod == ShapeInferenceMethod::ValidateOnly)
+    {
+        ConditionalThrowIfNotEqual<LayerValidationException>(
+                layerName + ": TensorShape set on OutputSlot[0] does not match the inferred shape.",
+                outputShape,
+                inferredShape);
+        return;
+    }
+
+    if (outputShape.GetDimensionality() == Dimensionality::Specified)
+    {
+        for (unsigned int i = 0; i < outputShape.GetNumDimensions(); ++i)
+        {
+            if (outputShape.GetDimensionSpecificity(i) && outputShape[i] != inferredShape[i])
+            {
+                std::stringstream ss;
+                ss << layerName << ": TensorShape set on OutputSlot[" << outputSlotIndex <<
+                "] does not match the inferred shape at dimension index [";
+                ss << i << "] " << outputShape << " != " << inferredShape;
+                throw LayerValidationException(ss.str());
+            }
+        }
+    }
+
+    TensorInfo info = GetOutputSlot(outputSlotIndex).GetTensorInfo();
+
+    armnn::TensorInfo inferredTensorInfo(inferredShape,
+                                         info.GetDataType(),
+                                         info.GetQuantizationScale(),
+                                         info.GetQuantizationOffset());
+
+    GetOutputSlot(outputSlotIndex).SetTensorInfo(inferredTensorInfo);
+}
+
+void Layer::VerifyShapeInferenceType(const TensorShape& outputShape, ShapeInferenceMethod shapeInferenceMethod)
+{
+    if (shapeInferenceMethod == ShapeInferenceMethod::ValidateOnly)
+    {
+        ConditionalThrow<LayerValidationException>(
+                outputShape.GetDimensionality() != Dimensionality::NotSpecified,
+                "Dimensionality can not be NotSpecified while using ShapeInferenceMethod::ValidateOnly");
+
+        ConditionalThrow<LayerValidationException>(
+                outputShape.AreAllDimensionsSpecified(),
+                "Unspecified dimension while using ShapeInferenceMethod::ValidateOnly");
+    }
+    else
+    {
+        if (outputShape.GetDimensionality() == Dimensionality::Specified)
+        {
+            ConditionalThrow<LayerValidationException>(
+                    !outputShape.AreAllDimensionsSpecified(),
+                    "No unspecified dimension while using ShapeInferenceMethod::InferAndValidate");
+        }
+    }
+}
+
 void Layer::SerializeLayerParameters(ParameterStringifyFunction& fn) const
 {
     std::string layerType = GetLayerTypeAsCString(m_Type);

@@ -34,11 +34,12 @@ void RankLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferen
     IgnoreUnused(shapeInferenceMethod);
     VerifyLayerConnections(1, CHECK_LOCATION());
 
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-            "Rank: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-            GetOutputSlot(0).GetTensorInfo().GetShape(), {TensorShape{Dimensionality::Scalar}});
-}
+    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+    const TensorShape inferredShape = TensorShape(Dimensionality::Scalar);
 
+    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
+    ValidateAndCopyShape(outputShape, inferredShape, shapeInferenceMethod, "RankLayer");
+}
 void RankLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitRankLayer(this, GetName());

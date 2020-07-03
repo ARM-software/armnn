@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -36,9 +36,11 @@ DetectionPostProcessLayer* DetectionPostProcessLayer::Clone(Graph& graph) const
 
 void DetectionPostProcessLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
-    IgnoreUnused(shapeInferenceMethod);
-
     VerifyLayerConnections(2, CHECK_LOCATION());
+
+    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+
+    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
 
     // on this level constant data should not be released.
     ARMNN_ASSERT_MSG(m_Anchors != nullptr, "DetectionPostProcessLayer: Anchors data should not be null.");
@@ -51,22 +53,22 @@ void DetectionPostProcessLayer::ValidateTensorShapesFromInputs(ShapeInferenceMet
     const TensorShape& inferredDetectionScores = TensorShape({ 1, detectedBoxes });
     const TensorShape& inferredNumberDetections = TensorShape({ 1 });
 
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "DetectionPostProcessLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-        GetOutputSlot(0).GetTensorInfo().GetShape(),
-        inferredDetectionBoxes);
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "DetectionPostProcessLayer: TensorShape set on OutputSlot[1] does not match the inferred shape.",
-        GetOutputSlot(1).GetTensorInfo().GetShape(),
-        inferredDetectionScores);
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "DetectionPostProcessLayer: TensorShape set on OutputSlot[2] does not match the inferred shape.",
-        GetOutputSlot(2).GetTensorInfo().GetShape(),
-        inferredDetectionScores);
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "DetectionPostProcessLayer: TensorShape set on OutputSlot[3] does not match the inferred shape.",
-        GetOutputSlot(3).GetTensorInfo().GetShape(),
-        inferredNumberDetections);
+    ValidateAndCopyShape(outputShape, inferredDetectionBoxes, shapeInferenceMethod, "DetectionPostProcessLayer");
+
+    ValidateAndCopyShape(GetOutputSlot(1).GetTensorInfo().GetShape(),
+                         inferredDetectionScores,
+                         shapeInferenceMethod,
+                         "DetectionPostProcessLayer", 1);
+
+    ValidateAndCopyShape(GetOutputSlot(2).GetTensorInfo().GetShape(),
+                         inferredDetectionScores,
+                         shapeInferenceMethod,
+                         "DetectionPostProcessLayer", 2);
+
+    ValidateAndCopyShape(GetOutputSlot(3).GetTensorInfo().GetShape(),
+                         inferredNumberDetections,
+                         shapeInferenceMethod,
+                         "DetectionPostProcessLayer", 3);
 }
 
 Layer::ConstantTensors DetectionPostProcessLayer::GetConstantTensorsByRef()

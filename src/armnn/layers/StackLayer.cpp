@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "StackLayer.hpp"
@@ -60,8 +60,6 @@ std::vector<TensorShape> StackLayer::InferOutputShapes(const std::vector<TensorS
 
 void StackLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
-    IgnoreUnused(shapeInferenceMethod);
-
     // Validates Stack layer.
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "StackLayer: Num Input Slots must match Num Inputs.",
@@ -69,6 +67,10 @@ void StackLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfere
         GetNumInputSlots());
 
     VerifyLayerConnections(m_Param.m_NumInputs, CHECK_LOCATION());
+
+    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+
+    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
 
     // Constructs and validates input shapes
     std::vector<TensorShape> inputShapes;
@@ -88,10 +90,7 @@ void StackLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfere
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "StackLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-        GetOutputSlot(0).GetTensorInfo().GetShape(),
-        inferredShapes[0]);
+    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "StackLayer");
 }
 
 void StackLayer::Accept(ILayerVisitor& visitor) const

@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -57,9 +57,11 @@ std::vector<TensorShape> ComparisonLayer::InferOutputShapes(const std::vector<Te
 
 void ComparisonLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
-    IgnoreUnused(shapeInferenceMethod);
-
     VerifyLayerConnections(2, CHECK_LOCATION());
+
+    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+
+    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
@@ -67,10 +69,7 @@ void ComparisonLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeI
     });
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "ComparisonLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-        GetOutputSlot(0).GetTensorInfo().GetShape(),
-        inferredShapes[0]);
+    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, "ComparisonLayer");
 }
 
 void ComparisonLayer::Accept(ILayerVisitor& visitor) const

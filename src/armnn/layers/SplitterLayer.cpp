@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "SplitterLayer.hpp"
@@ -141,7 +141,10 @@ std::vector<TensorShape> SplitterLayer::InferOutputShapes(const std::vector<Tens
 
 void SplitterLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
-    IgnoreUnused(shapeInferenceMethod);
+    std::for_each(BeginOutputSlots(), EndOutputSlots(), [&](OutputSlot& outputSlot)
+    {
+        VerifyShapeInferenceType(outputSlot.GetTensorInfo().GetShape(), shapeInferenceMethod);
+    });
 
     std::vector<TensorShape> views;
     for (unsigned int viewIdx = 0; viewIdx < m_Param.GetNumViews(); viewIdx++)
@@ -156,10 +159,11 @@ void SplitterLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInf
 
     for (unsigned int viewIdx = 0; viewIdx < m_Param.GetNumViews(); viewIdx++)
     {
-        ConditionalThrowIfNotEqual<LayerValidationException>(
-            "SplitterLayer: View sizes must match output tensor shapes.",
-            GetOutputSlot(viewIdx).GetTensorInfo().GetShape(),
-            inferredShapes[viewIdx]);
+        ValidateAndCopyShape(GetOutputSlot(viewIdx).GetTensorInfo().GetShape(),
+                             inferredShapes[viewIdx],
+                             shapeInferenceMethod,
+                             "SplitterLayer",
+                             viewIdx);
     }
 }
 

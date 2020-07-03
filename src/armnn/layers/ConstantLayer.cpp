@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "ConstantLayer.hpp"
@@ -46,10 +46,19 @@ void ConstantLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInf
 
     // Get the output shape from the value of the constant layer.
     TensorShape const& outShape = m_LayerOutput->GetTensorInfo().GetShape();
+
+    ConditionalThrow<LayerValidationException>(
+            outShape.GetDimensionality() != Dimensionality::NotSpecified,
+            "Constant layer m_LayerOutput output shape can not be Dimensionality::NotSpecified");
+
+    ConditionalThrow<LayerValidationException>(
+            outShape.AreAllDimensionsSpecified(),
+            "Constant layer m_LayerOutput output shape can not have an unspecified dimension");
+
     ConditionalThrowIfNotEqual<LayerValidationException>(
-        "ConstantLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-        GetOutputSlot(0).GetTensorInfo().GetShape(),
-        outShape);
+               "ConstantLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
+               GetOutputSlot(0).GetTensorInfo().GetShape(),
+               outShape);
 }
 
 void ConstantLayer::Accept(ILayerVisitor& visitor) const

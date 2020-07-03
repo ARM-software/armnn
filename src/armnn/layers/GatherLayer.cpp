@@ -31,9 +31,11 @@ GatherLayer* GatherLayer::Clone(Graph& graph) const
 
 void GatherLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
-    IgnoreUnused(shapeInferenceMethod);
-
     VerifyLayerConnections(2, CHECK_LOCATION());
+
+    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+
+    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
 
     const TensorInfo& params = GetInputSlot(0).GetConnection()->GetTensorInfo();
     const TensorInfo& indices = GetInputSlot(1).GetConnection()->GetTensorInfo();
@@ -66,10 +68,7 @@ void GatherLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInfer
 
     const TensorShape& inferredShape = TensorShape(outputDim, dimSizes.data());
 
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "GatherLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-        GetOutputSlot(0).GetTensorInfo().GetShape(),
-        inferredShape);
+    ValidateAndCopyShape(outputShape, inferredShape, shapeInferenceMethod, "GatherLayer");
 }
 
 void GatherLayer::Accept(ILayerVisitor& visitor) const

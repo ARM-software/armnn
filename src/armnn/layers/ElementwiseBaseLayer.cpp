@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -49,9 +49,11 @@ std::vector<TensorShape> ElementwiseBaseLayer::InferOutputShapes(const std::vect
 
 void ElementwiseBaseLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
-    IgnoreUnused(shapeInferenceMethod);
-
     VerifyLayerConnections(2, CHECK_LOCATION());
+
+    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+
+    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
@@ -60,11 +62,7 @@ void ElementwiseBaseLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod s
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
-    std::string msg = GetLayerTypeAsCString(GetType());
-    msg += "Layer: TensorShape set on OutputSlot[0] does not match the inferred shape.";
-    ConditionalThrowIfNotEqual<LayerValidationException>(msg,
-                                                         GetOutputSlot(0).GetTensorInfo().GetShape(),
-                                                         inferredShapes[0]);
+    ValidateAndCopyShape(outputShape, inferredShapes[0], shapeInferenceMethod, GetLayerTypeAsCString(GetType()));
 }
 
 } // namespace armnn

@@ -233,7 +233,6 @@ void TensorShape::SetNumDimensions(unsigned int numDimensions, bool initDimensio
 void TensorShape::SetDimensionSize(unsigned int i, unsigned int dimensionSize)
 {
     CheckScalar();
-    CheckUnspecifiedNumDimensions();
     CheckDimensionIndex(i);
 
     m_Dimensions[i] = dimensionSize;

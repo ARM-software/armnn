@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -40,9 +40,11 @@ MeanLayer* MeanLayer::Clone(Graph& graph) const
 
 void MeanLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferenceMethod)
 {
-    IgnoreUnused(shapeInferenceMethod);
-
     VerifyLayerConnections(1, CHECK_LOCATION());
+
+    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+
+    VerifyShapeInferenceType(outputShape, shapeInferenceMethod);
 
     const TensorInfo& input = GetInputSlot(0).GetConnection()->GetTensorInfo();
 
@@ -95,10 +97,7 @@ void MeanLayer::ValidateTensorShapesFromInputs(ShapeInferenceMethod shapeInferen
     }
     const TensorShape& inferredShape = TensorShape(outputRank, dimSizes.data());
 
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "MeanLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
-        GetOutputSlot(0).GetTensorInfo().GetShape(),
-        inferredShape);
+    ValidateAndCopyShape(outputShape, inferredShape, shapeInferenceMethod, "MeanLayer");
 }
 
 void MeanLayer::Accept(ILayerVisitor& visitor) const

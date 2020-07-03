@@ -65,6 +65,12 @@ std::vector<TensorShape> StridedSliceLayer::InferOutputShapes(
                 throw LayerValidationException(
                     "StridedSlice: Attempting to take a larger slice than can fit in inferred output");
             }
+
+            if (stride < 0)
+            {
+                throw LayerValidationException(
+                    "StridedSlice: Stride can not be negative with Shrink Axis Mask set.");
+            }
             continue;
         }
 

@@ -49,6 +49,7 @@ std::vector<TensorShape> StridedSliceLayer::InferOutputShapes(
 
     TensorShape inputShape = inputShapes[0];
     std::vector<unsigned int> outputShape;
+    unsigned int amountDimShrunk{0};
 
     for (unsigned int i = 0; i < inputShape.GetNumDimensions(); i++)
     {
@@ -58,6 +59,8 @@ std::vector<TensorShape> StridedSliceLayer::InferOutputShapes(
 
         if (m_Param.m_ShrinkAxisMask & (1 << i))
         {
+            amountDimShrunk+=1;
+
             // If the difference between the start point and the end point of the slice on an axis being shrunk
             // is greater than 1 then throw an error as the output will not be large enough to hold the slice
             if (((m_Param.m_Begin[i] - m_Param.m_End[i]) > 1) || ((m_Param.m_Begin[i] - m_Param.m_End[i]) < -1))
@@ -80,6 +83,11 @@ std::vector<TensorShape> StridedSliceLayer::InferOutputShapes(
         newSize = std::max(0, newSize);
 
         outputShape.push_back(boost::numeric_cast<unsigned int>(newSize));
+    }
+
+    if (outputShape.size() == 0 && (inputShape.GetNumDimensions() - amountDimShrunk) == 0)
+    {
+        outputShape.push_back(1);
     }
 
     return std::vector<TensorShape>({

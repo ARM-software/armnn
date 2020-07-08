@@ -192,7 +192,7 @@ unsigned int TensorShape::GetNumElements() const
     bool atLeastOneDimensionSpecified = false;
     for (unsigned int i = 0; i < m_NumDimensions; ++i)
     {
-        if (m_DimensionsSpecificity[i] && m_Dimensions[i] != 0)
+        if (m_DimensionsSpecificity[i])
         {
             atLeastOneDimensionSpecified = true;
             count *= m_Dimensions[i];

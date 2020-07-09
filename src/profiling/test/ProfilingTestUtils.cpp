@@ -25,7 +25,7 @@ uint32_t GetStreamMetaDataPacketSize()
     payloadSize += boost::numeric_cast<uint32_t>(GetProcessName().size()) + 1;
 
     // Add packetVersionEntries
-    payloadSize += 6 * 2 * sizeUint32;
+    payloadSize += 13 * 2 * sizeUint32;
     // Add packetVersionCountSize
     payloadSize += sizeUint32;
 

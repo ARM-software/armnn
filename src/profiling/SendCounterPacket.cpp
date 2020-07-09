@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -44,17 +44,41 @@ void SendCounterPacket::SendStreamMetaDataPacket()
     const uint32_t packetVersionCountSize = sizeUint32;
 
     // Supported Packets
-    // Stream metadata packet            (packet family=0; packet id=0)
-    // Connection Acknowledged packet    (packet family=0, packet id=1)
-    // Counter Directory packet          (packet family=0; packet id=2)
-    // Request Counter Directory packet  (packet family=0, packet id=3)
-    // Periodic Counter Selection packet (packet family=0, packet id=4)
-    // Periodic Counter Capture packet   (packet family=1, packet class=0, type=0)
-    const uint32_t packetVersionEntries = 6;
+    // Packet Encoding version 1.0.0
+    // Control packet family
+    //   Stream metadata packet (packet family=0; packet id=0)
+    //   Connection Acknowledged packet ( packet family=0, packet id=1) Version 1.0.0
+    //   Counter Directory packet (packet family=0; packet id=2) Version 1.0.0
+    //   Request Counter Directory packet ( packet family=0, packet id=3) Version 1.0.0
+    //   Periodic Counter Selection packet ( packet family=0, packet id=4) Version 1.0.0
+    //   Per Job Counter Selection packet ( packet family=0, packet id=5) Version 1.0.0
+    //   Activate Timeline Reporting (packet family = 0, packet id = 6) Version 1.0.0
+    //   Deactivate Timeline Reporting (packet family = 0, packet id = 7) Version 1.0.0
+    // Counter Packet Family
+    //   Periodic Counter Capture (packet_family = 3, packet_class = 0, packet_type = 0) Version 1.0.0
+    //   Per-Job Counter Capture (packet_family = 3, packet_class = 1, packet_type = 0,1) Version  1.0.0
+    // Timeline Packet Family
+    //   Timeline Message Directory (packet_family = 1, packet_class = 0, packet_type = 0) Version 1.0.0
+    //   Timeline Message (packet_family = 1, packet_class = 0, packet_type = 1) Version 1.0.0
+    std::vector<std::pair<uint32_t, uint32_t>> packetVersions;
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 0), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 1), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 2), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 3), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 4), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 5), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 6), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 7), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(3, 0, 0), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(3, 1, 0), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(3, 1, 1), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(1, 0, 0), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(1, 0, 1), EncodeVersion(1, 0, 0)));
+    uint32_t numberOfVersions = numeric_cast<uint32_t>(packetVersions.size());
+    uint32_t packetVersionSize = numeric_cast<uint32_t>(numberOfVersions * 2 * sizeUint32);
 
     const uint32_t payloadSize = numeric_cast<uint32_t>(infoSize + hardwareVersionSize + softwareVersionSize +
-                                                  processNameSize + packetVersionCountSize +
-                                                  (packetVersionEntries * 2 * sizeUint32));
+                                                  processNameSize + packetVersionCountSize + packetVersionSize);
 
     const uint32_t totalSize = headerSize + bodySize + payloadSize;
     uint32_t offset = 0;
@@ -122,30 +146,20 @@ void SendCounterPacket::SendStreamMetaDataPacket()
         memcpy(&writeBuffer->GetWritableData()[offset], processName.c_str(), processNameSize);
         offset += processNameSize;
 
-        if (packetVersionEntries)
+        if (!packetVersions.empty())
         {
             // Packet Version Count
-            WriteUint32(writeBuffer, offset, packetVersionEntries << 16);
+            WriteUint32(writeBuffer, offset, numberOfVersions << 16);
+            offset += sizeUint32;
 
             // Packet Version Entries
-            uint32_t packetFamily = 0;
-            uint32_t packetId = 0;
-
-            offset += sizeUint32;
-            for (uint32_t i = 0; i < packetVersionEntries - 1; ++i)
+            for (std::pair<uint32_t, uint32_t>& packetVersion : packetVersions)
             {
-                WriteUint32(writeBuffer, offset, ((packetFamily & 0x3F) << 26) | ((packetId++ & 0x3FF) << 16));
+                WriteUint32(writeBuffer, offset, packetVersion.first);
                 offset += sizeUint32;
-                WriteUint32(writeBuffer, offset, EncodeVersion(1, 0, 0));
+                WriteUint32(writeBuffer, offset, packetVersion.second);
                 offset += sizeUint32;
             }
-
-            packetFamily = 1;
-            packetId = 0;
-
-            WriteUint32(writeBuffer, offset, ((packetFamily & 0x3F) << 26) | ((packetId & 0x3FF) << 16));
-            offset += sizeUint32;
-            WriteUint32(writeBuffer, offset, EncodeVersion(1, 0, 0));
         }
     }
     catch(...)

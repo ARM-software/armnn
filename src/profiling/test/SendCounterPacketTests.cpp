@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -307,7 +307,39 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     uint32_t softwareVersionSize = numeric_cast<uint32_t>(GetSoftwareVersion().size()) + 1;
     uint32_t processNameSize =     numeric_cast<uint32_t>(processName.size()) + 1;
 
-    uint32_t packetEntries = 6;
+    // Supported Packets
+    // Packet Encoding version 1.0.0
+    // Control packet family
+    //   Stream metadata packet (packet family=0; packet id=0)
+    //   Connection Acknowledged packet ( packet family=0, packet id=1) Version 1.0.0
+    //   Counter Directory packet (packet family=0; packet id=2) Version 1.0.0
+    //   Request Counter Directory packet ( packet family=0, packet id=3) Version 1.0.0
+    //   Periodic Counter Selection packet ( packet family=0, packet id=4) Version 1.0.0
+    //   Per Job Counter Selection packet ( packet family=0, packet id=5) Version 1.0.0
+    //   Activate Timeline Reporting (packet family = 0, packet id = 6) Version 1.0.0
+    //   Deactivate Timeline Reporting (packet family = 0, packet id = 7) Version 1.0.0
+    // Counter Packet Family
+    //   Periodic Counter Capture (packet_family = 3, packet_class = 0, packet_type = 0) Version 1.0.0
+    //   Per-Job Counter Capture (packet_family = 3, packet_class = 1, packet_type = 0,1) Version  1.0.0
+    // Timeline Packet Family
+    //   Timeline Message Directory (packet_family = 1, packet_class = 0, packet_type = 0) Version 1.0.0
+    //   Timeline Message (packet_family = 1, packet_class = 0, packet_type = 1) Version 1.0.0
+    std::vector<std::pair<uint32_t, uint32_t>> packetVersions;
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 0), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 1), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 2), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 3), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 4), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 5), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 6), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 7), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(3, 0, 0), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(3, 1, 0), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(3, 1, 1), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(1, 0, 0), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(1, 0, 1), EncodeVersion(1, 0, 0)));
+
+    uint32_t packetEntries = static_cast<uint32_t>(packetVersions.size());
 
     MockBufferManager mockBuffer2(512);
     SendCounterPacket sendPacket2(mockBuffer2);
@@ -382,22 +414,18 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
 
     if (packetEntries)
     {
-        BOOST_TEST((ReadUint32(readBuffer2, offset) >> 16) == packetEntries);
+        uint32_t numberOfEntries = ReadUint32(readBuffer2, offset);
+        BOOST_TEST((numberOfEntries >> 16) == packetEntries);
         offset += sizeUint32;
-        for (uint32_t i = 0; i < packetEntries - 1; ++i)
+        for (std::pair<uint32_t, uint32_t>& packetVersion : packetVersions)
         {
-            BOOST_TEST(((ReadUint32(readBuffer2, offset) >> 26) & 0x3F) == 0);
-            BOOST_TEST(((ReadUint32(readBuffer2, offset) >> 16) & 0x3FF) == i);
+            uint32_t readPacketId = ReadUint32(readBuffer2, offset);
+            BOOST_TEST(packetVersion.first == readPacketId);
             offset += sizeUint32;
-            BOOST_TEST(ReadUint32(readBuffer2, offset) == EncodeVersion(1, 0, 0));
+            uint32_t readVersion = ReadUint32(readBuffer2, offset);
+            BOOST_TEST(packetVersion.second == readVersion);
             offset += sizeUint32;
         }
-
-        BOOST_TEST(((ReadUint32(readBuffer2, offset) >> 26) & 0x3F) == 1);
-        BOOST_TEST(((ReadUint32(readBuffer2, offset) >> 16) & 0x3FF) == 0);
-        offset += sizeUint32;
-        BOOST_TEST(ReadUint32(readBuffer2, offset) == EncodeVersion(1, 0, 0));
-        offset += sizeUint32;
     }
 
     BOOST_TEST(offset == totalLength);

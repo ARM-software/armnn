@@ -150,6 +150,8 @@ void WriteBytes(const IPacketBuffer& packetBuffer, unsigned int offset, const vo
 
 uint32_t ConstructHeader(uint32_t packetFamily, uint32_t packetId);
 
+uint32_t ConstructHeader(uint32_t packetFamily, uint32_t packetClass, uint32_t packetType);
+
 void WriteUint64(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint64_t value);
 
 void WriteUint32(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint32_t value);

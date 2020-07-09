@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_05" # Release 20.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="f3ad9513dd46fca1d6c5e4550286480fdbaba056" #COMPMID-3324: Fix paths in Android.bp
+DEFAULT_CLFRAMEWORKREVISION="6b6a16faa9375365d444b2a3998381b22cd6cd5b" #COMPMID-3501 Modify heuristics for f16+fastmath NEON Winograd Conv
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

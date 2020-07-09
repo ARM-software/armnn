@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <Threads.hpp>
 #include <ProfilingUtils.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -724,7 +725,7 @@ BOOST_AUTO_TEST_CASE(TimelineEventClassTestFullConstructionOfData)
 BOOST_AUTO_TEST_CASE(TimelineEventPacketTestNoBuffer)
 {
     const uint64_t timestamp = 456789u;
-    const std::thread::id threadId = std::this_thread::get_id();
+    const int threadId = armnnUtils::Threads::GetCurrentThreadId();
     const uint64_t profilingGuid = 123456u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEventBinary(timestamp,
@@ -742,7 +743,7 @@ BOOST_AUTO_TEST_CASE(TimelineEventPacketTestBufferExhaustionZeroValue)
     std::vector<unsigned char> buffer(512, 0);
 
     const uint64_t timestamp = 456789u;
-    const std::thread::id threadId = std::this_thread::get_id();
+    const int threadId = armnnUtils::Threads::GetCurrentThreadId();
     const uint64_t profilingGuid = 123456u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEventBinary(timestamp,
@@ -760,7 +761,7 @@ BOOST_AUTO_TEST_CASE(TimelineEventPacketTestBufferExhaustionFixedValue)
     std::vector<unsigned char> buffer(10, 0);
 
     const uint64_t timestamp = 456789u;
-    const std::thread::id threadId = std::this_thread::get_id();
+    const int threadId = armnnUtils::Threads::GetCurrentThreadId();
     const uint64_t profilingGuid = 123456u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEventBinary(timestamp,
@@ -778,7 +779,7 @@ BOOST_AUTO_TEST_CASE(TimelineEventPacketTestFullConstructionOfData)
     std::vector<unsigned char> buffer(512, 0);
 
     const uint64_t timestamp = 456789u;
-    const std::thread::id threadId = std::this_thread::get_id();
+    const int threadId = armnnUtils::Threads::GetCurrentThreadId();
     const uint64_t profilingGuid = 123456u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEventBinary(timestamp,

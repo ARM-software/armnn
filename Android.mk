@@ -131,6 +131,7 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/VerificationHelpers.cpp \
         src/armnnUtils/Filesystem.cpp \
         src/armnnUtils/Processes.cpp \
+        src/armnnUtils/Threads.cpp \
         src/armnnUtils/Transpose.cpp \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \

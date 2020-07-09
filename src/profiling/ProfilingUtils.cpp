@@ -802,7 +802,7 @@ TimelinePacketStatus WriteTimelineEventClassBinary(uint64_t profilingGuid,
 }
 
 TimelinePacketStatus WriteTimelineEventBinary(uint64_t timestamp,
-                                              std::thread::id threadId,
+                                              int threadId,
                                               uint64_t profilingGuid,
                                               unsigned char* buffer,
                                               unsigned int remainingBufferSize,
@@ -1093,7 +1093,7 @@ Packet ReceivePacket(const unsigned char* buffer, uint32_t length)
 namespace std
 {
 
-bool operator==(const std::vector<uint8_t>& left, std::thread::id right)
+bool operator==(const std::vector<uint8_t>& left, int right)
 {
     return std::memcmp(left.data(), &right, left.size()) == 0;
 }

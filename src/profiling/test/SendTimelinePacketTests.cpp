@@ -6,6 +6,7 @@
 #include "ProfilingMocks.hpp"
 
 #include <BufferManager.hpp>
+#include <Threads.hpp>
 #include <ProfilingService.hpp>
 #include <ProfilingUtils.hpp>
 #include <SendTimelinePacket.hpp>
@@ -322,7 +323,7 @@ BOOST_AUTO_TEST_CASE(SendEventClassAfterTimelineEntityPacketTest)
 
     // Send TimelineEventBinaryPacket
     const uint64_t timestamp = 456789u;
-    const std::thread::id threadId = std::this_thread::get_id();
+    const int threadId = armnnUtils::Threads::GetCurrentThreadId();
     const uint64_t eventProfilingGuid = 123456u;
     sendTimelinePacket->SendTimelineEventBinaryPacket(timestamp, threadId, eventProfilingGuid);
 

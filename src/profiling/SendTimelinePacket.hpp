@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -36,7 +36,7 @@ public:
     void SendTimelineEntityBinaryPacket(uint64_t profilingGuid) override;
 
     /// Create and write a TimelineEventBinaryPacket from the parameters to the buffer.
-    void SendTimelineEventBinaryPacket(uint64_t timestamp, std::thread::id threadId, uint64_t profilingGuid) override;
+    void SendTimelineEventBinaryPacket(uint64_t timestamp, int threadId, uint64_t profilingGuid) override;
 
     /// Create and write a TimelineEventClassBinaryPacket from the parameters to the buffer.
     void SendTimelineEventClassBinaryPacket(uint64_t profilingGuid, uint64_t nameGuid) override;

@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -89,7 +89,7 @@ void SendTimelinePacket::SendTimelineEntityBinaryPacket(uint64_t profilingGuid)
 }
 
 void SendTimelinePacket::SendTimelineEventBinaryPacket(uint64_t timestamp,
-                                                       std::thread::id threadId,
+                                                       int threadId,
                                                        uint64_t profilingGuid)
 {
     ForwardWriteBinaryFunction(WriteTimelineEventBinary,

@@ -127,7 +127,7 @@ void CheckTimelineDirectory(timelinedecoder::TimelineDirectoryCaptureCommandHand
     uint32_t uint8_t_size  = sizeof(uint8_t);
     uint32_t uint32_t_size = sizeof(uint32_t);
     uint32_t uint64_t_size = sizeof(uint64_t);
-    uint32_t threadId_size = sizeof(std::thread::id);
+    uint32_t threadId_size = sizeof(int);
 
     profiling::BufferManager bufferManager(5);
     profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);

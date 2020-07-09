@@ -2,9 +2,9 @@
 // Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-
-#include "TimelineUtilityMethods.hpp"
 #include "LabelsAndEventClasses.hpp"
+#include <Threads.hpp>
+#include "TimelineUtilityMethods.hpp"
 
 namespace armnn
 {
@@ -368,7 +368,7 @@ ProfilingDynamicGuid TimelineUtilityMethods::RecordEvent(ProfilingGuid entityGui
     uint64_t timestamp = GetTimestamp();
 
     // Get the thread id
-    std::thread::id threadId = std::this_thread::get_id();
+    int threadId = armnnUtils::Threads::GetCurrentThreadId();
 
     // Generate a GUID for the event
     ProfilingDynamicGuid eventGuid = profiling::ProfilingService::GetNextGuid();

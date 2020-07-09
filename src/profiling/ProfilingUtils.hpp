@@ -28,7 +28,7 @@ namespace armnn
 namespace profiling
 {
 
-constexpr unsigned int ThreadIdSize = sizeof(std::thread::id); // Is platform dependent
+constexpr unsigned int ThreadIdSize = sizeof(int); // Is platform dependent
 
 struct SwTraceHeader
 {
@@ -245,7 +245,7 @@ TimelinePacketStatus WriteTimelineEventClassBinary(uint64_t profilingGuid,
                                                    unsigned int& numberOfBytesWritten);
 
 TimelinePacketStatus WriteTimelineEventBinary(uint64_t timestamp,
-                                              std::thread::id threadId,
+                                              int threadId,
                                               uint64_t profilingGuid,
                                               unsigned char* buffer,
                                               unsigned int bufferSize,
@@ -271,6 +271,6 @@ Packet ReceivePacket(const unsigned char* buffer, uint32_t length);
 namespace std
 {
 
-bool operator==(const std::vector<uint8_t>& left, std::thread::id right);
+bool operator==(const std::vector<uint8_t>& left, int right);
 
 } // namespace std

@@ -8,6 +8,7 @@
 
 #include <armnn/Descriptors.hpp>
 #include <LabelsAndEventClasses.hpp>
+#include <Threads.hpp>
 #include <ProfilingService.hpp>
 
 #include <test/TestUtils.hpp>
@@ -295,7 +296,7 @@ ProfilingGuid VerifyTimelineEntityBinaryPacketData(Optional<ProfilingGuid> guid,
 }
 
 ProfilingGuid VerifyTimelineEventBinaryPacket(Optional<uint64_t> timestamp,
-                                              Optional<std::thread::id> threadId,
+                                              Optional<int> threadId,
                                               Optional<ProfilingGuid> eventGuid,
                                               const unsigned char* readableData,
                                               unsigned int& offset)
@@ -333,7 +334,7 @@ ProfilingGuid VerifyTimelineEventBinaryPacket(Optional<uint64_t> timestamp,
     }
     else
     {
-        BOOST_CHECK(readThreadId == std::this_thread::get_id());
+        BOOST_CHECK(readThreadId == armnnUtils::Threads::GetCurrentThreadId());
     }
 
     // Check the event GUID

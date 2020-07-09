@@ -53,7 +53,7 @@ ProfilingGuid VerifyTimelineEntityBinaryPacketData(Optional<ProfilingGuid> guid,
                                                    unsigned int& offset);
 
 ProfilingGuid VerifyTimelineEventBinaryPacket(Optional<uint64_t> timestamp,
-                                              Optional<std::thread::id> threadId,
+                                              Optional<int> threadId,
                                               Optional<ProfilingGuid> eventGuid,
                                               const unsigned char* readableData,
                                               unsigned int& offset);

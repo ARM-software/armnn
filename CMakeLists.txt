@@ -45,8 +45,6 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/BFloat16.hpp
     src/armnnUtils/Filesystem.hpp
     src/armnnUtils/Filesystem.cpp
-    src/armnnUtils/Processes.hpp
-    src/armnnUtils/Processes.cpp
     src/armnnUtils/GraphTopologicalSort.hpp
     src/armnnUtils/Half.hpp
     src/armnnUtils/Permute.cpp
@@ -67,11 +65,15 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/ParserHelper.hpp
     src/armnnUtils/ParserHelper.cpp
     src/armnnUtils/ParserPrototxtFixture.hpp
+    src/armnnUtils/Processes.hpp
+    src/armnnUtils/Processes.cpp
     src/armnnUtils/PrototxtConversions.hpp
     src/armnnUtils/PrototxtConversions.cpp
     src/armnnUtils/QuantizeHelper.hpp
     src/armnnUtils/TensorIOUtils.hpp
     src/armnnUtils/TensorUtils.cpp
+    src/armnnUtils/Threads.hpp
+    src/armnnUtils/Threads.cpp
     src/armnnUtils/Transpose.cpp
     src/armnnUtils/WindowsWrapper.hpp
     )

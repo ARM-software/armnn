@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,6 +8,7 @@
 #include <TimelineDecoder.hpp>
 
 #include <CommandHandlerFunctor.hpp>
+#include <Threads.hpp>
 #include <ProfilingService.hpp>
 #include <PacketBuffer.hpp>
 #include <TimelinePacketWriterFactory.hpp>
@@ -172,7 +173,7 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
     const uint64_t timestamp = 33333u;
     const uint64_t eventGuid = 44444u;
 
-    const std::thread::id threadId = std::this_thread::get_id();
+    const int threadId = armnnUtils::Threads::GetCurrentThreadId();
 
     // need to do a bit of work here to extract the value from threadId
     unsigned char* uCharThreadId = new unsigned char[armnn::profiling::ThreadIdSize]();;
@@ -285,7 +286,7 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTestMultipleStringsInBuffer)
     const uint64_t timestamp          = 33333u;
     const uint64_t eventGuid          = 44444u;
 
-    const std::thread::id threadId = std::this_thread::get_id();
+    const int threadId = armnnUtils::Threads::GetCurrentThreadId();
 
     // need to do a bit of work here to extract the value from threadId
     unsigned char* uCharThreadId = new unsigned char[armnn::profiling::ThreadIdSize]();

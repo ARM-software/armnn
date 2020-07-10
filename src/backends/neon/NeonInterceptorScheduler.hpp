@@ -10,7 +10,6 @@
 #include <arm_compute/runtime/IScheduler.h>
 #include <arm_compute/runtime/Scheduler.h>
 #include <arm_compute/core/CPP/ICPPKernel.h>
-#include <arm_compute/core/experimental/Types.h>
 
 namespace armnn
 {

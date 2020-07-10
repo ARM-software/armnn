@@ -37,6 +37,7 @@ IBackendInternal::IWorkloadFactoryPtr RefBackend::CreateWorkloadFactory(
     auto memoryManager = std::make_shared<RefMemoryManager>();
 
     tensorHandleFactoryRegistry.RegisterMemoryManager(memoryManager);
+    tensorHandleFactoryRegistry.RegisterFactory(std::make_unique<RefTensorHandleFactory>(memoryManager));
 
     return std::make_unique<RefWorkloadFactory>(PolymorphicPointerDowncast<RefMemoryManager>(memoryManager));
 }

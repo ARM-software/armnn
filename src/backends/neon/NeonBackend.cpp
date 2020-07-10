@@ -53,6 +53,8 @@ IBackendInternal::IWorkloadFactoryPtr NeonBackend::CreateWorkloadFactory(
                                                              BaseMemoryManager::MemoryAffinity::Offset);
 
     tensorHandleFactoryRegistry.RegisterMemoryManager(memoryManager);
+    tensorHandleFactoryRegistry.RegisterFactory(std::make_unique<NeonTensorHandleFactory>(memoryManager));
+
     return std::make_unique<NeonWorkloadFactory>(
         PolymorphicPointerDowncast<NeonMemoryManager>(memoryManager));
 }

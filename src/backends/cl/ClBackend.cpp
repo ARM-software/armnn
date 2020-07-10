@@ -50,6 +50,7 @@ IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
     auto memoryManager = std::make_shared<ClMemoryManager>(std::make_unique<arm_compute::CLBufferAllocator>());
 
     registry.RegisterMemoryManager(memoryManager);
+    registry.RegisterFactory(std::make_unique<ClTensorHandleFactory>(memoryManager));
 
     return std::make_unique<ClWorkloadFactory>(
             PolymorphicPointerDowncast<ClMemoryManager>(memoryManager));

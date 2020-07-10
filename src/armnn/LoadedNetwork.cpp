@@ -121,6 +121,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
                              m_OptimizedNetwork(std::move(net)),
                              m_IsImportEnabled(networkProperties.m_ImportEnabled),
                              m_IsExportEnabled(networkProperties.m_ExportEnabled),
+                             m_TensorHandleFactoryRegistry(),
                              m_ProfilingService(profilingService)
 {
     // Create a profiler and register it for the current thread.
@@ -144,8 +145,6 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
 
             if (backend->SupportsTensorAllocatorAPI())
             {
-                backend->RegisterTensorHandleFactories(m_TensorHandleFactoryRegistry);
-
                 auto workloadFactory = backend->CreateWorkloadFactory(m_TensorHandleFactoryRegistry);
                 m_WorkloadFactories.emplace(
                     std::make_pair(backendId, std::make_pair(std::move(workloadFactory), nullptr)));

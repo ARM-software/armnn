@@ -1942,10 +1942,7 @@ void TfLiteParser::ParsePad(size_t subgraphIndex, size_t operatorIndex)
     }
 
     auto layerName = boost::str(boost::format("Pad:%1%:%2%") % subgraphIndex % operatorIndex);
-
-    TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
-    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
 
     IConnectableLayer* layer = m_Network->AddPadLayer(desc, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
@@ -2313,10 +2310,7 @@ void TfLiteParser::ParseConcatenation(size_t subgraphIndex, size_t operatorIndex
     }
 
     auto layerName = boost::str(boost::format("Concatenation:%1%:%2%") % subgraphIndex % operatorIndex);
-
-    TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
-    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
 
     IConnectableLayer* layer = m_Network->AddConcatLayer(concatDescriptor, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);

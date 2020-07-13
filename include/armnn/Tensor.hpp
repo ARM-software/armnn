@@ -119,7 +119,7 @@ private:
     std::array<unsigned int, MaxNumOfTensorDimensions> m_Dimensions{};
 
     /// Array of flags to indicate if the size of each of the dimensions is specified or not
-    std::array<bool, MaxNumOfTensorDimensions> m_DimensionsSpecificity = {true};
+    std::array<bool, MaxNumOfTensorDimensions> m_DimensionsSpecificity = { {true} };
 
     /// Tensor rank
     unsigned int m_NumDimensions{};

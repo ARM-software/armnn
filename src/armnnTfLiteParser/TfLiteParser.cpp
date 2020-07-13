@@ -2125,48 +2125,57 @@ void TfLiteParser::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo actualOutputTensorInfo  = ToTensorInfo(outputs[0]);
     CheckMatchingQuantization(inputTensorInfo, actualOutputTensorInfo, layerName, "Input 0", "Output 0");
 
+    // Extracting new shape for the output
+    // There are two ways it can be passed
+    //  * First is to define the target shape in the operator built-in options
+    //  * Second is to pass it as a second input tensor
     std::vector<int32_t> targetShape;
-    if (inputs.size() > 1 && inputs[1] != nullptr)
+    bool targetShapeFound = false;
+    // Check if built-in options were given
+    if (options != nullptr)
     {
-        if (inputs[1]->is_variable)
+        // make sure the parameter is given
+        if (options->new_shape.empty() == false)
         {
-            ARMNN_THROW_PARSE_EXCEPTION( "Target shapes defined in non-const input tensors is not supported");
-        }
-
-        if (inputs[1]->shape.size() != 1)
-        {
-            ARMNN_THROW_PARSE_EXCEPTION("Target 'shape' input is not a 1D tensor");
-        }
-
-        if (inputs[1]->type != tflite::TensorType_INT32)
-        {
-            ARMNN_THROW_PARSE_EXCEPTION("Target 'shape' input is not an int32 type");
-        }
-
-        auto bufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
-        auto vals = reinterpret_cast<const int32_t*>(bufferPtr->data.data());
-        for (int i=0; i < inputs[1]->shape[0]; i++)
-        {
-            targetShape.push_back(vals[i]);
-        }
-
-        if (options != nullptr &&
-            options->new_shape.empty() == false &&
-            options->new_shape != targetShape)
-        {
-            ARMNN_THROW_PARSE_EXCEPTION("Target shape defined in reshape parameters and as input tensor but "
-                                        "the values do not match");
+            targetShape = options->new_shape;
+            targetShapeFound = true;
         }
     }
-    else
+
+    // If there is no built-in option given or if the built-in new_shape parameter was empty
+    if (!targetShapeFound)
     {
-        if (options == nullptr)
+        // Check for a second input tensor
+        if (inputs.size() > 1 && inputs[1] != nullptr)
+        {
+            if (inputs[1]->is_variable)
+            {
+                ARMNN_THROW_PARSE_EXCEPTION( "Target shapes defined in non-const input tensors is not supported");
+            }
+
+            if (inputs[1]->shape.size() != 1)
+            {
+                ARMNN_THROW_PARSE_EXCEPTION("Target 'shape' input is not a 1D tensor");
+            }
+
+            if (inputs[1]->type != tflite::TensorType_INT32)
+            {
+                ARMNN_THROW_PARSE_EXCEPTION("Target 'shape' input is not an int32 type");
+            }
+
+            // Extract target shape from input
+            auto bufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+            auto values = reinterpret_cast<const int32_t*>(bufferPtr->data.data());
+            for (int i=0; i < inputs[1]->shape[0]; ++i)
+            {
+                targetShape.push_back(values[i]);
+            }
+        }
+        else
         {
             ARMNN_THROW_PARSE_EXCEPTION("Target shape not defined in reshape parameters or input tensor. "
                                         "At least one method required");
         }
-
-        targetShape = options->new_shape;
     }
 
     armnn::TensorInfo reshapeOutputTensorInfo =

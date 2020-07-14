@@ -7,6 +7,7 @@
 #include "Layer.hpp"
 #include "Graph.hpp"
 #include "Network.hpp"
+#include <Processes.hpp>
 #include "Runtime.hpp"
 #include "Profiling.hpp"
 #include "HeapProfiling.hpp"
@@ -196,6 +197,13 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
     if (timelineUtils)
     {
         timelineUtils->CreateTypedEntity(networkGuid, LabelsAndEventClasses::NETWORK_GUID);
+        // Mark the network with a start of life event
+        timelineUtils->RecordEvent(networkGuid, LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
+        // and with the process ID
+        int processID = armnnUtils::Processes::GetCurrentId();
+        std::stringstream ss;
+        ss << processID;
+        timelineUtils->MarkEntityWithLabel(networkGuid, ss.str(), LabelsAndEventClasses::PROCESS_ID_GUID);
     }
 
     //Then create workloads.
@@ -296,6 +304,11 @@ void LoadedNetwork::SendNetworkStructure()
     }
     // Commit to send the post-optimisation network structure
     timelineUtils->Commit();
+}
+
+profiling::ProfilingGuid LoadedNetwork::GetNetworkGuid()
+{
+    return m_OptimizedNetwork->GetGuid();
 }
 
 TensorInfo LoadedNetwork::GetInputTensorInfo(LayerBindingId layerId) const

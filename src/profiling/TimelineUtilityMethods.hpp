@@ -47,7 +47,7 @@ public:
 
     void CreateNamedTypedEntity(ProfilingGuid entityGuid, const std::string& name, ProfilingStaticGuid typeGuid);
 
-    void MarkEntityWithLabel(ProfilingGuid entityGuid, const std::string &labelName, ProfilingStaticGuid labelLinkGuid);
+    void MarkEntityWithLabel(ProfilingGuid entityGuid, const std::string& labelName, ProfilingStaticGuid labelLinkGuid);
 
     ProfilingStaticGuid DeclareLabel(const std::string& labelName);
 

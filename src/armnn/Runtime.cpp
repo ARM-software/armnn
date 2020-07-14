@@ -6,6 +6,7 @@
 
 #include <armnn/Version.hpp>
 #include <armnn/BackendRegistry.hpp>
+#include <LabelsAndEventClasses.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/utility/Timer.hpp>
 
@@ -117,9 +118,22 @@ Status Runtime::UnloadNetwork(NetworkId networkId)
         return Status::Failure;
     }
 
+    std::unique_ptr<profiling::TimelineUtilityMethods> timelineUtils =
+            profiling::TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
     {
         std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
+        // If timeline recording is on mark the Network end of life
+        if (timelineUtils)
+        {
+            auto search = m_LoadedNetworks.find(networkId);
+            if (search != m_LoadedNetworks.end())
+            {
+                profiling::ProfilingGuid networkGuid = search->second->GetNetworkGuid();
+                timelineUtils->RecordEvent(networkGuid,
+                                           profiling::LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
+            }
+        }
         if (m_LoadedNetworks.erase(networkId) == 0)
         {
             ARMNN_LOG(warning) << "WARNING: Runtime::UnloadNetwork(): " << networkId << " not found!";

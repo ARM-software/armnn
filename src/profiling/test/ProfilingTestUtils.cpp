@@ -8,8 +8,9 @@
 
 #include <armnn/Descriptors.hpp>
 #include <LabelsAndEventClasses.hpp>
-#include <Threads.hpp>
+#include <Processes.hpp>
 #include <ProfilingService.hpp>
+#include <Threads.hpp>
 
 #include <test/TestUtils.hpp>
 
@@ -438,11 +439,9 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     profiling::BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
     auto readableBuffer = bufferManager.GetReadableBuffer();
 
-    // Profiling is enable, the post-optimisation structure should be created
+    // Profiling is enabled, the post-optimisation structure should be created
     BOOST_CHECK(readableBuffer != nullptr);
-
     unsigned int size = readableBuffer->GetSize();
-    BOOST_CHECK(size == 1124);
 
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
@@ -450,7 +449,7 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     unsigned int offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 1116);
+    VerifyTimelineHeaderBinary(readableData, offset, size - 8);
     BOOST_TEST_MESSAGE("HEADER OK");
 
     // Post-optimisation network
@@ -467,6 +466,42 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                readableData,
                                                offset);
     BOOST_TEST_MESSAGE("NETWORK TYPE RELATIONSHIP OK");
+
+    // Network - START OF LIFE
+    ProfilingGuid networkSolEventGuid = VerifyTimelineEventBinaryPacket(EmptyOptional(),
+                                                                        EmptyOptional(),
+                                                                        EmptyOptional(),
+                                                                        readableData,
+                                                                        offset);
+    BOOST_TEST_MESSAGE("NETWORK START OF LIFE EVENT OK");
+
+    // Network - START OF LIFE event relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
+                                               EmptyOptional(),
+                                               optNetGuid,
+                                               networkSolEventGuid,
+                                               LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
+                                               readableData,
+                                               offset);
+    BOOST_TEST_MESSAGE("NETWORK START OF LIFE RELATIONSHIP OK");
+
+    // Process ID Label
+    int processID = armnnUtils::Processes::GetCurrentId();
+    std::stringstream ss;
+    ss << processID;
+    std::string processIdLabel = ss.str();
+    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), processIdLabel, readableData, offset);
+    BOOST_TEST_MESSAGE("PROCESS ID LABEL OK");
+
+    // Entity - Process ID relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               EmptyOptional(),
+                                               optNetGuid,
+                                               EmptyOptional(),
+                                               LabelsAndEventClasses::PROCESS_ID_GUID,
+                                               readableData,
+                                               offset);
+    BOOST_TEST_MESSAGE("NETWORK PROCESS ID RELATIONSHIP OK");
 
     // Input layer
     // Input layer entity

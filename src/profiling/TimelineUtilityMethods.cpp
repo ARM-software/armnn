@@ -53,6 +53,10 @@ void TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses(ISendTimelinePac
     timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                  LabelsAndEventClasses::EXECUTION_OF_LABEL);
 
+    // Send the "process_id" label, this call throws in case of error
+    timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::PROCESS_ID_GUID,
+                                                 LabelsAndEventClasses::PROCESS_ID_LABEL);
+
     // Send the "layer" label, this call throws in case of error
     timelinePacket.SendTimelineLabelBinaryPacket(LabelsAndEventClasses::LAYER_GUID,
                                                  LabelsAndEventClasses::LAYER);

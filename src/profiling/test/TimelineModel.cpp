@@ -359,7 +359,13 @@ std::string GetEntityDescription(const Entity& entity)
     ss << "Entity [" << entity.GetGuid() << "]";
     for (auto& attributeEntry : entity.GetAttributes())
     {
-        ss << " " << attributeEntry.second.first << " = " << attributeEntry.second.second;
+        if (profiling::LabelsAndEventClasses::PROCESS_ID_LABEL == attributeEntry.second.first)
+        {
+            ss << " " << attributeEntry.second.first << " = [processId]";
+        }
+        else {
+            ss << " " << attributeEntry.second.first << " = " << attributeEntry.second.second;
+        }
     }
     return ss.str();
 }

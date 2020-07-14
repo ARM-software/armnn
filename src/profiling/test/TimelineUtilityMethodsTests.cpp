@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
     BOOST_CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_TEST(size == 432);
+    BOOST_TEST(size == 460);
     const unsigned char* readableData = readableBuffer->GetReadableData();
     BOOST_CHECK(readableData != nullptr);
 
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
     unsigned int offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 424);
+    VerifyTimelineHeaderBinary(readableData, offset, 452);
 
     // First "well-known" label: NAME
     VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::NAME_GUID,
@@ -125,6 +125,12 @@ BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
     // Sixth "well-known" label: EXECUTION_OF
     VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::EXECUTION_OF_GUID,
                                         LabelsAndEventClasses::EXECUTION_OF_LABEL,
+                                        readableData,
+                                        offset);
+
+    // Seventh "well-known" label: PROCESS_ID_LABEL
+    VerifyTimelineLabelBinaryPacketData(LabelsAndEventClasses::PROCESS_ID_GUID,
+                                        LabelsAndEventClasses::PROCESS_ID_LABEL,
                                         readableData,
                                         offset);
 

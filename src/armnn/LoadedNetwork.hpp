@@ -58,6 +58,8 @@ public:
 
     void SendNetworkStructure();
 
+    profiling::ProfilingGuid GetNetworkGuid();
+
 private:
     void AllocateWorkingMemory(std::lock_guard<std::mutex>& lock);
 

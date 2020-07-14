@@ -21,6 +21,7 @@ std::string LabelsAndEventClasses::INDEX_LABEL("index");
 std::string LabelsAndEventClasses::BACKENDID_LABEL("backendId");
 std::string LabelsAndEventClasses::CHILD_LABEL("child");
 std::string LabelsAndEventClasses::EXECUTION_OF_LABEL("execution_of");
+std::string LabelsAndEventClasses::PROCESS_ID_LABEL("processId");
 
 ProfilingStaticGuid LabelsAndEventClasses::EMPTY_GUID(0);
 ProfilingStaticGuid LabelsAndEventClasses::NAME_GUID(
@@ -35,6 +36,8 @@ ProfilingStaticGuid LabelsAndEventClasses::CHILD_GUID(
     m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::CHILD_LABEL));
 ProfilingStaticGuid LabelsAndEventClasses::EXECUTION_OF_GUID(
     m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::EXECUTION_OF_LABEL));
+ProfilingStaticGuid LabelsAndEventClasses::PROCESS_ID_GUID(
+    m_GuidGenerator.GenerateStaticId(LabelsAndEventClasses::PROCESS_ID_LABEL));
 
 // Common types
 std::string LabelsAndEventClasses::LAYER("layer");

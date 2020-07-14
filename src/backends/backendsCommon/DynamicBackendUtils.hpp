@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -14,7 +14,7 @@
 
 #include <string>
 #include <vector>
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
 #include <dlfcn.h>
 #endif
 
@@ -61,7 +61,7 @@ private:
 template<typename EntryPointType>
 EntryPointType DynamicBackendUtils::GetEntryPoint(const void* sharedObjectHandle, const char* symbolName)
 {
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
     if (sharedObjectHandle == nullptr)
     {
         throw RuntimeException("GetEntryPoint error: invalid handle");

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -15,7 +15,7 @@ namespace armnn
 
 void* DynamicBackendUtils::OpenHandle(const std::string& sharedObjectPath)
 {
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
     if (sharedObjectPath.empty())
     {
         throw RuntimeException("OpenHandle error: shared object path must not be empty");
@@ -35,7 +35,7 @@ void* DynamicBackendUtils::OpenHandle(const std::string& sharedObjectPath)
 
 void DynamicBackendUtils::CloseHandle(const void* sharedObjectHandle)
 {
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
     if (!sharedObjectHandle)
     {
         return;
@@ -63,7 +63,7 @@ bool DynamicBackendUtils::IsBackendCompatibleImpl(const BackendVersion &backendA
 
 std::string DynamicBackendUtils::GetDlError()
 {
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
     const char* errorMessage = dlerror();
     if (!errorMessage)
     {

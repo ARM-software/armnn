@@ -5,7 +5,7 @@
 
 #include "common/include/NetworkSockets.hpp"
 
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
 #include <fcntl.h>
 #include <armnn/Conversion.hpp>
@@ -19,7 +19,7 @@ namespace Sockets
 
 bool Initialize()
 {
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
     return true;
 #elif defined(_MSC_VER)
     WSADATA wsaData;
@@ -29,7 +29,7 @@ bool Initialize()
 
 int Close(Socket s)
 {
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
     return close(s);
 #elif defined(_MSC_VER)
     return closesocket(s);
@@ -39,7 +39,7 @@ int Close(Socket s)
 
 bool SetNonBlocking(Socket s)
 {
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
     const int currentFlags = fcntl(s, F_GETFL);
     return fcntl(s, F_SETFL, currentFlags | O_NONBLOCK) == 0;
 #elif defined(_MSC_VER)
@@ -51,7 +51,7 @@ bool SetNonBlocking(Socket s)
 
 long Write(Socket s, const void* buf, size_t len)
 {
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
     return write(s, buf, len);
 #elif defined(_MSC_VER)
     return send(s, static_cast<const char*>(buf), static_cast<int>(len), 0);
@@ -61,7 +61,7 @@ long Write(Socket s, const void* buf, size_t len)
 
 long Read(Socket s, void* buf, size_t len)
 {
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
     return read(s, buf, len);
 #elif defined(_MSC_VER)
     return recv(s, static_cast<char*>(buf), static_cast<int>(len), 0);
@@ -70,7 +70,7 @@ long Read(Socket s, void* buf, size_t len)
 
 int Ioctl(Socket s, unsigned long int cmd, void* arg)
 {
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
     ARMNN_NO_CONVERSION_WARN_BEGIN
     return ioctl(s, static_cast<int>(cmd), arg);
     ARMNN_NO_CONVERSION_WARN_END
@@ -82,7 +82,7 @@ int Ioctl(Socket s, unsigned long int cmd, void* arg)
 
 int Poll(PollFd* fds, nfds_t numFds, int timeout)
 {
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
     return poll(fds, numFds, timeout);
 #elif defined(_MSC_VER)
     return WSAPoll(fds, numFds, timeout);
@@ -94,6 +94,8 @@ armnnUtils::Sockets::Socket Accept(Socket s, sockaddr* addr, socklen_t* addrlen,
 {
 #if defined(__unix__)
     return accept4(s, addr, addrlen, flags);
+#elif defined(__APPLE__)
+    return accept(s, addr, addrlen);
 #elif defined(_MSC_VER)
     return accept(s, addr, reinterpret_cast<int*>(addrlen));
 #endif

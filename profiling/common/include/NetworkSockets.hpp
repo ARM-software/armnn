@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,7 +10,7 @@
 
 #pragma once
 
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
 #include <poll.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
@@ -30,6 +30,12 @@ namespace Sockets
 
 using Socket = int;
 using PollFd = pollfd;
+
+#elif defined(__APPLE__)
+
+using Socket = int;
+using PollFd = pollfd;
+#define SOCK_CLOEXEC 0
 
 #elif defined(_MSC_VER)
 

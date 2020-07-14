@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -134,7 +134,10 @@ int main(int argc, const char* argv[])
              "Available options are: 1 (Rapid), 2 (Normal), 3 (Exhaustive). "
              "Requires tuning-path to be set, default is set to 0 (No tuning run)")
             ("parse-unsupported", po::bool_switch()->default_value(false),
-                "Add unsupported operators as stand-in layers (where supported by parser)");
+                "Add unsupported operators as stand-in layers (where supported by parser)")
+            ("infer-output-shape", po::bool_switch()->default_value(false),
+                "Infers output tensor shape from input tensor shape and validate where applicable (where supported by "
+                "parser)");
     }
     catch (const std::exception& e)
     {
@@ -183,6 +186,7 @@ int main(int argc, const char* argv[])
     bool fileOnlyExternalProfiling = vm["file-only-external-profiling"].as<bool>();
     bool parseUnsupported = vm["parse-unsupported"].as<bool>();
     bool timelineEnabled = vm["timeline-profiling"].as<bool>();
+    bool inferOutputShape = vm["infer-output-shape"].as<bool>();
 
     if (enableBf16TurboMode && enableFp16TurboMode)
     {
@@ -245,7 +249,8 @@ int main(int argc, const char* argv[])
                 testCase.values.insert(testCase.values.begin(), executableName);
                 results.push_back(std::async(std::launch::async, RunCsvTest, std::cref(testCase), std::cref(runtime),
                                              enableProfiling, enableFp16TurboMode, enableBf16TurboMode, thresholdTime,
-                                             printIntermediate, enableLayerDetails, parseUnsupported));
+                                             printIntermediate, enableLayerDetails, parseUnsupported,
+                                             inferOutputShape));
             }
 
             // Check results
@@ -265,7 +270,7 @@ int main(int argc, const char* argv[])
                 testCase.values.insert(testCase.values.begin(), executableName);
                 if (RunCsvTest(testCase, runtime, enableProfiling,
                                enableFp16TurboMode, enableBf16TurboMode, thresholdTime, printIntermediate,
-                               enableLayerDetails, parseUnsupported) != EXIT_SUCCESS)
+                               enableLayerDetails, parseUnsupported, inferOutputShape) != EXIT_SUCCESS)
                 {
                     return EXIT_FAILURE;
                 }
@@ -298,7 +303,7 @@ int main(int argc, const char* argv[])
                     dynamicBackendsPath, modelPath, inputNames, inputTensorDataFilePaths, inputTypes, quantizeInput,
                     outputTypes, outputNames, outputTensorFiles, dequantizeOutput, enableProfiling,
                     enableFp16TurboMode, enableBf16TurboMode, thresholdTime, printIntermediate, subgraphId,
-                    enableLayerDetails, parseUnsupported);
+                    enableLayerDetails, parseUnsupported, inferOutputShape);
             }
             ARMNN_LOG(info) << "Using tuning params: " << tuningPath << "\n";
             options.m_BackendOptions.emplace_back(
@@ -330,6 +335,7 @@ int main(int argc, const char* argv[])
         return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath,
             inputNames, inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
             outputTensorFiles, dequantizeOutput, enableProfiling, enableFp16TurboMode, enableBf16TurboMode,
-            thresholdTime, printIntermediate, subgraphId, enableLayerDetails, parseUnsupported, iterations, runtime);
+            thresholdTime, printIntermediate, subgraphId, enableLayerDetails, parseUnsupported, inferOutputShape,
+            iterations, runtime);
     }
 }

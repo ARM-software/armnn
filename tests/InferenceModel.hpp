@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -95,6 +95,7 @@ struct Params
     bool                            m_EnableBf16TurboMode;
     bool                            m_PrintIntermediateLayers;
     bool                            m_ParseUnsupported;
+    bool                            m_InferOutputShape;
 
     Params()
         : m_ComputeDevices{}
@@ -105,6 +106,7 @@ struct Params
         , m_EnableBf16TurboMode(false)
         , m_PrintIntermediateLayers(false)
         , m_ParseUnsupported(false)
+        , m_InferOutputShape(false)
     {}
 };
 
@@ -241,6 +243,7 @@ public:
         // Create a network from a file on disk
         IParser::TfLiteParserOptions options;
         options.m_StandInLayerForUnsupported = params.m_ParseUnsupported;
+        options.m_InferAndValidate           = params.m_InferOutputShape;
         auto parser(IParser::Create(options));
 
         armnn::INetworkPtr network{nullptr, [](armnn::INetwork *){}};

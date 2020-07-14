@@ -186,36 +186,49 @@ void CheckTimelineDirectory(timelinedecoder::TimelineDirectoryCaptureCommandHand
 
 void CheckTimelinePackets(timelinedecoder::TimelineDecoder& timelineDecoder)
 {
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[0].m_Guid == profiling::LabelsAndEventClasses::NAME_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[0].m_Name == profiling::LabelsAndEventClasses::NAME_LABEL);
+    unsigned int i = 0; // Use a postfix increment to avoid changing indexes each time the packet gets updated.
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::NAME_GUID);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::NAME_LABEL);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[1].m_Guid == profiling::LabelsAndEventClasses::TYPE_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[1].m_Name == profiling::LabelsAndEventClasses::TYPE_LABEL);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::TYPE_GUID);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::TYPE_LABEL);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[2].m_Guid == profiling::LabelsAndEventClasses::INDEX_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[2].m_Name == profiling::LabelsAndEventClasses::INDEX_LABEL);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::INDEX_GUID);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::INDEX_LABEL);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[3].m_Guid == profiling::LabelsAndEventClasses::BACKENDID_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[3].m_Name == profiling::LabelsAndEventClasses::BACKENDID_LABEL);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::BACKENDID_GUID);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::BACKENDID_LABEL);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[4].m_Guid == profiling::LabelsAndEventClasses::LAYER_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[4].m_Name == profiling::LabelsAndEventClasses::LAYER);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::CHILD_GUID);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::CHILD_LABEL);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[5].m_Guid == profiling::LabelsAndEventClasses::WORKLOAD_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[5].m_Name == profiling::LabelsAndEventClasses::WORKLOAD);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::EXECUTION_OF_GUID);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name ==
+                profiling::LabelsAndEventClasses::EXECUTION_OF_LABEL);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[6].m_Guid == profiling::LabelsAndEventClasses::NETWORK_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[6].m_Name == profiling::LabelsAndEventClasses::NETWORK);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::PROCESS_ID_GUID);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name ==
+                profiling::LabelsAndEventClasses::PROCESS_ID_LABEL);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[7].m_Guid == profiling::LabelsAndEventClasses::CONNECTION_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[7].m_Name == profiling::LabelsAndEventClasses::CONNECTION);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::LAYER_GUID);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::LAYER);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[8].m_Guid == profiling::LabelsAndEventClasses::INFERENCE_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[8].m_Name == profiling::LabelsAndEventClasses::INFERENCE);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::WORKLOAD_GUID);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::WORKLOAD);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[9].m_Guid ==
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::NETWORK_GUID);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::NETWORK);
+
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::CONNECTION_GUID);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::CONNECTION);
+
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::INFERENCE_GUID);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::INFERENCE);
+
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid ==
                 profiling::LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[9].m_Name == profiling::LabelsAndEventClasses::WORKLOAD_EXECUTION);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name ==
+                profiling::LabelsAndEventClasses::WORKLOAD_EXECUTION);
 
     BOOST_CHECK(timelineDecoder.GetModel().m_EventClasses[0].m_Guid ==
                 profiling::LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
@@ -443,7 +456,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
     // Packets we expect from SendWellKnownLabelsAndEventClassesTest
     BOOST_CHECK(timelineDecoder.GetModel().m_Entities.size() == 1);
     BOOST_CHECK(timelineDecoder.GetModel().m_EventClasses.size()  == 2);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels.size()  == 14);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels.size()  == 15);
     BOOST_CHECK(timelineDecoder.GetModel().m_Relationships.size()  == 0);
     BOOST_CHECK(timelineDecoder.GetModel().m_Events.size()  == 0);
 
@@ -470,8 +483,8 @@ BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
     // Packets we expect from SendWellKnownLabelsAndEventClassesTest * 2 + network above (input, norm, backend, output)
     BOOST_CHECK(timelineDecoder.GetModel().m_Entities.size() == 6);
     BOOST_CHECK(timelineDecoder.GetModel().m_EventClasses.size()  == 4);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels.size()  == 32);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Relationships.size()  == 17);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Labels.size()  == 34);
+    BOOST_CHECK(timelineDecoder.GetModel().m_Relationships.size()  == 15);
     BOOST_CHECK(timelineDecoder.GetModel().m_Events.size()  == 0);
 
     mockService.WaitForReceivingThread();

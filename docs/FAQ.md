@@ -29,3 +29,16 @@ ArmNN uses CMake for build configuration. CMake uses a cumulative cache of user 
 Many DynamicBackendTests fail with "Base path for shared objects does not exist".
 ---------------------------------------------------------
 This problem most commonly occurs when the compile and runtime environments for the unit tests differ. These dynamic backend tests rely on a set of test files and directories at runtime. These files are created by default during the cmake build. At runtime the tests will look for these files in src/backends/backendsCommon/test/ relative to where the Unittests executable was built. The usual solution to to copy these files and directories into the new unit test execution environment. You can also specify a new root path for these files by adding a command line parameter to the Unittests executable: Unittests -- --dynamic-backend-build-dir "new path"
+
+UnitTests executable exits with "corrupted size vs. prev_size" in armv7 environments.
+---------------------------------------------------------
+Some combinations of GCC cross compiler and pthread runtime in an armv7 environment result a UnitTests executable that will raise SIGABRT signals. The exact combination has not been identified but it is known that cross compiling on Ubuntu 16.04 for an armv7 environment does exhibit this behavior. It is possible to exclude unit tests that use the pthread library using the Boost exclude mechanism, '--run_test=![filter expression]'. The list of tests that might cause this problem is constantly increasing. Consideration should be given to using a newer build environment.
+
+UnitTests fail on Max OS-X with errors in boost::program_options
+---------------------------------------------------------
+When executing ArmNN UnitTests built in an OS-X environment, runtime errors occur around boost::program_options. When compiling boost the "b2" tool appears to have a bug where it defaults to using the native ranlib even when the correct tool is specified in the user_config.jam.
+
+To validate that this issue is occurring inspect the boost build log looking for warnings like:
+warning: ranlib: warning for library: libboost_atomic.a the table of contents is empty (no object file members in the library define global symbols)
+
+This problem has previously been reported to the boostorg GitHub project. The solution is to manually execute the correct ranlib on each static library. https://github.com/boostorg/build/issues/160

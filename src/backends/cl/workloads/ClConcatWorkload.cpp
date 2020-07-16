@@ -36,7 +36,7 @@ arm_compute::Status ClConcatWorkloadValidate(const std::vector<const TensorInfo*
         aclInputs.emplace_back(aclInputInfo);
     }
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output);
-    std::vector<arm_compute::ITensorInfo*> aclInputPtrs;
+    std::vector<const arm_compute::ITensorInfo*> aclInputPtrs;
     for (arm_compute::ITensorInfo& input : aclInputs)
     {
         aclInputPtrs.emplace_back(&input);
@@ -68,7 +68,7 @@ ClConcatWorkload::ClConcatWorkload(const ConcatQueueDescriptor& descriptor, cons
         return;
     }
 
-    std::vector<arm_compute::ICLTensor *> aclInputs;
+    std::vector<const arm_compute::ICLTensor *> aclInputs;
     for (auto input : m_Data.m_Inputs)
     {
         arm_compute::ICLTensor& aclInput  = armnn::PolymorphicPointerDowncast<IClTensorHandle>(input)->GetTensor();

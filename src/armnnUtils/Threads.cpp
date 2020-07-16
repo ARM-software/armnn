@@ -11,6 +11,11 @@
 #define gettid() syscall(SYS_gettid)
 #elif defined(_MSC_VER)
 #include "WindowsWrapper.hpp"
+#elif defined(__APPLE__)
+#include "AvailabilityMacros.h"
+#include <sys/syscall.h>
+#include <sys/time.h>
+#include <unistd.h>
 #endif
 
 namespace armnnUtils
@@ -24,6 +29,14 @@ int GetCurrentThreadId()
     return static_cast<int>(gettid());
 #elif defined(_MSC_VER)
     return ::GetCurrentThreadId();
+#elif defined(__APPLE__)
+    uint64_t threadId;
+    int iRet = pthread_threadid_np(NULL, &threadId);
+    if (iRet != 0)
+    {
+        return 0;
+    }
+    return threadId;
 #endif
 }
 

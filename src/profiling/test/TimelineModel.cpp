@@ -14,7 +14,7 @@ namespace armnn
 namespace profiling
 {
 
-void TimelineModel::AddLabel(const ITimelineDecoder::Label& label)
+void TimelineModel::AddLabel(const arm::pipe::ITimelineDecoder::Label& label)
 {
     m_LabelMap.emplace(label.m_Guid, label);
 }
@@ -50,14 +50,14 @@ Entity* TimelineModel::FindEntity(uint64_t id)
     }
 }
 
-void TimelineModel::AddRelationship(const ITimelineDecoder::Relationship& relationship)
+void TimelineModel::AddRelationship(const arm::pipe::ITimelineDecoder::Relationship& relationship)
 {
     m_Relationships.emplace(relationship.m_Guid, relationship);
-    if (relationship.m_RelationshipType == ITimelineDecoder::RelationshipType::LabelLink)
+    if (relationship.m_RelationshipType == arm::pipe::ITimelineDecoder::RelationshipType::LabelLink)
     {
         HandleLabelLink(relationship);
     }
-    else if (relationship.m_RelationshipType == ITimelineDecoder::RelationshipType::RetentionLink)
+    else if (relationship.m_RelationshipType == arm::pipe::ITimelineDecoder::RelationshipType::RetentionLink)
     {
         // Take care of the special case of a connection between layers in ArmNN
         // modelled by a retention link between two layer entities with an attribute GUID
@@ -79,16 +79,16 @@ void TimelineModel::AddRelationship(const ITimelineDecoder::Relationship& relati
             // report unknown relationship type
             std::stringstream ss;
             ss << "Encountered a RetentionLink of unknown type [" << relationship.m_AttributeGuid << "]";
-            m_Errors.push_back(armnnProfiling::ProfilingException(ss.str()));
+            m_Errors.push_back(arm::pipe::ProfilingException(ss.str()));
         }
     }
-    else if (relationship.m_RelationshipType == ITimelineDecoder::RelationshipType::ExecutionLink)
+    else if (relationship.m_RelationshipType == arm::pipe::ITimelineDecoder::RelationshipType::ExecutionLink)
     {
         HandleExecutionLink(relationship);
     }
 }
 
-void TimelineModel::HandleLabelLink(const ITimelineDecoder::Relationship& relationship)
+void TimelineModel::HandleLabelLink(const arm::pipe::ITimelineDecoder::Relationship& relationship)
 {
     Entity* entity = FindEntity(relationship.m_HeadGuid);
     // we have a label attribute of an entity
@@ -101,7 +101,7 @@ void TimelineModel::HandleLabelLink(const ITimelineDecoder::Relationship& relati
         std::stringstream ss;
         ss << "could not find label link [" << relationship.m_Guid <<
            "] value [" << relationship.m_TailGuid << "]";
-        m_Errors.push_back(armnnProfiling::ProfilingException(ss.str()));
+        m_Errors.push_back(arm::pipe::ProfilingException(ss.str()));
     }
     if (relationship.m_AttributeGuid != 0)
     {
@@ -112,7 +112,7 @@ void TimelineModel::HandleLabelLink(const ITimelineDecoder::Relationship& relati
             std::stringstream ss;
             ss << "could not find label link [" << relationship.m_Guid <<
                "] attribute [" << relationship.m_AttributeGuid << "]";
-            m_Errors.push_back(armnnProfiling::ProfilingException(ss.str()));
+            m_Errors.push_back(arm::pipe::ProfilingException(ss.str()));
         }
     }
     else
@@ -120,7 +120,7 @@ void TimelineModel::HandleLabelLink(const ITimelineDecoder::Relationship& relati
         //report an error
         std::stringstream ss;
         ss << "label link [" << relationship.m_Guid << "] has a zero attribute guid";
-        m_Errors.push_back(armnnProfiling::ProfilingException(ss.str()));
+        m_Errors.push_back(arm::pipe::ProfilingException(ss.str()));
     }
     if (entity != nullptr && attribute != nullptr && value != nullptr)
     {
@@ -148,11 +148,11 @@ void TimelineModel::HandleLabelLink(const ITimelineDecoder::Relationship& relati
         {
             ss << "attribute [" << *attribute << "] ";
         }
-        m_Errors.push_back(armnnProfiling::ProfilingException(ss.str()));
+        m_Errors.push_back(arm::pipe::ProfilingException(ss.str()));
     }
 }
 
-void TimelineModel::HandleConnection(const ITimelineDecoder::Relationship& relationship)
+void TimelineModel::HandleConnection(const arm::pipe::ITimelineDecoder::Relationship& relationship)
 {
     Entity* outputLayer = FindEntity(relationship.m_HeadGuid);
     if (outputLayer == nullptr)
@@ -160,7 +160,7 @@ void TimelineModel::HandleConnection(const ITimelineDecoder::Relationship& relat
         std::stringstream ss;
         ss << "could not find output entity [" << relationship.m_HeadGuid << "]";
         ss << " of connection [" << relationship.m_Guid << "]";
-        m_Errors.push_back(armnnProfiling::ProfilingException(ss.str()));
+        m_Errors.push_back(arm::pipe::ProfilingException(ss.str()));
         return;
     }
     Entity* inputLayer = FindEntity(relationship.m_TailGuid);
@@ -169,14 +169,14 @@ void TimelineModel::HandleConnection(const ITimelineDecoder::Relationship& relat
         std::stringstream ss;
         ss << "could not find input entity [" << relationship.m_TailGuid << "]";
         ss << " of connection [" << relationship.m_Guid << "]";
-        m_Errors.push_back(armnnProfiling::ProfilingException(ss.str()));
+        m_Errors.push_back(arm::pipe::ProfilingException(ss.str()));
         return;
     }
     Connection connection(relationship.m_Guid, outputLayer, inputLayer);
     outputLayer->AddConnection(connection);
 }
 
-void TimelineModel::HandleChild(const ITimelineDecoder::Relationship& relationship)
+void TimelineModel::HandleChild(const arm::pipe::ITimelineDecoder::Relationship& relationship)
 {
     Entity* parentEntity = FindEntity(relationship.m_HeadGuid);
     if (parentEntity == nullptr)
@@ -184,7 +184,7 @@ void TimelineModel::HandleChild(const ITimelineDecoder::Relationship& relationsh
         std::stringstream ss;
         ss << "could not find parent entity [" << relationship.m_HeadGuid << "]";
         ss << " of child relationship [" << relationship.m_Guid << "]";
-        m_Errors.push_back(armnnProfiling::ProfilingException(ss.str()));
+        m_Errors.push_back(arm::pipe::ProfilingException(ss.str()));
         return;
     }
     Entity* childEntity = FindEntity(relationship.m_TailGuid);
@@ -193,13 +193,13 @@ void TimelineModel::HandleChild(const ITimelineDecoder::Relationship& relationsh
         std::stringstream ss;
         ss << "could not find child entity [" << relationship.m_TailGuid << "]";
         ss << " of child relationship [" << relationship.m_Guid << "]";
-        m_Errors.push_back(armnnProfiling::ProfilingException(ss.str()));
+        m_Errors.push_back(arm::pipe::ProfilingException(ss.str()));
         return;
     }
     parentEntity->AddChild(childEntity);
 }
 
-void TimelineModel::HandleExecutionOf(const ITimelineDecoder::Relationship& relationship)
+void TimelineModel::HandleExecutionOf(const arm::pipe::ITimelineDecoder::Relationship& relationship)
 {
     Entity* parentEntity = FindEntity(relationship.m_HeadGuid);
     if (parentEntity == nullptr)
@@ -207,7 +207,7 @@ void TimelineModel::HandleExecutionOf(const ITimelineDecoder::Relationship& rela
         std::stringstream ss;
         ss << "could not find parent entity [" << relationship.m_HeadGuid << "]";
         ss << " of execution relationship [" << relationship.m_Guid << "]";
-        m_Errors.push_back(armnnProfiling::ProfilingException(ss.str()));
+        m_Errors.push_back(arm::pipe::ProfilingException(ss.str()));
         return;
     }
     Entity* executedEntity = FindEntity(relationship.m_TailGuid);
@@ -216,13 +216,13 @@ void TimelineModel::HandleExecutionOf(const ITimelineDecoder::Relationship& rela
         std::stringstream ss;
         ss << "could not find executed entity [" << relationship.m_TailGuid << "]";
         ss << " of execution relationship [" << relationship.m_Guid << "]";
-        m_Errors.push_back(armnnProfiling::ProfilingException(ss.str()));
+        m_Errors.push_back(arm::pipe::ProfilingException(ss.str()));
         return;
     }
     parentEntity->AddExecution(executedEntity);
 }
 
-void TimelineModel::HandleExecutionLink(const ITimelineDecoder::Relationship& relationship)
+void TimelineModel::HandleExecutionLink(const arm::pipe::ITimelineDecoder::Relationship& relationship)
 {
     // entityGuid,
     Entity* parentEntity = FindEntity(relationship.m_HeadGuid);
@@ -231,7 +231,7 @@ void TimelineModel::HandleExecutionLink(const ITimelineDecoder::Relationship& re
         std::stringstream ss;
         ss << "could not find entity [" << relationship.m_HeadGuid << "]";
         ss << " of ExecutionLink [" << relationship.m_Guid << "]";
-        m_Errors.push_back(armnnProfiling::ProfilingException(ss.str()));
+        m_Errors.push_back(arm::pipe::ProfilingException(ss.str()));
         return;
     }
     // eventGuid,
@@ -241,7 +241,7 @@ void TimelineModel::HandleExecutionLink(const ITimelineDecoder::Relationship& re
         std::stringstream ss;
         ss << "could not find event [" << relationship.m_TailGuid << "]";
         ss << " of ExecutionLink [" << relationship.m_Guid << "]";
-        m_Errors.push_back(armnnProfiling::ProfilingException(ss.str()));
+        m_Errors.push_back(arm::pipe::ProfilingException(ss.str()));
         return;
     }
     // eventClassGuid
@@ -251,7 +251,7 @@ void TimelineModel::HandleExecutionLink(const ITimelineDecoder::Relationship& re
         std::stringstream ss;
         ss << "could not find event class [" << relationship.m_TailGuid << "]";
         ss << " of ExecutionLink [" << relationship.m_Guid << "]";
-        m_Errors.push_back(armnnProfiling::ProfilingException(ss.str()));
+        m_Errors.push_back(arm::pipe::ProfilingException(ss.str()));
         return;
     }
     eventObj->SetEventClass(eventClassObj);
@@ -277,7 +277,7 @@ bool TimelineModel::IsInferenceGuid(uint64_t guid) const
     return it != m_InferenceGuids.end();
 }
 
-void TimelineModel::AddEventClass(const ITimelineDecoder::EventClass& eventClass)
+void TimelineModel::AddEventClass(const arm::pipe::ITimelineDecoder::EventClass& eventClass)
 {
     std::string* eventClassName = FindLabel(eventClass.m_NameGuid);
     if (eventClassName != nullptr)
@@ -290,7 +290,7 @@ void TimelineModel::AddEventClass(const ITimelineDecoder::EventClass& eventClass
         std::stringstream ss;
         ss << "could not find name [" << eventClass.m_NameGuid << "]";
         ss << " of of event class  [" << eventClass.m_Guid << "]";
-        m_Errors.push_back(armnnProfiling::ProfilingException(ss.str()));
+        m_Errors.push_back(arm::pipe::ProfilingException(ss.str()));
     }
 }
 
@@ -307,7 +307,7 @@ EventClassObj* TimelineModel::FindEventClass(uint64_t id)
     }
 }
 
-void TimelineModel::AddEvent(const ITimelineDecoder::Event& event)
+void TimelineModel::AddEvent(const arm::pipe::ITimelineDecoder::Event& event)
 {
     EventObj evt(event.m_Guid, event.m_TimeStamp, event.m_ThreadId);
     m_Events.emplace(event.m_Guid, evt);

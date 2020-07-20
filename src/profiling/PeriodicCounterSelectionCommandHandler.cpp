@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -18,7 +18,7 @@ namespace armnn
 namespace profiling
 {
 
-void PeriodicCounterSelectionCommandHandler::ParseData(const Packet& packet, CaptureData& captureData)
+void PeriodicCounterSelectionCommandHandler::ParseData(const arm::pipe::Packet& packet, CaptureData& captureData)
 {
     std::vector<uint16_t> counterIds;
     uint32_t sizeOfUint32 = boost::numeric_cast<uint32_t>(sizeof(uint32_t));
@@ -56,7 +56,7 @@ void PeriodicCounterSelectionCommandHandler::ParseData(const Packet& packet, Cap
     captureData.SetCounterIds(counterIds);
 }
 
-void PeriodicCounterSelectionCommandHandler::operator()(const Packet& packet)
+void PeriodicCounterSelectionCommandHandler::operator()(const arm::pipe::Packet& packet)
 {
     ProfilingState currentState = m_StateMachine.GetCurrentState();
     switch (currentState)

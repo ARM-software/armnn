@@ -92,7 +92,16 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_SRC_FILES := \
         $(ARMNN_BACKEND_SOURCES) \
+        profiling/common/src/CommandHandlerFunctor.cpp \
+        profiling/common/src/CommandHandlerKey.cpp \
+        profiling/common/src/CommandHandlerRegistry.cpp \
+        profiling/common/src/CommonProfilingUtils.cpp \
         profiling/common/src/NetworkSockets.cpp \
+        profiling/common/src/PacketVersionResolver.cpp \
+        profiling/common/src/SwTrace.cpp \
+        profiling/server/src/timelineDecoder/TimelineCaptureCommandHandler.cpp \
+        profiling/server/src/timelineDecoder/TimelineDecoder.cpp \
+        profiling/server/src/timelineDecoder/TimelineDirectoryCaptureCommandHandler.cpp \
         src/armnn/BackendHelper.cpp \
         src/armnn/BackendRegistry.cpp \
         src/armnn/Descriptors.cpp \
@@ -199,9 +208,6 @@ LOCAL_SRC_FILES := \
         src/profiling/ActivateTimelineReportingCommandHandler.cpp \
         src/profiling/BufferManager.cpp \
         src/profiling/CommandHandler.cpp \
-        src/profiling/CommandHandlerFunctor.cpp \
-        src/profiling/CommandHandlerKey.cpp \
-        src/profiling/CommandHandlerRegistry.cpp \
         src/profiling/ConnectionAcknowledgedCommandHandler.cpp \
         src/profiling/CounterDirectory.cpp \
         src/profiling/CounterIdMap.cpp \
@@ -211,7 +217,6 @@ LOCAL_SRC_FILES := \
         src/profiling/Holder.cpp \
         src/profiling/LabelsAndEventClasses.cpp \
         src/profiling/PacketBuffer.cpp \
-        src/profiling/PacketVersionResolver.cpp \
         src/profiling/PeriodicCounterCapture.cpp \
         src/profiling/PeriodicCounterSelectionCommandHandler.cpp \
         src/profiling/PerJobCounterSelectionCommandHandler.cpp \
@@ -228,10 +233,7 @@ LOCAL_SRC_FILES := \
         src/profiling/SocketProfilingConnection.cpp \
         src/profiling/TimelinePacketWriterFactory.cpp \
         src/profiling/TimelineUtilityMethods.cpp \
-        src/profiling/backends/BackendProfiling.cpp \
-        src/timelineDecoder/TimelineCaptureCommandHandler.cpp \
-        src/timelineDecoder/TimelineDecoder.cpp \
-        src/timelineDecoder/TimelineDirectoryCaptureCommandHandler.cpp
+        src/profiling/backends/BackendProfiling.cpp
 
 LOCAL_STATIC_LIBRARIES := \
         arm_compute_library \

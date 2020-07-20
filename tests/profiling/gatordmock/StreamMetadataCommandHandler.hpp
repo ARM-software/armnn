@@ -1,12 +1,12 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <Packet.hpp>
-#include <CommandHandlerFunctor.hpp>
+#include <common/include/CommandHandlerFunctor.hpp>
+#include <common/include/Packet.hpp>
 
 #include <vector>
 
@@ -23,7 +23,7 @@ struct PacketVersion
     uint32_t m_PacketVersion;
 };
 
-class StreamMetadataCommandHandler : public profiling::CommandHandlerFunctor
+class StreamMetadataCommandHandler : public arm::pipe::CommandHandlerFunctor
 {
 
 public:
@@ -41,10 +41,10 @@ public:
         , m_QuietOperation(quietOperation)
     {}
 
-    void operator()(const armnn::profiling::Packet& packet) override;
+    void operator()(const arm::pipe::Packet& packet) override;
 
 private:
-    void ParseData(const armnn::profiling::Packet& packet);
+    void ParseData(const arm::pipe::Packet& packet);
 
     uint32_t m_PipeMagic;
     uint32_t m_StreamMetadataVersion;

@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -47,7 +47,7 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
     {
         try
         {
-            Packet packet = profilingConnection.ReadPacket(m_Timeout.load());
+            arm::pipe::Packet packet = profilingConnection.ReadPacket(m_Timeout.load());
 
             if (packet.IsEmpty())
             {
@@ -55,12 +55,12 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
                 continue;
             }
 
-            Version version = m_PacketVersionResolver.ResolvePacketVersion(packet.GetPacketFamily(),
-                                                                           packet.GetPacketId());
+            arm::pipe::Version version = m_PacketVersionResolver.ResolvePacketVersion(packet.GetPacketFamily(),
+                                                                                      packet.GetPacketId());
 
-            CommandHandlerFunctor* commandHandlerFunctor =
-                m_CommandHandlerRegistry.GetFunctor(packet.GetPacketFamily(), 
-                                                    packet.GetPacketId(), 
+            arm::pipe::CommandHandlerFunctor* commandHandlerFunctor =
+                m_CommandHandlerRegistry.GetFunctor(packet.GetPacketFamily(),
+                                                    packet.GetPacketId(),
                                                     version.GetEncodedValue());
             ARMNN_ASSERT(commandHandlerFunctor);
             commandHandlerFunctor->operator()(packet);
@@ -69,6 +69,19 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
         {
             if (m_StopAfterTimeout.load())
             {
+                m_KeepRunning.store(false);
+            }
+        }
+        catch (const arm::pipe::ProfilingException& e)
+        {
+            // Log the error and continue
+            ARMNN_LOG(warning) << "An error has occurred when handling a command: " << e.what();
+            // Did we get here because the socket failed?
+            if ( !profilingConnection.IsOpen() )
+            {
+                // We're going to stop processing commands.
+                // This will leave the thread idle. There is no mechanism to restart the profiling service when the
+                // connection is lost.
                 m_KeepRunning.store(false);
             }
         }

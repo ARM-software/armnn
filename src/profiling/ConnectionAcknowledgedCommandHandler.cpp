@@ -16,7 +16,7 @@ namespace armnn
 namespace profiling
 {
 
-void ConnectionAcknowledgedCommandHandler::operator()(const Packet& packet)
+void ConnectionAcknowledgedCommandHandler::operator()(const arm::pipe::Packet& packet)
 {
     ProfilingState currentState = m_StateMachine.GetCurrentState();
     switch (currentState)

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,8 +7,9 @@
 
 #include <armnn/Types.hpp>
 #include <armnn/profiling/ILocalPacketHandler.hpp>
-#include "Packet.hpp"
 #include "ProfilingUtils.hpp"
+
+#include <common/include/Packet.hpp>
 
 namespace armnn
 {
@@ -26,7 +27,7 @@ public:
 
     std::vector<uint32_t> GetHeadersAccepted() override; // ILocalPacketHandler
 
-    void HandlePacket(const Packet& packet) override; // ILocalPacketHandler
+    void HandlePacket(const arm::pipe::Packet& packet) override; // ILocalPacketHandler
 
     void SetConnection(IInternalProfilingConnection* profilingConnection) override // ILocalPacketHandler
     {

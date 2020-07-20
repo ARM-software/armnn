@@ -19,11 +19,14 @@
 #include <WindowsWrapper.hpp>
 #include <winsock2.h>
 #include <afunix.h>
+#elif defined(__MINGW32__)
+#include <WindowsWrapper.hpp>
+#include <winsock2.h>
 #endif
 
-namespace armnnUtils
+namespace arm
 {
-namespace Sockets
+namespace pipe
 {
 
 #if defined(__unix__)
@@ -38,6 +41,14 @@ using PollFd = pollfd;
 #define SOCK_CLOEXEC 0
 
 #elif defined(_MSC_VER)
+
+using Socket = SOCKET;
+using PollFd = WSAPOLLFD;
+using nfds_t = int;
+using socklen_t = int;
+#define SOCK_CLOEXEC 0
+
+#elif defined(__MINGW32__)
 
 using Socket = SOCKET;
 using PollFd = WSAPOLLFD;
@@ -64,5 +75,5 @@ int Poll(PollFd* fds, nfds_t numFds, int timeout);
 
 Socket Accept(Socket s, sockaddr* addr, socklen_t* addrlen, int flags);
 
-}
-}
+} // namespace arm
+} // namespace pipe

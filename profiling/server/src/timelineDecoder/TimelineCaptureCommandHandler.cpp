@@ -3,14 +3,16 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "TimelineCaptureCommandHandler.hpp"
+#include <common/include/CommonProfilingUtils.hpp>
+#include <common/include/Logging.hpp>
+#include <server/include/timelineDecoder/TimelineCaptureCommandHandler.hpp>
 
 #include <string>
-#include <armnn/Logging.hpp>
-namespace armnn
+
+namespace arm
 {
 
-namespace timelinedecoder
+namespace pipe
 {
 
 //Array of member functions, the array index matches the decl_id
@@ -28,12 +30,12 @@ void TimelineCaptureCommandHandler::SetThreadIdSize(uint32_t size)
     m_ThreadIdSize = size;
 }
 
-void TimelineCaptureCommandHandler::operator()(const profiling::Packet& packet)
+void TimelineCaptureCommandHandler::operator()(const arm::pipe::Packet& packet)
 {
     ParseData(packet);
 }
 
-void TimelineCaptureCommandHandler::ParseData(const armnn::profiling::Packet& packet)
+void TimelineCaptureCommandHandler::ParseData(const arm::pipe::Packet& packet)
 {
     uint32_t offset = 0;
     m_PacketLength = packet.GetLength();
@@ -42,7 +44,7 @@ void TimelineCaptureCommandHandler::ParseData(const armnn::profiling::Packet& pa
     // if it not set in the constructor
     if (m_ThreadIdSize == 0)
     {
-        ARMNN_LOG(error) << "TimelineCaptureCommandHandler: m_ThreadIdSize has not been set";
+        ARM_PIPE_LOG(error) << "TimelineCaptureCommandHandler: m_ThreadIdSize has not been set";
         return;
     }
 
@@ -57,13 +59,13 @@ void TimelineCaptureCommandHandler::ParseData(const armnn::profiling::Packet& pa
 
     while ( offset < m_PacketLength )
     {
-        declId = profiling::ReadUint32(data, offset);
+        declId = arm::pipe::ReadUint32(data, offset);
         offset += uint32_t_size;
 
         ITimelineDecoder::TimelineStatus status = (this->*m_ReadFunctions[declId])(data, offset);
         if (status == ITimelineDecoder::TimelineStatus::TimelineStatus_Fail)
         {
-            ARMNN_LOG(error) << "Decode of timeline message type [" << declId <<
+            ARM_PIPE_LOG(error) << "Decode of timeline message type [" << declId <<
                                 "] at offset [" << offset << "] failed";
             break;
         }
@@ -73,17 +75,17 @@ void TimelineCaptureCommandHandler::ParseData(const armnn::profiling::Packet& pa
 ITimelineDecoder::TimelineStatus TimelineCaptureCommandHandler::ReadLabel(const unsigned char* data, uint32_t& offset)
 {
     ITimelineDecoder::Label label;
-    label.m_Guid = profiling::ReadUint64(data, offset);
+    label.m_Guid = arm::pipe::ReadUint64(data, offset);
     offset += uint64_t_size;
 
-    uint32_t nameLength = profiling::ReadUint32(data, offset);
+    uint32_t nameLength = arm::pipe::ReadUint32(data, offset);
     offset += uint32_t_size;
 
     uint32_t i = 0;
     // nameLength - 1 to account for null operator \0
     for ( i = 0; i < nameLength - 1; ++i )
     {
-        label.m_Name += static_cast<char>(profiling::ReadUint8(data, offset + i));
+        label.m_Name += static_cast<char>(arm::pipe::ReadUint8(data, offset + i));
     }
     // Shift offset past nameLength
     uint32_t uint32WordAmount = (nameLength / uint32_t_size) + (nameLength % uint32_t_size != 0 ? 1 : 0);
@@ -96,7 +98,7 @@ ITimelineDecoder::TimelineStatus TimelineCaptureCommandHandler::ReadEntity(
         const unsigned char* data, uint32_t& offset)
 {
     ITimelineDecoder::Entity entity;
-    entity.m_Guid = profiling::ReadUint64(data, offset);
+    entity.m_Guid = arm::pipe::ReadUint64(data, offset);
     offset += uint64_t_size;
     return m_TimelineDecoder.CreateEntity(entity);
 }
@@ -105,9 +107,9 @@ ITimelineDecoder::TimelineStatus TimelineCaptureCommandHandler::ReadEventClass(
     const unsigned char* data, uint32_t& offset)
 {
     ITimelineDecoder::EventClass eventClass;
-    eventClass.m_Guid = profiling::ReadUint64(data, offset);
+    eventClass.m_Guid = arm::pipe::ReadUint64(data, offset);
     offset += uint64_t_size;
-    eventClass.m_NameGuid = profiling::ReadUint64(data, offset);
+    eventClass.m_NameGuid = arm::pipe::ReadUint64(data, offset);
     offset += uint64_t_size;
     return m_TimelineDecoder.CreateEventClass(eventClass);
 }
@@ -117,19 +119,19 @@ ITimelineDecoder::TimelineStatus TimelineCaptureCommandHandler::ReadRelationship
 {
     ITimelineDecoder::Relationship relationship;
     relationship.m_RelationshipType =
-        static_cast<ITimelineDecoder::RelationshipType>(profiling::ReadUint32(data, offset));
+        static_cast<ITimelineDecoder::RelationshipType>(arm::pipe::ReadUint32(data, offset));
     offset += uint32_t_size;
 
-    relationship.m_Guid = profiling::ReadUint64(data, offset);
+    relationship.m_Guid = arm::pipe::ReadUint64(data, offset);
     offset += uint64_t_size;
 
-    relationship.m_HeadGuid = profiling::ReadUint64(data, offset);
+    relationship.m_HeadGuid = arm::pipe::ReadUint64(data, offset);
     offset += uint64_t_size;
 
-    relationship.m_TailGuid = profiling::ReadUint64(data, offset);
+    relationship.m_TailGuid = arm::pipe::ReadUint64(data, offset);
     offset += uint64_t_size;
 
-    relationship.m_AttributeGuid = profiling::ReadUint64(data, offset);
+    relationship.m_AttributeGuid = arm::pipe::ReadUint64(data, offset);
     offset += uint64_t_size;
 
     return m_TimelineDecoder.CreateRelationship(relationship);
@@ -139,26 +141,26 @@ ITimelineDecoder::TimelineStatus TimelineCaptureCommandHandler::ReadEvent(
     const unsigned char* data, uint32_t& offset)
 {
     ITimelineDecoder::Event event;
-    event.m_TimeStamp = profiling::ReadUint64(data, offset);
+    event.m_TimeStamp = arm::pipe::ReadUint64(data, offset);
     offset += uint64_t_size;
 
     if ( m_ThreadIdSize == 4 )
     {
-        event.m_ThreadId = profiling::ReadUint32(data, offset);
+        event.m_ThreadId = arm::pipe::ReadUint32(data, offset);
     }
     else if ( m_ThreadIdSize == 8 )
     {
-        event.m_ThreadId = profiling::ReadUint64(data, offset);
+        event.m_ThreadId = arm::pipe::ReadUint64(data, offset);
     }
 
     offset += m_ThreadIdSize;
 
-    event.m_Guid = profiling::ReadUint64(data, offset);
+    event.m_Guid = arm::pipe::ReadUint64(data, offset);
     offset += uint64_t_size;
 
     return m_TimelineDecoder.CreateEvent(event);
 }
 
-} //namespace gatordmock
+} //namespace pipe
 
-} //namespace armnn
+} //namespace arm

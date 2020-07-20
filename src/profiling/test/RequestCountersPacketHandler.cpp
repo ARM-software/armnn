@@ -1,12 +1,12 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "RequestCountersPacketHandler.hpp"
 
 #include "DirectoryCaptureCommandHandler.hpp"
-#include "PacketVersionResolver.hpp"
+#include <common/include/PacketVersionResolver.hpp>
 
 #include <common/include/ProfilingException.hpp>
 
@@ -23,13 +23,13 @@ std::vector<uint32_t> RequestCountersPacketHandler::GetHeadersAccepted()
     return headers;
 }
 
-void RequestCountersPacketHandler::HandlePacket(const Packet& packet)
+void RequestCountersPacketHandler::HandlePacket(const arm::pipe::Packet& packet)
 {
     if (packet.GetHeader() != m_CounterDirectoryMessageHeader)
     {
         return;
     }
-    armnn::profiling::PacketVersionResolver packetVersionResolver;
+    arm::pipe::PacketVersionResolver packetVersionResolver;
     DirectoryCaptureCommandHandler directoryCaptureCommandHandler(
             0, 2, packetVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue());
     directoryCaptureCommandHandler.operator()(packet);
@@ -69,7 +69,7 @@ void RequestCountersPacketHandler::SendCounterSelectionPacket()
         offset += uint16_t_size;
     }
 
-    Packet packet(0x40000, bodySize, uniqueData);
+    arm::pipe::Packet packet(0x40000, bodySize, uniqueData);
     m_Connection->ReturnPacket(packet);
 }
 

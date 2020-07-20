@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -15,7 +15,7 @@ namespace armnn
 namespace profiling
 {
 
-void DeactivateTimelineReportingCommandHandler::operator()(const Packet& packet)
+void DeactivateTimelineReportingCommandHandler::operator()(const arm::pipe::Packet& packet)
 {
     ProfilingState currentState = m_StateMachine.GetCurrentState();
 

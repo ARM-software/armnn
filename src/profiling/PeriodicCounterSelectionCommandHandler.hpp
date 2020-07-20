@@ -1,13 +1,11 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include "CounterIdMap.hpp"
-#include <Packet.hpp>
-#include "CommandHandlerFunctor.hpp"
 #include "Holder.hpp"
 #include "ProfilingStateMachine.hpp"
 #include "SendCounterPacket.hpp"
@@ -18,8 +16,10 @@
 #include "armnn/Logging.hpp"
 #include "armnn/BackendRegistry.hpp"
 
-#include <set>
+#include <common/include/CommandHandlerFunctor.hpp>
+#include <common/include/Packet.hpp>
 
+#include <set>
 
 namespace armnn
 {
@@ -28,7 +28,7 @@ namespace profiling
 {
 
 
-class PeriodicCounterSelectionCommandHandler : public CommandHandlerFunctor
+class PeriodicCounterSelectionCommandHandler : public arm::pipe::CommandHandlerFunctor
 {
 
 public:
@@ -60,7 +60,7 @@ public:
 
     }
 
-    void operator()(const Packet& packet) override;
+    void operator()(const arm::pipe::Packet& packet) override;
 
 private:
 
@@ -90,7 +90,7 @@ private:
                                << errorMsg.value();
         }
     }
-    void ParseData(const Packet& packet, CaptureData& captureData);
+    void ParseData(const arm::pipe::Packet& packet, CaptureData& captureData);
     std::set<armnn::BackendId> ProcessBackendCounterIds(const uint32_t capturePeriod,
                                                         const std::set<uint16_t> newCounterIds,
                                                         const std::set<uint16_t> unusedCounterIds);

@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <armnn/profiling/ITimelineDecoder.hpp>
 #include <common/include/ProfilingException.hpp>
+#include <server/include/timelineDecoder/ITimelineDecoder.hpp>
 
 #include <map>
 #include <sstream>
@@ -17,7 +17,7 @@ namespace armnn
 
 namespace profiling
 {
-using LabelMap = std::map<uint64_t, ITimelineDecoder::Label>;
+using LabelMap = std::map<uint64_t, arm::pipe::ITimelineDecoder::Label>;
 using Attribute = std::pair<std::string, std::string>;
 using Attributes = std::map<std::string, Attribute>;
 class Entity;
@@ -31,13 +31,13 @@ public:
         {
             std::stringstream ss;
             ss << "connection [" << guid << "] head cannot be null";
-            throw armnnProfiling::ProfilingException(ss.str());
+            throw arm::pipe::ProfilingException(ss.str());
         }
         if (tail == nullptr)
         {
             std::stringstream ss;
             ss << "connection [" << guid << "] tail cannot be null";
-            throw armnnProfiling::ProfilingException(ss.str());
+            throw arm::pipe::ProfilingException(ss.str());
         }
     }
 
@@ -136,8 +136,8 @@ private:
 using Entities = std::map<uint64_t, Entity>;
 struct ModelRelationship
 {
-    ModelRelationship(const ITimelineDecoder::Relationship& relationship) : m_Relationship(relationship) {}
-    ITimelineDecoder::Relationship m_Relationship;
+    ModelRelationship(const arm::pipe::ITimelineDecoder::Relationship& relationship) : m_Relationship(relationship) {}
+    arm::pipe::ITimelineDecoder::Relationship m_Relationship;
     std::vector<Entity*> m_RelatedEntities;
 };
 using Relationships = std::map<uint64_t, ModelRelationship>;
@@ -146,35 +146,35 @@ using Events = std::map<uint64_t, EventObj>;
 class TimelineModel
 {
 public:
-    void AddLabel(const ITimelineDecoder::Label& label);
+    void AddLabel(const arm::pipe::ITimelineDecoder::Label& label);
     std::string* FindLabel(uint64_t guid);
     void AddEntity(uint64_t guid);
     Entity* FindEntity(uint64_t id);
-    void AddRelationship(const ITimelineDecoder::Relationship& relationship);
+    void AddRelationship(const arm::pipe::ITimelineDecoder::Relationship& relationship);
     ModelRelationship* FindRelationship(uint64_t id);
     const LabelMap& GetLabelMap() const {return m_LabelMap;}
     const Entities& GetEntities() const {return m_Entities;}
-    const std::vector<armnnProfiling::ProfilingException>& GetErrors() const {return m_Errors;}
+    const std::vector<arm::pipe::ProfilingException>& GetErrors() const {return m_Errors;}
     bool IsInferenceGuid(uint64_t guid) const;
-    void AddEventClass(const ITimelineDecoder::EventClass& eventClass);
+    void AddEventClass(const arm::pipe::ITimelineDecoder::EventClass& eventClass);
     const EventClasses& GetEventClasses() const {return m_EventClasses;}
     EventClassObj* FindEventClass(uint64_t id);
-    void AddEvent(const ITimelineDecoder::Event& event);
+    void AddEvent(const arm::pipe::ITimelineDecoder::Event& event);
     EventObj* FindEvent(uint64_t id);
 private:
     LabelMap m_LabelMap;
     Entities m_Entities;
     Relationships m_Relationships;
-    std::vector<armnnProfiling::ProfilingException> m_Errors;
+    std::vector<arm::pipe::ProfilingException> m_Errors;
     std::vector<uint64_t> m_InferenceGuids;
     EventClasses m_EventClasses;
     Events m_Events;
 
-    void HandleLabelLink(const ITimelineDecoder::Relationship& relationship);
-    void HandleConnection(const ITimelineDecoder::Relationship& relationship);
-    void HandleChild(const ITimelineDecoder::Relationship& relationship);
-    void HandleExecutionOf(const ITimelineDecoder::Relationship& relationship);
-    void HandleExecutionLink(const ITimelineDecoder::Relationship& relationship);
+    void HandleLabelLink(const arm::pipe::ITimelineDecoder::Relationship& relationship);
+    void HandleConnection(const arm::pipe::ITimelineDecoder::Relationship& relationship);
+    void HandleChild(const arm::pipe::ITimelineDecoder::Relationship& relationship);
+    void HandleExecutionOf(const arm::pipe::ITimelineDecoder::Relationship& relationship);
+    void HandleExecutionLink(const arm::pipe::ITimelineDecoder::Relationship& relationship);
 };
 
 std::vector<std::string> GetModelDescription(const TimelineModel& model);

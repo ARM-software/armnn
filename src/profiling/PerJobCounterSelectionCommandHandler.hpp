@@ -1,13 +1,14 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <Packet.hpp>
-#include "CommandHandlerFunctor.hpp"
 #include "ProfilingStateMachine.hpp"
+
+#include <common/include/CommandHandlerFunctor.hpp>
+#include <common/include/Packet.hpp>
 
 namespace armnn
 {
@@ -15,7 +16,7 @@ namespace armnn
 namespace profiling
 {
 
-class PerJobCounterSelectionCommandHandler : public CommandHandlerFunctor
+class PerJobCounterSelectionCommandHandler : public arm::pipe::CommandHandlerFunctor
 {
 
 public:
@@ -27,7 +28,7 @@ public:
         , m_StateMachine(profilingStateMachine)
     {}
 
-    void operator()(const Packet& packet) override;
+    void operator()(const arm::pipe::Packet& packet) override;
 
 private:
     const ProfilingStateMachine& m_StateMachine;

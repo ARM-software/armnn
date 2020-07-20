@@ -1,12 +1,13 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include <armnn/profiling/ILocalPacketHandler.hpp>
-#include <Packet.hpp>
+
+#include <common/include/Packet.hpp>
 
 namespace armnn
 {
@@ -18,7 +19,7 @@ class PrintPacketHeaderHandler : public ILocalPacketHandler
 {
     virtual std::vector<uint32_t> GetHeadersAccepted();
 
-    virtual void HandlePacket(const Packet& packet);
+    virtual void HandlePacket(const arm::pipe::Packet& packet);
 };
 
 } // namespace profiling

@@ -13,7 +13,7 @@ namespace armnn
 namespace profiling
 {
 
-void RequestCounterDirectoryCommandHandler::operator()(const Packet& packet)
+void RequestCounterDirectoryCommandHandler::operator()(const arm::pipe::Packet& packet)
 {
     ProfilingState currentState = m_StateMachine.GetCurrentState();
     switch (currentState)

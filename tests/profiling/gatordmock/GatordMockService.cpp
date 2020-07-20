@@ -1,23 +1,19 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "GatordMockService.hpp"
 
-#include <CommandHandlerRegistry.hpp>
-#include <PacketVersionResolver.hpp>
-#include <ProfilingUtils.hpp>
-#include <NetworkSockets.hpp>
-
-#include <armnn/utility/Assert.hpp>
+#include <common/include/Assert.hpp>
+#include <common/include/CommandHandlerRegistry.hpp>
+#include <common/include/CommonProfilingUtils.hpp>
+#include <common/include/PacketVersionResolver.hpp>
+#include <common/include/NetworkSockets.hpp>
 
 #include <cerrno>
-#include <iomanip>
 #include <iostream>
 #include <string>
-
-using namespace armnnUtils;
 
 namespace armnn
 {
@@ -125,11 +121,11 @@ void GatordMockService::SendPeriodicCounterSelectionList(uint32_t period, std::v
     unsigned char* data                         = reinterpret_cast<unsigned char*>(uniqueData.get());
 
     uint32_t offset = 0;
-    profiling::WriteUint32(data, offset, period);
+    arm::pipe::WriteUint32(data, offset, period);
     offset += 4;
     for (std::vector<uint16_t>::iterator it = counters.begin(); it != counters.end(); ++it)
     {
-        profiling::WriteUint16(data, offset, *it);
+        arm::pipe::WriteUint16(data, offset, *it);
         offset += 2;
     }
 
@@ -164,33 +160,33 @@ void GatordMockService::ReceiveLoop()
     {
         try
         {
-            profiling::Packet packet = m_BasePipeServer.get()->WaitForPacket(500);
+            arm::pipe::Packet packet = m_BasePipeServer.get()->WaitForPacket(500);
 
-            profiling::PacketVersionResolver packetVersionResolver;
+            arm::pipe::PacketVersionResolver packetVersionResolver;
 
-            profiling::Version version =
+            arm::pipe::Version version =
                 packetVersionResolver.ResolvePacketVersion(packet.GetPacketFamily(), packet.GetPacketId());
 
-            profiling::CommandHandlerFunctor* commandHandlerFunctor = m_HandlerRegistry.GetFunctor(
+            arm::pipe::CommandHandlerFunctor* commandHandlerFunctor = m_HandlerRegistry.GetFunctor(
                                                                         packet.GetPacketFamily(),
                                                                         packet.GetPacketId(),
                                                                         version.GetEncodedValue());
 
 
 
-            ARMNN_ASSERT(commandHandlerFunctor);
+            ARM_PIPE_ASSERT(commandHandlerFunctor);
             commandHandlerFunctor->operator()(packet);
         }
-        catch (const armnn::TimeoutException&)
+        catch (const arm::pipe::TimeoutException&)
         {
             // In this case we ignore timeouts and and keep trying to receive.
         }
-        catch (const armnn::InvalidArgumentException& e)
+        catch (const arm::pipe::InvalidArgumentException& e)
         {
             // We couldn't find a functor to handle the packet?
             std::cerr << "Packet received that could not be processed: " << e.what() << std::endl;
         }
-        catch (const armnn::RuntimeException& e)
+        catch (const arm::pipe::ProfilingException& e)
         {
             // A runtime exception occurred which means we must exit the loop.
             std::cerr << "Receive thread closing: " << e.what() << std::endl;

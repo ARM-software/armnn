@@ -6,6 +6,8 @@
 #include <Threads.hpp>
 #include <ProfilingUtils.hpp>
 
+#include <common/include/SwTrace.hpp>
+
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -524,7 +526,7 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTestFullConstruction)
 
     // Check the ui_name
     std::vector<uint32_t> swTraceString;
-    StringToSwTraceString<SwTraceCharPolicy>(label, swTraceString);
+    arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(label, swTraceString);
     offset += (boost::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     uint32_t swTraceUINameLength = ReadUint32(buffer.data(), offset);
     BOOST_CHECK(swTraceUINameLength == 14); // ui_name length including the null-terminator
@@ -536,7 +538,7 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTestFullConstruction)
                             swTraceUINameLength - 1) == 0);   // The length of the label
 
     // Check arg_types
-    StringToSwTraceString<SwTraceCharPolicy>(label, swTraceString);
+    arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(label, swTraceString);
     offset += (boost::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     uint32_t swTraceArgTypesLength = ReadUint32(buffer.data(), offset);
     BOOST_CHECK(swTraceArgTypesLength == 3); // arg_types length including the null-terminator
@@ -548,7 +550,7 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTestFullConstruction)
                             swTraceArgTypesLength - 1) == 0); // The length of the label
 
     // Check arg_names
-    StringToSwTraceString<SwTraceCharPolicy>(label, swTraceString);
+    arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(label, swTraceString);
     offset += (boost::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     uint32_t swTraceArgNamesLength = ReadUint32(buffer.data(), offset);
     BOOST_CHECK(swTraceArgNamesLength == 11); // arg_names length including the null-terminator
@@ -560,7 +562,7 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTestFullConstruction)
                             swTraceArgNamesLength - 1) == 0); // The length of the label
 
     // Check second message decl_id
-    StringToSwTraceString<SwTraceCharPolicy>(label, swTraceString);
+    arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(label, swTraceString);
     offset += (boost::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     readDeclId = ReadUint32(buffer.data(), offset);
     BOOST_CHECK(readDeclId == 1);

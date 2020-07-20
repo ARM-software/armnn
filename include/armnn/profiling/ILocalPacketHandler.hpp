@@ -12,6 +12,15 @@
 #include <memory>
 #include <vector>
 
+// forward declare to prevent a circular dependency
+namespace arm
+{
+namespace pipe
+{
+    class Packet;
+} // namespace pipe
+} // namespace arm
+
 namespace armnn
 {
 
@@ -23,9 +32,6 @@ enum class TargetEndianness
     BeWire,
     LeWire
 };
-
-// forward declare to prevent a circular dependency
-class Packet;
 
 // the handlers need to be able to do two
 // things to service the FileOnlyProfilingConnection
@@ -39,7 +45,7 @@ public:
 
     virtual void SetEndianess(const TargetEndianness& endianness) = 0;
 
-    virtual void ReturnPacket(Packet& packet) = 0;
+    virtual void ReturnPacket(arm::pipe::Packet& packet) = 0;
 
     virtual void Close() = 0;
 };
@@ -56,7 +62,7 @@ public:
     virtual std::vector<uint32_t> GetHeadersAccepted() = 0;
 
     /// process the packet
-    virtual void HandlePacket(const Packet& packet) = 0;
+    virtual void HandlePacket(const arm::pipe::Packet& packet) = 0;
 
     /// Set a profiling connection on the handler. Only need to implement this
     /// function if the handler will be writing data back to the profiled application.

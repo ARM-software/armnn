@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,7 +8,10 @@
 #include "BasePipeServer.hpp"
 #include <string>
 
-namespace armnnProfiling
+namespace arm
+{
+
+namespace pipe
 {
 
 class ConnectionHandler
@@ -22,7 +25,7 @@ public:
     ~ConnectionHandler()
     {
         // We have set SOCK_CLOEXEC on this socket but we'll close it to be good citizens.
-        armnnUtils::Sockets::Close(m_ListeningSocket);
+        arm::pipe::Close(m_ListeningSocket);
     }
 
     ConnectionHandler(const ConnectionHandler&) = delete;
@@ -38,7 +41,8 @@ public:
 
 private:
 
-    armnnUtils::Sockets::Socket m_ListeningSocket;
+    arm::pipe::Socket m_ListeningSocket;
 };
 
-} // namespace armnnProfiling
+} // namespace pipe
+} // namespace arm

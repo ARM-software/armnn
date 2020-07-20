@@ -5,11 +5,12 @@
 
 #pragma once
 
-#include "CommandHandlerFunctor.hpp"
 #include "ISendCounterPacket.hpp"
 #include "armnn/profiling/ISendTimelinePacket.hpp"
-#include <Packet.hpp>
 #include "ProfilingStateMachine.hpp"
+
+#include <common/include/CommandHandlerFunctor.hpp>
+#include <common/include/Packet.hpp>
 
 namespace armnn
 {
@@ -17,7 +18,7 @@ namespace armnn
 namespace profiling
 {
 
-class RequestCounterDirectoryCommandHandler : public CommandHandlerFunctor
+class RequestCounterDirectoryCommandHandler : public arm::pipe::CommandHandlerFunctor
 {
 
 public:
@@ -35,7 +36,7 @@ public:
         , m_StateMachine(profilingStateMachine)
     {}
 
-    void operator()(const Packet& packet) override;
+    void operator()(const arm::pipe::Packet& packet) override;
 
 private:
     const ICounterDirectory& m_CounterDirectory;

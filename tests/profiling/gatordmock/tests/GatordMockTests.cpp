@@ -3,16 +3,16 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <CommandHandlerRegistry.hpp>
-#include <ConnectionHandler.hpp>
+#include <common/include/CommandHandlerRegistry.hpp>
+#include <server/include/basePipeServer/ConnectionHandler.hpp>
 #include <DirectoryCaptureCommandHandler.hpp>
 #include <GatordMockService.hpp>
 #include <LabelsAndEventClasses.hpp>
 #include <ProfilingService.hpp>
 #include <TimelinePacketWriterFactory.hpp>
 
-#include <TimelineDirectoryCaptureCommandHandler.hpp>
-#include <TimelineDecoder.hpp>
+#include <server/include/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp>
+#include <server/include/timelineDecoder/TimelineDecoder.hpp>
 
 #include <Runtime.hpp>
 
@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(CounterCaptureHandlingTest)
 {
     using boost::numeric_cast;
 
-    profiling::PacketVersionResolver packetVersionResolver;
+    arm::pipe::PacketVersionResolver packetVersionResolver;
 
     // Data with timestamp, counter idx & counter values
     std::vector<std::pair<uint16_t, uint32_t>> indexValuePairs;
@@ -91,8 +91,8 @@ BOOST_AUTO_TEST_CASE(CounterCaptureHandlingTest)
 
     uint32_t headerWord1 = packetVersionResolver.ResolvePacketVersion(0, 4).GetEncodedValue();
     // Create packet to send through to the command functor
-    profiling::Packet packet1(headerWord1, dataLength, uniqueData1);
-    profiling::Packet packet2(headerWord1, dataLength, uniqueData2);
+    arm::pipe::Packet packet1(headerWord1, dataLength, uniqueData1);
+    arm::pipe::Packet packet2(headerWord1, dataLength, uniqueData2);
 
     gatordmock::PeriodicCounterCaptureCommandHandler commandHandler(0, 4, headerWord1, true);
 
@@ -122,7 +122,7 @@ void WaitFor(std::function<bool()> predicate, std::string errorMsg, uint32_t tim
     }
 }
 
-void CheckTimelineDirectory(timelinedecoder::TimelineDirectoryCaptureCommandHandler& commandHandler)
+void CheckTimelineDirectory(arm::pipe::TimelineDirectoryCaptureCommandHandler& commandHandler)
 {
     uint32_t uint8_t_size  = sizeof(uint8_t);
     uint32_t uint32_t_size = sizeof(uint32_t);
@@ -138,7 +138,7 @@ void CheckTimelineDirectory(timelinedecoder::TimelineDirectoryCaptureCommandHand
     sendTimelinePacket->SendTimelineMessageDirectoryPackage();
     sendTimelinePacket->Commit();
 
-    std::vector<profiling::SwTraceMessage> swTraceBufferMessages;
+    std::vector<arm::pipe::SwTraceMessage> swTraceBufferMessages;
 
     unsigned int offset = uint32_t_size * 2;
 
@@ -158,15 +158,15 @@ void CheckTimelineDirectory(timelinedecoder::TimelineDirectoryCaptureCommandHand
     offset += uint32_t_size;
     for(uint32_t i = 0; i < declarationSize; ++i)
     {
-        swTraceBufferMessages.push_back(profiling::ReadSwTraceMessage(packetBuffer->GetReadableData(),
+        swTraceBufferMessages.push_back(arm::pipe::ReadSwTraceMessage(packetBuffer->GetReadableData(),
                                                                       offset,
                                                                       packetBuffer->GetSize()));
     }
 
     for(uint32_t index = 0; index < declarationSize; ++index)
     {
-        profiling::SwTraceMessage& bufferMessage = swTraceBufferMessages[index];
-        profiling::SwTraceMessage& handlerMessage = commandHandler.m_SwTraceMessages[index];
+        arm::pipe::SwTraceMessage& bufferMessage = swTraceBufferMessages[index];
+        arm::pipe::SwTraceMessage& handlerMessage = commandHandler.m_SwTraceMessages[index];
 
         BOOST_CHECK(bufferMessage.m_Name == handlerMessage.m_Name);
         BOOST_CHECK(bufferMessage.m_UiName == handlerMessage.m_UiName);
@@ -186,7 +186,7 @@ void CheckTimelineDirectory(timelinedecoder::TimelineDirectoryCaptureCommandHand
     }
 }
 
-void CheckTimelinePackets(timelinedecoder::TimelineDecoder& timelineDecoder)
+void CheckTimelinePackets(arm::pipe::TimelineDecoder& timelineDecoder)
 {
     unsigned int i = 0; // Use a postfix increment to avoid changing indexes each time the packet gets updated.
     BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::NAME_GUID);
@@ -246,9 +246,9 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     // Setup the mock service to bind to the UDS.
     std::string udsNamespace = "gatord_namespace";
 
-    BOOST_CHECK_NO_THROW(armnnProfiling::ConnectionHandler connectionHandler(udsNamespace, false));
+    BOOST_CHECK_NO_THROW(arm::pipe::ConnectionHandler connectionHandler(udsNamespace, false));
 
-    armnnProfiling::ConnectionHandler connectionHandler(udsNamespace, false);
+    arm::pipe::ConnectionHandler connectionHandler(udsNamespace, false);
 
     // Enable the profiling service.
     armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
@@ -270,7 +270,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     // Connect the profiling service to the mock Gatord.
     gatordmock::GatordMockService mockService(std::move(basePipeServer), false);
 
-    timelinedecoder::TimelineDecoder& timelineDecoder = mockService.GetTimelineDecoder();
+    arm::pipe::TimelineDecoder& timelineDecoder = mockService.GetTimelineDecoder();
     profiling::DirectoryCaptureCommandHandler& directoryCaptureCommandHandler =
          mockService.GetDirectoryCaptureCommandHandler();
 
@@ -401,7 +401,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
     // Setup the mock service to bind to the UDS.
     std::string udsNamespace = "gatord_namespace";
 
-    armnnProfiling::ConnectionHandler connectionHandler(udsNamespace, false);
+    arm::pipe::ConnectionHandler connectionHandler(udsNamespace, false);
 
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
@@ -447,7 +447,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
     WaitFor([&](){return mockService.GetDirectoryCaptureCommandHandler().ParsedCounterDirectory();},
             "MockGatord did not receive counter directory packet");
 
-    timelinedecoder::TimelineDecoder& timelineDecoder = mockService.GetTimelineDecoder();
+    arm::pipe::TimelineDecoder& timelineDecoder = mockService.GetTimelineDecoder();
 
     WaitFor([&](){return timelineDecoder.GetModel().m_EventClasses.size() >= 2;},
             "MockGatord did not receive well known timeline labels");

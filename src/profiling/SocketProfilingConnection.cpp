@@ -11,7 +11,6 @@
 #include <fcntl.h>
 #include <string>
 
-using namespace armnnUtils;
 
 namespace armnn
 {
@@ -20,13 +19,13 @@ namespace profiling
 
 SocketProfilingConnection::SocketProfilingConnection()
 {
-    Sockets::Initialize();
+    arm::pipe::Initialize();
     memset(m_Socket, 0, sizeof(m_Socket));
     // Note: we're using Linux specific SOCK_CLOEXEC flag.
     m_Socket[0].fd = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
     if (m_Socket[0].fd == -1)
     {
-        throw armnnProfiling::SocketConnectionException(
+        throw arm::pipe::SocketConnectionException(
             std::string("SocketProfilingConnection: Socket construction failed: ")  + strerror(errno),
             m_Socket[0].fd,
             errno);
@@ -41,7 +40,7 @@ SocketProfilingConnection::SocketProfilingConnection()
     if (0 != connect(m_Socket[0].fd, reinterpret_cast<const sockaddr*>(&server), sizeof(sockaddr_un)))
     {
         Close();
-        throw armnnProfiling::SocketConnectionException(
+        throw arm::pipe::SocketConnectionException(
             std::string("SocketProfilingConnection: Cannot connect to stream socket: ")  + strerror(errno),
             m_Socket[0].fd,
             errno);
@@ -51,10 +50,10 @@ SocketProfilingConnection::SocketProfilingConnection()
     m_Socket[0].events = POLLIN;
 
     // Make the socket non blocking.
-    if (!Sockets::SetNonBlocking(m_Socket[0].fd))
+    if (!arm::pipe::SetNonBlocking(m_Socket[0].fd))
     {
         Close();
-        throw armnnProfiling::SocketConnectionException(
+        throw arm::pipe::SocketConnectionException(
             std::string("SocketProfilingConnection: Failed to set socket as non blocking: ")  + strerror(errno),
             m_Socket[0].fd,
             errno);
@@ -68,9 +67,9 @@ bool SocketProfilingConnection::IsOpen() const
 
 void SocketProfilingConnection::Close()
 {
-    if (Sockets::Close(m_Socket[0].fd) != 0)
+    if (arm::pipe::Close(m_Socket[0].fd) != 0)
     {
-        throw armnnProfiling::SocketConnectionException(
+        throw arm::pipe::SocketConnectionException(
             std::string("SocketProfilingConnection: Cannot close stream socket: ")  + strerror(errno),
             m_Socket[0].fd,
             errno);
@@ -86,14 +85,14 @@ bool SocketProfilingConnection::WritePacket(const unsigned char* buffer, uint32_
         return false;
     }
 
-    return Sockets::Write(m_Socket[0].fd, buffer, length) != -1;
+    return arm::pipe::Write(m_Socket[0].fd, buffer, length) != -1;
 }
 
-Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
+arm::pipe::Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
 {
     // Is there currently at least a header worth of data waiting to be read?
     int bytes_available = 0;
-    Sockets::Ioctl(m_Socket[0].fd, FIONREAD, &bytes_available);
+    arm::pipe::Ioctl(m_Socket[0].fd, FIONREAD, &bytes_available);
     if (bytes_available >= 8)
     {
         // Yes there is. Read it:
@@ -101,18 +100,18 @@ Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
     }
 
     // Poll for data on the socket or until timeout occurs
-    int pollResult = Sockets::Poll(&m_Socket[0], 1, static_cast<int>(timeout));
+    int pollResult = arm::pipe::Poll(&m_Socket[0], 1, static_cast<int>(timeout));
 
     switch (pollResult)
     {
     case -1: // Error
-        throw armnnProfiling::SocketConnectionException(
+        throw arm::pipe::SocketConnectionException(
             std::string("SocketProfilingConnection: Error occured while reading from socket: ") + strerror(errno),
             m_Socket[0].fd,
             errno);
 
     case 0: // Timeout
-        throw TimeoutException("SocketProfilingConnection: Timeout while reading from socket");
+        throw arm::pipe::TimeoutException("SocketProfilingConnection: Timeout while reading from socket");
 
     default: // Normal poll return but it could still contain an error signal
         // Check if the socket reported an error
@@ -122,13 +121,13 @@ Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
             {
                 // This is an unrecoverable error.
                 Close();
-                throw armnnProfiling::SocketConnectionException(
+                throw arm::pipe::SocketConnectionException(
                     std::string("SocketProfilingConnection: Error occured while polling receiving socket: POLLNVAL."),
                     m_Socket[0].fd);
             }
             if (m_Socket[0].revents == POLLERR)
             {
-                throw armnnProfiling::SocketConnectionException(
+                throw arm::pipe::SocketConnectionException(
                     std::string(
                         "SocketProfilingConnection: Error occured while polling receiving socket: POLLERR: ")
                         + strerror(errno),
@@ -139,7 +138,7 @@ Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
             {
                 // This is an unrecoverable error.
                 Close();
-                throw armnnProfiling::SocketConnectionException(
+                throw arm::pipe::SocketConnectionException(
                     std::string("SocketProfilingConnection: Connection closed by remote client: POLLHUP."),
                     m_Socket[0].fd);
             }
@@ -158,30 +157,30 @@ Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
     }
 }
 
-Packet SocketProfilingConnection::ReceivePacket()
+arm::pipe::Packet SocketProfilingConnection::ReceivePacket()
 {
     char header[8] = {};
-    long receiveResult = Sockets::Read(m_Socket[0].fd, &header, sizeof(header));
+    long receiveResult = arm::pipe::Read(m_Socket[0].fd, &header, sizeof(header));
     // We expect 8 as the result here. 0 means EOF, socket is closed. -1 means there been some other kind of error.
     switch( receiveResult )
     {
         case 0:
             // Socket has closed.
             Close();
-            throw armnnProfiling::SocketConnectionException(
+            throw arm::pipe::SocketConnectionException(
                 std::string("SocketProfilingConnection: Remote socket has closed the connection."),
                 m_Socket[0].fd);
         case -1:
             // There's been a socket error. We will presume it's unrecoverable.
             Close();
-            throw armnnProfiling::SocketConnectionException(
+            throw arm::pipe::SocketConnectionException(
                 std::string("SocketProfilingConnection: Error occured while reading the packet: ") + strerror(errno),
                 m_Socket[0].fd,
                 errno);
         default:
             if (receiveResult < 8)
             {
-                 throw armnnProfiling::SocketConnectionException(
+                 throw arm::pipe::SocketConnectionException(
                      std::string(
                          "SocketProfilingConnection: The received packet did not contains a valid PIPE header."),
                      m_Socket[0].fd);
@@ -201,10 +200,10 @@ Packet SocketProfilingConnection::ReceivePacket()
     if (dataLength > 0)
     {
         packetData = std::make_unique<unsigned char[]>(dataLength);
-        long receivedLength = Sockets::Read(m_Socket[0].fd, packetData.get(), dataLength);
+        long receivedLength = arm::pipe::Read(m_Socket[0].fd, packetData.get(), dataLength);
         if (receivedLength < 0)
         {
-            throw armnnProfiling::SocketConnectionException(
+            throw arm::pipe::SocketConnectionException(
                 std::string("SocketProfilingConnection: Error occured while reading the packet: ")  + strerror(errno),
                 m_Socket[0].fd,
                 errno);
@@ -212,13 +211,13 @@ Packet SocketProfilingConnection::ReceivePacket()
         if (dataLength != static_cast<uint32_t>(receivedLength))
         {
             // What do we do here if we can't read in a full packet?
-            throw armnnProfiling::SocketConnectionException(
+            throw arm::pipe::SocketConnectionException(
                 std::string("SocketProfilingConnection: Invalid PIPE packet."),
                 m_Socket[0].fd);
         }
     }
 
-    return Packet(metadataIdentifier, dataLength, packetData);
+    return arm::pipe::Packet(metadataIdentifier, dataLength, packetData);
 }
 
 } // namespace profiling

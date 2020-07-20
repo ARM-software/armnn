@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -93,7 +93,7 @@ private:
     std::vector<Timestamp> m_timestamps;
 };
 
-Packet PacketWriter(uint32_t period, std::vector<uint16_t> countervalues)
+arm::pipe::Packet PacketWriter(uint32_t period, std::vector<uint16_t> countervalues)
 {
     const uint32_t packetId = 0x40000;
     uint32_t offset = 0;
@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(BackendProfilingCounterRegisterMockBackendTest)
 BOOST_AUTO_TEST_CASE(TestBackendCounters)
 {
     Holder holder;
-    PacketVersionResolver packetVersionResolver;
+    arm::pipe::PacketVersionResolver packetVersionResolver;
     ProfilingStateMachine stateMachine;
     ReadCounterVals readCounterVals;
     CounterIdMap counterIdMap;
@@ -387,7 +387,7 @@ BOOST_AUTO_TEST_CASE(TestBackendCounterLogging)
     };
 
     Holder holder;
-    PacketVersionResolver packetVersionResolver;
+    arm::pipe::PacketVersionResolver packetVersionResolver;
     ProfilingStateMachine stateMachine;
     ReadCounterVals readCounterVals;
     StreamRedirector redirect(std::cout, ss.rdbuf());

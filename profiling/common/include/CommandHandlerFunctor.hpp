@@ -1,20 +1,17 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include <Packet.hpp>
-
-#include <armnn/utility/IgnoreUnused.hpp>
-
 #include <cstdint>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class CommandHandlerFunctor
@@ -40,6 +37,6 @@ private:
     uint32_t m_Version;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -9,8 +9,9 @@
 #include "GatordMockService.hpp"
 #include "MockUtils.hpp"
 
-#include <Packet.hpp>
-#include "CommandHandlerFunctor.hpp"
+#include <common/include/Packet.hpp>
+#include <common/include/CommandHandlerFunctor.hpp>
+
 #include "SendCounterPacket.hpp"
 #include "IPeriodicCounterCapture.hpp"
 

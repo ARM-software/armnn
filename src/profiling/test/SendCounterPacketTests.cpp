@@ -9,7 +9,7 @@
 
 #include <BufferManager.hpp>
 #include <CounterDirectory.hpp>
-#include <EncodeVersion.hpp>
+#include <common/include/EncodeVersion.hpp>
 #include <ProfilingUtils.hpp>
 #include <SendCounterPacket.hpp>
 #include <Processes.hpp>
@@ -325,19 +325,19 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     //   Timeline Message Directory (packet_family = 1, packet_class = 0, packet_type = 0) Version 1.0.0
     //   Timeline Message (packet_family = 1, packet_class = 0, packet_type = 1) Version 1.0.0
     std::vector<std::pair<uint32_t, uint32_t>> packetVersions;
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 0), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 1), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 2), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 3), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 4), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 5), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 6), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 7), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(3, 0, 0), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(3, 1, 0), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(3, 1, 1), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(1, 0, 0), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(1, 0, 1), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 0), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 1), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 2), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 3), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 4), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 5), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 6), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 7), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(3, 0, 0), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(3, 1, 0), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(3, 1, 1), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(1, 0, 0), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(1, 0, 1), arm::pipe::EncodeVersion(1, 0, 0)));
 
     uint32_t packetEntries = static_cast<uint32_t>(packetVersions.size());
 
@@ -359,9 +359,9 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     BOOST_TEST(headerWord1 == totalLength - (2 * sizeUint32)); // data length
 
     uint32_t offset = sizeUint32 * 2;
-    BOOST_TEST(ReadUint32(readBuffer2, offset) == armnnProfiling::PIPE_MAGIC); // pipe_magic
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == arm::pipe::PIPE_MAGIC); // pipe_magic
     offset += sizeUint32;
-    BOOST_TEST(ReadUint32(readBuffer2, offset) == EncodeVersion(1, 0, 0)); // stream_metadata_version
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == arm::pipe::EncodeVersion(1, 0, 0)); // stream_metadata_version
     offset += sizeUint32;
     BOOST_TEST(ReadUint32(readBuffer2, offset) == MAX_METADATA_PACKET_LENGTH); // max_data_len
     offset += sizeUint32;

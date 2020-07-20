@@ -1,11 +1,11 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
 
-#include <CommandHandlerFunctor.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
+#include <common/include/CommandHandlerFunctor.hpp>
+#include <common/include/IgnoreUnused.hpp>
 
 #include <vector>
 
@@ -15,7 +15,7 @@ namespace armnn
 namespace gatordmock
 {
 
-class StubCommandHandler : public profiling::CommandHandlerFunctor
+class StubCommandHandler : public arm::pipe::CommandHandlerFunctor
 {
 
 public:
@@ -30,10 +30,10 @@ public:
             : CommandHandlerFunctor(familyId, packetId, version)
     {}
 
-    void operator()(const armnn::profiling::Packet& packet) override
+    void operator()(const arm::pipe::Packet& packet) override
     {
         //No op
-        IgnoreUnused(packet);
+        arm::pipe::IgnoreUnused(packet);
     }
 
 };

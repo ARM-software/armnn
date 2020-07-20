@@ -1,15 +1,17 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
-#include "TimelineDecoder.hpp"
-#include <ProfilingUtils.hpp>
-#include <iostream>
+#include <common/include/CommonProfilingUtils.hpp>
+#include <server/include/timelineDecoder/TimelineDecoder.hpp>
 
-namespace armnn
+#include <iostream>
+#include <sstream>
+
+namespace arm
 {
-namespace timelinedecoder
+namespace pipe
 {
 
 TimelineDecoder::TimelineStatus TimelineDecoder::CreateEntity(const Entity &entity)
@@ -169,13 +171,13 @@ void TimelineDecoder::printLabels()
 {
     std::string header;
 
-    header.append(profiling::CentreAlignFormatting("guid", 12));
+    header.append(arm::pipe::CentreAlignFormatting("guid", 12));
     header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("value", 30));
+    header.append(arm::pipe::CentreAlignFormatting("value", 30));
     header.append("\n");
 
     std::cout << "\n" << "\n";
-    std::cout << profiling::CentreAlignFormatting("LABELS", static_cast<int>(header.size()));
+    std::cout << arm::pipe::CentreAlignFormatting("LABELS", static_cast<int>(header.size()));
     std::cout << "\n";
     std::cout << std::string(header.size(), '=') << "\n";
     std::cout << header;
@@ -184,9 +186,9 @@ void TimelineDecoder::printLabels()
     {
         std::string body;
 
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_Labels[i].m_Guid), 12));
+        body.append(arm::pipe::CentreAlignFormatting(std::to_string(m_Model.m_Labels[i].m_Guid), 12));
         body.append(" | ");
-        body.append(profiling::CentreAlignFormatting(m_Model.m_Labels[i].m_Name, 30));
+        body.append(arm::pipe::CentreAlignFormatting(m_Model.m_Labels[i].m_Name, 30));
         body.append("\n");
 
         std::cout << std::string(body.size(), '-') << "\n";
@@ -197,11 +199,11 @@ void TimelineDecoder::printLabels()
 void TimelineDecoder::printEntities()
 {
     std::string header;
-    header.append(profiling::CentreAlignFormatting("guid", 12));
+    header.append(arm::pipe::CentreAlignFormatting("guid", 12));
     header.append("\n");
 
     std::cout << "\n" << "\n";
-    std::cout << profiling::CentreAlignFormatting("ENTITIES", static_cast<int>(header.size()));
+    std::cout << arm::pipe::CentreAlignFormatting("ENTITIES", static_cast<int>(header.size()));
     std::cout << "\n";
     std::cout << std::string(header.size(), '=') << "\n";
     std::cout << header;
@@ -210,7 +212,7 @@ void TimelineDecoder::printEntities()
     {
         std::string body;
 
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_Entities[i].m_Guid), 12));
+        body.append(arm::pipe::CentreAlignFormatting(std::to_string(m_Model.m_Entities[i].m_Guid), 12));
         body.append("\n");
 
         std::cout << std::string(body.size(), '-') << "\n";
@@ -221,11 +223,11 @@ void TimelineDecoder::printEntities()
 void TimelineDecoder::printEventClasses()
 {
     std::string header;
-    header.append(profiling::CentreAlignFormatting("guid", 12));
+    header.append(arm::pipe::CentreAlignFormatting("guid", 12));
     header.append("\n");
 
     std::cout << "\n" << "\n";
-    std::cout << profiling::CentreAlignFormatting("EVENT CLASSES", static_cast<int>(header.size()));
+    std::cout << arm::pipe::CentreAlignFormatting("EVENT CLASSES", static_cast<int>(header.size()));
     std::cout << "\n";
     std::cout << std::string(header.size(), '=') << "\n";
     std::cout << header;
@@ -234,7 +236,7 @@ void TimelineDecoder::printEventClasses()
     {
         std::string body;
 
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_EventClasses[i].m_Guid), 12));
+        body.append(arm::pipe::CentreAlignFormatting(std::to_string(m_Model.m_EventClasses[i].m_Guid), 12));
         body.append("\n");
 
         std::cout << std::string(body.size(), '-') << "\n";
@@ -246,15 +248,15 @@ void TimelineDecoder::printEvents()
 {
     std::string header;
 
-    header.append(profiling::CentreAlignFormatting("timestamp", 12));
+    header.append(arm::pipe::CentreAlignFormatting("timestamp", 12));
     header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("threadId", 12));
+    header.append(arm::pipe::CentreAlignFormatting("threadId", 12));
     header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("eventGuid", 12));
+    header.append(arm::pipe::CentreAlignFormatting("eventGuid", 12));
     header.append("\n");
 
     std::cout << "\n" << "\n";
-    std::cout << profiling::CentreAlignFormatting("EVENTS", static_cast<int>(header.size()));
+    std::cout << arm::pipe::CentreAlignFormatting("EVENTS", static_cast<int>(header.size()));
     std::cout << "\n";
     std::cout << std::string(header.size(), '=') << "\n";
     std::cout << header;
@@ -263,16 +265,16 @@ void TimelineDecoder::printEvents()
     {
         std::string body;
 
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_Events[i].m_TimeStamp), 12));
+        body.append(arm::pipe::CentreAlignFormatting(std::to_string(m_Model.m_Events[i].m_TimeStamp), 12));
         body.append(" | ");
 
         std::stringstream ss;
         ss << m_Model.m_Events[i].m_ThreadId;
         std::string threadId = ss.str();;
 
-        body.append(profiling::CentreAlignFormatting(threadId, 12));
+        body.append(arm::pipe::CentreAlignFormatting(threadId, 12));
         body.append(" | ");
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_Events[i].m_Guid), 12));
+        body.append(arm::pipe::CentreAlignFormatting(std::to_string(m_Model.m_Events[i].m_Guid), 12));
         body.append("\n");
 
         std::cout << std::string(body.size(), '-') << "\n";
@@ -283,17 +285,17 @@ void TimelineDecoder::printEvents()
 void TimelineDecoder::printRelationships()
 {
     std::string header;
-    header.append(profiling::CentreAlignFormatting("relationshipType", 20));
+    header.append(arm::pipe::CentreAlignFormatting("relationshipType", 20));
     header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("relationshipGuid", 20));
+    header.append(arm::pipe::CentreAlignFormatting("relationshipGuid", 20));
     header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("headGuid", 12));
+    header.append(arm::pipe::CentreAlignFormatting("headGuid", 12));
     header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("tailGuid", 12));
+    header.append(arm::pipe::CentreAlignFormatting("tailGuid", 12));
     header.append("\n");
 
     std::cout << "\n" << "\n";
-    std::cout << profiling::CentreAlignFormatting("RELATIONSHIPS", static_cast<int>(header.size()));
+    std::cout << arm::pipe::CentreAlignFormatting("RELATIONSHIPS", static_cast<int>(header.size()));
     std::cout << "\n";
     std::cout << std::string(header.size(), '=') << "\n";
     std::cout << header;
@@ -303,15 +305,15 @@ void TimelineDecoder::printRelationships()
         std::string body;
 
         body.append(
-                profiling::CentreAlignFormatting(std::to_string(static_cast<unsigned int>
+                arm::pipe::CentreAlignFormatting(std::to_string(static_cast<unsigned int>
                                                                 (m_Model.m_Relationships[i].m_RelationshipType)),
                                                  20));
         body.append(" | ");
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_Relationships[i].m_Guid), 20));
+        body.append(arm::pipe::CentreAlignFormatting(std::to_string(m_Model.m_Relationships[i].m_Guid), 20));
         body.append(" | ");
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_Relationships[i].m_HeadGuid), 12));
+        body.append(arm::pipe::CentreAlignFormatting(std::to_string(m_Model.m_Relationships[i].m_HeadGuid), 12));
         body.append(" | ");
-        body.append(profiling::CentreAlignFormatting(std::to_string(m_Model.m_Relationships[i].m_TailGuid), 12));
+        body.append(arm::pipe::CentreAlignFormatting(std::to_string(m_Model.m_Relationships[i].m_TailGuid), 12));
         body.append(" | ");
         body.append("\n");
 
@@ -319,5 +321,6 @@ void TimelineDecoder::printRelationships()
         std::cout << body;
     }
 }
-}
-}
+
+} // namespace pipe
+} // namespace arm

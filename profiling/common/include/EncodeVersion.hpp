@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -9,10 +9,10 @@
 #include <ostream>
 #include <sstream>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 constexpr inline uint32_t EncodeVersion(uint32_t major, uint32_t minor, uint32_t patch)
@@ -78,6 +78,6 @@ inline std::ostream& operator<<(std::ostream& os, const Version& version)
     return os;
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

@@ -1,9 +1,10 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "PerJobCounterSelectionCommandHandler.hpp"
+#include <armnn/Exceptions.hpp>
 
 #include <boost/format.hpp>
 
@@ -13,7 +14,7 @@ namespace armnn
 namespace profiling
 {
 
-void PerJobCounterSelectionCommandHandler::operator()(const Packet& packet)
+void PerJobCounterSelectionCommandHandler::operator()(const arm::pipe::Packet& packet)
 {
     ProfilingState currentState = m_StateMachine.GetCurrentState();
     switch (currentState)
@@ -21,9 +22,9 @@ void PerJobCounterSelectionCommandHandler::operator()(const Packet& packet)
     case ProfilingState::Uninitialised:
     case ProfilingState::NotConnected:
     case ProfilingState::WaitingForAck:
-        throw RuntimeException(boost::str(boost::format("Per-Job Counter Selection Command Handler invoked while in "
-                                                        "an wrong state: %1%")
-                                          % GetProfilingStateName(currentState)));
+        throw armnn::RuntimeException(boost::str(boost::format(
+            "Per-Job Counter Selection Command Handler invoked while in an incorrect state: %1%")
+            % GetProfilingStateName(currentState)));
     case ProfilingState::Active:
         // Process the packet
         if (!(packet.GetPacketFamily() == 0u && packet.GetPacketId() == 5u))
@@ -38,8 +39,8 @@ void PerJobCounterSelectionCommandHandler::operator()(const Packet& packet)
 
         break;
     default:
-        throw RuntimeException(boost::str(boost::format("Unknown profiling service state: %1%")
-                                          % static_cast<int>(currentState)));
+        throw armnn::RuntimeException(boost::str(boost::format("Unknown profiling service state: %1%")
+                                                 % static_cast<int>(currentState)));
     }
 }
 

@@ -5,7 +5,9 @@
 
 #include "ProfilingUtils.hpp"
 
-#include "common/include/ProfilingException.hpp"
+#include <common/include/CommonProfilingUtils.hpp>
+#include <common/include/ProfilingException.hpp>
+#include <common/include/SwTrace.hpp>
 
 #include <armnn/Version.hpp>
 
@@ -139,52 +141,27 @@ void WriteUint8(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint8
 
 void WriteBytes(unsigned char* buffer, unsigned int offset, const void* value, unsigned int valueSize)
 {
-    ARMNN_ASSERT(buffer);
-    ARMNN_ASSERT(value);
-
-    for (unsigned int i = 0; i < valueSize; i++, offset++)
-    {
-        buffer[offset] = *(reinterpret_cast<const unsigned char*>(value) + i);
-    }
+    arm::pipe::WriteBytes(buffer, offset, value, valueSize);
 }
 
 void WriteUint64(unsigned char* buffer, unsigned int offset, uint64_t value)
 {
-    ARMNN_ASSERT(buffer);
-
-    buffer[offset]     = static_cast<unsigned char>(value & 0xFF);
-    buffer[offset + 1] = static_cast<unsigned char>((value >> 8) & 0xFF);
-    buffer[offset + 2] = static_cast<unsigned char>((value >> 16) & 0xFF);
-    buffer[offset + 3] = static_cast<unsigned char>((value >> 24) & 0xFF);
-    buffer[offset + 4] = static_cast<unsigned char>((value >> 32) & 0xFF);
-    buffer[offset + 5] = static_cast<unsigned char>((value >> 40) & 0xFF);
-    buffer[offset + 6] = static_cast<unsigned char>((value >> 48) & 0xFF);
-    buffer[offset + 7] = static_cast<unsigned char>((value >> 56) & 0xFF);
+    arm::pipe::WriteUint64(buffer, offset, value);
 }
 
 void WriteUint32(unsigned char* buffer, unsigned int offset, uint32_t value)
 {
-    ARMNN_ASSERT(buffer);
-
-    buffer[offset]     = static_cast<unsigned char>(value & 0xFF);
-    buffer[offset + 1] = static_cast<unsigned char>((value >> 8) & 0xFF);
-    buffer[offset + 2] = static_cast<unsigned char>((value >> 16) & 0xFF);
-    buffer[offset + 3] = static_cast<unsigned char>((value >> 24) & 0xFF);
+    arm::pipe::WriteUint32(buffer, offset, value);
 }
 
 void WriteUint16(unsigned char* buffer, unsigned int offset, uint16_t value)
 {
-    ARMNN_ASSERT(buffer);
-
-    buffer[offset]     = static_cast<unsigned char>(value & 0xFF);
-    buffer[offset + 1] = static_cast<unsigned char>((value >> 8) & 0xFF);
+    arm::pipe::WriteUint16(buffer, offset, value);
 }
 
 void WriteUint8(unsigned char* buffer, unsigned int offset, uint8_t value)
 {
-    ARMNN_ASSERT(buffer);
-
-    buffer[offset] = static_cast<unsigned char>(value);
+    arm::pipe::WriteUint8(buffer, offset, value);
 }
 
 void ReadBytes(const IPacketBufferPtr& packetBuffer, unsigned int offset, unsigned int valueSize, uint8_t outValue[])
@@ -224,59 +201,27 @@ uint8_t ReadUint8(const IPacketBufferPtr& packetBuffer, unsigned int offset)
 
 void ReadBytes(const unsigned char* buffer, unsigned int offset, unsigned int valueSize, uint8_t outValue[])
 {
-    ARMNN_ASSERT(buffer);
-    ARMNN_ASSERT(outValue);
-
-    for (unsigned int i = 0; i < valueSize; i++, offset++)
-    {
-        outValue[i] = static_cast<uint8_t>(buffer[offset]);
-    }
+    arm::pipe::ReadBytes(buffer, offset, valueSize, outValue);
 }
 
 uint64_t ReadUint64(const unsigned char* buffer, unsigned int offset)
 {
-    ARMNN_ASSERT(buffer);
-
-    uint64_t value = 0;
-    value  = static_cast<uint64_t>(buffer[offset]);
-    value |= static_cast<uint64_t>(buffer[offset + 1]) << 8;
-    value |= static_cast<uint64_t>(buffer[offset + 2]) << 16;
-    value |= static_cast<uint64_t>(buffer[offset + 3]) << 24;
-    value |= static_cast<uint64_t>(buffer[offset + 4]) << 32;
-    value |= static_cast<uint64_t>(buffer[offset + 5]) << 40;
-    value |= static_cast<uint64_t>(buffer[offset + 6]) << 48;
-    value |= static_cast<uint64_t>(buffer[offset + 7]) << 56;
-
-    return value;
+    return arm::pipe::ReadUint64(buffer, offset);
 }
 
 uint32_t ReadUint32(const unsigned char* buffer, unsigned int offset)
 {
-    ARMNN_ASSERT(buffer);
-
-    uint32_t value = 0;
-    value  = static_cast<uint32_t>(buffer[offset]);
-    value |= static_cast<uint32_t>(buffer[offset + 1]) << 8;
-    value |= static_cast<uint32_t>(buffer[offset + 2]) << 16;
-    value |= static_cast<uint32_t>(buffer[offset + 3]) << 24;
-    return value;
+    return arm::pipe::ReadUint32(buffer, offset);
 }
 
 uint16_t ReadUint16(const unsigned char* buffer, unsigned int offset)
 {
-    ARMNN_ASSERT(buffer);
-
-    uint32_t value = 0;
-    value  = static_cast<uint32_t>(buffer[offset]);
-    value |= static_cast<uint32_t>(buffer[offset + 1]) << 8;
-    return static_cast<uint16_t>(value);
+    return arm::pipe::ReadUint16(buffer, offset);
 }
 
 uint8_t ReadUint8(const unsigned char* buffer, unsigned int offset)
 {
-    ARMNN_ASSERT(buffer);
-
-    return buffer[offset];
+    return arm::pipe::ReadUint8(buffer, offset);
 }
 
 std::string GetSoftwareInfo()
@@ -301,113 +246,6 @@ std::string GetProcessName()
     std::string name;
     getline(comm, name);
     return name;
-}
-
-// Calculate the actual length an SwString will be including the terminating null character
-// padding to bring it to the next uint32_t boundary but minus the leading uint32_t encoding
-// the size to allow the offset to be correctly updated when decoding a binary packet.
-uint32_t CalculateSizeOfPaddedSwString(const std::string& str)
-{
-    std::vector<uint32_t> swTraceString;
-    StringToSwTraceString<SwTraceCharPolicy>(str, swTraceString);
-    unsigned int uint32_t_size = sizeof(uint32_t);
-    uint32_t size = (boost::numeric_cast<uint32_t>(swTraceString.size()) - 1) * uint32_t_size;
-    return size;
-}
-
-// Read TimelineMessageDirectoryPacket from given IPacketBuffer and offset
-SwTraceMessage ReadSwTraceMessage(const unsigned char* packetBuffer,
-                                  unsigned int& offset,
-                                  const unsigned int& packetLength)
-{
-    ARMNN_ASSERT(packetBuffer);
-
-    unsigned int uint32_t_size = sizeof(uint32_t);
-
-    SwTraceMessage swTraceMessage;
-
-    // Read the decl_id
-    uint32_t readDeclId = ReadUint32(packetBuffer, offset);
-    swTraceMessage.m_Id = readDeclId;
-
-    // SWTrace "namestring" format
-    // length of the string (first 4 bytes) + string + null terminator
-
-    // Check the decl_name
-    offset += uint32_t_size;
-    uint32_t swTraceDeclNameLength = ReadUint32(packetBuffer, offset);
-
-    if (swTraceDeclNameLength == 0 || swTraceDeclNameLength > packetLength)
-    {
-        throw RuntimeException("Error swTraceDeclNameLength is an invalid size", CHECK_LOCATION());
-    }
-
-    offset += uint32_t_size;
-    std::vector<unsigned char> swTraceStringBuffer(swTraceDeclNameLength - 1);
-    std::memcpy(swTraceStringBuffer.data(),
-                packetBuffer + offset, swTraceStringBuffer.size());
-
-    swTraceMessage.m_Name.assign(swTraceStringBuffer.begin(), swTraceStringBuffer.end()); // name
-
-    // Check the ui_name
-    offset += CalculateSizeOfPaddedSwString(swTraceMessage.m_Name);
-    uint32_t swTraceUINameLength = ReadUint32(packetBuffer, offset);
-
-    if (swTraceUINameLength == 0 || swTraceUINameLength > packetLength)
-    {
-        throw RuntimeException("Error swTraceUINameLength is an invalid size", CHECK_LOCATION());
-    }
-
-    offset += uint32_t_size;
-    swTraceStringBuffer.resize(swTraceUINameLength - 1);
-    std::memcpy(swTraceStringBuffer.data(),
-                packetBuffer  + offset, swTraceStringBuffer.size());
-
-    swTraceMessage.m_UiName.assign(swTraceStringBuffer.begin(), swTraceStringBuffer.end()); // ui_name
-
-    // Check arg_types
-    offset += CalculateSizeOfPaddedSwString(swTraceMessage.m_UiName);
-    uint32_t swTraceArgTypesLength = ReadUint32(packetBuffer, offset);
-
-    if (swTraceArgTypesLength == 0 || swTraceArgTypesLength > packetLength)
-    {
-        throw RuntimeException("Error swTraceArgTypesLength is an invalid size", CHECK_LOCATION());
-    }
-
-    offset += uint32_t_size;
-    swTraceStringBuffer.resize(swTraceArgTypesLength - 1);
-    std::memcpy(swTraceStringBuffer.data(),
-                packetBuffer  + offset, swTraceStringBuffer.size());
-
-    swTraceMessage.m_ArgTypes.assign(swTraceStringBuffer.begin(), swTraceStringBuffer.end()); // arg_types
-
-    std::string swTraceString(swTraceStringBuffer.begin(), swTraceStringBuffer.end());
-
-    // Check arg_names
-    offset += CalculateSizeOfPaddedSwString(swTraceString);
-    uint32_t swTraceArgNamesLength = ReadUint32(packetBuffer, offset);
-
-    if (swTraceArgNamesLength == 0 || swTraceArgNamesLength > packetLength)
-    {
-        throw RuntimeException("Error swTraceArgNamesLength is an invalid size", CHECK_LOCATION());
-    }
-
-    offset += uint32_t_size;
-    swTraceStringBuffer.resize(swTraceArgNamesLength - 1);
-    std::memcpy(swTraceStringBuffer.data(),
-                packetBuffer  + offset, swTraceStringBuffer.size());
-
-    swTraceString.assign(swTraceStringBuffer.begin(), swTraceStringBuffer.end());
-    std::stringstream stringStream(swTraceString);
-    std::string argName;
-    while (std::getline(stringStream, argName, ','))
-    {
-        swTraceMessage.m_ArgNames.push_back(argName);
-    }
-
-    offset += CalculateSizeOfPaddedSwString(swTraceString);
-
-    return swTraceMessage;
 }
 
 /// Creates a timeline packet header
@@ -493,7 +331,7 @@ TimelinePacketStatus WriteTimelineLabelBinaryPacket(uint64_t profilingGuid,
 
     // Convert the label into a SWTrace string
     std::vector<uint32_t> swTraceLabel;
-    bool result = StringToSwTraceString<SwTraceCharPolicy>(label, swTraceLabel);
+    bool result = arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(label, swTraceLabel);
     if (!result)
     {
         return TimelinePacketStatus::Error;
@@ -712,10 +550,14 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
         swTraceBuffer.push_back(declId);
 
         bool result = true;
-        result &= ConvertDirectoryComponent<SwTraceNameCharPolicy>(directoryComponent[1], swTraceBuffer); // decl_name
-        result &= ConvertDirectoryComponent<SwTraceCharPolicy>    (directoryComponent[2], swTraceBuffer); // ui_name
-        result &= ConvertDirectoryComponent<SwTraceTypeCharPolicy>(directoryComponent[3], swTraceBuffer); // arg_types
-        result &= ConvertDirectoryComponent<SwTraceCharPolicy>    (directoryComponent[4], swTraceBuffer); // arg_names
+        result &= arm::pipe::ConvertDirectoryComponent<arm::pipe::SwTraceNameCharPolicy>(
+                      directoryComponent[1], swTraceBuffer); // decl_name
+        result &= arm::pipe::ConvertDirectoryComponent<arm::pipe::SwTraceCharPolicy>    (
+                      directoryComponent[2], swTraceBuffer); // ui_name
+        result &= arm::pipe::ConvertDirectoryComponent<arm::pipe::SwTraceTypeCharPolicy>(
+                      directoryComponent[3], swTraceBuffer); // arg_types
+        result &= arm::pipe::ConvertDirectoryComponent<arm::pipe::SwTraceCharPolicy>    (
+                      directoryComponent[4], swTraceBuffer); // arg_names
         if (!result)
         {
             return TimelinePacketStatus::Error;
@@ -884,22 +726,7 @@ TimelinePacketStatus WriteTimelineEventBinary(uint64_t timestamp,
 
 std::string CentreAlignFormatting(const std::string& stringToPass, const int spacingWidth)
 {
-    std::stringstream outputStream, centrePadding;
-    int padding = spacingWidth - static_cast<int>(stringToPass.size());
-
-    for (int i = 0; i < padding / 2; ++i)
-    {
-        centrePadding << " ";
-    }
-
-    outputStream << centrePadding.str() << stringToPass << centrePadding.str();
-
-    if (padding > 0 && padding %2 != 0)
-    {
-        outputStream << " ";
-    }
-
-    return outputStream.str();
+    return arm::pipe::CentreAlignFormatting(stringToPass, spacingWidth);
 }
 
 void PrintDeviceDetails(const std::pair<const unsigned short, std::unique_ptr<Device>>& devicePair)
@@ -1088,15 +915,15 @@ uint64_t GetTimestamp()
     return static_cast<uint64_t>(timestamp.count());
 }
 
-Packet ReceivePacket(const unsigned char* buffer, uint32_t length)
+arm::pipe::Packet ReceivePacket(const unsigned char* buffer, uint32_t length)
 {
     if (buffer == nullptr)
     {
-        throw armnnProfiling::ProfilingException("data buffer is nullptr");
+        throw arm::pipe::ProfilingException("data buffer is nullptr");
     }
     if (length < 8)
     {
-        throw armnnProfiling::ProfilingException("length of data buffer is less than 8");
+        throw arm::pipe::ProfilingException("length of data buffer is less than 8");
     }
 
     uint32_t metadataIdentifier = 0;
@@ -1112,7 +939,7 @@ Packet ReceivePacket(const unsigned char* buffer, uint32_t length)
         std::memcpy(packetData.get(), buffer + 8u, dataLength);
     }
 
-    return Packet(metadataIdentifier, dataLength, packetData);
+    return arm::pipe::Packet(metadataIdentifier, dataLength, packetData);
 }
 
 } // namespace profiling

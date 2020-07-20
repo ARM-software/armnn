@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,9 +7,10 @@
 #include "ProfilingUtils.hpp"
 
 #include <armnn/Exceptions.hpp>
-#include <armnn/Conversion.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+
+#include <common/include/SwTrace.hpp>
 
 #include <boost/format.hpp>
 
@@ -23,7 +24,7 @@ const Category* CounterDirectory::RegisterCategory(const std::string& categoryNa
 {
     // Check that the given category name is valid
     if (categoryName.empty() ||
-            !IsValidSwTraceString<SwTraceNameCharPolicy>(categoryName))
+            !arm::pipe::IsValidSwTraceString<arm::pipe::SwTraceNameCharPolicy>(categoryName))
     {
         throw InvalidArgumentException("Trying to register a category with an invalid name");
     }
@@ -56,7 +57,7 @@ const Device* CounterDirectory::RegisterDevice(const std::string& deviceName,
 {
     // Check that the given device name is valid
     if (deviceName.empty() ||
-            !IsValidSwTraceString<SwTraceCharPolicy>(deviceName))
+            !arm::pipe::IsValidSwTraceString<arm::pipe::SwTraceCharPolicy>(deviceName))
     {
         throw InvalidArgumentException("Trying to register a device with an invalid name");
     }
@@ -118,7 +119,7 @@ const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counte
 {
     // Check that the given counter set name is valid
     if (counterSetName.empty() ||
-            !IsValidSwTraceString<SwTraceNameCharPolicy>(counterSetName))
+            !arm::pipe::IsValidSwTraceString<arm::pipe::SwTraceNameCharPolicy>(counterSetName))
     {
         throw InvalidArgumentException("Trying to register a counter set with an invalid name");
     }
@@ -196,7 +197,7 @@ const Counter* CounterDirectory::RegisterCounter(const BackendId& backendId,
 
     // Check that the given parent category name is valid
     if (parentCategoryName.empty() ||
-            !IsValidSwTraceString<SwTraceNameCharPolicy>(parentCategoryName))
+            !arm::pipe::IsValidSwTraceString<arm::pipe::SwTraceNameCharPolicy>(parentCategoryName))
     {
         throw InvalidArgumentException("Trying to register a counter with an invalid parent category name");
     }
@@ -221,21 +222,21 @@ const Counter* CounterDirectory::RegisterCounter(const BackendId& backendId,
 
     // Check that the given name is valid
     if (name.empty() ||
-            !IsValidSwTraceString<SwTraceCharPolicy>(name))
+            !arm::pipe::IsValidSwTraceString<arm::pipe::SwTraceCharPolicy>(name))
     {
         throw InvalidArgumentException("Trying to register a counter with an invalid name");
     }
 
     // Check that the given description is valid
     if (description.empty() ||
-            !IsValidSwTraceString<SwTraceCharPolicy>(description))
+            !arm::pipe::IsValidSwTraceString<arm::pipe::SwTraceCharPolicy>(description))
     {
         throw InvalidArgumentException("Trying to register a counter with an invalid description");
     }
 
     // Check that the given units are valid
     if (units.has_value()
-            && !IsValidSwTraceString<SwTraceNameCharPolicy>(units.value()))
+            && !arm::pipe::IsValidSwTraceString<arm::pipe::SwTraceNameCharPolicy>(units.value()))
     {
         throw InvalidArgumentException("Trying to register a counter with a invalid units");
     }

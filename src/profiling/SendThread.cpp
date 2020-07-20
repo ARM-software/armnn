@@ -1,10 +1,9 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "SendThread.hpp"
-#include "EncodeVersion.hpp"
 #include "ProfilingUtils.hpp"
 
 #include <armnn/Exceptions.hpp>
@@ -25,7 +24,9 @@ namespace profiling
 using boost::numeric_cast;
 
 SendThread::SendThread(armnn::profiling::ProfilingStateMachine& profilingStateMachine,
-    armnn::profiling::IBufferManager& buffer, armnn::profiling::ISendCounterPacket& sendCounterPacket, int timeout)
+                       armnn::profiling::IBufferManager& buffer,
+                       armnn::profiling::ISendCounterPacket& sendCounterPacket,
+                       int timeout)
     : m_StateMachine(profilingStateMachine)
     , m_BufferManager(buffer)
     , m_SendCounterPacket(sendCounterPacket)

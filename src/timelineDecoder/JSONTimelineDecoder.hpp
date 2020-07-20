@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/profiling/ITimelineDecoder.hpp>
+#include <server/include/timelineDecoder/ITimelineDecoder.hpp>
 
 #include <Filesystem.hpp>
 #include <map>
@@ -15,7 +15,7 @@ namespace armnn
 {
 namespace timelinedecoder
 {
-class JSONTimelineDecoder : public ITimelineDecoder
+class JSONTimelineDecoder : public arm::pipe::ITimelineDecoder
 {
 public:
     struct JSONEntity

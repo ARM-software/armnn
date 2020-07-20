@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,10 +7,10 @@
 
 #include <cstdint>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class CommandHandlerKey
@@ -36,6 +36,6 @@ private:
     uint32_t m_Version;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

@@ -1,18 +1,21 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <NetworkSockets.hpp>
-#include <Packet.hpp>
-#include <SocketConnectionException.hpp>
+#include <common/include/NetworkSockets.hpp>
+#include <common/include/Packet.hpp>
+#include <common/include/SocketConnectionException.hpp>
 
 #include <string>
 #include <atomic>
 
-namespace armnnProfiling
+namespace arm
+{
+
+namespace pipe
 {
 
 enum class TargetEndianness
@@ -34,7 +37,7 @@ class BasePipeServer
 
 public:
 
-    BasePipeServer(armnnUtils::Sockets::Socket clientConnection, bool echoPackets)
+    BasePipeServer(arm::pipe::Socket clientConnection, bool echoPackets)
             : m_ClientConnection(clientConnection)
             , m_EchoPackets(echoPackets)
             {}
@@ -42,7 +45,7 @@ public:
     ~BasePipeServer()
     {
         // We have set SOCK_CLOEXEC on this socket but we'll close it to be good citizens.
-        armnnUtils::Sockets::Close(m_ClientConnection);
+        arm::pipe::Close(m_ClientConnection);
     }
 
     BasePipeServer(const BasePipeServer&) = delete;
@@ -55,7 +58,7 @@ public:
     /// @return 0 if successful
     int Close()
     {
-        return armnnUtils::Sockets::Close(m_ClientConnection);
+        return arm::pipe::Close(m_ClientConnection);
     }
 
     /// Send a packet to the client
@@ -66,12 +69,12 @@ public:
     /// @return true if successful.
     bool SetNonBlocking()
     {
-        return armnnUtils::Sockets::SetNonBlocking(m_ClientConnection);
+        return arm::pipe::SetNonBlocking(m_ClientConnection);
     }
 
     /// Block on the client connection until a complete packet has been received.
     /// @return true if a valid packet has been received.
-    armnn::profiling::Packet WaitForPacket(uint32_t timeoutMs);
+    arm::pipe::Packet WaitForPacket(uint32_t timeoutMs);
 
     /// Once the connection is open wait to receive the stream meta data packet from the client. Reading this
     /// packet differs from others as we need to determine endianness.
@@ -99,12 +102,12 @@ private:
     bool ReadFromSocket(uint8_t* packetData, uint32_t expectedLength);
     bool ReadHeader(uint32_t headerAsWords[2]);
 
-    armnn::profiling::Packet ReceivePacket();
+    arm::pipe::Packet ReceivePacket();
 
     uint32_t ToUint32(uint8_t* data, TargetEndianness endianness);
     void InsertU32(uint32_t value, uint8_t* data, TargetEndianness endianness);
 
-    armnnUtils::Sockets::Socket m_ClientConnection;
+    arm::pipe::Socket m_ClientConnection;
     bool m_EchoPackets;
     TargetEndianness m_Endianness;
 
@@ -113,4 +116,5 @@ private:
     uint32_t m_StreamMetaDataPid;
 };
 
-} // namespace armnnProfiling
+} // namespace pipe
+} // namespace arm

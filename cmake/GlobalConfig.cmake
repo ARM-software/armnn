@@ -1,5 +1,5 @@
 #
-# Copyright © 2020 Arm Ltd. All rights reserved.
+# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 # Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 #
@@ -33,6 +33,8 @@ option(SHARED_BOOST "Use dynamic linking for boost libraries" OFF)
 option(BUILD_BASE_PIPE_SERVER "Build the server to handle external profiling pipe traffic" ON)
 option(BUILD_PYTHON_WHL "Build Python wheel package" OFF)
 option(BUILD_PYTHON_SRC "Build Python source package" OFF)
+option(BUILD_STATIC_PIPE_LIBS "Build Static PIPE libraries" OFF)
+option(BUILD_PIPE_ONLY "Build the PIPE libraries only" OFF)
 
 include(SelectLibraryConfigurations)
 
@@ -121,25 +123,32 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
-# Boost
-if(SHARED_BOOST)
+if (NOT BUILD_PIPE_ONLY)
+  # Boost
+  message(STATUS "Finding Boost")
+  if(SHARED_BOOST)
     add_definitions(-DBOOST_ALL_DYN_LINK)
     set(Boost_USE_STATIC_LIBS OFF)
-else()
+  else()
     set(Boost_USE_STATIC_LIBS ON)
+  endif()
+  add_definitions("-DBOOST_ALL_NO_LIB") # Turn off auto-linking as we specify the libs manually
+  find_package(Boost 1.59 REQUIRED COMPONENTS unit_test_framework filesystem system program_options)
+  include_directories(SYSTEM "${Boost_INCLUDE_DIRS}")
+  link_directories(${Boost_LIBRARY_DIRS})
 endif()
-add_definitions("-DBOOST_ALL_NO_LIB") # Turn off auto-linking as we specify the libs manually
-find_package(Boost 1.59 REQUIRED COMPONENTS unit_test_framework filesystem system program_options)
-include_directories(SYSTEM "${Boost_INCLUDE_DIRS}")
-link_directories(${Boost_LIBRARY_DIRS})
 
-# cxxopts (Alternative to boost::program_options)
-find_path(CXXOPTS_INCLUDE cxxopts/cxxopts.hpp PATHS third-party)
-include_directories(SYSTEM "${CXXOPTS_INCLUDE}")
+if (NOT BUILD_PIPE_ONLY)
+  # cxxopts (Alternative to boost::program_options)
+  find_path(CXXOPTS_INCLUDE cxxopts/cxxopts.hpp PATHS third-party)
+  include_directories(SYSTEM "${CXXOPTS_INCLUDE}")
+endif()
 
-# ghc (Alternative to boost::filesystem)
-find_path(GHC_INCLUDE ghc/filesystem.hpp PATHS third-party)
-include_directories(SYSTEM "${GHC_INCLUDE}")
+if (NOT BUILD_PIPE_ONLY)
+  # ghc (Alternative to boost::filesystem)
+  find_path(GHC_INCLUDE ghc/filesystem.hpp PATHS third-party)
+  include_directories(SYSTEM "${GHC_INCLUDE}")
+endif()
 
 # pthread
 find_package (Threads)

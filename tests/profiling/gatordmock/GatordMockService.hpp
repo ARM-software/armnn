@@ -1,28 +1,31 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <CommandHandlerRegistry.hpp>
-#include <Packet.hpp>
+// local includes
+#include "PeriodicCounterCaptureCommandHandler.hpp"
+#include "StreamMetadataCommandHandler.hpp"
+#include "StubCommandHandler.hpp"
+
+#include <common/include/CommandHandlerRegistry.hpp>
+#include <common/include/Packet.hpp>
+#include <common/include/PacketVersionResolver.hpp>
+
+#include <server/include/basePipeServer/BasePipeServer.hpp>
+
+#include <server/include/timelineDecoder/TimelineDecoder.hpp>
+#include <server/include/timelineDecoder/TimelineCaptureCommandHandler.hpp>
+#include <server/include/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp>
+
+// src/profiling
+#include <DirectoryCaptureCommandHandler.hpp>
 
 #include <atomic>
 #include <string>
 #include <thread>
-
-#include <TimelineDecoder.hpp>
-#include <DirectoryCaptureCommandHandler.hpp>
-#include <TimelineCaptureCommandHandler.hpp>
-#include <TimelineDirectoryCaptureCommandHandler.hpp>
-#include "PeriodicCounterCaptureCommandHandler.hpp"
-#include "StreamMetadataCommandHandler.hpp"
-
-#include <BasePipeServer.hpp>
-
-#include "PacketVersionResolver.hpp"
-#include "StubCommandHandler.hpp"
 
 namespace armnn
 {
@@ -37,7 +40,7 @@ class GatordMockService
 public:
     /// @param registry reference to a command handler registry.
     /// @param echoPackets if true the raw packets will be printed to stdout.
-    GatordMockService(std::unique_ptr<armnnProfiling::BasePipeServer> clientConnection, bool echoPackets)
+    GatordMockService(std::unique_ptr<arm::pipe::BasePipeServer> clientConnection, bool echoPackets)
             : m_BasePipeServer(std::move(clientConnection))
             , m_EchoPackets(echoPackets)
             , m_CloseReceivingThread(false)
@@ -122,12 +125,12 @@ public:
         return m_DirectoryCaptureCommandHandler;
     }
 
-    timelinedecoder::TimelineDecoder& GetTimelineDecoder()
+    arm::pipe::TimelineDecoder& GetTimelineDecoder()
     {
         return m_TimelineDecoder;
     }
 
-    timelinedecoder::TimelineDirectoryCaptureCommandHandler& GetTimelineDirectoryCaptureCommandHandler()
+    arm::pipe::TimelineDirectoryCaptureCommandHandler& GetTimelineDirectoryCaptureCommandHandler()
     {
         return m_TimelineDirectoryCaptureCommandHandler;
     }
@@ -135,7 +138,7 @@ public:
 private:
     void ReceiveLoop();
 
-    std::unique_ptr<armnnProfiling::BasePipeServer>  m_BasePipeServer;
+    std::unique_ptr<arm::pipe::BasePipeServer>  m_BasePipeServer;
 
     std::atomic<uint32_t> m_PacketsReceivedCount;
 
@@ -143,10 +146,10 @@ private:
     std::thread m_ListeningThread;
     std::atomic<bool> m_CloseReceivingThread;
 
-    profiling::PacketVersionResolver m_PacketVersionResolver;
-    profiling::CommandHandlerRegistry m_HandlerRegistry;
+    arm::pipe::PacketVersionResolver m_PacketVersionResolver;
+    arm::pipe::CommandHandlerRegistry m_HandlerRegistry;
 
-    timelinedecoder::TimelineDecoder m_TimelineDecoder;
+    arm::pipe::TimelineDecoder m_TimelineDecoder;
 
     gatordmock::PeriodicCounterCaptureCommandHandler m_CounterCaptureCommandHandler;
     gatordmock::StreamMetadataCommandHandler m_StreamMetadataCommandHandler;
@@ -154,8 +157,8 @@ private:
 
     profiling::DirectoryCaptureCommandHandler m_DirectoryCaptureCommandHandler;
 
-    timelinedecoder::TimelineCaptureCommandHandler m_TimelineCaptureCommandHandler;
-    timelinedecoder::TimelineDirectoryCaptureCommandHandler m_TimelineDirectoryCaptureCommandHandler;
+    arm::pipe::TimelineCaptureCommandHandler m_TimelineCaptureCommandHandler;
+    arm::pipe::TimelineDirectoryCaptureCommandHandler m_TimelineDirectoryCaptureCommandHandler;
 };
 }    // namespace gatordmock
 

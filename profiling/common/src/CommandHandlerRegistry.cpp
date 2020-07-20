@@ -1,18 +1,18 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
-#include "CommandHandlerRegistry.hpp"
 
-#include <armnn/utility/Assert.hpp>
+#include <common/include/Assert.hpp>
+#include <common/include/CommandHandlerRegistry.hpp>
 
-#include <boost/format.hpp>
+#include <sstream>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 void CommandHandlerRegistry::RegisterFunctor(CommandHandlerFunctor* functor,
@@ -20,7 +20,7 @@ void CommandHandlerRegistry::RegisterFunctor(CommandHandlerFunctor* functor,
                                              uint32_t packetId,
                                              uint32_t version)
 {
-    ARMNN_ASSERT_MSG(functor, "Provided functor should not be a nullptr");
+    ARM_PIPE_ASSERT_MSG(functor, "Provided functor should not be a nullptr");
 
     CommandHandlerKey key(familyId, packetId, version);
     registry[key] = functor;
@@ -28,7 +28,7 @@ void CommandHandlerRegistry::RegisterFunctor(CommandHandlerFunctor* functor,
 
 void CommandHandlerRegistry::RegisterFunctor(CommandHandlerFunctor* functor)
 {
-    ARMNN_ASSERT_MSG(functor, "Provided functor should not be a nullptr");
+    ARM_PIPE_ASSERT_MSG(functor, "Provided functor should not be a nullptr");
 
     RegisterFunctor(functor, functor->GetFamilyId(), functor->GetPacketId(), functor->GetVersion());
 }
@@ -40,24 +40,22 @@ CommandHandlerFunctor* CommandHandlerRegistry::GetFunctor(uint32_t familyId,uint
     // Check that the requested key exists
     if (registry.find(key) == registry.end())
     {
-        throw armnn::InvalidArgumentException(
-                    boost::str(boost::format("Functor with requested PacketId=%1% and Version=%2% does not exist")
-                               % packetId
-                               % version));
+        std::stringstream ss;
+        ss << "Functor with requested PacketId=" << packetId << " and Version=" << version << " does not exist";
+        throw ProfilingException(ss.str());
     }
 
     CommandHandlerFunctor* commandHandlerFunctor = registry.at(key);
     if (commandHandlerFunctor == nullptr)
     {
-        throw RuntimeException(
-                    boost::str(boost::format("Invalid functor registered for PacketId=%1% and Version=%2%")
-                               % packetId
-                               % version));
+        std::stringstream ss;
+        ss << "Invalid functor registered for PacketId=" << packetId << " and Version=" << version;
+        throw ProfilingException(ss.str());
     }
 
     return commandHandlerFunctor;
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

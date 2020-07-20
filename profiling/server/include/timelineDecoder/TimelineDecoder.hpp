@@ -1,17 +1,19 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
 
-#include <armnn/profiling/ITimelineDecoder.hpp>
+#include "ITimelineDecoder.hpp"
 
 #include <vector>
 
-namespace armnn
+namespace arm
 {
-namespace timelinedecoder
+
+namespace pipe
 {
+
 class TimelineDecoder : public ITimelineDecoder
 {
 
@@ -66,5 +68,5 @@ private:
     void printEvents();
 };
 
-}
-}
+} // namespace pipe
+} // namespace arm

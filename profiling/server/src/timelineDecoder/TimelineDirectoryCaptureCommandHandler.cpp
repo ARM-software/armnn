@@ -3,21 +3,21 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "TimelineDirectoryCaptureCommandHandler.hpp"
-#include "TimelineCaptureCommandHandler.hpp"
+#include <common/include/CommonProfilingUtils.hpp>
+#include <common/include/SwTrace.hpp>
+#include <server/include/timelineDecoder/TimelineCaptureCommandHandler.hpp>
+#include <server/include/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp>
 
 #include <iostream>
 #include <string>
 
-using namespace armnn::profiling;
-
-namespace armnn
+namespace arm
 {
 
-namespace timelinedecoder
+namespace pipe
 {
 
-void TimelineDirectoryCaptureCommandHandler::ParseData(const armnn::profiling::Packet& packet)
+void TimelineDirectoryCaptureCommandHandler::ParseData(const arm::pipe::Packet& packet)
 {
     uint32_t offset = 0;
 
@@ -35,12 +35,12 @@ void TimelineDirectoryCaptureCommandHandler::ParseData(const armnn::profiling::P
     m_SwTraceHeader.m_ThreadIdBytes = ReadUint8(data, offset);
     offset += uint8_t_size;
 
-    uint32_t numberOfDeclarations = profiling::ReadUint32(data, offset);
+    uint32_t numberOfDeclarations = arm::pipe::ReadUint32(data, offset);
     offset += uint32_t_size;
 
     for (uint32_t declaration = 0; declaration < numberOfDeclarations; ++declaration)
     {
-        m_SwTraceMessages.push_back(profiling::ReadSwTraceMessage(data, offset, packet.GetLength()));
+        m_SwTraceMessages.push_back(arm::pipe::ReadSwTraceMessage(data, offset, packet.GetLength()));
     }
 
     m_TimelineCaptureCommandHandler.SetThreadIdSize(m_SwTraceHeader.m_ThreadIdBytes);
@@ -50,19 +50,19 @@ void TimelineDirectoryCaptureCommandHandler::Print()
 {
     std::string header;
 
-    header.append(profiling::CentreAlignFormatting("decl_id", 12));
+    header.append(arm::pipe::CentreAlignFormatting("decl_id", 12));
     header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("decl_name", 20));
+    header.append(arm::pipe::CentreAlignFormatting("decl_name", 20));
     header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("ui_name", 20));
+    header.append(arm::pipe::CentreAlignFormatting("ui_name", 20));
     header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("arg_types", 16));
+    header.append(arm::pipe::CentreAlignFormatting("arg_types", 16));
     header.append(" | ");
-    header.append(profiling::CentreAlignFormatting("arg_names", 80));
+    header.append(arm::pipe::CentreAlignFormatting("arg_names", 80));
     header.append("\n");
 
     std::cout << "\n" << "\n";
-    std::cout << profiling::CentreAlignFormatting("SW DIRECTORY", static_cast<int>(header.size()));
+    std::cout << arm::pipe::CentreAlignFormatting("SW DIRECTORY", static_cast<int>(header.size()));
     std::cout << "\n";
     std::cout << std::string(header.size(), '=') << "\n";
 
@@ -72,11 +72,11 @@ void TimelineDirectoryCaptureCommandHandler::Print()
     {
         std::string body;
 
-        body.append(profiling::CentreAlignFormatting(std::to_string(swTraceMessage.m_Id), 12));
+        body.append(arm::pipe::CentreAlignFormatting(std::to_string(swTraceMessage.m_Id), 12));
         body.append(" | ");
-        body.append(profiling::CentreAlignFormatting(swTraceMessage.m_Name, 20));
+        body.append(arm::pipe::CentreAlignFormatting(swTraceMessage.m_Name, 20));
         body.append(" | ");
-        body.append(profiling::CentreAlignFormatting(swTraceMessage.m_UiName, 20));
+        body.append(arm::pipe::CentreAlignFormatting(swTraceMessage.m_UiName, 20));
         body.append(" | ");
 
         std::string argTypes;
@@ -85,7 +85,7 @@ void TimelineDirectoryCaptureCommandHandler::Print()
             argTypes += argType;
             argTypes += " ";
         }
-        body.append(profiling::CentreAlignFormatting(argTypes, 16));
+        body.append(arm::pipe::CentreAlignFormatting(argTypes, 16));
         body.append(" | ");
 
         std::string argNames;
@@ -93,7 +93,7 @@ void TimelineDirectoryCaptureCommandHandler::Print()
         {
             argNames += argName + " ";
         }
-        body.append(profiling::CentreAlignFormatting(argNames, 80));
+        body.append(arm::pipe::CentreAlignFormatting(argNames, 80));
 
         body.append("\n");
 
@@ -103,7 +103,7 @@ void TimelineDirectoryCaptureCommandHandler::Print()
     }
 }
 
-void TimelineDirectoryCaptureCommandHandler::operator()(const profiling::Packet& packet)
+void TimelineDirectoryCaptureCommandHandler::operator()(const arm::pipe::Packet& packet)
 {
     ParseData(packet);
 
@@ -113,6 +113,5 @@ void TimelineDirectoryCaptureCommandHandler::operator()(const profiling::Packet&
     }
 }
 
-} //namespace gatordmock
-
-} //namespace armnn
+} //namespace pipe
+} //namespace arm

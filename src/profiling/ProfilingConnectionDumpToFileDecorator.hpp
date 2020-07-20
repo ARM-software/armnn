@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -38,14 +38,14 @@ public:
 
     bool WritePacket(const unsigned char* buffer, uint32_t length) override;
 
-    Packet ReadPacket(uint32_t timeout) override;
+    arm::pipe::Packet ReadPacket(uint32_t timeout) override;
 
 private:
     bool OpenIncomingDumpFile();
 
     bool OpenOutgoingDumpFile();
 
-    void DumpIncomingToFile(const Packet& packet);
+    void DumpIncomingToFile(const arm::pipe::Packet& packet);
 
     bool DumpOutgoingToFile(const unsigned char* buffer, uint32_t length);
 

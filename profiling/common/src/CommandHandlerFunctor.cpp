@@ -1,14 +1,14 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "CommandHandlerFunctor.hpp"
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 uint32_t CommandHandlerFunctor::GetFamilyId() const
@@ -26,6 +26,6 @@ uint32_t CommandHandlerFunctor::GetVersion() const
     return m_Version;
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

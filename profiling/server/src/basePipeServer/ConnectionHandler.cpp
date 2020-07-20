@@ -1,18 +1,21 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "ConnectionHandler.hpp"
 
-#include <string.h>
+#include <server/include/basePipeServer/ConnectionHandler.hpp>
 
-using namespace armnnUtils;
+#include <string>
 
-namespace armnnProfiling
+namespace arm
 {
+
+namespace pipe
+{
+
 ConnectionHandler::ConnectionHandler(const std::string& udsNamespace, const bool setNonBlocking)
 {
-    Sockets::Initialize();
+    arm::pipe::Initialize();
     m_ListeningSocket = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
 
     if (-1 == m_ListeningSocket)
@@ -39,14 +42,13 @@ ConnectionHandler::ConnectionHandler(const std::string& udsNamespace, const bool
 
     if (setNonBlocking)
     {
-        Sockets::SetNonBlocking(m_ListeningSocket);
+        arm::pipe::SetNonBlocking(m_ListeningSocket);
     }
 }
 
 std::unique_ptr<BasePipeServer> ConnectionHandler::GetNewBasePipeServer(const bool echoPackets)
 {
-    armnnUtils::Sockets::Socket clientConnection = armnnUtils::Sockets::Accept(m_ListeningSocket, nullptr, nullptr,
-                                                                               SOCK_CLOEXEC);
+    arm::pipe::Socket clientConnection = arm::pipe::Accept(m_ListeningSocket, nullptr, nullptr, SOCK_CLOEXEC);
     if (clientConnection < 1)
     {
         return nullptr;
@@ -54,4 +56,5 @@ std::unique_ptr<BasePipeServer> ConnectionHandler::GetNewBasePipeServer(const bo
     return std::make_unique<BasePipeServer>(clientConnection, echoPackets);
 }
 
-} // namespace armnnProfiling
+} // namespace pipe
+} // namespace arm

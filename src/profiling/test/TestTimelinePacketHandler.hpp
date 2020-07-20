@@ -6,13 +6,14 @@
 #pragma once
 
 #include <armnn/profiling/ILocalPacketHandler.hpp>
-#include <armnn/profiling/ITimelineDecoder.hpp>
-#include <Packet.hpp>
+#include <server/include/timelineDecoder/ITimelineDecoder.hpp>
 
 #include "ProfilingUtils.hpp"
-#include "TimelineCaptureCommandHandler.hpp"
-#include "TimelineDirectoryCaptureCommandHandler.hpp"
+#include <server/include/timelineDecoder/TimelineCaptureCommandHandler.hpp>
+#include <server/include/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp>
 #include "TimelineModel.hpp"
+
+#include <common/include/Packet.hpp>
 
 #include <condition_variable>
 #include <map>
@@ -27,7 +28,7 @@ namespace profiling
 
 // forward declaration of class
 class TestTimelinePacketHandler;
-class TimelineMessageDecoder : public ITimelineDecoder
+class TimelineMessageDecoder : public arm::pipe::ITimelineDecoder
 {
 public:
     TimelineMessageDecoder(TimelineModel& model) : m_PacketHandler(nullptr), m_TimelineModel(model) {}
@@ -57,7 +58,7 @@ public:
 
     virtual std::vector<uint32_t> GetHeadersAccepted() override; // ILocalPacketHandler
 
-    virtual void HandlePacket(const Packet& packet) override; // ILocalPacketHandler
+    virtual void HandlePacket(const arm::pipe::Packet& packet) override; // ILocalPacketHandler
 
     void Stop();
 
@@ -72,8 +73,8 @@ public:
     }
 
 private:
-    void ProcessDirectoryPacket(const Packet& packet);
-    void ProcessMessagePacket(const Packet& packet);
+    void ProcessDirectoryPacket(const arm::pipe::Packet& packet);
+    void ProcessMessagePacket(const arm::pipe::Packet& packet);
     IInternalProfilingConnection* m_Connection;
     std::mutex m_InferenceCompletedMutex;
     std::condition_variable m_InferenceCompletedConditionVariable;
@@ -82,8 +83,8 @@ private:
     uint32_t m_DirectoryHeader;
     uint32_t m_MessageHeader;
     TimelineMessageDecoder m_MessageDecoder;
-    timelinedecoder::TimelineCaptureCommandHandler m_Decoder;
-    timelinedecoder::TimelineDirectoryCaptureCommandHandler m_DirectoryDecoder;
+    arm::pipe::TimelineCaptureCommandHandler m_Decoder;
+    arm::pipe::TimelineDirectoryCaptureCommandHandler m_DirectoryDecoder;
 };
 
 } // namespace profiling

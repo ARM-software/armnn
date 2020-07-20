@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,9 +8,10 @@
 #include <armnn/profiling/ILocalPacketHandler.hpp>
 #include "DirectoryCaptureCommandHandler.hpp"
 #include "IProfilingConnection.hpp"
-#include <Packet.hpp>
 #include "ProfilingUtils.hpp"
 #include "Runtime.hpp"
+
+#include <common/include/Packet.hpp>
 
 #include <atomic>
 #include <condition_variable>
@@ -37,7 +38,7 @@ public:
 
     std::vector<uint32_t> GetHeadersAccepted() override;
 
-    void HandlePacket(const Packet& packet) override;
+    void HandlePacket(const arm::pipe::Packet& packet) override;
 
 private:
     FileOnlyProfilingConnection* m_FileOnlyProfilingConnection;
@@ -82,28 +83,28 @@ public:
     bool WritePacket(const unsigned char* buffer, uint32_t length) override;
 
     // Sending a packet back to ArmNN.
-    Packet ReadPacket(uint32_t timeout) override;
+    arm::pipe::Packet ReadPacket(uint32_t timeout) override;
 
     void SetEndianess(const TargetEndianness& endianness) override //IInternalProfilingConnection
     {
         m_Endianness = endianness;
     }
 
-    void ReturnPacket(Packet& packet) override; //IInternalProfilingConnection
+    void ReturnPacket(arm::pipe::Packet& packet) override; //IInternalProfilingConnection
 
 private:
     void AddLocalPacketHandler(ILocalPacketHandlerSharedPtr localPacketHandler);
     void StartProcessingThread();
     void ClearReadableList();
-    void DispatchPacketToHandlers(const Packet& packet);
+    void DispatchPacketToHandlers(const arm::pipe::Packet& packet);
 
     void Fail(const std::string& errorMessage);
 
-    void ForwardPacketToHandlers(Packet& packet);
+    void ForwardPacketToHandlers(arm::pipe::Packet& packet);
     void ServiceLocalHandlers();
 
     Runtime::CreationOptions::ExternalProfilingOptions m_Options;
-    std::queue<Packet> m_PacketQueue;
+    std::queue<arm::pipe::Packet> m_PacketQueue;
     TargetEndianness m_Endianness;
 
     std::mutex m_PacketAvailableMutex;
@@ -114,7 +115,7 @@ private:
     std::vector<ILocalPacketHandlerSharedPtr> m_UniversalHandlers;
 
     // List of readable packets for the local packet handlers
-    std::queue<Packet> m_ReadableList;
+    std::queue<arm::pipe::Packet> m_ReadableList;
     // Mutex and condition variable for the readable packet list
     std::mutex m_ReadableMutex;
     std::condition_variable m_ConditionPacketReadable;

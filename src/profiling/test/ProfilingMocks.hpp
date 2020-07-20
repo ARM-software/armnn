@@ -121,7 +121,7 @@ public:
         }
     }
 
-    bool WritePacket(Packet&& packet)
+    bool WritePacket(arm::pipe::Packet&& packet)
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -129,7 +129,7 @@ public:
         return true;
     }
 
-    Packet ReadPacket(uint32_t timeout) override
+    arm::pipe::Packet ReadPacket(uint32_t timeout) override
     {
         IgnoreUnused(timeout);
 
@@ -156,7 +156,7 @@ public:
 private:
     bool m_IsOpen;
     std::vector<std::pair<PacketType, uint32_t>> m_WrittenData;
-    Packet m_Packet;
+    arm::pipe::Packet m_Packet;
     mutable std::mutex m_Mutex;
 };
 

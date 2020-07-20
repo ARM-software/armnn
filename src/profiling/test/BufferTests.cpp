@@ -7,6 +7,8 @@
 #include "PacketBuffer.hpp"
 #include "ProfilingUtils.hpp"
 
+#include <common/include/SwTrace.hpp>
+
 #include <armnn/Exceptions.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -380,8 +382,8 @@ BOOST_AUTO_TEST_CASE(ReadSwTraceMessageExceptionTest0)
 
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int offset = uint32_t_size;
-    BOOST_CHECK_THROW(ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize()),
-                      armnn::RuntimeException);
+    BOOST_CHECK_THROW(arm::pipe::ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize()),
+                      arm::pipe::ProfilingException);
 
 }
 
@@ -402,8 +404,8 @@ BOOST_AUTO_TEST_CASE(ReadSwTraceMessageExceptionTest1)
 
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int offset = uint32_t_size;
-    BOOST_CHECK_THROW(ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize()),
-                      armnn::RuntimeException);
+    BOOST_CHECK_THROW(arm::pipe::ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize()),
+                      arm::pipe::ProfilingException);
 
 }
 

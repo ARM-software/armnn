@@ -1,11 +1,11 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
 
-#include <CommandHandlerFunctor.hpp>
-#include <Packet.hpp>
+#include <common/include/CommandHandlerFunctor.hpp>
+#include <common/include/Packet.hpp>
 
 #include <vector>
 
@@ -15,7 +15,7 @@ namespace armnn
 namespace gatordmock
 {
 
-class PeriodicCounterSelectionResponseHandler : public profiling::CommandHandlerFunctor
+class PeriodicCounterSelectionResponseHandler : public arm::pipe::CommandHandlerFunctor
 {
 
 public:
@@ -33,7 +33,7 @@ public:
         , m_QuietOperation(quietOperation)
     {}
 
-    void operator()(const armnn::profiling::Packet& packet) override;
+    void operator()(const arm::pipe::Packet& packet) override;
 
 private:
     bool m_QuietOperation;

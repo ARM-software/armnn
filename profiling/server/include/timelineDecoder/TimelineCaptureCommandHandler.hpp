@@ -5,20 +5,18 @@
 
 #pragma once
 
-#include <armnn/profiling/ITimelineDecoder.hpp>
+#include "ITimelineDecoder.hpp"
 
-#include <CommandHandlerFunctor.hpp>
-#include <Packet.hpp>
-#include <ProfilingUtils.hpp>
+#include <common/include/CommandHandlerFunctor.hpp>
+#include <common/include/Packet.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace timelinedecoder
+namespace pipe
 {
 
-class TimelineCaptureCommandHandler :
-    public profiling::CommandHandlerFunctor
+class TimelineCaptureCommandHandler : public arm::pipe::CommandHandlerFunctor
 {
     // Utils
     uint32_t uint32_t_size = sizeof(uint32_t);
@@ -39,13 +37,13 @@ public:
         , m_PacketLength(0)
     {}
 
-    void operator()(const armnn::profiling::Packet& packet) override;
+    void operator()(const arm::pipe::Packet& packet) override;
 
 
     void SetThreadIdSize(uint32_t size);
 
 private:
-    void ParseData(const armnn::profiling::Packet& packet);
+    void ParseData(const arm::pipe::Packet& packet);
 
     ITimelineDecoder::TimelineStatus ReadLabel(const unsigned char* data, uint32_t& offset);
     ITimelineDecoder::TimelineStatus ReadEntity(const unsigned char* data, uint32_t& offset);
@@ -60,6 +58,6 @@ private:
 
 };
 
-} //namespace gatordmock
+} //namespace pipe
 
-} //namespace armnn
+} //namespace arm

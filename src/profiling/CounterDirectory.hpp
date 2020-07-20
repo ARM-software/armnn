@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -12,7 +12,7 @@
 #include <unordered_set>
 #include <unordered_map>
 
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 namespace armnn
 {
@@ -48,10 +48,10 @@ public:
                                    const Optional<uint16_t>& counterSetUid = EmptyOptional()) override;
 
     // Getters for counts
-    uint16_t GetCategoryCount()   const override { return boost::numeric_cast<uint16_t>(m_Categories.size());  }
-    uint16_t GetDeviceCount()     const override { return boost::numeric_cast<uint16_t>(m_Devices.size());    }
-    uint16_t GetCounterSetCount() const override { return boost::numeric_cast<uint16_t>(m_CounterSets.size()); }
-    uint16_t GetCounterCount()    const override { return boost::numeric_cast<uint16_t>(m_Counters.size());    }
+    uint16_t GetCategoryCount()   const override { return armnn::numeric_cast<uint16_t>(m_Categories.size());  }
+    uint16_t GetDeviceCount()     const override { return armnn::numeric_cast<uint16_t>(m_Devices.size());    }
+    uint16_t GetCounterSetCount() const override { return armnn::numeric_cast<uint16_t>(m_CounterSets.size()); }
+    uint16_t GetCounterCount()    const override { return armnn::numeric_cast<uint16_t>(m_Counters.size());    }
 
     // Getters for collections
     const Categories&  GetCategories()  const override { return m_Categories;  }

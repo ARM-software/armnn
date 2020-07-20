@@ -1,30 +1,31 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
-#include "BasePipeServer.hpp"
+#include <server/include/basePipeServer/BasePipeServer.hpp>
 
-#include "common/include/Constants.hpp"
+#include <common/include/Constants.hpp>
+#include <common/include/NumericCast.hpp>
 
 #include <iostream>
-#include <boost/cast.hpp>
 #include <vector>
 #include <iomanip>
 #include <string.h>
 
-using namespace armnnUtils;
+namespace arm
+{
 
-namespace armnnProfiling
+namespace pipe
 {
 
 bool BasePipeServer::ReadFromSocket(uint8_t* packetData, uint32_t expectedLength)
 {
     // This is a blocking read until either expectedLength has been received or an error is detected.
     long totalBytesRead = 0;
-    while (boost::numeric_cast<uint32_t>(totalBytesRead) < expectedLength)
+    while (arm::pipe::numeric_cast<uint32_t>(totalBytesRead) < expectedLength)
     {
-        long bytesRead = Sockets::Read(m_ClientConnection, packetData, expectedLength);
+        long bytesRead = arm::pipe::Read(m_ClientConnection, packetData, expectedLength);
         if (bytesRead < 0)
         {
             std::cerr << ": Failure when reading from client socket: " << strerror(errno) << std::endl;
@@ -68,17 +69,17 @@ bool BasePipeServer::WaitForStreamMetaData()
     EchoPacket(PacketDirection::ReceivedData, pipeMagic, 4);
 
     // Before we interpret the length we need to read the pipe_magic word to determine endianness.
-    if (ToUint32(&pipeMagic[0], TargetEndianness::BeWire) == armnnProfiling::PIPE_MAGIC)
+    if (ToUint32(&pipeMagic[0], TargetEndianness::BeWire) == PIPE_MAGIC)
     {
         m_Endianness = TargetEndianness::BeWire;
     }
-    else if (ToUint32(&pipeMagic[0], TargetEndianness::LeWire) == armnnProfiling::PIPE_MAGIC)
+    else if (ToUint32(&pipeMagic[0], TargetEndianness::LeWire) == PIPE_MAGIC)
     {
         m_Endianness = TargetEndianness::LeWire;
     }
     else
     {
-        std::cerr << ": Protocol read error. Unable to read PIPE_MAGIC value." << std::endl;
+        std::cerr << ": Protocol read error. Unable to read the PIPE_MAGIC value." << std::endl;
         return false;
     }
     // Now we know the endianness we can get the length from the header.
@@ -87,7 +88,7 @@ bool BasePipeServer::WaitForStreamMetaData()
     // Read the entire packet.
     std::vector<uint8_t> packetData(metaDataLength);
     if (metaDataLength !=
-        boost::numeric_cast<uint32_t>(Sockets::Read(m_ClientConnection, packetData.data(), metaDataLength)))
+        arm::pipe::numeric_cast<uint32_t>(arm::pipe::Read(m_ClientConnection, packetData.data(), metaDataLength)))
     {
         std::cerr << ": Protocol read error. Data length mismatch." << std::endl;
         return false;
@@ -100,11 +101,11 @@ bool BasePipeServer::WaitForStreamMetaData()
     return true;
 }
 
-armnn::profiling::Packet BasePipeServer::WaitForPacket(uint32_t timeoutMs)
+arm::pipe::Packet BasePipeServer::WaitForPacket(uint32_t timeoutMs)
 {
     // Is there currently more than a headers worth of data waiting to be read?
     int bytes_available;
-    Sockets::Ioctl(m_ClientConnection, FIONREAD, &bytes_available);
+    arm::pipe::Ioctl(m_ClientConnection, FIONREAD, &bytes_available);
     if (bytes_available > 8)
     {
         // Yes there is. Read it:
@@ -115,18 +116,18 @@ armnn::profiling::Packet BasePipeServer::WaitForPacket(uint32_t timeoutMs)
         // No there's not. Poll for more data.
         struct pollfd pollingFd[1]{};
         pollingFd[0].fd = m_ClientConnection;
-        int pollResult  = Sockets::Poll(pollingFd, 1, static_cast<int>(timeoutMs));
+        int pollResult  = arm::pipe::Poll(pollingFd, 1, static_cast<int>(timeoutMs));
 
         switch (pollResult)
         {
             // Error
             case -1:
-                throw armnn::RuntimeException(std::string("File descriptor reported an error during polling: ") +
-                                              strerror(errno));
+                throw ProfilingException(std::string("File descriptor reported an error during polling: ") +
+                                         strerror(errno));
 
                 // Timeout
             case 0:
-                throw armnn::TimeoutException("Timeout while waiting to receive packet.");
+                throw arm::pipe::TimeoutException("Timeout while waiting to receive packet.");
 
                 // Normal poll return. It could still contain an error signal
             default:
@@ -135,16 +136,18 @@ armnn::profiling::Packet BasePipeServer::WaitForPacket(uint32_t timeoutMs)
                 {
                     if (pollingFd[0].revents == POLLNVAL)
                     {
-                        throw armnn::RuntimeException(std::string("Error while polling receiving socket: POLLNVAL"));
+                        throw arm::pipe::ProfilingException(
+                            std::string("Error while polling receiving socket: POLLNVAL"));
                     }
                     if (pollingFd[0].revents == POLLERR)
                     {
-                        throw armnn::RuntimeException(std::string("Error while polling receiving socket: POLLERR: ") +
-                                                      strerror(errno));
+                        throw arm::pipe::ProfilingException(
+                            std::string("Error while polling receiving socket: POLLERR: ") + strerror(errno));
                     }
                     if (pollingFd[0].revents == POLLHUP)
                     {
-                        throw armnn::RuntimeException(std::string("Connection closed by remote client: POLLHUP"));
+                        throw arm::pipe::ProfilingException(
+                            std::string("Connection closed by remote client: POLLHUP"));
                     }
                 }
 
@@ -153,19 +156,20 @@ armnn::profiling::Packet BasePipeServer::WaitForPacket(uint32_t timeoutMs)
                 {
                     // This is a corner case. The socket as been woken up but not with any data.
                     // We'll throw a timeout exception to loop around again.
-                    throw armnn::TimeoutException("File descriptor was polled but no data was available to receive.");
+                    throw arm::pipe::TimeoutException(
+                        "File descriptor was polled but no data was available to receive.");
                 }
                 return ReceivePacket();
         }
     }
 }
 
-armnn::profiling::Packet BasePipeServer::ReceivePacket()
+arm::pipe::Packet BasePipeServer::ReceivePacket()
 {
     uint32_t header[2];
     if (!ReadHeader(header))
     {
-        return armnn::profiling::Packet();
+        return arm::pipe::Packet();
     }
     // Read data_length bytes from the socket.
     std::unique_ptr<unsigned char[]> uniquePacketData = std::make_unique<unsigned char[]>(header[1]);
@@ -173,13 +177,13 @@ armnn::profiling::Packet BasePipeServer::ReceivePacket()
 
     if (!ReadFromSocket(packetData, header[1]))
     {
-        return armnn::profiling::Packet();
+        return arm::pipe::Packet();
     }
 
     EchoPacket(PacketDirection::ReceivedData, packetData, header[1]);
 
     // Construct received packet
-    armnn::profiling::Packet packetRx = armnn::profiling::Packet(header[0], header[1], uniquePacketData);
+    arm::pipe::Packet packetRx = arm::pipe::Packet(header[0], header[1], uniquePacketData);
     if (m_EchoPackets)
     {
         std::cout << "Processing packet ID= " << packetRx.GetPacketId() << " Length=" << packetRx.GetLength()
@@ -206,7 +210,7 @@ bool BasePipeServer::SendPacket(uint32_t packetFamily, uint32_t packetId, const 
         memcpy((packet.data() + 8), data, dataLength);
     }
     EchoPacket(PacketDirection::Sending, packet.data(), packet.size());
-    if (-1 == armnnUtils::Sockets::Write(m_ClientConnection, packet.data(), packet.size()))
+    if (-1 == arm::pipe::Write(m_ClientConnection, packet.data(), packet.size()))
     {
         std::cerr  << ": Failure when writing to client socket: " << strerror(errno) << std::endl;
         return false;
@@ -294,4 +298,5 @@ void BasePipeServer::InsertU32(uint32_t value, uint8_t* data, TargetEndianness e
     }
 }
 
-} // namespace armnnProfiling
+} // namespace pipe
+} // namespace arm

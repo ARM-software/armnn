@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -28,30 +28,30 @@ std::vector<uint32_t> StreamMetaDataProcessor::GetHeadersAccepted()
     return headers;
 }
 
-void StreamMetaDataProcessor::HandlePacket(const Packet& packet)
+void StreamMetaDataProcessor::HandlePacket(const arm::pipe::Packet& packet)
 {
     if (packet.GetHeader() != m_MetaDataPacketHeader)
     {
-        throw armnnProfiling::ProfilingException("StreamMetaDataProcessor can only handle Stream Meta Data Packets");
+        throw arm::pipe::ProfilingException("StreamMetaDataProcessor can only handle Stream Meta Data Packets");
     }
     // determine the endianness of the protocol
     TargetEndianness endianness;
-    if (ToUint32(packet.GetData(),TargetEndianness::BeWire) == armnnProfiling::PIPE_MAGIC)
+    if (ToUint32(packet.GetData(),TargetEndianness::BeWire) == arm::pipe::PIPE_MAGIC)
     {
         endianness = TargetEndianness::BeWire;
     }
-    else if (ToUint32(packet.GetData(), TargetEndianness::LeWire) == armnnProfiling::PIPE_MAGIC)
+    else if (ToUint32(packet.GetData(), TargetEndianness::LeWire) == arm::pipe::PIPE_MAGIC)
     {
         endianness = TargetEndianness::LeWire;
     }
     else
     {
-        throw armnnProfiling::ProfilingException("Protocol read error. Unable to read PIPE_MAGIC value.");
+        throw arm::pipe::ProfilingException("Protocol read error. Unable to read the PIPE_MAGIC value.");
     }
     m_FileOnlyProfilingConnection->SetEndianess(endianness);
     // send back the acknowledgement
     std::unique_ptr<unsigned char[]> uniqueNullPtr = nullptr;
-    Packet returnPacket(0x10000, 0, uniqueNullPtr);
+    arm::pipe::Packet returnPacket(0x10000, 0, uniqueNullPtr);
     m_FileOnlyProfilingConnection->ReturnPacket(returnPacket);
 }
 
@@ -110,12 +110,12 @@ void FileOnlyProfilingConnection::Close()
 bool FileOnlyProfilingConnection::WritePacket(const unsigned char* buffer, uint32_t length)
 {
     ARMNN_ASSERT(buffer);
-    Packet packet = ReceivePacket(buffer, length);
+    arm::pipe::Packet packet = ReceivePacket(buffer, length);
     ForwardPacketToHandlers(packet);
     return true;
 }
 
-void FileOnlyProfilingConnection::ReturnPacket(Packet& packet)
+void FileOnlyProfilingConnection::ReturnPacket(arm::pipe::Packet& packet)
 {
     {
         std::lock_guard<std::mutex> lck(m_PacketAvailableMutex);
@@ -124,7 +124,7 @@ void FileOnlyProfilingConnection::ReturnPacket(Packet& packet)
     m_ConditionPacketAvailable.notify_one();
 }
 
-Packet FileOnlyProfilingConnection::ReadPacket(uint32_t timeout)
+arm::pipe::Packet FileOnlyProfilingConnection::ReadPacket(uint32_t timeout)
 {
     std::unique_lock<std::mutex> lck(m_PacketAvailableMutex);
 
@@ -134,11 +134,11 @@ Packet FileOnlyProfilingConnection::ReadPacket(uint32_t timeout)
                                              std::chrono::milliseconds(timeout),
                                              [&]{return !m_PacketQueue.empty();}))
     {
-        Packet empty;
+        arm::pipe::Packet empty;
         return empty;
     }
 
-    Packet returnedPacket = std::move(m_PacketQueue.front());
+    arm::pipe::Packet returnedPacket = std::move(m_PacketQueue.front());
     m_PacketQueue.pop();
     return returnedPacket;
 }
@@ -199,7 +199,7 @@ void FileOnlyProfilingConnection::StartProcessingThread()
     m_LocalHandlersThread = std::thread(&FileOnlyProfilingConnection::ServiceLocalHandlers, this);
 }
 
-void FileOnlyProfilingConnection::ForwardPacketToHandlers(Packet& packet)
+void FileOnlyProfilingConnection::ForwardPacketToHandlers(arm::pipe::Packet& packet)
 {
     if (m_PacketHandlers.empty())
     {
@@ -224,7 +224,7 @@ void FileOnlyProfilingConnection::ServiceLocalHandlers()
 {
     do
     {
-        Packet returnedPacket;
+        arm::pipe::Packet returnedPacket;
         bool readPacket = false;
         {   // only lock while we are taking the packet off the incoming list
             std::unique_lock<std::mutex> lck(m_ReadableMutex);
@@ -273,7 +273,7 @@ void FileOnlyProfilingConnection::ClearReadableList()
     }
 }
 
-void FileOnlyProfilingConnection::DispatchPacketToHandlers(const Packet& packet)
+void FileOnlyProfilingConnection::DispatchPacketToHandlers(const arm::pipe::Packet& packet)
 {
     for (auto& delegate : m_UniversalHandlers)
     {
@@ -288,7 +288,7 @@ void FileOnlyProfilingConnection::DispatchPacketToHandlers(const Packet& packet)
             {
                 delegate->HandlePacket(packet);
             }
-            catch (const armnnProfiling::ProfilingException& ex)
+            catch (const arm::pipe::ProfilingException& ex)
             {
                 Fail(ex.what());
             }

@@ -1,12 +1,12 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <Packet.hpp>
-#include <CommandHandlerFunctor.hpp>
+#include <common/include/CommandHandlerFunctor.hpp>
+#include <common/include/Packet.hpp>
 
 #include <vector>
 
@@ -23,7 +23,7 @@ struct CounterCaptureValues
     std::vector<uint32_t> m_Values;
 };
 
-class PeriodicCounterCaptureCommandHandler : public profiling::CommandHandlerFunctor
+class PeriodicCounterCaptureCommandHandler : public arm::pipe::CommandHandlerFunctor
 {
 
 public:
@@ -41,14 +41,14 @@ public:
         , m_QuietOperation(quietOperation)
     {}
 
-    void operator()(const armnn::profiling::Packet& packet) override;
+    void operator()(const arm::pipe::Packet& packet) override;
 
     CounterCaptureValues m_CounterCaptureValues;
 
     uint64_t m_CurrentPeriodValue = 0;
 
 private:
-    void ParseData(const armnn::profiling::Packet& packet);
+    void ParseData(const arm::pipe::Packet& packet);
 
     uint64_t m_FirstTimestamp = 0, m_SecondTimestamp = 0;
 

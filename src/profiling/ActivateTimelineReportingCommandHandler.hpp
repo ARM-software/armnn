@@ -1,11 +1,10 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include "CommandHandlerFunctor.hpp"
 #include "ProfilingStateMachine.hpp"
 #include "SendTimelinePacket.hpp"
 #include "IReportStructure.hpp"
@@ -13,7 +12,8 @@
 
 #include "armnn/Optional.hpp"
 
-#include <Packet.hpp>
+#include <common/include/CommandHandlerFunctor.hpp>
+#include <common/include/Packet.hpp>
 
 
 namespace armnn
@@ -22,7 +22,7 @@ namespace armnn
 namespace profiling
 {
 
-class ActivateTimelineReportingCommandHandler : public CommandHandlerFunctor
+class ActivateTimelineReportingCommandHandler : public arm::pipe::CommandHandlerFunctor
 {
 public:
     ActivateTimelineReportingCommandHandler(uint32_t familyId,
@@ -41,7 +41,7 @@ public:
           m_ReportStructure(reportStructure)
     {}
 
-    void operator()(const Packet& packet) override;
+    void operator()(const arm::pipe::Packet& packet) override;
 
 private:
     SendTimelinePacket&    m_SendTimelinePacket;

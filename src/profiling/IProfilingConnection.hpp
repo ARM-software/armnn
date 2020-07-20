@@ -5,8 +5,9 @@
 
 #pragma once
 
-#include <Packet.hpp>
 #include <armnn/profiling/ILocalPacketHandler.hpp>
+
+#include <common/include/Packet.hpp>
 
 #include <cstdint>
 
@@ -27,7 +28,7 @@ public:
 
     virtual bool WritePacket(const unsigned char* buffer, uint32_t length) = 0;
 
-    virtual Packet ReadPacket(uint32_t timeout) = 0;
+    virtual arm::pipe::Packet ReadPacket(uint32_t timeout) = 0;
 };
 
 } // namespace profiling

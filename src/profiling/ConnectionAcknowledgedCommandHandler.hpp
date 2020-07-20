@@ -6,12 +6,13 @@
 #pragma once
 
 #include <armnn/backends/profiling/IBackendProfilingContext.hpp>
-#include "CommandHandlerFunctor.hpp"
 #include "IProfilingServiceStatus.hpp"
 #include "ISendCounterPacket.hpp"
 #include "armnn/profiling/ISendTimelinePacket.hpp"
-#include <Packet.hpp>
 #include "ProfilingStateMachine.hpp"
+
+#include <common/include/CommandHandlerFunctor.hpp>
+#include <common/include/Packet.hpp>
 
 namespace armnn
 {
@@ -19,7 +20,7 @@ namespace armnn
 namespace profiling
 {
 
-class ConnectionAcknowledgedCommandHandler final : public CommandHandlerFunctor
+class ConnectionAcknowledgedCommandHandler final : public arm::pipe::CommandHandlerFunctor
 {
 
 typedef const std::unordered_map<BackendId, std::shared_ptr<armnn::profiling::IBackendProfilingContext>>&
@@ -44,7 +45,7 @@ public:
         , m_BackendProfilingContext(backendProfilingContexts)
     {}
 
-    void operator()(const Packet& packet) override;
+    void operator()(const arm::pipe::Packet& packet) override;
 
     void setTimelineEnabled(bool timelineEnabled)
     {

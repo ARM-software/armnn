@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,7 +32,7 @@ public:
     {
         // populate packet data and construct packet
         std::memcpy(m_PacketData.get(), g_DataPtr, g_DataLength);
-        m_Packet = std::make_unique<Packet>(0u, g_DataLength, m_PacketData);
+        m_Packet = std::make_unique<arm::pipe::Packet>(0u, g_DataLength, m_PacketData);
     }
 
     ~DummyProfilingConnection() = default;
@@ -54,7 +54,7 @@ public:
         return true;
     }
 
-    Packet ReadPacket(uint32_t timeout) override
+    arm::pipe::Packet ReadPacket(uint32_t timeout) override
     {
         armnn::IgnoreUnused(timeout);
         return std::move(*m_Packet);
@@ -63,7 +63,7 @@ public:
 private:
     bool m_Open;
     std::unique_ptr<unsigned char[]> m_PacketData;
-    std::unique_ptr<Packet> m_Packet;
+    std::unique_ptr<arm::pipe::Packet> m_Packet;
 };
 
 std::vector<char> ReadDumpFile(const std::string& dumpFileName)
@@ -105,8 +105,8 @@ BOOST_AUTO_TEST_CASE(DumpIncomingValidFile)
     ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, false);
 
     // NOTE: unique_ptr is needed here because operator=() is deleted for Packet
-    std::unique_ptr<Packet> packet;
-    BOOST_CHECK_NO_THROW(packet = std::make_unique<Packet>(decorator.ReadPacket(0)));
+    std::unique_ptr<arm::pipe::Packet> packet;
+    BOOST_CHECK_NO_THROW(packet = std::make_unique<arm::pipe::Packet>(decorator.ReadPacket(0)));
 
     decorator.Close();
 

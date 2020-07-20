@@ -7,7 +7,6 @@
 #include "../profiling/ProfilingUtils.hpp"
 
 #include <string>
-#include <fstream>
 
 namespace armnn
 {

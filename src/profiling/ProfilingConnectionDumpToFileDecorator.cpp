@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -61,9 +61,9 @@ bool ProfilingConnectionDumpToFileDecorator::WritePacket(const unsigned char* bu
     return success;
 }
 
-Packet ProfilingConnectionDumpToFileDecorator::ReadPacket(uint32_t timeout)
+arm::pipe::Packet ProfilingConnectionDumpToFileDecorator::ReadPacket(uint32_t timeout)
 {
-    Packet packet = m_Connection->ReadPacket(timeout);
+    arm::pipe::Packet packet = m_Connection->ReadPacket(timeout);
     if (!m_Options.m_IncomingCaptureFile.empty())
     {
         DumpIncomingToFile(packet);
@@ -90,7 +90,7 @@ bool ProfilingConnectionDumpToFileDecorator::OpenOutgoingDumpFile()
 /// to write the data into the specified file.
 /// @param packet data packet to write
 /// @return nothing
-void ProfilingConnectionDumpToFileDecorator::DumpIncomingToFile(const Packet& packet)
+void ProfilingConnectionDumpToFileDecorator::DumpIncomingToFile(const arm::pipe::Packet& packet)
 {
     bool success = true;
     if (!m_IncomingDumpFileStream.is_open())

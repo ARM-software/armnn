@@ -31,6 +31,8 @@
 #include "INotifyBackends.hpp"
 #include <armnn/backends/profiling/IBackendProfilingContext.hpp>
 
+#include <list>
+
 namespace armnn
 {
 
@@ -236,22 +238,22 @@ private:
     void CheckCounterUid(uint16_t counterUid) const;
 
     // Profiling service components
-    ExternalProfilingOptions       m_Options;
-    std::atomic<bool>              m_TimelineReporting;
-    CounterDirectory               m_CounterDirectory;
-    CounterIdMap                   m_CounterIdMap;
-    IProfilingConnectionFactoryPtr m_ProfilingConnectionFactory;
-    IProfilingConnectionPtr        m_ProfilingConnection;
-    ProfilingStateMachine          m_StateMachine;
-    CounterIndices                 m_CounterIndex;
-    CounterValues                  m_CounterValues;
-    CommandHandlerRegistry         m_CommandHandlerRegistry;
-    PacketVersionResolver          m_PacketVersionResolver;
-    CommandHandler                 m_CommandHandler;
-    BufferManager                  m_BufferManager;
-    SendCounterPacket              m_SendCounterPacket;
-    SendThread                     m_SendThread;
-    SendTimelinePacket             m_SendTimelinePacket;
+    ExternalProfilingOptions           m_Options;
+    std::atomic<bool>                  m_TimelineReporting;
+    CounterDirectory                   m_CounterDirectory;
+    CounterIdMap                       m_CounterIdMap;
+    IProfilingConnectionFactoryPtr     m_ProfilingConnectionFactory;
+    IProfilingConnectionPtr            m_ProfilingConnection;
+    ProfilingStateMachine              m_StateMachine;
+    CounterIndices                     m_CounterIndex;
+    CounterValues                      m_CounterValues;
+    arm::pipe::CommandHandlerRegistry  m_CommandHandlerRegistry;
+    arm::pipe::PacketVersionResolver   m_PacketVersionResolver;
+    CommandHandler                     m_CommandHandler;
+    BufferManager                      m_BufferManager;
+    SendCounterPacket                  m_SendCounterPacket;
+    SendThread                         m_SendThread;
+    SendTimelinePacket                 m_SendTimelinePacket;
 
     Holder m_Holder;
 

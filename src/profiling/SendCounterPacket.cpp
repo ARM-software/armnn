@@ -4,13 +4,14 @@
 //
 
 #include "SendCounterPacket.hpp"
-#include "EncodeVersion.hpp"
+#include <common/include/EncodeVersion.hpp>
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Conversion.hpp>
 #include <Processes.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <common/include/Constants.hpp>
+#include <common/include/SwTrace.hpp>
 
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -61,19 +62,19 @@ void SendCounterPacket::SendStreamMetaDataPacket()
     //   Timeline Message Directory (packet_family = 1, packet_class = 0, packet_type = 0) Version 1.0.0
     //   Timeline Message (packet_family = 1, packet_class = 0, packet_type = 1) Version 1.0.0
     std::vector<std::pair<uint32_t, uint32_t>> packetVersions;
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 0), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 1), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 2), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 3), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 4), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 5), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 6), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(0, 7), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(3, 0, 0), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(3, 1, 0), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(3, 1, 1), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(1, 0, 0), EncodeVersion(1, 0, 0)));
-    packetVersions.push_back(std::make_pair(ConstructHeader(1, 0, 1), EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 0), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 1), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 2), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 3), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 4), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 5), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 6), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(0, 7), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(3, 0, 0), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(3, 1, 0), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(3, 1, 1), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(1, 0, 0), arm::pipe::EncodeVersion(1, 0, 0)));
+    packetVersions.push_back(std::make_pair(ConstructHeader(1, 0, 1), arm::pipe::EncodeVersion(1, 0, 0)));
     uint32_t numberOfVersions = numeric_cast<uint32_t>(packetVersions.size());
     uint32_t packetVersionSize = numeric_cast<uint32_t>(numberOfVersions * 2 * sizeUint32);
 
@@ -104,9 +105,9 @@ void SendCounterPacket::SendStreamMetaDataPacket()
         // Packet body
 
         offset += sizeUint32;
-        WriteUint32(writeBuffer, offset, armnnProfiling::PIPE_MAGIC); // pipe_magic
+        WriteUint32(writeBuffer, offset, arm::pipe::PIPE_MAGIC); // pipe_magic
         offset += sizeUint32;
-        WriteUint32(writeBuffer, offset, EncodeVersion(1, 0, 0)); // stream_metadata_version
+        WriteUint32(writeBuffer, offset, arm::pipe::EncodeVersion(1, 0, 0)); // stream_metadata_version
         offset += sizeUint32;
         WriteUint32(writeBuffer, offset, MAX_METADATA_PACKET_LENGTH); // max_data_length
         offset += sizeUint32;
@@ -213,7 +214,7 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
 
     // Convert the device name into a SWTrace namestring
     std::vector<uint32_t> categoryNameBuffer;
-    if (!StringToSwTraceString<SwTraceNameCharPolicy>(categoryName, categoryNameBuffer))
+    if (!arm::pipe::StringToSwTraceString<arm::pipe::SwTraceNameCharPolicy>(categoryName, categoryNameBuffer))
     {
         errorMessage = boost::str(boost::format("Cannot convert the name of category (%1%) to an SWTrace namestring")
                                   % categoryName);
@@ -318,7 +319,7 @@ bool SendCounterPacket::CreateDeviceRecord(const DevicePtr& device,
 
     // Convert the device name into a SWTrace string
     std::vector<uint32_t> deviceNameBuffer;
-    if (!StringToSwTraceString<SwTraceCharPolicy>(deviceName, deviceNameBuffer))
+    if (!arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(deviceName, deviceNameBuffer))
     {
         errorMessage = boost::str(boost::format("Cannot convert the name of device %1% (%2%) to an SWTrace string")
                                   % deviceUid
@@ -368,7 +369,7 @@ bool SendCounterPacket::CreateCounterSetRecord(const CounterSetPtr& counterSet,
 
     // Convert the device name into a SWTrace namestring
     std::vector<uint32_t> counterSetNameBuffer;
-    if (!StringToSwTraceString<SwTraceNameCharPolicy>(counterSet->m_Name, counterSetNameBuffer))
+    if (!arm::pipe::StringToSwTraceString<arm::pipe::SwTraceNameCharPolicy>(counterSet->m_Name, counterSetNameBuffer))
     {
         errorMessage = boost::str(boost::format("Cannot convert the name of counter set %1% (%2%) to "
                                                 "an SWTrace namestring")
@@ -465,7 +466,7 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
 
     // Convert the counter name into a SWTrace string
     std::vector<uint32_t> counterNameBuffer;
-    if (!StringToSwTraceString<SwTraceCharPolicy>(counterName, counterNameBuffer))
+    if (!arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(counterName, counterNameBuffer))
     {
         errorMessage = boost::str(boost::format("Cannot convert the name of counter %1% (name: %2%) "
                                                 "to an SWTrace string")
@@ -482,7 +483,7 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
 
     // Convert the counter description into a SWTrace string
     std::vector<uint32_t> counterDescriptionBuffer;
-    if (!StringToSwTraceString<SwTraceCharPolicy>(counterDescription, counterDescriptionBuffer))
+    if (!arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(counterDescription, counterDescriptionBuffer))
     {
         errorMessage = boost::str(boost::format("Cannot convert the description of counter %1% (description: %2%) "
                                                 "to an SWTrace string")
@@ -507,7 +508,7 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
     if (includeUnits)
     {
         // Convert the counter units into a SWTrace namestring
-        if (!StringToSwTraceString<SwTraceNameCharPolicy>(counterUnits, counterUnitsBuffer))
+        if (!arm::pipe::StringToSwTraceString<arm::pipe::SwTraceNameCharPolicy>(counterUnits, counterUnitsBuffer))
         {
             errorMessage = boost::str(boost::format("Cannot convert the units of counter %1% (units: %2%) "
                                                     "to an SWTrace string")

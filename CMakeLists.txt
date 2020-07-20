@@ -1,5 +1,5 @@
 #
-# Copyright © 2020 Arm Ltd. and Contributors All rights reserved.
+# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 # Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 #
@@ -75,7 +75,6 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/Threads.hpp
     src/armnnUtils/Threads.cpp
     src/armnnUtils/Transpose.cpp
-    src/armnnUtils/WindowsWrapper.hpp
     )
 
 add_library_ex(armnnUtils STATIC ${armnnUtils_sources})
@@ -252,12 +251,6 @@ list(APPEND armnn_sources
     include/armnn/utility/NumericCast.hpp
     include/armnn/utility/PolymorphicDowncast.hpp
     include/armnn/utility/StringUtils.hpp
-    profiling/common/include/Packet.hpp
-    profiling/common/include/ProfilingException.hpp
-    profiling/common/include/SocketConnectionException.hpp
-    profiling/common/include/Constants.hpp
-    profiling/common/include/NetworkSockets.hpp
-    profiling/common/src/NetworkSockets.cpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp
     src/armnn/layers/ActivationLayer.hpp
@@ -478,12 +471,6 @@ list(APPEND armnn_sources
     src/profiling/BufferManager.hpp
     src/profiling/CommandHandler.cpp
     src/profiling/CommandHandler.hpp
-    src/profiling/CommandHandlerFunctor.cpp
-    src/profiling/CommandHandlerFunctor.hpp
-    src/profiling/CommandHandlerKey.cpp
-    src/profiling/CommandHandlerKey.hpp
-    src/profiling/CommandHandlerRegistry.cpp
-    src/profiling/CommandHandlerRegistry.hpp
     src/profiling/ConnectionAcknowledgedCommandHandler.cpp
     src/profiling/ConnectionAcknowledgedCommandHandler.hpp
     src/profiling/CounterDirectory.cpp
@@ -494,7 +481,6 @@ list(APPEND armnn_sources
     src/profiling/DeactivateTimelineReportingCommandHandler.hpp
     src/profiling/DirectoryCaptureCommandHandler.cpp
     src/profiling/DirectoryCaptureCommandHandler.hpp
-    src/profiling/EncodeVersion.hpp
     src/profiling/FileOnlyProfilingConnection.cpp
     src/profiling/FileOnlyProfilingConnection.hpp
     src/profiling/Holder.cpp
@@ -517,8 +503,6 @@ list(APPEND armnn_sources
     src/profiling/NullProfilingConnection.hpp
     src/profiling/PacketBuffer.cpp
     src/profiling/PacketBuffer.hpp
-    src/profiling/PacketVersionResolver.cpp
-    src/profiling/PacketVersionResolver.hpp
     src/profiling/PeriodicCounterCapture.hpp
     src/profiling/PeriodicCounterCapture.cpp
     src/profiling/PeriodicCounterSelectionCommandHandler.cpp
@@ -558,6 +542,7 @@ list(APPEND armnn_sources
     third-party/fmt/core.h
     third-party/fmt/format.h
     third-party/fmt/format-inl.h
+    third-party/fmt/src/format.cc
     third-party/ghc/filesystem.hpp
     third-party/half/half.hpp
     )
@@ -587,7 +572,7 @@ target_include_directories(armnn PRIVATE src/backends)
 target_include_directories(armnn PRIVATE src/profiling)
 target_include_directories(armnn PRIVATE profiling/common/include)
 
-target_link_libraries(armnn armnnUtils)
+target_link_libraries(armnn armnnUtils pipeCommon)
 
 target_link_libraries(armnn ${CMAKE_DL_LIBS})
 if ("${CMAKE_SYSTEM_NAME}" STREQUAL Windows)
@@ -925,7 +910,7 @@ if(BUILD_UNIT_TESTS)
     if(BUILD_TIMELINE_DECODER)
         list(APPEND unittest_sources
              src/timelineDecoder/tests/JSONTimelineDecoderTests.cpp
-             src/timelineDecoder/tests/TimelineTests.cpp
+             profiling/server/src/timelineDecoder/tests/TimelineTests.cpp
              )
     endif()
 
@@ -971,6 +956,7 @@ if(BUILD_UNIT_TESTS)
 
     if(BUILD_TIMELINE_DECODER)
         target_link_libraries(UnitTests timelineDecoder)
+        target_link_libraries(UnitTests jsonTimelineDecoder)
     endif()
 
     if(BUILD_TF_LITE_PARSER)
@@ -1045,6 +1031,8 @@ if(BUILD_BASE_PIPE_SERVER)
 endif()
 
 if(BUILD_TIMELINE_DECODER)
+    add_subdirectory(profiling/server/src/timelineDecoder)
+    add_subdirectory(profiling/common/src)
     add_subdirectory(src/timelineDecoder)
 endif()
 

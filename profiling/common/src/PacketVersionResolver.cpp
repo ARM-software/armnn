@@ -1,16 +1,14 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
-#include "PacketVersionResolver.hpp"
+#include <common/include/PacketVersionResolver.hpp>
 
-#include <armnn/utility/IgnoreUnused.hpp>
-
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 bool PacketKey::operator<(const PacketKey& rhs) const
@@ -68,6 +66,6 @@ Version PacketVersionResolver::ResolvePacketVersion(uint32_t familyId, uint32_t 
     return Version(1, 0, 0);
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

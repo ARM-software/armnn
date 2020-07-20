@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,7 +7,7 @@
 #include "CommandLineProcessor.hpp"
 #include "GatordMockService.hpp"
 
-#include <ConnectionHandler.hpp>
+#include <server/include/basePipeServer/ConnectionHandler.hpp>
 
 #include <string>
 #include <signal.h>
@@ -19,11 +19,11 @@ using namespace gatordmock;
 static volatile bool run = true;
 void exit_capture(int signum)
 {
-    IgnoreUnused(signum);
+    arm::pipe::IgnoreUnused(signum);
     run = false;
 }
 
-bool CreateMockService(std::unique_ptr<armnnProfiling::BasePipeServer> basePipeServer,
+bool CreateMockService(std::unique_ptr<arm::pipe::BasePipeServer> basePipeServer,
                        std::string commandFile,
                        bool isEchoEnabled)
 {
@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
     std::string commandFile = cmdLine.GetCommandFile();
 
     // make the socket non-blocking so we can exit the loop
-    armnnProfiling::ConnectionHandler connectionHandler(cmdLine.GetUdsNamespace(), true);
+    arm::pipe::ConnectionHandler connectionHandler(cmdLine.GetUdsNamespace(), true);
 
     while (run)
     {

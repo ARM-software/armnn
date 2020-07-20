@@ -1,12 +1,13 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include "CommandHandlerFunctor.hpp"
 #include "CounterDirectory.hpp"
+
+#include <common/include/CommandHandlerFunctor.hpp>
 
 #include <atomic>
 
@@ -30,7 +31,7 @@ struct CounterDirectoryEventRecord
     uint16_t m_MaxCounterUid;
 };
 
-class DirectoryCaptureCommandHandler : public profiling::CommandHandlerFunctor
+class DirectoryCaptureCommandHandler : public arm::pipe::CommandHandlerFunctor
 {
 
 public:
@@ -40,7 +41,7 @@ public:
         , m_AlreadyParsed(false)
     {}
 
-    void operator()(const armnn::profiling::Packet& packet) override;
+    void operator()(const arm::pipe::Packet& packet) override;
 
     const ICounterDirectory& GetCounterDirectory() const;
 
@@ -61,7 +62,7 @@ public:
     }
 
 private:
-    void ParseData(const armnn::profiling::Packet& packet);
+    void ParseData(const arm::pipe::Packet& packet);
 
     void ReadCategoryRecords(const unsigned char* data, uint32_t offset, std::vector<uint32_t> categoryOffsets);
 

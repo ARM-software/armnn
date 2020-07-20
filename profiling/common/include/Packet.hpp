@@ -1,18 +1,18 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/Exceptions.hpp>
+#include "ProfilingException.hpp"
 
 #include <memory>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class Packet
@@ -45,7 +45,7 @@ public:
 
         if (length == 0 && m_Data != nullptr)
         {
-            throw armnn::InvalidArgumentException("Data should be null when length is zero");
+            throw arm::pipe::InvalidArgumentException("Data should be null when length is zero");
         }
     }
 
@@ -86,6 +86,6 @@ private:
     std::unique_ptr<unsigned char[]> m_Data;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

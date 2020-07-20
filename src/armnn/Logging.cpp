@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -9,7 +9,7 @@
 #include <armnn/utility/Assert.hpp>
 
 #if defined(_MSC_VER)
-#include <WindowsWrapper.hpp>
+#include <commons/include/WindowsWrapper.hpp>
 #endif
 
 #if defined(__ANDROID__)

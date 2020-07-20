@@ -1,9 +1,9 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
-#include <ConnectionHandler.hpp>
+#include <server/include/basePipeServer/ConnectionHandler.hpp>
 
 #include <SocketProfilingConnection.hpp>
 #include <Processes.hpp>
@@ -15,7 +15,7 @@
 BOOST_AUTO_TEST_SUITE(BasePipeServerTests)
 
 using namespace armnn;
-using namespace armnnProfiling;
+using namespace arm::pipe;
 
 BOOST_AUTO_TEST_CASE(BasePipeServerTest)
 {
@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(BasePipeServerTest)
     // The socket should close once we leave the scope of BOOST_CHECK_NO_THROW
     // and socketProfilingConnection should fail to connect
     BOOST_CHECK_THROW(profiling::SocketProfilingConnection socketProfilingConnection,
-                      armnnProfiling::SocketConnectionException);
+                      arm::pipe::SocketConnectionException);
 
     // Try to initialize a listening socket through the ConnectionHandler again
     ConnectionHandler connectionHandler(udsNamespace, true);

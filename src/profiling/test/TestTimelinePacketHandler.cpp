@@ -7,11 +7,8 @@
 #include "IProfilingConnection.hpp"
 #include <LabelsAndEventClasses.hpp>
 
-#include <armnn/utility/IgnoreUnused.hpp>
-
 #include <chrono>
 #include <iostream>
-#include <sstream>
 
 namespace armnn
 {
@@ -27,7 +24,7 @@ std::vector<uint32_t> TestTimelinePacketHandler::GetHeadersAccepted()
     return headers;
 }
 
-void TestTimelinePacketHandler::HandlePacket(const Packet& packet)
+void TestTimelinePacketHandler::HandlePacket(const arm::pipe::Packet& packet)
 {
     if (packet.GetHeader() == m_DirectoryHeader)
     {
@@ -79,44 +76,46 @@ void TestTimelinePacketHandler::SetInferenceComplete()
     m_InferenceCompletedConditionVariable.notify_one();
 }
 
-void TestTimelinePacketHandler::ProcessDirectoryPacket(const Packet& packet)
+void TestTimelinePacketHandler::ProcessDirectoryPacket(const arm::pipe::Packet& packet)
 {
     m_DirectoryDecoder(packet);
 }
 
-void TestTimelinePacketHandler::ProcessMessagePacket(const Packet& packet)
+void TestTimelinePacketHandler::ProcessMessagePacket(const arm::pipe::Packet& packet)
 {
     m_Decoder(packet);
 }
 
 // TimelineMessageDecoder functions
-ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateEntity(const Entity& entity)
+arm::pipe::ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateEntity(const Entity& entity)
 {
     m_TimelineModel.AddEntity(entity.m_Guid);
-    return ITimelineDecoder::TimelineStatus::TimelineStatus_Success;
+    return arm::pipe::ITimelineDecoder::TimelineStatus::TimelineStatus_Success;
 }
 
-ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateEventClass(
-    const ITimelineDecoder::EventClass& eventClass)
+arm::pipe::ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateEventClass(
+    const arm::pipe::ITimelineDecoder::EventClass& eventClass)
 {
     m_TimelineModel.AddEventClass(eventClass);
-    return ITimelineDecoder::TimelineStatus::TimelineStatus_Success;
+    return arm::pipe::ITimelineDecoder::TimelineStatus::TimelineStatus_Success;
 }
 
-ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateEvent(const ITimelineDecoder::Event& event)
+arm::pipe::ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateEvent(
+    const arm::pipe::ITimelineDecoder::Event& event)
 {
     m_TimelineModel.AddEvent(event);
-    return ITimelineDecoder::TimelineStatus::TimelineStatus_Success;
+    return arm::pipe::ITimelineDecoder::TimelineStatus::TimelineStatus_Success;
 }
 
-ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateLabel(const ITimelineDecoder::Label& label)
+arm::pipe::ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateLabel(
+    const arm::pipe::ITimelineDecoder::Label& label)
 {
     m_TimelineModel.AddLabel(label);
-    return ITimelineDecoder::TimelineStatus::TimelineStatus_Success;
+    return arm::pipe::ITimelineDecoder::TimelineStatus::TimelineStatus_Success;
 }
 
-ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateRelationship(
-    const ITimelineDecoder::Relationship& relationship)
+arm::pipe::ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateRelationship(
+    const arm::pipe::ITimelineDecoder::Relationship& relationship)
 {
     m_TimelineModel.AddRelationship(relationship);
     // check to see if this is an execution link to an inference of event class end of life
@@ -133,7 +132,7 @@ ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateRelationship(
             }
         }
     }
-    return ITimelineDecoder::TimelineStatus::TimelineStatus_Success;
+    return arm::pipe::ITimelineDecoder::TimelineStatus::TimelineStatus_Success;
 }
 
 } // namespace profiling

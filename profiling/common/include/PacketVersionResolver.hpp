@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,10 +7,10 @@
 
 #include "EncodeVersion.hpp"
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class PacketKey final
@@ -45,6 +45,6 @@ public:
     Version ResolvePacketVersion(uint32_t familyId, uint32_t packetId) const;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

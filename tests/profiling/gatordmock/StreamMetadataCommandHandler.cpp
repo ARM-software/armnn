@@ -1,15 +1,14 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "StreamMetadataCommandHandler.hpp"
 
-#include <ProfilingUtils.hpp>
+#include <common/include/CommonProfilingUtils.hpp>
 
 #include <iostream>
-
-using namespace armnn::profiling;
+#include <sstream>
 
 namespace armnn
 {
@@ -17,7 +16,7 @@ namespace armnn
 namespace gatordmock
 {
 
-void StreamMetadataCommandHandler::operator()(const Packet& packet)
+void StreamMetadataCommandHandler::operator()(const arm::pipe::Packet& packet)
 {
     ParseData(packet);
 
@@ -57,7 +56,7 @@ std::string ReadString(const unsigned char* buffer, unsigned int &offset)
     return stringPtr != nullptr ? std::string(stringPtr) : "";
 }
 
-void StreamMetadataCommandHandler::ParseData(const Packet &packet)
+void StreamMetadataCommandHandler::ParseData(const arm::pipe::Packet &packet)
 {
     // Check that at least the packet contains the fixed-length fields
     if (packet.GetLength() < 80)
@@ -73,23 +72,23 @@ void StreamMetadataCommandHandler::ParseData(const Packet &packet)
     unsigned int offset = 0;
 
     // Get the fixed-length fields
-    m_PipeMagic = ReadUint32(buffer, offset);
+    m_PipeMagic = arm::pipe::ReadUint32(buffer, offset);
     offset += uint32_t_size;
-    m_StreamMetadataVersion = ReadUint32(buffer, offset);
+    m_StreamMetadataVersion = arm::pipe::ReadUint32(buffer, offset);
     offset += uint32_t_size;
-    m_MaxDataLen = ReadUint32(buffer, offset);
+    m_MaxDataLen = arm::pipe::ReadUint32(buffer, offset);
     offset += uint32_t_size;
-    m_Pid = ReadUint32(buffer, offset);
+    m_Pid = arm::pipe::ReadUint32(buffer, offset);
     offset += uint32_t_size;
-    m_OffsetInfo = ReadUint32(buffer, offset);
+    m_OffsetInfo = arm::pipe::ReadUint32(buffer, offset);
     offset += uint32_t_size;
-    m_OffsetHwVersion = ReadUint32(buffer, offset);
+    m_OffsetHwVersion = arm::pipe::ReadUint32(buffer, offset);
     offset += uint32_t_size;
-    m_OffsetSwVersion = ReadUint32(buffer, offset);
+    m_OffsetSwVersion = arm::pipe::ReadUint32(buffer, offset);
     offset += uint32_t_size;
-    m_OffsetProcessName = ReadUint32(buffer, offset);
+    m_OffsetProcessName = arm::pipe::ReadUint32(buffer, offset);
     offset += uint32_t_size;
-    m_OffsetPacketVersionTable = ReadUint32(buffer, offset);
+    m_OffsetPacketVersionTable = arm::pipe::ReadUint32(buffer, offset);
     offset += uint32_t_size * 2; // Also skipping the reserved word (all zeros)
 
     // Get the string fields
@@ -103,15 +102,15 @@ void StreamMetadataCommandHandler::ParseData(const Packet &packet)
     if (m_OffsetPacketVersionTable > 0)
     {
         offset = m_OffsetPacketVersionTable;
-        uint16_t packetEntries = ReadUint16(buffer, offset + uint16_t_size);
+        uint16_t packetEntries = arm::pipe::ReadUint16(buffer, offset + uint16_t_size);
         offset += uint32_t_size; // Also skipping the reserved bytes (all zeros)
         for (uint16_t i = 0; i < packetEntries; i++)
         {
-            uint16_t packetFamilyAndId = ReadUint16(buffer, offset + uint16_t_size);
+            uint16_t packetFamilyAndId = arm::pipe::ReadUint16(buffer, offset + uint16_t_size);
             uint16_t packetFamily = (packetFamilyAndId >> 10) & 0x003F;
             uint16_t packetId     = (packetFamilyAndId >>  0) & 0x03FF;
             offset += uint32_t_size; // Also skipping the reserved bytes (all zeros)
-            uint32_t packetVersion = ReadUint32(buffer, offset);
+            uint32_t packetVersion = arm::pipe::ReadUint32(buffer, offset);
             offset += uint32_t_size;
 
             m_PacketVersionTable.push_back({ packetFamily, packetId, packetVersion });

@@ -3,11 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <TimelineCaptureCommandHandler.hpp>
-#include <TimelineDirectoryCaptureCommandHandler.hpp>
-#include <TimelineDecoder.hpp>
+#include <common/include/CommandHandlerFunctor.hpp>
+#include <common/include/CommonProfilingUtils.hpp>
+#include <server/include/timelineDecoder/TimelineCaptureCommandHandler.hpp>
+#include <server/include/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp>
+#include <server/include/timelineDecoder/TimelineDecoder.hpp>
 
-#include <CommandHandlerFunctor.hpp>
+#include <BufferManager.hpp>
 #include <Threads.hpp>
 #include <ProfilingService.hpp>
 #include <PacketBuffer.hpp>
@@ -18,53 +20,51 @@
 
 BOOST_AUTO_TEST_SUITE(TimelineDecoderTests)
 
-using namespace armnn;
-using namespace timelinedecoder;
-
 void SendTimelinePacketToCommandHandler(const unsigned char* packetBuffer,
-                                        profiling::CommandHandlerFunctor &CommandHandler)
+                                        arm::pipe::CommandHandlerFunctor& CommandHandler)
 {
     uint32_t uint32_t_size = sizeof(uint32_t);
     unsigned int offset = 0;
 
     uint32_t header[2];
-    header[0] = profiling::ReadUint32(packetBuffer, offset);
+    header[0] = arm::pipe::ReadUint32(packetBuffer, offset);
     offset += uint32_t_size;
-    header[1] = profiling::ReadUint32(packetBuffer, offset);
+    header[1] = arm::pipe::ReadUint32(packetBuffer, offset);
     offset += uint32_t_size;
     uint32_t PacketDataLength  = header[1] & 0x00FFFFFF;
 
     auto uniquePacketData = std::make_unique<unsigned char[]>(PacketDataLength);
     std::memcpy(uniquePacketData.get(), packetBuffer + offset, PacketDataLength);
 
-    armnn::profiling::Packet packet(header[0], PacketDataLength, uniquePacketData);
+    arm::pipe::Packet packet(header[0], PacketDataLength, uniquePacketData);
 
     BOOST_CHECK(std::memcmp(packetBuffer + offset, packet.GetData(), packet.GetLength()) == 0);
 
     CommandHandler(packet);
 }
 
-void PushEntity(TimelineDecoder::Model& model, const ITimelineDecoder::Entity entity)
+void PushEntity(arm::pipe::TimelineDecoder::Model& model, const arm::pipe::ITimelineDecoder::Entity entity)
 {
     model.m_Entities.emplace_back(entity);
 }
 
-void PushEventClass(TimelineDecoder::Model& model, const ITimelineDecoder::EventClass eventClass)
+void PushEventClass(arm::pipe::TimelineDecoder::Model& model, const arm::pipe::ITimelineDecoder::EventClass eventClass)
 {
     model.m_EventClasses.emplace_back(eventClass);
 }
 
-void PushEvent(TimelineDecoder::Model& model, const ITimelineDecoder::Event event)
+void PushEvent(arm::pipe::TimelineDecoder::Model& model, const arm::pipe::ITimelineDecoder::Event event)
 {
     model.m_Events.emplace_back(event);
 }
 
-void PushLabel(TimelineDecoder::Model& model, const ITimelineDecoder::Label label)
+void PushLabel(arm::pipe::TimelineDecoder::Model& model, const arm::pipe::ITimelineDecoder::Label label)
 {
     model.m_Labels.emplace_back(label);
 }
 
-void PushRelationship(TimelineDecoder::Model& model, const ITimelineDecoder::Relationship relationship)
+void PushRelationship(arm::pipe::TimelineDecoder::Model& model,
+                      const arm::pipe::ITimelineDecoder::Relationship relationship)
 {
     model.m_Relationships.emplace_back(relationship);
 }
@@ -75,30 +75,30 @@ BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
     uint32_t uint32_t_size = sizeof(uint32_t);
     uint32_t uint64_t_size = sizeof(uint64_t);
 
-    profiling::BufferManager bufferManager(5);
-    profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
+    armnn::profiling::BufferManager bufferManager(5);
+    armnn::profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
 
-    std::unique_ptr<profiling::ISendTimelinePacket> sendTimelinePacket =
+    std::unique_ptr<armnn::profiling::ISendTimelinePacket> sendTimelinePacket =
             timelinePacketWriterFactory.GetSendTimelinePacket();
 
-    profiling::PacketVersionResolver packetVersionResolver;
+    arm::pipe::PacketVersionResolver packetVersionResolver;
 
-    TimelineDecoder timelineDecoder;
-    TimelineCaptureCommandHandler timelineCaptureCommandHandler(
+    arm::pipe::TimelineDecoder timelineDecoder;
+    arm::pipe::TimelineCaptureCommandHandler timelineCaptureCommandHandler(
             1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder);
 
-    TimelineDirectoryCaptureCommandHandler timelineDirectoryCaptureCommandHandler(
+    arm::pipe::TimelineDirectoryCaptureCommandHandler timelineDirectoryCaptureCommandHandler(
             1, 0, packetVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue(),
             timelineCaptureCommandHandler, true);
 
     sendTimelinePacket->SendTimelineMessageDirectoryPackage();
     sendTimelinePacket->Commit();
 
-    std::vector<profiling::SwTraceMessage> swTraceBufferMessages;
+    std::vector<arm::pipe::SwTraceMessage> swTraceBufferMessages;
 
     unsigned int offset = uint32_t_size * 2;
 
-    std::unique_ptr<profiling::IPacketBuffer> packetBuffer = bufferManager.GetReadableBuffer();
+    std::unique_ptr<armnn::profiling::IPacketBuffer> packetBuffer = bufferManager.GetReadableBuffer();
 
     uint8_t readStreamVersion = ReadUint8(packetBuffer, offset);
     BOOST_CHECK(readStreamVersion == 4);
@@ -110,11 +110,11 @@ BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
     BOOST_CHECK(readThreadIdBytes == armnn::profiling::ThreadIdSize);
     offset += uint8_t_size;
 
-    uint32_t declarationSize = profiling::ReadUint32(packetBuffer, offset);
+    uint32_t declarationSize = arm::pipe::ReadUint32(packetBuffer->GetReadableData(), offset);
     offset += uint32_t_size;
     for(uint32_t i = 0; i < declarationSize; ++i)
     {
-        swTraceBufferMessages.push_back(profiling::ReadSwTraceMessage(packetBuffer->GetReadableData(),
+        swTraceBufferMessages.push_back(arm::pipe::ReadSwTraceMessage(packetBuffer->GetReadableData(),
                                                                       offset,
                                                                       packetBuffer->GetSize()));
     }
@@ -123,8 +123,8 @@ BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
 
     for(uint32_t index = 0; index < declarationSize; ++index)
     {
-        profiling::SwTraceMessage& bufferMessage = swTraceBufferMessages[index];
-        profiling::SwTraceMessage& handlerMessage = timelineDirectoryCaptureCommandHandler.m_SwTraceMessages[index];
+        arm::pipe::SwTraceMessage& bufferMessage = swTraceBufferMessages[index];
+        arm::pipe::SwTraceMessage& handlerMessage = timelineDirectoryCaptureCommandHandler.m_SwTraceMessages[index];
 
         BOOST_CHECK(bufferMessage.m_Name == handlerMessage.m_Name);
         BOOST_CHECK(bufferMessage.m_UiName == handlerMessage.m_UiName);
@@ -146,23 +146,23 @@ BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
 
 BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
 {
-    profiling::BufferManager bufferManager(50);
-    profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
+    armnn::profiling::BufferManager bufferManager(50);
+    armnn::profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
 
-    std::unique_ptr<profiling::ISendTimelinePacket> sendTimelinePacket =
+    std::unique_ptr<armnn::profiling::ISendTimelinePacket> sendTimelinePacket =
         timelinePacketWriterFactory.GetSendTimelinePacket();
 
-    profiling::PacketVersionResolver packetVersionResolver;
+    arm::pipe::PacketVersionResolver packetVersionResolver;
 
-    TimelineDecoder timelineDecoder;
-    const TimelineDecoder::Model& model = timelineDecoder.GetModel();
+    arm::pipe::TimelineDecoder timelineDecoder;
+    const arm::pipe::TimelineDecoder::Model& model = timelineDecoder.GetModel();
 
 
-    TimelineCaptureCommandHandler timelineCaptureCommandHandler(
+    arm::pipe::TimelineCaptureCommandHandler timelineCaptureCommandHandler(
         1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder,
         armnn::profiling::ThreadIdSize);
 
-    using Status = ITimelineDecoder::TimelineStatus;
+    using Status = arm::pipe::ITimelineDecoder::TimelineStatus;
     BOOST_CHECK(timelineDecoder.SetEntityCallback(PushEntity)             == Status::TimelineStatus_Success);
     BOOST_CHECK(timelineDecoder.SetEventClassCallback(PushEventClass)     == Status::TimelineStatus_Success);
     BOOST_CHECK(timelineDecoder.SetEventCallback(PushEvent)               == Status::TimelineStatus_Success);
@@ -181,15 +181,15 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
     unsigned char* uCharThreadId = new unsigned char[armnn::profiling::ThreadIdSize]();;
     uint64_t uint64ThreadId;
 
-    profiling::WriteBytes(uCharThreadId, 0, &threadId, armnn::profiling::ThreadIdSize);
+    arm::pipe::WriteBytes(uCharThreadId, 0, &threadId, armnn::profiling::ThreadIdSize);
 
     if (armnn::profiling::ThreadIdSize == 4)
     {
-        uint64ThreadId =  profiling::ReadUint32(uCharThreadId, 0);
+        uint64ThreadId =  arm::pipe::ReadUint32(uCharThreadId, 0);
     }
     else if (armnn::profiling::ThreadIdSize == 8)
     {
-        uint64ThreadId =  profiling::ReadUint64(uCharThreadId, 0);
+        uint64ThreadId =  arm::pipe::ReadUint64(uCharThreadId, 0);
     }
     delete[] uCharThreadId;
 
@@ -227,7 +227,8 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
                                            timelineCaptureCommandHandler);
 
         // Send relationship
-        profiling::ProfilingRelationshipType relationshipType = profiling::ProfilingRelationshipType::DataLink;
+        armnn::profiling::ProfilingRelationshipType relationshipType =
+            armnn::profiling::ProfilingRelationshipType::DataLink;
         sendTimelinePacket->SendTimelineRelationshipBinaryPacket(relationshipType,
                                                                  relationshipGuid,
                                                                  headGuid,
@@ -251,7 +252,8 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
         BOOST_CHECK(model.m_Labels[i].m_Guid == labelGuid);
         BOOST_CHECK(model.m_Labels[i].m_Name == labelName);
 
-        BOOST_CHECK(model.m_Relationships[i].m_RelationshipType == ITimelineDecoder::RelationshipType::DataLink);
+        BOOST_CHECK(model.m_Relationships[i].m_RelationshipType ==
+            arm::pipe::ITimelineDecoder::RelationshipType::DataLink);
         BOOST_CHECK(model.m_Relationships[i].m_Guid == relationshipGuid);
         BOOST_CHECK(model.m_Relationships[i].m_HeadGuid == headGuid);
         BOOST_CHECK(model.m_Relationships[i].m_TailGuid == tailGuid);
@@ -260,22 +262,22 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
 
 BOOST_AUTO_TEST_CASE(TimelineCaptureTestMultipleStringsInBuffer)
 {
-    profiling::BufferManager               bufferManager(50);
-    profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
+    armnn::profiling::BufferManager               bufferManager(50);
+    armnn::profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
 
-    std::unique_ptr<profiling::ISendTimelinePacket> sendTimelinePacket =
+    std::unique_ptr<armnn::profiling::ISendTimelinePacket> sendTimelinePacket =
                                                         timelinePacketWriterFactory.GetSendTimelinePacket();
 
-    profiling::PacketVersionResolver packetVersionResolver;
+    arm::pipe::PacketVersionResolver packetVersionResolver;
 
-    TimelineDecoder timelineDecoder;
-    const TimelineDecoder::Model& model = timelineDecoder.GetModel();
+    arm::pipe::TimelineDecoder timelineDecoder;
+    const arm::pipe::TimelineDecoder::Model& model = timelineDecoder.GetModel();
 
-    TimelineCaptureCommandHandler timelineCaptureCommandHandler(
+    arm::pipe::TimelineCaptureCommandHandler timelineCaptureCommandHandler(
         1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder,
         armnn::profiling::ThreadIdSize);
 
-    using Status = ITimelineDecoder::TimelineStatus;
+    using Status = arm::pipe::TimelineDecoder::TimelineStatus;
     BOOST_CHECK(timelineDecoder.SetEntityCallback(PushEntity) == Status::TimelineStatus_Success);
     BOOST_CHECK(timelineDecoder.SetEventClassCallback(PushEventClass) == Status::TimelineStatus_Success);
     BOOST_CHECK(timelineDecoder.SetEventCallback(PushEvent) == Status::TimelineStatus_Success);
@@ -294,15 +296,15 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTestMultipleStringsInBuffer)
     unsigned char* uCharThreadId = new unsigned char[armnn::profiling::ThreadIdSize]();
     uint64_t uint64ThreadId;
 
-    profiling::WriteBytes(uCharThreadId, 0, &threadId, armnn::profiling::ThreadIdSize);
+    arm::pipe::WriteBytes(uCharThreadId, 0, &threadId, armnn::profiling::ThreadIdSize);
 
     if ( armnn::profiling::ThreadIdSize == 4 )
     {
-        uint64ThreadId = profiling::ReadUint32(uCharThreadId, 0);
+        uint64ThreadId = arm::pipe::ReadUint32(uCharThreadId, 0);
     } 
     else if ( armnn::profiling::ThreadIdSize == 8 )
     {
-        uint64ThreadId = profiling::ReadUint64(uCharThreadId, 0);
+        uint64ThreadId = arm::pipe::ReadUint64(uCharThreadId, 0);
     }
     delete[] uCharThreadId;
 
@@ -329,7 +331,8 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTestMultipleStringsInBuffer)
         sendTimelinePacket->SendTimelineLabelBinaryPacket(labelGuid, labelName2);
         sendTimelinePacket->SendTimelineLabelBinaryPacket(labelGuid, labelName3);
         // Send relationship
-        profiling::ProfilingRelationshipType relationshipType = profiling::ProfilingRelationshipType::DataLink;
+        armnn::profiling::ProfilingRelationshipType relationshipType =
+            armnn::profiling::ProfilingRelationshipType::DataLink;
         sendTimelinePacket->SendTimelineRelationshipBinaryPacket(relationshipType,
                                                                  relationshipGuid,
                                                                  headGuid,
@@ -353,7 +356,8 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTestMultipleStringsInBuffer)
         BOOST_CHECK(model.m_Events[i].m_ThreadId == uint64ThreadId);
         BOOST_CHECK(model.m_Events[i].m_Guid == eventGuid);
 
-        BOOST_CHECK(model.m_Relationships[i].m_RelationshipType == ITimelineDecoder::RelationshipType::DataLink);
+        BOOST_CHECK(model.m_Relationships[i].m_RelationshipType ==
+            arm::pipe::ITimelineDecoder::RelationshipType::DataLink);
         BOOST_CHECK(model.m_Relationships[i].m_Guid == relationshipGuid);
         BOOST_CHECK(model.m_Relationships[i].m_HeadGuid == headGuid);
         BOOST_CHECK(model.m_Relationships[i].m_TailGuid == tailGuid);

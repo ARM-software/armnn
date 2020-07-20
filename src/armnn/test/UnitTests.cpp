@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #define BOOST_TEST_MODULE UnitTests
@@ -24,7 +24,7 @@ BOOST_GLOBAL_FIXTURE(ConfigureLoggingFixture);
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/tee.hpp>
 #include <iostream>
-#include <WindowsWrapper.hpp>
+#include <commons/include/WindowsWrapper.hpp>
 
 using namespace boost::iostreams;
 using namespace std;

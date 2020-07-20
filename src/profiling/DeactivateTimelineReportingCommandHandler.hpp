@@ -1,14 +1,15 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include "CommandHandlerFunctor.hpp"
-#include <Packet.hpp>
 #include "ProfilingStateMachine.hpp"
 #include "INotifyBackends.hpp"
+
+#include <common/include/CommandHandlerFunctor.hpp>
+#include <common/include/Packet.hpp>
 
 namespace armnn
 {
@@ -16,7 +17,7 @@ namespace armnn
 namespace profiling
 {
 
-class DeactivateTimelineReportingCommandHandler : public CommandHandlerFunctor
+class DeactivateTimelineReportingCommandHandler : public arm::pipe::CommandHandlerFunctor
 {
 
 public:
@@ -32,7 +33,7 @@ public:
         , m_BackendNotifier(notifyBackends)
     {}
 
-    void operator()(const Packet& packet) override;
+    void operator()(const arm::pipe::Packet& packet) override;
 
 private:
     std::atomic<bool>&     m_TimelineReporting;

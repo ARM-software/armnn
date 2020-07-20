@@ -10,9 +10,11 @@
 #include <armnn/Logging.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
-#include <CommandHandlerFunctor.hpp>
 #include <IProfilingConnection.hpp>
 #include <ProfilingService.hpp>
+
+#include <common/include/CommandHandlerFunctor.hpp>
+
 
 #include <boost/test/unit_test.hpp>
 
@@ -82,14 +84,14 @@ public:
         return false;
     }
 
-    Packet ReadPacket(uint32_t timeout) override
+    arm::pipe::Packet ReadPacket(uint32_t timeout) override
     {
         // First time we're called return a connection ack packet. After that always timeout.
         if (m_FirstCall)
         {
             m_FirstCall = false;
             // Return connection acknowledged packet
-            return Packet(65536);
+            return arm::pipe::Packet(65536);
         }
         else
         {
@@ -108,7 +110,7 @@ public:
         : m_ReadRequests(0)
     {}
 
-    Packet ReadPacket(uint32_t timeout) override
+    arm::pipe::Packet ReadPacket(uint32_t timeout) override
     {
         // Return connection acknowledged packet after three timeouts
         if (m_ReadRequests % 3 == 0)
@@ -118,7 +120,7 @@ public:
             throw armnn::TimeoutException("Simulate a timeout error\n");
         }
 
-        return Packet(65536);
+        return arm::pipe::Packet(65536);
     }
 
     int ReadCalledCount()
@@ -137,7 +139,7 @@ public:
         : m_ReadRequests(0)
     {}
 
-    Packet ReadPacket(uint32_t timeout) override
+    arm::pipe::Packet ReadPacket(uint32_t timeout) override
     {
         IgnoreUnused(timeout);
         ++m_ReadRequests;
@@ -156,7 +158,7 @@ private:
 class TestProfilingConnectionBadAckPacket : public TestProfilingConnectionBase
 {
 public:
-    Packet ReadPacket(uint32_t timeout) override
+    arm::pipe::Packet ReadPacket(uint32_t timeout) override
     {
         IgnoreUnused(timeout);
         // Connection Acknowledged Packet header (word 0, word 1 is always zero):
@@ -168,18 +170,18 @@ public:
         uint32_t packetId     = 37;    // Wrong packet id!!!
         uint32_t header       = ((packetFamily & 0x0000003F) << 26) | ((packetId & 0x000003FF) << 16);
 
-        return Packet(header);
+        return arm::pipe::Packet(header);
     }
 };
 
-class TestFunctorA : public CommandHandlerFunctor
+class TestFunctorA : public arm::pipe::CommandHandlerFunctor
 {
 public:
     using CommandHandlerFunctor::CommandHandlerFunctor;
 
     int GetCount() { return m_Count; }
 
-    void operator()(const Packet& packet) override
+    void operator()(const arm::pipe::Packet& packet) override
     {
         IgnoreUnused(packet);
         m_Count++;

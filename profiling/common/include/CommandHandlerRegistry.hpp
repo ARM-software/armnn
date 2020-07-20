@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,14 +8,13 @@
 #include "CommandHandlerFunctor.hpp"
 #include "CommandHandlerKey.hpp"
 
-#include <boost/functional/hash.hpp>
-
+#include <functional>
 #include <unordered_map>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 struct CommandHandlerHash
@@ -23,8 +22,9 @@ struct CommandHandlerHash
     std::size_t operator() (const CommandHandlerKey& commandHandlerKey) const
     {
         std::size_t seed = 0;
-        boost::hash_combine(seed, commandHandlerKey.GetPacketId());
-        boost::hash_combine(seed, commandHandlerKey.GetVersion());
+        std::hash<uint32_t> hasher;
+        seed ^= hasher(commandHandlerKey.GetPacketId()) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+        seed ^= hasher(commandHandlerKey.GetVersion()) + 0x9e3779b9 + (seed<<6) + (seed>>2);
         return seed;
     }
 };
@@ -44,6 +44,6 @@ private:
     std::unordered_map<CommandHandlerKey, CommandHandlerFunctor*, CommandHandlerHash> registry;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,17 +7,15 @@
 
 #include "TimelineCaptureCommandHandler.hpp"
 
-#include <Packet.hpp>
-#include <PacketBuffer.hpp>
-#include <ProfilingUtils.hpp>
+#include <common/include/SwTrace.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace timelinedecoder
+namespace pipe
 {
 
-class TimelineDirectoryCaptureCommandHandler : public profiling::CommandHandlerFunctor
+class TimelineDirectoryCaptureCommandHandler : public arm::pipe::CommandHandlerFunctor
 {
     // Utils
     uint32_t uint8_t_size  = sizeof(uint8_t);
@@ -34,19 +32,19 @@ public:
         , m_QuietOperation(quietOperation)
     {}
 
-    void operator()(const armnn::profiling::Packet& packet) override;
+    void operator()(const arm::pipe::Packet& packet) override;
 
-    profiling::SwTraceHeader m_SwTraceHeader;
-    std::vector<profiling::SwTraceMessage> m_SwTraceMessages;
+    arm::pipe::SwTraceHeader m_SwTraceHeader;
+    std::vector<arm::pipe::SwTraceMessage> m_SwTraceMessages;
 
 private:
-    void ParseData(const armnn::profiling::Packet& packet);
+    void ParseData(const arm::pipe::Packet& packet);
     void Print();
 
     TimelineCaptureCommandHandler& m_TimelineCaptureCommandHandler;
     bool m_QuietOperation;
 };
 
-} //namespace gatordmock
+} //namespace pipe
 
-} //namespace armnn
+} //namespace arm

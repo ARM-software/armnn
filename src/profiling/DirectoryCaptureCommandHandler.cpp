@@ -1,7 +1,8 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include "DirectoryCaptureCommandHandler.hpp"
 
 #include <armnn/BackendId.hpp>
@@ -20,7 +21,7 @@ namespace profiling
 uint32_t uint16_t_size = sizeof(uint16_t);
 uint32_t uint32_t_size = sizeof(uint32_t);
 
-void DirectoryCaptureCommandHandler::ParseData(const armnn::profiling::Packet& packet)
+void DirectoryCaptureCommandHandler::ParseData(const arm::pipe::Packet& packet)
 {
     uint16_t categoryRecordCount;
     uint16_t counterSetRecordCount;
@@ -296,7 +297,7 @@ std::vector<CounterDirectoryEventRecord> DirectoryCaptureCommandHandler::ReadEve
     return eventRecords;
 }
 
-void DirectoryCaptureCommandHandler::operator()(const profiling::Packet& packet)
+void DirectoryCaptureCommandHandler::operator()(const arm::pipe::Packet& packet)
 {
     if (!m_QuietOperation)    // Are we supposed to print to stdout?
     {

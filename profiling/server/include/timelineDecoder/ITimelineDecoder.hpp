@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,6 +7,12 @@
 
 #include <cstdint>
 #include <string>
+
+namespace arm
+{
+
+namespace pipe
+{
 
 class ITimelineDecoder
 {
@@ -80,3 +86,6 @@ public:
     virtual TimelineStatus CreateLabel(const Label&) = 0;
     virtual TimelineStatus CreateRelationship(const Relationship&) = 0;
 };
+
+} // namespace pipe
+} // namespace arm

@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 ARM Ltd. All rights reserved.
+# Copyright © 2017 ARM Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -45,6 +45,7 @@ BACKEND_SOURCES := \
         workloads/ClGatherWorkload.cpp \
         workloads/ClInstanceNormalizationWorkload.cpp \
         workloads/ClL2NormalizationFloatWorkload.cpp \
+        workloads/ClLogSoftmaxWorkload.cpp \
         workloads/ClLstmFloatWorkload.cpp \
         workloads/ClMaximumWorkload.cpp \
         workloads/ClMeanWorkload.cpp \

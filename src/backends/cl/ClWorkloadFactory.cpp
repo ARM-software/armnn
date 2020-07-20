@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "ClWorkloadFactory.hpp"
@@ -339,6 +339,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateL2Normalization(const L2Norm
                                                                     const WorkloadInfo& info) const
 {
     return MakeWorkload<ClL2NormalizationFloatWorkload, NullWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLogSoftmax(const LogSoftmaxQueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const
+{
+    return MakeWorkload<ClLogSoftmaxWorkload>(descriptor, info, m_MemoryManager->GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLstm(const LstmQueueDescriptor& descriptor,

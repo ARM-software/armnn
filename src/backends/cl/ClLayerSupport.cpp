@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -38,6 +38,7 @@
 #include "workloads/ClGatherWorkload.hpp"
 #include "workloads/ClInstanceNormalizationWorkload.hpp"
 #include "workloads/ClL2NormalizationFloatWorkload.hpp"
+#include "workloads/ClLogSoftmaxWorkload.hpp"
 #include "workloads/ClLstmFloatWorkload.hpp"
 #include "workloads/ClMaximumWorkload.hpp"
 #include "workloads/ClMeanWorkload.hpp"
@@ -510,6 +511,18 @@ bool ClLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
                                                 Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClL2NormalizationWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
+}
+
+bool ClLayerSupport::IsLogSoftmaxSupported(const TensorInfo& input,
+                                                const TensorInfo& output,
+                                                const LogSoftmaxDescriptor& descriptor,
+                                                Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClLogSoftmaxWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
                                    output,

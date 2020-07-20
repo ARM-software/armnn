@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Arm Ltd. All rights reserved.
+# Copyright © 2017 Arm Ltd anc Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -50,6 +50,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClInstanceNormalizationWorkload.hpp
     ClL2NormalizationFloatWorkload.cpp
     ClL2NormalizationFloatWorkload.hpp
+    ClLogSoftmaxWorkload.cpp
+    ClLogSoftmaxWorkload.hpp
     ClLstmFloatWorkload.cpp
     ClLstmFloatWorkload.hpp
     ClMaximumWorkload.cpp

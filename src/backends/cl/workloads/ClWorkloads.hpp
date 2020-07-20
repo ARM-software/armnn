@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -24,6 +24,7 @@
 #include "ClGatherWorkload.hpp"
 #include "ClInstanceNormalizationWorkload.hpp"
 #include "ClL2NormalizationFloatWorkload.hpp"
+#include "ClLogSoftmaxWorkload.hpp"
 #include "ClLstmFloatWorkload.hpp"
 #include "ClConcatWorkload.hpp"
 #include "ClMaximumWorkload.hpp"

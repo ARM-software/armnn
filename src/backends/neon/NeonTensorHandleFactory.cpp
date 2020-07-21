@@ -33,6 +33,18 @@ std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateSubTensorHandle(IT
     }
 
     const arm_compute::TensorShape parentShape = armcomputetensorutils::BuildArmComputeTensorShape(parent.GetShape());
+
+    // In order for ACL to support subtensors the concat axis cannot be on x or y and the values of x and y
+    // must match the parent shapes
+    if (coords.x() != 0 || coords.y() != 0)
+    {
+        return nullptr;
+    }
+    if ((parentShape.x() != shape.x()) || (parentShape.y() != shape.y()))
+    {
+        return nullptr;
+    }
+
     if (!::arm_compute::error_on_invalid_subtensor(__func__, __FILE__, __LINE__, parentShape, coords, shape))
     {
         return nullptr;

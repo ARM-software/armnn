@@ -48,7 +48,7 @@ static const int GENERAL_ERROR = -100;
 
 template<typename TContainer>
 inline armnn::InputTensors MakeInputTensors(const std::vector<armnn::BindingPointInfo>& inputBindings,
-                                            const std::vector<TContainer>& inputDataContainers)
+                                            const std::vector<std::reference_wrapper<TContainer>>& inputDataContainers)
 {
     armnn::InputTensors inputTensors;
 
@@ -61,7 +61,7 @@ inline armnn::InputTensors MakeInputTensors(const std::vector<armnn::BindingPoin
     for (size_t i = 0; i < numInputs; i++)
     {
         const armnn::BindingPointInfo& inputBinding = inputBindings[i];
-        const TContainer& inputData = inputDataContainers[i];
+        const TContainer& inputData = inputDataContainers[i].get();
 
         armnn::ConstTensor inputTensor(inputBinding.second, inputData.data());
         inputTensors.push_back(std::make_pair(inputBinding.first, inputTensor));
@@ -71,8 +71,9 @@ inline armnn::InputTensors MakeInputTensors(const std::vector<armnn::BindingPoin
 }
 
 template<typename TContainer>
-inline armnn::OutputTensors MakeOutputTensors(const std::vector<armnn::BindingPointInfo>& outputBindings,
-                                              const std::vector<TContainer>& outputDataContainers)
+inline armnn::OutputTensors MakeOutputTensors(
+    const std::vector<armnn::BindingPointInfo>& outputBindings,
+    const std::vector<std::reference_wrapper<TContainer>>& outputDataContainers)
 {
     armnn::OutputTensors outputTensors;
 
@@ -82,10 +83,12 @@ inline armnn::OutputTensors MakeOutputTensors(const std::vector<armnn::BindingPo
         throw armnn::Exception("Mismatching vectors");
     }
 
+    outputTensors.reserve(numOutputs);
+
     for (size_t i = 0; i < numOutputs; i++)
     {
         const armnn::BindingPointInfo& outputBinding = outputBindings[i];
-        const TContainer& outputData = outputDataContainers[i];
+        const TContainer& outputData = outputDataContainers[i].get();
 
         armnn::Tensor outputTensor(outputBinding.second, const_cast<float*>(outputData.data()));
         outputTensors.push_back(std::make_pair(outputBinding.first, outputTensor));
@@ -366,22 +369,22 @@ int main(int argc, char* argv[])
 
     // Setup inputs and outputs
     using BindingInfos = std::vector<armnn::BindingPointInfo>;
-    using FloatTensors = std::vector<std::vector<float>>;
+    using FloatTensors = std::vector<std::reference_wrapper<std::vector<float>>>;
 
-    InputTensors bbInputTensors = MakeInputTensors(BindingInfos{inputId},
-                                                   FloatTensors{std::move(image)});
-    OutputTensors bbOutputTensors = MakeOutputTensors(BindingInfos{bbOut0Id, bbOut1Id, bbOut2Id},
-                                                      FloatTensors{intermediateMem0,
-                                                                   intermediateMem1,
-                                                                   intermediateMem2});
-    InputTensors detectInputTensors = MakeInputTensors(BindingInfos{detectIn0Id,
-                                                                    detectIn1Id,
-                                                                    detectIn2Id},
-                                                       FloatTensors{intermediateMem0,
+    InputTensors bbInputTensors = MakeInputTensors(BindingInfos{ inputId },
+                                                   FloatTensors{ image });
+    OutputTensors bbOutputTensors = MakeOutputTensors(BindingInfos{ bbOut0Id, bbOut1Id, bbOut2Id },
+                                                      FloatTensors{ intermediateMem0,
                                                                     intermediateMem1,
-                                                                    intermediateMem2});
-    OutputTensors detectOutputTensors = MakeOutputTensors(BindingInfos{outputBoxesId},
-                                                          FloatTensors{intermediateMem3});
+                                                                    intermediateMem2 });
+    InputTensors detectInputTensors = MakeInputTensors(BindingInfos{ detectIn0Id,
+                                                                     detectIn1Id,
+                                                                     detectIn2Id } ,
+                                                       FloatTensors{ intermediateMem0,
+                                                                     intermediateMem1,
+                                                                     intermediateMem2 });
+    OutputTensors detectOutputTensors = MakeOutputTensors(BindingInfos{ outputBoxesId },
+                                                          FloatTensors{ intermediateMem3 });
 
     static const int numIterations=2;
     using DurationUS = std::chrono::duration<double, std::micro>;

@@ -27,13 +27,16 @@ public:
 
     bool SupportsSubTensors() const override { return true; }
 
+    ARMNN_DEPRECATED_MSG("Use ITensorHandleFactory::CreateSubTensorHandle instead")
     std::unique_ptr<ITensorHandle> CreateSubTensorHandle(ITensorHandle& parent,
                                                          TensorShape const& subTensorShape,
                                                          unsigned int const* subTensorOrigin) const override;
 
+    ARMNN_DEPRECATED_MSG("Use ITensorHandleFactory::CreateTensorHandle instead")
     std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                       const bool IsMemoryManaged = true) const override;
 
+    ARMNN_DEPRECATED_MSG("Use ITensorHandleFactory::CreateTensorHandle instead")
     std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                       DataLayout dataLayout,
                                                       const bool IsMemoryManaged = true) const override;

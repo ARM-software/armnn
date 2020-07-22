@@ -36,6 +36,7 @@ public:
 
     virtual bool SupportsSubTensors() const = 0;
 
+    ARMNN_DEPRECATED_MSG("Use ITensorHandleFactory::CreateSubTensorHandle instead")
     virtual std::unique_ptr<ITensorHandle> CreateSubTensorHandle(ITensorHandle& parent,
                                                                  TensorShape const& subTensorShape,
                                                                  unsigned int const* subTensorOrigin
@@ -44,9 +45,11 @@ public:
     virtual std::unique_ptr<IWorkload> CreateInput(const InputQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const = 0;
 
+    ARMNN_DEPRECATED_MSG("Use ITensorHandleFactory::CreateTensorHandle instead")
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                               const bool IsMemoryManaged = true) const = 0;
 
+    ARMNN_DEPRECATED_MSG("Use ITensorHandleFactory::CreateTensorHandle instead")
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                               DataLayout dataLayout,
                                                               const bool IsMemoryManaged = true) const = 0;

@@ -15,6 +15,29 @@
 namespace armnn
 {
 
+/// Capability class to calculate in the GetCapabilities function
+/// so that only the capability in the scope can be choose to calculate
+enum class CapabilityClass
+{
+    PaddingRequired = 1,
+
+    // add new enum values here
+
+    CapabilityClassMax = 254
+};
+
+/// Capability of the TensorHandleFactory
+struct Capability
+{
+    Capability(CapabilityClass capabilityClass, bool value)
+        : m_CapabilityClass(capabilityClass)
+        , m_Value(value)
+    {}
+
+    CapabilityClass m_CapabilityClass;
+    bool            m_Value;
+};
+
 class ITensorHandleFactory
 {
 public:
@@ -59,6 +82,16 @@ public:
 
     virtual MemorySourceFlags GetExportFlags() const { return 0; }
     virtual MemorySourceFlags GetImportFlags() const { return 0; }
+
+    virtual std::vector<Capability> GetCapabilities(const IConnectableLayer* layer,
+                                                    const IConnectableLayer* connectedLayer,
+                                                    CapabilityClass capabilityClass)
+    {
+        IgnoreUnused(layer);
+        IgnoreUnused(connectedLayer);
+        IgnoreUnused(capabilityClass);
+        return std::vector<Capability>();
+    }
 };
 
 enum class EdgeStrategy

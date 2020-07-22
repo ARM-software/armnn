@@ -141,6 +141,23 @@ BOOST_AUTO_TEST_CASE(RefTensorHandleImport)
     BOOST_CHECK(buffer[1] == 10.0f);
 }
 
+BOOST_AUTO_TEST_CASE(RefTensorHandleGetCapabilities)
+{
+    std::shared_ptr<RefMemoryManager> memoryManager = std::make_shared<RefMemoryManager>();
+    RefTensorHandleFactory handleFactory(memoryManager);
+
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
+    IConnectableLayer* input = net->AddInputLayer(0);
+    IConnectableLayer* output = net->AddOutputLayer(0);
+    input->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    std::vector<Capability> capabilities = handleFactory.GetCapabilities(input,
+                                                                         output,
+                                                                         CapabilityClass::PaddingRequired);
+    BOOST_CHECK(capabilities.empty());
+}
+
 #if !defined(__ANDROID__)
 // Only run these tests on non Android platforms
 BOOST_AUTO_TEST_CASE(CheckSourceType)

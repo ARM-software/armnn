@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -816,6 +816,30 @@ ResizeNearestNeighborMagTest<armnn::DataType::Float16>(
     float outQuantScale,
     int32_t outQuantOffset);
 
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 4>
+HalfPixelCentersResizeBilinearTest<armnn::DataType::Float16>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 4>
+AlignCornersResizeBilinearTest<armnn::DataType::Float16>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 4>
+HalfPixelCentersResizeNearestNeighbourTest<armnn::DataType::Float16>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 4>
+AlignCornersResizeNearestNeighbourTest<armnn::DataType::Float16>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);
+
 // QAsymm8
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
 ResizeBilinearNopTest<armnn::DataType::QAsymmU8>(
@@ -880,6 +904,30 @@ ResizeNearestNeighborMagTest<armnn::DataType::QAsymmU8>(
     int32_t inQuantOffset,
     float outQuantScale,
     int32_t outQuantOffset);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+HalfPixelCentersResizeBilinearTest<armnn::DataType::QAsymmS8>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+AlignCornersResizeBilinearTest<armnn::DataType::QAsymmS8>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+HalfPixelCentersResizeNearestNeighbourTest<armnn::DataType::QAsymmS8>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+AlignCornersResizeNearestNeighbourTest<armnn::DataType::QAsymmS8>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);
 
 // QAsymmS8
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
@@ -946,6 +994,30 @@ ResizeNearestNeighborMagTest<armnn::DataType::QAsymmS8>(
     float outQuantScale,
     int32_t outQuantOffset);
 
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+HalfPixelCentersResizeBilinearTest<armnn::DataType::QAsymmU8>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+AlignCornersResizeBilinearTest<armnn::DataType::QAsymmU8>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+HalfPixelCentersResizeNearestNeighbourTest<armnn::DataType::QAsymmU8>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+AlignCornersResizeNearestNeighbourTest<armnn::DataType::QAsymmU8>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);
+
 // QSymm16
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
 ResizeBilinearNopTest<armnn::DataType::QSymmS16>(
@@ -1010,3 +1082,27 @@ ResizeNearestNeighborMagTest<armnn::DataType::QSymmS16>(
     int32_t inQuantOffset,
     float outQuantScale,
     int32_t outQuantOffset);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+HalfPixelCentersResizeBilinearTest<armnn::DataType::QSymmS16>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+AlignCornersResizeBilinearTest<armnn::DataType::QSymmS16>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+HalfPixelCentersResizeNearestNeighbourTest<armnn::DataType::QSymmS16>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+AlignCornersResizeNearestNeighbourTest<armnn::DataType::QSymmS16>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout dataLayout);

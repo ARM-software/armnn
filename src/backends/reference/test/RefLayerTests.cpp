@@ -912,8 +912,32 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearMagUint16,
 ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeBilinear,
                      HalfPixelCentersResizeBilinearTest<DataType::Float32>,
                      DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeBilinearFloat16,
+                     HalfPixelCentersResizeBilinearTest<DataType::Float16>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeBilinearInt8,
+                     HalfPixelCentersResizeBilinearTest<DataType::QAsymmS8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeBilinearUint8,
+                     HalfPixelCentersResizeBilinearTest<DataType::QAsymmU8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeBilinearUint16,
+                     HalfPixelCentersResizeBilinearTest<DataType::QSymmS16>,
+                     DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(AlignCornersResizeBilinear,
                      AlignCornersResizeBilinearTest<DataType::Float32>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeBilinearFloat16,
+                     AlignCornersResizeBilinearTest<DataType::Float16>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeBilinearInt8,
+                     AlignCornersResizeBilinearTest<DataType::QAsymmS8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeBilinearUint8,
+                     AlignCornersResizeBilinearTest<DataType::QAsymmU8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeBilinearUint16,
+                     AlignCornersResizeBilinearTest<DataType::QSymmS16>,
                      DataLayout::NCHW)
 
 // Resize Bilinear - NHWC
@@ -992,6 +1016,36 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearMagUint8Nhwc,
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMagUint16Nhwc,
                      ResizeBilinearNopTest<DataType::QSymmS16>,
                      DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeBilinearNhwc,
+                     HalfPixelCentersResizeBilinearTest<DataType::Float32>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeBilinearFloat16Nhwc,
+                     HalfPixelCentersResizeBilinearTest<DataType::Float16>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeBilinearInt8Nhwc,
+                     HalfPixelCentersResizeBilinearTest<DataType::QAsymmS8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeBilinearUint8Nhwc,
+                     HalfPixelCentersResizeBilinearTest<DataType::QAsymmU8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeBilinearUint16Nhwc,
+                     HalfPixelCentersResizeBilinearTest<DataType::QSymmS16>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeBilinearNhwc,
+                     AlignCornersResizeBilinearTest<DataType::Float32>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeBilinearFloat16Nhwc,
+                     AlignCornersResizeBilinearTest<DataType::Float16>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeBilinearInt8Nhwc,
+                     AlignCornersResizeBilinearTest<DataType::QAsymmS8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeBilinearUint8Nhwc,
+                     AlignCornersResizeBilinearTest<DataType::QAsymmU8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeBilinearUint16Nhwc,
+                     AlignCornersResizeBilinearTest<DataType::QSymmS16>,
+                     DataLayout::NCHW)
 
 // Resize NearestNeighbor - NCHW
 ARMNN_AUTO_TEST_CASE(SimpleResizeNearestNeighbor,
@@ -1057,8 +1111,32 @@ ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagUint16,
 ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeNearestNeighbour,
                      HalfPixelCentersResizeNearestNeighbourTest<DataType::Float32>,
                      DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeNearestNeighbourFloat16,
+                     HalfPixelCentersResizeNearestNeighbourTest<DataType::Float16>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeNearestNeighbourInt8,
+                     HalfPixelCentersResizeNearestNeighbourTest<DataType::QAsymmS8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeNearestNeighbourUint8,
+                     HalfPixelCentersResizeNearestNeighbourTest<DataType::QAsymmU8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeNearestNeighbourUint16,
+                     HalfPixelCentersResizeNearestNeighbourTest<DataType::QSymmS16>,
+                     DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(AlignCornersResizeNearestNeighbour,
                      AlignCornersResizeNearestNeighbourTest<DataType::Float32>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeNearestNeighbourFloat16,
+                     AlignCornersResizeNearestNeighbourTest<DataType::Float16>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeNearestNeighbourInt8,
+                     AlignCornersResizeNearestNeighbourTest<DataType::QAsymmS8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeNearestNeighbourUint8,
+                     AlignCornersResizeNearestNeighbourTest<DataType::QAsymmU8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeNearestNeighbourUint16,
+                     AlignCornersResizeNearestNeighbourTest<DataType::QSymmS16>,
                      DataLayout::NCHW)
 
 // Resize NearestNeighbor - NHWC
@@ -1122,6 +1200,36 @@ ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagUint8Nhwc,
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagUint16Nhwc,
                      ResizeNearestNeighborNopTest<DataType::QSymmS16>,
                      DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeNearestNeighbourNchw,
+                     HalfPixelCentersResizeNearestNeighbourTest<DataType::Float32>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeNearestNeighbourFloat16Nchw,
+                     HalfPixelCentersResizeNearestNeighbourTest<DataType::Float16>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeNearestNeighbourInt8Nchw,
+                     HalfPixelCentersResizeNearestNeighbourTest<DataType::QAsymmS8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeNearestNeighbourUint8Nchw,
+                     HalfPixelCentersResizeNearestNeighbourTest<DataType::QAsymmU8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(HalfPixelCentersResizeNearestNeighbourUint16Nchw,
+                     HalfPixelCentersResizeNearestNeighbourTest<DataType::QSymmS16>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeNearestNeighbourNchw,
+                     AlignCornersResizeNearestNeighbourTest<DataType::Float32>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeNearestNeighbourFloat16Nchw,
+                     AlignCornersResizeNearestNeighbourTest<DataType::Float16>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeNearestNeighbourInt8Nchw,
+                     AlignCornersResizeNearestNeighbourTest<DataType::QAsymmS8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeNearestNeighbourUint8Nchw,
+                     AlignCornersResizeNearestNeighbourTest<DataType::QAsymmU8>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(AlignCornersResizeNearestNeighbourUint16Nchw,
+                     AlignCornersResizeNearestNeighbourTest<DataType::QSymmS16>,
+                     DataLayout::NCHW)
 
 // Fake Quantization
 ARMNN_AUTO_TEST_CASE(FakeQuantization, FakeQuantizationTest)

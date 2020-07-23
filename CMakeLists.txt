@@ -555,6 +555,9 @@ list(APPEND armnn_sources
     src/profiling/backends/BackendProfiling.cpp
     src/profiling/backends/BackendProfiling.hpp
     third-party/cxxopts/cxxopts.hpp
+    third-party/fmt/core.h
+    third-party/fmt/format.h
+    third-party/fmt/format-inl.h
     third-party/ghc/filesystem.hpp
     third-party/half/half.hpp
     )

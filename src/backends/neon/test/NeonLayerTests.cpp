@@ -784,6 +784,8 @@ ARMNN_AUTO_TEST_CASE(LstmLayerFloat32NoCifgWithPeepholeWithProjectionWithLayerNo
 
 // QLstm
 ARMNN_AUTO_TEST_CASE(QLstm, QLstmTest)
+ARMNN_AUTO_TEST_CASE(QLstm1, QLstmTest1)
+ARMNN_AUTO_TEST_CASE(QLstm2, QLstmTest2)
 
 // QuantizedLstm
 ARMNN_AUTO_TEST_CASE(QuantizedLstm, QuantizedLstmTest)

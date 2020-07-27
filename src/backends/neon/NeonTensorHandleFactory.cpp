@@ -6,6 +6,8 @@
 #include "NeonTensorHandleFactory.hpp"
 #include "NeonTensorHandle.hpp"
 
+#include "Layer.hpp"
+
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
@@ -106,6 +108,25 @@ MemorySourceFlags NeonTensorHandleFactory::GetExportFlags() const
 MemorySourceFlags NeonTensorHandleFactory::GetImportFlags() const
 {
     return 0;
+}
+
+std::vector<Capability> NeonTensorHandleFactory::GetCapabilities(const IConnectableLayer* layer,
+                                                                 const IConnectableLayer* connectedLayer,
+                                                                 CapabilityClass capabilityClass)
+
+{
+    IgnoreUnused(connectedLayer);
+    std::vector<Capability> capabilities;
+    if (capabilityClass == CapabilityClass::PaddingRequired)
+    {
+        auto search = paddingRequiredLayers.find((PolymorphicDowncast<const Layer*>(layer))->GetType());
+        if ( search != paddingRequiredLayers.end())
+        {
+            Capability paddingCapability(CapabilityClass::PaddingRequired, true);
+            capabilities.push_back(paddingCapability);
+        }
+    }
+    return capabilities;
 }
 
 } // namespace armnn

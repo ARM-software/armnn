@@ -13,6 +13,30 @@ namespace armnn
 
 constexpr const char* NeonTensorHandleFactoryId() { return "Arm/Neon/TensorHandleFactory"; }
 
+const std::set<armnn::LayerType> paddingRequiredLayers {
+    LayerType::ArgMinMax,
+    LayerType::Concat,
+    LayerType::Convolution2d,
+    LayerType::DepthToSpace,
+    LayerType::DepthwiseConvolution2d,
+    LayerType::Dequantize,
+    LayerType::FullyConnected,
+    LayerType::Gather,
+    LayerType::L2Normalization,
+    LayerType::Lstm,
+    LayerType::Mean,
+    LayerType::Multiplication,
+    LayerType::Normalization,
+    LayerType::Permute,
+    LayerType::Pooling2d,
+    LayerType::Quantize,
+    LayerType::QuantizedLstm,
+    LayerType::Resize,
+    LayerType::Stack,
+    LayerType::Transpose,
+    LayerType::TransposeConvolution2d
+};
+
 class NeonTensorHandleFactory : public ITensorHandleFactory
 {
 public:
@@ -45,6 +69,10 @@ public:
     MemorySourceFlags GetExportFlags() const override;
 
     MemorySourceFlags GetImportFlags() const override;
+
+    std::vector<Capability> GetCapabilities(const IConnectableLayer* layer,
+                                            const IConnectableLayer* connectedLayer,
+                                            CapabilityClass capabilityClass) override;
 
 private:
     mutable std::shared_ptr<NeonMemoryManager> m_MemoryManager;

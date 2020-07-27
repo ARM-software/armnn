@@ -11,6 +11,7 @@ list(APPEND armnnNeonBackendUnitTests_sources
     NeonLayerTests.cpp
     NeonOptimizedNetworkTests.cpp
     NeonRuntimeTests.cpp
+    NeonTensorHandleTests.cpp
     NeonTimerTest.cpp
     NeonWorkloadFactoryHelper.hpp
 )

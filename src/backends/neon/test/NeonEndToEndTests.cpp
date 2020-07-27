@@ -13,6 +13,7 @@
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DetectionPostProcessEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp>
+#include <backendsCommon/test/FillEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QLstmEndToEndTestImpl.hpp>
@@ -443,6 +444,17 @@ BOOST_AUTO_TEST_CASE(NeonInstanceNormalizationNchwEndToEndTest1)
 BOOST_AUTO_TEST_CASE(NeonInstanceNormalizationNchwEndToEndTest2)
 {
     InstanceNormalizationNchwEndToEndTest2(defaultBackends);
+}
+
+// Fill
+BOOST_AUTO_TEST_CASE(NeonFillEndToEndTest)
+{
+    FillEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonFillEndToEndTestInt32)
+{
+    FillEndToEnd<armnn::DataType::Signed32>(defaultBackends);
 }
 
 // ArgMinMax

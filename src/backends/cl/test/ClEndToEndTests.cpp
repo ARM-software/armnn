@@ -12,6 +12,7 @@
 #include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp>
+#include <backendsCommon/test/FillEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QLstmEndToEndTestImpl.hpp>
@@ -230,6 +231,18 @@ BOOST_AUTO_TEST_CASE(ClInstanceNormalizationNchwEndToEndTest2)
     InstanceNormalizationNchwEndToEndTest2(defaultBackends);
 }
 
+// Fill
+BOOST_AUTO_TEST_CASE(ClFillEndToEndTest)
+{
+    FillEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClFillEndToEndTestInt32)
+{
+    FillEndToEnd<armnn::DataType::Signed32>(defaultBackends);
+}
+
+// Prelu
 BOOST_AUTO_TEST_CASE(ClPreluEndToEndFloat32Test)
 {
     PreluEndToEndNegativeTest<armnn::DataType::Float32>(defaultBackends);

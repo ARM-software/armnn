@@ -877,6 +877,8 @@ bool RefLayerSupport::IsFillSupported(const TensorInfo& input,
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
                                   "Reference Fill: input type not supported.");
 
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference Fill: output type not supported.");
     return supported;
 }
 

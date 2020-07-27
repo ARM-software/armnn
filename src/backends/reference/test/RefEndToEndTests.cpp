@@ -14,6 +14,7 @@
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DetectionPostProcessEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp>
+#include <backendsCommon/test/FillEndToEndTestImpl.hpp>
 #include <backendsCommon/test/GatherEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/LogSoftmaxEndToEndTestImpl.hpp>
@@ -580,6 +581,21 @@ BOOST_AUTO_TEST_CASE(RefEluEndToEndTestQAsymmU8)
 BOOST_AUTO_TEST_CASE(RefEluEndToEndTestQSymmS16)
 {
     EluEndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefFillEndToEndTest)
+{
+    FillEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+//BOOST_AUTO_TEST_CASE(RefFillEndToEndTestFloat16)
+//{
+//    FillEndToEnd<armnn::DataType::Float16>(defaultBackends);
+//}
+
+BOOST_AUTO_TEST_CASE(RefFillEndToEndTestInt32)
+{
+    FillEndToEnd<armnn::DataType::Signed32>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefGatherFloatTest)

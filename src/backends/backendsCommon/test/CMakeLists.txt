@@ -1,10 +1,11 @@
 #
-# Copyright © 2017 Arm Ltd. All rights reserved.
+# Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
 list(APPEND armnnBackendsCommonUnitTests_sources
     ActivationFixture.hpp
+    ActivationEndToEndTestImpl.hpp
     ArgMinMaxEndToEndTestImpl.hpp
     BackendIdTests.cpp
     BackendProfilingTests.cpp
@@ -21,7 +22,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     DynamicBackendTests.hpp
     ElementwiseUnaryEndToEndTestImpl.hpp
     EndToEndTestImpl.hpp
-    ActivationEndToEndTestImpl.hpp
+    FillEndToEndTestImpl.hpp
     GatherEndToEndTestImpl.hpp
     InstanceNormalizationEndToEndTestImpl.cpp
     InstanceNormalizationEndToEndTestImpl.hpp

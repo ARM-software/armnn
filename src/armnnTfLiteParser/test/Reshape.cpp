@@ -138,4 +138,22 @@ BOOST_FIXTURE_TEST_CASE(ParseReshapeWithReshapeDimsFlattenOneDim, ReshapeFixture
                 == armnn::TensorShape({2,3,3})));
 }
 
+struct DynamicReshapeFixtureWithReshapeDimsFlattenOneDim : ReshapeFixture
+{
+    DynamicReshapeFixtureWithReshapeDimsFlattenOneDim() : ReshapeFixture("[ 2, 9 ]",
+                                                                         "[ ]",
+                                                                         "[ 2, -1, 3 ]") {}
+};
+
+BOOST_FIXTURE_TEST_CASE(DynParseReshapeWithReshapeDimsFlattenOneDim, DynamicReshapeFixtureWithReshapeDimsFlattenOneDim)
+{
+    SetupSingleInputSingleOutput("inputTensor", "outputTensor");
+     RunTest<3,
+        armnn::DataType::QAsymmU8,
+        armnn::DataType::QAsymmU8>(0,
+                                   { { "inputTensor", {  1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 } } },
+                                   { { "outputTensor", { 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 } } },
+                                   true);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

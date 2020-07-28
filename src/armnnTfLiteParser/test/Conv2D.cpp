@@ -234,6 +234,32 @@ BOOST_FIXTURE_TEST_CASE( ParseConv2DWithBias, SimpleConv2DWithBiasesFixture )
         });
 }
 
+struct DynamicConv2DWithBiasesFixture : Conv2DWithBiasesFixture
+{
+    DynamicConv2DWithBiasesFixture()
+        : Conv2DWithBiasesFixture("[ 1, 2, 2, 1 ]",    // inputShape
+                                  "[ ]",              // outputShape
+                                  "[ 1, 2, 2, 1 ]",    // filterShape
+                                  "[ 2,1, 0,6 ]",      // filterData
+                                  "[ 1 ]",             // biasShape
+                                  "[ 10, 0, 0, 0 ]",   // biasData
+                                  "1")                 // stride w and h
+    {}
+};
+
+BOOST_FIXTURE_TEST_CASE( ParseDynamicConv2DWithBias, DynamicConv2DWithBiasesFixture )
+{
+    RunTest<4,
+        armnn::DataType::QAsymmU8,
+        armnn::DataType::QAsymmU8>(0,
+                                   { { "inputTensor", { 1, 2, 3, 4, } } },
+                                   { { "outputTensor", {   (1*2 + 2*1 + 3*0 + 4*6 + 10)/2,
+                                                           (2*2 + 0*1 + 4*0 + 0*6 + 10)/2,
+                                                           (3*2 + 4*1 + 0*0 + 0*6 + 10)/2,
+                                                           (4*2 + 0*1 + 0*0 + 0*6 + 10)/2} } },
+                                   true);
+}
+
 struct Conv2DShapeTestFixture : Conv2DWithBiasesFixture
 {
     static std::string GenerateInts(unsigned int n)

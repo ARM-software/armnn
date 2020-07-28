@@ -104,4 +104,21 @@ BOOST_FIXTURE_TEST_CASE(SimpleSub, SimpleSubFixture)
       {{"outputTensor", { 1, 3, 5, 7 }}});
 }
 
+struct DynamicSubFixture : SubFixture
+{
+    DynamicSubFixture() : SubFixture("[ 1, 4 ]",
+                                     "[ 1, 4 ]",
+                                     "[  ]") {}
+};
+
+BOOST_FIXTURE_TEST_CASE(DynamicSub, DynamicSubFixture)
+{
+    RunTest<2, armnn::DataType::QAsymmU8, armnn::DataType::QAsymmU8>(
+        0,
+        {{"inputTensor1", { 4, 5, 6, 7 }},
+         {"inputTensor2", { 3, 2, 1, 0 }}},
+        {{"outputTensor", { 1, 3, 5, 7 }}},
+        true);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

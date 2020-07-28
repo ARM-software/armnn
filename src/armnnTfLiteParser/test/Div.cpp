@@ -112,4 +112,30 @@ BOOST_FIXTURE_TEST_CASE(ParseDiv, SimpleDivFixture)
                                                           1.0f,  1.0f, -1.0f } } });
 }
 
+
+struct DynamicDivFixture : public DivFixture
+{
+    DynamicDivFixture() : DivFixture("[ 1, 2, 2, 3 ]", "[ 1, 2, 2, 3 ]", "[  ]") {}
+};
+
+BOOST_FIXTURE_TEST_CASE(ParseDynamicDiv, DynamicDivFixture)
+{
+    using armnn::DataType;
+    float Inf = std::numeric_limits<float>::infinity();
+    float NaN = std::numeric_limits<float>::quiet_NaN();
+
+    RunTest<4, DataType::Float32, DataType::Float32>(0, {{ "inputTensor1", { 0.0f,  1.0f,  2.0f,
+                                                            3.0f,  4.0f,  5.0f,
+                                                            6.0f,  7.0f,  8.0f,
+                                                            9.0f, 10.0f, -11.0f } },
+                                      { "inputTensor2", { 0.0f,  0.0f,  4.0f,
+                                                            3.0f,  40.0f,  5.0f,
+                                                            6.0f,  7.0f,  8.0f,
+                                                            9.0f,  10.0f,  11.0f} } },
+                                  {{ "outputTensor", { NaN,   Inf,  0.5f,
+                                                         1.0f,  0.1f, 1.0f,
+                                                         1.0f,  1.0f, 1.0f,
+                                                         1.0f,  1.0f, -1.0f } } }, true);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

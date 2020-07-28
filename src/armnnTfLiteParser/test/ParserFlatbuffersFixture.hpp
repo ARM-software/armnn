@@ -42,6 +42,7 @@ struct ParserFlatbuffersFixture
     {
         ITfLiteParser::TfLiteParserOptions options;
         options.m_StandInLayerForUnsupported = true;
+        options.m_InferAndValidate = true;
 
         m_Parser.reset(ITfLiteParser::CreateRaw(armnn::Optional<ITfLiteParser::TfLiteParserOptions>(options)));
     }
@@ -149,7 +150,8 @@ struct ParserFlatbuffersFixture
               armnn::DataType ArmnnType2>
     void RunTest(size_t subgraphId,
                  const std::map<std::string, std::vector<armnn::ResolveType<ArmnnType1>>>& inputData,
-                 const std::map<std::string, std::vector<armnn::ResolveType<ArmnnType2>>>& expectedOutputData);
+                 const std::map<std::string, std::vector<armnn::ResolveType<ArmnnType2>>>& expectedOutputData,
+                 bool isDynamic = false);
 
 
     /// Multiple Inputs, Multiple Outputs w/ Variable Datatypes and different dimension sizes.
@@ -248,7 +250,8 @@ template <std::size_t NumOutputDimensions,
           armnn::DataType armnnType2>
 void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
     const std::map<std::string, std::vector<armnn::ResolveType<armnnType1>>>& inputData,
-    const std::map<std::string, std::vector<armnn::ResolveType<armnnType2>>>& expectedOutputData)
+    const std::map<std::string, std::vector<armnn::ResolveType<armnnType2>>>& expectedOutputData,
+    bool isDynamic)
 {
     using DataType2 = armnn::ResolveType<armnnType2>;
 
@@ -289,8 +292,8 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
     for (auto&& it : expectedOutputData)
     {
         armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first);
-        auto outputExpected = MakeTensor<DataType2, NumOutputDimensions>(bindingInfo.second, it.second);
-        BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first]));
+        auto outputExpected = MakeTensor<DataType2, NumOutputDimensions>(bindingInfo.second, it.second, isDynamic);
+        BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first], false, isDynamic));
     }
 }
 

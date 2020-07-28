@@ -171,4 +171,28 @@ BOOST_FIXTURE_TEST_CASE(FullyConnectedWithBiasMultipleOutputs, FullyConnectedWit
             { (40+10)/2, (400+10)/2 });
 }
 
+struct DynamicFullyConnectedWithBiasMultipleOutputsFixture : FullyConnectedFixture
+{
+    DynamicFullyConnectedWithBiasMultipleOutputsFixture()
+        : FullyConnectedFixture("[ 1, 4, 2, 1 ]",     // inputShape
+                                "[ ]",               // outputShape
+                                "[ 1, 4 ]",           // filterShape
+                                "[ 2, 3, 4, 5 ]",     // filterData
+                                "[ 1 ]",              // biasShape
+                                "[ 10, 0, 0, 0 ]" )   // biasData
+    { }
+};
+
+BOOST_FIXTURE_TEST_CASE(
+    DynamicFullyConnectedWithBiasMultipleOutputs,
+    DynamicFullyConnectedWithBiasMultipleOutputsFixture)
+{
+    RunTest<2,
+            armnn::DataType::QAsymmU8,
+            armnn::DataType::QAsymmU8>(0,
+                                      { { "inputTensor", { 1, 2, 3, 4, 10, 20, 30, 40} } },
+                                      { { "outputTensor", { (40+10)/2, (400+10)/2 } } },
+                                      true);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

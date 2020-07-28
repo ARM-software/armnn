@@ -28,9 +28,11 @@ public:
     struct TfLiteParserOptions
     {
         TfLiteParserOptions()
-            : m_StandInLayerForUnsupported(false) {}
+            : m_StandInLayerForUnsupported(false),
+              m_InferAndValidate(false) {}
 
         bool m_StandInLayerForUnsupported;
+        bool m_InferAndValidate;
     };
 
     static ITfLiteParser* CreateRaw(const armnn::Optional<TfLiteParserOptions>& options = armnn::EmptyOptional());

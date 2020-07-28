@@ -74,20 +74,26 @@ bool SelectiveCompareBoolean(T a, T b)
 template <typename T, std::size_t n>
 boost::test_tools::predicate_result CompareTensors(const boost::multi_array<T, n>& a,
                                                    const boost::multi_array<T, n>& b,
-                                                   bool compareBoolean = false)
+                                                   bool compareBoolean = false,
+                                                   bool isDynamic = false)
 {
-    // Checks they are same shape.
-    for (unsigned int i=0; i<n; i++)
+    if (!isDynamic)
     {
-        if (a.shape()[i] != b.shape()[i])
+        // Checks they are same shape.
+        for (unsigned int i = 0;
+             i < n;
+             i++)
         {
-            boost::test_tools::predicate_result res(false);
-            res.message() << "Different shapes ["
-                        << a.shape()[i]
-                        << "!="
-                        << b.shape()[i]
-                        << "]";
-            return res;
+            if (a.shape()[i] != b.shape()[i])
+            {
+                boost::test_tools::predicate_result res(false);
+                res.message() << "Different shapes ["
+                              << a.shape()[i]
+                              << "!="
+                              << b.shape()[i]
+                              << "]";
+                return res;
+            }
         }
     }
 
@@ -190,9 +196,13 @@ boost::multi_array<T, n> MakeTensor(const armnn::TensorInfo& tensorInfo)
 
 // Creates a boost::multi_array with the shape defined by the given TensorInfo and contents defined by the given vector.
 template <typename T, std::size_t n>
-boost::multi_array<T, n> MakeTensor(const armnn::TensorInfo& tensorInfo, const std::vector<T>& flat)
+boost::multi_array<T, n> MakeTensor(
+    const armnn::TensorInfo& tensorInfo, const std::vector<T>& flat, bool isDynamic = false)
 {
-    ARMNN_ASSERT_MSG(flat.size() == tensorInfo.GetNumElements(), "Wrong number of components supplied to tensor");
+    if (!isDynamic)
+    {
+        ARMNN_ASSERT_MSG(flat.size() == tensorInfo.GetNumElements(), "Wrong number of components supplied to tensor");
+    }
 
     std::array<unsigned int, n> shape;
 

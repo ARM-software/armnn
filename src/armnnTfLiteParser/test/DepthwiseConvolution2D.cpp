@@ -196,4 +196,30 @@ BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DSameBias, DepthwiseConvolution2dSame
           (110+10)/2, (197+10)/2, (158+10)/2 });
 }
 
+struct DynamicDepthwiseConvolution2dSameBiasFixture : DepthwiseConvolution2dFixture
+{
+    DynamicDepthwiseConvolution2dSameBiasFixture()
+        : DepthwiseConvolution2dFixture("[ 1, 3, 3, 1 ]",           // inputShape
+                                        "[ ]",           // outputShape
+                                        "[ 1, 3, 3, 1 ]",           // filterShape
+                                        "[ 9,8,7, 6,5,4, 3,2,1 ]",  // filterData
+                                        "1",                        // stride w and h
+                                        "SAME",                     // padding type
+                                        "[ 1 ]",                    // biasShape
+                                        "[ 10, 0, 0, 0 ]")          // biasData
+    {}
+};
+
+BOOST_FIXTURE_TEST_CASE(ParseDynamicDepthwiseConv2DSameBias, DynamicDepthwiseConvolution2dSameBiasFixture)
+{
+    RunTest<4, armnn::DataType::QAsymmU8, armnn::DataType::QAsymmU8>(0,
+                                                      { { "inputTensor", { 0, 1, 2,
+                                                                            3, 4, 5,
+                                                                            6, 7, 8 } } },
+                                                      { { "outputTensor", { ( 14+10)/2, ( 35+10)/2, ( 38+10)/2,
+                                                                            ( 57+10)/2, (120+10)/2, (111+10)/2,
+                                                                            (110+10)/2, (197+10)/2, (158+10)/2  } } },
+                                                      true);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

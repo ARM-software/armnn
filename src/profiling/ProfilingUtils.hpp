@@ -214,7 +214,7 @@ enum class TimelinePacketStatus
 
 uint32_t CalculateSizeOfPaddedSwString(const std::string& str);
 
-SwTraceMessage ReadSwTraceMessage(const unsigned char*, unsigned int& offset);
+SwTraceMessage ReadSwTraceMessage(const unsigned char*, unsigned int&, const unsigned int& packetLength);
 
 TimelinePacketStatus WriteTimelineLabelBinaryPacket(uint64_t profilingGuid,
                                                     const std::string& label,

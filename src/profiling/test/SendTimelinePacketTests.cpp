@@ -72,7 +72,9 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     BOOST_CHECK(DeclCount == 5);
 
     offset += uint32_t_size;
-    SwTraceMessage swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
+    SwTraceMessage swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(),
+                                                       offset,
+                                                       packetBuffer->GetSize());
 
     BOOST_CHECK(swTraceMessage.m_Id == 0);
     BOOST_CHECK(swTraceMessage.m_Name == "declareLabel");
@@ -84,7 +86,7 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     BOOST_CHECK(swTraceMessage.m_ArgNames[0] == "guid");
     BOOST_CHECK(swTraceMessage.m_ArgNames[1] == "value");
 
-    swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
+    swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize());
 
     BOOST_CHECK(swTraceMessage.m_Id == 1);
     BOOST_CHECK(swTraceMessage.m_Name == "declareEntity");
@@ -94,7 +96,7 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     BOOST_CHECK(swTraceMessage.m_ArgNames.size() == 1);
     BOOST_CHECK(swTraceMessage.m_ArgNames[0] == "guid");
 
-    swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
+    swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize());
 
     BOOST_CHECK(swTraceMessage.m_Id == 2);
     BOOST_CHECK(swTraceMessage.m_Name == "declareEventClass");
@@ -106,7 +108,7 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     BOOST_CHECK(swTraceMessage.m_ArgNames[0] == "guid");
     BOOST_CHECK(swTraceMessage.m_ArgNames[1] == "nameGuid");
 
-    swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
+    swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize());
 
     BOOST_CHECK(swTraceMessage.m_Id == 3);
     BOOST_CHECK(swTraceMessage.m_Name == "declareRelationship");
@@ -124,7 +126,7 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     BOOST_CHECK(swTraceMessage.m_ArgNames[3] == "tailGuid");
     BOOST_CHECK(swTraceMessage.m_ArgNames[4] == "attributeGuid");
 
-    swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
+    swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize());
 
     BOOST_CHECK(swTraceMessage.m_Id == 4);
     BOOST_CHECK(swTraceMessage.m_Name == "declareEvent");

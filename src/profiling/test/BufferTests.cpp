@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -361,6 +361,50 @@ BOOST_AUTO_TEST_CASE(BufferMarkReadTest)
 
     BOOST_TEST(reservedSize3 == 56);
     BOOST_TEST(packetBuffer3.get());
+}
+
+BOOST_AUTO_TEST_CASE(ReadSwTraceMessageExceptionTest0)
+{
+    IPacketBufferPtr packetBuffer = std::make_unique<PacketBuffer>(512);
+
+    BOOST_TEST(packetBuffer->GetSize() == 0);
+
+    // Write zero data to the buffer
+    WriteUint32(packetBuffer, 0, 0);
+    WriteUint32(packetBuffer, 4, 0);
+    WriteUint32(packetBuffer, 8, 0);
+    WriteUint32(packetBuffer, 12, 0);
+
+    // Commit
+    packetBuffer->Commit(16);
+
+    unsigned int uint32_t_size = sizeof(uint32_t);
+    unsigned int offset = uint32_t_size;
+    BOOST_CHECK_THROW(ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize()),
+                      armnn::RuntimeException);
+
+}
+
+BOOST_AUTO_TEST_CASE(ReadSwTraceMessageExceptionTest1)
+{
+    IPacketBufferPtr packetBuffer = std::make_unique<PacketBuffer>(512);
+
+    BOOST_TEST(packetBuffer->GetSize() == 0);
+
+    // Write data to the buffer
+    WriteUint32(packetBuffer, 0, 10);
+    WriteUint32(packetBuffer, 4, 20);
+    WriteUint32(packetBuffer, 8, 30);
+    WriteUint32(packetBuffer, 12, 40);
+
+    // Commit
+    packetBuffer->Commit(16);
+
+    unsigned int uint32_t_size = sizeof(uint32_t);
+    unsigned int offset = uint32_t_size;
+    BOOST_CHECK_THROW(ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize()),
+                      armnn::RuntimeException);
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

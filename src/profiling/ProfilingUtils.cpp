@@ -316,7 +316,9 @@ uint32_t CalculateSizeOfPaddedSwString(const std::string& str)
 }
 
 // Read TimelineMessageDirectoryPacket from given IPacketBuffer and offset
-SwTraceMessage ReadSwTraceMessage(const unsigned char* packetBuffer, unsigned int& offset)
+SwTraceMessage ReadSwTraceMessage(const unsigned char* packetBuffer,
+                                  unsigned int& offset,
+                                  const unsigned int& packetLength)
 {
     ARMNN_ASSERT(packetBuffer);
 
@@ -335,6 +337,11 @@ SwTraceMessage ReadSwTraceMessage(const unsigned char* packetBuffer, unsigned in
     offset += uint32_t_size;
     uint32_t swTraceDeclNameLength = ReadUint32(packetBuffer, offset);
 
+    if (swTraceDeclNameLength == 0 || swTraceDeclNameLength > packetLength)
+    {
+        throw RuntimeException("Error swTraceDeclNameLength is an invalid size", CHECK_LOCATION());
+    }
+
     offset += uint32_t_size;
     std::vector<unsigned char> swTraceStringBuffer(swTraceDeclNameLength - 1);
     std::memcpy(swTraceStringBuffer.data(),
@@ -346,6 +353,11 @@ SwTraceMessage ReadSwTraceMessage(const unsigned char* packetBuffer, unsigned in
     offset += CalculateSizeOfPaddedSwString(swTraceMessage.m_Name);
     uint32_t swTraceUINameLength = ReadUint32(packetBuffer, offset);
 
+    if (swTraceUINameLength == 0 || swTraceUINameLength > packetLength)
+    {
+        throw RuntimeException("Error swTraceUINameLength is an invalid size", CHECK_LOCATION());
+    }
+
     offset += uint32_t_size;
     swTraceStringBuffer.resize(swTraceUINameLength - 1);
     std::memcpy(swTraceStringBuffer.data(),
@@ -356,6 +368,11 @@ SwTraceMessage ReadSwTraceMessage(const unsigned char* packetBuffer, unsigned in
     // Check arg_types
     offset += CalculateSizeOfPaddedSwString(swTraceMessage.m_UiName);
     uint32_t swTraceArgTypesLength = ReadUint32(packetBuffer, offset);
+
+    if (swTraceArgTypesLength == 0 || swTraceArgTypesLength > packetLength)
+    {
+        throw RuntimeException("Error swTraceArgTypesLength is an invalid size", CHECK_LOCATION());
+    }
 
     offset += uint32_t_size;
     swTraceStringBuffer.resize(swTraceArgTypesLength - 1);
@@ -369,6 +386,11 @@ SwTraceMessage ReadSwTraceMessage(const unsigned char* packetBuffer, unsigned in
     // Check arg_names
     offset += CalculateSizeOfPaddedSwString(swTraceString);
     uint32_t swTraceArgNamesLength = ReadUint32(packetBuffer, offset);
+
+    if (swTraceArgNamesLength == 0 || swTraceArgNamesLength > packetLength)
+    {
+        throw RuntimeException("Error swTraceArgNamesLength is an invalid size", CHECK_LOCATION());
+    }
 
     offset += uint32_t_size;
     swTraceStringBuffer.resize(swTraceArgNamesLength - 1);

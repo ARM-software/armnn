@@ -114,7 +114,9 @@ BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
     offset += uint32_t_size;
     for(uint32_t i = 0; i < declarationSize; ++i)
     {
-        swTraceBufferMessages.push_back(profiling::ReadSwTraceMessage(packetBuffer->GetReadableData(), offset));
+        swTraceBufferMessages.push_back(profiling::ReadSwTraceMessage(packetBuffer->GetReadableData(),
+                                                                      offset,
+                                                                      packetBuffer->GetSize()));
     }
 
     SendTimelinePacketToCommandHandler(packetBuffer->GetReadableData(), timelineDirectoryCaptureCommandHandler);

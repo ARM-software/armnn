@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -40,7 +40,7 @@ void TimelineDirectoryCaptureCommandHandler::ParseData(const armnn::profiling::P
 
     for (uint32_t declaration = 0; declaration < numberOfDeclarations; ++declaration)
     {
-        m_SwTraceMessages.push_back(profiling::ReadSwTraceMessage(data, offset));
+        m_SwTraceMessages.push_back(profiling::ReadSwTraceMessage(data, offset, packet.GetLength()));
     }
 
     m_TimelineCaptureCommandHandler.SetThreadIdSize(m_SwTraceHeader.m_ThreadIdBytes);

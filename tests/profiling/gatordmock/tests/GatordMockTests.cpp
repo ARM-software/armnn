@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -158,7 +158,9 @@ void CheckTimelineDirectory(timelinedecoder::TimelineDirectoryCaptureCommandHand
     offset += uint32_t_size;
     for(uint32_t i = 0; i < declarationSize; ++i)
     {
-        swTraceBufferMessages.push_back(profiling::ReadSwTraceMessage(packetBuffer->GetReadableData(), offset));
+        swTraceBufferMessages.push_back(profiling::ReadSwTraceMessage(packetBuffer->GetReadableData(),
+                                                                      offset,
+                                                                      packetBuffer->GetSize()));
     }
 
     for(uint32_t index = 0; index < declarationSize; ++index)

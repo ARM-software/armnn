@@ -105,4 +105,16 @@ BOOST_FIXTURE_TEST_CASE(ParseTanH, TanHFixture)
         { -0.1f,       -0.2f,         -0.3f,       -0.4f,    0.1f,         0.2f,              0.3f },
         { -0.09966799f, -0.19737528f, -0.29131261f, -0.379949f, 0.09966799f, 0.19737528f, 0.29131261f });
 }
+
+struct HardSwishFixture : ActivationFixture
+{
+    HardSwishFixture() : ActivationFixture("HARD_SWISH", "FLOAT32") {}
+};
+
+BOOST_FIXTURE_TEST_CASE(ParseHardSwish, HardSwishFixture)
+{
+    RunTest<2, armnn::DataType::Float32>(0,
+                                         { -4.0f, -3.0f,        -2.9f,  1.2f,        2.2f, 3.0f, 4.0f },
+                                         { -0.0f, -0.0f, -0.04833334f, 0.84f, 1.90666667f, 3.0f, 4.0f });
+}
 BOOST_AUTO_TEST_SUITE_END()

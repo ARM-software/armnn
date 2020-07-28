@@ -538,6 +538,7 @@ TfLiteParser::TfLiteParser(const Optional<ITfLiteParser::TfLiteParserOptions>& o
     m_ParserFunctions[tflite::BuiltinOperator_DEQUANTIZE]              = &TfLiteParser::ParseDequantize;
     m_ParserFunctions[tflite::BuiltinOperator_EXP]                     = &TfLiteParser::ParseExp;
     m_ParserFunctions[tflite::BuiltinOperator_FULLY_CONNECTED]         = &TfLiteParser::ParseFullyConnected;
+    m_ParserFunctions[tflite::BuiltinOperator_HARD_SWISH]              = &TfLiteParser::ParseHardSwish;
     m_ParserFunctions[tflite::BuiltinOperator_LEAKY_RELU]              = &TfLiteParser::ParseLeakyRelu;
     m_ParserFunctions[tflite::BuiltinOperator_LOGISTIC]                = &TfLiteParser::ParseLogistic;
     m_ParserFunctions[tflite::BuiltinOperator_L2_NORMALIZATION]        = &TfLiteParser::ParseL2Normalization;
@@ -1992,7 +1993,7 @@ void TfLiteParser::ParseRelu6(size_t subgraphIndex, size_t operatorIndex)
 
 void TfLiteParser::ParseLeakyRelu(size_t subgraphIndex, size_t operatorIndex)
 {
-    ParseActivation(subgraphIndex,operatorIndex, ActivationFunction::LeakyReLu);
+    ParseActivation(subgraphIndex, operatorIndex, ActivationFunction::LeakyReLu);
 }
 
 void TfLiteParser::ParseLogistic(size_t subgraphIndex, size_t operatorIndex)
@@ -2005,6 +2006,10 @@ void TfLiteParser::ParseTanH(size_t subgraphIndex, size_t operatorIndex)
     ParseActivation(subgraphIndex,operatorIndex,ActivationFunction::TanH);
 }
 
+void TfLiteParser::ParseHardSwish(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseActivation(subgraphIndex, operatorIndex, ActivationFunction::HardSwish);
+}
 
 void TfLiteParser::ParseActivation(size_t subgraphIndex, size_t operatorIndex, ActivationFunction activationType)
 {
@@ -2055,6 +2060,9 @@ void TfLiteParser::ParseActivation(size_t subgraphIndex, size_t operatorIndex, A
             activationDesc.m_A = options->alpha;
             break;
         }
+        case ActivationFunction::HardSwish:
+            layerName += str(boost::format("HARDSWISH:%1%:%2%") % subgraphIndex % operatorIndex);
+            break;
         default:
         {
             throw ParseException(

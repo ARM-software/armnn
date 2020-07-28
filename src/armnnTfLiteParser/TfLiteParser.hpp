@@ -104,6 +104,7 @@ private:
     void ParseDetectionPostProcess(size_t subgraphIndex, size_t operatorIndex);
     void ParseExp(size_t subgraphIndex, size_t operatorIndex);
     void ParseFullyConnected(size_t subgraphIndex, size_t operatorIndex);
+    void ParseHardSwish(size_t subgraphIndex, size_t operatorIndex);
     void ParseLeakyRelu(size_t subgraphIndex, size_t operatorIndex);
     void ParseLogistic(size_t subgraphIndex, size_t operatorIndex);
     void ParseL2Normalization(size_t subgraphIndex, size_t operatorIndex);

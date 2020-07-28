@@ -189,19 +189,33 @@ inline std::set<unsigned int> ComputeSplitAxis(const armnn::SplitterDescriptor& 
     return splitAxis;
 }
 
-/// Function to convert ArmNN axis (left to right) to ACL axis (right to left) ranging from [-dim, dim)
+/// Function to convert ArmNN axis (left to right) to ACL axis (right to left) ranging from [-rank, rank)
 inline int ComputeAclAxis(const int& armnnAxis, const armnn::TensorInfo& tensor)
 {
-    int dim = static_cast<int>(tensor.GetNumDimensions());
+    int rank = static_cast<int>(tensor.GetNumDimensions());
 
-    ARMNN_ASSERT(dim != 0);
-    ARMNN_ASSERT((-1 * dim) <= armnnAxis);
-    ARMNN_ASSERT(armnnAxis < dim);
+    ARMNN_ASSERT(rank != 0);
+    ARMNN_ASSERT((-1 * rank) <= armnnAxis);
+    ARMNN_ASSERT(armnnAxis < rank);
 
     int sign = (armnnAxis < 0) ? -1 : 1;
-    int aclAxis = sign * dim - 1  - armnnAxis;
+    int aclAxis = sign * rank - 1  - armnnAxis;
 
     return aclAxis;
+}
+
+/// Function to convert axis to its positive equivalent value.
+/// [-rank, rank) --> [0, rank)
+inline unsigned int ComputePositiveAxis(const int& axis, const armnn::TensorInfo& tensor)
+{
+    int rank = static_cast<int>(tensor.GetNumDimensions());
+
+    ARMNN_ASSERT(rank != 0);
+    ARMNN_ASSERT((-1 * rank) <= axis);
+    ARMNN_ASSERT(axis < rank);
+
+    int positiveAxis = (axis < 0) ? rank + axis : axis;
+    return static_cast<unsigned int>(positiveAxis);
 }
 
 } // namespace armnn

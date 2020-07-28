@@ -21,7 +21,8 @@ arm_compute::Status ClLogSoftmaxWorkloadValidate(const TensorInfo& input,
     const arm_compute::TensorInfo aclInputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(output);
 
-    unsigned int aclAxis = ComputeSoftmaxAclAxis<unsigned int>(descriptor, input);
+    int aclAxis_int = ComputeAclAxis(descriptor.m_Axis, input);
+    unsigned int aclAxis = ComputePositiveAxis(aclAxis_int, input);
     return arm_compute::CLLogSoftmaxLayer::validate(&aclInputInfo, &aclOutputInfo, descriptor.m_Beta, aclAxis);
 }
 
@@ -35,7 +36,8 @@ ClLogSoftmaxWorkload::ClLogSoftmaxWorkload(const LogSoftmaxQueueDescriptor& desc
     arm_compute::ICLTensor& input  = static_cast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    unsigned int aclAxis = ComputeSoftmaxAclAxis<unsigned int>(m_Data.m_Parameters, info.m_InputTensorInfos[0]);
+    int aclAxis_int = ComputeAclAxis(m_Data.m_Parameters.m_Axis, info.m_InputTensorInfos[0]);
+    unsigned int aclAxis = ComputePositiveAxis(aclAxis_int, info.m_InputTensorInfos[0]);
     m_LogSoftmaxLayer.configure(&input, &output, m_Data.m_Parameters.m_Beta, aclAxis);
 }
 

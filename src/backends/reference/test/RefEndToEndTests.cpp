@@ -20,6 +20,7 @@
 #include <backendsCommon/test/LogSoftmaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QLstmEndToEndTestImpl.hpp>
+#include <backendsCommon/test/RankEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ResizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
@@ -1255,6 +1256,36 @@ BOOST_AUTO_TEST_CASE(RefArgMinAxis3Uint8Test)
 BOOST_AUTO_TEST_CASE(RefQLstmEndToEndTest)
 {
     QLstmEndToEnd(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefRankEndToEndTest)
+{
+    RankEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefRankEndToEndTestFloat16)
+{
+    RankEndToEnd<armnn::DataType::Float16>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefRankEndToEndTestInt32)
+{
+    RankEndToEnd<armnn::DataType::Signed32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefRankEndToEndTestQAsymmS8)
+{
+    RankEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefRankEndToEndTestQSymmS16)
+{
+    RankEndToEnd<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefRankEndToEndTestQSymmS8)
+{
+    RankEndToEnd<armnn::DataType::QSymmS8>(defaultBackends);
 }
 
 #if !defined(__ANDROID__)

@@ -44,6 +44,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     QLstmEndToEndTestImpl.hpp
     QuantizedLstmEndToEndTestImpl.cpp
     QuantizedLstmEndToEndTestImpl.hpp
+    RankEndToEndTestImpl.hpp
     ResizeEndToEndTestImpl.hpp
     RuntimeTestImpl.hpp
     SpaceToDepthEndToEndTestImpl.cpp

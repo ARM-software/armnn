@@ -184,7 +184,9 @@ void EndToEndLayerTestImpl(INetworkPtr network,
         std::vector<TOutput> out = outputStorage.at(it.first);
         for (unsigned int i = 0; i < out.size(); ++i)
         {
-            BOOST_CHECK(Compare<ArmnnOType>(it.second[i], out[i], tolerance) == true);
+            BOOST_CHECK_MESSAGE(Compare<ArmnnOType>(it.second[i], out[i], tolerance) == true,
+                    "Actual output: " << out[i] << ". Expected output:" << it.second[i]);
+
         }
     }
 }

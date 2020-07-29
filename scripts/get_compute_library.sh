@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_05" # Release 20.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="ad7515d231acb075a9585e52f257373b1a1b5d1f" #COMPMID-3385: Async support to CLArithmetic* kernels/functions Pt.1.
+DEFAULT_CLFRAMEWORKREVISION="42e57362933b7fa04f9a86297fa75ed38c5e3c97" #COMPMID-2078: Remove legacy TODOs
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

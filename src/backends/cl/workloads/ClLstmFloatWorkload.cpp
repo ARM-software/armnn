@@ -124,7 +124,7 @@ ClLstmFloatWorkload::ClLstmFloatWorkload(const LstmQueueDescriptor &descriptor, 
 
     const arm_compute::ICLTensor& input           = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     const arm_compute::ICLTensor& output_state_in = static_cast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
-    const arm_compute::ICLTensor& cell_state_in   = static_cast<IClTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
+    arm_compute::ICLTensor& cell_state_in         = static_cast<IClTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
 
     arm_compute::ICLTensor& output_state_out      = static_cast<IClTensorHandle*>(m_Data.m_Outputs[1])->GetTensor();
     arm_compute::ICLTensor& cell_state_out        = static_cast<IClTensorHandle*>(m_Data.m_Outputs[2])->GetTensor();

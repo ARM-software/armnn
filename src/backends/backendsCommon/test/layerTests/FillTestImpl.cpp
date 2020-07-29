@@ -17,13 +17,10 @@ LayerTestResult<T, 4> SimpleFillTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     IgnoreUnused(memoryManager);
-    armnn::TensorInfo inputTensorInfo({4}, ArmnnType);
-    inputTensorInfo.SetQuantizationScale(0.0f);
-
+    armnn::TensorInfo inputTensorInfo({4}, armnn::DataType::Signed32);
     armnn::TensorInfo outputTensorInfo({2, 2, 3, 2}, ArmnnType);
-    outputTensorInfo.SetQuantizationScale(0.0f);
 
-    auto input = MakeTensor<T, 1>(inputTensorInfo, ConvertToDataType<ArmnnType>(
+    auto input = MakeTensor<int32_t, 1>(inputTensorInfo, ConvertToDataType<armnn::DataType::Signed32>(
         {2, 2, 3, 2},
         inputTensorInfo));
 

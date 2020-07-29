@@ -34,7 +34,7 @@ struct FillFixture : public ParserFlatbuffersSerializeFixture
                           dimensions: [
                             4
                           ],
-                          dataType: "Float32",
+                          dataType: "Signed32",
                           quantizationScale: 0.0
                         }
                       }
@@ -125,7 +125,7 @@ struct SimpleFillFixture : FillFixture
 
 BOOST_FIXTURE_TEST_CASE(Fill, SimpleFillFixture)
 {
-    RunTest<4, armnn::DataType::Float32>(
+    RunTest<4, armnn::DataType::Signed32, armnn::DataType::Float32>(
             0,
             {{"InputLayer", { 1, 3, 3, 1 }}},
             {{"OutputLayer",{ 1, 1, 1, 1, 1, 1, 1, 1, 1}}});

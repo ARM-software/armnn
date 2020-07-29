@@ -874,7 +874,7 @@ bool RefLayerSupport::IsFillSupported(const TensorInfo& input,
         DataType::Signed32
     };
 
-    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypeIs(input, DataType::Signed32), reasonIfUnsupported,
                                   "Reference Fill: input type not supported.");
 
     supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,

@@ -39,27 +39,31 @@ void FillEndToEnd(const std::vector<armnn::BackendId>& backends)
     FillDescriptor descriptor;
     descriptor.m_Value = 9;
 
-    std::vector<T> inputData{
+    std::vector<int32_t> inputData {
             1, 1, 5, 3
     };
 
-    std::vector<T> expectedOutputData{
+    std::vector<float> floatExpectedOutputData {
             9, 9, 9, 9, 9,
             9, 9, 9, 9, 9,
             9, 9, 9, 9, 9
     };
+    std::vector<T> expectedOutputData = armnnUtils::QuantizedVector<T>(floatExpectedOutputData);
 
-    TensorInfo inputInfo ({ 4 }, ArmnnType);
+    TensorInfo inputInfo ({ 4 }, DataType::Signed32);
     TensorInfo outputInfo({ 1, 1, 5, 3 }, ArmnnType);
 
     armnn::INetworkPtr network = CreateFillNetwork(inputInfo, outputInfo, descriptor);
 
     BOOST_TEST_CHECKPOINT("create a network");
 
-    std::map<int, std::vector<T>> inputTensorData          = {{ 0, inputData }};
+    std::map<int, std::vector<int32_t>> inputTensorData    = {{ 0, inputData }};
     std::map<int, std::vector<T>> expectedOutputTensorData = {{ 0, expectedOutputData }};
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(network), inputTensorData, expectedOutputTensorData, backends);
+    EndToEndLayerTestImpl<DataType::Signed32, ArmnnType>(move(network),
+                                                         inputTensorData,
+                                                         expectedOutputTensorData,
+                                                         backends);
 }
 
 } // anonymous namespace

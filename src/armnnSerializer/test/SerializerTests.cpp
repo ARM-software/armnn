@@ -1204,7 +1204,7 @@ BOOST_AUTO_TEST_CASE(SerializeFill)
     DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Fill)
 
     const std::string layerName("fill");
-    const armnn::TensorInfo inputInfo({4}, armnn::DataType::Float32);
+    const armnn::TensorInfo inputInfo({4}, armnn::DataType::Signed32);
     const armnn::TensorInfo outputInfo({1, 3, 3, 1}, armnn::DataType::Float32);
 
     armnn::FillDescriptor descriptor(1.0f);

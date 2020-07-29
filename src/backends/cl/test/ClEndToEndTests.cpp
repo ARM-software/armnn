@@ -237,6 +237,11 @@ BOOST_AUTO_TEST_CASE(ClFillEndToEndTest)
     FillEndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
+BOOST_AUTO_TEST_CASE(RefFillEndToEndTestFloat16)
+{
+    FillEndToEnd<armnn::DataType::Float16>(defaultBackends);
+}
+
 BOOST_AUTO_TEST_CASE(ClFillEndToEndTestInt32)
 {
     FillEndToEnd<armnn::DataType::Signed32>(defaultBackends);

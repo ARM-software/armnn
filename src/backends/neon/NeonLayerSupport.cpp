@@ -406,12 +406,16 @@ bool NeonLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
     }
 }
 
-bool NeonLayerSupport::IsFillSupported(const TensorInfo&,
-                                       const TensorInfo&,
-                                       const FillDescriptor&,
-                                       Optional<std::string&>) const
+bool NeonLayerSupport::IsFillSupported(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       const FillDescriptor& descriptor,
+                                       Optional<std::string&> reasonIfUnsupported) const
 {
-    return true;
+    armnn::IgnoreUnused(input);
+    armnn::IgnoreUnused(output);
+    armnn::IgnoreUnused(descriptor);
+
+    return IsNeonBackendSupported(reasonIfUnsupported);
 }
 
 bool NeonLayerSupport::IsFloorSupported(const TensorInfo& input,

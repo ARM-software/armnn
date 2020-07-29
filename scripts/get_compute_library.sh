@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_05" # Release 20.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="42e57362933b7fa04f9a86297fa75ed38c5e3c97" #COMPMID-2078: Remove legacy TODOs
+DEFAULT_CLFRAMEWORKREVISION="a179798501af2b3939f9282b2f03ef4f98471d81" #COMPMID-3585: Android R while_fib_n_5_quant8 failure on CpuAcc
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

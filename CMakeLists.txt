@@ -956,7 +956,7 @@ if(BUILD_UNIT_TESTS)
 
     if(BUILD_TIMELINE_DECODER)
         target_link_libraries(UnitTests timelineDecoder)
-        target_link_libraries(UnitTests jsonTimelineDecoder)
+        target_link_libraries(UnitTests timelineDecoderJson)
     endif()
 
     if(BUILD_TF_LITE_PARSER)

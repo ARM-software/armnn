@@ -327,7 +327,14 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFill(const FillQueueDescrip
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    return std::make_unique<RefFloorWorkload>(descriptor, info);
+    if(IsQuantizedType(info.m_InputTensorInfos[0].GetDataType()))
+    {
+        return nullptr;
+    }
+    else
+    {
+        return std::make_unique<RefFloorWorkload>(descriptor, info);
+    }
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFullyConnected(

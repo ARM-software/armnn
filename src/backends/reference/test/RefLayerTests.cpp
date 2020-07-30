@@ -1366,7 +1366,6 @@ ARMNN_AUTO_TEST_CASE(SimpleFillS32, SimpleFillTest<DataType::Signed32>)
 // Floor
 ARMNN_AUTO_TEST_CASE(SimpleFloor, SimpleFloorTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(SimpleFloorFloat16, SimpleFloorTest<DataType::Float16>)
-ARMNN_AUTO_TEST_CASE(SimpleFloorQuantisedSymm16, SimpleFloorTest<DataType::QSymmS16>)
 
 // Reshape
 ARMNN_AUTO_TEST_CASE(SimpleReshapeFloat32, SimpleReshapeTest<DataType::Float32>)

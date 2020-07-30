@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_SUITE(Deserializer)
         RunTest<4, armnn::DataType::Float32>(
                 0,
                 {{"InputLayer",  { -100.0f, -50.5f, -25.9999f, -0.5f , 0.0f, 1.5555f, 25.5f, 100.0f }}},
-                {{"OutputLayer", { 100.0f, 50.0f, 25.9999f, 0.5f , 0.0f, 1.5555f, 25.5f, 100.0f }}});
+                {{"OutputLayer", { 100.0f, 50.5f, 25.9999f, 0.5f , 0.0f, 1.5555f, 25.5f, 100.0f }}});
     }
 
 BOOST_AUTO_TEST_SUITE_END()

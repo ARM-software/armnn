@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_05" # Release 20.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="a179798501af2b3939f9282b2f03ef4f98471d81" #COMPMID-3585: Android R while_fib_n_5_quant8 failure on CpuAcc
+DEFAULT_CLFRAMEWORKREVISION="3b64e3e78c166773fea680afb4829d886e90552d" #COMPMID-3653 CL GEMM kernel creation error on certain combinations of N and N0
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

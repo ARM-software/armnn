@@ -56,7 +56,7 @@ protected:
 
 private:
     template <typename FactoryType>
-    void CreateTensors(const FactoryType& factory);
+    void CreateTensors(const TensorHandleFactoryRegistry& registry, const FactoryType& factory);
 
 };
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,6 +7,7 @@
 #include "SampleDynamicLayerSupport.hpp"
 #include "SampleDynamicWorkloadFactory.hpp"
 #include "SampleMemoryManager.hpp"
+#include "SampleDynamicTensorHandleFactory.hpp"
 
 #include <armnn/backends/IBackendInternal.hpp>
 #include <armnn/backends/OptimizationViews.hpp>
@@ -38,7 +39,8 @@ public:
     IBackendInternal::IWorkloadFactoryPtr CreateWorkloadFactory(
         const IMemoryManagerSharedPtr& memoryManager) const override
     {
-        return std::make_unique<SampleDynamicWorkloadFactory>();
+        return std::make_unique<SampleDynamicWorkloadFactory>(
+                PolymorphicPointerDowncast<SampleMemoryManager>(memoryManager));
     }
 
     IBackendInternal::IWorkloadFactoryPtr CreateWorkloadFactory(
@@ -61,7 +63,7 @@ public:
 
     std::vector<ITensorHandleFactory::FactoryId> GetHandleFactoryPreferences() const override
     {
-        return std::vector<ITensorHandleFactory::FactoryId>();
+        return std::vector<ITensorHandleFactory::FactoryId> { SampleDynamicTensorHandleFactory::GetIdStatic() };
     }
 
     IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override
@@ -77,6 +79,15 @@ public:
 
         return optimizationViews;
     }
+
+    void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry) const override
+    {
+        auto memoryManager = std::make_shared<SampleMemoryManager>();
+
+        registry.RegisterMemoryManager(memoryManager);
+        registry.RegisterFactory(std::make_unique<SampleDynamicTensorHandleFactory>(memoryManager));
+    }
+
 };
 
 } // namespace armnn

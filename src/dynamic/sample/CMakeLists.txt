@@ -1,5 +1,5 @@
 #
-# Copyright © 2020 Arm Ltd. All rights reserved.
+# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -26,6 +26,8 @@ list(APPEND armnnSampleDynamicBackend_sources
         SampleMemoryManager.hpp
         SampleTensorHandle.cpp
         SampleTensorHandle.hpp
+        SampleDynamicTensorHandleFactory.cpp
+        SampleDynamicTensorHandleFactory.hpp
 )
 
 add_library(Arm_SampleDynamic_backend MODULE ${armnnSampleDynamicBackend_sources})

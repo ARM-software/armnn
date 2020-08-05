@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_05" # Release 20.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="ac4c03042d7a3020f87cea641e69aa38a684ddd7" #COMPMID-3618 Add support for export_to_cl_image_rhs in GEMMTuner.py 
+DEFAULT_CLFRAMEWORKREVISION="dd4cfc0c82a7e559e9a1985e5616f5f3c9d1c299" #COMPMID-3516: Update documentation for new operators in 20.08 
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

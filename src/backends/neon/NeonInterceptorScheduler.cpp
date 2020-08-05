@@ -54,12 +54,11 @@ void NeonInterceptorScheduler::run_tagged_workloads(std::vector<Workload> &workl
 
 void NeonInterceptorScheduler::schedule_op(arm_compute::ICPPKernel *kernel,
                                            const Hints &hints,
-                                           const arm_compute::InputTensorMap &inputs,
-                                           const arm_compute::OutputTensorMap &outputs )
+                                           arm_compute::ITensorPack &tensors )
 {
 
     WallClockTimer::clock::time_point startTime = WallClockTimer::clock::now();
-    m_RealScheduler.schedule_op(kernel, hints, inputs, outputs);
+    m_RealScheduler.schedule_op(kernel, hints, tensors);
     WallClockTimer::clock::time_point stopTime = WallClockTimer::clock::now();
 
     const auto delta       = std::chrono::duration<double, std::micro>(stopTime - startTime);

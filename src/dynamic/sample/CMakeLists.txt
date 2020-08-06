@@ -37,6 +37,7 @@ target_include_directories(Arm_SampleDynamic_backend PRIVATE ${PROJECT_SOURCE_DI
 target_include_directories(Arm_SampleDynamic_backend PRIVATE ${PROJECT_SOURCE_DIR}/../../../src/backends)
 target_include_directories(Arm_SampleDynamic_backend PRIVATE ${PROJECT_SOURCE_DIR}/../../../src/profiling)
 target_include_directories(Arm_SampleDynamic_backend PRIVATE ${PROJECT_SOURCE_DIR}/../../../profiling/common/include)
+target_include_directories(Arm_SampleDynamic_backend PRIVATE ${PROJECT_SOURCE_DIR}/../../../profiling)
 target_include_directories(Arm_SampleDynamic_backend PRIVATE ${Boost_INCLUDE_DIRS})
 target_link_libraries(Arm_SampleDynamic_backend ${Boost_SYSTEM_LIBRARY})
 target_link_libraries(Arm_SampleDynamic_backend ${ARMNN_PATH})

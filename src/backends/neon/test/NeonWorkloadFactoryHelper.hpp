@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -12,6 +12,7 @@
 
 #include <neon/NeonBackend.hpp>
 #include <neon/NeonWorkloadFactory.hpp>
+#include "neon/NeonTensorHandleFactory.hpp"
 
 namespace
 {
@@ -29,6 +30,14 @@ struct WorkloadFactoryHelper<armnn::NeonWorkloadFactory>
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
     {
         return armnn::NeonWorkloadFactory(
+            armnn::PolymorphicPointerDowncast<armnn::NeonMemoryManager>(memoryManager));
+    }
+
+    static armnn::NeonTensorHandleFactory GetTensorHandleFactory(
+            const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager = nullptr)
+    {
+
+        return armnn::NeonTensorHandleFactory(
             armnn::PolymorphicPointerDowncast<armnn::NeonMemoryManager>(memoryManager));
     }
 };

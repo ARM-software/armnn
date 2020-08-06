@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -12,6 +12,7 @@
 
 #include <cl/ClBackend.hpp>
 #include <cl/ClWorkloadFactory.hpp>
+#include <cl/ClTensorHandleFactory.hpp>
 
 namespace
 {
@@ -29,6 +30,13 @@ struct WorkloadFactoryHelper<armnn::ClWorkloadFactory>
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
     {
         return armnn::ClWorkloadFactory(armnn::PolymorphicPointerDowncast<armnn::ClMemoryManager>(memoryManager));
+    }
+
+    static armnn::ClTensorHandleFactory GetTensorHandleFactory(
+            const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager = nullptr)
+    {
+
+        return armnn::ClTensorHandleFactory(armnn::PolymorphicPointerDowncast<armnn::ClMemoryManager>(memoryManager));
     }
 };
 

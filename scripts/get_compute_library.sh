@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_05" # Release 20.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="dd4cfc0c82a7e559e9a1985e5616f5f3c9d1c299" #COMPMID-3516: Update documentation for new operators in 20.08 
+DEFAULT_CLFRAMEWORKREVISION="b972ae62dd877eb53e6ad56ee124cfbc89441e2d" #COMPMID-3652 Fix CLFullyConnectedLayer failure on S10 
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

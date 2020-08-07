@@ -477,6 +477,10 @@ BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
     WaitFor([&](){return mockBackEndProfilingContext->TimelineReportingEnabled();},
             "Timeline packets were not activated");
 
+    // Once TimelineReporting is Enabled additional activateTimelinePackets should be ignored
+    mockService.SendActivateTimelinePacket();
+    mockService.SendActivateTimelinePacket();
+
     // Once timeline packets have been reactivated the ActivateTimelineReportingCommandHandler will resend the
     // SendWellKnownLabelsAndEventClasses and then send the structure of any loaded networks
     WaitFor([&](){return timelineDecoder.GetModel().m_Labels.size() >= 24;},

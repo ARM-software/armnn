@@ -41,15 +41,18 @@ void ActivateTimelineReportingCommandHandler::operator()(const arm::pipe::Packet
                                            + " id = " + std::to_string(packet.GetPacketId()));
             }
 
-            m_SendTimelinePacket.SendTimelineMessageDirectoryPackage();
+            if(!m_TimelineReporting)
+            {
+                m_SendTimelinePacket.SendTimelineMessageDirectoryPackage();
 
-            TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses(m_SendTimelinePacket);
+                TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses(m_SendTimelinePacket);
 
-            m_TimelineReporting = true;
+                m_TimelineReporting = true;
 
-            m_ReportStructure.value().ReportStructure();
+                m_ReportStructure.value().ReportStructure();
 
-            m_BackendNotifier.NotifyBackendsForTimelineReporting();
+                m_BackendNotifier.NotifyBackendsForTimelineReporting();
+            }
 
             break;
         default:

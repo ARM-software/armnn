@@ -198,6 +198,90 @@ bool ValidateFilePath(std::string& file)
     return true;
 }
 
+void CheckAccuracy(std::vector<float>* toDetector0, std::vector<float>* toDetector1,
+                   std::vector<float>* toDetector2, std::vector<float>* detectorOutput,
+                   const std::vector<yolov3::Detection>& nmsOut, const std::vector<std::string>& filePaths)
+{
+    std::ifstream pathStream;
+    std::vector<float> expected;
+    std::vector<std::vector<float>*> outputs;
+    float compare = 0;
+    unsigned int count = 0;
+
+    //Push back output vectors from inference for use in loop
+    outputs.push_back(toDetector0);
+    outputs.push_back(toDetector1);
+    outputs.push_back(toDetector2);
+    outputs.push_back(detectorOutput);
+
+    for (unsigned int i = 0; i < outputs.size(); ++i)
+    {
+        // Reading expected output files and assigning them to @expected. Close and Clear to reuse stream and clean RAM
+        pathStream.open(filePaths[i]);
+        if (!pathStream.is_open())
+        {
+            ARMNN_LOG(error) << "Expected output file can not be opened: " << filePaths[i];
+            continue;
+        }
+
+        expected.assign(std::istream_iterator<float>(pathStream), {});
+        pathStream.close();
+        pathStream.clear();
+
+        // Ensure each vector is the same length
+        if (expected.size() != outputs[i]->size())
+        {
+            ARMNN_LOG(error) << "Expected output size does not match actual output size: " << filePaths[i];
+        }
+        else
+        {
+            count = 0;
+
+            // Compare abs(difference) with tolerance to check for value by value equality
+            for (unsigned int j = 0; j < outputs[i]->size(); ++j)
+            {
+                compare = abs(expected[j] - outputs[i]->at(j));
+                if (compare > 0.001f)
+                {
+                    count++;
+                }
+            }
+            if (count > 0)
+            {
+                ARMNN_LOG(error) << count << " output(s) do not match expected values in: " << filePaths[i];
+            }
+        }
+    }
+
+    pathStream.open(filePaths[4]);
+    if (!pathStream.is_open())
+    {
+        ARMNN_LOG(error) << "Expected output file can not be opened: " << filePaths[4];
+    }
+    else
+    {
+        expected.assign(std::istream_iterator<float>(pathStream), {});
+        pathStream.close();
+        pathStream.clear();
+        unsigned int y = 0;
+        unsigned int numOfMember = 6;
+        std::vector<float> intermediate;
+
+        for (auto& detection: nmsOut)
+        {
+            for (unsigned int x = y * numOfMember; x < ((y * numOfMember) + numOfMember); ++x)
+            {
+                intermediate.push_back(expected[x]);
+            }
+            if (!yolov3::compare_detection(detection, intermediate))
+            {
+                ARMNN_LOG(error) << "Expected NMS output does not match: Detection " << y + 1;
+            }
+            intermediate.clear();
+            y++;
+        }
+    }
+}
 
 struct ParseArgs
 {
@@ -212,6 +296,13 @@ struct ParseArgs
                  "File path where the TfLite model for the yoloV3big backbone "
                  "can be found e.g. mydir/yoloV3big_backbone.tflite",
                  cxxopts::value<std::string>())
+
+               ("c,comparison-files",
+                "Defines the expected outputs for the model "
+                "of yoloV3big e.g. 'mydir/file1.txt,mydir/file2.txt,mydir/file3.txt,mydir/file4.txt'->InputToDetector1"
+                " will be tried first then InputToDetector2 then InputToDetector3 then the Detector Output and finally"
+                " the NMS output. NOTE: Files are passed as comma separated list without whitespaces.",
+                cxxopts::value<std::vector<std::string>>())
 
                 ("d,detector-path",
                  "File path where the TfLite model for the yoloV3big "
@@ -248,8 +339,11 @@ struct ParseArgs
         }
 
         backboneDir = GetPathArgument(result, "backbone-path");
+        comparisonFiles = GetPathArgument(result["comparison-files"].as<std::vector<std::string>>());
         detectorDir = GetPathArgument(result, "detector-path");
         imageDir    = GetPathArgument(result, "image-path");
+
+
 
         prefBackendsBackbone = GetBackendIDs(result["preferred-backends-backbone"].as<std::vector<std::string>>());
         LogBackendsInfo(prefBackendsBackbone, "Backbone");
@@ -288,6 +382,25 @@ struct ParseArgs
         }
     }
 
+    /// Assigns vector of strings to struct member variable
+    std::vector<std::string> GetPathArgument(const std::vector<std::string>& pathStrings)
+    {
+        if (pathStrings.size() < 5){
+            throw cxxopts::option_syntax_exception("Comparison files requires 5 file paths.");
+        }
+
+        std::vector<std::string> filePaths;
+        for (auto& path : pathStrings)
+        {
+            filePaths.push_back(path);
+            if (!ValidateFilePath(filePaths.back()))
+            {
+                throw cxxopts::option_syntax_exception("Argument given to Comparison Files is not a valid file path");
+            }
+        }
+        return filePaths;
+    }
+
     /// Log info about assigned backends
     void LogBackendsInfo(std::vector<BackendId>& backends, std::string&& modelName)
     {
@@ -302,6 +415,7 @@ struct ParseArgs
 
     // Member variables
     std::string backboneDir;
+    std::vector<std::string> comparisonFiles;
     std::string detectorDir;
     std::string imageDir;
 
@@ -391,6 +505,7 @@ int main(int argc, char* argv[])
     static const int numIterations=2;
     using DurationUS = std::chrono::duration<double, std::micro>;
     std::vector<DurationUS> nmsDurations(0);
+    std::vector<yolov3::Detection> filtered_boxes;
     nmsDurations.reserve(numIterations);
     for (int i=0; i < numIterations; i++)
     {
@@ -411,7 +526,7 @@ int main(int argc, char* argv[])
         config.num_classes = 80;
         config.confidence_threshold = 0.9f;
         config.iou_threshold = 0.5f;
-        auto filtered_boxes = yolov3::nms(config, intermediateMem3);
+        filtered_boxes = yolov3::nms(config, intermediateMem3);
         auto nmsEndTime = clock::now();
 
         // Enable the profiling after the warm-up run
@@ -456,6 +571,10 @@ int main(int argc, char* argv[])
     nmsProfileStream << "  }" << "\n";
     nmsProfileStream << "}" << "\n";
     nmsProfileStream.close();
+
+    CheckAccuracy(&intermediateMem0, &intermediateMem1,
+                  &intermediateMem2, &intermediateMem3,
+                  filtered_boxes, progArgs.comparisonFiles);
 
     ARMNN_LOG(info) << "Run completed";
     return 0;

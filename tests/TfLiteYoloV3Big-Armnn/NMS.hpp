@@ -40,6 +40,15 @@ struct Detection {
 void print_detection(std::ostream& os,
                      const std::vector<Detection>& detections);
 
+/** Compare a detection object with a vector of float values
+ *
+ * @param detection [in] Detection object
+ * @param expected  [in] Vector of expected float values
+ * @return Boolean to represent if they match or not
+ */
+bool compare_detection(const yolov3::Detection& detection,
+                       const std::vector<float>& expected);
+
 /** Perform Non-Maxima Supression on a list of given detections
  *
  * @param[in] config         Configuration metadata for NMS

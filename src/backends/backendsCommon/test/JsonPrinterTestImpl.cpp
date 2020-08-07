@@ -134,10 +134,10 @@ std::string GetSoftmaxProfilerJson(const std::vector<armnn::BackendId>& backends
 
     IConnectableLayer* input = net->AddInputLayer(0, "input");
     SoftmaxDescriptor softmaxDescriptor;
-    // Set Axis to 0 if CL or Neon until further Axes are supported.
+    // Set Axis to -1 if CL or Neon until further Axes are supported.
     if ( backends.front() == armnn::Compute::CpuAcc || backends.front() == armnn::Compute::GpuAcc)
     {
-        softmaxDescriptor.m_Axis = 0;
+        softmaxDescriptor.m_Axis = -1;
     }
     IConnectableLayer* softmax = net->AddSoftmaxLayer(softmaxDescriptor, "softmax");
     IConnectableLayer* output  = net->AddOutputLayer(0, "output");

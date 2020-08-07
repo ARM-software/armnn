@@ -23,8 +23,12 @@ arm_compute::Status NeonSoftmaxWorkloadValidate(const TensorInfo& input,
     const arm_compute::TensorInfo aclInputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(output);
 
-    int aclAxis = ComputeAclAxis(descriptor.m_Axis, input);
-    return arm_compute::NESoftmaxLayer::validate(&aclInputInfo, &aclOutputInfo, descriptor.m_Beta, aclAxis);
+    int aclAxis_int = ComputeAclAxis(descriptor.m_Axis, input);
+    unsigned int aclAxis = ComputePositiveAxis(aclAxis_int, input);
+    return arm_compute::NESoftmaxLayer::validate(&aclInputInfo,
+                                                 &aclOutputInfo,
+                                                 descriptor.m_Beta,
+                                                 static_cast<int>(aclAxis));
 }
 
 NeonSoftmaxWorkload::NeonSoftmaxWorkload(const SoftmaxQueueDescriptor& descriptor,
@@ -38,8 +42,9 @@ NeonSoftmaxWorkload::NeonSoftmaxWorkload(const SoftmaxQueueDescriptor& descripto
     arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     auto layer = std::make_unique<arm_compute::NESoftmaxLayer>(memoryManager);
-    int aclAxis = ComputeAclAxis(m_Data.m_Parameters.m_Axis, info.m_InputTensorInfos[0]);
-    layer->configure(&input, &output, m_Data.m_Parameters.m_Beta, aclAxis);
+    int aclAxis_int = ComputeAclAxis(m_Data.m_Parameters.m_Axis, info.m_InputTensorInfos[0]);
+    unsigned int aclAxis = ComputePositiveAxis(aclAxis_int, info.m_InputTensorInfos[0]);
+    layer->configure(&input, &output, m_Data.m_Parameters.m_Beta, static_cast<int>(aclAxis));
     m_SoftmaxLayer.reset(layer.release());
 }
 

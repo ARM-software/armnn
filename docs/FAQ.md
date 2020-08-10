@@ -42,3 +42,7 @@ To validate that this issue is occurring inspect the boost build log looking for
 warning: ranlib: warning for library: libboost_atomic.a the table of contents is empty (no object file members in the library define global symbols)
 
 This problem has previously been reported to the boostorg GitHub project. The solution is to manually execute the correct ranlib on each static library. https://github.com/boostorg/build/issues/160
+
+ArmNN fails to build on Ubuntu 20.04
+---------------------------------------------------------
+The compiler version update on Ubuntu 20.04 resulted in build errors in Flat buffers 1.10.0. Update to Flatbuffers 1.12.0 to resolve this problem. In addition when building flatbuffers specify -fPIC CXX flag to allow the libraries to be used in our shared objects. Without this the the ArmNN build can fail with libflatbuffers.a(util.cpp.o): relocation R_X86_64_PC32 against symbol `_ZN11flatbuffers9DirExistsEPKc' can not be used when making a shared object; recompile with -fPIC

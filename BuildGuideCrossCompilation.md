@@ -130,11 +130,11 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     '''
 
 #### <"a name=buildflatbuffer">Build Flatbuffer</a>
-* Building Flatbuffer version 1.10.0
+* Building Flatbuffer version 1.12.0
     '''bash
-    wget -O flatbuffers-1.10.0.tar.gz https://github.com/google/flatbuffers/archive/v1.10.0.tar.gz
-    tar xf flatbuffers-1.10.0.tar.gz
-    cd flatbuffers-1.10.0
+    wget -O flatbuffers-1.12.0.tar.gz https://github.com/google/flatbuffers/archive/v1.12.0.tar.gz
+    tar xf flatbuffers-1.12.0.tar.gz
+    cd flatbuffers-1.12.0
     rm -f CMakeCache.txt
     mkdir build
     cd build
@@ -147,7 +147,8 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     '''bash
     mkdir build-arm64
     cd build-arm64
-    cmake .. -DCMAKE_C_COMPILER=/usr/bin/aarch64-linux-gnu-gcc \
+    # Add -fPIC to allow us to use the libraries in shared objects.
+    CXXFLAGS="-fPIC" cmake .. -DCMAKE_C_COMPILER=/usr/bin/aarch64-linux-gnu-gcc \
 	     -DCMAKE_CXX_COMPILER=/usr/bin/aarch64-linux-gnu-g++ \
 	     -DFLATBUFFERS_BUILD_FLATC=1 \
 	     -DCMAKE_INSTALL_PREFIX:PATH=$<DIRECTORY_PATH> \
@@ -171,7 +172,7 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     mkdir tflite
     cd tflite
     cp ../tensorflow/tensorflow/lite/schema/schema.fbs .
-    ../flatbuffers-1.10.0/build/flatc -c --gen-object-api --reflect-types --reflect-names schema.fbs
+    ../flatbuffers-1.12.0/build/flatc -c --gen-object-api --reflect-types --reflect-names schema.fbs
     '''
 
 #### <a name="buildANN">Build ArmNN</a>
@@ -210,7 +211,7 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     -DBUILD_TF_LITE_PARSER=1 \
     -DTF_LITE_GENERATED_PATH=$HOME/tflite \
     -DFLATBUFFERS_ROOT=$HOME/flatbuffers-arm64 \
-    -DFLATC_DIR=$HOME/flatbuffers-1.10.0/build \
+    -DFLATC_DIR=$HOME/flatbuffers-1.12.0/build \
     -DPROTOBUF_ROOT=$HOME/google/x86_64_pb_install \
     -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/x86_64_pb_install/ \
     -DPROTOBUF_LIBRARY_DEBUG=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.15.0.1 \

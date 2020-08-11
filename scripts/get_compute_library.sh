@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_05" # Release 20.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="996c777eea8acb8ce816552e77050dbf388f62be" #COMPMID-3700: ArmNN OOB test failure 
+DEFAULT_CLFRAMEWORKREVISION="315a20eea78a1861a55ba9fa25e244b702384f01" #COMPMID-3339: Fix doxygen comments about VECTOR_SIZE and BOUNDARY_VECTOR_SIZE 
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_05" # Release 20.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="4aed4aafa2ddb0b6f4b76aef5008c8bb45599ea4" #COMPMID-3683: Fix performance regression on Mali-G76 (Fully connected) COMPMID-3682: Fix performance regression on Mali-G76 (Convolution) 
+DEFAULT_CLFRAMEWORKREVISION="996c777eea8acb8ce816552e77050dbf388f62be" #COMPMID-3700: ArmNN OOB test failure 
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

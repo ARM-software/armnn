@@ -21,14 +21,13 @@ SampleTensorHandle::SampleTensorHandle(const TensorInfo &tensorInfo,
 }
 
 SampleTensorHandle::SampleTensorHandle(const TensorInfo& tensorInfo,
-                                       std::shared_ptr<SampleMemoryManager> &memoryManager,
                                        MemorySourceFlags importFlags)
     : m_TensorInfo(tensorInfo),
-      m_MemoryManager(memoryManager),
+      m_MemoryManager(nullptr),
       m_Pool(nullptr),
       m_UnmanagedMemory(nullptr),
       m_ImportFlags(importFlags),
-      m_Imported(false)
+      m_Imported(true)
 {
 
 }
@@ -132,6 +131,20 @@ bool SampleTensorHandle::Import(void* memory, MemorySource source)
     }
 
     return false;
+}
+
+void SampleTensorHandle::CopyOutTo(void* dest) const
+{
+    const void *src = GetPointer();
+    ARMNN_ASSERT(src);
+    memcpy(dest, src, m_TensorInfo.GetNumBytes());
+}
+
+void SampleTensorHandle::CopyInFrom(const void* src)
+{
+    void *dest = GetPointer();
+    ARMNN_ASSERT(dest);
+    memcpy(dest, src, m_TensorInfo.GetNumBytes());
 }
 
 }

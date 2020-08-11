@@ -17,9 +17,7 @@ class SampleTensorHandle : public ITensorHandle
 public:
     SampleTensorHandle(const TensorInfo& tensorInfo, std::shared_ptr<SampleMemoryManager> &memoryManager);
 
-    SampleTensorHandle(const TensorInfo& tensorInfo,
-                       std::shared_ptr<SampleMemoryManager> &memoryManager,
-                       MemorySourceFlags importFlags);
+    SampleTensorHandle(const TensorInfo& tensorInfo, MemorySourceFlags importFlags);
 
     ~SampleTensorHandle();
 
@@ -61,6 +59,10 @@ public:
     virtual bool Import(void* memory, MemorySource source) override;
 
 private:
+    // Only used for testing
+    void CopyOutTo(void*) const override;
+    void CopyInFrom(const void*) override;
+
     void* GetPointer() const;
 
     SampleTensorHandle(const SampleTensorHandle& other) = delete; // noncopyable

@@ -44,9 +44,15 @@ public:
     }
 
     IBackendInternal::IWorkloadFactoryPtr CreateWorkloadFactory(
-        class TensorHandleFactoryRegistry& /*tensorHandleFactoryRegistry*/) const override
+        class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry) const override
     {
-        return IWorkloadFactoryPtr{};
+        auto memoryManager = std::make_shared<SampleMemoryManager>();
+
+        tensorHandleFactoryRegistry.RegisterMemoryManager(memoryManager);
+        tensorHandleFactoryRegistry.RegisterFactory(std::make_unique<SampleDynamicTensorHandleFactory>(memoryManager));
+
+        return std::make_unique<SampleDynamicWorkloadFactory>(
+            PolymorphicPointerDowncast<SampleMemoryManager>(memoryManager));
     }
 
     IBackendInternal::IBackendProfilingContextPtr CreateBackendProfilingContext(
@@ -80,7 +86,7 @@ public:
         return optimizationViews;
     }
 
-    void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry) const override
+    void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry) override
     {
         auto memoryManager = std::make_shared<SampleMemoryManager>();
 

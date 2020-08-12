@@ -1219,7 +1219,7 @@ void CaffeParserBase::ParseSoftmaxLayer(const LayerParameter& layerParam)
     //      Engine
 
     armnn::SoftmaxDescriptor softmaxDescriptor;
-    softmaxDescriptor.m_Axis = -1;
+    softmaxDescriptor.m_Axis = 1;
     armnn::IConnectableLayer* const softmaxLayer = m_Network->AddSoftmaxLayer(
         softmaxDescriptor,
         layerParam.name().c_str());

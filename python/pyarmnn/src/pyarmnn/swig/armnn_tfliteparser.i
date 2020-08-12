@@ -87,14 +87,37 @@ public:
             list: A list of the output tensor names for the given model.
         ") GetSubgraphOutputTensorNames;
     std::vector<std::string> GetSubgraphOutputTensorNames(size_t subgraphId);
+
+    %feature("flatnested");
+    %feature("docstring",
+             "
+    Options for TfLiteParser.
+
+            Contains:
+    m_StandInLayerForUnsupported (bool): Add StandInLayers as placeholders for unsupported operators.
+            Default: False
+    m_InferAndValidate (bool): Infer output shape of operations based on their input shape. Default: False
+    ")TfLiteParserOptions;
+    struct TfLiteParserOptions
+    {
+        TfLiteParserOptions();
+
+        bool m_StandInLayerForUnsupported;
+        bool m_InferAndValidate;
+    };
 };
 
 %extend ITfLiteParser {
 // This is not a substitution of the default constructor of the Armnn class. It tells swig to create custom __init__
 // method for ITfLiteParser python object that will use static factory method to do the job.
 
-    ITfLiteParser() {
-        return armnnTfLiteParser::ITfLiteParser::CreateRaw();
+    ITfLiteParser(const armnnTfLiteParser::ITfLiteParser::TfLiteParserOptions* options = nullptr) {
+        if (options) {
+            return armnnTfLiteParser::ITfLiteParser::CreateRaw(
+                    armnn::Optional<armnnTfLiteParser::ITfLiteParser::TfLiteParserOptions>(*options));
+        } else {
+            return armnnTfLiteParser::ITfLiteParser::CreateRaw();
+        }
     }
 
 // The following does not replace a real destructor of the Armnn class.
@@ -127,6 +150,7 @@ public:
 
 }
 
-}
+} // end of namespace armnnTfLiteParser
+
 // Clear exception typemap.
 %exception;

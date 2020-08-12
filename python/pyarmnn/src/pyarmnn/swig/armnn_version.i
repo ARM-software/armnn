@@ -39,7 +39,7 @@ std::string GetVersion();
 
 %feature("docstring",
 "
-    Returns Arm NN library major version. The year of the release.
+    Returns Arm NN library major version.
 
     Returns:
         str: Major version of Arm NN installed.
@@ -49,7 +49,7 @@ std::string GetMajorVersion();
 
 %feature("docstring",
 "
-    Returns Arm NN library minor version. Month of the year of the release.
+    Returns Arm NN library minor version.
 
     Returns:
         str: Minor version of Arm NN installed.

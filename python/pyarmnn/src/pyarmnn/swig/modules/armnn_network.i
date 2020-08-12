@@ -20,15 +20,21 @@ Struct for holding options relating to the Arm NN optimizer. See `Optimize`.
 
 Contains:
     m_debug (bool): Add debug data for easier troubleshooting.
-    m_ReduceFp32ToFp16 (bool): Reduce Fp32 data to Fp16 for faster processing.
+    m_ReduceFp32ToBf16 (bool): Reduces Fp32 network to BFloat16 (Bf16) for faster processing. Layers
+                               that can not be reduced will be left in Fp32.
+    m_ReduceFp32ToFp16 (bool): Reduces Fp32 network to Fp16 for faster processing. Layers
+                               that can not be reduced will be left in Fp32.
 
 ") OptimizerOptions;
 struct OptimizerOptions
 {
     OptimizerOptions();
 
-    OptimizerOptions(bool reduceFp32ToFp16, bool debug);
+    OptimizerOptions(bool reduceFp32ToFp16,
+                     bool debug,
+                     bool reduceFp32ToBf16 = false);
 
+    bool m_ReduceFp32ToBf16;
     bool m_ReduceFp32ToFp16;
     bool m_Debug;
 };
@@ -501,18 +507,32 @@ public:
     armnn::IConnectableLayer* AddDivisionLayer(const char* name = nullptr);
 
     %feature("docstring",
-    "
-    Adds an Elementwise Unary layer to the network. Type of unary operation to use is decided by elementwiseUnaryDescriptor. Unary operations supported are (Abs, Exp, Neg, Rsqrt, Sqrt)
+        "
+        Adds an Elementwise Unary layer to the network. Type of unary operation to use is decided by elementwiseUnaryDescriptor. Unary operations supported are (Abs, Exp, Neg, Rsqrt, Sqrt)
 
-    Args:
-        elementwiseUnaryDescriptor (ElementwiseUnaryDescriptor): ElementwiseUnaryDescriptor to configure the choice of unary operation added to the network.
-        name (str): Optional name for the layer.
+        Args:
+            elementwiseUnaryDescriptor (ElementwiseUnaryDescriptor): ElementwiseUnaryDescriptor to configure the choice of unary operation added to the network.
+            name (str): Optional name for the layer.
 
-    Returns:
-        IConnectableLayer: Interface for configuring the layer.
-    ") AddElementwiseUnaryLayer;
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddElementwiseUnaryLayer;
     armnn::IConnectableLayer* AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
                                                        const char* name = nullptr);
+
+    %feature("docstring",
+        "
+        Add a Fill layer to the network.
+
+        Args:
+            FillDescriptor (FillDescriptor): Descriptor for the fill operation.
+            name (str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddFillLayer;
+    armnn::IConnectableLayer* AddFillLayer(const FillDescriptor& fillDescriptor,
+                                           const char* name = nullptr);
 
     %feature("docstring",
         "
@@ -531,12 +551,14 @@ public:
         Add Gather layer to the network.
 
         Args:
+            descriptor (GatherDescriptor): Descriptor for the gather operation.
             name (str): Optional name for the layer.
 
         Returns:
             IConnectableLayer: Interface for configuring the layer.
         ") AddGatherLayer;
-    armnn::IConnectableLayer* AddGatherLayer(const char* name = nullptr);
+    armnn::IConnectableLayer* AddGatherLayer(const GatherDescriptor& descriptor,
+                                             const char* name = nullptr);
 
     %feature("docstring",
         "
@@ -752,6 +774,20 @@ public:
     armnn::IConnectableLayer* AddQuantizedLstmLayer(const armnn::QuantizedLstmInputParams& params,
                                                      const char* name = nullptr);
 
+
+    %feature("docstring",
+        "
+        Adds a Rank layer to the network.
+
+        Args:
+            name (str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddRankLayer;
+    armnn::IConnectableLayer* AddRankLayer(const char* name = nullptr);
+
+    
     %feature("docstring",
         "
         Adds a Reshape layer to the network.

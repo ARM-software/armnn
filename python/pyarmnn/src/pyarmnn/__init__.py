@@ -47,7 +47,7 @@ except ImportError as err:
         raise RuntimeError(message)
 
 try:
-    from ._generated.pyarmnn_tfliteparser import ITfLiteParser
+    from ._generated.pyarmnn_tfliteparser import ITfLiteParser, TfLiteParserOptions
 except ImportError as err:
     logger = logging.getLogger(__name__)
     message = "Your ArmNN library instance does not support TF lite models parser functionality. "
@@ -92,8 +92,8 @@ from ._generated.pyarmnn import ComparisonDescriptor, ComparisonOperation_Equal,
 from ._generated.pyarmnn import UnaryOperation_Abs, UnaryOperation_Exp, UnaryOperation_Sqrt, UnaryOperation_Rsqrt, \
     UnaryOperation_Neg, ElementwiseUnaryDescriptor
 from ._generated.pyarmnn import Convolution2dDescriptor, DepthToSpaceDescriptor, DepthwiseConvolution2dDescriptor, \
-    DetectionPostProcessDescriptor, FakeQuantizationDescriptor, FullyConnectedDescriptor, \
-    InstanceNormalizationDescriptor, LstmDescriptor, L2NormalizationDescriptor, MeanDescriptor
+    DetectionPostProcessDescriptor, FakeQuantizationDescriptor, FillDescriptor, FullyConnectedDescriptor, \
+    GatherDescriptor, InstanceNormalizationDescriptor, LstmDescriptor, L2NormalizationDescriptor, MeanDescriptor
 from ._generated.pyarmnn import NormalizationAlgorithmChannel_Across, NormalizationAlgorithmChannel_Within, \
     NormalizationAlgorithmMethod_LocalBrightness, NormalizationAlgorithmMethod_LocalContrast, NormalizationDescriptor
 from ._generated.pyarmnn import PadDescriptor

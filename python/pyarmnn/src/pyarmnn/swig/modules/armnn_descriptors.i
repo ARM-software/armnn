@@ -15,6 +15,7 @@ namespace std {
 }
 
 %include "typemaps/vectors.i"
+%include "stdint.i"
 
 %typemap(out) const uint32_t*
 %{
@@ -388,6 +389,46 @@ struct FakeQuantizationDescriptor
 
 %feature("docstring",
     "
+    A descriptor for the Fill layer. Creates a tensor filled with a scalar value.
+
+    Contains:
+        m_Value (float): Value the tensor will be filled with.
+
+    ") FillDescriptor;
+struct FillDescriptor
+{
+    FillDescriptor();
+    FillDescriptor(const float& value);
+
+    bool operator ==(const FillDescriptor& rhs) const;
+
+    float m_Value;
+};
+
+%feature("docstring",
+    "
+    A descriptor for the Gather layer.
+
+    Contains:
+        m_Axis (int32_t): The axis from where to gather values from.
+
+    ") GatherDescriptor;
+struct GatherDescriptor
+{
+    GatherDescriptor();
+
+    GatherDescriptor(int32_t axis);
+
+    bool operator ==(const GatherDescriptor& rhs) const
+    {
+        return m_Axis == rhs.m_Axis;
+    }
+
+    int32_t m_Axis;
+};
+
+%feature("docstring",
+    "
     A descriptor for the FullyConnected layer. See `INetwork.AddFullyConnectedLayer()`.
 
     Contains:
@@ -661,7 +702,9 @@ struct ReshapeDescriptor
                         Default: `ResizeMethod_NearestNeighbor`.
         m_DataLayout (int): The data layout to be used (`DataLayout_NCHW`, `DataLayout_NHWC`). Default: `DataLayout_NCHW`.
         m_AlignCorners (bool):  Align corners or not when resizing. If True, corner pixel values are preserved after resizing.
-                                        Default: False
+                                        Default: False.
+        m_HalfPixelCenters (bool): If true, calculates the pixels from the center instead of from the edge.
+                                    Default: False.
 
     ") ResizeDescriptor;
 struct ResizeDescriptor
@@ -673,6 +716,7 @@ struct ResizeDescriptor
     ResizeMethod m_Method;
     DataLayout m_DataLayout;
     bool m_AlignCorners;
+    bool m_HalfPixelCenters;
 
     bool operator ==(const ResizeDescriptor& rhs) const;
 };
@@ -970,20 +1014,24 @@ struct SoftmaxDescriptor
         m_StrideY (int): Underlying C++ data type is uint32_t. Stride value when proceeding through input for the height dimension. Default: 0.
         m_BiasEnabled (bool): Enable/disable bias. Default: false.
         m_DataLayout (int): The data layout to be used (`DataLayout_NCHW`, `DataLayout_NHWC`). Default: `DataLayout_NCHW`.
+        m_OutputShapeEnabled (bool): Set to true if output shape is specified. Will prevent output shape inference.
+        m_OutputShape (list of int): Output shape if it has been specified.
 
     ") TransposeConvolution2dDescriptor;
 struct TransposeConvolution2dDescriptor
 {
     TransposeConvolution2dDescriptor();
 
-    uint32_t   m_PadLeft;
-    uint32_t   m_PadRight;
-    uint32_t   m_PadTop;
-    uint32_t   m_PadBottom;
-    uint32_t   m_StrideX;
-    uint32_t   m_StrideY;
-    bool       m_BiasEnabled;
-    DataLayout m_DataLayout;
+    uint32_t                  m_PadLeft;
+    uint32_t                  m_PadRight;
+    uint32_t                  m_PadTop;
+    uint32_t                  m_PadBottom;
+    uint32_t                  m_StrideX;
+    uint32_t                  m_StrideY;
+    bool                      m_BiasEnabled;
+    DataLayout                m_DataLayout;
+    bool                      m_OutputShapeEnabled;
+    std::vector<unsigned int> m_OutputShape;
 
     bool operator ==(const TransposeConvolution2dDescriptor& rhs) const;
 };

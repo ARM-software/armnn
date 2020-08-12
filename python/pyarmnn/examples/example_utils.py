@@ -73,7 +73,7 @@ def __create_network(model_file: str, backends: list, parser=None):
 
 
 def create_tflite_network(model_file: str, backends: list = ['CpuAcc', 'CpuRef']):
-    """Creates a network from an onnx model file.
+    """Creates a network from a tflite model file.
 
     Args:
         model_file (str): Path of the model file.
@@ -92,7 +92,7 @@ def create_tflite_network(model_file: str, backends: list = ['CpuAcc', 'CpuRef']
 
 
 def create_onnx_network(model_file: str, backends: list = ['CpuAcc', 'CpuRef']):
-    """Creates a network from a tflite model file.
+    """Creates a network from an onnx model file.
 
     Args:
         model_file (str): Path of the model file.

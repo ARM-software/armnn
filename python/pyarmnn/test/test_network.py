@@ -6,6 +6,23 @@ import stat
 import pytest
 import pyarmnn as ann
 
+def test_optimizer_options_default_values():
+    opt = ann.OptimizerOptions()
+    assert opt.m_ReduceFp32ToFp16 == False
+    assert opt.m_Debug == False
+    assert opt.m_ReduceFp32ToBf16 == False
+
+def test_optimizer_options_set_values1():
+    opt = ann.OptimizerOptions(True, True)
+    assert opt.m_ReduceFp32ToFp16 == True
+    assert opt.m_Debug == True
+    assert opt.m_ReduceFp32ToBf16 == False
+
+def test_optimizer_options_set_values2():
+    opt = ann.OptimizerOptions(False, False, True)
+    assert opt.m_ReduceFp32ToFp16 == False
+    assert opt.m_Debug == False
+    assert opt.m_ReduceFp32ToBf16 == True
 
 @pytest.fixture(scope="function")
 def get_runtime(shared_data_folder, network_file):
@@ -166,6 +183,7 @@ def test_serialize_to_dot_mode_readonly(network_file, get_runtime, tmpdir):
     'AddDivisionLayer',
     'AddElementwiseUnaryLayer',
     'AddFloorLayer',
+    'AddFillLayer',
     'AddFullyConnectedLayer',
     'AddGatherLayer',
     'AddInputLayer',
@@ -186,6 +204,7 @@ def test_serialize_to_dot_mode_readonly(network_file, get_runtime, tmpdir):
     'AddPreluLayer',
     'AddQuantizeLayer',
     'AddQuantizedLstmLayer',
+    'AddRankLayer',
     'AddReshapeLayer',
     'AddResizeLayer',
     'AddSliceLayer',

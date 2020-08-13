@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_05" # Release 20.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="27423f0c3f005155637ef7f1eb8fd31a06a9f205" #COMPMID-3608: Fix z index in gemmlowp_mm_reshaped_only kernel
+DEFAULT_CLFRAMEWORKREVISION="547b2e7aa07db4dd41f99e492c40710f2548c6ba" #COMPMID-3702: Update documentation
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

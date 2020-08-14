@@ -602,6 +602,7 @@ endif()
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 target_link_libraries(armnn ${Boost_THREAD_LIBRARY}
+                            ${Boost_FILESYSTEM_LIBRARY}
                             ${Boost_SYSTEM_LIBRARY})
 
 if(ARMCOMPUTENEON OR ARMCOMPUTECL)
@@ -1091,6 +1092,7 @@ if(BUILD_GATORD_MOCK)
                           timelineDecoder
                           gatordMockService
                           ${Boost_PROGRAM_OPTIONS_LIBRARY}
+                          ${Boost_FILESYSTEM_LIBRARY}
                           ${Boost_SYSTEM_LIBRARY})
 
     if(Threads_FOUND AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))

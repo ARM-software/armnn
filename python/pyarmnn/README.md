@@ -91,14 +91,14 @@ This step will put all generated files under `./src/pyarmnn/_generated` folder a
 ```bash
 $ python setup.py sdist
 ```
-As the result you will get `./dist/pyarmnn-21.0.0.tar.gz` file. As you can see it is platform independent.
+As the result you will get `./dist/pyarmnn-22.0.0.tar.gz` file. As you can see it is platform independent.
 
 ##### 5. Build the binary package
 
 ```bash
 $ python setup.py bdist_wheel
 ```
-As the result you will get something like `./dist/pyarmnn-21.0.0-cp36-cp36m-linux_x86_64.whl` file. As you can see it is platform dependent.
+As the result you will get something like `./dist/pyarmnn-22.0.0-cp36-cp36m-linux_x86_64.whl` file. As you can see it is platform dependent.
 
 # PyArmNN installation
 
@@ -106,8 +106,8 @@ PyArmNN can be distributed as a source package or a binary package (wheel).
 
 Binary package is platform dependent, the name of the package will indicate the platform it was built for, e.g.:
 
-* Linux x86 64bit machine: pyarmnn-21.0.0-cp36-cp36m-*linux_x86_64*.whl
-* Linux Aarch 64 bit machine: pyarmnn-21.0.0-cp36-cp36m-*linux_aarch64*.whl
+* Linux x86 64bit machine: pyarmnn-22.0.0-cp36-cp36m-*linux_x86_64*.whl
+* Linux Aarch 64 bit machine: pyarmnn-22.0.0-cp36-cp36m-*linux_aarch64*.whl
 
 The source package is platform independent but installation involves compilation of Arm NN python extension. You will need to have g++ compatible with C++ 14 standard and a python development library installed on the build machine.
 
@@ -125,7 +125,7 @@ $ gcc --print-search-dirs
 ```
 Install PyArmNN from binary by pointing to the wheel file:
 ```bash
-$ pip install /path/to/pyarmnn-21.0.0-cp36-cp36m-linux_aarch64.whl
+$ pip install /path/to/pyarmnn-22.0.0-cp36-cp36m-linux_aarch64.whl
 ```
 
 ## Installing from source package
@@ -142,7 +142,7 @@ $ export  ARMNN_INCLUDE=/path/to/headers
 
 Install PyArmNN as follows:
 ```bash
-$ pip install /path/to/pyarmnn-21.0.0.tar.gz
+$ pip install /path/to/pyarmnn-22.0.0.tar.gz
 ```
 
 If PyArmNN installation script fails to find Arm NN libraries it will raise an error like this
@@ -156,7 +156,7 @@ $ pip show pyarmnn
 You can also verify it by running the following and getting output similar to below:
 ```bash
 $ python -c "import pyarmnn as ann;print(ann.GetVersion())"
-'21.0.0'
+'22.0.0'
 ```
 
 # PyArmNN API overview

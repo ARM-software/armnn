@@ -185,7 +185,8 @@ if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
             armnn
             ${Boost_SYSTEM_LIBRARY}
             ${Boost_PROGRAM_OPTIONS_LIBRARY}
-            ${Boost_THREAD_LIBRARY} )
+            ${Boost_THREAD_LIBRARY}
+            ${Boost_FILESYSTEM_LIBRARY})
 
     add_executable_ex(ArmnnQuantizer
         src/armnnQuantizer/ArmNNQuantizerMain.cpp)
@@ -1022,7 +1023,8 @@ if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD
     target_link_libraries(ArmnnConverter ${CMAKE_THREAD_LIBS_INIT})
     target_link_libraries(ArmnnConverter
         ${Boost_SYSTEM_LIBRARY}
-        ${Boost_PROGRAM_OPTIONS_LIBRARY})
+        ${Boost_PROGRAM_OPTIONS_LIBRARY}
+        ${Boost_FILESYSTEM_LIBRARY})
     addDllCopyCommands(ArmnnConverter)
   endif()
 

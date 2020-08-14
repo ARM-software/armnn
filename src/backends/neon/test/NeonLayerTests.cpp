@@ -1094,8 +1094,8 @@ ARMNN_AUTO_TEST_CASE(QuantizeSimpleUint8, QuantizeSimpleUint8Test)
 ARMNN_AUTO_TEST_CASE(QuantizeClampUint8, QuantizeClampUint8Test)
 
 // PReLU
-ARMNN_AUTO_TEST_CASE(PreluFloat32, PreluTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(PreluUint8,   PreluTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(PreluFloat32, PreluTest<NeonWorkloadFactory, DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(PreluUint8,   PreluTest<NeonWorkloadFactory, DataType::QAsymmU8>)
 
 // Stack
 ARMNN_AUTO_TEST_CASE(Stack0Axis,           StackAxis0Float32Test)

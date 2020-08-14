@@ -153,6 +153,7 @@ void DetectionPostProcessImpl(const armnn::TensorInfo& boxEncodingsInfo,
 
     auto memoryManager = WorkloadFactoryHelper<FactoryType>::GetMemoryManager();
     FactoryType workloadFactory = WorkloadFactoryHelper<FactoryType>::GetFactory(memoryManager);
+    auto tensorHandleFactory = WorkloadFactoryHelper<FactoryType>::GetTensorHandleFactory(memoryManager);
 
     auto boxEncodings = MakeTensor<T, 3>(boxEncodingsInfo, boxEncodingsData);
     auto scores = MakeTensor<T, 3>(scoresInfo, scoresData);
@@ -172,13 +173,13 @@ void DetectionPostProcessImpl(const armnn::TensorInfo& boxEncodingsInfo,
     LayerTestResult<float, 1> numDetectionsResult(numDetectionInfo);
     numDetectionsResult.outputExpected = MakeTensor<float, 1>(numDetectionInfo, expectedNumDetections);
 
-    std::unique_ptr<armnn::ITensorHandle> boxedHandle = workloadFactory.CreateTensorHandle(boxEncodingsInfo);
-    std::unique_ptr<armnn::ITensorHandle> scoreshandle = workloadFactory.CreateTensorHandle(scoresInfo);
-    std::unique_ptr<armnn::ITensorHandle> anchorsHandle = workloadFactory.CreateTensorHandle(anchorsInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputBoxesHandle = workloadFactory.CreateTensorHandle(detectionBoxesInfo);
-    std::unique_ptr<armnn::ITensorHandle> classesHandle = workloadFactory.CreateTensorHandle(detectionClassesInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputScoresHandle = workloadFactory.CreateTensorHandle(detectionScoresInfo);
-    std::unique_ptr<armnn::ITensorHandle> numDetectionHandle = workloadFactory.CreateTensorHandle(numDetectionInfo);
+    auto boxedHandle = tensorHandleFactory.CreateTensorHandle(boxEncodingsInfo);
+    auto scoreshandle = tensorHandleFactory.CreateTensorHandle(scoresInfo);
+    auto anchorsHandle = tensorHandleFactory.CreateTensorHandle(anchorsInfo);
+    auto outputBoxesHandle = tensorHandleFactory.CreateTensorHandle(detectionBoxesInfo);
+    auto classesHandle = tensorHandleFactory.CreateTensorHandle(detectionClassesInfo);
+    auto outputScoresHandle = tensorHandleFactory.CreateTensorHandle(detectionScoresInfo);
+    auto numDetectionHandle = tensorHandleFactory.CreateTensorHandle(numDetectionInfo);
 
     armnn::ScopedCpuTensorHandle anchorsTensor(anchorsInfo);
     AllocateAndCopyDataToITensorHandle(&anchorsTensor, &anchors[0][0]);

@@ -1881,10 +1881,10 @@ ARMNN_AUTO_TEST_CASE(QuantizeClampInt8, QuantizeClampInt8Test)
 ARMNN_AUTO_TEST_CASE(QuantizeClampInt16, QuantizeClampInt16Test)
 
 // PReLU
-ARMNN_AUTO_TEST_CASE(PreluFloat32, PreluTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(PreluFloat16, PreluTest<DataType::Float16>)
-ARMNN_AUTO_TEST_CASE(PreluUint8,   PreluTest<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_CASE(PreluInt16,   PreluTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE(PreluFloat32, PreluTest<RefWorkloadFactory, DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(PreluFloat16, PreluTest<RefWorkloadFactory, DataType::Float16>)
+ARMNN_AUTO_TEST_CASE(PreluUint8,   PreluTest<RefWorkloadFactory, DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(PreluInt16,   PreluTest<RefWorkloadFactory, DataType::QSymmS16>)
 
 // Slice
 ARMNN_AUTO_TEST_CASE(Slice4dFloat32, Slice4dFloat32Test)

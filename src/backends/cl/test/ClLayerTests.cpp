@@ -499,8 +499,8 @@ ARMNN_AUTO_TEST_CASE(Pad3dQSymm16, Pad3dTestCommon<DataType::QSymmS16>, 2.0f, 0)
 ARMNN_AUTO_TEST_CASE(Pad4dQSymm16, Pad4dTestCommon<DataType::QSymmS16>, 2.0f, 0)
 
 // PReLU
-ARMNN_AUTO_TEST_CASE(PreluFloat32, PreluTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(PreluUint8,   PreluTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE(PreluFloat32, PreluTest<ClWorkloadFactory, DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(PreluUint8,   PreluTest<ClWorkloadFactory, DataType::QAsymmU8>)
 
 // Permute
 ARMNN_AUTO_TEST_CASE(SimplePermuteFloat32, SimplePermuteTest<DataType::Float32>)

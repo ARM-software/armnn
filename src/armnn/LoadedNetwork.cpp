@@ -168,6 +168,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
         switch (layer->GetType())
         {
         case LayerType::Input:
+        case LayerType::MemImport:
             {
                 // If IsImportEnabled is true then we need to set IsMemoryManaged to false when creating TensorHandles
                 layer->CreateTensorHandles(m_TensorHandleFactoryRegistry, workloadFactory, !m_IsImportEnabled);

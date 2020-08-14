@@ -6,6 +6,7 @@
 list(APPEND armnnNeonBackendUnitTests_sources
     NeonCreateWorkloadTests.cpp
     NeonEndToEndTests.cpp
+    NeonFallbackTests.cpp
     NeonJsonPrinterTests.cpp
     NeonLayerSupportTests.cpp
     NeonLayerTests.cpp

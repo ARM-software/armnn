@@ -21,3 +21,5 @@ bool IsConnected(armnn::Layer* srcLayer, armnn::Layer* destLayer,
                  unsigned int srcSlot, unsigned int destSlot,
                  const armnn::TensorInfo& expectedTensorInfo);
 
+bool CheckOrder(const armnn::Graph& graph, const armnn::Layer* first, const armnn::Layer* second);
+

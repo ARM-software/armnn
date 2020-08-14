@@ -912,7 +912,15 @@ EdgeStrategy CalculateEdgeStrategy(BackendsMap& backends,
 
             if ((dstFactory->GetImportFlags() & srcFactory->GetExportFlags()) != 0)
             {
-                return EdgeStrategy::ExportToTarget;
+                auto srcCapability = srcFactory->GetCapabilities(&layer, &layer, CapabilityClass::PaddingRequired);
+                auto dstCapability = dstFactory->GetCapabilities(&connectedLayer,
+                                                                 &connectedLayer,
+                                                                 CapabilityClass::PaddingRequired);
+                // Do not require memory copy if the source and destination do not require padding.
+                if (srcCapability.empty() && dstCapability.empty())
+                {
+                    return EdgeStrategy::ExportToTarget;
+                }
             }
         }
     }

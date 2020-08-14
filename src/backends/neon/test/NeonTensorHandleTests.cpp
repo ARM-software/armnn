@@ -12,6 +12,7 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <test/GraphUtils.hpp>
+#include <arm_compute/runtime/Allocator.h>
 
 #include <boost/test/unit_test.hpp>
 
@@ -158,6 +159,79 @@ BOOST_AUTO_TEST_CASE(ConcatOnXorYSubTensorsNoPaddinRequiredTest)
             BOOST_CHECK(numberOfSubTensors > 0);
         }
     }
+}
+
+BOOST_AUTO_TEST_CASE(NeonTensorHandleFactoryMemoryManaged)
+{
+    std::shared_ptr<NeonMemoryManager> memoryManager = std::make_shared<NeonMemoryManager>(
+        std::make_unique<arm_compute::Allocator>(),
+        BaseMemoryManager::MemoryAffinity::Offset);
+    NeonTensorHandleFactory handleFactory(memoryManager);
+    TensorInfo info({ 1, 1, 2, 1 }, DataType::Float32);
+
+    // create TensorHandle with memory managed
+    auto handle = handleFactory.CreateTensorHandle(info, true);
+    handle->Manage();
+    handle->Allocate();
+
+    memoryManager->Acquire();
+    {
+        float* buffer = reinterpret_cast<float*>(handle->Map());
+        BOOST_CHECK(buffer != nullptr); // Yields a valid pointer
+        buffer[0] = 1.5f;
+        buffer[1] = 2.5f;
+        BOOST_CHECK(buffer[0] == 1.5f); // Memory is writable and readable
+        BOOST_CHECK(buffer[1] == 2.5f); // Memory is writable and readable
+    }
+    memoryManager->Release();
+
+    memoryManager->Acquire();
+    {
+        float* buffer = reinterpret_cast<float*>(handle->Map());
+        BOOST_CHECK(buffer != nullptr); // Yields a valid pointer
+        buffer[0] = 3.5f;
+        buffer[1] = 4.5f;
+        BOOST_CHECK(buffer[0] == 3.5f); // Memory is writable and readable
+        BOOST_CHECK(buffer[1] == 4.5f); // Memory is writable and readable
+    }
+    memoryManager->Release();
+
+    float testPtr[2] = { 2.5f, 5.5f };
+    // Cannot import as import is disabled
+    BOOST_CHECK(!handle->Import(static_cast<void*>(testPtr), MemorySource::Malloc));
+}
+
+BOOST_AUTO_TEST_CASE(NeonTensorHandleFactoryImport)
+{
+    std::shared_ptr<NeonMemoryManager> memoryManager = std::make_shared<NeonMemoryManager>(
+        std::make_unique<arm_compute::Allocator>(),
+        BaseMemoryManager::MemoryAffinity::Offset);
+    NeonTensorHandleFactory handleFactory(memoryManager);
+    TensorInfo info({ 1, 1, 2, 1 }, DataType::Float32);
+
+    // create TensorHandle without memory managed
+    auto handle = handleFactory.CreateTensorHandle(info, false);
+    handle->Manage();
+    handle->Allocate();
+    memoryManager->Acquire();
+
+    // No buffer allocated when import is enabled
+    BOOST_CHECK((PolymorphicDowncast<NeonTensorHandle*>(handle.get()))->GetTensor().buffer() == nullptr);
+
+    float testPtr[2] = { 2.5f, 5.5f };
+    // Correctly import
+    BOOST_CHECK(handle->Import(static_cast<void*>(testPtr), MemorySource::Malloc));
+    float* buffer = reinterpret_cast<float*>(handle->Map());
+    BOOST_CHECK(buffer != nullptr); // Yields a valid pointer after import
+    BOOST_CHECK(buffer == testPtr); // buffer is pointing to testPtr
+    // Memory is writable and readable with correct value
+    BOOST_CHECK(buffer[0] == 2.5f);
+    BOOST_CHECK(buffer[1] == 5.5f);
+    buffer[0] = 3.5f;
+    buffer[1] = 10.0f;
+    BOOST_CHECK(buffer[0] == 3.5f);
+    BOOST_CHECK(buffer[1] == 10.0f);
+    memoryManager->Release();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

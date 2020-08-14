@@ -19,19 +19,6 @@
 #include <boost/cast.hpp>
 #include <boost/test/unit_test.hpp>
 
-/// Checks that first comes before second in the order.
-bool CheckOrder(const armnn::Graph& graph, const armnn::Layer* first, const armnn::Layer* second)
-{
-    graph.Print();
-
-    const auto& order = graph.TopologicalSort();
-
-    auto firstPos = std::find(order.begin(), order.end(), first);
-    auto secondPos = std::find(firstPos, order.end(), second);
-
-    return (secondPos != order.end());
-}
-
 BOOST_AUTO_TEST_SUITE(Graph)
 
 BOOST_AUTO_TEST_CASE(ClassGraph)

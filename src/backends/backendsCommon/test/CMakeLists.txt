@@ -159,6 +159,9 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/SubtractionTestImpl.hpp
     layerTests/TransposeConvolution2dTestImpl.cpp
     layerTests/TransposeConvolution2dTestImpl.hpp
+    mockBackend/MockImportBackend.cpp
+    mockBackend/MockImportBackend.hpp
+    mockBackend/MockImportLayerSupport.hpp
 )
 
 if (ARMNNREF)

@@ -63,3 +63,16 @@ bool IsConnected(armnn::Layer* srcLayer, armnn::Layer* destLayer,
     }
     return false;
 }
+
+/// Checks that first comes before second in the order.
+bool CheckOrder(const armnn::Graph& graph, const armnn::Layer* first, const armnn::Layer* second)
+{
+    graph.Print();
+
+    const auto& order = graph.TopologicalSort();
+
+    auto firstPos = std::find(order.begin(), order.end(), first);
+    auto secondPos = std::find(firstPos, order.end(), second);
+
+    return (secondPos != order.end());
+}

@@ -41,7 +41,9 @@ class NeonTensorHandleFactory : public ITensorHandleFactory
 {
 public:
     NeonTensorHandleFactory(std::weak_ptr<NeonMemoryManager> mgr)
-                            : m_MemoryManager(mgr)
+                            : m_MemoryManager(mgr),
+                              m_ImportFlags(static_cast<MemorySourceFlags>(MemorySource::Malloc)),
+                              m_ExportFlags(static_cast<MemorySourceFlags>(MemorySource::Malloc))
     {}
 
     std::unique_ptr<ITensorHandle> CreateSubTensorHandle(ITensorHandle& parent,
@@ -76,6 +78,8 @@ public:
 
 private:
     mutable std::shared_ptr<NeonMemoryManager> m_MemoryManager;
+    MemorySourceFlags m_ImportFlags;
+    MemorySourceFlags m_ExportFlags;
 };
 
 } // namespace armnn

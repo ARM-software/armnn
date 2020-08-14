@@ -103,12 +103,12 @@ bool NeonTensorHandleFactory::SupportsSubTensors() const
 
 MemorySourceFlags NeonTensorHandleFactory::GetExportFlags() const
 {
-    return 0;
+    return m_ExportFlags;
 }
 
 MemorySourceFlags NeonTensorHandleFactory::GetImportFlags() const
 {
-    return 0;
+    return m_ImportFlags;
 }
 
 std::vector<Capability> NeonTensorHandleFactory::GetCapabilities(const IConnectableLayer* layer,

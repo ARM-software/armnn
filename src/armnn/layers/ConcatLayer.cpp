@@ -118,9 +118,11 @@ void ConcatLayer::CreateTensors(const TensorHandleFactoryRegistry& registry, con
                         slot->GetNumConnections() == 1 &&
                         canUseSubTensorOnXorY) //(5)
                     {
+                        ARMNN_NO_DEPRECATE_WARN_BEGIN
                         return factory.CreateSubTensorHandle(*parentTensor,
                                                              info.GetShape(),
                                                              currentLayer->m_Param.GetViewOrigin(i));
+                        ARMNN_NO_DEPRECATE_WARN_END
                     }
                     return std::unique_ptr<ITensorHandle>();
                 };

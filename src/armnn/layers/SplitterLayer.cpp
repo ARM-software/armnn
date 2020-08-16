@@ -133,9 +133,11 @@ void SplitterLayer::CreateTensors(const TensorHandleFactoryRegistry& registry, c
                     GetOutputSlot(i).GetConnection(0)->GetOwningLayer().GetType() != LayerType::Input && //(3)
                     canUseSubTensorOnXorY) //(4)
                 {
+                    ARMNN_NO_DEPRECATE_WARN_BEGIN
                     return factory.CreateSubTensorHandle(*inputData,
                                                          info.GetShape(),
                                                          this->m_Param.GetViewOrigin(i));
+                    ARMNN_NO_DEPRECATE_WARN_END
                 }
                 return std::unique_ptr<ITensorHandle>();
             };

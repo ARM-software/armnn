@@ -8,9 +8,11 @@
 #include <Graph.hpp>
 #include <SubgraphView.hpp>
 #include <SubgraphViewSelector.hpp>
+#include <ResolveType.hpp>
 
 #include <armnn/BackendRegistry.hpp>
 
+#include <armnn/Types.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <test/TestUtils.hpp>
@@ -48,6 +50,23 @@ template <typename MapType>
 bool Contains(const MapType& map, const typename MapType::key_type& key)
 {
     return map.find(key) != map.end();
+}
+
+// Utility template for comparing tensor elements
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+bool Compare(T a, T b, float tolerance = 0.000001f)
+{
+    if (ArmnnType == armnn::DataType::Boolean)
+    {
+        // NOTE: Boolean is represented as uint8_t (with zero equals
+        // false and everything else equals true), therefore values
+        // need to be casted to bool before comparing them
+        return static_cast<bool>(a) == static_cast<bool>(b);
+    }
+
+    // NOTE: All other types can be cast to float and compared with
+    // a certain level of tolerance
+    return std::fabs(static_cast<float>(a) - static_cast<float>(b)) <= tolerance;
 }
 
 template <typename ConvolutionLayer>

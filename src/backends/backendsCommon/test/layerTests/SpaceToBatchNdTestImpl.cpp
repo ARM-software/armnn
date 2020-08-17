@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -64,8 +64,10 @@ LayerTestResult<T, 4> SpaceToBatchNdTestImpl(
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
                                           armnnUtils::QuantizedVector<T>(outputExpectedData, qScale, qOffset));
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::WorkloadInfo info;
     AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());

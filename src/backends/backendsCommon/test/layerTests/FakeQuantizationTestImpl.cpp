@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,8 +32,10 @@ LayerTestResult<float, 2> FakeQuantizationTest(
 
     LayerTestResult<float, 2> ret(tensorInfo);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle   = workloadFactory.CreateTensorHandle(tensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle  = workloadFactory.CreateTensorHandle(tensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::FakeQuantizationQueueDescriptor data;
     armnn::WorkloadInfo info;

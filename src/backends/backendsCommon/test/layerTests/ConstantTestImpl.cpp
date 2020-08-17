@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -97,9 +97,9 @@ LayerTestResult<T, 4> ConstantTestImpl(
 
     LayerTestResult<T, 4> result(outputTensorInfo);
     result.outputExpected = input;
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     armnn::ScopedCpuTensorHandle constantTensor(inputTensorInfo);
     AllocateAndCopyDataToITensorHandle(&constantTensor, &input[0][0][0][0]);
 

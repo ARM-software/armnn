@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -85,9 +85,11 @@ void TransposeConvolution2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
         AllocateAndCopyDataToITensorHandle(biasesTensor.get(), biases.value().second.data());
     }
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     // set up input and output handles
     std::unique_ptr<ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(input.first);
     std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(output.first);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     // set up workload
     armnn::WorkloadInfo workloadInfo;
@@ -627,8 +629,10 @@ LayerTestResult<uint8_t, 4> TransposeConvolution2dPerAxisQuantTest(
     descriptor.m_BiasEnabled = true;
     descriptor.m_DataLayout  = layout;
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     WorkloadInfo workloadInfo;
     ScopedCpuTensorHandle weightTensor(kernelInfo);

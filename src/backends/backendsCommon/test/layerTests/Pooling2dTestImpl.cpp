@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -74,8 +74,10 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
 
     LayerTestResult<T, 4> result(outputTensorInfo);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::Pooling2dQueueDescriptor queueDescriptor;
     queueDescriptor.m_Parameters = descriptor;
@@ -779,8 +781,10 @@ LayerTestResult<T, 4> ComparePooling2dTestCommon(
 
     LayerTestResult<T, 4> comparisonResult(outputTensorInfo);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::Pooling2dQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -797,8 +801,10 @@ LayerTestResult<T, 4> ComparePooling2dTestCommon(
     data.m_Parameters.m_PadBottom = padY;
     data.m_Parameters.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refWorkloadFactory.CreateTensorHandle(outputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> inputHandleRef = refWorkloadFactory.CreateTensorHandle(inputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     // Don't execute if Pooling is not supported, as an exception will be raised.
     armnn::BackendId backend = workloadFactory.GetBackendId();

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -69,8 +69,10 @@ LayerTestResult<T, 4> BatchNormTestImpl(
     result.outputExpected = MakeTensor<T, 4>(inputTensorInfo,
                                              QuantizedVector<T>(expectedOutputValues, qScale, qOffset));
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::ScopedCpuTensorHandle meanTensor(tensorInfo);
     armnn::ScopedCpuTensorHandle varianceTensor(tensorInfo);
@@ -152,8 +154,10 @@ LayerTestResult<T,4> BatchNormTestNhwcImpl(
     auto gamma    = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>({ 2,  1 }, qScale, qOffset));
     LayerTestResult<T,4> ret(outputTensorInfo);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::BatchNormalizationQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -615,11 +619,13 @@ LayerTestResult<float,4> CompareBatchNormTest(
 
     LayerTestResult<float,4> ret(outputTensorInfo);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandleRef  = refWorkloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refWorkloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::BatchNormalizationQueueDescriptor data;
     armnn::WorkloadInfo info;

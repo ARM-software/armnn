@@ -109,9 +109,10 @@ LayerTestResult<T, NumDims> ResizeTestImpl(
 
     LayerTestResult<T, NumDims> result(outputInfo);
     result.outputExpected = MakeTensor<T, NumDims>(outputInfo, expectedOutputData);
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::ResizeQueueDescriptor descriptor;
     descriptor.m_Parameters.m_Method     = params.m_ResizeMethod;

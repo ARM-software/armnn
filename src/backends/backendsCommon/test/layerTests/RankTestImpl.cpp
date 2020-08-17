@@ -26,8 +26,10 @@ LayerTestResult<int32_t, 1> RankTest(
     LayerTestResult<int32_t , 1> ret(outputTensorInfo);
     ret.outputExpected = MakeTensor<uint32_t, 1>(outputTensorInfo, { n });
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::RankQueueDescriptor data;
     armnn::WorkloadInfo info;

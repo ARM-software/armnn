@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -312,10 +312,10 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
         outputData = tmp;
     }
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     armnn::Convolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
     armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
@@ -418,10 +418,10 @@ LayerTestResult<O, 4> SimpleConvolution2dNhwcTestImpl(
 
     LayerTestResult<O, 4> ret(outputTensorInfo);
     ret.outputExpected = MakeTensor<O, 4>(outputTensorInfo, outputData);
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
     AllocateAndCopyDataToITensorHandle(&weightsTensor, &kernel[0][0][0][0]);
 
@@ -539,10 +539,10 @@ LayerTestResult<T,4> Convolution1dTestImpl(
             biasData, biasInfo.GetQuantizationScale(), biasInfo.GetQuantizationOffset(),
             1, outputSize);
     }
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     armnn::Convolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
     armnn::ScopedCpuTensorHandle         weightsTensor(kernelInfo);
@@ -1319,10 +1319,10 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(
     auto input  = MakeRandomTensor<T, 4>(inputTensorInfo, 124908);
     auto kernel = MakeRandomTensor<T, 4>(kernelDesc, 891234);
     auto bias   = MakeRandomTensor<T, 1>(biasDesc, 1028);
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     armnn::Convolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
     armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
@@ -1342,10 +1342,10 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(
     data.m_Parameters.m_PadTop = padY;
     data.m_Parameters.m_PadBottom = padY;
     data.m_Parameters.m_BiasEnabled = true;
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refWorkloadFactory.CreateTensorHandle(outputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> inputHandleRef = refWorkloadFactory.CreateTensorHandle(inputTensorInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     armnn::Convolution2dQueueDescriptor refData = data;
     armnn::WorkloadInfo               refInfo = info;
     SetWorkloadInput(refData, refInfo, 0, inputTensorInfo, inputHandleRef.get());
@@ -1689,10 +1689,10 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     }
 
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
 
     AllocateAndCopyDataToITensorHandle(&weightsTensor, &kernel[0][0][0][0]);
@@ -1846,10 +1846,10 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
     }
 
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputImage);
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     armnn::DepthwiseConvolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
     armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
@@ -2058,10 +2058,10 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     }
 
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputImage);
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     armnn::DepthwiseConvolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
     armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
@@ -2214,10 +2214,10 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
         outputData = tmp;
     }
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
-
+ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
+ARMNN_NO_DEPRECATE_WARN_END
     armnn::DepthwiseConvolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
     armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
@@ -2951,10 +2951,10 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
     auto kernel = MakeRandomTensor<T, 4>(kernelDesc, 891234, 0.0f, 255.0f);
     auto bias = MakeRandomTensor<typename FullyConnectedBiasTypeForInputType<T>::Type, 1>(
             biasDesc, 1028, 0.0f, 255.0f);
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     armnn::DepthwiseConvolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
     armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
@@ -2975,10 +2975,10 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
     data.m_Parameters.m_PadBottom = padY;
     data.m_Parameters.m_BiasEnabled = true;
     data.m_Parameters.m_DataLayout = layout.GetDataLayout();
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refWorkloadFactory.CreateTensorHandle(outputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> inputHandleRef = refWorkloadFactory.CreateTensorHandle(inputTensorInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     armnn::DepthwiseConvolution2dQueueDescriptor refData = data;
     armnn::WorkloadInfo refInfo = info;
     SetWorkloadInput(refData, refInfo, 0, inputTensorInfo, inputHandleRef.get());
@@ -3402,8 +3402,10 @@ LayerTestResult<uint8_t, 4> Convolution2dPerAxisQuantTest(
     descriptor.m_BiasEnabled = true;
     descriptor.m_DataLayout  = layout;
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     WorkloadInfo workloadInfo;
     ScopedCpuTensorHandle weightTensor(kernelInfo);
@@ -3641,8 +3643,10 @@ LayerTestResult<uint8_t, 4> DepthwiseConvolution2dPerAxisQuantTest(
     descriptor.m_BiasEnabled = true;
     descriptor.m_DataLayout  = layout;
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     WorkloadInfo workloadInfo;
     ScopedCpuTensorHandle weightTensor(kernelInfo);

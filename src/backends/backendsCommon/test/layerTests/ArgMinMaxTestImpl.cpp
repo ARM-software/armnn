@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,8 +32,10 @@ LayerTestResult<int32_t, 3> ArgMinMaxTestCommon(
     LayerTestResult<int32_t, 3> result(outputTensorInfo);
     result.outputExpected = MakeTensor<int32_t, 3>(outputTensorInfo, outputData);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::ArgMinMaxQueueDescriptor descriptor;
     descriptor.m_Parameters.m_Function = argMinMaxFunction;

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -137,9 +137,10 @@ template<typename T> void PermuteTensorData(
     }
 
     TensorInfo outputTensorInfo = armnnUtils::Permuted(inputTensorInfo, mappings);
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     PermuteQueueDescriptor queueDescriptor;
     queueDescriptor.m_Parameters = PermuteDescriptor{mappings};
@@ -322,9 +323,9 @@ template<typename T> void Concatenate(
 
     std::vector<std::unique_ptr<ITensorHandle>> inputHandles;
     inputHandles.reserve(inputCount);
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     ConcatQueueDescriptor queueDescriptor;
     OriginsDescriptor viewsDescriptor = CreateDescriptorForConcat(inputTensorInfos, concatDim);
     queueDescriptor.m_Parameters = viewsDescriptor;
@@ -337,29 +338,33 @@ template<typename T> void Concatenate(
             queueDescriptor.m_ViewOrigins.emplace_back(std::vector<unsigned int>(viewsDescriptor.GetViewOrigin(i),
                 viewsDescriptor.GetViewOrigin(i) + viewsDescriptor.GetNumDimensions()));
         }
-
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
+        ARMNN_NO_DEPRECATE_WARN_END
         const bool subTensorsSupported = workloadFactory.SupportsSubTensors();
         for (unsigned int i = 0; i < inputCount; ++i)
         {
             const TensorInfo& inputTensorInfo = inputTensorInfos[i];
+            ARMNN_NO_DEPRECATE_WARN_BEGIN
             std::unique_ptr<ITensorHandle> inputHandle =
                 subTensorsSupported ?
                     workloadFactory.CreateSubTensorHandle(*outputHandle,
                                                           inputTensorInfo.GetShape(),
                                                           queueDescriptor.m_ViewOrigins[i].m_Origin.data()) :
                     workloadFactory.CreateTensorHandle(inputTensorInfo);
-
+            ARMNN_NO_DEPRECATE_WARN_END
             inputHandles.emplace_back(std::move(inputHandle));
         }
+
 
     }
     else
     {
         for (unsigned int i = 0; i < inputCount; ++i)
         {
+            ARMNN_NO_DEPRECATE_WARN_BEGIN
             std::unique_ptr<ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfos[i]);
+            ARMNN_NO_DEPRECATE_WARN_END
             inputHandles.emplace_back(std::move(inputHandle));
         }
     }
@@ -2004,11 +2009,11 @@ LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
 
     std::vector<unsigned int> wOrigin2 = { 0, 0, 2 }; //Extent of the window is defined by size of input[1].
     ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     bool subTensorsSupported = useSubtensor && workloadFactory.SupportsSubTensors();
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<ITensorHandle> inputHandle1 =
             subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo1.GetShape(), wOrigin1.data()) :
@@ -2018,7 +2023,7 @@ LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
             subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     ConcatQueueDescriptor data;
     OriginsDescriptor desc = CreateDescriptorForConcatenation(
             inputTensorShapes.begin(),inputTensorShapes.end(), 2);
@@ -2153,7 +2158,7 @@ LayerTestResult<float,3> ConcatTest(
 
     std::vector<unsigned int> wOrigin2 = {2, 0, 0}; //Extent of the window is defined by size of input[1].
     ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
     bool subTensorsSupported = workloadFactory.SupportsSubTensors();
@@ -2167,7 +2172,7 @@ LayerTestResult<float,3> ConcatTest(
         subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     ConcatQueueDescriptor data;
     WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
@@ -2453,7 +2458,7 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
 
     std::vector<unsigned int> wOrigin2 = { 2, 0, 0 }; //Extent of the window is defined by size of input[1].
     ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
     bool subTensorsSupported = workloadFactory.SupportsSubTensors();
@@ -2467,7 +2472,7 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
             subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     ConcatQueueDescriptor data;
     WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
@@ -2590,7 +2595,7 @@ LayerTestResult<uint8_t, 3> ConcatUint8Test(
     std::vector<unsigned int> wOrigin2 = { 2, 0, 0 }; //Extent of the window is defined by size of input[1].
     ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
 
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
     bool subTensorsSupported = workloadFactory.SupportsSubTensors();
@@ -2604,7 +2609,7 @@ LayerTestResult<uint8_t, 3> ConcatUint8Test(
         subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
-
+    ARMNN_NO_DEPRECATE_WARN_END
 
     ConcatQueueDescriptor data;
     WorkloadInfo info;
@@ -2725,7 +2730,7 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
     std::vector<unsigned int> wOrigin2 = { 2, 0, 0 }; //Extent of the window is defined by size of input[1].
     ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
 
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
     bool subTensorsSupported = workloadFactory.SupportsSubTensors();
@@ -2739,7 +2744,7 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
             subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
-
+    ARMNN_NO_DEPRECATE_WARN_END
 
     ConcatQueueDescriptor data;
     WorkloadInfo info;

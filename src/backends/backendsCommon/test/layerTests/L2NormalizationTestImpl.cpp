@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -68,8 +68,10 @@ LayerTestResult<T, 4> L2NormalizationTestImpl(
                                                         outputTensorInfo.GetQuantizationScale(),
                                                         outputTensorInfo.GetQuantizationOffset()));
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::L2NormalizationQueueDescriptor descriptor;
     descriptor.m_Parameters.m_Eps = epsilon;
@@ -702,8 +704,10 @@ LayerTestResult<float, 2> L2Normalization2dShapeTest(
     LayerTestResult<float, 2> result(outputTensorInfo);
     result.outputExpected = MakeTensor<float, 2>(outputTensorInfo, expectedOutputData);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::L2NormalizationQueueDescriptor descriptor;
     descriptor.m_Parameters.m_Eps = 1e-12f;

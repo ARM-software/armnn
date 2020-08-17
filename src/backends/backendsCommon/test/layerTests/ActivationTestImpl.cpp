@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -59,8 +59,10 @@ LayerTestResult<T, 4> BoundedReLuTestCommon(
 
     auto input = MakeTensor<T, 4>(inputTensorInfo, inputData);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     // Setup bounded ReLu.
     armnn::ActivationQueueDescriptor descriptor;
@@ -255,8 +257,10 @@ boost::multi_array<float, 4> BoundedReLuRandomInputTest(
     // range [lowerBound, upperBound].
     auto input = MakeRandomTensor<float, 4>(inputTensorInfo, 4605828, lowerBound - 5.0f, upperBound * 2.0f);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     // Set up bounded ReLu.
     armnn::ActivationQueueDescriptor descriptor;
@@ -334,9 +338,10 @@ LayerTestResult<T,4> ConstantLinearActivationTestCommon(
     }
 
     LayerTestResult<T, 4> ret(outputTensorInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     // Do linear activation that should leave the tensor unchanged.
     armnn::ActivationQueueDescriptor data;
@@ -429,8 +434,10 @@ LayerTestResult<T, 4> SimpleActivationTest(
 
     auto input = MakeTensor<T, 4>(inputTensorInfo, armnnUtils::QuantizedVector<T>(inputData, scale, offset));
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     // Setup bounded ReLu.
     armnn::ActivationQueueDescriptor descriptor;
@@ -818,8 +825,10 @@ LayerTestResult<float, 5> SqrtNNTest(
 
     auto input = MakeTensor<float, 5>(inputTensorInfo, inputData);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::ActivationQueueDescriptor descriptor;
     armnn::WorkloadInfo workloadInfo;
@@ -1191,12 +1200,13 @@ LayerTestResult<T,4> CompareActivationTestImpl(
     ret.output.resize(boostArrayExtents);
     ret.outputExpected.resize(boostArrayExtents);
 
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandleRef = refWorkloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refWorkloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::ActivationQueueDescriptor data;
     armnn::WorkloadInfo info;

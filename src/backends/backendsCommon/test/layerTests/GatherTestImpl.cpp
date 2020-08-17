@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -38,9 +38,11 @@ LayerTestResult<T, OutputDim> GatherTestImpl(
     LayerTestResult<T, OutputDim> result(outputInfo);
     result.outputExpected = MakeTensor<T, OutputDim>(outputInfo, outputData);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> paramsHandle = workloadFactory.CreateTensorHandle(paramsInfo);
     std::unique_ptr<armnn::ITensorHandle> indicesHandle = workloadFactory.CreateTensorHandle(indicesInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::GatherQueueDescriptor data;
     armnn::WorkloadInfo info;

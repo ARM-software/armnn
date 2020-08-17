@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -214,9 +214,11 @@ LayerTestResult<T, 4> AdditionBroadcastTestImpl(
     },
     qScale, qOffset));
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
     std::unique_ptr<armnn::ITensorHandle> inputHandle2 = workloadFactory.CreateTensorHandle(inputTensorInfo2);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::AdditionQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -292,9 +294,11 @@ LayerTestResult<T, 4> AdditionBroadcast1ElementTestImpl(
     },
     qScale, qOffset));
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
     std::unique_ptr<armnn::ITensorHandle> inputHandle2 = workloadFactory.CreateTensorHandle(inputTensorInfo2);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::AdditionQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -528,11 +532,12 @@ LayerTestResult<float, 4> AdditionAfterMaxPoolTest(
                                                              4, 5, 6,
                                                              7, 8, 9
                                                             });
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> poolingInputHandle =
             workloadFactory.CreateTensorHandle(poolingInputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> poolingOutputHandle =
             workloadFactory.CreateTensorHandle(poolingOutputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     // Apply MaxPool poolSize = 1x1, stride=2x2
     // Result =
@@ -582,8 +587,10 @@ LayerTestResult<float, 4> AdditionAfterMaxPoolTest(
         31, 37
     }));
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> addInputHandle = workloadFactory.CreateTensorHandle(addInputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> addOutputHandle = workloadFactory.CreateTensorHandle(addOutputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::AdditionQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -641,6 +648,7 @@ LayerTestResult<float,4> CompareAdditionTest(
 
     LayerTestResult<float,4> ret(outputTensorInfo);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
     std::unique_ptr<armnn::ITensorHandle> inputHandle2 = workloadFactory.CreateTensorHandle(inputTensorInfo2);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -648,6 +656,7 @@ LayerTestResult<float,4> CompareAdditionTest(
     std::unique_ptr<armnn::ITensorHandle> inputHandle1Ref = refWorkloadFactory.CreateTensorHandle(inputTensorInfo1);
     std::unique_ptr<armnn::ITensorHandle> inputHandle2Ref = refWorkloadFactory.CreateTensorHandle(inputTensorInfo2);
     std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refWorkloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::AdditionQueueDescriptor data;
     armnn::WorkloadInfo info;

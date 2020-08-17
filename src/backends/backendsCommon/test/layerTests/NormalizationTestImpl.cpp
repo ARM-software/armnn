@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -57,8 +57,10 @@ LayerTestResult<float,4> SimpleNormalizationTestImpl(
     float kappa = 1.f;
     uint32_t normSize = 3;
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::NormalizationQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -200,8 +202,10 @@ LayerTestResult<float,4> SimpleNormalizationNhwcTestImpl(
     float kappa = 1.f;
     uint32_t normSize = 3;
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::NormalizationQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -298,8 +302,10 @@ LayerTestResult<float,4> CompareNormalizationTestImpl(
     constexpr float kappa = 1.f;
     constexpr uint32_t normSize = 5;
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::NormalizationQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -312,8 +318,10 @@ LayerTestResult<float,4> CompareNormalizationTestImpl(
     data.m_Parameters.m_Beta            = beta;
     data.m_Parameters.m_K               = kappa;
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refWorkloadFactory.CreateTensorHandle(outputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> inputHandleRef = refWorkloadFactory.CreateTensorHandle(inputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::NormalizationQueueDescriptor refData = data;
     armnn::WorkloadInfo refInfo = info;

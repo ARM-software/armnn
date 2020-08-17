@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -53,10 +53,10 @@ LayerTestResult<armnn::BFloat16, 4> ConvertFp32ToBf16Test(
 
     LayerTestResult<armnn::BFloat16, 4> ret(outputTensorInfo);
     ret.outputExpected = MakeTensor<armnn::BFloat16, 4>(outputTensorInfo, outputValues);
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     armnn::ConvertFp32ToBf16QueueDescriptor data;
     armnn::WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());

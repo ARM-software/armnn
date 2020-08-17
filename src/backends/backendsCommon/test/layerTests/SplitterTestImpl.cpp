@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -181,6 +181,7 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(
 
     bool subTensorsSupported = workloadFactory.SupportsSubTensors();
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputTensorInfo);
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle1 =
@@ -202,6 +203,7 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(
         subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle2, outputTensorInfo4.GetShape(), wOrigin4.data()) :
             workloadFactory.CreateTensorHandle(outputTensorInfo4);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     // Do the first split
     armnn::SplitterQueueDescriptor data;
@@ -290,12 +292,14 @@ LayerTestResult<T, 3> CopyViaSplitterTestImpl(
 
     const bool subTensorsSupported = workloadFactory.SupportsSubTensors();
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(tensorInfo);
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle =
         subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*inputHandle, tensorInfo.GetShape(), origin.data()) :
             workloadFactory.CreateTensorHandle(tensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::SplitterQueueDescriptor data;
     armnn::WorkloadInfo info;

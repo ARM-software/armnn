@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -42,11 +42,13 @@ LayerTestResult<T, outputDimLength> StackTestHelper(
     result.outputExpected = MakeTensor<T, outputDimLength>(outputTensorInfo, outputExpectedData);
 
     std::vector<std::unique_ptr<armnn::ITensorHandle>> inputHandles;
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     for (unsigned int i = 0; i < numInputs; ++i)
     {
         inputHandles.push_back(workloadFactory.CreateTensorHandle(inputTensorInfo));
     }
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::StackQueueDescriptor descriptor;
     descriptor.m_Parameters.m_Axis = axis;

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -183,6 +183,7 @@ LstmNoCifgNoPeepholeNoProjectionTestImpl(
     outputVector.assign(outputExpected.data(), outputExpected.data() + (batchSize * outputSize));
     ret.outputExpected = MakeTensor<T, 2>(outputTensorInfo, outputVector);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> cellStateInHandle =
             workloadFactory.CreateTensorHandle(cellStateInTensorInfo);
@@ -195,7 +196,7 @@ LstmNoCifgNoPeepholeNoProjectionTestImpl(
     std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
             workloadFactory.CreateTensorHandle(cellStateOutTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::LstmQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -386,6 +387,7 @@ LstmLayerNoCifgWithPeepholeWithProjectionTestImpl(armnn::IWorkloadFactory& workl
     outputVector.assign(outputExpected.data(), outputExpected.data() + (batchSize * outputSize));
     ret.outputExpected = MakeTensor<T, 2>(outputTensorInfo, outputVector);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> cellStateInHandle =
             workloadFactory.CreateTensorHandle(cellStateInTensorInfo);
@@ -398,6 +400,7 @@ LstmLayerNoCifgWithPeepholeWithProjectionTestImpl(armnn::IWorkloadFactory& workl
     std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
             workloadFactory.CreateTensorHandle(cellStateOutTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::LstmQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -1217,6 +1220,7 @@ LayerTestResult<T, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
     LayerTestResult<T, 2> ret3(outputTensorInfo);
     ret3.outputExpected = MakeTensor<T, 2>(outputTensorInfo, outputData);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     // Prepare the inputs and outputs for the workload
     std::unique_ptr<armnn::ITensorHandle> inputHandle =
             workloadFactory.CreateTensorHandle(inputTensorInfo);
@@ -1233,6 +1237,7 @@ LayerTestResult<T, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
             workloadFactory.CreateTensorHandle(cellStateOutTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle =
             workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
@@ -1326,6 +1331,7 @@ LstmLayerNoCifgWithPeepholeWithProjectionWithLayerNormTestImpl(armnn::IWorkloadF
     outputVector.assign(outputExpected.data(), outputExpected.data() + (batchSize * outputSize));
     ret.outputExpected = MakeTensor<float, 2>(outputTensorInfo, outputVector);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> cellStateInHandle =
             workloadFactory.CreateTensorHandle(cellStateInTensorInfo);
@@ -1338,6 +1344,7 @@ LstmLayerNoCifgWithPeepholeWithProjectionWithLayerNormTestImpl(armnn::IWorkloadF
     std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
             workloadFactory.CreateTensorHandle(cellStateOutTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::LstmQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -1610,6 +1617,7 @@ LayerTestResult<uint8_t, 2> QuantizedLstmTestImpl(
     outputVector.assign(outputExpected.data(), outputExpected.data() + (numBatches * outputSize));
     ret.outputExpected = MakeTensor<uint8_t, 2>(outputStateInfo, outputVector);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     // Create tensor handles
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<armnn::ITensorHandle> cellStateInHandle =
@@ -1620,6 +1628,7 @@ LayerTestResult<uint8_t, 2> QuantizedLstmTestImpl(
     std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
             workloadFactory.CreateTensorHandle(cellStateInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputStateInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::QuantizedLstmQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -1819,6 +1828,7 @@ LayerTestResult<int8_t, 2> QLstmTestImpl(
     outputVector.assign(outputExpected.data(), outputExpected.data() + (numBatches * outputSize));
     ret.outputExpected = MakeTensor<int8_t, 2>(outputStateInfo, outputVector);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     // Create tensor handles
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<armnn::ITensorHandle> cellStateInHandle =
@@ -1830,6 +1840,7 @@ LayerTestResult<int8_t, 2> QLstmTestImpl(
     std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
             workloadFactory.CreateTensorHandle(cellStateInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputStateInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::QLstmQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -2057,6 +2068,7 @@ LayerTestResult<int8_t, 2> QLstmTestImpl1(
     outputVector.assign(outputExpected.data(), outputExpected.data() + (numBatches * outputSize));
     ret.outputExpected = MakeTensor<int8_t, 2>(outputStateInfo, outputVector);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     // Create tensor handles
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<armnn::ITensorHandle> cellStateInHandle =
@@ -2068,6 +2080,7 @@ LayerTestResult<int8_t, 2> QLstmTestImpl1(
     std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
             workloadFactory.CreateTensorHandle(cellStateInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputStateInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::QLstmQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -2327,6 +2340,7 @@ LayerTestResult<int8_t, 2> QLstmTestImpl2(
     outputVector.assign(outputExpected.data(), outputExpected.data() + (numBatches * outputSize));
     ret.outputExpected = MakeTensor<int8_t, 2>(outputStateInfo, outputVector);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     // Create tensor handles
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<armnn::ITensorHandle> cellStateInHandle =
@@ -2338,6 +2352,7 @@ LayerTestResult<int8_t, 2> QLstmTestImpl2(
     std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
             workloadFactory.CreateTensorHandle(cellStateInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputStateInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::QLstmQueueDescriptor data;
     armnn::WorkloadInfo info;

@@ -101,7 +101,8 @@ int LoadModel(const char* filename,
               ITfLiteParser& parser,
               IRuntime& runtime,
               NetworkId& networkId,
-              const std::vector<BackendId>& backendPreferences)
+              const std::vector<BackendId>& backendPreferences,
+              bool enableImport = false)
 {
     std::ifstream stream(filename, std::ios::in | std::ios::binary);
     if (!stream.is_open())
@@ -125,10 +126,10 @@ int LoadModel(const char* filename,
         return OPTIMIZE_NETWORK_ERROR;
     }
 
-    // Load backbone model into runtime
+    // Load model into runtime
     {
         std::string errorMessage;
-        INetworkProperties modelProps;
+        INetworkProperties modelProps(enableImport, enableImport);
         Status status = runtime.LoadNetwork(networkId, std::move(optimizedModel), errorMessage, modelProps);
         if (status != Status::Success)
         {
@@ -346,7 +347,8 @@ int main(int argc, char* argv[])
     // Load detector model
     ARMNN_LOG(info) << "Loading detector...";
     NetworkId detectorId;
-    CHECK_OK(LoadModel(progArgs.detectorDir.c_str(), *parser, *runtime, detectorId, progArgs.prefBackendsDetector));
+    CHECK_OK(LoadModel(
+        progArgs.detectorDir.c_str(), *parser, *runtime, detectorId, progArgs.prefBackendsDetector, true));
     auto detectIn0Id = parser->GetNetworkInputBindingInfo(0, "input_to_detector_1");
     auto detectIn1Id = parser->GetNetworkInputBindingInfo(0, "input_to_detector_2");
     auto detectIn2Id = parser->GetNetworkInputBindingInfo(0, "input_to_detector_3");

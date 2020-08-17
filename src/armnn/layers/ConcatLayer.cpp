@@ -36,12 +36,14 @@ std::unique_ptr<IWorkload> ConcatLayer::CreateWorkload(const IWorkloadFactory& f
 }
 
 template<typename FactoryType>
-void ConcatLayer::CreateTensors(const TensorHandleFactoryRegistry& registry, const FactoryType& factory)
+void ConcatLayer::CreateTensors(const TensorHandleFactoryRegistry& registry,
+                                const FactoryType& factory,
+                                bool isMemoryManaged)
 {
     //If sub tensors are supported then the concat
     //just needs to make sure that the outputs of the prev layer
     //are made subtensors of the output of the concat layer.
-    m_OutputHandlers[0].CreateTensorHandles(factory);
+    m_OutputHandlers[0].CreateTensorHandles(factory, isMemoryManaged);
 
     if (factory.SupportsSubTensors())
     {
@@ -168,21 +170,20 @@ void ConcatLayer::CreateTensors(const TensorHandleFactoryRegistry& registry, con
 
 void ConcatLayer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
                                       const IWorkloadFactory& workloadFactory,
-                                      const bool IsMemoryManaged)
+                                      const bool isMemoryManaged)
 {
-    IgnoreUnused(IsMemoryManaged);
     OutputSlot& slot = GetOutputSlot(0);
     ITensorHandleFactory::FactoryId factoryId = slot.GetTensorHandleFactoryId();
 
     if (factoryId == ITensorHandleFactory::LegacyFactoryId)
     {
-        CreateTensors(registry, workloadFactory);
+        CreateTensors(registry, workloadFactory, isMemoryManaged);
     }
     else
     {
         ITensorHandleFactory* handleFactory = registry.GetFactory(factoryId);
         ARMNN_ASSERT(handleFactory);
-        CreateTensors(registry, *handleFactory);
+        CreateTensors(registry, *handleFactory, isMemoryManaged);
     }
 }
 

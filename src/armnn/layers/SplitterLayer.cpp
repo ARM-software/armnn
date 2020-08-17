@@ -33,7 +33,9 @@ std::unique_ptr<IWorkload> SplitterLayer::CreateWorkload(const IWorkloadFactory&
 }
 
 template<typename FactoryType>
-void SplitterLayer::CreateTensors(const TensorHandleFactoryRegistry& registry, const FactoryType& factory)
+void SplitterLayer::CreateTensors(const TensorHandleFactoryRegistry& registry,
+                                  const FactoryType& factory,
+                                  bool isMemoryManaged)
 {
     //If sub tensors are supported than all the "splitter" need to do is to
     //set the outputs to be appropriate sub tensors of the input.
@@ -166,28 +168,27 @@ void SplitterLayer::CreateTensors(const TensorHandleFactoryRegistry& registry, c
     {
         for (unsigned int i = 0; i < m_Param.GetNumViews(); ++i)
         {
-            m_OutputHandlers[i].CreateTensorHandles(factory);
+            m_OutputHandlers[i].CreateTensorHandles(factory, isMemoryManaged);
         }
     }
 }
 
 void SplitterLayer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
                                         const IWorkloadFactory& workloadFactory,
-                                        const bool IsMemoryManaged)
+                                        const bool isMemoryManaged)
 {
-    IgnoreUnused(IsMemoryManaged);
     OutputSlot& slot = GetOutputSlot(0);
     ITensorHandleFactory::FactoryId factoryId = slot.GetTensorHandleFactoryId();
 
     if (factoryId == ITensorHandleFactory::LegacyFactoryId)
     {
-        CreateTensors(registry, workloadFactory);
+        CreateTensors(registry, workloadFactory, isMemoryManaged);
     }
     else
     {
         ITensorHandleFactory* handleFactory = registry.GetFactory(factoryId);
         ARMNN_ASSERT(handleFactory);
-        CreateTensors(registry, *handleFactory);
+        CreateTensors(registry, *handleFactory, isMemoryManaged);
     }
 }
 

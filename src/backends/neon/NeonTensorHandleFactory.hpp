@@ -15,25 +15,20 @@ constexpr const char* NeonTensorHandleFactoryId() { return "Arm/Neon/TensorHandl
 
 const std::set<armnn::LayerType> paddingRequiredLayers {
     LayerType::ArgMinMax,
-    LayerType::Concat,
     LayerType::Convolution2d,
     LayerType::DepthToSpace,
     LayerType::DepthwiseConvolution2d,
     LayerType::Dequantize,
     LayerType::FullyConnected,
     LayerType::Gather,
-    LayerType::L2Normalization,
     LayerType::Lstm,
     LayerType::Mean,
-    LayerType::Multiplication,
-    LayerType::Normalization,
     LayerType::Permute,
     LayerType::Pooling2d,
     LayerType::Quantize,
     LayerType::QuantizedLstm,
     LayerType::Resize,
     LayerType::Stack,
-    LayerType::Transpose,
     LayerType::TransposeConvolution2d
 };
 

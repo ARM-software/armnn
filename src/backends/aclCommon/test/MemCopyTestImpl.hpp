@@ -44,8 +44,10 @@ LayerTestResult<T, 4> MemCopyTest(armnn::IWorkloadFactory& srcWorkloadFactory,
 
     boost::multi_array<T, 4> outputData(shapeData);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     auto inputTensorHandle = srcWorkloadFactory.CreateTensorHandle(tensorInfo);
     auto outputTensorHandle = dstWorkloadFactory.CreateTensorHandle(tensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     AllocateAndCopyDataToITensorHandle(inputTensorHandle.get(), inputData.data());
     outputTensorHandle->Allocate();
@@ -55,12 +57,14 @@ LayerTestResult<T, 4> MemCopyTest(armnn::IWorkloadFactory& srcWorkloadFactory,
 
     const unsigned int origin[4] = {};
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     auto workloadInput = (withSubtensors && srcWorkloadFactory.SupportsSubTensors())
                          ? srcWorkloadFactory.CreateSubTensorHandle(*inputTensorHandle, tensorShape, origin)
                          : std::move(inputTensorHandle);
     auto workloadOutput = (withSubtensors && dstWorkloadFactory.SupportsSubTensors())
                           ? dstWorkloadFactory.CreateSubTensorHandle(*outputTensorHandle, tensorShape, origin)
                           : std::move(outputTensorHandle);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     AddInputToWorkload(memCopyQueueDesc, workloadInfo, tensorInfo, workloadInput.get());
     AddOutputToWorkload(memCopyQueueDesc, workloadInfo, tensorInfo, workloadOutput.get());

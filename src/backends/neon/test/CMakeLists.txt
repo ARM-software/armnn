@@ -6,7 +6,6 @@
 list(APPEND armnnNeonBackendUnitTests_sources
     NeonCreateWorkloadTests.cpp
     NeonEndToEndTests.cpp
-    NeonFallbackTests.cpp
     NeonJsonPrinterTests.cpp
     NeonLayerSupportTests.cpp
     NeonLayerTests.cpp
@@ -19,6 +18,7 @@ list(APPEND armnnNeonBackendUnitTests_sources
 
 if (ARMNNREF)
     list(APPEND armnnNeonBackendUnitTests_sources
+        NeonFallbackTests.cpp
         NeonMemCopyTests.cpp
         )
 endif()

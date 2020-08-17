@@ -9,7 +9,7 @@
 #include <armnn/utility/Assert.hpp>
 
 #if defined(_MSC_VER)
-#include <commons/include/WindowsWrapper.hpp>
+#include <common/include/WindowsWrapper.hpp>
 #endif
 
 #if defined(__ANDROID__)

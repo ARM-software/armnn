@@ -8,7 +8,7 @@
 #if defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
 #elif defined(_MSC_VER)
-#include <commons/include/WindowsWrapper.hpp>
+#include <common/include/WindowsWrapper.hpp>
 #endif
 
 namespace armnnUtils

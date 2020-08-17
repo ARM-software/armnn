@@ -8,17 +8,11 @@
 #if defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
 #include <fcntl.h>
-#include <common/include/Conversion.hpp>
 #endif
 
-#if defined(__APPLE__) || defined(_MSC_VER) || defined(__MINGW32__)
+#include <common/include/Conversion.hpp>
 #include <common/include/IgnoreUnused.hpp>
-#endif
-
-#if defined(__MINGW32__)
-#include <common/include/Conversion.hpp>
 #include <common/include/NumericCast.hpp>
-#endif
 
 namespace arm
 {

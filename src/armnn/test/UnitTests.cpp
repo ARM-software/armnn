@@ -24,7 +24,7 @@ BOOST_GLOBAL_FIXTURE(ConfigureLoggingFixture);
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/tee.hpp>
 #include <iostream>
-#include <commons/include/WindowsWrapper.hpp>
+#include <common/include/WindowsWrapper.hpp>
 
 using namespace boost::iostreams;
 using namespace std;

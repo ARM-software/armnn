@@ -73,8 +73,10 @@ BOOST_AUTO_TEST_CASE(OpenClTimerBatchNorm)
     auto beta     = MakeTensor<float, 1>(tensorInfo, { 3.f,  2.f });
     auto gamma    = MakeTensor<float, 1>(tensorInfo, { 2.f,  1.f });
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     BatchNormalizationQueueDescriptor data;
     WorkloadInfo info;

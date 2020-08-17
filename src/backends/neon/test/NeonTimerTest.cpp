@@ -67,8 +67,10 @@ BOOST_AUTO_TEST_CASE(NeonTimerMeasure)
 
     auto input = MakeTensor<float, 4>(inputTensorInfo, inputData);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     // Setup bounded ReLu
     armnn::ActivationQueueDescriptor descriptor;

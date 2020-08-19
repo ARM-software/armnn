@@ -9,25 +9,25 @@
 #include <LayerSupportCommon.hpp>
 #include <armnn/Types.hpp>
 
-namespace armnn
+namespace sdb // sample dynamic backend
 {
 
-bool SampleDynamicLayerSupport::IsInputSupported(const TensorInfo& input,
-                                                 Optional<std::string&> reasonIfUnsupported) const
-{
-    return true;
-}
-
-bool SampleDynamicLayerSupport::IsOutputSupported(const TensorInfo& output,
-                                                  Optional<std::string&> reasonIfUnsupported) const
+bool SampleDynamicLayerSupport::IsInputSupported(const armnn::TensorInfo& input,
+                                                 armnn::Optional<std::string&> reasonIfUnsupported) const
 {
     return true;
 }
 
-bool SampleDynamicLayerSupport::IsAdditionSupported(const TensorInfo& input0,
-                                                    const TensorInfo& input1,
-                                                    const TensorInfo& output,
-                                                    Optional<std::string&> reasonIfUnsupported) const
+bool SampleDynamicLayerSupport::IsOutputSupported(const armnn::TensorInfo& output,
+                                                  armnn::Optional<std::string&> reasonIfUnsupported) const
+{
+    return true;
+}
+
+bool SampleDynamicLayerSupport::IsAdditionSupported(const armnn::TensorInfo& input0,
+                                                    const armnn::TensorInfo& input1,
+                                                    const armnn::TensorInfo& output,
+                                                    armnn::Optional<std::string&> reasonIfUnsupported) const
 {
 
     if (input0.GetDataType() != armnn::DataType::Float32)
@@ -48,4 +48,4 @@ bool SampleDynamicLayerSupport::IsAdditionSupported(const TensorInfo& input0,
     return true;
 }
 
-} // namespace armnn
+} // namespace sdb

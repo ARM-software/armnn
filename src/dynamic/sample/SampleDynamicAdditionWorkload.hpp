@@ -7,15 +7,15 @@
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 
-namespace armnn
+namespace sdb // sample dynamic backend
 {
 
-class SampleDynamicAdditionWorkload : public BaseWorkload<AdditionQueueDescriptor>
+class SampleDynamicAdditionWorkload : public armnn::BaseWorkload<armnn::AdditionQueueDescriptor>
 {
 public:
-    SampleDynamicAdditionWorkload(const AdditionQueueDescriptor& descriptor, const WorkloadInfo& info);
+    SampleDynamicAdditionWorkload(const armnn::AdditionQueueDescriptor& descriptor, const armnn::WorkloadInfo& info);
 
     void Execute() const override;
 };
 
-} // namespace armnn
+} // namespace sdb

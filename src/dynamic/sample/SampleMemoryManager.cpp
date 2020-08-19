@@ -7,7 +7,7 @@
 
 #include <algorithm>
 
-namespace armnn
+namespace sdb // sample dynamic backend
 {
 
 SampleMemoryManager::SampleMemoryManager()
@@ -92,4 +92,4 @@ void SampleMemoryManager::Pool::Release()
     m_Pointer = nullptr;
 }
 
-}
+} // namespace sdb

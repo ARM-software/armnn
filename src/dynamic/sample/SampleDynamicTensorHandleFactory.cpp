@@ -8,10 +8,10 @@
 
 #include <armnn/utility/IgnoreUnused.hpp>
 
-namespace armnn
+namespace sdb // sample dynamic backend
 {
 
-using FactoryId = ITensorHandleFactory::FactoryId;
+using FactoryId = armnn::ITensorHandleFactory::FactoryId;
 
 const FactoryId& SampleDynamicTensorHandleFactory::GetIdStatic()
 {
@@ -19,29 +19,32 @@ const FactoryId& SampleDynamicTensorHandleFactory::GetIdStatic()
     return s_Id;
 }
 
-std::unique_ptr<ITensorHandle>
-SampleDynamicTensorHandleFactory::CreateSubTensorHandle(ITensorHandle& parent,
-                                                        TensorShape const& subTensorShape,
+std::unique_ptr<armnn::ITensorHandle>
+SampleDynamicTensorHandleFactory::CreateSubTensorHandle(armnn::ITensorHandle& parent,
+                                                        armnn::TensorShape const& subTensorShape,
                                                         unsigned int const* subTensorOrigin) const
 {
     IgnoreUnused(parent, subTensorShape, subTensorOrigin);
     return nullptr;
 }
 
-std::unique_ptr<ITensorHandle> SampleDynamicTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
+std::unique_ptr<armnn::ITensorHandle> SampleDynamicTensorHandleFactory::CreateTensorHandle(
+        const armnn::TensorInfo& tensorInfo) const
 {
     return std::make_unique<SampleTensorHandle>(tensorInfo, m_MemoryManager);
 }
 
-std::unique_ptr<ITensorHandle> SampleDynamicTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                                                    DataLayout dataLayout) const
+std::unique_ptr<armnn::ITensorHandle> SampleDynamicTensorHandleFactory::CreateTensorHandle(
+        const armnn::TensorInfo& tensorInfo,
+        armnn::DataLayout dataLayout) const
 {
     IgnoreUnused(dataLayout);
     return std::make_unique<SampleTensorHandle>(tensorInfo, m_MemoryManager);
 }
 
-std::unique_ptr<ITensorHandle> SampleDynamicTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                                                    const bool IsMemoryManaged) const
+std::unique_ptr<armnn::ITensorHandle> SampleDynamicTensorHandleFactory::CreateTensorHandle(
+        const armnn::TensorInfo& tensorInfo,
+        const bool IsMemoryManaged) const
 {
     if (IsMemoryManaged)
     {
@@ -53,9 +56,10 @@ std::unique_ptr<ITensorHandle> SampleDynamicTensorHandleFactory::CreateTensorHan
     }
 }
 
-std::unique_ptr<ITensorHandle> SampleDynamicTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                                                    DataLayout dataLayout,
-                                                                                    const bool IsMemoryManaged) const
+std::unique_ptr<armnn::ITensorHandle> SampleDynamicTensorHandleFactory::CreateTensorHandle(
+        const armnn::TensorInfo& tensorInfo,
+        armnn::DataLayout dataLayout,
+        const bool IsMemoryManaged) const
 {
     IgnoreUnused(dataLayout);
     if (IsMemoryManaged)
@@ -78,14 +82,14 @@ bool SampleDynamicTensorHandleFactory::SupportsSubTensors() const
     return false;
 }
 
-MemorySourceFlags SampleDynamicTensorHandleFactory::GetExportFlags() const
+armnn::MemorySourceFlags SampleDynamicTensorHandleFactory::GetExportFlags() const
 {
     return m_ExportFlags;
 }
 
-MemorySourceFlags SampleDynamicTensorHandleFactory::GetImportFlags() const
+armnn::MemorySourceFlags SampleDynamicTensorHandleFactory::GetImportFlags() const
 {
     return m_ImportFlags;
 }
 
-} // namespace armnn
+} // namespace sdb

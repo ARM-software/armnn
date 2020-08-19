@@ -8,16 +8,16 @@
 
 #include "SampleMemoryManager.hpp"
 
-namespace armnn
+namespace sdb // sample dynamic backend
 {
 
 // An implementation of ITensorHandle with simple "bump the pointer" memory-management behaviour
-class SampleTensorHandle : public ITensorHandle
+class SampleTensorHandle : public armnn::ITensorHandle
 {
 public:
-    SampleTensorHandle(const TensorInfo& tensorInfo, std::shared_ptr<SampleMemoryManager> &memoryManager);
+    SampleTensorHandle(const armnn::TensorInfo& tensorInfo, std::shared_ptr<SampleMemoryManager> &memoryManager);
 
-    SampleTensorHandle(const TensorInfo& tensorInfo, MemorySourceFlags importFlags);
+    SampleTensorHandle(const armnn::TensorInfo& tensorInfo, armnn::MemorySourceFlags importFlags);
 
     ~SampleTensorHandle();
 
@@ -36,27 +36,27 @@ public:
     virtual void Unmap() const override
     {}
 
-    TensorShape GetStrides() const override
+    armnn::TensorShape GetStrides() const override
     {
         return GetUnpaddedTensorStrides(m_TensorInfo);
     }
 
-    TensorShape GetShape() const override
+    armnn::TensorShape GetShape() const override
     {
         return m_TensorInfo.GetShape();
     }
 
-    const TensorInfo& GetTensorInfo() const
+    const armnn::TensorInfo& GetTensorInfo() const
     {
         return m_TensorInfo;
     }
 
-    virtual MemorySourceFlags GetImportFlags() const override
+    virtual armnn::MemorySourceFlags GetImportFlags() const override
     {
         return m_ImportFlags;
     }
 
-    virtual bool Import(void* memory, MemorySource source) override;
+    virtual bool Import(void* memory, armnn::MemorySource source) override;
 
 private:
     // Only used for testing
@@ -68,13 +68,13 @@ private:
     SampleTensorHandle(const SampleTensorHandle& other) = delete; // noncopyable
     SampleTensorHandle& operator=(const SampleTensorHandle& other) = delete; //noncopyable
 
-    TensorInfo m_TensorInfo;
+    armnn::TensorInfo m_TensorInfo;
 
     std::shared_ptr<SampleMemoryManager> m_MemoryManager;
     SampleMemoryManager::Pool* m_Pool;
     mutable void *m_UnmanagedMemory;
-    MemorySourceFlags m_ImportFlags;
+    armnn::MemorySourceFlags m_ImportFlags;
     bool m_Imported;
 };
 
-}
+} // namespace sdb

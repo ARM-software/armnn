@@ -8,10 +8,10 @@
 #include "SampleDynamicAdditionWorkload.hpp"
 #include "SampleTensorHandle.hpp"
 
-namespace armnn
+namespace sdb // sample dynamic backend
 {
 
-inline const TensorInfo& GetTensorInfo(const ITensorHandle* tensorHandle)
+inline const armnn::TensorInfo& GetTensorInfo(const armnn::ITensorHandle* tensorHandle)
 {
     // We know that reference workloads use RefTensorHandles for inputs and outputs
     const SampleTensorHandle* sampleTensorHandle =
@@ -19,26 +19,26 @@ inline const TensorInfo& GetTensorInfo(const ITensorHandle* tensorHandle)
     return sampleTensorHandle->GetTensorInfo();
 }
 
-const float* GetInputTensorData(unsigned int idx, const AdditionQueueDescriptor& data)
+const float* GetInputTensorData(unsigned int idx, const armnn::AdditionQueueDescriptor& data)
 {
-    const ITensorHandle* tensorHandle = data.m_Inputs[idx];
+    const armnn::ITensorHandle* tensorHandle = data.m_Inputs[idx];
     return reinterpret_cast<const float*>(tensorHandle->Map());
 }
 
-float* GetOutputTensorData(unsigned int idx, const AdditionQueueDescriptor& data)
+float* GetOutputTensorData(unsigned int idx, const armnn::AdditionQueueDescriptor& data)
 {
-    ITensorHandle* tensorHandle = data.m_Outputs[idx];
+    armnn::ITensorHandle* tensorHandle = data.m_Outputs[idx];
     return reinterpret_cast<float*>(tensorHandle->Map());
 }
 
-SampleDynamicAdditionWorkload::SampleDynamicAdditionWorkload(const AdditionQueueDescriptor& descriptor,
-                                                             const WorkloadInfo& info)
+SampleDynamicAdditionWorkload::SampleDynamicAdditionWorkload(const armnn::AdditionQueueDescriptor& descriptor,
+                                                             const armnn::WorkloadInfo& info)
     : BaseWorkload(descriptor, info)
 {}
 
 void SampleDynamicAdditionWorkload::Execute() const
 {
-    const TensorInfo& info = GetTensorInfo(m_Data.m_Inputs[0]);
+    const armnn::TensorInfo& info = GetTensorInfo(m_Data.m_Inputs[0]);
     unsigned int num = info.GetNumElements();
 
     const float* inputData0 = GetInputTensorData(0, m_Data);
@@ -51,4 +51,4 @@ void SampleDynamicAdditionWorkload::Execute() const
     }
 }
 
-} // namespace armnn
+} // namespace sdb // sample dynamic backend

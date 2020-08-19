@@ -7,22 +7,22 @@
 
 #include <backendsCommon/LayerSupportBase.hpp>
 
-namespace armnn
+namespace sdb // sample dynamic backend
 {
 
-class SampleDynamicLayerSupport : public LayerSupportBase
+class SampleDynamicLayerSupport : public armnn::LayerSupportBase
 {
 public:
-    bool IsAdditionSupported(const TensorInfo& input0,
-                             const TensorInfo& input1,
-                             const TensorInfo& output,
-                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+    bool IsAdditionSupported(const armnn::TensorInfo& input0,
+                             const armnn::TensorInfo& input1,
+                             const armnn::TensorInfo& output,
+                             armnn::Optional<std::string&> reasonIfUnsupported = armnn::EmptyOptional()) const override;
 
-    bool IsInputSupported(const TensorInfo& input,
-                          Optional<std::string&> reasonIfUnsupported) const override;
+    bool IsInputSupported(const armnn::TensorInfo& input,
+                          armnn::Optional<std::string&> reasonIfUnsupported) const override;
 
-    bool IsOutputSupported(const TensorInfo& output,
-                           Optional<std::string&> reasonIfUnsupported) const override;
+    bool IsOutputSupported(const armnn::TensorInfo& output,
+                           armnn::Optional<std::string&> reasonIfUnsupported) const override;
 };
 
-} // namespace armnn
+} // namespace sdb

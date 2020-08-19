@@ -9,11 +9,11 @@
 #include <forward_list>
 #include <vector>
 
-namespace armnn
+namespace sdb // sample dynamic backend
 {
 
 // An implementation of IMemoryManager to be used with SampleTensorHandle
-class SampleMemoryManager : public IMemoryManager
+class SampleMemoryManager : public armnn::IMemoryManager
 {
 public:
     SampleMemoryManager();
@@ -56,4 +56,4 @@ private:
     std::vector<Pool*> m_FreePools;
 };
 
-}
+} // namespace sdb

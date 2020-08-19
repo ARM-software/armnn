@@ -12,24 +12,24 @@
 #include <armnn/backends/IBackendInternal.hpp>
 #include <armnn/backends/OptimizationViews.hpp>
 
-namespace armnn
+namespace sdb // sample dynamic backend
 {
 
 constexpr const char * SampleDynamicBackendId() { return "SampleDynamic"; }
 
-class SampleDynamicBackend : public IBackendInternal
+class SampleDynamicBackend : public armnn::IBackendInternal
 {
 public:
     SampleDynamicBackend()  = default;
     ~SampleDynamicBackend() = default;
 
-    static const BackendId& GetIdStatic()
+    static const armnn::BackendId& GetIdStatic()
     {
-        static const BackendId s_Id{SampleDynamicBackendId()};
+        static const armnn::BackendId s_Id{SampleDynamicBackendId()};
         return s_Id;
     }
 
-    const BackendId& GetId() const override { return GetIdStatic(); }
+    const armnn::BackendId& GetId() const override { return GetIdStatic(); }
 
     IBackendInternal::IMemoryManagerUniquePtr CreateMemoryManager() const override
     {
@@ -40,11 +40,11 @@ public:
         const IMemoryManagerSharedPtr& memoryManager) const override
     {
         return std::make_unique<SampleDynamicWorkloadFactory>(
-                PolymorphicPointerDowncast<SampleMemoryManager>(memoryManager));
+                armnn::PolymorphicPointerDowncast<SampleMemoryManager>(memoryManager));
     }
 
     IBackendInternal::IWorkloadFactoryPtr CreateWorkloadFactory(
-        class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry) const override
+        class armnn::TensorHandleFactoryRegistry& tensorHandleFactoryRegistry) const override
     {
         auto memoryManager = std::make_shared<SampleMemoryManager>();
 
@@ -52,11 +52,11 @@ public:
         tensorHandleFactoryRegistry.RegisterFactory(std::make_unique<SampleDynamicTensorHandleFactory>(memoryManager));
 
         return std::make_unique<SampleDynamicWorkloadFactory>(
-            PolymorphicPointerDowncast<SampleMemoryManager>(memoryManager));
+                armnn::PolymorphicPointerDowncast<SampleMemoryManager>(memoryManager));
     }
 
     IBackendInternal::IBackendProfilingContextPtr CreateBackendProfilingContext(
-        const IRuntime::CreationOptions&, IBackendProfilingPtr&) override
+        const armnn::IRuntime::CreationOptions&, IBackendProfilingPtr&) override
     {
         return IBackendProfilingContextPtr{};
     }
@@ -67,26 +67,26 @@ public:
         return layerSupport;
     }
 
-    std::vector<ITensorHandleFactory::FactoryId> GetHandleFactoryPreferences() const override
+    std::vector<armnn::ITensorHandleFactory::FactoryId> GetHandleFactoryPreferences() const override
     {
-        return std::vector<ITensorHandleFactory::FactoryId> { SampleDynamicTensorHandleFactory::GetIdStatic() };
+        return std::vector<armnn::ITensorHandleFactory::FactoryId> { SampleDynamicTensorHandleFactory::GetIdStatic() };
     }
 
-    IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override
+    IBackendInternal::IBackendContextPtr CreateBackendContext(const armnn::IRuntime::CreationOptions&) const override
     {
         return IBackendContextPtr{};
     }
 
-    OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const override
+    armnn::OptimizationViews OptimizeSubgraphView(const armnn::SubgraphView& subgraph) const override
     {
-        OptimizationViews optimizationViews;
+        armnn::OptimizationViews optimizationViews;
 
-        optimizationViews.AddUntouchedSubgraph(SubgraphView(subgraph));
+        optimizationViews.AddUntouchedSubgraph(armnn::SubgraphView(subgraph));
 
         return optimizationViews;
     }
 
-    void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry) override
+    void RegisterTensorHandleFactories(class armnn::TensorHandleFactoryRegistry& registry) override
     {
         auto memoryManager = std::make_shared<SampleMemoryManager>();
 
@@ -96,11 +96,11 @@ public:
 
 };
 
-} // namespace armnn
+} // namespace sdb
 
 const char* GetBackendId()
 {
-    return armnn::SampleDynamicBackend::GetIdStatic().Get().c_str();
+    return sdb::SampleDynamicBackend::GetIdStatic().Get().c_str();
 }
 
 void GetVersion(uint32_t* outMajor, uint32_t* outMinor)
@@ -118,7 +118,7 @@ void GetVersion(uint32_t* outMajor, uint32_t* outMinor)
 
 void* BackendFactory()
 {
-    return new armnn::SampleDynamicBackend();
+    return new sdb::SampleDynamicBackend();
 }
 
 

@@ -11,12 +11,12 @@
 #include "SampleDynamicWorkloadFactory.hpp"
 #include "SampleTensorHandle.hpp"
 
-namespace armnn
+namespace sdb // sample dynamic backend
 {
 
 namespace
 {
-static const BackendId s_Id{  GetBackendId() };
+static const armnn::BackendId s_Id{  GetBackendId() };
 }
 
 SampleDynamicWorkloadFactory::SampleDynamicWorkloadFactory(const std::shared_ptr<SampleMemoryManager>& memoryManager)
@@ -29,47 +29,52 @@ SampleDynamicWorkloadFactory::SampleDynamicWorkloadFactory()
 {
 }
 
-const BackendId& SampleDynamicWorkloadFactory::GetBackendId() const
+const armnn::BackendId& SampleDynamicWorkloadFactory::GetBackendId() const
 {
     return s_Id;
 }
 
-bool SampleDynamicWorkloadFactory::IsLayerSupported(const IConnectableLayer& layer,
-                                                    Optional<DataType> dataType,
+bool SampleDynamicWorkloadFactory::IsLayerSupported(const armnn::IConnectableLayer& layer,
+                                                    armnn::Optional<armnn::DataType> dataType,
                                                     std::string& outReasonIfUnsupported)
 {
     return IWorkloadFactory::IsLayerSupported(s_Id, layer, dataType, outReasonIfUnsupported);
 }
 
-std::unique_ptr<ITensorHandle> SampleDynamicWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                                                const bool isMemoryManaged) const
+std::unique_ptr<armnn::ITensorHandle> SampleDynamicWorkloadFactory::CreateTensorHandle(
+        const armnn::TensorInfo& tensorInfo,
+        const bool isMemoryManaged) const
 {
-    return std::make_unique<ScopedCpuTensorHandle>(tensorInfo);
+    return std::make_unique<armnn::ScopedCpuTensorHandle>(tensorInfo);
 }
 
-std::unique_ptr<ITensorHandle> SampleDynamicWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                                                DataLayout dataLayout,
-                                                                                const bool isMemoryManaged) const
+std::unique_ptr<armnn::ITensorHandle> SampleDynamicWorkloadFactory::CreateTensorHandle(
+        const armnn::TensorInfo& tensorInfo,
+        armnn::DataLayout dataLayout,
+        const bool isMemoryManaged) const
 {
-    return std::make_unique<ScopedCpuTensorHandle>(tensorInfo);
+    return std::make_unique<armnn::ScopedCpuTensorHandle>(tensorInfo);
 }
 
-std::unique_ptr<IWorkload> SampleDynamicWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
-                                                                        const WorkloadInfo& info) const
+std::unique_ptr<armnn::IWorkload> SampleDynamicWorkloadFactory::CreateAddition(
+        const armnn::AdditionQueueDescriptor& descriptor,
+        const armnn::WorkloadInfo& info) const
 {
     return std::make_unique<SampleDynamicAdditionWorkload>(descriptor, info);
 }
 
-std::unique_ptr<IWorkload> SampleDynamicWorkloadFactory::CreateInput(const InputQueueDescriptor& descriptor,
-                                                                     const WorkloadInfo& info) const
+std::unique_ptr<armnn::IWorkload> SampleDynamicWorkloadFactory::CreateInput(
+        const armnn::InputQueueDescriptor& descriptor,
+        const armnn::WorkloadInfo& info) const
 {
-    return std::make_unique<CopyMemGenericWorkload>(descriptor, info);
+    return std::make_unique<armnn::CopyMemGenericWorkload>(descriptor, info);
 }
 
-std::unique_ptr<IWorkload> SampleDynamicWorkloadFactory::CreateOutput(const OutputQueueDescriptor& descriptor,
-                                                                      const WorkloadInfo& info) const
+std::unique_ptr<armnn::IWorkload> SampleDynamicWorkloadFactory::CreateOutput(
+        const armnn::OutputQueueDescriptor& descriptor,
+        const armnn::WorkloadInfo& info) const
 {
-    return std::make_unique<CopyMemGenericWorkload>(descriptor, info);
+    return std::make_unique<armnn::CopyMemGenericWorkload>(descriptor, info);
 }
 
-} // namespace armnn
+} // namespace sdb

@@ -323,6 +323,7 @@ BackendsMap CreateSupportedBackends(TensorHandleFactoryRegistry& handleFactoryRe
 OptimizationResult SelectTensorHandleStrategy(Graph& optGraph,
                                               BackendsMap& backends,
                                               TensorHandleFactoryRegistry& registry,
+                                              bool importEnabled,
                                               Optional<std::vector<std::string>&> errMessages);
 
 OptimizationResult AssignBackends(OptimizedNetwork* optNetObjPtr,

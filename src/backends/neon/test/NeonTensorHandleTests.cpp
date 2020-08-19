@@ -661,7 +661,7 @@ BOOST_AUTO_TEST_CASE(NeonTensorHandleFactoryMemoryManaged)
 
     float testPtr[2] = { 2.5f, 5.5f };
     // Cannot import as import is disabled
-    BOOST_CHECK(!handle->Import(static_cast<void*>(testPtr), MemorySource::Malloc));
+    BOOST_CHECK_THROW(handle->Import(static_cast<void*>(testPtr), MemorySource::Malloc), MemoryImportException);
 }
 
 BOOST_AUTO_TEST_CASE(NeonTensorHandleFactoryImport)

@@ -119,7 +119,9 @@ int LoadModel(const char* filename,
     ARMNN_LOG(debug) << "Model loaded ok: " << filename;
 
     // Optimize backbone model
-    auto optimizedModel = Optimize(*model, backendPreferences, runtime.GetDeviceSpec());
+    OptimizerOptions options;
+    options.m_ImportEnabled = enableImport;
+    auto optimizedModel = Optimize(*model, backendPreferences, runtime.GetDeviceSpec(), options);
     if (!optimizedModel)
     {
         ARMNN_LOG(fatal) << "Could not optimize the model:" << filename;

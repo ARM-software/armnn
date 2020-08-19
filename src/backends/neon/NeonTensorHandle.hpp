@@ -159,6 +159,14 @@ public:
                     return m_Imported;
                 }
             }
+            else
+            {
+                throw MemoryImportException("NeonTensorHandle::Import is disabled");
+            }
+        }
+        else
+        {
+            throw MemoryImportException("NeonTensorHandle::Incorrect import flag");
         }
         return false;
     }

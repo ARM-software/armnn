@@ -339,7 +339,7 @@ BOOST_AUTO_TEST_CASE(TensorHandleSelectionStrategy)
     graph.TopologicalSort();
 
     std::vector<std::string> errors;
-    auto result = SelectTensorHandleStrategy(graph, backends, registry, errors);
+    auto result = SelectTensorHandleStrategy(graph, backends, registry, true, errors);
 
     BOOST_TEST(result.m_Error == false);
     BOOST_TEST(result.m_Warning == false);

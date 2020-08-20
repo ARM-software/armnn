@@ -9,6 +9,7 @@
 #include <armnn/Types.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <armnn/Descriptors.hpp>
+#include <armnnUtils/Permute.hpp>
 #include <GraphTopologicalSort.hpp>
 #include <Graph.hpp>
 #include <ResolveType.hpp>
@@ -243,6 +244,26 @@ BOOST_AUTO_TEST_CASE(CyclicalGraphTopologicalSortTest)
     bool sortCompleted = armnnUtils::GraphTopologicalSort<int>(targetNodes, getNodeInputs, output);
 
     BOOST_TEST(!sortCompleted);
+}
+
+BOOST_AUTO_TEST_CASE(PermuteQuantizationDim)
+{
+    std::vector<float> scales;
+
+    // Set QuantizationDim to be index 1
+    const armnn::TensorInfo info({ 1, 2, 3, 4 }, armnn::DataType::Float32, scales, 1U);
+    BOOST_CHECK(info.GetQuantizationDim().value() == 1U);
+
+    // Permute so that index 1 moves to final index i.e. index 3
+    armnn::PermutationVector mappings({ 0, 3, 2, 1 });
+    auto permutedPerChannel = armnnUtils::Permuted(info, mappings, true);
+    auto permuted = armnnUtils::Permuted(info, mappings);
+
+    // Check that QuantizationDim is in index 3
+    BOOST_CHECK(permutedPerChannel.GetQuantizationDim().value() == 3U);
+
+    // Check previous implementation unchanged
+    BOOST_CHECK(permuted.GetQuantizationDim().value() == 1U);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

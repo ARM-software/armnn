@@ -95,7 +95,8 @@ private:
 namespace armnnUtils
 {
 
-armnn::TensorShape Permuted(const armnn::TensorShape& srcShape, const armnn::PermutationVector& mappings)
+armnn::TensorShape Permuted(const armnn::TensorShape& srcShape,
+                            const armnn::PermutationVector& mappings)
 {
     assert(srcShape.GetNumDimensions() == mappings.GetSize());
 
@@ -111,10 +112,19 @@ armnn::TensorShape Permuted(const armnn::TensorShape& srcShape, const armnn::Per
     return permutedShape;
 }
 
-armnn::TensorInfo Permuted(const armnn::TensorInfo& info, const armnn::PermutationVector& mappings)
+armnn::TensorInfo Permuted(const armnn::TensorInfo& info,
+                           const armnn::PermutationVector& mappings,
+                           bool perChannelPermute)
 {
     armnn::TensorInfo outInfo(info);
     outInfo.SetShape(Permuted(info.GetShape(), mappings));
+
+    // If TensorInfo has Per-Axis Quantization then permute QuantizationDim to mapping
+    if (info.HasPerAxisQuantization() && perChannelPermute)
+    {
+        outInfo.SetQuantizationDim(mappings[info.GetQuantizationDim().value()]);
+    }
+
     return outInfo;
 }
 

@@ -122,16 +122,16 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 
 #### <a name="buildtf">Build Tensorflow</a>
 * Building Tensorflow version 1.15:
-    '''bash
+    ```bash
     git clone https://github.com/tensorflow/tensorflow.git
     cd tensorflow/
     git checkout 590d6eef7e91a6a7392c8ffffb7b58f2e0c8bc6b
     ../armnn/scripts/generate_tensorflow_protobuf.sh ../tensorflow-protobuf ../google/x86_64_pb_install
-    '''
+    ```
 
-#### <"a name=buildflatbuffer">Build Flatbuffer</a>
+#### <a name="buildflatbuffer">Build Flatbuffer</a>
 * Building Flatbuffer version 1.12.0
-    '''bash
+    ```bash
     wget -O flatbuffers-1.12.0.tar.gz https://github.com/google/flatbuffers/archive/v1.12.0.tar.gz
     tar xf flatbuffers-1.12.0.tar.gz
     cd flatbuffers-1.12.0
@@ -142,9 +142,10 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 	     -DCMAKE_INSTALL_PREFIX:PATH=$<DIRECTORY_PATH> \
 	     -DFLATBUFFERS_BUILD_TESTS=0
     make all install
-    '''
+    ```
+
 * Build arm64 version of flatbuffer
-    '''bash
+    ```bash
     mkdir build-arm64
     cd build-arm64
     # Add -fPIC to allow us to use the libraries in shared objects.
@@ -154,26 +155,26 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 	     -DCMAKE_INSTALL_PREFIX:PATH=$<DIRECTORY_PATH> \
 	     -DFLATBUFFERS_BUILD_TESTS=0
     make all install
-    '''
+    ```
 
 #### <a name="buildingONNX">Build Onnx</a>
 * Building Onnx
-    '''bash
+    ```bash
     git clone https://github.com/onnx/onnx.git
     cd onnx
     git fetch https://github.com/onnx/onnx.git f612532843bd8e24efeab2815e45b436479cc9ab && git checkout FETCH_HEAD
     export LD_LIBRARY_PATH=$<DIRECTORY_PATH>/protobuf-host/lib:$LD_LIBRARY_PATH
     ../google/x86_64_pb_install/bin/protoc onnx/onnx.proto --proto_path=. --proto_path=../google/x86_64_pb_install/include --cpp_out ../onnx
-    '''
+    ```
 
 #### <a name="buildingtflite">Build TfLite</a>
 * Building TfLite
-    '''bash
+    ```bash
     mkdir tflite
     cd tflite
     cp ../tensorflow/tensorflow/lite/schema/schema.fbs .
     ../flatbuffers-1.12.0/build/flatc -c --gen-object-api --reflect-types --reflect-names schema.fbs
-    '''
+    ```
 
 #### <a name="buildANN">Build ArmNN</a>
 * Compile ArmNN for arm64:

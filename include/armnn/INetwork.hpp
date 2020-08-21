@@ -616,6 +616,19 @@ struct OptimizerOptions
         , m_ImportEnabled(false)
     {}
 
+    OptimizerOptions(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16, bool importEnabled)
+        : m_ReduceFp32ToFp16(reduceFp32ToFp16)
+        , m_Debug(debug)
+        , m_ReduceFp32ToBf16(reduceFp32ToBf16)
+        , m_shapeInferenceMethod(armnn::ShapeInferenceMethod::ValidateOnly)
+        , m_ImportEnabled(importEnabled)
+    {
+        if (m_ReduceFp32ToFp16 && m_ReduceFp32ToBf16)
+        {
+            throw InvalidArgumentException("BFloat16 and Float16 optimization cannot be enabled at the same time.");
+        }
+    }
+
     OptimizerOptions(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16 = false,
                      ShapeInferenceMethod shapeInferenceMethod = armnn::ShapeInferenceMethod::ValidateOnly,
                      bool importEnabled = false)

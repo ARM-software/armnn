@@ -11,18 +11,28 @@ def test_optimizer_options_default_values():
     assert opt.m_ReduceFp32ToFp16 == False
     assert opt.m_Debug == False
     assert opt.m_ReduceFp32ToBf16 == False
+    assert opt.m_ImportEnabled == False
 
 def test_optimizer_options_set_values1():
     opt = ann.OptimizerOptions(True, True)
     assert opt.m_ReduceFp32ToFp16 == True
     assert opt.m_Debug == True
     assert opt.m_ReduceFp32ToBf16 == False
+    assert opt.m_ImportEnabled == False
 
 def test_optimizer_options_set_values2():
     opt = ann.OptimizerOptions(False, False, True)
     assert opt.m_ReduceFp32ToFp16 == False
     assert opt.m_Debug == False
     assert opt.m_ReduceFp32ToBf16 == True
+    assert opt.m_ImportEnabled == False
+
+def test_optimizer_options_set_values3():
+    opt = ann.OptimizerOptions(False, False, True, True)
+    assert opt.m_ReduceFp32ToFp16 == False
+    assert opt.m_Debug == False
+    assert opt.m_ReduceFp32ToBf16 == True
+    assert opt.m_ImportEnabled == True
 
 @pytest.fixture(scope="function")
 def get_runtime(shared_data_folder, network_file):

@@ -24,6 +24,7 @@ Contains:
                                that can not be reduced will be left in Fp32.
     m_ReduceFp32ToFp16 (bool): Reduces Fp32 network to Fp16 for faster processing. Layers
                                that can not be reduced will be left in Fp32.
+    m_ImportEnabled (bool): Enable memory import.
 
 ") OptimizerOptions;
 struct OptimizerOptions
@@ -32,11 +33,13 @@ struct OptimizerOptions
 
     OptimizerOptions(bool reduceFp32ToFp16,
                      bool debug,
-                     bool reduceFp32ToBf16 = false);
+                     bool reduceFp32ToBf16 = false,
+                     bool importEnabled = false);
 
     bool m_ReduceFp32ToBf16;
     bool m_ReduceFp32ToFp16;
     bool m_Debug;
+    bool m_ImportEnabled;
 };
 
 %feature("docstring",

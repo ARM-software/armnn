@@ -1916,7 +1916,7 @@ bool RefLayerSupport::IsSplitterSupported(const TensorInfo& input,
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
                                   "Reference splitter: output type not supported");
-    for (const TensorInfo output : outputs)
+    for (const TensorInfo& output : outputs)
     {
         supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
                                       "Reference splitter: input type not supported");

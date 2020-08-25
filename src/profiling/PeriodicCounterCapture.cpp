@@ -59,7 +59,7 @@ void PeriodicCounterCapture::DispatchPeriodicCounterCapturePacket(
     const armnn::BackendId& backendId, const std::vector<Timestamp>& timestampValues)
 {
     // Report counter values
-    for (const auto timestampInfo : timestampValues)
+    for (const auto& timestampInfo : timestampValues)
     {
         std::vector<CounterValue> backendCounterValues = timestampInfo.counterValues;
         for_each(backendCounterValues.begin(), backendCounterValues.end(), [&](CounterValue& backendCounterValue)

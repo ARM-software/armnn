@@ -27,4 +27,11 @@ if(BUILD_TIMELINE_DECODER)
     # to simplify the build. No extra .so file to deploy to boards etc.
     add_library_ex(pipeCommon STATIC ${pipeCommon_sources})
 
+    # install the target
+    install(
+        TARGETS pipeCommon
+        EXPORT  armnn-targets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
 endif()

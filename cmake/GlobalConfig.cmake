@@ -123,6 +123,8 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
+include(CMakeFindDependencyMacro)
+
 if (NOT BUILD_PIPE_ONLY)
   # Boost
   message(STATUS "Finding Boost")
@@ -151,7 +153,7 @@ if (NOT BUILD_PIPE_ONLY)
 endif()
 
 # pthread
-find_package (Threads)
+find_dependency(Threads)
 
 # Favour the protobuf passed on command line
 if(BUILD_TF_PARSER OR BUILD_CAFFE_PARSER OR BUILD_ONNX_PARSER)

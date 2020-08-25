@@ -32,7 +32,7 @@ IProfilingGuidGenerator& BackendProfiling::GetProfilingGuidGenerator()
 
 void BackendProfiling::ReportCounters(const std::vector<Timestamp>& timestamps)
 {
-    for (const auto timestampInfo : timestamps)
+    for (const auto& timestampInfo : timestamps)
     {
         std::vector<CounterValue> backendCounterValues = timestampInfo.counterValues;
         for_each(backendCounterValues.begin(), backendCounterValues.end(), [&](CounterValue& backendCounterValue)

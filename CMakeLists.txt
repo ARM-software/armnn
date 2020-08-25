@@ -567,11 +567,17 @@ add_library_ex(armnn SHARED ${armnn_sources})
 
 target_compile_definitions(armnn PRIVATE "ARMNN_COMPILING_DLL")
 
-target_include_directories(armnn PRIVATE src/armnn)
-target_include_directories(armnn PRIVATE src/armnnUtils)
-target_include_directories(armnn PRIVATE src/backends)
-target_include_directories(armnn PRIVATE src/profiling)
-target_include_directories(armnn PRIVATE profiling/common/include)
+target_include_directories(armnn
+    PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PRIVATE
+        src/armnn
+        src/armnnUtils
+        src/backends
+        src/profiling
+        profiling/common/include
+)
 
 target_link_libraries(armnn armnnUtils pipeCommon)
 
@@ -580,9 +586,6 @@ if ("${CMAKE_SYSTEM_NAME}" STREQUAL Windows)
     target_link_libraries(armnn Ws2_32.lib)
 endif()
 
-install(TARGETS armnn
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 if(BUILD_CAFFE_PARSER)
     install(TARGETS armnnCaffeParser
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -601,9 +604,11 @@ endif()
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-target_link_libraries(armnn ${Boost_THREAD_LIBRARY}
-                            ${Boost_FILESYSTEM_LIBRARY}
-                            ${Boost_SYSTEM_LIBRARY})
+target_link_libraries(armnn
+        ${Boost_THREAD_LIBRARY}
+        ${Boost_SYSTEM_LIBRARY}
+        ${Boost_FILESYSTEM_LIBRARY}
+    )
 
 if(ARMCOMPUTENEON OR ARMCOMPUTECL)
     target_link_libraries(armnn ${ARMCOMPUTE_LIBRARIES})
@@ -1027,7 +1032,7 @@ if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD
         ${Boost_PROGRAM_OPTIONS_LIBRARY}
         ${Boost_FILESYSTEM_LIBRARY})
     addDllCopyCommands(ArmnnConverter)
-  endif()
+endif()
 
 if(BUILD_BASE_PIPE_SERVER)
     add_subdirectory(profiling/server/src/basePipeServer)
@@ -1101,6 +1106,67 @@ if(BUILD_GATORD_MOCK)
 
 endif()
 
+####################################################
+# export targets
+set(armnn_export_targets)
+list(APPEND armnn_export_targets
+    armnn
+    armnnUtils
+)
+
+install(
+    TARGETS ${armnn_export_targets}
+    EXPORT  armnn-targets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+####################################################
+## Set export alias
+set_target_properties(armnn
+    PROPERTIES
+    EXPORT_NAME Armnn
+)
+
+## Export target scrips
+install(
+    EXPORT      armnn-targets
+    FILE        ArmnnTargets.cmake
+    NAMESPACE   Armnn::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+####################################################
+## Create ArmnnConfig.cmake
+include(CMakePackageConfigHelpers)
+set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR})
+
+message(STATUS "CMAKE_CURRENT_LIST_DIR ${CMAKE_CURRENT_LIST_DIR}" )
+message(STATUS "CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}" )
+configure_package_config_file(
+    ${CMAKE_CURRENT_LIST_DIR}/cmake/ArmnnConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/ArmnnConfig.cmake
+    INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
+)
+
+####################################################
+## Install Armnn config file
+install(
+    FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/ArmnnConfig.cmake
+    DESTINATION ${INSTALL_CONFIGDIR}
+)
+
+####################################################
+## Export from build tree
+export(
+    EXPORT      armnn-targets
+    FILE        ${CMAKE_CURRENT_BINARY_DIR}/ArmnnTargets.cmake
+    NAMESPACE   Armnn::
+)
+
+####################################################
+## Build Python bindings
 if (BUILD_PYTHON_WHL OR BUILD_PYTHON_SRC)
     add_subdirectory(python/pyarmnn)
 endif()

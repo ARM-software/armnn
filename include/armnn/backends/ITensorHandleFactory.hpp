@@ -76,6 +76,8 @@ public:
 
     virtual const FactoryId& GetId() const = 0;
 
+    virtual bool SupportsInPlaceComputation() const { return false; }
+
     virtual bool SupportsSubTensors() const = 0;
 
     virtual bool SupportsMapUnmap() const final { return true; }

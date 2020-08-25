@@ -61,6 +61,8 @@ public:
 
     const FactoryId& GetId() const override;
 
+    bool SupportsInPlaceComputation() const override;
+
     bool SupportsSubTensors() const override;
 
     MemorySourceFlags GetExportFlags() const override;

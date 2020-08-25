@@ -158,6 +158,15 @@ BOOST_AUTO_TEST_CASE(RefTensorHandleGetCapabilities)
     BOOST_CHECK(capabilities.empty());
 }
 
+BOOST_AUTO_TEST_CASE(RefTensorHandleSupportsInPlaceComputation)
+{
+    std::shared_ptr<RefMemoryManager> memoryManager = std::make_shared<RefMemoryManager>();
+    RefTensorHandleFactory handleFactory(memoryManager);
+
+    // RefTensorHandleFactory does not support InPlaceComputation
+    ARMNN_ASSERT(!(handleFactory.SupportsInPlaceComputation()));
+}
+
 #if !defined(__ANDROID__)
 // Only run these tests on non Android platforms
 BOOST_AUTO_TEST_CASE(CheckSourceType)

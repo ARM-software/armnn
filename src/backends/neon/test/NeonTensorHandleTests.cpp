@@ -697,4 +697,13 @@ BOOST_AUTO_TEST_CASE(NeonTensorHandleFactoryImport)
     memoryManager->Release();
 }
 
+BOOST_AUTO_TEST_CASE(NeonTensorHandleSupportsInPlaceComputation)
+{
+    std::shared_ptr<NeonMemoryManager> memoryManager = std::make_shared<NeonMemoryManager>();
+    NeonTensorHandleFactory handleFactory(memoryManager);
+
+    // NeonTensorHandleFactory supports InPlaceComputation
+    ARMNN_ASSERT(handleFactory.SupportsInPlaceComputation());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

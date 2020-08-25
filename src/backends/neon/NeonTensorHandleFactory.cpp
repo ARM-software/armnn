@@ -96,6 +96,11 @@ const FactoryId& NeonTensorHandleFactory::GetId() const
     return GetIdStatic();
 }
 
+bool NeonTensorHandleFactory::SupportsInPlaceComputation() const
+{
+    return true;
+}
+
 bool NeonTensorHandleFactory::SupportsSubTensors() const
 {
     return true;

@@ -1232,7 +1232,7 @@ ARMNN_AUTO_TEST_CASE(AlignCornersResizeNearestNeighbourUint16Nchw,
                      DataLayout::NCHW)
 
 // Fake Quantization
-ARMNN_AUTO_TEST_CASE(FakeQuantization, FakeQuantizationTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(FakeQuantization, FakeQuantizationTest)
 
 // L2 Normalization
 ARMNN_AUTO_TEST_CASE(L2Normalization1d, L2Normalization1dTest, DataLayout::NCHW)
@@ -1359,9 +1359,9 @@ ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim2Uint8, Concat4dDiffShapeDim2Uint8Test)
 ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim3Uint8, Concat4dDiffShapeDim3Uint8Test, true)
 
 // Fill
-ARMNN_AUTO_TEST_CASE(SimpleFill, SimpleFillTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(SimpleFillF16, SimpleFillTest<DataType::Float16>)
-ARMNN_AUTO_TEST_CASE(SimpleFillS32, SimpleFillTest<DataType::Signed32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFill, SimpleFillTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFillF16, SimpleFillTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFillS32, SimpleFillTest<DataType::Signed32>)
 
 // Floor
 ARMNN_AUTO_TEST_CASE(SimpleFloor, SimpleFloorTest<DataType::Float32>)

@@ -14,7 +14,8 @@
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 4> SimpleFillTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
     IgnoreUnused(memoryManager);
     armnn::TensorInfo inputTensorInfo({4}, armnn::DataType::Signed32);
@@ -30,10 +31,8 @@ LayerTestResult<T, 4> SimpleFillTest(
           1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
         outputTensorInfo));
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory->CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory->CreateTensorHandle(outputTensorInfo);
 
     armnn::FillQueueDescriptor data;
     data.m_Parameters.m_Value = 1.0f;
@@ -61,14 +60,17 @@ LayerTestResult<T, 4> SimpleFillTest(
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
 SimpleFillTest<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 4>
 SimpleFillTest<armnn::DataType::Float16>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Signed32>, 4>
 SimpleFillTest<armnn::DataType::Signed32>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory);

@@ -74,6 +74,24 @@ void RunTestFunction(const char* testName, TFuncPtr testFunction, Args... args)
     armnn::ProfilerManager::GetInstance().RegisterProfiler(nullptr);
 }
 
+
+template<typename FactoryType, typename TFuncPtr, typename... Args>
+void RunTestFunctionUsingTensorHandleFactory(const char* testName, TFuncPtr testFunction, Args... args)
+{
+    std::unique_ptr<armnn::Profiler> profiler = std::make_unique<armnn::Profiler>();
+    armnn::ProfilerManager::GetInstance().RegisterProfiler(profiler.get());
+
+    auto memoryManager = WorkloadFactoryHelper<FactoryType>::GetMemoryManager();
+    FactoryType workloadFactory = WorkloadFactoryHelper<FactoryType>::GetFactory(memoryManager);
+
+    auto tensorHandleFactory = WorkloadFactoryHelper<FactoryType>::GetTensorHandleFactory(memoryManager);
+
+    auto testResult = (*testFunction)(workloadFactory, memoryManager, &tensorHandleFactory, args...);
+    CompareTestResultIfSupported(testName, testResult);
+
+    armnn::ProfilerManager::GetInstance().RegisterProfiler(nullptr);
+}
+
 #define ARMNN_SIMPLE_TEST_CASE(TestName, TestFunction) \
     BOOST_AUTO_TEST_CASE(TestName) \
     { \
@@ -84,6 +102,12 @@ void RunTestFunction(const char* testName, TFuncPtr testFunction, Args... args)
     BOOST_AUTO_TEST_CASE(TestName) \
     { \
         RunTestFunction<FactoryType>(#TestName, &TestFunction, ##__VA_ARGS__); \
+    }
+
+#define ARMNN_AUTO_TEST_CASE_WITH_THF(TestName, TestFunction, ...) \
+    BOOST_AUTO_TEST_CASE(TestName) \
+    { \
+        RunTestFunctionUsingTensorHandleFactory<FactoryType>(#TestName, &TestFunction, ##__VA_ARGS__); \
     }
 
 template<typename FactoryType, typename TFuncPtr, typename... Args>

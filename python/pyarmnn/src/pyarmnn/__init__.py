@@ -59,6 +59,18 @@ except ImportError as err:
         """In case people try importing without having Arm NN built with this parser."""
         raise RuntimeError(message)
 
+try:
+    from ._generated.pyarmnn_deserializer import IDeserializer
+except ImportError as err:
+    logger = logging.getLogger(__name__)
+    message = "Your ArmNN library instance does not have an armnn models parser funcionality. "
+    logger.warning("%s Skipped IDeserializer import.", message)
+    logger.debug(str(err))
+
+    def IDeserializer():
+        """In case people try importing without having ArmNN built with this parser."""
+        raise RuntimeError(message)
+
 # Network
 from ._generated.pyarmnn import Optimize, OptimizerOptions, IOptimizedNetwork, IInputSlot, \
     IOutputSlot, IConnectableLayer, INetwork

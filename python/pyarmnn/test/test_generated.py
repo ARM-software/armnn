@@ -1,4 +1,4 @@
-# Copyright © 2020 Arm Ltd. All rights reserved.
+# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 import inspect
 from typing import Tuple
@@ -6,6 +6,7 @@ from typing import Tuple
 import pytest
 
 import pyarmnn._generated.pyarmnn as generated_armnn
+import pyarmnn._generated.pyarmnn as generated_deserializer
 import pyarmnn._generated.pyarmnn_caffeparser as generated_caffe
 import pyarmnn._generated.pyarmnn_onnxparser as generated_onnx
 import pyarmnn._generated.pyarmnn_tfliteparser as generated_tflite
@@ -26,6 +27,7 @@ def get_classes(swig_independent_classes: Tuple):
     ignored_class_names = (*swig_independent_classes, '_SwigNonDynamicMeta')
     return list(filter(lambda x: x[0] not in ignored_class_names,
                        inspect.getmembers(generated_armnn, inspect.isclass) +
+                       inspect.getmembers(generated_deserializer, inspect.isclass) +
                        inspect.getmembers(generated_caffe, inspect.isclass) +
                        inspect.getmembers(generated_tflite, inspect.isclass) +
                        inspect.getmembers(generated_onnx, inspect.isclass) +

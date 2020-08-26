@@ -27,6 +27,7 @@ include(GNUInstallDirs)
 add_subdirectory(samples)
 add_subdirectory(src/armnnTfLiteParser)
 add_subdirectory(src/armnnSerializer)
+add_subdirectory(src/armnnDeserializer)
 
 if (BUILD_TESTS)
     add_subdirectory(tests)

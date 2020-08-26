@@ -285,6 +285,7 @@ if __name__ == '__main__':
     add_parsers_ext('OnnxParser', extensions_to_build)
     add_parsers_ext('TfParser', extensions_to_build)
     add_parsers_ext('TfLiteParser', extensions_to_build)
+    add_parsers_ext('Deserializer', extensions_to_build)
 
     setup(
         name='pyarmnn',

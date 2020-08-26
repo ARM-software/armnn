@@ -105,12 +105,13 @@ if __name__ == "__main__":
 
     __verbose = args.verbose
 
-    wrap_names = ['armnn_version', 
-        'armnn', 
-        'armnn_caffeparser', 
-        'armnn_onnxparser', 
-        'armnn_tfparser', 
-        'armnn_tfliteparser']
+    wrap_names = ['armnn_version',
+        'armnn',
+        'armnn_caffeparser',
+        'armnn_onnxparser',
+        'armnn_tfparser',
+        'armnn_tfliteparser',
+        'armnn_deserializer']
 
     for n in wrap_names:
         generate_wrap(n, f"-I{' -I'.join(armnn_includes)} ")

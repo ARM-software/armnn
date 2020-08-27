@@ -402,60 +402,68 @@ ARMNN_AUTO_TEST_CASE(DequantizeOffsetUint8, DequantizeOffsetUint8Test)
 ARMNN_AUTO_TEST_CASE(DequantizeSimpleInt16, DequantizeSimpleInt16Test)
 
 // Pooling
-ARMNN_AUTO_TEST_CASE(SimpleMaxPooling2dSize3x3Stride2x4, SimpleMaxPooling2dSize3x3Stride2x4Test, true)
-ARMNN_AUTO_TEST_CASE(SimpleMaxPooling2dSize3x3Stride2x4Uint8, SimpleMaxPooling2dSize3x3Stride2x4Uint8Test, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMaxPooling2dSize3x3Stride2x4,
+                                          SimpleMaxPooling2dSize3x3Stride2x4Test, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMaxPooling2dSize3x3Stride2x4Uint8,
+                                          SimpleMaxPooling2dSize3x3Stride2x4Uint8Test, true)
 
-ARMNN_AUTO_TEST_CASE(SimpleMaxPooling2d, SimpleMaxPooling2dTest, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(SimpleMaxPooling2dNhwc, SimpleMaxPooling2dTest, DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(SimpleMaxPooling2dUint8, SimpleMaxPooling2dUint8Test, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(SimpleMaxPooling2dUint8Nhwc, SimpleMaxPooling2dUint8Test, DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMaxPooling2d, SimpleMaxPooling2dTest, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMaxPooling2dNhwc, SimpleMaxPooling2dTest, DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMaxPooling2dUint8, SimpleMaxPooling2dUint8Test, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMaxPooling2dUint8Nhwc, SimpleMaxPooling2dUint8Test, DataLayout::NHWC)
 
-ARMNN_AUTO_TEST_CASE(SimpleAveragePooling2d, SimpleAveragePooling2dTest, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(SimpleAveragePooling2dNhwc, SimpleAveragePooling2dTest, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(SimpleAveragePooling2dUint8, SimpleAveragePooling2dUint8Test, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(SimpleAveragePooling2dUint8Nhwc, SimpleAveragePooling2dUint8Test, DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleAveragePooling2d, SimpleAveragePooling2dTest, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleAveragePooling2dNhwc, SimpleAveragePooling2dTest, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleAveragePooling2dUint8,
+                                          SimpleAveragePooling2dUint8Test, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleAveragePooling2dUint8Nhwc,
+                                          SimpleAveragePooling2dUint8Test, DataLayout::NHWC)
 
-ARMNN_AUTO_TEST_CASE(LargeTensorsAveragePooling2d, LargeTensorsAveragePooling2dTest)
-ARMNN_AUTO_TEST_CASE(LargeTensorsAveragePooling2dUint8, LargeTensorsAveragePooling2dUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LargeTensorsAveragePooling2d, LargeTensorsAveragePooling2dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LargeTensorsAveragePooling2dUint8, LargeTensorsAveragePooling2dUint8Test)
 
-ARMNN_AUTO_TEST_CASE(SimpleL2Pooling2d, SimpleL2Pooling2dTest, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(SimpleL2Pooling2dNeon, SimpleL2Pooling2dTest, DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(UNSUPPORTED_SimpleL2Pooling2dUint8, SimpleL2Pooling2dUint8Test, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleL2Pooling2d, SimpleL2Pooling2dTest, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleL2Pooling2dNeon, SimpleL2Pooling2dTest, DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UNSUPPORTED_SimpleL2Pooling2dUint8, SimpleL2Pooling2dUint8Test, DataLayout::NCHW)
 
-ARMNN_AUTO_TEST_CASE(L2Pooling2dSize3Stride1, L2Pooling2dSize3Stride1Test)
-ARMNN_AUTO_TEST_CASE(UNSUPPORTED_L2Pooling2dSize3Stride1Uint8, L2Pooling2dSize3Stride1Uint8Test)
-ARMNN_AUTO_TEST_CASE(L2Pooling2dSize3Stride3, L2Pooling2dSize3Stride3Test)
-ARMNN_AUTO_TEST_CASE(UNSUPPORTED_L2Pooling2dSize3Stride3Uint8, L2Pooling2dSize3Stride3Uint8Test)
-ARMNN_AUTO_TEST_CASE(L2Pooling2dSize3Stride4, L2Pooling2dSize3Stride4Test)
-ARMNN_AUTO_TEST_CASE(UNSUPPORTED_L2Pooling2dSize3Stride4Uint8, L2Pooling2dSize3Stride4Uint8Test)
-ARMNN_AUTO_TEST_CASE(L2Pooling2dSize7, L2Pooling2dSize7Test)
-ARMNN_AUTO_TEST_CASE(UNSUPPORTED_L2Pooling2dSize7Uint8, L2Pooling2dSize7Uint8Test)
-ARMNN_AUTO_TEST_CASE(L2Pooling2dSize9, L2Pooling2dSize9Test)
-ARMNN_AUTO_TEST_CASE(UNSUPPORTED_L2Pooling2dSize9Uint8, L2Pooling2dSize9Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(L2Pooling2dSize3Stride1, L2Pooling2dSize3Stride1Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UNSUPPORTED_L2Pooling2dSize3Stride1Uint8, L2Pooling2dSize3Stride1Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(L2Pooling2dSize3Stride3, L2Pooling2dSize3Stride3Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UNSUPPORTED_L2Pooling2dSize3Stride3Uint8, L2Pooling2dSize3Stride3Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(L2Pooling2dSize3Stride4, L2Pooling2dSize3Stride4Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UNSUPPORTED_L2Pooling2dSize3Stride4Uint8, L2Pooling2dSize3Stride4Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(L2Pooling2dSize7, L2Pooling2dSize7Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UNSUPPORTED_L2Pooling2dSize7Uint8, L2Pooling2dSize7Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(L2Pooling2dSize9, L2Pooling2dSize9Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UNSUPPORTED_L2Pooling2dSize9Uint8, L2Pooling2dSize9Uint8Test)
 
 // Ignore padding values for pooling but count padding fields into the divisor
-ARMNN_AUTO_TEST_CASE(IgnorePaddingSimpleMaxPooling2d, IgnorePaddingSimpleMaxPooling2dTest)
-ARMNN_AUTO_TEST_CASE(IgnorePaddingSimpleMaxPooling2dUint8, IgnorePaddingSimpleMaxPooling2dUint8Test)
-ARMNN_AUTO_TEST_CASE(IgnorePaddingMaxPooling2dSize3, IgnorePaddingMaxPooling2dSize3Test)
-ARMNN_AUTO_TEST_CASE(IgnorePaddingMaxPooling2dSize3Uint8, IgnorePaddingMaxPooling2dSize3Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleMaxPooling2d, IgnorePaddingSimpleMaxPooling2dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleMaxPooling2dUint8, IgnorePaddingSimpleMaxPooling2dUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingMaxPooling2dSize3, IgnorePaddingMaxPooling2dSize3Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingMaxPooling2dSize3Uint8, IgnorePaddingMaxPooling2dSize3Uint8Test)
 
-ARMNN_AUTO_TEST_CASE(IgnorePaddingSimpleAveragePooling2d, IgnorePaddingSimpleAveragePooling2dTest)
-ARMNN_AUTO_TEST_CASE(IgnorePaddingSimpleAveragePooling2dUint8, IgnorePaddingSimpleAveragePooling2dUint8Test)
-ARMNN_AUTO_TEST_CASE(IgnorePaddingSimpleAveragePooling2dNoPadding, IgnorePaddingSimpleAveragePooling2dNoPaddingTest)
-ARMNN_AUTO_TEST_CASE(IgnorePaddingSimpleAveragePooling2dNoPaddingUint8,
-    IgnorePaddingSimpleAveragePooling2dNoPaddingUint8Test)
-ARMNN_AUTO_TEST_CASE(IgnorePaddingAveragePooling2dSize3, IgnorePaddingAveragePooling2dSize3Test)
-ARMNN_AUTO_TEST_CASE(IgnorePaddingAveragePooling2dSize3Uint8, IgnorePaddingAveragePooling2dSize3Uint8Test)
-ARMNN_AUTO_TEST_CASE(IgnorePaddingAveragePooling2dSize3x2Stride2x2,
-                             IgnorePaddingAveragePooling2dSize3x2Stride2x2Test, false)
-ARMNN_AUTO_TEST_CASE(IgnorePaddingAveragePooling2dSize3x2Stride2x2NoPadding,
-                             IgnorePaddingAveragePooling2dSize3x2Stride2x2Test,
-                                          true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleAveragePooling2d, IgnorePaddingSimpleAveragePooling2dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleAveragePooling2dUint8, IgnorePaddingSimpleAveragePooling2dUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleAveragePooling2dNoPadding,
+                              IgnorePaddingSimpleAveragePooling2dNoPaddingTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleAveragePooling2dNoPaddingUint8,
+                              IgnorePaddingSimpleAveragePooling2dNoPaddingUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingAveragePooling2dSize3, IgnorePaddingAveragePooling2dSize3Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingAveragePooling2dSize3Uint8,
+                              IgnorePaddingAveragePooling2dSize3Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingAveragePooling2dSize3x2Stride2x2,
+                              IgnorePaddingAveragePooling2dSize3x2Stride2x2Test, false)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingAveragePooling2dSize3x2Stride2x2NoPadding,
+                              IgnorePaddingAveragePooling2dSize3x2Stride2x2Test,
+                              true)
 
-ARMNN_AUTO_TEST_CASE(IgnorePaddingSimpleL2Pooling2d, IgnorePaddingSimpleL2Pooling2dTest)
-ARMNN_AUTO_TEST_CASE(UNSUPPORTED_IgnorePaddingSimpleL2Pooling2dUint8, IgnorePaddingSimpleL2Pooling2dUint8Test)
-ARMNN_AUTO_TEST_CASE(IgnorePaddingL2Pooling2dSize3, IgnorePaddingL2Pooling2dSize3Test)
-ARMNN_AUTO_TEST_CASE(UNSUPPORTED_IgnorePaddingL2Pooling2dSize3Uint8, IgnorePaddingL2Pooling2dSize3Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleL2Pooling2d, IgnorePaddingSimpleL2Pooling2dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UNSUPPORTED_IgnorePaddingSimpleL2Pooling2dUint8,
+                                          IgnorePaddingSimpleL2Pooling2dUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingL2Pooling2dSize3, IgnorePaddingL2Pooling2dSize3Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UNSUPPORTED_IgnorePaddingL2Pooling2dSize3Uint8,
+                                          IgnorePaddingL2Pooling2dSize3Uint8Test)
 
 // Activation
 ARMNN_AUTO_TEST_CASE(ConstantLinearActivation, ConstantLinearActivationTest)
@@ -517,12 +525,14 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToBatchNdMultiBlockUint8, SpaceToBatchNdMulti
 ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToBatchNdPaddingUint8, SpaceToBatchNdPaddingUint8Test)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToBatchNdSimpleNhwcFloat32, SpaceToBatchNdSimpleNhwcFloat32Test)
-ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToBatchNdMultiChannelsNhwcFloat32, SpaceToBatchNdMultiChannelsNhwcFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToBatchNdMultiChannelsNhwcFloat32,
+                                          SpaceToBatchNdMultiChannelsNhwcFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToBatchNdMultiBlockNhwcFloat32, SpaceToBatchNdMultiBlockNhwcFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToBatchNdPaddingNhwcFloat32, SpaceToBatchNdPaddingNhwcFloat32Test)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToBatchNdSimpleNhwcUint8, SpaceToBatchNdSimpleNhwcUint8Test)
-ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToBatchNdMultiChannelsNhwcUint8, SpaceToBatchNdMultiChannelsNhwcUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToBatchNdMultiChannelsNhwcUint8,
+                                          SpaceToBatchNdMultiChannelsNhwcUint8Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToBatchNdMultiBlockNhwcUint8, SpaceToBatchNdMultiBlockNhwcUint8Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToBatchNdPaddingNhwcUint8, SpaceToBatchNdPaddingNhwcUint8Test)
 
@@ -739,34 +749,34 @@ ARMNN_AUTO_TEST_CASE(SimpleReshapeUint8, SimpleReshapeTest<armnn::DataType::QAsy
 ARMNN_AUTO_TEST_CASE(Reshape5d, Reshape5dTest<armnn::DataType::Float32>)
 
 // Pad
-ARMNN_AUTO_TEST_CASE(PadFloat322d, PadFloat322dTest)
-ARMNN_AUTO_TEST_CASE(PadFloat322dCustomPadding, PadFloat322dCustomPaddingTest)
-ARMNN_AUTO_TEST_CASE(PadFloat323d, PadFloat323dTest)
-ARMNN_AUTO_TEST_CASE(PadFloat324d, PadFloat324dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadFloat322d, PadFloat322dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadFloat322dCustomPadding, PadFloat322dCustomPaddingTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadFloat323d, PadFloat323dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadFloat324d, PadFloat324dTest)
 
-ARMNN_AUTO_TEST_CASE(PadUint82d, PadUint82dTest)
-ARMNN_AUTO_TEST_CASE(PadUint82dCustomPadding, PadUint82dCustomPaddingTest)
-ARMNN_AUTO_TEST_CASE(PadUint83d, PadUint83dTest)
-ARMNN_AUTO_TEST_CASE(PadUint84d, PadUint84dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadUint82d, PadUint82dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadUint82dCustomPadding, PadUint82dCustomPaddingTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadUint83d, PadUint83dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadUint84d, PadUint84dTest)
 
-ARMNN_AUTO_TEST_CASE(Pad2dQSymm16, Pad2dTestCommon<DataType::QSymmS16>, 2.0f, 0, 0.0f)
-ARMNN_AUTO_TEST_CASE(Pad2dQSymm16CustomPadding, Pad2dTestCommon<DataType::QSymmS16>, 2.0f, 0, 1.0f)
-ARMNN_AUTO_TEST_CASE(Pad3dQSymm16, Pad3dTestCommon<DataType::QSymmS16>, 2.0f, 0)
-ARMNN_AUTO_TEST_CASE(Pad4dQSymm16, Pad4dTestCommon<DataType::QSymmS16>, 2.0f, 0)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Pad2dQSymm16, Pad2dTestCommon<DataType::QSymmS16>, 2.0f, 0, 0.0f)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Pad2dQSymm16CustomPadding, Pad2dTestCommon<DataType::QSymmS16>, 2.0f, 0, 1.0f)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Pad3dQSymm16, Pad3dTestCommon<DataType::QSymmS16>, 2.0f, 0)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Pad4dQSymm16, Pad4dTestCommon<DataType::QSymmS16>, 2.0f, 0)
 
 // Permute
-ARMNN_AUTO_TEST_CASE(SimplePermuteFloat32, SimplePermuteTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet1Test, PermuteValueSet1Test<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet2Test, PermuteValueSet2Test<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet3Test, PermuteValueSet3Test<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(SimplePermuteQASymmS8, SimplePermuteTest<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE(PermuteQASymmS8ValueSet1Test, PermuteValueSet1Test<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE(PermuteQASymmS8ValueSet2Test, PermuteValueSet2Test<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE(PermuteQASymmS8ValueSet3Test, PermuteValueSet3Test<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE(SimplePermuteQASymm8, SimplePermuteTest<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_CASE(PermuteQASymm8ValueSet1Test, PermuteValueSet1Test<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_CASE(PermuteQASymm8ValueSet2Test, PermuteValueSet2Test<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_CASE(PermuteQASymm8ValueSet3Test, PermuteValueSet3Test<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimplePermuteFloat32, SimplePermuteTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PermuteFloat32ValueSet1Test, PermuteValueSet1Test<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PermuteFloat32ValueSet2Test, PermuteValueSet2Test<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PermuteFloat32ValueSet3Test, PermuteValueSet3Test<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimplePermuteQASymmS8, SimplePermuteTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PermuteQASymmS8ValueSet1Test, PermuteValueSet1Test<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PermuteQASymmS8ValueSet2Test, PermuteValueSet2Test<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PermuteQASymmS8ValueSet3Test, PermuteValueSet3Test<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimplePermuteQASymm8, SimplePermuteTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PermuteQASymm8ValueSet1Test, PermuteValueSet1Test<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PermuteQASymm8ValueSet2Test, PermuteValueSet2Test<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PermuteQASymm8ValueSet3Test, PermuteValueSet3Test<DataType::QAsymmU8>)
 
 // Lstm
 ARMNN_AUTO_TEST_CASE_WITH_THF(LstmLayerFloat32WithCifgWithPeepholeNoProjection,
@@ -787,29 +797,29 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(QLstm2, QLstmTest2)
 ARMNN_AUTO_TEST_CASE_WITH_THF(QuantizedLstm, QuantizedLstmTest)
 
 // Mean
-ARMNN_AUTO_TEST_CASE(MeanSimpleFloat32, MeanSimpleTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(MeanSimpleAxisFloat32, MeanSimpleAxisTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(MeanKeepDimsFloat32, MeanKeepDimsTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(MeanMultipleDimsFloat32, MeanMultipleDimsTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(MeanVts1Float32, MeanVts1Test<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(MeanVts2Float32, MeanVts2Test<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(MeanVts3Float32, MeanVts3Test<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanSimpleFloat32, MeanSimpleTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanSimpleAxisFloat32, MeanSimpleAxisTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanKeepDimsFloat32, MeanKeepDimsTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanMultipleDimsFloat32, MeanMultipleDimsTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanVts1Float32, MeanVts1Test<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanVts2Float32, MeanVts2Test<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanVts3Float32, MeanVts3Test<DataType::Float32>)
 
-ARMNN_AUTO_TEST_CASE(MeanSimpleQuantisedAsymmS8, MeanSimpleTest<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE(MeanSimpleAxisQuantisedAsymmS8, MeanSimpleAxisTest<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE(MeanKeepDimsQuantisedAsymmS8, MeanKeepDimsTest<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE(MeanMultipleDimsQuantisedAsymmS8, MeanMultipleDimsTest<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE(MeanVts1QuantisedAsymmS8, MeanVts1Test<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE(MeanVts2QuantisedAsymmS8, MeanVts2Test<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE(MeanVts3QuantisedAsymmS8, MeanVts3Test<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanSimpleQuantisedAsymmS8, MeanSimpleTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanSimpleAxisQuantisedAsymmS8, MeanSimpleAxisTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanKeepDimsQuantisedAsymmS8, MeanKeepDimsTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanMultipleDimsQuantisedAsymmS8, MeanMultipleDimsTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanVts1QuantisedAsymmS8, MeanVts1Test<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanVts2QuantisedAsymmS8, MeanVts2Test<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanVts3QuantisedAsymmS8, MeanVts3Test<DataType::QAsymmS8>)
 
-ARMNN_AUTO_TEST_CASE(MeanSimpleQuantisedAsymm8, MeanSimpleTest<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_CASE(MeanSimpleAxisQuantisedAsymm8, MeanSimpleAxisTest<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_CASE(MeanKeepDimsQuantisedAsymm8, MeanKeepDimsTest<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_CASE(MeanMultipleDimsQuantisedAsymm8, MeanMultipleDimsTest<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_CASE(MeanVts1QuantisedAsymm8, MeanVts1Test<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_CASE(MeanVts2QuantisedAsymm8, MeanVts2Test<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_CASE(MeanVts3QuantisedAsymm8, MeanVts3Test<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanSimpleQuantisedAsymm8, MeanSimpleTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanSimpleAxisQuantisedAsymm8, MeanSimpleAxisTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanKeepDimsQuantisedAsymm8, MeanKeepDimsTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanMultipleDimsQuantisedAsymm8, MeanMultipleDimsTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanVts1QuantisedAsymm8, MeanVts1Test<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanVts2QuantisedAsymm8, MeanVts2Test<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MeanVts3QuantisedAsymm8, MeanVts3Test<DataType::QAsymmU8>)
 
 // Max
 ARMNN_AUTO_TEST_CASE(SimpleMaximum, MaximumSimpleTest)
@@ -825,9 +835,9 @@ ARMNN_AUTO_TEST_CASE(SimpleMinimum2, MinimumBroadcast1ElementTest2)
 ARMNN_AUTO_TEST_CASE(Minimum1DVectorUint8, MinimumBroadcast1DVectorUint8Test)
 
 // Normalization
-ARMNN_AUTO_TEST_CASE(SimpleNormalizationAcross, SimpleNormalizationAcrossTest)
-ARMNN_AUTO_TEST_CASE(SimpleNormalizationWithin, SimpleNormalizationWithinTest)
-ARMNN_AUTO_TEST_CASE(SimpleNormalizationAcrossNhwc, SimpleNormalizationAcrossNhwcTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleNormalizationAcross, SimpleNormalizationAcrossTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleNormalizationWithin, SimpleNormalizationWithinTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleNormalizationAcrossNhwc, SimpleNormalizationAcrossNhwcTest)
 
 // Resize Bilinear - NCHW data layout
 ARMNN_AUTO_TEST_CASE(SimpleResizeBilinear, SimpleResizeBilinearTest<DataType::Float32>, DataLayout::NCHW)
@@ -1047,7 +1057,8 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSlice4dReverseFloat32, StridedSlice4dRevers
 ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSliceSimpleStrideFloat32, StridedSliceSimpleStrideFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSliceSimpleRangeMaskFloat32, StridedSliceSimpleRangeMaskFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSliceShrinkAxisMaskFloat32, StridedSliceShrinkAxisMaskFloat32Test)
-ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSliceShrinkAxisMaskCTSFloat32, StridedSliceShrinkAxisMaskCTSFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSliceShrinkAxisMaskCTSFloat32,
+                                          StridedSliceShrinkAxisMaskCTSFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(
     StridedSliceShrinkAxisMaskBitPosition0Dim3Float32, StridedSliceShrinkAxisMaskBitPosition0Dim3Float32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(
@@ -1104,8 +1115,8 @@ ARMNN_AUTO_TEST_CASE(QuantizeSimpleUint8, QuantizeSimpleUint8Test)
 ARMNN_AUTO_TEST_CASE(QuantizeClampUint8, QuantizeClampUint8Test)
 
 // PReLU
-ARMNN_AUTO_TEST_CASE(PreluFloat32, PreluTest<NeonWorkloadFactory, DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(PreluUint8,   PreluTest<NeonWorkloadFactory, DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PreluFloat32, PreluTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PreluUint8,   PreluTest<DataType::QAsymmU8>)
 
 // Stack
 ARMNN_AUTO_TEST_CASE_WITH_THF(Stack0Axis,           StackAxis0Float32Test)
@@ -1335,23 +1346,23 @@ ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareDepthwiseConv2dWithReferenceUin
                                  CompareDepthwiseConvolution2dUint8Test,
                                  DataLayout::NHWC)
 
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareNormalizationWithinWithReference, CompareNormalizationTest,
-                                 NormalizationAlgorithmChannel::Within,
-                                 NormalizationAlgorithmMethod::LocalBrightness)
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareNormalizationAcrossWithReference, CompareNormalizationTest,
-                                 NormalizationAlgorithmChannel::Across,
-                                 NormalizationAlgorithmMethod::LocalBrightness)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareNormalizationWithinWithReference, CompareNormalizationTest,
+                                          NormalizationAlgorithmChannel::Within,
+                                          NormalizationAlgorithmMethod::LocalBrightness)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareNormalizationAcrossWithReference, CompareNormalizationTest,
+                                          NormalizationAlgorithmChannel::Across,
+                                          NormalizationAlgorithmMethod::LocalBrightness)
 
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareMaxPooling2dWithReference, ComparePooling2dTest, PoolingAlgorithm::Max)
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareMaxPooling2dWithReferenceUint8, ComparePooling2dUint8Test,
-                                 PoolingAlgorithm::Max)
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareAveragePooling2dWithReference, ComparePooling2dTest,
-                                 PoolingAlgorithm::Average)
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareAveragePooling2dWithReferenceUint8, ComparePooling2dUint8Test,
-                                 PoolingAlgorithm::Average)
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareL2Pooling2dWithReference, ComparePooling2dTest, PoolingAlgorithm::L2)
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(UNSUPPORTED_CompareL2Pooling2dWithReferenceUint8, ComparePooling2dUint8Test,
-                                 PoolingAlgorithm::L2)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareMaxPooling2dWithReference, ComparePooling2dTest, PoolingAlgorithm::Max)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareMaxPooling2dWithReferenceUint8, ComparePooling2dUint8Test,
+                                          PoolingAlgorithm::Max)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareAveragePooling2dWithReference, ComparePooling2dTest,
+                                          PoolingAlgorithm::Average)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareAveragePooling2dWithReferenceUint8, ComparePooling2dUint8Test,
+                                          PoolingAlgorithm::Average)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareL2Pooling2dWithReference, ComparePooling2dTest, PoolingAlgorithm::L2)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(UNSUPPORTED_CompareL2Pooling2dWithReferenceUint8, ComparePooling2dUint8Test,
+                                          PoolingAlgorithm::L2)
 
 ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareSoftmaxBeta1WithReference, CompareSoftmaxTest, 1.0f)
 ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareSoftmaxBeta2WithReference, CompareSoftmaxTest, 2.0f)

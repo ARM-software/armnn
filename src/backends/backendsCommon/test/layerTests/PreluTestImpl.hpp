@@ -20,10 +20,11 @@
 
 #include <test/TensorHelpers.hpp>
 
-template<typename FactoryType, armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> PreluTest(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     IgnoreUnused(memoryManager);
 
@@ -77,7 +78,6 @@ LayerTestResult<T, 4> PreluTest(
                                                         outputTensorInfo.GetQuantizationScale(),
                                                         outputTensorInfo.GetQuantizationOffset()));
 
-    auto tensorHandleFactory = WorkloadFactoryHelper<FactoryType>::GetTensorHandleFactory(memoryManager);
     std::unique_ptr <armnn::ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr <armnn::ITensorHandle> alphaHandle  = tensorHandleFactory.CreateTensorHandle(alphaTensorInfo);
     std::unique_ptr <armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);

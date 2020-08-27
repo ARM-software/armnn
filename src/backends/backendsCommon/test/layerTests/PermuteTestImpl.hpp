@@ -19,6 +19,7 @@ template<typename T>
 LayerTestResult<T, 4> SimplePermuteTestImpl(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         armnn::PermuteDescriptor descriptor,
         armnn::TensorInfo inputTensorInfo,
         armnn::TensorInfo outputTensorInfo,
@@ -31,10 +32,8 @@ LayerTestResult<T, 4> SimplePermuteTestImpl(
     LayerTestResult<T, 4> ret(outputTensorInfo);
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputExpectedData);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::PermuteQueueDescriptor data;
     data.m_Parameters = descriptor;
@@ -59,7 +58,8 @@ LayerTestResult<T, 4> SimplePermuteTestImpl(
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimplePermuteTest(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -100,7 +100,7 @@ LayerTestResult<T, 4> SimplePermuteTest(
     },
     qScale, qOffset);
 
-    return SimplePermuteTestImpl<T>(workloadFactory, memoryManager,
+    return SimplePermuteTestImpl<T>(workloadFactory, memoryManager, tensorHandleFactory,
                                     descriptor, inputTensorInfo,
                                     outputTensorInfo, input, outputExpected);
 }
@@ -108,7 +108,8 @@ LayerTestResult<T, 4> SimplePermuteTest(
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> PermuteValueSet1Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -150,7 +151,7 @@ LayerTestResult<T, 4> PermuteValueSet1Test(
     },
     qScale, qOffset);
 
-    return SimplePermuteTestImpl<T>(workloadFactory, memoryManager,
+    return SimplePermuteTestImpl<T>(workloadFactory, memoryManager, tensorHandleFactory,
                                     descriptor, inputTensorInfo,
                                     outputTensorInfo, input, outputExpected);
 }
@@ -158,7 +159,8 @@ LayerTestResult<T, 4> PermuteValueSet1Test(
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> PermuteValueSet2Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -200,7 +202,7 @@ LayerTestResult<T, 4> PermuteValueSet2Test(
     },
     qScale, qOffset);
 
-    return SimplePermuteTestImpl<T>(workloadFactory, memoryManager,
+    return SimplePermuteTestImpl<T>(workloadFactory, memoryManager, tensorHandleFactory,
                                     descriptor, inputTensorInfo,
                                     outputTensorInfo, input, outputExpected);
 }
@@ -208,7 +210,8 @@ LayerTestResult<T, 4> PermuteValueSet2Test(
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> PermuteValueSet3Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -252,7 +255,7 @@ LayerTestResult<T, 4> PermuteValueSet3Test(
     },
     qScale, qOffset);
 
-    return SimplePermuteTestImpl<T>(workloadFactory, memoryManager,
+    return SimplePermuteTestImpl<T>(workloadFactory, memoryManager, tensorHandleFactory,
                                     descriptor, inputTensorInfo,
                                     outputTensorInfo, input, outputExpected);
 }

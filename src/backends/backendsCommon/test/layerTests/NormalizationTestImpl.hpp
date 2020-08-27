@@ -14,19 +14,24 @@
 
 LayerTestResult<float, 4> SimpleNormalizationAcrossTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 LayerTestResult<float, 4> SimpleNormalizationWithinTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 LayerTestResult<float,4> SimpleNormalizationAcrossNhwcTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 LayerTestResult<float, 4> CompareNormalizationTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::ITensorHandleFactory& refTensorHandleFactory,
     armnn::NormalizationAlgorithmChannel normChannel,
     armnn::NormalizationAlgorithmMethod normMethod);

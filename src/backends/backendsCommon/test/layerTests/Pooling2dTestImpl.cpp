@@ -34,6 +34,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimplePooling2dTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     armnn::Pooling2dDescriptor descriptor,
     float qScale,
     int32_t qOffset,
@@ -74,10 +75,8 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
 
     LayerTestResult<T, 4> result(outputTensorInfo);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::Pooling2dQueueDescriptor queueDescriptor;
     queueDescriptor.m_Parameters = descriptor;
@@ -128,6 +127,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     bool forceNoPadding,
     float qScale = 1.0f,
     int32_t qOffset = 0)
@@ -246,13 +246,14 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(
     }
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleMaxPooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout dataLayout = armnn::DataLayout::NCHW,
     float qScale = 1.0f,
     int32_t qOffset = 0)
@@ -317,13 +318,14 @@ LayerTestResult<T, 4> SimpleMaxPooling2dTestCommon(
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     armnn::DataLayout dataLayout = armnn::DataLayout::NCHW,
     float qScale = 1.0f,
     int32_t qOffset = 0)
@@ -388,13 +390,14 @@ LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> LargeTensorsAveragePooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -439,13 +442,14 @@ LayerTestResult<T, 4> LargeTensorsAveragePooling2dTestCommon(
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputVec);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleL2Pooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     armnn::DataLayout dataLayout = armnn::DataLayout::NCHW,
     float qScale = 1.0f,
     int32_t qOffset = 0)
@@ -501,13 +505,14 @@ LayerTestResult<T, 4> SimpleL2Pooling2dTestCommon(
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Pooling2dSize3Stride1TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -536,13 +541,14 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride1TestCommon(
         qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Pooling2dSize3Stride3TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -577,13 +583,14 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride3TestCommon(
         qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Pooling2dSize3Stride4TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -615,13 +622,14 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride4TestCommon(
         qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Pooling2dSize7TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -652,13 +660,14 @@ LayerTestResult<T, 4> L2Pooling2dSize7TestCommon(
         qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Pooling2dSize9TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -691,13 +700,14 @@ LayerTestResult<T, 4> L2Pooling2dSize9TestCommon(
         qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> AsymmetricNonSquarePooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -732,7 +742,7 @@ LayerTestResult<T, 4> AsymmetricNonSquarePooling2dTestCommon(
         qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -740,6 +750,8 @@ LayerTestResult<T, 4> ComparePooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::ITensorHandleFactory& refTensorHandleFactory,
     armnn::PoolingAlgorithm poolingType,
     float qScale = 1.0f,
     int32_t qOffset = 0)
@@ -781,10 +793,8 @@ LayerTestResult<T, 4> ComparePooling2dTestCommon(
 
     LayerTestResult<T, 4> comparisonResult(outputTensorInfo);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::Pooling2dQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -801,10 +811,8 @@ LayerTestResult<T, 4> ComparePooling2dTestCommon(
     data.m_Parameters.m_PadBottom = padY;
     data.m_Parameters.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refWorkloadFactory.CreateTensorHandle(outputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> inputHandleRef = refWorkloadFactory.CreateTensorHandle(inputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refTensorHandleFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> inputHandleRef = refTensorHandleFactory.CreateTensorHandle(inputTensorInfo);
 
     // Don't execute if Pooling is not supported, as an exception will be raised.
     armnn::BackendId backend = workloadFactory.GetBackendId();
@@ -856,6 +864,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleMaxPooling2dSize2x2Stride2x2TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     bool forceNoPadding,
     float qScale = 1.0f,
     int32_t qOffset = 0)
@@ -923,7 +932,7 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize2x2Stride2x2TestCommon(
                          QuantizedVector<T>(expectedOutputDataWithPadding, qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 //
@@ -939,6 +948,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2TestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         bool forceNoPadding,
         float qScale = 1.0f,
         int32_t qOffset = 0)
@@ -1001,7 +1011,7 @@ LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2TestCommon(
                          QuantizedVector<T>(expectedOutputDataWithPadding, qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 
@@ -1009,6 +1019,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingSimpleMaxPooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -1052,13 +1063,14 @@ LayerTestResult<T, 4> IgnorePaddingSimpleMaxPooling2dTestCommon(
         qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingMaxPooling2dSize3TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -1103,13 +1115,14 @@ LayerTestResult<T, 4> IgnorePaddingMaxPooling2dSize3TestCommon(
         qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -1153,13 +1166,14 @@ LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dTestCommon(
         qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -1203,13 +1217,14 @@ LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon(
         qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -1254,13 +1269,14 @@ LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3TestCommon(
         qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingSimpleL2Pooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -1304,13 +1320,14 @@ LayerTestResult<T, 4> IgnorePaddingSimpleL2Pooling2dTestCommon(
         qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingL2Pooling2dSize3TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -1355,7 +1372,7 @@ LayerTestResult<T, 4> IgnorePaddingL2Pooling2dSize3TestCommon(
         qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 } // anonymous namespace
@@ -1363,469 +1380,570 @@ LayerTestResult<T, 4> IgnorePaddingL2Pooling2dSize3TestCommon(
 LayerTestResult<float, 4> SimpleMaxPooling2dSize2x2Stride2x2Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     bool forceNoPadding)
 {
     return SimpleMaxPooling2dSize2x2Stride2x2TestCommon<armnn::DataType::Float32>(
-        workloadFactory, memoryManager, forceNoPadding);
+        workloadFactory, memoryManager, tensorHandleFactory, forceNoPadding);
 }
 
 LayerTestResult<uint8_t, 4> SimpleMaxPooling2dSize2x2Stride2x2Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     bool forceNoPadding)
 {
     return SimpleMaxPooling2dSize2x2Stride2x2TestCommon<armnn::DataType::QAsymmU8>(
-        workloadFactory, memoryManager, forceNoPadding, 3.0f, -5);
+        workloadFactory, memoryManager, tensorHandleFactory, forceNoPadding, 3.0f, -5);
 }
 
 LayerTestResult<int16_t, 4> SimpleMaxPooling2dSize2x2Stride2x2Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     bool forceNoPadding)
 {
     return SimpleMaxPooling2dSize2x2Stride2x2TestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager, forceNoPadding);
+            workloadFactory, memoryManager, tensorHandleFactory, forceNoPadding);
 }
 
 LayerTestResult<float, 4> SimpleMaxPooling2dSize3x3Stride2x4Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     bool forceNoPadding)
 {
     return SimpleMaxPooling2dSize3x3Stride2x4TestCommon<armnn::DataType::Float32>(
-        workloadFactory, memoryManager, forceNoPadding);
+        workloadFactory, memoryManager, tensorHandleFactory, forceNoPadding);
 }
 
 LayerTestResult<uint8_t, 4> SimpleMaxPooling2dSize3x3Stride2x4Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     bool forceNoPadding)
 {
     return SimpleMaxPooling2dSize3x3Stride2x4TestCommon<armnn::DataType::QAsymmU8>(
-        workloadFactory, memoryManager, forceNoPadding, 0.1f, 128);
+        workloadFactory, memoryManager, tensorHandleFactory, forceNoPadding, 0.1f, 128);
 }
 
 LayerTestResult<int16_t, 4> SimpleMaxPooling2dSize3x3Stride2x4Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     bool forceNoPadding)
 {
     return SimpleMaxPooling2dSize3x3Stride2x4TestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager, forceNoPadding);
+            workloadFactory, memoryManager, tensorHandleFactory, forceNoPadding);
 }
 
 LayerTestResult<float, 4> SimpleMaxPooling2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout dataLayout)
 {
-    return SimpleMaxPooling2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, dataLayout);
+    return SimpleMaxPooling2dTestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<uint8_t, 4> SimpleMaxPooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout dataLayout)
 {
-    return SimpleMaxPooling2dTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, dataLayout);
+    return SimpleMaxPooling2dTestCommon<armnn::DataType::QAsymmU8>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<int16_t, 4> SimpleMaxPooling2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout dataLayout)
 {
-    return SimpleMaxPooling2dTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, dataLayout);
+    return SimpleMaxPooling2dTestCommon<armnn::DataType::QSymmS16>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 LayerTestResult<float, 4> IgnorePaddingSimpleMaxPooling2dTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return IgnorePaddingSimpleMaxPooling2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return IgnorePaddingSimpleMaxPooling2dTestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> IgnorePaddingSimpleMaxPooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return IgnorePaddingSimpleMaxPooling2dTestCommon<armnn::DataType::QAsymmU8>(
-            workloadFactory, memoryManager, 1.0f, -5);
+            workloadFactory, memoryManager, tensorHandleFactory, 1.0f, -5);
 }
 
 LayerTestResult<int16_t, 4> IgnorePaddingSimpleMaxPooling2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return IgnorePaddingSimpleMaxPooling2dTestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager);
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> IgnorePaddingMaxPooling2dSize3Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return IgnorePaddingMaxPooling2dSize3TestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return IgnorePaddingMaxPooling2dSize3TestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> IgnorePaddingMaxPooling2dSize3Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return IgnorePaddingMaxPooling2dSize3TestCommon<armnn::DataType::QAsymmU8>(
-            workloadFactory, memoryManager, 1.0f, -5);
+            workloadFactory, memoryManager, tensorHandleFactory, 1.0f, -5);
 }
 
 LayerTestResult<int16_t, 4> IgnorePaddingMaxPooling2dSize3Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return IgnorePaddingMaxPooling2dSize3TestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager);
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> SimpleAveragePooling2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout dataLayout)
 {
-    return SimpleAveragePooling2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, dataLayout);
+    return SimpleAveragePooling2dTestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<uint8_t, 4> SimpleAveragePooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout dataLayout)
 {
     return SimpleAveragePooling2dTestCommon<armnn::DataType::QAsymmU8>(
-        workloadFactory, memoryManager, dataLayout, 0.5, -1);
+        workloadFactory, memoryManager, tensorHandleFactory, dataLayout, 0.5, -1);
 }
 
 LayerTestResult<int16_t, 4> SimpleAveragePooling2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout dataLayout)
 {
     return SimpleAveragePooling2dTestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager, dataLayout);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<float, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     bool forceNoPadding)
 {
     return IgnorePaddingAveragePooling2dSize3x2Stride2x2TestCommon<armnn::DataType::Float32>(
-        workloadFactory, memoryManager, forceNoPadding);
+        workloadFactory, memoryManager, tensorHandleFactory, forceNoPadding);
 }
 
 LayerTestResult<float, 4> LargeTensorsAveragePooling2dTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return LargeTensorsAveragePooling2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return LargeTensorsAveragePooling2dTestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> LargeTensorsAveragePooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return LargeTensorsAveragePooling2dTestCommon<armnn::DataType::QAsymmU8>(
-        workloadFactory, memoryManager, 0.5, -1);
+        workloadFactory, memoryManager, tensorHandleFactory, 0.5, -1);
 }
 
 LayerTestResult<int16_t, 4> LargeTensorsAveragePooling2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return LargeTensorsAveragePooling2dTestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager);
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 LayerTestResult<float, 4> IgnorePaddingSimpleAveragePooling2dTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return IgnorePaddingSimpleAveragePooling2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return IgnorePaddingSimpleAveragePooling2dTestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> IgnorePaddingSimpleAveragePooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return IgnorePaddingSimpleAveragePooling2dTestCommon<armnn::DataType::QAsymmU8>(
-            workloadFactory, memoryManager);
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> IgnorePaddingSimpleAveragePooling2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return IgnorePaddingSimpleAveragePooling2dTestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager);
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon<armnn::DataType::Float32>(
-            workloadFactory, memoryManager);
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon<armnn::DataType::QAsymmU8>(
-            workloadFactory, memoryManager);
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager);
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> IgnorePaddingAveragePooling2dSize3Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return IgnorePaddingAveragePooling2dSize3TestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return IgnorePaddingAveragePooling2dSize3TestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> IgnorePaddingAveragePooling2dSize3Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return IgnorePaddingAveragePooling2dSize3TestCommon<armnn::DataType::QAsymmU8>(
-            workloadFactory, memoryManager);
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> IgnorePaddingAveragePooling2dSize3Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return IgnorePaddingAveragePooling2dSize3TestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager);
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> SimpleL2Pooling2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout dataLayout)
 {
-    return SimpleL2Pooling2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, dataLayout);
+    return SimpleL2Pooling2dTestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<uint8_t, 4> SimpleL2Pooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout dataLayout)
 {
-    return SimpleL2Pooling2dTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, dataLayout);
+    return SimpleL2Pooling2dTestCommon<armnn::DataType::QAsymmU8>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<int16_t, 4> SimpleL2Pooling2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout dataLayout)
 {
-    return SimpleL2Pooling2dTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, dataLayout);
+    return SimpleL2Pooling2dTestCommon<armnn::DataType::QSymmS16>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<float, 4> L2Pooling2dSize3Stride1Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return L2Pooling2dSize3Stride1TestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return L2Pooling2dSize3Stride1TestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> L2Pooling2dSize3Stride1Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return L2Pooling2dSize3Stride1TestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return L2Pooling2dSize3Stride1TestCommon<armnn::DataType::QAsymmU8>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> L2Pooling2dSize3Stride1Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return L2Pooling2dSize3Stride1TestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return L2Pooling2dSize3Stride1TestCommon<armnn::DataType::QSymmS16>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> L2Pooling2dSize3Stride3Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return L2Pooling2dSize3Stride3TestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return L2Pooling2dSize3Stride3TestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> L2Pooling2dSize3Stride3Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return L2Pooling2dSize3Stride3TestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return L2Pooling2dSize3Stride3TestCommon<armnn::DataType::QAsymmU8>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> L2Pooling2dSize3Stride3Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return L2Pooling2dSize3Stride3TestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return L2Pooling2dSize3Stride3TestCommon<armnn::DataType::QSymmS16>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 LayerTestResult<float, 4> L2Pooling2dSize3Stride4Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return L2Pooling2dSize3Stride4TestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return L2Pooling2dSize3Stride4TestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> L2Pooling2dSize3Stride4Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return L2Pooling2dSize3Stride4TestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return L2Pooling2dSize3Stride4TestCommon<armnn::DataType::QAsymmU8>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> L2Pooling2dSize3Stride4Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return L2Pooling2dSize3Stride4TestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return L2Pooling2dSize3Stride4TestCommon<armnn::DataType::QSymmS16>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> L2Pooling2dSize7Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return L2Pooling2dSize7TestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return L2Pooling2dSize7TestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> L2Pooling2dSize7Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return L2Pooling2dSize7TestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return L2Pooling2dSize7TestCommon<armnn::DataType::QAsymmU8>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> L2Pooling2dSize7Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return L2Pooling2dSize7TestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return L2Pooling2dSize7TestCommon<armnn::DataType::QSymmS16>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> L2Pooling2dSize9Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return L2Pooling2dSize9TestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return L2Pooling2dSize9TestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> L2Pooling2dSize9Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return L2Pooling2dSize9TestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return L2Pooling2dSize9TestCommon<armnn::DataType::QAsymmU8>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> L2Pooling2dSize9Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return L2Pooling2dSize9TestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return L2Pooling2dSize9TestCommon<armnn::DataType::QSymmS16>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 LayerTestResult<float, 4> IgnorePaddingSimpleL2Pooling2dTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return IgnorePaddingSimpleL2Pooling2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return IgnorePaddingSimpleL2Pooling2dTestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> IgnorePaddingSimpleL2Pooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return IgnorePaddingSimpleL2Pooling2dTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return IgnorePaddingSimpleL2Pooling2dTestCommon<armnn::DataType::QAsymmU8>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> IgnorePaddingSimpleL2Pooling2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return IgnorePaddingSimpleL2Pooling2dTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return IgnorePaddingSimpleL2Pooling2dTestCommon<armnn::DataType::QSymmS16>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> IgnorePaddingL2Pooling2dSize3Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return IgnorePaddingL2Pooling2dSize3TestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return IgnorePaddingL2Pooling2dSize3TestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> IgnorePaddingL2Pooling2dSize3Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return IgnorePaddingL2Pooling2dSize3TestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return IgnorePaddingL2Pooling2dSize3TestCommon<armnn::DataType::QAsymmU8>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> IgnorePaddingL2Pooling2dSize3Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return IgnorePaddingL2Pooling2dSize3TestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return IgnorePaddingL2Pooling2dSize3TestCommon<armnn::DataType::QSymmS16>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> AsymmetricNonSquarePooling2dTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return AsymmetricNonSquarePooling2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return AsymmetricNonSquarePooling2dTestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> AsymmetricNonSquarePooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return AsymmetricNonSquarePooling2dTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return AsymmetricNonSquarePooling2dTestCommon<armnn::DataType::QAsymmU8>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> AsymmetricNonSquarePooling2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return AsymmetricNonSquarePooling2dTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return AsymmetricNonSquarePooling2dTestCommon<armnn::DataType::QSymmS16>(
+            workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> ComparePooling2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::ITensorHandleFactory& refTensorHandleFactory,
     armnn::PoolingAlgorithm  poolingType)
 {
     return ComparePooling2dTestCommon<armnn::DataType::Float32>(
-        workloadFactory, memoryManager, refWorkloadFactory, poolingType);
+        workloadFactory, memoryManager,  refWorkloadFactory, tensorHandleFactory, refTensorHandleFactory, poolingType);
 }
 
 LayerTestResult<uint8_t, 4> ComparePooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::ITensorHandleFactory& refTensorHandleFactory,
     armnn::PoolingAlgorithm  poolingType)
 {
     return ComparePooling2dTestCommon<armnn::DataType::QAsymmU8>(
-        workloadFactory, memoryManager, refWorkloadFactory, poolingType, 0.1f, 128);
+        workloadFactory, memoryManager,  refWorkloadFactory, tensorHandleFactory, refTensorHandleFactory,
+        poolingType, 0.1f, 128);
 }
 
 LayerTestResult<int16_t, 4> ComparePooling2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::ITensorHandleFactory& refTensorHandleFactory,
     armnn::PoolingAlgorithm  poolingType)
 {
     return ComparePooling2dTestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager, refWorkloadFactory, poolingType);
+        workloadFactory, memoryManager,  refWorkloadFactory, tensorHandleFactory, refTensorHandleFactory, poolingType);
 }

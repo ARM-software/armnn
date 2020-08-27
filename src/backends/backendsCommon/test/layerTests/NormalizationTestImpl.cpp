@@ -21,6 +21,7 @@ namespace
 LayerTestResult<float,4> SimpleNormalizationTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     armnn::NormalizationAlgorithmChannel normChannel,
     armnn::NormalizationAlgorithmMethod normMethod)
 {
@@ -57,10 +58,8 @@ LayerTestResult<float,4> SimpleNormalizationTestImpl(
     float kappa = 1.f;
     uint32_t normSize = 3;
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::NormalizationQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -167,6 +166,7 @@ LayerTestResult<float,4> SimpleNormalizationTestImpl(
 LayerTestResult<float,4> SimpleNormalizationNhwcTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     armnn::NormalizationAlgorithmChannel normChannel,
     armnn::NormalizationAlgorithmMethod normMethod)
 {
@@ -202,10 +202,8 @@ LayerTestResult<float,4> SimpleNormalizationNhwcTestImpl(
     float kappa = 1.f;
     uint32_t normSize = 3;
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::NormalizationQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -271,6 +269,8 @@ LayerTestResult<float,4> CompareNormalizationTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::ITensorHandleFactory& refTensorHandleFactory,
     armnn::NormalizationAlgorithmChannel normChannel,
     armnn::NormalizationAlgorithmMethod normMethod)
 {
@@ -302,10 +302,8 @@ LayerTestResult<float,4> CompareNormalizationTestImpl(
     constexpr float kappa = 1.f;
     constexpr uint32_t normSize = 5;
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::NormalizationQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -318,10 +316,8 @@ LayerTestResult<float,4> CompareNormalizationTestImpl(
     data.m_Parameters.m_Beta            = beta;
     data.m_Parameters.m_K               = kappa;
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refWorkloadFactory.CreateTensorHandle(outputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> inputHandleRef = refWorkloadFactory.CreateTensorHandle(inputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refTensorHandleFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> inputHandleRef = refTensorHandleFactory.CreateTensorHandle(inputTensorInfo);
 
     armnn::NormalizationQueueDescriptor refData = data;
     armnn::WorkloadInfo refInfo = info;
@@ -365,37 +361,45 @@ LayerTestResult<float,4> CompareNormalizationTestImpl(
 
 LayerTestResult<float,4> SimpleNormalizationAcrossTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     auto normMethod = armnn::NormalizationAlgorithmMethod::LocalBrightness;
     auto normChannel = armnn::NormalizationAlgorithmChannel::Across;
-    return SimpleNormalizationTestImpl(workloadFactory, memoryManager, normChannel, normMethod);
+    return SimpleNormalizationTestImpl(workloadFactory, memoryManager,  tensorHandleFactory, normChannel, normMethod);
 }
 
 LayerTestResult<float,4> SimpleNormalizationWithinTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     auto normMethod = armnn::NormalizationAlgorithmMethod::LocalBrightness;
     auto normChannel = armnn::NormalizationAlgorithmChannel::Within;
-    return SimpleNormalizationTestImpl(workloadFactory, memoryManager, normChannel, normMethod);
+    return SimpleNormalizationTestImpl(workloadFactory, memoryManager,  tensorHandleFactory, normChannel, normMethod);
 }
 
 LayerTestResult<float,4> SimpleNormalizationAcrossNhwcTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     auto normMethod = armnn::NormalizationAlgorithmMethod::LocalBrightness;
     auto normChannel = armnn::NormalizationAlgorithmChannel::Across;
-    return SimpleNormalizationNhwcTestImpl(workloadFactory, memoryManager, normChannel, normMethod);
+    return SimpleNormalizationNhwcTestImpl(
+            workloadFactory, memoryManager,  tensorHandleFactory, normChannel, normMethod);
 }
 
 LayerTestResult<float,4> CompareNormalizationTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::ITensorHandleFactory& refTensorHandleFactory,
     armnn::NormalizationAlgorithmChannel normChannel,
     armnn::NormalizationAlgorithmMethod normMethod)
 {
-    return CompareNormalizationTestImpl(workloadFactory, memoryManager, refWorkloadFactory, normChannel, normMethod);
+    return CompareNormalizationTestImpl(
+            workloadFactory, memoryManager, refWorkloadFactory, tensorHandleFactory, refTensorHandleFactory,
+            normChannel, normMethod);
 }

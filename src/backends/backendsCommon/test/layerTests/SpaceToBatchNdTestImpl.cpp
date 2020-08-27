@@ -23,6 +23,7 @@ template<typename T>
 LayerTestResult<T, 4> SpaceToBatchNdTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory,
     armnn::TensorInfo& inputTensorInfo,
     armnn::TensorInfo& outputTensorInfo,
     std::vector<float>& inputData,
@@ -64,10 +65,8 @@ LayerTestResult<T, 4> SpaceToBatchNdTestImpl(
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
                                           armnnUtils::QuantizedVector<T>(outputExpectedData, qScale, qOffset));
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle  = tensorHandleFactory->CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory->CreateTensorHandle(outputTensorInfo);
 
     armnn::WorkloadInfo info;
     AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
@@ -91,6 +90,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdSimpleTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory,
     armnn::DataLayout dataLayout = armnn::DataLayout::NCHW)
 {
     armnn::TensorInfo inputTensorInfo;
@@ -118,13 +118,15 @@ LayerTestResult<T, 4> SpaceToBatchNdSimpleTest(
     });
 
     return SpaceToBatchNdTestImpl<T>(
-        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdMultiChannelsTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory,
     armnn::DataLayout dataLayout = armnn::DataLayout::NCHW)
 {
     armnn::TensorInfo inputTensorInfo;
@@ -157,13 +159,15 @@ LayerTestResult<T, 4> SpaceToBatchNdMultiChannelsTest(
     });
 
     return SpaceToBatchNdTestImpl<T>(
-        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdMultiBlockTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory,
     armnn::DataLayout dataLayout = armnn::DataLayout::NCHW)
 {
     armnn::TensorInfo inputTensorInfo;
@@ -197,13 +201,15 @@ LayerTestResult<T, 4> SpaceToBatchNdMultiBlockTest(
     });
 
     return SpaceToBatchNdTestImpl<T>(
-        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdPaddingTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory,
     armnn::DataLayout dataLayout = armnn::DataLayout::NCHW)
 {
     armnn::TensorInfo inputTensorInfo;
@@ -241,263 +247,376 @@ LayerTestResult<T, 4> SpaceToBatchNdPaddingTest(
     });
 
     return SpaceToBatchNdTestImpl<T>(
-        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdSimpleNhwcTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdSimpleTest<ArmnnType>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
+    return SpaceToBatchNdSimpleTest<ArmnnType>(workloadFactory,
+                                               memoryManager,
+                                               tensorHandleFactory,
+                                               armnn::DataLayout::NHWC);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdMultiChannelsNhwcTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiChannelsTest<ArmnnType>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
+    return SpaceToBatchNdMultiChannelsTest<ArmnnType>(workloadFactory,
+                                                      memoryManager,
+                                                      tensorHandleFactory,
+                                                      armnn::DataLayout::NHWC);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdMultiBlockNhwcTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiBlockTest<ArmnnType>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
+    return SpaceToBatchNdMultiBlockTest<ArmnnType>(workloadFactory,
+                                                   memoryManager,
+                                                   tensorHandleFactory,
+                                                   armnn::DataLayout::NHWC);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdPaddingNhwcTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdPaddingTest<ArmnnType>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
+    return SpaceToBatchNdPaddingTest<ArmnnType>(workloadFactory,
+                                                memoryManager,
+                                                tensorHandleFactory,
+                                                armnn::DataLayout::NHWC);
 }
 
 } // anonymous namespace
 
 LayerTestResult<float, 4> SpaceToBatchNdSimpleFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdSimpleTest<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return SpaceToBatchNdSimpleTest<armnn::DataType::Float32>(workloadFactory,
+                                                              memoryManager,
+                                                              tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> SpaceToBatchNdMultiChannelsFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiChannelsTest<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiChannelsTest<armnn::DataType::Float32>(workloadFactory,
+                                                                     memoryManager,
+                                                                     tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> SpaceToBatchNdMultiBlockFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiBlockTest<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiBlockTest<armnn::DataType::Float32>(workloadFactory,
+                                                                  memoryManager,
+                                                                  tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> SpaceToBatchNdPaddingFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdPaddingTest<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return SpaceToBatchNdPaddingTest<armnn::DataType::Float32>(workloadFactory,
+                                                               memoryManager,
+                                                               tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> SpaceToBatchNdSimpleFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdSimpleTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdSimpleTest<armnn::DataType::Float16>(workloadFactory,
+                                                              memoryManager,
+                                                              tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> SpaceToBatchNdMultiChannelsFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiChannelsTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiChannelsTest<armnn::DataType::Float16>(workloadFactory,
+                                                                     memoryManager,
+                                                                     tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> SpaceToBatchNdMultiBlockFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiBlockTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiBlockTest<armnn::DataType::Float16>(workloadFactory,
+                                                                  memoryManager,
+                                                                  tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> SpaceToBatchNdPaddingFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdPaddingTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdPaddingTest<armnn::DataType::Float16>(workloadFactory,
+                                                               memoryManager,
+                                                               tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdSimpleTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdSimpleTest<armnn::DataType::QAsymmU8>(workloadFactory,
+                                                               memoryManager,
+                                                               tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiChannelsUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiChannelsTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiChannelsTest<armnn::DataType::QAsymmU8>(workloadFactory,
+                                                                      memoryManager,
+                                                                      tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiBlockUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiBlockTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiBlockTest<armnn::DataType::QAsymmU8>(workloadFactory,
+                                                                   memoryManager,
+                                                                   tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdPaddingTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdPaddingTest<armnn::DataType::QAsymmU8>(workloadFactory,
+                                                                memoryManager,
+                                                                tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> SpaceToBatchNdSimpleNhwcFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdSimpleNhwcTest<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return SpaceToBatchNdSimpleNhwcTest<armnn::DataType::Float32>(workloadFactory,
+                                                                  memoryManager,
+                                                                  tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> SpaceToBatchNdMultiChannelsNhwcFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiChannelsNhwcTest<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiChannelsNhwcTest<armnn::DataType::Float32>(workloadFactory,
+                                                                         memoryManager,
+                                                                         tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> SpaceToBatchNdMultiBlockNhwcFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiBlockNhwcTest<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiBlockNhwcTest<armnn::DataType::Float32>(workloadFactory,
+                                                                      memoryManager,
+                                                                      tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> SpaceToBatchNdPaddingNhwcFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdPaddingNhwcTest<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return SpaceToBatchNdPaddingNhwcTest<armnn::DataType::Float32>(workloadFactory,
+                                                                   memoryManager,
+                                                                   tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> SpaceToBatchNdSimpleNhwcFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdSimpleNhwcTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdSimpleNhwcTest<armnn::DataType::Float16>(workloadFactory,
+                                                                  memoryManager,
+                                                                  tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> SpaceToBatchNdMultiChannelsNhwcFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiChannelsNhwcTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiChannelsNhwcTest<armnn::DataType::Float16>(workloadFactory,
+                                                                         memoryManager,
+                                                                         tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> SpaceToBatchNdMultiBlockNhwcFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiBlockNhwcTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiBlockNhwcTest<armnn::DataType::Float16>(workloadFactory,
+                                                                      memoryManager,
+                                                                      tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> SpaceToBatchNdPaddingNhwcFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdPaddingNhwcTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdPaddingNhwcTest<armnn::DataType::Float16>(workloadFactory,
+                                                                   memoryManager,
+                                                                   tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleNhwcUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdSimpleNhwcTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdSimpleNhwcTest<armnn::DataType::QAsymmU8>(workloadFactory,
+                                                                   memoryManager,
+                                                                   tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiChannelsNhwcUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiChannelsNhwcTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiChannelsNhwcTest<armnn::DataType::QAsymmU8>(workloadFactory,
+                                                                          memoryManager,
+                                                                          tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiBlockNhwcUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiBlockNhwcTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiBlockNhwcTest<armnn::DataType::QAsymmU8>(workloadFactory,
+                                                                       memoryManager,
+                                                                       tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingNhwcUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdPaddingNhwcTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager);
+    return SpaceToBatchNdPaddingNhwcTest<armnn::DataType::QAsymmU8>(workloadFactory,
+                                                                    memoryManager,
+                                                                    tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdSimpleUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdSimpleTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdSimpleTest<armnn::DataType::QSymmS16>(workloadFactory,
+                                                               memoryManager,
+                                                               tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdMultiChannelsUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiChannelsTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiChannelsTest<armnn::DataType::QSymmS16>(workloadFactory,
+                                                                      memoryManager,
+                                                                      tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdMultiBlockUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiBlockTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiBlockTest<armnn::DataType::QSymmS16>(workloadFactory,
+                                                                   memoryManager,
+                                                                   tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdPaddingUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdPaddingTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdPaddingTest<armnn::DataType::QSymmS16>(workloadFactory,
+                                                                memoryManager,
+                                                                tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdSimpleNhwcUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdSimpleNhwcTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdSimpleNhwcTest<armnn::DataType::QSymmS16>(workloadFactory,
+                                                                   memoryManager,
+                                                                   tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdMultiChannelsNhwcUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiChannelsNhwcTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiChannelsNhwcTest<armnn::DataType::QSymmS16>(workloadFactory,
+                                                                          memoryManager,
+                                                                          tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdMultiBlockNhwcUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdMultiBlockNhwcTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdMultiBlockNhwcTest<armnn::DataType::QSymmS16>(workloadFactory,
+                                                                       memoryManager,
+                                                                       tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdPaddingNhwcUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        armnn::ITensorHandleFactory* tensorHandleFactory)
 {
-    return SpaceToBatchNdPaddingNhwcTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager);
+    return SpaceToBatchNdPaddingNhwcTest<armnn::DataType::QSymmS16>(workloadFactory,
+                                                                    memoryManager,
+                                                                    tensorHandleFactory);
 }

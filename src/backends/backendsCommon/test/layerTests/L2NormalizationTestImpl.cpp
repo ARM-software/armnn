@@ -23,6 +23,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2NormalizationTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::TensorShape& inputOutputTensorShape,
     float scale,
     int32_t offset,
@@ -68,10 +69,8 @@ LayerTestResult<T, 4> L2NormalizationTestImpl(
                                                         outputTensorInfo.GetQuantizationScale(),
                                                         outputTensorInfo.GetQuantizationOffset()));
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::L2NormalizationQueueDescriptor descriptor;
     descriptor.m_Parameters.m_Eps = epsilon;
@@ -107,6 +106,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2NormalizationEpsilonTestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float scale,
         int32_t offset,
         float outScale,
@@ -151,6 +151,7 @@ LayerTestResult<T, 4> L2NormalizationEpsilonTestCommon(
     return L2NormalizationTestImpl<ArmnnType>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputOutputShape,
         scale,
         offset,
@@ -167,6 +168,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Normalization1dTestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float scale,
         int32_t offset,
         float outScale,
@@ -237,6 +239,7 @@ LayerTestResult<T, 4> L2Normalization1dTestCommon(
     return L2NormalizationTestImpl<ArmnnType>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputOutputShape,
         scale,
         offset,
@@ -251,6 +254,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Normalization2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float scale,
     int32_t offset,
     float outScale,
@@ -296,6 +300,7 @@ LayerTestResult<T, 4> L2Normalization2dTestCommon(
     return L2NormalizationTestImpl<ArmnnType>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputOutputShape,
         scale,
         offset,
@@ -310,6 +315,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Normalization3dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float scale,
     int32_t offset,
     float outScale,
@@ -375,6 +381,7 @@ LayerTestResult<T, 4> L2Normalization3dTestCommon(
     return L2NormalizationTestImpl<ArmnnType>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputOutputShape,
         scale,
         offset,
@@ -389,6 +396,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Normalization4dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float scale,
     int32_t offset,
     float outScale,
@@ -534,6 +542,7 @@ LayerTestResult<T, 4> L2Normalization4dTestCommon(
     return L2NormalizationTestImpl<ArmnnType>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputOutputShape,
         scale,
         offset,
@@ -549,6 +558,7 @@ LayerTestResult<T, 4> L2Normalization4dTestCommon(
 LayerTestResult<float, 4> L2NormalizationDefaultEpsilonTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         const armnn::DataLayout layout)
 {
     // Dummy descriptor to get the default value of epsilon.
@@ -557,6 +567,7 @@ LayerTestResult<float, 4> L2NormalizationDefaultEpsilonTest(
     return L2NormalizationEpsilonTestCommon<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         0.f,
         0,
         0.f,
@@ -568,11 +579,13 @@ LayerTestResult<float, 4> L2NormalizationDefaultEpsilonTest(
 LayerTestResult<float, 4> L2NormalizationNonDefaultEpsilonTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         const armnn::DataLayout layout)
 {
     return L2NormalizationEpsilonTestCommon<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         0.f,
         0,
         0.f,
@@ -584,11 +597,13 @@ LayerTestResult<float, 4> L2NormalizationNonDefaultEpsilonTest(
 LayerTestResult<float, 4> L2Normalization1dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout layout)
 {
     return L2Normalization1dTestCommon<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         0.f,
         0,
         0.f,
@@ -599,11 +614,13 @@ LayerTestResult<float, 4> L2Normalization1dTest(
 LayerTestResult<int16_t, 4> L2Normalization1dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout layout)
 {
     return L2Normalization1dTestCommon<armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         1.f,
         0,
         1.f,
@@ -614,11 +631,13 @@ LayerTestResult<int16_t, 4> L2Normalization1dInt16Test(
 LayerTestResult<uint8_t, 4> L2Normalization1dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout layout)
 {
     return L2Normalization1dTestCommon<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         1.f,
         0,
         1.f / 128,
@@ -629,11 +648,13 @@ LayerTestResult<uint8_t, 4> L2Normalization1dUint8Test(
 LayerTestResult<float, 4> L2Normalization2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout layout)
 {
     return L2Normalization2dTestCommon<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         0.f,
         0,
         0.f,
@@ -644,11 +665,13 @@ LayerTestResult<float, 4> L2Normalization2dTest(
 LayerTestResult<int16_t, 4> L2Normalization2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout layout)
 {
     return L2Normalization1dTestCommon<armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         1.f,
         0,
         1.f,
@@ -659,11 +682,13 @@ LayerTestResult<int16_t, 4> L2Normalization2dInt16Test(
 LayerTestResult<uint8_t, 4> L2Normalization2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout layout)
 {
     return L2Normalization1dTestCommon<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         1.f,
         0,
         1.f / 128,
@@ -673,7 +698,8 @@ LayerTestResult<uint8_t, 4> L2Normalization2dUint8Test(
 
 LayerTestResult<float, 2> L2Normalization2dShapeTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const armnn::DataLayout layout = armnn::DataLayout::NHWC;
     const armnn::TensorShape inputOutputTensorShape = armnn::TensorShape({ 5, 2 });
@@ -704,10 +730,8 @@ LayerTestResult<float, 2> L2Normalization2dShapeTest(
     LayerTestResult<float, 2> result(outputTensorInfo);
     result.outputExpected = MakeTensor<float, 2>(outputTensorInfo, expectedOutputData);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::L2NormalizationQueueDescriptor descriptor;
     descriptor.m_Parameters.m_Eps = 1e-12f;
@@ -735,11 +759,13 @@ LayerTestResult<float, 2> L2Normalization2dShapeTest(
 LayerTestResult<float, 4> L2Normalization3dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout layout)
 {
     return L2Normalization3dTestCommon<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         0.f,
         0,
         0.f,
@@ -750,11 +776,13 @@ LayerTestResult<float, 4> L2Normalization3dTest(
 LayerTestResult<int16_t, 4> L2Normalization3dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout layout)
 {
     return L2Normalization1dTestCommon<armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         1.f,
         0,
         1.f,
@@ -765,11 +793,13 @@ LayerTestResult<int16_t, 4> L2Normalization3dInt16Test(
 LayerTestResult<uint8_t, 4> L2Normalization3dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout layout)
 {
     return L2Normalization1dTestCommon<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         1.f,
         0,
         1.f / 128,
@@ -780,11 +810,13 @@ LayerTestResult<uint8_t, 4> L2Normalization3dUint8Test(
 LayerTestResult<float, 4> L2Normalization4dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout layout)
 {
     return L2Normalization4dTestCommon<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         0.f,
         0,
         0.f,
@@ -795,11 +827,13 @@ LayerTestResult<float, 4> L2Normalization4dTest(
 LayerTestResult<int16_t, 4> L2Normalization4dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout layout)
 {
     return L2Normalization1dTestCommon<armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         1.f,
         0,
         1.f,
@@ -810,11 +844,13 @@ LayerTestResult<int16_t, 4> L2Normalization4dInt16Test(
 LayerTestResult<uint8_t, 4> L2Normalization4dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::DataLayout layout)
 {
     return L2Normalization1dTestCommon<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         1.f,
         0,
         1.f / 128,

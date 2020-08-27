@@ -28,6 +28,7 @@ template<armnn::DataType ArmnnType,
 LayerTestResult<T, NumDims> LogSoftmaxTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::TensorInfo& inputInfo,
     const armnn::TensorInfo& outputInfo,
     const std::vector<float>& inputValues,
@@ -41,10 +42,8 @@ LayerTestResult<T, NumDims> LogSoftmaxTestImpl(
     result.outputExpected =
         MakeTensor<T, NumDims>(outputInfo, armnnUtils::QuantizedVector<T>(expectedOutputValues, qScale, qOffset));
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputInfo);
 
     armnn::WorkloadInfo info;
 
@@ -71,7 +70,8 @@ LayerTestResult<T, NumDims> LogSoftmaxTestImpl(
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 4> LogSoftmaxTest1(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const armnn::TensorShape inputOutputShape{1, 1, 2, 4};
 
@@ -97,6 +97,7 @@ LayerTestResult<T, 4> LogSoftmaxTest1(
     return LogSoftmaxTestImpl<ArmnnType, 4>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputTensorInfo,
         outputTensorInfo,
         inputValues,
@@ -107,7 +108,8 @@ LayerTestResult<T, 4> LogSoftmaxTest1(
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 4> LogSoftmaxTest2(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const armnn::TensorShape inputOutputShape{1, 1, 2, 4};
 
@@ -133,6 +135,7 @@ LayerTestResult<T, 4> LogSoftmaxTest2(
     return LogSoftmaxTestImpl<ArmnnType, 4>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputTensorInfo,
         outputTensorInfo,
         inputValues,
@@ -143,7 +146,8 @@ LayerTestResult<T, 4> LogSoftmaxTest2(
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 4> LogSoftmaxTest3(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const armnn::TensorShape inputOutputShape{1, 1, 2, 4};
 
@@ -169,6 +173,7 @@ LayerTestResult<T, 4> LogSoftmaxTest3(
     return LogSoftmaxTestImpl<ArmnnType, 4>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputTensorInfo,
         outputTensorInfo,
         inputValues,
@@ -179,7 +184,8 @@ LayerTestResult<T, 4> LogSoftmaxTest3(
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 4> LogSoftmaxTest4(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const armnn::TensorShape inputOutputShape{1, 1, 2, 4};
 
@@ -205,6 +211,7 @@ LayerTestResult<T, 4> LogSoftmaxTest4(
     return LogSoftmaxTestImpl<ArmnnType, 4>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputTensorInfo,
         outputTensorInfo,
         inputValues,
@@ -215,39 +222,47 @@ LayerTestResult<T, 4> LogSoftmaxTest4(
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
 LogSoftmaxTest1<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
 LogSoftmaxTest2<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
 LogSoftmaxTest3<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
 LogSoftmaxTest4<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 4>
 LogSoftmaxTest1<armnn::DataType::Float16>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 4>
 LogSoftmaxTest2<armnn::DataType::Float16>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 4>
 LogSoftmaxTest3<armnn::DataType::Float16>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 4>
 LogSoftmaxTest4<armnn::DataType::Float16>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);

@@ -11,7 +11,6 @@
 
 #include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-#include <backendsCommon/test/WorkloadFactoryHelper.hpp>
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<int32_t, 3> ArgMaxSimpleTest(armnn::IWorkloadFactory& workloadFactory,

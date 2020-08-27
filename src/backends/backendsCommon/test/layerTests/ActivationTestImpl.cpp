@@ -8,10 +8,10 @@
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
-
 #include <backendsCommon/test/ActivationFixture.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
+#include <reference/test/RefWorkloadFactoryHelper.hpp>
 
 #include <test/TensorHelpers.hpp>
 
@@ -23,6 +23,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> BoundedReLuTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float upperBound,
     float lowerBound,
     float inputScale,
@@ -59,10 +60,8 @@ LayerTestResult<T, 4> BoundedReLuTestCommon(
 
     auto input = MakeTensor<T, 4>(inputTensorInfo, inputData);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     // Setup bounded ReLu.
     armnn::ActivationQueueDescriptor descriptor;
@@ -92,7 +91,8 @@ LayerTestResult<T, 4> BoundedReLuTestCommon(
 
 LayerTestResult<float, 4> BoundedReLuUpperAndLowerBoundTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int inputWidth = 4u;
     unsigned int inputHeight = 5u;
@@ -117,13 +117,14 @@ LayerTestResult<float, 4> BoundedReLuUpperAndLowerBoundTest(
     };
 
     return BoundedReLuTestCommon<armnn::DataType::Float32>(
-        workloadFactory, memoryManager, 1.0f, -1.0f, 1.0f, 0, 1.0f, 0, input, output,
+        workloadFactory, memoryManager, tensorHandleFactory, 1.0f, -1.0f, 1.0f, 0, 1.0f, 0, input, output,
         inputWidth, inputHeight, inputChannels, inputBatchSize);
 }
 
 LayerTestResult<float, 4> BoundedReLuUpperBoundOnlyTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int inputWidth = 4u;
     unsigned int inputHeight = 5u;
@@ -148,13 +149,14 @@ LayerTestResult<float, 4> BoundedReLuUpperBoundOnlyTest(
     };
 
     return BoundedReLuTestCommon<armnn::DataType::Float32>(
-        workloadFactory, memoryManager, 6.0f, 0.0f, 1.0f, 0, 1.0f, 0, input, output,
+        workloadFactory, memoryManager, tensorHandleFactory, 6.0f, 0.0f, 1.0f, 0, 1.0f, 0, input, output,
         inputWidth, inputHeight, inputChannels, inputBatchSize);
 }
 
 LayerTestResult<uint8_t, 4> BoundedReLuUint8UpperBoundOnlyTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int inputWidth     = 3u;
     unsigned int inputHeight    = 2u;
@@ -178,14 +180,15 @@ LayerTestResult<uint8_t, 4> BoundedReLuUint8UpperBoundOnlyTest(
     int32_t outputOffset = 0;
 
     return BoundedReLuTestCommon<armnn::DataType::QAsymmU8>(
-        workloadFactory, memoryManager, 6.0f, 0.0f,
+        workloadFactory, memoryManager, tensorHandleFactory, 6.0f, 0.0f,
         inputScale, inputOffset, outputScale, outputOffset,
         input, output, inputWidth, inputHeight, inputChannels, inputBatchSize);
 }
 
 LayerTestResult<uint8_t, 4> BoundedReLuUint8UpperAndLowerBoundTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int inputWidth     = 3u;
     unsigned int inputHeight    = 2u;
@@ -207,7 +210,7 @@ LayerTestResult<uint8_t, 4> BoundedReLuUint8UpperAndLowerBoundTest(
     float inputScale    = 0.0125f;
 
     return BoundedReLuTestCommon<armnn::DataType::QAsymmU8>(
-        workloadFactory, memoryManager, 1.0f, -1.0f,
+        workloadFactory, memoryManager, tensorHandleFactory, 1.0f, -1.0f,
         inputScale, inputOffset, inputScale, inputOffset, // Input/output scale & offset same.
         input, output, inputWidth, inputHeight, inputChannels, inputBatchSize);
 }
@@ -243,6 +246,7 @@ struct BoundedReLuRandomInputTestTraits
 boost::multi_array<float, 4> BoundedReLuRandomInputTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float lowerBound,
     float upperBound,
     const armnn::ActivationDescriptor& activationDescriptor)
@@ -257,10 +261,8 @@ boost::multi_array<float, 4> BoundedReLuRandomInputTest(
     // range [lowerBound, upperBound].
     auto input = MakeRandomTensor<float, 4>(inputTensorInfo, 4605828, lowerBound - 5.0f, upperBound * 2.0f);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     // Set up bounded ReLu.
     armnn::ActivationQueueDescriptor descriptor;
@@ -289,6 +291,8 @@ LayerTestResult<float, 4> CompareBoundedReLuTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::ITensorHandleFactory& refTensorHandleFactory,
     float upperBound,
     float lowerBound)
 {
@@ -300,9 +304,9 @@ LayerTestResult<float, 4> CompareBoundedReLuTest(
     activationDescriptor.m_B = lowerBound;
 
     result.output = BoundedReLuRandomInputTest(
-        workloadFactory, memoryManager, 0.0f, upperBound, activationDescriptor);
+        workloadFactory, memoryManager, tensorHandleFactory, 0.0f, upperBound, activationDescriptor);
     result.outputExpected = BoundedReLuRandomInputTest(
-        refWorkloadFactory, nullptr, 0.0f, upperBound, activationDescriptor);
+        refWorkloadFactory, nullptr, refTensorHandleFactory, 0.0f, upperBound, activationDescriptor);
 
     return result;
 }
@@ -311,6 +315,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T,4> ConstantLinearActivationTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 0.0f,
     int32_t qOffset = 0)
 {
@@ -338,10 +343,8 @@ LayerTestResult<T,4> ConstantLinearActivationTestCommon(
     }
 
     LayerTestResult<T, 4> ret(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     // Do linear activation that should leave the tensor unchanged.
     armnn::ActivationQueueDescriptor data;
@@ -372,31 +375,37 @@ LayerTestResult<T,4> ConstantLinearActivationTestCommon(
 
 LayerTestResult<float, 4> ConstantLinearActivationTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return ConstantLinearActivationTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return ConstantLinearActivationTestCommon<armnn::DataType::Float32>(workloadFactory,
+                                                                        memoryManager,
+                                                                        tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> ConstantLinearActivationUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ConstantLinearActivationTestCommon<armnn::DataType::QAsymmU8>(
-        workloadFactory, memoryManager, 4.0f, 3);
+        workloadFactory, memoryManager, tensorHandleFactory, 4.0f, 3);
 }
 
 LayerTestResult<int16_t, 4> ConstantLinearActivationInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ConstantLinearActivationTestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager, 0.1f, 0);
+            workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleActivationTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     armnn::ActivationFunction activationFunction,
     float activationParameterA,
     float activationParameterB,
@@ -434,10 +443,8 @@ LayerTestResult<T, 4> SimpleActivationTest(
 
     auto input = MakeTensor<T, 4>(inputTensorInfo, armnnUtils::QuantizedVector<T>(inputData, scale, offset));
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     // Setup bounded ReLu.
     armnn::ActivationQueueDescriptor descriptor;
@@ -471,6 +478,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleSigmoidTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale,
     int32_t qOffset)
 {
@@ -492,6 +500,7 @@ LayerTestResult<T, 4> SimpleSigmoidTestCommon(
 
     return SimpleActivationTest<ArmnnType>(workloadFactory,
                                            memoryManager,
+                                           tensorHandleFactory,
                                            armnn::ActivationFunction::Sigmoid,
                                            0.f,
                                            0.f,
@@ -505,29 +514,36 @@ LayerTestResult<T, 4> SimpleSigmoidTestCommon(
 
 LayerTestResult<float, 4> SimpleSigmoidTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SimpleSigmoidTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return SimpleSigmoidTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager,
+                                                            tensorHandleFactory, 0.0f, 0);
 }
 
 LayerTestResult<uint8_t, 4> SimpleSigmoidUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SimpleSigmoidTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 0.1f, 50);
+    return SimpleSigmoidTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager,
+                                                              tensorHandleFactory, 0.1f, 50);
 }
 
 LayerTestResult<int16_t, 4> SimpleSigmoidInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SimpleSigmoidTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 0.1f, 0);
+    return SimpleSigmoidTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager,
+                                                              tensorHandleFactory, 0.1f, 0);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> ReLuTestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float qScale,
         int32_t qOffset)
 {
@@ -548,6 +564,7 @@ LayerTestResult<T, 4> ReLuTestCommon(
 
     return SimpleActivationTest<ArmnnType>(workloadFactory,
                                            memoryManager,
+                                           tensorHandleFactory,
                                            armnn::ActivationFunction::ReLu,
                                            0.f,
                                            0.f,
@@ -561,24 +578,27 @@ LayerTestResult<T, 4> ReLuTestCommon(
 
 LayerTestResult<int16_t, 4> ReLuInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return ReLuTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 0.1f, 0);
+    return ReLuTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 
 LayerTestResult<uint8_t, 4> ReLuUint8Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return ReLuTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 0.1f, 0);
+    return ReLuTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 LayerTestResult<float, 4> ReLuTest(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return ReLuTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+    return ReLuTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 
@@ -586,6 +606,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> BoundedReLuTestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float qScale,
         int32_t qOffset)
 {
@@ -607,6 +628,7 @@ LayerTestResult<T, 4> BoundedReLuTestCommon(
 
     return SimpleActivationTest<ArmnnType>(workloadFactory,
                                            memoryManager,
+                                           tensorHandleFactory,
                                            armnn::ActivationFunction::BoundedReLu,
                                            a,
                                            b,
@@ -620,9 +642,10 @@ LayerTestResult<T, 4> BoundedReLuTestCommon(
 
 LayerTestResult<int16_t, 4> BoundedReLuInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return ReLuTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 0.1f, 0);
+    return ReLuTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 
@@ -631,6 +654,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SoftReLuTestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float qScale,
         int32_t qOffset)
 {
@@ -651,6 +675,7 @@ LayerTestResult<T, 4> SoftReLuTestCommon(
 
     return SimpleActivationTest<ArmnnType>(workloadFactory,
                                            memoryManager,
+                                           tensorHandleFactory,
                                            armnn::ActivationFunction::SoftReLu,
                                            0.f,
                                            0.f,
@@ -664,29 +689,34 @@ LayerTestResult<T, 4> SoftReLuTestCommon(
 
 LayerTestResult<float, 4> SoftReLuTest(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SoftReLuTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+    return SoftReLuTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 LayerTestResult<uint8_t, 4> SoftReLuUint8Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SoftReLuTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 0.0625f, 64);
+    return SoftReLuTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager,
+                                                         tensorHandleFactory, 0.0625f, 64);
 }
 
 LayerTestResult<int16_t, 4> SoftReLuInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SoftReLuTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 0.1f, 0);
+    return SoftReLuTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> LeakyReLuTestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float qScale,
         int32_t qOffset)
 {
@@ -708,6 +738,7 @@ LayerTestResult<T, 4> LeakyReLuTestCommon(
 
     return SimpleActivationTest<ArmnnType>(workloadFactory,
                                            memoryManager,
+                                           tensorHandleFactory,
                                            armnn::ActivationFunction::LeakyReLu,
                                            a,
                                            0.f,
@@ -721,29 +752,34 @@ LayerTestResult<T, 4> LeakyReLuTestCommon(
 
 LayerTestResult<float, 4> LeakyReLuTest(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return LeakyReLuTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+    return LeakyReLuTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 LayerTestResult<uint8_t, 4> LeakyReLuUint8Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return LeakyReLuTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 0.0625f, 64);
+    return LeakyReLuTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager,
+                                                          tensorHandleFactory, 0.0625f, 64);
 }
 
 LayerTestResult<int16_t, 4> LeakyReLuInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return LeakyReLuTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 0.1f, 0);
+    return LeakyReLuTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> AbsTestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float qScale,
         int32_t qOffset)
 {
@@ -764,6 +800,7 @@ LayerTestResult<T, 4> AbsTestCommon(
 
     return SimpleActivationTest<ArmnnType>(workloadFactory,
                                            memoryManager,
+                                           tensorHandleFactory,
                                            armnn::ActivationFunction::Abs,
                                            0.f,
                                            0.f,
@@ -777,28 +814,32 @@ LayerTestResult<T, 4> AbsTestCommon(
 
 LayerTestResult<float, 4> AbsTest(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return AbsTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+    return AbsTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 LayerTestResult<uint8_t, 4> AbsUint8Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return AbsTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 0.0625f, 64);
+    return AbsTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, tensorHandleFactory, 0.0625f, 64);
 }
 
 LayerTestResult<int16_t, 4> AbsInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return AbsTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 0.1f, 0);
+    return AbsTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 LayerTestResult<float, 5> SqrtNNTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     IgnoreUnused(memoryManager);
     const int inputDataSize = 120;
@@ -825,10 +866,8 @@ LayerTestResult<float, 5> SqrtNNTest(
 
     auto input = MakeTensor<float, 5>(inputTensorInfo, inputData);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::ActivationQueueDescriptor descriptor;
     armnn::WorkloadInfo workloadInfo;
@@ -858,6 +897,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SqrtTestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float qScale,
         int32_t qOffset)
 {
@@ -878,6 +918,7 @@ LayerTestResult<T, 4> SqrtTestCommon(
 
     return SimpleActivationTest<ArmnnType>(workloadFactory,
                                            memoryManager,
+                                           tensorHandleFactory,
                                            armnn::ActivationFunction::Sqrt,
                                            0.f,
                                            0.f,
@@ -891,29 +932,33 @@ LayerTestResult<T, 4> SqrtTestCommon(
 
 LayerTestResult<float, 4> SqrtTest(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SqrtTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+    return SqrtTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 LayerTestResult<uint8_t, 4> SqrtUint8Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SqrtTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 0.0625f, 64);
+    return SqrtTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, tensorHandleFactory, 0.0625f, 64);
 }
 
 LayerTestResult<int16_t, 4> SqrtInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SqrtTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 0.1f, 0);
+    return SqrtTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SquareTestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float qScale,
         int32_t qOffset)
 {
@@ -934,6 +979,7 @@ LayerTestResult<T, 4> SquareTestCommon(
 
     return SimpleActivationTest<ArmnnType>(workloadFactory,
                                            memoryManager,
+                                           tensorHandleFactory,
                                            armnn::ActivationFunction::Square,
                                            0.f,
                                            0.f,
@@ -947,29 +993,34 @@ LayerTestResult<T, 4> SquareTestCommon(
 
 LayerTestResult<float, 4> SquareTest(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SquareTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+    return SquareTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 LayerTestResult<uint8_t, 4> SquareUint8Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SquareTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 0.0625f, 64);
+    return SquareTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager,
+                                                      tensorHandleFactory, 0.0625f, 64);
 }
 
 LayerTestResult<int16_t, 4> SquareInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SquareTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 0.1f, 0);
+    return SquareTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> TanhTestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float qScale,
         int32_t qOffset)
 {
@@ -992,6 +1043,7 @@ LayerTestResult<T, 4> TanhTestCommon(
 
     return SimpleActivationTest<ArmnnType>(workloadFactory,
                                            memoryManager,
+                                           tensorHandleFactory,
                                            armnn::ActivationFunction::TanH,
                                            a,
                                            b,
@@ -1005,23 +1057,26 @@ LayerTestResult<T, 4> TanhTestCommon(
 
 LayerTestResult<float, 4> TanhTest(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return TanhTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+    return TanhTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 LayerTestResult<uint8_t, 4> TanhUint8Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return TanhTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 0.1f, 64);
+    return TanhTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 64);
 }
 
 LayerTestResult<int16_t, 4> TanhInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return TanhTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 0.1f, 0);
+    return TanhTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 
@@ -1029,6 +1084,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> EluTestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float qScale,
         int32_t qOffset)
 {
@@ -1051,6 +1107,7 @@ LayerTestResult<T, 4> EluTestCommon(
 
     return SimpleActivationTest<ArmnnType>(workloadFactory,
                                            memoryManager,
+                                           tensorHandleFactory,
                                            armnn::ActivationFunction::Elu,
                                            a,
                                            0.0f,
@@ -1064,23 +1121,26 @@ LayerTestResult<T, 4> EluTestCommon(
 
 LayerTestResult<float, 4> EluTest(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return EluTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+    return EluTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 LayerTestResult<uint8_t, 4> EluUint8Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return EluTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 0.1f, 64);
+    return EluTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 64);
 }
 
 LayerTestResult<int16_t, 4> EluInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return EluTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 0.1f, 0);
+    return EluTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 
@@ -1088,6 +1148,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> HardSwishTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale,
     int32_t qOffset)
 {
@@ -1114,6 +1175,7 @@ LayerTestResult<T, 4> HardSwishTestCommon(
 
     return SimpleActivationTest<ArmnnType>(workloadFactory,
                                            memoryManager,
+                                           tensorHandleFactory,
                                            armnn::ActivationFunction::HardSwish,
                                            0.f,
                                            0.f,
@@ -1127,23 +1189,27 @@ LayerTestResult<T, 4> HardSwishTestCommon(
 
 LayerTestResult<float, 4> HardSwishTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return HardSwishTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+    return HardSwishTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 LayerTestResult<uint8_t, 4> HardSwishUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return HardSwishTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 0.1f, 64);
+    return HardSwishTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager,
+                                                          tensorHandleFactory, 0.1f, 64);
 }
 
 LayerTestResult<int16_t, 4> HardSwishInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return HardSwishTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 0.1f, 0);
+    return HardSwishTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
 }
 
 
@@ -1152,6 +1218,8 @@ LayerTestResult<T,4> CompareActivationTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::ITensorHandleFactory& refTensorHandleFactory,
     armnn::ActivationFunction f,
     unsigned int batchSize = 5,
     float qScale = 0.0f,
@@ -1200,13 +1268,11 @@ LayerTestResult<T,4> CompareActivationTestImpl(
     ret.output.resize(boostArrayExtents);
     ret.outputExpected.resize(boostArrayExtents);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandleRef = refWorkloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refWorkloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandleRef = refTensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refTensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::ActivationQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -1247,29 +1313,38 @@ LayerTestResult<float,4> CompareActivationTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::ITensorHandleFactory& refTensorHandleFactory,
     armnn::ActivationFunction f,
     unsigned int batchSize)
 {
     return CompareActivationTestImpl<armnn::DataType::Float32>(
-        workloadFactory, memoryManager, refWorkloadFactory, f, batchSize);
+        workloadFactory, memoryManager, refWorkloadFactory, tensorHandleFactory,
+        refTensorHandleFactory, f, batchSize);
 }
 
 LayerTestResult<uint8_t,4> CompareActivationUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::ITensorHandleFactory& refTensorHandleFactory,
     armnn::ActivationFunction f)
 {
     return CompareActivationTestImpl<armnn::DataType::QAsymmU8>(
-        workloadFactory, memoryManager, refWorkloadFactory, f, 5, 0.1f, 50);
+        workloadFactory, memoryManager, refWorkloadFactory,
+        tensorHandleFactory, refTensorHandleFactory, f, 5, 0.1f, 50);
 }
 
 LayerTestResult<int16_t,4> CompareActivationInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         armnn::IWorkloadFactory& refWorkloadFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
+        const armnn::ITensorHandleFactory& refTensorHandleFactory,
         armnn::ActivationFunction f)
 {
     return CompareActivationTestImpl<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager, refWorkloadFactory, f, 5, 0.1f, 0);
+            workloadFactory, memoryManager, refWorkloadFactory, tensorHandleFactory,
+            refTensorHandleFactory, f, 5, 0.1f, 0);
 }

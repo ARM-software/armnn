@@ -157,3 +157,9 @@ void CompareRefTestFunctionUsingTensorHandleFactory(const char* testName, TFuncP
     { \
         CompareRefTestFunction<FactoryType>(#TestName, &TestFunction, ##__VA_ARGS__); \
     }
+
+#define ARMNN_COMPARE_REF_FIXTURE_TEST_CASE_WITH_THF(TestName, Fixture, TestFunction, ...) \
+    BOOST_FIXTURE_TEST_CASE(TestName, Fixture) \
+    { \
+        CompareRefTestFunctionUsingTensorHandleFactory<FactoryType>(#TestName, &TestFunction, ##__VA_ARGS__); \
+    }

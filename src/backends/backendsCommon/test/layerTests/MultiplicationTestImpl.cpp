@@ -6,6 +6,7 @@
 #include "MultiplicationTestImpl.hpp"
 
 #include "ElementwiseTestImpl.hpp"
+#include <reference/test/RefWorkloadFactoryHelper.hpp>
 
 template<>
 std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::MultiplicationQueueDescriptor>(
@@ -17,7 +18,8 @@ std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::MultiplicationQueueDescr
 }
 
 LayerTestResult<float, 4> MultiplicationTest(armnn::IWorkloadFactory& workloadFactory,
-                                             const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+                                             const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+                                             const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int width        = 2u;
     const unsigned int height       = 2u;
@@ -52,11 +54,13 @@ LayerTestResult<float, 4> MultiplicationTest(armnn::IWorkloadFactory& workloadFa
         shape,
         input1,
         shape,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<float, 5> Multiplication5dTest(armnn::IWorkloadFactory& workloadFactory,
-                                               const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+                                               const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+                                               const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int width        = 3u;
     const unsigned int height       = 2u;
@@ -122,12 +126,14 @@ LayerTestResult<float, 5> Multiplication5dTest(armnn::IWorkloadFactory& workload
         shape,
         input1,
         shape,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> MultiplicationBroadcast1ElementTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int shape0[] = { 1, 2, 2, 2 };
     unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -146,12 +152,14 @@ LayerTestResult<float, 4> MultiplicationBroadcast1ElementTest(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> MultiplicationBroadcast1DVectorTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int shape0[] = { 1, 3, 3, 2 };
     unsigned int shape1[] = { 1, 1, 1, 2 };
@@ -180,12 +188,14 @@ LayerTestResult<float, 4> MultiplicationBroadcast1DVectorTest(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> MultiplicationUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     constexpr unsigned int batchSize = 1u;
     constexpr unsigned int channels  = 2u;
@@ -229,13 +239,15 @@ LayerTestResult<uint8_t, 4> MultiplicationUint8Test(
         -2,
         shape,
         output,
+        tensorHandleFactory,
         1366.255f,
         -5);
 }
 
 LayerTestResult<uint8_t, 4> MultiplicationBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -262,12 +274,14 @@ LayerTestResult<uint8_t, 4> MultiplicationBroadcast1ElementUint8Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> MultiplicationBroadcast1DVectorUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 3 };
@@ -294,12 +308,14 @@ LayerTestResult<uint8_t, 4> MultiplicationBroadcast1DVectorUint8Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> MultiplicationInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape[] = { 1, 2, 2, 3 };
 
@@ -329,12 +345,14 @@ LayerTestResult<int16_t, 4> MultiplicationInt16Test(
         shape,
         input1,
         shape,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> MultiplicationBroadcast1ElementInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -361,12 +379,14 @@ LayerTestResult<int16_t, 4> MultiplicationBroadcast1ElementInt16Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> MultiplicationBroadcast1DVectorInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 3 };
@@ -393,12 +413,14 @@ LayerTestResult<int16_t, 4> MultiplicationBroadcast1DVectorInt16Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int32_t, 4> MultiplicationInt32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape[] = { 1, 2, 2, 3 };
 
@@ -428,12 +450,14 @@ LayerTestResult<int32_t, 4> MultiplicationInt32Test(
         shape,
         input1,
         shape,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int32_t, 4> MultiplicationBroadcast1ElementInt32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -460,12 +484,14 @@ LayerTestResult<int32_t, 4> MultiplicationBroadcast1ElementInt32Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int32_t, 4> MultiplicationBroadcast1DVectorInt32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 3 };
@@ -492,13 +518,16 @@ LayerTestResult<int32_t, 4> MultiplicationBroadcast1DVectorInt32Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<float,4> CompareMultiplicationTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::IWorkloadFactory& refWorkloadFactory)
+    armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::ITensorHandleFactory& refTensorHandleFactory)
 {
     IgnoreUnused(memoryManager);
     const unsigned int width = 16;
@@ -521,15 +550,13 @@ LayerTestResult<float,4> CompareMultiplicationTest(
     auto input0 = MakeRandomTensor<float, 4>(inputTensorInfo0, 803506992);
     auto input1 = MakeRandomTensor<float, 4>(inputTensorInfo1, 54902257);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle0 = workloadFactory.CreateTensorHandle(inputTensorInfo0);
-    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle0 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo0);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo1);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle0Ref = refWorkloadFactory.CreateTensorHandle(inputTensorInfo0);
-    std::unique_ptr<armnn::ITensorHandle> inputHandle1Ref = refWorkloadFactory.CreateTensorHandle(inputTensorInfo1);
-    std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refWorkloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle0Ref = refTensorHandleFactory.CreateTensorHandle(inputTensorInfo0);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1Ref = refTensorHandleFactory.CreateTensorHandle(inputTensorInfo1);
+    std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refTensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::MultiplicationQueueDescriptor data;
     armnn::WorkloadInfo info;

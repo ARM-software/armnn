@@ -18,7 +18,8 @@ std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::DivisionQueueDescriptor>
 
 LayerTestResult<float, 4> DivisionByZeroTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     IgnoreUnused(memoryManager);
     const unsigned int width        = 2u;
@@ -54,12 +55,14 @@ LayerTestResult<float, 4> DivisionByZeroTest(
         shape,
         input1,
         shape,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> DivisionTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int width        = 2u;
     const unsigned int height       = 2u;
@@ -94,12 +97,14 @@ LayerTestResult<float, 4> DivisionTest(
         shape,
         input1,
         shape,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> DivisionBroadcast1ElementTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int shape0[] = { 1, 2, 2, 2 };
     unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -118,12 +123,14 @@ LayerTestResult<float, 4> DivisionBroadcast1ElementTest(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> DivisionBroadcast1DVectorTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int shape0[] = { 1, 3, 3, 2 };
     unsigned int shape1[] = { 1, 1, 1, 2 };
@@ -152,12 +159,14 @@ LayerTestResult<float, 4> DivisionBroadcast1DVectorTest(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> DivisionFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     using namespace half_float::literal;
 
@@ -194,12 +203,14 @@ LayerTestResult<armnn::Half, 4> DivisionFloat16Test(
         shape,
         input1,
         shape,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> DivisionBroadcast1ElementFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     using namespace half_float::literal;
 
@@ -220,12 +231,14 @@ LayerTestResult<armnn::Half, 4> DivisionBroadcast1ElementFloat16Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> DivisionBroadcast1DVectorFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     using namespace half_float::literal;
 
@@ -256,12 +269,14 @@ LayerTestResult<armnn::Half, 4> DivisionBroadcast1DVectorFloat16Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> DivisionUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int width        = 2u;
     const unsigned int height       = 2u;
@@ -297,13 +312,15 @@ LayerTestResult<uint8_t, 4> DivisionUint8Test(
         input1,
         shape,
         output,
+        tensorHandleFactory,
         0.25f,
         0);
 }
 
 LayerTestResult<uint8_t, 4> DivisionBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int shape0[] = { 1, 2, 2, 2 };
     unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -322,12 +339,14 @@ LayerTestResult<uint8_t, 4> DivisionBroadcast1ElementUint8Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> DivisionBroadcast1DVectorUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int shape0[] = { 1, 3, 3, 2 };
     unsigned int shape1[] = { 1, 1, 1, 2 };
@@ -356,12 +375,14 @@ LayerTestResult<uint8_t, 4> DivisionBroadcast1DVectorUint8Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int16_t,4> DivisionInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int shape[] = { 2, 2, 2, 2 };
 
@@ -392,13 +413,15 @@ LayerTestResult<int16_t,4> DivisionInt16Test(
         input1,
         shape,
         output,
+        tensorHandleFactory,
         0.25f,
         0);
 }
 
 LayerTestResult<int16_t, 4> DivisionBroadcast1ElementInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int shape0[] = { 1, 2, 2, 2 };
     unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -417,12 +440,14 @@ LayerTestResult<int16_t, 4> DivisionBroadcast1ElementInt16Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> DivisionBroadcast1DVectorInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int shape0[] = { 1, 3, 3, 2 };
     unsigned int shape1[] = { 1, 1, 1, 2 };
@@ -451,12 +476,14 @@ LayerTestResult<int16_t, 4> DivisionBroadcast1DVectorInt16Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int32_t, 4> DivisionInt32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int width        = 2u;
     const unsigned int height       = 2u;
@@ -493,13 +520,15 @@ LayerTestResult<int32_t, 4> DivisionInt32Test(
         input1,
         shape,
         output,
+        tensorHandleFactory,
         1.f,
         0);
 }
 
 LayerTestResult<int32_t, 4> DivisionBroadcast1ElementInt32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int shape0[] = { 1, 2, 2, 2 };
     unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -518,12 +547,14 @@ LayerTestResult<int32_t, 4> DivisionBroadcast1ElementInt32Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int32_t, 4> DivisionBroadcast1DVectorInt32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int shape0[] = { 1, 3, 3, 2 };
     unsigned int shape1[] = { 1, 1, 1, 2 };
@@ -552,5 +583,6 @@ LayerTestResult<int32_t, 4> DivisionBroadcast1DVectorInt32Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }

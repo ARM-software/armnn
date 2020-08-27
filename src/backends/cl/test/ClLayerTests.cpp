@@ -34,68 +34,68 @@ using FactoryType = ClWorkloadFactory;
 // UNIT tests
 
 // Activation
-ARMNN_AUTO_TEST_CASE(ConstantLinearActivation, ConstantLinearActivationTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ConstantLinearActivation, ConstantLinearActivationTest)
 
 // Sigmoid Activation / Logistic
-ARMNN_AUTO_TEST_CASE(SimpleSigmoid, SimpleSigmoidTest)
-ARMNN_AUTO_TEST_CASE(SimpleSigmoidUint8, SimpleSigmoidUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleSigmoid, SimpleSigmoidTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleSigmoidUint8, SimpleSigmoidUint8Test)
 
 // BoundedReLU Activation
-ARMNN_AUTO_TEST_CASE(ReLu1, BoundedReLuUpperAndLowerBoundTest)
-ARMNN_AUTO_TEST_CASE(ReLu6, BoundedReLuUpperBoundOnlyTest)
-ARMNN_AUTO_TEST_CASE(ReLu1Uint8, BoundedReLuUint8UpperAndLowerBoundTest)
-ARMNN_AUTO_TEST_CASE(ReLu6Uint8, BoundedReLuUint8UpperBoundOnlyTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReLu1, BoundedReLuUpperAndLowerBoundTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReLu6, BoundedReLuUpperBoundOnlyTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReLu1Uint8, BoundedReLuUint8UpperAndLowerBoundTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReLu6Uint8, BoundedReLuUint8UpperBoundOnlyTest)
 
 // ReLU Activation
-ARMNN_AUTO_TEST_CASE(ReLu, ReLuTest)
-ARMNN_AUTO_TEST_CASE(ReLuUint8, ReLuUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReLu, ReLuTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReLuUint8, ReLuUint8Test)
 
 // SoftReLU Activation
-ARMNN_AUTO_TEST_CASE(SoftReLu, SoftReLuTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SoftReLu, SoftReLuTest)
 
 // LeakyReLU Activation
-ARMNN_AUTO_TEST_CASE(LeakyReLu, LeakyReLuTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LeakyReLu, LeakyReLuTest)
 
 // Abs Activation
-ARMNN_AUTO_TEST_CASE(Abs, AbsTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Abs, AbsTest)
 
 // Sqrt Activation
-ARMNN_AUTO_TEST_CASE(Sqrt, SqrtTest)
-ARMNN_AUTO_TEST_CASE(SqrtNN, SqrtNNTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sqrt, SqrtTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SqrtNN, SqrtNNTest)
 
 // Square Activation
-ARMNN_AUTO_TEST_CASE(Square, SquareTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Square, SquareTest)
 
 // Tanh Activation
-ARMNN_AUTO_TEST_CASE(Tanh, TanhTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tanh, TanhTest)
 
 // Elu Activation
-ARMNN_AUTO_TEST_CASE(Elu, EluTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Elu, EluTest)
 
 // Batch To Space
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcFloat321, BatchToSpaceNdNhwcTest1<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcFloat322, BatchToSpaceNdNhwcTest2<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcFloat323, BatchToSpaceNdNhwcTest3<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcFloat321, BatchToSpaceNdNhwcTest1<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcFloat322, BatchToSpaceNdNhwcTest2<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcFloat323, BatchToSpaceNdNhwcTest3<DataType::Float32>)
 
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwFloat321, BatchToSpaceNdNchwTest1<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwFloat322, BatchToSpaceNdNchwTest2<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwFloat323, BatchToSpaceNdNchwTest3<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwFloat321, BatchToSpaceNdNchwTest1<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwFloat322, BatchToSpaceNdNchwTest2<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwFloat323, BatchToSpaceNdNchwTest3<DataType::Float32>)
 
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcInt1, BatchToSpaceNdNhwcTest1<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcInt2, BatchToSpaceNdNhwcTest2<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcInt3, BatchToSpaceNdNhwcTest3<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcInt1, BatchToSpaceNdNhwcTest1<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcInt2, BatchToSpaceNdNhwcTest2<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcInt3, BatchToSpaceNdNhwcTest3<DataType::QAsymmS8>)
 
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwInt1, BatchToSpaceNdNchwTest1<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwInt2, BatchToSpaceNdNchwTest2<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwInt3, BatchToSpaceNdNchwTest3<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwInt1, BatchToSpaceNdNchwTest1<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwInt2, BatchToSpaceNdNchwTest2<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwInt3, BatchToSpaceNdNchwTest3<DataType::QAsymmS8>)
 
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint1, BatchToSpaceNdNhwcTest1<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint2, BatchToSpaceNdNhwcTest2<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint3, BatchToSpaceNdNhwcTest3<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcUint1, BatchToSpaceNdNhwcTest1<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcUint2, BatchToSpaceNdNhwcTest2<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcUint3, BatchToSpaceNdNhwcTest3<DataType::QAsymmU8>)
 
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint1, BatchToSpaceNdNchwTest1<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint2, BatchToSpaceNdNchwTest2<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint3, BatchToSpaceNdNchwTest3<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwUint1, BatchToSpaceNdNchwTest1<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwUint2, BatchToSpaceNdNchwTest2<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwUint3, BatchToSpaceNdNchwTest3<DataType::QAsymmU8>)
 
 // Fully Connected
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFullyConnected, FullyConnectedFloat32Test, false, false)
@@ -301,44 +301,44 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(L2Pooling2dSize9, L2Pooling2dSize9Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(UNSUPPORTED_L2Pooling2dSize9Uint8, L2Pooling2dSize9Uint8Test)
 
 // Add
-ARMNN_AUTO_TEST_CASE(SimpleAdd, AdditionTest)
-ARMNN_AUTO_TEST_CASE(Add5d, Addition5dTest)
-ARMNN_AUTO_TEST_CASE(AddBroadcast1Element, AdditionBroadcast1ElementTest)
-ARMNN_AUTO_TEST_CASE(AddBroadcast, AdditionBroadcastTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleAdd, AdditionTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Add5d, Addition5dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AddBroadcast1Element, AdditionBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AddBroadcast, AdditionBroadcastTest)
 
-ARMNN_AUTO_TEST_CASE(AdditionUint8, AdditionUint8Test)
-ARMNN_AUTO_TEST_CASE(AddBroadcastUint8, AdditionBroadcastUint8Test)
-ARMNN_AUTO_TEST_CASE(AddBroadcast1ElementUint8, AdditionBroadcast1ElementUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AdditionUint8, AdditionUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AddBroadcastUint8, AdditionBroadcastUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AddBroadcast1ElementUint8, AdditionBroadcast1ElementUint8Test)
 
 // Sub
-ARMNN_AUTO_TEST_CASE(SimpleSub, SubtractionTest)
-ARMNN_AUTO_TEST_CASE(SubBroadcast1Element, SubtractionBroadcast1ElementTest)
-ARMNN_AUTO_TEST_CASE(SubBroadcast, SubtractionBroadcastTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleSub, SubtractionTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SubBroadcast1Element, SubtractionBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SubBroadcast, SubtractionBroadcastTest)
 
-ARMNN_AUTO_TEST_CASE(SubtractionUint8, SubtractionUint8Test)
-ARMNN_AUTO_TEST_CASE(SubBroadcastUint8, SubtractionBroadcastUint8Test)
-ARMNN_AUTO_TEST_CASE(SubBroadcast1ElementUint8, SubtractionBroadcast1ElementUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SubtractionUint8, SubtractionUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SubBroadcastUint8, SubtractionBroadcastUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SubBroadcast1ElementUint8, SubtractionBroadcast1ElementUint8Test)
 
 // Div
-ARMNN_AUTO_TEST_CASE(SimpleDivision, DivisionTest)
-ARMNN_AUTO_TEST_CASE(DivisionByZero, DivisionByZeroTest)
-ARMNN_AUTO_TEST_CASE(DivisionBroadcast1Element, DivisionBroadcast1ElementTest)
-ARMNN_AUTO_TEST_CASE(DivisionBroadcast1DVector, DivisionBroadcast1DVectorTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleDivision, DivisionTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(DivisionByZero, DivisionByZeroTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(DivisionBroadcast1Element, DivisionBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(DivisionBroadcast1DVector, DivisionBroadcast1DVectorTest)
 // NOTE: quantized division is not supported by CL and not required by the
 //       android NN api
 
 // Mul
-ARMNN_AUTO_TEST_CASE(SimpleMultiplication, MultiplicationTest)
-ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1Element, MultiplicationBroadcast1ElementTest)
-ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1DVector, MultiplicationBroadcast1DVectorTest)
-ARMNN_AUTO_TEST_CASE(MultiplicationUint8, MultiplicationUint8Test)
-ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1ElementUint8, MultiplicationBroadcast1ElementUint8Test)
-ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1DVectorUint8, MultiplicationBroadcast1DVectorUint8Test)
-ARMNN_AUTO_TEST_CASE(Multiplication5d, Multiplication5dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMultiplication, MultiplicationTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MultiplicationBroadcast1Element, MultiplicationBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MultiplicationBroadcast1DVector, MultiplicationBroadcast1DVectorTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MultiplicationUint8, MultiplicationUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MultiplicationBroadcast1ElementUint8, MultiplicationBroadcast1ElementUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MultiplicationBroadcast1DVectorUint8, MultiplicationBroadcast1DVectorUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Multiplication5d, Multiplication5dTest)
 
 // Batch Norm
-ARMNN_AUTO_TEST_CASE(BatchNormFloat32, BatchNormFloat32Test)
-ARMNN_AUTO_TEST_CASE(BatchNormFloat32Nhwc, BatchNormFloat32NhwcTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchNormFloat32, BatchNormFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchNormFloat32Nhwc, BatchNormFloat32NhwcTest)
 
 // InstanceNormalization
 ARMNN_AUTO_TEST_CASE_WITH_THF(InstanceNormFloat32Nchw, InstanceNormFloat32Test, DataLayout::NCHW);
@@ -542,15 +542,15 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvertFp16ToFp32, SimpleConvertFp16ToFp32Te
 // Convert from Float32 to Float16
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvertFp32ToFp16, SimpleConvertFp32ToFp16Test)
 
-ARMNN_AUTO_TEST_CASE(AdditionAfterMaxPool, AdditionAfterMaxPoolTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AdditionAfterMaxPool, AdditionAfterMaxPoolTest)
 
 //Max
-ARMNN_AUTO_TEST_CASE(MaximumSimple, MaximumSimpleTest)
-ARMNN_AUTO_TEST_CASE(MaximumBroadcast1Element, MaximumBroadcast1ElementTest)
-ARMNN_AUTO_TEST_CASE(MaximumBroadcast1DVector, MaximumBroadcast1DVectorTest)
-ARMNN_AUTO_TEST_CASE(MaximumUint8, MaximumUint8Test)
-ARMNN_AUTO_TEST_CASE(MaximumBroadcast1ElementUint8, MaximumBroadcast1ElementUint8Test)
-ARMNN_AUTO_TEST_CASE(MaximumBroadcast1DVectorUint8, MaximumBroadcast1DVectorUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MaximumSimple, MaximumSimpleTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MaximumBroadcast1Element, MaximumBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MaximumBroadcast1DVector, MaximumBroadcast1DVectorTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MaximumUint8, MaximumUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MaximumBroadcast1ElementUint8, MaximumBroadcast1ElementUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MaximumBroadcast1DVectorUint8, MaximumBroadcast1DVectorUint8Test)
 
 // Mean
 ARMNN_AUTO_TEST_CASE_WITH_THF(MeanSimpleFloat32, MeanSimpleTest<DataType::Float32>)
@@ -578,9 +578,9 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(MeanVts2QuantisedAsymm8, MeanVts2Test<DataType::QA
 ARMNN_AUTO_TEST_CASE_WITH_THF(MeanVts3QuantisedAsymm8, MeanVts3Test<DataType::QAsymmU8>)
 
 // Minimum
-ARMNN_AUTO_TEST_CASE(MinimumBroadcast1Element1, MinimumBroadcast1ElementTest1)
-ARMNN_AUTO_TEST_CASE(MinimumBroadcast1Element2, MinimumBroadcast1ElementTest2)
-ARMNN_AUTO_TEST_CASE(MinimumBroadcast1DVectorUint8, MinimumBroadcast1DVectorUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MinimumBroadcast1Element1, MinimumBroadcast1ElementTest1)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MinimumBroadcast1Element2, MinimumBroadcast1ElementTest2)
+ARMNN_AUTO_TEST_CASE_WITH_THF(MinimumBroadcast1DVectorUint8, MinimumBroadcast1DVectorUint8Test)
 
 // Equal
 ARMNN_AUTO_TEST_CASE_WITH_THF(EqualSimple,            EqualSimpleTest)
@@ -1031,10 +1031,10 @@ ARMNN_AUTO_TEST_CASE(AlignCornersResizeNearestNeighbourUint8Nhwc,
                      DataLayout::NHWC)
 
 // Rsqrt
-ARMNN_AUTO_TEST_CASE(Rsqrt2d, Rsqrt2dTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(Rsqrt3d, Rsqrt3dTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(RsqrtZero, RsqrtZeroTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(RsqrtNegative, RsqrtNegativeTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Rsqrt2d, Rsqrt2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Rsqrt3d, Rsqrt3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(RsqrtZero, RsqrtZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(RsqrtNegative, RsqrtNegativeTest<DataType::Float32>)
 
 // Quantize
 ARMNN_AUTO_TEST_CASE(QuantizeSimpleUint8, QuantizeSimpleUint8Test)
@@ -1182,15 +1182,15 @@ ARMNN_AUTO_TEST_CASE(MultiChannelTransposeConvolution2dUint8Nhwc,
                      DataLayout::NHWC)
 
 // Abs
-ARMNN_AUTO_TEST_CASE(Abs2d, Abs2dTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(Abs3d, Abs3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Abs2d, Abs2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Abs3d, Abs3dTest<DataType::Float32>)
 
-ARMNN_AUTO_TEST_CASE(AbsZero, AbsZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AbsZero, AbsZeroTest<DataType::Float32>)
 
-ARMNN_AUTO_TEST_CASE(Abs2dFloat16, Abs2dTest<DataType::Float16>)
-ARMNN_AUTO_TEST_CASE(Abs3dFloat16, Abs3dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Abs2dFloat16, Abs2dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Abs3dFloat16, Abs3dTest<DataType::Float16>)
 
-ARMNN_AUTO_TEST_CASE(AbsZeroFloat16, AbsZeroTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AbsZeroFloat16, AbsZeroTest<DataType::Float16>)
 
 // ArgMinMax
 ARMNN_AUTO_TEST_CASE_WITH_THF(ArgMinFloat32, ArgMinSimpleTest<DataType::Float32>)
@@ -1208,20 +1208,20 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(ArgMaxHeightQAsymm8, ArgMaxHeightTest<DataType::QA
 ARMNN_AUTO_TEST_CASE_WITH_THF(ArgMinWidthQAsymm8, ArgMinWidthTest<DataType::QAsymmU8>)
 
 // Neg
-ARMNN_AUTO_TEST_CASE(Neg2d, Neg2dTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(Neg3d, Neg3dTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(NegZero, NegZeroTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(NegNegative, NegNegativeTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(Neg2dFloat16, Neg2dTest<DataType::Float16>)
-ARMNN_AUTO_TEST_CASE(Neg3dFloat16, Neg3dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Neg2d, Neg2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Neg3d, Neg3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(NegZero, NegZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(NegNegative, NegNegativeTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Neg2dFloat16, Neg2dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Neg3dFloat16, Neg3dTest<DataType::Float16>)
 
 // Exp
-ARMNN_AUTO_TEST_CASE(Exp2d, Exp2dTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(Exo3d, Exp3dTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(ExpZero, ExpZeroTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(ExpNegative, ExpNegativeTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(Exp2dFloat16, Exp2dTest<DataType::Float16>)
-ARMNN_AUTO_TEST_CASE(Exp3dFloat16, Exp3dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Exp2d, Exp2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Exo3d, Exp3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ExpZero, ExpZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ExpNegative, ExpNegativeTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Exp2dFloat16, Exp2dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Exp3dFloat16, Exp3dTest<DataType::Float16>)
 
 #if defined(ARMNNREF_ENABLED)
 
@@ -1267,51 +1267,51 @@ ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareAveragePooling2dWithRefUint8, C
 
 ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareL2Pooling2dWithRef, ComparePooling2dTest, PoolingAlgorithm::L2)
 
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareAddition, CompareAdditionTest)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareAddition, CompareAdditionTest)
 
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareMultiplicationWithRef, CompareMultiplicationTest)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareMultiplicationWithRef, CompareMultiplicationTest)
 
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareBatchNorm, CompareBatchNormTest)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareBatchNorm, CompareBatchNormTest)
 
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareReLu1, CompareBoundedReLuTest, 1.0f, -1.0f)
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareReLu6, CompareBoundedReLuTest, 6.0f, 0.0f)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareReLu1, CompareBoundedReLuTest, 1.0f, -1.0f)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareReLu6, CompareBoundedReLuTest, 6.0f, 0.0f)
 
 // ============================================================================
 // FIXTURE tests
 
-ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareSigmoidActivationWithReference, ActivationFixture,
+ARMNN_COMPARE_REF_FIXTURE_TEST_CASE_WITH_THF(CompareSigmoidActivationWithReference, ActivationFixture,
                                     CompareActivationTest, ActivationFunction::Sigmoid, 5u)
 
-ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareTanhActivationWithReference, ActivationFixture,
+ARMNN_COMPARE_REF_FIXTURE_TEST_CASE_WITH_THF(CompareTanhActivationWithReference, ActivationFixture,
                                     CompareActivationTest, ActivationFunction::TanH, 5u)
 
-ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareLinearActivationWithReference, ActivationFixture,
+ARMNN_COMPARE_REF_FIXTURE_TEST_CASE_WITH_THF(CompareLinearActivationWithReference, ActivationFixture,
                                     CompareActivationTest, ActivationFunction::Linear, 5u)
 
-ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareReLuActivationWithReference, ActivationFixture,
+ARMNN_COMPARE_REF_FIXTURE_TEST_CASE_WITH_THF(CompareReLuActivationWithReference, ActivationFixture,
                                     CompareActivationTest, ActivationFunction::ReLu, 5u)
 
-ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareBoundedReLuActivationWithReference, ActivationFixture,
+ARMNN_COMPARE_REF_FIXTURE_TEST_CASE_WITH_THF(CompareBoundedReLuActivationWithReference, ActivationFixture,
                                     CompareActivationTest, ActivationFunction::BoundedReLu, 5u)
-ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareBoundedReLuActivationWithReferenceUint8, ActivationFixture,
+ARMNN_COMPARE_REF_FIXTURE_TEST_CASE_WITH_THF(CompareBoundedReLuActivationWithReferenceUint8, ActivationFixture,
                                     CompareActivationUint8Test, ActivationFunction::BoundedReLu)
 
-ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareSoftReLuActivationWithReference, ActivationFixture,
+ARMNN_COMPARE_REF_FIXTURE_TEST_CASE_WITH_THF(CompareSoftReLuActivationWithReference, ActivationFixture,
                                     CompareActivationTest, ActivationFunction::SoftReLu, 5u)
 
-ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareLeakyReLuActivationWithReference, ActivationFixture,
+ARMNN_COMPARE_REF_FIXTURE_TEST_CASE_WITH_THF(CompareLeakyReLuActivationWithReference, ActivationFixture,
                                     CompareActivationTest, ActivationFunction::LeakyReLu, 5u)
 
-ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareAbsActivationWithReference, ActivationFixture,
+ARMNN_COMPARE_REF_FIXTURE_TEST_CASE_WITH_THF(CompareAbsActivationWithReference, ActivationFixture,
                                     CompareActivationTest, ActivationFunction::Abs, 5u)
 
-ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareSqrtActivationWithReference, PositiveActivationFixture,
+ARMNN_COMPARE_REF_FIXTURE_TEST_CASE_WITH_THF(CompareSqrtActivationWithReference, PositiveActivationFixture,
                                     CompareActivationTest, ActivationFunction::Sqrt, 5u)
 
-ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareSquareActivationWithReference, ActivationFixture,
+ARMNN_COMPARE_REF_FIXTURE_TEST_CASE_WITH_THF(CompareSquareActivationWithReference, ActivationFixture,
                                     CompareActivationTest, ActivationFunction::Square, 5u)
 
-ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareEluActivationWithReference, ActivationFixture,
+ARMNN_COMPARE_REF_FIXTURE_TEST_CASE_WITH_THF(CompareEluActivationWithReference, ActivationFixture,
                                     CompareActivationTest, ActivationFunction::Elu, 5u)
 
 #endif

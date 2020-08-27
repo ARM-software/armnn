@@ -8,6 +8,7 @@
 #include "ElementwiseTestImpl.hpp"
 
 #include <QuantizeHelper.hpp>
+#include <reference/test/RefWorkloadFactoryHelper.hpp>
 
 template<>
 std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::AdditionQueueDescriptor>(
@@ -20,7 +21,8 @@ std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::AdditionQueueDescriptor>
 
 LayerTestResult<float,4> AdditionTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int batchSize = 2u;
     unsigned int channels  = 2u;
@@ -83,12 +85,14 @@ LayerTestResult<float,4> AdditionTest(
         shape,
         input2,
         shape,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<float, 5> Addition5dTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int depth     = 2u;
     unsigned int batchSize = 2u;
@@ -155,7 +159,8 @@ LayerTestResult<float, 5> Addition5dTest(
         shape,
         input2,
         shape,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -163,7 +168,8 @@ LayerTestResult<T, 4> AdditionBroadcastTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
-    int32_t qOffset)
+    int32_t qOffset,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     IgnoreUnused(memoryManager);
     armnn::TensorInfo inputTensorInfo1 = armnn::TensorInfo({1, 3, 2, 1}, ArmnnType);
@@ -214,11 +220,9 @@ LayerTestResult<T, 4> AdditionBroadcastTestImpl(
     },
     qScale, qOffset));
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
-    std::unique_ptr<armnn::ITensorHandle> inputHandle2 = workloadFactory.CreateTensorHandle(inputTensorInfo2);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo1);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle2 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo2);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::AdditionQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -248,7 +252,8 @@ LayerTestResult<T, 4> AdditionBroadcast1ElementTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
-    int32_t qOffset)
+    int32_t qOffset,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     IgnoreUnused(memoryManager);
     armnn::TensorInfo inputTensorInfo1 = armnn::TensorInfo({1, 3, 2, 3}, ArmnnType);
@@ -294,11 +299,9 @@ LayerTestResult<T, 4> AdditionBroadcast1ElementTestImpl(
     },
     qScale, qOffset));
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
-    std::unique_ptr<armnn::ITensorHandle> inputHandle2 = workloadFactory.CreateTensorHandle(inputTensorInfo2);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo1);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle2 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo2);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::AdditionQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -325,71 +328,80 @@ LayerTestResult<T, 4> AdditionBroadcast1ElementTestImpl(
 
 LayerTestResult<float, 4> AdditionBroadcastTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return AdditionBroadcastTestImpl<armnn::DataType::Float32>(
-        workloadFactory, memoryManager, 0.0f, 0);
+        workloadFactory, memoryManager, 0.0f, 0, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> AdditionBroadcastUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return AdditionBroadcastTestImpl<armnn::DataType::QAsymmU8>(
-        workloadFactory, memoryManager, 2.f, 0);
+        workloadFactory, memoryManager, 2.f, 0, tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> AdditionBroadcastInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return AdditionBroadcastTestImpl<armnn::DataType::QSymmS16>(
-        workloadFactory, memoryManager, 2.f, 0);
+        workloadFactory, memoryManager, 2.f, 0, tensorHandleFactory);
 }
 
 LayerTestResult<int32_t, 4> AdditionBroadcastInt32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return AdditionBroadcastTestImpl<armnn::DataType::Signed32>(
-            workloadFactory, memoryManager, 1.f, 0);
+            workloadFactory, memoryManager, 1.f, 0, tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> AdditionBroadcast1ElementTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return AdditionBroadcast1ElementTestImpl<armnn::DataType::Float32>(
-        workloadFactory, memoryManager, 0.0f, 0);
+        workloadFactory, memoryManager, 0.0f, 0, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> AdditionBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return AdditionBroadcast1ElementTestImpl<armnn::DataType::QAsymmU8>(
-        workloadFactory, memoryManager, 0.1333333f, 128);
+        workloadFactory, memoryManager, 0.1333333f, 128, tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> AdditionBroadcast1ElementInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return AdditionBroadcast1ElementTestImpl<armnn::DataType::QSymmS16>(
-        workloadFactory, memoryManager, 0.1333333f, 0);
+        workloadFactory, memoryManager, 0.1333333f, 0, tensorHandleFactory);
 }
 
 LayerTestResult<int32_t, 4> AdditionBroadcast1ElementInt32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return AdditionBroadcast1ElementTestImpl<armnn::DataType::Signed32>(
-            workloadFactory, memoryManager, 1.f, 0);
+            workloadFactory, memoryManager, 1.f, 0, tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> AdditionUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 2, 2, 3 };
@@ -425,13 +437,15 @@ LayerTestResult<uint8_t, 4> AdditionUint8Test(
         3,
         shape0,
         output,
+        tensorHandleFactory,
         7.0f,
         3);
 }
 
 LayerTestResult<int16_t, 4> AdditionInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 2, 2, 3 };
@@ -467,13 +481,15 @@ LayerTestResult<int16_t, 4> AdditionInt16Test(
         0,
         shape0,
         output,
+        tensorHandleFactory,
         7.0f,
         0);
 }
 
 LayerTestResult<int32_t, 4> AdditionInt32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 2, 2, 3 };
@@ -509,13 +525,15 @@ LayerTestResult<int32_t, 4> AdditionInt32Test(
         0,
         shape0,
         output,
+        tensorHandleFactory,
         1.0f,
         0);
 }
 
 LayerTestResult<float, 4> AdditionAfterMaxPoolTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     IgnoreUnused(memoryManager);
 
@@ -532,12 +550,10 @@ LayerTestResult<float, 4> AdditionAfterMaxPoolTest(
                                                              4, 5, 6,
                                                              7, 8, 9
                                                             });
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> poolingInputHandle =
-            workloadFactory.CreateTensorHandle(poolingInputTensorInfo);
+            tensorHandleFactory.CreateTensorHandle(poolingInputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> poolingOutputHandle =
-            workloadFactory.CreateTensorHandle(poolingOutputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+            tensorHandleFactory.CreateTensorHandle(poolingOutputTensorInfo);
 
     // Apply MaxPool poolSize = 1x1, stride=2x2
     // Result =
@@ -587,10 +603,9 @@ LayerTestResult<float, 4> AdditionAfterMaxPoolTest(
         31, 37
     }));
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> addInputHandle = workloadFactory.CreateTensorHandle(addInputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> addOutputHandle = workloadFactory.CreateTensorHandle(addOutputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> addInputHandle = tensorHandleFactory.CreateTensorHandle(addInputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> addOutputHandle =
+        tensorHandleFactory.CreateTensorHandle(addOutputTensorInfo);
 
     armnn::AdditionQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -626,7 +641,9 @@ LayerTestResult<float, 4> AdditionAfterMaxPoolTest(
 LayerTestResult<float,4> CompareAdditionTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::IWorkloadFactory& refWorkloadFactory)
+    armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::ITensorHandleFactory& refTensorHandleFactory)
 {
     IgnoreUnused(memoryManager);
     unsigned int batchSize = 4;
@@ -648,15 +665,13 @@ LayerTestResult<float,4> CompareAdditionTest(
 
     LayerTestResult<float,4> ret(outputTensorInfo);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
-    std::unique_ptr<armnn::ITensorHandle> inputHandle2 = workloadFactory.CreateTensorHandle(inputTensorInfo2);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo1);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle2 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo2);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle1Ref = refWorkloadFactory.CreateTensorHandle(inputTensorInfo1);
-    std::unique_ptr<armnn::ITensorHandle> inputHandle2Ref = refWorkloadFactory.CreateTensorHandle(inputTensorInfo2);
-    std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refWorkloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1Ref = refTensorHandleFactory.CreateTensorHandle(inputTensorInfo1);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle2Ref = refTensorHandleFactory.CreateTensorHandle(inputTensorInfo2);
+    std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refTensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::AdditionQueueDescriptor data;
     armnn::WorkloadInfo info;

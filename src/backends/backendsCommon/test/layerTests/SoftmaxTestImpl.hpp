@@ -11,7 +11,6 @@
 
 #include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-#include <backendsCommon/test/WorkloadFactoryHelper.hpp>
 
 LayerTestResult<float, 2> SimpleSoftmaxTest(
     armnn::IWorkloadFactory& workloadFactory,

@@ -18,7 +18,8 @@ std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::SubtractionQueueDescript
 
 LayerTestResult<uint8_t, 4> SubtractionUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 2, 2 };
@@ -40,13 +41,15 @@ LayerTestResult<uint8_t, 4> SubtractionUint8Test(
         0,
         shape0,
         output,
+        tensorHandleFactory,
         1.0f,
         0);
 }
 
 LayerTestResult<uint8_t, 4> SubtractionBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -70,13 +73,15 @@ LayerTestResult<uint8_t, 4> SubtractionBroadcast1ElementUint8Test(
         0,
         shape0,
         output,
+        tensorHandleFactory,
         1.0f,
         3);
 }
 
 LayerTestResult<uint8_t, 4> SubtractionBroadcastUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 2, 1 };
@@ -95,12 +100,14 @@ LayerTestResult<uint8_t, 4> SubtractionBroadcastUint8Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> SubtractionTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 2, 2 };
@@ -117,12 +124,14 @@ LayerTestResult<float, 4> SubtractionTest(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> SubtractionBroadcast1ElementTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -141,12 +150,14 @@ LayerTestResult<float, 4> SubtractionBroadcast1ElementTest(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> SubtractionBroadcastTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 1, 2 };
@@ -165,12 +176,14 @@ LayerTestResult<float, 4> SubtractionBroadcastTest(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> SubtractionFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     using namespace half_float::literal;
 
@@ -189,12 +202,14 @@ LayerTestResult<armnn::Half, 4> SubtractionFloat16Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> SubtractionBroadcast1ElementFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     using namespace half_float::literal;
 
@@ -215,12 +230,14 @@ LayerTestResult<armnn::Half, 4> SubtractionBroadcast1ElementFloat16Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> SubtractionBroadcastFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     using namespace half_float::literal;
 
@@ -241,12 +258,14 @@ LayerTestResult<armnn::Half, 4> SubtractionBroadcastFloat16Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> SubtractionInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape[] = { 1, 1, 2, 2 };
 
@@ -267,13 +286,15 @@ LayerTestResult<int16_t, 4> SubtractionInt16Test(
         0,
         shape,
         output,
+        tensorHandleFactory,
         1.0f,
         0);
 }
 
 LayerTestResult<int16_t, 4> SubtractionBroadcast1ElementInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -297,13 +318,15 @@ LayerTestResult<int16_t, 4> SubtractionBroadcast1ElementInt16Test(
         0,
         shape0,
         output,
+        tensorHandleFactory,
         1.0f,
         0);
 }
 
 LayerTestResult<int16_t, 4> SubtractionBroadcastInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 2, 1 };
@@ -322,12 +345,14 @@ LayerTestResult<int16_t, 4> SubtractionBroadcastInt16Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int32_t, 4> SubtractionInt32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape[] = { 1, 1, 2, 2 };
 
@@ -348,13 +373,15 @@ LayerTestResult<int32_t, 4> SubtractionInt32Test(
         0,
         shape,
         output,
+        tensorHandleFactory,
         1.0f,
         0);
 }
 
 LayerTestResult<int32_t, 4> SubtractionBroadcast1ElementInt32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -378,13 +405,15 @@ LayerTestResult<int32_t, 4> SubtractionBroadcast1ElementInt32Test(
         0,
         shape0,
         output,
+        tensorHandleFactory,
         1.0f,
         0);
 }
 
 LayerTestResult<int32_t, 4> SubtractionBroadcastInt32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 2, 1 };
@@ -403,5 +432,6 @@ LayerTestResult<int32_t, 4> SubtractionBroadcastInt32Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }

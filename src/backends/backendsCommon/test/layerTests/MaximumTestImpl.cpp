@@ -16,8 +16,10 @@ std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::MaximumQueueDescriptor>(
     return workloadFactory.CreateMaximum(descriptor, info);
 }
 
-LayerTestResult<float, 4> MaximumSimpleTest(armnn::IWorkloadFactory& workloadFactory,
-                                           const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+LayerTestResult<float, 4> MaximumSimpleTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     IgnoreUnused(memoryManager);
     const unsigned int width        = 2u;
@@ -53,12 +55,14 @@ LayerTestResult<float, 4> MaximumSimpleTest(armnn::IWorkloadFactory& workloadFac
         shape,
         input1,
         shape,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> MaximumBroadcast1ElementTest(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int shape0[] = { 1, 2, 2, 2 };
     unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -77,12 +81,14 @@ LayerTestResult<float, 4> MaximumBroadcast1ElementTest(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> MaximumBroadcast1DVectorTest(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 3 };
@@ -109,11 +115,14 @@ LayerTestResult<float, 4> MaximumBroadcast1DVectorTest(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
-LayerTestResult<armnn::Half, 4> MaximumFloat16Test(armnn::IWorkloadFactory& workloadFactory,
-                                           const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+LayerTestResult<armnn::Half, 4> MaximumFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     using namespace half_float::literal;
 
@@ -150,15 +159,17 @@ LayerTestResult<armnn::Half, 4> MaximumFloat16Test(armnn::IWorkloadFactory& work
         shape,
         input1,
         shape,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> MaximumBroadcast1ElementFloat16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     using namespace half_float::literal;
-    
+
     unsigned int shape0[] = { 1, 2, 2, 2 };
     unsigned int shape1[] = { 1, 1, 1, 1 };
 
@@ -176,15 +187,17 @@ LayerTestResult<armnn::Half, 4> MaximumBroadcast1ElementFloat16Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> MaximumBroadcast1DVectorFloat16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     using namespace half_float::literal;
-    
+
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 3 };
 
@@ -210,12 +223,14 @@ LayerTestResult<armnn::Half, 4> MaximumBroadcast1DVectorFloat16Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> MaximumUint8Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int shape[] = { 2, 2, 2, 2 };
 
@@ -246,12 +261,14 @@ LayerTestResult<uint8_t, 4> MaximumUint8Test(
         shape,
         input1,
         shape,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> MaximumBroadcast1ElementUint8Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -278,12 +295,14 @@ LayerTestResult<uint8_t, 4> MaximumBroadcast1ElementUint8Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<uint8_t, 4> MaximumBroadcast1DVectorUint8Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 3 };
@@ -309,12 +328,14 @@ LayerTestResult<uint8_t, 4> MaximumBroadcast1DVectorUint8Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> MaximumInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int shape[] = { 2, 2, 2, 2 };
 
@@ -335,12 +356,14 @@ LayerTestResult<int16_t, 4> MaximumInt16Test(
         shape,
         input1,
         shape,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> MaximumBroadcast1ElementInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -367,12 +390,14 @@ LayerTestResult<int16_t, 4> MaximumBroadcast1ElementInt16Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int16_t, 4> MaximumBroadcast1DVectorInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 3 };
@@ -399,12 +424,14 @@ LayerTestResult<int16_t, 4> MaximumBroadcast1DVectorInt16Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int32_t, 4> MaximumInt32Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     unsigned int shape[] = { 2, 2, 2, 2 };
 
@@ -425,12 +452,14 @@ LayerTestResult<int32_t, 4> MaximumInt32Test(
             shape,
             input1,
             shape,
-            output);
+            output,
+            tensorHandleFactory);
 }
 
 LayerTestResult<int32_t, 4> MaximumBroadcast1ElementInt32Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -457,12 +486,14 @@ LayerTestResult<int32_t, 4> MaximumBroadcast1ElementInt32Test(
         shape1,
         input1,
         shape0,
-        output);
+        output,
+        tensorHandleFactory);
 }
 
 LayerTestResult<int32_t, 4> MaximumBroadcast1DVectorInt32Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 3 };
@@ -489,5 +520,6 @@ LayerTestResult<int32_t, 4> MaximumBroadcast1DVectorInt32Test(
             shape1,
             input1,
             shape0,
-            output);
+            output,
+            tensorHandleFactory);
 }

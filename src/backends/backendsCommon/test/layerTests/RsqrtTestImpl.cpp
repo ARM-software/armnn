@@ -10,7 +10,8 @@
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 2> Rsqrt2dTest(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int inputShape[] = { 2, 2 };
 
@@ -33,13 +34,15 @@ LayerTestResult<T, 2> Rsqrt2dTest(
         inputShape,
         inputValues,
         inputShape,
-        expectedOutputValues);
+        expectedOutputValues,
+        tensorHandleFactory);
 }
 
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 3> Rsqrt3dTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int inputShape[] = { 3, 1, 2 };
 
@@ -62,13 +65,15 @@ LayerTestResult<T, 3> Rsqrt3dTest(
         inputShape,
         inputValues,
         inputShape,
-        expectedOutputValues);
+        expectedOutputValues,
+        tensorHandleFactory);
 }
 
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 2> RsqrtZeroTest(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int inputShape[] = { 1, 2 };
 
@@ -89,13 +94,15 @@ LayerTestResult<T, 2> RsqrtZeroTest(
         inputShape,
         inputValues,
         inputShape,
-        expectedOutputValues);
+        expectedOutputValues,
+        tensorHandleFactory);
 }
 
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 2> RsqrtNegativeTest(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     const unsigned int inputShape[] = { 1, 2 };
 
@@ -116,7 +123,8 @@ LayerTestResult<T, 2> RsqrtNegativeTest(
         inputShape,
         inputValues,
         inputShape,
-        expectedOutputValues);
+        expectedOutputValues,
+        tensorHandleFactory);
 }
 
 //
@@ -126,59 +134,71 @@ LayerTestResult<T, 2> RsqrtNegativeTest(
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 2>
 Rsqrt2dTest<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 2>
 Rsqrt2dTest<armnn::DataType::Float16>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 2>
 Rsqrt2dTest<armnn::DataType::QAsymmS8>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 2>
 Rsqrt2dTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 2>
 Rsqrt2dTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 3>
 Rsqrt3dTest<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 3>
 Rsqrt3dTest<armnn::DataType::Float16>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 3>
 Rsqrt3dTest<armnn::DataType::QAsymmS8>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 3>
 Rsqrt3dTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 3>
 Rsqrt3dTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 2>
 RsqrtZeroTest<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 2>
 RsqrtNegativeTest<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);

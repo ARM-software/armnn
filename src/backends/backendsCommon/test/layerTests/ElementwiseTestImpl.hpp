@@ -51,6 +51,7 @@ LayerTestResult<TOutput, NumDims> ElementwiseTestHelper(
     int quantOffset1,
     const unsigned int outShape[NumDims],
     std::vector<TOutput> outValues,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float outQuantScale,
     int outQuantOffset)
 {
@@ -77,11 +78,9 @@ LayerTestResult<TOutput, NumDims> ElementwiseTestHelper(
         ret.compareBoolean = true;
     }
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle0 = workloadFactory.CreateTensorHandle(inputTensorInfo0);
-    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle0 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo0);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo1);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     Descriptor data;
     armnn::WorkloadInfo info;
@@ -123,6 +122,7 @@ LayerTestResult<T, NumDims> ElementwiseTestHelper(
     int quantOffset1,
     const unsigned int outShape[NumDims],
     std::vector<T> outValues,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float outQuantScale,
     int outQuantOffset)
 {
@@ -139,6 +139,7 @@ LayerTestResult<T, NumDims> ElementwiseTestHelper(
         quantOffset1,
         outShape,
         outValues,
+        tensorHandleFactory,
         outQuantScale,
         outQuantOffset);
 }
@@ -158,6 +159,7 @@ LayerTestResult<TOutput, NumDims> ElementwiseTestHelper(
     std::vector<TInput> values1,
     const unsigned int outShape[NumDims],
     std::vector<TOutput> outValues,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float quantScale = 1.0f,
     int quantOffset = 0)
 {
@@ -174,6 +176,7 @@ LayerTestResult<TOutput, NumDims> ElementwiseTestHelper(
         quantOffset,
         outShape,
         outValues,
+        tensorHandleFactory,
         quantScale,
         quantOffset);
 }
@@ -191,6 +194,7 @@ LayerTestResult<T, NumDims> ElementwiseTestHelper(
     std::vector<T> values1,
     const unsigned int outShape[NumDims],
     std::vector<T> outValues,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float quantScale = 1.0f,
     int quantOffset = 0)
 {
@@ -203,6 +207,7 @@ LayerTestResult<T, NumDims> ElementwiseTestHelper(
         values1,
         outShape,
         outValues,
+        tensorHandleFactory,
         quantScale,
         quantOffset);
 }

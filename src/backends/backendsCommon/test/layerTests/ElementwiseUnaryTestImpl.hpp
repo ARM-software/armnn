@@ -42,6 +42,7 @@ LayerTestResult<T, NumDims> ElementwiseUnaryTestHelper(
     int quantOffset,
     const unsigned int outShape[NumDims],
     std::vector<float> outValues,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float outQuantScale,
     int outQuantOffset)
 {
@@ -58,10 +59,8 @@ LayerTestResult<T, NumDims> ElementwiseUnaryTestHelper(
 
     LayerTestResult<T, NumDims> ret(outputTensorInfo);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::ElementwiseUnaryDescriptor desc(op);
     armnn::ElementwiseUnaryQueueDescriptor qDesc;
@@ -97,6 +96,7 @@ LayerTestResult<T, NumDims> ElementwiseUnaryTestHelper(
     std::vector<float> values,
     const unsigned int outShape[NumDims],
     std::vector<float> outValues,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float quantScale = 1.0f,
     int quantOffset = 0)
 {
@@ -110,6 +110,7 @@ LayerTestResult<T, NumDims> ElementwiseUnaryTestHelper(
         quantOffset,
         outShape,
         outValues,
+        tensorHandleFactory,
         quantScale,
         quantOffset);
 }

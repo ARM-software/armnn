@@ -7,6 +7,8 @@
 #include <armnn/Logging.hpp>
 #include <armnn/Utils.hpp>
 #include <reference/RefWorkloadFactory.hpp>
+#include <reference/test/RefWorkloadFactoryHelper.hpp>
+
 #include <backendsCommon/test/LayerTests.hpp>
 #include <backendsCommon/test/WorkloadFactoryHelper.hpp>
 #include "TensorHelpers.hpp"
@@ -122,10 +124,32 @@ void CompareRefTestFunction(const char* testName, TFuncPtr testFunction, Args...
     CompareTestResultIfSupported(testName, testResult);
 }
 
+template<typename FactoryType, typename TFuncPtr, typename... Args>
+void CompareRefTestFunctionUsingTensorHandleFactory(const char* testName, TFuncPtr testFunction, Args... args)
+{
+    auto memoryManager = WorkloadFactoryHelper<FactoryType>::GetMemoryManager();
+    FactoryType workloadFactory = WorkloadFactoryHelper<FactoryType>::GetFactory(memoryManager);
+
+    armnn::RefWorkloadFactory refWorkloadFactory;
+    auto tensorHandleFactory = WorkloadFactoryHelper<FactoryType>::GetTensorHandleFactory(memoryManager);
+    auto refTensorHandleFactory =
+        RefWorkloadFactoryHelper::GetTensorHandleFactory(memoryManager);
+
+    auto testResult = (*testFunction)(
+        workloadFactory, memoryManager, refWorkloadFactory, &tensorHandleFactory, &refTensorHandleFactory, args...);
+    CompareTestResultIfSupported(testName, testResult);
+}
+
 #define ARMNN_COMPARE_REF_AUTO_TEST_CASE(TestName, TestFunction, ...) \
     BOOST_AUTO_TEST_CASE(TestName) \
     { \
         CompareRefTestFunction<FactoryType>(#TestName, &TestFunction, ##__VA_ARGS__); \
+    }
+
+#define ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(TestName, TestFunction, ...) \
+    BOOST_AUTO_TEST_CASE(TestName) \
+    { \
+        CompareRefTestFunctionUsingTensorHandleFactory<FactoryType>(#TestName, &TestFunction, ##__VA_ARGS__); \
     }
 
 #define ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(TestName, Fixture, TestFunction, ...) \

@@ -24,6 +24,7 @@ template<armnn::DataType ArmnnType, typename T, std::size_t outputDimLength>
 LayerTestResult<T, outputDimLength> StackTestHelper(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         const armnn::TensorInfo& inputTensorInfo,
         const armnn::TensorInfo& outputTensorInfo,
         unsigned int axis,
@@ -42,13 +43,11 @@ LayerTestResult<T, outputDimLength> StackTestHelper(
     result.outputExpected = MakeTensor<T, outputDimLength>(outputTensorInfo, outputExpectedData);
 
     std::vector<std::unique_ptr<armnn::ITensorHandle>> inputHandles;
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     for (unsigned int i = 0; i < numInputs; ++i)
     {
-        inputHandles.push_back(workloadFactory.CreateTensorHandle(inputTensorInfo));
+        inputHandles.push_back(tensorHandleFactory.CreateTensorHandle(inputTensorInfo));
     }
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::StackQueueDescriptor descriptor;
     descriptor.m_Parameters.m_Axis = axis;
@@ -85,7 +84,8 @@ LayerTestResult<T, outputDimLength> StackTestHelper(
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> StackAxis0TestImpl(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo ({ 3, 2, 3 }, ArmnnType);
     armnn::TensorInfo outputTensorInfo({ 2, 3, 2, 3 }, ArmnnType);
@@ -141,6 +141,7 @@ LayerTestResult<T, 4> StackAxis0TestImpl(
     return StackTestHelper<ArmnnType, T, 4>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputTensorInfo,
         outputTensorInfo,
         0U,
@@ -152,7 +153,8 @@ LayerTestResult<T, 4> StackAxis0TestImpl(
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> StackOutput4DAxis1TestImpl(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo ({ 3, 2, 3 }, ArmnnType);
     armnn::TensorInfo outputTensorInfo({ 3, 2, 2, 3 }, ArmnnType);
@@ -209,6 +211,7 @@ LayerTestResult<T, 4> StackOutput4DAxis1TestImpl(
     return StackTestHelper<ArmnnType, T, 4>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputTensorInfo,
         outputTensorInfo,
         1U,
@@ -220,7 +223,8 @@ LayerTestResult<T, 4> StackOutput4DAxis1TestImpl(
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> StackOutput4DAxis2TestImpl(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo ({ 3, 2, 3 }, ArmnnType);
     armnn::TensorInfo outputTensorInfo({ 3, 2, 2, 3 }, ArmnnType);
@@ -275,6 +279,7 @@ LayerTestResult<T, 4> StackOutput4DAxis2TestImpl(
     return StackTestHelper<ArmnnType, T, 4>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputTensorInfo,
         outputTensorInfo,
         2U,
@@ -286,7 +291,8 @@ LayerTestResult<T, 4> StackOutput4DAxis2TestImpl(
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> StackOutput4DAxis3TestImpl(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo ({ 3, 2, 3 }, ArmnnType);
     armnn::TensorInfo outputTensorInfo({ 3, 2, 3, 2 }, ArmnnType);
@@ -349,6 +355,7 @@ LayerTestResult<T, 4> StackOutput4DAxis3TestImpl(
     return StackTestHelper<ArmnnType, T, 4>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputTensorInfo,
         outputTensorInfo,
         3U,
@@ -360,7 +367,8 @@ LayerTestResult<T, 4> StackOutput4DAxis3TestImpl(
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 3> StackOutput3DInputs3TestImpl(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo ({ 3, 3 }, ArmnnType);
     armnn::TensorInfo outputTensorInfo({ 3, 3, 3 }, ArmnnType);
@@ -406,6 +414,7 @@ LayerTestResult<T, 3> StackOutput3DInputs3TestImpl(
     return StackTestHelper<ArmnnType, T, 3>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputTensorInfo,
         outputTensorInfo,
         1U,
@@ -417,7 +426,8 @@ LayerTestResult<T, 3> StackOutput3DInputs3TestImpl(
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 5> StackOutput5DTestImpl(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo ({ 2, 2, 2, 3 }, ArmnnType);
     armnn::TensorInfo outputTensorInfo({ 2, 2, 2, 2, 3 }, ArmnnType);
@@ -491,6 +501,7 @@ LayerTestResult<T, 5> StackOutput5DTestImpl(
     return StackTestHelper<ArmnnType, T, 5>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputTensorInfo,
         outputTensorInfo,
         1U,
@@ -505,49 +516,56 @@ LayerTestResult<T, 5> StackOutput5DTestImpl(
 
 LayerTestResult<float, 4> StackAxis0Float32Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return StackAxis0TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return StackAxis0TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> StackOutput4DAxis1Float32Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return StackOutput4DAxis1TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return StackOutput4DAxis1TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> StackOutput4DAxis2Float32Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return StackOutput4DAxis2TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return StackOutput4DAxis2TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 4> StackOutput4DAxis3Float32Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return StackOutput4DAxis3TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return StackOutput4DAxis3TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 3> StackOutput3DInputs3Float32Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return StackOutput3DInputs3TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return StackOutput3DInputs3TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 5> StackOutput5DFloat32Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return StackOutput5DTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return StackOutput5DTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<armnn::Half, 4> StackFloat16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     using namespace half_float::literal;
 
@@ -604,6 +622,7 @@ LayerTestResult<armnn::Half, 4> StackFloat16Test(
     return StackTestHelper<armnn::DataType::Float16, armnn::Half, 4>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         inputTensorInfo,
         outputTensorInfo,
         2U,

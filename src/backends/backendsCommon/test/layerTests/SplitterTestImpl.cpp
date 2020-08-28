@@ -21,6 +21,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 std::vector<LayerTestResult<T,3>> SplitterTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale = 0.0f,
     int32_t qOffset = 0)
 {
@@ -179,31 +180,28 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(
     std::vector<unsigned int> wOrigin4 = {1, 0, 0}; //Extent of the window is defined by size of output[3].
     armnn::SplitterQueueDescriptor::ViewOrigin window4(wOrigin4);
 
-    bool subTensorsSupported = workloadFactory.SupportsSubTensors();
-
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    bool subTensorsSupported = tensorHandleFactory.SupportsSubTensors();
+    std::unique_ptr<armnn::ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle1 =
         subTensorsSupported ?
-            workloadFactory.CreateSubTensorHandle(*inputHandle, outputTensorInfo1.GetShape(), wOrigin1.data()) :
-            workloadFactory.CreateTensorHandle(outputTensorInfo1);
+        tensorHandleFactory.CreateSubTensorHandle(*inputHandle, outputTensorInfo1.GetShape(), wOrigin1.data()) :
+        tensorHandleFactory.CreateTensorHandle(outputTensorInfo1);
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle2 =
         subTensorsSupported ?
-            workloadFactory.CreateSubTensorHandle(*inputHandle, outputTensorInfo2.GetShape(), wOrigin2.data()) :
-            workloadFactory.CreateTensorHandle(outputTensorInfo2);
+        tensorHandleFactory.CreateSubTensorHandle(*inputHandle, outputTensorInfo2.GetShape(), wOrigin2.data()) :
+        tensorHandleFactory.CreateTensorHandle(outputTensorInfo2);
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle3 =
         subTensorsSupported ?
-            workloadFactory.CreateSubTensorHandle(*outputHandle2, outputTensorInfo3.GetShape(), wOrigin3.data()) :
-            workloadFactory.CreateTensorHandle(outputTensorInfo3);
+        tensorHandleFactory.CreateSubTensorHandle(*outputHandle2, outputTensorInfo3.GetShape(), wOrigin3.data()) :
+        tensorHandleFactory.CreateTensorHandle(outputTensorInfo3);
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle4 =
         subTensorsSupported ?
-            workloadFactory.CreateSubTensorHandle(*outputHandle2, outputTensorInfo4.GetShape(), wOrigin4.data()) :
-            workloadFactory.CreateTensorHandle(outputTensorInfo4);
-    ARMNN_NO_DEPRECATE_WARN_END
+        tensorHandleFactory.CreateSubTensorHandle(*outputHandle2, outputTensorInfo4.GetShape(), wOrigin4.data()) :
+        tensorHandleFactory.CreateTensorHandle(outputTensorInfo4);
 
     // Do the first split
     armnn::SplitterQueueDescriptor data;
@@ -257,6 +255,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 3> CopyViaSplitterTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale, int32_t qOffset)
 {
     IgnoreUnused(memoryManager);
@@ -290,16 +289,13 @@ LayerTestResult<T, 3> CopyViaSplitterTestImpl(
     std::vector<unsigned int> origin = { 0, 0, 0 };
     armnn::SplitterQueueDescriptor::ViewOrigin window(origin);
 
-    const bool subTensorsSupported = workloadFactory.SupportsSubTensors();
-
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(tensorInfo);
+    const bool subTensorsSupported = tensorHandleFactory.SupportsSubTensors();
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(tensorInfo);
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle =
         subTensorsSupported ?
-            workloadFactory.CreateSubTensorHandle(*inputHandle, tensorInfo.GetShape(), origin.data()) :
-            workloadFactory.CreateTensorHandle(tensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+        tensorHandleFactory.CreateSubTensorHandle(*inputHandle, tensorInfo.GetShape(), origin.data()) :
+        tensorHandleFactory.CreateTensorHandle(tensorInfo);
 
     armnn::SplitterQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -328,56 +324,80 @@ LayerTestResult<T, 3> CopyViaSplitterTestImpl(
 
 std::vector<LayerTestResult<float,3>> SplitterFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SplitterTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return SplitterTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 std::vector<LayerTestResult<armnn::Half,3>> SplitterFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SplitterTestCommon<armnn::DataType::Float16>(workloadFactory, memoryManager);
+    return SplitterTestCommon<armnn::DataType::Float16>(workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 std::vector<LayerTestResult<uint8_t,3>> SplitterUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SplitterTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 1.0f, 0);
+    return SplitterTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, tensorHandleFactory, 1.0f, 0);
 }
 
 std::vector<LayerTestResult<int16_t,3>> SplitterInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return SplitterTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 1.0f, 0);
+    return SplitterTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, tensorHandleFactory, 1.0f, 0);
 }
 
 LayerTestResult<float, 3> CopyViaSplitterFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return CopyViaSplitterTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return CopyViaSplitterTestImpl<armnn::DataType::Float32>(workloadFactory,
+                                                             memoryManager,
+                                                             tensorHandleFactory,
+                                                             0.0f,
+                                                             0);
 }
 
 LayerTestResult<armnn::Half, 3> CopyViaSplitterFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return CopyViaSplitterTestImpl<armnn::DataType::Float16>(workloadFactory, memoryManager, 0.0f, 0);
+    return CopyViaSplitterTestImpl<armnn::DataType::Float16>(workloadFactory,
+                                                             memoryManager,
+                                                             tensorHandleFactory,
+                                                             0.0f,
+                                                             0);
 }
 
 LayerTestResult<uint8_t, 3> CopyViaSplitterUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return CopyViaSplitterTestImpl<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, 1.0f, 0);
+    return CopyViaSplitterTestImpl<armnn::DataType::QAsymmU8>(workloadFactory,
+                                                              memoryManager,
+                                                              tensorHandleFactory,
+                                                              1.0f,
+                                                              0);
 }
 
 LayerTestResult<int16_t, 3> CopyViaSplitterInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    return CopyViaSplitterTestImpl<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, 1.0f, 0);
+    return CopyViaSplitterTestImpl<armnn::DataType::QSymmS16>(workloadFactory,
+                                                              memoryManager,
+                                                              tensorHandleFactory,
+                                                              1.0f,
+                                                              0);
 }

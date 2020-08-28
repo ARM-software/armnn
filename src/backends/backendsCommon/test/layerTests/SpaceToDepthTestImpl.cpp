@@ -23,6 +23,7 @@ template<typename T>
 LayerTestResult<T, 4> SpaceToDepthTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     armnn::TensorInfo& inputTensorInfo,
     armnn::TensorInfo& outputTensorInfo,
     std::vector<float>& inputData,
@@ -65,10 +66,8 @@ LayerTestResult<T, 4> SpaceToDepthTestImpl(
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
                                           armnnUtils::QuantizedVector<T>(outputExpectedData, qScale, qOffset));
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::WorkloadInfo info;
     AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
@@ -92,6 +91,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToDepthSimpleTest1(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     armnn::DataLayout dataLayout = armnn::DataLayout::NHWC)
 {
     unsigned int inputShape[] = {1, 2, 2, 1};
@@ -118,13 +118,15 @@ LayerTestResult<T, 4> SpaceToDepthSimpleTest1(
     outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
 
     return SpaceToDepthTestImpl<T>(
-        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToDepthSimpleTest2(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     armnn::DataLayout dataLayout = armnn::DataLayout::NHWC)
 {
     unsigned int inputShape[]  = {1, 2, 2, 2};
@@ -151,102 +153,123 @@ LayerTestResult<T, 4> SpaceToDepthSimpleTest2(
     outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
 
     return SpaceToDepthTestImpl<T>(
-        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
 }
 
 } // anonymous namespace
 
 LayerTestResult<uint8_t, 4> SpaceToDepthNhwcAsymmQ8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
-{
-    return SpaceToDepthSimpleTest1<armnn::DataType::QAsymmU8>(
-        workloadFactory,
-        memoryManager);
-}
-
-LayerTestResult<uint8_t, 4> SpaceToDepthNchwAsymmQ8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return SpaceToDepthSimpleTest1<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory);
+}
+
+LayerTestResult<uint8_t, 4> SpaceToDepthNchwAsymmQ8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return SpaceToDepthSimpleTest1<armnn::DataType::QAsymmU8>(
+        workloadFactory,
+        memoryManager,
+        tensorHandleFactory,
         armnn::DataLayout::NCHW);
 }
 
 LayerTestResult<armnn::Half, 4> SpaceToDepthNhwcFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
-{
-    return SpaceToDepthSimpleTest1<armnn::DataType::Float16>(
-        workloadFactory,
-        memoryManager);
-}
-
-LayerTestResult<armnn::Half, 4> SpaceToDepthNchwFloat16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return SpaceToDepthSimpleTest1<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory);
+}
+
+LayerTestResult<armnn::Half, 4> SpaceToDepthNchwFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return SpaceToDepthSimpleTest1<armnn::DataType::Float16>(
+        workloadFactory,
+        memoryManager,
+        tensorHandleFactory,
         armnn::DataLayout::NCHW);
 }
 
 LayerTestResult<float, 4> SpaceToDepthNhwcFloat32Test1(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
-{
-    return SpaceToDepthSimpleTest1<armnn::DataType::Float32>(
-        workloadFactory,
-        memoryManager);
-}
-
-LayerTestResult<float, 4> SpaceToDepthNchwFloat32Test1(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return SpaceToDepthSimpleTest1<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory);
+}
+
+LayerTestResult<float, 4> SpaceToDepthNchwFloat32Test1(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return SpaceToDepthSimpleTest1<armnn::DataType::Float32>(
+        workloadFactory,
+        memoryManager,
+        tensorHandleFactory,
         armnn::DataLayout::NCHW);
 }
 
 LayerTestResult<float, 4> SpaceToDepthNhwcFloat32Test2(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
-{
-    return SpaceToDepthSimpleTest2<armnn::DataType::Float32>(
-        workloadFactory,
-        memoryManager);
-}
-
-LayerTestResult<float, 4> SpaceToDepthNchwFloat32Test2(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return SpaceToDepthSimpleTest2<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory);
+}
+
+LayerTestResult<float, 4> SpaceToDepthNchwFloat32Test2(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return SpaceToDepthSimpleTest2<armnn::DataType::Float32>(
+        workloadFactory,
+        memoryManager,
+        tensorHandleFactory,
         armnn::DataLayout::NCHW);
 }
 
 LayerTestResult<int16_t, 4> SpaceToDepthNhwcQSymm16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
-{
-    return SpaceToDepthSimpleTest2<armnn::DataType::QSymmS16>(
-        workloadFactory,
-        memoryManager);
-}
-
-LayerTestResult<int16_t, 4> SpaceToDepthNchwQSymm16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return SpaceToDepthSimpleTest2<armnn::DataType::QSymmS16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory);
+}
+
+LayerTestResult<int16_t, 4> SpaceToDepthNchwQSymm16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return SpaceToDepthSimpleTest2<armnn::DataType::QSymmS16>(
+        workloadFactory,
+        memoryManager,
+        tensorHandleFactory,
         armnn::DataLayout::NCHW);
 }

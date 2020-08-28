@@ -16,22 +16,23 @@
 
 #include <test/TensorHelpers.hpp>
 
-template<typename FactoryType, typename T>
+template<typename T>
 LayerTestResult<T, 4> SimpleTransposeTestImpl(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         armnn::TransposeDescriptor descriptor,
         armnn::TensorInfo inputTensorInfo,
         armnn::TensorInfo outputTensorInfo,
         const std::vector<T>& inputData,
         const std::vector<T>& outputExpectedData)
 {
+    IgnoreUnused(memoryManager);
     auto input = MakeTensor<T, 4>(inputTensorInfo, inputData);
 
     LayerTestResult<T, 4> ret(outputTensorInfo);
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputExpectedData);
 
-    auto tensorHandleFactory = WorkloadFactoryHelper<FactoryType>::GetTensorHandleFactory(memoryManager);
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
@@ -55,10 +56,11 @@ LayerTestResult<T, 4> SimpleTransposeTestImpl(
     return ret;
 }
 
-template<typename FactoryType, armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleTransposeTest(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -99,15 +101,16 @@ LayerTestResult<T, 4> SimpleTransposeTest(
     },
     qScale, qOffset);
 
-    return SimpleTransposeTestImpl<FactoryType, T>(workloadFactory, memoryManager,
-                                                   descriptor, inputTensorInfo,
-                                                   outputTensorInfo, input, outputExpected);
+    return SimpleTransposeTestImpl(workloadFactory, memoryManager, tensorHandleFactory,
+                                   descriptor, inputTensorInfo,
+                                   outputTensorInfo, input, outputExpected);
 }
 
-template<typename FactoryType, armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> TransposeValueSet1Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -149,15 +152,16 @@ LayerTestResult<T, 4> TransposeValueSet1Test(
     },
     qScale, qOffset);
 
-    return SimpleTransposeTestImpl<FactoryType, T>(workloadFactory, memoryManager,
-                                                   descriptor, inputTensorInfo,
-                                                   outputTensorInfo, input, outputExpected);
+    return SimpleTransposeTestImpl<T>(workloadFactory, memoryManager, tensorHandleFactory,
+                                      descriptor, inputTensorInfo,
+                                      outputTensorInfo, input, outputExpected);
 }
 
-template<typename FactoryType, armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> TransposeValueSet2Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -199,15 +203,16 @@ LayerTestResult<T, 4> TransposeValueSet2Test(
     },
     qScale, qOffset);
 
-    return SimpleTransposeTestImpl<FactoryType, T>(workloadFactory, memoryManager,
-                                                   descriptor, inputTensorInfo,
-                                                   outputTensorInfo, input, outputExpected);
+    return SimpleTransposeTestImpl<T>(workloadFactory, memoryManager, tensorHandleFactory,
+                                      descriptor, inputTensorInfo,
+                                      outputTensorInfo, input, outputExpected);
 }
 
-template<typename FactoryType, armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> TransposeValueSet3Test(
         armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -251,7 +256,7 @@ LayerTestResult<T, 4> TransposeValueSet3Test(
     },
     qScale, qOffset);
 
-    return SimpleTransposeTestImpl<FactoryType, T>(workloadFactory, memoryManager,
-                                                   descriptor, inputTensorInfo,
-                                                   outputTensorInfo, input, outputExpected);
+    return SimpleTransposeTestImpl<T>(workloadFactory, memoryManager, tensorHandleFactory,
+                                      descriptor, inputTensorInfo,
+                                      outputTensorInfo, input, outputExpected);
 }

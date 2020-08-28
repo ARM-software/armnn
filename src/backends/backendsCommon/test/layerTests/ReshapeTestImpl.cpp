@@ -18,6 +18,7 @@ template<typename T, size_t NumDims>
 LayerTestResult<T, NumDims> SimpleReshapeTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     armnn::TensorInfo inputTensorInfo,
     armnn::TensorInfo outputTensorInfo,
     const std::vector<T>& inputData,
@@ -29,10 +30,8 @@ LayerTestResult<T, NumDims> SimpleReshapeTestImpl(
     LayerTestResult<T, NumDims> ret(outputTensorInfo);
     ret.outputExpected = MakeTensor<T, NumDims>(outputTensorInfo, outputExpectedData);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::ReshapeQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -58,7 +57,8 @@ LayerTestResult<T, NumDims> SimpleReshapeTestImpl(
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 4> SimpleReshapeTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -104,13 +104,14 @@ LayerTestResult<T, 4> SimpleReshapeTest(
         outputTensorInfo);
 
     return SimpleReshapeTestImpl<T, 4>(
-        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, inputTensorInfo, outputTensorInfo, input, outputExpected);
 }
 
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 5> Reshape5dTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -166,7 +167,7 @@ LayerTestResult<T, 5> Reshape5dTest(
         outputTensorInfo);
 
     return SimpleReshapeTestImpl<T, 5>(
-        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, inputTensorInfo, outputTensorInfo, input, outputExpected);
 }
 
 //
@@ -176,39 +177,47 @@ LayerTestResult<T, 5> Reshape5dTest(
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
 SimpleReshapeTest<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
 SimpleReshapeTest<armnn::DataType::QAsymmS8>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
 SimpleReshapeTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
 SimpleReshapeTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 5>
 Reshape5dTest<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 5>
 Reshape5dTest<armnn::DataType::QAsymmS8>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 5>
 Reshape5dTest<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 5>
 Reshape5dTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);

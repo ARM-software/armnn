@@ -88,7 +88,7 @@ void RunTestFunctionUsingTensorHandleFactory(const char* testName, TFuncPtr test
 
     auto tensorHandleFactory = WorkloadFactoryHelper<FactoryType>::GetTensorHandleFactory(memoryManager);
 
-    auto testResult = (*testFunction)(workloadFactory, memoryManager, &tensorHandleFactory, args...);
+    auto testResult = (*testFunction)(workloadFactory, memoryManager, tensorHandleFactory, args...);
     CompareTestResultIfSupported(testName, testResult);
 
     armnn::ProfilerManager::GetInstance().RegisterProfiler(nullptr);
@@ -136,7 +136,7 @@ void CompareRefTestFunctionUsingTensorHandleFactory(const char* testName, TFuncP
         RefWorkloadFactoryHelper::GetTensorHandleFactory(memoryManager);
 
     auto testResult = (*testFunction)(
-        workloadFactory, memoryManager, refWorkloadFactory, &tensorHandleFactory, &refTensorHandleFactory, args...);
+        workloadFactory, memoryManager, refWorkloadFactory, tensorHandleFactory, refTensorHandleFactory, args...);
     CompareTestResultIfSupported(testName, testResult);
 }
 

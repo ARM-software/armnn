@@ -16,29 +16,29 @@
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<int32_t, 3> ArgMaxSimpleTest(armnn::IWorkloadFactory& workloadFactory,
                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-                                             armnn::ITensorHandleFactory* tensorHandleFactory);
+                                             const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<int32_t, 3> ArgMinSimpleTest(armnn::IWorkloadFactory& workloadFactory,
                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-                                             armnn::ITensorHandleFactory* tensorHandleFactory);
+                                             const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<int32_t, 3> ArgMinChannelTest(armnn::IWorkloadFactory& workloadFactory,
                                               const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-                                              armnn::ITensorHandleFactory* tensorHandleFactory);
+                                              const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<int32_t, 3> ArgMaxChannelTest(armnn::IWorkloadFactory& workloadFactory,
                                               const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-                                              armnn::ITensorHandleFactory* tensorHandleFactory);
+                                              const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<int32_t, 3> ArgMaxHeightTest(armnn::IWorkloadFactory& workloadFactory,
                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-                                             armnn::ITensorHandleFactory* tensorHandleFactory);
+                                             const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<int32_t, 3> ArgMinWidthTest(armnn::IWorkloadFactory& workloadFactory,
                                             const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-                                            armnn::ITensorHandleFactory* tensorHandleFactory);
+                                            const armnn::ITensorHandleFactory& tensorHandleFactory);

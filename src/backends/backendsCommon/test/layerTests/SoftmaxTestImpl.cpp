@@ -59,7 +59,7 @@ template<armnn::DataType ArmnnType, std::size_t n, typename T = armnn::ResolveTy
 LayerTestResult<T, n> SimpleSoftmaxBaseTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::ITensorHandleFactory* tensorHandleFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float beta,
     const armnn::TensorShape& inputShape,
     const std::vector<float>& outputData,
@@ -87,8 +87,8 @@ LayerTestResult<T, n> SimpleSoftmaxBaseTestImpl(
     // Each row is independently softmax'd.
     auto input = MakeTensor<T, n>(inputTensorInfo, armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset));
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle  = tensorHandleFactory->CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory->CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::SoftmaxQueueDescriptor data;
     data.m_Parameters.m_Beta = beta;
@@ -120,7 +120,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 2> SimpleSoftmaxTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::ITensorHandleFactory* tensorHandleFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float beta)
 {
     using std::exp;
@@ -150,7 +150,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 2> SimpleSoftmaxTestImpl(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        armnn::ITensorHandleFactory* tensorHandleFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float beta,
         int axis)
 {
@@ -206,7 +206,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 3> Simple3dSoftmaxTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::ITensorHandleFactory* tensorHandleFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float beta,
     const armnn::TensorShape& inputShape,
     const std::vector<float>& outputData,
@@ -221,7 +221,7 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> Simple4dSoftmaxTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::ITensorHandleFactory* tensorHandleFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float beta,
     const armnn::TensorShape& inputShape,
     const std::vector<float>& outputData,
@@ -238,8 +238,8 @@ LayerTestResult<T, 2> CompareSoftmaxTestImpl(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         armnn::IWorkloadFactory& refWorkloadFactory,
-        const armnn::ITensorHandleFactory* tensorHandleFactory,
-        const armnn::ITensorHandleFactory* refTensorHandleFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
+        const armnn::ITensorHandleFactory& refTensorHandleFactory,
         float beta)
 {
     const int batchSize = 20;
@@ -263,8 +263,8 @@ LayerTestResult<T, 2> CompareSoftmaxTestImpl(
     LayerTestResult<T, 2> ret(outputTensorInfo);
     auto input = MakeRandomTensor<T, 2>(inputTensorInfo, 0xF00D, 0.0f, 1.0f);
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle  = tensorHandleFactory->CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory->CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::SoftmaxQueueDescriptor data;
     data.m_Parameters.m_Beta = beta;
@@ -274,9 +274,9 @@ LayerTestResult<T, 2> CompareSoftmaxTestImpl(
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     std::unique_ptr<armnn::ITensorHandle> outputHandleRef =
-        refTensorHandleFactory->CreateTensorHandle(outputTensorInfo);
+        refTensorHandleFactory.CreateTensorHandle(outputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> inputHandleRef  =
-        refTensorHandleFactory->CreateTensorHandle(inputTensorInfo);
+        refTensorHandleFactory.CreateTensorHandle(inputTensorInfo);
 
     armnn::SoftmaxQueueDescriptor refData = data;
     armnn::WorkloadInfo refInfo = info;
@@ -310,7 +310,7 @@ LayerTestResult<T, 2> CompareSoftmaxTestImpl(
 LayerTestResult<float,2> SimpleSoftmaxTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::ITensorHandleFactory* tensorHandleFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float beta)
 {
     return SimpleSoftmaxTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory, beta);
@@ -319,7 +319,7 @@ LayerTestResult<float,2> SimpleSoftmaxTest(
 LayerTestResult<float,2> SimpleAxisSoftmaxTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        armnn::ITensorHandleFactory* tensorHandleFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float beta,
         int axis)
 {
@@ -330,7 +330,7 @@ LayerTestResult<float,2> SimpleAxisSoftmaxTest(
 LayerTestResult<float,3> Simple3dSoftmaxTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        armnn::ITensorHandleFactory* tensorHandleFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float beta)
 {
     Simple3dSoftmaxOutputData data;
@@ -341,7 +341,7 @@ LayerTestResult<float,3> Simple3dSoftmaxTest(
 LayerTestResult<float,3> Simple3dAxisSoftmaxTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        armnn::ITensorHandleFactory* tensorHandleFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float beta,
         int axis)
 {
@@ -436,7 +436,7 @@ LayerTestResult<float,3> Simple3dAxisSoftmaxTest(
 LayerTestResult<float,4> Simple4dSoftmaxTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        armnn::ITensorHandleFactory* tensorHandleFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float beta)
 {
     Simple4dSoftmaxData data;
@@ -447,7 +447,7 @@ LayerTestResult<float,4> Simple4dSoftmaxTest(
 LayerTestResult<float,4> Simple4dAxisSoftmaxTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        armnn::ITensorHandleFactory* tensorHandleFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float beta,
         int axis)
 {
@@ -613,7 +613,7 @@ LayerTestResult<float,4> Simple4dAxisSoftmaxTest(
 LayerTestResult<uint8_t,2> SimpleSoftmaxUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::ITensorHandleFactory* tensorHandleFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     float beta)
 {
     return SimpleSoftmaxTestImpl<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, tensorHandleFactory, beta);
@@ -622,7 +622,7 @@ LayerTestResult<uint8_t,2> SimpleSoftmaxUint8Test(
 LayerTestResult<uint8_t,3> Simple3dSoftmaxUint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        armnn::ITensorHandleFactory* tensorHandleFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float beta)
 {
     Simple3dSoftmaxOutputData data;
@@ -639,7 +639,7 @@ LayerTestResult<uint8_t,3> Simple3dSoftmaxUint8Test(
 LayerTestResult<uint8_t,4> Simple4dSoftmaxUint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        armnn::ITensorHandleFactory* tensorHandleFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float beta)
 {
     Simple4dSoftmaxData data;
@@ -651,7 +651,7 @@ LayerTestResult<uint8_t,4> Simple4dSoftmaxUint8Test(
 LayerTestResult<armnn::Half,2> SimpleSoftmaxFloat16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        armnn::ITensorHandleFactory* tensorHandleFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float beta)
 {
     return SimpleSoftmaxTestImpl<armnn::DataType::Float16>(workloadFactory, memoryManager, tensorHandleFactory, beta);
@@ -660,7 +660,7 @@ LayerTestResult<armnn::Half,2> SimpleSoftmaxFloat16Test(
 LayerTestResult<armnn::Half,3> Simple3dSoftmaxFloat16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        armnn::ITensorHandleFactory* tensorHandleFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float beta)
 {
     Simple3dSoftmaxOutputData data;
@@ -671,7 +671,7 @@ LayerTestResult<armnn::Half,3> Simple3dSoftmaxFloat16Test(
 LayerTestResult<armnn::Half,4> Simple4dSoftmaxFloat16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        armnn::ITensorHandleFactory* tensorHandleFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float beta)
 {
     Simple4dSoftmaxData data;
@@ -682,7 +682,7 @@ LayerTestResult<armnn::Half,4> Simple4dSoftmaxFloat16Test(
 LayerTestResult<int16_t,2> SimpleSoftmaxUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        armnn::ITensorHandleFactory* tensorHandleFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float beta)
 {
     return SimpleSoftmaxTestImpl<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, tensorHandleFactory, beta);
@@ -691,7 +691,7 @@ LayerTestResult<int16_t,2> SimpleSoftmaxUint16Test(
 LayerTestResult<int16_t,3> Simple3dSoftmaxUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        armnn::ITensorHandleFactory* tensorHandleFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float beta)
 {
     Simple3dSoftmaxOutputData data;
@@ -702,7 +702,7 @@ LayerTestResult<int16_t,3> Simple3dSoftmaxUint16Test(
 LayerTestResult<int16_t,4> Simple4dSoftmaxUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        armnn::ITensorHandleFactory* tensorHandleFactory,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
         float beta)
 {
     Simple4dSoftmaxData data;
@@ -715,8 +715,8 @@ LayerTestResult<float,2> CompareSoftmaxTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
-    const armnn::ITensorHandleFactory* tensorHandleFactory,
-    const armnn::ITensorHandleFactory* refTensorHandleFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::ITensorHandleFactory& refTensorHandleFactory,
     float beta)
 {
     return CompareSoftmaxTestImpl<armnn::DataType::Float32>(
@@ -727,8 +727,8 @@ LayerTestResult<uint8_t,2> CompareSoftmaxUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
-    const armnn::ITensorHandleFactory* tensorHandleFactory,
-    const armnn::ITensorHandleFactory* refTensorHandleFactory,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::ITensorHandleFactory& refTensorHandleFactory,
     float beta)
 {
     return CompareSoftmaxTestImpl<armnn::DataType::QAsymmU8>(

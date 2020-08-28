@@ -16,7 +16,7 @@
 LayerTestResult<float, 2> FakeQuantizationTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::ITensorHandleFactory* tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     IgnoreUnused(memoryManager);
     constexpr unsigned int width = 2;
@@ -33,8 +33,8 @@ LayerTestResult<float, 2> FakeQuantizationTest(
 
     LayerTestResult<float, 2> ret(tensorInfo);
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle   = tensorHandleFactory->CreateTensorHandle(tensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle  = tensorHandleFactory->CreateTensorHandle(tensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle   = tensorHandleFactory.CreateTensorHandle(tensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle  = tensorHandleFactory.CreateTensorHandle(tensorInfo);
 
     armnn::FakeQuantizationQueueDescriptor data;
     armnn::WorkloadInfo info;

@@ -16,4 +16,4 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleFillTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::ITensorHandleFactory* tensorHandleFactory);
+    const armnn::ITensorHandleFactory& tensorHandleFactory);

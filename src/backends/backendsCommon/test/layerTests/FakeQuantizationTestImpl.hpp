@@ -14,4 +14,4 @@
 LayerTestResult<float, 2> FakeQuantizationTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        armnn::ITensorHandleFactory* tensorHandleFactory);
+        const armnn::ITensorHandleFactory& tensorHandleFactory);

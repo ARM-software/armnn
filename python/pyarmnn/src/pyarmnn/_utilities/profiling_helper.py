@@ -53,8 +53,11 @@ def get_profiling_data(profiler: 'IProfiler') -> ProfilerData:
 
     top_level_dict = json.loads(profiler.as_json())
     armnn_data = top_level_dict["ArmNN"]
-    inference_measurements = armnn_data["inference_measurements_#1"]
-    execution_data = inference_measurements["Execute_#2"]
+    #Get the inference measurements dict, this will be just one value for key starting with "inference_measurements"
+    inference_measurements = [v for k, v in armnn_data.items() if k.startswith("inference_measurements_")][0]
+
+    #Get the execution data dict, this will be just one value for key starting with "Execute_"
+    execution_data = [v for k, v in inference_measurements.items() if k.startswith("Execute_")][0]
 
     workload_data = {}
     inference_data = {}

@@ -445,8 +445,13 @@ void Layer::VerifyShapeInferenceType(const TensorShape& outputShape, ShapeInfere
 
 void Layer::SerializeLayerParameters(ParameterStringifyFunction& fn) const
 {
+    std::string guid = std::to_string(m_Guid);
     std::string layerType = GetLayerTypeAsCString(m_Type);
     std::string backendId = std::string(m_BackendId);
+    if (!(guid.compare("") == 0) && !guid.empty())
+    {
+        fn("Guid", guid);
+    }
     if(!(m_LayerName.compare("") == 0) && !m_LayerName.empty())
     {
         fn("LayerName",m_LayerName);

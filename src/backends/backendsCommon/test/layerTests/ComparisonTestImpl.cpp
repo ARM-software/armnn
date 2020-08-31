@@ -26,7 +26,8 @@ template <std::size_t NumDims,
           typename InType = armnn::ResolveType<ArmnnInType>>
 LayerTestResult<uint8_t, NumDims> ComparisonTestImpl(
     armnn::IWorkloadFactory & workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr & memoryManager,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::ComparisonDescriptor& descriptor,
     const armnn::TensorShape& shape0,
     std::vector<InType> values0,
@@ -56,11 +57,9 @@ LayerTestResult<uint8_t, NumDims> ComparisonTestImpl(
 
     LayerTestResult<uint8_t, NumDims> ret(outputTensorInfo);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    std::unique_ptr<armnn::ITensorHandle> inputHandle0 = workloadFactory.CreateTensorHandle(inputTensorInfo0);
-    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
+    std::unique_ptr<armnn::ITensorHandle> inputHandle0 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo0);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo1);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::ComparisonQueueDescriptor qDescriptor;
     qDescriptor.m_Parameters = descriptor;
@@ -95,7 +94,8 @@ template <std::size_t NumDims,
           typename InType = armnn::ResolveType<ArmnnInType>>
 LayerTestResult<uint8_t, NumDims> ComparisonTestImpl(
     armnn::IWorkloadFactory & workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr & memoryManager,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::ComparisonDescriptor& descriptor,
     const armnn::TensorShape& shape0,
     std::vector<InType> values0,
@@ -109,6 +109,7 @@ LayerTestResult<uint8_t, NumDims> ComparisonTestImpl(
     return ComparisonTestImpl<NumDims, ArmnnInType>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         descriptor,
         shape0,
         values0,
@@ -148,6 +149,7 @@ std::vector<uint8_t> GetExpectedOutputData(const TestData& testData, armnn::Comp
 template<armnn::DataType ArmnnInType, typename TestData>
 LayerTestResult<uint8_t, 4> ComparisonTestImpl(armnn::IWorkloadFactory& workloadFactory,
                                                const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+                                               const armnn::ITensorHandleFactory& tensorHandleFactory,
                                                const TestData& testData,
                                                armnn::ComparisonOperation operation,
                                                float quantScale = 1.f,
@@ -161,6 +163,7 @@ LayerTestResult<uint8_t, 4> ComparisonTestImpl(armnn::IWorkloadFactory& workload
     return ComparisonTestImpl<4, ArmnnInType>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         armnn::ComparisonDescriptor(operation),
         testData.m_InputShape0,
         inputData0,
@@ -339,198 +342,234 @@ static Broadcast1dVectorTestData s_Broadcast1dVectorTestData;
 
 // Equal
 LayerTestResult<uint8_t, 4> EqualSimpleTest(armnn::IWorkloadFactory& workloadFactory,
-                                            const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+                                            const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+                                            const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::Equal);
 }
 
 LayerTestResult<uint8_t, 4> EqualBroadcast1ElementTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::Equal);
 }
 
 LayerTestResult<uint8_t, 4> EqualBroadcast1dVectorTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::Equal);
 }
 
 LayerTestResult<uint8_t, 4> EqualSimpleFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::Equal);
 }
 
 LayerTestResult<uint8_t, 4> EqualBroadcast1ElementFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::Equal);
 }
 
 LayerTestResult<uint8_t, 4> EqualBroadcast1dVectorFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::Equal);
 }
 
 LayerTestResult<uint8_t, 4> EqualSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::Equal);
 }
 
 LayerTestResult<uint8_t, 4> EqualBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::Equal);
 }
 
 LayerTestResult<uint8_t, 4> EqualBroadcast1dVectorUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::Equal);
 }
 
 // Greater
 LayerTestResult<uint8_t, 4> GreaterSimpleTest(armnn::IWorkloadFactory& workloadFactory,
-                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+                                              const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::Greater);
 }
 
 LayerTestResult<uint8_t, 4> GreaterBroadcast1ElementTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::Greater);
 }
 
 LayerTestResult<uint8_t, 4> GreaterBroadcast1dVectorTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::Greater);
 }
 
 LayerTestResult<uint8_t, 4> GreaterSimpleFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::Greater);
 }
 
 LayerTestResult<uint8_t, 4> GreaterBroadcast1ElementFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::Greater);
 }
 
 LayerTestResult<uint8_t, 4> GreaterBroadcast1dVectorFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::Greater);
 }
 
 LayerTestResult<uint8_t, 4> GreaterSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::Greater);
 }
 
 LayerTestResult<uint8_t, 4> GreaterBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::Greater);
 }
 
 LayerTestResult<uint8_t, 4> GreaterBroadcast1dVectorUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::Greater);
 }
@@ -538,198 +577,234 @@ LayerTestResult<uint8_t, 4> GreaterBroadcast1dVectorUint8Test(
 // GreaterOrEqual
 LayerTestResult<uint8_t, 4> GreaterOrEqualSimpleTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::GreaterOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> GreaterOrEqualBroadcast1ElementTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::GreaterOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> GreaterOrEqualBroadcast1dVectorTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::GreaterOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> GreaterOrEqualSimpleFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::GreaterOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> GreaterOrEqualBroadcast1ElementFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::GreaterOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> GreaterOrEqualBroadcast1dVectorFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::GreaterOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> GreaterOrEqualSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::GreaterOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> GreaterOrEqualBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::GreaterOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> GreaterOrEqualBroadcast1dVectorUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::GreaterOrEqual);
 }
 
 // Less
 LayerTestResult<uint8_t, 4> LessSimpleTest(armnn::IWorkloadFactory& workloadFactory,
-                                           const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+                                           const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+                                           const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::Less);
 }
 
 LayerTestResult<uint8_t, 4> LessBroadcast1ElementTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::Less);
 }
 
 LayerTestResult<uint8_t, 4> LessBroadcast1dVectorTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::Less);
 }
 
 LayerTestResult<uint8_t, 4> LessSimpleFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::Less);
 }
 
 LayerTestResult<uint8_t, 4> LessBroadcast1ElementFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::Less);
 }
 
 LayerTestResult<uint8_t, 4> LessBroadcast1dVectorFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::Less);
 }
 
 LayerTestResult<uint8_t, 4> LessSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::Less);
 }
 
 LayerTestResult<uint8_t, 4> LessBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::Less);
 }
 
 LayerTestResult<uint8_t, 4> LessBroadcast1dVectorUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::Less);
 }
@@ -737,99 +812,117 @@ LayerTestResult<uint8_t, 4> LessBroadcast1dVectorUint8Test(
 // LessOrEqual
 LayerTestResult<uint8_t, 4> LessOrEqualSimpleTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::LessOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> LessOrEqualBroadcast1ElementTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::LessOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> LessOrEqualBroadcast1dVectorTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::LessOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> LessOrEqualSimpleFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::LessOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> LessOrEqualBroadcast1ElementFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::LessOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> LessOrEqualBroadcast1dVectorFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::LessOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> LessOrEqualSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::LessOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> LessOrEqualBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::LessOrEqual);
 }
 
 LayerTestResult<uint8_t, 4> LessOrEqualBroadcast1dVectorUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::LessOrEqual);
 }
@@ -837,99 +930,117 @@ LayerTestResult<uint8_t, 4> LessOrEqualBroadcast1dVectorUint8Test(
 // NotEqual
 LayerTestResult<uint8_t, 4> NotEqualSimpleTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::NotEqual);
 }
 
 LayerTestResult<uint8_t, 4> NotEqualBroadcast1ElementTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::NotEqual);
 }
 
 LayerTestResult<uint8_t, 4> NotEqualBroadcast1dVectorTest(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::NotEqual);
 }
 
 LayerTestResult<uint8_t, 4> NotEqualSimpleFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::NotEqual);
 }
 
 LayerTestResult<uint8_t, 4> NotEqualBroadcast1ElementFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::NotEqual);
 }
 
 LayerTestResult<uint8_t, 4> NotEqualBroadcast1dVectorFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::NotEqual);
 }
 
 LayerTestResult<uint8_t, 4> NotEqualSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_SimpleTestData,
         armnn::ComparisonOperation::NotEqual);
 }
 
 LayerTestResult<uint8_t, 4> NotEqualBroadcast1ElementUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1ElementTestData,
         armnn::ComparisonOperation::NotEqual);
 }
 
 LayerTestResult<uint8_t, 4> NotEqualBroadcast1dVectorUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ComparisonTestImpl<armnn::DataType::QAsymmU8>(
         workloadFactory,
         memoryManager,
+        tensorHandleFactory,
         s_Broadcast1dVectorTestData,
         armnn::ComparisonOperation::NotEqual);
 }

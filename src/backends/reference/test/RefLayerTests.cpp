@@ -23,341 +23,349 @@ using FactoryType = RefWorkloadFactory;
 // UNIT tests
 
 // Convolution
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2d3x5, SimpleConvolution2d3x5Test, true, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2d3x5Uint8, SimpleConvolution2d3x5Uint8Test, true, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2d3x5Nhwc, SimpleConvolution2d3x5Test, true, DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2d3x5Uint8Nhwc, SimpleConvolution2d3x5Uint8Test, true, DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2d3x5QSymm16, SimpleConvolution2d3x5QSymm16Test, true, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2d3x5QSymm16Nhwc, SimpleConvolution2d3x5QSymm16Test, true, DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2d3x5, SimpleConvolution2d3x5Test, true, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2d3x5Uint8, SimpleConvolution2d3x5Uint8Test, true, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2d3x5Nhwc, SimpleConvolution2d3x5Test, true, DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2d3x5Uint8Nhwc, SimpleConvolution2d3x5Uint8Test, true, DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2d3x5QSymm16, SimpleConvolution2d3x5QSymm16Test, true, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2d3x5QSymm16Nhwc,
+                              SimpleConvolution2d3x5QSymm16Test,
+                              true,
+                              DataLayout::NHWC)
 
-ARMNN_AUTO_TEST_CASE(UnbiasedConvolution2d, SimpleConvolution2d3x5Test, false, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(UnbiasedConvolutionUint8, SimpleConvolution2d3x5Uint8Test, false, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(UnbiasedConvolution2dNhwc, SimpleConvolution2d3x5Test, false, DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(UnbiasedConvolutionUint8Nhwc, SimpleConvolution2d3x5Uint8Test, false, DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedConvolution2d, SimpleConvolution2d3x5Test, false, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedConvolutionUint8, SimpleConvolution2d3x5Uint8Test, false, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedConvolution2dNhwc, SimpleConvolution2d3x5Test, false, DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedConvolutionUint8Nhwc, SimpleConvolution2d3x5Uint8Test, false, DataLayout::NHWC)
 
-ARMNN_AUTO_TEST_CASE(SimpleConvolution1d, Convolution1dTest, true)
-ARMNN_AUTO_TEST_CASE(SimpleConvolution1dUint8, Convolution1dUint8Test, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution1d, Convolution1dTest, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution1dUint8, Convolution1dUint8Test, true)
 
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2d3x3, SimpleConvolution2d3x3Test, true, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2d3x3Uint8, SimpleConvolution2d3x3Uint8Test, true, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2d3x3QSymm16, SimpleConvolution2d3x3QSymm16Test, true, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2d3x3, SimpleConvolution2d3x3Test, true, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2d3x3Uint8, SimpleConvolution2d3x3Uint8Test, true, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2d3x3QSymm16, SimpleConvolution2d3x3QSymm16Test, true, DataLayout::NCHW)
 
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2d3x3Nhwc, SimpleConvolution2d3x3Test, true, DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2d3x3Uint8Nhwc, SimpleConvolution2d3x3Uint8Test, true, DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2d3x3QSymm16Nhwc, SimpleConvolution2d3x3QSymm16Test, true,
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2d3x3Nhwc, SimpleConvolution2d3x3Test, true, DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2d3x3Uint8Nhwc, SimpleConvolution2d3x3Uint8Test, true, DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2d3x3QSymm16Nhwc, SimpleConvolution2d3x3QSymm16Test, true,
                      DataLayout::NCHW)
 
-ARMNN_AUTO_TEST_CASE(UnbiasedConvolution2dSquare, SimpleConvolution2d3x3Test, false, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(UnbiasedConvolution2dSquareNhwc, SimpleConvolution2d3x3Test, false, DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedConvolution2dSquare, SimpleConvolution2d3x3Test, false, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedConvolution2dSquareNhwc, SimpleConvolution2d3x3Test, false, DataLayout::NHWC)
 
-ARMNN_AUTO_TEST_CASE(UnbiasedConvolution2dSquareStride2x2Nhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedConvolution2dSquareStride2x2Nhwc,
                      SimpleConvolution2d3x3Stride2x2Test,
                      false,
                      DataLayout::NHWC)
 
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2dAsymmetricPaddingLargerThanHalfKernelSize,
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2dAsymmetricPaddingLargerThanHalfKernelSize,
                      Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2dAsymmetricPadding, Convolution2dAsymmetricPaddingTest, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2dAsymmetricPadding,
+                              Convolution2dAsymmetricPaddingTest, DataLayout::NCHW)
 
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2dAsymmetricPaddingLargerThanHalfKernelSizeNhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2dAsymmetricPaddingLargerThanHalfKernelSizeNhwc,
                      Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2dAsymmetricPaddingNhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2dAsymmetricPaddingNhwc,
                      Convolution2dAsymmetricPaddingTest,
                      DataLayout::NHWC)
 
-ARMNN_AUTO_TEST_CASE(SimpleConvolution2dSquareNhwc, SimpleConvolution2d3x3NhwcTest, false)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution2dSquareNhwc, SimpleConvolution2d3x3NhwcTest, false)
 
-ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3BFloat16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d3x3Dilation3x3BFloat16,
                      Convolution2d3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3NhwcBFloat16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d3x3Dilation3x3NhwcBFloat16,
                      Convolution2d3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d3x3Dilation3x3,
                      Convolution2d3x3Dilation3x3Test<DataType::Float32, DataType::Float32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3Nhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d3x3Dilation3x3Nhwc,
                      Convolution2d3x3Dilation3x3Test<DataType::Float32, DataType::Float32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3Int8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d3x3Dilation3x3Int8,
                      Convolution2d3x3Dilation3x3Test<DataType::QAsymmS8, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3NhwcInt8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d3x3Dilation3x3NhwcInt8,
                      Convolution2d3x3Dilation3x3Test<DataType::QAsymmS8, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3Uint8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d3x3Dilation3x3Uint8,
                      Convolution2d3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3NhwcUint8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d3x3Dilation3x3NhwcUint8,
                      Convolution2d3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3Int16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d3x3Dilation3x3Int16,
                      Convolution2d3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3NhwcInt16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d3x3Dilation3x3NhwcInt16,
                      Convolution2d3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
 
-ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3BFloat16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x3x3Dilation3x3BFloat16,
                      Convolution2d2x3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3NhwcBFloat16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x3x3Dilation3x3NhwcBFloat16,
                      Convolution2d2x3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x3x3Dilation3x3,
                      Convolution2d2x3x3Dilation3x3Test<DataType::Float32, DataType::Float32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3Nhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x3x3Dilation3x3Nhwc,
                      Convolution2d2x3x3Dilation3x3Test<DataType::Float32, DataType::Float32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3Int8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x3x3Dilation3x3Int8,
                      Convolution2d2x3x3Dilation3x3Test<DataType::QAsymmS8, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3NhwcInt8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x3x3Dilation3x3NhwcInt8,
                      Convolution2d2x3x3Dilation3x3Test<DataType::QAsymmS8, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3Uint8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x3x3Dilation3x3Uint8,
                      Convolution2d2x3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3NhwcUint8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x3x3Dilation3x3NhwcUint8,
                      Convolution2d2x3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3Int16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x3x3Dilation3x3Int16,
                      Convolution2d2x3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3NhwcInt16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x3x3Dilation3x3NhwcInt16,
                      Convolution2d2x3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
 
-ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3BFloat16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x2Dilation2x2Padding2x2Stride3x3BFloat16,
                      Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::BFloat16, DataType::BFloat16>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3NhwcBFloat16,
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x2Dilation2x2Padding2x2Stride3x3NhwcBFloat16,
                      Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::BFloat16, DataType::BFloat16>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x2Dilation2x2Padding2x2Stride3x3,
                      Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::Float32, DataType::Float32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3Nhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x2Dilation2x2Padding2x2Stride3x3Nhwc,
                      Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::Float32, DataType::Float32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3Int8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x2Dilation2x2Padding2x2Stride3x3Int8,
                      Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::QAsymmS8, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3NhwcInt8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x2Dilation2x2Padding2x2Stride3x3NhwcInt8,
                      Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::QAsymmS8, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3Uint8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x2Dilation2x2Padding2x2Stride3x3Uint8,
                      Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3NhwcUint8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x2Dilation2x2Padding2x2Stride3x3NhwcUint8,
                      Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3Int16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x2Dilation2x2Padding2x2Stride3x3Int16,
                      Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding2x2Stride3x3NhwcInt16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d2x2Dilation2x2Padding2x2Stride3x3NhwcInt16,
                      Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
 
-ARMNN_AUTO_TEST_CASE(Convolution2dPerAxisQuantTestNchw, Convolution2dPerAxisQuantTest, DataLayout::NCHW);
-ARMNN_AUTO_TEST_CASE(Convolution2dPerAxisQuantTestNhwc, Convolution2dPerAxisQuantTest, DataLayout::NHWC);
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2dPerAxisQuantTestNchw, Convolution2dPerAxisQuantTest, DataLayout::NCHW);
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2dPerAxisQuantTestNhwc, Convolution2dPerAxisQuantTest, DataLayout::NHWC);
 
-ARMNN_AUTO_TEST_CASE(Convolution2d3x3Stride2x2Bf16, Convolution2d3x3Stride2x2BFloat16Test, false, DataLayout::NHWC);
-ARMNN_AUTO_TEST_CASE(Convolution2d3x3Stride2x2BFloat16SmallValue,
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d3x3Stride2x2Bf16,
+                              Convolution2d3x3Stride2x2BFloat16Test,
+                              false,
+                              DataLayout::NHWC);
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d3x3Stride2x2BFloat16SmallValue,
                      Convolution2d3x3Stride2x2BFloat16SmallValueTest,
                      false,
                      DataLayout::NHWC);
 
 // Depthwise Convolution
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d, DepthwiseConvolution2dTest, true, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dUint8, DepthwiseConvolution2dUint8Test, true, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d, DepthwiseConvolution2dTest, true, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dUint8, DepthwiseConvolution2dUint8Test, true, DataLayout::NCHW)
 
-ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2d, DepthwiseConvolution2dTest, false, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dUint8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedDepthwiseConvolution2d, DepthwiseConvolution2dTest, false, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedDepthwiseConvolution2dUint8,
                      DepthwiseConvolution2dUint8Test,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dQSymm16, DepthwiseConvolution2dInt16Test, true, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dQSymm16, DepthwiseConvolution2dInt16Test, true, DataLayout::NCHW)
 
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dNhwc, DepthwiseConvolution2dTest, true, DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dUint8Nhwc, DepthwiseConvolution2dUint8Test, true, DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dNhwc, DepthwiseConvolution2dTest, true, DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dUint8Nhwc, DepthwiseConvolution2dUint8Test, true, DataLayout::NHWC)
 
-ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dNhwc, DepthwiseConvolution2dTest, false, DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dUint8Nhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedDepthwiseConvolution2dNhwc, DepthwiseConvolution2dTest, false, DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedDepthwiseConvolution2dUint8Nhwc,
                      DepthwiseConvolution2dUint8Test,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthNhwc, DepthwiseConvolution2dDepthNhwcTest, false)
-ARMNN_AUTO_TEST_CASE(SimpleDepthwiseConvolution2d3x3Dilation3x3Nhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dDepthNhwc, DepthwiseConvolution2dDepthNhwcTest, false)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleDepthwiseConvolution2d3x3Dilation3x3Nhwc,
                      SimpleDepthwiseConvolution2d3x3Dilation3x3NhwcTest)
 
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d3x3Dilation3x3,
                      DepthwiseConvolution2d3x3Dilation3x3Test<DataType::Float32, DataType::Float32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3Nhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d3x3Dilation3x3Nhwc,
                      DepthwiseConvolution2d3x3Dilation3x3Test<DataType::Float32, DataType::Float32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3BFloat16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d3x3Dilation3x3BFloat16,
                      DepthwiseConvolution2d3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3NhwcBFloat16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d3x3Dilation3x3NhwcBFloat16,
                      DepthwiseConvolution2d3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3Int8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d3x3Dilation3x3Int8,
                      DepthwiseConvolution2d3x3Dilation3x3Test<DataType::QAsymmS8, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3NhwcInt8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d3x3Dilation3x3NhwcInt8,
                      DepthwiseConvolution2d3x3Dilation3x3Test<DataType::QAsymmS8, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3Uint8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d3x3Dilation3x3Uint8,
                      DepthwiseConvolution2d3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3NhwcUint8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d3x3Dilation3x3NhwcUint8,
                      DepthwiseConvolution2d3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3Int16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d3x3Dilation3x3Int16,
                      DepthwiseConvolution2d3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d3x3Dilation3x3NhwcInt16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d3x3Dilation3x3NhwcInt16,
                      DepthwiseConvolution2d3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
 
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d2x3x3Dilation3x3,
                      DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::Float32, DataType::Float32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3Nhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d2x3x3Dilation3x3Nhwc,
                      DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::Float32, DataType::Float32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3BFloat16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d2x3x3Dilation3x3BFloat16,
                      DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3NhwcBFloat16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d2x3x3Dilation3x3NhwcBFloat16,
                      DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::BFloat16, DataType::BFloat16>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3Int8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d2x3x3Dilation3x3Int8,
                      DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QAsymmS8, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3NhwcInt8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d2x3x3Dilation3x3NhwcInt8,
                      DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QAsymmS8, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3Uint8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d2x3x3Dilation3x3Uint8,
                      DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3NhwcUint8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d2x3x3Dilation3x3NhwcUint8,
                      DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QAsymmU8, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3Int16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d2x3x3Dilation3x3Int16,
                      DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3NhwcInt16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d2x3x3Dilation3x3NhwcInt16,
                      DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QSymmS16, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dMult4,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dMult4,
                      DepthwiseConvolution2dMult4Test<armnn::DataType::Float32, armnn::DataType::Float32>,
                      false,
                      armnn::DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dMult2,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dMult2,
                      DepthwiseConvolution2dMult2Test<armnn::DataType::Float32, armnn::DataType::Float32>,
                      false,
                      armnn::DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dMult4BFloat16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dMult4BFloat16,
                      DepthwiseConvolution2dMult4Test<armnn::DataType::BFloat16, armnn::DataType::BFloat16>,
                      false,
                      armnn::DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dMult2BFloat16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dMult2BFloat16,
                      DepthwiseConvolution2dMult2Test<armnn::DataType::BFloat16, armnn::DataType::BFloat16>,
                      false,
                      armnn::DataLayout::NCHW)
 
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dDepthMul1,
                      DepthwiseConvolution2dDepthMul1Test, true, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1Uint8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dDepthMul1Uint8,
                      DepthwiseConvolution2dDepthMul1Uint8Test, true, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1Int16,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dDepthMul1Int16,
                      DepthwiseConvolution2dDepthMul1Int16Test, true, DataLayout::NCHW)
 
-ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1,
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedDepthwiseConvolution2dDepthMul1,
                      DepthwiseConvolution2dDepthMul1Test, false, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1Uint8,
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedDepthwiseConvolution2dDepthMul1Uint8,
                      DepthwiseConvolution2dDepthMul1Uint8Test, false, DataLayout::NCHW)
 
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1Nhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dDepthMul1Nhwc,
                      DepthwiseConvolution2dDepthMul1Test, true, DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1Uint8Nhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dDepthMul1Uint8Nhwc,
                      DepthwiseConvolution2dDepthMul1Uint8Test, true, DataLayout::NHWC)
 
-ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1Nhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedDepthwiseConvolution2dDepthMul1Nhwc,
                      DepthwiseConvolution2dDepthMul1Test, false, DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1Uint8Nhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedDepthwiseConvolution2dDepthMul1Uint8Nhwc,
                      DepthwiseConvolution2dDepthMul1Uint8Test, false, DataLayout::NHWC)
 
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dAsymmetric,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dAsymmetric,
                      DepthwiseConvolution2dAsymmetricTest, true, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dAsymmetric,
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedDepthwiseConvolution2dAsymmetric,
                      DepthwiseConvolution2dAsymmetricTest, false, DataLayout::NCHW)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dAsymmetricNhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dAsymmetricNhwc,
                      DepthwiseConvolution2dAsymmetricTest, true, DataLayout::NHWC)
-ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dAsymmetricNhwc,
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedDepthwiseConvolution2dAsymmetricNhwc,
                      DepthwiseConvolution2dAsymmetricTest, false, DataLayout::NHWC)
 
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul64, DepthwiseConvolution2dDepthMul64Test);
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dDepthMul64, DepthwiseConvolution2dDepthMul64Test);
 
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dPerAxisQuantTestNchw, DepthwiseConvolution2dPerAxisQuantTest,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dPerAxisQuantTestNchw, DepthwiseConvolution2dPerAxisQuantTest,
                      DataLayout::NCHW);
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dPerAxisQuantTestNhwc, DepthwiseConvolution2dPerAxisQuantTest,
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dPerAxisQuantTestNhwc, DepthwiseConvolution2dPerAxisQuantTest,
                      DataLayout::NHWC);
 
 // Pooling
@@ -588,15 +596,15 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(CopyViaSplitterUint8, CopyViaSplitterUint8Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(CopyViaSplitterInt16, CopyViaSplitterInt16Test)
 
 // Concat
-ARMNN_AUTO_TEST_CASE(SimpleConcat, ConcatTest)
-ARMNN_AUTO_TEST_CASE(ConcatBFloat16, ConcatBFloat16Test)
-ARMNN_AUTO_TEST_CASE(ConcatFloat16, ConcatFloat16Test)
-ARMNN_AUTO_TEST_CASE(ConcatUint8, ConcatUint8Test)
-ARMNN_AUTO_TEST_CASE(ConcatUint8DifferentQParams, ConcatUint8DifferentQParamsTest)
-ARMNN_AUTO_TEST_CASE(ConcatUint16, ConcatUint16Test)
-ARMNN_AUTO_TEST_CASE(ConcatUint8DifferentInputOutputQParam,
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConcat, ConcatTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ConcatBFloat16, ConcatBFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ConcatFloat16, ConcatFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ConcatUint8, ConcatUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ConcatUint8DifferentQParams, ConcatUint8DifferentQParamsTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ConcatUint16, ConcatUint16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ConcatUint8DifferentInputOutputQParam,
                      ConcatDifferentInputOutputQParamTest<DataType::QAsymmU8>, true)
-ARMNN_AUTO_TEST_CASE(ConcatInt16DifferentInputOutputQParam,
+ARMNN_AUTO_TEST_CASE_WITH_THF(ConcatInt16DifferentInputOutputQParam,
                      ConcatDifferentInputOutputQParamTest<DataType::QSymmS16>, true)
 
 // Add
@@ -663,82 +671,82 @@ ARMNN_AUTO_TEST_CASE(DivisionInt32Broadcast1Element, DivisionBroadcast1ElementIn
 ARMNN_AUTO_TEST_CASE(DivisionInt32Broadcast1DVector, DivisionBroadcast1DVectorInt32Test)
 
 // Equal
-ARMNN_AUTO_TEST_CASE(EqualSimple,            EqualSimpleTest)
-ARMNN_AUTO_TEST_CASE(EqualBroadcast1Element, EqualBroadcast1ElementTest)
-ARMNN_AUTO_TEST_CASE(EqualBroadcast1dVector, EqualBroadcast1dVectorTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(EqualSimple,            EqualSimpleTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(EqualBroadcast1Element, EqualBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(EqualBroadcast1dVector, EqualBroadcast1dVectorTest)
 
-ARMNN_AUTO_TEST_CASE(EqualSimpleFloat16,            EqualSimpleFloat16Test)
-ARMNN_AUTO_TEST_CASE(EqualBroadcast1ElementFloat16, EqualBroadcast1ElementFloat16Test)
-ARMNN_AUTO_TEST_CASE(EqualBroadcast1dVectorFloat16, EqualBroadcast1dVectorFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(EqualSimpleFloat16,            EqualSimpleFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(EqualBroadcast1ElementFloat16, EqualBroadcast1ElementFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(EqualBroadcast1dVectorFloat16, EqualBroadcast1dVectorFloat16Test)
 
-ARMNN_AUTO_TEST_CASE(EqualSimpleUint8,            EqualSimpleUint8Test)
-ARMNN_AUTO_TEST_CASE(EqualBroadcast1ElementUint8, EqualBroadcast1ElementUint8Test)
-ARMNN_AUTO_TEST_CASE(EqualBroadcast1dVectorUint8, EqualBroadcast1dVectorUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(EqualSimpleUint8,            EqualSimpleUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(EqualBroadcast1ElementUint8, EqualBroadcast1ElementUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(EqualBroadcast1dVectorUint8, EqualBroadcast1dVectorUint8Test)
 
 // Greater
-ARMNN_AUTO_TEST_CASE(GreaterSimple,            GreaterSimpleTest)
-ARMNN_AUTO_TEST_CASE(GreaterBroadcast1Element, GreaterBroadcast1ElementTest)
-ARMNN_AUTO_TEST_CASE(GreaterBroadcast1dVector, GreaterBroadcast1dVectorTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterSimple,            GreaterSimpleTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterBroadcast1Element, GreaterBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterBroadcast1dVector, GreaterBroadcast1dVectorTest)
 
-ARMNN_AUTO_TEST_CASE(GreaterSimpleFloat16,            GreaterSimpleFloat16Test)
-ARMNN_AUTO_TEST_CASE(GreaterBroadcast1ElementFloat16, GreaterBroadcast1ElementFloat16Test)
-ARMNN_AUTO_TEST_CASE(GreaterBroadcast1dVectorFloat16, GreaterBroadcast1dVectorFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterSimpleFloat16,            GreaterSimpleFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterBroadcast1ElementFloat16, GreaterBroadcast1ElementFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterBroadcast1dVectorFloat16, GreaterBroadcast1dVectorFloat16Test)
 
-ARMNN_AUTO_TEST_CASE(GreaterSimpleUint8,            GreaterSimpleUint8Test)
-ARMNN_AUTO_TEST_CASE(GreaterBroadcast1ElementUint8, GreaterBroadcast1ElementUint8Test)
-ARMNN_AUTO_TEST_CASE(GreaterBroadcast1dVectorUint8, GreaterBroadcast1dVectorUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterSimpleUint8,            GreaterSimpleUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterBroadcast1ElementUint8, GreaterBroadcast1ElementUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterBroadcast1dVectorUint8, GreaterBroadcast1dVectorUint8Test)
 
 // GreaterOrEqual
-ARMNN_AUTO_TEST_CASE(GreaterOrEqualSimple,            GreaterOrEqualSimpleTest)
-ARMNN_AUTO_TEST_CASE(GreaterOrEqualBroadcast1Element, GreaterOrEqualBroadcast1ElementTest)
-ARMNN_AUTO_TEST_CASE(GreaterOrEqualBroadcast1dVector, GreaterOrEqualBroadcast1dVectorTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterOrEqualSimple,            GreaterOrEqualSimpleTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterOrEqualBroadcast1Element, GreaterOrEqualBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterOrEqualBroadcast1dVector, GreaterOrEqualBroadcast1dVectorTest)
 
-ARMNN_AUTO_TEST_CASE(GreaterOrEqualSimpleFloat16,            GreaterOrEqualSimpleFloat16Test)
-ARMNN_AUTO_TEST_CASE(GreaterOrEqualBroadcast1ElementFloat16, GreaterOrEqualBroadcast1ElementFloat16Test)
-ARMNN_AUTO_TEST_CASE(GreaterOrEqualBroadcast1dVectorFloat16, GreaterOrEqualBroadcast1dVectorFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterOrEqualSimpleFloat16,            GreaterOrEqualSimpleFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterOrEqualBroadcast1ElementFloat16, GreaterOrEqualBroadcast1ElementFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterOrEqualBroadcast1dVectorFloat16, GreaterOrEqualBroadcast1dVectorFloat16Test)
 
-ARMNN_AUTO_TEST_CASE(GreaterOrEqualSimpleUint8,            GreaterOrEqualSimpleUint8Test)
-ARMNN_AUTO_TEST_CASE(GreaterOrEqualBroadcast1ElementUint8, GreaterOrEqualBroadcast1ElementUint8Test)
-ARMNN_AUTO_TEST_CASE(GreaterOrEqualBroadcast1dVectorUint8, GreaterOrEqualBroadcast1dVectorUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterOrEqualSimpleUint8,            GreaterOrEqualSimpleUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterOrEqualBroadcast1ElementUint8, GreaterOrEqualBroadcast1ElementUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GreaterOrEqualBroadcast1dVectorUint8, GreaterOrEqualBroadcast1dVectorUint8Test)
 
 // Less
-ARMNN_AUTO_TEST_CASE(LessSimple,            LessSimpleTest)
-ARMNN_AUTO_TEST_CASE(LessBroadcast1Element, LessBroadcast1ElementTest)
-ARMNN_AUTO_TEST_CASE(LessBroadcast1dVector, LessBroadcast1dVectorTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessSimple,            LessSimpleTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessBroadcast1Element, LessBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessBroadcast1dVector, LessBroadcast1dVectorTest)
 
-ARMNN_AUTO_TEST_CASE(LessSimpleFloat16,            LessSimpleFloat16Test)
-ARMNN_AUTO_TEST_CASE(LessBroadcast1ElementFloat16, LessBroadcast1ElementFloat16Test)
-ARMNN_AUTO_TEST_CASE(LessBroadcast1dVectorFloat16, LessBroadcast1dVectorFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessSimpleFloat16,            LessSimpleFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessBroadcast1ElementFloat16, LessBroadcast1ElementFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessBroadcast1dVectorFloat16, LessBroadcast1dVectorFloat16Test)
 
-ARMNN_AUTO_TEST_CASE(LessSimpleUint8,            LessSimpleUint8Test)
-ARMNN_AUTO_TEST_CASE(LessBroadcast1ElementUint8, LessBroadcast1ElementUint8Test)
-ARMNN_AUTO_TEST_CASE(LessBroadcast1dVectorUint8, LessBroadcast1dVectorUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessSimpleUint8,            LessSimpleUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessBroadcast1ElementUint8, LessBroadcast1ElementUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessBroadcast1dVectorUint8, LessBroadcast1dVectorUint8Test)
 
 // LessOrEqual
-ARMNN_AUTO_TEST_CASE(LessOrEqualSimple,            LessOrEqualSimpleTest)
-ARMNN_AUTO_TEST_CASE(LessOrEqualBroadcast1Element, LessOrEqualBroadcast1ElementTest)
-ARMNN_AUTO_TEST_CASE(LessOrEqualBroadcast1dVector, LessOrEqualBroadcast1dVectorTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessOrEqualSimple,            LessOrEqualSimpleTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessOrEqualBroadcast1Element, LessOrEqualBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessOrEqualBroadcast1dVector, LessOrEqualBroadcast1dVectorTest)
 
-ARMNN_AUTO_TEST_CASE(LessOrEqualSimpleFloat16,            LessOrEqualSimpleFloat16Test)
-ARMNN_AUTO_TEST_CASE(LessOrEqualBroadcast1ElementFloat16, LessOrEqualBroadcast1ElementFloat16Test)
-ARMNN_AUTO_TEST_CASE(LessOrEqualBroadcast1dVectorFloat16, LessOrEqualBroadcast1dVectorFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessOrEqualSimpleFloat16,            LessOrEqualSimpleFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessOrEqualBroadcast1ElementFloat16, LessOrEqualBroadcast1ElementFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessOrEqualBroadcast1dVectorFloat16, LessOrEqualBroadcast1dVectorFloat16Test)
 
-ARMNN_AUTO_TEST_CASE(LessOrEqualSimpleUint8,            LessOrEqualSimpleUint8Test)
-ARMNN_AUTO_TEST_CASE(LessOrEqualBroadcast1ElementUint8, LessOrEqualBroadcast1ElementUint8Test)
-ARMNN_AUTO_TEST_CASE(LessOrEqualBroadcast1dVectorUint8, LessOrEqualBroadcast1dVectorUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessOrEqualSimpleUint8,            LessOrEqualSimpleUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessOrEqualBroadcast1ElementUint8, LessOrEqualBroadcast1ElementUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LessOrEqualBroadcast1dVectorUint8, LessOrEqualBroadcast1dVectorUint8Test)
 
 // NotEqual
-ARMNN_AUTO_TEST_CASE(NotEqualSimple,            NotEqualSimpleTest)
-ARMNN_AUTO_TEST_CASE(NotEqualBroadcast1Element, NotEqualBroadcast1ElementTest)
-ARMNN_AUTO_TEST_CASE(NotEqualBroadcast1dVector, NotEqualBroadcast1dVectorTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(NotEqualSimple,            NotEqualSimpleTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(NotEqualBroadcast1Element, NotEqualBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(NotEqualBroadcast1dVector, NotEqualBroadcast1dVectorTest)
 
-ARMNN_AUTO_TEST_CASE(NotEqualSimpleFloat16,            NotEqualSimpleFloat16Test)
-ARMNN_AUTO_TEST_CASE(NotEqualBroadcast1ElementFloat16, NotEqualBroadcast1ElementFloat16Test)
-ARMNN_AUTO_TEST_CASE(NotEqualBroadcast1dVectorFloat16, NotEqualBroadcast1dVectorFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(NotEqualSimpleFloat16,            NotEqualSimpleFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(NotEqualBroadcast1ElementFloat16, NotEqualBroadcast1ElementFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(NotEqualBroadcast1dVectorFloat16, NotEqualBroadcast1dVectorFloat16Test)
 
-ARMNN_AUTO_TEST_CASE(NotEqualSimpleUint8,            NotEqualSimpleUint8Test)
-ARMNN_AUTO_TEST_CASE(NotEqualBroadcast1ElementUint8, NotEqualBroadcast1ElementUint8Test)
-ARMNN_AUTO_TEST_CASE(NotEqualBroadcast1dVectorUint8, NotEqualBroadcast1dVectorUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(NotEqualSimpleUint8,            NotEqualSimpleUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(NotEqualBroadcast1ElementUint8, NotEqualBroadcast1ElementUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(NotEqualBroadcast1dVectorUint8, NotEqualBroadcast1dVectorUint8Test)
 
 // Max
 ARMNN_AUTO_TEST_CASE(SimpleMaximum, MaximumSimpleTest)
@@ -1308,55 +1316,55 @@ ARMNN_AUTO_TEST_CASE(PadInt83d, PadInt83dTest)
 ARMNN_AUTO_TEST_CASE(PadInt84d, PadInt84dTest)
 
 // Constant
-ARMNN_AUTO_TEST_CASE(Constant, ConstantTest)
-ARMNN_AUTO_TEST_CASE(ConstantUint8, ConstantUint8CustomQuantizationScaleAndOffsetTest)
-ARMNN_AUTO_TEST_CASE(ConstantInt16, ConstantInt16CustomQuantizationScaleAndOffsetTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Constant, ConstantTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ConstantUint8, ConstantUint8CustomQuantizationScaleAndOffsetTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ConstantInt16, ConstantInt16CustomQuantizationScaleAndOffsetTest)
 
 // Concat
-ARMNN_AUTO_TEST_CASE(Concat1d, Concat1dTest)
-ARMNN_AUTO_TEST_CASE(Concat1dUint8, Concat1dUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat1d, Concat1dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat1dUint8, Concat1dUint8Test)
 
-ARMNN_AUTO_TEST_CASE(Concat2dDim0, Concat2dDim0Test)
-ARMNN_AUTO_TEST_CASE(Concat2dDim0Uint8, Concat2dDim0Uint8Test)
-ARMNN_AUTO_TEST_CASE(Concat2dDim1, Concat2dDim1Test)
-ARMNN_AUTO_TEST_CASE(Concat2dDim1Uint8, Concat2dDim1Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat2dDim0, Concat2dDim0Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat2dDim0Uint8, Concat2dDim0Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat2dDim1, Concat2dDim1Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat2dDim1Uint8, Concat2dDim1Uint8Test)
 
-ARMNN_AUTO_TEST_CASE(Concat2dDim0DiffInputDims, Concat2dDim0DiffInputDimsTest)
-ARMNN_AUTO_TEST_CASE(Concat2dDim0DiffInputDimsUint8, Concat2dDim0DiffInputDimsUint8Test)
-ARMNN_AUTO_TEST_CASE(Concat2dDim1DiffInputDims, Concat2dDim1DiffInputDimsTest)
-ARMNN_AUTO_TEST_CASE(Concat2dDim1DiffInputDimsUint8, Concat2dDim1DiffInputDimsUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat2dDim0DiffInputDims, Concat2dDim0DiffInputDimsTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat2dDim0DiffInputDimsUint8, Concat2dDim0DiffInputDimsUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat2dDim1DiffInputDims, Concat2dDim1DiffInputDimsTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat2dDim1DiffInputDimsUint8, Concat2dDim1DiffInputDimsUint8Test)
 
-ARMNN_AUTO_TEST_CASE(Concat3dDim0, Concat3dDim0Test)
-ARMNN_AUTO_TEST_CASE(Concat3dDim0Uint8, Concat3dDim0Uint8Test)
-ARMNN_AUTO_TEST_CASE(Concat3dDim1, Concat3dDim1Test)
-ARMNN_AUTO_TEST_CASE(Concat3dDim1Uint8, Concat3dDim1Uint8Test)
-ARMNN_AUTO_TEST_CASE(Concat3dDim2, Concat3dDim2Test, true)
-ARMNN_AUTO_TEST_CASE(Concat3dDim2Uint8, Concat3dDim2Uint8Test, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat3dDim0, Concat3dDim0Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat3dDim0Uint8, Concat3dDim0Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat3dDim1, Concat3dDim1Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat3dDim1Uint8, Concat3dDim1Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat3dDim2, Concat3dDim2Test, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat3dDim2Uint8, Concat3dDim2Uint8Test, true)
 
-ARMNN_AUTO_TEST_CASE(Concat3dDim0DiffInputDims, Concat3dDim0DiffInputDimsTest)
-ARMNN_AUTO_TEST_CASE(Concat3dDim0DiffInputDimsUint8, Concat3dDim0DiffInputDimsUint8Test)
-ARMNN_AUTO_TEST_CASE(Concat3dDim1DiffInputDims, Concat3dDim1DiffInputDimsTest)
-ARMNN_AUTO_TEST_CASE(Concat3dDim1DiffInputDimsUint8, Concat3dDim1DiffInputDimsUint8Test)
-ARMNN_AUTO_TEST_CASE(Concat3dDim2DiffInputDims, Concat3dDim2DiffInputDimsTest, true)
-ARMNN_AUTO_TEST_CASE(Concat3dDim2DiffInputDimsUint8, Concat3dDim2DiffInputDimsUint8Test, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat3dDim0DiffInputDims, Concat3dDim0DiffInputDimsTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat3dDim0DiffInputDimsUint8, Concat3dDim0DiffInputDimsUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat3dDim1DiffInputDims, Concat3dDim1DiffInputDimsTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat3dDim1DiffInputDimsUint8, Concat3dDim1DiffInputDimsUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat3dDim2DiffInputDims, Concat3dDim2DiffInputDimsTest, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat3dDim2DiffInputDimsUint8, Concat3dDim2DiffInputDimsUint8Test, true)
 
-ARMNN_AUTO_TEST_CASE(Concat4dDim0, Concat4dDim0Test)
-ARMNN_AUTO_TEST_CASE(Concat4dDim1, Concat4dDim1Test)
-ARMNN_AUTO_TEST_CASE(Concat4dDim2, Concat4dDim2Test)
-ARMNN_AUTO_TEST_CASE(Concat4dDim3, Concat4dDim3Test, true)
-ARMNN_AUTO_TEST_CASE(Concat4dDim0Uint8, Concat4dDim0Uint8Test)
-ARMNN_AUTO_TEST_CASE(Concat4dDim1Uint8, Concat4dDim1Uint8Test)
-ARMNN_AUTO_TEST_CASE(Concat4dDim2Uint8, Concat4dDim2Uint8Test)
-ARMNN_AUTO_TEST_CASE(Concat4dDim3Uint8, Concat4dDim3Uint8Test, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDim0, Concat4dDim0Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDim1, Concat4dDim1Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDim2, Concat4dDim2Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDim3, Concat4dDim3Test, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDim0Uint8, Concat4dDim0Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDim1Uint8, Concat4dDim1Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDim2Uint8, Concat4dDim2Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDim3Uint8, Concat4dDim3Uint8Test, true)
 
-ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim0, Concat4dDiffShapeDim0Test)
-ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim1, Concat4dDiffShapeDim1Test)
-ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim2, Concat4dDiffShapeDim2Test)
-ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim3, Concat4dDiffShapeDim3Test, true)
-ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim0Uint8, Concat4dDiffShapeDim0Uint8Test)
-ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim1Uint8, Concat4dDiffShapeDim1Uint8Test)
-ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim2Uint8, Concat4dDiffShapeDim2Uint8Test)
-ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim3Uint8, Concat4dDiffShapeDim3Uint8Test, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDiffShapeDim0, Concat4dDiffShapeDim0Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDiffShapeDim1, Concat4dDiffShapeDim1Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDiffShapeDim2, Concat4dDiffShapeDim2Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDiffShapeDim3, Concat4dDiffShapeDim3Test, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDiffShapeDim0Uint8, Concat4dDiffShapeDim0Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDiffShapeDim1Uint8, Concat4dDiffShapeDim1Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDiffShapeDim2Uint8, Concat4dDiffShapeDim2Uint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Concat4dDiffShapeDim3Uint8, Concat4dDiffShapeDim3Uint8Test, true)
 
 // Fill
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFill, SimpleFillTest<DataType::Float32>)
@@ -1447,15 +1455,15 @@ ARMNN_AUTO_TEST_CASE(QLstm1, QLstmTest1)
 ARMNN_AUTO_TEST_CASE(QLstm2, QLstmTest2)
 
 // Convert from BFloat16 to Float32
-ARMNN_AUTO_TEST_CASE(ConvertBf16ToFp32, ConvertBf16ToFp32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ConvertBf16ToFp32, ConvertBf16ToFp32Test)
 
 // Convert from Float32 to BFloat16
-ARMNN_AUTO_TEST_CASE(ConvertFp32ToBf16, ConvertFp32ToBf16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ConvertFp32ToBf16, ConvertFp32ToBf16Test)
 
 // Convert from Float16 to Float32
-ARMNN_AUTO_TEST_CASE(SimpleConvertFp16ToFp32, SimpleConvertFp16ToFp32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvertFp16ToFp32, SimpleConvertFp16ToFp32Test)
 // Convert from Float32 to Float16
-ARMNN_AUTO_TEST_CASE(SimpleConvertFp32ToFp16, SimpleConvertFp32ToFp16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvertFp32ToFp16, SimpleConvertFp32ToFp16Test)
 
 // Mean
 ARMNN_AUTO_TEST_CASE(MeanSimpleFloat32, MeanSimpleTest<DataType::Float32>)

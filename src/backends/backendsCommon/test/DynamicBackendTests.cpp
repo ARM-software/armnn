@@ -21,7 +21,6 @@ ARMNN_SIMPLE_TEST_CASE(GetNotExistingEntryPoint, GetNotExistingEntryPointTestImp
 
 ARMNN_SIMPLE_TEST_CASE(BackendVersioning, BackendVersioningTestImpl);
 
-ARMNN_SIMPLE_TEST_CASE(CreateValidDynamicBackendObject, CreateValidDynamicBackendObjectTestImpl);
 
 ARMNN_SIMPLE_TEST_CASE(CreateDynamicBackendObjectInvalidHandle,
                        CreateDynamicBackendObjectInvalidHandleTestImpl);
@@ -50,10 +49,7 @@ ARMNN_SIMPLE_TEST_CASE(CreateDynamicBackendsNoPaths, CreateDynamicBackendsNoPath
 ARMNN_SIMPLE_TEST_CASE(CreateDynamicBackendsAllInvalid, CreateDynamicBackendsAllInvalidTestImpl);
 ARMNN_SIMPLE_TEST_CASE(CreateDynamicBackendsMixedTypes, CreateDynamicBackendsMixedTypesTestImpl);
 
-ARMNN_SIMPLE_TEST_CASE(RegisterSingleDynamicBackend, RegisterSingleDynamicBackendTestImpl);
-ARMNN_SIMPLE_TEST_CASE(RegisterMultipleDynamicBackends, RegisterMultipleDynamicBackendsTestImpl);
 ARMNN_SIMPLE_TEST_CASE(RegisterMultipleInvalidDynamicBackends, RegisterMultipleInvalidDynamicBackendsTestImpl);
-ARMNN_SIMPLE_TEST_CASE(RegisterMixedDynamicBackends, RegisterMixedDynamicBackendsTestImpl);
 
 #if !defined(ARMNN_DYNAMIC_BACKEND_ENABLED)
 ARMNN_SIMPLE_TEST_CASE(RuntimeEmpty, RuntimeEmptyTestImpl);
@@ -68,6 +64,10 @@ ARMNN_SIMPLE_TEST_CASE(RuntimeInvalidOverridePath, RuntimeInvalidOverridePathTes
 // This test unit needs the reference backend, it's not available if the reference backend is not built
 
 ARMNN_SIMPLE_TEST_CASE(CreateReferenceDynamicBackend, CreateReferenceDynamicBackendTestImpl);
+ARMNN_SIMPLE_TEST_CASE(CreateValidDynamicBackendObject, CreateValidDynamicBackendObjectTestImpl);
+ARMNN_SIMPLE_TEST_CASE(RegisterSingleDynamicBackend, RegisterSingleDynamicBackendTestImpl);
+ARMNN_SIMPLE_TEST_CASE(RegisterMultipleDynamicBackends, RegisterMultipleDynamicBackendsTestImpl);
+ARMNN_SIMPLE_TEST_CASE(RegisterMixedDynamicBackends, RegisterMixedDynamicBackendsTestImpl);
 
 #endif
 

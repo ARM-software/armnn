@@ -374,6 +374,7 @@ void BackendVersioningTestImpl()
     BOOST_TEST(TestDynamicBackendUtils::IsBackendCompatibleTest(backendApiVersion, earlierMinorBackendVersion) == true);
 }
 
+#if defined(ARMNNREF_ENABLED)
 void CreateValidDynamicBackendObjectTestImpl()
 {
     // Valid shared object handle
@@ -422,6 +423,7 @@ void CreateValidDynamicBackendObjectTestImpl()
     BOOST_TEST((dynamicBackendInstance1->GetId() == "ValidTestDynamicBackend"));
     BOOST_TEST((dynamicBackendInstance2->GetId() == "ValidTestDynamicBackend"));
 }
+#endif
 
 void CreateDynamicBackendObjectInvalidHandleTestImpl()
 {
@@ -910,6 +912,7 @@ void CreateDynamicBackendsMixedTypesTestImpl()
     BOOST_TEST((dynamicBackends[0]->GetBackendId() == "TestValid2"));
 }
 
+#if defined(ARMNNREF_ENABLED)
 void RegisterSingleDynamicBackendTestImpl()
 {
     using namespace armnn;
@@ -1031,66 +1034,6 @@ void RegisterMultipleDynamicBackendsTestImpl()
         BOOST_TEST((dynamicBackend != nullptr));
         BOOST_TEST((dynamicBackend->GetId() == dynamicBackendId));
     }
-}
-
-void RegisterMultipleInvalidDynamicBackendsTestImpl()
-{
-    using namespace armnn;
-    using namespace fs;
-
-    // Try to register many invalid dynamic backends
-
-    // The test covers one directory:
-    // <unit test path>/src/backends/backendsCommon/test/
-    //                                                └─ backendsTestPath9/   -> exists, contains files
-    //
-    // The test sub-directory backendsTestPath9/ contains the following test files:
-    //
-    // Arm_TestInvalid10_backend.so -> not valid (invalid backend id)
-    // Arm_TestInvalid11_backend.so -> not valid (invalid backend id)
-
-    std::string testDynamicBackendsSubDir9 = GetTestSubDirectory(g_TestDynamicBackendsSubDir9);
-    BOOST_CHECK(exists(testDynamicBackendsSubDir9));
-
-    std::string testInvalidBackend10FilePath = GetTestFilePath(testDynamicBackendsSubDir9,
-                                                               g_TestInvalidBackend10FileName);
-    std::string testInvalidBackend11FilePath = GetTestFilePath(testDynamicBackendsSubDir9,
-                                                               g_TestInvalidBackend11FileName);
-    BOOST_CHECK(exists(testInvalidBackend10FilePath));
-    BOOST_CHECK(exists(testInvalidBackend11FilePath));
-
-    std::vector<std::string> sharedObjects
-    {
-        testInvalidBackend10FilePath,
-        testInvalidBackend11FilePath,
-        "InvalidSharedObject"
-    };
-    std::vector<DynamicBackendPtr> dynamicBackends = TestDynamicBackendUtils::CreateDynamicBackends(sharedObjects);
-
-    BOOST_TEST(dynamicBackends.size() == 2);
-    BOOST_TEST((dynamicBackends[0] != nullptr));
-    BOOST_TEST((dynamicBackends[1] != nullptr));
-
-    BackendId dynamicBackendId1 = dynamicBackends[0]->GetBackendId();
-    BackendId dynamicBackendId2 = dynamicBackends[1]->GetBackendId();
-    BOOST_TEST((dynamicBackendId1 == ""));
-    BOOST_TEST((dynamicBackendId2 == "Unknown"));
-
-    for (size_t i = 0; i < dynamicBackends.size(); i++)
-    {
-        BackendVersion dynamicBackendVersion = dynamicBackends[i]->GetBackendVersion();
-        BOOST_TEST(TestDynamicBackendUtils::IsBackendCompatible(dynamicBackendVersion));
-    }
-
-    // Dummy registry used for testing
-    BackendRegistry backendRegistry;
-    BOOST_TEST(backendRegistry.Size() == 0);
-
-    // Check that no dynamic backend got registered
-    BackendIdSet registeredBackendIds = TestDynamicBackendUtils::RegisterDynamicBackendsImplTest(backendRegistry,
-                                                                                                 dynamicBackends);
-    BOOST_TEST(backendRegistry.Size() == 0);
-    BOOST_TEST(registeredBackendIds.empty());
 }
 
 void RegisterMixedDynamicBackendsTestImpl()
@@ -1237,6 +1180,67 @@ void RegisterMixedDynamicBackendsTestImpl()
         BOOST_TEST((dynamicBackend != nullptr));
         BOOST_TEST((dynamicBackend->GetId() == expectedRegisteredbackendId));
     }
+}
+#endif
+
+void RegisterMultipleInvalidDynamicBackendsTestImpl()
+{
+    using namespace armnn;
+    using namespace fs;
+
+    // Try to register many invalid dynamic backends
+
+    // The test covers one directory:
+    // <unit test path>/src/backends/backendsCommon/test/
+    //                                                └─ backendsTestPath9/   -> exists, contains files
+    //
+    // The test sub-directory backendsTestPath9/ contains the following test files:
+    //
+    // Arm_TestInvalid10_backend.so -> not valid (invalid backend id)
+    // Arm_TestInvalid11_backend.so -> not valid (invalid backend id)
+
+    std::string testDynamicBackendsSubDir9 = GetTestSubDirectory(g_TestDynamicBackendsSubDir9);
+    BOOST_CHECK(exists(testDynamicBackendsSubDir9));
+
+    std::string testInvalidBackend10FilePath = GetTestFilePath(testDynamicBackendsSubDir9,
+                                                               g_TestInvalidBackend10FileName);
+    std::string testInvalidBackend11FilePath = GetTestFilePath(testDynamicBackendsSubDir9,
+                                                               g_TestInvalidBackend11FileName);
+    BOOST_CHECK(exists(testInvalidBackend10FilePath));
+    BOOST_CHECK(exists(testInvalidBackend11FilePath));
+
+    std::vector<std::string> sharedObjects
+    {
+        testInvalidBackend10FilePath,
+        testInvalidBackend11FilePath,
+        "InvalidSharedObject"
+    };
+    std::vector<DynamicBackendPtr> dynamicBackends = TestDynamicBackendUtils::CreateDynamicBackends(sharedObjects);
+
+    BOOST_TEST(dynamicBackends.size() == 2);
+    BOOST_TEST((dynamicBackends[0] != nullptr));
+    BOOST_TEST((dynamicBackends[1] != nullptr));
+
+    BackendId dynamicBackendId1 = dynamicBackends[0]->GetBackendId();
+    BackendId dynamicBackendId2 = dynamicBackends[1]->GetBackendId();
+    BOOST_TEST((dynamicBackendId1 == ""));
+    BOOST_TEST((dynamicBackendId2 == "Unknown"));
+
+    for (size_t i = 0; i < dynamicBackends.size(); i++)
+    {
+        BackendVersion dynamicBackendVersion = dynamicBackends[i]->GetBackendVersion();
+        BOOST_TEST(TestDynamicBackendUtils::IsBackendCompatible(dynamicBackendVersion));
+    }
+
+    // Dummy registry used for testing
+    BackendRegistry backendRegistry;
+    BOOST_TEST(backendRegistry.Size() == 0);
+
+    // Check that no dynamic backend got registered
+    BackendIdSet registeredBackendIds = TestDynamicBackendUtils::RegisterDynamicBackendsImplTest(backendRegistry,
+                                                                                                 dynamicBackends);
+    BOOST_TEST(backendRegistry.Size() == 0);
+    BOOST_TEST(registeredBackendIds.empty());
 }
 
 #if !defined(ARMNN_DYNAMIC_BACKEND_ENABLED)

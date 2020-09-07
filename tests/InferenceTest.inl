@@ -6,8 +6,8 @@
 
 #include <armnn/utility/Assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
+#include <fmt/format.h>
 
 #include <fstream>
 #include <iostream>
@@ -288,8 +288,8 @@ void ClassifierTestCaseProvider<TDatabase, InferenceModel>::ReadPredictions()
         }
         else
         {
-            throw armnn::Exception(boost::str(boost::format("Failed to open input validation file: %1%")
-                % m_ValidationFileIn));
+            throw armnn::Exception(fmt::format("Failed to open input validation file: {}"
+                , m_ValidationFileIn));
         }
     }
 }

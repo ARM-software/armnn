@@ -7,8 +7,8 @@
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <fmt/format.h>
 
 #include <array>
 
@@ -33,8 +33,7 @@ unsigned int GetImageChannelIndex(ImageChannelLayout channelLayout, ImageChannel
     case ImageChannelLayout::Bgr:
         return 2u - static_cast<unsigned int>(channel);
     default:
-        throw UnknownImageChannelLayout(boost::str(boost::format("Unknown layout %1%")
-            % static_cast<int>(channelLayout)));
+        throw UnknownImageChannelLayout(fmt::format("Unknown layout {}", static_cast<int>(channelLayout)));
     }
 }
 
@@ -139,12 +138,12 @@ InferenceTestImage::InferenceTestImage(char const* filePath)
 
     if (stbData == nullptr)
     {
-        throw InferenceTestImageLoadFailed(boost::str(boost::format("Could not load the image at %1%") % filePath));
+        throw InferenceTestImageLoadFailed(fmt::format("Could not load the image at {}", filePath));
     }
 
     if (width == 0 || height == 0)
     {
-        throw InferenceTestImageLoadFailed(boost::str(boost::format("Could not load empty image at %1%") % filePath));
+        throw InferenceTestImageLoadFailed(fmt::format("Could not load empty image at {}", filePath));
     }
 
     m_Width = boost::numeric_cast<unsigned int>(width);
@@ -160,8 +159,8 @@ std::tuple<uint8_t, uint8_t, uint8_t> InferenceTestImage::GetPixelAs3Channels(un
 {
     if (x >= m_Width || y >= m_Height)
     {
-        throw InferenceTestImageOutOfBoundsAccess(boost::str(boost::format("Attempted out of bounds image access. "
-            "Requested (%1%, %2%). Maximum valid coordinates (%3%, %4%).") % x % y % (m_Width - 1) % (m_Height - 1)));
+        throw InferenceTestImageOutOfBoundsAccess(fmt::format("Attempted out of bounds image access. "
+            "Requested ({0}, {1}). Maximum valid coordinates ({2}, {3}).", x, y, (m_Width - 1), (m_Height - 1)));
     }
 
     const unsigned int pixelOffset = x * GetNumChannels() + y * GetWidth() * GetNumChannels();
@@ -218,8 +217,8 @@ std::vector<float> InferenceTestImage::Resize(unsigned int newWidth,
     std::vector<float> out;
     if (newWidth == 0 || newHeight == 0)
     {
-        throw InferenceTestImageResizeFailed(boost::str(boost::format("None of the dimensions passed to a resize "
-            "operation can be zero. Requested width: %1%. Requested height: %2%.") % newWidth % newHeight));
+        throw InferenceTestImageResizeFailed(fmt::format("None of the dimensions passed to a resize "
+            "operation can be zero. Requested width: {0}. Requested height: {1}.", newWidth, newHeight));
     }
 
     switch (meth) {
@@ -234,9 +233,9 @@ std::vector<float> InferenceTestImage::Resize(unsigned int newWidth,
             break;
         }
         default:
-            throw InferenceTestImageResizeFailed(boost::str(
-                boost::format("Unknown resizing method asked ArmNN only supports {STB, BilinearAndNormalized} %1%")
-                              % location.AsString()));
+            throw InferenceTestImageResizeFailed(fmt::format("Unknown resizing method asked ArmNN only"
+                                                             " supports {STB, BilinearAndNormalized} {}",
+                                                             location.AsString()));
     }
     return out;
 }
@@ -266,14 +265,13 @@ void InferenceTestImage::Write(WriteFormat format, const char* filePath) const
             break;
         }
     default:
-        throw InferenceTestImageWriteFailed(boost::str(boost::format("Unknown format %1%")
-            % static_cast<int>(format)));
+        throw InferenceTestImageWriteFailed(fmt::format("Unknown format {}", static_cast<int>(format)));
     }
 
     if (res == 0)
     {
-        throw InferenceTestImageWriteFailed(boost::str(boost::format("An error occurred when writing to file %1%")
-            % filePath));
+        throw InferenceTestImageWriteFailed(fmt::format("An error occurred when writing to file {}",
+                                                        filePath));
     }
 }
 

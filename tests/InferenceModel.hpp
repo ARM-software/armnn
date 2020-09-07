@@ -28,9 +28,9 @@
 #include "armnn/utility/StringUtils.hpp"
 #include <boost/exception/exception.hpp>
 #include <boost/exception/diagnostic_information.hpp>
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/variant.hpp>
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <iterator>
@@ -134,9 +134,9 @@ public:
             const size_t numInputBindings = params.m_InputBindings.size();
             if (numInputShapes < numInputBindings)
             {
-                throw armnn::Exception(boost::str(boost::format(
-                    "Not every input has its tensor shape specified: expected=%1%, got=%2%")
-                    % numInputBindings % numInputShapes));
+                throw armnn::Exception(fmt::format(
+                    "Not every input has its tensor shape specified: expected={0}, got={1}",
+                    numInputBindings, numInputShapes));
             }
 
             for (size_t i = 0; i < numInputShapes; i++)
@@ -194,10 +194,9 @@ public:
             fs::path pathToFile(params.m_ModelPath);
             if (!fs::exists(pathToFile, errorCode))
             {
-                throw armnn::FileNotFoundException(boost::str(
-                                                   boost::format("Cannot find the file (%1%) errorCode: %2% %3%") %
-                                                   params.m_ModelPath %
-                                                   errorCode %
+                throw armnn::FileNotFoundException(fmt::format("Cannot find the file ({0}) errorCode: {1} {2}",
+                                                   params.m_ModelPath,
+                                                   errorCode.message(),
                                                    CHECK_LOCATION().AsString()));
             }
             std::ifstream file(params.m_ModelPath, std::ios::binary);
@@ -454,7 +453,7 @@ public:
     {
         if (m_InputBindings.size() < inputIndex + 1)
         {
-            throw armnn::Exception(boost::str(boost::format("Input index out of range: %1%") % inputIndex));
+            throw armnn::Exception(fmt::format("Input index out of range: {}", inputIndex));
         }
     }
 
@@ -462,7 +461,7 @@ public:
     {
         if (m_OutputBindings.size() < outputIndex + 1)
         {
-            throw armnn::Exception(boost::str(boost::format("Output index out of range: %1%") % outputIndex));
+            throw armnn::Exception(fmt::format("Output index out of range: {}", outputIndex));
         }
     }
 
@@ -493,8 +492,8 @@ public:
                 {
                     unsigned int outputIndex = boost::numeric_cast<unsigned int>(i);
                     throw armnn::Exception(
-                            boost::str(boost::format("Not enough data for output #%1%: expected "
-                            "%2% elements, got %3%") % outputIndex % expectedOutputDataSize % actualOutputDataSize));
+                            fmt::format("Not enough data for output #{0}: expected "
+                            "{1} elements, got {2}", outputIndex, expectedOutputDataSize, actualOutputDataSize));
                 }
             },
             outputContainers[i]);

@@ -1037,6 +1037,9 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     // Get the optimized graph
     Graph& optGraph = optNetObjPtr->GetGraph();
 
+    // Infer the tensor infos for all output slots. Throws an exception on failure
+    optGraph.InferTensorInfos();
+
     // Perform optimisation passes
     using namespace optimizations;
     Optimizer::Pass(optGraph, MakeOptimizations(SquashEqualPermuteSiblings(),
@@ -1052,9 +1055,6 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                                                 FoldPadIntoConvolution2d(),
                                                 PermuteAndBatchToSpaceAsDepthToSpace(),
                                                 TransposeAndBatchToSpaceAsDepthToSpace()));
-
-    // Infer the tensor infos for all output slots. Throws an exception on failure
-    optGraph.InferTensorInfos();
 
     // If Fp32 to Fp16 optimization is set convert Fp32 network to Fp16
     if (options.m_ReduceFp32ToFp16)

@@ -777,26 +777,6 @@ INetworkPtr TfLiteParser::CreateNetworkFromModel()
         }
     }
 
-    // if InferAndValidate set make sure all the TensorInfo set and all the dynamic output tensors are inferred
-    if (m_Options && m_Options.value().m_InferAndValidate)
-    {
-        for (subgraphIndex = 0;
-             subgraphIndex < m_SubgraphConnections.size();
-             ++subgraphIndex)
-        {
-            if (m_SubgraphConnections[subgraphIndex].size() > 0)
-            {
-                // get the last output slot on the layer
-                auto outputSlot =
-                    m_SubgraphConnections[subgraphIndex][m_SubgraphConnections[subgraphIndex].size() - 1].outputSlot;
-                if (outputSlot != nullptr)
-                {
-                    outputSlot->IsTensorInfoSet();
-                }
-            }
-        }
-    }
-
     return std::move(m_Network);
 }
 

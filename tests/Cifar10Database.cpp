@@ -5,8 +5,8 @@
 #include "Cifar10Database.hpp"
 
 #include <armnn/Logging.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
 #include <fstream>
 #include <vector>
 
@@ -70,9 +70,10 @@ std::unique_ptr<Cifar10Database::TTestCaseData> Cifar10Database::GetTestCaseData
     {
         for (unsigned int w = 0; w < 32; w++)
         {
-            inputImageData[countR_o] = boost::numeric_cast<float>(I[countR++]);
-            inputImageData[countG_o] = boost::numeric_cast<float>(I[countG++]);
-            inputImageData[countB_o] = boost::numeric_cast<float>(I[countB++]);
+            // Static_cast of unsigned char is safe with float
+            inputImageData[countR_o] = static_cast<float>(I[countR++]);
+            inputImageData[countG_o] = static_cast<float>(I[countG++]);
+            inputImageData[countB_o] = static_cast<float>(I[countB++]);
 
             countR_o += step;
             countG_o += step;
@@ -80,6 +81,6 @@ std::unique_ptr<Cifar10Database::TTestCaseData> Cifar10Database::GetTestCaseData
         }
     }
 
-    const unsigned int label = boost::numeric_cast<unsigned int>(I[0]);
+    const unsigned int label = armnn::numeric_cast<unsigned int>(I[0]);
     return std::make_unique<TTestCaseData>(label, std::move(inputImageData));
 }

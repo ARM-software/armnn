@@ -5,7 +5,8 @@
 #include "InferenceTestImage.hpp"
 #include "CaffePreprocessor.hpp"
 
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
+
 #include <boost/format.hpp>
 
 #include <iostream>
@@ -28,7 +29,7 @@ CaffePreprocessor::CaffePreprocessor(const std::string& binaryFileDirectory, uns
 
 std::unique_ptr<CaffePreprocessor::TTestCaseData> CaffePreprocessor::GetTestCaseData(unsigned int testCaseId)
 {
-    testCaseId = testCaseId % boost::numeric_cast<unsigned int>(m_ImageSet.size());
+    testCaseId = testCaseId % armnn::numeric_cast<unsigned int>(m_ImageSet.size());
     const ImageSet& imageSet = m_ImageSet[testCaseId];
     const std::string fullPath = m_BinaryDirectory + imageSet.first;
 

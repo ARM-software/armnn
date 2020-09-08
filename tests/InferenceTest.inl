@@ -5,6 +5,8 @@
 #include "InferenceTest.hpp"
 
 #include <armnn/utility/Assert.hpp>
+#include <armnn/utility/NumericCast.hpp>
+
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/program_options.hpp>
 #include <fmt/format.h>
@@ -130,7 +132,7 @@ TestCaseResult ClassifierTestCase<TTestCaseDatabase, TModel>::ProcessResult(cons
     unsigned int prediction = 0;
     boost::apply_visitor([&](auto&& value)
                          {
-                             prediction = boost::numeric_cast<unsigned int>(
+                             prediction = armnn::numeric_cast<unsigned int>(
                                      std::distance(value.begin(), std::max_element(value.begin(), value.end())));
                          },
                          output);

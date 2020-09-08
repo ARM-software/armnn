@@ -11,8 +11,7 @@
 #include <vector>
 
 #include <armnn/TypesUtils.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <array>
 #include <string>
@@ -80,7 +79,7 @@ inline auto ParseDataArray<armnn::DataType::QAsymmU8>(std::istream& stream,
     return ParseArrayImpl<uint8_t>(stream,
                                    [&quantizationScale, &quantizationOffset](const std::string & s)
                                    {
-                                       return boost::numeric_cast<uint8_t>(
+                                       return armnn::numeric_cast<uint8_t>(
                                                armnn::Quantize<uint8_t>(std::stof(s),
                                                                          quantizationScale,
                                                                          quantizationOffset));

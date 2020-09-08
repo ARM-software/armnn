@@ -11,6 +11,8 @@
 #include <ProfilingService.hpp>
 #include <TimelinePacketWriterFactory.hpp>
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include <server/include/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp>
 #include <server/include/timelineDecoder/TimelineDecoder.hpp>
 
@@ -18,10 +20,8 @@
 
 #include <MockBackend.hpp>
 
-#include <boost/cast.hpp>
 #include <boost/test/test_tools.hpp>
 #include <boost/test/unit_test_suite.hpp>
-
 
 BOOST_AUTO_TEST_SUITE(GatordMockTests)
 
@@ -31,8 +31,6 @@ using namespace std::chrono_literals;
 
 BOOST_AUTO_TEST_CASE(CounterCaptureHandlingTest)
 {
-    using boost::numeric_cast;
-
     arm::pipe::PacketVersionResolver packetVersionResolver;
 
     // Data with timestamp, counter idx & counter values
@@ -61,9 +59,9 @@ BOOST_AUTO_TEST_CASE(CounterCaptureHandlingTest)
     std::unique_ptr<unsigned char[]> uniqueData2 = std::make_unique<unsigned char[]>(dataLength);
     unsigned char* data2                         = reinterpret_cast<unsigned char*>(uniqueData2.get());
 
-    uint32_t sizeOfUint64 = numeric_cast<uint32_t>(sizeof(uint64_t));
-    uint32_t sizeOfUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
-    uint32_t sizeOfUint16 = numeric_cast<uint32_t>(sizeof(uint16_t));
+    uint32_t sizeOfUint64 = armnn::numeric_cast<uint32_t>(sizeof(uint64_t));
+    uint32_t sizeOfUint32 = armnn::numeric_cast<uint32_t>(sizeof(uint32_t));
+    uint32_t sizeOfUint16 = armnn::numeric_cast<uint32_t>(sizeof(uint16_t));
     // Offset index to point to mem address
     uint32_t offset = 0;
 

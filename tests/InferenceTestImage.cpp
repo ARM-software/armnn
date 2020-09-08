@@ -6,6 +6,7 @@
 
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
 #include <fmt/format.h>
@@ -146,9 +147,9 @@ InferenceTestImage::InferenceTestImage(char const* filePath)
         throw InferenceTestImageLoadFailed(fmt::format("Could not load empty image at {}", filePath));
     }
 
-    m_Width = boost::numeric_cast<unsigned int>(width);
-    m_Height = boost::numeric_cast<unsigned int>(height);
-    m_NumChannels = boost::numeric_cast<unsigned int>(channels);
+    m_Width = armnn::numeric_cast<unsigned int>(width);
+    m_Height = armnn::numeric_cast<unsigned int>(height);
+    m_NumChannels = armnn::numeric_cast<unsigned int>(channels);
 
     const unsigned int sizeInBytes = GetSizeInBytes();
     m_Data.resize(sizeInBytes);
@@ -185,11 +186,11 @@ void InferenceTestImage::StbResize(InferenceTestImage& im, const unsigned int ne
     std::vector<uint8_t> newData;
     newData.resize(newWidth * newHeight * im.GetNumChannels() * im.GetSingleElementSizeInBytes());
 
-    // boost::numeric_cast<>() is used for user-provided data (protecting about overflows).
+    // armnn::numeric_cast<>() is used for user-provided data (protecting about overflows).
     // static_cast<> is ok for internal data (assumes that, when internal data was originally provided by a user,
-    // a boost::numeric_cast<>() handled the conversion).
-    const int nW = boost::numeric_cast<int>(newWidth);
-    const int nH = boost::numeric_cast<int>(newHeight);
+    // a armnn::numeric_cast<>() handled the conversion).
+    const int nW = armnn::numeric_cast<int>(newWidth);
+    const int nH = armnn::numeric_cast<int>(newHeight);
 
     const int w = static_cast<int>(im.GetWidth());
     const int h = static_cast<int>(im.GetHeight());

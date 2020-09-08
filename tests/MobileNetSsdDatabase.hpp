@@ -11,8 +11,7 @@
 #include <QuantizeHelper.hpp>
 
 #include <armnn/TypesUtils.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <array>
 #include <memory>
@@ -75,7 +74,7 @@ MobileNetSsdDatabase::MobileNetSsdDatabase(const std::string& imageDir, float sc
 std::unique_ptr<MobileNetSsdTestCaseData> MobileNetSsdDatabase::GetTestCaseData(unsigned int testCaseId)
 {
     const unsigned int safeTestCaseId =
-        testCaseId % boost::numeric_cast<unsigned int>(g_PerTestCaseInput.size());
+        testCaseId % armnn::numeric_cast<unsigned int>(g_PerTestCaseInput.size());
     const ObjectDetectionInput& testCaseInput = g_PerTestCaseInput[safeTestCaseId];
 
     // Load test case input

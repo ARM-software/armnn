@@ -4,6 +4,7 @@
 //
 #include <armnn/ArmNN.hpp>
 #include <armnn/TypesUtils.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/Timer.hpp>
 
 #if defined(ARMNN_SERIALIZER)
@@ -136,7 +137,7 @@ template<>
 auto ParseDataArray<armnn::DataType::QAsymmU8>(std::istream& stream)
 {
     return ParseArrayImpl<uint8_t>(stream,
-                                   [](const std::string& s) { return boost::numeric_cast<uint8_t>(std::stoi(s)); });
+                                   [](const std::string& s) { return armnn::numeric_cast<uint8_t>(std::stoi(s)); });
 }
 
 template<>
@@ -147,7 +148,7 @@ auto ParseDataArray<armnn::DataType::QAsymmU8>(std::istream& stream,
     return ParseArrayImpl<uint8_t>(stream,
                                    [&quantizationScale, &quantizationOffset](const std::string & s)
                                    {
-                                       return boost::numeric_cast<uint8_t>(
+                                       return armnn::numeric_cast<uint8_t>(
                                            armnn::Quantize<uint8_t>(std::stof(s),
                                                                      quantizationScale,
                                                                      quantizationOffset));
@@ -156,7 +157,7 @@ auto ParseDataArray<armnn::DataType::QAsymmU8>(std::istream& stream,
 std::vector<unsigned int> ParseArray(std::istream& stream)
 {
     return ParseArrayImpl<unsigned int>(stream,
-        [](const std::string& s) { return boost::numeric_cast<unsigned int>(std::stoi(s)); });
+        [](const std::string& s) { return armnn::numeric_cast<unsigned int>(std::stoi(s)); });
 }
 
 std::vector<std::string> ParseStringList(const std::string & inputString, const char * delimiter)

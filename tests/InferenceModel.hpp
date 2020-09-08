@@ -10,6 +10,7 @@
 #include <armnn/utility/Timer.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/utility/Assert.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #if defined(ARMNN_SERIALIZER)
 #include "armnnDeserializer/IDeserializer.hpp"
@@ -204,7 +205,7 @@ public:
             network = parser->CreateNetworkFromBinary(file);
         }
 
-        unsigned int subgraphId = boost::numeric_cast<unsigned int>(params.m_SubgraphId);
+        unsigned int subgraphId = armnn::numeric_cast<unsigned int>(params.m_SubgraphId);
 
         for (const std::string& inputLayerName : params.m_InputBindings)
         {
@@ -487,10 +488,10 @@ public:
 
             boost::apply_visitor([expectedOutputDataSize, i](auto&& value)
             {
-                const unsigned int actualOutputDataSize   = boost::numeric_cast<unsigned int>(value.size());
+                const unsigned int actualOutputDataSize   = armnn::numeric_cast<unsigned int>(value.size());
                 if (actualOutputDataSize < expectedOutputDataSize)
                 {
-                    unsigned int outputIndex = boost::numeric_cast<unsigned int>(i);
+                    unsigned int outputIndex = i;
                     throw armnn::Exception(
                             fmt::format("Not enough data for output #{0}: expected "
                             "{1} elements, got {2}", outputIndex, expectedOutputDataSize, actualOutputDataSize));

@@ -7,13 +7,14 @@
 #include <armnn/Exceptions.hpp>
 #include <armnn/Logging.hpp>
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include <array>
 #include <cstdint>
 #include <tuple>
 #include <utility>
 
 #include <boost/format.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
 #include "InferenceTestImage.hpp"
 
@@ -73,7 +74,7 @@ YoloDatabase::YoloDatabase(const std::string& imageDir)
 
 std::unique_ptr<YoloDatabase::TTestCaseData> YoloDatabase::GetTestCaseData(unsigned int testCaseId)
 {
-    testCaseId = testCaseId % boost::numeric_cast<unsigned int>(g_PerTestCaseInputOutput.size());
+    testCaseId = testCaseId % armnn::numeric_cast<unsigned int>(g_PerTestCaseInputOutput.size());
     const auto& testCaseInputOutput = g_PerTestCaseInputOutput[testCaseId];
     const std::string imagePath = m_ImageDir + testCaseInputOutput.first;
 

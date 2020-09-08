@@ -235,6 +235,17 @@ private:
                 (m_QuantizationDim == other.m_QuantizationDim));
         }
 
+        Quantization& operator=(const Quantization& other)
+        {
+            if(!(*this == other))
+            {
+                m_Scales = other.m_Scales;
+                m_Offset = other.m_Offset;
+                m_QuantizationDim = other.m_QuantizationDim;
+            }
+            return *this;
+        }
+
         std::vector<float>     m_Scales;
         Optional<int32_t>      m_Offset;
         Optional<unsigned int> m_QuantizationDim;

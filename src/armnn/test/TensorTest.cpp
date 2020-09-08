@@ -99,6 +99,69 @@ BOOST_FIXTURE_TEST_CASE(TensorInfoAssignmentOperator, TensorInfoFixture)
     BOOST_TEST(copy == m_TensorInfo);
 }
 
+BOOST_AUTO_TEST_CASE(CopyNoQuantizationTensorInfo)
+{
+    TensorInfo infoA;
+    infoA.SetShape({ 5, 6, 7, 8 });
+    infoA.SetDataType(DataType::QAsymmU8);
+
+    TensorInfo infoB;
+    infoB.SetShape({ 5, 6, 7, 8 });
+    infoB.SetDataType(DataType::QAsymmU8);
+    infoB.SetQuantizationScale(10.0f);
+    infoB.SetQuantizationOffset(5);
+    infoB.SetQuantizationDim(Optional<unsigned int>(1));
+
+    BOOST_TEST((infoA.GetShape() == TensorShape({ 5, 6, 7, 8 })));
+    BOOST_TEST((infoA.GetDataType() == DataType::QAsymmU8));
+    BOOST_TEST(infoA.GetQuantizationScale() == 1);
+    BOOST_TEST(infoA.GetQuantizationOffset() == 0);
+    BOOST_CHECK(!infoA.GetQuantizationDim().has_value());
+
+    BOOST_TEST(infoA != infoB);
+    infoA = infoB;
+    BOOST_TEST(infoA == infoB);
+
+    BOOST_TEST((infoA.GetShape() == TensorShape({ 5, 6, 7, 8 })));
+    BOOST_TEST((infoA.GetDataType() == DataType::QAsymmU8));
+    BOOST_TEST(infoA.GetQuantizationScale() == 10.0f);
+    BOOST_TEST(infoA.GetQuantizationOffset() == 5);
+    BOOST_CHECK(infoA.GetQuantizationDim().value() == 1);
+}
+
+BOOST_AUTO_TEST_CASE(CopyDifferentQuantizationTensorInfo)
+{
+    TensorInfo infoA;
+    infoA.SetShape({ 5, 6, 7, 8 });
+    infoA.SetDataType(DataType::QAsymmU8);
+    infoA.SetQuantizationScale(10.0f);
+    infoA.SetQuantizationOffset(5);
+    infoA.SetQuantizationDim(Optional<unsigned int>(1));
+
+    TensorInfo infoB;
+    infoB.SetShape({ 5, 6, 7, 8 });
+    infoB.SetDataType(DataType::QAsymmU8);
+    infoB.SetQuantizationScale(11.0f);
+    infoB.SetQuantizationOffset(6);
+    infoB.SetQuantizationDim(Optional<unsigned int>(2));
+
+    BOOST_TEST((infoA.GetShape() == TensorShape({ 5, 6, 7, 8 })));
+    BOOST_TEST((infoA.GetDataType() == DataType::QAsymmU8));
+    BOOST_TEST(infoA.GetQuantizationScale() == 10.0f);
+    BOOST_TEST(infoA.GetQuantizationOffset() == 5);
+    BOOST_CHECK(infoA.GetQuantizationDim().value() == 1);
+
+    BOOST_TEST(infoA != infoB);
+    infoA = infoB;
+    BOOST_TEST(infoA == infoB);
+
+    BOOST_TEST((infoA.GetShape() == TensorShape({ 5, 6, 7, 8 })));
+    BOOST_TEST((infoA.GetDataType() == DataType::QAsymmU8));
+    BOOST_TEST(infoA.GetQuantizationScale() == 11.0f);
+    BOOST_TEST(infoA.GetQuantizationOffset() == 6);
+    BOOST_CHECK(infoA.GetQuantizationDim().value() == 2);
+}
+
 void CheckTensor(const ConstTensor& t)
 {
     t.GetInfo();

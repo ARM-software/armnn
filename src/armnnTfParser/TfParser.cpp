@@ -24,7 +24,7 @@
 
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include <armnn/utility/PolymorphicDowncast.hpp>
+#include <fmt/core.h>
 #include <numeric>
 
 using namespace armnnUtils;
@@ -1464,7 +1464,9 @@ ParsedTfOperationPtr TfParser::ParseDepthwiseConv2D(const tensorflow::NodeDef& n
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-TensorInfo OutputShapeOfExpandDims(const tensorflow::NodeDef& nodeDef, TensorInfo inputTensorInfo)
+TensorInfo OutputShapeOfExpandDims(const tensorflow::NodeDef& nodeDef,
+                                   TensorInfo inputTensorInfo,
+                                   std::int32_t expandDim)
 {
     ARMNN_ASSERT(nodeDef.op() == "ExpandDims");
 
@@ -1477,8 +1479,6 @@ TensorInfo OutputShapeOfExpandDims(const tensorflow::NodeDef& nodeDef, TensorInf
                         % nodeDef.name()
                         % CHECK_LOCATION().AsString()));
     }
-
-    std::int32_t expandDim = ReadMandatoryNodeInt32Attribute(nodeDef, "Tdim");
 
     std::int32_t inputDimSize = boost::numeric_cast<int32_t>(inputTensorInfo.GetNumDimensions());
     std::vector<uint32_t> outputDims;
@@ -1542,13 +1542,78 @@ TensorInfo OutputShapeOfExpandDims(const tensorflow::NodeDef& nodeDef, TensorInf
 ParsedTfOperationPtr TfParser::ParseExpandDims(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
-    std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
 
+    // Number of inputs can either
+    // be 1 - that indicates that the axis parameter is passed as an attribute of the operation
+    // or 2 - which means that the axis parameter is passed as a second input
+    std::vector<OutputOfConstNodeDef> nodes = GetTfInputNodes(nodeDef);
+    const std::size_t numInputs = nodes.size();
+    std::vector<OutputOfParsedTfOperation> inputs;
+    std::int32_t expandDim; // axis or dim parameter. Describes which dimension to expand.
+    if (numInputs == 1)
+    {
+        inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
+        expandDim = ReadMandatoryNodeInt32Attribute(nodeDef, "Tdim");
+    }
+    else
+    {
+        inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
+
+        // make sure data type is int32
+        IOutputSlot& prevLayerOutputSlot = inputs[1].m_IndexedValue->ResolveArmnnOutputSlot(inputs[1].m_Index);
+        TensorInfo inputTensorInfo = prevLayerOutputSlot.GetTensorInfo();
+
+        if (inputTensorInfo.GetDataType()!=armnn::DataType::Signed32)
+        {
+            throw ParseException(
+                    fmt::format(
+                            "The axis parameter of ExpandDims operation given as second input is not of type int32. "
+                            "Input {0} Node {1} {2}",
+                            inputs[1].m_IndexedValue->GetNode().name(),
+                            nodeDef.name(),
+                            CHECK_LOCATION().AsString()));
+        }
+
+        // ensure the second input is a constant value
+        if (!HasParsedConstTensor<int32_t>(inputs[1].m_IndexedValue->GetNode().name()))
+        {
+            throw ParseException(
+                    fmt::format(
+                            "ArmNN only supports ExpandDims layers with constant axis/dim parameter. "
+                            "Input {0} Node {1} {2}",
+                            inputs[1].m_IndexedValue->GetNode().name(),
+                            nodeDef.name(),
+                            CHECK_LOCATION().AsString()));
+        }
+
+        // make sure the second input is scalar or contains only a single value
+        // (we don't support expand dims for multiple axis but we don't care what shape the
+        //  given tensor has as long as there is only a single value in it
+        //  e.g. a tensor like this [[[1]]] is completely fine)
+        if (inputTensorInfo.GetNumElements() != 1)
+        {
+            throw ParseException(
+                    fmt::format(
+                            "The axis parameter of ExpandDims operation given as second input is not "
+                            "allowed to hold more than one value. "
+                            "Input {0} Node {1} {2}",
+                            inputs[1].m_IndexedValue->GetNode().name(),
+                            nodeDef.name(),
+                            CHECK_LOCATION().AsString()));
+        }
+
+        ParsedConstTfOperation<int32_t>* expandDimsNode =
+                PolymorphicDowncast<ParsedConstTfOperation<int32_t>*>(inputs[1].m_IndexedValue);
+
+        memcpy(&expandDim, expandDimsNode->GetStorage(), sizeof(expandDim));
+    }
+
+    // First input is the vector that should be expanded by another dimension
     IOutputSlot& prevLayerOutputSlot = inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
     TensorInfo inputTensorInfo = prevLayerOutputSlot.GetTensorInfo();
 
     TensorInfo outputInfo;
-    outputInfo = OutputShapeOfExpandDims(nodeDef, inputTensorInfo);
+    outputInfo = OutputShapeOfExpandDims(nodeDef, inputTensorInfo, expandDim);
 
     ReshapeDescriptor reshapeDesc;
     reshapeDesc.m_TargetShape = outputInfo.GetShape();

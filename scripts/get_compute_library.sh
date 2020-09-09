@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_08" # Release 20.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="e8f05da5fb919aa209e1bf0e5c70dd15fff84b7f" #Add ArgMinMax layer node to Graph API.
+DEFAULT_CLFRAMEWORKREVISION="57f30a9309ff2e5e3b32731a785bf38b01d1fd69" #COMPMID-3767: Align documentation with trademark rules.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

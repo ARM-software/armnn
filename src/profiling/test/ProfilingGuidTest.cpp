@@ -11,7 +11,7 @@
 #include <set>
 
 #include <boost/test/unit_test.hpp>
-#include <boost/format.hpp>
+#include <fmt/format.h>
 #include <thread>
 
 using namespace armnn::profiling;
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(StaticGuidGeneratorCollisionTest)
             } 
             else
             {
-                BOOST_ERROR(boost::str(boost::format("GUID collision occurred: %1% -> %2%") % str % guid));
+                BOOST_ERROR(fmt::format("GUID collision occurred: {} -> {}", str, guid));
             }
             break;
         }

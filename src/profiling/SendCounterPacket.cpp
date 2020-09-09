@@ -14,7 +14,7 @@
 #include <common/include/Constants.hpp>
 #include <common/include/SwTrace.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 #include <cstring>
 
@@ -90,7 +90,7 @@ void SendCounterPacket::SendStreamMetaDataPacket()
     {
         CancelOperationAndThrow<BufferExhaustion>(
             writeBuffer,
-            boost::str(boost::format("No space left in buffer. Unable to reserve (%1%) bytes.") % totalSize));
+            fmt::format("No space left in buffer. Unable to reserve ({}) bytes.", totalSize));
     }
 
     try
@@ -188,8 +188,9 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
         auto it = counters.find(counterUid);
         if (it == counters.end())
         {
-            errorMessage = boost::str(boost::format("Counter (%1%) not found in category (%2%)")
-                                      % counterUid % category->m_Name );
+            errorMessage = fmt::format("Counter ({}) not found in category ({})",
+                                       counterUid,
+                                       category->m_Name );
             return false;
         }
 
@@ -202,7 +203,7 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
     }
     if (categoryCounters.empty())
     {
-        errorMessage = boost::str(boost::format("No valid counters found in category (%1%)")% categoryName);
+        errorMessage = fmt::format("No valid counters found in category ({})", categoryName);
         return false;
     }
 
@@ -213,8 +214,8 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
     std::vector<uint32_t> categoryNameBuffer;
     if (!arm::pipe::StringToSwTraceString<arm::pipe::SwTraceNameCharPolicy>(categoryName, categoryNameBuffer))
     {
-        errorMessage = boost::str(boost::format("Cannot convert the name of category (%1%) to an SWTrace namestring")
-                                  % categoryName);
+        errorMessage = fmt::format("Cannot convert the name of category ({}) to an SWTrace namestring",
+                                   categoryName);
         return false;
     }
 
@@ -319,9 +320,9 @@ bool SendCounterPacket::CreateDeviceRecord(const DevicePtr& device,
     std::vector<uint32_t> deviceNameBuffer;
     if (!arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(deviceName, deviceNameBuffer))
     {
-        errorMessage = boost::str(boost::format("Cannot convert the name of device %1% (%2%) to an SWTrace string")
-                                  % deviceUid
-                                  % deviceName);
+        errorMessage = fmt::format("Cannot convert the name of device {} ({}) to an SWTrace string",
+                                   deviceUid,
+                                   deviceName);
         return false;
     }
 
@@ -369,10 +370,9 @@ bool SendCounterPacket::CreateCounterSetRecord(const CounterSetPtr& counterSet,
     std::vector<uint32_t> counterSetNameBuffer;
     if (!arm::pipe::StringToSwTraceString<arm::pipe::SwTraceNameCharPolicy>(counterSet->m_Name, counterSetNameBuffer))
     {
-        errorMessage = boost::str(boost::format("Cannot convert the name of counter set %1% (%2%) to "
-                                                "an SWTrace namestring")
-                                  % counterSetUid
-                                  % counterSetName);
+        errorMessage = fmt::format("Cannot convert the name of counter set {} ({}) to an SWTrace namestring",
+                                   counterSetUid,
+                                   counterSetName);
         return false;
     }
 
@@ -464,10 +464,9 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
     std::vector<uint32_t> counterNameBuffer;
     if (!arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(counterName, counterNameBuffer))
     {
-        errorMessage = boost::str(boost::format("Cannot convert the name of counter %1% (name: %2%) "
-                                                "to an SWTrace string")
-                                  % counterUid
-                                  % counterName);
+        errorMessage = fmt::format("Cannot convert the name of counter {} (name: {}) to an SWTrace string",
+                                   counterUid,
+                                   counterName);
         return false;
     }
 
@@ -481,10 +480,10 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
     std::vector<uint32_t> counterDescriptionBuffer;
     if (!arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(counterDescription, counterDescriptionBuffer))
     {
-        errorMessage = boost::str(boost::format("Cannot convert the description of counter %1% (description: %2%) "
-                                                "to an SWTrace string")
-                                  % counterUid
-                                  % counterName);
+        errorMessage = fmt::format("Cannot convert the description of counter {} (description: {}) "
+                                   "to an SWTrace string",
+                                   counterUid,
+                                   counterName);
         return false;
     }
 
@@ -506,10 +505,9 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
         // Convert the counter units into a SWTrace namestring
         if (!arm::pipe::StringToSwTraceString<arm::pipe::SwTraceNameCharPolicy>(counterUnits, counterUnitsBuffer))
         {
-            errorMessage = boost::str(boost::format("Cannot convert the units of counter %1% (units: %2%) "
-                                                    "to an SWTrace string")
-                                      % counterUid
-                                      % counterName);
+            errorMessage = fmt::format("Cannot convert the units of counter {} (units: {}) to an SWTrace string",
+                                       counterUid,
+                                       counterName);
             return false;
         }
     }
@@ -811,7 +809,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
     {
         CancelOperationAndThrow<BufferExhaustion>(
             writeBuffer,
-            boost::str(boost::format("No space left in buffer. Unable to reserve (%1%) bytes.") % totalSize));
+            fmt::format("No space left in buffer. Unable to reserve ({}) bytes.", totalSize));
     }
 
     // Offset for writing to the buffer
@@ -848,7 +846,7 @@ void SendCounterPacket::SendPeriodicCounterCapturePacket(uint64_t timestamp, con
     {
         CancelOperationAndThrow<BufferExhaustion>(
             writeBuffer,
-            boost::str(boost::format("No space left in buffer. Unable to reserve (%1%) bytes.") % totalSize));
+            fmt::format("No space left in buffer. Unable to reserve ({}) bytes.", totalSize));
     }
 
     // Create header.
@@ -897,7 +895,7 @@ void SendCounterPacket::SendPeriodicCounterSelectionPacket(uint32_t capturePerio
     {
         CancelOperationAndThrow<BufferExhaustion>(
             writeBuffer,
-            boost::str(boost::format("No space left in buffer. Unable to reserve (%1%) bytes.") % totalSize));
+            fmt::format("No space left in buffer. Unable to reserve ({}) bytes.", totalSize));
     }
 
     // Create header.

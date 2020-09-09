@@ -9,7 +9,7 @@
 #include <armnn/Types.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 #include <vector>
 
@@ -65,18 +65,18 @@ void PeriodicCounterSelectionCommandHandler::operator()(const arm::pipe::Packet&
     case ProfilingState::Uninitialised:
     case ProfilingState::NotConnected:
     case ProfilingState::WaitingForAck:
-        throw RuntimeException(boost::str(boost::format("Periodic Counter Selection Command Handler invoked while in "
-                                                        "an wrong state: %1%")
-                                          % GetProfilingStateName(currentState)));
+        throw RuntimeException(fmt::format("Periodic Counter Selection Command Handler invoked while in "
+                                           "an wrong state: {}",
+                                           GetProfilingStateName(currentState)));
     case ProfilingState::Active:
     {
         // Process the packet
         if (!(packet.GetPacketFamily() == 0u && packet.GetPacketId() == 4u))
         {
-            throw armnn::InvalidArgumentException(boost::str(boost::format("Expected Packet family = 0, id = 4 but "
-                                                                           "received family = %1%, id = %2%")
-                                                  % packet.GetPacketFamily()
-                                                  % packet.GetPacketId()));
+            throw armnn::InvalidArgumentException(fmt::format("Expected Packet family = 0, id = 4 but "
+                                                              "received family = {}, id = {}",
+                                                              packet.GetPacketFamily(),
+                                                              packet.GetPacketId()));
         }
 
         // Parse the packet to get the capture period and counter UIDs
@@ -161,8 +161,8 @@ void PeriodicCounterSelectionCommandHandler::operator()(const arm::pipe::Packet&
         break;
     }
     default:
-        throw RuntimeException(boost::str(boost::format("Unknown profiling service state: %1%")
-                                          % static_cast<int>(currentState)));
+        throw RuntimeException(fmt::format("Unknown profiling service state: {}",
+                                           static_cast<int>(currentState)));
     }
 }
 

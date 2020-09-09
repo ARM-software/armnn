@@ -11,7 +11,7 @@
 
 #include <common/include/SocketConnectionException.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 namespace armnn
 {
@@ -183,8 +183,8 @@ void ProfilingService::Update()
 
         break;
     default:
-        throw RuntimeException(boost::str(boost::format("Unknown profiling service state: %1")
-                                          % static_cast<int>(currentState)));
+        throw RuntimeException(fmt::format("Unknown profiling service state: {}",
+                                           static_cast<int>(currentState)));
     }
 }
 
@@ -203,8 +203,8 @@ void ProfilingService::Disconnect()
 
         break;
     default:
-        throw RuntimeException(boost::str(boost::format("Unknown profiling service state: %1")
-                                          % static_cast<int>(currentState)));
+        throw RuntimeException(fmt::format("Unknown profiling service state: {}",
+                                           static_cast<int>(currentState)));
     }
 }
 
@@ -486,7 +486,7 @@ inline void ProfilingService::CheckCounterUid(uint16_t counterUid) const
 {
     if (!IsCounterRegistered(counterUid))
     {
-        throw InvalidArgumentException(boost::str(boost::format("Counter UID %1% is not registered") % counterUid));
+        throw InvalidArgumentException(fmt::format("Counter UID {} is not registered", counterUid));
     }
 }
 

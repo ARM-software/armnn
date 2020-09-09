@@ -6,7 +6,7 @@
 #include "PerJobCounterSelectionCommandHandler.hpp"
 #include <armnn/Exceptions.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 namespace armnn
 {
@@ -22,25 +22,25 @@ void PerJobCounterSelectionCommandHandler::operator()(const arm::pipe::Packet& p
     case ProfilingState::Uninitialised:
     case ProfilingState::NotConnected:
     case ProfilingState::WaitingForAck:
-        throw armnn::RuntimeException(boost::str(boost::format(
-            "Per-Job Counter Selection Command Handler invoked while in an incorrect state: %1%")
-            % GetProfilingStateName(currentState)));
+        throw armnn::RuntimeException(fmt::format(
+            "Per-Job Counter Selection Command Handler invoked while in an incorrect state: {}",
+            GetProfilingStateName(currentState)));
     case ProfilingState::Active:
         // Process the packet
         if (!(packet.GetPacketFamily() == 0u && packet.GetPacketId() == 5u))
         {
-            throw armnn::InvalidArgumentException(boost::str(boost::format("Expected Packet family = 0, id = 5 but "
-                                                                           "received family = %1%, id = %2%")
-                                                  % packet.GetPacketFamily()
-                                                  % packet.GetPacketId()));
+            throw armnn::InvalidArgumentException(fmt::format("Expected Packet family = 0, id = 5 but "
+                                                              "received family = {}, id = {}",
+                                                              packet.GetPacketFamily(),
+                                                              packet.GetPacketId()));
         }
 
         // Silently drop the packet
 
         break;
     default:
-        throw armnn::RuntimeException(boost::str(boost::format("Unknown profiling service state: %1%")
-                                                 % static_cast<int>(currentState)));
+        throw armnn::RuntimeException(fmt::format("Unknown profiling service state: {}",
+                                                  static_cast<int>(currentState)));
     }
 }
 

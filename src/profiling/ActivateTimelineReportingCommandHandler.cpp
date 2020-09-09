@@ -7,7 +7,7 @@
 #include "TimelineUtilityMethods.hpp"
 
 #include <armnn/Exceptions.hpp>
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 namespace armnn
 {
@@ -30,9 +30,9 @@ void ActivateTimelineReportingCommandHandler::operator()(const arm::pipe::Packet
         case ProfilingState::Uninitialised:
         case ProfilingState::NotConnected:
         case ProfilingState::WaitingForAck:
-            throw RuntimeException(boost::str(
-                boost::format("Activate Timeline Reporting Command Handler invoked while in a wrong state: %1%")
-                    % GetProfilingStateName(currentState)));
+            throw RuntimeException(fmt::format(
+                    "Activate Timeline Reporting Command Handler invoked while in a wrong state: {}",
+                    GetProfilingStateName(currentState)));
         case ProfilingState::Active:
             if ( !( packet.GetPacketFamily() == 0u && packet.GetPacketId() == 6u ))
             {
@@ -56,8 +56,8 @@ void ActivateTimelineReportingCommandHandler::operator()(const arm::pipe::Packet
 
             break;
         default:
-            throw RuntimeException(boost::str(boost::format("Unknown profiling service state: %1%")
-                                                  % static_cast<int>(currentState)));
+            throw RuntimeException(fmt::format("Unknown profiling service state: {}",
+                                               static_cast<int>(currentState)));
     }
 }
 

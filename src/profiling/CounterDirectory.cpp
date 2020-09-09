@@ -12,7 +12,7 @@
 
 #include <common/include/SwTrace.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 namespace armnn
 {
@@ -32,9 +32,8 @@ const Category* CounterDirectory::RegisterCategory(const std::string& categoryNa
     // Check that the given category is not already registered
     if (IsCategoryRegistered(categoryName))
     {
-        throw InvalidArgumentException(
-                    boost::str(boost::format("Trying to register a category already registered (\"%1%\")")
-                               % categoryName));
+        throw InvalidArgumentException(fmt::format("Trying to register a category already registered (\"{}\")",
+                                       categoryName));
     }
 
     // Create the category
@@ -65,9 +64,8 @@ const Device* CounterDirectory::RegisterDevice(const std::string& deviceName,
     // Check that a device with the given name is not already registered
     if (IsDeviceRegistered(deviceName))
     {
-        throw InvalidArgumentException(
-                    boost::str(boost::format("Trying to register a device already registered (\"%1%\")")
-                               % deviceName));
+        throw InvalidArgumentException(fmt::format("Trying to register a device already registered (\"{}\")",
+                                       deviceName));
     }
 
     // Check that a category with the given (optional) parent category name is already registered
@@ -78,10 +76,10 @@ const Device* CounterDirectory::RegisterDevice(const std::string& deviceName,
         if (parentCategoryNameValue.empty())
         {
             throw InvalidArgumentException(
-                        boost::str(boost::format("Trying to connect a device (name: \"%1%\") to an invalid "
-                                                 "parent category (name: \"%2%\")")
-                                   % deviceName
-                                   % parentCategoryNameValue));
+                        fmt::format("Trying to connect a device (name: \"{}\") to an invalid "
+                                    "parent category (name: \"{}\")",
+                                    deviceName,
+                                    parentCategoryNameValue));
         }
 
         // Check that the given parent category is already registered
@@ -89,10 +87,10 @@ const Device* CounterDirectory::RegisterDevice(const std::string& deviceName,
         if (categoryIt == m_Categories.end())
         {
             throw InvalidArgumentException(
-                        boost::str(boost::format("Trying to connect a device (name: \"%1%\") to a parent category that "
-                                                 "is not registered (name: \"%2%\")")
-                                   % deviceName
-                                   % parentCategoryNameValue));
+                        fmt::format("Trying to connect a device (name: \"{}\") to a parent category that "
+                                    "is not registered (name: \"{}\")",
+                                    deviceName,
+                                    parentCategoryNameValue));
         }
     }
 
@@ -128,8 +126,8 @@ const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counte
     if (IsCounterSetRegistered(counterSetName))
     {
         throw InvalidArgumentException(
-                    boost::str(boost::format("Trying to register a counter set already registered (\"%1%\")")
-                               % counterSetName));
+                    fmt::format("Trying to register a counter set already registered (\"{}\")",
+                                counterSetName));
     }
 
     // Peek the next UID, do not get an actual valid UID just now as we don't want to waste a good UID in case
@@ -144,10 +142,10 @@ const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counte
         if (parentCategoryNameValue.empty())
         {
             throw InvalidArgumentException(
-                        boost::str(boost::format("Trying to connect a counter set (UID: %1%) to an invalid "
-                                                 "parent category (name: \"%2%\")")
-                                   % counterSetUidPeek
-                                   % parentCategoryNameValue));
+                        fmt::format("Trying to connect a counter set (UID: {}) to an invalid "
+                                    "parent category (name: \"{}\")",
+                                    counterSetUidPeek,
+                                    parentCategoryNameValue));
         }
 
         // Check that the given parent category is already registered
@@ -155,10 +153,10 @@ const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counte
         if (it == m_Categories.end())
         {
             throw InvalidArgumentException(
-                        boost::str(boost::format("Trying to connect a counter set (UID: %1%) to a parent category "
-                                                 "that is not registered (name: \"%2%\")")
-                                   % counterSetUidPeek
-                                   % parentCategoryNameValue));
+                        fmt::format("Trying to connect a counter set (UID: {}) to a parent category "
+                                    "that is not registered (name: \"{}\")",
+                                    counterSetUidPeek,
+                                    parentCategoryNameValue));
         }
     }
 
@@ -246,9 +244,8 @@ const Counter* CounterDirectory::RegisterCounter(const BackendId& backendId,
     if (categoryIt == m_Categories.end())
     {
         throw InvalidArgumentException(
-                    boost::str(boost::format("Trying to connect a counter to a category "
-                                             "that is not registered (name: \"%1%\")")
-                               % parentCategoryName));
+                    fmt::format("Trying to connect a counter to a category that is not registered (name: \"{}\")",
+                                parentCategoryName));
     }
 
     // Get the parent category
@@ -265,10 +262,10 @@ const Counter* CounterDirectory::RegisterCounter(const BackendId& backendId,
         if (parentCategoryCounter->m_Name == name)
         {
             throw InvalidArgumentException(
-                        boost::str(boost::format("Trying to register a counter to category \"%1%\" with a name that "
-                                                 "is already used within that category (name: \"%2%\")")
-                                   % parentCategoryName
-                                   % name));
+                        fmt::format("Trying to register a counter to category \"{}\" with a name that "
+                                    "is already used within that category (name: \"{}\")",
+                                    parentCategoryName,
+                                    name));
         }
     }
 
@@ -280,9 +277,9 @@ const Counter* CounterDirectory::RegisterCounter(const BackendId& backendId,
         if (!IsCounterSetRegistered(counterSetUidValue))
         {
             throw InvalidArgumentException(
-                        boost::str(boost::format("Trying to connect a counter to a counter set that is "
-                                                 "not registered (counter set UID: %1%)")
-                                   % counterSetUidValue));
+                        fmt::format("Trying to connect a counter to a counter set that is "
+                                    "not registered (counter set UID: {})",
+                                    counterSetUidValue));
         }
     }
 
@@ -531,9 +528,8 @@ uint16_t CounterDirectory::GetNumberOfCores(const Optional<uint16_t>& numberOfCo
         if (deviceIt == m_Devices.end())
         {
             throw InvalidArgumentException(
-                        boost::str(boost::format("Trying to connect a counter to a device that is "
-                                                 "not registered (device UID %1%)")
-                                   % deviceUid));
+                        fmt::format("Trying to connect a counter to a device that is not registered (device UID {})",
+                                    deviceUid));
         }
 
         // Get the associated device

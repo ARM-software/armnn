@@ -8,7 +8,7 @@
 
 #include <armnn/Exceptions.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 namespace armnn
 {
@@ -23,17 +23,17 @@ void ConnectionAcknowledgedCommandHandler::operator()(const arm::pipe::Packet& p
     {
     case ProfilingState::Uninitialised:
     case ProfilingState::NotConnected:
-        throw RuntimeException(boost::str(boost::format("Connection Acknowledged Command Handler invoked while in an "
-                                                        "wrong state: %1%")
-                                          % GetProfilingStateName(currentState)));
+        throw RuntimeException(fmt::format("Connection Acknowledged Command Handler invoked while in an "
+                                           "wrong state: {}",
+                                           GetProfilingStateName(currentState)));
     case ProfilingState::WaitingForAck:
         // Process the packet
         if (!(packet.GetPacketFamily() == 0u && packet.GetPacketId() == 1u))
         {
-            throw armnn::InvalidArgumentException(boost::str(boost::format("Expected Packet family = 0, id = 1 but "
-                                                                           "received family = %1%, id = %2%")
-                                                  % packet.GetPacketFamily()
-                                                  % packet.GetPacketId()));
+            throw armnn::InvalidArgumentException(fmt::format("Expected Packet family = 0, id = 1 but "
+                                                              "received family = {}, id = {}",
+                                                              packet.GetPacketFamily(),
+                                                              packet.GetPacketId()));
         }
 
         // Once a Connection Acknowledged packet has been received, move to the Active state immediately
@@ -67,8 +67,8 @@ void ConnectionAcknowledgedCommandHandler::operator()(const arm::pipe::Packet& p
     case ProfilingState::Active:
         return; // NOP
     default:
-        throw RuntimeException(boost::str(boost::format("Unknown profiling service state: %1%")
-                                          % static_cast<int>(currentState)));
+        throw RuntimeException(fmt::format("Unknown profiling service state: {}",
+                                           static_cast<int>(currentState)));
     }
 }
 

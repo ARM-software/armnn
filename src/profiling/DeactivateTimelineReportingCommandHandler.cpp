@@ -6,7 +6,7 @@
 #include "DeactivateTimelineReportingCommandHandler.hpp"
 
 #include <armnn/Exceptions.hpp>
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 
 namespace armnn
@@ -24,9 +24,9 @@ void DeactivateTimelineReportingCommandHandler::operator()(const arm::pipe::Pack
         case ProfilingState::Uninitialised:
         case ProfilingState::NotConnected:
         case ProfilingState::WaitingForAck:
-            throw RuntimeException(boost::str(
-                boost::format("Deactivate Timeline Reporting Command Handler invoked while in a wrong state: %1%")
-                    % GetProfilingStateName(currentState)));
+            throw RuntimeException(fmt::format(
+                    "Deactivate Timeline Reporting Command Handler invoked while in a wrong state: {}",
+                    GetProfilingStateName(currentState)));
         case ProfilingState::Active:
             if (!(packet.GetPacketFamily() == 0u && packet.GetPacketId() == 7u))
             {
@@ -42,8 +42,8 @@ void DeactivateTimelineReportingCommandHandler::operator()(const arm::pipe::Pack
 
             break;
         default:
-            throw RuntimeException(boost::str(boost::format("Unknown profiling service state: %1%")
-                                                  % static_cast<int>(currentState)));
+            throw RuntimeException(fmt::format("Unknown profiling service state: {}",
+                                   static_cast<int>(currentState)));
     }
 }
 

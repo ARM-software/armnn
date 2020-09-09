@@ -8,10 +8,9 @@
 #include <armnn/Logging.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnnUtils/DataLayoutIndexed.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <Profiling.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
 
 #include "RefWorkloadUtils.hpp"
 #include "Decoders.hpp"
@@ -37,7 +36,7 @@ void NormalizeWithinUingLbr(Decoder<float>&    inputData,
     const unsigned int rows = tensorShape[2];
     const unsigned int cols = tensorShape[3];
 
-    int radius = boost::numeric_cast<int>(norm_size / 2u); /* Strong Assumption on rounding Mode */
+    int radius = armnn::numeric_cast<int>(norm_size / 2u); /* Strong Assumption on rounding Mode */
 
     for (unsigned int n = 0; n < batchSize; n++)
     {
@@ -52,23 +51,23 @@ void NormalizeWithinUingLbr(Decoder<float>&    inputData,
                     {
                         for (int x = -radius; x <= radius; x++)
                         {
-                            int i = boost::numeric_cast<int>(w) + x;
-                            int j = boost::numeric_cast<int>(h) + y;
+                            int i = armnn::numeric_cast<int>(w) + x;
+                            int j = armnn::numeric_cast<int>(h) + y;
 
-                            if ((i < 0) || (i >= boost::numeric_cast<int>(cols)))
+                            if ((i < 0) || (i >= armnn::numeric_cast<int>(cols)))
                             {
                                 continue;
                             }
 
-                            if ((j < 0) || (j >= boost::numeric_cast<int>(rows)))
+                            if ((j < 0) || (j >= armnn::numeric_cast<int>(rows)))
                             {
                                 continue;
                             }
 
                             unsigned int inputIndex = n * cols * rows * depth +
                                                       c * cols * rows +
-                                                      boost::numeric_cast<unsigned int>(j) * cols +
-                                                      boost::numeric_cast<unsigned int>(i);
+                                                      armnn::numeric_cast<unsigned int>(j) * cols +
+                                                      armnn::numeric_cast<unsigned int>(i);
                             inputData[inputIndex];
                             float inval = inputData.Get();
 
@@ -106,7 +105,7 @@ void NormalizeAcrossUingLbr(Decoder<float>&    inputData,
     const unsigned int rows      = tensorShape[dataLayoutIndexed.GetHeightIndex()];
     const unsigned int cols      = tensorShape[dataLayoutIndexed.GetWidthIndex()];
 
-    int radius = boost::numeric_cast<int>(norm_size / 2u); /* Strong Assumption on rounding Mode */
+    int radius = armnn::numeric_cast<int>(norm_size / 2u); /* Strong Assumption on rounding Mode */
 
     for (unsigned int n = 0; n < batchSize; n++)
     {
@@ -119,16 +118,16 @@ void NormalizeAcrossUingLbr(Decoder<float>&    inputData,
                     float accumulated_scale = 0.0;
                     for (int z = -radius; z <= radius; z++)
                     {
-                        int k = boost::numeric_cast<int>(c) + z;
+                        int k = armnn::numeric_cast<int>(c) + z;
 
-                        if ((k < 0) || (k >= boost::numeric_cast<int>(depth)))
+                        if ((k < 0) || (k >= armnn::numeric_cast<int>(depth)))
                         {
                             continue;
                         }
 
                         unsigned inputIndex = dataLayoutIndexed.GetIndex(tensorShape,
                                                                          n,
-                                                                         boost::numeric_cast<unsigned int>(k),
+                                                                         armnn::numeric_cast<unsigned int>(k),
                                                                          h,
                                                                          w);
 

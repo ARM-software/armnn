@@ -13,6 +13,8 @@
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 #include <reference/test/RefWorkloadFactoryHelper.hpp>
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include <test/TensorHelpers.hpp>
 
 #include <boost/multi_array.hpp>
@@ -1261,10 +1263,10 @@ LayerTestResult<T,4> CompareActivationTestImpl(
 
     LayerTestResult<T,4> ret(outputTensorInfo);
     auto boostArrayExtents = boost::extents
-        [boost::numeric_cast<boost::multi_array_types::extent_gen::index>(batchSize)]
-    [boost::numeric_cast<boost::multi_array_types::extent_gen::index>(channels)]
-    [boost::numeric_cast<boost::multi_array_types::extent_gen::index>(height)]
-    [boost::numeric_cast<boost::multi_array_types::extent_gen::index>(width)];
+        [armnn::numeric_cast<boost::multi_array_types::extent_gen::index>(batchSize)]
+        [armnn::numeric_cast<boost::multi_array_types::extent_gen::index>(channels)]
+        [armnn::numeric_cast<boost::multi_array_types::extent_gen::index>(height)]
+        [armnn::numeric_cast<boost::multi_array_types::extent_gen::index>(width)];
     ret.output.resize(boostArrayExtents);
     ret.outputExpected.resize(boostArrayExtents);
 

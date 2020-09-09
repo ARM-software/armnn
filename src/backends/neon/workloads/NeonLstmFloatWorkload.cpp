@@ -8,6 +8,8 @@
 
 #include "aclCommon/ArmComputeTensorUtils.hpp"
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include "neon/NeonTensorHandle.hpp"
 
 namespace armnn
@@ -131,8 +133,8 @@ NeonLstmFloatWorkload::NeonLstmFloatWorkload(const LstmQueueDescriptor &descript
 
     // Get the batch_size and the num_units from the cellStateIn dimensions
     const TensorInfo& inputTensorInfo = info.m_InputTensorInfos[2];
-    const unsigned int batch_size = boost::numeric_cast<unsigned int>(inputTensorInfo.GetShape()[0]);
-    const unsigned int num_units  = boost::numeric_cast<unsigned int>(inputTensorInfo.GetShape()[1]);
+    const unsigned int batch_size = armnn::numeric_cast<unsigned int>(inputTensorInfo.GetShape()[0]);
+    const unsigned int num_units  = armnn::numeric_cast<unsigned int>(inputTensorInfo.GetShape()[1]);
 
     m_ScratchBuffer = std::make_unique<arm_compute::Tensor>();
     if (m_Data.m_Parameters.m_CifgEnabled)

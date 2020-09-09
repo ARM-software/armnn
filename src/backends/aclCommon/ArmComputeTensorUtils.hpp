@@ -7,14 +7,14 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/DescriptorsFwd.hpp>
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include <arm_compute/core/ITensor.h>
 #include <arm_compute/core/TensorInfo.h>
 #include <arm_compute/core/Types.h>
 #include <arm_compute/core/Size2D.h>
 
 #include <Half.hpp>
-
-#include <boost/cast.hpp>
 
 namespace armnn
 {
@@ -126,7 +126,7 @@ inline size_t GetTensorOffset(const arm_compute::ITensorInfo& info,
     coords.set(2, static_cast<int>(channelIndex));
     coords.set(1, static_cast<int>(y));
     coords.set(0, static_cast<int>(x));
-    return boost::numeric_cast<size_t>(info.offset_element_in_bytes(coords));
+    return armnn::numeric_cast<size_t>(info.offset_element_in_bytes(coords));
 }
 
 // Helper function to obtain element offset into data buffer representing tensor data (assuming no strides).
@@ -229,9 +229,9 @@ TensorShape GetTensorShape(const ArmComputeType& shapelike, T initial)
     std::vector<unsigned int> s(MaxNumOfTensorDimensions, initial);
     for (unsigned int i=0; i < shapelike.num_dimensions(); ++i)
     {
-        s[(shapelike.num_dimensions()-1)-i] = boost::numeric_cast<unsigned int>(shapelike[i]);
+        s[(shapelike.num_dimensions()-1)-i] = armnn::numeric_cast<unsigned int>(shapelike[i]);
     }
-    return TensorShape(boost::numeric_cast<unsigned int>(shapelike.num_dimensions()), s.data());
+    return TensorShape(armnn::numeric_cast<unsigned int>(shapelike.num_dimensions()), s.data());
 };
 
 /// Get the strides from an ACL strides object

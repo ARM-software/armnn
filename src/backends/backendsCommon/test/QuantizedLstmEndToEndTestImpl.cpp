@@ -13,6 +13,8 @@
 #include <armnn/INetwork.hpp>
 #include <armnn/QuantizedLstmParams.hpp>
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include <test/TensorHelpers.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -27,9 +29,9 @@ using MultiArray = const boost::multi_array<uint8_t, 2>&;
 armnn::INetworkPtr CreateQuantizedLstmNetwork(MultiArray input,
                                               MultiArray expectedOutput)
 {
-    auto batchSize = boost::numeric_cast<unsigned int>(input.shape()[0]);
-    auto inputSize = boost::numeric_cast<unsigned int>(input.shape()[1]);
-    auto outputSize = boost::numeric_cast<unsigned int>(expectedOutput.shape()[1]);
+    auto batchSize = armnn::numeric_cast<unsigned int>(input.shape()[0]);
+    auto inputSize = armnn::numeric_cast<unsigned int>(input.shape()[1]);
+    auto outputSize = armnn::numeric_cast<unsigned int>(expectedOutput.shape()[1]);
 
     float inputOutputScale = 0.0078125f;
     int32_t inputOutputOffset = 128;

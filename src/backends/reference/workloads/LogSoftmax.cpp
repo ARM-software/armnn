@@ -8,17 +8,16 @@
 #include <armnnUtils/TensorUtils.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <cmath>
-
-#include <boost/numeric/conversion/cast.hpp>
 
 namespace
 {
 
 inline bool ValidateAxis(int axis, unsigned int numDimensions)
 {
-    const int sNumDimensions = boost::numeric_cast<int>(numDimensions);
+    const int sNumDimensions = armnn::numeric_cast<int>(numDimensions);
     return axis < sNumDimensions && axis >= -sNumDimensions;
 }
 
@@ -40,8 +39,8 @@ void LogSoftmax(Decoder<float>& input,
     IgnoreUnused(axisIsValid);
 
     unsigned int uAxis = descriptor.m_Axis < 0  ?
-        numDimensions - boost::numeric_cast<unsigned int>(std::abs(descriptor.m_Axis)) :
-        boost::numeric_cast<unsigned int>(descriptor.m_Axis);
+        numDimensions - armnn::numeric_cast<unsigned int>(std::abs(descriptor.m_Axis)) :
+        armnn::numeric_cast<unsigned int>(descriptor.m_Axis);
 
     const TensorShape& inputShape = inputInfo.GetShape();
     const unsigned int outerSize  = armnnUtils::GetNumElementsBetween(inputShape, 0, uAxis);

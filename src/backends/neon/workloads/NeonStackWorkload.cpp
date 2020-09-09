@@ -6,11 +6,10 @@
 #include "NeonWorkloadUtils.hpp"
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <neon/NeonTensorHandle.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
 
 namespace armnn
 {
@@ -20,8 +19,8 @@ namespace
 {
 int CalcAxis(const unsigned int axis, const unsigned int inputDimensions)
 {
-    const int intAxis = boost::numeric_cast<int>(axis);
-    return boost::numeric_cast<int>(inputDimensions) - intAxis;
+    const int intAxis = armnn::numeric_cast<int>(axis);
+    return armnn::numeric_cast<int>(inputDimensions) - intAxis;
 }
 } //namespace
 

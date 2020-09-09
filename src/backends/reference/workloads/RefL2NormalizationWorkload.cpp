@@ -11,8 +11,7 @@
 #include <Profiling.hpp>
 
 #include <armnnUtils/DataLayoutIndexed.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <cmath>
 
@@ -39,26 +38,26 @@ void RefL2NormalizationWorkload::Execute() const
 
     const TensorShape& shape = inputInfo.GetShape();
     unsigned int paddedShapeArray[4];
-    const int idxShift = 4 - boost::numeric_cast<int>(shape.GetNumDimensions());
+    const int idxShift = 4 - armnn::numeric_cast<int>(shape.GetNumDimensions());
 
     const unsigned int batches = (idxShift == 0) ? shape[0] : 1;
     paddedShapeArray[0] = batches;
 
-    const int channelsIdx = boost::numeric_cast<int>(dataLayout.GetChannelsIndex());
+    const int channelsIdx = armnn::numeric_cast<int>(dataLayout.GetChannelsIndex());
     const unsigned int channels = (channelsIdx - idxShift >= 0)
-                                  ? shape[boost::numeric_cast<unsigned int>(channelsIdx - idxShift)]
+                                  ? shape[armnn::numeric_cast<unsigned int>(channelsIdx - idxShift)]
                                   : 1;
     paddedShapeArray[channelsIdx] = channels;
 
-    const int heightIdx = boost::numeric_cast<int>(dataLayout.GetHeightIndex());
+    const int heightIdx = armnn::numeric_cast<int>(dataLayout.GetHeightIndex());
     const unsigned int height = (heightIdx - idxShift >= 0)
-                                ? shape[boost::numeric_cast<unsigned int>(heightIdx - idxShift)]
+                                ? shape[armnn::numeric_cast<unsigned int>(heightIdx - idxShift)]
                                 : 1;
     paddedShapeArray[heightIdx] = height;
 
-    const int widthIdx = boost::numeric_cast<int>(dataLayout.GetWidthIndex());
+    const int widthIdx = armnn::numeric_cast<int>(dataLayout.GetWidthIndex());
     const unsigned int width = (widthIdx - idxShift >= 0)
-                               ? shape[boost::numeric_cast<unsigned int>(widthIdx - idxShift)]
+                               ? shape[armnn::numeric_cast<unsigned int>(widthIdx - idxShift)]
                                : 1;
     paddedShapeArray[widthIdx] = width;
 

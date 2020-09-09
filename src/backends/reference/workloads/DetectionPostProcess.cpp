@@ -6,6 +6,7 @@
 #include "DetectionPostProcess.hpp"
 
 #include <armnn/utility/Assert.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -67,7 +68,7 @@ std::vector<unsigned int> NonMaxSuppression(unsigned int numBoxes,
     }
 
     // Sort the indices based on scores.
-    unsigned int numAboveThreshold = boost::numeric_cast<unsigned int>(scoresAboveThreshold.size());
+    unsigned int numAboveThreshold = armnn::numeric_cast<unsigned int>(scoresAboveThreshold.size());
     std::vector<unsigned int> sortedIndices = GenerateRangeK(numAboveThreshold);
     TopKSort(numAboveThreshold, sortedIndices.data(), scoresAboveThreshold.data(), numAboveThreshold);
 
@@ -267,7 +268,7 @@ void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
         }
 
         // Select max detection numbers of the highest score across all classes
-        unsigned int numSelected = boost::numeric_cast<unsigned int>(selectedBoxesAfterNms.size());
+        unsigned int numSelected = armnn::numeric_cast<unsigned int>(selectedBoxesAfterNms.size());
         unsigned int numOutput = std::min(desc.m_MaxDetections,  numSelected);
 
         // Sort the max scores among the selected indices.
@@ -311,7 +312,7 @@ void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
                                                                       desc.m_MaxDetections,
                                                                       desc.m_NmsIouThreshold);
 
-        unsigned int numSelected = boost::numeric_cast<unsigned int>(selectedIndices.size());
+        unsigned int numSelected = armnn::numeric_cast<unsigned int>(selectedIndices.size());
         unsigned int numOutput = std::min(desc.m_MaxDetections,  numSelected);
 
         AllocateOutputData(detectionBoxesInfo.GetShape()[1], numOutput, boxCorners, selectedIndices,

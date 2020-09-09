@@ -9,8 +9,7 @@
 
 #include <backendsCommon/WorkloadData.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 namespace armnn
 {
@@ -37,7 +36,7 @@ void Gather(const TensorInfo& paramsInfo,
     unsigned int outIndex = 0;
     for (unsigned int i = 0; i < indicesInfo.GetNumElements(); ++i)
     {
-        unsigned int indx = boost::numeric_cast<unsigned int>(indices[i]);
+        unsigned int indx = armnn::numeric_cast<unsigned int>(indices[i]);
 
         ARMNN_ASSERT(indices[i] >= 0 && indx < paramsShape[0]);
 

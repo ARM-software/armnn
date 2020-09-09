@@ -11,6 +11,8 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <cl/ClTensorHandle.hpp>
 
+#include <armnn/utility/NumericCast.hpp>
+
 namespace armnn
 {
 using namespace armcomputetensorutils;
@@ -26,7 +28,7 @@ ClSpaceToDepthWorkload::ClSpaceToDepthWorkload(const SpaceToDepthQueueDescriptor
     arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     input.info()->set_data_layout(aclDataLayout);
 
-    int32_t blockSize = boost::numeric_cast<int32_t>(desc.m_Parameters.m_BlockSize);
+    int32_t blockSize = armnn::numeric_cast<int32_t>(desc.m_Parameters.m_BlockSize);
 
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     output.info()->set_data_layout(aclDataLayout);
@@ -47,7 +49,7 @@ arm_compute::Status ClSpaceToDepthWorkloadValidate(const TensorInfo& input,
     DataLayout dataLayout = desc.m_DataLayout;
     const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input, dataLayout);
 
-    int32_t blockSize = boost::numeric_cast<int32_t>(desc.m_BlockSize);
+    int32_t blockSize = armnn::numeric_cast<int32_t>(desc.m_BlockSize);
 
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, dataLayout);
 

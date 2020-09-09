@@ -8,6 +8,7 @@
 #include <neon/NeonTensorHandle.hpp>
 #include <neon/NeonTensorHandleFactory.hpp>
 
+#include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <test/GraphUtils.hpp>
@@ -366,7 +367,7 @@ BOOST_AUTO_TEST_CASE(SplitteronXorYNoPaddingRequiredTest)
     for (unsigned int i = 0; i < outputShapes.size(); ++i)
     {
         TensorInfo outputTensorInfo(outputShapes[i], armnn::DataType::Float32, qScale, qOffset);
-        IConnectableLayer* output = net->AddOutputLayer(boost::numeric_cast<LayerBindingId>(i));
+        IConnectableLayer* output = net->AddOutputLayer(armnn::numeric_cast<LayerBindingId>(i));
         Connect(pooling2dLayers[i], output, outputTensorInfo, 0, 0);
     }
 
@@ -541,7 +542,7 @@ BOOST_AUTO_TEST_CASE(SplitteronXorYPaddingRequiredTest)
     for (unsigned int i = 0; i < outputShapes.size(); ++i)
     {
         TensorInfo outputTensorInfo(outputShapes[i], armnn::DataType::Float32, qScale, qOffset);
-        IConnectableLayer* output = net->AddOutputLayer(boost::numeric_cast<LayerBindingId>(i));
+        IConnectableLayer* output = net->AddOutputLayer(armnn::numeric_cast<LayerBindingId>(i));
         Connect(pooling2dLayers[i], output, outputTensorInfo, 0, 0);
     }
 

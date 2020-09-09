@@ -7,6 +7,7 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <armnnUtils/DataLayoutIndexed.hpp>
 #include <armnnUtils/TensorUtils.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <algorithm>
 #include <iomanip>
@@ -14,7 +15,6 @@
 #include <sstream>
 
 #include <boost/format.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
 using namespace armnnUtils;
 
@@ -306,7 +306,7 @@ void ValidateBroadcastTensorShapesMatch(const TensorInfo& first,
         }
         outputDims[i] = std::max(first.GetShape()[i], second.GetShape()[i]);
     }
-    TensorShape broadcastShape = TensorShape(boost::numeric_cast<unsigned int>(outputDims.size()), outputDims.data());
+    TensorShape broadcastShape = TensorShape(armnn::numeric_cast<unsigned int>(outputDims.size()), outputDims.data());
     if (broadcastShape != output.GetShape())
     {
         throw InvalidArgumentException(descName + ": The tensor shape resulting from adding "
@@ -2306,7 +2306,7 @@ void MeanQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     else
     {
         unsigned int outputDim =
-            inputTensorInfo.GetNumDimensions() - boost::numeric_cast<unsigned int>(m_Parameters.m_Axis.size());
+            inputTensorInfo.GetNumDimensions() - armnn::numeric_cast<unsigned int>(m_Parameters.m_Axis.size());
         ValidateTensorNumDimensions(outputTensorInfo,
                                     descriptorName,
                                     outputDim > 0 ? outputDim : 1,

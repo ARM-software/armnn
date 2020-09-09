@@ -7,6 +7,7 @@
 
 #include <QuantizeHelper.hpp>
 
+#include <armnn/utility/NumericCast.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 
@@ -144,9 +145,9 @@ LstmNoCifgNoPeepholeNoProjectionTestImpl(
         armnn::DataType constantDataType = armnn::DataType::Float32)
 {
     IgnoreUnused(memoryManager);
-    unsigned int batchSize = boost::numeric_cast<unsigned int>(input.shape()[0]);
-    unsigned int inputSize = boost::numeric_cast<unsigned int>(input.shape()[1]);
-    unsigned int outputSize = boost::numeric_cast<unsigned int>(outputExpected.shape()[1]);
+    unsigned int batchSize = armnn::numeric_cast<unsigned int>(input.shape()[0]);
+    unsigned int inputSize = armnn::numeric_cast<unsigned int>(input.shape()[1]);
+    unsigned int outputSize = armnn::numeric_cast<unsigned int>(outputExpected.shape()[1]);
     // cellSize and outputSize have the same size when there is no projection.
     unsigned numUnits = outputSize;
 
@@ -1069,10 +1070,10 @@ LayerTestResult<T, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
     bool peepholeEnabled = true;
     bool projectionEnabled = false;
     // These are not the input and the output of Lstm yet
-    unsigned int batchSize = boost::numeric_cast<unsigned int>(input.shape()[0]);
-    unsigned int inputSize = boost::numeric_cast<unsigned int>(input.shape()[1]);
+    unsigned int batchSize = armnn::numeric_cast<unsigned int>(input.shape()[0]);
+    unsigned int inputSize = armnn::numeric_cast<unsigned int>(input.shape()[1]);
 
-    unsigned int outputSize = boost::numeric_cast<unsigned int>(outputExpected.shape()[1]);
+    unsigned int outputSize = armnn::numeric_cast<unsigned int>(outputExpected.shape()[1]);
 
     const unsigned int cellSize = outputSize;
 
@@ -1560,9 +1561,9 @@ LayerTestResult<uint8_t, 2> QuantizedLstmTestImpl(
     const boost::multi_array<uint8_t, 2>& outputExpected)
 {
     IgnoreUnused(memoryManager);
-    auto numBatches = boost::numeric_cast<unsigned int>(input.shape()[0]);
-    auto inputSize = boost::numeric_cast<unsigned int>(input.shape()[1]);
-    auto outputSize = boost::numeric_cast<unsigned int>(outputExpected.shape()[1]);
+    auto numBatches = armnn::numeric_cast<unsigned int>(input.shape()[0]);
+    auto inputSize = armnn::numeric_cast<unsigned int>(input.shape()[1]);
+    auto outputSize = armnn::numeric_cast<unsigned int>(outputExpected.shape()[1]);
 
     // Scale/Offset for input/output, cellState In/Out, weights, bias
     float inputOutputScale = 0.0078125f;

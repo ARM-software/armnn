@@ -7,9 +7,10 @@
 #include "TensorCopyUtils.hpp"
 #include "WorkloadTestUtils.hpp"
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include <test/TensorHelpers.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
 #include <boost/multi_array.hpp>
 
 struct ActivationFixture
@@ -17,10 +18,10 @@ struct ActivationFixture
     ActivationFixture()
     {
         auto boostArrayExtents = boost::extents
-            [boost::numeric_cast<boost::multi_array_types::extent_gen::index>(batchSize)]
-            [boost::numeric_cast<boost::multi_array_types::extent_gen::index>(channels)]
-            [boost::numeric_cast<boost::multi_array_types::extent_gen::index>(height)]
-            [boost::numeric_cast<boost::multi_array_types::extent_gen::index>(width)];
+            [armnn::numeric_cast<boost::multi_array_types::extent_gen::index>(batchSize)]
+            [armnn::numeric_cast<boost::multi_array_types::extent_gen::index>(channels)]
+            [armnn::numeric_cast<boost::multi_array_types::extent_gen::index>(height)]
+            [armnn::numeric_cast<boost::multi_array_types::extent_gen::index>(width)];
         output.resize(boostArrayExtents);
         outputExpected.resize(boostArrayExtents);
         input.resize(boostArrayExtents);

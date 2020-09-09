@@ -9,16 +9,13 @@
 #include <armnn/Types.hpp>
 #include <armnn/Descriptors.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <LayerSupportCommon.hpp>
 #include <backendsCommon/LayerSupportRules.hpp>
 
-#include <boost/cast.hpp>
-
 #include <vector>
 #include <array>
-
-using namespace boost;
 
 namespace armnn
 {
@@ -1326,7 +1323,7 @@ bool RefLayerSupport::IsMeanSupported(const TensorInfo& input,
     }
     else
     {
-        auto outputDim = input.GetNumDimensions() - boost::numeric_cast<unsigned int>(descriptor.m_Axis.size());
+        auto outputDim = input.GetNumDimensions() - armnn::numeric_cast<unsigned int>(descriptor.m_Axis.size());
 
         if (outputDim > 0)
         {

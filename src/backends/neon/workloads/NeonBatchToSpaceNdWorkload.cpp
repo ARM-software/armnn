@@ -7,7 +7,9 @@
 
 #include "NeonWorkloadUtils.hpp"
 
+#include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
+
 #include <ResolveType.hpp>
 
 namespace armnn
@@ -23,8 +25,8 @@ arm_compute::Status NeonBatchToSpaceNdWorkloadValidate(const TensorInfo& input,
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, desc.m_DataLayout);
 
     // ArmNN blockShape is [H, W] Cl asks for W, H
-    int32_t blockHeight = boost::numeric_cast<int32_t>(desc.m_BlockShape[0]);
-    int32_t blockWidth = boost::numeric_cast<int32_t>(desc.m_BlockShape[1]);
+    int32_t blockHeight = armnn::numeric_cast<int32_t>(desc.m_BlockShape[0]);
+    int32_t blockWidth = armnn::numeric_cast<int32_t>(desc.m_BlockShape[1]);
 
     const arm_compute::Status aclStatus = arm_compute::NEBatchToSpaceLayer::validate(&aclInputInfo,
                                                                                      blockWidth,
@@ -49,8 +51,8 @@ NeonBatchToSpaceNdWorkload::NeonBatchToSpaceNdWorkload(const BatchToSpaceNdQueue
     output.info()->set_data_layout(aclDataLayout);
 
     // ArmNN blockShape is [H, W] Cl asks for W, H
-    int32_t blockHeight = boost::numeric_cast<int32_t>(desc.m_Parameters.m_BlockShape[0]);
-    int32_t blockWidth = boost::numeric_cast<int32_t>(desc.m_Parameters.m_BlockShape[1]);
+    int32_t blockHeight = armnn::numeric_cast<int32_t>(desc.m_Parameters.m_BlockShape[0]);
+    int32_t blockWidth = armnn::numeric_cast<int32_t>(desc.m_Parameters.m_BlockShape[1]);
 
     m_Layer.reset(new arm_compute::NEBatchToSpaceLayer());
     m_Layer->configure(&input, blockWidth, blockHeight, &output);

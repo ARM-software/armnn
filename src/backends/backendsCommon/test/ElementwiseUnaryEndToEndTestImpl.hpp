@@ -10,6 +10,8 @@
 
 #include <armnn/INetwork.hpp>
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include <boost/test/unit_test.hpp>
 
 #include <vector>
@@ -32,7 +34,7 @@ INetworkPtr CreateElementwiseUnaryNetwork(const TensorShape& inputShape,
     IConnectableLayer* elementwiseUnaryLayer = net->AddElementwiseUnaryLayer(descriptor, "elementwiseUnary");
 
     TensorInfo inputTensorInfo(inputShape, ArmnnTypeInput, qScale, qOffset);
-    IConnectableLayer* input = net->AddInputLayer(boost::numeric_cast<LayerBindingId>(0));
+    IConnectableLayer* input = net->AddInputLayer(armnn::numeric_cast<LayerBindingId>(0));
     Connect(input, elementwiseUnaryLayer, inputTensorInfo, 0, 0);
 
     TensorInfo outputTensorInfo(outputShape, ArmnnTypeInput, qScale, qOffset);

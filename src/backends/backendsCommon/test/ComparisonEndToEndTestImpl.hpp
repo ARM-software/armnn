@@ -10,6 +10,8 @@
 
 #include <armnn/INetwork.hpp>
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include <boost/test/unit_test.hpp>
 
 #include <vector>
@@ -34,7 +36,7 @@ INetworkPtr CreateComparisonNetwork(const std::vector<TensorShape>& inputShapes,
     for (unsigned int i = 0; i < inputShapes.size(); ++i)
     {
         TensorInfo inputTensorInfo(inputShapes[i], ArmnnTypeInput, qScale, qOffset);
-        IConnectableLayer* input = net->AddInputLayer(boost::numeric_cast<LayerBindingId>(i));
+        IConnectableLayer* input = net->AddInputLayer(armnn::numeric_cast<LayerBindingId>(i));
         Connect(input, comparisonLayer, inputTensorInfo, 0, i);
     }
 

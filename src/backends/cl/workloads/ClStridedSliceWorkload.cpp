@@ -13,7 +13,8 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadUtils.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
+
 #include <cl/ClLayerSupport.hpp>
 #include <cl/ClTensorHandle.hpp>
 #include <cl/ClLayerSupport.hpp>
@@ -36,7 +37,7 @@ arm_compute::Status ClStridedSliceWorkloadValidate(const TensorInfo& input,
 
     std::tie(starts, ends, strides) = SetClStridedSliceData(descriptor.m_Begin, descriptor.m_End, descriptor.m_Stride);
 
-    auto numDimensions       = boost::numeric_cast<int>(input.GetNumDimensions());
+    auto numDimensions       = armnn::numeric_cast<int>(input.GetNumDimensions());
     int32_t begin_mask       = ConvertMaskToACLFormat(descriptor.m_BeginMask, numDimensions);
     int32_t end_mask         = ConvertMaskToACLFormat(descriptor.m_EndMask, numDimensions);
     int32_t shrink_axis_mask = ConvertMaskToACLFormat(descriptor.m_ShrinkAxisMask, numDimensions);
@@ -68,7 +69,7 @@ ClStridedSliceWorkload::ClStridedSliceWorkload(const StridedSliceQueueDescriptor
                                                             m_Data.m_Parameters.m_End,
                                                             m_Data.m_Parameters.m_Stride);
 
-    auto numDimensions       = boost::numeric_cast<int>(info.m_InputTensorInfos[0].GetNumDimensions());
+    auto numDimensions       = armnn::numeric_cast<int>(info.m_InputTensorInfos[0].GetNumDimensions());
     int32_t begin_mask       = ConvertMaskToACLFormat(m_Data.m_Parameters.m_BeginMask, numDimensions);
     int32_t end_mask         = ConvertMaskToACLFormat(m_Data.m_Parameters.m_EndMask, numDimensions);
     int32_t shrink_axis_mask = ConvertMaskToACLFormat(m_Data.m_Parameters.m_ShrinkAxisMask, numDimensions);

@@ -9,6 +9,7 @@
 #include <armnnUtils/TensorUtils.hpp>
 
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <armnnUtils/DataLayoutIndexed.hpp>
 #include <armnnUtils/Permute.hpp>
 
@@ -219,20 +220,20 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     uint32_t dilationY = 1)
 {
     armnn::IgnoreUnused(memoryManager);
-    unsigned int inputHeight   = boost::numeric_cast<unsigned int>(originalInput.shape()[2]);
-    unsigned int inputWidth    = boost::numeric_cast<unsigned int>(originalInput.shape()[3]);
-    unsigned int inputChannels = boost::numeric_cast<unsigned int>(originalInput.shape()[1]);
-    unsigned int inputNum      = boost::numeric_cast<unsigned int>(originalInput.shape()[0]);
+    unsigned int inputHeight   = armnn::numeric_cast<unsigned int>(originalInput.shape()[2]);
+    unsigned int inputWidth    = armnn::numeric_cast<unsigned int>(originalInput.shape()[3]);
+    unsigned int inputChannels = armnn::numeric_cast<unsigned int>(originalInput.shape()[1]);
+    unsigned int inputNum      = armnn::numeric_cast<unsigned int>(originalInput.shape()[0]);
 
-    unsigned int outputHeight   = boost::numeric_cast<unsigned int>(originalOutputExpected.shape()[2]);
-    unsigned int outputWidth    = boost::numeric_cast<unsigned int>(originalOutputExpected.shape()[3]);
-    unsigned int outputChannels = boost::numeric_cast<unsigned int>(originalOutputExpected.shape()[1]);
-    unsigned int outputNum      = boost::numeric_cast<unsigned int>(originalOutputExpected.shape()[0]);
+    unsigned int outputHeight   = armnn::numeric_cast<unsigned int>(originalOutputExpected.shape()[2]);
+    unsigned int outputWidth    = armnn::numeric_cast<unsigned int>(originalOutputExpected.shape()[3]);
+    unsigned int outputChannels = armnn::numeric_cast<unsigned int>(originalOutputExpected.shape()[1]);
+    unsigned int outputNum      = armnn::numeric_cast<unsigned int>(originalOutputExpected.shape()[0]);
 
-    unsigned int kernelHeight = boost::numeric_cast<unsigned int>(originalKernel.shape()[2]);
-    unsigned int kernelWidth = boost::numeric_cast<unsigned int>(originalKernel.shape()[3]);
-    unsigned int kernelChannels = boost::numeric_cast<unsigned int>(originalKernel.shape()[1]);
-    unsigned int kernelDepthMul = boost::numeric_cast<unsigned int>(originalKernel.shape()[0]);
+    unsigned int kernelHeight = armnn::numeric_cast<unsigned int>(originalKernel.shape()[2]);
+    unsigned int kernelWidth = armnn::numeric_cast<unsigned int>(originalKernel.shape()[3]);
+    unsigned int kernelChannels = armnn::numeric_cast<unsigned int>(originalKernel.shape()[1]);
+    unsigned int kernelDepthMul = armnn::numeric_cast<unsigned int>(originalKernel.shape()[0]);
 
     bool biasEnabled = bias.size() > 0;
 
@@ -385,20 +386,20 @@ LayerTestResult<O, 4> SimpleConvolution2dNhwcTestImpl(
     uint32_t strideY  = 1)
 {
     armnn::IgnoreUnused(qScale, qOffset);
-    unsigned int inputNum       = boost::numeric_cast<unsigned int>(input.shape()[0]);
-    unsigned int inputChannels  = boost::numeric_cast<unsigned int>(input.shape()[3]);
-    unsigned int inputHeight    = boost::numeric_cast<unsigned int>(input.shape()[1]);
-    unsigned int inputWidth     = boost::numeric_cast<unsigned int>(input.shape()[2]);
+    unsigned int inputNum       = armnn::numeric_cast<unsigned int>(input.shape()[0]);
+    unsigned int inputChannels  = armnn::numeric_cast<unsigned int>(input.shape()[3]);
+    unsigned int inputHeight    = armnn::numeric_cast<unsigned int>(input.shape()[1]);
+    unsigned int inputWidth     = armnn::numeric_cast<unsigned int>(input.shape()[2]);
 
-    unsigned int kernelChanMul  = boost::numeric_cast<unsigned int>(kernel.shape()[0]);
-    unsigned int kernelChannels = boost::numeric_cast<unsigned int>(kernel.shape()[3]);
-    unsigned int kernelHeight   = boost::numeric_cast<unsigned int>(kernel.shape()[1]);
-    unsigned int kernelWidth    = boost::numeric_cast<unsigned int>(kernel.shape()[2]);
+    unsigned int kernelChanMul  = armnn::numeric_cast<unsigned int>(kernel.shape()[0]);
+    unsigned int kernelChannels = armnn::numeric_cast<unsigned int>(kernel.shape()[3]);
+    unsigned int kernelHeight   = armnn::numeric_cast<unsigned int>(kernel.shape()[1]);
+    unsigned int kernelWidth    = armnn::numeric_cast<unsigned int>(kernel.shape()[2]);
 
-    unsigned int outputNum      = boost::numeric_cast<unsigned int>(outputExpected.shape()[0]);
-    unsigned int outputChannels = boost::numeric_cast<unsigned int>(outputExpected.shape()[3]);
-    unsigned int outputHeight   = boost::numeric_cast<unsigned int>(outputExpected.shape()[1]);
-    unsigned int outputWidth    = boost::numeric_cast<unsigned int>(outputExpected.shape()[2]);
+    unsigned int outputNum      = armnn::numeric_cast<unsigned int>(outputExpected.shape()[0]);
+    unsigned int outputChannels = armnn::numeric_cast<unsigned int>(outputExpected.shape()[3]);
+    unsigned int outputHeight   = armnn::numeric_cast<unsigned int>(outputExpected.shape()[1]);
+    unsigned int outputWidth    = armnn::numeric_cast<unsigned int>(outputExpected.shape()[2]);
 
     bool biasEnabled = bias.size() > 0;
 
@@ -1643,18 +1644,18 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     uint32_t strideX = 1,
     uint32_t strideY = 1)
 {
-    unsigned int inputNum       = boost::numeric_cast<unsigned int>(input.shape()[0]);
-    unsigned int inputChannels  = boost::numeric_cast<unsigned int>(input.shape()[1]);
-    unsigned int inputHeight    = boost::numeric_cast<unsigned int>(input.shape()[2]);
-    unsigned int inputWidth     = boost::numeric_cast<unsigned int>(input.shape()[3]);
-    unsigned int kernelChanMul  = boost::numeric_cast<unsigned int>(kernel.shape()[0]);
-    unsigned int kernelChannels = boost::numeric_cast<unsigned int>(kernel.shape()[1]);
-    unsigned int kernelHeight   = boost::numeric_cast<unsigned int>(kernel.shape()[2]);
-    unsigned int kernelWidth    = boost::numeric_cast<unsigned int>(kernel.shape()[3]);
-    unsigned int outputNum      = boost::numeric_cast<unsigned int>(outputExpected.shape()[0]);
-    unsigned int outputChannels = boost::numeric_cast<unsigned int>(outputExpected.shape()[1]);
-    unsigned int outputHeight   = boost::numeric_cast<unsigned int>(outputExpected.shape()[2]);
-    unsigned int outputWidth    = boost::numeric_cast<unsigned int>(outputExpected.shape()[3]);
+    unsigned int inputNum       = armnn::numeric_cast<unsigned int>(input.shape()[0]);
+    unsigned int inputChannels  = armnn::numeric_cast<unsigned int>(input.shape()[1]);
+    unsigned int inputHeight    = armnn::numeric_cast<unsigned int>(input.shape()[2]);
+    unsigned int inputWidth     = armnn::numeric_cast<unsigned int>(input.shape()[3]);
+    unsigned int kernelChanMul  = armnn::numeric_cast<unsigned int>(kernel.shape()[0]);
+    unsigned int kernelChannels = armnn::numeric_cast<unsigned int>(kernel.shape()[1]);
+    unsigned int kernelHeight   = armnn::numeric_cast<unsigned int>(kernel.shape()[2]);
+    unsigned int kernelWidth    = armnn::numeric_cast<unsigned int>(kernel.shape()[3]);
+    unsigned int outputNum      = armnn::numeric_cast<unsigned int>(outputExpected.shape()[0]);
+    unsigned int outputChannels = armnn::numeric_cast<unsigned int>(outputExpected.shape()[1]);
+    unsigned int outputHeight   = armnn::numeric_cast<unsigned int>(outputExpected.shape()[2]);
+    unsigned int outputWidth    = armnn::numeric_cast<unsigned int>(outputExpected.shape()[3]);
 
     // If a bias is used, its size must equal the number of output channels.
     bool biasEnabled = bias.size() > 0;
@@ -2151,20 +2152,20 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     uint32_t dilationX = 1,
     uint32_t dilationY = 1)
 {
-    unsigned int inputHeight   = boost::numeric_cast<unsigned int>(originalInput.shape()[2]);
-    unsigned int inputWidth    = boost::numeric_cast<unsigned int>(originalInput.shape()[3]);
-    unsigned int inputChannels = boost::numeric_cast<unsigned int>(originalInput.shape()[1]);
-    unsigned int inputNum      = boost::numeric_cast<unsigned int>(originalInput.shape()[0]);
+    unsigned int inputHeight   = armnn::numeric_cast<unsigned int>(originalInput.shape()[2]);
+    unsigned int inputWidth    = armnn::numeric_cast<unsigned int>(originalInput.shape()[3]);
+    unsigned int inputChannels = armnn::numeric_cast<unsigned int>(originalInput.shape()[1]);
+    unsigned int inputNum      = armnn::numeric_cast<unsigned int>(originalInput.shape()[0]);
 
-    unsigned int outputHeight   = boost::numeric_cast<unsigned int>(originalOutputExpected.shape()[2]);
-    unsigned int outputWidth    = boost::numeric_cast<unsigned int>(originalOutputExpected.shape()[3]);
-    unsigned int outputChannels = boost::numeric_cast<unsigned int>(originalOutputExpected.shape()[1]);
-    unsigned int outputNum      = boost::numeric_cast<unsigned int>(originalOutputExpected.shape()[0]);
+    unsigned int outputHeight   = armnn::numeric_cast<unsigned int>(originalOutputExpected.shape()[2]);
+    unsigned int outputWidth    = armnn::numeric_cast<unsigned int>(originalOutputExpected.shape()[3]);
+    unsigned int outputChannels = armnn::numeric_cast<unsigned int>(originalOutputExpected.shape()[1]);
+    unsigned int outputNum      = armnn::numeric_cast<unsigned int>(originalOutputExpected.shape()[0]);
 
-    unsigned int kernelHeight = boost::numeric_cast<unsigned int>(originalKernel.shape()[2]);
-    unsigned int kernelWidth = boost::numeric_cast<unsigned int>(originalKernel.shape()[3]);
-    unsigned int kernelChannels = boost::numeric_cast<unsigned int>(originalKernel.shape()[1]);
-    unsigned int kernelDepthMul = boost::numeric_cast<unsigned int>(originalKernel.shape()[0]);
+    unsigned int kernelHeight = armnn::numeric_cast<unsigned int>(originalKernel.shape()[2]);
+    unsigned int kernelWidth = armnn::numeric_cast<unsigned int>(originalKernel.shape()[3]);
+    unsigned int kernelChannels = armnn::numeric_cast<unsigned int>(originalKernel.shape()[1]);
+    unsigned int kernelDepthMul = armnn::numeric_cast<unsigned int>(originalKernel.shape()[0]);
 
     bool biasEnabled = bias.size() > 0;
 

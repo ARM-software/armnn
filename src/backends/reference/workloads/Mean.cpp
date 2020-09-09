@@ -6,6 +6,8 @@
 #include "Mean.hpp"
 #include <backendsCommon/WorkloadData.hpp>
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <cmath>
@@ -111,7 +113,7 @@ void Mean(const armnn::TensorInfo& inputInfo,
           resolvedAxis.push_back(idx);
       }
     }
-    auto numResolvedAxis = boost::numeric_cast<unsigned int>(resolvedAxis.size());
+    auto numResolvedAxis = armnn::numeric_cast<unsigned int>(resolvedAxis.size());
 
     // Iterates through input_data and sum up the reduced axis.
     for (bool hasNext = true; hasNext; hasNext = NextIndex(inputNumDims, inputDims, tempIndex))

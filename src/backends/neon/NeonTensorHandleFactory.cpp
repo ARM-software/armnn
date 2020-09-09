@@ -9,6 +9,7 @@
 #include "Layer.hpp"
 
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 namespace armnn
@@ -29,7 +30,7 @@ std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateSubTensorHandle(IT
     {
         // Arm compute indexes tensor coords in reverse order.
         unsigned int revertedIndex = subTensorShape.GetNumDimensions() - i - 1;
-        coords.set(i, boost::numeric_cast<int>(subTensorOrigin[revertedIndex]));
+        coords.set(i, armnn::numeric_cast<int>(subTensorOrigin[revertedIndex]));
     }
 
     const arm_compute::TensorShape parentShape = armcomputetensorutils::BuildArmComputeTensorShape(parent.GetShape());

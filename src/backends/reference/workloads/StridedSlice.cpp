@@ -8,8 +8,7 @@
 #include <ResolveType.hpp>
 
 #include <armnn/utility/Assert.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <cstring>
 
@@ -24,7 +23,7 @@ void PadParams(StridedSliceDescriptor& p, unsigned int dimCount)
     ARMNN_ASSERT_MSG(dimCount <= 4, "Expected input with at most 4 dimensions");
 
     const unsigned int beginIndicesCount =
-        boost::numeric_cast<unsigned int>(p.m_Begin.size());
+        armnn::numeric_cast<unsigned int>(p.m_Begin.size());
 
     ARMNN_ASSERT(dimCount >= beginIndicesCount);
     const unsigned int padCount = dimCount - beginIndicesCount;
@@ -116,7 +115,7 @@ void StridedSlice(const TensorInfo& inputInfo,
     const int start3 = paddedParams.GetStartForAxis(inputShape, 3);
     const int stop3  = paddedParams.GetStopForAxis (inputShape, 3, start3);
 
-    const int step = boost::numeric_cast<int>(dataTypeSize);
+    const int step = armnn::numeric_cast<int>(dataTypeSize);
 
     for (int in0 = start0;
          !LoopCondition(in0, stop0, paddedParams.m_Stride[0]);
@@ -134,9 +133,9 @@ void StridedSlice(const TensorInfo& inputInfo,
                      !LoopCondition(in3, stop3, paddedParams.m_Stride[3]);
                      in3 += paddedParams.m_Stride[3])
                 {
-                    int dim1 = boost::numeric_cast<int>(inputShape[1]);
-                    int dim2 = boost::numeric_cast<int>(inputShape[2]);
-                    int dim3 = boost::numeric_cast<int>(inputShape[3]);
+                    int dim1 = armnn::numeric_cast<int>(inputShape[1]);
+                    int dim2 = armnn::numeric_cast<int>(inputShape[2]);
+                    int dim3 = armnn::numeric_cast<int>(inputShape[3]);
 
                     int inputOffset = (((in0 * dim1 + in1) * dim2 + in2) * dim3 + in3) * step;
                     ::memcpy(output, input + inputOffset, dataTypeSize);

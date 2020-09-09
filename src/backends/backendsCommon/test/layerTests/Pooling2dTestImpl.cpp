@@ -15,6 +15,7 @@
 #include <armnnUtils/Permute.hpp>
 
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <backendsCommon/WorkloadInfo.hpp>
 
@@ -48,15 +49,15 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
     auto widthIndex = dimensionIndices.GetWidthIndex();
     auto channelsIndex = dimensionIndices.GetChannelsIndex();
 
-    unsigned int inputHeight     = boost::numeric_cast<unsigned int>(input.shape()[heightIndex]);
-    unsigned int inputWidth      = boost::numeric_cast<unsigned int>(input.shape()[widthIndex]);
-    unsigned int inputChannels   = boost::numeric_cast<unsigned int>(input.shape()[channelsIndex]);
-    unsigned int inputBatchSize  = boost::numeric_cast<unsigned int>(input.shape()[0]);
+    unsigned int inputHeight     = armnn::numeric_cast<unsigned int>(input.shape()[heightIndex]);
+    unsigned int inputWidth      = armnn::numeric_cast<unsigned int>(input.shape()[widthIndex]);
+    unsigned int inputChannels   = armnn::numeric_cast<unsigned int>(input.shape()[channelsIndex]);
+    unsigned int inputBatchSize  = armnn::numeric_cast<unsigned int>(input.shape()[0]);
 
-    unsigned int outputHeight    = boost::numeric_cast<unsigned int>(outputExpected.shape()[heightIndex]);
-    unsigned int outputWidth     = boost::numeric_cast<unsigned int>(outputExpected.shape()[widthIndex]);
-    unsigned int outputChannels  = boost::numeric_cast<unsigned int>(outputExpected.shape()[channelsIndex]);
-    unsigned int outputBatchSize = boost::numeric_cast<unsigned int>(outputExpected.shape()[0]);
+    unsigned int outputHeight    = armnn::numeric_cast<unsigned int>(outputExpected.shape()[heightIndex]);
+    unsigned int outputWidth     = armnn::numeric_cast<unsigned int>(outputExpected.shape()[widthIndex]);
+    unsigned int outputChannels  = armnn::numeric_cast<unsigned int>(outputExpected.shape()[channelsIndex]);
+    unsigned int outputBatchSize = armnn::numeric_cast<unsigned int>(outputExpected.shape()[0]);
 
     armnn::TensorInfo inputTensorInfo  = armnnUtils::GetTensorInfo(
         inputBatchSize, inputChannels, inputHeight, inputWidth, dataLayout, ArmnnType);

@@ -8,6 +8,8 @@
 #include <armnn/Exceptions.hpp>
 #include <armnn/LayerSupport.hpp>
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <backendsCommon/test/TensorCopyUtils.hpp>
@@ -102,7 +104,7 @@ LayerTestResult<float,4> SimpleNormalizationTestImpl(
                     // pow((kappa + (accumulatedScale * alpha)), beta)
                     // ...where accumulatedScale is the sum of every element squared.
                     float divisor[inputNum];
-                    for(int i = 0; i < boost::numeric_cast<int>(inputNum); i++)
+                    for(int i = 0; i < armnn::numeric_cast<int>(inputNum); i++)
                     {
                         float accumulatedScale = input[i][0][0][0]*input[i][0][0][0] +
                                                  input[i][0][0][1]*input[i][0][0][1] +
@@ -129,11 +131,11 @@ LayerTestResult<float,4> SimpleNormalizationTestImpl(
                     // ...where adjacent channels means within half the normSize for the channel
                     // The test data has only one channel, so this is simplified below.
                     std::vector<float> outputVector;
-                    for (int n = 0; n < boost::numeric_cast<int>(inputNum); ++n)
+                    for (int n = 0; n < armnn::numeric_cast<int>(inputNum); ++n)
                     {
-                        for (int h = 0; h < boost::numeric_cast<int>(inputHeight); ++h)
+                        for (int h = 0; h < armnn::numeric_cast<int>(inputHeight); ++h)
                         {
-                            for (int w = 0; w < boost::numeric_cast<int>(inputWidth); ++w)
+                            for (int w = 0; w < armnn::numeric_cast<int>(inputWidth); ++w)
                             {
                                 float accumulatedScale = input[n][0][h][w]*input[n][0][h][w];
                                 float scale = powf((kappa + accumulatedScale * alpha), -beta);

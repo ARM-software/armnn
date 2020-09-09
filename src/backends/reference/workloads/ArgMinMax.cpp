@@ -7,7 +7,7 @@
 
 #include <armnnUtils/TensorUtils.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 namespace armnn
 {
@@ -39,7 +39,7 @@ void ArgMinMax(Decoder<float>& in, int32_t* out, const TensorInfo& inputTensorIn
                     tmpIndex = i;
                 }
             }
-            out[outer * innerElements + inner] = boost::numeric_cast<int32_t>(tmpIndex);
+            out[outer * innerElements + inner] = armnn::numeric_cast<int32_t>(tmpIndex);
         }
     }
 }

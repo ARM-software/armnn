@@ -9,6 +9,7 @@
 #include <armnn/Types.hpp>
 
 #include <armnnUtils/DataLayoutIndexed.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -151,20 +152,20 @@ void Pooling2d(Decoder<float>& rInputDecoder,
     auto heightIndex = dataLayout.GetHeightIndex();
     auto widthIndex = dataLayout.GetWidthIndex();
 
-    const int batchSize    = boost::numeric_cast<int>(outputInfo.GetShape()[0]);
-    const int channels     = boost::numeric_cast<int>(outputInfo.GetShape()[channelsIndex]);
-    const int heightOutput = boost::numeric_cast<int>(outputInfo.GetShape()[heightIndex]);
-    const int widthOutput  = boost::numeric_cast<int>(outputInfo.GetShape()[widthIndex]);
-    const int heightInput  = boost::numeric_cast<int>(inputInfo.GetShape()[heightIndex]);
-    const int widthInput   = boost::numeric_cast<int>(inputInfo.GetShape()[widthIndex]);
-    const int padLeft      = boost::numeric_cast<int>(params.m_PadLeft);
-    const int padRight     = boost::numeric_cast<int>(params.m_PadRight);
-    const int padTop       = boost::numeric_cast<int>(params.m_PadTop);
-    const int padBottom    = boost::numeric_cast<int>(params.m_PadBottom);
-    const int strideX      = boost::numeric_cast<int>(params.m_StrideX);
-    const int strideY      = boost::numeric_cast<int>(params.m_StrideY);
-    const int poolHeight   = boost::numeric_cast<int>(params.m_PoolHeight);
-    const int poolWidth    = boost::numeric_cast<int>(params.m_PoolWidth);
+    const int batchSize    = armnn::numeric_cast<int>(outputInfo.GetShape()[0]);
+    const int channels     = armnn::numeric_cast<int>(outputInfo.GetShape()[channelsIndex]);
+    const int heightOutput = armnn::numeric_cast<int>(outputInfo.GetShape()[heightIndex]);
+    const int widthOutput  = armnn::numeric_cast<int>(outputInfo.GetShape()[widthIndex]);
+    const int heightInput  = armnn::numeric_cast<int>(inputInfo.GetShape()[heightIndex]);
+    const int widthInput   = armnn::numeric_cast<int>(inputInfo.GetShape()[widthIndex]);
+    const int padLeft      = armnn::numeric_cast<int>(params.m_PadLeft);
+    const int padRight     = armnn::numeric_cast<int>(params.m_PadRight);
+    const int padTop       = armnn::numeric_cast<int>(params.m_PadTop);
+    const int padBottom    = armnn::numeric_cast<int>(params.m_PadBottom);
+    const int strideX      = armnn::numeric_cast<int>(params.m_StrideX);
+    const int strideY      = armnn::numeric_cast<int>(params.m_StrideY);
+    const int poolHeight   = armnn::numeric_cast<int>(params.m_PoolHeight);
+    const int poolWidth    = armnn::numeric_cast<int>(params.m_PoolWidth);
 
     float defaultInitializer = DefaultInitializer(params.m_PoolType);
 
@@ -221,10 +222,10 @@ void Pooling2d(Decoder<float>& rInputDecoder,
                         result = 0.0f;
 
                         unsigned int outputIndex = dataLayout.GetIndex(outputShape,
-                                                                       boost::numeric_cast<unsigned int>(n),
-                                                                       boost::numeric_cast<unsigned int>(c),
-                                                                       boost::numeric_cast<unsigned int>(yOutput),
-                                                                       boost::numeric_cast<unsigned int>(xOutput));
+                                                                       armnn::numeric_cast<unsigned int>(n),
+                                                                       armnn::numeric_cast<unsigned int>(c),
+                                                                       armnn::numeric_cast<unsigned int>(yOutput),
+                                                                       armnn::numeric_cast<unsigned int>(xOutput));
                         rOutputEncoder[outputIndex];
                         rOutputEncoder.Set(result);
                         continue;
@@ -244,10 +245,10 @@ void Pooling2d(Decoder<float>& rInputDecoder,
                         for (auto xInput = wstart; xInput < wend; xInput++)
                         {
                             unsigned int inputIndex = dataLayout.GetIndex(inputShape,
-                                                                          boost::numeric_cast<unsigned int>(n),
-                                                                          boost::numeric_cast<unsigned int>(c),
-                                                                          boost::numeric_cast<unsigned int>(yInput),
-                                                                          boost::numeric_cast<unsigned int>(xInput));
+                                                                          armnn::numeric_cast<unsigned int>(n),
+                                                                          armnn::numeric_cast<unsigned int>(c),
+                                                                          armnn::numeric_cast<unsigned int>(yInput),
+                                                                          armnn::numeric_cast<unsigned int>(xInput));
 
                             rInputDecoder[inputIndex];
                             float inval = rInputDecoder.Get();
@@ -259,10 +260,10 @@ void Pooling2d(Decoder<float>& rInputDecoder,
                     execute(result, poolAreaSize);
 
                     unsigned int outputIndex = dataLayout.GetIndex(outputShape,
-                                                                   boost::numeric_cast<unsigned int>(n),
-                                                                   boost::numeric_cast<unsigned int>(c),
-                                                                   boost::numeric_cast<unsigned int>(yOutput),
-                                                                   boost::numeric_cast<unsigned int>(xOutput));
+                                                                   armnn::numeric_cast<unsigned int>(n),
+                                                                   armnn::numeric_cast<unsigned int>(c),
+                                                                   armnn::numeric_cast<unsigned int>(yOutput),
+                                                                   armnn::numeric_cast<unsigned int>(xOutput));
 
                     rOutputEncoder[outputIndex];
                     rOutputEncoder.Set(result);

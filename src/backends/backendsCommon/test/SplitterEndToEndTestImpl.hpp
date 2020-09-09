@@ -8,6 +8,8 @@
 
 #include <armnn/INetwork.hpp>
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include <backendsCommon/test/CommonTestUtils.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -63,7 +65,7 @@ INetworkPtr CreateSplitterNetwork(const TensorShape& inputShape,
     for (unsigned int i = 0; i < outputShapes.size(); ++i)
     {
         TensorInfo outputTensorInfo(outputShapes[i], DataType, qScale, qOffset);
-        IConnectableLayer* output = net->AddOutputLayer(boost::numeric_cast<LayerBindingId>(i));
+        IConnectableLayer* output = net->AddOutputLayer(armnn::numeric_cast<LayerBindingId>(i));
         Connect(splitter, output, outputTensorInfo, i, 0);
     }
 

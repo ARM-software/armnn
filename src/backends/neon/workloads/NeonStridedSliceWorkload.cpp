@@ -9,6 +9,7 @@
 #include <neon/NeonTensorHandle.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/WorkloadUtils.hpp>
 
@@ -30,7 +31,7 @@ arm_compute::Status NeonStridedSliceWorkloadValidate(const TensorInfo& input,
                                                               descriptor.m_End,
                                                               descriptor.m_Stride);
 
-    auto numDimensions       = boost::numeric_cast<int>(input.GetNumDimensions());
+    auto numDimensions       = armnn::numeric_cast<int>(input.GetNumDimensions());
     int32_t begin_mask       = ConvertMaskToACLFormat(descriptor.m_BeginMask, numDimensions);
     int32_t end_mask         = ConvertMaskToACLFormat(descriptor.m_EndMask, numDimensions);
     int32_t shrink_axis_mask = ConvertMaskToACLFormat(descriptor.m_ShrinkAxisMask, numDimensions);
@@ -62,7 +63,7 @@ NeonStridedSliceWorkload::NeonStridedSliceWorkload(const StridedSliceQueueDescri
                                                               m_Data.m_Parameters.m_End,
                                                               m_Data.m_Parameters.m_Stride);
 
-    auto numDimensions       = boost::numeric_cast<int>(info.m_InputTensorInfos[0].GetNumDimensions());
+    auto numDimensions       = armnn::numeric_cast<int>(info.m_InputTensorInfos[0].GetNumDimensions());
     int32_t begin_mask       = ConvertMaskToACLFormat(m_Data.m_Parameters.m_BeginMask, numDimensions);
     int32_t end_mask         = ConvertMaskToACLFormat(m_Data.m_Parameters.m_EndMask, numDimensions);
     int32_t shrink_axis_mask = ConvertMaskToACLFormat(m_Data.m_Parameters.m_ShrinkAxisMask, numDimensions);

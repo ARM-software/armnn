@@ -11,6 +11,7 @@
 #include <armnn/Exceptions.hpp>
 #include <armnn/Utils.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
@@ -130,7 +131,7 @@ std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateSubTensorHandle(ITensorH
     {
         // Arm compute indexes tensor coords in reverse order.
         unsigned int revertedIndex = subTensorShape.GetNumDimensions() - i - 1;
-        coords.set(i, boost::numeric_cast<int>(subTensorOrigin[revertedIndex]));
+        coords.set(i, armnn::numeric_cast<int>(subTensorOrigin[revertedIndex]));
     }
 
     const arm_compute::TensorShape parentShape = armcomputetensorutils::BuildArmComputeTensorShape(parent.GetShape());

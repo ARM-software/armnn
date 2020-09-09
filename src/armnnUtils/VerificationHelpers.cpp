@@ -4,8 +4,9 @@
 //
 
 #include "VerificationHelpers.hpp"
-#include <boost/format.hpp>
 #include <armnn/Exceptions.hpp>
+
+#include <fmt/format.h>
 
 using namespace armnn;
 
@@ -23,13 +24,11 @@ void CheckValidSize(std::initializer_list<size_t> validInputCounts,
                                [&actualValue](size_t x) { return x == actualValue; } );
     if (!isValid)
     {
-        throw ParseException(
-            boost::str(
-                boost::format("%1% = %2% is not valid, not in {%3%}. %4%") %
-                              actualExpr %
-                              actualValue %
-                              validExpr %
-                              location.AsString()));
+        throw ParseException(fmt::format("{} = {} is not valid, not in {{}}. {}",
+                                         actualExpr,
+                                         actualValue,
+                                         validExpr,
+                                         location.AsString()));
     }
 }
 
@@ -39,12 +38,10 @@ uint32_t NonNegative(const char* expr,
 {
     if (value < 0)
     {
-        throw ParseException(
-            boost::str(
-                boost::format("'%1%' must be non-negative, received: %2% at %3%") %
-                              expr %
-                              value %
-                              location.AsString() ));
+        throw ParseException(fmt::format("'{}' must be non-negative, received: {} at {}",
+                                         expr,
+                                         value,
+                                         location.AsString()));
     }
     else
     {
@@ -58,12 +55,11 @@ int32_t VerifyInt32(const char* expr,
 {
     if (value < std::numeric_limits<int>::min()  || value > std::numeric_limits<int>::max())
     {
-        throw ParseException(
-            boost::str(
-                boost::format("'%1%' must should fit into a int32 (ArmNN don't support int64), received: %2% at %3%") %
-                              expr %
-                              value %
-                              location.AsString() ));
+        throw ParseException(fmt::format("'{}' must should fit into a int32 (ArmNN don't support int64),"
+                                         " received: {} at {}",
+                                         expr,
+                                         value,
+                                         location.AsString()));
     }
     else
     {

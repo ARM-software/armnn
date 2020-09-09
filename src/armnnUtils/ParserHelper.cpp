@@ -8,7 +8,7 @@
 #include <armnn/Descriptors.hpp>
 #include <armnnUtils/Permute.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 namespace armnnUtils
 {
@@ -27,14 +27,12 @@ void ProcessConcatInputTensorInfo(armnn::TensorInfo& inputTensorInfo,
     // double check dimensions of the tensors
     if (inputTensorInfo.GetNumDimensions() != inputRank)
     {
-        throw armnn::ParseException(
-            boost::str(
-                boost::format(
-                    "The number of dimensions: %1% for input tensors of the "
-                    "concatenation op should be %2% %3%")
-                % inputTensorInfo.GetNumDimensions()
-                % inputRank
-                % CHECK_LOCATION().AsString()));
+        throw armnn::ParseException(fmt::format(
+                                    "The number of dimensions: {0} for input tensors of the "
+                                    "concatenation op should be {1} {2}",
+                                    inputTensorInfo.GetNumDimensions(),
+                                    inputRank,
+                                    CHECK_LOCATION().AsString()));
     }
 
     for (unsigned int j = 0; j < concatAxis; ++j)

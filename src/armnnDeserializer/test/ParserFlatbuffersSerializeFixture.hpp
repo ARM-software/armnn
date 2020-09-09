@@ -18,7 +18,7 @@
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <ResolveType.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 
 using armnnDeserializer::IDeserializer;
@@ -68,14 +68,12 @@ struct ParserFlatbuffersSerializeFixture
 
         if (ret != armnn::Status::Success)
         {
-            throw armnn::Exception(
-                    boost::str(
-                            boost::format("The runtime failed to load the network. "
-                                          "Error was: %1%. in %2% [%3%:%4%]") %
-                            errorMessage %
-                            __func__ %
-                            __FILE__ %
-                            __LINE__));
+            throw armnn::Exception(fmt::format("The runtime failed to load the network. "
+                                               "Error was: {0}. in {1} [{2}:{3}]",
+                                               errorMessage,
+                                               __func__,
+                                               __FILE__,
+                                               __LINE__));
         }
 
     }

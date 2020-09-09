@@ -16,7 +16,7 @@
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 #include <unordered_map>
 #include <DotSerializer.hpp>
@@ -312,12 +312,11 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
                     // A copy layer is needed in between the source and destination layers.
                     // Record the operation rather than attempting to modify the graph as we go.
                     // (invalidating iterators)
-                    const std::string compLayerName = boost::str(boost::format("[ %1% (%2%) -> %3% (%4%) ]")
-                                                                 % srcLayer->GetName()
-                                                                 % srcOutputIndex
-                                                                 % dstLayer.GetName()
-                                                                 % dstInputSlot->GetSlotIndex());
-
+                    const std::string compLayerName = fmt::format("[ {} ({}) -> {} ({}) ]",
+                                                                  srcLayer->GetName(),
+                                                                  srcOutputIndex,
+                                                                  dstLayer.GetName(),
+                                                                  dstInputSlot->GetSlotIndex());
                     Layer* compLayer = nullptr;
                     if (strategy == EdgeStrategy::CopyToTarget)
                     {

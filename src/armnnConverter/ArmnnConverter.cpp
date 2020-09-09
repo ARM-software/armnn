@@ -24,7 +24,7 @@
 #include <armnn/utility/NumericCast.hpp>
 #include "armnn/utility/StringUtils.hpp"
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 #include <boost/program_options.hpp>
 
 #include <cstdlib>
@@ -265,9 +265,9 @@ private:
             const size_t numInputBindings = m_InputNames.size();
             if (numInputShapes < numInputBindings)
             {
-                throw armnn::Exception(boost::str(boost::format(
-                    "Not every input has its tensor shape specified: expected=%1%, got=%2%")
-                    % numInputBindings % numInputShapes));
+                throw armnn::Exception(fmt::format(
+                   "Not every input has its tensor shape specified: expected={0}, got={1}",
+                   numInputBindings, numInputShapes));
             }
 
             for (size_t i = 0; i < numInputShapes; i++)
@@ -298,9 +298,9 @@ private:
             const size_t numInputBindings = m_InputNames.size();
             if (numInputShapes < numInputBindings)
             {
-                throw armnn::Exception(boost::str(boost::format(
-                    "Not every input has its tensor shape specified: expected=%1%, got=%2%")
-                    % numInputBindings % numInputShapes));
+                throw armnn::Exception(fmt::format(
+                   "Not every input has its tensor shape specified: expected={0}, got={1}",
+                   numInputBindings, numInputShapes));
             }
         }
 
@@ -325,9 +325,9 @@ private:
             const size_t numInputBindings = m_InputNames.size();
             if (numInputShapes < numInputBindings)
             {
-                throw armnn::Exception(boost::str(boost::format(
-                    "Not every input has its tensor shape specified: expected=%1%, got=%2%")
-                    % numInputBindings % numInputShapes));
+                throw armnn::Exception(fmt::format(
+                   "Not every input has its tensor shape specified: expected={0}, got={1}",
+                   numInputBindings, numInputShapes));
             }
         }
 

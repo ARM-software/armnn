@@ -8,7 +8,6 @@
 #include "Graph.hpp"
 #include "Network.hpp"
 #include <Processes.hpp>
-#include "Runtime.hpp"
 #include "Profiling.hpp"
 #include "HeapProfiling.hpp"
 
@@ -23,7 +22,7 @@
 
 #include <LabelsAndEventClasses.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 namespace armnn
 {
@@ -236,9 +235,9 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
                 {
                     const char* const layerName =
                         layer->GetNameStr().length() != 0 ? layer->GetName() : "<Unnamed>";
-                    throw InvalidArgumentException(boost::str(
-                        boost::format("No workload created for layer (name: '%1%' type: '%2%') (compute '%3%')")
-                        % layerName % static_cast<int>(layer->GetType()) % layer->GetBackendId().Get()
+                    throw InvalidArgumentException(
+                        fmt::format("No workload created for layer (name: '{0}' type: '{1}') (compute '{2}')",
+                                    layerName, static_cast<int>(layer->GetType()), layer->GetBackendId().Get()
                     ));
                 }
 
@@ -325,7 +324,7 @@ TensorInfo LoadedNetwork::GetInputTensorInfo(LayerBindingId layerId) const
         }
     }
 
-    throw InvalidArgumentException(boost::str(boost::format("No input layer is associated with id %1%") % layerId));
+    throw InvalidArgumentException(fmt::format("No input layer is associated with id {}", layerId));
 }
 
 TensorInfo LoadedNetwork::GetOutputTensorInfo(LayerBindingId layerId) const
@@ -340,7 +339,7 @@ TensorInfo LoadedNetwork::GetOutputTensorInfo(LayerBindingId layerId) const
         }
     }
 
-    throw InvalidArgumentException(boost::str(boost::format("No output layer is associated with id %1%") % layerId));
+    throw InvalidArgumentException(fmt::format("No output layer is associated with id {}", layerId));
 }
 
 const IWorkloadFactory& LoadedNetwork::GetWorkloadFactory(const Layer& layer) const
@@ -350,12 +349,10 @@ const IWorkloadFactory& LoadedNetwork::GetWorkloadFactory(const Layer& layer) co
     auto it = m_WorkloadFactories.find(layer.GetBackendId());
     if (it ==  m_WorkloadFactories.end())
     {
-        throw RuntimeException(
-            boost::str(
-                boost::format("No workload factory for %1% to be used for layer: %2%")
-                % layer.GetBackendId().Get()
-                % layer.GetNameStr()),
-            CHECK_LOCATION());
+        throw RuntimeException(fmt::format("No workload factory for {0} to be used for layer: {1}",
+                                           layer.GetBackendId().Get(),
+                                           layer.GetNameStr()),
+                                           CHECK_LOCATION());
     }
 
     workloadFactory = it->second.first.get();
@@ -411,8 +408,7 @@ static const TensorPin& GetTensorPin(LayerBindingId id,
     }
     else
     {
-        throw InvalidArgumentException(boost::str(
-            boost::format("No tensor supplied for %1% %2%") % bindingPointDesc % id));
+        throw InvalidArgumentException(fmt::format("No tensor supplied for {0} {1}", bindingPointDesc, id));
     }
 }
 

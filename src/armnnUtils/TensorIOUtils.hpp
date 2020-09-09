@@ -7,7 +7,7 @@
 
 #include <armnn/Tensor.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 #include <mapbox/variant.hpp>
 
 namespace armnnUtils
@@ -22,10 +22,10 @@ inline armnn::InputTensors MakeInputTensors(const std::vector<armnn::BindingPoin
     const size_t numInputs = inputBindings.size();
     if (numInputs != inputDataContainers.size())
     {
-        throw armnn::Exception(boost::str(boost::format("The number of inputs does not match number of "
-                                                        "tensor data containers: %1% != %2%")
-                                          % numInputs
-                                          % inputDataContainers.size()));
+        throw armnn::Exception(fmt::format("The number of inputs does not match number of "
+                                           "tensor data containers: {0} != {1}",
+                                           numInputs,
+                                           inputDataContainers.size()));
     }
 
     for (size_t i = 0; i < numInputs; i++)
@@ -37,10 +37,9 @@ inline armnn::InputTensors MakeInputTensors(const std::vector<armnn::BindingPoin
         {
             if (value.size() != inputBinding.second.GetNumElements())
             {
-               throw armnn::Exception(boost::str(boost::format("The input tensor has incorrect size "
-                                                               "(expected %1% got %2%)")
-                                                 % inputBinding.second.GetNumElements()
-                                                 % value.size()));
+               throw armnn::Exception(fmt::format("The input tensor has incorrect size (expected {0} got {1})",
+                                                  inputBinding.second.GetNumElements(),
+                                                  value.size()));
             }
 
             armnn::ConstTensor inputTensor(inputBinding.second, value.data());
@@ -61,10 +60,10 @@ inline armnn::OutputTensors MakeOutputTensors(const std::vector<armnn::BindingPo
     const size_t numOutputs = outputBindings.size();
     if (numOutputs != outputDataContainers.size())
     {
-        throw armnn::Exception(boost::str(boost::format("Number of outputs does not match number of "
-                                                        "tensor data containers: %1% != %2%")
-                                          % numOutputs
-                                          % outputDataContainers.size()));
+        throw armnn::Exception(fmt::format("Number of outputs does not match number"
+                                           "of tensor data containers: {0} != {1}",
+                                           numOutputs,
+                                           outputDataContainers.size()));
     }
 
     for (size_t i = 0; i < numOutputs; i++)

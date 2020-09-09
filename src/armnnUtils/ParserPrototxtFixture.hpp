@@ -6,13 +6,13 @@
 #pragma once
 
 #include <armnn/IRuntime.hpp>
-
 #include <test/TensorHelpers.hpp>
 
 #include <Network.hpp>
 #include <VerificationHelpers.hpp>
 
 #include <boost/format.hpp>
+#include <fmt/format.h>
 
 #include <iomanip>
 #include <string>
@@ -129,10 +129,9 @@ void ParserPrototxtFixture<TParser>::Setup(const std::map<std::string, armnn::Te
     armnn::Status ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, move(optimized), errorMessage);
     if (ret != armnn::Status::Success)
     {
-        throw armnn::Exception(boost::str(
-            boost::format("LoadNetwork failed with error: '%1%' %2%")
-                            % errorMessage
-                            % CHECK_LOCATION().AsString()));
+        throw armnn::Exception(fmt::format("LoadNetwork failed with error: '{0}' {1}",
+                                           errorMessage,
+                                           CHECK_LOCATION().AsString()));
     }
 }
 
@@ -147,10 +146,9 @@ void ParserPrototxtFixture<TParser>::Setup()
     armnn::Status ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, move(optimized), errorMessage);
     if (ret != armnn::Status::Success)
     {
-        throw armnn::Exception(boost::str(
-            boost::format("LoadNetwork failed with error: '%1%' %2%")
-                            % errorMessage
-                            % CHECK_LOCATION().AsString()));
+        throw armnn::Exception(fmt::format("LoadNetwork failed with error: '{0}' {1}",
+                                           errorMessage,
+                                           CHECK_LOCATION().AsString()));
     }
 }
 
@@ -214,13 +212,12 @@ void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::ve
         armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(it.first);
         if (bindingInfo.second.GetNumElements() != it.second.size())
         {
-            throw armnn::Exception(
-                boost::str(boost::format("Output tensor %1% is expected to have %2% elements. "
-                                         "%3% elements supplied. %4%") %
-                                         it.first %
-                                         bindingInfo.second.GetNumElements() %
-                                         it.second.size() %
-                                         CHECK_LOCATION().AsString()));
+            throw armnn::Exception(fmt::format("Output tensor {0} is expected to have {1} elements. "
+                                               "{2} elements supplied. {3}",
+                                               it.first,
+                                               bindingInfo.second.GetNumElements(),
+                                               it.second.size(),
+                                               CHECK_LOCATION().AsString()));
         }
 
         // If the expected output shape is set, the output tensor checks will be carried out.
@@ -234,25 +231,25 @@ void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::ve
                 {
                     if (m_SingleOutputShape[i] != bindingInfo.second.GetShape()[i])
                     {
-                        throw armnn::Exception(
-                                boost::str(boost::format("Output tensor %1% is expected to have %2% shape. "
-                                                         "%3% shape supplied. %4%") %
-                                                         it.first %
-                                                         bindingInfo.second.GetShape() %
-                                                         m_SingleOutputShape %
-                                                         CHECK_LOCATION().AsString()));
+                        // This exception message could not be created by fmt:format because of an oddity in
+                        // the operator << of TensorShape.
+                        std::stringstream message;
+                        message << "Output tensor " << it.first << " is expected to have "
+                                << bindingInfo.second.GetShape() << "shape. "
+                                << m_SingleOutputShape << " shape supplied. "
+                                << CHECK_LOCATION().AsString();
+                        throw armnn::Exception(message.str());
                     }
                 }
             }
             else
             {
-                throw armnn::Exception(
-                        boost::str(boost::format("Output tensor %1% is expected to have %2% dimensions. "
-                                                 "%3% dimensions supplied. %4%") %
-                                                 it.first %
-                                                 bindingInfo.second.GetShape().GetNumDimensions() %
-                                                 NumOutputDimensions %
-                                                 CHECK_LOCATION().AsString()));
+                throw armnn::Exception(fmt::format("Output tensor {0} is expected to have {1} dimensions. "
+                                                   "{2} dimensions supplied. {3}",
+                                                   it.first,
+                                                   bindingInfo.second.GetShape().GetNumDimensions(),
+                                                   NumOutputDimensions,
+                                                   CHECK_LOCATION().AsString()));
             }
         }
 

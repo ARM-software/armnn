@@ -10,7 +10,7 @@
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 #include <numeric>
 
@@ -159,8 +159,7 @@ void OutputSlot::ValidateConnectionIndex(unsigned int index) const
 {
     if (armnn::numeric_cast<std::size_t>(index) >= m_Connections.size())
     {
-        throw InvalidArgumentException(
-            boost::str(boost::format("GetConnection: Invalid index %1% provided") % index));
+        throw InvalidArgumentException((fmt::format("GetConnection: Invalid index {} provided", index)));
     }
 }
 
@@ -350,14 +349,12 @@ void Layer::VerifyLayerConnections(unsigned int expectedConnections, const Check
         if (GetInputSlot(i).GetConnection() == nullptr)
         {
             throw LayerValidationException(
-                boost::str(
-                    boost::format(
-                        "Input connection #%1% must be connected "
-                        "for %2% layer %3% %4%")
-                        % i
-                        % GetLayerTypeAsCString(this->GetType())
-                        % GetNameStr()
-                        % location.AsString()));
+                    fmt::format("Input connection #{0} must be connected "
+                                "for {1} layer {2} {3}",
+                                i,
+                                GetLayerTypeAsCString(this->GetType()),
+                                GetNameStr(),
+                                location.AsString()));
         }
     }
 }
@@ -375,16 +372,14 @@ std::vector<TensorShape> Layer::InferOutputShapes(const std::vector<TensorShape>
     if (GetNumInputSlots() != GetNumOutputSlots())
     {
         throw UnimplementedException(
-            boost::str(
-                boost::format(
-                    "Default implementation for InferOutputShapes can only be used for "
-                    "layers with the same number of input and output slots. This doesn't "
-                    "hold for %1% layer %2% (#inputs=%3% #outputs=%4%) %5%")
-                    % GetLayerTypeAsCString(this->GetType())
-                    % GetNameStr()
-                    % GetNumInputSlots()
-                    % GetNumOutputSlots()
-                    % CHECK_LOCATION().AsString()));
+                fmt::format("Default implementation for InferOutputShapes can only be used for "
+                            "layers with the same number of input and output slots. This doesn't "
+                            "hold for {0} layer {1} (#inputs={2} #outputs={3}) {4}",
+                            GetLayerTypeAsCString(this->GetType()),
+                            GetNameStr(),
+                            GetNumInputSlots(),
+                            GetNumOutputSlots(),
+                            CHECK_LOCATION().AsString()));
     }
     return inputShapes;
 }

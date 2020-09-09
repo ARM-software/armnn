@@ -9,7 +9,7 @@
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 using namespace armnn;
 
@@ -88,11 +88,10 @@ TensorShape ExpandDims(const TensorShape& tensorShape, int axis)
 
     if (axis < -armnn::numeric_cast<int>(outputDim) || axis > armnn::numeric_cast<int>(tensorShape.GetNumDimensions()))
     {
-        throw InvalidArgumentException(
-            boost::str(boost::format("Invalid expansion axis %1% for %2%D input tensor. %3%") %
-                       axis %
-                       tensorShape.GetNumDimensions() %
-                       CHECK_LOCATION().AsString()));
+        throw InvalidArgumentException(fmt::format("Invalid expansion axis {} for {}D input tensor. {}",
+                                                   axis,
+                                                   tensorShape.GetNumDimensions(),
+                                                   CHECK_LOCATION().AsString()));
     }
 
     if (axis < 0)
@@ -101,6 +100,7 @@ TensorShape ExpandDims(const TensorShape& tensorShape, int axis)
     }
 
     std::vector<unsigned int> outputShape;
+    outputShape.reserve(tensorShape.GetNumDimensions());
     for (unsigned int i = 0; i < tensorShape.GetNumDimensions(); ++i)
     {
         outputShape.push_back(tensorShape[i]);

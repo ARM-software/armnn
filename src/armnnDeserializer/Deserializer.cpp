@@ -20,7 +20,7 @@
 #include <ParserHelper.hpp>
 #include <VerificationHelpers.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 #include <fstream>
 #include <algorithm>
@@ -45,24 +45,19 @@ const uint32_t VIRTUAL_LAYER_ID = std::numeric_limits<uint32_t>::max();
 {
     if (graph->layers() == nullptr)
     {
-        throw ParseException(
-                boost::str(
-                        boost::format("%1% was called with invalid (null) graph. "
-                                      "Possible reason is that the graph is not yet loaded and Unpack(ed). "
-                                      "layers:%2% at %3%") %
-                        location.m_Function %
-                        layersIndex %
-                        location.FileLine()));
+        throw ParseException(fmt::format("{0} was called with invalid (null) graph. "
+                                         "Possible reason is that the graph is not yet loaded and Unpack(ed). "
+                                         "layers:{1} at {2}",
+                                         location.m_Function,
+                                         layersIndex,
+                                         location.FileLine()));
     }
     else if (layersIndex >= graph->layers()->size())
     {
-        throw ParseException(
-                boost::str(
-                        boost::format("%1% was called with an invalid layers index. "
-                                      "layers:%2% at %3%") %
-                        location.m_Function %
-                        layersIndex %
-                        location.FileLine()));
+        throw ParseException(fmt::format("{0} was called with an invalid layers index. layers:{1} at {2}",
+                                         location.m_Function,
+                                         layersIndex,
+                                         location.FileLine()));
     }
 }
 
@@ -73,36 +68,30 @@ void CheckLayers(const Deserializer::GraphPtr& graph,
 {
     if (graph->layers() == nullptr)
     {
-        throw ParseException(
-            boost::str(
-                boost::format("%1% was called with invalid (null) graph. "
-                              "Possible reason is that the graph is not yet loaded and Unpack(ed). "
-                              "layers:%2% at %3%") %
-                location.m_Function %
-                layersIndex %
-                location.FileLine()));
+        throw ParseException(fmt::format("{0} was called with invalid (null) graph. "
+                                         "Possible reason is that the graph is not yet loaded and Unpack(ed). "
+                                         "layers:{1} at {2}",
+                                         location.m_Function,
+                                         layersIndex,
+                                         location.FileLine()));
     }
     else if (layersIndex >= graph->layers()->size())
     {
-        throw ParseException(
-            boost::str(
-                boost::format("%1% was called with an invalid layers index. "
-                              "layers:%2% at %3%") %
-                location.m_Function %
-                layersIndex %
-                location.FileLine()));
+        throw ParseException(fmt::format("{0} was called with an invalid layers index. "
+                                         "layers:{1} at {2}",
+                                         location.m_Function,
+                                         layersIndex,
+                                         location.FileLine()));
     }
     else if (layerIndex >= graph->layers()[layersIndex].size()
             && layerIndex != VIRTUAL_LAYER_ID)
     {
-        throw ParseException(
-            boost::str(
-                boost::format("%1% was called with an invalid layer index. "
-                              "layers:%2% layer:%3% at %4%") %
-                location.m_Function %
-                layersIndex %
-                layerIndex %
-                location.FileLine()));
+        throw ParseException(fmt::format("{0} was called with an invalid layer index. "
+                                         "layers:{1} layer:{2} at {3}",
+                                         location.m_Function,
+                                         layersIndex,
+                                         layerIndex,
+                                         location.FileLine()));
     }
 }
 
@@ -111,13 +100,9 @@ void CheckTensorPtr(Deserializer::TensorRawPtr rawPtr,
 {
     if (rawPtr == nullptr)
     {
-        throw ParseException(
-            boost::str(
-                boost::format("%1% was called with a null tensor pointer. "
-                              "at %2%") %
-                location.m_Function %
-                location.FileLine()));
-
+        throw ParseException(fmt::format("{0} was called with a null tensor pointer. at {1}",
+                                         location.m_Function,
+                                         location.FileLine()));
     }
 }
 
@@ -126,9 +111,9 @@ void CheckConstTensorPtr(Deserializer::ConstTensorRawPtr rawPtr,
 {
     if (rawPtr == nullptr)
     {
-        throw ParseException(boost::str(boost::format("%1% was called with a null const tensor pointer. at %2%") %
-                                        location.m_Function %
-                                        location.FileLine()));
+        throw ParseException(fmt::format("{0} was called with a null const tensor pointer. at {1}",
+                                         location.m_Function,
+                                         location.FileLine()));
     }
 }
 
@@ -138,9 +123,9 @@ void CheckConstTensorSize(const unsigned int constTensorSize,
 {
     if (constTensorSize != tensorSize)
     {
-        throw ParseException(boost::str(boost::format("%1% wrong number of components supplied to tensor. at:%2%") %
-                                                      location.m_Function %
-                                                      location.FileLine()));
+        throw ParseException(fmt::format("{0} wrong number of components supplied to tensor. at:{1}",
+                                         location.m_Function,
+                                         location.FileLine()));
     }
 }
 
@@ -368,9 +353,7 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_TransposeLayer()->base();
         case Layer::Layer_NONE:
         default:
-            throw ParseException(boost::str(
-                  boost::format("Layer type %1% not recognized") %
-                  layerType));
+            throw ParseException(fmt::format("Layer type {} not recognized", layerType));
     }
 }
 
@@ -539,12 +522,10 @@ armnn::TensorInfo ToTensorInfo(Deserializer::TensorRawPtr tensorPtr)
         default:
         {
             CheckLocation location = CHECK_LOCATION();
-            throw ParseException(
-                    boost::str(
-                            boost::format("Unsupported data type %1% = %2%. %3%") %
-                            tensorPtr->dataType() %
-                            EnumNameDataType(tensorPtr->dataType()) %
-                            location.AsString()));
+            throw ParseException(fmt::format("Unsupported data type {0} = {1}. {2}",
+                                             tensorPtr->dataType(),
+                                             EnumNameDataType(tensorPtr->dataType()),
+                                             location.AsString()));
         }
     }
 
@@ -624,11 +605,10 @@ armnn::ConstTensor ToConstTensor(Deserializer::ConstTensorRawPtr constTensorPtr)
         default:
         {
             CheckLocation location = CHECK_LOCATION();
-            throw ParseException(
-                    boost::str(boost::format("Unsupported data type %1% = %2%. %3%") %
-                               constTensorPtr->data_type() %
-                               EnumNameConstTensorData(constTensorPtr->data_type()) %
-                               location.AsString()));
+            throw ParseException(fmt::format("Unsupported data type {0} = {1}. {2}",
+                                             constTensorPtr->data_type(),
+                                             EnumNameConstTensorData(constTensorPtr->data_type()),
+                                             location.AsString()));
         }
     }
 }
@@ -671,14 +651,11 @@ void Deserializer::ParseUnsupportedLayer(GraphPtr graph, unsigned int layerIndex
 {
     CHECK_LAYERS(graph, 0, layerIndex);
     const auto layerName = GetBaseLayer(graph, layerIndex)->layerName()->c_str();
-    throw ParseException(
-        boost::str(
-            boost::format("Layer not supported. "
-                          "layerIndex: %1% "
-                          "layerName: %2% / %3%") %
-            layerIndex %
-            layerName %
-            CHECK_LOCATION().AsString()));
+    throw ParseException(fmt::format("Layer not supported. layerIndex: {0} "
+                                     "layerName: {1} / {2}",
+                                     layerIndex,
+                                     layerName,
+                                     CHECK_LOCATION().AsString()));
 }
 
 void Deserializer::ResetParser()
@@ -722,17 +699,16 @@ Deserializer::GraphPtr Deserializer::LoadGraphFromBinary(const uint8_t* binaryCo
 {
     if (binaryContent == nullptr)
     {
-        throw InvalidArgumentException(boost::str(boost::format("Invalid (null) binary content %1%") %
-                                                  CHECK_LOCATION().AsString()));
+        throw InvalidArgumentException(fmt::format("Invalid (null) binary content {}",
+                                                   CHECK_LOCATION().AsString()));
     }
     flatbuffers::Verifier verifier(binaryContent, len);
     if (verifier.VerifyBuffer<SerializedGraph>() == false)
     {
-        throw ParseException(
-                boost::str(boost::format("Buffer doesn't conform to the expected Armnn "
-                                         "flatbuffers format. size:%1% %2%") %
-                           len %
-                           CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("Buffer doesn't conform to the expected Armnn "
+                                         "flatbuffers format. size:{0} {1}",
+                                         len,
+                                         CHECK_LOCATION().AsString()));
     }
     return GetSerializedGraph(binaryContent);
 }
@@ -789,11 +765,9 @@ BindingPointInfo Deserializer::GetNetworkInputBindingInfo(unsigned int layerInde
             return inputBinding.second;
         }
     }
-    throw ParseException(
-            boost::str(
-                    boost::format("No input binding found for layer:%1% / %2%") %
-                    name %
-                    CHECK_LOCATION().AsString()));
+    throw ParseException(fmt::format("No input binding found for layer:{0} / {1}",
+                                     name,
+                                     CHECK_LOCATION().AsString()));
 }
 
 BindingPointInfo Deserializer::GetNetworkOutputBindingInfo(unsigned int layerIndex,
@@ -807,11 +781,9 @@ BindingPointInfo Deserializer::GetNetworkOutputBindingInfo(unsigned int layerInd
             return outputBinding.second;
         }
     }
-    throw ParseException(
-        boost::str(
-            boost::format("No output binding found for layer:%1% / %2%") %
-            name %
-            CHECK_LOCATION().AsString()));
+    throw ParseException(fmt::format("No output binding found for layer:{0} / {1}",
+                                     name,
+                                     CHECK_LOCATION().AsString()));
 }
 
 unsigned int Deserializer::GetInputLayerInVector(GraphPtr graph, int targetId)
@@ -963,13 +935,12 @@ void Deserializer::RegisterOutputSlots(GraphPtr graph,
     LayerBaseRawPtr baseLayer = GetBaseLayer(graph, layerIndex);
     if (baseLayer->outputSlots()->size() != layer->GetNumOutputSlots())
     {
-        throw ParseException(
-            boost::str(boost::format("The number of outputslots (%1%) does not match the number expected (%2%)"
-                                     " for layer index: %3% %4%") %
-                       baseLayer->outputSlots()->size() %
-                       layer->GetNumOutputSlots() %
-                       layerIndex %
-                       CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("The number of outputslots ({0}) does not match the number expected ({1})"
+                                         " for layer index: {2} {3}",
+                                         baseLayer->outputSlots()->size(),
+                                         layer->GetNumOutputSlots(),
+                                         layerIndex,
+                                         CHECK_LOCATION().AsString()));
     }
 
     for (unsigned int i = 0; i < layer->GetNumOutputSlots(); ++i)
@@ -990,13 +961,12 @@ void Deserializer::RegisterInputSlots(GraphPtr graph,
     LayerBaseRawPtr baseLayer = GetBaseLayer(graph, layerIndex);
     if (baseLayer->inputSlots()->size() != layer->GetNumInputSlots())
     {
-        throw ParseException(
-            boost::str(boost::format("The number of inputslots (%1%) does not match the number expected (%2%)"
-                                     " for layer index:%3% %4%") %
-                       baseLayer->inputSlots()->size() %
-                       layer->GetNumInputSlots() %
-                       layerIndex %
-                       CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("The number of inputslots ({0}) does not match the number expected ({1})"
+                                         " for layer index:{2} {3}",
+                                         baseLayer->inputSlots()->size(),
+                                         layer->GetNumInputSlots(),
+                                         layerIndex,
+                                         CHECK_LOCATION().AsString()));
     }
 
     for (unsigned int i = 0; i < layer->GetNumInputSlots(); ++i)
@@ -1157,8 +1127,7 @@ void Deserializer::ParseBatchToSpaceNd(GraphPtr graph, unsigned int layerIndex)
 
     if (flatBufferCrops->Length() % 2 != 0)
     {
-        throw ParseException(boost::str(
-            boost::format("The size of crops must be divisible by 2 %1%") % CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("The size of crops must be divisible by 2 {}", CHECK_LOCATION().AsString()));
     }
 
     std::vector<std::pair<unsigned int, unsigned int>> crops;
@@ -1814,8 +1783,8 @@ void Deserializer::ParsePad(GraphPtr graph, unsigned int layerIndex)
 
     if (flatBufferPadList->Length() % 2 != 0)
     {
-        throw ParseException(boost::str(
-            boost::format("The size of the pad list must be divisible by 2 %1%") % CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("The size of the pad list must be divisible by 2 {}",
+                                         CHECK_LOCATION().AsString()));
     }
 
     std::vector<std::pair<unsigned int, unsigned int>> padList;
@@ -2001,8 +1970,8 @@ armnn::TensorInfo Deserializer::OutputShapeOfReshape(const armnn::TensorInfo& in
     {
         if (std::find(std::next(stretchDim), targetDimsIn.end(), -1) != targetDimsIn.end())
         {
-            throw ParseException(boost::str(
-                boost::format("At most one component of shape can be -1 %1%") % CHECK_LOCATION().AsString()));
+            throw ParseException(fmt::format("At most one component of shape can be -1 {}",
+                                             CHECK_LOCATION().AsString()));
         }
 
         auto targetNumElements =
@@ -2183,8 +2152,8 @@ void Deserializer::ParseSpaceToBatchNd(GraphPtr graph, unsigned int layerIndex)
 
     if (flatBufferPadList->Length() % 2 != 0)
     {
-        throw ParseException(boost::str(
-            boost::format("The size of the pad list must be divisible by 2 %1%") % CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("The size of the pad list must be divisible by 2 {}",
+                                         CHECK_LOCATION().AsString()));
     }
 
     std::vector<std::pair<unsigned int, unsigned int>> padList;
@@ -2367,8 +2336,8 @@ void Deserializer::ParseSlice(GraphPtr graph, unsigned int layerIndex)
 
     if (fbBegin->Length() != fbSize->Length())
     {
-        throw ParseException(boost::str(
-            boost::format("Begin and size descriptors must have the same length %1%") % CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("Begin and size descriptors must have the same length {}",
+                                         CHECK_LOCATION().AsString()));
     }
 
     armnn::SliceDescriptor descriptor;
@@ -2404,8 +2373,8 @@ void Deserializer::ParseStridedSlice(GraphPtr graph, unsigned int layerIndex)
     if (!(flatBufferBegin->Length() == flatBufferEnd->Length() &&
           flatBufferBegin->Length() == flatBufferStride->Length()))
     {
-        throw ParseException(boost::str(
-            boost::format("The size of the begin, end, and stride must be equal %1%") % CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("The size of the begin, end, and stride must be equal {}",
+                                         CHECK_LOCATION().AsString()));
     }
 
     std::vector<int> begin(flatBufferBegin->begin(), flatBufferBegin->end());

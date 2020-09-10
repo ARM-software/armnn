@@ -14,7 +14,7 @@
 #include <string>
 #include <sstream>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 using namespace armnnUtils;
 
@@ -387,16 +387,15 @@ void ValidatePerAxisQuantizationDimension(const TensorInfo& tensorInfo,
     const Optional<unsigned int>& quantizationDim = tensorInfo.GetQuantizationDim();
     if (!quantizationDim.has_value())
     {
-        throw InvalidArgumentException(boost::str(
-            boost::format("%1%: Quantization dimension for per-axis quantization not set on tensor %2%.")
-            % descName % tensorName));
+        throw InvalidArgumentException(fmt::format("{0}: Quantization dimension for per-axis quantization "
+                                                   "not set on tensor {1}.", descName, tensorName));
     }
 
     if (quantizationDim.value() != 0)
     {
-        throw InvalidArgumentException(boost::str(
-            boost::format("%1%: Quantization dimension for per-axis quantization expected to be 0 on tensor %2%, "
-            "but got: %3%") % descName % tensorName % quantizationDim.value()));
+        throw InvalidArgumentException(fmt::format(
+            "{0}: Quantization dimension for per-axis quantization expected to be 0 on tensor {1}, "
+            "but got: {2}", descName, tensorName, quantizationDim.value()));
     }
 }
 
@@ -407,9 +406,9 @@ void ValidatePerAxisQuantizationOffset(const TensorInfo& tensorInfo,
     int32_t quantizationOffset = tensorInfo.GetQuantizationOffset();
     if (quantizationOffset != 0)
     {
-        throw InvalidArgumentException(boost::str(
-            boost::format("%1%: Quantization offset for per-axis quantization expected to be 0 on tensor %2%, "
-            "but got: %3%") % descName % tensorName % quantizationOffset));
+        throw InvalidArgumentException(fmt::format(
+            "{0}: Quantization offset for per-axis quantization expected to be 0 on tensor {1}, but got: {2}",
+            descName, tensorName, quantizationOffset));
     }
 }
 
@@ -428,9 +427,9 @@ void ValidatePerAxisQuantization(const TensorInfo& inputInfo,
 
         if (!canHavePerAxisQuantization)
         {
-            throw InvalidArgumentException(boost::str(
-                boost::format("%1%: Per-axis quantization parameters set on tensor %2%, "
-                "but data type does not support per-axis quantization.") % descName % "weight"));
+            throw InvalidArgumentException(fmt::format(
+                "{0}: Per-axis quantization parameters set on tensor {1}, but data type does not support "
+                "per-axis quantization.", descName, "weight"));
         }
 
 
@@ -443,9 +442,9 @@ void ValidatePerAxisQuantization(const TensorInfo& inputInfo,
             const TensorInfo& biasInfo = optionalBiasInfo.value();
             if (!biasInfo.HasPerAxisQuantization())
             {
-                throw InvalidArgumentException(boost::str(
-                    boost::format("%1%: Per-axis quantization parameters not set on bias tensor, despite being set on "
-                    "weight tensor.") % descName));
+                throw InvalidArgumentException(fmt::format(
+                        "{}: Per-axis quantization parameters not set on bias tensor, "
+                        "despite being set on weight tensor.", descName));
             }
 
             ValidateTensorDataType(biasInfo, DataType::Signed32, descName, "bias");
@@ -480,23 +479,22 @@ void MemCopyQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
     if (m_Inputs.size() != m_Outputs.size())
     {
-        throw InvalidArgumentException(boost::str(
-            boost::format("%1%: Number of inputs (%2%) does not match the number of outputs (%3%).") %
-                          descriptorName % m_Inputs.size() % m_Outputs.size()));
+        throw InvalidArgumentException(fmt::format(
+            "{0}: Number of inputs ({1}) does not match the number of outputs ({2}).",
+            descriptorName, m_Inputs.size(), m_Outputs.size()));
     }
 
     for (unsigned int i = 0; i < m_Inputs.size(); ++i)
     {
         if (!m_Inputs[i])
         {
-            throw InvalidArgumentException(boost::str(boost::format("%1%: Invalid NULL input %2%.") %
-                                                      descriptorName % i));
+            throw InvalidArgumentException(fmt::format(
+                "{0}: Invalid NULL input {1}.", descriptorName, i));
         }
 
         if (!m_Outputs[i])
         {
-            throw InvalidArgumentException(boost::str(boost::format("%1%: Invalid NULL output %2%") %
-                                                      descriptorName % i));
+            throw InvalidArgumentException(fmt::format("{0}: Invalid NULL output {1}", descriptorName, i));
         }
     }
 }
@@ -509,17 +507,16 @@ void MemImportQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
     if (workloadInfo.m_InputTensorInfos.size() != 1)
     {
-        throw InvalidArgumentException(boost::str(
-            boost::format("Number of input infos (%1%) is not 1.")
-            % workloadInfo.m_InputTensorInfos.size()));
+        throw InvalidArgumentException(fmt::format("Number of input infos ({}) is not 1.",
+                                                   workloadInfo.m_InputTensorInfos.size()));
 
     }
 
     if (workloadInfo.m_InputTensorInfos.size() != workloadInfo.m_OutputTensorInfos.size())
     {
-        throw InvalidArgumentException(boost::str(
-            boost::format("Number of input infos (%1%) does not match the number of output infos (%2%)")
-            % workloadInfo.m_InputTensorInfos.size() % workloadInfo.m_OutputTensorInfos.size()));
+        throw InvalidArgumentException(fmt::format(
+            "Number of input infos ({0}) does not match the number of output infos ({1})",
+            workloadInfo.m_InputTensorInfos.size(), workloadInfo.m_OutputTensorInfos.size()));
     }
 
     for (std::size_t i = 0; i < workloadInfo.m_InputTensorInfos.size(); ++i)
@@ -527,36 +524,33 @@ void MemImportQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         if (workloadInfo.m_InputTensorInfos[i].GetNumElements() !=
             workloadInfo.m_OutputTensorInfos[i].GetNumElements())
         {
-            throw InvalidArgumentException(boost::str(
-                boost::format("Number of elements for tensor input and output %1% does not match")
-                % i ));
+            throw InvalidArgumentException(fmt::format(
+                "Number of elements for tensor input and output {} does not match", i ));
         }
     }
 
     if (m_Inputs.size() != 1)
     {
-        throw InvalidArgumentException(boost::str(
-            boost::format("Number of inputs (%1%) is not 1.")
-            % m_Inputs.size()));
+        throw InvalidArgumentException(fmt::format("Number of inputs ({}) is not 1.", m_Inputs.size()));
     }
 
     if (m_Inputs.size() != m_Outputs.size())
     {
-        throw InvalidArgumentException(boost::str(
-            boost::format("Number of inputs (%1%) does not match the number of outputs (%2%)")
-            % m_Inputs.size() % m_Outputs.size()));
+        throw InvalidArgumentException(fmt::format(
+            "Number of inputs ({0}) does not match the number of outputs ({1})",
+            m_Inputs.size(), m_Outputs.size()));
     }
 
     for (unsigned int i = 0; i < m_Inputs.size(); ++i)
     {
         if (!m_Inputs[i])
         {
-            throw InvalidArgumentException(boost::str(boost::format("Invalid null input %1%") % i));
+            throw InvalidArgumentException(fmt::format("Invalid null input {}", i));
         }
 
         if (!m_Outputs[i])
         {
-            throw InvalidArgumentException(boost::str(boost::format("Invalid null output %1%") % i));
+            throw InvalidArgumentException(fmt::format("Invalid null output {}", i));
         }
     }
 }
@@ -569,21 +563,17 @@ void MemSyncQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
     if (m_Inputs.size() != 1)
     {
-        throw InvalidArgumentException(boost::str(
-            boost::format("Number of inputs (%1%) is not 1.")
-            % m_Inputs.size()));
+        throw InvalidArgumentException(fmt::format("Number of inputs ({}) is not 1.", m_Inputs.size()));
     }
 
     if (m_Outputs.size() != 0)
     {
-        throw InvalidArgumentException(boost::str(
-            boost::format("Number of outputs (%1%) is not 0.")
-            % m_Inputs.size() % m_Outputs.size()));
+        throw InvalidArgumentException(fmt::format("Number of outputs ({}) is not 0.", m_Outputs.size()));
     }
 
     if (!m_Inputs[0])
     {
-        throw InvalidArgumentException(boost::str(boost::format("Invalid null input 0")));
+        throw InvalidArgumentException(fmt::format("Invalid null input 0"));
     }
 }
 
@@ -1288,9 +1278,9 @@ void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
     if (m_Parameters.m_DilationX < 1 || m_Parameters.m_DilationY < 1 )
     {
         throw InvalidArgumentException(
-            boost::str(boost::format("%1%: dilationX (provided %2%) and dilationY (provided %3%) "
-                                     "cannot be smaller than 1.") % descriptorName %
-                                     m_Parameters.m_DilationX % m_Parameters.m_DilationX));
+            fmt::format("{}: dilationX (provided {}) and dilationY (provided {}) "
+                        "cannot be smaller than 1.",
+                        descriptorName, m_Parameters.m_DilationX, m_Parameters.m_DilationX));
     }
 
     const unsigned int channelIndex = (m_Parameters.m_DataLayout == DataLayout::NCHW) ? 1 : 3;
@@ -1302,11 +1292,10 @@ void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
     const unsigned int numWeightOutputChannels    = outputTensorInfo.GetShape()[channelIndex];
     if (numWeightChannelMultiplier * numWeightInputChannels != numWeightOutputChannels)
     {
-        throw InvalidArgumentException(
-            boost::str(boost::format("%1%: output_channels (provided %2%) should be "
-                                     "equal to input_channels (provided %3%) multiplied by channel_multiplier "
-                                     "(provided %4%).") % descriptorName % numWeightOutputChannels %
-                                     numWeightInputChannels % numWeightChannelMultiplier));
+        throw InvalidArgumentException(fmt::format(
+            "{0}: output_channels (provided {1}) should be equal to input_channels (provided {2}) "
+            "multiplied by channel_multiplier (provided {3}).",
+            descriptorName, numWeightOutputChannels, numWeightInputChannels, numWeightChannelMultiplier));
     }
 
     ValidateWeightDataType(inputTensorInfo, weightTensorInfo, descriptorName);
@@ -1430,9 +1419,8 @@ void ResizeBilinearQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
     if (inputBatchSize != outputBatchSize)
     {
         throw InvalidArgumentException(
-            boost::str(boost::format("%1%: Input batch size (%2%) "
-                "does not match output batch size (%3%)") %
-                descriptorName % inputBatchSize % outputBatchSize));
+            fmt::format("{}: Input batch size ({}) does not match output batch size ({})",
+                        descriptorName, inputBatchSize, outputBatchSize));
     }
 
     DataLayoutIndexed dimensionIndices(m_Parameters.m_DataLayout);
@@ -1441,9 +1429,8 @@ void ResizeBilinearQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
     if (inputChannelCount != outputChannelCount)
     {
         throw InvalidArgumentException(
-            boost::str(boost::format("%1%: Input channel count (%2%) "
-                "does not match output channel count (%3%)") %
-                descriptorName % inputChannelCount % outputChannelCount));
+            fmt::format("{}: Input channel count ({}) does not match output channel count ({})",
+                        descriptorName, inputChannelCount, outputChannelCount));
     }
 }
 
@@ -1479,9 +1466,8 @@ void ResizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     if (inputBatchSize != outputBatchSize)
     {
         throw InvalidArgumentException(
-                boost::str(boost::format("%1%: Input batch size (%2%) "
-                           "does not match output batch size (%3%)") %
-                           descriptorName % inputBatchSize % outputBatchSize));
+                fmt::format("{}: Input batch size ({}) does not match output batch size ({})",
+                            descriptorName, inputBatchSize, outputBatchSize));
     }
 
     DataLayoutIndexed dimensionIndices(m_Parameters.m_DataLayout);
@@ -1490,9 +1476,8 @@ void ResizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     if (inputChannelCount != outputChannelCount)
     {
         throw InvalidArgumentException(
-                boost::str(boost::format("%1%: Input channel count (%2%) "
-                           "does not match output channel count (%3%)") %
-                           descriptorName % inputChannelCount % outputChannelCount));
+                fmt::format("{}: Input channel count ({}) does not match output channel count ({})",
+                            descriptorName, inputChannelCount, outputChannelCount));
     }
 }
 

@@ -10,7 +10,7 @@
 
 #include <armnn/Exceptions.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 #include <string>
 #include <vector>
@@ -75,7 +75,7 @@ EntryPointType DynamicBackendUtils::GetEntryPoint(const void* sharedObjectHandle
     auto entryPoint = reinterpret_cast<EntryPointType>(dlsym(const_cast<void*>(sharedObjectHandle), symbolName));
     if (!entryPoint)
     {
-        throw RuntimeException(boost::str(boost::format("GetEntryPoint error: %1%") % GetDlError()));
+        throw RuntimeException(fmt::format("GetEntryPoint error: {}", GetDlError()));
     }
 
     return entryPoint;

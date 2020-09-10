@@ -30,11 +30,12 @@ DynamicBackend::DynamicBackend(const void* sharedObjectHandle)
     BackendVersion backendVersion = GetBackendVersion();
     if (!DynamicBackendUtils::IsBackendCompatible(backendVersion))
     {
-        throw RuntimeException(boost::str(boost::format("The dynamic backend %1% (version %2%) is not compatible"
-                                                        "with the current Backend API (vesion %3%)")
-                                          % backendId
-                                          % backendVersion
-                                          % IBackendInternal::GetApiVersion()));
+        // This exception message could not be formatted simply using fmt::format
+        std::stringstream message;
+        message << "The dynamic backend " << backendId << " (version " << backendVersion <<
+        ") is not compatible with the current Backend API (version " << IBackendInternal::GetApiVersion() << ")";
+
+        throw RuntimeException(message.str());
     }
 }
 

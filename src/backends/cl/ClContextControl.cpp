@@ -15,7 +15,7 @@
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 namespace cl
 {
@@ -51,9 +51,9 @@ ClContextControl::ClContextControl(arm_compute::CLTuner *tuner,
     }
     catch (const cl::Error& clError)
     {
-        throw ClRuntimeUnavailableException(boost::str(boost::format(
-            "Could not initialize the CL runtime. Error description: %1%. CL error code: %2%"
-        ) % clError.what() % clError.err()));
+        throw ClRuntimeUnavailableException(fmt::format(
+            "Could not initialize the CL runtime. Error description: {0}. CL error code: {1}",
+            clError.what(), clError.err()));
     }
 
     // Removes the use of global CL context.
@@ -149,9 +149,9 @@ void ClContextControl::DoLoadOpenClRuntime(bool updateTunedParameters)
     }
     catch (const cl::Error& clError)
     {
-        throw ClRuntimeUnavailableException(boost::str(boost::format(
-            "Could not initialize the CL runtime. Error description: %1%. CL error code: %2%"
-        ) % clError.what() % clError.err()));
+        throw ClRuntimeUnavailableException(fmt::format(
+            "Could not initialize the CL runtime. Error description: {0}. CL error code: {1}",
+            clError.what(), clError.err()));
     }
 
     // Note the first argument (path to cl source code) will be ignored as they should be embedded in the armcompute.

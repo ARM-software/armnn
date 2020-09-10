@@ -75,7 +75,7 @@ PyArmNN can also be built using the provided python scripts only. The advantage 
 $ export SWIG_EXECUTABLE=<path_to_swig>
 $ export ARMNN_INCLUDE=<path_to_armnn_include>
 $ export ARMNN_LIB=<path_to_armnn_libraries>
-``` 
+```
 
 ##### 2. Clean and build SWIG wrappers:
 
@@ -212,15 +212,20 @@ print(results)
 
 #### Examples
 
-To further explore PyArmNN API there are several examples provided in the examples folder running classification on an image. To run them first install the dependencies:
- ```bash
-$ pip install -r examples/requirements.txt
-```
-Afterwards simply execute the example scripts, e.g.:
- ```bash
-$ python tflite_mobilenetv1_quantized.py
-```
-All resources are downloaded during execution, so if you do not have access to the internet, you may need to download these manually. `example_utils.py` contains code shared between the examples.
+To further explore PyArmNN API there are several examples provided in the `/examples` folder for you to explore.
+
+##### Image Classification
+
+This sample application performs image classification on an image and outputs the <i>Top N</i> results, listing the classes and probabilities associated with the classified image. All resources are downloaded during execution, so if you do not have access to the internet, you may need to download these manually.
+
+Sample scripts are provided for performing image classification with TFLite and ONNX models with `tflite_mobilenetv1_quantized.py` and `onnx_mobilenetv2.py`.
+
+##### Object Detection
+
+This sample application guides the user and shows how to perform object detection using PyArmNN API. By taking a model and video file or camera feed as input, and running inference on each frame, we are able to interpret the output to draw bounding boxes around detected objects and overlay the corresponding labels and confidence scores.
+
+Sample scripts are provided for performing object detection from video file and video stream with `run_video_file.py` and `run_video_stream.py`.
+
 
 ## Tox for automation
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright © 2020 Arm Ltd. All rights reserved.
-# Copyright 2020 NXP
+# Copyright © 2020 NXP and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 """Python bindings for Arm NN
 
@@ -55,16 +55,18 @@ class ArmnnVersionCheckerExtBuilder(build_ext):
         self.failed_ext = []
 
     def build_extension(self, ext):
-        try:
+        if ext.optional:
+            try:
+                super().build_extension(ext)
+            except Exception as err:
+                self.failed_ext.append(ext)
+                logger.warning('Failed to build extension %s. \n %s', ext.name, str(err))
+        else:
             super().build_extension(ext)
-        except Exception as err:
-            self.failed_ext.append(ext)
-            logger.warning('Failed to build extension %s. \n %s', ext.name, str(err))
-
-        if ext.name == 'pyarmnn._generated._pyarmnn_version':
-            sys.path.append(os.path.abspath(os.path.join(self.build_lib, str(Path(ext._file_name).parent))))
-            from _pyarmnn_version import GetVersion
-            check_armnn_version(GetVersion(), __arm_ml_version__)
+            if ext.name == 'pyarmnn._generated._pyarmnn_version':
+                sys.path.append(os.path.abspath(os.path.join(self.build_lib, str(Path(ext._file_name).parent))))
+                from _pyarmnn_version import GetVersion
+                check_armnn_version(GetVersion(), __arm_ml_version__)
 
     def copy_extensions_to_source(self):
 
@@ -76,7 +78,7 @@ class ArmnnVersionCheckerExtBuilder(build_ext):
 def linux_gcc_name():
     """Returns the name of the `gcc` compiler. Might happen that we are cross-compiling and the
     compiler has a longer name.
-    
+
     Args:
         None
 
@@ -92,7 +94,7 @@ def linux_gcc_name():
 
 def linux_gcc_lib_search(gcc_compiler_name: str = linux_gcc_name()):
     """Calls the `gcc` to get linker default system paths.
-    
+
     Args:
         gcc_compiler_name(str): Name of the GCC compiler
 
@@ -158,6 +160,9 @@ def find_armnn(lib_name: str,
         raise RuntimeError("""ArmNN library {} was not found in {}. Please install ArmNN to one of the standard
                            locations or set correct ARMNN_INCLUDE and ARMNN_LIB env variables.""".format(lib_name,
                                                                                                          lib_search))
+    if optional and len(armnn_libs) == 0:
+        logger.warning("""Optional parser library %s was not found in %s and will not be installed.""", lib_name,
+                                                                                                        lib_search)
 
     # gives back tuple of names of the libs, set of unique libs locations and includes.
     return list(armnn_libs.keys()), list(set(
@@ -181,6 +186,7 @@ class LazyArmnnFinderExtension(Extension):
         self._library_dirs = None
         self._runtime_library_dirs = None
         self._armnn_libs = armnn_libs
+        self._optional = optional[0]
         # self.__swig_opts = None
         super().__init__(name, sources, include_dirs, define_macros, undef_macros, library_dirs, libraries,
                          runtime_library_dirs, extra_objects, extra_compile_args, extra_link_args, export_symbols,
@@ -198,7 +204,7 @@ class LazyArmnnFinderExtension(Extension):
     def library_dirs(self):
         library_dirs = self._library_dirs
         for lib in self._armnn_libs:
-            _, lib_path = find_armnn(lib)
+            _, lib_path = find_armnn(lib, self._optional)
             library_dirs = library_dirs + lib_path
 
         return library_dirs
@@ -211,7 +217,7 @@ class LazyArmnnFinderExtension(Extension):
     def runtime_library_dirs(self):
         library_dirs = self._runtime_library_dirs
         for lib in self._armnn_libs:
-            _, lib_path = find_armnn(lib)
+            _, lib_path = find_armnn(lib, self._optional)
             library_dirs = library_dirs + lib_path
 
         return library_dirs
@@ -224,7 +230,7 @@ class LazyArmnnFinderExtension(Extension):
     def libraries(self):
         libraries = self._libraries
         for lib in self._armnn_libs:
-            lib_names, _ = find_armnn(lib)
+            lib_names, _ = find_armnn(lib, self._optional)
             libraries = libraries + lib_names
 
         return libraries
@@ -249,13 +255,15 @@ if __name__ == '__main__':
                                               sources=['src/pyarmnn/_generated/armnn_wrap.cpp'],
                                               extra_compile_args=['-std=c++14'],
                                               language='c++',
-                                              armnn_libs=['libarmnn.so']
+                                              armnn_libs=['libarmnn.so'],
+                                              optional=[False]
                                               )
     pyarmnn_v_module = LazyArmnnFinderExtension('pyarmnn._generated._pyarmnn_version',
                                                 sources=['src/pyarmnn/_generated/armnn_version_wrap.cpp'],
                                                 extra_compile_args=['-std=c++14'],
                                                 language='c++',
-                                                armnn_libs=['libarmnn.so']
+                                                armnn_libs=['libarmnn.so'],
+                                                optional=[False]
                                                 )
     extensions_to_build = [pyarmnn_v_module, pyarmnn_module]
 
@@ -267,7 +275,8 @@ if __name__ == '__main__':
                                                                name.lower())],
                                                            extra_compile_args=['-std=c++14'],
                                                            language='c++',
-                                                           armnn_libs=['libarmnn.so', 'libarmnn{}.so'.format(name)]
+                                                           armnn_libs=['libarmnn.so', 'libarmnn{}.so'.format(name)],
+                                                           optional=[True]
                                                            )
         ext_list.append(pyarmnn_optional_module)
 
@@ -316,7 +325,7 @@ if __name__ == '__main__':
         python_requires='>=3.5',
         install_requires=['numpy'],
         cmdclass={
-            'build_py': ExtensionPriorityBuilder, 
+            'build_py': ExtensionPriorityBuilder,
             'build_ext': ArmnnVersionCheckerExtBuilder
         },
         ext_modules=extensions_to_build

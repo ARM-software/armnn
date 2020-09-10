@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2020 NXP
+# Copyright © 2020 NXP and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 
 import pyarmnn as ann

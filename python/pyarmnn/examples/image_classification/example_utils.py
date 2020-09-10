@@ -1,4 +1,4 @@
-# Copyright 2020 NXP
+# Copyright © 2020 NXP and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 
 from urllib.parse import urlparse

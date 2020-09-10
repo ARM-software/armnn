@@ -53,17 +53,20 @@ struct ArgMinMaxDescriptor
     ArgMinMaxDescriptor()
         : m_Function(ArgMinMaxFunction::Min)
         , m_Axis(-1)
+        , m_Output_Type(armnn::DataType::Signed32)
     {}
 
     bool operator ==(const ArgMinMaxDescriptor &rhs) const
     {
-        return m_Function == rhs.m_Function && m_Axis == rhs.m_Axis;
+        return m_Function == rhs.m_Function && m_Axis == rhs.m_Axis && m_Output_Type == rhs.m_Output_Type;
     }
 
     /// Specify if the function is to find Min or Max.
     ArgMinMaxFunction m_Function;
     /// Axis to reduce across the input tensor.
     int m_Axis;
+    // Tensor data type and this could be int32 or int64. Default type is int64.
+    armnn::DataType m_Output_Type;
 };
 
 /// A ComparisonDescriptor for the ComparisonLayer

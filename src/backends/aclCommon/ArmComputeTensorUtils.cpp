@@ -31,6 +31,8 @@ arm_compute::DataType GetArmComputeDataType(armnn::DataType dataType, bool multi
             return arm_compute::DataType::QASYMM8;
         case armnn::DataType::QSymmS16:
             return arm_compute::DataType::QSYMM16;
+        case armnn::DataType::Signed64:
+            return arm_compute::DataType::S64;
         case armnn::DataType::QSymmS8:
         {
             return multiScales ? arm_compute::DataType::QSYMM8_PER_CHANNEL : arm_compute::DataType::QSYMM8;

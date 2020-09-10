@@ -120,6 +120,7 @@ constexpr unsigned int GetDataTypeSize(DataType dataType)
         case DataType::Float16:               return 2U;
         case DataType::Float32:
         case DataType::Signed32:              return 4U;
+        case DataType::Signed64:              return 8U;
         case DataType::QAsymmU8:              return 1U;
         case DataType::QAsymmS8:              return 1U;
         case DataType::QSymmS8:               return 1U;
@@ -171,6 +172,7 @@ constexpr const char* GetDataTypeName(DataType dataType)
     {
         case DataType::Float16:               return "Float16";
         case DataType::Float32:               return "Float32";
+        case DataType::Signed64:              return "Signed64";
         case DataType::QAsymmU8:              return "QAsymmU8";
         case DataType::QAsymmS8:              return "QAsymmS8";
         case DataType::QSymmS8:               return "QSymmS8";

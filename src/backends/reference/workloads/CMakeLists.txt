@@ -5,8 +5,6 @@
 
 list(APPEND armnnRefBackendWorkloads_sources
     Abs.hpp
-    ArgMinMax.cpp
-    ArgMinMax.hpp
     Activation.cpp
     Activation.hpp
     ArgMinMax.cpp

@@ -623,9 +623,10 @@ void ArgMinMaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
     const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
-    if (outputTensorInfo.GetDataType() != DataType::Signed32)
+    if (outputTensorInfo.GetDataType() != DataType::Signed32 &&
+        outputTensorInfo.GetDataType() != DataType::Signed64)
     {
-        throw InvalidArgumentException(descriptorName + ": Output of ArgMinMax layer must be Int32.");
+        throw InvalidArgumentException(descriptorName + ": Output of ArgMinMax layer must be Int32 or Int64.");
     }
 
     std::vector<DataType> supportedInputTypes =
@@ -636,7 +637,8 @@ void ArgMinMaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16,
-        DataType::Signed32
+        DataType::Signed32,
+        DataType::Signed64
     };
 
     ValidateDataTypes(inputTensorInfo, supportedInputTypes, descriptorName);

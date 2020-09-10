@@ -41,6 +41,7 @@ enum class DataType
     QSymmS8 = 7,
     QAsymmS8 = 8,
     BFloat16 = 9,
+    Signed64 = 10,
 
     QuantisedAsymm8 ARMNN_DEPRECATED_ENUM_MSG("Use DataType::QAsymmU8 instead.") = QAsymmU8,
     QuantisedSymm16 ARMNN_DEPRECATED_ENUM_MSG("Use DataType::QSymmS16 instead.") = QSymmS16

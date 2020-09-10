@@ -13,7 +13,8 @@
 namespace armnn
 {
 
-void ArgMinMax(Decoder<float>& in, int32_t* out, const TensorInfo& inputTensorInfo,
+template <typename OUT>
+void ArgMinMax(Decoder<float>& in, OUT *out, const TensorInfo& inputTensorInfo,
                const TensorInfo& outputTensorInfo, ArgMinMaxFunction function, int axis);
 
 } //namespace armnn

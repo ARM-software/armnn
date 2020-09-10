@@ -12,7 +12,8 @@
 namespace armnn
 {
 
-void ArgMinMax(Decoder<float>& in, int32_t* out, const TensorInfo& inputTensorInfo,
+template <typename OUT>
+void ArgMinMax(Decoder<float>& in, OUT* out, const TensorInfo& inputTensorInfo,
                const TensorInfo& outputTensorInfo, ArgMinMaxFunction function, int axis)
 {
     IgnoreUnused(outputTensorInfo);
@@ -39,9 +40,16 @@ void ArgMinMax(Decoder<float>& in, int32_t* out, const TensorInfo& inputTensorIn
                     tmpIndex = i;
                 }
             }
-            out[outer * innerElements + inner] = armnn::numeric_cast<int32_t>(tmpIndex);
+
+            out[outer * innerElements + inner] = armnn::numeric_cast<OUT>(tmpIndex);
         }
     }
 }
+
+template void ArgMinMax(Decoder<float>& in, int32_t* out, const TensorInfo& inputTensorInfo,
+               const TensorInfo& outputTensorInfo, ArgMinMaxFunction function, int axis);
+
+template void ArgMinMax(Decoder<float>& in, int64_t* out, const TensorInfo& inputTensorInfo,
+               const TensorInfo& outputTensorInfo, ArgMinMaxFunction function, int axis);
 
 } //namespace armnn

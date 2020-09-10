@@ -5,6 +5,7 @@
 
 #include "ClBackend.hpp"
 #include "ClBackendId.hpp"
+#include "ClBackendModelContext.hpp"
 #include "ClWorkloadFactory.hpp"
 #include "ClBackendContext.hpp"
 #include "ClLayerSupport.hpp"
@@ -69,8 +70,7 @@ void ClBackend::RegisterTensorHandleFactories(TensorHandleFactoryRegistry& regis
     registry.RegisterFactory(std::make_unique<ClTensorHandleFactory>(mgr));
 }
 
-IBackendInternal::IBackendContextPtr
-ClBackend::CreateBackendContext(const IRuntime::CreationOptions& options) const
+IBackendInternal::IBackendContextPtr ClBackend::CreateBackendContext(const IRuntime::CreationOptions& options) const
 {
     return IBackendContextPtr{new ClBackendContext{options}};
 }
@@ -86,9 +86,27 @@ IBackendInternal::Optimizations ClBackend::GetOptimizations() const
     return Optimizations{};
 }
 
+IBackendInternal::IBackendSpecificModelContextPtr ClBackend::CreateBackendSpecificModelContext(
+    const ModelOptions& modelOptions) const
+{
+    return IBackendSpecificModelContextPtr{new ClBackendModelContext{modelOptions}};
+}
+
 IBackendInternal::ILayerSupportSharedPtr ClBackend::GetLayerSupport() const
 {
-    static ILayerSupportSharedPtr layerSupport{new ClLayerSupport};
+    static ILayerSupportSharedPtr layerSupport
+        {
+            new ClLayerSupport(IBackendInternal::IBackendSpecificModelContextPtr{})
+        };
+    return layerSupport;
+}
+
+IBackendInternal::ILayerSupportSharedPtr ClBackend::GetLayerSupport(const ModelOptions& modelOptions) const
+{
+    static ILayerSupportSharedPtr layerSupport
+    {
+        new ClLayerSupport(CreateBackendSpecificModelContext(modelOptions))
+    };
     return layerSupport;
 }
 

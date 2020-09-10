@@ -8,6 +8,8 @@ if(ARMCOMPUTENEON)
         NeonBackend.cpp
         NeonBackend.hpp
         NeonBackendId.hpp
+        NeonBackendModelContext.hpp
+        NeonBackendModelContext.cpp
         NeonInterceptorScheduler.hpp
         NeonInterceptorScheduler.cpp
         NeonLayerSupport.cpp

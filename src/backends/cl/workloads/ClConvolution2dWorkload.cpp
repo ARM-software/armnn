@@ -24,7 +24,8 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
                                                     const TensorInfo& output,
                                                     const Convolution2dDescriptor& descriptor,
                                                     const TensorInfo& weights,
-                                                    const Optional<TensorInfo>& biases)
+                                                    const Optional<TensorInfo>& biases,
+                                                    bool isFastMathEnabled)
 {
     const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
@@ -52,7 +53,9 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
                                                      &aclOutputInfo,
                                                      layerInfo,
                                                      arm_compute::WeightsInfo(),
-                                                     aclDilationInfo);
+                                                     aclDilationInfo,
+                                                     arm_compute::ActivationLayerInfo(),
+                                                     isFastMathEnabled);
 }
 
 ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescriptor& descriptor,

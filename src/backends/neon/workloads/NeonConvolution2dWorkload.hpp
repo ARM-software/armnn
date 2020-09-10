@@ -17,10 +17,11 @@ namespace armnn
 {
 
 arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
-    const TensorInfo& output,
-    const Convolution2dDescriptor& descriptor,
-    const TensorInfo& weights,
-    const Optional<TensorInfo>& biases);
+                                                      const TensorInfo& output,
+                                                      const Convolution2dDescriptor& descriptor,
+                                                      const TensorInfo& weights,
+                                                      const Optional<TensorInfo>& biases,
+                                                      bool isFastMathEnabled = false);
 
 class NeonConvolution2dWorkload : public BaseWorkload<Convolution2dQueueDescriptor>
 {

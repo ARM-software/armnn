@@ -5,6 +5,7 @@
 
 #include "NeonBackend.hpp"
 #include "NeonBackendId.hpp"
+#include "NeonBackendModelContext.hpp"
 #include "NeonWorkloadFactory.hpp"
 #include "NeonLayerSupport.hpp"
 #include "NeonTensorHandleFactory.hpp"
@@ -75,9 +76,27 @@ IBackendInternal::Optimizations NeonBackend::GetOptimizations() const
     return Optimizations{};
 }
 
+IBackendInternal::IBackendSpecificModelContextPtr NeonBackend::CreateBackendSpecificModelContext(
+    const ModelOptions& modelOptions) const
+{
+    return IBackendSpecificModelContextPtr{new NeonBackendModelContext{modelOptions}};
+}
+
 IBackendInternal::ILayerSupportSharedPtr NeonBackend::GetLayerSupport() const
 {
-    static ILayerSupportSharedPtr layerSupport{new NeonLayerSupport};
+    static ILayerSupportSharedPtr layerSupport
+        {
+            new NeonLayerSupport(IBackendInternal::IBackendSpecificModelContextPtr{})
+        };
+    return layerSupport;
+}
+
+IBackendInternal::ILayerSupportSharedPtr NeonBackend::GetLayerSupport(const ModelOptions& modelOptions) const
+{
+    static ILayerSupportSharedPtr layerSupport
+        {
+            new NeonLayerSupport(CreateBackendSpecificModelContext(modelOptions))
+        };
     return layerSupport;
 }
 

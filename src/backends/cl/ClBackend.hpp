@@ -36,8 +36,12 @@ public:
 
     IBackendInternal::Optimizations GetOptimizations() const override;
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override;
+    IBackendInternal::ILayerSupportSharedPtr GetLayerSupport(const ModelOptions& modelOptions) const override;
 
     OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const override;
+
+    IBackendInternal::IBackendSpecificModelContextPtr CreateBackendSpecificModelContext(
+        const ModelOptions& modelOptions) const override;
 };
 
 } // namespace armnn

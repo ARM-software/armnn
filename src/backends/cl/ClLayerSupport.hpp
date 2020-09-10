@@ -4,6 +4,8 @@
 //
 #pragma once
 
+#include <armnn/backends/IBackendInternal.hpp>
+
 #include <backendsCommon/LayerSupportBase.hpp>
 
 namespace armnn
@@ -12,6 +14,10 @@ namespace armnn
 class ClLayerSupport : public LayerSupportBase
 {
 public:
+    explicit ClLayerSupport(const IBackendInternal::IBackendSpecificModelContextPtr& modelContextPtr);
+    ClLayerSupport();
+    ~ClLayerSupport() {}
+
     ARMNN_DEPRECATED_MSG("Use IsElementwiseUnarySupported instead")
     bool IsAbsSupported(const TensorInfo& input,
                         const TensorInfo& output,
@@ -317,6 +323,9 @@ public:
                               const TensorInfo& output,
                               const TransposeDescriptor& descriptor,
                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
+private:
+    const IBackendInternal::IBackendSpecificModelContextPtr m_ModelContextPtr;
 
 };
 

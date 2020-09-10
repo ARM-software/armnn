@@ -16,6 +16,7 @@ ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
 BACKEND_SOURCES := \
         ClBackend.cpp \
         ClBackendContext.cpp \
+        ClBackendModelContext.cpp \
         ClContextControl.cpp \
         ClLayerSupport.cpp \
         ClRegistryInitializer.cpp \

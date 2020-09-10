@@ -14,6 +14,8 @@ namespace armnn
 struct BackendOptions;
 using NetworkOptions = std::vector<BackendOptions>;
 
+using ModelOptions = std::vector<BackendOptions>;
+
 /// Struct for the users to pass backend specific options
 struct BackendOptions
 {
@@ -261,5 +263,22 @@ private:
     /// The array of options to pass to the backend context
     std::vector<BackendOption> m_Options;
 };
+
+
+template <typename F>
+void ParseOptions(const std::vector<BackendOptions>& options, BackendId backend, F f)
+{
+    for (auto optionsGroup : options)
+    {
+        if (optionsGroup.GetBackendId() == backend)
+        {
+            for (size_t i=0; i < optionsGroup.GetOptionCount(); i++)
+            {
+                const BackendOptions::BackendOption option = optionsGroup.GetOption(i);
+                f(option.GetName(), option.GetValue());
+            }
+        }
+    }
+}
 
 } //namespace armnn

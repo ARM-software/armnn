@@ -4,6 +4,8 @@
 //
 #pragma once
 
+#include <armnn/backends/IBackendInternal.hpp>
+
 #include <backendsCommon/LayerSupportBase.hpp>
 
 namespace armnn
@@ -12,6 +14,11 @@ namespace armnn
 class NeonLayerSupport : public LayerSupportBase
 {
 public:
+    explicit NeonLayerSupport(const IBackendInternal::IBackendSpecificModelContextPtr& modelContextPtr);
+    NeonLayerSupport();
+
+    ~NeonLayerSupport() {}
+
     ARMNN_DEPRECATED_MSG("Use IsElementwiseUnarySupported instead")
     bool IsAbsSupported(const TensorInfo& input,
                         const TensorInfo& output,
@@ -326,6 +333,9 @@ public:
                               const TensorInfo& output,
                               const TransposeDescriptor& descriptor,
                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
+private:
+    const IBackendInternal::IBackendSpecificModelContextPtr m_ModelContextPtr;
 
 }; // class NeonLayerSupport
 

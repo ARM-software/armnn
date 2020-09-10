@@ -70,4 +70,34 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateDeviceNonSupportLayerNoFallback)
     BOOST_CHECK(!optNet);
 }
 
+BOOST_AUTO_TEST_CASE(FastMathEnabledTestOnCpuAcc)
+{
+    armnn::INetworkPtr net(armnn::INetwork::Create());
+
+    armnn::IConnectableLayer* input  = net->AddInputLayer(0);
+    armnn::IConnectableLayer* output = net->AddOutputLayer(0);
+
+    input->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+    input->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo({ 1, 1, 4, 4 }, armnn::DataType::Float32));
+
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
+    armnn::OptimizerOptions optimizerOptions;
+    armnn::BackendOptions modelOptions("CpuAcc", {{"FastMathEnabled", true}});
+    optimizerOptions.m_ModelOptions.push_back(modelOptions);
+
+    armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(
+    *net, backends, runtime->GetDeviceSpec(), optimizerOptions);
+
+    BOOST_CHECK(optimizedNet);
+
+    auto modelOptionsOut = static_cast<armnn::OptimizedNetwork*>(optimizedNet.get())->GetModelOptions();
+
+    BOOST_TEST(modelOptionsOut.size() == 1);
+    BOOST_TEST(modelOptionsOut[0].GetOption(0).GetName() == "FastMathEnabled");
+    BOOST_TEST(modelOptionsOut[0].GetOption(0).GetValue().AsBool() == true);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

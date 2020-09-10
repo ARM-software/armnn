@@ -22,7 +22,8 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
                                                     const TensorInfo& output,
                                                     const Convolution2dDescriptor& descriptor,
                                                     const TensorInfo& weights,
-                                                    const Optional<TensorInfo>& biases);
+                                                    const Optional<TensorInfo>& biases,
+                                                    bool isFastMathEnabled = false);
 
 class ClConvolution2dWorkload : public BaseWorkload<Convolution2dQueueDescriptor>
 {

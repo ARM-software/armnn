@@ -10,6 +10,8 @@ if(ARMCOMPUTECL)
         ClBackendContext.cpp
         ClBackendContext.hpp
         ClBackendId.hpp
+        ClBackendModelContext.cpp
+        ClBackendModelContext.hpp
         ClContextControl.cpp
         ClContextControl.hpp
         ClLayerSupport.cpp

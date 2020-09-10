@@ -86,6 +86,8 @@ public:
     using Optimizations = std::vector<OptimizationPtr>;
     using ILayerSupportSharedPtr = std::shared_ptr<ILayerSupport>;
 
+    using IBackendSpecificModelContextPtr = std::shared_ptr<IBackendModelContext>;
+
     using IMemoryManagerUniquePtr = std::unique_ptr<IMemoryManager>;
     using IMemoryManagerSharedPtr = std::shared_ptr<IMemoryManager>;
 
@@ -125,11 +127,22 @@ public:
     /// The default implementation always returns a default-constructed pointer.
     virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const;
 
+    virtual IBackendSpecificModelContextPtr CreateBackendSpecificModelContext(const ModelOptions& modelOptions) const;
+
     /// Create context specifically used for profiling interaction from backends.
     virtual IBackendProfilingContextPtr CreateBackendProfilingContext(const IRuntime::CreationOptions& creationOptions,
                                                                       IBackendProfilingPtr& backendProfiling);
 
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
+
+    virtual ILayerSupportSharedPtr GetLayerSupport(const ModelOptions& modelOptions) const
+    {
+        if (modelOptions.empty())
+        {
+            return GetLayerSupport();
+        }
+        return GetLayerSupport(modelOptions);
+    }
 
     virtual OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const;
 

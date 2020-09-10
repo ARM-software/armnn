@@ -34,6 +34,11 @@ public:
                                  Optional<DataType> dataType,
                                  std::string& outReasonIfUnsupported);
 
+    static bool IsLayerSupported(const IConnectableLayer& layer,
+                                 Optional<DataType> dataType,
+                                 std::string& outReasonIfUnsupported,
+                                 const ModelOptions& modelOptions);
+
     virtual bool SupportsSubTensors() const = 0;
 
     ARMNN_DEPRECATED_MSG("Use ITensorHandleFactory::CreateSubTensorHandle instead")
@@ -259,6 +264,13 @@ public:
     virtual std::unique_ptr<IWorkload> CreateTransposeConvolution2d(
         const TransposeConvolution2dQueueDescriptor& descriptor,
         const WorkloadInfo& info) const;
+
+private:
+    static bool IsLayerConfigurationSupported(const BackendId& backendId,
+                                       const IConnectableLayer& connectableLayer,
+                                       Optional<DataType> dataType,
+                                       std::string& outReasonIfUnsupported,
+                                       const ModelOptions& modelOptions = {});
 };
 
 } // namespace armnn

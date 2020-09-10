@@ -44,6 +44,12 @@ IBackendInternal::IBackendContextPtr IBackendInternal::CreateBackendContext(cons
     return IBackendContextPtr{};
 }
 
+IBackendInternal::IBackendSpecificModelContextPtr IBackendInternal::CreateBackendSpecificModelContext(
+    const ModelOptions&) const
+{
+    return IBackendSpecificModelContextPtr{};
+}
+
 IBackendInternal::IBackendProfilingContextPtr IBackendInternal::CreateBackendProfilingContext(
     const IRuntime::CreationOptions&, IBackendProfilingPtr&)
 {

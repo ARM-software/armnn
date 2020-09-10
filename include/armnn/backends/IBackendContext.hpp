@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include <armnn/BackendOptions.hpp>
 #include <armnn/IRuntime.hpp>
 #include <memory>
 
@@ -28,5 +29,11 @@ public:
 };
 
 using IBackendContextUniquePtr = std::unique_ptr<IBackendContext>;
+
+class IBackendModelContext
+{
+public:
+    virtual ~IBackendModelContext() {}
+};
 
 } // namespace armnn

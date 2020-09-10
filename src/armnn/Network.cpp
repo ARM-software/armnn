@@ -1030,7 +1030,8 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     const Network& network = *PolymorphicDowncast<const Network*>(&inNetwork);
     std::unique_ptr<Graph> graph = std::make_unique<Graph>(network.GetGraph());
 
-    auto optNet = IOptimizedNetworkPtr(new OptimizedNetwork(std::move(graph)), &IOptimizedNetwork::Destroy);
+    auto optNet = IOptimizedNetworkPtr(new OptimizedNetwork(std::move(graph), options.m_ModelOptions),
+                                       &IOptimizedNetwork::Destroy);
 
     OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
 
@@ -2005,6 +2006,11 @@ void Network::Accept(ILayerVisitor& visitor) const
 
 OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)
     : m_Graph(std::move(graph)), m_Guid(profiling::ProfilingService::GetNextGuid())
+{
+}
+
+OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph, const ModelOptions& modelOptions)
+    : m_Graph(std::move(graph)), m_Guid(profiling::ProfilingService::GetNextGuid()), m_ModelOptions(modelOptions)
 {
 }
 

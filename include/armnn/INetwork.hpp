@@ -614,14 +614,17 @@ struct OptimizerOptions
         , m_ReduceFp32ToBf16(false)
         , m_shapeInferenceMethod(armnn::ShapeInferenceMethod::ValidateOnly)
         , m_ImportEnabled(false)
+        , m_ModelOptions()
     {}
 
-    OptimizerOptions(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16, bool importEnabled)
+    OptimizerOptions(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16, bool importEnabled,
+        ModelOptions modelOptions = {})
         : m_ReduceFp32ToFp16(reduceFp32ToFp16)
         , m_Debug(debug)
         , m_ReduceFp32ToBf16(reduceFp32ToBf16)
         , m_shapeInferenceMethod(armnn::ShapeInferenceMethod::ValidateOnly)
         , m_ImportEnabled(importEnabled)
+        , m_ModelOptions(modelOptions)
     {
         if (m_ReduceFp32ToFp16 && m_ReduceFp32ToBf16)
         {
@@ -631,12 +634,13 @@ struct OptimizerOptions
 
     OptimizerOptions(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16 = false,
                      ShapeInferenceMethod shapeInferenceMethod = armnn::ShapeInferenceMethod::ValidateOnly,
-                     bool importEnabled = false)
+                     bool importEnabled = false, ModelOptions modelOptions = {})
         : m_ReduceFp32ToFp16(reduceFp32ToFp16)
         , m_Debug(debug)
         , m_ReduceFp32ToBf16(reduceFp32ToBf16)
         , m_shapeInferenceMethod(shapeInferenceMethod)
         , m_ImportEnabled(importEnabled)
+        , m_ModelOptions(modelOptions)
     {
         if (m_ReduceFp32ToFp16 && m_ReduceFp32ToBf16)
         {
@@ -658,6 +662,9 @@ struct OptimizerOptions
 
     // Enable Import
     bool m_ImportEnabled;
+
+    // Enable Model Options
+    ModelOptions m_ModelOptions;
 };
 
 /// Create an optimized version of the network

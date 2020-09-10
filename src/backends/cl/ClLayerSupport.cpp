@@ -5,13 +5,16 @@
 
 #include "ClLayerSupport.hpp"
 #include "ClBackendId.hpp"
+#include "ClBackendModelContext.hpp"
 
-#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/Descriptors.hpp>
 #include <armnn/BackendRegistry.hpp>
 
 #include <InternalTypes.hpp>
 #include <LayerSupportCommon.hpp>
+
+#include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #if defined(ARMCOMPUTECL_ENABLED)
 #include <aclCommon/ArmComputeUtils.hpp>
@@ -154,6 +157,16 @@ bool IsSupportedForDataTypeCl(Optional<std::string&> reasonIfUnsupported,
                                       std::forward<Params>(params)...);
 }
 } // anonymous namespace
+
+ClLayerSupport::ClLayerSupport(const IBackendInternal::IBackendSpecificModelContextPtr& modelContextPtr)
+    : m_ModelContextPtr(modelContextPtr)
+{
+}
+
+ClLayerSupport::ClLayerSupport()
+    : m_ModelContextPtr(nullptr)
+{
+}
 
 bool ClLayerSupport::IsAbsSupported(const TensorInfo& input,
                                     const TensorInfo& output,
@@ -322,13 +335,29 @@ bool ClLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
                                               const Optional<TensorInfo>& biases,
                                               Optional<std::string&> reasonIfUnsupported) const
 {
+    bool isFastMathEnabled = false;
+#if defined(ARMCOMPUTECL_ENABLED)
+    if (m_ModelContextPtr)
+    {
+        if (m_ModelContextPtr.get() != nullptr)
+        {
+            auto modelOptions = dynamic_cast<ClBackendModelContext*>(m_ModelContextPtr.get());
+            if (modelOptions)
+            {
+                isFastMathEnabled = modelOptions->IsFastMathEnabled();
+            }
+        }
+    }
+#endif
+
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClConvolution2dWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
                                    output,
                                    descriptor,
                                    weights,
-                                   biases);
+                                   biases,
+                                   isFastMathEnabled);
 }
 
 bool ClLayerSupport::IsDequantizeSupported(const TensorInfo& input,

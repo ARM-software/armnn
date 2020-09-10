@@ -15,6 +15,7 @@ ifeq ($(ARMNN_COMPUTE_NEON_ENABLED),1)
 
 BACKEND_SOURCES := \
         NeonBackend.cpp \
+        NeonBackendModelContext.cpp \
         NeonInterceptorScheduler.cpp \
         NeonLayerSupport.cpp \
         NeonRegistryInitializer.cpp \

@@ -273,12 +273,14 @@ private:
     NetworkOptions m_NetworkOptions;
 
     std::unique_ptr<Graph> m_Graph;
+    ModelOptions m_ModelOptions;
 };
 
 class OptimizedNetwork final : public IOptimizedNetwork
 {
 public:
     OptimizedNetwork(std::unique_ptr<Graph> graph);
+    OptimizedNetwork(std::unique_ptr<Graph> graph, const ModelOptions& modelOptions);
     ~OptimizedNetwork();
 
     Status PrintGraph() override;
@@ -287,10 +289,12 @@ public:
     profiling::ProfilingGuid GetGuid() const final { return m_Guid; };
 
     Graph& GetGraph() { return *m_Graph; }
+    ModelOptions& GetModelOptions() { return m_ModelOptions; }
 
 private:
     std::unique_ptr<Graph> m_Graph;
     profiling::ProfilingGuid m_Guid;
+    ModelOptions m_ModelOptions;
 };
 
 

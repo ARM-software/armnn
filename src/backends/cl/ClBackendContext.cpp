@@ -99,7 +99,6 @@ bool ParseBoolean(const BackendOptions::Var& value, bool defaultValue)
     {
         return value.AsBool();
     }
-
     return defaultValue;
 }
 
@@ -110,22 +109,6 @@ std::string ParseFile(const BackendOptions::Var& value, std::string defaultValue
         return value.AsString();
     }
     return defaultValue;
-}
-
-template <typename F>
-void ParseOptions(const std::vector<BackendOptions>& options, BackendId backend, F f)
-{
-    for (auto optionsGroup : options)
-    {
-        if (optionsGroup.GetBackendId() == backend)
-        {
-            for (size_t i=0; i < optionsGroup.GetOptionCount(); i++)
-            {
-                const BackendOptions::BackendOption option = optionsGroup.GetOption(i);
-                f(option.GetName(), option.GetValue());
-            }
-        }
-    }
 }
 
 void ConfigureTuner(arm_compute::CLTuner &tuner, TuningLevel level)

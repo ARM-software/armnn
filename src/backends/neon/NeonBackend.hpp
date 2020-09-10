@@ -31,12 +31,16 @@ public:
         const IRuntime::CreationOptions&, IBackendProfilingPtr& backendProfiling) override;
     IBackendInternal::Optimizations GetOptimizations() const override;
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override;
+    IBackendInternal::ILayerSupportSharedPtr GetLayerSupport(const ModelOptions& modelOptions) const override;
 
     OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const override;
 
     std::vector<ITensorHandleFactory::FactoryId> GetHandleFactoryPreferences() const override;
 
     void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry) override;
+
+    IBackendInternal::IBackendSpecificModelContextPtr CreateBackendSpecificModelContext(
+        const ModelOptions& modelOptions) const override;
 };
 
 } // namespace armnn

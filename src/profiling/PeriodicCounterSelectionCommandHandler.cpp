@@ -7,7 +7,8 @@
 #include "ProfilingUtils.hpp"
 
 #include <armnn/Types.hpp>
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
+
 #include <boost/format.hpp>
 
 #include <vector>
@@ -21,8 +22,8 @@ namespace profiling
 void PeriodicCounterSelectionCommandHandler::ParseData(const arm::pipe::Packet& packet, CaptureData& captureData)
 {
     std::vector<uint16_t> counterIds;
-    uint32_t sizeOfUint32 = boost::numeric_cast<uint32_t>(sizeof(uint32_t));
-    uint32_t sizeOfUint16 = boost::numeric_cast<uint32_t>(sizeof(uint16_t));
+    uint32_t sizeOfUint32 = armnn::numeric_cast<uint32_t>(sizeof(uint32_t));
+    uint32_t sizeOfUint16 = armnn::numeric_cast<uint32_t>(sizeof(uint16_t));
     uint32_t offset = 0;
 
     if (packet.GetLength() < 4)

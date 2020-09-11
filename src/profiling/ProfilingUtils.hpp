@@ -8,12 +8,12 @@
 #include <armnn/Exceptions.hpp>
 #include <armnn/profiling/ISendTimelinePacket.hpp>
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include "ICounterDirectory.hpp"
 #include "IPacketBuffer.hpp"
 
 #include <common/include/Packet.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
 
 #include <algorithm>
 #include <cstring>

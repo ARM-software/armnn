@@ -10,11 +10,11 @@
 #include <armnn/Conversion.hpp>
 #include <Processes.hpp>
 #include <armnn/utility/Assert.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <common/include/Constants.hpp>
 #include <common/include/SwTrace.hpp>
 
 #include <boost/format.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
 #include <cstring>
 
@@ -24,8 +24,6 @@ namespace armnn
 namespace profiling
 {
 
-using boost::numeric_cast;
-
 void SendCounterPacket::SendStreamMetaDataPacket()
 {
     const std::string info(GetSoftwareInfo());
@@ -33,10 +31,10 @@ void SendCounterPacket::SendStreamMetaDataPacket()
     const std::string softwareVersion(GetSoftwareVersion());
     const std::string processName = GetProcessName().substr(0, 60);
 
-    const uint32_t infoSize =            numeric_cast<uint32_t>(info.size()) + 1;
-    const uint32_t hardwareVersionSize = numeric_cast<uint32_t>(hardwareVersion.size()) + 1;
-    const uint32_t softwareVersionSize = numeric_cast<uint32_t>(softwareVersion.size()) + 1;
-    const uint32_t processNameSize =     numeric_cast<uint32_t>(processName.size()) + 1;
+    const uint32_t infoSize =            armnn::numeric_cast<uint32_t>(info.size()) + 1;
+    const uint32_t hardwareVersionSize = armnn::numeric_cast<uint32_t>(hardwareVersion.size()) + 1;
+    const uint32_t softwareVersionSize = armnn::numeric_cast<uint32_t>(softwareVersion.size()) + 1;
+    const uint32_t processNameSize =     armnn::numeric_cast<uint32_t>(processName.size()) + 1;
 
     const uint32_t sizeUint32 = sizeof(uint32_t);
 
@@ -75,11 +73,12 @@ void SendCounterPacket::SendStreamMetaDataPacket()
     packetVersions.push_back(std::make_pair(ConstructHeader(3, 1, 1), arm::pipe::EncodeVersion(1, 0, 0)));
     packetVersions.push_back(std::make_pair(ConstructHeader(1, 0, 0), arm::pipe::EncodeVersion(1, 0, 0)));
     packetVersions.push_back(std::make_pair(ConstructHeader(1, 0, 1), arm::pipe::EncodeVersion(1, 0, 0)));
-    uint32_t numberOfVersions = numeric_cast<uint32_t>(packetVersions.size());
-    uint32_t packetVersionSize = numeric_cast<uint32_t>(numberOfVersions * 2 * sizeUint32);
+    uint32_t numberOfVersions = armnn::numeric_cast<uint32_t>(packetVersions.size());
+    uint32_t packetVersionSize = armnn::numeric_cast<uint32_t>(numberOfVersions * 2 * sizeUint32);
 
-    const uint32_t payloadSize = numeric_cast<uint32_t>(infoSize + hardwareVersionSize + softwareVersionSize +
-                                                  processNameSize + packetVersionCountSize + packetVersionSize);
+    const uint32_t payloadSize = armnn::numeric_cast<uint32_t>(infoSize + hardwareVersionSize +
+                                                               softwareVersionSize + processNameSize +
+                                                               packetVersionCountSize + packetVersionSize);
 
     const uint32_t totalSize = headerSize + bodySize + payloadSize;
     uint32_t offset = 0;
@@ -112,7 +111,7 @@ void SendCounterPacket::SendStreamMetaDataPacket()
         WriteUint32(writeBuffer, offset, MAX_METADATA_PACKET_LENGTH); // max_data_length
         offset += sizeUint32;
         int pid = armnnUtils::Processes::GetCurrentId();
-        WriteUint32(writeBuffer, offset, numeric_cast<uint32_t>(pid)); // pid
+        WriteUint32(writeBuffer, offset, armnn::numeric_cast<uint32_t>(pid)); // pid
         offset += sizeUint32;
         uint32_t poolOffset = bodySize;
         WriteUint32(writeBuffer, offset, poolOffset); // offset_info
@@ -176,8 +175,6 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
                                              CategoryRecord& categoryRecord,
                                              std::string& errorMessage)
 {
-    using namespace boost::numeric;
-
     ARMNN_ASSERT(category);
 
     const std::string& categoryName = category->m_Name;
@@ -236,8 +233,8 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
     std::vector<EventRecord> eventRecords(counterCount);
     std::vector<uint32_t> eventRecordOffsets(counterCount, 0);
     size_t eventRecordsSize = 0;
-    uint32_t eventRecordsOffset =
-            numeric_cast<uint32_t>((eventRecords.size() + categoryNameBuffer.size()) * uint32_t_size);
+    uint32_t eventRecordsOffset = armnn::numeric_cast<uint32_t>(
+                    (eventRecords.size() + categoryNameBuffer.size()) * uint32_t_size);
     for (size_t counterIndex = 0, eventRecordIndex = 0, eventRecordOffsetIndex = 0;
          counterIndex < counterCount;
          counterIndex++, eventRecordIndex++, eventRecordOffsetIndex++)
@@ -257,12 +254,13 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
 
         // Add the event record offset to the event pointer table offset field
         eventRecordOffsets[eventRecordOffsetIndex] = eventRecordsOffset;
-        eventRecordsOffset += numeric_cast<uint32_t>(eventRecord.size() * uint32_t_size);
+        eventRecordsOffset += armnn::numeric_cast<uint32_t>(eventRecord.size() * uint32_t_size);
     }
 
     // Category record word 3:
     // 0:31 [32] name_offset (offset from the beginning of the category data pool to the name field)
-    const uint32_t categoryRecordWord3 = numeric_cast<uint32_t>((3u + eventRecordOffsets.size()) * uint32_t_size);
+    const uint32_t categoryRecordWord3 = armnn::numeric_cast<uint32_t>(
+            (3u + eventRecordOffsets.size()) * uint32_t_size);
 
     // Calculate the size in words of the category record
     const size_t categoryRecordSize = 3u +// The size of the fixed part (device + counter_set + event_count +
@@ -399,8 +397,6 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
                                           EventRecord& eventRecord,
                                           std::string& errorMessage)
 {
-    using namespace boost::numeric;
-
     ARMNN_ASSERT(counter);
 
     uint16_t           counterUid           = counter->m_Uid;
@@ -499,7 +495,7 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
     // The size of the description buffer in bytes
     const uint32_t eventRecordWord7 = includeUnits ?
                                 eventRecordWord6 +
-                                numeric_cast<uint32_t>(counterDescriptionBuffer.size()
+                                armnn::numeric_cast<uint32_t>(counterDescriptionBuffer.size()
                                 * uint32_t_size) :
                                 0;
 
@@ -553,8 +549,6 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
 
 void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& counterDirectory)
 {
-    using namespace boost::numeric;
-
     // Get the amount of data that needs to be put into the packet
     const uint16_t categoryCount    = counterDirectory.GetCategoryCount();
     const uint16_t deviceCount      = counterDirectory.GetDeviceCount();
@@ -581,9 +575,9 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
     size_t deviceIndex = 0;
     size_t deviceRecordOffsetIndex = 0;
 
-    pointerTableOffset = numeric_cast<uint32_t>(deviceCount     * uint32_t_size +
-                                                counterSetCount * uint32_t_size +
-                                                categoryCount   * uint32_t_size);
+    pointerTableOffset = armnn::numeric_cast<uint32_t>(deviceCount * uint32_t_size +
+                                                       counterSetCount * uint32_t_size +
+                                                       categoryCount   * uint32_t_size);
     for (auto it = devices.begin(); it != devices.end(); it++)
     {
         const DevicePtr& device = it->second;
@@ -600,7 +594,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
 
         // Add the device record offset to the device records pointer table offset field
         deviceRecordOffsets[deviceRecordOffsetIndex] = pointerTableOffset;
-        pointerTableOffset += numeric_cast<uint32_t>(deviceRecord.size() * uint32_t_size);
+        pointerTableOffset += armnn::numeric_cast<uint32_t>(deviceRecord.size() * uint32_t_size);
 
         deviceIndex++;
         deviceRecordOffsetIndex++;
@@ -618,7 +612,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
     size_t counterSetIndex = 0;
     size_t counterSetRecordOffsetIndex = 0;
 
-    pointerTableOffset -= numeric_cast<uint32_t>(deviceCount * uint32_t_size);
+    pointerTableOffset -= armnn::numeric_cast<uint32_t>(deviceCount * uint32_t_size);
     for (auto it = counterSets.begin(); it != counterSets.end(); it++)
     {
         const CounterSetPtr& counterSet = it->second;
@@ -635,7 +629,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
 
         // Add the counter set record offset to the counter set records pointer table offset field
         counterSetRecordOffsets[counterSetRecordOffsetIndex] = pointerTableOffset;
-        pointerTableOffset += numeric_cast<uint32_t>(counterSetRecord.size() * uint32_t_size);
+        pointerTableOffset += armnn::numeric_cast<uint32_t>(counterSetRecord.size() * uint32_t_size);
 
         counterSetIndex++;
         counterSetRecordOffsetIndex++;
@@ -653,7 +647,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
     size_t categoryIndex = 0;
     size_t categoryRecordOffsetIndex = 0;
 
-    pointerTableOffset -= numeric_cast<uint32_t>(counterSetCount * uint32_t_size);
+    pointerTableOffset -= armnn::numeric_cast<uint32_t>(counterSetCount * uint32_t_size);
     for (auto it = categories.begin(); it != categories.end(); it++)
     {
         const CategoryPtr& category = *it;
@@ -670,7 +664,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
 
         // Add the category record offset to the category records pointer table offset field
         categoryRecordOffsets[categoryRecordOffsetIndex] = pointerTableOffset;
-        pointerTableOffset += numeric_cast<uint32_t>(categoryRecord.size() * uint32_t_size);
+        pointerTableOffset += armnn::numeric_cast<uint32_t>(categoryRecord.size() * uint32_t_size);
 
         categoryIndex++;
         categoryRecordOffsetIndex++;
@@ -708,7 +702,8 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
 
     // Packet header word 1:
     // 0:31 [32] data_length: length of data, in bytes
-    uint32_t packetHeaderWord1 = numeric_cast<uint32_t>(counterDirectoryPacketDataLength * uint32_t_size);
+    uint32_t packetHeaderWord1 = armnn::numeric_cast<uint32_t>(
+            counterDirectoryPacketDataLength * uint32_t_size);
 
     // Create the packet header
     uint32_t packetHeader[2]
@@ -739,9 +734,9 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
 
     // Body header word 3:
     // 0:31 [32] counter_set_pointer_table_offset: offset to the counter_set_pointer_table
-    const uint32_t bodyHeaderWord3 =
-                   numeric_cast<uint32_t>(deviceRecordOffsets.size() * uint32_t_size // The size of the
-                                          + bodyHeaderSizeBytes);                    // device records pointer table
+    const uint32_t bodyHeaderWord3 = armnn::numeric_cast<uint32_t>(deviceRecordOffsets.size() *
+                                                                   uint32_t_size +       // The size of the
+                                                                   bodyHeaderSizeBytes); // device records pointer table
 
     // Body header word 4:
     // 16:31 [16] categories_count: number of entries in the categories_pointer_table
@@ -751,7 +746,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
     // Body header word 3:
     // 0:31 [32] categories_pointer_table_offset: offset to the categories_pointer_table
     const uint32_t bodyHeaderWord5 =
-                   numeric_cast<uint32_t>(
+                   armnn::numeric_cast<uint32_t>(
                        deviceRecordOffsets.size() * uint32_t_size +     // The size of the device records
                        counterSetRecordOffsets.size() * uint32_t_size   // pointer table, plus the size of
                        +  bodyHeaderSizeBytes);                         // the counter set pointer table
@@ -806,7 +801,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
     ARMNN_NO_CONVERSION_WARN_END
 
     // Calculate the total size in bytes of the counter directory packet
-    uint32_t totalSize = numeric_cast<uint32_t>(counterDirectoryPacketSize * uint32_t_size);
+    uint32_t totalSize = armnn::numeric_cast<uint32_t>(counterDirectoryPacketSize * uint32_t_size);
 
     // Reserve space in the buffer for the packet
     uint32_t reserved = 0;
@@ -826,7 +821,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
     for (uint32_t counterDirectoryPacketWord : counterDirectoryPacket)
     {
         WriteUint32(writeBuffer, offset, counterDirectoryPacketWord);
-        offset += numeric_cast<uint32_t>(uint32_t_size);
+        offset += armnn::numeric_cast<uint32_t>(uint32_t_size);
     }
 
     m_BufferManager.Commit(writeBuffer, totalSize);
@@ -842,7 +837,7 @@ void SendCounterPacket::SendPeriodicCounterCapturePacket(uint64_t timestamp, con
     uint32_t packetClass = 0;
     uint32_t packetType = 0;
     uint32_t headerSize = 2 * uint32_t_size;
-    uint32_t bodySize = uint64_t_size + numeric_cast<uint32_t>(values.size()) * (uint16_t_size + uint32_t_size);
+    uint32_t bodySize = uint64_t_size + armnn::numeric_cast<uint32_t>(values.size()) * (uint16_t_size + uint32_t_size);
     uint32_t totalSize = headerSize + bodySize;
     uint32_t offset = 0;
     uint32_t reserved = 0;
@@ -891,7 +886,7 @@ void SendCounterPacket::SendPeriodicCounterSelectionPacket(uint32_t capturePerio
     uint32_t packetFamily = 0;
     uint32_t packetId = 4;
     uint32_t headerSize = 2 * uint32_t_size;
-    uint32_t bodySize = uint32_t_size + numeric_cast<uint32_t>(selectedCounterIds.size()) * uint16_t_size;
+    uint32_t bodySize = uint32_t_size + armnn::numeric_cast<uint32_t>(selectedCounterIds.size()) * uint16_t_size;
     uint32_t totalSize = headerSize + bodySize;
     uint32_t offset = 0;
     uint32_t reserved = 0;

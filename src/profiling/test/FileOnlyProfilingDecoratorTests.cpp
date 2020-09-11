@@ -11,7 +11,6 @@
 #include <Runtime.hpp>
 #include "TestTimelinePacketHandler.hpp"
 
-#include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstdio>

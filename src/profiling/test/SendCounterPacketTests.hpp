@@ -15,8 +15,7 @@
 #include <armnn/Conversion.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <atomic>
 #include <condition_variable>

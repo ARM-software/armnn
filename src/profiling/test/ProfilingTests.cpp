@@ -33,13 +33,12 @@
 
 #include <armnn/Utils.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <common/include/CommandHandlerKey.hpp>
 #include <common/include/CommandHandlerRegistry.hpp>
 #include <common/include/SocketConnectionException.hpp>
 #include <common/include/Packet.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
 
 #include <cstdint>
 #include <cstring>
@@ -1750,8 +1749,6 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
 BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
 {
-    using boost::numeric_cast;
-
     ProfilingStateMachine profilingStateMachine;
 
     class TestCaptureThread : public IPeriodicCounterCapture
@@ -1798,8 +1795,8 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     SendCounterPacket sendCounterPacket(mockBuffer);
     SendThread sendThread(profilingStateMachine, mockBuffer, sendCounterPacket);
 
-    uint32_t sizeOfUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
-    uint32_t sizeOfUint16 = numeric_cast<uint32_t>(sizeof(uint16_t));
+    uint32_t sizeOfUint32 = armnn::numeric_cast<uint32_t>(sizeof(uint32_t));
+    uint32_t sizeOfUint16 = armnn::numeric_cast<uint32_t>(sizeof(uint16_t));
 
     // Data with period and counters
     uint32_t period1     = armnn::LOWEST_CAPTURE_PERIOD;
@@ -2024,14 +2021,12 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceNotActive)
 
 BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
 {
-    using boost::numeric_cast;
-
     const uint32_t packetFamilyId     = 0;
     const uint32_t connectionPacketId = 0x10000;
     const uint32_t version            = 1;
 
-    uint32_t sizeOfUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
-    uint32_t sizeOfUint16 = numeric_cast<uint32_t>(sizeof(uint16_t));
+    uint32_t sizeOfUint32 = armnn::numeric_cast<uint32_t>(sizeof(uint32_t));
+    uint32_t sizeOfUint16 = armnn::numeric_cast<uint32_t>(sizeof(uint16_t));
 
     // Data with period and counters
     uint32_t period1     = 10;
@@ -2407,8 +2402,6 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
 
 BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
 {
-    using boost::numeric_cast;
-
     const uint32_t familyId = 0;
     const uint32_t packetId = 3;
     const uint32_t version  = 1;
@@ -2453,7 +2446,7 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
     BOOST_TEST(header1Word1 == 24);                       // data length
 
     uint32_t bodyHeader1Word0   = ReadUint32(readBuffer1, 8);
-    uint16_t deviceRecordCount = numeric_cast<uint16_t>(bodyHeader1Word0 >> 16);
+    uint16_t deviceRecordCount = armnn::numeric_cast<uint16_t>(bodyHeader1Word0 >> 16);
     BOOST_TEST(deviceRecordCount == 0); // device_records_count
 
     auto readBuffer2 = mockBuffer2.GetReadableBuffer();
@@ -2469,8 +2462,6 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
 
 BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
 {
-    using boost::numeric_cast;
-
     const uint32_t familyId = 0;
     const uint32_t packetId = 3;
     const uint32_t version  = 1;
@@ -2522,9 +2513,9 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
     const uint32_t bodyHeader1Word3      = ReadUint32(readBuffer1, 20);
     const uint32_t bodyHeader1Word4      = ReadUint32(readBuffer1, 24);
     const uint32_t bodyHeader1Word5      = ReadUint32(readBuffer1, 28);
-    const uint16_t deviceRecordCount     = numeric_cast<uint16_t>(bodyHeader1Word0 >> 16);
-    const uint16_t counterSetRecordCount = numeric_cast<uint16_t>(bodyHeader1Word2 >> 16);
-    const uint16_t categoryRecordCount   = numeric_cast<uint16_t>(bodyHeader1Word4 >> 16);
+    const uint16_t deviceRecordCount     = armnn::numeric_cast<uint16_t>(bodyHeader1Word0 >> 16);
+    const uint16_t counterSetRecordCount = armnn::numeric_cast<uint16_t>(bodyHeader1Word2 >> 16);
+    const uint16_t categoryRecordCount   = armnn::numeric_cast<uint16_t>(bodyHeader1Word4 >> 16);
     BOOST_TEST(deviceRecordCount == 1);                      // device_records_count
     BOOST_TEST(bodyHeader1Word1 == 0 + bodyHeaderSizeBytes);      // device_records_pointer_table_offset
     BOOST_TEST(counterSetRecordCount == 1);                  // counter_set_count

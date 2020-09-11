@@ -6,10 +6,9 @@
 #include "ProfilingConnectionDumpToFileDecorator.hpp"
 
 #include <armnn/Exceptions.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <fstream>
-
-#include <boost/numeric/conversion/cast.hpp>
 
 namespace armnn
 {
@@ -110,7 +109,7 @@ void ProfilingConnectionDumpToFileDecorator::DumpIncomingToFile(const arm::pipe:
     m_IncomingDumpFileStream.write(reinterpret_cast<const char*>(&header), sizeof header);
     m_IncomingDumpFileStream.write(reinterpret_cast<const char*>(&packetLength), sizeof packetLength);
     m_IncomingDumpFileStream.write(reinterpret_cast<const char*>(packet.GetData()),
-                                   boost::numeric_cast<std::streamsize>(packetLength));
+                                   armnn::numeric_cast<std::streamsize>(packetLength));
 
     success &= m_IncomingDumpFileStream.good();
     if (!(success || m_IgnoreFileErrors))
@@ -142,7 +141,7 @@ bool ProfilingConnectionDumpToFileDecorator::DumpOutgoingToFile(const unsigned c
 
     // attempt to write binary data
     m_OutgoingDumpFileStream.write(reinterpret_cast<const char*>(buffer),
-                                   boost::numeric_cast<std::streamsize>(length));
+                                   armnn::numeric_cast<std::streamsize>(length));
     success &= m_OutgoingDumpFileStream.good();
     if (!(success || m_IgnoreFileErrors))
     {

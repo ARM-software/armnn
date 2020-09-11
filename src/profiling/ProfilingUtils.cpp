@@ -338,7 +338,7 @@ TimelinePacketStatus WriteTimelineLabelBinaryPacket(uint64_t profilingGuid,
     }
 
     // Calculate the size of the SWTrace string label (in bytes)
-    unsigned int swTraceLabelSize = boost::numeric_cast<unsigned int>(swTraceLabel.size()) * uint32_t_size;
+    unsigned int swTraceLabelSize = armnn::numeric_cast<unsigned int>(swTraceLabel.size()) * uint32_t_size;
 
     // Calculate the length of the data (in bytes)
     unsigned int timelineLabelPacketDataLength = uint32_t_size +   // decl_Id
@@ -541,7 +541,7 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
         uint32_t declId = 0;
         try
         {
-            declId = boost::numeric_cast<uint32_t>(std::stoul(directoryComponent[0]));
+            declId = armnn::numeric_cast<uint32_t>(std::stoul(directoryComponent[0]));
         }
         catch (const std::exception&)
         {
@@ -565,7 +565,7 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
     }
 
     unsigned int dataLength = 3 * uint8_t_size +  // Stream header (3 bytes)
-                              boost::numeric_cast<unsigned int>(swTraceBuffer.size()) *
+                              armnn::numeric_cast<unsigned int>(swTraceBuffer.size()) *
                                   uint32_t_size; // Trace directory (5 messages)
 
     // Calculate the timeline directory binary packet size (in bytes)
@@ -579,7 +579,7 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
     }
 
     // Create packet header
-    auto packetHeader = CreateTimelinePacketHeader(1, 0, 0, 0, 0, boost::numeric_cast<uint32_t>(dataLength));
+    auto packetHeader = CreateTimelinePacketHeader(1, 0, 0, 0, 0, armnn::numeric_cast<uint32_t>(dataLength));
 
     // Initialize the offset for writing in the buffer
     unsigned int offset = 0;
@@ -592,8 +592,8 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
 
     // Write the stream header
     uint8_t streamVersion = 4;
-    uint8_t pointerBytes  = boost::numeric_cast<uint8_t>(uint64_t_size); // All GUIDs are uint64_t
-    uint8_t threadIdBytes = boost::numeric_cast<uint8_t>(ThreadIdSize);
+    uint8_t pointerBytes  = armnn::numeric_cast<uint8_t>(uint64_t_size); // All GUIDs are uint64_t
+    uint8_t threadIdBytes = armnn::numeric_cast<uint8_t>(ThreadIdSize);
     switch (threadIdBytes)
     {
     case 4: // Typically Windows and Android
@@ -610,7 +610,7 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
     offset += uint8_t_size;
 
     // Write the SWTrace directory
-    uint32_t numberOfDeclarations = boost::numeric_cast<uint32_t>(timelineDirectoryMessages.size());
+    uint32_t numberOfDeclarations = armnn::numeric_cast<uint32_t>(timelineDirectoryMessages.size());
     WriteUint32(buffer, offset, numberOfDeclarations); // Number of declarations
     offset += uint32_t_size;
     for (uint32_t i : swTraceBuffer)

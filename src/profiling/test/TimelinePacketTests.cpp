@@ -6,10 +6,11 @@
 #include <Threads.hpp>
 #include <ProfilingUtils.hpp>
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include <common/include/SwTrace.hpp>
 
 #include <boost/test/unit_test.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
 using namespace armnn::profiling;
 
@@ -55,7 +56,7 @@ BOOST_AUTO_TEST_CASE(TimelineLabelPacketTestBufferExhaustionFixedValue)
     TimelinePacketStatus result = WriteTimelineLabelBinaryPacket(profilingGuid,
                                                                  label,
                                                                  buffer.data(),
-                                                                 boost::numeric_cast<unsigned int>(buffer.size()),
+                                                                 armnn::numeric_cast<unsigned int>(buffer.size()),
                                                                  numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::BufferExhaustion);
     BOOST_CHECK(numberOfBytesWritten == 0);
@@ -71,7 +72,7 @@ BOOST_AUTO_TEST_CASE(TimelineLabelPacketTestInvalidLabel)
     TimelinePacketStatus result = WriteTimelineLabelBinaryPacket(profilingGuid,
                                                                  label,
                                                                  buffer.data(),
-                                                                 boost::numeric_cast<unsigned int>(buffer.size()),
+                                                                 armnn::numeric_cast<unsigned int>(buffer.size()),
                                                                  numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Error);
     BOOST_CHECK(numberOfBytesWritten == 0);
@@ -87,7 +88,7 @@ BOOST_AUTO_TEST_CASE(TimelineLabelPacketTestSingleConstructionOfData)
     TimelinePacketStatus result = WriteTimelineLabelBinaryPacket(profilingGuid,
                                                                  label,
                                                                  buffer.data(),
-                                                                 boost::numeric_cast<unsigned int>(buffer.size()),
+                                                                 armnn::numeric_cast<unsigned int>(buffer.size()),
                                                                  numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
     BOOST_CHECK(numberOfBytesWritten == 28);
@@ -178,7 +179,7 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketSmallBufferSizeTest)
                                                              tailGuid,
                                                              attributeGuid,
                                                              buffer.data(),
-                                                             boost::numeric_cast<unsigned int>(buffer.size()),
+                                                             armnn::numeric_cast<unsigned int>(buffer.size()),
                                                              numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::BufferExhaustion);
     BOOST_CHECK(numberOfBytesWritten == 0);
@@ -201,7 +202,7 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketInvalidRelationTest)
                                                       tailGuid,
                                                       attributeGuid,
                                                       buffer.data(),
-                                                      boost::numeric_cast<unsigned int>(buffer.size()),
+                                                      armnn::numeric_cast<unsigned int>(buffer.size()),
                                                       numberOfBytesWritten),
                       armnn::InvalidArgumentException);
 
@@ -225,7 +226,7 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketTestDataConstruction)
                                                              tailGuid,
                                                              attributeGuid,
                                                              buffer.data(),
-                                                             boost::numeric_cast<unsigned int>(buffer.size()),
+                                                             armnn::numeric_cast<unsigned int>(buffer.size()),
                                                              numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
     BOOST_CHECK(numberOfBytesWritten == 40);
@@ -282,7 +283,7 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketExecutionLinkTestDataConstruction
                                                              tailGuid,
                                                              attributeGuid,
                                                              buffer.data(),
-                                                             boost::numeric_cast<unsigned int>(buffer.size()),
+                                                             armnn::numeric_cast<unsigned int>(buffer.size()),
                                                              numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
     BOOST_CHECK(numberOfBytesWritten == 40);
@@ -338,7 +339,7 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketDataLinkTestDataConstruction)
                                                              tailGuid,
                                                              attributeGuid,
                                                              buffer.data(),
-                                                             boost::numeric_cast<unsigned int>(buffer.size()),
+                                                             armnn::numeric_cast<unsigned int>(buffer.size()),
                                                              numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
     BOOST_CHECK(numberOfBytesWritten == 40);
@@ -394,7 +395,7 @@ BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketLabelLinkTestDataConstruction)
                                                              tailGuid,
                                                              attributeGuid,
                                                              buffer.data(),
-                                                             boost::numeric_cast<unsigned int>(buffer.size()),
+                                                             armnn::numeric_cast<unsigned int>(buffer.size()),
                                                              numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
     BOOST_CHECK(numberOfBytesWritten == 40);
@@ -460,7 +461,7 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTestFullConstruction)
     std::vector<unsigned char> buffer(512, 0);
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineMessageDirectoryPackage(buffer.data(),
-                                                                       boost::numeric_cast<unsigned int>(buffer.size()),
+                                                                       armnn::numeric_cast<unsigned int>(buffer.size()),
                                                                        numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
 
@@ -527,7 +528,7 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTestFullConstruction)
     // Check the ui_name
     std::vector<uint32_t> swTraceString;
     arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(label, swTraceString);
-    offset += (boost::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
+    offset += (armnn::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     uint32_t swTraceUINameLength = ReadUint32(buffer.data(), offset);
     BOOST_CHECK(swTraceUINameLength == 14); // ui_name length including the null-terminator
 
@@ -539,7 +540,7 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTestFullConstruction)
 
     // Check arg_types
     arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(label, swTraceString);
-    offset += (boost::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
+    offset += (armnn::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     uint32_t swTraceArgTypesLength = ReadUint32(buffer.data(), offset);
     BOOST_CHECK(swTraceArgTypesLength == 3); // arg_types length including the null-terminator
 
@@ -551,7 +552,7 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTestFullConstruction)
 
     // Check arg_names
     arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(label, swTraceString);
-    offset += (boost::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
+    offset += (armnn::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     uint32_t swTraceArgNamesLength = ReadUint32(buffer.data(), offset);
     BOOST_CHECK(swTraceArgNamesLength == 11); // arg_names length including the null-terminator
 
@@ -563,7 +564,7 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTestFullConstruction)
 
     // Check second message decl_id
     arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(label, swTraceString);
-    offset += (boost::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
+    offset += (armnn::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     readDeclId = ReadUint32(buffer.data(), offset);
     BOOST_CHECK(readDeclId == 1);
 
@@ -613,7 +614,7 @@ BOOST_AUTO_TEST_CASE(TimelineEntityPacketTestBufferExhaustedWithFixedBufferSize)
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEntityBinary(profilingGuid,
                                                             buffer.data(),
-                                                            boost::numeric_cast<unsigned int>(buffer.size()),
+                                                            armnn::numeric_cast<unsigned int>(buffer.size()),
                                                             numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::BufferExhaustion);
     BOOST_CHECK(numberOfBytesWritten == 0);
@@ -627,7 +628,7 @@ BOOST_AUTO_TEST_CASE(TimelineEntityPacketTestFullConstructionOfData)
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEntityBinary(profilingGuid,
                                                             buffer.data(),
-                                                            boost::numeric_cast<unsigned int>(buffer.size()),
+                                                            armnn::numeric_cast<unsigned int>(buffer.size()),
                                                             numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
     BOOST_CHECK(numberOfBytesWritten == 12);
@@ -685,7 +686,7 @@ BOOST_AUTO_TEST_CASE(TimelineEventClassTestBufferExhaustionFixedValue)
     TimelinePacketStatus result = WriteTimelineEventClassBinary(profilingGuid,
                                                                 profilingNameGuid,
                                                                 buffer.data(),
-                                                                boost::numeric_cast<unsigned int>(buffer.size()),
+                                                                armnn::numeric_cast<unsigned int>(buffer.size()),
                                                                 numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::BufferExhaustion);
     BOOST_CHECK(numberOfBytesWritten == 0);
@@ -701,7 +702,7 @@ BOOST_AUTO_TEST_CASE(TimelineEventClassTestFullConstructionOfData)
     TimelinePacketStatus result = WriteTimelineEventClassBinary(profilingGuid,
                                                                 profilingNameGuid,
                                                                 buffer.data(),
-                                                                boost::numeric_cast<unsigned int>(buffer.size()),
+                                                                armnn::numeric_cast<unsigned int>(buffer.size()),
                                                                 numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
     BOOST_CHECK(numberOfBytesWritten == 20);
@@ -770,7 +771,7 @@ BOOST_AUTO_TEST_CASE(TimelineEventPacketTestBufferExhaustionFixedValue)
                                                            threadId,
                                                            profilingGuid,
                                                            buffer.data(),
-                                                           boost::numeric_cast<unsigned int>(buffer.size()),
+                                                           armnn::numeric_cast<unsigned int>(buffer.size()),
                                                            numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::BufferExhaustion);
     BOOST_CHECK(numberOfBytesWritten == 0);
@@ -788,7 +789,7 @@ BOOST_AUTO_TEST_CASE(TimelineEventPacketTestFullConstructionOfData)
                                                            threadId,
                                                            profilingGuid,
                                                            buffer.data(),
-                                                           boost::numeric_cast<unsigned int>(buffer.size()),
+                                                           armnn::numeric_cast<unsigned int>(buffer.size()),
                                                            numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
 

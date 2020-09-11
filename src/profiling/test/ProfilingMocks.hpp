@@ -19,8 +19,7 @@
 #include <armnn/Conversion.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <atomic>
 #include <condition_variable>
@@ -571,10 +570,10 @@ public:
     }
 
     // Getters for counts
-    uint16_t GetCategoryCount()   const override { return boost::numeric_cast<uint16_t>(m_Categories.size());  }
-    uint16_t GetDeviceCount()     const override { return boost::numeric_cast<uint16_t>(m_Devices.size());     }
-    uint16_t GetCounterSetCount() const override { return boost::numeric_cast<uint16_t>(m_CounterSets.size()); }
-    uint16_t GetCounterCount()    const override { return boost::numeric_cast<uint16_t>(m_Counters.size());    }
+    uint16_t GetCategoryCount()   const override { return armnn::numeric_cast<uint16_t>(m_Categories.size());  }
+    uint16_t GetDeviceCount()     const override { return armnn::numeric_cast<uint16_t>(m_Devices.size());     }
+    uint16_t GetCounterSetCount() const override { return armnn::numeric_cast<uint16_t>(m_CounterSets.size()); }
+    uint16_t GetCounterCount()    const override { return armnn::numeric_cast<uint16_t>(m_Counters.size());    }
 
     // Getters for collections
     const Categories&  GetCategories()  const override { return m_Categories;  }

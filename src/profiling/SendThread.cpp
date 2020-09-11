@@ -8,10 +8,11 @@
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Conversion.hpp>
+#include <armnn/utility/NumericCast.hpp>
+
 #include <Processes.hpp>
 
 #include <boost/format.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
 #include <cstring>
 
@@ -20,8 +21,6 @@ namespace armnn
 
 namespace profiling
 {
-
-using boost::numeric_cast;
 
 SendThread::SendThread(armnn::profiling::ProfilingStateMachine& profilingStateMachine,
                        armnn::profiling::IBufferManager& buffer,
@@ -235,7 +234,7 @@ void SendThread::FlushBuffer(IProfilingConnection& profilingConnection, bool not
         if (profilingConnection.IsOpen())
         {
             // Write a packet to the profiling connection. Silently ignore any write error and continue
-            profilingConnection.WritePacket(readBuffer, boost::numeric_cast<uint32_t>(readBufferSize));
+            profilingConnection.WritePacket(readBuffer, armnn::numeric_cast<uint32_t>(readBufferSize));
 
             // Set the flag that indicates whether at least a packet has been sent
             packetsSent = true;

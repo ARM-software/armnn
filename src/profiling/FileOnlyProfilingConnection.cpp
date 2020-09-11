@@ -11,7 +11,6 @@
 #include <common/include/ProfilingException.hpp>
 
 #include <algorithm>
-#include <boost/numeric/conversion/cast.hpp>
 #include <iostream>
 #include <thread>
 

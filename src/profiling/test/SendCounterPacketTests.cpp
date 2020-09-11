@@ -20,9 +20,7 @@
 
 #include <common/include/Constants.hpp>
 
-
 #include <boost/test/unit_test.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
 #include <chrono>
 
@@ -289,9 +287,7 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterCapturePacketTest)
 
 BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
 {
-    using boost::numeric_cast;
-
-    uint32_t sizeUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
+    uint32_t sizeUint32 = armnn::numeric_cast<uint32_t>(sizeof(uint32_t));
 
     // Error no space left in buffer
     MockBufferManager mockBuffer1(10);
@@ -302,10 +298,10 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
 
     std::string processName = GetProcessName().substr(0, 60);
 
-    uint32_t infoSize =            numeric_cast<uint32_t>(GetSoftwareInfo().size()) + 1;
-    uint32_t hardwareVersionSize = numeric_cast<uint32_t>(GetHardwareVersion().size()) + 1;
-    uint32_t softwareVersionSize = numeric_cast<uint32_t>(GetSoftwareVersion().size()) + 1;
-    uint32_t processNameSize =     numeric_cast<uint32_t>(processName.size()) + 1;
+    uint32_t infoSize =            armnn::numeric_cast<uint32_t>(GetSoftwareInfo().size()) + 1;
+    uint32_t hardwareVersionSize = armnn::numeric_cast<uint32_t>(GetHardwareVersion().size()) + 1;
+    uint32_t softwareVersionSize = armnn::numeric_cast<uint32_t>(GetSoftwareVersion().size()) + 1;
+    uint32_t processNameSize =     armnn::numeric_cast<uint32_t>(processName.size()) + 1;
 
     // Supported Packets
     // Packet Encoding version 1.0.0
@@ -352,9 +348,11 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0); // packet family
     BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 0); // packet id
 
-    uint32_t totalLength = numeric_cast<uint32_t>(2 * sizeUint32 + 10 * sizeUint32 + infoSize + hardwareVersionSize +
-                                                  softwareVersionSize + processNameSize + sizeUint32 +
-                                                  2 * packetEntries * sizeUint32);
+    uint32_t totalLength = armnn::numeric_cast<uint32_t>(2 * sizeUint32 +
+                                                         10 * sizeUint32 + infoSize +
+                                                         hardwareVersionSize + softwareVersionSize +
+                                                         processNameSize + sizeUint32 +
+                                                         2 * packetEntries * sizeUint32);
 
     BOOST_TEST(headerWord1 == totalLength - (2 * sizeUint32)); // data length
 
@@ -366,7 +364,7 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     BOOST_TEST(ReadUint32(readBuffer2, offset) == MAX_METADATA_PACKET_LENGTH); // max_data_len
     offset += sizeUint32;
     int pid = armnnUtils::Processes::GetCurrentId();
-    BOOST_TEST(ReadUint32(readBuffer2, offset) == numeric_cast<uint32_t>(pid));
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == armnn::numeric_cast<uint32_t>(pid));
     offset += sizeUint32;
     uint32_t poolOffset = 10 * sizeUint32;
     BOOST_TEST(ReadUint32(readBuffer2, offset) == poolOffset); // offset_info
@@ -942,7 +940,7 @@ BOOST_AUTO_TEST_CASE(CreateCategoryRecordTest)
     ARMNN_ASSERT(counter1);
     ARMNN_ASSERT(counter2);
     ARMNN_ASSERT(counter3);
-    uint16_t categoryEventCount = boost::numeric_cast<uint16_t>(counters.size());
+    uint16_t categoryEventCount = armnn::numeric_cast<uint16_t>(counters.size());
 
     // Create a category record
     SendCounterPacket::CategoryRecord categoryRecord;

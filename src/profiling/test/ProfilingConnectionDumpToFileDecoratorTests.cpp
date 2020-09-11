@@ -7,11 +7,11 @@
 #include <Filesystem.hpp>
 #include <Runtime.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <fstream>
 #include <sstream>
 
-#include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace armnn::profiling;
@@ -20,7 +20,7 @@ namespace
 {
 
 const std::vector<char> g_Data       = { 'd', 'u', 'm', 'm', 'y' };
-const uint32_t          g_DataLength = boost::numeric_cast<uint32_t>(g_Data.size());
+const uint32_t          g_DataLength = armnn::numeric_cast<uint32_t>(g_Data.size());
 const unsigned char*    g_DataPtr    = reinterpret_cast<const unsigned char*>(g_Data.data());
 
 class DummyProfilingConnection : public IProfilingConnection

@@ -6,10 +6,10 @@
 
 #include <armnn/Descriptors.hpp>
 #include <armnn/utility/Assert.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <VerificationHelpers.hpp>
 
 #include <boost/format.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -350,7 +350,7 @@ TensorInfo ComputeReshapeInfo(const TensorShape& targetShapeTensor,
                               % CHECK_LOCATION().AsString()));
         }
 
-        auto targetNumElements = boost::numeric_cast<unsigned int>(std::accumulate(targetDims.begin(), targetDims.end(),
+        auto targetNumElements = armnn::numeric_cast<unsigned int>(std::accumulate(targetDims.begin(), targetDims.end(),
             -1, std::multiplies<int32_t>()));
         auto stretchIndex = static_cast<size_t>(std::distance(targetDims.begin(), stretchDim));
         outDims[stretchIndex] = inShape.GetNumElements() / targetNumElements;

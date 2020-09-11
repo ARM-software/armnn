@@ -14,6 +14,7 @@
 #include "VerificationHelpers.hpp"
 
 #include <armnn/utility/Assert.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/format.hpp>
@@ -66,7 +67,7 @@ namespace
 const float* GetArrayPtrFromBlob(const LayerParameter& layerParam, unsigned int blobIndex)
 {
     auto nBlobs = layerParam.blobs_size();
-    if (blobIndex >= boost::numeric_cast<unsigned int>(nBlobs))
+    if (blobIndex >= armnn::numeric_cast<unsigned int>(nBlobs))
     {
         throw ParseException(
             boost::str(
@@ -78,7 +79,7 @@ const float* GetArrayPtrFromBlob(const LayerParameter& layerParam, unsigned int 
                     CHECK_LOCATION().AsString()));
     }
 
-    const BlobProto& blob = layerParam.blobs(boost::numeric_cast<int>(blobIndex));
+    const BlobProto& blob = layerParam.blobs(armnn::numeric_cast<int>(blobIndex));
 
     const float* arrayPtr = blob.data().data();
     return arrayPtr;
@@ -87,7 +88,7 @@ const float* GetArrayPtrFromBlob(const LayerParameter& layerParam, unsigned int 
 void GetDataFromBlob(const LayerParameter& layerParam, vector<float>& outData, unsigned int blobIndex)
 {
     auto nBlobs = layerParam.blobs_size();
-    if (blobIndex >= boost::numeric_cast<unsigned int>(nBlobs))
+    if (blobIndex >= armnn::numeric_cast<unsigned int>(nBlobs))
     {
         throw ParseException(
             boost::str(
@@ -98,9 +99,9 @@ void GetDataFromBlob(const LayerParameter& layerParam, vector<float>& outData, u
                     CHECK_LOCATION().AsString()));
     }
 
-    const BlobProto& blob = layerParam.blobs(boost::numeric_cast<int>(blobIndex));
+    const BlobProto& blob = layerParam.blobs(armnn::numeric_cast<int>(blobIndex));
 
-    size_t blobSize = boost::numeric_cast<size_t>(blob.data_size());
+    size_t blobSize = armnn::numeric_cast<size_t>(blob.data_size());
     if (blobSize != outData.size())
     {
         throw ParseException(
@@ -115,7 +116,7 @@ void GetDataFromBlob(const LayerParameter& layerParam, vector<float>& outData, u
                     CHECK_LOCATION().AsString()));
     }
 
-    int outSizeInt = boost::numeric_cast<int>(outData.size());
+    int outSizeInt = armnn::numeric_cast<int>(outData.size());
     for (int i = 0; i < outSizeInt; ++i)
     {
         outData[static_cast<size_t>(i)] = blob.data(i);
@@ -133,7 +134,7 @@ void ValidateNumInputsOutputs(const caffe::LayerParameter& layerParameter,
                               unsigned int                 numOutputs)
 {
     int numInputsActual = layerParameter.bottom_size();
-    if (numInputs != boost::numeric_cast<unsigned int>(numInputsActual))
+    if (numInputs != armnn::numeric_cast<unsigned int>(numInputsActual))
     {
         throw ParseException(
             boost::str(
@@ -146,7 +147,7 @@ void ValidateNumInputsOutputs(const caffe::LayerParameter& layerParameter,
     }
 
     int numOutputsActual = layerParameter.top_size();
-    if (numOutputs != boost::numeric_cast<unsigned int>(numOutputsActual))
+    if (numOutputs != armnn::numeric_cast<unsigned int>(numOutputsActual))
     {
         throw ParseException(
             boost::str(
@@ -320,7 +321,7 @@ TensorInfo CaffeParserBase::BlobShapeToTensorInfo(const caffe::BlobShape& blobSh
         shape.push_back(static_cast<unsigned int>(blobShape.dim(j)));
     }
 
-    return TensorInfo(boost::numeric_cast<unsigned int>(shape.size()), shape.data(), DataType::Float32);
+    return TensorInfo(armnn::numeric_cast<unsigned int>(shape.size()), shape.data(), DataType::Float32);
 }
 
 BlobShape TensorDescToBlobShape(const TensorInfo& desc)
@@ -329,7 +330,7 @@ BlobShape TensorDescToBlobShape(const TensorInfo& desc)
     for (unsigned int i = 0; i < desc.GetNumDimensions(); ++i)
     {
         ret.add_dim(i);
-        ret.set_dim(boost::numeric_cast<int>(i), desc.GetShape()[i]);
+        ret.set_dim(armnn::numeric_cast<int>(i), desc.GetShape()[i]);
     }
 
     return ret;
@@ -340,7 +341,7 @@ BlobShape TensorDescToBlobShape(const TensorInfo& desc)
 vector<const LayerParameter*> CaffeParserBase::GetInputs(const LayerParameter& layerParam)
 {
     std::vector<const caffe::LayerParameter*> ret;
-    ret.reserve(boost::numeric_cast<size_t>(layerParam.bottom_size()));
+    ret.reserve(armnn::numeric_cast<size_t>(layerParam.bottom_size()));
     for (int j = 0; j < layerParam.bottom_size(); ++j)
     {
         std::string inputName = layerParam.bottom(j);
@@ -369,7 +370,7 @@ void CaffeParserBase::ParseInputLayer(const LayerParameter& layerParam)
 
     const InputParameter& param = layerParam.input_param();
 
-    const armnn::LayerBindingId inputId = boost::numeric_cast<armnn::LayerBindingId>(
+    const armnn::LayerBindingId inputId = armnn::numeric_cast<armnn::LayerBindingId>(
         m_NetworkInputsBindingInfo.size());
     armnn::IConnectableLayer* const inputLayer = m_Network->AddInputLayer(inputId, layerParam.name().c_str());
 
@@ -504,7 +505,7 @@ void CaffeParserBase::AddConvLayerWithSplits(const caffe::LayerParameter& layerP
                 static_cast<float>(desc.m_StrideX)) + 1));
 
     // Load the weight data for ALL groups
-    vector<float> weightData(boost::numeric_cast<size_t>(numGroups *
+    vector<float> weightData(armnn::numeric_cast<size_t>(numGroups *
                                                          inputShape.dim(1) *  // number of input channels
                                                          outputShape.dim(1) * // number of output channels
                                                          kernelH *
@@ -522,15 +523,15 @@ void CaffeParserBase::AddConvLayerWithSplits(const caffe::LayerParameter& layerP
 
     if (desc.m_BiasEnabled)
     {
-        biasData.resize(boost::numeric_cast<size_t>(numGroups * outputShape.dim(1)), 1.f);
+        biasData.resize(armnn::numeric_cast<size_t>(numGroups * outputShape.dim(1)), 1.f);
         GetDataFromBlob(layerParam, biasData, 1);
 
         const unsigned int biasDimSizes[1] = {static_cast<unsigned int>(outputShape.dim(1))};
         biasInfo = TensorInfo(1, biasDimSizes, DataType::Float32);
     }
 
-    const unsigned int numWeightsPerGroup = boost::numeric_cast<unsigned int>(weightData.size()) / numGroups;
-    const unsigned int numBiasesPerGroup  = boost::numeric_cast<unsigned int>(biasData.size()) / numGroups;
+    const unsigned int numWeightsPerGroup = armnn::numeric_cast<unsigned int>(weightData.size()) / numGroups;
+    const unsigned int numBiasesPerGroup  = armnn::numeric_cast<unsigned int>(biasData.size()) / numGroups;
 
     for (unsigned int g = 0; g < numGroups; ++g)
     {
@@ -648,7 +649,7 @@ void CaffeParserBase::AddConvLayerWithDepthwiseConv(const caffe::LayerParameter&
                 static_cast<float>(desc.m_StrideX)) + 1));
 
     // Load the weight data
-    size_t allWeightsSize = boost::numeric_cast<size_t>(inputShape.dim(1) * kernelH * kernelW);
+    size_t allWeightsSize = armnn::numeric_cast<size_t>(inputShape.dim(1) * kernelH * kernelW);
     vector<float> weightData(allWeightsSize);
 
     GetDataFromBlob(layerParam, weightData, 0);
@@ -668,7 +669,7 @@ void CaffeParserBase::AddConvLayerWithDepthwiseConv(const caffe::LayerParameter&
     {
         TensorInfo biasInfo;
 
-        biasData.resize(boost::numeric_cast<size_t>(outputShape.dim(1)), 1.f);
+        biasData.resize(armnn::numeric_cast<size_t>(outputShape.dim(1)), 1.f);
         GetDataFromBlob(layerParam, biasData, 1);
 
         const unsigned int biasDimSizes[1] = {static_cast<unsigned int>(outputShape.dim(1))};
@@ -824,7 +825,7 @@ void CaffeParserBase::ParseConvLayer(const LayerParameter& layerParam)
                 static_cast<float>(strideW)) + 1));
 
     // Load the weight data for ALL groups
-    vector<float> weightData(boost::numeric_cast<size_t>(inputShape.dim(1) *
+    vector<float> weightData(armnn::numeric_cast<size_t>(inputShape.dim(1) *
                                                          outputShape.dim(1) *
                                                          kernelH *
                                                          kernelW));
@@ -846,7 +847,7 @@ void CaffeParserBase::ParseConvLayer(const LayerParameter& layerParam)
     {
         TensorInfo biasInfo;
 
-        biasData.resize(boost::numeric_cast<size_t>(outputShape.dim(1)), 1.f);
+        biasData.resize(armnn::numeric_cast<size_t>(outputShape.dim(1)), 1.f);
         GetDataFromBlob(layerParam, biasData, 1);
 
         const unsigned int biasDimSizes[1] = {static_cast<unsigned int>(outputShape.dim(1))};
@@ -1290,7 +1291,7 @@ void CaffeParserBase::ParseConcatLayer(const LayerParameter& layerParam)
     for (unsigned int viewIndex = 0; viewIndex < numInputs; ++viewIndex)
     {
         const TensorInfo& inputInfo = GetArmnnOutputSlotForCaffeTop(
-            layerParam.bottom(boost::numeric_cast<int>(viewIndex))).GetTensorInfo();
+            layerParam.bottom(armnn::numeric_cast<int>(viewIndex))).GetTensorInfo();
         // Checks whether the dimensions of the input tensors are actually 4.
         if (inputInfo.GetNumDimensions()!=4)
         {
@@ -1328,7 +1329,7 @@ void CaffeParserBase::ParseConcatLayer(const LayerParameter& layerParam)
     armnn::IConnectableLayer* concatlayer = m_Network->AddConcatLayer(concatDescriptor, layerParam.name().c_str());
     for (unsigned int i = 0; i < numInputs; ++i)
     {
-        armnn::IOutputSlot& outputSlot = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(boost::numeric_cast<int>(i)));
+        armnn::IOutputSlot& outputSlot = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(armnn::numeric_cast<int>(i)));
         outputSlot.Connect(concatlayer->GetInputSlot(i));
     }
 
@@ -1375,8 +1376,8 @@ void CaffeParserBase::ParseBatchNormLayer(const LayerParameter& layerParam)
     GetDataFromBlob(layerParam, varianceData, 1);
 
     // Reads moving average factor and applies scaling (if required).
-    const BlobProto& blob = layerParam.blobs(boost::numeric_cast<int>(2));
-    const float movingAverageFactor = blob.data(boost::numeric_cast<int>(0));
+    const BlobProto& blob = layerParam.blobs(armnn::numeric_cast<int>(2));
+    const float movingAverageFactor = blob.data(armnn::numeric_cast<int>(0));
     if(movingAverageFactor != 0.0f)
     {
         const float scaleFactor = 1.0f / movingAverageFactor;
@@ -1722,7 +1723,7 @@ void CaffeParserBase::LoadNetParam(NetParameter& netParameter)
     {
         armnn::IOutputSlot& outputSlot = GetArmnnOutputSlotForCaffeTop(requestedOutput);
 
-        const armnn::LayerBindingId outputId = boost::numeric_cast<armnn::LayerBindingId>(
+        const armnn::LayerBindingId outputId = armnn::numeric_cast<armnn::LayerBindingId>(
             m_NetworkOutputsBindingInfo.size());
         armnn::IConnectableLayer* const outputLayer = m_Network->AddOutputLayer(outputId, requestedOutput.c_str());
         outputSlot.Connect(outputLayer->GetInputSlot(0));

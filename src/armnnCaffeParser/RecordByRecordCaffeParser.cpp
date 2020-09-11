@@ -7,11 +7,9 @@
 
 #include "armnn/Exceptions.hpp"
 #include "armnn/Utils.hpp"
-
+#include <armnn/utility/NumericCast.hpp>
 
 #include "GraphTopologicalSort.hpp"
-
-#include <boost/numeric/conversion/cast.hpp>
 
 // Caffe
 #include <google/protobuf/wire_format.h>
@@ -282,7 +280,7 @@ std::unique_ptr<char[]> AllocateBuffer(std::ifstream& ifs, VarLenDataInfo& dataI
     std::unique_ptr<char[]> ptr(new char[dataInfo.SizeOfData()]);
     ifs.clear();
     ifs.seekg(dataInfo.PositionOfData(), std::ios_base::beg);
-    ifs.read(ptr.get(), boost::numeric_cast<std::streamsize>(dataInfo.SizeOfData()));
+    ifs.read(ptr.get(), armnn::numeric_cast<std::streamsize>(dataInfo.SizeOfData()));
     return ptr;
 }
 
@@ -299,12 +297,12 @@ VarLenDataInfo CreateVarLenDataInfo(std::streamoff bufferStart, std::streamoff e
     // on the platform in which I am currently compiling std::streamoff is signed long int and
     // size_t is unsigned long int so there is no way this error condition can fire but this stuff
     // is supposed to be portable so the check remains in place
-    if (boost::numeric_cast<size_t>(sizeOfLayer) > SIZE_MAX) {
+    if (armnn::numeric_cast<size_t>(sizeOfLayer) > SIZE_MAX) {
         std::stringstream ss;
         ss << "layer is greater than " << SIZE_MAX << " in size cannot process. layer size = [" << sizeOfLayer << "]";
         throw armnn::ParseException(ss.str());
     }
-    LayerParameterInfo info(bufferStart, boost::numeric_cast<size_t>(sizeOfLayer));
+    LayerParameterInfo info(bufferStart, armnn::numeric_cast<size_t>(sizeOfLayer));
     return info;
 }
 
@@ -314,7 +312,7 @@ void ReadTopologicalInfoForLayerParameter(LayerParameterInfo& layerInfo, std::if
     ifs.clear();
     ifs.seekg(layerInfo.PositionOfData(), std::ios_base::beg);
     std::streamoff endOfLayer = layerInfo.PositionOfData() +
-        boost::numeric_cast<std::streamoff>(layerInfo.SizeOfData());
+        armnn::numeric_cast<std::streamoff>(layerInfo.SizeOfData());
     while(true)
     {
         // check to see if we have reached the end of the record
@@ -342,7 +340,7 @@ void ReadTopologicalInfoForLayerParameter(LayerParameterInfo& layerInfo, std::if
             {
                 int size = ReadBase128(ifs);
                 std::streamoff posStartOfData = ifs.tellg();
-                VarLenDataInfo dataInfo(posStartOfData, boost::numeric_cast<size_t>(size));
+                VarLenDataInfo dataInfo(posStartOfData, armnn::numeric_cast<size_t>(size));
                 //optional string name = 1; // the layer name
                 //optional string type = 2; // the layer type
                 //repeated string bottom = 3; // the name of each bottom blob
@@ -684,7 +682,7 @@ armnn::INetworkPtr RecordByRecordCaffeParser::LoadLayers(std::ifstream& ifs,
             char *buffer = new char[info->SizeOfData()];
             ifs.clear();
             ifs.seekg(info->PositionOfData(), std::ios_base::beg);
-            ifs.read(buffer, boost::numeric_cast<std::streamsize>(info->SizeOfData()));
+            ifs.read(buffer, armnn::numeric_cast<std::streamsize>(info->SizeOfData()));
             bool bRet = layer.ParseFromArray(buffer, static_cast<int>(info->SizeOfData()));
             delete[] buffer;
             if (!bRet)
@@ -719,7 +717,7 @@ armnn::INetworkPtr RecordByRecordCaffeParser::LoadLayers(std::ifstream& ifs,
     {
         armnn::IOutputSlot& outputSlot = GetArmnnOutputSlotForCaffeTop(requestedOutput);
 
-        const armnn::LayerBindingId outputId = boost::numeric_cast<armnn::LayerBindingId>(
+        const armnn::LayerBindingId outputId = armnn::numeric_cast<armnn::LayerBindingId>(
             m_NetworkOutputsBindingInfo.size());
         armnn::IConnectableLayer* const outputLayer = m_Network->AddOutputLayer(outputId, requestedOutput.c_str());
         outputSlot.Connect(outputLayer->GetInputSlot(0));

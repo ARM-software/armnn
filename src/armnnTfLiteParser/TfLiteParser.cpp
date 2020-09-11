@@ -28,7 +28,6 @@
 #include <flatbuffers/flexbuffers.h>
 
 #include <boost/format.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
 #include <fstream>
 #include <algorithm>
@@ -388,10 +387,10 @@ armnn::TensorInfo ToTensorInfo(TfLiteParser::TensorRawPtr tensorPtr,
             {
                 // NOTE: we lose precision here when converting from 64 bit to 32
                 //       but this is what we support at the moment in ArmNN
-                quantizationOffset = boost::numeric_cast<int32_t>(tensorPtr->quantization->zero_point[0]);
+                quantizationOffset = armnn::numeric_cast<int32_t>(tensorPtr->quantization->zero_point[0]);
             }
 
-            TensorShape tensorShape(boost::numeric_cast<unsigned int>(safeShape.size()),
+            TensorShape tensorShape(armnn::numeric_cast<unsigned int>(safeShape.size()),
                                     safeShape.data());
             if (isDynamic)
             {
@@ -414,7 +413,7 @@ armnn::TensorInfo ToTensorInfo(TfLiteParser::TensorRawPtr tensorPtr,
                       std::back_inserter(quantizationScales));
 
             // QSymmS8 Per-axis
-            TensorShape tensorShape(boost::numeric_cast<unsigned int>(safeShape.size()),
+            TensorShape tensorShape(armnn::numeric_cast<unsigned int>(safeShape.size()),
                                     safeShape.data());
             if (isDynamic)
             {
@@ -423,14 +422,14 @@ armnn::TensorInfo ToTensorInfo(TfLiteParser::TensorRawPtr tensorPtr,
             armnn::TensorInfo result(tensorShape,
                                      type,
                                      quantizationScales,
-                                     dimensionMappings[boost::numeric_cast<unsigned int>(
+                                     dimensionMappings[armnn::numeric_cast<unsigned int>(
                                          tensorPtr->quantization->quantized_dimension)]);
             return result;
         }
     }
     else
     {
-        TensorShape tensorShape(boost::numeric_cast<unsigned int>(safeShape.size()),
+        TensorShape tensorShape(armnn::numeric_cast<unsigned int>(safeShape.size()),
                                 safeShape.data());
         if (isDynamic)
         {
@@ -866,8 +865,8 @@ void TfLiteParser::ParseUnsupportedOperator(size_t subgraphIndex, size_t operato
     auto inputs  = GetInputs(m_Model, subgraphIndex, operatorIndex);
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
 
-    const unsigned int numInputs  = boost::numeric_cast<unsigned int>(inputs.size());
-    const unsigned int numOutputs = boost::numeric_cast<unsigned int>(outputs.size());
+    const unsigned int numInputs  = armnn::numeric_cast<unsigned int>(inputs.size());
+    const unsigned int numOutputs = armnn::numeric_cast<unsigned int>(outputs.size());
 
     StandInDescriptor descriptor(numInputs, numOutputs);
     auto layerName = boost::str(boost::format("StandIn:%1%:%2%:%3%") % subgraphIndex % operatorIndex % opcode);
@@ -2144,7 +2143,7 @@ armnn::TensorInfo TfLiteParser::OutputShapeOfReshape(const armnn::TensorInfo & i
         }
 
         auto targetNumElements =
-            boost::numeric_cast<unsigned int>(
+            armnn::numeric_cast<unsigned int>(
                 std::accumulate(targetDimsIn.begin(), targetDimsIn.end(), -1, std::multiplies<int32_t>()));
 
         auto stretchIndex = static_cast<size_t>(std::distance(targetDimsIn.begin(), stretchDim));
@@ -2899,14 +2898,14 @@ void TfLiteParser::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
     // Check for inferred Axis
     if (numInferred == 0)
     {
-        if (splitSum != numeric_cast<int>(inputTensorInfo.GetShape()[splitDim]))
+        if (splitSum != armnn::numeric_cast<int>(inputTensorInfo.GetShape()[splitDim]))
         {
             throw ParseException("SplitV split_sizes does not sum to the dimension of value along split_dim.");
         }
     }
     else if (numInferred == 1)
     {
-        splitsData[inferIdx] = numeric_cast<int>(inputTensorInfo.GetShape()[splitDim]) - splitSum;
+        splitsData[inferIdx] = armnn::numeric_cast<int>(inputTensorInfo.GetShape()[splitDim]) - splitSum;
     }
     else
     {
@@ -2922,7 +2921,7 @@ void TfLiteParser::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
     unsigned int accumSplit = 0;
     for (unsigned int j = 0; j < numSplits; ++j)
     {
-        unsigned int splitSize = numeric_cast<unsigned int>(splitsData[j]);
+        unsigned int splitSize = armnn::numeric_cast<unsigned int>(splitsData[j]);
 
         // Set the size of the views.
         for (unsigned int dimIdx = 0; dimIdx < inputTensorInfo.GetNumDimensions(); ++dimIdx)

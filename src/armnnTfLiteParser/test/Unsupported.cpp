@@ -8,6 +8,7 @@
 
 #include <armnn/LayerVisitorBase.hpp>
 #include <armnn/utility/Assert.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <layers/StandInLayer.hpp>
@@ -39,11 +40,11 @@ public:
                            const StandInDescriptor& descriptor,
                            const char*) override
     {
-        unsigned int numInputs = boost::numeric_cast<unsigned int>(m_InputInfos.size());
+        unsigned int numInputs = armnn::numeric_cast<unsigned int>(m_InputInfos.size());
         BOOST_CHECK(descriptor.m_NumInputs    == numInputs);
         BOOST_CHECK(layer->GetNumInputSlots() == numInputs);
 
-        unsigned int numOutputs = boost::numeric_cast<unsigned int>(m_OutputInfos.size());
+        unsigned int numOutputs = armnn::numeric_cast<unsigned int>(m_OutputInfos.size());
         BOOST_CHECK(descriptor.m_NumOutputs    == numOutputs);
         BOOST_CHECK(layer->GetNumOutputSlots() == numOutputs);
 
@@ -77,10 +78,10 @@ public:
         : ParserFlatbuffersFixture()
         , m_StandInLayerVerifier(inputInfos, outputInfos)
     {
-        const unsigned int numInputs = boost::numeric_cast<unsigned int>(inputInfos.size());
+        const unsigned int numInputs = armnn::numeric_cast<unsigned int>(inputInfos.size());
         ARMNN_ASSERT(numInputs > 0);
 
-        const unsigned int numOutputs = boost::numeric_cast<unsigned int>(outputInfos.size());
+        const unsigned int numOutputs = armnn::numeric_cast<unsigned int>(outputInfos.size());
         ARMNN_ASSERT(numOutputs > 0);
 
         m_JsonString = R"(

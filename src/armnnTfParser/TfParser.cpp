@@ -12,6 +12,7 @@
 #include <armnnUtils/DataLayoutIndexed.hpp>
 #include <armnnUtils/Transpose.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <GraphTopologicalSort.hpp>
@@ -23,7 +24,6 @@
 #include <tensorflow/core/framework/graph.pb.h>
 
 #include <boost/format.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 #include <fmt/core.h>
 #include <numeric>
 
@@ -250,7 +250,7 @@ TensorInfo PrepareReshape(const TensorInfo& input, const std::vector<int32_t>& t
         }
 
         auto targetNumElements =
-            boost::numeric_cast<unsigned int>(
+            armnn::numeric_cast<unsigned int>(
                 std::accumulate(targetDims.begin(), targetDims.end(), -1, std::multiplies<int32_t>()));
         auto stretchIndex = static_cast<size_t>(std::distance(targetDims.begin(), stretchDim));
         outDims[stretchIndex] = input.GetNumElements() / targetNumElements;
@@ -563,7 +563,7 @@ TfParser::GetTfInputNodes(const tensorflow::NodeDef& nodeDef) const
         return ret;
     }
 
-    ret.reserve(boost::numeric_cast<size_t>(nodeDef.input_size()));
+    ret.reserve(armnn::numeric_cast<size_t>(nodeDef.input_size()));
     for (int j = 0; j < nodeDef.input_size(); ++j)
     {
         OutputId outputId = ParseOutputId(nodeDef.input(j));
@@ -1480,7 +1480,7 @@ TensorInfo OutputShapeOfExpandDims(const tensorflow::NodeDef& nodeDef,
                         % CHECK_LOCATION().AsString()));
     }
 
-    std::int32_t inputDimSize = boost::numeric_cast<int32_t>(inputTensorInfo.GetNumDimensions());
+    std::int32_t inputDimSize = armnn::numeric_cast<int32_t>(inputTensorInfo.GetNumDimensions());
     std::vector<uint32_t> outputDims;
 
     // expandDim operation requires: -1-input.dims() <= dim <= input.dims()
@@ -1503,7 +1503,7 @@ TensorInfo OutputShapeOfExpandDims(const tensorflow::NodeDef& nodeDef,
         // and insert 1 dimension at index 'expandDim'
         if (expandDim < 0)
         {
-            int outputDimSize = boost::numeric_cast<int>(outputDims.size() + 1);
+            int outputDimSize = armnn::numeric_cast<int>(outputDims.size() + 1);
             auto getPosition = std::next(outputDims.begin() + outputDimSize, expandDim);
             outputDims.insert(getPosition, 1);
         }
@@ -2766,7 +2766,7 @@ ParsedTfOperationPtr TfParser::ParsePlaceholder(const tensorflow::NodeDef& nodeD
 
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 0);
 
-    const LayerBindingId layerId = boost::numeric_cast<LayerBindingId>(m_NetworkInputsBindingInfo.size());
+    const LayerBindingId layerId = armnn::numeric_cast<LayerBindingId>(m_NetworkInputsBindingInfo.size());
 
     auto it = m_InputShapes.find(nodeDef.name());
     if (it == m_InputShapes.end())
@@ -3524,7 +3524,7 @@ void TfParser::LoadNodeDef(const tensorflow::NodeDef& nodeDef, const tensorflow:
             m_RequestedOutputs.end())
         {
             auto outId = ParseOutputId(nodeDef.name());
-            const LayerBindingId layerId = boost::numeric_cast<LayerBindingId>(m_NetworkOutputsBindingInfo.size());
+            const LayerBindingId layerId = armnn::numeric_cast<LayerBindingId>(m_NetworkOutputsBindingInfo.size());
             IOutputSlot& prevSlot = parsedTfOperationRaw->ResolveArmnnOutputSlot(outId.m_Index);
 
             TensorInfo tensorInfo = prevSlot.GetTensorInfo();

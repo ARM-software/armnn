@@ -19,7 +19,7 @@
 
 #include <test/TensorHelpers.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 #include "flatbuffers/idl.h"
 #include "flatbuffers/util.h"
@@ -81,13 +81,12 @@ struct ParserFlatbuffersFixture
         if (ret != armnn::Status::Success)
         {
             throw armnn::Exception(
-                boost::str(
-                    boost::format("The runtime failed to load the network. "
-                                    "Error was: %1%. in %2% [%3%:%4%]") %
-                    errorMessage %
-                    __func__ %
-                    __FILE__ %
-                    __LINE__));
+                fmt::format("The runtime failed to load the network. "
+                            "Error was: {}. in {} [{}:{}]",
+                            errorMessage,
+                            __func__,
+                            __FILE__,
+                            __LINE__));
         }
     }
 
@@ -275,10 +274,10 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
         // Check that output tensors have correct number of dimensions (NumOutputDimensions specified in test)
         auto outputNumDimensions = outputTensorInfo.GetNumDimensions();
         BOOST_CHECK_MESSAGE((outputNumDimensions == NumOutputDimensions),
-            boost::str(boost::format("Number of dimensions expected %1%, but got %2% for output layer %3%")
-                                       % NumOutputDimensions
-                                       % outputNumDimensions
-                                       % it.first));
+            fmt::format("Number of dimensions expected {}, but got {} for output layer {}",
+                        NumOutputDimensions,
+                        outputNumDimensions,
+                        it.first));
 
         armnn::VerifyTensorInfoDataType(outputTensorInfo, armnnType2);
         outputStorage.emplace(it.first, MakeTensor<DataType2, NumOutputDimensions>(outputTensorInfo));

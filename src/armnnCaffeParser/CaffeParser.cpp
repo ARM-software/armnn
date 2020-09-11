@@ -17,7 +17,7 @@
 #include <armnn/utility/NumericCast.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 // Caffe
 #include "caffe/proto/caffe.pb.h"
@@ -70,13 +70,11 @@ const float* GetArrayPtrFromBlob(const LayerParameter& layerParam, unsigned int 
     if (blobIndex >= armnn::numeric_cast<unsigned int>(nBlobs))
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Expected data blob at index %1% in layer %2% not found. nBlobs=%2%. %4%") %
-                    blobIndex %
-                    layerParam.name() %
-                    nBlobs %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Expected data blob at index {} in layer {} not found. nBlobs={}. {}",
+                        blobIndex,
+                        layerParam.name(),
+                        nBlobs,
+                        CHECK_LOCATION().AsString()));
     }
 
     const BlobProto& blob = layerParam.blobs(armnn::numeric_cast<int>(blobIndex));
@@ -91,12 +89,10 @@ void GetDataFromBlob(const LayerParameter& layerParam, vector<float>& outData, u
     if (blobIndex >= armnn::numeric_cast<unsigned int>(nBlobs))
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Expected data blob at index %1% in layer %2% not found. %3%") %
-                    blobIndex %
-                    layerParam.name() %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Expected data blob at index {} in layer {} not found. {}",
+                        blobIndex,
+                        layerParam.name(),
+                        CHECK_LOCATION().AsString()));
     }
 
     const BlobProto& blob = layerParam.blobs(armnn::numeric_cast<int>(blobIndex));
@@ -105,15 +101,13 @@ void GetDataFromBlob(const LayerParameter& layerParam, vector<float>& outData, u
     if (blobSize != outData.size())
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Data blob at index %1% in layer %2% has an unexpected size. "
-                    "Expected %3% elements but got %4% elements. %5%") %
-                    blobIndex %
-                    layerParam.name() %
-                    outData.size() %
-                    blobSize %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Data blob at index {} in layer {} has an unexpected size. "
+                        "Expected {} elements but got {} elements. {}",
+                        blobIndex,
+                        layerParam.name(),
+                        outData.size(),
+                        blobSize,
+                        CHECK_LOCATION().AsString()));
     }
 
     int outSizeInt = armnn::numeric_cast<int>(outData.size());
@@ -137,26 +131,24 @@ void ValidateNumInputsOutputs(const caffe::LayerParameter& layerParameter,
     if (numInputs != armnn::numeric_cast<unsigned int>(numInputsActual))
     {
         throw ParseException(
-            boost::str(
-                boost::format("Invalid number of inputs requested %1% for layer %2% "
-                              "while only %3% present. %4%") %
-                              numInputs %
-                              layerParameter.name() %
-                              numInputsActual %
-                              CHECK_LOCATION().AsString()));
+            fmt::format("Invalid number of inputs requested {} for layer {} "
+                        "while only {} present. {}",
+                        numInputs,
+                        layerParameter.name(),
+                        numInputsActual,
+                        CHECK_LOCATION().AsString()));
     }
 
     int numOutputsActual = layerParameter.top_size();
     if (numOutputs != armnn::numeric_cast<unsigned int>(numOutputsActual))
     {
         throw ParseException(
-            boost::str(
-                boost::format("Invalid number of outputs requested %1% for layer %2% "
-                              "while only %3% present. %4%") %
-                              numOutputs %
-                              layerParameter.name() %
-                              numOutputsActual %
-                              CHECK_LOCATION().AsString()));
+            fmt::format("Invalid number of outputs requested {} for layer {} "
+                        "while only {} present. {}",
+                        numOutputs,
+                        layerParameter.name(),
+                        numOutputsActual,
+                        CHECK_LOCATION().AsString()));
     }
 }
 
@@ -303,12 +295,10 @@ std::pair<armnn::LayerBindingId, armnn::TensorInfo> CaffeParserBase::GetBindingI
     if (it == nameToBindingInfo.end())
     {
         throw InvalidArgumentException(
-            boost::str(
-                boost::format(
-                    "Unknown binding %1% for layer '%2%'. %3%") %
-                    bindingPointDesc %
-                    layerName %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Unknown binding {} for layer '{}'. {}",
+                        bindingPointDesc,
+                        layerName,
+                        CHECK_LOCATION().AsString()));
     }
     return it->second;
 }
@@ -349,13 +339,11 @@ vector<const LayerParameter*> CaffeParserBase::GetInputs(const LayerParameter& l
         if (inputIt == m_CaffeLayersByTopName.end())
         {
             throw ParseException(
-                boost::str(
-                    boost::format(
-                        "Can't find Caffe layer with top called '%1%', "
-                        "which is listed as an input of '%2%'. %3%") %
-                        inputName %
-                        layerParam.name() %
-                        CHECK_LOCATION().AsString()));
+                fmt::format("Can't find Caffe layer with top called '{}', "
+                            "which is listed as an input of '{}'. {}",
+                            inputName,
+                            layerParam.name(),
+                            CHECK_LOCATION().AsString()));
         }
         ret.push_back(inputIt->second);
     }
@@ -395,22 +383,18 @@ void CaffeParserBase::ParseInputLayer(const LayerParameter& layerParam)
               || originalShape->dim(3) != overrideShape[3]))
         {
             throw ParseException(
-                boost::str(
-                    boost::format(
-                        "Parsed input shape for '%1%' is incompatible with the override provided. %2%") %
-                        layerParam.name() %
-                        CHECK_LOCATION().AsString()));
+                fmt::format("Parsed input shape for '{}' is incompatible with the override provided. {}",
+                            layerParam.name(),
+                            CHECK_LOCATION().AsString()));
         }
         inputTensorInfo.SetShape(overrideShape);
     }
     else if (!originalShape)
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "No input descriptor given for '%1%' and no input shape found in caffe model. %2%") %
-                    layerParam.name() %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("No input descriptor given for '{}' and no input shape found in caffe model. {}",
+                        layerParam.name(),
+                        CHECK_LOCATION().AsString()));
     }
 
     TrackInputBinding(inputLayer, inputId, inputTensorInfo);
@@ -592,14 +576,12 @@ void CaffeParserBase::AddConvLayerWithSplits(const caffe::LayerParameter& layerP
     if (!concatLayer)
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Failed to create final concat layer for Split+Convolution+Concat. "
-                    "Layer=%1% #groups=%2% #filters=%3% %4%") %
-                    layerParam.name() %
-                    numGroups %
-                    numFilters %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Failed to create final concat layer for Split+Convolution+Concat. "
+                        "Layer={} #groups={} #filters={} {}",
+                        layerParam.name(),
+                        numGroups,
+                        numFilters,
+                        CHECK_LOCATION().AsString()));
     }
 
     for (unsigned int g = 0; g < numGroups; ++g)
@@ -686,13 +668,11 @@ void CaffeParserBase::AddConvLayerWithDepthwiseConv(const caffe::LayerParameter&
     if (!returnLayer)
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Failed to create depthwise convolution layer. "
-                    "Layer=%1% #filters=%2% %3%") %
-                    layerParam.name() %
-                    numFilters %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Failed to create depthwise convolution layer. "
+                        "Layer={} #filters={} {}",
+                        layerParam.name(),
+                        numFilters,
+                        CHECK_LOCATION().AsString()));
     }
     armnn::IOutputSlot& inputConnection = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0));
     inputConnection.Connect(returnLayer->GetInputSlot(0));
@@ -750,27 +730,23 @@ void CaffeParserBase::ParseConvLayer(const LayerParameter& layerParam)
     if (numGroups > numFilters)
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Error parsing Convolution: %1%. "
-                    "The 'group'=%2% parameter cannot be larger than the "
-                    "number of filters supplied ='%3%'. %4%") %
-                    layerParam.name() %
-                    numGroups %
-                    numFilters %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Error parsing Convolution: {}. "
+                        "The 'group'={} parameter cannot be larger than the "
+                        "number of filters supplied ='{}'. {}",
+                        layerParam.name(),
+                        numGroups,
+                        numFilters,
+                        CHECK_LOCATION().AsString()));
     }
 
     if (inputShape.dim_size() != 4)
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Convolution input shape is expected to have 4 dimensions. "
-                    "%1%'s input has only %2%. %3%") %
-                    layerParam.name() %
-                    inputShape.dim_size() %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Convolution input shape is expected to have 4 dimensions. "
+                        "{}'s input has only {}. {}",
+                        layerParam.name(),
+                        inputShape.dim_size(),
+                        CHECK_LOCATION().AsString()));
     }
 
     if (numGroups > 1)
@@ -778,15 +754,13 @@ void CaffeParserBase::ParseConvLayer(const LayerParameter& layerParam)
         if (numGroups > inputShape.dim(1))
         {
             throw ParseException(
-                boost::str(
-                    boost::format(
-                        "Error parsing Convolution: %1%. "
-                        "The 'group'=%2% parameter cannot be larger than the "
-                        "channel of the input shape=%3% (in NCHW format). %4%") %
-                        layerParam.name() %
-                        numGroups %
-                        inputShape.dim(1) %
-                        CHECK_LOCATION().AsString()));
+                fmt::format("Error parsing Convolution: {}. "
+                            "The 'group'={} parameter cannot be larger than the "
+                            "channel of the input shape={} (in NCHW format). {}",
+                            layerParam.name(),
+                            numGroups,
+                            inputShape.dim(1),
+                            CHECK_LOCATION().AsString()));
         }
         else if (numGroups == inputShape.dim(1))
         {
@@ -869,14 +843,12 @@ void CaffeParserBase::ParseConvLayer(const LayerParameter& layerParam)
     if (!returnLayer)
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Failed to create Convolution layer. "
-                    "Layer=%1% #groups=%2% #filters=%3% %4%") %
-                    layerParam.name() %
-                    numGroups %
-                    numFilters %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Failed to create Convolution layer. "
+                        "Layer={} #groups={} #filters={} {}",
+                        layerParam.name(),
+                        numGroups,
+                        numFilters,
+                        CHECK_LOCATION().AsString()));
     }
 
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), returnLayer->GetOutputSlot(0));
@@ -941,32 +913,26 @@ void CaffeParserBase::ParsePoolingLayer(const LayerParameter& layerParam)
             case PoolingParameter_PoolMethod_STOCHASTIC:
             {
                 throw ParseException(
-                    boost::str(
-                        boost::format(
-                            "Pooling Layer: Stochastic Pooling Not Supported. Layer=%1% %2%") %
-                            layerParam.name() %
-                            CHECK_LOCATION().AsString()));
+                    fmt::format("Pooling Layer: Stochastic Pooling Not Supported. Layer={} {}",
+                                layerParam.name(),
+                                CHECK_LOCATION().AsString()));
             }
             default:
             {
                 throw ParseException(
-                    boost::str(
-                        boost::format(
-                            "Pooling Layer: unknown pooling method: %1% for layer: %2% %3%") %
-                            p %
-                            layerParam.name() %
-                            CHECK_LOCATION().AsString()));
+                    fmt::format("Pooling Layer: unknown pooling method: {} for layer: {} {}",
+                                p,
+                                layerParam.name(),
+                                CHECK_LOCATION().AsString()));
             }
         }
     }
     else
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "No Pooling Method Defined for %1% %2%") %
-                    layerParam.name() %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("No Pooling Method Defined for {} {}",
+                        layerParam.name(),
+                        CHECK_LOCATION().AsString()));
     }
 
     pooling2dDescriptor.m_PadLeft     = pad_w;
@@ -1058,12 +1024,10 @@ void CaffeParserBase::ParseLRNLayer(const LayerParameter& layerParam)
             default:
             {
                 throw ParseException(
-                    boost::str(
-                        boost::format(
-                            "Unknown region %1% for LRN layer %2% %3%") %
-                            n %
-                            layerParam.name() %
-                            CHECK_LOCATION().AsString()));
+                    fmt::format("Unknown region {} for LRN layer {} {}",
+                                n,
+                                layerParam.name(),
+                                CHECK_LOCATION().AsString()));
             }
         }
     }
@@ -1081,11 +1045,9 @@ void CaffeParserBase::ParseLRNLayer(const LayerParameter& layerParam)
     else
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "local_size not defined for LRN layer %1% %2%") %
-                    layerParam.name() %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("local_size not defined for LRN layer {} {}",
+                        layerParam.name(),
+                        CHECK_LOCATION().AsString()));
     }
 
     if (param.has_alpha())
@@ -1096,11 +1058,9 @@ void CaffeParserBase::ParseLRNLayer(const LayerParameter& layerParam)
     else
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Alpha not defined for LRN layer %1% %2%") %
-                    layerParam.name() %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Alpha not defined for LRN layer {} {}",
+                        layerParam.name(),
+                        CHECK_LOCATION().AsString()));
     }
     if (param.has_beta())
     {
@@ -1109,11 +1069,9 @@ void CaffeParserBase::ParseLRNLayer(const LayerParameter& layerParam)
     else
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Beta not defined for LRN layer %1% %2%") %
-                    layerParam.name() %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Beta not defined for LRN layer {} {}",
+                        layerParam.name(),
+                        CHECK_LOCATION().AsString()));
     }
 
     if (param.has_k())
@@ -1261,12 +1219,10 @@ void CaffeParserBase::ParseEltwiseLayer(const LayerParameter& layerParam)
         default:
         {
             throw ParseException(
-                boost::str(
-                    boost::format(
-                        "Unsupported operation %1% in Eltwise layer %2% %3%") %
-                        operation %
-                        layerParam.name() %
-                        CHECK_LOCATION().AsString()));
+                fmt::format("Unsupported operation {} in Eltwise layer {} {}",
+                            operation,
+                            layerParam.name(),
+                            CHECK_LOCATION().AsString()));
         }
     }
 
@@ -1296,14 +1252,12 @@ void CaffeParserBase::ParseConcatLayer(const LayerParameter& layerParam)
         if (inputInfo.GetNumDimensions()!=4)
         {
             throw ParseException(
-                boost::str(
-                    boost::format(
-                        "The number of dimensions for input tensors of "
-                        "the concatenation op should be 4. Inputs of %1% has "
-                        "%2% dimensions. %3%") %
-                        layerParam.name() %
-                        inputInfo.GetNumDimensions() %
-                        CHECK_LOCATION().AsString()));
+                fmt::format("The number of dimensions for input tensors of "
+                            "the concatenation op should be 4. Inputs of {} has "
+                            "{} dimensions. {}",
+                            layerParam.name(),
+                            inputInfo.GetNumDimensions(),
+                            CHECK_LOCATION().AsString()));
         }
 
         mergeDimSizes[0] = inputInfo.GetShape()[0];
@@ -1353,13 +1307,11 @@ void CaffeParserBase::ParseBatchNormLayer(const LayerParameter& layerParam)
         if (!param.use_global_stats())
         {
             throw ParseException(
-                boost::str(
-                    boost::format(
-                        "Error parsing Batch Norm layer '%1%': "
-                        "Parameter 'use_global_stats' is set to false, which is "
-                        "unsupported (value used for training). %2%") %
-                        name %
-                        CHECK_LOCATION().AsString()));
+                fmt::format("Error parsing Batch Norm layer '{}': "
+                            "Parameter 'use_global_stats' is set to false, which is "
+                            "unsupported (value used for training). {}",
+                            name,
+                            CHECK_LOCATION().AsString()));
         }
     }
 
@@ -1417,13 +1369,11 @@ void CaffeParserBase::ParseScaleLayer(const LayerParameter& layerParam)
     {
         // Would have to use something other than BatchNormalizationLayer in this case
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Loading Scale Layer: Only axis 1 is supported currently. "
-                    "Layer=%1% Axis=%2% %3%") %
-                    layerParam.name() %
-                    param.axis() %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Loading Scale Layer: Only axis 1 is supported currently. "
+                        "Layer={} Axis={} {}",
+                        layerParam.name(),
+                        param.axis(),
+                        CHECK_LOCATION().AsString()));
     }
 
     unsigned int     channels = inputInfo.GetShape()[1];
@@ -1461,13 +1411,11 @@ void CaffeParserBase::ParseSplitLayer(const caffe::LayerParameter& layerParam)
     if (layerParam.bottom_size() != 1)
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Split layer '%1%' should have exactly 1 bottom. "
-                    "#bottoms=%2% %3%") %
-                    layerParam.name() %
-                    layerParam.bottom_size() %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Split layer '{}' should have exactly 1 bottom. "
+                        "#bottoms={} {}",
+                        layerParam.name(),
+                        layerParam.bottom_size(),
+                        CHECK_LOCATION().AsString()));
     }
     armnn::IOutputSlot& outputSlot = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0));
     for (int i = 0; i < layerParam.top_size(); i++)
@@ -1482,14 +1430,12 @@ void CaffeParserBase::ParseDropoutLayer(const caffe::LayerParameter& layerParam)
     if (layerParam.bottom_size() != 1 || layerParam.top_size() != 1)
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Dropout layer '%1%' should have exactly 1 bottom and 1 top. "
-                    "#bottoms=%2% #tops=%3% %4%") %
-                    layerParam.name() %
-                    layerParam.bottom_size() %
-                    layerParam.top_size() %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Dropout layer '{}' should have exactly 1 bottom and 1 top. "
+                        "#bottoms={} #tops={} {}",
+                        layerParam.name(),
+                        layerParam.bottom_size(),
+                        layerParam.top_size(),
+                        CHECK_LOCATION().AsString()));
     }
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)));
 }
@@ -1523,12 +1469,10 @@ void CaffeParserBase::TrackBindingPoint(armnn::IConnectableLayer* layer,
     else
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Id %1% used by more than one %2% layer %3%") %
-                    id %
-                    bindingPointDesc %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Id {} used by more than one {} layer {}",
+                        id,
+                        bindingPointDesc,
+                        CHECK_LOCATION().AsString()));
     }
 }
 
@@ -1542,11 +1486,9 @@ armnn::IOutputSlot& CaffeParserBase::GetArmnnOutputSlotForCaffeTop(const std::st
     else
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Could not find armnn output slot for Caffe top '%1%' %2%") %
-                    caffeTopName %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Could not find armnn output slot for Caffe top '{}' {}",
+                        caffeTopName,
+                        CHECK_LOCATION().AsString()));
     }
 }
 
@@ -1561,11 +1503,9 @@ void CaffeParserBase::SetArmnnOutputSlotForCaffeTop(
     else
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Attempting to add duplicate entry for Caffe top '%1%' %2%") %
-                    caffeTopName %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Attempting to add duplicate entry for Caffe top '{}' {}",
+                        caffeTopName,
+                        CHECK_LOCATION().AsString()));
     }
 }
 
@@ -1601,28 +1541,24 @@ void CaffeParserBase::ResolveInPlaceLayers(caffe::NetParameter& netParameter)
             if (layer1.top_size() != 1)
             {
                 throw ParseException(
-                    boost::str(
-                        boost::format(
-                            "Node '%1%' is an in-place layer but doesn't have exactly one "
-                            "top. It has %2% instead. %3%") %
-                            layer1.name() %
-                            layer1.top_size() %
-                            CHECK_LOCATION().AsString()));
+                    fmt::format("Node '{}' is an in-place layer but doesn't have exactly one "
+                                "top. It has {} instead. {}",
+                                layer1.name(),
+                                layer1.top_size(),
+                                CHECK_LOCATION().AsString()));
             }
             std::string newTop = layer1.name() + "_top";
             layer1.set_top(0, newTop);
             if (layer2.bottom_size() != 1 || layer2.bottom(0) != top)
             {
                 throw ParseException(
-                    boost::str(
-                        boost::format(
-                            "Node '%1%' is an in-place layer but "
-                            "doesn't have exactly one bottom, or it doesn't match its top. "
-                            "#bottoms=%2%, first bottom is %3%, top is %4% %5%") %
-                            layer2.name() %
-                            layer2.bottom(0) %
-                            top %
-                            CHECK_LOCATION().AsString()));
+                    fmt::format("Node '{}' is an in-place layer but "
+                                "doesn't have exactly one bottom, or it doesn't match its top. "
+                                "#bottoms={}, first bottom is {}, top is {} {}",
+                                layer2.name(),
+                                layer2.bottom(0),
+                                top,
+                                CHECK_LOCATION().AsString()));
             }
             layer2.set_bottom(0, newTop);
         }
@@ -1674,11 +1610,9 @@ void CaffeParserBase::LoadNetParam(NetParameter& netParameter)
         if (nodeIt == m_CaffeLayersByTopName.end())
         {
             throw ParseException(
-                boost::str(
-                    boost::format(
-                        "Couldn't find requested output layer '%1%' in graph %2%") %
-                        requestedOutputName %
-                        CHECK_LOCATION().AsString()));
+                fmt::format("Couldn't find requested output layer '{}' in graph {}",
+                            requestedOutputName,
+                            CHECK_LOCATION().AsString()));
         }
         targetLayers.push_back(nodeIt->second);
     }
@@ -1694,11 +1628,9 @@ void CaffeParserBase::LoadNetParam(NetParameter& netParameter)
         sortedNodes))
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Cycle detected in graph. #nodes: %1% %2%") %
-                    sortedNodes.size() %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Cycle detected in graph. #nodes: {} {}",
+                        sortedNodes.size(),
+                        CHECK_LOCATION().AsString()));
     }
 
     // Parses each node in order, knowing that all inputs of a node will be processed before the node itself.
@@ -1708,11 +1640,10 @@ void CaffeParserBase::LoadNetParam(NetParameter& netParameter)
         if (it == ms_CaffeLayerNameToParsingFunctions.end())
         {
             throw ParseException(
-                boost::str(
-                    boost::format("Unsupported layer type: '%1%' for layer %2% %3%") %
-                    current->type() %
-                    current->name() %
-                    CHECK_LOCATION().AsString()));
+                fmt::format("Unsupported layer type: '{}' for layer {} {}",
+                            current->type(),
+                            current->name(),
+                            CHECK_LOCATION().AsString()));
         }
         auto func = it->second;
         (this->*func)(*current);
@@ -1741,11 +1672,9 @@ INetworkPtr CaffeParserBase::CreateNetworkFromTextFile(const char* graphFile,
     if (fd == nullptr)
     {
         throw FileNotFoundException(
-            boost::str(
-                boost::format(
-                    "Failed to open graph file: %1% %2%") %
-                    graphFile %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Failed to open graph file: {} {}",
+                        graphFile,
+                        CHECK_LOCATION().AsString()));
     }
 
     // Parses the file into a message.
@@ -1758,11 +1687,9 @@ INetworkPtr CaffeParserBase::CreateNetworkFromTextFile(const char* graphFile,
     if (!success)
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Failed to parse graph file: %1% %2%") %
-                    graphFile %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Failed to parse graph file: {} {}",
+                        graphFile,
+                        CHECK_LOCATION().AsString()));
     }
 
     return CreateNetworkFromNetParameter(netParam, inputShapes, requestedOutputs);
@@ -1779,10 +1706,8 @@ INetworkPtr CaffeParserBase::CreateNetworkFromString(const char* protoText,
     if (!success)
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Failed to parse graph string %1%") %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Failed to parse graph string {}",
+                        CHECK_LOCATION().AsString()));
     }
 
     return CreateNetworkFromNetParameter(netParam, inputShapes, requestedOutputs);
@@ -1797,11 +1722,9 @@ INetworkPtr CaffeParser::CreateNetworkFromBinaryFile(const char* graphFile,
     if (fd == nullptr)
     {
         throw FileNotFoundException(
-            boost::str(
-                boost::format(
-                    "Failed to open graph file at: %1% %2%") %
-                    graphFile %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Failed to open graph file at: {} {}",
+                        graphFile,
+                        CHECK_LOCATION().AsString()));
     }
 
     // Parses the file into a message.
@@ -1816,11 +1739,9 @@ INetworkPtr CaffeParser::CreateNetworkFromBinaryFile(const char* graphFile,
     if (!success)
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Failed to parse protobuf file: %1% %2%") %
-                    graphFile %
-                    CHECK_LOCATION().AsString()));
+            fmt::format("Failed to parse protobuf file: {} {}",
+                        graphFile,
+                        CHECK_LOCATION().AsString()));
     }
 
     return CreateNetworkFromNetParameter(netParam, inputShapes, requestedOutputs);

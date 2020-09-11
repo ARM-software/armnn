@@ -9,7 +9,7 @@
 #include <armnn/utility/NumericCast.hpp>
 #include <VerificationHelpers.hpp>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -35,13 +35,12 @@ void CheckValidDataType(std::initializer_list<onnx::TensorProto::DataType> valid
     if (!isValid)
     {
         throw ParseException(
-            boost::str(
-                boost::format("Datatype %1% is not valid for tensor '%2%' of node '%3%', not in {%4%}. %5%") %
-                              onnx::TensorProto::DataType_Name(actualValue) %
-                              tensorName %
-                              nodeName %
-                              validExpr %
-                              location.AsString()));
+            fmt::format("Datatype {} is not valid for tensor '{}' of node '{}', not in {{{}}}. {}",
+                        onnx::TensorProto::DataType_Name(actualValue),
+                        tensorName,
+                        nodeName,
+                        validExpr,
+                        location.AsString()));
     }
 }
 
@@ -69,14 +68,13 @@ void ReadMandatoryNodeAttributeImpl(const onnx::NodeProto& node,
           }
           else
           {
-              throw ParseException(boost::str(boost::format(
-                  "Attribute %1% of node %2% expected to have %3% as onnx::AttributeProto::AttributeType, "
-                  "but found %4% instead %5%")
-                  % attribName
-                  % node.name()
-                  % onnx::AttributeProto::AttributeType_Name(expectedType)
-                  % onnx::AttributeProto::AttributeType_Name(attribs.Get(attriNum).type())
-                  % CHECK_LOCATION().AsString()));
+              throw ParseException(fmt::format("Attribute {} of node {} expected to have {} as "
+                                               "onnx::AttributeProto::AttributeType, but found {} instead {}",
+                                               attribName,
+                                               node.name(),
+                                               onnx::AttributeProto::AttributeType_Name(expectedType),
+                                               onnx::AttributeProto::AttributeType_Name(attribs.Get(attriNum).type()),
+                                               CHECK_LOCATION().AsString()));
           }
           break;
       }
@@ -84,8 +82,8 @@ void ReadMandatoryNodeAttributeImpl(const onnx::NodeProto& node,
   }
   if (attriNum == node.attribute_size())
   {
-      throw ParseException(boost::str(boost::format("Could not find required attribute %1% in node %2% %3%")
-          % attribName % node.name() % CHECK_LOCATION().AsString()));
+      throw ParseException(fmt::format("Could not find required attribute {} in node {} {}",
+                                       attribName, node.name(), CHECK_LOCATION().AsString()));
   }
 }
 
@@ -106,14 +104,14 @@ void ReadOptionalNodeAttributeImpl(const onnx::NodeProto& node,
             }
             else
             {
-                throw ParseException(boost::str(boost::format(
-                    "Attribute %1% of node %2% expected to have %3% as onnx::AttributeProto::AttributeType, "
-                    "but found %4% instead %5%")
-                    % attribName
-                    % node.name()
-                    % onnx::AttributeProto::AttributeType_Name(expectedType)
-                    % onnx::AttributeProto::AttributeType_Name(attribs.Get(attriNum).type())
-                    % CHECK_LOCATION().AsString()));
+                throw ParseException(
+                    fmt::format("Attribute {} of node {} expected to have {} as onnx::AttributeProto::AttributeType, "
+                                "but found {} instead {}",
+                                attribName,
+                                node.name(),
+                                onnx::AttributeProto::AttributeType_Name(expectedType),
+                                onnx::AttributeProto::AttributeType_Name(attribs.Get(attriNum).type()),
+                                CHECK_LOCATION().AsString()));
             }
         }
     }
@@ -219,13 +217,11 @@ armnn::TensorInfo ToTensorInfo(const std::string& name, std::vector<unsigned int
       default:
       {
           throw ParseException(
-              boost::str(
-                  boost::format("'%1%' is not a currently supported datatype for tensor %2%."
-                                " Supported dataTypes are FLOAT, INT32 and INT64.  %3%") %
-                                onnx::TensorProto::DataType_Name(
-                                    static_cast<onnx::TensorProto::DataType>(data_type)) %
-                                name %
-                                CHECK_LOCATION().AsString() ));
+              fmt::format("'{}' is not a currently supported datatype for tensor {}."
+                          " Supported dataTypes are FLOAT, INT32 and INT64.  {}",
+                          onnx::TensorProto::DataType_Name(static_cast<onnx::TensorProto::DataType>(data_type)),
+                          name,
+                          CHECK_LOCATION().AsString() ));
       }
   }
 
@@ -342,12 +338,12 @@ TensorInfo ComputeReshapeInfo(const TensorShape& targetShapeTensor,
             }
             ss << targetDims[targetDims.size() - 1] << " ]";
 
-            throw ParseException(boost::str(
-                boost::format("Error during creation of reshaped tensor '%1%'. At most one component of shape can be "
-                              " -1 and here, shape is %2% %3%")
-                              % outName
-                              % ss.str()
-                              % CHECK_LOCATION().AsString()));
+            throw ParseException(
+                fmt::format("Error during creation of reshaped tensor '{}'. At most one component of shape can be "
+                            " -1 and here, shape is {} {}",
+                            outName,
+                            ss.str(),
+                            CHECK_LOCATION().AsString()));
         }
 
         auto targetNumElements = armnn::numeric_cast<unsigned int>(std::accumulate(targetDims.begin(), targetDims.end(),
@@ -478,13 +474,13 @@ std::pair<ConstTensor, std::unique_ptr<float[]>> OnnxParser::CreateConstTensor(c
     {
         if(tensorInfo.GetNumElements() != static_cast<uint>(onnxTensor.float_data_size()))
         {
-            throw ParseException(boost::str(
-                boost::format("The number of data provided (%1%) does not match the tensor '%2%' number of elements"
-                          " (%3%) %4%")
-                          % onnxTensor.float_data_size()
-                          % name
-                          % tensorInfo.GetNumElements()
-                          % CHECK_LOCATION().AsString()));
+            throw ParseException(
+                fmt::format("The number of data provided ({}) does not match the tensor '{}' number of "
+                            "elements ({}) {}",
+                            onnxTensor.float_data_size(),
+                            name,
+                            tensorInfo.GetNumElements(),
+                            CHECK_LOCATION().AsString()));
         }
         ::memcpy(tensorData.get(), srcData, tensorSizeInBytes);
     }
@@ -496,10 +492,9 @@ std::pair<ConstTensor, std::unique_ptr<float[]>> OnnxParser::CreateConstTensor(c
     // Const tensors requires at least a list of values
     if (tensorInfo.GetNumElements() == 0)
     {
-        throw ParseException(boost::str(
-            boost::format("No tensor data found for Const tensor '%1%' %2%")
-                          % name
-                          % CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("No tensor data found for Const tensor '{}' {}",
+                                         name,
+                                         CHECK_LOCATION().AsString()));
     }
     return std::make_pair(ConstTensor(tensorInfo, tensorData.get()), std::move(tensorData));
 }
@@ -510,8 +505,7 @@ ModelPtr OnnxParser::LoadModelFromTextFile(const char* graphFile)
 
     if (fd == nullptr)
     {
-        throw FileNotFoundException(boost::str(
-            boost::format("Invalid (null) filename %1%") % CHECK_LOCATION().AsString()));
+        throw FileNotFoundException(fmt::format("Invalid (null) filename {}", CHECK_LOCATION().AsString()));
     }
 
     // Parse the file into a message
@@ -525,8 +519,7 @@ ModelPtr OnnxParser::LoadModelFromTextFile(const char* graphFile)
     {
         std::stringstream error;
         error << "Failed to parse graph file";
-        throw ParseException(boost::str(
-            boost::format("%1% %2%") % error.str() % CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("{} {}", error.str(), CHECK_LOCATION().AsString()));
     }
     return modelProto;
 }
@@ -545,8 +538,7 @@ ModelPtr OnnxParser::LoadModelFromBinaryFile(const char* graphFile)
 
     if (fd == nullptr)
     {
-        throw FileNotFoundException(boost::str(
-            boost::format("Invalid (null) filename %1%") % CHECK_LOCATION().AsString()));
+        throw FileNotFoundException(fmt::format("Invalid (null) filename {}", CHECK_LOCATION().AsString()));
     }
 
     // Parse the file into a message
@@ -562,8 +554,7 @@ ModelPtr OnnxParser::LoadModelFromBinaryFile(const char* graphFile)
     {
         std::stringstream error;
         error << "Failed to parse graph file";
-        throw ParseException(boost::str(
-            boost::format("%1% %2%") % error.str() % CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("{} {}", error.str(), CHECK_LOCATION().AsString()));
     }
     return modelProto;
 
@@ -580,8 +571,8 @@ ModelPtr OnnxParser::LoadModelFromString(const std::string& protoText)
 {
     if (protoText == "")
     {
-        throw InvalidArgumentException(boost::str(
-                boost::format("Invalid (empty) string for model parameter %1%") % CHECK_LOCATION().AsString()));
+        throw InvalidArgumentException(fmt::format("Invalid (empty) string for model parameter {}",
+                                                   CHECK_LOCATION().AsString()));
     }
     // Parse the string into a message
     ModelPtr modelProto = std::make_unique<onnx::ModelProto>();
@@ -590,8 +581,7 @@ ModelPtr OnnxParser::LoadModelFromString(const std::string& protoText)
     {
         std::stringstream error;
         error << "Failed to parse graph file";
-        throw ParseException(boost::str(
-                boost::format("%1% %2%") % error.str() % CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("{} {}", error.str(), CHECK_LOCATION().AsString()));
     }
     return modelProto;
 }
@@ -673,11 +663,10 @@ void OnnxParser::LoadGraph()
             }
             else
             {
-                throw ParseException(boost::str(
-                    boost::format("Unsupported operation %1% for node '%2%' %3%")
-                    % operation
-                    % node.name()
-                    % CHECK_LOCATION().AsString()));
+                throw ParseException(fmt::format("Unsupported operation {} for node '{}' {}",
+                                                 operation,
+                                                 node.name(),
+                                                 CHECK_LOCATION().AsString()));
             }
         }
     }
@@ -780,12 +769,11 @@ void OnnxParser::GetInputAndParam(const onnx::NodeProto& node,
     }
     else
     {
-        throw ParseException(boost::str(
-            boost::format("One of the input tensors ('%1%' or '%2%') should be constant in node '%3%' %4%")
-                          % node.input(0)
-                          % node.input(1)
-                          % node.name()
-                          % location.AsString()));
+        throw ParseException(fmt::format("One of the input tensors ('{}' or '{}') should be constant in node '{}' {}",
+                                         node.input(0),
+                                         node.input(1),
+                                         node.name(),
+                                         location.AsString()));
     }
     if(constName)
     {
@@ -806,10 +794,10 @@ void OnnxParser::To1DTensor(const std::string& name, const Location& location)
     {
         if(shape[i] != 1)
         {
-            throw ParseException(boost::str(
-                boost::format("Only tensors with shape [1, ..., 1, X] can be converted to 1D and %1% %2%")
-                             % TensorInfoAsString(*m_TensorsInfo[name].m_info, name, m_TensorsInfo[name].m_dtype)
-                             % location.AsString()));
+            throw ParseException(
+                fmt::format("Only tensors with shape [1, ..., 1, X] can be converted to 1D and {} {}",
+                            TensorInfoAsString(*m_TensorsInfo[name].m_info, name, m_TensorsInfo[name].m_dtype),
+                            location.AsString()));
         }
     }
     newShape.push_back(shape[shape.GetNumDimensions() - 1]);
@@ -841,11 +829,10 @@ void OnnxParser::AddConvLayerWithDepthwiseConv(const onnx::NodeProto& node, cons
     {
         if(!m_TensorsInfo[node.input(2)].isConstant())
         {
-            throw ParseException(boost::str(
-                boost::format("Bias '%1%' should be constant in Conv layer '%2%' %3%")
-                % node.input(2)
-                % node.name()
-                % CHECK_LOCATION().AsString()));
+            throw ParseException(fmt::format("Bias '{}' should be constant in Conv layer '{}' {}",
+                                             node.input(2),
+                                             node.name(),
+                                             CHECK_LOCATION().AsString()));
         }
         desc.m_BiasEnabled = true;
         auto biasTensor = CreateConstTensor(node.input(2));
@@ -910,17 +897,16 @@ void OnnxParser::AddFullyConnected(const onnx::NodeProto& matmulNode, const onnx
 
         if (weightInfo.GetShape()[1] != biasInfo.GetShape()[0])
         {
-            throw ParseException(boost::str(
-                boost::format("Shape of weights '%1%' and bias of following Add node '%2%' do not match : %3%"
-                              " and %4% ( /!\\ bias should be a 1D tensor) %5%")
-                              % weightName
-                              % addNode->name()
-                              % TensorInfoAsString(*m_TensorsInfo[weightName].m_info,
-                                                   weightName,
-                                                   m_TensorsInfo[weightName].m_dtype)
-                              % TensorInfoAsString(*m_TensorsInfo[biasName].m_info, biasName,
-                                                   m_TensorsInfo[biasName].m_dtype )
-                              % CHECK_LOCATION().AsString()));
+            throw ParseException(
+                fmt::format("Shape of weights '{}' and bias of following Add node '{}' do not match : {}"
+                            " and {} ( /!\\ bias should be a 1D tensor) {}",
+                            weightName,
+                            addNode->name(),
+                            TensorInfoAsString(*m_TensorsInfo[weightName].m_info, weightName,
+                                               m_TensorsInfo[weightName].m_dtype),
+                            TensorInfoAsString(*m_TensorsInfo[biasName].m_info, biasName,
+                                               m_TensorsInfo[biasName].m_dtype ),
+                            CHECK_LOCATION().AsString()));
         }
         layer = m_Network->AddFullyConnectedLayer(desc,
                                                   CreateConstTensor(weightName).first,
@@ -1000,12 +986,11 @@ void OnnxParser::AddPoolingLayer(const onnx::NodeProto& node, Pooling2dDescripto
             }
             else
             {
-                throw ParseException(boost::str(
-                    boost::format("Invalid auto_pad attribute for node %1%. "
-                                  "Only SAME_UPPER, SAME_LOWER or VALID supported and found %2% %3%")
-                    % node.name()
-                    % paddingString
-                    % CHECK_LOCATION().AsString()));
+                throw ParseException(fmt::format("Invalid auto_pad attribute for node {}. "
+                                                 "Only SAME_UPPER, SAME_LOWER or VALID supported and found {} {}",
+                                                 node.name(),
+                                                 paddingString,
+                                                 CHECK_LOCATION().AsString()));
             }
             auto inputInfo = *m_TensorsInfo[node.input(0)].m_info;
             uint32_t inputHeight = inputInfo.GetShape()[2];
@@ -1046,13 +1031,13 @@ std::pair<std::string, std::string> OnnxParser::AddPrepareBroadcast(const std::s
 
     if(input1Shape.GetNumDimensions() < input0Shape.GetNumDimensions())
     {
-        auto outputName = boost::str(boost::format("reshape_output_%1%") % input1);
+        auto outputName = fmt::format("reshape_output_{}", input1);
         PrependForBroadcast(outputName, input1, input0);
         inputs.second = outputName;
     }
     else if(input0Shape.GetNumDimensions() < input1Shape.GetNumDimensions())
     {
-        auto outputName = boost::str(boost::format("reshape_output_%1%") % input0);
+        auto outputName = fmt::format("reshape_output_{}", input0);
         PrependForBroadcast(outputName, input0, input1);
         inputs.first = outputName;
     }
@@ -1166,16 +1151,16 @@ void OnnxParser::ParseAdd(const onnx::NodeProto& node)
         unsigned int dim1 = input1.GetShape()[i];
         if (dim0 != dim1 && dim0 != 1 && dim1 != 1)
         {
-            throw ParseException(boost::str(
-                boost::format("Broadcast is only supported for scalar or 1D tensors in Add node '%1%'. "
-                              "Input dimensions should either match or one should be of size 1 and here, "
-                              "%2% and %3% %4%")
-                % node.name()
-                % TensorInfoAsString(*m_TensorsInfo[inputs.first].m_info, inputs.first,
-                                     m_TensorsInfo[inputs.first].m_dtype)
-                % TensorInfoAsString(*m_TensorsInfo[inputs.second].m_info, inputs.second,
-                                     m_TensorsInfo[inputs.second].m_dtype)
-                % CHECK_LOCATION().AsString()));
+            throw ParseException(
+                fmt::format("Broadcast is only supported for scalar or 1D tensors in Add node '{}'. "
+                            "Input dimensions should either match or one should be of size 1 and here, "
+                            "{} and {} {}",
+                            node.name(),
+                            TensorInfoAsString(*m_TensorsInfo[inputs.first].m_info, inputs.first,
+                                               m_TensorsInfo[inputs.first].m_dtype),
+                            TensorInfoAsString(*m_TensorsInfo[inputs.second].m_info, inputs.second,
+                                               m_TensorsInfo[inputs.second].m_dtype),
+                            CHECK_LOCATION().AsString()));
         }
     }
 
@@ -1190,10 +1175,10 @@ void OnnxParser::ParseAdd(const onnx::NodeProto& node)
 
     // register the input connection -> for constant inputs, we need to make a newDim constant layer
     if(m_TensorsInfo[inputs.first].isConstant()) {
-        CreateConstantLayer(inputs.first, boost::str(boost::format("Add:constant_of_%1%") % node.input(0)));
+        CreateConstantLayer(inputs.first, fmt::format("Add:constant_of_{}", node.input(0)));
     }
     if(m_TensorsInfo[inputs.second].isConstant()) {
-        CreateConstantLayer(inputs.second, boost::str(boost::format("Add:constant_of_%1%") % node.input(1)));
+        CreateConstantLayer(inputs.second, fmt::format("Add:constant_of_{}", node.input(1)));
     }
     RegisterInputSlots(layer, {inputs.first, inputs.second});
 
@@ -1227,11 +1212,11 @@ void OnnxParser::ParseBatchNormalization(const onnx::NodeProto& node)
         auto tensor = node.input(ind);
         if(! m_TensorsInfo[tensor].isConstant())
         {
-            throw ParseException(boost::str(
-                boost::format("Input tensor '%1%' should be constant in BatchNormalization node '%2%' %3%")
-                % tensor
-                % node.name()
-                % CHECK_LOCATION().AsString()));
+            throw ParseException(
+                fmt::format("Input tensor '{}' should be constant in BatchNormalization node '{}' {}",
+                            tensor,
+                            node.name(),
+                            CHECK_LOCATION().AsString()));
         }
     }
 
@@ -1266,10 +1251,9 @@ void OnnxParser::ParseConstant(const onnx::NodeProto& node)
     CHECK_VALID_SIZE(static_cast<size_t>(node.attribute_size()), 1);
     if (!node.attribute(0).has_t())
     {
-        throw ParseException(boost::str(
-              boost::format("Value not found for Constant node '%1%' %2%")
-              % node.name()
-              % CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("Value not found for Constant node '{}' {}",
+                                         node.name(),
+                                         CHECK_LOCATION().AsString()));
     }
     const onnx::TensorProto& onnxTensor = node.attribute(0).t();
 
@@ -1294,21 +1278,21 @@ void OnnxParser::ParseConv(const onnx::NodeProto& node)
 
     if(m_TensorsInfo[node.input(0)].m_info->GetNumDimensions() != 4)
     {
-        throw ParseException(boost::str(
-            boost::format("ArmNN only supports 2D convolution and Conv layer '%1%' input %2% %3%")
-            % node.name()
-            % TensorInfoAsString(*m_TensorsInfo[node.input(0)].m_info, node.input(0),
-                                 m_TensorsInfo[node.input(0)].m_dtype)
-            % CHECK_LOCATION().AsString()));
+        throw ParseException(
+            fmt::format("ArmNN only supports 2D convolution and Conv layer '{}' input {} {}",
+                        node.name(),
+                        TensorInfoAsString(*m_TensorsInfo[node.input(0)].m_info, node.input(0),
+                                           m_TensorsInfo[node.input(0)].m_dtype),
+                        CHECK_LOCATION().AsString()));
     }
 
     if(!m_TensorsInfo[node.input(1)].isConstant())
     {
-        throw ParseException(boost::str(
-            boost::format("Weights '%1%' should be constant in Conv layer '%2%' %3%")
-            % node.input(1)
-            % node.name()
-            % CHECK_LOCATION().AsString()));
+        throw ParseException(
+            fmt::format("Weights '{}' should be constant in Conv layer '{}' {}",
+                        node.input(1),
+                        node.name(),
+                        CHECK_LOCATION().AsString()));
     }
 
     auto inputInfo = *m_TensorsInfo[node.input(0)].m_info;
@@ -1324,12 +1308,10 @@ void OnnxParser::ParseConv(const onnx::NodeProto& node)
             if (dilation != 1u)
             {
                 ss << "... ]";
-                throw ParseException(boost::str(
-                    boost::format("ArmNN only supports Convolution layers with dilations [1,1], and node '%1%' "
-                                  "has dilatation %2% %3%")
-                    % node.name()
-                    % ss.str()
-                    % CHECK_LOCATION().AsString()));
+                throw ParseException(
+                    fmt::format("ArmNN only supports Convolution layers with dilations [1,1], and node '{}' "
+                                "has dilatation {} {}",
+                                node.name(), ss.str(), CHECK_LOCATION().AsString()));
             }
         }
     }
@@ -1368,12 +1350,12 @@ void OnnxParser::ParseConv(const onnx::NodeProto& node)
             }
             else
             {
-                throw ParseException(boost::str(
-                    boost::format("Invalid auto_pad attribute for node %1%. "
-                                  "Only SAME_UPPER, SAME_LOWER or VALID supported and found %2% %3%")
-                    % node.name()
-                    % paddingString
-                    % CHECK_LOCATION().AsString()));
+                throw ParseException(
+                    fmt::format("Invalid auto_pad attribute for node {}. Only SAME_UPPER, SAME_LOWER or VALID "
+                                "supported and found {} {}",
+                                node.name(),
+                                paddingString,
+                                CHECK_LOCATION().AsString()));
             }
             uint32_t inputHeight = inputInfo.GetShape()[2];
             uint32_t inputWidth  = inputInfo.GetShape()[3];
@@ -1410,15 +1392,13 @@ void OnnxParser::ParseConv(const onnx::NodeProto& node)
         if (group > inputInfo.GetShape()[1])
         {
             throw ParseException(
-                boost::str(
-                    boost::format(
-                        "Error parsing Convolution node: %1%. "
-                        "The 'group'=%2% parameter cannot be larger than the "
-                        "channel of the input shape=%3% (in NCHW format). %4%") %
-                    node.name() %
-                    group %
-                    inputInfo.GetShape()[1] %
-                    CHECK_LOCATION().AsString()));
+                fmt::format("Error parsing Convolution node: {}. "
+                            "The 'group'={} parameter cannot be larger than the "
+                            "channel of the input shape={} (in NCHW format). {}",
+                            node.name(),
+                            group,
+                            inputInfo.GetShape()[1],
+                            CHECK_LOCATION().AsString()));
         }
         else if (group == inputInfo.GetShape()[1])
         {
@@ -1431,14 +1411,13 @@ void OnnxParser::ParseConv(const onnx::NodeProto& node)
         {
             // TODO: split the input by channels into channels/groups separate convolutions
             //  and concatenate the results afterwards
-            throw ParseException(boost::str(
-                boost::format("Error parsing Convolution node: %1%. "
-                              "The 'group'=%2% parameter should be 1 or be equal to the "
-                              "channel of the input shape=%3% (in NCHW format). %4%") %
-                node.name() %
-                group %
-                inputInfo.GetShape()[1] %
-                CHECK_LOCATION().AsString()));
+            throw ParseException(fmt::format("Error parsing Convolution node: {}. "
+                                             "The 'group'={} parameter should be 1 or be equal to the "
+                                             "channel of the input shape={} (in NCHW format). {}",
+                                             node.name(),
+                                             group,
+                                             inputInfo.GetShape()[1],
+                                             CHECK_LOCATION().AsString()));
         }
     }
 
@@ -1449,11 +1428,10 @@ void OnnxParser::ParseConv(const onnx::NodeProto& node)
     {
         if(!m_TensorsInfo[node.input(2)].isConstant())
         {
-            throw ParseException(boost::str(
-                boost::format("Bias '%1%' should be constant in Conv layer '%2%' %3%")
-                % node.input(2)
-                % node.name()
-                % CHECK_LOCATION().AsString()));
+            throw ParseException(fmt::format("Bias '{}' should be constant in Conv layer '{}' {}",
+                                             node.input(2),
+                                             node.name(),
+                                             CHECK_LOCATION().AsString()));
         }
         desc.m_BiasEnabled = true;
         auto biasTensor = CreateConstTensor(node.input(2));
@@ -1505,9 +1483,8 @@ void OnnxParser::ParseFlatten(const onnx::NodeProto& node)
     /// Check Axis is within dimensions
     if (axis < 0 || axis >= inputShape.GetNumDimensions())
     {
-        throw ParseException( boost::str(
-            boost::format("Axis '%1%' invalid. Tensor has '%2%' dimensions in FlattenLayer '%3%'")
-            % axis % inputShape.GetNumDimensions() % node.name()));
+        throw ParseException(fmt::format("Axis '{}' invalid. Tensor has '{}' dimensions in FlattenLayer '{}'",
+                                         axis, inputShape.GetNumDimensions(), node.name()));
     }
 
     /// If axis chosen is 0 dimension1 will always be 1 in output , default dimension2 to 1 because 0 is invalid
@@ -1578,11 +1555,10 @@ void OnnxParser::ParseReshape(const onnx::NodeProto& node)
 
     if(!m_TensorsInfo[node.input(1)].isConstant())
     {
-        throw ParseException(boost::str(
-            boost::format("Shape '%1%' should be constant in Reshape layer '%2%' %3%")
-            % node.input(1)
-            % node.name()
-            % CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("Shape '{}' should be constant in Reshape layer '{}' {}",
+                                         node.input(1),
+                                         node.name(),
+                                         CHECK_LOCATION().AsString()));
     }
 
     if(m_TensorsInfo[node.input(0)].isConstant())
@@ -1648,7 +1624,7 @@ void OnnxParser::PrependForBroadcast(const std::string& outputName,
     //add reshape layer if the parent was not constant...
     if( ! m_TensorsInfo[input0].isConstant())
     {
-        CreateReshapeLayer(input0, outputName, boost::str(boost::format("Add:reshapeOf%1%") % input0));
+        CreateReshapeLayer(input0, outputName, fmt::format("Add:reshapeOf{}", input0));
     }
     else //make it constant and it will be create in Add
     {
@@ -1679,8 +1655,7 @@ void OnnxParser::SetupOutputLayers()
 {
     if(m_Graph->output_size() == 0)
     {
-        throw ParseException(boost::str(boost::format("The given model does not have any outputs %1%")
-                                                      % CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("The given model does not have any outputs {}", CHECK_LOCATION().AsString()));
     }
 
     for(int outputIndex = 0; outputIndex < m_Graph->output_size(); ++outputIndex)
@@ -1699,10 +1674,10 @@ void OnnxParser::RegisterInputSlots(IConnectableLayer* layer, const std::vector<
     if (tensorIds.size() != layer->GetNumInputSlots())
     {
         throw ParseException(
-            boost::str(boost::format("The number of tensor inputs (%1%) does not match the number expected (%2%) %3%") %
-                       tensorIds.size() %
-                       layer->GetNumInputSlots() %
-                       CHECK_LOCATION().AsString()));
+            fmt::format("The number of tensor inputs ({}) does not match the number expected ({}) {}",
+                        tensorIds.size(),
+                        layer->GetNumInputSlots(),
+                        CHECK_LOCATION().AsString()));
     }
     for (unsigned int slotIndex = 0; slotIndex < layer->GetNumInputSlots(); ++slotIndex)
     {
@@ -1726,10 +1701,10 @@ void OnnxParser::RegisterOutputSlots(IConnectableLayer* layer, const std::vector
     if (tensorIds.size() != layer->GetNumOutputSlots())
     {
         throw ParseException(
-            boost::str(boost::format("The number of tensor outputs (%1%) does not match the number expected (%2%) %3% ")
-                       % tensorIds.size()
-                       % layer->GetNumOutputSlots()
-                       % CHECK_LOCATION().AsString()));
+            fmt::format("The number of tensor outputs ({}) does not match the number expected ({}) {} ",
+                        tensorIds.size(),
+                        layer->GetNumOutputSlots(),
+                        CHECK_LOCATION().AsString()));
     }
 
     for (unsigned int slotIndex = 0; slotIndex < layer->GetNumOutputSlots(); ++slotIndex)
@@ -1750,11 +1725,10 @@ void OnnxParser::RegisterOutputSlots(IConnectableLayer* layer, const std::vector
         // assuming there is only one producer for that tensor
         if (tensorSlots.outputSlot != nullptr)
         {
-            throw ParseException(boost::str(
-                    boost::format("Another layer has already registered itself as the producer of "
-                                  "tensor:%1% %2%")
-                                  % tensorId
-                                  % CHECK_LOCATION().AsString()));
+            throw ParseException(fmt::format("Another layer has already registered itself as the producer of "
+                                             "tensor:{} {}",
+                                             tensorId,
+                                             CHECK_LOCATION().AsString()));
         }
         tensorSlots.outputSlot = slot;
     }
@@ -1770,8 +1744,8 @@ BindingPointInfo OnnxParser::GetNetworkInputBindingInfo(const std::string& name)
             return std::make_pair(static_cast<armnn::LayerBindingId>(i), ToTensorInfo(input));
         }
     }
-    throw InvalidArgumentException(boost::str(boost::format("The input layer '%1%' does not exist %2%")
-                                                            % name % CHECK_LOCATION().AsString()));
+    throw InvalidArgumentException(fmt::format("The input layer '{}' does not exist {}",
+                                               name, CHECK_LOCATION().AsString()));
 }
 
 BindingPointInfo OnnxParser::GetNetworkOutputBindingInfo(const std::string& name) const
@@ -1784,16 +1758,15 @@ BindingPointInfo OnnxParser::GetNetworkOutputBindingInfo(const std::string& name
             return std::make_pair(static_cast<armnn::LayerBindingId>(i), ToTensorInfo(output));
         }
     }
-    throw InvalidArgumentException(boost::str(boost::format("The output layer '%1%' does not exist %2%")
-                                                            % name % CHECK_LOCATION().AsString()));
+    throw InvalidArgumentException(fmt::format("The output layer '{}' does not exist {}",
+                                               name, CHECK_LOCATION().AsString()));
 }
 
 std::vector<std::string> OnnxParser::GetInputs(ModelPtr& model)
 {
     if(model == nullptr) {
-        throw InvalidArgumentException(boost::str(
-            boost::format("The given model cannot be null %1%")
-            % CHECK_LOCATION().AsString()));
+        throw InvalidArgumentException(fmt::format("The given model cannot be null {}",
+                                                   CHECK_LOCATION().AsString()));
     }
 
     std::vector<std::string> inputNames;
@@ -1816,9 +1789,8 @@ std::vector<std::string> OnnxParser::GetInputs(ModelPtr& model)
 std::vector<std::string> OnnxParser::GetOutputs(ModelPtr& model)
 {
     if(model == nullptr) {
-        throw InvalidArgumentException(boost::str(
-            boost::format("The given model cannot be null %1%")
-            % CHECK_LOCATION().AsString()));
+        throw InvalidArgumentException(fmt::format("The given model cannot be null {}",
+                                                   CHECK_LOCATION().AsString()));
     }
 
     std::vector<std::string> outputNames;

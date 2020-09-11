@@ -27,7 +27,7 @@
 
 #include <flatbuffers/flexbuffers.h>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 #include <fstream>
 #include <algorithm>
@@ -58,23 +58,21 @@ void CheckSubgraph(const TfLiteParser::ModelPtr & model,
     if (model.get() == nullptr)
     {
         throw ParseException(
-            boost::str(
-                boost::format("%1% was called with invalid (null) model. "
-                              "Possible reason is that the model is not yet loaded and Unpack(ed). "
-                              "subgraph:%2% at %3%") %
-                              location.m_Function %
-                              subgraphIndex %
-                              location.FileLine()));
+            fmt::format("{} was called with invalid (null) model. "
+                        "Possible reason is that the model is not yet loaded and Unpack(ed). "
+                        "subgraph:{} at {}",
+                        location.m_Function,
+                        subgraphIndex,
+                        location.FileLine()));
     }
     else if (subgraphIndex >= model->subgraphs.size())
     {
         throw ParseException(
-            boost::str(
-                boost::format("%1% was called with an invalid subgraph index. "
-                              "subgraph:%2% at %3%") %
-                              location.m_Function %
-                              subgraphIndex %
-                              location.FileLine()));
+            fmt::format("{} was called with an invalid subgraph index. "
+                        "subgraph:{} at {}",
+                        location.m_Function,
+                        subgraphIndex,
+                        location.FileLine()));
     }
 }
 
@@ -89,37 +87,34 @@ void CheckModel(const TfLiteParser::ModelPtr & model,
     if (model.get() == nullptr)
     {
         throw ParseException(
-            boost::str(
-                boost::format("%1% was called with invalid (null) model. "
-                                "Possible reason is that the model is not yet loaded and Unpack(ed). "
-                                "subgraph:%2% operator:%3% at %4%") %
-                                location.m_Function %
-                                subgraphIndex %
-                                operatorIndex %
-                                location.FileLine()));
+            fmt::format("{} was called with invalid (null) model. "
+                        "Possible reason is that the model is not yet loaded and Unpack(ed). "
+                        "subgraph:{} operator:{} at {}",
+                        location.m_Function,
+                        subgraphIndex,
+                        operatorIndex,
+                        location.FileLine()));
     }
     else if (subgraphIndex >= model->subgraphs.size())
     {
         throw ParseException(
-            boost::str(
-                boost::format("%1% was called with an invalid subgraph index. "
-                                "subgraph:%2% operator:%3% at %4%") %
-                                location.m_Function %
-                                subgraphIndex %
-                                operatorIndex %
-                                location.FileLine()));
+            fmt::format("{} was called with an invalid subgraph index. "
+                        "subgraph:{} operator:{} at {}",
+                        location.m_Function,
+                        subgraphIndex,
+                        operatorIndex,
+                        location.FileLine()));
     }
     else if (operatorIndex >= model->subgraphs[subgraphIndex]->operators.size() &&
              operatorIndex != VIRTUAL_OPERATOR_ID)
     {
         throw ParseException(
-            boost::str(
-                boost::format("%1% was called with an invalid operator index. "
-                                "subgraph:%2% operator:%3% at %4%") %
-                                location.m_Function %
-                                subgraphIndex %
-                                operatorIndex %
-                                location.FileLine()));
+            fmt::format("{} was called with an invalid operator index. "
+                        "subgraph:{} operator:{} at {}",
+                        location.m_Function,
+                        subgraphIndex,
+                        operatorIndex,
+                        location.FileLine()));
     }
 }
 
@@ -143,13 +138,12 @@ void CheckTensor(const TfLiteParser::ModelPtr & model,
     if (tensorIndex >= model->subgraphs[subgraphIndex]->tensors.size())
     {
         throw ParseException(
-            boost::str(
-                boost::format("%1% was called with an invalid tensor index. "
-                                "subgraph:%2% tensor:%3% at %4%") %
-                                location.m_Function %
-                                subgraphIndex %
-                                tensorIndex %
-                                location.FileLine()));
+            fmt::format("{} was called with an invalid tensor index. "
+                        "subgraph:{} tensor:{} at {}",
+                        location.m_Function,
+                        subgraphIndex,
+                        tensorIndex,
+                        location.FileLine()));
     }
 }
 
@@ -162,12 +156,7 @@ void CheckTensorPtr(TfLiteParser::TensorRawPtr rawPtr,
     if (rawPtr == nullptr)
     {
         throw ParseException(
-            boost::str(
-                boost::format("%1% was called with a null tensor pointer. "
-                              "at %2%") %
-                              location.m_Function %
-                              location.FileLine()));
-
+            fmt::format("{} was called with a null tensor pointer at {}", location.m_Function, location.FileLine()));
     }
 }
 
@@ -181,31 +170,28 @@ void CheckBuffer(const TfLiteParser::ModelPtr & model,
     if (model.get() == nullptr)
     {
         throw ParseException(
-            boost::str(
-                boost::format("%1% was called with invalid (null) model. "
-                              "Possible reason is that the model is not yet loaded and Unpack(ed). "
-                              "buffer:%2% at %3%") %
-                              location.m_Function %
-                              bufferIndex %
-                              location.FileLine()));
+            fmt::format("{} was called with invalid (null) model. "
+                        "Possible reason is that the model is not yet loaded and Unpack(ed). "
+                        "buffer:{} at {}",
+                        location.m_Function,
+                        bufferIndex,
+                        location.FileLine()));
     }
     else if (bufferIndex >= model->buffers.size())
     {
         throw ParseException(
-            boost::str(
-                boost::format("%1% was called with an invalid buffer index. "
-                              "buffer index:%2% at %3%") %
-                              location.m_Function %
-                              bufferIndex %
-                              location.FileLine()));
+            fmt::format("{} was called with an invalid buffer index. "
+                        "buffer index:{} at {}",
+                        location.m_Function,
+                        bufferIndex,
+                        location.FileLine()));
     }
     else if (model->buffers[bufferIndex].get() == nullptr)
     {
         throw ParseException(
-            boost::str(
-                boost::format("The buffer #%1% is null. %3%") %
-                              bufferIndex %
-                              location.AsString()));
+            fmt::format("The buffer #{} is null. {}",
+                        bufferIndex,
+                        location.AsString()));
     }
 }
 
@@ -220,10 +206,9 @@ void CheckBufferSize(TfLiteParser::BufferRawPtr bufferPtr,
     if (bufferPtr == nullptr)
     {
         throw ParseException(
-            boost::str(
-                boost::format("BufferPtr is null for buffer:%1%. %2%") %
-                              bufferId %
-                              location.AsString()));
+            fmt::format("BufferPtr is null for buffer:{}. {}",
+                        bufferId,
+                        location.AsString()));
     }
     else if(tensorInfo.GetNumElements() > bufferPtr->data.size() ||
             tensorInfo.GetNumBytes() > bufferPtr->data.size())
@@ -263,16 +248,15 @@ bool IsActivationSupported(tflite::ActivationFunctionType activationType)
         if (IsActivationSupported(OPTION->fused_activation_function) == false) \
         { \
             throw ParseException( \
-                boost::str( \
-                    boost::format("TfLite parser doesn't suppport fused activation: " \
-                                  "%1%/%2% in %3% subgraph:%4% operator:%5% at %6%") % \
-                                  OPTION->fused_activation_function % \
-                                  tflite::EnumNameActivationFunctionType(\
-                                      OPTION->fused_activation_function) % \
-                                  __func__ % \
-                                  SUBGRAPH_INDEX % \
-                                  OPERATOR_INDEX % \
-                                  CHECK_LOCATION().FileLine())); \
+                fmt::format("TfLite parser doesn't suppport fused activation: " \
+                            "{}/{} in {} subgraph:{} operator:{} at {}", \
+                            OPTION->fused_activation_function, \
+                            tflite::EnumNameActivationFunctionType(\
+                            OPTION->fused_activation_function), \
+                            __func__, \
+                            SUBGRAPH_INDEX, \
+                            OPERATOR_INDEX, \
+                            CHECK_LOCATION().FileLine())); \
         } \
     } while(false)
 
@@ -352,12 +336,11 @@ armnn::TensorInfo ToTensorInfo(TfLiteParser::TensorRawPtr tensorPtr,
         {
             CheckLocation location = CHECK_LOCATION();
             throw ParseException(
-                boost::str(
-                    boost::format("Unsupported data type %1% = %2% for tensor: %3%. %4%") %
-                                  tensorPtr->type %
-                                  tflite::EnumNameTensorType(tensorPtr->type) %
-                                  tensorPtr->name %
-                                  location.AsString()));
+                fmt::format("Unsupported data type {} = {} for tensor: {}. {}",
+                            tensorPtr->type,
+                            tflite::EnumNameTensorType(tensorPtr->type),
+                            tensorPtr->name,
+                            location.AsString()));
         }
     }
     std::vector<unsigned int> safeShape = shapes;
@@ -470,8 +453,7 @@ CreateConstTensorImpl(TfLiteParser::BufferRawPtr bufferPtr,
     IgnoreUnused(tensorPtr);
     ARMNN_ASSERT_MSG(tensorPtr != nullptr, "tensorPtr is null");
     ARMNN_ASSERT_MSG(bufferPtr != nullptr,
-        boost::str(
-            boost::format("Buffer for buffer:%1% is null") % tensorPtr->buffer).c_str());
+        fmt::format("Buffer for buffer:{} is null", tensorPtr->buffer).c_str());
 
     std::unique_ptr<T[]> data(new T[tensorInfo.GetNumElements()]);
 
@@ -647,10 +629,9 @@ INetworkPtr TfLiteParser::CreateNetworkFromModel()
     if (m_Model->subgraphs.size() != 1)
     {
         throw ParseException(
-                boost::str(
-                        boost::format("Current TfLite parser only supports 1 subgraph. Current one has: %1% %2%") %
-                        m_Model->subgraphs.size() %
-                        CHECK_LOCATION().AsString()));
+                fmt::format("Current TfLite parser only supports 1 subgraph. Current one has: {} {}",
+                            m_Model->subgraphs.size(),
+                            CHECK_LOCATION().AsString()));
     }
 
     size_t subgraphIndex = 0;
@@ -667,10 +648,10 @@ INetworkPtr TfLiteParser::CreateNetworkFromModel()
 
                 if (builtinCode > tflite::BuiltinOperator_MAX)
                 {
-                    throw ParseException(boost::str(boost::format("Operator code %1% is out of range 0-%2%. "
-                                                                  "subgraph:%3% operator idx:%4%. %5%") %
-                                                    builtinCode % tflite::BuiltinOperator_MAX % subgraphIndex %
-                                                    operatorIndex % CHECK_LOCATION().AsString()));
+                    throw ParseException(fmt::format("Operator code {} is out of range 0-{}. "
+                                                     "subgraph:{} operator idx:{}. {}",
+                                                     builtinCode, tflite::BuiltinOperator_MAX, subgraphIndex,
+                                                     operatorIndex, CHECK_LOCATION().AsString()));
                 }
 
                 // lookup and call the parser function
@@ -732,12 +713,11 @@ void TfLiteParser::RegisterProducerOfTensor(size_t subgraphIndex,
     // assuming there is only one producer for that tensor
     if (tensorSlots.outputSlot != nullptr)
     {
-        throw ParseException(boost::str(
-                boost::format("Another layer has already registered itself as the producer of "
-                              "subgraph:%1% tensor:%2% %3%") %
-                               subgraphIndex %
-                               tensorIndex %
-                               CHECK_LOCATION().AsString()));
+        throw ParseException(fmt::format("Another layer has already registered itself as the producer of "
+                                         "subgraph:{} tensor:{} {}",
+                                         subgraphIndex,
+                                         tensorIndex,
+                                         CHECK_LOCATION().AsString()));
     }
 
     tensorSlots.outputSlot = slot;
@@ -790,16 +770,15 @@ void TfLiteParser::ParseUnsupportedOperator(size_t subgraphIndex, size_t operato
     {
         // Do not add StandInLayer, throw ParseException instead
         throw ParseException(
-            boost::str(
-                boost::format("Operator not supported. "
-                              "subgraph:%1% operator:%2% "
-                              "opcode_index:%3% opcode:%4% / %5% %6%") %
-                              subgraphIndex %
-                              operatorIndex %
-                              opcodeIndex %
-                              opcode %
-                              tflite::EnumNameBuiltinOperator(opcode) %
-                              CHECK_LOCATION().AsString()));
+            fmt::format("Operator not supported. "
+                        "subgraph:{} operator:{} "
+                        "opcode_index:{} opcode:{} / {} {}",
+                        subgraphIndex,
+                        operatorIndex,
+                        opcodeIndex,
+                        opcode,
+                        tflite::EnumNameBuiltinOperator(opcode),
+                        CHECK_LOCATION().AsString()));
     }
 
     auto inputs  = GetInputs(m_Model, subgraphIndex, operatorIndex);
@@ -809,7 +788,7 @@ void TfLiteParser::ParseUnsupportedOperator(size_t subgraphIndex, size_t operato
     const unsigned int numOutputs = armnn::numeric_cast<unsigned int>(outputs.size());
 
     StandInDescriptor descriptor(numInputs, numOutputs);
-    auto layerName = boost::str(boost::format("StandIn:%1%:%2%:%3%") % subgraphIndex % operatorIndex % opcode);
+    auto layerName = fmt::format("StandIn:{}:{}:{}", subgraphIndex, operatorIndex, opcode);
 
     // Add a non-executable StandInLayer as a placeholder for any unsupported operator
     IConnectableLayer* layer = m_Network->AddStandInLayer(descriptor, layerName.c_str());
@@ -872,7 +851,7 @@ void TfLiteParser::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
                                                  armnn::Optional<armnn::PermutationVector&>());
     armnn::IConnectableLayer* layer = nullptr;
 
-    auto layerName = boost::str(boost::format("Conv2D:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Conv2D:{}:{}", subgraphIndex, operatorIndex);
 
     if (inputs.size() == 3)
     {
@@ -960,7 +939,7 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
 
     auto filterTensorAndData = CreateConstTensor(inputs[1], filterTensorInfo, permutationVector);
     armnn::IConnectableLayer* layer = nullptr;
-    auto layerName = boost::str(boost::format("DepthwiseConv2D:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("DepthwiseConv2D:{}:{}", subgraphIndex, operatorIndex);
 
     if (inputs.size() == 3)
     {
@@ -1007,7 +986,7 @@ void TfLiteParser::ParseDequantize(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    auto layerName = boost::str(boost::format("Dequantize:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Dequantize:{}:{}", subgraphIndex, operatorIndex);
 
     IConnectableLayer* layer = m_Network->AddDequantizeLayer(layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
@@ -1032,7 +1011,7 @@ void TfLiteParser::ParseExp(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    auto layerName = boost::str(boost::format("Exp:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Exp:{}:{}", subgraphIndex, operatorIndex);
 
     ElementwiseUnaryDescriptor desc;
     desc.m_Operation = UnaryOperation::Exp;
@@ -1059,7 +1038,7 @@ void TfLiteParser::ParseTranspose(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    auto layerName = boost::str(boost::format("Transpose:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Transpose:{}:{}", subgraphIndex, operatorIndex);
     TransposeDescriptor desc;
 
     if (inputs.size() == 2)
@@ -1161,7 +1140,7 @@ void TfLiteParser::ParseTransposeConv(size_t subgraphIndex, size_t operatorIndex
                                                  armnn::Optional<armnn::PermutationVector&>());
 
     armnn::IConnectableLayer* layer = nullptr;
-    auto layerName = boost::str(boost::format("TransposeConv:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("TransposeConv:{}:{}", subgraphIndex, operatorIndex);
 
     layer = m_Network->AddTransposeConvolution2dLayer(desc,
                                                       filterTensorAndData.first,
@@ -1220,7 +1199,7 @@ void TfLiteParser::ParseBatchToSpaceND(size_t subgraphIndex, size_t operatorInde
     desc.m_Crops = crops;
     desc.m_DataLayout = armnn::DataLayout::NHWC;
 
-    auto layerName = boost::str(boost::format("BatchToSpaceND:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("BatchToSpaceND:{}:{}", subgraphIndex, operatorIndex);
 
     TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
@@ -1249,7 +1228,7 @@ void TfLiteParser::ParseL2Normalization(size_t subgraphIndex, size_t operatorInd
 
     L2NormalizationDescriptor desc;
     desc.m_DataLayout = armnn::DataLayout::NHWC;
-    auto layerName = boost::str(boost::format("L2Normalization:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("L2Normalization:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddL2NormalizationLayer(desc, layerName.c_str());
 
     ARMNN_ASSERT(layer != nullptr);
@@ -1279,7 +1258,7 @@ void TfLiteParser::ParseMaximum(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    auto layerName = boost::str(boost::format("Maximum:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Maximum:{}:{}", subgraphIndex, operatorIndex);
 
     TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     TensorInfo input1TensorInfo = ToTensorInfo(inputs[1]);
@@ -1309,7 +1288,7 @@ void TfLiteParser::ParseMinimum(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    auto layerName = boost::str(boost::format("Minimum:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Minimum:{}:{}", subgraphIndex, operatorIndex);
 
     TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     TensorInfo input1TensorInfo = ToTensorInfo(inputs[1]);
@@ -1346,11 +1325,11 @@ void TfLiteParser::ParsePool(size_t subgraphIndex,
     {
         case PoolingAlgorithm::Average:
             layerName =
-                boost::str(boost::format("AveragePool2D:%1%:%2%") % subgraphIndex % operatorIndex);
+                fmt::format("AveragePool2D:{}:{}", subgraphIndex, operatorIndex);
             break;
         case PoolingAlgorithm::Max:
             layerName =
-                boost::str(boost::format("MaxPool2D:%1%:%2%") % subgraphIndex % operatorIndex);
+                fmt::format("MaxPool2D:{}:{}", subgraphIndex, operatorIndex);
             break;
         default:
             ARMNN_ASSERT_MSG(false, "Unsupported Pooling Algorithm");
@@ -1427,7 +1406,7 @@ void TfLiteParser::ParseSlice(size_t subgraphIndex, size_t operatorIndex)
     ::memcpy(size.data(), sizeBufferPtr->data.data(), sizeTensorInfo.GetNumBytes());
     desc = SliceDescriptor(begin, size);
 
-    auto layerName = boost::str(boost::format("Slice:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Slice:{}:{}", subgraphIndex, operatorIndex);
 
     TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
@@ -1460,7 +1439,7 @@ void TfLiteParser::ParseSoftmax(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    auto layerName = boost::str(boost::format("Softmax:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Softmax:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* const layer = m_Network->AddSoftmaxLayer(desc, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
@@ -1510,7 +1489,7 @@ void TfLiteParser::ParseSpaceToBatchND(size_t subgraphIndex, size_t operatorInde
     desc.m_PadList = padList;
     desc.m_DataLayout = armnn::DataLayout::NHWC;
 
-    auto layerName = boost::str(boost::format("SpaceToBatchND:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("SpaceToBatchND:{}:{}", subgraphIndex, operatorIndex);
 
     TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
@@ -1591,7 +1570,7 @@ void TfLiteParser::ParseSqueeze(size_t subgraphIndex, size_t operatorIndex)
 
     const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
     const auto * options = operatorPtr->builtin_options.AsSqueezeOptions();
-    auto layerName = boost::str(boost::format("Squeeze:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Squeeze:{}:{}", subgraphIndex, operatorIndex);
 
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     armnn::TensorInfo outputTensorInfo =
@@ -1656,7 +1635,7 @@ void TfLiteParser::ParseStridedSlice(size_t subgraphIndex, size_t operatorIndex)
     desc.m_End = end;
     desc.m_Stride = stride;
 
-    auto layerName = boost::str(boost::format("StridedSlice:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("StridedSlice:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddStridedSliceLayer(desc, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
@@ -1686,7 +1665,7 @@ void TfLiteParser::ParseSub(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     armnn::TensorInfo input1TensorInfo = ToTensorInfo(inputs[1]);
 
-    auto layerName = boost::str(boost::format("Sub:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Sub:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddSubtractionLayer(layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
@@ -1718,7 +1697,7 @@ void TfLiteParser::ParseDiv(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     armnn::TensorInfo input1TensorInfo = ToTensorInfo(inputs[1]);
 
-    auto layerName = boost::str(boost::format("Div:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Div:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddDivisionLayer(layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
@@ -1749,7 +1728,7 @@ void TfLiteParser::ParseAdd(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     armnn::TensorInfo input1TensorInfo = ToTensorInfo(inputs[1]);
 
-    auto layerName = boost::str(boost::format("Add:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Add:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddAdditionLayer(layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
@@ -1780,7 +1759,7 @@ void TfLiteParser::ParseMul(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     armnn::TensorInfo input1TensorInfo = ToTensorInfo(inputs[1]);
 
-    auto layerName = boost::str(boost::format("Mul:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Mul:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddMultiplicationLayer(layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
@@ -1819,7 +1798,7 @@ void TfLiteParser::ParseMean(size_t subgraphIndex, size_t operatorIndex)
         inputTensorInfo.GetNumDimensions() == outputTensorInfo.GetNumDimensions() ?
             true : false;
 
-    auto layerName = boost::str(boost::format("Mean:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Mean:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddMeanLayer(desc, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
@@ -1842,7 +1821,7 @@ void TfLiteParser::ParseNeg(size_t subgraphIndex, size_t operatorIndex)
   auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
   CHECK_VALID_SIZE(outputs.size(), 1);
 
-  auto layerName = boost::str(boost::format("Neg:%1%:%2%") % subgraphIndex % operatorIndex);
+  auto layerName = fmt::format("Neg:{}:{}", subgraphIndex, operatorIndex);
   armnn::ElementwiseUnaryDescriptor descriptor(armnn::UnaryOperation::Neg);
   IConnectableLayer* layer = m_Network->AddElementwiseUnaryLayer(descriptor, layerName.c_str());
   ARMNN_ASSERT(layer != nullptr);
@@ -1879,7 +1858,7 @@ void TfLiteParser::ParsePad(size_t subgraphIndex, size_t operatorIndex)
         desc.m_PadList.emplace_back(padBuffer[i * step], padBuffer[i * step + 1]);
     }
 
-    auto layerName = boost::str(boost::format("Pad:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Pad:{}:{}", subgraphIndex, operatorIndex);
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
 
     IConnectableLayer* layer = m_Network->AddPadLayer(desc, layerName.c_str());
@@ -1903,7 +1882,7 @@ void TfLiteParser::ParseQuantize(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    auto layerName = boost::str(boost::format("Quantize:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Quantize:{}:{}", subgraphIndex, operatorIndex);
 
     IConnectableLayer* layer = m_Network->AddQuantizeLayer(layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
@@ -1960,7 +1939,7 @@ void TfLiteParser::ParseActivation(size_t subgraphIndex, size_t operatorIndex, A
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    auto layerName = str(boost::format("Activation:"));
+    auto layerName = fmt::format("Activation:");
     ActivationDescriptor activationDesc;
     activationDesc.m_Function = activationType;
 
@@ -1968,43 +1947,43 @@ void TfLiteParser::ParseActivation(size_t subgraphIndex, size_t operatorIndex, A
     {
         case ActivationFunction::ReLu:
         {
-            layerName += str(boost::format("RELU:%1%:%2%") % subgraphIndex % operatorIndex);
+            layerName += fmt::format("RELU:{}:{}", subgraphIndex, operatorIndex);
             break;
         }
         case ActivationFunction::BoundedReLu:
         {
-            layerName += str(boost::format("RELU6:%1%:%2%") % subgraphIndex % operatorIndex);
+            layerName += fmt::format("RELU6:{}:{}", subgraphIndex, operatorIndex);
             activationDesc.m_A = 6.0f;
             activationDesc.m_B = 0.0f;
             break;
         }
         case ActivationFunction::Sigmoid:
         {
-            layerName += str(boost::format("SIGMOID:%1%:%2%") % subgraphIndex % operatorIndex);
+            layerName += fmt::format("SIGMOID:{}:{}", subgraphIndex, operatorIndex);
             break;
         }
         case ActivationFunction::TanH:
         {
-            layerName += str(boost::format("TANH:%1%:%2%") % subgraphIndex % operatorIndex);
+            layerName += fmt::format("TANH:{}:{}", subgraphIndex, operatorIndex);
             activationDesc.m_A = 1.0f;
             activationDesc.m_B = 1.0f;
             break;
         }
         case ActivationFunction::LeakyReLu:
         {
-            layerName += str(boost::format("LEAKYRELU:%1%:%2%") % subgraphIndex % operatorIndex);
+            layerName += fmt::format("LEAKYRELU:{}:{}", subgraphIndex, operatorIndex);
             const auto * options = operatorPtr->builtin_options.AsLeakyReluOptions();
             activationDesc.m_A = options->alpha;
             break;
         }
         case ActivationFunction::HardSwish:
-            layerName += str(boost::format("HARDSWISH:%1%:%2%") % subgraphIndex % operatorIndex);
+            layerName += fmt::format("HARDSWISH:{}:{}", subgraphIndex, operatorIndex);
             break;
         default:
         {
             throw ParseException(
-                boost::str(boost::format("Unexpected ActivationFunction[%1%] when creating layerName "
-                                         " %2% ") %static_cast<int>(activationType)% CHECK_LOCATION().AsString()));
+                fmt::format("Unexpected ActivationFunction[{}] when creating layerName {} ",
+                            static_cast<int>(activationType), CHECK_LOCATION().AsString()));
         }
     }
 
@@ -2033,8 +2012,7 @@ armnn::TensorInfo TfLiteParser::OutputShapeOfReshape(const armnn::TensorInfo & i
         if (std::find(std::next(stretchDim), targetDimsIn.end(), -1) != targetDimsIn.end())
         {
             throw ParseException(
-                boost::str(
-                    boost::format("At most one component of shape can be -1 %1%") % CHECK_LOCATION().AsString()));
+                fmt::format("At most one component of shape can be -1 {}", CHECK_LOCATION().AsString()));
         }
 
         auto targetNumElements =
@@ -2064,7 +2042,7 @@ void TfLiteParser::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
 
     const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
     const auto * options = operatorPtr->builtin_options.AsReshapeOptions();
-    auto layerName = boost::str(boost::format("Reshape:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Reshape:{}:{}", subgraphIndex, operatorIndex);
 
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     armnn::TensorInfo actualOutputTensorInfo  = ToTensorInfo(outputs[0]);
@@ -2188,13 +2166,13 @@ void TfLiteParser::ParseResize(size_t subgraphIndex, size_t operatorIndex, Resiz
     desc.m_TargetWidth  = static_cast<uint32_t> (sizeTensorData[1]);
     desc.m_DataLayout   = armnn::DataLayout::NHWC;
 
-    auto layerName = str(boost::format("Resize:"));
+    auto layerName = fmt::format("Resize:");
 
     switch (resizeMethod)
     {
         case ResizeMethod::Bilinear:
         {
-            layerName += str(boost::format("BILINEAR:%1%:%2%") % subgraphIndex % operatorIndex);
+            layerName += fmt::format("BILINEAR:{}:{}", subgraphIndex, operatorIndex);
 
             const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
             const auto * options     = operatorPtr->builtin_options.AsResizeBilinearOptions();
@@ -2204,14 +2182,14 @@ void TfLiteParser::ParseResize(size_t subgraphIndex, size_t operatorIndex, Resiz
         }
         case ResizeMethod::NearestNeighbor:
         {
-            layerName += str(boost::format("NEARESTNEIGHBOR:%1%:%2%") % subgraphIndex % operatorIndex);
+            layerName += fmt::format("NEARESTNEIGHBOR:{}:{}", subgraphIndex, operatorIndex);
             break;
         }
         default:
         {
             throw ParseException(
-                boost::str(boost::format("Unexpected ResizeMethod[%1%] when creating layerName "
-                                         " %2% ") %static_cast<int>(resizeMethod)% CHECK_LOCATION().AsString()));
+                fmt::format("Unexpected ResizeMethod[{}] when creating layerName {} ",
+                            static_cast<int>(resizeMethod), CHECK_LOCATION().AsString()));
         }
     }
 
@@ -2263,7 +2241,7 @@ void TfLiteParser::ParseConcatenation(size_t subgraphIndex, size_t operatorIndex
             inputTensorInfo, concatDescriptor, concatDimInput, viewIndex, mergeDimOrigin);
     }
 
-    auto layerName = boost::str(boost::format("Concatenation:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Concatenation:{}:{}", subgraphIndex, operatorIndex);
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
 
     IConnectableLayer* layer = m_Network->AddConcatLayer(concatDescriptor, layerName.c_str());
@@ -2304,19 +2282,17 @@ void TfLiteParser::ParseFullyConnected(size_t subgraphIndex, size_t operatorInde
     if (weightsDimension != 2)
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "Dimension %1% for Fully Connected weights is not supported by Armnn. "
-                    "Node %2%")
-                % weightsDimension
-                % CHECK_LOCATION().AsString()));
+            fmt::format("Dimension {} for Fully Connected weights is not supported by Armnn. "
+                        "Node {}",
+                        weightsDimension,
+                        CHECK_LOCATION().AsString()));
     }
 
     auto filterTensorAndData = CreateConstTensor(inputs[1],
                                                  filterTensorInfo,
                                                  armnn::Optional<armnn::PermutationVector&>());
     armnn::IConnectableLayer* layer = nullptr;
-    auto layerName = boost::str(boost::format("FullyConnected:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("FullyConnected:{}:{}", subgraphIndex, operatorIndex);
 
     if (inputs.size() == 3)
     {
@@ -2356,17 +2332,15 @@ void TfLiteParser::ParseFullyConnected(size_t subgraphIndex, size_t operatorInde
         if (inputTensorInfo.GetNumElements() % reshapedDimensions[1] != 0)
         {
             throw ParseException(
-                    boost::str(
-                            boost::format(
-                                    "Failed to deduce input tensor shape from filter size %1%")
-                            % reshapedDimensions[1]
-                            % CHECK_LOCATION().AsString()));
+                    fmt::format("Failed to deduce input tensor shape from filter size {} {}",
+                                reshapedDimensions[1],
+                                CHECK_LOCATION().AsString()));
         }
 
         armnn::TensorInfo reshapedTensorInfo = ToTensorInfo(inputs[0]);
         reshapedTensorInfo.SetShape(armnn::TensorShape{ 2, reshapedDimensions.data() });
 
-        std::string reshapeLayerName = boost::str(boost::format("Reshape_for:%1%") % layer->GetName());
+        std::string reshapeLayerName = fmt::format("Reshape_for:{}", layer->GetName());
         armnn::ReshapeDescriptor desc;
         desc.m_TargetShape = reshapedTensorInfo.GetShape();
         armnn::IConnectableLayer* reshapeLayer = m_Network->AddReshapeLayer(desc, layerName.c_str());
@@ -2440,7 +2414,7 @@ void TfLiteParser::ParseDetectionPostProcess(size_t subgraphIndex, size_t operat
     auto anchorTensorAndData = CreateConstTensor(inputs[2], anchorTensorInfo,
                                                  armnn::Optional<armnn::PermutationVector&>());
 
-    auto layerName = boost::str(boost::format("DetectionPostProcess:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("DetectionPostProcess:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddDetectionPostProcessLayer(desc, anchorTensorAndData.first,
                                                                        layerName.c_str());
 
@@ -2498,7 +2472,7 @@ void TfLiteParser::ParsePack(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
     desc.m_InputShape = inputTensorInfo.GetShape();
 
-    auto layerName = boost::str(boost::format("Pack:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Pack:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddStackLayer(desc, layerName.c_str());
 
     ARMNN_ASSERT(layer != nullptr);
@@ -2531,13 +2505,11 @@ void TfLiteParser::ParseUnpack(size_t subgraphIndex, size_t operatorIndex)
     if (unpackAxis >= inputTensorInfo.GetNumDimensions())
     {
         throw ParseException(
-                boost::str(
-                        boost::format(
-                                "The unpack axis: %1% cannot be greater than or equal to "
-                                "the number of input dimension %2% %3%")
-                        % unpackAxis
-                        % inputTensorInfo.GetNumDimensions()
-                        % CHECK_LOCATION().AsString()));
+                fmt::format("The unpack axis: {} cannot be greater than or equal to "
+                            "the number of input dimension {} {}",
+                            unpackAxis,
+                            inputTensorInfo.GetNumDimensions(),
+                            CHECK_LOCATION().AsString()));
     }
 
     unsigned int unpackNum = CHECKED_NON_NEGATIVE(options->num);
@@ -2584,7 +2556,7 @@ void TfLiteParser::ParseUnpack(size_t subgraphIndex, size_t operatorIndex)
         splitDesc.SetViewOriginCoord(j, unpackAxis, unpackDimSizes[unpackAxis] * j);
     }
 
-    auto layerName = boost::str(boost::format("Unpack:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Unpack:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddSplitterLayer(splitDesc, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
@@ -2598,7 +2570,7 @@ void TfLiteParser::ParseUnpack(size_t subgraphIndex, size_t operatorIndex)
     for (unsigned int k = 0; k < layer->GetNumOutputSlots(); ++k)
     {
         armnn::TensorInfo outputTensorInfo  = ToTensorInfo(outputs[k], true);
-        std::string reshapeLayerName = boost::str(boost::format("Reshape_for:%1%") % layer->GetName());
+        std::string reshapeLayerName = fmt::format("Reshape_for:{}", layer->GetName());
         armnn::ReshapeDescriptor desc;
         desc.m_TargetShape = outputTensorInfo.GetShape();
         armnn::IConnectableLayer* reshapeLayer = m_Network->AddReshapeLayer(desc, layerName.c_str());
@@ -2651,13 +2623,10 @@ void TfLiteParser::ParseSplit(size_t subgraphIndex, size_t operatorIndex)
     if (inputDimSize > MaxNumOfTensorDimensions)
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "The number of dimensions: %1% for input tensors of the "
-                    "split op cannot be greater than %2% %3%")
-                    % inputTensorInfo.GetNumDimensions()
-                    % MaxNumOfTensorDimensions
-                    % CHECK_LOCATION().AsString()));
+            fmt::format("The number of dimensions: {} for input tensors of the split op cannot be greater than {} {}",
+                        inputTensorInfo.GetNumDimensions(),
+                        MaxNumOfTensorDimensions,
+                        CHECK_LOCATION().AsString()));
     }
 
     std::vector<unsigned int> splitterDimSizes(inputDimSize);
@@ -2685,7 +2654,7 @@ void TfLiteParser::ParseSplit(size_t subgraphIndex, size_t operatorIndex)
         splitDesc.SetViewOriginCoord(j, splitDim, splitterDimSizes[splitDim] * j);
     }
 
-    auto layerName = boost::str(boost::format("Split:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("Split:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddSplitterLayer(splitDesc, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
@@ -2736,13 +2705,11 @@ void TfLiteParser::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
     if (inputDimSize > MaxNumOfTensorDimensions)
     {
         throw ParseException(
-            boost::str(
-                boost::format(
-                    "The number of dimensions: %1% for input tensors of the "
-                    "SplitV op cannot be greater than %2% %3%")
-                % inputTensorInfo.GetNumDimensions()
-                % MaxNumOfTensorDimensions
-                % CHECK_LOCATION().AsString()));
+            fmt::format("The number of dimensions: {} for input tensors of the "
+                        "SplitV op cannot be greater than {} {}",
+                        inputTensorInfo.GetNumDimensions(),
+                        MaxNumOfTensorDimensions,
+                        CHECK_LOCATION().AsString()));
     }
 
     // Get split axis
@@ -2833,7 +2800,7 @@ void TfLiteParser::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
         accumSplit += splitSize;
     }
 
-    auto layerName = boost::str(boost::format("SplitV:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("SplitV:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddSplitterLayer(splitDesc, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
@@ -2862,7 +2829,7 @@ void TfLiteParser::ParseArgMax(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    auto layerName = boost::str(boost::format("ArgMax:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = fmt::format("ArgMax:{}:{}", subgraphIndex, operatorIndex);
 
     armnn::TensorInfo sizeTensorInfo0 = ToTensorInfo(inputs[0]);
     armnn::TensorInfo sizeTensorInfo1 = ToTensorInfo(inputs[1]);
@@ -2934,12 +2901,11 @@ armnn::IConnectableLayer* TfLiteParser::AddFusedActivationLayer(armnn::IConnecta
         default:
         {
             throw ParseException(
-                boost::str(
-                    boost::format("TfLite parser doesn't suppport fused activation: "
-                                  "%1%/%2% %3% ") %
-                                  activationType %
-                                  tflite::EnumNameActivationFunctionType(activationType) %
-                                  CHECK_LOCATION().AsString()));
+                fmt::format("TfLite parser doesn't suppport fused activation: "
+                            "{}/{} {} ",
+                            activationType,
+                            tflite::EnumNameActivationFunctionType(activationType),
+                            CHECK_LOCATION().AsString()));
 
         }
     }
@@ -2957,19 +2923,19 @@ TfLiteParser::ModelPtr TfLiteParser::LoadModelFromFile(const char * fileName)
 {
     if (fileName == nullptr)
     {
-        throw InvalidArgumentException(boost::str(boost::format("Invalid (null) file name %1%") %
+        throw InvalidArgumentException(fmt::format("Invalid (null) file name {}",
                                        CHECK_LOCATION().AsString()));
     }
     std::error_code errorCode;
     fs::path pathToFile(fileName);
     if (!fs::exists(pathToFile, errorCode))
     {
-        std::string locationString = CHECK_LOCATION().AsString();
-        std::string msg = boost::str(boost::format("Cannot find the file (%1%) errorCode: %2% %3%") %
-                                     fileName %
-                                     errorCode %
-                                         locationString);
-        throw FileNotFoundException(msg);
+        //fmt::format() could not be used here (format error)
+        std::stringstream msg;
+        msg << "Cannot find the file (" << fileName << ") errorCode: " << errorCode
+            << " " << CHECK_LOCATION().AsString();
+
+        throw FileNotFoundException(msg.str());
     }
     std::ifstream file(fileName, std::ios::binary);
     std::string fileContent((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
@@ -2981,17 +2947,17 @@ TfLiteParser::ModelPtr TfLiteParser::LoadModelFromBinary(const uint8_t * binaryC
 {
     if (binaryContent == nullptr)
      {
-        throw InvalidArgumentException(boost::str(boost::format("Invalid (null) binary content %1%") %
+        throw InvalidArgumentException(fmt::format("Invalid (null) binary content {}",
                                        CHECK_LOCATION().AsString()));
      }
     flatbuffers::Verifier verifier(binaryContent, len);
     if (verifier.VerifyBuffer<tflite::Model>() == false)
     {
         throw ParseException(
-            boost::str(boost::format("Buffer doesn't conform to the expected Tensorflow Lite "
-                                     "flatbuffers format. size:%1% %2%") %
-                       len %
-                       CHECK_LOCATION().AsString()));
+            fmt::format("Buffer doesn't conform to the expected Tensorflow Lite "
+                        "flatbuffers format. size:{} {}",
+                        len,
+                        CHECK_LOCATION().AsString()));
     }
     return tflite::UnPackModel(binaryContent);
 }
@@ -3098,13 +3064,13 @@ void TfLiteParser::RegisterInputSlots(size_t subgraphIndex,
     if (tensorIndexes.size() != layer->GetNumInputSlots())
     {
         throw ParseException(
-            boost::str(boost::format("The number of tensor inputs (%1%) does not match the number expected (%2%)"
-                                     " for subgraph:%3% operator index:%4% %5%") %
-                       tensorIndexes.size() %
-                       layer->GetNumInputSlots() %
-                       subgraphIndex %
-                       operatorIndex %
-                       CHECK_LOCATION().AsString()));
+            fmt::format("The number of tensor inputs ({}) does not match the number expected ({})"
+                        " for subgraph:{} operator index:{} {}",
+                        tensorIndexes.size(),
+                        layer->GetNumInputSlots(),
+                        subgraphIndex,
+                        operatorIndex,
+                        CHECK_LOCATION().AsString()));
     }
 
     for (unsigned int slotIndex = 0; slotIndex < layer->GetNumInputSlots(); ++slotIndex)
@@ -3125,13 +3091,13 @@ void TfLiteParser::RegisterOutputSlots(size_t subgraphIndex,
     if (tensorIndexes.size() != layer->GetNumOutputSlots())
     {
         throw ParseException(
-            boost::str(boost::format("The number of tensor outputs (%1%) does not match the number expected (%2%)"
-                                     " for subgraph:%3% operator index:%4% %5%") %
-                       tensorIndexes.size() %
-                       layer->GetNumOutputSlots() %
-                       subgraphIndex %
-                       operatorIndex %
-                       CHECK_LOCATION().AsString()));
+            fmt::format("The number of tensor outputs ({}) does not match the number expected ({})"
+                        " for subgraph:{} operator index:{} {}",
+                        tensorIndexes.size(),
+                        layer->GetNumOutputSlots(),
+                        subgraphIndex,
+                        operatorIndex,
+                        CHECK_LOCATION().AsString()));
     }
 
     for (unsigned int slotIndex = 0; slotIndex < layer->GetNumOutputSlots(); ++slotIndex)
@@ -3199,7 +3165,7 @@ void TfLiteParser::SetupConstantLayers(size_t subgraphIndex)
                                                        tensorInfo,
                                                        armnn::Optional<armnn::PermutationVector&>());
 
-                std::string layerName = boost::str(boost::format("Constant:%1%") % tensorPtr->name);
+                std::string layerName = fmt::format("Constant:{}", tensorPtr->name);
                 IConnectableLayer *layer =
                     m_Network->AddConstantLayer(tensorAndData.first, layerName.c_str());
 
@@ -3305,13 +3271,12 @@ BindingPointInfo TfLiteParser::GetNetworkInputBindingInfo(size_t subgraphId,
     }
 
     throw ParseException(
-        boost::str(
-            boost::format("No input binding found for subgraph:%1% and name:%2%. "
-                          "Possible inputs are: [%3%] %4%") %
-            subgraphId %
-            name %
-            bindings.str() %
-            CHECK_LOCATION().AsString()));
+        fmt::format("No input binding found for subgraph:{} and name:{}. "
+                    "Possible inputs are: [{}] {}",
+                    subgraphId,
+                    name,
+                    bindings.str(),
+                    CHECK_LOCATION().AsString()));
 }
 
 BindingPointInfo TfLiteParser::GetNetworkOutputBindingInfo(size_t subgraphId,
@@ -3338,13 +3303,12 @@ BindingPointInfo TfLiteParser::GetNetworkOutputBindingInfo(size_t subgraphId,
     }
 
     throw ParseException(
-        boost::str(
-            boost::format("No output binding found for subgraph:%1% and name:%2%. "
-                          "Possible outputs are: [%3%] %4%") %
-            subgraphId %
-            name %
-            bindings.str() %
-            CHECK_LOCATION().AsString()));
+        fmt::format("No output binding found for subgraph:{} and name:{}. "
+                    "Possible outputs are: [{}] {}",
+                    subgraphId,
+                    name,
+                    bindings.str(),
+                    CHECK_LOCATION().AsString()));
 }
 
 size_t TfLiteParser::GetSubgraphCount() const

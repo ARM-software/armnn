@@ -10,6 +10,8 @@
 
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
+#include <boost/numeric/conversion/cast.hpp>
+
 namespace armnn
 {
 

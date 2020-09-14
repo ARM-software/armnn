@@ -9,8 +9,7 @@
 #include "armnn/TypesUtils.hpp"
 
 #include <armnn/utility/Assert.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <iostream>
 
@@ -53,7 +52,7 @@ TensorShape::TensorShape(const unsigned int numDimensions, const unsigned int* c
 }
 
 TensorShape::TensorShape(std::initializer_list<unsigned int> dimensionSizeList)
- : TensorShape(boost::numeric_cast<unsigned int>(dimensionSizeList.size()), dimensionSizeList.begin())
+ : TensorShape(armnn::numeric_cast<unsigned int>(dimensionSizeList.size()), dimensionSizeList.begin())
 {
 }
 

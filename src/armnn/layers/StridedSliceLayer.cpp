@@ -6,10 +6,10 @@
 
 #include "LayerCloneBase.hpp"
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
 
 namespace armnn
 {
@@ -82,7 +82,7 @@ std::vector<TensorShape> StridedSliceLayer::InferOutputShapes(
 
         newSize = std::max(0, newSize);
 
-        outputShape.push_back(boost::numeric_cast<unsigned int>(newSize));
+        outputShape.push_back(armnn::numeric_cast<unsigned int>(newSize));
     }
 
     if (outputShape.size() == 0 && (inputShape.GetNumDimensions() - amountDimShrunk) == 0)
@@ -91,7 +91,7 @@ std::vector<TensorShape> StridedSliceLayer::InferOutputShapes(
     }
 
     return std::vector<TensorShape>({
-        TensorShape(boost::numeric_cast<unsigned int>(outputShape.size()), &outputShape[0]) });
+        TensorShape(armnn::numeric_cast<unsigned int>(outputShape.size()), &outputShape[0]) });
 }
 
 void StridedSliceLayer::ValidateTensorShapesFromInputs()

@@ -10,7 +10,6 @@
 #include <QuantizeHelper.hpp>
 
 #include <boost/multi_array.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>

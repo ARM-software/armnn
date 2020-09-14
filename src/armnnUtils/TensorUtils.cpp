@@ -7,9 +7,9 @@
 
 #include <armnn/backends/ITensorHandle.hpp>
 #include <armnn/utility/Assert.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <boost/format.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
 using namespace armnn;
 
@@ -86,7 +86,7 @@ TensorShape ExpandDims(const TensorShape& tensorShape, int axis)
 {
     unsigned int outputDim = tensorShape.GetNumDimensions() + 1;
 
-    if (axis < -boost::numeric_cast<int>(outputDim) || axis > boost::numeric_cast<int>(tensorShape.GetNumDimensions()))
+    if (axis < -armnn::numeric_cast<int>(outputDim) || axis > armnn::numeric_cast<int>(tensorShape.GetNumDimensions()))
     {
         throw InvalidArgumentException(
             boost::str(boost::format("Invalid expansion axis %1% for %2%D input tensor. %3%") %
@@ -97,7 +97,7 @@ TensorShape ExpandDims(const TensorShape& tensorShape, int axis)
 
     if (axis < 0)
     {
-        axis = boost::numeric_cast<int>(outputDim) + axis;
+        axis = armnn::numeric_cast<int>(outputDim) + axis;
     }
 
     std::vector<unsigned int> outputShape;
@@ -126,14 +126,14 @@ unsigned int GetNumElementsBetween(const TensorShape& shape,
 
 unsigned int GetUnsignedAxis(const unsigned int inputDimension, const int axis)
 {
-    ARMNN_ASSERT_MSG(axis < boost::numeric_cast<int>(inputDimension),
+    ARMNN_ASSERT_MSG(axis < armnn::numeric_cast<int>(inputDimension),
                      "Required axis index greater than number of dimensions.");
-    ARMNN_ASSERT_MSG(axis >= -boost::numeric_cast<int>(inputDimension),
+    ARMNN_ASSERT_MSG(axis >= -armnn::numeric_cast<int>(inputDimension),
                      "Required axis index lower than negative of the number of dimensions");
 
     unsigned int uAxis = axis < 0  ?
-                         inputDimension - boost::numeric_cast<unsigned int>(abs(axis))
-                         : boost::numeric_cast<unsigned int>(axis);
+                         inputDimension - armnn::numeric_cast<unsigned int>(abs(axis))
+                         : armnn::numeric_cast<unsigned int>(axis);
     return uAxis;
 }
 

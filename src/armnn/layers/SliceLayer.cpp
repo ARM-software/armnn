@@ -8,11 +8,10 @@
 #include "LayerCloneBase.hpp"
 
 #include <armnn/TypesUtils.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
 
 namespace armnn
 {
@@ -53,7 +52,7 @@ std::vector<TensorShape> SliceLayer::InferOutputShapes(const std::vector<TensorS
     IgnoreUnused(inputShapes);
     ARMNN_ASSERT(inputShapes.size() == 1);
 
-    TensorShape outputShape(boost::numeric_cast<unsigned int>(m_Param.m_Size.size()), m_Param.m_Size.data());
+    TensorShape outputShape(armnn::numeric_cast<unsigned int>(m_Param.m_Size.size()), m_Param.m_Size.data());
 
     return std::vector<TensorShape>({ outputShape });
 }

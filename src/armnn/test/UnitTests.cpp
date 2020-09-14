@@ -7,6 +7,7 @@
 
 #include "UnitTests.hpp"
 #include <armnn/Logging.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 struct ConfigureLoggingFixture
 {
@@ -34,7 +35,7 @@ struct DebugOutputSink : boost::iostreams::sink
     std::streamsize write(const char* s, std::streamsize n)
     {
         // The given string is not null-terminated, so we need to copy it.
-        std::string s2(s, boost::numeric_cast<size_t>(n));
+        std::string s2(s, armnn::numeric_cast<size_t>(n));
         OutputDebugString(s2.c_str());
         return n;
     }

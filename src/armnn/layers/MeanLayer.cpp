@@ -6,6 +6,8 @@
 #include "MeanLayer.hpp"
 #include "LayerCloneBase.hpp"
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
@@ -69,7 +71,7 @@ void MeanLayer::ValidateTensorShapesFromInputs()
     }
     else
     {
-        outputRank = input.GetNumDimensions() - boost::numeric_cast<unsigned int>(m_Param.m_Axis.size());
+        outputRank = input.GetNumDimensions() - armnn::numeric_cast<unsigned int>(m_Param.m_Axis.size());
         if (outputRank == 0)
         {
             outputRank = 1;
@@ -85,7 +87,7 @@ void MeanLayer::ValidateTensorShapesFromInputs()
         {
             if (std::find(m_Param.m_Axis.begin(), m_Param.m_Axis.end(), i) == m_Param.m_Axis.end())
             {
-                dimSizes[outputIndex] = boost::numeric_cast<unsigned int>(input.GetShape()[i]);
+                dimSizes[outputIndex] = armnn::numeric_cast<unsigned int>(input.GetShape()[i]);
                 ++outputIndex;
             }
             else if (m_Param.m_KeepDims)

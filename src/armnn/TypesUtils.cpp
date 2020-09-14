@@ -49,8 +49,7 @@ float armnn::Dequantize(QuantizedType value, float scale, int32_t offset)
     static_assert(IsQuantizedType<QuantizedType>(), "Not an integer type.");
     ARMNN_ASSERT(scale != 0.f);
     ARMNN_ASSERT(!IsNan(value));
-    float dequantized = boost::numeric_cast<float>(value - offset) * scale;
-    return dequantized;
+    return (boost::numeric_cast<float>(value - offset)) * scale;
 }
 
 /// Explicit specialization of Quantize for int8_t

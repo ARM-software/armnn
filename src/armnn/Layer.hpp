@@ -18,6 +18,7 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/INetwork.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <algorithm>
@@ -27,8 +28,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-#include <boost/cast.hpp>
 
 namespace armnn
 {
@@ -135,7 +134,7 @@ public:
 
     // IOutputSlot
 
-    unsigned int GetNumConnections() const override { return boost::numeric_cast<unsigned int>(m_Connections.size()); }
+    unsigned int GetNumConnections() const override { return armnn::numeric_cast<unsigned int>(m_Connections.size()); }
     const InputSlot* GetConnection(unsigned int index) const override;
     InputSlot* GetConnection(unsigned int index) override;
 

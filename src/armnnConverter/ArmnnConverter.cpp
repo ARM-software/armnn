@@ -21,6 +21,7 @@
 #endif
 
 #include <HeapProfiling.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include "armnn/utility/StringUtils.hpp"
 
 #include <boost/format.hpp>
@@ -49,7 +50,7 @@ armnn::TensorShape ParseTensorShape(std::istream& stream)
             {
                 try
                 {
-                    result.push_back(boost::numeric_cast<unsigned int>(std::stoi((token))));
+                    result.push_back(armnn::numeric_cast<unsigned int>(std::stoi((token))));
                 }
                 catch (const std::exception&)
                 {
@@ -59,7 +60,7 @@ armnn::TensorShape ParseTensorShape(std::istream& stream)
         }
     }
 
-    return armnn::TensorShape(boost::numeric_cast<unsigned int>(result.size()), result.data());
+    return armnn::TensorShape(armnn::numeric_cast<unsigned int>(result.size()), result.data());
 }
 
 bool CheckOption(const po::variables_map& vm,

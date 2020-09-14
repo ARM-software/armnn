@@ -9,6 +9,7 @@
 
 #include <armnn/TypesUtils.hpp>
 #include <armnn/Exceptions.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
@@ -16,7 +17,6 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 
-#include <boost/cast.hpp>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(Graph)
@@ -299,7 +299,7 @@ static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armn
             if (origEdge.first->GetNameStr() == edge.first->GetNameStr() &&
                 origEdge.second->GetNameStr() == edge.second->GetNameStr())
             {
-                originalEdge = boost::numeric_cast<int>(i);
+                originalEdge = armnn::numeric_cast<int>(i);
             }
         }
 

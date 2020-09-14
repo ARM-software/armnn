@@ -14,6 +14,7 @@
 #include <armnn/TypesUtils.hpp>
 #include <armnn/Utils.hpp>
 #include <armnn/utility/Assert.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <boost/format.hpp>
 
@@ -384,7 +385,7 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
                                                                          &compLayer->GetInputSlot(0)));
 
                     // The input strategy of a compatibility layer is always DirectCompatibilty.
-                    srcOutputSlot.SetEdgeStrategy(boost::numeric_cast<unsigned int>(newSrcConnectionIndex),
+                    srcOutputSlot.SetEdgeStrategy(armnn::numeric_cast<unsigned int>(newSrcConnectionIndex),
                                                     EdgeStrategy::DirectCompatibility);
                 }
             }
@@ -442,8 +443,8 @@ void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const Subgr
     const SubgraphView::InputSlots& subgraphInputSlots = subgraph.GetInputSlots();
     const SubgraphView::OutputSlots& subgraphOutputSlots = subgraph.GetOutputSlots();
 
-    unsigned int subgraphNumInputSlots = boost::numeric_cast<unsigned int>(subgraphInputSlots.size());
-    unsigned int subgraphNumOutputSlots = boost::numeric_cast<unsigned int>(subgraphOutputSlots.size());
+    unsigned int subgraphNumInputSlots = armnn::numeric_cast<unsigned int>(subgraphInputSlots.size());
+    unsigned int subgraphNumOutputSlots = armnn::numeric_cast<unsigned int>(subgraphOutputSlots.size());
 
     const SubgraphView::InputSlots& substituteSubgraphInputSlots = substituteSubgraph.GetInputSlots();
     const SubgraphView::OutputSlots& substituteSubgraphOutputSlots = substituteSubgraph.GetOutputSlots();

@@ -8,10 +8,10 @@
 #include <armnn/LstmParams.hpp>
 #include <armnn/QuantizedLstmParams.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <iostream>
 
-#include <boost/numeric/conversion/cast.hpp>
 #include <flatbuffers/util.h>
 
 #include "SerializerUtils.hpp"
@@ -1752,7 +1752,7 @@ bool Serializer::SaveSerializedToStream(std::ostream& stream)
 {
     flatbuffers::FlatBufferBuilder& fbBuilder = m_SerializerVisitor.GetFlatBufferBuilder();
 
-    auto bytesToWrite = boost::numeric_cast<std::streamsize>(fbBuilder.GetSize());
+    auto bytesToWrite = armnn::numeric_cast<std::streamsize>(fbBuilder.GetSize());
     stream.write(reinterpret_cast<const char*>(fbBuilder.GetBufferPointer()), bytesToWrite);
     return !stream.bad();
 }

@@ -19,7 +19,6 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <boost/test/unit_test.hpp>
-#include <boost/cast.hpp>
 
 #include <utility>
 

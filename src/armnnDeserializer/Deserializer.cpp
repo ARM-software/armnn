@@ -15,12 +15,12 @@
 #include <armnnUtils/Transpose.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <ParserHelper.hpp>
 #include <VerificationHelpers.hpp>
 
 #include <boost/format.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
 #include <fstream>
 #include <algorithm>
@@ -885,7 +885,7 @@ void Deserializer::SetupInputLayers(GraphPtr graph)
         unsigned int inputLayerIndex = 0xFFFFFFFF;
         if (GetFeatureVersions(graph).m_BindingIdScheme == 0)
         {
-            const unsigned int inputId = boost::numeric_cast<unsigned int>(graph->inputIds()->Get(i));
+            const unsigned int inputId = armnn::numeric_cast<unsigned int>(graph->inputIds()->Get(i));
             inputLayerIndex = GetLayerIndexInVector(graph, inputId);
         }
         else
@@ -924,7 +924,7 @@ void Deserializer::SetupOutputLayers(GraphPtr graph)
         unsigned int outputLayerIndex = 0xFFFFFFFF;
         if (GetFeatureVersions(graph).m_BindingIdScheme == 0)
         {
-            const unsigned int outputId = boost::numeric_cast<unsigned int>(graph->outputIds()->Get(i));
+            const unsigned int outputId = armnn::numeric_cast<unsigned int>(graph->outputIds()->Get(i));
             outputLayerIndex = GetLayerIndexInVector(graph, outputId);
         }
         else
@@ -2006,7 +2006,7 @@ armnn::TensorInfo Deserializer::OutputShapeOfReshape(const armnn::TensorInfo& in
         }
 
         auto targetNumElements =
-           boost::numeric_cast<unsigned int>(
+           armnn::numeric_cast<unsigned int>(
                std::accumulate(targetDimsIn.begin(), targetDimsIn.end(), -1, std::multiplies<int32_t>()));
 
         auto stretchIndex = static_cast<size_t>(std::distance(targetDimsIn.begin(), stretchDim));

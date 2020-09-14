@@ -7,9 +7,9 @@
 #include "Graph.hpp"
 
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
 #include <utility>
 
 namespace armnn
@@ -149,12 +149,12 @@ OutputSlot* SubgraphView::GetOutputSlot(unsigned int index)
 
 unsigned int SubgraphView::GetNumInputSlots() const
 {
-    return boost::numeric_cast<unsigned int>(m_InputSlots.size());
+    return armnn::numeric_cast<unsigned int>(m_InputSlots.size());
 }
 
 unsigned int SubgraphView::GetNumOutputSlots() const
 {
-    return boost::numeric_cast<unsigned int>(m_OutputSlots.size());
+    return armnn::numeric_cast<unsigned int>(m_OutputSlots.size());
 }
 
 const SubgraphView::Layers& SubgraphView::GetLayers() const

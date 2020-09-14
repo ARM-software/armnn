@@ -37,7 +37,6 @@
 
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/converter_policies.hpp>
-#include <boost/cast.hpp>
 
 namespace armnn
 {

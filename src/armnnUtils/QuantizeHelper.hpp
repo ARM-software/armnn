@@ -6,6 +6,7 @@
 #pragma once
 
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <armnn/TypesUtils.hpp>
 
 #include <BFloat16.hpp>
@@ -14,8 +15,6 @@
 #include <initializer_list>
 #include <iterator>
 #include <vector>
-
-#include <boost/numeric/conversion/cast.hpp>
 
 namespace armnnUtils
 {
@@ -106,7 +105,7 @@ typename std::enable_if<IsFloatingPointIterator<FloatIt>::value, int>::type=0 //
 std::vector<T> QuantizedVector(FloatIt first, FloatIt last, float qScale, int32_t qOffset)
 {
     std::vector<T> quantized;
-    quantized.reserve(boost::numeric_cast<size_t>(std::distance(first, last)));
+    quantized.reserve(armnn::numeric_cast<size_t>(std::distance(first, last)));
 
     for (auto it = first; it != last; ++it)
     {

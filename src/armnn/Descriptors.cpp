@@ -6,13 +6,13 @@
 #include "armnn/Logging.hpp"
 
 #include <armnn/utility/Assert.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <algorithm>
 #include <array>
 #include <vector>
 
 #include <boost/format.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
 namespace armnn
 {
@@ -69,7 +69,7 @@ PermutationVector::PermutationVector(const ValueType *dimMappings, const SizeTyp
 }
 
 PermutationVector::PermutationVector(std::initializer_list<ValueType> dimMappings)
-    : PermutationVector(dimMappings.begin(), boost::numeric_cast<SizeType>(dimMappings.size()))
+    : PermutationVector(dimMappings.begin(), armnn::numeric_cast<SizeType>(dimMappings.size()))
 {
 }
 
@@ -374,7 +374,7 @@ int StridedSliceDescriptor::GetStartForAxis(const TensorShape& inputShape,
         }
     }
 
-    const int axisSize = boost::numeric_cast<int>(inputShape[axis]);
+    const int axisSize = armnn::numeric_cast<int>(inputShape[axis]);
     if (start < 0)
     {
         start += (axisSize);
@@ -408,7 +408,7 @@ int StridedSliceDescriptor::GetStopForAxis(const TensorShape& inputShape,
         }
     }
 
-    const int axisSize = boost::numeric_cast<int>(inputShape[axis]);
+    const int axisSize = armnn::numeric_cast<int>(inputShape[axis]);
     if (stop < 0)
     {
         stop += axisSize;

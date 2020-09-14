@@ -4,10 +4,11 @@
 //
 #include <boost/test/unit_test.hpp>
 
-
 #include <Graph.hpp>
 #include <SubgraphView.hpp>
 #include <SubgraphViewSelector.hpp>
+
+#include <armnn/utility/NumericCast.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <fstream>
@@ -1374,8 +1375,8 @@ BOOST_AUTO_TEST_CASE(SingleSubgraph)
 
         if (subgraphs[0].get() != nullptr)
         {
-            unsigned int numInputSlots = boost::numeric_cast<unsigned int>(subgraphs[0]->GetInputSlots().size());
-            unsigned int numOutputSlots = boost::numeric_cast<unsigned int>(subgraphs[0]->GetOutputSlots().size());
+            unsigned int numInputSlots = armnn::numeric_cast<unsigned int>(subgraphs[0]->GetInputSlots().size());
+            unsigned int numOutputSlots = armnn::numeric_cast<unsigned int>(subgraphs[0]->GetOutputSlots().size());
 
             BOOST_TEST((numInputSlots == 1));
             BOOST_TEST((numOutputSlots == 1));
@@ -1456,11 +1457,11 @@ BOOST_AUTO_TEST_CASE(MultipleSubgraphs)
                       }
             );
 
-            unsigned int numInputSlots1  = boost::numeric_cast<unsigned int>(subgraphs[0]->GetInputSlots().size());
-            unsigned int numOutputSlots1 = boost::numeric_cast<unsigned int>(subgraphs[0]->GetOutputSlots().size());
+            unsigned int numInputSlots1  = armnn::numeric_cast<unsigned int>(subgraphs[0]->GetInputSlots().size());
+            unsigned int numOutputSlots1 = armnn::numeric_cast<unsigned int>(subgraphs[0]->GetOutputSlots().size());
 
-            unsigned int numInputSlots2  = boost::numeric_cast<unsigned int>(subgraphs[1]->GetInputSlots().size());
-            unsigned int numOutputSlots2 = boost::numeric_cast<unsigned int>(subgraphs[1]->GetOutputSlots().size());
+            unsigned int numInputSlots2  = armnn::numeric_cast<unsigned int>(subgraphs[1]->GetInputSlots().size());
+            unsigned int numOutputSlots2 = armnn::numeric_cast<unsigned int>(subgraphs[1]->GetOutputSlots().size());
 
             // Save sub-graph connections for comparison after substitution
             IOutputSlot* subgraph1InputConn  = subgraphs[0]->GetInputSlot(0)->GetConnection();

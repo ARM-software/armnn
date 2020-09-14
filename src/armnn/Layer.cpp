@@ -6,10 +6,10 @@
 
 #include "Graph.hpp"
 #include <ProfilingService.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 
-#include <boost/cast.hpp>
 #include <boost/format.hpp>
 
 #include <numeric>
@@ -31,7 +31,7 @@ void InputSlot::Insert(Layer& layer)
         // Connects inserted layer to parent.
         ARMNN_ASSERT(layer.GetNumInputSlots() == 1);
         int idx = prevSlot->Connect(layer.GetInputSlot(0));
-        prevSlot->SetEdgeStrategy(boost::numeric_cast<unsigned int>(idx), EdgeStrategy::Undefined);
+        prevSlot->SetEdgeStrategy(armnn::numeric_cast<unsigned int>(idx), EdgeStrategy::Undefined);
 
         // Sets tensor info for inserted layer.
         const TensorInfo& tensorInfo = prevSlot->GetTensorInfo();
@@ -85,7 +85,7 @@ int OutputSlot::Connect(InputSlot& destination)
     destination.SetConnection(this);
     m_Connections.push_back(&destination);
     m_EdgeStrategies.push_back(EdgeStrategy::Undefined);
-    return boost::numeric_cast<int>(m_Connections.size() - 1);
+    return armnn::numeric_cast<int>(m_Connections.size() - 1);
 }
 
 void OutputSlot::Disconnect(InputSlot& slot)
@@ -157,7 +157,7 @@ bool OutputSlot::operator==(const OutputSlot& other) const
 
 void OutputSlot::ValidateConnectionIndex(unsigned int index) const
 {
-    if (boost::numeric_cast<std::size_t>(index) >= m_Connections.size())
+    if (armnn::numeric_cast<std::size_t>(index) >= m_Connections.size())
     {
         throw InvalidArgumentException(
             boost::str(boost::format("GetConnection: Invalid index %1% provided") % index));

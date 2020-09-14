@@ -7,6 +7,8 @@
 
 #include "LayerCloneBase.hpp"
 
+#include <armnn/utility/NumericCast.hpp>
+
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
@@ -52,15 +54,15 @@ std::vector<TensorShape> PreluLayer::InferOutputShapes(const std::vector<TensorS
 
     TensorShape outputShape(outputDimensions);
 
-    int inputShapeIndex = boost::numeric_cast<int>(inputShapeDimensions) - 1;
-    int alphaShapeIndex = boost::numeric_cast<int>(alphaShapeDimensions) - 1;
+    int inputShapeIndex = armnn::numeric_cast<int>(inputShapeDimensions) - 1;
+    int alphaShapeIndex = armnn::numeric_cast<int>(alphaShapeDimensions) - 1;
     unsigned int outputShapeIndex = outputDimensions - 1;
 
     // Loop backwards through the common part of the shapes
     while (inputShapeIndex >= 0 && alphaShapeIndex >= 0)
     {
-        unsigned int inputDimension = inputShape[boost::numeric_cast<unsigned int>(inputShapeIndex)];
-        unsigned int alphaDimension = alphaShape[boost::numeric_cast<unsigned int>(alphaShapeIndex)];
+        unsigned int inputDimension = inputShape[armnn::numeric_cast<unsigned int>(inputShapeIndex)];
+        unsigned int alphaDimension = alphaShape[armnn::numeric_cast<unsigned int>(alphaShapeIndex)];
 
         // Check that the inputs are broadcast compatible
         ARMNN_ASSERT_MSG(inputDimension == alphaDimension || inputDimension == 1 || alphaDimension == 1,
@@ -76,7 +78,7 @@ std::vector<TensorShape> PreluLayer::InferOutputShapes(const std::vector<TensorS
     // Loop backwards through the remaing part of the input shape (if any)
     while (inputShapeIndex >= 0)
     {
-        outputShape[outputShapeIndex] = inputShape[boost::numeric_cast<unsigned int>(inputShapeIndex)];
+        outputShape[outputShapeIndex] = inputShape[armnn::numeric_cast<unsigned int>(inputShapeIndex)];
 
         inputShapeIndex--;
         outputShapeIndex--;
@@ -85,7 +87,7 @@ std::vector<TensorShape> PreluLayer::InferOutputShapes(const std::vector<TensorS
     // Loop backwards through the remaing part of the alpha shape (if any)
     while (alphaShapeIndex >= 0)
     {
-        outputShape[outputShapeIndex] = alphaShape[boost::numeric_cast<unsigned int>(alphaShapeIndex)];
+        outputShape[outputShapeIndex] = alphaShape[armnn::numeric_cast<unsigned int>(alphaShapeIndex)];
 
         alphaShapeIndex--;
         outputShapeIndex--;

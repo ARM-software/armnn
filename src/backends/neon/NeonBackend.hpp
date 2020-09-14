@@ -26,6 +26,12 @@ public:
     IWorkloadFactoryPtr CreateWorkloadFactory(
         class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry) const override;
 
+    IWorkloadFactoryPtr CreateWorkloadFactory( const IMemoryManagerSharedPtr& memoryManager,
+                                               const ModelOptions& modelOptions) const override;
+
+    IWorkloadFactoryPtr CreateWorkloadFactory(class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry,
+                                              const ModelOptions& modelOptions) const override;
+
     IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override;
     IBackendInternal::IBackendProfilingContextPtr CreateBackendProfilingContext(
         const IRuntime::CreationOptions&, IBackendProfilingPtr& backendProfiling) override;

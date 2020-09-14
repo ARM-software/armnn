@@ -6,6 +6,8 @@
 #include "NeonWorkloadFactoryHelper.hpp"
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <armnn/utility/Assert.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
 
@@ -274,6 +276,33 @@ BOOST_AUTO_TEST_CASE(CreateConvolution2dFloatNchwWorkload)
 BOOST_AUTO_TEST_CASE(CreateConvolution2dFloatNhwcWorkload)
 {
     NeonCreateConvolution2dWorkloadTest<DataType::Float32>(DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(CreateConvolution2dFastMathEnabledWorkload)
+{
+    Graph graph;
+    using ModelOptions = std::vector<BackendOptions>;
+    ModelOptions modelOptions = {};
+    BackendOptions cpuAcc("CpuAcc",
+    {
+        { "FastMathEnabled", true }
+    });
+    modelOptions.push_back(cpuAcc);
+    NeonWorkloadFactory factory =
+        NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager(), modelOptions);
+
+    auto workload =
+        CreateConvolution2dWorkloadTest<NeonConvolution2dWorkload, armnn::DataType::Float32>(factory,
+                                                                                             graph,
+                                                                                             DataLayout::NCHW,
+                                                                                             modelOptions);
+
+    ARMNN_ASSERT(workload != nullptr);
+    auto conv2dWorkload = PolymorphicDowncast<NeonConvolution2dWorkload*>(workload.get());
+    IgnoreUnused(conv2dWorkload);
+    ARMNN_ASSERT(conv2dWorkload != nullptr);
+    // fast_math enabled but configuration does not match with WINOGRAD
+    ARMNN_ASSERT(conv2dWorkload->GetConvolutionMethod() == arm_compute::ConvolutionMethod::GEMM);
 }
 
 template <typename armnn::DataType DataType>

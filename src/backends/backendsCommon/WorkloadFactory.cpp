@@ -1243,6 +1243,19 @@ bool IWorkloadFactory::IsLayerSupported(const IConnectableLayer& connectableLaye
                                          modelOptions);
 }
 
+bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
+                                        const IConnectableLayer& connectableLayer,
+                                        Optional<DataType> dataType,
+                                        std::string& outReasonIfUnsupported,
+                                        const ModelOptions& modelOptions)
+{
+    return IsLayerConfigurationSupported(backendId,
+                                         connectableLayer,
+                                         dataType,
+                                         outReasonIfUnsupported,
+                                         modelOptions);
+}
+
 // Default Implementations
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateAbs(const AbsQueueDescriptor& /*descriptor*/,
                                                        const WorkloadInfo& /*info*/) const

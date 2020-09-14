@@ -6,6 +6,8 @@
 #include "ClContextControlFixture.hpp"
 #include "ClWorkloadFactoryHelper.hpp"
 
+#include <armnn/utility/Assert.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
 
@@ -302,6 +304,35 @@ BOOST_AUTO_TEST_CASE(CreateConvolution2dFloat16NchwWorkload)
 BOOST_AUTO_TEST_CASE(CreateConvolution2dFloat16NhwcWorkload)
 {
     ClConvolution2dWorkloadTest<ClConvolution2dWorkload, armnn::DataType::Float16>(DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(CreateConvolution2dFastMathEnabledWorkload)
+{
+    Graph graph;
+
+    using ModelOptions = std::vector<BackendOptions>;
+    ModelOptions modelOptions = {};
+    BackendOptions gpuAcc("GpuAcc",
+    {
+        { "FastMathEnabled", true }
+    });
+    modelOptions.push_back(gpuAcc);
+
+    ClWorkloadFactory factory =
+        ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager(), modelOptions);
+
+    auto workload =
+        CreateConvolution2dWorkloadTest<ClConvolution2dWorkload, armnn::DataType::Float32>(factory,
+                                                                                           graph,
+                                                                                           DataLayout::NCHW,
+                                                                                           modelOptions);
+
+    ARMNN_ASSERT(workload != nullptr);
+    auto conv2dWorkload = PolymorphicDowncast<ClConvolution2dWorkload*>(workload.get());
+    IgnoreUnused(conv2dWorkload);
+    ARMNN_ASSERT(conv2dWorkload != nullptr);
+    // fast_math enabled but configuration does not match with WINOGRAD
+    ARMNN_ASSERT(conv2dWorkload->GetConvolutionMethod() == arm_compute::ConvolutionMethod::GEMM);
 }
 
 template <typename DepthwiseConvolutionWorkloadType, typename armnn::DataType DataType>

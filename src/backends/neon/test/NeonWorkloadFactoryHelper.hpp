@@ -27,10 +27,12 @@ struct WorkloadFactoryHelper<armnn::NeonWorkloadFactory>
     }
 
     static armnn::NeonWorkloadFactory GetFactory(
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ModelOptions& modelOptions = {})
     {
-        return armnn::NeonWorkloadFactory(
-            armnn::PolymorphicPointerDowncast<armnn::NeonMemoryManager>(memoryManager));
+        armnn::NeonBackend backend;
+        return armnn::NeonWorkloadFactory(armnn::PolymorphicPointerDowncast<armnn::NeonMemoryManager>(memoryManager),
+                                          backend.CreateBackendSpecificModelContext(modelOptions));
     }
 
     static armnn::NeonTensorHandleFactory GetTensorHandleFactory(

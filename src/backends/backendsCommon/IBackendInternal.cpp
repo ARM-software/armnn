@@ -39,6 +39,28 @@ IBackendInternal::IWorkloadFactoryPtr IBackendInternal::CreateWorkloadFactory(
     return IWorkloadFactoryPtr{};
 }
 
+IBackendInternal::IWorkloadFactoryPtr IBackendInternal::CreateWorkloadFactory(
+    const IMemoryManagerSharedPtr& memoryManager,
+    const ModelOptions& modelOptions) const
+{
+    if(modelOptions.empty())
+    {
+        return CreateWorkloadFactory(memoryManager);
+    }
+    return IWorkloadFactoryPtr{};
+}
+
+IBackendInternal::IWorkloadFactoryPtr IBackendInternal::CreateWorkloadFactory(
+    class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry,
+    const ModelOptions& modelOptions) const
+{
+    if(modelOptions.empty())
+    {
+        return CreateWorkloadFactory(tensorHandleFactoryRegistry);
+    }
+    return IWorkloadFactoryPtr{};
+}
+
 IBackendInternal::IBackendContextPtr IBackendInternal::CreateBackendContext(const IRuntime::CreationOptions&) const
 {
     return IBackendContextPtr{};

@@ -59,7 +59,9 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
 }
 
 ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescriptor& descriptor,
-    const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
+                                                 const WorkloadInfo& info,
+                                                 std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
+                                                 const bool isFastMathEnabled)
     : BaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
     , m_ConvolutionLayer(memoryManager)
 {
@@ -95,7 +97,20 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
                                  &output,
                                  padStrideInfo,
                                  arm_compute::WeightsInfo(),
-                                 aclDilationInfo);
+                                 aclDilationInfo,
+                                 arm_compute::ActivationLayerInfo(),
+                                 isFastMathEnabled);
+
+    m_ConvolutionMethod =
+        m_ConvolutionLayer.get_convolution_method(input.info(),
+                                                  m_KernelTensor->info(),
+                                                  output.info(),
+                                                  padStrideInfo,
+                                                  arm_compute::WeightsInfo(),
+                                                  arm_compute::ActivationLayerInfo(),
+                                                  arm_compute::CLScheduler::get().target(),
+                                                  aclDilationInfo,
+                                                  isFastMathEnabled);
 
     InitializeArmComputeClTensorData(*m_KernelTensor, m_Data.m_Weight);
 
@@ -114,6 +129,11 @@ void ClConvolution2dWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClConvolution2dWorkload_Execute");
     RunClFunction(m_ConvolutionLayer, CHECK_LOCATION());
+}
+
+arm_compute::ConvolutionMethod ClConvolution2dWorkload::GetConvolutionMethod() const
+{
+    return m_ConvolutionMethod;
 }
 
 void ClConvolution2dWorkload::FreeUnusedTensors()

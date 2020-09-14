@@ -46,6 +46,13 @@ IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
 }
 
 IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager, const ModelOptions& modelOptions) const
+{
+    return std::make_unique<ClWorkloadFactory>(
+        PolymorphicPointerDowncast<ClMemoryManager>(memoryManager), CreateBackendSpecificModelContext(modelOptions));
+}
+
+IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
     TensorHandleFactoryRegistry& registry) const
 {
     auto memoryManager = std::make_shared<ClMemoryManager>(std::make_unique<arm_compute::CLBufferAllocator>());
@@ -55,6 +62,18 @@ IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
 
     return std::make_unique<ClWorkloadFactory>(
             PolymorphicPointerDowncast<ClMemoryManager>(memoryManager));
+}
+
+IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
+    TensorHandleFactoryRegistry& registry, const ModelOptions& modelOptions) const
+{
+    auto memoryManager = std::make_shared<ClMemoryManager>(std::make_unique<arm_compute::CLBufferAllocator>());
+
+    registry.RegisterMemoryManager(memoryManager);
+    registry.RegisterFactory(std::make_unique<ClTensorHandleFactory>(memoryManager));
+
+    return std::make_unique<ClWorkloadFactory>(
+        PolymorphicPointerDowncast<ClMemoryManager>(memoryManager), CreateBackendSpecificModelContext(modelOptions));
 }
 
 std::vector<ITensorHandleFactory::FactoryId> ClBackend::GetHandleFactoryPreferences() const

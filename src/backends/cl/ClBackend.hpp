@@ -26,6 +26,12 @@ public:
     IBackendInternal::IWorkloadFactoryPtr CreateWorkloadFactory(
         TensorHandleFactoryRegistry& registry) const override;
 
+    IWorkloadFactoryPtr CreateWorkloadFactory( const IMemoryManagerSharedPtr& memoryManager,
+                                               const ModelOptions& modelOptions) const override;
+
+    IWorkloadFactoryPtr CreateWorkloadFactory(class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry,
+                                              const ModelOptions& modelOptions) const override;
+
     std::vector<ITensorHandleFactory::FactoryId> GetHandleFactoryPreferences() const override;
 
     void RegisterTensorHandleFactories(TensorHandleFactoryRegistry& registry) override;

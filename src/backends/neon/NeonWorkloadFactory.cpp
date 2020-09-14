@@ -4,6 +4,7 @@
 //
 
 #include "NeonBackendId.hpp"
+#include "NeonBackendModelContext.hpp"
 #include "NeonTensorHandle.hpp"
 #include "NeonWorkloadFactory.hpp"
 
@@ -36,13 +37,27 @@ bool NeonWorkloadFactory::IsLayerSupported(const Layer& layer,
     return IWorkloadFactory::IsLayerSupported(s_Id, layer, dataType, outReasonIfUnsupported);
 }
 
+bool NeonWorkloadFactory::IsLayerSupported(const IConnectableLayer& layer,
+                                           Optional<DataType> dataType,
+                                           std::string& outReasonIfUnsupported,
+                                           const ModelOptions& modelOptions)
+{
+    return IWorkloadFactory::IsLayerSupported(s_Id, layer, dataType, outReasonIfUnsupported, modelOptions);
+}
+
 const BackendId& NeonWorkloadFactory::GetBackendId() const
 {
     return s_Id;
 }
 
 NeonWorkloadFactory::NeonWorkloadFactory(const std::shared_ptr<NeonMemoryManager>& memoryManager)
-    : m_MemoryManager(memoryManager)
+    : m_MemoryManager(memoryManager), m_ModelContextPtr(IBackendInternal::IBackendSpecificModelContextPtr{})
+{
+}
+
+NeonWorkloadFactory::NeonWorkloadFactory(const std::shared_ptr<NeonMemoryManager>& memoryManager,
+                                         const IBackendInternal::IBackendSpecificModelContextPtr& modelContextPtr)
+    : m_MemoryManager(memoryManager), m_ModelContextPtr(modelContextPtr)
 {
 }
 
@@ -184,8 +199,22 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvertFp32ToFp16(
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConvolution2d(
     const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return std::make_unique<NeonConvolution2dWorkload>(descriptor, info,
-                                                       m_MemoryManager->GetIntraLayerManager());
+    bool isFastMathEnabled = false;
+    if (m_ModelContextPtr)
+    {
+        if (m_ModelContextPtr.get() != nullptr)
+        {
+            auto modelOptions = dynamic_cast<NeonBackendModelContext*>(m_ModelContextPtr.get());
+            if (modelOptions)
+            {
+                isFastMathEnabled = modelOptions->IsFastMathEnabled();
+            }
+        }
+    }
+    return std::make_unique<NeonConvolution2dWorkload>(descriptor,
+                                                       info,
+                                                       m_MemoryManager->GetIntraLayerManager(),
+                                                       isFastMathEnabled);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,

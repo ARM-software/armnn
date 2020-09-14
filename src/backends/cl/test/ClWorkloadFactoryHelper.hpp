@@ -27,9 +27,12 @@ struct WorkloadFactoryHelper<armnn::ClWorkloadFactory>
     }
 
     static armnn::ClWorkloadFactory GetFactory(
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ModelOptions& modelOptions = {})
     {
-        return armnn::ClWorkloadFactory(armnn::PolymorphicPointerDowncast<armnn::ClMemoryManager>(memoryManager));
+        armnn::ClBackend backend;
+        return armnn::ClWorkloadFactory(armnn::PolymorphicPointerDowncast<armnn::ClMemoryManager>(memoryManager),
+                                        backend.CreateBackendSpecificModelContext(modelOptions));
     }
 
     static armnn::ClTensorHandleFactory GetTensorHandleFactory(

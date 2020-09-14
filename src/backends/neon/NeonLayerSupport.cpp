@@ -329,7 +329,7 @@ bool NeonLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
     {
         if (m_ModelContextPtr.get() != nullptr)
         {
-            auto modelOptions = armnn::PolymorphicDowncast<NeonBackendModelContext*>(m_ModelContextPtr.get());
+            auto modelOptions = dynamic_cast<NeonBackendModelContext*>(m_ModelContextPtr.get());
             if (modelOptions)
             {
                 isFastMathEnabled = modelOptions->IsFastMathEnabled();

@@ -146,14 +146,16 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
 
             if (backend->SupportsTensorAllocatorAPI())
             {
-                auto workloadFactory = backend->CreateWorkloadFactory(m_TensorHandleFactoryRegistry);
+                auto workloadFactory = backend->CreateWorkloadFactory(
+                    m_TensorHandleFactoryRegistry, m_OptimizedNetwork->GetModelOptions());
                 m_WorkloadFactories.emplace(
                     std::make_pair(backendId, std::make_pair(std::move(workloadFactory), nullptr)));
             }
             else
             {
                 IBackendInternal::IMemoryManagerSharedPtr memoryManager = backend->CreateMemoryManager();
-                auto workloadFactory = backend->CreateWorkloadFactory(memoryManager);
+                auto workloadFactory = backend->CreateWorkloadFactory(
+                    memoryManager, m_OptimizedNetwork->GetModelOptions());
 
                 m_WorkloadFactories.emplace(
                     std::make_pair(backendId, std::make_pair(std::move(workloadFactory), memoryManager)));
@@ -361,7 +363,10 @@ const IWorkloadFactory& LoadedNetwork::GetWorkloadFactory(const Layer& layer) co
     ARMNN_ASSERT_MSG(workloadFactory, "No workload factory");
 
     std::string reasonIfUnsupported;
-    ARMNN_ASSERT_MSG(IWorkloadFactory::IsLayerSupported(layer, {}, reasonIfUnsupported),
+    ARMNN_ASSERT_MSG(IWorkloadFactory::IsLayerSupported(layer,
+                                                        {},
+                                                        reasonIfUnsupported,
+                                                        m_OptimizedNetwork->GetModelOptions()),
         "Factory does not support layer");
     IgnoreUnused(reasonIfUnsupported);
     return *workloadFactory;

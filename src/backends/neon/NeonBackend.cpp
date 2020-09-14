@@ -48,6 +48,13 @@ IBackendInternal::IWorkloadFactoryPtr NeonBackend::CreateWorkloadFactory(
 }
 
 IBackendInternal::IWorkloadFactoryPtr NeonBackend::CreateWorkloadFactory(
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager, const ModelOptions& modelOptions) const
+{
+    return std::make_unique<NeonWorkloadFactory>(
+        PolymorphicPointerDowncast<NeonMemoryManager>(memoryManager), CreateBackendSpecificModelContext(modelOptions));
+}
+
+IBackendInternal::IWorkloadFactoryPtr NeonBackend::CreateWorkloadFactory(
     class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry) const
 {
     auto memoryManager = std::make_shared<NeonMemoryManager>(std::make_unique<arm_compute::Allocator>(),
@@ -58,6 +65,19 @@ IBackendInternal::IWorkloadFactoryPtr NeonBackend::CreateWorkloadFactory(
 
     return std::make_unique<NeonWorkloadFactory>(
         PolymorphicPointerDowncast<NeonMemoryManager>(memoryManager));
+}
+
+IBackendInternal::IWorkloadFactoryPtr NeonBackend::CreateWorkloadFactory(
+    TensorHandleFactoryRegistry& tensorHandleFactoryRegistry, const ModelOptions& modelOptions) const
+{
+    auto memoryManager = std::make_shared<NeonMemoryManager>(std::make_unique<arm_compute::Allocator>(),
+                                                             BaseMemoryManager::MemoryAffinity::Offset);
+
+    tensorHandleFactoryRegistry.RegisterMemoryManager(memoryManager);
+    tensorHandleFactoryRegistry.RegisterFactory(std::make_unique<NeonTensorHandleFactory>(memoryManager));
+
+    return std::make_unique<NeonWorkloadFactory>(
+        PolymorphicPointerDowncast<NeonMemoryManager>(memoryManager), CreateBackendSpecificModelContext(modelOptions));
 }
 
 IBackendInternal::IBackendContextPtr NeonBackend::CreateBackendContext(const IRuntime::CreationOptions&) const

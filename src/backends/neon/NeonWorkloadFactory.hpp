@@ -5,6 +5,7 @@
 #pragma once
 
 #include <armnn/Optional.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 
 #include <backendsCommon/WorkloadFactoryBase.hpp>
 #include <aclCommon/BaseMemoryManager.hpp>
@@ -19,11 +20,19 @@ class NeonWorkloadFactory : public WorkloadFactoryBase
 public:
     NeonWorkloadFactory(const std::shared_ptr<NeonMemoryManager>& memoryManager);
 
+    NeonWorkloadFactory(const std::shared_ptr<NeonMemoryManager>& memoryManager,
+                        const IBackendInternal::IBackendSpecificModelContextPtr& modelContextPtr);
+
     const BackendId& GetBackendId() const override;
 
     static bool IsLayerSupported(const Layer& layer,
                                  Optional<DataType> dataType,
                                  std::string& outReasonIfUnsupported);
+
+    static bool IsLayerSupported(const IConnectableLayer& layer,
+                                 Optional<DataType> dataType,
+                                 std::string& outReasonIfUnsupported,
+                                 const ModelOptions& modelOptions);
 
     bool SupportsSubTensors() const override { return true; }
 
@@ -238,6 +247,7 @@ public:
 
 private:
     mutable std::shared_ptr<NeonMemoryManager> m_MemoryManager;
+    const IBackendInternal::IBackendSpecificModelContextPtr m_ModelContextPtr;
 };
 
 } // namespace armnn

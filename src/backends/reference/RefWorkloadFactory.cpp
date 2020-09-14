@@ -103,6 +103,14 @@ bool RefWorkloadFactory::IsLayerSupported(const Layer& layer,
     return IWorkloadFactory::IsLayerSupported(s_Id, layer, dataType, outReasonIfUnsupported);
 }
 
+bool RefWorkloadFactory::IsLayerSupported(const IConnectableLayer& layer,
+                                          Optional<DataType> dataType,
+                                          std::string& outReasonIfUnsupported,
+                                          const ModelOptions& modelOptions)
+{
+    return IWorkloadFactory::IsLayerSupported(s_Id, layer, dataType, outReasonIfUnsupported, modelOptions);
+}
+
 std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
                                                                       const bool isMemoryManaged) const
 {

@@ -59,8 +59,10 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
 }
 
 NeonConvolution2dWorkload::NeonConvolution2dWorkload(
-    const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info,
-    std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
+    const Convolution2dQueueDescriptor& descriptor,
+    const WorkloadInfo& info,
+    std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
+    const bool isFastMathEnabled)
     : BaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
 {
     using arm_compute::NEDirectConvolutionLayer;
@@ -97,7 +99,19 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
                                 &output,
                                 padStrideInfo,
                                 arm_compute::WeightsInfo(),
-                                aclDilationInfo);
+                                aclDilationInfo,
+                                arm_compute::ActivationLayerInfo(),
+                                isFastMathEnabled);
+
+    m_ConvolutionMethod =
+        convolutionLayer->get_convolution_method(input.info(),
+                                                 m_KernelTensor->info(),
+                                                 output.info(),
+                                                 padStrideInfo,
+                                                 arm_compute::WeightsInfo(),
+                                                 aclDilationInfo,
+                                                 arm_compute::ActivationLayerInfo(),
+                                                 isFastMathEnabled);
 
     m_ConvolutionLayer.reset(convolutionLayer.release());
 
@@ -118,6 +132,11 @@ void NeonConvolution2dWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonConvolution2dWorkload_Execute");
     m_ConvolutionLayer->run();
+}
+
+arm_compute::ConvolutionMethod NeonConvolution2dWorkload::GetConvolutionMethod() const
+{
+    return m_ConvolutionMethod;
 }
 
 void NeonConvolution2dWorkload::FreeUnusedTensors()

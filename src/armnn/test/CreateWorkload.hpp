@@ -32,14 +32,16 @@ using namespace std;
 
 // Calls CreateWorkload for a layer, and checks the returned pointer is of the correct type.
 template<typename Workload>
-std::unique_ptr<Workload> MakeAndCheckWorkload(Layer& layer, const IWorkloadFactory& factory)
+std::unique_ptr<Workload> MakeAndCheckWorkload(Layer& layer,
+                                               const IWorkloadFactory& factory,
+                                               const ModelOptions& modelOptions = {})
 {
     std::unique_ptr<IWorkload> workload = layer.CreateWorkload(factory);
     BOOST_TEST(workload.get() == PolymorphicDowncast<Workload*>(workload.get()),
                "Cannot convert to derived class");
     std::string reasonIfUnsupported;
     layer.SetBackendId(factory.GetBackendId());
-    BOOST_TEST(factory.IsLayerSupported(layer, layer.GetDataType(), reasonIfUnsupported));
+    BOOST_TEST(factory.IsLayerSupported(layer, layer.GetDataType(), reasonIfUnsupported, modelOptions));
     return std::unique_ptr<Workload>(static_cast<Workload*>(workload.release()));
 }
 
@@ -220,7 +222,8 @@ std::unique_ptr<BatchNormalizationWorkloadType> CreateBatchNormalizationWorkload
 template <typename Convolution2dWorkload, armnn::DataType DataType>
 std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadTest(armnn::IWorkloadFactory& factory,
                                                                        armnn::Graph&            graph,
-                                                                       DataLayout dataLayout = DataLayout::NCHW)
+                                                                       DataLayout dataLayout = DataLayout::NCHW,
+                                                                       const ModelOptions& modelOptions = {})
 {
     // Creates the layer we're testing.
     Convolution2dDescriptor layerDesc;
@@ -255,7 +258,7 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadTest(armnn::IW
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<Convolution2dWorkload>(*layer, factory);
+    auto workload = MakeAndCheckWorkload<Convolution2dWorkload>(*layer, factory, modelOptions);
 
     Convolution2dQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Parameters.m_StrideX == 2);

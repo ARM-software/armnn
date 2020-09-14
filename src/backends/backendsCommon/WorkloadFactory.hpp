@@ -39,6 +39,12 @@ public:
                                  std::string& outReasonIfUnsupported,
                                  const ModelOptions& modelOptions);
 
+    static bool IsLayerSupported(const BackendId& backendId,
+                                 const IConnectableLayer& layer,
+                                 Optional<DataType> dataType,
+                                 std::string& outReasonIfUnsupported,
+                                 const ModelOptions& modelOptions);
+
     virtual bool SupportsSubTensors() const = 0;
 
     ARMNN_DEPRECATED_MSG("Use ITensorHandleFactory::CreateSubTensorHandle instead")

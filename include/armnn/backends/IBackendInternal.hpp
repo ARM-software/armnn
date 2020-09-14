@@ -118,6 +118,14 @@ public:
     virtual IWorkloadFactoryPtr CreateWorkloadFactory(
         class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry) const;
 
+    virtual IWorkloadFactoryPtr CreateWorkloadFactory(
+        const IMemoryManagerSharedPtr& memoryManager,
+        const ModelOptions& modelOptions) const;
+
+    virtual IWorkloadFactoryPtr CreateWorkloadFactory(
+        class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry,
+        const ModelOptions& modelOptions) const;
+
     /// Create the runtime context of the backend
     ///
     /// Implementations may return a default-constructed IBackendContextPtr if

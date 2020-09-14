@@ -171,4 +171,209 @@ BOOST_FIXTURE_TEST_CASE(LoadScopeDynamicTensor2, LoadScopeDynamicTensor2Fixture)
         true);
 }
 
+struct LoadScopeDynamicTensorBroadcastingFixture : public ParserFlatbuffersFixture
+{
+    explicit LoadScopeDynamicTensorBroadcastingFixture(const std::string& inputShape0,
+                                                       const std::string& inputShape1,
+                                                       const std::string& inputShape2,
+                                                       const std::string& addShape,
+                                                       const std::string& outputShape)
+    {
+        m_JsonString = R"(
+        {
+            "version": 3,
+            "operator_codes": [
+                {
+                    "builtin_code": "ADD",
+                    "version": 1
+                },
+                {
+                    "builtin_code": "SUB",
+                    "version": 1
+                }
+            ],
+            "subgraphs": [
+                {
+                    "tensors": [
+                        {
+                            "shape": )" + inputShape0 + R"(,
+                            "type": "FLOAT32",
+                            "buffer": 1,
+                            "name": "input0",
+                            "quantization": {
+                                "details_type": 0,
+                                "quantized_dimension": 0
+                            },
+                            "is_variable": false
+                        },
+                        {
+                            "shape": )" + inputShape1 + R"(,
+                            "type": "FLOAT32",
+                            "buffer": 2,
+                            "name": "input1",
+                            "quantization": {
+                                "details_type": 0,
+                                "quantized_dimension": 0
+                            },
+                            "is_variable": false
+                        },
+                        {
+                            "shape": )" + outputShape + R"(,
+                            "type": "FLOAT32",
+                            "buffer": 5,
+                            "name": "output",
+                            "quantization": {
+                                "details_type": 0,
+                                "quantized_dimension": 0
+                            },
+                            "is_variable": false
+                        },
+
+                        {
+                            "shape": )" + addShape + R"(,
+                            "type": "FLOAT32",
+                            "buffer": 4,
+                            "name": "model/add/add",
+                            "quantization": {
+                                "details_type": 0,
+                                "quantized_dimension": 0
+                            },
+                            "is_variable": false
+                        },
+                        {
+                            "shape": )" + inputShape2 + R"(,
+                            "type": "FLOAT32",
+                            "buffer": 3,
+                            "name": "input2",
+                            "quantization": {
+                                "details_type": 0,
+                                "quantized_dimension": 0
+                            },
+                            "is_variable": false
+                        },
+                    ],
+                    "inputs": [
+                        0,
+                        1,
+                        4
+                    ],
+                    "outputs": [
+                        2
+                    ],
+                    "operators": [
+                        {
+                            "opcode_index": 0,
+                            "inputs": [
+                                0,
+                                1
+                            ],
+                            "outputs": [
+                                3
+                            ],
+                            "builtin_options_type": "AddOptions",
+                            "builtin_options": {
+                                "fused_activation_function": "NONE"
+                            },
+                            "custom_options_format": "FLEXBUFFERS"
+                        },
+                        {
+                            "opcode_index": 1,
+                            "inputs": [
+                                3,
+                                4
+                            ],
+                            "outputs": [
+                                2
+                            ],
+                            "builtin_options_type": "SubOptions",
+                            "builtin_options": {
+                                "fused_activation_function": "NONE"
+                            },
+                            "custom_options_format": "FLEXBUFFERS"
+                        }
+                    ],
+                    "name": "main"
+                }
+            ],
+            "buffers": [
+                {
+                },
+                {
+                },
+                {
+                },
+                {
+                },
+                {
+                },
+                {
+                }
+            ]
+        }
+        )";
+        Setup();
+    }
+};
+
+struct LoadScopeDynamicTensorBroadcasting3DFixture : LoadScopeDynamicTensorBroadcastingFixture
+{
+    LoadScopeDynamicTensorBroadcasting3DFixture() : LoadScopeDynamicTensorBroadcastingFixture("[ 1, 2, 3, 2 ]",
+                                                                                              "[ 2, 3, 2 ]",
+                                                                                              "[ 2, 3, 2 ]",
+                                                                                              "[ 1, 2, 3, 2 ]", "[]") {}
+};
+
+struct LoadScopeDynamicTensorBroadcasting2DFixture : LoadScopeDynamicTensorBroadcastingFixture
+{
+    LoadScopeDynamicTensorBroadcasting2DFixture() : LoadScopeDynamicTensorBroadcastingFixture("[ 1, 2, 3, 2 ]",
+                                                                                              "[ 3, 2 ]",
+                                                                                              "[ 3, 2 ]",
+                                                                                              "[]", "[]") {}
+};
+
+struct LoadScopeDynamicTensorBroadcasting1DFixture : LoadScopeDynamicTensorBroadcastingFixture
+{
+    LoadScopeDynamicTensorBroadcasting1DFixture() : LoadScopeDynamicTensorBroadcastingFixture("[ 1, 2, 3, 2 ]",
+                                                                                              "[ 1 ]",
+                                                                                              "[ 1 ]",
+                                                                                              "[]",
+                                                                                              "[ 1, 2, 3, 2 ]") {}
+};
+
+BOOST_FIXTURE_TEST_CASE(LoadScopeDynamicTensorBroadcasting3D, LoadScopeDynamicTensorBroadcasting3DFixture)
+{
+    RunTest<4, armnn::DataType::Float32, armnn::DataType::Float32>(
+        0,
+        { {"input0", { 0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f }},
+          {"input1", { 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f, 13.f, 14.f }},
+          {"input2", { 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f }}
+        },
+        { {"output", { 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f, 13.f }} },
+        true);
+}
+
+BOOST_FIXTURE_TEST_CASE(LoadScopeDynamicTensorBroadcasting2D, LoadScopeDynamicTensorBroadcasting2DFixture)
+{
+    RunTest<4, armnn::DataType::Float32, armnn::DataType::Float32>(
+        0,
+        { {"input0", { 0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f }},
+          {"input1", { 3.f, 4.f, 5.f, 6.f, 7.f, 8.f }},
+          {"input2", { -1.f, -2.f, 3.f, 4.f, 5.f, 6.f }}
+        },
+        { {"output", { 4.f, 7.f, 4.f, 5.f, 6.f, 7.f, 10.f, 13.f, 10.f, 11.f, 12.f, 13.f }} },
+        true);
+}
+
+BOOST_FIXTURE_TEST_CASE(LoadScopeDynamicTensorBroadcasting1D, LoadScopeDynamicTensorBroadcasting1DFixture)
+{
+    RunTest<4, armnn::DataType::Float32, armnn::DataType::Float32>(
+        0,
+        { {"input0", { 0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f }},
+          {"input1", { 5.f }},
+          {"input2", { 1.f }}
+        },
+        { {"output", { 4.f, 5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f, 13.f, 14.f, 15.f }} },
+        true);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

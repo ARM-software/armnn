@@ -443,7 +443,7 @@ armnn::TensorInfo ToTensorInfo(TfLiteParser::TensorRawPtr tensorPtr,
     }
 }
 
-armnn::TensorInfo ToTensorInfo(TfLiteParser::TensorRawPtr tensorPtr, 
+armnn::TensorInfo ToTensorInfo(TfLiteParser::TensorRawPtr tensorPtr,
                                const armnn::PermutationVector& dimensionMappings = {0, 1, 2, 3})
 {
     auto const & dimensions = AsUnsignedVector(tensorPtr->shape);
@@ -607,69 +607,6 @@ void TfLiteParser::ResetParser()
     m_Network = armnn::INetworkPtr(nullptr, nullptr);
     m_Model = nullptr;
     m_SubgraphConnections.clear();
-}
-
-void TfLiteParser::AddBroadcastReshapeLayer(size_t subgraphIndex,
-                                            size_t operatorIndex,
-                                            IConnectableLayer *layer)
-{
-    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
-    ARMNN_ASSERT(layer != nullptr);
-
-    const auto & subgraphPtr = m_Model->subgraphs[subgraphIndex];
-    const auto & operatorPtr = subgraphPtr->operators[operatorIndex];
-
-    ARMNN_ASSERT(operatorPtr->inputs.size() > 1);
-
-    uint32_t reshapedInputId = CHECKED_NON_NEGATIVE(operatorPtr->inputs[0]);
-    TensorRawPtr tensorPtr = subgraphPtr->tensors[reshapedInputId].get();
-    uint32_t inputId = CHECKED_NON_NEGATIVE(operatorPtr->inputs[1]);
-    TensorRawPtr tensorPtr1 = subgraphPtr->tensors[inputId].get();
-
-    armnn::TensorInfo reshapedTensorInfo = ToTensorInfo(tensorPtr);
-    armnn::TensorInfo inputTensorInfo    = ToTensorInfo(tensorPtr1);
-
-    uint32_t inputSlotId   = 1;
-    uint32_t reshapeSlotId = 0;
-
-    if (inputTensorInfo.GetNumDimensions() < reshapedTensorInfo.GetNumDimensions())
-    {
-        uint32_t id = reshapedInputId;
-        reshapedInputId = inputId;
-        inputId = id;
-
-        reshapedTensorInfo = ToTensorInfo(tensorPtr1);
-        inputTensorInfo = ToTensorInfo(tensorPtr);
-
-        inputSlotId = 0;
-        reshapeSlotId = 1;
-    }
-
-    uint32_t numDimensions = inputTensorInfo.GetNumDimensions();
-
-    std::vector<unsigned> reshapedDim;
-    for (unsigned int i = 0; i < reshapedTensorInfo.GetNumDimensions(); ++i)
-    {
-        reshapedDim.push_back(reshapedTensorInfo.GetShape()[i]);
-    }
-
-    std::vector<unsigned int> reshapedDimensions(numDimensions, 1);
-    std::copy_backward (reshapedDim.begin(), reshapedDim.end(), reshapedDimensions.end());
-
-    reshapedTensorInfo.SetShape(armnn::TensorShape{ numDimensions, reshapedDimensions.data() });
-
-    std::string layerName = boost::str(boost::format("Reshape_for:%1%") % layer->GetName());
-    armnn::ReshapeDescriptor desc;
-    desc.m_TargetShape = reshapedTensorInfo.GetShape();
-    armnn::IConnectableLayer* reshapeLayer = m_Network->AddReshapeLayer(desc, layerName.c_str());
-
-    reshapeLayer->GetOutputSlot(0).SetTensorInfo(reshapedTensorInfo);
-    reshapeLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(reshapeSlotId));
-
-    RegisterInputSlots(subgraphIndex, operatorIndex, reshapeLayer, {reshapedInputId});
-
-    armnn::IInputSlot* input1Slot = &(layer->GetInputSlot(inputSlotId));
-    RegisterConsumerOfTensor(subgraphIndex, inputId, input1Slot);
 }
 
 INetworkPtr TfLiteParser::CreateNetworkFromBinaryFile(const char* graphFile)
@@ -995,7 +932,7 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
 
     // Mappings from TensorflowLite filter tensors to the ArmNN filter tensors (ArmNN weights have to be [M, I, H, W])
     PermutationVector permutationVector{ 2, 3, 1, 0 }; // [H, W, I, M] -> [M, I, H, W]
-  
+
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     armnn::TensorInfo filterTensorInfo = ToTensorInfo(inputs[1], permutationVector);
 
@@ -1353,14 +1290,7 @@ void TfLiteParser::ParseMaximum(size_t subgraphIndex, size_t operatorIndex)
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    if (inputTensorInfo.GetNumDimensions() != input1TensorInfo.GetNumDimensions())
-    {
-        AddBroadcastReshapeLayer(subgraphIndex, operatorIndex, layer);
-    }
-    else
-    {
-        RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
-    }
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
@@ -1390,14 +1320,7 @@ void TfLiteParser::ParseMinimum(size_t subgraphIndex, size_t operatorIndex)
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    if (inputTensorInfo.GetNumDimensions() != input1TensorInfo.GetNumDimensions())
-    {
-        AddBroadcastReshapeLayer(subgraphIndex, operatorIndex, layer);
-    }
-    else
-    {
-        RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
-    }
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
@@ -1768,14 +1691,7 @@ void TfLiteParser::ParseSub(size_t subgraphIndex, size_t operatorIndex)
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    if (inputTensorInfo.GetNumDimensions() != input1TensorInfo.GetNumDimensions())
-    {
-        AddBroadcastReshapeLayer(subgraphIndex, operatorIndex, layer);
-    }
-    else
-    {
-        RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
-    }
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
 
     layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
 
@@ -1807,15 +1723,7 @@ void TfLiteParser::ParseDiv(size_t subgraphIndex, size_t operatorIndex)
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    if (inputTensorInfo.GetNumDimensions() != input1TensorInfo.GetNumDimensions())
-    {
-        AddBroadcastReshapeLayer(subgraphIndex, operatorIndex, layer);
-    }
-    else
-    {
-        RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
-    }
-
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
     layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -1846,15 +1754,7 @@ void TfLiteParser::ParseAdd(size_t subgraphIndex, size_t operatorIndex)
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    if (inputTensorInfo.GetNumDimensions() != input1TensorInfo.GetNumDimensions())
-    {
-        AddBroadcastReshapeLayer(subgraphIndex, operatorIndex, layer);
-    }
-    else
-    {
-        RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
-    }
-
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
     layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -1885,15 +1785,7 @@ void TfLiteParser::ParseMul(size_t subgraphIndex, size_t operatorIndex)
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    if (inputTensorInfo.GetNumDimensions() != input1TensorInfo.GetNumDimensions())
-    {
-        AddBroadcastReshapeLayer(subgraphIndex, operatorIndex, layer);
-    }
-    else
-    {
-        RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
-    }
-
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
     layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));

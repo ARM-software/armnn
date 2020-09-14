@@ -22,18 +22,29 @@ ElementwiseBaseLayer::ElementwiseBaseLayer(unsigned int numInputSlots, unsigned 
 std::vector<TensorShape> ElementwiseBaseLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
     ARMNN_ASSERT(inputShapes.size() == 2);
-    auto& input0 = inputShapes[0];
-    auto& input1 = inputShapes[1];
+    TensorShape input0 = inputShapes[0];
+    TensorShape input1 = inputShapes[1];
+
+    if (m_ShapeInferenceMethod == ShapeInferenceMethod::ValidateOnly)
+    {
+        ARMNN_ASSERT(input0.GetNumDimensions() == input1.GetNumDimensions());
+    }
+    else if (m_ShapeInferenceMethod == ShapeInferenceMethod::InferAndValidate &&
+             inputShapes[0].GetNumDimensions() < inputShapes[1].GetNumDimensions())
+    {
+        input1 = inputShapes[0];
+        input0 = inputShapes[1];
+    }
+
+    unsigned int numDims = input0.GetNumDimensions();
+    unsigned int shiftedDims = input0.GetNumDimensions() - input1.GetNumDimensions();
 
     // Get the max of the inputs.
-    ARMNN_ASSERT(input0.GetNumDimensions() == input1.GetNumDimensions());
-    unsigned int numDims = input0.GetNumDimensions();
     std::vector<unsigned int> dims(numDims);
-
-    for (unsigned int i = 0; i < numDims; i++)
+    for (unsigned int i = shiftedDims; i < numDims; i++)
     {
         unsigned int dim0 = input0[i];
-        unsigned int dim1 = input1[i];
+        unsigned int dim1 = input1[i - shiftedDims];
 
 #if !NDEBUG
         // Validate inputs are broadcast compatible.
@@ -42,6 +53,12 @@ std::vector<TensorShape> ElementwiseBaseLayer::InferOutputShapes(const std::vect
 #endif
 
         dims[i] = std::max(dim0, dim1);
+    }
+
+    // Fill in the rest of the shifted dimensions.
+    for (unsigned int i = 0; i < shiftedDims; i++)
+    {
+        dims[i] = input0[i];
     }
 
     return std::vector<TensorShape>({ TensorShape(numDims, dims.data()) });

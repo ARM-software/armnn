@@ -451,6 +451,7 @@ list(APPEND armnn_sources
     src/armnn/Utils.cpp
     src/armnn/WallClockTimer.cpp
     src/armnn/WallClockTimer.hpp
+    src/armnn/optimizations/AddBroadcastReshapeLayer.hpp
     src/armnn/optimizations/AddDebug.hpp
     src/armnn/optimizations/All.hpp
     src/armnn/optimizations/ConvertConstants.hpp
@@ -641,6 +642,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/NetworkTests.cpp
         src/armnn/test/ObservableTest.cpp
         src/armnn/test/OptimizerTests.cpp
+        src/armnn/test/optimizations/AddBroadcastReshapeLayerTests.cpp
         src/armnn/test/optimizations/ConvertConstantsBFloatTests.cpp
         src/armnn/test/optimizations/ConvertConstantsFloatToHalfTests.cpp
         src/armnn/test/optimizations/ConvertConstantsHalfToFloatTests.cpp

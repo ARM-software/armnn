@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include "AddBroadcastReshapeLayer.hpp"
 #include "AddDebug.hpp"
 #include "ConvertConstants.hpp"
 #include "ConvertFp32NetworkToBf16.hpp"

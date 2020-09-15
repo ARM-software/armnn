@@ -97,6 +97,7 @@ struct Params
     bool                            m_PrintIntermediateLayers;
     bool                            m_ParseUnsupported;
     bool                            m_InferOutputShape;
+    bool                            m_EnableFastMath;
 
     Params()
         : m_ComputeDevices{}
@@ -108,6 +109,7 @@ struct Params
         , m_PrintIntermediateLayers(false)
         , m_ParseUnsupported(false)
         , m_InferOutputShape(false)
+        , m_EnableFastMath(false)
     {}
 };
 
@@ -417,6 +419,17 @@ public:
             options.m_ReduceFp32ToFp16 = params.m_EnableFp16TurboMode;
             options.m_ReduceFp32ToBf16 = params.m_EnableBf16TurboMode;
             options.m_Debug = params.m_PrintIntermediateLayers;
+
+            armnn::BackendOptions gpuAcc("GpuAcc",
+            {
+                { "FastMathEnabled", params.m_EnableFastMath }
+            });
+            armnn::BackendOptions cpuAcc("CpuAcc",
+            {
+                { "FastMathEnabled", params.m_EnableFastMath }
+            });
+            options.m_ModelOptions.push_back(gpuAcc);
+            options.m_ModelOptions.push_back(cpuAcc);
 
             const auto optimization_start_time = armnn::GetTimeNow();
             optNet = armnn::Optimize(*network, params.m_ComputeDevices, m_Runtime->GetDeviceSpec(), options);

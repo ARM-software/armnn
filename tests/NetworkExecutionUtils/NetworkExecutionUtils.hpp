@@ -377,6 +377,7 @@ struct ExecuteNetworkParams
     bool                          m_GenerateTensorData;
     bool                          m_ParseUnsupported = false;
     bool                          m_InferOutputShape = false;
+    bool                          m_EnableFastMath   = false;
 };
 
 template<typename TParser, typename TDataType>
@@ -400,6 +401,7 @@ int MainImpl(const ExecuteNetworkParams& params,
         inferenceModelParams.m_VisualizePostOptimizationModel = params.m_EnableLayerDetails;
         inferenceModelParams.m_ParseUnsupported               = params.m_ParseUnsupported;
         inferenceModelParams.m_InferOutputShape               = params.m_InferOutputShape;
+        inferenceModelParams.m_EnableFastMath                 = params.m_EnableFastMath;
 
         for(const std::string& inputName: params.m_InputNames)
         {
@@ -554,6 +556,7 @@ int RunTest(const std::string& format,
             bool enableLayerDetails = false,
             bool parseUnsupported = false,
             bool inferOutputShape = false,
+            bool enableFastMath   = false,
             const size_t iterations = 1,
             const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
@@ -683,6 +686,7 @@ int RunTest(const std::string& format,
     params.m_GenerateTensorData       = inputTensorDataFilePathsVector.empty();
     params.m_ParseUnsupported         = parseUnsupported;
     params.m_InferOutputShape         = inferOutputShape;
+    params.m_EnableFastMath           = enableFastMath;
 
     // Warn if ExecuteNetwork will generate dummy input data
     if (params.m_GenerateTensorData)
@@ -754,7 +758,7 @@ int RunTest(const std::string& format,
 int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IRuntime>& runtime,
                const bool enableProfiling, const bool enableFp16TurboMode, const bool enableBf16TurboMode,
                const double& thresholdTime, const bool printIntermediate, bool enableLayerDetails = false,
-               bool parseUnuspported = false, bool inferOutputShape = false)
+               bool parseUnuspported = false, bool inferOutputShape = false, bool enableFastMath = false)
 {
     IgnoreUnused(runtime);
     std::string modelFormat;
@@ -875,7 +879,7 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
                    inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames, outputTensorFiles,
                    dequantizeOutput, enableProfiling, enableFp16TurboMode, enableBf16TurboMode,
                    thresholdTime, printIntermediate, subgraphId, enableLayerDetails, parseUnuspported,
-                   inferOutputShape);
+                   inferOutputShape, enableFastMath);
 }
 
 #if defined(ARMCOMPUTECL_ENABLED)
@@ -902,7 +906,8 @@ int RunCLTuning(const std::string& tuningPath,
             const size_t subgraphId,
             bool enableLayerDetails = false,
             bool parseUnsupported = false,
-            bool inferOutputShape = false)
+            bool inferOutputShape = false,
+            bool enableFastMath = false)
 {
     armnn::IRuntime::CreationOptions options;
     options.m_BackendOptions.emplace_back(
@@ -925,7 +930,7 @@ int RunCLTuning(const std::string& tuningPath,
                         inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
                         outputTensorFiles, dequantizeOutput, enableProfiling, enableFp16TurboMode, enableBf16TurboMode,
                         thresholdTime, printIntermediate, subgraphId, enableLayerDetails, parseUnsupported,
-                        inferOutputShape, 1, runtime);
+                        inferOutputShape, enableFastMath, 1, runtime);
 
     ARMNN_LOG(info) << "Tuning time: " << std::setprecision(2)
                     << std::fixed << armnn::GetTimeDuration(start_time).count() << " ms\n";

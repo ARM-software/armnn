@@ -43,22 +43,36 @@ IBackendInternal::IWorkloadFactoryPtr IBackendInternal::CreateWorkloadFactory(
     const IMemoryManagerSharedPtr& memoryManager,
     const ModelOptions& modelOptions) const
 {
-    if(modelOptions.empty())
+    if (!modelOptions.empty())
     {
-        return CreateWorkloadFactory(memoryManager);
+        for (auto optionsGroup : modelOptions)
+        {
+            if (optionsGroup.GetBackendId() == GetId())
+            {
+                return IWorkloadFactoryPtr{};
+            }
+        }
     }
-    return IWorkloadFactoryPtr{};
+
+    return CreateWorkloadFactory(memoryManager);
 }
 
 IBackendInternal::IWorkloadFactoryPtr IBackendInternal::CreateWorkloadFactory(
     class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry,
     const ModelOptions& modelOptions) const
 {
-    if(modelOptions.empty())
+    if (!modelOptions.empty())
     {
-        return CreateWorkloadFactory(tensorHandleFactoryRegistry);
+        for (auto optionsGroup : modelOptions)
+        {
+            if (optionsGroup.GetBackendId() == GetId())
+            {
+                return IWorkloadFactoryPtr{};
+            }
+        }
     }
-    return IWorkloadFactoryPtr{};
+
+    return CreateWorkloadFactory(tensorHandleFactoryRegistry);
 }
 
 IBackendInternal::IBackendContextPtr IBackendInternal::CreateBackendContext(const IRuntime::CreationOptions&) const
@@ -76,6 +90,22 @@ IBackendInternal::IBackendProfilingContextPtr IBackendInternal::CreateBackendPro
     const IRuntime::CreationOptions&, IBackendProfilingPtr&)
 {
     return IBackendProfilingContextPtr{};
+}
+
+IBackendInternal::ILayerSupportSharedPtr IBackendInternal::GetLayerSupport(const ModelOptions& modelOptions) const
+{
+    if (!modelOptions.empty())
+    {
+        for (auto optionsGroup : modelOptions)
+        {
+            if (optionsGroup.GetBackendId() == GetId())
+            {
+                return ILayerSupportSharedPtr{};
+            }
+        }
+    }
+
+    return GetLayerSupport();
 }
 
 // Default implementation of OptimizeSubgraphView for backward compatibility with the old API.

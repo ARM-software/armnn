@@ -143,14 +143,7 @@ public:
 
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
 
-    virtual ILayerSupportSharedPtr GetLayerSupport(const ModelOptions& modelOptions) const
-    {
-        if (modelOptions.empty())
-        {
-            return GetLayerSupport();
-        }
-        return GetLayerSupport(modelOptions);
-    }
+    virtual ILayerSupportSharedPtr GetLayerSupport(const ModelOptions& modelOptions) const;
 
     virtual OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const;
 

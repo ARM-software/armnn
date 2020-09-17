@@ -95,19 +95,45 @@ void Convolve(const TensorShape& rInputShape,
     const unsigned int heightIndex   = dataLayoutIndexed.GetHeightIndex();
     const unsigned int widthIndex    = dataLayoutIndexed.GetWidthIndex();
 
-    unsigned int depthMultiplier = depthwise ? rFilterShape[0] : 1;
-    unsigned int inputChannels   = depthwise ? rFilterShape[1] : rFilterShape[channelsIndex];
-    unsigned int outputChannels  = depthwise ? inputChannels * depthMultiplier : rFilterShape[0];
+    const unsigned int depthMultiplier = depthwise ? rFilterShape[0] : 1;
+    const unsigned int inputChannels   = depthwise ? rFilterShape[1] : rFilterShape[channelsIndex];
+    const unsigned int outputChannels  = depthwise ? inputChannels * depthMultiplier : rFilterShape[0];
 
-    unsigned int batchSize    = rOutputShape[0];
-    unsigned int outputHeight = rOutputShape[heightIndex];
-    unsigned int outputWidth  = rOutputShape[widthIndex];
-    unsigned int inputHeight  = rInputShape[heightIndex];
-    unsigned int inputWidth   = rInputShape[widthIndex];
+    const unsigned int batchSize    = rOutputShape[0];
+    const unsigned int outputHeight = rOutputShape[heightIndex];
+    const unsigned int outputWidth  = rOutputShape[widthIndex];
+    const unsigned int inputHeight  = rInputShape[heightIndex];
+    const unsigned int inputWidth   = rInputShape[widthIndex];
 
-    unsigned int filterHeight = depthwise ? rFilterShape[2] : rFilterShape[heightIndex];
-    unsigned int filterWidth  = depthwise ? rFilterShape[3] : rFilterShape[widthIndex];
+    const unsigned int filterHeight = depthwise ? rFilterShape[2] : rFilterShape[heightIndex];
+    const unsigned int filterWidth  = depthwise ? rFilterShape[3] : rFilterShape[widthIndex];
 
+    const std::vector<float> inputVec = rInputDecoder.DecodeTensor(rInputShape.GetNumElements());
+
+    uint32_t channelStepSize;
+    if (depthwise)
+    {
+        channelStepSize = filterHeight * filterWidth;
+    }
+    else
+    {
+        if (dataLayoutIndexed.GetDataLayout() == DataLayout::NHWC)
+        {
+            channelStepSize = rFilterShape[3];
+        }
+        else
+        {
+            channelStepSize = rFilterShape[1] * rFilterShape[2] * rFilterShape[3];
+        }
+    }
+
+    const std::vector<float> filterVec = rFilterDecoder.DecodeTensor(rFilterShape.GetNumElements(),
+                                                                     channelStepSize,
+                                                                     depthMultiplier);
+    const std::vector<float> biasVec = biasEnabled ?
+                                       pBiasDecoder->DecodeTensor(outputChannels) : std::vector<float>();
+
+    unsigned int depthwiseMultiplierIdx = 0;
     for (unsigned int batchIdx = 0; batchIdx < batchSize; batchIdx++)
     {
         for (unsigned int cOutput = 0; cOutput < outputChannels; cOutput++)
@@ -117,15 +143,15 @@ void Convolve(const TensorShape& rInputShape,
                 for (unsigned int xOutput = 0; xOutput < outputWidth; xOutput++)
                 {
                     // This loop goes over each output element.
-                    float sum =  0.0f;
+                    float sum = 0.0f;
 
                     // For depthwise, each output channel corresponds to exactly one input channel.
                     // For normal, must loop over each input channel.
                     for (unsigned int cInput = 0; cInput < (depthwise ? 1 : inputChannels); cInput++)
                     {
-                        unsigned int depthwiseMultiplierIdx = 0;
                         if (depthwise)
                         {
+                            depthwiseMultiplierIdx = 0;
                             cInput = cOutput / depthMultiplier;
                             depthwiseMultiplierIdx = cOutput % depthMultiplier;
                         }
@@ -149,7 +175,7 @@ void Convolve(const TensorShape& rInputShape,
                                 {
                                     // Keep this implementation, as using DataLayoutIndexed::GetIndex causes great
                                     // performance regression.
-                                    if (dataLayout == DataLayout::NHWC)
+                                    if (dataLayoutIndexed.GetDataLayout() == DataLayout::NHWC)
                                     {
                                         filterIndex = cOutput * filterHeight * filterWidth * inputChannels +
                                                       yFilter * filterWidth * inputChannels +
@@ -159,14 +185,11 @@ void Convolve(const TensorShape& rInputShape,
                                     else
                                     {
                                         filterIndex = cOutput * filterWidth * filterHeight * inputChannels +
-                                                      cInput  * filterWidth * filterHeight +
+                                                      cInput * filterWidth * filterHeight +
                                                       yFilter * filterWidth +
                                                       xFilter;
                                     }
                                 }
-
-                                rFilterDecoder.SetIndex(filterIndex, cOutput);
-                                float filterValue = rFilterDecoder.Get();
 
                                 unsigned int yInput = yOutput * yStride + yFilter * yDilation;
                                 unsigned int xInput = xOutput * xStride + xFilter * xDilation;
@@ -175,7 +198,7 @@ void Convolve(const TensorShape& rInputShape,
 
                                 // Check if we're in the padding.
                                 if (yInput < paddingTop || yInput >= inputHeight + paddingTop ||
-                                    xInput < paddingLeft || xInput >= inputWidth + paddingLeft )
+                                    xInput < paddingLeft || xInput >= inputWidth + paddingLeft)
                                 {
                                     inputValue = 0.0f;
                                 }
@@ -185,9 +208,9 @@ void Convolve(const TensorShape& rInputShape,
 
                                     // Keep this implementation, as using DataLayoutIndexed::GetIndex causes great
                                     // performance regression.
-                                    if (dataLayout == DataLayout::NHWC)
+                                    if (dataLayoutIndexed.GetDataLayout() == DataLayout::NHWC)
                                     {
-                                        inputIndex = batchIdx * inputHeight * inputWidth  * inputChannels +
+                                        inputIndex = batchIdx * inputHeight * inputWidth * inputChannels +
                                                      (yInput - paddingTop) * inputWidth * inputChannels +
                                                      (xInput - paddingLeft) * inputChannels +
                                                      cInput;
@@ -199,23 +222,34 @@ void Convolve(const TensorShape& rInputShape,
                                                      inputWidth * (yInput - paddingTop) +
                                                      xInput - paddingLeft;
                                     }
-
-                                    rInputDecoder[inputIndex];
-                                    inputValue = rInputDecoder.Get();
+                                    inputValue = inputVec[inputIndex];
                                 }
 
-                                sum += filterValue * inputValue;
+                                sum += filterVec[filterIndex] * inputValue;
                             }
                         }
                     }
 
                     if (biasEnabled)
                     {
-                        (*pBiasDecoder).SetIndex(cOutput, cOutput);
-                        sum += pBiasDecoder->Get();
+                        sum += biasVec[cOutput];
                     }
 
-                    unsigned int outIdx = dataLayoutIndexed.GetIndex(rOutputShape, batchIdx, cOutput, yOutput, xOutput);
+                    unsigned int outIdx;
+                    if (dataLayoutIndexed.GetDataLayout() == DataLayout::NHWC)
+                    {
+                        outIdx =  batchIdx * outputHeight * outputWidth * outputChannels +
+                                  yOutput * outputWidth * outputChannels +
+                                  xOutput * outputChannels +
+                                  cOutput;
+                    }
+                    else
+                    {
+                        outIdx = batchIdx * outputHeight * outputWidth * outputChannels +
+                                 cOutput * outputHeight * outputWidth +
+                                 yOutput * outputWidth +
+                                 xOutput;
+                    }
 
                     rOutputEncoder[outIdx];
                     rOutputEncoder.Set(sum);

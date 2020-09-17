@@ -58,6 +58,7 @@ void RefFullyConnectedWorkload::Execute() const
                    *m_InputDecoder,
                    m_OutputShape,
                    *m_OutputEncoder,
+                   m_WeightShape,
                    *m_WeightDecoder,
                    *m_BiasDecoder,
                    m_Data.m_Parameters.m_BiasEnabled,

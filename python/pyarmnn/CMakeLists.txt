@@ -31,11 +31,7 @@ add_custom_command(OUTPUT ${OUT_WRAP}
                    COMMAND ${CMAKE_COMMAND} -E env ${ARMNN_ENV} ${Python3_EXECUTABLE} ${SETUP_PY} --quiet build_ext --inplace
                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/src/pyarmnn/_generated ${CMAKE_CURRENT_BINARY_DIR}/src/pyarmnn/_generated
                    COMMAND ${CMAKE_COMMAND} -E touch ${OUT_WRAP}
-                   DEPENDS armnn
-                           armnnOnnxParser
-                           armnnCaffeParser
-                           armnnTfParser
-                           armnnTfLiteParser)
+                   DEPENDS armnn)
 
 # source package
 if(BUILD_PYTHON_SRC)

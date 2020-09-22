@@ -138,7 +138,7 @@ int main(int argc, const char* argv[])
             ("infer-output-shape", po::bool_switch()->default_value(false),
                 "Infers output tensor shape from input tensor shape and validate where applicable (where supported by "
                 "parser)")
-            ("enable_fast_math", po::bool_switch()->default_value(false),
+            ("enable-fast-math", po::bool_switch()->default_value(false),
              "Enable fast_math computation of Convolution2D operator where applicable (where supported by backend)");
     }
     catch (const std::exception& e)
@@ -189,7 +189,7 @@ int main(int argc, const char* argv[])
     bool parseUnsupported = vm["parse-unsupported"].as<bool>();
     bool timelineEnabled = vm["timeline-profiling"].as<bool>();
     bool inferOutputShape = vm["infer-output-shape"].as<bool>();
-    bool enableFastMath = vm["enable_fast_math"].as<bool>();
+    bool enableFastMath = vm["enable-fast-math"].as<bool>();
 
     if (enableBf16TurboMode && enableFp16TurboMode)
     {

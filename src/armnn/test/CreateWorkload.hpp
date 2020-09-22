@@ -279,6 +279,64 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadTest(armnn::IW
     return workload;
 }
 
+template <typename Convolution2dWorkload, armnn::DataType DataType>
+std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadFastMathTest(armnn::IWorkloadFactory& factory,
+                                                                               armnn::Graph&            graph,
+                                                                               DataLayout dataLayout = DataLayout::NCHW,
+                                                                               const ModelOptions& modelOptions = {})
+{
+    // Creates the layer we're testing.
+    Convolution2dDescriptor layerDesc;
+    layerDesc.m_PadLeft = 0;
+    layerDesc.m_PadRight = 0;
+    layerDesc.m_PadTop = 0;
+    layerDesc.m_PadBottom = 0;
+    layerDesc.m_StrideX = 1;
+    layerDesc.m_StrideY = 1;
+    layerDesc.m_BiasEnabled = false;
+    layerDesc.m_DataLayout = dataLayout;
+
+    Convolution2dLayer* const layer = graph.AddLayer<Convolution2dLayer>(layerDesc, "layer");
+
+    TensorShape weightShape = TensorShape{32, 32, 3, 3};
+    TensorShape inputShape  = TensorShape{1, 32, 149, 149};
+    TensorShape outputShape = TensorShape{1, 32, 147, 147};
+
+    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo(weightShape, DataType));
+    layer->m_Bias   = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({2}, GetBiasDataType(DataType)));
+
+    layer->m_Weight->Allocate();
+    layer->m_Bias->Allocate();
+
+    // Creates extra layers.
+    Layer* const input = graph.AddLayer<InputLayer>(0, "input");
+    Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Connects up.
+    Connect(input, layer, TensorInfo(inputShape, DataType));
+    Connect(layer, output, TensorInfo(outputShape, DataType));
+    CreateTensorHandles(graph, factory);
+
+    // Makes the workload and checks it.
+    auto workload = MakeAndCheckWorkload<Convolution2dWorkload>(*layer, factory, modelOptions);
+
+    Convolution2dQueueDescriptor queueDescriptor = workload->GetData();
+    BOOST_TEST(queueDescriptor.m_Parameters.m_StrideX == 1);
+    BOOST_TEST(queueDescriptor.m_Parameters.m_StrideY == 1);
+    BOOST_TEST(queueDescriptor.m_Parameters.m_PadLeft == 0);
+    BOOST_TEST(queueDescriptor.m_Parameters.m_PadRight == 0);
+    BOOST_TEST(queueDescriptor.m_Parameters.m_PadTop == 0);
+    BOOST_TEST(queueDescriptor.m_Parameters.m_PadBottom == 0);
+    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
+
+    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
+    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    BOOST_TEST((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo(weightShape, DataType)));
+
+    // Returns so we can do extra, backend-specific tests.
+    return workload;
+}
+
 template <typename LstmWorkload>
 std::unique_ptr<LstmWorkload> CreateLstmWorkloadTest(armnn::IWorkloadFactory& factory, armnn::Graph& graph)
 {

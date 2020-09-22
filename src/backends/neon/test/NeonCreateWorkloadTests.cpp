@@ -292,7 +292,7 @@ BOOST_AUTO_TEST_CASE(CreateConvolution2dFastMathEnabledWorkload)
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager(), modelOptions);
 
     auto workload =
-        CreateConvolution2dWorkloadTest<NeonConvolution2dWorkload, armnn::DataType::Float32>(factory,
+        CreateConvolution2dWorkloadFastMathTest<NeonConvolution2dWorkload, armnn::DataType::Float32>(factory,
                                                                                              graph,
                                                                                              DataLayout::NCHW,
                                                                                              modelOptions);
@@ -301,8 +301,7 @@ BOOST_AUTO_TEST_CASE(CreateConvolution2dFastMathEnabledWorkload)
     auto conv2dWorkload = PolymorphicDowncast<NeonConvolution2dWorkload*>(workload.get());
     IgnoreUnused(conv2dWorkload);
     ARMNN_ASSERT(conv2dWorkload != nullptr);
-    // fast_math enabled but configuration does not match with WINOGRAD
-    ARMNN_ASSERT(conv2dWorkload->GetConvolutionMethod() == arm_compute::ConvolutionMethod::GEMM);
+    ARMNN_ASSERT(conv2dWorkload->GetConvolutionMethod() == arm_compute::ConvolutionMethod::WINOGRAD);
 }
 
 template <typename armnn::DataType DataType>

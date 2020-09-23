@@ -17,8 +17,6 @@
 
 #include <neon/workloads/NeonWorkloadUtils.hpp>
 
-#include <boost/cast.hpp>
-
 namespace armnn
 {
 

@@ -8,8 +8,6 @@
 #include <BFloat16.hpp>
 #include <Half.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
-
 #include <algorithm>
 #include <iostream>
 
@@ -53,10 +51,10 @@ void Debug(const TensorInfo& inputInfo,
     std::cout << "], ";
 
     std::cout << "\"min\": "
-        << boost::numeric_cast<float>(*std::min_element(inputData, inputData + numElements)) << ", ";
+        << static_cast<float>(*std::min_element(inputData, inputData + numElements)) << ", ";
 
     std::cout << "\"max\": "
-        << boost::numeric_cast<float>(*std::max_element(inputData, inputData + numElements)) << ", ";
+        << static_cast<float>(*std::max_element(inputData, inputData + numElements)) << ", ";
 
     std::cout << "\"data\": ";
 
@@ -70,7 +68,7 @@ void Debug(const TensorInfo& inputInfo,
             }
         }
 
-        std::cout << boost::numeric_cast<float>(inputData[i]);
+        std::cout << static_cast<float>(inputData[i]);
 
         for (unsigned int j = 0; j < numDims; j++)
         {

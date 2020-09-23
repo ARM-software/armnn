@@ -8,8 +8,6 @@
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
-
 #include <algorithm>
 #include <numeric>
 
@@ -120,7 +118,7 @@ void AllocateOutputData(unsigned int numOutput,
             {
                 unsigned int boxCornorIndex = selectedBoxes[outputIndices[i]] * 4;
                 detectionScores[i] = selectedScores[outputIndices[i]];
-                detectionClasses[i] = boost::numeric_cast<float>(selectedClasses[outputIndices[i]]);
+                detectionClasses[i] = armnn::numeric_cast<float>(selectedClasses[outputIndices[i]]);
                 detectionBoxes[boxIndex] = boxCorners[boxCornorIndex];
                 detectionBoxes[boxIndex + 1] = boxCorners[boxCornorIndex + 1];
                 detectionBoxes[boxIndex + 2] = boxCorners[boxCornorIndex + 2];
@@ -136,7 +134,7 @@ void AllocateOutputData(unsigned int numOutput,
                 detectionBoxes[boxIndex + 3] = 0.0f;
             }
         }
-        numDetections[0] = boost::numeric_cast<float>(numSelected);
+        numDetections[0] = armnn::numeric_cast<float>(numSelected);
 }
 
 void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,

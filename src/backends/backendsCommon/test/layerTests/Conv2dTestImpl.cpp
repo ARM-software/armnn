@@ -21,8 +21,6 @@
 
 #include <test/TensorHelpers.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
-
 #include <string>
 
 //

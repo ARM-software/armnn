@@ -14,8 +14,6 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/Workload.hpp>
 
-#include <boost/cast.hpp>
-
 namespace armnn
 {
 

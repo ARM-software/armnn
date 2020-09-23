@@ -11,8 +11,6 @@
 #include <armnnUtils/DataLayoutIndexed.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
-
 #include <limits>
 #include <algorithm>
 #include <functional>
@@ -208,7 +206,7 @@ void Pooling2d(Decoder<float>& rInputDecoder,
                     wend = std::min(wend, widthInput + padRight);
 
                     float result = defaultInitializer;
-                    float poolAreaSize = boost::numeric_cast<float>(height * (wend - wstart));
+                    float poolAreaSize = armnn::numeric_cast<float>(height * (wend - wstart));
 
                     // Special case: when the pooling kernel is over a padding region and the padding
                     //               size is larger or equal to the kernel and the kernel only covers
@@ -248,7 +246,7 @@ void Pooling2d(Decoder<float>& rInputDecoder,
                     {
                         // When we exclude the padding, it means we calculate with a smaller
                         // kernel size, so I changed the divisor here.
-                        poolAreaSize = boost::numeric_cast<float>((hend - hstart) * (wend - wstart));
+                        poolAreaSize = armnn::numeric_cast<float>((hend - hstart) * (wend - wstart));
                     }
 
                     for (auto yInput = hstart; yInput < hend; yInput++)

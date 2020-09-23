@@ -23,8 +23,6 @@
 
 #include <arm_compute/runtime/Allocator.h>
 
-#include <boost/cast.hpp>
-
 namespace armnn
 {
 

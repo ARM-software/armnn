@@ -8,7 +8,6 @@
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
 #include <fmt/format.h>
 
 #include <array>
@@ -72,8 +71,8 @@ std::vector<float> ResizeBilinearAndNormalize(const InferenceTestImage & image,
 
     // How much to scale pixel coordinates in the output image to get the corresponding pixel coordinates
     // in the input image.
-    const float scaleY = boost::numeric_cast<float>(inputHeight) / boost::numeric_cast<float>(outputHeight);
-    const float scaleX = boost::numeric_cast<float>(inputWidth) / boost::numeric_cast<float>(outputWidth);
+    const float scaleY = armnn::numeric_cast<float>(inputHeight) / armnn::numeric_cast<float>(outputHeight);
+    const float scaleX = armnn::numeric_cast<float>(inputWidth) / armnn::numeric_cast<float>(outputWidth);
 
     uint8_t rgb_x0y0[3];
     uint8_t rgb_x1y0[3];
@@ -83,11 +82,11 @@ std::vector<float> ResizeBilinearAndNormalize(const InferenceTestImage & image,
     for (unsigned int y = 0; y < outputHeight; ++y)
     {
         // Corresponding real-valued height coordinate in input image.
-        const float iy = boost::numeric_cast<float>(y) * scaleY;
+        const float iy = armnn::numeric_cast<float>(y) * scaleY;
 
         // Discrete height coordinate of top-left texel (in the 2x2 texel area used for interpolation).
         const float fiy = floorf(iy);
-        const unsigned int y0 = boost::numeric_cast<unsigned int>(fiy);
+        const unsigned int y0 = armnn::numeric_cast<unsigned int>(fiy);
 
         // Interpolation weight (range [0,1])
         const float yw = iy - fiy;
@@ -95,9 +94,9 @@ std::vector<float> ResizeBilinearAndNormalize(const InferenceTestImage & image,
         for (unsigned int x = 0; x < outputWidth; ++x)
         {
             // Real-valued and discrete width coordinates in input image.
-            const float ix = boost::numeric_cast<float>(x) * scaleX;
+            const float ix = armnn::numeric_cast<float>(x) * scaleX;
             const float fix = floorf(ix);
-            const unsigned int x0 = boost::numeric_cast<unsigned int>(fix);
+            const unsigned int x0 = armnn::numeric_cast<unsigned int>(fix);
 
             // Interpolation weight (range [0,1]).
             const float xw = ix - fix;

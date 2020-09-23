@@ -7,7 +7,7 @@
 
 #include "TensorBufferArrayView.hpp"
 
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <cmath>
 #include <algorithm>
@@ -27,7 +27,7 @@ inline float Lerp(float a, float b, float w)
 
 inline double EuclideanDistance(float Xa, float Ya, const unsigned int Xb, const unsigned int Yb)
 {
-    return std::sqrt(pow(Xa - boost::numeric_cast<float>(Xb), 2) + pow(Ya - boost::numeric_cast<float>(Yb), 2));
+    return std::sqrt(pow(Xa - armnn::numeric_cast<float>(Xb), 2) + pow(Ya - armnn::numeric_cast<float>(Yb), 2));
 }
 
 inline float CalculateResizeScale(const unsigned int& InputSize,
@@ -35,8 +35,8 @@ inline float CalculateResizeScale(const unsigned int& InputSize,
                                   const bool& AlignCorners)
 {
     return (AlignCorners && OutputSize > 1)
-            ?  boost::numeric_cast<float>(InputSize - 1) / boost::numeric_cast<float>(OutputSize - 1)
-            :  boost::numeric_cast<float>(InputSize) / boost::numeric_cast<float>(OutputSize);
+            ?  armnn::numeric_cast<float>(InputSize - 1) / armnn::numeric_cast<float>(OutputSize - 1)
+            :  armnn::numeric_cast<float>(InputSize) / armnn::numeric_cast<float>(OutputSize);
 }
 
 inline float PixelScaler(const unsigned int& Pixel,

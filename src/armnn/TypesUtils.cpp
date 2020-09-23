@@ -4,8 +4,7 @@
 //
 #include <armnn/TypesUtils.hpp>
 #include <armnn/utility/Assert.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 namespace
 {
@@ -49,7 +48,7 @@ float armnn::Dequantize(QuantizedType value, float scale, int32_t offset)
     static_assert(IsQuantizedType<QuantizedType>(), "Not an integer type.");
     ARMNN_ASSERT(scale != 0.f);
     ARMNN_ASSERT(!IsNan(value));
-    return (boost::numeric_cast<float>(value - offset)) * scale;
+    return (armnn::numeric_cast<float>(value - offset)) * scale;
 }
 
 /// Explicit specialization of Quantize for int8_t

@@ -9,8 +9,8 @@
 
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 
 #include <vector>
@@ -53,7 +53,7 @@ public:
         const std::vector<float>& output4 = mapbox::util::get<std::vector<float>>(this->GetOutputs()[3]);
         ARMNN_ASSERT(output4.size() == k_OutputSize4);
 
-        const size_t numDetections = boost::numeric_cast<size_t>(output4[0]);
+        const size_t numDetections = armnn::numeric_cast<size_t>(output4[0]);
 
         // Check if number of valid detections matches expectations
         const size_t expectedNumDetections = m_DetectedObjects.size();

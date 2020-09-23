@@ -8,8 +8,6 @@
 
 #include <armnn/utility/NumericCast.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
-
 #include <cmath>
 #include <cstddef>
 #include <functional>
@@ -130,15 +128,15 @@ void Mean(const armnn::TensorInfo& inputInfo,
     for (unsigned int idx = 0; idx < numResolvedAxis; ++idx)
     {
         unsigned int current = inputDims[resolvedAxis[idx]];
-        ARMNN_ASSERT(boost::numeric_cast<float>(current) <
-              (std::numeric_limits<float>::max() / boost::numeric_cast<float>(numElementsInAxis)));
+        ARMNN_ASSERT(armnn::numeric_cast<float>(current) <
+              (std::numeric_limits<float>::max() / armnn::numeric_cast<float>(numElementsInAxis)));
         numElementsInAxis *= current;
     }
     if (numElementsInAxis > 0) {
         for (unsigned int idx = 0; idx < numOutputs; ++idx)
         {
             output[idx];
-            output.Set(tempSum[idx] / boost::numeric_cast<float>(numElementsInAxis));
+            output.Set(tempSum[idx] / armnn::numeric_cast<float>(numElementsInAxis));
         }
     }
 }

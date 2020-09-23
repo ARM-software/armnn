@@ -16,7 +16,6 @@
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
 #include <fmt/format.h>
 
 // Caffe
@@ -955,10 +954,10 @@ void CaffeParserBase::ParsePoolingLayer(const LayerParameter& layerParam)
           inputInfo.GetShape()[1],
           static_cast<unsigned int>(ceil(
               static_cast<float>(inputInfo.GetShape()[2] + 2 * pad_h - kernel_h) /
-              boost::numeric_cast<float>(stride_h))) + 1,
+              armnn::numeric_cast<float>(stride_h))) + 1,
           static_cast<unsigned int>(ceil(
               static_cast<float>(inputInfo.GetShape()[3] + 2 * pad_w - kernel_w) /
-              boost::numeric_cast<float>(stride_w))) + 1 },
+              armnn::numeric_cast<float>(stride_w))) + 1 },
         DataType::Float32);
 
     GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)).Connect(poolingLayer->GetInputSlot(0));
@@ -1053,7 +1052,7 @@ void CaffeParserBase::ParseLRNLayer(const LayerParameter& layerParam)
     if (param.has_alpha())
     {
         normalizationDescriptor.m_Alpha = param.alpha();
-        normalizationDescriptor.m_Alpha /= boost::numeric_cast<float>(param.local_size());
+        normalizationDescriptor.m_Alpha /= armnn::numeric_cast<float>(param.local_size());
     }
     else
     {

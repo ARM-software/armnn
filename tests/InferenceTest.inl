@@ -7,7 +7,6 @@
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
 #include <boost/program_options.hpp>
 #include <fmt/format.h>
 
@@ -247,8 +246,8 @@ ClassifierTestCaseProvider<TDatabase, InferenceModel>::GetTestCase(unsigned int 
 template <typename TDatabase, typename InferenceModel>
 bool ClassifierTestCaseProvider<TDatabase, InferenceModel>::OnInferenceTestFinished()
 {
-    const double accuracy = boost::numeric_cast<double>(m_NumCorrectInferences) /
-        boost::numeric_cast<double>(m_NumInferences);
+    const double accuracy = armnn::numeric_cast<double>(m_NumCorrectInferences) /
+        armnn::numeric_cast<double>(m_NumInferences);
     ARMNN_LOG(info) << std::fixed << std::setprecision(3) << "Overall accuracy: " << accuracy;
 
     // If a validation file was requested as output, the predictions are saved to it.

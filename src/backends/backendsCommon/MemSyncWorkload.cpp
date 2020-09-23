@@ -8,8 +8,6 @@
 #include <backendsCommon/MemSyncWorkload.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 
-#include <boost/cast.hpp>
-
 #include <cstring>
 
 namespace armnn

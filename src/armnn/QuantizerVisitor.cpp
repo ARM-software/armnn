@@ -8,9 +8,8 @@
 #include "QuantizerVisitor.hpp"
 #include "StaticRangeVisitor.hpp"
 
+#include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
-
-#include <boost/numeric/conversion/cast.hpp>
 
 namespace armnn
 {
@@ -105,7 +104,7 @@ ConstTensor QuantizerVisitor::CreateQuantizedBias(const IConnectableLayer* srcLa
     for (size_t i = 0; i < backing.size(); ++i)
     {
         float fp32Value = static_cast<const float*>(biases.value().GetMemoryArea())[i];
-        backing[i] = boost::numeric_cast<int32_t>(fp32Value * ( 1 / scale ));
+        backing[i] = armnn::numeric_cast<int32_t>(fp32Value * ( 1 / scale ));
     }
 
     return ConstTensor(qInfo, backing);

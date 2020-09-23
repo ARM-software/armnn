@@ -8,8 +8,6 @@
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
-
 namespace armnn
 {
 

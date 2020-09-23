@@ -10,7 +10,6 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 
-#include <boost/cast.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <utility>

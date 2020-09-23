@@ -8,7 +8,6 @@
 #include <Filesystem.hpp>
 
 #include "../src/armnn/Profiling.hpp"
-#include <boost/numeric/conversion/cast.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 

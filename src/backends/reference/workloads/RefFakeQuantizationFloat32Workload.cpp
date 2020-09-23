@@ -9,7 +9,7 @@
 
 #include "Profiling.hpp"
 
-#include <boost/numeric/conversion/cast.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 namespace armnn
 {
@@ -17,7 +17,7 @@ namespace armnn
 void FakeQuantization(const float* inputData, float* outputData, uint32_t numElements, float min, float max)
 {
     float scale = (max - min) / 255.f;
-    int32_t offset = boost::numeric_cast<int32_t>((-min * 255.f) / (max - min));
+    int32_t offset = armnn::numeric_cast<int32_t>((-min * 255.f) / (max - min));
 
     for (uint32_t i = 0; i < numElements; i++)
     {

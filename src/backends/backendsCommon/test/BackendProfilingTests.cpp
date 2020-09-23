@@ -21,7 +21,6 @@
 #include <armnn/Logging.hpp>
 #include <armnn/profiling/ISendTimelinePacket.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/unit_test.hpp>
 #include <vector>
 

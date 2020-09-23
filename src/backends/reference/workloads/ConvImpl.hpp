@@ -15,8 +15,6 @@
 
 #include <armnnUtils/DataLayoutIndexed.hpp>
 
-#include <boost/numeric/conversion/cast.hpp>
-
 #include <cmath>
 #include <limits>
 

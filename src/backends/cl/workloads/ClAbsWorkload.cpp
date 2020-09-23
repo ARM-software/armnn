@@ -13,8 +13,6 @@
 
 #include <cl/ClTensorHandle.hpp>
 
-#include <boost/cast.hpp>
-
 namespace armnn
 {
 

@@ -14,8 +14,6 @@
 #include <Optimizer.hpp>
 #include <SubgraphViewSelector.hpp>
 
-#include <boost/cast.hpp>
-
 #include <algorithm>
 
 namespace

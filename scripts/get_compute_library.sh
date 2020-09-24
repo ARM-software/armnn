@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_08" # Release 20.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="1643a45557fde79ee209f55c507860307ffe627c" #COMPMID-3760: Reduce template instantiations for ROIAlign reference.
+DEFAULT_CLFRAMEWORKREVISION="840a72cc745c60eccbd26fe192b035ec68b2ee41" #COMPMID-3773: Fix the accumulation of projection in QLSTM.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

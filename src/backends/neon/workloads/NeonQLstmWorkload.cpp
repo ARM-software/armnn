@@ -133,7 +133,7 @@ NeonQLstmWorkload::NeonQLstmWorkload(const QLstmQueueDescriptor& descriptor, con
 
     // Input/Output tensors
     const arm_compute::ITensor& input         = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    const arm_compute::ITensor& outputStateIn = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
+    arm_compute::ITensor& outputStateIn = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     const arm_compute::ITensor& cellStateIn   = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
 
     arm_compute::ITensor& outputStateOut = static_cast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();

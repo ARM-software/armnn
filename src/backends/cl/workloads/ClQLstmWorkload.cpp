@@ -131,8 +131,8 @@ ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor &descriptor, const W
 
     // Input/Output tensors
     const arm_compute::ICLTensor& input         = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    const arm_compute::ICLTensor& outputStateIn = static_cast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
-    arm_compute::ICLTensor& cellStateIn         = static_cast<IClTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
+    arm_compute::ICLTensor&       outputStateIn = static_cast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
+    arm_compute::ICLTensor&       cellStateIn   = static_cast<IClTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
 
     arm_compute::ICLTensor& outputStateOut = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     arm_compute::ICLTensor& cellStateOut   = static_cast<IClTensorHandle*>(m_Data.m_Outputs[1])->GetTensor();

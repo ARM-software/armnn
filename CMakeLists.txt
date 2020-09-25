@@ -543,6 +543,12 @@ list(APPEND armnn_sources
     third-party/cxxopts/cxxopts.hpp
     third-party/ghc/filesystem.hpp
     third-party/half/half.hpp
+    third-party/mapbox/optional.hpp
+    third-party/mapbox/recursive_wrapper.hpp
+    third-party/mapbox/variant.hpp
+    third-party/mapbox/variant_cast.hpp
+    third-party/mapbox/variant_io.hpp
+    third-party/mapbox/variant_visitor.hpp
     )
 
 # Files used for Streamline-based profiling backend

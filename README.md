@@ -54,12 +54,13 @@ This enables machine processing of license information based on the SPDX License
 
 TPIP used by Arm NN:
 
-| Name    | License (SPDX ID) |
-|---------|-------------------|
-| half    | MIT               |
-| stb     | MIT               |
-| cxxopts | MIT               |
-| ghc     | MIT               |
+| Name           | License (SPDX ID) |
+|----------------|-------------------|
+| half           | MIT               |
+| stb            | MIT               |
+| cxxopts        | MIT               |
+| ghc            | MIT               |
+| mapbox/variant | BSD               |
 
 ### Contributions
 

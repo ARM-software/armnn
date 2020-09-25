@@ -16,6 +16,9 @@ target_include_directories(inferenceTest PRIVATE ../src/armnnUtils)
 target_include_directories(inferenceTest PRIVATE ../src/backends)
 target_include_directories(inferenceTest PRIVATE ../third-party/stb)
 
+# Link fmt third-party library
+target_link_libraries(inferenceTest fmt)
+
 if(BUILD_CAFFE_PARSER)
     macro(CaffeParserTest testName sources)
         add_executable_ex(${testName} ${sources})

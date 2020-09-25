@@ -541,10 +541,6 @@ list(APPEND armnn_sources
     src/profiling/backends/BackendProfiling.cpp
     src/profiling/backends/BackendProfiling.hpp
     third-party/cxxopts/cxxopts.hpp
-    third-party/fmt/core.h
-    third-party/fmt/format.h
-    third-party/fmt/format-inl.h
-    third-party/fmt/src/format.cc
     third-party/ghc/filesystem.hpp
     third-party/half/half.hpp
     )
@@ -586,6 +582,10 @@ target_link_libraries(armnn ${CMAKE_DL_LIBS})
 if ("${CMAKE_SYSTEM_NAME}" STREQUAL Windows)
     target_link_libraries(armnn Ws2_32.lib)
 endif()
+
+# Link fmt third-party library
+add_subdirectory(third-party/fmt)
+target_link_libraries(armnn fmt)
 
 if(BUILD_CAFFE_PARSER)
     install(TARGETS armnnCaffeParser

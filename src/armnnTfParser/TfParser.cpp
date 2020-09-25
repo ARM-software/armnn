@@ -24,7 +24,7 @@
 #include <tensorflow/core/framework/graph.pb.h>
 
 #include <boost/format.hpp>
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <numeric>
 
 using namespace armnnUtils;

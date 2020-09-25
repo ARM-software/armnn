@@ -4,7 +4,8 @@
 //
 
 #include <Filesystem.hpp>
-#include <boost/program_options.hpp>
+#include <cxxopts/cxxopts.hpp>
+#include <boost/range/iterator_range.hpp>
 
 #include <algorithm>
 #include <fstream>
@@ -20,6 +21,50 @@ namespace
 class CommandLineProcessor
 {
 public:
+    bool ParseOptions(cxxopts::ParseResult& result)
+    {
+        // indir is mandatory, dir could possibly be changed.
+        if (result.count("indir"))
+        {
+            std::string dir = result["indir"].as<std::string>();
+
+            if (!ValidateDirectory(dir))
+            {
+                return false;
+            }
+
+            m_InputDirectory = dir;
+        }
+        else
+        {
+            std::cerr << "-i/--indir parameter is mandatory." << std::endl;
+            return false;
+        }
+
+        // outfile is mandatory
+        if (result.count("outfile"))
+        {
+            if (!ValidateOutputFile(result["outfile"].as<std::string>()))
+            {
+                return false;
+            }
+        }
+        else
+        {
+            std::cerr << "-o/--outfile parameter is mandatory." << std::endl;
+            return false;
+        }
+
+        if (result.count("layer-binding-id"))
+        {
+            if(!ValidateBindingId(result["layer-binding-id"].as<std::string>()))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     bool ValidateDirectory(std::string& dir)
     {
         if (dir.empty())
@@ -48,7 +93,7 @@ public:
         return true;
     }
 
-    bool ValidateOutputFile(std::string& outputFileName)
+    bool ValidateOutputFile(const std::string& outputFileName)
     {
         if (outputFileName.empty())
         {
@@ -80,70 +125,57 @@ public:
 
     bool ValidateBindingId(const std::string& id)
     {
-         if (!std::all_of(id.begin(), id.end(), ::isdigit))
-         {
-             std::cerr << "Invalid input binding Id" << std::endl;
-             return false;
-         }
+        if (!std::all_of(id.begin(), id.end(), ::isdigit))
+        {
+            std::cerr << "Invalid input binding Id" << std::endl;
+            return false;
+        }
 
         return true;
     }
 
     bool ProcessCommandLine(int argc, char* argv[])
     {
-        namespace po = boost::program_options;
-
-        po::options_description desc("Options");
         try
         {
-            desc.add_options()
-                ("help,h", "Display help messages")
-                ("indir,i", po::value<std::string>(&m_InputDirectory)->required(),
-                            "Directory that .raw files are stored in")
-                ("outfile,o", po::value<std::string>(&m_OutputFileName)->required(),
-                              "Output CSV file path")
-                ("layer-binding-id,l", po::value<std::string>(&m_InputBindingId)->default_value("0"),
-                              "Input layer binding Id, Defaults to 0");
+            cxxopts::Options options("ImageCSVFileGenerator",
+                                     "Program for creating a CSV file that "
+                                     "contains a list of .raw tensor files. "
+                                     "These .raw tensor files can be generated using the ImageTensorGenerator");
+
+            options.add_options()
+                ("h,help", "Display help messages")
+                ("i,indir",
+                    "Directory that .raw files are stored in",
+                 cxxopts::value<std::string>(m_InputDirectory))
+                ("o,outfile",
+                    "Output CSV file path",
+                 cxxopts::value<std::string>(m_OutputFileName))
+                ("l, layer-binding-id",
+                    "Input layer binding Id, Defaults to 0",
+                    cxxopts::value<std::string>(m_InputBindingId)->default_value("0"));
+
+            auto result = options.parse(argc, argv);
+
+            if (result.count("help"))
+            {
+                std::cout << options.help() << std::endl;
+                return false;
+            }
+
+            // Check for mandatory parameters and validate inputs
+            if(!ParseOptions(result)){
+                return false;
+            }
+        }
+        catch (const cxxopts::OptionException& e)
+        {
+            std::cerr << e.what() << std::endl << std::endl;
+            return false;
         }
         catch (const std::exception& e)
         {
             std::cerr << "Fatal internal error: [" << e.what() << "]" << std::endl;
-            return false;
-        }
-
-        po::variables_map vm;
-
-        try
-        {
-            po::store(po::parse_command_line(argc, argv, desc), vm);
-
-            if (vm.count("help"))
-            {
-                std::cout << desc << std::endl;
-                return false;
-            }
-
-            po::notify(vm);
-        }
-        catch (const po::error& e)
-        {
-            std::cerr << e.what() << std::endl << std::endl;
-            std::cerr << desc << std::endl;
-            return false;
-        }
-
-        if (!ValidateDirectory(m_InputDirectory))
-        {
-            return false;
-        }
-
-        if (!ValidateOutputFile(m_OutputFileName))
-        {
-            return false;
-        }
-
-        if(!ValidateBindingId(m_InputBindingId))
-        {
             return false;
         }
 

@@ -533,6 +533,8 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(LstmLayerFloat32NoCifgWithPeepholeWithProjectionWi
 
 // QLstm
 ARMNN_AUTO_TEST_CASE_WITH_THF(QLstm, QLstmTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(QLstm1, QLstmTest1)
+ARMNN_AUTO_TEST_CASE_WITH_THF(QLstm2, QLstmTest2)
 
 // QuantizedLstm
 ARMNN_AUTO_TEST_CASE_WITH_THF(QuantizedLstm, QuantizedLstmTest)

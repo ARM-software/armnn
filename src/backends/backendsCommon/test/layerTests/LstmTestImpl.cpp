@@ -1817,7 +1817,7 @@ LayerTestResult<int8_t, 2> QLstmTestImpl(
     std::vector<int16_t> cellStateInVector = {0, 0, 0, 0, 0, 0, 0, 0};
     auto cellStateInTensor = MakeTensor<int16_t, 2>(cellStateInfo, cellStateInVector);
 
-    std::vector<int8_t> outputStateInVector = {0, 0, 0, 0, 0, 0, 0, 02};
+    std::vector<int8_t> outputStateInVector = {0, 0, 0, 0, 0, 0, 0, 0};
     auto outputStateInTensor = MakeTensor<int8_t, 2>(outputStateInfo, outputStateInVector);
 
     // Output tensors

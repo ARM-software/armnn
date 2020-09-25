@@ -14,7 +14,7 @@ namespace armnn
 {
 using namespace armcomputetensorutils;
 
-ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor &descriptor, const WorkloadInfo &info)
+ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor& descriptor, const WorkloadInfo& info)
     : BaseWorkload<QLstmQueueDescriptor>(descriptor, info)
 {
     arm_compute::LSTMParams<arm_compute::ICLTensor> qLstmParams;
@@ -104,6 +104,7 @@ ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor &descriptor, const W
         m_OutputLayerNormWeightsTensor = std::make_unique<arm_compute::CLTensor>();
         BuildArmComputeTensor(*m_OutputLayerNormWeightsTensor, m_Data.m_OutputLayerNormWeights->GetTensorInfo());
 
+        // Set layer norm params
         qLstmParams.set_layer_normalization_params(
             m_Data.m_InputLayerNormWeights != nullptr ? m_InputLayerNormWeightsTensor.get() : nullptr,
             m_ForgetLayerNormWeightsTensor.get(),
@@ -122,10 +123,11 @@ ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor &descriptor, const W
         m_InputGateBiasTensor = std::make_unique<arm_compute::CLTensor>();
         BuildArmComputeTensor(*m_InputGateBiasTensor, m_Data.m_InputGateBias->GetTensorInfo());
 
+        // Set CIFG params
         qLstmParams.set_cifg_params(
             m_InputToInputWeightsTensor.get(),
             m_RecurrentToInputWeightsTensor.get(),
-            m_Data.m_CellToInputWeights      != nullptr ? m_CellToInputWeightsTensor.get()      : nullptr,
+            m_Data.m_CellToInputWeights != nullptr ? m_CellToInputWeightsTensor.get() : nullptr,
             m_InputGateBiasTensor.get());
     }
 
@@ -148,6 +150,7 @@ ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor &descriptor, const W
                                         m_Data.m_Parameters.m_CellIntermediateScale,
                                         m_Data.m_Parameters.m_OutputIntermediateScale);
 
+    // QLSTM NEON configure
     m_QLstmLayer.configure(&input,
                            m_InputToForgetWeightsTensor.get(),
                            m_InputToCellWeightsTensor.get(),
@@ -165,7 +168,7 @@ ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor &descriptor, const W
                            &output,
                            qLstmParams);
 
-    // InitializeArmComputeTensorData for mandatory params
+    // Initialise ACL tensor data for mandatory params
     InitializeArmComputeClTensorData(*m_InputToForgetWeightsTensor, m_Data.m_InputToForgetWeights);
     InitializeArmComputeClTensorData(*m_InputToCellWeightsTensor,   m_Data.m_InputToCellWeights);
     InitializeArmComputeClTensorData(*m_InputToOutputWeightsTensor, m_Data.m_InputToOutputWeights);
@@ -178,6 +181,7 @@ ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor &descriptor, const W
     InitializeArmComputeClTensorData(*m_CellBiasTensor,       m_Data.m_CellBias);
     InitializeArmComputeClTensorData(*m_OutputGateBiasTensor, m_Data.m_OutputGateBias);
 
+    // Initialise ACL tensor data for optional params
     if (!m_Data.m_Parameters.m_CifgEnabled)
     {
         InitializeArmComputeClTensorData(*m_InputToInputWeightsTensor,     m_Data.m_InputToInputWeights);
@@ -238,7 +242,7 @@ arm_compute::Status ClQLstmWorkloadValidate(const TensorInfo& input,
 {
     arm_compute::LSTMParams<arm_compute::ITensorInfo> aclParamsInfo;
 
-    // The inputs and outputs
+    // Input/Output tensor info
     const arm_compute::TensorInfo aclInputInfo         = BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutputStateInInfo = BuildArmComputeTensorInfo(outputStateIn);
     const arm_compute::TensorInfo aclCellStateInInfo   = BuildArmComputeTensorInfo(cellStateIn);
@@ -270,18 +274,22 @@ arm_compute::Status ClQLstmWorkloadValidate(const TensorInfo& input,
     // Optional tensor info
     arm_compute::TensorInfo aclInputToInputWeightsInfo;
     arm_compute::TensorInfo aclRecurrentToInputWeightsInfo;
+
     arm_compute::TensorInfo aclCellToInputWeightsInfo;
     arm_compute::TensorInfo aclCellToForgetWeightsInfo;
     arm_compute::TensorInfo aclCellToOutputWeightsInfo;
+
     arm_compute::TensorInfo aclInputGateBiasInfo;
+
     arm_compute::TensorInfo aclProjectionWeightsInfo;
     arm_compute::TensorInfo aclProjectionBiasInfo;
+
     arm_compute::TensorInfo aclInputLayerNormWeightsInfo;
     arm_compute::TensorInfo aclForgetLayerNormWeightsInfo;
     arm_compute::TensorInfo aclCellLayerNormWeightsInfo;
     arm_compute::TensorInfo aclOutputLayerNormWeightsInfo;
 
-
+    // Create tensor info for optional params if they are enabled
     if (descriptor.m_PeepholeEnabled)
     {
         if (!descriptor.m_CifgEnabled)
@@ -292,6 +300,7 @@ arm_compute::Status ClQLstmWorkloadValidate(const TensorInfo& input,
         aclCellToForgetWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.GetCellToForgetWeights());
         aclCellToOutputWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.GetCellToOutputWeights());
 
+        // Set peephole params info
         aclParamsInfo.set_peephole_params(&aclCellToForgetWeightsInfo,
                                           &aclCellToOutputWeightsInfo);
     }
@@ -305,6 +314,7 @@ arm_compute::Status ClQLstmWorkloadValidate(const TensorInfo& input,
             aclProjectionBiasInfo = BuildArmComputeTensorInfo(paramsInfo.GetProjectionBias());
         }
 
+        // Set projection params info
         aclParamsInfo.set_projection_params(
             &aclProjectionWeightsInfo,
             paramsInfo.m_ProjectionBias != nullptr ? &aclProjectionBiasInfo : nullptr);
@@ -321,6 +331,7 @@ arm_compute::Status ClQLstmWorkloadValidate(const TensorInfo& input,
         aclCellLayerNormWeightsInfo   = BuildArmComputeTensorInfo(paramsInfo.GetCellLayerNormWeights());
         aclOutputLayerNormWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.GetOutputLayerNormWeights());
 
+        // Set layer norm params info
         aclParamsInfo.set_layer_normalization_params(
             paramsInfo.m_InputLayerNormWeights != nullptr ? &aclInputLayerNormWeightsInfo : nullptr,
             &aclForgetLayerNormWeightsInfo,
@@ -334,14 +345,15 @@ arm_compute::Status ClQLstmWorkloadValidate(const TensorInfo& input,
         aclRecurrentToInputWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.GetRecurrentToInputWeights());
         aclInputGateBiasInfo           = BuildArmComputeTensorInfo(paramsInfo.GetInputGateBias());
 
-
+        // Set CIFG params info
         aclParamsInfo.set_cifg_params(
             &aclInputToInputWeightsInfo,
             &aclRecurrentToInputWeightsInfo,
-            paramsInfo.m_CellToInputWeights      != nullptr ? &aclCellToInputWeightsInfo      : nullptr,
+            paramsInfo.m_CellToInputWeights != nullptr ? &aclCellToInputWeightsInfo : nullptr,
             &aclInputGateBiasInfo);
     }
 
+    // Set scalar descriptor params
     aclParamsInfo.set_cell_clip_params(descriptor.m_CellClip);
     aclParamsInfo.set_projection_clip_params(descriptor.m_ProjectionClip);
     aclParamsInfo.set_hidden_state_params(descriptor.m_HiddenStateZeroPoint, descriptor.m_HiddenStateScale);
@@ -350,6 +362,7 @@ arm_compute::Status ClQLstmWorkloadValidate(const TensorInfo& input,
                                           descriptor.m_CellIntermediateScale,
                                           descriptor.m_OutputIntermediateScale);
 
+    // QLSTM CL validate
     return arm_compute::CLQLSTMLayer::validate(&aclInputInfo,
                                                &aclInputToForgetWeightsInfo,
                                                &aclInputToCellWeightsInfo,

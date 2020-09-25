@@ -9,8 +9,8 @@
 #include <armnn/TypesUtils.hpp>
 #include <Filesystem.hpp>
 
-#include <boost/program_options.hpp>
 #include <mapbox/variant.hpp>
+#include <cxxopts/cxxopts.hpp>
 
 #include <algorithm>
 #include <fstream>
@@ -27,6 +27,54 @@ namespace
 class CommandLineProcessor
 {
 public:
+    bool ParseOptions(cxxopts::ParseResult& result)
+    {
+        // infile is mandatory
+        if (result.count("infile"))
+        {
+            if (!ValidateInputFile(result["infile"].as<std::string>()))
+            {
+                return false;
+            }
+        }
+        else
+        {
+            std::cerr << "-i/--infile parameter is mandatory." << std::endl;
+            return false;
+        }
+
+        // model-format is mandatory
+        if (!result.count("model-format"))
+        {
+            std::cerr << "-f/--model-format parameter is mandatory." << std::endl;
+            return false;
+        }
+
+        // outfile is mandatory
+        if (result.count("outfile"))
+        {
+            if (!ValidateOutputFile(result["outfile"].as<std::string>()))
+            {
+                return false;
+            }
+        }
+        else
+        {
+            std::cerr << "-o/--outfile parameter is mandatory." << std::endl;
+            return false;
+        }
+
+        if (result.count("layout"))
+        {
+            if(!ValidateLayout(result["layout"].as<std::string>()))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     bool ValidateInputFile(const std::string& inputFileName)
     {
         if (inputFileName.empty())
@@ -70,7 +118,7 @@ public:
         return true;
     }
 
-    bool ValidateOutputFile(std::string& outputFileName)
+    bool ValidateOutputFile(const std::string& outputFileName)
     {
         if (outputFileName.empty())
         {
@@ -102,71 +150,64 @@ public:
 
     bool ProcessCommandLine(int argc, char* argv[])
     {
-        namespace po = boost::program_options;
+        cxxopts::Options options("ImageTensorGenerator",
+                                 "Program for pre-processing a .jpg image "
+                                 "before generating a .raw tensor file from it.");
 
-        po::options_description desc("Options");
         try
         {
-            desc.add_options()
-                ("help,h", "Display help messages")
-                ("infile,i", po::value<std::string>(&m_InputFileName)->required(),
-                             "Input image file to generate tensor from")
-                ("model-format,f", po::value<std::string>(&m_ModelFormat)->required(),
-                             "Format of the intended model file that uses the images."
-                             "Different formats have different image normalization styles."
-                             "Accepted values (caffe, tensorflow, tflite)")
-                ("outfile,o", po::value<std::string>(&m_OutputFileName)->required(),
-                             "Output raw tensor file path")
-                ("output-type,z", po::value<std::string>(&m_OutputType)->default_value("float"),
-                             "The data type of the output tensors."
-                             "If unset, defaults to \"float\" for all defined inputs. "
-                             "Accepted values (float, int or qasymm8)")
-                ("new-width", po::value<std::string>(&m_NewWidth)->default_value("0"),
-                             "Resize image to new width. Keep original width if unspecified")
-                ("new-height", po::value<std::string>(&m_NewHeight)->default_value("0"),
-                             "Resize image to new height. Keep original height if unspecified")
-                ("layout,l", po::value<std::string>(&m_Layout)->default_value("NHWC"),
-                             "Output data layout, \"NHWC\" or \"NCHW\", default value NHWC");
+            options.add_options()
+                ("h,help", "Display help messages")
+                ("i,infile",
+                    "Input image file to generate tensor from",
+                    cxxopts::value<std::string>(m_InputFileName))
+                ("f,model-format",
+                    "Format of the intended model file that uses the images."
+                    "Different formats have different image normalization styles."
+                    "Accepted values (caffe, tensorflow, tflite)",
+                    cxxopts::value<std::string>(m_ModelFormat))
+                ("o,outfile",
+                    "Output raw tensor file path",
+                    cxxopts::value<std::string>(m_OutputFileName))
+                ("z,output-type",
+                    "The data type of the output tensors."
+                    "If unset, defaults to \"float\" for all defined inputs. "
+                    "Accepted values (float, int or qasymm8)",
+                    cxxopts::value<std::string>(m_OutputType)->default_value("float"))
+                ("new-width",
+                    "Resize image to new width. Keep original width if unspecified",
+                    cxxopts::value<std::string>(m_NewWidth)->default_value("0"))
+                ("new-height",
+                    "Resize image to new height. Keep original height if unspecified",
+                    cxxopts::value<std::string>(m_NewHeight)->default_value("0"))
+                ("l,layout",
+                    "Output data layout, \"NHWC\" or \"NCHW\", default value NHWC",
+                    cxxopts::value<std::string>(m_Layout)->default_value("NHWC"));
         }
         catch (const std::exception& e)
         {
-            std::cerr << "Fatal internal error: [" << e.what() << "]" << std::endl;
+            std::cerr << options.help() << std::endl;
             return false;
         }
-
-        po::variables_map vm;
 
         try
         {
-            po::store(po::parse_command_line(argc, argv, desc), vm);
+            auto result = options.parse(argc, argv);
 
-            if (vm.count("help"))
+            if (result.count("help"))
             {
-                std::cout << desc << std::endl;
+                std::cout << options.help() << std::endl;
                 return false;
             }
 
-            po::notify(vm);
+            // Check for mandatory parameters and validate inputs
+            if(!ParseOptions(result)){
+                return false;
+            }
         }
-        catch (const po::error& e)
+        catch (const cxxopts::OptionException& e)
         {
             std::cerr << e.what() << std::endl << std::endl;
-            std::cerr << desc << std::endl;
-            return false;
-        }
-
-        if (!ValidateInputFile(m_InputFileName))
-        {
-            return false;
-        }
-
-        if (!ValidateLayout(m_Layout))
-        {
-            return false;
-        }
-
-        if (!ValidateOutputFile(m_OutputFileName))
-        {
             return false;
         }
 

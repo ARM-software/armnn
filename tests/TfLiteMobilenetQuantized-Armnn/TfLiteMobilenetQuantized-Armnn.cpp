@@ -6,7 +6,7 @@
 #include "../ImagePreprocessor.hpp"
 #include "armnnTfLiteParser/ITfLiteParser.hpp"
 
-#include "boost/program_options.hpp"
+#include <cxxopts/cxxopts.hpp>
 #include <fstream>
 
 using namespace armnnTfLiteParser;
@@ -61,20 +61,33 @@ std::vector<ImageSet> ParseDataset(const std::string& filename)
 
 std::string GetLabelsFilenameFromOptions(int argc, char* argv[])
 {
-    namespace po = boost::program_options;
-    po::options_description desc("Validation Options");
-    std::string fn("");
-    desc.add_options()
-        ("labels", po::value<std::string>(&fn), "Filename of a text file where in each line contains an image "
-            "filename and the correct label the network should predict when fed that image");
-    po::variables_map vm;
-    po::parsed_options parsed = po::command_line_parser(argc, argv).options(desc).allow_unregistered().run();
-    po::store(parsed, vm);
-    if (vm.count("labels"))
+    cxxopts::Options options("TfLiteMobilenetQuantized-Armnn","Validation Options");
+
+    std::string fileName;
+    try
     {
-        fn = vm["labels"].as<std::string>();
+        options
+            .allow_unrecognised_options()
+            .add_options()
+                ("l,labels",
+                    "Filename of a text file where in each line contains an image "
+                    "filename and the correct label the network should predict when fed that image",
+                    cxxopts::value<std::string>(fileName));
+
+        auto result = options.parse(argc, argv);
     }
-    return fn;
+    catch (const cxxopts::OptionException& e)
+    {
+        std::cerr << e.what() << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Fatal internal error: [" << e.what() << "]" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    return fileName;
 }
 
 

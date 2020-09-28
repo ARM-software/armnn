@@ -30,8 +30,8 @@
 #include <boost/exception/exception.hpp>
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/program_options.hpp>
-#include <boost/variant.hpp>
 #include <fmt/format.h>
+#include <mapbox/variant.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -327,7 +327,7 @@ public:
     using DataType           = TDataType;
     using Params             = InferenceModelInternal::Params;
     using QuantizationParams = InferenceModelInternal::QuantizationParams;
-    using TContainer         = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
+    using TContainer         = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
 
     struct CommandLineOptions
     {
@@ -499,7 +499,7 @@ public:
         {
             const unsigned int expectedOutputDataSize = GetOutputSize(i);
 
-            boost::apply_visitor([expectedOutputDataSize, i](auto&& value)
+            mapbox::util::apply_visitor([expectedOutputDataSize, i](auto&& value)
             {
                 const unsigned int actualOutputDataSize   = armnn::numeric_cast<unsigned int>(value.size());
                 if (actualOutputDataSize < expectedOutputDataSize)

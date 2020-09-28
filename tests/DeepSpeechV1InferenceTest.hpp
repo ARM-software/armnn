@@ -38,13 +38,13 @@ public:
     TestCaseResult ProcessResult(const InferenceTestOptions& options) override
     {
         armnn::IgnoreUnused(options);
-        const std::vector<float>& output1 = boost::get<std::vector<float>>(this->GetOutputs()[0]); // logits
+        const std::vector<float>& output1 = mapbox::util::get<std::vector<float>>(this->GetOutputs()[0]); // logits
         ARMNN_ASSERT(output1.size() == k_OutputSize1);
 
-        const std::vector<float>& output2 = boost::get<std::vector<float>>(this->GetOutputs()[1]); // new_state_c
+        const std::vector<float>& output2 = mapbox::util::get<std::vector<float>>(this->GetOutputs()[1]); // new_state_c
         ARMNN_ASSERT(output2.size() == k_OutputSize2);
 
-        const std::vector<float>& output3 = boost::get<std::vector<float>>(this->GetOutputs()[2]); // new_state_h
+        const std::vector<float>& output3 = mapbox::util::get<std::vector<float>>(this->GetOutputs()[2]); // new_state_h
         ARMNN_ASSERT(output3.size() == k_OutputSize3);
 
         // Check each output to see whether it is the expected value

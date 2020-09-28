@@ -234,7 +234,7 @@ int main(int argc, char* argv[])
         const map<std::string, std::string> imageNameToLabel = LoadValidationImageFilenamesAndLabels(
             validationLabelPath, pathToDataDir.string(), imageBegIndex, imageEndIndex, blacklistPath);
         armnnUtils::ModelAccuracyChecker checker(imageNameToLabel, modelOutputLabels);
-        using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<uint8_t>>;
+        using TContainer = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<uint8_t>>;
 
         if (ValidateDirectory(dataDir))
         {

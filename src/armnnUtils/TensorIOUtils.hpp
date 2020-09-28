@@ -8,7 +8,7 @@
 #include <armnn/Tensor.hpp>
 
 #include <boost/format.hpp>
-#include <boost/variant/apply_visitor.hpp>
+#include <mapbox/variant.hpp>
 
 namespace armnnUtils
 {
@@ -33,7 +33,7 @@ inline armnn::InputTensors MakeInputTensors(const std::vector<armnn::BindingPoin
         const armnn::BindingPointInfo& inputBinding = inputBindings[i];
         const TContainer& inputData = inputDataContainers[i];
 
-        boost::apply_visitor([&](auto&& value)
+        mapbox::util::apply_visitor([&](auto&& value)
         {
             if (value.size() != inputBinding.second.GetNumElements())
             {
@@ -72,7 +72,7 @@ inline armnn::OutputTensors MakeOutputTensors(const std::vector<armnn::BindingPo
         const armnn::BindingPointInfo& outputBinding = outputBindings[i];
         TContainer& outputData = outputDataContainers[i];
 
-        boost::apply_visitor([&](auto&& value)
+        mapbox::util::apply_visitor([&](auto&& value)
         {
             if (value.size() != outputBinding.second.GetNumElements())
             {

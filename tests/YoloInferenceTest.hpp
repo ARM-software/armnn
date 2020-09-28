@@ -38,7 +38,7 @@ public:
 
         using Boost3dArray = boost::multi_array<float, 3>;
 
-        const std::vector<float>& output = boost::get<std::vector<float>>(this->GetOutputs()[0]);
+        const std::vector<float>& output = mapbox::util::get<std::vector<float>>(this->GetOutputs()[0]);
         ARMNN_ASSERT(output.size() == YoloOutputSize);
 
         constexpr Boost3dArray::index gridSize = 7;

@@ -109,7 +109,7 @@ template <typename TModel>
 class InferenceModelTestCase : public IInferenceTestCase
 {
 public:
-    using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
+    using TContainer = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
 
     InferenceModelTestCase(TModel& model,
                            unsigned int testCaseId,

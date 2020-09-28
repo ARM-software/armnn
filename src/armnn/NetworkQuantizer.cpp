@@ -23,7 +23,7 @@
 #include <armnnUtils/TensorUtils.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
-#include <boost/variant.hpp>
+#include <mapbox/variant.hpp>
 
 #include <vector>
 #include <cmath>
@@ -31,7 +31,7 @@
 namespace armnn
 {
 
-using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
+using TContainer = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
 
 INetworkQuantizer* INetworkQuantizer::CreateRaw(INetwork* inputNetwork, const QuantizerOptions& options)
 {

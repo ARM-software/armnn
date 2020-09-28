@@ -10,7 +10,7 @@
 #include <Filesystem.hpp>
 
 #include <boost/program_options.hpp>
-#include <boost/variant.hpp>
+#include <mapbox/variant.hpp>
 
 #include <algorithm>
 #include <fstream>
@@ -259,7 +259,7 @@ int main(int argc, char* argv[])
     const unsigned int batchSize = 1;
     const armnn::DataLayout outputLayout(cmdline.GetLayout());
 
-    using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<uint8_t>>;
+    using TContainer = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<uint8_t>>;
     std::vector<TContainer> imageDataContainers;
     const NormalizationParameters& normParams = GetNormalizationParameters(modelFormat, outputType);
     try
@@ -291,8 +291,11 @@ int main(int argc, char* argv[])
     imageTensorFile.open(outputPath, std::ofstream::out);
     if (imageTensorFile.is_open())
     {
-        boost::apply_visitor([&imageTensorFile](auto&& imageData) { WriteImageTensorImpl(imageData, imageTensorFile); },
-                             imageDataContainers[0]);
+        mapbox::util::apply_visitor(
+            [&imageTensorFile](auto&& imageData){ WriteImageTensorImpl(imageData,imageTensorFile); },
+            imageDataContainers[0]
+            );
+
         if (!imageTensorFile)
         {
             ARMNN_LOG(fatal) << "Failed to write to output file" << outputPath;

@@ -29,7 +29,7 @@
 #include <ResolveType.hpp>
 
 #include <boost/program_options.hpp>
-#include <boost/variant.hpp>
+#include <mapbox/variant.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -186,7 +186,7 @@ void RemoveDuplicateDevices(std::vector<armnn::BackendId>& computeDevices)
                          computeDevices.end());
 }
 
-struct TensorPrinter : public boost::static_visitor<>
+struct TensorPrinter
 {
     TensorPrinter(const std::string& binding,
                   const armnn::TensorInfo& info,
@@ -286,7 +286,7 @@ std::vector<T> GenerateDummyTensorData(unsigned int numElements)
     return std::vector<T>(numElements, static_cast<T>(0));
 }
 
-using TContainer         = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
+using TContainer         = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
 using QuantizationParams = std::pair<float, int32_t>;
 
 void PopulateTensorWithData(TContainer& tensorData,
@@ -385,7 +385,7 @@ int MainImpl(const ExecuteNetworkParams& params,
              const std::shared_ptr<armnn::IRuntime>& runtime = nullptr,
              size_t iterations = 1)
 {
-    using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
+    using TContainer = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
 
     std::vector<TContainer> inputDataContainers;
 
@@ -501,7 +501,7 @@ int MainImpl(const ExecuteNetworkParams& params,
                                     infoOut,
                                     outputTensorFile,
                                     params.m_DequantizeOutput);
-                boost::apply_visitor(printer, outputDataContainers[i]);
+                mapbox::util::apply_visitor(printer, outputDataContainers[i]);
             }
 
             ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)

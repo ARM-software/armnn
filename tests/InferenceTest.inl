@@ -26,7 +26,7 @@ namespace armnn
 namespace test
 {
 
-using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
+using TContainer = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
 
 template <typename TTestCaseDatabase, typename TModel>
 ClassifierTestCase<TTestCaseDatabase, TModel>::ClassifierTestCase(
@@ -49,7 +49,7 @@ ClassifierTestCase<TTestCaseDatabase, TModel>::ClassifierTestCase(
 {
 }
 
-struct ClassifierResultProcessor : public boost::static_visitor<>
+struct ClassifierResultProcessor
 {
     using ResultMap = std::map<float,int>;
 
@@ -118,7 +118,7 @@ TestCaseResult ClassifierTestCase<TTestCaseDatabase, TModel>::ProcessResult(cons
     const auto testCaseId = this->GetTestCaseId();
 
     ClassifierResultProcessor resultProcessor(m_QuantizationParams.first, m_QuantizationParams.second);
-    boost::apply_visitor(resultProcessor, output);
+    mapbox::util::apply_visitor(resultProcessor, output);
 
     ARMNN_LOG(info) << "= Prediction values for test #" << testCaseId;
     auto it = resultProcessor.GetResultMap().rbegin();
@@ -130,7 +130,7 @@ TestCaseResult ClassifierTestCase<TTestCaseDatabase, TModel>::ProcessResult(cons
     }
 
     unsigned int prediction = 0;
-    boost::apply_visitor([&](auto&& value)
+    mapbox::util::apply_visitor([&](auto&& value)
                          {
                              prediction = armnn::numeric_cast<unsigned int>(
                                      std::distance(value.begin(), std::max_element(value.begin(), value.end())));

@@ -37,16 +37,20 @@ public:
     {
         armnn::IgnoreUnused(options);
 
-        const std::vector<float>& output1 = boost::get<std::vector<float>>(this->GetOutputs()[0]); // bounding boxes
+        // bounding boxes
+        const std::vector<float>& output1 = mapbox::util::get<std::vector<float>>(this->GetOutputs()[0]);
         ARMNN_ASSERT(output1.size() == k_OutputSize1);
 
-        const std::vector<float>& output2 = boost::get<std::vector<float>>(this->GetOutputs()[1]); // classes
+        // classes
+        const std::vector<float>& output2 = mapbox::util::get<std::vector<float>>(this->GetOutputs()[1]);
         ARMNN_ASSERT(output2.size() == k_OutputSize2);
 
-        const std::vector<float>& output3 = boost::get<std::vector<float>>(this->GetOutputs()[2]); // scores
+        // scores
+        const std::vector<float>& output3 = mapbox::util::get<std::vector<float>>(this->GetOutputs()[2]);
         ARMNN_ASSERT(output3.size() == k_OutputSize3);
 
-        const std::vector<float>& output4 = boost::get<std::vector<float>>(this->GetOutputs()[3]); // valid detections
+        // valid detections
+        const std::vector<float>& output4 = mapbox::util::get<std::vector<float>>(this->GetOutputs()[3]);
         ARMNN_ASSERT(output4.size() == k_OutputSize4);
 
         const size_t numDetections = boost::numeric_cast<size_t>(output4[0]);

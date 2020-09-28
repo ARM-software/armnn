@@ -199,11 +199,11 @@ int main(int argc, char* argv[])
             }
 
             // Compares outputs.
-            std::vector<float> output0 = boost::get<std::vector<float>>(outputs[0]);
+            std::vector<float> output0 = mapbox::util::get<std::vector<float>>(outputs[0]);
 
             for (unsigned int k = 1; k < networksCount; ++k)
             {
-                std::vector<float> outputK = boost::get<std::vector<float>>(outputs[k]);
+                std::vector<float> outputK = mapbox::util::get<std::vector<float>>(outputs[k]);
 
                 if (!std::equal(output0.begin(), output0.end(), outputK.begin(), outputK.end()))
                 {

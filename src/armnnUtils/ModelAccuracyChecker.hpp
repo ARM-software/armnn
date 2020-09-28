@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <armnn/Types.hpp>
 #include <armnn/utility/Assert.hpp>
-#include <boost/variant/apply_visitor.hpp>
+#include <mapbox/variant.hpp>
 #include <cstddef>
 #include <functional>
 #include <iostream>
@@ -79,7 +79,7 @@ public:
         auto& output = outputTensor[0];
 
         // Create a map of all predictions
-        boost::apply_visitor([&confidenceMap](auto && value)
+        mapbox::util::apply_visitor([&confidenceMap](auto && value)
                              {
                                  int index = 0;
                                  for (const auto & o : value)

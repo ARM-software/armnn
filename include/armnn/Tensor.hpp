@@ -229,6 +229,11 @@ private:
             , m_Offset(EmptyOptional())
             , m_QuantizationDim(EmptyOptional()) {}
 
+        Quantization(const Quantization& other)
+            : m_Scales(other.m_Scales)
+            , m_Offset(other.m_Offset)
+            , m_QuantizationDim(other.m_QuantizationDim) {}
+
         bool operator==(const Quantization& other) const
         {
             return ((m_Scales == other.m_Scales) && (m_Offset == other.m_Offset) &&
@@ -237,7 +242,7 @@ private:
 
         Quantization& operator=(const Quantization& other)
         {
-            if(!(*this == other))
+            if(this != &other)
             {
                 m_Scales = other.m_Scales;
                 m_Offset = other.m_Offset;

@@ -685,24 +685,29 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
     }
     else
     {
-        // If we got here then we didn't export the memory, so add an output workload which performs a memcopy.
-        outputQueueDescriptor.m_Inputs.push_back(inputTensorHandle);
-        info.m_InputTensorInfos.push_back(inputTensorInfo);
-
-        std::unique_ptr<IWorkload> outputWorkload =
-            std::make_unique<CopyMemGenericWorkload>(outputQueueDescriptor, info);
-        ARMNN_ASSERT_MSG(outputWorkload, "No output workload created");
-
-        std::unique_ptr<TimelineUtilityMethods> timelineUtils =
-                                TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
-        if (timelineUtils)
+        const Layer& connectedLayer = layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetOwningLayer();
+        // Do not add MemCopy Layer if OutputLayer is already connected the MemCopy Layer
+        if (connectedLayer.GetType() != LayerType::MemCopy)
         {
-            // Add Output Workload to the post-optimisation network structure
-            AddWorkloadStructure(timelineUtils, outputWorkload, layer);
-            timelineUtils->Commit();
-        }
+            // If we got here then we didn't export the memory, so add an output workload which performs a memcopy.
+            outputQueueDescriptor.m_Inputs.push_back(inputTensorHandle);
+            info.m_InputTensorInfos.push_back(inputTensorInfo);
 
-        m_OutputQueue.push_back(move(outputWorkload));
+            std::unique_ptr<IWorkload> outputWorkload =
+                std::make_unique<CopyMemGenericWorkload>(outputQueueDescriptor, info);
+            ARMNN_ASSERT_MSG(outputWorkload, "No output workload created");
+
+            std::unique_ptr<TimelineUtilityMethods> timelineUtils =
+                TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
+            if (timelineUtils)
+            {
+                // Add Output Workload to the post-optimisation network structure
+                AddWorkloadStructure(timelineUtils, outputWorkload, layer);
+                timelineUtils->Commit();
+            }
+
+            m_OutputQueue.push_back(move(outputWorkload));
+        }
     }
 }
 

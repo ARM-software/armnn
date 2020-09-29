@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_08" # Release 20.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="d175ecea20f5c9e3bff07f7c5d3e4bb5519f7cb9" #COMPMID-3324: Remove configuration tests.
+DEFAULT_CLFRAMEWORKREVISION="d6d1b3682a2cdd54bae5498635b108a4b19a045a" #COMPMID-3784 Add broadcast support to S32 NEPixelwiseMultiplication
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

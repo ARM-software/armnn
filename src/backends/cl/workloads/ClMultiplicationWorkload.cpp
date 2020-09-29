@@ -19,6 +19,10 @@ arm_compute::Status ClMultiplicationWorkloadValidate(const TensorInfo& input0,
     const arm_compute::TensorInfo aclInput2 = armcomputetensorutils::BuildArmComputeTensorInfo(input1);
     const arm_compute::TensorInfo aclOutput = armcomputetensorutils::BuildArmComputeTensorInfo(output);
 
+    auto convertPolicy = (IsQuantizedType(input0.GetDataType()) || IsQuantizedType(input1.GetDataType())) ?
+                          arm_compute::ConvertPolicy::SATURATE :
+                          arm_compute::ConvertPolicy::WRAP;
+
     // At the time of writing, configure() will fail if a rounding policy other than TO_ZERO is supplied to it,
     // when providing a scale of 1.0 for F32 tensors, even though the provided rounding policy appears to be
     // ignored for F32 tensors.
@@ -26,7 +30,7 @@ arm_compute::Status ClMultiplicationWorkloadValidate(const TensorInfo& input0,
                                                             &aclInput2,
                                                             &aclOutput,
                                                             1.0f,
-                                                            arm_compute::ConvertPolicy::SATURATE,
+                                                            convertPolicy,
                                                             arm_compute::RoundingPolicy::TO_ZERO);
 }
 
@@ -40,12 +44,18 @@ ClMultiplicationWorkload::ClMultiplicationWorkload(const MultiplicationQueueDesc
     arm_compute::ICLTensor& input0 = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& input1 = static_cast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+
+    auto convertPolicy = (IsQuantizedType(info.m_InputTensorInfos[0].GetDataType()) ||
+                          IsQuantizedType(info.m_InputTensorInfos[1].GetDataType())) ?
+                          arm_compute::ConvertPolicy::SATURATE :
+                          arm_compute::ConvertPolicy::WRAP;
+
     // Construct
     m_PixelWiseMultiplication.configure(&input0,
                                         &input1,
                                         &output,
                                         1.0f,
-                                        arm_compute::ConvertPolicy::SATURATE,
+                                        convertPolicy,
                                         arm_compute::RoundingPolicy::TO_NEAREST_EVEN);
 }
 

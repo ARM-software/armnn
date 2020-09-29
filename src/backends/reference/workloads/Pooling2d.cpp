@@ -180,7 +180,7 @@ void Pooling2d(Decoder<float>& rInputDecoder,
         throw armnn::InvalidArgumentException("Unsupported padding type");
     }
 
-    const std::vector<float> decodedInputVec = rInputDecoder.DecodeTensor(inputInfo.GetNumElements());
+    const std::vector<float> decodedInputVec = rInputDecoder.DecodeTensor(inputInfo.GetShape());
 
     for (int n = 0; n < batchSize; n++)
     {

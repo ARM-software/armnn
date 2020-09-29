@@ -52,12 +52,8 @@ void TransposeConvolution2dImpl(const TransposeConvolution2dDescriptor& descript
 
     std::vector<float> outputBuffer(outputShape.GetNumElements(), 0);
 
-    const std::vector<float> inputVec = inputDecoder.DecodeTensor(inputShape.GetNumElements());
-
-    const unsigned channelStep = weightsWidth * weightsHeight * weightsDepth;
-
-    const std::vector<float> filterVec =
-            weightsDecoder.DecodeTensor(weightsShape.GetNumElements(), channelStep);
+    const std::vector<float> inputVec = inputDecoder.DecodeTensor(inputShape);
+    const std::vector<float> filterVec = weightsDecoder.DecodeTensor(weightsShape);
 
     for (unsigned int batch = 0u; batch < numBatches; ++batch)
     {

@@ -45,9 +45,10 @@ public:
 
     virtual IType Get() const = 0;
 
-    virtual std::vector<float> DecodeTensor(uint32_t size,
-                                            uint32_t channelStep = 1,
-                                            uint32_t channelMultiplier = 1) = 0;
+    virtual std::vector<float>
+    DecodeTensor(const TensorShape &tensorShape,
+                 const unsigned int channelMultiplier = 1,
+                 bool isDepthwise = false) = 0;
 };
 
 template<typename IType>
@@ -133,11 +134,13 @@ public:
     {
         return armnn::Dequantize(*m_Iterator, m_Scale, m_Offset);
     }
-
-    std::vector<float> DecodeTensor(uint32_t size, uint32_t channelStepSize, uint32_t channelMultiplier) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
+                                     const unsigned int channelMultiplier,
+                                     const bool isDepthwise) override
     {
-        IgnoreUnused(channelStepSize, channelMultiplier);
+        IgnoreUnused(channelMultiplier, isDepthwise);
 
+        const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
 
@@ -169,11 +172,13 @@ public:
     {
         return armnn::Dequantize(*m_Iterator, m_Scale, m_Offset);
     }
-
-    std::vector<float> DecodeTensor(uint32_t size, uint32_t channelStepSize, uint32_t channelMultiplier) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
+                                     const unsigned int channelMultiplier,
+                                     const bool isDepthwise) override
     {
-        IgnoreUnused(channelStepSize, channelMultiplier);
+        IgnoreUnused(channelMultiplier, isDepthwise);
 
+        const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
 
@@ -205,11 +210,13 @@ public:
     {
         return armnn::Dequantize(*m_Iterator, m_Scale, m_Offset);
     }
-
-    std::vector<float> DecodeTensor(uint32_t size, uint32_t channelStepSize, uint32_t channelMultiplier) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
+                                     const unsigned int channelMultiplier,
+                                     const bool isDepthwise) override
     {
-        IgnoreUnused(channelStepSize, channelMultiplier);
+        IgnoreUnused(channelMultiplier, isDepthwise);
 
+        const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
 
@@ -241,13 +248,13 @@ public:
     {
         return armnn::Dequantize(*m_Iterator, m_Scale, m_Offset);
     }
-
-
-
-    std::vector<float> DecodeTensor(uint32_t size, uint32_t channelStepSize, uint32_t channelMultiplier) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
+                                     const unsigned int channelMultiplier,
+                                     const bool isDepthwise) override
     {
-        IgnoreUnused(channelStepSize, channelMultiplier);
+        IgnoreUnused(channelMultiplier, isDepthwise);
 
+        const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
 
@@ -281,11 +288,13 @@ public:
         armnnUtils::FloatingPointConverter::ConvertBFloat16ToFloat32(m_Iterator, 1, &val);
         return val;
     }
-
-    std::vector<float> DecodeTensor(uint32_t size, uint32_t channelStepSize, uint32_t channelMultiplier) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
+                                     const unsigned int channelMultiplier,
+                                     const bool isDepthwise) override
     {
-        IgnoreUnused(channelStepSize, channelMultiplier);
+        IgnoreUnused(channelMultiplier, isDepthwise);
 
+        const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
 
@@ -318,11 +327,13 @@ public:
         armnnUtils::FloatingPointConverter::ConvertFloat16To32(m_Iterator, 1, &val);
         return val;
     }
-
-    std::vector<float> DecodeTensor(uint32_t size, uint32_t channelStepSize, uint32_t channelMultiplier) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
+                                     const unsigned int channelMultiplier,
+                                     const bool isDepthwise) override
     {
-        IgnoreUnused(channelStepSize, channelMultiplier);
+        IgnoreUnused(channelMultiplier, isDepthwise);
 
+        const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
 
@@ -353,9 +364,12 @@ public:
     {
         return *m_Iterator;
     }
-    std::vector<float> DecodeTensor(uint32_t size, uint32_t channelStepSize, uint32_t channelMultiplier) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
+                                     const unsigned int channelMultiplier,
+                                     const bool isDepthwise) override
     {
-        IgnoreUnused(channelStepSize, channelMultiplier);
+        IgnoreUnused(channelMultiplier, isDepthwise);
+        const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
 
         decodedTensor.reserve(size);
@@ -378,11 +392,13 @@ public:
     {
         return static_cast<float>(*m_Iterator) * m_Scale;
     }
-
-    std::vector<float> DecodeTensor(uint32_t size, uint32_t channelStepSize, uint32_t channelMultiplier) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
+                                     const unsigned int channelMultiplier,
+                                     const bool isDepthwise) override
     {
-        IgnoreUnused(channelStepSize, channelMultiplier);
+        IgnoreUnused(channelMultiplier, isDepthwise);
 
+        const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
 
@@ -413,11 +429,13 @@ public:
     {
         return static_cast<float>(*m_Iterator);
     }
-
-    std::vector<float> DecodeTensor(uint32_t size, uint32_t channelStepSize, uint32_t channelMultiplier) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
+                                     const unsigned int channelMultiplier,
+                                     const bool isDepthwise) override
     {
-        IgnoreUnused(channelStepSize, channelMultiplier);
+        IgnoreUnused(channelMultiplier, isDepthwise);
 
+        const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
 
@@ -444,11 +462,13 @@ public:
     {
         return *m_Iterator;
     }
-
-    std::vector<float> DecodeTensor(uint32_t size, uint32_t channelStepSize, uint32_t channelMultiplier) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
+                                     const unsigned int channelMultiplier,
+                                     const bool isDepthwise) override
     {
-        IgnoreUnused(channelStepSize, channelMultiplier);
+        IgnoreUnused(channelMultiplier, isDepthwise);
 
+        const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
 
@@ -475,11 +495,13 @@ public:
     {
         return *m_Iterator;
     }
-
-    std::vector<float> DecodeTensor(uint32_t size, uint32_t channelStepSize, uint32_t channelMultiplier) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
+                                     const unsigned int channelMultiplier,
+                                     const bool isDepthwise) override
     {
-        IgnoreUnused(channelStepSize, channelMultiplier);
+        IgnoreUnused(channelMultiplier, isDepthwise);
 
+        const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
 
@@ -782,42 +804,49 @@ class QSymm8PerAxisDecoder : public PerAxisIterator<const int8_t, Decoder<float>
 {
 public:
     QSymm8PerAxisDecoder(const int8_t* data, const std::vector<float>& scale, unsigned int axisFactor)
-        : PerAxisIterator(data, axisFactor), m_Scale(scale) {}
+        : PerAxisIterator(data, axisFactor), m_Scales(scale) {}
 
     float Get() const override
     {
-        return armnn::Dequantize(*m_Iterator, m_Scale[m_AxisIndex], 0);
+        return armnn::Dequantize(*m_Iterator, m_Scales[m_AxisIndex], 0);
     }
 
     // Get scale of the current value
     float GetScale() const
     {
-        return m_Scale[m_AxisIndex];
+        return m_Scales[m_AxisIndex];
     }
 
-    std::vector<float> DecodeTensor(uint32_t size, uint32_t channelStepSize, uint32_t channelMultiplier) override
+    std::vector<float> DecodeTensor(const TensorShape &tensorShape,
+                                    const unsigned int channelMultiplier,
+                                    bool isDepthwise) override
     {
-        uint32_t channels = static_cast<uint32_t>(m_Scale.size());
-        uint32_t channelSteps = size / (channelStepSize * channelMultiplier);
+        const uint32_t size = tensorShape.GetNumElements();
+        const uint32_t scaleSize = static_cast<uint32_t>(m_Scales.size());
+
+        const uint32_t stepSize = isDepthwise ?
+                                  tensorShape[2] * tensorShape[3] : tensorShape.GetNumElements() / tensorShape[0];
+
+        const uint32_t stepNum = size / (stepSize * channelMultiplier);
         uint32_t scale;
 
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
 
-        // channelMultiplier is only used in depthwise convolutions and in other cases will cancel out
-        // channelStepSize is the length of a contiguous section of a channel within a tensor
-        // channelSteps is the number of those steps/blocks in the tensor
+        // channelMultiplier is only used in depthwise convolutions and in other cases will have no effect
+        // stepSize is the length of a contiguous area sharing a quantization scale within a tensor
+        // stepNum is the number of those steps/blocks in the tensor
         for (uint32_t mult = 0; mult < channelMultiplier; ++mult)
         {
-            for (uint32_t channelStep = 0; channelStep < channelSteps; ++channelStep)
+            for (uint32_t step = 0; step < stepNum; ++step)
             {
-                scale = (channelMultiplier * channelStep + mult) % channels;
-                for (uint32_t i = 0; i < channelStepSize; ++i)
+                scale = (channelMultiplier * step + mult) % scaleSize;
+                for (uint32_t i = 0; i < stepSize; ++i)
                 {
-                    unsigned int index = mult * channelStepSize * channelMultiplier +
-                                         channelStep * channelStepSize + i;
+                    unsigned int index = mult * stepSize * channelMultiplier +
+                                         step * stepSize + i;
                     this->operator[](index);
-                    decodedTensor.emplace_back(armnn::Dequantize(*m_Iterator, m_Scale[scale], 0));
+                    decodedTensor.emplace_back(armnn::Dequantize(*m_Iterator, m_Scales[scale], 0));
                 }
             }
         }
@@ -825,7 +854,7 @@ public:
     }
 
 private:
-    std::vector<float> m_Scale;
+    std::vector<float> m_Scales;
 };
 
 class QSymm8PerAxisEncoder : public PerAxisIterator<int8_t, Encoder<float>>
@@ -871,27 +900,34 @@ public:
         return m_Scales[m_AxisIndex];
     }
 
-    std::vector<float> DecodeTensor(uint32_t size, uint32_t channelStepSize, uint32_t channelMultiplier) override
+    std::vector<float> DecodeTensor(const TensorShape &tensorShape,
+                                    const unsigned int channelMultiplier,
+                                    bool isDepthwise) override
     {
-        uint32_t channels = static_cast<uint32_t>(m_Scales.size());
-        uint32_t channelSteps = size / (channelStepSize * channelMultiplier);
+        const uint32_t size = tensorShape.GetNumElements();
+        const uint32_t scaleSize = static_cast<uint32_t>(m_Scales.size());
+
+        const uint32_t stepSize = isDepthwise ?
+                                  tensorShape[2] * tensorShape[3] : tensorShape.GetNumElements() / tensorShape[0];
+
+        const uint32_t stepNum = size / (stepSize * channelMultiplier);
         uint32_t scale;
 
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
 
-        // channelMultiplier is only used in depthwise convolutions and in other cases will cancel out
-        // channelStepSize is the length of a contiguous section of a channel within a tensor
-        // channelSteps is the number of those steps/blocks in the tensor
+        // channelMultiplier is only used in depthwise convolutions and in other cases will have no effect
+        // stepSize is the length of a contiguous area sharing a quantization scale within a tensor
+        // stepNum is the number of those steps/blocks in the tensor
         for (uint32_t mult = 0; mult < channelMultiplier; ++mult)
         {
-            for (uint32_t channelStep = 0; channelStep < channelSteps; ++channelStep)
+            for (uint32_t step = 0; step < stepNum; ++step)
             {
-                scale = (channelMultiplier * channelStep + mult) % channels;
-                for (uint32_t i = 0; i < channelStepSize; ++i)
+                scale = (channelMultiplier * step + mult) % scaleSize;
+                for (uint32_t i = 0; i < stepSize; ++i)
                 {
-                    unsigned int index = mult * channelStepSize * channelMultiplier +
-                                         channelStep * channelStepSize + i;
+                    unsigned int index = mult * stepSize * channelMultiplier +
+                                         step * stepSize + i;
                     this->operator[](index);
                     decodedTensor.emplace_back(armnn::Dequantize(*m_Iterator, m_Scales[scale], 0));
                 }

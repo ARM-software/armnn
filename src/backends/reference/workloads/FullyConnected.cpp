@@ -24,10 +24,11 @@ void FullyConnected(const TensorShape& rInputShape,
     // Perform FullyConnected implementation
     unsigned int outputSize = rOutputShape[1];
 
-    const std::vector<float> decodedInputs = rInputDecoder.DecodeTensor(rInputShape.GetNumElements());
-    const std::vector<float> decodedWeights = rWeightDecoder.DecodeTensor(rWeightsShape.GetNumElements());
-    const std::vector<float> decodedBiases = biasEnabled ?
-                                             rBiasDecoder.DecodeTensor(outputSize) : std::vector<float>();
+    const std::vector<float> decodedInputs = rInputDecoder.DecodeTensor(rInputShape);
+    const std::vector<float> decodedWeights = rWeightDecoder.DecodeTensor(rWeightsShape);
+
+    const TensorShape biasShape{outputSize};
+    const std::vector<float> decodedBiases = biasEnabled ? rBiasDecoder.DecodeTensor(biasShape) : std::vector<float>();
 
 
     for (unsigned int n = 0; n < rInputShape[0]; n++)

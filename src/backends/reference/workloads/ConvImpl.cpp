@@ -108,30 +108,11 @@ void Convolve(const TensorShape& rInputShape,
     const unsigned int filterHeight = depthwise ? rFilterShape[2] : rFilterShape[heightIndex];
     const unsigned int filterWidth  = depthwise ? rFilterShape[3] : rFilterShape[widthIndex];
 
-    const std::vector<float> inputVec = rInputDecoder.DecodeTensor(rInputShape.GetNumElements());
+    const std::vector<float> inputVec = rInputDecoder.DecodeTensor(rInputShape);
+    const std::vector<float> filterVec = rFilterDecoder.DecodeTensor(rFilterShape, depthMultiplier, depthwise);
 
-    uint32_t channelStepSize;
-    if (depthwise)
-    {
-        channelStepSize = filterHeight * filterWidth;
-    }
-    else
-    {
-        if (dataLayoutIndexed.GetDataLayout() == DataLayout::NHWC)
-        {
-            channelStepSize = rFilterShape[3];
-        }
-        else
-        {
-            channelStepSize = rFilterShape[1] * rFilterShape[2] * rFilterShape[3];
-        }
-    }
-
-    const std::vector<float> filterVec = rFilterDecoder.DecodeTensor(rFilterShape.GetNumElements(),
-                                                                     channelStepSize,
-                                                                     depthMultiplier);
-    const std::vector<float> biasVec = biasEnabled ?
-                                       pBiasDecoder->DecodeTensor(outputChannels) : std::vector<float>();
+    const TensorShape biasShape{outputChannels};
+    const std::vector<float> biasVec = biasEnabled ? pBiasDecoder->DecodeTensor(biasShape) : std::vector<float>();
 
     unsigned int depthwiseMultiplierIdx = 0;
     for (unsigned int batchIdx = 0; batchIdx < batchSize; batchIdx++)

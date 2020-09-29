@@ -51,8 +51,18 @@ BOOST_AUTO_TEST_CASE(ErrorOnLoadNetwork)
 
     // optimize the network
     std::vector<BackendId> backends = {Compute::CpuRef};
-    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
-    BOOST_CHECK(!optNet); // Should have failed to optimise, as flow control is not yet implemented
+    std::vector<std::string> errMessages;
+
+    try
+    {
+        Optimize(*net, backends, runtime->GetDeviceSpec(), OptimizerOptions(), errMessages);
+        BOOST_FAIL("Should have thrown an exception.");
+    }
+    catch (const InvalidArgumentException& e)
+    {
+        // Different exceptions are thrown on different backends
+    }
+    BOOST_TEST(errMessages.size() > 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

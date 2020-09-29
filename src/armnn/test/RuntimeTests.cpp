@@ -262,17 +262,21 @@ BOOST_AUTO_TEST_CASE(IVGCVSW_1929_QuantizedSoftmaxIssue)
 
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     std::vector<std::string>      errMessages;
-    armnn::IOptimizedNetworkPtr   optNet   = Optimize(*net,
+
+    try
+    {
+        armnn::IOptimizedNetworkPtr optNet = Optimize(*net,
                                                       backends,
                                                       runtime->GetDeviceSpec(),
                                                       OptimizerOptions(),
                                                       errMessages);
-
-    BOOST_TEST(errMessages.size() == 1);
-    BOOST_TEST(errMessages[0] ==
-        "ERROR: output 0 of layer Softmax (softmax) is of type "
-        "Quantized 8 bit but its scale parameter has not been set");
-    BOOST_TEST(!optNet);
+        BOOST_FAIL("An exception should have been thrown");
+    }
+    catch (const InvalidArgumentException& e)
+    {
+        // Different exceptions are thrown on different backends
+    }
+    BOOST_CHECK(errMessages.size() > 0);
 }
 
 BOOST_AUTO_TEST_CASE(RuntimeBackendOptions)

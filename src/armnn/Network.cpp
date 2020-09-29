@@ -1018,7 +1018,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
 {
     if (backendPreferences.empty())
     {
-        throw armnn::InvalidArgumentException("Invoked Optimize with no backends specified");
+        throw InvalidArgumentException("Invoked Optimize with no backends specified");
     }
 
     if (options.m_ReduceFp32ToFp16 && options.m_ReduceFp32ToBf16)
@@ -1082,7 +1082,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
         failureMsg << "None of the preferred backends " << backendPreferences
                    << " are supported. Current platform provides " << backendSettings.m_SupportedBackends;
         ReportError(failureMsg.str(), messages);
-        return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
+        throw InvalidArgumentException(failureMsg.str());
     }
 
     // Create a map to temporarily hold initialized backend objects
@@ -1100,7 +1100,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     if (assignBackendsResult.m_Error)
     {
         // Failed to assign a backend to each layer
-        return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
+        throw InvalidArgumentException("Failed to assign a backend to each layer");
     }
 
     Optimizer::Pass(optGraph, MakeOptimizations(OptimizeInverseConversionsFp16(),
@@ -1114,7 +1114,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     if (backendOptimizationResult.m_Error)
     {
         // Failed to apply the backend-specific optimizations
-        return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
+        throw InvalidArgumentException("Failed to apply the backend-specific optimizations");
     }
 
     // If the debug flag is set, then insert a DebugLayer after each layer

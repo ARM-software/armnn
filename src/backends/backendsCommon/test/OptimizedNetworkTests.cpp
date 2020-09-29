@@ -84,8 +84,18 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateDeviceNonSupportLayerNoFallback)
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
-    BOOST_CHECK(!optNet);
+    std::vector<std::string> errMessages;
+
+    try
+    {
+        Optimize(*net, backends, runtime->GetDeviceSpec(), armnn::OptimizerOptions(), errMessages);
+        BOOST_FAIL("Should have thrown an exception.");
+    }
+    catch (const armnn::InvalidArgumentException& e)
+    {
+        // Different exceptions are thrown on different backends
+    }
+    BOOST_CHECK(errMessages.size() > 0);
 }
 
 BOOST_AUTO_TEST_CASE(OptimizeValidateDeviceNonSupportLayerWithFallback)
@@ -190,10 +200,18 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDevice)
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
     std::vector<armnn::BackendId> backends = { armnn::Compute::Undefined };
+    std::vector<std::string> errMessages;
 
-    armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(net, backends, runtime->GetDeviceSpec());
-    BOOST_CHECK(!optNet);
-
+    try
+    {
+        Optimize(net, backends, runtime->GetDeviceSpec(), armnn::OptimizerOptions(), errMessages);
+        BOOST_FAIL("Should have thrown an exception.");
+    }
+    catch (const armnn::InvalidArgumentException& e)
+    {
+        // Different exceptions are thrown on different backends
+    }
+    BOOST_CHECK(errMessages.size() > 0);
 }
 
 BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDeviceWithFallback)

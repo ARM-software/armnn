@@ -137,10 +137,8 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 	cd ~/armnn-devenv/google/
 	git clone https://github.com/tensorflow/tensorflow.git
         cd tensorflow/
-        git checkout 590d6eef7e91a6a7392c8ffffb7b58f2e0c8bc6b
+        git checkout fcc4b966f1265f466e82617020af93670141b009
 	```
-
-	You need tensorflow/contrib/makefile/tf_proto_files.txt from TensorFlow to generate TensorFlow protobuf definitions. This file is not available in TensorFlow master branch.
 
 #### <a name="buildArmNN">Build ArmNN</a>
 

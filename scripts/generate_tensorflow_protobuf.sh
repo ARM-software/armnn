@@ -52,22 +52,12 @@ then
   exit 1
 fi
 
-
-TF_PROTO_FILES=tensorflow/contrib/makefile/tf_proto_files.txt
-if [ -r $TF_PROTO_FILES ]
-then
-  OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
-  for i in `cat $TF_PROTO_FILES`
-  do
-    LD_LIBRARY_PATH=$OLD_LD_LIBRARY_PATH:${PROTOBUF_INSTALL_DIR}/lib \
-    $PROTOBUF_INSTALL_DIR/bin/protoc $i \
-      --proto_path=. \
-      --proto_path=${PROTOBUF_INSTALL_DIR}/include \
-      --cpp_out $OUTPUT_DIR
-  done
-else
-  echo "Couldn't find $TF_PROTO_FILES. This script should be run from the"
-  echo "tensorflow source directory."
-  exit 1
-fi
-
+OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+#hardware_types.proto and autotuning.proto not required
+find tensorflow -type f -name '*.proto' | grep -v autotuning | grep -v hardware_types | while read i; do
+  LD_LIBRARY_PATH=$OLD_LD_LIBRARY_PATH:${PROTOBUF_INSTALL_DIR}/lib $PROTOBUF_INSTALL_DIR/bin/protoc $i \
+    --proto_path=. \
+    --proto_path=${PROTOBUF_INSTALL_DIR}/include \
+    --cpp_out $OUTPUT_DIR
+  AssertZeroExitCode "Failed to make proto files"
+done

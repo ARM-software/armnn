@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_08" # Release 20.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="de2e747de0a63933d0cfcb75739d9460ea7c2ff5" #COMPMID-3782: Delay initialization of Scheduler
+DEFAULT_CLFRAMEWORKREVISION="b84f9d34dbb857ad6113c0c89ad109498fa75fe5" #COMPMID-3801: Nightly failure - validation CL ArithmeticDivision build error
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

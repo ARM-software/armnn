@@ -2,10 +2,6 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <iostream>
-#include <chrono>
-#include <vector>
-#include <array>
 
 #include "armnn/ArmNN.hpp"
 #include "armnn/Utils.hpp"
@@ -14,6 +10,14 @@
 #include "../Cifar10Database.hpp"
 #include "../InferenceTest.hpp"
 #include "../InferenceModel.hpp"
+
+#include <cxxopts/cxxopts.hpp>
+
+#include <iostream>
+#include <chrono>
+#include <vector>
+#include <array>
+
 
 using namespace std;
 using namespace std::chrono;
@@ -31,65 +35,61 @@ int main(int argc, char* argv[])
     {
         // Configures logging for both the ARMNN library and this test program.
         armnn::ConfigureLogging(true, true, level);
-        namespace po = boost::program_options;
 
         std::vector<armnn::BackendId> computeDevice;
-        std::vector<armnn::BackendId> defaultBackends = {armnn::Compute::CpuAcc, armnn::Compute::CpuRef};
         std::string modelDir;
         std::string dataDir;
 
         const std::string backendsMessage = "Which device to run layers on by default. Possible choices: "
                                           + armnn::BackendRegistryInstance().GetBackendIdsAsString();
 
-        po::options_description desc("Options");
+        cxxopts::Options in_options("MultipleNetworksCifar10",
+                                    "Run multiple networks inference tests using Cifar-10 data.");
+
         try
         {
             // Adds generic options needed for all inference tests.
-            desc.add_options()
-                ("help", "Display help messages")
-                ("model-dir,m", po::value<std::string>(&modelDir)->required(),
-                    "Path to directory containing the Cifar10 model file")
-                ("compute,c", po::value<std::vector<armnn::BackendId>>(&computeDevice)->default_value(defaultBackends),
-                    backendsMessage.c_str())
-                ("data-dir,d", po::value<std::string>(&dataDir)->required(),
-                    "Path to directory containing the Cifar10 test data");
-        }
-        catch (const std::exception& e)
-        {
-            // Coverity points out that default_value(...) can throw a bad_lexical_cast,
-            // and that desc.add_options() can throw boost::io::too_few_args.
-            // They really won't in any of these cases.
-            ARMNN_ASSERT_MSG(false, "Caught unexpected exception");
-            std::cerr << "Fatal internal error: " << e.what() << std::endl;
-            return 1;
-        }
+            in_options.add_options()
+                ("h,help", "Display help messages")
+                ("m,model-dir", "Path to directory containing the Cifar10 model file",
+                 cxxopts::value<std::string>(modelDir))
+                ("c,compute", backendsMessage.c_str(),
+                 cxxopts::value<std::vector<armnn::BackendId>>(computeDevice)->default_value("CpuAcc,CpuRef"))
+                ("d,data-dir", "Path to directory containing the Cifar10 test data",
+                 cxxopts::value<std::string>(dataDir));
 
-        po::variables_map vm;
+            auto result = in_options.parse(argc, argv);
 
-        try
-        {
-            po::store(po::parse_command_line(argc, argv, desc), vm);
-
-            if (vm.count("help"))
+            if(result.count("help") > 0)
             {
-                std::cout << desc << std::endl;
-                return 1;
+                std::cout << in_options.help() << std::endl;
+                return EXIT_FAILURE;
             }
 
-            po::notify(vm);
+            //ensure mandatory parameters given
+            std::string mandatorySingleParameters[] = {"model-dir", "data-dir"};
+            for (auto param : mandatorySingleParameters)
+            {
+                if(result.count(param) > 0)
+                {
+                    std::string dir = result[param].as<std::string>();
+
+                    if(!ValidateDirectory(dir)) {
+                        return EXIT_FAILURE;
+                    }
+                } else {
+                    std::cerr << "Parameter \'--" << param << "\' is required but missing." << std::endl;
+                    return EXIT_FAILURE;
+                }
+            }
         }
-        catch (po::error& e)
+        catch (const cxxopts::OptionException& e)
         {
-            std::cerr << e.what() << std::endl << std::endl;
-            std::cerr << desc << std::endl;
-            return 1;
+            std::cerr << e.what() << std::endl << in_options.help() << std::endl;
+            return EXIT_FAILURE;
         }
 
-        if (!ValidateDirectory(modelDir))
-        {
-            return 1;
-        }
-        string modelPath = modelDir + "cifar10_full_iter_60000.caffemodel";
+        fs::path modelPath = fs::path(modelDir + "/cifar10_full_iter_60000.caffemodel");
 
         // Create runtime
         // This will also load dynamic backend in case that the dynamic backend path is specified
@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
                 std::stringstream message;
                 message << "armnn::Exception ("<<e.what()<<") caught from optimize.";
                 ARMNN_LOG(fatal) << message.str();
-                return 1;
+                return EXIT_FAILURE;
             }
 
             // Loads the network into the runtime.
@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
             if (status == armnn::Status::Failure)
             {
                 ARMNN_LOG(fatal) << "armnn::IRuntime: Failed to load network";
-                return 1;
+                return EXIT_FAILURE;
             }
 
             networks.emplace_back(networkId,
@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
         // Loads a test case and tests inference.
         if (!ValidateDirectory(dataDir))
         {
-            return 1;
+            return EXIT_FAILURE;
         }
         Cifar10Database cifar10(dataDir);
 
@@ -194,7 +194,7 @@ int main(int argc, char* argv[])
                 if (status == armnn::Status::Failure)
                 {
                     ARMNN_LOG(fatal) << "armnn::IRuntime: Failed to enqueue workload";
-                    return 1;
+                    return EXIT_FAILURE;
                 }
             }
 
@@ -208,13 +208,13 @@ int main(int argc, char* argv[])
                 if (!std::equal(output0.begin(), output0.end(), outputK.begin(), outputK.end()))
                 {
                     ARMNN_LOG(error) << "Multiple networks inference failed!";
-                    return 1;
+                    return EXIT_FAILURE;
                 }
             }
         }
 
         ARMNN_LOG(info) << "Multiple networks inference ran successfully!";
-        return 0;
+        return EXIT_SUCCESS;
     }
     catch (const armnn::Exception& e)
     {
@@ -222,13 +222,13 @@ int main(int argc, char* argv[])
         // exception of type std::length_error.
         // Using stderr instead in this context as there is no point in nesting try-catch blocks here.
         std::cerr << "Armnn Error: " << e.what() << std::endl;
-        return 1;
+        return EXIT_FAILURE;
     }
     catch (const std::exception& e)
     {
         // Coverity fix: various boost exceptions can be thrown by methods called by this test.
         std::cerr << "WARNING: MultipleNetworksCifar10: An error has occurred when running the "
                      "multiple networks inference tests: " << e.what() << std::endl;
-        return 1;
+        return EXIT_FAILURE;
     }
 }

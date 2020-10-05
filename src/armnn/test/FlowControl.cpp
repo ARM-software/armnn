@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(ErrorOnLoadNetwork)
     {
         // Different exceptions are thrown on different backends
     }
-    BOOST_TEST(errMessages.size() > 1);
+    BOOST_TEST(errMessages.size() > 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

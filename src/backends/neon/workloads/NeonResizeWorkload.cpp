@@ -36,13 +36,15 @@ arm_compute::Status NeonResizeWorkloadValidate(const TensorInfo& input,
     arm_compute::SamplingPolicy samplingPolicy = descriptor.m_HalfPixelCenters ? arm_compute::SamplingPolicy::CENTER :
                                                                                  arm_compute::SamplingPolicy::TOP_LEFT;
 
+    bool usePadding = false;
+
     return arm_compute::NEScale::validate(&aclInputInfo,
                                           &aclOutputInfo,
                                           arm_compute::ScaleKernelInfo(aclInterpolationPolicy,
                                                                        arm_compute::BorderMode::REPLICATE,
                                                                        arm_compute::PixelValue(0.f),
                                                                        samplingPolicy,
-                                                                       true,
+                                                                       usePadding,
                                                                        descriptor.m_AlignCorners));
 
 }
@@ -67,13 +69,15 @@ NeonResizeWorkload::NeonResizeWorkload(const ResizeQueueDescriptor& descriptor,
                                                  ? arm_compute::SamplingPolicy::CENTER
                                                  : arm_compute::SamplingPolicy::TOP_LEFT;
 
+    bool usePadding = false;
+
     m_ResizeLayer.configure(&input,
                             &output,
                             arm_compute::ScaleKernelInfo(aclInterpolationPolicy,
                                                          arm_compute::BorderMode::REPLICATE,
                                                          arm_compute::PixelValue(0.f),
                                                          samplingPolicy,
-                                                         true,
+                                                         usePadding,
                                                          descriptor.m_Parameters.m_AlignCorners));
 };
 

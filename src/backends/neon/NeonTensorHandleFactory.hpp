@@ -27,7 +27,6 @@ const std::set<armnn::LayerType> paddingRequiredLayers {
     LayerType::Pooling2d,
     LayerType::Quantize,
     LayerType::QuantizedLstm,
-    LayerType::Resize,
     LayerType::Stack,
     LayerType::TransposeConvolution2d
 };

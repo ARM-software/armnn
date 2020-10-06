@@ -22,10 +22,18 @@
 
 #include <HeapProfiling.hpp>
 #include <armnn/utility/NumericCast.hpp>
-#include "armnn/utility/StringUtils.hpp"
+#include <armnn/utility/StringUtils.hpp>
+
+/*
+ * Historically we use the ',' character to separate dimensions in a tensor shape. However, cxxopts will read this
+ * an an array of values which is fine until we have multiple tensors specified. This lumps the values of all shapes
+ * together in a single array and we cannot break it up again. We'll change the vector delimiter to a '.'. We do this
+ * as close as possible to the usage of cxxopts to avoid polluting other possible uses.
+ */
+#define CXXOPTS_VECTOR_DELIMITER '.'
+#include <cxxopts/cxxopts.hpp>
 
 #include <fmt/format.h>
-#include <boost/program_options.hpp>
 
 #include <cstdlib>
 #include <fstream>
@@ -33,8 +41,6 @@
 
 namespace
 {
-
-namespace po = boost::program_options;
 
 armnn::TensorShape ParseTensorShape(std::istream& stream)
 {
@@ -63,46 +69,7 @@ armnn::TensorShape ParseTensorShape(std::istream& stream)
     return armnn::TensorShape(armnn::numeric_cast<unsigned int>(result.size()), result.data());
 }
 
-bool CheckOption(const po::variables_map& vm,
-                 const char* option)
-{
-    if (option == nullptr)
-    {
-        return false;
-    }
-
-    // Check whether 'option' is provided.
-    return vm.find(option) != vm.end();
-}
-
-void CheckOptionDependency(const po::variables_map& vm,
-                           const char* option,
-                           const char* required)
-{
-    if (option == nullptr || required == nullptr)
-    {
-        throw po::error("Invalid option to check dependency for");
-    }
-
-    // Check that if 'option' is provided, 'required' is also provided.
-    if (CheckOption(vm, option) && !vm[option].defaulted())
-    {
-        if (CheckOption(vm, required) == 0 || vm[required].defaulted())
-        {
-            throw po::error(std::string("Option '") + option + "' requires option '" + required + "'.");
-        }
-    }
-}
-
-void CheckOptionDependencies(const po::variables_map& vm)
-{
-    CheckOptionDependency(vm, "model-path", "model-format");
-    CheckOptionDependency(vm, "model-path", "input-name");
-    CheckOptionDependency(vm, "model-path", "output-name");
-    CheckOptionDependency(vm, "input-tensor-shape", "model-path");
-}
-
-int ParseCommandLineArgs(int argc, const char* argv[],
+int ParseCommandLineArgs(int argc, char* argv[],
                          std::string& modelFormat,
                          std::string& modelPath,
                          std::vector<std::string>& inputNames,
@@ -110,64 +77,92 @@ int ParseCommandLineArgs(int argc, const char* argv[],
                          std::vector<std::string>& outputNames,
                          std::string& outputPath, bool& isModelBinary)
 {
-    po::options_description desc("Options");
-
-    desc.add_options()
-        ("help", "Display usage information")
-        ("model-format,f", po::value(&modelFormat)->required(),"Format of the model file"
+    cxxopts::Options options("ArmNNConverter", "Convert a neural network model from provided file to ArmNN format.");
+    try
+    {
+        std::string modelFormatDescription("Format of the model file");
 #if defined(ARMNN_CAFFE_PARSER)
-         ", caffe-binary, caffe-text"
+        modelFormatDescription += ", caffe-binary, caffe-text";
 #endif
 #if defined(ARMNN_ONNX_PARSER)
-         ", onnx-binary, onnx-text"
+        modelFormatDescription += ", onnx-binary, onnx-text";
 #endif
 #if defined(ARMNN_TF_PARSER)
-         ", tensorflow-binary, tensorflow-text"
+        modelFormatDescription += ", tensorflow-binary, tensorflow-text";
 #endif
 #if defined(ARMNN_TF_LITE_PARSER)
-         ", tflite-binary"
+        modelFormatDescription += ", tflite-binary";
 #endif
-         ".")
-        ("model-path,m", po::value(&modelPath)->required(), "Path to model file.")
-        ("input-name,i", po::value<std::vector<std::string>>()->multitoken(),
-         "Identifier of the input tensors in the network, separated by whitespace.")
-        ("input-tensor-shape,s", po::value<std::vector<std::string>>()->multitoken(),
-         "The shape of the input tensor in the network as a flat array of integers, separated by comma."
-         " Multiple shapes are separated by whitespace."
-         " This parameter is optional, depending on the network.")
-        ("output-name,o", po::value<std::vector<std::string>>()->multitoken(),
-         "Identifier of the output tensor in the network.")
-        ("output-path,p", po::value(&outputPath)->required(), "Path to serialize the network to.");
+        modelFormatDescription += ".";
+        options.add_options()
+            ("help", "Display usage information")
+            ("f,model-format", modelFormatDescription, cxxopts::value<std::string>(modelFormat))
+            ("m,model-path", "Path to model file.", cxxopts::value<std::string>(modelPath))
 
-    po::variables_map vm;
-    try
-    {
-        po::store(po::parse_command_line(argc, argv, desc), vm);
+            ("i,input-name", "Identifier of the input tensors in the network. "
+                             "Each input must be specified separately.",
+                             cxxopts::value<std::vector<std::string>>(inputNames))
+            ("s,input-tensor-shape",
+                             "The shape of the input tensor in the network as a flat array of integers, "
+                             "separated by comma. Each input shape must be specified separately after the input name. "
+                             "This parameter is optional, depending on the network.",
+                             cxxopts::value<std::vector<std::string>>(inputTensorShapeStrs))
 
-        if (CheckOption(vm, "help") || argc <= 1)
-        {
-            std::cout << "Convert a neural network model from provided file to ArmNN format." << std::endl;
-            std::cout << std::endl;
-            std::cout << desc << std::endl;
-            exit(EXIT_SUCCESS);
-        }
-        po::notify(vm);
+            ("o,output-name", "Identifier of the output tensor in the network.",
+                              cxxopts::value<std::vector<std::string>>(outputNames))
+            ("p,output-path",
+                         "Path to serialize the network to.", cxxopts::value<std::string>(outputPath));
     }
-    catch (const po::error& e)
+    catch (const std::exception& e)
     {
-        std::cerr << e.what() << std::endl << std::endl;
-        std::cerr << desc << std::endl;
+        std::cerr << e.what() << std::endl << options.help() << std::endl;
         return EXIT_FAILURE;
     }
-
     try
     {
-        CheckOptionDependencies(vm);
+        cxxopts::ParseResult result = options.parse(argc, argv);
+        if (result.count("help"))
+        {
+            std::cerr << options.help()  << std::endl;
+            return EXIT_SUCCESS;
+        }
+        // Check for mandatory single options.
+        std::string mandatorySingleParameters[] = { "model-format", "model-path", "output-name", "output-path" };
+        bool somethingsMissing = false;
+        for (auto param : mandatorySingleParameters)
+        {
+            if (result.count(param) != 1)
+            {
+                std::cerr << "Parameter \'--" << param << "\' is required but missing." << std::endl;
+                somethingsMissing = true;
+            }
+        }
+        // Check at least one "input-name" option.
+        if (result.count("input-name") == 0)
+        {
+            std::cerr << "Parameter \'--" << "input-name" << "\' must be specified at least once." << std::endl;
+            somethingsMissing = true;
+        }
+        // If input-tensor-shape is specified then there must be a 1:1 match with input-name.
+        if (result.count("input-tensor-shape") > 0)
+        {
+            if (result.count("input-tensor-shape") != result.count("input-name"))
+            {
+                std::cerr << "When specifying \'input-tensor-shape\' a matching number of \'input-name\' parameters "
+                             "must be specified." << std::endl;
+                somethingsMissing = true;
+            }
+        }
+
+        if (somethingsMissing)
+        {
+            std::cerr << options.help()  << std::endl;
+            return EXIT_FAILURE;
+        }
     }
-    catch (const po::error& e)
+    catch (const cxxopts::OptionException& e)
     {
         std::cerr << e.what() << std::endl << std::endl;
-        std::cerr << desc << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -184,14 +179,6 @@ int ParseCommandLineArgs(int argc, const char* argv[],
         ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat << "'. Please include 'binary' or 'text'";
         return EXIT_FAILURE;
     }
-
-    if (!vm["input-tensor-shape"].empty())
-    {
-        inputTensorShapeStrs = vm["input-tensor-shape"].as<std::vector<std::string>>();
-    }
-
-    inputNames = vm["input-name"].as<std::vector<std::string>>();
-    outputNames = vm["output-name"].as<std::vector<std::string>>();
 
     return EXIT_SUCCESS;
 }
@@ -346,7 +333,7 @@ private:
 
 } // anonymous namespace
 
-int main(int argc, const char* argv[])
+int main(int argc, char* argv[])
 {
 
 #if (!defined(ARMNN_CAFFE_PARSER)     \

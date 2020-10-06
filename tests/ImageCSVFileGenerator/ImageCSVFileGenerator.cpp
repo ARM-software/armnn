@@ -5,7 +5,6 @@
 
 #include <Filesystem.hpp>
 #include <cxxopts/cxxopts.hpp>
-#include <boost/range/iterator_range.hpp>
 
 #include <algorithm>
 #include <fstream>
@@ -147,10 +146,10 @@ public:
                 ("h,help", "Display help messages")
                 ("i,indir",
                     "Directory that .raw files are stored in",
-                 cxxopts::value<std::string>(m_InputDirectory))
+                    cxxopts::value<std::string>(m_InputDirectory))
                 ("o,outfile",
                     "Output CSV file path",
-                 cxxopts::value<std::string>(m_OutputFileName))
+                    cxxopts::value<std::string>(m_OutputFileName))
                 ("l, layer-binding-id",
                     "Input layer binding Id, Defaults to 0",
                     cxxopts::value<std::string>(m_InputBindingId)->default_value("0"));
@@ -209,7 +208,7 @@ int main(int argc, char* argv[])
     const std::string bindingId(cmdline.GetInputBindingId());
 
     std::vector<fs::path> rawFiles;
-    for (auto& entry : boost::make_iterator_range(fs::directory_iterator(rawDirectory), {}))
+    for (auto& entry : fs::directory_iterator(rawDirectory))
     {
         if (entry.path().extension().c_str() == fileFormat)
         {

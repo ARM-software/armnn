@@ -10,7 +10,6 @@
 #include <Filesystem.hpp>
 
 #include <boost/program_options/variables_map.hpp>
-#include <boost/range/iterator_range.hpp>
 #include <map>
 
 using namespace armnn::test;
@@ -391,11 +390,14 @@ map<std::string, std::string> LoadValidationImageFilenamesAndLabels(const string
 {
     // Populate imageFilenames with names of all .JPEG, .PNG images
     std::vector<std::string> imageFilenames;
-    for (const auto& imageEntry :
-         boost::make_iterator_range(fs::directory_iterator(fs::path(imageDirectoryPath))))
+    for (const auto& imageEntry : fs::directory_iterator(fs::path(imageDirectoryPath)))
     {
         fs::path imagePath = imageEntry.path();
-        std::string imageExtension        = boost::to_upper_copy<std::string>(imagePath.extension().string());
+
+        // Get extension and convert to uppercase
+        std::string imageExtension = imagePath.extension().string();
+        std::transform(imageExtension.begin(), imageExtension.end(), imageExtension.begin(), ::toupper);
+
         if (fs::is_regular_file(imagePath) && (imageExtension == ".JPEG" || imageExtension == ".PNG"))
         {
             imageFilenames.push_back(imagePath.filename().string());

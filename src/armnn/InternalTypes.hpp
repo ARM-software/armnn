@@ -43,6 +43,7 @@
     X(LogSoftmax) \
     X(Lstm) \
     X(QLstm) \
+    X(Map) \
     X(Maximum) \
     X(Mean) \
     X(MemCopy) \

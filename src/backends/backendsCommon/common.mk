@@ -14,6 +14,7 @@ COMMON_SOURCES := \
     IBackendInternal.cpp \
     ITensorHandleFactory.cpp \
     LayerSupportBase.cpp \
+    MapWorkload.cpp \
     MemCopyWorkload.cpp \
     MemImportWorkload.cpp \
     MemSyncWorkload.cpp \

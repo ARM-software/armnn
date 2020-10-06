@@ -36,6 +36,7 @@
 #include "layers/L2NormalizationLayer.hpp"
 #include "layers/LogSoftmaxLayer.hpp"
 #include "layers/LstmLayer.hpp"
+#include "layers/MapLayer.hpp"
 #include "layers/MaximumLayer.hpp"
 #include "layers/MeanLayer.hpp"
 #include "layers/MemCopyLayer.hpp"
@@ -126,6 +127,7 @@ DECLARE_LAYER(InstanceNormalization)
 DECLARE_LAYER(L2Normalization)
 DECLARE_LAYER(LogSoftmax)
 DECLARE_LAYER(Lstm)
+DECLARE_LAYER(Map)
 DECLARE_LAYER(Maximum)
 DECLARE_LAYER(Mean)
 DECLARE_LAYER(MemCopy)

@@ -55,6 +55,11 @@ protected:
     QueueDescriptorWithParameters& operator=(QueueDescriptorWithParameters const&) = default;
 };
 
+struct MapQueueDescriptor : QueueDescriptor
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 struct MemCopyQueueDescriptor : QueueDescriptor
 {
     void Validate(const WorkloadInfo& workloadInfo) const;

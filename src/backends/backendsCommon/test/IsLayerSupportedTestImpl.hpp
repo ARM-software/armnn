@@ -6,6 +6,7 @@
 
 #include <Graph.hpp>
 
+#include <backendsCommon/MapWorkload.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <armnn/utility/IgnoreUnused.hpp>
@@ -162,6 +163,22 @@ struct DummyLayer<armnn::ConcatLayer>
     }
 
     armnn::ConcatLayer* m_Layer;
+};
+
+template<>
+struct DummyLayer<armnn::MapLayer, void>
+{
+    DummyLayer()
+    {
+        m_Layer = dummyGraph.AddLayer<armnn::MapLayer>("");
+    }
+
+    ~DummyLayer()
+    {
+        dummyGraph.EraseLayer(m_Layer);
+    }
+
+    armnn::MapLayer* m_Layer;
 };
 
 template<>
@@ -467,6 +484,27 @@ struct LayerTypePolicy<armnn::LayerType::name, DataType> \
     } \
 };
 
+#define DECLARE_LAYER_POLICY_MAP_PARAM(name, descType) \
+template<armnn::DataType DataType> \
+struct LayerTypePolicy<armnn::LayerType::name, DataType> \
+{ \
+    using Type = armnn::name##Layer; \
+    using Desc = descType; \
+    using QueueDesc = armnn::name##QueueDescriptor; \
+    using Workload = armnn::name##Workload; \
+    constexpr static const char* NameStr = #name; \
+    constexpr static const bool IsException = false; \
+    \
+    static std::unique_ptr<armnn::IWorkload> MakeDummyWorkload(armnn::IWorkloadFactory* factory, \
+        unsigned int nIn, unsigned int nOut) \
+    { \
+        IgnoreUnused(factory); \
+        QueueDesc desc; \
+        armnn::WorkloadInfo info = MakeDummyWorkloadInfo<DataType>(nIn, nOut); \
+        return std::make_unique<armnn::name##Workload>(desc, info); \
+    } \
+};
+
 // Define a layer policy specialization for use with the IsLayerSupported tests.
 // Use this version for layers whose constructor takes 1 parameter(name).
 #define DECLARE_LAYER_POLICY_1_PARAM(name) DECLARE_LAYER_POLICY_CUSTOM_PARAM(name, void)
@@ -562,6 +600,8 @@ DECLARE_LAYER_POLICY_2_PARAM(L2Normalization)
 DECLARE_LAYER_POLICY_2_PARAM(LogSoftmax)
 
 DECLARE_LAYER_POLICY_2_PARAM(Lstm)
+
+DECLARE_LAYER_POLICY_MAP_PARAM(Map, void)
 
 DECLARE_LAYER_POLICY_1_PARAM(Maximum)
 
@@ -749,6 +789,13 @@ bool IsLayerSupportedTest(FactoryType *factory, Tag<Type>)
             return false;
         }
     }
+}
+
+template<typename FactoryType, armnn::DataType DataType, armnn::LayerType Type>
+bool IsLayerSupportedTest(FactoryType *factory, Tag<armnn::LayerType::Map>)
+{
+    IgnoreUnused(factory);
+    return true;
 }
 
 // Helper function to compute the next type in the LayerType enum.

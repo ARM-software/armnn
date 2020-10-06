@@ -22,6 +22,8 @@ list(APPEND armnnBackendsCommon_sources
     LayerSupportBase.hpp
     LayerSupportRules.hpp
     MakeWorkloadHelper.hpp
+    MapWorkload.cpp
+    MapWorkload.hpp
     MemCopyWorkload.cpp
     MemCopyWorkload.hpp
     MemImportWorkload.cpp

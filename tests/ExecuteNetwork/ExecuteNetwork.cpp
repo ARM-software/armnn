@@ -139,7 +139,8 @@ int main(int argc, const char* argv[])
                 "Infers output tensor shape from input tensor shape and validate where applicable (where supported by "
                 "parser)")
             ("enable-fast-math", po::bool_switch()->default_value(false),
-             "Enable fast_math computation of Convolution2D operator where applicable (where supported by backend)");
+             "Enables fast_math options in backends that support it. Using the fast_math flag can lead to "
+             "performance improvements but may result in reduced or different precision.");
     }
     catch (const std::exception& e)
     {

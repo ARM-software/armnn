@@ -382,6 +382,8 @@ list(APPEND armnn_sources
     src/armnn/layers/TransposeConvolution2dLayer.hpp
     src/armnn/layers/TransposeLayer.hpp
     src/armnn/layers/TransposeLayer.cpp
+    src/armnn/layers/UnmapLayer.cpp
+    src/armnn/layers/UnmapLayer.hpp
     src/armnn/BackendRegistry.cpp
     src/armnn/BackendSettings.hpp
     src/armnn/BackendHelper.cpp

@@ -469,7 +469,25 @@ void MapQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     const std::string descriptorName{"MapQueueDescriptor"};
 
     ValidateNumInputs(workloadInfo,  descriptorName, 1);
-    ValidateNumOutputs(workloadInfo, descriptorName , 0);
+    ValidateNumOutputs(workloadInfo, descriptorName, 0);
+
+    for (unsigned int i = 0; i < m_Inputs.size(); ++i)
+    {
+        if (!m_Inputs[i])
+        {
+            throw InvalidArgumentException(
+                fmt::format("{}: Invalid NULL input {}.", descriptorName, static_cast<int>(i)));
+        }
+    }
+}
+
+//---------------------------------------------------------------
+void UnmapQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"UnmapQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 0);
 
     for (unsigned int i = 0; i < m_Inputs.size(); ++i)
     {

@@ -34,6 +34,8 @@ list(APPEND armnnBackendsCommon_sources
     OptimizationViews.hpp
     TensorHandleFactoryRegistry.cpp
     TensorHandleFactoryRegistry.hpp
+    UnmapWorkload.cpp
+    UnmapWorkload.hpp
     WorkloadDataCollector.hpp
     Workload.hpp
     WorkloadData.cpp

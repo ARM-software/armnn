@@ -7,6 +7,7 @@
 #include <Graph.hpp>
 
 #include <backendsCommon/MapWorkload.hpp>
+#include <backendsCommon/UnmapWorkload.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <armnn/utility/IgnoreUnused.hpp>
@@ -212,6 +213,22 @@ struct DummyLayer<armnn::SplitterLayer>
     }
 
     armnn::SplitterLayer* m_Layer;
+};
+
+template<>
+struct DummyLayer<armnn::UnmapLayer, void>
+{
+    DummyLayer()
+    {
+        m_Layer = dummyGraph.AddLayer<armnn::UnmapLayer>("");
+    }
+
+    ~DummyLayer()
+    {
+        dummyGraph.EraseLayer(m_Layer);
+    }
+
+    armnn::UnmapLayer* m_Layer;
 };
 
 template <typename ConvolutionLayerType>
@@ -628,7 +645,6 @@ DECLARE_LAYER_POLICY_2_PARAM(Pooling2d)
 DECLARE_LAYER_POLICY_2_PARAM(PreCompiled)
 
 DECLARE_LAYER_POLICY_1_PARAM(Prelu)
-
 DECLARE_LAYER_POLICY_2_PARAM(QLstm)
 
 DECLARE_LAYER_POLICY_1_PARAM(QuantizedLstm)
@@ -664,6 +680,8 @@ DECLARE_LAYER_POLICY_1_PARAM(Switch)
 DECLARE_LAYER_POLICY_2_PARAM(Transpose)
 
 DECLARE_LAYER_POLICY_2_PARAM(TransposeConvolution2d)
+
+DECLARE_LAYER_POLICY_MAP_PARAM(Unmap, void)
 
 
 // Generic implementation to get the number of input slots for a given layer type;
@@ -793,6 +811,13 @@ bool IsLayerSupportedTest(FactoryType *factory, Tag<Type>)
 
 template<typename FactoryType, armnn::DataType DataType, armnn::LayerType Type>
 bool IsLayerSupportedTest(FactoryType *factory, Tag<armnn::LayerType::Map>)
+{
+    IgnoreUnused(factory);
+    return true;
+}
+
+template<typename FactoryType, armnn::DataType DataType, armnn::LayerType Type>
+bool IsLayerSupportedTest(FactoryType *factory, Tag<armnn::LayerType::Unmap>)
 {
     IgnoreUnused(factory);
     return true;

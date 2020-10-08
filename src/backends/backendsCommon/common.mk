@@ -20,6 +20,7 @@ COMMON_SOURCES := \
     MemSyncWorkload.cpp \
     OptimizationViews.cpp \
     TensorHandleFactoryRegistry.cpp \
+    UnmapWorkload.cpp \
     WorkloadData.cpp \
     WorkloadFactory.cpp \
     WorkloadUtils.cpp

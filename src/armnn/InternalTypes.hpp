@@ -74,7 +74,8 @@
     X(Subtraction) \
     X(Switch) \
     X(Transpose) \
-    X(TransposeConvolution2d)
+    X(TransposeConvolution2d) \
+    X(Unmap)
 
 /// When adding a new layer, adapt also the LastLayer enum value in the
 /// enum class LayerType below
@@ -87,7 +88,7 @@ enum class LayerType
   LIST_OF_LAYER_TYPE
 #undef X
   FirstLayer = Activation,
-  LastLayer = TransposeConvolution2d
+  LastLayer = Unmap
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

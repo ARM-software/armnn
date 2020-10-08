@@ -6,7 +6,7 @@
 #include "CommandLineProcessor.hpp"
 #include <Filesystem.hpp>
 
-#include <boost/program_options.hpp>
+#include <cxxopts/cxxopts.hpp>
 
 namespace armnnQuantizer
 {
@@ -83,53 +83,60 @@ bool ValidateQuantizationScheme(const std::string& scheme)
 
 bool CommandLineProcessor::ProcessCommandLine(int argc, char* argv[])
 {
-    namespace po = boost::program_options;
-
-    po::options_description desc("Options");
     try
     {
-        desc.add_options()
-                ("help,h", "Display help messages")
-                ("infile,f", po::value<std::string>(&m_InputFileName)->required(),
-                             "Input file containing float 32 ArmNN Input Graph")
-                ("scheme,s", po::value<std::string>(&m_QuantizationScheme)->default_value("QAsymmU8"),
-                              "Quantization scheme,"
-                              " \"QAsymmU8\" or \"QAsymmS8\" or \"QSymm16\","
-                              " default value QAsymmU8")
-                ("csvfile,c", po::value<std::string>(&m_CsvFileName)->default_value(""),
-                             "CSV file containing paths for RAW input tensors")
-                ("preserve-data-type,p", po::bool_switch(&m_PreserveDataType)->default_value(false),
-                              "Preserve the input and output data types")
-                ("outdir,d", po::value<std::string>(&m_OutputDirectory)->required(),
-                             "Directory that output file will be written to")
-                ("outfile,o", po::value<std::string>(&m_OutputFileName)->required(), "ArmNN output file name");
+        cxxopts::Options options("ArmnnQuantizer","Convert a Fp32 ArmNN model to a quantized ArmNN model.");
+
+        options.add_options()
+            ("h,help", "Display help messages")
+            ("f,infile",
+                "Input file containing float 32 ArmNN Input Graph",
+                cxxopts::value<std::string>(m_InputFileName))
+            ("s,scheme",
+                "Quantization scheme,"
+                " \"QAsymmU8\" or \"QAsymmS8\" or \"QSymm16\","
+                " default value QAsymmU8",
+                cxxopts::value<std::string>(m_QuantizationScheme)->default_value("QAsymmU8"))
+            ("c,csvfile",
+                "CSV file containing paths for RAW input tensors",
+                cxxopts::value<std::string>(m_CsvFileName)->default_value(""))
+            ("p,preserve-data-type",
+                "Preserve the input and output data types",
+                cxxopts::value<bool>(m_PreserveDataType)->default_value("false"))
+            ("d,outdir",
+                "Directory that output file will be written to",
+                cxxopts::value<std::string>(m_OutputDirectory))
+            ("o,outfile",
+                "ArmNN output file name",
+                cxxopts::value<std::string>(m_OutputFileName));
+
+        auto result = options.parse(argc, argv);
+
+        if (result.count("help") > 0 || argc <= 1)
+        {
+            std::cout << options.help() << std::endl;
+            return false;
+        }
+
+        // Check for mandatory single options.
+        std::string mandatorySingleParameters[] = { "infile", "outdir", "outfile" };
+        for (auto param : mandatorySingleParameters)
+        {
+            if (result.count(param) != 1)
+            {
+                std::cerr << "Parameter \'--" << param << "\' is required but missing." << std::endl;
+                return false;
+            }
+        }
+    }
+    catch (const cxxopts::OptionException& e)
+    {
+        std::cerr << e.what() << std::endl << std::endl;
+        return false;
     }
     catch (const std::exception& e)
     {
         std::cerr << "Fatal internal error: [" << e.what() << "]" << std::endl;
-        return false;
-    }
-
-    po::variables_map vm;
-
-    try
-    {
-        po::store(po::parse_command_line(argc, argv, desc), vm);
-
-        if (vm.count("help") || argc <= 1)
-        {
-            std::cout << "Convert a Fp32 ArmNN model to a quantized ArmNN model."  << std::endl;
-            std::cout << std::endl;
-            std::cout << desc << std::endl;
-            return false;
-        }
-
-        po::notify(vm);
-    }
-    catch (const po::error& e)
-    {
-        std::cerr << e.what() << std::endl << std::endl;
-        std::cerr << desc << std::endl;
         return false;
     }
 

@@ -89,6 +89,14 @@ void ConcatLayer::CreateTensors(const TensorHandleFactoryRegistry& registry,
                         }
                     }
 
+                    // Splitter layer outputs are subtensors on the inputs whereas concat inputs are subtensors on
+                    // the output. If the parent is a Splitter layer we cannot use subtensors.
+                    if ((PolymorphicDowncast<const Layer*>(&(slot->GetOwningLayer())))->GetType() == LayerType::Splitter
+                        && (PolymorphicDowncast<const Layer*>(currentLayer))->GetType() == LayerType::Concat)
+                    {
+                        canUseSubTensorOnXorY = false;
+                    }
+
                     if (!canUseSubTensorOnXorY)
                     {
                         break;

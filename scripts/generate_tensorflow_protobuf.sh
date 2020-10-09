@@ -59,5 +59,9 @@ find tensorflow -type f -name '*.proto' | grep -v autotuning | grep -v hardware_
     --proto_path=. \
     --proto_path=${PROTOBUF_INSTALL_DIR}/include \
     --cpp_out $OUTPUT_DIR
-  AssertZeroExitCode "Failed to make proto files"
+  EXIT_CODE=$?
+  if [ $EXIT_CODE -ne 0 ]; then
+    echo "Failed to make proto files"
+    exit 1
+  fi
 done

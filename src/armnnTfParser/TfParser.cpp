@@ -3564,7 +3564,7 @@ INetworkPtr TfParser::CreateNetworkFromBinaryFile(const char* graphFile,
 
     google::protobuf::io::FileInputStream  inStream(fileno(fd));
     google::protobuf::io::CodedInputStream codedStream(&inStream);
-    codedStream.SetTotalBytesLimit(INT_MAX, INT_MAX);
+    codedStream.SetTotalBytesLimit(INT_MAX);
     bool success = graphDef.ParseFromCodedStream(&codedStream);
     fclose(fd);
 

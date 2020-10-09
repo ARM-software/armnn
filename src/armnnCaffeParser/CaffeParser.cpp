@@ -1731,7 +1731,7 @@ INetworkPtr CaffeParser::CreateNetworkFromBinaryFile(const char* graphFile,
 
     FileInputStream  inStream(fileno(fd));
     CodedInputStream codedStream(&inStream);
-    codedStream.SetTotalBytesLimit(INT_MAX, INT_MAX);
+    codedStream.SetTotalBytesLimit(INT_MAX);
     bool success = netParam.ParseFromCodedStream(&codedStream);
     fclose(fd);
 

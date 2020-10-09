@@ -145,7 +145,7 @@ if(BUILD_TF_PARSER)
         )
     # The generated tensorflow protobuf .cc files are not warning clean and we can't fix them.
     if(COMPILER_IS_GNU_LIKE)
-        set_source_files_properties(${TF_PROTOBUFS} PROPERTIES COMPILE_FLAGS "-Wno-unused-variable -Wno-unused-parameter -Wno-conversion -Wno-sign-conversion")
+        set_source_files_properties(${TF_PROTOBUFS} PROPERTIES COMPILE_FLAGS "-Wno-unused-variable -Wno-unused-parameter -Wno-conversion -Wno-sign-conversion  -Wno-error=deprecated-declarations")
     endif()
 
     add_library_ex(armnnTfParser SHARED ${armnn_tf_parser_sources})

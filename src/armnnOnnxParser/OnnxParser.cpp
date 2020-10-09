@@ -546,7 +546,7 @@ ModelPtr OnnxParser::LoadModelFromBinaryFile(const char* graphFile)
 
     google::protobuf::io::FileInputStream  inStream(fileno(fd));
     google::protobuf::io::CodedInputStream codedStream(&inStream);
-    codedStream.SetTotalBytesLimit(INT_MAX, INT_MAX);
+    codedStream.SetTotalBytesLimit(INT_MAX);
     bool success = modelProto.get()->ParseFromCodedStream(&codedStream);
     fclose(fd);
 

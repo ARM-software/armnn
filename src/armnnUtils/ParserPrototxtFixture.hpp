@@ -11,7 +11,6 @@
 #include <Network.hpp>
 #include <VerificationHelpers.hpp>
 
-#include <boost/format.hpp>
 #include <fmt/format.h>
 
 #include <iomanip>

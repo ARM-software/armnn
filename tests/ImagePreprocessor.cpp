@@ -11,8 +11,6 @@
 #include <armnnUtils/Permute.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
-#include <boost/format.hpp>
-
 #include <iostream>
 #include <fcntl.h>
 #include <array>

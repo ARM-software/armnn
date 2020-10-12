@@ -7,8 +7,6 @@
 #include "RefWorkloadUtils.hpp"
 #include "StridedSlice.hpp"
 
-#include <boost/format.hpp>
-
 namespace armnn
 {
 

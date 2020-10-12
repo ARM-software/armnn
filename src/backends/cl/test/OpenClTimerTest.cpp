@@ -21,7 +21,6 @@
 
 #include <arm_compute/runtime/CL/CLScheduler.h>
 
-#include <boost/format.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <iostream>

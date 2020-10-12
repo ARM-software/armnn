@@ -12,8 +12,6 @@
 
 #include <Processes.hpp>
 
-#include <boost/format.hpp>
-
 #include <cstring>
 
 namespace armnn

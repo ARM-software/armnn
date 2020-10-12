@@ -14,8 +14,6 @@
 #include <tuple>
 #include <utility>
 
-#include <boost/format.hpp>
-
 #include "InferenceTestImage.hpp"
 
 namespace

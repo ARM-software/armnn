@@ -10,8 +10,6 @@
 
 #include <memory>
 
-#include <boost/format.hpp>
-
 namespace armnn
 {
 namespace

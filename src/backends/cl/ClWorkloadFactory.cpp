@@ -27,8 +27,6 @@
 #include <arm_compute/runtime/CL/CLBufferAllocator.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
 
-#include <boost/format.hpp>
-
 namespace armnn
 {
 

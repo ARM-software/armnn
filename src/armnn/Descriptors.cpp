@@ -12,7 +12,7 @@
 #include <array>
 #include <vector>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 namespace armnn
 {
@@ -23,9 +23,11 @@ PermutationVector::PermutationVector(const ValueType *dimMappings, const SizeTyp
 
     if (numDimMappings > MaxNumOfTensorDimensions)
     {
-        boost::format fmt("The number of mappings (%1%) cannot be greater "
-                          "than the maximum number of dimensions supported (%2%)");
-        throw InvalidArgumentException(boost::str(fmt % numDimMappings % MaxNumOfTensorDimensions));
+        throw InvalidArgumentException(
+            fmt::format("The number of mappings ({0}) cannot be greater "
+                        "than the maximum number of dimensions supported ({1})",
+                        numDimMappings,
+                        MaxNumOfTensorDimensions));
     }
 
     if ((dimMappings == nullptr) && (numDimMappings != 0))
@@ -38,8 +40,12 @@ PermutationVector::PermutationVector(const ValueType *dimMappings, const SizeTyp
         const ValueType dstIndex = dimMappings[i];
         if (dstIndex >= numDimMappings)
         {
-            boost::format fmt("Dimension mapping at index %1% is invalid: %2% is outside of the valid range [0,%3%]");
-            throw InvalidArgumentException(boost::str(fmt % i % dstIndex % (numDimMappings - 1)));
+            throw InvalidArgumentException(
+                fmt::format("Dimension mapping at index {0} is invalid: "
+                            "{1} is outside of the valid range [0,{2}]",
+                            i,
+                            dstIndex,
+                            (numDimMappings - 1)));
         }
     }
 

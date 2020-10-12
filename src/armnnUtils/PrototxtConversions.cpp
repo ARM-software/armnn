@@ -6,8 +6,6 @@
 #include "PrototxtConversions.hpp"
 #include "armnn/Tensor.hpp"
 
-#include <boost/format.hpp>
-
 #include <iomanip>
 #include <sstream>
 #include <string>

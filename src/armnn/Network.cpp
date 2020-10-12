@@ -35,9 +35,6 @@
 #include <vector>
 #include <algorithm>
 
-#include <boost/format.hpp>
-#include <boost/numeric/conversion/converter_policies.hpp>
-
 namespace armnn
 {
 

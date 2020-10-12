@@ -113,4 +113,4 @@ if __name__ == "__main__":
         'armnn_tfliteparser']
 
     for n in wrap_names:
-        generate_wrap(n, f"-I{'-I'.join(armnn_includes)} ")
+        generate_wrap(n, f"-I{' -I'.join(armnn_includes)} ")

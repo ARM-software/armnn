@@ -99,31 +99,28 @@ public:
         : m_ConstructModel(constructModel)
     {}
 
-    virtual void AddCommandLineOptions(boost::program_options::options_description& options) override
+    virtual void AddCommandLineOptions(cxxopts::Options& options, std::vector<std::string>& required) override
     {
-        namespace po = boost::program_options;
+        options
+            .allow_unrecognised_options()
+            .add_options()
+                ("s,input-seq-dir", "Path to directory containing test data for m_InputSeq",
+                 cxxopts::value<std::string>(m_InputSeqDir))
+                ("h,prev-state-h-dir", "Path to directory containing test data for m_PrevStateH",
+                 cxxopts::value<std::string>(m_PrevStateHDir))
+                ("c,prev-state-c-dir", "Path to directory containing test data for m_PrevStateC",
+                 cxxopts::value<std::string>(m_PrevStateCDir))
+                ("l,logits-dir", "Path to directory containing test data for m_Logits",
+                 cxxopts::value<std::string>(m_LogitsDir))
+                ("H,new-state-h-dir", "Path to directory containing test data for m_NewStateH",
+                 cxxopts::value<std::string>(m_NewStateHDir))
+                ("C,new-state-c-dir", "Path to directory containing test data for m_NewStateC",
+                 cxxopts::value<std::string>(m_NewStateCDir));
 
-        options.add_options()
-                ("input-seq-dir,s", po::value<std::string>(&m_InputSeqDir)->required(),
-                 "Path to directory containing test data for m_InputSeq");
-        options.add_options()
-                ("prev-state-h-dir,h", po::value<std::string>(&m_PrevStateHDir)->required(),
-                 "Path to directory containing test data for m_PrevStateH");
-        options.add_options()
-                ("prev-state-c-dir,c", po::value<std::string>(&m_PrevStateCDir)->required(),
-                 "Path to directory containing test data for m_PrevStateC");
-        options.add_options()
-                ("logits-dir,l", po::value<std::string>(&m_LogitsDir)->required(),
-                 "Path to directory containing test data for m_Logits");
-        options.add_options()
-                ("new-state-h-dir,H", po::value<std::string>(&m_NewStateHDir)->required(),
-                 "Path to directory containing test data for m_NewStateH");
-        options.add_options()
-                ("new-state-c-dir,C", po::value<std::string>(&m_NewStateCDir)->required(),
-                 "Path to directory containing test data for m_NewStateC");
+        required.insert(required.end(), {"input-seq-dir", "prev-state-h-dir", "prev-state-c-dir", "logits-dir",
+                                         "new-state-h-dir", "new-state-c-dir"});
 
-
-        Model::AddCommandLineOptions(options, m_ModelCommandLineOptions);
+        Model::AddCommandLineOptions(options, m_ModelCommandLineOptions, required);
     }
 
     virtual bool ProcessCommandLineOptions(const InferenceTestOptions &commonOptions) override

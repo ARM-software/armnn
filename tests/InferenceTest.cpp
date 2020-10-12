@@ -8,7 +8,7 @@
 #include <Filesystem.hpp>
 
 #include "../src/armnn/Profiling.hpp"
-#include <boost/program_options.hpp>
+#include <cxxopts/cxxopts.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -28,24 +28,43 @@ namespace test
 bool ParseCommandLine(int argc, char** argv, IInferenceTestCaseProvider& testCaseProvider,
     InferenceTestOptions& outParams)
 {
-    namespace po = boost::program_options;
-
-    po::options_description desc("Options");
+    cxxopts::Options options("InferenceTest", "Inference iteration parameters");
 
     try
     {
         // Adds generic options needed for all inference tests.
-        desc.add_options()
-            ("help", "Display help messages")
-            ("iterations,i", po::value<unsigned int>(&outParams.m_IterationCount)->default_value(0),
-                "Sets the number number of inferences to perform. If unset, a default number will be ran.")
-            ("inference-times-file", po::value<std::string>(&outParams.m_InferenceTimesFile)->default_value(""),
-                "If non-empty, each individual inference time will be recorded and output to this file")
-            ("event-based-profiling,e", po::value<bool>(&outParams.m_EnableProfiling)->default_value(0),
-                "Enables built in profiler. If unset, defaults to off.");
+        options
+            .allow_unrecognised_options()
+            .add_options()
+                ("h,help", "Display help messages")
+                ("i,iterations", "Sets the number of inferences to perform. If unset, will only be run once.",
+                 cxxopts::value<unsigned int>(outParams.m_IterationCount)->default_value("0"))
+                ("inference-times-file",
+                 "If non-empty, each individual inference time will be recorded and output to this file",
+                 cxxopts::value<std::string>(outParams.m_InferenceTimesFile)->default_value(""))
+                ("e,event-based-profiling", "Enables built in profiler. If unset, defaults to off.",
+                 cxxopts::value<bool>(outParams.m_EnableProfiling)->default_value("0"));
+
+        std::vector<std::string> required; //to be passed as reference to derived inference tests
 
         // Adds options specific to the ITestCaseProvider.
-        testCaseProvider.AddCommandLineOptions(desc);
+        testCaseProvider.AddCommandLineOptions(options, required);
+
+        auto result = options.parse(argc, argv);
+
+        if (result.count("help"))
+        {
+            std::cout << options.help() << std::endl;
+            return false;
+        }
+
+        CheckRequiredOptions(result, required);
+
+    }
+    catch (const cxxopts::OptionException& e)
+    {
+        std::cerr << e.what() << std::endl << options.help() << std::endl;
+        return false;
     }
     catch (const std::exception& e)
     {
@@ -54,27 +73,6 @@ bool ParseCommandLine(int argc, char** argv, IInferenceTestCaseProvider& testCas
         // They really won't in any of these cases.
         ARMNN_ASSERT_MSG(false, "Caught unexpected exception");
         std::cerr << "Fatal internal error: " << e.what() << std::endl;
-        return false;
-    }
-
-    po::variables_map vm;
-
-    try
-    {
-        po::store(po::parse_command_line(argc, argv, desc), vm);
-
-        if (vm.count("help"))
-        {
-            std::cout << desc << std::endl;
-            return false;
-        }
-
-        po::notify(vm);
-    }
-    catch (po::error& e)
-    {
-        std::cerr << e.what() << std::endl << std::endl;
-        std::cerr << desc << std::endl;
         return false;
     }
 

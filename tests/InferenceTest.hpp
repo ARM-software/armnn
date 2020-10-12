@@ -11,7 +11,8 @@
 #include <armnn/TypesUtils.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/program_options.hpp>
+#include <cxxopts/cxxopts.hpp>
+#include <fmt/format.h>
 
 
 namespace armnn
@@ -25,7 +26,7 @@ inline std::istream& operator>>(std::istream& in, armnn::Compute& compute)
     if (compute == armnn::Compute::Undefined)
     {
         in.setstate(std::ios_base::failbit);
-        throw boost::program_options::validation_error(boost::program_options::validation_error::invalid_option_value);
+        throw cxxopts::OptionException(fmt::format("Unrecognised compute device: {}", token));
     }
     return in;
 }
@@ -38,7 +39,7 @@ inline std::istream& operator>>(std::istream& in, armnn::BackendId& backend)
     if (compute == armnn::Compute::Undefined)
     {
         in.setstate(std::ios_base::failbit);
-        throw boost::program_options::validation_error(boost::program_options::validation_error::invalid_option_value);
+        throw cxxopts::OptionException(fmt::format("Unrecognised compute device: {}", token));
     }
     backend = compute;
     return in;
@@ -92,9 +93,9 @@ class IInferenceTestCaseProvider
 public:
     virtual ~IInferenceTestCaseProvider() {}
 
-    virtual void AddCommandLineOptions(boost::program_options::options_description& options)
+    virtual void AddCommandLineOptions(cxxopts::Options& options, std::vector<std::string>& required)
     {
-        IgnoreUnused(options);
+        IgnoreUnused(options, required);
     };
     virtual bool ProcessCommandLineOptions(const InferenceTestOptions &commonOptions)
     {
@@ -180,7 +181,7 @@ public:
     template <typename TConstructDatabaseCallable, typename TConstructModelCallable>
     ClassifierTestCaseProvider(TConstructDatabaseCallable constructDatabase, TConstructModelCallable constructModel);
 
-    virtual void AddCommandLineOptions(boost::program_options::options_description& options) override;
+    virtual void AddCommandLineOptions(cxxopts::Options& options, std::vector<std::string>& required) override;
     virtual bool ProcessCommandLineOptions(const InferenceTestOptions &commonOptions) override;
     virtual std::unique_ptr<IInferenceTestCase> GetTestCase(unsigned int testCaseId) override;
     virtual bool OnInferenceTestFinished() override;

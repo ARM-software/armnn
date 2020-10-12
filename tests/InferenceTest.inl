@@ -6,8 +6,9 @@
 
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
+#include "CxxoptsUtils.hpp"
 
-#include <boost/program_options.hpp>
+#include <cxxopts/cxxopts.hpp>
 #include <fmt/format.h>
 
 #include <fstream>
@@ -181,19 +182,21 @@ ClassifierTestCaseProvider<TDatabase, InferenceModel>::ClassifierTestCaseProvide
 
 template <typename TDatabase, typename InferenceModel>
 void ClassifierTestCaseProvider<TDatabase, InferenceModel>::AddCommandLineOptions(
-    boost::program_options::options_description& options)
+    cxxopts::Options& options, std::vector<std::string>& required)
 {
-    namespace po = boost::program_options;
+    options
+        .allow_unrecognised_options()
+        .add_options()
+            ("validation-file-in",
+             "Reads expected predictions from the given file and confirms they match the actual predictions.",
+             cxxopts::value<std::string>(m_ValidationFileIn)->default_value(""))
+            ("validation-file-out", "Predictions are saved to the given file for later use via --validation-file-in.",
+             cxxopts::value<std::string>(m_ValidationFileOut)->default_value(""))
+            ("d,data-dir", "Path to directory containing test data", cxxopts::value<std::string>(m_DataDir));
 
-    options.add_options()
-        ("validation-file-in", po::value<std::string>(&m_ValidationFileIn)->default_value(""),
-            "Reads expected predictions from the given file and confirms they match the actual predictions.")
-        ("validation-file-out", po::value<std::string>(&m_ValidationFileOut)->default_value(""),
-            "Predictions are saved to the given file for later use via --validation-file-in.")
-        ("data-dir,d", po::value<std::string>(&m_DataDir)->required(),
-            "Path to directory containing test data");
+    required.emplace_back("data-dir"); //add to required arguments to check
 
-    InferenceModel::AddCommandLineOptions(options, m_ModelCommandLineOptions);
+    InferenceModel::AddCommandLineOptions(options, m_ModelCommandLineOptions, required);
 }
 
 template <typename TDatabase, typename InferenceModel>

@@ -152,18 +152,19 @@ public:
         : m_ConstructModel(constructModel)
     {}
 
-    virtual void AddCommandLineOptions(boost::program_options::options_description& options) override
+    virtual void AddCommandLineOptions(cxxopts::Options& options, std::vector<std::string>& required) override
     {
-        namespace po = boost::program_options;
+        options
+            .allow_unrecognised_options()
+            .add_options()
+                ("d,data-dir", "Path to directory containing test data", cxxopts::value<std::string>(m_DataDir));
 
-        options.add_options()
-            ("data-dir,d", po::value<std::string>(&m_DataDir)->required(),
-             "Path to directory containing test data");
+        required.emplace_back("data-dir");
 
-        Model::AddCommandLineOptions(options, m_ModelCommandLineOptions);
+        Model::AddCommandLineOptions(options, m_ModelCommandLineOptions, required);
     }
 
-    virtual bool ProcessCommandLineOptions(const InferenceTestOptions &commonOptions) override
+    virtual bool ProcessCommandLineOptions(const InferenceTestOptions& commonOptions) override
     {
         if (!ValidateDirectory(m_DataDir))
         {

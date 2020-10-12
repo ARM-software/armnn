@@ -29,7 +29,8 @@
 #include "armnn/utility/StringUtils.hpp"
 #include <boost/exception/exception.hpp>
 #include <boost/exception/diagnostic_information.hpp>
-#include <boost/program_options.hpp>
+#include <cxxopts/cxxopts.hpp>
+#include "CxxoptsUtils.hpp"
 #include <fmt/format.h>
 #include <mapbox/variant.hpp>
 
@@ -347,37 +348,42 @@ public:
         }
     };
 
-    static void AddCommandLineOptions(boost::program_options::options_description& desc, CommandLineOptions& options)
+    static void AddCommandLineOptions(cxxopts::Options& options,
+                                      CommandLineOptions& cLineOptions, std::vector<std::string>& required)
     {
-        namespace po = boost::program_options;
-
         const std::vector<std::string> defaultComputes = { "CpuAcc", "CpuRef" };
 
         const std::string backendsMessage = "Which device to run layers on by default. Possible choices: "
                                           + armnn::BackendRegistryInstance().GetBackendIdsAsString();
 
-        desc.add_options()
-            ("model-dir,m", po::value<std::string>(&options.m_ModelDir)->required(),
-                "Path to directory containing model files (.caffemodel/.prototxt/.tflite)")
-            ("compute,c", po::value<std::vector<std::string>>(&options.m_ComputeDevices)->
-                default_value(defaultComputes, armnn::stringUtils::StringConcat(defaultComputes, ", "))->
-                multitoken(), backendsMessage.c_str())
-            ("dynamic-backends-path,b", po::value(&options.m_DynamicBackendsPath),
-                "Path where to load any available dynamic backend from. "
-                "If left empty (the default), dynamic backends will not be used.")
-            ("labels,l", po::value<std::string>(&options.m_Labels),
-                "Text file containing one image filename - correct label pair per line, "
-                "used to test the accuracy of the network.")
-            ("visualize-optimized-model,v",
-                po::value<bool>(&options.m_VisualizePostOptimizationModel)->default_value(false),
-             "Produce a dot file useful for visualizing the graph post optimization."
-                "The file will have the same name as the model with the .dot extention.")
-            ("fp16-turbo-mode", po::value<bool>(&options.m_EnableFp16TurboMode)->default_value(false),
-                "If this option is enabled FP32 layers, weights and biases will be converted "
-                "to FP16 where the backend supports it.")
-            ("bf16-turbo-mode", po::value<bool>(&options.m_EnableBf16TurboMode)->default_value(false),
-                "If this option is enabled FP32 layers, weights and biases will be converted "
-                "to BF16 where the backend supports it.");
+        options
+            .allow_unrecognised_options()
+            .add_options()
+                ("m,model-dir", "Path to directory containing model files (.caffemodel/.prototxt/.tflite)",
+                 cxxopts::value<std::string>(cLineOptions.m_ModelDir))
+                ("c,compute", backendsMessage.c_str(),
+                 cxxopts::value<std::vector<std::string>>(cLineOptions.m_ComputeDevices)->default_value("CpuRef"))
+                ("b,dynamic-backends-path",
+                 "Path where to load any available dynamic backend from. "
+                 "If left empty (the default), dynamic backends will not be used.",
+                 cxxopts::value(cLineOptions.m_DynamicBackendsPath))
+                ("l,labels",
+                 "Text file containing one image filename - correct label pair per line, "
+                 "used to test the accuracy of the network.", cxxopts::value<std::string>(cLineOptions.m_Labels))
+                ("v,visualize-optimized-model",
+                 "Produce a dot file useful for visualizing the graph post optimization."
+                 "The file will have the same name as the model with the .dot extention.",
+                 cxxopts::value<bool>(cLineOptions.m_VisualizePostOptimizationModel)->default_value("false"))
+                ("fp16-turbo-mode",
+                 "If this option is enabled FP32 layers, weights and biases will be converted "
+                 "to FP16 where the backend supports it.",
+                 cxxopts::value<bool>(cLineOptions.m_EnableFp16TurboMode)->default_value("false"))
+                ("bf16-turbo-mode",
+                 "If this option is enabled FP32 layers, weights and biases will be converted "
+                 "to BF16 where the backend supports it.",
+                 cxxopts::value<bool>(cLineOptions.m_EnableBf16TurboMode)->default_value("false"));
+
+        required.emplace_back("model-dir");
     }
 
     InferenceModel(const Params& params,

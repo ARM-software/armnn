@@ -52,19 +52,19 @@ Individual files contain the following tag instead of the full license text.
 
 This enables machine processing of license information based on the SPDX License Identifiers that are available here: http://spdx.org/licenses/
 
-TPIP used by Arm NN:
+Third party tools used by Arm NN:
 
-| Name           | License (SPDX ID) |
-|----------------|-------------------|
-| half           | MIT               |
-| stb            | MIT               |
-| cxxopts        | MIT               |
-| ghc            | MIT               |
-| mapbox/variant | BSD               |
+| Tool           | License (SPDX ID) | Description                    | Version | Provenience
+|----------------|-------------------|------------------------------------------------------------------|-------------|-------------------
+| half           | MIT               | IEEE 754 conformant 16-bit half-precision floating point library | 1.12.0 | http://half.sourceforge.net 
+| stb            | MIT               | Image loader, resize and writer | 2.16 | https://github.com/nothings/stb
+| cxxopts        | MIT               | A lightweight C++ option parser library | SHA 12e496da3d486b87fa9df43edea65232ed852510 | https://github.com/jarro2783/cxxopts
+| ghc            | MIT               | A header-only single-file std::filesystem compatible helper library | 1.3.2 | https://github.com/gulrak/filesystem 
+| mapbox/variant | BSD               | A header-only alternative to 'boost::variant' | 1.1.3 | https://github.com/mapbox/variant
 
 ### Contributions
 
 The Arm NN project welcomes contributions. For more details on contributing to Arm NN see the [Contributing page](https://mlplatform.org/contributing/) on the [MLPlatform.org](https://mlplatform.org/) website, or see the [Contributor Guide](ContributorGuide.md).
 
 ### Security Issues
-If you believe you have discovered a security issue please contact MLG-Security@arm.com
+If you believe you have discovered a security issue please contact arm-security@arm.com

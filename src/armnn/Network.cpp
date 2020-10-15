@@ -1054,7 +1054,8 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                                                 OptimizeConsecutiveReshapes(),
                                                 FoldPadIntoConvolution2d(),
                                                 PermuteAndBatchToSpaceAsDepthToSpace(),
-                                                TransposeAndBatchToSpaceAsDepthToSpace()));
+                                                TransposeAndBatchToSpaceAsDepthToSpace(),
+                                                FuseBatchNormIntoConvolution2D()));
 
     // If Fp32 to Fp16 optimization is set convert Fp32 network to Fp16
     if (options.m_ReduceFp32ToFp16)

@@ -597,11 +597,11 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConvolution2dLayer)
     };
 
     BOOST_TEST(CheckSequence(graph.cbegin(),
-        graph.cend(),
-        &IsLayerOfType<armnn::InputLayer>,
-        &IsLayerOfType<armnn::PadLayer>,
-        checkSimpleConv2d,
-        &IsLayerOfType<armnn::OutputLayer>));
+                             graph.cend(),
+                             &IsLayerOfType<armnn::InputLayer>,
+                             &IsLayerOfType<armnn::PadLayer>,
+                             checkSimpleConv2d,
+                             &IsLayerOfType<armnn::OutputLayer>));
 
     armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(FoldPadIntoConvolution2d()));
 
@@ -622,10 +622,10 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConvolution2dLayer)
     };
 
     BOOST_TEST(CheckSequence(graph.cbegin(),
-        graph.cend(),
-        &IsLayerOfType<armnn::InputLayer>,
-        checkPadFoldedIntoConv2d,
-        &IsLayerOfType<armnn::OutputLayer>));
+                             graph.cend(),
+                             &IsLayerOfType<armnn::InputLayer>,
+                             checkPadFoldedIntoConv2d,
+                             &IsLayerOfType<armnn::OutputLayer>));
 }
 
 
@@ -795,6 +795,296 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
     for (auto it =firstLayer; it != lastLayer; ++it)
     {
         (*it)->Accept(visitor);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnections_fuse_Test)
+{
+    using namespace armnn;
+    // Define layers information
+    Convolution2dDescriptor convolution2dDescriptor;
+    convolution2dDescriptor.m_BiasEnabled = false;
+    convolution2dDescriptor.m_DataLayout = DataLayout::NHWC;
+    BatchNormalizationDescriptor batchNormDescriptor;
+    batchNormDescriptor.m_DataLayout = DataLayout::NHWC;
+
+    const unsigned int inputDimensionSizes[]   = {1, 4, 4, 3};               // NHWCin
+    const unsigned int weightsDimensionSizes[] = {1, 2, 2, 3};               // CoutHWCin
+    const unsigned int outputDimensionSizes[]  = {1, 3, 3, 1};               // NHWCout
+    const unsigned int outputChannelSize[]     = {outputDimensionSizes[3]};  // Cout
+
+    TensorInfo inputInfo (4, inputDimensionSizes, DataType::Float32);
+    TensorInfo outputInfo(4, outputDimensionSizes, DataType::Float32);
+
+    std::vector<float> weightsVector = {1, 2, 3, 4,   5, 6, 7, 8,  9, 10, 11, 12};
+    ConstTensor weights (TensorInfo(4, weightsDimensionSizes, DataType::Float32), weightsVector);
+
+
+    std::vector<float> betaVector     = {0.1f};
+    std::vector<float> gammaVector    = {0.5f};
+    std::vector<float> meanVector     = {0};
+    std::vector<float> varianceVector = {1};
+    ConstTensor beta    (TensorInfo(1, outputChannelSize, DataType::Float32), betaVector);
+    ConstTensor gamma   (TensorInfo(1, outputChannelSize, DataType::Float32), gammaVector);
+    ConstTensor mean    (TensorInfo(1, outputChannelSize, DataType::Float32), meanVector);
+    ConstTensor variance(TensorInfo(1, outputChannelSize, DataType::Float32), varianceVector);
+
+    // Define the network
+    Graph graph;
+    auto input     = graph.AddLayer<InputLayer>(0, "input");
+    auto conv      = graph.AddLayer<Convolution2dLayer>(convolution2dDescriptor, "convolution");
+    auto batchNorm = graph.AddLayer<BatchNormalizationLayer>(batchNormDescriptor, "batchNorm");
+    auto output    = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Set layer information
+    input    ->GetOutputSlot().SetTensorInfo(inputInfo);
+    conv     ->GetOutputSlot().SetTensorInfo(outputInfo);
+    batchNorm->GetOutputSlot().SetTensorInfo(outputInfo);
+    conv     ->m_Weight   = std::make_unique<ScopedCpuTensorHandle>(weights);
+    batchNorm->m_Beta     = std::make_unique<ScopedCpuTensorHandle>(beta);
+    batchNorm->m_Gamma    = std::make_unique<ScopedCpuTensorHandle>(gamma);
+    batchNorm->m_Mean     = std::make_unique<ScopedCpuTensorHandle>(mean);
+    batchNorm->m_Variance = std::make_unique<ScopedCpuTensorHandle>(variance);
+    if (convolution2dDescriptor.m_BiasEnabled)
+    {
+        std::vector<float> biasVector = {11};
+        ConstTensor bias (TensorInfo(1, outputChannelSize, DataType::Float32), biasVector);
+        conv->m_Bias = std::make_unique<ScopedCpuTensorHandle>(bias);
+    }
+
+    // Connect layers
+    input     ->GetOutputSlot(0).Connect(conv     ->GetInputSlot(0));
+    conv      ->GetOutputSlot(0).Connect(batchNorm->GetInputSlot(0));
+    batchNorm ->GetOutputSlot(0).Connect(output   ->GetInputSlot(0));
+
+    BOOST_CHECK(4 == graph.GetNumLayers());
+    BOOST_TEST(CheckSequence(graph.cbegin(),
+                             graph.cend(),
+                             &IsLayerOfType<InputLayer>,
+                             &IsLayerOfType<Convolution2dLayer>,
+                             &IsLayerOfType<BatchNormalizationLayer>,
+                             &IsLayerOfType<OutputLayer>));
+
+    // Optimize graph
+    armnn::Optimizer::Pass(graph, MakeOptimizations(FuseBatchNormIntoConvolution2D()));
+
+    auto checkFusedConv2d = [ ](const armnn::Layer* const layer) -> bool
+    {
+        return IsLayerOfType<armnn::Convolution2dLayer>(layer) &&
+               (layer->GetNameStr() == "fused-batchNorm-into-convolution");
+    };
+
+    BOOST_CHECK(3 == graph.GetNumLayers());
+    BOOST_TEST(CheckSequence(graph.cbegin(),
+                             graph.cend(),
+                             &IsLayerOfType<InputLayer>,
+                             checkFusedConv2d,
+                             &IsLayerOfType<OutputLayer>));
+}
+
+BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnections_notFuse_Test)
+{
+    // Define the network
+    Graph graph;
+    Convolution2dDescriptor convolution2dDescriptor;
+    BatchNormalizationDescriptor batchNormDescriptor;
+
+    auto input     = graph.AddLayer<InputLayer>(0, "input");
+    auto conv      = graph.AddLayer<Convolution2dLayer>(convolution2dDescriptor, "convolution");
+    auto batchNorm = graph.AddLayer<BatchNormalizationLayer>(batchNormDescriptor, "batchNorm");
+    auto output    = graph.AddLayer<OutputLayer>(0, "output");
+    auto output2   = graph.AddLayer<OutputLayer>(1, "output2");
+
+    // Connect layers
+    input     ->GetOutputSlot(0).Connect(conv     ->GetInputSlot(0));
+    conv      ->GetOutputSlot(0).Connect(batchNorm->GetInputSlot(0));
+    batchNorm ->GetOutputSlot(0).Connect(output   ->GetInputSlot(0));
+    conv      ->GetOutputSlot(0).Connect(output2  ->GetInputSlot(0));
+
+    BOOST_CHECK(5 == graph.GetNumLayers());
+    BOOST_TEST(CheckSequence(graph.cbegin(),
+                             graph.cend(),
+                             &IsLayerOfType<armnn::InputLayer>,
+                             &IsLayerOfType<armnn::Convolution2dLayer>,
+                             &IsLayerOfType<armnn::BatchNormalizationLayer>,
+                             &IsLayerOfType<armnn::OutputLayer>,
+                             &IsLayerOfType<armnn::OutputLayer>));
+    // Optimize graph
+    armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(FuseBatchNormIntoConvolution2D()));
+
+    BOOST_CHECK(5 == graph.GetNumLayers());
+    BOOST_TEST(CheckSequence(graph.cbegin(),
+                             graph.cend(),
+                             &IsLayerOfType<armnn::InputLayer>,
+                             &IsLayerOfType<armnn::Convolution2dLayer>,
+                             &IsLayerOfType<armnn::BatchNormalizationLayer>,
+                             &IsLayerOfType<armnn::OutputLayer>,
+                             &IsLayerOfType<armnn::OutputLayer>));
+}
+
+BOOST_AUTO_TEST_CASE(Fuse_batchNorm_into_Conv2D_Float32_Test)
+{
+    using namespace armnn;
+
+    // Define layers information
+    Convolution2dDescriptor convolution2dDescriptor;
+    convolution2dDescriptor.m_BiasEnabled = false;
+    convolution2dDescriptor.m_DataLayout = DataLayout::NHWC;
+    convolution2dDescriptor.m_StrideX = 1;
+    convolution2dDescriptor.m_StrideY = 1;
+    BatchNormalizationDescriptor batchNormDescriptor;
+    batchNormDescriptor.m_DataLayout = DataLayout::NHWC;
+
+    const unsigned int inputDimensionSizes[]   = {1, 4, 4, 3};  // NHWCin
+    const unsigned int weightsDimensionSizes[] = {4, 2, 2, 3};  // CoutHWCin
+    const unsigned int outputDimensionSizes[]  = {1, 3, 3, 4};  // NHWCout
+    const unsigned int outputChannelSize[]     = {outputDimensionSizes[3]};  // Cout
+
+    TensorInfo inputInfo (4, inputDimensionSizes, DataType::Float32);
+    TensorInfo outputInfo(4, outputDimensionSizes, DataType::Float32);
+
+    std::vector<float> weightsVector = { 1,  2,  3,  4,    5,  6,  7, 8,    9,  10,  11,  12,
+                                        11, 12, 13, 14,   15, 16, 17, 18,  19, 110, 111, 112,
+                                        21, 22, 23, 24,   25, 26, 27, 28,  29, 210, 211, 212,
+                                        31, 32, 33, 34,   35, 36, 37, 38,  39, 310, 311, 312};
+    TensorInfo weightsInfo(4, weightsDimensionSizes, DataType::Float32);
+    ConstTensor weights (weightsInfo, weightsVector);
+    std::vector<float> biasVector     = {3.3f, 3.2f, 3.1f, 3.0f};
+    TensorInfo biasInfo(1, outputChannelSize, DataType::Float32);
+    ConstTensor bias (biasInfo, biasVector);
+    Optional<ConstTensor> optionalBias = Optional<ConstTensor>(bias);
+
+    std::vector<float> betaVector     = {0.0f, 0.2f, 0.3f, 0.4f};
+    std::vector<float> gammaVector    = {0.5f, 0.6f, 0.7f, 0.8f};
+    std::vector<float> meanVector     = {0.1f, 0.2f, 0.3f, 0.4f};
+    std::vector<float> varianceVector = {1.0f, 1.1f, 1.2f, 1.3f};
+    ConstTensor beta    (TensorInfo(1, outputChannelSize, DataType::Float32), betaVector);
+    ConstTensor gamma   (TensorInfo(1, outputChannelSize, DataType::Float32), gammaVector);
+    ConstTensor mean    (TensorInfo(1, outputChannelSize, DataType::Float32), meanVector);
+    ConstTensor variance(TensorInfo(1, outputChannelSize, DataType::Float32), varianceVector);
+
+    auto inputSize = inputDimensionSizes[0]*inputDimensionSizes[1]*inputDimensionSizes[2]*inputDimensionSizes[3];
+    auto outputSize = outputDimensionSizes[0]*outputDimensionSizes[1]*outputDimensionSizes[2]*outputDimensionSizes[3];
+
+    // FIRST NETWORK: Fused
+
+    // Construct ArmNN network
+    NetworkId networkIdentifier;
+    INetworkPtr network = INetwork::Create();
+    IConnectableLayer *inputLayer = network->AddInputLayer(0);
+    IConnectableLayer *convLayer = network->AddConvolution2dLayer(convolution2dDescriptor,
+                                                                  weights,
+                                                                  optionalBias,
+                                                                  "convolution");
+    IConnectableLayer *batchNormLayer = network->AddBatchNormalizationLayer(batchNormDescriptor,
+                                                                            mean,
+                                                                            variance,
+                                                                            beta,
+                                                                            gamma,
+                                                                            "batchNorm");
+    IConnectableLayer *outputLayer = network->AddOutputLayer(0);
+
+    inputLayer     ->GetOutputSlot(0).Connect(convLayer     ->GetInputSlot(0));
+    convLayer      ->GetOutputSlot(0).Connect(batchNormLayer->GetInputSlot(0));
+    batchNormLayer ->GetOutputSlot(0).Connect(outputLayer   ->GetInputSlot(0));
+
+    // Create ArmNN runtime
+    IRuntime::CreationOptions options; // default options
+    IRuntimePtr run = IRuntime::Create(options);
+
+    //Set the tensors in the network.
+    inputLayer     ->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    convLayer      ->GetOutputSlot(0).SetTensorInfo(outputInfo);
+    batchNormLayer ->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    // Optimise ArmNN network
+    IOptimizedNetworkPtr optNet = Optimize(*network, {Compute::CpuRef}, run->GetDeviceSpec());
+    if (!optNet)
+    {
+        // This shouldn't happen for this simple sample, with reference backend.
+        // But in general usage Optimize could fail if the hardware at runtime cannot
+        // support the model that has been provided.
+        std::cerr << "Error: Failed to optimise the input network." << std::endl;
+    }
+
+    // Load graph into runtime
+    run->LoadNetwork(networkIdentifier, std::move(optNet));
+
+    //Creates structures for inputs and outputs.
+    std::vector<float> inputData(inputSize, 128);
+    std::vector<float> outputData(outputSize);
+
+    InputTensors inputTensors  {{0, ConstTensor(run->GetInputTensorInfo (networkIdentifier, 0), inputData.data())}};
+    OutputTensors outputTensors{{0,      Tensor(run->GetOutputTensorInfo(networkIdentifier, 0), outputData.data())}};
+
+
+    // Execute network
+    run->EnqueueWorkload(networkIdentifier, inputTensors, outputTensors);
+
+    // SECOND NETWORK: NotFused
+
+    // Construct ArmNN network
+    NetworkId networkIdentifierNotFused;
+    INetworkPtr networkNotFused = INetwork::Create();
+    IConnectableLayer *inputLayerNotFused = networkNotFused->AddInputLayer(0);
+    IConnectableLayer *convLayerNotFused  = networkNotFused->AddConvolution2dLayer(convolution2dDescriptor,
+                                                                                   weights,
+                                                                                   optionalBias,
+                                                                                   "convolution");
+    IConnectableLayer *batchNormLayerNotFused = networkNotFused->AddBatchNormalizationLayer(batchNormDescriptor,
+                                                                                            mean,
+                                                                                            variance,
+                                                                                            beta,
+                                                                                            gamma,
+                                                                                            "batchNorm");
+    IConnectableLayer *outputLayerNotFused = networkNotFused->AddOutputLayer(0);
+    IConnectableLayer *output2LayerNotFused = networkNotFused->AddOutputLayer(1);
+
+
+    inputLayerNotFused     ->GetOutputSlot(0).Connect(convLayerNotFused     ->GetInputSlot(0));
+    convLayerNotFused      ->GetOutputSlot(0).Connect(batchNormLayerNotFused->GetInputSlot(0));
+    batchNormLayerNotFused ->GetOutputSlot(0).Connect(outputLayerNotFused   ->GetInputSlot(0));
+    convLayerNotFused      ->GetOutputSlot(0).Connect(output2LayerNotFused  ->GetInputSlot(0));
+
+    // Create ArmNN runtime
+    IRuntimePtr runNotFused = IRuntime::Create(options);
+
+    //Set the tensors in the network.
+    inputLayerNotFused     ->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    convLayerNotFused      ->GetOutputSlot(0).SetTensorInfo(outputInfo);
+    batchNormLayerNotFused ->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    // Optimise ArmNN network
+    IOptimizedNetworkPtr optNetNotFused = Optimize(*networkNotFused, {Compute::CpuRef}, runNotFused->GetDeviceSpec());
+    if (!optNetNotFused)
+    {
+        // This shouldn't happen for this simple sample, with reference backend.
+        // But in general usage Optimize could fail if the hardware at runtime cannot
+        // support the model that has been provided.
+        std::cerr << "Error: Failed to optimise the input network." << std::endl;
+    }
+
+    // Load graph into runtime
+    runNotFused->LoadNetwork(networkIdentifierNotFused, std::move(optNetNotFused));
+
+    //Creates structures for inputs and outputs.
+    std::vector<float> inputDataNotFused(inputSize, 128);
+    std::vector<float> outputDataNotFused(outputSize);
+    std::vector<float> outputData2NotFused(outputSize);
+
+    InputTensors inputTensorsNotFused{
+        {0, ConstTensor(runNotFused->GetInputTensorInfo(networkIdentifierNotFused, 0), inputDataNotFused.data())}};
+    OutputTensors outputTensorsNotFused{
+        {0, Tensor(runNotFused->GetOutputTensorInfo(networkIdentifierNotFused, 0), outputDataNotFused.data())},
+        {1, Tensor(runNotFused->GetOutputTensorInfo(networkIdentifierNotFused, 1), outputData2NotFused.data())}};
+
+    // Execute network
+    runNotFused->EnqueueWorkload(networkIdentifierNotFused, inputTensorsNotFused, outputTensorsNotFused);
+
+    // Check the output of the fused-convolution matches with the output of the batchNormm in the "NotFused" network
+    for (unsigned int n = 0; n < outputData.size(); ++n)
+    {
+        BOOST_CHECK_CLOSE(outputData[n], outputDataNotFused[n], 0.001);
     }
 }
 

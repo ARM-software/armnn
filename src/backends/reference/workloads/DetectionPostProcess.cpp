@@ -85,14 +85,14 @@ std::vector<unsigned int> NonMaxSuppression(unsigned int numBoxes,
         if (!visited[sortedIndices[i]])
         {
             outputIndices.push_back(indicesAboveThreshold[sortedIndices[i]]);
-        }
-        for (unsigned int j = i + 1; j < numAboveThreshold; ++j)
-        {
-            unsigned int iIndex = indicesAboveThreshold[sortedIndices[i]] * 4;
-            unsigned int jIndex = indicesAboveThreshold[sortedIndices[j]] * 4;
-            if (IntersectionOverUnion(&boxCorners[iIndex], &boxCorners[jIndex]) > nmsIouThreshold)
+            for (unsigned int j = i + 1; j < numAboveThreshold; ++j)
             {
-                visited[sortedIndices[j]] = true;
+                unsigned int iIndex = indicesAboveThreshold[sortedIndices[i]] * 4;
+                unsigned int jIndex = indicesAboveThreshold[sortedIndices[j]] * 4;
+                if (IntersectionOverUnion(&boxCorners[iIndex], &boxCorners[jIndex]) > nmsIouThreshold)
+                {
+                    visited[sortedIndices[j]] = true;
+                }
             }
         }
     }

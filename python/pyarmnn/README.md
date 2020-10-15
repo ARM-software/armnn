@@ -199,7 +199,7 @@ input_tensors = ann.make_input_tensors([input_binding_info], [img])
 
 # Get output binding information for an output layer by using the layer name.
 output_binding_info = parser.GetNetworkOutputBindingInfo(0, 'model/output')
-output_tensors = ann.make_output_tensors([outputs_binding_info])
+output_tensors = ann.make_output_tensors([output_binding_info])
 ```
 
 Perform inference and get the results back into a numpy array.

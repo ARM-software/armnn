@@ -3,343 +3,256 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "../NetworkExecutionUtils/NetworkExecutionUtils.hpp"
+#include "NetworkExecutionUtils/NetworkExecutionUtils.hpp"
+#include "ExecuteNetworkProgramOptions.hpp"
+
+#include <armnn/Logging.hpp>
+#include <Filesystem.hpp>
+#include <InferenceTest.hpp>
+
+#if defined(ARMNN_SERIALIZER)
+#include "armnnDeserializer/IDeserializer.hpp"
+#endif
+#if defined(ARMNN_CAFFE_PARSER)
+#include "armnnCaffeParser/ICaffeParser.hpp"
+#endif
+#if defined(ARMNN_TF_PARSER)
+#include "armnnTfParser/ITfParser.hpp"
+#endif
+#if defined(ARMNN_TF_LITE_PARSER)
+#include "armnnTfLiteParser/ITfLiteParser.hpp"
+#endif
+#if defined(ARMNN_ONNX_PARSER)
+#include "armnnOnnxParser/IOnnxParser.hpp"
+#endif
+
+#include <future>
+
+template<typename TParser, typename TDataType>
+int MainImpl(const ExecuteNetworkParams& params,
+             const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
+{
+    using TContainer = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
+
+    std::vector<TContainer> inputDataContainers;
+
+    try
+    {
+        // Creates an InferenceModel, which will parse the model and load it into an IRuntime.
+        typename InferenceModel<TParser, TDataType>::Params inferenceModelParams;
+        inferenceModelParams.m_ModelPath                      = params.m_ModelPath;
+        inferenceModelParams.m_IsModelBinary                  = params.m_IsModelBinary;
+        inferenceModelParams.m_ComputeDevices                 = params.m_ComputeDevices;
+        inferenceModelParams.m_DynamicBackendsPath            = params.m_DynamicBackendsPath;
+        inferenceModelParams.m_PrintIntermediateLayers        = params.m_PrintIntermediate;
+        inferenceModelParams.m_VisualizePostOptimizationModel = params.m_EnableLayerDetails;
+        inferenceModelParams.m_ParseUnsupported               = params.m_ParseUnsupported;
+        inferenceModelParams.m_InferOutputShape               = params.m_InferOutputShape;
+        inferenceModelParams.m_EnableFastMath                 = params.m_EnableFastMath;
+
+        for(const std::string& inputName: params.m_InputNames)
+        {
+            inferenceModelParams.m_InputBindings.push_back(inputName);
+        }
+
+        for(unsigned int i = 0; i < params.m_InputTensorShapes.size(); ++i)
+        {
+            inferenceModelParams.m_InputShapes.push_back(*params.m_InputTensorShapes[i]);
+        }
+
+        for(const std::string& outputName: params.m_OutputNames)
+        {
+            inferenceModelParams.m_OutputBindings.push_back(outputName);
+        }
+
+        inferenceModelParams.m_SubgraphId          = params.m_SubgraphId;
+        inferenceModelParams.m_EnableFp16TurboMode = params.m_EnableFp16TurboMode;
+        inferenceModelParams.m_EnableBf16TurboMode = params.m_EnableBf16TurboMode;
+
+        InferenceModel<TParser, TDataType> model(inferenceModelParams,
+                                                 params.m_EnableProfiling,
+                                                 params.m_DynamicBackendsPath,
+                                                 runtime);
+
+        const size_t numInputs = inferenceModelParams.m_InputBindings.size();
+        for(unsigned int i = 0; i < numInputs; ++i)
+        {
+            armnn::Optional<QuantizationParams> qParams = params.m_QuantizeInput ?
+                                                          armnn::MakeOptional<QuantizationParams>(
+                                                                  model.GetInputQuantizationParams()) :
+                                                          armnn::EmptyOptional();
+
+            armnn::Optional<std::string> dataFile = params.m_GenerateTensorData ?
+                                                    armnn::EmptyOptional() :
+                                                    armnn::MakeOptional<std::string>(
+                                                            params.m_InputTensorDataFilePaths[i]);
+
+            unsigned int numElements = model.GetInputSize(i);
+            if (params.m_InputTensorShapes.size() > i && params.m_InputTensorShapes[i])
+            {
+                // If the user has provided a tensor shape for the current input,
+                // override numElements
+                numElements = params.m_InputTensorShapes[i]->GetNumElements();
+            }
+
+            TContainer tensorData;
+            PopulateTensorWithData(tensorData,
+                                   numElements,
+                                   params.m_InputTypes[i],
+                                   qParams,
+                                   dataFile);
+
+            inputDataContainers.push_back(tensorData);
+        }
+
+        const size_t numOutputs = inferenceModelParams.m_OutputBindings.size();
+        std::vector<TContainer> outputDataContainers;
+
+        for (unsigned int i = 0; i < numOutputs; ++i)
+        {
+            if (params.m_OutputTypes[i].compare("float") == 0)
+            {
+                outputDataContainers.push_back(std::vector<float>(model.GetOutputSize(i)));
+            }
+            else if (params.m_OutputTypes[i].compare("int") == 0)
+            {
+                outputDataContainers.push_back(std::vector<int>(model.GetOutputSize(i)));
+            }
+            else if (params.m_OutputTypes[i].compare("qasymm8") == 0)
+            {
+                outputDataContainers.push_back(std::vector<uint8_t>(model.GetOutputSize(i)));
+            }
+            else
+            {
+                ARMNN_LOG(fatal) << "Unsupported tensor data type \"" << params.m_OutputTypes[i] << "\". ";
+                return EXIT_FAILURE;
+            }
+        }
+
+        for (size_t x = 0; x < params.m_Iterations; x++)
+        {
+            // model.Run returns the inference time elapsed in EnqueueWorkload (in milliseconds)
+            auto inference_duration = model.Run(inputDataContainers, outputDataContainers);
+
+            if (params.m_GenerateTensorData)
+            {
+                ARMNN_LOG(warning) << "The input data was generated, note that the output will not be useful";
+            }
+
+            // Print output tensors
+            const auto& infosOut = model.GetOutputBindingInfos();
+            for (size_t i = 0; i < numOutputs; i++)
+            {
+                const armnn::TensorInfo& infoOut = infosOut[i].second;
+                auto outputTensorFile = params.m_OutputTensorFiles.empty() ? "" : params.m_OutputTensorFiles[i];
+
+                TensorPrinter printer(inferenceModelParams.m_OutputBindings[i],
+                                      infoOut,
+                                      outputTensorFile,
+                                      params.m_DequantizeOutput);
+                mapbox::util::apply_visitor(printer, outputDataContainers[i]);
+            }
+
+            ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)
+                            << std::fixed << inference_duration.count() << " ms\n";
+
+            // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
+            if (params.m_ThresholdTime != 0.0)
+            {
+                ARMNN_LOG(info) << "Threshold time: " << std::setprecision(2)
+                                << std::fixed << params.m_ThresholdTime << " ms";
+                auto thresholdMinusInference = params.m_ThresholdTime - inference_duration.count();
+                ARMNN_LOG(info) << "Threshold time - Inference time: " << std::setprecision(2)
+                                << std::fixed << thresholdMinusInference << " ms" << "\n";
+
+                if (thresholdMinusInference < 0)
+                {
+                    std::string errorMessage = "Elapsed inference time is greater than provided threshold time.";
+                    ARMNN_LOG(fatal) << errorMessage;
+                }
+            }
+        }
+    }
+    catch (const armnn::Exception& e)
+    {
+        ARMNN_LOG(fatal) << "Armnn Error: " << e.what();
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
 
 // MAIN
 int main(int argc, const char* argv[])
 {
     // Configures logging for both the ARMNN library and this test program.
-#ifdef NDEBUG
+    #ifdef NDEBUG
     armnn::LogSeverity level = armnn::LogSeverity::Info;
-#else
+    #else
     armnn::LogSeverity level = armnn::LogSeverity::Debug;
-#endif
+    #endif
     armnn::ConfigureLogging(true, true, level);
 
-    std::string testCasesFile;
 
-    std::string modelFormat;
-    std::string modelPath;
-    std::string inputNames;
-    std::string inputTensorShapes;
-    std::string inputTensorDataFilePaths;
-    std::string outputNames;
-    std::string inputTypes;
-    std::string outputTypes;
-    std::string dynamicBackendsPath;
-    std::string outputTensorFiles;
-
-    // external profiling parameters
-    std::string outgoingCaptureFile;
-    std::string incomingCaptureFile;
-    uint32_t counterCapturePeriod;
-    std::string fileFormat;
-
-    size_t iterations = 1;
-    int tuningLevel = 0;
-    std::string tuningPath;
-
-    double thresholdTime = 0.0;
-
-    size_t subgraphId = 0;
-
-    const std::string backendsMessage = "REQUIRED: Which device to run layers on by default. Possible choices: "
-                                      + armnn::BackendRegistryInstance().GetBackendIdsAsString();
-    po::options_description desc("Options");
-    try
-    {
-        desc.add_options()
-            ("help", "Display usage information")
-            ("compute,c", po::value<std::vector<std::string>>()->multitoken()->required(),
-             backendsMessage.c_str())
-            ("test-cases,t", po::value(&testCasesFile), "Path to a CSV file containing test cases to run. "
-             "If set, further parameters -- with the exception of compute device and concurrency -- will be ignored, "
-             "as they are expected to be defined in the file for each test in particular.")
-            ("concurrent,n", po::bool_switch()->default_value(false),
-             "Whether or not the test cases should be executed in parallel")
-            ("model-format,f", po::value(&modelFormat)->required(),
-             "armnn-binary, caffe-binary, caffe-text, onnx-binary, onnx-text, tflite-binary, tensorflow-binary or "
-             "tensorflow-text.")
-            ("model-path,m", po::value(&modelPath)->required(), "Path to model file, e.g. .armnn, .caffemodel, "
-             ".prototxt, .tflite, .onnx")
-            ("dynamic-backends-path,b", po::value(&dynamicBackendsPath),
-             "Path where to load any available dynamic backend from. "
-             "If left empty (the default), dynamic backends will not be used.")
-            ("input-name,i", po::value(&inputNames),
-             "Identifier of the input tensors in the network separated by comma.")
-            ("subgraph-number,x", po::value<size_t>(&subgraphId)->default_value(0), "Id of the subgraph to be executed."
-              "Defaults to 0")
-            ("input-tensor-shape,s", po::value(&inputTensorShapes),
-             "The shape of the input tensors in the network as a flat array of integers separated by comma."
-             "Several shapes can be passed by separating them with a colon (:)."
-             "This parameter is optional, depending on the network.")
-            ("input-tensor-data,d", po::value(&inputTensorDataFilePaths)->default_value(""),
-             "Path to files containing the input data as a flat array separated by whitespace. "
-             "Several paths can be passed by separating them with a comma. If not specified, the network will be run "
-             "with dummy data (useful for profiling).")
-            ("input-type,y",po::value(&inputTypes), "The type of the input tensors in the network separated by comma. "
-             "If unset, defaults to \"float\" for all defined inputs. "
-             "Accepted values (float, int or qasymm8)")
-            ("quantize-input,q",po::bool_switch()->default_value(false),
-             "If this option is enabled, all float inputs will be quantized to qasymm8. "
-             "If unset, default to not quantized. "
-             "Accepted values (true or false)")
-            ("output-type,z",po::value(&outputTypes),
-             "The type of the output tensors in the network separated by comma. "
-             "If unset, defaults to \"float\" for all defined outputs. "
-             "Accepted values (float, int or qasymm8).")
-            ("dequantize-output,l",po::bool_switch()->default_value(false),
-             "If this option is enabled, all quantized outputs will be dequantized to float. "
-             "If unset, default to not get dequantized. "
-             "Accepted values (true or false)")
-            ("output-name,o", po::value(&outputNames),
-             "Identifier of the output tensors in the network separated by comma.")
-            ("write-outputs-to-file,w", po::value(&outputTensorFiles),
-             "Comma-separated list of output file paths keyed with the binding-id of the output slot. "
-             "If left empty (the default), the output tensors will not be written to a file.")
-            ("event-based-profiling,e", po::bool_switch()->default_value(false),
-             "Enables built in profiler. If unset, defaults to off.")
-            ("visualize-optimized-model,v", po::bool_switch()->default_value(false),
-             "Enables built optimized model visualizer. If unset, defaults to off.")
-            ("bf16-turbo-mode", po::bool_switch()->default_value(false), "If this option is enabled, FP32 layers, "
-             "weights and biases will be converted to BFloat16 where the backend supports it")
-            ("fp16-turbo-mode,h", po::bool_switch()->default_value(false), "If this option is enabled, FP32 layers, "
-             "weights and biases will be converted to FP16 where the backend supports it")
-            ("threshold-time,r", po::value<double>(&thresholdTime)->default_value(0.0),
-             "Threshold time is the maximum allowed time for inference measured in milliseconds. If the actual "
-             "inference time is greater than the threshold time, the test will fail. By default, no threshold "
-             "time is used.")
-            ("print-intermediate-layers,p", po::bool_switch()->default_value(false),
-             "If this option is enabled, the output of every graph layer will be printed.")
-            ("enable-external-profiling,a", po::bool_switch()->default_value(false),
-             "If enabled external profiling will be switched on")
-            ("timeline-profiling", po::bool_switch()->default_value(false),
-             "If enabled timeline profiling will be switched on, requires external profiling")
-            ("outgoing-capture-file,j", po::value(&outgoingCaptureFile),
-             "If specified the outgoing external profiling packets will be captured in this binary file")
-            ("incoming-capture-file,k", po::value(&incomingCaptureFile),
-             "If specified the incoming external profiling packets will be captured in this binary file")
-            ("file-only-external-profiling,g", po::bool_switch()->default_value(false),
-             "If enabled then the 'file-only' test mode of external profiling will be enabled")
-            ("counter-capture-period,u", po::value<uint32_t>(&counterCapturePeriod)->default_value(150u),
-             "If profiling is enabled in 'file-only' mode this is the capture period that will be used in the test")
-            ("file-format", po::value(&fileFormat)->default_value("binary"),
-             "If profiling is enabled specifies the output file format")
-            ("iterations", po::value<size_t>(&iterations)->default_value(1),
-             "Number of iterations to run the network for, default is set to 1")
-            ("tuning-path", po::value(&tuningPath),
-            "Path to tuning file. Enables use of CL tuning")
-            ("tuning-level", po::value<int>(&tuningLevel)->default_value(0),
-             "Sets the tuning level which enables a tuning run which will update/create a tuning file. "
-             "Available options are: 1 (Rapid), 2 (Normal), 3 (Exhaustive). "
-             "Requires tuning-path to be set, default is set to 0 (No tuning run)")
-            ("parse-unsupported", po::bool_switch()->default_value(false),
-                "Add unsupported operators as stand-in layers (where supported by parser)")
-            ("infer-output-shape", po::bool_switch()->default_value(false),
-                "Infers output tensor shape from input tensor shape and validate where applicable (where supported by "
-                "parser)")
-            ("enable-fast-math", po::bool_switch()->default_value(false),
-             "Enables fast_math options in backends that support it. Using the fast_math flag can lead to "
-             "performance improvements but may result in reduced or different precision.");
-    }
-    catch (const std::exception& e)
-    {
-        // Coverity points out that default_value(...) can throw a bad_lexical_cast,
-        // and that desc.add_options() can throw boost::io::too_few_args.
-        // They really won't in any of these cases.
-        ARMNN_ASSERT_MSG(false, "Caught unexpected exception");
-        ARMNN_LOG(fatal) << "Fatal internal error: " << e.what();
-        return EXIT_FAILURE;
-    }
-
-    // Parses the command-line.
-    po::variables_map vm;
-    try
-    {
-        po::store(po::parse_command_line(argc, argv, desc), vm);
-
-        if (CheckOption(vm, "help") || argc <= 1)
-        {
-            std::cout << "Executes a neural network model using the provided input tensor. " << std::endl;
-            std::cout << "Prints the resulting output tensor." << std::endl;
-            std::cout << std::endl;
-            std::cout << desc << std::endl;
-            return EXIT_SUCCESS;
-        }
-
-        po::notify(vm);
-    }
-    catch (const po::error& e)
-    {
-        std::cerr << e.what() << std::endl << std::endl;
-        std::cerr << desc << std::endl;
-        return EXIT_FAILURE;
-    }
-
-    // Get the value of the switch arguments.
-    bool concurrent = vm["concurrent"].as<bool>();
-    bool enableProfiling = vm["event-based-profiling"].as<bool>();
-    bool enableLayerDetails = vm["visualize-optimized-model"].as<bool>();
-    bool enableBf16TurboMode = vm["bf16-turbo-mode"].as<bool>();
-    bool enableFp16TurboMode = vm["fp16-turbo-mode"].as<bool>();
-    bool quantizeInput = vm["quantize-input"].as<bool>();
-    bool dequantizeOutput = vm["dequantize-output"].as<bool>();
-    bool printIntermediate = vm["print-intermediate-layers"].as<bool>();
-    bool enableExternalProfiling = vm["enable-external-profiling"].as<bool>();
-    bool fileOnlyExternalProfiling = vm["file-only-external-profiling"].as<bool>();
-    bool parseUnsupported = vm["parse-unsupported"].as<bool>();
-    bool timelineEnabled = vm["timeline-profiling"].as<bool>();
-    bool inferOutputShape = vm["infer-output-shape"].as<bool>();
-    bool enableFastMath = vm["enable-fast-math"].as<bool>();
-
-    if (enableBf16TurboMode && enableFp16TurboMode)
-    {
-        ARMNN_LOG(fatal) << "BFloat16 and Float16 turbo mode cannot be enabled at the same time.";
-        return EXIT_FAILURE;
-    }
+    // Get ExecuteNetwork parameters and runtime options from command line
+    ProgramOptions ProgramOptions(argc, argv);
 
     // Create runtime
-    armnn::IRuntime::CreationOptions options;
-    options.m_EnableGpuProfiling                     = enableProfiling;
-    options.m_DynamicBackendsPath                    = dynamicBackendsPath;
-    options.m_ProfilingOptions.m_EnableProfiling     = enableExternalProfiling;
-    options.m_ProfilingOptions.m_IncomingCaptureFile = incomingCaptureFile;
-    options.m_ProfilingOptions.m_OutgoingCaptureFile = outgoingCaptureFile;
-    options.m_ProfilingOptions.m_FileOnly            = fileOnlyExternalProfiling;
-    options.m_ProfilingOptions.m_CapturePeriod       = counterCapturePeriod;
-    options.m_ProfilingOptions.m_FileFormat          = fileFormat;
-    options.m_ProfilingOptions.m_TimelineEnabled     = timelineEnabled;
+    std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(ProgramOptions.m_RuntimeOptions));
 
-    if (timelineEnabled && !enableExternalProfiling)
+    std::string modelFormat = ProgramOptions.m_ExNetParams.m_ModelFormat;
+
+    // Forward to implementation based on the parser type
+    if (modelFormat.find("armnn") != std::string::npos)
     {
-        ARMNN_LOG(fatal) << "Timeline profiling requires external profiling to be turned on";
+    #if defined(ARMNN_SERIALIZER)
+        return MainImpl<armnnDeserializer::IDeserializer, float>(ProgramOptions.m_ExNetParams, runtime);
+    #else
+        ARMNN_LOG(fatal) << "Not built with serialization support.";
         return EXIT_FAILURE;
+    #endif
     }
-
-    // Check whether we have to load test cases from a file.
-    if (CheckOption(vm, "test-cases"))
+    else if (modelFormat.find("caffe") != std::string::npos)
     {
-        // Check that the file exists.
-        if (!fs::exists(testCasesFile))
-        {
-            ARMNN_LOG(fatal) << "Given file \"" << testCasesFile << "\" does not exist";
-            return EXIT_FAILURE;
-        }
-
-        // Parse CSV file and extract test cases
-        armnnUtils::CsvReader reader;
-        std::vector<armnnUtils::CsvRow> testCases = reader.ParseFile(testCasesFile);
-
-        // Check that there is at least one test case to run
-        if (testCases.empty())
-        {
-            ARMNN_LOG(fatal) << "Given file \"" << testCasesFile << "\" has no test cases";
-            return EXIT_FAILURE;
-        }
-        // Create runtime
-        std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(options));
-
-        const std::string executableName("ExecuteNetwork");
-
-        // Check whether we need to run the test cases concurrently
-        if (concurrent)
-        {
-            std::vector<std::future<int>> results;
-            results.reserve(testCases.size());
-
-            // Run each test case in its own thread
-            for (auto&  testCase : testCases)
-            {
-                testCase.values.insert(testCase.values.begin(), executableName);
-                results.push_back(std::async(std::launch::async, RunCsvTest, std::cref(testCase), std::cref(runtime),
-                                             enableProfiling, enableFp16TurboMode, enableBf16TurboMode, thresholdTime,
-                                             printIntermediate, enableLayerDetails, parseUnsupported,
-                                             inferOutputShape, enableFastMath));
-            }
-
-            // Check results
-            for (auto& result : results)
-            {
-                if (result.get() != EXIT_SUCCESS)
-                {
-                    return EXIT_FAILURE;
-                }
-            }
-        }
-        else
-        {
-            // Run tests sequentially
-            for (auto&  testCase : testCases)
-            {
-                testCase.values.insert(testCase.values.begin(), executableName);
-                if (RunCsvTest(testCase, runtime, enableProfiling,
-                               enableFp16TurboMode, enableBf16TurboMode, thresholdTime, printIntermediate,
-                               enableLayerDetails, parseUnsupported, inferOutputShape, enableFastMath) != EXIT_SUCCESS)
-                {
-                    return EXIT_FAILURE;
-                }
-            }
-        }
-
-        return EXIT_SUCCESS;
+    #if defined(ARMNN_CAFFE_PARSER)
+        return MainImpl<armnnCaffeParser::ICaffeParser, float>(ProgramOptions.m_ExNetParams, runtime);
+    #else
+        ARMNN_LOG(fatal) << "Not built with Caffe parser support.";
+        return EXIT_FAILURE;
+    #endif
     }
-    else // Run single test
+    else if (modelFormat.find("onnx") != std::string::npos)
     {
-        // Get the preferred order of compute devices. If none are specified, default to using CpuRef
-        const std::string computeOption("compute");
-        std::vector<std::string> computeDevicesAsStrings =
-                CheckOption(vm, computeOption.c_str()) ?
-                    vm[computeOption].as<std::vector<std::string>>() :
-                    std::vector<std::string>();
-        std::vector<armnn::BackendId> computeDevices(computeDevicesAsStrings.begin(), computeDevicesAsStrings.end());
-
-        // Remove duplicates from the list of compute devices.
-        RemoveDuplicateDevices(computeDevices);
-
-#if defined(ARMCOMPUTECL_ENABLED)
-        std::shared_ptr<armnn::IGpuAccTunedParameters> tuned_params;
-
-        if (tuningPath != "")
-        {
-            if (tuningLevel != 0)
-            {
-                RunCLTuning(tuningPath, tuningLevel, modelFormat, inputTensorShapes, computeDevices,
-                    dynamicBackendsPath, modelPath, inputNames, inputTensorDataFilePaths, inputTypes, quantizeInput,
-                    outputTypes, outputNames, outputTensorFiles, dequantizeOutput, enableProfiling,
-                    enableFp16TurboMode, enableBf16TurboMode, thresholdTime, printIntermediate, subgraphId,
-                    enableLayerDetails, parseUnsupported, inferOutputShape, enableFastMath);
-            }
-            ARMNN_LOG(info) << "Using tuning params: " << tuningPath << "\n";
-            options.m_BackendOptions.emplace_back(
-                armnn::BackendOptions
-                {
-                    "GpuAcc",
-                    {
-                        {"TuningLevel", 0},
-                        {"TuningFile", tuningPath.c_str()},
-                        {"KernelProfilingEnabled", enableProfiling}
-                    }
-                }
-            );
-        }
-#endif
-        try
-        {
-            CheckOptionDependencies(vm);
-        }
-        catch (const po::error& e)
-        {
-            std::cerr << e.what() << std::endl << std::endl;
-            std::cerr << desc << std::endl;
-            return EXIT_FAILURE;
-        }
-        // Create runtime
-        std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(options));
-
-        return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath,
-            inputNames, inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
-            outputTensorFiles, dequantizeOutput, enableProfiling, enableFp16TurboMode, enableBf16TurboMode,
-            thresholdTime, printIntermediate, subgraphId, enableLayerDetails, parseUnsupported, inferOutputShape,
-            enableFastMath, iterations, runtime);
+    #if defined(ARMNN_ONNX_PARSER)
+        return MainImpl<armnnOnnxParser::IOnnxParser, float>(ProgramOptions.m_ExNetParams, runtime);
+    #else
+        ARMNN_LOG(fatal) << "Not built with Onnx parser support.";
+        return EXIT_FAILURE;
+    #endif
+    }
+    else if (modelFormat.find("tensorflow") != std::string::npos)
+    {
+    #if defined(ARMNN_TF_PARSER)
+        return MainImpl<armnnTfParser::ITfParser, float>(ProgramOptions.m_ExNetParams, runtime);
+    #else
+        ARMNN_LOG(fatal) << "Not built with Tensorflow parser support.";
+        return EXIT_FAILURE;
+    #endif
+    }
+    else if(modelFormat.find("tflite") != std::string::npos)
+    {
+    #if defined(ARMNN_TF_LITE_PARSER)
+        return MainImpl<armnnTfLiteParser::ITfLiteParser, float>(ProgramOptions.m_ExNetParams, runtime);
+    #else
+        ARMNN_LOG(fatal) << "Not built with Tensorflow-Lite parser support.";
+        return EXIT_FAILURE;
+    #endif
+    }
+    else
+    {
+        ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat
+                         << "'. Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'";
+        return EXIT_FAILURE;
     }
 }

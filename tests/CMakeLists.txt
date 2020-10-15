@@ -255,12 +255,19 @@ endif()
 
 if (BUILD_ARMNN_SERIALIZER OR BUILD_CAFFE_PARSER OR BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER)
     set(ExecuteNetwork_sources
-        ExecuteNetwork/ExecuteNetwork.cpp)
+        ExecuteNetwork/ExecuteNetwork.cpp
+        ExecuteNetwork/ExecuteNetworkProgramOptions.cpp
+        ExecuteNetwork/ExecuteNetworkProgramOptions.hpp
+        ExecuteNetwork/ExecuteNetworkParams.cpp
+        ExecuteNetwork/ExecuteNetworkParams.hpp
+        NetworkExecutionUtils/NetworkExecutionUtils.cpp
+        NetworkExecutionUtils/NetworkExecutionUtils.hpp)
 
     add_executable_ex(ExecuteNetwork ${ExecuteNetwork_sources})
     target_include_directories(ExecuteNetwork PRIVATE ../src/armnn)
     target_include_directories(ExecuteNetwork PRIVATE ../src/armnnUtils)
     target_include_directories(ExecuteNetwork PRIVATE ../src/backends)
+    target_include_directories(ExecuteNetwork PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
     if (BUILD_ARMNN_SERIALIZER)
         target_link_libraries(ExecuteNetwork armnnSerializer)

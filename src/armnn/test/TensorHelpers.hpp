@@ -6,13 +6,13 @@
 
 #include <armnn/Tensor.hpp>
 #include <armnn/utility/Assert.hpp>
+#include <armnnUtils/FloatingPointComparison.hpp>
 
 #include <QuantizeHelper.hpp>
 
 #include <boost/multi_array.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
-#include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <array>
@@ -53,8 +53,7 @@ struct SelectiveComparer<T, false>
         }
 
         // For unquantized floats we use a tolerance of 1%.
-        boost::math::fpc::close_at_tolerance<float> comparer(boost::math::fpc::percent_tolerance(1.0f));
-        return comparer(a, b);
+        return armnnUtils::within_percentage_tolerance(a, b);
     }
 };
 

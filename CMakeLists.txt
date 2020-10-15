@@ -39,6 +39,7 @@ set(armnnUtils_sources)
 list(APPEND armnnUtils_sources
     include/armnnUtils/DataLayoutIndexed.hpp
     include/armnnUtils/Permute.hpp
+    include/armnnUtils/FloatingPointComparison.hpp
     include/armnnUtils/FloatingPointConverter.hpp
     include/armnnUtils/TensorUtils.hpp
     include/armnnUtils/Transpose.hpp
@@ -690,9 +691,10 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/UnitTests.cpp
         src/armnn/test/UnitTests.hpp
         src/armnn/test/UtilsTests.cpp
-        src/armnnUtils/test/QuantizeHelperTest.cpp
-        src/armnnUtils/test/PrototxtConversionsTest.cpp
+        src/armnnUtils/test/FloatingPointComparisonTest.cpp
         src/armnnUtils/test/ParserHelperTest.cpp
+        src/armnnUtils/test/PrototxtConversionsTest.cpp
+        src/armnnUtils/test/QuantizeHelperTest.cpp
         src/armnnUtils/test/TensorUtilsTest.cpp
         src/profiling/test/BufferTests.cpp
         src/profiling/test/FileOnlyProfilingDecoratorTests.cpp

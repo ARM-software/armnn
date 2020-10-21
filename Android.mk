@@ -239,10 +239,7 @@ LOCAL_SRC_FILES := \
 
 LOCAL_STATIC_LIBRARIES := \
         arm_compute_library \
-        libboost_log \
-        libboost_system \
-        libboost_thread \
-        libboost_filesystem
+        libboost_system
 
 LOCAL_SHARED_LIBRARIES := \
         liblog
@@ -332,7 +329,6 @@ LOCAL_CFLAGS := \
         -std=$(CPP_VERSION) \
         -fexceptions \
         -frtti \
-        -isystem vendor/arm/android-nn-driver/boost_1_64_0
 
 # The variable to enable/disable the CL backend (ARMNN_COMPUTE_CL_ENABLED) is declared in android-nn-driver/Android.mk
 ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
@@ -427,11 +423,7 @@ endif
 
 LOCAL_STATIC_LIBRARIES := \
         libneuralnetworks_common \
-        libboost_log \
-        libboost_system \
         libboost_unit_test_framework \
-        libboost_thread \
-        libboost_filesystem \
         arm_compute_library
 
 LOCAL_WHOLE_STATIC_LIBRARIES := libarmnn

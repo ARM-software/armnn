@@ -14,7 +14,7 @@ import uuid
 
 SCRIPTS_DIR = os.path.dirname(os.path.realpath(__file__))
 EXTRACT_DIR = os.path.join(SCRIPTS_DIR, "..", "test")
-ARCHIVE_URL = "https://snapshots.linaro.org/components/pyarmnn-tests/pyarmnn_testdata_200500_20200415.tar.bz2"
+ARCHIVE_URL = "https://snapshots.linaro.org/components/pyarmnn-tests/pyarmnn_testdata_201100_20201022.tar.bz2"
 
 
 def download_resources(url, save_path):

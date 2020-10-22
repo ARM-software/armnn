@@ -11,13 +11,12 @@
 #include <armnn/ILayerSupport.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
+#include <armnn/utility/TransformIterator.hpp>
 
 #include <backendsCommon/WorkloadFactory.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
-
-#include <boost/iterator/transform_iterator.hpp>
 
 #include <sstream>
 
@@ -26,6 +25,8 @@ namespace armnn
 
 namespace
 {
+using LayerList = std::list<Layer*>;
+using Iterator = LayerList::const_iterator; // Const so pointers in the list can't be modified externally.
 
 const TensorInfo OverrideDataType(const TensorInfo& info, Optional<DataType> type)
 {
@@ -667,16 +668,18 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                 {
                     return OverrideDataType(slot.GetConnectedOutputSlot()->GetTensorInfo(), dataType);
                 };
-            auto beginI = boost::make_transform_iterator(layer.GetInputSlots().begin(), getTensorInfo);
-            auto endI = boost::make_transform_iterator(layer.GetInputSlots().end(), getTensorInfo);
+
+            auto beginI = MakeTransformIterator(layer.GetInputSlots().begin(), getTensorInfo);
+            auto endI = MakeTransformIterator(layer.GetInputSlots().end(), getTensorInfo);
             std::vector<TensorInfo> inputs(beginI, endI);
 
             auto getTensorInfoPtr = [](const TensorInfo& info)
                 {
                     return &info;
                 };
-            auto beginPtr = boost::make_transform_iterator(inputs.begin(), getTensorInfoPtr);
-            auto endPtr = boost::make_transform_iterator(inputs.end(), getTensorInfoPtr);
+
+            auto beginPtr = MakeTransformIterator(inputs.begin(), getTensorInfoPtr);
+            auto endPtr = MakeTransformIterator(inputs.end(), getTensorInfoPtr);
             std::vector<const TensorInfo*> inputPtrs(beginPtr, endPtr);
 
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
@@ -1011,8 +1014,8 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             {
                 return OverrideDataType(slot.GetTensorInfo(), dataType);
             };
-            auto beginI = boost::make_transform_iterator(layer.GetOutputSlots().begin(), getTensorInfo);
-            auto endI = boost::make_transform_iterator(layer.GetOutputSlots().end(), getTensorInfo);
+            auto beginI = MakeTransformIterator(layer.GetOutputSlots().begin(), getTensorInfo);
+            auto endI = MakeTransformIterator(layer.GetOutputSlots().end(), getTensorInfo);
             std::vector<TensorInfo> outputs(beginI, endI);
 
             const std::vector<std::reference_wrapper<TensorInfo>> outputPtrs(outputs.begin(), outputs.end());
@@ -1032,16 +1035,16 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                 {
                     return OverrideDataType(slot.GetConnectedOutputSlot()->GetTensorInfo(), dataType);
                 };
-            auto beginI = boost::make_transform_iterator(layer.GetInputSlots().begin(), getTensorInfo);
-            auto endI = boost::make_transform_iterator(layer.GetInputSlots().end(), getTensorInfo);
+            auto beginI = MakeTransformIterator(layer.GetInputSlots().begin(), getTensorInfo);
+            auto endI = MakeTransformIterator(layer.GetInputSlots().end(), getTensorInfo);
             std::vector<TensorInfo> inputs(beginI, endI);
 
             auto getTensorInfoPtr = [](const TensorInfo& info)
                 {
                     return &info;
                 };
-            auto beginPtr = boost::make_transform_iterator(inputs.begin(), getTensorInfoPtr);
-            auto endPtr = boost::make_transform_iterator(inputs.end(), getTensorInfoPtr);
+            auto beginPtr = MakeTransformIterator(inputs.begin(), getTensorInfoPtr);
+            auto endPtr = MakeTransformIterator(inputs.end(), getTensorInfoPtr);
             std::vector<const TensorInfo*> inputPtrs(beginPtr, endPtr);
 
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
@@ -1063,12 +1066,12 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                 {
                     return OverrideDataType(slot.GetTensorInfo(), dataType);
                 };
-            auto beginI = boost::make_transform_iterator(layer.GetInputSlots().begin(), getTensorInfoIn);
-            auto endI = boost::make_transform_iterator(layer.GetInputSlots().end(), getTensorInfoIn);
+            auto beginI = MakeTransformIterator(layer.GetInputSlots().begin(), getTensorInfoIn);
+            auto endI = MakeTransformIterator(layer.GetInputSlots().end(), getTensorInfoIn);
             std::vector<TensorInfo> inputs(beginI, endI);
 
-            auto beginO = boost::make_transform_iterator(layer.GetOutputSlots().begin(), getTensorInfoOut);
-            auto endO = boost::make_transform_iterator(layer.GetOutputSlots().end(), getTensorInfoOut);
+            auto beginO = MakeTransformIterator(layer.GetOutputSlots().begin(), getTensorInfoOut);
+            auto endO = MakeTransformIterator(layer.GetOutputSlots().end(), getTensorInfoOut);
             std::vector<TensorInfo> outputs(beginO, endO);
 
 
@@ -1076,12 +1079,12 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                 {
                     return &info;
                 };
-            auto beginPtrI = boost::make_transform_iterator(inputs.begin(), getTensorInfoPtr);
-            auto endPtrI = boost::make_transform_iterator(inputs.end(), getTensorInfoPtr);
+            auto beginPtrI = MakeTransformIterator(inputs.begin(), getTensorInfoPtr);
+            auto endPtrI = MakeTransformIterator(inputs.end(), getTensorInfoPtr);
             std::vector<const TensorInfo*> inputPtrs(beginPtrI, endPtrI);
 
-            auto beginPtrO = boost::make_transform_iterator(outputs.begin(), getTensorInfoPtr);
-            auto endPtrO = boost::make_transform_iterator(outputs.end(), getTensorInfoPtr);
+            auto beginPtrO = MakeTransformIterator(outputs.begin(), getTensorInfoPtr);
+            auto endPtrO = MakeTransformIterator(outputs.end(), getTensorInfoPtr);
             std::vector<const TensorInfo*> outputPtrs(beginPtrO, endPtrO);
 
 

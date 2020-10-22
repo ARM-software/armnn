@@ -254,6 +254,7 @@ list(APPEND armnn_sources
     include/armnn/utility/NumericCast.hpp
     include/armnn/utility/PolymorphicDowncast.hpp
     include/armnn/utility/StringUtils.hpp
+    include/armnn/utility/TransformIterator.hpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp
     src/armnn/layers/ActivationLayer.hpp
@@ -701,6 +702,7 @@ if(BUILD_UNIT_TESTS)
         src/armnnUtils/test/PrototxtConversionsTest.cpp
         src/armnnUtils/test/QuantizeHelperTest.cpp
         src/armnnUtils/test/TensorUtilsTest.cpp
+        src/armnnUtils/test/TransformIteratorTest.cpp
         src/profiling/test/BufferTests.cpp
         src/profiling/test/FileOnlyProfilingDecoratorTests.cpp
         src/profiling/test/PrintPacketHeaderHandler.cpp

@@ -13,14 +13,13 @@
 #include <armnn/Exceptions.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
+#include <armnn/utility/TransformIterator.hpp>
 
 #include <list>
 #include <map>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-
-#include <boost/iterator/transform_iterator.hpp>
 
 namespace armnn
 {
@@ -51,9 +50,9 @@ public:
     using Iterator = LayerList::const_iterator; // Const so pointers in the list can't be modified externally.
     using IteratorDifference = Iterator::difference_type;
 
-    using ConstIterator        = boost::transform_iterator<decltype(&PtrCast<const Layer>),       Iterator>;
-    using ConstIteratorInputs  = boost::transform_iterator<decltype(&PtrCast<const InputLayer>),  Iterator>;
-    using ConstIteratorOutputs = boost::transform_iterator<decltype(&PtrCast<const OutputLayer>), Iterator>;
+    using ConstIterator        = TransformIterator<decltype(&PtrCast<const Layer>),       Iterator>;
+    using ConstIteratorInputs  = TransformIterator<decltype(&PtrCast<const InputLayer>),  Iterator>;
+    using ConstIteratorOutputs = TransformIterator<decltype(&PtrCast<const OutputLayer>), Iterator>;
 
     /// Wrapper class returned by Graph::GetInputLayers()
     struct InputLayersAccessor

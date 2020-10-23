@@ -24,6 +24,8 @@ SliceLayer::SliceLayer(const SliceDescriptor& param, const char* name)
 std::unique_ptr<IWorkload> SliceLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     SliceQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateSlice(descriptor, PrepInfoAndDesc(descriptor));
 }
 

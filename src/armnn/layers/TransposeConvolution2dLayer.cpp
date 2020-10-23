@@ -35,6 +35,8 @@ std::unique_ptr<IWorkload> TransposeConvolution2dLayer::CreateWorkload(const IWo
         descriptor.m_Bias = m_Bias.get();
     }
 
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateTransposeConvolution2d(descriptor, PrepInfoAndDesc(descriptor));
 }
 

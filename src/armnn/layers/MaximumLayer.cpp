@@ -21,6 +21,8 @@ MaximumLayer::MaximumLayer(const char* name)
 std::unique_ptr<IWorkload> MaximumLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     MaximumQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateMaximum(descriptor, PrepInfoAndDesc(descriptor));
 }
 

@@ -20,6 +20,8 @@ RankLayer::RankLayer(const char* name)
 std::unique_ptr<IWorkload> RankLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     RankQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateRank(descriptor, PrepInfoAndDesc(descriptor));
 }
 

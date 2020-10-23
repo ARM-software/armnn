@@ -28,6 +28,8 @@ std::unique_ptr<IWorkload> DepthToSpaceLayer::CreateWorkload(const IWorkloadFact
     descriptor.m_Parameters.m_BlockSize  = m_Param.m_BlockSize;
     descriptor.m_Parameters.m_DataLayout = m_Param.m_DataLayout;
 
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateDepthToSpace(descriptor, PrepInfoAndDesc(descriptor));
 }
 

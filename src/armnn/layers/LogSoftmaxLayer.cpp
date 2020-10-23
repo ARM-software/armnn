@@ -21,6 +21,8 @@ LogSoftmaxLayer::LogSoftmaxLayer(const LogSoftmaxDescriptor &param, const char* 
 std::unique_ptr<IWorkload> LogSoftmaxLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     LogSoftmaxQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateLogSoftmax(descriptor, PrepInfoAndDesc(descriptor));
 }
 

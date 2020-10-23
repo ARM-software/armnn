@@ -21,6 +21,8 @@ FillLayer::FillLayer(const FillDescriptor& param, const char* name)
 std::unique_ptr<IWorkload> FillLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     FillQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateFill(descriptor, PrepInfoAndDesc(descriptor) );
 }
 

@@ -27,6 +27,8 @@ Pooling2dLayer::Pooling2dLayer(const Pooling2dDescriptor& param, const char* nam
 std::unique_ptr<IWorkload> Pooling2dLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     Pooling2dQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreatePooling2d(descriptor, PrepInfoAndDesc(descriptor));
 }
 

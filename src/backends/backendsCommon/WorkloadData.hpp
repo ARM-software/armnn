@@ -29,15 +29,23 @@ struct QueueDescriptor
 {
     std::vector<ITensorHandle*> m_Inputs;
     std::vector<ITensorHandle*> m_Outputs;
+    void* m_AdditionalInfoObject;
 
     void ValidateInputsOutputs(const std::string& descName,
                                unsigned int numExpectedIn,
                                unsigned int numExpectedOut) const;
 
+    template<typename T>
+    const T* GetAdditionalInformation()
+    {
+        return static_cast<T*>(m_AdditionalInfoObject);
+    }
 
 protected:
     ~QueueDescriptor() = default;
-    QueueDescriptor() = default;
+    QueueDescriptor()
+        : m_AdditionalInfoObject(nullptr)
+    {}
     QueueDescriptor(QueueDescriptor const&) = default;
     QueueDescriptor& operator=(QueueDescriptor const&) = default;
 };

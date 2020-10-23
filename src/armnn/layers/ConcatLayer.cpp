@@ -31,6 +31,7 @@ std::unique_ptr<IWorkload> ConcatLayer::CreateWorkload(const IWorkloadFactory& f
         descriptor.m_ViewOrigins.emplace_back(
             std::vector<unsigned int>(m_Param.GetViewOrigin(i), m_Param.GetViewOrigin(i) + m_Param.GetNumDimensions()));
     }
+    SetAdditionalInfo(descriptor);
 
     return factory.CreateConcat(descriptor, PrepInfoAndDesc(descriptor));
 }

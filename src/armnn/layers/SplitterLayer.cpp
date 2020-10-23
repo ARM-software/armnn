@@ -29,6 +29,8 @@ std::unique_ptr<IWorkload> SplitterLayer::CreateWorkload(const IWorkloadFactory&
             std::vector<unsigned int>(m_Param.GetViewOrigin(i), m_Param.GetViewOrigin(i) + m_Param.GetNumDimensions()));
     }
 
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateSplitter(descriptor, PrepInfoAndDesc(descriptor));
 }
 

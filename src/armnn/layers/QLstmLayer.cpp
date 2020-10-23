@@ -73,6 +73,8 @@ std::unique_ptr<IWorkload> QLstmLayer::CreateWorkload(const IWorkloadFactory& fa
         descriptor.m_OutputLayerNormWeights = m_LayerNormParameters.m_OutputLayerNormWeights.get();
     }
 
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateQLstm(descriptor, PrepInfoAndDesc(descriptor));
 }
 

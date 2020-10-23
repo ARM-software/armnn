@@ -22,6 +22,8 @@ StackLayer::StackLayer(const StackDescriptor& param, const char* name)
 std::unique_ptr<IWorkload> StackLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     StackQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateStack(descriptor, PrepInfoAndDesc(descriptor));
 }
 

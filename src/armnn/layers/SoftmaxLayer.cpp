@@ -21,6 +21,8 @@ SoftmaxLayer::SoftmaxLayer(const SoftmaxDescriptor &param, const char* name)
 std::unique_ptr<IWorkload> SoftmaxLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     SoftmaxQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateSoftmax(descriptor, PrepInfoAndDesc(descriptor));
 }
 

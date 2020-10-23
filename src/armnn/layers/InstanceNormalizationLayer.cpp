@@ -21,6 +21,8 @@ InstanceNormalizationLayer::InstanceNormalizationLayer(const InstanceNormalizati
 std::unique_ptr<IWorkload> InstanceNormalizationLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     InstanceNormalizationQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateInstanceNormalization(descriptor, PrepInfoAndDesc(descriptor));
 }
 

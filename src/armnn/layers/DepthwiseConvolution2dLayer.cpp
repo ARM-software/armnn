@@ -62,6 +62,9 @@ std::unique_ptr<IWorkload> DepthwiseConvolution2dLayer::CreateWorkload(const IWo
         ARMNN_ASSERT_MSG(m_Bias != nullptr, "DepthwiseConvolution2dLayer: Bias data should not be null.");
         descriptor.m_Bias = m_Bias.get();
     }
+
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateDepthwiseConvolution2d(descriptor, PrepInfoAndDesc(descriptor));
 }
 

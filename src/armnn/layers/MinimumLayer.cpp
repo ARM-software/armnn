@@ -22,6 +22,8 @@ MinimumLayer::MinimumLayer(const char* name)
 std::unique_ptr<IWorkload> MinimumLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     MinimumQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateMinimum(descriptor, PrepInfoAndDesc(descriptor));
 }
 

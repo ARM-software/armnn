@@ -25,6 +25,8 @@ PermuteLayer::PermuteLayer(const PermuteDescriptor& param, const char* name)
 std::unique_ptr<IWorkload> PermuteLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     PermuteQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreatePermute(descriptor, PrepInfoAndDesc(descriptor));
 }
 

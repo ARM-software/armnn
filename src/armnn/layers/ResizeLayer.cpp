@@ -26,6 +26,8 @@ ResizeLayer::ResizeLayer(const ResizeDescriptor& param, const char* name)
 std::unique_ptr<IWorkload> ResizeLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     ResizeQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateResize(descriptor, PrepInfoAndDesc(descriptor));
 }
 

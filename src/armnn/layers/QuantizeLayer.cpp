@@ -19,7 +19,10 @@ QuantizeLayer::QuantizeLayer(const char* name)
 std::unique_ptr<IWorkload> QuantizeLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     QuantizeQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     WorkloadInfo info = PrepInfoAndDesc(descriptor);
+
     return factory.CreateQuantize(descriptor, info);
 }
 

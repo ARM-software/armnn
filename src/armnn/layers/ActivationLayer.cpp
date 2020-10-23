@@ -20,6 +20,8 @@ ActivationLayer::ActivationLayer(const ActivationDescriptor& param, const char* 
 std::unique_ptr<IWorkload> ActivationLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     ActivationQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateActivation(descriptor, PrepInfoAndDesc(descriptor));
 }
 

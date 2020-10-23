@@ -26,9 +26,10 @@ SpaceToBatchNdLayer::SpaceToBatchNdLayer(const SpaceToBatchNdDescriptor param, c
 
 std::unique_ptr<IWorkload> SpaceToBatchNdLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
-   SpaceToBatchNdQueueDescriptor descriptor;
+    SpaceToBatchNdQueueDescriptor descriptor;
     descriptor.m_Parameters.m_BlockShape = m_Param.m_BlockShape;
-    descriptor.m_Parameters.m_PadList = m_Param.m_PadList;
+    descriptor.m_Parameters.m_PadList    = m_Param.m_PadList;
+    SetAdditionalInfo(descriptor);
 
     return factory.CreateSpaceToBatchNd(descriptor, PrepInfoAndDesc(descriptor));
 }

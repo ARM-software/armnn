@@ -28,6 +28,7 @@ std::unique_ptr<IWorkload> MemImportLayer::CreateWorkload(const IWorkloadFactory
 {
     IgnoreUnused(factory);
     MemImportQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
 
     //This is different from other workloads. Does not get created by the workload factory.
     return std::make_unique<ImportMemGenericWorkload>(descriptor, PrepInfoAndDesc(descriptor));

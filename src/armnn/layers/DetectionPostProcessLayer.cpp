@@ -24,6 +24,8 @@ std::unique_ptr<IWorkload> DetectionPostProcessLayer::CreateWorkload(const armnn
 {
     DetectionPostProcessQueueDescriptor descriptor;
     descriptor.m_Anchors = m_Anchors.get();
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateDetectionPostProcess(descriptor, PrepInfoAndDesc(descriptor));
 }
 

@@ -21,6 +21,8 @@ FloorLayer::FloorLayer(const char* name)
 std::unique_ptr<IWorkload> FloorLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     FloorQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateFloor(descriptor, PrepInfoAndDesc(descriptor));
 }
 

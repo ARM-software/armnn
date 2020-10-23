@@ -21,6 +21,8 @@ FakeQuantizationLayer::FakeQuantizationLayer(const FakeQuantizationDescriptor& p
 std::unique_ptr<IWorkload> FakeQuantizationLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     FakeQuantizationQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateFakeQuantization(descriptor, PrepInfoAndDesc(descriptor) );
 }
 

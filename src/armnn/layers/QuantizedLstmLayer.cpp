@@ -39,6 +39,8 @@ std::unique_ptr<IWorkload> QuantizedLstmLayer::CreateWorkload(const IWorkloadFac
     descriptor.m_CellBias       = m_QuantizedLstmParameters.m_CellBias.get();
     descriptor.m_OutputGateBias = m_QuantizedLstmParameters.m_OutputGateBias.get();
 
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateQuantizedLstm(descriptor, PrepInfoAndDesc(descriptor));
 }
 

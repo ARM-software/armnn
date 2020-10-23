@@ -72,6 +72,8 @@ std::unique_ptr<IWorkload> LstmLayer::CreateWorkload(const IWorkloadFactory& fac
         descriptor.m_OutputLayerNormWeights = m_LayerNormParameters.m_OutputLayerNormWeights.get();
     }
 
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateLstm(descriptor, PrepInfoAndDesc(descriptor));
 }
 

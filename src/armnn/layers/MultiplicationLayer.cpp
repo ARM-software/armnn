@@ -22,6 +22,8 @@ MultiplicationLayer::MultiplicationLayer(const char* name)
 std::unique_ptr<IWorkload> MultiplicationLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     MultiplicationQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateMultiplication(descriptor, PrepInfoAndDesc(descriptor));
 }
 

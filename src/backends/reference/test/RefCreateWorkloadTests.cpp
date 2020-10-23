@@ -89,6 +89,55 @@ static void RefCreateElementwiseWorkloadTest()
         TensorInfo({ 2, 3 }, DataType));
 }
 
+BOOST_AUTO_TEST_CASE(CreateSubtractionWorkloadWithBlobTest)
+{
+    Graph graph;
+    RefWorkloadFactory factory = GetFactory();
+    armnn::DataType DataType = armnn::DataType::Float32;
+
+    auto workload = CreateSubtractionWithBlobWorkloadTest<RefSubtractionWorkload<>,
+                                                          SubtractionQueueDescriptor,
+                                                          armnn::DataType::Float32>
+                                                          (factory, graph);
+
+    CheckInputsOutput(std::move(workload),
+        TensorInfo({ 2, 3 }, DataType),
+        TensorInfo({ 2, 3 }, DataType),
+        TensorInfo({ 2, 3 }, DataType));
+}
+
+BOOST_AUTO_TEST_CASE(CreateAdditionWorkloadWithBlobTest)
+{
+    Graph graph;
+    RefWorkloadFactory factory = GetFactory();
+    armnn::DataType DataType = armnn::DataType::Float32;
+
+    auto workload = CreateAdditionWithBlobWorkloadTest<RefAdditionWorkload<>,
+                                                       AdditionQueueDescriptor,
+                                                       armnn::DataType::Float32>(factory, graph);
+
+    CheckInputsOutput(std::move(workload),
+        TensorInfo({ 2, 3 }, DataType),
+        TensorInfo({ 2, 3 }, DataType),
+        TensorInfo({ 2, 3 }, DataType));
+}
+
+BOOST_AUTO_TEST_CASE(CreateMultiplicationWorkloadWithBlobTest)
+{
+    Graph              graph;
+    RefWorkloadFactory factory  = GetFactory();
+    armnn::DataType    DataType = armnn::DataType::Float32;
+
+    auto workload = CreateMultiplicationWithBlobWorkloadTest<RefMultiplicationWorkload<>,
+                                                             MultiplicationQueueDescriptor,
+                                                             armnn::DataType::Float32>(factory, graph);
+
+    CheckInputsOutput(std::move(workload),
+                      TensorInfo({2, 3}, DataType),
+                      TensorInfo({2, 3}, DataType),
+                      TensorInfo({2, 3}, DataType));
+}
+
 BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
 {
     RefCreateElementwiseWorkloadTest<RefAdditionWorkload<>,
@@ -262,6 +311,24 @@ static void RefCreateBatchNormalizationWorkloadTest(DataLayout dataLayout)
     CheckInputOutput(std::move(workload), TensorInfo(inputShape, DataType), TensorInfo(outputShape, DataType));
 }
 
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationWithBlobFloat32Workload)
+{
+    Graph graph;
+    RefWorkloadFactory factory = GetFactory();
+    auto dataType = armnn::DataType::Float32;
+    auto workload = CreateBatchNormalizationWorkloadTest<RefBatchNormalizationWorkload,
+                                                         armnn::DataType::Float32>(factory, graph, DataLayout::NHWC);
+
+    TensorShape inputShape;
+    TensorShape outputShape;
+
+    inputShape  = { 2, 4, 4, 3 };
+    outputShape = { 2, 4, 4, 3 };
+
+    // Checks that outputs and inputs are as we expect them (see definition of CreateBatchNormalizationWorkloadTest).
+    CheckInputOutput(std::move(workload), TensorInfo(inputShape, dataType), TensorInfo(outputShape, dataType));
+}
+
 BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat32Workload)
 {
     RefCreateBatchNormalizationWorkloadTest<RefBatchNormalizationWorkload,armnn::DataType::Float32>
@@ -360,6 +427,25 @@ BOOST_AUTO_TEST_CASE(CreateConvolution2dFloatNhwcWorkload)
     RefCreateConvolution2dWorkloadTest(DataLayout::NHWC);
 }
 
+BOOST_AUTO_TEST_CASE(CreateConvolution2dWithBlobWorkload)
+{
+    DataLayout dataLayout = DataLayout::NHWC;
+    Graph graph;
+    RefWorkloadFactory factory = GetFactory();
+    auto workload = CreateConvolution2dFusedActivationWithBlobWorkloadTest<RefConvolution2dWorkload, DataType::Float32>
+                    (factory, graph, dataLayout);
+
+    TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({2, 3, 8, 16})
+                                                               : std::initializer_list<unsigned int>({2, 8, 16, 3});
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({2, 2, 2, 10})
+                                                               : std::initializer_list<unsigned int>({2, 2, 10, 2});
+
+    // Checks that outputs and inputs are as we expect them (see definition of CreateConvolution2dWorkloadTest).
+    CheckInputOutput(std::move(workload),
+                     TensorInfo(inputShape, DataType::Float32),
+                     TensorInfo(outputShape, DataType::Float32));
+}
+
 static void RefCreateDepthwiseConvolutionWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
@@ -381,6 +467,21 @@ static void RefCreateDepthwiseConvolutionWorkloadTest(DataLayout dataLayout)
 BOOST_AUTO_TEST_CASE(CreateDepthwiseConvolutionFloat32NhwcWorkload)
 {
     RefCreateDepthwiseConvolutionWorkloadTest(DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(RefCreateFullyConnectedWithBlobWorkloadTest)
+{
+    Graph graph;
+    RefWorkloadFactory factory = GetFactory();
+    auto workload = CreateFullyConnectedWithBlobWorkloadTest<RefFullyConnectedWorkload,
+                                                         armnn::DataType::Float32>(factory, graph);
+
+    // Checks that outputs and inputs are as we expect them (see definition of CreateFullyConnectedWorkloadTest).
+    float inputsQScale = 0.0f;
+    float outputQScale = 0.0f;
+    CheckInputOutput(std::move(workload),
+        TensorInfo({ 3, 1, 4, 5 }, armnn::DataType::Float32, inputsQScale),
+        TensorInfo({ 3, 7 }, armnn::DataType::Float32, outputQScale));
 }
 
 template <typename FullyConnectedWorkloadType, armnn::DataType DataType>

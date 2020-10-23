@@ -22,6 +22,8 @@ ConvertBf16ToFp32Layer::ConvertBf16ToFp32Layer(const char* name)
 std::unique_ptr<IWorkload> ConvertBf16ToFp32Layer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     ConvertBf16ToFp32QueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateConvertBf16ToFp32(descriptor, PrepInfoAndDesc(descriptor));
 }
 

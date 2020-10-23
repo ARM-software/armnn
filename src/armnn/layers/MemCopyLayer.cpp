@@ -28,6 +28,7 @@ std::unique_ptr<IWorkload> MemCopyLayer::CreateWorkload(const IWorkloadFactory& 
 {
     IgnoreUnused(factory);
     MemCopyQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
 
     //This is different from other workloads. Does not get created by the workload factory.
     return std::make_unique<CopyMemGenericWorkload>(descriptor, PrepInfoAndDesc(descriptor));

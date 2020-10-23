@@ -26,6 +26,7 @@ std::unique_ptr<IWorkload> MeanLayer::CreateWorkload(const armnn::IWorkloadFacto
     MeanQueueDescriptor descriptor;
     descriptor.m_Parameters.m_Axis = m_Param.m_Axis;
     descriptor.m_Parameters.m_KeepDims = m_Param.m_KeepDims;
+    SetAdditionalInfo(descriptor);
 
     return factory.CreateMean(descriptor, PrepInfoAndDesc(descriptor));
 }

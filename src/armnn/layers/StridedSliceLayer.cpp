@@ -34,6 +34,8 @@ std::unique_ptr<IWorkload> StridedSliceLayer::CreateWorkload(const IWorkloadFact
     descriptor.m_Parameters.m_NewAxisMask    = m_Param.m_NewAxisMask;
     descriptor.m_Parameters.m_ShrinkAxisMask = m_Param.m_ShrinkAxisMask;
 
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateStridedSlice(descriptor, PrepInfoAndDesc(descriptor));
 }
 

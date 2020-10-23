@@ -28,6 +28,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <backendsCommon/WorkloadData.hpp>
 
 namespace armnn
 {
@@ -204,6 +205,7 @@ class ScopedCpuTensorHandle;
 // Base layer class
 
 using LayerPriority = unsigned int;
+using AdditionalInfoObjectPtr = std::shared_ptr<void>;
 
 class Layer : public IConnectableLayer
 {
@@ -333,6 +335,17 @@ public:
         m_ShapeInferenceMethod = shapeInferenceMethod;
     }
 
+    template<typename T>
+    std::shared_ptr<T> GetAdditionalInformation()
+    {
+        return std::static_pointer_cast<T>(m_AdditionalInfoObject);
+    }
+
+    void SetAdditionalInfoForObject(const AdditionalInfoObjectPtr& additionalInfo)
+    {
+        m_AdditionalInfoObject = additionalInfo;
+    }
+
 protected:
     // Graph needs access to the virtual destructor.
     friend class Graph;
@@ -376,6 +389,12 @@ protected:
     // Retrieve the Handles to the constants
     using ConstantTensors = std::vector<std::reference_wrapper<std::unique_ptr<ScopedCpuTensorHandle>>>;
     virtual ConstantTensors GetConstantTensorsByRef() {return ConstantTensors(); };
+
+    // "Blob"
+    AdditionalInfoObjectPtr m_AdditionalInfoObject;
+
+    // Utility method to set a pointer in the queueDescriptor to the "blob" location in the layer
+    void SetAdditionalInfo(QueueDescriptor& descriptor) const;
 
 private:
     void CollectWorkloadInputs(WorkloadDataCollector& dataCollector) const;

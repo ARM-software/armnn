@@ -22,6 +22,8 @@ SubtractionLayer::SubtractionLayer(const char* name)
 std::unique_ptr<IWorkload> SubtractionLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     SubtractionQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateSubtraction(descriptor, PrepInfoAndDesc(descriptor));
 }
 

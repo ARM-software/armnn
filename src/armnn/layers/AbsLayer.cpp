@@ -22,6 +22,8 @@ AbsLayer::AbsLayer(const char* name)
 std::unique_ptr<IWorkload> AbsLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     AbsQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateAbs(descriptor, PrepInfoAndDesc(descriptor));
 }
 

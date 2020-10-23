@@ -21,6 +21,8 @@ L2NormalizationLayer::L2NormalizationLayer(const L2NormalizationDescriptor& para
 std::unique_ptr<IWorkload> L2NormalizationLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     L2NormalizationQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateL2Normalization(descriptor, PrepInfoAndDesc(descriptor));
 }
 

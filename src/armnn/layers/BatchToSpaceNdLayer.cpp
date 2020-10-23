@@ -31,6 +31,7 @@ BatchToSpaceNdLayer::BatchToSpaceNdLayer(const armnn::BatchToSpaceNdDescriptor& 
 std::unique_ptr<IWorkload> BatchToSpaceNdLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     BatchToSpaceNdQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
 
     return factory.CreateBatchToSpaceNd(descriptor, PrepInfoAndDesc(descriptor));
 }

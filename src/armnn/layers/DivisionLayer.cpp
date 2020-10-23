@@ -22,6 +22,8 @@ DivisionLayer::DivisionLayer(const char* name)
 std::unique_ptr<IWorkload> DivisionLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     DivisionQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateDivision(descriptor, PrepInfoAndDesc(descriptor));
 }
 

@@ -25,6 +25,8 @@ TransposeLayer::TransposeLayer(const TransposeDescriptor& param, const char* nam
 std::unique_ptr<IWorkload> TransposeLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     TransposeQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateTranspose(descriptor, PrepInfoAndDesc(descriptor));
 }
 

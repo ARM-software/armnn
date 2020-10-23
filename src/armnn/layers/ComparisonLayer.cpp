@@ -23,6 +23,8 @@ ComparisonLayer::ComparisonLayer(const ComparisonDescriptor& param, const char* 
 std::unique_ptr<IWorkload> ComparisonLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     ComparisonQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateComparison(descriptor, PrepInfoAndDesc(descriptor));
 }
 

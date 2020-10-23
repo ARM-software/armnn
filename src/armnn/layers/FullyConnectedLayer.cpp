@@ -26,12 +26,16 @@ std::unique_ptr<IWorkload> FullyConnectedLayer::CreateWorkload(const IWorkloadFa
 
     FullyConnectedQueueDescriptor descriptor;
 
+    SetAdditionalInfo(descriptor);
     descriptor.m_Weight = m_Weight.get();
     if (m_Param.m_BiasEnabled)
     {
         ARMNN_ASSERT_MSG(m_Bias != nullptr, "FullyConnectedLayer: Bias data should not be null.");
         descriptor.m_Bias = m_Bias.get();
     }
+
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateFullyConnected(descriptor, PrepInfoAndDesc(descriptor));
 }
 

@@ -22,6 +22,8 @@ std::unique_ptr<IWorkload> ConstantLayer::CreateWorkload(const IWorkloadFactory&
 {
     ConstantQueueDescriptor descriptor;
     descriptor.m_LayerOutput = m_LayerOutput.get();
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateConstant(descriptor, PrepInfoAndDesc(descriptor));
 }
 

@@ -21,6 +21,8 @@ GatherLayer::GatherLayer(const GatherDescriptor& param, const char* name)
 std::unique_ptr<IWorkload> GatherLayer::CreateWorkload(const armnn::IWorkloadFactory& factory) const
 {
     GatherQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateGather(descriptor, PrepInfoAndDesc(descriptor));
 }
 

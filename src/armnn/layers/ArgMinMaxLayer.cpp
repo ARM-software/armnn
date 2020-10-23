@@ -24,6 +24,8 @@ ArgMinMaxLayer::ArgMinMaxLayer(const ArgMinMaxDescriptor& param, const char* nam
 std::unique_ptr<IWorkload> ArgMinMaxLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     ArgMinMaxQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateArgMinMax(descriptor, PrepInfoAndDesc(descriptor));
 }
 

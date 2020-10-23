@@ -22,6 +22,8 @@ AdditionLayer::AdditionLayer(const char* name)
 std::unique_ptr<IWorkload> AdditionLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     AdditionQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateAddition(descriptor, PrepInfoAndDesc(descriptor));
 }
 

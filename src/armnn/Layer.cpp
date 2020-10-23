@@ -242,6 +242,11 @@ void Layer::CollectWorkloadOutputs(WorkloadDataCollector& dataCollector) const
     }
 }
 
+void Layer::SetAdditionalInfo(QueueDescriptor& descriptor) const
+{
+    descriptor.m_AdditionalInfoObject = m_AdditionalInfoObject.get();
+}
+
 void Layer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
                                 const IWorkloadFactory& workloadFactory,
                                 const bool IsMemoryManaged)

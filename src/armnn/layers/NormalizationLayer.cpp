@@ -21,6 +21,8 @@ NormalizationLayer::NormalizationLayer(const NormalizationDescriptor& param, con
 std::unique_ptr<IWorkload> NormalizationLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     NormalizationQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateNormalization(descriptor, PrepInfoAndDesc(descriptor));
 }
 

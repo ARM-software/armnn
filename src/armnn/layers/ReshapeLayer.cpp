@@ -22,6 +22,8 @@ ReshapeLayer::ReshapeLayer(const ReshapeDescriptor& param, const char* name)
 std::unique_ptr<IWorkload> ReshapeLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     ReshapeQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateReshape(descriptor, PrepInfoAndDesc(descriptor));
 }
 

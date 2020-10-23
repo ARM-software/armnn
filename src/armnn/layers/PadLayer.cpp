@@ -23,6 +23,7 @@ std::unique_ptr<IWorkload> PadLayer::CreateWorkload(const armnn::IWorkloadFactor
 {
     PadQueueDescriptor descriptor;
     descriptor.m_Parameters.m_PadList = m_Param.m_PadList;
+    SetAdditionalInfo(descriptor);
 
     return factory.CreatePad(descriptor, PrepInfoAndDesc(descriptor));
 }

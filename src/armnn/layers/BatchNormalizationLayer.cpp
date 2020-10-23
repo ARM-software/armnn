@@ -27,6 +27,7 @@ std::unique_ptr<IWorkload> BatchNormalizationLayer::CreateWorkload(const IWorklo
     ARMNN_ASSERT_MSG(m_Gamma != nullptr, "BatchNormalizationLayer: Gamma data should not be null.");
 
     BatchNormalizationQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
 
     descriptor.m_Mean = m_Mean.get();
     descriptor.m_Variance = m_Variance.get();

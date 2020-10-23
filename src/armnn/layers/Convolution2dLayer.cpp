@@ -60,6 +60,9 @@ std::unique_ptr<IWorkload> Convolution2dLayer::CreateWorkload(const IWorkloadFac
         ARMNN_ASSERT_MSG(m_Bias != nullptr, "Convolution2dLayer: Bias data should not be null.");
         descriptor.m_Bias = m_Bias.get();
     }
+
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateConvolution2d(descriptor, PrepInfoAndDesc(descriptor));
 }
 

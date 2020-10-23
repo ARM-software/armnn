@@ -22,6 +22,8 @@ RsqrtLayer::RsqrtLayer(const char* name)
 std::unique_ptr<IWorkload> RsqrtLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     RsqrtQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateRsqrt(descriptor, PrepInfoAndDesc(descriptor));
 }
 

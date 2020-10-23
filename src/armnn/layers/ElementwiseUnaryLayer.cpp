@@ -23,6 +23,7 @@ ElementwiseUnaryLayer::ElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& p
 std::unique_ptr<IWorkload> ElementwiseUnaryLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     ElementwiseUnaryQueueDescriptor descriptor;
+
     return factory.CreateElementwiseUnary(descriptor, PrepInfoAndDesc(descriptor));
 }
 

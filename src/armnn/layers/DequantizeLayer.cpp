@@ -20,6 +20,7 @@ std::unique_ptr<IWorkload> DequantizeLayer::CreateWorkload(
                                                            const IWorkloadFactory& factory) const
 {
     DequantizeQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
 
     return factory.CreateDequantize(descriptor, PrepInfoAndDesc(descriptor));
 }

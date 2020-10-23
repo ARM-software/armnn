@@ -28,6 +28,7 @@ std::unique_ptr<IWorkload> UnmapLayer::CreateWorkload(const IWorkloadFactory& fa
 {
     IgnoreUnused(factory);
     UnmapQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
 
     //This is different from other workloads. Does not get created by the workload factory.
     return std::make_unique<UnmapWorkload>(descriptor, PrepInfoAndDesc(descriptor));

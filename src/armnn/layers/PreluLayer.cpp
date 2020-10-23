@@ -23,6 +23,7 @@ PreluLayer::PreluLayer(const char* name)
 std::unique_ptr<IWorkload> PreluLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     PreluQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
 
     return factory.CreatePrelu(descriptor, PrepInfoAndDesc(descriptor));
 }

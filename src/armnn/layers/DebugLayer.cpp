@@ -26,6 +26,8 @@ std::unique_ptr<IWorkload> DebugLayer::CreateWorkload(const IWorkloadFactory& fa
     descriptor.m_LayerName = prevLayer.GetNameStr();
     descriptor.m_SlotIndex = GetInputSlot(0).GetConnectedOutputSlot()->CalculateIndexOnOwner();
 
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateDebug(descriptor, PrepInfoAndDesc(descriptor));
 }
 

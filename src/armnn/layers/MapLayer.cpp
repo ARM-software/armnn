@@ -28,6 +28,7 @@ std::unique_ptr<IWorkload> MapLayer::CreateWorkload(const IWorkloadFactory& fact
 {
     IgnoreUnused(factory);
     MapQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
 
     //This is different from other workloads. Does not get created by the workload factory.
     return std::make_unique<MapWorkload>(descriptor, PrepInfoAndDesc(descriptor));

@@ -19,6 +19,8 @@ SwitchLayer::SwitchLayer(const char* name)
 std::unique_ptr<IWorkload> SwitchLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     SwitchQueueDescriptor descriptor;
+    SetAdditionalInfo(descriptor);
+
     return factory.CreateSwitch(descriptor, PrepInfoAndDesc(descriptor));
 }
 

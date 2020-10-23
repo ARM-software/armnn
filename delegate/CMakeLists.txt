@@ -15,7 +15,31 @@ list(APPEND armnnDelegate_sources
         include/armnn_delegate.hpp
         include/DelegateOptions.hpp
         src/armnn_delegate.cpp
-        src/DelegateOptions.cpp)
+        src/DelegateOptions.cpp
+        src/Activation.hpp
+        src/ArgMinMax.hpp
+        src/BatchSpace.hpp
+        src/Comparison.hpp
+        src/Convolution.hpp
+        src/Control.hpp
+        src/DelegateUtils.hpp
+        src/ElementwiseBinary.hpp
+        src/ElementwiseUnary.hpp
+        src/Fill.hpp
+        src/FullyConnected.hpp
+        src/Gather.hpp
+        src/Lstm.hpp
+        src/Normalization.hpp
+        src/Pad.hpp
+        src/Pooling.hpp
+        src/Quantization.hpp
+        src/Redefine.hpp
+        src/Resize.hpp
+        src/Round.hpp
+        src/Slice.hpp
+        src/Softmax.hpp
+        src/SpaceDepth.hpp
+        src/Transpose.hpp)
 
 add_library(armnnDelegate SHARED ${armnnDelegate_sources})
 
@@ -52,10 +76,6 @@ target_include_directories(armnnDelegate
         PRIVATE
             ${TfLite_INCLUDE_DIR})
 
-target_include_directories(armnnDelegate
-        SYSTEM PRIVATE
-            "${TfLite_Schema_INCLUDE_PATH}")
-
 ## Add Flatbuffers dependency
 find_package(Flatbuffers REQUIRED MODULE)
 
@@ -68,7 +88,10 @@ target_include_directories(armnnDelegate
 
 set(armnnDelegate_unittest_sources)
 list(APPEND armnnDelegate_unittest_sources
-        src/test/ArmnnDelegateTest.cpp)
+        src/test/AbsTest.cpp
+        src/test/ArmnnDelegateTest.cpp
+        src/test/ElementwiseUnaryTestHelper.hpp
+        src/test/SqrtTest.cpp)
 
 add_executable(DelegateUnitTests ${armnnDelegate_unittest_sources})
 target_include_directories(DelegateUnitTests PRIVATE src)
@@ -81,8 +104,8 @@ target_include_directories(DelegateUnitTests
             ${TfLite_INCLUDE_DIR})
 
 target_include_directories(DelegateUnitTests
-        SYSTEM PRIVATE
-            "${TfLite_Schema_INCLUDE_PATH}")
+        PRIVATE
+            ${Flatbuffers_INCLUDE_DIR})
 
 ####################################################
 ## Export targets

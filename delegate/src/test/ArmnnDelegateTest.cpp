@@ -3,19 +3,16 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <armnn_delegate.hpp>
-
-#ifndef DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#endif
 #include <doctest/doctest.h>
+
+#include <armnn_delegate.hpp>
 
 #include "tensorflow/lite/kernels/builtin_op_kernels.h"
 #include <tensorflow/lite/interpreter.h>
 
-namespace
+namespace armnnDelegate
 {
-
 
 TEST_SUITE("ArmnnDelegate")
 {
@@ -50,5 +47,4 @@ TEST_CASE ("ArmnnDelegate Registered")
 
 }
 
-} // anonymous namespace
-
+} // namespace armnnDelegate

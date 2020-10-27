@@ -588,7 +588,11 @@ target_include_directories(armnn
         profiling/common/include
 )
 
-target_link_libraries(armnn armnnUtils pipeCommon)
+target_link_libraries(armnn armnnUtils)
+# only link pipeCommon if it has been built
+if(BUILD_TIMELINE_DECODER)
+    target_link_libraries(armnn pipeCommon)
+endif()
 
 target_link_libraries(armnn ${CMAKE_DL_LIBS})
 if ("${CMAKE_SYSTEM_NAME}" STREQUAL Windows)

@@ -15,6 +15,7 @@ LayerType* Layer::CloneBase(Graph& graph, Params&& ... params) const
 {
     LayerType* const layer = graph.AddLayer<LayerType>(std::forward<Params>(params)...);
 
+    layer->BackendSelectionHint(GetBackendHint());
     layer->SetBackendId(GetBackendId());
     layer->SetGuid(GetGuid());
     layer->SetShapeInferenceMethod(m_ShapeInferenceMethod);

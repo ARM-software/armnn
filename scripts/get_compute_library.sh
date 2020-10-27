@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_08" # Release 20.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="9ae06d4986bc3055f7786c1097b465bd321cf8eb" #COMPMID-3925: Dispatch CLGEMM with no padding y requirement
+DEFAULT_CLFRAMEWORKREVISION="19a41bad7fbbc18fc9032753b234b1f7c632b2d5" #COMPMID-3927 CTS failure for OpenCL ElementwiseOperation
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

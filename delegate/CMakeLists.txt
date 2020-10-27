@@ -88,10 +88,9 @@ target_include_directories(armnnDelegate
 
 set(armnnDelegate_unittest_sources)
 list(APPEND armnnDelegate_unittest_sources
-        src/test/AbsTest.cpp
         src/test/ArmnnDelegateTest.cpp
-        src/test/ElementwiseUnaryTestHelper.hpp
-        src/test/SqrtTest.cpp)
+        src/test/ElementwiseUnaryTest.cpp
+        src/test/ElementwiseUnaryTestHelper.hpp)
 
 add_executable(DelegateUnitTests ${armnnDelegate_unittest_sources})
 target_include_directories(DelegateUnitTests PRIVATE src)

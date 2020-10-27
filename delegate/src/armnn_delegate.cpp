@@ -130,7 +130,7 @@ Delegate::Delegate(armnnDelegate::DelegateOptions options)
         {
             if (std::find(supportedDevices.cbegin(), supportedDevices.cend(), backend) == supportedDevices.cend())
             {
-                TFLITE_LOG_PROD_ONCE(tflite::TFLITE_LOG_INFO,
+                TFLITE_LOG_PROD(tflite::TFLITE_LOG_INFO,
                     "TfLiteArmnnDelegate: Requested unknown backend %s", backend.Get().c_str());
             }
             else

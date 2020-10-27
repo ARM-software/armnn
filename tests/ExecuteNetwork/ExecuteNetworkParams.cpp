@@ -125,14 +125,18 @@ void CheckClTuningParameter(const int& tuningLevel,
 
 void ExecuteNetworkParams::ValidateParams()
 {
-    // Check compute devices
-    std::string invalidBackends;
-    if (!CheckRequestedBackendsAreValid(m_ComputeDevices, armnn::Optional<std::string&>(invalidBackends)))
+    if (m_DynamicBackendsPath=="")
     {
-        throw armnn::InvalidArgumentException(fmt::format("Some of the requested compute devices are invalid. "
-                                                          "\nInvalid devices: {} \nAvailable devices are: {}",
-                                                          invalidBackends,
-                                                          armnn::BackendRegistryInstance().GetBackendIdsAsString()));
+        // Check compute devices are valid unless they are dynamically loaded at runtime
+        std::string invalidBackends;
+        if (!CheckRequestedBackendsAreValid(m_ComputeDevices, armnn::Optional<std::string&>(invalidBackends)))
+        {
+            throw armnn::InvalidArgumentException(
+                    fmt::format("Some of the requested compute devices are invalid. "
+                                "\nInvalid devices: {} \nAvailable devices are: {}",
+                                invalidBackends,
+                                armnn::BackendRegistryInstance().GetBackendIdsAsString()));
+        }
     }
 
     CheckClTuningParameter(m_TuningLevel, m_TuningPath, m_ComputeDevices);

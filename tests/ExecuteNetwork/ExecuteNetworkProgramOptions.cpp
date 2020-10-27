@@ -371,6 +371,7 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
             ParseStringList(GetOptionValue<std::string>("write-outputs-to-file", m_CxxResult), ",");
     m_ExNetParams.m_GenerateTensorData =
             m_ExNetParams.m_InputTensorDataFilePaths.empty();
+    m_ExNetParams.m_DynamicBackendsPath = m_RuntimeOptions.m_DynamicBackendsPath;
 
     // Parse input tensor shape from the string we got from the command-line.
     std::vector<std::string> inputTensorShapesVector =

@@ -97,7 +97,7 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 	cd ~/armnn-devenv/google
 	git clone https://github.com/google/protobuf.git
 	cd protobuf
-	git checkout -b v3.5.2 v3.5.2
+	git checkout -b v3.12.0 v3.12.0
 	```
 
 * Build a native (x86) version of the protobuf libraries and compiler (protoc):
@@ -248,9 +248,9 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
         adb push libtimelineDecoder.so /data/local/tmp/
 	adb push UnitTests /data/local/tmp/
 	adb push $NDK/sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_shared.so /data/local/tmp/
-	adb push $HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so /data/local/tmp/libprotobuf.so.15.0.1
-	adb shell 'ln -s libprotobuf.so.15.0.1 /data/local/tmp/libprotobuf.so.15'
-	adb shell 'ln -s libprotobuf.so.15.0.1 /data/local/tmp/libprotobuf.so'
+	adb push $HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so /data/local/tmp/libprotobuf.so.23.0.0
+	adb shell 'ln -s libprotobuf.so.23.0.0 /data/local/tmp/libprotobuf.so.23'
+	adb shell 'ln -s libprotobuf.so.23.0.0 /data/local/tmp/libprotobuf.so'
 	```
 
 * Push the files needed for the unit tests (they are a mix of files, directories and symbolic links):

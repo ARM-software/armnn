@@ -23,10 +23,10 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 
 #### <a name="buildProtobuf">Build and install Google's Protobuf library</a>
 
-## We support protobuf version 3.5.2
+## We support protobuf version 3.12.0
 * Get protobuf from here: https://github.com/protocolbuffers/protobuf : 
     ```bash
-    git clone -b v3.5.2 https://github.com/google/protobuf.git protobuf
+    git clone -b v3.12.0 https://github.com/google/protobuf.git protobuf
     cd protobuf
     git submodule update --init --recursive
     ./autogen
@@ -63,10 +63,11 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     sudo apt-get install libopenblas-dev
     sudo apt-get install libatlas-base-dev
     ```
-* Download Caffe-Master from: https://github.com/BVLC/caffe
+* Download Caffe from: https://github.com/BVLC/caffe. We have tested using tag 1.0
     ```bash
     git clone https://github.com/BVLC/caffe.git
     cd caffe
+    git checkout eeebdab16155d34ff8f5f42137da7df4d1c7eab0
     cp Makefile.config.example Makefile.config
     ```
 * Adjust Makefile.config as necessary for your environment, for example:
@@ -162,7 +163,7 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     ```bash
     git clone https://github.com/onnx/onnx.git
     cd onnx
-    git fetch https://github.com/onnx/onnx.git f612532843bd8e24efeab2815e45b436479cc9ab && git checkout FETCH_HEAD
+    git fetch https://github.com/onnx/onnx.git 553df22c67bee5f0fe6599cff60f1afc6748c635 && git checkout FETCH_HEAD
     export LD_LIBRARY_PATH=$<DIRECTORY_PATH>/protobuf-host/lib:$LD_LIBRARY_PATH
     ../google/x86_64_pb_install/bin/protoc onnx/onnx.proto --proto_path=. --proto_path=../google/x86_64_pb_install/include --cpp_out ../onnx
     ```
@@ -215,8 +216,8 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     -DFLATC_DIR=$HOME/flatbuffers-1.12.0/build \
     -DPROTOBUF_ROOT=$HOME/google/x86_64_pb_install \
     -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/x86_64_pb_install/ \
-    -DPROTOBUF_LIBRARY_DEBUG=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.15.0.1 \
-    -DPROTOBUF_LIBRARY_RELEASE=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.15.0.1
+    -DPROTOBUF_LIBRARY_DEBUG=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.23.0.0 \
+    -DPROTOBUF_LIBRARY_RELEASE=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.23.0.0
     ```
 
 * If you want to include standalone sample dynamic backend tests, add the argument to enable the tests and the dynamic backend path to the CMake command:
@@ -262,9 +263,9 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     cd build/
     export LD_LIBRARY_PATH=`pwd`
     ```
-* Create a symbolic link to libprotobuf.so.15.0.1:
+* Create a symbolic link to libprotobuf.so.23.0.0:
     ```
-    ln -s libprotobuf.so.15.0.1 ./libprotobuf.so.15
+    ln -s libprotobuf.so.23.0.0 ./libprotobuf.so.23
     ```
 * Run the UnitTests:
     ```
@@ -316,7 +317,7 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 #### Missing libz.so.1
 * When compiling armNN:
     ```bash
-    /usr/lib/gcc-cross/aarch64-linux-gnu/5/../../../../aarch64-linux-gnu/bin/ld: warning: libz.so.1, needed by /home/<username>/armNN/usr/lib64/libprotobuf.so.15.0.0, not found (try using -rpath or -rpath-link)
+    /usr/lib/gcc-cross/aarch64-linux-gnu/5/../../../../aarch64-linux-gnu/bin/ld: warning: libz.so.1, needed by /home/<username>/armNN/usr/lib64/libprotobuf.so.23.0.0, not found (try using -rpath or -rpath-link)
     ```
 
 * Missing arm64 libraries for libz.so.1, these can be added by adding a second architecture to dpkg and explicitly installing them:
@@ -366,8 +367,8 @@ https://askubuntu.com/questions/430705/how-to-use-apt-get-to-download-multi-arch
     libarmnnCaffeParser.so: undefined reference to `google::protobuf:*
     ```
 * Missing or out of date protobuf compilation libraries.
-    Use the command 'protoc --version' to check which version of protobuf is available (version 3.5.2 is required).
-    Follow the instructions above to install protobuf 3.5.2
+    Use the command 'protoc --version' to check which version of protobuf is available (version 3.12.0 is required).
+    Follow the instructions above to install protobuf 3.12.0
     Note this will require you to recompile Caffe for x86_64
 
 ##

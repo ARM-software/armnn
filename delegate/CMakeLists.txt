@@ -89,6 +89,8 @@ target_include_directories(armnnDelegate
 set(armnnDelegate_unittest_sources)
 list(APPEND armnnDelegate_unittest_sources
         src/test/ArmnnDelegateTest.cpp
+        src/test/ElementwiseBinaryTest.cpp
+        src/test/ElementwiseBinaryTestHelper.hpp
         src/test/ElementwiseUnaryTest.cpp
         src/test/ElementwiseUnaryTestHelper.hpp)
 

@@ -77,7 +77,7 @@ TfLiteStatus VisitElementwiseUnaryOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // Connect
-    return Connect(*layer, tfLiteNode, delegateData);
+    return Connect(layer, tfLiteNode, delegateData);
 }
 
 } // namespace armnnDelegate

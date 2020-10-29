@@ -7,6 +7,7 @@
 #include <doctest/doctest.h>
 
 #include <armnn_delegate.hpp>
+#include "ElementwiseUnaryTestHelper.hpp"
 
 #include "tensorflow/lite/kernels/builtin_op_kernels.h"
 #include <tensorflow/lite/interpreter.h>
@@ -19,30 +20,31 @@ TEST_SUITE("ArmnnDelegate")
 
 TEST_CASE ("ArmnnDelegate Registered")
 {
-    std::unique_ptr<tflite::impl::Interpreter> tfLiteInterpreter;
-    tfLiteInterpreter.reset(new tflite::impl::Interpreter);
+    using namespace tflite;
+    auto tfLiteInterpreter =  std::make_unique<Interpreter>();
 
-    // Create the network
     tfLiteInterpreter->AddTensors(3);
-    tfLiteInterpreter->SetInputs({0});
+    tfLiteInterpreter->SetInputs({0, 1});
     tfLiteInterpreter->SetOutputs({2});
 
-    TfLiteQuantizationParams quantizationParams;
-    tfLiteInterpreter->SetTensorParametersReadWrite(0, kTfLiteFloat32, "", {3}, quantizationParams);
-    tfLiteInterpreter->SetTensorParametersReadWrite(1, kTfLiteFloat32, "", {3}, quantizationParams);
-    tfLiteInterpreter->SetTensorParametersReadWrite(2, kTfLiteFloat32, "", {3}, quantizationParams);
-    TfLiteRegistration* nodeRegistration = tflite::ops::builtin::Register_ABS();
-    void* data = malloc(sizeof(int));
+    tfLiteInterpreter->SetTensorParametersReadWrite(0, kTfLiteFloat32, "input1", {1,2,2,1}, TfLiteQuantization());
+    tfLiteInterpreter->SetTensorParametersReadWrite(1, kTfLiteFloat32, "input2", {1,2,2,1}, TfLiteQuantization());
+    tfLiteInterpreter->SetTensorParametersReadWrite(2, kTfLiteFloat32, "output", {1,2,2,1}, TfLiteQuantization());
 
-    tfLiteInterpreter->AddNodeWithParameters({0}, {2}, nullptr, 0, data, nodeRegistration);
+    tflite::ops::builtin::BuiltinOpResolver opResolver;
+    const TfLiteRegistration* opRegister = opResolver.FindOp(BuiltinOperator_ADD, 1);
+    tfLiteInterpreter->AddNodeWithParameters({0, 1}, {2}, "", 0, nullptr, opRegister);
 
     // create the Armnn Delegate
-    auto delegateOptions = TfLiteArmnnDelegateOptionsDefault();
-    auto delegate = TfLiteArmnnDelegateCreate(delegateOptions);
-    auto status = tfLiteInterpreter->ModifyGraphWithDelegate(std::move(delegate));
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    armnnDelegate::DelegateOptions delegateOptions(backends);
+    std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
+                       theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
+                                        armnnDelegate::TfLiteArmnnDelegateDelete);
+
+    auto status = tfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate));
     CHECK(status == kTfLiteOk);
     CHECK(tfLiteInterpreter != nullptr);
-
 }
 
 }

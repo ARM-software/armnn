@@ -97,12 +97,15 @@ void ElementwiseUnaryFP32Test(tflite::BuiltinOperator unaryOperatorCode,
               (&tfLiteInterpreter) == kTfLiteOk);
     CHECK(tfLiteInterpreter != nullptr);
     CHECK(tfLiteInterpreter->AllocateTensors() == kTfLiteOk);
+
     // Create the ArmNN Delegate
     armnnDelegate::DelegateOptions delegateOptions(backends);
-    auto armnnDelegate = TfLiteArmnnDelegateCreate(delegateOptions);
-    CHECK(armnnDelegate != nullptr);
+    std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
+                        theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
+                                         armnnDelegate::TfLiteArmnnDelegateDelete);
+    CHECK(theArmnnDelegate != nullptr);
     // Modify armnnDelegateInterpreter to use armnnDelegate
-    CHECK(armnnDelegateInterpreter->ModifyGraphWithDelegate(armnnDelegate) == kTfLiteOk);
+    CHECK(armnnDelegateInterpreter->ModifyGraphWithDelegate(theArmnnDelegate.get()) == kTfLiteOk);
 
     // Set input data
     auto tfLiteDelegateInputId = tfLiteInterpreter->inputs()[0];

@@ -9,10 +9,9 @@
 
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnnUtils/FloatingPointComparison.hpp>
 
 #include <boost/multi_array.hpp>
-#include <boost/test/tools/floating_point_comparison.hpp>
-
 #include <algorithm>
 #include <array>
 #include <utility>
@@ -27,7 +26,6 @@ public:
         unsigned int testCaseId,
         YoloTestCaseData& testCaseData)
      : InferenceModelTestCase<Model>(model, testCaseId, { std::move(testCaseData.m_InputImage) }, { YoloOutputSize })
-     , m_FloatComparer(boost::math::fpc::percent_tolerance(1.0f))
      , m_TopObjectDetections(std::move(testCaseData.m_TopObjectDetections))
     {
     }
@@ -155,11 +153,11 @@ public:
                 return TestCaseResult::Failed;
             }
 
-            if (!m_FloatComparer(detectedObject.m_Box.m_X, expectedDetection.m_Box.m_X) ||
-                !m_FloatComparer(detectedObject.m_Box.m_Y, expectedDetection.m_Box.m_Y) ||
-                !m_FloatComparer(detectedObject.m_Box.m_W, expectedDetection.m_Box.m_W) ||
-                !m_FloatComparer(detectedObject.m_Box.m_H, expectedDetection.m_Box.m_H) ||
-                !m_FloatComparer(detectedObject.m_Confidence, expectedDetection.m_Confidence))
+            if (!armnnUtils::within_percentage_tolerance(detectedObject.m_Box.m_X, expectedDetection.m_Box.m_X) ||
+                !armnnUtils::within_percentage_tolerance(detectedObject.m_Box.m_Y, expectedDetection.m_Box.m_Y) ||
+                !armnnUtils::within_percentage_tolerance(detectedObject.m_Box.m_W, expectedDetection.m_Box.m_W) ||
+                !armnnUtils::within_percentage_tolerance(detectedObject.m_Box.m_H, expectedDetection.m_Box.m_H) ||
+                !armnnUtils::within_percentage_tolerance(detectedObject.m_Confidence, expectedDetection.m_Confidence))
             {
                 ARMNN_LOG(error) << "Detected bounding box for test case " << this->GetTestCaseId() <<
                     " is incorrect";
@@ -173,7 +171,6 @@ public:
     }
 
 private:
-    boost::math::fpc::close_at_tolerance<float> m_FloatComparer;
     std::vector<YoloDetectedObject> m_TopObjectDetections;
 };
 

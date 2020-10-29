@@ -135,7 +135,7 @@ if (NOT BUILD_PIPE_ONLY)
     set(Boost_USE_STATIC_LIBS ON)
   endif()
   add_definitions("-DBOOST_ALL_NO_LIB") # Turn off auto-linking as we specify the libs manually
-  find_package(Boost 1.59 REQUIRED COMPONENTS unit_test_framework filesystem system program_options)
+  find_package(Boost 1.59 REQUIRED COMPONENTS unit_test_framework)
   include_directories(SYSTEM "${Boost_INCLUDE_DIRS}")
   link_directories(${Boost_LIBRARY_DIRS})
 endif()

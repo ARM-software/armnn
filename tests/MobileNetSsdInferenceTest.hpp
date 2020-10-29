@@ -10,8 +10,7 @@
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
-
-#include <boost/test/tools/floating_point_comparison.hpp>
+#include <armnnUtils/FloatingPointComparison.hpp>
 
 #include <vector>
 
@@ -29,7 +28,6 @@ public:
                                         testCaseId,
                                         { std::move(testCaseData.m_InputData) },
                                         { k_OutputSize1, k_OutputSize2, k_OutputSize3, k_OutputSize4 })
-        , m_FloatComparer(boost::math::fpc::percent_tolerance(1.0f))
         , m_DetectedObjects(testCaseData.m_ExpectedDetectedObject)
     {}
 
@@ -107,7 +105,7 @@ public:
                 return TestCaseResult::Failed;
             }
 
-            if(!m_FloatComparer(detectedObject.m_Confidence, expectedObject.m_Confidence))
+            if(!armnnUtils::within_percentage_tolerance(detectedObject.m_Confidence, expectedObject.m_Confidence))
             {
                 ARMNN_LOG(error) << "Confidence of prediction for test case " << this->GetTestCaseId() <<
                     " is incorrect: Expected (" << expectedObject.m_Confidence << ")  +- 1.0 pc" <<
@@ -115,10 +113,14 @@ public:
                 return TestCaseResult::Failed;
             }
 
-            if (!m_FloatComparer(detectedObject.m_BoundingBox.m_XMin, expectedObject.m_BoundingBox.m_XMin) ||
-                !m_FloatComparer(detectedObject.m_BoundingBox.m_YMin, expectedObject.m_BoundingBox.m_YMin) ||
-                !m_FloatComparer(detectedObject.m_BoundingBox.m_XMax, expectedObject.m_BoundingBox.m_XMax) ||
-                !m_FloatComparer(detectedObject.m_BoundingBox.m_YMax, expectedObject.m_BoundingBox.m_YMax))
+            if (!armnnUtils::within_percentage_tolerance(detectedObject.m_BoundingBox.m_XMin,
+                                                         expectedObject.m_BoundingBox.m_XMin) ||
+                !armnnUtils::within_percentage_tolerance(detectedObject.m_BoundingBox.m_YMin,
+                                                         expectedObject.m_BoundingBox.m_YMin) ||
+                !armnnUtils::within_percentage_tolerance(detectedObject.m_BoundingBox.m_XMax,
+                                                         expectedObject.m_BoundingBox.m_XMax) ||
+                !armnnUtils::within_percentage_tolerance(detectedObject.m_BoundingBox.m_YMax,
+                                                         expectedObject.m_BoundingBox.m_YMax))
             {
                 ARMNN_LOG(error) << "Detected bounding box for test case " << this->GetTestCaseId() <<
                     " is incorrect";
@@ -139,7 +141,6 @@ private:
     static constexpr unsigned int k_OutputSize3 = k_Shape;
     static constexpr unsigned int k_OutputSize4 = 1u;
 
-    boost::math::fpc::close_at_tolerance<float> m_FloatComparer;
     std::vector<DetectedObject>                 m_DetectedObjects;
 };
 

@@ -18,8 +18,6 @@ if(BUILD_TF_LITE_PARSER)
     target_include_directories(armnnTfLiteParser PRIVATE ../armnnUtils)
     target_include_directories(armnnTfLiteParser SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
 
-    target_link_libraries(armnnTfLiteParser ${Boost_THREAD_LIBRARY})
-
     # If user has explicitly specified flatbuffers lib then use that,
     # otherwise search for it based on FLATBUFFERS_BUILD_DIR
     if (FLATBUFFERS_LIBRARY)

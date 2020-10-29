@@ -9,8 +9,7 @@
 
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
-
-#include <boost/test/tools/floating_point_comparison.hpp>
+#include <armnnUtils/FloatingPointComparison.hpp>
 
 #include <vector>
 
@@ -30,7 +29,6 @@ public:
                                           testCaseData.m_InputData.m_StateH,
                                           testCaseData.m_InputData.m_StateC},
                                         { k_OutputSize1, k_OutputSize2, k_OutputSize3 })
-        , m_FloatComparer(boost::math::fpc::percent_tolerance(1.0f))
         , m_ExpectedOutputs({testCaseData.m_ExpectedOutputData.m_InputSeq, testCaseData.m_ExpectedOutputData.m_StateH,
                              testCaseData.m_ExpectedOutputData.m_StateC})
     {}
@@ -50,7 +48,7 @@ public:
         // Check each output to see whether it is the expected value
         for (unsigned int j = 0u; j < output1.size(); j++)
         {
-            if(!m_FloatComparer(output1[j], m_ExpectedOutputs.m_InputSeq[j]))
+            if(!armnnUtils::within_percentage_tolerance(output1[j], m_ExpectedOutputs.m_InputSeq[j]))
             {
                 ARMNN_LOG(error) << "InputSeq for Lstm " << this->GetTestCaseId() <<
                                          " is incorrect at" << j;
@@ -60,7 +58,7 @@ public:
 
         for (unsigned int j = 0u; j < output2.size(); j++)
         {
-            if(!m_FloatComparer(output2[j], m_ExpectedOutputs.m_StateH[j]))
+            if(!armnnUtils::within_percentage_tolerance(output2[j], m_ExpectedOutputs.m_StateH[j]))
             {
                 ARMNN_LOG(error) << "StateH for Lstm " << this->GetTestCaseId() <<
                                          " is incorrect";
@@ -70,7 +68,7 @@ public:
 
         for (unsigned int j = 0u; j < output3.size(); j++)
         {
-            if(!m_FloatComparer(output3[j], m_ExpectedOutputs.m_StateC[j]))
+            if(!armnnUtils::within_percentage_tolerance(output3[j], m_ExpectedOutputs.m_StateC[j]))
             {
                 ARMNN_LOG(error) << "StateC for Lstm " << this->GetTestCaseId() <<
                                          " is incorrect";
@@ -86,7 +84,6 @@ private:
     static constexpr unsigned int k_OutputSize2 = 2048u;
     static constexpr unsigned int k_OutputSize3 = 2048u;
 
-    boost::math::fpc::close_at_tolerance<float> m_FloatComparer;
     LstmInput m_ExpectedOutputs;
 };
 

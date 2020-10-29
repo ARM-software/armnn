@@ -103,8 +103,6 @@ if(BUILD_CAFFE_PARSER)
 
     target_include_directories(armnnCaffeParser PRIVATE src/armnnUtils)
 
-    target_link_libraries(armnnCaffeParser ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY})
-
     target_link_libraries(armnnCaffeParser armnn)
     target_link_libraries(armnnCaffeParser ${PROTOBUF_LIBRARIES})
     set_target_properties(armnnCaffeParser PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
@@ -183,23 +181,13 @@ if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
     include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
     set_target_properties(armnnQuantizer PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 
-    target_link_libraries(armnnQuantizer
-            armnn
-            ${Boost_SYSTEM_LIBRARY}
-            ${Boost_PROGRAM_OPTIONS_LIBRARY}
-            ${Boost_THREAD_LIBRARY}
-            ${Boost_FILESYSTEM_LIBRARY})
+    target_link_libraries(armnnQuantizer armnn)
 
     add_executable_ex(ArmnnQuantizer
         src/armnnQuantizer/ArmNNQuantizerMain.cpp)
 
     target_include_directories(ArmnnQuantizer PRIVATE include/armnnDeserializer)
     target_include_directories(ArmnnQuantizer PRIVATE src/armnn)
-
-    target_link_libraries(ArmnnQuantizer
-            ${Boost_SYSTEM_LIBRARY}
-            ${Boost_PROGRAM_OPTIONS_LIBRARY}
-            ${Boost_THREAD_LIBRARY} )
 
     target_link_libraries(ArmnnQuantizer
             armnnQuantizer
@@ -622,12 +610,6 @@ endif()
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-target_link_libraries(armnn
-        ${Boost_THREAD_LIBRARY}
-        ${Boost_SYSTEM_LIBRARY}
-        ${Boost_FILESYSTEM_LIBRARY}
-    )
-
 if(ARMCOMPUTENEON OR ARMCOMPUTECL)
     target_link_libraries(armnn ${ARMCOMPUTE_LIBRARIES})
 endif()
@@ -970,7 +952,7 @@ if(BUILD_UNIT_TESTS)
     endif()
 
     target_link_libraries(UnitTests ${CMAKE_THREAD_LIBS_INIT})
-    target_link_libraries(UnitTests ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
+    target_link_libraries(UnitTests ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
     target_link_libraries(UnitTests armnn)
     target_link_libraries(UnitTests armnnUtils)
@@ -1049,10 +1031,6 @@ if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD
 
     target_link_libraries(ArmnnConverter armnn)
     target_link_libraries(ArmnnConverter ${CMAKE_THREAD_LIBS_INIT})
-    target_link_libraries(ArmnnConverter
-        ${Boost_SYSTEM_LIBRARY}
-        ${Boost_PROGRAM_OPTIONS_LIBRARY}
-        ${Boost_FILESYSTEM_LIBRARY})
     addDllCopyCommands(ArmnnConverter)
 endif()
 
@@ -1117,10 +1095,7 @@ if(BUILD_GATORD_MOCK)
                           armnn
                           armnnBasePipeServer
                           timelineDecoder
-                          gatordMockService
-                          ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                          ${Boost_FILESYSTEM_LIBRARY}
-                          ${Boost_SYSTEM_LIBRARY})
+                          gatordMockService)
 
     if(Threads_FOUND AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
         target_link_libraries(GatordMock ${CMAKE_THREAD_LIBS_INIT})

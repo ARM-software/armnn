@@ -128,7 +128,6 @@ LOCAL_SRC_FILES := \
         src/armnn/TypesUtils.cpp \
         src/armnn/Utils.cpp \
         src/armnn/WallClockTimer.cpp \
-        src/armnnUtils/CsvReader.cpp \
         src/armnnUtils/DataLayoutIndexed.cpp \
         src/armnnUtils/DotSerializer.cpp \
         src/armnnUtils/FloatingPointConverter.cpp \
@@ -238,8 +237,7 @@ LOCAL_SRC_FILES := \
         src/profiling/backends/BackendProfiling.cpp
 
 LOCAL_STATIC_LIBRARIES := \
-        arm_compute_library \
-        libboost_system
+        arm_compute_library 
 
 LOCAL_SHARED_LIBRARIES := \
         liblog
@@ -354,7 +352,6 @@ endif # PLATFORM_VERSION == Q or later
 LOCAL_SRC_FILES := \
         $(ARMNN_BACKEND_TEST_SOURCES) \
         src/armnn/test/ConstTensorLayerVisitor.cpp \
-        src/armnn/test/CsvReaderTest.cpp \
         src/armnn/test/EndToEndTest.cpp \
         src/armnn/ExecutionFrame.cpp \
         src/armnn/test/ExecutionFrameTest.cpp \

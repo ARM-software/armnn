@@ -59,8 +59,6 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/LeakChecking.hpp
     src/armnnUtils/ModelAccuracyChecker.cpp
     src/armnnUtils/ModelAccuracyChecker.hpp
-    src/armnnUtils/CsvReader.cpp
-    src/armnnUtils/CsvReader.hpp
     src/armnnUtils/FloatingPointConverter.cpp
     src/armnnUtils/VerificationHelpers.hpp
     src/armnnUtils/VerificationHelpers.cpp
@@ -177,6 +175,7 @@ if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
     target_include_directories(armnnQuantizer PRIVATE include/armnnDeserializer)
     target_include_directories(armnnQuantizer PRIVATE src/armnnUtils)
     target_include_directories(armnnQuantizer PRIVATE src/armnn)
+    target_include_directories(armnnQuantizer PRIVATE third-party)
 
     include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
     set_target_properties(armnnQuantizer PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
@@ -626,7 +625,6 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/ConstTensorLayerVisitor.hpp
         src/armnn/test/ConstTensorLayerVisitor.cpp
         src/armnn/test/CreateWorkload.hpp
-        src/armnn/test/CsvReaderTest.cpp
         src/armnn/test/EndToEndTest.cpp
         src/armnn/test/ExecutionFrameTest.cpp
         src/armnn/test/FloatingPointConverterTest.cpp

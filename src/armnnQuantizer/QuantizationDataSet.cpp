@@ -4,8 +4,10 @@
 //
 
 #include "QuantizationDataSet.hpp"
-#include "CsvReader.hpp"
 
+#include <fmt/format.h>
+
+#include <armnn/utility/StringUtils.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <Filesystem.hpp>
 
@@ -67,49 +69,49 @@ armnn::TensorInfo InputLayerVisitor::GetTensorInfo(armnn::LayerBindingId layerBi
 }
 
 
-unsigned int GetPassIdFromCsvRow(std::vector<armnnUtils::CsvRow> csvRows, unsigned int rowIndex)
+unsigned int GetPassIdFromCsvRow(std::vector<std::string> tokens, unsigned int lineIndex)
 {
     unsigned int passId;
     try
     {
-        passId = static_cast<unsigned int>(std::stoi(csvRows[rowIndex].values[0]));
+        passId = static_cast<unsigned int>(std::stoi(tokens[0]));
     }
     catch (const std::invalid_argument&)
     {
-        throw armnn::ParseException("Pass ID [" + csvRows[rowIndex].values[0] + "]" +
-                                    " is not correct format on CSV row " + std::to_string(rowIndex));
+        throw armnn::ParseException(fmt::format("Pass ID [{}] is not correct format on CSV row {}",
+                                                tokens[0], lineIndex));
     }
     return passId;
 }
 
-armnn::LayerBindingId GetBindingIdFromCsvRow(std::vector<armnnUtils::CsvRow> csvRows, unsigned int rowIndex)
+armnn::LayerBindingId GetBindingIdFromCsvRow(std::vector<std::string> tokens, unsigned int lineIndex)
 {
     armnn::LayerBindingId bindingId;
     try
     {
-        bindingId = std::stoi(csvRows[rowIndex].values[1]);
+        bindingId = std::stoi(tokens[1]);
     }
     catch (const std::invalid_argument&)
     {
-        throw armnn::ParseException("Binding ID [" + csvRows[rowIndex].values[0] + "]" +
-                                    " is not correct format on CSV row " + std::to_string(rowIndex));
+        throw armnn::ParseException(fmt::format("Binding ID [{}] is not correct format on CSV row {}",
+                                                tokens[1], lineIndex));
     }
     return bindingId;
 }
 
-std::string GetFileNameFromCsvRow(std::vector<armnnUtils::CsvRow> csvRows, unsigned int rowIndex)
+std::string GetFileNameFromCsvRow(std::vector<std::string> tokens, unsigned int lineIndex)
 {
-    std::string fileName = csvRows[rowIndex].values[2];
+    std::string fileName = armnn::stringUtils::StringTrim(tokens[2]);
 
     if (!fs::exists(fileName))
     {
-        throw armnn::ParseException("File [ " + fileName + "] provided on CSV row " + std::to_string(rowIndex) +
-                                    " does not exist.");
+        throw armnn::ParseException(fmt::format("File [{}] provided on CSV row {} does not exist.",
+                                                fileName, lineIndex));
     }
 
     if (fileName.empty())
     {
-        throw armnn::ParseException("Filename cannot be empty on CSV row " + std::to_string(rowIndex));
+        throw armnn::ParseException(fmt::format("Filename cannot be empty on CSV row {} ", lineIndex));
     }
     return fileName;
 }
@@ -118,34 +120,41 @@ std::string GetFileNameFromCsvRow(std::vector<armnnUtils::CsvRow> csvRows, unsig
 void QuantizationDataSet::ParseCsvFile()
 {
     std::map<unsigned int, QuantizationInput> passIdToQuantizationInput;
-    armnnUtils::CsvReader reader;
 
     if (m_CsvFilePath == "")
     {
         throw armnn::Exception("CSV file not specified.");
     }
 
-    // Parse CSV file and extract data
-    std::vector<armnnUtils::CsvRow> csvRows = reader.ParseFile(m_CsvFilePath);
-    if (csvRows.empty())
+    std::ifstream inf (m_CsvFilePath.c_str());
+    std::string line;
+    std::vector<std::string> tokens;
+    unsigned int lineIndex = 0;
+
+    if (!inf)
     {
-        throw armnn::Exception("CSV file [" + m_CsvFilePath + "] is empty.");
+        throw armnn::Exception(fmt::format("CSV file {} not found.", m_CsvFilePath));
     }
 
-    for (unsigned int i = 0; i < csvRows.size(); ++i)
+    while (getline(inf, line))
     {
-        if (csvRows[i].values.size() != 3)
+        tokens = armnn::stringUtils::StringTokenizer(line, ",");
+
+        if (tokens.size() != 3)
         {
-            throw armnn::Exception("CSV file [" + m_CsvFilePath + "] does not have correct number of entries " +
-                                   "on line " + std::to_string(i) + ". Expected 3 entries " +
-                                   "but was " + std::to_string(csvRows[i].values.size()));
+            throw armnn::Exception(fmt::format("CSV file [{}] does not have correct number of entries" \
+                                               "on line {}. Expected 3 entries but was {}.",
+                                               m_CsvFilePath, lineIndex, tokens.size()));
+
         }
 
-        unsigned int passId = GetPassIdFromCsvRow(csvRows, i);
-        armnn::LayerBindingId bindingId = GetBindingIdFromCsvRow(csvRows, i);
-        std::string rawFileName = GetFileNameFromCsvRow(csvRows, i);
+        unsigned int passId = GetPassIdFromCsvRow(tokens, lineIndex);
+        armnn::LayerBindingId bindingId = GetBindingIdFromCsvRow(tokens, lineIndex);
+        std::string rawFileName = GetFileNameFromCsvRow(tokens, lineIndex);
 
         AddInputData(passId, bindingId, rawFileName, passIdToQuantizationInput);
+
+        ++lineIndex;
     }
 
     if (passIdToQuantizationInput.empty())

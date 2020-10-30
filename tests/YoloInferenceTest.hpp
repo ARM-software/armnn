@@ -11,7 +11,6 @@
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnnUtils/FloatingPointComparison.hpp>
 
-#include <boost/multi_array.hpp>
 #include <algorithm>
 #include <array>
 #include <utility>
@@ -34,24 +33,23 @@ public:
     {
         armnn::IgnoreUnused(options);
 
-        using Boost3dArray = boost::multi_array<float, 3>;
-
         const std::vector<float>& output = mapbox::util::get<std::vector<float>>(this->GetOutputs()[0]);
         ARMNN_ASSERT(output.size() == YoloOutputSize);
 
-        constexpr Boost3dArray::index gridSize = 7;
-        constexpr Boost3dArray::index numClasses = 20;
-        constexpr Boost3dArray::index numScales = 2;
+        constexpr unsigned int gridSize = 7;
+        constexpr unsigned int numClasses = 20;
+        constexpr unsigned int numScales = 2;
 
         const float* outputPtr =  output.data();
 
         // Range 0-980. Class probabilities. 7x7x20
-        Boost3dArray classProbabilities(boost::extents[gridSize][gridSize][numClasses]);
-        for (Boost3dArray::index y = 0; y < gridSize; ++y)
+        vector<vector<vector<float>>> classProbabilities(gridSize, vector<vector<float>>(gridSize,
+                                                         vector<float>(numClasses)));
+        for (unsigned int y = 0; y < gridSize; ++y)
         {
-            for (Boost3dArray::index x = 0; x < gridSize; ++x)
+            for (unsigned int x = 0; x < gridSize; ++x)
             {
-                for (Boost3dArray::index c = 0; c < numClasses; ++c)
+                for (unsigned int c = 0; c < numClasses; ++c)
                 {
                     classProbabilities[y][x][c] = *outputPtr++;
                 }
@@ -59,12 +57,12 @@ public:
         }
 
         // Range 980-1078. Scales. 7x7x2
-        Boost3dArray scales(boost::extents[gridSize][gridSize][numScales]);
-        for (Boost3dArray::index y = 0; y < gridSize; ++y)
+        vector<vector<vector<float>>> scales(gridSize, vector<vector<float>>(gridSize, vector<float>(numScales)));
+        for (unsigned int y = 0; y < gridSize; ++y)
         {
-            for (Boost3dArray::index x = 0; x < gridSize; ++x)
+            for (unsigned int x = 0; x < gridSize; ++x)
             {
-                for (Boost3dArray::index s = 0; s < numScales; ++s)
+                for (unsigned int s = 0; s < numScales; ++s)
                 {
                     scales[y][x][s] = *outputPtr++;
                 }
@@ -75,12 +73,13 @@ public:
         constexpr float imageWidthAsFloat = static_cast<float>(YoloImageWidth);
         constexpr float imageHeightAsFloat = static_cast<float>(YoloImageHeight);
 
-        boost::multi_array<float, 4> boxes(boost::extents[gridSize][gridSize][numScales][4]);
-        for (Boost3dArray::index y = 0; y < gridSize; ++y)
+        vector<vector<vector<vector<float>>>> boxes(gridSize, vector<vector<vector<float>>>
+            (gridSize, vector<vector<float>>(numScales, vector<float>(4))));
+        for (unsigned int y = 0; y < gridSize; ++y)
         {
-            for (Boost3dArray::index x = 0; x < gridSize; ++x)
+            for (unsigned int x = 0; x < gridSize; ++x)
             {
-                for (Boost3dArray::index s = 0; s < numScales; ++s)
+                for (unsigned int s = 0; s < numScales; ++s)
                 {
                     float bx = *outputPtr++;
                     float by = *outputPtr++;
@@ -99,13 +98,13 @@ public:
         std::vector<YoloDetectedObject> detectedObjects;
         detectedObjects.reserve(gridSize * gridSize * numScales * numClasses);
 
-        for (Boost3dArray::index y = 0; y < gridSize; ++y)
+        for (unsigned int y = 0; y < gridSize; ++y)
         {
-            for (Boost3dArray::index x = 0; x < gridSize; ++x)
+            for (unsigned int x = 0; x < gridSize; ++x)
             {
-                for (Boost3dArray::index s = 0; s < numScales; ++s)
+                for (unsigned int s = 0; s < numScales; ++s)
                 {
-                    for (Boost3dArray::index c = 0; c < numClasses; ++c)
+                    for (unsigned int c = 0; c < numClasses; ++c)
                     {
                         // Resolved confidence: class probabilities * scales.
                         const float confidence = classProbabilities[y][x][c] * scales[y][x][s];

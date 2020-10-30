@@ -27,8 +27,6 @@
 #include <TensorIOUtils.hpp>
 
 #include "armnn/utility/StringUtils.hpp"
-#include <boost/exception/exception.hpp>
-#include <boost/exception/diagnostic_information.hpp>
 #include <cxxopts/cxxopts.hpp>
 #include "CxxoptsUtils.hpp"
 #include <fmt/format.h>

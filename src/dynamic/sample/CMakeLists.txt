@@ -8,8 +8,6 @@ project(sample-dynamic)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-add_definitions("-DBOOST_ALL_NO_LIB") # Turn off auto-linking as we specify the libs manually
-
 list(APPEND armnnSampleDynamicBackend_sources
         SampleDynamicAdditionWorkload.cpp
         SampleDynamicAdditionWorkload.hpp

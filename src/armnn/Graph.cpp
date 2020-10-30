@@ -70,8 +70,45 @@ Status Graph::Print() const
 
     for (auto&& it : TopologicalSort())
     {
+        auto numInputSlots = it->GetNumInputSlots();
+        auto numOutputSlots = it->GetNumOutputSlots();
+
         ARMNN_LOG(info) << it->GetName() << ":" << GetLayerTypeAsCString(it->GetType())
-                                << ":" << it->GetBackendId().Get();
+                                << ":" << it->GetBackendId().Get()
+                                << " has " << numInputSlots << " input slots"
+                                << " and " << numOutputSlots << " output slots.";
+
+        for (auto i : it->GetInputSlots())
+        {
+            std::ostringstream message;
+            auto inputTensorShape = i.GetConnectedOutputSlot()->GetTensorInfo().GetShape();
+            unsigned int numDims = inputTensorShape.GetNumDimensions();
+
+            message << "The input slot has shape [ ";
+            for (unsigned int dim=0; dim < numDims; dim++)
+            {
+                message << inputTensorShape[dim] << ",";
+            }
+            message << " ]";
+            ARMNN_LOG(info) << message.str();
+        }
+
+        for (unsigned int i = 0; i < it->GetNumOutputSlots(); i++)
+        {
+            const armnn::Layer *layer = it;
+            std::ostringstream message;
+            auto outputTensorShape = layer->GetOutputSlots()[i].GetTensorInfo().GetShape();
+            unsigned int numDims = outputTensorShape.GetNumDimensions();
+
+            message << "The output slot has shape [ ";
+            for (unsigned int dim=0; dim < numDims; dim++)
+            {
+                message << outputTensorShape[dim] << ",";
+            }
+            message << " ]";
+            ARMNN_LOG(info) << message.str();
+        }
+        ARMNN_LOG(info) << "\n";
     }
     ARMNN_LOG(info) << "\n\n";
 

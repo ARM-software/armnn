@@ -23,6 +23,12 @@ if (ARMNNREF)
         )
 endif()
 
+if (ARMCOMPUTENEON)
+    list(APPEND armnnClBackendUnitTests_sources
+        ClFallbackTests.cpp
+        )
+endif()
+
 add_library(armnnClBackendUnitTests OBJECT ${armnnClBackendUnitTests_sources})
 target_include_directories(armnnClBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnClBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)

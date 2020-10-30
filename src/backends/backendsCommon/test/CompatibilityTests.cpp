@@ -15,7 +15,7 @@
 
 using namespace armnn;
 
-BOOST_AUTO_TEST_SUITE(BackendsCompatibility)
+BOOST_AUTO_TEST_SUITE(BackendsCompatibility, * boost::unit_test::disabled())
 
 BOOST_AUTO_TEST_CASE(Neon_Cl_DirectCompatibility_Test)
 {

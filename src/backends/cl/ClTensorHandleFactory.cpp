@@ -73,10 +73,11 @@ std::unique_ptr<ITensorHandle> ClTensorHandleFactory::CreateTensorHandle(const T
                                                                          const bool IsMemoryManaged) const
 {
     std::unique_ptr<ClTensorHandle> tensorHandle = std::make_unique<ClTensorHandle>(tensorInfo);
-    if (IsMemoryManaged)
+    if (!IsMemoryManaged)
     {
-        tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
+        ARMNN_LOG(warning) << "ClTensorHandleFactory only has support for memory managed.";
     }
+    tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
     return tensorHandle;
 }
 
@@ -85,10 +86,11 @@ std::unique_ptr<ITensorHandle> ClTensorHandleFactory::CreateTensorHandle(const T
                                                                          const bool IsMemoryManaged) const
 {
     std::unique_ptr<ClTensorHandle> tensorHandle = std::make_unique<ClTensorHandle>(tensorInfo, dataLayout);
-    if (IsMemoryManaged)
+    if (!IsMemoryManaged)
     {
-        tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
+        ARMNN_LOG(warning) << "ClTensorHandleFactory only has support for memory managed.";
     }
+    tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
     return tensorHandle;
 }
 

@@ -570,10 +570,12 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
     info.m_OutputTensorInfos.push_back(outputTensorInfo);
 
     MemorySourceFlags importFlags = outputTensorHandle->GetImportFlags();
+    bool needMemCopy = true;
     if (m_IsImportEnabled)  // Try import the input tensor
     {
         if(CheckFlag(importFlags, MemorySource::Malloc) )
         {
+            needMemCopy = false;
             // This assumes a CPU Tensor handle
             void* mem = tensorHandle->Map(false);
             if (outputTensorHandle->Import(mem, MemorySource::Malloc))
@@ -584,12 +586,8 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
             tensorHandle->Unmap();
             throw MemoryImportException("EnqueueInput: Memory Import failed");
         }
-        else
-        {
-            throw MemoryImportException("EnqueueInput: Memory Import failed, backend does not support Import");
-        }
     }
-    else
+    if (needMemCopy)
     {
         // Create a mem copy workload for input since we did not import
         std::unique_ptr<IWorkload> inputWorkload = std::make_unique<CopyMemGenericWorkload>(inputQueueDescriptor, info);
@@ -643,6 +641,7 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
     // c) There is only one connection to the OutputSlot and it is to an OutputLayer.
     // d) The output pointer is allocated via malloc. (Other types will be supported in a later release)
     // e) m_IsExportEnabled must be set to true
+    bool needMemCopy = true;
     if (m_IsExportEnabled && (layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetNumConnections() == 1))
     {
         if(layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetOwningLayer().GetType() != LayerType::Input)
@@ -650,6 +649,7 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
             MemorySourceFlags importFlags = inputTensorHandle->GetImportFlags();
             if (CheckFlag(importFlags, MemorySource::Malloc))
             {
+                needMemCopy = false;
                 void *mem = tensorHandle->Map(false);
                 bool importOk = inputTensorHandle->Import(mem, MemorySource::Malloc);
                 tensorHandle->Unmap();
@@ -669,17 +669,9 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
                     throw MemoryExportException("EnqueueOutput: Memory Export failed");
                 }
             }
-            else
-            {
-                throw MemoryExportException("EnqueueOutput: Memory Export failed, backend does not support Export");
-            }
-        }
-        else
-        {
-            throw MemoryExportException("EnqueueOutput: Memory Export failed, attempting to export Input Layer");
         }
     }
-    else
+    if (needMemCopy)
     {
         const Layer& connectedLayer = layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetOwningLayer();
         // Do not add MemCopy Layer if OutputLayer is already connected the MemCopy Layer

@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_08" # Release 20.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="5a4284dc7d98a382d0fa492b64fabe430d5afdc6" #COMPMID-3710: Remove OpenCL padding: CLDepthConvertLayerKernel
+DEFAULT_CLFRAMEWORKREVISION="ca6068594bcabcc392f30c8ff3188b03f4a35407" #COMPMID-3599: Remove arm_compute/core/NEON from Android.bp script
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

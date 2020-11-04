@@ -246,12 +246,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/profiling)
 # Note that ARM Compute has a different folder layout depending on the branch but also on
 # whether it comes from a prepackaged archive (this is why we add several hints below)
 if(ARMCOMPUTENEON OR ARMCOMPUTECL)
-    find_path(ARMCOMPUTE_INCLUDE arm_compute/core/CL/ICLKernel.h
+    find_path(ARMCOMPUTE_INCLUDE arm_compute/core/CL/OpenCL.h
               PATHS ${ARMCOMPUTE_ROOT}/include
               PATHS ${ARMCOMPUTE_ROOT}/applications/arm_compute
               PATHS ${ARMCOMPUTE_ROOT}
               NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
-    find_path(ARMCOMPUTE_INCLUDE arm_compute/core/CL/ICLKernel.h)
+    find_path(ARMCOMPUTE_INCLUDE arm_compute/core/CL/OpenCL.h)
     include_directories(SYSTEM "${ARMCOMPUTE_INCLUDE}")
 
     # Find the Arm Compute libraries if not already specified (the user may have already defined this in advance,

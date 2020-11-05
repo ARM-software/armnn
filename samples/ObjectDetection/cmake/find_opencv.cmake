@@ -61,7 +61,6 @@ else()
 
         ExternalProject_Add(${X264_LIB}
             URL "https://code.videolan.org/videolan/x264/-/archive/${LIBX264_VERSION}/x264-${LIBX264_VERSION}.tar.gz"
-            URL_HASH MD5=07eae2352f6ba201999be45fece0c26c
             DOWNLOAD_DIR ${LIBX264_ROOT_DIR}
             PREFIX ${LIBX264_ROOT_DIR}
             CONFIGURE_COMMAND <SOURCE_DIR>/configure

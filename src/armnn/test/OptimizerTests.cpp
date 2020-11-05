@@ -255,8 +255,6 @@ BOOST_AUTO_TEST_CASE(InsertConvertersTest)
                              &IsLayerOfType<armnn::OutputLayer>));
 }
 
-
-
 void CreateConvolution2dGraph(Graph &graph, const unsigned int* inputShape,
                               const unsigned int* weightsShape, const unsigned int* outputShape,
                               DataLayout dataLayout = DataLayout::NCHW)
@@ -308,8 +306,8 @@ BOOST_AUTO_TEST_CASE(Conv2dValidateTensorShapesFromInputsNhwc)
 }
 
 void CreateDepthwiseConvolution2dGraph(Graph &graph, const unsigned int* inputShape,
-                              const unsigned int* weightsShape, const unsigned int* outputShape,
-                              DataLayout dataLayout = DataLayout::NCHW)
+                                       const unsigned int* weightsShape, const unsigned int* outputShape,
+                                       DataLayout dataLayout = DataLayout::NCHW)
 {
     armnn::TensorInfo inputInfo(4, inputShape, DataType::Float32);
     armnn::TensorInfo outputInfo(4, outputShape, DataType::Float32);
@@ -357,7 +355,7 @@ BOOST_AUTO_TEST_CASE(DepthwiseConv2dValidateTensorShapesFromInputsNhwc)
     BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
 }
 
-void CreatePooling2dGraph(Graph &graph, const unsigned int* inputShape,  const unsigned int* outputShape,
+void CreatePooling2dGraph(Graph& graph, const unsigned int* inputShape,  const unsigned int* outputShape,
                           DataLayout dataLayout = DataLayout::NCHW)
 {
     armnn::TensorInfo inputInfo(4, inputShape, DataType::Float32);
@@ -405,7 +403,7 @@ BOOST_AUTO_TEST_CASE(Pooling2dValidateTensorShapesFromInputsNhwc)
     BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
 }
 
-void CreateResizeBilinearGraph(Graph &graph, const unsigned int* inputShape,  const unsigned int* outputShape,
+void CreateResizeBilinearGraph(Graph& graph, const unsigned int* inputShape, const unsigned int* outputShape,
                                DataLayout dataLayout = DataLayout::NCHW)
 {
     TensorInfo inputInfo(4, inputShape, DataType::Float32);
@@ -447,7 +445,6 @@ BOOST_AUTO_TEST_CASE(ResizeBilinearValidateTensorShapesFromInputsNhwc)
 
     BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
 }
-
 
 void CreateGatherGraph(Graph& graph, const armnn::TensorInfo& paramsInfo, const armnn::TensorInfo& indicesInfo,
                        const armnn::TensorInfo& outputInfo)
@@ -547,7 +544,6 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConvolution2dLayer)
     const unsigned int weightsShape[] = { 1, 2, 3, 3 };
     const unsigned int outputShape[] = { 1, 2, 1, 1 };
 
-
     armnn::TensorInfo inputInfo(4, inputShape, DataType::Float32);
     armnn::TensorInfo paddedInfo(4, paddedShape, DataType::Float32);
     armnn::TensorInfo outputInfo(4, outputShape, DataType::Float32);
@@ -628,9 +624,6 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConvolution2dLayer)
                              &IsLayerOfType<armnn::OutputLayer>));
 }
 
-
-
-
 class MockLayerSupport : public LayerSupportBase {
 public:
     bool IsInputSupported(const TensorInfo& /*input*/,
@@ -685,7 +678,6 @@ public:
         return {};
     };
 };
-
 
 BOOST_AUTO_TEST_CASE(BackendHintTest)
 {
@@ -764,14 +756,12 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
     input->GetOutputSlot(0).Connect(act->GetInputSlot(0));
     act->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-
     auto optNet = IOptimizedNetworkPtr(new OptimizedNetwork(std::move(graph)), &IOptimizedNetwork::Destroy);
 
     OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
 
     // Get the optimized graph
     Graph& optGraph = optNetObjPtr->GetGraph();
-
 
     std::vector<BackendId> prefs{"MockBackend", "CustomBackend"};
 
@@ -799,13 +789,13 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
 }
 
 // Tests that OptimizeForExclusiveConnections works, fusing when needed, using BatchNorm fusing as example
-BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnections_fuse_Test)
+BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnectionsFuseTest)
 {
     using namespace armnn;
     // Define layers information
     Convolution2dDescriptor convolution2dDescriptor;
     convolution2dDescriptor.m_BiasEnabled = false;
-    convolution2dDescriptor.m_DataLayout = DataLayout::NHWC;
+    convolution2dDescriptor.m_DataLayout  = DataLayout::NHWC;
     BatchNormalizationDescriptor batchNormDescriptor;
     batchNormDescriptor.m_DataLayout = DataLayout::NHWC;
 
@@ -814,32 +804,31 @@ BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnections_fuse_Test)
     const unsigned int outputDimensionSizes[]  = {1, 3, 3, 1};               // NHWCout
     const unsigned int outputChannelSize[]     = {outputDimensionSizes[3]};  // Cout
 
-    TensorInfo inputInfo (4, inputDimensionSizes, DataType::Float32);
+    TensorInfo inputInfo(4, inputDimensionSizes, DataType::Float32);
     TensorInfo outputInfo(4, outputDimensionSizes, DataType::Float32);
 
-    std::vector<float> weightsVector = {1, 2, 3, 4,   5, 6, 7, 8,  9, 10, 11, 12};
-    ConstTensor weights (TensorInfo(4, weightsDimensionSizes, DataType::Float32), weightsVector);
-
+    std::vector<float> weightsVector = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+    ConstTensor        weights(TensorInfo(4, weightsDimensionSizes, DataType::Float32), weightsVector);
 
     std::vector<float> betaVector     = {0.1f};
     std::vector<float> gammaVector    = {0.5f};
     std::vector<float> meanVector     = {0};
     std::vector<float> varianceVector = {1};
-    ConstTensor beta    (TensorInfo(1, outputChannelSize, DataType::Float32), betaVector);
-    ConstTensor gamma   (TensorInfo(1, outputChannelSize, DataType::Float32), gammaVector);
-    ConstTensor mean    (TensorInfo(1, outputChannelSize, DataType::Float32), meanVector);
-    ConstTensor variance(TensorInfo(1, outputChannelSize, DataType::Float32), varianceVector);
+    ConstTensor        beta(TensorInfo(1, outputChannelSize, DataType::Float32), betaVector);
+    ConstTensor        gamma(TensorInfo(1, outputChannelSize, DataType::Float32), gammaVector);
+    ConstTensor        mean(TensorInfo(1, outputChannelSize, DataType::Float32), meanVector);
+    ConstTensor        variance(TensorInfo(1, outputChannelSize, DataType::Float32), varianceVector);
 
     // Define the network
     Graph graph;
-    auto input     = graph.AddLayer<InputLayer>(0, "input");
-    auto conv      = graph.AddLayer<Convolution2dLayer>(convolution2dDescriptor, "convolution");
-    auto batchNorm = graph.AddLayer<BatchNormalizationLayer>(batchNormDescriptor, "batchNorm");
-    auto output    = graph.AddLayer<OutputLayer>(0, "output");
+    auto  input     = graph.AddLayer<InputLayer>(0, "input");
+    auto  conv      = graph.AddLayer<Convolution2dLayer>(convolution2dDescriptor, "convolution");
+    auto  batchNorm = graph.AddLayer<BatchNormalizationLayer>(batchNormDescriptor, "batchNorm");
+    auto  output    = graph.AddLayer<OutputLayer>(0, "output");
 
     // Set layer information
-    input    ->GetOutputSlot().SetTensorInfo(inputInfo);
-    conv     ->GetOutputSlot().SetTensorInfo(outputInfo);
+    input->GetOutputSlot().SetTensorInfo(inputInfo);
+    conv->GetOutputSlot().SetTensorInfo(outputInfo);
     batchNorm->GetOutputSlot().SetTensorInfo(outputInfo);
     conv     ->m_Weight   = std::make_unique<ScopedCpuTensorHandle>(weights);
     batchNorm->m_Beta     = std::make_unique<ScopedCpuTensorHandle>(beta);
@@ -849,8 +838,8 @@ BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnections_fuse_Test)
     if (convolution2dDescriptor.m_BiasEnabled)
     {
         std::vector<float> biasVector = {11};
-        ConstTensor bias (TensorInfo(1, outputChannelSize, DataType::Float32), biasVector);
-        conv->m_Bias = std::make_unique<ScopedCpuTensorHandle>(bias);
+        ConstTensor        bias(TensorInfo(1, outputChannelSize, DataType::Float32), biasVector);
+        conv->m_Bias      = std::make_unique<ScopedCpuTensorHandle>(bias);
     }
 
     // Connect layers
@@ -867,12 +856,12 @@ BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnections_fuse_Test)
                              &IsLayerOfType<OutputLayer>));
 
     // Optimize graph
-    armnn::Optimizer::Pass(graph, MakeOptimizations(FuseBatchNormIntoConvolution2D()));
+    armnn::Optimizer::Pass(graph, MakeOptimizations(FuseBatchNormIntoConvolution2DFloat32()));
 
-    auto checkFusedConv2d = [ ](const armnn::Layer* const layer) -> bool
+    auto checkFusedConv2d = [](const armnn::Layer* const layer)->bool 
     {
         return IsLayerOfType<armnn::Convolution2dLayer>(layer) &&
-               (layer->GetNameStr() == "fused-batchNorm-into-convolution");
+            (layer->GetNameStr() == "fused-batchNorm-into-convolution");
     };
 
     BOOST_CHECK(3 == graph.GetNumLayers());
@@ -884,11 +873,11 @@ BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnections_fuse_Test)
 }
 
 // Tests that OptimizeForExclusiveConnections works, not fusing when not needed, using BatchNorm fusing as example
-BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnections_notFuse_Test)
+BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnectionsWithoutFuseTest)
 {
     // Define the network
-    Graph graph;
-    Convolution2dDescriptor convolution2dDescriptor;
+    Graph                        graph;
+    Convolution2dDescriptor      convolution2dDescriptor;
     BatchNormalizationDescriptor batchNormDescriptor;
 
     auto input     = graph.AddLayer<InputLayer>(0, "input");
@@ -912,7 +901,7 @@ BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnections_notFuse_Test)
                              &IsLayerOfType<armnn::OutputLayer>,
                              &IsLayerOfType<armnn::OutputLayer>));
     // Optimize graph
-    armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(FuseBatchNormIntoConvolution2D()));
+    armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(FuseBatchNormIntoConvolution2DFloat32()));
 
     BOOST_CHECK(5 == graph.GetNumLayers());
     BOOST_TEST(CheckSequence(graph.cbegin(),

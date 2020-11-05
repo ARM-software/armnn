@@ -7,13 +7,15 @@
 
 #include "Optimization.hpp"
 #include <armnnUtils/DataLayoutIndexed.hpp>
+#include <ResolveType.hpp>
 
 namespace armnn
 {
 namespace optimizations
 {
 
-template <typename ConvLayer>
+template <typename ConvLayer, armnn::DataType ArmnnType,
+          typename T = armnn::ResolveType<ArmnnType>>
 class FuseBatchNorm
 {
 public:
@@ -27,10 +29,12 @@ public:
         Layer& base  = connection.GetConnectedOutputSlot()->GetOwningLayer();
         Layer& child = connection.GetOwningLayer();
 
-        ARMNN_ASSERT(base.GetType() == LayerType::Convolution2d);
+        bool depthwise = (base.GetType() == LayerType::DepthwiseConvolution2d);
+
+        ARMNN_ASSERT(base.GetType() == LayerType::Convolution2d || depthwise);
         ARMNN_ASSERT(child.GetType() == LayerType::BatchNormalization);
 
-        if (base.GetDataType() == DataType::Float32 && child.GetDataType() == DataType::Float32)
+        if (base.GetDataType() == ArmnnType && child.GetDataType() == ArmnnType)
         {
             OutputSlot* parentOut = base.GetInputSlot(0).GetConnectedOutputSlot();
             auto convLayer      = PolymorphicDowncast<ConvLayer*>(&base);
@@ -47,58 +51,92 @@ public:
             ConstTensor varTensor(batchNormLayer->m_Variance->GetTensorInfo(), batchNormLayer->m_Variance->Map(true));
 
             auto convDescriptor = convLayer->GetParameters();
-            ConstTensor weightsTensor(convLayer->m_Weight->GetTensorInfo(), convLayer->m_Weight->Map(true));
+            auto weightsInfo(convLayer->m_Weight->GetTensorInfo());
+            ConstTensor weightsTensor(weightsInfo, convLayer->m_Weight->Map(true));
 
             armnnUtils::DataLayoutIndexed dataLayout(convDescriptor.m_DataLayout);
-            auto weightsShape = convLayer->m_Weight->GetTensorInfo().GetShape();
-            const unsigned int outputChannels  = weightsShape[0];
-            const unsigned int inputChannels   = weightsShape[dataLayout.GetChannelsIndex()];
-            const unsigned int weightsHeight   = weightsShape[dataLayout.GetHeightIndex()];
-            const unsigned int weightsWidth    = weightsShape[dataLayout.GetWidthIndex()];
+            auto weightsShape = weightsInfo.GetShape();
+            const unsigned int depthMultiplier = depthwise ? weightsShape[0] : 1;
+            const unsigned int inputChannels   = depthwise ? weightsShape[1] :
+                                                             weightsShape[dataLayout.GetChannelsIndex()];
+            const unsigned int outputChannels  = depthwise ? inputChannels * depthMultiplier : weightsShape[0];
+            const unsigned int weightsHeight   = depthwise ? weightsShape[2] :
+                                                             weightsShape[dataLayout.GetHeightIndex()];
+            const unsigned int weightsWidth    = depthwise ? weightsShape[3] :
+                                                             weightsShape[dataLayout.GetWidthIndex()];
 
-            const auto* weightsBuffer = static_cast<const float*>(weightsTensor.GetMemoryArea());
-            const auto* betaBuffer    = static_cast<const float*>(betaTensor.GetMemoryArea());
-            const auto* gammaBuffer   = static_cast<const float*>(gammaTensor.GetMemoryArea());
-            const auto* meanBuffer    = static_cast<const float*>(meanTensor.GetMemoryArea());
-            const auto* varBuffer     = static_cast<const float*>(varTensor.GetMemoryArea());
+            const auto* weightsBuffer = static_cast<const T*>(weightsTensor.GetMemoryArea());
+            const auto* betaBuffer    = static_cast<const T*>(betaTensor.GetMemoryArea());
+            const auto* gammaBuffer   = static_cast<const T*>(gammaTensor.GetMemoryArea());
+            const auto* meanBuffer    = static_cast<const T*>(meanTensor.GetMemoryArea());
+            const auto* varBuffer     = static_cast<const T*>(varTensor.GetMemoryArea());
 
-            std::vector<float> weightsVector (weightsBuffer, weightsBuffer + weightsTensor.GetNumElements());
-            std::vector<float> betaVector    (betaBuffer, betaBuffer + betaTensor.GetNumElements());
-            std::vector<float> gammaVector   (gammaBuffer, gammaBuffer + gammaTensor.GetNumElements());
-            std::vector<float> meanVector    (meanBuffer, meanBuffer + meanTensor.GetNumElements());
-            std::vector<float> varianceVector(varBuffer, varBuffer + varTensor.GetNumElements());
+            std::vector<T> weightsVector (weightsBuffer, weightsBuffer + weightsTensor.GetNumElements());
+            std::vector<T> betaVector    (betaBuffer, betaBuffer + betaTensor.GetNumElements());
+            std::vector<T> gammaVector   (gammaBuffer, gammaBuffer + gammaTensor.GetNumElements());
+            std::vector<T> meanVector    (meanBuffer, meanBuffer + meanTensor.GetNumElements());
+            std::vector<T> varianceVector(varBuffer, varBuffer + varTensor.GetNumElements());
 
             // fusedWeights = ( gamma * weights ) / ( std - epsilon);
-            std::vector<float> fusedWeightsVector(weightsVector.size());
+            std::vector<T> fusedWeightsVector(weightsVector.size());
+            unsigned int depthwiseMultiplierIdx = 0;
 
-            unsigned int i = 0;
-            for (unsigned int cOut = 0; cOut < outputChannels; ++cOut)
+            for (unsigned int cInput = 0; cInput < inputChannels; ++cInput)
             {
-                auto mult = gammaVector[cOut] / sqrtf (varianceVector[cOut] + epsilon);
-                for (unsigned int cInput = 0; cInput < inputChannels; ++cInput)
+                for (unsigned int cOut = 0; cOut < outputChannels; ++cOut)
                 {
+                    T mult = gammaVector[cOut] / static_cast<T>(sqrtf (varianceVector[cOut] + epsilon));
+
+                    if (depthwise)
+                    {
+                        cInput = cOut / depthMultiplier;
+                        depthwiseMultiplierIdx = cOut % depthMultiplier;
+                    }
+
                     for (unsigned int h = 0; h < weightsHeight; ++h)
                     {
                         for (unsigned int w = 0; w < weightsWidth; ++w)
                         {
-                            fusedWeightsVector[i] = mult * weightsVector[i];
-                            i++;
+                            unsigned int weightsIdx = 0;
+
+                            if (depthwise)
+                            {
+                                weightsIdx = depthwiseMultiplierIdx * weightsWidth * weightsHeight * inputChannels +
+                                             cInput * weightsWidth * weightsHeight +
+                                             h * weightsWidth +
+                                             w;
+                            }
+                            else if (convDescriptor.m_DataLayout == DataLayout::NHWC)
+                            {
+                                weightsIdx = cOut * weightsHeight * weightsWidth * inputChannels +
+                                             h * weightsWidth * inputChannels +
+                                             w * inputChannels +
+                                             cInput;
+                            }
+                            else
+                            {
+                                weightsIdx = cOut * weightsWidth * weightsHeight * inputChannels +
+                                             cInput * weightsWidth * weightsHeight +
+                                             h * weightsWidth +
+                                             w;
+                            }
+                            fusedWeightsVector[weightsIdx] = mult * weightsVector[weightsIdx];
                         }
                     }
                 }
             }
-            ConstTensor fusedWeightsTensor(convLayer->m_Weight->GetTensorInfo(), fusedWeightsVector);
+            ConstTensor fusedWeightsTensor(weightsInfo, fusedWeightsVector);
 
             //  fusedBias = (gamma * (bias - mean)) / (variance - epsilon) + beta;
-            std::vector<float> fusedBiasVector(outputChannels);
+            std::vector<T> fusedBiasVector(outputChannels);
             if (convDescriptor.m_BiasEnabled)
             {
                 ARMNN_ASSERT_MSG(convLayer->m_Bias != nullptr,
                                  "FuseBatchNorm: Bias data should not be null if bias is enabled.");
 
                 ConstTensor biasTensor(convLayer->m_Bias->GetTensorInfo(), convLayer->m_Bias->Map(true));
-                const auto* biasBuffer = static_cast<const float*>(biasTensor.GetMemoryArea());
-                std::vector<float> biasVector(biasBuffer, biasBuffer + biasTensor.GetNumElements());
+                const auto* biasBuffer = static_cast<const T*>(biasTensor.GetMemoryArea());
+                std::vector<T> biasVector(biasBuffer, biasBuffer + biasTensor.GetNumElements());
 
                 for (unsigned int cOut = 0; cOut < outputChannels; ++cOut)
                 {
@@ -109,7 +147,7 @@ public:
             else
             {
                 convDescriptor.m_BiasEnabled = true;
-                std::vector<float> biasVector(outputChannels, 0);
+                std::vector<T> biasVector(outputChannels, T(0));
 
                 for (unsigned int cOut = 0; cOut < outputChannels; ++cOut)
                 {
@@ -117,7 +155,7 @@ public:
                                              sqrtf(varianceVector[cOut] + epsilon)) + betaVector[cOut];
                 }
             }
-            ConstTensor fusedBiasTensor(TensorInfo({outputChannels}, DataType::Float32), fusedBiasVector);
+            ConstTensor fusedBiasTensor(TensorInfo({outputChannels}, ArmnnType), fusedBiasVector);
 
             // Insert the new convolution layer that has batch norm parameters fused into
             const std::string name = std::string("fused-") + child.GetName() + std::string("-into-") + base.GetName();
@@ -143,10 +181,25 @@ protected:
     ~FuseBatchNorm() = default;
 };
 
-using FuseBatchNormIntoConvolution2D          =
+using FuseBatchNormIntoConvolution2DFloat32 =
         OptimizeForExclusiveConnection<Convolution2dLayer,
                                        BatchNormalizationLayer,
-                                       FuseBatchNorm<Convolution2dLayer>>;
+                                       FuseBatchNorm<Convolution2dLayer, armnn::DataType::Float32>>;
+
+using FuseBatchNormIntoConvolution2DFloat16 =
+        OptimizeForExclusiveConnection<Convolution2dLayer,
+                                       BatchNormalizationLayer,
+                                       FuseBatchNorm<Convolution2dLayer, armnn::DataType::Float16>>;
+
+using FuseBatchNormIntoDepthwiseConvolution2DFloat32 =
+        OptimizeForExclusiveConnection<DepthwiseConvolution2dLayer,
+                                       BatchNormalizationLayer,
+                                       FuseBatchNorm<DepthwiseConvolution2dLayer, armnn::DataType::Float32>>;
+
+using FuseBatchNormIntoDepthwiseConvolution2DFloat16 =
+        OptimizeForExclusiveConnection<DepthwiseConvolution2dLayer,
+                                       BatchNormalizationLayer,
+                                       FuseBatchNorm<DepthwiseConvolution2dLayer, armnn::DataType::Float16>>;
 
 } // namespace optimizations
 } // namespace armnn

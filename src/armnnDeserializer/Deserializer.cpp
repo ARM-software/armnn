@@ -194,6 +194,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_GreaterLayer]                = &Deserializer::ParseGreater;
     m_ParserFunctions[Layer_InstanceNormalizationLayer]  = &Deserializer::ParseInstanceNormalization;
     m_ParserFunctions[Layer_L2NormalizationLayer]        = &Deserializer::ParseL2Normalization;
+    m_ParserFunctions[Layer_LogicalBinaryLayer]          = &Deserializer::ParseLogicalBinary;
     m_ParserFunctions[Layer_LogSoftmaxLayer]             = &Deserializer::ParseLogSoftmax;
     m_ParserFunctions[Layer_LstmLayer]                   = &Deserializer::ParseLstm;
     m_ParserFunctions[Layer_MaximumLayer]                = &Deserializer::ParseMaximum;
@@ -267,6 +268,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_DivisionLayer()->base();
         case Layer::Layer_EqualLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_EqualLayer()->base();
+        case Layer::Layer_ElementwiseUnaryLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_ElementwiseUnaryLayer()->base();
         case Layer::Layer_FullyConnectedLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_FullyConnectedLayer()->base();
         case Layer::Layer_FillLayer:
@@ -283,6 +286,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_InstanceNormalizationLayer()->base();
         case Layer::Layer_L2NormalizationLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_L2NormalizationLayer()->base();
+        case Layer::Layer_LogicalBinaryLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_LogicalBinaryLayer()->base();
         case Layer::Layer_LogSoftmaxLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_LogSoftmaxLayer()->base();
         case Layer::Layer_LstmLayer:
@@ -454,6 +459,19 @@ armnn::ComparisonOperation ToComparisonOperation(armnnSerializer::ComparisonOper
     }
 }
 
+armnn::LogicalBinaryOperation ToLogicalBinaryOperation(armnnSerializer::LogicalBinaryOperation operation)
+{
+    switch (operation)
+    {
+        case armnnSerializer::LogicalBinaryOperation::LogicalBinaryOperation_LogicalAnd:
+            return armnn::LogicalBinaryOperation::LogicalAnd;
+        case armnnSerializer::LogicalBinaryOperation::LogicalBinaryOperation_LogicalOr:
+            return armnn::LogicalBinaryOperation::LogicalOr;
+        default:
+            throw armnn::InvalidArgumentException("Logical Binary operation unknown");
+    }
+}
+
 armnn::UnaryOperation ToUnaryOperation(armnnSerializer::UnaryOperation operation)
 {
     switch (operation)
@@ -468,6 +486,8 @@ armnn::UnaryOperation ToUnaryOperation(armnnSerializer::UnaryOperation operation
             return armnn::UnaryOperation::Exp;
         case armnnSerializer::UnaryOperation::UnaryOperation_Neg:
             return armnn::UnaryOperation::Neg;
+        case armnnSerializer::UnaryOperation::UnaryOperation_LogicalNot:
+            return armnn::UnaryOperation::LogicalNot;
         default:
             throw armnn::InvalidArgumentException("Unary operation unknown");
     }
@@ -1507,6 +1527,33 @@ void Deserializer::ParseL2Normalization(GraphPtr graph, unsigned int layerIndex)
 
     IConnectableLayer* layer = m_Network->AddL2NormalizationLayer(descriptor, layerName.c_str());
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseLogicalBinary(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+    CHECK_LOCATION();
+
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto fbLayer      = graph->layers()->Get(layerIndex)->layer_as_LogicalBinaryLayer();
+    auto fbDescriptor = fbLayer->descriptor();
+
+    armnn::LogicalBinaryDescriptor descriptor;
+    descriptor.m_Operation = ToLogicalBinaryOperation(fbDescriptor->operation());
+
+    const std::string& layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer     = m_Network->AddLogicalBinaryLayer(descriptor, layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

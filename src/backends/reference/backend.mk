@@ -69,6 +69,8 @@ BACKEND_SOURCES := \
         workloads/RefGatherWorkload.cpp \
         workloads/RefInstanceNormalizationWorkload.cpp \
         workloads/RefL2NormalizationWorkload.cpp \
+        workloads/RefLogicalBinaryWorkload.cpp \
+        workloads/RefLogicalUnaryWorkload.cpp \
         workloads/RefLogSoftmaxWorkload.cpp \
         workloads/RefLstmWorkload.cpp \
         workloads/RefMeanWorkload.cpp \

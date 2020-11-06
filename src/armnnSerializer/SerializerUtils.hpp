@@ -35,4 +35,7 @@ armnnSerializer::NormalizationAlgorithmMethod GetFlatBufferNormalizationAlgorith
 
 armnnSerializer::ResizeMethod GetFlatBufferResizeMethod(armnn::ResizeMethod method);
 
+armnnSerializer::LogicalBinaryOperation GetFlatBufferLogicalBinaryOperation(
+    armnn::LogicalBinaryOperation logicalBinaryOperation);
+
 } // namespace armnnSerializer

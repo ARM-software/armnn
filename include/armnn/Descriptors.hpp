@@ -1266,4 +1266,24 @@ struct TransposeDescriptor
     PermutationVector m_DimMappings;
 };
 
+/// A LogicalBinaryDescriptor for the LogicalBinaryLayer
+struct LogicalBinaryDescriptor
+{
+    LogicalBinaryDescriptor()
+        : LogicalBinaryDescriptor(LogicalBinaryOperation::LogicalAnd)
+    {}
+
+    LogicalBinaryDescriptor(LogicalBinaryOperation operation)
+        : m_Operation(operation)
+    {}
+
+    bool operator ==(const LogicalBinaryDescriptor &rhs) const
+    {
+        return m_Operation == rhs.m_Operation;
+    }
+
+    /// Specifies the logical operation to execute
+    LogicalBinaryOperation m_Operation;
+};
+
 } // namespace armnn

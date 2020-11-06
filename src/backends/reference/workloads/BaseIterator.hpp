@@ -515,6 +515,40 @@ public:
     }
 };
 
+class BooleanDecoderBool : public TypedIterator<const uint8_t, Decoder<bool>>
+{
+public:
+    BooleanDecoderBool(const uint8_t* data)
+        : TypedIterator(data) {}
+
+    BooleanDecoderBool()
+        : BooleanDecoderBool(nullptr) {}
+
+    bool Get() const override
+    {
+        return *m_Iterator;
+    }
+
+    std::vector<float> DecodeTensor(const TensorShape& tensorShape,
+                                    const unsigned int channelMultiplier,
+                                    const bool isDepthwise) override
+    {
+        IgnoreUnused(channelMultiplier, isDepthwise);
+
+        const unsigned int size = tensorShape.GetNumElements();
+        std::vector<float> decodedTensor;
+        decodedTensor.reserve(size);
+
+        for (uint32_t i = 0; i < size; ++i)
+        {
+            this->operator[](i);
+            decodedTensor.emplace_back(*m_Iterator);
+        }
+
+        return decodedTensor;
+    }
+};
+
 class QASymm8Encoder : public TypedIterator<uint8_t, Encoder<float>>
 {
 public:

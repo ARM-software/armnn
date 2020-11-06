@@ -23,6 +23,7 @@ struct FullyConnectedDescriptor;
 struct GatherDescriptor;
 struct InstanceNormalizationDescriptor;
 struct L2NormalizationDescriptor;
+struct LogicalBinaryDescriptor;
 struct LstmDescriptor;
 struct MeanDescriptor;
 struct NormalizationDescriptor;

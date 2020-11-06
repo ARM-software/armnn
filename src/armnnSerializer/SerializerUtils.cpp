@@ -28,6 +28,20 @@ armnnSerializer::ComparisonOperation GetFlatBufferComparisonOperation(armnn::Com
     }
 }
 
+armnnSerializer::LogicalBinaryOperation GetFlatBufferLogicalBinaryOperation(
+    armnn::LogicalBinaryOperation logicalBinaryOperation)
+{
+    switch (logicalBinaryOperation)
+    {
+        case armnn::LogicalBinaryOperation::LogicalAnd:
+            return armnnSerializer::LogicalBinaryOperation::LogicalBinaryOperation_LogicalAnd;
+        case armnn::LogicalBinaryOperation::LogicalOr:
+            return armnnSerializer::LogicalBinaryOperation::LogicalBinaryOperation_LogicalOr;
+        default:
+            throw armnn::InvalidArgumentException("Logical Binary operation unknown");
+    }
+}
+
 armnnSerializer::ConstTensorData GetFlatBufferConstTensorData(armnn::DataType dataType)
 {
     switch (dataType)
@@ -98,6 +112,8 @@ armnnSerializer::UnaryOperation GetFlatBufferUnaryOperation(armnn::UnaryOperatio
             return armnnSerializer::UnaryOperation::UnaryOperation_Exp;
         case armnn::UnaryOperation::Neg:
             return armnnSerializer::UnaryOperation::UnaryOperation_Neg;
+        case armnn::UnaryOperation::LogicalNot:
+            return armnnSerializer::UnaryOperation::UnaryOperation_LogicalNot;
         default:
             throw armnn::InvalidArgumentException("Unary operation unknown");
     }

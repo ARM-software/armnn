@@ -107,6 +107,10 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefInstanceNormalizationWorkload.hpp
     RefL2NormalizationWorkload.cpp
     RefL2NormalizationWorkload.hpp
+    RefLogicalBinaryWorkload.cpp
+    RefLogicalBinaryWorkload.hpp
+    RefLogicalUnaryWorkload.cpp
+    RefLogicalUnaryWorkload.hpp
     RefLogSoftmaxWorkload.cpp
     RefLogSoftmaxWorkload.hpp
     RefLstmWorkload.cpp

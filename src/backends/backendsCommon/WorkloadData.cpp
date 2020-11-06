@@ -3534,7 +3534,21 @@ void ElementwiseUnaryQueueDescriptor::Validate(const WorkloadInfo& workloadInfo)
         DataType::Signed32
     };
 
-    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    std::vector<DataType> logicalSupportedTypes =
+    {
+        DataType::Boolean
+    };
+
+    if (m_Parameters.m_Operation == UnaryOperation::LogicalNot)
+    {
+        ValidateDataTypes(inputTensorInfo, logicalSupportedTypes, descriptorName);
+    }
+    else
+    {
+        ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    }
+
+
     ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
@@ -3565,6 +3579,40 @@ void RankQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
     ValidateDataTypes(outputTensorInfo, { DataType::Signed32 }, descriptorName);
+}
+
+void LogicalBinaryQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"LogicalBinaryQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 2);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo0 = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& inputTensorInfo1 = workloadInfo.m_InputTensorInfos[1];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateBroadcastTensorShapesMatch(inputTensorInfo0,
+                                       inputTensorInfo1,
+                                       outputTensorInfo,
+                                       descriptorName,
+                                       "input_0",
+                                       "input_1");
+
+    if (inputTensorInfo0.GetDataType() != DataType::Boolean)
+    {
+        throw InvalidArgumentException(descriptorName + ": Input tensor 0 type must be Boolean.");
+    }
+
+    if (inputTensorInfo1.GetDataType() != DataType::Boolean)
+    {
+        throw InvalidArgumentException(descriptorName + ": Input tensor 1 type must be Boolean.");
+    }
+
+    if (outputTensorInfo.GetDataType() != DataType::Boolean)
+    {
+        throw InvalidArgumentException(descriptorName + ": Output tensor type must be Boolean.");
+    }
 }
 
 } // namespace armnn

@@ -663,4 +663,9 @@ struct ElementwiseUnaryQueueDescriptor : QueueDescriptorWithParameters<Elementwi
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct LogicalBinaryQueueDescriptor : QueueDescriptorWithParameters<LogicalBinaryDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } // namespace armnn

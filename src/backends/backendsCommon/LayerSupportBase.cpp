@@ -313,9 +313,26 @@ bool LayerSupportBase::IsInstanceNormalizationSupported(const TensorInfo&, // in
 }
 
 bool LayerSupportBase::IsL2NormalizationSupported(const TensorInfo&, // input
-                                                  const TensorInfo&, // output                        
+                                                  const TensorInfo&, // output
                                                   const L2NormalizationDescriptor&, // descriptor
                                                   Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
+bool LayerSupportBase::IsLogicalBinarySupported(const TensorInfo&, // input0
+                                                const TensorInfo&, // input1
+                                                const TensorInfo&, // output
+                                                const LogicalBinaryDescriptor&, // descriptor
+                                                Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
+bool LayerSupportBase::IsLogicalUnarySupported(const TensorInfo&, // input
+                                               const TensorInfo&, // output
+                                               const ElementwiseUnaryDescriptor&, // descriptor
+                                               Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }

@@ -37,6 +37,26 @@ ElementwiseUnaryFunction<Functor>::ElementwiseUnaryFunction(const TensorShape& i
     BroadcastLoop(inShape, outShape).Unroll(Functor(), 0, inData, outData);
 }
 
+template <typename Functor>
+LogicalBinaryFunction<Functor>::LogicalBinaryFunction(const TensorShape& inShape0,
+                                                      const TensorShape& inShape1,
+                                                      const TensorShape& outShape,
+                                                      Decoder<InType>& inData0,
+                                                      Decoder<InType>& inData1,
+                                                      Encoder<OutType>& outData)
+{
+    BroadcastLoop(inShape0, inShape1, outShape).Unroll(Functor(), 0, inData0, inData1, outData);
+}
+
+template <typename Functor>
+LogicalUnaryFunction<Functor>::LogicalUnaryFunction(const TensorShape& inShape,
+                                                    const TensorShape& outShape,
+                                                    Decoder<InType>& inData,
+                                                    Encoder<OutType>& outData)
+{
+    BroadcastLoop(inShape, outShape).Unroll(Functor(), 0, inData, outData);
+}
+
 } //namespace armnn
 
 template struct armnn::ElementwiseBinaryFunction<std::plus<float>>;
@@ -67,3 +87,8 @@ template struct armnn::ElementwiseUnaryFunction<armnn::exp<float>>;
 template struct armnn::ElementwiseUnaryFunction<std::negate<float>>;
 template struct armnn::ElementwiseUnaryFunction<armnn::rsqrt<float>>;
 template struct armnn::ElementwiseUnaryFunction<armnn::sqrt<float>>;
+
+// Logical Unary
+template struct armnn::LogicalUnaryFunction<std::logical_not<bool>>;
+template struct armnn::LogicalBinaryFunction<std::logical_and<bool>>;
+template struct armnn::LogicalBinaryFunction<std::logical_or<bool>>;

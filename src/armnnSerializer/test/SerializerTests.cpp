@@ -1626,6 +1626,74 @@ BOOST_AUTO_TEST_CASE(EnsureL2NormalizationBackwardCompatibility)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeLogicalBinary)
+{
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(LogicalBinary)
+
+    const std::string layerName("logicalBinaryAnd");
+
+    const armnn::TensorShape shape{2, 1, 2, 2};
+
+    const armnn::TensorInfo inputInfo  = armnn::TensorInfo(shape, armnn::DataType::Boolean);
+    const armnn::TensorInfo outputInfo = armnn::TensorInfo(shape, armnn::DataType::Boolean);
+
+    armnn::LogicalBinaryDescriptor descriptor(armnn::LogicalBinaryOperation::LogicalAnd);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0        = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1        = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const logicalBinaryLayer = network->AddLogicalBinaryLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer        = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(logicalBinaryLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(logicalBinaryLayer->GetInputSlot(1));
+    logicalBinaryLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    logicalBinaryLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    LogicalBinaryLayerVerifier verifier(layerName, { inputInfo, inputInfo }, { outputInfo }, descriptor);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeLogicalUnary)
+{
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(ElementwiseUnary)
+
+    const std::string layerName("elementwiseUnaryLogicalNot");
+
+    const armnn::TensorShape shape{2, 1, 2, 2};
+
+    const armnn::TensorInfo inputInfo  = armnn::TensorInfo(shape, armnn::DataType::Boolean);
+    const armnn::TensorInfo outputInfo = armnn::TensorInfo(shape, armnn::DataType::Boolean);
+
+    armnn::ElementwiseUnaryDescriptor descriptor(armnn::UnaryOperation::LogicalNot);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const elementwiseUnaryLayer =
+        network->AddElementwiseUnaryLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(elementwiseUnaryLayer->GetInputSlot(0));
+    elementwiseUnaryLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    elementwiseUnaryLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+
+    BOOST_CHECK(deserializedNetwork);
+
+    ElementwiseUnaryLayerVerifier verifier(layerName, { inputInfo }, { outputInfo }, descriptor);
+
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeLogSoftmax)
 {
     DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(LogSoftmax)

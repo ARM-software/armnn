@@ -458,6 +458,21 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                                                 reason);
             break;
         }
+        case LayerType::LogicalBinary:
+        {
+            auto cLayer = PolymorphicDowncast<const LogicalBinaryLayer*>(&layer);
+
+            const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject->IsLogicalBinarySupported(input0,
+                                                                  input1,
+                                                                  output,
+                                                                  cLayer->GetParameters(),
+                                                                  reason);
+            break;
+        }
         case LayerType::LogSoftmax:
         {
             auto cLayer = PolymorphicDowncast<const LogSoftmaxLayer*>(&layer);
@@ -1437,6 +1452,18 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateInstanceNormalization(
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateL2Normalization(const L2NormalizationQueueDescriptor& /*desc*/,
                                                                    const WorkloadInfo& /*info*/) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateLogicalBinary(const LogicalBinaryQueueDescriptor& /*desc*/,
+                                                                 const WorkloadInfo& /*info*/) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateLogicalUnary(const ElementwiseUnaryQueueDescriptor& /*desc*/,
+                                                                const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }

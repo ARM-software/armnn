@@ -141,6 +141,10 @@ public:
                               const LogSoftmaxDescriptor&,
                               const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitLogicalBinaryLayer(const IConnectableLayer*,
+                                 const LogicalBinaryDescriptor&,
+                                 const char*) override {DefaultPolicy::Apply(__func__); }
+
     void VisitLstmLayer(const IConnectableLayer*,
                         const LstmDescriptor&,
                         const LstmInputParams&,

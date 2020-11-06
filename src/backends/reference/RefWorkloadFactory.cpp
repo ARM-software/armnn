@@ -401,6 +401,19 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateL2Normalization(const L2Nor
     return std::make_unique<RefL2NormalizationWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateLogicalBinary(const LogicalBinaryQueueDescriptor& descriptor,
+                                                                   const WorkloadInfo& info) const
+{
+    return std::make_unique<RefLogicalBinaryWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateLogicalUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
+                                                                  const WorkloadInfo& info) const
+{
+    return std::make_unique<RefLogicalUnaryWorkload>(descriptor, info);
+}
+
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateLogSoftmax(const LogSoftmaxQueueDescriptor& descriptor,
                                                                 const WorkloadInfo& info) const
 {

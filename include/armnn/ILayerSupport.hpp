@@ -205,6 +205,17 @@ public:
                                             const L2NormalizationDescriptor& descriptor,
                                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    virtual bool IsLogicalBinarySupported(const TensorInfo& input0,
+                                          const TensorInfo& input1,
+                                          const TensorInfo& output,
+                                          const LogicalBinaryDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
+    virtual bool IsLogicalUnarySupported(const TensorInfo& input,
+                                         const TensorInfo& output,
+                                         const ElementwiseUnaryDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
     virtual bool IsLogSoftmaxSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        const LogSoftmaxDescriptor& descriptor,

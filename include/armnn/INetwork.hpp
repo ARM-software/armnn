@@ -584,6 +584,13 @@ public:
                                              const LstmInputParams& params,
                                              const char* name = nullptr) = 0;
 
+    /// Adds a Logical Binary layer to the network.
+    /// @param descriptor - Description of the Logical Binary layer.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddLogicalBinaryLayer(const LogicalBinaryDescriptor& descriptor,
+                                                     const char* name = nullptr) = 0;
+
     virtual void Accept(ILayerVisitor& visitor) const = 0;
 
 protected:

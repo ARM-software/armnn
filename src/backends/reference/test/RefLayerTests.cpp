@@ -2215,4 +2215,17 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(Exp3dQuantisedAsymm8, Exp3dTest<DataType::QAsymmU8
 ARMNN_AUTO_TEST_CASE_WITH_THF(Exp2dQuantisedSymm16, Exp2dTest<DataType::QSymmS16>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Exp3dQuantisedSymm16, Exp3dTest<DataType::QSymmS16>)
 
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalNot, LogicalNotTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalNotInt, LogicalNotIntTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalAnd, LogicalAndTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalOr, LogicalOrTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalAndInt, LogicalAndIntTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalOrInt, LogicalOrIntTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalAndBroadcast1, LogicalAndBroadcast1Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalOrBroadcast1, LogicalOrBroadcast1Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalAndBroadcast2, LogicalAndBroadcast2Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalOrBroadcast2, LogicalOrBroadcast2Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalAndBroadcast3, LogicalAndBroadcast3Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalOrBroadcast3, LogicalOrBroadcast3Test)
+
 BOOST_AUTO_TEST_SUITE_END()

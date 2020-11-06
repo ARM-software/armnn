@@ -1999,6 +1999,12 @@ IConnectableLayer* Network::AddQLstmLayer(const QLstmDescriptor&  descriptor,
     return layer;
 }
 
+IConnectableLayer* Network::AddLogicalBinaryLayer(const LogicalBinaryDescriptor& logicalBinaryDescriptor,
+                                                  const char* name)
+{
+    return m_Graph->AddLayer<LogicalBinaryLayer>(logicalBinaryDescriptor, name);
+}
+
 void Network::Accept(ILayerVisitor& visitor) const
 {
     for (auto layer : GetGraph())

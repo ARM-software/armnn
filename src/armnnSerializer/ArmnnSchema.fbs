@@ -159,7 +159,8 @@ enum LayerType : uint {
     Transpose = 55,
     QLstm = 56,
     Fill = 57,
-    Rank = 58
+    Rank = 58,
+    LogicalBinary = 59
 }
 
 // Base layer table to be used as part of other layers
@@ -270,7 +271,8 @@ enum UnaryOperation : byte {
     Rsqrt = 1,
     Sqrt = 2,
     Exp = 3,
-    Neg = 4
+    Neg = 4,
+    LogicalNot = 5
 }
 
 table ElementwiseUnaryDescriptor {
@@ -360,6 +362,20 @@ table L2NormalizationLayer {
 table L2NormalizationDescriptor {
     dataLayout:DataLayout = NCHW;
     eps:float = 1e-12;
+}
+
+enum LogicalBinaryOperation : byte {
+    LogicalAnd = 0,
+    LogicalOr = 1
+}
+
+table LogicalBinaryDescriptor {
+    operation:LogicalBinaryOperation;
+}
+
+table LogicalBinaryLayer {
+    base:LayerBase;
+    descriptor:LogicalBinaryDescriptor;
 }
 
 table MinimumLayer {
@@ -924,7 +940,8 @@ union Layer {
     TransposeLayer,
     QLstmLayer,
     FillLayer,
-    RankLayer
+    RankLayer,
+    LogicalBinaryLayer
 }
 
 table AnyLayer {

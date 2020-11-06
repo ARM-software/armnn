@@ -564,6 +564,21 @@ void SerializerVisitor::VisitL2NormalizationLayer(const armnn::IConnectableLayer
     CreateAnyLayer(fbLayer.o, serializer::Layer::Layer_L2NormalizationLayer);
 }
 
+void SerializerVisitor::VisitLogicalBinaryLayer(const armnn::IConnectableLayer* layer,
+                                                const armnn::LogicalBinaryDescriptor& descriptor,
+                                                const char* name)
+{
+    IgnoreUnused(name);
+
+    auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_LogicalBinary);
+    auto fbDescriptor = serializer::CreateLogicalBinaryDescriptor(
+        m_flatBufferBuilder,
+        GetFlatBufferLogicalBinaryOperation(descriptor.m_Operation));
+
+    auto fbLayer = serializer::CreateLogicalBinaryLayer(m_flatBufferBuilder, fbBaseLayer, fbDescriptor);
+    CreateAnyLayer(fbLayer.o, serializer::Layer::Layer_LogicalBinaryLayer);
+}
+
 void SerializerVisitor::VisitLogSoftmaxLayer(const armnn::IConnectableLayer* layer,
                                              const armnn::LogSoftmaxDescriptor& logSoftmaxDescriptor,
                                              const char* name)

@@ -40,6 +40,7 @@
     X(Input) \
     X(InstanceNormalization) \
     X(L2Normalization) \
+    X(LogicalBinary) \
     X(LogSoftmax) \
     X(Lstm) \
     X(QLstm) \

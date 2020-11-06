@@ -41,6 +41,8 @@
 #include "RefGatherWorkload.hpp"
 #include "RefInstanceNormalizationWorkload.hpp"
 #include "RefL2NormalizationWorkload.hpp"
+#include "RefLogicalBinaryWorkload.hpp"
+#include "RefLogicalUnaryWorkload.hpp"
 #include "RefLogSoftmaxWorkload.hpp"
 #include "RefLstmWorkload.hpp"
 #include "RefMeanWorkload.hpp"

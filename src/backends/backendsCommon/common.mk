@@ -64,6 +64,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/GatherTestImpl.cpp \
     test/layerTests/InstanceNormalizationTestImpl.cpp \
     test/layerTests/L2NormalizationTestImpl.cpp \
+    test/layerTests/LogicalTestImpl.cpp \
     test/layerTests/LogSoftmaxTestImpl.cpp \
     test/layerTests/LstmTestImpl.cpp \
     test/layerTests/MaximumTestImpl.cpp \

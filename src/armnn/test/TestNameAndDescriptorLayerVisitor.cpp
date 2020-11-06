@@ -126,6 +126,12 @@ armnn::L2NormalizationDescriptor GetDescriptor<armnn::L2NormalizationDescriptor>
 }
 
 template<>
+armnn::LogicalBinaryDescriptor GetDescriptor<armnn::LogicalBinaryDescriptor>()
+{
+    return armnn::LogicalBinaryDescriptor(armnn::LogicalBinaryOperation::LogicalOr);
+}
+
+template<>
 armnn::MeanDescriptor GetDescriptor<armnn::MeanDescriptor>()
 {
     return armnn::MeanDescriptor({ 1, 2, }, true);
@@ -280,6 +286,7 @@ TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Fill)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Gather)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(InstanceNormalization)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(L2Normalization)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(LogicalBinary)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(LogSoftmax)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Mean)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Normalization)

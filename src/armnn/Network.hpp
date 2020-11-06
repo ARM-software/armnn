@@ -250,6 +250,9 @@ public:
     IConnectableLayer* AddQuantizedLstmLayer(const QuantizedLstmInputParams& params,
                                              const char* name = nullptr) override;
 
+    IConnectableLayer* AddLogicalBinaryLayer(const LogicalBinaryDescriptor& logicalBinaryDescriptor,
+                                             const char* name = nullptr) override;
+
     void Accept(ILayerVisitor& visitor) const override;
 
 private:

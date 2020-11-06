@@ -1105,6 +1105,53 @@ bool RefLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
     return supported;
 }
 
+bool RefLayerSupport::IsLogicalBinarySupported(const TensorInfo& input0,
+                                               const TensorInfo& input1,
+                                               const TensorInfo& output,
+                                               const LogicalBinaryDescriptor& descriptor,
+                                               Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(descriptor);
+
+    std::array<DataType, 1> supportedTypes =
+    {
+        DataType::Boolean
+    };
+
+    bool supported = true;
+    supported &= CheckSupportRule(TypeAnyOf(input0, supportedTypes), reasonIfUnsupported,
+                                  "Reference LogicalBinary: input 0 type not supported");
+    supported &= CheckSupportRule(TypeAnyOf(input1, supportedTypes), reasonIfUnsupported,
+                                  "Reference LogicalBinary: input 1 type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(input0, output), reasonIfUnsupported,
+                                  "Reference LogicalBinary: input and output types do not match");
+
+    return supported;
+}
+
+bool RefLayerSupport::IsLogicalUnarySupported(const TensorInfo& input,
+                                              const TensorInfo& output,
+                                              const ElementwiseUnaryDescriptor& descriptor,
+                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(descriptor);
+
+    std::array<DataType, 1> supportedTypes =
+    {
+        DataType::Boolean
+    };
+
+    bool supported = true;
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference LogicalUnary: input type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference LogicalUnary: input and output types do not match");
+
+    return supported;
+}
+
 bool RefLayerSupport::IsLogSoftmaxSupported(const TensorInfo& input,
                                             const TensorInfo& output,
                                             const LogSoftmaxDescriptor& descriptor,

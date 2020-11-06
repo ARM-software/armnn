@@ -85,13 +85,20 @@ enum class ComparisonOperation
     NotEqual       = 5
 };
 
+enum class LogicalBinaryOperation
+{
+    LogicalAnd = 0,
+    LogicalOr  = 1
+};
+
 enum class UnaryOperation
 {
-    Abs   = 0,
-    Exp   = 1,
-    Sqrt  = 2,
-    Rsqrt = 3,
-    Neg   = 4
+    Abs        = 0,
+    Exp        = 1,
+    Sqrt       = 2,
+    Rsqrt      = 3,
+    Neg        = 4,
+    LogicalNot = 5
 };
 
 enum class PoolingAlgorithm

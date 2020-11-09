@@ -139,14 +139,7 @@ armnn::IConnectableLayer* BroadcastTensor(const armnn::TensorInfo& inputInfo0,
     if (inputDimensions0 == inputDimensions1)
     {
         auto status = Connect(startLayer, tfLiteNode, delegateData);
-        if(status == kTfLiteOk)
-        {
-            return startLayer;
-        }
-        else
-        {
-            return nullptr;
-        }
+        return status == kTfLiteOk ? startLayer : nullptr;
     }
 
     unsigned int biggerInputDimensions = std::max(inputDimensions0, inputDimensions1);

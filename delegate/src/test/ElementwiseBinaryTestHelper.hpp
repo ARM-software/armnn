@@ -24,7 +24,9 @@ std::vector<char> CreateElementwiseBinaryTfLiteModel(tflite::BuiltinOperator bin
                                                      tflite::TensorType tensorType,
                                                      const std::vector <int32_t>& input0TensorShape,
                                                      const std::vector <int32_t>& input1TensorShape,
-                                                     const std::vector <int32_t>& outputTensorShape)
+                                                     const std::vector <int32_t>& outputTensorShape,
+                                                     float quantScale = 1.0f,
+                                                     int quantOffset  = 0)
 {
     using namespace tflite;
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
@@ -32,19 +34,36 @@ std::vector<char> CreateElementwiseBinaryTfLiteModel(tflite::BuiltinOperator bin
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
     buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
 
+    auto quantizationParameters =
+        CreateQuantizationParameters(flatBufferBuilder,
+                                     0,
+                                     0,
+                                     flatBufferBuilder.CreateVector<float>({ quantScale }),
+                                     flatBufferBuilder.CreateVector<int64_t>({ quantOffset }));
+
+
     std::array<flatbuffers::Offset<Tensor>, 3> tensors;
     tensors[0] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(input0TensorShape.data(),
                                                                       input0TensorShape.size()),
-                              tensorType, 0);
+                              tensorType,
+                              0,
+                              flatBufferBuilder.CreateString("input_0"),
+                              quantizationParameters);
     tensors[1] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(input1TensorShape.data(),
                                                                       input1TensorShape.size()),
-                              tensorType, 0);
+                              tensorType,
+                              0,
+                              flatBufferBuilder.CreateString("input_1"),
+                              quantizationParameters);
     tensors[2] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
                                                                       outputTensorShape.size()),
-                              tensorType);
+                              tensorType,
+                              0,
+                              flatBufferBuilder.CreateString("output"),
+                              quantizationParameters);
 
     // create operator
     tflite::BuiltinOptions operatorBuiltinOptionsType = tflite::BuiltinOptions_NONE;
@@ -61,6 +80,18 @@ std::vector<char> CreateElementwiseBinaryTfLiteModel(tflite::BuiltinOperator bin
         {
             operatorBuiltinOptionsType = BuiltinOptions_DivOptions;
             operatorBuiltinOptions = CreateDivOptions(flatBufferBuilder, activationType).Union();
+            break;
+        }
+        case BuiltinOperator_MAXIMUM:
+        {
+            operatorBuiltinOptionsType = BuiltinOptions_MaximumMinimumOptions;
+            operatorBuiltinOptions = CreateMaximumMinimumOptions(flatBufferBuilder).Union();
+            break;
+        }
+        case BuiltinOperator_MINIMUM:
+        {
+            operatorBuiltinOptionsType = BuiltinOptions_MaximumMinimumOptions;
+            operatorBuiltinOptions = CreateMaximumMinimumOptions(flatBufferBuilder).Union();
             break;
         }
         case BuiltinOperator_MUL:
@@ -115,23 +146,29 @@ std::vector<char> CreateElementwiseBinaryTfLiteModel(tflite::BuiltinOperator bin
                              flatBufferBuilder.GetBufferPointer() + flatBufferBuilder.GetSize());
 }
 
-void ElementwiseBinaryFP32Test(tflite::BuiltinOperator binaryOperatorCode,
-                               tflite::ActivationFunctionType activationType,
-                               std::vector<armnn::BackendId>& backends,
-                               std::vector<int32_t>& input0Shape,
-                               std::vector<int32_t>& input1Shape,
-                               std::vector<int32_t>& outputShape,
-                               std::vector<float>& input0Values,
-                               std::vector<float>& input1Values,
-                               std::vector<float>& expectedOutputValues)
+template <typename T>
+void ElementwiseBinaryTest(tflite::BuiltinOperator binaryOperatorCode,
+                           tflite::ActivationFunctionType activationType,
+                           tflite::TensorType tensorType,
+                           std::vector<armnn::BackendId>& backends,
+                           std::vector<int32_t>& input0Shape,
+                           std::vector<int32_t>& input1Shape,
+                           std::vector<int32_t>& outputShape,
+                           std::vector<T>& input0Values,
+                           std::vector<T>& input1Values,
+                           std::vector<T>& expectedOutputValues,
+                           float quantScale = 1.0f,
+                           int quantOffset  = 0)
 {
     using namespace tflite;
     std::vector<char> modelBuffer = CreateElementwiseBinaryTfLiteModel(binaryOperatorCode,
                                                                        activationType,
-                                                                      ::tflite::TensorType_FLOAT32,
-                                                                      input0Shape,
-                                                                      input1Shape,
-                                                                      outputShape);
+                                                                       tensorType,
+                                                                       input0Shape,
+                                                                       input1Shape,
+                                                                       outputShape,
+                                                                       quantScale,
+                                                                       quantOffset);
 
     const Model* tfLiteModel = GetModel(modelBuffer.data());
     // Create TfLite Interpreters
@@ -158,28 +195,28 @@ void ElementwiseBinaryFP32Test(tflite::BuiltinOperator binaryOperatorCode,
 
     // Set input data
     auto tfLiteDelegateInput0Id = tfLiteInterpreter->inputs()[0];
-    auto tfLiteDelageInput0Data = tfLiteInterpreter->typed_tensor<float>(tfLiteDelegateInput0Id);
+    auto tfLiteDelageInput0Data = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateInput0Id);
     for (unsigned int i = 0; i < input0Values.size(); ++i)
     {
         tfLiteDelageInput0Data[i] = input0Values[i];
     }
 
     auto tfLiteDelegateInput1Id = tfLiteInterpreter->inputs()[1];
-    auto tfLiteDelageInput1Data = tfLiteInterpreter->typed_tensor<float>(tfLiteDelegateInput1Id);
+    auto tfLiteDelageInput1Data = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateInput1Id);
     for (unsigned int i = 0; i < input1Values.size(); ++i)
     {
         tfLiteDelageInput1Data[i] = input1Values[i];
     }
 
     auto armnnDelegateInput0Id = armnnDelegateInterpreter->inputs()[0];
-    auto armnnDelegateInput0Data = armnnDelegateInterpreter->typed_tensor<float>(armnnDelegateInput0Id);
+    auto armnnDelegateInput0Data = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateInput0Id);
     for (unsigned int i = 0; i < input0Values.size(); ++i)
     {
         armnnDelegateInput0Data[i] = input0Values[i];
     }
 
     auto armnnDelegateInput1Id = armnnDelegateInterpreter->inputs()[1];
-    auto armnnDelegateInput1Data = armnnDelegateInterpreter->typed_tensor<float>(armnnDelegateInput1Id);
+    auto armnnDelegateInput1Data = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateInput1Id);
     for (unsigned int i = 0; i < input1Values.size(); ++i)
     {
         armnnDelegateInput1Data[i] = input1Values[i];
@@ -191,9 +228,9 @@ void ElementwiseBinaryFP32Test(tflite::BuiltinOperator binaryOperatorCode,
 
     // Compare output data
     auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[0];
-    auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<float>(tfLiteDelegateOutputId);
+    auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateOutputId);
     auto armnnDelegateOutputId = armnnDelegateInterpreter->outputs()[0];
-    auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<float>(armnnDelegateOutputId);
+    auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateOutputId);
     for (size_t i = 0; i < expectedOutputValues.size(); i++)
     {
         CHECK(expectedOutputValues[i] == armnnDelegateOutputData[i]);
@@ -205,7 +242,3 @@ void ElementwiseBinaryFP32Test(tflite::BuiltinOperator binaryOperatorCode,
 }
 
 } // anonymous namespace
-
-
-
-

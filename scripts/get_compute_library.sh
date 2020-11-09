@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_08" # Release 20.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="770dfeb04b6fd89afde2005bd46caa6ff0858f3e" #COMPMID-3953: Move assignment operator failures on android
+DEFAULT_CLFRAMEWORKREVISION="bef7fa27b0d231a8649952f60808132d109b6345" #COMPMID-3639: (3RDPARTY_UPDATE) Move CL kernels to src
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

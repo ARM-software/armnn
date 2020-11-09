@@ -108,6 +108,8 @@ if(BUILD_UNIT_TESTS)
         src/test/QuantizationTestHelper.hpp
         src/test/ResizeTest.cpp
         src/test/ResizeTestHelper.hpp
+        src/test/TransposeTest.cpp
+        src/test/TransposeTestHelper.hpp
         src/test/TestUtils.hpp)
 
     add_executable(DelegateUnitTests ${armnnDelegate_unittest_sources})

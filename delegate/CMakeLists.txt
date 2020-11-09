@@ -94,7 +94,9 @@ list(APPEND armnnDelegate_unittest_sources
         src/test/ElementwiseBinaryTest.cpp
         src/test/ElementwiseBinaryTestHelper.hpp
         src/test/ElementwiseUnaryTest.cpp
-        src/test/ElementwiseUnaryTestHelper.hpp)
+        src/test/ElementwiseUnaryTestHelper.hpp
+        src/test/QuantizationTest.cpp
+        src/test/QuantizationTestHelper.hpp)
 
 add_executable(DelegateUnitTests ${armnnDelegate_unittest_sources})
 target_include_directories(DelegateUnitTests PRIVATE src)

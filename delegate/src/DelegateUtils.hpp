@@ -104,6 +104,16 @@ bool IsDynamicTensor(const TfLiteTensor& tfLiteTensor)
     return false;
 }
 
+bool IsAffineQuantization(const TfLiteTensor& tfLiteTensor)
+{
+    auto quantizationInfo = tfLiteTensor.quantization;
+    if (quantizationInfo.type == kTfLiteAffineQuantization)
+    {
+        return true;
+    }
+    return false;
+}
+
 TfLiteStatus Connect(armnn::IConnectableLayer* layer,
                      TfLiteNode* tfLiteNode,
                      armnnDelegate::DelegateData& data)

@@ -95,6 +95,8 @@ list(APPEND armnnDelegate_unittest_sources
         src/test/ElementwiseBinaryTestHelper.hpp
         src/test/ElementwiseUnaryTest.cpp
         src/test/ElementwiseUnaryTestHelper.hpp
+        src/test/Pooling2dTest.cpp
+        src/test/Pooling2dTestHelper.hpp
         src/test/QuantizationTest.cpp
         src/test/QuantizationTestHelper.hpp)
 

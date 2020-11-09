@@ -317,7 +317,14 @@ armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor)
             type = armnn::DataType::QAsymmU8;
             break;
         case kTfLiteInt8:
-            type = armnn::DataType::QSymmS8;
+            if (tfLiteTensor.params.zero_point == 0)
+            {
+                type = armnn::DataType::QSymmS8;
+            }
+            else
+            {
+                type = armnn::DataType::QAsymmS8;
+            }
             break;
         case kTfLiteInt16:
             type = armnn::DataType::QSymmS16;

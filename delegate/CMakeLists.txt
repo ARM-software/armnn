@@ -102,7 +102,10 @@ if(BUILD_UNIT_TESTS)
         src/test/Pooling2dTest.cpp
         src/test/Pooling2dTestHelper.hpp
         src/test/QuantizationTest.cpp
-        src/test/QuantizationTestHelper.hpp)
+        src/test/QuantizationTestHelper.hpp
+        src/test/ResizeTest.cpp
+        src/test/ResizeTestHelper.hpp
+        src/test/TestUtils.hpp)
 
     add_executable(DelegateUnitTests ${armnnDelegate_unittest_sources})
     target_include_directories(DelegateUnitTests PRIVATE third-party)

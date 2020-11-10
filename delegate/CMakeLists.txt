@@ -95,16 +95,18 @@ list(APPEND armnnDelegate_unittest_sources
         src/test/ElementwiseBinaryTestHelper.hpp
         src/test/ElementwiseUnaryTest.cpp
         src/test/ElementwiseUnaryTestHelper.hpp
+        src/test/FullyConnectedTest.cpp
+        src/test/FullyConnectedTestHelper.hpp
         src/test/Pooling2dTest.cpp
         src/test/Pooling2dTestHelper.hpp
         src/test/QuantizationTest.cpp
         src/test/QuantizationTestHelper.hpp)
 
 add_executable(DelegateUnitTests ${armnnDelegate_unittest_sources})
-target_include_directories(DelegateUnitTests PRIVATE src)
 target_include_directories(DelegateUnitTests PRIVATE third-party)
 
 target_link_libraries(DelegateUnitTests armnnDelegate)
+target_link_libraries(DelegateUnitTests Armnn::armnnUtils)
 
 target_include_directories(DelegateUnitTests
         PRIVATE

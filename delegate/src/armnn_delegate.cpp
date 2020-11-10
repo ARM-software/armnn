@@ -85,7 +85,6 @@ TfLiteStatus DoPrepare(TfLiteContext* tfLiteContext, TfLiteDelegate* tfLiteDeleg
             {
                 return kTfLiteError;
             }
-
             return static_cast<ArmnnSubgraph*>(tfLiteNode->user_data)->Prepare(tfLiteContext);
         },
         // ArmnnSubgraph Invoke
@@ -209,6 +208,11 @@ TfLiteStatus ArmnnSubgraph::AddInputLayer(DelegateData& delegateData,
     {
         const int32_t tensorId = inputs->data[i];
         const TfLiteTensor tensor = tfLiteContext->tensors[tensorId];
+        // Do not create bindings for constant inputs
+        if (tensor.allocation_type == kTfLiteMmapRo)
+        {
+            continue;
+        }
 
         auto bindingId = static_cast<armnn::LayerBindingId>((tensorId));
         armnn::IConnectableLayer* layer = delegateData.m_Network->AddInputLayer(bindingId);
@@ -220,12 +224,9 @@ TfLiteStatus ArmnnSubgraph::AddInputLayer(DelegateData& delegateData,
         // Store for creating connections
         delegateData.m_OutputSlotForNode[tensorId] = &outputSlot;
 
-        // Do not create bindings for constant inputs
-        if (tensor.allocation_type != kTfLiteMmapRo)
-        {
-            inputBindings.push_back(std::make_pair(bindingId, tensorInfo));
-        }
+        inputBindings.push_back(std::make_pair(bindingId, tensorInfo));
     }
+
     return kTfLiteOk;
 }
 
@@ -244,7 +245,6 @@ TfLiteStatus ArmnnSubgraph::AddOutputLayer(DelegateData& delegateData,
         armnn::IConnectableLayer* layer = delegateData.m_Network->AddOutputLayer(bindingId);
 
         auto tensorInfo = GetTensorInfoForTfLiteTensor(tensor);
-
         ARMNN_ASSERT(delegateData.m_OutputSlotForNode[tensorId] != nullptr);
         delegateData.m_OutputSlotForNode[tensorId]->Connect(layer->GetInputSlot(0));
         outputBindings.push_back(std::make_pair(bindingId, tensorInfo));
@@ -272,7 +272,8 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
     armnn::NetworkId networkId;
     delegateData.m_Network = armnn::INetwork::Create(networkOptions);
 
-    delegateData.m_OutputSlotForNode = std::vector<armnn::IOutputSlot*>(parameters->nodes_to_replace->size, nullptr);
+    delegateData.m_OutputSlotForNode = std::vector<armnn::IOutputSlot*>(tfLiteContext->tensors_size, nullptr);
+
 
     std::vector<armnn::BindingPointInfo> inputBindings;
     std::vector<armnn::BindingPointInfo> outputBindings;
@@ -314,8 +315,7 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
     armnn::IOptimizedNetworkPtr optNet(nullptr, nullptr);
     try
     {
-
-        optNet = armnn::Optimize(*(delegateData.m_Network),
+        optNet = armnn::Optimize(*(delegateData.m_Network.get()),
                                  delegate->m_Options.GetBackends(),
                                  delegate->m_Runtime->GetDeviceSpec());
     }

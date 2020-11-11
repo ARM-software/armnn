@@ -161,7 +161,7 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  + armnn::BackendRegistryInstance().GetBackendIdsAsString()
                  + " NOTE: Compute devices need to be passed as a comma separated list without whitespaces "
                    "e.g. CpuRef,CpuAcc",
-                 cxxopts::value<std::string>())
+                 cxxopts::value<std::vector<std::string>>())
 
                 ("f,model-format",
                  "armnn-binary, caffe-binary, caffe-text, onnx-binary, onnx-text, tflite-binary, tensorflow-binary or "
@@ -352,9 +352,8 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
     CheckOptionDependencies(m_CxxResult);
 
     // Some options can't be assigned directly because they need some post-processing:
-    auto computeDevices = GetOptionValue<std::string>("compute", m_CxxResult);
-    m_ExNetParams.m_ComputeDevices =
-            GetBackendIDs(ParseStringList(computeDevices, ","));
+    auto computeDevices = GetOptionValue<std::vector<std::string>>("compute", m_CxxResult);
+    m_ExNetParams.m_ComputeDevices = GetBackendIDs(computeDevices);
     m_ExNetParams.m_ModelFormat =
             armnn::stringUtils::StringTrimCopy(GetOptionValue<std::string>("model-format", m_CxxResult));
     m_ExNetParams.m_InputNames =

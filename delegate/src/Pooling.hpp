@@ -72,6 +72,12 @@ TfLiteStatus VisitPoolingOperator(DelegateData& delegateData,
     armnn::PoolingAlgorithm poolingAlgorithm;
     switch(tfLitePoolingOperatorCode)
     {
+        case kTfLiteBuiltinAveragePool2d:
+            poolingAlgorithm = armnn::PoolingAlgorithm::Average;
+            break;
+        case kTfLiteBuiltinL2Pool2d:
+            poolingAlgorithm = armnn::PoolingAlgorithm::L2;
+            break;
         case kTfLiteBuiltinMaxPool2d:
             poolingAlgorithm = armnn::PoolingAlgorithm::Max;
             break;

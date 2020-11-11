@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_08" # Release 20.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="2cb05d9ee91880179ad2537cbf66229c7c2a2356" #COMPMID-3852: Fix complex multiplication remove padding performance regression
+DEFAULT_CLFRAMEWORKREVISION="087ee3d521c1137b0bc611579eb1b94cc7813fb2" #COMPMID-3630: Fix nightly build regarding move constructor
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

@@ -35,9 +35,18 @@ TEST_CASE ("ArmnnDelegate Registered")
     const TfLiteRegistration* opRegister = opResolver.FindOp(BuiltinOperator_ADD, 1);
     tfLiteInterpreter->AddNodeWithParameters({0, 1}, {2}, "", 0, nullptr, opRegister);
 
-    // create the Armnn Delegate
+    // Create the Armnn Delegate
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    armnnDelegate::DelegateOptions delegateOptions(backends);
+    std::vector<armnn::BackendOptions> backendOptions;
+    backendOptions.emplace_back(
+        armnn::BackendOptions{ "BackendName",
+                               {
+                                  { "Option1", 42 },
+                                  { "Option2", true }
+                               }}
+    );
+
+    armnnDelegate::DelegateOptions delegateOptions(backends, backendOptions);
     std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
                        theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
                                         armnnDelegate::TfLiteArmnnDelegateDelete);

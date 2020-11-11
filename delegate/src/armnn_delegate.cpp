@@ -118,10 +118,15 @@ Delegate::Delegate(armnnDelegate::DelegateOptions options)
 {
     // Create ArmNN Runtime
     armnn::IRuntime::CreationOptions runtimeOptions;
+
+    auto backendOptions = m_Options.GetBackendOptions();
+    if (!backendOptions.empty())
+    {
+        runtimeOptions.m_BackendOptions = backendOptions;
+    }
     m_Runtime = armnn::IRuntime::Create(runtimeOptions);
 
     std::vector<armnn::BackendId> backends;
-
     if (m_Runtime)
     {
         const armnn::BackendIdSet supportedDevices = m_Runtime->GetDeviceSpec().GetSupportedBackends();

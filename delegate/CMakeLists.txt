@@ -86,8 +86,10 @@ target_include_directories(armnnDelegate
         PRIVATE
             ${Flatbuffers_INCLUDE_DIR})
 
-set(armnnDelegate_unittest_sources)
-list(APPEND armnnDelegate_unittest_sources
+option(BUILD_UNIT_TESTS "Build unit tests" ON)
+if(BUILD_UNIT_TESTS)
+    set(armnnDelegate_unittest_sources)
+    list(APPEND armnnDelegate_unittest_sources
         src/test/ArmnnDelegateTest.cpp
         src/test/ComparisonTest.cpp
         src/test/ComparisonTestHelper.hpp
@@ -102,19 +104,23 @@ list(APPEND armnnDelegate_unittest_sources
         src/test/QuantizationTest.cpp
         src/test/QuantizationTestHelper.hpp)
 
-add_executable(DelegateUnitTests ${armnnDelegate_unittest_sources})
-target_include_directories(DelegateUnitTests PRIVATE third-party)
+    add_executable(DelegateUnitTests ${armnnDelegate_unittest_sources})
+    target_include_directories(DelegateUnitTests PRIVATE third-party)
 
-target_link_libraries(DelegateUnitTests armnnDelegate)
-target_link_libraries(DelegateUnitTests Armnn::armnnUtils)
+    # Add half library from armnn third-party libraries
+    target_include_directories(DelegateUnitTests PRIVATE ${ARMNN_SOURCE_DIR}/third-party)
 
-target_include_directories(DelegateUnitTests
+    target_link_libraries(DelegateUnitTests armnnDelegate)
+    target_link_libraries(DelegateUnitTests Armnn::armnnUtils)
+
+    target_include_directories(DelegateUnitTests
         PRIVATE
             ${TfLite_INCLUDE_DIR})
 
-target_include_directories(DelegateUnitTests
+    target_include_directories(DelegateUnitTests
         PRIVATE
             ${Flatbuffers_INCLUDE_DIR})
+endif()
 
 ####################################################
 ## Export targets

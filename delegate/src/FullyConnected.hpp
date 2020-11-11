@@ -165,13 +165,13 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
                                             biasTensorInfo,
                                             armnn::Optional<armnn::PermutationVector&>());
         layer = delegateData.m_Network->AddFullyConnectedLayer(descriptor,
-                                                               weightsTensor.first,
-                                                               armnn::Optional<armnn::ConstTensor>(biasTensor.first));
+                                                               weightsTensor,
+                                                               armnn::Optional<armnn::ConstTensor>(biasTensor));
     }
     else
     {
         layer = delegateData.m_Network->AddFullyConnectedLayer(descriptor,
-                                                               weightsTensor.first,
+                                                               weightsTensor,
                                                                armnn::EmptyOptional());
     }
     ARMNN_ASSERT(layer != nullptr);

@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_08" # Release 20.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="5f2fb59054aee2ec190d72accdb45f852caf4b87" #COMPMID-3792: Graph examples crash on bare-metal
+DEFAULT_CLFRAMEWORKREVISION="d7341fb9e3b24b904edf7ac9d83e1e063bc77765" #COMPMID-3960: Mismatch on NEArithmeticSubtraction
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

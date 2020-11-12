@@ -65,7 +65,7 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
     const bool isFastMathEnabled)
     : BaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
 {
-    using arm_compute::NEDirectConvolutionLayer;
+    using arm_compute::NEConvolutionLayer;
 
     m_Data.ValidateInputsOutputs("NeonConvolution2dWorkload", 1, 1);
 

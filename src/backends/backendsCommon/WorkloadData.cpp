@@ -230,7 +230,7 @@ void ValidateBiasTensorQuantization(const TensorInfo& biasTensor,
             to_string(biasTensor.GetQuantizationOffset()));
     }
 
-    if (biasTensor.HasMultipleQuantizationScales())
+    if (biasTensor.HasMultipleQuantizationScales() || weightsTensorInfo.HasMultipleQuantizationScales())
     {
         // Validate per-axis quantization scales
         const std::vector<float>& weightScales = weightsTensorInfo.GetQuantizationScales();
@@ -239,8 +239,9 @@ void ValidateBiasTensorQuantization(const TensorInfo& biasTensor,
         if (weightScales.size() != biasScales.size())
         {
             std::stringstream msg;
-            msg << descName << ": Expected matchhing number of per-axis quantization scales, but got different "
-                << "values: weights=" << weightScales.size()  << ", biases=" << biasScales.size();
+            msg << descName << ": Expected matching number of per-axis quantization scales for weights and bias, "
+                << "but got different values. This is currently unsupported: weights=" << weightScales.size()
+                << ", biases=" << biasScales.size();
             throw InvalidArgumentException(msg.str(), CHECK_LOCATION());
         }
 

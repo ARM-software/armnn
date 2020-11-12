@@ -137,6 +137,10 @@ if (BUILD_TF_LITE_PARSER)
         addDllCopyCommands(${testName})
     endmacro()
 
+    set(TfLiteBenchmark-Armnn_sources
+        TfLiteBenchmark-Armnn/TfLiteBenchmark-Armnn.cpp)
+    TfLiteParserTest(TfLiteBenchmark-Armnn "${TfLiteBenchmark-Armnn_sources}")
+
     set(TfLiteMobilenetQuantized-Armnn_sources
         TfLiteMobilenetQuantized-Armnn/TfLiteMobilenetQuantized-Armnn.cpp
         ImagePreprocessor.hpp

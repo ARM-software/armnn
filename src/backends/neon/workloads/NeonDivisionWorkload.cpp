@@ -6,23 +6,31 @@
 #include "NeonDivisionWorkload.hpp"
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
+
 #include <armnn/utility/PolymorphicDowncast.hpp>
+
 #include <backendsCommon/CpuTensorHandle.hpp>
 
 namespace armnn
 {
 
 arm_compute::Status NeonDivisionWorkloadValidate(const TensorInfo& input0,
-                                                const TensorInfo& input1,
-                                                const TensorInfo& output)
+                                                 const TensorInfo& input1,
+                                                 const TensorInfo& output,
+                                                 const ActivationDescriptor* activationDescriptor)
 {
     const arm_compute::TensorInfo aclInput0 = armcomputetensorutils::BuildArmComputeTensorInfo(input0);
     const arm_compute::TensorInfo aclInput1 = armcomputetensorutils::BuildArmComputeTensorInfo(input1);
     const arm_compute::TensorInfo aclOutput = armcomputetensorutils::BuildArmComputeTensorInfo(output);
 
+    const arm_compute::ActivationLayerInfo activationInfo = ConvertActivationDescriptorToAclActivationLayerInfo(
+            activationDescriptor);
+
     return arm_compute::NEElementwiseDivision::validate(&aclInput0,
-                                                   &aclInput1,
-                                                   &aclOutput);
+                                                        &aclInput1,
+                                                        &aclOutput,
+                                                        activationInfo);
 }
 
 NeonDivisionWorkload::NeonDivisionWorkload(const DivisionQueueDescriptor& descriptor,
@@ -35,7 +43,9 @@ NeonDivisionWorkload::NeonDivisionWorkload(const DivisionQueueDescriptor& descri
     arm_compute::ITensor& input1 = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_DivLayer.configure(&input0, &input1, &output);
+    const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
+
+    m_DivLayer.configure(&input0, &input1, &output, activationInfo);
 }
 
 void NeonDivisionWorkload::Execute() const

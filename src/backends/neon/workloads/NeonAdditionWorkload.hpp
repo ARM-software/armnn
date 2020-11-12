@@ -8,6 +8,7 @@
 #include <backendsCommon/Workload.hpp>
 
 #include <arm_compute/core/Error.h>
+#include <arm_compute/core/Types.h>
 #include <arm_compute/runtime/IFunction.h>
 
 namespace armnn
@@ -15,7 +16,8 @@ namespace armnn
 
 arm_compute::Status NeonAdditionWorkloadValidate(const TensorInfo& input0,
                                                  const TensorInfo& input1,
-                                                 const TensorInfo& output);
+                                                 const TensorInfo& output,
+                                                 const ActivationDescriptor* activationDescriptor = nullptr);
 
 class NeonAdditionWorkload : public BaseWorkload<AdditionQueueDescriptor>
 {

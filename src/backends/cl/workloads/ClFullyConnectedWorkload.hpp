@@ -19,7 +19,8 @@ arm_compute::Status ClFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                      const TensorInfo& output,
                                                      const TensorInfo& weights,
                                                      const TensorInfo& biases,
-                                                     const FullyConnectedDescriptor& descriptor);
+                                                     const FullyConnectedDescriptor& descriptor,
+                                                     const ActivationDescriptor* activationDescriptor = nullptr);
 
 class ClFullyConnectedWorkload : public armnn::BaseWorkload<armnn::FullyConnectedQueueDescriptor>
 {

@@ -370,6 +370,7 @@ LOCAL_SRC_FILES := \
         src/armnn/test/optimizations/ConvertConstantsHalfToFloatTests.cpp \
         src/armnn/test/optimizations/Fp32NetworkToBf16ConverterTests.cpp \
         src/armnn/test/optimizations/Fp32NetworkToFp16ConverterTests.cpp \
+        src/armnn/test/optimizations/FuseActivationTests.cpp \
         src/armnn/test/optimizations/InsertDebugLayerTests.cpp \
         src/armnn/test/optimizations/MovePermuteUpTests.cpp \
         src/armnn/test/optimizations/OptimizeConsecutiveReshapesTests.cpp \

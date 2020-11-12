@@ -21,7 +21,8 @@ arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                        const TensorInfo& output,
                                                        const TensorInfo& weights,
                                                        const TensorInfo& biases,
-                                                       const FullyConnectedDescriptor& descriptor);
+                                                       const FullyConnectedDescriptor& descriptor,
+                                                       const ActivationDescriptor* activationDescriptor = nullptr);
 
 class NeonFullyConnectedWorkload : public BaseWorkload<FullyConnectedQueueDescriptor>
 {

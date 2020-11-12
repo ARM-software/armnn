@@ -14,7 +14,8 @@ namespace armnn
 
 arm_compute::Status ClMultiplicationWorkloadValidate(const TensorInfo& input0,
                                                      const TensorInfo& input1,
-                                                     const TensorInfo& output);
+                                                     const TensorInfo& output,
+                                                     const ActivationDescriptor* activationDescriptor = nullptr);
 
 class ClMultiplicationWorkload : public BaseWorkload<MultiplicationQueueDescriptor>
 {

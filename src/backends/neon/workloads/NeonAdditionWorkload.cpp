@@ -7,6 +7,8 @@
 #include "NeonWorkloadUtils.hpp"
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
+
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 
@@ -17,16 +19,21 @@ namespace armnn
 
 arm_compute::Status NeonAdditionWorkloadValidate(const TensorInfo& input0,
                                                  const TensorInfo& input1,
-                                                 const TensorInfo& output)
+                                                 const TensorInfo& output,
+                                                 const ActivationDescriptor* activationDescriptor)
 {
     const arm_compute::TensorInfo aclInput0 = armcomputetensorutils::BuildArmComputeTensorInfo(input0);
     const arm_compute::TensorInfo aclInput1 = armcomputetensorutils::BuildArmComputeTensorInfo(input1);
     const arm_compute::TensorInfo aclOutput = armcomputetensorutils::BuildArmComputeTensorInfo(output);
 
+    const arm_compute::ActivationLayerInfo activationInfo = ConvertActivationDescriptorToAclActivationLayerInfo(
+            activationDescriptor);
+
     return arm_compute::NEArithmeticAddition::validate(&aclInput0,
                                                        &aclInput1,
                                                        &aclOutput,
-                                                       arm_compute::ConvertPolicy::SATURATE);
+                                                       arm_compute::ConvertPolicy::SATURATE,
+                                                       activationInfo);
 }
 
 
@@ -40,8 +47,10 @@ NeonAdditionWorkload::NeonAdditionWorkload(const AdditionQueueDescriptor& descri
     arm_compute::ITensor& input2 = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
+    const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
+
     auto layer = std::make_unique<arm_compute::NEArithmeticAddition>();
-    layer->configure(&input1, &input2, &output, arm_compute::ConvertPolicy::SATURATE);
+    layer->configure(&input1, &input2, &output, arm_compute::ConvertPolicy::SATURATE, activationInfo);
     m_AddLayer.reset(layer.release());
 }
 

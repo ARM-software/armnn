@@ -18,7 +18,8 @@ arm_compute::Status ClDepthwiseConvolutionWorkloadValidate(const TensorInfo& inp
                                                            const TensorInfo& output,
                                                            const DepthwiseConvolution2dDescriptor& descriptor,
                                                            const TensorInfo& weights,
-                                                           const Optional<TensorInfo>& biases);
+                                                           const Optional<TensorInfo>& biases,
+                                                           const ActivationDescriptor* activationDescriptor = nullptr);
 
 class ClDepthwiseConvolutionWorkload : public BaseWorkload<DepthwiseConvolution2dQueueDescriptor>
 {

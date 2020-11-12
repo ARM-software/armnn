@@ -36,7 +36,7 @@ struct QueueDescriptor
                                unsigned int numExpectedOut) const;
 
     template<typename T>
-    const T* GetAdditionalInformation()
+    const T* GetAdditionalInformation() const
     {
         return static_cast<T*>(m_AdditionalInfoObject);
     }

@@ -6,6 +6,7 @@
 #include "NeonConvolution2dWorkload.hpp"
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <neon/workloads/NeonWorkloadUtils.hpp>
@@ -25,7 +26,8 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
                                                       const Convolution2dDescriptor& descriptor,
                                                       const TensorInfo& weights,
                                                       const Optional<TensorInfo>& biases,
-                                                      bool isFastMathEnabled)
+                                                      bool isFastMathEnabled,
+                                                      const ActivationDescriptor* activationDescriptor)
 {
     const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
@@ -47,6 +49,9 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
 
     arm_compute::PadStrideInfo layerInfo = BuildArmComputePadStrideInfo(descriptor);
 
+    const arm_compute::ActivationLayerInfo activationInfo = ConvertActivationDescriptorToAclActivationLayerInfo(
+            activationDescriptor);
+
     return arm_compute::NEConvolutionLayer::validate(&aclInputInfo,
                                                      &aclWeightsInfo,
                                                      optionalAclBiasesInfo,
@@ -54,7 +59,7 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
                                                      layerInfo,
                                                      arm_compute::WeightsInfo(),
                                                      aclDilationInfo,
-                                                     arm_compute::ActivationLayerInfo(),
+                                                     activationInfo,
                                                      isFastMathEnabled);
 }
 
@@ -92,6 +97,8 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
     const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(m_Data.m_Parameters.m_DilationX,
                                                                       m_Data.m_Parameters.m_DilationY);
 
+    const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
+
     auto convolutionLayer = std::make_unique<arm_compute::NEConvolutionLayer>(memoryManager);
     convolutionLayer->configure(&input,
                                 m_KernelTensor.get(),
@@ -100,7 +107,7 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
                                 padStrideInfo,
                                 arm_compute::WeightsInfo(),
                                 aclDilationInfo,
-                                arm_compute::ActivationLayerInfo(),
+                                activationInfo,
                                 isFastMathEnabled);
 
     m_ConvolutionMethod =
@@ -110,7 +117,7 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
                                                  padStrideInfo,
                                                  arm_compute::WeightsInfo(),
                                                  aclDilationInfo,
-                                                 arm_compute::ActivationLayerInfo(),
+                                                 activationInfo,
                                                  isFastMathEnabled);
 
     m_ConvolutionLayer.reset(convolutionLayer.release());

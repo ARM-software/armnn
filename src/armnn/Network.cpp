@@ -537,6 +537,7 @@ BackendsMap CreateSupportedBackends(TensorHandleFactoryRegistry& handleFactoryRe
 OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
                                              BackendSettings& backendSettings,
                                              BackendsMap& backends,
+                                             const ModelOptions& modelOptions,
                                              Optional<std::vector<std::string>&> errMessages)
 {
     ARMNN_ASSERT(optNetObjPtr);
@@ -572,7 +573,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
         for (auto& subgraph : subgraphs)
         {
             // Try to optimize the current sub-graph
-            OptimizationViews optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraph);
+            OptimizationViews optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraph, modelOptions);
             ARMNN_ASSERT(optimizationViews.Validate(*subgraph));
 
             // Optimization attempted, check the resulting optimized sub-graph
@@ -1111,6 +1112,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     OptimizationResult backendOptimizationResult = ApplyBackendOptimizations(optNetObjPtr,
                                                                              backendSettings,
                                                                              backends,
+                                                                             options.m_ModelOptions,
                                                                              messages);
     if (backendOptimizationResult.m_Error)
     {

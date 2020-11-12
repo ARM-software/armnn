@@ -19,7 +19,9 @@ arm_compute::Status NeonDepthwiseConvolutionWorkloadValidate(const TensorInfo& i
                                                              const TensorInfo& output,
                                                              const DepthwiseConvolution2dDescriptor& descriptor,
                                                              const TensorInfo& weights,
-                                                             const Optional<TensorInfo>& biases);
+                                                             const Optional<TensorInfo>& biases,
+                                                             const ActivationDescriptor* activationDescriptor
+                                                                     = nullptr);
 
 class NeonDepthwiseConvolutionWorkload : public BaseWorkload<DepthwiseConvolution2dQueueDescriptor>
 {

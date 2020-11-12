@@ -147,6 +147,9 @@ public:
 
     virtual OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const;
 
+    virtual OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph,
+                                                   const ModelOptions& modelOptions) const;
+
     bool SupportsTensorAllocatorAPI() const;
 
     ITensorHandleFactory::FactoryId GetBackwardCompatibleFavoriteHandleFactory();

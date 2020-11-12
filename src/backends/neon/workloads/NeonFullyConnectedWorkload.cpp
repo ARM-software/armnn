@@ -6,9 +6,12 @@
 #include "NeonFullyConnectedWorkload.hpp"
 
 #include "NeonWorkloadUtils.hpp"
+
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>
+
 #include <armnn/utility/PolymorphicDowncast.hpp>
+
 #include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <arm_compute/runtime/NEON/functions/NEFullyConnectedLayer.h>
@@ -21,7 +24,8 @@ arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                        const TensorInfo& output,
                                                        const TensorInfo& weights,
                                                        const TensorInfo& biases,
-                                                       const FullyConnectedDescriptor& descriptor)
+                                                       const FullyConnectedDescriptor& descriptor,
+                                                       const ActivationDescriptor* activationDescriptor)
 {
     const arm_compute::TensorInfo aclInput = BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutput = BuildArmComputeTensorInfo(output);
@@ -36,8 +40,7 @@ arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
     }
 
     const arm_compute::FullyConnectedLayerInfo fullyConnectedLayerInfo =
-        ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor);
-
+        ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor, activationDescriptor);
 
     return arm_compute::NEFullyConnectedLayer::validate(&aclInput,
                                                         &aclWeights,
@@ -64,9 +67,10 @@ NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueue
         BuildArmComputeTensor(*m_BiasesTensor, m_Data.m_Bias->GetTensorInfo());
     }
 
-    // Construct
-    arm_compute::FullyConnectedLayerInfo fc_info;
-    fc_info.transpose_weights = m_Data.m_Parameters.m_TransposeWeightMatrix;
+    const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
+
+    arm_compute::FullyConnectedLayerInfo fc_info  =
+            ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor.m_Parameters, activationInfo);
 
     auto layer = std::make_unique<arm_compute::NEFullyConnectedLayer>(memoryManager);
     layer->configure(&input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output, fc_info);

@@ -26,7 +26,6 @@ std::unique_ptr<IWorkload> FullyConnectedLayer::CreateWorkload(const IWorkloadFa
 
     FullyConnectedQueueDescriptor descriptor;
 
-    SetAdditionalInfo(descriptor);
     descriptor.m_Weight = m_Weight.get();
     if (m_Param.m_BiasEnabled)
     {

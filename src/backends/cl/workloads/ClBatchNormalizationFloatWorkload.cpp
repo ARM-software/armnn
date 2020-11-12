@@ -4,12 +4,16 @@
 //
 
 #include "ClBatchNormalizationFloatWorkload.hpp"
-#include <cl/ClTensorHandle.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
-#include <aclCommon/ArmComputeTensorUtils.hpp>
-#include <cl/ClLayerSupport.hpp>
-
 #include "ClWorkloadUtils.hpp"
+
+#include <cl/ClTensorHandle.hpp>
+
+#include <backendsCommon/CpuTensorHandle.hpp>
+
+#include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
+
+#include <cl/ClLayerSupport.hpp>
 
 namespace armnn
 {
@@ -21,7 +25,8 @@ arm_compute::Status ClBatchNormalizationValidate(const TensorInfo& input,
                                                  const TensorInfo& var,
                                                  const TensorInfo& beta,
                                                  const TensorInfo& gamma,
-                                                 const BatchNormalizationDescriptor &desc)
+                                                 const BatchNormalizationDescriptor& desc,
+                                                 const ActivationDescriptor* activationDescriptor)
 {
     const arm_compute::TensorInfo aclInputInfo =
           armcomputetensorutils::BuildArmComputeTensorInfo(input, desc.m_DataLayout);
@@ -36,13 +41,17 @@ arm_compute::Status ClBatchNormalizationValidate(const TensorInfo& input,
     const arm_compute::TensorInfo aclGammaInfo =
           armcomputetensorutils::BuildArmComputeTensorInfo(gamma, desc.m_DataLayout);
 
+    const arm_compute::ActivationLayerInfo activationInfo = ConvertActivationDescriptorToAclActivationLayerInfo(
+            activationDescriptor);
+
     return arm_compute::CLBatchNormalizationLayer::validate(&aclInputInfo,
                                                             &aclOutputInfo,
                                                             &aclMeanInfo,
                                                             &aclVarInfo,
                                                             &aclBetaInfo,
                                                             &aclGammaInfo,
-                                                            desc.m_Eps);
+                                                            desc.m_Eps,
+                                                            activationInfo);
 }
 
 ClBatchNormalizationFloatWorkload::ClBatchNormalizationFloatWorkload(
@@ -70,13 +79,16 @@ ClBatchNormalizationFloatWorkload::ClBatchNormalizationFloatWorkload(
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
+    const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
+
     m_Layer.configure(&input,
                       &output,
                       m_Mean.get(),
                       m_Variance.get(),
                       m_Beta.get(),
                       m_Gamma.get(),
-                      m_Data.m_Parameters.m_Eps);
+                      m_Data.m_Parameters.m_Eps,
+                      activationInfo);
 
     InitializeArmComputeClTensorData(*m_Mean, m_Data.m_Mean);
     InitializeArmComputeClTensorData(*m_Variance, m_Data.m_Variance);

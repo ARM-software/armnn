@@ -7,6 +7,7 @@ list(APPEND armnnAclCommon_sources
     ArmComputeTensorHandle.hpp
     ArmComputeTensorUtils.hpp
     ArmComputeTensorUtils.cpp
+    ArmComputeSubgraphUtils.hpp
     ArmComputeUtils.hpp
     BaseMemoryManager.cpp
     BaseMemoryManager.hpp

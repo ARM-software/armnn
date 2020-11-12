@@ -20,7 +20,8 @@ arm_compute::Status ClFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                      const TensorInfo& output,
                                                      const TensorInfo& weights,
                                                      const TensorInfo& biases,
-                                                     const FullyConnectedDescriptor& descriptor)
+                                                     const FullyConnectedDescriptor& descriptor,
+                                                     const ActivationDescriptor* activationDescriptor)
 {
     const arm_compute::TensorInfo aclInput = BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutput = BuildArmComputeTensorInfo(output);
@@ -35,7 +36,7 @@ arm_compute::Status ClFullyConnectedWorkloadValidate(const TensorInfo& input,
     }
 
     const arm_compute::FullyConnectedLayerInfo fullyConnectedLayerInfo =
-        ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor);
+        ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor, activationDescriptor);
 
     return arm_compute::CLFullyConnectedLayer::validate(&aclInput,
                                                         &aclWeights,
@@ -63,9 +64,11 @@ ClFullyConnectedWorkload::ClFullyConnectedWorkload(const FullyConnectedQueueDesc
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    // Construct
-    arm_compute::FullyConnectedLayerInfo fc_info;
-    fc_info.transpose_weights = m_Data.m_Parameters.m_TransposeWeightMatrix;
+    const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
+
+    arm_compute::FullyConnectedLayerInfo fc_info =
+            ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor.m_Parameters, activationInfo);
+
     m_FullyConnectedLayer.configure(&input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output, fc_info);
 
     InitializeArmComputeClTensorData(*m_WeightsTensor, m_Data.m_Weight);

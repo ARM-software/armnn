@@ -21,7 +21,8 @@ arm_compute::Status NeonBatchNormalizationValidate(const TensorInfo& input,
                                                    const TensorInfo& var,
                                                    const TensorInfo& beta,
                                                    const TensorInfo& gamma,
-                                                   const BatchNormalizationDescriptor& descriptor);
+                                                   const BatchNormalizationDescriptor& descriptor,
+                                                   const ActivationDescriptor* activationDescriptor = nullptr);
 
 class NeonBatchNormalizationWorkload : public BaseWorkload<BatchNormalizationQueueDescriptor>
 {

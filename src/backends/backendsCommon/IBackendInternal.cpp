@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <armnn/BackendOptions.hpp>
 #include <armnn/backends/IBackendInternal.hpp>
 
 namespace armnn
@@ -133,6 +134,12 @@ OptimizationViews IBackendInternal::OptimizeSubgraphView(const SubgraphView& sub
     }
 
     return result;
+}
+
+OptimizationViews IBackendInternal::OptimizeSubgraphView(const SubgraphView& subgraph,
+                                                         const ModelOptions& /*modelOptions*/) const
+{
+    return OptimizeSubgraphView(subgraph);
 }
 
 bool IBackendInternal::SupportsTensorAllocatorAPI() const

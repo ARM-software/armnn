@@ -810,10 +810,10 @@ BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnectionsFuseTest)
     std::vector<float> weightsVector = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
     ConstTensor        weights(TensorInfo(4, weightsDimensionSizes, DataType::Float32), weightsVector);
 
-    std::vector<float> betaVector     = {0.1f};
-    std::vector<float> gammaVector    = {0.5f};
-    std::vector<float> meanVector     = {0};
-    std::vector<float> varianceVector = {1};
+    std::vector<float> betaVector     = { 0.1f };
+    std::vector<float> gammaVector    = { 0.5f };
+    std::vector<float> meanVector     = { 0 };
+    std::vector<float> varianceVector = { 1 };
     ConstTensor        beta(TensorInfo(1, outputChannelSize, DataType::Float32), betaVector);
     ConstTensor        gamma(TensorInfo(1, outputChannelSize, DataType::Float32), gammaVector);
     ConstTensor        mean(TensorInfo(1, outputChannelSize, DataType::Float32), meanVector);
@@ -830,7 +830,7 @@ BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnectionsFuseTest)
     input->GetOutputSlot().SetTensorInfo(inputInfo);
     conv->GetOutputSlot().SetTensorInfo(outputInfo);
     batchNorm->GetOutputSlot().SetTensorInfo(outputInfo);
-    conv     ->m_Weight   = std::make_unique<ScopedCpuTensorHandle>(weights);
+    conv->m_Weight        = std::make_unique<ScopedCpuTensorHandle>(weights);
     batchNorm->m_Beta     = std::make_unique<ScopedCpuTensorHandle>(beta);
     batchNorm->m_Gamma    = std::make_unique<ScopedCpuTensorHandle>(gamma);
     batchNorm->m_Mean     = std::make_unique<ScopedCpuTensorHandle>(mean);
@@ -843,9 +843,9 @@ BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnectionsFuseTest)
     }
 
     // Connect layers
-    input     ->GetOutputSlot(0).Connect(conv     ->GetInputSlot(0));
-    conv      ->GetOutputSlot(0).Connect(batchNorm->GetInputSlot(0));
-    batchNorm ->GetOutputSlot(0).Connect(output   ->GetInputSlot(0));
+    input->GetOutputSlot(0).Connect(conv->GetInputSlot(0));
+    conv->GetOutputSlot(0).Connect(batchNorm->GetInputSlot(0));
+    batchNorm->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
     BOOST_CHECK(4 == graph.GetNumLayers());
     BOOST_TEST(CheckSequence(graph.cbegin(),
@@ -887,10 +887,10 @@ BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnectionsWithoutFuseTest)
     auto output2   = graph.AddLayer<OutputLayer>(1, "output2");
 
     // Connect layers
-    input     ->GetOutputSlot(0).Connect(conv     ->GetInputSlot(0));
-    conv      ->GetOutputSlot(0).Connect(batchNorm->GetInputSlot(0));
-    batchNorm ->GetOutputSlot(0).Connect(output   ->GetInputSlot(0));
-    conv      ->GetOutputSlot(0).Connect(output2  ->GetInputSlot(0));
+    input->GetOutputSlot(0).Connect(conv->GetInputSlot(0));
+    conv->GetOutputSlot(0).Connect(batchNorm->GetInputSlot(0));
+    batchNorm->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+    conv->GetOutputSlot(0).Connect(output2->GetInputSlot(0));
 
     BOOST_CHECK(5 == graph.GetNumLayers());
     BOOST_TEST(CheckSequence(graph.cbegin(),

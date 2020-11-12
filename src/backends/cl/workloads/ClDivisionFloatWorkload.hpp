@@ -14,7 +14,8 @@ namespace armnn
 
 arm_compute::Status ClDivisionWorkloadValidate(const TensorInfo& input0,
                                                const TensorInfo& input1,
-                                               const TensorInfo& output);
+                                               const TensorInfo& output,
+                                               const ActivationDescriptor* activationDescriptor = nullptr);
 
 class ClDivisionFloatWorkload : public FloatWorkload<DivisionQueueDescriptor>
 {

@@ -10,6 +10,7 @@
 #include <armnnUtils/DataLayoutIndexed.hpp>
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
 
 #include <neon/NeonLayerSupport.hpp>
 
@@ -29,7 +30,8 @@ arm_compute::Status NeonDepthwiseConvolutionWorkloadValidate(const TensorInfo& i
                                                              const TensorInfo& output,
                                                              const DepthwiseConvolution2dDescriptor& descriptor,
                                                              const TensorInfo& weights,
-                                                             const Optional<TensorInfo>& biases)
+                                                             const Optional<TensorInfo>& biases,
+                                                             const ActivationDescriptor* activationDescriptor)
 {
     const arm_compute::TensorInfo aclInputInfo  = BuildArmComputeTensorInfo(input,  descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
@@ -59,13 +61,16 @@ arm_compute::Status NeonDepthwiseConvolutionWorkloadValidate(const TensorInfo& i
     const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(
             descriptor.m_DilationX,descriptor.m_DilationY);
 
+    const arm_compute::ActivationLayerInfo activationInfo = ConvertActivationDescriptorToAclActivationLayerInfo(
+            activationDescriptor);
+
     return arm_compute::NEDepthwiseConvolutionLayer::validate(&aclInputInfo,
                                                               &aclWeightsInfo,
                                                               optionalAclBiasesInfo,
                                                               &aclOutputInfo,
                                                               aclPadStrideInfo,
                                                               aclDepthMultiplier,
-                                                              arm_compute::ActivationLayerInfo(),
+                                                              activationInfo,
                                                               aclDilationInfo);
 }
 
@@ -116,16 +121,18 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
 
     arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
 
+    const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
+
     m_pDepthwiseConvolutionLayer = std::make_unique<arm_compute::NEDepthwiseConvolutionLayer>();
     static_cast<arm_compute::NEDepthwiseConvolutionLayer*>(
         m_pDepthwiseConvolutionLayer.get())->configure(&input,
-                                                        m_KernelTensor.get(),
-                                                        m_BiasTensor.get(),
-                                                        &output,
-                                                        padStrideInfo,
-                                                        depthMultiplier,
-                                                        arm_compute::ActivationLayerInfo(),
-                                                        aclDilationInfo);
+                                                       m_KernelTensor.get(),
+                                                       m_BiasTensor.get(),
+                                                       &output,
+                                                       padStrideInfo,
+                                                       depthMultiplier,
+                                                       activationInfo,
+                                                       aclDilationInfo);
 
     ARMNN_ASSERT(m_pDepthwiseConvolutionLayer);
 

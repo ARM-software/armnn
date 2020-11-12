@@ -13,8 +13,9 @@ namespace armnn
 {
 
 arm_compute::Status NeonDivisionWorkloadValidate(const TensorInfo& input0,
-                                                const TensorInfo& input1,
-                                                const TensorInfo& output);
+                                                 const TensorInfo& input1,
+                                                 const TensorInfo& output,
+                                                 const ActivationDescriptor* activationDescriptor = nullptr);
 
 class NeonDivisionWorkload : public BaseWorkload<DivisionQueueDescriptor>
 {

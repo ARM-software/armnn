@@ -9,6 +9,8 @@
 #include <armnn/utility/Assert.hpp>
 
 #include <arm_compute/core/Types.h>
+#include "../../../../clframework/arm_compute/core/Types.h"
+#include "../backendsCommon/WorkloadData.hpp"
 
 namespace armnn
 {
@@ -77,6 +79,30 @@ ConvertActivationDescriptorToAclActivationLayerInfo(const ActivationDescriptor& 
         actDesc.m_A, actDesc.m_B);
 }
 
+inline arm_compute::ActivationLayerInfo
+ConvertActivationDescriptorToAclActivationLayerInfo(const ActivationDescriptor* activationDescPtr)
+{
+    if (activationDescPtr != nullptr)
+    {
+        return ConvertActivationDescriptorToAclActivationLayerInfo(static_cast<ActivationDescriptor>(
+                                                                           *activationDescPtr));
+    }
+    return arm_compute::ActivationLayerInfo();
+}
+
+inline arm_compute::ActivationLayerInfo
+ConvertAdditionalInfoToAclActivationLayerInfo(const QueueDescriptor& queueDescriptor)
+{
+    const ActivationDescriptor* activationDescPtr = queueDescriptor.GetAdditionalInformation<ActivationDescriptor>();
+
+    if (activationDescPtr != nullptr)
+    {
+        return ConvertActivationDescriptorToAclActivationLayerInfo(static_cast<ActivationDescriptor>(
+                *activationDescPtr));
+    }
+    return arm_compute::ActivationLayerInfo();
+}
+
 inline arm_compute::ComparisonOperation ConvertComparisonOperationToAcl(const ComparisonDescriptor& descriptor)
 {
     switch (descriptor.m_Operation)
@@ -130,10 +156,22 @@ ConvertNormalizationAlgorithmChannelToAclNormType(NormalizationAlgorithmChannel 
 }
 
 inline arm_compute::FullyConnectedLayerInfo
-ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(const FullyConnectedDescriptor& fullyConnectedDesc)
+ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(const FullyConnectedDescriptor& fullyConnectedDesc,
+                                                            const ActivationDescriptor* activationDesc)
 {
     arm_compute::FullyConnectedLayerInfo fc_info;
     fc_info.transpose_weights = fullyConnectedDesc.m_TransposeWeightMatrix;
+    fc_info.activation_info = ConvertActivationDescriptorToAclActivationLayerInfo(activationDesc);
+    return fc_info;
+}
+
+inline arm_compute::FullyConnectedLayerInfo
+ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(const FullyConnectedDescriptor& fullyConnectedDesc,
+        arm_compute::ActivationLayerInfo activationLayerInfo)
+{
+    arm_compute::FullyConnectedLayerInfo fc_info;
+    fc_info.transpose_weights = fullyConnectedDesc.m_TransposeWeightMatrix;
+    fc_info.activation_info = activationLayerInfo;
     return fc_info;
 }
 

@@ -167,7 +167,8 @@ bool NeonLayerSupport::IsAdditionSupported(const TensorInfo& input0,
                                    reasonIfUnsupported,
                                    input0,
                                    input1,
-                                   output);
+                                   output,
+                                   nullptr);
 }
 
 bool NeonLayerSupport::IsArgMinMaxSupported(const TensorInfo& input,
@@ -199,7 +200,8 @@ bool NeonLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
                                    var,
                                    beta,
                                    gamma,
-                                   descriptor);
+                                   descriptor,
+                                   nullptr);
 }
 
 bool NeonLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
@@ -345,7 +347,8 @@ bool NeonLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
                                    descriptor,
                                    weights,
                                    biases,
-                                   isFastMathEnabled);
+                                   isFastMathEnabled,
+                                   nullptr);
 }
 
 bool NeonLayerSupport::IsDepthToSpaceSupported(const TensorInfo& input,
@@ -373,7 +376,8 @@ bool NeonLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                    output,
                                    descriptor,
                                    weights,
-                                   biases);
+                                   biases,
+                                   nullptr);
 }
 
 bool NeonLayerSupport::IsDequantizeSupported(const TensorInfo& input,
@@ -399,7 +403,8 @@ bool NeonLayerSupport::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& 
                                    output,
                                    descriptor,
                                    weights,
-                                   biases);
+                                   biases,
+                                   nullptr);
 }
 
 bool NeonLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
@@ -474,7 +479,8 @@ bool NeonLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
                                    output,
                                    weights,
                                    biases,
-                                   descriptor);
+                                   descriptor,
+                                   nullptr);
 }
 
 bool NeonLayerSupport::IsGatherSupported(const TensorInfo& input0,
@@ -611,7 +617,8 @@ bool NeonLayerSupport::IsMultiplicationSupported(const TensorInfo& input0,
                                    reasonIfUnsupported,
                                    input0,
                                    input1,
-                                   output);
+                                   output,
+                                   nullptr);
 }
 
 bool NeonLayerSupport::IsDivisionSupported(const TensorInfo& input0,
@@ -623,7 +630,8 @@ bool NeonLayerSupport::IsDivisionSupported(const TensorInfo& input0,
                                    reasonIfUnsupported,
                                    input0,
                                    input1,
-                                   output);
+                                   output,
+                                   nullptr);
 }
 
 bool NeonLayerSupport::IsNormalizationSupported(const TensorInfo& input,
@@ -911,7 +919,8 @@ bool NeonLayerSupport::IsSubtractionSupported(const TensorInfo& input0,
                                    reasonIfUnsupported,
                                    input0,
                                    input1,
-                                   output);
+                                   output,
+                                   nullptr);
 }
 
 bool NeonLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,

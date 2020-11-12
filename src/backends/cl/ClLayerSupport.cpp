@@ -197,7 +197,8 @@ bool ClLayerSupport::IsAdditionSupported(const TensorInfo& input0,
                                    reasonIfUnsupported,
                                    input0,
                                    input1,
-                                   output);
+                                   output,
+                                   nullptr);
 }
 
 bool ClLayerSupport::IsArgMinMaxSupported(const TensorInfo& input,
@@ -230,7 +231,8 @@ bool ClLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
                                    var,
                                    beta,
                                    gamma,
-                                   descriptor);
+                                   descriptor,
+                                   nullptr);
 }
 
 bool ClLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
@@ -357,7 +359,8 @@ bool ClLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
                                    descriptor,
                                    weights,
                                    biases,
-                                   isFastMathEnabled);
+                                   isFastMathEnabled,
+                                   nullptr);
 }
 
 bool ClLayerSupport::IsDequantizeSupported(const TensorInfo& input,
@@ -395,7 +398,8 @@ bool ClLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                    output,
                                    descriptor,
                                    weights,
-                                   biases);
+                                   biases,
+                                   nullptr);
 }
 
 bool ClLayerSupport::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& input,
@@ -411,7 +415,8 @@ bool ClLayerSupport::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& in
                                    output,
                                    descriptor,
                                    weights,
-                                   biases);
+                                   biases,
+                                   nullptr);
 }
 
 
@@ -424,7 +429,8 @@ bool ClLayerSupport::IsDivisionSupported(const TensorInfo& input0,
                                    reasonIfUnsupported,
                                    input0,
                                    input1,
-                                   output);
+                                   output,
+                                   nullptr);
 }
 
 bool ClLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
@@ -494,7 +500,8 @@ bool ClLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
                                    output,
                                    weights,
                                    biases,
-                                   descriptor);
+                                   descriptor,
+                                   nullptr);
 }
 
 bool ClLayerSupport::IsGatherSupported(const TensorInfo& input0,
@@ -639,7 +646,8 @@ bool ClLayerSupport::IsMultiplicationSupported(const TensorInfo& input0,
                                    reasonIfUnsupported,
                                    input0,
                                    input1,
-                                   output);
+                                   output,
+                                   nullptr);
 }
 
 bool ClLayerSupport::IsNormalizationSupported(const TensorInfo& input,
@@ -911,7 +919,8 @@ bool ClLayerSupport::IsSubtractionSupported(const TensorInfo& input0,
                                    reasonIfUnsupported,
                                    input0,
                                    input1,
-                                   output);
+                                   output,
+                                   nullptr);
 }
 
 bool ClLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,

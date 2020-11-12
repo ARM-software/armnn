@@ -21,7 +21,8 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
                                                       const Convolution2dDescriptor& descriptor,
                                                       const TensorInfo& weights,
                                                       const Optional<TensorInfo>& biases,
-                                                      bool isFastMathEnabled = false);
+                                                      bool isFastMathEnabled = false,
+                                                      const ActivationDescriptor* activationDescriptor = nullptr);
 
 class NeonConvolution2dWorkload : public BaseWorkload<Convolution2dQueueDescriptor>
 {

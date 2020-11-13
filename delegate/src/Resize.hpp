@@ -6,6 +6,7 @@
 #pragma once
 
 #include "DelegateUtils.hpp"
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <armnn/Descriptors.hpp>
 

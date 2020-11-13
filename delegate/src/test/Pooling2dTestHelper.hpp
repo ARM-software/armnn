@@ -191,7 +191,7 @@ void Pooling2dTest(tflite::BuiltinOperator poolingOperatorCode,
     auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateOutputId);
     auto armnnDelegateOutputTensor = armnnDelegateInterpreter->tensor(armnnDelegateOutputId);
 
-    for (size_t i = 0; i < tfLiteDelegateOutputTensor->dims->size; i++)
+    for (size_t i = 0; i < static_cast<size_t>(tfLiteDelegateOutputTensor->dims->size); i++)
     {
         CHECK(outputShape[i] == armnnDelegateOutputTensor->dims->data[i]);
         CHECK(tfLiteDelegateOutputTensor->dims->data[i] == armnnDelegateOutputTensor->dims->data[i]);

@@ -70,7 +70,7 @@ TfLiteStatus ValidateNumInputs(TfLiteContext* tfLiteContext,
                                int nodeIndex)
 {
     auto numInputs = tfLiteNode->inputs->size;
-    if (numInputs != expectedSize)
+    if (static_cast<unsigned int >(numInputs) != expectedSize)
     {
         TF_LITE_MAYBE_KERNEL_LOG(
             tfLiteContext, "TfLiteArmnnDelegate: Unexpected number of inputs (%d != %d) in node #%d",
@@ -86,7 +86,7 @@ TfLiteStatus ValidateNumOutputs(TfLiteContext* tfLiteContext,
                                 int nodeIndex)
 {
     auto numOutputs = tfLiteNode->outputs->size;
-    if (numOutputs != expectedSize)
+    if (static_cast<unsigned int >(numOutputs) != expectedSize)
     {
         TF_LITE_MAYBE_KERNEL_LOG(
             tfLiteContext, "TfLiteArmnnDelegate: Unexpected number of outputs (%d != %d) in node #%d",
@@ -137,7 +137,7 @@ TfLiteStatus Connect(armnn::IConnectableLayer* layer,
                      TfLiteNode* tfLiteNode,
                      armnnDelegate::DelegateData& data)
 {
-    ARMNN_ASSERT(tfLiteNode->outputs->size == layer->GetNumOutputSlots());
+    ARMNN_ASSERT(static_cast<unsigned int >(tfLiteNode->outputs->size) == layer->GetNumOutputSlots());
 
     // Connect the input slots
     for (unsigned int inputIndex = 0; inputIndex < layer->GetNumInputSlots(); ++inputIndex)
@@ -152,7 +152,7 @@ TfLiteStatus Connect(armnn::IConnectableLayer* layer,
     for (unsigned int outputIndex = 0; outputIndex < layer->GetNumOutputSlots(); ++outputIndex)
     {
         armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(outputIndex);
-        data.m_OutputSlotForNode[tfLiteNode->outputs->data[outputIndex]] = &outputSlot;
+        data.m_OutputSlotForNode[static_cast<unsigned long>(tfLiteNode->outputs->data[outputIndex])] = &outputSlot;
     }
 
     return kTfLiteOk;
@@ -175,8 +175,8 @@ armnn::IConnectableLayer* BroadcastTensor(const armnn::TensorInfo& inputInfo0,
     }
 
     unsigned int biggerInputDimensions = std::max(inputDimensions0, inputDimensions1);
-    unsigned int dimDifference =
-        std::abs(armnn::numeric_cast<int>(inputDimensions0) - armnn::numeric_cast<int>(inputDimensions1));
+    unsigned int dimDifference = static_cast<unsigned int>(std::abs(armnn::numeric_cast<int>(inputDimensions0) -
+                                                                    armnn::numeric_cast<int>(inputDimensions1)));
 
     bool input0IsSmaller = inputDimensions0 < inputDimensions1;
     const armnn::TensorInfo& smallInfo = input0IsSmaller ? inputInfo0 : inputInfo1;
@@ -217,22 +217,27 @@ armnn::IConnectableLayer* BroadcastTensor(const armnn::TensorInfo& inputInfo0,
 
     if (input0IsSmaller)
     {
-        delegateData.m_OutputSlotForNode[tfLiteNode->inputs->data[0]]->Connect(reshapeLayer->GetInputSlot(0));
+        delegateData.m_OutputSlotForNode[static_cast<unsigned long>(tfLiteNode->inputs->data[0])]
+            ->Connect(reshapeLayer->GetInputSlot(0));
         reshapeLayer->GetOutputSlot(0).Connect(startLayer->GetInputSlot(0));
-        delegateData.m_OutputSlotForNode[tfLiteNode->inputs->data[1]]->Connect(startLayer->GetInputSlot(1));
+        delegateData.m_OutputSlotForNode[static_cast<unsigned long>(tfLiteNode->inputs->data[1])]
+            ->Connect(startLayer->GetInputSlot(1));
     }
     else
     {
-        delegateData.m_OutputSlotForNode[tfLiteNode->inputs->data[1]]->Connect(reshapeLayer->GetInputSlot(0));
+        delegateData.m_OutputSlotForNode[static_cast<unsigned long>(tfLiteNode->inputs->data[1])]
+            ->Connect(reshapeLayer->GetInputSlot(0));
         reshapeLayer->GetOutputSlot(0).Connect(startLayer->GetInputSlot(1));
-        delegateData.m_OutputSlotForNode[tfLiteNode->inputs->data[0]]->Connect(startLayer->GetInputSlot(0));
+        delegateData.m_OutputSlotForNode[static_cast<unsigned long>(tfLiteNode->inputs->data[0])]
+            ->Connect(startLayer->GetInputSlot(0));
     }
 
     // Prepare output slots
     for (unsigned int outputIndex = 0; outputIndex < startLayer->GetNumOutputSlots(); ++outputIndex)
     {
         armnn::IOutputSlot& outputSlot = startLayer->GetOutputSlot(outputIndex);
-        delegateData.m_OutputSlotForNode[tfLiteNode->outputs->data[outputIndex]] = &outputSlot;
+        delegateData.m_OutputSlotForNode
+            [static_cast<unsigned long>(tfLiteNode->outputs->data[outputIndex])] = &outputSlot;
     }
 
     return reshapeLayer;
@@ -246,8 +251,7 @@ TfLiteStatus FusedActivation(TfLiteContext* tfLiteContext,
                              armnnDelegate::DelegateData& data)
 {
 
-    armnn::IOutputSlot& outputSlot = prevLayer->GetOutputSlot(outputSlotIndex);
-    const armnn::TensorInfo& activationOutputInfo = outputSlot.GetTensorInfo();
+    const armnn::TensorInfo& activationOutputInfo = prevLayer->GetOutputSlot(outputSlotIndex).GetTensorInfo();
 
     armnn::ActivationDescriptor activationDesc;
 
@@ -314,9 +318,11 @@ TfLiteStatus FusedActivation(TfLiteContext* tfLiteContext,
     // Connect and prepare output slots
     for (unsigned int outputIndex = 0; outputIndex < activationLayer->GetNumOutputSlots(); ++outputIndex)
     {
-        data.m_OutputSlotForNode[tfLiteNode->outputs->data[outputIndex]]->Connect(activationLayer->GetInputSlot(0));
+        data.m_OutputSlotForNode[static_cast<unsigned long>(
+                tfLiteNode->outputs->data[outputIndex])]->Connect(activationLayer->GetInputSlot(0));
         armnn::IOutputSlot& outputSlot = activationLayer->GetOutputSlot(outputIndex);
-        data.m_OutputSlotForNode[tfLiteNode->outputs->data[outputIndex]] = &outputSlot;
+        data.m_OutputSlotForNode[static_cast<unsigned long>(
+                tfLiteNode->outputs->data[outputIndex])] = &outputSlot;
     }
     return kTfLiteOk;
 }
@@ -347,7 +353,7 @@ armnn::DataType GetDataType(const TfLiteTensor& tfLiteTensor)
         case kTfLiteInt32:
             return armnn::DataType::Signed32;
         default:
-            throw armnn::Exception("TfLiteArmnnDelegate: Unsupported data type: " + tfLiteTensor.type);
+            throw armnn::Exception(&"TfLiteArmnnDelegate: Unsupported data type: " [ tfLiteTensor.type]);
     }
 }
 
@@ -364,17 +370,19 @@ armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor,
     }
     else
     {
-        std::vector<unsigned int> tensorDims(tensorDimensionSize);
+        std::vector<unsigned int> tensorDims(static_cast<unsigned int>(tensorDimensionSize));
         bool dimensionsSpecificity[5] = { true, true, true, true, true };
-        for (unsigned int i = 0; i < tensorDimensionSize; ++i) {
+        for (unsigned int i = 0; i < static_cast<unsigned int>(tensorDimensionSize); ++i) {
             auto dim = tfLiteTensor.dims->data[i];
             if (dim == 0)
             {
                 dimensionsSpecificity[i] = false;
             }
-            tensorDims[i] = dim;
+            tensorDims[i] = static_cast<unsigned int>(dim);
         }
-        armnn::TensorShape tensorShape(tensorDimensionSize, tensorDims.data(), dimensionsSpecificity);
+        armnn::TensorShape tensorShape(static_cast<unsigned int>(tensorDimensionSize),
+                                       tensorDims.data(),
+                                       dimensionsSpecificity);
         ret = armnn::TensorInfo(tensorShape, type);
     }
 
@@ -387,7 +395,7 @@ armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor,
         if (affineQuantization->scale->size > 1)
         {
             std::vector<float> quantizationScales;
-            for (unsigned int i = 1; i < affineQuantization->scale->size; ++i)
+            for (unsigned int i = 1; i < static_cast<unsigned int>(affineQuantization->scale->size); ++i)
             {
                 quantizationScales.push_back(affineQuantization->scale->data[i]);
             }

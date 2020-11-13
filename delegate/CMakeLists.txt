@@ -6,7 +6,7 @@
 cmake_minimum_required (VERSION 3.8.0)
 project(armnnDelegate)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Werror -Wold-style-cast -Wno-missing-braces -Wconversion -Wsign-conversion")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
@@ -72,9 +72,18 @@ find_package(TfLite REQUIRED MODULE)
 target_link_libraries(armnnDelegate
         ${TfLite_LIB})
 
-target_include_directories(armnnDelegate
-        PRIVATE
-            ${TfLite_INCLUDE_DIR})
+# Various tflite header files are not warning clean
+# We can't change compilation flags on header files directly, so we need to add them to an interface library first
+add_library(tflite_headers INTERFACE)
+target_include_directories(tflite_headers INTERFACE $<BUILD_INTERFACE:${TfLite_INCLUDE_DIR}>
+                                                    $<INSTALL_INTERFACE:include/tflite_headers>)
+
+target_compile_options(tflite_headers INTERFACE $<$<CXX_COMPILER_ID:GNU>:-Wno-conversion
+                                                                         -Wno-sign-conversion
+                                                                         -Wno-unused-parameter
+                                                                         -Wno-unused-function>)
+
+target_link_libraries(armnnDelegate tflite_headers)
 
 ## Add Flatbuffers dependency
 find_package(Flatbuffers REQUIRED MODULE)
@@ -82,9 +91,14 @@ find_package(Flatbuffers REQUIRED MODULE)
 target_link_libraries(armnnDelegate
         ${Flatbuffers_LIB})
 
-target_include_directories(armnnDelegate
-        PRIVATE
-            ${Flatbuffers_INCLUDE_DIR})
+# include/flatbuffers/flatbuffers.h is not warning clean
+# We can't change compilation flags on header files directly, so we need to add them to an interface library first
+add_library(flatbuffer_headers INTERFACE)
+target_include_directories(flatbuffer_headers INTERFACE $<BUILD_INTERFACE:${Flatbuffers_INCLUDE_DIR}>
+                                                 $<INSTALL_INTERFACE:include/flatbuffer_headers>)
+target_compile_options(flatbuffer_headers INTERFACE $<$<CXX_COMPILER_ID:GNU>:-Wno-sign-conversion>)
+
+target_link_libraries(armnnDelegate flatbuffer_headers)
 
 option(BUILD_UNIT_TESTS "Build unit tests" ON)
 if(BUILD_UNIT_TESTS)
@@ -121,20 +135,19 @@ if(BUILD_UNIT_TESTS)
     target_link_libraries(DelegateUnitTests armnnDelegate)
     target_link_libraries(DelegateUnitTests Armnn::armnnUtils)
 
-    target_include_directories(DelegateUnitTests
-        PRIVATE
-            ${TfLite_INCLUDE_DIR})
+target_link_libraries(DelegateUnitTests tflite_headers)
 
-    target_include_directories(DelegateUnitTests
-        PRIVATE
-            ${Flatbuffers_INCLUDE_DIR})
+target_link_libraries(DelegateUnitTests flatbuffer_headers)
+
 endif()
 
 ####################################################
 ## Export targets
 set(armnn_delegate_export_targets)
 list(APPEND armnn_delegate_export_targets
-        armnnDelegate)
+            armnnDelegate
+            tflite_headers
+            flatbuffer_headers)
 
 install(
         TARGETS ${armnn_delegate_export_targets}

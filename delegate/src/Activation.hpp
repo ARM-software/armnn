@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <armnn/utility/IgnoreUnused.hpp>
+
 #include <tensorflow/lite/builtin_ops.h>
 #include <tensorflow/lite/c/builtin_op_data.h>
 #include <tensorflow/lite/c/common.h>
@@ -19,6 +21,13 @@ TfLiteStatus VisitActivationOperator(DelegateData& delegateData,
                                      int nodeIndex,
                                      int32_t comparisonOperatorCode)
 {
+    armnn::IgnoreUnused(delegateData,
+                        tfLiteContext,
+                        tfLiteNode,
+                        nodeIndex,
+                        comparisonOperatorCode);
+
+
     return kTfLiteError;
 }
 

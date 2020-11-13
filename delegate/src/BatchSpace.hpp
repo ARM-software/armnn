@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <armnn/utility/IgnoreUnused.hpp>
+
 #include <tensorflow/lite/builtin_ops.h>
 #include <tensorflow/lite/c/builtin_op_data.h>
 #include <tensorflow/lite/c/common.h>
@@ -19,6 +21,11 @@ TfLiteStatus VisitBatchToSpaceNdOperator(DelegateData& delegateData,
                                          int nodeIndex,
                                          int32_t operatorCode)
 {
+    armnn::IgnoreUnused(delegateData,
+                        tfLiteContext,
+                        tfLiteNode,
+                        nodeIndex,
+                        operatorCode);
     return kTfLiteError;
 }
 
@@ -28,6 +35,11 @@ TfLiteStatus VisitSpaceToBatchNdOperator(DelegateData& delegateData,
                                          int nodeIndex,
                                          int32_t operatorCode)
 {
+    armnn::IgnoreUnused(delegateData,
+                        tfLiteContext,
+                        tfLiteNode,
+                        nodeIndex,
+                        operatorCode);
     return kTfLiteError;
 }
 

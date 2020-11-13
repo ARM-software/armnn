@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <armnn/utility/IgnoreUnused.hpp>
+
 #include <tensorflow/lite/builtin_ops.h>
 #include <tensorflow/lite/c/builtin_op_data.h>
 #include <tensorflow/lite/c/common.h>
@@ -31,6 +33,7 @@ TfLiteStatus VisitTransposeOperator(DelegateData& delegateData,
                                  "TfLiteArmnnDelegate: Dynamic input tensors are not supported in "
                                  "operator #%d node #%d: ",
                                  tfliteTransposeOperatorCode, nodeIndex);
+
         return kTfLiteError;
     }
 
@@ -66,7 +69,7 @@ TfLiteStatus VisitTransposeOperator(DelegateData& delegateData,
 
     armnn::TransposeDescriptor descriptor(armnn::PermutationVector(
         reinterpret_cast<const armnn::PermutationVector::ValueType *> (permTensorDataPtr),
-        (armnn::PermutationVector::SizeType)(numEl)));
+        static_cast<armnn::PermutationVector::SizeType>(numEl)));
 
     bool isSupported = false;
 

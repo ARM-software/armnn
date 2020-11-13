@@ -6,6 +6,7 @@
 #pragma once
 
 #include "DelegateUtils.hpp"
+#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <tensorflow/lite/builtin_ops.h>
 #include <tensorflow/lite/c/builtin_op_data.h>
@@ -32,6 +33,7 @@ TfLiteStatus VisitComparisonOperator(DelegateData& delegateData,
             tfLiteContext,
             "TfLiteArmnnDelegate: Dynamic input tensors are not supported in operator #%d node #%d: ",
             tfLiteComparisonOperatorCode, nodeIndex);
+
         return kTfLiteError;
     }
 

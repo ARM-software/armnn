@@ -67,6 +67,7 @@ TfLiteStatus DoPrepare(TfLiteContext* tfLiteContext, TfLiteDelegate* tfLiteDeleg
     static const TfLiteRegistration kArmnnSubgraphRegistration = {
         // ArmnnSubgraph Init
         .init = [](TfLiteContext* tfLiteContext, const char* buffer, size_t length) -> void* {
+            armnn::IgnoreUnused(length);
             const TfLiteDelegateParams* parameters = reinterpret_cast<const TfLiteDelegateParams*>(buffer);
 
             return static_cast<void*>(ArmnnSubgraph::Create(
@@ -74,6 +75,7 @@ TfLiteStatus DoPrepare(TfLiteContext* tfLiteContext, TfLiteDelegate* tfLiteDeleg
         },
         // ArmnnSubgraph Free
         .free = [](TfLiteContext* tfLiteContext, void* buffer) -> void {
+            armnn::IgnoreUnused(tfLiteContext);
             if (buffer != nullptr)
             {
                 delete static_cast<ArmnnSubgraph*>(buffer);
@@ -208,7 +210,7 @@ TfLiteStatus ArmnnSubgraph::AddInputLayer(DelegateData& delegateData,
                                           const TfLiteIntArray* inputs,
                                           std::vector<armnn::BindingPointInfo>& inputBindings)
 {
-    const size_t numInputs = inputs->size;
+    const size_t numInputs = static_cast<size_t>(inputs->size);
     for (unsigned int i = 0; i < numInputs; ++i)
     {
         const int32_t tensorId = inputs->data[i];
@@ -227,7 +229,7 @@ TfLiteStatus ArmnnSubgraph::AddInputLayer(DelegateData& delegateData,
         outputSlot.SetTensorInfo(tensorInfo);
 
         // Store for creating connections
-        delegateData.m_OutputSlotForNode[tensorId] = &outputSlot;
+        delegateData.m_OutputSlotForNode[static_cast<unsigned long>(tensorId)] = &outputSlot;
 
         inputBindings.push_back(std::make_pair(bindingId, tensorInfo));
     }
@@ -240,7 +242,7 @@ TfLiteStatus ArmnnSubgraph::AddOutputLayer(DelegateData& delegateData,
                                            const TfLiteIntArray* outputs,
                                            std::vector<armnn::BindingPointInfo>& outputBindings)
 {
-    const size_t numOutputs = outputs->size;
+    const size_t numOutputs = static_cast<size_t>(outputs->size);
     for (unsigned int i = 0; i < numOutputs; ++i)
     {
         const int32_t tensorId = outputs->data[i];
@@ -250,8 +252,8 @@ TfLiteStatus ArmnnSubgraph::AddOutputLayer(DelegateData& delegateData,
         armnn::IConnectableLayer* layer = delegateData.m_Network->AddOutputLayer(bindingId);
 
         auto tensorInfo = GetTensorInfoForTfLiteTensor(tensor);
-        ARMNN_ASSERT(delegateData.m_OutputSlotForNode[tensorId] != nullptr);
-        delegateData.m_OutputSlotForNode[tensorId]->Connect(layer->GetInputSlot(0));
+        ARMNN_ASSERT(delegateData.m_OutputSlotForNode[static_cast<unsigned long>(tensorId)] != nullptr);
+        delegateData.m_OutputSlotForNode[static_cast<unsigned long>(tensorId)]->Connect(layer->GetInputSlot(0));
         outputBindings.push_back(std::make_pair(bindingId, tensorInfo));
     }
 
@@ -272,7 +274,6 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
     DelegateData delegateData(delegate->m_Options.GetBackends());
 
     // Build ArmNN Network
-    using NetworkOptions = std::vector<armnn::BackendOptions>;
     armnn::NetworkOptions networkOptions = {};
     armnn::NetworkId networkId;
     delegateData.m_Network = armnn::INetwork::Create(networkOptions);
@@ -300,12 +301,12 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
         if (tfLiteContext->GetNodeAndRegistration(
             tfLiteContext, nodeIndex, &tfLiteNode, &tfLiteRegistration) != kTfLiteOk)
         {
-            throw armnn::Exception("TfLiteArmnnDelegate: Unable to get node registration: " + nodeIndex);
+            throw armnn::Exception(&"TfLiteArmnnDelegate: Unable to get node registration: " [ nodeIndex]);
         }
 
         if (VisitNode(delegateData, tfLiteContext, tfLiteRegistration, tfLiteNode, nodeIndex) != kTfLiteOk)
         {
-            throw armnn::Exception("TfLiteArmnnDelegate: Unable to parse node: " + nodeIndex);
+            throw armnn::Exception(&"TfLiteArmnnDelegate: Unable to parse node: " [ nodeIndex]);
         }
     }
 
@@ -359,6 +360,7 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
 
 TfLiteStatus ArmnnSubgraph::Prepare(TfLiteContext* tfLiteContext)
 {
+    armnn::IgnoreUnused(tfLiteContext);
     return kTfLiteOk;
 }
 

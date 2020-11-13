@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <armnn/utility/IgnoreUnused.hpp>
+
 #include <tensorflow/lite/builtin_ops.h>
 #include <tensorflow/lite/c/builtin_op_data.h>
 #include <tensorflow/lite/c/common.h>
@@ -40,6 +42,7 @@ TfLiteStatus VisitDequantizeOperator(DelegateData& delegateData,
             tfLiteContext,
             "TfLiteArmnnDelegate: Dynamic output tensors are not supported in operator #%d node #%d: ",
             tfLiteDequantizeOperatorCode, nodeIndex);
+
         return kTfLiteError;
     }
 

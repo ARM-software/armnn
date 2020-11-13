@@ -93,6 +93,9 @@ if(BUILD_UNIT_TESTS)
         src/test/ArmnnDelegateTest.cpp
         src/test/ComparisonTest.cpp
         src/test/ComparisonTestHelper.hpp
+        src/test/Convolution2dTest.cpp
+        src/test/ConvolutionTestHelper.hpp
+        src/test/DepthwiseConvolution2dTest.cpp
         src/test/ElementwiseBinaryTest.cpp
         src/test/ElementwiseBinaryTestHelper.hpp
         src/test/ElementwiseUnaryTest.cpp

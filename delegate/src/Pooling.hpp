@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "DelegateUtils.hpp"
+
 #include <tensorflow/lite/builtin_ops.h>
 #include <tensorflow/lite/c/builtin_op_data.h>
 #include <tensorflow/lite/c/common.h>
@@ -12,29 +14,6 @@
 
 namespace armnnDelegate
 {
-
-void CalcPadding(uint32_t inputSize,
-                 uint32_t filterSize,
-                 uint32_t stride,
-                 uint32_t dilation,
-                 uint32_t& paddingFront,
-                 uint32_t& paddingBack,
-                 TfLitePadding padding)
-{
-    paddingFront = 0;
-    paddingBack = 0;
-    if (padding == kTfLitePaddingSame)
-    {
-        uint32_t outputSize = (inputSize + stride - 1) / stride;
-        uint32_t dilatedSize = filterSize + (dilation - 1) * (filterSize - 1);
-        uint32_t temp = (outputSize - 1) * stride + dilatedSize;
-        if (temp > inputSize)
-        {
-            paddingFront = (temp - inputSize) / 2;
-            paddingBack = (temp - inputSize) - paddingFront;
-        }
-    }
-}
 
 TfLiteStatus VisitPoolingOperator(DelegateData& delegateData,
                                   TfLiteContext* tfLiteContext,

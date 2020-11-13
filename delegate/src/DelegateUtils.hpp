@@ -101,6 +101,18 @@ bool IsValid(const TfLiteTensor* tfLiteTensor)
     return tfLiteTensor == nullptr ? false : true;
 }
 
+uint32_t NonNegative(int32_t value, int nodeIndex)
+{
+    if (value < 0)
+    {
+        throw armnn::Exception("TfLiteArmnnDelegate: Non-negative value in node " + nodeIndex);
+    }
+    else
+    {
+        return static_cast<uint32_t>(value);
+    }
+}
+
 bool IsDynamicTensor(const TfLiteTensor& tfLiteTensor)
 {
     auto tensorAllocationType = tfLiteTensor.allocation_type;
@@ -339,7 +351,8 @@ armnn::DataType GetDataType(const TfLiteTensor& tfLiteTensor)
     }
 }
 
-armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor)
+armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor,
+                                               const armnn::PermutationVector& dimensionMappings = {0, 1, 2, 3})
 {
     armnn::DataType type = GetDataType(tfLiteTensor);
     armnn::TensorInfo ret;
@@ -379,7 +392,8 @@ armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor)
                 quantizationScales.push_back(affineQuantization->scale->data[i]);
             }
             ret.SetQuantizationScales(quantizationScales);
-            ret.SetQuantizationDim(armnn::MakeOptional<unsigned int>(affineQuantization->quantized_dimension));
+            ret.SetQuantizationDim(dimensionMappings[armnn::numeric_cast<unsigned int>(
+                affineQuantization->quantized_dimension)]);
         }
         else
         {
@@ -399,28 +413,53 @@ armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor)
 
 armnn::ConstTensor CreateConstTensor(const TfLiteTensor* tfLiteTensor,
                                      armnn::TensorInfo& tensorInfo,
-                                     armnn::Optional<armnn::PermutationVector&> permutationVector)
+                                     armnn::Optional<armnn::PermutationVector&> permutationVector,
+                                     void* permutationData = nullptr)
 {
     if (tfLiteTensor->allocation_type != kTfLiteMmapRo)
     {
         throw armnn::Exception("TfLiteArmnnDelegate: Not constant allocation type: " + tfLiteTensor->allocation_type);
     }
 
-    if (permutationVector.has_value() && permutationVector.value().GetSize() > 0)
+    if (permutationVector.has_value() && permutationVector.value().GetSize() > 0 && permutationData != nullptr)
     {
-        std::vector<uint8_t> swizzledData;
-        swizzledData.resize(tensorInfo.GetNumBytes());
         armnnUtils::Permute(armnnUtils::Permuted(tensorInfo.GetShape(), permutationVector.value()),
                             permutationVector.value(),
                             tfLiteTensor->data.data,
-                            swizzledData.data(),
+                            permutationData,
                             armnn::GetDataTypeSize(tensorInfo.GetDataType()));
-        return armnn::ConstTensor(armnnUtils::Permuted(tensorInfo, permutationVector.value()), swizzledData.data());
+
+        return armnn::ConstTensor(armnnUtils::Permuted(tensorInfo, permutationVector.value()), permutationData);
     }
     else
     {
         return armnn::ConstTensor(tensorInfo, tfLiteTensor->data.data);
     }
 }
+
+void CalcPadding(uint32_t inputSize,
+                 uint32_t filterSize,
+                 uint32_t stride,
+                 uint32_t dilation,
+                 uint32_t& paddingFront,
+                 uint32_t& paddingBack,
+                 TfLitePadding padding)
+{
+    paddingFront = 0;
+    paddingBack = 0;
+    if (padding == kTfLitePaddingSame)
+    {
+        uint32_t outputSize = (inputSize + stride - 1) / stride;
+        uint32_t dilatedSize = filterSize + (dilation - 1) * (filterSize - 1);
+        uint32_t temp = (outputSize - 1) * stride + dilatedSize;
+        if (temp > inputSize)
+        {
+            paddingFront = (temp - inputSize) / 2;
+            paddingBack = (temp - inputSize) - paddingFront;
+        }
+    }
+}
+
+
 
 } // namespace anonymous

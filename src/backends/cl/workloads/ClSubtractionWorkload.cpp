@@ -11,7 +11,6 @@
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
 #include "ClWorkloadUtils.hpp"
-#include "../../../../include/armnn/ArmNN.hpp"
 
 namespace armnn
 {

@@ -7,10 +7,9 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/utility/Assert.hpp>
+#include <backendsCommon/WorkloadData.hpp>
 
 #include <arm_compute/core/Types.h>
-#include "../../../../clframework/arm_compute/core/Types.h"
-#include "../backendsCommon/WorkloadData.hpp"
 
 namespace armnn
 {

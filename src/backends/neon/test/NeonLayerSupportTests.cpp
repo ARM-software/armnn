@@ -75,6 +75,26 @@ BOOST_AUTO_TEST_CASE(IsConvertFp32ToFp16SupportedNeon)
     BOOST_CHECK(result);
 }
 
+BOOST_AUTO_TEST_CASE(IsLogicalBinarySupportedNeon)
+{
+    std::string reasonIfUnsupported;
+
+    bool result = IsLogicalBinaryLayerSupportedTests<armnn::NeonWorkloadFactory,
+      armnn::DataType::Boolean, armnn::DataType::Boolean>(reasonIfUnsupported);
+
+    BOOST_CHECK(result);
+}
+
+BOOST_AUTO_TEST_CASE(IsLogicalBinaryBroadcastSupportedNeon)
+{
+    std::string reasonIfUnsupported;
+
+    bool result = IsLogicalBinaryLayerBroadcastSupportedTests<armnn::NeonWorkloadFactory,
+      armnn::DataType::Boolean, armnn::DataType::Boolean>(reasonIfUnsupported);
+
+    BOOST_CHECK(result);
+}
+
 BOOST_AUTO_TEST_CASE(IsMeanSupportedNeon)
 {
     std::string reasonIfUnsupported;

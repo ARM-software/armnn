@@ -260,25 +260,27 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateElementwiseUnary(
     switch(descriptor.m_Parameters.m_Operation)
     {
         case UnaryOperation::Abs:
-            {
-                AbsQueueDescriptor absQueueDescriptor;
-                absQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
-                absQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+        {
+            AbsQueueDescriptor absQueueDescriptor;
+            absQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
+            absQueueDescriptor.m_Outputs = descriptor.m_Outputs;
 
-                return std::make_unique<NeonAbsWorkload>(absQueueDescriptor, info);
-            }
+            return std::make_unique<NeonAbsWorkload>(absQueueDescriptor, info);
+        }
         case UnaryOperation::Rsqrt:
-            {
-                RsqrtQueueDescriptor rsqrtQueueDescriptor;
-                rsqrtQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
-                rsqrtQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+        {
+            RsqrtQueueDescriptor rsqrtQueueDescriptor;
+            rsqrtQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
+            rsqrtQueueDescriptor.m_Outputs = descriptor.m_Outputs;
 
-                return std::make_unique<NeonRsqrtWorkload>(rsqrtQueueDescriptor, info);
-            }
+            return std::make_unique<NeonRsqrtWorkload>(rsqrtQueueDescriptor, info);
+        }
         case UnaryOperation::Neg:
             return std::make_unique<NeonNegWorkload>(descriptor, info);
         case UnaryOperation::Exp:
             return std::make_unique<NeonExpWorkload>(descriptor, info);
+        case UnaryOperation::LogicalNot:
+            return std::make_unique<NeonLogicalNotWorkload>(descriptor, info);
         default:
             return nullptr;
     }
@@ -354,6 +356,32 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateLogSoftmax(const LogSoftma
                                                                  const WorkloadInfo& info) const
 {
     return std::make_unique<NeonLogSoftmaxWorkload>(descriptor, info, m_MemoryManager->GetIntraLayerManager());
+}
+
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateLogicalBinary(const LogicalBinaryQueueDescriptor& descriptor,
+                                                                    const WorkloadInfo& info) const
+{
+    switch(descriptor.m_Parameters.m_Operation)
+    {
+        case LogicalBinaryOperation::LogicalAnd:
+            return std::make_unique<NeonLogicalAndWorkload>(descriptor, info);
+        case LogicalBinaryOperation::LogicalOr:
+            return std::make_unique<NeonLogicalOrWorkload>(descriptor, info);
+        default:
+            return nullptr;
+    }
+}
+
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateLogicalUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
+                                                                   const WorkloadInfo& info) const
+{
+    switch(descriptor.m_Parameters.m_Operation)
+    {
+        case UnaryOperation::LogicalNot:
+            return std::make_unique<NeonLogicalNotWorkload>(descriptor, info);
+        default:
+            return nullptr;
+    }
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateLstm(const LstmQueueDescriptor& descriptor,

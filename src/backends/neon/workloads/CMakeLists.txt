@@ -54,10 +54,16 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonInstanceNormalizationWorkload.hpp
     NeonL2NormalizationFloatWorkload.cpp
     NeonL2NormalizationFloatWorkload.hpp
-    NeonLstmFloatWorkload.cpp
-    NeonLstmFloatWorkload.hpp
+    NeonLogicalAndWorkload.cpp
+    NeonLogicalAndWorkload.hpp
+    NeonLogicalNotWorkload.cpp
+    NeonLogicalNotWorkload.hpp
+    NeonLogicalOrWorkload.cpp
+    NeonLogicalOrWorkload.hpp
     NeonLogSoftmaxWorkload.cpp
     NeonLogSoftmaxWorkload.hpp
+    NeonLstmFloatWorkload.cpp
+    NeonLstmFloatWorkload.hpp
     NeonMaximumWorkload.cpp
     NeonMaximumWorkload.hpp
     NeonMeanWorkload.cpp

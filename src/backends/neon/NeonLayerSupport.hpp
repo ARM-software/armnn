@@ -160,6 +160,12 @@ public:
                                     const L2NormalizationDescriptor& descriptor,
                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsLogicalBinarySupported(const TensorInfo& input0,
+                                  const TensorInfo& input1,
+                                  const TensorInfo& output,
+                                  const LogicalBinaryDescriptor& descriptor,
+                                  Optional<std::string&> reasonIfUnsupported) const override;
+
     bool IsLogSoftmaxSupported(const TensorInfo& input,
                                const TensorInfo& output,
                                const LogSoftmaxDescriptor& descriptor,

@@ -907,6 +907,70 @@ bool IsConvertLayerSupportedTests(std::string& reasonIfUnsupported)
 }
 
 template<typename FactoryType, armnn::DataType InputDataType , armnn::DataType OutputDataType>
+bool IsLogicalBinaryLayerSupportedTests(std::string& reasonIfUnsupported)
+{
+    armnn::Graph graph;
+    armnn::LogicalBinaryDescriptor desc(armnn::LogicalBinaryOperation::LogicalOr);
+
+    armnn::Layer* const input0 = graph.AddLayer<armnn::InputLayer>(0, "input0");
+    armnn::Layer* const input1 = graph.AddLayer<armnn::InputLayer>(1, "input1");
+
+    armnn::Layer* const layer = graph.AddLayer<armnn::LogicalBinaryLayer>(desc, "logicalOrLayer");
+
+    armnn::Layer* const output = graph.AddLayer<armnn::OutputLayer>(0, "output1");
+
+    armnn::TensorInfo inputTensorInfo0({1, 1, 1, 4}, InputDataType);
+    armnn::TensorInfo inputTensorInfo1({1, 1, 1, 4}, InputDataType);
+
+    armnn::TensorInfo outputTensorInfo({1, 1, 1, 4}, OutputDataType);
+
+    input0->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
+    input1->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+
+    input0->GetOutputHandler(0).SetTensorInfo(inputTensorInfo0);
+    input1->GetOutputHandler(0).SetTensorInfo(inputTensorInfo1);
+
+    layer->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+    layer->GetOutputHandler(0).SetTensorInfo(outputTensorInfo);
+
+    bool result = FactoryType::IsLayerSupported(*layer, InputDataType, reasonIfUnsupported);
+
+    return result;
+}
+
+template<typename FactoryType, armnn::DataType InputDataType , armnn::DataType OutputDataType>
+bool IsLogicalBinaryLayerBroadcastSupportedTests(std::string& reasonIfUnsupported)
+{
+    armnn::Graph graph;
+    armnn::LogicalBinaryDescriptor desc(armnn::LogicalBinaryOperation::LogicalAnd);
+
+    armnn::Layer* const input0 = graph.AddLayer<armnn::InputLayer>(0, "input0");
+    armnn::Layer* const input1 = graph.AddLayer<armnn::InputLayer>(1, "input1");
+
+    armnn::Layer* const layer = graph.AddLayer<armnn::LogicalBinaryLayer>(desc, "logicalAndLayer");
+
+    armnn::Layer* const output = graph.AddLayer<armnn::OutputLayer>(0, "output2");
+
+    armnn::TensorInfo inputTensorInfo0({1, 1, 1, 4}, InputDataType);
+    armnn::TensorInfo inputTensorInfo1({1, 1, 1, 1}, InputDataType);
+
+    armnn::TensorInfo outputTensorInfo({1, 1, 1, 4}, OutputDataType);
+
+    input0->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
+    input1->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+
+    input0->GetOutputHandler(0).SetTensorInfo(inputTensorInfo0);
+    input1->GetOutputHandler(0).SetTensorInfo(inputTensorInfo1);
+
+    layer->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+    layer->GetOutputHandler(0).SetTensorInfo(outputTensorInfo);
+
+    bool result = FactoryType::IsLayerSupported(*layer, InputDataType, reasonIfUnsupported);
+
+    return result;
+}
+
+template<typename FactoryType, armnn::DataType InputDataType , armnn::DataType OutputDataType>
 bool IsMeanLayerSupportedTests(std::string& reasonIfUnsupported)
 {
     armnn::Graph graph;

@@ -37,6 +37,9 @@
 #include "workloads/NeonInstanceNormalizationWorkload.hpp"
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
 #include "workloads/NeonLogSoftmaxWorkload.hpp"
+#include "workloads/NeonLogicalAndWorkload.hpp"
+#include "workloads/NeonLogicalNotWorkload.hpp"
+#include "workloads/NeonLogicalOrWorkload.hpp"
 #include "workloads/NeonLstmFloatWorkload.hpp"
 #include "workloads/NeonMaximumWorkload.hpp"
 #include "workloads/NeonMeanWorkload.hpp"
@@ -434,6 +437,11 @@ bool NeonLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
                                            reasonIfUnsupported,
                                            input,
                                            output);
+        case UnaryOperation::LogicalNot:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(NeonLogicalNotWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
         default:
             return false;
     }
@@ -530,6 +538,31 @@ bool NeonLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
                                                   Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonL2NormalizationWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
+}
+
+bool NeonLayerSupport::IsLogicalBinarySupported(const TensorInfo& input0,
+                                                const TensorInfo& input1,
+                                                const TensorInfo& output,
+                                                const LogicalBinaryDescriptor& descriptor,
+                                                Optional<std::string&> reasonIfUnsupported) const
+{
+    switch(descriptor.m_Operation)
+    {
+        case LogicalBinaryOperation::LogicalAnd:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(NeonLogicalAndWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input0,
+                                           input1,
+                                           output);
+        case LogicalBinaryOperation::LogicalOr:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(NeonLogicalOrWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input0,
+                                           input1,
+                                           output);
+        default:
+            return false;
+    }
 }
 
 bool NeonLayerSupport::IsLogSoftmaxSupported(const TensorInfo& input,

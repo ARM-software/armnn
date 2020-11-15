@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-cmake_minimum_required (VERSION 3.8.0)
+cmake_minimum_required (VERSION 3.7.0)
 project(armnnDelegate)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Werror -Wold-style-cast -Wno-missing-braces -Wconversion -Wsign-conversion")

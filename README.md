@@ -12,6 +12,8 @@ There is a getting started guide here using ONNX: <https://developer.arm.com/sol
 
 There is a guide for backend development: [Backend development guide](src/backends/README.md)
 
+There is a guide for installation of ArmNN, Tensorflow Lite Parser and PyArmnn via our Apt Repository: [Installation via Apt Repository](InstallationViaAptRepository.md)
+
 API Documentation is available at https://github.com/ARM-software/armnn/wiki/Documentation.
 
 Dox files to generate Arm NN doxygen files can be found at armnn/docs/. Following generation the xhtml files can be found at armnn/documentation/

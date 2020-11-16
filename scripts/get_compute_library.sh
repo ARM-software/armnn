@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_08" # Release 20.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="d7341fb9e3b24b904edf7ac9d83e1e063bc77765" #COMPMID-3960: Mismatch on NEArithmeticSubtraction
+DEFAULT_CLFRAMEWORKREVISION="61ffda4839d6fe8cc165faae0ec7c9be1d528194" #COMPMID-3599: Disable direct gemm convolution testing for armv7 for 8bit
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

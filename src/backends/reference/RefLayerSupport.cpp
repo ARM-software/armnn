@@ -722,10 +722,11 @@ bool RefLayerSupport::IsDetectionPostProcessSupported(const TensorInfo& boxEncod
 
     bool supported = true;
 
-    std::array<DataType,5> supportedInputTypes =
+    std::array<DataType,6> supportedInputTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
+        DataType::Float16,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16

@@ -28,13 +28,18 @@ public:
         }
         else if (layer.GetType() == LayerType::Output)
         {
-            // if the inputs of this layer are DataType::Float32
-            // add a ConvertFloat16ToFloat32 layer before each of the inputs
-            if (layer.GetDataType() == DataType::Float32)
+            // For DetectionPostProcess Layer output is always Float32 regardless of input type
+            Layer& connectedLayer = layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetOwningLayer();
+            if (connectedLayer.GetType() != LayerType::DetectionPostProcess)
             {
-                // NOTE: We need to call InsertConvertFp16ToFp32LayersBefore with expectCorrectInputType = false
-                // here, otherwise it will expect the inputs to be DataType::Float16
-                InsertConvertFp16ToFp32LayersBefore(graph, layer, false);
+                // if the inputs of this layer are DataType::Float32
+                // add a ConvertFloat16ToFloat32 layer before each of the inputs
+                if (layer.GetDataType() == DataType::Float32)
+                {
+                    // NOTE: We need to call InsertConvertFp16ToFp32LayersBefore with expectCorrectInputType = false
+                    // here, otherwise it will expect the inputs to be DataType::Float16
+                    InsertConvertFp16ToFp32LayersBefore(graph, layer, false);
+                }
             }
         }
         else if (layer.GetType() != LayerType::ConvertFp32ToFp16 && layer.GetType() != LayerType::ConvertFp16ToFp32)
@@ -57,14 +62,18 @@ public:
                 }
             }
 
-            // change outputs to DataType::Float16
-            for (auto&& output = layer.BeginOutputSlots(); output != layer.EndOutputSlots(); ++output)
+            // For DetectionPostProcess Layer output is always Float32 regardless of input type
+            if (layer.GetType() != LayerType::DetectionPostProcess)
             {
-                TensorInfo convertInfo = output->GetTensorInfo();
-                if (convertInfo.GetDataType() == DataType::Float32)
+                // change outputs to DataType::Float16
+                for (auto&& output = layer.BeginOutputSlots(); output != layer.EndOutputSlots(); ++output)
                 {
-                    convertInfo.SetDataType(DataType::Float16);
-                    output->SetTensorInfo(convertInfo);
+                    TensorInfo convertInfo = output->GetTensorInfo();
+                    if (convertInfo.GetDataType() == DataType::Float32)
+                    {
+                        convertInfo.SetDataType(DataType::Float16);
+                        output->SetTensorInfo(convertInfo);
+                    }
                 }
             }
         }

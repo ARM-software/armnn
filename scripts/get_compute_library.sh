@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_08" # Release 20.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="61ffda4839d6fe8cc165faae0ec7c9be1d528194" #COMPMID-3599: Disable direct gemm convolution testing for armv7 for 8bit
+DEFAULT_CLFRAMEWORKREVISION="17b7102b30e0159263d06d3a0816cd2998a13456" #COMPMID-3973: CTS failure in QASYMM8_SIGNED Depthwise and Fully connected when fusing Bounded ReLU in Android R GpuAcc
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

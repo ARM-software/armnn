@@ -68,6 +68,3 @@ Third party tools used by Arm NN:
 ### Contributions
 
 The Arm NN project welcomes contributions. For more details on contributing to Arm NN see the [Contributing page](https://mlplatform.org/contributing/) on the [MLPlatform.org](https://mlplatform.org/) website, or see the [Contributor Guide](ContributorGuide.md).
-
-### Security Issues
-If you believe you have discovered a security issue please contact arm-security@arm.com

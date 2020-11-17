@@ -148,7 +148,16 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
 
     auto it = subgraph.end();
     bool isFastMathEnabled = false;
+    std::map<LayerGuid, Layer*> untouched;
 
+    while (it != subgraph.begin())
+    {
+        --it;
+        Layer& base = **it;
+        untouched.insert({base.GetGuid(), &base});
+    }
+
+    it = subgraph.end();
 #if defined(ARMCOMPUTECL_ENABLED)
     IBackendInternal::IBackendSpecificModelContextPtr modelContextPtr = CreateBackendSpecificModelContext(modelOptions);
 
@@ -161,7 +170,6 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
         }
     }
 #endif
-
     while (it != subgraph.begin())
     {
         --it;
@@ -199,9 +207,7 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
 
                                 if (baseLayer->GetParameters().m_BiasEnabled)
                                 {
-                                    biases = GetOverriddenDataType(baseLayer->m_Bias->GetTensorInfo(),
-                                            GetOptionalBiasTypeFromWeightsType(
-                                                    baseLayer->m_Weight->GetTensorInfo().GetDataType()));
+                                    biases = baseLayer->m_Bias->GetTensorInfo();
                                 }
 
                                 arm_compute::Status status = ClConvolution2dWorkloadValidate(
@@ -220,6 +226,8 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                                                                       activationLayer,
                                                                                       activationDesc,
                                                                                       name);
+                                    untouched.erase(baseLayer->GetGuid());
+                                    untouched.erase(activationLayer->GetGuid());
                                 }
                             }
                             else if (base.GetType() == LayerType::DepthwiseConvolution2d)
@@ -231,9 +239,7 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
 
                                 if (baseLayer->GetParameters().m_BiasEnabled)
                                 {
-                                    biases = GetOverriddenDataType(baseLayer->m_Bias->GetTensorInfo(),
-                                            GetOptionalBiasTypeFromWeightsType(
-                                                    baseLayer->m_Weight->GetTensorInfo().GetDataType()));
+                                    biases = baseLayer->m_Bias->GetTensorInfo();
                                 }
 
                                 arm_compute::Status status = ClDepthwiseConvolutionWorkloadValidate(
@@ -251,6 +257,8 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                                                                                activationLayer,
                                                                                                activationDesc,
                                                                                                name);
+                                    untouched.erase(baseLayer->GetGuid());
+                                    untouched.erase(activationLayer->GetGuid());
                                 }
                             }
                             else if (base.GetType() == LayerType::FullyConnected)
@@ -272,6 +280,8 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                                                                        activationLayer,
                                                                                        activationDesc,
                                                                                        name);
+                                    untouched.erase(baseLayer->GetGuid());
+                                    untouched.erase(activationLayer->GetGuid());
                                 }
                             }
                             else if (base.GetType() == LayerType::BatchNormalization)
@@ -302,6 +312,8 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                     replacementLayer->m_Gamma    = std::move(baseLayer->m_Gamma);
                                     replacementLayer->m_Mean     = std::move(baseLayer->m_Mean);
                                     replacementLayer->m_Variance = std::move(baseLayer->m_Variance);
+                                    untouched.erase(baseLayer->GetGuid());
+                                    untouched.erase(activationLayer->GetGuid());
                                 }
                             }
                             else if (base.GetType() == LayerType::Addition)
@@ -321,6 +333,8 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                                                               activationLayer,
                                                                               activationDesc,
                                                                               name);
+                                    untouched.erase(baseLayer->GetGuid());
+                                    untouched.erase(activationLayer->GetGuid());
                                 }
                             }
                             else if (base.GetType() == LayerType::Division)
@@ -340,6 +354,8 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                                                               activationLayer,
                                                                               activationDesc,
                                                                               name);
+                                    untouched.erase(baseLayer->GetGuid());
+                                    untouched.erase(activationLayer->GetGuid());
                                 }
                             }
                             else if (base.GetType() == LayerType::Multiplication)
@@ -359,6 +375,8 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                                                                     activationLayer,
                                                                                     activationDesc,
                                                                                     name);
+                                    untouched.erase(baseLayer->GetGuid());
+                                    untouched.erase(activationLayer->GetGuid());
                                 }
                             }
                             else if (base.GetType() == LayerType::Subtraction)
@@ -378,6 +396,8 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                                                                  activationLayer,
                                                                                  activationDesc,
                                                                                  name);
+                                    untouched.erase(baseLayer->GetGuid());
+                                    untouched.erase(activationLayer->GetGuid());
                                 }
                             }
                         }
@@ -386,10 +406,14 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
             }
         }
     }
-    // end each optimization
+
     if (optimizationViews.GetSubstitutions().empty())
     {
         optimizationViews.AddUntouchedSubgraph(SubgraphView(subgraph));
+    }
+    else
+    {
+        ReportUntouchedLayers(optimizationViews, untouched);
     }
 
     return optimizationViews;

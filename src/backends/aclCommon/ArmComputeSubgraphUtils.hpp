@@ -47,38 +47,17 @@ SubgraphView::OutputSlots CreateOutputsFrom(const std::vector<Layer*>& layers)
 
 } // namespace
 
-inline const TensorInfo GetOverriddenDataType(const TensorInfo& info, Optional<DataType> type)
+inline void ReportUntouchedLayers(OptimizationViews& optimizationViews, std::map<LayerGuid, Layer*> untouched)
 {
-    if (!type)
+    std::vector<Layer*> untouchedVector;
+    for (const auto& pair : untouched)
     {
-        return info;
+        Layer* layer = pair.second;
+        SubgraphView subgraphView(CreateInputsFrom({layer}),
+                                  CreateOutputsFrom({layer}),
+                                  {layer});
+        optimizationViews.AddUntouchedSubgraph(std::move(subgraphView));
     }
-
-    return TensorInfo(info.GetShape(), type.value(), info.GetQuantizationScale(), info.GetQuantizationOffset());
-}
-
-inline armnn::Optional<armnn::DataType> GetOptionalBiasTypeFromWeightsType(armnn::Optional<armnn::DataType> weightsType)
-{
-    if (!weightsType)
-    {
-        return weightsType;
-    }
-
-    switch(weightsType.value())
-    {
-        case armnn::DataType::BFloat16:
-        case armnn::DataType::Float16:
-        case armnn::DataType::Float32:
-            return weightsType;
-        case armnn::DataType::QAsymmS8:
-        case armnn::DataType::QAsymmU8:
-        case armnn::DataType::QSymmS8:
-        case armnn::DataType::QSymmS16:
-            return armnn::DataType::Signed32;
-        default:
-            ARMNN_ASSERT_MSG(false, "GetBiasTypeFromWeightsType(): Unsupported data type.");
-    }
-    return armnn::EmptyOptional();
 }
 
 template<typename LayerType>

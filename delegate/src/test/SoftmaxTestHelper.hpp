@@ -161,9 +161,9 @@ void SoftmaxTest(tflite::BuiltinOperator softmaxOperatorCode,
 
     for (size_t i = 0; i < inputValues.size(); ++i)
     {
-         CHECK(armnnUtils::within_percentage_tolerance(expectedOutputValues[i], armnnDelegateOutputData[i], 1e-5));
+         CHECK(armnnUtils::within_percentage_tolerance(expectedOutputValues[i], armnnDelegateOutputData[i], 0.1));
          CHECK(armnnUtils::within_percentage_tolerance(tfLiteInterpreterOutputData[i],
-                                                       armnnDelegateOutputData[i], 1e-5));
+                                                       armnnDelegateOutputData[i], 0.1));
     }
 }
 

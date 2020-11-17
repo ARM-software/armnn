@@ -464,6 +464,13 @@ void Layer::SerializeLayerParameters(ParameterStringifyFunction& fn) const
     {
         fn("BackendID",backendId);
     }
+    std::shared_ptr<ActivationDescriptor>
+            activationDescPtr = GetAdditionalInformation<ActivationDescriptor>();
+
+    if (activationDescPtr)
+    {
+        StringifyLayerParameters<ActivationDescriptor>::Serialize(fn, *activationDescPtr.get());
+    }
 }
 
 } // namespace armnn

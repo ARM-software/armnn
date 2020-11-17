@@ -336,7 +336,7 @@ public:
     }
 
     template<typename T>
-    std::shared_ptr<T> GetAdditionalInformation()
+    std::shared_ptr<T> GetAdditionalInformation() const
     {
         return std::static_pointer_cast<T>(m_AdditionalInfoObject);
     }

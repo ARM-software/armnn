@@ -35,6 +35,7 @@ option(BUILD_PYTHON_WHL "Build Python wheel package" OFF)
 option(BUILD_PYTHON_SRC "Build Python source package" OFF)
 option(BUILD_STATIC_PIPE_LIBS "Build Static PIPE libraries" OFF)
 option(BUILD_PIPE_ONLY "Build the PIPE libraries only" OFF)
+option(BUILD_ARMNN_TFLITE_DELEGATE "Build the Arm NN TfLite delegate" OFF)
 
 include(SelectLibraryConfigurations)
 
@@ -210,6 +211,9 @@ if(BUILD_ONNX_PARSER)
     include_directories(SYSTEM "${ONNX_GENERATED_SOURCES}")
 endif()
 
+if(BUILD_ARMNN_TFLITE_DELEGATE)
+    add_definitions(-DARMNN_TFLITE_DELEGATE)
+endif()
 # Flatbuffers support for TF Lite and Armnn Serializer
 if(BUILD_TF_LITE_PARSER OR BUILD_ARMNN_SERIALIZER)
     # verify we have a valid flatbuffers include path

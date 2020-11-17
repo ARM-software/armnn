@@ -17,6 +17,16 @@ foreach(cmake_file ${additional_cmake_files})
     include(${cmake_file})
 endforeach()
 
+cmake_policy(SET CMP0057 NEW)
+
+set(as_subproject Armnn)
+
+macro(find_package)
+    if(NOT ${ARGV0} IN_LIST as_subproject)
+        _find_package(${ARGV})
+    endif()
+endmacro()
+
 if (DYNAMIC_BACKEND_PATHS)
     # It's expected to have the format: DYNAMIC_BACKEND_PATHS="PATH_1:PATH_2...:PATH_N"
     add_definitions('-DDYNAMIC_BACKEND_PATHS="${DYNAMIC_BACKEND_PATHS}"')
@@ -28,6 +38,15 @@ add_subdirectory(samples)
 add_subdirectory(src/armnnTfLiteParser)
 add_subdirectory(src/armnnSerializer)
 add_subdirectory(src/armnnDeserializer)
+
+
+if (BUILD_ARMNN_TFLITE_DELEGATE)
+
+    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/delegate/cmake/Modules)
+    add_subdirectory(delegate)
+
+    add_definitions(-DARMNN_TF_LITE_DELEGATE)
+endif()
 
 if (BUILD_TESTS)
     add_subdirectory(tests)
@@ -1163,6 +1182,9 @@ export(
     FILE        ${CMAKE_CURRENT_BINARY_DIR}/ArmnnTargets.cmake
     NAMESPACE   Armnn::
 )
+
+add_library(Armnn::Armnn ALIAS armnn)
+add_library(Armnn::armnnUtils ALIAS armnnUtils)
 
 ####################################################
 ## Build Python bindings

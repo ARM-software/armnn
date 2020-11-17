@@ -264,12 +264,15 @@ if (BUILD_ARMNN_SERIALIZER OR BUILD_CAFFE_PARSER OR BUILD_TF_PARSER OR BUILD_TF_
         target_link_libraries(ExecuteNetwork armnnTfLiteParser)
     endif()
     if (BUILD_ONNX_PARSER)
-            target_link_libraries(ExecuteNetwork armnnOnnxParser)
+        target_link_libraries(ExecuteNetwork armnnOnnxParser)
     endif()
-
+    if (BUILD_ARMNN_TFLITE_DELEGATE)
+        target_link_libraries(ExecuteNetwork ArmnnDelegate::ArmnnDelegate)
+    endif()
     target_link_libraries(ExecuteNetwork armnn)
-    target_link_libraries(ExecuteNetwork ${CMAKE_THREAD_LIBS_INIT})
-    addDllCopyCommands(ExecuteNetwork)
+
+   target_link_libraries(ExecuteNetwork ${CMAKE_THREAD_LIBS_INIT})
+   addDllCopyCommands(ExecuteNetwork)
 endif()
 
 if(BUILD_ACCURACY_TOOL)

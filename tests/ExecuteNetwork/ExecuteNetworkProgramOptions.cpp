@@ -168,6 +168,10 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "tensorflow-text.",
                  cxxopts::value<std::string>())
 
+                ("D,armnn-tflite-delegate",
+                 "enable Arm NN TfLite delegate",
+                 cxxopts::value<bool>(m_ExNetParams.m_EnableDelegate)->default_value("false")->implicit_value("true"))
+
                 ("m,model-path",
                  "Path to model file, e.g. .armnn, .caffemodel, .prototxt, .tflite, .onnx",
                  cxxopts::value<std::string>(m_ExNetParams.m_ModelPath))

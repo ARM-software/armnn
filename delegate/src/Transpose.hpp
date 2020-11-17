@@ -64,7 +64,7 @@ TfLiteStatus VisitTransposeOperator(DelegateData& delegateData,
     auto* permTensorDataPtr = tflite::GetTensorData<int32_t>(&tfLiteInputTensor1);
     unsigned int numEl = tfLiteInputTensor1.dims->data[0];
 
-    ARMNN_ASSERT( numEl <= armnn::MaxNumOfTensorDimensions);
+    ARMNN_ASSERT( numEl <= static_cast<int>(armnn::MaxNumOfTensorDimensions));
     ARMNN_ASSERT( tfLiteInputTensor1.dims->size == 1); // ensure only single dimension to the permutation tensor
 
     armnn::TransposeDescriptor descriptor(armnn::PermutationVector(

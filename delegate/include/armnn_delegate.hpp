@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#ifndef ARMNN_TFLITE_DELEGATE
-#define ARMNN_TFLITE_DELEGATE
+#pragma once
 
 #include "DelegateOptions.hpp"
 
@@ -114,5 +113,4 @@ private:
 
 } // armnnDelegate namespace
 
-#endif  // ARMNN_TFLITE_DELEGATE
 

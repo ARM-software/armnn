@@ -25,9 +25,194 @@
 #if defined(ARMNN_ONNX_PARSER)
 #include "armnnOnnxParser/IOnnxParser.hpp"
 #endif
+#if defined(ARMNN_TFLITE_DELEGATE)
+#include <armnn_delegate.hpp>
+#include <DelegateOptions.hpp>
+
+#include <tensorflow/lite/builtin_ops.h>
+#include <tensorflow/lite/c/builtin_op_data.h>
+#include <tensorflow/lite/c/common.h>
+#include <tensorflow/lite/optional_debug_tools.h>
+#include <tensorflow/lite/kernels/builtin_op_kernels.h>
+#include <tensorflow/lite/interpreter.h>
+#include <tensorflow/lite/kernels/register.h>
+#endif
 
 #include <future>
+#if defined(ARMNN_TFLITE_DELEGATE)
+int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
+                           const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
+{
+    using namespace tflite;
 
+    std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(params.m_ModelPath.c_str());
+
+    auto tfLiteInterpreter =  std::make_unique<Interpreter>();
+    tflite::ops::builtin::BuiltinOpResolver resolver;
+
+    tflite::InterpreterBuilder builder(*model, resolver);
+    builder(&tfLiteInterpreter);
+    tfLiteInterpreter->AllocateTensors();
+
+    // Create the Armnn Delegate
+    armnnDelegate::DelegateOptions delegateOptions(params.m_ComputeDevices);
+    std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
+            theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
+                             armnnDelegate::TfLiteArmnnDelegateDelete);
+    // Register armnn_delegate to TfLiteInterpreter
+    int status = tfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate));
+
+    std::vector<std::string>  inputBindings;
+    for (const std::string& inputName: params.m_InputNames)
+    {
+        inputBindings.push_back(inputName);
+    }
+
+    armnn::Optional<std::string> dataFile = params.m_GenerateTensorData
+                                            ? armnn::EmptyOptional()
+                                            : armnn::MakeOptional<std::string>(params.m_InputTensorDataFilePaths[0]);
+
+    const size_t numInputs = inputBindings.size();
+
+    for(unsigned int inputIndex = 0; inputIndex < numInputs; ++inputIndex)
+    {
+        int input = tfLiteInterpreter->inputs()[inputIndex];
+        if (params.m_InputTypes[inputIndex].compare("float") == 0)
+        {
+            auto inputData = tfLiteInterpreter->typed_tensor<float>(input);
+            TContainer tensorData;
+            PopulateTensorWithData(tensorData,
+                                   params.m_InputTensorShapes[inputIndex]->GetNumElements(),
+                                   params.m_InputTypes[inputIndex],
+                                   armnn::EmptyOptional(),
+                                   dataFile);
+            inputData = reinterpret_cast<float*>(&tensorData);
+            armnn::IgnoreUnused(inputData);
+        }
+        else if (params.m_InputTypes[inputIndex].compare("int") == 0)
+        {
+            auto inputData = tfLiteInterpreter->typed_tensor<int32_t>(input);
+            TContainer tensorData;
+            PopulateTensorWithData(tensorData,
+                                   params.m_InputTensorShapes[inputIndex]->GetNumElements(),
+                                   params.m_InputTypes[inputIndex],
+                                   armnn::EmptyOptional(),
+                                   dataFile);
+            inputData = reinterpret_cast<int32_t*>(&tensorData);
+            armnn::IgnoreUnused(inputData);
+        }
+        else if (params.m_InputTypes[inputIndex].compare("qasymm8") == 0)
+        {
+            auto inputData = tfLiteInterpreter->typed_tensor<uint8_t>(input);
+            TContainer tensorData;
+            PopulateTensorWithData(tensorData,
+                                   params.m_InputTensorShapes[inputIndex]->GetNumElements(),
+                                   params.m_InputTypes[inputIndex],
+                                   armnn::EmptyOptional(),
+                                   dataFile);
+            inputData = reinterpret_cast<uint8_t*>(&tensorData);
+            armnn::IgnoreUnused(inputData);
+        }
+        else
+        {
+            ARMNN_LOG(fatal) << "Unsupported input tensor data type \"" << params.m_InputTypes[inputIndex] << "\". ";
+            return EXIT_FAILURE;
+        }
+    }
+
+    for (size_t x = 0; x < params.m_Iterations; x++)
+    {
+        // Run the inference
+        tfLiteInterpreter->Invoke();
+
+        // Print out the output
+        for (unsigned int outputIndex = 0; outputIndex < params.m_OutputNames.size(); ++outputIndex)
+        {
+            std::cout << "Printing out the output" << std::endl;
+            auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[outputIndex];
+            TfLiteIntArray *outputDims = tfLiteInterpreter->tensor(tfLiteDelegateOutputId)->dims;
+
+            int outputSize = 1;
+            for (unsigned int dim = 0; dim < static_cast<unsigned int>(outputDims->size); ++dim)
+            {
+                outputSize *= outputDims->data[dim];
+            }
+
+            std::cout << params.m_OutputNames[outputIndex] << ": ";
+            if (params.m_OutputTypes[outputIndex].compare("float") == 0)
+            {
+                auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<float>(tfLiteDelegateOutputId);
+
+                if(tfLiteDelageOutputData == NULL)
+                {
+                    ARMNN_LOG(fatal) << "Output tensor is null, output type: "
+                                        "\"" << params.m_OutputTypes[outputIndex] << "\" may be incorrect.";
+                    return EXIT_FAILURE;
+                }
+
+                for (int i = 0; i < outputSize; ++i)
+                {
+                    std::cout << tfLiteDelageOutputData[i] << ", ";
+                    if (i % 60 == 0)
+                    {
+                        std::cout << std::endl;
+                    }
+                }
+            }
+            else if (params.m_OutputTypes[outputIndex].compare("int") == 0)
+            {
+                auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<int32_t>(tfLiteDelegateOutputId);
+
+                if(tfLiteDelageOutputData == NULL)
+                {
+                    ARMNN_LOG(fatal) << "Output tensor is null, output type: "
+                                        "\"" << params.m_OutputTypes[outputIndex] << "\" may be incorrect.";
+                    return EXIT_FAILURE;
+                }
+
+                for (int i = 0; i < outputSize; ++i)
+                {
+                    std::cout << tfLiteDelageOutputData[i] << ", ";
+                    if (i % 60 == 0)
+                    {
+                        std::cout << std::endl;
+                    }
+                }
+            }
+            else if (params.m_OutputTypes[outputIndex].compare("qasymm8") == 0)
+            {
+                auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<uint8_t>(tfLiteDelegateOutputId);
+
+                if(tfLiteDelageOutputData == NULL)
+                {
+                    ARMNN_LOG(fatal) << "Output tensor is null, output type: "
+                                        "\"" << params.m_OutputTypes[outputIndex] << "\" may be incorrect.";
+                    return EXIT_FAILURE;
+                }
+
+                for (int i = 0; i < outputSize; ++i)
+                {
+                    std::cout << unsigned(tfLiteDelageOutputData[i]) << ", ";
+                    if (i % 60 == 0)
+                    {
+                        std::cout << std::endl;
+                    }
+                }
+            }
+            else
+            {
+                ARMNN_LOG(fatal) << "Output tensor is null, output type: "
+                                    "\"" << params.m_OutputTypes[outputIndex] <<
+                                 "\" may be incorrect. Output type can be specified with -z argument";
+                return EXIT_FAILURE;
+            }
+            std::cout << std::endl;
+        }
+    }
+
+    return status;
+}
+#endif
 template<typename TParser, typename TDataType>
 int MainImpl(const ExecuteNetworkParams& params,
              const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
@@ -242,6 +427,16 @@ int main(int argc, const char* argv[])
     }
     else if(modelFormat.find("tflite") != std::string::npos)
     {
+
+        if (ProgramOptions.m_ExNetParams.m_EnableDelegate)
+        {
+        #if defined(ARMNN_TF_LITE_DELEGATE)
+            return TfLiteDelegateMainImpl(ProgramOptions.m_ExNetParams, runtime);
+        #else
+            ARMNN_LOG(fatal) << "Not built with Tensorflow-Lite parser support.";
+            return EXIT_FAILURE;
+        #endif
+        }
     #if defined(ARMNN_TF_LITE_PARSER)
         return MainImpl<armnnTfLiteParser::ITfLiteParser, float>(ProgramOptions.m_ExNetParams, runtime);
     #else

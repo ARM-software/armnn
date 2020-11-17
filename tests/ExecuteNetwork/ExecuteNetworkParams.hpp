@@ -24,6 +24,7 @@ struct ExecuteNetworkParams
     bool                          m_EnableProfiling;
     bool                          m_GenerateTensorData;
     bool                          m_InferOutputShape = false;
+    bool                          m_EnableDelegate = false;
     std::vector<std::string>      m_InputNames;
     std::vector<std::string>      m_InputTensorDataFilePaths;
     std::vector<TensorShapePtr>   m_InputTensorShapes;

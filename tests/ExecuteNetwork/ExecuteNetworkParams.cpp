@@ -74,6 +74,7 @@ void CheckModelFormat(const std::string& modelFormat)
                                                               "format supported for tflite files",
                                                               modelFormat));
         }
+#elif defined(ARMNN_TFLITE_DELEGATE)
 #else
         throw armnn::InvalidArgumentException("Can't run model in tflite format without a "
                                               "built with Tensorflow Lite parser support.");

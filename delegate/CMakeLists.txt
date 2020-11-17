@@ -195,5 +195,7 @@ export(
         EXPORT      armnn-delegate-targets
         FILE        ${CMAKE_CURRENT_BINARY_DIR}/ArmnnDelegateTargets.cmake
         NAMESPACE   ArmnnDelegate::)
+add_library(ArmnnDelegate::ArmnnDelegate ALIAS armnnDelegate)
+
 
 ####################################################

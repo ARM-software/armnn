@@ -129,6 +129,7 @@ if(BUILD_UNIT_TESTS)
         src/test/SoftmaxTest.cpp
         src/test/SoftmaxTestHelper.hpp
         src/test/TestUtils.hpp
+        src/test/TestUtils.cpp
         src/test/TransposeTest.cpp
         src/test/TransposeTestHelper.hpp)
 

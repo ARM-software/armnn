@@ -25,6 +25,13 @@ void FillInput(std::unique_ptr<tflite::Interpreter>& interpreter, int inputIndex
     }
 }
 
+// Can be used to compare data with a tolerance depending on their data type
+void CompareData(float tensor1[], float tensor2[], size_t tensorSize);
+void CompareData(int8_t tensor1[], int8_t tensor2[], size_t tensorSize);
+void CompareData(uint8_t tensor1[], uint8_t tensor2[], size_t tensorSize);
+void CompareData(int16_t tensor1[], int16_t tensor2[], size_t tensorSize);
+
+
 // Can be used to compare the output tensor shape and values
 // from armnnDelegateInterpreter and tfLiteInterpreter.
 // Example usage can be found in ControlTestHelper.hpp
@@ -36,7 +43,7 @@ void CompareOutputData(std::unique_ptr<tflite::Interpreter>& tfLiteInterpreter,
 {
     auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[0];
     auto tfLiteDelegateOutputTensor = tfLiteInterpreter->tensor(tfLiteDelegateOutputId);
-    auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateOutputId);
+    auto tfLiteDelegateOutputData = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateOutputId);
     auto armnnDelegateOutputId = armnnDelegateInterpreter->outputs()[0];
     auto armnnDelegateOutputTensor = armnnDelegateInterpreter->tensor(armnnDelegateOutputId);
     auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateOutputId);
@@ -48,12 +55,9 @@ void CompareOutputData(std::unique_ptr<tflite::Interpreter>& tfLiteInterpreter,
         CHECK(tfLiteDelegateOutputTensor->dims->data[i] == armnnDelegateOutputTensor->dims->data[i]);
     }
 
-    for (size_t i = 0; i < expectedOutputValues.size(); i++)
-    {
-        CHECK(expectedOutputValues[i] == armnnDelegateOutputData[i]);
-        CHECK(tfLiteDelageOutputData[i] == expectedOutputValues[i]);
-        CHECK(tfLiteDelageOutputData[i] == armnnDelegateOutputData[i]);
-    }
+    armnnDelegate::CompareData(expectedOutputValues.data(), armnnDelegateOutputData    , expectedOutputValues.size());
+    armnnDelegate::CompareData(tfLiteDelegateOutputData   , expectedOutputValues.data(), expectedOutputValues.size());
+    armnnDelegate::CompareData(tfLiteDelegateOutputData   , armnnDelegateOutputData    , expectedOutputValues.size());
 }
 
 } // namespace armnnDelegate

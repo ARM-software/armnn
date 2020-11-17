@@ -864,18 +864,6 @@ TEST_CASE ("MaxPooling2d_Uint8_Relu_GpuAcc_Test")
     MaxPool2dUint8ReluTest(backends);
 }
 
-TEST_CASE ("MaxPooling2d_Int16_PaddingSame_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MaxPool2dInt16PaddingSameTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_Int16_Relu_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MaxPool2dInt16ReluTest(backends);
-}
-
 TEST_CASE ("AveragePooling2d_FP32_PaddingValid_GpuAcc_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
@@ -934,18 +922,6 @@ TEST_CASE ("AveragePooling2d_Uint8_Relu_GpuAcc_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     AveragePool2dUint8ReluTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Int16_PaddingSame_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AveragePool2dInt16PaddingSameTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Int16_Relu_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AveragePool2dInt16ReluTest(backends);
 }
 
 TEST_CASE ("L2Pooling2d_FP32_PaddingValid_GpuAcc_Test")
@@ -1037,18 +1013,6 @@ TEST_CASE ("MaxPooling2d_Uint8_Relu_CpuAcc_Test")
     MaxPool2dUint8ReluTest(backends);
 }
 
-TEST_CASE ("MaxPooling2d_Int16_PaddingSame_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MaxPool2dInt16PaddingSameTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_Int16_Relu_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MaxPool2dInt16ReluTest(backends);
-}
-
 TEST_CASE ("AveragePooling2d_FP32_PaddingValid_CpuAcc_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
@@ -1107,18 +1071,6 @@ TEST_CASE ("AveragePooling2d_Uint8_Relu_CpuAcc_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
     AveragePool2dUint8ReluTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Int16_PaddingSame_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AveragePool2dInt16PaddingSameTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Int16_Relu_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AveragePool2dInt16ReluTest(backends);
 }
 
 TEST_CASE ("L2Pooling2d_FP32_PaddingValid_CpuAcc_Test")

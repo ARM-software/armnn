@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "TestUtils.hpp"
+
 #include <armnn_delegate.hpp>
 
 #include <flatbuffers/flatbuffers.h>
@@ -183,26 +185,8 @@ void Pooling2dTest(tflite::BuiltinOperator poolingOperatorCode,
     // Run EnqueueWorkload
     CHECK(tfLiteInterpreter->Invoke() == kTfLiteOk);
     CHECK(armnnDelegateInterpreter->Invoke() == kTfLiteOk);
-    // Compare output data
-    auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[0];
-    auto tfLiteDelegateOutputData = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateOutputId);
-    auto tfLiteDelegateOutputTensor = tfLiteInterpreter->tensor(tfLiteDelegateOutputId);
-    auto armnnDelegateOutputId = armnnDelegateInterpreter->outputs()[0];
-    auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateOutputId);
-    auto armnnDelegateOutputTensor = armnnDelegateInterpreter->tensor(armnnDelegateOutputId);
 
-    for (size_t i = 0; i < static_cast<size_t>(tfLiteDelegateOutputTensor->dims->size); i++)
-    {
-        CHECK(outputShape[i] == armnnDelegateOutputTensor->dims->data[i]);
-        CHECK(tfLiteDelegateOutputTensor->dims->data[i] == armnnDelegateOutputTensor->dims->data[i]);
-    }
-
-    for (size_t i = 0; i < expectedOutputValues.size(); i++)
-    {
-        CHECK(expectedOutputValues[i] == armnnDelegateOutputData[i]);
-        CHECK(tfLiteDelegateOutputData[i] == expectedOutputValues[i]);
-        CHECK(tfLiteDelegateOutputData[i] == armnnDelegateOutputData[i]);
-    }
+    armnnDelegate::CompareOutputData(tfLiteInterpreter, armnnDelegateInterpreter, outputShape, expectedOutputValues);
 }
 
 } // anonymous namespace

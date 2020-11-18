@@ -124,6 +124,8 @@ if(BUILD_UNIT_TESTS)
         src/test/Pooling2dTestHelper.hpp
         src/test/QuantizationTest.cpp
         src/test/QuantizationTestHelper.hpp
+        src/test/RedefineTestHelper.hpp
+        src/test/ReshapeTest.cpp
         src/test/ResizeTest.cpp
         src/test/ResizeTestHelper.hpp
         src/test/SoftmaxTest.cpp

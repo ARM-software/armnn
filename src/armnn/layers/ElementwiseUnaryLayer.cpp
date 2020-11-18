@@ -24,6 +24,11 @@ std::unique_ptr<IWorkload> ElementwiseUnaryLayer::CreateWorkload(const IWorkload
 {
     ElementwiseUnaryQueueDescriptor descriptor;
 
+    if (descriptor.m_Parameters.m_Operation == UnaryOperation::LogicalNot)
+    {
+        return factory.CreateLogicalUnary(descriptor, PrepInfoAndDesc(descriptor));
+    }
+
     return factory.CreateElementwiseUnary(descriptor, PrepInfoAndDesc(descriptor));
 }
 

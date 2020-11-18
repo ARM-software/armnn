@@ -747,6 +747,7 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleReshapeFloat32, SimpleReshapeTest<armnn::Dat
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleReshapeInt8, SimpleReshapeTest<armnn::DataType::QAsymmS8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleReshapeUint8, SimpleReshapeTest<armnn::DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Reshape5d, Reshape5dTest<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReshapeBoolean, ReshapeBooleanTest)
 
 // Pad
 ARMNN_AUTO_TEST_CASE_WITH_THF(PadFloat322d, PadFloat322dTest)

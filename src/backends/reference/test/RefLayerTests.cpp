@@ -1386,6 +1386,8 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleReshapeQuantisedAsymmS8, SimpleReshapeTest<D
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleReshapeQuantisedAsymm8, SimpleReshapeTest<DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleReshapeQuantisedSymm16, SimpleReshapeTest<DataType::QSymmS16>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Reshape5d, Reshape5dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReshapeBoolean, ReshapeBooleanTest)
+
 
 // Rsqrt
 ARMNN_AUTO_TEST_CASE_WITH_THF(Rsqrt2d, Rsqrt2dTest<DataType::Float32>)

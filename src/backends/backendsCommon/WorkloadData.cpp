@@ -1675,7 +1675,8 @@ void ReshapeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16,
-        DataType::Signed32
+        DataType::Signed32,
+        DataType::Boolean
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);

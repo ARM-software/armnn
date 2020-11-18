@@ -119,6 +119,10 @@ public:
             RsqrtQueueDescriptor rsqrtDescriptor;
             return CreateRsqrt(rsqrtDescriptor, info);
         }
+        else if (descriptor.m_Parameters.m_Operation == UnaryOperation::LogicalNot)
+        {
+            return CreateLogicalUnary(descriptor, info);
+        }
         return nullptr;
     }
 

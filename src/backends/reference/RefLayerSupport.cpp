@@ -807,13 +807,29 @@ bool RefLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
         DataType::Signed32
     };
 
+    std::array<DataType, 1> logicalSupportedTypes =
+    {
+        DataType::Boolean
+    };
+
     bool supported = true;
 
-    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
-                                  "Reference elementwise unary: input type not supported");
+    if (descriptor.m_Operation == UnaryOperation::LogicalNot)
+    {
+        supported &= CheckSupportRule(TypeAnyOf(input, logicalSupportedTypes), reasonIfUnsupported,
+                                      "Reference elementwise unary: input type not supported");
 
-    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
-                                  "Reference elementwise unary: output type not supported");
+        supported &= CheckSupportRule(TypeAnyOf(output, logicalSupportedTypes), reasonIfUnsupported,
+                                      "Reference elementwise unary: output type not supported");
+    }
+    else
+    {
+        supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                      "Reference elementwise unary: input type not supported");
+
+        supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                      "Reference elementwise unary: output type not supported");
+    }
 
     supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
                                   "Reference elementwise unary: input and output types not matching");
@@ -1720,7 +1736,7 @@ bool RefLayerSupport::IsReshapeSupported(const TensorInfo& input,
     IgnoreUnused(output);
     IgnoreUnused(descriptor);
     // Define supported output types.
-    std::array<DataType,7> supportedOutputTypes =
+    std::array<DataType,8> supportedOutputTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
@@ -1728,7 +1744,8 @@ bool RefLayerSupport::IsReshapeSupported(const TensorInfo& input,
         DataType::Signed32,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Boolean
     };
 
     return CheckSupportRule(TypeAnyOf(input, supportedOutputTypes), reasonIfUnsupported,

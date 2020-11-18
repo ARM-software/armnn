@@ -170,6 +170,30 @@ LayerTestResult<T, 5> Reshape5dTest(
         workloadFactory, memoryManager, tensorHandleFactory, inputTensorInfo, outputTensorInfo, input, outputExpected);
 }
 
+LayerTestResult<uint8_t, 2> ReshapeBooleanTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[] = { 1, 4 };
+    unsigned int outputShape[] = { 2, 2 };
+
+    inputTensorInfo = armnn::TensorInfo(2, inputShape, armnn::DataType::Boolean);
+    inputTensorInfo.SetQuantizationScale(1.0f);
+    outputTensorInfo = armnn::TensorInfo(2, outputShape, armnn::DataType::Boolean);
+    outputTensorInfo.SetQuantizationScale(1.0f);
+
+    const std::vector<uint8_t> input = { true, false, false, true };
+
+    const std::vector<uint8_t> outputExpected = { true, false, false, true };
+
+    return SimpleReshapeTestImpl<uint8_t, 2>(
+        workloadFactory, memoryManager, tensorHandleFactory, inputTensorInfo, outputTensorInfo, input, outputExpected);
+}
+
 //
 // Explicit template specializations
 //

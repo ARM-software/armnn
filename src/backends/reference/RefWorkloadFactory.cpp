@@ -307,6 +307,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDivision(const DivisionQueu
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
                                                                       const WorkloadInfo& info) const
 {
+    if (descriptor.m_Parameters.m_Operation == UnaryOperation::LogicalNot)
+    {
+        return std::make_unique<RefLogicalUnaryWorkload>(descriptor, info);
+    }
     return std::make_unique<RefElementwiseUnaryWorkload>(descriptor, info);
 }
 

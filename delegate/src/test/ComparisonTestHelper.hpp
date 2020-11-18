@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "TestUtils.hpp"
+
 #include <armnn_delegate.hpp>
 
 #include <flatbuffers/flatbuffers.h>
@@ -225,12 +227,9 @@ void ComparisonTest(tflite::BuiltinOperator comparisonOperatorCode,
     auto armnnDelegateOutputId = armnnDelegateInterpreter->outputs()[0];
     auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<bool>(armnnDelegateOutputId);
 
-    for (size_t i = 0; i < expectedOutputValues.size(); i++)
-    {
-        CHECK(expectedOutputValues[i] == armnnDelegateOutputData[i]);
-        CHECK(tfLiteDelageOutputData[i] == expectedOutputValues[i]);
-        CHECK(tfLiteDelageOutputData[i] == armnnDelegateOutputData[i]);
-    }
+    armnnDelegate::CompareData(expectedOutputValues  , armnnDelegateOutputData, expectedOutputValues.size());
+    armnnDelegate::CompareData(expectedOutputValues  , tfLiteDelageOutputData , expectedOutputValues.size());
+    armnnDelegate::CompareData(tfLiteDelageOutputData, armnnDelegateOutputData, expectedOutputValues.size());
 }
 
 } // anonymous namespace

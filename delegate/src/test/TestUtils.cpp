@@ -8,6 +8,26 @@
 namespace armnnDelegate
 {
 
+
+
+void CompareData(bool tensor1[], bool tensor2[], size_t tensorSize)
+{
+    auto compareBool = [](auto a, auto b) {return (((a == 0) && (b == 0)) || ((a != 0) && (b != 0)));};
+    for (size_t i = 0; i < tensorSize; i++)
+    {
+        CHECK(compareBool(tensor1[i], tensor2[i]));
+    }
+}
+
+void CompareData(std::vector<bool>& tensor1, bool tensor2[], size_t tensorSize)
+{
+    auto compareBool = [](auto a, auto b) {return (((a == 0) && (b == 0)) || ((a != 0) && (b != 0)));};
+    for (size_t i = 0; i < tensorSize; i++)
+    {
+        CHECK(compareBool(tensor1[i], tensor2[i]));
+    }
+}
+
 void CompareData(float tensor1[], float tensor2[], size_t tensorSize)
 {
     for (size_t i = 0; i < tensorSize; i++)

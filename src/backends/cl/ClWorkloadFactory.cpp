@@ -281,25 +281,27 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateElementwiseUnary(const Eleme
     switch(descriptor.m_Parameters.m_Operation)
     {
         case UnaryOperation::Abs:
-             {
-                 AbsQueueDescriptor absQueueDescriptor;
-                 absQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
-                 absQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+        {
+            AbsQueueDescriptor absQueueDescriptor;
+            absQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
+            absQueueDescriptor.m_Outputs = descriptor.m_Outputs;
 
-                 return  std::make_unique<ClAbsWorkload>(absQueueDescriptor, info);
-             }
+            return  std::make_unique<ClAbsWorkload>(absQueueDescriptor, info);
+        }
         case UnaryOperation::Exp:
             return std::make_unique<ClExpWorkload>(descriptor, info);
         case UnaryOperation::Neg:
             return std::make_unique<ClNegWorkload>(descriptor, info);
         case UnaryOperation::Rsqrt:
-             {
-                 RsqrtQueueDescriptor rsqrtQueueDescriptor;
-                 rsqrtQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
-                 rsqrtQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+        {
+            RsqrtQueueDescriptor rsqrtQueueDescriptor;
+            rsqrtQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
+            rsqrtQueueDescriptor.m_Outputs = descriptor.m_Outputs;
 
-                 return std::make_unique<ClRsqrtWorkload>(rsqrtQueueDescriptor, info);
-             }
+            return std::make_unique<ClRsqrtWorkload>(rsqrtQueueDescriptor, info);
+        }
+        case UnaryOperation::LogicalNot:
+            return std::make_unique<ClLogicalNotWorkload>(descriptor, info);
         default:
             return nullptr;
     }
@@ -368,6 +370,32 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateL2Normalization(const L2Norm
                                                                     const WorkloadInfo& info) const
 {
     return MakeWorkload<ClL2NormalizationFloatWorkload, NullWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLogicalBinary(const LogicalBinaryQueueDescriptor& descriptor,
+                                                                  const WorkloadInfo& info) const
+{
+    switch(descriptor.m_Parameters.m_Operation)
+    {
+        case LogicalBinaryOperation::LogicalAnd:
+            return std::make_unique<ClLogicalAndWorkload>(descriptor, info);
+        case LogicalBinaryOperation::LogicalOr:
+            return std::make_unique<ClLogicalOrWorkload>(descriptor, info);
+        default:
+            return nullptr;
+    }
+}
+
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLogicalUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
+                                                                 const WorkloadInfo& info) const
+{
+    switch(descriptor.m_Parameters.m_Operation)
+    {
+        case UnaryOperation::LogicalNot:
+            return std::make_unique<ClLogicalNotWorkload>(descriptor, info);
+        default:
+            return nullptr;
+    }
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLogSoftmax(const LogSoftmaxQueueDescriptor& descriptor,

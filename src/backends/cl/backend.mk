@@ -46,6 +46,9 @@ BACKEND_SOURCES := \
         workloads/ClGatherWorkload.cpp \
         workloads/ClInstanceNormalizationWorkload.cpp \
         workloads/ClL2NormalizationFloatWorkload.cpp \
+        workloads/ClLogicalAndWorkload.cpp \
+        workloads/ClLogicalNotWorkload.cpp \
+        workloads/ClLogicalOrWorkload.cpp \
         workloads/ClLogSoftmaxWorkload.cpp \
         workloads/ClLstmFloatWorkload.cpp \
         workloads/ClMaximumWorkload.cpp \

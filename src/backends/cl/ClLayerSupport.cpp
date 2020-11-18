@@ -42,6 +42,9 @@
 #include "workloads/ClInstanceNormalizationWorkload.hpp"
 #include "workloads/ClL2NormalizationFloatWorkload.hpp"
 #include "workloads/ClLogSoftmaxWorkload.hpp"
+#include "workloads/ClLogicalAndWorkload.hpp"
+#include "workloads/ClLogicalNotWorkload.hpp"
+#include "workloads/ClLogicalOrWorkload.hpp"
 #include "workloads/ClLstmFloatWorkload.hpp"
 #include "workloads/ClMaximumWorkload.hpp"
 #include "workloads/ClMeanWorkload.hpp"
@@ -460,6 +463,11 @@ bool ClLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
                                            reasonIfUnsupported,
                                            input,
                                            output);
+        case UnaryOperation::LogicalNot:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(ClLogicalNotWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
         default:
             return false;
     }
@@ -556,6 +564,34 @@ bool ClLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
                                    output,
                                    descriptor);
 }
+
+bool ClLayerSupport::IsLogicalBinarySupported(const TensorInfo& input0,
+                                              const TensorInfo& input1,
+                                              const TensorInfo& output,
+                                              const LogicalBinaryDescriptor& descriptor,
+                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(output);
+
+    switch(descriptor.m_Operation)
+    {
+        case LogicalBinaryOperation::LogicalAnd:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(ClLogicalAndWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input0,
+                                           input1,
+                                           output);
+        case LogicalBinaryOperation::LogicalOr:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(ClLogicalOrWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input0,
+                                           input1,
+                                           output);
+        default:
+            return false;
+    }
+}
+
 
 bool ClLayerSupport::IsLogSoftmaxSupported(const TensorInfo& input,
                                                 const TensorInfo& output,

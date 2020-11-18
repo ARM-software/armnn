@@ -121,6 +121,26 @@ BOOST_FIXTURE_TEST_CASE(IsConvertFp32ToFp16SupportedFp32OutputCl, ClContextContr
     BOOST_CHECK_EQUAL(reasonIfUnsupported, "Output should be Float16");
 }
 
+BOOST_FIXTURE_TEST_CASE(IsLogicalBinarySupportedCl, ClContextControlFixture)
+{
+    std::string reasonIfUnsupported;
+
+    bool result = IsLogicalBinaryLayerSupportedTests<armnn::ClWorkloadFactory,
+      armnn::DataType::Boolean, armnn::DataType::Boolean>(reasonIfUnsupported);
+
+    BOOST_CHECK(result);
+}
+
+BOOST_FIXTURE_TEST_CASE(IsLogicalBinaryBroadcastSupportedCl, ClContextControlFixture)
+{
+    std::string reasonIfUnsupported;
+
+    bool result = IsLogicalBinaryLayerBroadcastSupportedTests<armnn::ClWorkloadFactory,
+      armnn::DataType::Boolean, armnn::DataType::Boolean>(reasonIfUnsupported);
+
+    BOOST_CHECK(result);
+}
+
 BOOST_FIXTURE_TEST_CASE(IsMeanSupportedCl, ClContextControlFixture)
 {
     std::string reasonIfUnsupported;

@@ -50,6 +50,12 @@ list(APPEND armnnClBackendWorkloads_sources
     ClInstanceNormalizationWorkload.hpp
     ClL2NormalizationFloatWorkload.cpp
     ClL2NormalizationFloatWorkload.hpp
+    ClLogicalAndWorkload.cpp
+    ClLogicalAndWorkload.hpp
+    ClLogicalNotWorkload.cpp
+    ClLogicalNotWorkload.hpp
+    ClLogicalOrWorkload.cpp
+    ClLogicalOrWorkload.hpp
     ClLogSoftmaxWorkload.cpp
     ClLogSoftmaxWorkload.hpp
     ClLstmFloatWorkload.cpp

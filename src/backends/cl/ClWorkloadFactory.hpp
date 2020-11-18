@@ -138,6 +138,12 @@ public:
     std::unique_ptr<IWorkload> CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
                                                      const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateLogicalBinary(const LogicalBinaryQueueDescriptor& descriptor,
+                                                   const WorkloadInfo& info) const override;
+
+    std::unique_ptr<IWorkload> CreateLogicalUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
+                                                  const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateLogSoftmax(const LogSoftmaxQueueDescriptor& descriptor,
                                                 const WorkloadInfo& info) const override;
 

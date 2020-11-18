@@ -7,10 +7,10 @@
 CMD=$( basename $0 )
 
 # For pinning to a ref use this:
-#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_08" # Release 20.08
+DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_11" # Release 20.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="04a0706dddc6ca24cb80e3e0789c6b0f54c48b28" #COMPMID-3979 Sanitise Padding Removal epic
+#DEFAULT_CLFRAMEWORKREVISION="75eea338eb232ebdafa2fb84d22e711b5f964785" #COMPMID-3961: Add Logical OR/AND/NOT operator on CL
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

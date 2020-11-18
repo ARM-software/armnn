@@ -77,6 +77,14 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
     for(unsigned int inputIndex = 0; inputIndex < numInputs; ++inputIndex)
     {
         int input = tfLiteInterpreter->inputs()[inputIndex];
+        TfLiteIntArray* inputDims = tfLiteInterpreter->tensor(input)->dims;
+
+        long inputSize = 1;
+        for (unsigned int dim = 0; dim < static_cast<unsigned int>(inputDims->size); ++dim)
+        {
+            inputSize *=  inputDims->data[dim];
+        }
+
         if (params.m_InputTypes[inputIndex].compare("float") == 0)
         {
             auto inputData = tfLiteInterpreter->typed_tensor<float>(input);
@@ -86,8 +94,15 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
                                    params.m_InputTypes[inputIndex],
                                    armnn::EmptyOptional(),
                                    dataFile);
-            inputData = reinterpret_cast<float*>(&tensorData);
-            armnn::IgnoreUnused(inputData);
+
+            mapbox::util::apply_visitor([&](auto&& value)
+            {
+                for (unsigned int i = 0; i < inputSize; ++i)
+                {
+                    inputData[i] = value.data()[i];
+                }
+            },
+            tensorData);
         }
         else if (params.m_InputTypes[inputIndex].compare("int") == 0)
         {
@@ -98,8 +113,14 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
                                    params.m_InputTypes[inputIndex],
                                    armnn::EmptyOptional(),
                                    dataFile);
-            inputData = reinterpret_cast<int32_t*>(&tensorData);
-            armnn::IgnoreUnused(inputData);
+            mapbox::util::apply_visitor([&](auto&& value)
+            {
+                for (unsigned int i = 0; i < inputSize; ++i)
+                {
+                    inputData[i] = value.data()[i];
+                }
+            },
+            tensorData);
         }
         else if (params.m_InputTypes[inputIndex].compare("qasymm8") == 0)
         {
@@ -110,8 +131,14 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
                                    params.m_InputTypes[inputIndex],
                                    armnn::EmptyOptional(),
                                    dataFile);
-            inputData = reinterpret_cast<uint8_t*>(&tensorData);
-            armnn::IgnoreUnused(inputData);
+            mapbox::util::apply_visitor([&](auto&& value)
+            {
+                for (unsigned int i = 0; i < inputSize; ++i)
+                {
+                    inputData[i] = value.data()[i];
+                }
+            },
+            tensorData);
         }
         else
         {
@@ -128,21 +155,19 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
         // Print out the output
         for (unsigned int outputIndex = 0; outputIndex < params.m_OutputNames.size(); ++outputIndex)
         {
-            std::cout << "Printing out the output" << std::endl;
             auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[outputIndex];
-            TfLiteIntArray *outputDims = tfLiteInterpreter->tensor(tfLiteDelegateOutputId)->dims;
+            TfLiteIntArray* outputDims = tfLiteInterpreter->tensor(tfLiteDelegateOutputId)->dims;
 
-            int outputSize = 1;
+            long outputSize = 1;
             for (unsigned int dim = 0; dim < static_cast<unsigned int>(outputDims->size); ++dim)
             {
-                outputSize *= outputDims->data[dim];
+                outputSize *=  outputDims->data[dim];
             }
 
             std::cout << params.m_OutputNames[outputIndex] << ": ";
             if (params.m_OutputTypes[outputIndex].compare("float") == 0)
             {
                 auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<float>(tfLiteDelegateOutputId);
-
                 if(tfLiteDelageOutputData == NULL)
                 {
                     ARMNN_LOG(fatal) << "Output tensor is null, output type: "
@@ -162,7 +187,6 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
             else if (params.m_OutputTypes[outputIndex].compare("int") == 0)
             {
                 auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<int32_t>(tfLiteDelegateOutputId);
-
                 if(tfLiteDelageOutputData == NULL)
                 {
                     ARMNN_LOG(fatal) << "Output tensor is null, output type: "
@@ -182,7 +206,6 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
             else if (params.m_OutputTypes[outputIndex].compare("qasymm8") == 0)
             {
                 auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<uint8_t>(tfLiteDelegateOutputId);
-
                 if(tfLiteDelageOutputData == NULL)
                 {
                     ARMNN_LOG(fatal) << "Output tensor is null, output type: "

@@ -228,13 +228,13 @@ TfLiteStatus VisitElementwiseBinaryOperator(DelegateData& delegateData,
                                                inputTensorInfo1,
                                                outputTensorInfo);
             case kTfLiteBuiltinMul:
-                return ValidateDivOperator(delegateData,
+                return ValidateMulOperator(delegateData,
                                            tfLiteContext,
                                            inputTensorInfo0,
                                            inputTensorInfo1,
                                            outputTensorInfo);
             case kTfLiteBuiltinSub:
-                return ValidateDivOperator(delegateData,
+                return ValidateSubOperator(delegateData,
                                            tfLiteContext,
                                            inputTensorInfo0,
                                            inputTensorInfo1,

@@ -657,289 +657,382 @@ void SubUint8Test(std::vector<armnn::BackendId>& backends)
                                    expectedOutputValues, 1.0f, 0);
 }
 
-TEST_SUITE("ElementwiseBinaryTest")
+TEST_SUITE("ElementwiseBinary_GpuAccTests")
 {
 
 TEST_CASE ("ADD_FP32_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    AddFP32Test(backends);
-}
-
-TEST_CASE ("ADD_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     AddFP32Test(backends);
 }
 
 TEST_CASE ("ADD_Broadcast_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    AddBroadcastTest(backends);
-}
-
-TEST_CASE ("ADD_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     AddBroadcastTest(backends);
 }
 
 TEST_CASE ("ADD_Activation_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    AddActivationTest(backends);
-}
-
-TEST_CASE ("ADD_Actiation_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     AddActivationTest(backends);
 }
 
 TEST_CASE ("ADD_UINT8_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    AddUint8Test(backends);
-}
-
-TEST_CASE ("ADD_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     AddUint8Test(backends);
 }
 
 TEST_CASE ("DIV_FP32_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    DivFP32Test(backends);
-}
-
-TEST_CASE ("DIV_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     DivFP32Test(backends);
 }
 
 TEST_CASE ("DIV_Broadcast_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    DivBroadcastTest(backends);
-}
-
-TEST_CASE ("DIV_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     DivBroadcastTest(backends);
 }
 
 TEST_CASE ("DIV_UINT8_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    DivUint8Test(backends);
-}
-
-TEST_CASE ("DIV_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     DivUint8Test(backends);
 }
 
 TEST_CASE ("MAX_FP32_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    MaxFP32Test(backends);
-}
-
-TEST_CASE ("MAX_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     MaxFP32Test(backends);
 }
 
 TEST_CASE ("MAX_Broadcast_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    MaxBroadcastTest(backends);
-}
-
-TEST_CASE ("MAX_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     MaxBroadcastTest(backends);
 }
 
 TEST_CASE ("MAX_UINT8_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    MaxUint8Test(backends);
-}
-
-TEST_CASE ("MAX_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     MaxUint8Test(backends);
 }
 
 TEST_CASE ("MIN_FP32_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    MinFP32Test(backends);
-}
-
-TEST_CASE ("MIN_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     MinFP32Test(backends);
 }
 
 TEST_CASE ("MIN_Broadcast_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    MinBroadcastTest(backends);
-}
-
-TEST_CASE ("MIN_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     MinBroadcastTest(backends);
 }
 
 TEST_CASE ("MIN_UINT8_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    MinUint8Test(backends);
-}
-
-TEST_CASE ("MIN_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     MinUint8Test(backends);
 }
 
 TEST_CASE ("MUL_FP32_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    MulFP32Test(backends);
-}
-
-TEST_CASE ("MUL_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     MulFP32Test(backends);
 }
 
 TEST_CASE ("MUL_Broadcast_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    MulBroadcastTest(backends);
-}
-
-TEST_CASE ("MUL_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     MulBroadcastTest(backends);
 }
 
 TEST_CASE ("MUL_Activation_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    MulActivationTest(backends);
-}
-
-TEST_CASE ("MUL_Actiation_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     MulActivationTest(backends);
 }
 
 TEST_CASE ("MUL_UINT8_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    MulUint8Test(backends);
-}
-
-TEST_CASE ("MUL_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     MulUint8Test(backends);
 }
 
 TEST_CASE ("SUB_FP32_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    SubFP32Test(backends);
-}
-
-TEST_CASE ("SUB_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     SubFP32Test(backends);
 }
 
 TEST_CASE ("SUB_Broadcast_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    SubBroadcastTest(backends);
-}
-
-TEST_CASE ("SUB_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     SubBroadcastTest(backends);
 }
 
 TEST_CASE ("SUB_UINT8_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     SubUint8Test(backends);
+}
+
+} //TEST_SUITE("ElementwiseBinary_GpuAccTests")
+
+
+
+TEST_SUITE("ElementwiseBinary_CpuAccTests")
+{
+
+TEST_CASE ("ADD_FP32_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    AddFP32Test(backends);
+}
+
+TEST_CASE ("ADD_Broadcast_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    AddBroadcastTest(backends);
+}
+
+TEST_CASE ("ADD_Actiation_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    AddActivationTest(backends);
+}
+
+TEST_CASE ("ADD_UINT8_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    AddUint8Test(backends);
+}
+
+TEST_CASE ("DIV_FP32_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    DivFP32Test(backends);
+}
+
+TEST_CASE ("DIV_Broadcast_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    DivBroadcastTest(backends);
+}
+
+TEST_CASE ("DIV_UINT8_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    DivUint8Test(backends);
+}
+
+TEST_CASE ("MAX_FP32_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    MaxFP32Test(backends);
+}
+
+TEST_CASE ("MAX_Broadcast_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    MaxBroadcastTest(backends);
+}
+
+TEST_CASE ("MAX_UINT8_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    MaxUint8Test(backends);
+}
+
+TEST_CASE ("MIN_FP32_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    MinFP32Test(backends);
+}
+
+TEST_CASE ("MIN_Broadcast_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    MinBroadcastTest(backends);
+}
+
+TEST_CASE ("MIN_UINT8_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    MinUint8Test(backends);
+}
+
+TEST_CASE ("MUL_FP32_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    MulFP32Test(backends);
+}
+
+TEST_CASE ("MUL_Broadcast_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    MulBroadcastTest(backends);
+}
+
+TEST_CASE ("MUL_Actiation_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    MulActivationTest(backends);
+}
+
+TEST_CASE ("MUL_UINT8_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    MulUint8Test(backends);
+}
+
+TEST_CASE ("SUB_FP32_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    SubFP32Test(backends);
+}
+
+TEST_CASE ("SUB_Broadcast_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    SubBroadcastTest(backends);
 }
 
 TEST_CASE ("SUB_UINT8_CpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
     SubUint8Test(backends);
 }
 
-} // End of TEST_SUITE("ElementwiseBinaryTest")
+} // TEST_SUITE("ElementwiseBinary_CpuAccTests")
+
+
+TEST_SUITE("ElementwiseBinary_CpuRefTests")
+{
+
+TEST_CASE ("ADD_FP32_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    AddFP32Test(backends);
+}
+
+TEST_CASE ("ADD_Broadcast_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    AddBroadcastTest(backends);
+}
+
+TEST_CASE ("ADD_Actiation_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    AddActivationTest(backends);
+}
+
+TEST_CASE ("ADD_UINT8_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    AddUint8Test(backends);
+}
+
+TEST_CASE ("DIV_FP32_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    DivFP32Test(backends);
+}
+
+TEST_CASE ("DIV_Broadcast_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    DivBroadcastTest(backends);
+}
+
+TEST_CASE ("DIV_UINT8_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    DivUint8Test(backends);
+}
+
+TEST_CASE ("MAX_FP32_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    MaxFP32Test(backends);
+}
+
+TEST_CASE ("MAX_Broadcast_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    MaxBroadcastTest(backends);
+}
+
+TEST_CASE ("MAX_UINT8_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    MaxUint8Test(backends);
+}
+
+TEST_CASE ("MIN_FP32_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    MinFP32Test(backends);
+}
+
+TEST_CASE ("MIN_Broadcast_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    MinBroadcastTest(backends);
+}
+
+TEST_CASE ("MIN_UINT8_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    MinUint8Test(backends);
+}
+
+TEST_CASE ("MUL_FP32_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    MulFP32Test(backends);
+}
+
+TEST_CASE ("MUL_Broadcast_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    MulBroadcastTest(backends);
+}
+
+TEST_CASE ("MUL_Actiation_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    MulActivationTest(backends);
+}
+
+TEST_CASE ("MUL_UINT8_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    MulUint8Test(backends);
+}
+
+TEST_CASE ("SUB_FP32_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    SubFP32Test(backends);
+}
+
+TEST_CASE ("SUB_Broadcast_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    SubBroadcastTest(backends);
+}
+
+TEST_CASE ("SUB_UINT8_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    SubUint8Test(backends);
+}
+
+} // TEST_SUITE("ElementwiseBinary_CpuRefTests")
 
 } // namespace armnnDelegate

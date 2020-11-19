@@ -188,11 +188,6 @@ public:
                                   const LogicalBinaryDescriptor& descriptor,
                                   Optional<std::string&> reasonIfUnsupported) const override;
 
-    bool IsLogicalUnarySupported(const TensorInfo& input,
-                                 const TensorInfo& output,
-                                 const ElementwiseUnaryDescriptor& descriptor,
-                                 Optional<std::string&> reasonIfUnsupported) const override;
-
     bool IsLogSoftmaxSupported(const TensorInfo& input,
                                const TensorInfo& output,
                                const LogSoftmaxDescriptor& descriptor,

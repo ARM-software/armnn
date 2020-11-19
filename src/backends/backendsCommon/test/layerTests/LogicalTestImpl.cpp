@@ -50,7 +50,7 @@ LayerTestResult<uint8_t, NumDims> LogicalUnaryTestHelper(
     AddInputToWorkload(qDesc, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(qDesc, info, outputTensorInfo, outputHandle.get());
 
-    auto workload = workloadFactory.CreateLogicalUnary(qDesc, info);
+    auto workload = workloadFactory.CreateElementwiseUnary(qDesc, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

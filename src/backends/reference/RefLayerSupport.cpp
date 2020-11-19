@@ -1147,28 +1147,6 @@ bool RefLayerSupport::IsLogicalBinarySupported(const TensorInfo& input0,
     return supported;
 }
 
-bool RefLayerSupport::IsLogicalUnarySupported(const TensorInfo& input,
-                                              const TensorInfo& output,
-                                              const ElementwiseUnaryDescriptor& descriptor,
-                                              Optional<std::string&> reasonIfUnsupported) const
-{
-    IgnoreUnused(descriptor);
-
-    std::array<DataType, 1> supportedTypes =
-    {
-        DataType::Boolean
-    };
-
-    bool supported = true;
-    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
-                                  "Reference LogicalUnary: input type not supported");
-
-    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
-                                  "Reference LogicalUnary: input and output types do not match");
-
-    return supported;
-}
-
 bool RefLayerSupport::IsLogSoftmaxSupported(const TensorInfo& input,
                                             const TensorInfo& output,
                                             const LogSoftmaxDescriptor& descriptor,

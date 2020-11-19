@@ -372,18 +372,6 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateLogicalBinary(const Logica
     }
 }
 
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateLogicalUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
-                                                                   const WorkloadInfo& info) const
-{
-    switch(descriptor.m_Parameters.m_Operation)
-    {
-        case UnaryOperation::LogicalNot:
-            return std::make_unique<NeonLogicalNotWorkload>(descriptor, info);
-        default:
-            return nullptr;
-    }
-}
-
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateLstm(const LstmQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {

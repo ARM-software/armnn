@@ -386,18 +386,6 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLogicalBinary(const LogicalB
     }
 }
 
-std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLogicalUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
-                                                                 const WorkloadInfo& info) const
-{
-    switch(descriptor.m_Parameters.m_Operation)
-    {
-        case UnaryOperation::LogicalNot:
-            return std::make_unique<ClLogicalNotWorkload>(descriptor, info);
-        default:
-            return nullptr;
-    }
-}
-
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLogSoftmax(const LogSoftmaxQueueDescriptor& descriptor,
                                                                const WorkloadInfo& info) const
 {

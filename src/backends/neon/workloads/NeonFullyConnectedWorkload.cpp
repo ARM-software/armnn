@@ -27,6 +27,16 @@ arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                        const FullyConnectedDescriptor& descriptor,
                                                        const ActivationDescriptor* activationDescriptor)
 {
+    if (activationDescriptor)
+    {
+        std::vector<ActivationFunction> activations = {ActivationFunction::ReLu, ActivationFunction::BoundedReLu};
+        if (std::find(activations.begin(), activations.end(), activationDescriptor->m_Function) == activations.end())
+        {
+            return arm_compute::Status{
+                arm_compute::ErrorCode::RUNTIME_ERROR, "NeonFullyConnectedWorkload :Unsupported Activation Function"};
+        }
+    }
+
     const arm_compute::TensorInfo aclInput = BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutput = BuildArmComputeTensorInfo(output);
     const arm_compute::TensorInfo aclWeights = BuildArmComputeTensorInfo(weights);

@@ -220,7 +220,7 @@ void Conv2DWithBiasesRelu6Uint8Test(std::vector<armnn::BackendId>& backends)
                                             biasValues);
 }
 
-TEST_SUITE("Convolution2dTest_CpuRef")
+TEST_SUITE("Convolution2dTest_CpuRefTests")
 {
 
 TEST_CASE ("Conv2DWithBiases_Fp32_CpuRef_Test")
@@ -249,7 +249,7 @@ TEST_CASE ("Conv2DWithBiases_Relu6_Uint8_CpuRef_Test")
 
 } //End of TEST_SUITE("Convolution2dTest_CpuRef")
 
-TEST_SUITE("Convolution2dTest_CpuAcc")
+TEST_SUITE("Convolution2dTest_CpuAccTests")
 {
 
 TEST_CASE ("Conv2DWithBiases_Fp32_CpuAcc_Test")
@@ -278,7 +278,7 @@ Conv2DWithBiasesRelu6Uint8Test(backends);
 
 } //End of TEST_SUITE("Convolution2dTest_CpuAcc")
 
-TEST_SUITE("Convolution2dTest_GpuAcc")
+TEST_SUITE("Convolution2dTest_GpuAccTests")
 {
 
 TEST_CASE ("Conv2DWithBiases_Fp32_GpuAcc_Test")

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "TestUtils.hpp"
+
 #include <armnn_delegate.hpp>
 
 #include <flatbuffers/flatbuffers.h>
@@ -79,7 +81,7 @@ void ElementwiseUnaryFP32Test(tflite::BuiltinOperator unaryOperatorCode,
                               std::vector<float>& expectedOutputValues)
 {
     using namespace tflite;
-    const std::vector<int32_t> inputShape  { { 3, 1, 2} };
+    std::vector<int32_t> inputShape  { { 3, 1, 2} };
     std::vector<char> modelBuffer = CreateElementwiseUnaryTfLiteModel(unaryOperatorCode,
                                                                       ::tflite::TensorType_FLOAT32,
                                                                       inputShape);
@@ -126,15 +128,7 @@ void ElementwiseUnaryFP32Test(tflite::BuiltinOperator unaryOperatorCode,
     CHECK(armnnDelegateInterpreter->Invoke() == kTfLiteOk);
 
     // Compare output data
-    auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[0];
-    auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<float>(tfLiteDelegateOutputId);
-    auto armnnDelegateOutputId = armnnDelegateInterpreter->outputs()[0];
-    auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<float>(armnnDelegateOutputId);
-    for (size_t i = 0; i < inputValues.size(); i++)
-    {
-        CHECK(expectedOutputValues[i] == armnnDelegateOutputData[i]);
-        CHECK(tfLiteDelageOutputData[i] == armnnDelegateOutputData[i]);
-    }
+    armnnDelegate::CompareOutputData(tfLiteInterpreter, armnnDelegateInterpreter, inputShape, expectedOutputValues);
 }
 
 } // anonymous namespace

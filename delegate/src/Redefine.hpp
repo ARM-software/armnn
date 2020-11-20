@@ -105,10 +105,13 @@ TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,
             for (int i=0; i < reshapeOptions->num_dimensions; ++i)
             {
                 targetShape.push_back(reshapeOptions->shape[i]);
-                elementCounter = elementCounter * reshapeOptions->shape[i];
+                if (reshapeOptions->shape[i] > 0)
+                {
+                    elementCounter = elementCounter * reshapeOptions->shape[i];
+                }
             }
             // Check the number of elements match, otherwise fall back to using the second input tensor.
-            if (elementCounter == inputTensorInfo0.GetNumElements())
+            if (elementCounter <= inputTensorInfo0.GetNumElements())
             {
                 targetShapeFound = true;
             }

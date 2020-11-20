@@ -103,26 +103,6 @@ TEST_CASE ("Rsqrt_Float32_GpuAcc_Test")
     ElementwiseUnaryFP32Test(tflite::BuiltinOperator_RSQRT, backends, inputValues, expectedOutputValues);
 }
 
-TEST_CASE ("Sqrt_Float32_GpuAcc_Test")
-{
-    // Create the ArmNN Delegate
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    // Set input data
-    std::vector<float> inputValues
-    {
-        9.0f, 4.25f, 81.9f,
-        0.1f,  0.9f,  169.0f
-    };
-    // Calculate output data
-    std::vector<float> expectedOutputValues(inputValues.size());
-    for (unsigned int i = 0; i < inputValues.size(); ++i)
-    {
-        expectedOutputValues[i] = std::sqrt(inputValues[i]);
-    }
-
-    ElementwiseUnaryFP32Test(tflite::BuiltinOperator_SQRT, backends, inputValues, expectedOutputValues);
-}
-
 } // TEST_SUITE("ElementwiseUnary_GpuAccTests")
 
 
@@ -212,27 +192,7 @@ TEST_CASE ("Rsqrt_Float32_CpuAcc_Test")
     ElementwiseUnaryFP32Test(tflite::BuiltinOperator_RSQRT, backends, inputValues, expectedOutputValues);
 }
 
-TEST_CASE ("Sqrt_Float32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    // Set input data
-    std::vector<float> inputValues
-    {
-        9.0f, 4.25f, 81.9f,
-        0.1f,  0.9f,  169.0f
-    };
-    // Calculate output data
-    std::vector<float> expectedOutputValues(inputValues.size());
-    for (unsigned int i = 0; i < inputValues.size(); ++i)
-    {
-        expectedOutputValues[i] = std::sqrt(inputValues[i]);
-    }
-
-    ElementwiseUnaryFP32Test(tflite::BuiltinOperator_SQRT, backends, inputValues, expectedOutputValues);
-}
-
 } // TEST_SUITE("ElementwiseUnary_CpuAccTests")
-
 
 TEST_SUITE("ElementwiseUnary_CpuRefTests")
 {

@@ -696,12 +696,6 @@ TEST_CASE ("DIV_Broadcast_GpuAcc_Test")
     DivBroadcastTest(backends);
 }
 
-TEST_CASE ("DIV_UINT8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    DivUint8Test(backends);
-}
-
 TEST_CASE ("MAX_FP32_GpuAcc_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
@@ -821,12 +815,6 @@ TEST_CASE ("DIV_Broadcast_CpuAcc_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
     DivBroadcastTest(backends);
-}
-
-TEST_CASE ("DIV_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    DivUint8Test(backends);
 }
 
 TEST_CASE ("MAX_FP32_CpuAcc_Test")

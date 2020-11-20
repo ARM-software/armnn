@@ -340,6 +340,13 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
         biasTensorInfo = armnn::TensorInfo(armnn::TensorShape({1}), GetDataType(tfLiteInputTensor));
     }
 
+    std::vector<uint8_t> swizzledData(filterTensorInfo.GetNumBytes());
+    auto filter =
+        CreateConstTensor(&tfLiteFilterTensor,
+                          filterTensorInfo,
+                          armnn::Optional<armnn::PermutationVector&>(permutationVector),
+                          swizzledData.data());
+
     if (!delegateData.m_Network)
     {
         bool isSupported = false;
@@ -351,18 +358,13 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
                                    inputTensorInfo,
                                    outputTensorInfo,
                                    descriptor,
-                                   filterTensorInfo,
+                                   filter.GetInfo(),
                                    armnn::Optional<armnn::TensorInfo>(biasTensorInfo));
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
     armnn::IConnectableLayer* layer = nullptr;
-    std::vector<uint8_t> swizzledData(filterTensorInfo.GetNumBytes());
-    auto filter =
-        CreateConstTensor(&tfLiteFilterTensor,
-                          filterTensorInfo,
-                          armnn::Optional<armnn::PermutationVector&>(permutationVector),
-                          swizzledData.data());
+
     if(biasEnabled)
     {
         auto biases =

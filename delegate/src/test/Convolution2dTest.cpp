@@ -271,7 +271,7 @@ Conv2DWithBiasesInt8Test(backends);
 
 } //End of TEST_SUITE("Convolution2dTest_GpuAcc")
 
-void TransposeConvUint8Test(std::vector<armnn::BackendId>& backends)
+void TransposeConvInt8Test(std::vector<armnn::BackendId>& backends)
 {
     // Set input data
     std::vector<int32_t> transposeTensorShape { 4 };
@@ -280,9 +280,9 @@ void TransposeConvUint8Test(std::vector<armnn::BackendId>& backends)
     std::vector<int32_t> outputShape { 1, 3, 3, 1 };
 
     std::vector<int32_t> transposeData = { 1, 3, 3, 1 };
-    static std::vector<uint8_t> inputValues = { 1, 2, 3, 4 };
-    std::vector<uint8_t> filterValues = { 0, 1, 2, 4 };
-    std::vector<uint8_t> expectedOutputValues =
+    static std::vector<int8_t> inputValues = { 1, 2, 3, 4 };
+    std::vector<int8_t> filterValues = { 0, 1, 2, 4 };
+    std::vector<int8_t> expectedOutputValues =
         {
             0, 1,  2,
             2, 11, 12,
@@ -290,8 +290,8 @@ void TransposeConvUint8Test(std::vector<armnn::BackendId>& backends)
         };
 
     tflite::Padding padding = tflite::Padding_VALID;
-    TransposeConvTest<uint8_t>(backends,
-                             ::tflite::TensorType_UINT8,
+    TransposeConvTest<int8_t>(backends,
+                             ::tflite::TensorType_INT8,
                              1, // strideX
                              1, // strideY
                              padding,
@@ -347,10 +347,10 @@ TEST_CASE ("TransposeConv_Fp32_Test")
     TransposeConvFp32Test(backends);
 }
 
-TEST_CASE ("TransposeConv_Uint8_Test")
+TEST_CASE ("TransposeConv_Int8_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    TransposeConvUint8Test(backends);
+    TransposeConvInt8Test(backends);
 }
 
 } // End of  TEST_SUITE(TransposeConv_CpuRef_Test)
@@ -360,14 +360,14 @@ TEST_SUITE("TransposeConv_CpuAcc_Test")
 
 TEST_CASE ("TransposeConv_Fp32_Test")
 {
-std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-TransposeConvFp32Test(backends);
+    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
+    TransposeConvFp32Test(backends);
 }
 
-TEST_CASE ("TransposeConv_Uint8_Test")
+TEST_CASE ("TransposeConv_Int8_Test")
 {
-std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-TransposeConvUint8Test(backends);
+    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
+    TransposeConvInt8Test(backends);
 }
 
 } // End of  TEST_SUITE(TransposeConv_CpuAcc_Test)
@@ -377,14 +377,14 @@ TEST_SUITE("TransposeConv_GpuAcc_Test")
 
 TEST_CASE ("TransposeConv_Fp32_Test")
 {
-std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-TransposeConvFp32Test(backends);
+    std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+    TransposeConvFp32Test(backends);
 }
 
-TEST_CASE ("TransposeConv_Uint8_Test")
+TEST_CASE ("TransposeConv_Int8_Test")
 {
-std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-TransposeConvUint8Test(backends);
+    std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+    TransposeConvInt8Test(backends);
 }
 
 } // End of  TEST_SUITE(TransposeConv_GpuAcc_Test)

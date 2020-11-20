@@ -279,142 +279,174 @@ void QuantizeUint8Int8Test(std::vector<armnn::BackendId>& backends)
                                       expectedOutputValues);
 }
 
-TEST_SUITE("QuantizationTests")
+TEST_SUITE("CpuRef_QuantizationTests")
+{
+
+TEST_CASE ("DEQUANTIZE_UINT8_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    DequantizeUint8Test(backends);
+}
+
+
+TEST_CASE ("DEQUANTIZE_INT8_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    DequantizeInt8Test(backends);
+}
+
+
+TEST_CASE ("DEQUANTIZE_INT16_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    DequantizeInt16Test(backends);
+}
+
+
+TEST_CASE ("QUANTIZE_FLOAT32_UINT8_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    QuantizeFloat32Uint8Test(backends);
+}
+
+
+TEST_CASE ("QUANTIZE_FLOAT32_INT8_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    QuantizeFloat32Int8Test(backends);
+}
+
+
+TEST_CASE ("QUANTIZE_FLOAT32_INT16_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    QuantizeFloat32Int16Test(backends);
+}
+
+
+TEST_CASE ("QUANTIZE_INT16_INT16_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    QuantizeInt16Int16Test(backends);
+}
+
+
+TEST_CASE ("QUANTIZE_INT16_INT8_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    QuantizeInt16Int8Test(backends);
+}
+
+
+
+TEST_CASE ("QUANTIZE_INT8_UINT8_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    QuantizeInt8Uint8Test(backends);
+}
+
+
+TEST_CASE ("QUANTIZE_UINT8_INT8_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    QuantizeUint8Int8Test(backends);
+}
+
+}
+
+TEST_SUITE("CpuAcc_QuantizationTests")
+{
+
+// Dequantize Operator Tests
+TEST_CASE ("DEQUANTIZE_UINT8_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    DequantizeUint8Test(backends);
+}
+
+TEST_CASE ("DEQUANTIZE_INT8_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    DequantizeInt8Test(backends);
+}
+
+TEST_CASE ("DEQUANTIZE_INT16_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    DequantizeInt16Test(backends);
+}
+
+// Quantize Operator Tests
+TEST_CASE ("QUANTIZE_FLOAT32_UINT8_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    QuantizeFloat32Uint8Test(backends);
+}
+
+TEST_CASE ("QUANTIZE_FLOAT32_INT8_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    QuantizeFloat32Int8Test(backends);
+}
+
+TEST_CASE ("QUANTIZE_INT8_UINT8_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    QuantizeInt8Uint8Test(backends);
+}
+
+TEST_CASE ("QUANTIZE_UINT8_INT8_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    QuantizeUint8Int8Test(backends);
+}
+
+}
+
+TEST_SUITE("GpuAcc_QuantizationTests")
 {
 
 // Dequantize Operator Tests
 TEST_CASE ("DEQUANTIZE_UINT8_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    DequantizeUint8Test(backends);
-}
-
-TEST_CASE ("DEQUANTIZE_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     DequantizeUint8Test(backends);
 }
 
 TEST_CASE ("DEQUANTIZE_INT8_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    DequantizeInt8Test(backends);
-}
-
-TEST_CASE ("DEQUANTIZE_INT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     DequantizeInt8Test(backends);
 }
 
 TEST_CASE ("DEQUANTIZE_INT16_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    DequantizeInt16Test(backends);
-}
-
-TEST_CASE ("DEQUANTIZE_INT16_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     DequantizeInt16Test(backends);
 }
 
 // Quantize Operator Tests
 TEST_CASE ("QUANTIZE_FLOAT32_UINT8_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    QuantizeFloat32Uint8Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_FLOAT32_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     QuantizeFloat32Uint8Test(backends);
 }
 
 TEST_CASE ("QUANTIZE_FLOAT32_INT8_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     QuantizeFloat32Int8Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_FLOAT32_INT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
-    QuantizeFloat32Int8Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_FLOAT32_INT16_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    QuantizeFloat32Int16Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_FLOAT32_INT16_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    QuantizeFloat32Int16Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_INT16_INT16_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    QuantizeInt16Int16Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_INT16_INT16_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    QuantizeInt16Int16Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_INT16_INT8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    QuantizeInt16Int8Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_INT16_INT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    QuantizeInt16Int8Test(backends);
 }
 
 TEST_CASE ("QUANTIZE_INT8_UINT8_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    QuantizeInt8Uint8Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_INT8_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     QuantizeInt8Uint8Test(backends);
 }
 
 TEST_CASE ("QUANTIZE_UINT8_INT8_GpuAcc_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    QuantizeUint8Int8Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_UINT8_INT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
-                                               armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     QuantizeUint8Int8Test(backends);
 }
 

@@ -91,7 +91,7 @@ std::vector<char> CreateConv2dTfLiteModel(tflite::BuiltinOperator convolutionOpe
                               filterQuantizationParameters);
 
     auto biasTensorType = ::tflite::TensorType_FLOAT32;
-    if (tensorType == ::tflite::TensorType_UINT8)
+    if (tensorType == ::tflite::TensorType_INT8 || tensorType == ::tflite::TensorType_UINT8)
     {
         biasTensorType = ::tflite::TensorType_INT32;
     }

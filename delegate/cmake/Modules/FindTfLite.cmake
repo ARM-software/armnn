@@ -11,7 +11,7 @@ find_path(TfLite_INCLUDE_DIR
             tensorflow/lite
             third_party
         HINTS
-            ${TENSORFLOW_ROOT}/..)
+            ${TENSORFLOW_ROOT})
 
 find_library(TfLite_LIB
         NAMES

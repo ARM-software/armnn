@@ -25,36 +25,6 @@
 #include "armnnOnnxParser/IOnnxParser.hpp"
 #endif
 
-
-template<typename T, typename TParseElementFunc>
-std::vector<T> ParseArrayImpl(std::istream& stream, TParseElementFunc parseElementFunc, const char* chars = "\t ,:")
-{
-    std::vector<T> result;
-    // Processes line-by-line.
-    std::string line;
-    while (std::getline(stream, line))
-    {
-        std::vector<std::string> tokens = armnn::stringUtils::StringTokenizer(line, chars);
-        for (const std::string& token : tokens)
-        {
-            if (!token.empty()) // See https://stackoverflow.com/questions/10437406/
-            {
-                try
-                {
-                    result.push_back(parseElementFunc(token));
-                }
-                catch (const std::exception&)
-                {
-                    ARMNN_LOG(error) << "'" << token << "' is not a valid number. It has been ignored.";
-                }
-            }
-        }
-    }
-
-    return result;
-}
-
-
 template<armnn::DataType NonQuantizedType>
 auto ParseDataArray(std::istream& stream);
 

@@ -92,61 +92,86 @@ TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,
     armnn::ReshapeDescriptor reshapeDesc;
 
     // The new shape can be defined by either a second input tensor or by a builtin option, we need to check for both.
-    if (numInputs == 2)
+    TfLiteReshapeParams* reshapeOptions = reinterpret_cast<TfLiteReshapeParams*>(tfLiteNode->builtin_data);
+    std::vector<int32_t> targetShape;
+    bool targetShapeFound = false;
+
+    if (reshapeOptions != nullptr)
     {
-        const TfLiteTensor& tfLiteShapeInputTensor = tfLiteTensors[tfLiteNode->inputs->data[1]];
-        if (IsDynamicTensor(tfLiteShapeInputTensor))
+        // Options might be set without valid data. we need to check the dimensions are in a valid range.
+        if (reshapeOptions->num_dimensions > 0 && reshapeOptions->num_dimensions <= 8)
+        {
+            uint64_t elementCounter = 1;
+            for (int i=0; i < reshapeOptions->num_dimensions; ++i)
+            {
+                targetShape.push_back(reshapeOptions->shape[i]);
+                elementCounter = elementCounter * reshapeOptions->shape[i];
+            }
+            // Check the number of elements match, otherwise fall back to using the second input tensor.
+            if (elementCounter == inputTensorInfo0.GetNumElements())
+            {
+                targetShapeFound = true;
+            }
+        }
+    }
+    if (!targetShapeFound)
+    {
+        if (numInputs == 2)
+        {
+            const TfLiteTensor& tfLiteShapeInputTensor = tfLiteTensors[tfLiteNode->inputs->data[1]];
+            if (IsDynamicTensor(tfLiteShapeInputTensor))
+            {
+                TF_LITE_MAYBE_KERNEL_LOG(tfLiteContext,
+                                         "TfLiteArmnnDelegate: Dynamic input tensors are not supported in "
+                                         "operator #%d node #%d: ",
+                                         operatorCode, nodeIndex);
+                return kTfLiteError;
+            }
+
+            if (tfLiteShapeInputTensor.dims->size != 1)
+            {
+                TF_LITE_MAYBE_KERNEL_LOG(tfLiteContext,
+                         "TfLiteArmnnDelegate: Target 'shape' input is not a 1D tensor in "
+                         "operator #%d node #%d: ",
+                         operatorCode, nodeIndex);
+                return kTfLiteError;
+            }
+
+            // Get the shape data out of the input tensor
+            auto* shapeTensorDataPtr = tflite::GetTensorData<int32_t>(&tfLiteShapeInputTensor);
+            auto shapeTensorNumValues = tfLiteShapeInputTensor.dims->data[0];
+            for (auto i=0; i < shapeTensorNumValues; ++i)
+            {
+                targetShape.push_back(*(shapeTensorDataPtr+i));
+            }
+        }
+        else
         {
             TF_LITE_MAYBE_KERNEL_LOG(tfLiteContext,
-                                     "TfLiteArmnnDelegate: Dynamic input tensors are not supported in "
-                                     "operator #%d node #%d: ",
-                                     operatorCode, nodeIndex);
-            return kTfLiteError;
-        }
-
-        // Get the shape data out of the input tensor
-        std::vector<int32_t> targetShape;
-        auto* shapeTensorDataPtr = tflite::GetTensorData<int32_t>(&tfLiteShapeInputTensor);
-        auto shapeTensorNumValues = tfLiteShapeInputTensor.dims->data[0];
-        for (auto i=0; i < shapeTensorNumValues; ++i)
-        {
-            targetShape.push_back(*(shapeTensorDataPtr+i));
-        }
-
-        // Use the data to create the required tensor shape.
-        if (CreateOutputTensorShape(inputTensorInfo0, targetShape, reshapeDesc) != kTfLiteOk)
-        {
-            TF_LITE_MAYBE_KERNEL_LOG(tfLiteContext,
-                                     "TfLiteArmnnDelegate: At most one component of shape can be -1 in: "
-                                     "operator #%d node #%d: ",
+                                     "Target shape not defined in reshape parameters or input tensor. "
+                                     "At least one method required in operator #%d node #%d: ",
                                      operatorCode, nodeIndex);
             return kTfLiteError;
         }
     }
-    else if (tfLiteNode->builtin_data)
-    {
-        std::vector<int32_t> targetShape;
-        TfLiteReshapeParams* reshapeOptions =
-                    reinterpret_cast<TfLiteReshapeParams*>(tfLiteNode->builtin_data);
-        for (int i=0; i < reshapeOptions->num_dimensions; ++i)
-        {
-            targetShape.push_back(reshapeOptions->shape[i]);
-        }
-        if (CreateOutputTensorShape(inputTensorInfo0, targetShape, reshapeDesc) != kTfLiteOk)
-        {
-            TF_LITE_MAYBE_KERNEL_LOG(tfLiteContext,
-                                     "TfLiteArmnnDelegate: At most one component of shape can be -1 in: "
-                                     "operator #%d node #%d: ",
-                                     operatorCode, nodeIndex);
-            return kTfLiteError;
-        }
-    }
-    else
+
+    // Use the data to create the required tensor shape.
+    if (CreateOutputTensorShape(inputTensorInfo0, targetShape, reshapeDesc) != kTfLiteOk)
     {
         TF_LITE_MAYBE_KERNEL_LOG(tfLiteContext,
-                                 "Target shape not defined in reshape parameters or input tensor. "
-                                 "At least one method required in operator #%d node #%d: ",
+                                 "TfLiteArmnnDelegate: At most one component of shape can be -1 in: "
+                                 "operator #%d node #%d: ",
                                  operatorCode, nodeIndex);
+        return kTfLiteError;
+    }
+
+    if (reshapeDesc.m_TargetShape.GetNumElements() != inputTensorInfo0.GetNumElements())
+    {
+        TF_LITE_MAYBE_KERNEL_LOG(tfLiteContext,
+                         "TfLiteArmnnDelegate: Reshape, number of elements in output shape does not match input "
+                         "operator #%d node #%d: ",
+                         operatorCode, nodeIndex);
+        return kTfLiteError;
     }
 
     bool isSupported = false;

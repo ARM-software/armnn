@@ -123,15 +123,22 @@ BOOST_AUTO_TEST_CASE(BackendProfilingCounterRegisterMockBackendTest)
     // Create a runtime
     armnn::Runtime runtime(options);
 
+    unsigned int shiftedId = 0;
+
+#if defined(ETHOSN_SUPPORT_ENABLED)
+    // Shift the id as ETHOSN is enabled.
+    shiftedId = 4;
+#endif
+
     // Check if the MockBackends 3 dummy counters {0, 1, 2-5 (four cores)} are registered
     armnn::BackendId mockId = armnn::MockBackendId();
     const armnn::profiling::ICounterMappings& counterMap = GetProfilingService(&runtime).GetCounterMappings();
-    BOOST_CHECK(counterMap.GetGlobalId(0, mockId) == 5);
-    BOOST_CHECK(counterMap.GetGlobalId(1, mockId) == 6);
-    BOOST_CHECK(counterMap.GetGlobalId(2, mockId) == 7);
-    BOOST_CHECK(counterMap.GetGlobalId(3, mockId) == 8);
-    BOOST_CHECK(counterMap.GetGlobalId(4, mockId) == 9);
-    BOOST_CHECK(counterMap.GetGlobalId(5, mockId) == 10);
+    BOOST_CHECK(counterMap.GetGlobalId(0, mockId) == 5 + shiftedId);
+    BOOST_CHECK(counterMap.GetGlobalId(1, mockId) == 6 + shiftedId);
+    BOOST_CHECK(counterMap.GetGlobalId(2, mockId) == 7 + shiftedId);
+    BOOST_CHECK(counterMap.GetGlobalId(3, mockId) == 8 + shiftedId);
+    BOOST_CHECK(counterMap.GetGlobalId(4, mockId) == 9 + shiftedId);
+    BOOST_CHECK(counterMap.GetGlobalId(5, mockId) == 10 + shiftedId);
     options.m_ProfilingOptions.m_EnableProfiling = false;
     GetProfilingService(&runtime).ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
 }

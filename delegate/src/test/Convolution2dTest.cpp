@@ -73,7 +73,7 @@ void Conv2DWithBiasesFp32Test(std::vector<armnn::BackendId>& backends)
                                  biasValues);
 }
 
-void Conv2DWithBiasesUint8Test(std::vector<armnn::BackendId>& backends)
+void Conv2DWithBiasesInt8Test(std::vector<armnn::BackendId>& backends)
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 2, 2, 1 };
@@ -81,13 +81,13 @@ void Conv2DWithBiasesUint8Test(std::vector<armnn::BackendId>& backends)
     std::vector<int32_t> biasShape { 1 };
     std::vector<int32_t> outputShape { 1, 2, 2, 1 };
 
-    static std::vector<uint8_t> inputValues = { 1, 2, 3, 4 };
+    static std::vector<int8_t> inputValues = { 1, 2, 3, 4 };
 
-    std::vector<uint8_t> filterValues = { 2, 1, 0, 6 };
+    std::vector<int8_t> filterValues = { 2, 1, 0, 6 };
 
     std::vector<int32_t> biasValues = { 10 };
 
-    std::vector<uint8_t> expectedOutputValues =
+    std::vector<int8_t> expectedOutputValues =
         {
             (1 * 2 + 2 * 1 + 3 * 0 + 4 * 6 + 10) / 2, // 19
             (2 * 2 + 0 * 1 + 4 * 0 + 0 * 6 + 10) / 2, // 7
@@ -97,8 +97,8 @@ void Conv2DWithBiasesUint8Test(std::vector<armnn::BackendId>& backends)
 
     tflite::Padding padding = tflite::Padding_SAME;
 
-    ConvolutionTest<uint8_t, int32_t>(tflite::BuiltinOperator_CONV_2D,
-                                            ::tflite::TensorType_UINT8,
+    ConvolutionTest<int8_t, int32_t>(tflite::BuiltinOperator_CONV_2D,
+                                            ::tflite::TensorType_INT8,
                                             1, // strideX
                                             1, // strideY
                                             1, // dilationX
@@ -229,22 +229,10 @@ TEST_CASE ("Conv2DWithBiases_Fp32_CpuRef_Test")
     Conv2DWithBiasesFp32Test(backends);
 }
 
-TEST_CASE ("Conv2DWithBiases_Uint8_CpuRef_Test")
+TEST_CASE ("Conv2DWithBiases_Int8_CpuRef_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    Conv2DWithBiasesUint8Test(backends);
-}
-
-TEST_CASE ("Conv2DWithBiases_Relu_Uint8_CpuRef_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    Conv2DWithBiasesReluUint8Test(backends);
-}
-
-TEST_CASE ("Conv2DWithBiases_Relu6_Uint8_CpuRef_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    Conv2DWithBiasesRelu6Uint8Test(backends);
+    Conv2DWithBiasesInt8Test(backends);
 }
 
 } //End of TEST_SUITE("Convolution2dTest_CpuRef")
@@ -258,22 +246,10 @@ std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
 Conv2DWithBiasesFp32Test(backends);
 }
 
-TEST_CASE ("Conv2DWithBiases_Uint8_CpuAcc_Test")
+TEST_CASE ("Conv2DWithBiases_Int8_CpuAcc_Test")
 {
 std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-Conv2DWithBiasesUint8Test(backends);
-}
-
-TEST_CASE ("Conv2DWithBiases_Relu_Uint8_CpuAcc_Test")
-{
-std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-Conv2DWithBiasesReluUint8Test(backends);
-}
-
-TEST_CASE ("Conv2DWithBiases_Relu6Uint8_CpuAcc_Test")
-{
-std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-Conv2DWithBiasesRelu6Uint8Test(backends);
+Conv2DWithBiasesInt8Test(backends);
 }
 
 } //End of TEST_SUITE("Convolution2dTest_CpuAcc")
@@ -287,22 +263,10 @@ std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
 Conv2DWithBiasesFp32Test(backends);
 }
 
-TEST_CASE ("Conv2DWithBiases_Uint8_GpuAcc_Test")
+TEST_CASE ("Conv2DWithBiases_Int8_GpuAcc_Test")
 {
 std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-Conv2DWithBiasesUint8Test(backends);
-}
-
-TEST_CASE ("Conv2DWithBiases_Relu_Uint8_GpuAcc_Test")
-{
-std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-Conv2DWithBiasesReluUint8Test(backends);
-}
-
-TEST_CASE ("Conv2DWithBiases_Relu_Uint8_GpuAcc_Test")
-{
-std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-Conv2DWithBiasesRelu6Uint8Test(backends);
+Conv2DWithBiasesInt8Test(backends);
 }
 
 } //End of TEST_SUITE("Convolution2dTest_GpuAcc")

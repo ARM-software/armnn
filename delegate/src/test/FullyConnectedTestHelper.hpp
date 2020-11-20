@@ -41,7 +41,7 @@ std::vector<char> CreateFullyConnectedTfLiteModel(tflite::TensorType tensorType,
                                                     sizeof(T) * weightsData.size()));
 
     auto biasTensorType = ::tflite::TensorType_FLOAT32;
-    if (tensorType == ::tflite::TensorType_UINT8)
+    if (tensorType == ::tflite::TensorType_INT8)
     {
         biasTensorType = ::tflite::TensorType_INT32;
         std::vector<int32_t> biasData = { 10 };

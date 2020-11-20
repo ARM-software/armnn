@@ -104,6 +104,8 @@ Arm tested these operators with the following TensorFlow Lite neural network:
 
 * FSRCNN
 
+* EfficientNet-lite
+
 * RDN converted from [TensorFlow model](https://github.com/hengchuan/RDN-TensorFlow)
 
 * Quantized RDN (CpuRef)

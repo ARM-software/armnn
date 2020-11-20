@@ -353,6 +353,10 @@ if(ARMNNREF)
     add_definitions(-DARMNNREF_ENABLED)
 endif()
 
+if(ETHOSN_SUPPORT)
+    add_definitions(-DETHOSN_SUPPORT_ENABLED)
+endif()
+
 # This is the root for the dynamic backend tests to search for dynamic
 # backends. By default it will be the project build directory.
 add_definitions(-DDYNAMIC_BACKEND_BUILD_DIR="${PROJECT_BINARY_DIR}")

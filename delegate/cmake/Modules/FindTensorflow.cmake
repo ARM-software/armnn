@@ -18,7 +18,7 @@ find_library(Tensorflow_LIB
         NAMES
             tensorflow_all
         HINTS
-            ${TENSORFLOW_ROOT})
+            ${TENSORFLOW_LIB_DIR})
 
 ## Set TENSORFLOW_FOUND
 find_package_handle_standard_args(Tensorflow DEFAULT_MSG Tensorflow_INCLUDE_DIR Tensorflow_LIB)

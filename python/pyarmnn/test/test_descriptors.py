@@ -94,8 +94,8 @@ def test_convolution2d_descriptor_default_values():
     assert desc.m_PadTop == 0
     assert desc.m_PadRight == 0
     assert desc.m_PadBottom == 0
-    assert desc.m_StrideX == 0
-    assert desc.m_StrideY == 0
+    assert desc.m_StrideX == 1
+    assert desc.m_StrideY == 1
     assert desc.m_DilationX == 1
     assert desc.m_DilationY == 1
     assert desc.m_BiasEnabled == False
@@ -114,8 +114,8 @@ def test_depthwise_convolution2d_descriptor_default_values():
     assert desc.m_PadTop == 0
     assert desc.m_PadRight == 0
     assert desc.m_PadBottom == 0
-    assert desc.m_StrideX == 0
-    assert desc.m_StrideY == 0
+    assert desc.m_StrideX == 1
+    assert desc.m_StrideY == 1
     assert desc.m_DilationX == 1
     assert desc.m_DilationY == 1
     assert desc.m_BiasEnabled == False

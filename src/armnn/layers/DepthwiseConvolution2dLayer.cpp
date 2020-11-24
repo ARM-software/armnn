@@ -90,6 +90,9 @@ DepthwiseConvolution2dLayer::InferOutputShapes(const std::vector<TensorShape>& i
 
     ARMNN_ASSERT_MSG(inputShape.GetNumDimensions() == 4, "Convolutions will always have 4D input.");
 
+    ARMNN_ASSERT( m_Param.m_StrideX > 0);
+    ARMNN_ASSERT( m_Param.m_StrideY > 0);
+
     DataLayoutIndexed dataLayoutIndex(m_Param.m_DataLayout);
 
     unsigned int inputBatchSize = inputShape[0];

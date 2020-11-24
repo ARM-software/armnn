@@ -89,6 +89,9 @@ std::vector<TensorShape> Convolution2dLayer::InferOutputShapes(const std::vector
     // If we support multiple batch dimensions in the future, then this assert will need to change.
     ARMNN_ASSERT_MSG(inputShape.GetNumDimensions() == 4, "Convolutions will always have 4D input.");
 
+    ARMNN_ASSERT( m_Param.m_StrideX > 0);
+    ARMNN_ASSERT( m_Param.m_StrideY > 0);
+
     DataLayoutIndexed dataLayoutIndex(m_Param.m_DataLayout);
 
     unsigned int inWidth = inputShape[dataLayoutIndex.GetWidthIndex()];

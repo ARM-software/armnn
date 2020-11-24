@@ -1260,6 +1260,14 @@ void Convolution2dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) co
         ValidateBiasTensorQuantization(biasTensorInfo, inputTensorInfo, weightTensorInfo, descriptorName);
     }
 
+    if (m_Parameters.m_StrideX <= 0 || m_Parameters.m_StrideY <= 0  )
+    {
+        throw InvalidArgumentException(
+            fmt::format("{}: strideX (provided {}) and strideY (provided {}) "
+                        "cannot be either negative or 0.",
+                        descriptorName, m_Parameters.m_StrideX, m_Parameters.m_StrideY));
+    }
+
     ValidatePerAxisQuantization(inputTensorInfo,
                                 outputTensorInfo,
                                 weightTensorInfo,
@@ -1318,6 +1326,14 @@ void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
             fmt::format("{}: dilationX (provided {}) and dilationY (provided {}) "
                         "cannot be smaller than 1.",
                         descriptorName, m_Parameters.m_DilationX, m_Parameters.m_DilationX));
+    }
+
+    if (m_Parameters.m_StrideX <= 0 || m_Parameters.m_StrideY <= 0  )
+    {
+        throw InvalidArgumentException(
+            fmt::format("{}: strideX (provided {}) and strideY (provided {}) "
+                        "cannot be either negative or 0.",
+                        descriptorName, m_Parameters.m_StrideX, m_Parameters.m_StrideY));
     }
 
     const unsigned int channelIndex = (m_Parameters.m_DataLayout == DataLayout::NCHW) ? 1 : 3;

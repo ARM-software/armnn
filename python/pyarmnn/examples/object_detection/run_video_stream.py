@@ -36,11 +36,9 @@ def get_model_processing(model_name: str, video: cv2.VideoCapture, input_binding
         Model labels, decoding and processing functions.
     """
     if model_name == 'ssd_mobilenet_v1':
-        labels = os.path.join(script_dir, 'ssd_labels.txt')
-        return labels, ssd_processing, ssd_resize_factor(video)
+        return ssd_processing, ssd_resize_factor(video)
     elif model_name == 'yolo_v3_tiny':
-        labels = os.path.join(script_dir, 'yolo_labels.txt')
-        return labels, yolo_processing, yolo_resize_factor(video, input_binding_info)
+        return yolo_processing, yolo_resize_factor(video, input_binding_info)
     else:
         raise ValueError(f'{model_name} is not a valid model name')
 
@@ -49,8 +47,8 @@ def main(args):
     video = init_video_stream_capture(args.video_source)
     executor = ArmnnNetworkExecutor(args.model_file_path, args.preferred_backends)
 
-    labels, process_output, resize_factor = get_model_processing(args.model_name, video, executor.input_binding_info)
-    labels = dict_labels(labels if args.label_path is None else args.label_path, include_rgb=True)
+    process_output, resize_factor = get_model_processing(args.model_name, video, executor.input_binding_info)
+    labels = dict_labels(args.label_path, include_rgb=True)
 
     while True:
         frame_present, frame = video.read()
@@ -77,7 +75,7 @@ if __name__ == '__main__':
                         help='Path to the Object Detection model to use')
     parser.add_argument('--model_name', required=True, type=str,
                         help='The name of the model being used. Accepted options: ssd_mobilenet_v1, yolo_v3_tiny')
-    parser.add_argument('--label_path', type=str,
+    parser.add_argument('--label_path', required=True, type=str,
                         help='Path to the labelset for the provided model file')
     parser.add_argument('--preferred_backends', type=str, nargs='+', default=['CpuAcc', 'CpuRef'],
                         help='Takes the preferred backends in preference order, separated by whitespace, '

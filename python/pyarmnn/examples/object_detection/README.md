@@ -3,7 +3,7 @@
 ## Introduction
 This sample application guides the user and shows how to perform object detection using PyArmNN API. We assume the user has already built PyArmNN by following the instructions of the README in the main PyArmNN directory.
 
-We provide example scripts for performing object detection from video file and video stream with `run_video_file.py` and `run_video_stream.py`. 
+We provide example scripts for performing object detection from video file and video stream with `run_video_file.py` and `run_video_stream.py`.
 
 The application takes a model and video file or camera feed as input, runs inference on each frame, and draws bounding boxes around detected objects, with the corresponding labels and confidence scores overlaid.
 
@@ -49,17 +49,24 @@ $ pip install -r requirements.txt
 # Performing Object Detection
 
 ## Object Detection from Video File
-The `run_video_file.py` example takes a video file as input, runs inference on each frame, and produces frames with bounding boxes drawn around detected objects. The processed frames are written to video file. 
+The `run_video_file.py` example takes a video file as input, runs inference on each frame, and produces frames with bounding boxes drawn around detected objects. The processed frames are written to video file.
 
 The user can specify these arguments at command line:
 
 * `--video_file_path` - <b>Required:</b> Path to the video file to run object detection on
+
 * `--model_file_path` - <b>Required:</b> Path to <b>.tflite, .pb</b> or <b>.onnx</b> object detection model
+
 * `--model_name` - <b>Required:</b> The name of the model being used. Assembles the workflow for the input model. The examples support the model names:
-    * `ssd_mobilenet_v1`
-    * `yolo_v3_tiny`
-* `--label_path` - Path to labels file for the specified model file. Labels are provided for above model names
+
+  * `ssd_mobilenet_v1`
+
+  * `yolo_v3_tiny`
+
+* `--label_path` - <b>Required:</b> Path to labels file for the specified model file
+
 * `--output_video_file_path` - Path to the output video file with detections added in
+
 * `--preferred_backends` - You can specify one or more backend in order of preference. Accepted backends include `CpuAcc, GpuAcc, CpuRef`. Arm NN will decide which layers of the network are supported by the backend, falling back to the next if a layer is unsupported. Defaults to `['CpuAcc', 'CpuRef']`
 
 
@@ -74,11 +81,17 @@ The `run_video_stream.py` example captures frames from a video stream of a devic
 The user can specify these arguments at command line:
 
 * `--video_source` - Device index to access video stream. Defaults to primary device camera at index 0
+
 * `--model_file_path` - <b>Required:</b> Path to <b>.tflite, .pb</b> or <b>.onnx</b> object detection model
+
 * `--model_name` - <b>Required:</b> The name of the model being used. Assembles the workflow for the input model. The examples support the model names:
-    * `ssd_mobilenet_v1`
-    * `yolo_v3_tiny`
-* `--label_path` - Path to labels file for the specified model file. Labels are provided for above model names
+
+  * `ssd_mobilenet_v1`
+
+  * `yolo_v3_tiny`
+
+* `--label_path` - <b>Required:</b> Path to labels file for the specified model file
+
 * `--preferred_backends` - You can specify one or more backend in order of preference. Accepted backends include `CpuAcc, GpuAcc, CpuRef`. Arm NN will decide which layers of the network are supported by the backend, falling back to the next if a layer is unsupported. Defaults to `['CpuAcc', 'CpuRef']`
 
 
@@ -87,32 +100,29 @@ Run the sample script:
 $ python run_video_stream.py --model_file_path <model_file_path> --model_name <model_name>
 ```
 
+This application has been verified to work against the MobileNet SSD model, which can be downloaded along with it's label set from:
+
+* https://storage.googleapis.com/download.tensorflow.org/models/tflite/coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.zip
+
 ## Implementing Your Own Network
 The examples provide support for `ssd_mobilenet_v1` and `yolo_v3_tiny` models. However, the user is able to add their own network to the object detection scripts by following the steps:
 
 1. Create a new file for your network, for example `network.py`, to contain functions to process the output of the model
 2. In that file, the user will need to write a function that decodes the output vectors obtained from running inference on their network and return the bounding box positions of detected objects plus their class index and confidence. Additionally, include a function that returns a resize factor that will scale the obtained bounding boxes to their correct positions in the original frame
 3. Import the functions into the main file and, such as with the provided networks, add a conditional statement to the `get_model_processing()` function with the new model name and functions
-4. The labels associated with the model can then either be included inside the conditional statement or passed in with `--label_path` argument when executing the main script
+4. The labels associated with the model can then be passed in with `--label_path` argument
 
 ---
 
 # Application Overview
+
 This section provides a walkthrough of the application, explaining in detail the steps:
+
 1. Initialisation
-    1.1. Reading from Video Source
-    1.2. Preparing Labels and Model Specific Functions
 2. Creating a Network
-    2.1. Creating Parser and Importing Graph
-    2.2. Optimizing Graph for Compute Device
-    2.3. Creating Input and Output Binding Information
 3. Preparing the Workload Tensors
-    3.1. Preprocessing the Captured Frame
-    3.2. Making Input and Output Tensors
 4. Executing Inference
 5. Postprocessing
-    5.1. Decoding and Processing Inference Output
-    5.2. Drawing Bounding Boxes
 
 
 ### Initialisation
@@ -133,16 +143,16 @@ Depending on the model being used, the user-specified model name accesses and re
 ##### Creating Parser and Importing Graph
 The first step with PyArmNN is to import a graph from file by using the appropriate parser.
 
-The Arm NN SDK provides parsers for reading graphs from a variety of model formats. In our application we specifically focus on `.tflite, .pb, .onnx` models. 
+The Arm NN SDK provides parsers for reading graphs from a variety of model formats. In our application we specifically focus on `.tflite, .pb, .onnx` models.
 
 Based on the extension of the provided model file, the corresponding parser is created and the network file loaded with `CreateNetworkFromBinaryFile()` function. The parser will handle the creation of the underlying Arm NN graph.
 
 ##### Optimizing Graph for Compute Device
 Arm NN supports optimized execution on multiple CPU and GPU devices. Prior to executing a graph, we must select the appropriate device context. We do this by creating a runtime context with default options with `IRuntime()`.
 
-We can optimize the imported graph by specifying a list of backends in order of preference and implement backend-specific optimizations. The backends are identified by a string unique to the backend, for example `CpuAcc, GpuAcc, CpuRef`. 
+We can optimize the imported graph by specifying a list of backends in order of preference and implement backend-specific optimizations. The backends are identified by a string unique to the backend, for example `CpuAcc, GpuAcc, CpuRef`.
 
-Internally and transparently, Arm NN splits the graph into subgraph based on backends, it calls a optimize subgraphs function on each of them and, if possible, substitutes the corresponding subgraph in the original graph with its optimized version. 
+Internally and transparently, Arm NN splits the graph into subgraph based on backends, it calls a optimize subgraphs function on each of them and, if possible, substitutes the corresponding subgraph in the original graph with its optimized version.
 
 Using the `Optimize()` function we optimize the graph for inference and load the optimized network onto the compute device with `LoadNetwork()`. This function creates the backend-specific workloads for the layers and a backend specific workload factory which is called to create the workloads.
 
@@ -157,7 +167,7 @@ Similarly, we can get the output binding information for an output layer by usin
 ### Preparing the Workload Tensors
 
 ##### Preprocessing the Captured Frame
-Each frame captured from source is read as an `ndarray` in BGR format and therefore has to be preprocessed before being passed into the network. 
+Each frame captured from source is read as an `ndarray` in BGR format and therefore has to be preprocessed before being passed into the network.
 
 This preprocessing step consists of swapping channels (BGR to RGB in this example), resizing the frame to the required resolution, expanding dimensions of the array and doing data type conversion to match the model input layer. This information about the input tensor can be readily obtained from reading the `input_binding_info`. For example, SSD MobileNet V1 takes for input a tensor with shape `[1, 300, 300, 3]` and data type `uint8`.
 
@@ -172,7 +182,7 @@ After making the workload tensors, a compute device performs inference for the l
 ### Postprocessing
 
 ##### Decoding and Processing Inference Output
-The output from inference must be decoded to obtain information about detected objects in the frame. In the examples there are implementations for two networks but you may also implement your own network decoding solution here. Please refer to <i>Implementing Your Own Network</i> section of this document to learn how to do this. 
+The output from inference must be decoded to obtain information about detected objects in the frame. In the examples there are implementations for two networks but you may also implement your own network decoding solution here. Please refer to <i>Implementing Your Own Network</i> section of this document to learn how to do this.
 
 For SSD MobileNet V1 models, we decode the results to obtain the bounding box positions, classification index, confidence and number of detections in the input frame.
 

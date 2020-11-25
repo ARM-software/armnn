@@ -88,6 +88,14 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
         if (params.m_InputTypes[inputIndex].compare("float") == 0)
         {
             auto inputData = tfLiteInterpreter->typed_tensor<float>(input);
+
+            if(tfLiteInterpreter == NULL)
+            {
+                ARMNN_LOG(fatal) << "Input tensor is null, input type: "
+                                    "\"" << params.m_InputTypes[inputIndex] << "\" may be incorrect.";
+                return EXIT_FAILURE;
+            }
+
             std::vector<float> tensorData;
             PopulateTensorWithDataGeneric<float>(tensorData,
                                                   params.m_InputTensorShapes[inputIndex]->GetNumElements(),
@@ -100,6 +108,14 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
         else if (params.m_InputTypes[inputIndex].compare("int8") == 0)
         {
             auto inputData = tfLiteInterpreter->typed_tensor<int8_t>(input);
+
+            if(tfLiteInterpreter == NULL)
+            {
+                ARMNN_LOG(fatal) << "Input tensor is null, input type: "
+                                    "\"" << params.m_InputTypes[inputIndex] << "\" may be incorrect.";
+                return EXIT_FAILURE;
+            }
+
             std::vector<int8_t> tensorData;
             PopulateTensorWithDataGeneric<int8_t>(tensorData,
                                                   params.m_InputTensorShapes[inputIndex]->GetNumElements(),
@@ -112,6 +128,14 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
         else if (params.m_InputTypes[inputIndex].compare("int") == 0)
         {
             auto inputData = tfLiteInterpreter->typed_tensor<int32_t>(input);
+
+            if(tfLiteInterpreter == NULL)
+            {
+                ARMNN_LOG(fatal) << "Input tensor is null, input type: "
+                                    "\"" << params.m_InputTypes[inputIndex] << "\" may be incorrect.";
+                return EXIT_FAILURE;
+            }
+
             std::vector<int32_t> tensorData;
             PopulateTensorWithDataGeneric<int32_t>(tensorData,
                                                    params.m_InputTensorShapes[inputIndex]->GetNumElements(),
@@ -124,6 +148,14 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
         else if (params.m_InputTypes[inputIndex].compare("qasymm8") == 0)
         {
             auto inputData = tfLiteInterpreter->typed_tensor<uint8_t>(input);
+
+            if(tfLiteInterpreter == NULL)
+            {
+                ARMNN_LOG(fatal) << "Input tensor is null, input type: "
+                                    "\"" << params.m_InputTypes[inputIndex] << "\" may be incorrect.";
+                return EXIT_FAILURE;
+            }
+
             std::vector<uint8_t> tensorData;
             PopulateTensorWithDataGeneric<uint8_t>(tensorData,
                                                    params.m_InputTensorShapes[inputIndex]->GetNumElements(),
@@ -468,7 +500,7 @@ int main(int argc, const char* argv[])
         #if defined(ARMNN_TF_LITE_DELEGATE)
             return TfLiteDelegateMainImpl(ProgramOptions.m_ExNetParams, runtime);
         #else
-            ARMNN_LOG(fatal) << "Not built with Tensorflow-Lite parser support.";
+            ARMNN_LOG(fatal) << "Not built with Arm NN Tensorflow-Lite delegate support.";
             return EXIT_FAILURE;
         #endif
         }

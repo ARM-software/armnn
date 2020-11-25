@@ -9,9 +9,11 @@ MESSAGE(STATUS "Found ArmnnDelegate: ${ARMNN_DELEGATE_CONFIG_FILE}")
 
 include(CMakeFindDependencyMacro)
 
-find_dependency(Armnn REQUIRED CONFIG)
-
 list(APPEND CMAKE_MODULE_PATH ${ARMNN_DELEGATE_CMAKE_DIR})
+
+@PACKAGE_INIT@
+set_and_check(Armnn_DIR "@Armnn_DIR@")
+find_dependency(Armnn REQUIRED CONFIG HINTS ${Armnn_DIR})
 
 if(NOT TARGET ArmnnDelegate::ArmnnDelegate)
     MESSAGE(STATUS "ArmnnDelegate Import: ${ARMNN_DELEGATE_CMAKE_DIR}/ArmnnDelegateTargets.cmake")

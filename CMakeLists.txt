@@ -41,10 +41,8 @@ add_subdirectory(src/armnnDeserializer)
 
 
 if (BUILD_ARMNN_TFLITE_DELEGATE)
-
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/delegate/cmake/Modules)
+    set(ARMNN_SUB_PROJECT ON)
     add_subdirectory(delegate)
-
     add_definitions(-DARMNN_TF_LITE_DELEGATE)
 endif()
 

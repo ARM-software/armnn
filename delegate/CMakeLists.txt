@@ -120,6 +120,8 @@ if(BUILD_UNIT_TESTS)
         src/test/ElementwiseUnaryTestHelper.hpp
         src/test/FullyConnectedTest.cpp
         src/test/FullyConnectedTestHelper.hpp
+        src/test/GatherTest.cpp
+        src/test/GatherTestHelper.hpp
         src/test/Pooling2dTest.cpp
         src/test/Pooling2dTestHelper.hpp
         src/test/QuantizationTest.cpp

@@ -1,5 +1,0 @@
-var classarmnn_1_1_neon_convert_bf16_to_fp32_workload =
-[
-    [ "NeonConvertBf16ToFp32Workload", "classarmnn_1_1_neon_convert_bf16_to_fp32_workload.xhtml#a3cd589cb8b149a6f13087130d75e640e", null ],
-    [ "Execute", "classarmnn_1_1_neon_convert_bf16_to_fp32_workload.xhtml#ae071e8822437c78baea75c3aef3a263a", null ]
-];

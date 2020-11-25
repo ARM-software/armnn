@@ -1,8 +1,0 @@
-var _half_8hpp =
-[
-    [ "is_floating_point< armnn::Half >", "structstd_1_1is__floating__point_3_01armnn_1_1_half_01_4.xhtml", null ],
-    [ "is_floating_point< const armnn::Half >", "structstd_1_1is__floating__point_3_01const_01armnn_1_1_half_01_4.xhtml", null ],
-    [ "is_floating_point< volatile armnn::Half >", "structstd_1_1is__floating__point_3_01volatile_01armnn_1_1_half_01_4.xhtml", null ],
-    [ "HALF_ROUND_STYLE", "_half_8hpp.xhtml#af470ed60568b3e7f4fde6092d22abbde", null ],
-    [ "Half", "_half_8hpp.xhtml#a0f38fa92b2468d5378258a2b074c1a31", null ]
-];

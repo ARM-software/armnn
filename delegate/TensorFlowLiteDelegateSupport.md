@@ -26,7 +26,7 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 * EXP
 
-* FULLY_CONNECTED
+* FULLY_CONNECTED, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 
 * GREATER
 

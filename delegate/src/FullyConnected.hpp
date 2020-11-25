@@ -223,7 +223,7 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
         Connect(layer, tfLiteNode, delegateData);
     }
 
-    auto* tfLiteNodeParameters = reinterpret_cast<TfLiteAddParams*>(tfLiteNode->builtin_data);
+    auto* tfLiteNodeParameters = reinterpret_cast<TfLiteFullyConnectedParams*>(tfLiteNode->builtin_data);
     if (!tfLiteNodeParameters)
     {
         // No Activation

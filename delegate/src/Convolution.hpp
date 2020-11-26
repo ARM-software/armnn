@@ -568,16 +568,18 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // Connect
-    if (delegateData.m_OutputSlotForNode[tfLiteNode->inputs->data[2]] != nullptr)
+    if (delegateData.m_OutputSlotForNode[static_cast<unsigned int>(tfLiteNode->inputs->data[2])] != nullptr)
     {
-        delegateData.m_OutputSlotForNode[tfLiteNode->inputs->data[2]]->Connect(layer->GetInputSlot(0));
+        delegateData.m_OutputSlotForNode[static_cast<unsigned int>(tfLiteNode->inputs->data[2])]->
+                                                                   Connect(layer->GetInputSlot(0));
     }
 
     // Prepare output slots
     for (unsigned int outputIndex = 0; outputIndex < layer->GetNumOutputSlots(); ++outputIndex)
     {
         armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(outputIndex);
-        delegateData.m_OutputSlotForNode[tfLiteNode->outputs->data[outputIndex]] = &outputSlot;
+        delegateData.m_OutputSlotForNode[static_cast<unsigned int>(tfLiteNode->outputs->data[outputIndex])] =
+                                                                   &outputSlot;
     }
     return kTfLiteOk;
 }

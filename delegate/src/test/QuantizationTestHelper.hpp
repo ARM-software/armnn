@@ -78,8 +78,8 @@ std::vector<char> CreateQuantizationTfLiteModel(tflite::BuiltinOperator quantiza
             break;
     }
 
-    const std::vector<int32_t> operatorInputs{ {0} };
-    const std::vector<int32_t> operatorOutputs{{1}};
+    const std::vector<int32_t> operatorInputs{0};
+    const std::vector<int32_t> operatorOutputs{1};
     flatbuffers::Offset <Operator> quantizationOperator =
             CreateOperator(flatBufferBuilder,
                            0,
@@ -88,8 +88,8 @@ std::vector<char> CreateQuantizationTfLiteModel(tflite::BuiltinOperator quantiza
                            operatorBuiltinOptionsType,
                            operatorBuiltinOptions);
 
-    const std::vector<int> subgraphInputs{ {0} };
-    const std::vector<int> subgraphOutputs{{1}};
+    const std::vector<int> subgraphInputs{0};
+    const std::vector<int> subgraphOutputs{1};
     flatbuffers::Offset <SubGraph> subgraph =
             CreateSubGraph(flatBufferBuilder,
                            flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),

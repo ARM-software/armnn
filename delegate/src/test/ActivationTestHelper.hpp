@@ -38,16 +38,16 @@ std::vector<char> CreateActivationTfLiteModel(tflite::BuiltinOperator activation
                               tensorType);
 
     // create operator
-    const std::vector<int> operatorInputs{{0}};
-    const std::vector<int> operatorOutputs{{1}};
+    const std::vector<int> operatorInputs{0};
+    const std::vector<int> operatorOutputs{1};
     flatbuffers::Offset <Operator> unaryOperator =
         CreateOperator(flatBufferBuilder,
                        0,
                        flatBufferBuilder.CreateVector<int32_t>(operatorInputs.data(), operatorInputs.size()),
                        flatBufferBuilder.CreateVector<int32_t>(operatorOutputs.data(), operatorOutputs.size()));
 
-    const std::vector<int> subgraphInputs{{0}};
-    const std::vector<int> subgraphOutputs{{1}};
+    const std::vector<int> subgraphInputs{0};
+    const std::vector<int> subgraphOutputs{1};
     flatbuffers::Offset <SubGraph> subgraph =
         CreateSubGraph(flatBufferBuilder,
                        flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),

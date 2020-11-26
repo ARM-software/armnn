@@ -137,8 +137,8 @@ std::vector<char> CreateConv2dTfLiteModel(tflite::BuiltinOperator convolutionOpe
     }
 
     // create operator
-    const std::vector<int> operatorInputs{{0, 1, 2}};
-    const std::vector<int> operatorOutputs{{3}};
+    const std::vector<int> operatorInputs{0, 1, 2};
+    const std::vector<int> operatorOutputs{3};
     flatbuffers::Offset <Operator> convolutionOperator =
         CreateOperator(flatBufferBuilder,
                        0,
@@ -147,8 +147,8 @@ std::vector<char> CreateConv2dTfLiteModel(tflite::BuiltinOperator convolutionOpe
                        operatorBuiltinOptionsType,
                        operatorBuiltinOptions);
 
-    const std::vector<int> subgraphInputs{ {0, 1, 2} };
-    const std::vector<int> subgraphOutputs{{3}};
+    const std::vector<int> subgraphInputs{0, 1, 2};
+    const std::vector<int> subgraphOutputs{3};
     flatbuffers::Offset <SubGraph> subgraph =
         CreateSubGraph(flatBufferBuilder,
                        flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),
@@ -363,8 +363,8 @@ std::vector<char> CreateTransposeConvTfLiteModel(tflite::TensorType tensorType,
         CreateTransposeConvOptions(flatBufferBuilder, padding, strideX, strideY).Union();
 
     // create operator
-    const std::vector<int> operatorInputs{{0, 1, 2}};
-    const std::vector<int> operatorOutputs{{3}};
+    const std::vector<int> operatorInputs{0, 1, 2};
+    const std::vector<int> operatorOutputs{3};
     flatbuffers::Offset <Operator> convolutionOperator =
         CreateOperator(flatBufferBuilder,
                        0,
@@ -373,8 +373,8 @@ std::vector<char> CreateTransposeConvTfLiteModel(tflite::TensorType tensorType,
                        operatorBuiltinOptionsType,
                        operatorBuiltinOptions);
 
-    const std::vector<int> subgraphInputs{ {0, 1, 2} };
-    const std::vector<int> subgraphOutputs{{3}};
+    const std::vector<int> subgraphInputs{0, 1, 2};
+    const std::vector<int> subgraphOutputs{3};
     flatbuffers::Offset <SubGraph> subgraph =
         CreateSubGraph(flatBufferBuilder,
                        flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),

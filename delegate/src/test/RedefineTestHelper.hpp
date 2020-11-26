@@ -68,8 +68,8 @@ std::vector<char> CreateRedefineTfLiteModel(
     if (useOption)
     {
         tensors = { inputTensor, outputTensor};
-        operatorInputs = {{0}};
-        subgraphInputs = {{0}};
+        operatorInputs = {0};
+        subgraphInputs = {0};
         operatorBuiltinOptions = CreateReshapeOptions(
             flatBufferBuilder,
             flatBufferBuilder.CreateVector(targetShape.data(), targetShape.size())).Union();
@@ -87,15 +87,15 @@ std::vector<char> CreateRedefineTfLiteModel(
                                         2,
                                         flatBufferBuilder.CreateString("shape"));
         tensors = { inputTensor, outputTensor, shapeTensor };
-        operatorInputs = {{ 0, 2 }};
-        subgraphInputs = {{ 0, 2 }};
+        operatorInputs = {0, 2};
+        subgraphInputs = {0, 2};
         operatorBuiltinOptions = CreateReshapeOptions(flatBufferBuilder).Union();
     }
 
     // create operator
     tflite::BuiltinOptions operatorBuiltinOptionsType = BuiltinOptions_ReshapeOptions;
 
-    const std::vector<int32_t> operatorOutputs{{1}};
+    const std::vector<int32_t> operatorOutputs{1};
     flatbuffers::Offset <Operator> redefineOperator =
         CreateOperator(flatBufferBuilder,
                        0,
@@ -104,7 +104,7 @@ std::vector<char> CreateRedefineTfLiteModel(
                        operatorBuiltinOptionsType,
                        operatorBuiltinOptions);
 
-    const std::vector<int> subgraphOutputs{{1}};
+    const std::vector<int> subgraphOutputs{1};
     flatbuffers::Offset <SubGraph> subgraph =
         CreateSubGraph(flatBufferBuilder,
                        flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),

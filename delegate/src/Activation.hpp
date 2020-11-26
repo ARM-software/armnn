@@ -22,7 +22,7 @@ TfLiteStatus ValidateActivationOperator(DelegateData& delegateData,
                                         armnn::ActivationDescriptor& activationDesc)
 {
     bool isSupported = false;
-    auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
+    auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    tfLiteContext,

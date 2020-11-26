@@ -86,7 +86,6 @@ TfLiteStatus VisitResizeOperator(DelegateData& delegateData,
     }
 
     const armnn::TensorInfo& inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
-    const armnn::TensorInfo& sizeTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteSizeTensor);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
 
     std::string layerName("Resize");
@@ -99,7 +98,7 @@ TfLiteStatus VisitResizeOperator(DelegateData& delegateData,
         {
             desc.m_Method = armnn::ResizeMethod::Bilinear;
 
-            layerName += "Bilinear:" + nodeIndex;
+            layerName += "Bilinear:" + std::to_string(nodeIndex);
 
             TfLiteResizeBilinearParams* biliniarOptions =
                     reinterpret_cast<TfLiteResizeBilinearParams*>(tfLiteNode->builtin_data);
@@ -111,7 +110,7 @@ TfLiteStatus VisitResizeOperator(DelegateData& delegateData,
         case kTfLiteBuiltinResizeNearestNeighbor:
         {
             desc.m_Method =  armnn::ResizeMethod::NearestNeighbor;
-            layerName += "NearestNeighbor:" + nodeIndex;
+            layerName += "NearestNeighbor:" + std::to_string(nodeIndex);
 
             TfLiteResizeNearestNeighborParams* nearestNeighborOptions =
                     reinterpret_cast<TfLiteResizeNearestNeighborParams*>(tfLiteNode->builtin_data);

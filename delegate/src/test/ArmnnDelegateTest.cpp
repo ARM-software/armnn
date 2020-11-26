@@ -7,10 +7,10 @@
 #include <doctest/doctest.h>
 
 #include <armnn_delegate.hpp>
-#include "ElementwiseUnaryTestHelper.hpp"
 
 #include "tensorflow/lite/kernels/builtin_op_kernels.h"
 #include <tensorflow/lite/interpreter.h>
+#include <tensorflow/lite/kernels/register.h>
 
 namespace armnnDelegate
 {

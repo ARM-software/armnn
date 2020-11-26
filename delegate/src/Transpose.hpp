@@ -58,7 +58,6 @@ TfLiteStatus VisitTransposeOperator(DelegateData& delegateData,
     }
 
     const armnn::TensorInfo& inputTensorInfo0 = GetTensorInfoForTfLiteTensor(tfLiteInputTensor0);
-    const armnn::TensorInfo& inputTensorInfo1 = GetTensorInfoForTfLiteTensor(tfLiteInputTensor1); //permutation tensor
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
 
     auto* permTensorDataPtr = tflite::GetTensorData<int32_t>(&tfLiteInputTensor1);

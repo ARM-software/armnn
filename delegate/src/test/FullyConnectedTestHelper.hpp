@@ -111,8 +111,8 @@ std::vector<char> CreateFullyConnectedTfLiteModel(tflite::TensorType tensorType,
                                     activationType,
                                     FullyConnectedOptionsWeightsFormat_DEFAULT, false).Union();
 
-    const std::vector<int> operatorInputs{ {0, 1, 2} };
-    const std::vector<int> operatorOutputs{ {3} };
+    const std::vector<int> operatorInputs{0, 1, 2};
+    const std::vector<int> operatorOutputs{3};
     flatbuffers::Offset <Operator> fullyConnectedOperator =
         CreateOperator(flatBufferBuilder,
                        0,
@@ -120,8 +120,8 @@ std::vector<char> CreateFullyConnectedTfLiteModel(tflite::TensorType tensorType,
                        flatBufferBuilder.CreateVector<int32_t>(operatorOutputs.data(), operatorOutputs.size()),
                        operatorBuiltinOptionsType, operatorBuiltinOptions);
 
-    const std::vector<int> subgraphInputs{ {0, 1, 2} };
-    const std::vector<int> subgraphOutputs{ {3} };
+    const std::vector<int> subgraphInputs{0, 1, 2};
+    const std::vector<int> subgraphOutputs{3};
     flatbuffers::Offset <SubGraph> subgraph =
         CreateSubGraph(flatBufferBuilder,
                        flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),

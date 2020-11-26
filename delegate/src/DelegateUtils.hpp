@@ -140,7 +140,8 @@ uint32_t NonNegative(int32_t value, int nodeIndex)
 {
     if (value < 0)
     {
-        throw armnn::Exception("TfLiteArmnnDelegate: Non-negative value in node " + nodeIndex);
+        throw armnn::Exception(
+            "TfLiteArmnnDelegate: Non-negative value in node " + std::to_string(static_cast<int>(nodeIndex)));
     }
     else
     {
@@ -162,7 +163,7 @@ TfLiteStatus Connect(armnn::IConnectableLayer* layer,
                      TfLiteNode* tfLiteNode,
                      armnnDelegate::DelegateData& data)
 {
-    ARMNN_ASSERT(static_cast<unsigned int >(tfLiteNode->outputs->size) == layer->GetNumOutputSlots());
+    ARMNN_ASSERT(static_cast<unsigned int>(tfLiteNode->outputs->size) == layer->GetNumOutputSlots());
 
     // Connect the input slots
     for (unsigned int inputIndex = 0; inputIndex < layer->GetNumInputSlots(); ++inputIndex)
@@ -475,7 +476,8 @@ armnn::ConstTensor CreateConstTensor(const TfLiteTensor* tfLiteTensor,
 {
     if (tfLiteTensor->allocation_type != kTfLiteMmapRo)
     {
-        throw armnn::Exception("TfLiteArmnnDelegate: Not constant allocation type: " + tfLiteTensor->allocation_type);
+        throw armnn::Exception(
+            "TfLiteArmnnDelegate:  Not constant allocation type: " + std::to_string(tfLiteTensor->allocation_type));
     }
 
     if (permutationVector.has_value() && permutationVector.value().GetSize() > 0 && permutationData != nullptr)
@@ -524,6 +526,7 @@ TfLiteStatus ConnectConstant(armnn::IConnectableLayer* layer,
                              armnnDelegate::DelegateData& data,
                              unsigned int slotIndex)
 {
+    IgnoreUnused(layer);
     bool isSupported = false;
     FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                tfLiteContext,

@@ -109,8 +109,8 @@ std::vector<char> CreateElementwiseBinaryTfLiteModel(tflite::BuiltinOperator bin
         default:
             break;
     }
-    const std::vector<int32_t> operatorInputs{ {0, 1} };
-    const std::vector<int32_t> operatorOutputs{{2}};
+    const std::vector<int32_t> operatorInputs{0, 1};
+    const std::vector<int32_t> operatorOutputs{2};
     flatbuffers::Offset <Operator> elementwiseBinaryOperator =
         CreateOperator(flatBufferBuilder,
                        0,
@@ -119,8 +119,8 @@ std::vector<char> CreateElementwiseBinaryTfLiteModel(tflite::BuiltinOperator bin
                        operatorBuiltinOptionsType,
                        operatorBuiltinOptions);
 
-    const std::vector<int> subgraphInputs{ {0, 1} };
-    const std::vector<int> subgraphOutputs{{2}};
+    const std::vector<int> subgraphInputs{0, 1};
+    const std::vector<int> subgraphOutputs{2};
     flatbuffers::Offset <SubGraph> subgraph =
         CreateSubGraph(flatBufferBuilder,
                        flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),

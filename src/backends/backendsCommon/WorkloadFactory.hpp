@@ -23,6 +23,8 @@ class IWorkloadFactory
 public:
     virtual ~IWorkloadFactory() { }
 
+    virtual void AfterWorkloadsCreated() {};
+
     virtual const BackendId& GetBackendId() const = 0;
 
     static bool IsLayerSupported(const BackendId& backendId,

@@ -6,6 +6,8 @@
 
 #include <armnn/backends/IBackendContext.hpp>
 
+#include<string>
+
 namespace armnn
 {
 
@@ -19,10 +21,17 @@ class ClBackendModelContext : public IBackendModelContext
 public:
     ClBackendModelContext(const ModelOptions& modelOptions);
 
+    std::string GetCachedNetworkFilePath() const;
+
     bool IsFastMathEnabled() const;
 
+    bool SaveCachedNetwork() const;
+
 private:
+    std::string m_CachedNetworkFilePath;
     bool m_IsFastMathEnabled;
+    bool m_SaveCachedNetwork;
+
 };
 
 } // namespace armnn

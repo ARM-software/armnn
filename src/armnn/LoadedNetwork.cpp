@@ -255,6 +255,11 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
         }
     }
 
+    for (auto&& workloadFactory : m_WorkloadFactories)
+    {
+        workloadFactory.second.first->AfterWorkloadsCreated();
+    }
+
     if (timelineUtils)
     {
         // Commit to send the post-optimisation network structure

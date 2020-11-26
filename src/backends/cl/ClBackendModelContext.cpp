@@ -17,13 +17,22 @@ bool ParseBool(const armnn::BackendOptions::Var& value, bool defaultValue)
     return defaultValue;
 }
 
+std::string ParseFile(const armnn::BackendOptions::Var& value, std::string defaultValue)
+{
+    if (value.IsString())
+    {
+        return value.AsString();
+    }
+    return defaultValue;
+}
+
 } // namespace anonymous
 
 namespace armnn
 {
 
 ClBackendModelContext::ClBackendModelContext(const ModelOptions& modelOptions)
-    : m_IsFastMathEnabled(false)
+    : m_CachedNetworkFilePath(""), m_IsFastMathEnabled(false), m_SaveCachedNetwork(false)
 {
    if (!modelOptions.empty())
    {
@@ -33,13 +42,31 @@ ClBackendModelContext::ClBackendModelContext(const ModelOptions& modelOptions)
            {
                m_IsFastMathEnabled |= ParseBool(value, false);
            }
+           if (name == "SaveCachedNetwork")
+           {
+               m_SaveCachedNetwork |= ParseBool(value, false);
+           }
+           if (name == "CachedNetworkFilePath")
+           {
+               m_CachedNetworkFilePath = ParseFile(value, "");
+           }
        });
    }
+}
+
+std::string ClBackendModelContext::GetCachedNetworkFilePath() const
+{
+    return m_CachedNetworkFilePath;
 }
 
 bool ClBackendModelContext::IsFastMathEnabled() const
 {
     return m_IsFastMathEnabled;
+}
+
+bool ClBackendModelContext::SaveCachedNetwork() const
+{
+    return m_SaveCachedNetwork;
 }
 
 } // namespace armnn

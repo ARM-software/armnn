@@ -28,6 +28,7 @@ list(APPEND armnnDelegate_sources
         src/Fill.hpp
         src/FullyConnected.hpp
         src/Gather.hpp
+        src/LogicalBinary.hpp
         src/Lstm.hpp
         src/Normalization.hpp
         src/Pad.hpp
@@ -114,6 +115,8 @@ if(BUILD_UNIT_TESTS)
         src/test/FullyConnectedTestHelper.hpp
         src/test/GatherTest.cpp
         src/test/GatherTestHelper.hpp
+        src/test/LogicalTest.cpp
+        src/test/LogicalTestHelper.hpp
         src/test/Pooling2dTest.cpp
         src/test/Pooling2dTestHelper.hpp
         src/test/QuantizationTest.cpp

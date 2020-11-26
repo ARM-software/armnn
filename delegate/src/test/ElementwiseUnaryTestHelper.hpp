@@ -110,25 +110,76 @@ void ElementwiseUnaryFP32Test(tflite::BuiltinOperator unaryOperatorCode,
     CHECK(armnnDelegateInterpreter->ModifyGraphWithDelegate(theArmnnDelegate.get()) == kTfLiteOk);
 
     // Set input data
-    auto tfLiteDelegateInputId = tfLiteInterpreter->inputs()[0];
-    auto tfLiteDelageInputData = tfLiteInterpreter->typed_tensor<float>(tfLiteDelegateInputId);
-    for (unsigned int i = 0; i < inputValues.size(); ++i)
-    {
-        tfLiteDelageInputData[i] = inputValues[i];
-    }
+    armnnDelegate::FillInput(armnnDelegateInterpreter, 0, inputValues);
+    armnnDelegate::FillInput(tfLiteInterpreter, 0, inputValues);
 
-    auto armnnDelegateInputId = armnnDelegateInterpreter->inputs()[0];
-    auto armnnDelegateInputData = armnnDelegateInterpreter->typed_tensor<float>(armnnDelegateInputId);
-    for (unsigned int i = 0; i < inputValues.size(); ++i)
-    {
-        armnnDelegateInputData[i] = inputValues[i];
-    }
     // Run EnqueWorkload
     CHECK(tfLiteInterpreter->Invoke() == kTfLiteOk);
     CHECK(armnnDelegateInterpreter->Invoke() == kTfLiteOk);
 
     // Compare output data
     armnnDelegate::CompareOutputData(tfLiteInterpreter, armnnDelegateInterpreter, inputShape, expectedOutputValues);
+
+    armnnDelegateInterpreter.reset(nullptr);
+    tfLiteInterpreter.reset(nullptr);
+}
+
+void ElementwiseUnaryBoolTest(tflite::BuiltinOperator unaryOperatorCode,
+                              std::vector<armnn::BackendId>& backends,
+                              std::vector<int32_t>& inputShape,
+                              std::vector<bool>& inputValues,
+                              std::vector<bool>& expectedOutputValues)
+{
+    using namespace tflite;
+    std::vector<char> modelBuffer = CreateElementwiseUnaryTfLiteModel(unaryOperatorCode,
+                                                                      ::tflite::TensorType_BOOL,
+                                                                      inputShape);
+
+    const Model* tfLiteModel = GetModel(modelBuffer.data());
+    // Create TfLite Interpreters
+    std::unique_ptr<Interpreter> armnnDelegateInterpreter;
+    CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
+                  (&armnnDelegateInterpreter) == kTfLiteOk);
+    CHECK(armnnDelegateInterpreter != nullptr);
+    CHECK(armnnDelegateInterpreter->AllocateTensors() == kTfLiteOk);
+
+    std::unique_ptr<Interpreter> tfLiteInterpreter;
+    CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
+                  (&tfLiteInterpreter) == kTfLiteOk);
+    CHECK(tfLiteInterpreter != nullptr);
+    CHECK(tfLiteInterpreter->AllocateTensors() == kTfLiteOk);
+
+    // Create the ArmNN Delegate
+    armnnDelegate::DelegateOptions delegateOptions(backends);
+    std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
+            theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
+                             armnnDelegate::TfLiteArmnnDelegateDelete);
+    CHECK(theArmnnDelegate != nullptr);
+
+    // Modify armnnDelegateInterpreter to use armnnDelegate
+    CHECK(armnnDelegateInterpreter->ModifyGraphWithDelegate(theArmnnDelegate.get()) == kTfLiteOk);
+
+    // Set input data
+    armnnDelegate::FillInput(armnnDelegateInterpreter, 0, inputValues);
+    armnnDelegate::FillInput(tfLiteInterpreter, 0, inputValues);
+
+    // Run EnqueWorkload
+    CHECK(tfLiteInterpreter->Invoke() == kTfLiteOk);
+    CHECK(armnnDelegateInterpreter->Invoke() == kTfLiteOk);
+
+    // Compare output data, comparing Boolean values is handled differently and needs to call the CompareData function
+    // directly instead. This is because Boolean types get converted to a bit representation in a vector.
+    auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[0];
+    auto tfLiteDelegateOutputData = tfLiteInterpreter->typed_tensor<bool>(tfLiteDelegateOutputId);
+    auto armnnDelegateOutputId = armnnDelegateInterpreter->outputs()[0];
+    auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<bool>(armnnDelegateOutputId);
+
+    armnnDelegate::CompareData(expectedOutputValues, armnnDelegateOutputData, expectedOutputValues.size());
+    armnnDelegate::CompareData(expectedOutputValues, tfLiteDelegateOutputData, expectedOutputValues.size());
+    armnnDelegate::CompareData(tfLiteDelegateOutputData, armnnDelegateOutputData, expectedOutputValues.size());
+
+    armnnDelegateInterpreter.reset(nullptr);
+    tfLiteInterpreter.reset(nullptr);
 }
 
 } // anonymous namespace

@@ -16,6 +16,7 @@
 #include "Fill.hpp"
 #include "FullyConnected.hpp"
 #include "Gather.hpp"
+#include "LogicalBinary.hpp"
 #include "Lstm.hpp"
 #include "Normalization.hpp"
 #include "Pad.hpp"
@@ -583,6 +584,26 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                               tfLiteNode,
                                               nodeIndex,
                                               kTfLiteBuiltinLocalResponseNormalization);
+        case kTfLiteBuiltinLogicalAnd:
+            return VisitLogicalBinaryOperator(delegateData,
+                                              tfLiteContext,
+                                              tfLiteNode,
+                                              nodeIndex,
+                                              kTfLiteBuiltinLogicalAnd,
+                                              armnn::LogicalBinaryOperation::LogicalAnd);
+        case kTfLiteBuiltinLogicalNot:
+            return VisitElementwiseUnaryOperator(delegateData,
+                                                 tfLiteContext,
+                                                 tfLiteNode,
+                                                 nodeIndex,
+                                                 armnn::UnaryOperation::LogicalNot);
+        case kTfLiteBuiltinLogicalOr:
+            return VisitLogicalBinaryOperator(delegateData,
+                                              tfLiteContext,
+                                              tfLiteNode,
+                                              nodeIndex,
+                                              kTfLiteBuiltinLogicalOr,
+                                              armnn::LogicalBinaryOperation::LogicalOr);
         case kTfLiteBuiltinLogistic:
             return VisitActivationOperator(delegateData,
                                            tfLiteContext,

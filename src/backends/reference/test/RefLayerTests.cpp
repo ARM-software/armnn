@@ -1309,6 +1309,8 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(PadUint82d, PadUint82dTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(PadUint82dCustomPadding, PadUint82dCustomPaddingTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(PadUint83d, PadUint83dTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(PadUint84d, PadUint84dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadUint8Asymm, PadQAsymmTestCommon<DataType::QAsymmU8>, -2.0f, 3, 0.0f)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadUint8CustomPaddingAsymm, PadQAsymmTestCommon<DataType::QAsymmU8>, -2.0f, 3, 2.0f)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(Pad2dQSymm16, Pad2dTestCommon<DataType::QSymmS16>, 2.0f, 0, 0.0f)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Pad2dQSymm16CustomPadding, Pad2dTestCommon<DataType::QSymmS16>, 2.0f, 0, 1.0f)
@@ -1319,6 +1321,8 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(PadInt82d, PadInt82dTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(PadInt82dCustomPadding, PadInt82dCustomPaddingTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(PadInt83d, PadInt83dTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(PadInt84d, PadInt84dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadQAsymmS8, PadQAsymmTestCommon<DataType::QAsymmS8>, -2.0f, 3, 0.0f)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadQAsymmS8CustomPadding, PadQAsymmTestCommon<DataType::QAsymmS8>, -2.0f, 3, 2.0f)
 
 // Constant
 ARMNN_AUTO_TEST_CASE_WITH_THF(Constant, ConstantTest)

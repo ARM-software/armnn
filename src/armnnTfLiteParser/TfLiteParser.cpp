@@ -1845,6 +1845,8 @@ void TfLiteParser::ParsePad(size_t subgraphIndex, size_t operatorIndex)
     TfLiteParser::TensorRawPtrVector outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
+    armnn::TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
+
     armnn::TensorInfo padTensorInfo = ToTensorInfo(inputs[1]);
     BufferRawPtr bufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
 
@@ -1853,6 +1855,10 @@ void TfLiteParser::ParsePad(size_t subgraphIndex, size_t operatorIndex)
 
     size_t step = 2;
     armnn::PadDescriptor desc;
+    if (inputTensorInfo.IsQuantized())
+    {
+        desc.m_PadValue = static_cast<float>(inputTensorInfo.GetQuantizationOffset());
+    }
     for (unsigned int i = 0; i < padTensorInfo.GetNumElements() / step; ++i)
     {
         desc.m_PadList.emplace_back(padBuffer[i * step], padBuffer[i * step + 1]);

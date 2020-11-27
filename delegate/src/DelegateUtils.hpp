@@ -98,9 +98,42 @@ TfLiteStatus ValidateNumOutputs(TfLiteContext* tfLiteContext,
     return kTfLiteOk;
 }
 
+bool IsDynamicTensor(const TfLiteTensor& tfLiteTensor)
+{
+    auto tensorAllocationType = tfLiteTensor.allocation_type;
+    if (tensorAllocationType == kTfLiteDynamic)
+    {
+        return true;
+    }
+    return false;
+}
+
 bool IsValid(const TfLiteTensor* tfLiteTensor)
 {
     return tfLiteTensor == nullptr ? false : true;
+}
+
+bool IsValid(TfLiteContext* tfLiteContext, const TfLiteTensor& tfLiteTensor, int32_t operatorCode, int32_t nodeIndex)
+{
+    if(!IsValid(&tfLiteTensor))
+    {
+        std::cout << "..Is Not Valid" << std::endl;
+        TF_LITE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLiteArmnnDelegate: Invalid TfLite tensor in operator #%d node #%d: ",
+            operatorCode, nodeIndex);
+        return false;
+    }
+    if (IsDynamicTensor(tfLiteTensor))
+    {
+        std::cout << "..IsDynamicTensor" << std::endl;
+        TF_LITE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLiteArmnnDelegate: Dynamic tensors are not supported in operator #%d node #%d: ",
+            operatorCode, nodeIndex);
+        return false;
+    }
+    return true;
 }
 
 uint32_t NonNegative(int32_t value, int nodeIndex)
@@ -113,16 +146,6 @@ uint32_t NonNegative(int32_t value, int nodeIndex)
     {
         return static_cast<uint32_t>(value);
     }
-}
-
-bool IsDynamicTensor(const TfLiteTensor& tfLiteTensor)
-{
-    auto tensorAllocationType = tfLiteTensor.allocation_type;
-    if (tensorAllocationType == kTfLiteDynamic)
-    {
-        return true;
-    }
-    return false;
 }
 
 bool IsAffineQuantization(const TfLiteTensor& tfLiteTensor)

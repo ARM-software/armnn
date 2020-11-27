@@ -27,6 +27,7 @@
 #include "Slice.hpp"
 #include "Softmax.hpp"
 #include "SpaceDepth.hpp"
+#include "Split.hpp"
 #include "Transpose.hpp"
 
 #include <flatbuffers/flatbuffers.h>
@@ -714,6 +715,18 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                                  tfLiteNode,
                                                  nodeIndex,
                                                  armnn::UnaryOperation::Rsqrt);
+        case kTfLiteBuiltinSplit:
+            return VisitSplitOperator(delegateData,
+                                      tfLiteContext,
+                                      tfLiteNode,
+                                      nodeIndex,
+                                      kTfLiteBuiltinSplit);
+        case kTfLiteBuiltinSplitV:
+            return VisitSplitVOperator(delegateData,
+                                       tfLiteContext,
+                                       tfLiteNode,
+                                       nodeIndex,
+                                       kTfLiteBuiltinSplitV);
         case kTfLiteBuiltinSqrt:
             return VisitElementwiseUnaryOperator(delegateData,
                                                  tfLiteContext,

@@ -39,6 +39,7 @@ list(APPEND armnnDelegate_sources
         src/Slice.hpp
         src/Softmax.hpp
         src/SpaceDepth.hpp
+        src/Split.hpp
         src/Transpose.hpp)
 
 add_library(armnnDelegate SHARED ${armnnDelegate_sources})
@@ -132,6 +133,8 @@ if(BUILD_UNIT_TESTS)
         src/test/ResizeTestHelper.hpp
         src/test/SoftmaxTest.cpp
         src/test/SoftmaxTestHelper.hpp
+        src/test/SplitTest.cpp
+        src/test/SplitTestHelper.hpp
         src/test/TestUtils.hpp
         src/test/TestUtils.cpp
         src/test/TransposeTest.cpp

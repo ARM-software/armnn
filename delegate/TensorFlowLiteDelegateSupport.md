@@ -74,6 +74,10 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 * SOFTMAX
 
+* SPLIT
+
+* SPLIT_V
+
 * SQRT
 
 * SUB

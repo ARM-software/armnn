@@ -51,12 +51,13 @@ template <typename T>
 void CompareOutputData(std::unique_ptr<tflite::Interpreter>& tfLiteInterpreter,
                        std::unique_ptr<tflite::Interpreter>& armnnDelegateInterpreter,
                        std::vector<int32_t>& expectedOutputShape,
-                       std::vector<T>& expectedOutputValues)
+                       std::vector<T>& expectedOutputValues,
+                       unsigned int outputIndex = 0)
 {
-    auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[0];
+    auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[outputIndex];
     auto tfLiteDelegateOutputTensor = tfLiteInterpreter->tensor(tfLiteDelegateOutputId);
     auto tfLiteDelegateOutputData = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateOutputId);
-    auto armnnDelegateOutputId = armnnDelegateInterpreter->outputs()[0];
+    auto armnnDelegateOutputId = armnnDelegateInterpreter->outputs()[outputIndex];
     auto armnnDelegateOutputTensor = armnnDelegateInterpreter->tensor(armnnDelegateOutputId);
     auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateOutputId);
 

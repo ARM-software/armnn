@@ -42,7 +42,6 @@ template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 struct Convolution2dTest
 {
     using LayerType = Convolution2dLayer;
-    static std::string GetReceiverLayerName() { return "Convolution2d"; };
     static const bool isElementWise = false;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }  // NHWCin
@@ -58,7 +57,6 @@ struct Convolution2dTest
                                                int32_t offset = 0)
     {
         Convolution2dDescriptor descriptor;
-        descriptor.m_BiasEnabled = false;
         descriptor.m_DataLayout  = DataLayout::NHWC;
         descriptor.m_StrideX     = 1;
         descriptor.m_StrideY     = 1;
@@ -81,7 +79,6 @@ struct DWConvolution2dTest
 {
 public:
     using LayerType = DepthwiseConvolution2dLayer;
-    static std::string GetReceiverLayerName() { return "DepthwiseConvolution2d"; };
     static const bool isElementWise = false;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }   // NHWCin
@@ -120,7 +117,6 @@ struct FullyConnectedTest
 {
 public:
     using LayerType = FullyConnectedLayer;
-    static std::string GetReceiverLayerName() { return "FullyConnected"; };
     static const bool isElementWise = false;
 
     static TensorShape GetInputShape()   { return TensorShape( {2, 5, 1, 1}); } // NCinHW
@@ -155,7 +151,6 @@ struct BatchNormTest
 {
 public:
     using LayerType = BatchNormalizationLayer;
-    static std::string GetReceiverLayerName() { return "BatchNorm"; };
     static const bool isElementWise = false;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }  // NHWCin
@@ -194,7 +189,6 @@ template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 struct MultiplicationTest
 {
     using LayerType = MultiplicationLayer;
-    static std::string GetReceiverLayerName() { return "Multiplication"; };
     static const bool isElementWise = true;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }  // NHWCin
@@ -219,7 +213,6 @@ template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 struct AdditionTest
 {
     using LayerType = AdditionLayer;
-    static std::string GetReceiverLayerName() { return "Addition"; };
     static const bool isElementWise = true;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }  // NHWCin
@@ -244,7 +237,6 @@ template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 struct SubtractionTest
 {
     using LayerType = SubtractionLayer;
-    static std::string GetReceiverLayerName() { return "Subtraction"; };
     static const bool isElementWise = true;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }  // NHWCin
@@ -269,7 +261,6 @@ template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 struct DivisionTest
 {
     using LayerType = DivisionLayer;
-    static std::string GetReceiverLayerName() { return "Division"; };
     static const bool isElementWise = true;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }  // NHWCin
@@ -361,7 +352,7 @@ void FuseActivationIntoPreviousLayerTest(ActivationDescriptor activationDescript
             (layer->GetNameStr() == "fused-activation-into-receiverLayer");
     };
 
-    BOOST_CHECK_MESSAGE(3 == graphFused.GetNumLayers(), LayerTest::GetReceiverLayerName());
+    BOOST_CHECK(3 == graphFused.GetNumLayers());
     BOOST_TEST(CheckSequence(graphFused.cbegin(),
                              graphFused.cend(),
                              &IsLayerOfType<InputLayer>,
@@ -587,13 +578,35 @@ BOOST_AUTO_TEST_CASE(FuseReLUIntoFullyConnectedQAsymmU8CpuAccTest)
         (activationDescriptor, 0.0001f, Compute::CpuAcc);
 }
 
-// HardSwish fused into Receiver Layers Float32
-BOOST_AUTO_TEST_CASE(FuseHardSwishIntoConvFloat32CpuAccTest)
+// BoundedReLu fused into Receiver Layers QAsymmS8
+BOOST_AUTO_TEST_CASE(FuseBoundedReLUIntoConvQASymmS8CpuAccTest)
 {
     ActivationDescriptor activationDescriptor;
-    activationDescriptor.m_Function = ActivationFunction::HardSwish;
+    activationDescriptor.m_Function = ActivationFunction::BoundedReLu;
+    activationDescriptor.m_A = 6.0f;
+    activationDescriptor.m_B = 0.0f;
 
-    FuseActivationIntoPreviousLayerTest<Convolution2dTest<DataType::Float32>, DataType::Float32>
+    FuseActivationIntoPreviousLayerTest<Convolution2dTest<DataType::QAsymmS8>, DataType::QAsymmS8>
+        (activationDescriptor, 0.0001f, Compute::CpuAcc);
+}
+BOOST_AUTO_TEST_CASE(FuseBoundedReLUIntoDWConvQASymmS8CpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::BoundedReLu;
+    activationDescriptor.m_A = 6.0f;
+    activationDescriptor.m_B = 0.0f;
+
+    FuseActivationIntoPreviousLayerTest < DWConvolution2dTest < DataType::QAsymmS8 > , DataType::QAsymmS8 >
+        (activationDescriptor, 0.0001f, Compute::CpuAcc);
+}
+BOOST_AUTO_TEST_CASE(FuseBoundedReLUIntoFullyConnectedQASymmS8CpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::BoundedReLu;
+    activationDescriptor.m_A = 6.0f;
+    activationDescriptor.m_B = 0.0f;
+
+    FuseActivationIntoPreviousLayerTest<FullyConnectedTest<DataType::QAsymmS8>, DataType::QAsymmS8>
         (activationDescriptor, 0.0001f, Compute::CpuAcc);
 }
 
@@ -602,6 +615,16 @@ BOOST_AUTO_TEST_CASE(FuseTanHIntoConvFloat32CpuAccTest)
 {
     ActivationDescriptor activationDescriptor;
     activationDescriptor.m_Function = ActivationFunction::TanH;
+
+    FuseActivationIntoPreviousLayerTest<Convolution2dTest<DataType::Float32>, DataType::Float32>
+        (activationDescriptor, 0.0001f, Compute::CpuAcc);
+}
+
+// HardSwish fused into Receiver Layers Float32
+BOOST_AUTO_TEST_CASE(FuseHardSwishIntoConvFloat32CpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::HardSwish;
 
     FuseActivationIntoPreviousLayerTest<Convolution2dTest<DataType::Float32>, DataType::Float32>
         (activationDescriptor, 0.0001f, Compute::CpuAcc);
@@ -841,6 +864,72 @@ BOOST_AUTO_TEST_CASE(FuseBoundedReLUIntoDivFloat32GpuAccTest)
         (activationDescriptor, 0.0001f, Compute::GpuAcc);
 }
 
+// ReLu fused into Receiver Layers Float16
+BOOST_AUTO_TEST_CASE(FuseReLUIntoConvFloat16GpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::ReLu;
+
+    FuseActivationIntoPreviousLayerTest<Convolution2dTest<DataType::Float16>, DataType::Float16>
+        (activationDescriptor, 0.0001f, Compute::GpuAcc);
+}
+BOOST_AUTO_TEST_CASE(FuseReLUIntoDWConvFloat16GpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::ReLu;
+
+    FuseActivationIntoPreviousLayerTest<DWConvolution2dTest<DataType::Float16>, DataType::Float16>
+        (activationDescriptor, 0.0001f, Compute::GpuAcc);
+}
+BOOST_AUTO_TEST_CASE(FuseReLUIntoFullyConnectedFloat16GpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::ReLu;
+
+    FuseActivationIntoPreviousLayerTest<FullyConnectedTest<DataType::Float16>, DataType::Float16>
+        (activationDescriptor, 0.0001f, Compute::GpuAcc);
+}
+BOOST_AUTO_TEST_CASE(FuseReLUIntoBatchNormFloat16GpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::ReLu;
+
+    FuseActivationIntoPreviousLayerTest<BatchNormTest<DataType::Float16>, DataType::Float16>
+        (activationDescriptor, 0.0001f, Compute::GpuAcc);
+}
+BOOST_AUTO_TEST_CASE(FuseReLUIntoMulFloat16GpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::ReLu;
+
+    FuseActivationIntoPreviousLayerTest<MultiplicationTest<DataType::Float16>, DataType::Float16>
+        (activationDescriptor, 0.0001f, Compute::GpuAcc);
+}
+BOOST_AUTO_TEST_CASE(FuseReLUIntoAddFloat16GpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::ReLu;
+
+    FuseActivationIntoPreviousLayerTest<AdditionTest<DataType::Float16>, DataType::Float16>
+        (activationDescriptor, 0.0001f, Compute::GpuAcc);
+}
+BOOST_AUTO_TEST_CASE(FuseReLUIntoSubFloat16GpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::ReLu;
+
+    FuseActivationIntoPreviousLayerTest<SubtractionTest<DataType::Float16>, DataType::Float16>
+        (activationDescriptor, 0.0001f, Compute::GpuAcc);
+}
+BOOST_AUTO_TEST_CASE(FuseReLUIntoDivFloat16GpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::ReLu;
+
+    FuseActivationIntoPreviousLayerTest<DivisionTest<DataType::Float16>, DataType::Float16>
+        (activationDescriptor, 0.0001f, Compute::GpuAcc);
+}
+
 // ReLU fused into Receiver Layers QAsymmU8
 BOOST_AUTO_TEST_CASE(FuseReLUQIntoConvAsymmU8GpuAccTest)
 {
@@ -867,45 +956,35 @@ BOOST_AUTO_TEST_CASE(FuseReLUQIntoFullyConnectedAsymmU8GpuAccTest)
         (activationDescriptor, 0.0001f, Compute::GpuAcc);
 }
 
-// HardSwish fused into Receiver Layers Float32
-BOOST_AUTO_TEST_CASE(FuseHardSwishIntoConvFloat32GpuAccTest)
+// BoundedReLu fused into Receiver Layers QAsymmS8
+BOOST_AUTO_TEST_CASE(FuseBoundedReLUIntoConvQASymmS8GpuAccTest)
 {
     ActivationDescriptor activationDescriptor;
-    activationDescriptor.m_Function = ActivationFunction::HardSwish;
+    activationDescriptor.m_Function = ActivationFunction::BoundedReLu;
+    activationDescriptor.m_A = 6.0f;
+    activationDescriptor.m_B = 0.0f;
 
-    FuseActivationIntoPreviousLayerTest<Convolution2dTest<DataType::Float32>, DataType::Float32>
+    FuseActivationIntoPreviousLayerTest<Convolution2dTest<DataType::QAsymmS8>, DataType::QAsymmS8>
         (activationDescriptor, 0.0001f, Compute::GpuAcc);
 }
-BOOST_AUTO_TEST_CASE(FuseHardSwishIntoMulFloat32GpuAccTest)
+BOOST_AUTO_TEST_CASE(FuseBoundedReLUIntoDWConvQASymmS8GpuAccTest)
 {
     ActivationDescriptor activationDescriptor;
-    activationDescriptor.m_Function = ActivationFunction::HardSwish;
+    activationDescriptor.m_Function = ActivationFunction::BoundedReLu;
+    activationDescriptor.m_A = 6.0f;
+    activationDescriptor.m_B = 0.0f;
 
-    FuseActivationIntoPreviousLayerTest<MultiplicationTest<DataType::Float32>, DataType::Float32>
+    FuseActivationIntoPreviousLayerTest < DWConvolution2dTest < DataType::QAsymmS8 > , DataType::QAsymmS8 >
         (activationDescriptor, 0.0001f, Compute::GpuAcc);
 }
-BOOST_AUTO_TEST_CASE(FuseHardSwishIntoAddFloat32GpuAccTest)
+BOOST_AUTO_TEST_CASE(FuseBoundedReLUIntoFullyConnectedQASymmS8GpuAccTest)
 {
     ActivationDescriptor activationDescriptor;
-    activationDescriptor.m_Function = ActivationFunction::HardSwish;
+    activationDescriptor.m_Function = ActivationFunction::BoundedReLu;
+    activationDescriptor.m_A = 6.0f;
+    activationDescriptor.m_B = 0.0f;
 
-    FuseActivationIntoPreviousLayerTest<AdditionTest<DataType::Float32>, DataType::Float32>
-        (activationDescriptor, 0.0001f, Compute::GpuAcc);
-}
-BOOST_AUTO_TEST_CASE(FuseHardSwishIntoSubFloat32GpuAccTest)
-{
-    ActivationDescriptor activationDescriptor;
-    activationDescriptor.m_Function = ActivationFunction::HardSwish;
-
-    FuseActivationIntoPreviousLayerTest<SubtractionTest<DataType::Float32>, DataType::Float32>
-        (activationDescriptor, 0.0001f, Compute::GpuAcc);
-}
-BOOST_AUTO_TEST_CASE(FuseHardSwishIntoDivFloat32GpuAccTest)
-{
-    ActivationDescriptor activationDescriptor;
-    activationDescriptor.m_Function = ActivationFunction::HardSwish;
-
-    FuseActivationIntoPreviousLayerTest<DivisionTest<DataType::Float32>, DataType::Float32>
+    FuseActivationIntoPreviousLayerTest<FullyConnectedTest<DataType::QAsymmS8>, DataType::QAsymmS8>
         (activationDescriptor, 0.0001f, Compute::GpuAcc);
 }
 
@@ -946,6 +1025,48 @@ BOOST_AUTO_TEST_CASE(FuseTanHIntoDivFloat32GpuAccTest)
 {
     ActivationDescriptor activationDescriptor;
     activationDescriptor.m_Function = ActivationFunction::TanH;
+
+    FuseActivationIntoPreviousLayerTest<DivisionTest<DataType::Float32>, DataType::Float32>
+        (activationDescriptor, 0.0001f, Compute::GpuAcc);
+}
+
+// HardSwish fused into Receiver Layers Float32
+BOOST_AUTO_TEST_CASE(FuseHardSwishIntoConvFloat32GpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::HardSwish;
+
+    FuseActivationIntoPreviousLayerTest<Convolution2dTest<DataType::Float32>, DataType::Float32>
+        (activationDescriptor, 0.0001f, Compute::GpuAcc);
+}
+BOOST_AUTO_TEST_CASE(FuseHardSwishIntoMulFloat32GpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::HardSwish;
+
+    FuseActivationIntoPreviousLayerTest<MultiplicationTest<DataType::Float32>, DataType::Float32>
+        (activationDescriptor, 0.0001f, Compute::GpuAcc);
+}
+BOOST_AUTO_TEST_CASE(FuseHardSwishIntoAddFloat32GpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::HardSwish;
+
+    FuseActivationIntoPreviousLayerTest<AdditionTest<DataType::Float32>, DataType::Float32>
+        (activationDescriptor, 0.0001f, Compute::GpuAcc);
+}
+BOOST_AUTO_TEST_CASE(FuseHardSwishIntoSubFloat32GpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::HardSwish;
+
+    FuseActivationIntoPreviousLayerTest<SubtractionTest<DataType::Float32>, DataType::Float32>
+        (activationDescriptor, 0.0001f, Compute::GpuAcc);
+}
+BOOST_AUTO_TEST_CASE(FuseHardSwishIntoDivFloat32GpuAccTest)
+{
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::HardSwish;
 
     FuseActivationIntoPreviousLayerTest<DivisionTest<DataType::Float32>, DataType::Float32>
         (activationDescriptor, 0.0001f, Compute::GpuAcc);

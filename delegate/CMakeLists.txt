@@ -71,10 +71,10 @@ add_library(tflite_headers INTERFACE)
 target_include_directories(tflite_headers INTERFACE $<BUILD_INTERFACE:${TfLite_INCLUDE_DIR}>
                                                     $<INSTALL_INTERFACE:include/tflite_headers>)
 
-target_compile_options(tflite_headers INTERFACE $<$<CXX_COMPILER_ID:GNU>:-Wno-conversion
-                                                                         -Wno-sign-conversion
-                                                                         -Wno-unused-parameter
-                                                                         -Wno-unused-function>)
+target_compile_options(tflite_headers INTERFACE -Wno-conversion
+                                                -Wno-sign-conversion
+                                                -Wno-unused-parameter
+                                                -Wno-unused-function)
 
 target_link_libraries(armnnDelegate PUBLIC tflite_headers)
 
@@ -89,7 +89,7 @@ target_link_libraries(armnnDelegate PRIVATE
 add_library(flatbuffer_headers INTERFACE)
 target_include_directories(flatbuffer_headers INTERFACE $<BUILD_INTERFACE:${Flatbuffers_INCLUDE_DIR}>
                                                  $<INSTALL_INTERFACE:include/flatbuffer_headers>)
-target_compile_options(flatbuffer_headers INTERFACE $<$<CXX_COMPILER_ID:GNU>:-Wno-sign-conversion>)
+target_compile_options(flatbuffer_headers INTERFACE -Wno-sign-conversion)
 
 target_link_libraries(armnnDelegate PUBLIC flatbuffer_headers)
 

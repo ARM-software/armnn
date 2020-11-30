@@ -16,6 +16,7 @@ find_path(TfLite_INCLUDE_DIR
 find_library(TfLite_LIB
         NAMES
             "libtensorflow_lite_all.so"
+            "libtensorflowlite.so"
         HINTS
             ${TFLITE_LIB_ROOT})
 

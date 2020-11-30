@@ -71,7 +71,7 @@ std::vector<char> CreateGatherTfLiteModel(tflite::TensorType tensorType,
     flatbuffers::Offset<void> operatorBuiltinOptions     = CreateGatherOptions(flatBufferBuilder).Union();
 
     const std::vector<int>        operatorInputs{{0, 1}};
-    const std::vector<int>        operatorOutputs{{2}};
+    const std::vector<int>        operatorOutputs{2};
     flatbuffers::Offset<Operator> controlOperator        =
                                       CreateOperator(flatBufferBuilder,
                                                      0,
@@ -83,7 +83,7 @@ std::vector<char> CreateGatherTfLiteModel(tflite::TensorType tensorType,
                                                      operatorBuiltinOptions);
 
     const std::vector<int>        subgraphInputs{{0, 1}};
-    const std::vector<int>        subgraphOutputs{{2}};
+    const std::vector<int>        subgraphOutputs{2};
     flatbuffers::Offset<SubGraph> subgraph               =
                                       CreateSubGraph(flatBufferBuilder,
                                                      flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),

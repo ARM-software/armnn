@@ -186,11 +186,13 @@ class LazyArmnnFinderExtension(Extension):
         self._library_dirs = None
         self._runtime_library_dirs = None
         self._armnn_libs = armnn_libs
-        self._optional = optional[0]
-        # self.__swig_opts = None
-        super().__init__(name, sources, include_dirs, define_macros, undef_macros, library_dirs, libraries,
-                         runtime_library_dirs, extra_objects, extra_compile_args, extra_link_args, export_symbols,
-                         language, optional, **kw)
+        self._optional = False if optional is None else optional
+
+        super().__init__(name=name, sources=sources, include_dirs=include_dirs, define_macros=define_macros,
+                         undef_macros=undef_macros, library_dirs=library_dirs, libraries=libraries,
+                         runtime_library_dirs=runtime_library_dirs, extra_objects=extra_objects,
+                         extra_compile_args=extra_compile_args, extra_link_args=extra_link_args,
+                         export_symbols=export_symbols, language=language, optional=optional, **kw)
 
     @property
     def include_dirs(self):
@@ -256,14 +258,14 @@ if __name__ == '__main__':
                                               extra_compile_args=['-std=c++14'],
                                               language='c++',
                                               armnn_libs=['libarmnn.so'],
-                                              optional=[False]
+                                              optional=False
                                               )
     pyarmnn_v_module = LazyArmnnFinderExtension('pyarmnn._generated._pyarmnn_version',
                                                 sources=['src/pyarmnn/_generated/armnn_version_wrap.cpp'],
                                                 extra_compile_args=['-std=c++14'],
                                                 language='c++',
                                                 armnn_libs=['libarmnn.so'],
-                                                optional=[False]
+                                                optional=False
                                                 )
     extensions_to_build = [pyarmnn_v_module, pyarmnn_module]
 
@@ -276,7 +278,7 @@ if __name__ == '__main__':
                                                            extra_compile_args=['-std=c++14'],
                                                            language='c++',
                                                            armnn_libs=['libarmnn.so', 'libarmnn{}.so'.format(name)],
-                                                           optional=[True]
+                                                           optional=True
                                                            )
         ext_list.append(pyarmnn_optional_module)
 

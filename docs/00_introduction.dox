@@ -176,35 +176,19 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
      cd ~/armnn-devenv/toolchains
 
      #For Mac OS, change the NDK download link accordingly.
-     wget https://dl.google.com/android/repository/android-ndk-r17b-linux-x86_64.zip
-     unzip android-ndk-r17b-linux-x86_64.zip
-     export NDK=~/armnn-devenv/toolchains/android-ndk-r17b
+     wget https://dl.google.com/android/repository/android-ndk-r20b-linux-x86_64.zip
+     unzip android-ndk-r20b-linux-x86_64.zip
+     export NDK=~/armnn-devenv/toolchains/android-ndk-r20b
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	 You may want to append `export NDK=~/armnn-devenv/toolchains/android-ndk-r17b` to your `~/.bashrc` (or `~/.bash_profile` in Mac OS).
-
-### Make a standalone toolchain:
-
-	 (Requires python if not previously installed: `sudo apt install python`)
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
-
-   # Create an arm64 API 26 libc++ toolchain.
-   $NDK/build/tools/make_standalone_toolchain.py \
-       --arch arm64 \
-       --api 26 \
-       --stl=libc++ \
-       --install-dir=$HOME/armnn-devenv/toolchains/aarch64-android-r17b
-   export PATH=$HOME/armnn-devenv/toolchains/aarch64-android-r17b/bin:$PATH
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-	 You may want to append `export PATH=$HOME/armnn-devenv/toolchains/aarch64-android-r17b/bin:$PATH` to your `~/.bashrc` (or `~/.bash_profile` in Mac OS).
+	 You may want to append `export NDK=~/armnn-devenv/toolchains/android-ndk-r20b` to your `~/.bashrc` (or `~/.bash_profile` in Mac OS).
 
 ## <a name="buildBoost">Build the Boost C++ libraries</a>
 
 ### Download Boost version 1.64:
+
+#### <b>Note:</b> as of ArmNN version 20.11, Boost is no longer required to build the core ArmNN code. Boost is, however, still required to build the unit tests.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
    mkdir ~/armnn-devenv/boost
@@ -258,11 +242,11 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
 
-	mkdir ~/armnn-devenv/google
+	mkdir -p ~/armnn-devenv/google
 	cd ~/armnn-devenv/google
 	git clone https://github.com/google/protobuf.git
 	cd protobuf
-	git checkout -b v3.5.2 v3.5.2
+	git checkout -b v3.12.0 v3.12.0
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -306,11 +290,9 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 	cd ~/armnn-devenv/google/
 	git clone https://github.com/tensorflow/tensorflow.git
     cd tensorflow/
-    git checkout a0043f9262dc1b0e7dc4bdf3a7f0ef0bebc4891e
+    git checkout fcc4b966f1265f466e82617020af93670141b009  # Tensorflow version 2.3.1
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-	You need tensorflow/contrib/makefile/tf_proto_files.txt from TensorFlow to generate TensorFlow protobuf definitions. This file is not available in TensorFlow master branch.
 
 ## <a name="buildArmNN">Build ArmNN</a>
 
@@ -337,25 +319,30 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 
  	(Requires CMake if not previously installed: `sudo apt install cmake`)
 
+ 	<b>Note: </b> please specify the ANDROID_API version.
+ 	e.g. for version 27 `export ANDROID_API=27`
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
 
 	  mkdir ~/armnn-devenv/armnn/build
 	  cd ~/armnn-devenv/armnn/build
-      CXX=aarch64-linux-android-clang++ \
-	  CC=aarch64-linux-android-clang \
+      CXX=aarch64-linux-android${ANDROID_API}-clang++ \
+	  CC=aarch64-linux-android${ANDROID_API}-clang \
 	  CXX_FLAGS="-fPIE -fPIC" \
 	  cmake .. \
+      -DCMAKE_ANDROID_NDK=$NDK \
       -DCMAKE_SYSTEM_NAME=Android \
+      -DCMAKE_SYSTEM_VERSION=$ANDROID_API \
       -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a \
-      -DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=$HOME/armnn-devenv/toolchains/aarch64-android-r17b/ \
-      -DCMAKE_EXE_LINKER_FLAGS="-pie -llog" \
+      -DCMAKE_SYSROOT=$HOME/android-ndk-r20b/toolchains/llvm/prebuilt/linux-x86_64/sysroot \
+      -DCMAKE_EXE_LINKER_FLAGS="-pie -llog -lz" \
       -DARMCOMPUTE_ROOT=$HOME/armnn-devenv/ComputeLibrary/ \
       -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build \
       -DBOOST_ROOT=$HOME/armnn-devenv/boost/install/ \
       -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
       -DTF_GENERATED_SOURCES=$HOME/armnn-devenv/google/tf_pb/ -DBUILD_TF_PARSER=1 \
       -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/arm64_pb_install/
-	  make -j16
+          make -j16
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -371,9 +358,9 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 	adb push libarmnn.so /data/local/tmp/
 	adb push UnitTests /data/local/tmp/
 	adb push $NDK/sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_shared.so /data/local/tmp/
-	adb push $HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so /data/local/tmp/libprotobuf.so.15.0.1
-	adb shell 'ln -s libprotobuf.so.15.0.1 /data/local/tmp/libprotobuf.so.15'
-	adb shell 'ln -s libprotobuf.so.15.0.1 /data/local/tmp/libprotobuf.so'
+	adb push $HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so /data/local/tmp/libprotobuf.so.3.12.0.0
+	adb shell 'ln -s libprotobuf.so.23.0.0 /data/local/tmp/libprotobuf.so.23'
+	adb shell 'ln -s libprotobuf.so.23.0.0 /data/local/tmp/libprotobuf.so'
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -458,14 +445,14 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 
 ## <a name="buildProtobuf">Build and install Google's Protobuf library</a>
 
-### Get protobuf-all-3.5.1.tar.gz from [here](https://github.com/protocolbuffers/protobuf/releases/tag/v3.5.1).
+### Get protobuf-all-3.12.0.tar.gz from [here](https://github.com/protocolbuffers/protobuf/releases/tag/v3.12.0).
 
 ### Extract:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
 
-    tar -zxvf protobuf-all-3.5.1.tar.gz
-    cd protobuf-3.5.1
+    tar -zxvf protobuf-all-3.12.0.tar.gz
+    cd protobuf-3.12.0
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -614,8 +601,8 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     -DCAFFE_GENERATED_SOURCES=$HOME/armnn-devenv/caffe/build/src \
     -DBUILD_CAFFE_PARSER=1 \
     -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/x86_64_pb_install/ \
-    -DPROTOBUF_LIBRARY_DEBUG=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.15.0.1 \
-    -DPROTOBUF_LIBRARY_RELEASE=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.15.0.1
+    -DPROTOBUF_LIBRARY_DEBUG=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.23.0.0 \
+    -DPROTOBUF_LIBRARY_RELEASE=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.23.0.0
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -631,7 +618,7 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 
 ### Copy the build folder to an arm64 linux machine
 
-### Copy the libprotobuf.so.15.0.1 library file to the build folder
+### Copy the libprotobuf.so.23.0.0 library file to the build folder
 
 ### cd to the build folder on your arm64 machine and set your LD_LIBRARY_PATH to its current location:
 
@@ -642,11 +629,11 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Create a symbolic link to libprotobuf.so.15.0.1:
+### Create a symbolic link to libprotobuf.so.23.0.0:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
 
-    ln -s libprotobuf.so.15.0.1 ./libprotobuf.so.15
+    ln -s libprotobuf.so.23.0.0 ./libprotobuf.so.23
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -728,7 +715,7 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
 
-    /usr/lib/gcc-cross/aarch64-linux-gnu/5/../../../../aarch64-linux-gnu/bin/ld: warning: libz.so.1, needed by /home/<username>/armNN/usr/lib64/libprotobuf.so.15.0.0, not found (try using -rpath or -rpath-link)
+    /usr/lib/gcc-cross/aarch64-linux-gnu/5/../../../../aarch64-linux-gnu/bin/ld: warning: libz.so.1, needed by /home/<username>/armNN/usr/lib64/libprotobuf.so.23.0.0, not found (try using -rpath or -rpath-link)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

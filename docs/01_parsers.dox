@@ -44,6 +44,7 @@ This reference guide provides a list of Caffe layers the Arm NN SDK currently su
 - Yolov1_tiny.
 - Lenet.
 - MobileNetv1.
+- SqueezeNet v1.0 and SqueezeNet v1.1
 
 ## The Arm NN SDK supports the following machine learning layers for Caffe networks:
 
@@ -157,6 +158,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - CONCATENATION, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - DEPTHWISE_CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- DEQUANTIZE
 - DIV
 - EXP
 - FULLY_CONNECTED, Supported Fused Activation: RELU , RELU6 , TANH, NONE
@@ -171,10 +173,12 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - NEG
 - PACK
 - PAD
+- QUANTIZE
 - RELU
 - RELU6
 - RESHAPE
 - RESIZE_BILINEAR
+- RESIZE_NEAREST_NEIGHBOR
 - SLICE
 - SOFTMAX
 - SPACE_TO_BATCH
@@ -199,6 +203,15 @@ Arm tested these operators with the following TensorFlow Lite neural network:
 - [Quantized SSD MobileNet](http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_quantized_300x300_coco14_sync_2018_07_18.tar.gz)
 - DeepSpeech v1 converted from [TensorFlow model](https://github.com/mozilla/DeepSpeech/releases/tag/v0.4.1)
 - DeepSpeaker
+- [DeepLab v3+](https://www.tensorflow.org/lite/models/segmentation/overview)
+- FSRCNN
+- EfficientNet-lite
+- RDN converted from [TensorFlow model](https://github.com/hengchuan/RDN-TensorFlow)
+- Quantized RDN (CpuRef)
+- [Quantized Inception v3](http://download.tensorflow.org/models/tflite_11_05_08/inception_v3_quant.tgz)
+- [Quantized Inception v4](http://download.tensorflow.org/models/inception_v4_299_quant_20181026.tgz) (CpuRef)
+- Quantized ResNet v2 50 (CpuRef)
+- Quantized Yolo v3 (CpuRef)
 
 More machine learning operators will be supported in future releases.
 <br/><br/><br/><br/>
@@ -251,6 +264,8 @@ The Arm NN SDK TensorFlow parser currently only supports fp32 operators.
   - See the TensorFlow [squeeze documentation](https://www.tensorflow.org/api_docs/python/tf/squeeze) for more information.
 - tanh
   - See the TensorFlow [tanh documentation](https://www.tensorflow.org/api_docs/python/tf/tanh) for more information.
+- transpose
+  - See the TensorFlow [transpose documentation](https://www.tensorflow.org/api_docs/python/tf/transpose) for more information.
 
 ## Partially supported
 
@@ -283,6 +298,8 @@ The Arm NN SDK TensorFlow parser currently only supports fp32 operators.
   - The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of 4D and 1D tensors. See the TensorFlow [minimum operator documentation](https://www.tensorflow.org/api_docs/python/tf/math/minimum) for more information.
 - multiply
   - The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [multiply documentation](https://www.tensorflow.org/api_docs/python/tf/multiply) for more information.
+- pack/stack
+  - See the TensorFlow [stack documentation](https://www.tensorflow.org/api_docs/python/tf/stack) for more information.
 - pad
   - Only supports tf.pad function with mode = 'CONSTANT' and constant_values = 0. See the TensorFlow [pad documentation](https://www.tensorflow.org/api_docs/python/tf/pad) for more information.
 - realdiv
@@ -295,8 +312,11 @@ The Arm NN SDK TensorFlow parser currently only supports fp32 operators.
   - The parser only supports 2D inputs and does not support selecting the `softmax` dimension. See the TensorFlow [softmax documentation](https://www.tensorflow.org/api_docs/python/tf/nn/softmax) for more information.
 - split
   - Arm NN supports split along the channel dimension for data formats NHWC and NCHW.
+- strided_slice
+  - See the TensorFlow [strided_slice documentation](https://www.tensorflow.org/api_docs/python/tf/strided_slice) for more information.
 - subtract
   - The parser does not support all forms of broadcasting [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [subtract documentation](https://www.tensorflow.org/api_docs/python/tf/math/subtract) for more information.
+
 
 ## Tested networks
 

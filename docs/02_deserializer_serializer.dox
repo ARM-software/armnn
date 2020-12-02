@@ -60,6 +60,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 - Input
 - InstanceNormalization
 - L2Normalization
+- Logical
 - LogSoftmax
 - Lstm
 - Maximum
@@ -73,8 +74,10 @@ The Arm NN SDK Serializer currently supports the following layers:
 - Permute
 - Pooling2d
 - Prelu
+- QLstm
 - Quantize
 - QuantizedLstm
+- Rank
 - Reshape
 - Resize
 - Slice
@@ -87,6 +90,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 - StridedSlice
 - Subtraction
 - Switch
+- Transpose
 - TransposeConvolution2d
 
 More machine learning layers will be supported in future releases.
@@ -131,12 +135,15 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 - Dequantize
 - DetectionPostProcess
 - Division
+- ElementwiseUnary
+- Fill
 - Floor
 - FullyConnected
 - Gather
 - Input
 - InstanceNormalization
 - L2Normalization
+- Logical
 - LogSoftmax
 - Lstm
 - Maximum
@@ -150,9 +157,12 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 - Permute
 - Pooling2d
 - Prelu
+- QLstm
 - Quantize
 - QuantizedLstm
+- Rank
 - Reshape
+- Resize
 - Rsqrt
 - Slice
 - Softmax
@@ -165,7 +175,6 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 - Subtraction
 - Switch
 - TransposeConvolution2d
-- Resize
 
 More machine learning layers will be supported in future releases.
 

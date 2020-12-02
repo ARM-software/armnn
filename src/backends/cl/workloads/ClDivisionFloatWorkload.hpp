@@ -20,8 +20,9 @@ arm_compute::Status ClDivisionWorkloadValidate(const TensorInfo& input0,
 class ClDivisionFloatWorkload : public FloatWorkload<DivisionQueueDescriptor>
 {
 public:
-    ClDivisionFloatWorkload(const DivisionQueueDescriptor& descriptor, const
-    WorkloadInfo& info);
+    ClDivisionFloatWorkload(const DivisionQueueDescriptor& descriptor,
+                            const WorkloadInfo& info,
+                            const arm_compute::CLCompileContext& clCompileContext);
 
     using FloatWorkload<DivisionQueueDescriptor>::FloatWorkload;
     void Execute() const override;

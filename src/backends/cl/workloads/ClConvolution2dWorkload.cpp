@@ -65,6 +65,7 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
 ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescriptor& descriptor,
                                                  const WorkloadInfo& info,
                                                  std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
+                                                 const arm_compute::CLCompileContext& clCompileContext,
                                                  const bool isFastMathEnabled)
     : BaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
     , m_ConvolutionLayer(memoryManager)
@@ -97,7 +98,8 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
-    m_ConvolutionLayer.configure(&input,
+    m_ConvolutionLayer.configure(clCompileContext,
+                                 &input,
                                  m_KernelTensor.get(),
                                  m_BiasTensor.get(),
                                  &output,

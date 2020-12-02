@@ -28,7 +28,9 @@ arm_compute::Status ClPooling2dWorkloadValidate(const TensorInfo& input,
 }
 
 ClPooling2dWorkload::ClPooling2dWorkload(
-    const Pooling2dQueueDescriptor& descriptor, const WorkloadInfo& info)
+    const Pooling2dQueueDescriptor& descriptor,
+    const WorkloadInfo& info,
+    const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<Pooling2dQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClPooling2dWorkload", 1, 1);
@@ -48,7 +50,7 @@ ClPooling2dWorkload::ClPooling2dWorkload(
     arm_compute::PoolingLayerInfo layerInfo = BuildArmComputePoolingLayerInfo(m_Data.m_Parameters, fpMixedPrecision);
 
     // Run the layer.
-    m_PoolingLayer.configure(&input, &output, layerInfo);
+    m_PoolingLayer.configure(clCompileContext, &input, &output, layerInfo);
 }
 
 void ClPooling2dWorkload::Execute() const

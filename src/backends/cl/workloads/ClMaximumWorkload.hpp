@@ -19,7 +19,9 @@ arm_compute::Status ClMaximumWorkloadValidate(const TensorInfo& input0,
 class ClMaximumWorkload : public BaseWorkload<MaximumQueueDescriptor>
 {
 public:
-    ClMaximumWorkload(const MaximumQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClMaximumWorkload(const MaximumQueueDescriptor& descriptor,
+                      const WorkloadInfo& info,
+                      const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

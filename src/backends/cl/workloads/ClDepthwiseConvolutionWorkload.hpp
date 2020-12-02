@@ -27,7 +27,8 @@ public:
     using BaseWorkload<DepthwiseConvolution2dQueueDescriptor>::m_Data;
 
     ClDepthwiseConvolutionWorkload(const DepthwiseConvolution2dQueueDescriptor& descriptor,
-                                   const WorkloadInfo& info);
+                                   const WorkloadInfo& info,
+                                   const arm_compute::CLCompileContext& clCompileContext);
 
     void Execute() const override;
 

@@ -18,8 +18,9 @@ namespace armnn
 using namespace armcomputetensorutils;
 
 ClBatchToSpaceNdWorkload::ClBatchToSpaceNdWorkload(const BatchToSpaceNdQueueDescriptor& desc,
-                                                   const WorkloadInfo& info)
-                                                   : BaseWorkload<BatchToSpaceNdQueueDescriptor>(desc, info)
+                                                   const WorkloadInfo& info,
+                                                   const arm_compute::CLCompileContext& clCompileContext)
+   : BaseWorkload<BatchToSpaceNdQueueDescriptor>(desc, info)
 {
     m_Data.ValidateInputsOutputs("ClBatchToSpaceNdWorkload", 1, 1);
 
@@ -35,7 +36,7 @@ ClBatchToSpaceNdWorkload::ClBatchToSpaceNdWorkload(const BatchToSpaceNdQueueDesc
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     output.info()->set_data_layout(aclDataLayout);
 
-    m_Layer.configure(&input, blockWidth, blockHeight, &output);
+    m_Layer.configure(clCompileContext, &input, blockWidth, blockHeight, &output);
 }
 
 void ClBatchToSpaceNdWorkload::Execute() const

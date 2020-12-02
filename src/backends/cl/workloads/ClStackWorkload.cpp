@@ -44,7 +44,9 @@ arm_compute::Status ClStackWorkloadValidate(const std::vector<const TensorInfo*>
     return arm_compute::CLStackLayer::validate(aclInputPtrs, aclAxis, &aclOutputInfo);
 }
 
-ClStackWorkload::ClStackWorkload(const StackQueueDescriptor& descriptor, const WorkloadInfo& info)
+ClStackWorkload::ClStackWorkload(const StackQueueDescriptor& descriptor,
+                                 const WorkloadInfo& info,
+                                 const arm_compute::CLCompileContext& clCompileContext)
 : BaseWorkload<StackQueueDescriptor>(descriptor, info)
 {
     std::vector<arm_compute::ICLTensor*> aclInputs;
@@ -58,7 +60,7 @@ ClStackWorkload::ClStackWorkload(const StackQueueDescriptor& descriptor, const W
 
     m_Layer.reset(new arm_compute::CLStackLayer());
     int aclAxis = CalcAxis(descriptor.m_Parameters.m_Axis, descriptor.m_Parameters.m_InputShape.GetNumDimensions());
-    m_Layer->configure(aclInputs, aclAxis, &output);
+    m_Layer->configure(clCompileContext, aclInputs, aclAxis, &output);
 }
 
 void ClStackWorkload::Execute() const

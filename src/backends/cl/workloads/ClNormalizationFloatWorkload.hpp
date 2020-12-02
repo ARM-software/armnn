@@ -19,7 +19,9 @@ arm_compute::Status ClNormalizationWorkloadValidate(const TensorInfo& input,
 class ClNormalizationFloatWorkload : public FloatWorkload<NormalizationQueueDescriptor>
 {
 public:
-    ClNormalizationFloatWorkload(const NormalizationQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClNormalizationFloatWorkload(const NormalizationQueueDescriptor& descriptor,
+                                 const WorkloadInfo& info,
+                                 const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

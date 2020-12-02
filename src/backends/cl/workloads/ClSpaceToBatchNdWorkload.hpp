@@ -22,7 +22,9 @@ arm_compute::Status ClSpaceToBatchNdWorkloadValidate(const TensorInfo& input,
 class ClSpaceToBatchNdWorkload : public BaseWorkload<SpaceToBatchNdQueueDescriptor>
 {
 public:
-    ClSpaceToBatchNdWorkload(const SpaceToBatchNdQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClSpaceToBatchNdWorkload(const SpaceToBatchNdQueueDescriptor& descriptor,
+                             const WorkloadInfo& info,
+                             const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

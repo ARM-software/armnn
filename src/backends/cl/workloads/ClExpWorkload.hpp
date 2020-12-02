@@ -18,7 +18,9 @@ arm_compute::Status ClExpWorkloadValidate(const TensorInfo& input, const TensorI
 class ClExpWorkload : public BaseWorkload<ElementwiseUnaryQueueDescriptor>
 {
 public:
-    ClExpWorkload(const ElementwiseUnaryQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClExpWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
+                  const WorkloadInfo& info,
+                  const arm_compute::CLCompileContext& clCompileContext);
     virtual void Execute() const override;
 
 private:

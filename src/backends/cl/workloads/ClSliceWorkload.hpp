@@ -20,7 +20,9 @@ arm_compute::Status ClSliceWorkloadValidate(const TensorInfo& input,
 class ClSliceWorkload : public BaseWorkload<SliceQueueDescriptor>
 {
 public:
-    ClSliceWorkload(const SliceQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClSliceWorkload(const SliceQueueDescriptor& descriptor,
+                    const WorkloadInfo& info,
+                    const arm_compute::CLCompileContext& clCompileContext);
     virtual void Execute() const override;
 
 private:

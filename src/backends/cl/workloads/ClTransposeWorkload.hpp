@@ -29,7 +29,9 @@ public:
         return name;
     }
 
-    ClTransposeWorkload(const TransposeQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClTransposeWorkload(const TransposeQueueDescriptor& descriptor,
+                        const WorkloadInfo& info,
+                        const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

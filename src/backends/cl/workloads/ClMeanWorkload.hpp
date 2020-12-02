@@ -19,7 +19,9 @@ arm_compute::Status ClMeanValidate(const TensorInfo& input,
 class ClMeanWorkload : public BaseWorkload<MeanQueueDescriptor>
 {
 public:
-    ClMeanWorkload(const MeanQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClMeanWorkload(const MeanQueueDescriptor& descriptor,
+                   const WorkloadInfo& info,
+                   const arm_compute::CLCompileContext& clCompileContext);
 
     void Execute() const override;
 

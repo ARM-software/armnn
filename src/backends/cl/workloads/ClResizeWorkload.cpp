@@ -46,8 +46,10 @@ arm_compute::Status ClResizeWorkloadValidate(const TensorInfo& input,
                                                                        descriptor.m_AlignCorners));
 }
 
-ClResizeWorkload::ClResizeWorkload(const ResizeQueueDescriptor& descriptor, const WorkloadInfo& info) :
-    BaseWorkload<ResizeQueueDescriptor>(descriptor, info)
+ClResizeWorkload::ClResizeWorkload(const ResizeQueueDescriptor& descriptor,
+                                   const WorkloadInfo& info,
+                                   const arm_compute::CLCompileContext& clCompileContext)
+  : BaseWorkload<ResizeQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClResizeWorkload", 1, 1);
 
@@ -65,7 +67,8 @@ ClResizeWorkload::ClResizeWorkload(const ResizeQueueDescriptor& descriptor, cons
                                                  ? arm_compute::SamplingPolicy::CENTER
                                                  : arm_compute::SamplingPolicy::TOP_LEFT;
 
-    m_ResizeLayer.configure(&input,
+    m_ResizeLayer.configure(clCompileContext,
+                            &input,
                             &output,
                             arm_compute::ScaleKernelInfo(aclInterpolationPolicy,
                                                          arm_compute::BorderMode::REPLICATE,

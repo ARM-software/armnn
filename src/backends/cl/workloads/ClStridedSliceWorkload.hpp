@@ -22,7 +22,9 @@ arm_compute::Status ClStridedSliceWorkloadValidate(const TensorInfo& input,
 class ClStridedSliceWorkload : public BaseWorkload<StridedSliceQueueDescriptor>
 {
 public:
-    ClStridedSliceWorkload(const StridedSliceQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClStridedSliceWorkload(const StridedSliceQueueDescriptor& descriptor,
+                           const WorkloadInfo& info,
+                           const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

@@ -14,7 +14,9 @@ namespace armnn
 {
 using namespace armcomputetensorutils;
 
-ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor& descriptor, const WorkloadInfo& info)
+ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor& descriptor,
+                                 const WorkloadInfo& info,
+                                 const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<QLstmQueueDescriptor>(descriptor, info)
 {
     arm_compute::LSTMParams<arm_compute::ICLTensor> qLstmParams;
@@ -150,8 +152,9 @@ ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor& descriptor, const W
                                         m_Data.m_Parameters.m_CellIntermediateScale,
                                         m_Data.m_Parameters.m_OutputIntermediateScale);
 
-    // QLSTM NEON configure
-    m_QLstmLayer.configure(&input,
+    // QLSTM CL configure
+    m_QLstmLayer.configure(clCompileContext,
+                           &input,
                            m_InputToForgetWeightsTensor.get(),
                            m_InputToCellWeightsTensor.get(),
                            m_InputToOutputWeightsTensor.get(),

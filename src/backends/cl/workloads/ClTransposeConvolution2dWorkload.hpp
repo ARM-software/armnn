@@ -29,7 +29,8 @@ class ClTransposeConvolution2dWorkload : public BaseWorkload<TransposeConvolutio
 public:
     ClTransposeConvolution2dWorkload(const TransposeConvolution2dQueueDescriptor& descriptor,
                                      const WorkloadInfo& info,
-                                     std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager);
+                                     std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
+                                     const arm_compute::CLCompileContext& clCompileContext);
 
     void Execute() const override;
 

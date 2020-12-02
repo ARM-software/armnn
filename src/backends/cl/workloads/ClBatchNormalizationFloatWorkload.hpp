@@ -25,7 +25,9 @@ arm_compute::Status ClBatchNormalizationValidate(const TensorInfo& input,
 class ClBatchNormalizationFloatWorkload : public FloatWorkload<BatchNormalizationQueueDescriptor>
 {
 public:
-    ClBatchNormalizationFloatWorkload(const BatchNormalizationQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClBatchNormalizationFloatWorkload(const BatchNormalizationQueueDescriptor& descriptor,
+                                      const WorkloadInfo& info,
+                                      const arm_compute::CLCompileContext& clCompileContext);
 
     using FloatWorkload<BatchNormalizationQueueDescriptor>::FloatWorkload;
     void Execute() const override;

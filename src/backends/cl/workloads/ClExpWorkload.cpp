@@ -23,7 +23,9 @@ arm_compute::Status ClExpWorkloadValidate(const TensorInfo& input, const TensorI
     return arm_compute::CLExpLayer::validate(&aclInput, &aclOutput);
 }
 
-ClExpWorkload::ClExpWorkload(const ElementwiseUnaryQueueDescriptor& descriptor, const WorkloadInfo& info)
+ClExpWorkload::ClExpWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
+                             const WorkloadInfo& info,
+                             const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClExpWorkload", 1, 1);
@@ -31,7 +33,7 @@ ClExpWorkload::ClExpWorkload(const ElementwiseUnaryQueueDescriptor& descriptor, 
     arm_compute::ICLTensor& input  = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_ExpLayer.configure(&input, &output);
+    m_ExpLayer.configure(clCompileContext, &input, &output);
 }
 
 void ClExpWorkload::Execute() const

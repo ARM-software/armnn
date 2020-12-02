@@ -18,7 +18,9 @@ arm_compute::Status ClStackWorkloadValidate(const std::vector<const TensorInfo*>
 class ClStackWorkload : public BaseWorkload<StackQueueDescriptor>
 {
 public:
-    ClStackWorkload(const StackQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClStackWorkload(const StackQueueDescriptor& descriptor,
+                    const WorkloadInfo& info,
+                    const arm_compute::CLCompileContext& clCompileContext);
 
     void Execute() const override;
 

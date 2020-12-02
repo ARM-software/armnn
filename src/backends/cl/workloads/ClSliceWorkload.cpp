@@ -30,7 +30,9 @@ arm_compute::Status ClSliceWorkloadValidate(const TensorInfo& input,
     return arm_compute::CLSlice::validate(&aclInput, &aclOutput, starts, ends);
 }
 
-ClSliceWorkload::ClSliceWorkload(const SliceQueueDescriptor& descriptor, const WorkloadInfo& info)
+ClSliceWorkload::ClSliceWorkload(const SliceQueueDescriptor& descriptor,
+                                 const WorkloadInfo& info,
+                                 const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<SliceQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClSliceWorkload", 1, 1);
@@ -43,7 +45,7 @@ ClSliceWorkload::ClSliceWorkload(const SliceQueueDescriptor& descriptor, const W
 
     std::tie(starts, ends) = SetClSliceData(m_Data.m_Parameters.m_Begin, m_Data.m_Parameters.m_Size);
 
-    m_SliceFunction.configure(&input, &output, starts, ends);
+    m_SliceFunction.configure(clCompileContext, &input, &output, starts, ends);
 }
 
 void ClSliceWorkload::Execute() const

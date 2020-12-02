@@ -45,7 +45,8 @@ arm_compute::Status ClMultiplicationWorkloadValidate(const TensorInfo& input0,
 
 
 ClMultiplicationWorkload::ClMultiplicationWorkload(const MultiplicationQueueDescriptor& descriptor,
-                                                   const WorkloadInfo& info)
+                                                   const WorkloadInfo& info,
+                                                   const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<MultiplicationQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClMultiplicationWorkload", 2, 1);
@@ -62,7 +63,8 @@ ClMultiplicationWorkload::ClMultiplicationWorkload(const MultiplicationQueueDesc
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
     // Construct
-    m_PixelWiseMultiplication.configure(&input0,
+    m_PixelWiseMultiplication.configure(clCompileContext,
+                                        &input0,
                                         &input1,
                                         &output,
                                         1.0f,

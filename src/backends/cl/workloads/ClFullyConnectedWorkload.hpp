@@ -27,7 +27,8 @@ class ClFullyConnectedWorkload : public armnn::BaseWorkload<armnn::FullyConnecte
 public:
     ClFullyConnectedWorkload(const armnn::FullyConnectedQueueDescriptor& descriptor,
                              const armnn::WorkloadInfo& info,
-                             std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager);
+                             std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
+                             const arm_compute::CLCompileContext& clCompileContext);
 
     using armnn::BaseWorkload<armnn::FullyConnectedQueueDescriptor>::m_Data;
     void Execute() const override;

@@ -18,7 +18,9 @@ arm_compute::Status ClLogicalNotWorkloadValidate(const TensorInfo& input, const 
 class ClLogicalNotWorkload : public BaseWorkload<ElementwiseUnaryQueueDescriptor>
 {
 public:
-    ClLogicalNotWorkload(const ElementwiseUnaryQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClLogicalNotWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
+                         const WorkloadInfo& info,
+                         const arm_compute::CLCompileContext& clCompileContext);
     virtual void Execute() const override;
 
 private:

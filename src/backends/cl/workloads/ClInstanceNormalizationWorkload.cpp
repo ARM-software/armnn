@@ -31,7 +31,8 @@ arm_compute::Status ClInstanceNormalizationWorkloadValidate(const TensorInfo& in
 
 ClInstanceNormalizationWorkload::ClInstanceNormalizationWorkload(
     const InstanceNormalizationQueueDescriptor& descriptor,
-    const WorkloadInfo& info)
+    const WorkloadInfo& info,
+    const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<InstanceNormalizationQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClInstanceNormalizationWorkload", 1, 1);
@@ -43,7 +44,8 @@ ClInstanceNormalizationWorkload::ClInstanceNormalizationWorkload(
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
-    m_Layer.configure(&input,
+    m_Layer.configure(clCompileContext,
+                      &input,
                       &output,
                       descriptor.m_Parameters.m_Gamma,
                       descriptor.m_Parameters.m_Beta,

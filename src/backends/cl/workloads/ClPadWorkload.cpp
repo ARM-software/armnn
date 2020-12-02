@@ -15,7 +15,9 @@ namespace armnn
 {
 using namespace armcomputetensorutils;
 
-ClPadWorkload::ClPadWorkload(const PadQueueDescriptor& descriptor, const WorkloadInfo& info)
+ClPadWorkload::ClPadWorkload(const PadQueueDescriptor& descriptor,
+                             const WorkloadInfo& info,
+                             const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<PadQueueDescriptor>(descriptor, info)
 {
     this->m_Data.ValidateInputsOutputs("ClPadWorkload", 1, 1);
@@ -33,7 +35,7 @@ ClPadWorkload::ClPadWorkload(const PadQueueDescriptor& descriptor, const Workloa
 
     arm_compute::PixelValue pixelValue = GetPixelValue(input, descriptor.m_Parameters.m_PadValue);
 
-    m_Layer.configure(&input, &output, padList, pixelValue);
+    m_Layer.configure(clCompileContext, &input, &output, padList, pixelValue);
 }
 
 void ClPadWorkload::Execute() const

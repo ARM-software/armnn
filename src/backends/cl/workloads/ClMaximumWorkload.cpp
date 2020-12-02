@@ -37,7 +37,8 @@ arm_compute::Status ClMaximumWorkloadValidate(const TensorInfo& input0,
 }
 
 ClMaximumWorkload::ClMaximumWorkload(const MaximumQueueDescriptor& descriptor,
-                                               const WorkloadInfo& info)
+                                     const WorkloadInfo& info,
+                                     const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<MaximumQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClMaximumWorkload", 2, 1);
@@ -46,7 +47,7 @@ ClMaximumWorkload::ClMaximumWorkload(const MaximumQueueDescriptor& descriptor,
     arm_compute::ICLTensor& input1 = static_cast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_MaximumLayer.configure(&input0, &input1, &output);
+    m_MaximumLayer.configure(clCompileContext, &input0, &input1, &output);
 }
 
 void ClMaximumWorkload::Execute() const

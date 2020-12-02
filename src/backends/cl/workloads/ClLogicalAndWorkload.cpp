@@ -32,7 +32,8 @@ arm_compute::Status ClLogicalAndWorkloadValidate(const TensorInfo& input0,
 }
 
 ClLogicalAndWorkload::ClLogicalAndWorkload(const LogicalBinaryQueueDescriptor& descriptor,
-                                           const WorkloadInfo& info)
+                                           const WorkloadInfo& info,
+                                           const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<LogicalBinaryQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClLogicalAndWorkload", 2, 1);
@@ -41,7 +42,7 @@ ClLogicalAndWorkload::ClLogicalAndWorkload(const LogicalBinaryQueueDescriptor& d
     arm_compute::ICLTensor& input1 = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_LogicalAndLayer.configure(&input0, &input1, &output);
+    m_LogicalAndLayer.configure(clCompileContext, &input0, &input1, &output);
 }
 
 void ClLogicalAndWorkload::Execute() const

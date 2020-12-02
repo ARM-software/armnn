@@ -45,8 +45,11 @@ arm_compute::Status ClFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                         fullyConnectedLayerInfo);
 }
 
-ClFullyConnectedWorkload::ClFullyConnectedWorkload(const FullyConnectedQueueDescriptor& descriptor,
-    const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
+ClFullyConnectedWorkload::ClFullyConnectedWorkload(
+    const FullyConnectedQueueDescriptor& descriptor,
+    const WorkloadInfo& info,
+    std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
+    const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<FullyConnectedQueueDescriptor>(descriptor, info)
     , m_FullyConnectedLayer(memoryManager)
 {
@@ -69,7 +72,12 @@ ClFullyConnectedWorkload::ClFullyConnectedWorkload(const FullyConnectedQueueDesc
     arm_compute::FullyConnectedLayerInfo fc_info =
             ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor.m_Parameters, activationInfo);
 
-    m_FullyConnectedLayer.configure(&input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output, fc_info);
+    m_FullyConnectedLayer.configure(clCompileContext,
+                                    &input,
+                                    m_WeightsTensor.get(),
+                                    m_BiasesTensor.get(),
+                                    &output,
+                                    fc_info);
 
     InitializeArmComputeClTensorData(*m_WeightsTensor, m_Data.m_Weight);
 

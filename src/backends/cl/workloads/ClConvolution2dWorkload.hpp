@@ -32,6 +32,7 @@ public:
     ClConvolution2dWorkload(const Convolution2dQueueDescriptor& descriptor,
                             const WorkloadInfo& info,
                             std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
+                            const arm_compute::CLCompileContext& clCompileContext,
                             const bool isFastMathEnabled = false);
     void Execute() const override;
 

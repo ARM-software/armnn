@@ -18,7 +18,9 @@ arm_compute::Status ClActivationWorkloadValidate(const TensorInfo& input,
 class ClActivationWorkload : public BaseWorkload<ActivationQueueDescriptor>
 {
 public:
-    ClActivationWorkload(const ActivationQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClActivationWorkload(const ActivationQueueDescriptor& descriptor,
+                         const WorkloadInfo& info,
+                         const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

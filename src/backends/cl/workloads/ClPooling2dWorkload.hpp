@@ -22,7 +22,8 @@ public:
     using BaseWorkload<Pooling2dQueueDescriptor>::m_Data;
 
     ClPooling2dWorkload(const Pooling2dQueueDescriptor& descriptor,
-                        const WorkloadInfo& info);
+                        const WorkloadInfo& info,
+                        const arm_compute::CLCompileContext& clCompileContext);
 
     void Execute() const override;
 

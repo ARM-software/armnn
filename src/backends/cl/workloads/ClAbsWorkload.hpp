@@ -18,7 +18,9 @@ arm_compute::Status ClAbsWorkloadValidate(const TensorInfo& input, const TensorI
 class ClAbsWorkload : public BaseWorkload<AbsQueueDescriptor>
 {
 public:
-    ClAbsWorkload(const AbsQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClAbsWorkload(const AbsQueueDescriptor& descriptor,
+                  const WorkloadInfo& info,
+                  const arm_compute::CLCompileContext& clCompileContext);
     virtual void Execute() const override;
 
 private:

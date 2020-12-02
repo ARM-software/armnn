@@ -107,9 +107,8 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::MakeWorkload(const QueueDescriptor
 void ClWorkloadFactory::InitializeCLCompileContext()
 {
     // Initialize our m_CLCompileContext using default device and context
-    cl::Device device = cl::Device::getDefault();
-    cl::Context context = cl::Context(device);
-
+    auto context = arm_compute::CLKernelLibrary::get().context();
+    auto device  = arm_compute::CLKernelLibrary::get().get_device();
     m_CLCompileContext = arm_compute::CLCompileContext(context, device);
 
     if (m_ModelContextPtr)
@@ -200,64 +199,64 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateAbs(const AbsQueueDescriptor
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                                const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClActivationWorkload>(descriptor, info);
+    return MakeWorkload<ClActivationWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClAdditionWorkload>(descriptor, info);
+    return MakeWorkload<ClAdditionWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateArgMinMax(const ArgMinMaxQueueDescriptor& descriptor,
                                                               const WorkloadInfo& info) const
 {
-    return std::make_unique<ClArgMinMaxWorkload>(descriptor, info);
+    return std::make_unique<ClArgMinMaxWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateBatchNormalization(
     const BatchNormalizationQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClBatchNormalizationFloatWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClBatchNormalizationFloatWorkload, NullWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                                    const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClBatchToSpaceNdWorkload>(descriptor, info);
+    return MakeWorkload<ClBatchToSpaceNdWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateComparison(const ComparisonQueueDescriptor& descriptor,
                                                                const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClComparisonWorkload>(descriptor, info);
+    return MakeWorkload<ClComparisonWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConcat(const ConcatQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClConcatWorkload>(descriptor, info);
+    return MakeWorkload<ClConcatWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClConstantWorkload>(descriptor, info);
+    return MakeWorkload<ClConstantWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConvertFp16ToFp32(
     const ConvertFp16ToFp32QueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClConvertFp16ToFp32Workload>(descriptor, info);
+    return MakeWorkload<ClConvertFp16ToFp32Workload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConvertFp32ToFp16(
     const ConvertFp32ToFp16QueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClConvertFp32ToFp16Workload>(descriptor, info);
+    return MakeWorkload<ClConvertFp32ToFp16Workload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConvolution2d(const Convolution2dQueueDescriptor& descriptor,
@@ -278,45 +277,46 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConvolution2d(const Convolut
     return MakeWorkload<ClConvolution2dWorkload>(descriptor,
                                                  info,
                                                  m_MemoryManager->GetIntraLayerManager(),
+                                                 m_CLCompileContext,
                                                  isFastMathEnabled);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {
-    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDepthToSpace(const DepthToSpaceQueueDescriptor& descriptor,
                                                                  const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClDepthToSpaceWorkload>(descriptor, info);
+    return MakeWorkload<ClDepthToSpaceWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDepthwiseConvolution2d(
     const DepthwiseConvolution2dQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClDepthwiseConvolutionWorkload>(descriptor, info);
+    return MakeWorkload<ClDepthwiseConvolutionWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDequantize(const DequantizeQueueDescriptor& descriptor,
                                                                const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClDequantizeWorkload>(descriptor, info);
+    return MakeWorkload<ClDequantizeWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDetectionPostProcess(
     const DetectionPostProcessQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDivision(const DivisionQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClDivisionFloatWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClDivisionFloatWorkload, NullWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
@@ -330,22 +330,22 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateElementwiseUnary(const Eleme
             absQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
             absQueueDescriptor.m_Outputs = descriptor.m_Outputs;
 
-            return  std::make_unique<ClAbsWorkload>(absQueueDescriptor, info);
+            return  std::make_unique<ClAbsWorkload>(absQueueDescriptor, info, m_CLCompileContext);
         }
         case UnaryOperation::Exp:
-            return std::make_unique<ClExpWorkload>(descriptor, info);
+            return std::make_unique<ClExpWorkload>(descriptor, info, m_CLCompileContext);
         case UnaryOperation::Neg:
-            return std::make_unique<ClNegWorkload>(descriptor, info);
+            return std::make_unique<ClNegWorkload>(descriptor, info, m_CLCompileContext);
         case UnaryOperation::Rsqrt:
         {
             RsqrtQueueDescriptor rsqrtQueueDescriptor;
             rsqrtQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
             rsqrtQueueDescriptor.m_Outputs = descriptor.m_Outputs;
 
-            return std::make_unique<ClRsqrtWorkload>(rsqrtQueueDescriptor, info);
+            return std::make_unique<ClRsqrtWorkload>(rsqrtQueueDescriptor, info, m_CLCompileContext);
         }
         case UnaryOperation::LogicalNot:
-            return std::make_unique<ClLogicalNotWorkload>(descriptor, info);
+            return std::make_unique<ClLogicalNotWorkload>(descriptor, info, m_CLCompileContext);
         default:
             return nullptr;
     }
@@ -365,25 +365,28 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateEqual(const EqualQueueDescri
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFill(const FillQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const
 {
-    return std::make_unique<ClFillWorkload>(descriptor, info);
+    return std::make_unique<ClFillWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClFloorFloatWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClFloorFloatWorkload, NullWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFullyConnected(const FullyConnectedQueueDescriptor& descriptor,
                                                                    const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClFullyConnectedWorkload>(descriptor, info, m_MemoryManager->GetIntraLayerManager());
+    return MakeWorkload<ClFullyConnectedWorkload>(descriptor,
+                                                  info,
+                                                  m_MemoryManager->GetIntraLayerManager(),
+                                                  m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateGather(const GatherQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClGatherWorkload>(descriptor, info);
+    return MakeWorkload<ClGatherWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
@@ -407,13 +410,13 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateInstanceNormalization(
     const InstanceNormalizationQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClInstanceNormalizationWorkload>(descriptor, info);
+    return MakeWorkload<ClInstanceNormalizationWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
                                                                     const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClL2NormalizationFloatWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClL2NormalizationFloatWorkload, NullWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLogicalBinary(const LogicalBinaryQueueDescriptor& descriptor,
@@ -422,9 +425,9 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLogicalBinary(const LogicalB
     switch(descriptor.m_Parameters.m_Operation)
     {
         case LogicalBinaryOperation::LogicalAnd:
-            return std::make_unique<ClLogicalAndWorkload>(descriptor, info);
+            return std::make_unique<ClLogicalAndWorkload>(descriptor, info, m_CLCompileContext);
         case LogicalBinaryOperation::LogicalOr:
-            return std::make_unique<ClLogicalOrWorkload>(descriptor, info);
+            return std::make_unique<ClLogicalOrWorkload>(descriptor, info, m_CLCompileContext);
         default:
             return nullptr;
     }
@@ -433,25 +436,28 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLogicalBinary(const LogicalB
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLogSoftmax(const LogSoftmaxQueueDescriptor& descriptor,
                                                                const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClLogSoftmaxWorkload>(descriptor, info, m_MemoryManager->GetIntraLayerManager());
+    return MakeWorkload<ClLogSoftmaxWorkload>(descriptor,
+                                              info,
+                                              m_MemoryManager->GetIntraLayerManager(),
+                                              m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLstm(const LstmQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClLstmFloatWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClLstmFloatWorkload, NullWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMaximum(const MaximumQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClMaximumWorkload>(descriptor, info);
+    return MakeWorkload<ClMaximumWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMean(const MeanQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClMeanWorkload>(descriptor, info);
+    return MakeWorkload<ClMeanWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMemCopy(const MemCopyQueueDescriptor& descriptor,
@@ -485,19 +491,19 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMerger(const MergerQueueDesc
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMinimum(const MinimumQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClMinimumWorkload>(descriptor, info);
+    return MakeWorkload<ClMinimumWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMultiplication(const MultiplicationQueueDescriptor& descriptor,
                                                                    const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClMultiplicationWorkload>(descriptor, info);
+    return MakeWorkload<ClMultiplicationWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateNormalization(const NormalizationQueueDescriptor& descriptor,
                                                                   const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClNormalizationFloatWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClNormalizationFloatWorkload, NullWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateOutput(const OutputQueueDescriptor& descriptor,
@@ -509,61 +515,61 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateOutput(const OutputQueueDesc
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreatePad(const PadQueueDescriptor& descriptor,
                                                         const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClPadWorkload>(descriptor, info);
+    return MakeWorkload<ClPadWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClPermuteWorkload>(descriptor, info);
+    return MakeWorkload<ClPermuteWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
                                                               const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClPooling2dWorkload>(descriptor, info);
+    return MakeWorkload<ClPooling2dWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreatePreCompiled(const PreCompiledQueueDescriptor& descriptor,
                                                                 const WorkloadInfo& info) const
 {
-    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreatePrelu(const PreluQueueDescriptor &descriptor,
                                                           const WorkloadInfo &info) const
 {
-    return MakeWorkload<ClPreluWorkload>(descriptor, info);
+    return MakeWorkload<ClPreluWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateQLstm(const QLstmQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {
-    return std::make_unique<ClQLstmWorkload>(descriptor, info);
+    return std::make_unique<ClQLstmWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateQuantize(const QuantizeQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClQuantizeWorkload>(descriptor, info);
+    return MakeWorkload<ClQuantizeWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateQuantizedLstm(const QuantizedLstmQueueDescriptor& descriptor,
                                                                   const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClQuantizedLstmWorkload>(descriptor, info);
+    return MakeWorkload<ClQuantizedLstmWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClReshapeWorkload>(descriptor, info);
+    return MakeWorkload<ClReshapeWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateResize(const ResizeQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClResizeWorkload>(descriptor, info);
+    return MakeWorkload<ClResizeWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateResizeBilinear(const ResizeBilinearQueueDescriptor& descriptor,
@@ -595,62 +601,68 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateRsqrt(const RsqrtQueueDescri
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSlice(const SliceQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClSliceWorkload>(descriptor, info);
+    return MakeWorkload<ClSliceWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {
-    return std::make_unique<ClSoftmaxWorkload>(descriptor, info, m_MemoryManager->GetIntraLayerManager());
+    return std::make_unique<ClSoftmaxWorkload>(descriptor,
+                                               info,
+                                               m_MemoryManager->GetIntraLayerManager(),
+                                               m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
                                                                    const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClSpaceToBatchNdWorkload>(descriptor, info);
+    return MakeWorkload<ClSpaceToBatchNdWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSpaceToDepth(const SpaceToDepthQueueDescriptor& descriptor,
                                                                  const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClSpaceToDepthWorkload>(descriptor, info);
+    return MakeWorkload<ClSpaceToDepthWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClSplitterWorkload>(descriptor, info);
+    return MakeWorkload<ClSplitterWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateStack(const StackQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClStackWorkload>(descriptor, info);
+    return MakeWorkload<ClStackWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateStridedSlice(const StridedSliceQueueDescriptor& descriptor,
                                                                  const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClStridedSliceWorkload>(descriptor, info);
+    return MakeWorkload<ClStridedSliceWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSubtraction(const SubtractionQueueDescriptor& descriptor,
                                                                 const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClSubtractionWorkload>(descriptor, info);
+    return MakeWorkload<ClSubtractionWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateTranspose(const TransposeQueueDescriptor& descriptor,
                                                               const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClTransposeWorkload>(descriptor, info);
+    return MakeWorkload<ClTransposeWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateTransposeConvolution2d(
     const TransposeConvolution2dQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClTransposeConvolution2dWorkload>(descriptor, info, m_MemoryManager->GetIntraLayerManager());
+    return MakeWorkload<ClTransposeConvolution2dWorkload>(descriptor,
+                                                          info,
+                                                          m_MemoryManager->GetIntraLayerManager(),
+                                                          m_CLCompileContext);
 }
 
 } // namespace armnn

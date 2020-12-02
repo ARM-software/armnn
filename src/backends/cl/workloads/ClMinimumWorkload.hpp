@@ -19,7 +19,9 @@ arm_compute::Status ClMinimumWorkloadValidate(const TensorInfo& input0,
 class ClMinimumWorkload : public BaseWorkload<MinimumQueueDescriptor>
 {
 public:
-    ClMinimumWorkload(const MinimumQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClMinimumWorkload(const MinimumQueueDescriptor& descriptor,
+                      const WorkloadInfo& info,
+                      const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

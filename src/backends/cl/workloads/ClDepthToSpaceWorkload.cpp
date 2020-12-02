@@ -37,7 +37,8 @@ arm_compute::Status ClDepthToSpaceWorkloadValidate(const TensorInfo& input,
 }
 
 ClDepthToSpaceWorkload::ClDepthToSpaceWorkload(const DepthToSpaceQueueDescriptor& desc,
-                                               const WorkloadInfo& info)
+                                               const WorkloadInfo& info,
+                                               const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<DepthToSpaceQueueDescriptor>(desc, info)
 {
     m_Data.ValidateInputsOutputs("ClDepthToSpaceWorkload", 1, 1);
@@ -54,7 +55,7 @@ ClDepthToSpaceWorkload::ClDepthToSpaceWorkload(const DepthToSpaceQueueDescriptor
         PolymorphicPointerDowncast<IClTensorHandle>(m_Data.m_Outputs[0])->GetTensor();
     output.info()->set_data_layout(aclDataLayout);
 
-    m_Layer.configure(&input, &output, blockSize);
+    m_Layer.configure(clCompileContext, &input, &output, blockSize);
 }
 
 void ClDepthToSpaceWorkload::Execute() const

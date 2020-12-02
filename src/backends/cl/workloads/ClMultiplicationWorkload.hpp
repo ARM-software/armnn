@@ -20,7 +20,9 @@ arm_compute::Status ClMultiplicationWorkloadValidate(const TensorInfo& input0,
 class ClMultiplicationWorkload : public BaseWorkload<MultiplicationQueueDescriptor>
 {
 public:
-    ClMultiplicationWorkload(const MultiplicationQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClMultiplicationWorkload(const MultiplicationQueueDescriptor& descriptor,
+                             const WorkloadInfo& info,
+                             const arm_compute::CLCompileContext& clCompileContext);
 
     using BaseWorkload<MultiplicationQueueDescriptor>::BaseWorkload;
     void Execute() const override;

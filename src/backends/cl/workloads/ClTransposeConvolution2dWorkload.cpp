@@ -56,7 +56,8 @@ arm_compute::Status ClTransposeConvolution2dWorkloadValidate(const TensorInfo& i
 ClTransposeConvolution2dWorkload::ClTransposeConvolution2dWorkload(
     const TransposeConvolution2dQueueDescriptor& descriptor,
     const WorkloadInfo& info,
-    std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager) :
+    std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
+    const arm_compute::CLCompileContext& clCompileContext) :
     BaseWorkload<TransposeConvolution2dQueueDescriptor>(descriptor, info),
     m_Layer(memoryManager)
 {
@@ -82,7 +83,7 @@ ClTransposeConvolution2dWorkload::ClTransposeConvolution2dWorkload(
     output.info()->set_data_layout(aclDataLayout);
 
     arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
-    m_Layer.configure(&input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output, padStrideInfo);
+    m_Layer.configure(clCompileContext, &input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output, padStrideInfo);
 
     InitializeArmComputeClTensorData(*m_WeightsTensor, m_Data.m_Weight);
     if (m_BiasesTensor)

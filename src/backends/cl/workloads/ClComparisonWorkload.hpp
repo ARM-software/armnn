@@ -20,7 +20,9 @@ arm_compute::Status ClComparisonWorkloadValidate(const TensorInfo& input0,
 class ClComparisonWorkload : public BaseWorkload<ComparisonQueueDescriptor>
 {
 public:
-    ClComparisonWorkload(const ComparisonQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClComparisonWorkload(const ComparisonQueueDescriptor& descriptor,
+                         const WorkloadInfo& info,
+                         const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

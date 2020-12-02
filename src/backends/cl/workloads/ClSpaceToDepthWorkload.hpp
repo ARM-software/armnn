@@ -19,7 +19,9 @@ arm_compute::Status ClSpaceToDepthWorkloadValidate(const TensorInfo& input,
 class ClSpaceToDepthWorkload : public BaseWorkload<SpaceToDepthQueueDescriptor>
 {
 public:
-    ClSpaceToDepthWorkload(const SpaceToDepthQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClSpaceToDepthWorkload(const SpaceToDepthQueueDescriptor& descriptor,
+                           const WorkloadInfo& info,
+                           const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

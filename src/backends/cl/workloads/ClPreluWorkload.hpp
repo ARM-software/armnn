@@ -18,7 +18,9 @@ arm_compute::Status ClPreluWorkloadValidate(const TensorInfo& input,
 class ClPreluWorkload : public BaseWorkload<PreluQueueDescriptor>
 {
 public:
-    ClPreluWorkload(const PreluQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClPreluWorkload(const PreluQueueDescriptor& descriptor,
+                    const WorkloadInfo& info,
+                    const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

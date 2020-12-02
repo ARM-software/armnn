@@ -27,7 +27,8 @@ arm_compute::Status ClPermuteWorkloadValidate(const TensorInfo& input,
 }
 
 ClPermuteWorkload::ClPermuteWorkload(const PermuteQueueDescriptor& descriptor,
-                                     const WorkloadInfo& info)
+                                     const WorkloadInfo& info,
+                                     const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<PermuteQueueDescriptor>(descriptor, info)
 {
     using armcomputetensorutils::BuildArmComputePermutationVector;
@@ -39,7 +40,7 @@ ClPermuteWorkload::ClPermuteWorkload(const PermuteQueueDescriptor& descriptor,
     const armnn::PermutationVector& mappings = m_Data.m_Parameters.m_DimMappings;
 
     // Run the layer.
-    m_PermuteFunction.configure(&input, &output, BuildArmComputePermutationVector(mappings));
+    m_PermuteFunction.configure(clCompileContext, &input, &output, BuildArmComputePermutationVector(mappings));
 }
 
 void ClPermuteWorkload::Execute() const

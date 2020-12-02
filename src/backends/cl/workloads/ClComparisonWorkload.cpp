@@ -39,7 +39,9 @@ arm_compute::Status ClComparisonWorkloadValidate(const TensorInfo& input0,
     return aclStatus;
 }
 
-ClComparisonWorkload::ClComparisonWorkload(const ComparisonQueueDescriptor& descriptor, const WorkloadInfo& info)
+ClComparisonWorkload::ClComparisonWorkload(const ComparisonQueueDescriptor& descriptor,
+                                           const WorkloadInfo& info,
+                                           const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<ComparisonQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClComparisonWorkload", 2, 1);
@@ -50,7 +52,7 @@ ClComparisonWorkload::ClComparisonWorkload(const ComparisonQueueDescriptor& desc
 
     const arm_compute::ComparisonOperation comparisonOperation = ConvertComparisonOperationToAcl(m_Data.m_Parameters);
 
-    m_ComparisonLayer.configure(&input0, &input1, &output, comparisonOperation);
+    m_ComparisonLayer.configure(clCompileContext, &input0, &input1, &output, comparisonOperation);
 }
 
 void ClComparisonWorkload::Execute() const

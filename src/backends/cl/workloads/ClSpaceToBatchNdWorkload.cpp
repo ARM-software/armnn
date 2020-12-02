@@ -45,7 +45,9 @@ arm_compute::Status ClSpaceToBatchNdWorkloadValidate(const TensorInfo& input,
 }
 
 ClSpaceToBatchNdWorkload::ClSpaceToBatchNdWorkload(
-    const SpaceToBatchNdQueueDescriptor& descriptor, const WorkloadInfo& info)
+    const SpaceToBatchNdQueueDescriptor& descriptor,
+    const WorkloadInfo& info,
+    const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<SpaceToBatchNdQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClSpaceToBatchNdWorkload", 1, 1);
@@ -68,7 +70,8 @@ ClSpaceToBatchNdWorkload::ClSpaceToBatchNdWorkload(
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
-    m_SpaceToBatchLayer.configure(&input,
+    m_SpaceToBatchLayer.configure(clCompileContext,
+                                  &input,
                                   blockWidth,
                                   blockHeight,
                                   paddingLeftTop,

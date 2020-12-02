@@ -25,7 +25,8 @@ class ClLogSoftmaxWorkload : public BaseWorkload<LogSoftmaxQueueDescriptor>
 {
 public:
     ClLogSoftmaxWorkload(const LogSoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info,
-                         std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager);
+                         std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
+                         const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

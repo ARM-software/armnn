@@ -23,8 +23,10 @@ arm_compute::Status ClSoftmaxWorkloadValidate(const TensorInfo& input,
 class ClSoftmaxWorkload : public BaseWorkload<SoftmaxQueueDescriptor>
 {
 public:
-    ClSoftmaxWorkload(const SoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info,
-                      std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager);
+    ClSoftmaxWorkload(const SoftmaxQueueDescriptor& descriptor,
+                      const WorkloadInfo& info,
+                      std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
+                      const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

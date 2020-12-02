@@ -19,7 +19,9 @@ namespace armnn
 class ClQLstmWorkload : public BaseWorkload<QLstmQueueDescriptor>
 {
 public:
-    ClQLstmWorkload(const QLstmQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClQLstmWorkload(const QLstmQueueDescriptor& descriptor,
+                    const WorkloadInfo& info,
+                    const arm_compute::CLCompileContext& clCompileContext);
     virtual void Execute() const override;
 
 private:

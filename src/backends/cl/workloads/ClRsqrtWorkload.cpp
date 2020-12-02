@@ -23,7 +23,9 @@ arm_compute::Status ClRsqrtWorkloadValidate(const TensorInfo& input, const Tenso
     return arm_compute::CLRsqrtLayer::validate(&aclInput, &aclOutput);
 }
 
-ClRsqrtWorkload::ClRsqrtWorkload(const RsqrtQueueDescriptor& descriptor, const WorkloadInfo& info)
+ClRsqrtWorkload::ClRsqrtWorkload(const RsqrtQueueDescriptor& descriptor,
+                                 const WorkloadInfo& info,
+                                 const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<RsqrtQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClRsqrtWorkload", 1, 1);
@@ -31,7 +33,7 @@ ClRsqrtWorkload::ClRsqrtWorkload(const RsqrtQueueDescriptor& descriptor, const W
     arm_compute::ICLTensor& input  = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_RsqrtLayer.configure(&input, &output);
+    m_RsqrtLayer.configure(clCompileContext, &input, &output);
 }
 
 void ClRsqrtWorkload::Execute() const

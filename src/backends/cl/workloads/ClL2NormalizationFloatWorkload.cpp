@@ -27,7 +27,8 @@ arm_compute::Status ClL2NormalizationWorkloadValidate(const TensorInfo& input,
 }
 
 ClL2NormalizationFloatWorkload::ClL2NormalizationFloatWorkload(const L2NormalizationQueueDescriptor& descriptor,
-                                                               const WorkloadInfo& info)
+                                                               const WorkloadInfo& info,
+                                                               const arm_compute::CLCompileContext& clCompileContext)
     : FloatWorkload<L2NormalizationQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClL2NormalizationFloatWorkload", 1, 1);
@@ -41,7 +42,7 @@ ClL2NormalizationFloatWorkload::ClL2NormalizationFloatWorkload(const L2Normaliza
 
     int axis = (m_Data.m_Parameters.m_DataLayout == DataLayout::NCHW) ? 2 : 0;
 
-    m_Layer.configure(&input, &output, axis, m_Data.m_Parameters.m_Eps);
+    m_Layer.configure(clCompileContext, &input, &output, axis, m_Data.m_Parameters.m_Eps);
 }
 
 void ClL2NormalizationFloatWorkload::Execute() const

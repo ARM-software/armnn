@@ -9,6 +9,7 @@
 
 #include <arm_compute/core/Error.h>
 #include <arm_compute/runtime/IFunction.h>
+#include <arm_compute/runtime/CL/functions/CLConcatenateLayer.h>
 
 namespace armnn
 {
@@ -20,7 +21,9 @@ arm_compute::Status ClConcatWorkloadValidate(const std::vector<const TensorInfo*
 class ClConcatWorkload : public BaseWorkload<ConcatQueueDescriptor>
 {
 public:
-    ClConcatWorkload(const ConcatQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClConcatWorkload(const ConcatQueueDescriptor& descriptor,
+                     const WorkloadInfo& info,
+                     const arm_compute::CLCompileContext& clCompileContext);
 
     void Execute() const override;
 

@@ -32,7 +32,8 @@ arm_compute::Status ClDivisionWorkloadValidate(const TensorInfo& input0,
 
 
 ClDivisionFloatWorkload::ClDivisionFloatWorkload(const DivisionQueueDescriptor& descriptor,
-                                                     const WorkloadInfo& info)
+                                                 const WorkloadInfo& info,
+                                                 const arm_compute::CLCompileContext& clCompileContext)
     : FloatWorkload<DivisionQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClDivisionFloatWorkload", 2, 1);
@@ -43,7 +44,7 @@ ClDivisionFloatWorkload::ClDivisionFloatWorkload(const DivisionQueueDescriptor& 
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
-    m_ArithmeticDivision.configure(&input0, &input1, &output, activationInfo);
+    m_ArithmeticDivision.configure(clCompileContext, &input0, &input1, &output, activationInfo);
 }
 
 void ClDivisionFloatWorkload::Execute() const

@@ -20,7 +20,9 @@ arm_compute::Status ClLogicalOrWorkloadValidate(const TensorInfo& input0,
 class ClLogicalOrWorkload : public BaseWorkload<LogicalBinaryQueueDescriptor>
 {
 public:
-    ClLogicalOrWorkload(const LogicalBinaryQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClLogicalOrWorkload(const LogicalBinaryQueueDescriptor& descriptor,
+                        const WorkloadInfo& info,
+                        const arm_compute::CLCompileContext& clCompileContext);
     virtual void Execute() const override;
 
 private:

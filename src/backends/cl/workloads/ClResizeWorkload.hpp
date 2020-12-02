@@ -19,7 +19,9 @@ arm_compute::Status ClResizeWorkloadValidate(const TensorInfo& input,
 class ClResizeWorkload : public BaseWorkload<ResizeQueueDescriptor>
 {
 public:
-    ClResizeWorkload(const ResizeQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClResizeWorkload(const ResizeQueueDescriptor& descriptor,
+                     const WorkloadInfo& info,
+                     const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

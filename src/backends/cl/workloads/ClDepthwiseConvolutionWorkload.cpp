@@ -75,7 +75,8 @@ arm_compute::Status ClDepthwiseConvolutionWorkloadValidate(const TensorInfo& inp
 
 ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
     const DepthwiseConvolution2dQueueDescriptor& descriptor,
-    const WorkloadInfo& info)
+    const WorkloadInfo& info,
+    const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
 {
     // Allocate a buffer for the swizzling of the weight tensor
@@ -124,6 +125,7 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
 
     m_DepthwiseConvolutionLayer = std::make_unique<arm_compute::CLDepthwiseConvolutionLayer>();
     static_cast<arm_compute::CLDepthwiseConvolutionLayer*>(m_DepthwiseConvolutionLayer.get())->configure(
+        clCompileContext,
         &input,
         m_KernelTensor.get(),
         m_BiasTensor.get(),

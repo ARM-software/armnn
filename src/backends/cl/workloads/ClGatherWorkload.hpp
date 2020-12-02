@@ -19,7 +19,9 @@ arm_compute::Status ClGatherWorkloadValidate(const TensorInfo& input,
 class ClGatherWorkload : public BaseWorkload<GatherQueueDescriptor>
 {
 public:
-    ClGatherWorkload(const GatherQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClGatherWorkload(const GatherQueueDescriptor& descriptor,
+                     const WorkloadInfo& info,
+                     const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

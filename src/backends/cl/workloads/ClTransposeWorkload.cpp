@@ -27,7 +27,8 @@ arm_compute::Status ClTransposeWorkloadValidate(const TensorInfo& input,
 }
 
 ClTransposeWorkload::ClTransposeWorkload(const TransposeQueueDescriptor& descriptor,
-                                         const WorkloadInfo& info)
+                                         const WorkloadInfo& info,
+                                         const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<TransposeQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs(GetName(), 1, 1);
@@ -36,7 +37,9 @@ ClTransposeWorkload::ClTransposeWorkload(const TransposeQueueDescriptor& descrip
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     const armnn::PermutationVector& mappings = m_Data.m_Parameters.m_DimMappings;
     // Run the layer.
-    m_PermuteFunction.configure(&input, &output,
+    m_PermuteFunction.configure(clCompileContext,
+                                &input,
+                                &output,
                                 armcomputetensorutils::BuildArmComputeTransposeVector(mappings));
 }
 

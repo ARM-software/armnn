@@ -19,7 +19,8 @@ using namespace armcomputetensorutils;
 static constexpr arm_compute::ConvertPolicy g_AclConvertPolicy = arm_compute::ConvertPolicy::SATURATE;
 
 ClAdditionWorkload::ClAdditionWorkload(const AdditionQueueDescriptor& descriptor,
-                                       const WorkloadInfo& info)
+                                       const WorkloadInfo& info,
+                                       const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<AdditionQueueDescriptor>(descriptor, info)
 {
     this->m_Data.ValidateInputsOutputs("ClAdditionWorkload", 2, 1);
@@ -30,7 +31,7 @@ ClAdditionWorkload::ClAdditionWorkload(const AdditionQueueDescriptor& descriptor
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
-    m_Layer.configure(&input0, &input1, &output, g_AclConvertPolicy, activationInfo);
+    m_Layer.configure(clCompileContext, &input0, &input1, &output, g_AclConvertPolicy, activationInfo);
 }
 
 void ClAdditionWorkload::Execute() const

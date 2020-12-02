@@ -20,7 +20,9 @@ arm_compute::Status ClFloorWorkloadValidate(const TensorInfo& input,
     return arm_compute::CLFloor::validate(&aclInput, &aclOutput);
 }
 
-ClFloorFloatWorkload::ClFloorFloatWorkload(const FloorQueueDescriptor& descriptor, const WorkloadInfo& info)
+ClFloorFloatWorkload::ClFloorFloatWorkload(const FloorQueueDescriptor& descriptor,
+                                           const WorkloadInfo& info,
+                                           const arm_compute::CLCompileContext& clCompileContext)
     : FloatWorkload<FloorQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClFloorFloatWorkload", 1, 1);
@@ -28,7 +30,7 @@ ClFloorFloatWorkload::ClFloorFloatWorkload(const FloorQueueDescriptor& descripto
     arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_Layer.configure(&input, &output);
+    m_Layer.configure(clCompileContext, &input, &output);
 }
 
 void ClFloorFloatWorkload::Execute() const

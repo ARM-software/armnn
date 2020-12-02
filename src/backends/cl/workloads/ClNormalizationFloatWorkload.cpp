@@ -29,7 +29,8 @@ arm_compute::Status ClNormalizationWorkloadValidate(const TensorInfo& input,
 }
 
 ClNormalizationFloatWorkload::ClNormalizationFloatWorkload(const NormalizationQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info)
+                                                           const WorkloadInfo& info,
+                                                           const arm_compute::CLCompileContext& clCompileContext)
     : FloatWorkload<NormalizationQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClNormalizationFloatWorkload", 1, 1);
@@ -43,7 +44,7 @@ ClNormalizationFloatWorkload::ClNormalizationFloatWorkload(const NormalizationQu
 
     arm_compute::NormalizationLayerInfo normalizationInfo = BuildArmComputeNormalizationLayerInfo(m_Data.m_Parameters);
 
-    m_NormalizationLayer.configure(&input, &output, normalizationInfo);
+    m_NormalizationLayer.configure(clCompileContext, &input, &output, normalizationInfo);
 };
 
 void ClNormalizationFloatWorkload::Execute() const

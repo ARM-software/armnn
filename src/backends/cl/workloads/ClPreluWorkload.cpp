@@ -27,7 +27,8 @@ arm_compute::Status ClPreluWorkloadValidate(const TensorInfo& input,
 }
 
 ClPreluWorkload::ClPreluWorkload(const PreluQueueDescriptor& descriptor,
-                                 const WorkloadInfo& info)
+                                 const WorkloadInfo& info,
+                                 const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<PreluQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClPreluWorkload", 1, 1);
@@ -36,7 +37,7 @@ ClPreluWorkload::ClPreluWorkload(const PreluQueueDescriptor& descriptor,
     arm_compute::ICLTensor& alpha = static_cast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_PreluLayer.configure(&input, &alpha, &output);
+    m_PreluLayer.configure(clCompileContext, &input, &alpha, &output);
 }
 
 void ClPreluWorkload::Execute() const

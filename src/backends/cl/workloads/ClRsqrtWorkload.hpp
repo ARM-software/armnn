@@ -18,7 +18,9 @@ arm_compute::Status ClRsqrtWorkloadValidate(const TensorInfo& input, const Tenso
 class ClRsqrtWorkload : public BaseWorkload<RsqrtQueueDescriptor>
 {
 public:
-    ClRsqrtWorkload(const RsqrtQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClRsqrtWorkload(const RsqrtQueueDescriptor& descriptor,
+                    const WorkloadInfo& info,
+                    const arm_compute::CLCompileContext& clCompileContext);
     virtual void Execute() const override;
 
 private:

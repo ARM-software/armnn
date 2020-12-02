@@ -29,7 +29,8 @@ arm_compute::Status ClLogicalNotWorkloadValidate(const TensorInfo& input,
 }
 
 ClLogicalNotWorkload::ClLogicalNotWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
-                                           const WorkloadInfo& info)
+                                           const WorkloadInfo& info,
+                                           const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClLogicalNotWorkload", 1, 1);
@@ -37,7 +38,7 @@ ClLogicalNotWorkload::ClLogicalNotWorkload(const ElementwiseUnaryQueueDescriptor
     arm_compute::ICLTensor& input  = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_LogicalNotLayer.configure(&input, &output);
+    m_LogicalNotLayer.configure(clCompileContext, &input, &output);
 }
 
 void ClLogicalNotWorkload::Execute() const

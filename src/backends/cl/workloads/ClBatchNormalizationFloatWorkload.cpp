@@ -52,7 +52,9 @@ arm_compute::Status ClBatchNormalizationValidate(const TensorInfo& input,
 }
 
 ClBatchNormalizationFloatWorkload::ClBatchNormalizationFloatWorkload(
-    const BatchNormalizationQueueDescriptor& descriptor, const WorkloadInfo& info)
+    const BatchNormalizationQueueDescriptor& descriptor,
+    const WorkloadInfo& info,
+    const arm_compute::CLCompileContext& clCompileContext)
     : FloatWorkload<BatchNormalizationQueueDescriptor>(descriptor, info)
 {
     m_Mean = std::make_unique<arm_compute::CLTensor>();
@@ -78,7 +80,8 @@ ClBatchNormalizationFloatWorkload::ClBatchNormalizationFloatWorkload(
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
-    m_Layer.configure(&input,
+    m_Layer.configure(clCompileContext,
+                      &input,
                       &output,
                       m_Mean.get(),
                       m_Variance.get(),

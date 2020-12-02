@@ -53,7 +53,8 @@ arm_compute::Status ClStridedSliceWorkloadValidate(const TensorInfo& input,
 }
 
 ClStridedSliceWorkload::ClStridedSliceWorkload(const StridedSliceQueueDescriptor& descriptor,
-                                               const WorkloadInfo& info)
+                                               const WorkloadInfo& info,
+                                               const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<StridedSliceQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClStridedSliceWorkload", 1, 1);
@@ -78,7 +79,8 @@ ClStridedSliceWorkload::ClStridedSliceWorkload(const StridedSliceQueueDescriptor
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
-    m_StridedSliceLayer.configure(&input,
+    m_StridedSliceLayer.configure(clCompileContext,
+                                  &input,
                                   &output,
                                   starts,
                                   ends,

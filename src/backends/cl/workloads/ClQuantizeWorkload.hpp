@@ -18,7 +18,9 @@ arm_compute::Status ClQuantizeWorkloadValidate(const TensorInfo& input,
 class ClQuantizeWorkload : public BaseWorkload<QuantizeQueueDescriptor>
 {
 public:
-    ClQuantizeWorkload(const QuantizeQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClQuantizeWorkload(const QuantizeQueueDescriptor& descriptor,
+                       const WorkloadInfo& info,
+                       const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

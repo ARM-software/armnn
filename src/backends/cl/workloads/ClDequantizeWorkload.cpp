@@ -28,7 +28,8 @@ arm_compute::Status ClDequantizeWorkloadValidate(const TensorInfo& input, const 
 }
 
 ClDequantizeWorkload::ClDequantizeWorkload(const DequantizeQueueDescriptor& descriptor,
-                                           const WorkloadInfo& workloadInfo)
+                                           const WorkloadInfo& workloadInfo,
+                                           const arm_compute::CLCompileContext& clCompileContext)
                                            : BaseWorkload<DequantizeQueueDescriptor>(descriptor, workloadInfo)
 {
     m_Data.ValidateInputsOutputs("ClDequantizeWorkload", 1, 1);
@@ -40,7 +41,7 @@ ClDequantizeWorkload::ClDequantizeWorkload(const DequantizeQueueDescriptor& desc
             m_Data.m_Outputs[0])->GetTensor();
 
     m_Layer.reset(new arm_compute::CLDequantizationLayer());
-    m_Layer->configure(&input, &output);
+    m_Layer->configure(clCompileContext, &input, &output);
     m_Layer->prepare();
 }
 

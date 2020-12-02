@@ -18,7 +18,9 @@ arm_compute::Status ClFloorWorkloadValidate(const TensorInfo& input,
 class ClFloorFloatWorkload : public FloatWorkload<FloorQueueDescriptor>
 {
 public:
-    ClFloorFloatWorkload(const FloorQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClFloorFloatWorkload(const FloorQueueDescriptor& descriptor,
+                         const WorkloadInfo& info,
+                         const arm_compute::CLCompileContext& clCompileContext);
 
     void Execute() const override;
 

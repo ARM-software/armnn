@@ -37,7 +37,8 @@ arm_compute::Status ClMinimumWorkloadValidate(const TensorInfo& input0,
 }
 
 ClMinimumWorkload::ClMinimumWorkload(const MinimumQueueDescriptor& descriptor,
-                                     const WorkloadInfo& info)
+                                     const WorkloadInfo& info,
+                                     const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<MinimumQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClMinimumWorkload", 2, 1);
@@ -46,7 +47,7 @@ ClMinimumWorkload::ClMinimumWorkload(const MinimumQueueDescriptor& descriptor,
     arm_compute::ICLTensor& input1 = static_cast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_MinimumLayer.configure(&input0, &input1, &output);
+    m_MinimumLayer.configure(clCompileContext, &input0, &input1, &output);
 }
 
 void ClMinimumWorkload::Execute() const

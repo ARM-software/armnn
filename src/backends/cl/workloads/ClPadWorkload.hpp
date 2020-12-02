@@ -14,7 +14,9 @@ namespace armnn {
 class ClPadWorkload : public BaseWorkload<PadQueueDescriptor>
 {
 public:
-    ClPadWorkload(const PadQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClPadWorkload(const PadQueueDescriptor& descriptor,
+                  const WorkloadInfo& info,
+                  const arm_compute::CLCompileContext& clCompileContext);
 
     void Execute() const override;
 

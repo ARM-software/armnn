@@ -19,7 +19,9 @@ namespace armnn
 {
 using namespace armcomputetensorutils;
 
-ClLstmFloatWorkload::ClLstmFloatWorkload(const LstmQueueDescriptor &descriptor, const WorkloadInfo &info)
+ClLstmFloatWorkload::ClLstmFloatWorkload(const LstmQueueDescriptor &descriptor,
+                                         const WorkloadInfo &info,
+                                         const arm_compute::CLCompileContext& clCompileContext)
         : FloatWorkload<LstmQueueDescriptor>(descriptor, info)
 {
     arm_compute::LSTMParams<arm_compute::ICLTensor> lstm_param;
@@ -185,11 +187,12 @@ ClLstmFloatWorkload::ClLstmFloatWorkload(const LstmQueueDescriptor &descriptor, 
         throw armnn::Exception("Wrong Type of Activation Function!");
     }
 
-    m_LstmLayer.configure(&input, m_InputToForgetWeightsTensor.get(), m_InputToCellWeightsTensor.get(),
-                          m_InputToOutputWeightsTensor.get(), m_RecurrentToForgetWeightsTensor.get(),
-                          m_RecurrentToCellWeightsTensor.get(), m_RecurrentToOutputWeightsTensor.get(),
-                          m_ForgetGateBiasTensor.get(), m_CellBiasTensor.get(), m_OutputGateBiasTensor.get(),
-                          &output_state_in, &cell_state_in, m_ScratchBuffer.get(), &output_state_out,
+    m_LstmLayer.configure(clCompileContext, &input, m_InputToForgetWeightsTensor.get(),
+                          m_InputToCellWeightsTensor.get(), m_InputToOutputWeightsTensor.get(),
+                          m_RecurrentToForgetWeightsTensor.get(), m_RecurrentToCellWeightsTensor.get(),
+                          m_RecurrentToOutputWeightsTensor.get(), m_ForgetGateBiasTensor.get(),
+                          m_CellBiasTensor.get(), m_OutputGateBiasTensor.get(), &output_state_in,
+                          &cell_state_in, m_ScratchBuffer.get(), &output_state_out,
                           &cell_state_out, &output, lstm_param, activationLayerInfo,
                           cell_threshold, projection_threshold);
 

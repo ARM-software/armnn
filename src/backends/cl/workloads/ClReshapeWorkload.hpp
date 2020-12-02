@@ -18,7 +18,9 @@ arm_compute::Status ClReshapeWorkloadValidate(const TensorInfo& input,
 class ClReshapeWorkload : public BaseWorkload<ReshapeQueueDescriptor>
 {
 public:
-    ClReshapeWorkload(const ReshapeQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClReshapeWorkload(const ReshapeQueueDescriptor& descriptor,
+                      const WorkloadInfo& info,
+                      const arm_compute::CLCompileContext& clCompileContext);
 
     void Execute() const override;
 

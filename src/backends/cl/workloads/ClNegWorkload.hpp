@@ -18,7 +18,9 @@ arm_compute::Status ClNegWorkloadValidate(const TensorInfo& input, const TensorI
 class ClNegWorkload : public BaseWorkload<ElementwiseUnaryQueueDescriptor>
 {
 public:
-    ClNegWorkload(const ElementwiseUnaryQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClNegWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
+                  const WorkloadInfo& info,
+                  const arm_compute::CLCompileContext& clCompileContext);
     virtual void Execute() const override;
 
 private:

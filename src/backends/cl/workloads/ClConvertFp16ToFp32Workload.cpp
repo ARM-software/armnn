@@ -15,7 +15,9 @@ using namespace armcomputetensorutils;
 static constexpr arm_compute::ConvertPolicy g_AclConvertPolicy = arm_compute::ConvertPolicy::SATURATE;
 
 ClConvertFp16ToFp32Workload::ClConvertFp16ToFp32Workload(
-    const ConvertFp16ToFp32QueueDescriptor& descriptor, const WorkloadInfo& info) :
+    const ConvertFp16ToFp32QueueDescriptor& descriptor,
+    const WorkloadInfo& info,
+    const arm_compute::CLCompileContext& clCompileContext) :
     Float16ToFloat32Workload<ConvertFp16ToFp32QueueDescriptor>(descriptor, info)
 {
     this->m_Data.ValidateInputsOutputs("ClConvertFp16ToFp32Workload", 1, 1);
@@ -23,7 +25,7 @@ ClConvertFp16ToFp32Workload::ClConvertFp16ToFp32Workload(
     arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(this->m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(this->m_Data.m_Outputs[0])->GetTensor();
 
-    m_Layer.configure(&input, &output, g_AclConvertPolicy, 0);
+    m_Layer.configure(clCompileContext, &input, &output, g_AclConvertPolicy, 0);
 }
 
 void ClConvertFp16ToFp32Workload::Execute() const

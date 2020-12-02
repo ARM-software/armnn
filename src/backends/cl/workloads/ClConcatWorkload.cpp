@@ -11,7 +11,6 @@
 #include <cl/ClLayerSupport.hpp>
 
 #include <arm_compute/core/Types.h>
-#include <arm_compute/runtime/CL/functions/CLConcatenateLayer.h>
 
 namespace armnn
 {
@@ -46,7 +45,9 @@ arm_compute::Status ClConcatWorkloadValidate(const std::vector<const TensorInfo*
     return arm_compute::CLConcatenateLayer::validate(aclInputPtrs, &aclOutputInfo, aclAxis);
 }
 
-ClConcatWorkload::ClConcatWorkload(const ConcatQueueDescriptor& descriptor, const WorkloadInfo& info)
+ClConcatWorkload::ClConcatWorkload(const ConcatQueueDescriptor& descriptor,
+                                   const WorkloadInfo& info,
+                                   const arm_compute::CLCompileContext& clCompileContext)
 : BaseWorkload<ConcatQueueDescriptor>(descriptor, info)
 {
     bool allInputsAreSubtensors = true;
@@ -83,7 +84,7 @@ ClConcatWorkload::ClConcatWorkload(const ConcatQueueDescriptor& descriptor, cons
 
     // Configure input and output tensors
     size_t aclAxis = CalcAxis(descriptor.m_Parameters);
-    layer->configure(aclInputs, &output, aclAxis);
+    layer->configure(clCompileContext, aclInputs, &output, aclAxis);
 
     // Prepare
     layer->prepare();

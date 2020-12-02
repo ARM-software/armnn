@@ -28,7 +28,9 @@ arm_compute::Status ClMeanValidate(const TensorInfo& input,
     return arm_compute::CLReduceMean::validate(&aclInputInfo, coords, desc.m_KeepDims, &aclOutputInfo);
 }
 
-ClMeanWorkload::ClMeanWorkload(const MeanQueueDescriptor& descriptor, const WorkloadInfo& info)
+ClMeanWorkload::ClMeanWorkload(const MeanQueueDescriptor& descriptor,
+                               const WorkloadInfo& info,
+                               const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<MeanQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClMeanWorkload", 1, 1);
@@ -40,7 +42,7 @@ ClMeanWorkload::ClMeanWorkload(const MeanQueueDescriptor& descriptor, const Work
                                                                           info.m_InputTensorInfos[0].GetNumDimensions(),
                                                                           m_Data.m_Parameters.m_Axis);
 
-    m_Layer.configure(&input, coords, m_Data.m_Parameters.m_KeepDims, &output);
+    m_Layer.configure(clCompileContext, &input, coords, m_Data.m_Parameters.m_KeepDims, &output);
 }
 
 void ClMeanWorkload::Execute() const

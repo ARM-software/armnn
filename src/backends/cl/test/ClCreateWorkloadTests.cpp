@@ -10,6 +10,8 @@
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
+#include <backendsCommon/test/TensorCopyUtils.hpp>
+#include <backendsCommon/test/WorkloadTestUtils.hpp>
 
 #include <aclCommon/test/CreateWorkloadClNeon.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
@@ -332,6 +334,98 @@ BOOST_AUTO_TEST_CASE(CreateConvolution2dFastMathEnabledWorkload)
     IgnoreUnused(conv2dWorkload);
     ARMNN_ASSERT(conv2dWorkload != nullptr);
     ARMNN_ASSERT(conv2dWorkload->GetConvolutionMethod() == arm_compute::ConvolutionMethod::WINOGRAD);
+}
+
+BOOST_AUTO_TEST_CASE(CreateConvolution2dClCompiledContextWorkload)
+{
+    using namespace armnn;
+
+    const DataType inputType  = DataType::QAsymmU8;
+    const DataType kernelType = DataType::QSymmS8;
+    const DataType biasType   = DataType::Signed32;
+
+    TensorInfo inputInfo ({ 1, 3, 1, 2 }, inputType, 0.5f, 128);
+    TensorInfo outputInfo({ 1, 3, 1, 3 }, inputType, 1.0f, 128);
+
+    const std::vector<float> quantScales{ 0.5f, 0.75f, 1.0f };
+    constexpr unsigned int quantDimension = 0;
+
+    TensorInfo kernelInfo({ 3, 1, 1, 2 }, kernelType, quantScales, quantDimension);
+
+    const std::vector<float> biasQuantScales{ 0.25f, 0.375f, 0.5f };
+    TensorInfo biasInfo({ 3 }, biasType, biasQuantScales, quantDimension);
+
+    std::vector<uint8_t> inputData =
+    {
+        138, 108, 138, 108, 138, 108
+    };
+
+    std::vector<int8_t> kernelData =
+    {
+        1, 2, 1, 2, 1, 2
+    };
+
+    std::vector<int32_t> biasData =
+    {
+        4, 4, 4
+    };
+
+    std::vector<uint8_t> expectedOutputData =
+    {
+        121, 118, 115, 121, 118, 115, 121, 118, 115
+    };
+
+
+    Convolution2dDescriptor descriptor;
+    descriptor.m_StrideX     = 1;
+    descriptor.m_StrideY     = 1;
+    descriptor.m_PadLeft     = 0;
+    descriptor.m_PadRight    = 0;
+    descriptor.m_PadTop      = 0;
+    descriptor.m_PadBottom   = 0;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_DataLayout  = DataLayout::NHWC;
+
+    auto memoryManager = ClWorkloadFactoryHelper::GetMemoryManager();
+    auto clMemoryManager = armnn::PolymorphicPointerDowncast<armnn::ClMemoryManager>(memoryManager);
+    auto tensorHandleFactory = ClWorkloadFactoryHelper::GetTensorHandleFactory(memoryManager);
+
+    std::unique_ptr<ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputInfo);
+    std::unique_ptr<ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputInfo);
+
+
+    WorkloadInfo workloadInfo;
+    ScopedCpuTensorHandle weightTensor(kernelInfo);
+    ScopedCpuTensorHandle biasTensor(biasInfo);
+
+    AllocateAndCopyDataToITensorHandle(&weightTensor, kernelData.data());
+    AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());
+
+    Convolution2dQueueDescriptor queueDescriptor;
+    queueDescriptor.m_Parameters = descriptor;
+    queueDescriptor.m_Weight     = &weightTensor;
+    queueDescriptor.m_Bias       = &biasTensor;
+
+    AddInputToWorkload(queueDescriptor, workloadInfo, inputInfo, inputHandle.get());
+    AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, outputHandle.get());
+
+    // Initialize our m_CLCompileContext using default device and context
+    auto context = arm_compute::CLKernelLibrary::get().context();
+    auto device  = arm_compute::CLKernelLibrary::get().get_device();
+    auto clCompileContext = arm_compute::CLCompileContext(context, device);
+
+
+
+    // Check built programs are empty in context
+    BOOST_TEST(clCompileContext.get_built_programs().empty());
+
+    auto workload = std::make_unique<ClConvolution2dWorkload>(queueDescriptor,
+                                                              workloadInfo,
+                                                              clMemoryManager->GetIntraLayerManager(),
+                                                              clCompileContext);
+    ARMNN_ASSERT(workload != nullptr);
+    // Check built programs are not empty in context
+    BOOST_TEST(!clCompileContext.get_built_programs().empty());
 }
 
 template <typename DepthwiseConvolutionWorkloadType, typename armnn::DataType DataType>

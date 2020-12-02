@@ -14,7 +14,9 @@ namespace armnn {
 class ClFillWorkload : public BaseWorkload<FillQueueDescriptor>
 {
 public:
-    ClFillWorkload(const FillQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClFillWorkload(const FillQueueDescriptor& descriptor,
+                   const WorkloadInfo& info,
+                   const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

@@ -27,7 +27,8 @@ arm_compute::Status ClGatherWorkloadValidate(const TensorInfo& input,
 }
 
 ClGatherWorkload::ClGatherWorkload(const GatherQueueDescriptor& descriptor,
-                                   const WorkloadInfo& info)
+                                   const WorkloadInfo& info,
+                                   const arm_compute::CLCompileContext& clCompileContext)
         : BaseWorkload<GatherQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClGatherWorkload", 1, 1);
@@ -38,7 +39,7 @@ ClGatherWorkload::ClGatherWorkload(const GatherQueueDescriptor& descriptor,
 
     int aclAxis = ComputeAclAxis(descriptor.m_Parameters.m_Axis, info.m_InputTensorInfos[0]);
 
-    m_Layer.configure(&input, &indices, &output, aclAxis);
+    m_Layer.configure(clCompileContext, &input, &indices, &output, aclAxis);
 };
 
 void ClGatherWorkload::Execute() const

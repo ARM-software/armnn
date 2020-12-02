@@ -16,7 +16,9 @@ class ClConvertFp16ToFp32Workload : public Float16ToFloat32Workload<ConvertFp16T
 {
 public:
 
-    ClConvertFp16ToFp32Workload(const ConvertFp16ToFp32QueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClConvertFp16ToFp32Workload(const ConvertFp16ToFp32QueueDescriptor& descriptor,
+                                const WorkloadInfo& info,
+                                const arm_compute::CLCompileContext& clCompileContext);
     virtual void Execute() const override;
 
 private:

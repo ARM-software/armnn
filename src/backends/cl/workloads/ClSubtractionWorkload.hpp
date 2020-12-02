@@ -15,7 +15,9 @@ namespace armnn
 class ClSubtractionWorkload : public BaseWorkload<SubtractionQueueDescriptor>
 {
 public:
-    ClSubtractionWorkload(const SubtractionQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClSubtractionWorkload(const SubtractionQueueDescriptor& descriptor,
+                          const WorkloadInfo& info,
+                          const arm_compute::CLCompileContext& clCompileContext);
 
     void Execute() const override;
 

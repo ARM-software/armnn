@@ -53,7 +53,8 @@ arm_compute::Status ClArgMinMaxWorkloadValidate(const TensorInfo& input,
 
 
 ClArgMinMaxWorkload::ClArgMinMaxWorkload(const ArgMinMaxQueueDescriptor& descriptor,
-                                         const WorkloadInfo& info)
+                                         const WorkloadInfo& info,
+                                         const arm_compute::CLCompileContext& clCompileContext)
         : BaseWorkload<ArgMinMaxQueueDescriptor>(descriptor, info)
 {
     arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(this->m_Data.m_Inputs[0])->GetTensor();
@@ -69,7 +70,11 @@ ClArgMinMaxWorkload::ClArgMinMaxWorkload(const ArgMinMaxQueueDescriptor& descrip
     }
     else
     {
-        m_ArgMinMaxLayer.configure(&input, aclAxis, &output, arm_compute::ReductionOperation::ARG_IDX_MIN);
+        m_ArgMinMaxLayer.configure(clCompileContext,
+                                   &input,
+                                   aclAxis,
+                                   &output,
+                                   arm_compute::ReductionOperation::ARG_IDX_MIN);
     }
 }
 

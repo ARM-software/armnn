@@ -15,7 +15,9 @@ namespace armnn
 class ClAdditionWorkload : public BaseWorkload<AdditionQueueDescriptor>
 {
 public:
-    ClAdditionWorkload(const AdditionQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClAdditionWorkload(const AdditionQueueDescriptor& descriptor,
+                       const WorkloadInfo& info,
+                       const arm_compute::CLCompileContext& clCompileContext);
 
     void Execute() const override;
 

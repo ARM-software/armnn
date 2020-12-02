@@ -19,7 +19,8 @@ using namespace armcomputetensorutils;
 static constexpr arm_compute::ConvertPolicy g_AclConvertPolicy = arm_compute::ConvertPolicy::SATURATE;
 
 ClSubtractionWorkload::ClSubtractionWorkload(const SubtractionQueueDescriptor& descriptor,
-                                             const WorkloadInfo& info)
+                                             const WorkloadInfo& info,
+                                             const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<SubtractionQueueDescriptor>(descriptor, info)
 {
     this->m_Data.ValidateInputsOutputs("ClSubtractionWorkload", 2, 1);
@@ -30,7 +31,7 @@ ClSubtractionWorkload::ClSubtractionWorkload(const SubtractionQueueDescriptor& d
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
-    m_Layer.configure(&input0, &input1, &output, g_AclConvertPolicy, activationInfo);
+    m_Layer.configure(clCompileContext, &input0, &input1, &output, g_AclConvertPolicy, activationInfo);
 }
 
 void ClSubtractionWorkload::Execute() const

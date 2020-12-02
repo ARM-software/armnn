@@ -9,7 +9,6 @@
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>
-#include <arm_compute/runtime/CL/functions/CLSplit.h>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <cl/ClTensorHandle.hpp>
@@ -53,7 +52,9 @@ arm_compute::Status ClSplitterWorkloadValidate(const TensorInfo& input,
     return arm_compute::CLSplit::validate(&aclInputInfo, aclOutputPtr, aclAxis);
 }
 
-ClSplitterWorkload::ClSplitterWorkload(const SplitterQueueDescriptor& descriptor, const WorkloadInfo& info)
+ClSplitterWorkload::ClSplitterWorkload(const SplitterQueueDescriptor& descriptor,
+                                       const WorkloadInfo& info,
+                                       const arm_compute::CLCompileContext&)
         : BaseWorkload<SplitterQueueDescriptor>(descriptor, info)
 {
     bool allOutputsAreSubtensors = true;

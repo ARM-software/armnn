@@ -18,7 +18,9 @@ namespace armnn
 class ClLstmFloatWorkload : public FloatWorkload<LstmQueueDescriptor>
 {
 public:
-    ClLstmFloatWorkload(const LstmQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClLstmFloatWorkload(const LstmQueueDescriptor& descriptor,
+                        const WorkloadInfo& info,
+                        const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

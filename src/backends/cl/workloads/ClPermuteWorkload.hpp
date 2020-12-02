@@ -29,7 +29,9 @@ public:
         return name;
     }
 
-    ClPermuteWorkload(const PermuteQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClPermuteWorkload(const PermuteQueueDescriptor& descriptor,
+                      const WorkloadInfo& info,
+                      const arm_compute::CLCompileContext& clCompileContext);
     void Execute() const override;
 
 private:

@@ -23,6 +23,7 @@ public:
         const int32_t rank = static_cast<int32_t>(neonTensorHandle->GetShape().GetNumDimensions());
 
         std::memcpy(GetOutputTensorData<void>(0, m_Data), &rank, sizeof(int32_t));
+        m_Data.m_Outputs[0]->Unmap();
     }
 };
 

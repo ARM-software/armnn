@@ -560,6 +560,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateQuantizedLstm(const Quantize
     return MakeWorkload<ClQuantizedLstmWorkload>(descriptor, info, m_CLCompileContext);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateRank(const RankQueueDescriptor& descriptor,
+                                                         const WorkloadInfo& info) const
+{
+    return std::make_unique<ClRankWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {

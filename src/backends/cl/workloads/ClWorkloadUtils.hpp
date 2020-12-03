@@ -143,4 +143,11 @@ inline void RunClFunction(arm_compute::IFunction& function, const CheckLocation&
     }
 }
 
+template <typename DataType, typename PayloadType>
+DataType* GetOutputTensorData(unsigned int idx, const PayloadType& data)
+{
+    ITensorHandle* tensorHandle = data.m_Outputs[idx];
+    return reinterpret_cast<DataType*>(tensorHandle->Map());
+}
+
 } //namespace armnn

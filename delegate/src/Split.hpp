@@ -9,7 +9,6 @@
 
 #include <algorithm>
 #include <iterator>
-#include <string>
 #include <vector>
 
 namespace armnnDelegate
@@ -231,12 +230,8 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
     }
 
     std::vector<int32_t> splitsTensorData(numSplits);
-#ifdef __STDC_LIB_EXT1__
-    ::memcpy_s(splitsTensorData.data(), sizeof(splitsTensorData),
-                  tfLiteSplitsTensor.data.data, splitsTensorInfo.GetNumBytes());
-#else
-    ::memcpy(splitsTensorData.data(), tfLiteSplitsTensor.data.data, splitsTensorInfo.GetNumBytes());
-#endif
+    std::memcpy(splitsTensorData.data(), tfLiteSplitsTensor.data.data, splitsTensorInfo.GetNumBytes());
+
 
     unsigned int index         = 0;
     unsigned int inferredIndex = 0;

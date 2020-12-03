@@ -122,11 +122,11 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
         ```
 
 #### <a name="buildtf">Build Tensorflow</a>
-* Building Tensorflow version 1.15:
+* Building Tensorflow version 2.3.1:
     ```bash
     git clone https://github.com/tensorflow/tensorflow.git
     cd tensorflow/
-    git checkout 590d6eef7e91a6a7392c8ffffb7b58f2e0c8bc6b
+    git checkout fcc4b966f1265f466e82617020af93670141b009
     ../armnn/scripts/generate_tensorflow_protobuf.sh ../tensorflow-protobuf ../google/x86_64_pb_install
     ```
 

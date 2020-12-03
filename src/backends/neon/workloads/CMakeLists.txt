@@ -92,6 +92,7 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonQuantizedLstmWorkload.hpp
     NeonQuantizeWorkload.cpp
     NeonQuantizeWorkload.hpp
+    NeonRankWorkload.hpp
     NeonReshapeWorkload.cpp
     NeonReshapeWorkload.hpp
     NeonResizeWorkload.cpp

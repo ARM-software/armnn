@@ -113,4 +113,11 @@ inline auto SetNeonSliceData(const std::vector<unsigned int>& m_begin,
     return std::make_tuple(starts, ends);
 }
 
+template <typename DataType, typename PayloadType>
+DataType* GetOutputTensorData(unsigned int idx, const PayloadType& data)
+{
+    ITensorHandle* tensorHandle = data.m_Outputs[idx];
+    return reinterpret_cast<DataType*>(tensorHandle->Map());
+}
+
 } //namespace armnn

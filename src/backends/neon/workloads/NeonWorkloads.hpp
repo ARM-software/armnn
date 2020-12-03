@@ -48,6 +48,7 @@
 #include "NeonQLstmWorkload.hpp"
 #include "NeonQuantizedLstmWorkload.hpp"
 #include "NeonQuantizeWorkload.hpp"
+#include "NeonRankWorkload.hpp"
 #include "NeonReshapeWorkload.hpp"
 #include "NeonResizeWorkload.hpp"
 #include "NeonRsqrtWorkload.hpp"

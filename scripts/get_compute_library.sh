@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_11" # Release 20.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="ccff409625cbc721e5fc227b3617ebca01c9f47e" #Updated the errata.
+DEFAULT_CLFRAMEWORKREVISION="96b16b65dd96351b8af1b2a785856ce13cc8ba84" #Remove support for (NE/CL)LocallyConnectedLayer.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

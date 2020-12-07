@@ -324,7 +324,7 @@ struct ParseArgs
                 "of yoloV3big e.g. 'mydir/file1.txt,mydir/file2.txt,mydir/file3.txt,mydir/file4.txt'->InputToDetector1"
                 " will be tried first then InputToDetector2 then InputToDetector3 then the Detector Output and finally"
                 " the NMS output. NOTE: Files are passed as comma separated list without whitespaces.",
-                cxxopts::value<std::vector<std::string>>())
+                cxxopts::value<std::vector<std::string>>()->default_value({}))
 
                 ("d,detector-path",
                  "File path where the TfLite model for the yoloV3big "

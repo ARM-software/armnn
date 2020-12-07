@@ -86,6 +86,9 @@ public:
 private:
     void CheckSubgraph();
 
+    /// Arrange the order of layers topologically so that nodes can be visited in valid order
+    void ArrangeBySortOrder();
+
     /// The list of pointers to the input slots of the parent graph.
     InputSlots m_InputSlots;
 

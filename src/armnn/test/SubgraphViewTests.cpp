@@ -1582,4 +1582,31 @@ BOOST_AUTO_TEST_CASE(SubgraphCycles)
     }
 }
 
+BOOST_AUTO_TEST_CASE(SubgraphOrder)
+{
+    Graph graph;
+
+    auto input      = graph.AddLayer<InputLayer>(0, "Input");
+    auto activation = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "Activation");
+    auto output     = graph.AddLayer<OutputLayer>(1, "Output");
+
+    input->GetOutputSlot(0).Connect(activation->GetInputSlot(0));
+    activation->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    //Add in out of order
+    auto view = CreateSubgraphViewFrom({},
+                                       {},
+                                       {output, input, activation});
+
+    // Check the layers are sorted topologically in the view
+    int idx=0;
+    LayerType expectedSorted[] = {LayerType::Input, LayerType::Activation, LayerType::Output};
+    view->ForEachLayer([&idx, &expectedSorted](const Layer* l)
+        {
+            BOOST_TEST((expectedSorted[idx] == l->GetType()));
+            idx++;
+        }
+    );
+}
+
 BOOST_AUTO_TEST_SUITE_END()

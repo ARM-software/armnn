@@ -45,6 +45,7 @@ SubgraphView::SubgraphView(Graph& graph)
     , m_OutputSlots{}
     , m_Layers(graph.begin(), graph.end())
 {
+    ArrangeBySortOrder();
     CheckSubgraph();
 }
 
@@ -53,6 +54,7 @@ SubgraphView::SubgraphView(InputSlots&& inputs, OutputSlots&& outputs, Layers&& 
     , m_OutputSlots{outputs}
     , m_Layers{layers}
 {
+    ArrangeBySortOrder();
     CheckSubgraph();
 }
 
@@ -61,6 +63,7 @@ SubgraphView::SubgraphView(const SubgraphView& subgraph)
     , m_OutputSlots(subgraph.m_OutputSlots.begin(), subgraph.m_OutputSlots.end())
     , m_Layers(subgraph.m_Layers.begin(), subgraph.m_Layers.end())
 {
+    ArrangeBySortOrder();
     CheckSubgraph();
 }
 
@@ -69,6 +72,7 @@ SubgraphView::SubgraphView(SubgraphView&& subgraph)
     , m_OutputSlots(std::move(subgraph.m_OutputSlots))
     , m_Layers(std::move(subgraph.m_Layers))
 {
+    ArrangeBySortOrder();
     CheckSubgraph();
 }
 
@@ -197,6 +201,17 @@ void SubgraphView::Clear()
     m_InputSlots.clear();
     m_OutputSlots.clear();
     m_Layers.clear();
+}
+
+void SubgraphView::ArrangeBySortOrder()
+{
+    using LayerList = std::list<Layer*>;
+    auto compareLayerPriority = [](const LayerList::value_type& layerA, const LayerList::value_type& layerB)
+        {
+            return layerA->GetPriority() < layerB->GetPriority();
+        };
+
+    m_Layers.sort(compareLayerPriority);
 }
 
 } // namespace armnn

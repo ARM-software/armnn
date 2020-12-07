@@ -19,8 +19,8 @@ namespace armnnDelegate
 {
 
 TfLiteStatus CreateOutputTensorShape(const armnn::TensorInfo& inputTensorInfo,
-                                           const std::vector<int32_t>& targetShape,
-                                           armnn::ReshapeDescriptor& reshapeDesc)
+                                     const std::vector<int32_t>& targetShape,
+                                     armnn::ReshapeDescriptor& reshapeDesc)
 {
     std::vector<unsigned int> outputDims(targetShape.begin(), targetShape.end());
     const auto stretchDim = std::find(targetShape.begin(), targetShape.end(), -1);
@@ -67,22 +67,14 @@ TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,
 
     const TfLiteTensor* tfLiteTensors = tfLiteContext->tensors;
     const TfLiteTensor& tfLiteInputTensor0 = tfLiteTensors[tfLiteNode->inputs->data[0]];
-    if (IsDynamicTensor(tfLiteInputTensor0))
+    if (!IsValid(tfLiteContext, tfLiteInputTensor0, operatorCode, nodeIndex))
     {
-        TF_LITE_MAYBE_KERNEL_LOG(tfLiteContext,
-                                 "TfLiteArmnnDelegate: Dynamic input tensors are not supported in "
-                                 "operator #%d node #%d: ",
-                                 operatorCode, nodeIndex);
         return kTfLiteError;
     }
 
     const TfLiteTensor& tfLiteOutputTensor = tfLiteTensors[tfLiteNode->outputs->data[0]];
-    if (IsDynamicTensor(tfLiteOutputTensor))
+    if (!IsValid(tfLiteContext, tfLiteOutputTensor, operatorCode, nodeIndex))
     {
-        TF_LITE_MAYBE_KERNEL_LOG(tfLiteContext,
-                                 "TfLiteArmnnDelegate: Dynamic output tensors are not supported in "
-                                 "operator #%d node #%d: ",
-                                 operatorCode, nodeIndex);
         return kTfLiteError;
     }
 
@@ -91,18 +83,15 @@ TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,
 
     armnn::ReshapeDescriptor reshapeDesc;
     std::vector<int32_t> targetShape;
+    bool shapeSet = false;
 
     // The new shape can be defined by either a second input tensor or by a builtin option, we need to check for both.
     if (numInputs == 2)
     {
         // Get shape from the second input tensor
         const TfLiteTensor& tfLiteShapeInputTensor = tfLiteTensors[tfLiteNode->inputs->data[1]];
-        if (IsDynamicTensor(tfLiteShapeInputTensor))
+        if (!IsValid(tfLiteContext, tfLiteShapeInputTensor, operatorCode, nodeIndex))
         {
-            TF_LITE_MAYBE_KERNEL_LOG(tfLiteContext,
-                                     "TfLiteArmnnDelegate: Dynamic input tensors are not supported in "
-                                     "operator #%d node #%d: ",
-                                     operatorCode, nodeIndex);
             return kTfLiteError;
         }
 
@@ -110,20 +99,22 @@ TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,
         {
             TF_LITE_MAYBE_KERNEL_LOG(tfLiteContext,
                                      "TfLiteArmnnDelegate: Target 'shape' input is not a 1D tensor in "
-                                     "operator #%d node #%d: ",
+                                     "operator #%d node #%d: Falling back to TfLiteOptions.",
                                      operatorCode, nodeIndex);
-            return kTfLiteError;
         }
-
-        // Get the shape data out of the input tensor
-        auto* shapeTensorDataPtr = tflite::GetTensorData<int32_t>(&tfLiteShapeInputTensor);
-        auto shapeTensorNumValues = tfLiteShapeInputTensor.dims->data[0];
-        for (auto i=0; i < shapeTensorNumValues; ++i)
+        else
         {
-            targetShape.push_back(*(shapeTensorDataPtr+i));
+            // Get the shape data out of the input tensor
+            auto* shapeTensorDataPtr = tflite::GetTensorData<int32_t>(&tfLiteShapeInputTensor);
+            auto shapeTensorNumValues = tfLiteShapeInputTensor.dims->data[0];
+            for (auto i=0; i < shapeTensorNumValues; ++i)
+            {
+                targetShape.push_back(*(shapeTensorDataPtr+i));
+            }
+            shapeSet = true;
         }
     }
-    else
+    if (!shapeSet)
     {
         // Get shape from the builtin data
         TfLiteReshapeParams* reshapeOptions = reinterpret_cast<TfLiteReshapeParams*>(tfLiteNode->builtin_data);

@@ -38,6 +38,12 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 * LESS_OR_EQUAL
 
+* LOGICAL_AND
+  
+* LOGICAL_NOT
+  
+* LOGICAL_OR
+
 * LOGISTIC
 
 * LOG_SOFTMAX

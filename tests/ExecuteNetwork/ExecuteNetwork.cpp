@@ -89,7 +89,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
         {
             auto inputData = tfLiteInterpreter->typed_tensor<float>(input);
 
-            if(tfLiteInterpreter == NULL)
+            if(inputData == NULL)
             {
                 ARMNN_LOG(fatal) << "Input tensor is null, input type: "
                                     "\"" << params.m_InputTypes[inputIndex] << "\" may be incorrect.";
@@ -109,7 +109,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
         {
             auto inputData = tfLiteInterpreter->typed_tensor<int8_t>(input);
 
-            if(tfLiteInterpreter == NULL)
+            if(inputData == NULL)
             {
                 ARMNN_LOG(fatal) << "Input tensor is null, input type: "
                                     "\"" << params.m_InputTypes[inputIndex] << "\" may be incorrect.";
@@ -129,7 +129,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
         {
             auto inputData = tfLiteInterpreter->typed_tensor<int32_t>(input);
 
-            if(tfLiteInterpreter == NULL)
+            if(inputData == NULL)
             {
                 ARMNN_LOG(fatal) << "Input tensor is null, input type: "
                                     "\"" << params.m_InputTypes[inputIndex] << "\" may be incorrect.";
@@ -149,7 +149,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
         {
             auto inputData = tfLiteInterpreter->typed_tensor<uint8_t>(input);
 
-            if(tfLiteInterpreter == NULL)
+            if(inputData == NULL)
             {
                 ARMNN_LOG(fatal) << "Input tensor is null, input type: "
                                     "\"" << params.m_InputTypes[inputIndex] << "\" may be incorrect.";

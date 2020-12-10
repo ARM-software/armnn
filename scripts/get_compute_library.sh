@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_11" # Release 20.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="98e33b97b92c912f058bfb3295adad1bcad3e80f" #Fix invalid arguments error for cl_gemmlowp* examples without arguments.
+DEFAULT_CLFRAMEWORKREVISION="ec2256b81e6d6f655dcfbc76683738fbfeb82bcc" #Move NEGEMMAssemblyDispatch as an internal function.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

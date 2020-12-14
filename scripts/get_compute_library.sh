@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_11" # Release 20.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="ec2256b81e6d6f655dcfbc76683738fbfeb82bcc" #Move NEGEMMAssemblyDispatch as an internal function.
+DEFAULT_CLFRAMEWORKREVISION="ec241b48ea7481e797285788fd68e5e1d42382bb" #Allow TensorShape to increment num_dimensions for new unit dimensions, without correction
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

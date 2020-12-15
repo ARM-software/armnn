@@ -6,6 +6,8 @@
 #pragma once
 
 #include <armnn/ArmNN.hpp>
+#include <armnn/Logging.hpp>
+#include <armnn/Optional.hpp>
 
 #include <set>
 #include <string>
@@ -17,16 +19,31 @@ namespace armnnDelegate
 class DelegateOptions
 {
 public:
-    DelegateOptions(armnn::Compute computeDevice, const std::vector<armnn::BackendOptions>& backendOptions = {});
+    DelegateOptions(armnn::Compute computeDevice,
+                    const std::vector<armnn::BackendOptions>& backendOptions = {},
+                    armnn::Optional<armnn::LogSeverity> logSeverityLevel = armnn::EmptyOptional());
 
     DelegateOptions(const std::vector<armnn::BackendId>& backends,
-                    const std::vector<armnn::BackendOptions>& backendOptions = {});
+                    const std::vector<armnn::BackendOptions>& backendOptions = {},
+                    armnn::Optional<armnn::LogSeverity> logSeverityLevel = armnn::EmptyOptional());
 
     const std::vector<armnn::BackendId>& GetBackends() const { return m_Backends; }
 
     void SetBackends(const std::vector<armnn::BackendId>& backends) { m_Backends = backends; }
 
     const std::vector<armnn::BackendOptions>& GetBackendOptions() const { return m_BackendOptions; }
+
+    /// Appends a backend option to the list of backend options
+    void AddBackendOption(const armnn::BackendOptions& option) { m_BackendOptions.push_back(option); }
+
+    /// Sets the severity level for logging within ArmNN that will be used on creation of the delegate
+    void SetLoggingSeverity(const armnn::LogSeverity& level) { m_LoggingSeverity = level; }
+    void SetLoggingSeverity(const std::string& level) { m_LoggingSeverity = armnn::StringToLogLevel(level); }
+
+    /// Returns the severity level for logging within ArmNN
+    armnn::LogSeverity GetLoggingSeverity() { return m_LoggingSeverity.value(); }
+
+    bool IsLoggingEnabled() { return m_LoggingSeverity.has_value(); }
 
 private:
     /// Which backend to run Delegate on.
@@ -52,6 +69,9 @@ private:
     ///   "TuningFile" : string [filenameString]
     ///   "KernelProfilingEnabled" : bool [true | false]
     std::vector<armnn::BackendOptions> m_BackendOptions;
+
+    /// Severity level for logging within ArmNN that will be used on creation of the delegate
+    armnn::Optional<armnn::LogSeverity> m_LoggingSeverity;
 };
 
 } // namespace armnnDelegate

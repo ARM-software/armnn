@@ -120,6 +120,12 @@ Delegate::Delegate(armnnDelegate::DelegateOptions options)
   : m_Runtime(nullptr, nullptr),
     m_Options(std::move(options))
 {
+    // Configures logging for ARMNN
+    if (options.IsLoggingEnabled())
+    {
+        armnn::ConfigureLogging(true, true, options.GetLoggingSeverity());
+    }
+
     // Create ArmNN Runtime
     armnn::IRuntime::CreationOptions runtimeOptions;
 

@@ -118,12 +118,15 @@ void ConfigureTuner(arm_compute::CLTuner &tuner, TuningLevel level)
     switch (level)
     {
         case TuningLevel::Rapid:
+            ARMNN_LOG(info) << "Gpu tuning is activated. TuningLevel: Rapid (1)";
             tuner.set_tuner_mode(arm_compute::CLTunerMode::RAPID);
             break;
         case TuningLevel::Normal:
+            ARMNN_LOG(info) << "Gpu tuning is activated. TuningLevel: Normal (2)";
             tuner.set_tuner_mode(arm_compute::CLTunerMode::NORMAL);
             break;
         case TuningLevel::Exhaustive:
+            ARMNN_LOG(info) << "Gpu tuning is activated. TuningLevel: Exhaustive (3)";
             tuner.set_tuner_mode(arm_compute::CLTunerMode::EXHAUSTIVE);
             break;
         case TuningLevel::None:
@@ -205,6 +208,7 @@ ClBackendContext::ClBackendContext(const IRuntime::CreationOptions& options)
         {
             try
             {
+                ARMNN_LOG(info) << "Loading Gpu tuning data from file: " << m_TuningFile;
                 m_Tuner->load_from_file(m_TuningFile.c_str());
             }
             catch (const std::exception& e)

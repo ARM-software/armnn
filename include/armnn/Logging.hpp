@@ -7,6 +7,7 @@
 
 #include <armnn/Utils.hpp>
 #include <iostream>
+#include <algorithm>
 
 namespace armnn
 {
@@ -29,6 +30,44 @@ inline std::string LevelToString(LogSeverity level)
             return "Fatal";
         default:
             return "Log";
+    }
+}
+
+inline LogSeverity StringToLogLevel(std::string level)
+{
+    // Transfer to lower case
+    std::transform(level.begin(), level.end(), level.begin(),
+                   [](unsigned char c){ return std::tolower(c); }
+    );
+
+    if (level == "trace")
+    {
+        return LogSeverity::Trace;
+    }
+    else if (level == "debug")
+    {
+        return LogSeverity::Debug;
+    }
+    else if (level == "info")
+    {
+        return LogSeverity::Info;
+    }
+    else if (level == "warning")
+    {
+        return LogSeverity::Warning;
+    }
+    else if (level == "error")
+    {
+        return LogSeverity::Error;
+    }
+    else if (level == "fatal")
+    {
+        return LogSeverity::Fatal;
+    }
+    else
+    {
+        throw armnn::Exception("Unknown severity level for logging: '" + level +
+                               "'. Valid options: trace, debug, info, warning, error, fatal");
     }
 }
 

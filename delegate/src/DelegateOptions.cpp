@@ -9,14 +9,16 @@ namespace armnnDelegate
 {
 
 DelegateOptions::DelegateOptions(armnn::Compute computeDevice,
-                                 const std::vector<armnn::BackendOptions>& backendOptions)
-    : m_Backends({computeDevice}), m_BackendOptions(backendOptions)
+                                 const std::vector<armnn::BackendOptions>& backendOptions,
+                                 const armnn::Optional<armnn::LogSeverity> logSeverityLevel)
+    : m_Backends({computeDevice}), m_BackendOptions(backendOptions), m_LoggingSeverity(logSeverityLevel)
 {
 }
 
 DelegateOptions::DelegateOptions(const std::vector<armnn::BackendId>& backends,
-                                 const std::vector<armnn::BackendOptions>& backendOptions)
-    : m_Backends(backends), m_BackendOptions(backendOptions)
+                                 const std::vector<armnn::BackendOptions>& backendOptions,
+                                 const armnn::Optional<armnn::LogSeverity> logSeverityLevel)
+    : m_Backends(backends), m_BackendOptions(backendOptions), m_LoggingSeverity(logSeverityLevel)
 {
 }
 

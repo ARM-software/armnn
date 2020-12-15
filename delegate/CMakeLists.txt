@@ -15,6 +15,7 @@ list(APPEND armnnDelegate_sources
         include/armnn_delegate.hpp
         include/DelegateOptions.hpp
         src/armnn_delegate.cpp
+        src/armnn_external_delegate.cpp
         src/DelegateOptions.cpp
         src/Activation.hpp
         src/ArgMinMax.hpp

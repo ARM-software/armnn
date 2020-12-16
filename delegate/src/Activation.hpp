@@ -49,21 +49,14 @@ TfLiteStatus VisitActivationOperator(DelegateData& delegateData,
 
     const TfLiteTensor* tfLiteTensors = tfLiteContext->tensors;
     const TfLiteTensor& tfLiteInputTensor = tfLiteTensors[tfLiteNode->inputs->data[0]];
-    if (IsDynamicTensor(tfLiteInputTensor))
+    if (!IsValid(tfLiteContext, tfLiteInputTensor, operatorCode, nodeIndex))
     {
-        TF_LITE_MAYBE_KERNEL_LOG(
-            tfLiteContext,
-            "TfLiteArmnnDelegate: Dynamic input tensors are not supported in node #%d: ",
-            nodeIndex);
         return kTfLiteError;
     }
+
     const TfLiteTensor& tfLiteOutputTensor = tfLiteTensors[tfLiteNode->outputs->data[0]];
-    if (IsDynamicTensor(tfLiteOutputTensor))
+    if (!IsValid(tfLiteContext, tfLiteOutputTensor, operatorCode, nodeIndex))
     {
-        TF_LITE_MAYBE_KERNEL_LOG(
-            tfLiteContext,
-            "TfLiteArmnnDelegate: Dynamic output tensors are not supported in node #%d: ",
-            nodeIndex);
         return kTfLiteError;
     }
 
@@ -94,6 +87,17 @@ TfLiteStatus VisitActivationOperator(DelegateData& delegateData,
             activationDesc.m_Function = armnn::ActivationFunction::TanH;
             activationDesc.m_A = 1.0f;
             activationDesc.m_B = 1.0f;
+            break;
+        }
+        case kTfLiteBuiltinElu:
+        {
+            activationDesc.m_Function = armnn::ActivationFunction::Elu;
+            activationDesc.m_A = 1.0f;
+            break;
+        }
+        case kTfLiteBuiltinHardSwish:
+        {
+            activationDesc.m_Function = armnn::ActivationFunction::HardSwish;
             break;
         }
         default:

@@ -549,6 +549,7 @@ TfLiteParser::TfLiteParser(const Optional<ITfLiteParser::TfLiteParserOptions>& o
     m_ParserFunctions[tflite::BuiltinOperator_CUSTOM]                  = &TfLiteParser::ParseCustomOperator;
     m_ParserFunctions[tflite::BuiltinOperator_DEPTHWISE_CONV_2D]       = &TfLiteParser::ParseDepthwiseConv2D;
     m_ParserFunctions[tflite::BuiltinOperator_DEQUANTIZE]              = &TfLiteParser::ParseDequantize;
+    m_ParserFunctions[tflite::BuiltinOperator_ELU]                     = &TfLiteParser::ParseElu;
     m_ParserFunctions[tflite::BuiltinOperator_EXP]                     = &TfLiteParser::ParseExp;
     m_ParserFunctions[tflite::BuiltinOperator_FULLY_CONNECTED]         = &TfLiteParser::ParseFullyConnected;
     m_ParserFunctions[tflite::BuiltinOperator_HARD_SWISH]              = &TfLiteParser::ParseHardSwish;
@@ -1928,6 +1929,11 @@ void TfLiteParser::ParseTanH(size_t subgraphIndex, size_t operatorIndex)
     ParseActivation(subgraphIndex,operatorIndex,ActivationFunction::TanH);
 }
 
+void TfLiteParser::ParseElu(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseActivation(subgraphIndex, operatorIndex, ActivationFunction::Elu);
+}
+
 void TfLiteParser::ParseHardSwish(size_t subgraphIndex, size_t operatorIndex)
 {
     ParseActivation(subgraphIndex, operatorIndex, ActivationFunction::HardSwish);
@@ -1982,9 +1988,17 @@ void TfLiteParser::ParseActivation(size_t subgraphIndex, size_t operatorIndex, A
             activationDesc.m_A = options->alpha;
             break;
         }
+        case ActivationFunction::Elu:
+        {
+            layerName += fmt::format("ELU:{}:{}", subgraphIndex, operatorIndex);
+            activationDesc.m_A = 1.0f;
+            break;
+        }
         case ActivationFunction::HardSwish:
+        {
             layerName += fmt::format("HARDSWISH:{}:{}", subgraphIndex, operatorIndex);
             break;
+        }
         default:
         {
             throw ParseException(

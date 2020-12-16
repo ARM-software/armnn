@@ -24,6 +24,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 * EQUAL
 
+* ELU
+
 * EXP
 
 * FULLY_CONNECTED, Supported Fused Activation: RELU , RELU6 , TANH, NONE
@@ -33,6 +35,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 * GREATER
 
 * GREATER_OR_EQUAL
+
+* HARD_SWISH
 
 * LESS
 

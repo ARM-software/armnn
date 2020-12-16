@@ -106,6 +106,18 @@ BOOST_FIXTURE_TEST_CASE(ParseTanH, TanHFixture)
         { -0.09966799f, -0.19737528f, -0.29131261f, -0.379949f, 0.09966799f, 0.19737528f, 0.29131261f });
 }
 
+struct EluFixture : ActivationFixture
+{
+    EluFixture() : ActivationFixture("ELU", "FLOAT32") {}
+};
+
+BOOST_FIXTURE_TEST_CASE(ParseElu, EluFixture)
+{
+    RunTest<2, armnn::DataType::Float32>(0,
+                                         { -2.0f,           -1.0f,           -0.0f, 0.0f, 1.0f, 2.0f, 3.0f },
+                                         { -0.86466471676f, -0.63212055882f, -0.0f, 0.0f, 1.0f, 2.0f, 3.0f });
+}
+
 struct HardSwishFixture : ActivationFixture
 {
     HardSwishFixture() : ActivationFixture("HARD_SWISH", "FLOAT32") {}

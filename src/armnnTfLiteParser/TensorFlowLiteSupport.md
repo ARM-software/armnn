@@ -22,9 +22,13 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 
 * DIV
 
+* ELU
+
 * EXP
 
 * FULLY_CONNECTED, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+
+* HARD_SWISH
 
 * LEAKY_RELU
 

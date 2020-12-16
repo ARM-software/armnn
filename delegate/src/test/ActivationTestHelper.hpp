@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "TestUtils.hpp"
+
 #include <armnn_delegate.hpp>
 
 #include <flatbuffers/flatbuffers.h>
@@ -79,7 +81,7 @@ void ActivationTest(tflite::BuiltinOperator activationOperatorCode,
                     std::vector<float>& expectedOutputValues)
 {
     using namespace tflite;
-    const std::vector<int32_t> inputShape  { { 4, 1, 4} };
+    std::vector<int32_t> inputShape  { { 4, 1, 4} };
     std::vector<char> modelBuffer = CreateActivationTfLiteModel(activationOperatorCode,
                                                                       ::tflite::TensorType_FLOAT32,
                                                                       inputShape);
@@ -108,33 +110,21 @@ void ActivationTest(tflite::BuiltinOperator activationOperatorCode,
     CHECK(armnnDelegateInterpreter->ModifyGraphWithDelegate(theArmnnDelegate.get()) == kTfLiteOk);
 
     // Set input data
-    auto tfLiteDelegateInputId = tfLiteInterpreter->inputs()[0];
-    auto tfLiteDelageInputData = tfLiteInterpreter->typed_tensor<float>(tfLiteDelegateInputId);
-    for (unsigned int i = 0; i < inputValues.size(); ++i)
-    {
-        tfLiteDelageInputData[i] = inputValues[i];
-    }
+    armnnDelegate::FillInput<float>(tfLiteInterpreter, 0, inputValues);
+    armnnDelegate::FillInput<float>(armnnDelegateInterpreter, 0, inputValues);
 
-    auto armnnDelegateInputId = armnnDelegateInterpreter->inputs()[0];
-    auto armnnDelegateInputData = armnnDelegateInterpreter->typed_tensor<float>(armnnDelegateInputId);
-    for (unsigned int i = 0; i < inputValues.size(); ++i)
-    {
-        armnnDelegateInputData[i] = inputValues[i];
-    }
     // Run EnqueWorkload
     CHECK(tfLiteInterpreter->Invoke() == kTfLiteOk);
     CHECK(armnnDelegateInterpreter->Invoke() == kTfLiteOk);
 
     // Compare output data
-    auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[0];
-    auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<float>(tfLiteDelegateOutputId);
-    auto armnnDelegateOutputId = armnnDelegateInterpreter->outputs()[0];
-    auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<float>(armnnDelegateOutputId);
-    for (size_t i = 0; i < inputValues.size(); i++)
-    {
-        CHECK(expectedOutputValues[i] == doctest::Approx(armnnDelegateOutputData[i]));
-        CHECK(tfLiteDelageOutputData[i] == doctest::Approx(armnnDelegateOutputData[i]));
-    }
+    armnnDelegate::CompareOutputData<float>(tfLiteInterpreter,
+                                            armnnDelegateInterpreter,
+                                            inputShape,
+                                            expectedOutputValues);
+
+    tfLiteInterpreter.reset(nullptr);
+    armnnDelegateInterpreter.reset(nullptr);
 }
 
 } // anonymous namespace

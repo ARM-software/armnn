@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_11" # Release 20.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="aa51a5ba9a3f05be08b94859b53c398edee5d2e3" #COMPMID-3870: Create ActivationLayer SVE/SVE2
+DEFAULT_CLFRAMEWORKREVISION="4d9687e70e2d71097cd43929d5f63377c3c44523" #Address RVO issue on some compilers
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

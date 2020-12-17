@@ -61,6 +61,9 @@ void CompareOutputData(std::unique_ptr<tflite::Interpreter>& tfLiteInterpreter,
     auto armnnDelegateOutputTensor = armnnDelegateInterpreter->tensor(armnnDelegateOutputId);
     auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateOutputId);
 
+    CHECK(expectedOutputShape.size() == tfLiteDelegateOutputTensor->dims->size);
+    CHECK(expectedOutputShape.size() == armnnDelegateOutputTensor->dims->size);
+
     for (size_t i = 0; i < expectedOutputShape.size(); i++)
     {
         CHECK(expectedOutputShape[i] == armnnDelegateOutputTensor->dims->data[i]);

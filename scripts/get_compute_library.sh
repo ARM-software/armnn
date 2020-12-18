@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_11" # Release 20.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="462e75e217a11b92b8df8c3434f2491ef70487e3" #NeuralNetwork VTS tests LOGICAL_AND and LOGICAL_OR fail with R29
+DEFAULT_CLFRAMEWORKREVISION="b6869dda4a5bf233df009eaac15cf0c220b653f2" #Adding no padding check asserts to specific CL Kernels
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

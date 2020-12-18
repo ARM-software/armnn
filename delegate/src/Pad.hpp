@@ -98,9 +98,6 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
             case kTfLiteInt8:
                 descriptor.m_PadValue = tflite::GetTensorData<int8>(&tfLitepaddingValue)[0];
                 break;
-            case kTfLiteInt16:
-                descriptor.m_PadValue = tflite::GetTensorData<int16>(&tfLitepaddingValue)[0];
-                break;
             default:
                 TF_LITE_MAYBE_KERNEL_LOG(
                     tfLiteContext,

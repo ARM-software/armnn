@@ -93,6 +93,15 @@ target_compile_options(flatbuffer_headers INTERFACE -Wno-sign-conversion)
 
 target_link_libraries(armnnDelegate PUBLIC flatbuffer_headers)
 
+# Add libraries from armnn third-party libraries
+# Third-party header files are not warning clean
+# We can't change compilation flags on header files directly, so we need to add them to an interface library first
+add_library(thirdparty_headers INTERFACE)
+target_include_directories(thirdparty_headers INTERFACE $<BUILD_INTERFACE:${ARMNN_SOURCE_DIR}/third-party>
+                                                        $<INSTALL_INTERFACE:include/thirdparty_headers>)
+
+target_compile_options(thirdparty_headers INTERFACE -Wno-old-style-cast)
+
 option(BUILD_UNIT_TESTS "Build unit tests" ON)
 if(BUILD_UNIT_TESTS)
     set(armnnDelegate_unittest_sources)
@@ -140,7 +149,7 @@ if(BUILD_UNIT_TESTS)
     target_include_directories(DelegateUnitTests PRIVATE third-party)
 
     # Add half library from armnn third-party libraries
-    target_include_directories(DelegateUnitTests PRIVATE ${ARMNN_SOURCE_DIR}/third-party)
+    target_link_libraries(DelegateUnitTests PRIVATE thirdparty_headers)
 
     target_link_libraries(DelegateUnitTests PRIVATE armnnDelegate)
     target_link_libraries(DelegateUnitTests PRIVATE Armnn::armnnUtils)

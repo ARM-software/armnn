@@ -136,7 +136,7 @@ void RedefineTest(tflite::BuiltinOperator redefineOperatorCode,
                   tflite::TensorType tensorType,
                   const std::vector<armnn::BackendId>& backends,
                   const std::vector<int32_t>& inputShape,
-                  const std::vector<int32_t>& outputShape,
+                  std::vector<int32_t>& outputShape,
                   std::vector<T>& inputValues,
                   std::vector<T>& expectedOutputValues,
                   std::vector<int32_t>& targetShape,
@@ -186,28 +186,7 @@ void RedefineTest(tflite::BuiltinOperator redefineOperatorCode,
     CHECK(tfLiteInterpreter->Invoke() == kTfLiteOk);
     CHECK(armnnDelegateInterpreter->Invoke() == kTfLiteOk);
 
-    auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[0];
-    auto tfLiteDelegateOutputData = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateOutputId);
-    auto tfLiteDelegateOutputTensor = tfLiteInterpreter->tensor(tfLiteDelegateOutputId);
-    auto armnnDelegateOutputId = armnnDelegateInterpreter->outputs()[0];
-    auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateOutputId);
-    auto armnnDelegateOutputTensor = armnnDelegateInterpreter->tensor(armnnDelegateOutputId);
-
-    CHECK(outputShape.size() == tfLiteDelegateOutputTensor->dims->size);
-    CHECK(outputShape.size() == armnnDelegateOutputTensor->dims->size);
-
-    for (size_t i = 0; i < static_cast<size_t>(tfLiteDelegateOutputTensor->dims->size); i++)
-    {
-        CHECK(outputShape[i] == armnnDelegateOutputTensor->dims->data[i]);
-        CHECK(tfLiteDelegateOutputTensor->dims->data[i] == armnnDelegateOutputTensor->dims->data[i]);
-    }
-
-    for (size_t i = 0; i < expectedOutputValues.size(); i++)
-    {
-        CHECK(expectedOutputValues[i] == armnnDelegateOutputData[i]);
-        CHECK(tfLiteDelegateOutputData[i] == expectedOutputValues[i]);
-        CHECK(tfLiteDelegateOutputData[i] == armnnDelegateOutputData[i]);
-    }
+    armnnDelegate::CompareOutputData<T>(tfLiteInterpreter, armnnDelegateInterpreter, outputShape, expectedOutputValues);
 }
 
 } // anonymous namespace

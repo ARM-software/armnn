@@ -73,7 +73,7 @@ std::vector<char> CreatePadTfLiteModel(
     buffers.push_back(
         CreateBuffer(flatBufferBuilder,
                      flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(paddingDim.data()),
-                                                     sizeof(int32_t) * paddingDim.size())));
+                                                    sizeof(int32_t) * paddingDim.size())));
     buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
 
     std::vector<int32_t> operatorInputs;

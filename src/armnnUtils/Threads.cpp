@@ -13,6 +13,7 @@
 #include <common/include/WindowsWrapper.hpp>
 #elif defined(__APPLE__)
 #include "AvailabilityMacros.h"
+#include <pthread.h>
 #include <sys/syscall.h>
 #include <sys/time.h>
 #include <unistd.h>
@@ -36,7 +37,7 @@ int GetCurrentThreadId()
     {
         return 0;
     }
-    return threadId;
+    return static_cast<int>(threadId);
 #endif
 }
 

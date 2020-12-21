@@ -16,8 +16,10 @@ Although some other neural networks might work, Arm tests the Arm NN SDK with Ca
 The Arm NN SDK supports the following machine learning layers for Caffe networks:
 
 
+- Argmax, excluding the top_k and out_max_val parameters.
 - BatchNorm, in inference mode.
-- Convolution, excluding the Dilation Size, Weight Filler, Bias Filler, Engine, Force nd_im2col, and Axis parameters.
+- Convolution, excluding Weight Filler, Bias Filler, Engine, Force nd_im2col, and Axis parameters.
+- Deconvolution, excluding the Dilation Size, Weight Filler, Bias Filler, Engine, Force nd_im2col, and Axis parameters.
 
   Caffe doesn't support depthwise convolution, the equivalent layer is implemented through the notion of groups. ArmNN supports groups this way:
   - when group=1, it is a normal conv2d

@@ -199,13 +199,18 @@ if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
 
     target_link_libraries(armnnQuantizer armnn)
 
-    add_executable_ex(ArmnnQuantizer
+    add_executable_ex(ArmnnQuantizerMain
         src/armnnQuantizer/ArmNNQuantizerMain.cpp)
 
-    target_include_directories(ArmnnQuantizer PRIVATE include/armnnDeserializer)
-    target_include_directories(ArmnnQuantizer PRIVATE src/armnn)
+    # cmake does not allow same executable and library name
+    # workaround that by rename that using set_target_properties
+    set_target_properties(ArmnnQuantizerMain
+        PROPERTIES OUTPUT_NAME ArmnnQuantizer)
 
-    target_link_libraries(ArmnnQuantizer
+    target_include_directories(ArmnnQuantizerMain PRIVATE include/armnnDeserializer)
+    target_include_directories(ArmnnQuantizerMain PRIVATE src/armnn)
+
+    target_link_libraries(ArmnnQuantizerMain
             armnnQuantizer
             armnnSerializer
             armnn
@@ -213,7 +218,7 @@ if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
             ${FLATBUFFERS_LIBRARY})
 
     if(Threads_FOUND AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
-        target_link_libraries(ArmnnQuantizer pthread)
+        target_link_libraries(ArmnnQuantizerMain pthread)
     endif()
 
     set_target_properties(armnnQuantizer PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})

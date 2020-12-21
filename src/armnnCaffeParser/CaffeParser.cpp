@@ -236,6 +236,7 @@ const std::map<std::string, CaffeParserBase::OperationParsingFunction>
     CaffeParserBase::ms_CaffeLayerNameToParsingFunctions = {
     { "Input",        &CaffeParserBase::ParseInputLayer },
     { "Convolution",  &CaffeParserBase::ParseConvLayer },
+    { "Deconvolution",&CaffeParserBase::ParseDeconvLayer },
     { "Pooling",      &CaffeParserBase::ParsePoolingLayer },
     { "ReLU",         &CaffeParserBase::ParseReluLayer },
     { "LRN",          &CaffeParserBase::ParseLRNLayer },
@@ -247,6 +248,7 @@ const std::map<std::string, CaffeParserBase::OperationParsingFunction>
     { "Scale",        &CaffeParserBase::ParseScaleLayer },
     { "Split",        &CaffeParserBase::ParseSplitLayer },
     { "Dropout",      &CaffeParserBase::ParseDropoutLayer},
+    { "ArgMax",       &CaffeParserBase::ParseArgmaxLayer},
 };
 
 ICaffeParser* ICaffeParser::CreateRaw()
@@ -395,7 +397,6 @@ void CaffeParserBase::ParseInputLayer(const LayerParameter& layerParam)
                         layerParam.name(),
                         CHECK_LOCATION().AsString()));
     }
-
     TrackInputBinding(inputLayer, inputId, inputTensorInfo);
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), inputLayer->GetOutputSlot(0));
@@ -576,6 +577,194 @@ void CaffeParserBase::AddConvLayerWithSplits(const caffe::LayerParameter& layerP
     {
         throw ParseException(
             fmt::format("Failed to create final concat layer for Split+Convolution+Concat. "
+                        "Layer={} #groups={} #filters={} {}",
+                        layerParam.name(),
+                        numGroups,
+                        numFilters,
+                        CHECK_LOCATION().AsString()));
+    }
+
+    for (unsigned int g = 0; g < numGroups; ++g)
+    {
+        convLayers[g]->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(g));
+    }
+    concatLayer->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo(4, concatDimSizes, DataType::Float32));
+    SetArmnnOutputSlotForCaffeTop(layerParam.top(0), concatLayer->GetOutputSlot(0));
+}
+
+void CaffeParserBase::AddDeconvLayerWithSplits(const caffe::LayerParameter& layerParam,
+                                             const armnn::TransposeConvolution2dDescriptor& desc,
+                                             unsigned int kernelW,
+                                             unsigned int kernelH)
+{
+    ARMNN_ASSERT(layerParam.type() == "Deconvolution");
+    ValidateNumInputsOutputs(layerParam, 1, 1);
+
+    ConvolutionParameter convParam = layerParam.convolution_param();
+    BlobShape inputShape = TensorDescToBlobShape(GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)).GetTensorInfo());
+    const unsigned int numGroups = convParam.has_group() ? convParam.group() : 1;
+
+    // asusme these were already verified by the caller ParseDeconvLayer() function
+    ARMNN_ASSERT(numGroups <= inputShape.dim(1));
+    ARMNN_ASSERT(numGroups > 1);
+
+    // Handle grouping
+    armnn::IOutputSlot& inputConnection = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0));
+
+    vector<string> convLayerNames(numGroups);
+    vector<armnn::IConnectableLayer*> convLayers(numGroups);
+    convLayerNames[0] = layerParam.name();
+
+    // This deconvolution is to be applied to chunks of the input data so add a splitter layer
+
+    // Redirect the deconvolution input to the splitter
+    unsigned int splitterDimSizes[4] = {static_cast<unsigned int>(inputShape.dim(0)),
+                                        static_cast<unsigned int>(inputShape.dim(1)),
+                                        static_cast<unsigned int>(inputShape.dim(2)),
+                                        static_cast<unsigned int>(inputShape.dim(3))};
+
+    // Split dimension 1 of the splitter output shape and deconv input shapes
+    // according to the number of groups
+
+    splitterDimSizes[1] /= numGroups;
+    inputShape.set_dim(1, splitterDimSizes[1]);
+
+    // This is used to describe how the input is to be split
+    ViewsDescriptor splitterDesc(numGroups);
+
+    // Create an output node for each group, giving each a unique name
+    for (unsigned int g = 0; g < numGroups; ++g)
+    {
+        // Work out the names of the splitter layers child deconvolutions
+        stringstream ss;
+        ss << layerParam.name() << "_" << g;
+        convLayerNames[g] = ss.str();
+
+        splitterDesc.SetViewOriginCoord(g, 1, splitterDimSizes[1] * g);
+
+        // Set the size of the views.
+        for (unsigned int dimIdx=0; dimIdx < 4; dimIdx++)
+        {
+            splitterDesc.SetViewSize(g, dimIdx, splitterDimSizes[dimIdx]);
+        }
+    }
+
+    const std::string splitterLayerName = std::string("splitter_") + layerParam.bottom(0);
+    armnn::IConnectableLayer* splitterLayer = m_Network->AddSplitterLayer(splitterDesc, splitterLayerName.c_str());
+
+    inputConnection.Connect(splitterLayer->GetInputSlot(0));
+    for (unsigned int i = 0; i < splitterLayer->GetNumOutputSlots(); i++)
+    {
+        splitterLayer->GetOutputSlot(i).SetTensorInfo(BlobShapeToTensorInfo(inputShape));
+    }
+
+    unsigned int numFilters = convParam.num_output();
+
+    // Populates deconvolution output tensor descriptor dimensions.
+    BlobShape outputShape;
+    outputShape.add_dim(0);
+    outputShape.set_dim(0, inputShape.dim(0));
+    outputShape.add_dim(1);
+    // Ensures that dimension 1 of the deconvolution output is split according to the number of groups.
+    outputShape.set_dim(1, numFilters / numGroups);
+    outputShape.add_dim(2);
+    outputShape.set_dim(
+        2, (static_cast<int>(
+                desc.m_StrideY * (inputShape.dim(2) - 1) - 2 * desc.m_PadBottom + kernelH)));
+    outputShape.add_dim(3);
+    outputShape.set_dim(
+        3, (static_cast<int>(
+                desc.m_StrideX * (inputShape.dim(3) - 1) - 2 * desc.m_PadRight + kernelW)));
+
+    // Load the weight data for ALL groups
+    vector<float> weightData(armnn::numeric_cast<size_t>(numGroups *
+                                                         inputShape.dim(1) *  // number of input channels
+                                                         outputShape.dim(1) * // number of output channels
+                                                         kernelH *
+                                                         kernelW));
+    GetDataFromBlob(layerParam, weightData, 0);
+
+    const unsigned int weightDimSizes[4] = {
+        static_cast<unsigned int>(outputShape.dim(1)),
+        static_cast<unsigned int>(inputShape.dim(1)),
+        kernelH,
+        kernelW};
+
+    TensorInfo biasInfo;
+    vector<float> biasData;
+
+    if (desc.m_BiasEnabled)
+    {
+        biasData.resize(armnn::numeric_cast<size_t>(numGroups * outputShape.dim(1)), 1.f);
+        GetDataFromBlob(layerParam, biasData, 1);
+
+        const unsigned int biasDimSizes[1] = {static_cast<unsigned int>(outputShape.dim(1))};
+        biasInfo = TensorInfo(1, biasDimSizes, DataType::Float32);
+    }
+
+    const unsigned int numWeightsPerGroup = armnn::numeric_cast<unsigned int>(weightData.size()) / numGroups;
+    const unsigned int numBiasesPerGroup  = armnn::numeric_cast<unsigned int>(biasData.size()) / numGroups;
+
+    for (unsigned int g = 0; g < numGroups; ++g)
+    {
+        // Sets the slot index, group 0 should be connected to the 0th output of the splitter
+        // group 1 should be connected to the 1st output of the splitter.
+
+        // Pulls out the weights for this group from that loaded from the model file earlier.
+        ConstTensor weights(TensorInfo(4, weightDimSizes, DataType::Float32),
+                            weightData.data() + numWeightsPerGroup * g);
+
+        IConnectableLayer* deconvLayer = nullptr;
+        Optional<ConstTensor> optionalBiases;
+        if (desc.m_BiasEnabled)
+        {
+            // Pulls out the biases for this group from that loaded from the model file earlier.
+            ConstTensor biases(biasInfo, biasData.data() + numBiasesPerGroup * g);
+            optionalBiases = Optional<ConstTensor>(biases);
+        }
+        deconvLayer = m_Network->AddTransposeConvolution2dLayer(desc,
+                                                     weights,
+                                                     optionalBiases,
+                                                     convLayerNames[g].c_str());
+        convLayers[g] = deconvLayer;
+
+        // If we have more than one group then the input to the nth deconvolution the splitter layer's nth output,
+        // otherwise it's the regular input to this layer.
+        armnn::IOutputSlot& splitterInputConnection =
+            splitterLayer ? splitterLayer->GetOutputSlot(g) : inputConnection;
+        splitterInputConnection.Connect(deconvLayer->GetInputSlot(0));
+        deconvLayer->GetOutputSlot(0).SetTensorInfo(BlobShapeToTensorInfo(outputShape));
+    }
+
+    // If the deconvolution was performed in chunks, add a layer to concatenate the results
+
+    // The merge input shape matches that of the deconvolution output
+    unsigned int concatDimSizes[4] = {static_cast<unsigned int>(outputShape.dim(0)),
+                                      static_cast<unsigned int>(outputShape.dim(1)),
+                                      static_cast<unsigned int>(outputShape.dim(2)),
+                                      static_cast<unsigned int>(outputShape.dim(3))};
+
+    // This is used to describe how the input is to be concatenated
+    OriginsDescriptor concatDesc(numGroups);
+
+    // Now create an input node for each group, using the name from
+    // the output of the corresponding deconvolution
+    for (unsigned int g = 0; g < numGroups; ++g)
+    {
+        concatDesc.SetViewOriginCoord(g, 1, concatDimSizes[1] * g);
+    }
+
+    // Make sure the output from the concat is the correct size to hold the data for all groups
+    concatDimSizes[1] *= numGroups;
+    outputShape.set_dim(1, concatDimSizes[1]);
+
+    // Finally add the concat layer
+    IConnectableLayer* concatLayer = m_Network->AddConcatLayer(concatDesc, layerParam.name().c_str());
+
+    if (!concatLayer)
+    {
+        throw ParseException(
+            fmt::format("Failed to create final concat layer for Split+Deconvolution+Concat. "
                         "Layer={} #groups={} #filters={} {}",
                         layerParam.name(),
                         numGroups,
@@ -853,6 +1042,181 @@ void CaffeParserBase::ParseConvLayer(const LayerParameter& layerParam)
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), returnLayer->GetOutputSlot(0));
 }
 
+void CaffeParserBase::ParseDeconvLayer(const LayerParameter& layerParam)
+{
+    // Ignored Caffe Parameters
+    // * Weight Filler
+    // * Bias Filler
+    // * Engine
+    // * Force nd_im2col
+    // * Axis
+
+    // Not Available ArmNN Interface Parameters
+    // * Rounding policy;
+
+    ARMNN_ASSERT(layerParam.type() == "Deconvolution");
+    ValidateNumInputsOutputs(layerParam, 1, 1);
+
+    ConvolutionParameter convParam = layerParam.convolution_param();
+    BlobShape inputShape = TensorDescToBlobShape(GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)).GetTensorInfo());
+    const unsigned int numGroups = convParam.has_group() ? convParam.group() : 1;
+    unsigned int numFilters = convParam.num_output();
+
+    const auto notFound = std::numeric_limits<unsigned int>::max();
+
+    unsigned int kernelH = GET_OPTIONAL_WITH_VECTOR_FALLBACK(convParam, ConvolutionParameter,
+                                                             kernel_h, kernel_size, unsigned int, notFound);
+    unsigned int kernelW = GET_OPTIONAL_WITH_VECTOR_FALLBACK(convParam, ConvolutionParameter,
+                                                             kernel_w, kernel_size, unsigned int, notFound);
+
+    unsigned int strideH = GET_OPTIONAL_WITH_VECTOR_FALLBACK(convParam, ConvolutionParameter,
+                                                             stride_h, stride, unsigned int, 1u);
+    unsigned int strideW = GET_OPTIONAL_WITH_VECTOR_FALLBACK(convParam, ConvolutionParameter,
+                                                             stride_w, stride, unsigned int, 1u);
+
+    unsigned int padH = GET_OPTIONAL_WITH_VECTOR_FALLBACK(convParam, ConvolutionParameter,
+                                                          pad_h, pad, unsigned int, 0u);
+    unsigned int padW = GET_OPTIONAL_WITH_VECTOR_FALLBACK(convParam, ConvolutionParameter,
+                                                          pad_w, pad, unsigned int, 0u);
+
+    unsigned int dilationH = convParam.dilation_size() > 0 ? convParam.dilation(0) : 1;
+    unsigned int dilationW = convParam.dilation_size() > 1 ? convParam.dilation(1) : convParam.dilation_size() > 0 ? convParam.dilation(0) : 1;
+
+    if (dilationH != 1 || dilationW != 1) {
+        fmt::format("Dilated decnvolution is not supported. "
+                "{}'s input has dilation {} {}. {}",
+                layerParam.name(),
+                dilationW, dilationH,
+                CHECK_LOCATION().AsString());
+    }
+
+    TransposeConvolution2dDescriptor deconvolution2dDescriptor;
+    deconvolution2dDescriptor.m_PadLeft     = padW;
+    deconvolution2dDescriptor.m_PadRight    = padW;
+    deconvolution2dDescriptor.m_PadTop      = padH;
+    deconvolution2dDescriptor.m_PadBottom   = padH;
+    deconvolution2dDescriptor.m_StrideX     = strideW;
+    deconvolution2dDescriptor.m_StrideY     = strideH;
+    deconvolution2dDescriptor.m_BiasEnabled = convParam.has_bias_term() ? convParam.bias_term() : true;
+
+    if (numGroups > numFilters)
+    {
+        throw ParseException(
+            fmt::format("Error parsing Deconvolution: {}. "
+                        "The 'group'={} parameter cannot be larger than the "
+                        "number of filters supplied ='{}'. {}",
+                        layerParam.name(),
+                        numGroups,
+                        numFilters,
+                        CHECK_LOCATION().AsString()));
+    }
+
+    if (inputShape.dim_size() != 4)
+    {
+        throw ParseException(
+            fmt::format("Deconvolution input shape is expected to have 4 dimensions. "
+                        "{}'s input has only {}. {}",
+                        layerParam.name(),
+                        inputShape.dim_size(),
+                        CHECK_LOCATION().AsString()));
+    }
+
+    if (numGroups > 1)
+    {
+        if (numGroups > inputShape.dim(1))
+        {
+            throw ParseException(
+                fmt::format("Error parsing Deconvolution: {}. "
+                            "The 'group'={} parameter cannot be larger than the "
+                            "channel of the input shape={} (in NCHW format). {}",
+                            layerParam.name(),
+                            numGroups,
+                            inputShape.dim(1),
+                            CHECK_LOCATION().AsString()));
+        }
+        else
+        {
+            // we split the input by channels into channels/groups separate convolutions
+            // and concatenate the results afterwards
+            AddDeconvLayerWithSplits(layerParam, deconvolution2dDescriptor, kernelW, kernelH);
+            return;
+        }
+    }
+
+    // NOTE: at this point we only need to handle #group=1 case, all other cases should be
+    //       handled by the AddDeconvLayer* helpers
+
+    // Populate deconvolution output tensor descriptor dimensions
+    BlobShape outputShape;
+    outputShape.add_dim(0);
+    outputShape.set_dim(0, inputShape.dim(0));
+    outputShape.add_dim(1);
+    outputShape.set_dim(1, numFilters);
+    outputShape.add_dim(2);
+    outputShape.set_dim(
+        2, (static_cast<int>(
+                strideH * (inputShape.dim(2) - 1) - 2 * padH + (dilationH * (kernelH - 1) + 1))));
+    outputShape.add_dim(3);
+    outputShape.set_dim(
+        3, (static_cast<int>(
+                strideW * (inputShape.dim(3) - 1) - 2 * padW + (dilationW * (kernelW - 1) + 1))));
+
+    // Load the weight data for ALL groups
+    vector<float> weightData(armnn::numeric_cast<size_t>(inputShape.dim(1) *
+                                                         outputShape.dim(1) *
+                                                         kernelH *
+                                                         kernelW));
+    GetDataFromBlob(layerParam, weightData, 0);
+
+    const unsigned int weightDimSizes[4] = {
+        static_cast<unsigned int>(outputShape.dim(1)), // output channels
+        static_cast<unsigned int>(inputShape.dim(1)),  // input channels
+        kernelH,
+        kernelW};
+
+    armnn::IConnectableLayer* returnLayer = nullptr;
+
+    // Pull out the weights for this group from that loaded from the model file earlier
+    ConstTensor weights(TensorInfo(4, weightDimSizes, DataType::Float32), weightData.data());
+    Optional<ConstTensor> optionalBiases;
+    vector<float> biasData;
+    if (deconvolution2dDescriptor.m_BiasEnabled)
+    {
+        TensorInfo biasInfo;
+
+        biasData.resize(armnn::numeric_cast<size_t>(outputShape.dim(1)), 1.f);
+        GetDataFromBlob(layerParam, biasData, 1);
+
+        const unsigned int biasDimSizes[1] = {static_cast<unsigned int>(outputShape.dim(1))};
+        biasInfo = TensorInfo(1, biasDimSizes, DataType::Float32);
+
+        // Pull out the biases for this group from that loaded from the model file earlier
+        ConstTensor biases(biasInfo, biasData.data());
+        optionalBiases = Optional<ConstTensor>(biases);
+    }
+    returnLayer = m_Network->AddTransposeConvolution2dLayer(deconvolution2dDescriptor,
+                                                   weights,
+                                                   optionalBiases,
+                                                   layerParam.name().c_str());
+
+    armnn::IOutputSlot& inputConnection = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0));
+    inputConnection.Connect(returnLayer->GetInputSlot(0));
+    returnLayer->GetOutputSlot(0).SetTensorInfo(BlobShapeToTensorInfo(outputShape));
+
+    if (!returnLayer)
+    {
+        throw ParseException(
+            fmt::format("Failed to create Deconvolution layer. "
+                        "Layer={} #groups={} #filters={} {}",
+                        layerParam.name(),
+                        numGroups,
+                        numFilters,
+                        CHECK_LOCATION().AsString()));
+    }
+
+    SetArmnnOutputSlotForCaffeTop(layerParam.top(0), returnLayer->GetOutputSlot(0));
+}
+
 void CaffeParserBase::ParsePoolingLayer(const LayerParameter& layerParam)
 {
     // Ignored Caffe Parameters
@@ -963,6 +1327,66 @@ void CaffeParserBase::ParsePoolingLayer(const LayerParameter& layerParam)
     GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)).Connect(poolingLayer->GetInputSlot(0));
     poolingLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), poolingLayer->GetOutputSlot(0));
+}
+
+void CaffeParserBase::ParseArgmaxLayer(const LayerParameter& layerParam)
+{
+    ValidateNumInputsOutputs(layerParam, 1, 1);
+    ArgMaxParameter param = layerParam.argmax_param();
+
+    BlobShape inputShape = TensorDescToBlobShape(GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)).GetTensorInfo());
+
+    const unsigned int topK = param.has_top_k() ? param.top_k() : 1;
+    if (topK != 1) {
+        throw ParseException(
+                fmt::format("ArgMaxLayer: Only support top_k equals to 1. Layer={} {}",
+                    layerParam.name(),
+                    CHECK_LOCATION().AsString()));
+    }
+
+    const unsigned int outMaxVal = param.has_out_max_val() ? param.out_max_val() : false;
+    if (outMaxVal) {
+        throw ParseException(
+                fmt::format("ArgMaxLayer: Does not support out_max_val. Layer={} {}",
+                    layerParam.name(),
+                    CHECK_LOCATION().AsString()));
+    }
+
+    int axis = param.has_axis() ? param.axis() : 1;
+    if (axis < 0) {
+        axis = inputShape.dim_size() - axis;
+    }
+    if ((axis < 0) || (axis >= inputShape.dim_size())) {
+        throw ParseException(
+            fmt::format("ArgMaxLayer: Invalid axis value which outside range of input dims. "
+                        "{}'s input has input dim_size {}, requested axis: {}. {}",
+                        layerParam.name(),
+                        inputShape.dim_size(),
+                        axis,
+                        CHECK_LOCATION().AsString()));
+    }
+
+    ArgMinMaxDescriptor desc;
+    desc.m_Axis = axis;
+    desc.m_Output_Type = armnn::DataType::Signed32;
+    desc.m_Function = ArgMinMaxFunction::Max;
+
+    armnn::IConnectableLayer* argmaxLayer = m_Network->AddArgMinMaxLayer(desc,
+        layerParam.name().c_str());
+
+    TensorShape outputShape(static_cast<unsigned int>(inputShape.dim_size() - 1));
+    int j = 0;
+    // remove the flatten axis
+    for (int i = 0; i < inputShape.dim_size(); ++i)
+    {
+        if (i == axis) continue;
+        outputShape[static_cast<unsigned int>(j++)] = static_cast<unsigned int>(inputShape.dim(i));
+    }
+    TensorInfo outputInfo(outputShape, DataType::Signed32);
+
+    GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)).Connect(argmaxLayer->GetInputSlot(0));
+    argmaxLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+    SetArmnnOutputSlotForCaffeTop(layerParam.top(0), argmaxLayer->GetOutputSlot(0));
 }
 
 void CaffeParserBase::ParseReluLayer(const LayerParameter& layerParam)

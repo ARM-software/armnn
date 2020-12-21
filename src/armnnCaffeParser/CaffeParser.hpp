@@ -56,6 +56,7 @@ protected:
     /// @{
     void ParseInputLayer(const caffe::LayerParameter& layerParam);
     void ParseConvLayer(const caffe::LayerParameter& layerParam);
+    void ParseDeconvLayer(const caffe::LayerParameter& layerParam);
     void ParsePoolingLayer(const caffe::LayerParameter& layerParam);
     void ParseReluLayer(const caffe::LayerParameter& layerParam);
     void ParseLRNLayer(const caffe::LayerParameter& layerParam);
@@ -67,6 +68,7 @@ protected:
     void ParseScaleLayer(const caffe::LayerParameter& layerParam);
     void ParseSplitLayer(const caffe::LayerParameter& layerParam);
     void ParseDropoutLayer(const caffe::LayerParameter& layerParam);
+    void ParseArgmaxLayer(const caffe::LayerParameter& layerParam);
     /// @}
 
     /// ParseConv may use these helpers depending on the group parameter
@@ -79,6 +81,10 @@ protected:
                                        const armnn::Convolution2dDescriptor & desc,
                                        unsigned int kernelW,
                                        unsigned int kernelH);
+    void AddDeconvLayerWithSplits(const caffe::LayerParameter& layerParam,
+                                const armnn::TransposeConvolution2dDescriptor& desc,
+                                unsigned int kernelW,
+                                unsigned int kernelH);
     /// @}
 
     /// Converts Caffe's protobuf tensor shape format to ArmNN's

@@ -3,11 +3,21 @@
 // SPDX-License-Identifier: MIT
 //
 
+#if !defined(__MACH__)
 .section .rodata
+#define EXTERN_ASM
+#else
+.const_data
+#define EXTERN_ASM _
+#endif
 
-.global deserialize_schema_start
-.global deserialize_schema_end
+#define GLUE(a, b) a ## b
+#define JOIN(a, b) GLUE(a, b)
+#define X(s) JOIN(EXTERN_ASM, s)
 
-deserialize_schema_start:
+.global X(deserialize_schema_start)
+.global X(deserialize_schema_end)
+
+X(deserialize_schema_start):
 .incbin ARMNN_SERIALIZER_SCHEMA_PATH
-deserialize_schema_end:
+X(deserialize_schema_end):

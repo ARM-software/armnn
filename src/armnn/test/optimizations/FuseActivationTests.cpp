@@ -374,7 +374,7 @@ void FuseActivationIntoPreviousLayerTest(ActivationDescriptor activationDescript
         {0, Tensor(run->GetOutputTensorInfo(networkIdentifier, 0), outputDataFused.data())}};
 
     // Execute network
-    run->EnqueueWorkload(networkIdentifier, inputTensorsFused, outputTensorsFused);
+    BOOST_TEST(run->EnqueueWorkload(networkIdentifier, inputTensorsFused, outputTensorsFused) == Status::Success);
 
     // SECOND NETWORK: NotFused
     // Construct ArmNN network
@@ -413,7 +413,8 @@ void FuseActivationIntoPreviousLayerTest(ActivationDescriptor activationDescript
         {1, Tensor(runNotFused->GetOutputTensorInfo(networkIdentifierNotFused, 1), outputData2NotFused.data())}};
 
     // Execute network
-    runNotFused->EnqueueWorkload(networkIdentifierNotFused, inputTensorsNotFused, outputTensorsNotFused);
+    BOOST_TEST(runNotFused->EnqueueWorkload(networkIdentifierNotFused, inputTensorsNotFused, outputTensorsNotFused)
+               == Status::Success);
 
     // Check the output of the fused-activation matches with the output of the activation in the "NotFused" network
     for (unsigned int n = 0; n < outputDataFused.size(); ++n)

@@ -2111,7 +2111,7 @@ BOOST_AUTO_TEST_CASE(CheckSocketConnectionException2)
     catch (const arm::pipe::SocketConnectionException& ex)
     {
         BOOST_CHECK(ex.GetSocketFd() == 0);
-        BOOST_CHECK(ex.GetErrorNo() == 111);
+        BOOST_CHECK(ex.GetErrorNo() == ECONNREFUSED);
         BOOST_CHECK(ex.what()
                     == std::string("SocketProfilingConnection: Cannot connect to stream socket: Connection refused"));
     }

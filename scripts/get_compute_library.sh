@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_11" # Release 20.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="97b3f11a1655c05bedaf378f85f94cdccb1536ba" #COMPMID-4076: ArmNN unittest failure with memory access voilation in FuseReLUIntoBatchNormFloat32CpuAccTest
+DEFAULT_CLFRAMEWORKREVISION="b309fc249e4383b4d40ae03e377c3cbad3f9f5f7" #Fix uniform_real_distribution_fp16 warning and single Dimension increment
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

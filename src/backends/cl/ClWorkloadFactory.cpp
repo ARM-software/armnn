@@ -5,6 +5,8 @@
 #include "ClWorkloadFactory.hpp"
 #include "ClBackendId.hpp"
 #include "ClBackendModelContext.hpp"
+#include "ClContextDeserializer.hpp"
+#include "ClContextSerializer.hpp"
 
 #include <Layer.hpp>
 
@@ -28,6 +30,7 @@
 #include <arm_compute/runtime/CL/CLScheduler.h>
 
 #include <Filesystem.hpp>
+#include <fstream>
 
 namespace armnn
 {
@@ -68,7 +71,11 @@ void ClWorkloadFactory::AfterWorkloadsCreated()
             auto filePath = modelOptions->GetCachedNetworkFilePath();
             if (filePath != "" && fs::exists(filePath) && fs::is_regular_file(filePath))
             {
-                ///  Saving will be implemented within IVGCVSW-5483 story.
+                // Serialize ClContext to the file specified
+                ClContextSerializer serializer;
+                serializer.Serialize(m_CLCompileContext);
+                std::ofstream file(filePath, std::ios::out | std::ios::binary);
+                serializer.SaveSerializedToStream(file);
             }
         }
     }
@@ -121,7 +128,9 @@ void ClWorkloadFactory::InitializeCLCompileContext()
             && fs::is_regular_file(filePath)
             && !(modelOptions->SaveCachedNetwork()))
         {
-            ///  Loading will be implemented within IVGCVSW-5483 story.
+            // Deserialize binary file and load into m_CLCompileContext
+            ClContextDeserializer deserializer;
+            deserializer.Deserialize(m_CLCompileContext, context, device, filePath);
         }
     }
 }

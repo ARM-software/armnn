@@ -1,0 +1,21 @@
+//
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// SPDX-License-Identifier: MIT
+//
+
+namespace armnn;
+
+file_identifier "ARMN";
+
+file_extension "armnn";
+
+table ClContext {
+    programs:[Program];
+}
+
+table Program {
+    name:string;
+    binary:[ubyte];
+}
+
+root_type ClContext;

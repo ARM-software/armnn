@@ -5,6 +5,7 @@
 
 list(APPEND armnnClBackendUnitTests_sources
     ClContextControlFixture.hpp
+    ClContextSerializerTests.cpp
     ClCreateWorkloadTests.cpp
     ClEndToEndTests.cpp
     ClJsonPrinterTests.cpp

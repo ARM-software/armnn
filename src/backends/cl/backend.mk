@@ -18,6 +18,8 @@ BACKEND_SOURCES := \
         ClBackendContext.cpp \
         ClBackendModelContext.cpp \
         ClContextControl.cpp \
+        ClContextDeserializer.cpp \
+        ClContextSerializer.cpp \
         ClLayerSupport.cpp \
         ClRegistryInitializer.cpp \
         ClTensorHandleFactory.cpp \
@@ -97,6 +99,7 @@ ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
 # Include the source files for the CL backend tests
 
 BACKEND_TEST_SOURCES := \
+        test/ClContextSerializerTests.cpp \
         test/ClCreateWorkloadTests.cpp \
         test/ClEndToEndTests.cpp \
         test/ClJsonPrinterTests.cpp \

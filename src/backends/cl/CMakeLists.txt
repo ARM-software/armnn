@@ -4,7 +4,23 @@
 #
 
 if(ARMCOMPUTECL)
+    find_program(FLATC flatc
+                 HINTS ${FLATC_DIR}
+                 DOC "Path to 'flatc', the flatbuffers compiler")
+    if (NOT FLATC)
+        message(SEND_ERROR "flatc not found. Specify the full path of the flatc executable with -DFLATC=<flatc path>")
+    endif()
+
+    add_custom_command(
+        # Generate an ClContextSchema_generated.h file if it doesn't exist, or update it when necessary otherwise
+        OUTPUT ClContextSchema_generated.h DEPENDS ClContextSchema.fbs
+        COMMAND ${FLATC} -o ${CMAKE_CURRENT_BINARY_DIR} --cpp ${CMAKE_CURRENT_SOURCE_DIR}/ClContextSchema.fbs
+        #COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/ClContextSchema_generated.h
+        #                                         ${CMAKE_CURRENT_SOURCE_DIR}/ClContextSchema_generated.h
+    )
+
     list(APPEND armnnClBackend_sources
+        ClContextSchema_generated.h
         ClBackend.cpp
         ClBackend.hpp
         ClBackendContext.cpp
@@ -14,6 +30,10 @@ if(ARMCOMPUTECL)
         ClBackendModelContext.hpp
         ClContextControl.cpp
         ClContextControl.hpp
+        ClContextDeserializer.hpp
+        ClContextDeserializer.cpp
+        ClContextSerializer.hpp
+        ClContextSerializer.cpp
         ClLayerSupport.cpp
         ClLayerSupport.hpp
         ClRegistryInitializer.cpp

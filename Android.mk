@@ -238,6 +238,7 @@ LOCAL_SRC_FILES := \
         src/profiling/backends/BackendProfiling.cpp
 
 LOCAL_STATIC_LIBRARIES := \
+        libflatbuffers-framework \
         arm_compute_library 
 
 LOCAL_SHARED_LIBRARIES := \
@@ -422,6 +423,7 @@ endif
 LOCAL_STATIC_LIBRARIES := \
         libneuralnetworks_common \
         libboost_unit_test_framework \
+        libflatbuffers-framework \
         arm_compute_library
 
 LOCAL_WHOLE_STATIC_LIBRARIES := libarmnn

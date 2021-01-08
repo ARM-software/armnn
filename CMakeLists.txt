@@ -1160,7 +1160,7 @@ install(
     EXPORT      armnn-targets
     FILE        ArmnnTargets.cmake
     NAMESPACE   Armnn::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
 ####################################################
@@ -1173,7 +1173,7 @@ message(STATUS "CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}" )
 configure_package_config_file(
     ${CMAKE_CURRENT_LIST_DIR}/cmake/ArmnnConfig.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/ArmnnConfig.cmake
-    INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
 ####################################################
@@ -1181,7 +1181,7 @@ configure_package_config_file(
 install(
     FILES
     ${CMAKE_CURRENT_BINARY_DIR}/ArmnnConfig.cmake
-    DESTINATION ${INSTALL_CONFIGDIR}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
 ####################################################

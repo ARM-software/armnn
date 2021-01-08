@@ -97,6 +97,8 @@ struct Params
     bool                            m_ParseUnsupported;
     bool                            m_InferOutputShape;
     bool                            m_EnableFastMath;
+    bool                            m_SaveCachedNetwork;
+    std::string                     m_CachedNetworkFilePath;
 
     Params()
         : m_ComputeDevices{}
@@ -109,6 +111,8 @@ struct Params
         , m_ParseUnsupported(false)
         , m_InferOutputShape(false)
         , m_EnableFastMath(false)
+        , m_SaveCachedNetwork(false)
+        , m_CachedNetworkFilePath("")
     {}
 };
 
@@ -426,7 +430,9 @@ public:
 
             armnn::BackendOptions gpuAcc("GpuAcc",
             {
-                { "FastMathEnabled", params.m_EnableFastMath }
+                { "FastMathEnabled", params.m_EnableFastMath },
+                { "SaveCachedNetwork", params.m_SaveCachedNetwork },
+                { "CachedNetworkFilePath", params.m_CachedNetworkFilePath }
             });
             armnn::BackendOptions cpuAcc("CpuAcc",
             {

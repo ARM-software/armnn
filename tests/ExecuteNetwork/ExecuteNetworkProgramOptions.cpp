@@ -276,6 +276,16 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "performance improvements but may result in reduced or different precision.",
                  cxxopts::value<bool>(m_ExNetParams.m_EnableFastMath)->default_value("false")->implicit_value("true"))
 
+                ("save-cached-network",
+                 "Enables saving of the cached network. "
+                 "See also --cached-network-filepath",
+                 cxxopts::value<bool>(m_ExNetParams.m_SaveCachedNetwork)
+                 ->default_value("false")->implicit_value("true"))
+
+                ("cached-network-filepath",
+                 "If non-empty, the given file will be used to load/save cached network.",
+                 cxxopts::value<std::string>(m_ExNetParams.m_CachedNetworkFilePath)->default_value(""))
+
                 ("fp16-turbo-mode",
                  "If this option is enabled, FP32 layers, "
                  "weights and biases will be converted to FP16 where the backend supports it",

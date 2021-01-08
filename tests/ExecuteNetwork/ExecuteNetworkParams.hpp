@@ -14,6 +14,7 @@ struct ExecuteNetworkParams
 {
     using TensorShapePtr = std::unique_ptr<armnn::TensorShape>;
 
+    std::string                   m_CachedNetworkFilePath;
     std::vector<armnn::BackendId> m_ComputeDevices;
     bool                          m_DequantizeOutput;
     std::string                   m_DynamicBackendsPath;
@@ -39,6 +40,7 @@ struct ExecuteNetworkParams
     bool                          m_ParseUnsupported = false;
     bool                          m_PrintIntermediate;
     bool                          m_QuantizeInput;
+    bool                          m_SaveCachedNetwork;
     size_t                        m_SubgraphId;
     double                        m_ThresholdTime;
     int                           m_TuningLevel;

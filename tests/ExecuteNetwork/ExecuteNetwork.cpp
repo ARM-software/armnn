@@ -301,6 +301,8 @@ int MainImpl(const ExecuteNetworkParams& params,
         inferenceModelParams.m_ParseUnsupported               = params.m_ParseUnsupported;
         inferenceModelParams.m_InferOutputShape               = params.m_InferOutputShape;
         inferenceModelParams.m_EnableFastMath                 = params.m_EnableFastMath;
+        inferenceModelParams.m_SaveCachedNetwork              = params.m_SaveCachedNetwork;
+        inferenceModelParams.m_CachedNetworkFilePath          = params.m_CachedNetworkFilePath;
 
         for(const std::string& inputName: params.m_InputNames)
         {

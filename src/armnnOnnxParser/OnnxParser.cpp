@@ -331,22 +331,28 @@ std::string TensorInfoAsString(const TensorInfo& info,
     return ss.str();
 }
 
-void CalcPadding(uint32_t inputSize, uint32_t filterSize, uint32_t stride, uint32_t* paddingFront,
-                 uint32_t* paddingBack, bool isUpper)
+void CalcPadding(uint32_t inputSize,
+                 uint32_t filterSize,
+                 uint32_t stride,
+                 uint32_t dilation,
+                 uint32_t* paddingFront,
+                 uint32_t* paddingBack,
+                 bool isUpper)
 {
     uint32_t outputSize = (inputSize + stride - 1) / stride;
-    uint32_t temp = (outputSize - 1) * stride + filterSize;
+    uint32_t dilatedSize = filterSize + (dilation - 1) * (filterSize - 1);
+    uint32_t temp = (outputSize - 1) * stride + dilatedSize;
     *paddingFront = (temp - inputSize) / 2;
     *paddingBack = *paddingFront;
     if((temp - inputSize) % 2 == 1)
     {
         if (isUpper)
         {
-          *paddingBack += 1;
+            *paddingBack += 1;
         }
         else
         {
-          *paddingFront += 1;
+            *paddingFront += 1;
         }
     }
 }
@@ -1025,8 +1031,20 @@ void OnnxParserImpl::AddPoolingLayer(const onnx::NodeProto& node, Pooling2dDescr
             auto inputInfo = *m_TensorsInfo[node.input(0)].m_info;
             uint32_t inputHeight = inputInfo.GetShape()[2];
             uint32_t inputWidth  = inputInfo.GetShape()[3];
-            CalcPadding(inputHeight, desc.m_PoolHeight, desc.m_StrideY, &desc.m_PadTop, &desc.m_PadBottom, isUpper);
-            CalcPadding(inputWidth, desc.m_PoolWidth, desc.m_StrideX, &desc.m_PadLeft, &desc.m_PadRight, isUpper);
+            CalcPadding(inputHeight,
+                        desc.m_PoolHeight,
+                        desc.m_StrideY,
+                        1u,
+                        &desc.m_PadTop,
+                        &desc.m_PadBottom,
+                        isUpper);
+            CalcPadding(inputWidth,
+                        desc.m_PoolWidth,
+                        desc.m_StrideX,
+                        1u,
+                        &desc.m_PadLeft,
+                        &desc.m_PadRight,
+                        isUpper);
         }
     }
     else
@@ -1327,25 +1345,6 @@ void OnnxParserImpl::ParseConv(const onnx::NodeProto& node)
 
     auto inputInfo = *m_TensorsInfo[node.input(0)].m_info;
 
-    std::vector<uint32_t> dilations = ReadOptionalNodeUint32ListAttribute(node, "dilations");
-    if (!dilations.empty())
-    {
-        std::stringstream ss;
-        ss << "[ ";
-        for (auto dilation : dilations)
-        {
-            ss << dilation << ", ";
-            if (dilation != 1u)
-            {
-                ss << "... ]";
-                throw ParseException(
-                    fmt::format("ArmNN only supports Convolution layers with dilations [1,1], and node '{}' "
-                                "has dilatation {} {}",
-                                node.name(), ss.str(), CHECK_LOCATION().AsString()));
-            }
-        }
-    }
-
     Convolution2dDescriptor desc;
     desc.m_BiasEnabled = false;
 
@@ -1359,6 +1358,13 @@ void OnnxParserImpl::ParseConv(const onnx::NodeProto& node)
     {
         desc.m_StrideX    = strides[1];
         desc.m_StrideY    = strides[0];
+    }
+
+    std::vector<uint32_t> dilations = ReadOptionalNodeUint32ListAttribute(node, "dilations");
+    if(!dilations.empty())
+    {
+        desc.m_DilationX = dilations[1];
+        desc.m_DilationY = dilations[0];
     }
 
     std::vector<uint32_t> pads = ReadOptionalNodeUint32ListAttribute(node, "pads");
@@ -1404,8 +1410,20 @@ void OnnxParserImpl::ParseConv(const onnx::NodeProto& node)
                 weightHeight = kernel_shape[0];
                 weightWidth = kernel_shape[1];
             }
-            CalcPadding(inputHeight, weightHeight, desc.m_StrideY, &desc.m_PadTop, &desc.m_PadBottom, isUpper);
-            CalcPadding(inputWidth, weightWidth, desc.m_StrideX, &desc.m_PadLeft, &desc.m_PadRight, isUpper);
+            CalcPadding(inputHeight,
+                        weightHeight,
+                        desc.m_StrideY,
+                        desc.m_DilationY,
+                        &desc.m_PadTop,
+                        &desc.m_PadBottom,
+                        isUpper);
+            CalcPadding(inputWidth,
+                        weightWidth,
+                        desc.m_StrideX,
+                        desc.m_DilationX,
+                        &desc.m_PadLeft,
+                        &desc.m_PadRight,
+                        isUpper);
         }
     }
     else

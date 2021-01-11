@@ -423,26 +423,27 @@ const std::list<std::string> ITfParser::TfParserImpl::m_ControlInputs = {
     "Assert"
 };
 
-inline void CalculateSamePadding(uint32_t inputSize, uint32_t stride,
-                                 uint32_t filterSize, bool samePadding,
-                                 uint32_t* paddingFront, uint32_t* paddingBack) {
-    *paddingFront = 0;
-    *paddingBack = 0;
-
-    if (samePadding) {
-        uint32_t outputSize = (inputSize + stride - 1) / stride;
-        uint32_t temp = (outputSize - 1) * stride + filterSize;
-        if (temp > inputSize) {
-            *paddingFront = (temp - inputSize) / 2;
-            *paddingBack = (temp - inputSize) - *paddingFront;
-        }
-    }
-}
-
-void CalcPadding(uint32_t input, uint32_t kernel, uint32_t stride, uint32_t& outPadHead, uint32_t& outPadTail,
+void CalcPadding(uint32_t inputSize,
+                 uint32_t filterSize,
+                 uint32_t stride,
+                 uint32_t dilation,
+                 uint32_t& paddingFront,
+                 uint32_t& paddingBack,
                  bool samePadding)
 {
-    CalculateSamePadding(input, stride, kernel, samePadding, &outPadHead, &outPadTail);
+    paddingFront = 0;
+    paddingBack = 0;
+    if (samePadding)
+    {
+        uint32_t outputSize = (inputSize + stride - 1) / stride;
+        uint32_t dilatedSize = filterSize + (dilation - 1) * (filterSize - 1);
+        uint32_t temp = (outputSize - 1) * stride + dilatedSize;
+        if (temp > inputSize)
+        {
+            paddingFront = (temp - inputSize) / 2;
+            paddingBack = (temp - inputSize) - paddingFront;
+        }
+    }
 }
 
 /// An Abstract base class which represents a single tensorflow operation (node)
@@ -1229,22 +1230,6 @@ ParsedTfOperationPtr ITfParser::TfParserImpl::ParseConv2D(const tensorflow::Node
     std::string dataFormat = ReadMandatoryNodeStringAttribute(nodeDef, "data_format");
     std::vector<uint32_t> strides = ReadMandatoryNodeUint32ListAttribute(nodeDef, "strides");
 
-    // Read the dilations, if present - only [1,1,1,1] (the default) is supported.
-    std::vector<uint32_t> dilations = ReadOptionalNodeUint32ListAttribute(nodeDef, "dilations");
-    if (!dilations.empty())
-    {
-        for (auto dilation : dilations)
-        {
-            if (dilation != 1u)
-            {
-                throw ParseException(
-                    fmt::format("ArmNN only supports Convolution layers with dilations [1,1,1,1] for {} {}",
-                                nodeDef.name(),
-                                CHECK_LOCATION().AsString()));
-            }
-        }
-    }
-
     Convolution2dDescriptor desc;
     desc.m_BiasEnabled = false;
 
@@ -1258,6 +1243,13 @@ ParsedTfOperationPtr ITfParser::TfParserImpl::ParseConv2D(const tensorflow::Node
 
     desc.m_StrideX = strides[dataLayoutIndexed.GetWidthIndex()];
     desc.m_StrideY = strides[dataLayoutIndexed.GetHeightIndex()];
+
+    std::vector<uint32_t> dilations = ReadOptionalNodeUint32ListAttribute(nodeDef, "dilations");
+    if (!dilations.empty())
+    {
+        desc.m_DilationX = dilations[dataLayoutIndexed.GetWidthIndex()];
+        desc.m_DilationY = dilations[dataLayoutIndexed.GetHeightIndex()];
+    }
 
     uint32_t inputHeight = inputTensorInfo.GetShape()[dataLayoutIndexed.GetHeightIndex()];
     uint32_t inputWidth  = inputTensorInfo.GetShape()[dataLayoutIndexed.GetWidthIndex()];
@@ -1296,21 +1288,23 @@ ParsedTfOperationPtr ITfParser::TfParserImpl::ParseConv2D(const tensorflow::Node
     if (paddingString == "SAME")
     {
         padding = true;
-
-        outputHeight = static_cast<uint32_t>(ceil(static_cast<float>(inputHeight) /
-                                                  static_cast<float>(desc.m_StrideY)));
-        outputWidth  = static_cast<uint32_t>(ceil(static_cast<float>(inputWidth) /
-                                                  static_cast<float>(desc.m_StrideX)));
     }
     else if (paddingString == "VALID")
     {
         padding = false;
-
-        outputHeight = static_cast<uint32_t>(ceil(static_cast<float>(inputHeight - weightHeight + 1) /
-                                                  static_cast<float>(desc.m_StrideY)));
-        outputWidth  = static_cast<uint32_t>(ceil(static_cast<float>(inputWidth - weightWidth + 1) /
-                                                  static_cast<float>(desc.m_StrideX)));
     }
+
+    CalcPadding(inputHeight, weightHeight, desc.m_StrideY, desc.m_DilationY, desc.m_PadTop, desc.m_PadBottom, padding);
+    CalcPadding(inputWidth, weightWidth, desc.m_StrideX, desc.m_DilationX, desc.m_PadLeft, desc.m_PadRight, padding);
+
+    // Calculate output height and  width
+    unsigned int dilatedFilterWidth = weightWidth + (desc.m_DilationX - 1) * (weightWidth - 1);
+    unsigned int readWidth = (inputWidth + desc.m_PadLeft + desc.m_PadRight) - dilatedFilterWidth;
+    outputWidth = 1 + (readWidth / desc.m_StrideX);
+
+    unsigned int dilatedFilterHeight = weightHeight + (desc.m_DilationY - 1) * (weightHeight - 1);
+    unsigned int readHeight = (inputHeight + desc.m_PadTop + desc.m_PadBottom) - dilatedFilterHeight;
+    outputHeight = 1 + (readHeight / desc.m_StrideY);
 
     switch (dataLayout)
     {
@@ -1330,9 +1324,6 @@ ParsedTfOperationPtr ITfParser::TfParserImpl::ParseConv2D(const tensorflow::Node
                                 DataType::Float32);
         break;
     }
-
-    CalcPadding(inputHeight, weightHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, padding);
-    CalcPadding(inputWidth, weightWidth, desc.m_StrideX, desc.m_PadLeft, desc.m_PadRight, padding);
 
     IConnectableLayer* layer = m_Network->AddConvolution2dLayer(desc,
                                                                 weightTensor,
@@ -1382,6 +1373,12 @@ ParsedTfOperationPtr ITfParser::TfParserImpl::ParseDepthwiseConv2D(const tensorf
 
     desc.m_StrideX = strides[dataLayoutIndexed.GetWidthIndex()];
     desc.m_StrideY = strides[dataLayoutIndexed.GetHeightIndex()];
+    std::vector<uint32_t> dilations = ReadOptionalNodeUint32ListAttribute(nodeDef, "dilations");
+    if (!dilations.empty())
+    {
+        desc.m_DilationX = dilations[dataLayoutIndexed.GetWidthIndex()];
+        desc.m_DilationY = dilations[dataLayoutIndexed.GetHeightIndex()];
+    }
 
     uint32_t inputHeight = inputTensorInfo.GetShape()[dataLayoutIndexed.GetHeightIndex()];
     uint32_t inputWidth  = inputTensorInfo.GetShape()[dataLayoutIndexed.GetWidthIndex()];
@@ -1416,21 +1413,23 @@ ParsedTfOperationPtr ITfParser::TfParserImpl::ParseDepthwiseConv2D(const tensorf
     if (paddingString == "SAME")
     {
         padding = true;
-
-        outputHeight = static_cast<uint32_t>(ceil(static_cast<float>(inputHeight) /
-                                                  static_cast<float>(desc.m_StrideY)));
-        outputWidth  = static_cast<uint32_t>(ceil(static_cast<float>(inputWidth) /
-                                                  static_cast<float>(desc.m_StrideX)));
     }
     else if (paddingString == "VALID")
     {
         padding = false;
-
-        outputHeight = static_cast<uint32_t>(ceil(static_cast<float>(inputHeight - weightHeight + 1) /
-                                                  static_cast<float>(desc.m_StrideY)));
-        outputWidth  = static_cast<uint32_t>(ceil(static_cast<float>(inputWidth - weightWidth + 1) /
-                                                  static_cast<float>(desc.m_StrideX)));
     }
+
+    CalcPadding(inputHeight, weightHeight, desc.m_StrideY, desc.m_DilationY, desc.m_PadTop, desc.m_PadBottom, padding);
+    CalcPadding(inputWidth, weightWidth, desc.m_StrideX, desc.m_DilationX, desc.m_PadLeft, desc.m_PadRight, padding);
+
+    // Calculate output height and  width
+    unsigned int dilatedFilterWidth = weightWidth + (desc.m_DilationX - 1) * (weightWidth - 1);
+    unsigned int readWidth = (inputWidth + desc.m_PadLeft + desc.m_PadRight) - dilatedFilterWidth;
+    outputWidth = 1 + (readWidth / desc.m_StrideX);
+
+    unsigned int dilatedFilterHeight = weightHeight + (desc.m_DilationY - 1) * (weightHeight - 1);
+    unsigned int readHeight = (inputHeight + desc.m_PadTop + desc.m_PadBottom) - dilatedFilterHeight;
+    outputHeight = 1 + (readHeight / desc.m_StrideY);
 
     switch (dataLayout)
     {
@@ -1450,9 +1449,6 @@ ParsedTfOperationPtr ITfParser::TfParserImpl::ParseDepthwiseConv2D(const tensorf
                                     DataType::Float32);
             break;
     }
-
-    CalcPadding(inputHeight, weightHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, padding);
-    CalcPadding(inputWidth, weightWidth, desc.m_StrideX, desc.m_PadLeft, desc.m_PadRight, padding);
 
     IConnectableLayer* layer = m_Network->AddDepthwiseConvolution2dLayer(desc,
                                                                          weightTensor,
@@ -3094,9 +3090,9 @@ ParsedTfOperationPtr ITfParser::TfParserImpl::ParsePooling2d(const tensorflow::N
             break;
     }
 
-    CalcPadding(inputWidth, pooling2dDescriptor.m_PoolWidth, pooling2dDescriptor.m_StrideX,
+    CalcPadding(inputWidth, pooling2dDescriptor.m_PoolWidth, pooling2dDescriptor.m_StrideX, 1u,
                 pooling2dDescriptor.m_PadLeft, pooling2dDescriptor.m_PadRight, padding);
-    CalcPadding(inputHeight, pooling2dDescriptor.m_PoolHeight, pooling2dDescriptor.m_StrideY,
+    CalcPadding(inputHeight, pooling2dDescriptor.m_PoolHeight, pooling2dDescriptor.m_StrideY, 1u,
                 pooling2dDescriptor.m_PadTop, pooling2dDescriptor.m_PadBottom, padding);
 
 

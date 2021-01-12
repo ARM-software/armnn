@@ -105,9 +105,12 @@ BOOST_AUTO_TEST_CASE(NeonTimerMeasure)
         BOOST_CHECK_EQUAL(measurements[0].m_Name, "NeonKernelTimer/0: NEFillBorderKernel");
         BOOST_CHECK(measurements[0].m_Value > 0.0);
     }
-    std::ostringstream oss;
-    oss << "NeonKernelTimer/" << measurements.size()-1 << ": NEActivationLayerKernel";
-    BOOST_CHECK_EQUAL(measurements[measurements.size()-1].m_Name, oss.str());
+    std::ostringstream oss_neon;
+    std::ostringstream oss_cpu;
+    oss_neon << "NeonKernelTimer/" << measurements.size()-1 << ": NEActivationLayerKernel";
+    oss_cpu << "NeonKernelTimer/" << measurements.size()-1 << ": CpuActivationKernel";
+    BOOST_CHECK(measurements[measurements.size()-1].m_Name == oss_neon.str() ||
+                measurements[measurements.size()-1].m_Name == oss_cpu.str());
     BOOST_CHECK(measurements[measurements.size()-1].m_Value > 0.0);
 }
 

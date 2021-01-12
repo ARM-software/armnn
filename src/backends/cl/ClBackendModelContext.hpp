@@ -16,6 +16,15 @@ namespace armnn
 ///  - "FastMathEnabled"\n
 ///    Using the fast_math flag can lead to performance improvements in fp32 and fp16 layers but may result in\n
 ///    results with reduced or different precision. The fast_math flag will not have any effect on int8 performance.
+///  - "SaveCachedNetwork"\n
+///    Using the save_cached_network flag enables saving the cached network\n
+///    to a file given with the cached_network_file_path option.
+///  - "CachedNetworkFilePath"\n
+///    If the cached_network_file_path is a valid file and the save_cached_network flag is present\n
+///    then the cached network will be saved to the given file.\n
+///    If the cached_network_file_path is a valid file and the save_cached_network flag is not present\n
+///    then the cached network will be loaded from the given file.\n
+///    This will remove the time taken for initial compilation of kernels and speed up the first execution.
 class ClBackendModelContext : public IBackendModelContext
 {
 public:

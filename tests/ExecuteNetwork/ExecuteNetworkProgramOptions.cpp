@@ -277,13 +277,17 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  cxxopts::value<bool>(m_ExNetParams.m_EnableFastMath)->default_value("false")->implicit_value("true"))
 
                 ("save-cached-network",
-                 "Enables saving of the cached network. "
+                 "Enables saving of the cached network to a file given with the cached-network-filepath option. "
                  "See also --cached-network-filepath",
                  cxxopts::value<bool>(m_ExNetParams.m_SaveCachedNetwork)
                  ->default_value("false")->implicit_value("true"))
 
                 ("cached-network-filepath",
-                 "If non-empty, the given file will be used to load/save cached network.",
+                 "If non-empty, the given file will be used to load/save the cached network. "
+                 "If save-cached-network is given then the cached network will be saved to the given file. "
+                 "To save the cached network a file must already exist. "
+                 "If save-cached-network is not given then the cached network will be loaded from the given file. "
+                 "This will remove initial compilation time of kernels and speed up the first execution.",
                  cxxopts::value<std::string>(m_ExNetParams.m_CachedNetworkFilePath)->default_value(""))
 
                 ("fp16-turbo-mode",

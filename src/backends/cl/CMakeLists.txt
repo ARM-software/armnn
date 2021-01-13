@@ -15,8 +15,6 @@ if(ARMCOMPUTECL)
         # Generate an ClContextSchema_generated.h file if it doesn't exist, or update it when necessary otherwise
         OUTPUT ClContextSchema_generated.h DEPENDS ClContextSchema.fbs
         COMMAND ${FLATC} -o ${CMAKE_CURRENT_BINARY_DIR} --cpp ${CMAKE_CURRENT_SOURCE_DIR}/ClContextSchema.fbs
-        #COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/ClContextSchema_generated.h
-        #                                         ${CMAKE_CURRENT_SOURCE_DIR}/ClContextSchema_generated.h
     )
 
     list(APPEND armnnClBackend_sources
@@ -51,6 +49,8 @@ if(ARMCOMPUTECL)
     if(BUILD_UNIT_TESTS)
         add_subdirectory(test)
     endif()
+
+    include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
 
 else()
     list(APPEND armnnClBackend_sources

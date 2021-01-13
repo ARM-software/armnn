@@ -18,6 +18,8 @@ ARMNN_SOURCE_HEADER_PATH := $(LOCAL_PATH)/src/armnn
 ARMNN_SOURCE_UTILS_HEADER_PATH := $(LOCAL_PATH)/src/armnnUtils
 ARMNN_BACKENDS_HEADER_PATH := $(LOCAL_PATH)/src/backends
 ARMNN_PROFILING_HEADER_PATH := $(LOCAL_PATH)/src/profiling
+ARMNN_SERIALIZER_HEADER_PATH := $(LOCAL_PATH)/src/armnnSerializer
+ARMNN_DESERIALIZER_HEADER_PATH := $(LOCAL_PATH)/src/armnnDeserializer
 
 # find the common.mk and backend.mk files in the backend source folders
 ARMNN_BACKEND_COMMON_MAKEFILE_LOCAL_PATHS := $(wildcard $(LOCAL_PATH)/src/backends/*/common.mk)
@@ -74,7 +76,9 @@ LOCAL_EXPORT_C_INCLUDES := \
         $(ARMNN_THIRD_PARTY_INCLUDE_PATH) \
         $(ARMNN_SOURCE_UTILS_HEADER_PATH) \
         $(ARMNN_PROFILING_HEADER_PATH) \
-        $(ARMNN_BACKENDS_HEADER_PATH)
+        $(ARMNN_BACKENDS_HEADER_PATH) \
+        $(ARMNN_SERIALIZER_HEADER_PATH) \
+        $(ARMNN_DESERIALIZER_HEADER_PATH)
 
 LOCAL_C_INCLUDES := \
         $(OPENCL_HEADER_PATH) \
@@ -88,7 +92,9 @@ LOCAL_C_INCLUDES := \
         $(ARMNN_SOURCE_HEADER_PATH) \
         $(ARMNN_SOURCE_UTILS_HEADER_PATH) \
         $(ARMNN_PROFILING_HEADER_PATH) \
-        $(ARMNN_BACKENDS_HEADER_PATH)
+        $(ARMNN_BACKENDS_HEADER_PATH) \
+        $(ARMNN_SERIALIZER_HEADER_PATH) \
+        $(ARMNN_DESERIALIZER_HEADER_PATH)
 
 LOCAL_SRC_FILES := \
         $(ARMNN_BACKEND_SOURCES) \
@@ -235,7 +241,10 @@ LOCAL_SRC_FILES := \
         src/profiling/SocketProfilingConnection.cpp \
         src/profiling/TimelinePacketWriterFactory.cpp \
         src/profiling/TimelineUtilityMethods.cpp \
-        src/profiling/backends/BackendProfiling.cpp
+        src/profiling/backends/BackendProfiling.cpp \
+        src/armnnSerializer/Serializer.cpp \
+        src/armnnSerializer/SerializerUtils.cpp \
+        src/armnnDeserializer/Deserializer.cpp
 
 LOCAL_STATIC_LIBRARIES := \
         libflatbuffers-framework \
@@ -322,7 +331,9 @@ LOCAL_C_INCLUDES := \
         $(ARMNN_SOURCE_HEADER_PATH) \
         $(ARMNN_SOURCE_UTILS_HEADER_PATH) \
         $(ARMNN_PROFILING_HEADER_PATH) \
-        $(ARMNN_BACKENDS_HEADER_PATH)
+        $(ARMNN_BACKENDS_HEADER_PATH) \
+        $(ARMNN_SERIALIZER_HEADER_PATH) \
+        $(ARMNN_DESERIALIZER_HEADER_PATH)
 
 LOCAL_CFLAGS := \
         -std=$(CPP_VERSION) \
@@ -412,7 +423,9 @@ LOCAL_SRC_FILES := \
         src/profiling/test/TestTimelinePacketHandler.cpp \
         src/profiling/test/TimelineModel.cpp \
         src/profiling/test/TimelinePacketTests.cpp \
-        src/profiling/test/TimelineUtilityMethodsTests.cpp
+        src/profiling/test/TimelineUtilityMethodsTests.cpp \
+        src/armnnSerializer/test/ActivationSerializationTests.cpp \
+        src/armnnSerializer/test/SerializerTests.cpp
 
 ifeq ($(ARMNN_REF_ENABLED),1)
 LOCAL_SRC_FILES += \

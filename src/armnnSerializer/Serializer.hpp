@@ -11,7 +11,7 @@
 
 #include <unordered_map>
 
-#include <ArmnnSchema_generated.h>
+#include "ArmnnSchema_generated.h"
 
 #include <armnn/Types.hpp>
 

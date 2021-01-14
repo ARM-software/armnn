@@ -16,9 +16,9 @@ You must use your real name, no pseudonyms or anonymous contributions are accept
 
 In each source file, include the following copyright notice:
 
-//
-// Copyright © <years additions were made to project> <your name> and Contributors. All rights reserved.
-// SPDX-License-Identifier: MIT
+//  
+// Copyright © `<years additions were made to project> <your name>` and Contributors. All rights reserved.  
+// SPDX-License-Identifier: MIT  
 //
 
 Note: if an existing file does not conform, update it when you next modify it, as convenient.

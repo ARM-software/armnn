@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -106,8 +106,7 @@ void DynamicQuantizationVisitor::VisitArgMinMaxLayer(const IConnectableLayer* la
 {
     IgnoreUnused(name);
     IgnoreUnused(desc);
-    SetRange(layer, 0, -20.f, 20.f);
-    AddToCalibratedLayers(layer);
+    AddToNonCalibratedLayers(layer);
 }
 
 void DynamicQuantizationVisitor::VisitBatchNormalizationLayer(const IConnectableLayer* layer,

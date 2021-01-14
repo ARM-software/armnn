@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,7 +8,6 @@
 #include "../NetworkQuantizerUtils.hpp"
 #include "../OverrideInputRangeVisitor.hpp"
 #include "../RangeTracker.hpp"
-#include "../../armnnQuantizer/CommandLineProcessor.hpp"
 
 #include <armnn/INetwork.hpp>
 #include <armnn/LayerVisitorBase.hpp>
@@ -314,6 +313,50 @@ INetworkPtr CreateNetworkWithActivationLayer(const ActivationDescriptor& descrip
     return network;
 }
 
+class TestArgMinMaxQuantization : public TestQuantization
+{
+public:
+    TestArgMinMaxQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+            : TestQuantization(inputShape, outputShape) {}
+
+    TestArgMinMaxQuantization(const QuantizerOptions& options,
+                              const TensorShape& inputShape,
+                              const TensorShape& outputShape)
+            : TestQuantization(options, inputShape, outputShape) {}
+
+    void VisitArgMinMaxLayer(const IConnectableLayer* layer,
+                             const ArgMinMaxDescriptor&,
+                             const char* name = nullptr) override
+    {
+        IgnoreUnused(name);
+        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+        BOOST_CHECK(info.GetDataType() == DataType::Signed32);
+    }
+};
+
+INetworkPtr CreateNetworkWithArgMinMaxLayer(const ArgMinMaxDescriptor& descriptor, const TensorShape& shape)
+{
+    INetworkPtr network = INetwork::Create();
+
+    // Add the layers
+    IConnectableLayer* input0 = network->AddInputLayer(0);
+    IConnectableLayer* activation = network->AddArgMinMaxLayer(descriptor);
+    IConnectableLayer* output = network->AddOutputLayer(2);
+
+    // Establish connections
+    input0->GetOutputSlot(0).Connect(activation->GetInputSlot(0));
+    activation->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    // Set TensorInfo
+    TensorInfo inInfo(shape, DataType::Float32);
+    input0->GetOutputSlot(0).SetTensorInfo(inInfo);
+    TensorInfo outInfo({1}, DataType::Signed32);
+    activation->GetOutputSlot(0).SetTensorInfo(outInfo);
+
+    return network;
+}
+
 INetworkPtr CreateNetworkWithInputOutputLayers()
 {
     INetworkPtr network = INetwork::Create();
@@ -432,6 +475,35 @@ BOOST_AUTO_TEST_CASE(QuantizeAbsActivation)
     const QuantizerOptions qSymmS16options(DataType::QSymmS16);
     INetworkPtr quantizedNetworkQSymmS16 = INetworkQuantizer::Create(network.get(), qSymmS16options)->ExportNetwork();
     TestActivationQuantization validatorQSymmS16(qSymmS16options, shape, shape);
+    VisitLayersTopologically(quantizedNetworkQSymmS16.get(), validatorQSymmS16);
+}
+
+BOOST_AUTO_TEST_CASE(QuantizeArgMax)
+{
+    ArgMinMaxDescriptor descriptor;
+    descriptor.m_Function = ArgMinMaxFunction::Max;
+
+    const TensorShape shape{1U};
+    INetworkPtr network = CreateNetworkWithArgMinMaxLayer(descriptor, shape);
+
+    const QuantizerOptions qAsymmU8Options(DataType::QAsymmU8);
+    INetworkPtr quantizedNetworkQAsymmU8 = INetworkQuantizer::Create(network.get(), qAsymmU8Options)->ExportNetwork();
+    TestArgMinMaxQuantization validatorQAsymmU8(shape, shape);
+    VisitLayersTopologically(quantizedNetworkQAsymmU8.get(), validatorQAsymmU8);
+
+    const QuantizerOptions qAsymmS8Options(DataType::QAsymmS8);
+    INetworkPtr quantizedNetworkQAsymmS8 = INetworkQuantizer::Create(network.get(), qAsymmS8Options)->ExportNetwork();
+    TestArgMinMaxQuantization validatorQAsymmS8(qAsymmS8Options, shape, shape);
+    VisitLayersTopologically(quantizedNetworkQAsymmS8.get(), validatorQAsymmS8);
+
+    const QuantizerOptions qSymmS8Options(DataType::QSymmS8);
+    INetworkPtr quantizedNetworkQSymmS8 = INetworkQuantizer::Create(network.get(), qSymmS8Options)->ExportNetwork();
+    TestArgMinMaxQuantization validatorQSymmS8(qSymmS8Options, shape, shape);
+    VisitLayersTopologically(quantizedNetworkQSymmS8.get(), validatorQSymmS8);
+
+    const QuantizerOptions qSymmS16options(DataType::QSymmS16);
+    INetworkPtr quantizedNetworkQSymmS16 = INetworkQuantizer::Create(network.get(), qSymmS16options)->ExportNetwork();
+    TestArgMinMaxQuantization validatorQSymmS16(qSymmS16options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymmS16.get(), validatorQSymmS16);
 }
 

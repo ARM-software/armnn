@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -24,6 +24,10 @@ public:
 
     /// Functions to set the Range on a per-layer-type basis
     void VisitAdditionLayer(const IConnectableLayer* layer, const char* name = nullptr) override;
+
+    void VisitArgMinMaxLayer(const IConnectableLayer* layer,
+                             const ArgMinMaxDescriptor& desc,
+                             const char* name = nullptr) override;
 
     void VisitBatchNormalizationLayer(const IConnectableLayer* layer,
                                       const BatchNormalizationDescriptor& desc,

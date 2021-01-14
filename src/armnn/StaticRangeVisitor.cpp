@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -107,11 +107,20 @@ void StaticRangeVisitor::VisitActivationLayer(const IConnectableLayer* layer,
     }
 }
 
-void StaticRangeVisitor::VisitFullyConnectedLayer(const IConnectableLayer *layer,
+void StaticRangeVisitor::VisitArgMinMaxLayer(const armnn::IConnectableLayer* layer,
+                                             const armnn::ArgMinMaxDescriptor& argMinMaxDescriptor,
+                                             const char* name)
+{
+    IgnoreUnused(argMinMaxDescriptor);
+    IgnoreUnused(name);
+    ForwardParentParameters(layer);
+}
+
+void StaticRangeVisitor::VisitFullyConnectedLayer(const IConnectableLayer* layer,
                                                   const FullyConnectedDescriptor& desc,
                                                   const ConstTensor& weights,
                                                   const Optional<ConstTensor>& biases,
-                                                  const char *name)
+                                                  const char* name)
 {
     IgnoreUnused(desc);
     IgnoreUnused(weights);

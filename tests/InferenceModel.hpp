@@ -464,7 +464,12 @@ public:
         armnn::Status ret;
         {
             ARMNN_SCOPED_HEAP_PROFILING("LoadNetwork");
+
+            const auto loading_start_time = armnn::GetTimeNow();
             ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, std::move(optNet));
+
+            ARMNN_LOG(info) << "Network loading time: " << std::setprecision(2)
+                            << std::fixed << armnn::GetTimeDuration(loading_start_time).count() << " ms\n";
         }
 
         if (ret == armnn::Status::Failure)

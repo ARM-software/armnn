@@ -163,7 +163,8 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                 {
                     for (auto&& childInput : output->GetConnections())
                     {
-                        if (childInput->GetOwningLayer().GetType() == LayerType::Activation)
+                        if ((childInput->GetOwningLayer().GetType() == LayerType::Activation) &&
+                            (checkDataTypeInputandOutput(childInput->GetOwningLayer())))
                         {
                             Layer& child = childInput->GetOwningLayer();
 

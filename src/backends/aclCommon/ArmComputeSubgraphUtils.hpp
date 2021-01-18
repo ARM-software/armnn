@@ -45,6 +45,33 @@ SubgraphView::OutputSlots CreateOutputsFrom(const std::vector<Layer*>& layers)
     return result;
 }
 
+bool checkDataTypeInputandOutput(const Layer& layer)
+{
+    auto inputInfo = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+    auto outputInfo = layer.GetOutputSlot(0).GetTensorInfo();
+    bool sameDataType = (inputInfo.GetDataType() == outputInfo.GetDataType());
+
+    // Check is same quantization info (same scale and offset)
+    if (sameDataType)
+    {
+        if (IsQuantizedType(inputInfo.GetDataType()))
+        {
+            bool sameScale = (inputInfo.GetQuantizationScale() == outputInfo.GetQuantizationScale());
+            bool sameOffset = (inputInfo.GetQuantizationOffset() == outputInfo.GetQuantizationOffset());
+
+            return (sameScale && sameOffset);
+        }
+        else
+        {
+            return true;
+        }
+    }
+    else
+    {
+        return false;
+    }
+}
+
 } // namespace
 
 inline void ReportUntouchedLayers(OptimizationViews& optimizationViews, std::map<LayerGuid, Layer*> untouched)

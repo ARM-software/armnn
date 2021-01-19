@@ -108,6 +108,8 @@ if(BUILD_UNIT_TESTS)
     list(APPEND armnnDelegate_unittest_sources
         src/test/ActivationTest.cpp
         src/test/ActivationTestHelper.hpp
+        src/test/ArgMinMaxTest.cpp
+        src/test/ArgMinMaxTestHelper.hpp
         src/test/ArmnnDelegateTest.cpp
         src/test/ComparisonTest.cpp
         src/test/ComparisonTestHelper.hpp

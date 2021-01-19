@@ -10,6 +10,10 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 * ADD
 
+* ARGMAX
+
+* ARGMIN
+
 * AVERAGE_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 
 * CONCATENATION, Supported Fused Activation: RELU , RELU6 , TANH, NONE

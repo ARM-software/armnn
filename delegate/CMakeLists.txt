@@ -118,6 +118,8 @@ if(BUILD_UNIT_TESTS)
         src/test/ControlTestHelper.hpp
         src/test/Convolution2dTest.cpp
         src/test/ConvolutionTestHelper.hpp
+        src/test/DelegateOptionsTest.cpp
+        src/test/DelegateOptionsTestHelper.hpp
         src/test/DepthwiseConvolution2dTest.cpp
         src/test/ElementwiseBinaryTest.cpp
         src/test/ElementwiseBinaryTestHelper.hpp

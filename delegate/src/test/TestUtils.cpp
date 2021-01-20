@@ -71,17 +71,22 @@ void CompareData(Half tensor1[], Half tensor2[], size_t tensorSize)
 
 void CompareData(TfLiteFloat16 tensor1[], TfLiteFloat16 tensor2[], size_t tensorSize)
 {
+    uint16_t tolerance = 1;
     for (size_t i = 0; i < tensorSize; i++)
     {
-        CHECK(tensor1[i].data == tensor2[i].data);
+        uint16_t tensor1Data = tensor1[i].data;
+        uint16_t tensor2Data = tensor2[i].data;
+        CHECK(std::max(tensor1Data, tensor2Data) - std::min(tensor1Data, tensor2Data) <= tolerance);
     }
 }
 
-void CompareData(TfLiteFloat16 tensor1[], Half tensor2[], size_t tensorSize)
-{
+void CompareData(TfLiteFloat16 tensor1[], Half tensor2[], size_t tensorSize) {
+    uint16_t tolerance = 1;
     for (size_t i = 0; i < tensorSize; i++)
     {
-        CHECK(tensor1[i].data == half_float::detail::float2half<std::round_indeterminate, float>(tensor2[i]));
+        uint16_t tensor1Data = tensor1[i].data;
+        uint16_t tensor2Data = half_float::detail::float2half<std::round_indeterminate, float>(tensor2[i]);
+        CHECK(std::max(tensor1Data, tensor2Data) - std::min(tensor1Data, tensor2Data) <= tolerance);
     }
 }
 

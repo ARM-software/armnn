@@ -42,12 +42,13 @@ try \
             { \
                 if (reasonIfUnsupported.size() > 0) \
                 { \
-                    TF_LITE_KERNEL_LOG( \
-                        tfLiteContext, "%s: not supported by armnn: %s", funcName, reasonIfUnsupported.c_str()); \
+                    TFLITE_LOG_PROD(tflite::TFLITE_LOG_WARNING, \
+                                    "%s: not supported by armnn: %s", funcName, reasonIfUnsupported.c_str()); \
                 } \
                 else \
                 { \
-                    TF_LITE_KERNEL_LOG(tfLiteContext, "%s: not supported by armnn", funcName); \
+                    TFLITE_LOG_PROD(tflite::TFLITE_LOG_WARNING, \
+                                    "%s: not supported by armnn", funcName); \
                 } \
             } \
         } \

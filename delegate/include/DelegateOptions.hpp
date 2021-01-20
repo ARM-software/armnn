@@ -27,6 +27,18 @@ public:
                     const std::vector<armnn::BackendOptions>& backendOptions = {},
                     armnn::Optional<armnn::LogSeverity> logSeverityLevel = armnn::EmptyOptional());
 
+    DelegateOptions(armnn::Compute computeDevice,
+                    const armnn::OptimizerOptions& optimizerOptions,
+                    const armnn::INetworkProperties& networkProperties = armnn::INetworkProperties(),
+                    const armnn::Optional<armnn::LogSeverity>& logSeverityLevel = armnn::EmptyOptional(),
+                    const armnn::Optional<armnn::DebugCallbackFunction>& func = armnn::EmptyOptional());
+
+    DelegateOptions(const std::vector<armnn::BackendId>& backends,
+                    const armnn::OptimizerOptions& optimizerOptions,
+                    const armnn::INetworkProperties& networkProperties = armnn::INetworkProperties(),
+                    const armnn::Optional<armnn::LogSeverity>& logSeverityLevel = armnn::EmptyOptional(),
+                    const armnn::Optional<armnn::DebugCallbackFunction>& func = armnn::EmptyOptional());
+
     const std::vector<armnn::BackendId>& GetBackends() const { return m_Backends; }
 
     void SetBackends(const std::vector<armnn::BackendId>& backends) { m_Backends = backends; }
@@ -44,6 +56,13 @@ public:
     armnn::LogSeverity GetLoggingSeverity() { return m_LoggingSeverity.value(); }
 
     bool IsLoggingEnabled() { return m_LoggingSeverity.has_value(); }
+
+    const armnn::OptimizerOptions& GetOptimizerOptions() const { return m_OptimizerOptions; }
+
+    const armnn::Optional<armnn::DebugCallbackFunction>& GetDebugCallbackFunction() const
+        { return m_DebugCallbackFunc; }
+
+    const armnn::INetworkProperties& GetNetworkProperties() const { return m_NetworkProperties; };
 
 private:
     /// Which backend to run Delegate on.
@@ -70,8 +89,31 @@ private:
     ///   "KernelProfilingEnabled" : bool [true | false]
     std::vector<armnn::BackendOptions> m_BackendOptions;
 
+    /// OptimizerOptions
+    /// Reduce Fp32 data to Fp16 for faster processing
+    /// bool m_ReduceFp32ToFp16;
+    /// Add debug data for easier troubleshooting
+    /// bool m_Debug;
+    /// Reduce Fp32 data to Bf16 for faster processing
+    /// bool m_ReduceFp32ToBf16;
+    /// Infer output size when not available
+    /// ShapeInferenceMethod m_shapeInferenceMethod;
+    /// Enable Import
+    /// bool m_ImportEnabled;
+    /// Enable Model Options
+    /// ModelOptions m_ModelOptions;
+    armnn::OptimizerOptions m_OptimizerOptions;
+
+    /// Network properties to enable memory import
+    armnn::INetworkProperties m_NetworkProperties;
+
     /// Severity level for logging within ArmNN that will be used on creation of the delegate
     armnn::Optional<armnn::LogSeverity> m_LoggingSeverity;
+
+    /// A callback function to debug layers performing custom computations on intermediate tensors.
+    /// If a function is not registered, and debug is enabled in OptimizerOptions,
+    /// debug will print information of the intermediate tensors.
+     armnn::Optional<armnn::DebugCallbackFunction> m_DebugCallbackFunc;
 };
 
 } // namespace armnnDelegate

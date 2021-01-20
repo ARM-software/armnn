@@ -2130,6 +2130,10 @@ void TfLiteParser::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
             // Extract target shape from input
             auto bufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
             auto values = reinterpret_cast<const int32_t*>(bufferPtr->data.data());
+            if (!values)
+            {
+                ARMNN_THROW_PARSE_EXCEPTION("Reshape operator target shape input buffer data is null");
+            }
             for (int i=0; i < inputs[1]->shape[0]; ++i)
             {
                 targetShape.push_back(values[i]);

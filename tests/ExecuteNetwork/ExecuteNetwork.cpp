@@ -61,6 +61,11 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
                              armnnDelegate::TfLiteArmnnDelegateDelete);
     // Register armnn_delegate to TfLiteInterpreter
     int status = tfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate));
+    if (status == kTfLiteError)
+    {
+        ARMNN_LOG(fatal) << "Could not register ArmNN TfLite Delegate to TfLiteInterpreter!";
+        return EXIT_FAILURE;
+    }
 
     std::vector<std::string>  inputBindings;
     for (const std::string& inputName: params.m_InputNames)

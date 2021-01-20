@@ -20,6 +20,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 * CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 
+* DEPTH_TO_SPACE
+
 * DEPTHWISE_CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 
 * DEQUANTIZE
@@ -93,6 +95,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 * RSQRT
 
 * SOFTMAX
+
+* SPACE_TO_DEPTH
 
 * SPLIT
 

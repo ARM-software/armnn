@@ -145,6 +145,8 @@ if(BUILD_UNIT_TESTS)
         src/test/ResizeTestHelper.hpp
         src/test/SoftmaxTest.cpp
         src/test/SoftmaxTestHelper.hpp
+        src/test/SpaceDepthTest.cpp
+        src/test/SpaceDepthTestHelper.hpp
         src/test/SplitTest.cpp
         src/test/SplitTestHelper.hpp
         src/test/TestUtils.hpp

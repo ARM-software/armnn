@@ -152,6 +152,18 @@ struct ParserFlatbuffersFixture
                  const std::map<std::string, std::vector<armnn::ResolveType<ArmnnType2>>>& expectedOutputData,
                  bool isDynamic = false);
 
+    /// Multiple Inputs with different DataTypes, Multiple Outputs w/ Variable DataTypes
+    /// Executes the network with the given input tensors and checks the results against the given output tensors.
+    /// This overload supports multiple inputs and multiple outputs, identified by name along with the allowance for
+    /// the input datatype to be different to the output
+    template <std::size_t NumOutputDimensions,
+        armnn::DataType inputType1,
+        armnn::DataType inputType2,
+        armnn::DataType outputType>
+    void RunTest(size_t subgraphId,
+                 const std::map<std::string, std::vector<armnn::ResolveType<inputType1>>>& input1Data,
+                 const std::map<std::string, std::vector<armnn::ResolveType<inputType2>>>& input2Data,
+                 const std::map<std::string, std::vector<armnn::ResolveType<outputType>>>& expectedOutputData);
 
     /// Multiple Inputs, Multiple Outputs w/ Variable Datatypes and different dimension sizes.
     /// Executes the network with the given input tensors and checks the results against the given output tensors.
@@ -212,7 +224,29 @@ struct ParserFlatbuffersFixture
                                       tensors->quantization.get()->zero_point.begin(),
                                       tensors->quantization.get()->zero_point.end());
     }
+
+private:
+    /// Fills the InputTensors with given input data
+    template <armnn::DataType dataType>
+    void FillInputTensors(armnn::InputTensors& inputTensors,
+                          const std::map<std::string, std::vector<armnn::ResolveType<dataType>>>& inputData,
+                          size_t subgraphId);
 };
+
+/// Fills the InputTensors with given input data
+template <armnn::DataType dataType>
+void ParserFlatbuffersFixture::FillInputTensors(
+                  armnn::InputTensors& inputTensors,
+                  const std::map<std::string, std::vector<armnn::ResolveType<dataType>>>& inputData,
+                  size_t subgraphId)
+{
+    for (auto&& it : inputData)
+    {
+        armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(subgraphId, it.first);
+        armnn::VerifyTensorInfoDataType(bindingInfo.second, dataType);
+        inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
+    }
+}
 
 /// Single Input, Single Output
 /// Executes the network with the given input tensor and checks the result against the given output tensor.
@@ -256,12 +290,7 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
 
     // Setup the armnn input tensors from the given vectors.
     armnn::InputTensors inputTensors;
-    for (auto&& it : inputData)
-    {
-        armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(subgraphId, it.first);
-        armnn::VerifyTensorInfoDataType(bindingInfo.second, armnnType1);
-        inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
-    }
+    FillInputTensors<armnnType1>(inputTensors, inputData, subgraphId);
 
     // Allocate storage for the output tensors to be written to and setup the armnn output tensors.
     std::map<std::string, boost::multi_array<DataType2, NumOutputDimensions>> outputStorage;
@@ -310,13 +339,7 @@ void ParserFlatbuffersFixture::RunTest(std::size_t subgraphId,
 
     // Setup the armnn input tensors from the given vectors.
     armnn::InputTensors inputTensors;
-    for (auto&& it : inputData)
-    {
-        armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(subgraphId, it.first);
-        armnn::VerifyTensorInfoDataType(bindingInfo.second, armnnType1);
-
-        inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
-    }
+    FillInputTensors<armnnType1>(inputTensors, inputData, subgraphId);
 
     armnn::OutputTensors outputTensors;
     outputTensors.reserve(expectedOutputData.size());
@@ -345,5 +368,58 @@ void ParserFlatbuffersFixture::RunTest(std::size_t subgraphId,
                 BOOST_TEST(it.second[i] == out[i], boost::test_tools::tolerance(0.000001f));
             }
         }
+    }
+}
+
+/// Multiple Inputs with different DataTypes, Multiple Outputs w/ Variable DataTypes
+/// Executes the network with the given input tensors and checks the results against the given output tensors.
+/// This overload supports multiple inputs and multiple outputs, identified by name along with the allowance for
+/// the input datatype to be different to the output
+template <std::size_t NumOutputDimensions,
+          armnn::DataType inputType1,
+          armnn::DataType inputType2,
+          armnn::DataType outputType>
+void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
+    const std::map<std::string, std::vector<armnn::ResolveType<inputType1>>>& input1Data,
+    const std::map<std::string, std::vector<armnn::ResolveType<inputType2>>>& input2Data,
+    const std::map<std::string, std::vector<armnn::ResolveType<outputType>>>& expectedOutputData)
+{
+    using DataType2 = armnn::ResolveType<outputType>;
+
+    // Setup the armnn input tensors from the given vectors.
+    armnn::InputTensors inputTensors;
+    FillInputTensors<inputType1>(inputTensors, input1Data, subgraphId);
+    FillInputTensors<inputType2>(inputTensors, input2Data, subgraphId);
+
+    // Allocate storage for the output tensors to be written to and setup the armnn output tensors.
+    std::map<std::string, boost::multi_array<DataType2, NumOutputDimensions>> outputStorage;
+    armnn::OutputTensors outputTensors;
+    for (auto&& it : expectedOutputData)
+    {
+        armnn::LayerBindingId outputBindingId = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first).first;
+        armnn::TensorInfo outputTensorInfo = m_Runtime->GetOutputTensorInfo(m_NetworkIdentifier, outputBindingId);
+
+        // Check that output tensors have correct number of dimensions (NumOutputDimensions specified in test)
+        auto outputNumDimensions = outputTensorInfo.GetNumDimensions();
+        BOOST_CHECK_MESSAGE((outputNumDimensions == NumOutputDimensions),
+            fmt::format("Number of dimensions expected {}, but got {} for output layer {}",
+                        NumOutputDimensions,
+                        outputNumDimensions,
+                        it.first));
+
+        armnn::VerifyTensorInfoDataType(outputTensorInfo, outputType);
+        outputStorage.emplace(it.first, MakeTensor<DataType2, NumOutputDimensions>(outputTensorInfo));
+        outputTensors.push_back(
+                { outputBindingId, armnn::Tensor(outputTensorInfo, outputStorage.at(it.first).data()) });
+    }
+
+    m_Runtime->EnqueueWorkload(m_NetworkIdentifier, inputTensors, outputTensors);
+
+    // Compare each output tensor to the expected values
+    for (auto&& it : expectedOutputData)
+    {
+        armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first);
+        auto outputExpected = MakeTensor<DataType2, NumOutputDimensions>(bindingInfo.second, it.second);
+        BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first], false));
     }
 }

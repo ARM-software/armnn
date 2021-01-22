@@ -99,12 +99,14 @@ private:
     void ParseBatchToSpaceND(size_t subgraphIndex, size_t operatorIndex);
     void ParseConcatenation(size_t subgraphIndex, size_t operatorIndex);
     void ParseConv2D(size_t subgraphIndex, size_t operatorIndex);
+    void ParseDepthToSpace(size_t subgraphIndex, size_t operatorIndex);
     void ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseDequantize(size_t subgraphIndex, size_t operatorIndex);
     void ParseDetectionPostProcess(size_t subgraphIndex, size_t operatorIndex);
     void ParseElu(size_t subgraphIndex, size_t operatorIndex);
     void ParseExp(size_t subgraphIndex, size_t operatorIndex);
     void ParseFullyConnected(size_t subgraphIndex, size_t operatorIndex);
+    void ParseGather(size_t subgraphIndex, size_t operatorIndex);
     void ParseHardSwish(size_t subgraphIndex, size_t operatorIndex);
     void ParseLeakyRelu(size_t subgraphIndex, size_t operatorIndex);
     void ParseLogistic(size_t subgraphIndex, size_t operatorIndex);

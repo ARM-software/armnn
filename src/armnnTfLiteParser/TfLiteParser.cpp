@@ -547,11 +547,13 @@ TfLiteParser::TfLiteParser(const Optional<ITfLiteParser::TfLiteParserOptions>& o
     m_ParserFunctions[tflite::BuiltinOperator_CONCATENATION]           = &TfLiteParser::ParseConcatenation;
     m_ParserFunctions[tflite::BuiltinOperator_CONV_2D]                 = &TfLiteParser::ParseConv2D;
     m_ParserFunctions[tflite::BuiltinOperator_CUSTOM]                  = &TfLiteParser::ParseCustomOperator;
+    m_ParserFunctions[tflite::BuiltinOperator_DEPTH_TO_SPACE]          = &TfLiteParser::ParseDepthToSpace;
     m_ParserFunctions[tflite::BuiltinOperator_DEPTHWISE_CONV_2D]       = &TfLiteParser::ParseDepthwiseConv2D;
     m_ParserFunctions[tflite::BuiltinOperator_DEQUANTIZE]              = &TfLiteParser::ParseDequantize;
     m_ParserFunctions[tflite::BuiltinOperator_ELU]                     = &TfLiteParser::ParseElu;
     m_ParserFunctions[tflite::BuiltinOperator_EXP]                     = &TfLiteParser::ParseExp;
     m_ParserFunctions[tflite::BuiltinOperator_FULLY_CONNECTED]         = &TfLiteParser::ParseFullyConnected;
+    m_ParserFunctions[tflite::BuiltinOperator_GATHER]                  = &TfLiteParser::ParseGather;
     m_ParserFunctions[tflite::BuiltinOperator_HARD_SWISH]              = &TfLiteParser::ParseHardSwish;
     m_ParserFunctions[tflite::BuiltinOperator_LEAKY_RELU]              = &TfLiteParser::ParseLeakyRelu;
     m_ParserFunctions[tflite::BuiltinOperator_LOGISTIC]                = &TfLiteParser::ParseLogistic;
@@ -2901,6 +2903,95 @@ void TfLiteParser::ParseArgMax(size_t subgraphIndex, size_t operatorIndex)
     // Register output tensor to the layer.
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, outputTensorIndexes);
+}
+
+void TfLiteParser::ParseGather(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    TfLiteParser::TensorRawPtrVector inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+    TfLiteParser::TensorRawPtrVector outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
+    armnn::TensorInfo indicesTensorInfo = ToTensorInfo(inputs[1]);
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
+
+    armnn::GatherDescriptor gatherDescriptor;
+
+    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto * options = operatorPtr->builtin_options.AsGatherOptions();
+    auto axis = options->axis;
+
+    auto inputDimensions = static_cast<int32_t>(inputTensorInfo.GetNumDimensions());
+    auto indicesDimensions = indicesTensorInfo.GetNumDimensions();
+    auto outputDimensions = outputTensorInfo.GetNumDimensions();
+    if (((axis < -inputDimensions) && (axis < 0)) || ((axis >= inputDimensions) && (axis > 0)))
+    {
+        throw ParseException(
+            fmt::format("Operation has invalid axis: {} It is out of bounds [ -{}, {} ) {}",
+                        axis,
+                        inputDimensions, inputDimensions,
+                        CHECK_LOCATION().AsString()));
+    }
+    if (outputDimensions != static_cast<unsigned int>(inputDimensions) + indicesDimensions - 1)
+    {
+        throw ParseException(
+            fmt::format("Operation has invalid output dimensions: {} Output must be an ({} + {} - 1) -D tensor {}",
+                        outputDimensions,
+                        inputDimensions, indicesDimensions,
+                        CHECK_LOCATION().AsString()));
+    }
+
+    gatherDescriptor.m_Axis = axis;
+
+    auto layerName = fmt::format("Gather:{}:{}", subgraphIndex, operatorIndex);
+    IConnectableLayer* layer = m_Network->AddGatherLayer(gatherDescriptor, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParseDepthToSpace(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    TfLiteParser::TensorRawPtrVector inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+    TfLiteParser::TensorRawPtrVector outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::DepthToSpaceDescriptor descriptor;
+
+    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto * options = operatorPtr->builtin_options.AsDepthToSpaceOptions();
+    auto blockSize = options->block_size;
+    if (blockSize < 2)
+    {
+        throw ParseException(
+            fmt::format("Operation has invalid block size: {} Block size should be >= 2 {}",
+                        blockSize,
+                        CHECK_LOCATION().AsString()));
+    }
+    descriptor.m_BlockSize = armnn::numeric_cast<uint32_t>(blockSize);
+
+    auto layerName = fmt::format("DepthToSpace:{}:{}", subgraphIndex, operatorIndex);
+    IConnectableLayer* layer = m_Network->AddDepthToSpaceLayer(descriptor, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
 }
 
 armnn::IConnectableLayer* TfLiteParser::AddFusedActivationLayer(armnn::IConnectableLayer* prevLayer,

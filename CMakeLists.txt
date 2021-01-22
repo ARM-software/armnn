@@ -753,6 +753,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/Convolution2d.cpp
             src/armnnTfParser/test/Concat.cpp
             src/armnnTfParser/test/ConcatOfConcats.cpp
+            src/armnnTfLiteParser/test/DepthToSpace.cpp
             src/armnnTfParser/test/DepthwiseConvolution2d.cpp
             src/armnnTfParser/test/Equal.cpp
             src/armnnTfParser/test/ExpandDims.cpp
@@ -805,6 +806,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Div.cpp
              src/armnnTfLiteParser/test/Exp.cpp
              src/armnnTfLiteParser/test/FullyConnected.cpp
+             src/armnnTfLiteParser/test/Gather.cpp
              src/armnnTfLiteParser/test/L2Normalization.cpp
              src/armnnTfLiteParser/test/LeakyRelu.cpp
              src/armnnTfLiteParser/test/LoadScopeDynamicTensor.cpp

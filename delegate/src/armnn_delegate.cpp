@@ -575,11 +575,11 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                            nodeIndex,
                                            kTfLiteBuiltinHardSwish);
         case kTfLiteBuiltinL2Normalization:
-            return VisitNormalizationOperator(delegateData,
-                                              tfLiteContext,
-                                              tfLiteNode,
-                                              nodeIndex,
-                                              kTfLiteBuiltinL2Normalization);
+            return VisitL2NormalizationOperator(delegateData,
+                                                tfLiteContext,
+                                                tfLiteNode,
+                                                nodeIndex,
+                                                kTfLiteBuiltinL2Normalization);
         case kTfLiteBuiltinL2Pool2d:
             return VisitPoolingOperator(delegateData,
                                         tfLiteContext,
@@ -599,11 +599,11 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                            nodeIndex,
                                            kTfLiteBuiltinLessEqual);
         case kTfLiteBuiltinLocalResponseNormalization:
-            return VisitNormalizationOperator(delegateData,
-                                              tfLiteContext,
-                                              tfLiteNode,
-                                              nodeIndex,
-                                              kTfLiteBuiltinLocalResponseNormalization);
+            return VisitLocalResponseNormalizationOperator(delegateData,
+                                                           tfLiteContext,
+                                                           tfLiteNode,
+                                                           nodeIndex,
+                                                           kTfLiteBuiltinLocalResponseNormalization);
         case kTfLiteBuiltinLogicalAnd:
             return VisitLogicalBinaryOperator(delegateData,
                                               tfLiteContext,

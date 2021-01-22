@@ -131,6 +131,8 @@ if(BUILD_UNIT_TESTS)
         src/test/GatherTestHelper.hpp
         src/test/LogicalTest.cpp
         src/test/LogicalTestHelper.hpp
+        src/test/NormalizationTest.cpp
+        src/test/NormalizationTestHelper.hpp
         src/test/PadTest.cpp
         src/test/PadTestHelper.hpp
         src/test/Pooling2dTest.cpp

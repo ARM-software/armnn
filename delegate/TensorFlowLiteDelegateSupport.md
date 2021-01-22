@@ -46,6 +46,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 * LESS_OR_EQUAL
 
+* LOCAL_RESPONSE_NORMALIZATION
+
 * LOGICAL_AND
   
 * LOGICAL_NOT
@@ -55,6 +57,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 * LOGISTIC
 
 * LOG_SOFTMAX
+
+* L2_NORMALIZATION
 
 * L2_POOL_2D
 

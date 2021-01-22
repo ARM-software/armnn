@@ -33,9 +33,10 @@ public:
     void SetKernels(NeonTimer::KernelMeasurements* kernels) { m_Kernels = kernels; }
     NeonTimer::KernelMeasurements* GetKernels() { return m_Kernels; }
 
-    void schedule_op(arm_compute::ICPPKernel *kernel,
-                     const Hints &hints,
-                     arm_compute::ITensorPack &tensors ) override;
+    void schedule_op(arm_compute::ICPPKernel* kernel,
+                     const Hints& hints,
+                     const arm_compute::Window& window,
+                     arm_compute::ITensorPack& tensors ) override;
 private:
     NeonTimer::KernelMeasurements* m_Kernels;
     arm_compute::IScheduler& m_RealScheduler;

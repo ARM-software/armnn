@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_11" # Release 20.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="b309fc249e4383b4d40ae03e377c3cbad3f9f5f7" #Fix uniform_real_distribution_fp16 warning and single Dimension increment
+DEFAULT_CLFRAMEWORKREVISION="6a4ebe1305b544aec1ba0bfc67ed65d94fcc8c2e" #CTS Failures in Android CpuAcc in Add
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

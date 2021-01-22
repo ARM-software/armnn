@@ -52,13 +52,14 @@ void NeonInterceptorScheduler::run_tagged_workloads(std::vector<Workload> &workl
     m_Kernels->emplace_back(std::string(tag != nullptr ? tag : "Unknown"), delta.count(), Measurement::Unit::TIME_US);
 }
 
-void NeonInterceptorScheduler::schedule_op(arm_compute::ICPPKernel *kernel,
-                                           const Hints &hints,
-                                           arm_compute::ITensorPack &tensors )
+void NeonInterceptorScheduler::schedule_op(arm_compute::ICPPKernel* kernel,
+                                           const Hints& hints,
+                                           const arm_compute::Window& window,
+                                           arm_compute::ITensorPack& tensors )
 {
 
     WallClockTimer::clock::time_point startTime = WallClockTimer::clock::now();
-    m_RealScheduler.schedule_op(kernel, hints, tensors);
+    m_RealScheduler.schedule_op(kernel, hints, window, tensors);
     WallClockTimer::clock::time_point stopTime = WallClockTimer::clock::now();
 
     const auto delta       = std::chrono::duration<double, std::micro>(stopTime - startTime);

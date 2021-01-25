@@ -5,6 +5,13 @@
 #include "armnn/Logging.hpp"
 #include "armnn/Utils.hpp"
 
+#if !defined(BARE_METAL) && (defined(__arm__) || defined(__aarch64__))
+
+#include <sys/auxv.h>
+#include <asm/hwcap.h>
+
+#endif
+
 namespace armnn
 {
 void ConfigureLogging(bool printToStandardOutput, bool printToDebugOutput, LogSeverity severity)
@@ -24,5 +31,46 @@ struct DefaultLoggingConfiguration
 };
 
 static DefaultLoggingConfiguration g_DefaultLoggingConfiguration;
+
+// Detect the presence of Neon on Linux
+bool NeonDetected()
+{
+#if !defined(BARE_METAL) && (defined(__arm__) || defined(__aarch64__))
+    auto hwcaps= getauxval(AT_HWCAP);
+#endif
+
+#if !defined(BARE_METAL) && defined(__aarch64__)
+
+    if (hwcaps & HWCAP_ASIMD)
+    {
+        // On an arm64 device with Neon.
+        return true;
+    }
+    else
+    {
+        // On an arm64 device without Neon.
+        return false;
+    }
+
+#endif
+#if !defined(BARE_METAL) && defined(__arm__)
+
+    if (hwcaps & HWCAP_NEON)
+    {
+        // On an armhf device with Neon.
+        return true;
+    }
+    else
+    {
+        // On an armhf device without Neon.
+        return false;
+    }
+
+#endif
+
+    // This method of Neon detection is only supported on Linux so in order to prevent a false negative
+    // we will return true in cases where detection did not run.
+    return true;
+}
 
 } // namespace armnn

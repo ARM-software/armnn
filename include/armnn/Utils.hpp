@@ -35,4 +35,6 @@ void ConfigureLogging(bool printToStandardOutput, bool printToDebugOutput, LogSe
 #   define ARMNN_FALLTHROUGH ((void)0)
 #endif
 
+bool NeonDetected();
+
 } // namespace armnn

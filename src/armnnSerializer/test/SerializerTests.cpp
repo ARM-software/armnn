@@ -237,11 +237,12 @@ armnn::INetworkPtr DeserializeNetwork(const std::string& serializerString)
 
 std::string SerializeNetwork(const armnn::INetwork& network)
 {
-    armnnSerializer::Serializer serializer;
-    serializer.Serialize(network);
+    armnnSerializer::ISerializerPtr serializer = armnnSerializer::ISerializer::Create();
+
+    serializer->Serialize(network);
 
     std::stringstream stream;
-    serializer.SaveSerializedToStream(stream);
+    serializer->SaveSerializedToStream(stream);
 
     std::string serializerString{stream.str()};
     return serializerString;

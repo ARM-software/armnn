@@ -23,15 +23,19 @@ public:
 
     /// Serializes the network to ArmNN SerializedGraph.
     /// @param [in] inNetwork The network to be serialized.
-    virtual void Serialize(const armnn::INetwork& inNetwork) = 0;
+    void Serialize(const armnn::INetwork& inNetwork);
 
     /// Serializes the SerializedGraph to the stream.
     /// @param [stream] the stream to save to
     /// @return true if graph is Serialized to the Stream, false otherwise
-    virtual bool SaveSerializedToStream(std::ostream& stream) = 0;
+    bool SaveSerializedToStream(std::ostream& stream);
 
-protected:
-    virtual ~ISerializer() {}
+private:
+    ISerializer();
+    ~ISerializer();
+
+    class SerializerImpl;
+    std::unique_ptr<SerializerImpl> pSerializerImpl;
 };
 
 } //namespace armnnSerializer

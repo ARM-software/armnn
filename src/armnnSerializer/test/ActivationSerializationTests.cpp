@@ -54,11 +54,12 @@ BOOST_AUTO_TEST_CASE(ActivationSerialization)
     activationLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
     activationLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
-    armnnSerializer::Serializer serializer;
-    serializer.Serialize(*network);
+    armnnSerializer::ISerializerPtr serializer = armnnSerializer::ISerializer::Create();
+
+    serializer->Serialize(*network);
 
     std::stringstream stream;
-    serializer.SaveSerializedToStream(stream);
+    serializer->SaveSerializedToStream(stream);
 
     std::string const serializerString{stream.str()};
     std::vector<std::uint8_t> const serializerVector{serializerString.begin(), serializerString.end()};

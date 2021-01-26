@@ -5,7 +5,7 @@
 
 #include "ParserFlatbuffersSerializeFixture.hpp"
 
-#include "../Deserializer.hpp"
+#include <armnnDeserializer/IDeserializer.hpp>
 
 #include <boost/test/unit_test.hpp>
 

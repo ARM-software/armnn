@@ -18,9 +18,9 @@ if(BUILD_ARMNN_DESERIALIZER)
 
     set(armnn_deserializer_sources)
     list(APPEND armnn_deserializer_sources
-        ArmnnSchema_generated.h
-        Deserializer.hpp
-        Deserializer.cpp
+            ArmnnSchema_generated.h
+            Deserializer.hpp
+            Deserializer.cpp
         )
 
     add_library_ex(armnnDeserializer SHARED ${armnn_deserializer_sources})

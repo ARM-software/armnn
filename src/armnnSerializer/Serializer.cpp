@@ -12,8 +12,6 @@
 
 #include <iostream>
 
-#include <flatbuffers/util.h>
-
 #include "SerializerUtils.hpp"
 
 using namespace armnn;
@@ -22,6 +20,37 @@ namespace serializer = armnnSerializer;
 
 namespace armnnSerializer
 {
+
+ISerializer::ISerializer() : pSerializerImpl(new SerializerImpl())
+{
+}
+
+ISerializer::~ISerializer() = default;
+
+ISerializer* ISerializer::CreateRaw()
+{
+    return new ISerializer();
+}
+
+ISerializerPtr ISerializer::Create()
+{
+    return ISerializerPtr(CreateRaw(), &ISerializer::Destroy);
+}
+
+void ISerializer::Destroy(ISerializer* serializer)
+{
+    delete serializer;
+}
+
+void ISerializer::Serialize(const armnn::INetwork& inNetwork)
+{
+    pSerializerImpl->Serialize(inNetwork);
+}
+
+bool ISerializer::SaveSerializedToStream(std::ostream& stream)
+{
+    return pSerializerImpl->SaveSerializedToStream(stream);
+}
 
 serializer::ActivationFunction GetFlatBufferActivationFunction(armnn::ActivationFunction function)
 {
@@ -1729,23 +1758,7 @@ std::vector<fb::Offset<serializer::OutputSlot>>
     return outputSlots;
 }
 
-
-ISerializer* ISerializer::CreateRaw()
-{
-    return new Serializer();
-}
-
-ISerializerPtr ISerializer::Create()
-{
-    return ISerializerPtr(CreateRaw(), &ISerializer::Destroy);
-}
-
-void ISerializer::Destroy(ISerializer* serializer)
-{
-    delete serializer;
-}
-
-void Serializer::Serialize(const INetwork& inNetwork)
+void ISerializer::SerializerImpl::Serialize(const INetwork& inNetwork)
 {
     // Iterate through to network
     inNetwork.Accept(m_SerializerVisitor);
@@ -1763,7 +1776,7 @@ void Serializer::Serialize(const INetwork& inNetwork)
     fbBuilder.Finish(serializedGraph);
 }
 
-bool Serializer::SaveSerializedToStream(std::ostream& stream)
+bool ISerializer::SerializerImpl::SaveSerializedToStream(std::ostream& stream)
 {
     flatbuffers::FlatBufferBuilder& fbBuilder = m_SerializerVisitor.GetFlatBufferBuilder();
 
@@ -1771,5 +1784,6 @@ bool Serializer::SaveSerializedToStream(std::ostream& stream)
     stream.write(reinterpret_cast<const char*>(fbBuilder.GetBufferPointer()), bytesToWrite);
     return !stream.bad();
 }
+
 
 } // namespace armnnSerializer

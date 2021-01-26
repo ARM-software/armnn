@@ -5,10 +5,9 @@
 
 #include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersSerializeFixture.hpp"
-#include "../Deserializer.hpp"
+#include <armnnDeserializer/IDeserializer.hpp>
 
 #include <string>
-#include <iostream>
 
 BOOST_AUTO_TEST_SUITE(Deserializer)
 

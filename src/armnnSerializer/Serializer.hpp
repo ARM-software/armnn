@@ -345,20 +345,20 @@ private:
     uint32_t m_layerId;
 };
 
-class Serializer : public ISerializer
+class ISerializer::SerializerImpl
 {
 public:
-    Serializer() {}
-    ~Serializer() {}
+    SerializerImpl() = default;
+    ~SerializerImpl() = default;
 
     /// Serializes the network to ArmNN SerializedGraph.
     /// @param [in] inNetwork The network to be serialized.
-    void Serialize(const armnn::INetwork& inNetwork) override;
+    void Serialize(const armnn::INetwork& inNetwork);
 
     /// Serializes the SerializedGraph to the stream.
     /// @param [stream] the stream to save to
     /// @return true if graph is Serialized to the Stream, false otherwise
-    bool SaveSerializedToStream(std::ostream& stream) override;
+    bool SaveSerializedToStream(std::ostream& stream);
 
 private:
 

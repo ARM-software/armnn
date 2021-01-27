@@ -665,7 +665,7 @@ GENERATE_BUGLIST       = YES
 # the documentation.
 # The default value is: YES.
 
-GENERATE_DEPRECATEDLIST= YES
+GENERATE_DEPRECATEDLIST= NO
 
 # The ENABLED_SECTIONS tag can be used to enable conditional documentation
 # sections, marked by \if <section_label> ... \endif and \cond <section_label>
@@ -813,8 +813,7 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ./docs/00_introduction.dox \
-                         ./docs/01_parsers.dox \
+INPUT                  = ./docs/01_parsers.dox \
                          ./docs/02_deserializer_serializer.dox \
                          ./docs/03_converter_quantizer.dox \
                          ./docs/04_backends.dox \
@@ -824,7 +823,9 @@ INPUT                  = ./docs/00_introduction.dox \
                          ./tests/ \
                          ./docs/ \
                          ./delegate/include \
-                         ./delegate/src/armnn_external_delegate.cpp
+                         ./delegate/src/armnn_external_delegate.cpp \
+                         ./README.md \
+                         ./docs/FAQ.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1016,7 +1017,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE =
+USE_MDFILE_AS_MAINPAGE = ./README.md
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing

@@ -18,7 +18,8 @@ find_library(TfLite_LIB
             "libtensorflow_lite_all.so"
             "libtensorflowlite.so"
         HINTS
-            ${TFLITE_LIB_ROOT})
+            ${TFLITE_LIB_ROOT}
+            ${TFLITE_LIB_ROOT}/tensorflow/lite)
 
 find_path(TfLite_Schema_INCLUDE_PATH
             schema_generated.h

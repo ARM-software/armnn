@@ -115,7 +115,7 @@ std::vector<char> CreatePadTfLiteModel(
     }
 
     // create operator
-    const std::vector<int32_t> operatorOutputs{{ 2 }};
+    const std::vector<int32_t> operatorOutputs{ 2 };
     flatbuffers::Offset <Operator> redefineOperator =
         CreateOperator(flatBufferBuilder,
                        0,
@@ -124,7 +124,7 @@ std::vector<char> CreatePadTfLiteModel(
                        operatorBuiltinOptionsType,
                        operatorBuiltinOptions);
 
-    const std::vector<int> subgraphOutputs{{ 2 }};
+    const std::vector<int> subgraphOutputs{ 2 };
     flatbuffers::Offset <SubGraph> subgraph =
         CreateSubGraph(flatBufferBuilder,
                        flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),

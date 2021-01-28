@@ -29,11 +29,11 @@ try \
     for (auto&& backendId : backends) \
     { \
         auto layerSupportObject = armnn::GetILayerSupportByBackendId(backendId); \
-        if (layerSupportObject) \
+        if (layerSupportObject.IsBackendRegistered()) \
         { \
             std::string reasonIfUnsupported; \
             supported = \
-                layerSupportObject->func(__VA_ARGS__, armnn::Optional<std::string&>(reasonIfUnsupported)); \
+                layerSupportObject.func(__VA_ARGS__, armnn::Optional<std::string&>(reasonIfUnsupported)); \
             if (supported) \
             { \
                 break; \

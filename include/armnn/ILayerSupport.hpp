@@ -27,7 +27,6 @@ protected:
     virtual ~ILayerSupport() {}
 
 public:
-    ARMNN_DEPRECATED_MSG("Use IsElementwiseUnarySupported instead")
     virtual bool IsAbsSupported(const TensorInfo& input,
                                 const TensorInfo& output,
                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
@@ -147,7 +146,6 @@ public:
                                              const ElementwiseUnaryDescriptor& descriptor,
                                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
-    ARMNN_DEPRECATED_MSG("Use IsComparisonSupported instead")
     virtual bool IsEqualSupported(const TensorInfo& input0,
                                   const TensorInfo& input1,
                                   const TensorInfo& output,
@@ -173,7 +171,6 @@ public:
                                            const FullyConnectedDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
-    ARMNN_DEPRECATED_MSG("Use IsGatherSupported with descriptor instead")
     virtual bool IsGatherSupported(const TensorInfo& input0,
                                    const TensorInfo& input1,
                                    const TensorInfo& output,
@@ -185,7 +182,6 @@ public:
                                    const GatherDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
-    ARMNN_DEPRECATED_MSG("Use IsComparisonSupported instead")
     virtual bool IsGreaterSupported(const TensorInfo& input0,
                                     const TensorInfo& input1,
                                     const TensorInfo& ouput,
@@ -255,7 +251,6 @@ public:
                                   const TensorInfo& output,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
-    ARMNN_DEPRECATED_MSG("Use IsConcatSupported instead")
     virtual bool IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                                    const TensorInfo& output,
                                    const OriginsDescriptor& descriptor,
@@ -334,7 +329,6 @@ public:
                                     const ReshapeDescriptor& descriptor,
                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
-    ARMNN_DEPRECATED_MSG("Use IsResizeSupported instead")
     virtual bool IsResizeBilinearSupported(const TensorInfo& input,
                                            const TensorInfo& output,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
@@ -344,7 +338,6 @@ public:
                                    const ResizeDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
-    ARMNN_DEPRECATED_MSG("Use IsElementwiseUnarySupported instead")
     virtual bool IsRsqrtSupported(const TensorInfo& input,
                                   const TensorInfo& output,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
@@ -369,7 +362,6 @@ public:
                                          const SpaceToDepthDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
-    ARMNN_DEPRECATED_MSG("Use IsSplitterSupported with outputs instead")
     virtual bool IsSplitterSupported(const TensorInfo& input,
                                      const ViewsDescriptor& descriptor,
                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;

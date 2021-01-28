@@ -5,6 +5,7 @@
 #include <boost/test/unit_test.hpp>
 
 
+#include <armnn/BackendHelper.hpp>
 #include <armnn/Utils.hpp>
 #include <armnn/Types.hpp>
 #include <armnn/TypesUtils.hpp>
@@ -265,5 +266,18 @@ BOOST_AUTO_TEST_CASE(PermuteQuantizationDim)
     // Check previous implementation unchanged
     BOOST_CHECK(permuted.GetQuantizationDim().value() == 1U);
 }
+
+#if defined(ARMNNREF_ENABLED)
+BOOST_AUTO_TEST_CASE(LayerSupportHandle)
+{
+    auto layerSupportObject = armnn::GetILayerSupportByBackendId("CpuRef");
+    armnn::TensorInfo input;
+    std::string reasonIfUnsupported;
+    // InputLayer always supported for CpuRef
+    BOOST_CHECK_EQUAL(layerSupportObject.IsInputSupported(input, reasonIfUnsupported), true);
+
+    BOOST_CHECK(layerSupportObject.IsBackendRegistered());
+}
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()

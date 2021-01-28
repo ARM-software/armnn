@@ -816,9 +816,10 @@ WARN_LOGFILE           =
 INPUT                  = ./docs/00_software_tools.dox \
                          ./docs/01_parsers.dox \
                          ./docs/02_deserializer_serializer.dox \
-                         ./docs/03_converter_quantizer.dox \
                          ./docs/04_backends.dox \
                          ./docs/05_other_tools.dox \
+                         ./src/armnnQuantizer/README.md \
+                         ./src/armnnConverter/README.md \
                          ./include/ \
                          ./src/ \
                          ./tests/ \

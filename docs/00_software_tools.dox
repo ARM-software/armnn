@@ -17,7 +17,25 @@ other helpful information in each section.
 
 @subpage deserializer
 
+@subpage md_src_armnnQuantizer_README
+
+@subpage md_src_armnnConverter_README
+
 **/
 }
 
+
+/// Create pages for each tool so they appear nicely in the doxygen tree-view. Subpages are not listed there.
+///
+/// Note: The parser, serializer and deserializer pages are created in 01_parsers.dox or 02_deserializer_serializer.dox
+namespace armnn
+{
+/**
+
+@page md_src_armnnQuantizer_README Quantizer
+
+@page md_src_armnnConverter_README Converter
+
+**/
+}
 

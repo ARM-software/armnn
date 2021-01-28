@@ -813,7 +813,8 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ./docs/01_parsers.dox \
+INPUT                  = ./docs/00_software_tools.dox \
+                         ./docs/01_parsers.dox \
                          ./docs/02_deserializer_serializer.dox \
                          ./docs/03_converter_quantizer.dox \
                          ./docs/04_backends.dox \
@@ -821,7 +822,6 @@ INPUT                  = ./docs/01_parsers.dox \
                          ./include/ \
                          ./src/ \
                          ./tests/ \
-                         ./docs/ \
                          ./delegate/include \
                          ./delegate/src/armnn_external_delegate.cpp \
                          ./README.md \

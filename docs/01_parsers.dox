@@ -27,11 +27,14 @@ namespace armnn
 @page parsers Parsers
 
 @tableofcontents
+Execute models from different machine learning platforms efficiently with our parsers. Simply choose a parser according
+to the model you want to run e.g. If you've got a model in tensorflow format (<model_name>.pb) use our tensorflow-parser.
+
 @section S4_caffe_parser ArmNN Caffe Parser
 
 `armnnCaffeParser` is a library for loading neural networks defined in Caffe protobuf files into the Arm NN runtime.
 
-##Caffe layers supported by the Arm NN SDK
+## Caffe layers supported by the Arm NN SDK
 This reference guide provides a list of Caffe layers the Arm NN SDK currently supports.
 
 ## Although some other neural networks might work, Arm tests the Arm NN SDK with Caffe implementations of the following neural networks:

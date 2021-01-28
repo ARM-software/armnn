@@ -1,0 +1,19 @@
+/// Copyright (c) 2021 ARM Limited and Contributors. All rights reserved.
+///
+/// SPDX-License-Identifier: MIT
+///
+
+namespace armnn
+{
+/**
+@page swtools Software Tools
+
+On this page you can find all software tools contained in the ArmNN repository. You will find links to how-to guides and
+other helpful information in each section.
+
+@subpage parsers
+
+**/
+}
+
+

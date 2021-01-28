@@ -13,6 +13,10 @@ other helpful information in each section.
 
 @subpage parsers
 
+@subpage serializer
+
+@subpage deserializer
+
 **/
 }
 

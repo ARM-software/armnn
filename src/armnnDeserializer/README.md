@@ -4,4 +4,5 @@ The `armnnDeserializer` is a library for loading neural networks defined by Arm 
 into the Arm NN runtime.
 
 For more information about the layers that are supported, and the networks that have been tested,
-see [DeserializerSupport.md](./DeserializerSupport.md)
+take a look into our doxygen documentation which can be found in the [wiki section](https://github.com/ARM-software/armnn/wiki/Documentation) 
+of our github repository.

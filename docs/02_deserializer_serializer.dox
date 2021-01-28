@@ -24,18 +24,16 @@
 namespace armnn
 {
 /**
-@page serializers The ArmNN Serializer and Deserializer
+@page serializer Serializer
 @tableofcontents
-
-@section S8_serializer The ArmNN Serializer
 
 The `armnnSerializer` is a library for serializing an Arm NN network to a stream.
 
-## The layers that ArmNN SDK Serializer currently supports.
+@section serializersupport Supported Layers
 
-This reference guide provides a list of layers which can be serialized currently by the Arm NN SDK.
+This reference guide provides a list of layers which can be serialized by the Arm NN SDK.
 
-## Fully supported
+@subsection serializersupportflully Fully supported
 
 The Arm NN SDK Serializer currently supports the following layers:
 
@@ -54,6 +52,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 - DetectionPostProcess
 - Division
 - ElementwiseUnary
+- Fill
 - Floor
 - FullyConnected
 - Gather
@@ -95,28 +94,29 @@ The Arm NN SDK Serializer currently supports the following layers:
 
 More machine learning layers will be supported in future releases.
 
-## Deprecated layers
+@subsection serializersupportdeprecated Deprecated layers
 
 Some layers have been deprecated and replaced by others layers. In order to maintain backward compatibility, serializations of these deprecated layers will deserialize to the layers that have replaced them, as follows:
 
-- Equal will deserialize as Comparison
-- Merger will deserialize as Concat
-- Greater will deserialize as Comparison
-- ResizeBilinear will deserialize as Resize
 - Abs will deserialize as ElementwiseUnary
+- Equal will deserialize as Comparison
+- Greater will deserialize as Comparison
+- Merger will deserialize as Concat
+- ResizeBilinear will deserialize as Resize
 - Rsqrt will deserialize as ElementwiseUnary
 <br/><br/><br/><br/>
 
-@section S9_deserializer The ArmNN Deserializer
+@page deserializer Deserializer
+@tableofcontents
 
 The `armnnDeserializer` is a library for loading neural networks defined by Arm NN FlatBuffers files
 into the Arm NN runtime.
 
-## The layers that ArmNN SDK Deserializer currently supports.
+@section deserializersupport Supported Layers
 
-This reference guide provides a list of layers which can be deserialized currently by the Arm NN SDK.
+This reference guide provides a list of layers which can be deserialized by the Arm NN SDK.
 
-## Fully supported
+@subsection deserializersupportfully Fully supported
 
 The Arm NN SDK Deserialize parser currently supports the following layers:
 
@@ -157,12 +157,13 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 - Permute
 - Pooling2d
 - Prelu
-- QLstm
 - Quantize
+- QLstm
 - QuantizedLstm
 - Rank
 - Reshape
 - Resize
+- ResizeBilinear
 - Rsqrt
 - Slice
 - Softmax
@@ -178,7 +179,7 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 
 More machine learning layers will be supported in future releases.
 
-## Deprecated layers
+@subsection deserializersupportdeprecated Deprecated layers
 
 Some layers have been deprecated and replaced by others layers. In order to maintain backward compatibility, serializations of these deprecated layers will deserialize to the layers that have replaced them, as follows:
 

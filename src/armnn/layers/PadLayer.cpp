@@ -46,8 +46,7 @@ std::vector<TensorShape> PadLayer::InferOutputShapes(const std::vector<TensorSha
     ARMNN_ASSERT(m_Param.m_PadList.size() == rank);
     ARMNN_ASSERT(rank != 0);
 
-    std::vector<unsigned int> outputDimensionSizes;
-    outputDimensionSizes.reserve(rank);
+    std::vector<unsigned int> outputDimensionSizes(rank);
     for (unsigned int i = 0; i < rank; ++i)
     {
         outputDimensionSizes[i] = inputShape[i] + m_Param.m_PadList[i].first + m_Param.m_PadList[i].second;

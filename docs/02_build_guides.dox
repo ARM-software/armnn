@@ -1,0 +1,26 @@
+/// Copyright (c) 2021 ARM Limited and Contributors. All rights reserved.
+///
+/// SPDX-License-Identifier: MIT
+///
+
+namespace armnn
+{
+/**
+@page buildguides Build Guides
+@tableofcontents
+
+This page links all guides to build and/or install Arm NN tools. Some of these guides are not hosted in our
+repository and will lead you to guides on
+https://developer.arm.com/solutions/machine-learning-on-arm/developer-material/how-to-guides
+
+Arm NN is written using portable C++14 and the build system uses [CMake](https://cmake.org/), therefore it is possible
+to build for a wide variety of target platforms, from a wide variety of host environments.
+
+Arm NN is managed by a single CMake project. That allows you to build multiple tools at once by combining the CMake
+options from different build guides.
+
+## TfLite Delegate build guide
+@subpage md_delegate_BuildGuideNative
+
+**/
+}

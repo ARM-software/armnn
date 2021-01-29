@@ -1,0 +1,144 @@
+/// Copyright (c) 2021 ARM Limited and Contributors. All rights reserved.
+///
+/// SPDX-License-Identifier: MIT
+///
+
+namespace armnn
+{
+/**
+@page delegate TfLite Delegate
+@tableofcontents
+
+
+@section delegateintro About the delegate
+'armnnDelegate' is a library for accelerating certain TensorFlow Lite (TfLite) operators on Arm hardware. It can be
+integrated in TfLite using its delegation mechanism. TfLite will then delegate the execution of operators supported by
+Arm NN to Arm NN.
+
+The main difference to our @ref S6_tf_lite_parser is the amount of operators you can run with it. If none of the active
+backends support an operation in your model you won't be able to execute it with our parser. In contrast to that, TfLite
+only delegates operations to the armnnDelegate if it does support them and otherwise executes them itself. In other
+words, every TfLite model can be executed and every operation in your model that we can accelerate will be accelerated.
+That is the reason why the armnnDelegate is our recommended way to accelerate TfLite models.
+
+If you need help building the armnnDelegate, please take a look at our [build guide](delegate/BuildGuideNative.md).
+An example how to setup TfLite to integrate the armnnDelegate can be found in this
+guide: [Integrate the delegate into python](delegate/IntegrateDelegateIntoPython.md)
+
+
+@section delegatesupport Supported Operators
+This reference guide provides a list of TensorFlow Lite operators the Arm NN SDK currently supports.
+
+@subsection delegatefullysupported Fully supported
+
+The Arm NN SDK TensorFlow Lite delegate currently supports the following operators:
+
+- ABS
+
+- ADD
+
+- ARGMAX
+
+- ARGMIN
+
+- AVERAGE_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+
+- CONCATENATION, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+
+- CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+
+- DEPTH_TO_SPACE
+
+- DEPTHWISE_CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+
+- DEQUANTIZE
+
+- DIV
+
+- EQUAL
+
+- ELU
+
+- EXP
+
+- FULLY_CONNECTED, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+
+- GATHER
+
+- GREATER
+
+- GREATER_OR_EQUAL
+
+- HARD_SWISH
+
+- LESS
+
+- LESS_OR_EQUAL
+
+- LOCAL_RESPONSE_NORMALIZATION
+
+- LOGICAL_AND
+-
+- LOGICAL_NOT
+-
+- LOGICAL_OR
+
+- LOGISTIC
+
+- LOG_SOFTMAX
+
+- L2_NORMALIZATION
+
+- L2_POOL_2D
+
+- MAXIMUM
+
+- MAX_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+
+- MEAN
+
+- MINIMUM
+
+- MUL
+
+- NEG
+
+- NOT_EQUAL
+
+- PAD
+
+- QUANTIZE
+
+- RESHAPE
+
+- RESIZE_BILINEAR
+
+- RESIZE_NEAREST_NEIGHBOR
+
+- RELU
+
+- RELU6
+
+- RSQRT
+
+- SOFTMAX
+
+- SPACE_TO_DEPTH
+
+- SPLIT
+
+- SPLIT_V
+
+- SQRT
+
+- SUB
+
+- TANH
+
+- TRANSPOSE
+
+- TRANSPOSE_CONV
+
+More machine learning operators will be supported in future releases.
+**/
+}

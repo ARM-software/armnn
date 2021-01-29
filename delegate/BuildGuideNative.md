@@ -1,38 +1,41 @@
-# Introduction
+# Delegate build guide introduction
 
-The ArmNN Delegate can be found within the ArmNN repository but it is a standalone piece of software. However,
-it makes use of the ArmNN library. For this reason we have added two options to build the delegate. The first option
-allows you to build the delegate together with the ArmNN library, the second option is a standalone build 
+The Arm NN Delegate can be found within the Arm NN repository but it is a standalone piece of software. However,
+it makes use of the Arm NN library. For this reason we have added two options to build the delegate. The first option
+allows you to build the delegate together with the Arm NN library, the second option is a standalone build 
 of the delegate.
 
 This tutorial uses an Aarch64 machine with Ubuntu 18.04 installed that can build all components
 natively (no cross-compilation required). This is to keep this guide simple.
 
-1. [Dependencies](#Dependencies)
-   * [Build Tensorflow for C++](#Build Tensorflow for C++)
-   * [Build Flatbuffers](#Build Flatbuffers)
-   * [Build the Arm Compute Library](#Build the Arm Compute Library)
-   * [Build the ArmNN Library](#Build the ArmNN Library)
-2. [Build the TfLite Delegate (Stand-Alone)](#Build the TfLite Delegate (Stand-Alone))
-3. [Build the Delegate together with ArmNN](#Build the Delegate together with ArmNN)
-4. [Integrate the ArmNN TfLite Delegate into your project](#Integrate the ArmNN TfLite Delegate into your project)
+**Table of content:**
+- [Delegate build guide introduction](#delegate-build-guide-introduction)
+- [Dependencies](#dependencies)
+   * [Build Tensorflow for C++](#build-tensorflow-for-c--)
+   * [Build Flatbuffers](#build-flatbuffers)
+   * [Build the Arm Compute Library](#build-the-arm-compute-library)
+   * [Build the Arm NN Library](#build-the-arm-nn-library)
+- [Build the TfLite Delegate (Stand-Alone)](#build-the-tflite-delegate--stand-alone-)
+- [Build the Delegate together with Arm NN](#build-the-delegate-together-with-arm-nn)
+- [Integrate the Arm NN TfLite Delegate into your project](#integrate-the-arm-nn-tflite-delegate-into-your-project)
+
 
 # Dependencies
 
 Build Dependencies:
- * Tensorflow and Tensorflow Lite version 2.3.1
+ * Tensorflow and Tensorflow Lite. This guide uses version 2.3.1 . Other versions might work.
  * Flatbuffers 1.12.0
- * ArmNN 20.11 or higher
+ * Arm NN 20.11 or higher
 
 Required Tools:
- * Git
- * pip
- * wget
- * zip
- * unzip
- * cmake 3.7.0 or higher
- * scons
- * bazel 3.1.0
+ * Git. This guide uses version 2.17.1 . Other versions might work.
+ * pip. This guide uses version 20.3.3 . Other versions might work.
+ * wget. This guide uses version 1.17.1 . Other versions might work.
+ * zip. This guide uses version 3.0 . Other versions might work.
+ * unzip. This guide uses version 6.00 . Other versions might work.
+ * cmake 3.7.0 or higher. This guide uses version 3.7.2
+ * scons. This guide uses version 2.4.1 . Other versions might work.
+ * bazel. This guide uses version 3.1.0 . Other versions might work.
 
 Our first step is to build all the build dependencies I have mentioned above. We will have to create quite a few
 directories. To make navigation a bit easier define a base directory for the project. At this stage we can also
@@ -54,7 +57,7 @@ to this guide. Depending on your operating system and architecture there might b
 pip3 install -U pip numpy wheel
 pip3 install -U keras_preprocessing --no-deps
 
-# Bazel has a dependency on JDK
+# Bazel has a dependency on JDK (The JDK version depends on the bazel version you want to build)
 apt-get install openjdk-11-jdk
 # Build Bazel
 wget -O bazel-3.1.0-dist.zip https://github.com/bazelbuild/bazel/releases/download/3.1.0/bazel-3.1.0-dist.zip
@@ -121,16 +124,16 @@ make install
 
 ## Build the Arm Compute Library
 
-The ArmNN library depends on the Arm Compute Library (ACL). It provides a set of functions that are optimized for 
-both Arm CPUs and GPUs. The Arm Compute Library is used directly by ArmNN to run machine learning workloads on 
+The Arm NN library depends on the Arm Compute Library (ACL). It provides a set of functions that are optimized for 
+both Arm CPUs and GPUs. The Arm Compute Library is used directly by Arm NN to run machine learning workloads on 
 Arm CPUs and GPUs.
 
-It is important to have the right version of ACL and ArmNN to make it work. Luckily, ArmNN and ACL are developed 
-very closely and released together. If you would like to use the ArmNN version "20.11" you can use the same "20.11"
+It is important to have the right version of ACL and Arm NN to make it work. Luckily, Arm NN and ACL are developed 
+very closely and released together. If you would like to use the Arm NN version "20.11" you can use the same "20.11"
 version for ACL too.
 
-To build the Arm Compute Library on your platform, download the Arm Compute Library and check the branch 
-out that contains the version you want to use and build it using `scons`.
+To build the Arm Compute Library on your platform, download the Arm Compute Library and checkout the branch 
+that contains the version you want to use and build it using `scons`.
 ```bash
 cd $BASEDIR
 git clone https://review.mlplatform.org/ml/ComputeLibrary 
@@ -141,9 +144,9 @@ git checkout <branch_name> # e.g. branches/arm_compute_20_11
 scons arch=arm64-v8a neon=1 extra_cxx_flags="-fPIC" benchmark_tests=0 validation_tests=0 
 ```
 
-## Build the ArmNN Library
+## Build the Arm NN Library
 
-After building ACL we can now continue building ArmNN. To do so, download the repository and checkout the same 
+After building ACL we can now continue building Arm NN. To do so, download the repository and checkout the same 
 version as you did for ACL. Create a build directory and use cmake to build it.
 ```bash
 cd $BASEDIR
@@ -158,7 +161,7 @@ make
 
 # Build the TfLite Delegate (Stand-Alone)
 
-The delegate as well as ArmNN is built using cmake. Create a build directory as usual and build the Delegate
+The delegate as well as Arm NN is built using cmake. Create a build directory as usual and build the Delegate
 with the additional cmake arguments shown below
 ```bash
 cd $BASEDIR/armnn/delegate && mkdir build && cd build
@@ -166,15 +169,15 @@ cmake .. -DTENSORFLOW_LIB_DIR=$BASEDIR/tensorflow/bazel-bin \     # Directory wh
          -DTENSORFLOW_ROOT=$BASEDIR/tensorflow \                  # The top directory of the tensorflow repository
          -DTFLITE_LIB_ROOT=$BASEDIR/tensorflow/bazel-bin \        # In our case the same as TENSORFLOW_LIB_DIR 
          -DFLATBUFFERS_ROOT=$BASEDIR/flatbuffers-1.12.0/install \ # The install directory 
-         -DArmnn_DIR=$BASEDIR/armnn/build \                       # Directory where the ArmNN library can be found
-         -DARMNN_SOURCE_DIR=$BASEDIR/armnn                        # The top directory of the ArmNN repository. 
-                                                                  # Required are the includes for ArmNN
+         -DArmnn_DIR=$BASEDIR/armnn/build \                       # Directory where the Arm NN library can be found
+         -DARMNN_SOURCE_DIR=$BASEDIR/armnn                        # The top directory of the Arm NN repository. 
+                                                                  # Required are the includes for Arm NN
 make
 ```
 
 To ensure that the build was successful you can run the unit tests for the delegate that can be found in 
 the build directory for the delegate. [Doctest](https://github.com/onqtam/doctest) was used to create those tests. Using test filters you can
-filter out tests that your build is not configured for. In this case, because ArmNN was only built for Cpu 
+filter out tests that your build is not configured for. In this case, because Arm NN was only built for Cpu 
 acceleration (CpuAcc), we filter for all test suites that have `CpuAcc` in their name.
 ```bash
 cd $BASEDIR/armnn/delegate/build
@@ -186,12 +189,12 @@ If you have built for Gpu acceleration as well you might want to change your tes
 ```
 
 
-# Build the Delegate together with ArmNN
+# Build the Delegate together with Arm NN
 
-In the introduction it was mentioned that there is a way to integrate the delegate build into ArmNN. This is
+In the introduction it was mentioned that there is a way to integrate the delegate build into Arm NN. This is
 pretty straight forward. The cmake arguments that were previously used for the delegate have to be added
-to the ArmNN cmake arguments. Also another argument `BUILD_ARMNN_TFLITE_DELEGATE` needs to be added to 
-instruct ArmNN to build the delegate as well. The new commands to build ArmNN are as follows:
+to the Arm NN cmake arguments. Also another argument `BUILD_ARMNN_TFLITE_DELEGATE` needs to be added to 
+instruct Arm NN to build the delegate as well. The new commands to build Arm NN are as follows:
 ```bash
 cd $BASEDIR
 git clone "https://review.mlplatform.org/ml/armnn" 
@@ -212,10 +215,10 @@ make
 The delegate library can then be found in `build/armnn/delegate`.
 
 
-# Integrate the ArmNN TfLite Delegate into your project
+# Integrate the Arm NN TfLite Delegate into your project
 
 The delegate can be integrated into your c++ project by creating a TfLite Interpreter and 
-instructing it to use the ArmNN delegate for the graph execution. This should look similiar
+instructing it to use the Arm NN delegate for the graph execution. This should look similiar
 to the following code snippet.
 ```objectivec
 // Create TfLite Interpreter
@@ -223,7 +226,7 @@ std::unique_ptr<Interpreter> armnnDelegateInterpreter;
 InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
                   (&armnnDelegateInterpreter)
 
-// Create the ArmNN Delegate
+// Create the Arm NN Delegate
 armnnDelegate::DelegateOptions delegateOptions(backends);
 std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
                     theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),

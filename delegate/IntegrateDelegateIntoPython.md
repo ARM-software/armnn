@@ -1,4 +1,4 @@
-# Integrate the TfLite delegate into a python script
+# Integrate the TfLite delegate into TfLite using Python
 If you have built the TfLite delegate as a separate dynamic library then this tutorial will show you how you can
 integrate it in TfLite to run models using python.
 
@@ -36,13 +36,13 @@ print(output_data)
 
 # Prepare the environment
 Pre-requisites:
- * Dynamically build ArmNN Delegate library
+ * Dynamically build Arm NN Delegate library
  * python3 (Depends on TfLite version)
  * virtualenv
  * numpy (Depends on TfLite version)
- * tflite_runtime (>=2.0, depends on ArmNN Delegate)
+ * tflite_runtime (>=2.0, depends on Arm NN Delegate)
 
-If you haven't built the delegate yet then take a look at the [build guide](BuildBuideNative.md).
+If you haven't built the delegate yet then take a look at the [build guide](./BuildGuideNative.md).
 
 We recommend creating a virtual environment for this tutorial. For the following code to work python3 is needed. Please
 also check the documentation of the TfLite version you want to use. There might be additional prerequisites for the python
@@ -63,7 +63,7 @@ source myenv/bin/activate
 Now that the environment is active we can install additional packages we need for our example script. As you can see 
 in the python script at the start of this page, this tutorial uses the `tflite_runtime` rather than the whole tensorflow 
 package. The `tflite_runtime` is a package that wraps the TfLite Interpreter. Therefore it can only be used to run inferences of 
-TfLite models. But since ArmNN is only an inference engine itself this is a perfect match. The 
+TfLite models. But since Arm NN is only an inference engine itself this is a perfect match. The 
 `tflite_runtime` is also much smaller than the whole tensorflow package and better suited to run models on 
 mobile and embedded devices.
 
@@ -73,7 +73,7 @@ possible. The TfLite [website](https://www.tensorflow.org/lite/guide/python) poi
 packages. However, that limits you to specific TfLite and Python versions. For this reason we will build the 
 `tflite_runtime` from source.
 
-You will have downloaded the tensorflow repository in order to build the ArmNN delegate. In there you can find further 
+You will have downloaded the tensorflow repository in order to build the Arm NN delegate. In there you can find further 
 instructions on how to build the `tflite_runtime` under `tensorflow/lite/tools/pip_package/README.md`. This tutorial 
 uses bazel to build it natively but there are scripts for cross-compilation available as well.
 ```bash
@@ -91,7 +91,7 @@ pip install tensorflow/lite/tools/pip_package/gen/tflite_pip/python3/dist/tflite
 
 Your virtual environment is now all setup. Copy the final python script into a python file e.g. 
 `ExternalDelegatePythonTutorial.py`. Modify the python script above and replace `<your-armnn-build-dir>` and 
-`<your-armnn-repo-dir>` with the directories you have set up. If you've been using the [native build guide](BuildGuideNative.md) 
+`<your-armnn-repo-dir>` with the directories you have set up. If you've been using the [native build guide](./BuildGuideNative.md) 
 this will be `$BASEDIR/armnn/build` and `$BASEDIR/armnn`.
 
 Finally, execute the script:
@@ -109,13 +109,13 @@ INFO: TfLiteArmnnDelegate: Created TfLite ArmNN delegate.
 Info: Shutdown time: 0.28 ms
 ```
 
-For more details on what kind of options you can pass to the armnn delegate please check 
+For more details on what kind of options you can pass to the Arm NN delegate please check 
 [armnn_delegate_adaptor.cpp](src/armnn_external_delegate.cpp).
 
 You can also test the functionality of the external delegate adaptor by running some unit tests:
 ```bash
 pip install pytest
 cd armnn/delegate/python/test
-# You can deselect tests that require backends that your hardware doesn't support using markers e.g. `-m "not GpuAccTest`
+# You can deselect tests that require backends that your hardware doesn't support using markers e.g. -m "not GpuAccTest"
 pytest --delegate-dir="<your-armnn-build-dir>/armnn/delegate/libarmnnDelegate.so" -m "not GpuAccTest" 
 ```

@@ -813,9 +813,12 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ./docs/00_software_tools.dox \
-                         ./docs/01_parsers.dox \
-                         ./docs/02_deserializer_serializer.dox \
+INPUT                  = ./docs/01_00_software_tools.dox \
+                         ./docs/01_01_parsers.dox \
+                         ./docs/01_03_delegate.dox \
+                         ./docs/01_02_deserializer_serializer.dox \
+                         ./docs/02_build_guides.dox \
+                         ./docs/03_use_guides.dox \
                          ./docs/04_backends.dox \
                          ./src/armnnQuantizer/README.md \
                          ./src/armnnConverter/README.md \
@@ -828,6 +831,8 @@ INPUT                  = ./docs/00_software_tools.dox \
                          ./tests/ \
                          ./delegate/include \
                          ./delegate/src/armnn_external_delegate.cpp \
+                         ./delegate/BuildGuideNative.md \
+                         ./delegate/IntegrateDelegateIntoPython.md \
                          ./README.md \
                          ./docs/FAQ.md
 

@@ -25,8 +25,7 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsReduceFp32ToFp16")
 
         // Enable ReduceFp32ToFp16
         armnn::OptimizerOptions optimizerOptions(true, true, false, false);
-        armnn::INetworkProperties networkProperties;
-        armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions, networkProperties);
+        armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
 
         DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
                                   backends,
@@ -56,8 +55,7 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsDebug")
 
         // Enable Debug
         armnn::OptimizerOptions optimizerOptions(false, true, false, false);
-        armnn::INetworkProperties networkProperties;
-        armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions, networkProperties);
+        armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
 
         DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
                                   backends,
@@ -98,7 +96,6 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsDebugFunction")
     armnn::INetworkProperties networkProperties;
     armnnDelegate::DelegateOptions delegateOptions(backends,
                                                    optimizerOptions,
-                                                   networkProperties,
                                                    armnn::EmptyOptional(),
                                                    armnn::Optional<armnn::DebugCallbackFunction>(mockCallback));
 
@@ -136,11 +133,10 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsImport")
     std::vector<int32_t> tensorShape { 1, 2, 2, 1 };
     std::vector<uint8_t> inputData = { 1, 2, 3, 4 };
     std::vector<uint8_t> divData = { 2, 2, 3, 4 };
-    std::vector<uint8_t> expectedResult = { 1, 2, 2, 2};
+    std::vector<uint8_t> expectedResult = { 1, 2, 2, 2 };
 
     armnn::OptimizerOptions optimizerOptions(false, false, false, true);
-    armnn::INetworkProperties networkProperties(true, true);
-    armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions, networkProperties);
+    armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
 
     DelegateOptionTest<uint8_t>(::tflite::TensorType_UINT8,
                                 backends,

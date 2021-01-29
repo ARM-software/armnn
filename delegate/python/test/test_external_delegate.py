@@ -1,11 +1,11 @@
 # Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 
+import numpy as np
 import pytest
 import tflite_runtime.interpreter as tflite
 import os
-from utils import run_mock_model
-
+from utils import run_mock_model, run_inference, compare_outputs
 
 def test_external_delegate_unknown_options(delegate_dir):
     print(delegate_dir)
@@ -13,7 +13,6 @@ def test_external_delegate_unknown_options(delegate_dir):
         tflite.load_delegate(
             delegate_dir,
             options={"wrong": "wrong"})
-
 
 def test_external_delegate_options_multiple_backends(delegate_dir):
     tflite.load_delegate(
@@ -63,3 +62,104 @@ def test_external_delegate_options_wrong_logging_level(delegate_dir):
         tflite.load_delegate(
             delegate_dir,
             options={"logging-severity": "wrong"})
+
+def test_external_delegate_options_debug(capfd, delegate_dir, test_data_folder):
+    # create armnn delegate with debug option
+    armnn_delegate = tflite.load_delegate(delegate_dir, options = {'backends': 'CpuRef', 'debug-data': '1'})
+
+    model_file_name = 'fp32_model.tflite'
+
+    tensor_shape = [1, 2, 2, 1]
+
+    input0 = np.array([1, 2, 3, 4], dtype=np.float32).reshape(tensor_shape)
+    input1 = np.array([2, 2, 3, 4], dtype=np.float32).reshape(tensor_shape)
+    inputs = [input0, input0, input1]
+    expected_output = np.array([1, 2, 2, 2], dtype=np.float32).reshape(tensor_shape)
+
+    # run the inference
+    armnn_outputs = run_inference(test_data_folder, model_file_name, inputs, [armnn_delegate])
+
+    # check results
+    compare_outputs(armnn_outputs, [expected_output])
+
+    captured = capfd.readouterr()
+    assert 'layerGuid' in captured.out
+
+
+def test_external_delegate_options_fp32_to_fp16(capfd, delegate_dir, test_data_folder):
+    # create armnn delegate with reduce-fp32-to-fp16 option
+    armnn_delegate = tflite.load_delegate(delegate_dir, options = {'backends': 'CpuRef',
+                                                                   'debug-data': '1',
+                                                                   'reduce-fp32-to-fp16': '1'})
+
+    model_file_name = 'fp32_model.tflite'
+
+    tensor_shape = [1, 2, 2, 1]
+
+    input0 = np.array([1, 2, 3, 4], dtype=np.float32).reshape(tensor_shape)
+    input1 = np.array([2, 2, 3, 4], dtype=np.float32).reshape(tensor_shape)
+    inputs = [input0, input0, input1]
+    expected_output = np.array([1, 2, 2, 2], dtype=np.float32).reshape(tensor_shape)
+
+    # run the inference
+    armnn_outputs = run_inference(test_data_folder, model_file_name, inputs, [armnn_delegate])
+
+    # check results
+    compare_outputs(armnn_outputs, [expected_output])
+
+    captured = capfd.readouterr()
+    assert 'convert_fp32_to_fp16' in captured.out
+    assert 'convert_fp16_to_fp32' in captured.out
+
+def test_external_delegate_options_fp32_to_bf16(capfd, delegate_dir, test_data_folder):
+    # create armnn delegate with reduce-fp32-to-bf16 option
+    armnn_delegate = tflite.load_delegate(delegate_dir, options = {'backends': 'CpuRef',
+                                                                   'debug-data': '1',
+                                                                   'reduce-fp32-to-bf16': '1'})
+
+    model_file_name = 'conv2d.tflite'
+
+    inputShape = [ 1, 5, 5, 1 ]
+    outputShape = [ 1, 3, 3, 1 ]
+
+    inputValues = [ 1, 5, 2, 3, 5,
+                    8, 7, 3, 6, 3,
+                    3, 3, 9, 1, 9,
+                    4, 1, 8, 1, 3,
+                    6, 8, 1, 9, 2 ]
+
+    expectedResult = [ 28, 38, 29,
+                       96, 104, 53,
+                       31, 55, 24 ]
+
+    input = np.array(inputValues, dtype=np.float32).reshape(inputShape)
+    expected_output = np.array(expectedResult, dtype=np.float32).reshape(outputShape)
+
+    # run the inference
+    armnn_outputs = run_inference(test_data_folder, model_file_name, [input], [armnn_delegate])
+
+    # check results
+    compare_outputs(armnn_outputs, [expected_output])
+
+    captured = capfd.readouterr()
+    assert 'convert_fp32_to_bf16' in captured.out
+
+def test_external_delegate_options_memory_import(delegate_dir, test_data_folder):
+    # create armnn delegate with memory-import option
+    armnn_delegate = tflite.load_delegate(delegate_dir, options = {'backends': 'CpuAcc,CpuRef',
+                                                                   'memory-import': '1'})
+
+    model_file_name = 'fallback_model.tflite'
+
+    tensor_shape = [1, 2, 2, 1]
+
+    input0 = np.array([1, 2, 3, 4], dtype=np.uint8).reshape(tensor_shape)
+    input1 = np.array([2, 2, 3, 4], dtype=np.uint8).reshape(tensor_shape)
+    inputs = [input0, input0, input1]
+    expected_output = np.array([1, 2, 2, 2], dtype=np.uint8).reshape(tensor_shape)
+
+    # run the inference
+    armnn_outputs = run_inference(test_data_folder, model_file_name, inputs, [armnn_delegate])
+
+    # check results
+    compare_outputs(armnn_outputs, [expected_output])

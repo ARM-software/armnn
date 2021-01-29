@@ -62,6 +62,22 @@ std::vector<std::string> gpu_options {"gpu-tuning-level",
  *    Possible values: ["true"/"false"] \n
  *    Description: Enables GPU kernel profiling
  *
+ *    Option key: "reduce-fp32-to-fp16" \n
+ *    Possible values: ["true"/"false"] \n
+ *    Description: Reduce Fp32 data to Fp16 for faster processing
+ *
+ *    Option key: "reduce-fp32-to-bf16" \n
+ *    Possible values: ["true"/"false"] \n
+ *    Description: Reduce Fp32 data to Bf16 for faster processing
+ *
+ *    Option key: "debug-data" \n
+ *    Possible values: ["true"/"false"] \n
+ *    Description: Add debug data for easier troubleshooting
+ *
+ *    Option key: "memory-import" \n
+ *    Possible values: ["true"/"false"] \n
+ *    Description: Enable memory import
+ *
  *
  * @param[in]     option_keys     Delegate option names
  * @param[in]     options_values  Delegate option values
@@ -81,6 +97,7 @@ TfLiteDelegate* tflite_plugin_create_delegate(char** options_keys,
     {
         // (Initializes with CpuRef backend)
         armnnDelegate::DelegateOptions options = armnnDelegate::TfLiteArmnnDelegateOptionsDefault();
+        armnn::OptimizerOptions optimizerOptions;
         for (size_t i = 0; i < num_options; ++i)
         {
             // Process backends
@@ -118,11 +135,32 @@ TfLiteDelegate* tflite_plugin_create_delegate(char** options_keys,
                 armnn::BackendOptions option("GpuAcc", {{"KernelProfilingEnabled", (*options_values[i] != '0')}});
                 options.AddBackendOption(option);
             }
+            // Process reduce-fp32-to-fp16 option
+            else if (std::string(options_keys[i]) == std::string("reduce-fp32-to-fp16"))
+            {
+               optimizerOptions.m_ReduceFp32ToFp16 = *options_values[i] != '0';
+            }
+            // Process reduce-fp32-to-bf16 option
+            else if (std::string(options_keys[i]) == std::string("reduce-fp32-to-bf16"))
+            {
+               optimizerOptions.m_ReduceFp32ToBf16 = *options_values[i] != '0';
+            }
+            // Process debug-data
+            else if (std::string(options_keys[i]) == std::string("debug-data"))
+            {
+               optimizerOptions.m_Debug = *options_values[i] != '0';
+            }
+            // Process memory-import
+            else if (std::string(options_keys[i]) == std::string("memory-import"))
+            {
+               optimizerOptions.m_ImportEnabled = *options_values[i] != '0';
+            }
             else
             {
                 throw armnn::Exception("Unknown option for the ArmNN Delegate given: " + std::string(options_keys[i]));
             }
         }
+        options.SetOptimizerOptions(optimizerOptions);
         delegate = TfLiteArmnnDelegateCreate(options);
     }
     catch (const std::exception& ex)

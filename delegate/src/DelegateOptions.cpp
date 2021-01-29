@@ -24,13 +24,11 @@ DelegateOptions::DelegateOptions(const std::vector<armnn::BackendId>& backends,
 
 DelegateOptions::DelegateOptions(armnn::Compute computeDevice,
                                  const armnn::OptimizerOptions& optimizerOptions,
-                                 const armnn::INetworkProperties& networkProperties,
                                  const armnn::Optional<armnn::LogSeverity>& logSeverityLevel,
                                  const armnn::Optional<armnn::DebugCallbackFunction>& func)
     : m_Backends({computeDevice}),
       m_BackendOptions({}),
       m_OptimizerOptions(optimizerOptions),
-      m_NetworkProperties(networkProperties),
       m_LoggingSeverity(logSeverityLevel),
       m_DebugCallbackFunc(func)
 {
@@ -38,13 +36,11 @@ DelegateOptions::DelegateOptions(armnn::Compute computeDevice,
 
 DelegateOptions::DelegateOptions(const std::vector<armnn::BackendId>& backends,
                                  const armnn::OptimizerOptions& optimizerOptions,
-                                 const armnn::INetworkProperties& networkProperties,
                                  const armnn::Optional<armnn::LogSeverity>& logSeverityLevel,
                                  const armnn::Optional<armnn::DebugCallbackFunction>& func)
     : m_Backends(backends),
       m_BackendOptions({}),
       m_OptimizerOptions(optimizerOptions),
-      m_NetworkProperties(networkProperties),
       m_LoggingSeverity(logSeverityLevel),
       m_DebugCallbackFunc(func)
 {

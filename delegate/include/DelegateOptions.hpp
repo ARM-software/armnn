@@ -29,13 +29,11 @@ public:
 
     DelegateOptions(armnn::Compute computeDevice,
                     const armnn::OptimizerOptions& optimizerOptions,
-                    const armnn::INetworkProperties& networkProperties = armnn::INetworkProperties(),
                     const armnn::Optional<armnn::LogSeverity>& logSeverityLevel = armnn::EmptyOptional(),
                     const armnn::Optional<armnn::DebugCallbackFunction>& func = armnn::EmptyOptional());
 
     DelegateOptions(const std::vector<armnn::BackendId>& backends,
                     const armnn::OptimizerOptions& optimizerOptions,
-                    const armnn::INetworkProperties& networkProperties = armnn::INetworkProperties(),
                     const armnn::Optional<armnn::LogSeverity>& logSeverityLevel = armnn::EmptyOptional(),
                     const armnn::Optional<armnn::DebugCallbackFunction>& func = armnn::EmptyOptional());
 
@@ -59,10 +57,10 @@ public:
 
     const armnn::OptimizerOptions& GetOptimizerOptions() const { return m_OptimizerOptions; }
 
+    void SetOptimizerOptions(const armnn::OptimizerOptions& optimizerOptions) { m_OptimizerOptions = optimizerOptions; }
+
     const armnn::Optional<armnn::DebugCallbackFunction>& GetDebugCallbackFunction() const
         { return m_DebugCallbackFunc; }
-
-    const armnn::INetworkProperties& GetNetworkProperties() const { return m_NetworkProperties; };
 
 private:
     /// Which backend to run Delegate on.
@@ -96,16 +94,11 @@ private:
     /// bool m_Debug;
     /// Reduce Fp32 data to Bf16 for faster processing
     /// bool m_ReduceFp32ToBf16;
-    /// Infer output size when not available
-    /// ShapeInferenceMethod m_shapeInferenceMethod;
     /// Enable Import
     /// bool m_ImportEnabled;
     /// Enable Model Options
     /// ModelOptions m_ModelOptions;
     armnn::OptimizerOptions m_OptimizerOptions;
-
-    /// Network properties to enable memory import
-    armnn::INetworkProperties m_NetworkProperties;
 
     /// Severity level for logging within ArmNN that will be used on creation of the delegate
     armnn::Optional<armnn::LogSeverity> m_LoggingSeverity;

@@ -353,10 +353,21 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
     {
         // Load graph into runtime
         std::string errorMessage;
-        auto loadingStatus = delegate->m_Runtime->LoadNetwork(networkId,
-                                                              std::move(optNet),
-                                                              errorMessage,
-                                                              delegate->m_Options.GetNetworkProperties());
+        armnn::Status loadingStatus;
+        if (delegate->m_Options.GetOptimizerOptions().m_ImportEnabled)
+        {
+            armnn::INetworkProperties networkProperties(true, true);
+            loadingStatus = delegate->m_Runtime->LoadNetwork(networkId,
+                                                             std::move(optNet),
+                                                             errorMessage,
+                                                             networkProperties);
+        }
+        else
+        {
+            loadingStatus = delegate->m_Runtime->LoadNetwork(networkId,
+                                                             std::move(optNet),
+                                                             errorMessage);
+        }
         if (loadingStatus != armnn::Status::Success)
         {
             // Optimize failed

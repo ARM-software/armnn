@@ -13,6 +13,8 @@ other helpful information in each section.
 
 @subpage parsers
 
+@subpage md_python_pyarmnn_README
+
 @subpage serializer
 
 @subpage deserializer
@@ -36,6 +38,8 @@ other helpful information in each section.
 namespace armnn
 {
 /**
+
+@page md_python_pyarmnn_README PyArmNN
 
 @page md_src_armnnQuantizer_README Quantizer
 

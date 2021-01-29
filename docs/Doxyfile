@@ -822,6 +822,7 @@ INPUT                  = ./docs/00_software_tools.dox \
                          ./tests/ImageCSVFileGenerator/README.md \
                          ./tests/ImageTensorGenerator/README.md \
                          ./tests/ModelAccuracyTool-Armnn/README.md \
+                         ./python/pyarmnn/README.md \
                          ./include/ \
                          ./src/ \
                          ./tests/ \
@@ -964,7 +965,7 @@ EXAMPLE_RECURSIVE      = NO
 # that contain images that are to be included in the documentation (see the
 # \image command).
 
-IMAGE_PATH             =
+IMAGE_PATH             = python/pyarmnn/
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

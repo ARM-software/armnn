@@ -60,6 +60,59 @@ using namespace caffe;
 using namespace std;
 using namespace google::protobuf::io;
 
+ICaffeParser::ICaffeParser() : pCaffeParserImpl(new RecordByRecordCaffeParser()) {}
+
+ICaffeParser::~ICaffeParser() = default;
+
+ICaffeParser* ICaffeParser::CreateRaw()
+{
+    return new ICaffeParser();
+}
+
+ICaffeParserPtr ICaffeParser::Create()
+{
+    return ICaffeParserPtr(CreateRaw(), &ICaffeParser::Destroy);
+}
+
+void ICaffeParser::Destroy(ICaffeParser* parser)
+{
+    delete parser;
+}
+
+armnn::INetworkPtr ICaffeParser::CreateNetworkFromTextFile(
+    const char* graphFile,
+    const std::map<std::string, armnn::TensorShape>& inputShapes,
+    const std::vector<std::string>& requestedOutputs)
+{
+    return pCaffeParserImpl->CreateNetworkFromTextFile(graphFile, inputShapes, requestedOutputs);
+}
+
+armnn::INetworkPtr ICaffeParser::CreateNetworkFromBinaryFile(
+    const char* graphFile,
+    const std::map<std::string, armnn::TensorShape>& inputShapes,
+    const std::vector<std::string>& requestedOutputs)
+{
+    return pCaffeParserImpl->CreateNetworkFromBinaryFile(graphFile, inputShapes,requestedOutputs);
+}
+
+armnn::INetworkPtr ICaffeParser::CreateNetworkFromString(
+    const char* protoText,
+    const std::map<std::string, armnn::TensorShape>& inputShapes,
+    const std::vector<std::string>& requestedOutputs)
+{
+    return pCaffeParserImpl->CreateNetworkFromString(protoText, inputShapes, requestedOutputs);
+}
+
+BindingPointInfo ICaffeParser::GetNetworkInputBindingInfo(const std::string& name) const
+{
+    return pCaffeParserImpl->GetNetworkInputBindingInfo(name);
+}
+
+BindingPointInfo ICaffeParser::GetNetworkOutputBindingInfo(const std::string& name) const
+{
+    return pCaffeParserImpl->GetNetworkOutputBindingInfo(name);
+}
+
 namespace
 {
 
@@ -232,63 +285,49 @@ ValueType GetOptionalWithFallback(const ParamType& param,
 
 } // namespace <anonymous>
 
-const std::map<std::string, CaffeParserBase::OperationParsingFunction>
-    CaffeParserBase::ms_CaffeLayerNameToParsingFunctions = {
-    { "Input",        &CaffeParserBase::ParseInputLayer },
-    { "Convolution",  &CaffeParserBase::ParseConvLayer },
-    { "Deconvolution",&CaffeParserBase::ParseDeconvLayer },
-    { "Pooling",      &CaffeParserBase::ParsePoolingLayer },
-    { "ReLU",         &CaffeParserBase::ParseReluLayer },
-    { "LRN",          &CaffeParserBase::ParseLRNLayer },
-    { "InnerProduct", &CaffeParserBase::ParseInnerProductLayer },
-    { "Softmax",      &CaffeParserBase::ParseSoftmaxLayer },
-    { "Eltwise",      &CaffeParserBase::ParseEltwiseLayer },
-    { "Concat",       &CaffeParserBase::ParseConcatLayer },
-    { "BatchNorm",    &CaffeParserBase::ParseBatchNormLayer },
-    { "Scale",        &CaffeParserBase::ParseScaleLayer },
-    { "Split",        &CaffeParserBase::ParseSplitLayer },
-    { "Dropout",      &CaffeParserBase::ParseDropoutLayer},
-    { "ArgMax",       &CaffeParserBase::ParseArgmaxLayer},
+const std::map<std::string, ICaffeParser::CaffeParserImpl::OperationParsingFunction>
+    ICaffeParser::CaffeParserImpl::ms_CaffeLayerNameToParsingFunctions = {
+    { "Input",        &CaffeParserImpl::ParseInputLayer },
+    { "Convolution",  &CaffeParserImpl::ParseConvLayer },
+    { "Deconvolution",&CaffeParserImpl::ParseDeconvLayer },
+    { "Pooling",      &CaffeParserImpl::ParsePoolingLayer },
+    { "ReLU",         &CaffeParserImpl::ParseReluLayer },
+    { "LRN",          &CaffeParserImpl::ParseLRNLayer },
+    { "InnerProduct", &CaffeParserImpl::ParseInnerProductLayer },
+    { "Softmax",      &CaffeParserImpl::ParseSoftmaxLayer },
+    { "Eltwise",      &CaffeParserImpl::ParseEltwiseLayer },
+    { "Concat",       &CaffeParserImpl::ParseConcatLayer },
+    { "BatchNorm",    &CaffeParserImpl::ParseBatchNormLayer },
+    { "Scale",        &CaffeParserImpl::ParseScaleLayer },
+    { "Split",        &CaffeParserImpl::ParseSplitLayer },
+    { "Dropout",      &CaffeParserImpl::ParseDropoutLayer},
+    { "ArgMax",       &CaffeParserImpl::ParseArgmaxLayer},
 };
 
-ICaffeParser* ICaffeParser::CreateRaw()
-{
-    return new RecordByRecordCaffeParser();
-}
-
-ICaffeParserPtr ICaffeParser::Create()
-{
-    return ICaffeParserPtr(CreateRaw(), &ICaffeParser::Destroy);
-}
-
-void ICaffeParser::Destroy(ICaffeParser* parser)
-{
-    delete parser;
-}
-
-CaffeParserBase::CaffeParserBase()
+ICaffeParser::CaffeParserImpl::CaffeParserImpl()
     : m_Network(nullptr, nullptr)
 {
 
 }
 
 CaffeParser::CaffeParser()
-: CaffeParserBase()
+: CaffeParserImpl()
 {
 
 }
 
-BindingPointInfo CaffeParserBase::GetNetworkInputBindingInfo(const std::string& name) const
+BindingPointInfo ICaffeParser::CaffeParserImpl::GetNetworkInputBindingInfo(const std::string& name) const
 {
     return GetBindingInfo(name, "input", m_NetworkInputsBindingInfo);
 }
 
-BindingPointInfo CaffeParserBase::GetNetworkOutputBindingInfo(const std::string& name) const
+BindingPointInfo ICaffeParser::CaffeParserImpl::GetNetworkOutputBindingInfo(const std::string& name) const
 {
     return GetBindingInfo(name, "output", m_NetworkOutputsBindingInfo);
 }
 
-std::pair<armnn::LayerBindingId, armnn::TensorInfo> CaffeParserBase::GetBindingInfo(const std::string& layerName,
+std::pair<armnn::LayerBindingId, armnn::TensorInfo> ICaffeParser::CaffeParserImpl::GetBindingInfo(
+    const std::string& layerName,
     const char* bindingPointDesc,
     const std::unordered_map<std::string, BindingPointInfo>& nameToBindingInfo)
 {
@@ -304,7 +343,7 @@ std::pair<armnn::LayerBindingId, armnn::TensorInfo> CaffeParserBase::GetBindingI
     return it->second;
 }
 
-TensorInfo CaffeParserBase::BlobShapeToTensorInfo(const caffe::BlobShape& blobShape) const
+TensorInfo ICaffeParser::CaffeParserImpl::BlobShapeToTensorInfo(const caffe::BlobShape& blobShape) const
 {
     std::vector<unsigned int> shape;
     for (int j = 0; j < blobShape.dim_size(); ++j)
@@ -329,7 +368,7 @@ BlobShape TensorDescToBlobShape(const TensorInfo& desc)
 
 // Note: can move to CaffeParser when/if we optimise the text/string format
 //       to load on a layer by layer basis
-vector<const LayerParameter*> CaffeParserBase::GetInputs(const LayerParameter& layerParam)
+vector<const LayerParameter*> ICaffeParser::CaffeParserImpl::GetInputs(const LayerParameter& layerParam)
 {
     std::vector<const caffe::LayerParameter*> ret;
     ret.reserve(armnn::numeric_cast<size_t>(layerParam.bottom_size()));
@@ -352,7 +391,7 @@ vector<const LayerParameter*> CaffeParserBase::GetInputs(const LayerParameter& l
     return ret;
 }
 
-void CaffeParserBase::ParseInputLayer(const LayerParameter& layerParam)
+void ICaffeParser::CaffeParserImpl::ParseInputLayer(const LayerParameter& layerParam)
 {
     ARMNN_ASSERT(layerParam.type() == "Input");
     ValidateNumInputsOutputs(layerParam, 0, 1);
@@ -402,10 +441,10 @@ void CaffeParserBase::ParseInputLayer(const LayerParameter& layerParam)
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), inputLayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::AddConvLayerWithSplits(const caffe::LayerParameter& layerParam,
-                                             const armnn::Convolution2dDescriptor& desc,
-                                             unsigned int kernelW,
-                                             unsigned int kernelH)
+void ICaffeParser::CaffeParserImpl::AddConvLayerWithSplits(const caffe::LayerParameter& layerParam,
+                                                           const armnn::Convolution2dDescriptor& desc,
+                                                           unsigned int kernelW,
+                                                           unsigned int kernelH)
 {
     ARMNN_ASSERT(layerParam.type() == "Convolution");
     ValidateNumInputsOutputs(layerParam, 1, 1);
@@ -592,10 +631,10 @@ void CaffeParserBase::AddConvLayerWithSplits(const caffe::LayerParameter& layerP
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), concatLayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::AddDeconvLayerWithSplits(const caffe::LayerParameter& layerParam,
-                                             const armnn::TransposeConvolution2dDescriptor& desc,
-                                             unsigned int kernelW,
-                                             unsigned int kernelH)
+void ICaffeParser::CaffeParserImpl::AddDeconvLayerWithSplits(const caffe::LayerParameter& layerParam,
+                                                             const armnn::TransposeConvolution2dDescriptor& desc,
+                                                             unsigned int kernelW,
+                                                             unsigned int kernelH)
 {
     ARMNN_ASSERT(layerParam.type() == "Deconvolution");
     ValidateNumInputsOutputs(layerParam, 1, 1);
@@ -780,10 +819,10 @@ void CaffeParserBase::AddDeconvLayerWithSplits(const caffe::LayerParameter& laye
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), concatLayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::AddConvLayerWithDepthwiseConv(const caffe::LayerParameter& layerParam,
-                                                    const armnn::Convolution2dDescriptor& convDesc,
-                                                    unsigned int kernelW,
-                                                    unsigned int kernelH)
+void ICaffeParser::CaffeParserImpl::AddConvLayerWithDepthwiseConv(const caffe::LayerParameter& layerParam,
+                                                                  const armnn::Convolution2dDescriptor& convDesc,
+                                                                  unsigned int kernelW,
+                                                                  unsigned int kernelH)
 {
     ARMNN_ASSERT(layerParam.type() == "Convolution");
     ValidateNumInputsOutputs(layerParam, 1, 1);
@@ -870,7 +909,7 @@ void CaffeParserBase::AddConvLayerWithDepthwiseConv(const caffe::LayerParameter&
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), returnLayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::ParseConvLayer(const LayerParameter& layerParam)
+void ICaffeParser::CaffeParserImpl::ParseConvLayer(const LayerParameter& layerParam)
 {
     // Ignored Caffe Parameters
     // * Weight Filler
@@ -1049,7 +1088,7 @@ void CaffeParserBase::ParseConvLayer(const LayerParameter& layerParam)
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), returnLayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::ParseDeconvLayer(const LayerParameter& layerParam)
+void ICaffeParser::CaffeParserImpl::ParseDeconvLayer(const LayerParameter& layerParam)
 {
     // Ignored Caffe Parameters
     // * Weight Filler
@@ -1225,7 +1264,7 @@ void CaffeParserBase::ParseDeconvLayer(const LayerParameter& layerParam)
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), returnLayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::ParsePoolingLayer(const LayerParameter& layerParam)
+void ICaffeParser::CaffeParserImpl::ParsePoolingLayer(const LayerParameter& layerParam)
 {
     // Ignored Caffe Parameters
     //      Stochastic Pooling
@@ -1337,7 +1376,7 @@ void CaffeParserBase::ParsePoolingLayer(const LayerParameter& layerParam)
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), poolingLayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::ParseArgmaxLayer(const LayerParameter& layerParam)
+void ICaffeParser::CaffeParserImpl::ParseArgmaxLayer(const LayerParameter& layerParam)
 {
     ValidateNumInputsOutputs(layerParam, 1, 1);
     ArgMaxParameter param = layerParam.argmax_param();
@@ -1397,7 +1436,7 @@ void CaffeParserBase::ParseArgmaxLayer(const LayerParameter& layerParam)
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), argmaxLayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::ParseReluLayer(const LayerParameter& layerParam)
+void ICaffeParser::CaffeParserImpl::ParseReluLayer(const LayerParameter& layerParam)
 {
     ValidateNumInputsOutputs(layerParam, 1, 1);
 
@@ -1423,7 +1462,7 @@ void CaffeParserBase::ParseReluLayer(const LayerParameter& layerParam)
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), activationLayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::ParseLRNLayer(const LayerParameter& layerParam)
+void ICaffeParser::CaffeParserImpl::ParseLRNLayer(const LayerParameter& layerParam)
 {
     ValidateNumInputsOutputs(layerParam, 1, 1);
 
@@ -1522,7 +1561,7 @@ void CaffeParserBase::ParseLRNLayer(const LayerParameter& layerParam)
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), normLayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::ParseInnerProductLayer(const LayerParameter& layerParam)
+void ICaffeParser::CaffeParserImpl::ParseInnerProductLayer(const LayerParameter& layerParam)
 {
     InnerProductParameter param = layerParam.inner_product_param();
 
@@ -1596,7 +1635,7 @@ void CaffeParserBase::ParseInnerProductLayer(const LayerParameter& layerParam)
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), fullyConnectedLayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::ParseSoftmaxLayer(const LayerParameter& layerParam)
+void ICaffeParser::CaffeParserImpl::ParseSoftmaxLayer(const LayerParameter& layerParam)
 {
     ValidateNumInputsOutputs(layerParam, 1, 1);
 
@@ -1618,7 +1657,7 @@ void CaffeParserBase::ParseSoftmaxLayer(const LayerParameter& layerParam)
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), softmaxLayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::ParseEltwiseLayer(const LayerParameter& layerParam)
+void ICaffeParser::CaffeParserImpl::ParseEltwiseLayer(const LayerParameter& layerParam)
 {
     ValidateNumInputsOutputs(layerParam, 2, 1);
 
@@ -1663,7 +1702,7 @@ void CaffeParserBase::ParseEltwiseLayer(const LayerParameter& layerParam)
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), newLayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::ParseConcatLayer(const LayerParameter& layerParam)
+void ICaffeParser::CaffeParserImpl::ParseConcatLayer(const LayerParameter& layerParam)
 {
     unsigned int numInputs = static_cast<unsigned int>(layerParam.bottom_size());
     // We assume concat happens along the channel dimension, which is 1 in (0, 1, 2, 3).
@@ -1722,7 +1761,7 @@ void CaffeParserBase::ParseConcatLayer(const LayerParameter& layerParam)
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), concatlayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::ParseBatchNormLayer(const LayerParameter& layerParam)
+void ICaffeParser::CaffeParserImpl::ParseBatchNormLayer(const LayerParameter& layerParam)
 {
     ValidateNumInputsOutputs(layerParam, 1, 1);
 
@@ -1786,7 +1825,7 @@ void CaffeParserBase::ParseBatchNormLayer(const LayerParameter& layerParam)
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), batchNormLayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::ParseScaleLayer(const LayerParameter& layerParam)
+void ICaffeParser::CaffeParserImpl::ParseScaleLayer(const LayerParameter& layerParam)
 {
     // Current unoptimal solution: add a batchnormalization layer with 0 mean and 1 variance.
     ValidateNumInputsOutputs(layerParam, 1, 1);
@@ -1836,7 +1875,7 @@ void CaffeParserBase::ParseScaleLayer(const LayerParameter& layerParam)
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), batchNormLayer->GetOutputSlot(0));
 }
 
-void CaffeParserBase::ParseSplitLayer(const caffe::LayerParameter& layerParam)
+void ICaffeParser::CaffeParserImpl::ParseSplitLayer(const caffe::LayerParameter& layerParam)
 {
     // Used in caffe to duplicate memory - not necessary in armnn.
     if (layerParam.bottom_size() != 1)
@@ -1855,7 +1894,7 @@ void CaffeParserBase::ParseSplitLayer(const caffe::LayerParameter& layerParam)
     }
 }
 
-void CaffeParserBase::ParseDropoutLayer(const caffe::LayerParameter& layerParam)
+void ICaffeParser::CaffeParserImpl::ParseDropoutLayer(const caffe::LayerParameter& layerParam)
 {
     // Ignored for inference, so patch the single input to its single output.
     if (layerParam.bottom_size() != 1 || layerParam.top_size() != 1)
@@ -1871,21 +1910,21 @@ void CaffeParserBase::ParseDropoutLayer(const caffe::LayerParameter& layerParam)
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)));
 }
 
-void CaffeParserBase::TrackInputBinding(armnn::IConnectableLayer* layer,
+void ICaffeParser::CaffeParserImpl::TrackInputBinding(armnn::IConnectableLayer* layer,
     armnn::LayerBindingId id,
     const armnn::TensorInfo& tensorInfo)
 {
     return TrackBindingPoint(layer, id, tensorInfo, layer->GetName(), m_NetworkInputsBindingInfo);
 }
 
-void CaffeParserBase::TrackOutputBinding(armnn::IConnectableLayer* layer,
+void ICaffeParser::CaffeParserImpl::TrackOutputBinding(armnn::IConnectableLayer* layer,
     armnn::LayerBindingId id,
     const armnn::TensorInfo& tensorInfo)
 {
     return TrackBindingPoint(layer, id, tensorInfo, layer->GetName(), m_NetworkOutputsBindingInfo);
 }
 
-void CaffeParserBase::TrackBindingPoint(armnn::IConnectableLayer* layer,
+void ICaffeParser::CaffeParserImpl::TrackBindingPoint(armnn::IConnectableLayer* layer,
     armnn::LayerBindingId id,
     const armnn::TensorInfo& tensorInfo,
     const char* bindingPointDesc,
@@ -1907,7 +1946,7 @@ void CaffeParserBase::TrackBindingPoint(armnn::IConnectableLayer* layer,
     }
 }
 
-armnn::IOutputSlot& CaffeParserBase::GetArmnnOutputSlotForCaffeTop(const std::string& caffeTopName) const
+armnn::IOutputSlot& ICaffeParser::CaffeParserImpl::GetArmnnOutputSlotForCaffeTop(const std::string& caffeTopName) const
 {
     auto it = m_ArmnnOutputSlotForCaffeTop.find(caffeTopName);
     if (it != m_ArmnnOutputSlotForCaffeTop.end())
@@ -1923,7 +1962,7 @@ armnn::IOutputSlot& CaffeParserBase::GetArmnnOutputSlotForCaffeTop(const std::st
     }
 }
 
-void CaffeParserBase::SetArmnnOutputSlotForCaffeTop(
+void ICaffeParser::CaffeParserImpl::SetArmnnOutputSlotForCaffeTop(
     const std::string& caffeTopName, armnn::IOutputSlot& armnnOutputSlot)
 {
     auto it = m_ArmnnOutputSlotForCaffeTop.find(caffeTopName);
@@ -1942,7 +1981,7 @@ void CaffeParserBase::SetArmnnOutputSlotForCaffeTop(
 
 // Note: can move to CaffeParser when/if we optimise the text/string format
 //       to load on a layer by layer basis
-void CaffeParserBase::ResolveInPlaceLayers(caffe::NetParameter& netParameter)
+void ICaffeParser::CaffeParserImpl::ResolveInPlaceLayers(caffe::NetParameter& netParameter)
 {
     // Finds layers with the same top.
     std::map<std::string, std::vector<caffe::LayerParameter*>> layersByTop;
@@ -1998,7 +2037,7 @@ void CaffeParserBase::ResolveInPlaceLayers(caffe::NetParameter& netParameter)
 
 // Note: can move to CaffeParser when/if we optimise the text/string format
 //       to load on a layer by layer basis
-void CaffeParserBase::LoadNetParam(NetParameter& netParameter)
+void ICaffeParser::CaffeParserImpl::LoadNetParam(NetParameter& netParameter)
 {
     // Caffe models sometimes have an implicit input layer.
     // In that case, add an explicit one.
@@ -2094,7 +2133,7 @@ void CaffeParserBase::LoadNetParam(NetParameter& netParameter)
     }
 }
 
-INetworkPtr CaffeParserBase::CreateNetworkFromTextFile(const char* graphFile,
+INetworkPtr ICaffeParser::CaffeParserImpl::CreateNetworkFromTextFile(const char* graphFile,
     const std::map<std::string, armnn::TensorShape>& inputShapes,
     const std::vector<std::string>& requestedOutputs)
 {
@@ -2126,7 +2165,7 @@ INetworkPtr CaffeParserBase::CreateNetworkFromTextFile(const char* graphFile,
     return CreateNetworkFromNetParameter(netParam, inputShapes, requestedOutputs);
 }
 
-INetworkPtr CaffeParserBase::CreateNetworkFromString(const char* protoText,
+INetworkPtr ICaffeParser::CaffeParserImpl::CreateNetworkFromString(const char* protoText,
     const std::map<std::string, armnn::TensorShape>& inputShapes,
     const std::vector<std::string>& requestedOutputs)
 {
@@ -2180,7 +2219,7 @@ INetworkPtr CaffeParser::CreateNetworkFromBinaryFile(const char* graphFile,
 
 // Note: can move to CaffeParser when/if we optimise the text/string format
 //       to load on a layer by layer basis
-INetworkPtr CaffeParserBase::CreateNetworkFromNetParameter(NetParameter& netParam,
+INetworkPtr ICaffeParser::CaffeParserImpl::CreateNetworkFromNetParameter(NetParameter& netParam,
     const std::map<std::string, armnn::TensorShape>& inputShapes,
     const std::vector<std::string>& requestedOutputs)
 {
@@ -2211,7 +2250,7 @@ INetworkPtr CaffeParserBase::CreateNetworkFromNetParameter(NetParameter& netPara
     return move(m_Network);
 }
 
-void CaffeParserBase::Cleanup() {
+void ICaffeParser::CaffeParserImpl::Cleanup() {
     // cleanup, in case we reuse this parser
     m_InputShapes.clear();
     m_RequestedOutputs.clear();

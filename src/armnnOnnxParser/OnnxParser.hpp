@@ -22,33 +22,34 @@ namespace armnnOnnxParser
 
 using ModelPtr = std::unique_ptr<onnx::ModelProto>;
 
-class OnnxParser : public IOnnxParser
+class OnnxParserImpl
 {
 
-using OperationParsingFunction = void(OnnxParser::*)(const onnx::NodeProto& NodeProto);
+using OperationParsingFunction = void(OnnxParserImpl::*)(const onnx::NodeProto& NodeProto);
 
 public:
 
     using GraphPtr = std::unique_ptr<onnx::GraphProto>;
 
     /// Create the network from a protobuf binary file on disk
-    virtual armnn::INetworkPtr CreateNetworkFromBinaryFile(const char* graphFile) override;
+    armnn::INetworkPtr CreateNetworkFromBinaryFile(const char* graphFile);
 
     /// Create the network from a protobuf text file on disk
-    virtual armnn::INetworkPtr CreateNetworkFromTextFile(const char* graphFile) override;
+    armnn::INetworkPtr CreateNetworkFromTextFile(const char* graphFile);
 
     /// Create the network directly from protobuf text in a string. Useful for debugging/testing
-    virtual armnn::INetworkPtr CreateNetworkFromString(const std::string& protoText) override;
+    armnn::INetworkPtr CreateNetworkFromString(const std::string& protoText);
 
     /// Retrieve binding info (layer id and tensor info) for the network input identified by the given layer name
-    virtual BindingPointInfo GetNetworkInputBindingInfo(const std::string& name) const override;
+    BindingPointInfo GetNetworkInputBindingInfo(const std::string& name) const;
 
     /// Retrieve binding info (layer id and tensor info) for the network output identified by the given layer name
-    virtual BindingPointInfo GetNetworkOutputBindingInfo(const std::string& name) const override;
+    BindingPointInfo GetNetworkOutputBindingInfo(const std::string& name) const;
 
 public:
 
-    OnnxParser();
+    OnnxParserImpl();
+    ~OnnxParserImpl() = default;
 
     static ModelPtr LoadModelFromBinaryFile(const char * fileName);
     static ModelPtr LoadModelFromTextFile(const char * fileName);

@@ -22,7 +22,7 @@ class NetParameterInfo;
 class LayerParameterInfo;
 
 
-class RecordByRecordCaffeParser : public CaffeParserBase
+class RecordByRecordCaffeParser : public ICaffeParser::CaffeParserImpl
 {
 public:
 

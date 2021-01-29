@@ -23,32 +23,39 @@ class NetParameter;
 namespace armnnCaffeParser
 {
 
-class CaffeParserBase:  public ICaffeParser
+class ICaffeParser::CaffeParserImpl
 {
 public:
 
     // Because we haven't looked at reducing the memory usage when loading from Text/String
     // have to retain these functions here for the moment.
     /// Create the network from a protobuf text file on disk
-    virtual armnn::INetworkPtr CreateNetworkFromTextFile(
+    armnn::INetworkPtr CreateNetworkFromTextFile(
         const char* graphFile,
         const std::map<std::string, armnn::TensorShape>& inputShapes,
-        const std::vector<std::string>& requestedOutputs) override;
+        const std::vector<std::string>& requestedOutputs);
+
+    /// Create the network from a protobuf binary file on the disk.
+    virtual armnn::INetworkPtr CreateNetworkFromBinaryFile(
+        const char* graphFile,
+        const std::map<std::string, armnn::TensorShape>& inputShapes,
+        const std::vector<std::string>& requestedOutputs) = 0;
 
 
     /// Creates the network directly from protobuf text in a string. Useful for debugging/testing.
-    virtual armnn::INetworkPtr CreateNetworkFromString(
+    armnn::INetworkPtr CreateNetworkFromString(
         const char* protoText,
         const std::map<std::string, armnn::TensorShape>& inputShapes,
-        const std::vector<std::string>& requestedOutputs) override;
+        const std::vector<std::string>& requestedOutputs);
 
     /// Retrieves binding info (layer id and tensor info) for the network input identified by the given layer name.
-    virtual BindingPointInfo GetNetworkInputBindingInfo(const std::string& name) const override;
+    BindingPointInfo GetNetworkInputBindingInfo(const std::string& name) const;
 
     /// Retrieves binding info (layer id and tensor info) for the network output identified by the given layer name.
-    virtual BindingPointInfo GetNetworkOutputBindingInfo(const std::string& name) const override;
+    BindingPointInfo GetNetworkOutputBindingInfo(const std::string& name) const;
 
-    CaffeParserBase();
+    CaffeParserImpl();
+    virtual ~CaffeParserImpl() = default;
 
 protected:
     /// Adds an armnn layer to m_Network given a Caffe LayerParameter of the correct type
@@ -118,7 +125,7 @@ protected:
 
     void Cleanup();
 
-    using OperationParsingFunction = void(CaffeParserBase::*)(const caffe::LayerParameter& layerParam);
+    using OperationParsingFunction = void(CaffeParserImpl::*)(const caffe::LayerParameter& layerParam);
 
     /// Maps Caffe layer names to parsing member functions.
     static const std::map<std::string, OperationParsingFunction> ms_CaffeLayerNameToParsingFunctions;
@@ -162,7 +169,7 @@ protected:
 
 };
 
-class CaffeParser : public CaffeParserBase
+class CaffeParser : public ICaffeParser::CaffeParserImpl
 {
 public:
 

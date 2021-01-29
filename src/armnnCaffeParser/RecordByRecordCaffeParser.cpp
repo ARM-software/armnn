@@ -456,7 +456,7 @@ void ResolveInPlaceLayers(std::vector<LayerParameterInfo>& layerInfo)
 
 } // anonymous namespace, can't be seen outside this source file
 
-RecordByRecordCaffeParser::RecordByRecordCaffeParser() : CaffeParserBase()
+RecordByRecordCaffeParser::RecordByRecordCaffeParser() : CaffeParserImpl()
 {}
 
 armnn::INetworkPtr RecordByRecordCaffeParser::CreateNetworkFromBinaryFile(

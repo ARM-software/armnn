@@ -15,7 +15,7 @@ https://developer.arm.com/solutions/machine-learning-on-arm/developer-material/h
 
 
 ## TfLite delegate guides
-@subpage md_delegate_IntegrateDelegateIntoPython
+ - @subpage md_delegate_IntegrateDelegateIntoPython
 
 **/
 }

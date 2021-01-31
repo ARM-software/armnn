@@ -20,7 +20,7 @@ Arm NN is managed by a single CMake project. That allows you to build multiple t
 options from different build guides.
 
 ## TfLite Delegate build guide
-@subpage md_delegate_BuildGuideNative
+ - @subpage md_delegate_BuildGuideNative
 
 **/
 }

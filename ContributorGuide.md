@@ -1,4 +1,4 @@
-# Contributor Guide
+# Contribution Guidelines
 
 The Arm NN project is open for external contributors and welcomes contributions. Arm NN is licensed under the [MIT license](https://spdx.org/licenses/MIT.html) and all accepted contributions must have the same license. For more details on contributing to Arm NN see the [Contributing page](https://mlplatform.org/contributing/) on the [MLPlatform.org](https://mlplatform.org/) website.
 

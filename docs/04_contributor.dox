@@ -1,0 +1,39 @@
+/// Copyright (c) 2021 ARM Limited and Contributors. All rights reserved.
+///
+/// SPDX-License-Identifier: MIT
+///
+
+namespace armnn
+{
+/**
+
+@page contribguides Contribution Guides
+@tableofcontents
+
+This is a collection of guides that should help you contribute code to Arm NN. Before you get started, please
+take a look into our /ref md_Contributor_Guide section.
+
+ - @subpage md_src_backends_README \n
+ This guide explains how to add your own backend to Arm NN. This might be useful if you would like to accelerate neural
+ networks on hardware that Arm NN currently doesn't support.
+
+
+ - @subpage md_src_dynamic_README \n
+ Arm NN allows you to load a backend dynamically on runtime. To find out how that can be done take a look at this guide.
+
+**/
+}
+
+
+/// Create pages for each tool so they appear nicely in the doxygen tree-view. Subpages are not listed there.
+/// Also we can overwrite the page name this way.
+namespace armnn
+{
+/**
+
+@page md_src_backends_README Backend Developer Guide
+
+@page md_src_dynamic_README Dynamically loadable Backend
+
+**/
+}

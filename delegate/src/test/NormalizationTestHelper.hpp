@@ -64,8 +64,8 @@ std::vector<char> CreateNormalizationTfLiteModel(tflite::BuiltinOperator normali
     buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
     buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
 
-    std::vector<int32_t> operatorInputs = {{ 0 }};
-    std::vector<int> subgraphInputs = {{ 0 }};
+    std::vector<int32_t> operatorInputs = { 0 };
+    std::vector<int> subgraphInputs = { 0 };
 
     tflite::BuiltinOptions operatorBuiltinOptionsType = BuiltinOptions_L2NormOptions;
     flatbuffers::Offset<void> operatorBuiltinOptions = CreateL2NormOptions(flatBufferBuilder,
@@ -79,7 +79,7 @@ std::vector<char> CreateNormalizationTfLiteModel(tflite::BuiltinOperator normali
     }
 
     // create operator
-    const std::vector<int32_t> operatorOutputs{{ 1 }};
+    const std::vector<int32_t> operatorOutputs{ 1 };
     flatbuffers::Offset <Operator> normalizationOperator =
         CreateOperator(flatBufferBuilder,
                        0,
@@ -88,7 +88,7 @@ std::vector<char> CreateNormalizationTfLiteModel(tflite::BuiltinOperator normali
                        operatorBuiltinOptionsType,
                        operatorBuiltinOptions);
 
-    const std::vector<int> subgraphOutputs{{ 1 }};
+    const std::vector<int> subgraphOutputs{ 1 };
     flatbuffers::Offset <SubGraph> subgraph =
         CreateSubGraph(flatBufferBuilder,
                        flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),

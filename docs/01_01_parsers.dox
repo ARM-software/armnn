@@ -12,21 +12,26 @@ namespace armnn
 Execute models from different machine learning platforms efficiently with our parsers. Simply choose a parser according
 to the model you want to run e.g. If you've got a model in tensorflow format (<model_name>.pb) use our tensorflow-parser.
 
-If you would like to run a Tensorflow Lite (TfLite) model you probably also want to take a look at our [TfLite delegate](delegate).
+If you would like to run a Tensorflow Lite (TfLite) model you probably also want to take a look at our @ref delegate.
 
 All parsers are written in C++ but it is also possible to use them in python. For more information on our python
-bindings take a look into the [PyArmNN](pyarmnn) section.
+bindings take a look into the @ref md_python_pyarmnn_README section.
 
-Fallback mechanism
 
-@section S4_caffe_parser ArmNN Caffe Parser
+
+@section S4_caffe_parser Arm NN Caffe Parser
 
 `armnnCaffeParser` is a library for loading neural networks defined in Caffe protobuf files into the Arm NN runtime.
+
+Please note that certain deprecated Caffe features are not supported by the armnnCaffeParser. If you think that Arm NN
+should be able to load your model according to the list of supported layers, but you are getting strange error
+messages, then try upgrading your model to the latest format using Caffe, either by saving it to a new file or using
+the upgrade utilities in `caffe/tools`.
 
 ## Caffe layers supported by the Arm NN SDK
 This reference guide provides a list of Caffe layers the Arm NN SDK currently supports.
 
-## Although some other neural networks might work, Arm tests the Arm NN SDK with Caffe implementations of the following neural networks:
+### Although some other neural networks might work, Arm tests the Arm NN SDK with Caffe implementations of the following neural networks:
 
 - AlexNet.
 - Cifar10.
@@ -38,20 +43,23 @@ This reference guide provides a list of Caffe layers the Arm NN SDK currently su
 - MobileNetv1.
 - SqueezeNet v1.0 and SqueezeNet v1.1
 
-## The Arm NN SDK supports the following machine learning layers for Caffe networks:
+### The Arm NN SDK supports the following machine learning layers for Caffe networks:
 
+- Argmax, excluding the top_k and out_max_val parameters.
 - BatchNorm, in inference mode.
-- Convolution, excluding the Dilation Size, Weight Filler, Bias Filler, Engine, Force nd_im2col, and Axis parameters.
+- Convolution, excluding Weight Filler, Bias Filler, Engine, Force nd_im2col, and Axis parameters.
+- Deconvolution, excluding the Dilation Size, Weight Filler, Bias Filler, Engine, Force nd_im2col, and Axis parameters.
+
   Caffe doesn't support depthwise convolution, the equivalent layer is implemented through the notion of groups. ArmNN supports groups this way:
   - when group=1, it is a normal conv2d
   - when group=#input_channels, we can replace it by a depthwise convolution
   - when group>1 && group<#input_channels, we need to split the input into the given number of groups, apply a separate convolution and then merge the results
 - Concat, along the channel dimension only.
 - Dropout, in inference mode.
-- Element wise, excluding the coefficient parameter.
+- Eltwise, excluding the coeff parameter.
 - Inner Product, excluding the Weight Filler, Bias Filler, Engine, and Axis parameters.
 - Input.
-- Local Response Normalisation (LRN), excluding the Engine parameter.
+- LRN, excluding the Engine parameter.
 - Pooling, excluding the Stochastic Pooling and Engine parameters.
 - ReLU.
 - Scale.
@@ -60,8 +68,10 @@ This reference guide provides a list of Caffe layers the Arm NN SDK currently su
 
 More machine learning layers will be supported in future releases.
 
-Please note that certain deprecated Caffe features are not supported by the armnnCaffeParser. If you think that Arm NN should be able to load your model according to the list of supported layers, but you are getting strange error messages, then try upgrading your model to the latest format using Caffe, either by saving it to a new file or using the upgrade utilities in `caffe/tools`.
 <br/><br/><br/><br/>
+
+
+
 
 @section S5_onnx_parser ArmNN Onnx Parser
 
@@ -73,7 +83,7 @@ This reference guide provides a list of ONNX operators the Arm NN SDK currently 
 
 The Arm NN SDK ONNX parser currently only supports fp32 operators.
 
-## Fully supported
+### Fully supported
 
 - Add
   - See the ONNX [Add documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Add) for more information
@@ -112,7 +122,7 @@ The Arm NN SDK ONNX parser currently only supports fp32 operators.
   - See the ONNX [Tanh documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Tanh) for more information.
 
 
-## Partially supported
+### Partially supported
 
 - Conv
   - The parser only supports 2D convolutions with a dilation rate of [1, 1] and group = 1 or group = #Nb_of_channel (depthwise convolution)
@@ -125,11 +135,14 @@ The Arm NN SDK ONNX parser currently only supports fp32 operators.
 ## Tested networks
 
 Arm tested these operators with the following ONNX fp32 neural networks:
-- Simple MNIST. See the ONNX [MNIST documentation](https://github.com/onnx/models/tree/master/mnist) for more information.
-- Mobilenet_v2. See the ONNX [MobileNet documentation](https://github.com/onnx/models/tree/master/models/image_classification/mobilenet) for more information.
+- Mobilenet_v2. See the ONNX [MobileNet documentation](https://github.com/onnx/models/tree/master/vision/classification/mobilenet) for more information.
+- Simple MNIST. This is no longer directly documented by ONNX. The model and test data may be downloaded [from the ONNX model zoo](https://onnxzoo.blob.core.windows.net/models/opset_8/mnist/mnist.tar.gz).
 
 More machine learning operators will be supported in future releases.
 <br/><br/><br/><br/>
+
+
+
 
 @section S6_tf_lite_parser ArmNN Tf Lite Parser
 
@@ -140,8 +153,7 @@ into the Arm NN runtime.
 
 This reference guide provides a list of TensorFlow Lite operators the Arm NN SDK currently supports.
 
-## Fully supported
-
+### Fully supported
 The Arm NN SDK TensorFlow Lite parser currently supports the following operators:
 
 - ADD
@@ -149,19 +161,23 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - BATCH_TO_SPACE
 - CONCATENATION, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- DEPTH_TO_SPACE
 - DEPTHWISE_CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - DEQUANTIZE
 - DIV
+- ELU
 - EXP
 - FULLY_CONNECTED, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- GATHER
+- HARD_SWISH
+- LEAKY_RELU
 - LOGISTIC
 - L2_NORMALIZATION
-- LEAKY_RELU
 - MAX_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - MAXIMUM
 - MEAN
 - MINIMUM
-- MUL
+- MU
 - NEG
 - PACK
 - PAD
@@ -184,12 +200,10 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - TRANSPOSE_CONV
 - UNPACK
 
-## Custom Operator
-
+### Custom Operator
 - TFLite_Detection_PostProcess
 
 ## Tested networks
-
 Arm tested these operators with the following TensorFlow Lite neural network:
 - [Quantized MobileNet](http://download.tensorflow.org/models/mobilenet_v1_2018_02_22/mobilenet_v1_1.0_224_quant.tgz)
 - [Quantized SSD MobileNet](http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_quantized_300x300_coco14_sync_2018_07_18.tar.gz)
@@ -208,6 +222,9 @@ Arm tested these operators with the following TensorFlow Lite neural network:
 More machine learning operators will be supported in future releases.
 <br/><br/><br/><br/>
 
+
+
+
 @section S7_tf_parser ArmNN Tensorflow Parser
 
 `armnnTfParser` is a library for loading neural networks defined by TensorFlow protobuf files into the Arm NN runtime.
@@ -218,7 +235,7 @@ This reference guide provides a list of TensorFlow operators the Arm NN SDK curr
 
 The Arm NN SDK TensorFlow parser currently only supports fp32 operators.
 
-## Fully supported
+### Fully supported
 
 - avg_pool
   - See the TensorFlow [avg_pool documentation](https://www.tensorflow.org/api_docs/python/tf/nn/avg_pool) for more information.
@@ -259,7 +276,7 @@ The Arm NN SDK TensorFlow parser currently only supports fp32 operators.
 - transpose
   - See the TensorFlow [transpose documentation](https://www.tensorflow.org/api_docs/python/tf/transpose) for more information.
 
-## Partially supported
+### Partially supported
 
 - add
   - The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [add operator documentation](https://www.tensorflow.org/api_docs/python/tf/add) for more information.
@@ -316,10 +333,8 @@ Arm tests these operators with the following TensorFlow fp32 neural networks:
 - Lenet
 - mobilenet_v1_1.0_224. The Arm NN SDK only supports the non-quantized version of the network. See the [MobileNet_v1 documentation](https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet_v1.md) for more information on quantized networks.
 - inception_v3. The Arm NN SDK only supports the official inception_v3 transformed model. See the TensorFlow documentation on [preparing models for mobile deployment](https://www.tensorflow.org/mobile/prepare_models) for more information on how to transform the inception_v3 network.
-
-Using these datasets:
-- Cifar10
 - Simple MNIST. For more information check out the [tutorial](https://developer.arm.com/technologies/machine-learning-on-arm/developer-material/how-to-guides/deploying-a-tensorflow-mnist-model-on-arm-nn) on the Arm Developer portal.
+- ResNet v2 50 implementation from the [TF Slim model zoo](https://github.com/tensorflow/models/tree/master/research/slim)
 
 More machine learning operators will be supported in future releases.
 

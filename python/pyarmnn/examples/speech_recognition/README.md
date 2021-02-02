@@ -35,6 +35,15 @@ Install the required Python modules:
 $ pip install -r requirements.txt
 ```
 
+### Model
+
+The model for this can be found in the Arm Model Zoo repository:
+https://github.com/ARM-software/ML-zoo/tree/master/models
+
+The model we're looking for:
+https://github.com/ARM-software/ML-zoo/tree/master/models/speech_recognition/wav2letter/tflite_int8 
+
+
 ## Performing Automatic Speech Recognition
 
 ### Processing Audio Files

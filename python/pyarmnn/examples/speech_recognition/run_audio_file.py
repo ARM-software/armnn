@@ -65,7 +65,7 @@ def main(args):
     mfcc_params = MFCCParams(sampling_freq=16000, num_fbank_bins=128, mel_lo_freq=0, mel_hi_freq=8000,
                                         num_mfcc_feats=13, frame_len=512, use_htk_method=False, n_FFT=512)
     mfcc = MFCC(mfcc_params)
-    preprocessor = Preprocessor(mfcc, model_input_size=1044, stride=160)
+    preprocessor = Preprocessor(mfcc, model_input_size=296, stride=160)
 
     text = ""
     current_r_context = ""

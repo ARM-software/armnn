@@ -20,7 +20,7 @@ class ModelParams:
         self.mono = True
         self.dtype = np.float32
         self.samplerate = 16000
-        self.min_samples = 167392
+        self.min_samples = 47712  # (model_input_size-1)*stride + frame_len
 
 
 class AudioCapture:

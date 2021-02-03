@@ -3633,4 +3633,31 @@ void LogicalBinaryQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) co
     }
 }
 
+void ReduceQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"ReduceQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
+
+    std::vector<DataType> supportedTypes =
+    {
+        DataType::BFloat16,
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QAsymmS8,
+        DataType::QAsymmU8,
+        DataType::QSymmS16,
+        DataType::Signed32
+    };
+
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+}
+
 } // namespace armnn

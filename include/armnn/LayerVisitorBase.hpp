@@ -208,6 +208,10 @@ public:
     void VisitRankLayer(const IConnectableLayer*,
                         const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitReduceLayer(const IConnectableLayer*,
+                          const ReduceDescriptor&,
+                          const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitReshapeLayer(const IConnectableLayer*,
                            const ReshapeDescriptor&,
                            const char*) override { DefaultPolicy::Apply(__func__); }

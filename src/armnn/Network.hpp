@@ -169,6 +169,9 @@ public:
     IConnectableLayer* AddResizeLayer(const ResizeDescriptor& resizeDescriptor,
                                       const char* name = nullptr) override;
 
+    IConnectableLayer* AddReduceLayer(const ReduceDescriptor& reduceDescriptor,
+                                      const char* name = nullptr) override;
+
     IConnectableLayer* AddInstanceNormalizationLayer(const InstanceNormalizationDescriptor& desc,
                                                      const char* name = nullptr) override;
 

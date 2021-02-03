@@ -137,6 +137,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/QuantizeTestImpl.hpp
     layerTests/RankTestImpl.cpp
     layerTests/RankTestImpl.hpp
+    layerTests/ReduceSumTestImpl.cpp
+    layerTests/ReduceSumTestImpl.hpp
     layerTests/ReshapeTestImpl.cpp
     layerTests/ReshapeTestImpl.hpp
     layerTests/ResizeTestImpl.cpp

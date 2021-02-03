@@ -368,6 +368,8 @@ list(APPEND armnn_sources
     src/armnn/layers/PreluLayer.cpp
     src/armnn/layers/RankLayer.hpp
     src/armnn/layers/RankLayer.cpp
+    src/armnn/layers/ReduceLayer.hpp
+    src/armnn/layers/ReduceLayer.cpp
     src/armnn/layers/ReshapeLayer.hpp
     src/armnn/layers/ReshapeLayer.cpp
     src/armnn/layers/ResizeLayer.hpp
@@ -829,6 +831,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Squeeze.cpp
              src/armnnTfLiteParser/test/StridedSlice.cpp
              src/armnnTfLiteParser/test/Sub.cpp
+             src/armnnTfLiteParser/test/Sum.cpp
              src/armnnTfLiteParser/test/TransposeConv.cpp
              src/armnnTfLiteParser/test/Transpose.cpp
              src/armnnTfLiteParser/test/Unpack.cpp
@@ -925,6 +928,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/DeserializePermute.cpp
             src/armnnDeserializer/test/DeserializePooling2d.cpp
             src/armnnDeserializer/test/DeserializeRank.cpp
+            src/armnnDeserializer/test/DeserializeReduceSum.cpp
             src/armnnDeserializer/test/DeserializeReshape.cpp
             src/armnnDeserializer/test/DeserializeResizeBilinear.cpp
             src/armnnDeserializer/test/DeserializeRsqrt.cpp

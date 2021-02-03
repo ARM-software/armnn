@@ -44,8 +44,6 @@ list(APPEND armnnRefBackendWorkloads_sources
     LstmUtils.hpp
     LstmUtils.cpp
     Maximum.hpp
-    Mean.cpp
-    Mean.hpp
     Concatenate.hpp
     Concatenate.cpp
     Minimum.hpp
@@ -55,6 +53,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Pooling2d.hpp
     PreluImpl.cpp
     PreluImpl.hpp
+    Reduce.cpp
+    Reduce.hpp
     RefActivationWorkload.cpp
     RefActivationWorkload.hpp
     RefArgMinMaxWorkload.cpp
@@ -132,6 +132,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefQLstmWorkload.cpp
     RefQLstmWorkload.hpp
     RefRankWorkload.hpp
+    RefReduceWorkload.cpp
+    RefReduceWorkload.hpp
     RefReshapeWorkload.cpp
     RefReshapeWorkload.hpp
     RefResizeBilinearWorkload.cpp

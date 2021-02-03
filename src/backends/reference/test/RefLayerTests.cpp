@@ -2234,4 +2234,11 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalOrBroadcast2, LogicalOrBroadcast2Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalAndBroadcast3, LogicalAndBroadcast3Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalOrBroadcast3, LogicalOrBroadcast3Test)
 
+// ReduceSum
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceSumFloat32, ReduceSumSimpleTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceSumSingleAxisFloat32_1, ReduceSumSingleAxisTest1<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceSumSingleAxisFloat32_2, ReduceSumSingleAxisTest2<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceSumSingleAxisFloat32_3, ReduceSumSingleAxisTest3<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceSumMultipleAxisFloat32, ReduceSumMultipleAxisTest<DataType::Float32>)
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -251,6 +251,7 @@ m_ParserFunctions(Layer_MAX+1, &IDeserializer::DeserializerImpl::ParseUnsupporte
     m_ParserFunctions[Layer_QuantizeLayer]               = &DeserializerImpl::ParseQuantize;
     m_ParserFunctions[Layer_QuantizedLstmLayer]          = &DeserializerImpl::ParseQuantizedLstm;
     m_ParserFunctions[Layer_RankLayer]                   = &DeserializerImpl::ParseRank;
+    m_ParserFunctions[Layer_ReduceLayer]                 = &DeserializerImpl::ParseReduce;
     m_ParserFunctions[Layer_ReshapeLayer]                = &DeserializerImpl::ParseReshape;
     m_ParserFunctions[Layer_ResizeBilinearLayer]         = &DeserializerImpl::ParseResizeBilinear;
     m_ParserFunctions[Layer_ResizeLayer]                 = &DeserializerImpl::ParseResize;
@@ -363,6 +364,8 @@ LayerBaseRawPtr IDeserializer::DeserializerImpl::GetBaseLayer(const GraphPtr& gr
             return graphPtr->layers()->Get(layerIndex)->layer_as_QuantizedLstmLayer()->base();
         case Layer::Layer_RankLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_RankLayer()->base();
+        case Layer::Layer_ReduceLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_ReduceLayer()->base();
         case Layer::Layer_ReshapeLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_ReshapeLayer()->base();
         case Layer::Layer_ResizeBilinearLayer:
@@ -495,6 +498,23 @@ armnn::ComparisonOperation ToComparisonOperation(armnnSerializer::ComparisonOper
         case armnnSerializer::ComparisonOperation::ComparisonOperation_NotEqual:
         default:
             return armnn::ComparisonOperation::NotEqual;
+    }
+}
+
+armnn::ReduceOperation ToReduceOperation(armnnSerializer::ReduceOperation operation)
+{
+    switch (operation)
+    {
+        case armnnSerializer::ReduceOperation::ReduceOperation_Sum:
+            return armnn::ReduceOperation::Sum;
+        case armnnSerializer::ReduceOperation::ReduceOperation_Max:
+            return armnn::ReduceOperation::Max;
+        case armnnSerializer::ReduceOperation::ReduceOperation_Mean:
+            return armnn::ReduceOperation::Mean;
+        case armnnSerializer::ReduceOperation::ReduceOperation_Min:
+            return armnn::ReduceOperation::Min;
+        default:
+            return armnn::ReduceOperation::Sum;
     }
 }
 
@@ -2074,6 +2094,38 @@ void IDeserializer::DeserializerImpl::ParseRank(GraphPtr graph, unsigned int lay
 
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddRankLayer( layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void IDeserializer::DeserializerImpl::ParseReduce(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+    CHECK_LOCATION();
+
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto fbLayer      = graph->layers()->Get(layerIndex)->layer_as_ReduceLayer();
+    auto fbDescriptor = fbLayer->descriptor();
+    auto flatBufferAxis = fbDescriptor->axis();
+
+    armnn::ReduceDescriptor descriptor;
+    descriptor.m_TargetHeight = fbDescriptor->targetHeight();
+    descriptor.m_TargetWidth  = fbDescriptor->targetWidth();
+    descriptor.m_KeepDims     = fbDescriptor->keepDims();
+    descriptor.m_vAxis = std::vector<unsigned int>(flatBufferAxis->begin(), flatBufferAxis->end());
+    descriptor.m_ReduceOperation = ToReduceOperation(fbDescriptor->reduceOperation());
+
+    const std::string& layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer     = m_Network->AddReduceLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

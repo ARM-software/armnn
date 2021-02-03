@@ -38,11 +38,11 @@ BACKEND_SOURCES := \
         workloads/InstanceNorm.cpp \
         workloads/LogSoftmax.cpp \
         workloads/LstmUtils.cpp \
-        workloads/Mean.cpp \
         workloads/Concatenate.cpp \
         workloads/Pad.cpp \
         workloads/Pooling2d.cpp \
         workloads/PreluImpl.cpp \
+        workloads/Reduce.cpp \
         workloads/RefActivationWorkload.cpp \
         workloads/RefArgMinMaxWorkload.cpp \
         workloads/RefBatchNormalizationWorkload.cpp \
@@ -81,6 +81,7 @@ BACKEND_SOURCES := \
         workloads/RefPreluWorkload.cpp \
         workloads/RefQLstmWorkload.cpp \
         workloads/RefQuantizeWorkload.cpp \
+        workloads/RefReduceWorkload.cpp \
         workloads/RefReshapeWorkload.cpp \
         workloads/RefResizeBilinearWorkload.cpp \
         workloads/RefResizeWorkload.cpp \

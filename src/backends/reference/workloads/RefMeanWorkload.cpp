@@ -5,7 +5,7 @@
 
 #include "RefMeanWorkload.hpp"
 
-#include "Mean.hpp"
+#include "Reduce.hpp"
 #include "RefWorkloadUtils.hpp"
 
 #include "Profiling.hpp"
@@ -28,7 +28,12 @@ void RefMeanWorkload::Execute() const
     auto inputDecoder  = MakeDecoder<float>(inputInfo,  m_Data.m_Inputs[0]->Map());
     auto outputEncoder = MakeEncoder<float>(outputInfo, m_Data.m_Outputs[0]->Map());
 
-    Mean(inputInfo, outputInfo, m_Data.m_Parameters.m_Axis, *inputDecoder, *outputEncoder);
+    Reduce(inputInfo,
+           outputInfo,
+           *inputDecoder,
+           *outputEncoder,
+           m_Data.m_Parameters.m_Axis,
+           armnn::ReduceOperation::Mean);
 }
 
 } //namespace armnn

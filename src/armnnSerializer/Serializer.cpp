@@ -904,6 +904,25 @@ void SerializerVisitor::VisitRankLayer(const armnn::IConnectableLayer* layer,
 
     CreateAnyLayer(flatBufferRankLayer.o, serializer::Layer::Layer_RankLayer);
 }
+
+void SerializerVisitor::VisitReduceLayer(const armnn::IConnectableLayer* layer,
+                                         const armnn::ReduceDescriptor& reduceDescriptor,
+                                         const char*)
+{
+    auto fbReduceBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Reduce);
+    auto fbDescriptor = CreateReduceDescriptor(m_flatBufferBuilder,
+                                               reduceDescriptor.m_TargetHeight,
+                                               reduceDescriptor.m_TargetWidth,
+                                               reduceDescriptor.m_KeepDims,
+                                               m_flatBufferBuilder.CreateVector(reduceDescriptor.m_vAxis),
+                                               GetFlatBufferReduceOperation(reduceDescriptor.m_ReduceOperation));
+    auto fbReduceLayer = serializer::CreateReduceLayer(m_flatBufferBuilder,
+                                                       fbReduceBaseLayer,
+                                                       fbDescriptor);
+
+    CreateAnyLayer(fbReduceLayer.o, serializer::Layer::Layer_ReduceLayer);
+}
+
 // Build FlatBuffer for Reshape Layer
 void SerializerVisitor::VisitReshapeLayer(const armnn::IConnectableLayer* layer,
                                           const armnn::ReshapeDescriptor& reshapeDescriptor,

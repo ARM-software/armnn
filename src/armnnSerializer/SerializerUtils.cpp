@@ -198,4 +198,21 @@ armnnSerializer::ResizeMethod GetFlatBufferResizeMethod(armnn::ResizeMethod meth
     }
 }
 
+armnnSerializer::ReduceOperation GetFlatBufferReduceOperation(armnn::ReduceOperation reduceOperation)
+{
+    switch (reduceOperation)
+    {
+        case armnn::ReduceOperation::Sum:
+            return armnnSerializer::ReduceOperation::ReduceOperation_Sum;
+        case armnn::ReduceOperation::Max:
+            return armnnSerializer::ReduceOperation::ReduceOperation_Max;
+        case armnn::ReduceOperation::Mean:
+            return armnnSerializer::ReduceOperation::ReduceOperation_Mean;
+        case armnn::ReduceOperation::Min:
+            return armnnSerializer::ReduceOperation::ReduceOperation_Min;
+        default:
+            return armnnSerializer::ReduceOperation::ReduceOperation_Sum;
+    }
+}
+
 } // namespace armnnSerializer

@@ -108,6 +108,14 @@ enum class PoolingAlgorithm
     L2      = 2
 };
 
+enum class ReduceOperation
+{
+    Sum  = 0,
+    Max  = 1,
+    Mean = 2,
+    Min  = 3
+};
+
 enum class ResizeMethod
 {
     Bilinear        = 0,

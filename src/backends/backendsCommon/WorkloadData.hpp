@@ -668,4 +668,9 @@ struct LogicalBinaryQueueDescriptor : QueueDescriptorWithParameters<LogicalBinar
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct ReduceQueueDescriptor : QueueDescriptorWithParameters<ReduceDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } // namespace armnn

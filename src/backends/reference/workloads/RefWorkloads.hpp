@@ -54,6 +54,7 @@
 #include "RefQLstmWorkload.hpp"
 #include "RefQuantizeWorkload.hpp"
 #include "RefRankWorkload.hpp"
+#include "RefReduceWorkload.hpp"
 #include "RefReshapeWorkload.hpp"
 #include "RefResizeBilinearWorkload.hpp"
 #include "RefResizeWorkload.hpp"

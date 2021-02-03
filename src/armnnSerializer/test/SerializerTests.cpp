@@ -2297,6 +2297,36 @@ BOOST_AUTO_TEST_CASE(SerializeRank)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeReduceSum)
+{
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Reduce)
+
+    const std::string layerName("Reduce_Sum");
+    const armnn::TensorInfo inputInfo({1, 1, 3, 2}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({1, 1, 1, 2}, armnn::DataType::Float32);
+
+    armnn::ReduceDescriptor descriptor;
+    descriptor.m_vAxis = { 2 };
+    descriptor.m_ReduceOperation = armnn::ReduceOperation::Sum;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer   = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const reduceSumLayer = network->AddReduceLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer  = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(reduceSumLayer->GetInputSlot(0));
+    reduceSumLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    reduceSumLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    ReduceLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, descriptor);
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeReshape)
 {
     DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Reshape)

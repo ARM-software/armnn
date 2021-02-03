@@ -512,6 +512,14 @@ bool LayerSupportBase::IsRankSupported(const TensorInfo&, // input
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsReduceSupported(const TensorInfo& /*input*/,
+                                         const TensorInfo& /*output*/,
+                                         const ReduceDescriptor& /*descriptor*/,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsReshapeSupported(const TensorInfo&, // input
                                           const TensorInfo&, // output
                                           const ReshapeDescriptor&, // descriptor

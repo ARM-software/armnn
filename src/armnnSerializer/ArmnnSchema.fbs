@@ -47,6 +47,13 @@ enum DataLayout : byte {
     NCHW = 1
 }
 
+enum ReduceOperation: byte {
+    Sum  = 0,
+    Max  = 1,
+    Mean = 2,
+    Min  = 3
+}
+
 enum ResizeMethod: byte {
     NearestNeighbor = 0,
     Bilinear = 1,
@@ -160,7 +167,8 @@ enum LayerType : uint {
     QLstm = 56,
     Fill = 57,
     Rank = 58,
-    LogicalBinary = 59
+    LogicalBinary = 59,
+    Reduce = 60
 }
 
 // Base layer table to be used as part of other layers
@@ -881,6 +889,19 @@ table RankLayer {
     base:LayerBase;
 }
 
+table ReduceLayer {
+    base:LayerBase;
+    descriptor:ReduceDescriptor;
+}
+
+table ReduceDescriptor {
+    targetHeight:uint;
+    targetWidth:uint;
+    keepDims:bool = false;
+    axis:[uint];
+    reduceOperation:ReduceOperation = Sum;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -941,7 +962,8 @@ union Layer {
     QLstmLayer,
     FillLayer,
     RankLayer,
-    LogicalBinaryLayer
+    LogicalBinaryLayer,
+    ReduceLayer
 }
 
 table AnyLayer {

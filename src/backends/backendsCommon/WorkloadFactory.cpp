@@ -1220,6 +1220,18 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
 
             break;
         }
+        case LayerType::Reduce:
+        {
+            auto cLayer = PolymorphicDowncast<const ReduceLayer*>(&layer);
+            const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject->IsReduceSupported(OverrideDataType(input, dataType),
+                                                           OverrideDataType(output, dataType),
+                                                           cLayer->GetParameters(),
+                                                           reason);
+            break;
+        }
         default:
         {
             ARMNN_ASSERT_MSG(false, "WorkloadFactory did not recognise type of layer.");
@@ -1589,6 +1601,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateQuantizedLstm(const Quantized
 }
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateRank(const RankQueueDescriptor& /*descriptor*/,
                                                         const WorkloadInfo& /*info*/) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateReduce(const ReduceQueueDescriptor& /*descriptor*/,
+                                                          const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }

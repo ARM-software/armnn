@@ -372,6 +372,13 @@ public:
     virtual IConnectableLayer* AddResizeLayer(const ResizeDescriptor& resizeDescriptor,
                                               const char* name = nullptr) = 0;
 
+    /// Adds a reduce layer to the network.
+    /// @param ReduceDescriptor - Parameters for the reduce operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddReduceLayer(const ReduceDescriptor& reduceDescriptor,
+                                              const char* name = nullptr) = 0;
+
     /// Adds an instance normalization layer to the network.
     /// @param desc - Parameters for the instance normalization operation.
     /// @param name - Optional name for the layer.

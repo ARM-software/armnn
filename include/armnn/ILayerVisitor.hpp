@@ -409,6 +409,14 @@ public:
     virtual void VisitRankLayer(const IConnectableLayer* layer,
                                 const char* name = nullptr) = 0;
 
+    /// Function that a reduce layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param ReduceDescriptor - Parameters for the reduce max operation.
+    /// @param name - Optional name for the layer.
+    virtual void VisitReduceLayer(const IConnectableLayer* layer,
+                                  const ReduceDescriptor& reduceDescriptor,
+                                  const char* name = nullptr) = 0;
+
     /// Function a reshape layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param reshapeDescriptor - Parameters for the reshape operation.

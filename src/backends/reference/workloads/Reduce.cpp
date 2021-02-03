@@ -1,12 +1,13 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
-#include "Mean.hpp"
-#include <backendsCommon/WorkloadData.hpp>
+#include "Reduce.hpp"
 
 #include <armnn/utility/NumericCast.hpp>
+
+#include <backendsCommon/WorkloadData.hpp>
 
 #include <cmath>
 #include <cstddef>
@@ -15,6 +16,7 @@
 
 namespace armnn
 {
+
 bool NextIndex(const unsigned int numDims, const armnn::TensorShape& dims, std::vector<unsigned int>& current)
 {
     unsigned int carry = 1;
@@ -64,18 +66,16 @@ unsigned int ReducedOutputOffset(const unsigned int numDims,
     }
     return offset;
 }
-} // namespace
 
-namespace armnn
-{
-void Mean(const armnn::TensorInfo& inputInfo,
-          const armnn::TensorInfo& outputInfo,
-          const std::vector<unsigned int>& axis,
-          Decoder<float>& input,
-          Encoder<float>& output)
-{
 
-    unsigned int inputNumDims = inputInfo.GetNumDimensions();
+void Reduce(const TensorInfo& inputInfo,
+            const TensorInfo& outputInfo,
+            Decoder<float>& input,
+            Encoder<float>& output,
+            const std::vector<uint32_t> axis,
+            const ReduceOperation reduceOperation)
+{
+    unsigned int inputNumDims  = inputInfo.GetNumDimensions();
     unsigned int outputNumDims = outputInfo.GetNumDimensions();
 
     armnn::TensorShape outputDims = outputInfo.GetShape();
@@ -106,10 +106,10 @@ void Mean(const armnn::TensorInfo& inputInfo,
     std::vector<unsigned int> resolvedAxis = axis;
     if (resolvedAxis.empty())
     {
-      for (unsigned int idx = 0; idx < inputNumDims; ++idx)
-      {
-          resolvedAxis.push_back(idx);
-      }
+        for (unsigned int idx = 0; idx < inputNumDims; ++idx)
+        {
+            resolvedAxis.push_back(idx);
+        }
     }
     auto numResolvedAxis = armnn::numeric_cast<unsigned int>(resolvedAxis.size());
 
@@ -129,15 +129,23 @@ void Mean(const armnn::TensorInfo& inputInfo,
     {
         unsigned int current = inputDims[resolvedAxis[idx]];
         ARMNN_ASSERT(armnn::numeric_cast<float>(current) <
-              (std::numeric_limits<float>::max() / armnn::numeric_cast<float>(numElementsInAxis)));
+                     (std::numeric_limits<float>::max() / armnn::numeric_cast<float>(numElementsInAxis)));
         numElementsInAxis *= current;
     }
     if (numElementsInAxis > 0) {
         for (unsigned int idx = 0; idx < numOutputs; ++idx)
         {
             output[idx];
-            output.Set(tempSum[idx] / armnn::numeric_cast<float>(numElementsInAxis));
+            if (reduceOperation == ReduceOperation::Sum)
+            {
+                output.Set(tempSum[idx]);
+            }
+            else if (reduceOperation == ReduceOperation::Mean)
+            {
+                output.Set(tempSum[idx] / armnn::numeric_cast<float>(numElementsInAxis));
+            }
         }
     }
 }
+
 } //namespace armnn

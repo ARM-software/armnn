@@ -36,6 +36,7 @@ struct QLstmDescriptor;
 struct ReshapeDescriptor;
 struct ResizeBilinearDescriptor;
 struct ResizeDescriptor;
+struct ReduceDescriptor;
 struct SoftmaxDescriptor;
 struct SpaceToBatchNdDescriptor;
 struct SpaceToDepthDescriptor;

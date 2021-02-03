@@ -528,6 +528,7 @@ bool IsQuantizedLstmSupported(const BackendId& backend,
                                cellStateOut, output, paramsInfo);
 }
 
+
 bool IsPermuteSupported(const BackendId& backend,
                         const TensorInfo& input,
                         const TensorInfo& output,
@@ -556,6 +557,16 @@ bool IsPreluSupported(const BackendId& backend,
                       size_t reasonIfUnsupportedMaxLength)
 {
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsPreluSupported, input, alpha, output);
+}
+
+bool IsReduceSupported(const BackendId& backend,
+                       const TensorInfo& input,
+                       const TensorInfo& output,
+                       const ReduceDescriptor& descriptor,
+                       char* reasonIfUnsupported,
+                       size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsReduceSupported, input, output, descriptor);
 }
 
 bool IsReshapeSupported(const BackendId& backend,

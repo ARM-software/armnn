@@ -63,6 +63,7 @@
     X(QuantizedLstm) \
     X(Reshape) \
     X(Rank) \
+    X(Reduce) \
     X(Resize) \
     X(Slice) \
     X(Softmax) \

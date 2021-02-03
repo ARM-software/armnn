@@ -1286,4 +1286,36 @@ struct LogicalBinaryDescriptor
     LogicalBinaryOperation m_Operation;
 };
 
+/// A ReduceDescriptor for the REDUCE operators.
+struct ReduceDescriptor
+{
+    ReduceDescriptor()
+        : m_TargetHeight(0)
+        , m_TargetWidth(0)
+        , m_KeepDims(false)
+        , m_vAxis()
+        , m_ReduceOperation(ReduceOperation::Sum)
+    {}
+
+    bool operator ==(const ReduceDescriptor& rhs) const
+    {
+        return m_TargetHeight         == rhs.m_TargetHeight &&
+               m_TargetWidth          == rhs.m_TargetWidth &&
+               m_KeepDims             == rhs.m_KeepDims &&
+               m_vAxis                == rhs.m_vAxis &&
+               m_ReduceOperation      == rhs.m_ReduceOperation;
+    }
+
+    /// Target height value.
+    uint32_t m_TargetHeight;
+    /// Target width value.
+    uint32_t m_TargetWidth;
+    /// if true then output shape has no change.
+    bool m_KeepDims;
+    /// The indices of the dimensions to reduce.
+    std::vector<uint32_t> m_vAxis;
+    /// Specifies the reduction operation to execute
+    ReduceOperation m_ReduceOperation;
+};
+
 } // namespace armnn

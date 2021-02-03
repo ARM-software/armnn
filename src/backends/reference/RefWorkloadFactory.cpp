@@ -580,6 +580,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateRank(const RankQueueDescrip
     return std::make_unique<RefRankWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateReduce(const ReduceQueueDescriptor& descriptor,
+                                                            const WorkloadInfo& info) const
+{
+    return std::make_unique<RefReduceWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {

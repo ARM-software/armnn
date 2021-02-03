@@ -226,6 +226,10 @@ public:
     void VisitRankLayer(const armnn::IConnectableLayer* layer,
                         const char* name = nullptr) override;
 
+   void VisitReduceLayer(const armnn::IConnectableLayer* layer,
+                         const armnn::ReduceDescriptor& reduceDescriptor,
+                         const char* name = nullptr) override;
+
     void VisitReshapeLayer(const armnn::IConnectableLayer* layer,
                            const armnn::ReshapeDescriptor& reshapeDescriptor,
                            const char* name = nullptr) override;

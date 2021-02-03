@@ -1706,6 +1706,36 @@ bool RefLayerSupport::IsRankSupported(const TensorInfo& input,
            "Reference rank: input type not supported.");
 }
 
+bool RefLayerSupport::IsReduceSupported(const TensorInfo& input,
+                                        const TensorInfo& output,
+                                        const ReduceDescriptor& descriptor,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(descriptor);
+    bool supported = true;
+    std::array<DataType,7> supportedTypes =
+    {
+        DataType::BFloat16,
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QAsymmS8,
+        DataType::QAsymmU8,
+        DataType::QSymmS16,
+        DataType::Signed32
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference Reduce: input type not supported");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference Reduce: output type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference Reduce: input and output types not matching");
+
+    return supported;
+}
+
 bool RefLayerSupport::IsReshapeSupported(const TensorInfo& input,
                                          const TensorInfo& output,
                                          const ReshapeDescriptor& descriptor,

@@ -119,6 +119,7 @@ private:
     void ParseQLstm(GraphPtr graph, unsigned int layerIndex);
     void ParseQuantize(GraphPtr graph, unsigned int layerIndex);
     void ParseRank(GraphPtr graph, unsigned int layerIndex);
+    void ParseReduce(GraphPtr graph, unsigned int layerIndex);
     void ParseReshape(GraphPtr graph, unsigned int layerIndex);
     void ParseResize(GraphPtr graph, unsigned int layerIndex);
     void ParseResizeBilinear(GraphPtr graph, unsigned int layerIndex);

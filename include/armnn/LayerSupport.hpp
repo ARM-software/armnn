@@ -303,6 +303,14 @@ bool IsQuantizedLstmSupported(const BackendId& backend,
                               size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsReduceSupported(const BackendId& backend,
+                       const TensorInfo& input,
+                       const TensorInfo& output,
+                       const ReduceDescriptor& descriptor,
+                       char* reasonIfUnsupported = nullptr,
+                       size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsReshapeSupported(const BackendId& backend,
                         const TensorInfo& input,
                         const ReshapeDescriptor& descriptor,
@@ -413,4 +421,5 @@ bool IsTransposeConvolution2dSupported(const BackendId& backend,
                                        const Optional<TensorInfo>& biases,
                                        char* reasonIfUnsupported = nullptr,
                                        size_t reasonIfUnsupportedMaxLength = 1024);
+
 }

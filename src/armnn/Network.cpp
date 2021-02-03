@@ -1491,6 +1491,12 @@ IConnectableLayer* Network::AddRankLayer(const char* name)
     return m_Graph->AddLayer<RankLayer>(name);
 }
 
+IConnectableLayer* Network::AddReduceLayer(const ReduceDescriptor& reduceDescriptor,
+                                           const char* name)
+{
+    return m_Graph->AddLayer<ReduceLayer>(reduceDescriptor, name);
+}
+
 IConnectableLayer* Network::AddResizeBilinearLayer(const ResizeBilinearDescriptor& descriptor,
                                                    const char* name)
 {

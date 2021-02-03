@@ -16,7 +16,7 @@
 namespace armnnTfLiteParser
 {
 
-class TfLiteParser : public ITfLiteParser
+class TfLiteParserImpl
 {
 public:
     // Shorthands for TfLite types
@@ -34,33 +34,33 @@ public:
 
 public:
     /// Create the network from a flatbuffers binary file on disk
-    virtual armnn::INetworkPtr CreateNetworkFromBinaryFile(const char* graphFile) override;
+    armnn::INetworkPtr CreateNetworkFromBinaryFile(const char* graphFile);
 
     /// Create the network from a flatbuffers binary
-    virtual armnn::INetworkPtr CreateNetworkFromBinary(const std::vector<uint8_t> & binaryContent) override;
+    armnn::INetworkPtr CreateNetworkFromBinary(const std::vector<uint8_t> & binaryContent);
 
 
     /// Retrieve binding info (layer id and tensor info) for the network input identified by
     /// the given layer name and subgraph id
-    virtual BindingPointInfo GetNetworkInputBindingInfo(size_t subgraphId,
-                                                        const std::string& name) const override;
+    BindingPointInfo GetNetworkInputBindingInfo(size_t subgraphId,
+                                                const std::string& name) const;
 
     /// Retrieve binding info (layer id and tensor info) for the network output identified by
     /// the given layer name and subgraph id
-    virtual BindingPointInfo GetNetworkOutputBindingInfo(size_t subgraphId,
-                                                         const std::string& name) const override;
+    BindingPointInfo GetNetworkOutputBindingInfo(size_t subgraphId,
+                                                         const std::string& name) const;
 
     /// Return the number of subgraphs in the parsed model
-    virtual size_t GetSubgraphCount() const override;
+    size_t GetSubgraphCount() const;
 
     /// Return the input tensor names for a given subgraph
-    virtual std::vector<std::string> GetSubgraphInputTensorNames(size_t subgraphId) const override;
+    std::vector<std::string> GetSubgraphInputTensorNames(size_t subgraphId) const;
 
     /// Return the output tensor names for a given subgraph
-    virtual std::vector<std::string> GetSubgraphOutputTensorNames(size_t subgraphId) const override;
+    std::vector<std::string> GetSubgraphOutputTensorNames(size_t subgraphId) const;
 
-    TfLiteParser(const armnn::Optional<ITfLiteParser::TfLiteParserOptions>& options = armnn::EmptyOptional());
-    virtual ~TfLiteParser() {}
+    TfLiteParserImpl(const armnn::Optional<ITfLiteParser::TfLiteParserOptions>& options = armnn::EmptyOptional());
+    ~TfLiteParserImpl() = default;
 
 public:
     // testable helpers
@@ -81,14 +81,14 @@ public:
 
 private:
     // No copying allowed until it is wanted and properly implemented
-    TfLiteParser(const TfLiteParser &) = delete;
-    TfLiteParser & operator=(const TfLiteParser &) = delete;
+    TfLiteParserImpl(const TfLiteParserImpl &) = delete;
+    TfLiteParserImpl & operator=(const TfLiteParserImpl &) = delete;
 
     /// Create the network from an already loaded flatbuffers model
     armnn::INetworkPtr CreateNetworkFromModel();
 
     // signature for the parser functions
-    using OperatorParsingFunction = void(TfLiteParser::*)(size_t subgraphIndex, size_t operatorIndex);
+    using OperatorParsingFunction = void(TfLiteParserImpl::*)(size_t subgraphIndex, size_t operatorIndex);
 
     void ParseCustomOperator(size_t subgraphIndex, size_t operatorIndex);
     void ParseUnsupportedOperator(size_t subgraphIndex, size_t operatorIndex);
@@ -190,9 +190,9 @@ private:
 
 
     template<typename T>
-    std::pair<armnn::ConstTensor, TfLiteParser::SupportedDataStorage>
-    CreateConstTensorAndStoreData(TfLiteParser::BufferRawPtr bufferPtr,
-                                  TfLiteParser::TensorRawPtr tensorPtr,
+    std::pair<armnn::ConstTensor, TfLiteParserImpl::SupportedDataStorage>
+    CreateConstTensorAndStoreData(TfLiteParserImpl::BufferRawPtr bufferPtr,
+                                  TfLiteParserImpl::TensorRawPtr tensorPtr,
                                   armnn::TensorInfo& tensorInfo,
                                   armnn::Optional<armnn::PermutationVector&> permutationVector);
 

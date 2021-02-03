@@ -19,6 +19,7 @@ namespace armnnTfLiteParser
 
 using BindingPointInfo = armnn::BindingPointInfo;
 
+class TfLiteParserImpl;
 class ITfLiteParser;
 using ITfLiteParserPtr = std::unique_ptr<ITfLiteParser, void(*)(ITfLiteParser* parser)>;
 
@@ -40,32 +41,35 @@ public:
     static void Destroy(ITfLiteParser* parser);
 
     /// Create the network from a flatbuffers binary file on disk
-    virtual armnn::INetworkPtr CreateNetworkFromBinaryFile(const char* graphFile) = 0;
+    armnn::INetworkPtr CreateNetworkFromBinaryFile(const char* graphFile);
 
     /// Create the network from a flatbuffers binary
-    virtual armnn::INetworkPtr CreateNetworkFromBinary(const std::vector<uint8_t> & binaryContent) = 0;
+    armnn::INetworkPtr CreateNetworkFromBinary(const std::vector<uint8_t> & binaryContent);
 
     /// Retrieve binding info (layer id and tensor info) for the network input identified by
     /// the given layer name and subgraph id
-    virtual BindingPointInfo GetNetworkInputBindingInfo(size_t subgraphId,
-                                                        const std::string& name) const = 0;
+    BindingPointInfo GetNetworkInputBindingInfo(size_t subgraphId,
+                                                const std::string& name) const;
 
     /// Retrieve binding info (layer id and tensor info) for the network output identified by
     /// the given layer name and subgraph id
-    virtual BindingPointInfo GetNetworkOutputBindingInfo(size_t subgraphId,
-                                                         const std::string& name) const = 0;
+    BindingPointInfo GetNetworkOutputBindingInfo(size_t subgraphId,
+                                                         const std::string& name) const;
 
     /// Return the number of subgraphs in the parsed model
-    virtual size_t GetSubgraphCount() const = 0;
+    size_t GetSubgraphCount() const;
 
     /// Return the input tensor names for a given subgraph
-    virtual std::vector<std::string> GetSubgraphInputTensorNames(size_t subgraphId) const = 0;
+    std::vector<std::string> GetSubgraphInputTensorNames(size_t subgraphId) const;
 
     /// Return the output tensor names for a given subgraph
-    virtual std::vector<std::string> GetSubgraphOutputTensorNames(size_t subgraphId) const = 0;
+    std::vector<std::string> GetSubgraphOutputTensorNames(size_t subgraphId) const;
 
-protected:
-    virtual ~ITfLiteParser() {};
+private:
+    ITfLiteParser(const armnn::Optional<TfLiteParserOptions>& options = armnn::EmptyOptional());
+    ~ITfLiteParser();
+
+    std::unique_ptr<TfLiteParserImpl> pTfLiteParserImpl;
 };
 
 }

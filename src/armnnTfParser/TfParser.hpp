@@ -61,41 +61,38 @@ using OutputOfParsedTfOperation = WithOutputTensorIndex<ParsedTfOperation *>;
 using OutputOfConstNodeDef = WithOutputTensorIndex<const tensorflow::NodeDef*>;
 using OutputId = WithOutputTensorIndex<std::string>;
 
-class TfParser : public ITfParser
+struct ITfParser::TfParserImpl
 {
 public:
     /// Creates the network from a protobuf text file on the disk.
-    virtual armnn::INetworkPtr CreateNetworkFromTextFile(
+    armnn::INetworkPtr CreateNetworkFromTextFile(
         const char* graphFile,
         const std::map<std::string, armnn::TensorShape>& inputShapes,
-        const std::vector<std::string>& requestedOutputs) override;
+        const std::vector<std::string>& requestedOutputs);
 
     /// Creates the network from a protobuf binary file on the disk.
-    virtual armnn::INetworkPtr CreateNetworkFromBinaryFile(
+    armnn::INetworkPtr CreateNetworkFromBinaryFile(
         const char* graphFile,
         const std::map<std::string, armnn::TensorShape>& inputShapes,
-        const std::vector<std::string>& requestedOutputs) override;
+        const std::vector<std::string>& requestedOutputs);
 
     /// Creates the network directly from protobuf text in a string. Useful for debugging/testing.
-    virtual armnn::INetworkPtr CreateNetworkFromString(
+    armnn::INetworkPtr CreateNetworkFromString(
         const char* protoText,
         const std::map<std::string, armnn::TensorShape>& inputShapes,
-        const std::vector<std::string>& requestedOutputs) override;
+        const std::vector<std::string>& requestedOutputs);
 
     /// Retrieves binding info (layer id and tensor info) for the network input identified by the given layer name.
-    virtual BindingPointInfo GetNetworkInputBindingInfo(const std::string& name) const override;
+    BindingPointInfo GetNetworkInputBindingInfo(const std::string& name) const;
 
     /// Retrieves binding info (layer id and tensor info) for the network output identified by the given layer name.
-    virtual BindingPointInfo GetNetworkOutputBindingInfo(const std::string& name) const override;
+    BindingPointInfo GetNetworkOutputBindingInfo(const std::string& name) const;
 
-public:
-    TfParser();
+    TfParserImpl();
+    ~TfParserImpl() = default;
 
-private:
-    template <typename T>
-    friend class ParsedConstTfOperation;
-    friend class ParsedMatMulTfOperation;
-    friend class ParsedMulTfOperation;
+    TfParserImpl(const TfParserImpl&) = delete;
+    TfParserImpl& operator=(const TfParserImpl&) = delete;
 
     /// Parses a GraphDef loaded into memory from one of the other CreateNetwork*.
     armnn::INetworkPtr CreateNetworkFromGraphDef(const tensorflow::GraphDef& graphDef,
@@ -177,7 +174,6 @@ private:
     ParsedTfOperationPtr AddRealDivLayer(const tensorflow::NodeDef& nodeDef);
     ParsedTfOperationPtr AddMaximumLayer(const tensorflow::NodeDef& nodeDef);
 
-private:
     armnn::IConnectableLayer* AddMultiplicationLayer(const tensorflow::NodeDef& nodeDef);
 
     armnn::IConnectableLayer* AddFullyConnectedLayer(const tensorflow::NodeDef& matMulNodeDef,
@@ -251,8 +247,8 @@ private:
     /// The network we're building. Gets cleared after it is passed to the user.
     armnn::INetworkPtr m_Network;
 
-    using OperationParsingFunction = ParsedTfOperationPtr(TfParser::*)(const tensorflow::NodeDef& nodeDef,
-                                                                 const tensorflow::GraphDef& graphDef);
+    using OperationParsingFunction = ParsedTfOperationPtr(TfParserImpl::*)(const tensorflow::NodeDef& nodeDef,
+                                                                           const tensorflow::GraphDef& graphDef);
 
     /// Map of TensorFlow operation names to parsing member functions.
     static const std::map<std::string, OperationParsingFunction> ms_OperationNameToParsingFunctions;

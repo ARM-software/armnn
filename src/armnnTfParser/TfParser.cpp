@@ -32,6 +32,56 @@ using namespace armnn;
 
 namespace armnnTfParser
 {
+
+ITfParser::ITfParser() : pTfParserImpl(new ITfParser::TfParserImpl()){}
+
+ITfParser::~ITfParser() = default;
+
+ITfParser *ITfParser::CreateRaw()
+{
+    return new ITfParser();
+}
+
+ITfParserPtr ITfParser::Create()
+{
+    return ITfParserPtr(CreateRaw(), &ITfParser::Destroy);
+}
+
+void ITfParser::Destroy(ITfParser *parser)
+{
+    delete parser;
+}
+
+armnn::INetworkPtr ITfParser::CreateNetworkFromTextFile(const char* graphFile,
+                                                        const std::map<std::string, armnn::TensorShape>& inputShapes,
+                                                        const std::vector<std::string>& requestedOutputs)
+{
+    return pTfParserImpl->CreateNetworkFromTextFile(graphFile, inputShapes, requestedOutputs);
+}
+
+armnn::INetworkPtr ITfParser::CreateNetworkFromBinaryFile(const char* graphFile,
+                                                          const std::map<std::string, armnn::TensorShape>& inputShapes,
+                                                          const std::vector<std::string>& requestedOutputs)
+{
+    return pTfParserImpl->CreateNetworkFromBinaryFile(graphFile, inputShapes, requestedOutputs);
+}
+
+armnn::INetworkPtr ITfParser::CreateNetworkFromString(const char* protoText,
+                                                      const std::map<std::string, armnn::TensorShape>& inputShapes,
+                                                      const std::vector<std::string>& requestedOutputs)
+{
+    return pTfParserImpl->CreateNetworkFromString(protoText, inputShapes, requestedOutputs);
+}
+
+BindingPointInfo ITfParser::GetNetworkInputBindingInfo(const std::string& name) const
+{
+    return pTfParserImpl->GetNetworkInputBindingInfo(name);
+}
+
+BindingPointInfo ITfParser::GetNetworkOutputBindingInfo(const std::string& name) const
+{
+    return pTfParserImpl->GetNetworkOutputBindingInfo(name);
+}
 namespace
 {
 
@@ -324,68 +374,54 @@ OutputId ParseOutputId(const std::string & name)
 
 } // namespace
 
-const std::map<std::string, TfParser::OperationParsingFunction> TfParser::ms_OperationNameToParsingFunctions = {
-    { "Const",                 &TfParser::ParseConst },
-    { "Add",                   &TfParser::ParseAdd },
-    { "AddN",                  &TfParser::ParseAddN },
-    { "BiasAdd",               &TfParser::ParseBiasAdd },
-    { "Identity",              &TfParser::ParseIdentity },
-    { "Conv2D",                &TfParser::ParseConv2D },
-    { "DepthwiseConv2dNative", &TfParser::ParseDepthwiseConv2D },
-    { "ExpandDims",            &TfParser::ParseExpandDims },
-    { "FusedBatchNorm",        &TfParser::ParseFusedBatchNorm },
-    { "Gather",                &TfParser::ParseGather},
-    { "Greater",               &TfParser::ParseGreater},
-    { "ConcatV2",              &TfParser::ParseConcat },
-    { "LRN",                   &TfParser::ParseLrn },
-    { "MatMul",                &TfParser::ParseMatMul },
-    { "Mean",                  &TfParser::ParseMean },
-    { "Mul",                   &TfParser::ParseMul },
-    { "Placeholder",           &TfParser::ParsePlaceholder },
-    { "RealDiv",               &TfParser::ParseRealDiv },
-    { "Relu",                  &TfParser::ParseRelu },
-    { "Relu6",                 &TfParser::ParseRelu6 },
-    { "Reshape",               &TfParser::ParseReshape },
-    { "ResizeBilinear",        &TfParser::ParseResizeBilinear },
-    { "Rsqrt",                 &TfParser::ParseRsqrt },
-    { "Shape",                 &TfParser::ParseShape },
-    { "Squeeze",               &TfParser::ParseSqueeze },
-    { "Sigmoid",               &TfParser::ParseSigmoid },
-    { "Softmax",               &TfParser::ParseSoftmax },
-    { "Softplus",              &TfParser::ParseSoftplus },
-    { "Split",                 &TfParser::ParseSplit },
-    { "StridedSlice",          &TfParser::ParseStridedSlice },
-    { "Tanh",                  &TfParser::ParseTanh },
-    { "MaxPool",               &TfParser::ParseMaxPool },
-    { "AvgPool",               &TfParser::ParseAvgPool },
-    { "Maximum",               &TfParser::ParseMaximum },
-    { "Minimum",               &TfParser::ParseMinimum },
-    { "Equal",                 &TfParser::ParseEqual },
-    { "Pad",                   &TfParser::ParsePad },
-    { "Sub",                   &TfParser::ParseSub },
-    { "Pack" ,                 &TfParser::ParseStack },
-    { "Stack",                 &TfParser::ParseStack },
-    { "Transpose",             &TfParser::ParseTranspose },
+const std::map<std::string, ITfParser::TfParserImpl::OperationParsingFunction>
+    ITfParser::TfParserImpl::ms_OperationNameToParsingFunctions = {
+    { "Const",                 &TfParserImpl::ParseConst },
+    { "Add",                   &TfParserImpl::ParseAdd },
+    { "AddN",                  &TfParserImpl::ParseAddN },
+    { "BiasAdd",               &TfParserImpl::ParseBiasAdd },
+    { "Identity",              &TfParserImpl::ParseIdentity },
+    { "Conv2D",                &TfParserImpl::ParseConv2D },
+    { "DepthwiseConv2dNative", &TfParserImpl::ParseDepthwiseConv2D },
+    { "ExpandDims",            &TfParserImpl::ParseExpandDims },
+    { "FusedBatchNorm",        &TfParserImpl::ParseFusedBatchNorm },
+    { "Gather",                &TfParserImpl::ParseGather},
+    { "Greater",               &TfParserImpl::ParseGreater},
+    { "ConcatV2",              &TfParserImpl::ParseConcat },
+    { "LRN",                   &TfParserImpl::ParseLrn },
+    { "MatMul",                &TfParserImpl::ParseMatMul },
+    { "Mean",                  &TfParserImpl::ParseMean },
+    { "Mul",                   &TfParserImpl::ParseMul },
+    { "Placeholder",           &TfParserImpl::ParsePlaceholder },
+    { "RealDiv",               &TfParserImpl::ParseRealDiv },
+    { "Relu",                  &TfParserImpl::ParseRelu },
+    { "Relu6",                 &TfParserImpl::ParseRelu6 },
+    { "Reshape",               &TfParserImpl::ParseReshape },
+    { "ResizeBilinear",        &TfParserImpl::ParseResizeBilinear },
+    { "Rsqrt",                 &TfParserImpl::ParseRsqrt },
+    { "Shape",                 &TfParserImpl::ParseShape },
+    { "Squeeze",               &TfParserImpl::ParseSqueeze },
+    { "Sigmoid",               &TfParserImpl::ParseSigmoid },
+    { "Softmax",               &TfParserImpl::ParseSoftmax },
+    { "Softplus",              &TfParserImpl::ParseSoftplus },
+    { "Split",                 &TfParserImpl::ParseSplit },
+    { "StridedSlice",          &TfParserImpl::ParseStridedSlice },
+    { "Tanh",                  &TfParserImpl::ParseTanh },
+    { "MaxPool",               &TfParserImpl::ParseMaxPool },
+    { "AvgPool",               &TfParserImpl::ParseAvgPool },
+    { "Maximum",               &TfParserImpl::ParseMaximum },
+    { "Minimum",               &TfParserImpl::ParseMinimum },
+    { "Equal",                 &TfParserImpl::ParseEqual },
+    { "Pad",                   &TfParserImpl::ParsePad },
+    { "Sub",                   &TfParserImpl::ParseSub },
+    { "Pack" ,                 &TfParserImpl::ParseStack },
+    { "Stack",                 &TfParserImpl::ParseStack },
+    { "Transpose",             &TfParserImpl::ParseTranspose },
 };
 
-const std::list<std::string> TfParser::m_ControlInputs = {
+const std::list<std::string> ITfParser::TfParserImpl::m_ControlInputs = {
     "Assert"
 };
-
-ITfParser* ITfParser::CreateRaw()
-{
-    return new TfParser();
-}
-
-ITfParserPtr ITfParser::Create()
-{
-    return ITfParserPtr(CreateRaw(), &ITfParser::Destroy);
-}
-
-void ITfParser::Destroy(ITfParser* parser)
-{
-    delete parser;
-}
 
 inline void CalculateSamePadding(uint32_t inputSize, uint32_t stride,
                                  uint32_t filterSize, bool samePadding,
@@ -415,7 +451,7 @@ void CalcPadding(uint32_t input, uint32_t kernel, uint32_t stride, uint32_t& out
 class ParsedTfOperation
 {
 public:
-    ParsedTfOperation(TfParser* parser, const tensorflow::NodeDef& node)
+    ParsedTfOperation(ITfParser::TfParserImpl* parser, const tensorflow::NodeDef& node)
     : m_Parser(parser)
     , m_Node(node)
     {
@@ -436,7 +472,7 @@ public:
     }
 
 protected:
-    TfParser* m_Parser;
+    ITfParser::TfParserImpl* m_Parser;
     const tensorflow::NodeDef& m_Node;
 };
 
@@ -445,7 +481,9 @@ protected:
 class SingleLayerParsedTfOperation : public ParsedTfOperation
 {
 public:
-    SingleLayerParsedTfOperation(TfParser* parser, const tensorflow::NodeDef& node, IConnectableLayer* layer)
+    SingleLayerParsedTfOperation(ITfParser::TfParserImpl* parser,
+                                 const tensorflow::NodeDef& node,
+                                 IConnectableLayer* layer)
     : ParsedTfOperation(parser, node)
     , m_Layer(layer)
     {
@@ -476,7 +514,7 @@ protected:
 class DeferredSingleLayerParsedTfOperation : public SingleLayerParsedTfOperation
 {
 public:
-    DeferredSingleLayerParsedTfOperation(TfParser* parser, const tensorflow::NodeDef& node)
+    DeferredSingleLayerParsedTfOperation(ITfParser::TfParserImpl* parser, const tensorflow::NodeDef& node)
     : SingleLayerParsedTfOperation(parser, node, nullptr)
     {
     }
@@ -495,13 +533,13 @@ private:
 };
 
 
-TfParser::TfParser()
+ITfParser::TfParserImpl::TfParserImpl()
     : m_Network(nullptr, nullptr)
 {
 }
 
 
-const tensorflow::NodeDef* TfParser::ResolveIdentityNode(const tensorflow::NodeDef* nodeDef)
+const tensorflow::NodeDef* ITfParser::TfParserImpl::ResolveIdentityNode(const tensorflow::NodeDef* nodeDef)
 {
     if (nodeDef->op() != "Identity")
     {
@@ -533,7 +571,7 @@ const tensorflow::NodeDef* TfParser::ResolveIdentityNode(const tensorflow::NodeD
 }
 
 std::vector<OutputOfConstNodeDef>
-TfParser::GetTfInputNodes(const tensorflow::NodeDef& nodeDef) const
+ITfParser::TfParserImpl::GetTfInputNodes(const tensorflow::NodeDef& nodeDef) const
 {
     std::vector<OutputOfConstNodeDef> ret;
 
@@ -570,7 +608,7 @@ TfParser::GetTfInputNodes(const tensorflow::NodeDef& nodeDef) const
 }
 
 std::vector<OutputOfParsedTfOperation>
-TfParser::GetInputParsedTfOperationsChecked(const tensorflow::NodeDef& nodeDef,
+ITfParser::TfParserImpl::GetInputParsedTfOperationsChecked(const tensorflow::NodeDef& nodeDef,
                                             std::size_t expectedNumInputs)
 {
     // Fetches the tensorflow nodes connected as inputs and validate the size.
@@ -605,7 +643,7 @@ TfParser::GetInputParsedTfOperationsChecked(const tensorflow::NodeDef& nodeDef,
     return result;
 }
 
-IConnectableLayer* TfParser::CreateAdditionLayer(
+IConnectableLayer* ITfParser::TfParserImpl::CreateAdditionLayer(
             const tensorflow::NodeDef& nodeDef,
             IOutputSlot* input0Slot,
             IOutputSlot* input1Slot,
@@ -660,7 +698,7 @@ IConnectableLayer* TfParser::CreateAdditionLayer(
     return layer;
 }
 
-IConnectableLayer* TfParser::CreateAdditionLayer(
+IConnectableLayer* ITfParser::TfParserImpl::CreateAdditionLayer(
             const tensorflow::NodeDef& nodeDef,
             IConnectableLayer* layerOne,
             IConnectableLayer* layerTwo,
@@ -679,7 +717,7 @@ IConnectableLayer* TfParser::CreateAdditionLayer(
     return CreateAdditionLayer(nodeDef, input0Slot, input1Slot, layerName);
 }
 
-IConnectableLayer* TfParser::CreateAdditionLayer(
+IConnectableLayer* ITfParser::TfParserImpl::CreateAdditionLayer(
         const tensorflow::NodeDef& nodeDef,
         const OutputOfParsedTfOperation& opOne,
         const OutputOfParsedTfOperation& opTwo,
@@ -692,7 +730,7 @@ IConnectableLayer* TfParser::CreateAdditionLayer(
     return CreateAdditionLayer(nodeDef, input0Slot, input1Slot, layerName);
 }
 
-IConnectableLayer* TfParser::CreateAdditionLayer(
+IConnectableLayer* ITfParser::TfParserImpl::CreateAdditionLayer(
             const tensorflow::NodeDef& nodeDef,
             const OutputOfParsedTfOperation& op,
             IConnectableLayer* layer)
@@ -702,7 +740,8 @@ IConnectableLayer* TfParser::CreateAdditionLayer(
     return CreateAdditionLayer(nodeDef, input0Slot, input1Slot, nodeDef.name());
 }
 
-ParsedTfOperationPtr TfParser::ParseAddN(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseAddN(const tensorflow::NodeDef& nodeDef,
+                                                        const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     uint32_t numberOfInputs = ReadMandatoryNodeUint32Attribute(nodeDef, "N");
@@ -780,7 +819,8 @@ ParsedTfOperationPtr TfParser::ParseAddN(const tensorflow::NodeDef& nodeDef, con
     }
 }
 
-ParsedTfOperationPtr TfParser::ParseAdd(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseAdd(const tensorflow::NodeDef& nodeDef,
+                                                       const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
@@ -810,7 +850,8 @@ ParsedTfOperationPtr TfParser::ParseAdd(const tensorflow::NodeDef& nodeDef, cons
     }
 }
 
-ParsedTfOperationPtr TfParser::ParseBiasAdd(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseBiasAdd(const tensorflow::NodeDef& nodeDef,
+                                                           const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     return AddAdditionLayer(nodeDef, true);
@@ -820,7 +861,9 @@ ParsedTfOperationPtr TfParser::ParseBiasAdd(const tensorflow::NodeDef& nodeDef, 
 class ParsedIdentityTfOperation : public ParsedTfOperation
 {
 public:
-    ParsedIdentityTfOperation(TfParser* parser, const tensorflow::NodeDef& node, ParsedTfOperation* representative)
+    ParsedIdentityTfOperation(ITfParser::TfParserImpl* parser,
+                              const tensorflow::NodeDef& node,
+                              ParsedTfOperation* representative)
         : ParsedTfOperation(parser, node)
         , m_Representative(representative)
     {
@@ -841,7 +884,8 @@ private:
     ParsedTfOperation* m_Representative;
 };
 
-ParsedTfOperationPtr TfParser::ParseIdentity(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseIdentity(const tensorflow::NodeDef& nodeDef,
+                                                            const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
@@ -856,7 +900,7 @@ template <typename T>
 class ParsedConstTfOperation : public DeferredSingleLayerParsedTfOperation
 {
 public:
-    ParsedConstTfOperation(TfParser* parser, const tensorflow::NodeDef& node,
+    ParsedConstTfOperation(ITfParser::TfParserImpl* parser, const tensorflow::NodeDef& node,
         const T* tensorData, const TensorInfo& tensorInfo)
         : DeferredSingleLayerParsedTfOperation(parser, node),
         m_Storage(tensorData, tensorData + tensorInfo.GetNumElements()),
@@ -868,7 +912,8 @@ public:
     void CreateLayerDeferred() override
     {
         ARMNN_ASSERT(m_Layer == nullptr);
-        m_Layer = m_Parser->m_Network->AddConstantLayer(ConstTensor(m_TensorInfo, m_Storage), m_Node.name().c_str());
+        m_Layer = m_Parser->m_Network->AddConstantLayer(ConstTensor(m_TensorInfo, m_Storage),
+                                                                       m_Node.name().c_str());
         m_Layer->GetOutputSlot(0).SetTensorInfo(m_TensorInfo);
     }
 
@@ -982,8 +1027,9 @@ template <template<typename> class OperatorType, typename T = int8_t>
 struct MakeTfOperation
 {
     template<typename DataType, class... Args>
-    inline static std::unique_ptr<OperatorType<DataType>> Parse(TfParser* parser, const tensorflow::NodeDef& node,
-        Args&&... args)
+    inline static std::unique_ptr<OperatorType<DataType>> Parse(ITfParser::TfParserImpl* parser,
+                                                                const tensorflow::NodeDef& node,
+                                                                Args&&... args)
     {
         return std::make_unique<OperatorType<DataType>>(parser, node, std::forward<Args>(args)...);
     }
@@ -993,7 +1039,7 @@ template <>
 struct MakeTfOperation<ParsedConstTfOperation>
 {
     template<typename DataType, class... Args>
-    inline static std::unique_ptr<ParsedConstTfOperation<DataType>> Parse(TfParser* parser,
+    inline static std::unique_ptr<ParsedConstTfOperation<DataType>> Parse(ITfParser::TfParserImpl* parser,
         const tensorflow::NodeDef& node, const std::vector<int8_t>& tensorData, const TensorInfo& tensorInfo)
     {
         return std::make_unique<ParsedConstTfOperation<DataType>>(parser, node,
@@ -1033,7 +1079,8 @@ struct InvokeParseFunction
     }
 };
 
-ParsedTfOperationPtr TfParser::ParseConst(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseConst(const tensorflow::NodeDef& nodeDef,
+                                                         const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     ARMNN_ASSERT(nodeDef.op() == "Const");
@@ -1128,7 +1175,7 @@ ParsedTfOperationPtr TfParser::ParseConst(const tensorflow::NodeDef& nodeDef, co
 }
 
 template<typename Type>
-bool TfParser::HasParsedConstTensor(const std::string & nodeName) const
+bool ITfParser::TfParserImpl::HasParsedConstTensor(const std::string & nodeName) const
 {
     auto it = m_ParsedTfOperations.find(nodeName);
     if (it == m_ParsedTfOperations.end())
@@ -1139,12 +1186,12 @@ bool TfParser::HasParsedConstTensor(const std::string & nodeName) const
 }
 
 template<typename Type>
-bool TfParser::HasParsedConstTensor(ParsedTfOperation* parsedTfOpPtr) const
+bool ITfParser::TfParserImpl::HasParsedConstTensor(ParsedTfOperation* parsedTfOpPtr) const
 {
     return dynamic_cast<ParsedConstTfOperation<Type>*>(parsedTfOpPtr) != nullptr;
 }
 
-unsigned int TfParser::GetConstInputIndex(const std::vector<OutputOfParsedTfOperation>& inputs)
+unsigned int ITfParser::TfParserImpl::GetConstInputIndex(const std::vector<OutputOfParsedTfOperation>& inputs)
 {
     for (unsigned int i = 0; i < inputs.size(); i++)
     {
@@ -1159,7 +1206,7 @@ unsigned int TfParser::GetConstInputIndex(const std::vector<OutputOfParsedTfOper
 
 }
 
-ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseConv2D(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
@@ -1297,8 +1344,8 @@ ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseDepthwiseConv2D(const tensorflow::NodeDef& nodeDef,
-                                                    const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseDepthwiseConv2D(const tensorflow::NodeDef& nodeDef,
+                                                                   const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
@@ -1486,7 +1533,8 @@ TensorInfo OutputShapeOfExpandDims(const tensorflow::NodeDef& nodeDef,
     return outTensorInfo;
 }
 
-ParsedTfOperationPtr TfParser::ParseExpandDims(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseExpandDims(const tensorflow::NodeDef& nodeDef,
+                                                             const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
 
@@ -1568,8 +1616,8 @@ ParsedTfOperationPtr TfParser::ParseExpandDims(const tensorflow::NodeDef& nodeDe
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseFusedBatchNorm(const tensorflow::NodeDef& nodeDef,
-                                                   const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseFusedBatchNorm(const tensorflow::NodeDef& nodeDef,
+                                                                 const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 5);
@@ -1659,11 +1707,11 @@ ParsedTfOperationPtr TfParser::ParseFusedBatchNorm(const tensorflow::NodeDef& no
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-bool TfParser::IsSupportedLeakyReluPattern(const tensorflow::NodeDef& mulNodeDef,
-                                           size_t alphaLayerIndex,
-                                           const OutputOfParsedTfOperation& otherOp,
-                                           armnn::IOutputSlot** outputOfLeakyRelu,
-                                           armnn::ActivationDescriptor & desc)
+bool ITfParser::TfParserImpl::IsSupportedLeakyReluPattern(const tensorflow::NodeDef& mulNodeDef,
+                                                         size_t alphaLayerIndex,
+                                                         const OutputOfParsedTfOperation& otherOp,
+                                                         armnn::IOutputSlot** outputOfLeakyRelu,
+                                                         armnn::ActivationDescriptor & desc)
 {
     const tensorflow::NodeDef& otherNodeDef = otherOp.m_IndexedValue->GetNode();
 
@@ -1709,8 +1757,8 @@ bool TfParser::IsSupportedLeakyReluPattern(const tensorflow::NodeDef& mulNodeDef
     return false;
 }
 
-ParsedTfOperationPtr TfParser::ParseMaximum(const tensorflow::NodeDef& nodeDef,
-                                            const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseMaximum(const tensorflow::NodeDef& nodeDef,
+                                                          const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
@@ -1757,7 +1805,7 @@ ParsedTfOperationPtr TfParser::ParseMaximum(const tensorflow::NodeDef& nodeDef,
     }
 }
 
-std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> TfParser::ProcessElementwiseInputSlots(
+std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> ITfParser::TfParserImpl::ProcessElementwiseInputSlots(
             const tensorflow::NodeDef& nodeDef, const std::string& layerName)
 {
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
@@ -1791,7 +1839,7 @@ std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> TfParser::ProcessElementwise
     return {input0Slot, input1Slot};
 }
 
-ParsedTfOperationPtr TfParser::ProcessComparisonLayer(
+ParsedTfOperationPtr ITfParser::TfParserImpl::ProcessComparisonLayer(
     IOutputSlot* input0Slot,
     IOutputSlot* input1Slot,
     IConnectableLayer* const layer,
@@ -1818,7 +1866,7 @@ ParsedTfOperationPtr TfParser::ProcessComparisonLayer(
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ProcessElementwiseLayer(
+ParsedTfOperationPtr ITfParser::TfParserImpl::ProcessElementwiseLayer(
         IOutputSlot* input0Slot,
         IOutputSlot* input1Slot,
         IConnectableLayer* const layer,
@@ -1844,8 +1892,8 @@ ParsedTfOperationPtr TfParser::ProcessElementwiseLayer(
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseGather(const tensorflow::NodeDef& nodeDef,
-                                           const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseGather(const tensorflow::NodeDef& nodeDef,
+                                                         const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
@@ -1883,8 +1931,8 @@ ParsedTfOperationPtr TfParser::ParseGather(const tensorflow::NodeDef& nodeDef,
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseGreater(const tensorflow::NodeDef& nodeDef,
-                                            const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseGreater(const tensorflow::NodeDef& nodeDef,
+                                                          const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> inputLayers = ProcessElementwiseInputSlots(nodeDef, "Greater");
@@ -1897,8 +1945,8 @@ ParsedTfOperationPtr TfParser::ParseGreater(const tensorflow::NodeDef& nodeDef,
     return ProcessComparisonLayer(input0Slot, input1Slot, layer, nodeDef);
 }
 
-ParsedTfOperationPtr TfParser::ParseEqual(const tensorflow::NodeDef& nodeDef,
-                                          const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseEqual(const tensorflow::NodeDef& nodeDef,
+                                                        const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> inputLayers = ProcessElementwiseInputSlots(nodeDef, "Equal");
@@ -1911,8 +1959,8 @@ ParsedTfOperationPtr TfParser::ParseEqual(const tensorflow::NodeDef& nodeDef,
     return ProcessComparisonLayer(input0Slot, input1Slot, layer, nodeDef);
 }
 
-ParsedTfOperationPtr TfParser::ParseMinimum(const tensorflow::NodeDef& nodeDef,
-                                            const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseMinimum(const tensorflow::NodeDef& nodeDef,
+                                                          const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> inputLayers = ProcessElementwiseInputSlots(nodeDef, "Minimum");
@@ -1924,7 +1972,8 @@ ParsedTfOperationPtr TfParser::ParseMinimum(const tensorflow::NodeDef& nodeDef,
     return ProcessElementwiseLayer(input0Slot, input1Slot, layer, nodeDef);
 }
 
-ParsedTfOperationPtr TfParser::ParseSub(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseSub(const tensorflow::NodeDef& nodeDef,
+                                                      const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
@@ -1964,7 +2013,8 @@ ParsedTfOperationPtr TfParser::ParseSub(const tensorflow::NodeDef& nodeDef, cons
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseStack(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseStack(const tensorflow::NodeDef& nodeDef,
+                                                        const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     std::vector<OutputOfConstNodeDef> nodes = GetTfInputNodes(nodeDef);
@@ -2049,7 +2099,8 @@ ParsedTfOperationPtr TfParser::ParseStack(const tensorflow::NodeDef& nodeDef, co
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseTranspose(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseTranspose(const tensorflow::NodeDef& nodeDef,
+                                                            const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
 
@@ -2142,8 +2193,8 @@ TensorInfo CalculatePaddedOutputTensorInfo(const TensorInfo& inputTensorInfo,
     return paddedTensorInfo;
 }
 
-ParsedTfOperationPtr TfParser::ParsePad(const tensorflow::NodeDef& nodeDef,
-                                        const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParsePad(const tensorflow::NodeDef& nodeDef,
+                                                      const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     // input consists of:
@@ -2213,8 +2264,8 @@ ParsedTfOperationPtr TfParser::ParsePad(const tensorflow::NodeDef& nodeDef,
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseConcat(const tensorflow::NodeDef& nodeDef,
-                                           const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseConcat(const tensorflow::NodeDef& nodeDef,
+                                                         const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     std::vector<OutputOfConstNodeDef> nodes = GetTfInputNodes(nodeDef);
@@ -2295,7 +2346,7 @@ ParsedTfOperationPtr TfParser::ParseConcat(const tensorflow::NodeDef& nodeDef,
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseShape(const tensorflow::NodeDef& nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseShape(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
@@ -2336,7 +2387,7 @@ ParsedTfOperationPtr TfParser::ParseShape(const tensorflow::NodeDef& nodeDef,
                                                              shapeTensorInfo);
 }
 
-ParsedTfOperationPtr TfParser::ParseReshape(const tensorflow::NodeDef& nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseReshape(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
@@ -2373,7 +2424,7 @@ ParsedTfOperationPtr TfParser::ParseReshape(const tensorflow::NodeDef& nodeDef,
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseResizeBilinear(const tensorflow::NodeDef& nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseResizeBilinear(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
@@ -2504,7 +2555,8 @@ TensorInfo OutputShapeOfSqueeze(const tensorflow::NodeDef& nodeDef, TensorInfo i
     return outTensorInfo;
 }
 
-ParsedTfOperationPtr TfParser::ParseSqueeze(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseSqueeze(const tensorflow::NodeDef& nodeDef,
+                                                          const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
@@ -2524,7 +2576,8 @@ ParsedTfOperationPtr TfParser::ParseSqueeze(const tensorflow::NodeDef& nodeDef, 
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseLrn(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseLrn(const tensorflow::NodeDef& nodeDef,
+                                                      const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
@@ -2558,7 +2611,7 @@ ParsedTfOperationPtr TfParser::ParseLrn(const tensorflow::NodeDef& nodeDef, cons
 class ParsedMatMulTfOperation : public DeferredSingleLayerParsedTfOperation
 {
 public:
-    ParsedMatMulTfOperation(TfParser* parser, const tensorflow::NodeDef& node)
+    ParsedMatMulTfOperation(ITfParser::TfParserImpl* parser, const tensorflow::NodeDef& node)
         : DeferredSingleLayerParsedTfOperation(parser, node)
     {
     }
@@ -2570,7 +2623,8 @@ public:
     }
 };
 
-ParsedTfOperationPtr TfParser::ParseMatMul(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseMatMul(const tensorflow::NodeDef& nodeDef,
+                                                         const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
 
@@ -2578,7 +2632,8 @@ ParsedTfOperationPtr TfParser::ParseMatMul(const tensorflow::NodeDef& nodeDef, c
     return std::make_unique<ParsedMatMulTfOperation>(this, nodeDef);
 }
 
-ParsedTfOperationPtr TfParser::ParseMean(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseMean(const tensorflow::NodeDef& nodeDef,
+                                                       const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
@@ -2641,7 +2696,7 @@ ParsedTfOperationPtr TfParser::ParseMean(const tensorflow::NodeDef& nodeDef, con
 class ParsedMulTfOperation : public DeferredSingleLayerParsedTfOperation
 {
 public:
-    ParsedMulTfOperation(TfParser* parser, const tensorflow::NodeDef& node)
+    ParsedMulTfOperation(ITfParser::TfParserImpl* parser, const tensorflow::NodeDef& node)
         : DeferredSingleLayerParsedTfOperation(parser, node)
     {
     }
@@ -2653,14 +2708,15 @@ public:
     }
 };
 
-ParsedTfOperationPtr TfParser::ParseMul(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseMul(const tensorflow::NodeDef& nodeDef,
+                                                      const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
 
     return std::make_unique<ParsedMulTfOperation>(this, nodeDef);
 }
 
-ParsedTfOperationPtr TfParser::ParsePlaceholder(const tensorflow::NodeDef& nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParsePlaceholder(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
@@ -2688,13 +2744,14 @@ ParsedTfOperationPtr TfParser::ParsePlaceholder(const tensorflow::NodeDef& nodeD
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseRealDiv(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseRealDiv(const tensorflow::NodeDef& nodeDef,
+                                                          const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
     return AddRealDivLayer(nodeDef);
 }
 
-ParsedTfOperationPtr TfParser::ParseRelu(const tensorflow::NodeDef& nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseRelu(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
@@ -2704,7 +2761,7 @@ ParsedTfOperationPtr TfParser::ParseRelu(const tensorflow::NodeDef& nodeDef,
     return AddActivationLayer(nodeDef, activationDesc);
 }
 
-ParsedTfOperationPtr TfParser::ParseRelu6(const tensorflow::NodeDef& nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseRelu6(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
@@ -2717,7 +2774,7 @@ ParsedTfOperationPtr TfParser::ParseRelu6(const tensorflow::NodeDef& nodeDef,
     return AddActivationLayer(nodeDef, activationDesc);
 }
 
-ParsedTfOperationPtr TfParser::ParseSigmoid(const tensorflow::NodeDef& nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseSigmoid(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
@@ -2728,7 +2785,7 @@ ParsedTfOperationPtr TfParser::ParseSigmoid(const tensorflow::NodeDef& nodeDef,
     return AddActivationLayer(nodeDef, activationDesc);
 }
 
-ParsedTfOperationPtr TfParser::ParseRsqrt(const tensorflow::NodeDef &nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseRsqrt(const tensorflow::NodeDef &nodeDef,
     const tensorflow::GraphDef &graphDef)
 {
     IgnoreUnused(graphDef);
@@ -2745,7 +2802,7 @@ ParsedTfOperationPtr TfParser::ParseRsqrt(const tensorflow::NodeDef &nodeDef,
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseSoftmax(const tensorflow::NodeDef& nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseSoftmax(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
@@ -2762,7 +2819,7 @@ ParsedTfOperationPtr TfParser::ParseSoftmax(const tensorflow::NodeDef& nodeDef,
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseSplit(const tensorflow::NodeDef& nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseSplit(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
@@ -2853,7 +2910,7 @@ ParsedTfOperationPtr TfParser::ParseSplit(const tensorflow::NodeDef& nodeDef,
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseSoftplus(const tensorflow::NodeDef& nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseSoftplus(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
@@ -2864,8 +2921,8 @@ ParsedTfOperationPtr TfParser::ParseSoftplus(const tensorflow::NodeDef& nodeDef,
     return AddActivationLayer(nodeDef, activationDesc);
 }
 
-ParsedTfOperationPtr TfParser::ParseStridedSlice(const tensorflow::NodeDef& nodeDef,
-                                                 const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseStridedSlice(const tensorflow::NodeDef& nodeDef,
+                                                               const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
 
@@ -2912,7 +2969,8 @@ ParsedTfOperationPtr TfParser::ParseStridedSlice(const tensorflow::NodeDef& node
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseTanh(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseTanh(const tensorflow::NodeDef& nodeDef,
+                                                        const tensorflow::GraphDef& graphDef)
 {
     IgnoreUnused(graphDef);
 
@@ -2924,7 +2982,7 @@ ParsedTfOperationPtr TfParser::ParseTanh(const tensorflow::NodeDef& nodeDef, con
     return AddActivationLayer(nodeDef, activationDesc);
 }
 
-ParsedTfOperationPtr TfParser::AddActivationLayer(const tensorflow::NodeDef& nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::AddActivationLayer(const tensorflow::NodeDef& nodeDef,
     ActivationDescriptor& activationDesc)
 {
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
@@ -2937,19 +2995,19 @@ ParsedTfOperationPtr TfParser::AddActivationLayer(const tensorflow::NodeDef& nod
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::ParseMaxPool(const tensorflow::NodeDef& nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseMaxPool(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
     return ParsePooling2d(nodeDef, graphDef, PoolingAlgorithm::Max);
 }
 
-ParsedTfOperationPtr TfParser::ParseAvgPool(const tensorflow::NodeDef& nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParseAvgPool(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
     return ParsePooling2d(nodeDef, graphDef, PoolingAlgorithm::Average);
 }
 
-ParsedTfOperationPtr TfParser::ParsePooling2d(const tensorflow::NodeDef& nodeDef,
+ParsedTfOperationPtr ITfParser::TfParserImpl::ParsePooling2d(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef, PoolingAlgorithm pooltype)
 {
     IgnoreUnused(graphDef);
@@ -3058,7 +3116,7 @@ ParsedTfOperationPtr TfParser::ParsePooling2d(const tensorflow::NodeDef& nodeDef
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::AddAdditionLayer(const tensorflow::NodeDef& nodeDef, bool isBiasAdd)
+ParsedTfOperationPtr ITfParser::TfParserImpl::AddAdditionLayer(const tensorflow::NodeDef& nodeDef, bool isBiasAdd)
 {
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
 
@@ -3138,7 +3196,7 @@ ParsedTfOperationPtr TfParser::AddAdditionLayer(const tensorflow::NodeDef& nodeD
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::AddRealDivLayer(const tensorflow::NodeDef& nodeDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::AddRealDivLayer(const tensorflow::NodeDef& nodeDef)
 {
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
 
@@ -3176,7 +3234,7 @@ ParsedTfOperationPtr TfParser::AddRealDivLayer(const tensorflow::NodeDef& nodeDe
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-ParsedTfOperationPtr TfParser::AddMaximumLayer(const tensorflow::NodeDef& nodeDef)
+ParsedTfOperationPtr ITfParser::TfParserImpl::AddMaximumLayer(const tensorflow::NodeDef& nodeDef)
 {
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
 
@@ -3219,7 +3277,7 @@ ParsedTfOperationPtr TfParser::AddMaximumLayer(const tensorflow::NodeDef& nodeDe
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
-IConnectableLayer* TfParser::AddMultiplicationLayer(const tensorflow::NodeDef& nodeDef)
+IConnectableLayer* ITfParser::TfParserImpl::AddMultiplicationLayer(const tensorflow::NodeDef& nodeDef)
 {
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
 
@@ -3255,7 +3313,7 @@ IConnectableLayer* TfParser::AddMultiplicationLayer(const tensorflow::NodeDef& n
     return layer;
 }
 
-IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& matMulNodeDef,
+IConnectableLayer* ITfParser::TfParserImpl::AddFullyConnectedLayer(const tensorflow::NodeDef& matMulNodeDef,
     const tensorflow::NodeDef* addNodeDef, const char* armnnLayerName)
 {
     // Finds bias const (if applicable).
@@ -3353,7 +3411,7 @@ IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& m
     return layer;
 }
 
-void TfParser::LoadNodeDef(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+void ITfParser::TfParserImpl::LoadNodeDef(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
     // Gets the type of the node (assume float).
     tensorflow::DataType type = tensorflow::DT_FLOAT;
@@ -3426,7 +3484,7 @@ void TfParser::LoadNodeDef(const tensorflow::NodeDef& nodeDef, const tensorflow:
     }
 }
 
-void TfParser::LoadGraphDef(const tensorflow::GraphDef& graphDef)
+void ITfParser::TfParserImpl::LoadGraphDef(const tensorflow::GraphDef& graphDef)
 {
     // Adds all nodes to our map.
     m_NodesByName.clear();
@@ -3496,7 +3554,7 @@ void TfParser::LoadGraphDef(const tensorflow::GraphDef& graphDef)
     }
 }
 
-INetworkPtr TfParser::CreateNetworkFromTextFile(const char* graphFile,
+INetworkPtr ITfParser::TfParserImpl::CreateNetworkFromTextFile(const char* graphFile,
     const std::map<std::string, TensorShape>& inputShapes,
     const std::vector<std::string>& requestedOutputs)
 {
@@ -3527,7 +3585,7 @@ INetworkPtr TfParser::CreateNetworkFromTextFile(const char* graphFile,
     return CreateNetworkFromGraphDef(graphDef, inputShapes, requestedOutputs);
 }
 
-INetworkPtr TfParser::CreateNetworkFromString(const char* protoText,
+INetworkPtr ITfParser::TfParserImpl::CreateNetworkFromString(const char* protoText,
     const std::map<std::string, TensorShape>& inputShapes,
     const std::vector<std::string>& requestedOutputs)
 {
@@ -3545,7 +3603,7 @@ INetworkPtr TfParser::CreateNetworkFromString(const char* protoText,
     return CreateNetworkFromGraphDef(graphDef, inputShapes, requestedOutputs);
 }
 
-INetworkPtr TfParser::CreateNetworkFromBinaryFile(const char* graphFile,
+INetworkPtr ITfParser::TfParserImpl::CreateNetworkFromBinaryFile(const char* graphFile,
     const std::map<std::string, TensorShape>& inputShapes,
     const std::vector<std::string>& requestedOutputs)
 {
@@ -3579,7 +3637,7 @@ INetworkPtr TfParser::CreateNetworkFromBinaryFile(const char* graphFile,
     return CreateNetworkFromGraphDef(graphDef, inputShapes, requestedOutputs);
 }
 
-INetworkPtr TfParser::CreateNetworkFromGraphDef(const tensorflow::GraphDef& graphDef,
+INetworkPtr ITfParser::TfParserImpl::CreateNetworkFromGraphDef(const tensorflow::GraphDef& graphDef,
     const std::map<std::string, TensorShape>& inputShapes,
     const std::vector<std::string>& requestedOutputs)
 {
@@ -3609,7 +3667,7 @@ INetworkPtr TfParser::CreateNetworkFromGraphDef(const tensorflow::GraphDef& grap
     return std::move(m_Network);
 }
 
-void TfParser::Cleanup()
+void ITfParser::TfParserImpl::Cleanup()
 {
     // Cleanup, in case we reuse this parser.
     m_InputShapes.clear();
@@ -3618,17 +3676,17 @@ void TfParser::Cleanup()
     m_ParsedTfOperations.clear();
 }
 
-BindingPointInfo TfParser::GetNetworkInputBindingInfo(const std::string& name) const
+BindingPointInfo ITfParser::TfParserImpl::GetNetworkInputBindingInfo(const std::string& name) const
 {
     return GetBindingInfo(name, "input", m_NetworkInputsBindingInfo);
 }
 
-BindingPointInfo TfParser::GetNetworkOutputBindingInfo(const std::string& name) const
+BindingPointInfo ITfParser::TfParserImpl::GetNetworkOutputBindingInfo(const std::string& name) const
 {
     return GetBindingInfo(name, "output", m_NetworkOutputsBindingInfo);
 }
 
-std::pair<LayerBindingId, TensorInfo> TfParser::GetBindingInfo(const std::string& layerName,
+std::pair<LayerBindingId, TensorInfo> ITfParser::TfParserImpl::GetBindingInfo(const std::string& layerName,
     const char* bindingPointDesc,
     const std::unordered_map<std::string, BindingPointInfo>& nameToBindingInfo)
 {
@@ -3644,17 +3702,21 @@ std::pair<LayerBindingId, TensorInfo> TfParser::GetBindingInfo(const std::string
     return it->second;
 }
 
-void TfParser::TrackInputBinding(IConnectableLayer* layer, LayerBindingId id, const TensorInfo& tensorInfo)
+void ITfParser::TfParserImpl::TrackInputBinding(IConnectableLayer* layer,
+                                                LayerBindingId id,
+                                                const TensorInfo& tensorInfo)
 {
     return TrackBindingPoint(layer, id, tensorInfo, "input", m_NetworkInputsBindingInfo);
 }
 
-void TfParser::TrackOutputBinding(IConnectableLayer* layer, LayerBindingId id, const TensorInfo& tensorInfo)
+void ITfParser::TfParserImpl::TrackOutputBinding(IConnectableLayer* layer,
+                                                 LayerBindingId id,
+                                                 const TensorInfo& tensorInfo)
 {
     return TrackBindingPoint(layer, id, tensorInfo, "output", m_NetworkOutputsBindingInfo);
 }
 
-void TfParser::TrackBindingPoint(IConnectableLayer* layer,
+void ITfParser::TfParserImpl::TrackBindingPoint(IConnectableLayer* layer,
     LayerBindingId id,
     const TensorInfo& tensorInfo,
     const char* bindingPointDesc,

@@ -10,8 +10,6 @@
 #include <string>
 #include <iostream>
 
-using armnnTfLiteParser::TfLiteParser;
-
 BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
 
 struct ResizeNearestNeighborFixture : public ParserFlatbuffersFixture

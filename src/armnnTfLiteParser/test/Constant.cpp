@@ -10,7 +10,7 @@
 #include <string>
 #include <iostream>
 
-using armnnTfLiteParser::TfLiteParser;
+using armnnTfLiteParser::TfLiteParserImpl;
 
 BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
 

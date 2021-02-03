@@ -11,12 +11,10 @@
 struct TfLiteParserFixture
 {
 
-    armnnTfLiteParser::TfLiteParser m_Parser;
+    armnnTfLiteParser::TfLiteParserImpl m_Parser;
     unsigned int m_InputShape[4];
 
-    TfLiteParserFixture() : m_Parser( ), m_InputShape { 1, 2, 2, 1 } {
-        m_Parser.Create();
-    }
+    TfLiteParserFixture() : m_Parser( ), m_InputShape { 1, 2, 2, 1 } {}
     ~TfLiteParserFixture()          {  }
 
 };

@@ -8,10 +8,10 @@
 
 #include <Filesystem.hpp>
 
-using armnnTfLiteParser::TfLiteParser;
-using ModelPtr = TfLiteParser::ModelPtr;
-using SubgraphPtr = TfLiteParser::SubgraphPtr;
-using OperatorPtr = TfLiteParser::OperatorPtr;
+using armnnTfLiteParser::TfLiteParserImpl;
+using ModelPtr = TfLiteParserImpl::ModelPtr;
+using SubgraphPtr = TfLiteParserImpl::SubgraphPtr;
+using OperatorPtr = TfLiteParserImpl::OperatorPtr;
 
 BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
 
@@ -185,7 +185,8 @@ struct LoadModelFixture : public ParserFlatbuffersFixture
 
 BOOST_FIXTURE_TEST_CASE(LoadModelFromBinary, LoadModelFixture)
 {
-    TfLiteParser::ModelPtr model = TfLiteParser::LoadModelFromBinary(m_GraphBinary.data(), m_GraphBinary.size());
+    TfLiteParserImpl::ModelPtr model = TfLiteParserImpl::LoadModelFromBinary(m_GraphBinary.data(),
+                                                                             m_GraphBinary.size());
     CheckModel(model, 3, 2, { tflite::BuiltinOperator_AVERAGE_POOL_2D, tflite::BuiltinOperator_CONV_2D },
                2, "Test loading a model", 2);
     CheckSubgraph(model->subgraphs[0], 2, { 1 }, { 0 }, 1, "");
@@ -205,7 +206,7 @@ BOOST_FIXTURE_TEST_CASE(LoadModelFromFile, LoadModelFixture)
                                        m_GraphBinary.size(), true);
     BOOST_CHECK_MESSAGE(saved, "Cannot save test file");
 
-    TfLiteParser::ModelPtr model = TfLiteParser::LoadModelFromFile(fname.c_str());
+    TfLiteParserImpl::ModelPtr model = TfLiteParserImpl::LoadModelFromFile(fname.c_str());
     CheckModel(model, 3, 2, { tflite::BuiltinOperator_AVERAGE_POOL_2D, tflite::BuiltinOperator_CONV_2D },
                2, "Test loading a model", 2);
     CheckSubgraph(model->subgraphs[0], 2, { 1 }, { 0 }, 1, "");
@@ -219,24 +220,24 @@ BOOST_FIXTURE_TEST_CASE(LoadModelFromFile, LoadModelFixture)
 
 BOOST_AUTO_TEST_CASE(LoadNullBinary)
 {
-    BOOST_CHECK_THROW(TfLiteParser::LoadModelFromBinary(nullptr, 0), armnn::InvalidArgumentException);
+    BOOST_CHECK_THROW(TfLiteParserImpl::LoadModelFromBinary(nullptr, 0), armnn::InvalidArgumentException);
 }
 
 BOOST_AUTO_TEST_CASE(LoadInvalidBinary)
 {
     std::string testData = "invalid data";
-    BOOST_CHECK_THROW(TfLiteParser::LoadModelFromBinary(reinterpret_cast<const uint8_t*>(&testData),
+    BOOST_CHECK_THROW(TfLiteParserImpl::LoadModelFromBinary(reinterpret_cast<const uint8_t*>(&testData),
                                                         testData.length()), armnn::ParseException);
 }
 
 BOOST_AUTO_TEST_CASE(LoadFileNotFound)
 {
-    BOOST_CHECK_THROW(TfLiteParser::LoadModelFromFile("invalidfile.tflite"), armnn::FileNotFoundException);
+    BOOST_CHECK_THROW(TfLiteParserImpl::LoadModelFromFile("invalidfile.tflite"), armnn::FileNotFoundException);
 }
 
 BOOST_AUTO_TEST_CASE(LoadNullPtrFile)
 {
-    BOOST_CHECK_THROW(TfLiteParser::LoadModelFromFile(nullptr), armnn::InvalidArgumentException);
+    BOOST_CHECK_THROW(TfLiteParserImpl::LoadModelFromFile(nullptr), armnn::InvalidArgumentException);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "armnn/TypesUtils.hpp"
+#include <iostream>
 
 namespace armnn
 {
@@ -36,5 +37,7 @@ void ConfigureLogging(bool printToStandardOutput, bool printToDebugOutput, LogSe
 #endif
 
 bool NeonDetected();
+
+const std::string GetVersion();
 
 } // namespace armnn

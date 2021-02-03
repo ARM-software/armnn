@@ -4,6 +4,7 @@
 //
 #include "armnn/Logging.hpp"
 #include "armnn/Utils.hpp"
+#include "armnn/Version.hpp"
 
 #if !defined(BARE_METAL) && (defined(__arm__) || defined(__aarch64__))
 
@@ -71,6 +72,11 @@ bool NeonDetected()
     // This method of Neon detection is only supported on Linux so in order to prevent a false negative
     // we will return true in cases where detection did not run.
     return true;
+}
+
+const std::string GetVersion()
+{
+    return ARMNN_VERSION;
 }
 
 } // namespace armnn

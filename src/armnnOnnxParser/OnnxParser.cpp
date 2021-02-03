@@ -4,6 +4,8 @@
 //
 #include "OnnxParser.hpp"
 
+#include "armnnOnnxParser/Version.hpp"
+
 #include <armnn/Descriptors.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
@@ -14,6 +16,7 @@
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 
+#include <iostream>
 #include <numeric>
 
 using namespace armnn;
@@ -1847,6 +1850,11 @@ std::vector<std::string> OnnxParserImpl::GetOutputs(ModelPtr& model)
         outputNames.push_back(output.name());
     }
     return outputNames;
+}
+
+const std::string OnnxParserImpl::GetVersion()
+{
+    return ONNX_PARSER_VERSION;
 }
 
 } // namespace armnnOnnxParser

@@ -14,6 +14,7 @@ set(armnnDelegate_sources)
 list(APPEND armnnDelegate_sources
         include/armnn_delegate.hpp
         include/DelegateOptions.hpp
+        include/Version.hpp
         src/armnn_delegate.cpp
         src/armnn_external_delegate.cpp
         src/DelegateOptions.cpp
@@ -102,6 +103,8 @@ target_include_directories(thirdparty_headers INTERFACE $<BUILD_INTERFACE:${ARMN
                                                         $<INSTALL_INTERFACE:include/thirdparty_headers>)
 
 target_compile_options(thirdparty_headers INTERFACE -Wno-old-style-cast)
+
+set_target_properties(armnnDelegate PROPERTIES VERSION ${DELEGATE_LIB_VERSION} SOVERSION ${DELEGATE_LIB_SOVERSION})
 
 option(BUILD_UNIT_TESTS "Build unit tests" ON)
 if(BUILD_UNIT_TESTS)

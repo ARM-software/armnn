@@ -5,6 +5,8 @@
 #include "CaffeParser.hpp"
 #include "RecordByRecordCaffeParser.hpp"
 
+#include "armnnCaffeParser/Version.hpp"
+
 #include "armnn/Descriptors.hpp"
 #include "armnn/INetwork.hpp"
 #include "armnn/Utils.hpp"
@@ -35,6 +37,7 @@
 #include <google/protobuf/wire_format.h>
 
 #include <cmath>
+#include <iostream>
 #include <sstream>
 #include <queue>
 #include <fcntl.h>
@@ -2248,6 +2251,11 @@ INetworkPtr ICaffeParser::CaffeParserImpl::CreateNetworkFromNetParameter(NetPara
     Cleanup();
 
     return move(m_Network);
+}
+
+const std::string ICaffeParser::CaffeParserImpl::GetVersion()
+{
+    return CAFFE_PARSER_VERSION;
 }
 
 void ICaffeParser::CaffeParserImpl::Cleanup() {

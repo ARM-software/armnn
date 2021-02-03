@@ -9,6 +9,8 @@ project(armnn)
 set(additional_cmake_files)
 list(APPEND additional_cmake_files
     cmake/ArmnnVersion.cmake
+    cmake/DelegateVersion.cmake
+    cmake/ParserVersion.cmake
     cmake/Utils.cmake
     cmake/GlobalConfig.cmake
     cmake/AddDllCopyCommands.cmake)
@@ -102,6 +104,7 @@ if(BUILD_CAFFE_PARSER)
     set(armnn_caffe_parser_sources)
     list(APPEND armnn_caffe_parser_sources
         include/armnnCaffeParser/ICaffeParser.hpp
+        include/armnnCaffeParser/Version.hpp
         src/armnnCaffeParser/RecordByRecordCaffeParser.hpp
         src/armnnCaffeParser/RecordByRecordCaffeParser.cpp
         src/armnnCaffeParser/CaffeParser.hpp
@@ -120,7 +123,7 @@ if(BUILD_CAFFE_PARSER)
 
     target_link_libraries(armnnCaffeParser armnn)
     target_link_libraries(armnnCaffeParser ${PROTOBUF_LIBRARIES})
-    set_target_properties(armnnCaffeParser PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
+    set_target_properties(armnnCaffeParser PROPERTIES VERSION ${CAFFE_PARSER_LIB_VERSION} SOVERSION ${CAFFE_PARSER_LIB_SOVERSION})
 
 endif()
 
@@ -128,6 +131,7 @@ if(BUILD_ONNX_PARSER)
     set(armnn_onnx_parser_sources)
     list(APPEND armnn_onnx_parser_sources
         include/armnnOnnxParser/IOnnxParser.hpp
+        include/armnnOnnxParser/Version.hpp
         src/armnnOnnxParser/OnnxParser.hpp
         src/armnnOnnxParser/OnnxParser.cpp
         ${ONNX_GENERATED_SOURCES}/onnx/onnx.pb.cc
@@ -145,13 +149,14 @@ if(BUILD_ONNX_PARSER)
 
     # Protobuf
     target_link_libraries(armnnOnnxParser ${PROTOBUF_LIBRARIES})
-    set_target_properties(armnnOnnxParser PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
+    set_target_properties(armnnOnnxParser PROPERTIES VERSION ${ONNX_PARSER_LIB_VERSION} SOVERSION ${ONNX_PARSER_LIB_SOVERSION})
 endif()
 
 if(BUILD_TF_PARSER)
     set(armnn_tf_parser_sources)
     list(APPEND armnn_tf_parser_sources
         include/armnnTfParser/ITfParser.hpp
+        include/armnnTfParser/Version.hpp
         src/armnnTfParser/TfParser.hpp
         src/armnnTfParser/TfParser.cpp
         ${TF_PROTOBUFS}
@@ -169,7 +174,7 @@ if(BUILD_TF_PARSER)
 
     # Protobuf (use the specific version tensorflow wants)
     target_link_libraries(armnnTfParser ${PROTOBUF_LIBRARIES})
-    set_target_properties(armnnTfParser PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
+    set_target_properties(armnnTfParser PROPERTIES VERSION ${TF_PARSER_LIB_VERSION} SOVERSION ${TF_PARSER_LIB_SOVERSION})
 endif()
 
 if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)

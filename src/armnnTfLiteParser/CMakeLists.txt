@@ -6,6 +6,7 @@ if(BUILD_TF_LITE_PARSER)
     set(armnn_tf_lite_parser_sources)
     list(APPEND armnn_tf_lite_parser_sources
         ../../include/armnnTfLiteParser/ITfLiteParser.hpp
+        ../../include/armnnTfLiteParser/Version.hpp
         TfLiteParser.hpp
         TfLiteParser.cpp
         )
@@ -33,7 +34,7 @@ if(BUILD_TF_LITE_PARSER)
         target_link_libraries(armnnTfLiteParser armnn debug ${FLATBUFFERS_LIBRARY_DEBUG} optimized ${FLATBUFFERS_LIBRARY_RELEASE})
     endif()
 
-    set_target_properties(armnnTfLiteParser PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION} )
+    set_target_properties(armnnTfLiteParser PROPERTIES VERSION ${TFLITE_PARSER_LIB_VERSION} SOVERSION ${TFLITE_PARSER_LIB_SOVERSION} )
 
     install(TARGETS armnnTfLiteParser
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

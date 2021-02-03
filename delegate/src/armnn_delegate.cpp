@@ -5,6 +5,8 @@
 
 #include <armnn_delegate.hpp>
 
+#include "Version.hpp"
+
 #include "Activation.hpp"
 #include "ArgMinMax.hpp"
 #include "BatchSpace.hpp"
@@ -35,6 +37,7 @@
 #include <tensorflow/lite/context_util.h>
 
 #include <algorithm>
+#include <iostream>
 #include <sstream>
 
 namespace armnnDelegate
@@ -215,6 +218,11 @@ TfLiteIntArray* Delegate::IdentifyOperatorsToDelegate(TfLiteContext* tfLiteConte
 TfLiteDelegate* Delegate::GetDelegate()
 {
     return &m_Delegate;
+}
+
+const std::string Delegate::GetVersion()
+{
+    return DELEGATE_VERSION;
 }
 
 TfLiteStatus ArmnnSubgraph::AddInputLayer(DelegateData& delegateData,

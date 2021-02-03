@@ -79,6 +79,9 @@ public:
     static armnn::TensorInfo OutputShapeOfReshape(const armnn::TensorInfo & inputTensorInfo,
                                                   const std::vector<int32_t> & targetDimsIn);
 
+    /// Retrieve version in X.Y.Z form
+    static const std::string GetVersion();
+
 private:
     // No copying allowed until it is wanted and properly implemented
     TfLiteParserImpl(const TfLiteParserImpl &) = delete;

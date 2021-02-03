@@ -88,6 +88,9 @@ public:
     /// Retrieves binding info (layer id and tensor info) for the network output identified by the given layer name.
     BindingPointInfo GetNetworkOutputBindingInfo(const std::string& name) const;
 
+    /// Retrieve version in X.Y.Z form
+    static const std::string GetVersion();
+
     TfParserImpl();
     ~TfParserImpl() = default;
 

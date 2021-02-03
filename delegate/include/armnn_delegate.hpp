@@ -47,6 +47,9 @@ public:
 
     TfLiteDelegate* GetDelegate();
 
+    /// Retrieve version in X.Y.Z form
+    static const std::string GetVersion();
+
 private:
     TfLiteDelegate m_Delegate = {
         reinterpret_cast<void*>(this),  // .data_

@@ -5,6 +5,8 @@
 
 #include "TfLiteParser.hpp"
 
+#include "armnnTfLiteParser/Version.hpp"
+
 #include <armnn/BackendOptions.hpp>
 #include <armnn/Descriptors.hpp>
 #include <armnn/Exceptions.hpp>
@@ -30,8 +32,9 @@
 
 #include <fmt/format.h>
 
-#include <fstream>
 #include <algorithm>
+#include <fstream>
+#include <iostream>
 #include <limits>
 #include <numeric>
 #include <sstream>
@@ -3588,6 +3591,11 @@ std::vector<std::string> TfLiteParserImpl::GetSubgraphOutputTensorNames(size_t s
         result.push_back(output.second->name);
     }
     return result;
+}
+
+const std::string TfLiteParserImpl::GetVersion()
+{
+    return TFLITE_PARSER_VERSION;
 }
 
 TfLiteParserImpl::SupportedDataStorage::SupportedDataStorage(std::unique_ptr<float[]> && data)

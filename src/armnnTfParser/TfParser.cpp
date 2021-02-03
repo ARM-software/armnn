@@ -5,6 +5,8 @@
 
 #include "TfParser.hpp"
 
+#include "armnnTfParser/Version.hpp"
+
 #include <armnn/TypesUtils.hpp>
 #include <armnn/Descriptors.hpp>
 
@@ -25,6 +27,7 @@
 
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include <iostream>
 #include <numeric>
 
 using namespace armnnUtils;
@@ -3732,6 +3735,11 @@ void ITfParser::TfParserImpl::TrackBindingPoint(IConnectableLayer* layer,
                         bindingPointDesc,
                         CHECK_LOCATION().AsString()));
     }
+}
+
+const std::string ITfParser::TfParserImpl::GetVersion()
+{
+    return TF_PARSER_VERSION;
 }
 
 } // namespace armnnTfParser

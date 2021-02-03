@@ -61,6 +61,9 @@ public:
     /// Retrieve outputs names
     static std::vector<std::string> GetOutputs(ModelPtr& model);
 
+    /// Retrieve version in X.Y.Z form
+    static const std::string GetVersion();
+
 private:
 
     /// Parses a ModelProto loaded into memory from one of the other CreateNetwork*

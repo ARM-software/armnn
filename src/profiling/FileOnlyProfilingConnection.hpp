@@ -50,7 +50,7 @@ private:
 class FileOnlyProfilingConnection : public IProfilingConnection, public IInternalProfilingConnection
 {
 public:
-    explicit FileOnlyProfilingConnection(const Runtime::CreationOptions::ExternalProfilingOptions& options)
+    explicit FileOnlyProfilingConnection(const IRuntime::CreationOptions::ExternalProfilingOptions& options)
         : m_Options(options)
         , m_Endianness(TargetEndianness::LeWire)    // Set a sensible default.
                                                     // StreamMetaDataProcessor will set a real value.
@@ -103,7 +103,7 @@ private:
     void ForwardPacketToHandlers(arm::pipe::Packet& packet);
     void ServiceLocalHandlers();
 
-    Runtime::CreationOptions::ExternalProfilingOptions m_Options;
+    IRuntime::CreationOptions::ExternalProfilingOptions m_Options;
     std::queue<arm::pipe::Packet> m_PacketQueue;
     TargetEndianness m_Endianness;
 

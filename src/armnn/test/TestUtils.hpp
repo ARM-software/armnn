@@ -52,6 +52,6 @@ bool CheckRelatedLayers(armnn::Graph& graph, const std::list<std::string>& testR
 namespace armnn
 {
 
-profiling::ProfilingService& GetProfilingService(armnn::Runtime* runtime);
+profiling::ProfilingService& GetProfilingService(RuntimeImpl* runtime);
 
 } // namespace armnn

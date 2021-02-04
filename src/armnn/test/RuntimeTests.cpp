@@ -27,7 +27,7 @@
 namespace armnn
 {
 
-void RuntimeLoadedNetworksReserve(armnn::Runtime* runtime)
+void RuntimeLoadedNetworksReserve(armnn::RuntimeImpl* runtime)
 {
     runtime->m_LoadedNetworks.reserve(1);
 }
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryLeak)
     // ensure that runtime is large enough before checking for memory leaks
     // otherwise when loading the network it will automatically reserve memory that won't be released until destruction
     armnn::IRuntime::CreationOptions options;
-    armnn::Runtime                   runtime(options);
+    armnn::RuntimeImpl                   runtime(options);
     armnn::RuntimeLoadedNetworksReserve(&runtime);
 
     {
@@ -333,7 +333,7 @@ BOOST_AUTO_TEST_CASE(ProfilingDisable)
 
     // Create runtime in which the test will run
     armnn::IRuntime::CreationOptions options;
-    armnn::Runtime runtime(options);
+    armnn::RuntimeImpl runtime(options);
 
     // build up the structure of the network
     INetworkPtr net(INetwork::Create());
@@ -378,7 +378,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     options.m_ProfilingOptions.m_EnableProfiling = true;
     options.m_ProfilingOptions.m_TimelineEnabled = true;
 
-    armnn::Runtime runtime(options);
+    armnn::RuntimeImpl runtime(options);
     GetProfilingService(&runtime).ResetExternalProfilingOptions(options.m_ProfilingOptions, false);
 
     profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));

@@ -10,7 +10,7 @@
 namespace
 {
 
-inline void CreateAndDropDummyNetwork(const std::vector<armnn::BackendId>& backends, armnn::Runtime& runtime)
+inline void CreateAndDropDummyNetwork(const std::vector<armnn::BackendId>& backends, armnn::RuntimeImpl& runtime)
 {
     armnn::NetworkId networkIdentifier;
     {

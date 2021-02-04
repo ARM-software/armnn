@@ -16,7 +16,7 @@ namespace profiling
 {
 
 std::unique_ptr<IProfilingConnection> ProfilingConnectionFactory::GetProfilingConnection(
-    const Runtime::CreationOptions::ExternalProfilingOptions& options) const
+    const IRuntime::CreationOptions::ExternalProfilingOptions& options) const
 {
     // Before proceed to create the IProfilingConnection, check if the file format is supported
     if (!(options.m_FileFormat == "binary"))

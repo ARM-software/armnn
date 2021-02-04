@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryLeaksCpuRef)
     BOOST_TEST(ARMNN_LEAK_CHECKER_IS_ACTIVE());
 
     armnn::IRuntime::CreationOptions options;
-    armnn::Runtime runtime(options);
+    armnn::RuntimeImpl runtime(options);
     armnn::RuntimeLoadedNetworksReserve(&runtime);
 
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};

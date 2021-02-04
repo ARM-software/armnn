@@ -18,7 +18,7 @@ namespace profiling
 
 ProfilingConnectionDumpToFileDecorator::ProfilingConnectionDumpToFileDecorator(
     std::unique_ptr<IProfilingConnection> connection,
-    const Runtime::CreationOptions::ExternalProfilingOptions& options,
+    const IRuntime::CreationOptions::ExternalProfilingOptions& options,
     bool ignoreFailures)
       : m_Connection(std::move(connection))
       , m_Options(options)

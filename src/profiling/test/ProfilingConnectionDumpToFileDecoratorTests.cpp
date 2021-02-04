@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_SUITE(ProfilingConnectionDumpToFileDecoratorTests)
 
 BOOST_AUTO_TEST_CASE(DumpIncomingInvalidFile)
 {
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_IncomingCaptureFile = "/";
     options.m_OutgoingCaptureFile =  "";
     ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, false);
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(DumpIncomingInvalidFile)
 
 BOOST_AUTO_TEST_CASE(DumpIncomingInvalidFileIgnoreErrors)
 {
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_IncomingCaptureFile = "/";
     options.m_OutgoingCaptureFile =  "";
     ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, true);
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(DumpIncomingValidFile)
 {
     fs::path fileName = armnnUtils::Filesystem::NamedTempFile("Armnn-DumpIncomingValidFileTest-TempFile");
 
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_IncomingCaptureFile = fileName.string();
     options.m_OutgoingCaptureFile =  "";
 
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(DumpIncomingValidFile)
 
 BOOST_AUTO_TEST_CASE(DumpOutgoingInvalidFile)
 {
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_IncomingCaptureFile = "";
     options.m_OutgoingCaptureFile = "/";
     ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, false);
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingInvalidFile)
 
 BOOST_AUTO_TEST_CASE(DumpOutgoingInvalidFileIgnoreErrors)
 {
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_IncomingCaptureFile = "";
     options.m_OutgoingCaptureFile = "/";
 
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFile)
 {
     fs::path fileName = armnnUtils::Filesystem::NamedTempFile("Armnn-DumpOutgoingValidFileTest-TempFile");
 
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_IncomingCaptureFile = "";
     options.m_OutgoingCaptureFile = fileName.string();
 

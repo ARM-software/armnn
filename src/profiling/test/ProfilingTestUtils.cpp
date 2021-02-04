@@ -366,7 +366,7 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
     options.m_ProfilingOptions.m_TimelineEnabled = true;
-    armnn::Runtime runtime(options);
+    armnn::RuntimeImpl runtime(options);
     GetProfilingService(&runtime).ResetExternalProfilingOptions(options.m_ProfilingOptions, false);
 
     profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));

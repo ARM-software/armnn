@@ -21,6 +21,7 @@ using NetworkId = int;
 
 class IGpuAccTunedParameters;
 
+struct RuntimeImpl;
 class IRuntime;
 using IRuntimePtr = std::unique_ptr<IRuntime, void(*)(IRuntime* runtime)>;
 
@@ -124,7 +125,7 @@ public:
     /// @param [in] network - Complete network to load into the IRuntime.
     /// The runtime takes ownership of the network once passed in.
     /// @return armnn::Status
-    virtual Status LoadNetwork(NetworkId& networkIdOut, IOptimizedNetworkPtr network) = 0;
+    Status LoadNetwork(NetworkId& networkIdOut, IOptimizedNetworkPtr network);
 
     /// Load a complete network into the IRuntime.
     /// @param [out] networkIdOut Unique identifier for the network is returned in this reference.
@@ -132,44 +133,48 @@ public:
     /// @param [out] errorMessage Error message if there were any errors.
     /// The runtime takes ownership of the network once passed in.
     /// @return armnn::Status
-    virtual Status LoadNetwork(NetworkId& networkIdOut,
-                               IOptimizedNetworkPtr network,
-                               std::string& errorMessage) = 0;
+    Status LoadNetwork(NetworkId& networkIdOut,
+                       IOptimizedNetworkPtr network,
+                       std::string& errorMessage);
 
-    virtual Status LoadNetwork(NetworkId& networkIdOut,
-                               IOptimizedNetworkPtr network,
-                               std::string& errorMessage,
-                               const INetworkProperties& networkProperties) = 0;
+    Status LoadNetwork(NetworkId& networkIdOut,
+                       IOptimizedNetworkPtr network,
+                       std::string& errorMessage,
+                       const INetworkProperties& networkProperties);
 
-    virtual TensorInfo GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const = 0;
-    virtual TensorInfo GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const = 0;
+    TensorInfo GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
+    TensorInfo GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
 
     /// Evaluates a network using input in inputTensors and outputs filled into outputTensors
-    virtual Status EnqueueWorkload(NetworkId networkId,
-                                   const InputTensors& inputTensors,
-                                   const OutputTensors& outputTensors) = 0;
+    Status EnqueueWorkload(NetworkId networkId,
+                           const InputTensors& inputTensors,
+                           const OutputTensors& outputTensors);
 
     /// Unloads a network from the IRuntime.
     /// At the moment this only removes the network from the m_Impl->m_Network.
     /// This might need more work in the future to be AndroidNN compliant.
     /// @param [in] networkId - Unique identifier for the network to be unloaded. Generated in LoadNetwork().
     /// @return armnn::Status
-    virtual Status UnloadNetwork(NetworkId networkId) = 0;
+    Status UnloadNetwork(NetworkId networkId);
 
-    virtual const IDeviceSpec& GetDeviceSpec() const = 0;
+    const IDeviceSpec& GetDeviceSpec() const;
 
     /// Gets the profiler corresponding to the given network id.
     /// @param networkId The id of the network for which to get the profile.
     /// @return A pointer to the requested profiler, or nullptr if not found.
-    virtual const std::shared_ptr<IProfiler> GetProfiler(NetworkId networkId) const = 0;
+    const std::shared_ptr<IProfiler> GetProfiler(NetworkId networkId) const;
 
     /// Registers a callback function to debug layers performing custom computations on intermediate tensors.
     /// @param networkId The id of the network to register the callback.
     /// @param func callback function to pass to the debug layer.
-    virtual void RegisterDebugCallback(NetworkId networkId, const DebugCallbackFunction& func) = 0;
+    void RegisterDebugCallback(NetworkId networkId, const DebugCallbackFunction& func);
 
 protected:
-    ~IRuntime() {}
+    IRuntime();
+    IRuntime(const IRuntime::CreationOptions& options);
+    ~IRuntime();
+
+    std::unique_ptr<RuntimeImpl> pRuntimeImpl;
 };
 
 

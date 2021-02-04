@@ -22,7 +22,7 @@ void Connect(armnn::IConnectableLayer* from, armnn::IConnectableLayer* to, const
 namespace armnn
 {
 
-profiling::ProfilingService& GetProfilingService(armnn::Runtime* runtime)
+profiling::ProfilingService& GetProfilingService(armnn::RuntimeImpl* runtime)
 {
     return runtime->m_ProfilingService;
 }

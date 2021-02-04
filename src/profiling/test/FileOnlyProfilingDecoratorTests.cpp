@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
     {
         // Enable m_FileOnly but also provide ILocalPacketHandler which should consume the packets.
         // This won't dump anything to file.
-        armnn::Runtime::CreationOptions creationOptions;
+        armnn::IRuntime::CreationOptions creationOptions;
         creationOptions.m_ProfilingOptions.m_EnableProfiling     = true;
         creationOptions.m_ProfilingOptions.m_FileOnly            = true;
         creationOptions.m_ProfilingOptions.m_CapturePeriod       = 100;
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
         ILocalPacketHandlerSharedPtr localPacketHandlerPtr = std::make_shared<TestTimelinePacketHandler>();
         creationOptions.m_ProfilingOptions.m_LocalPacketHandlers.push_back(localPacketHandlerPtr);
 
-        armnn::Runtime runtime(creationOptions);
+        armnn::RuntimeImpl runtime(creationOptions);
         // ensure the GUID generator is reset to zero
         GetProfilingService(&runtime).ResetGuidGenerator();
 
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
         // Make sure the file does not exist at this point
         BOOST_CHECK(!fs::exists(tempPath));
 
-        armnn::Runtime::CreationOptions options;
+        armnn::IRuntime::CreationOptions options;
         options.m_ProfilingOptions.m_EnableProfiling     = true;
         options.m_ProfilingOptions.m_FileOnly            = true;
         options.m_ProfilingOptions.m_IncomingCaptureFile = "";
@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
         ILocalPacketHandlerSharedPtr localPacketHandlerPtr = std::make_shared<TestTimelinePacketHandler>();
         options.m_ProfilingOptions.m_LocalPacketHandlers.push_back(localPacketHandlerPtr);
 
-        armnn::Runtime runtime(options);
+        armnn::RuntimeImpl runtime(options);
         // ensure the GUID generator is reset to zero
         GetProfilingService(&runtime).ResetGuidGenerator();
 

@@ -404,7 +404,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
     options.m_ProfilingOptions.m_TimelineEnabled = true;
-    armnn::Runtime runtime(options);
+    armnn::RuntimeImpl runtime(options);
 
     auto basePipeServer = connectionHandler.GetNewBasePipeServer(false);
     gatordmock::GatordMockService mockService(std::move(basePipeServer), false);

@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(BackendProfilingCounterRegisterMockBackendTest)
 
     armnn::MockBackendInitialiser initialiser;
     // Create a runtime
-    armnn::Runtime runtime(options);
+    armnn::RuntimeImpl runtime(options);
 
     unsigned int shiftedId = 0;
 

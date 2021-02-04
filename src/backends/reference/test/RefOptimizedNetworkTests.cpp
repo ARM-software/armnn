@@ -17,7 +17,8 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateCpuRefWorkloads)
 {
     const armnn::TensorInfo desc({3, 5}, armnn::DataType::Float32);
 
-    armnn::Network  net;
+    // build up the structure of the network
+    armnn::INetworkPtr net(armnn::INetwork::Create());
 
     armnn::NormalizationDescriptor nmDesc;
     armnn::ActivationDescriptor acDesc;
@@ -33,21 +34,21 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateCpuRefWorkloads)
     //    sm
     //     |
     //    ot
-    armnn::IConnectableLayer* layer = net.AddInputLayer(0, "in");
+    armnn::IConnectableLayer* layer = net->AddInputLayer(0, "in");
     layer->GetOutputSlot(0).SetTensorInfo(desc);
 
-    armnn::IConnectableLayer* const normLayer = net.AddNormalizationLayer(nmDesc, "nm");
+    armnn::IConnectableLayer* const normLayer = net->AddNormalizationLayer(nmDesc, "nm");
 
     layer->GetOutputSlot(0).Connect(normLayer->GetInputSlot(0));
     normLayer->GetOutputSlot(0).SetTensorInfo(desc);
 
-    layer = net.AddActivationLayer(acDesc, "ac");
+    layer = net->AddActivationLayer(acDesc, "ac");
 
     normLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
     layer->GetOutputSlot(0).SetTensorInfo(desc);
 
     armnn::IConnectableLayer* prevLayer = layer;
-    layer = net.AddMultiplicationLayer("ml");
+    layer = net->AddMultiplicationLayer("ml");
 
     prevLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
     normLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
@@ -55,13 +56,13 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateCpuRefWorkloads)
 
     prevLayer = layer;
     armnn::SoftmaxDescriptor softmaxDescriptor;
-    layer = net.AddSoftmaxLayer(softmaxDescriptor, "sm");
+    layer = net->AddSoftmaxLayer(softmaxDescriptor, "sm");
 
     prevLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
     layer->GetOutputSlot(0).SetTensorInfo(desc);
 
     prevLayer = layer;
-    layer = net.AddOutputLayer(0, "ot");
+    layer = net->AddOutputLayer(0, "ot");
 
     prevLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
 
@@ -69,7 +70,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateCpuRefWorkloads)
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(net, backends, runtime->GetDeviceSpec());
+    armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
     static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph().AllocateDynamicBuffers();
     BOOST_CHECK(optNet);
 
@@ -149,7 +150,8 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsCpuRefMeanLayer)
 
 BOOST_AUTO_TEST_CASE(DebugTestOnCpuRef)
 {
-    armnn::Network net;
+    // build up the structure of the network
+    armnn::INetworkPtr net(armnn::INetwork::Create());
 
     armnn::ActivationDescriptor activation1Descriptor;
     activation1Descriptor.m_Function = armnn::ActivationFunction::BoundedReLu;
@@ -157,9 +159,9 @@ BOOST_AUTO_TEST_CASE(DebugTestOnCpuRef)
     activation1Descriptor.m_B = -1.f;
 
     // Defines layers.
-    auto input = net.AddInputLayer(0, "InputLayer");
-    auto activation = net.AddActivationLayer(activation1Descriptor, "ActivationLayer");
-    auto output = net.AddOutputLayer(0, "OutputLayer");
+    auto input = net->AddInputLayer(0, "InputLayer");
+    auto activation = net->AddActivationLayer(activation1Descriptor, "ActivationLayer");
+    auto output = net->AddOutputLayer(0, "OutputLayer");
 
     // Connects layers.
     input->GetOutputSlot(0).Connect(activation->GetInputSlot(0));
@@ -178,7 +180,7 @@ BOOST_AUTO_TEST_CASE(DebugTestOnCpuRef)
     armnn::OptimizerOptions optimizerOptions;
     optimizerOptions.m_Debug = true;
 
-    armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(net, backends, runtime->GetDeviceSpec(),
+    armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec(),
                                                                optimizerOptions);
 
     const armnn::Graph& graph = static_cast<armnn::OptimizedNetwork*>(optimizedNet.get())->GetGraph();

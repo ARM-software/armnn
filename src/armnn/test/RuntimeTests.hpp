@@ -9,6 +9,6 @@
 namespace armnn
 {
 
-void RuntimeLoadedNetworksReserve(armnn::Runtime* runtime);
+void RuntimeLoadedNetworksReserve(armnn::RuntimeImpl* runtime);
 
 } // namespace armnn

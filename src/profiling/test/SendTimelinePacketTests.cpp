@@ -427,7 +427,7 @@ BOOST_AUTO_TEST_CASE(GetGuidsFromProfilingService)
 {
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
-    armnn::Runtime runtime(options);
+    armnn::RuntimeImpl runtime(options);
     armnn::profiling::ProfilingService profilingService(runtime);
 
     profilingService.ResetExternalProfilingOptions(options.m_ProfilingOptions, true);

@@ -655,7 +655,7 @@ BOOST_AUTO_TEST_CASE(CaptureDataMethods)
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisabled)
 {
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -665,7 +665,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisabled)
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterDirectory)
 {
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
@@ -688,7 +688,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterDirectory)
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterValues)
 {
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -2006,7 +2006,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceNotActive)
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
 
-    armnn::Runtime runtime(options);
+    armnn::RuntimeImpl runtime(options);
     profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
     profilingServiceHelper.ForceTransitionToState(ProfilingState::NotConnected);
     profilingServiceHelper.ForceTransitionToState(ProfilingState::WaitingForAck);
@@ -2548,7 +2548,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
     unsigned int streamMetadataPacketsize = GetStreamMetaDataPacketSize();
 
     // Reset the profiling service to the uninitialized state
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -2608,7 +2608,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodRequestCounterDirectoryPacket)
 {
     // Reset the profiling service to the uninitialized state
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -2666,7 +2666,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodRequestCounterDirectoryPacket)
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacketInvalidCounterUid)
 {
     // Reset the profiling service to the uninitialized state
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -2745,7 +2745,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacketInval
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketNoCounters)
 {
     // Reset the profiling service to the uninitialized state
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -2810,7 +2810,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketNoCo
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketSingleCounter)
 {
     // Reset the profiling service to the uninitialized state
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -2887,7 +2887,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketSing
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketMultipleCounters)
 {
     // Reset the profiling service to the uninitialized state
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -2966,7 +2966,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketMult
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisconnect)
 {
     // Reset the profiling service to the uninitialized state
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -3024,7 +3024,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisconnect)
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPerJobCounterSelectionPacket)
 {
     // Reset the profiling service to the uninitialized state
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -3091,7 +3091,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPerJobCounterSelectionPacket)
 
 BOOST_AUTO_TEST_CASE(CheckConfigureProfilingServiceOn)
 {
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -3105,7 +3105,7 @@ BOOST_AUTO_TEST_CASE(CheckConfigureProfilingServiceOn)
 
 BOOST_AUTO_TEST_CASE(CheckConfigureProfilingServiceOff)
 {
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     armnn::profiling::ProfilingService profilingService;
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.ConfigureProfilingService(options);
@@ -3120,7 +3120,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabled)
 {
     // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
     LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -3151,7 +3151,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabledRuntime)
 {
     // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
     LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -3193,7 +3193,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
     StreamRedirector streamRedirector(std::cout, ss.rdbuf());
 
     // Reset the profiling service to the uninitialized state
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -3255,7 +3255,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadRequestCounterDirectoryPacket)
     StreamRedirector streamRedirector(std::cout, ss.rdbuf());
 
     // Reset the profiling service to the uninitialized state
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -3319,7 +3319,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacket)
     StreamRedirector streamRedirector(std::cout, ss.rdbuf());
 
     // Reset the profiling service to the uninitialized state
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -3420,7 +3420,7 @@ BOOST_AUTO_TEST_CASE(CheckRegisterBackendCounters)
     armnn::BackendId cpuRefId(armnn::Compute::CpuRef);
 
     // Reset the profiling service to the uninitialized state
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling          = true;
     ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -3604,7 +3604,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterStatusQuery)
 
 BOOST_AUTO_TEST_CASE(CheckRegisterCounters)
 {
-    armnn::Runtime::CreationOptions options;
+    armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
     MockBufferManager mockBuffer(1024);
 
@@ -3666,7 +3666,7 @@ BOOST_AUTO_TEST_CASE(CheckFileFormat) {
     LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
 
     // Create profiling options.
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling = true;
     // Check the default value set to binary
     BOOST_CHECK(options.m_FileFormat == "binary");

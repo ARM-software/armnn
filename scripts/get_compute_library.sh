@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_11" # Release 20.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="0841ca085301e8ddbc9627b2be55758b66437c15" #Fix OpenCL direct convolution
+DEFAULT_CLFRAMEWORKREVISION="cf87f509fc23d02c56569f794a3fb59e1b8be277" #Tweak scheduling use of SQDMULH in quantized AVG pooling
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

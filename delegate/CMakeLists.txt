@@ -116,6 +116,8 @@ if(BUILD_UNIT_TESTS)
         src/test/ArgMinMaxTest.cpp
         src/test/ArgMinMaxTestHelper.hpp
         src/test/ArmnnDelegateTest.cpp
+        src/test/BatchSpaceTest.cpp
+        src/test/BatchSpaceTestHelper.hpp
         src/test/ComparisonTest.cpp
         src/test/ComparisonTestHelper.hpp
         src/test/ControlTest.cpp

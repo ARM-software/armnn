@@ -1,18 +1,22 @@
 # How to install ArmNN via our APT repository on Ubuntu's Launchpad
 
-*  [Introduction](#introduction)
-*  [Add the Ubuntu Launchpad PPA to your system](#addRepo)
-*  [Outline of available packages](#availablePackages)
-*  [Install desired combination of packages](#InstallPackages)
-*  [Uninstall packages](#uninstallPackages)
+* [Introduction](#introduction)
+* [Add the Ubuntu Launchpad PPA to your system](#add-the-ubuntu-launchpad-ppa-to-your-system)
+* [Outline of available packages](#outline-of-available-packages)
+  + [x86_64](#x86-64)
+  + [arm64](#arm64)
+  + [armhf](#armhf)
+* [Check latest version of packages](#check-latest-version-of-packages)
+* [Install desired combination of packages](#install-desired-combination-of-packages)
+* [Uninstall packages](#uninstall-packages)
 
 
-#### <a name="introduction">Introduction</a>
+## Introduction
 These are the step by step instructions on how to install the ArmNN core, TensorflowLite Parser as well as PyArmnn for x86_64, Arm64 and Armhf for Ubuntu 20.04.
 The packages will also be added to Debian Bullseye, their progress can be tracked here: https://tracker.debian.org/pkg/armnn
 
 
-#### <a name="addRepo">Add the Ubuntu Launchpad PPA to your system</a>
+## Add the Ubuntu Launchpad PPA to your system
 * Add the PPA to your sources using a command contained in software-properties-common package:
     ```
     sudo apt install software-properties-common
@@ -20,7 +24,7 @@ The packages will also be added to Debian Bullseye, their progress can be tracke
     sudo apt update
     ```
 * More information about our PPA and the Ubuntu Launchpad service can be found at [launchpad.net](https://launchpad.net/~armnn/+archive/ubuntu/ppa)
-#### <a name="availablePackages"> Outline of available packages</a>
+## Outline of available packages
 
 We provide a number of packages for each architecture; x86_64, aarch64 and armhf as outlined below.
 
@@ -30,7 +34,7 @@ ARMNN_RELEASE_VERSION: This is the marketing release version based on the date s
 
 PACKAGE_VERSION: This is the version of the source package used to build the binaries packages from.
 
-##### x86_64
+### x86_64
 * Runtime Packages
 ```
 libarmnn-cpuref-backend{ARMNN_MAJOR_VERSION}_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_amd64.deb
@@ -43,7 +47,7 @@ python3-pyarmnn_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_amd64.deb
 libarmnn-dev_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_amd64.deb
 libarmnn-tfliteparser-dev_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_amd64.deb
 ```
-##### arm64
+### arm64
 * Runtime Packages
 ```
 libarmnn-aclcommon{ARMNN_MAJOR_VERSION}_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
@@ -61,7 +65,7 @@ libarmnn-dev_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
 libarmnn-tfliteparser-dev_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
 
 ```
-##### armhf
+### armhf
 * Runtime Packages
 ```
 libarmnn-aclcommon{ARMNN_MAJOR_VERSION}_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_armhf.deb
@@ -80,7 +84,7 @@ libarmnn-tfliteparser-dev_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_armhf.deb
 
 ```
 
-#### <a name="VersionPackages"> Check latest version of packages</a>
+## Check latest version of packages
 Due to Debian Packaging requiring the pristine tarball from our Github release, the version on Launchpad may not align with the released version on Github depending on the complexity of newly added features.
 In order to check for the latest available ArmNN version use apt-cache search:
 ```
@@ -108,7 +112,7 @@ In order to check for the latest available ArmNN version use apt-cache search:
 ```
 
 
-#### <a name="InstallPackages"> Install desired combination of packages</a>
+## Install desired combination of packages
 The easiest way to install all of the available packages for your systems architecture is to run the command:
 
 (Please Note: libarmnn-cpuacc-backend has been built with NEON support, installing this backend on an armhf device not supporting NEON may cause a crash/undefined behaviour.)
@@ -125,7 +129,7 @@ If the user does not wish to use PyArmnn they can go up a level of dependencies 
   sudo apt-get install -y libarmnn-tfliteparser${ARMNN_MAJOR_VERSION} libarmnn-gpuacc-backend${ARMNN_MAJOR_VERSION}
 ```
 
-#### <a name="uninstallPackages"> Uninstall packages</a>
+## Uninstall packages
 The easiest way to uninstall all of the previously installed packages is to run the command:
 ```
  sudo apt autoremove -y libarmnn${ARMNN_MAJOR_VERSION}

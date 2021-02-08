@@ -6,11 +6,11 @@
 namespace armnn
 {
 /**
-@page buildguides Build Guides
+@page buildguides Installation and build Guides
 @tableofcontents
 
-This page links all guides to build and/or install Arm NN tools. Some of these guides are not hosted in our
-repository and will lead you to guides on
+This page links all guides to build and/or install Arm NN tools hosted in our repository.
+You can find additional tutorials on
 https://developer.arm.com/solutions/machine-learning-on-arm/developer-material/how-to-guides
 
 Arm NN is written using portable C++14 and the build system uses [CMake](https://cmake.org/), therefore it is possible
@@ -19,8 +19,17 @@ to build for a wide variety of target platforms, from a wide variety of host env
 Arm NN is managed by a single CMake project. That allows you to build multiple tools at once by combining the CMake
 options from different build guides.
 
+## Installation via APT Repository
+ - @subpage md_InstallationViaAptRepository
+
 ## TfLite Delegate build guide
  - @subpage md_delegate_BuildGuideNative
+
+## Android NDK and Arm NN
+ - @subpage md_BuildGuideAndroidNDK
+
+## Crosscompile Guide for Arm NN
+ - @subpage md_BuildGuideCrossCompilation
 
 **/
 }

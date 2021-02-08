@@ -820,14 +820,15 @@ INPUT                  = ./docs/01_00_software_tools.dox \
                          ./docs/02_build_guides.dox \
                          ./docs/03_use_guides.dox \
                          ./docs/04_contributor.dox \
-                         ./src/armnnQuantizer/README.md \
-                         ./src/armnnConverter/README.md \
+                         ./docs/FAQ.md \
                          ./tests/ImageCSVFileGenerator/README.md \
                          ./tests/ImageTensorGenerator/README.md \
                          ./tests/ModelAccuracyTool-Armnn/README.md \
                          ./python/pyarmnn/README.md \
                          ./include/ \
                          ./src/ \
+                         ./src/armnnQuantizer/README.md \
+                         ./src/armnnConverter/README.md \
                          ./src/backends/README.md \
                          ./src/dynamic/README.md \
                          ./tests/ \
@@ -836,8 +837,10 @@ INPUT                  = ./docs/01_00_software_tools.dox \
                          ./delegate/BuildGuideNative.md \
                          ./delegate/IntegrateDelegateIntoPython.md \
                          ./README.md \
-                         ./docs/FAQ.md \
-                         ./ContributorGuide.md
+                         ./InstallationViaAptRepository.md \
+                         ./ContributorGuide.md \
+                         ./BuildGuideAndroidNDK.md \
+                         ./BuildGuideCrossCompilation.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

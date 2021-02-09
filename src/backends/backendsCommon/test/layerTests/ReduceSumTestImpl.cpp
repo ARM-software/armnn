@@ -24,7 +24,8 @@ LayerTestResult<float, 4> ReduceTestCommon(
         const std::vector<float>& inputData,
         const std::vector<float>& outputData,
         const std::vector<int32_t> vAxis,
-        const armnn::ReduceOperation reduceOperation)
+        const armnn::ReduceOperation reduceOperation,
+        bool keepDims = false)
 {
     IgnoreUnused(memoryManager);
     auto inputTensor = MakeTensor<T, 4>(inputTensorInfo, ConvertToDataType<ArmnnType>(inputData, inputTensorInfo));
@@ -53,6 +54,7 @@ LayerTestResult<float, 4> ReduceTestCommon(
 
     descriptor.m_Parameters.m_vAxis = updated_idx;
     descriptor.m_Parameters.m_ReduceOperation = reduceOperation;
+    descriptor.m_Parameters.m_KeepDims = keepDims;
     armnn::WorkloadInfo info;
 
     AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
@@ -268,7 +270,8 @@ LayerTestResult<float, 4> ReduceSumSingleAxisTest3(
                                        inputValues,
                                        outputValues,
                                        { 3 },
-                                       armnn::ReduceOperation::Sum);
+                                       armnn::ReduceOperation::Sum,
+                                       true);
 }
 
 template<armnn::DataType ArmnnType, typename T>

@@ -255,4 +255,16 @@ inline unsigned int ComputePositiveAxis(const int& axis, const armnn::TensorInfo
     return static_cast<unsigned int>(positiveAxis);
 }
 
+inline arm_compute::ReductionOperation ConvertReductionOperationToAcl(const ReduceDescriptor& descriptor)
+{
+    switch (descriptor.m_ReduceOperation)
+    {
+        case ReduceOperation::Sum:    return arm_compute::ReductionOperation::SUM;
+        case ReduceOperation::Mean:   return arm_compute::ReductionOperation::MEAN_SUM;
+        case ReduceOperation::Max:    return arm_compute::ReductionOperation::MAX;
+        case ReduceOperation::Min:    return arm_compute::ReductionOperation::MIN;
+        default:                         throw InvalidArgumentException("Unsupported Reduction operation");
+    }
+}
+
 } // namespace armnn

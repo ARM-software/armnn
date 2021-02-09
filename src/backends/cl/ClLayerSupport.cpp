@@ -60,6 +60,7 @@
 #include "workloads/ClQLstmWorkload.hpp"
 #include "workloads/ClQuantizedLstmWorkload.hpp"
 #include "workloads/ClQuantizeWorkload.hpp"
+#include "workloads/ClReduceWorkload.hpp"
 #include "workloads/ClReshapeWorkload.hpp"
 #include "workloads/ClResizeWorkload.hpp"
 #include "workloads/ClRsqrtWorkload.hpp"
@@ -796,6 +797,18 @@ bool ClLayerSupport::IsQuantizeSupported(const TensorInfo& input,
                                    reasonIfUnsupported,
                                    input,
                                    output);
+}
+
+bool ClLayerSupport::IsReduceSupported(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       const ReduceDescriptor& descriptor,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClReduceWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool ClLayerSupport::IsReshapeSupported(const TensorInfo& input,

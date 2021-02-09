@@ -497,6 +497,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateRank(const RankQueueDescri
     return std::make_unique<NeonRankWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateReduce(const ReduceQueueDescriptor& descriptor,
+                                                             const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonReduceWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
                                                               const WorkloadInfo& info) const
 {

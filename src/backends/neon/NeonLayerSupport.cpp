@@ -58,6 +58,7 @@
 #include "workloads/NeonQLstmWorkload.hpp"
 #include "workloads/NeonQuantizeWorkload.hpp"
 #include "workloads/NeonQuantizedLstmWorkload.hpp"
+#include "workloads/NeonReduceWorkload.hpp"
 #include "workloads/NeonReshapeWorkload.hpp"
 #include "workloads/NeonResizeWorkload.hpp"
 #include "workloads/NeonRsqrtWorkload.hpp"
@@ -782,6 +783,18 @@ bool NeonLayerSupport::IsQuantizedLstmSupported(const TensorInfo& input,
                                    cellStateOut,
                                    outputStateOut,
                                    paramsInfo);
+}
+
+bool NeonLayerSupport::IsReduceSupported(const TensorInfo& input,
+                                         const TensorInfo& output,
+                                         const ReduceDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonReduceWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool NeonLayerSupport::IsReshapeSupported(const TensorInfo& input,

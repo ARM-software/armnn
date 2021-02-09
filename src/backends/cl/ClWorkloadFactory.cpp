@@ -575,6 +575,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateRank(const RankQueueDescript
     return std::make_unique<ClRankWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateReduce(const ReduceQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
+{
+    return std::make_unique<ClReduceWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {

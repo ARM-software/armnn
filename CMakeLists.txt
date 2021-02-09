@@ -760,7 +760,6 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/Convolution2d.cpp
             src/armnnTfParser/test/Concat.cpp
             src/armnnTfParser/test/ConcatOfConcats.cpp
-            src/armnnTfLiteParser/test/DepthToSpace.cpp
             src/armnnTfParser/test/DepthwiseConvolution2d.cpp
             src/armnnTfParser/test/Equal.cpp
             src/armnnTfParser/test/ExpandDims.cpp
@@ -808,6 +807,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Constant.cpp
              src/armnnTfLiteParser/test/Conv2D.cpp
              src/armnnTfLiteParser/test/DepthwiseConvolution2D.cpp
+             src/armnnTfLiteParser/test/DepthToSpace.cpp
              src/armnnTfLiteParser/test/Dequantize.cpp
              src/armnnTfLiteParser/test/DetectionPostProcess.cpp
              src/armnnTfLiteParser/test/Div.cpp
@@ -825,6 +825,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Neg.cpp
              src/armnnTfLiteParser/test/Pack.cpp
              src/armnnTfLiteParser/test/Pad.cpp
+             src/armnnTfLiteParser/test/Reduce.cpp
              src/armnnTfLiteParser/test/Reshape.cpp
              src/armnnTfLiteParser/test/ResizeBilinear.cpp
              src/armnnTfLiteParser/test/ResizeNearestNeighbor.cpp

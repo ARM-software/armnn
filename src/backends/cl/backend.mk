@@ -66,6 +66,7 @@ BACKEND_SOURCES := \
         workloads/ClQLstmWorkload.cpp \
         workloads/ClQuantizedLstmWorkload.cpp \
         workloads/ClQuantizeWorkload.cpp \
+        workloads/ClReduceWorkload.cpp \
         workloads/ClReshapeWorkload.cpp \
         workloads/ClResizeWorkload.cpp \
         workloads/ClRsqrtWorkload.cpp \

@@ -44,6 +44,7 @@
 #include "ClQuantizeWorkload.hpp"
 #include "ClQuantizedLstmWorkload.hpp"
 #include "ClRankWorkload.hpp"
+#include "ClReduceWorkload.hpp"
 #include "ClReshapeWorkload.hpp"
 #include "ClResizeWorkload.hpp"
 #include "ClRsqrtWorkload.hpp"

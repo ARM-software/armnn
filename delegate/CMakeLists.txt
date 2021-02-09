@@ -37,6 +37,7 @@ list(APPEND armnnDelegate_sources
         src/Pooling.hpp
         src/Quantization.hpp
         src/Redefine.hpp
+        src/Reduce.hpp
         src/Resize.hpp
         src/Round.hpp
         src/Slice.hpp
@@ -143,6 +144,8 @@ if(BUILD_UNIT_TESTS)
         src/test/QuantizationTest.cpp
         src/test/QuantizationTestHelper.hpp
         src/test/RedefineTestHelper.hpp
+        src/test/ReduceTest.cpp
+        src/test/ReduceTestHelper.hpp
         src/test/ReshapeTest.cpp
         src/test/ResizeTest.cpp
         src/test/ResizeTestHelper.hpp

@@ -75,33 +75,27 @@ void Reduce(const TensorInfo& inputInfo,
             const std::vector<uint32_t> axis,
             const ReduceOperation reduceOperation)
 {
-    unsigned int inputNumDims  = inputInfo.GetNumDimensions();
-    unsigned int outputNumDims = outputInfo.GetNumDimensions();
-
-    armnn::TensorShape outputDims = outputInfo.GetShape();
     armnn::TensorShape inputDims = inputInfo.GetShape();
+    unsigned int inputNumDims    = inputInfo.GetNumDimensions();
+    unsigned int numOutputs      = outputInfo.GetNumElements();
 
-    // Initialise output data.
-    unsigned int numOutputs = 1;
-    for (unsigned int idx = 0; idx < outputNumDims; ++idx)
+    // Initialise temp output
+    std::vector<float> tempOut(numOutputs);
+    if (reduceOperation == ReduceOperation::Max || reduceOperation == ReduceOperation::Min)
     {
-        numOutputs *= outputDims[idx];
+        for (unsigned int idx = 0; idx < numOutputs; ++idx)
+        {
+            input[idx];
+            tempOut[idx] = input.Get();
+        }
+    }
+    else
+    {
+        std::fill(tempOut.begin(), tempOut.end(), 0.0);
     }
 
-    std::vector<float> tempSum(numOutputs);
-    for (unsigned int idx = 0; idx < numOutputs; ++idx)
-    {
-        output[idx];
-        output.Set(0.0f);
-        tempSum[idx] = 0.0f;
-    }
-
-    // Initialise temp index.
-    std::vector<unsigned int> tempIndex(inputNumDims);
-    for (unsigned int idx = 0; idx < inputNumDims; ++idx)
-    {
-        tempIndex[idx] = 0;
-    }
+    // Initialise temp index
+    std::vector<unsigned int> tempIndex(inputNumDims, 0);
 
     std::vector<unsigned int> resolvedAxis = axis;
     if (resolvedAxis.empty())
@@ -113,17 +107,35 @@ void Reduce(const TensorInfo& inputInfo,
     }
     auto numResolvedAxis = armnn::numeric_cast<unsigned int>(resolvedAxis.size());
 
-    // Iterates through input_data and sum up the reduced axis.
+    // Iterates through input_data and operates over the reduced axis
     for (bool hasNext = true; hasNext; hasNext = NextIndex(inputNumDims, inputDims, tempIndex))
     {
         unsigned int inputOffset = ReducedOutputOffset(inputNumDims, inputDims, tempIndex, 0, {});
         unsigned int outputOffset = ReducedOutputOffset(inputNumDims, inputDims, tempIndex,
                                                         numResolvedAxis, resolvedAxis);
         input[inputOffset];
-        tempSum[outputOffset] += input.Get();
+        auto inputValue = input.Get();
+        if (reduceOperation == ReduceOperation::Max)
+        {
+            if (inputValue > tempOut[outputOffset])
+            {
+                tempOut[outputOffset] = inputValue;
+            }
+        }
+        else if (reduceOperation == ReduceOperation::Min)
+        {
+            if (inputValue < tempOut[outputOffset])
+            {
+                tempOut[outputOffset] = inputValue;
+            }
+        }
+        else
+        {
+            tempOut[outputOffset] += inputValue;
+        }
     }
 
-    // Takes average by num of elements added to get mean.
+    // Takes average by num of elements added to get MEAN
     size_t numElementsInAxis = 1;
     for (unsigned int idx = 0; idx < numResolvedAxis; ++idx)
     {
@@ -132,18 +144,20 @@ void Reduce(const TensorInfo& inputInfo,
                      (std::numeric_limits<float>::max() / armnn::numeric_cast<float>(numElementsInAxis)));
         numElementsInAxis *= current;
     }
-    if (numElementsInAxis > 0) {
-        for (unsigned int idx = 0; idx < numOutputs; ++idx)
+
+    for (unsigned int idx = 0; idx < numOutputs; ++idx)
+    {
+        output[idx];
+        if (reduceOperation == ReduceOperation::Mean)
         {
-            output[idx];
-            if (reduceOperation == ReduceOperation::Sum)
+            if (numElementsInAxis > 0)
             {
-                output.Set(tempSum[idx]);
+                output.Set(tempOut[idx] / armnn::numeric_cast<float>(numElementsInAxis));
             }
-            else if (reduceOperation == ReduceOperation::Mean)
-            {
-                output.Set(tempSum[idx] / armnn::numeric_cast<float>(numElementsInAxis));
-            }
+        }
+        else
+        {
+            output.Set(tempOut[idx]);
         }
     }
 }

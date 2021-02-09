@@ -2241,4 +2241,13 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceSumSingleAxisFloat32_2, ReduceSumSingleAxisT
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceSumSingleAxisFloat32_3, ReduceSumSingleAxisTest3<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceSumMultipleAxisFloat32, ReduceSumMultipleAxisTest<DataType::Float32>)
 
+// ReduceMax
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceMaxFloat32, ReduceMaxSimpleTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceMaxNegativeAxisFloat32, ReduceMaxNegativeAxisTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceMax2Float32, ReduceMaxSimpleTest2<DataType::Float32>)
+
+// ReduceMin
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceMinFloat32, ReduceMinSimpleTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceMinNegativeAxisFloat32, ReduceMinNegativeAxisTest<DataType::Float32>)
+
 BOOST_AUTO_TEST_SUITE_END()

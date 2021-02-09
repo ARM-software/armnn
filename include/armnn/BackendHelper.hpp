@@ -325,6 +325,11 @@ public:
                          const TensorInfo& output,
                          Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
+    bool IsReduceSupported(const TensorInfo& input,
+                           const TensorInfo& output,
+                           const ReduceDescriptor& descriptor,
+                           Optional<std::string&> reasonIfUnsupported = EmptyOptional());
+
     bool IsReshapeSupported(const TensorInfo& input,
                             const TensorInfo& output,
                             const ReshapeDescriptor& descriptor,

@@ -568,6 +568,14 @@ bool LayerSupportHandle::IsRankSupported(const TensorInfo& input,
     return m_LayerSupport->IsRankSupported(input, output, reasonIfUnsupported.value());
 }
 
+bool LayerSupportHandle::IsReduceSupported(const TensorInfo& input,
+                                           const TensorInfo& output,
+                                           const ReduceDescriptor& descriptor,
+                                           Optional<std::string&> reasonIfUnsupported)
+{
+    return m_LayerSupport->IsReduceSupported(input, output, descriptor, reasonIfUnsupported.value());
+}
+
 bool LayerSupportHandle::IsReshapeSupported(const TensorInfo& input,
                                             const TensorInfo& output,
                                             const ReshapeDescriptor& descriptor,

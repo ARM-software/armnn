@@ -631,6 +631,8 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_QUANTIZE]                = &TfLiteParserImpl::ParseQuantize;
     m_ParserFunctions[tflite::BuiltinOperator_RELU]                    = &TfLiteParserImpl::ParseRelu;
     m_ParserFunctions[tflite::BuiltinOperator_RELU6]                   = &TfLiteParserImpl::ParseRelu6;
+    m_ParserFunctions[tflite::BuiltinOperator_REDUCE_MAX]              = &TfLiteParserImpl::ParseReduceMax;
+    m_ParserFunctions[tflite::BuiltinOperator_REDUCE_MIN]              = &TfLiteParserImpl::ParseReduceMin;
     m_ParserFunctions[tflite::BuiltinOperator_RESHAPE]                 = &TfLiteParserImpl::ParseReshape;
     m_ParserFunctions[tflite::BuiltinOperator_RESIZE_BILINEAR]         = &TfLiteParserImpl::ParseResizeBilinear;
     m_ParserFunctions[tflite::BuiltinOperator_RESIZE_NEAREST_NEIGHBOR] = &TfLiteParserImpl::ParseResizeNearestNeighbor;
@@ -3059,6 +3061,21 @@ void TfLiteParserImpl::ParseDepthToSpace(size_t subgraphIndex, size_t operatorIn
 
 void TfLiteParserImpl::ParseSum(size_t subgraphIndex, size_t operatorIndex)
 {
+    ParseReduce(subgraphIndex, operatorIndex, armnn::ReduceOperation::Sum);
+}
+
+void TfLiteParserImpl::ParseReduceMax(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseReduce(subgraphIndex, operatorIndex, armnn::ReduceOperation::Max);
+}
+
+void TfLiteParserImpl::ParseReduceMin(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseReduce(subgraphIndex, operatorIndex, armnn::ReduceOperation::Min);
+}
+
+void TfLiteParserImpl::ParseReduce(size_t subgraphIndex, size_t operatorIndex, ReduceOperation reduceOperation)
+{
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
     const auto &operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
@@ -3070,7 +3087,7 @@ void TfLiteParserImpl::ParseSum(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    auto layerName = fmt::format("Sum:{}:{}", subgraphIndex, operatorIndex);
+    auto layerName = fmt::format("Reduce:{}:{}", subgraphIndex, operatorIndex);
 
     armnn::TensorInfo inputTensorInfo0 = ToTensorInfo(inputs[0]);
     armnn::TensorInfo inputTensorInfo1 = ToTensorInfo(inputs[1]);
@@ -3088,11 +3105,18 @@ void TfLiteParserImpl::ParseSum(size_t subgraphIndex, size_t operatorIndex)
                                                                axisBufferPtr->data.data()[i]));
         }
     }
+    else
+    {
+        for (uint32_t i = 0; i < inputTensorInfo0.GetNumDimensions(); ++i)
+        {
+            desc.m_vAxis.push_back(i);
+        }
+    }
 
     desc.m_TargetHeight    = input0Shape[1];
     desc.m_TargetWidth     = input0Shape[2];
     desc.m_KeepDims        = options->keep_dims;
-    desc.m_ReduceOperation = armnn::ReduceOperation::Sum;
+    desc.m_ReduceOperation = reduceOperation;
 
     // Register a new layer object, Sum.
     IConnectableLayer *layer = m_Network->AddReduceLayer(desc, layerName.c_str());

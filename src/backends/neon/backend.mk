@@ -66,6 +66,7 @@ BACKEND_SOURCES := \
         workloads/NeonQLstmWorkload.cpp \
         workloads/NeonQuantizedLstmWorkload.cpp \
         workloads/NeonQuantizeWorkload.cpp \
+        workloads/NeonReduceWorkload.cpp \
         workloads/NeonReshapeWorkload.cpp \
         workloads/NeonResizeWorkload.cpp \
         workloads/NeonRsqrtWorkload.cpp \

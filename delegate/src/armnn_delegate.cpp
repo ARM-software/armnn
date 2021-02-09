@@ -25,6 +25,7 @@
 #include "Pooling.hpp"
 #include "Quantization.hpp"
 #include "Redefine.hpp"
+#include "Reduce.hpp"
 #include "Resize.hpp"
 #include "Round.hpp"
 #include "Slice.hpp"
@@ -733,6 +734,18 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                         tfLiteNode,
                                         nodeIndex,
                                         kTfLiteBuiltinRank);
+        case kTfLiteBuiltinReduceMax:
+            return VisitReduceOperator(delegateData,
+                                       tfLiteContext,
+                                       tfLiteNode,
+                                       nodeIndex,
+                                       kTfLiteBuiltinReduceMax);
+        case kTfLiteBuiltinReduceMin:
+            return VisitReduceOperator(delegateData,
+                                       tfLiteContext,
+                                       tfLiteNode,
+                                       nodeIndex,
+                                       kTfLiteBuiltinReduceMin);
         case kTfLiteBuiltinRelu:
             return VisitActivationOperator(delegateData,
                                            tfLiteContext,
@@ -805,6 +818,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                       tfLiteNode,
                                       nodeIndex,
                                       kTfLiteBuiltinStridedSlice);
+        case kTfLiteBuiltinSum:
+            return VisitReduceOperator(delegateData,
+                                       tfLiteContext,
+                                       tfLiteNode,
+                                       nodeIndex,
+                                       kTfLiteBuiltinSum);
         case kTfLiteBuiltinTranspose:
             return VisitTransposeOperator(delegateData,
                                           tfLiteContext,

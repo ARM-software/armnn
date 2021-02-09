@@ -8,14 +8,14 @@ if(ARMCOMPUTECL)
                  HINTS ${FLATC_DIR}
                  DOC "Path to 'flatc', the flatbuffers compiler")
     if (NOT FLATC)
-        message(SEND_ERROR "flatc not found. Specify the full path of the flatc executable with -DFLATC=<flatc path>")
+        message(WARNING "flatc not found. Specify the full path of the flatc executable with -DFLATC=<flatc path>")
+    else()
+        add_custom_command(
+            # Updates ClContextSchema_generated.h if changes are made.
+            OUTPUT ClContextSchema_generated.h DEPENDS ClContextSchema.fbs
+            COMMAND ${FLATC} -o ${CMAKE_CURRENT_BINARY_DIR} --cpp ${CMAKE_CURRENT_SOURCE_DIR}/ClContextSchema.fbs
+        )
     endif()
-
-    add_custom_command(
-        # Generate an ClContextSchema_generated.h file if it doesn't exist, or update it when necessary otherwise
-        OUTPUT ClContextSchema_generated.h DEPENDS ClContextSchema.fbs
-        COMMAND ${FLATC} -o ${CMAKE_CURRENT_BINARY_DIR} --cpp ${CMAKE_CURRENT_SOURCE_DIR}/ClContextSchema.fbs
-    )
 
     list(APPEND armnnClBackend_sources
         ClContextSchema_generated.h

@@ -55,4 +55,10 @@ void MemImportLayer::Accept(ILayerVisitor& visitor) const
     throw armnn::Exception("MemImportLayer should not appear in an input graph");
 }
 
+void MemImportLayer::ExecuteStrategy(IStrategy& strategy) const
+{
+    IgnoreUnused(strategy);
+    throw armnn::Exception("FakeQuantizationLayer should not appear in an input graph");
+}
+
 } // namespace armnn

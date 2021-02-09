@@ -84,4 +84,11 @@ void DetectionPostProcessLayer::Accept(ILayerVisitor& visitor) const
     visitor.VisitDetectionPostProcessLayer(this, GetParameters(), anchorTensor, GetName());
 }
 
+void DetectionPostProcessLayer::ExecuteStrategy(IStrategy& strategy) const
+{
+    std::vector<armnn::ConstTensor> constTensors { {m_Anchors->GetTensorInfo(), m_Anchors->GetConstTensor<void>()} };
+
+    strategy.ExecuteStrategy(this, GetParameters(), constTensors, GetName());
+}
+
 } // namespace armnn

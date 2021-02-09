@@ -24,7 +24,9 @@ class RankLayer : public Layer
 
         void Accept(ILayerVisitor& visitor) const override;
 
-    protected:
+        void ExecuteStrategy(IStrategy& strategy) const override;
+
+protected:
         RankLayer(const char* name);
         ~RankLayer() = default;
 };

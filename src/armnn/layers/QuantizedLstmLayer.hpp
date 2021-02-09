@@ -71,6 +71,8 @@ public:
 
     void Accept(ILayerVisitor& visitor) const override;
 
+    void ExecuteStrategy(IStrategy& strategy) const override;
+
 protected:
     /// Constructor to create a QuantizedLstmLayer.
     /// @param [in] name Optional name for the layer.

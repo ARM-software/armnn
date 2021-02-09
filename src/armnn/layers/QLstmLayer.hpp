@@ -109,6 +109,8 @@ public:
 
     void Accept(ILayerVisitor& visitor) const override;
 
+    void ExecuteStrategy(IStrategy& strategy) const override;
+
 protected:
     /// Constructor to create a QLstmLayer.
     /// @param [in] name Optional name for the layer.

@@ -473,4 +473,10 @@ void Layer::SerializeLayerParameters(ParameterStringifyFunction& fn) const
     }
 }
 
+// default implementation of ExecuteStrategy
+void Layer::ExecuteStrategy(IStrategy& strategy) const
+{
+    strategy.ExecuteStrategy(this, BaseDescriptor(), {}, GetName());
+}
+
 } // namespace armnn

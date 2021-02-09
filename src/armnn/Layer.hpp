@@ -214,6 +214,9 @@ public:
     Layer(unsigned int numInputSlots, unsigned int numOutputSlots, LayerType type, const char* name);
     Layer(unsigned int numInputSlots, unsigned int numOutputSlots, LayerType type, DataLayout layout, const char* name);
 
+    void ExecuteStrategy(IStrategy& strategy) const override;
+
+
     const std::string& GetNameStr() const
     {
         return m_LayerName;
@@ -259,7 +262,7 @@ public:
     void ResetPriority() const;
     LayerPriority GetPriority() const;
 
-    LayerType GetType() const { return m_Type; }
+    LayerType GetType() const override { return m_Type; }
 
     DataType GetDataType() const;
 
@@ -439,6 +442,11 @@ public:
     }
 
     LayerBindingId GetBindingId() const { return m_Id; };
+
+    void ExecuteStrategy(IStrategy& strategy) const override
+    {
+        strategy.ExecuteStrategy(this, BaseDescriptor(), {}, GetName(), GetBindingId());
+    }
 
 protected:
     ~BindableLayer() = default;

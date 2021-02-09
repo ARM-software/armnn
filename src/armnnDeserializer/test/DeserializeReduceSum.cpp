@@ -8,7 +8,6 @@
 #include "../Deserializer.hpp"
 
 #include <string>
-#include <iostream>
 
 BOOST_AUTO_TEST_SUITE(Deserializer)
 

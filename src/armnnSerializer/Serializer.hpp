@@ -5,6 +5,7 @@
 #pragma once
 
 #include <armnn/ILayerVisitor.hpp>
+#include <armnn/IStrategy.hpp>
 #include <armnn/LayerVisitorBase.hpp>
 
 #include <armnnSerializer/ISerializer.hpp>
@@ -18,11 +19,17 @@
 namespace armnnSerializer
 {
 
-class SerializerVisitor : public armnn::ILayerVisitor
+class SerializerStrategy : public armnn::IStrategy
 {
 public:
-    SerializerVisitor() : m_layerId(0) {}
-    ~SerializerVisitor() {}
+    void ExecuteStrategy(const armnn::IConnectableLayer* layer,
+                         const armnn::BaseDescriptor& descriptor,
+                         const std::vector<armnn::ConstTensor>& constants,
+                         const char* name,
+                         const armnn::LayerBindingId id) override;
+
+    SerializerStrategy() : m_layerId(0) {}
+    ~SerializerStrategy() {}
 
     flatbuffers::FlatBufferBuilder& GetFlatBufferBuilder()
     {
@@ -46,261 +53,7 @@ public:
 
     flatbuffers::Offset<armnnSerializer::FeatureCompatibilityVersions> GetVersionTable();
 
-
-    ARMNN_DEPRECATED_MSG("Use VisitElementwiseUnaryLayer instead")
-    void VisitAbsLayer(const armnn::IConnectableLayer* layer,
-                       const char* name = nullptr) override;
-
-    void VisitActivationLayer(const armnn::IConnectableLayer* layer,
-                              const armnn::ActivationDescriptor& descriptor,
-                              const char* name = nullptr) override;
-
-    void VisitAdditionLayer(const armnn::IConnectableLayer* layer,
-                            const char* name = nullptr) override;
-
-    void VisitArgMinMaxLayer(const armnn::IConnectableLayer* layer,
-                             const armnn::ArgMinMaxDescriptor& argMinMaxDescriptor,
-                             const char* name = nullptr) override;
-
-    void VisitBatchToSpaceNdLayer(const armnn::IConnectableLayer* layer,
-                                  const armnn::BatchToSpaceNdDescriptor& descriptor,
-                                  const char* name = nullptr) override;
-
-    void VisitBatchNormalizationLayer(const armnn::IConnectableLayer* layer,
-                                      const armnn::BatchNormalizationDescriptor& BatchNormalizationDescriptor,
-                                      const armnn::ConstTensor& mean,
-                                      const armnn::ConstTensor& variance,
-                                      const armnn::ConstTensor& beta,
-                                      const armnn::ConstTensor& gamma,
-                                      const char* name = nullptr) override;
-
-    void VisitComparisonLayer(const armnn::IConnectableLayer* layer,
-                              const armnn::ComparisonDescriptor& descriptor,
-                              const char* name = nullptr) override;
-
-    void VisitConcatLayer(const armnn::IConnectableLayer* layer,
-                          const armnn::ConcatDescriptor& concatDescriptor,
-                          const char* name = nullptr) override;
-
-    void VisitConstantLayer(const armnn::IConnectableLayer* layer,
-                            const armnn::ConstTensor& input,
-                            const char* = nullptr) override;
-
-    void VisitConvolution2dLayer(const armnn::IConnectableLayer* layer,
-                                 const armnn::Convolution2dDescriptor& descriptor,
-                                 const armnn::ConstTensor& weights,
-                                 const armnn::Optional<armnn::ConstTensor>& biases,
-                                 const char* = nullptr) override;
-
-    void VisitDepthToSpaceLayer(const armnn::IConnectableLayer* layer,
-                                const armnn::DepthToSpaceDescriptor& descriptor,
-                                const char* name = nullptr) override;
-
-    void VisitDepthwiseConvolution2dLayer(const armnn::IConnectableLayer* layer,
-                                          const armnn::DepthwiseConvolution2dDescriptor& descriptor,
-                                          const armnn::ConstTensor& weights,
-                                          const armnn::Optional<armnn::ConstTensor>& biases,
-                                          const char* name = nullptr) override;
-
-    void VisitDequantizeLayer(const armnn::IConnectableLayer* layer,
-                              const char* name = nullptr) override;
-
-    void VisitDetectionPostProcessLayer(const armnn::IConnectableLayer* layer,
-                                        const armnn::DetectionPostProcessDescriptor& descriptor,
-                                        const armnn::ConstTensor& anchors,
-                                        const char* name = nullptr) override;
-
-    void VisitDivisionLayer(const armnn::IConnectableLayer* layer,
-                            const char* name = nullptr) override;
-
-    void VisitElementwiseUnaryLayer(const armnn::IConnectableLayer* layer,
-                                    const armnn::ElementwiseUnaryDescriptor& descriptor,
-                                    const char* name = nullptr) override;
-
-    ARMNN_DEPRECATED_MSG("Use VisitComparisonLayer instead")
-    void VisitEqualLayer(const armnn::IConnectableLayer* layer,
-                         const char* name = nullptr) override;
-
-    void VisitFillLayer(const armnn::IConnectableLayer* layer,
-                        const armnn::FillDescriptor& fillDescriptor,
-                        const char* name = nullptr) override;
-
-    void VisitFloorLayer(const armnn::IConnectableLayer *layer,
-                         const char *name = nullptr) override;
-
-    void VisitFullyConnectedLayer(const armnn::IConnectableLayer* layer,
-                                  const armnn::FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                  const armnn::ConstTensor& weights,
-                                  const armnn::Optional<armnn::ConstTensor>& biases,
-                                  const char* name = nullptr) override;
-
-    ARMNN_DEPRECATED_MSG("Use VisitGatherLayer with descriptor instead")
-    void VisitGatherLayer(const armnn::IConnectableLayer* layer,
-                          const char* name = nullptr) override;
-
-    void VisitGatherLayer(const armnn::IConnectableLayer* layer,
-                          const armnn::GatherDescriptor& gatherDescriptor,
-                          const char* name = nullptr) override;
-
-    ARMNN_DEPRECATED_MSG("Use VisitComparisonLayer instead")
-    void VisitGreaterLayer(const armnn::IConnectableLayer* layer,
-                           const char* name = nullptr) override;
-
-    void VisitInputLayer(const armnn::IConnectableLayer* layer,
-                         armnn::LayerBindingId id,
-                         const char* name = nullptr) override;
-
-    void VisitInstanceNormalizationLayer(const armnn::IConnectableLayer* layer,
-                                         const armnn::InstanceNormalizationDescriptor& instanceNormalizationDescriptor,
-                                         const char* name = nullptr) override;
-
-    void VisitL2NormalizationLayer(const armnn::IConnectableLayer* layer,
-                                   const armnn::L2NormalizationDescriptor& l2NormalizationDescriptor,
-                                   const char* name = nullptr) override;
-
-    void VisitLogicalBinaryLayer(const armnn::IConnectableLayer* layer,
-                                 const armnn::LogicalBinaryDescriptor& descriptor,
-                                 const char* name = nullptr) override;
-
-    void VisitLogSoftmaxLayer(const armnn::IConnectableLayer* layer,
-                              const armnn::LogSoftmaxDescriptor& logSoftmaxDescriptor,
-                              const char* name = nullptr) override;
-
-    void VisitLstmLayer(const armnn::IConnectableLayer* layer,
-                        const armnn::LstmDescriptor& descriptor,
-                        const armnn::LstmInputParams& params,
-                        const char* name = nullptr) override;
-
-    void VisitMeanLayer(const armnn::IConnectableLayer* layer,
-                        const armnn::MeanDescriptor& descriptor,
-                        const char* name) override;
-
-    void VisitMinimumLayer(const armnn::IConnectableLayer* layer,
-                           const char* name = nullptr) override;
-
-    void VisitMaximumLayer(const armnn::IConnectableLayer* layer,
-                           const char* name = nullptr) override;
-
-    void VisitMergeLayer(const armnn::IConnectableLayer* layer,
-                         const char* name = nullptr) override;
-
-    ARMNN_DEPRECATED_MSG("Use VisitConcatLayer instead")
-    void VisitMergerLayer(const armnn::IConnectableLayer* layer,
-                          const armnn::MergerDescriptor& mergerDescriptor,
-                          const char* name = nullptr) override;
-
-    void VisitMultiplicationLayer(const armnn::IConnectableLayer* layer,
-                                  const char* name = nullptr) override;
-
-    void VisitOutputLayer(const armnn::IConnectableLayer* layer,
-                          armnn::LayerBindingId id,
-                          const char* name = nullptr) override;
-
-    void VisitPadLayer(const armnn::IConnectableLayer* layer,
-                       const armnn::PadDescriptor& PadDescriptor,
-                       const char* name = nullptr) override;
-
-    void VisitPermuteLayer(const armnn::IConnectableLayer* layer,
-                           const armnn::PermuteDescriptor& PermuteDescriptor,
-                           const char* name = nullptr) override;
-
-    void VisitPooling2dLayer(const armnn::IConnectableLayer* layer,
-                             const armnn::Pooling2dDescriptor& pooling2dDescriptor,
-                             const char* name = nullptr) override;
-
-    void VisitPreluLayer(const armnn::IConnectableLayer* layer,
-                         const char* name = nullptr) override;
-
-    void VisitQuantizeLayer(const armnn::IConnectableLayer* layer,
-                            const char* name = nullptr) override;
-
-    void VisitQLstmLayer(const armnn::IConnectableLayer* layer,
-                         const armnn::QLstmDescriptor& descriptor,
-                         const armnn::LstmInputParams& params,
-                         const char* name = nullptr) override;
-
-    void VisitQuantizedLstmLayer(const armnn::IConnectableLayer* layer,
-                                 const armnn::QuantizedLstmInputParams& params,
-                                 const char* name = nullptr) override;
-
-    void VisitRankLayer(const armnn::IConnectableLayer* layer,
-                        const char* name = nullptr) override;
-
-   void VisitReduceLayer(const armnn::IConnectableLayer* layer,
-                         const armnn::ReduceDescriptor& reduceDescriptor,
-                         const char* name = nullptr) override;
-
-    void VisitReshapeLayer(const armnn::IConnectableLayer* layer,
-                           const armnn::ReshapeDescriptor& reshapeDescriptor,
-                           const char* name = nullptr) override;
-
-    void VisitResizeLayer(const armnn::IConnectableLayer* layer,
-                          const armnn::ResizeDescriptor& resizeDescriptor,
-                          const char* name = nullptr) override;
-
-    ARMNN_DEPRECATED_MSG("Use VisitResizeLayer instead")
-    void VisitResizeBilinearLayer(const armnn::IConnectableLayer* layer,
-                                  const armnn::ResizeBilinearDescriptor& resizeDescriptor,
-                                  const char* name = nullptr) override;
-
-    ARMNN_DEPRECATED_MSG("Use VisitElementwiseUnaryLayer instead")
-    void VisitRsqrtLayer(const armnn::IConnectableLayer* layer,
-                         const char* name = nullptr) override;
-
-    void VisitSliceLayer(const armnn::IConnectableLayer* layer,
-                         const armnn::SliceDescriptor& sliceDescriptor,
-                         const char* name = nullptr) override;
-
-    void VisitSoftmaxLayer(const armnn::IConnectableLayer* layer,
-                           const armnn::SoftmaxDescriptor& softmaxDescriptor,
-                           const char* name = nullptr) override;
-
-    void VisitSpaceToBatchNdLayer(const armnn::IConnectableLayer* layer,
-                                  const armnn::SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
-                                  const char* name = nullptr) override;
-
-    void VisitSpaceToDepthLayer(const armnn::IConnectableLayer* layer,
-                                const armnn::SpaceToDepthDescriptor& spaceToDepthDescriptor,
-                                const char* name = nullptr) override;
-
-    void VisitNormalizationLayer(const armnn::IConnectableLayer* layer,
-                                 const armnn::NormalizationDescriptor& normalizationDescriptor,
-                                 const char* name = nullptr) override;
-
-    void VisitSplitterLayer(const armnn::IConnectableLayer* layer,
-                            const armnn::ViewsDescriptor& viewsDescriptor,
-                            const char* name = nullptr) override;
-
-    void VisitStandInLayer(const armnn::IConnectableLayer* layer,
-                           const armnn::StandInDescriptor& standInDescriptor,
-                           const char* name = nullptr) override;
-
-    void VisitStackLayer(const armnn::IConnectableLayer* layer,
-                         const armnn::StackDescriptor& stackDescriptor,
-                         const char* name = nullptr) override;
-
-    void VisitStridedSliceLayer(const armnn::IConnectableLayer* layer,
-                                const armnn::StridedSliceDescriptor& stridedSliceDescriptor,
-                                const char* name = nullptr) override;
-
-    void VisitSubtractionLayer(const armnn::IConnectableLayer* layer,
-                               const char* name = nullptr) override;
-
-    void VisitSwitchLayer(const armnn::IConnectableLayer* layer,
-                          const char* name = nullptr) override;
-
-    void VisitTransposeConvolution2dLayer(const armnn::IConnectableLayer* layer,
-                                          const armnn::TransposeConvolution2dDescriptor& descriptor,
-                                          const armnn::ConstTensor& weights,
-                                          const armnn::Optional<armnn::ConstTensor>& biases,
-                                          const char* = nullptr) override;
-
-    void VisitTransposeLayer(const armnn::IConnectableLayer* layer,
-                             const armnn::TransposeDescriptor& descriptor,
-                             const char* name = nullptr) override;
-
 private:
-
     /// Creates the Input Slots and Output Slots and LayerBase for the layer.
     flatbuffers::Offset<armnnSerializer::LayerBase> CreateLayerBase(
             const armnn::IConnectableLayer* layer,
@@ -324,11 +77,11 @@ private:
 
     /// Creates the serializer InputSlots for the layer.
     std::vector<flatbuffers::Offset<armnnSerializer::InputSlot>> CreateInputSlots(
-            const armnn::IConnectableLayer* layer);
+    const armnn::IConnectableLayer* layer);
 
     /// Creates the serializer OutputSlots for the layer.
     std::vector<flatbuffers::Offset<armnnSerializer::OutputSlot>> CreateOutputSlots(
-            const armnn::IConnectableLayer* layer);
+    const armnn::IConnectableLayer* layer);
 
     /// FlatBufferBuilder to create our layers' FlatBuffers.
     flatbuffers::FlatBufferBuilder m_flatBufferBuilder;
@@ -347,7 +100,249 @@ private:
 
     /// layer within our FlatBuffer index.
     uint32_t m_layerId;
+
+private:
+    ARMNN_DEPRECATED_MSG("Use VisitElementwiseUnaryLayer instead")
+    void SerializeAbsLayer(const armnn::IConnectableLayer* layer,
+                                  const char* name = nullptr);
+
+    void SerializeActivationLayer(const armnn::IConnectableLayer* layer,
+                                  const armnn::ActivationDescriptor& descriptor,
+                                  const char* name = nullptr);
+
+    void SerializeAdditionLayer(const armnn::IConnectableLayer* layer,
+                                const char* name = nullptr);
+
+    void SerializeArgMinMaxLayer(const armnn::IConnectableLayer* layer,
+                                 const armnn::ArgMinMaxDescriptor& argMinMaxDescriptor,
+                                 const char* name = nullptr);
+
+    void SerializeBatchToSpaceNdLayer(const armnn::IConnectableLayer* layer,
+                                      const armnn::BatchToSpaceNdDescriptor& descriptor,
+                                      const char* name = nullptr);
+
+    void SerializeBatchNormalizationLayer(const armnn::IConnectableLayer* layer,
+                                          const armnn::BatchNormalizationDescriptor& BatchNormalizationDescriptor,
+                                          const std::vector<armnn::ConstTensor>& constants,
+                                          const char* name = nullptr);
+
+    void SerializeComparisonLayer(const armnn::IConnectableLayer* layer,
+                                  const armnn::ComparisonDescriptor& descriptor,
+                                  const char* name = nullptr);
+
+    void SerializeConcatLayer(const armnn::IConnectableLayer* layer,
+                              const armnn::ConcatDescriptor& concatDescriptor,
+                              const char* name = nullptr);
+
+    void SerializeConstantLayer(const armnn::IConnectableLayer* layer,
+                                const std::vector<armnn::ConstTensor>& contants,
+                                const char* name = nullptr);
+
+    void SerializeConvolution2dLayer(const armnn::IConnectableLayer* layer,
+                                     const armnn::Convolution2dDescriptor& descriptor,
+                                     const std::vector<armnn::ConstTensor>& contants,
+                                     const char* name = nullptr);
+
+    void SerializeDepthToSpaceLayer(const armnn::IConnectableLayer* layer,
+                                    const armnn::DepthToSpaceDescriptor& descriptor,
+                                    const char* name = nullptr);
+
+    void SerializeDepthwiseConvolution2dLayer(const armnn::IConnectableLayer* layer,
+                                              const armnn::DepthwiseConvolution2dDescriptor& descriptor,
+                                              const std::vector<armnn::ConstTensor>& constants,
+                                              const char* name = nullptr);
+
+    void SerializeDequantizeLayer(const armnn::IConnectableLayer* layer,
+                                  const char* name = nullptr);
+
+    void SerializeDetectionPostProcessLayer(const armnn::IConnectableLayer* layer,
+                                            const armnn::DetectionPostProcessDescriptor& descriptor,
+                                            const std::vector<armnn::ConstTensor>& constants,
+                                            const char* name = nullptr);
+
+    void SerializeDivisionLayer(const armnn::IConnectableLayer* layer,
+                                const char* name = nullptr);
+
+    void SerializeElementwiseUnaryLayer(const armnn::IConnectableLayer* layer,
+                                        const armnn::ElementwiseUnaryDescriptor& descriptor,
+                                        const char* name = nullptr);
+
+    ARMNN_DEPRECATED_MSG("Use VisitComparisonLayer instead")
+    void SerializeEqualLayer(const armnn::IConnectableLayer* layer, const char* name);
+
+    void SerializeFillLayer(const armnn::IConnectableLayer* layer,
+                            const armnn::FillDescriptor& fillDescriptor,
+                            const char* name = nullptr);
+
+    void SerializeFloorLayer(const armnn::IConnectableLayer *layer,
+                             const char *name = nullptr);
+
+    void SerializeFullyConnectedLayer(const armnn::IConnectableLayer* layer,
+                                      const armnn::FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                      const std::vector<armnn::ConstTensor>& constants,
+                                      const char* name = nullptr);
+
+    void SerializeGatherLayer(const armnn::IConnectableLayer* layer,
+                              const armnn::GatherDescriptor& gatherDescriptor,
+                              const char* name = nullptr);
+
+    ARMNN_DEPRECATED_MSG("Use VisitComparisonLayer instead")
+    void SerializeGreaterLayer(const armnn::IConnectableLayer* layer, const char* name = nullptr);
+
+    void SerializeInputLayer(const armnn::IConnectableLayer* layer,
+                         armnn::LayerBindingId id,
+                         const char* name = nullptr);
+
+    void SerializeInstanceNormalizationLayer(const armnn::IConnectableLayer* layer,
+                                         const armnn::InstanceNormalizationDescriptor& instanceNormalizationDescriptor,
+                                         const char* name = nullptr);
+
+    void SerializeL2NormalizationLayer(const armnn::IConnectableLayer* layer,
+                                   const armnn::L2NormalizationDescriptor& l2NormalizationDescriptor,
+                                   const char* name = nullptr);
+
+    void SerializeLogicalBinaryLayer(const armnn::IConnectableLayer* layer,
+                                 const armnn::LogicalBinaryDescriptor& descriptor,
+                                 const char* name = nullptr);
+
+    void SerializeLogSoftmaxLayer(const armnn::IConnectableLayer* layer,
+                              const armnn::LogSoftmaxDescriptor& logSoftmaxDescriptor,
+                              const char* name = nullptr);
+
+    void SerializeLstmLayer(const armnn::IConnectableLayer* layer,
+                            const armnn::LstmDescriptor& descriptor,
+                            const std::vector<armnn::ConstTensor>& constants,
+                            const char* name = nullptr);
+
+    void SerializeMeanLayer(const armnn::IConnectableLayer* layer,
+                            const armnn::MeanDescriptor& descriptor,
+                            const char* name);
+
+    void SerializeMinimumLayer(const armnn::IConnectableLayer* layer,
+                               const char* name = nullptr);
+
+    void SerializeMaximumLayer(const armnn::IConnectableLayer* layer,
+                               const char* name = nullptr);
+
+    void SerializeMergeLayer(const armnn::IConnectableLayer* layer,
+                             const char* name = nullptr);
+
+    ARMNN_DEPRECATED_MSG("Use VisitConcatLayer instead")
+    void SerializeMergerLayer(const armnn::IConnectableLayer* layer,
+                              const armnn::MergerDescriptor& mergerDescriptor,
+                              const char* name = nullptr);
+
+    void SerializeMultiplicationLayer(const armnn::IConnectableLayer* layer,
+                                      const char* name = nullptr);
+
+    void SerializeOutputLayer(const armnn::IConnectableLayer* layer,
+                              armnn::LayerBindingId id,
+                              const char* name = nullptr);
+
+    void SerializePadLayer(const armnn::IConnectableLayer* layer,
+                           const armnn::PadDescriptor& PadDescriptor,
+                           const char* name = nullptr);
+
+    void SerializePermuteLayer(const armnn::IConnectableLayer* layer,
+                               const armnn::PermuteDescriptor& PermuteDescriptor,
+                               const char* name = nullptr);
+
+    void SerializePooling2dLayer(const armnn::IConnectableLayer* layer,
+                                 const armnn::Pooling2dDescriptor& pooling2dDescriptor,
+                                 const char* name = nullptr);
+
+    void SerializePreluLayer(const armnn::IConnectableLayer* layer,
+                             const char* name = nullptr);
+
+    void SerializeQuantizeLayer(const armnn::IConnectableLayer* layer,
+                                const char* name = nullptr);
+
+    void SerializeQLstmLayer(const armnn::IConnectableLayer* layer,
+                             const armnn::QLstmDescriptor& descriptor,
+                             const std::vector<armnn::ConstTensor>& constants,
+                             const char* name = nullptr);
+
+    void SerializeQuantizedLstmLayer(const armnn::IConnectableLayer* layer,
+                                     const std::vector<armnn::ConstTensor>& constants,
+                                     const char* name = nullptr);
+
+    void SerializeRankLayer(const armnn::IConnectableLayer* layer,
+                            const char* name = nullptr);
+
+    void SerializeReduceLayer(const armnn::IConnectableLayer* layer,
+                          const armnn::ReduceDescriptor& reduceDescriptor,
+                          const char* name = nullptr);
+
+    void SerializeReshapeLayer(const armnn::IConnectableLayer* layer,
+                               const armnn::ReshapeDescriptor& reshapeDescriptor,
+                               const char* name = nullptr);
+
+    void SerializeResizeLayer(const armnn::IConnectableLayer* layer,
+                              const armnn::ResizeDescriptor& resizeDescriptor,
+                              const char* name = nullptr);
+
+    ARMNN_DEPRECATED_MSG("Use VisitResizeLayer instead")
+    void SerializeResizeBilinearLayer(const armnn::IConnectableLayer* layer,
+                                      const armnn::ResizeBilinearDescriptor& resizeDescriptor,
+                                      const char* name = nullptr);
+
+    ARMNN_DEPRECATED_MSG("Use VisitElementwiseUnaryLayer instead")
+    void SerializeRsqrtLayer(const armnn::IConnectableLayer* layer,
+                             const char* name = nullptr);
+
+    void SerializeSliceLayer(const armnn::IConnectableLayer* layer,
+                             const armnn::SliceDescriptor& sliceDescriptor,
+                             const char* name = nullptr);
+
+    void SerializeSoftmaxLayer(const armnn::IConnectableLayer* layer,
+                               const armnn::SoftmaxDescriptor& softmaxDescriptor,
+                               const char* name = nullptr);
+
+    void SerializeSpaceToBatchNdLayer(const armnn::IConnectableLayer* layer,
+                                      const armnn::SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+                                      const char* name = nullptr);
+
+    void SerializeSpaceToDepthLayer(const armnn::IConnectableLayer* layer,
+                                    const armnn::SpaceToDepthDescriptor& spaceToDepthDescriptor,
+                                    const char* name = nullptr);
+
+    void SerializeNormalizationLayer(const armnn::IConnectableLayer* layer,
+                                     const armnn::NormalizationDescriptor& normalizationDescriptor,
+                                     const char* name = nullptr);
+
+    void SerializeSplitterLayer(const armnn::IConnectableLayer* layer,
+                                const armnn::ViewsDescriptor& viewsDescriptor,
+                                const char* name = nullptr);
+
+    void SerializeStandInLayer(const armnn::IConnectableLayer* layer,
+                               const armnn::StandInDescriptor& standInDescriptor,
+                               const char* name = nullptr);
+
+    void SerializeStackLayer(const armnn::IConnectableLayer* layer,
+                             const armnn::StackDescriptor& stackDescriptor,
+                             const char* name = nullptr);
+
+    void SerializeStridedSliceLayer(const armnn::IConnectableLayer* layer,
+                                    const armnn::StridedSliceDescriptor& stridedSliceDescriptor,
+                                    const char* name = nullptr);
+
+    void SerializeSubtractionLayer(const armnn::IConnectableLayer* layer,
+                                   const char* name = nullptr);
+
+    void SerializeSwitchLayer(const armnn::IConnectableLayer* layer,
+                              const char* name = nullptr);
+
+    void SerializeTransposeConvolution2dLayer(const armnn::IConnectableLayer* layer,
+                                              const armnn::TransposeConvolution2dDescriptor& descriptor,
+                                              const std::vector<armnn::ConstTensor>& constants,
+                                              const char* = nullptr);
+
+    void SerializeTransposeLayer(const armnn::IConnectableLayer* layer,
+                                 const armnn::TransposeDescriptor& descriptor,
+                                 const char* name = nullptr);
 };
+
+
 
 class ISerializer::SerializerImpl
 {
@@ -367,7 +362,7 @@ public:
 private:
 
     /// Visitor to contruct serialized network
-    SerializerVisitor m_SerializerVisitor;
+    SerializerStrategy m_SerializerStrategy;
 };
 
 } //namespace armnnSerializer

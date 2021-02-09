@@ -291,4 +291,91 @@ void QuantizedLstmLayer::Accept(ILayerVisitor& visitor) const
     visitor.VisitQuantizedLstmLayer(this, inputParams, GetName());
 }
 
+void QuantizedLstmLayer::ExecuteStrategy(IStrategy& strategy) const
+{
+    std::vector<ConstTensor> constTensors;
+
+    // InputToX weight tensors
+    if (m_QuantizedLstmParameters.m_InputToInputWeights != nullptr)
+    {
+        constTensors.emplace_back(ConstTensor(m_QuantizedLstmParameters.m_InputToInputWeights->GetTensorInfo(),
+                                              m_QuantizedLstmParameters.m_InputToInputWeights->Map(true)));
+    }
+
+    if (m_QuantizedLstmParameters.m_InputToForgetWeights != nullptr)
+    {
+        constTensors.emplace_back(ConstTensor(m_QuantizedLstmParameters.m_InputToForgetWeights->GetTensorInfo(),
+                                              m_QuantizedLstmParameters.m_InputToForgetWeights->Map(true)));
+    }
+
+    if (m_QuantizedLstmParameters.m_InputToCellWeights != nullptr)
+    {
+        constTensors.emplace_back(ConstTensor(m_QuantizedLstmParameters.m_InputToCellWeights->GetTensorInfo(),
+                                              m_QuantizedLstmParameters.m_InputToCellWeights->Map(true)));
+    }
+
+    if (m_QuantizedLstmParameters.m_InputToOutputWeights != nullptr)
+    {
+        constTensors.emplace_back(ConstTensor(m_QuantizedLstmParameters.m_InputToOutputWeights->GetTensorInfo(),
+                                              m_QuantizedLstmParameters.m_InputToOutputWeights->Map(true)));
+    }
+
+    // RecurrentToX weight tensors
+    if (m_QuantizedLstmParameters.m_RecurrentToInputWeights != nullptr)
+    {
+        constTensors.emplace_back(ConstTensor(
+                m_QuantizedLstmParameters.m_RecurrentToInputWeights->GetTensorInfo(),
+                m_QuantizedLstmParameters.m_RecurrentToInputWeights->Map(true)));
+    }
+
+    if (m_QuantizedLstmParameters.m_RecurrentToForgetWeights != nullptr)
+    {
+        constTensors.emplace_back(ConstTensor(
+                m_QuantizedLstmParameters.m_RecurrentToForgetWeights->GetTensorInfo(),
+                m_QuantizedLstmParameters.m_RecurrentToForgetWeights->Map(true)));
+    }
+
+    if (m_QuantizedLstmParameters.m_RecurrentToCellWeights != nullptr)
+    {
+        constTensors.emplace_back(ConstTensor(
+                m_QuantizedLstmParameters.m_RecurrentToCellWeights->GetTensorInfo(),
+                m_QuantizedLstmParameters.m_RecurrentToCellWeights->Map(true)));
+    }
+
+    if (m_QuantizedLstmParameters.m_RecurrentToOutputWeights != nullptr)
+    {
+        constTensors.emplace_back(ConstTensor(
+                m_QuantizedLstmParameters.m_RecurrentToOutputWeights->GetTensorInfo(),
+                m_QuantizedLstmParameters.m_RecurrentToOutputWeights->Map(true)));
+    }
+
+    // Bias tensors
+    if (m_QuantizedLstmParameters.m_InputGateBias != nullptr)
+    {
+        constTensors.emplace_back(ConstTensor(m_QuantizedLstmParameters.m_InputGateBias->GetTensorInfo(),
+                                              m_QuantizedLstmParameters.m_InputGateBias->Map(true)));
+    }
+
+    if (m_QuantizedLstmParameters.m_ForgetGateBias != nullptr)
+    {
+        constTensors.emplace_back(ConstTensor(m_QuantizedLstmParameters.m_ForgetGateBias->GetTensorInfo(),
+                                              m_QuantizedLstmParameters.m_ForgetGateBias->Map(true)));
+    }
+
+    if (m_QuantizedLstmParameters.m_CellBias != nullptr)
+    {
+        constTensors.emplace_back(ConstTensor(m_QuantizedLstmParameters.m_CellBias->GetTensorInfo(),
+                                              m_QuantizedLstmParameters.m_CellBias->Map(true)));
+    }
+
+    if (m_QuantizedLstmParameters.m_OutputGateBias != nullptr)
+    {
+        constTensors.emplace_back(ConstTensor(m_QuantizedLstmParameters.m_OutputGateBias->GetTensorInfo(),
+                                              m_QuantizedLstmParameters.m_OutputGateBias->Map(true)));
+    }
+
+
+    strategy.ExecuteStrategy(this, BaseDescriptor(), constTensors, GetName());
+}
+
 } // namespace armnn

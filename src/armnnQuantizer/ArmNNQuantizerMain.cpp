@@ -61,8 +61,8 @@ int main(int argc, char* argv[])
         if (!dataSet.IsEmpty())
         {
             // Get the Input Tensor Infos
-            armnnQuantizer::InputLayerVisitor inputLayerVisitor;
-            network->Accept(inputLayerVisitor);
+            armnnQuantizer::InputLayerStrategy inputLayerStrategy;
+            network->ExecuteStrategy(inputLayerStrategy);
 
             for (armnnQuantizer::QuantizationInput quantizationInput : dataSet)
             {
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
                 unsigned int count = 0;
                 for (armnn::LayerBindingId layerBindingId : quantizationInput.GetLayerBindingIds())
                 {
-                    armnn::TensorInfo tensorInfo = inputLayerVisitor.GetTensorInfo(layerBindingId);
+                    armnn::TensorInfo tensorInfo = inputLayerStrategy.GetTensorInfo(layerBindingId);
                     inputData[count] = quantizationInput.GetDataForEntry(layerBindingId);
                     armnn::ConstTensor inputTensor(tensorInfo, inputData[count].data());
                     inputTensors.push_back(std::make_pair(layerBindingId, inputTensor));

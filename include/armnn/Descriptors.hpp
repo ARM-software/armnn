@@ -9,6 +9,8 @@
 
 #include <cstdint>
 #include <initializer_list>
+#include <iostream>
+#include <sstream>
 
 #include "Tensor.hpp"
 #include "Types.hpp"
@@ -16,8 +18,11 @@
 namespace armnn
 {
 
+/// Base class for all descriptors.
+struct BaseDescriptor {};
+
 /// An ActivationDescriptor for the ActivationLayer.
-struct ActivationDescriptor
+struct ActivationDescriptor : BaseDescriptor
 {
     ActivationDescriptor()
         : m_Function(ActivationFunction::Sigmoid)
@@ -48,7 +53,7 @@ struct ActivationDescriptor
 };
 
 /// An ArgMinMaxDescriptor for ArgMinMaxLayer
-struct ArgMinMaxDescriptor
+struct ArgMinMaxDescriptor : BaseDescriptor
 {
     ArgMinMaxDescriptor()
         : m_Function(ArgMinMaxFunction::Min)
@@ -70,7 +75,7 @@ struct ArgMinMaxDescriptor
 };
 
 /// A ComparisonDescriptor for the ComparisonLayer
-struct ComparisonDescriptor
+struct ComparisonDescriptor : BaseDescriptor
 {
     ComparisonDescriptor()
         : ComparisonDescriptor(ComparisonOperation::Equal)
@@ -90,7 +95,7 @@ struct ComparisonDescriptor
 };
 
 /// A ElementwiseUnaryDescriptor for the ElementwiseUnaryLayer
-struct ElementwiseUnaryDescriptor
+struct ElementwiseUnaryDescriptor : BaseDescriptor
 {
     ElementwiseUnaryDescriptor()
         : ElementwiseUnaryDescriptor(UnaryOperation::Abs)
@@ -110,7 +115,7 @@ struct ElementwiseUnaryDescriptor
 };
 
 /// A PermuteDescriptor for the PermuteLayer.
-struct PermuteDescriptor
+struct PermuteDescriptor : BaseDescriptor
 {
     PermuteDescriptor()
         : m_DimMappings{}
@@ -131,7 +136,7 @@ struct PermuteDescriptor
 };
 
 /// A SoftmaxDescriptor for the SoftmaxLayer.
-struct SoftmaxDescriptor
+struct SoftmaxDescriptor : BaseDescriptor
 {
     SoftmaxDescriptor()
         : m_Beta(1.0f)
@@ -155,7 +160,7 @@ using LogSoftmaxDescriptor = SoftmaxDescriptor;
 /// @brief An OriginsDescriptor for the ConcatLayer.
 /// Descriptor to configure the concatenation process. Number of views must be equal to the number of inputs, and
 /// their order must match - e.g. first view corresponds to the first input, second view to the second input, etc.
-struct OriginsDescriptor
+struct OriginsDescriptor : BaseDescriptor
 {
     OriginsDescriptor();
     OriginsDescriptor(uint32_t numViews, uint32_t numDimensions = 4);
@@ -198,7 +203,7 @@ private:
 /// @brief A ViewsDescriptor for the SplitterLayer.
 /// Descriptor to configure the splitting process. Number of Views must be equal to the number of outputs, and
 /// their order must match - e.g. first view corresponds to the first output, second view to the second output, etc.
-struct ViewsDescriptor
+struct ViewsDescriptor : BaseDescriptor
 {
     ViewsDescriptor(uint32_t numViews, uint32_t numDimensions = 4);
     ViewsDescriptor(const ViewsDescriptor& other);
@@ -321,7 +326,7 @@ OriginsDescriptor CreateDescriptorForConcatenation(TensorShapeIt first,
 }
 
 /// A Pooling2dDescriptor for the Pooling2dLayer.
-struct Pooling2dDescriptor
+struct Pooling2dDescriptor : BaseDescriptor
 {
     Pooling2dDescriptor()
         : m_PoolType(PoolingAlgorithm::Max)
@@ -381,7 +386,7 @@ struct Pooling2dDescriptor
 };
 
 /// A FullyConnectedDescriptor for the FullyConnectedLayer.
-struct FullyConnectedDescriptor
+struct FullyConnectedDescriptor : BaseDescriptor
 {
     FullyConnectedDescriptor()
         : m_BiasEnabled(false)
@@ -400,7 +405,7 @@ struct FullyConnectedDescriptor
 };
 
 /// A Convolution2dDescriptor for the Convolution2dLayer.
-struct Convolution2dDescriptor
+struct Convolution2dDescriptor : BaseDescriptor
 {
     Convolution2dDescriptor()
         : m_PadLeft(0)
@@ -452,7 +457,7 @@ struct Convolution2dDescriptor
 };
 
 /// A DepthwiseConvolution2dDescriptor for the DepthwiseConvolution2dLayer.
-struct DepthwiseConvolution2dDescriptor
+struct DepthwiseConvolution2dDescriptor : BaseDescriptor
 {
     DepthwiseConvolution2dDescriptor()
         : m_PadLeft(0)
@@ -503,7 +508,7 @@ struct DepthwiseConvolution2dDescriptor
     DataLayout m_DataLayout;
 };
 
-struct DetectionPostProcessDescriptor
+struct DetectionPostProcessDescriptor : BaseDescriptor
 {
     DetectionPostProcessDescriptor()
         : m_MaxDetections(0)
@@ -559,7 +564,7 @@ struct DetectionPostProcessDescriptor
 };
 
 /// A NormalizationDescriptor for the NormalizationLayer.
-struct NormalizationDescriptor
+struct NormalizationDescriptor : BaseDescriptor
 {
     NormalizationDescriptor()
         : m_NormChannelType(NormalizationAlgorithmChannel::Across)
@@ -599,7 +604,7 @@ struct NormalizationDescriptor
 };
 
 /// A L2NormalizationDescriptor for the L2NormalizationLayer.
-struct L2NormalizationDescriptor
+struct L2NormalizationDescriptor : BaseDescriptor
 {
     L2NormalizationDescriptor()
         : m_Eps(1e-12f)
@@ -618,7 +623,7 @@ struct L2NormalizationDescriptor
 };
 
 /// A BatchNormalizationDescriptor for the BatchNormalizationLayer.
-struct BatchNormalizationDescriptor
+struct BatchNormalizationDescriptor : BaseDescriptor
 {
     BatchNormalizationDescriptor()
         : m_Eps(0.0001f)
@@ -637,7 +642,7 @@ struct BatchNormalizationDescriptor
 };
 
 /// An InstanceNormalizationDescriptor for InstanceNormalizationLayer
-struct InstanceNormalizationDescriptor
+struct InstanceNormalizationDescriptor : BaseDescriptor
 {
     InstanceNormalizationDescriptor()
         : m_Gamma(1.0f)
@@ -665,7 +670,7 @@ struct InstanceNormalizationDescriptor
 };
 
 /// A BatchToSpaceNdDescriptor for the BatchToSpaceNdLayer.
-struct BatchToSpaceNdDescriptor
+struct BatchToSpaceNdDescriptor : BaseDescriptor
 {
     BatchToSpaceNdDescriptor()
         : m_BlockShape({1, 1})
@@ -696,7 +701,7 @@ struct BatchToSpaceNdDescriptor
 };
 
 /// A FakeQuantizationDescriptor for the FakeQuantizationLayer.
-struct FakeQuantizationDescriptor
+struct FakeQuantizationDescriptor : BaseDescriptor
 {
         FakeQuantizationDescriptor()
         : m_Min(-6.0f)
@@ -715,7 +720,7 @@ struct FakeQuantizationDescriptor
 };
 
 /// A FillDescriptor for the FillLayer
-struct FillDescriptor
+struct FillDescriptor : BaseDescriptor
 {
     FillDescriptor()
     : m_Value(0)
@@ -734,7 +739,7 @@ struct FillDescriptor
 };
 
 /// A GatherDescriptor for the GatherLayer.
-struct GatherDescriptor
+struct GatherDescriptor : BaseDescriptor
 {
     GatherDescriptor()
         : m_Axis(0)
@@ -754,7 +759,7 @@ struct GatherDescriptor
 };
 
 /// A ResizeBilinearDescriptor for the ResizeBilinearLayer.
-struct ResizeBilinearDescriptor
+struct ResizeBilinearDescriptor : BaseDescriptor
 {
     ResizeBilinearDescriptor()
         : m_TargetWidth(0)
@@ -763,6 +768,15 @@ struct ResizeBilinearDescriptor
         , m_AlignCorners(false)
         , m_HalfPixelCenters(false)
     {}
+
+    bool operator ==(const ResizeBilinearDescriptor& rhs) const
+    {
+        return m_TargetWidth          == rhs.m_TargetWidth &&
+               m_TargetHeight         == rhs.m_TargetHeight &&
+               m_DataLayout           == rhs.m_DataLayout &&
+               m_AlignCorners         == rhs.m_AlignCorners &&
+               m_HalfPixelCenters     == rhs.m_HalfPixelCenters;
+    }
 
     /// Target width value.
     uint32_t          m_TargetWidth;
@@ -777,7 +791,7 @@ struct ResizeBilinearDescriptor
 };
 
 /// A ResizeDescriptor for the ResizeLayer.
-struct ResizeDescriptor
+struct ResizeDescriptor : BaseDescriptor
 {
     ResizeDescriptor()
         : m_TargetWidth(0)
@@ -815,7 +829,7 @@ struct ResizeDescriptor
 
 
 /// A ReshapeDescriptor for the ReshapeLayer.
-struct ReshapeDescriptor
+struct ReshapeDescriptor : BaseDescriptor
 {
     ReshapeDescriptor()
         : m_TargetShape()
@@ -835,7 +849,7 @@ struct ReshapeDescriptor
 };
 
 /// A SpaceToBatchNdDescriptor for the SpaceToBatchNdLayer.
-struct SpaceToBatchNdDescriptor
+struct SpaceToBatchNdDescriptor : BaseDescriptor
 {
     SpaceToBatchNdDescriptor()
         : m_BlockShape({1, 1})
@@ -867,7 +881,7 @@ struct SpaceToBatchNdDescriptor
 };
 
 /// A SpaceToDepthDescriptor for the SpaceToDepthLayer
-struct SpaceToDepthDescriptor
+struct SpaceToDepthDescriptor : BaseDescriptor
 {
     SpaceToDepthDescriptor()
         : SpaceToDepthDescriptor(1u, DataLayout::NHWC)
@@ -894,7 +908,7 @@ struct SpaceToDepthDescriptor
 using DepthToSpaceDescriptor = SpaceToDepthDescriptor;
 
 /// An LstmDescriptor for the LstmLayer.
-struct LstmDescriptor
+struct LstmDescriptor : BaseDescriptor
 {
     LstmDescriptor()
         : m_ActivationFunc(1) // 0: None, 1: Relu, 3: Relu6, 4: Tanh, 6: Sigmoid
@@ -934,7 +948,7 @@ struct LstmDescriptor
 };
 
 /// A MeanDescriptor for the MeanLayer.
-struct MeanDescriptor
+struct MeanDescriptor : BaseDescriptor
 {
     MeanDescriptor()
         : m_Axis()
@@ -958,7 +972,7 @@ struct MeanDescriptor
 };
 
 /// A PadDescriptor for the PadLayer.
-struct PadDescriptor
+struct PadDescriptor : BaseDescriptor
 {
     PadDescriptor() : m_PadValue(0)
     {}
@@ -984,7 +998,7 @@ struct PadDescriptor
 };
 
 /// A SliceDescriptor for the SliceLayer.
-struct SliceDescriptor
+struct SliceDescriptor : BaseDescriptor
 {
     SliceDescriptor(const std::vector<unsigned int>& begin, const std::vector<unsigned int>& size)
         : m_Begin(begin)
@@ -1007,7 +1021,7 @@ struct SliceDescriptor
 };
 
 /// A StackDescriptor for the StackLayer.
-struct StackDescriptor
+struct StackDescriptor : BaseDescriptor
 {
     StackDescriptor()
         : m_Axis(0)
@@ -1037,7 +1051,7 @@ struct StackDescriptor
 };
 
 /// A StandInDescriptor for the StandIn layer
-struct StandInDescriptor
+struct StandInDescriptor : BaseDescriptor
 {
     StandInDescriptor() {};
 
@@ -1059,7 +1073,7 @@ struct StandInDescriptor
 };
 
 /// A StridedSliceDescriptor for the StridedSliceLayer.
-struct StridedSliceDescriptor
+struct StridedSliceDescriptor : BaseDescriptor
 {
     StridedSliceDescriptor(const std::vector<int>& begin,
                            const std::vector<int>& end,
@@ -1123,7 +1137,7 @@ struct StridedSliceDescriptor
 };
 
 /// A PreCompiledDescriptor for the PreCompiledLayer.
-struct PreCompiledDescriptor
+struct PreCompiledDescriptor : BaseDescriptor
 {
     PreCompiledDescriptor(unsigned int numInputSlots = 1u, unsigned int numOutputSlots = 1u)
         : m_NumInputSlots(numInputSlots), m_NumOutputSlots(numOutputSlots)
@@ -1136,7 +1150,7 @@ struct PreCompiledDescriptor
 };
 
 /// A QLstmDescriptor for the QLstmLayer.
-struct QLstmDescriptor
+struct QLstmDescriptor : BaseDescriptor
 {
     QLstmDescriptor()
             : m_CellClip(0.0)
@@ -1196,7 +1210,7 @@ struct QLstmDescriptor
 };
 
 /// A TransposeConvolution2dDescriptor for the TransposeConvolution2dLayer.
-struct TransposeConvolution2dDescriptor
+struct TransposeConvolution2dDescriptor : BaseDescriptor
 {
     TransposeConvolution2dDescriptor() :
         m_PadLeft(0),
@@ -1246,7 +1260,7 @@ struct TransposeConvolution2dDescriptor
 };
 
 /// A TransposeDescriptor for the TransposeLayer.
-struct TransposeDescriptor
+struct TransposeDescriptor : BaseDescriptor
 {
     TransposeDescriptor()
             : m_DimMappings{}
@@ -1267,7 +1281,7 @@ struct TransposeDescriptor
 };
 
 /// A LogicalBinaryDescriptor for the LogicalBinaryLayer
-struct LogicalBinaryDescriptor
+struct LogicalBinaryDescriptor : BaseDescriptor
 {
     LogicalBinaryDescriptor()
         : LogicalBinaryDescriptor(LogicalBinaryOperation::LogicalAnd)
@@ -1287,7 +1301,7 @@ struct LogicalBinaryDescriptor
 };
 
 /// A ReduceDescriptor for the REDUCE operators.
-struct ReduceDescriptor
+struct ReduceDescriptor : BaseDescriptor
 {
     ReduceDescriptor()
         : m_KeepDims(false)

@@ -55,4 +55,10 @@ void PreCompiledLayer::Accept(ILayerVisitor& visitor) const
     throw armnn::Exception("PreCompiledLayer should not appear in an input graph");
 }
 
+void PreCompiledLayer::ExecuteStrategy(IStrategy& strategy) const
+{
+    IgnoreUnused(strategy);
+    throw armnn::Exception("FakeQuantizationLayer should not appear in an input graph");
+}
+
 } // namespace armnn

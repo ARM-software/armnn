@@ -7,6 +7,7 @@
 
 namespace armnn
 {
+struct BaseDescriptor;
 
 struct ActivationDescriptor;
 struct ArgMinMaxDescriptor;

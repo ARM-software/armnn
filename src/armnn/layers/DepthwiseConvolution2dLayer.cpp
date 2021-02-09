@@ -165,4 +165,16 @@ void DepthwiseConvolution2dLayer::Accept(ILayerVisitor& visitor) const
     visitor.VisitDepthwiseConvolution2dLayer(this, GetParameters(), weightsTensor, optionalBiasTensor, GetName());
 }
 
+void DepthwiseConvolution2dLayer::ExecuteStrategy(IStrategy& strategy) const
+{
+    std::vector<armnn::ConstTensor> constTensors { {m_Weight->GetTensorInfo(), m_Weight->Map(true)} };
+
+    if (GetParameters().m_BiasEnabled)
+    {
+        constTensors.emplace_back(ConstTensor(m_Bias->GetTensorInfo(), m_Bias->Map(true)));
+    }
+
+    strategy.ExecuteStrategy(this, GetParameters(), constTensors, GetName());
+}
+
 } // namespace armnn

@@ -41,6 +41,8 @@ public:
 
     void Accept(ILayerVisitor& visitor) const override;
 
+    void ExecuteStrategy(IStrategy& strategy) const override;
+
     std::unique_ptr<ScopedCpuTensorHandle> m_LayerOutput;
 
 protected:

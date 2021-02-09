@@ -2021,6 +2021,14 @@ void Network::Accept(ILayerVisitor& visitor) const
     };
 }
 
+void Network::ExecuteStrategy(IStrategy& strategy) const
+{
+    for (auto layer : GetGraph())
+    {
+        layer->ExecuteStrategy(strategy);
+    };
+}
+
 OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)
     : m_Graph(std::move(graph)), m_Guid(profiling::ProfilingService::GetNextGuid())
 {

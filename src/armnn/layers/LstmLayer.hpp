@@ -107,6 +107,8 @@ public:
 
     void Accept(ILayerVisitor& visitor) const override;
 
+    void ExecuteStrategy(IStrategy& strategy) const override;
+
 protected:
     /// Constructor to create a LstmLayer.
     /// @param [in] param LstmDescriptor to configure the lstm operation.

@@ -68,4 +68,10 @@ void ConstantLayer::Accept(ILayerVisitor& visitor) const
     visitor.VisitConstantLayer(this, layerOutputTensor, GetName());
 }
 
+void ConstantLayer::ExecuteStrategy(IStrategy& strategy) const
+{
+    std::vector<armnn::ConstTensor> constTensors { {m_LayerOutput->GetTensorInfo(), m_LayerOutput->Map(true)} };
+    strategy.ExecuteStrategy(this, BaseDescriptor(), constTensors, GetName());
+}
+
 } // namespace armnn

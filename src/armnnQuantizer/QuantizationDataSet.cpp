@@ -47,6 +47,36 @@ QuantizationDataSet::~QuantizationDataSet()
 {
 }
 
+
+/// Visitor class implementation to gather the TensorInfo for LayerBindingID for creation of ConstTensor for Refine.
+
+void InputLayerStrategy::ExecuteStrategy(const armnn::IConnectableLayer* layer,
+                                         const armnn::BaseDescriptor& descriptor,
+                                         const std::vector<armnn::ConstTensor>& constants,
+                                         const char* name,
+                                         const armnn::LayerBindingId id)
+{
+    armnn::IgnoreUnused(name, descriptor, constants);
+
+    m_TensorInfos.emplace(id, layer->GetOutputSlot(0).GetTensorInfo());
+}
+
+
+
+
+armnn::TensorInfo InputLayerStrategy::GetTensorInfo(armnn::LayerBindingId layerBindingId)
+{
+    auto iterator = m_TensorInfos.find(layerBindingId);
+    if (iterator != m_TensorInfos.end())
+    {
+        return m_TensorInfos.at(layerBindingId);
+    }
+    else
+    {
+        throw armnn::Exception("Could not retrieve tensor info for binding ID " + std::to_string(layerBindingId));
+    }
+}
+
 void InputLayerVisitor::VisitInputLayer(const armnn::IConnectableLayer* layer,
                                         armnn::LayerBindingId id,
                                         const char* name)

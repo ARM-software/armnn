@@ -10,6 +10,7 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <armnn/ILayerVisitor.hpp>
+#include <armnn/IStrategy.hpp>
 #include <armnn/utility/Assert.hpp>
 
 #include <utility>
@@ -54,6 +55,16 @@ void VisitLayers(const LayerContainer& layerContainer, ILayerVisitor& visitor)
         layer->Accept(visitor);
     }
     visitor.FinishVisit();
+}
+
+template <typename LayerContainer>
+void ApplyStrategyToLayers(const LayerContainer& layerContainer, IStrategy& strategy)
+{
+    for (auto layer : layerContainer)
+    {
+        layer->ExecuteStrategy(strategy);
+    }
+    strategy.FinishStrategy();
 }
 
 } // namespace armnn

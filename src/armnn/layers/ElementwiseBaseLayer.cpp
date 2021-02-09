@@ -82,4 +82,9 @@ void ElementwiseBaseLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, GetLayerTypeAsCString(GetType()));
 }
 
+void ElementwiseBaseLayer::ExecuteStrategy(IStrategy& strategy) const
+{
+    strategy.ExecuteStrategy(this, BaseDescriptor(), {}, GetName());
+}
+
 } // namespace armnn

@@ -43,6 +43,8 @@ public:
 
     void Accept(ILayerVisitor& visitor) const override;
 
+    void ExecuteStrategy(IStrategy& strategy) const override;
+
     void SerializeLayerParameters(ParameterStringifyFunction& fn) const override;
 
 protected:

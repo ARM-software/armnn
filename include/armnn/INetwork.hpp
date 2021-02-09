@@ -8,6 +8,7 @@
 #include <armnn/Deprecated.hpp>
 #include <armnn/DescriptorsFwd.hpp>
 #include <armnn/ILayerVisitor.hpp>
+#include <armnn/IStrategy.hpp>
 #include <armnn/NetworkFwd.hpp>
 #include <armnn/Optional.hpp>
 #include <armnn/TensorFwd.hpp>
@@ -91,8 +92,15 @@ public:
     /// Apply a visitor to this layer
     virtual void Accept(ILayerVisitor& visitor) const = 0;
 
+    /// Apply a visitor to this layer
+    virtual void ExecuteStrategy(IStrategy& strategy) const = 0;
+
     /// Provide a hint for the optimizer as to which backend to prefer for this layer
     virtual void BackendSelectionHint(Optional<BackendId> backend) = 0;
+
+    /// Returns the armnn::LayerType of this layer
+    virtual LayerType GetType() const = 0;
+
 protected:
       /// Objects are not deletable via the handle
     ~IConnectableLayer() {}
@@ -599,6 +607,8 @@ public:
                                                      const char* name = nullptr) = 0;
 
     virtual void Accept(ILayerVisitor& visitor) const = 0;
+
+    virtual void ExecuteStrategy(IStrategy& strategy) const = 0;
 
 protected:
     ~INetwork() {}

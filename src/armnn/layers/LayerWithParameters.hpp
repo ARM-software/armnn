@@ -48,6 +48,11 @@ protected:
 
     /// The parameters for the layer (not including tensor-valued weights etc.).
     Parameters m_Param;
+
+    void ExecuteStrategy(IStrategy& strategy) const override
+    {
+        strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
+    }
 };
 
 } // namespace

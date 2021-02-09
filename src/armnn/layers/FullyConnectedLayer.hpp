@@ -43,6 +43,8 @@ public:
 
     void Accept(ILayerVisitor& visitor) const override;
 
+    void ExecuteStrategy(IStrategy& strategy) const override;
+
 protected:
     /// Constructor to create a FullyConnectedLayer.
     /// @param [in] param FullyConnectedDescriptor to configure the fully connected operation.

@@ -11,7 +11,7 @@
 #include <armnn/Types.hpp>
 #include <armnn/Optional.hpp>
 
-#include "DynamicQuantizationVisitor.hpp"
+#include "DynamicQuantizationStrategy.hpp"
 #include "RangeTracker.hpp"
 
 namespace armnn
@@ -44,7 +44,7 @@ private:
     // the runtime between invocations of the Refine method.
     IRuntimePtr m_Runtime;
 
-    Optional<DynamicQuantizationVisitor> m_DynamicQuantizationVisitor;
+    Optional<DynamicQuantizationStrategy> m_DynamicQuantizationStrategy;
 
     // counts the number of times refine is called
     unsigned int m_RefineCount;

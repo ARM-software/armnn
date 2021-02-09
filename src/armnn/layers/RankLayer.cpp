@@ -46,4 +46,9 @@ void RankLayer::Accept(ILayerVisitor& visitor) const
     visitor.VisitRankLayer(this, GetName());
 }
 
+void RankLayer::ExecuteStrategy(IStrategy& strategy) const
+{
+    strategy.ExecuteStrategy(this, BaseDescriptor(), {}, GetName());
+}
+
 } //namespace armnn

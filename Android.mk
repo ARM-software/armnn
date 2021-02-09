@@ -426,7 +426,10 @@ LOCAL_SRC_FILES := \
         src/profiling/test/TimelinePacketTests.cpp \
         src/profiling/test/TimelineUtilityMethodsTests.cpp \
         src/armnnSerializer/test/ActivationSerializationTests.cpp \
-        src/armnnSerializer/test/SerializerTests.cpp
+        src/armnnSerializer/test/ComparisonSerializationTests.cpp \
+        src/armnnSerializer/test/LstmSerializationTests.cpp \
+        src/armnnSerializer/test/SerializerTests.cpp \
+        src/armnnSerializer/test/SerializerTestUtils.cpp
 
 ifeq ($(ARMNN_REF_ENABLED),1)
 LOCAL_SRC_FILES += \

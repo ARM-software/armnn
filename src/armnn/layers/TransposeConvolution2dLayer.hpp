@@ -42,6 +42,8 @@ public:
 
     void Accept(ILayerVisitor& visitor) const override;
 
+    void ExecuteStrategy(IStrategy& strategy) const override;
+
 protected:
     /// Constructor to create a TransposeConvolution2dLayer.
     /// @param [in] param TransposeConvolution2dDescriptor to configure the 2D transpose convolution operation.

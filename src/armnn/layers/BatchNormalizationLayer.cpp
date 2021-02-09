@@ -80,4 +80,14 @@ void BatchNormalizationLayer::Accept(ILayerVisitor& visitor) const
             this, GetParameters(), meanTensor, varianceTensor, betaTensor, gammaTensor, GetName());
 }
 
+void BatchNormalizationLayer::ExecuteStrategy(IStrategy& strategy) const
+{
+    std::vector<armnn::ConstTensor> constTensors { {m_Mean->GetTensorInfo(), m_Mean->Map(true)},
+                                                   {m_Variance->GetTensorInfo(), m_Variance->Map(true)},
+                                                   {m_Beta->GetTensorInfo(), m_Beta->Map(true)},
+                                                   {m_Gamma->GetTensorInfo(), m_Gamma->Map(true)} };
+
+    strategy.ExecuteStrategy(this, GetParameters(), constTensors, GetName());
+}
+
 } // namespace armnn

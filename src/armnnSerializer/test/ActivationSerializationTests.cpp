@@ -17,15 +17,20 @@
 
 BOOST_AUTO_TEST_SUITE(SerializerTests)
 
-class VerifyActivationName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+class VerifyActivationName : public armnn::IStrategy
 {
 public:
-    void VisitActivationLayer(const armnn::IConnectableLayer* layer,
-                              const armnn::ActivationDescriptor& activationDescriptor,
-                              const char* name) override
+    void ExecuteStrategy(const armnn::IConnectableLayer* layer,
+                         const armnn::BaseDescriptor& descriptor,
+                         const std::vector<armnn::ConstTensor>& constants,
+                         const char* name,
+                         const armnn::LayerBindingId id = 0) override
     {
-        IgnoreUnused(layer, activationDescriptor);
-        BOOST_TEST(name == "activation");
+        IgnoreUnused(layer, descriptor, constants, id);
+        if (layer->GetType() == armnn::LayerType::Activation)
+        {
+            BOOST_TEST(name == "activation");
+        }
     }
 };
 
@@ -67,7 +72,7 @@ BOOST_AUTO_TEST_CASE(ActivationSerialization)
     armnn::INetworkPtr deserializedNetwork = parser->CreateNetworkFromBinary(serializerVector);
 
     VerifyActivationName visitor;
-    deserializedNetwork->Accept(visitor);
+    deserializedNetwork->ExecuteStrategy(visitor);
 
     armnn::IRuntime::CreationOptions options; // default options
     armnn::IRuntimePtr run = armnn::IRuntime::Create(options);

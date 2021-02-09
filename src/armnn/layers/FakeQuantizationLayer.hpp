@@ -30,6 +30,8 @@ public:
 
     void Accept(ILayerVisitor& visitor) const override;
 
+    void ExecuteStrategy(IStrategy& strategy) const override;
+
 protected:
     /// Constructor to create a FakeQuantizationLayer.
     /// @param [in] param FakeQuantizationDescriptor to configure the fake quantization operation.

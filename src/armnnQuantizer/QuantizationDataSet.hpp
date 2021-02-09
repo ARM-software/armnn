@@ -43,6 +43,22 @@ private:
 };
 
 /// Visitor class implementation to gather the TensorInfo for LayerBindingID for creation of ConstTensor for Refine.
+class InputLayerStrategy : public armnn::IStrategy
+{
+public:
+    virtual void ExecuteStrategy(const armnn::IConnectableLayer* layer,
+                                 const armnn::BaseDescriptor& descriptor,
+                                 const std::vector<armnn::ConstTensor>& constants,
+                                 const char* name,
+                                 const armnn::LayerBindingId id = 0) override;
+
+    armnn::TensorInfo GetTensorInfo(armnn::LayerBindingId);
+private:
+    std::map<armnn::LayerBindingId, armnn::TensorInfo> m_TensorInfos;
+};
+
+
+/// Visitor class implementation to gather the TensorInfo for LayerBindingID for creation of ConstTensor for Refine.
 class InputLayerVisitor : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
 {
 public:

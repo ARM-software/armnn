@@ -157,4 +157,16 @@ void Convolution2dLayer::Accept(ILayerVisitor& visitor) const
     visitor.VisitConvolution2dLayer(this, GetParameters(), weightsTensor, optionalBiasTensor, GetName());
 }
 
+void Convolution2dLayer::ExecuteStrategy(IStrategy& strategy) const
+{
+    std::vector<armnn::ConstTensor> constTensors { {m_Weight->GetTensorInfo(), m_Weight->Map(true)} };
+
+    if (GetParameters().m_BiasEnabled)
+    {
+        constTensors.emplace_back(ConstTensor(m_Bias->GetTensorInfo(), m_Bias->Map(true)));
+    }
+
+    strategy.ExecuteStrategy(this, GetParameters(), constTensors, GetName());
+}
+
 } // namespace armnn

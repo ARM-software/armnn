@@ -35,6 +35,8 @@ public:
 
     void Accept(ILayerVisitor& visitor) const override;
 
+    void ExecuteStrategy(IStrategy& strategy) const override;
+
 private:
     PreCompiledLayer(const PreCompiledLayer& other) = delete;
     PreCompiledLayer& operator=(const PreCompiledLayer& other) = delete;

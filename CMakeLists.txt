@@ -247,6 +247,7 @@ list(APPEND armnn_sources
     include/armnn/INetwork.hpp
     include/armnn/IProfiler.hpp
     include/armnn/IRuntime.hpp
+    include/armnn/IStrategy.hpp
     include/armnn/LayerSupport.hpp
     include/armnn/LayerVisitorBase.hpp
     include/armnn/Logging.hpp
@@ -412,8 +413,8 @@ list(APPEND armnn_sources
     src/armnn/Descriptors.cpp
     src/armnn/DeviceSpec.hpp
     src/armnn/DllExport.hpp
-    src/armnn/DynamicQuantizationVisitor.cpp
-    src/armnn/DynamicQuantizationVisitor.hpp
+    src/armnn/DynamicQuantizationStrategy.cpp
+    src/armnn/DynamicQuantizationStrategy.hpp
     src/armnn/Exceptions.cpp
     src/armnn/ExecutionFrame.cpp
     src/armnn/ExecutionFrame.hpp
@@ -456,8 +457,8 @@ list(APPEND armnn_sources
     src/armnn/ProfilingEvent.cpp
     src/armnn/ProfilingEvent.hpp
     src/armnn/Profiling.hpp
-    src/armnn/QuantizerVisitor.cpp
-    src/armnn/QuantizerVisitor.hpp
+    src/armnn/QuantizerStrategy.hpp
+    src/armnn/QuantizerStrategy.cpp
     src/armnn/Runtime.cpp
     src/armnn/Runtime.hpp
     src/armnn/RangeTracker.cpp
@@ -465,8 +466,8 @@ list(APPEND armnn_sources
     src/armnn/ResolveType.hpp
     src/armnn/SerializeLayerParameters.cpp
     src/armnn/SerializeLayerParameters.hpp
-    src/armnn/StaticRangeVisitor.cpp
-    src/armnn/StaticRangeVisitor.hpp
+    src/armnn/StaticRangeStrategy.cpp
+    src/armnn/StaticRangeStrategy.hpp
     src/armnn/SubgraphView.cpp
     src/armnn/SubgraphView.hpp
     src/armnn/SubgraphViewSelector.cpp
@@ -909,7 +910,11 @@ if(BUILD_UNIT_TESTS)
         enable_language(ASM)
         list(APPEND unittest_sources
             src/armnnSerializer/test/ActivationSerializationTests.cpp
+            src/armnnSerializer/test/ComparisonSerializationTests.cpp
+            src/armnnSerializer/test/LstmSerializationTests.cpp
             src/armnnSerializer/test/SerializerTests.cpp
+            src/armnnSerializer/test/SerializerTestUtils.cpp
+            src/armnnSerializer/test/SerializerTestUtils.hpp
             src/armnnDeserializer/test/DeserializeAbs.cpp
             src/armnnDeserializer/test/DeserializeActivation.cpp
             src/armnnDeserializer/test/DeserializeAdd.cpp

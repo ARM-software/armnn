@@ -276,6 +276,12 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "performance improvements but may result in reduced or different precision.",
                  cxxopts::value<bool>(m_ExNetParams.m_EnableFastMath)->default_value("false")->implicit_value("true"))
 
+                ("number-of-threads",
+                 "Assign the number of threads used by the CpuAcc backend. "
+                 "Input value must be between 1 and 64. "
+                 "Default is set to 0 (Backend will decide number of threads to use).",
+                 cxxopts::value<unsigned int>(m_ExNetParams.m_NumberOfThreads)->default_value("0"))
+
                 ("save-cached-network",
                  "Enables saving of the cached network to a file given with the cached-network-filepath option. "
                  "See also --cached-network-filepath",

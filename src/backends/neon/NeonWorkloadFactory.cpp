@@ -51,15 +51,36 @@ const BackendId& NeonWorkloadFactory::GetBackendId() const
     return s_Id;
 }
 
+void NeonWorkloadFactory::SetNumberOfThreads()
+{
+    if (m_ModelContextPtr)
+    {
+        const unsigned int MIN_THREADS = 1;
+        const unsigned int MAX_THREADS = 64;
+
+        // Set the number of threads to be used if the user has set NumberOfThreads param
+        // Only set if within limit or valid input
+        auto modelOptions = dynamic_cast<NeonBackendModelContext*>(m_ModelContextPtr.get());
+        auto numberOfThreads = modelOptions->GetNumberOfThreads();
+
+        if (numberOfThreads != 0 && numberOfThreads >= MIN_THREADS && numberOfThreads <= MAX_THREADS)
+        {
+            arm_compute::Scheduler::get().set_num_threads(numberOfThreads);
+        }
+    }
+}
+
 NeonWorkloadFactory::NeonWorkloadFactory(const std::shared_ptr<NeonMemoryManager>& memoryManager)
     : m_MemoryManager(memoryManager), m_ModelContextPtr(IBackendInternal::IBackendSpecificModelContextPtr{})
 {
+    SetNumberOfThreads();
 }
 
 NeonWorkloadFactory::NeonWorkloadFactory(const std::shared_ptr<NeonMemoryManager>& memoryManager,
                                          const IBackendInternal::IBackendSpecificModelContextPtr& modelContextPtr)
     : m_MemoryManager(memoryManager), m_ModelContextPtr(modelContextPtr)
 {
+    SetNumberOfThreads();
 }
 
 std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateSubTensorHandle(ITensorHandle& parent,

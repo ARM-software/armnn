@@ -99,6 +99,7 @@ struct Params
     bool                            m_EnableFastMath;
     bool                            m_SaveCachedNetwork;
     std::string                     m_CachedNetworkFilePath;
+    unsigned int                    m_NumberOfThreads;
 
     Params()
         : m_ComputeDevices{}
@@ -113,6 +114,7 @@ struct Params
         , m_EnableFastMath(false)
         , m_SaveCachedNetwork(false)
         , m_CachedNetworkFilePath("")
+        , m_NumberOfThreads(0)
     {}
 };
 
@@ -436,7 +438,8 @@ public:
             });
             armnn::BackendOptions cpuAcc("CpuAcc",
             {
-                { "FastMathEnabled", params.m_EnableFastMath }
+                { "FastMathEnabled", params.m_EnableFastMath },
+                { "NumberOfThreads", params.m_NumberOfThreads }
             });
             options.m_ModelOptions.push_back(gpuAcc);
             options.m_ModelOptions.push_back(cpuAcc);

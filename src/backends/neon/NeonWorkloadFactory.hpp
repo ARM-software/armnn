@@ -11,6 +11,8 @@
 #include <aclCommon/BaseMemoryManager.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
+#include <arm_compute/runtime/IScheduler.h>
+
 namespace armnn
 {
 
@@ -255,6 +257,8 @@ public:
                                                             const WorkloadInfo& info) const override;
 
 private:
+    void SetNumberOfThreads();
+
     mutable std::shared_ptr<NeonMemoryManager> m_MemoryManager;
     const IBackendInternal::IBackendSpecificModelContextPtr m_ModelContextPtr;
 };

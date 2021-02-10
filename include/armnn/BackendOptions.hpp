@@ -24,6 +24,7 @@ private:
     struct CheckAllowed
     {
         static const bool value = std::is_same<T, int>::value ||
+                                  std::is_same<T, unsigned int>::value ||
                                   std::is_same<T, float>::value ||
                                   std::is_same<T, bool>::value ||
                                   std::is_same<T, std::string>::value ||
@@ -38,6 +39,7 @@ public:
     public:
         /// Constructors
         explicit Var(int i) : m_Vals(i), m_Type(VarTypes::Integer) {};
+        explicit Var(unsigned int u) : m_Vals(u), m_Type(VarTypes::UnsignedInteger) {};
         explicit Var(float f) : m_Vals(f), m_Type(VarTypes::Float) {};
         explicit Var(bool b) : m_Vals(b), m_Type(VarTypes::Boolean) {};
         explicit Var(const char* s) : m_Vals(s), m_Type(VarTypes::String) {};
@@ -107,12 +109,14 @@ public:
         /// Type getters
         bool IsBool() const { return m_Type == VarTypes::Boolean; }
         bool IsInt() const { return m_Type == VarTypes::Integer; }
+        bool IsUnsignedInt() const { return m_Type == VarTypes::UnsignedInteger; }
         bool IsFloat() const { return m_Type == VarTypes::Float; }
         bool IsString() const { return m_Type == VarTypes::String; }
 
         /// Value getters
         bool AsBool() const { assert(IsBool()); return m_Vals.b; }
         int AsInt() const { assert(IsInt()); return m_Vals.i; }
+        unsigned int AsUnsignedInt() const { assert(IsUnsignedInt()); return m_Vals.u; }
         float AsFloat() const { assert(IsFloat()); return m_Vals.f; }
         std::string AsString() const { assert(IsString()); return m_Vals.s; }
 
@@ -135,6 +139,10 @@ public:
             else if (other.IsInt())
             {
                 func(m_Vals.i, other.m_Vals.i);
+            }
+            else if (other.IsUnsignedInt())
+            {
+                func(m_Vals.u, other.m_Vals.u);
             }
             else if (other.IsFloat())
             {
@@ -163,12 +171,14 @@ public:
             Integer,
             Float,
             String,
+            UnsignedInteger
         };
 
         /// Union of potential type values.
         union Vals
         {
             int i;
+            unsigned int u;
             float f;
             bool b;
             std::string s;
@@ -177,6 +187,7 @@ public:
             ~Vals(){}
 
             explicit Vals(int i) : i(i) {};
+            explicit Vals(unsigned int u) : u(u) {};
             explicit Vals(float f) : f(f) {};
             explicit Vals(bool b) : b(b) {};
             explicit Vals(const char* s) : s(std::string(s)) {}
@@ -195,6 +206,9 @@ public:
         {}
         BackendOption(std::string name, int value)
             : m_Name(name), m_Value(value)
+        {}
+        BackendOption(std::string name, unsigned int value)
+                : m_Name(name), m_Value(value)
         {}
         BackendOption(std::string name, float value)
             : m_Name(name), m_Value(value)

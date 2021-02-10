@@ -17,13 +17,22 @@ bool ParseBool(const armnn::BackendOptions::Var& value, bool defaultValue)
     return defaultValue;
 }
 
+unsigned int ParseUnsignedInt(const armnn::BackendOptions::Var& value, unsigned int defaultValue)
+{
+    if (value.IsUnsignedInt())
+    {
+        return value.AsUnsignedInt();
+    }
+    return defaultValue;
+}
+
 } // namespace anonymous
 
 namespace armnn
 {
 
 NeonBackendModelContext::NeonBackendModelContext(const ModelOptions& modelOptions)
-    : m_IsFastMathEnabled(false)
+    : m_IsFastMathEnabled(false), m_NumberOfThreads(0)
 {
    if (!modelOptions.empty())
    {
@@ -33,6 +42,10 @@ NeonBackendModelContext::NeonBackendModelContext(const ModelOptions& modelOption
            {
                m_IsFastMathEnabled |= ParseBool(value, false);
            }
+           if (name == "NumberOfThreads")
+           {
+               m_NumberOfThreads |= ParseUnsignedInt(value, 0);
+           }
        });
    }
 }
@@ -40,6 +53,11 @@ NeonBackendModelContext::NeonBackendModelContext(const ModelOptions& modelOption
 bool NeonBackendModelContext::IsFastMathEnabled() const
 {
     return m_IsFastMathEnabled;
+}
+
+unsigned int NeonBackendModelContext::GetNumberOfThreads() const
+{
+    return m_NumberOfThreads;
 }
 
 } // namespace armnn

@@ -150,4 +150,40 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsImport")
 
 }
 
+TEST_SUITE("DelegateOptions_CpuAccTests")
+{
+
+TEST_CASE ("ArmnnDelegateModelOptions_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    std::vector<int32_t> tensorShape { 1, 2, 2, 1 };
+    std::vector<float> inputData = { 1, 2, 3, 4 };
+    std::vector<float> divData = { 2, 2, 3, 4 };
+    std::vector<float> expectedResult = { 1, 2, 2, 2 };
+
+    unsigned int numberOfThreads = 2;
+
+    armnn::ModelOptions modelOptions;
+    armnn::BackendOptions cpuAcc("CpuAcc",
+                                 {
+                                         { "FastMathEnabled", true },
+                                         { "NumberOfThreads", numberOfThreads }
+                                 });
+    modelOptions.push_back(cpuAcc);
+
+    armnn::OptimizerOptions optimizerOptions(false, false, false, false, modelOptions);
+    armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
+
+    DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
+                              backends,
+                              tensorShape,
+                              inputData,
+                              inputData,
+                              divData,
+                              expectedResult,
+                              delegateOptions);
+}
+
+}
+
 } // namespace armnnDelegate

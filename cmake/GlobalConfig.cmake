@@ -321,6 +321,18 @@ endif()
 
 # ARM Compute OpenCL backend
 if(ARMCOMPUTECL)
+    # verify we have a valid flatbuffers include path
+    find_path(FLATBUFFERS_INCLUDE_PATH flatbuffers/flatbuffers.h
+              HINTS ${FLATBUFFERS_ROOT}/include /usr/local/include /usr/include)
+
+    message(STATUS "Flatbuffers headers are located at: ${FLATBUFFERS_INCLUDE_PATH}")
+
+    find_library(FLATBUFFERS_LIBRARY
+                 NAMES libflatbuffers.a flatbuffers
+                 HINTS ${FLATBUFFERS_ROOT}/lib /usr/local/lib /usr/lib)
+
+    message(STATUS "Flatbuffers library located at: ${FLATBUFFERS_LIBRARY}")
+
     # Always use Arm compute library OpenCL headers
     find_path(OPENCL_INCLUDE CL/cl2.hpp
               PATHS ${ARMCOMPUTE_ROOT}/include

@@ -3643,8 +3643,6 @@ void ReduceQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
     const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
-    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
-
     std::vector<DataType> supportedTypes =
     {
         DataType::BFloat16,

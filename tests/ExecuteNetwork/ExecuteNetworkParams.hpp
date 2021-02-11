@@ -46,6 +46,7 @@ struct ExecuteNetworkParams
     double                        m_ThresholdTime;
     int                           m_TuningLevel;
     std::string                   m_TuningPath;
+    std::string                   m_MLGOTuningFilePath;
 
     // Ensures that the parameters for ExecuteNetwork fit together
     void ValidateParams();

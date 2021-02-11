@@ -125,6 +125,11 @@ TfLiteDelegate* tflite_plugin_create_delegate(char** options_keys,
                 armnn::BackendOptions option("GpuAcc", {{"TuningLevel", atoi(options_values[i])}});
                 options.AddBackendOption(option);
             }
+            else if (std::string(options_keys[i]) == std::string("gpu-mlgo-tuning-file"))
+            {
+                armnn::BackendOptions option("GpuAcc", {{"MLGOTuningFilePath", std::string(options_values[i])}});
+                options.AddBackendOption(option);
+            }
             else if (std::string(options_keys[i]) == std::string("gpu-tuning-file"))
             {
                 armnn::BackendOptions option("GpuAcc", {{"TuningFile", std::string(options_values[i])}});

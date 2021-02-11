@@ -100,6 +100,8 @@ struct Params
     bool                            m_SaveCachedNetwork;
     std::string                     m_CachedNetworkFilePath;
     unsigned int                    m_NumberOfThreads;
+    std::string                     m_MLGOTuningFilePath;
+
 
     Params()
         : m_ComputeDevices{}
@@ -115,6 +117,7 @@ struct Params
         , m_SaveCachedNetwork(false)
         , m_CachedNetworkFilePath("")
         , m_NumberOfThreads(0)
+        , m_MLGOTuningFilePath("")
     {}
 };
 
@@ -434,8 +437,10 @@ public:
             {
                 { "FastMathEnabled", params.m_EnableFastMath },
                 { "SaveCachedNetwork", params.m_SaveCachedNetwork },
-                { "CachedNetworkFilePath", params.m_CachedNetworkFilePath }
+                { "CachedNetworkFilePath", params.m_CachedNetworkFilePath },
+                { "MLGOTuningFilePath", params.m_MLGOTuningFilePath }
             });
+
             armnn::BackendOptions cpuAcc("CpuAcc",
             {
                 { "FastMathEnabled", params.m_EnableFastMath },

@@ -310,7 +310,11 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
 
                 ("tuning-path",
                  "Path to tuning file. Enables use of CL tuning",
-                 cxxopts::value<std::string>(m_ExNetParams.m_TuningPath));
+                 cxxopts::value<std::string>(m_ExNetParams.m_TuningPath))
+
+                ("MLGOTuningFilePath",
+                "Path to tuning file. Enables use of CL MLGO tuning",
+                cxxopts::value<std::string>(m_ExNetParams.m_MLGOTuningFilePath));
 
         m_CxxOptions.add_options("d) Profiling")
                 ("a,enable-external-profiling",
@@ -427,7 +431,8 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
                 {
                     {"TuningLevel", m_ExNetParams.m_TuningLevel},
                     {"TuningFile", m_ExNetParams.m_TuningPath.c_str()},
-                    {"KernelProfilingEnabled", m_ExNetParams.m_EnableProfiling}
+                    {"KernelProfilingEnabled", m_ExNetParams.m_EnableProfiling},
+                    {"MLGOTuningFilePath", m_ExNetParams.m_MLGOTuningFilePath}
                 }
             }
         );

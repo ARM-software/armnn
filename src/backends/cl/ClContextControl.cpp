@@ -28,8 +28,10 @@ namespace armnn
 {
 
 ClContextControl::ClContextControl(arm_compute::CLTuner *tuner,
+                                   arm_compute::CLGEMMHeuristicsHandle* heuristicsHandle,
                                    bool profilingEnabled)
     : m_Tuner(tuner)
+    , m_HeuristicsHandle(heuristicsHandle)
     , m_ProfilingEnabled(profilingEnabled)
 {
     // Ignore m_ProfilingEnabled if unused to avoid compiling problems when ArmCompute is disabled.
@@ -156,7 +158,7 @@ void ClContextControl::DoLoadOpenClRuntime(bool updateTunedParameters)
 
     // Note the first argument (path to cl source code) will be ignored as they should be embedded in the armcompute.
     arm_compute::CLKernelLibrary::get().init(".", context, device);
-    arm_compute::CLScheduler::get().init(context, commandQueue, device, m_Tuner);
+    arm_compute::CLScheduler::get().init(context, commandQueue, device, m_Tuner, m_HeuristicsHandle);
 }
 
 void ClContextControl::ClearClCache()

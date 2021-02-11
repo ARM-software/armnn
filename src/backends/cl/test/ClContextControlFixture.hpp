@@ -13,7 +13,7 @@ struct ClContextControlFixtureBase
 {
     // Initialising ClContextControl to ensure OpenCL is loaded correctly for each test case
     ClContextControlFixtureBase()
-        : m_ClContextControl(nullptr, ProfilingEnabled) {}
+        : m_ClContextControl(nullptr, nullptr, ProfilingEnabled) {}
 
     armnn::ClContextControl m_ClContextControl;
 };

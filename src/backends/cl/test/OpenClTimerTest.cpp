@@ -32,7 +32,7 @@ struct OpenClFixture
     // Initialising ClContextControl to ensure OpenCL is loaded correctly for each test case.
     // NOTE: Profiling needs to be enabled in ClContextControl to be able to obtain execution
     // times from OpenClTimer.
-    OpenClFixture() : m_ClContextControl(nullptr, true) {}
+    OpenClFixture() : m_ClContextControl(nullptr, nullptr, true) {}
     ~OpenClFixture() {}
 
     ClContextControl m_ClContextControl;

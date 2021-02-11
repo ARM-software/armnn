@@ -9,6 +9,7 @@
 #include <mutex>
 
 #include <arm_compute/runtime/CL/CLTuner.h>
+#include <arm_compute/runtime/CL/CLGEMMHeuristicsHandle.h>
 
 namespace armnn
 {
@@ -35,6 +36,10 @@ private:
 
     std::unique_ptr<arm_compute::CLTuner> m_Tuner;
     std::string m_TuningFile;
+
+protected:
+    arm_compute::CLGEMMHeuristicsHandle m_MLGOTuner;
+    std::string m_MLGOTuningFile;
 };
 
 } // namespace armnn

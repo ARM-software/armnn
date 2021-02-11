@@ -7,6 +7,7 @@
 #include "armnn/IRuntime.hpp"
 
 #include <arm_compute/runtime/CL/CLTuner.h>
+#include <arm_compute/runtime/CL/CLGEMMHeuristicsHandle.h>
 
 namespace armnn
 {
@@ -17,6 +18,7 @@ class ClContextControl
 public:
 
     ClContextControl(arm_compute::CLTuner* = nullptr,
+                     arm_compute::CLGEMMHeuristicsHandle* = nullptr,
                      bool profilingEnabled = false);
 
     virtual ~ClContextControl();
@@ -35,6 +37,7 @@ private:
     void DoLoadOpenClRuntime(bool updateTunedParameters);
 
     arm_compute::CLTuner* m_Tuner;
+    arm_compute::CLGEMMHeuristicsHandle* m_HeuristicsHandle;
 
     bool m_ProfilingEnabled;
 };
@@ -51,6 +54,7 @@ public:
     TuningLevel m_TuningLevel;
 
     arm_compute::CLTuner m_Tuner;
+    arm_compute::CLGEMMHeuristicsHandle m_HeuristicsHandle;
 };
 
 } // namespace armnn

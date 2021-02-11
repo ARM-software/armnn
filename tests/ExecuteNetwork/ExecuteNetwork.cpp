@@ -309,6 +309,7 @@ int MainImpl(const ExecuteNetworkParams& params,
         inferenceModelParams.m_SaveCachedNetwork              = params.m_SaveCachedNetwork;
         inferenceModelParams.m_CachedNetworkFilePath          = params.m_CachedNetworkFilePath;
         inferenceModelParams.m_NumberOfThreads                = params.m_NumberOfThreads;
+        inferenceModelParams.m_MLGOTuningFilePath             = params.m_MLGOTuningFilePath;
 
         for(const std::string& inputName: params.m_InputNames)
         {

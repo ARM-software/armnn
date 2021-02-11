@@ -13,7 +13,7 @@ namespace armnnCaffeParser
 #define STRINGIFY_MACRO(s) #s
 
 // CaffeParser version components
-#define CAFFE_PARSER_MAJOR_VERSION 23
+#define CAFFE_PARSER_MAJOR_VERSION 24
 #define CAFFE_PARSER_MINOR_VERSION 0
 #define CAFFE_PARSER_PATCH_VERSION 0
 

@@ -13,7 +13,7 @@ namespace armnnTfLiteParser
 #define STRINGIFY_MACRO(s) #s
 
 // TfLiteParser version components
-#define TFLITE_PARSER_MAJOR_VERSION 23
+#define TFLITE_PARSER_MAJOR_VERSION 24
 #define TFLITE_PARSER_MINOR_VERSION 0
 #define TFLITE_PARSER_PATCH_VERSION 0
 

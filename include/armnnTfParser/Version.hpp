@@ -13,7 +13,7 @@ namespace armnnTfParser
 #define STRINGIFY_MACRO(s) #s
 
 // tfParser version components
-#define TF_PARSER_MAJOR_VERSION 23
+#define TF_PARSER_MAJOR_VERSION 24
 #define TF_PARSER_MINOR_VERSION 0
 #define TF_PARSER_PATCH_VERSION 0
 

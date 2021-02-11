@@ -239,9 +239,9 @@ adb push libarmnn.so /data/local/tmp/
     adb push libtimelineDecoder.so /data/local/tmp/
 adb push UnitTests /data/local/tmp/
 adb push $NDK/sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_shared.so /data/local/tmp/
-adb push $HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so /data/local/tmp/libprotobuf.so.23.0.0
-adb shell 'ln -s libprotobuf.so.23.0.0 /data/local/tmp/libprotobuf.so.23'
-adb shell 'ln -s libprotobuf.so.23.0.0 /data/local/tmp/libprotobuf.so'
+adb push $HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so /data/local/tmp/libprotobuf.so.24.0.0
+adb shell 'ln -s libprotobuf.so.24.0.0 /data/local/tmp/libprotobuf.so.24'
+adb shell 'ln -s libprotobuf.so.24.0.0 /data/local/tmp/libprotobuf.so'
 ```
 
 * Push the files needed for the unit tests (they are a mix of files, directories and symbolic links):

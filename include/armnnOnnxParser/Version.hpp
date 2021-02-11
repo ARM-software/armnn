@@ -13,7 +13,7 @@ namespace armnnOnnxParser
 #define STRINGIFY_MACRO(s) #s
 
 // OnnxParser version components
-#define ONNX_PARSER_MAJOR_VERSION 23
+#define ONNX_PARSER_MAJOR_VERSION 24
 #define ONNX_PARSER_MINOR_VERSION 0
 #define ONNX_PARSER_PATCH_VERSION 0
 

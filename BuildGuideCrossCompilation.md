@@ -222,8 +222,8 @@ cmake .. \
 -DFLATC_DIR=$HOME/flatbuffers-1.12.0/build \
 -DPROTOBUF_ROOT=$HOME/google/x86_64_pb_install \
 -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/x86_64_pb_install/ \
--DPROTOBUF_LIBRARY_DEBUG=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.23.0.0 \
--DPROTOBUF_LIBRARY_RELEASE=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.23.0.0
+-DPROTOBUF_LIBRARY_DEBUG=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.24.0.0 \
+-DPROTOBUF_LIBRARY_RELEASE=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.24.0.0
 ```
 
 * If you want to include standalone sample dynamic backend tests, add the argument to enable the tests and the dynamic backend path to the CMake command:
@@ -271,10 +271,10 @@ cd build/
 export LD_LIBRARY_PATH=<current_working_directory>
 ```
 
-* Create a symbolic link to libprotobuf.so.23.0.0:
+* Create a symbolic link to libprotobuf.so.24.0.0:
 
 ```bash
-ln -s libprotobuf.so.23.0.0 ./libprotobuf.so.23
+ln -s libprotobuf.so.24.0.0 ./libprotobuf.so.24
 ```
 
 * Run the UnitTests:
@@ -330,7 +330,7 @@ sudo ./b2 clean
 ### Missing libz.so.1
 * When compiling armNN:
 ```bash
-/usr/lib/gcc-cross/aarch64-linux-gnu/5/../../../../aarch64-linux-gnu/bin/ld: warning: libz.so.1, needed by /home/<username>/armNN/usr/lib64/libprotobuf.so.23.0.0, not found (try using -rpath or -rpath-link)
+/usr/lib/gcc-cross/aarch64-linux-gnu/5/../../../../aarch64-linux-gnu/bin/ld: warning: libz.so.1, needed by /home/<username>/armNN/usr/lib64/libprotobuf.so.24.0.0, not found (try using -rpath or -rpath-link)
 ```
 
 * Missing arm64 libraries for libz.so.1, these can be added by adding a second architecture to dpkg and explicitly installing them:

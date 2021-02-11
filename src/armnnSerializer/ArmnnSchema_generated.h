@@ -9207,18 +9207,10 @@ inline flatbuffers::Offset<ReduceLayer> CreateReduceLayer(
 struct ReduceDescriptor FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef ReduceDescriptorBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_TARGETHEIGHT = 4,
-    VT_TARGETWIDTH = 6,
-    VT_KEEPDIMS = 8,
-    VT_AXIS = 10,
-    VT_REDUCEOPERATION = 12
+    VT_KEEPDIMS = 4,
+    VT_AXIS = 6,
+    VT_REDUCEOPERATION = 8
   };
-  uint32_t targetHeight() const {
-    return GetField<uint32_t>(VT_TARGETHEIGHT, 0);
-  }
-  uint32_t targetWidth() const {
-    return GetField<uint32_t>(VT_TARGETWIDTH, 0);
-  }
   bool keepDims() const {
     return GetField<uint8_t>(VT_KEEPDIMS, 0) != 0;
   }
@@ -9230,8 +9222,6 @@ struct ReduceDescriptor FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<uint32_t>(verifier, VT_TARGETHEIGHT) &&
-           VerifyField<uint32_t>(verifier, VT_TARGETWIDTH) &&
            VerifyField<uint8_t>(verifier, VT_KEEPDIMS) &&
            VerifyOffset(verifier, VT_AXIS) &&
            verifier.VerifyVector(axis()) &&
@@ -9244,12 +9234,6 @@ struct ReduceDescriptorBuilder {
   typedef ReduceDescriptor Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_targetHeight(uint32_t targetHeight) {
-    fbb_.AddElement<uint32_t>(ReduceDescriptor::VT_TARGETHEIGHT, targetHeight, 0);
-  }
-  void add_targetWidth(uint32_t targetWidth) {
-    fbb_.AddElement<uint32_t>(ReduceDescriptor::VT_TARGETWIDTH, targetWidth, 0);
-  }
   void add_keepDims(bool keepDims) {
     fbb_.AddElement<uint8_t>(ReduceDescriptor::VT_KEEPDIMS, static_cast<uint8_t>(keepDims), 0);
   }
@@ -9273,15 +9257,11 @@ struct ReduceDescriptorBuilder {
 
 inline flatbuffers::Offset<ReduceDescriptor> CreateReduceDescriptor(
     flatbuffers::FlatBufferBuilder &_fbb,
-    uint32_t targetHeight = 0,
-    uint32_t targetWidth = 0,
     bool keepDims = false,
     flatbuffers::Offset<flatbuffers::Vector<uint32_t>> axis = 0,
     armnnSerializer::ReduceOperation reduceOperation = armnnSerializer::ReduceOperation_Sum) {
   ReduceDescriptorBuilder builder_(_fbb);
   builder_.add_axis(axis);
-  builder_.add_targetWidth(targetWidth);
-  builder_.add_targetHeight(targetHeight);
   builder_.add_reduceOperation(reduceOperation);
   builder_.add_keepDims(keepDims);
   return builder_.Finish();
@@ -9289,16 +9269,12 @@ inline flatbuffers::Offset<ReduceDescriptor> CreateReduceDescriptor(
 
 inline flatbuffers::Offset<ReduceDescriptor> CreateReduceDescriptorDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    uint32_t targetHeight = 0,
-    uint32_t targetWidth = 0,
     bool keepDims = false,
     const std::vector<uint32_t> *axis = nullptr,
     armnnSerializer::ReduceOperation reduceOperation = armnnSerializer::ReduceOperation_Sum) {
   auto axis__ = axis ? _fbb.CreateVector<uint32_t>(*axis) : 0;
   return armnnSerializer::CreateReduceDescriptor(
       _fbb,
-      targetHeight,
-      targetWidth,
       keepDims,
       axis__,
       reduceOperation);

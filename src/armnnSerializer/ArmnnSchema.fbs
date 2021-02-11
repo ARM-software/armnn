@@ -895,8 +895,6 @@ table ReduceLayer {
 }
 
 table ReduceDescriptor {
-    targetHeight:uint;
-    targetWidth:uint;
     keepDims:bool = false;
     axis:[uint];
     reduceOperation:ReduceOperation = Sum;

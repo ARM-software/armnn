@@ -90,7 +90,7 @@ struct ReduceMaxFixture : public ParserFlatbuffersFixture
 
 struct SimpleReduceMaxFixture : public ReduceMaxFixture
 {
-    SimpleReduceMaxFixture() : ReduceMaxFixture("[ 1, 1, 2, 3 ]", "[ 1, 1, 1, 3 ]", "[ 1 ]", "[ 2 ]") {}
+    SimpleReduceMaxFixture() : ReduceMaxFixture("[ 1, 1, 2, 3 ]", "[ 1, 1, 1, 3 ]", "[ 1 ]", "[  2,0,0,0 ]") {}
 };
 
 BOOST_FIXTURE_TEST_CASE(ParseReduceMax, SimpleReduceMaxFixture)
@@ -179,7 +179,7 @@ struct ReduceMinFixture : public ParserFlatbuffersFixture
 
 struct SimpleReduceMinFixture : public ReduceMinFixture
 {
-    SimpleReduceMinFixture() : ReduceMinFixture("[ 1, 1, 2, 3 ]", "[ 1, 1, 1, 3 ]", "[ 1 ]", "[ 2 ]") {}
+    SimpleReduceMinFixture() : ReduceMinFixture("[ 1, 1, 2, 3 ]", "[ 1, 1, 1, 3 ]", "[ 1 ]", "[ 2, 0, 0, 0 ]") {}
 };
 
 BOOST_FIXTURE_TEST_CASE(ParseReduceMin, SimpleReduceMinFixture)

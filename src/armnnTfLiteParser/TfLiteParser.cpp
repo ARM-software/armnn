@@ -3091,19 +3091,24 @@ void TfLiteParserImpl::ParseReduce(size_t subgraphIndex, size_t operatorIndex, R
 
     armnn::TensorInfo inputTensorInfo0 = ToTensorInfo(inputs[0]);
     armnn::TensorInfo inputTensorInfo1 = ToTensorInfo(inputs[1]);
-    TensorShape input0Shape = inputTensorInfo0.GetShape();
 
     ReduceDescriptor desc;
-
     BufferRawPtr axisBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
     // Get const axis value from model and set it to descriptor.
     if (axisBufferPtr != nullptr)
     {
-        for (uint32_t i = 0; i < inputTensorInfo1.GetNumElements(); ++i)
-        {
-            desc.m_vAxis.push_back(armnnUtils::GetUnsignedAxis(inputTensorInfo0.GetNumDimensions(),
-                                                               axisBufferPtr->data.data()[i]));
-        }
+        std::vector<int32_t> axisData(inputTensorInfo1.GetNumElements());
+        ::memcpy(axisData.data(), axisBufferPtr->data.data(), inputTensorInfo1.GetNumBytes());
+
+        // Convert the axis to unsigned int and remove duplicates.
+        auto rank = static_cast<int32_t>(inputTensorInfo0.GetNumDimensions());
+        std::set<unsigned int> uniqueAxis;
+        std::transform(axisData.begin(),
+                       axisData.end(),
+                       std::inserter(uniqueAxis, uniqueAxis.begin()),
+                       [rank](int i)->unsigned int{
+                               return static_cast<uint32_t>(((i + rank) % rank)); });
+        desc.m_vAxis.assign(uniqueAxis.begin(), uniqueAxis.end());
     }
     else
     {
@@ -3113,8 +3118,6 @@ void TfLiteParserImpl::ParseReduce(size_t subgraphIndex, size_t operatorIndex, R
         }
     }
 
-    desc.m_TargetHeight    = input0Shape[1];
-    desc.m_TargetWidth     = input0Shape[2];
     desc.m_KeepDims        = options->keep_dims;
     desc.m_ReduceOperation = reduceOperation;
 

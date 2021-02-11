@@ -90,7 +90,7 @@ struct SumFixture : public ParserFlatbuffersFixture
 
 struct SimpleSumFixture : public SumFixture
 {
-    SimpleSumFixture() : SumFixture("[ 1, 3, 2, 4 ]", "[ 1, 1, 1, 4 ]", "[ 2 ]", "[ 1, 2 ]") {}
+    SimpleSumFixture() : SumFixture("[ 1, 3, 2, 4 ]", "[ 1, 1, 1, 4 ]", "[ 2 ]", "[ 1, 0, 0, 0,  2, 0, 0, 0 ]") {}
 };
 
 BOOST_FIXTURE_TEST_CASE(ParseSum, SimpleSumFixture)

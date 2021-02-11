@@ -2118,8 +2118,6 @@ void IDeserializer::DeserializerImpl::ParseReduce(GraphPtr graph, unsigned int l
     auto flatBufferAxis = fbDescriptor->axis();
 
     armnn::ReduceDescriptor descriptor;
-    descriptor.m_TargetHeight = fbDescriptor->targetHeight();
-    descriptor.m_TargetWidth  = fbDescriptor->targetWidth();
     descriptor.m_KeepDims     = fbDescriptor->keepDims();
     descriptor.m_vAxis = std::vector<unsigned int>(flatBufferAxis->begin(), flatBufferAxis->end());
     descriptor.m_ReduceOperation = ToReduceOperation(fbDescriptor->reduceOperation());

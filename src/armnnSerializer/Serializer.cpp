@@ -911,8 +911,6 @@ void SerializerVisitor::VisitReduceLayer(const armnn::IConnectableLayer* layer,
 {
     auto fbReduceBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Reduce);
     auto fbDescriptor = CreateReduceDescriptor(m_flatBufferBuilder,
-                                               reduceDescriptor.m_TargetHeight,
-                                               reduceDescriptor.m_TargetWidth,
                                                reduceDescriptor.m_KeepDims,
                                                m_flatBufferBuilder.CreateVector(reduceDescriptor.m_vAxis),
                                                GetFlatBufferReduceOperation(reduceDescriptor.m_ReduceOperation));

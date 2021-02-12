@@ -1668,6 +1668,14 @@ flatbuffers::Offset<TensorInfo>  SerializerStrategy::CreateTensorInfo(const armn
         shape.push_back(tensorInfo.GetShape()[dim]);
     }
 
+    std::vector<bool> specificity;
+    // This assumes that the TensorShape constructors have ensured that the size of m_DimensionsSpecificity
+    // matches the size of dimensions.
+    for(unsigned int dim = 0; dim < tensorInfo.GetShape().GetNumDimensions(); ++dim)
+    {
+        specificity.push_back(tensorInfo.GetShape().GetDimensionSpecificity(dim));
+    }
+
     if (tensorInfo.HasPerAxisQuantization())
     {
         // Create FlatBuffer TensorInfo
@@ -1680,7 +1688,8 @@ flatbuffers::Offset<TensorInfo>  SerializerStrategy::CreateTensorInfo(const armn
                                          m_flatBufferBuilder.CreateVector(tensorInfo.GetQuantizationScales()),
                                          tensorInfo.GetQuantizationDim().value(),
                                          static_cast<unsigned int>
-                                         (tensorInfo.GetShape().GetDimensionality()));
+                                         (tensorInfo.GetShape().GetDimensionality()),
+                                         m_flatBufferBuilder.CreateVector(specificity));
         return flatBufferTensorInfo;
     }
 
@@ -1693,7 +1702,8 @@ flatbuffers::Offset<TensorInfo>  SerializerStrategy::CreateTensorInfo(const armn
                                                              0,
                                                              0,
                                                              static_cast<unsigned int>
-                                                             (tensorInfo.GetShape().GetDimensionality()));
+                                                             (tensorInfo.GetShape().GetDimensionality()),
+                                                             m_flatBufferBuilder.CreateVector(specificity));
     return flatBufferTensorInfo;
 }
 

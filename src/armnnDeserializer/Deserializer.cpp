@@ -608,45 +608,63 @@ armnn::TensorInfo ToTensorInfo(TensorRawPtr tensorPtr)
         }
     }
 
+    float quantizationScale = tensorPtr->quantizationScale();
+    int32_t quantizationOffset = tensorPtr->quantizationOffset();
+
     if (tensorPtr->dimensionality() == static_cast<unsigned int>(Dimensionality::Scalar))
     {
-        float quantizationScale = tensorPtr->quantizationScale();
-        int32_t quantizationOffset = tensorPtr->quantizationOffset();
-
-        return armnn::TensorInfo(armnn::TensorShape{armnn::Dimensionality::Scalar},
+        return armnn::TensorInfo(TensorShape{armnn::Dimensionality::Scalar},
                                  type,
                                  quantizationScale,
                                  quantizationOffset);
+    }
+    else if (tensorPtr->dimensionality() == static_cast<unsigned int>(Dimensionality::NotSpecified))
+    {
+        armnn::TensorInfo result(TensorShape{Dimensionality::NotSpecified},
+                                 type,
+                                 quantizationScale,
+                                 quantizationOffset);
+        return result;
     }
 
     auto dimensions = tensorPtr->dimensions();
     unsigned int size = dimensions->size();
     std::vector<unsigned int> outputDims(dimensions->begin(), dimensions->begin() + size);
+    bool dimensionsSpecificity[armnn::MaxNumOfTensorDimensions];
+    std::fill_n(dimensionsSpecificity, armnn::MaxNumOfTensorDimensions, true);
+    // For backwards compatibility check if the dimensionSpecificity vector is present first.
+    // The default is to have dimensionSpecificity set to all true's anyway.
+    if (tensorPtr->dimensionSpecificity() != nullptr)
+    {
+        auto dimensionSpecificity = tensorPtr->dimensionSpecificity();
+        size = dimensionSpecificity->size();
+        for (unsigned int i = 0; i < size; ++i)
+        {
+            dimensionsSpecificity[i] = dimensionSpecificity->Get(i);
+        }
+    }
+    // Construct a TensorShape
+    TensorShape shape(size, outputDims.data(), dimensionsSpecificity);
 
     auto quantizationScales = tensorPtr->quantizationScales();
-
     if (quantizationScales)
     {
         unsigned int quantizationScalesSize = quantizationScales->size();
         std::vector<float> scales(quantizationScales->begin(), quantizationScales->begin() + quantizationScalesSize);
         unsigned int quantizationDim = tensorPtr->quantizationDim();
-        armnn::TensorInfo result(size,
-                                 outputDims.data(),
+        armnn::TensorInfo result(shape,
                                  type,
                                  scales,
                                  quantizationDim);
         return result;
     }
 
-    float quantizationScale = tensorPtr->quantizationScale();
-    int32_t quantizationOffset = tensorPtr->quantizationOffset();
-
     // two statements (on purpose) for easier debugging:
-    armnn::TensorInfo result(size,
-                             outputDims.data(),
+    armnn::TensorInfo result(shape,
                              type,
                              quantizationScale,
                              quantizationOffset);
+    
     return result;
 }
 

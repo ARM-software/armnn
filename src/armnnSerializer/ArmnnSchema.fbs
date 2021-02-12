@@ -67,6 +67,7 @@ table TensorInfo {
     quantizationScales:[float];
     quantizationDim:uint;
     dimensionality:uint = 1;
+    dimensionSpecificity:[bool];
 }
 
 struct Connection {

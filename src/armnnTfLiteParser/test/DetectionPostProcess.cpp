@@ -241,8 +241,7 @@ BOOST_FIXTURE_TEST_CASE(DetectionPostProcessGraphStructureTest, ParseDetectionPo
 
     auto optimized = Optimize(*network, { armnn::Compute::CpuRef }, m_Runtime->GetDeviceSpec());
 
-    auto optimizedNetwork = armnn::PolymorphicDowncast<armnn::OptimizedNetwork*>(optimized.get());
-    auto graph = optimizedNetwork->GetGraph();
+    armnn::Graph& graph = GetGraphForTesting(optimized.get());
 
     // Check the number of layers in the graph
     BOOST_TEST((graph.GetNumInputs() == 2));

@@ -39,7 +39,9 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateGpuDeviceSupportLayerNoFallback)
     // validate workloads
     armnn::ClWorkloadFactory fact =
         ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
-    for (auto&& layer : static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph())
+
+    const armnn::Graph& theGraph = GetGraphForTesting(optNet.get());
+    for (auto&& layer : theGraph)
     {
         BOOST_CHECK(layer->GetBackendId() == armnn::Compute::GpuAcc);
         BOOST_CHECK_NO_THROW(
@@ -59,17 +61,17 @@ BOOST_AUTO_TEST_CASE(FP16TurboModeTestOnGpuAcc)
     // if there are inverse conversion layers remove them with optimization
     // at the moment FloorLayer is not supported in Fp16 so it rolls back to Fp32
     // and inverse conversion layers are removed by the optimizer
-    armnn::Network net;
+    armnn::INetworkPtr net(armnn::INetwork::Create());
 
     // Defines layers.
-    auto input = net.AddInputLayer(0, "input layer");
+    auto input = net->AddInputLayer(0, "input layer");
     // ReLu1
     armnn::ActivationDescriptor activation1Descriptor;
     activation1Descriptor.m_Function = armnn::ActivationFunction::BoundedReLu;
     activation1Descriptor.m_A = 1.f;
     activation1Descriptor.m_B = -1.f;
-    auto activation = net.AddActivationLayer(activation1Descriptor, "activation layer");
-    auto output = net.AddOutputLayer(0, "output layer");
+    auto activation = net->AddActivationLayer(activation1Descriptor, "activation layer");
+    auto output = net->AddOutputLayer(0, "output layer");
 
     // Connects layers.
     input->GetOutputSlot(0).Connect(activation->GetInputSlot(0));
@@ -89,9 +91,9 @@ BOOST_AUTO_TEST_CASE(FP16TurboModeTestOnGpuAcc)
     optimizerOptions.m_ReduceFp32ToFp16 = true;
 
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(
-            net, backends, runtime->GetDeviceSpec(), optimizerOptions);
+            *net, backends, runtime->GetDeviceSpec(), optimizerOptions);
 
-    const armnn::Graph& graph = static_cast<armnn::OptimizedNetwork*>(optimizedNet.get())->GetGraph();
+    const armnn::Graph& graph = GetGraphForTesting(optimizedNet.get());
 
     // Tests that all layers are present in the graph.
     BOOST_TEST(graph.GetNumLayers() == 5);
@@ -127,7 +129,7 @@ BOOST_AUTO_TEST_CASE(FastMathEnabledTestOnGpuAcc)
 
     BOOST_CHECK(optimizedNet);
 
-    auto modelOptionsOut = static_cast<armnn::OptimizedNetwork*>(optimizedNet.get())->GetModelOptions();
+    auto modelOptionsOut = GetModelOptionsForTesting(optimizedNet.get());
 
     BOOST_TEST(modelOptionsOut.size() == 1);
     BOOST_TEST(modelOptionsOut[0].GetOption(0).GetName() == "FastMathEnabled");

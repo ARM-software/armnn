@@ -33,6 +33,70 @@ const float g_SymmS8QuantizationBase  = 127.0f;
 const float g_SymmS16QuantizationBase = 32767.0f;
 const float g_TestTolerance = 0.000001f;
 
+class TestConnectionPreservation : public LayerVisitorBase<VisitorNoThrowPolicy>
+{
+public:
+    TestConnectionPreservation(INetwork* network)
+        : LayerVisitorBase<VisitorNoThrowPolicy>()
+        , m_Network(network)
+    {}
+
+    void VisitAdditionLayer(const IConnectableLayer* layer, const char*) override
+    {
+        CheckLayerName(layer->GetInputSlot(0).GetConnection()->GetOwningLayerGuid(), "reLU1");
+        CheckLayerName(layer->GetInputSlot(1).GetConnection()->GetOwningLayerGuid(), "reLU2");
+    }
+
+    void CheckLayerName(LayerGuid guid, std::string expectedName)
+    {
+        auto graph = m_Network->pNetworkImpl->GetGraph();
+        bool guidFound = false;
+        for (Layer* layer : graph)
+        {
+            if (layer->GetGuid() == guid)
+            {
+                BOOST_CHECK_EQUAL(layer->GetName(), expectedName.c_str());
+                guidFound = true;
+                break;
+            }
+        }
+        if (!guidFound)
+        {
+            BOOST_FAIL("No layer matching the GUID was found");
+        }
+    }
+
+private:
+    INetwork* m_Network;
+};
+
+void VisitLayersTopologically(const INetwork* inputNetwork, IStrategy& visitor)
+{
+    auto graph = inputNetwork->pNetworkImpl->GetGraph().TopologicalSort();
+
+    ApplyStrategyToLayers(graph, visitor);
+}
+
+TensorInfo GetInputTensorInfo(const INetwork* network)
+{
+    for (auto&& inputLayer : network->pNetworkImpl->GetGraph().GetInputLayers())
+    {
+        ARMNN_ASSERT_MSG(inputLayer->GetNumOutputSlots() == 1, "Input layer should have exactly 1 output slot");
+        return inputLayer->GetOutputSlot(0).GetTensorInfo();
+    }
+    throw InvalidArgumentException("Network has no input layers");
+}
+
+TensorInfo GetInputTensorInfo(const NetworkImpl* network)
+{
+    for (auto&& inputLayer : network->GetGraph().GetInputLayers())
+    {
+        ARMNN_ASSERT_MSG(inputLayer->GetNumOutputSlots() == 1, "Input layer should have exactly 1 output slot");
+        return inputLayer->GetOutputSlot(0).GetTensorInfo();
+    }
+    throw InvalidArgumentException("Network has no input layers");
+}
+
 BOOST_AUTO_TEST_SUITE(Quantizer)
 
 class TestQuantization : public IStrategy
@@ -473,14 +537,6 @@ private:
     QuantizerOptions m_QuantizerOptions;
 };
 
-void VisitLayersTopologically(const INetwork* inputNetwork, IStrategy& strategy)
-{
-    auto network = PolymorphicDowncast<const Network*>(inputNetwork);
-    auto graph = network->GetGraph().TopologicalSort();
-
-    ApplyStrategyToLayers(graph, strategy);
-}
-
 void TestNetwork(INetwork* network, const TensorShape inShape, const TensorShape outShape)
 {
     const QuantizerOptions qAsymmU8Options(DataType::QAsymmU8);
@@ -596,21 +652,11 @@ INetworkPtr CreateNetworkWithInputOutputLayers()
     return network;
 }
 
-TensorInfo GetInputTensorInfo(const Network* network)
-{
-    for (auto&& inputLayer : network->GetGraph().GetInputLayers())
-    {
-        ARMNN_ASSERT_MSG(inputLayer->GetNumOutputSlots() == 1, "Input layer should have exactly 1 output slot");
-        return inputLayer->GetOutputSlot(0).GetTensorInfo();
-    }
-    throw InvalidArgumentException("Network has no input layers");
-}
-
 BOOST_AUTO_TEST_CASE(InputOutputLayerDynamicQuant)
 {
     INetworkPtr network = CreateNetworkWithInputOutputLayers();
 
-    armnn::TensorInfo tensorInfo = GetInputTensorInfo(PolymorphicDowncast<const Network*>(network.get()));
+    armnn::TensorInfo tensorInfo = GetInputTensorInfo(network.get());
 
     // Outliers -56 and 98
     std::vector<float> inputData({0, 0, 0, -56, 98, 0, 0, 0});
@@ -870,7 +916,7 @@ BOOST_AUTO_TEST_CASE(OverrideInputRangeEmptyNetwork)
     RangeTracker ranges;
     RangeTracker::MinMaxRange minMaxRange(-12.3f, 45.6f); // Range to use for the override
 
-    Network network; // Empty network
+    NetworkImpl network; // Empty network
     auto inputLayers = network.GetGraph().GetInputLayers(); // Empty list of input layers
 
     OverrideInputRangeStrategy overrideInputRangeStrategy(ranges, 0, minMaxRange);
@@ -884,7 +930,7 @@ BOOST_AUTO_TEST_CASE(OverrideInputRangeNoInputLayers)
     RangeTracker ranges;
     MinMaxRange minMaxRange(-12.3f, 45.6f); // Range to use for the override
 
-    Network network;
+    NetworkImpl network;
     network.AddAdditionLayer(); // Network with no input layers
     auto inputLayers = network.GetGraph().GetInputLayers(); // Empty list of input layers
 
@@ -899,7 +945,7 @@ BOOST_AUTO_TEST_CASE(OverrideInputRangeInputLayers)
     RangeTracker ranges;
     MinMaxRange minMaxRange(-12.3f, 45.6f); // Range to use for the override
 
-    Network network;
+    NetworkImpl network;
 
     // Adding the layers
     IConnectableLayer* input0 = network.AddInputLayer(0);
@@ -2117,16 +2163,25 @@ BOOST_AUTO_TEST_CASE(TestConnectionPreservationAfterDynamicQuant)
         Graph m_Graph;
     };
 
-    INetworkPtr network = INetwork::Create();
+    class TestNetwork : public INetwork
+    {
+    public :
+        NetworkImpl* GetPNetworkImpl()
+        {
+            return  pNetworkImpl.get();
+        }
+    };
 
-    IConnectableLayer* inputLayer =  network->AddInputLayer(0,"inputLayer1");
+    TestNetwork testNetwork;
+
+    IConnectableLayer* inputLayer =  testNetwork.AddInputLayer(0,"inputLayer1");
     armnn::ActivationDescriptor ReLUDesc;
     ReLUDesc.m_Function = ActivationFunction::ReLu;
 
-    IConnectableLayer* reLULayer1 = network->AddActivationLayer(ReLUDesc, "reLU1");
-    IConnectableLayer* reLULayer2 = network->AddActivationLayer(ReLUDesc, "reLU2");
-    IConnectableLayer* addLayer1 = network->AddAdditionLayer("addLayer1");
-    IConnectableLayer* outputLayer = network->AddOutputLayer(0,"outPutLayer1");
+    IConnectableLayer* reLULayer1 = testNetwork.AddActivationLayer(ReLUDesc, "reLU1");
+    IConnectableLayer* reLULayer2 = testNetwork.AddActivationLayer(ReLUDesc, "reLU2");
+    IConnectableLayer* addLayer1 = testNetwork.AddAdditionLayer("addLayer1");
+    IConnectableLayer* outputLayer = testNetwork.AddOutputLayer(0,"outPutLayer1");
 
     inputLayer->GetOutputSlot(0).Connect(reLULayer1->GetInputSlot(0));
     reLULayer1->GetOutputSlot(0).Connect(reLULayer2->GetInputSlot(0));
@@ -2139,12 +2194,12 @@ BOOST_AUTO_TEST_CASE(TestConnectionPreservationAfterDynamicQuant)
     reLULayer2->GetOutputSlot(0).SetTensorInfo(TensorInfo(TensorShape({1, 2, 2, 1}), DataType::Float32));
     addLayer1->GetOutputSlot(0).SetTensorInfo(TensorInfo(TensorShape({1, 2, 2, 1}), DataType::Float32));
 
-    TestConnectionPreservation strategy1(PolymorphicDowncast<const Network*>(network.get())->GetGraph());
-    VisitLayersTopologically(network.get(), strategy1);
+    TestConnectionPreservation strategy1(testNetwork.GetPNetworkImpl()->GetGraph());
+    VisitLayersTopologically(&testNetwork, strategy1);
 
-    armnn::INetworkQuantizerPtr quantizer = armnn::INetworkQuantizer::Create(network.get());
+    armnn::INetworkQuantizerPtr quantizer = armnn::INetworkQuantizer::Create(&testNetwork);
 
-    armnn::TensorInfo tensorInfo = GetInputTensorInfo(PolymorphicDowncast<const Network*>(network.get()));
+    armnn::TensorInfo tensorInfo = GetInputTensorInfo(&testNetwork);
 
     std::vector<float> inputData({0, 2, 0, 4});
     armnn::ConstTensor inputTensor(tensorInfo, inputData.data());
@@ -2155,7 +2210,9 @@ BOOST_AUTO_TEST_CASE(TestConnectionPreservationAfterDynamicQuant)
 
     INetworkPtr quantNetwork = quantizer->ExportNetwork();
 
-    TestConnectionPreservation strategy2(PolymorphicDowncast<const Network*>(quantNetwork.get())->GetGraph());
+    TestNetwork* testQuantNetwork = static_cast<TestNetwork*>(quantNetwork.get());
+
+    TestConnectionPreservation strategy2(testQuantNetwork->GetPNetworkImpl()->GetGraph());
     VisitLayersTopologically(quantNetwork.get(), strategy2);
 }
 

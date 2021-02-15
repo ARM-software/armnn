@@ -80,7 +80,7 @@ void AddWorkloadStructure(std::unique_ptr<TimelineUtilityMethods>& timelineUtils
 
 } // anonymous
 
-std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
+std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                                                                 std::string& errorMessage,
                                                                 const INetworkProperties& networkProperties,
                                                                 profiling::ProfilingService&  profilingService)
@@ -115,7 +115,7 @@ std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<
     return loadedNetwork;
 }
 
-LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
+LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                              const INetworkProperties& networkProperties,
                              profiling::ProfilingService&  profilingService) :
                              m_OptimizedNetwork(std::move(net)),
@@ -128,7 +128,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
     m_Profiler = std::make_shared<IProfiler>();
     ProfilerManager::GetInstance().RegisterProfiler(m_Profiler.get());
 
-    Graph& order = m_OptimizedNetwork->GetGraph().TopologicalSort();
+    Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().TopologicalSort();
     //First create tensor handlers, backends and workload factories.
     //Handlers are created before workloads are.
     //Because workload creation can modify some of the handlers,
@@ -146,7 +146,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
             if (backend->SupportsTensorAllocatorAPI())
             {
                 auto workloadFactory = backend->CreateWorkloadFactory(
-                    m_TensorHandleFactoryRegistry, m_OptimizedNetwork->GetModelOptions());
+                    m_TensorHandleFactoryRegistry, m_OptimizedNetwork->pOptimizedNetworkImpl->GetModelOptions());
                 m_WorkloadFactories.emplace(
                     std::make_pair(backendId, std::make_pair(std::move(workloadFactory), nullptr)));
             }
@@ -154,7 +154,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
             {
                 IBackendInternal::IMemoryManagerSharedPtr memoryManager = backend->CreateMemoryManager();
                 auto workloadFactory = backend->CreateWorkloadFactory(
-                    memoryManager, m_OptimizedNetwork->GetModelOptions());
+                    memoryManager, m_OptimizedNetwork->pOptimizedNetworkImpl->GetModelOptions());
 
                 m_WorkloadFactories.emplace(
                     std::make_pair(backendId, std::make_pair(std::move(workloadFactory), memoryManager)));
@@ -267,7 +267,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
     }
 
     // Set up memory.
-    m_OptimizedNetwork->GetGraph().AllocateDynamicBuffers();
+    m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().AllocateDynamicBuffers();
 
     // Now that the intermediate tensor memory has been set-up, do any post allocation configuration for each workload.
     for (auto& workload : m_WorkloadQueue)
@@ -278,7 +278,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
 
 void LoadedNetwork::SendNetworkStructure()
 {
-    Graph& order = m_OptimizedNetwork->GetGraph().TopologicalSort();
+    Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().TopologicalSort();
     ProfilingGuid networkGuid = m_OptimizedNetwork->GetGuid();
 
     std::unique_ptr<TimelineUtilityMethods> timelineUtils =
@@ -320,7 +320,7 @@ profiling::ProfilingGuid LoadedNetwork::GetNetworkGuid()
 
 TensorInfo LoadedNetwork::GetInputTensorInfo(LayerBindingId layerId) const
 {
-    for (auto&& inputLayer : m_OptimizedNetwork->GetGraph().GetInputLayers())
+    for (auto&& inputLayer : m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().GetInputLayers())
     {
         ARMNN_ASSERT_MSG(inputLayer->GetNumOutputSlots() == 1, "Input layer should have exactly 1 output slot");
         if (inputLayer->GetBindingId() == layerId)
@@ -334,7 +334,7 @@ TensorInfo LoadedNetwork::GetInputTensorInfo(LayerBindingId layerId) const
 
 TensorInfo LoadedNetwork::GetOutputTensorInfo(LayerBindingId layerId) const
 {
-    for (auto&& outputLayer : m_OptimizedNetwork->GetGraph().GetOutputLayers())
+    for (auto&& outputLayer : m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().GetOutputLayers())
     {
         ARMNN_ASSERT_MSG(outputLayer->GetNumInputSlots() == 1, "Output layer should have exactly 1 input slot");
         ARMNN_ASSERT_MSG(outputLayer->GetInputSlot(0).GetConnection(), "Input slot on Output layer must be connected");
@@ -368,7 +368,7 @@ const IWorkloadFactory& LoadedNetwork::GetWorkloadFactory(const Layer& layer) co
     ARMNN_ASSERT_MSG(IWorkloadFactory::IsLayerSupported(layer,
                                                         {},
                                                         reasonIfUnsupported,
-                                                        m_OptimizedNetwork->GetModelOptions()),
+                                                        m_OptimizedNetwork->pOptimizedNetworkImpl->GetModelOptions()),
         "Factory does not support layer");
     IgnoreUnused(reasonIfUnsupported);
     return *workloadFactory;
@@ -470,7 +470,7 @@ private:
 Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
                                       const OutputTensors& outputTensors)
 {
-    const Graph& graph = m_OptimizedNetwork->GetGraph();
+    const Graph& graph = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph();
 
     // Walk graph to determine the order of execution.
     if (graph.GetNumLayers() < 2)

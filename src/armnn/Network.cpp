@@ -38,9 +38,473 @@
 namespace armnn
 {
 
+INetwork::INetwork(NetworkOptions networkOptions) : pNetworkImpl(new NetworkImpl(networkOptions)) {}
+
+INetwork::~INetwork() = default;
+
+Status INetwork::PrintGraph()
+{
+    return pNetworkImpl->PrintGraph();
+}
+
+IConnectableLayer* INetwork::AddInputLayer(LayerBindingId id, const char* name)
+{
+    return pNetworkImpl->AddInputLayer(id, name);
+}
+
+
+IConnectableLayer* INetwork::AddArgMinMaxLayer(const ArgMinMaxDescriptor& desc,
+                                               const char* name)
+{
+    return pNetworkImpl->AddArgMinMaxLayer(desc, name);
+}
+
+
+IConnectableLayer* INetwork::AddComparisonLayer(const ComparisonDescriptor& comparisonDescriptor,
+                                                const char* name)
+{
+    return pNetworkImpl->AddComparisonLayer(comparisonDescriptor, name);
+}
+
+
+IConnectableLayer* INetwork::AddConcatLayer(const ConcatDescriptor& concatDescriptor,
+                                            const char* name)
+{
+    return pNetworkImpl->AddConcatLayer(concatDescriptor, name);
+}
+
+
+IConnectableLayer* INetwork::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+                                                   const ConstTensor& weights,
+                                                   const Optional<ConstTensor>& biases,
+                                                   const char* name)
+{
+    return pNetworkImpl->AddConvolution2dLayer(convolution2dDescriptor, weights, biases, name);
+}
+
+
+IConnectableLayer* INetwork::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+                                                   const ConstTensor& weights,
+                                                   const char* name)
+{
+    Optional<ConstTensor> biases;
+    return pNetworkImpl->AddConvolution2dLayer(convolution2dDescriptor, weights, biases, name);
+}
+
+
+IConnectableLayer* INetwork::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+                                                   const ConstTensor& weights,
+                                                   const ConstTensor& biases,
+                                                   const char* name )
+{
+
+    return pNetworkImpl->AddConvolution2dLayer(convolution2dDescriptor,
+                                               weights,
+                                               armnn::Optional<ConstTensor>(biases),
+                                               name);
+}
+
+
+IConnectableLayer* INetwork::AddDepthToSpaceLayer(const DepthToSpaceDescriptor& depthToSpaceDescriptor,
+                                                  const char* name)
+{
+    return pNetworkImpl->AddDepthToSpaceLayer(depthToSpaceDescriptor, name);
+}
+
+
+IConnectableLayer* INetwork::AddDepthwiseConvolution2dLayer(
+    const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+    const ConstTensor& weights,
+    const Optional<ConstTensor>& biases,
+    const char* name)
+{
+    return pNetworkImpl->AddDepthwiseConvolution2dLayer(convolution2dDescriptor, weights, biases, name);
+}
+
+
+IConnectableLayer* INetwork::AddDepthwiseConvolution2dLayer(
+    const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+    const ConstTensor& weights,
+    const char* name)
+{
+    Optional<ConstTensor> biases;
+    return pNetworkImpl->AddDepthwiseConvolution2dLayer(convolution2dDescriptor, weights, biases, name);
+}
+
+
+IConnectableLayer* INetwork::AddDepthwiseConvolution2dLayer(
+    const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+    const ConstTensor& weights,
+    const ConstTensor& biases,
+    const char* name)
+{
+    return pNetworkImpl->AddDepthwiseConvolution2dLayer(convolution2dDescriptor, weights,
+                                                        armnn::Optional<ConstTensor>(biases), name);
+}
+
+
+IConnectableLayer* INetwork::AddDequantizeLayer(const char* name)
+{
+    return pNetworkImpl->AddDequantizeLayer(name);
+}
+
+
+IConnectableLayer* INetwork::AddDetectionPostProcessLayer(
+    const DetectionPostProcessDescriptor& descriptor,
+    const ConstTensor& anchors,
+    const char* name)
+{
+    return pNetworkImpl->AddDetectionPostProcessLayer(descriptor, anchors, name);
+}
+
+
+IConnectableLayer* INetwork::AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
+                                                      const char* name)
+{
+    return pNetworkImpl->AddElementwiseUnaryLayer(elementwiseUnaryDescriptor, name);
+}
+
+
+IConnectableLayer* INetwork::AddFillLayer(const FillDescriptor& fillDescriptor,
+                                          const char* name)
+{
+    return pNetworkImpl->AddFillLayer(fillDescriptor, name);
+}
+
+
+IConnectableLayer* INetwork::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                                    const ConstTensor& weights,
+                                                    const Optional<ConstTensor>& biases,
+                                                    const char* name)
+{
+    return pNetworkImpl->AddFullyConnectedLayer(fullyConnectedDescriptor, weights, biases, name);
+}
+
+IConnectableLayer* INetwork::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                                    const ConstTensor& weights,
+                                                    const char* name)
+{
+    Optional<ConstTensor> biases;
+    return pNetworkImpl->AddFullyConnectedLayer(fullyConnectedDescriptor, weights, biases, name);
+}
+
+IConnectableLayer* INetwork::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                                    const ConstTensor& weights,
+                                                    const ConstTensor& biases,
+                                                    const char* name)
+{
+    return pNetworkImpl->AddFullyConnectedLayer(fullyConnectedDescriptor, weights,
+                                                armnn::Optional<ConstTensor>(biases), name);
+}
+
+IConnectableLayer* INetwork::AddPermuteLayer(const PermuteDescriptor& permuteDescriptor,
+                                             const char* name)
+{
+    return pNetworkImpl->AddPermuteLayer(permuteDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddBatchToSpaceNdLayer(const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
+                                                    const char* name)
+{
+    return pNetworkImpl->AddBatchToSpaceNdLayer(batchToSpaceNdDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddPooling2dLayer(const Pooling2dDescriptor& pooling2dDescriptor,
+                                               const char* name)
+{
+    return pNetworkImpl->AddPooling2dLayer(pooling2dDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddActivationLayer(const ActivationDescriptor& activationDescriptor,
+                                                const char* name)
+{
+    return pNetworkImpl->AddActivationLayer(activationDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddNormalizationLayer(const NormalizationDescriptor& normalizationDescriptor,
+                                                   const char* name)
+{
+    return pNetworkImpl->AddNormalizationLayer(normalizationDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddSliceLayer(const SliceDescriptor& sliceDescriptor, const char* name)
+{
+    return pNetworkImpl->AddSliceLayer(sliceDescriptor, name);
+}
+IConnectableLayer* INetwork::AddSoftmaxLayer(const SoftmaxDescriptor& softmaxDescriptor,
+                                             const char* name)
+{
+    return pNetworkImpl->AddSoftmaxLayer(softmaxDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddSplitterLayer(const ViewsDescriptor& splitterDescriptor,
+                                              const char* name)
+{
+    return pNetworkImpl->AddSplitterLayer(splitterDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddMergeLayer(const char* name)
+{
+    return pNetworkImpl->AddMergeLayer(name);
+}
+
+IConnectableLayer* INetwork::AddMergerLayer(const MergerDescriptor& mergerDescriptor,
+                                            const char* name)
+{
+    return pNetworkImpl->AddConcatLayer(mergerDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddAbsLayer(const char* name)
+{
+    return pNetworkImpl->AddElementwiseUnaryLayer(ElementwiseUnaryDescriptor(UnaryOperation::Abs), name);
+}
+
+IConnectableLayer* INetwork::AddAdditionLayer(const char* name)
+{
+    return pNetworkImpl->AddAdditionLayer(name);
+}
+
+IConnectableLayer* INetwork::AddMultiplicationLayer(const char* name)
+{
+    return pNetworkImpl->AddMultiplicationLayer(name);
+}
+
+IConnectableLayer* INetwork::AddBatchNormalizationLayer(const BatchNormalizationDescriptor& desc,
+                                                        const ConstTensor& mean,
+                                                        const ConstTensor& variance,
+                                                        const ConstTensor& beta,
+                                                        const ConstTensor& gamma,
+                                                        const char* name)
+{
+    return pNetworkImpl->AddBatchNormalizationLayer(desc, mean, variance, beta, gamma, name);
+}
+
+IConnectableLayer* INetwork::AddRankLayer(const char* name)
+{
+    return pNetworkImpl->AddRankLayer(name);
+}
+
+IConnectableLayer* INetwork::AddResizeBilinearLayer(const ResizeBilinearDescriptor& descriptor,
+                                                    const char* name)
+{
+    ResizeDescriptor resizeDescriptor;
+    resizeDescriptor.m_Method           = ResizeMethod::Bilinear;
+    resizeDescriptor.m_DataLayout       = descriptor.m_DataLayout;
+    resizeDescriptor.m_TargetWidth      = descriptor.m_TargetWidth;
+    resizeDescriptor.m_TargetHeight     = descriptor.m_TargetHeight;
+    resizeDescriptor.m_AlignCorners     = descriptor.m_AlignCorners;
+    resizeDescriptor.m_HalfPixelCenters = descriptor.m_HalfPixelCenters;
+
+    return pNetworkImpl->AddResizeLayer(resizeDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddResizeLayer(const ResizeDescriptor& resizeDescriptor,
+                                            const char* name)
+{
+    return pNetworkImpl->AddResizeLayer(resizeDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddReduceLayer(const ReduceDescriptor& reduceDescriptor,
+                                            const char* name)
+{
+    return pNetworkImpl->AddReduceLayer(reduceDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddInstanceNormalizationLayer(const InstanceNormalizationDescriptor& desc,
+                                                           const char* name)
+{
+    return pNetworkImpl->AddInstanceNormalizationLayer(desc, name);
+}
+
+IConnectableLayer* INetwork::AddL2NormalizationLayer(const L2NormalizationDescriptor& desc,
+                                                     const char* name)
+{
+    return pNetworkImpl->AddL2NormalizationLayer(desc, name);
+}
+
+IConnectableLayer* INetwork::AddLogSoftmaxLayer(const LogSoftmaxDescriptor& logSoftmaxDescriptor,
+                                                const char* name)
+{
+    return pNetworkImpl->AddLogSoftmaxLayer(logSoftmaxDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddConstantLayer(const ConstTensor& input,
+                                              const char* name)
+{
+    return pNetworkImpl->AddConstantLayer(input, name);
+}
+
+IConnectableLayer* INetwork::AddReshapeLayer(const ReshapeDescriptor& reshapeDescriptor,
+                                            const char* name)
+{
+    return pNetworkImpl->AddReshapeLayer(reshapeDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddSpaceToBatchNdLayer(const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+                                                   const char* name)
+{
+    return pNetworkImpl->AddSpaceToBatchNdLayer(spaceToBatchNdDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddSpaceToDepthLayer(const SpaceToDepthDescriptor& spaceToDepthDescriptor,
+                                                  const char* name)
+{
+    return pNetworkImpl->AddSpaceToDepthLayer(spaceToDepthDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddFloorLayer(const char* name)
+{
+    return pNetworkImpl->AddFloorLayer(name);
+}
+IConnectableLayer* INetwork::AddOutputLayer(LayerBindingId id, const char* name)
+{
+    return pNetworkImpl->AddOutputLayer(id, name);
+}
+
+IConnectableLayer* INetwork::AddLstmLayer(const LstmDescriptor& descriptor,
+                                          const LstmInputParams& params,
+                                          const char* name)
+{
+    return pNetworkImpl->AddLstmLayer(descriptor, params, name);
+}
+
+IConnectableLayer* INetwork::AddDivisionLayer(const char* name)
+{
+    return pNetworkImpl->AddDivisionLayer(name);
+}
+
+IConnectableLayer* INetwork::AddSubtractionLayer(const char* name)
+{
+    return pNetworkImpl->AddSubtractionLayer(name);
+}
+
+IConnectableLayer* INetwork::AddMaximumLayer(const char* name)
+{
+    return pNetworkImpl->AddMaximumLayer(name);
+}
+
+IConnectableLayer* INetwork::AddMeanLayer(const MeanDescriptor& meanDescriptor, const char* name)
+{
+    return pNetworkImpl->AddMeanLayer(meanDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddPadLayer(const PadDescriptor& padDescriptor,
+                                         const char* name)
+{
+    return pNetworkImpl->AddPadLayer(padDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddQuantizeLayer(const char* name)
+{
+    return pNetworkImpl->AddQuantizeLayer(name);
+}
+
+IConnectableLayer* INetwork::AddStridedSliceLayer(const StridedSliceDescriptor& stridedSliceDescriptor,
+                                                  const char* name)
+{
+    return pNetworkImpl->AddStridedSliceLayer(stridedSliceDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddMinimumLayer(const char* name)
+{
+    return pNetworkImpl->AddMinimumLayer(name);
+}
+
+IConnectableLayer* INetwork::AddGreaterLayer(const char* name)
+{
+    return pNetworkImpl->AddComparisonLayer(ComparisonDescriptor(ComparisonOperation::Greater), name);
+}
+
+IConnectableLayer* INetwork::AddEqualLayer(const char* name)
+{
+    return pNetworkImpl->AddComparisonLayer(ComparisonDescriptor(ComparisonOperation::Equal), name);
+}
+
+IConnectableLayer* INetwork::AddRsqrtLayer(const char* name)
+{
+    return pNetworkImpl->AddElementwiseUnaryLayer(ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt), name);
+}
+
+IConnectableLayer* INetwork::AddGatherLayer(const char* name)
+{
+    GatherDescriptor gatherDescriptor{};
+    return pNetworkImpl->AddGatherLayer(gatherDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddGatherLayer(const GatherDescriptor& descriptor,
+                                            const char* name)
+{
+    return pNetworkImpl->AddGatherLayer(descriptor, name);
+}
+
+IConnectableLayer* INetwork::AddSwitchLayer(const char* name)
+{
+    return pNetworkImpl->AddSwitchLayer(name);
+}
+
+IConnectableLayer* INetwork::AddPreluLayer(const char* name)
+{
+    return pNetworkImpl->AddPreluLayer(name);
+}
+
+IConnectableLayer* INetwork::AddTransposeConvolution2dLayer(const TransposeConvolution2dDescriptor& descriptor,
+                                                            const ConstTensor& weights,
+                                                            const Optional<ConstTensor>& biases,
+                                                            const char* name)
+{
+    return pNetworkImpl->AddTransposeConvolution2dLayer(descriptor, weights, biases, name);
+}
+
+IConnectableLayer* INetwork::AddTransposeLayer(const TransposeDescriptor& transposeDescriptor,
+                                               const char* name)
+{
+    return pNetworkImpl->AddTransposeLayer(transposeDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddStackLayer(const StackDescriptor& descriptor,
+                                           const char* name)
+{
+    return pNetworkImpl->AddStackLayer(descriptor, name);
+}
+
+IConnectableLayer* INetwork::AddStandInLayer(const StandInDescriptor& descriptor,
+                                             const char* name)
+{
+    return pNetworkImpl->AddStandInLayer(descriptor, name);
+}
+
+IConnectableLayer* INetwork::AddQuantizedLstmLayer(const QuantizedLstmInputParams& params,
+                                                   const char* name)
+{
+    return pNetworkImpl->AddQuantizedLstmLayer(params, name);
+}
+
+IConnectableLayer* INetwork::AddQLstmLayer(const QLstmDescriptor& descriptor,
+                                           const LstmInputParams& params,
+                                           const char* name)
+{
+    return pNetworkImpl->AddQLstmLayer(descriptor, params, name);
+}
+
+IConnectableLayer* INetwork::AddLogicalBinaryLayer(const LogicalBinaryDescriptor& descriptor,
+                                                   const char* name)
+{
+    return pNetworkImpl->AddLogicalBinaryLayer(descriptor, name);
+}
+
+void INetwork::Accept(ILayerVisitor& visitor) const
+{
+    return pNetworkImpl->Accept(visitor);
+}
+
+void INetwork::ExecuteStrategy(IStrategy& strategy) const
+{
+    return pNetworkImpl->ExecuteStrategy(strategy);
+}
+
 armnn::INetwork* INetwork::CreateRaw(NetworkOptions networkOptions)
 {
-    return new Network(networkOptions);
+    return new INetwork(networkOptions);
 }
 
 armnn::INetworkPtr INetwork::Create(NetworkOptions networkOptions)
@@ -50,21 +514,48 @@ armnn::INetworkPtr INetwork::Create(NetworkOptions networkOptions)
 
 void INetwork::Destroy(INetwork* network)
 {
-    delete PolymorphicDowncast<Network*>(network);
+    delete network;
 }
+
+
+IOptimizedNetwork::IOptimizedNetwork(std::unique_ptr<Graph> graph)
+    : pOptimizedNetworkImpl(new OptimizedNetworkImpl(std::move(graph))) {}
+
+IOptimizedNetwork::IOptimizedNetwork(std::unique_ptr<OptimizedNetworkImpl> impl)
+    : pOptimizedNetworkImpl(std::move(impl)) {}
+
+IOptimizedNetwork::IOptimizedNetwork(std::unique_ptr<Graph> graph, const ModelOptions& modelOptions)
+    : pOptimizedNetworkImpl(new OptimizedNetworkImpl(std::move(graph), modelOptions)) {}
+
+IOptimizedNetwork::~IOptimizedNetwork() = default;
 
 void IOptimizedNetwork::Destroy(IOptimizedNetwork* network)
 {
-    delete PolymorphicDowncast<OptimizedNetwork*>(network);
+    delete network;
 }
 
-Status OptimizedNetwork::PrintGraph()
+Status IOptimizedNetwork::PrintGraph()
+{
+    return pOptimizedNetworkImpl->PrintGraph();
+}
+
+Status IOptimizedNetwork::SerializeToDot(std::ostream& stream) const
+{
+    return pOptimizedNetworkImpl->SerializeToDot(stream);
+}
+
+profiling::ProfilingGuid IOptimizedNetwork::GetGuid() const
+{
+    return pOptimizedNetworkImpl->GetGuid();
+}
+
+Status OptimizedNetworkImpl::PrintGraph()
 {
     m_Graph->Print();
     return Status::Success;
 }
 
-Status OptimizedNetwork::SerializeToDot(std::ostream& stream) const
+Status OptimizedNetworkImpl::SerializeToDot(std::ostream& stream) const
 {
     return m_Graph->SerializeToDot(stream);
 }
@@ -375,7 +866,7 @@ OptimizationResult AttemptBackendAssignment(BackendSettings& backendSettings,
 }
 
 
-OptimizationResult AssignBackends(OptimizedNetwork* optNetObjPtr,
+OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
                                   BackendSettings& backendSettings,
                                   Graph::Iterator& firstLayer,
                                   Graph::Iterator& lastLayer,
@@ -501,7 +992,7 @@ OptimizationResult AssignBackends(OptimizedNetwork* optNetObjPtr,
     return result;
 }
 
-OptimizationResult AssignBackends(OptimizedNetwork* optNetObjPtr,
+OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
                                   BackendSettings& backendSettings,
                                   SubgraphView& subgraph,
                                   Optional<std::vector<std::string>&> errMessages)
@@ -534,7 +1025,7 @@ BackendsMap CreateSupportedBackends(TensorHandleFactoryRegistry& handleFactoryRe
     return backends;
 }
 
-OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
+OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
                                              BackendSettings& backendSettings,
                                              BackendsMap& backends,
                                              const ModelOptions& modelOptions,
@@ -1024,16 +1515,15 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
         throw InvalidArgumentException("BFloat16 and Float16 optimization cannot be enabled at the same time.");
     }
 
-    const Network& network = *PolymorphicDowncast<const Network*>(&inNetwork);
-    std::unique_ptr<Graph> graph = std::make_unique<Graph>(network.GetGraph());
+    std::unique_ptr<Graph> graph = std::make_unique<Graph>(inNetwork.pNetworkImpl->GetGraph());
 
-    auto optNet = IOptimizedNetworkPtr(new OptimizedNetwork(std::move(graph), options.m_ModelOptions),
+    auto optNet = IOptimizedNetworkPtr(new IOptimizedNetwork(std::move(graph), options.m_ModelOptions),
                                        &IOptimizedNetwork::Destroy);
 
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
+    IOptimizedNetwork* optNetObjPtr = optNet.get();
 
     // Get the optimized graph
-    Graph& optGraph = optNetObjPtr->GetGraph();
+    Graph& optGraph = optNetObjPtr->pOptimizedNetworkImpl->GetGraph();
 
     // Perform AddBroadcastReshapeLayer optimisation
     using namespace optimizations;
@@ -1094,7 +1584,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     // Assign an available backend to each layer
     Graph::Iterator firstLayer = optGraph.begin();
     Graph::Iterator lastLayer  = optGraph.end();
-    OptimizationResult assignBackendsResult = AssignBackends(optNetObjPtr,
+    OptimizationResult assignBackendsResult = AssignBackends(optNetObjPtr->pOptimizedNetworkImpl.get(),
                                                              backendSettings,
                                                              firstLayer,
                                                              lastLayer,
@@ -1109,7 +1599,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                                                 OptimizeInverseConversionsFp32()));
 
     // Apply the backend-specific optimizations
-    OptimizationResult backendOptimizationResult = ApplyBackendOptimizations(optNetObjPtr,
+    OptimizationResult backendOptimizationResult = ApplyBackendOptimizations(optNetObjPtr->pOptimizedNetworkImpl.get(),
                                                                              backendSettings,
                                                                              backends,
                                                                              options.m_ModelOptions,
@@ -1159,13 +1649,13 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
 
         if (!backendSpecificOptimizations.empty())
         {
-            Optimizer::Pass(optNetObjPtr->GetGraph(), backendSpecificOptimizations);
+            Optimizer::Pass(optNetObjPtr->pOptimizedNetworkImpl->GetGraph(), backendSpecificOptimizations);
         }
     }
 
     return optNet;
 }
-bool Network::GetShapeInferenceMethod()
+bool NetworkImpl::GetShapeInferenceMethod()
 {
     if (m_NetworkOptions.size() > 0 && m_NetworkOptions[0].GetBackendId().Get() == "ShapeInferenceMethod")
     {
@@ -1174,51 +1664,51 @@ bool Network::GetShapeInferenceMethod()
 
     return false;
 }
-Network::Network(NetworkOptions networkOptions)
+NetworkImpl::NetworkImpl(NetworkOptions networkOptions)
 : m_NetworkOptions(networkOptions),
   m_Graph(std::make_unique<Graph>(GetShapeInferenceMethod()))
 {}
 
-Network::~Network()
+NetworkImpl::~NetworkImpl()
 {
 }
 
-Status Network::PrintGraph()
+Status NetworkImpl::PrintGraph()
 {
     m_Graph->Print();
     return Status::Success;
 }
 
-IConnectableLayer* Network::AddInputLayer(LayerBindingId id, const char* name)
+IConnectableLayer* NetworkImpl::AddInputLayer(LayerBindingId id, const char* name)
 {
     return m_Graph->AddLayer<InputLayer>(id, name);
 }
 
-IConnectableLayer* Network::AddBatchToSpaceNdLayer(const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
+IConnectableLayer* NetworkImpl::AddBatchToSpaceNdLayer(const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
                                             const char* name)
 {
     return m_Graph->AddLayer<BatchToSpaceNdLayer>(batchToSpaceNdDescriptor, name);
 }
 
-IConnectableLayer* Network::AddComparisonLayer(const ComparisonDescriptor& comparisonDescriptor,
+IConnectableLayer* NetworkImpl::AddComparisonLayer(const ComparisonDescriptor& comparisonDescriptor,
                                                const char* name)
 {
     return m_Graph->AddLayer<ComparisonLayer>(comparisonDescriptor, name);
 }
 
-IConnectableLayer* Network::AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
+IConnectableLayer* NetworkImpl::AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
                                                      const char* name)
 {
     return m_Graph->AddLayer<ElementwiseUnaryLayer>(elementwiseUnaryDescriptor, name);
 }
 
-IConnectableLayer* Network::AddFillLayer(const FillDescriptor& fillDescriptor,
+IConnectableLayer* NetworkImpl::AddFillLayer(const FillDescriptor& fillDescriptor,
                                          const char* name)
 {
     return m_Graph->AddLayer<FillLayer>(fillDescriptor, name);
 }
 
-IConnectableLayer* Network::AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+IConnectableLayer* NetworkImpl::AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                        const ConstTensor& weights,
                                                        const Optional<ConstTensor>& biases,
                                                        const char* name)
@@ -1240,7 +1730,7 @@ IConnectableLayer* Network::AddFullyConnectedLayerImpl(const FullyConnectedDescr
     return layer;
 }
 
-IConnectableLayer* Network::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+IConnectableLayer* NetworkImpl::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                    const ConstTensor& weights,
                                                    const Optional<ConstTensor>& biases,
                                                    const char* name)
@@ -1248,7 +1738,7 @@ IConnectableLayer* Network::AddFullyConnectedLayer(const FullyConnectedDescripto
     return AddFullyConnectedLayerImpl(fullyConnectedDescriptor, weights, biases, name);
 }
 
-IConnectableLayer* Network::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+IConnectableLayer* NetworkImpl::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                    const ConstTensor& weights,
                                                    const char* name)
 {
@@ -1256,7 +1746,7 @@ IConnectableLayer* Network::AddFullyConnectedLayer(const FullyConnectedDescripto
     return AddFullyConnectedLayerImpl(fullyConnectedDescriptor, weights, biases, name);
 }
 
-IConnectableLayer* Network::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+IConnectableLayer* NetworkImpl::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                    const ConstTensor& weights,
                                                    const ConstTensor& biases,
                                                    const char* name)
@@ -1265,16 +1755,16 @@ IConnectableLayer* Network::AddFullyConnectedLayer(const FullyConnectedDescripto
     return AddFullyConnectedLayerImpl(fullyConnectedDescriptor, weights, optionalBiases, name);
 }
 
-IConnectableLayer* Network::AddConcatLayer(const ConcatDescriptor& concatDescriptor,
+IConnectableLayer* NetworkImpl::AddConcatLayer(const ConcatDescriptor& concatDescriptor,
                                            const char* name)
 {
     return m_Graph->AddLayer<ConcatLayer>(concatDescriptor, name);
 }
 
-IConnectableLayer* Network::AddConvolution2dLayerImpl(const Convolution2dDescriptor& convolution2dDescriptor,
-                                                      const ConstTensor& weights,
-                                                      const Optional<ConstTensor>& biases,
-                                                      const char* name)
+IConnectableLayer* NetworkImpl::AddConvolution2dLayerImpl(const Convolution2dDescriptor& convolution2dDescriptor,
+                                                          const ConstTensor& weights,
+                                                          const Optional<ConstTensor>& biases,
+                                                          const char* name)
 {
     if (convolution2dDescriptor.m_BiasEnabled && !biases.has_value())
     {
@@ -1293,7 +1783,7 @@ IConnectableLayer* Network::AddConvolution2dLayerImpl(const Convolution2dDescrip
     return layer;
 }
 
-IConnectableLayer* Network::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+IConnectableLayer* NetworkImpl::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                                   const ConstTensor& weights,
                                                   const Optional<ConstTensor>& biases,
                                                   const char* name)
@@ -1301,7 +1791,7 @@ IConnectableLayer* Network::AddConvolution2dLayer(const Convolution2dDescriptor&
     return AddConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
 }
 
-IConnectableLayer* Network::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+IConnectableLayer* NetworkImpl::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                                   const ConstTensor& weights,
                                                   const char* name)
 {
@@ -1309,7 +1799,7 @@ IConnectableLayer* Network::AddConvolution2dLayer(const Convolution2dDescriptor&
     return AddConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
 }
 
-IConnectableLayer* Network::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+IConnectableLayer* NetworkImpl::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                                   const ConstTensor& weights,
                                                   const ConstTensor& biases,
                                                   const char* name)
@@ -1318,7 +1808,7 @@ IConnectableLayer* Network::AddConvolution2dLayer(const Convolution2dDescriptor&
     return AddConvolution2dLayerImpl(convolution2dDescriptor, weights, optionalBiases, name);
 }
 
-IConnectableLayer* Network::AddDepthwiseConvolution2dLayerImpl(
+IConnectableLayer* NetworkImpl::AddDepthwiseConvolution2dLayerImpl(
     const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
     const ConstTensor& weights,
     const Optional<ConstTensor>& biases,
@@ -1341,13 +1831,13 @@ IConnectableLayer* Network::AddDepthwiseConvolution2dLayerImpl(
     return layer;
 }
 
-IConnectableLayer* Network::AddDepthToSpaceLayer(const DepthToSpaceDescriptor& depthToSpaceDescriptor,
+IConnectableLayer* NetworkImpl::AddDepthToSpaceLayer(const DepthToSpaceDescriptor& depthToSpaceDescriptor,
                                                  const char* name)
 {
     return m_Graph->AddLayer<DepthToSpaceLayer>(depthToSpaceDescriptor, name);
 }
 
-IConnectableLayer* Network::AddDepthwiseConvolution2dLayer(
+IConnectableLayer* NetworkImpl::AddDepthwiseConvolution2dLayer(
         const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
         const ConstTensor& weights,
         const Optional<ConstTensor>& biases,
@@ -1356,7 +1846,7 @@ IConnectableLayer* Network::AddDepthwiseConvolution2dLayer(
     return AddDepthwiseConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
 }
 
-IConnectableLayer* Network::AddDepthwiseConvolution2dLayer(
+IConnectableLayer* NetworkImpl::AddDepthwiseConvolution2dLayer(
     const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
     const ConstTensor& weights,
     const char* name)
@@ -1365,7 +1855,7 @@ IConnectableLayer* Network::AddDepthwiseConvolution2dLayer(
     return AddDepthwiseConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
 }
 
-IConnectableLayer* Network::AddDepthwiseConvolution2dLayer(
+IConnectableLayer* NetworkImpl::AddDepthwiseConvolution2dLayer(
     const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
     const ConstTensor& weights,
     const ConstTensor& biases,
@@ -1375,7 +1865,7 @@ IConnectableLayer* Network::AddDepthwiseConvolution2dLayer(
     return AddDepthwiseConvolution2dLayerImpl(convolution2dDescriptor, weights, optionalBiases, name);
 }
 
-IConnectableLayer* Network::AddDetectionPostProcessLayer(const armnn::DetectionPostProcessDescriptor& descriptor,
+IConnectableLayer* NetworkImpl::AddDetectionPostProcessLayer(const armnn::DetectionPostProcessDescriptor& descriptor,
                                                          const ConstTensor& anchors, const char* name)
 {
     const auto layer = m_Graph->AddLayer<DetectionPostProcessLayer>(descriptor, name);
@@ -1385,91 +1875,91 @@ IConnectableLayer* Network::AddDetectionPostProcessLayer(const armnn::DetectionP
     return layer;
 }
 
-IConnectableLayer* Network::AddPermuteLayer(const PermuteDescriptor& permuteDescriptor,
+IConnectableLayer* NetworkImpl::AddPermuteLayer(const PermuteDescriptor& permuteDescriptor,
                                             const char* name)
 {
     return m_Graph->AddLayer<PermuteLayer>(permuteDescriptor, name);
 }
 
-IConnectableLayer* Network::AddPooling2dLayer(const Pooling2dDescriptor& pooling2dDescriptor,
+IConnectableLayer* NetworkImpl::AddPooling2dLayer(const Pooling2dDescriptor& pooling2dDescriptor,
     const char* name)
 {
     return m_Graph->AddLayer<Pooling2dLayer>(pooling2dDescriptor, name);
 }
 
-IConnectableLayer* Network::AddActivationLayer(const ActivationDescriptor& activationDescriptor,
+IConnectableLayer* NetworkImpl::AddActivationLayer(const ActivationDescriptor& activationDescriptor,
     const char* name)
 {
     return m_Graph->AddLayer<ActivationLayer>(activationDescriptor, name);
 }
 
-IConnectableLayer* Network::AddArgMinMaxLayer(const ArgMinMaxDescriptor& argMinMaxDescriptor,
+IConnectableLayer* NetworkImpl::AddArgMinMaxLayer(const ArgMinMaxDescriptor& argMinMaxDescriptor,
                                               const char* name)
 {
     return m_Graph->AddLayer<ArgMinMaxLayer>(argMinMaxDescriptor, name);
 }
 
-IConnectableLayer* Network::AddNormalizationLayer(const NormalizationDescriptor&
+IConnectableLayer* NetworkImpl::AddNormalizationLayer(const NormalizationDescriptor&
 normalizationDescriptor,
     const char* name)
 {
     return m_Graph->AddLayer<NormalizationLayer>(normalizationDescriptor, name);
 }
 
-IConnectableLayer* Network::AddSliceLayer(const SliceDescriptor& sliceDescriptor, const char* name)
+IConnectableLayer* NetworkImpl::AddSliceLayer(const SliceDescriptor& sliceDescriptor, const char* name)
 {
     return m_Graph->AddLayer<SliceLayer>(sliceDescriptor, name);
 }
 
-IConnectableLayer* Network::AddSoftmaxLayer(const SoftmaxDescriptor& softmaxDescriptor,
+IConnectableLayer* NetworkImpl::AddSoftmaxLayer(const SoftmaxDescriptor& softmaxDescriptor,
     const char* name)
 {
     return m_Graph->AddLayer<SoftmaxLayer>(softmaxDescriptor, name);
 }
 
-IConnectableLayer* Network::AddSplitterLayer(const ViewsDescriptor& splitterDescriptor,
+IConnectableLayer* NetworkImpl::AddSplitterLayer(const ViewsDescriptor& splitterDescriptor,
     const char* name)
 {
     return m_Graph->AddLayer<SplitterLayer>(splitterDescriptor, name);
 }
 
-IConnectableLayer* Network::AddMaximumLayer(const char* name)
+IConnectableLayer* NetworkImpl::AddMaximumLayer(const char* name)
 {
     return m_Graph->AddLayer<MaximumLayer>(name);
 }
 
-IConnectableLayer* Network::AddMinimumLayer(const char* name)
+IConnectableLayer* NetworkImpl::AddMinimumLayer(const char* name)
 {
     return m_Graph->AddLayer<MinimumLayer>(name);
 }
 
-IConnectableLayer* Network::AddMergerLayer(const MergerDescriptor& mergerDescriptor,
+IConnectableLayer* NetworkImpl::AddMergerLayer(const MergerDescriptor& mergerDescriptor,
                                            const char* name)
 {
     return AddConcatLayer(mergerDescriptor, name);
 }
 
-IConnectableLayer* Network::AddAbsLayer(const char * name)
+IConnectableLayer* NetworkImpl::AddAbsLayer(const char * name)
 {
     return AddElementwiseUnaryLayer(ElementwiseUnaryDescriptor(UnaryOperation::Abs), name);
 }
 
-IConnectableLayer* Network::AddAdditionLayer(const char* name)
+IConnectableLayer* NetworkImpl::AddAdditionLayer(const char* name)
 {
     return m_Graph->AddLayer<AdditionLayer>(name);
 }
 
-IConnectableLayer* Network::AddMultiplicationLayer(const char* name)
+IConnectableLayer* NetworkImpl::AddMultiplicationLayer(const char* name)
 {
     return m_Graph->AddLayer<MultiplicationLayer>(name);
 }
 
-IConnectableLayer* Network::AddOutputLayer(LayerBindingId id, const char* name)
+IConnectableLayer* NetworkImpl::AddOutputLayer(LayerBindingId id, const char* name)
 {
     return m_Graph->AddLayer<OutputLayer>(id, name);
 }
 
-IConnectableLayer* Network::AddBatchNormalizationLayer(const BatchNormalizationDescriptor& desc,
+IConnectableLayer* NetworkImpl::AddBatchNormalizationLayer(const BatchNormalizationDescriptor& desc,
                                                        const ConstTensor&                  mean,
                                                        const ConstTensor&                  variance,
                                                        const ConstTensor&                  beta,
@@ -1486,19 +1976,19 @@ IConnectableLayer* Network::AddBatchNormalizationLayer(const BatchNormalizationD
     return layer;
 }
 
-IConnectableLayer* Network::AddRankLayer(const char* name)
+IConnectableLayer* NetworkImpl::AddRankLayer(const char* name)
 {
     return m_Graph->AddLayer<RankLayer>(name);
 }
 
-IConnectableLayer* Network::AddReduceLayer(const ReduceDescriptor& reduceDescriptor,
-                                           const char* name)
+IConnectableLayer* NetworkImpl::AddReduceLayer(const ReduceDescriptor& reduceDescriptor,
+                                               const char* name)
 {
     return m_Graph->AddLayer<ReduceLayer>(reduceDescriptor, name);
 }
 
-IConnectableLayer* Network::AddResizeBilinearLayer(const ResizeBilinearDescriptor& descriptor,
-                                                   const char* name)
+IConnectableLayer* NetworkImpl::AddResizeBilinearLayer(const ResizeBilinearDescriptor& descriptor,
+                                                       const char* name)
 {
     ResizeDescriptor resizeDescriptor;
     resizeDescriptor.m_Method           = ResizeMethod::Bilinear;
@@ -1511,31 +2001,30 @@ IConnectableLayer* Network::AddResizeBilinearLayer(const ResizeBilinearDescripto
     return m_Graph->AddLayer<ResizeLayer>(resizeDescriptor, name);
 }
 
-IConnectableLayer* Network::AddResizeLayer(const ResizeDescriptor&
-resizeDescriptor, const char* name)
+IConnectableLayer* NetworkImpl::AddResizeLayer(const ResizeDescriptor& resizeDescriptor, const char* name)
 {
     return m_Graph->AddLayer<ResizeLayer>(resizeDescriptor, name);
 }
 
-IConnectableLayer* Network::AddInstanceNormalizationLayer(const InstanceNormalizationDescriptor& desc,
-                                                          const char* name)
+IConnectableLayer* NetworkImpl::AddInstanceNormalizationLayer(const InstanceNormalizationDescriptor& desc,
+                                                              const char* name)
 {
     return m_Graph->AddLayer<InstanceNormalizationLayer>(desc, name);
 }
 
-IConnectableLayer* Network::AddL2NormalizationLayer(const L2NormalizationDescriptor& desc,
-                                                    const char* name)
+IConnectableLayer* NetworkImpl::AddL2NormalizationLayer(const L2NormalizationDescriptor& desc,
+                                                        const char* name)
 {
     return m_Graph->AddLayer<L2NormalizationLayer>(desc, name);
 }
 
-IConnectableLayer* Network::AddLogSoftmaxLayer(const LogSoftmaxDescriptor& desc,
+IConnectableLayer* NetworkImpl::AddLogSoftmaxLayer(const LogSoftmaxDescriptor& desc,
                                                const char* name)
 {
     return m_Graph->AddLayer<LogSoftmaxLayer>(desc, name);
 }
 
-IConnectableLayer* Network::AddConstantLayer(const ConstTensor& input, const char* name)
+IConnectableLayer* NetworkImpl::AddConstantLayer(const ConstTensor& input, const char* name)
 {
     auto layer = m_Graph->AddLayer<ConstantLayer>(name);
 
@@ -1544,30 +2033,30 @@ IConnectableLayer* Network::AddConstantLayer(const ConstTensor& input, const cha
     return layer;
 }
 
-IConnectableLayer* Network::AddReshapeLayer(const ReshapeDescriptor& reshapeDescriptor,
+IConnectableLayer* NetworkImpl::AddReshapeLayer(const ReshapeDescriptor& reshapeDescriptor,
                                             const char* name)
 {
     return m_Graph->AddLayer<ReshapeLayer>(reshapeDescriptor, name);
 }
 
-IConnectableLayer* Network::AddSpaceToBatchNdLayer(const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+IConnectableLayer* NetworkImpl::AddSpaceToBatchNdLayer(const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
                                                    const char* name)
 {
     return m_Graph->AddLayer<SpaceToBatchNdLayer>(spaceToBatchNdDescriptor, name);
 }
 
-IConnectableLayer* Network::AddSpaceToDepthLayer(const SpaceToDepthDescriptor& spaceToDepthDescriptor,
+IConnectableLayer* NetworkImpl::AddSpaceToDepthLayer(const SpaceToDepthDescriptor& spaceToDepthDescriptor,
                                                  const char* name)
 {
     return m_Graph->AddLayer<SpaceToDepthLayer>(spaceToDepthDescriptor, name);
 }
 
-IConnectableLayer* Network::AddFloorLayer(const char* name)
+IConnectableLayer* NetworkImpl::AddFloorLayer(const char* name)
 {
     return m_Graph->AddLayer<FloorLayer>(name);
 }
 
-IConnectableLayer* Network::AddLstmLayer(const LstmDescriptor&  descriptor,
+IConnectableLayer* NetworkImpl::AddLstmLayer(const LstmDescriptor&  descriptor,
                                          const LstmInputParams& params,
                                          const char* name)
 {
@@ -1708,85 +2197,85 @@ IConnectableLayer* Network::AddLstmLayer(const LstmDescriptor&  descriptor,
     return layer;
 }
 
-IConnectableLayer* Network::AddDivisionLayer(const char* name)
+IConnectableLayer* NetworkImpl::AddDivisionLayer(const char* name)
 {
     return m_Graph->AddLayer<DivisionLayer>(name);
 }
 
-IConnectableLayer* Network::AddSubtractionLayer(const char* name)
+IConnectableLayer* NetworkImpl::AddSubtractionLayer(const char* name)
 {
     return m_Graph->AddLayer<SubtractionLayer>(name);
 }
 
-IConnectableLayer* Network::AddMeanLayer(const MeanDescriptor& meanDescriptor, const char* name)
+IConnectableLayer* NetworkImpl::AddMeanLayer(const MeanDescriptor& meanDescriptor, const char* name)
 {
     return m_Graph->AddLayer<MeanLayer>(meanDescriptor,name);
 }
 
-IConnectableLayer* Network::AddPadLayer(const PadDescriptor& padDescriptor, const char* name)
+IConnectableLayer* NetworkImpl::AddPadLayer(const PadDescriptor& padDescriptor, const char* name)
 {
     return m_Graph->AddLayer<PadLayer>(padDescriptor,name);
 }
 
-IConnectableLayer *Network::AddQuantizeLayer(const char *name)
+IConnectableLayer *NetworkImpl::AddQuantizeLayer(const char *name)
 {
     return m_Graph->AddLayer<QuantizeLayer>(name);
 }
 
-IConnectableLayer* Network::AddDequantizeLayer(const char* name)
+IConnectableLayer* NetworkImpl::AddDequantizeLayer(const char* name)
 {
     return m_Graph->AddLayer<DequantizeLayer>(name);
 }
 
-IConnectableLayer* Network::AddStridedSliceLayer(const StridedSliceDescriptor& stridedSliceDescriptor,
+IConnectableLayer* NetworkImpl::AddStridedSliceLayer(const StridedSliceDescriptor& stridedSliceDescriptor,
                                                  const char* name)
 {
     return m_Graph->AddLayer<StridedSliceLayer>(stridedSliceDescriptor, name);
 }
 
-IConnectableLayer* Network::AddGreaterLayer(const char* name)
+IConnectableLayer* NetworkImpl::AddGreaterLayer(const char* name)
 {
     return AddComparisonLayer(ComparisonDescriptor(ComparisonOperation::Greater), name);
 }
 
-IConnectableLayer* Network::AddEqualLayer(const char* name)
+IConnectableLayer* NetworkImpl::AddEqualLayer(const char* name)
 {
     return AddComparisonLayer(ComparisonDescriptor(ComparisonOperation::Equal), name);
 }
 
-IConnectableLayer* Network::AddRsqrtLayer(const char * name)
+IConnectableLayer* NetworkImpl::AddRsqrtLayer(const char * name)
 {
     return AddElementwiseUnaryLayer(ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt), name);
 }
 
-IConnectableLayer* Network::AddGatherLayer(const char* name)
+IConnectableLayer* NetworkImpl::AddGatherLayer(const char* name)
 {
     GatherDescriptor gatherDescriptor{};
     return AddGatherLayer(gatherDescriptor, name);
 }
 
-IConnectableLayer* Network::AddGatherLayer(const GatherDescriptor& gatherDescriptor,
+IConnectableLayer* NetworkImpl::AddGatherLayer(const GatherDescriptor& gatherDescriptor,
                                            const char* name)
 {
     return m_Graph->AddLayer<GatherLayer>(gatherDescriptor, name);
 }
 
-IConnectableLayer* Network::AddMergeLayer(const char* name)
+IConnectableLayer* NetworkImpl::AddMergeLayer(const char* name)
 {
     return m_Graph->AddLayer<MergeLayer>(name);
 }
 
-IConnectableLayer* Network::AddSwitchLayer(const char* name)
+IConnectableLayer* NetworkImpl::AddSwitchLayer(const char* name)
 {
     return m_Graph->AddLayer<SwitchLayer>(name);
 }
 
-IConnectableLayer* Network::AddPreluLayer(const char* name)
+IConnectableLayer* NetworkImpl::AddPreluLayer(const char* name)
 {
     return m_Graph->AddLayer<PreluLayer>(name);
 }
 
-IConnectableLayer* Network::AddTransposeConvolution2dLayer(const TransposeConvolution2dDescriptor& descriptor,
+IConnectableLayer* NetworkImpl::AddTransposeConvolution2dLayer(const TransposeConvolution2dDescriptor& descriptor,
                                                            const ConstTensor& weights,
                                                            const Optional<ConstTensor>& biases,
                                                            const char* name)
@@ -1808,26 +2297,26 @@ IConnectableLayer* Network::AddTransposeConvolution2dLayer(const TransposeConvol
     return layer;
 }
 
-IConnectableLayer* Network::AddTransposeLayer(const TransposeDescriptor& transposeDescriptor,
+IConnectableLayer* NetworkImpl::AddTransposeLayer(const TransposeDescriptor& transposeDescriptor,
                                               const char* name)
 {
     return m_Graph->AddLayer<TransposeLayer>(transposeDescriptor, name);
 }
 
-IConnectableLayer* Network::AddStackLayer(const StackDescriptor& stackDescriptor,
+IConnectableLayer* NetworkImpl::AddStackLayer(const StackDescriptor& stackDescriptor,
                                           const char* name)
 {
     return m_Graph->AddLayer<StackLayer>(stackDescriptor, name);
 }
 
 
-IConnectableLayer* Network::AddStandInLayer(const StandInDescriptor& desc,
+IConnectableLayer* NetworkImpl::AddStandInLayer(const StandInDescriptor& desc,
                                             const char* name)
 {
     return m_Graph->AddLayer<StandInLayer>(desc, name);
 }
 
-IConnectableLayer* Network::AddQuantizedLstmLayer(const QuantizedLstmInputParams& params,
+IConnectableLayer* NetworkImpl::AddQuantizedLstmLayer(const QuantizedLstmInputParams& params,
                                                   const char* name)
 {
     const auto layer = m_Graph->AddLayer<QuantizedLstmLayer>(name);
@@ -1865,7 +2354,7 @@ IConnectableLayer* Network::AddQuantizedLstmLayer(const QuantizedLstmInputParams
     return layer;
 }
 
-IConnectableLayer* Network::AddQLstmLayer(const QLstmDescriptor&  descriptor,
+IConnectableLayer* NetworkImpl::AddQLstmLayer(const QLstmDescriptor&  descriptor,
                                           const LstmInputParams& params,
                                           const char* name)
 {
@@ -2007,13 +2496,13 @@ IConnectableLayer* Network::AddQLstmLayer(const QLstmDescriptor&  descriptor,
     return layer;
 }
 
-IConnectableLayer* Network::AddLogicalBinaryLayer(const LogicalBinaryDescriptor& logicalBinaryDescriptor,
+IConnectableLayer* NetworkImpl::AddLogicalBinaryLayer(const LogicalBinaryDescriptor& logicalBinaryDescriptor,
                                                   const char* name)
 {
     return m_Graph->AddLayer<LogicalBinaryLayer>(logicalBinaryDescriptor, name);
 }
 
-void Network::Accept(ILayerVisitor& visitor) const
+void NetworkImpl::Accept(ILayerVisitor& visitor) const
 {
     for (auto layer : GetGraph())
     {
@@ -2021,7 +2510,7 @@ void Network::Accept(ILayerVisitor& visitor) const
     };
 }
 
-void Network::ExecuteStrategy(IStrategy& strategy) const
+void NetworkImpl::ExecuteStrategy(IStrategy& strategy) const
 {
     for (auto layer : GetGraph())
     {
@@ -2029,17 +2518,17 @@ void Network::ExecuteStrategy(IStrategy& strategy) const
     };
 }
 
-OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)
+OptimizedNetworkImpl::OptimizedNetworkImpl(std::unique_ptr<Graph> graph)
     : m_Graph(std::move(graph)), m_Guid(profiling::ProfilingService::GetNextGuid())
 {
 }
 
-OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph, const ModelOptions& modelOptions)
+OptimizedNetworkImpl::OptimizedNetworkImpl(std::unique_ptr<Graph> graph, const ModelOptions& modelOptions)
     : m_Graph(std::move(graph)), m_Guid(profiling::ProfilingService::GetNextGuid()), m_ModelOptions(modelOptions)
 {
 }
 
-OptimizedNetwork::~OptimizedNetwork()
+OptimizedNetworkImpl::~OptimizedNetworkImpl()
 {
 }
 

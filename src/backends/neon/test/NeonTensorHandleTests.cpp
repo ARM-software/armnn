@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(ConcatOnXorYSubTensorsNoPaddingRequiredTest)
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
 
-    const armnn::Graph& theGraph = static_cast<armnn::OptimizedNetwork*>(optimizedNet.get())->GetGraph();
+    const armnn::Graph& theGraph = GetGraphForTesting(optimizedNet.get());
 
     // Load graph into runtime
     armnn::NetworkId networkIdentifier;
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE(ConcatonXorYPaddingRequiredTest)
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
 
-    const armnn::Graph& theGraph = static_cast<armnn::OptimizedNetwork*>(optimizedNet.get())->GetGraph();
+    const armnn::Graph& theGraph = GetGraphForTesting(optimizedNet.get());
 
     // Load graph into runtime
     armnn::NetworkId networkIdentifier;
@@ -380,7 +380,7 @@ BOOST_AUTO_TEST_CASE(SplitteronXorYNoPaddingRequiredTest)
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
 
-    const armnn::Graph& theGraph = static_cast<armnn::OptimizedNetwork*>(optimizedNet.get())->GetGraph();
+    const armnn::Graph& theGraph = GetGraphForTesting(optimizedNet.get());
 
     // Load graph into runtime
     armnn::NetworkId networkIdentifier;
@@ -555,7 +555,7 @@ BOOST_AUTO_TEST_CASE(SplitteronXorYPaddingRequiredTest)
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
 
-    const armnn::Graph& theGraph = static_cast<armnn::OptimizedNetwork*>(optimizedNet.get())->GetGraph();
+    const armnn::Graph& theGraph = GetGraphForTesting(optimizedNet.get());
 
     // Load graph into runtime
     armnn::NetworkId networkIdentifier;

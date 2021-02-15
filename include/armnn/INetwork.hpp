@@ -106,529 +106,6 @@ protected:
     ~IConnectableLayer() {}
 };
 
-using INetworkPtr = std::unique_ptr<INetwork, void(*)(INetwork* network)>;
-
-/// Main network class which provides the interface for building up a neural network.
-/// This object is subsequently required by the IRuntime::Load() method.
-class INetwork
-{
-public:
-    static INetwork* CreateRaw(NetworkOptions networkOptions = {});
-    static INetworkPtr Create(NetworkOptions networkOptions = {});
-    static void Destroy(INetwork* network);
-
-    virtual Status PrintGraph() = 0;
-
-    /// Adds an input layer to the network.
-    /// @param id - User generated id to uniquely identify a particular input. The same id needs to be specified.
-    /// when passing the inputs to the IRuntime::EnqueueWorkload() function.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddInputLayer(LayerBindingId id, const char* name = nullptr) = 0;
-
-    /// Adds an ArgMinMax layer to the network.
-    /// @param desc - Parameters for the L2 normalization operation.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddArgMinMaxLayer(const ArgMinMaxDescriptor& desc,
-                                                 const char* name = nullptr) = 0;
-
-    /// Add a Comparison layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @param desc - Descriptor for the comparison operation.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddComparisonLayer(const ComparisonDescriptor& comparisonDescriptor,
-                                                  const char* name = nullptr) = 0;
-
-    /// Adds a concatenation layer to the network.
-    /// @param concatDescriptor - ConcatDescriptor (synonym for OriginsDescriptor) to configure the concatenation
-    ///                           process. Number of Views must be equal to the number of inputs, and their order
-    ///                           must match - e.g. first view corresponds to the first input, second view to the
-    ///                           second input, etc....
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddConcatLayer(const ConcatDescriptor& concatDescriptor,
-                                              const char* name = nullptr) = 0;
-
-    /// Adds a 2D convolution layer to the network.
-    /// @param convolution2dDescriptor - Description of the 2D convolution layer.
-    /// @param weights - Tensor for the weights data.
-    /// @param biases - Optional tensor for the bias data. If specified, must match the output tensor shape.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                                     const ConstTensor& weights,
-                                                     const Optional<ConstTensor>& biases,
-                                                     const char* name = nullptr) = 0;
-
-    ARMNN_DEPRECATED_MSG("This AddConvolution2dLayer overload is deprecated")
-    virtual IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                                     const ConstTensor& weights,
-                                                     const char* name = nullptr) = 0;
-
-    ARMNN_DEPRECATED_MSG("This AddConvolution2dLayer overload is deprecated")
-    virtual IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                                     const ConstTensor& weights,
-                                                     const ConstTensor& biases,
-                                                     const char* name = nullptr) = 0;
-
-    /// Adds a depth to space layer to the network.
-    /// @param depthToSpaceDescriptor - Parameters for the depth to space operation.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddDepthToSpaceLayer(const DepthToSpaceDescriptor& depthToSpaceDescriptor,
-                                                    const char* name = nullptr) = 0;
-
-    /// Adds a 2D depthwise convolution layer to the network.
-    /// @param convolution2dDescriptor - Description of the 2D depthwise convolution layer.
-    /// @param weights - Tensor for the weights. Expected format: [channelMultiplier, inputChannels, height, width].
-    /// @param biases Optional tensor for the bias data. If specified, must match the output tensor shape.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddDepthwiseConvolution2dLayer(
-        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const ConstTensor& weights,
-        const Optional<ConstTensor>& biases,
-        const char* name = nullptr) = 0;
-
-    ARMNN_DEPRECATED_MSG("This AddDepthwiseConvolution2dLayer overload is deprecated")
-    virtual IConnectableLayer* AddDepthwiseConvolution2dLayer(
-        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const ConstTensor& weights,
-        const char* name = nullptr) = 0;
-
-    ARMNN_DEPRECATED_MSG("This AddDepthwiseConvolution2dLayer overload is deprecated")
-    virtual IConnectableLayer* AddDepthwiseConvolution2dLayer(
-        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const ConstTensor& weights,
-        const ConstTensor& biases,
-        const char* name = nullptr) = 0;
-
-    /// Adds a Dequantize layer to the network.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddDequantizeLayer(const char* name = nullptr) = 0;
-
-    /// Adds a Detection PostProcess layer to the network.
-    /// @param descriptor - Description of the Detection PostProcess layer.
-    /// @param anchors - Tensor for anchors.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddDetectionPostProcessLayer(
-        const DetectionPostProcessDescriptor& descriptor,
-        const ConstTensor& anchors,
-        const char* name = nullptr) = 0;
-
-    /// Add an ElementwiseUnary layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @param desc - Descriptor for the elementwiseUnary operation.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
-                                                        const char* name = nullptr) = 0;
-
-    /// Add an Fill layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @param fillDescriptor - Descriptor for the fill operation.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddFillLayer(const FillDescriptor& fillDescriptor,
-                                            const char* name = nullptr) = 0;
-
-    /// Adds a fully connected layer to the network.
-    /// @param fullyConnectedDescriptor - Description of the fully connected layer.
-    /// @param weights - Tensor for the weights data.
-    /// @param biases - Optional tensor for the bias data.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                      const ConstTensor& weights,
-                                                      const Optional<ConstTensor>& biases,
-                                                      const char* name = nullptr) = 0;
-
-    ARMNN_DEPRECATED_MSG("This AddFullyConnectedLayer overload is deprecated")
-    virtual IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                      const ConstTensor& weights,
-                                                      const char* name = nullptr) = 0;
-
-    ARMNN_DEPRECATED_MSG("This AddFullyConnectedLayer overload is deprecated")
-    virtual IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                      const ConstTensor& weights,
-                                                      const ConstTensor& biases,
-                                                      const char* name = nullptr) = 0;
-
-    /// Adds a permute layer to the network.
-    /// @param permuteDescriptor - PermuteDescriptor to configure the permute.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddPermuteLayer(const PermuteDescriptor& permuteDescriptor,
-                                               const char* name = nullptr) = 0;
-
-    /// Adds a batch to space ND layer to the network.
-    /// @param batchToSpaceNdDescriptor - Description of the layer.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddBatchToSpaceNdLayer(const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
-                                                      const char* name = nullptr) = 0;
-
-    /// Adds a pooling layer to the network.
-    /// @param pooling2dDescriptor - Pooling2dDescriptor to configure the pooling.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddPooling2dLayer(const Pooling2dDescriptor& pooling2dDescriptor,
-        const char* name = nullptr) = 0;
-
-    /// Adds an activation layer to the network.
-    /// @param activationDescriptor - ActivationDescriptor to configure the activation.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddActivationLayer(const ActivationDescriptor& activationDescriptor,
-        const char* name = nullptr) = 0;
-
-    /// Adds a normalization layer to the network.
-    /// @param normalizationDescriptor - NormalizationDescriptor to configure the normalization.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddNormalizationLayer(const NormalizationDescriptor& normalizationDescriptor,
-        const char* name = nullptr) = 0;
-
-    /// Adds a slice layer to the network.
-    /// @param sliceDescriptor - SliceDescriptor to configure the slice operation.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddSliceLayer(const SliceDescriptor& sliceDescriptor, const char* name = nullptr) = 0;
-
-    /// Adds a softmax layer to the network.
-    /// If the data type is QAsymm8, then the output quantization parameters
-    /// must have a scale of 1/256 and an offset of 0
-    /// @param softmaxDescriptor - SoftmaxDescriptor to configure the softmax.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddSoftmaxLayer(const SoftmaxDescriptor& softmaxDescriptor,
-        const char* name = nullptr) = 0;
-
-    /// Adds a splitter layer to the network.
-    /// @param splitterDescriptor - ViewsDescriptor to configure the splitting process.
-    ///                             Number of Views must be equal to the number of outputs,
-    ///                             and their order must match - e.g. first view corresponds to
-    ///                             the first output, second view to the second output, etc....
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddSplitterLayer(const ViewsDescriptor& splitterDescriptor,
-                                                const char* name = nullptr) = 0;
-
-    /// Adds a merge layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddMergeLayer(const char* name = nullptr) = 0;
-
-    /// Adds a concat layer to the network.
-    /// @param mergerDescriptor - MergerDescriptor (synonym for OriginsDescriptor) to configure the concatenation
-    ///                           process. Number of Views must be equal to the number of inputs, and their order
-    ///                           must match - e.g. first view corresponds to the first input, second view to the
-    ///                           second input, etc....
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG("Use AddConcatLayer instead")
-    virtual IConnectableLayer* AddMergerLayer(const MergerDescriptor& mergerDescriptor,
-        const char* name = nullptr) = 0;
-
-    /// Add absolute layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG("Use AddElementwiseUnaryLayer instead")
-    virtual IConnectableLayer* AddAbsLayer(const char* name = nullptr) = 0;
-
-    /// Adds an addition layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddAdditionLayer(const char* name = nullptr) = 0;
-
-    /// Adds a multiplication layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddMultiplicationLayer(const char* name = nullptr) = 0;
-
-    /// Adds a batch normalization layer to the network.
-    /// @param mean - Pre-calculated mean for each channel.
-    /// @param variance - Pre-calculated variance for each channel.
-    /// @param beta - Per-channel additive factor.
-    /// @param gamma - Per-channel multiplicative factor.
-    /// @return - Interface for configuring the layer.
-    /// @param name - Optional name for the layer.
-    virtual IConnectableLayer* AddBatchNormalizationLayer(const BatchNormalizationDescriptor& desc,
-        const ConstTensor& mean,
-        const ConstTensor& variance,
-        const ConstTensor& beta,
-        const ConstTensor& gamma,
-        const char* name = nullptr) = 0;
-
-    /// Adds a rank layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddRankLayer(const char* name = nullptr) = 0;
-
-    /// Adds a resize bilinear layer to the network.
-    /// @param resizeDesc - Parameters for the resize operation.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG("Use AddResizeLayer instead")
-    virtual IConnectableLayer* AddResizeBilinearLayer(const ResizeBilinearDescriptor& resizeDesc,
-                                                      const char* name = nullptr) = 0;
-
-    /// Adds a resize layer to the network.
-    /// @param resizeDescriptor - Parameters for the resize operation.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddResizeLayer(const ResizeDescriptor& resizeDescriptor,
-                                              const char* name = nullptr) = 0;
-
-    /// Adds a reduce layer to the network.
-    /// @param ReduceDescriptor - Parameters for the reduce operation.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddReduceLayer(const ReduceDescriptor& reduceDescriptor,
-                                              const char* name = nullptr) = 0;
-
-    /// Adds an instance normalization layer to the network.
-    /// @param desc - Parameters for the instance normalization operation.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddInstanceNormalizationLayer(const InstanceNormalizationDescriptor& desc,
-                                                             const char* name = nullptr) = 0;
-
-    /// Adds an L2 normalization layer to the network.
-    /// Normalization is performed along dimension 1, but requires a 4d input.
-    /// @param desc - Parameters for the L2 normalization operation.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddL2NormalizationLayer(const L2NormalizationDescriptor& desc,
-                                                       const char* name = nullptr) = 0;
-
-    /// Adds a log softmax layer to the network.
-    /// @param logSoftmaxDescriptor - LogSoftmaxDescriptor to configure the log softmax.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddLogSoftmaxLayer(const LogSoftmaxDescriptor& logSoftmaxDescriptor,
-                                                  const char* name = nullptr) = 0;
-
-    /// Adds a layer with no inputs and a single output, which always corresponds to
-    /// the passed in constant tensor.
-    /// @param input - Tensor to be provided as the only output of the layer. The layer will maintain
-    ///                its own copy of the tensor data, meaning the memory referenced by @a input can
-    ///                be freed or reused after this function is called.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddConstantLayer(const ConstTensor& input,
-                                                const char* name = nullptr) = 0;
-
-    /// Adds a reshape layer to the network.
-    /// @param reshapeDescriptor - Parameters for the reshape operation.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddReshapeLayer(const ReshapeDescriptor& reshapeDescriptor,
-                                               const char* name = nullptr) = 0;
-
-    /// Adds a space to batch layer to the network.
-    /// @param spaceToBatchNdDescriptor - Parameters for the space to batch operation.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddSpaceToBatchNdLayer(const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
-                                                      const char* name = nullptr) = 0;
-
-    /// Adds a space to depth layer to the network.
-    /// @param spaceToDepthDescriptor - Parameters for the space to depth operation.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddSpaceToDepthLayer(const SpaceToDepthDescriptor& spaceToDepthDescriptor,
-                                                    const char* name = nullptr) = 0;
-
-    /// Adds a floor layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddFloorLayer(const char* name = nullptr) = 0;
-
-    /// Adds an output layer to the network.
-    /// @param id - User generated id to uniquely identify a particular output. The same id needs to be specified
-    /// when passing the outputs to the IRuntime::EnqueueWorkload() function.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddOutputLayer(LayerBindingId id, const char* name = nullptr) = 0;
-
-    /// Add a Lstm layer to the network
-    /// @param descriptor - Parameters for the Lstm operation
-    /// @param params - Weights and biases for the LSTM cell
-    /// @param name - Optional name for the layer
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddLstmLayer(const LstmDescriptor& descriptor,
-                                            const LstmInputParams& params,
-                                            const char* name = nullptr) = 0;
-
-    /// Adds a division layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddDivisionLayer(const char* name = nullptr) = 0;
-
-    /// Adds a subtraction layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddSubtractionLayer(const char* name = nullptr) = 0;
-
-    /// Add a Maximum layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddMaximumLayer(const char* name = nullptr) = 0;
-
-    /// Add a Mean layer to the network.
-    /// @param meanDescriptor - Parameters for the mean operation.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddMeanLayer(const MeanDescriptor& meanDescriptor, const char* name = nullptr) = 0;
-
-    /// Adds a fully pad layer to the network.
-    /// @param paddings - n by 2 tensor, where n is the rank of the input tensor,
-    ///                   such that paddings[i,0] indicates the amount of padding to add in front of dimonsion i, and
-    ///                   paddings[i,1] indicates the amount of padding to add after the end of dimension i
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddPadLayer(const PadDescriptor& padDescriptor,
-                                           const char* name = nullptr) = 0;
-
-    /// Add a quantize layer to the network
-    ///@param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddQuantizeLayer(const char* name = nullptr) = 0;
-
-    /// Adds a strided slice layer to the network.
-    /// @param StridedSliceDescriptor - Parameters for the strided slice operation.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddStridedSliceLayer(const StridedSliceDescriptor& stridedSliceDescriptor,
-                                                    const char* name = nullptr) = 0;
-
-    /// Add a Minimum layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddMinimumLayer(const char* name = nullptr) = 0;
-
-    /// Add a Greater layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG("Use AddComparisonLayer instead")
-    virtual IConnectableLayer* AddGreaterLayer(const char* name = nullptr) = 0;
-
-    /// Add a Equal layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG("Use AddComparisonLayer instead")
-    virtual IConnectableLayer* AddEqualLayer(const char* name = nullptr) = 0;
-
-    /// Add Reciprocal of square root layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG("Use AddElementwiseUnaryLayer instead")
-    virtual IConnectableLayer* AddRsqrtLayer(const char* name = nullptr) = 0;
-
-    /// Add Gather layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG("Use AddGatherLayer with descriptor instead")
-    virtual IConnectableLayer* AddGatherLayer(const char* name = nullptr) = 0;
-
-    /// Add Gather layer to the network.
-    /// @param descriptor - Description of the gather layer.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddGatherLayer(const GatherDescriptor& descriptor,
-                                              const char* name = nullptr) = 0;
-
-    /// Adds a switch layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddSwitchLayer(const char* name = nullptr) = 0;
-
-    /// Adds a PReLU layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddPreluLayer(const char* name = nullptr) = 0;
-
-    /// Adds a 2D transpose convolution layer to the network.
-    /// @param descriptor - Description of the 2D transpose convolution layer.
-    /// @param weights - Tensor for the weights data.
-    /// @param biases - Optional tensor for the bias data.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddTransposeConvolution2dLayer(const TransposeConvolution2dDescriptor& descriptor,
-                                                              const ConstTensor& weights,
-                                                              const Optional<ConstTensor>& biases,
-                                                              const char* name = nullptr) = 0;
-
-    /// Adds a transpose layer to the network.
-    /// @param transposeDescriptor - TransposeDescriptor to configure the transpose.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddTransposeLayer(const TransposeDescriptor& transposeDescriptor,
-                                                 const char* name = nullptr) = 0;
-
-    /// Adds a stack layer to the network.
-    /// @param descriptor - Description of the stack layer.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddStackLayer(const StackDescriptor& descriptor,
-                                             const char* name = nullptr) = 0;
-
-    /// Add a stand-in layer for a type unknown to the Arm NN framework.
-    /// Note: Due to the nature of this layer, no validation can be performed by the framework.
-    /// Furthermore, Any model containing this layer cannot make use of dynamic tensors since the
-    /// tensor sizes cannot be inferred.
-    /// @descriptor - Descriptor for the StandIn layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddStandInLayer(const StandInDescriptor& descriptor,
-                                               const char* name = nullptr) = 0;
-
-    /// Add a QuantizedLstm layer to the network
-    /// @param params - The weights and biases for the Quantized LSTM cell
-    /// @param name - Optional name for the layer
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddQuantizedLstmLayer(const QuantizedLstmInputParams& params,
-                                                     const char* name = nullptr) = 0;
-
-    /// Add a QLstm layer to the network
-    /// @param descriptor - Parameters for the QLstm operation
-    /// @param params - Weights and biases for the layer
-    /// @param name - Optional name for the layer
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddQLstmLayer(const QLstmDescriptor& descriptor,
-                                             const LstmInputParams& params,
-                                             const char* name = nullptr) = 0;
-
-    /// Adds a Logical Binary layer to the network.
-    /// @param descriptor - Description of the Logical Binary layer.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddLogicalBinaryLayer(const LogicalBinaryDescriptor& descriptor,
-                                                     const char* name = nullptr) = 0;
-
-    virtual void Accept(ILayerVisitor& visitor) const = 0;
-
-    virtual void ExecuteStrategy(IStrategy& strategy) const = 0;
-
-protected:
-    ~INetwork() {}
-};
-
-using IOptimizedNetworkPtr = std::unique_ptr<IOptimizedNetwork, void(*)(IOptimizedNetwork* network)>;
-
-class IOptimizedNetwork
-{
-public:
-    static void Destroy(IOptimizedNetwork* network);
-
-    virtual Status PrintGraph() = 0;
-    virtual Status SerializeToDot(std::ostream& stream) const = 0;
-
-    virtual profiling::ProfilingGuid GetGuid() const = 0;
-
-protected:
-    ~IOptimizedNetwork() {}
-};
 
 struct OptimizerOptions
 {
@@ -642,7 +119,7 @@ struct OptimizerOptions
     {}
 
     OptimizerOptions(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16, bool importEnabled,
-        ModelOptions modelOptions = {})
+                     ModelOptions modelOptions = {})
         : m_ReduceFp32ToFp16(reduceFp32ToFp16)
         , m_Debug(debug)
         , m_ReduceFp32ToBf16(reduceFp32ToBf16)
@@ -689,6 +166,569 @@ struct OptimizerOptions
 
     // Enable Model Options
     ModelOptions m_ModelOptions;
+};
+
+class IWorkloadFactory;
+class NetworkImpl;
+using INetworkPtr = std::unique_ptr<INetwork, void(*)(INetwork* network)>;
+using IOptimizedNetworkPtr = std::unique_ptr<IOptimizedNetwork, void(*)(IOptimizedNetwork* network)>;
+
+/// Main network class which provides the interface for building up a neural network.
+/// This object is subsequently required by the IRuntime::Load() method.
+class INetwork
+{
+public:
+    static INetwork* CreateRaw(NetworkOptions networkOptions = {});
+    static INetworkPtr Create(NetworkOptions networkOptions = {});
+    static void Destroy(INetwork* network);
+
+    Status PrintGraph();
+
+    /// Adds an input layer to the network.
+    /// @param id - User generated id to uniquely identify a particular input. The same id needs to be specified.
+    /// when passing the inputs to the IRuntime::EnqueueWorkload() function.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddInputLayer(LayerBindingId id, const char* name = nullptr);
+
+    /// Adds an ArgMinMax layer to the network.
+    /// @param desc - Parameters for the L2 normalization operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddArgMinMaxLayer(const ArgMinMaxDescriptor& desc,
+                                         const char* name = nullptr);
+
+    /// Add a Comparison layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @param desc - Descriptor for the comparison operation.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddComparisonLayer(const ComparisonDescriptor& comparisonDescriptor,
+                                          const char* name = nullptr);
+
+    /// Adds a concatenation layer to the network.
+    /// @param concatDescriptor - ConcatDescriptor (synonym for OriginsDescriptor) to configure the concatenation
+    ///                           process. Number of Views must be equal to the number of inputs, and their order
+    ///                           must match - e.g. first view corresponds to the first input, second view to the
+    ///                           second input, etc....
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddConcatLayer(const ConcatDescriptor& concatDescriptor,
+                                      const char* name = nullptr);
+
+    /// Adds a 2D convolution layer to the network.
+    /// @param convolution2dDescriptor - Description of the 2D convolution layer.
+    /// @param weights - Tensor for the weights data.
+    /// @param biases - Optional tensor for the bias data. If specified, must match the output tensor shape.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+                                             const ConstTensor& weights,
+                                             const Optional<ConstTensor>& biases,
+                                             const char* name = nullptr);
+
+    ARMNN_DEPRECATED_MSG("This AddConvolution2dLayer overload is deprecated")
+    IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+                                             const ConstTensor& weights,
+                                             const char* name = nullptr);
+
+    ARMNN_DEPRECATED_MSG("This AddConvolution2dLayer overload is deprecated")
+    IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+                                             const ConstTensor& weights,
+                                             const ConstTensor& biases,
+                                             const char* name = nullptr);
+
+    /// Adds a depth to space layer to the network.
+    /// @param depthToSpaceDescriptor - Parameters for the depth to space operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddDepthToSpaceLayer(const DepthToSpaceDescriptor& depthToSpaceDescriptor,
+                                            const char* name = nullptr);
+
+    /// Adds a 2D depthwise convolution layer to the network.
+    /// @param convolution2dDescriptor - Description of the 2D depthwise convolution layer.
+    /// @param weights - Tensor for the weights. Expected format: [channelMultiplier, inputChannels, height, width].
+    /// @param biases Optional tensor for the bias data. If specified, must match the output tensor shape.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddDepthwiseConvolution2dLayer(
+        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+        const ConstTensor& weights,
+        const Optional<ConstTensor>& biases,
+        const char* name = nullptr);
+
+    ARMNN_DEPRECATED_MSG("This AddDepthwiseConvolution2dLayer overload is deprecated")
+    IConnectableLayer* AddDepthwiseConvolution2dLayer(
+        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+        const ConstTensor& weights,
+        const char* name = nullptr);
+
+    ARMNN_DEPRECATED_MSG("This AddDepthwiseConvolution2dLayer overload is deprecated")
+    IConnectableLayer* AddDepthwiseConvolution2dLayer(
+        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+        const ConstTensor& weights,
+        const ConstTensor& biases,
+        const char* name = nullptr);
+
+    /// Adds a Dequantize layer to the network.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddDequantizeLayer(const char* name = nullptr);
+
+    /// Adds a Detection PostProcess layer to the network.
+    /// @param descriptor - Description of the Detection PostProcess layer.
+    /// @param anchors - Tensor for anchors.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddDetectionPostProcessLayer(
+        const DetectionPostProcessDescriptor& descriptor,
+        const ConstTensor& anchors,
+        const char* name = nullptr);
+
+    /// Add an ElementwiseUnary layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @param desc - Descriptor for the elementwiseUnary operation.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
+                                                const char* name = nullptr);
+
+    /// Add an Fill layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @param fillDescriptor - Descriptor for the fill operation.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddFillLayer(const FillDescriptor& fillDescriptor,
+                                    const char* name = nullptr);
+
+    /// Adds a fully connected layer to the network.
+    /// @param fullyConnectedDescriptor - Description of the fully connected layer.
+    /// @param weights - Tensor for the weights data.
+    /// @param biases - Optional tensor for the bias data.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                              const ConstTensor& weights,
+                                              const Optional<ConstTensor>& biases,
+                                              const char* name = nullptr);
+
+    ARMNN_DEPRECATED_MSG("This AddFullyConnectedLayer overload is deprecated")
+    IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                              const ConstTensor& weights,
+                                              const char* name = nullptr);
+
+    ARMNN_DEPRECATED_MSG("This AddFullyConnectedLayer overload is deprecated")
+    IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                              const ConstTensor& weights,
+                                              const ConstTensor& biases,
+                                              const char* name = nullptr);
+
+    /// Adds a permute layer to the network.
+    /// @param permuteDescriptor - PermuteDescriptor to configure the permute.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddPermuteLayer(const PermuteDescriptor& permuteDescriptor,
+                                       const char* name = nullptr);
+
+    /// Adds a batch to space ND layer to the network.
+    /// @param batchToSpaceNdDescriptor - Description of the layer.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddBatchToSpaceNdLayer(const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
+                                              const char* name = nullptr);
+
+    /// Adds a pooling layer to the network.
+    /// @param pooling2dDescriptor - Pooling2dDescriptor to configure the pooling.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddPooling2dLayer(const Pooling2dDescriptor& pooling2dDescriptor,
+        const char* name = nullptr);
+
+    /// Adds an activation layer to the network.
+    /// @param activationDescriptor - ActivationDescriptor to configure the activation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddActivationLayer(const ActivationDescriptor& activationDescriptor,
+        const char* name = nullptr);
+
+    /// Adds a normalization layer to the network.
+    /// @param normalizationDescriptor - NormalizationDescriptor to configure the normalization.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddNormalizationLayer(const NormalizationDescriptor& normalizationDescriptor,
+        const char* name = nullptr);
+
+    /// Adds a slice layer to the network.
+    /// @param sliceDescriptor - SliceDescriptor to configure the slice operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddSliceLayer(const SliceDescriptor& sliceDescriptor, const char* name = nullptr);
+
+    /// Adds a softmax layer to the network.
+    /// If the data type is QAsymm8, then the output quantization parameters
+    /// must have a scale of 1/256 and an offset of 0
+    /// @param softmaxDescriptor - SoftmaxDescriptor to configure the softmax.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddSoftmaxLayer(const SoftmaxDescriptor& softmaxDescriptor,
+        const char* name = nullptr);
+
+    /// Adds a splitter layer to the network.
+    /// @param splitterDescriptor - ViewsDescriptor to configure the splitting process.
+    ///                             Number of Views must be equal to the number of outputs,
+    ///                             and their order must match - e.g. first view corresponds to
+    ///                             the first output, second view to the second output, etc....
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddSplitterLayer(const ViewsDescriptor& splitterDescriptor,
+                                        const char* name = nullptr);
+
+    /// Adds a merge layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddMergeLayer(const char* name = nullptr);
+
+    /// Adds a concat layer to the network.
+    /// @param mergerDescriptor - MergerDescriptor (synonym for OriginsDescriptor) to configure the concatenation
+    ///                           process. Number of Views must be equal to the number of inputs, and their order
+    ///                           must match - e.g. first view corresponds to the first input, second view to the
+    ///                           second input, etc....
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG("Use AddConcatLayer instead")
+    IConnectableLayer* AddMergerLayer(const MergerDescriptor& mergerDescriptor,
+        const char* name = nullptr);
+
+    /// Add absolute layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG("Use AddElementwiseUnaryLayer instead")
+    IConnectableLayer* AddAbsLayer(const char* name = nullptr);
+
+    /// Adds an addition layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddAdditionLayer(const char* name = nullptr);
+
+    /// Adds a multiplication layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddMultiplicationLayer(const char* name = nullptr);
+
+    /// Adds a batch normalization layer to the network.
+    /// @param mean - Pre-calculated mean for each channel.
+    /// @param variance - Pre-calculated variance for each channel.
+    /// @param beta - Per-channel additive factor.
+    /// @param gamma - Per-channel multiplicative factor.
+    /// @return - Interface for configuring the layer.
+    /// @param name - Optional name for the layer.
+    IConnectableLayer* AddBatchNormalizationLayer(const BatchNormalizationDescriptor& desc,
+        const ConstTensor& mean,
+        const ConstTensor& variance,
+        const ConstTensor& beta,
+        const ConstTensor& gamma,
+        const char* name = nullptr);
+
+    /// Adds a rank layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddRankLayer(const char* name = nullptr);
+
+    /// Adds a resize bilinear layer to the network.
+    /// @param resizeDesc - Parameters for the resize operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG("Use AddResizeLayer instead")
+    IConnectableLayer* AddResizeBilinearLayer(const ResizeBilinearDescriptor& resizeDesc,
+                                              const char* name = nullptr);
+
+    /// Adds a resize layer to the network.
+    /// @param resizeDescriptor - Parameters for the resize operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddResizeLayer(const ResizeDescriptor& resizeDescriptor,
+                                      const char* name = nullptr);
+
+    /// Adds a reduce layer to the network.
+    /// @param ReduceDescriptor - Parameters for the reduce operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddReduceLayer(const ReduceDescriptor& reduceDescriptor,
+                                      const char* name = nullptr);
+
+    /// Adds an instance normalization layer to the network.
+    /// @param desc - Parameters for the instance normalization operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddInstanceNormalizationLayer(const InstanceNormalizationDescriptor& desc,
+                                                     const char* name = nullptr);
+
+    /// Adds an L2 normalization layer to the network.
+    /// Normalization is performed along dimension 1, but requires a 4d input.
+    /// @param desc - Parameters for the L2 normalization operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddL2NormalizationLayer(const L2NormalizationDescriptor& desc,
+                                               const char* name = nullptr);
+
+    /// Adds a log softmax layer to the network.
+    /// @param logSoftmaxDescriptor - LogSoftmaxDescriptor to configure the log softmax.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddLogSoftmaxLayer(const LogSoftmaxDescriptor& logSoftmaxDescriptor,
+                                          const char* name = nullptr);
+
+    /// Adds a layer with no inputs and a single output, which always corresponds to
+    /// the passed in constant tensor.
+    /// @param input - Tensor to be provided as the only output of the layer. The layer will maintain
+    ///                its own copy of the tensor data, meaning the memory referenced by @a input can
+    ///                be freed or reused after this function is called.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddConstantLayer(const ConstTensor& input,
+                                        const char* name = nullptr);
+
+    /// Adds a reshape layer to the network.
+    /// @param reshapeDescriptor - Parameters for the reshape operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddReshapeLayer(const ReshapeDescriptor& reshapeDescriptor,
+                                       const char* name = nullptr);
+
+    /// Adds a space to batch layer to the network.
+    /// @param spaceToBatchNdDescriptor - Parameters for the space to batch operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddSpaceToBatchNdLayer(const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+                                              const char* name = nullptr);
+
+    /// Adds a space to depth layer to the network.
+    /// @param spaceToDepthDescriptor - Parameters for the space to depth operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddSpaceToDepthLayer(const SpaceToDepthDescriptor& spaceToDepthDescriptor,
+                                            const char* name = nullptr);
+
+    /// Adds a floor layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddFloorLayer(const char* name = nullptr);
+
+    /// Adds an output layer to the network.
+    /// @param id - User generated id to uniquely identify a particular output. The same id needs to be specified
+    /// when passing the outputs to the IRuntime::EnqueueWorkload() function.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddOutputLayer(LayerBindingId id, const char* name = nullptr);
+
+    /// Add a Lstm layer to the network
+    /// @param descriptor - Parameters for the Lstm operation
+    /// @param params - Weights and biases for the LSTM cell
+    /// @param name - Optional name for the layer
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddLstmLayer(const LstmDescriptor& descriptor,
+                                    const LstmInputParams& params,
+                                    const char* name = nullptr);
+
+    /// Adds a division layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddDivisionLayer(const char* name = nullptr);
+
+    /// Adds a subtraction layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddSubtractionLayer(const char* name = nullptr);
+
+    /// Add a Maximum layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddMaximumLayer(const char* name = nullptr);
+
+    /// Add a Mean layer to the network.
+    /// @param meanDescriptor - Parameters for the mean operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddMeanLayer(const MeanDescriptor& meanDescriptor, const char* name = nullptr);
+
+    /// Adds a fully pad layer to the network.
+    /// @param paddings - n by 2 tensor, where n is the rank of the input tensor,
+    ///                   such that paddings[i,0] indicates the amount of padding to add in front of dimonsion i, and
+    ///                   paddings[i,1] indicates the amount of padding to add after the end of dimension i
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddPadLayer(const PadDescriptor& padDescriptor,
+                                           const char* name = nullptr);
+
+    /// Add a quantize layer to the network
+    ///@param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddQuantizeLayer(const char* name = nullptr);
+
+    /// Adds a strided slice layer to the network.
+    /// @param StridedSliceDescriptor - Parameters for the strided slice operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddStridedSliceLayer(const StridedSliceDescriptor& stridedSliceDescriptor,
+                                                    const char* name = nullptr);
+
+    /// Add a Minimum layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddMinimumLayer(const char* name = nullptr);
+
+    /// Add a Greater layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG("Use AddComparisonLayer instead")
+    IConnectableLayer* AddGreaterLayer(const char* name = nullptr);
+
+    /// Add a Equal layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG("Use AddComparisonLayer instead")
+    IConnectableLayer* AddEqualLayer(const char* name = nullptr);
+
+    /// Add Reciprocal of square root layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG("Use AddElementwiseUnaryLayer instead")
+    IConnectableLayer* AddRsqrtLayer(const char* name = nullptr);
+
+    /// Add Gather layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG("Use AddGatherLayer with descriptor instead")
+    IConnectableLayer* AddGatherLayer(const char* name = nullptr);
+
+    /// Add Gather layer to the network.
+    /// @param descriptor - Description of the gather layer.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddGatherLayer(const GatherDescriptor& descriptor,
+                                              const char* name = nullptr);
+
+    /// Adds a switch layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddSwitchLayer(const char* name = nullptr);
+
+    /// Adds a PReLU layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddPreluLayer(const char* name = nullptr);
+
+    /// Adds a 2D transpose convolution layer to the network.
+    /// @param descriptor - Description of the 2D transpose convolution layer.
+    /// @param weights - Tensor for the weights data.
+    /// @param biases - Optional tensor for the bias data.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddTransposeConvolution2dLayer(const TransposeConvolution2dDescriptor& descriptor,
+                                                              const ConstTensor& weights,
+                                                              const Optional<ConstTensor>& biases,
+                                                              const char* name = nullptr);
+
+    /// Adds a transpose layer to the network.
+    /// @param transposeDescriptor - TransposeDescriptor to configure the transpose.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddTransposeLayer(const TransposeDescriptor& transposeDescriptor,
+                                                 const char* name = nullptr);
+
+    /// Adds a stack layer to the network.
+    /// @param descriptor - Description of the stack layer.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddStackLayer(const StackDescriptor& descriptor,
+                                             const char* name = nullptr);
+
+    /// Add a stand-in layer for a type unknown to the Arm NN framework.
+    /// Note: Due to the nature of this layer, no validation can be performed by the framework.
+    /// Furthermore, Any model containing this layer cannot make use of dynamic tensors since the
+    /// tensor sizes cannot be inferred.
+    /// @descriptor - Descriptor for the StandIn layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddStandInLayer(const StandInDescriptor& descriptor,
+                                               const char* name = nullptr);
+
+    /// Add a QuantizedLstm layer to the network
+    /// @param params - The weights and biases for the Quantized LSTM cell
+    /// @param name - Optional name for the layer
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddQuantizedLstmLayer(const QuantizedLstmInputParams& params,
+                                                     const char* name = nullptr);
+
+    /// Add a QLstm layer to the network
+    /// @param descriptor - Parameters for the QLstm operation
+    /// @param params - Weights and biases for the layer
+    /// @param name - Optional name for the layer
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddQLstmLayer(const QLstmDescriptor& descriptor,
+                                             const LstmInputParams& params,
+                                             const char* name = nullptr);
+
+    /// Adds a Logical Binary layer to the network.
+    /// @param descriptor - Description of the Logical Binary layer.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddLogicalBinaryLayer(const LogicalBinaryDescriptor& descriptor,
+                                                     const char* name = nullptr);
+
+    void Accept(ILayerVisitor& visitor) const;
+
+    void ExecuteStrategy(IStrategy& strategy) const;
+
+protected:
+    ~INetwork();
+
+    friend class NetworkQuantizer;
+    friend void VisitLayersTopologically(const INetwork* inputNetwork, IStrategy& strategy);
+    friend class TestConnectionPreservation;
+    friend TensorInfo GetInputTensorInfo(const INetwork* network);
+    friend IOptimizedNetworkPtr Optimize(const INetwork& network,
+                                         const std::vector<BackendId>& backendPreferences,
+                                         const IDeviceSpec& deviceSpec,
+                                         const OptimizerOptions& options,
+                                         Optional<std::vector<std::string>&> messages);
+
+    INetwork(NetworkOptions networkOptions = {});
+
+    std::unique_ptr<NetworkImpl> pNetworkImpl;
+};
+
+struct BackendSettings;
+struct OptimizationResult;
+class OptimizedNetworkImpl;
+class IOptimizedNetwork
+{
+public:
+    static void Destroy(IOptimizedNetwork* network);
+
+    Status PrintGraph();
+    Status SerializeToDot(std::ostream& stream) const;
+
+    profiling::ProfilingGuid GetGuid() const;
+
+    IOptimizedNetwork(std::unique_ptr<Graph> graph);
+    IOptimizedNetwork(std::unique_ptr<OptimizedNetworkImpl> impl);
+    ~IOptimizedNetwork();
+
+protected:
+    friend class LoadedNetwork;
+    friend Graph& GetGraphForTesting(IOptimizedNetwork* optNetPtr);
+    friend ModelOptions& GetModelOptionsForTesting(IOptimizedNetwork* optNetPtr);
+    friend IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
+                                         const std::vector<BackendId>& backendPreferences,
+                                         const IDeviceSpec& deviceSpec,
+                                         const OptimizerOptions& options,
+                                         Optional<std::vector<std::string>&> messages);
+
+    template <typename PreCompiledWorkload, armnn::DataType dataType>
+    friend std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> CreatePreCompiledWorkloadTest(
+        armnn::IWorkloadFactory& factory,
+        armnn::Graph& graph,
+        bool biasEnabled);
+
+    IOptimizedNetwork(std::unique_ptr<Graph> graph, const ModelOptions& modelOptions);
+
+    std::unique_ptr<OptimizedNetworkImpl> pOptimizedNetworkImpl;
 };
 
 /// Create an optimized version of the network

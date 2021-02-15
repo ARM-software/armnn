@@ -62,8 +62,7 @@ BOOST_AUTO_TEST_CASE(FallbackImportToCpuAcc)
     optOptions.m_ImportEnabled = true;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
-    Graph& graph = optNetObjPtr->GetGraph();
+    Graph& graph = GetGraphForTesting(optNet.get());
 
     armnn::Layer* const layer0 = GetFirstLayerWithName(graph, "input0");
     armnn::Layer* const layer1 = GetFirstLayerWithName(graph, "input1");
@@ -200,8 +199,7 @@ BOOST_AUTO_TEST_CASE(FallbackPaddingCopyToCpuAcc)
     optOptions.m_ImportEnabled = true;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
-    Graph& graph = optNetObjPtr->GetGraph();
+    Graph& graph = GetGraphForTesting(optNet.get());
 
     armnn::Layer* const layer0 = GetFirstLayerWithName(graph, "input0");
     armnn::Layer* const layer1 = GetFirstLayerWithName(graph, "input1");
@@ -331,8 +329,7 @@ BOOST_AUTO_TEST_CASE(FallbackImportFromCpuAcc)
     optOptions.m_ImportEnabled = true;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
-    Graph& graph = optNetObjPtr->GetGraph();
+    Graph& graph = GetGraphForTesting(optNet.get());
 
     armnn::Layer* const layer0 = GetFirstLayerWithName(graph, "input0");
     armnn::Layer* const layer1 = GetFirstLayerWithName(graph, "input1");
@@ -469,8 +466,7 @@ BOOST_AUTO_TEST_CASE(FallbackPaddingCopyFromCpuAcc)
     optOptions.m_ImportEnabled = true;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
-    Graph& graph = optNetObjPtr->GetGraph();
+    Graph& graph = GetGraphForTesting(optNet.get());
 
     armnn::Layer* const layer0 = GetFirstLayerWithName(graph, "input0");
     armnn::Layer* const layer1 = GetFirstLayerWithName(graph, "input1");
@@ -598,8 +594,7 @@ BOOST_AUTO_TEST_CASE(FallbackDisableImportFromCpuAcc)
     std::vector<BackendId> backends = { "MockRef", Compute::CpuAcc };
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
-    Graph& graph = optNetObjPtr->GetGraph();
+    Graph& graph = GetGraphForTesting(optNet.get());
 
     armnn::Layer* const layer0 = GetFirstLayerWithName(graph, "input0");
     armnn::Layer* const layer1 = GetFirstLayerWithName(graph, "input1");
@@ -723,8 +718,7 @@ BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackToCl)
     optOptions.m_ImportEnabled = true;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
-    Graph& graph = optNetObjPtr->GetGraph();
+    Graph& graph = GetGraphForTesting(optNet.get());
 
     armnn::Layer* const layer0 = GetFirstLayerWithName(graph, "input0");
     armnn::Layer* const layer1 = GetFirstLayerWithName(graph, "input1");
@@ -849,8 +843,7 @@ BOOST_AUTO_TEST_CASE(NeonImportDisabledFallbackToCl)
     OptimizerOptions optOptions;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
-    Graph& graph = optNetObjPtr->GetGraph();
+    Graph& graph = GetGraphForTesting(optNet.get());
 
     armnn::Layer* const layer0 = GetFirstLayerWithName(graph, "input0");
     armnn::Layer* const layer1 = GetFirstLayerWithName(graph, "input1");
@@ -979,8 +972,7 @@ BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackSubgraphToCl)
     optOptions.m_ImportEnabled = true;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
-    Graph& graph = optNetObjPtr->GetGraph();
+    Graph& graph = GetGraphForTesting(optNet.get());
 
     armnn::Layer* const layer0 = GetFirstLayerWithName(graph, "input0");
     armnn::Layer* const layer1 = GetFirstLayerWithName(graph, "input1");
@@ -1121,8 +1113,7 @@ BOOST_AUTO_TEST_CASE(NeonImportDisableFallbackSubgraphToCl)
     OptimizerOptions optOptions;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
-    Graph& graph = optNetObjPtr->GetGraph();
+    Graph& graph = GetGraphForTesting(optNet.get());
 
     armnn::Layer* const layer0 = GetFirstLayerWithName(graph, "input0");
     armnn::Layer* const layer1 = GetFirstLayerWithName(graph, "input1");

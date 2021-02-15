@@ -42,7 +42,7 @@ public:
 
     Status EnqueueWorkload(const InputTensors& inputTensors, const OutputTensors& outputTensors);
 
-    static std::unique_ptr<LoadedNetwork> MakeLoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
+    static std::unique_ptr<LoadedNetwork> MakeLoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                                                             std::string & errorMessage,
                                                             const INetworkProperties& networkProperties,
                                                             profiling::ProfilingService& profilingService);
@@ -63,7 +63,7 @@ public:
 private:
     void AllocateWorkingMemory(std::lock_guard<std::mutex>& lock);
 
-    LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
+    LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                   const INetworkProperties& networkProperties,
                   profiling::ProfilingService& profilingService);
 
@@ -87,7 +87,7 @@ private:
     BackendPtrMap       m_Backends;
     WorkloadFactoryMap  m_WorkloadFactories;
 
-    std::unique_ptr<OptimizedNetwork> m_OptimizedNetwork;
+    std::unique_ptr<IOptimizedNetwork> m_OptimizedNetwork;
     WorkloadQueue m_InputQueue;
     WorkloadQueue m_WorkloadQueue;
     WorkloadQueue m_OutputQueue;

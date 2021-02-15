@@ -51,8 +51,7 @@ BOOST_AUTO_TEST_CASE(ClImportEnabledFallbackToNeon)
     optOptions.m_ImportEnabled = true;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
-    Graph& graph = optNetObjPtr->GetGraph();
+    Graph& graph = GetGraphForTesting(optNet.get());
 
     armnn::Layer* const layer0 = GetFirstLayerWithName(graph, "input0");
     armnn::Layer* const layer1 = GetFirstLayerWithName(graph, "input1");
@@ -177,8 +176,7 @@ BOOST_AUTO_TEST_CASE(ClImportDisabledFallbackToNeon)
     OptimizerOptions optOptions;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
-    Graph& graph = optNetObjPtr->GetGraph();
+    Graph& graph = GetGraphForTesting(optNet.get());
 
     armnn::Layer* const layer0 = GetFirstLayerWithName(graph, "input0");
     armnn::Layer* const layer1 = GetFirstLayerWithName(graph, "input1");
@@ -307,8 +305,7 @@ BOOST_AUTO_TEST_CASE(ClImportEnabledFallbackSubgraphToNeon)
     optOptions.m_ImportEnabled = true;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
-    Graph& graph = optNetObjPtr->GetGraph();
+    Graph& graph = GetGraphForTesting(optNet.get());
 
     armnn::Layer* const layer0 = GetFirstLayerWithName(graph, "input0");
     armnn::Layer* const layer1 = GetFirstLayerWithName(graph, "input1");
@@ -445,8 +442,7 @@ BOOST_AUTO_TEST_CASE(ClImportDisableFallbackSubgraphToNeon)
     OptimizerOptions optOptions;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
-    Graph& graph = optNetObjPtr->GetGraph();
+    Graph& graph = GetGraphForTesting(optNet.get());
 
     armnn::Layer* const layer0 = GetFirstLayerWithName(graph, "input0");
     armnn::Layer* const layer1 = GetFirstLayerWithName(graph, "input1");

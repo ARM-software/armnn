@@ -51,7 +51,8 @@ bool CheckRelatedLayers(armnn::Graph& graph, const std::list<std::string>& testR
 
 namespace armnn
 {
-
+Graph& GetGraphForTesting(IOptimizedNetwork* optNetPtr);
+ModelOptions& GetModelOptionsForTesting(IOptimizedNetwork* optNetPtr);
 profiling::ProfilingService& GetProfilingService(RuntimeImpl* runtime);
 
 } // namespace armnn

@@ -16,7 +16,7 @@ namespace
 BOOST_AUTO_TEST_CASE(Check##name##LayerVisitorName) \
 { \
     Test##name##LayerVisitor visitor("name##Layer"); \
-    armnn::Network net; \
+    armnn::NetworkImpl net; \
     armnn::IConnectableLayer *const layer = net.Add##name##Layer("name##Layer"); \
     layer->Accept(visitor); \
 }
@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(Check##name##LayerVisitorName) \
 BOOST_AUTO_TEST_CASE(Check##name##LayerVisitorNameNullptr) \
 { \
     Test##name##LayerVisitor visitor; \
-    armnn::Network net; \
+    armnn::NetworkImpl net; \
     armnn::IConnectableLayer *const layer = net.Add##name##Layer(); \
     layer->Accept(visitor); \
 }

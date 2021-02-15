@@ -1974,11 +1974,11 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
 {
     IgnoreUnused(graph);
 
-    // To create a PreCompiled layer, create a network and Optimize it.
-    armnn::Network net;
+    // build up the structure of the network
+    armnn::INetworkPtr net(armnn::INetwork::Create());
 
     // Add an input layer
-    armnn::IConnectableLayer* const inputLayer = net.AddInputLayer(0, "input layer");
+    armnn::IConnectableLayer* const inputLayer = net->AddInputLayer(0, "input layer");
     BOOST_TEST(inputLayer);
 
     // ArmNN weights tensor shape is OIHW (out channels, in channels, height, width) for NCHW
@@ -2021,7 +2021,7 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
         armnn::ConstTensor biases(biasTensorInfo, biasData);
 
         // Create convolution layer with biases
-        convLayer = net.AddConvolution2dLayer(convDesc2d,
+        convLayer = net->AddConvolution2dLayer(convDesc2d,
                                               weights,
                                               Optional<ConstTensor>(biases),
                                               convLayerName.c_str());
@@ -2029,7 +2029,7 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
     else
     {
         // Create convolution layer without biases
-        convLayer = net.AddConvolution2dLayer(convDesc2d,
+        convLayer = net->AddConvolution2dLayer(convDesc2d,
                                               weights,
                                               EmptyOptional(),
                                               convLayerName.c_str());
@@ -2038,7 +2038,7 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
     BOOST_TEST(convLayer);
 
     // Add an output layer
-    armnn::IConnectableLayer* const outputLayer = net.AddOutputLayer(0, "output layer");
+    armnn::IConnectableLayer* const outputLayer = net->AddOutputLayer(0, "output layer");
     BOOST_TEST(outputLayer);
 
     // set the tensors in the network (NHWC format)
@@ -2068,12 +2068,12 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
     armnn::OptimizerOptions optimizerOptions;
-    armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(net, backends, runtime->GetDeviceSpec(),
+    armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec(),
                                                                optimizerOptions);
     BOOST_CHECK(optimizedNet != nullptr);
 
     // Find the PreCompiled layer in the optimised graph
-    armnn::Graph& optimisedGraph = static_cast<armnn::OptimizedNetwork*>(optimizedNet.get())->GetGraph();
+    armnn::Graph& optimisedGraph = GetGraphForTesting(optimizedNet.get());
     Layer* preCompiledLayer = nullptr;
     for (auto& layer : optimisedGraph)
     {

@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryLeak)
     {
         std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
 
-        std::unique_ptr<armnn::Network> mockNetwork1 = std::make_unique<armnn::Network>();
+        armnn::INetworkPtr mockNetwork1(armnn::INetwork::Create());
         mockNetwork1->AddInputLayer(0, "test layer");
 
         // Warm-up load/unload pair to put the runtime in a stable state (memory-wise).

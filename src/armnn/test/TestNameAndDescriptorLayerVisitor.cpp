@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(Check##name##LayerVisitorNameAndDescriptor) \
     const char* layerName = "name##Layer"; \
     armnn::name##Descriptor descriptor = GetDescriptor<armnn::name##Descriptor>(); \
     Test##name##LayerVisitor visitor(descriptor, layerName); \
-    armnn::Network net; \
+    armnn::NetworkImpl net; \
     armnn::IConnectableLayer *const layer = net.Add##name##Layer(descriptor, layerName); \
     layer->Accept(visitor); \
 }
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(Check##name##LayerVisitorNameNullptrAndDescriptor) \
 { \
     armnn::name##Descriptor descriptor = GetDescriptor<armnn::name##Descriptor>(); \
     Test##name##LayerVisitor visitor(descriptor); \
-    armnn::Network net; \
+    armnn::NetworkImpl net; \
     armnn::IConnectableLayer *const layer = net.Add##name##Layer(descriptor); \
     layer->Accept(visitor); \
 }

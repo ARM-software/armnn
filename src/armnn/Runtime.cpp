@@ -135,7 +135,7 @@ Status RuntimeImpl::LoadNetwork(NetworkId& networkIdOut,
     }
 
     unique_ptr<LoadedNetwork> loadedNetwork = LoadedNetwork::MakeLoadedNetwork(
-        std::unique_ptr<OptimizedNetwork>(PolymorphicDowncast<OptimizedNetwork*>(rawNetwork)),
+        std::unique_ptr<IOptimizedNetwork>(rawNetwork),
         errorMessage,
         networkProperties,
         m_ProfilingService);

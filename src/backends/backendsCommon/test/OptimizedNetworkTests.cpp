@@ -15,12 +15,13 @@ BOOST_AUTO_TEST_SUITE(OptimizedNetwork)
 
 BOOST_AUTO_TEST_CASE(SerializeToDot)
 {
-    armnn::Network net;
+    // build up the structure of the network
+    armnn::INetworkPtr net(armnn::INetwork::Create());
 
     //Defines layers.
-    auto input = net.AddInputLayer(0);
-    auto add = net.AddAdditionLayer();
-    auto output = net.AddOutputLayer(0);
+    auto input = net->AddInputLayer(0);
+    auto add = net->AddAdditionLayer();
+    auto output = net->AddOutputLayer(0);
 
     // Connects layers.
     input->GetOutputSlot(0).Connect(add->GetInputSlot(0));
@@ -36,7 +37,7 @@ BOOST_AUTO_TEST_CASE(SerializeToDot)
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(net, backends, runtime->GetDeviceSpec());
+    armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
 
     std::ostringstream ss;
     optimizedNet->SerializeToDot(ss);
@@ -127,7 +128,10 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateDeviceNonSupportLayerWithFallback)
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
     BOOST_REQUIRE(optNet);
 
-    for (auto&& layer : static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph())
+    armnn::Graph& graph = GetGraphForTesting(optNet.get());
+    graph.AllocateDynamicBuffers();
+
+    for (auto&& layer : graph)
     {
         // If NEON is enabled, Input and Output layers are supported by CpuAcc,
         // the other layers are supported by CpuRef.
@@ -151,7 +155,8 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDevice)
 {
     const armnn::TensorInfo desc({3, 5}, armnn::DataType::Float32);
 
-    armnn::Network  net;
+    // build up the structure of the network
+    armnn::INetworkPtr net(armnn::INetwork::Create());
 
     armnn::NormalizationDescriptor nmDesc;
     armnn::ActivationDescriptor acDesc;
@@ -167,21 +172,21 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDevice)
     //    sm
     //     |
     //    ot
-    armnn::IConnectableLayer* layer = net.AddInputLayer(0, "in");
+    armnn::IConnectableLayer* layer = net->AddInputLayer(0, "in");
     layer->GetOutputSlot(0).SetTensorInfo(desc);
 
-    armnn::IConnectableLayer* const normLayer = net.AddNormalizationLayer(nmDesc, "nm");
+    armnn::IConnectableLayer* const normLayer = net->AddNormalizationLayer(nmDesc, "nm");
 
     layer->GetOutputSlot(0).Connect(normLayer->GetInputSlot(0));
     normLayer->GetOutputSlot(0).SetTensorInfo(desc);
 
-    layer = net.AddActivationLayer(acDesc, "ac");
+    layer = net->AddActivationLayer(acDesc, "ac");
 
     normLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
     layer->GetOutputSlot(0).SetTensorInfo(desc);
 
     armnn::IConnectableLayer* prevLayer = layer;
-    layer = net.AddMultiplicationLayer("ml");
+    layer = net->AddMultiplicationLayer("ml");
 
     prevLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
     normLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
@@ -189,13 +194,13 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDevice)
 
     prevLayer = layer;
     armnn::SoftmaxDescriptor softmaxDescriptor;
-    layer = net.AddSoftmaxLayer(softmaxDescriptor, "sm");
+    layer = net->AddSoftmaxLayer(softmaxDescriptor, "sm");
 
     prevLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
     layer->GetOutputSlot(0).SetTensorInfo(desc);
 
     prevLayer = layer;
-    layer = net.AddOutputLayer(0, "ot");
+    layer = net->AddOutputLayer(0, "ot");
 
     prevLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
 
@@ -207,7 +212,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDevice)
 
     try
     {
-        Optimize(net, backends, runtime->GetDeviceSpec(), armnn::OptimizerOptions(), errMessages);
+        Optimize(*net, backends, runtime->GetDeviceSpec(), armnn::OptimizerOptions(), errMessages);
         BOOST_FAIL("Should have thrown an exception.");
     }
     catch (const armnn::InvalidArgumentException& e)
@@ -221,7 +226,8 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDeviceWithFallback
 {
     const armnn::TensorInfo desc({3, 5}, armnn::DataType::Float32);
 
-    armnn::Network  net;
+    // build up the structure of the network
+    armnn::INetworkPtr net(armnn::INetwork::Create());
 
     armnn::NormalizationDescriptor nmDesc;
     armnn::ActivationDescriptor acDesc;
@@ -237,21 +243,21 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDeviceWithFallback
     //    sm
     //     |
     //    ot
-    armnn::IConnectableLayer* layer = net.AddInputLayer(0, "in");
+    armnn::IConnectableLayer* layer = net->AddInputLayer(0, "in");
     layer->GetOutputSlot(0).SetTensorInfo(desc);
 
-    armnn::IConnectableLayer* const normLayer = net.AddNormalizationLayer(nmDesc, "nm");
+    armnn::IConnectableLayer* const normLayer = net->AddNormalizationLayer(nmDesc, "nm");
 
     layer->GetOutputSlot(0).Connect(normLayer->GetInputSlot(0));
     normLayer->GetOutputSlot(0).SetTensorInfo(desc);
 
-    layer = net.AddActivationLayer(acDesc, "ac");
+    layer = net->AddActivationLayer(acDesc, "ac");
 
     normLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
     layer->GetOutputSlot(0).SetTensorInfo(desc);
 
     armnn::IConnectableLayer* prevLayer = layer;
-    layer = net.AddMultiplicationLayer("ml");
+    layer = net->AddMultiplicationLayer("ml");
 
     prevLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
     normLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
@@ -259,13 +265,13 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDeviceWithFallback
 
     prevLayer = layer;
     armnn::SoftmaxDescriptor softmaxDescriptor;
-    layer = net.AddSoftmaxLayer(softmaxDescriptor, "sm");
+    layer = net->AddSoftmaxLayer(softmaxDescriptor, "sm");
 
     prevLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
     layer->GetOutputSlot(0).SetTensorInfo(desc);
 
     prevLayer = layer;
-    layer = net.AddOutputLayer(0, "ot");
+    layer = net->AddOutputLayer(0, "ot");
 
     prevLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
 
@@ -274,12 +280,15 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDeviceWithFallback
 
     std::vector<armnn::BackendId> backends = { armnn::Compute::Undefined, armnn::Compute::CpuRef };
 
-    armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(net, backends, runtime->GetDeviceSpec());
+    armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
     BOOST_CHECK(optNet);
+
+    armnn::Graph& graph = GetGraphForTesting(optNet.get());
+    graph.AllocateDynamicBuffers();
 
     // validate workloads
     armnn::RefWorkloadFactory fact;
-    for (auto&& layer : static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph())
+    for (auto&& layer : graph)
     {
         BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
         BOOST_CHECK_NO_THROW(
@@ -316,7 +325,10 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsDuplicateComputeDeviceWithFallback
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
     BOOST_REQUIRE(optNet);
 
-    for (auto&& layer : static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph())
+    armnn::Graph& graph = GetGraphForTesting(optNet.get());
+    graph.AllocateDynamicBuffers();
+
+    for (auto&& layer : graph)
     {
         // If NEON is enabled, Input and Output layers are supported by CpuAcc,
         // the other layers are supported by CpuRef.

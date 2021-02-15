@@ -186,7 +186,7 @@ void FuseBatchNormIntoConvTest(bool depthwise, float tolerance, armnn::Compute b
     // Optimise ArmNN network
     IOptimizedNetworkPtr optNetFused = Optimize(*networkFused, {backendId}, run->GetDeviceSpec());
 
-    Graph graphFused = PolymorphicDowncast<OptimizedNetwork*>(optNetFused.get())->GetGraph();
+    Graph& graphFused = GetGraphForTesting(optNetFused.get());
 
     auto checkFusedConv2d = [ ](const armnn::Layer* const layer) -> bool
     {
@@ -233,7 +233,7 @@ void FuseBatchNormIntoConvTest(bool depthwise, float tolerance, armnn::Compute b
     // Optimise ArmNN network
     IOptimizedNetworkPtr optNetNotFused = Optimize(*networkNotFused, {backendId}, runNotFused->GetDeviceSpec());
 
-    Graph graphNotFused = PolymorphicDowncast<OptimizedNetwork*>(optNetNotFused.get())->GetGraph();
+    Graph& graphNotFused = GetGraphForTesting(optNetNotFused.get());
 
     BOOST_CHECK(5 == graphNotFused.GetNumLayers());
     BOOST_TEST(CheckSequence(graphNotFused.cbegin(),

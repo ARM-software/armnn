@@ -50,10 +50,71 @@ INetworkPtr CreateTestNetwork()
 }
 
 /// Shared function for the below tests, so that we test the same network in both cases.
+std::unique_ptr<NetworkImpl> CreateTestNetworkImpl()
+{
+    std::unique_ptr<NetworkImpl> network(new NetworkImpl());
+
+    auto input = network->AddInputLayer(0, "input");
+    const TensorInfo inputInfo({ 1, 2, 3, 4 }, DataType::Float32);
+    input->GetOutputSlot(0).SetTensorInfo(inputInfo);
+
+    // Insert Permute which swaps batches and channels dimensions
+    auto permute = network->AddPermuteLayer(PermuteDescriptor(PermutationVector{ 3, 1, 2, 0 }), "permute");
+    const TensorInfo permuteInfo({ 4, 2, 3, 1 }, DataType::Float32);
+    permute->GetOutputSlot(0).SetTensorInfo(permuteInfo);
+    input->GetOutputSlot(0).Connect(permute->GetInputSlot(0));
+
+    // Insert BatchToSpace
+    BatchToSpaceNdDescriptor batchToSpaceDesc;
+    batchToSpaceDesc.m_BlockShape = { 2, 2 };
+    batchToSpaceDesc.m_DataLayout = DataLayout::NHWC;
+    auto batchToSpace             = network->AddBatchToSpaceNdLayer(batchToSpaceDesc, "batchToSpace");
+    const TensorInfo batchToSpaceInfo({ 1, 4, 6, 1 }, DataType::Float32);
+    batchToSpace->GetOutputSlot(0).SetTensorInfo(batchToSpaceInfo);
+    permute->GetOutputSlot(0).Connect(batchToSpace->GetInputSlot(0));
+
+    auto output = network->AddOutputLayer(0, "output");
+    batchToSpace->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    return network;
+}
+
+/// Shared function for the below tests, so that we test the same network in both cases.
 INetworkPtr CreateTransposeTestNetwork()
 {
     // Create a network
     INetworkPtr network = INetwork::Create();
+
+    auto input = network->AddInputLayer(0, "input");
+    const TensorInfo inputInfo({ 1, 2, 3, 4 }, DataType::Float32);
+    input->GetOutputSlot(0).SetTensorInfo(inputInfo);
+
+    // Insert Permute which swaps batches and channels dimensions
+    auto permute = network->AddTransposeLayer(TransposeDescriptor(PermutationVector{ 3, 1, 2, 0 }), "permute");
+    const TensorInfo permuteInfo({ 4, 2, 3, 1 }, DataType::Float32);
+    permute->GetOutputSlot(0).SetTensorInfo(permuteInfo);
+    input->GetOutputSlot(0).Connect(permute->GetInputSlot(0));
+
+    // Insert BatchToSpace
+    BatchToSpaceNdDescriptor batchToSpaceDesc;
+    batchToSpaceDesc.m_BlockShape = { 2, 2 };
+    batchToSpaceDesc.m_DataLayout = DataLayout::NHWC;
+    auto batchToSpace             = network->AddBatchToSpaceNdLayer(batchToSpaceDesc, "batchToSpace");
+    const TensorInfo batchToSpaceInfo({ 1, 4, 6, 1 }, DataType::Float32);
+    batchToSpace->GetOutputSlot(0).SetTensorInfo(batchToSpaceInfo);
+    permute->GetOutputSlot(0).Connect(batchToSpace->GetInputSlot(0));
+
+    auto output = network->AddOutputLayer(0, "output");
+    batchToSpace->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    return network;
+}
+
+/// Shared function for the below tests, so that we test the same network in both cases.
+std::unique_ptr<NetworkImpl> CreateTransposeTestNetworkImpl()
+{
+    // Create a network
+    std::unique_ptr<NetworkImpl> network(new NetworkImpl());
 
     auto input = network->AddInputLayer(0, "input");
     const TensorInfo inputInfo({ 1, 2, 3, 4 }, DataType::Float32);
@@ -86,8 +147,8 @@ INetworkPtr CreateTransposeTestNetwork()
 /// Note this does not ensure the correctness of the optimization - that is done in the below test.
 BOOST_AUTO_TEST_CASE(PermuteAndBatchToSpaceAsDepthToSpaceOptimizerTest)
 {
-    INetworkPtr network = CreateTestNetwork();
-    Graph graph         = static_cast<Network*>(network.get())->GetGraph();
+    std::unique_ptr<NetworkImpl> network = CreateTestNetworkImpl();
+    Graph graph         = network.get()->GetGraph();
 
     // Confirm initial graph is as we expect
     BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<InputLayer>, &IsLayerOfType<PermuteLayer>,
@@ -116,8 +177,8 @@ BOOST_AUTO_TEST_CASE(PermuteAndBatchToSpaceAsDepthToSpaceOptimizerTest)
 /// Note this does not ensure the correctness of the optimization - that is done in the below test.
 BOOST_AUTO_TEST_CASE(TransposeAndBatchToSpaceAsDepthToSpaceOptimizerTest)
 {
-    INetworkPtr network = CreateTransposeTestNetwork();
-    Graph graph         = static_cast<Network*>(network.get())->GetGraph();
+    std::unique_ptr<NetworkImpl> network = CreateTransposeTestNetworkImpl();
+    Graph graph         = network.get()->GetGraph();
 
     // Confirm initial graph is as we expect
     BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<InputLayer>, &IsLayerOfType<TransposeLayer>,
@@ -155,7 +216,7 @@ BOOST_AUTO_TEST_CASE(PermuteAndBatchToSpaceAsDepthToSpaceCorrectnessTest)
     IOptimizedNetworkPtr optimizedNetwork = Optimize(*network, { Compute::CpuRef }, runtime->GetDeviceSpec());
 
     // Confirm that the optimization has actually taken place
-    const Graph& optGraph = static_cast<OptimizedNetwork*>(optimizedNetwork.get())->GetGraph();
+    const Graph& optGraph = GetGraphForTesting(optimizedNetwork.get());
     BOOST_TEST(CheckSequence(optGraph.cbegin(), optGraph.cend(), &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<DepthToSpaceLayer>, &IsLayerOfType<OutputLayer>));
 
@@ -202,7 +263,7 @@ BOOST_AUTO_TEST_CASE(TransposeAndBatchToSpaceAsDepthToSpaceCorrectnessTest)
     IOptimizedNetworkPtr optimizedNetwork = Optimize(*network, { Compute::CpuRef }, runtime->GetDeviceSpec());
 
     // Confirm that the optimization has actually taken place
-    const Graph& optGraph = static_cast<OptimizedNetwork*>(optimizedNetwork.get())->GetGraph();
+    const Graph& optGraph = GetGraphForTesting(optimizedNetwork.get());
     BOOST_TEST(CheckSequence(optGraph.cbegin(), optGraph.cend(), &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<DepthToSpaceLayer>, &IsLayerOfType<OutputLayer>));
 

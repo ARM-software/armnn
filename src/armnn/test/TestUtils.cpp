@@ -22,6 +22,16 @@ void Connect(armnn::IConnectableLayer* from, armnn::IConnectableLayer* to, const
 namespace armnn
 {
 
+Graph& GetGraphForTesting(IOptimizedNetwork* optNet)
+{
+    return optNet->pOptimizedNetworkImpl->GetGraph();
+}
+
+ModelOptions& GetModelOptionsForTesting(IOptimizedNetwork* optNet)
+{
+    return optNet->pOptimizedNetworkImpl->GetModelOptions();
+}
+
 profiling::ProfilingService& GetProfilingService(armnn::RuntimeImpl* runtime)
 {
     return runtime->m_ProfilingService;

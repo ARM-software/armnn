@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_CASE(CheckConvolution2dLayer)
 
     TestConvolution2dLayerVisitor visitor(descriptor, weights, EmptyOptional());
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, EmptyOptional());
     layer->Accept(visitor);
@@ -306,7 +306,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedConvolution2dLayer)
 
     TestConvolution2dLayerVisitor visitor(descriptor, weights, EmptyOptional(), layerName);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, EmptyOptional(), layerName);
     layer->Accept(visitor);
@@ -335,7 +335,7 @@ BOOST_AUTO_TEST_CASE(CheckConvolution2dLayerWithBiases)
 
     TestConvolution2dLayerVisitor visitor(descriptor, weights, optionalBiases);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, optionalBiases);
     layer->Accept(visitor);
@@ -365,7 +365,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedConvolution2dLayerWithBiases)
 
     TestConvolution2dLayerVisitor visitor(descriptor, weights, optionalBiases, layerName);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, optionalBiases, layerName);
     layer->Accept(visitor);
@@ -388,7 +388,7 @@ BOOST_AUTO_TEST_CASE(CheckDepthwiseConvolution2dLayer)
 
     TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, EmptyOptional());
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights, EmptyOptional());
     layer->Accept(visitor);
@@ -412,7 +412,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedDepthwiseConvolution2dLayer)
 
     TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, EmptyOptional(), layerName);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor,
                                                                         weights,
@@ -444,7 +444,7 @@ BOOST_AUTO_TEST_CASE(CheckDepthwiseConvolution2dLayerWithBiases)
 
     TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, optionalBiases);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights, optionalBiases);
     layer->Accept(visitor);
@@ -474,7 +474,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedDepthwiseConvolution2dLayerWithBiases)
 
     TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, optionalBiases, layerName);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights, optionalBiases, layerName);
     layer->Accept(visitor);
@@ -491,7 +491,7 @@ BOOST_AUTO_TEST_CASE(CheckFullyConnectedLayer)
 
     TestFullyConnectedLayerVistor visitor(descriptor, weights, EmptyOptional());
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, EmptyOptional());
     layer->Accept(visitor);
@@ -509,7 +509,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedFullyConnectedLayer)
 
     TestFullyConnectedLayerVistor visitor(descriptor, weights, EmptyOptional(), layerName);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, EmptyOptional(), layerName);
     layer->Accept(visitor);
@@ -532,7 +532,7 @@ BOOST_AUTO_TEST_CASE(CheckFullyConnectedLayerWithBiases)
 
     TestFullyConnectedLayerVistor visitor(descriptor, weights, optionalBiases);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, optionalBiases);
     layer->Accept(visitor);
@@ -556,7 +556,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedFullyConnectedLayerWithBiases)
 
     TestFullyConnectedLayerVistor visitor(descriptor, weights, optionalBiases, layerName);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, optionalBiases, layerName);
     layer->Accept(visitor);
@@ -586,7 +586,7 @@ BOOST_AUTO_TEST_CASE(CheckBatchNormalizationLayer)
 
     TestBatchNormalizationLayerVisitor visitor(descriptor, mean, variance, beta, gamma);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddBatchNormalizationLayer(descriptor, mean, variance, beta, gamma);
     layer->Accept(visitor);
@@ -617,7 +617,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedBatchNormalizationLayer)
 
     TestBatchNormalizationLayerVisitor visitor(descriptor, mean, variance, beta, gamma, layerName);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddBatchNormalizationLayer(
             descriptor, mean, variance, beta, gamma, layerName);
@@ -632,7 +632,7 @@ BOOST_AUTO_TEST_CASE(CheckConstLayer)
 
     TestConstantLayerVisitor visitor(input);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddConstantLayer(input);
     layer->Accept(visitor);
@@ -647,7 +647,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedConstLayer)
 
     TestConstantLayerVisitor visitor(input, layerName);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddConstantLayer(input, layerName);
     layer->Accept(visitor);
@@ -719,7 +719,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerBasic)
 
     TestLstmLayerVisitor visitor(descriptor, params);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params);
     layer->Accept(visitor);
@@ -792,7 +792,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerBasic)
 
     TestLstmLayerVisitor visitor(descriptor, params, layerName);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params, layerName);
     layer->Accept(visitor);
@@ -883,7 +883,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerCifgDisabled)
 
     TestLstmLayerVisitor visitor(descriptor, params);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params);
     layer->Accept(visitor);
@@ -975,7 +975,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerCifgDisabled)
 
     TestLstmLayerVisitor visitor(descriptor, params, layerName);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params, layerName);
     layer->Accept(visitor);
@@ -1062,7 +1062,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerPeephole)
 
     TestLstmLayerVisitor visitor(descriptor, params);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params);
     layer->Accept(visitor);
@@ -1176,7 +1176,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerPeepholeCifgDisabled)
 
     TestLstmLayerVisitor visitor(descriptor, params);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params);
     layer->Accept(visitor);
@@ -1263,7 +1263,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerPeephole)
 
     TestLstmLayerVisitor visitor(descriptor, params, layerName);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params, layerName);
     layer->Accept(visitor);
@@ -1350,7 +1350,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerProjection)
 
     TestLstmLayerVisitor visitor(descriptor, params);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params);
     layer->Accept(visitor);
@@ -1437,7 +1437,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerProjection)
 
     TestLstmLayerVisitor visitor(descriptor, params, layerName);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params, layerName);
     layer->Accept(visitor);
@@ -1509,7 +1509,7 @@ BOOST_AUTO_TEST_CASE(CheckQLstmLayerBasic)
 
     TestQLstmLayerVisitor visitor(descriptor, params);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddQLstmLayer(descriptor, params);
     layer->Accept(visitor);
@@ -1582,7 +1582,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedQLstmLayerBasic)
 
     TestQLstmLayerVisitor visitor(descriptor, params, layerName);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddQLstmLayer(descriptor, params, layerName);
     layer->Accept(visitor);
@@ -1677,7 +1677,7 @@ BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgDisabled)
 
     TestQLstmLayerVisitor visitor(descriptor, params);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddQLstmLayer(descriptor, params);
     layer->Accept(visitor);
@@ -1794,7 +1794,7 @@ BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgDisabledPeepholeEnabled)
 
     TestQLstmLayerVisitor visitor(descriptor, params);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddQLstmLayer(descriptor, params);
     layer->Accept(visitor);
@@ -1884,7 +1884,7 @@ BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgEnabledPeepholeEnabled)
 
     TestQLstmLayerVisitor visitor(descriptor, params);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddQLstmLayer(descriptor, params);
     layer->Accept(visitor);
@@ -1974,7 +1974,7 @@ BOOST_AUTO_TEST_CASE(CheckQLstmLayerProjectionEnabled)
 
     TestQLstmLayerVisitor visitor(descriptor, params);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddQLstmLayer(descriptor, params);
     layer->Accept(visitor);
@@ -2097,7 +2097,7 @@ BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgDisabledLayerNormEnabled)
 
     TestQLstmLayerVisitor visitor(descriptor, params);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddQLstmLayer(descriptor, params);
     layer->Accept(visitor);
@@ -2187,7 +2187,7 @@ BOOST_AUTO_TEST_CASE(CheckQuantizedLstmLayer)
 
     TestQuantizedLstmLayerVisitor visitor(params);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddQuantizedLstmLayer(params);
     layer->Accept(visitor);
@@ -2277,7 +2277,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedQuantizedLstmLayer)
 
     TestQuantizedLstmLayerVisitor visitor(params, layerName);
 
-    Network net;
+    NetworkImpl net;
 
     IConnectableLayer* const layer = net.AddQuantizedLstmLayer(params, layerName);
     layer->Accept(visitor);

@@ -35,7 +35,8 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateCpuAccDeviceSupportLayerNoFallback)
     armnn::NeonWorkloadFactory fact =
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
 
-    for (auto&& layer : static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph())
+    armnn::Graph& graph = GetGraphForTesting(optNet.get());
+    for (auto&& layer : graph)
     {
         BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuAcc);
         BOOST_CHECK_NO_THROW(
@@ -103,7 +104,7 @@ BOOST_AUTO_TEST_CASE(FastMathEnabledTestOnCpuAcc)
 
     BOOST_CHECK(optimizedNet);
 
-    auto modelOptionsOut = static_cast<armnn::OptimizedNetwork*>(optimizedNet.get())->GetModelOptions();
+    auto modelOptionsOut = GetModelOptionsForTesting(optimizedNet.get());
 
     BOOST_TEST(modelOptionsOut.size() == 1);
     BOOST_TEST(modelOptionsOut[0].GetOption(0).GetName() == "FastMathEnabled");
@@ -134,8 +135,10 @@ BOOST_AUTO_TEST_CASE(NumberOfThreadsTestOnCpuAcc)
             *net, backends, runtime->GetDeviceSpec(), optimizerOptions);
 
     BOOST_CHECK(optimizedNet);
+    std::unique_ptr<armnn::Graph> graphPtr;
+    armnn::OptimizedNetworkImpl impl(std::move(graphPtr), optimizerOptions.m_ModelOptions);
 
-    auto modelOptionsOut = static_cast<armnn::OptimizedNetwork*>(optimizedNet.get())->GetModelOptions();
+    auto modelOptionsOut = impl.GetModelOptions();
 
     BOOST_TEST(modelOptionsOut.size() == 1);
     BOOST_TEST(modelOptionsOut[0].GetOption(0).GetName() == "NumberOfThreads");

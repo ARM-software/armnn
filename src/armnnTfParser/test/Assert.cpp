@@ -102,8 +102,7 @@ BOOST_FIXTURE_TEST_CASE(AssertSimpleGraphStructureTest, AssertSimpleFixture)
 {
     auto optimized = SetupOptimizedNetwork({ { "Placeholder", { 1, 1, 1, 4 } } }, { "Add" });
 
-    auto optimizedNetwork = armnn::PolymorphicDowncast<armnn::OptimizedNetwork*>(optimized.get());
-    auto graph = optimizedNetwork->GetGraph();
+    armnn::Graph& graph = GetGraphForTesting(optimized.get());
 
     BOOST_TEST((graph.GetNumInputs() == 1));
     BOOST_TEST((graph.GetNumOutputs() == 1));
@@ -258,8 +257,7 @@ BOOST_FIXTURE_TEST_CASE(AssertGraphStructureTest, AssertFixture)
                                              { "Input1", { 1, 1, 2, 2 } } },
                                            { "Output" });
 
-    auto optimizedNetwork = armnn::PolymorphicDowncast<armnn::OptimizedNetwork*>(optimized.get());
-    auto graph = optimizedNetwork->GetGraph();
+    armnn::Graph& graph = GetGraphForTesting(optimized.get());
 
     BOOST_TEST((graph.GetNumInputs() == 2));
     BOOST_TEST((graph.GetNumOutputs() == 1));

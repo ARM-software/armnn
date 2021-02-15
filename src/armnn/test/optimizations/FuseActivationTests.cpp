@@ -345,7 +345,7 @@ void FuseActivationIntoPreviousLayerTest(ActivationDescriptor activationDescript
     // Optimise ArmNN network
     IOptimizedNetworkPtr optNetFused = Optimize(*networkFused, {backendId}, run->GetDeviceSpec());
 
-    Graph graphFused = PolymorphicDowncast<OptimizedNetwork*>(optNetFused.get())->GetGraph();
+    Graph& graphFused = GetGraphForTesting(optNetFused.get());
 
     auto checkFusedConv2d = [](const Layer* const layer)->bool {
         return IsLayerOfType<LayerType>(layer) &&
@@ -386,7 +386,7 @@ void FuseActivationIntoPreviousLayerTest(ActivationDescriptor activationDescript
     // Optimise ArmNN network
     IOptimizedNetworkPtr optNetNotFused = Optimize(*networkNotFused, {backendId}, runNotFused->GetDeviceSpec());
 
-    Graph graphNotFused = PolymorphicDowncast<OptimizedNetwork*>(optNetNotFused.get())->GetGraph();
+    Graph& graphNotFused = GetGraphForTesting(optNetNotFused.get());
 
     BOOST_CHECK(5 == graphNotFused.GetNumLayers());
     BOOST_TEST(CheckSequence(graphNotFused.cbegin(),
@@ -442,8 +442,6 @@ bool FuseActivationSimpleTest(ActivationDescriptor activationDescriptor, Compute
 
         // Optimise ArmNN network
         IOptimizedNetworkPtr optNetFused = Optimize(*networkFused, {backendId}, run->GetDeviceSpec());
-
-        Graph graphFused = PolymorphicDowncast<OptimizedNetwork*>(optNetFused.get())->GetGraph();
 
         // Load network into runtime
         NetworkId networkIdentifier;

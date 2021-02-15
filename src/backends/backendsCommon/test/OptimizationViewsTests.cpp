@@ -212,8 +212,8 @@ BOOST_AUTO_TEST_CASE(OptimizeViewsValidateDeviceMockBackend)
     BOOST_CHECK(optNet);
 
     // Check the optimised graph
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
-    CheckLayers(optNetObjPtr->GetGraph());
+    armnn::Graph& graph = GetGraphForTesting(optNet.get());
+    CheckLayers(graph);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

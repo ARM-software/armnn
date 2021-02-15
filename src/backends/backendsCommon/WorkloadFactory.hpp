@@ -7,6 +7,7 @@
 #include <armnn/TensorFwd.hpp>
 #include <armnn/Optional.hpp>
 #include <armnn/backends/ITensorHandle.hpp>
+#include <armnn/INetwork.hpp>
 
 #include <backendsCommon/Workload.hpp>
 

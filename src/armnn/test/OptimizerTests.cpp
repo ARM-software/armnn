@@ -756,12 +756,10 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
     input->GetOutputSlot(0).Connect(act->GetInputSlot(0));
     act->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    auto optNet = IOptimizedNetworkPtr(new OptimizedNetwork(std::move(graph)), &IOptimizedNetwork::Destroy);
-
-    OptimizedNetwork* optNetObjPtr = PolymorphicDowncast<OptimizedNetwork*>(optNet.get());
+    OptimizedNetworkImpl optNet(std::move(graph));
 
     // Get the optimized graph
-    Graph& optGraph = optNetObjPtr->GetGraph();
+    Graph& optGraph = optNet.GetGraph();
 
     std::vector<BackendId> prefs{"MockBackend", "CustomBackend"};
 
@@ -773,6 +771,8 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
     // Assign an available backend to each layer
     Graph::Iterator firstLayer = optGraph.begin();
     Graph::Iterator lastLayer  = optGraph.end();
+
+    OptimizedNetworkImpl* optNetObjPtr = &optNet;
     OptimizationResult res = AssignBackends(optNetObjPtr,
                                             backendSettings,
                                             firstLayer,

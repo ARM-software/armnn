@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_SUITE(Network)
 
 BOOST_AUTO_TEST_CASE(LayerGuids)
 {
-    armnn::Network net;
+    armnn::NetworkImpl net;
     armnn::LayerGuid inputId = net.AddInputLayer(0)->GetGuid();
     armnn::LayerGuid addId = net.AddAdditionLayer()->GetGuid();
     armnn::LayerGuid outputId = net.AddOutputLayer(0)->GetGuid();
@@ -43,23 +43,22 @@ BOOST_AUTO_TEST_CASE(LayerGuids)
 
 BOOST_AUTO_TEST_CASE(NetworkBasic)
 {
-    armnn::Network net;
+    armnn::NetworkImpl net;
     BOOST_TEST(net.PrintGraph() == armnn::Status::Success);
 }
 
 BOOST_AUTO_TEST_CASE(LayerNamesAreOptionalForINetwork)
 {
-    armnn::Network net;
-    armnn::INetwork& inet = net;
-    inet.AddInputLayer(0);
-    inet.AddAdditionLayer();
-    inet.AddActivationLayer(armnn::ActivationDescriptor());
-    inet.AddOutputLayer(0);
+    armnn::INetworkPtr inet(armnn::INetwork::Create());
+    inet->AddInputLayer(0);
+    inet->AddAdditionLayer();
+    inet->AddActivationLayer(armnn::ActivationDescriptor());
+    inet->AddOutputLayer(0);
 }
 
 BOOST_AUTO_TEST_CASE(LayerNamesAreOptionalForNetwork)
 {
-    armnn::Network net;
+    armnn::NetworkImpl net;
     net.AddInputLayer(0);
     net.AddAdditionLayer();
     net.AddActivationLayer(armnn::ActivationDescriptor());
@@ -68,7 +67,7 @@ BOOST_AUTO_TEST_CASE(LayerNamesAreOptionalForNetwork)
 
 BOOST_AUTO_TEST_CASE(NetworkModification)
 {
-    armnn::Network net;
+    armnn::NetworkImpl net;
 
     armnn::IConnectableLayer* const inputLayer = net.AddInputLayer(0, "input layer");
     BOOST_TEST(inputLayer);
@@ -228,7 +227,7 @@ BOOST_AUTO_TEST_CASE(NetworkModification)
 
 BOOST_AUTO_TEST_CASE(NetworkModification_SplitterConcat)
 {
-    armnn::Network net;
+    armnn::NetworkImpl net;
 
     // Adds an input layer and an input tensor descriptor.
     armnn::IConnectableLayer* inputLayer = net.AddInputLayer(0, "input layer");
@@ -285,7 +284,7 @@ BOOST_AUTO_TEST_CASE(NetworkModification_SplitterConcat)
 
 BOOST_AUTO_TEST_CASE(NetworkModification_SplitterAddition)
 {
-    armnn::Network net;
+    armnn::NetworkImpl net;
 
     // Adds an input layer and an input tensor descriptor.
     armnn::IConnectableLayer* layer = net.AddInputLayer(0, "input layer");
@@ -330,7 +329,7 @@ BOOST_AUTO_TEST_CASE(NetworkModification_SplitterAddition)
 
 BOOST_AUTO_TEST_CASE(NetworkModification_SplitterMultiplication)
 {
-    armnn::Network net;
+    armnn::NetworkImpl net;
 
     // Adds an input layer and an input tensor descriptor.
     armnn::IConnectableLayer* layer = net.AddInputLayer(0, "input layer");
@@ -476,7 +475,7 @@ BOOST_AUTO_TEST_CASE(Network_AddMerge)
 BOOST_AUTO_TEST_CASE(StandInLayerNetworkTest)
 {
     // Create a simple network with a StandIn some place in it.
-    armnn::Network net;
+    armnn::NetworkImpl net;
     auto input = net.AddInputLayer(0);
 
     // Add some valid layer.
@@ -509,7 +508,7 @@ BOOST_AUTO_TEST_CASE(StandInLayerNetworkTest)
 BOOST_AUTO_TEST_CASE(StandInLayerSingleInputMultipleOutputsNetworkTest)
 {
     // Another test with one input and two outputs on the StandIn layer.
-    armnn::Network net;
+    armnn::NetworkImpl net;
 
     // Create the input.
     auto input = net.AddInputLayer(0);

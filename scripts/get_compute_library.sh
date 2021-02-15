@@ -7,10 +7,10 @@
 CMD=$( basename $0 )
 
 # For pinning to a ref use this:
-#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_20_11" # Release 20.11
+DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_02" # Release 21.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="8958167c8d609566a40c9e618158ebcbdcd3e3bb" #Building android-nn-driver failed
+#DEFAULT_CLFRAMEWORKREVISION="8958167c8d609566a40c9e618158ebcbdcd3e3bb" #Building android-nn-driver failed
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

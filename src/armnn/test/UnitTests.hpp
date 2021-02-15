@@ -64,7 +64,7 @@ void CompareTestResultIfSupported(const std::string& testName, const std::vector
 template<typename FactoryType, typename TFuncPtr, typename... Args>
 void RunTestFunction(const char* testName, TFuncPtr testFunction, Args... args)
 {
-    std::unique_ptr<armnn::Profiler> profiler = std::make_unique<armnn::Profiler>();
+    std::unique_ptr<armnn::IProfiler> profiler = std::make_unique<armnn::IProfiler>();
     armnn::ProfilerManager::GetInstance().RegisterProfiler(profiler.get());
 
     auto memoryManager = WorkloadFactoryHelper<FactoryType>::GetMemoryManager();
@@ -80,7 +80,7 @@ void RunTestFunction(const char* testName, TFuncPtr testFunction, Args... args)
 template<typename FactoryType, typename TFuncPtr, typename... Args>
 void RunTestFunctionUsingTensorHandleFactory(const char* testName, TFuncPtr testFunction, Args... args)
 {
-    std::unique_ptr<armnn::Profiler> profiler = std::make_unique<armnn::Profiler>();
+    std::unique_ptr<armnn::IProfiler> profiler = std::make_unique<armnn::IProfiler>();
     armnn::ProfilerManager::GetInstance().RegisterProfiler(profiler.get());
 
     auto memoryManager = WorkloadFactoryHelper<FactoryType>::GetMemoryManager();

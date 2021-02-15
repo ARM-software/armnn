@@ -50,7 +50,7 @@ public:
     // NOTE we return by reference as the purpose of this method is only to provide
     // access to the private m_Profiler and in theory we should not need to increment
     // the shared_ptr's reference counter
-    const std::shared_ptr<Profiler>& GetProfiler() const { return m_Profiler; }
+    const std::shared_ptr<IProfiler>& GetProfiler() const { return m_Profiler; }
 
     void FreeWorkingMemory();
 
@@ -91,7 +91,7 @@ private:
     WorkloadQueue m_InputQueue;
     WorkloadQueue m_WorkloadQueue;
     WorkloadQueue m_OutputQueue;
-    std::shared_ptr<Profiler> m_Profiler;
+    std::shared_ptr<IProfiler> m_Profiler;
 
     mutable std::mutex m_WorkingMemMutex;
 

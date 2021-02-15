@@ -9,7 +9,7 @@
 namespace armnn
 {
 Event::Event(const std::string& eventName,
-             Profiler* profiler,
+             IProfiler* profiler,
              Event* parent,
              const BackendId backendId,
              std::vector<InstrumentPtr>&& instruments)
@@ -69,7 +69,7 @@ const std::string& Event::GetName() const
     return m_EventName;
 }
 
-const Profiler* Event::GetProfiler() const
+const IProfiler* Event::GetProfiler() const
 {
     return m_Profiler;
 }

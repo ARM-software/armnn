@@ -16,7 +16,7 @@ namespace armnn
 {
 
 /// Forward declaration
-class Profiler;
+class IProfiler;
 
 /// Event class records measurements reported by BeginEvent()/EndEvent() and returns measurements when
 /// Event::GetMeasurements() is called.
@@ -27,7 +27,7 @@ public:
     using Instruments = std::vector<InstrumentPtr>;
 
     Event(const std::string& eventName,
-          Profiler* profiler,
+          IProfiler* profiler,
           Event* parent,
           const BackendId backendId,
           std::vector<InstrumentPtr>&& instrument);
@@ -56,7 +56,7 @@ public:
 
     /// Get the pointer of the profiler associated with this event
     /// \return Pointer of the profiler associated with this event
-    const Profiler* GetProfiler() const;
+    const IProfiler* GetProfiler() const;
 
     /// Get the pointer of the parent event
     /// \return Pointer of the parent event
@@ -77,7 +77,7 @@ private:
     std::string m_EventName;
 
     /// Stored associated profiler
-    Profiler* m_Profiler;
+    IProfiler* m_Profiler;
 
     /// Stores optional parent event
     Event* m_Parent;

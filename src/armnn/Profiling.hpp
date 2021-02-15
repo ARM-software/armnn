@@ -24,40 +24,42 @@ namespace armnn
 // Simple single-threaded profiler.
 // Tracks events reported by BeginEvent()/EndEvent() and outputs detailed information and stats when
 // Profiler::AnalyzeEventsAndWriteResults() is called.
-class Profiler final : public IProfiler
+class ProfilerImpl
 {
 public:
-    Profiler();
-    ~Profiler();
+    ProfilerImpl();
+    ~ProfilerImpl();
     using InstrumentPtr = std::unique_ptr<Instrument>;
 
     // Marks the beginning of a user-defined event.
     // No attempt will be made to copy the name string: it must be known at compile time.
-    Event* BeginEvent(const BackendId& backendId, const std::string& name, std::vector<InstrumentPtr>&& instruments);
+    Event* BeginEvent(armnn::IProfiler* profiler,
+                      const BackendId& backendId,
+                      const std::string& name,
+                      std::vector<InstrumentPtr>&& instruments);
 
     // Marks the end of a user-defined event.
     void EndEvent(Event* event);
 
     // Enables/disables profiling.
-    void EnableProfiling(bool enableProfiling) override;
+    void EnableProfiling(bool enableProfiling);
 
     // Checks if profiling is enabled.
-    bool IsProfilingEnabled() override;
+    bool IsProfilingEnabled();
 
     // Increments the event tag, allowing grouping of events in a user-defined manner (e.g. per inference).
     void UpdateEventTag();
 
     // Analyzes the tracked events and writes the results to the given output stream.
     // Please refer to the configuration variables in Profiling.cpp to customize the information written.
-    void AnalyzeEventsAndWriteResults(std::ostream& outStream) const override;
+    void AnalyzeEventsAndWriteResults(std::ostream& outStream) const;
 
     // Print stats for events in JSON Format to the given output stream.
-    void Print(std::ostream& outStream) const override;
+    void Print(std::ostream& outStream) const;
 
     // Gets the color to render an event with, based on which device it denotes.
     uint32_t GetEventColor(const BackendId& backendId) const;
 
-private:
     using EventPtr = std::unique_ptr<Event>;
     struct Marker
     {
@@ -82,10 +84,6 @@ private:
     std::stack<Event*> m_Parents;
     std::vector<EventPtr> m_EventSequence;
     bool m_ProfilingEnabled;
-
-private:
-    // Friend functions for unit testing, see ProfilerTests.cpp.
-    friend size_t GetProfilerEventSequenceSize(armnn::Profiler* profiler);
 };
 
 // Singleton profiler manager.
@@ -94,10 +92,10 @@ class ProfilerManager
 {
 public:
     // Register the given profiler as a thread local pointer.
-    void RegisterProfiler(Profiler* profiler);
+    void RegisterProfiler(IProfiler* profiler);
 
     // Gets the thread local pointer to the profiler.
-    Profiler* GetProfiler();
+    IProfiler* GetProfiler();
 
     // Accesses the singleton.
     static ProfilerManager& GetInstance();
@@ -132,7 +130,7 @@ public:
     {
         if (m_Profiler && m_Event)
         {
-            m_Profiler->EndEvent(m_Event);
+            m_Profiler->pProfilerImpl->EndEvent(m_Event);
         }
     }
 
@@ -151,7 +149,7 @@ private:
     }
 
     Event* m_Event;       ///< Event to track
-    Profiler* m_Profiler; ///< Profiler used
+    IProfiler* m_Profiler; ///< Profiler used
 };
 
 } // namespace armnn

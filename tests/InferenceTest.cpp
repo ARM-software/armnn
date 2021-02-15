@@ -142,7 +142,7 @@ bool InferenceTest(const InferenceTestOptions& params,
     }
 
     // Create a profiler and register it for the current thread.
-    std::unique_ptr<Profiler> profiler = std::make_unique<Profiler>();
+    std::unique_ptr<IProfiler> profiler = std::make_unique<IProfiler>();
     ProfilerManager::GetInstance().RegisterProfiler(profiler.get());
 
     // Enable profiling if requested.

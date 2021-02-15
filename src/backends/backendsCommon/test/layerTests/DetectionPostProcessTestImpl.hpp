@@ -148,7 +148,7 @@ void DetectionPostProcessImpl(const armnn::TensorInfo& boxEncodingsInfo,
                               const std::vector<float>& expectedNumDetections,
                               bool useRegularNms)
 {
-    std::unique_ptr<armnn::Profiler> profiler = std::make_unique<armnn::Profiler>();
+    std::unique_ptr<armnn::IProfiler> profiler = std::make_unique<armnn::IProfiler>();
     armnn::ProfilerManager::GetInstance().RegisterProfiler(profiler.get());
 
     auto memoryManager = WorkloadFactoryHelper<FactoryType>::GetMemoryManager();

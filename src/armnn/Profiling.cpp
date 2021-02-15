@@ -80,7 +80,7 @@ std::vector<Measurement> FindKernelMeasurements(const Event* event)
     return measurements;
 }
 
-std::map<std::string, Profiler::ProfilingEventStats> Profiler::CalculateProfilingEventStats() const
+std::map<std::string, ProfilerImpl::ProfilingEventStats> ProfilerImpl::CalculateProfilingEventStats() const
 {
     std::map<std::string, ProfilingEventStats> nameToStatsMap;
 
@@ -111,7 +111,7 @@ const Event* GetEventPtr(const Event* ptr) { return ptr;}
 const Event* GetEventPtr(const std::unique_ptr<Event>& ptr) {return ptr.get(); }
 
 template<typename ItertType>
-void Profiler::AnalyzeEventSequenceAndWriteResults(ItertType first, ItertType last, std::ostream& outStream) const
+void ProfilerImpl::AnalyzeEventSequenceAndWriteResults(ItertType first, ItertType last, std::ostream& outStream) const
 {
     // Outputs event sequence, if needed.
     if (g_WriteProfilingEventSequence)
@@ -162,7 +162,7 @@ void Profiler::AnalyzeEventSequenceAndWriteResults(ItertType first, ItertType la
     outStream << std::endl;
 }
 
-Profiler::Profiler()
+ProfilerImpl::ProfilerImpl()
     : m_ProfilingEnabled(false)
 {
     m_EventSequence.reserve(g_ProfilingEventCountHint);
@@ -173,7 +173,7 @@ Profiler::Profiler()
 #endif
 }
 
-Profiler::~Profiler()
+ProfilerImpl::~ProfilerImpl()
 {
     if (m_ProfilingEnabled)
     {
@@ -187,22 +187,23 @@ Profiler::~Profiler()
     ProfilerManager::GetInstance().RegisterProfiler(nullptr);
 }
 
-bool Profiler::IsProfilingEnabled()
+bool ProfilerImpl::IsProfilingEnabled()
 {
     return m_ProfilingEnabled;
 }
 
-void Profiler::EnableProfiling(bool enableProfiling)
+void ProfilerImpl::EnableProfiling(bool enableProfiling)
 {
     m_ProfilingEnabled = enableProfiling;
 }
 
-Event* Profiler::BeginEvent(const BackendId& backendId,
+Event* ProfilerImpl::BeginEvent(armnn::IProfiler* profiler,
+                            const BackendId& backendId,
                             const std::string& label,
                             std::vector<InstrumentPtr>&& instruments)
 {
     Event* parent = m_Parents.empty() ? nullptr : m_Parents.top();
-    m_EventSequence.push_back(std::make_unique<Event>(label, this, parent, backendId, std::move(instruments)));
+    m_EventSequence.push_back(std::make_unique<Event>(label, profiler, parent, backendId, std::move(instruments)));
     Event* event = m_EventSequence.back().get();
     event->Start();
 
@@ -214,7 +215,7 @@ Event* Profiler::BeginEvent(const BackendId& backendId,
     return event;
 }
 
-void Profiler::EndEvent(Event* event)
+void ProfilerImpl::EndEvent(Event* event)
 {
     event->Stop();
 
@@ -242,7 +243,7 @@ int CalcLevel(const Event* eventPtr)
     return level;
 }
 
-void Profiler::PopulateInferences(std::vector<const Event*>& outInferences, int& outBaseLevel) const
+void ProfilerImpl::PopulateInferences(std::vector<const Event*>& outInferences, int& outBaseLevel) const
 {
     outInferences.reserve(m_EventSequence.size());
     for (const auto& event : m_EventSequence)
@@ -256,7 +257,7 @@ void Profiler::PopulateInferences(std::vector<const Event*>& outInferences, int&
     }
 }
 
-void Profiler::PopulateDescendants(std::map<const Event*, std::vector<const Event*>>& outDescendantsMap) const
+void ProfilerImpl::PopulateDescendants(std::map<const Event*, std::vector<const Event*>>& outDescendantsMap) const
 {
     for (const auto& event : m_EventSequence)
     {
@@ -327,7 +328,7 @@ void ExtractJsonObjects(unsigned int inferenceIndex,
     }
 }
 
-void Profiler::Print(std::ostream& outStream) const
+void ProfilerImpl::Print(std::ostream& outStream) const
 {
     // Makes sure timestamps are output with 6 decimals, and save old settings.
     std::streamsize oldPrecision = outStream.precision();
@@ -377,7 +378,7 @@ void Profiler::Print(std::ostream& outStream) const
     outStream.precision(oldPrecision);
 }
 
-void Profiler::AnalyzeEventsAndWriteResults(std::ostream& outStream) const
+void ProfilerImpl::AnalyzeEventsAndWriteResults(std::ostream& outStream) const
 {
     // Stack should be empty now.
     const bool saneMarkerSequence = m_Parents.empty();
@@ -460,7 +461,7 @@ void Profiler::AnalyzeEventsAndWriteResults(std::ostream& outStream) const
     }
 }
 
-std::uint32_t Profiler::GetEventColor(const BackendId& backendId) const
+std::uint32_t ProfilerImpl::GetEventColor(const BackendId& backendId) const
 {
     static BackendId cpuRef("CpuRef");
     static BackendId cpuAcc("CpuAcc");
@@ -481,7 +482,9 @@ std::uint32_t Profiler::GetEventColor(const BackendId& backendId) const
 }
 
 // The thread_local pointer to the profiler instance.
-thread_local Profiler* tl_Profiler = nullptr;
+thread_local IProfiler* tl_Profiler = nullptr;
+
+
 
 ProfilerManager& ProfilerManager::GetInstance()
 {
@@ -490,14 +493,45 @@ ProfilerManager& ProfilerManager::GetInstance()
     return s_ProfilerManager;
 }
 
-void ProfilerManager::RegisterProfiler(Profiler* profiler)
+void ProfilerManager::RegisterProfiler(IProfiler* profiler)
 {
     tl_Profiler = profiler;
 }
 
-Profiler* ProfilerManager::GetProfiler()
+IProfiler* ProfilerManager::GetProfiler()
 {
     return tl_Profiler;
 }
+
+
+void IProfiler::EnableProfiling(bool enableProfiling)
+{
+    pProfilerImpl->EnableProfiling(enableProfiling);
+}
+
+bool IProfiler::IsProfilingEnabled()
+{
+    return pProfilerImpl->IsProfilingEnabled();
+}
+
+void IProfiler::AnalyzeEventsAndWriteResults(std::ostream& outStream) const
+{
+    pProfilerImpl->AnalyzeEventsAndWriteResults(outStream);
+}
+
+void IProfiler::Print(std::ostream& outStream) const
+{
+    pProfilerImpl->Print(outStream);
+}
+
+Event* IProfiler::BeginEvent(const BackendId& backendId,
+                  const std::string& label,
+                  std::vector<InstrumentPtr>&& instruments)
+{
+    return pProfilerImpl->BeginEvent(this, backendId, label,  std::move(instruments));
+}
+
+IProfiler::~IProfiler() = default;
+IProfiler::IProfiler() : pProfilerImpl(new ProfilerImpl()) {};
 
 } // namespace armnn

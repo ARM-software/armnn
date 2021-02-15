@@ -125,7 +125,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
                              m_ProfilingService(profilingService)
 {
     // Create a profiler and register it for the current thread.
-    m_Profiler = std::make_shared<Profiler>();
+    m_Profiler = std::make_shared<IProfiler>();
     ProfilerManager::GetInstance().RegisterProfiler(m_Profiler.get());
 
     Graph& order = m_OptimizedNetwork->GetGraph().TopologicalSort();

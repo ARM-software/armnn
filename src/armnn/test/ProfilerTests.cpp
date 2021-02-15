@@ -19,14 +19,14 @@
 namespace armnn
 {
 
-size_t GetProfilerEventSequenceSize(armnn::Profiler* profiler)
+size_t GetProfilerEventSequenceSize(armnn::IProfiler* profiler)
 {
     if (!profiler)
     {
         return static_cast<size_t>(-1);
     }
 
-    return profiler->m_EventSequence.size();
+    return profiler->pProfilerImpl->m_EventSequence.size();
 }
 } // namespace armnn
 
@@ -45,7 +45,7 @@ void RegisterUnregisterProfilerSingleThreadImpl(bool &res)
     res = !profilerManager.GetProfiler();
 
     // Create and register a profiler for this thread.
-    std::unique_ptr<armnn::Profiler> profiler = std::make_unique<armnn::Profiler>();
+    std::unique_ptr<armnn::IProfiler> profiler = std::make_unique<armnn::IProfiler>();
     profilerManager.RegisterProfiler(profiler.get());
 
     // Check that on a single thread we get the same profiler we registered.
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_SUITE(Profiler)
 
 BOOST_AUTO_TEST_CASE(EnableDisableProfiling)
 {
-    std::unique_ptr<armnn::Profiler> profiler = std::make_unique<armnn::Profiler>();
+    std::unique_ptr<armnn::IProfiler> profiler = std::make_unique<armnn::IProfiler>();
 
     // Check that profiling is disabled by default.
     BOOST_TEST(!profiler->IsProfilingEnabled());
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(ProfilingMacros)
     }
 
     // Create and register a profiler for this thread.
-    std::unique_ptr<armnn::Profiler> profiler = std::make_unique<armnn::Profiler>();
+    std::unique_ptr<armnn::IProfiler> profiler = std::make_unique<armnn::IProfiler>();
     profilerManager.RegisterProfiler(profiler.get());
 
     { // --- Profiler, but profiling disabled ---
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE(WriteEventResults)
     armnn::ProfilerManager& profileManager = armnn::ProfilerManager::GetInstance();
 
     // Create and register a profiler for this thread.
-    std::unique_ptr<armnn::Profiler> profiler = std::make_unique<armnn::Profiler>();
+    std::unique_ptr<armnn::IProfiler> profiler = std::make_unique<armnn::IProfiler>();
     profileManager.RegisterProfiler(profiler.get());
 
     // Enable profiling.
@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_CASE(ProfilerJsonPrinter)
     armnn::ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
 
     // Create and register a profiler for this thread.
-    std::unique_ptr<armnn::Profiler> profiler = std::make_unique<armnn::Profiler>();
+    std::unique_ptr<armnn::IProfiler> profiler = std::make_unique<armnn::IProfiler>();
     profilerManager.RegisterProfiler(profiler.get());
 
     profiler->EnableProfiling(true);

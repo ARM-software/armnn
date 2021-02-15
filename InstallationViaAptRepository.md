@@ -115,7 +115,6 @@ In order to check for the latest available ArmNN version use apt-cache search:
 ## Install desired combination of packages
 The easiest way to install all of the available packages for your systems architecture is to run the command:
 
-(Please Note: libarmnn-cpuacc-backend has been built with NEON support, installing this backend on an armhf device not supporting NEON may cause a crash/undefined behaviour.)
 ```
  sudo apt-get install -y python3-pyarmnn libarmnn-cpuacc-backend${ARMNN_MAJOR_VERSION} libarmnn-gpuacc-backend${ARMNN_MAJOR_VERSION} libarmnn-cpuref-backend${ARMNN_MAJOR_VERSION}
  # Verify installation via python:

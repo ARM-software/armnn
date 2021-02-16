@@ -433,9 +433,9 @@ void ProfilerImpl::AnalyzeEventsAndWriteResults(std::ostream& outStream) const
                     return;
                 }
 
-                for (const Event* child : children->second)
+                if (!(children->second.empty()))
                 {
-                    return FindDescendantEvents(child, sequence);
+                    return FindDescendantEvents(children->second[0], sequence);
                 }
             };
 

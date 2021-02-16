@@ -75,13 +75,20 @@ void RemoveDuplicateDevices(std::vector<armnn::BackendId>& computeDevices)
                          computeDevices.end());
 }
 
-/// Takes a vector of backend strings and returns a vector of backendIDs. Removes duplicate entries.
-std::vector<armnn::BackendId> GetBackendIDs(const std::vector<std::string>& backendStrings)
+/// Takes a vector of backend strings and returns a vector of backendIDs.
+/// Removes duplicate entries.
+/// Can handle backend strings that contain multiple backends separated by comma e.g "CpuRef,CpuAcc"
+std::vector<armnn::BackendId> GetBackendIDs(const std::vector<std::string>& backendStringsVec)
 {
     std::vector<armnn::BackendId> backendIDs;
-    for (const auto& b : backendStrings)
+    for (const auto& backendStrings : backendStringsVec)
     {
-        backendIDs.push_back(armnn::BackendId(b));
+        // Each backendStrings might contain multiple backends separated by comma e.g "CpuRef,CpuAcc"
+        std::vector<std::string> backendStringVec = ParseStringList(backendStrings, ",");
+        for (const auto& b : backendStringVec)
+        {
+            backendIDs.push_back(armnn::BackendId(b));
+        }
     }
 
     RemoveDuplicateDevices(backendIDs);
@@ -157,10 +164,12 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
         // separate function CheckRequiredOptions() for that.
         m_CxxOptions.add_options("a) Required")
                 ("c,compute",
-                 "Which device to run layers on by default. Possible choices: "
+                 "Which device to run layers on by default. If a single device doesn't support all layers in the model "
+                 "you can specify a second or third to fall back on. Possible choices: "
                  + armnn::BackendRegistryInstance().GetBackendIdsAsString()
-                 + " NOTE: Compute devices need to be passed as a comma separated list without whitespaces "
-                   "e.g. CpuRef,CpuAcc",
+                 + " NOTE: Multiple compute devices need to be passed as a comma separated list without whitespaces "
+                   "e.g. GpuAcc,CpuAcc,CpuRef or by repeating the program option e.g. '-c Cpuacc -c CpuRef'. "
+                   "Duplicates are ignored.",
                  cxxopts::value<std::vector<std::string>>())
 
                 ("f,model-format",

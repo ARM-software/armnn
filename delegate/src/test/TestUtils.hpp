@@ -30,6 +30,9 @@ void FillInput(std::unique_ptr<tflite::Interpreter>& interpreter, int inputIndex
     }
 }
 
+template <>
+void FillInput(std::unique_ptr<tflite::Interpreter>& interpreter, int inputIndex, std::vector<Half>& inputValues);
+
 /// Can be used to compare bool data coming from a tflite interpreter
 /// Boolean types get converted to a bit representation in a vector. vector.data() returns a void pointer
 /// instead of a pointer to bool. Therefore a special function to compare to vector of bool is required

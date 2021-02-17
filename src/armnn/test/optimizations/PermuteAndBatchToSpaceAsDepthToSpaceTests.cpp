@@ -19,37 +19,6 @@ namespace
 {
 
 /// Shared function for the below tests, so that we test the same network in both cases.
-INetworkPtr CreateTestNetwork()
-{
-    // Create a network
-    INetworkPtr network = INetwork::Create();
-
-    auto input = network->AddInputLayer(0, "input");
-    const TensorInfo inputInfo({ 1, 2, 3, 4 }, DataType::Float32);
-    input->GetOutputSlot(0).SetTensorInfo(inputInfo);
-
-    // Insert Permute which swaps batches and channels dimensions
-    auto permute = network->AddPermuteLayer(PermuteDescriptor(PermutationVector{ 3, 1, 2, 0 }), "permute");
-    const TensorInfo permuteInfo({ 4, 2, 3, 1 }, DataType::Float32);
-    permute->GetOutputSlot(0).SetTensorInfo(permuteInfo);
-    input->GetOutputSlot(0).Connect(permute->GetInputSlot(0));
-
-    // Insert BatchToSpace
-    BatchToSpaceNdDescriptor batchToSpaceDesc;
-    batchToSpaceDesc.m_BlockShape = { 2, 2 };
-    batchToSpaceDesc.m_DataLayout = DataLayout::NHWC;
-    auto batchToSpace             = network->AddBatchToSpaceNdLayer(batchToSpaceDesc, "batchToSpace");
-    const TensorInfo batchToSpaceInfo({ 1, 4, 6, 1 }, DataType::Float32);
-    batchToSpace->GetOutputSlot(0).SetTensorInfo(batchToSpaceInfo);
-    permute->GetOutputSlot(0).Connect(batchToSpace->GetInputSlot(0));
-
-    auto output = network->AddOutputLayer(0, "output");
-    batchToSpace->GetOutputSlot(0).Connect(output->GetInputSlot(0));
-
-    return network;
-}
-
-/// Shared function for the below tests, so that we test the same network in both cases.
 std::unique_ptr<NetworkImpl> CreateTestNetworkImpl()
 {
     std::unique_ptr<NetworkImpl> network(new NetworkImpl());
@@ -60,37 +29,6 @@ std::unique_ptr<NetworkImpl> CreateTestNetworkImpl()
 
     // Insert Permute which swaps batches and channels dimensions
     auto permute = network->AddPermuteLayer(PermuteDescriptor(PermutationVector{ 3, 1, 2, 0 }), "permute");
-    const TensorInfo permuteInfo({ 4, 2, 3, 1 }, DataType::Float32);
-    permute->GetOutputSlot(0).SetTensorInfo(permuteInfo);
-    input->GetOutputSlot(0).Connect(permute->GetInputSlot(0));
-
-    // Insert BatchToSpace
-    BatchToSpaceNdDescriptor batchToSpaceDesc;
-    batchToSpaceDesc.m_BlockShape = { 2, 2 };
-    batchToSpaceDesc.m_DataLayout = DataLayout::NHWC;
-    auto batchToSpace             = network->AddBatchToSpaceNdLayer(batchToSpaceDesc, "batchToSpace");
-    const TensorInfo batchToSpaceInfo({ 1, 4, 6, 1 }, DataType::Float32);
-    batchToSpace->GetOutputSlot(0).SetTensorInfo(batchToSpaceInfo);
-    permute->GetOutputSlot(0).Connect(batchToSpace->GetInputSlot(0));
-
-    auto output = network->AddOutputLayer(0, "output");
-    batchToSpace->GetOutputSlot(0).Connect(output->GetInputSlot(0));
-
-    return network;
-}
-
-/// Shared function for the below tests, so that we test the same network in both cases.
-INetworkPtr CreateTransposeTestNetwork()
-{
-    // Create a network
-    INetworkPtr network = INetwork::Create();
-
-    auto input = network->AddInputLayer(0, "input");
-    const TensorInfo inputInfo({ 1, 2, 3, 4 }, DataType::Float32);
-    input->GetOutputSlot(0).SetTensorInfo(inputInfo);
-
-    // Insert Permute which swaps batches and channels dimensions
-    auto permute = network->AddTransposeLayer(TransposeDescriptor(PermutationVector{ 3, 1, 2, 0 }), "permute");
     const TensorInfo permuteInfo({ 4, 2, 3, 1 }, DataType::Float32);
     permute->GetOutputSlot(0).SetTensorInfo(permuteInfo);
     input->GetOutputSlot(0).Connect(permute->GetInputSlot(0));
@@ -205,6 +143,68 @@ BOOST_AUTO_TEST_CASE(TransposeAndBatchToSpaceAsDepthToSpaceOptimizerTest)
 
 // This unit test needs the reference backend, it's not available if the reference backend is not built
 #if defined(ARMNNREF_ENABLED)
+
+/// Shared function for the below tests, so that we test the same network in both cases.
+INetworkPtr CreateTestNetwork()
+{
+    // Create a network
+    INetworkPtr network = INetwork::Create();
+
+    auto input = network->AddInputLayer(0, "input");
+    const TensorInfo inputInfo({ 1, 2, 3, 4 }, DataType::Float32);
+    input->GetOutputSlot(0).SetTensorInfo(inputInfo);
+
+    // Insert Permute which swaps batches and channels dimensions
+    auto permute = network->AddPermuteLayer(PermuteDescriptor(PermutationVector{ 3, 1, 2, 0 }), "permute");
+    const TensorInfo permuteInfo({ 4, 2, 3, 1 }, DataType::Float32);
+    permute->GetOutputSlot(0).SetTensorInfo(permuteInfo);
+    input->GetOutputSlot(0).Connect(permute->GetInputSlot(0));
+
+    // Insert BatchToSpace
+    BatchToSpaceNdDescriptor batchToSpaceDesc;
+    batchToSpaceDesc.m_BlockShape = { 2, 2 };
+    batchToSpaceDesc.m_DataLayout = DataLayout::NHWC;
+    auto batchToSpace             = network->AddBatchToSpaceNdLayer(batchToSpaceDesc, "batchToSpace");
+    const TensorInfo batchToSpaceInfo({ 1, 4, 6, 1 }, DataType::Float32);
+    batchToSpace->GetOutputSlot(0).SetTensorInfo(batchToSpaceInfo);
+    permute->GetOutputSlot(0).Connect(batchToSpace->GetInputSlot(0));
+
+    auto output = network->AddOutputLayer(0, "output");
+    batchToSpace->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    return network;
+}
+
+/// Shared function for the below tests, so that we test the same network in both cases.
+INetworkPtr CreateTransposeTestNetwork()
+{
+    // Create a network
+    INetworkPtr network = INetwork::Create();
+
+    auto input = network->AddInputLayer(0, "input");
+    const TensorInfo inputInfo({ 1, 2, 3, 4 }, DataType::Float32);
+    input->GetOutputSlot(0).SetTensorInfo(inputInfo);
+
+    // Insert Permute which swaps batches and channels dimensions
+    auto permute = network->AddTransposeLayer(TransposeDescriptor(PermutationVector{ 3, 1, 2, 0 }), "permute");
+    const TensorInfo permuteInfo({ 4, 2, 3, 1 }, DataType::Float32);
+    permute->GetOutputSlot(0).SetTensorInfo(permuteInfo);
+    input->GetOutputSlot(0).Connect(permute->GetInputSlot(0));
+
+    // Insert BatchToSpace
+    BatchToSpaceNdDescriptor batchToSpaceDesc;
+    batchToSpaceDesc.m_BlockShape = { 2, 2 };
+    batchToSpaceDesc.m_DataLayout = DataLayout::NHWC;
+    auto batchToSpace             = network->AddBatchToSpaceNdLayer(batchToSpaceDesc, "batchToSpace");
+    const TensorInfo batchToSpaceInfo({ 1, 4, 6, 1 }, DataType::Float32);
+    batchToSpace->GetOutputSlot(0).SetTensorInfo(batchToSpaceInfo);
+    permute->GetOutputSlot(0).Connect(batchToSpace->GetInputSlot(0));
+
+    auto output = network->AddOutputLayer(0, "output");
+    batchToSpace->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    return network;
+}
 
 /// Tests that a optimization performed by PermuteAndBatchToSpaceAsDepthToSpace does not change the behaviour
 /// of the network (i.e. it still produces the correct output).

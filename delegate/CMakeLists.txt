@@ -137,6 +137,8 @@ if(BUILD_UNIT_TESTS)
         src/test/GatherTestHelper.hpp
         src/test/LogicalTest.cpp
         src/test/LogicalTestHelper.hpp
+        src/test/LstmTest.cpp
+        src/test/LstmTestHelper.hpp
         src/test/NormalizationTest.cpp
         src/test/NormalizationTestHelper.hpp
         src/test/PadTest.cpp

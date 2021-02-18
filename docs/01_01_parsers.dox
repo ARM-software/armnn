@@ -28,6 +28,8 @@ should be able to load your model according to the list of supported layers, but
 messages, then try upgrading your model to the latest format using Caffe, either by saving it to a new file or using
 the upgrade utilities in `caffe/tools`.
 
+\b NOTE: The Arm NN Caffe Parser is deprecated in Arm NN 21.02 and will be removed in 21.05.
+
 ## Caffe layers supported by the Arm NN SDK
 This reference guide provides a list of Caffe layers the Arm NN SDK currently supports.
 
@@ -228,6 +230,8 @@ More machine learning operators will be supported in future releases.
 @section S7_tf_parser ArmNN Tensorflow Parser
 
 `armnnTfParser` is a library for loading neural networks defined by TensorFlow protobuf files into the Arm NN runtime.
+
+\b NOTE: The Arm NN Tensorflow Parser is deprecated in Arm NN 21.02 and will be removed in 21.05.
 
 ## TensorFlow operators that the Arm NN SDK supports
 

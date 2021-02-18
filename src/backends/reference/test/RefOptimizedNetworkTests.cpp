@@ -196,9 +196,9 @@ BOOST_AUTO_TEST_CASE(DebugTestOnCpuRef)
 
     // Tests that the vertices exist and have correct names.
     BOOST_TEST(GraphHasNamedLayer(graph, "InputLayer"));
-    BOOST_TEST(GraphHasNamedLayer(graph, "DebugLayerAfterInputLayer"));
+    BOOST_TEST(GraphHasNamedLayer(graph, "DebugLayerAfterInputLayer_0"));
     BOOST_TEST(GraphHasNamedLayer(graph, "ActivationLayer"));
-    BOOST_TEST(GraphHasNamedLayer(graph, "DebugLayerAfterActivationLayer"));
+    BOOST_TEST(GraphHasNamedLayer(graph, "DebugLayerAfterActivationLayer_0"));
     BOOST_TEST(GraphHasNamedLayer(graph, "OutputLayer"));
 }
 

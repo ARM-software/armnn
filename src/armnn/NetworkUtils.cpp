@@ -237,9 +237,11 @@ std::vector<DebugLayer*> InsertDebugLayerAfter(Graph& graph, Layer& layer)
     debugLayers.reserve(layer.GetNumOutputSlots());
 
     // Connect a DebugLayer to each output slot of the layer
+    uint32_t outputSlotIdx = 0;
     for (auto outputSlot = layer.BeginOutputSlots(); outputSlot != layer.EndOutputSlots(); ++outputSlot)
     {
-        const std::string debugName = std::string("DebugLayerAfter") + layer.GetNameStr();
+        const std::string debugName = std::string("DebugLayerAfter") + layer.GetNameStr() + "_" +
+            std::to_string(outputSlotIdx);
 
         DebugLayer* debugLayer =
             graph.InsertNewLayer<DebugLayer>(*outputSlot, debugName.c_str());
@@ -254,6 +256,8 @@ std::vector<DebugLayer*> InsertDebugLayerAfter(Graph& graph, Layer& layer)
         debugLayer->SetBackendId(Compute::CpuRef);
 
         debugLayers.emplace_back(debugLayer);
+
+        ++outputSlotIdx;
     }
 
     return debugLayers;

@@ -720,12 +720,6 @@ protected:
                                          const OptimizerOptions& options,
                                          Optional<std::vector<std::string>&> messages);
 
-    template <typename PreCompiledWorkload, armnn::DataType dataType>
-    friend std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> CreatePreCompiledWorkloadTest(
-        armnn::IWorkloadFactory& factory,
-        armnn::Graph& graph,
-        bool biasEnabled);
-
     IOptimizedNetwork(std::unique_ptr<Graph> graph, const ModelOptions& modelOptions);
 
     std::unique_ptr<OptimizedNetworkImpl> pOptimizedNetworkImpl;

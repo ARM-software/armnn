@@ -34,12 +34,12 @@ public:
 
     TransformIterator operator=(TransformIterator const& transformIterator)
     {
-        return{ transformIterator.it, transformIterator.fn};
+        return { transformIterator.m_it, transformIterator.m_fn };
     }
 
     TransformIterator operator=(TransformIterator&& transformIterator)
     {
-        return{ transformIterator.it, transformIterator.fn};
+        return { transformIterator.m_it, transformIterator.m_fn };
     }
 
     TransformIterator operator++() {++m_it; return *this;}

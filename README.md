@@ -70,7 +70,12 @@ or take a look at previous [github issues](https://github.com/ARM-software/armnn
 
 
 ## Note
-We are currently in the process of removing [boost](https://www.boost.org/) as a dependency to Arm NN. This process 
+1. The following tools are **deprecated** in Arm NN 21.02 and will be removed in 21.05:
+    * TensorflowParser
+    * CaffeParser
+    * Quantizer
+
+2. We are currently in the process of removing [boost](https://www.boost.org/) as a dependency to Arm NN. This process 
 is finished for everything apart from our unit tests. This means you don't need boost to build and use Arm NN but 
 you need it to execute our unit tests. Boost will soon be removed from Arm NN entirely.
 

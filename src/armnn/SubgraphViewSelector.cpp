@@ -472,6 +472,39 @@ SubgraphViewSelector::SelectSubgraphs(SubgraphView& subgraph, const LayerSelecto
             infoPtr->CollectNonSelectedOutputSlots(layerInfos, outputs);
             layers.push_back(infoPtr->m_Layer);
         }
+
+        // Sort lists into deterministic order, not relying on pointer values which may be different on each execution.
+        // This makes debugging the optimised graph much easier as subsequent stages can also be deterministic.
+        std::sort(inputs.begin(), inputs.end(), [](const InputSlot* a, const InputSlot* b)
+        {
+            const LayerGuid guidA = a->GetOwningLayer().GetGuid();
+            const LayerGuid guidB = b->GetOwningLayer().GetGuid();
+            if (guidA < guidB)
+            {
+                return true;
+            }
+            else if (guidA == guidB)
+            {
+                return (a->GetSlotIndex() < b->GetSlotIndex());
+            }
+            return false;
+        });
+        std::sort(outputs.begin(), outputs.end(), [](const OutputSlot* a, const OutputSlot* b)
+        {
+            const LayerGuid guidA = a->GetOwningLayer().GetGuid();
+            const LayerGuid guidB = b->GetOwningLayer().GetGuid();
+            if (guidA < guidB)
+            {
+                return true;
+            }
+            else if (guidA == guidB)
+            {
+                return (a->CalculateIndexOnOwner() < b->CalculateIndexOnOwner());
+            }
+            return false;
+        });
+        layers.sort([](const Layer* a, const Layer* b) { return a->GetGuid() < b->GetGuid(); });
+
         // Create a new sub-graph with the new lists of input/output slots and layer
         result.emplace_back(std::make_unique<SubgraphView>(std::move(inputs),
                                                             std::move(outputs),

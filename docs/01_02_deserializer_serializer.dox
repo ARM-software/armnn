@@ -59,6 +59,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 - Quantize
 - QuantizedLstm
 - Rank
+- Reduce
 - Reshape
 - Resize
 - Slice
@@ -143,10 +144,10 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 - QLstm
 - QuantizedLstm
 - Rank
+- Reduce
 - Reshape
 - Resize
 - ResizeBilinear
-- Rsqrt
 - Slice
 - Softmax
 - SpaceToBatchNd
@@ -157,6 +158,7 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 - StridedSlice
 - Subtraction
 - Switch
+- Transpose
 - TransposeConvolution2d
 
 More machine learning layers will be supported in future releases.

@@ -127,8 +127,7 @@ The Arm NN SDK ONNX parser currently only supports fp32 operators.
 ### Partially supported
 
 - Conv
-  - The parser only supports 2D convolutions with a dilation rate of [1, 1] and group = 1 or group = #Nb_of_channel (depthwise convolution)
-    See the ONNX [Conv documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Conv) for more information.
+  - The parser only supports 2D convolutions with a group = 1 or group = #Nb_of_channel (depthwise convolution)
 - BatchNormalization
   - The parser does not support training mode. See the ONNX [BatchNormalization documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#BatchNormalization) for more information.
 - MatMul
@@ -179,13 +178,15 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - MAXIMUM
 - MEAN
 - MINIMUM
-- MU
+- MUL
 - NEG
 - PACK
 - PAD
 - QUANTIZE
 - RELU
 - RELU6
+- REDUCE_MAX
+- REDUCE_MIN
 - RESHAPE
 - RESIZE_BILINEAR
 - RESIZE_NEAREST_NEIGHBOR
@@ -197,6 +198,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - SQUEEZE
 - STRIDED_SLICE
 - SUB
+- SUM
 - TANH
 - TRANSPOSE
 - TRANSPOSE_CONV

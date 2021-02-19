@@ -36,7 +36,7 @@ to build for a wide variety of target platforms, from a wide variety of host env
 Depending on what kind of framework (Tensorflow, Caffe, ONNX) you've been using to create your model there are multiple 
 software tools available within Arm NN that can serve your needs.
 
-Generally, there is a **parser** available **for each supported framework**. Each parser allows you to run a models from 
+Generally, there is a **parser** available **for each supported framework**. Each parser allows you to run models from 
 one framework e.g. the TfLite-Parser lets you run TfLite models. You can integrate these parsers into your own 
 application to load, optimize and execute your model. We also provide **python bindings** for our parsers and the Arm NN core.
 We call the result **PyArmNN**. Therefore your application can be conveniently written in either C++ using the "original"

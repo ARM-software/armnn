@@ -82,14 +82,16 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 - LOCAL_RESPONSE_NORMALIZATION
 
 - LOGICAL_AND
--
+
 - LOGICAL_NOT
--
+
 - LOGICAL_OR
 
 - LOGISTIC
 
 - LOG_SOFTMAX
+
+- LSTM
 
 - L2_NORMALIZATION
 
@@ -111,7 +113,15 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - PAD
 
+- PRELU
+
 - QUANTIZE
+
+- RANK
+
+- REDUCE_MAX
+
+- REDUCE_MIN
 
 - RESHAPE
 
@@ -137,7 +147,11 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - SQRT
 
+- STRIDED_SLICE
+
 - SUB
+
+- SUM
 
 - TANH
 

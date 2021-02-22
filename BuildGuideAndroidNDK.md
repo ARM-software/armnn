@@ -1,4 +1,4 @@
-# How to use the Android NDK to build ArmNN
+# How to use the Android NDK to build Arm NN
 
 - [Introduction](#introduction)
 - [Download the Android NDK and make a standalone toolchain](#download-the-android-ndk-and-make-a-standalone-toolchain)
@@ -6,16 +6,18 @@
 - [Build the Compute Library](#build-the-compute-library)
 - [Build Google's Protobuf library](#build-google-s-protobuf-library)
 - [Download TensorFlow](#download-tensorflow)
-- [Build ArmNN](#build-armnn)
+- [Build Arm NN](#build-armnn)
 - [Build Standalone Sample Dynamic Backend](#build-standalone-sample-dynamic-backend)
-- [Run the ArmNN unit tests on an Android device](#run-the-armnn-unit-tests-on-an-android-device)
+- [Run the Arm NN unit tests on an Android device](#run-the-armnn-unit-tests-on-an-android-device)
 
 
 ## Introduction
-These are step by step instructions for using the Android NDK to build ArmNN.
-They have been tested on a clean install of Ubuntu 18.04, and should also work with other OS versions.
-The instructions show how to build the ArmNN core library and the optional TensorFlow parser.
+These are step by step instructions for using the Android NDK to build Arm NN.
+They have been tested on a clean install of Ubuntu 16.04, and should also work with other OS versions.
+The instructions show how to build the Arm NN core library and the optional TensorFlow parser.
 All downloaded or generated files will be saved inside the `~/armnn-devenv` directory.
+
+#####Note: We are currently in the process of removing boost as a dependency to Arm NN. This process is finished for everything apart from our unit tests. This means you don't need boost to build and use Arm NN but you need it to execute our unit tests. Boost will soon be removed from Arm NN entirely. We also are deprecating support for Tensorflow parsers in 21.02. This will be removed in 21.05. 
 
 ## Download the Android NDK and make a standalone toolchain
 
@@ -136,15 +138,15 @@ git clone https://github.com/tensorflow/tensorflow.git
     git checkout fcc4b966f1265f466e82617020af93670141b009
 ```
 
-## Build ArmNN
+## Build Arm NN
 
-* Clone ArmNN source code:
+* Clone Arm NN source code:
 ```bash
 cd ~/armnn-devenv/
 git clone https://github.com/ARM-software/armnn.git
 ```
 
-* Checkout ArmNN branch:
+* Checkout Arm NN branch:
 ```bash
 cd armnn
 git checkout <branch_name>
@@ -164,7 +166,7 @@ cd ~/armnn-devenv/google/tensorflow
  $HOME/armnn-devenv/google/tf_pb $HOME/armnn-devenv/google/x86_pb_install
 ```
 
-* Build ArmNN:
+* Build Arm NN:
 
  	(Requires CMake if not previously installed: `sudo apt install cmake`)
 ```bash
@@ -207,7 +209,7 @@ mkdir build
 cd build
 ```
 
-* Use CMake to configure the build environment, update the following script and run it from the armnn/src/dynamic/sample/build directory to set up the armNN build:
+* Use CMake to configure the build environment, update the following script and run it from the armnn/src/dynamic/sample/build directory to set up the Arm NN build:
 ```bash
 #!/bin/bash
 CXX=aarch64-linux-android<Android_API>-clang++ \
@@ -228,7 +230,7 @@ cmake \
 make
 ```
 
-## Run the ArmNN unit tests on an Android device
+## Run the Arm NN unit tests on an Android device
 
 
 * Push the build results to an Android device and make symbolic links for shared libraries:
@@ -279,14 +281,14 @@ adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backends
 adb shell mkdir -p /data/local/tmp/src/backends/dynamic/reference
 adb push -p ~/armnn-devenv/armnn/build/src/backends/dynamic/reference/Arm_CpuRef_backend.so /data/local/tmp/src/backends/dynamic/reference/
 
-# If the standalone sample dynamic tests are enabled, also push libArm_SampleDynamic_backend.so library file to the folder specified as $SAMPLE_DYNAMIC_BACKEND_PATH when ArmNN is built.
+# If the standalone sample dynamic tests are enabled, also push libArm_SampleDynamic_backend.so library file to the folder specified as $SAMPLE_DYNAMIC_BACKEND_PATH when Arm NN is built.
 # This is the example when $SAMPLE_DYNAMIC_BACKEND_PATH is specified as /data/local/tmp/dynamic/sample/:
 
 adb shell mkdir -p /data/local/tmp/dynamic/sample/
 adb push -p ${WORKING_DIR}/armnn/src/dynamic/sample/build/libArm_SampleDynamic_backend.so /data/local/tmp/dynamic/sample/
 ```
 
-* Run ArmNN unit tests:
+* Run Arm NN unit tests:
 ```bash
 adb shell 'LD_LIBRARY_PATH=/data/local/tmp:/vendor/lib64:/vendor/lib64/egl /data/local/tmp/UnitTests'
 ```

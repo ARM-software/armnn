@@ -131,6 +131,8 @@ if(BUILD_UNIT_TESTS)
         src/test/ElementwiseBinaryTestHelper.hpp
         src/test/ElementwiseUnaryTest.cpp
         src/test/ElementwiseUnaryTestHelper.hpp
+        src/test/FillTest.cpp
+        src/test/FillTestHelper.hpp
         src/test/FullyConnectedTest.cpp
         src/test/FullyConnectedTestHelper.hpp
         src/test/GatherTest.cpp

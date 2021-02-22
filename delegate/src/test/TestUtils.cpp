@@ -52,6 +52,15 @@ void CompareData(int16_t tensor1[], int16_t tensor2[], size_t tensorSize)
     }
 }
 
+void CompareData(int32_t tensor1[], int32_t tensor2[], size_t tensorSize)
+{
+    int32_t tolerance = 1;
+    for (size_t i = 0; i < tensorSize; i++)
+    {
+        CHECK(std::max(tensor1[i], tensor2[i]) - std::min(tensor1[i], tensor2[i]) <= tolerance);
+    }
+}
+
 void CompareData(int8_t tensor1[], int8_t tensor2[], size_t tensorSize)
 {
     int8_t tolerance = 1;

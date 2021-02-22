@@ -49,7 +49,7 @@ usability by providing Arm NN as a **Debian package**. Our debian package is the
 the TfLite Parser and PyArmNN (More support is about to come): [Installation via Apt Repository](InstallationViaAptRepository.md)
 
 The newest member in Arm NNs software toolkit is the **TfLite Delegate**. The delegate can be integrated in TfLite.
-TfLite will then delegate operations that can be accelerated with Arm NN to Arm NN. Every other operation will still be
+TfLite will then delegate operations, that can be accelerated with Arm NN, to Arm NN. Every other operation will still be
 executed with the usual TfLite runtime. This is our **recommended way to accelerate TfLite models**. As with our parsers
 there are tutorials in our doxygen documentation that can be found in the [wiki section](https://github.com/ARM-software/armnn/wiki/Documentation).
 

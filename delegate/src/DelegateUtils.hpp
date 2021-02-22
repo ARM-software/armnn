@@ -446,7 +446,7 @@ armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor,
         if (affineQuantization->scale->size > 1)
         {
             std::vector<float> quantizationScales;
-            for (unsigned int i = 1; i < static_cast<unsigned int>(affineQuantization->scale->size); ++i)
+            for (unsigned int i = 0; i < static_cast<unsigned int>(affineQuantization->scale->size); ++i)
             {
                 quantizationScales.push_back(affineQuantization->scale->data[i]);
             }

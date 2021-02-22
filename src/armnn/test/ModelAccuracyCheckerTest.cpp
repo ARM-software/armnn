@@ -52,7 +52,8 @@ struct TestHelper
 
 BOOST_AUTO_TEST_SUITE(ModelAccuracyCheckerTest)
 
-using TContainer = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
+using TContainer =
+        mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>, std::vector<int8_t>>;
 
 BOOST_FIXTURE_TEST_CASE(TestFloat32OutputTensorAccuracy, TestHelper)
 {

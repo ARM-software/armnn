@@ -110,7 +110,8 @@ template <typename TModel>
 class InferenceModelTestCase : public IInferenceTestCase
 {
 public:
-    using TContainer = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
+    using TContainer =
+           mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>, std::vector<int8_t>>;
 
     InferenceModelTestCase(TModel& model,
                            unsigned int testCaseId,

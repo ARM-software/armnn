@@ -26,7 +26,8 @@ namespace armnn
 namespace test
 {
 
-using TContainer = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
+using TContainer =
+        mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>, std::vector<int8_t>>;
 
 template <typename TTestCaseDatabase, typename TModel>
 ClassifierTestCase<TTestCaseDatabase, TModel>::ClassifierTestCase(
@@ -64,6 +65,14 @@ struct ClassifierResultProcessor
                                 {
                                     return value;
                                 });
+    }
+
+    void operator()(const std::vector<int8_t>& values)
+    {
+        SortPredictions(values, [](int8_t value)
+        {
+            return value;
+        });
     }
 
     void operator()(const std::vector<uint8_t>& values)

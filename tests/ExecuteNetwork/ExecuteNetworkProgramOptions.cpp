@@ -177,10 +177,6 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "tensorflow-text.",
                  cxxopts::value<std::string>())
 
-                ("D,armnn-tflite-delegate",
-                 "enable Arm NN TfLite delegate",
-                 cxxopts::value<bool>(m_ExNetParams.m_EnableDelegate)->default_value("false")->implicit_value("true"))
-
                 ("m,model-path",
                  "Path to model file, e.g. .armnn, .caffemodel, .prototxt, .tflite, .onnx",
                  cxxopts::value<std::string>(m_ExNetParams.m_ModelPath))
@@ -271,7 +267,19 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "The type of the output tensors in the network separated by comma. "
                  "If unset, defaults to \"float\" for all defined outputs. "
                  "Accepted values (float, int or qasymm8).",
-                 cxxopts::value<std::string>());
+                 cxxopts::value<std::string>())
+
+                ("T,tflite-executor",
+                 "Set the executor for the tflite model: parser, delegate, tflite"
+                 "parser is the ArmNNTfLiteParser, "
+                 "delegate is the ArmNNTfLiteDelegate, "
+                 "tflite is the TfliteInterpreter",
+                 cxxopts::value<std::string>()->default_value("parser"))
+
+                ("D,armnn-tflite-delegate",
+                 "Enable Arm NN TfLite delegate. "
+                 "This option is depreciated please use tflite-executor instead",
+                 cxxopts::value<bool>(m_ExNetParams.m_EnableDelegate)->default_value("false")->implicit_value("true"));
 
         m_CxxOptions.add_options("c) Optimization")
                 ("bf16-turbo-mode",
@@ -408,6 +416,36 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
     m_ExNetParams.m_GenerateTensorData =
             m_ExNetParams.m_InputTensorDataFilePaths.empty();
     m_ExNetParams.m_DynamicBackendsPath = m_RuntimeOptions.m_DynamicBackendsPath;
+
+
+    std::string tfliteExecutor = GetOptionValue<std::string>("tflite-executor", m_CxxResult);
+
+    if (tfliteExecutor.size() == 0 || tfliteExecutor == "parser")
+    {
+        m_ExNetParams.m_TfLiteExecutor = ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteParser;
+    }
+    else if (tfliteExecutor == "delegate")
+    {
+        m_ExNetParams.m_TfLiteExecutor = ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteDelegate;
+    }
+    else if (tfliteExecutor == "tflite")
+    {
+        m_ExNetParams.m_TfLiteExecutor = ExecuteNetworkParams::TfLiteExecutor::TfliteInterpreter;
+    }
+    else
+    {
+        ARMNN_LOG(info) << fmt::format("Invalid tflite-executor option '{}'.", tfliteExecutor);
+        throw armnn::InvalidArgumentException ("Invalid tflite-executor option");
+    }
+
+    if (m_ExNetParams.m_EnableDelegate)
+    {
+        m_ExNetParams.m_TfLiteExecutor = ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteDelegate;
+        ARMNN_LOG(info) << fmt::format("armnn-tflite-delegate option is being depreciated, "
+                                       "please use tflite-executor instead.");
+    }
+
+
 
     // Parse input tensor shape from the string we got from the command-line.
     std::vector<std::string> inputTensorShapesVector =

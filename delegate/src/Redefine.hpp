@@ -83,10 +83,19 @@ TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,
 
     armnn::ReshapeDescriptor reshapeDesc;
     std::vector<int32_t> targetShape;
-    bool shapeSet = false;
+
+    TfLiteReshapeParams* reshapeOptions = reinterpret_cast<TfLiteReshapeParams*>(tfLiteNode->builtin_data);
 
     // The new shape can be defined by either a second input tensor or by a builtin option, we need to check for both.
-    if (numInputs == 2)
+    // Options might be set without valid data. we need to check the dimensions are in a valid range.
+    if (reshapeOptions && reshapeOptions->num_dimensions > 0 && reshapeOptions->num_dimensions <= 8)
+    {
+        for (int i=0; i < reshapeOptions->num_dimensions; ++i)
+        {
+            targetShape.push_back(reshapeOptions->shape[i]);
+        }
+    }
+    else if (numInputs == 2)
     {
         // Get shape from the second input tensor
         const TfLiteTensor& tfLiteShapeInputTensor = tfLiteTensors[tfLiteNode->inputs->data[1]];
@@ -111,33 +120,15 @@ TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,
             {
                 targetShape.push_back(*(shapeTensorDataPtr+i));
             }
-            shapeSet = true;
         }
     }
-    if (!shapeSet)
+    else
     {
-        // Get shape from the builtin data
-        TfLiteReshapeParams* reshapeOptions = reinterpret_cast<TfLiteReshapeParams*>(tfLiteNode->builtin_data);
-
-        if (reshapeOptions != nullptr)
-        {
-            // Options might be set without valid data. we need to check the dimensions are in a valid range.
-            if (reshapeOptions->num_dimensions > 0 && reshapeOptions->num_dimensions <= 8)
-            {
-                for (int i=0; i < reshapeOptions->num_dimensions; ++i)
-                {
-                    targetShape.push_back(reshapeOptions->shape[i]);
-                }
-            }
-        }
-        else
-        {
-            TF_LITE_MAYBE_KERNEL_LOG(tfLiteContext,
-                                     "Target shape not defined in reshape parameters or input tensor. "
-                                     "At least one method required in operator #%d node #%d: ",
-                                     operatorCode, nodeIndex);
-            return kTfLiteError;
-        }
+        TF_LITE_MAYBE_KERNEL_LOG(tfLiteContext,
+                                 "Target shape not defined in reshape parameters or input tensor. "
+                                 "At least one method required in operator #%d node #%d: ",
+                                 operatorCode, nodeIndex);
+        return kTfLiteError;
     }
 
     // Use the data to create the required tensor shape.

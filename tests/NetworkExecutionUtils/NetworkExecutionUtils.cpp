@@ -52,6 +52,16 @@ auto ParseDataArray<armnn::DataType::QAsymmU8>(std::istream& stream)
                                    [](const std::string& s) { return armnn::numeric_cast<uint8_t>(std::stoi(s)); });
 }
 
+
+template<>
+auto ParseDataArray<armnn::DataType::QSymmS8>(std::istream& stream)
+{
+    return ParseArrayImpl<int8_t>(stream,
+                                   [](const std::string& s) { return armnn::numeric_cast<int8_t>(std::stoi(s)); });
+}
+
+
+
 template<>
 auto ParseDataArray<armnn::DataType::QAsymmU8>(std::istream& stream,
                                                const float& quantizationScale,
@@ -130,6 +140,15 @@ void TensorPrinter::operator()(const std::vector<uint8_t>& values)
     }
 }
 
+void TensorPrinter::operator()(const std::vector<int8_t>& values)
+{
+    ForEachValue(values, [](int8_t value)
+    {
+        printf("%d ", value);
+    });
+    WriteToFile(values);
+}
+
 void TensorPrinter::operator()(const std::vector<int>& values)
 {
     ForEachValue(values, [](int value)
@@ -170,7 +189,8 @@ void TensorPrinter::WriteToFile(const std::vector<T>& values)
     }
 }
 
-using TContainer         = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
+using TContainer  =
+        mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>, std::vector<int8_t>>;
 using QuantizationParams = std::pair<float, int32_t>;
 
 void PopulateTensorWithData(TContainer& tensorData,
@@ -211,6 +231,12 @@ void PopulateTensorWithData(TContainer& tensorData,
         tensorData = readFromFile ?
                      ParseDataArray<armnn::DataType::Signed32>(inputTensorFile) :
                      GenerateDummyTensorData<armnn::DataType::Signed32>(numElements);
+    }
+    else if (dataTypeStr.compare("qsymms8") == 0)
+    {
+        tensorData = readFromFile ?
+                     ParseDataArray<armnn::DataType::QSymmS8>(inputTensorFile) :
+                     GenerateDummyTensorData<armnn::DataType::QSymmS8>(numElements);
     }
     else if (dataTypeStr.compare("qasymm8") == 0)
     {

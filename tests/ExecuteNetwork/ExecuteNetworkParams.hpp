@@ -14,6 +14,13 @@ struct ExecuteNetworkParams
 {
     using TensorShapePtr = std::unique_ptr<armnn::TensorShape>;
 
+    enum class TfLiteExecutor
+    {
+        ArmNNTfLiteParser,
+        ArmNNTfLiteDelegate,
+        TfliteInterpreter
+    };
+
     std::string                   m_CachedNetworkFilePath;
     std::vector<armnn::BackendId> m_ComputeDevices;
     bool                          m_DequantizeOutput;
@@ -47,6 +54,7 @@ struct ExecuteNetworkParams
     int                           m_TuningLevel;
     std::string                   m_TuningPath;
     std::string                   m_MLGOTuningFilePath;
+    TfLiteExecutor                m_TfLiteExecutor;
 
     // Ensures that the parameters for ExecuteNetwork fit together
     void ValidateParams();

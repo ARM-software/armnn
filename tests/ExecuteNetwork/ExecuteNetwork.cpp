@@ -54,18 +54,27 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
     builder(&tfLiteInterpreter);
     tfLiteInterpreter->AllocateTensors();
 
-    // Create the Armnn Delegate
-    armnnDelegate::DelegateOptions delegateOptions(params.m_ComputeDevices);
-    std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
-            theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
-                             armnnDelegate::TfLiteArmnnDelegateDelete);
-    // Register armnn_delegate to TfLiteInterpreter
-    int status = tfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate));
-    if (status == kTfLiteError)
+    int status = 0;
+    if (params.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteDelegate)
     {
-        ARMNN_LOG(fatal) << "Could not register ArmNN TfLite Delegate to TfLiteInterpreter!";
-        return EXIT_FAILURE;
+        // Create the Armnn Delegate
+        armnnDelegate::DelegateOptions delegateOptions(params.m_ComputeDevices);
+        std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
+                theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
+                                 armnnDelegate::TfLiteArmnnDelegateDelete);
+        // Register armnn_delegate to TfLiteInterpreter
+        status = tfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate));
+        if (status == kTfLiteError)
+        {
+            ARMNN_LOG(fatal) << "Could not register ArmNN TfLite Delegate to TfLiteInterpreter!";
+            return EXIT_FAILURE;
+        }
     }
+    else
+    {
+        std::cout << "Running on TfLite without ArmNN delegate\n";
+    }
+
 
     std::vector<std::string>  inputBindings;
     for (const std::string& inputName: params.m_InputNames)
@@ -110,7 +119,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
 
             std::copy(tensorData.begin(), tensorData.end(), inputData);
         }
-        else if (params.m_InputTypes[inputIndex].compare("int8") == 0)
+        else if (params.m_InputTypes[inputIndex].compare("qsymms8") == 0)
         {
             auto inputData = tfLiteInterpreter->typed_tensor<int8_t>(input);
 
@@ -180,7 +189,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
     for (size_t x = 0; x < params.m_Iterations; x++)
     {
         // Run the inference
-        tfLiteInterpreter->Invoke();
+        status = tfLiteInterpreter->Invoke();
 
         // Print out the output
         for (unsigned int outputIndex = 0; outputIndex < params.m_OutputNames.size(); ++outputIndex)
@@ -207,11 +216,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
 
                 for (int i = 0; i < outputSize; ++i)
                 {
-                    std::cout << tfLiteDelageOutputData[i] << ", ";
-                    if (i % 60 == 0)
-                    {
-                        std::cout << std::endl;
-                    }
+                    printf("%f ", tfLiteDelageOutputData[i]);
                 }
             }
             else if (params.m_OutputTypes[outputIndex].compare("int") == 0)
@@ -226,14 +231,10 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
 
                 for (int i = 0; i < outputSize; ++i)
                 {
-                    std::cout << tfLiteDelageOutputData[i] << ", ";
-                    if (i % 60 == 0)
-                    {
-                        std::cout << std::endl;
-                    }
+                    printf("%d ", tfLiteDelageOutputData[i]);
                 }
             }
-            else if (params.m_OutputTypes[outputIndex].compare("int8") == 0)
+            else if (params.m_OutputTypes[outputIndex].compare("qsymms8") == 0)
             {
                 auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<int8_t>(tfLiteDelegateOutputId);
                 if(tfLiteDelageOutputData == NULL)
@@ -245,11 +246,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
 
                 for (int i = 0; i < outputSize; ++i)
                 {
-                    std::cout << signed(tfLiteDelageOutputData[i]) << ", ";
-                    if (i % 60 == 0)
-                    {
-                        std::cout << std::endl;
-                    }
+                    printf("%d ", tfLiteDelageOutputData[i]);
                 }
             }
             else if (params.m_OutputTypes[outputIndex].compare("qasymm8") == 0)
@@ -264,11 +261,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
 
                 for (int i = 0; i < outputSize; ++i)
                 {
-                    std::cout << unsigned(tfLiteDelageOutputData[i]) << ", ";
-                    if (i % 60 == 0)
-                    {
-                        std::cout << std::endl;
-                    }
+                    printf("%u ", tfLiteDelageOutputData[i]);
                 }
             }
             else
@@ -289,7 +282,8 @@ template<typename TParser, typename TDataType>
 int MainImpl(const ExecuteNetworkParams& params,
              const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
-    using TContainer = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
+    using TContainer =
+           mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>, std::vector<int8_t>>;
 
     std::vector<TContainer> inputDataContainers;
 
@@ -382,6 +376,10 @@ int MainImpl(const ExecuteNetworkParams& params,
             else if (params.m_OutputTypes[i].compare("qasymm8") == 0)
             {
                 outputDataContainers.push_back(std::vector<uint8_t>(model.GetOutputSize(i)));
+            }
+            else if (params.m_OutputTypes[i].compare("qsymms8") == 0)
+            {
+                outputDataContainers.push_back(std::vector<int8_t>(model.GetOutputSize(i)));
             }
             else
             {
@@ -503,8 +501,19 @@ int main(int argc, const char* argv[])
     }
     else if(modelFormat.find("tflite") != std::string::npos)
     {
-
-        if (ProgramOptions.m_ExNetParams.m_EnableDelegate)
+        if (ProgramOptions.m_ExNetParams.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteParser)
+        {
+            #if defined(ARMNN_TF_LITE_PARSER)
+                        return MainImpl<armnnTfLiteParser::ITfLiteParser, float>(ProgramOptions.m_ExNetParams, runtime);
+            #else
+                        ARMNN_LOG(fatal) << "Not built with Tensorflow-Lite parser support.";
+                        return EXIT_FAILURE;
+            #endif
+        }
+        else if (ProgramOptions.m_ExNetParams.m_TfLiteExecutor ==
+                    ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteDelegate ||
+                ProgramOptions.m_ExNetParams.m_TfLiteExecutor ==
+                    ExecuteNetworkParams::TfLiteExecutor::TfliteInterpreter)
         {
         #if defined(ARMNN_TF_LITE_DELEGATE)
             return TfLiteDelegateMainImpl(ProgramOptions.m_ExNetParams, runtime);
@@ -513,12 +522,6 @@ int main(int argc, const char* argv[])
             return EXIT_FAILURE;
         #endif
         }
-    #if defined(ARMNN_TF_LITE_PARSER)
-        return MainImpl<armnnTfLiteParser::ITfLiteParser, float>(ProgramOptions.m_ExNetParams, runtime);
-    #else
-        ARMNN_LOG(fatal) << "Not built with Tensorflow-Lite parser support.";
-        return EXIT_FAILURE;
-    #endif
     }
     else
     {

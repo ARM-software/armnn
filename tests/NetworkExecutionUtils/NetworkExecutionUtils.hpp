@@ -34,6 +34,8 @@ struct TensorPrinter
 
     void operator()(const std::vector<int>& values);
 
+    void operator()(const std::vector<int8_t>& values);
+
 private:
     template<typename Container, typename Delegate>
     void ForEachValue(const Container& c, Delegate delegate);
@@ -48,7 +50,8 @@ private:
     bool m_DequantizeOutput;
 };
 
-using TContainer         = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
+using TContainer =
+        mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>, std::vector<int8_t>>;
 using QuantizationParams = std::pair<float, int32_t>;
 
 void PopulateTensorWithData(TContainer& tensorData,

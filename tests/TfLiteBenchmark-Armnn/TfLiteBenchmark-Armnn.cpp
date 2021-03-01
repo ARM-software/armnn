@@ -18,7 +18,8 @@
 #include <armnnTfLiteParser/ITfLiteParser.hpp>
 
 // Application parameters
-std::vector<armnn::BackendId> preferred_backends_order = {armnn::Compute::CpuAcc, armnn::Compute::CpuRef};
+std::vector<armnn::BackendId> default_preferred_backends_order = {armnn::Compute::CpuAcc, armnn::Compute::CpuRef};
+std::vector<armnn::BackendId> preferred_backends_order;
 std::string model_file_str;
 std::string preferred_backend_str;
 int nb_loops = 1;
@@ -45,7 +46,8 @@ static void print_help(char** argv)
         "-m --model_file <.tflite file path>:  .tflite model to be executed\n"
         "-b --backend <device>:                preferred backend device to run layers on by default. Possible choices: "
                                                << armnn::BackendRegistryInstance().GetBackendIdsAsString() << "\n"
-        "-l --loops <int>:                     provide the number of time the inference will be executed\n"
+        "                                      (by default CpuAcc, CpuRef)\n"
+        "-l --loops <int>:                     provide the number of times the inference will be executed\n"
         "                                      (by default nb_loops=1)\n"
         "--help:                               show this help\n";
     exit(1);
@@ -79,22 +81,10 @@ void process_args(int argc, char** argv)
             break;
         case 'b':
             preferred_backend_str = std::string(optarg);
-            // Overwrite the prefered backend order
-            if (preferred_backend_str == "CpuAcc")
-            {
-                preferred_backends_order = {armnn::Compute::CpuAcc, armnn::Compute::CpuRef};
-            }
-            else if (preferred_backend_str == "CpuRef")
-            {
-                preferred_backends_order = {armnn::Compute::CpuRef, armnn::Compute::CpuAcc};
-            }
+            // Overwrite the backend
+            preferred_backends_order.push_back(preferred_backend_str);
 
-            std::cout << "preferred backend device set to:";
-            for (unsigned int i = 0; i < preferred_backends_order.size(); i++)
-            {
-                std::cout << " " << preferred_backends_order.at(i);
-            }
-            std::cout << std::endl;
+            std::cout << "backend device set to:" << preferred_backend_str << std::endl;;
             break;
         case 'l':
             nb_loops = std::stoi(optarg);
@@ -136,6 +126,10 @@ int main(int argc, char* argv[])
     }
 
     // Optimize the network
+    if (preferred_backends_order.size() == 0)
+    {
+        preferred_backends_order = default_preferred_backends_order;
+    }
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(*network,
                                                                preferred_backends_order,
                                                                runtime->GetDeviceSpec());

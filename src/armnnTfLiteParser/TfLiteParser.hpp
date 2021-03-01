@@ -83,6 +83,7 @@ public:
     static const std::string GetVersion();
 
 private:
+
     // No copying allowed until it is wanted and properly implemented
     TfLiteParserImpl(const TfLiteParserImpl &) = delete;
     TfLiteParserImpl & operator=(const TfLiteParserImpl &) = delete;
@@ -154,7 +155,8 @@ private:
     void RegisterInputSlots(size_t subgraphIndex,
                             size_t operatorIndex,
                             armnn::IConnectableLayer* layer,
-                            const std::vector<unsigned int>& tensorIndexes);
+                            const std::vector<unsigned int>& tensorIndexes,
+                            unsigned int startingSlotIndex = 0);
     void RegisterOutputSlots(size_t subgraphIndex,
                              size_t operatorIndex,
                              armnn::IConnectableLayer* layer,
@@ -194,6 +196,13 @@ private:
         std::unique_ptr<int32_t[]> m_Int32Data;
     };
 
+    bool IsConstTensor(TensorRawPtr tensorPtr);
+    armnn::ConstTensor CreateConstTensorNonPermuted(TensorRawPtr tensorPtr,
+                                                    armnn::TensorInfo& tensorInfo);
+    std::pair<armnn::ConstTensor, SupportedDataStorage>
+    CreateConstTensorPermuted(TensorRawPtr tensorPtr,
+                              armnn::TensorInfo& tensorInfo,
+                              armnn::Optional<armnn::PermutationVector&> permutationVector);
 
     template<typename T>
     std::pair<armnn::ConstTensor, TfLiteParserImpl::SupportedDataStorage>
@@ -201,11 +210,6 @@ private:
                                   TfLiteParserImpl::TensorRawPtr tensorPtr,
                                   armnn::TensorInfo& tensorInfo,
                                   armnn::Optional<armnn::PermutationVector&> permutationVector);
-
-    std::pair<armnn::ConstTensor, SupportedDataStorage>
-    CreateConstTensor(TensorRawPtr tensorPtr,
-                      armnn::TensorInfo& tensorInfo,
-                      armnn::Optional<armnn::PermutationVector&> permutationVector);
 
     // Settings for configuring the TfLiteParser
     armnn::Optional<ITfLiteParser::TfLiteParserOptions> m_Options;

@@ -191,7 +191,7 @@ int main(int argc, char* argv[])
     {
         std::vector<float> in_data(inputTensorInfos.at(i).GetNumElements());
         in.push_back(in_data);
-        inputTensors.push_back({ inputBindings[i].first, armnn::ConstTensor(inputBindings[i].second, in.data()) });
+        inputTensors.push_back({ inputBindings[i].first, armnn::ConstTensor(inputBindings[i].second, in[i].data()) });
     }
 
     // Allocate output tensors

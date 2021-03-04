@@ -52,7 +52,6 @@ TfLiteStatus VisitFillOperator(DelegateData& delegateData,
     }
 
     armnn::TensorInfo inputTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
-    const armnn::TensorInfo& fillTensorInfo   = GetTensorInfoForTfLiteTensor(tfLiteFillTensor);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
 
     armnn::FillDescriptor descriptor;

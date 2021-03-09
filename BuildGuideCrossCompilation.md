@@ -6,6 +6,7 @@
 - [Build Caffe for x86_64](#build-caffe-for-x86-64)
 - [Build Boost library for arm64](#build-boost-library-for-arm64)
 - [Build Compute Library](#build-compute-library)
+- [Download ArmNN](#download-armnn)
 - [Build Tensorflow](#build-tensorflow)
 - [Build Flatbuffer](#build-flatbuffer)
 - [Build Onnx](#build-onnx)
@@ -18,7 +19,13 @@
 
 ## Introduction
 These are the step by step instructions on Cross-Compiling Arm NN under an x86_64 system to target an Arm64 system. This build flow has been tested with Ubuntu 16.04.
-The instructions show how to build the Arm NN core library and the Boost, Protobuf, Caffe, Tensorflow, Tflite, Flatbuffer and Compute Libraries for compilation.
+The instructions assume you are using a bash shell and show how to build the Arm NN core library, Boost, Protobuf, Caffe, Tensorflow, Tflite, Flatbuffer and Compute Libraries.
+Start by creating a directory to contain all components:
+
+'''
+mkdir $HOME/armnn-devenv
+cd $HOME/armnn-devenv
+'''
 
 #####Note: We are currently in the process of removing boost as a dependency to Arm NN. This process is finished for everything apart from our unit tests. This means you don't need boost to build and use Arm NN but you need it to execute our unit tests. Boost will soon be removed from Arm NN entirely. We also are deprecating support for Caffe and Tensorflow parsers in 21.02. This will be removed in 21.05. 
 
@@ -36,7 +43,7 @@ We support protobuf version 3.12.0
 git clone -b v3.12.0 https://github.com/google/protobuf.git protobuf
 cd protobuf
 git submodule update --init --recursive
-./autogen
+./autogen.sh
 ```
 * Build a native (x86_64) version of the protobuf libraries and compiler (protoc):
   (Requires cUrl, autoconf, llibtool, and other build dependencies if not previously installed: sudo apt install curl autoconf libtool build-essential g++)
@@ -51,8 +58,8 @@ cd ..
 ```
 mkdir arm64_build
 cd arm64_build
-export CC=aarch64-linux-gnu-gcc \
-export CXX=aarch64-linux-gnu-g++ \
+CC=aarch64-linux-gnu-gcc \
+CXX=aarch64-linux-gnu-g++ \
 ../configure --host=aarch64-linux \
 --prefix=$HOME/armnn-devenv/google/arm64_pb_install \
 --with-protoc=$HOME/armnn-devenv/google/x86_64_pb_install/bin/protoc
@@ -72,6 +79,7 @@ sudo apt-get install libatlas-base-dev
 ```
 * Download Caffe from: https://github.com/BVLC/caffe. We have tested using tag 1.0
 ```bash
+cd $HOME/armnn-devenv
 git clone https://github.com/BVLC/caffe.git
 cd caffe
 git checkout eeebdab16155d34ff8f5f42137da7df4d1c7eab0
@@ -83,8 +91,8 @@ cp Makefile.config.example Makefile.config
 CPU_ONLY := 1
 
 #Add hdf5 and protobuf include and library directories (Replace $HOME with explicit /home/username dir):
-INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial/ $HOME/armnn-devenv/google/x86_64_pb_install/include/
-LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu/hdf5/serial/ $HOME/armnn-devenv/google/x86_64_pb_install/lib/
+INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial/ $(HOME)/armnn-devenv/google/x86_64_pb_install/include/
+LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu/hdf5/serial/ $(HOME)/armnn-devenv/google/x86_64_pb_install/lib/
 ```
 * Setup environment:
 ```bash
@@ -106,6 +114,7 @@ make runtest
     Download Boost version 1.64 from http://www.boost.org/doc/libs/1_64_0/more/getting_started/unix-variants.html
     Using any version of Boost greater than 1.64 will fail to build Arm NN, due to different dependency issues.
 ```bash
+cd $HOME/armnn-devenv
 tar -zxvf boost_1_64_0.tar.gz
 cd boost_1_64_0
 echo "using gcc : arm : aarch64-linux-gnu-g++ ;" > user_config.jam
@@ -116,22 +125,37 @@ echo "using gcc : arm : aarch64-linux-gnu-g++ ;" > user_config.jam
 ## Build Compute Library
 * Building the Arm Compute Library:
 ```bash
+cd $HOME/armnn-devenv
 git clone https://github.com/ARM-software/ComputeLibrary.git
 cd ComputeLibrary/
-git checkout <branch_name>
-git pull
+git checkout <tag_name>
 scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" -j4 internal_only=0
 ```
 
-For example, if you want to checkout release branch of 20.02:
+For example, if you want to checkout release tag of 21.02:
 ```bash
-git checkout branches/arm_compute_20_02
+git checkout v21.02
+```
+
+## Download ArmNN
+```bash
+cd $HOME/armnn-devenv
+git clone https://github.com/ARM-software/armnn.git
+cd armnn
+git checkout <branch_name>
+git pull
+```
+
+For example, if you want to checkout release branch of 21.02:
+```bash
+git checkout branches/armnn_21_02
 git pull
 ```
 
 ## Build Tensorflow
 * Building Tensorflow version 2.3.1:
 ```bash
+cd $HOME/armnn-devenv
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow/
 git checkout fcc4b966f1265f466e82617020af93670141b009
@@ -141,6 +165,7 @@ git checkout fcc4b966f1265f466e82617020af93670141b009
 ## Build Flatbuffer
 * Building Flatbuffer version 1.12.0
 ```bash
+cd $HOME/armnn-devenv
 wget -O flatbuffers-1.12.0.tar.gz https://github.com/google/flatbuffers/archive/v1.12.0.tar.gz
 tar xf flatbuffers-1.12.0.tar.gz
 cd flatbuffers-1.12.0
@@ -155,6 +180,7 @@ make all install
 
 * Build arm64 version of flatbuffer
 ```bash
+cd ..
 mkdir build-arm64
 cd build-arm64
 # Add -fPIC to allow us to use the libraries in shared objects.
@@ -169,16 +195,19 @@ make all install
 ## Build Onnx
 * Building Onnx
 ```bash
+cd $HOME/armnn-devenv
 git clone https://github.com/onnx/onnx.git
 cd onnx
 git fetch https://github.com/onnx/onnx.git 553df22c67bee5f0fe6599cff60f1afc6748c635 && git checkout FETCH_HEAD
-export LD_LIBRARY_PATH=$HOME/armnn-devenv/google/x86_64_pb_install/lib:$LD_LIBRARY_PATH
-$HOME/armnn-devenv/google/x86_64_pb_install/bin/protoc onnx/onnx.proto --proto_path=. --proto_path=../google/x86_64_pb_install/include --cpp_out $HOME/armnn-devenv/onnx
+LD_LIBRARY_PATH=$HOME/armnn-devenv/google/x86_64_pb_install/lib:$LD_LIBRARY_PATH \
+$HOME/armnn-devenv/google/x86_64_pb_install/bin/protoc \
+onnx/onnx.proto --proto_path=. --proto_path=../google/x86_64_pb_install/include --cpp_out $HOME/armnn-devenv/onnx
 ```
 
 ## Build TfLite
 * Building TfLite
 ```bash
+cd $HOME/armnn-devenv
 mkdir tflite
 cd tflite
 cp ../tensorflow/tensorflow/lite/schema/schema.fbs .
@@ -188,26 +217,15 @@ cp ../tensorflow/tensorflow/lite/schema/schema.fbs .
 ## Build Arm NN
 * Compile Arm NN for arm64:
 ```bash
-git clone https://github.com/ARM-software/armnn.git
-cd armnn
-git checkout <branch_name>
-git pull
+cd $HOME/armnn-devenv/armnn
 mkdir build
 cd build
-```
-
-For example, if you want to checkout release branch of 20.02:
-```bash
-git checkout branches/armnn_20_02
-git pull
 ```
 
 * Use CMake to configure your build environment, update the following script and run it from the armnn/build directory to set up the Arm NN build:
 ```bash
 #!/bin/bash
-export CXX=aarch64-linux-gnu-g++ \
-export CC=aarch64-linux-gnu-gcc \
-cmake .. \
+CXX=aarch64-linux-gnu-g++ CC=aarch64-linux-gnu-gcc cmake .. \
 -DARMCOMPUTE_ROOT=$HOME/armnn-devenv/ComputeLibrary \
 -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build/ \
 -DBOOST_ROOT=$HOME/armnn-devenv/boost_arm64_install/ \
@@ -224,8 +242,8 @@ cmake .. \
 -DFLATC_DIR=$HOME/armnn-devenv/flatbuffers-1.12.0/build \
 -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/x86_64_pb_install \
 -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/x86_64_pb_install/ \
--DPROTOBUF_LIBRARY_DEBUG=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.24.0.0 \
--DPROTOBUF_LIBRARY_RELEASE=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.24.0.0
+-DPROTOBUF_LIBRARY_DEBUG=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.23.0.0 \
+-DPROTOBUF_LIBRARY_RELEASE=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.23.0.0
 ```
 
 * If you want to include standalone sample dynamic backend tests, add the argument to enable the tests and the dynamic backend path to the CMake command:
@@ -241,6 +259,7 @@ make -j32
 ## Build Standalone Sample Dynamic Backend
 * The sample dynamic backend is located in armnn/src/dynamic/sample
 ```bash
+cd $HOME/armnn-devenv/armnn/src/dynamic/sample
 mkdir build
 cd build
 ```
@@ -248,12 +267,8 @@ cd build
 * Use CMake to configure your build environment, update the following script and run it from the armnn/src/dynamic/sample/build directory to set up the Arm NN build:
 ```bash
 #!/bin/bash
-export CXX=aarch64-linux-gnu-g++ \
-export CC=aarch64-linux-gnu-gcc \
-cmake .. \
+CXX=aarch64-linux-gnu-g++ CC=aarch64-linux-gnu-gcc cmake .. \
 -DCMAKE_CXX_FLAGS=--std=c++14 \
--DBOOST_ROOT=$HOME/armnn-devenv/boost_arm64_install/ \
--DBoost_SYSTEM_LIBRARY=$HOME/armnn-devenv/boost_arm64_install/lib/libboost_system.a \
 -DARMNN_PATH=$HOME/armnn-devenv/armnn/build/libarmnn.so
 ```
 
@@ -264,26 +279,25 @@ make
 
 ## Run Unit Tests
 * Copy the build folder to an arm64 linux machine
-* Copy the libprotobuf.so.15.0.1 library file to the build folder
+* Copy the libprotobuf.so.23.0.0 library file to the build folder
 * If you enable the standalone sample dynamic tests, also copy libArm_SampleDynamic_backend.so library file to the folder specified as $SAMPLE_DYNAMIC_BACKEND_PATH when you build Arm NN 
 * cd to the build folder on your arm64 machine and set your LD_LIBRARY_PATH to its current location:
 
 ```bash
 cd build/
-export LD_LIBRARY_PATH=<current_working_directory>
 ```
 
 * Create a symbolic link to libprotobuf.so.24.0.0:
 
 ```bash
-ln -s libprotobuf.so.24.0.0 ./libprotobuf.so.24
+ln -s libprotobuf.so.23.0.0 ./libprotobuf.so.23
 ```
 
 * Run the UnitTests:
 
 ```bash
-./UnitTests
-Running 567 test cases...
+LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH ./UnitTests
+Running 4493 test cases...
 
 *** No errors detected
 ```

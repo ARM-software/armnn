@@ -1956,6 +1956,11 @@ armnn::Pooling2dDescriptor IDeserializer::DeserializerImpl::GetPoolingDescriptor
             desc.m_PoolType = armnn::PoolingAlgorithm::Max;
             break;
         }
+        case PoolingAlgorithm_L2:
+        {
+            desc.m_PoolType = armnn::PoolingAlgorithm::L2;
+            break;
+        }
         default:
         {
             ARMNN_ASSERT_MSG(false, "Unsupported pooling algorithm");

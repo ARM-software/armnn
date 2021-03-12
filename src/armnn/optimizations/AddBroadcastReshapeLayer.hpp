@@ -8,6 +8,7 @@
 
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 
 namespace armnn
 {
@@ -65,6 +66,20 @@ public:
             std::copy_backward (reshapedDim.begin(), reshapedDim.end(), reshapedDimensions.end());
 
             reshapeInfo.SetShape(armnn::TensorShape{ numDimensions, reshapedDimensions.data() });
+
+            // If the parent layer is a Constant layer we just change the tensor info rather than adding a reshape layer
+            Layer& parentLayer = layer.GetInputSlot(reshapeSlot).GetConnectedOutputSlot()->GetOwningLayer();
+            if (parentLayer.GetType() == armnn::LayerType::Constant)
+            {
+                ConstantLayer& constantLayer = static_cast<ConstantLayer&>(parentLayer);
+
+                constantLayer.m_LayerOutput = std::make_unique<ScopedCpuTensorHandle>(
+                                ConstTensor(reshapeInfo,constantLayer.m_LayerOutput.get()->GetTensor<void>()));
+                constantLayer.GetOutputSlot().SetTensorInfo(reshapeInfo);
+
+                return;
+            }
+
             const std::string layerName = "Reshape_for:" + layer.GetNameStr() + "-" + std::to_string(reshapeSlot);
             const ReshapeDescriptor descriptor{reshapeInfo.GetShape()};
             ReshapeLayer *reshapeLayer = graph.InsertNewLayer<ReshapeLayer>(layer.GetInputSlot(reshapeSlot),

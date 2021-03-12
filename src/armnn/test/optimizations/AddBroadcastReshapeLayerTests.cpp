@@ -285,4 +285,53 @@ BOOST_AUTO_TEST_CASE(AddNoBroadcastReshapeLayerTest)
     BOOST_TEST(!reshapeLayer);
 }
 
+BOOST_AUTO_TEST_CASE(ReshapeParentConstLayerTest)
+{
+    Graph graph;
+    const TensorInfo info0({ 1, 2, 3, 5 }, DataType::QAsymmU8);
+    const TensorInfo info1({ 5 }, DataType::QAsymmU8);
+    const TensorInfo outputInfo({ 1, 2, 3, 5 }, DataType::QAsymmU8);
+
+    auto input = graph.AddLayer<InputLayer>(0, "input");
+    auto constant = graph.AddLayer<ConstantLayer>("constant");
+    auto mul = graph.AddLayer<MultiplicationLayer>("mul");
+    auto output = graph.AddLayer<OutputLayer>(0, "output");
+
+    uint8_t tensor[] = { 1, 1, 1, 1, 1 };
+
+    constant->m_LayerOutput = std::make_unique<ScopedCpuTensorHandle>(ConstTensor(info1, &tensor));
+
+    input->GetOutputSlot().SetTensorInfo(info0);
+    constant->GetOutputSlot().SetTensorInfo(info1);
+    mul->GetOutputSlot().SetTensorInfo(outputInfo);
+
+    input->GetOutputSlot().Connect(mul->GetInputSlot(0));
+    constant->GetOutputSlot().Connect(mul->GetInputSlot(1));
+    mul->GetOutputSlot().Connect(output->GetInputSlot(0));
+
+    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+                             &IsLayerOfType<InputLayer>,
+                             &IsLayerOfType<ConstantLayer>,
+                             &IsLayerOfType<MultiplicationLayer>,
+                             &IsLayerOfType<OutputLayer>));
+
+    // Run optimizer
+    armnn::Optimizer::Pass(graph, MakeOptimizations(AddBroadcastReshapeLayer()));
+
+    // Broadcast reshape layer has not been added to the graph
+    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+                             &IsLayerOfType<InputLayer>,
+                             &IsLayerOfType<ConstantLayer>,
+                             &IsLayerOfType<MultiplicationLayer>,
+                             &IsLayerOfType<OutputLayer>));
+
+    TensorShape expectedShape = TensorShape{ 1, 1, 1, 5 };
+    BOOST_TEST(constant->m_LayerOutput.get()->GetTensorInfo().GetShape() == expectedShape);
+
+    BOOST_TEST(constant->m_LayerOutput.get()->GetTensorInfo().GetNumDimensions() == info0.GetNumDimensions());
+
+    Layer* const reshapeLayer = GetFirstLayerWithName(graph, "Reshape_for:mul-0");
+    BOOST_TEST(!reshapeLayer);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2021 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -12,20 +12,28 @@
 namespace armnn
 {
 
-constexpr const char* ClTensorHandleFactoryId()
+constexpr const char* ClImportTensorHandleFactoryId()
 {
-    return "Arm/Cl/TensorHandleFactory";
+    return "Arm/Cl/ImportTensorHandleFactory";
 }
 
-class ClTensorHandleFactory : public ITensorHandleFactory
+/**
+ * This factory creates ClTensorHandles that refer to imported memory tensors.
+ */
+class ClImportTensorHandleFactory : public ITensorHandleFactory
 {
 public:
     static const FactoryId m_Id;
 
-    ClTensorHandleFactory(std::shared_ptr<ClMemoryManager> mgr)
-        : m_MemoryManager(mgr)
-        , m_ImportFlags(static_cast<MemorySourceFlags>(MemorySource::Undefined))
-        , m_ExportFlags(static_cast<MemorySourceFlags>(MemorySource::Undefined))
+    /**
+     * Create a tensor handle factory for tensors that will be imported or exported.
+     *
+     * @param importFlags
+     * @param exportFlags
+     */
+    ClImportTensorHandleFactory(MemorySourceFlags importFlags, MemorySourceFlags exportFlags)
+        : m_ImportFlags(importFlags)
+        , m_ExportFlags(exportFlags)
     {}
 
     std::unique_ptr<ITensorHandle> CreateSubTensorHandle(ITensorHandle& parent,
@@ -55,7 +63,6 @@ public:
     MemorySourceFlags GetImportFlags() const override;
 
 private:
-    mutable std::shared_ptr<ClMemoryManager> m_MemoryManager;
     MemorySourceFlags m_ImportFlags;
     MemorySourceFlags m_ExportFlags;
 };

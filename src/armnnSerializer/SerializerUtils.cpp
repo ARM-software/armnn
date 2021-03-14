@@ -52,6 +52,7 @@ armnnSerializer::ConstTensorData GetFlatBufferConstTensorData(armnn::DataType da
         case armnn::DataType::Float16:
         case armnn::DataType::QSymmS16:
             return armnnSerializer::ConstTensorData::ConstTensorData_ShortData;
+        case armnn::DataType::QAsymmS8:
         case armnn::DataType::QAsymmU8:
         case armnn::DataType::QSymmS8:
         case armnn::DataType::Boolean:

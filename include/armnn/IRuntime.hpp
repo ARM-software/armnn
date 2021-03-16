@@ -203,9 +203,9 @@ public:
 
     enum class TuningLevel
     {
-        Rapid = 0,
-        Normal = 1,
-        Exhaustive = 2
+        Rapid = 1,
+        Normal = 2,
+        Exhaustive = 3
     };
 
     /// Creates an IClTunedParameters with the given mode.

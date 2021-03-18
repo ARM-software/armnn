@@ -138,6 +138,7 @@ git checkout v21.02
 ```
 
 ## Download ArmNN
+
 ```bash
 cd $HOME/armnn-devenv
 git clone https://github.com/ARM-software/armnn.git

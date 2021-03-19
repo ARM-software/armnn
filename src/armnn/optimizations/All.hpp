@@ -9,7 +9,7 @@
 #include "ConvertConstants.hpp"
 #include "ConvertFp32NetworkToBf16.hpp"
 #include "ConvertFp32NetworkToFp16.hpp"
-#include "FoldPadIntoConvolution2d.hpp"
+#include "FoldPadIntoLayer2d.hpp"
 #include "FuseBatchNorm.hpp"
 #include "MovePermuteUp.hpp"
 #include "MoveTransposeUp.hpp"

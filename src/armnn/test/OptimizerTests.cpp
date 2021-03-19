@@ -624,6 +624,89 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConvolution2dLayer)
                              &IsLayerOfType<armnn::OutputLayer>));
 }
 
+BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer)
+{
+    Graph graph;
+    const unsigned int inputShape[] = { 1, 2, 2, 3 };
+    const unsigned int paddedShape[] = { 1, 3, 3, 3 };
+    const unsigned int outputShape[] = { 1, 2, 2, 3 };
+
+    armnn::TensorInfo inputInfo(4, inputShape, DataType::Float32);
+    armnn::TensorInfo paddedInfo(4, paddedShape, DataType::Float32);
+    armnn::TensorInfo outputInfo(4, outputShape, DataType::Float32);
+
+    Layer* input = graph.AddLayer<InputLayer>(0, "input");
+    input->GetOutputSlot().SetTensorInfo(inputInfo);
+
+    PadDescriptor padDescriptor({{ 0, 0 }, { 1, 1 }, { 1, 1 }, { 0, 0 }});
+
+    PadLayer* padLayer = graph.AddLayer<PadLayer>(padDescriptor, "pad");
+    padLayer->GetOutputSlot().SetTensorInfo(paddedInfo);
+
+    Pooling2dDescriptor pooling2dDescriptor;
+    pooling2dDescriptor.m_PoolWidth = 3;
+    pooling2dDescriptor.m_PoolHeight = 3;
+    pooling2dDescriptor.m_StrideX = 1;
+    pooling2dDescriptor.m_StrideY = 1;
+    pooling2dDescriptor.m_DataLayout = DataLayout::NHWC;
+
+    Pooling2dLayer* pool2dLayer = graph.AddLayer<Pooling2dLayer>(pooling2dDescriptor, "pool2d");
+    pool2dLayer->GetOutputSlot().SetTensorInfo(outputInfo);
+
+    Layer* output = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Connect up layers - input -> pad -> pool2d -> output
+    input->GetOutputSlot().Connect(padLayer->GetInputSlot(0));
+    padLayer->GetOutputSlot().Connect(pool2dLayer->GetInputSlot(0));
+    pool2dLayer->GetOutputSlot().Connect(output->GetInputSlot(0));
+
+    auto checkSimplePool2d = [&](const armnn::Layer* const layer)
+    {
+        const auto pool2dLayer = static_cast<const armnn::Pooling2dLayer*>(layer);
+        return IsLayerOfType<armnn::Pooling2dLayer>(layer) &&
+            (layer->GetNameStr() == "pool2d") &&
+            (pool2dLayer->GetParameters() == pooling2dDescriptor);
+    };
+
+    BOOST_TEST(CheckSequence(graph.cbegin(),
+                             graph.cend(),
+                             &IsLayerOfType<armnn::InputLayer>,
+                             &IsLayerOfType<armnn::PadLayer>,
+                             checkSimplePool2d,
+                             &IsLayerOfType<armnn::OutputLayer>));
+
+    armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(FoldPadIntoPooling2d()));
+
+    auto checkPadFoldedIntoPool2d = [&](const armnn::Layer* const layer)
+    {
+        if (!IsLayerOfType<armnn::Pooling2dLayer>(layer) || (layer->GetNameStr() != "folded-pad-into-pool2d"))
+        {
+            return false;
+        }
+
+        const auto pool2dLayer = static_cast<const armnn::Pooling2dLayer*>(layer);
+        const Pooling2dDescriptor pool2dLayerParams = pool2dLayer->GetParameters();
+
+        Pooling2dDescriptor pool2dLayerParamsNoPad = pool2dLayerParams;
+        pool2dLayerParamsNoPad.m_PadLeft = 0;
+        pool2dLayerParamsNoPad.m_PadRight = 0;
+        pool2dLayerParamsNoPad.m_PadTop = 0;
+        pool2dLayerParamsNoPad.m_PadBottom = 0;
+
+        return (pool2dLayerParamsNoPad == pooling2dDescriptor) &&
+               (pool2dLayerParams.m_PadLeft == 1) &&
+               (pool2dLayerParams.m_PadRight == 1) &&
+               (pool2dLayerParams.m_PadTop == 1) &&
+               (pool2dLayerParams.m_PadBottom == 1);
+    };
+
+    BOOST_TEST(CheckSequence(graph.cbegin(),
+                             graph.cend(),
+                             &IsLayerOfType<armnn::InputLayer>,
+                             checkPadFoldedIntoPool2d,
+                             &IsLayerOfType<armnn::OutputLayer>));
+}
+
 class MockLayerSupport : public LayerSupportBase {
 public:
     bool IsInputSupported(const TensorInfo& /*input*/,

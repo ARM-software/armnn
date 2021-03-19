@@ -20,7 +20,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
-#include <stdlib.h>
+#include <cmath>
 
 using namespace armnnTfLiteParser;
 using namespace armnn;
@@ -262,7 +262,7 @@ void CheckAccuracy(std::vector<float>* toDetector0, std::vector<float>* toDetect
             // Compare abs(difference) with tolerance to check for value by value equality
             for (unsigned int j = 0; j < outputs[i]->size(); ++j)
             {
-                compare = abs(expected[j] - outputs[i]->at(j));
+                compare = std::abs(expected[j] - outputs[i]->at(j));
                 if (compare > 0.001f)
                 {
                     count++;

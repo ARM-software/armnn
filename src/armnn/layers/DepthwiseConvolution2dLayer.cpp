@@ -71,11 +71,11 @@ std::unique_ptr<IWorkload> DepthwiseConvolution2dLayer::CreateWorkload(const IWo
 DepthwiseConvolution2dLayer* DepthwiseConvolution2dLayer::Clone(Graph& graph) const
 {
     auto layer      = CloneBase<DepthwiseConvolution2dLayer>(graph, m_Param, GetName());
-    layer->m_Weight = m_Weight ? std::make_unique<ScopedCpuTensorHandle>(*m_Weight) : nullptr;
+    layer->m_Weight = m_Weight ? m_Weight : nullptr;
 
     if (layer->m_Param.m_BiasEnabled)
     {
-        layer->m_Bias = m_Bias ? std::make_unique<ScopedCpuTensorHandle>(*m_Bias) : nullptr;
+        layer->m_Bias = m_Bias ? m_Bias : nullptr;
     }
 
     return std::move(layer);

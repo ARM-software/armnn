@@ -27,9 +27,10 @@ inline LayerT* ConvertWeight(Layer* l)
         {
             std::vector<BFloat16> newValues(info.GetNumElements());
 
-            armnnUtils::FloatingPointConverter::ConvertFloat32ToBFloat16(layer->m_Weight->template GetTensor<float>(),
-                                                                         info.GetNumElements(),
-                                                                         newValues.data());
+            armnnUtils::FloatingPointConverter::ConvertFloat32ToBFloat16(
+                    layer->m_Weight->template GetConstTensor<float>(),
+                    info.GetNumElements(),
+                    newValues.data());
 
             TensorInfo newInfo(info);
             newInfo.SetDataType(DataType::BFloat16);

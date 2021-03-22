@@ -110,27 +110,27 @@ void RefLstmWorkload::Execute() const
 
     std::unique_ptr<Decoder<float>> inputToInputWeightsTensor;
     std::unique_ptr<Decoder<float>> inputToForgetWeightsTensor = MakeDecoder<float>(
-        m_InputToForgetWeightsTensor->GetTensorInfo(), m_InputToForgetWeightsTensor->GetTensor<void>());
+        m_InputToForgetWeightsTensor->GetTensorInfo(), m_InputToForgetWeightsTensor->GetConstTensor<void>());
     std::unique_ptr<Decoder<float>> inputToCellWeightsTensor = MakeDecoder<float>(
-        m_InputToCellWeightsTensor->GetTensorInfo(), m_InputToCellWeightsTensor->GetTensor<void>());
+        m_InputToCellWeightsTensor->GetTensorInfo(), m_InputToCellWeightsTensor->GetConstTensor<void>());
     std::unique_ptr<Decoder<float>> inputToOutputWeightsTensor = MakeDecoder<float>(
-        m_InputToOutputWeightsTensor->GetTensorInfo(), m_InputToOutputWeightsTensor->GetTensor<void>());
+        m_InputToOutputWeightsTensor->GetTensorInfo(), m_InputToOutputWeightsTensor->GetConstTensor<void>());
 
     std::unique_ptr<Decoder<float>> recurrentToInputWeightsTensor;
     std::unique_ptr<Decoder<float>> recurrentToForgetWeightsTensor = MakeDecoder<float>(
-        m_RecurrentToForgetWeightsTensor->GetTensorInfo(), m_RecurrentToForgetWeightsTensor->GetTensor<void>());
+        m_RecurrentToForgetWeightsTensor->GetTensorInfo(), m_RecurrentToForgetWeightsTensor->GetConstTensor<void>());
     std::unique_ptr<Decoder<float>> recurrentToCellWeightsTensor = MakeDecoder<float>(
-        m_RecurrentToCellWeightsTensor->GetTensorInfo(), m_RecurrentToCellWeightsTensor->GetTensor<void>());
+        m_RecurrentToCellWeightsTensor->GetTensorInfo(), m_RecurrentToCellWeightsTensor->GetConstTensor<void>());
     std::unique_ptr<Decoder<float>> recurrentToOutputWeightsTensor = MakeDecoder<float>(
-        m_RecurrentToOutputWeightsTensor->GetTensorInfo(), m_RecurrentToOutputWeightsTensor->GetTensor<void>());
+        m_RecurrentToOutputWeightsTensor->GetTensorInfo(), m_RecurrentToOutputWeightsTensor->GetConstTensor<void>());
 
     std::unique_ptr<Decoder<float>> inputGateBiasTensor;
     std::unique_ptr<Decoder<float>> forgetGateBiasTensor = MakeDecoder<float>(
-        m_ForgetGateBiasTensor->GetTensorInfo(), m_ForgetGateBiasTensor->GetTensor<void>());
+        m_ForgetGateBiasTensor->GetTensorInfo(), m_ForgetGateBiasTensor->GetConstTensor<void>());
     std::unique_ptr<Decoder<float>> cellBiasTensor = MakeDecoder<float>(
-        m_CellBiasTensor->GetTensorInfo(), m_CellBiasTensor->GetTensor<void>());
+        m_CellBiasTensor->GetTensorInfo(), m_CellBiasTensor->GetConstTensor<void>());
     std::unique_ptr<Decoder<float>> outputGateBiasTensor = MakeDecoder<float>(
-        m_OutputGateBiasTensor->GetTensorInfo(), m_OutputGateBiasTensor->GetTensor<void>());
+        m_OutputGateBiasTensor->GetTensorInfo(), m_OutputGateBiasTensor->GetConstTensor<void>());
 
     std::unique_ptr<Decoder<float>> cellToInputWeightsTensor;
     std::unique_ptr<Decoder<float>> cellToForgetWeightsTensor;
@@ -149,48 +149,48 @@ void RefLstmWorkload::Execute() const
         if (!useCifg)
         {
             inputLayerNormWeights = MakeDecoder<float>(
-                    m_InputLayerNormWeights->GetTensorInfo(), m_InputLayerNormWeights->GetTensor<void>());
+                    m_InputLayerNormWeights->GetTensorInfo(), m_InputLayerNormWeights->GetConstTensor<void>());
         }
         forgetLayerNormWeights = MakeDecoder<float>(
-                m_ForgetLayerNormWeights->GetTensorInfo(), m_ForgetLayerNormWeights->GetTensor<void>());
+                m_ForgetLayerNormWeights->GetTensorInfo(), m_ForgetLayerNormWeights->GetConstTensor<void>());
         cellLayerNormWeights = MakeDecoder<float>(
-                m_CellLayerNormWeights->GetTensorInfo(), m_CellLayerNormWeights->GetTensor<void>());
+                m_CellLayerNormWeights->GetTensorInfo(), m_CellLayerNormWeights->GetConstTensor<void>());
         outputLayerNormWeights = MakeDecoder<float>(
-                m_OutputLayerNormWeights->GetTensorInfo(), m_OutputLayerNormWeights->GetTensor<void>());
+                m_OutputLayerNormWeights->GetTensorInfo(), m_OutputLayerNormWeights->GetConstTensor<void>());
     }
 
     if (!useCifg)
     {
         inputToInputWeightsTensor = MakeDecoder<float>(
-            m_InputToInputWeightsTensor->GetTensorInfo(), m_InputToInputWeightsTensor->GetTensor<void>());
+            m_InputToInputWeightsTensor->GetTensorInfo(), m_InputToInputWeightsTensor->GetConstTensor<void>());
         inputGateBiasTensor = MakeDecoder<float>(
-            m_InputGateBiasTensor->GetTensorInfo(), m_InputGateBiasTensor->GetTensor<void>());
+            m_InputGateBiasTensor->GetTensorInfo(), m_InputGateBiasTensor->GetConstTensor<void>());
         recurrentToInputWeightsTensor = MakeDecoder<float>(
-            m_RecurrentToInputWeightsTensor->GetTensorInfo(), m_RecurrentToInputWeightsTensor->GetTensor<void>());
+            m_RecurrentToInputWeightsTensor->GetTensorInfo(), m_RecurrentToInputWeightsTensor->GetConstTensor<void>());
     }
 
     if (usePeephole)
     {
         cellToForgetWeightsTensor = MakeDecoder<float>(
-            m_CellToForgetWeightsTensor->GetTensorInfo(), m_CellToForgetWeightsTensor->GetTensor<void>());
+            m_CellToForgetWeightsTensor->GetTensorInfo(), m_CellToForgetWeightsTensor->GetConstTensor<void>());
         cellToOutputWeightsTensor = MakeDecoder<float>(
-            m_CellToOutputWeightsTensor->GetTensorInfo(), m_CellToOutputWeightsTensor->GetTensor<void>());
+            m_CellToOutputWeightsTensor->GetTensorInfo(), m_CellToOutputWeightsTensor->GetConstTensor<void>());
     }
 
     if (!useCifg && usePeephole)
     {
         cellToInputWeightsTensor = MakeDecoder<float>(
-            m_CellToInputWeightsTensor->GetTensorInfo(), m_CellToInputWeightsTensor->GetTensor<void>());
+            m_CellToInputWeightsTensor->GetTensorInfo(), m_CellToInputWeightsTensor->GetConstTensor<void>());
     }
 
     if (m_Data.m_Parameters.m_ProjectionEnabled)
     {
         projectionWeightsTensor = MakeDecoder<float>(
-            m_ProjectionWeightsTensor->GetTensorInfo(), m_ProjectionWeightsTensor->GetTensor<void>());
+            m_ProjectionWeightsTensor->GetTensorInfo(), m_ProjectionWeightsTensor->GetConstTensor<void>());
         if (m_ProjectionBiasTensor)
         {
             projectionBiasTensor = MakeDecoder<float>(
-                m_ProjectionBiasTensor->GetTensorInfo(), m_ProjectionBiasTensor->GetTensor<void>());
+                m_ProjectionBiasTensor->GetTensorInfo(), m_ProjectionBiasTensor->GetConstTensor<void>());
         }
     }
 

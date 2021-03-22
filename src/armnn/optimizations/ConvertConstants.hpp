@@ -23,7 +23,7 @@ namespace optimizations
 
 struct BFloat16ToFloat32
 {
-    static void Func(std::unique_ptr<ScopedCpuTensorHandle>& handle)
+    static void Func(std::shared_ptr<ConstCpuTensorHandle>& handle)
     {
         const TensorInfo& info = handle->GetTensorInfo();
 
@@ -31,7 +31,7 @@ struct BFloat16ToFloat32
         {
             std::vector<float> newValues(info.GetNumElements());
 
-            armnnUtils::FloatingPointConverter::ConvertBFloat16ToFloat32(handle->GetTensor<BFloat16>(),
+            armnnUtils::FloatingPointConverter::ConvertBFloat16ToFloat32(handle->GetConstTensor<BFloat16>(),
                                                                          info.GetNumElements(),
                                                                          newValues.data());
 
@@ -44,7 +44,7 @@ struct BFloat16ToFloat32
 
 struct Float16ToFloat32
 {
-    static void Func(std::unique_ptr<ScopedCpuTensorHandle>& handle)
+    static void Func(std::shared_ptr<ConstCpuTensorHandle>& handle)
     {
         const TensorInfo& info = handle->GetTensorInfo();
 
@@ -52,7 +52,7 @@ struct Float16ToFloat32
         {
             std::vector<float> newValues(info.GetNumElements());
 
-            armnnUtils::FloatingPointConverter::ConvertFloat16To32(handle->GetTensor<Half>(),
+            armnnUtils::FloatingPointConverter::ConvertFloat16To32(handle->GetConstTensor<Half>(),
                                                                    info.GetNumElements(),
                                                                    newValues.data());
 
@@ -65,7 +65,7 @@ struct Float16ToFloat32
 
 struct Float32ToBFloat16
 {
-    static void Func(std::unique_ptr<ScopedCpuTensorHandle>& handle)
+    static void Func(std::shared_ptr<ConstCpuTensorHandle>& handle)
     {
         const TensorInfo& info = handle->GetTensorInfo();
 
@@ -73,7 +73,7 @@ struct Float32ToBFloat16
         {
             std::vector<BFloat16> newValues(info.GetNumElements());
 
-            armnnUtils::FloatingPointConverter::ConvertFloat32ToBFloat16(handle->GetTensor<float>(),
+            armnnUtils::FloatingPointConverter::ConvertFloat32ToBFloat16(handle->GetConstTensor<float>(),
                                                                          info.GetNumElements(),
                                                                          newValues.data());
 
@@ -86,7 +86,7 @@ struct Float32ToBFloat16
 
 struct Float32ToFloat16
 {
-    static void Func(std::unique_ptr<ScopedCpuTensorHandle>& handle)
+    static void Func(std::shared_ptr<ConstCpuTensorHandle>& handle)
     {
         const TensorInfo& info = handle->GetTensorInfo();
 
@@ -94,7 +94,7 @@ struct Float32ToFloat16
         {
             std::vector<Half> newValues(info.GetNumElements());
 
-            armnnUtils::FloatingPointConverter::ConvertFloat32To16(handle->GetTensor<float>(),
+            armnnUtils::FloatingPointConverter::ConvertFloat32To16(handle->GetConstTensor<float>(),
                                                                    info.GetNumElements(),
                                                                    newValues.data());
 

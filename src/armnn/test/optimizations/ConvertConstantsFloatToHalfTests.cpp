@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(ConvertConstantsFloatToHalfTest)
     BOOST_CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::Float16);
 
     // Check whether data matches expected fp16 data
-    Half* data = fc->m_Weight->GetTensor<Half>();
+    const Half* data = fc->m_Weight->GetConstTensor<Half>();
     BOOST_CHECK(data[0] == Half(1.0f));
     BOOST_CHECK(data[1] == Half(2.0f));
     BOOST_CHECK(data[2] == Half(3.0f));

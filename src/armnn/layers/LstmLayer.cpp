@@ -82,41 +82,41 @@ LstmLayer* LstmLayer::Clone(Graph& graph) const
     auto layer = CloneBase<LstmLayer>(graph, m_Param, GetName());
 
     layer->m_BasicParameters.m_InputToForgetWeights = m_BasicParameters.m_InputToForgetWeights ?
-            std::make_unique<ScopedCpuTensorHandle>(*m_BasicParameters.m_InputToForgetWeights)
+            m_BasicParameters.m_InputToForgetWeights
                 : nullptr;
     layer->m_BasicParameters.m_InputToCellWeights = m_BasicParameters.m_InputToCellWeights ?
-            std::make_unique<ScopedCpuTensorHandle>(*m_BasicParameters.m_InputToCellWeights) : nullptr;
+            m_BasicParameters.m_InputToCellWeights : nullptr;
     layer->m_BasicParameters.m_InputToOutputWeights = m_BasicParameters.m_InputToOutputWeights ?
-            std::make_unique<ScopedCpuTensorHandle>(*m_BasicParameters.m_InputToOutputWeights) : nullptr;
+            m_BasicParameters.m_InputToOutputWeights : nullptr;
     layer->m_BasicParameters.m_RecurrentToForgetWeights = m_BasicParameters.m_RecurrentToForgetWeights ?
-            std::make_unique<ScopedCpuTensorHandle>(*m_BasicParameters.m_RecurrentToForgetWeights) : nullptr;
+            m_BasicParameters.m_RecurrentToForgetWeights : nullptr;
     layer->m_BasicParameters.m_RecurrentToCellWeights = m_BasicParameters.m_RecurrentToCellWeights ?
-            std::make_unique<ScopedCpuTensorHandle>(*m_BasicParameters.m_RecurrentToCellWeights) : nullptr;
+            m_BasicParameters.m_RecurrentToCellWeights : nullptr;
     layer->m_BasicParameters.m_RecurrentToOutputWeights = m_BasicParameters.m_RecurrentToOutputWeights ?
-            std::make_unique<ScopedCpuTensorHandle>(*m_BasicParameters.m_RecurrentToOutputWeights) : nullptr;
+            m_BasicParameters.m_RecurrentToOutputWeights : nullptr;
     layer->m_BasicParameters.m_ForgetGateBias = m_BasicParameters.m_ForgetGateBias ?
-            std::make_unique<ScopedCpuTensorHandle>(*m_BasicParameters.m_ForgetGateBias) : nullptr;
+            m_BasicParameters.m_ForgetGateBias : nullptr;
     layer->m_BasicParameters.m_CellBias = m_BasicParameters.m_CellBias ?
-            std::make_unique<ScopedCpuTensorHandle>(*m_BasicParameters.m_CellBias) : nullptr;
+            m_BasicParameters.m_CellBias : nullptr;
     layer->m_BasicParameters.m_OutputGateBias = m_BasicParameters.m_OutputGateBias ?
-            std::make_unique<ScopedCpuTensorHandle>(*m_BasicParameters.m_OutputGateBias) : nullptr;
+            m_BasicParameters.m_OutputGateBias : nullptr;
 
     if (!m_Param.m_CifgEnabled)
     {
         layer->m_CifgParameters.m_InputToInputWeights = m_CifgParameters.m_InputToInputWeights ?
-                std::make_unique<ScopedCpuTensorHandle>(*m_CifgParameters.m_InputToInputWeights) : nullptr;
+                m_CifgParameters.m_InputToInputWeights : nullptr;
         layer->m_CifgParameters.m_RecurrentToInputWeights = m_CifgParameters.m_RecurrentToInputWeights ?
-                std::make_unique<ScopedCpuTensorHandle>(*m_CifgParameters.m_RecurrentToInputWeights) : nullptr;
+                m_CifgParameters.m_RecurrentToInputWeights : nullptr;
         layer->m_CifgParameters.m_InputGateBias = m_CifgParameters.m_InputGateBias ?
-                std::make_unique<ScopedCpuTensorHandle>(*m_CifgParameters.m_InputGateBias) : nullptr;
+                m_CifgParameters.m_InputGateBias : nullptr;
     }
 
     if (m_Param.m_ProjectionEnabled)
     {
         layer->m_ProjectionParameters.m_ProjectionWeights = m_ProjectionParameters.m_ProjectionWeights ?
-               std::make_unique<ScopedCpuTensorHandle>(*m_ProjectionParameters.m_ProjectionWeights) : nullptr;
+               m_ProjectionParameters.m_ProjectionWeights : nullptr;
         layer->m_ProjectionParameters.m_ProjectionBias = m_ProjectionParameters.m_ProjectionBias ?
-               std::make_unique<ScopedCpuTensorHandle>(*m_ProjectionParameters.m_ProjectionBias) : nullptr;
+               m_ProjectionParameters.m_ProjectionBias : nullptr;
     }
 
     if (m_Param.m_PeepholeEnabled)
@@ -124,24 +124,24 @@ LstmLayer* LstmLayer::Clone(Graph& graph) const
         if (!m_Param.m_CifgEnabled)
         {
             layer->m_PeepholeParameters.m_CellToInputWeights = m_PeepholeParameters.m_CellToInputWeights ?
-                std::make_unique<ScopedCpuTensorHandle>(*m_PeepholeParameters.m_CellToInputWeights) : nullptr;
+                m_PeepholeParameters.m_CellToInputWeights : nullptr;
         }
         layer->m_PeepholeParameters.m_CellToForgetWeights = m_PeepholeParameters.m_CellToForgetWeights ?
-               std::make_unique<ScopedCpuTensorHandle>(*m_PeepholeParameters.m_CellToForgetWeights) : nullptr;
+               m_PeepholeParameters.m_CellToForgetWeights : nullptr;
         layer->m_PeepholeParameters.m_CellToOutputWeights = m_PeepholeParameters.m_CellToOutputWeights ?
-               std::make_unique<ScopedCpuTensorHandle>(*m_PeepholeParameters.m_CellToOutputWeights) : nullptr;
+               m_PeepholeParameters.m_CellToOutputWeights : nullptr;
     }
 
     if (m_Param.m_LayerNormEnabled)
     {
         layer->m_LayerNormParameters.m_InputLayerNormWeights = m_LayerNormParameters.m_InputLayerNormWeights ?
-               std::make_unique<ScopedCpuTensorHandle>(*m_LayerNormParameters.m_InputLayerNormWeights) : nullptr;
+               m_LayerNormParameters.m_InputLayerNormWeights : nullptr;
         layer->m_LayerNormParameters.m_ForgetLayerNormWeights = m_LayerNormParameters.m_ForgetLayerNormWeights ?
-               std::make_unique<ScopedCpuTensorHandle>(*m_LayerNormParameters.m_ForgetLayerNormWeights) : nullptr;
+               m_LayerNormParameters.m_ForgetLayerNormWeights : nullptr;
         layer->m_LayerNormParameters.m_CellLayerNormWeights = m_LayerNormParameters.m_CellLayerNormWeights ?
-               std::make_unique<ScopedCpuTensorHandle>(*m_LayerNormParameters.m_CellLayerNormWeights) : nullptr;
+               m_LayerNormParameters.m_CellLayerNormWeights : nullptr;
         layer->m_LayerNormParameters.m_OutputLayerNormWeights = m_LayerNormParameters.m_OutputLayerNormWeights ?
-               std::make_unique<ScopedCpuTensorHandle>(*m_LayerNormParameters.m_OutputLayerNormWeights) : nullptr;
+               m_LayerNormParameters.m_OutputLayerNormWeights : nullptr;
     }
 
     return std::move(layer);

@@ -74,7 +74,7 @@ public:
                 ConstantLayer& constantLayer = static_cast<ConstantLayer&>(parentLayer);
 
                 constantLayer.m_LayerOutput = std::make_unique<ScopedCpuTensorHandle>(
-                                ConstTensor(reshapeInfo,constantLayer.m_LayerOutput.get()->GetTensor<void>()));
+                                ConstTensor(reshapeInfo,constantLayer.m_LayerOutput.get()->GetConstTensor<void>()));
                 constantLayer.GetOutputSlot().SetTensorInfo(reshapeInfo);
 
                 return;

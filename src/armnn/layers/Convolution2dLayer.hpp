@@ -17,9 +17,9 @@ class Convolution2dLayer : public LayerWithParameters<Convolution2dDescriptor>
 public:
 
     /// A unique pointer to store Weight values.
-    std::unique_ptr<ScopedCpuTensorHandle> m_Weight;
+    std::shared_ptr<ConstCpuTensorHandle> m_Weight;
     /// A unique pointer to store Bias values.
-    std::unique_ptr<ScopedCpuTensorHandle> m_Bias;
+    std::shared_ptr<ConstCpuTensorHandle> m_Bias;
 
     /// Makes a workload for the Convolution2d type.
     /// @param [in] graph The graph where this layer can be found.

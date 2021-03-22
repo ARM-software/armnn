@@ -14,31 +14,31 @@ class ScopedCpuTensorHandle;
 struct QuantizedLstmParameters
 {
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, inputSize] (QAsymm8).
-    std::unique_ptr<ScopedCpuTensorHandle> m_InputToInputWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_InputToInputWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, inputSize] (QAsymm8).
-    std::unique_ptr<ScopedCpuTensorHandle> m_InputToForgetWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_InputToForgetWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, inputSize] (QAsymm8).
-    std::unique_ptr<ScopedCpuTensorHandle> m_InputToCellWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_InputToCellWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, inputSize] (QAsymm8).
-    std::unique_ptr<ScopedCpuTensorHandle> m_InputToOutputWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_InputToOutputWeights;
 
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, outputSize] (QAsymm8).
-    std::unique_ptr<ScopedCpuTensorHandle> m_RecurrentToInputWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToInputWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, outputSize] (QAsymm8).
-    std::unique_ptr<ScopedCpuTensorHandle> m_RecurrentToForgetWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToForgetWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, outputSize] (QAsymm8).
-    std::unique_ptr<ScopedCpuTensorHandle> m_RecurrentToCellWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToCellWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, outputSize] (QAsymm8).
-    std::unique_ptr<ScopedCpuTensorHandle> m_RecurrentToOutputWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToOutputWeights;
 
     /// A unique pointer to represent 1D bias tensor with dimensions [outputSize] (int32).
-    std::unique_ptr<ScopedCpuTensorHandle> m_InputGateBias;
+    std::shared_ptr<ConstCpuTensorHandle> m_InputGateBias;
     /// A unique pointer to represent 1D bias tensor with dimensions [outputSize] (int32).
-    std::unique_ptr<ScopedCpuTensorHandle> m_ForgetGateBias;
+    std::shared_ptr<ConstCpuTensorHandle> m_ForgetGateBias;
     /// A unique pointer to represent 1D bias tensor with dimensions [outputSize] (int32).
-    std::unique_ptr<ScopedCpuTensorHandle> m_CellBias;
+    std::shared_ptr<ConstCpuTensorHandle> m_CellBias;
     /// A unique pointer to represent 1D bias tensor with dimensions [outputSize] (int32).
-    std::unique_ptr<ScopedCpuTensorHandle> m_OutputGateBias;
+    std::shared_ptr<ConstCpuTensorHandle> m_OutputGateBias;
 };
 
 /// This layer represents a QuantizedLstm operation.

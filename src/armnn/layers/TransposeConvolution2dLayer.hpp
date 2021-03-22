@@ -16,9 +16,9 @@ class TransposeConvolution2dLayer : public LayerWithParameters<TransposeConvolut
 {
 public:
     /// A unique pointer to store weight values.
-    std::unique_ptr<ScopedCpuTensorHandle> m_Weight;
+    std::shared_ptr<ConstCpuTensorHandle> m_Weight;
     /// A unique pointer to store bias values.
-    std::unique_ptr<ScopedCpuTensorHandle> m_Bias;
+    std::shared_ptr<ConstCpuTensorHandle> m_Bias;
 
     /// Makes a workload for the TransposeConvolution2d type.
     /// @param [in] graph The graph where this layer can be found.

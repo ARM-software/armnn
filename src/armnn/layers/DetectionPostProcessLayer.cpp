@@ -32,7 +32,7 @@ std::unique_ptr<IWorkload> DetectionPostProcessLayer::CreateWorkload(const armnn
 DetectionPostProcessLayer* DetectionPostProcessLayer::Clone(Graph& graph) const
 {
     auto layer = CloneBase<DetectionPostProcessLayer>(graph, m_Param, GetName());
-    layer->m_Anchors = m_Anchors ? std::make_unique<ScopedCpuTensorHandle>(*m_Anchors) : nullptr;
+    layer->m_Anchors = m_Anchors ? m_Anchors : nullptr;
     return std::move(layer);
 }
 

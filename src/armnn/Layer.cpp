@@ -274,9 +274,9 @@ void Layer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
 void Layer::ReleaseConstantData()
 {
     // Now free up the static data.
-    OperateOnConstantTensors([](std::unique_ptr<ScopedCpuTensorHandle>& handle)
+    OperateOnConstantTensors([](std::shared_ptr<ConstCpuTensorHandle>& handle)
                                  {
-                                     handle.reset(nullptr);
+                                     handle.reset();
                                  });
 }
 

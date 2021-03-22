@@ -419,14 +419,14 @@ public:
             throw armnn::Exception("Some backend IDs are invalid: " + invalidBackends);
         }
 
-        const auto parsing_start_time = armnn::GetTimeNow();
-        armnn::INetworkPtr network = CreateNetworkImpl<IParser>::Create(params, m_InputBindings, m_OutputBindings);
-
-        ARMNN_LOG(info) << "Network parsing time: " << std::setprecision(2)
-                        << std::fixed << armnn::GetTimeDuration(parsing_start_time).count() << " ms\n";
-
         armnn::IOptimizedNetworkPtr optNet{nullptr, [](armnn::IOptimizedNetwork*){}};
         {
+            const auto parsing_start_time = armnn::GetTimeNow();
+            armnn::INetworkPtr network = CreateNetworkImpl<IParser>::Create(params, m_InputBindings, m_OutputBindings);
+
+            ARMNN_LOG(info) << "Network parsing time: " << std::setprecision(2)
+                            << std::fixed << armnn::GetTimeDuration(parsing_start_time).count() << " ms\n";
+
             ARMNN_SCOPED_HEAP_PROFILING("Optimizing");
 
             armnn::OptimizerOptions options;
@@ -460,6 +460,8 @@ public:
             {
                 throw armnn::Exception("Optimize returned nullptr");
             }
+
+
         }
 
         if (params.m_VisualizePostOptimizationModel)
@@ -469,6 +471,8 @@ public:
             std::fstream file(filename.c_str(), std::ios_base::out);
             optNet->SerializeToDot(file);
         }
+
+
 
         armnn::Status ret;
         {

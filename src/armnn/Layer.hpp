@@ -390,7 +390,7 @@ protected:
     LayerType* CloneBase(Graph& graph, Params&& ... params) const;
 
     // Retrieve the Handles to the constants
-    using ConstantTensors = std::vector<std::reference_wrapper<std::unique_ptr<ScopedCpuTensorHandle>>>;
+    using ConstantTensors = std::vector<std::reference_wrapper<std::shared_ptr<ConstCpuTensorHandle>>>;
     virtual ConstantTensors GetConstantTensorsByRef() {return ConstantTensors(); };
 
     // "Blob"

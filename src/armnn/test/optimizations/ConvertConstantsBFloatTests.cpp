@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(ConvertConstantsFloatToBFloatTest)
     BOOST_CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::BFloat16);
 
     // Check whether data matches expected Bf16 data
-    BFloat16* data = fc->m_Weight->GetTensor<BFloat16>();
+    const BFloat16* data = fc->m_Weight->GetConstTensor<BFloat16>();
     BOOST_CHECK(data[0] == BFloat16(0.0f));
     BOOST_CHECK(data[1] == BFloat16(-1.0f));
     BOOST_CHECK(data[2] == BFloat16(3.796875f)); // 0x4073
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(ConvertConstantsBFloatToFloatTest)
     BOOST_CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::Float32);
 
     // Now test the data matches float32 data
-    float* data = fc->m_Weight->GetTensor<float>();
+    const float* data = fc->m_Weight->GetConstTensor<float>();
     BOOST_CHECK(data[0] == 0.0f);
     BOOST_CHECK(data[1] == -1.0f);
     BOOST_CHECK(data[2] == 3.796875f);

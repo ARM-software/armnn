@@ -16,13 +16,13 @@ class BatchNormalizationLayer : public LayerWithParameters<BatchNormalizationDes
 {
 public:
     /// A unique pointer to store Mean values
-    std::unique_ptr<ScopedCpuTensorHandle> m_Mean;
+    std::shared_ptr<ConstCpuTensorHandle> m_Mean;
     /// A unique pointer to store Variance values
-    std::unique_ptr<ScopedCpuTensorHandle> m_Variance;
+    std::shared_ptr<ConstCpuTensorHandle> m_Variance;
     /// A unique pointer to store Beta values
-    std::unique_ptr<ScopedCpuTensorHandle> m_Beta;
+    std::shared_ptr<ConstCpuTensorHandle> m_Beta;
     /// A unique pointer to store Gamma values
-    std::unique_ptr<ScopedCpuTensorHandle> m_Gamma;
+    std::shared_ptr<ConstCpuTensorHandle> m_Gamma;
 
     /// Makes a workload for the BatchNormalization type.
     /// @param [in] graph The graph where this layer can be found.

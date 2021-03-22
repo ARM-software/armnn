@@ -14,63 +14,63 @@ class ScopedCpuTensorHandle;
 struct LstmOptLayerNormParameters
 {
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_InputLayerNormWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_InputLayerNormWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_ForgetLayerNormWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_ForgetLayerNormWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_CellLayerNormWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_CellLayerNormWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_OutputLayerNormWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_OutputLayerNormWeights;
 };
 
 struct LstmOptCifgParameters
 {
     /// A unique pointer to represent 2D weights tensor with dimensions [input_size, num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_InputToInputWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_InputToInputWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [input_size, num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_RecurrentToInputWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToInputWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_InputGateBias;
+    std::shared_ptr<ConstCpuTensorHandle> m_InputGateBias;
 };
 
 struct LstmOptProjectionParameters
 {
     /// A unique pointer to represent 2D weights tensor with dimensions [output_size, num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_ProjectionWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_ProjectionWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [output_size].
-    std::unique_ptr<ScopedCpuTensorHandle> m_ProjectionBias;
+    std::shared_ptr<ConstCpuTensorHandle> m_ProjectionBias;
 };
 
 struct LstmOptPeepholeParameters
 {
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_CellToInputWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_CellToInputWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_CellToForgetWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_CellToForgetWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_CellToOutputWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_CellToOutputWeights;
 };
 
 struct LstmBasicParameters
 {
     /// A unique pointer to represent 2D weights tensor with dimensions [input_size, num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_InputToForgetWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_InputToForgetWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [input_size, num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_InputToCellWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_InputToCellWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [input_size, num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_InputToOutputWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_InputToOutputWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [output_size, num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_RecurrentToForgetWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToForgetWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [output_size, num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_RecurrentToCellWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToCellWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [output_size, num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_RecurrentToOutputWeights;
+    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToOutputWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_ForgetGateBias;
+    std::shared_ptr<ConstCpuTensorHandle> m_ForgetGateBias;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_CellBias;
+    std::shared_ptr<ConstCpuTensorHandle> m_CellBias;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units].
-    std::unique_ptr<ScopedCpuTensorHandle> m_OutputGateBias;
+    std::shared_ptr<ConstCpuTensorHandle> m_OutputGateBias;
 };
 
 /// This layer represents a LSTM operation.

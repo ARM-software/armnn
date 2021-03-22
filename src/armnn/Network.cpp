@@ -663,7 +663,7 @@ LayerT* ConvertBf16ToFp32Weight(Layer* l)
             std::vector<float> newValues(info.GetNumElements());
 
             armnnUtils::FloatingPointConverter::ConvertBFloat16ToFloat32(
-                layer->m_Weight->template GetTensor<armnn::BFloat16>(), info.GetNumElements(), newValues.data());
+                layer->m_Weight->template GetConstTensor<armnn::BFloat16>(), info.GetNumElements(), newValues.data());
 
             TensorInfo newInfo(info.GetShape(), DataType::Float32);
             ConstTensor newInput(newInfo, newValues);
@@ -1742,10 +1742,10 @@ IConnectableLayer* NetworkImpl::AddFullyConnectedLayerImpl(const FullyConnectedD
 
     if (fullyConnectedDescriptor.m_ConstantWeights)
     {
-        layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(weights.value());
+        layer->m_Weight = std::make_shared<ScopedCpuTensorHandle>(weights.value());
         if (fullyConnectedDescriptor.m_BiasEnabled)
         {
-            layer->m_Bias = std::make_unique<ScopedCpuTensorHandle>(biases.value());
+            layer->m_Bias = std::make_shared<ScopedCpuTensorHandle>(biases.value());
         }
     }
 
@@ -1806,11 +1806,11 @@ IConnectableLayer* NetworkImpl::AddConvolution2dLayerImpl(const Convolution2dDes
 
     const auto layer = m_Graph->AddLayer<Convolution2dLayer>(convolution2dDescriptor, name);
 
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(weights);
+    layer->m_Weight = std::make_shared<ScopedCpuTensorHandle>(weights);
 
     if (convolution2dDescriptor.m_BiasEnabled)
     {
-        layer->m_Bias = std::make_unique<ScopedCpuTensorHandle>(biases.value());
+        layer->m_Bias = std::make_shared<ScopedCpuTensorHandle>(biases.value());
     }
 
     return layer;
@@ -1854,11 +1854,11 @@ IConnectableLayer* NetworkImpl::AddDepthwiseConvolution2dLayerImpl(
 
     const auto layer = m_Graph->AddLayer<DepthwiseConvolution2dLayer>(convolution2dDescriptor, name);
 
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(weights);
+    layer->m_Weight = std::make_shared<ScopedCpuTensorHandle>(weights);
 
     if (convolution2dDescriptor.m_BiasEnabled)
     {
-        layer->m_Bias = std::make_unique<ScopedCpuTensorHandle>(biases.value());
+        layer->m_Bias = std::make_shared<ScopedCpuTensorHandle>(biases.value());
     }
 
     return layer;
@@ -1903,7 +1903,7 @@ IConnectableLayer* NetworkImpl::AddDetectionPostProcessLayer(const armnn::Detect
 {
     const auto layer = m_Graph->AddLayer<DetectionPostProcessLayer>(descriptor, name);
 
-    layer->m_Anchors = std::make_unique<ScopedCpuTensorHandle>(anchors);
+    layer->m_Anchors = std::make_shared<ScopedCpuTensorHandle>(anchors);
 
     return layer;
 }
@@ -2001,10 +2001,10 @@ IConnectableLayer* NetworkImpl::AddBatchNormalizationLayer(const BatchNormalizat
 {
     const auto layer = m_Graph->AddLayer<BatchNormalizationLayer>(desc, name);
 
-    layer->m_Mean = std::make_unique<ScopedCpuTensorHandle>(mean);
-    layer->m_Variance = std::make_unique<ScopedCpuTensorHandle>(variance);
-    layer->m_Beta = std::make_unique<ScopedCpuTensorHandle>(beta);
-    layer->m_Gamma = std::make_unique<ScopedCpuTensorHandle>(gamma);
+    layer->m_Mean = std::make_shared<ScopedCpuTensorHandle>(mean);
+    layer->m_Variance = std::make_shared<ScopedCpuTensorHandle>(variance);
+    layer->m_Beta = std::make_shared<ScopedCpuTensorHandle>(beta);
+    layer->m_Gamma = std::make_shared<ScopedCpuTensorHandle>(gamma);
 
     return layer;
 }
@@ -2061,7 +2061,7 @@ IConnectableLayer* NetworkImpl::AddConstantLayer(const ConstTensor& input, const
 {
     auto layer = m_Graph->AddLayer<ConstantLayer>(name);
 
-    layer->m_LayerOutput = std::make_unique<ScopedCpuTensorHandle>(input);
+    layer->m_LayerOutput = std::make_shared<ScopedCpuTensorHandle>(input);
 
     return layer;
 }
@@ -2097,23 +2097,23 @@ IConnectableLayer* NetworkImpl::AddLstmLayer(const LstmDescriptor&  descriptor,
 
     //Lstm Basic Parameters
     layer->m_BasicParameters.m_InputToForgetWeights =
-        std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputToForgetWeights));
+        std::make_shared<ScopedCpuTensorHandle>(*(params.m_InputToForgetWeights));
     layer->m_BasicParameters.m_InputToCellWeights =
-        std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputToCellWeights));
+        std::make_shared<ScopedCpuTensorHandle>(*(params.m_InputToCellWeights));
     layer->m_BasicParameters.m_InputToOutputWeights =
-        std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputToOutputWeights));
+        std::make_shared<ScopedCpuTensorHandle>(*(params.m_InputToOutputWeights));
     layer->m_BasicParameters.m_RecurrentToForgetWeights =
-        std::make_unique<ScopedCpuTensorHandle>(*(params.m_RecurrentToForgetWeights));
+        std::make_shared<ScopedCpuTensorHandle>(*(params.m_RecurrentToForgetWeights));
     layer->m_BasicParameters.m_RecurrentToCellWeights =
-        std::make_unique<ScopedCpuTensorHandle>(*(params.m_RecurrentToCellWeights));
+        std::make_shared<ScopedCpuTensorHandle>(*(params.m_RecurrentToCellWeights));
     layer->m_BasicParameters.m_RecurrentToOutputWeights =
-        std::make_unique<ScopedCpuTensorHandle>(*(params.m_RecurrentToOutputWeights));
+        std::make_shared<ScopedCpuTensorHandle>(*(params.m_RecurrentToOutputWeights));
     layer->m_BasicParameters.m_ForgetGateBias =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_ForgetGateBias));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_ForgetGateBias));
     layer->m_BasicParameters.m_CellBias =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellBias));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_CellBias));
     layer->m_BasicParameters.m_OutputGateBias =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_OutputGateBias));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_OutputGateBias));
 
     //Lstm Cifg parameters
     if(!descriptor.m_CifgEnabled)
@@ -2135,11 +2135,11 @@ IConnectableLayer* NetworkImpl::AddLstmLayer(const LstmDescriptor&  descriptor,
                                            "when CIFG is disabled.");
         }
         layer->m_CifgParameters.m_InputToInputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputToInputWeights));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_InputToInputWeights));
         layer->m_CifgParameters.m_RecurrentToInputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_RecurrentToInputWeights));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_RecurrentToInputWeights));
         layer->m_CifgParameters.m_InputGateBias =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputGateBias));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_InputGateBias));
     }
 
     //Lstm projection parameters
@@ -2151,11 +2151,11 @@ IConnectableLayer* NetworkImpl::AddLstmLayer(const LstmDescriptor&  descriptor,
                                            "when projection is enabled.");
         }
         layer->m_ProjectionParameters.m_ProjectionWeights =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_ProjectionWeights));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_ProjectionWeights));
         if(params.m_ProjectionBias != nullptr)
         {
             layer->m_ProjectionParameters.m_ProjectionBias =
-                std::make_unique<ScopedCpuTensorHandle>(*(params.m_ProjectionBias));
+                std::make_shared<ScopedCpuTensorHandle>(*(params.m_ProjectionBias));
         }
     }
 
@@ -2171,7 +2171,7 @@ IConnectableLayer* NetworkImpl::AddLstmLayer(const LstmDescriptor&  descriptor,
             }
 
             layer->m_PeepholeParameters.m_CellToInputWeights =
-                std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellToInputWeights));
+                std::make_shared<ScopedCpuTensorHandle>(*(params.m_CellToInputWeights));
         }
 
         if(params.m_CellToForgetWeights == nullptr)
@@ -2186,9 +2186,9 @@ IConnectableLayer* NetworkImpl::AddLstmLayer(const LstmDescriptor&  descriptor,
         }
 
         layer->m_PeepholeParameters.m_CellToForgetWeights =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellToForgetWeights));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_CellToForgetWeights));
         layer->m_PeepholeParameters.m_CellToOutputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellToOutputWeights));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_CellToOutputWeights));
     }
 
     //Lstm Layer Normalization params
@@ -2202,7 +2202,7 @@ IConnectableLayer* NetworkImpl::AddLstmLayer(const LstmDescriptor&  descriptor,
                                                "when layer normalization is enabled and CIFG disabled.");
             }
             layer->m_LayerNormParameters.m_InputLayerNormWeights =
-                    std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputLayerNormWeights));
+                    std::make_shared<ScopedCpuTensorHandle>(*(params.m_InputLayerNormWeights));
         }
 
         if(params.m_ForgetLayerNormWeights == nullptr)
@@ -2221,11 +2221,11 @@ IConnectableLayer* NetworkImpl::AddLstmLayer(const LstmDescriptor&  descriptor,
                                            "when layer normalization is enabled.");
         }
         layer->m_LayerNormParameters.m_ForgetLayerNormWeights =
-                std::make_unique<ScopedCpuTensorHandle>(*(params.m_ForgetLayerNormWeights));
+                std::make_shared<ScopedCpuTensorHandle>(*(params.m_ForgetLayerNormWeights));
         layer->m_LayerNormParameters.m_CellLayerNormWeights =
-                std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellLayerNormWeights));
+                std::make_shared<ScopedCpuTensorHandle>(*(params.m_CellLayerNormWeights));
         layer->m_LayerNormParameters.m_OutputLayerNormWeights =
-                std::make_unique<ScopedCpuTensorHandle>(*(params.m_OutputLayerNormWeights));
+                std::make_shared<ScopedCpuTensorHandle>(*(params.m_OutputLayerNormWeights));
     }
     return layer;
 }
@@ -2320,11 +2320,11 @@ IConnectableLayer* NetworkImpl::AddTransposeConvolution2dLayer(const TransposeCo
 
     const auto layer = m_Graph->AddLayer<TransposeConvolution2dLayer>(descriptor, name);
 
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(weights);
+    layer->m_Weight = std::make_shared<ScopedCpuTensorHandle>(weights);
 
     if (descriptor.m_BiasEnabled)
     {
-        layer->m_Bias = std::make_unique<ScopedCpuTensorHandle>(biases.value());
+        layer->m_Bias = std::make_shared<ScopedCpuTensorHandle>(biases.value());
     }
 
     return layer;
@@ -2356,33 +2356,33 @@ IConnectableLayer* NetworkImpl::AddQuantizedLstmLayer(const QuantizedLstmInputPa
 
     // InputToX weights
     layer->m_QuantizedLstmParameters.m_InputToInputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.GetInputToInputWeights());
+            std::make_shared<ScopedCpuTensorHandle>(params.GetInputToInputWeights());
     layer->m_QuantizedLstmParameters.m_InputToForgetWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.GetInputToForgetWeights());
+            std::make_shared<ScopedCpuTensorHandle>(params.GetInputToForgetWeights());
     layer->m_QuantizedLstmParameters.m_InputToCellWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.GetInputToCellWeights());
+            std::make_shared<ScopedCpuTensorHandle>(params.GetInputToCellWeights());
     layer->m_QuantizedLstmParameters.m_InputToOutputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.GetInputToOutputWeights());
+            std::make_shared<ScopedCpuTensorHandle>(params.GetInputToOutputWeights());
 
     // RecurrentToX weights
     layer->m_QuantizedLstmParameters.m_RecurrentToInputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.GetRecurrentToInputWeights());
+            std::make_shared<ScopedCpuTensorHandle>(params.GetRecurrentToInputWeights());
     layer->m_QuantizedLstmParameters.m_RecurrentToForgetWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.GetRecurrentToForgetWeights());
+            std::make_shared<ScopedCpuTensorHandle>(params.GetRecurrentToForgetWeights());
     layer->m_QuantizedLstmParameters.m_RecurrentToCellWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.GetRecurrentToCellWeights());
+            std::make_shared<ScopedCpuTensorHandle>(params.GetRecurrentToCellWeights());
     layer->m_QuantizedLstmParameters.m_RecurrentToOutputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.GetRecurrentToOutputWeights());
+            std::make_shared<ScopedCpuTensorHandle>(params.GetRecurrentToOutputWeights());
 
     // Bias
     layer->m_QuantizedLstmParameters.m_InputGateBias =
-            std::make_unique<ScopedCpuTensorHandle>(params.GetInputGateBias());
+            std::make_shared<ScopedCpuTensorHandle>(params.GetInputGateBias());
     layer->m_QuantizedLstmParameters.m_ForgetGateBias =
-            std::make_unique<ScopedCpuTensorHandle>(params.GetForgetGateBias());
+            std::make_shared<ScopedCpuTensorHandle>(params.GetForgetGateBias());
     layer->m_QuantizedLstmParameters.m_CellBias =
-            std::make_unique<ScopedCpuTensorHandle>(params.GetCellBias());
+            std::make_shared<ScopedCpuTensorHandle>(params.GetCellBias());
     layer->m_QuantizedLstmParameters.m_OutputGateBias =
-            std::make_unique<ScopedCpuTensorHandle>(params.GetOutputGateBias());
+            std::make_shared<ScopedCpuTensorHandle>(params.GetOutputGateBias());
 
     return layer;
 }
@@ -2395,23 +2395,23 @@ IConnectableLayer* NetworkImpl::AddQLstmLayer(const QLstmDescriptor&  descriptor
 
     // QLstm Basic Parameters
     layer->m_BasicParameters.m_InputToForgetWeights =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputToForgetWeights));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_InputToForgetWeights));
     layer->m_BasicParameters.m_InputToCellWeights =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputToCellWeights));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_InputToCellWeights));
     layer->m_BasicParameters.m_InputToOutputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputToOutputWeights));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_InputToOutputWeights));
     layer->m_BasicParameters.m_RecurrentToForgetWeights =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_RecurrentToForgetWeights));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_RecurrentToForgetWeights));
     layer->m_BasicParameters.m_RecurrentToCellWeights =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_RecurrentToCellWeights));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_RecurrentToCellWeights));
     layer->m_BasicParameters.m_RecurrentToOutputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_RecurrentToOutputWeights));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_RecurrentToOutputWeights));
     layer->m_BasicParameters.m_ForgetGateBias =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_ForgetGateBias));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_ForgetGateBias));
     layer->m_BasicParameters.m_CellBias =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellBias));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_CellBias));
     layer->m_BasicParameters.m_OutputGateBias =
-            std::make_unique<ScopedCpuTensorHandle>(*(params.m_OutputGateBias));
+            std::make_shared<ScopedCpuTensorHandle>(*(params.m_OutputGateBias));
 
     // QLstm Cifg parameters
     if(!descriptor.m_CifgEnabled)
@@ -2433,11 +2433,11 @@ IConnectableLayer* NetworkImpl::AddQLstmLayer(const QLstmDescriptor&  descriptor
         }
 
         layer->m_CifgParameters.m_InputToInputWeights =
-                std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputToInputWeights));
+                std::make_shared<ScopedCpuTensorHandle>(*(params.m_InputToInputWeights));
         layer->m_CifgParameters.m_RecurrentToInputWeights =
-                std::make_unique<ScopedCpuTensorHandle>(*(params.m_RecurrentToInputWeights));
+                std::make_shared<ScopedCpuTensorHandle>(*(params.m_RecurrentToInputWeights));
         layer->m_CifgParameters.m_InputGateBias =
-                std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputGateBias));
+                std::make_shared<ScopedCpuTensorHandle>(*(params.m_InputGateBias));
     }
 
     // QLstm Projection parameters
@@ -2449,13 +2449,13 @@ IConnectableLayer* NetworkImpl::AddQLstmLayer(const QLstmDescriptor&  descriptor
         }
 
         layer->m_ProjectionParameters.m_ProjectionWeights =
-                std::make_unique<ScopedCpuTensorHandle>(*(params.m_ProjectionWeights));
+                std::make_shared<ScopedCpuTensorHandle>(*(params.m_ProjectionWeights));
 
         // Projection bias is optional even if projection is enabled
         if(params.m_ProjectionWeights != nullptr)
         {
             layer->m_ProjectionParameters.m_ProjectionBias =
-                    std::make_unique<ScopedCpuTensorHandle>(*(params.m_ProjectionBias));
+                    std::make_shared<ScopedCpuTensorHandle>(*(params.m_ProjectionBias));
         }
 
     }
@@ -2481,13 +2481,13 @@ IConnectableLayer* NetworkImpl::AddQLstmLayer(const QLstmDescriptor&  descriptor
             }
 
             layer->m_PeepholeParameters.m_CellToInputWeights =
-                    std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellToInputWeights));
+                    std::make_shared<ScopedCpuTensorHandle>(*(params.m_CellToInputWeights));
         }
 
         layer->m_PeepholeParameters.m_CellToForgetWeights =
-                std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellToForgetWeights));
+                std::make_shared<ScopedCpuTensorHandle>(*(params.m_CellToForgetWeights));
         layer->m_PeepholeParameters.m_CellToOutputWeights =
-                std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellToOutputWeights));
+                std::make_shared<ScopedCpuTensorHandle>(*(params.m_CellToOutputWeights));
     }
 
     // QLstm Layer Normalization params
@@ -2516,15 +2516,15 @@ IConnectableLayer* NetworkImpl::AddQLstmLayer(const QLstmDescriptor&  descriptor
             }
 
             layer->m_LayerNormParameters.m_InputLayerNormWeights =
-                    std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputLayerNormWeights));
+                    std::make_shared<ScopedCpuTensorHandle>(*(params.m_InputLayerNormWeights));
         }
 
         layer->m_LayerNormParameters.m_ForgetLayerNormWeights =
-                std::make_unique<ScopedCpuTensorHandle>(*(params.m_ForgetLayerNormWeights));
+                std::make_shared<ScopedCpuTensorHandle>(*(params.m_ForgetLayerNormWeights));
         layer->m_LayerNormParameters.m_CellLayerNormWeights =
-                std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellLayerNormWeights));
+                std::make_shared<ScopedCpuTensorHandle>(*(params.m_CellLayerNormWeights));
         layer->m_LayerNormParameters.m_OutputLayerNormWeights =
-                std::make_unique<ScopedCpuTensorHandle>(*(params.m_OutputLayerNormWeights));
+                std::make_shared<ScopedCpuTensorHandle>(*(params.m_OutputLayerNormWeights));
     }
     return layer;
 }

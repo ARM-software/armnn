@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(Fp32NetworkToBf16OptimizationConv2DTest)
     BOOST_TEST((outputTensor.GetDataType() == armnn::DataType::Float32));
 
     // Check whether data matches expected Bf16 data
-    armnn::BFloat16* data = conv->m_Weight->GetTensor<armnn::BFloat16>();
+    const armnn::BFloat16* data = conv->m_Weight->GetConstTensor<armnn::BFloat16>();
     BOOST_CHECK(data[0] == armnn::BFloat16(0.0f));
     BOOST_CHECK(data[1] == armnn::BFloat16(-1.0f));
     BOOST_CHECK(data[2] == armnn::BFloat16(3.796875f)); // 0x4073
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(Fp32NetworkToBf16OptimizationFullyConnectedTest)
     BOOST_TEST((outputTensor.GetDataType() == armnn::DataType::Float32));
 
     // Check whether data matches expected Bf16 data
-    armnn::BFloat16* data = fc->m_Weight->GetTensor<armnn::BFloat16>();
+    const armnn::BFloat16* data = fc->m_Weight->GetConstTensor<armnn::BFloat16>();
     BOOST_CHECK(data[0] == armnn::BFloat16(0.0f));
     BOOST_CHECK(data[1] == armnn::BFloat16(-1.0f));
     BOOST_CHECK(data[2] == armnn::BFloat16(3.796875f)); // 0x4073
@@ -181,5 +181,6 @@ BOOST_AUTO_TEST_CASE(Fp32NetworkToBf16OptimizationFullyConnectedTest)
     BOOST_CHECK(data[6] == armnn::BFloat16(-3.1072295E29f)); // 0xF07B
     BOOST_CHECK(data[7] == armnn::BFloat16(-9.131327E-10f)); // 0xB07B
 }
+
 
 BOOST_AUTO_TEST_SUITE_END()

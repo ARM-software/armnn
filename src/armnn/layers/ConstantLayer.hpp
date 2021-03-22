@@ -43,7 +43,7 @@ public:
 
     void ExecuteStrategy(IStrategy& strategy) const override;
 
-    std::unique_ptr<ScopedCpuTensorHandle> m_LayerOutput;
+    std::shared_ptr<ConstCpuTensorHandle> m_LayerOutput;
 
 protected:
     /// Constructor to create a ConstantLayer.

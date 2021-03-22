@@ -17,7 +17,7 @@ class DetectionPostProcessLayer : public LayerWithParameters<DetectionPostProces
 {
 public:
     /// A unique pointer to store Anchor values.
-    std::unique_ptr<ScopedCpuTensorHandle> m_Anchors;
+    std::shared_ptr<ConstCpuTensorHandle> m_Anchors;
 
     /// Makes a workload for the DetectionPostProcess type.
     /// @param [in] graph The graph where this layer can be found.

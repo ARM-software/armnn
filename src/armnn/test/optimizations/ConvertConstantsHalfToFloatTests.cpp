@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(ConvertConstantsHalfToFloatTest)
     BOOST_CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::Float32);
 
     // Now test the data matches float32 data
-    float* data = fc->m_Weight->GetTensor<float>();
+    const float* data = fc->m_Weight->GetConstTensor<float>();
     BOOST_CHECK(1.0f == data[0]);
     BOOST_CHECK(2.0f == data[1]);
     BOOST_CHECK(3.0f == data[2]);

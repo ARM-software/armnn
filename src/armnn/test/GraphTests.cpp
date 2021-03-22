@@ -590,4 +590,28 @@ BOOST_AUTO_TEST_CASE(DuplicateLayerNames)
     BOOST_TEST(((*std::next(it))->GetType() == armnn::LayerType::Output));
 }
 
+BOOST_AUTO_TEST_CASE(CheckGraphConstTensorSharing)
+{
+    armnn::Graph graph0;
+    const float* sharedWeightPtr;
+
+    {
+        armnn::Graph graph1;
+
+        armnn::FullyConnectedLayer* const fcLayer =
+                graph1.AddLayer<armnn::FullyConnectedLayer>(armnn::FullyConnectedDescriptor(), "fc");
+
+        float weight = 1.0f;
+        armnn::ConstTensor constTensor({{ 1, 1 }, armnn::DataType::Float32}, &weight);
+        fcLayer->m_Weight = std::make_shared<armnn::ScopedCpuTensorHandle>(constTensor);;
+        // point sharedWeightPtr to graph1's const tensor
+        sharedWeightPtr = fcLayer->m_Weight->GetConstTensor<float>();
+
+        graph0 = armnn::Graph(graph1);
+        // graph1 goes out of scope
+    }
+
+    BOOST_TEST(*sharedWeightPtr == 1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

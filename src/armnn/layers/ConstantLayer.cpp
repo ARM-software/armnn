@@ -32,7 +32,7 @@ ConstantLayer* ConstantLayer::Clone(Graph& graph) const
     // Cloned layers share the same layer output object.
     auto layer = CloneBase<ConstantLayer>(graph, GetName());
 
-    layer->m_LayerOutput = m_LayerOutput ? std::make_unique<ScopedCpuTensorHandle>(*m_LayerOutput) : nullptr;
+    layer->m_LayerOutput = m_LayerOutput ? m_LayerOutput : nullptr;
 
     return std::move(layer);
 }

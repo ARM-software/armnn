@@ -41,10 +41,10 @@ BatchNormalizationLayer* BatchNormalizationLayer::Clone(Graph& graph) const
 {
     auto layer = CloneBase<BatchNormalizationLayer>(graph, m_Param, GetName());
 
-    layer->m_Mean = m_Mean ? std::make_unique<ScopedCpuTensorHandle>(*m_Mean) : nullptr;
-    layer->m_Variance = m_Variance ? std::make_unique<ScopedCpuTensorHandle>(*m_Variance) : nullptr;
-    layer->m_Beta = m_Beta ? std::make_unique<ScopedCpuTensorHandle>(*m_Beta) : nullptr;
-    layer->m_Gamma = m_Gamma ? std::make_unique<ScopedCpuTensorHandle>(*m_Gamma) : nullptr;
+    layer->m_Mean = m_Mean ? m_Mean : nullptr;
+    layer->m_Variance = m_Variance ? m_Variance : nullptr;
+    layer->m_Beta = m_Beta ? m_Beta : nullptr;
+    layer->m_Gamma = m_Gamma ? m_Gamma : nullptr;
 
     return std::move(layer);
 }

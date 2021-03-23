@@ -483,7 +483,7 @@ list(APPEND armnn_sources
     src/armnn/optimizations/ConvertConstants.hpp
     src/armnn/optimizations/ConvertFp32NetworkToBf16.hpp
     src/armnn/optimizations/ConvertFp32NetworkToFp16.hpp
-    src/armnn/optimizations/FoldPadIntoLayer2d.hpp
+    src/armnn/optimizations/FoldPadIntoConvolution2d.hpp
     src/armnn/optimizations/MovePermuteUp.hpp
     src/armnn/optimizations/MoveTransposeUp.hpp
     src/armnn/optimizations/Optimization.hpp

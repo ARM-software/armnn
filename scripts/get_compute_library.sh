@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_02" # Release 21.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="ab8408872f49c9429c84d83de665c55e31a500b2" #Added Qasymm8 datatype support to NEROIPoolingLayer with Tests
+DEFAULT_CLFRAMEWORKREVISION="226169fef38e2361f6b503570645c802c513112d" #Fix SVE build on newer compilers
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

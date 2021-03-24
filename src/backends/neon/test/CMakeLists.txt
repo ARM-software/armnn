@@ -16,6 +16,33 @@ list(APPEND armnnNeonBackendUnitTests_sources
     NeonWorkloadFactoryHelper.hpp
 )
 
+# There's a known Android NDK bug which causes a subset of NeonLayerTests to
+# fail. We'll exclude these tests in NeonLayerTests_NDK_Bug.cpp if we're doing
+# a debug build and NDK is less than r21.
+# https://github.com/android/ndk/issues/1135
+
+# Default to always including these tests.
+set(INCLUDE_NDK_BUG_TESTS "ON")
+# Reconsider if we in a debug build.
+if ( NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release" )
+    # And NDK_VERSION has been set.
+    if ( DEFINED NDK_VERSION )
+        # And the version is less than r21.
+        if ( ${NDK_VERSION} STRLESS "r21" )
+            set(INCLUDE_NDK_BUG_TESTS "OFF")
+        endif()
+    endif()
+endif()
+
+if ( INCLUDE_NDK_BUG_TESTS STREQUAL "ON" )
+   list(APPEND armnnNeonBackendUnitTests_sources
+        NeonLayerTests_NDK_Bug.cpp
+        )
+    message ( "Added NeonLayerTests_NDK_Bug.cpp" )
+else()
+
+endif()
+
 if (ARMNNREF)
     list(APPEND armnnNeonBackendUnitTests_sources
         NeonFallbackTests.cpp

@@ -391,17 +391,25 @@ struct FullyConnectedDescriptor : BaseDescriptor
     FullyConnectedDescriptor()
         : m_BiasEnabled(false)
         , m_TransposeWeightMatrix(false)
+        , m_ConstantWeights(true)
     {}
 
     bool operator ==(const FullyConnectedDescriptor& rhs) const
     {
-        return m_BiasEnabled == rhs.m_BiasEnabled && m_TransposeWeightMatrix == rhs.m_TransposeWeightMatrix;
+        return m_BiasEnabled == rhs.m_BiasEnabled
+               && m_TransposeWeightMatrix == rhs.m_TransposeWeightMatrix
+               && m_ConstantWeights == rhs.m_ConstantWeights;
     }
+
+    /// Get the number of views/inputs.
+    uint32_t GetNumViews() const;
 
     /// Enable/disable bias.
     bool m_BiasEnabled;
     /// Enable/disable transpose weight matrix.
     bool m_TransposeWeightMatrix;
+    /// Enable/disable constant weights and biases.
+    bool m_ConstantWeights;
 };
 
 /// A Convolution2dDescriptor for the Convolution2dLayer.

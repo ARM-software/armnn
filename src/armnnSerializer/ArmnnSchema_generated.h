@@ -3504,7 +3504,8 @@ struct FullyConnectedDescriptor FLATBUFFERS_FINAL_CLASS : private flatbuffers::T
   typedef FullyConnectedDescriptorBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_BIASENABLED = 4,
-    VT_TRANSPOSEWEIGHTSMATRIX = 6
+    VT_TRANSPOSEWEIGHTSMATRIX = 6,
+    VT_CONSTANTWEIGHTS = 8
   };
   bool biasEnabled() const {
     return GetField<uint8_t>(VT_BIASENABLED, 0) != 0;
@@ -3512,10 +3513,14 @@ struct FullyConnectedDescriptor FLATBUFFERS_FINAL_CLASS : private flatbuffers::T
   bool transposeWeightsMatrix() const {
     return GetField<uint8_t>(VT_TRANSPOSEWEIGHTSMATRIX, 0) != 0;
   }
+  bool constantWeights() const {
+    return GetField<uint8_t>(VT_CONSTANTWEIGHTS, 1) != 0;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_BIASENABLED) &&
            VerifyField<uint8_t>(verifier, VT_TRANSPOSEWEIGHTSMATRIX) &&
+           VerifyField<uint8_t>(verifier, VT_CONSTANTWEIGHTS) &&
            verifier.EndTable();
   }
 };
@@ -3529,6 +3534,9 @@ struct FullyConnectedDescriptorBuilder {
   }
   void add_transposeWeightsMatrix(bool transposeWeightsMatrix) {
     fbb_.AddElement<uint8_t>(FullyConnectedDescriptor::VT_TRANSPOSEWEIGHTSMATRIX, static_cast<uint8_t>(transposeWeightsMatrix), 0);
+  }
+  void add_constantWeights(bool constantWeights) {
+    fbb_.AddElement<uint8_t>(FullyConnectedDescriptor::VT_CONSTANTWEIGHTS, static_cast<uint8_t>(constantWeights), 1);
   }
   explicit FullyConnectedDescriptorBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -3545,8 +3553,10 @@ struct FullyConnectedDescriptorBuilder {
 inline flatbuffers::Offset<FullyConnectedDescriptor> CreateFullyConnectedDescriptor(
     flatbuffers::FlatBufferBuilder &_fbb,
     bool biasEnabled = false,
-    bool transposeWeightsMatrix = false) {
+    bool transposeWeightsMatrix = false,
+    bool constantWeights = true) {
   FullyConnectedDescriptorBuilder builder_(_fbb);
+  builder_.add_constantWeights(constantWeights);
   builder_.add_transposeWeightsMatrix(transposeWeightsMatrix);
   builder_.add_biasEnabled(biasEnabled);
   return builder_.Finish();

@@ -7,6 +7,7 @@
 
 #include <armnn/BackendId.hpp>
 #include <armnn/ILayerSupport.hpp>
+#include <armnn/Types.hpp>
 
 namespace armnn
 {
@@ -19,7 +20,10 @@ class LayerSupportHandle
 {
 public:
     explicit LayerSupportHandle(std::shared_ptr<ILayerSupport> layerSupport)
-        : m_LayerSupport(std::move(layerSupport)) {};
+        : m_LayerSupport(std::move(layerSupport)), m_BackendId(Compute::Undefined) {};
+
+    explicit LayerSupportHandle(std::shared_ptr<ILayerSupport> layerSupport, const BackendId& backendId)
+        : m_LayerSupport(std::move(layerSupport)), m_BackendId(backendId) {};
 
     bool IsBackendRegistered() const;
 
@@ -422,9 +426,13 @@ public:
 
 private:
     std::shared_ptr<ILayerSupport> m_LayerSupport;
+    const BackendId m_BackendId;
 };
 
 /// Convenience function to retrieve the ILayerSupportHandle for a backend
 LayerSupportHandle GetILayerSupportByBackendId(const armnn::BackendId& backend);
+
+/// Convenience function to check a capability on a backend
+bool IsCapabilitySupported(const armnn::BackendId& backend, armnn::BackendCapability capability);
 
 }

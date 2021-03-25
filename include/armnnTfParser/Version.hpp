@@ -14,7 +14,7 @@ namespace armnnTfParser
 
 // tfParser version components
 #define TF_PARSER_MAJOR_VERSION 24
-#define TF_PARSER_MINOR_VERSION 0
+#define TF_PARSER_MINOR_VERSION 1
 #define TF_PARSER_PATCH_VERSION 0
 
 /// TF_PARSER_VERSION: "X.Y.Z"

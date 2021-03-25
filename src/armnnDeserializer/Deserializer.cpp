@@ -1841,7 +1841,6 @@ void IDeserializer::DeserializerImpl::ParseFullyConnected(GraphPtr graph, unsign
     CHECK_LAYERS(graph, 0, layerIndex);
     auto inputs = GetInputs(graph, layerIndex);
     CHECK_LOCATION();
-    CHECK_VALID_SIZE(inputs.size(), 1);
 
     auto outputs = GetOutputs(graph, layerIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
@@ -1853,20 +1852,36 @@ void IDeserializer::DeserializerImpl::ParseFullyConnected(GraphPtr graph, unsign
     armnn::FullyConnectedDescriptor fullyConnectedDescriptor;
     fullyConnectedDescriptor.m_BiasEnabled = flatBufferDescriptor->biasEnabled();
     fullyConnectedDescriptor.m_TransposeWeightMatrix = flatBufferDescriptor->transposeWeightsMatrix();
-
-    armnn::ConstTensor weightsTensor = ToConstTensor(flatBufferLayer->weights());
-
-    armnn::IConnectableLayer* layer;
-    armnn::Optional<armnn::ConstTensor> optionalBiases = armnn::EmptyOptional();
-    if (flatBufferDescriptor->biasEnabled())
+    fullyConnectedDescriptor.m_ConstantWeights = flatBufferDescriptor->constantWeights();
+    uint32_t numInputs = 1;
+    if (!fullyConnectedDescriptor.m_ConstantWeights)
     {
-        armnn::ConstTensor biasTensorData = ToConstTensor(flatBufferLayer->biases());
-        optionalBiases = armnn::Optional<armnn::ConstTensor>(biasTensorData);
+        numInputs = 2;
+        if (fullyConnectedDescriptor.m_BiasEnabled)
+        {
+            numInputs = 3;
+        }
     }
-    layer = m_Network->AddFullyConnectedLayer(fullyConnectedDescriptor,
-                                              weightsTensor,
-                                              optionalBiases,
-                                              layerName.c_str());
+    CHECK_VALID_SIZE(inputs.size(), numInputs);
+
+    armnn::Optional <armnn::ConstTensor> optionalWeights = armnn::EmptyOptional();
+    armnn::Optional<armnn::ConstTensor> optionalBiases = armnn::EmptyOptional();
+    if (fullyConnectedDescriptor.m_ConstantWeights)
+    {
+        armnn::ConstTensor weightsTensorData = ToConstTensor(flatBufferLayer->weights());
+        optionalWeights = armnn::Optional<armnn::ConstTensor>(weightsTensorData);
+
+        if (flatBufferDescriptor->biasEnabled())
+        {
+            armnn::ConstTensor biasTensorData = ToConstTensor(flatBufferLayer->biases());
+            optionalBiases = armnn::Optional<armnn::ConstTensor>(biasTensorData);
+        }
+    }
+
+    armnn::IConnectableLayer* layer = m_Network->AddFullyConnectedLayer(fullyConnectedDescriptor,
+                                                                        optionalWeights,
+                                                                        optionalBiases,
+                                                                        layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

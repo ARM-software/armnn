@@ -23,7 +23,21 @@ LayerSupportHandle GetILayerSupportByBackendId(const armnn::BackendId& backend)
 
     auto factoryFunc = backendRegistry.GetFactory(backend);
     auto backendObject = factoryFunc();
-    return LayerSupportHandle(backendObject->GetLayerSupport());
+    return LayerSupportHandle(backendObject->GetLayerSupport(), backend);
+}
+
+/// Convenience function to check a capability on a backend
+bool IsCapabilitySupported(const armnn::BackendId& backend, armnn::BackendCapability capability)
+{
+    bool hasCapability = false;
+    auto const& backendRegistry = armnn::BackendRegistryInstance();
+    if (backendRegistry.IsBackendRegistered(backend))
+    {
+        auto factoryFunc = backendRegistry.GetFactory(backend);
+        auto backendObject = factoryFunc();
+        hasCapability = backendObject->HasCapability(capability);
+    }
+    return hasCapability;
 }
 
 bool LayerSupportHandle::IsBackendRegistered() const
@@ -293,6 +307,16 @@ bool LayerSupportHandle::IsFullyConnectedSupported(const TensorInfo& input,
                                                    const FullyConnectedDescriptor& descriptor,
                                                    Optional<std::string&> reasonIfUnsupported)
 {
+    if(!descriptor.m_ConstantWeights && !m_BackendId.IsUndefined())
+    {
+        bool result = false;
+        result = IsCapabilitySupported(m_BackendId, BackendCapability::NonConstWeights);
+        if (!result)
+        {
+            return result;
+        }
+    }
+
     return m_LayerSupport->IsFullyConnectedSupported(input,
                                                     output,
                                                     weights,

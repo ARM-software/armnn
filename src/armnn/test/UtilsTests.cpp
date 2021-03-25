@@ -278,6 +278,18 @@ BOOST_AUTO_TEST_CASE(LayerSupportHandle)
 
     BOOST_CHECK(layerSupportObject.IsBackendRegistered());
 }
+
+BOOST_AUTO_TEST_CASE(IsCapabilitySupported_CpuRef)
+{
+    BOOST_CHECK(armnn::IsCapabilitySupported(armnn::Compute::CpuRef, armnn::BackendCapability::NonConstWeights));
+}
+#endif
+
+#if defined(ARMCOMPUTENEON_ENABLED)
+BOOST_AUTO_TEST_CASE(IsCapabilitySupported_CpuAcc)
+{
+    BOOST_CHECK(!armnn::IsCapabilitySupported(armnn::Compute::CpuAcc, armnn::BackendCapability::NonConstWeights));
+}
 #endif
 
 BOOST_AUTO_TEST_SUITE_END()

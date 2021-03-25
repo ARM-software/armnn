@@ -299,6 +299,17 @@ public:
 
     /// Adds a fully connected layer to the network.
     /// @param fullyConnectedDescriptor - Description of the fully connected layer.
+    /// @param weights -Optional Tensor for the weights data.
+    /// @param biases - Optional tensor for the bias data.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                              const Optional<ConstTensor>& weights,
+                                              const Optional<ConstTensor>& biases,
+                                              const char* name = nullptr);
+
+    /// Adds a fully connected layer to the network.
+    /// @param fullyConnectedDescriptor - Description of the fully connected layer.
     /// @param weights - Tensor for the weights data.
     /// @param biases - Optional tensor for the bias data.
     /// @param name - Optional name for the layer.

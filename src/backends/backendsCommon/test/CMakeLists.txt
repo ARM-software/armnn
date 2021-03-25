@@ -23,6 +23,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     ElementwiseUnaryEndToEndTestImpl.hpp
     EndToEndTestImpl.hpp
     FillEndToEndTestImpl.hpp
+    FullyConnectedEndToEndTestImpl.hpp
     GatherEndToEndTestImpl.hpp
     InstanceNormalizationEndToEndTestImpl.cpp
     InstanceNormalizationEndToEndTestImpl.hpp

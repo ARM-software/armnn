@@ -321,6 +321,7 @@ table FullyConnectedLayer {
 table FullyConnectedDescriptor {
     biasEnabled:bool = false;
     transposeWeightsMatrix:bool = false;
+    constantWeights:bool = true;
 }
 
 table GatherLayer {

@@ -14,18 +14,21 @@ namespace armnn
 {
 RefFullyConnectedWorkload::RefFullyConnectedWorkload(
     const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info)
-        : BaseWorkload<FullyConnectedQueueDescriptor>(descriptor, info),
-          m_Weight(std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Weight)))
+        : BaseWorkload<FullyConnectedQueueDescriptor>(descriptor, info)
 {
-    const TensorInfo& rWeightInfo = m_Weight->GetTensorInfo();
-    m_WeightShape = rWeightInfo.GetShape();
-    m_WeightDecoder = MakeDecoder<float>(rWeightInfo, m_Weight->Map(true));
-
-    if (descriptor.m_Parameters.m_BiasEnabled)
+    if (descriptor.m_Parameters.m_ConstantWeights)
     {
-        m_Bias = std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Bias));
-        const TensorInfo& biasInfo = m_Bias->GetTensorInfo();
-        m_BiasDecoder = MakeDecoder<float>(biasInfo, m_Bias->Map(true));
+        m_Weight = std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Weight));
+        const TensorInfo& rWeightInfo = m_Weight->GetTensorInfo();
+        m_WeightShape = rWeightInfo.GetShape();
+        m_WeightDecoder = MakeDecoder<float>(rWeightInfo, m_Weight->Map(true));
+
+        if (descriptor.m_Parameters.m_BiasEnabled)
+        {
+            m_Bias = std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Bias));
+            const TensorInfo& biasInfo = m_Bias->GetTensorInfo();
+            m_BiasDecoder = MakeDecoder<float>(biasInfo, m_Bias->Map(true));
+        }
     }
 }
 
@@ -35,6 +38,20 @@ void RefFullyConnectedWorkload::PostAllocationConfigure()
     ARMNN_ASSERT(inputInfo.GetNumDimensions() > 1);
     m_InputShape = inputInfo.GetShape();
     m_InputDecoder = MakeDecoder<float>(inputInfo);
+
+    if (!m_Data.m_Parameters.m_ConstantWeights)
+    {
+        const TensorInfo& rWeightInfo = GetTensorInfo(m_Data.m_Inputs[1]);
+        ARMNN_ASSERT(inputInfo.GetNumDimensions() > 1);
+        m_WeightShape = rWeightInfo.GetShape();
+        m_WeightDecoder = MakeDecoder<float>(rWeightInfo);
+
+        if (m_Data.m_Parameters.m_BiasEnabled)
+        {
+            const TensorInfo& biasInfo = GetTensorInfo(m_Data.m_Inputs[2]);
+            m_BiasDecoder = MakeDecoder<float>(biasInfo);
+        }
+    }
 
     const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[0]);
     m_OutputShape = outputInfo.GetShape();
@@ -52,6 +69,14 @@ void RefFullyConnectedWorkload::Execute() const
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefFullyConnectedWorkload_Execute");
 
     m_InputDecoder->Reset(m_Data.m_Inputs[0]->Map());
+    if (!m_Data.m_Parameters.m_ConstantWeights)
+    {
+        m_WeightDecoder->Reset(m_Data.m_Inputs[1]->Map());
+        if (m_Data.m_Parameters.m_BiasEnabled)
+        {
+            m_BiasDecoder->Reset(m_Data.m_Inputs[2]->Map());
+        }
+    }
     m_OutputEncoder->Reset(m_Data.m_Outputs[0]->Map());
 
     FullyConnected(m_InputShape,

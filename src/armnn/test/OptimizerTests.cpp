@@ -10,6 +10,7 @@
 #include <Network.hpp>
 #include <Optimizer.hpp>
 
+#include <armnn/BackendHelper.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/INetwork.hpp>
 #include <armnn/LayerVisitorBase.hpp>
@@ -678,6 +679,13 @@ public:
         return {};
     };
 };
+
+BOOST_AUTO_TEST_CASE(BackendCapabilityTest)
+{
+    BackendId backendId ="MockBackend";
+    // MockBackend does not support the NonConstWeights capability
+    BOOST_CHECK(!armnn::IsCapabilitySupported(backendId, armnn::BackendCapability::NonConstWeights));
+}
 
 BOOST_AUTO_TEST_CASE(BackendHintTest)
 {

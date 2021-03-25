@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "TestUtils.hpp"
+
 #include <armnn_delegate.hpp>
 
 #include <flatbuffers/flatbuffers.h>
@@ -25,8 +27,9 @@ std::vector<char> CreateFullyConnectedTfLiteModel(tflite::TensorType tensorType,
                                                   const std::vector <int32_t>& inputTensorShape,
                                                   const std::vector <int32_t>& weightsTensorShape,
                                                   const std::vector <int32_t>& biasTensorShape,
-                                                  const std::vector <int32_t>& outputTensorShape,
-                                                  const std::vector <T>& weightsData,
+                                                  std::vector <int32_t>& outputTensorShape,
+                                                  std::vector <T>& weightsData,
+                                                  bool constantWeights = true,
                                                   float quantScale = 1.0f,
                                                   int quantOffset  = 0,
                                                   float outputQuantScale = 2.0f,
@@ -36,26 +39,38 @@ std::vector<char> CreateFullyConnectedTfLiteModel(tflite::TensorType tensorType,
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
     std::array<flatbuffers::Offset<tflite::Buffer>, 3> buffers;
     buffers[0] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
-    buffers[1] = CreateBuffer(flatBufferBuilder,
-                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(weightsData.data()),
-                                                    sizeof(T) * weightsData.size()));
 
     auto biasTensorType = ::tflite::TensorType_FLOAT32;
     if (tensorType == ::tflite::TensorType_INT8)
     {
         biasTensorType = ::tflite::TensorType_INT32;
-        std::vector<int32_t> biasData = { 10 };
-        buffers[2] = CreateBuffer(flatBufferBuilder,
-                                  flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(biasData.data()),
-                                                                 sizeof(int32_t) * biasData.size()));
+    }
+    if (constantWeights)
+    {
+        buffers[1] = CreateBuffer(flatBufferBuilder,
+                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(weightsData.data()),
+                                                    sizeof(T) * weightsData.size()));
 
+        if (tensorType == ::tflite::TensorType_INT8)
+        {
+            std::vector<int32_t> biasData = { 10 };
+            buffers[2] = CreateBuffer(flatBufferBuilder,
+                                      flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(biasData.data()),
+                                                                     sizeof(int32_t) * biasData.size()));
+
+        }
+        else
+        {
+            std::vector<float> biasData = { 10 };
+            buffers[2] = CreateBuffer(flatBufferBuilder,
+                                      flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(biasData.data()),
+                                                                     sizeof(float) * biasData.size()));
+        }
     }
     else
     {
-        std::vector<float> biasData = { 10 };
-        buffers[2] = CreateBuffer(flatBufferBuilder,
-                                  flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(biasData.data()),
-                                                                 sizeof(float) * biasData.size()));
+        buffers[1] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
+        buffers[2] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
     }
 
     auto quantizationParameters =
@@ -155,10 +170,11 @@ void FullyConnectedTest(std::vector<armnn::BackendId>& backends,
                         const std::vector <int32_t>& inputTensorShape,
                         const std::vector <int32_t>& weightsTensorShape,
                         const std::vector <int32_t>& biasTensorShape,
-                        const std::vector <int32_t>& outputTensorShape,
-                        const std::vector <T>& inputValues,
-                        const std::vector <T>& expectedOutputValues,
-                        const std::vector <T>& weightsData,
+                        std::vector <int32_t>& outputTensorShape,
+                        std::vector <T>& inputValues,
+                        std::vector <T>& expectedOutputValues,
+                        std::vector <T>& weightsData,
+                        bool constantWeights = true,
                         float quantScale = 1.0f,
                         int quantOffset  = 0)
 {
@@ -171,10 +187,11 @@ void FullyConnectedTest(std::vector<armnn::BackendId>& backends,
                                                                     biasTensorShape,
                                                                     outputTensorShape,
                                                                     weightsData,
+                                                                    constantWeights,
                                                                     quantScale,
                                                                     quantOffset);
-
     const Model* tfLiteModel = GetModel(modelBuffer.data());
+
     // Create TfLite Interpreters
     std::unique_ptr<Interpreter> armnnDelegateInterpreter;
     CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
@@ -191,25 +208,34 @@ void FullyConnectedTest(std::vector<armnn::BackendId>& backends,
     // Create the ArmNN Delegate
     armnnDelegate::DelegateOptions delegateOptions(backends);
     std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
-                        theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
-                                         armnnDelegate::TfLiteArmnnDelegateDelete);
+    theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
+                     armnnDelegate::TfLiteArmnnDelegateDelete);
     CHECK(theArmnnDelegate != nullptr);
+
     // Modify armnnDelegateInterpreter to use armnnDelegate
     CHECK(armnnDelegateInterpreter->ModifyGraphWithDelegate(theArmnnDelegate.get()) == kTfLiteOk);
 
     // Set input data
-    auto tfLiteDelegateInputId = tfLiteInterpreter->inputs()[0];
-    auto tfLiteDelageInputData = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateInputId);
-    for (unsigned int i = 0; i < inputValues.size(); ++i)
-    {
-        tfLiteDelageInputData[i] = inputValues[i];
-    }
+    armnnDelegate::FillInput<T>(tfLiteInterpreter, 0, inputValues);
+    armnnDelegate::FillInput<T>(armnnDelegateInterpreter, 0, inputValues);
 
-    auto armnnDelegateInputId = armnnDelegateInterpreter->inputs()[0];
-    auto armnnDelegateInputData = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateInputId);
-    for (unsigned int i = 0; i < inputValues.size(); ++i)
+    if (!constantWeights)
     {
-        armnnDelegateInputData[i] = inputValues[i];
+        armnnDelegate::FillInput<T>(tfLiteInterpreter, 1, weightsData);
+        armnnDelegate::FillInput<T>(armnnDelegateInterpreter, 1, weightsData);
+
+        if (tensorType == ::tflite::TensorType_INT8)
+        {
+            std::vector <int32_t> biasData = {10};
+            armnnDelegate::FillInput<int32_t>(tfLiteInterpreter, 2, biasData);
+            armnnDelegate::FillInput<int32_t>(armnnDelegateInterpreter, 2, biasData);
+        }
+        else
+        {
+            std::vector<float> biasData = {10};
+            armnnDelegate::FillInput<float>(tfLiteInterpreter, 2, biasData);
+            armnnDelegate::FillInput<float>(armnnDelegateInterpreter, 2, biasData);
+        }
     }
 
     // Run EnqueWorkload
@@ -217,16 +243,11 @@ void FullyConnectedTest(std::vector<armnn::BackendId>& backends,
     CHECK(armnnDelegateInterpreter->Invoke() == kTfLiteOk);
 
     // Compare output data
-    auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[0];
-    auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateOutputId);
-    auto armnnDelegateOutputId = armnnDelegateInterpreter->outputs()[0];
-    auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateOutputId);
-    for (size_t i = 0; i < expectedOutputValues.size(); i++)
-    {
-        CHECK(expectedOutputValues[i] == tfLiteDelageOutputData[i]);
-        CHECK(expectedOutputValues[i] == armnnDelegateOutputData[i]);
-        CHECK(tfLiteDelageOutputData[i] == armnnDelegateOutputData[i]);
-    }
+    armnnDelegate::CompareOutputData<T>(tfLiteInterpreter,
+                                        armnnDelegateInterpreter,
+                                        outputTensorShape,
+                                        expectedOutputValues);
+    armnnDelegateInterpreter.reset(nullptr);
 }
 
 } // anonymous namespace

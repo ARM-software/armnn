@@ -196,6 +196,16 @@ public:
 using IBackendSharedPtr = std::shared_ptr<IBackend>;
 using IBackendUniquePtr = std::unique_ptr<IBackend, void(*)(IBackend* backend)>;
 
+/// BackendCapability class
+enum class BackendCapability : uint32_t
+{
+    /// Constant weights can be accessed through the descriptors,
+    /// On the other hand, non-const weights can be accessed through inputs.
+    NonConstWeights,
+
+    // add new enum values here
+};
+
 /// Device specific knowledge to be passed to the optimizer.
 class IDeviceSpec
 {

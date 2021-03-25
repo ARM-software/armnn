@@ -9,6 +9,10 @@
 namespace armnn
 {
 
+const std::set<armnn::BackendCapability> backendCapabilities {
+    armnn::BackendCapability::NonConstWeights,
+};
+
 class RefBackend : public IBackendInternal
 {
 public:
@@ -39,6 +43,8 @@ public:
     std::vector<ITensorHandleFactory::FactoryId> GetHandleFactoryPreferences() const override;
 
     void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry) override;
+
+    bool HasCapability(BackendCapability capabilityClass) const override;
 };
 
 } // namespace armnn

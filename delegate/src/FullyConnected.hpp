@@ -35,62 +35,27 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
 
     const TfLiteTensor* tfLiteTensors = tfLiteContext->tensors;
     const TfLiteTensor& tfLiteInputTensor = tfLiteTensors[tfLiteNode->inputs->data[0]];
-    if(!IsValid(&tfLiteTensors[tfLiteNode->inputs->data[0]]))
+    if (!IsValid(tfLiteContext, tfLiteInputTensor, operatorCode, nodeIndex))
     {
-        TF_LITE_MAYBE_KERNEL_LOG(
-            tfLiteContext,
-            "TfLiteArmnnDelegate: Invalid input tensor in operator #%d node #%d: ",
-            operatorCode, nodeIndex);
         return kTfLiteError;
     }
-    if (IsDynamicTensor(tfLiteInputTensor))
-    {
-        TF_LITE_MAYBE_KERNEL_LOG(
-            tfLiteContext,
-            "TfLiteArmnnDelegate: Dynamic input tensors are not supported in node #%d: ",
-            nodeIndex);
-        return kTfLiteError;
-    }
+
     const TfLiteTensor& tfLiteOutputTensor = tfLiteTensors[tfLiteNode->outputs->data[0]];
-    if(!IsValid(&tfLiteOutputTensor))
+    if (!IsValid(tfLiteContext, tfLiteOutputTensor, operatorCode, nodeIndex))
     {
-        TF_LITE_MAYBE_KERNEL_LOG(
-            tfLiteContext,
-            "TfLiteArmnnDelegate: Invalid output tensor in operator #%d node #%d: ",
-            operatorCode, nodeIndex);
-        return kTfLiteError;
-    }
-    if (IsDynamicTensor(tfLiteOutputTensor))
-    {
-        TF_LITE_MAYBE_KERNEL_LOG(
-            tfLiteContext,
-            "TfLiteArmnnDelegate: Dynamic output tensors are not supported in node #%d: ",
-            nodeIndex);
         return kTfLiteError;
     }
 
     const TfLiteTensor& tfLiteWeightsTensor = tfLiteTensors[tfLiteNode->inputs->data[1]];
-    if(!IsValid(&tfLiteWeightsTensor))
+    if (!IsValid(tfLiteContext, tfLiteWeightsTensor, operatorCode, nodeIndex))
     {
-        TF_LITE_MAYBE_KERNEL_LOG(
-            tfLiteContext,
-            "TfLiteArmnnDelegate: Invalid weights tensor in operator #%d node #%d: ",
-            operatorCode, nodeIndex);
-        return kTfLiteError;
-    }
-    if (IsDynamicTensor(tfLiteWeightsTensor))
-    {
-        TF_LITE_MAYBE_KERNEL_LOG(
-            tfLiteContext,
-            "TfLiteArmnnDelegate: Dynamic weight tensors are not supported in node #%d: ",
-            nodeIndex);
         return kTfLiteError;
     }
 
     const armnn::TensorInfo& inputTensorInfo   = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
+    armnn::TensorInfo weightsTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteWeightsTensor);
     const armnn::TensorInfo& outputTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
 
-    armnn::TensorInfo weightsTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteWeightsTensor);
     // Fully Connected Layer accepts two dimensional weights input
     int32_t weightsDimension = static_cast<int32_t>(weightsTensorInfo.GetNumDimensions());
     if (weightsDimension != 2)
@@ -102,24 +67,23 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
         return kTfLiteError;
     }
 
+    bool isConstantWeights = tflite::IsConstantTensor(&tfLiteWeightsTensor);
+
     armnn::TensorInfo biasTensorInfo;
     if (biasEnabled)
     {
         const TfLiteTensor& tfLiteBiasTensor = tfLiteTensors[tfLiteNode->inputs->data[2]];
-        if(!IsValid(&tfLiteBiasTensor))
+        if (!IsValid(tfLiteContext, tfLiteBiasTensor, operatorCode, nodeIndex))
         {
-            TF_LITE_MAYBE_KERNEL_LOG(
-                tfLiteContext,
-                "TfLiteArmnnDelegate: Invalid bias tensor in operator #%d node #%d: ",
-                operatorCode, nodeIndex);
             return kTfLiteError;
         }
-        if (IsDynamicTensor(tfLiteBiasTensor))
+        if ((isConstantWeights && !tflite::IsConstantTensor(&tfLiteBiasTensor))
+            || (!isConstantWeights && tflite::IsConstantTensor(&tfLiteBiasTensor)))
         {
             TF_LITE_MAYBE_KERNEL_LOG(
                 tfLiteContext,
-                "TfLiteArmnnDelegate: Dynamic bias tensors are not supported in node #%d: ",
-                nodeIndex);
+                "TfLiteArmnnDelegate: Weights and bias are not compatible"
+                " in operator #%d node #%d: ", operatorCode, nodeIndex);
             return kTfLiteError;
         }
         biasTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteBiasTensor);
@@ -130,7 +94,6 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
     }
 
     armnn::TensorInfo reshapedTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
-
     if (inputTensorInfo.GetNumDimensions() > 2)
     {
         // Calculate reshape to flatten to 2D [batch_size, input_size]
@@ -153,6 +116,7 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
     armnn::FullyConnectedDescriptor descriptor;
     descriptor.m_TransposeWeightMatrix = true;
     descriptor.m_BiasEnabled           = biasEnabled;
+    descriptor.m_ConstantWeights       = isConstantWeights;
 
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
@@ -175,27 +139,28 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    auto weightsTensor = CreateConstTensor(&tfLiteWeightsTensor,
-                                           weightsTensorInfo,
-                                           armnn::Optional<armnn::PermutationVector&>());
+    armnn::Optional<armnn::ConstTensor> optionalWeights = armnn::EmptyOptional();
+    armnn::Optional<armnn::ConstTensor> optionalBiases = armnn::EmptyOptional();
+    if(descriptor.m_ConstantWeights)
+    {
+        auto weightsTensor = CreateConstTensor(&tfLiteWeightsTensor,
+                                               weightsTensorInfo,
+                                               armnn::Optional<armnn::PermutationVector&>());
+        optionalWeights = armnn::Optional<armnn::ConstTensor>(weightsTensor);
 
-    armnn::IConnectableLayer* layer = nullptr;
-    if (biasEnabled)
-    {
-        const TfLiteTensor& tfLiteBiasTensor = tfLiteTensors[tfLiteNode->inputs->data[2]];
-        auto biasTensor = CreateConstTensor(&tfLiteBiasTensor,
-                                            biasTensorInfo,
-                                            armnn::Optional<armnn::PermutationVector&>());
-        layer = delegateData.m_Network->AddFullyConnectedLayer(descriptor,
-                                                               weightsTensor,
-                                                               armnn::Optional<armnn::ConstTensor>(biasTensor));
+        if (biasEnabled)
+        {
+            const TfLiteTensor& tfLiteBiasTensor = tfLiteTensors[tfLiteNode->inputs->data[2]];
+            auto biasTensor = CreateConstTensor(&tfLiteBiasTensor,
+                                                biasTensorInfo,
+                                                armnn::Optional<armnn::PermutationVector&>());
+            optionalBiases = armnn::Optional<armnn::ConstTensor>(biasTensor);
+        }
     }
-    else
-    {
-        layer = delegateData.m_Network->AddFullyConnectedLayer(descriptor,
-                                                               weightsTensor,
-                                                               armnn::EmptyOptional());
-    }
+
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddFullyConnectedLayer(descriptor,
+                                                                                     optionalWeights,
+                                                                                     optionalBiases);
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
@@ -215,6 +180,14 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
         // Connect
         delegateData.m_OutputSlotForNode[tfLiteNode->inputs->data[0]]->Connect(reshapeLayer->GetInputSlot(0));
         reshapeLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
+        if (!descriptor.m_ConstantWeights)
+        {
+            delegateData.m_OutputSlotForNode[tfLiteNode->inputs->data[1]]->Connect(layer->GetInputSlot(1));
+            if (biasEnabled)
+            {
+                delegateData.m_OutputSlotForNode[tfLiteNode->inputs->data[2]]->Connect(layer->GetInputSlot(2));
+            }
+        }
         delegateData.m_OutputSlotForNode[tfLiteNode->outputs->data[0]] = &outputSlot;
     }
 

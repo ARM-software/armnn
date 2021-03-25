@@ -104,6 +104,11 @@ public:
                                     const char* name = nullptr);
 
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                              const Optional<ConstTensor>& weights,
+                                              const Optional<ConstTensor>& biases,
+                                              const char* name = nullptr);
+
+    IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                               const ConstTensor& weights,
                                               const Optional<ConstTensor>& biases,
                                               const char* name = nullptr);
@@ -265,7 +270,7 @@ public:
 
 private:
     IConnectableLayer* AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                  const ConstTensor& weights,
+                                                  const Optional<ConstTensor>& weights,
                                                   const Optional<ConstTensor>& biases,
                                                   const char* name);
 

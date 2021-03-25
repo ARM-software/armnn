@@ -164,6 +164,9 @@ public:
 
     /// Returns the version of the Backend API
     static constexpr BackendVersion GetApiVersion() { return BackendVersion(1, 0); }
+
+    /// Returns true if backend support the capability false otherwise
+    virtual bool HasCapability(BackendCapability /*capabilityClass*/) const { return false; }
 };
 
 using IBackendInternalUniquePtr = std::unique_ptr<IBackendInternal>;

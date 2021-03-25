@@ -14,7 +14,7 @@ namespace armnnCaffeParser
 
 // CaffeParser version components
 #define CAFFE_PARSER_MAJOR_VERSION 24
-#define CAFFE_PARSER_MINOR_VERSION 0
+#define CAFFE_PARSER_MINOR_VERSION 1
 #define CAFFE_PARSER_PATCH_VERSION 0
 
 /// CAFFE_PARSER_VERSION: "X.Y.Z"

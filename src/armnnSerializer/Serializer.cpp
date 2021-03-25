@@ -1118,12 +1118,8 @@ void SerializerStrategy::SerializeQuantizeLayer(const armnn::IConnectableLayer *
 void SerializerStrategy::SerializeFullyConnectedLayer(const armnn::IConnectableLayer* layer,
                                                       const armnn::FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                       const std::vector<armnn::ConstTensor>& constants,
-                                                      const char* name)
+                                                      const char*)
 {
-    IgnoreUnused(name);
-
-    const armnn::ConstTensor& weights = constants.at(0);
-
     // Create FlatBuffer BaseLayer
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_FullyConnected);
 
@@ -1131,17 +1127,23 @@ void SerializerStrategy::SerializeFullyConnectedLayer(const armnn::IConnectableL
     auto flatBufferDescriptor =
         serializer::CreateFullyConnectedDescriptor(m_flatBufferBuilder,
                                                    fullyConnectedDescriptor.m_BiasEnabled,
-                                                   fullyConnectedDescriptor.m_TransposeWeightMatrix);
+                                                   fullyConnectedDescriptor.m_TransposeWeightMatrix,
+                                                   fullyConnectedDescriptor.m_ConstantWeights);
 
     // Create FlatBuffer weights data
-    auto flatBufferWeights = CreateConstTensorInfo(weights);
-
+    flatbuffers::Offset<serializer::ConstTensor> flatBufferWeights;
     // Create FlatBuffer bias data
     flatbuffers::Offset<serializer::ConstTensor> flatBufferBiases;
-    if (fullyConnectedDescriptor.m_BiasEnabled)
+    if (fullyConnectedDescriptor.m_ConstantWeights && !constants.empty())
     {
-        armnn::ConstTensor biases = constants.at(1);
-        flatBufferBiases = CreateConstTensorInfo(biases);
+        armnn::ConstTensor weights = constants.at(0);
+        flatBufferWeights = CreateConstTensorInfo(weights);
+
+        if (fullyConnectedDescriptor.m_BiasEnabled)
+        {
+            armnn::ConstTensor biases = constants.at(1);
+            flatBufferBiases = CreateConstTensorInfo(biases);
+        }
     }
 
     // Create FlatBuffer FullyConnectedLayer

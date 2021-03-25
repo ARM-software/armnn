@@ -9,6 +9,7 @@
 #include <armnn/Types.hpp>
 #include <armnn/LayerSupport.hpp>
 #include <armnn/ILayerSupport.hpp>
+#include <armnn/BackendHelper.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnn/utility/TransformIterator.hpp>
@@ -63,7 +64,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
 
     auto backendFactory = backendRegistry.GetFactory(backendId);
     auto backendObject = backendFactory();
-    auto layerSupportObject = backendObject->GetLayerSupport(modelOptions);
+    auto layerSupportObject = LayerSupportHandle(backendObject->GetLayerSupport(modelOptions), backendId);
 
     switch(layer.GetType())
     {
@@ -72,7 +73,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             auto cLayer = PolymorphicDowncast<const ActivationLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsActivationSupported(
+            result = layerSupportObject.IsActivationSupported(
                                            OverrideDataType(input, dataType),
                                            OverrideDataType(output, dataType),
                                            cLayer->GetParameters(),
@@ -84,7 +85,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsAdditionSupported(
+            result = layerSupportObject.IsAdditionSupported(
                                         OverrideDataType(input0, dataType),
                                         OverrideDataType(input1, dataType),
                                         OverrideDataType(output, dataType),
@@ -98,7 +99,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
 
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsArgMinMaxSupported(
+            result = layerSupportObject.IsArgMinMaxSupported(
                     OverrideDataType(input, dataType),
                     OverrideDataType(output, DataType::Signed32),
                     descriptor,
@@ -114,7 +115,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& var = cLayer->m_Variance->GetTensorInfo();
             const TensorInfo& beta = cLayer->m_Beta->GetTensorInfo();
             const TensorInfo& gamma = cLayer->m_Gamma->GetTensorInfo();
-            result = layerSupportObject->IsBatchNormalizationSupported(
+            result = layerSupportObject.IsBatchNormalizationSupported(
                                                    OverrideDataType(input, dataType),
                                                    OverrideDataType(output, dataType),
                                                    OverrideDataType(mean, dataType),
@@ -131,10 +132,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             auto cLayer = PolymorphicDowncast<const BatchToSpaceNdLayer*>(&layer);
 
-            result = layerSupportObject->IsBatchToSpaceNdSupported(OverrideDataType(input, dataType),
-                                                                   OverrideDataType(output, dataType),
-                                                                   cLayer->GetParameters(),
-                                                                   reason);
+            result = layerSupportObject.IsBatchToSpaceNdSupported(OverrideDataType(input, dataType),
+                                                                  OverrideDataType(output, dataType),
+                                                                  cLayer->GetParameters(),
+                                                                  reason);
             break;
         }
         case LayerType::Comparison:
@@ -145,45 +146,45 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsComparisonSupported(OverrideDataType(input0, dataType),
-                                                               OverrideDataType(input1, dataType),
-                                                               OverrideDataType(output, DataType::Boolean),
-                                                               cLayer->GetParameters(),
-                                                               reason);
+            result = layerSupportObject.IsComparisonSupported(OverrideDataType(input0, dataType),
+                                                              OverrideDataType(input1, dataType),
+                                                              OverrideDataType(output, DataType::Boolean),
+                                                              cLayer->GetParameters(),
+                                                              reason);
             break;
         }
         case LayerType::Constant:
         {
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsConstantSupported(OverrideDataType(output, dataType), reason);
+            result = layerSupportObject.IsConstantSupported(OverrideDataType(output, dataType), reason);
             break;
         }
         case LayerType::ConvertBf16ToFp32:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsConvertBf16ToFp32Supported(input, output, reason);
+            result = layerSupportObject.IsConvertBf16ToFp32Supported(input, output, reason);
             break;
         }
         case LayerType::ConvertFp16ToFp32:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsConvertFp16ToFp32Supported(input, output, reason);
+            result = layerSupportObject.IsConvertFp16ToFp32Supported(input, output, reason);
             break;
         }
         case LayerType::ConvertFp32ToBf16:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsConvertFp32ToBf16Supported(input, output, reason);
+            result = layerSupportObject.IsConvertFp32ToBf16Supported(input, output, reason);
             break;
         }
         case LayerType::ConvertFp32ToFp16:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsConvertFp32ToFp16Supported(input, output, reason);
+            result = layerSupportObject.IsConvertFp32ToFp16Supported(input, output, reason);
             break;
         }
         case LayerType::Convolution2d:
@@ -205,7 +206,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                     OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType));
             }
 
-            result = layerSupportObject->IsConvolution2dSupported(
+            result = layerSupportObject.IsConvolution2dSupported(
                                               input,
                                               output,
                                               descriptor,
@@ -219,7 +220,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsDebugSupported(OverrideDataType(input, dataType),
+            result = layerSupportObject.IsDebugSupported(OverrideDataType(input, dataType),
                                                           OverrideDataType(output, dataType),
                                                           reason);
             break;
@@ -231,7 +232,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsDepthToSpaceSupported(OverrideDataType(input, dataType),
+            result = layerSupportObject.IsDepthToSpaceSupported(OverrideDataType(input, dataType),
                                                                  OverrideDataType(output, dataType),
                                                                  cLayer->GetParameters(),
                                                                  reason);
@@ -255,7 +256,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                     OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType));
             }
 
-            result = layerSupportObject->IsDepthwiseConvolutionSupported(
+            result = layerSupportObject.IsDepthwiseConvolutionSupported(
                                                      input,
                                                      output,
                                                      descriptor,
@@ -269,9 +270,9 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsDequantizeSupported(input,
-                                                               OverrideDataType(output, dataType),
-                                                               reason);
+            result = layerSupportObject.IsDequantizeSupported(input,
+                                                              OverrideDataType(output, dataType),
+                                                              reason);
             break;
         }
         case LayerType::DetectionPostProcess:
@@ -287,15 +288,15 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& numDetections = layer.GetOutputSlot(3).GetTensorInfo();
 
             const DetectionPostProcessDescriptor& descriptor = cLayer->GetParameters();
-            result = layerSupportObject->IsDetectionPostProcessSupported(boxEncodings,
-                                                                         scores,
-                                                                         anchors,
-                                                                         detectionBoxes,
-                                                                         detectionClasses,
-                                                                         detectionScores,
-                                                                         numDetections,
-                                                                         descriptor,
-                                                                         reason);
+            result = layerSupportObject.IsDetectionPostProcessSupported(boxEncodings,
+                                                                        scores,
+                                                                        anchors,
+                                                                        detectionBoxes,
+                                                                        detectionClasses,
+                                                                        detectionScores,
+                                                                        numDetections,
+                                                                        descriptor,
+                                                                        reason);
             break;
         }
         case LayerType::ElementwiseUnary:
@@ -305,10 +306,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsElementwiseUnarySupported(OverrideDataType(input, dataType),
-                                                                     OverrideDataType(output, dataType),
-                                                                     cLayer->GetParameters(),
-                                                                     reason);
+            result = layerSupportObject.IsElementwiseUnarySupported(OverrideDataType(input, dataType),
+                                                                    OverrideDataType(output, dataType),
+                                                                    cLayer->GetParameters(),
+                                                                    reason);
             break;
         }
         case LayerType::Fill:
@@ -318,7 +319,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             const FillDescriptor& descriptor = cLayer->GetParameters();
 
-            result = layerSupportObject->IsFillSupported(
+            result = layerSupportObject.IsFillSupported(
                 OverrideDataType(input, dataType),
                 OverrideDataType(output, dataType),
                 descriptor,
@@ -329,18 +330,18 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
         {
             auto cLayer = PolymorphicDowncast<const FakeQuantizationLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            result = layerSupportObject->IsFakeQuantizationSupported(OverrideDataType(input, dataType),
-                                                                     cLayer->GetParameters(),
-                                                                     reason);
+            result = layerSupportObject.IsFakeQuantizationSupported(OverrideDataType(input, dataType),
+                                                                    cLayer->GetParameters(),
+                                                                    reason);
             break;
         }
         case LayerType::Floor:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsFloorSupported(OverrideDataType(input, dataType),
-                                                          OverrideDataType(output, dataType),
-                                                          reason);
+            result = layerSupportObject.IsFloorSupported(OverrideDataType(input, dataType),
+                                                         OverrideDataType(output, dataType),
+                                                         reason);
             break;
         }
         case LayerType::FullyConnected:
@@ -348,21 +349,43 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             auto cLayer = PolymorphicDowncast<const FullyConnectedLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            ARMNN_ASSERT(cLayer->m_Weight.get() != nullptr);
+
+            const FullyConnectedDescriptor& descriptor = cLayer->GetParameters();
+            TensorInfo weightsInfo;
+            const TensorInfo* weightsInfoPtr = nullptr;
+
+            if (descriptor.m_ConstantWeights)
+            {
+                ARMNN_ASSERT(cLayer->m_Weight.get() != nullptr);
+                weightsInfo = OverrideDataType(cLayer->m_Weight->GetTensorInfo(), dataType);
+            }
+            else
+            {
+                weightsInfo = OverrideDataType(layer.GetInputSlot(1).GetConnection()->GetTensorInfo(), dataType);
+
+            }
+            weightsInfoPtr = &weightsInfo;
 
             TensorInfo biasInfo;
-            const TensorInfo * biasInfoPtr = nullptr;
+            const TensorInfo* biasInfoPtr = nullptr;
             static const TensorInfo dummyBFloat16Bias(TensorShape({1,1,1,1}), DataType::BFloat16);
             static const TensorInfo dummyFloat16Bias(TensorShape({1,1,1,1}), DataType::Float16);
             static const TensorInfo dummyFloat32Bias(TensorShape({1,1,1,1}), DataType::Float32);
             static const TensorInfo dummyQA8Bias(TensorShape({1,1,1,1}), DataType::Signed32);
 
-            const FullyConnectedDescriptor& descriptor = cLayer->GetParameters();
             if (descriptor.m_BiasEnabled)
             {
-                ARMNN_ASSERT(cLayer->m_Bias.get() != nullptr);
-                biasInfo = OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType));
-                biasInfoPtr = &biasInfo;
+                if(descriptor.m_ConstantWeights)
+                {
+                    ARMNN_ASSERT(cLayer->m_Bias.get() != nullptr);
+                    biasInfo = OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType));
+                    biasInfoPtr = &biasInfo;
+                }
+                else
+                {
+                    biasInfo = OverrideDataType(layer.GetInputSlot(2).GetConnection()->GetTensorInfo(), dataType);
+                    biasInfoPtr = &biasInfo;
+                }
             }
             else
             {
@@ -398,11 +421,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                     }
                 }
             }
-
-            result = layerSupportObject->IsFullyConnectedSupported(
+            result = layerSupportObject.IsFullyConnectedSupported(
                                                OverrideDataType(input, dataType),
                                                OverrideDataType(output, dataType),
-                                               OverrideDataType(cLayer->m_Weight->GetTensorInfo(), dataType),
+                                               *weightsInfoPtr,
                                                *biasInfoPtr,
                                                descriptor,
                                                reason);
@@ -415,17 +437,17 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             auto cLayer = PolymorphicDowncast<const GatherLayer*>(&layer);
             const GatherDescriptor& descriptor = cLayer->GetParameters();
-            result = layerSupportObject->IsGatherSupported(OverrideDataType(input0, dataType),
-                                                           input1,
-                                                           OverrideDataType(output, dataType),
-                                                           descriptor,
-                                                           reason);
+            result = layerSupportObject.IsGatherSupported(OverrideDataType(input0, dataType),
+                                                          input1,
+                                                          OverrideDataType(output, dataType),
+                                                          descriptor,
+                                                          reason);
             break;
         }
         case LayerType::Input:
         {
             const TensorInfo& input = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsInputSupported(OverrideDataType(input, dataType), reason);
+            result = layerSupportObject.IsInputSupported(OverrideDataType(input, dataType), reason);
             break;
         }
         case LayerType::InstanceNormalization:
@@ -436,7 +458,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsInstanceNormalizationSupported(
+            result = layerSupportObject.IsInstanceNormalizationSupported(
                 OverrideDataType(input, dataType),
                 OverrideDataType(output, dataType),
                 descriptor,
@@ -451,7 +473,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsL2NormalizationSupported(
+            result = layerSupportObject.IsL2NormalizationSupported(
                                                 OverrideDataType(input, dataType),
                                                 OverrideDataType(output, dataType),
                                                 descriptor,
@@ -466,11 +488,11 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsLogicalBinarySupported(input0,
-                                                                  input1,
-                                                                  output,
-                                                                  cLayer->GetParameters(),
-                                                                  reason);
+            result = layerSupportObject.IsLogicalBinarySupported(input0,
+                                                                 input1,
+                                                                 output,
+                                                                 cLayer->GetParameters(),
+                                                                 reason);
             break;
         }
         case LayerType::LogSoftmax:
@@ -480,10 +502,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsLogSoftmaxSupported(OverrideDataType(input, dataType),
-                                                               OverrideDataType(output, dataType),
-                                                               cLayer->GetParameters(),
-                                                               reason);
+            result = layerSupportObject.IsLogSoftmaxSupported(OverrideDataType(input, dataType),
+                                                              OverrideDataType(output, dataType),
+                                                              cLayer->GetParameters(),
+                                                              reason);
             break;
         }
         case LayerType::Lstm:
@@ -617,7 +639,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                 paramsInfo.m_OutputLayerNormWeights = &optOutputLayerNormWeights;
             }
 
-            result = layerSupportObject->IsLstmSupported(
+            result = layerSupportObject.IsLstmSupported(
                                      input,
                                      outputStateIn,
                                      cellStateIn,
@@ -636,10 +658,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsMaximumSupported(OverrideDataType(input0, dataType),
-                                                            OverrideDataType(input1, dataType),
-                                                            OverrideDataType(output, dataType),
-                                                            reason);
+            result = layerSupportObject.IsMaximumSupported(OverrideDataType(input0, dataType),
+                                                           OverrideDataType(input1, dataType),
+                                                           OverrideDataType(output, dataType),
+                                                           reason);
             break;
         }
         case LayerType::MemCopy:
@@ -647,9 +669,9 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsMemCopySupported(OverrideDataType(input, dataType),
-                                                            OverrideDataType(output, dataType),
-                                                            reason);
+            result = layerSupportObject.IsMemCopySupported(OverrideDataType(input, dataType),
+                                                           OverrideDataType(output, dataType),
+                                                           reason);
             break;
         }
         case LayerType::MemImport:
@@ -657,9 +679,9 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsMemImportSupported(OverrideDataType(input, dataType),
-                                                              OverrideDataType(output, dataType),
-                                                              reason);
+            result = layerSupportObject.IsMemImportSupported(OverrideDataType(input, dataType),
+                                                             OverrideDataType(output, dataType),
+                                                             reason);
             break;
         }
         case LayerType::Merge:
@@ -668,10 +690,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsMergeSupported(OverrideDataType(input0, dataType),
-                                                          OverrideDataType(input1, dataType),
-                                                          OverrideDataType(output, dataType),
-                                                          reason);
+            result = layerSupportObject.IsMergeSupported(OverrideDataType(input0, dataType),
+                                                         OverrideDataType(input1, dataType),
+                                                         OverrideDataType(output, dataType),
+                                                         reason);
             break;
         }
         case LayerType::Concat:
@@ -699,7 +721,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
 
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsConcatSupported(inputPtrs, output, cLayer->GetParameters(), reason);
+            result = layerSupportObject.IsConcatSupported(inputPtrs, output, cLayer->GetParameters(), reason);
 
 
             break;
@@ -709,7 +731,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsMultiplicationSupported(
+            result = layerSupportObject.IsMultiplicationSupported(
                                                OverrideDataType(input0, dataType),
                                                OverrideDataType(input1, dataType),
                                                OverrideDataType(output, dataType),
@@ -721,16 +743,16 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             auto cLayer = PolymorphicDowncast<const NormalizationLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsNormalizationSupported(OverrideDataType(input, dataType),
-                                                                  OverrideDataType(output, dataType),
-                                                                  cLayer->GetParameters(),
-                                                                  reason);
+            result = layerSupportObject.IsNormalizationSupported(OverrideDataType(input, dataType),
+                                                                 OverrideDataType(output, dataType),
+                                                                 cLayer->GetParameters(),
+                                                                 reason);
             break;
         }
         case LayerType::Output:
         {
             const TensorInfo& output = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            result = layerSupportObject->IsOutputSupported(OverrideDataType(output, dataType), reason);
+            result = layerSupportObject.IsOutputSupported(OverrideDataType(output, dataType), reason);
             break;
         }
         case LayerType::Permute:
@@ -738,10 +760,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             auto cLayer = PolymorphicDowncast<const PermuteLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsPermuteSupported(OverrideDataType(input, dataType),
-                                                            OverrideDataType(output, dataType),
-                                                            cLayer->GetParameters(),
-                                                            reason);
+            result = layerSupportObject.IsPermuteSupported(OverrideDataType(input, dataType),
+                                                           OverrideDataType(output, dataType),
+                                                           cLayer->GetParameters(),
+                                                           reason);
             break;
         }
         case LayerType::Pad:
@@ -749,7 +771,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             auto cLayer = PolymorphicDowncast<const PadLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsPadSupported(
+            result = layerSupportObject.IsPadSupported(
                                     OverrideDataType(input, dataType),
                                     OverrideDataType(output, dataType),
                                     cLayer->GetParameters(),
@@ -761,26 +783,26 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             auto cLayer = PolymorphicDowncast<const Pooling2dLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsPooling2dSupported(OverrideDataType(input, dataType),
-                                                              OverrideDataType(output, dataType),
-                                                              cLayer->GetParameters(),
-                                                              reason);
+            result = layerSupportObject.IsPooling2dSupported(OverrideDataType(input, dataType),
+                                                             OverrideDataType(output, dataType),
+                                                             cLayer->GetParameters(),
+                                                             reason);
             break;
         }
         case LayerType::PreCompiled:
         {
             auto cLayer = PolymorphicDowncast<const PreCompiledLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            result = layerSupportObject->IsPreCompiledSupported(OverrideDataType(input, dataType),
-                                                                cLayer->GetParameters(),
-                                                                reason);
+            result = layerSupportObject.IsPreCompiledSupported(OverrideDataType(input, dataType),
+                                                               cLayer->GetParameters(),
+                                                               reason);
             break;
         }
         case LayerType::Quantize:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsQuantizeSupported(input, output, reason);
+            result = layerSupportObject.IsQuantizeSupported(input, output, reason);
             break;
         }
         case LayerType::QLstm:
@@ -865,15 +887,15 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                         &cLayer->m_LayerNormParameters.m_OutputLayerNormWeights->GetTensorInfo();
             }
 
-            result = layerSupportObject->IsQLstmSupported(input,
-                                                          previousOutputIn,
-                                                          previousCellStateIn,
-                                                          outputStateOut,
-                                                          cellStateOut,
-                                                          output,
-                                                          descriptor,
-                                                          paramsInfo,
-                                                          reason);
+            result = layerSupportObject.IsQLstmSupported(input,
+                                                         previousOutputIn,
+                                                         previousCellStateIn,
+                                                         outputStateOut,
+                                                         cellStateOut,
+                                                         output,
+                                                         descriptor,
+                                                         paramsInfo,
+                                                         reason);
             break;
         }
         case LayerType::QuantizedLstm:
@@ -919,13 +941,13 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             paramsInfo.m_OutputGateBias           =
                     &cLayer->m_QuantizedLstmParameters.m_OutputGateBias->GetTensorInfo();;
 
-            result = layerSupportObject->IsQuantizedLstmSupported(input,
-                                                                  previousCellStateIn,
-                                                                  previousOutputIn,
-                                                                  cellStateOut,
-                                                                  output,
-                                                                  paramsInfo,
-                                                                  reason);
+            result = layerSupportObject.IsQuantizedLstmSupported(input,
+                                                                 previousCellStateIn,
+                                                                 previousOutputIn,
+                                                                 cellStateOut,
+                                                                 output,
+                                                                 paramsInfo,
+                                                                 reason);
             break;
         }
         case LayerType::Division:
@@ -933,7 +955,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsDivisionSupported(
+            result = layerSupportObject.IsDivisionSupported(
                                          OverrideDataType(input0, dataType),
                                          OverrideDataType(input1, dataType),
                                          OverrideDataType(output, dataType),
@@ -944,9 +966,9 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsRankSupported(OverrideDataType(input, dataType),
-                                                         OverrideDataType(output, dataType),
-                                                         reason);
+            result = layerSupportObject.IsRankSupported(OverrideDataType(input, dataType),
+                                                        OverrideDataType(output, dataType),
+                                                        reason);
             break;
         }
         case LayerType::Reshape:
@@ -954,10 +976,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             auto cLayer = PolymorphicDowncast<const ReshapeLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsReshapeSupported(OverrideDataType(input, dataType),
-                                                            OverrideDataType(output, dataType),
-                                                            cLayer->GetParameters(),
-                                                            reason);
+            result = layerSupportObject.IsReshapeSupported(OverrideDataType(input, dataType),
+                                                           OverrideDataType(output, dataType),
+                                                           cLayer->GetParameters(),
+                                                           reason);
             break;
         }
         case LayerType::Resize:
@@ -965,10 +987,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             auto cLayer = PolymorphicDowncast<const ResizeLayer*>(&layer);
             const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsResizeSupported(OverrideDataType(input, dataType),
-                                                           OverrideDataType(output, dataType),
-                                                           cLayer->GetParameters(),
-                                                           reason);
+            result = layerSupportObject.IsResizeSupported(OverrideDataType(input, dataType),
+                                                          OverrideDataType(output, dataType),
+                                                          cLayer->GetParameters(),
+                                                          reason);
             break;
         }
         case LayerType::Slice:
@@ -978,10 +1000,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsSliceSupported(OverrideDataType(input, dataType),
-                                                          OverrideDataType(output, dataType),
-                                                          cLayer->GetParameters(),
-                                                          reason);
+            result = layerSupportObject.IsSliceSupported(OverrideDataType(input, dataType),
+                                                         OverrideDataType(output, dataType),
+                                                         cLayer->GetParameters(),
+                                                         reason);
             break;
         }
         case LayerType::Softmax:
@@ -989,10 +1011,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             auto cLayer = PolymorphicDowncast<const SoftmaxLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsSoftmaxSupported(OverrideDataType(input, dataType),
-                                                            OverrideDataType(output, dataType),
-                                                            cLayer->GetParameters(),
-                                                            reason);
+            result = layerSupportObject.IsSoftmaxSupported(OverrideDataType(input, dataType),
+                                                           OverrideDataType(output, dataType),
+                                                           cLayer->GetParameters(),
+                                                           reason);
             break;
         }
         case LayerType::SpaceToBatchNd:
@@ -1000,10 +1022,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             auto cLayer = PolymorphicDowncast<const SpaceToBatchNdLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsSpaceToBatchNdSupported(OverrideDataType(input, dataType),
-                                                                   OverrideDataType(output, dataType),
-                                                                   cLayer->GetParameters(),
-                                                                   reason);
+            result = layerSupportObject.IsSpaceToBatchNdSupported(OverrideDataType(input, dataType),
+                                                                  OverrideDataType(output, dataType),
+                                                                  cLayer->GetParameters(),
+                                                                  reason);
             break;
         }
         case LayerType::SpaceToDepth:
@@ -1013,10 +1035,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsSpaceToDepthSupported(OverrideDataType(input, dataType),
-                                                                 OverrideDataType(output, dataType),
-                                                                 cLayer->GetParameters(),
-                                                                 reason);
+            result = layerSupportObject.IsSpaceToDepthSupported(OverrideDataType(input, dataType),
+                                                                OverrideDataType(output, dataType),
+                                                                cLayer->GetParameters(),
+                                                                reason);
             break;
         }
         case LayerType::Splitter:
@@ -1035,10 +1057,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
 
             const std::vector<std::reference_wrapper<TensorInfo>> outputPtrs(outputs.begin(), outputs.end());
 
-            result = layerSupportObject->IsSplitterSupported(OverrideDataType(input, dataType),
-                                                             outputPtrs,
-                                                             cLayer->GetParameters(),
-                                                             reason);
+            result = layerSupportObject.IsSplitterSupported(OverrideDataType(input, dataType),
+                                                            outputPtrs,
+                                                            cLayer->GetParameters(),
+                                                            reason);
             break;
         }
         case LayerType::Stack:
@@ -1064,7 +1086,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
 
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsStackSupported(inputPtrs, output, cLayer->GetParameters(), reason);
+            result = layerSupportObject.IsStackSupported(inputPtrs, output, cLayer->GetParameters(), reason);
 
             break;
         }
@@ -1103,10 +1125,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             std::vector<const TensorInfo*> outputPtrs(beginPtrO, endPtrO);
 
 
-            result = layerSupportObject->IsStandInSupported(inputPtrs,
-                                                            outputPtrs,
-                                                            cLayer->GetParameters(),
-                                                            reason);
+            result = layerSupportObject.IsStandInSupported(inputPtrs,
+                                                           outputPtrs,
+                                                           cLayer->GetParameters(),
+                                                           reason);
             break;
         }
         case LayerType::StridedSlice:
@@ -1114,10 +1136,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             auto cLayer = PolymorphicDowncast<const StridedSliceLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsStridedSliceSupported(OverrideDataType(input, dataType),
-                                                                 OverrideDataType(output, dataType),
-                                                                 cLayer->GetParameters(),
-                                                                 reason);
+            result = layerSupportObject.IsStridedSliceSupported(OverrideDataType(input, dataType),
+                                                                OverrideDataType(output, dataType),
+                                                                cLayer->GetParameters(),
+                                                                reason);
             break;
         }
         case LayerType::Subtraction:
@@ -1125,7 +1147,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsSubtractionSupported(
+            result = layerSupportObject.IsSubtractionSupported(
                                             OverrideDataType(input0, dataType),
                                             OverrideDataType(input1, dataType),
                                             OverrideDataType(output, dataType),
@@ -1138,11 +1160,11 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output0 = layer.GetOutputSlot(0).GetTensorInfo();
             const TensorInfo& output1 = layer.GetOutputSlot(1).GetTensorInfo();
-            result = layerSupportObject->IsSwitchSupported(OverrideDataType(input0, dataType),
-                                                           OverrideDataType(input1, dataType),
-                                                           OverrideDataType(output0, dataType),
-                                                           OverrideDataType(output1, dataType),
-                                                           reason);
+            result = layerSupportObject.IsSwitchSupported(OverrideDataType(input0, dataType),
+                                                          OverrideDataType(input1, dataType),
+                                                          OverrideDataType(output0, dataType),
+                                                          OverrideDataType(output1, dataType),
+                                                          reason);
             break;
         }
         case LayerType::Mean:
@@ -1150,7 +1172,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             auto cLayer = PolymorphicDowncast<const MeanLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsMeanSupported(
+            result = layerSupportObject.IsMeanSupported(
                                      OverrideDataType(input, dataType),
                                      OverrideDataType(output, dataType),
                                      cLayer->GetParameters(),
@@ -1162,10 +1184,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsMinimumSupported(OverrideDataType(input0, dataType),
-                                                            OverrideDataType(input1, dataType),
-                                                            OverrideDataType(output, dataType),
-                                                            reason);
+            result = layerSupportObject.IsMinimumSupported(OverrideDataType(input0, dataType),
+                                                           OverrideDataType(input1, dataType),
+                                                           OverrideDataType(output, dataType),
+                                                           reason);
             break;
         }
         case LayerType::Prelu:
@@ -1173,10 +1195,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& alpha  = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsPreluSupported(OverrideDataType(input,  dataType),
-                                                          OverrideDataType(alpha,  dataType),
-                                                          OverrideDataType(output, dataType),
-                                                          reason);
+            result = layerSupportObject.IsPreluSupported(OverrideDataType(input,  dataType),
+                                                         OverrideDataType(alpha,  dataType),
+                                                         OverrideDataType(output, dataType),
+                                                         reason);
             break;
         }
         case LayerType::Transpose:
@@ -1184,10 +1206,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             auto cLayer = PolymorphicDowncast<const TransposeLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsTransposeSupported(OverrideDataType(input, dataType),
-                                                              OverrideDataType(output, dataType),
-                                                              cLayer->GetParameters(),
-                                                              reason);
+            result = layerSupportObject.IsTransposeSupported(OverrideDataType(input, dataType),
+                                                             OverrideDataType(output, dataType),
+                                                             cLayer->GetParameters(),
+                                                             reason);
             break;
         }
         case LayerType::TransposeConvolution2d:
@@ -1211,12 +1233,12 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             ARMNN_ASSERT(cLayer->m_Weight.get() != nullptr);
             const TensorInfo weights = OverrideDataType(cLayer->m_Weight->GetTensorInfo(), dataType);
 
-            result = layerSupportObject->IsTransposeConvolution2dSupported(input,
-                                                                           output,
-                                                                           descriptor,
-                                                                           weights,
-                                                                           biases,
-                                                                           reason);
+            result = layerSupportObject.IsTransposeConvolution2dSupported(input,
+                                                                          output,
+                                                                          descriptor,
+                                                                          weights,
+                                                                          biases,
+                                                                          reason);
 
             break;
         }
@@ -1226,10 +1248,10 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = layerSupportObject->IsReduceSupported(OverrideDataType(input, dataType),
-                                                           OverrideDataType(output, dataType),
-                                                           cLayer->GetParameters(),
-                                                           reason);
+            result = layerSupportObject.IsReduceSupported(OverrideDataType(input, dataType),
+                                                          OverrideDataType(output, dataType),
+                                                          cLayer->GetParameters(),
+                                                          reason);
             break;
         }
         default:

@@ -69,6 +69,16 @@ IBackendInternal::ILayerSupportSharedPtr RefBackend::GetLayerSupport() const
     return layerSupport;
 }
 
+bool RefBackend::HasCapability(BackendCapability capabilityClass) const
+{
+    auto search = backendCapabilities.find(capabilityClass);
+    if (search != backendCapabilities.end())
+    {
+        return true;
+    }
+    return false;
+}
+
 OptimizationViews RefBackend::OptimizeSubgraphView(const SubgraphView& subgraph) const
 {
     OptimizationViews optimizationViews;

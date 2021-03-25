@@ -15,24 +15,25 @@ namespace armnn
 {
 
 FullyConnectedLayer::FullyConnectedLayer(const FullyConnectedDescriptor& param, const char* name)
-    : LayerWithParameters(1, 1, LayerType::FullyConnected, param, name)
+    : LayerWithParameters(param.GetNumViews(), 1, LayerType::FullyConnected, param, name)
 {
 }
 
 std::unique_ptr<IWorkload> FullyConnectedLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     // on this level constant data should not be released..
-    ARMNN_ASSERT_MSG(m_Weight != nullptr, "FullyConnectedLayer: Weights data should not be null.");
-
     FullyConnectedQueueDescriptor descriptor;
-
-    descriptor.m_Weight = m_Weight.get();
-    if (m_Param.m_BiasEnabled)
+    if (m_Param.m_ConstantWeights)
     {
-        ARMNN_ASSERT_MSG(m_Bias != nullptr, "FullyConnectedLayer: Bias data should not be null.");
-        descriptor.m_Bias = m_Bias.get();
-    }
+        ARMNN_ASSERT_MSG(m_Weight != nullptr, "FullyConnectedLayer: Weights data should not be null.");
+        descriptor.m_Weight = m_Weight.get();
 
+        if (m_Param.m_BiasEnabled)
+        {
+            ARMNN_ASSERT_MSG(m_Bias != nullptr, "FullyConnectedLayer: Bias data should not be null.");
+            descriptor.m_Bias = m_Bias.get();
+        }
+    }
     SetAdditionalInfo(descriptor);
 
     return factory.CreateFullyConnected(descriptor, PrepInfoAndDesc(descriptor));
@@ -41,13 +42,15 @@ std::unique_ptr<IWorkload> FullyConnectedLayer::CreateWorkload(const IWorkloadFa
 FullyConnectedLayer* FullyConnectedLayer::Clone(Graph& graph) const
 {
     auto layer = CloneBase<FullyConnectedLayer>(graph, m_Param, GetName());
-
-    layer->m_Weight = m_Weight ? std::make_unique<ScopedCpuTensorHandle>(*m_Weight) : nullptr;
-    if (layer->m_Param.m_BiasEnabled)
+    if (m_Param.m_ConstantWeights)
     {
-        layer->m_Bias = m_Bias ? std::make_unique<ScopedCpuTensorHandle>(*m_Bias) : nullptr;
-    }
+        layer->m_Weight = m_Weight ? std::make_unique<ScopedCpuTensorHandle>(*m_Weight) : nullptr;
 
+        if (layer->m_Param.m_BiasEnabled)
+        {
+            layer->m_Bias = m_Bias ? std::make_unique<ScopedCpuTensorHandle>(*m_Bias) : nullptr;
+        }
+    }
     return std::move(layer);
 }
 
@@ -70,11 +73,20 @@ void FullyConnectedLayer::ValidateTensorShapesFromInputs()
 
     VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
-    // check if we m_Weight data is not nullptr
-    ARMNN_ASSERT_MSG(m_Weight != nullptr, "FullyConnectedLayer: Weights data should not be null.");
+    std::vector<TensorShape> inferredShapes;
+    if (m_Param.m_ConstantWeights)
+    {
+        // check if m_Weight data is not nullptr
+        ARMNN_ASSERT_MSG(m_Weight != nullptr, "FullyConnectedLayer: Weights data should not be null.");
 
-    auto inferredShapes = InferOutputShapes({GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
-                                             m_Weight->GetTensorInfo().GetShape() });
+        inferredShapes = InferOutputShapes({GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
+                                            m_Weight->GetTensorInfo().GetShape()});
+    }
+    else
+    {
+        inferredShapes = InferOutputShapes({GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
+                                            GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape()});
+    }
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
     ARMNN_ASSERT(inferredShapes[0].GetDimensionality() == Dimensionality::Specified);
@@ -89,27 +101,37 @@ Layer::ConstantTensors FullyConnectedLayer::GetConstantTensorsByRef()
 
 void FullyConnectedLayer::Accept(ILayerVisitor& visitor) const
 {
-    ConstTensor weightsTensor(m_Weight->GetTensorInfo(), m_Weight->Map(true));
+    Optional<ConstTensor> optionalWeightsTensor = EmptyOptional();
     Optional<ConstTensor> optionalBiasTensor = EmptyOptional();
-
-    if (GetParameters().m_BiasEnabled)
+    if(GetParameters().m_ConstantWeights)
     {
-        ConstTensor biasTensor(m_Bias->GetTensorInfo(), m_Bias->GetConstTensor<void>());
-        optionalBiasTensor = Optional<ConstTensor>(biasTensor);
-    }
+        ConstTensor weightsTensor(m_Weight->GetTensorInfo(), m_Weight->GetConstTensor<void>());
+        optionalWeightsTensor = Optional<ConstTensor>(weightsTensor);
 
-    visitor.VisitFullyConnectedLayer(this, GetParameters(), weightsTensor, optionalBiasTensor, GetName());
+        if (GetParameters().m_BiasEnabled)
+        {
+            ConstTensor biasTensor(m_Bias->GetTensorInfo(), m_Bias->GetConstTensor<void>());
+            optionalBiasTensor = Optional<ConstTensor>(biasTensor);
+        }
+    }
+    visitor.VisitFullyConnectedLayer(this,
+                                     GetParameters(),
+                                     optionalWeightsTensor.value(),
+                                     optionalBiasTensor,
+                                     GetName());
 }
 
 void FullyConnectedLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    std::vector<armnn::ConstTensor> constTensors { {m_Weight->GetTensorInfo(), m_Weight->Map(true)} };
-
-    if (GetParameters().m_BiasEnabled)
+    std::vector <armnn::ConstTensor> constTensors;
+    if(GetParameters().m_ConstantWeights)
     {
-        constTensors.emplace_back(ConstTensor(m_Bias->GetTensorInfo(), m_Bias->Map(true)));
+        constTensors.emplace_back(ConstTensor(m_Weight->GetTensorInfo(), m_Weight->Map(true)));
+        if (GetParameters().m_BiasEnabled)
+        {
+            constTensors.emplace_back(ConstTensor(m_Bias->GetTensorInfo(), m_Bias->Map(true)));
+        }
     }
-
     strategy.ExecuteStrategy(this, GetParameters(), constTensors, GetName());
 }
 

@@ -7,6 +7,7 @@
 
 #include <cl/ClBackend.hpp>
 #include <neon/NeonBackend.hpp>
+#include <reference/RefBackend.hpp>
 
 #include <Network.hpp>
 
@@ -112,6 +113,21 @@ BOOST_AUTO_TEST_CASE(Neon_Cl_DirectCompatibility_Test)
         }
     });
     BOOST_TEST(importCount == 0);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(BackendCapability)
+
+BOOST_AUTO_TEST_CASE(Backends_Capability_Test)
+{
+    auto neonBackend = std::make_unique<NeonBackend>();
+    auto clBackend   = std::make_unique<ClBackend>();
+    auto refBackend  = std::make_unique<RefBackend>();
+
+    BOOST_CHECK(!neonBackend->HasCapability(armnn::BackendCapability::NonConstWeights));
+    BOOST_CHECK(!clBackend->HasCapability(armnn::BackendCapability::NonConstWeights));
+    BOOST_CHECK(refBackend->HasCapability(armnn::BackendCapability::NonConstWeights));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

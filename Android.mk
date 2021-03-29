@@ -108,6 +108,7 @@ LOCAL_SRC_FILES := \
         profiling/server/src/timelineDecoder/TimelineCaptureCommandHandler.cpp \
         profiling/server/src/timelineDecoder/TimelineDecoder.cpp \
         profiling/server/src/timelineDecoder/TimelineDirectoryCaptureCommandHandler.cpp \
+        src/armnn/AsyncNetwork.cpp \
         src/armnn/BackendHelper.cpp \
         src/armnn/BackendRegistry.cpp \
         src/armnn/Descriptors.cpp \
@@ -134,6 +135,7 @@ LOCAL_SRC_FILES := \
         src/armnn/TypesUtils.cpp \
         src/armnn/Utils.cpp \
         src/armnn/WallClockTimer.cpp \
+        src/armnn/WorkingMemHandle.cpp \
         src/armnnUtils/DataLayoutIndexed.cpp \
         src/armnnUtils/DotSerializer.cpp \
         src/armnnUtils/FloatingPointConverter.cpp \

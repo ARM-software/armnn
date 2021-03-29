@@ -64,6 +64,14 @@ Status IRuntime::LoadNetwork(NetworkId& networkIdOut,
     return pRuntimeImpl->LoadNetwork(networkIdOut, std::move(network), errorMessage, networkProperties);
 }
 
+std::unique_ptr<IAsyncNetwork> IRuntime::CreateAsyncNetwork(NetworkId& networkIdOut,
+                                                            IOptimizedNetworkPtr network,
+                                                            std::string& errorMessage,
+                                                            const INetworkProperties& networkProperties)
+{
+    return pRuntimeImpl->CreateAsyncNetwork(networkIdOut, std::move(network), errorMessage, networkProperties);
+}
+
 TensorInfo IRuntime::GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const
 {
     return pRuntimeImpl->GetInputTensorInfo(networkId, layerId);
@@ -163,6 +171,43 @@ Status RuntimeImpl::LoadNetwork(NetworkId& networkIdOut,
     }
 
     return Status::Success;
+}
+
+std::unique_ptr<IAsyncNetwork> RuntimeImpl::CreateAsyncNetwork(NetworkId& networkIdOut,
+                                                               IOptimizedNetworkPtr network,
+                                                               std::string&,
+                                                               const INetworkProperties& networkProperties)
+{
+    IOptimizedNetwork* rawNetwork = network.release();
+
+    networkIdOut = GenerateNetworkId();
+
+    for (auto&& context : m_BackendContexts)
+    {
+        context.second->BeforeLoadNetwork(networkIdOut);
+    }
+
+    unique_ptr<AsyncNetwork> asyncNetwork = std::make_unique<AsyncNetwork>(
+            std::unique_ptr<IOptimizedNetwork>(rawNetwork),
+            networkProperties,
+            m_ProfilingService);
+
+    if (!asyncNetwork)
+    {
+        return nullptr;
+    }
+
+    for (auto&& context : m_BackendContexts)
+    {
+        context.second->AfterLoadNetwork(networkIdOut);
+    }
+
+    if (m_ProfilingService.IsProfilingEnabled())
+    {
+        m_ProfilingService.IncrementCounterValue(armnn::profiling::NETWORK_LOADS);
+    }
+
+    return asyncNetwork;
 }
 
 Status RuntimeImpl::UnloadNetwork(NetworkId networkId)

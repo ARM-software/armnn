@@ -242,12 +242,14 @@ list(APPEND armnn_sources
     include/armnn/Descriptors.hpp
     include/armnn/DescriptorsFwd.hpp
     include/armnn/Exceptions.hpp
+    include/armnn/IAsyncNetwork.hpp
     include/armnn/ILayerSupport.hpp
     include/armnn/ILayerVisitor.hpp
     include/armnn/INetwork.hpp
     include/armnn/IProfiler.hpp
     include/armnn/IRuntime.hpp
     include/armnn/IStrategy.hpp
+    include/armnn/IWorkingMemHandle.hpp
     include/armnn/LayerSupport.hpp
     include/armnn/LayerVisitorBase.hpp
     include/armnn/Logging.hpp
@@ -406,6 +408,8 @@ list(APPEND armnn_sources
     src/armnn/layers/TransposeLayer.cpp
     src/armnn/layers/UnmapLayer.cpp
     src/armnn/layers/UnmapLayer.hpp
+    src/armnn/AsyncNetwork.cpp
+    src/armnn/AsyncNetwork.hpp
     src/armnn/BackendRegistry.cpp
     src/armnn/BackendSettings.hpp
     src/armnn/BackendHelper.cpp
@@ -477,6 +481,9 @@ list(APPEND armnn_sources
     src/armnn/Utils.cpp
     src/armnn/WallClockTimer.cpp
     src/armnn/WallClockTimer.hpp
+    src/armnn/WorkingMemDescriptor.hpp
+    src/armnn/WorkingMemHandle.cpp
+    src/armnn/WorkingMemHandle.hpp
     src/armnn/optimizations/AddBroadcastReshapeLayer.hpp
     src/armnn/optimizations/AddDebug.hpp
     src/armnn/optimizations/All.hpp

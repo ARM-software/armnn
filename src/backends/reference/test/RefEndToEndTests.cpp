@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -25,6 +25,7 @@
 #include <backendsCommon/test/ResizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
+#include <backendsCommon/test/StridedSliceAsyncEndToEndTest.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -1336,6 +1337,10 @@ BOOST_AUTO_TEST_CASE(RefStridedSliceInvalidSliceEndToEndTest)
     StridedSliceInvalidSliceEndToEndTest(defaultBackends);
 }
 
+BOOST_AUTO_TEST_CASE(RefAsyncFP32StridedSlicedEndToEndTest)
+{
+    armnn::experimental::StridedSlicedEndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
 #endif
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BackendOptions.hpp"
+#include "IAsyncNetwork.hpp"
 #include "INetwork.hpp"
 #include "IProfiler.hpp"
 #include "Tensor.hpp"
@@ -36,6 +37,8 @@ struct INetworkProperties
 
     virtual ~INetworkProperties() {}
 };
+
+using namespace armnn::experimental;
 
 class IRuntime
 {
@@ -141,6 +144,20 @@ public:
                        IOptimizedNetworkPtr network,
                        std::string& errorMessage,
                        const INetworkProperties& networkProperties);
+
+    /// This is an experimental function.
+    /// Creates an executable network. This network is thread safe allowing for multiple networks to be
+    /// loaded simultaneously via different threads.
+    /// Note that the network is never registered with the runtime so does not need to be 'Unloaded'.
+    /// @param [out] networkIdOut Unique identifier for the network is returned in this reference.
+    /// @param [in] network Complete network to load into the IRuntime.
+    /// @param [out] errorMessage Error message if there were any errors.
+    /// @param [out] networkProperties the INetworkProperties that govern how the network should operate.
+    /// @return The IAsyncNetwork
+    std::unique_ptr<IAsyncNetwork> CreateAsyncNetwork(NetworkId& networkIdOut,
+                                                      IOptimizedNetworkPtr network,
+                                                      std::string& errorMessage,
+                                                      const INetworkProperties& networkProperties);
 
     TensorInfo GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
     TensorInfo GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;

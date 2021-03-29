@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -19,6 +19,7 @@ class SyncMemGenericWorkload : public BaseWorkload<MemSyncQueueDescriptor>
 public:
     SyncMemGenericWorkload(const MemSyncQueueDescriptor& descriptor, const WorkloadInfo& info);
     void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& descriptor) override;
 
 private:
     ITensorHandle* m_TensorHandle;

@@ -51,6 +51,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     SpaceToDepthEndToEndTestImpl.cpp
     SpaceToDepthEndToEndTestImpl.hpp
     SplitterEndToEndTestImpl.hpp
+    StridedSliceAsyncEndToEndTest.hpp
     TensorCopyUtils.cpp
     TensorCopyUtils.hpp
     WorkloadFactoryHelper.hpp

@@ -1,11 +1,12 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
 
 #include "WorkloadData.hpp"
 #include "WorkloadInfo.hpp"
+#include "WorkingMemDescriptor.hpp"
 
 #include <armnn/backends/IWorkload.hpp>
 #include <Profiling.hpp>
@@ -35,6 +36,8 @@ public:
     {
         m_Data.Validate(info);
     }
+
+    void ExecuteAsync(WorkingMemDescriptor&) override {};
 
     void PostAllocationConfigure() override {}
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -40,7 +40,7 @@ void GatherTensorHandlePairs(const MemCopyQueueDescriptor& descriptor,
 
 
 CopyMemGenericWorkload::CopyMemGenericWorkload(const MemCopyQueueDescriptor& descriptor,
-                                                         const WorkloadInfo& info)
+                                               const WorkloadInfo& info)
     : BaseWorkload<MemCopyQueueDescriptor>(descriptor, info)
 {
     GatherTensorHandlePairs(descriptor, m_TensorHandlePairs);
@@ -56,6 +56,23 @@ void CopyMemGenericWorkload::Execute() const
         };
 
     for (const auto& pair : m_TensorHandlePairs)
+    {
+        CopyTensorContentsGeneric(pair.first, pair.second, copyFunc);
+    }
+}
+
+void CopyMemGenericWorkload::ExecuteAsync(WorkingMemDescriptor& descriptor)
+{
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "CopyMemGeneric_Execute_WorkingMemDescriptor");
+    std::vector<TensorHandlePair> tensorHandlePairs;
+    GatherTensorHandlePairs(descriptor, tensorHandlePairs);
+
+    auto copyFunc = [](void* dst, const void* src, size_t size)
+    {
+        memcpy(dst, src, size);
+    };
+
+    for (const auto& pair : tensorHandlePairs)
     {
         CopyTensorContentsGeneric(pair.first, pair.second, copyFunc);
     }

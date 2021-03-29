@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include "AsyncNetwork.hpp"
 #include "LoadedNetwork.hpp"
 #include "DeviceSpec.hpp"
 
@@ -54,6 +55,13 @@ public:
 
     TensorInfo GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
     TensorInfo GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
+
+    // Create Aysnchronous Network from the IOptimizedNetowrkPtr
+    std::unique_ptr<IAsyncNetwork> CreateAsyncNetwork(NetworkId& networkIdOut,
+                                                      IOptimizedNetworkPtr network,
+                                                      std::string& errorMessage,
+                                                      const INetworkProperties& networkProperties);
+
 
     // Evaluates network using input in inputTensors, outputs filled into outputTensors.
     Status EnqueueWorkload(NetworkId networkId,

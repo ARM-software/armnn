@@ -704,6 +704,12 @@ protected:
     std::unique_ptr<NetworkImpl> pNetworkImpl;
 };
 
+namespace experimental
+{
+class AsyncNetwork;
+class WorkingMemHandle;
+}
+
 struct BackendSettings;
 struct OptimizationResult;
 class OptimizedNetworkImpl;
@@ -723,6 +729,10 @@ public:
 
 protected:
     friend class LoadedNetwork;
+
+    friend class experimental::AsyncNetwork;
+    friend class experimental::WorkingMemHandle;
+
     friend Graph& GetGraphForTesting(IOptimizedNetwork* optNetPtr);
     friend ModelOptions& GetModelOptionsForTesting(IOptimizedNetwork* optNetPtr);
     friend IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,

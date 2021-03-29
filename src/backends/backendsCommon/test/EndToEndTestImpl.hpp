@@ -4,6 +4,8 @@
 //
 #pragma once
 
+#include "CommonTestUtils.hpp"
+
 #include <armnn/Descriptors.hpp>
 #include <armnn/INetwork.hpp>
 #include <armnn/IRuntime.hpp>
@@ -103,23 +105,6 @@ inline bool ConstantUsageUint8Test(const std::vector<BackendId>& backends)
         armnnUtils::QuantizedVector<uint8_t>({ 6.f, 5.f, 4.f, 3.f, 2.f, 1.f }, scale, offset), // Const input.
         armnnUtils::QuantizedVector<uint8_t>({ 7.f, 7.f, 7.f, 7.f, 7.f, 7.f }, scale, offset)  // Expected output.
     );
-}
-
-// Utility template for comparing tensor elements
-template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
-bool Compare(T a, T b, float tolerance = 0.000001f)
-{
-    if (ArmnnType == DataType::Boolean)
-    {
-        // NOTE: Boolean is represented as uint8_t (with zero equals
-        // false and everything else equals true), therefore values
-        // need to be casted to bool before comparing them
-        return static_cast<bool>(a) == static_cast<bool>(b);
-    }
-
-    // NOTE: All other types can be cast to float and compared with
-    // a certain level of tolerance
-    return std::fabs(static_cast<float>(a) - static_cast<float>(b)) <= tolerance;
 }
 
 // Utility function to find the number of instances of a substring within a string.

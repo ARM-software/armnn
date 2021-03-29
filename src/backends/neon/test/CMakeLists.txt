@@ -38,7 +38,6 @@ if ( INCLUDE_NDK_BUG_TESTS STREQUAL "ON" )
    list(APPEND armnnNeonBackendUnitTests_sources
         NeonLayerTests_NDK_Bug.cpp
         )
-    message ( "Added NeonLayerTests_NDK_Bug.cpp" )
 else()
 
 endif()

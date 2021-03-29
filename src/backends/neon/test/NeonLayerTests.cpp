@@ -11,8 +11,6 @@
 #include <neon/NeonLayerSupport.hpp>
 #include <neon/NeonWorkloadFactory.hpp>
 
-#include <reference/RefWorkloadFactory.hpp>
-
 #include <backendsCommon/test/ActivationFixture.hpp>
 #include <backendsCommon/test/LayerTests.hpp>
 

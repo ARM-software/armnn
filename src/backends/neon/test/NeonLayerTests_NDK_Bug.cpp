@@ -5,18 +5,8 @@
 
 #include "NeonWorkloadFactoryHelper.hpp"
 
-#include <test/TensorHelpers.hpp>
-#include <test/UnitTests.hpp>
-
-#include <neon/NeonLayerSupport.hpp>
 #include <neon/NeonWorkloadFactory.hpp>
-
-#include <reference/RefWorkloadFactory.hpp>
-
-#include <backendsCommon/test/ActivationFixture.hpp>
-#include <backendsCommon/test/LayerTests.hpp>
-
-#include <boost/test/unit_test.hpp>
+#include <test/UnitTests.hpp>
 
 BOOST_AUTO_TEST_SUITE(Compute_ArmComputeNeon)
 
@@ -42,13 +32,16 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(L2Normalization1dNhwc, L2Normalization1dTest, Data
 ARMNN_AUTO_TEST_CASE_WITH_THF(LstmLayerFloat32NoCifgWithPeepholeWithProjectionWithLayerNorm,
                               LstmLayerFloat32NoCifgWithPeepholeWithProjectionWithLayerNormTest)
 
-ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareSoftmaxBeta1WithReference, CompareSoftmaxTest, 1.0f)
-ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareSoftmaxBeta2WithReference, CompareSoftmaxTest, 2.0f)
-
 // ReduceSum
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceSumFloat32, ReduceSumSimpleTest<DataType::Float32>)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceSumSingleAxisFloat32_3, ReduceSumSingleAxisTest3<DataType::Float32>)
 
+#if defined(ARMNNREF_ENABLED)
+
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareSoftmaxBeta1WithReference, CompareSoftmaxTest, 1.0f)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareSoftmaxBeta2WithReference, CompareSoftmaxTest, 2.0f)
+
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()

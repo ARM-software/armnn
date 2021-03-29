@@ -119,15 +119,34 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(BackendCapability)
 
-BOOST_AUTO_TEST_CASE(Backends_Capability_Test)
-{
-    auto neonBackend = std::make_unique<NeonBackend>();
-    auto clBackend   = std::make_unique<ClBackend>();
-    auto refBackend  = std::make_unique<RefBackend>();
+#if defined(ARMNNREF_ENABLED)
 
-    BOOST_CHECK(!neonBackend->HasCapability(armnn::BackendCapability::NonConstWeights));
-    BOOST_CHECK(!clBackend->HasCapability(armnn::BackendCapability::NonConstWeights));
+BOOST_AUTO_TEST_CASE(Ref_Backends_Capability_Test)
+{
+    auto refBackend  = std::make_unique<RefBackend>();
     BOOST_CHECK(refBackend->HasCapability(armnn::BackendCapability::NonConstWeights));
 }
+
+#endif
+
+#if defined(ARMCOMPUTENEON_ENABLED)
+
+BOOST_AUTO_TEST_CASE(Neon_Backends_Capability_Test)
+{
+    auto neonBackend = std::make_unique<NeonBackend>();
+    BOOST_CHECK(!neonBackend->HasCapability(armnn::BackendCapability::NonConstWeights));
+}
+
+#endif
+
+#if defined(ARMCOMPUTECL_ENABLED)
+
+BOOST_AUTO_TEST_CASE(Cl_Backends_Capability_Test)
+{
+    auto clBackend   = std::make_unique<ClBackend>();
+    BOOST_CHECK(!clBackend->HasCapability(armnn::BackendCapability::NonConstWeights));
+}
+
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()

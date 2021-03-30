@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_02" # Release 21.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="1e3ab4264fb0455abe8a3903abab40c59b9be91e" #Make CpuPixelWiseMultiplicationKernel stateless
+DEFAULT_CLFRAMEWORKREVISION="2788609b8a10306e9eae47543b39812a7b075aaa" #Port ClTranspose to new API
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

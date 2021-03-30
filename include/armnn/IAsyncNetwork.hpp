@@ -17,33 +17,46 @@
 
 namespace armnn
 {
+struct INetworkProperties;
+
+namespace profiling
+{
+class ProfilingService;
+}
 
 namespace experimental
 {
+class AsyncNetworkImpl;
 
 class IAsyncNetwork
 {
 public:
-    virtual ~IAsyncNetwork() {};
+    IAsyncNetwork(std::unique_ptr<IOptimizedNetwork> net,
+                  const INetworkProperties& networkProperties,
+                  profiling::ProfilingService& profilingService);
+    ~IAsyncNetwork();
 
-    virtual TensorInfo GetInputTensorInfo(LayerBindingId layerId) const = 0;
-    virtual TensorInfo GetOutputTensorInfo(LayerBindingId layerId) const = 0;
+    TensorInfo GetInputTensorInfo(LayerBindingId layerId) const;
+    TensorInfo GetOutputTensorInfo(LayerBindingId layerId) const;
 
     /// Thread safe execution of the network. Returns once execution is complete.
     /// Will block until this and any other thread using the same workingMem object completes.
-    virtual Status Execute(const InputTensors& inputTensors,
-                           const OutputTensors& outputTensors,
-                           IWorkingMemHandle& workingMemHandle) = 0;
+    Status Execute(const InputTensors& inputTensors,
+                   const OutputTensors& outputTensors,
+                   IWorkingMemHandle& workingMemHandle);
 
     /// Create a new unique WorkingMemHandle object. Create multiple handles if you wish to have
     /// overlapped Execution by calling this function from different threads.
-    virtual std::unique_ptr<IWorkingMemHandle> CreateWorkingMemHandle() = 0;
+    std::unique_ptr<IWorkingMemHandle> CreateWorkingMemHandle();
 
     /// Get the profiler used for this network
-    virtual std::shared_ptr<IProfiler> GetProfiler() const = 0;
+    std::shared_ptr<IProfiler> GetProfiler() const;
 
     /// Register a debug callback function to be used with this network
-    virtual void RegisterDebugCallback(const DebugCallbackFunction& func) = 0;
+    void RegisterDebugCallback(const DebugCallbackFunction& func);
+
+private:
+    std::unique_ptr<AsyncNetworkImpl> pAsyncNetworkImpl;
 };
 
 } // end experimental namespace

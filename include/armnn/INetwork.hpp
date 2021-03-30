@@ -706,7 +706,7 @@ protected:
 
 namespace experimental
 {
-class AsyncNetwork;
+class AsyncNetworkImpl;
 class WorkingMemHandle;
 }
 
@@ -730,7 +730,7 @@ public:
 protected:
     friend class LoadedNetwork;
 
-    friend class experimental::AsyncNetwork;
+    friend class experimental::AsyncNetworkImpl;
     friend class experimental::WorkingMemHandle;
 
     friend Graph& GetGraphForTesting(IOptimizedNetwork* optNetPtr);

@@ -187,7 +187,7 @@ std::unique_ptr<IAsyncNetwork> RuntimeImpl::CreateAsyncNetwork(NetworkId& networ
         context.second->BeforeLoadNetwork(networkIdOut);
     }
 
-    unique_ptr<AsyncNetwork> asyncNetwork = std::make_unique<AsyncNetwork>(
+    unique_ptr<IAsyncNetwork> asyncNetwork = std::make_unique<IAsyncNetwork>(
             std::unique_ptr<IOptimizedNetwork>(rawNetwork),
             networkProperties,
             m_ProfilingService);

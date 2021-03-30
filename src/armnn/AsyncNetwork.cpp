@@ -26,6 +26,45 @@ namespace armnn
 namespace experimental
 {
 
+IAsyncNetwork::IAsyncNetwork(std::unique_ptr<IOptimizedNetwork> net,
+                             const INetworkProperties& networkProperties,
+                             profiling::ProfilingService& profilingService)
+       : pAsyncNetworkImpl( new AsyncNetworkImpl(std::move(net), networkProperties, profilingService)) {};
+
+IAsyncNetwork::~IAsyncNetwork() = default;
+
+TensorInfo IAsyncNetwork::GetInputTensorInfo(LayerBindingId layerId) const
+{
+    return pAsyncNetworkImpl->GetInputTensorInfo(layerId);
+}
+
+TensorInfo IAsyncNetwork::GetOutputTensorInfo(LayerBindingId layerId) const
+{
+    return pAsyncNetworkImpl->GetOutputTensorInfo(layerId);
+}
+
+Status IAsyncNetwork::Execute(const InputTensors& inputTensors,
+                              const OutputTensors& outputTensors,
+                              IWorkingMemHandle& workingMemHandle)
+{
+    return pAsyncNetworkImpl->Execute(inputTensors, outputTensors, workingMemHandle);
+}
+
+std::unique_ptr<IWorkingMemHandle> IAsyncNetwork::CreateWorkingMemHandle()
+{
+    return pAsyncNetworkImpl->CreateWorkingMemHandle();
+}
+
+std::shared_ptr<IProfiler> IAsyncNetwork::GetProfiler() const
+{
+    return pAsyncNetworkImpl->GetProfiler();
+}
+
+void IAsyncNetwork::RegisterDebugCallback(const DebugCallbackFunction& func)
+{
+    pAsyncNetworkImpl->RegisterDebugCallback(func);
+}
+
 void AddLayerStructure(std::unique_ptr<profiling::TimelineUtilityMethods>& timelineUtils,
                        const Layer& layer,
                        profiling::ProfilingGuid networkGuid)
@@ -63,7 +102,7 @@ void AddWorkloadStructure(std::unique_ptr<profiling::TimelineUtilityMethods>& ti
                                       profiling::LabelsAndEventClasses::CHILD_GUID);
 }
 
-TensorInfo AsyncNetwork::GetInputTensorInfo(LayerBindingId layerId) const
+TensorInfo AsyncNetworkImpl::GetInputTensorInfo(LayerBindingId layerId) const
 {
     for (auto&& inputLayer : m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().GetInputLayers())
     {
@@ -77,7 +116,7 @@ TensorInfo AsyncNetwork::GetInputTensorInfo(LayerBindingId layerId) const
     throw InvalidArgumentException(fmt::format("No input layer is associated with id {0}}", layerId));
 }
 
-TensorInfo AsyncNetwork::GetOutputTensorInfo(LayerBindingId layerId) const
+TensorInfo AsyncNetworkImpl::GetOutputTensorInfo(LayerBindingId layerId) const
 {
     for (auto&& outputLayer : m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().GetOutputLayers())
     {
@@ -93,7 +132,7 @@ TensorInfo AsyncNetwork::GetOutputTensorInfo(LayerBindingId layerId) const
 }
 
 // Need something like the collectors to get the correct tensors for the inputs
-void AsyncNetwork::CollectInputTensorHandles(
+void AsyncNetworkImpl::CollectInputTensorHandles(
         std::unordered_map<LayerGuid, std::vector<ITensorHandle*> >& tensorHandles,
         std::vector<ITensorHandle*>& inputs,
         const armnn::Layer* layer,
@@ -128,7 +167,7 @@ void AsyncNetwork::CollectInputTensorHandles(
     }
 }
 
-void AsyncNetwork::CreateOutputTensorHandles(
+void AsyncNetworkImpl::CreateOutputTensorHandles(
         std::unordered_map<LayerGuid, std::vector<ITensorHandle*> >& tensorHandles,
         std::vector<ITensorHandle*>& outputs,
         const armnn::Layer* layer,
@@ -156,7 +195,7 @@ void AsyncNetwork::CreateOutputTensorHandles(
     tensorHandles.insert({guid, tensorHandleVectors});
 }
 
-const IWorkloadFactory& AsyncNetwork::GetWorkloadFactory(const Layer& layer) const
+const IWorkloadFactory& AsyncNetworkImpl::GetWorkloadFactory(const Layer& layer) const
 {
     const IWorkloadFactory* workloadFactory = nullptr;
 
@@ -181,7 +220,9 @@ const IWorkloadFactory& AsyncNetwork::GetWorkloadFactory(const Layer& layer) con
     return *workloadFactory;
 }
 
-void AsyncNetwork::EnqueueInput(const BindableLayer& layer, const ConstTensor& inputTensor, WorkingMemHandle& context)
+void AsyncNetworkImpl::EnqueueInput(const BindableLayer& layer,
+                                    const ConstTensor& inputTensor,
+                                    WorkingMemHandle& context)
 {
     if (layer.GetType() != LayerType::Input)
     {
@@ -232,7 +273,7 @@ void AsyncNetwork::EnqueueInput(const BindableLayer& layer, const ConstTensor& i
     }
 }
 
-void AsyncNetwork::EnqueueOutput(const BindableLayer& layer, const Tensor& outputTensor, WorkingMemHandle& handle)
+void AsyncNetworkImpl::EnqueueOutput(const BindableLayer& layer, const Tensor& outputTensor, WorkingMemHandle& handle)
 {
     if (layer.GetType() != LayerType::Output)
     {
@@ -304,7 +345,7 @@ void AsyncNetwork::EnqueueOutput(const BindableLayer& layer, const Tensor& outpu
     }
 }
 
-AsyncNetwork::AsyncNetwork(std::unique_ptr<IOptimizedNetwork> net,
+AsyncNetworkImpl::AsyncNetworkImpl(std::unique_ptr<IOptimizedNetwork> net,
                            const INetworkProperties& networkProperties,
                            profiling::ProfilingService& profilingService) :
     m_OptimizedNetwork(std::move(net)),
@@ -421,7 +462,7 @@ AsyncNetwork::AsyncNetwork(std::unique_ptr<IOptimizedNetwork> net,
     }
 }
 
-Status AsyncNetwork::Execute(const InputTensors& inputTensors,
+Status AsyncNetworkImpl::Execute(const InputTensors& inputTensors,
                              const OutputTensors& outputTensors,
                              IWorkingMemHandle& iWorkingMemHandle)
 {
@@ -529,12 +570,12 @@ Status AsyncNetwork::Execute(const InputTensors& inputTensors,
 }
 
 /// Get the profiler used for this network
-std::shared_ptr<IProfiler> AsyncNetwork::GetProfiler() const
+std::shared_ptr<IProfiler> AsyncNetworkImpl::GetProfiler() const
 {
     return m_Profiler;
 }
 
-void AsyncNetwork::RegisterDebugCallback(const DebugCallbackFunction& func)
+void AsyncNetworkImpl::RegisterDebugCallback(const DebugCallbackFunction& func)
 {
     for (auto&& workloadPtr: m_WorkloadQueue)
     {
@@ -544,7 +585,7 @@ void AsyncNetwork::RegisterDebugCallback(const DebugCallbackFunction& func)
 
 /// Create a new unique WorkingMemHandle object. Create multiple handles if you wish to have
 /// overlapped Execution by calling this function from different threads.
-std::unique_ptr<IWorkingMemHandle> AsyncNetwork::CreateWorkingMemHandle()
+std::unique_ptr<IWorkingMemHandle> AsyncNetworkImpl::CreateWorkingMemHandle()
 {
     Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph();
     std::unordered_map<LayerGuid, std::vector<ITensorHandle*> > tensorHandles;
@@ -592,7 +633,7 @@ std::unique_ptr<IWorkingMemHandle> AsyncNetwork::CreateWorkingMemHandle()
     return std::make_unique<WorkingMemHandle>(workingMemDescriptors, workingMemDescriptorMap);
 }
 
-void AsyncNetwork::FreeWorkingMemory()
+void AsyncNetworkImpl::FreeWorkingMemory()
 {
     // Informs the memory managers to release memory in it's respective memory group
     for (auto&& workloadFactory : m_WorkloadFactories)

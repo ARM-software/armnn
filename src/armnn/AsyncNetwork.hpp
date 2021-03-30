@@ -29,35 +29,35 @@ namespace armnn
 namespace experimental
 {
 
-class AsyncNetwork final : public IAsyncNetwork
+class AsyncNetworkImpl final
 {
 public:
     using WorkloadQueue = std::vector<std::unique_ptr<IWorkload>>;
 
-    AsyncNetwork(std::unique_ptr<IOptimizedNetwork> net,
-                 const INetworkProperties &networkProperties,
-                 profiling::ProfilingService &profilingService);
+    AsyncNetworkImpl(std::unique_ptr<IOptimizedNetwork> net,
+                     const INetworkProperties &networkProperties,
+                     profiling::ProfilingService &profilingService);
 
-    ~AsyncNetwork() { FreeWorkingMemory(); }
+    ~AsyncNetworkImpl() { FreeWorkingMemory(); }
 
-    TensorInfo GetInputTensorInfo(LayerBindingId layerId) const override;
-    TensorInfo GetOutputTensorInfo(LayerBindingId layerId) const override;
+    TensorInfo GetInputTensorInfo(LayerBindingId layerId) const;
+    TensorInfo GetOutputTensorInfo(LayerBindingId layerId) const;
 
     /// Thread safe execution of the network. Returns once execution is complete.
     /// Will block until this and any other thread using the same workingMem object completes.
     virtual Status Execute(const InputTensors& inputTensors,
                            const OutputTensors& outputTensors,
-                           IWorkingMemHandle& workingMemHandle) override;
+                           IWorkingMemHandle& workingMemHandle);
 
     /// Create a new unique WorkingMemHandle object. Create multiple handles if you wish to have
     /// overlapped Execution by calling this function from different threads.
-    std::unique_ptr<IWorkingMemHandle> CreateWorkingMemHandle() override;
+    std::unique_ptr<IWorkingMemHandle> CreateWorkingMemHandle();
 
     /// Get the profiler used for this network
-    std::shared_ptr<IProfiler> GetProfiler() const override;
+    std::shared_ptr<IProfiler> GetProfiler() const;
 
     /// Register a debug callback function to be used with this network
-    void RegisterDebugCallback(const DebugCallbackFunction& func) override;
+    void RegisterDebugCallback(const DebugCallbackFunction& func);
 
 private:
     void FreeWorkingMemory();

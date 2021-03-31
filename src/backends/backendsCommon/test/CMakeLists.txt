@@ -15,6 +15,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     ComparisonEndToEndTestImpl.hpp
     DataLayoutUtils.hpp
     DataTypeUtils.hpp
+    DefaultAsyncExecuteTest.cpp
     DepthToSpaceEndToEndTestImpl.hpp
     DequantizeEndToEndTestImpl.hpp
     DetectionPostProcessEndToEndTestImpl.hpp

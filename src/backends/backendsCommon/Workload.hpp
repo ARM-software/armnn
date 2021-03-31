@@ -37,7 +37,16 @@ public:
         m_Data.Validate(info);
     }
 
-    void ExecuteAsync(WorkingMemDescriptor&) override {};
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor) override
+    {
+        ARMNN_LOG(info) << "Using default async workload execution, this will network affect performance";
+        std::lock_guard<std::mutex> lockGuard(m_AsyncWorkloadMutex);
+
+        m_Data.m_Inputs = workingMemDescriptor.m_Inputs;
+        m_Data.m_Outputs = workingMemDescriptor.m_Outputs;
+
+        Execute();
+    };
 
     void PostAllocationConfigure() override {}
 
@@ -46,8 +55,11 @@ public:
     profiling::ProfilingGuid GetGuid() const final { return m_Guid; }
 
 protected:
-    const QueueDescriptor m_Data;
+    QueueDescriptor m_Data;
     const profiling::ProfilingGuid m_Guid;
+
+private:
+    std::mutex m_AsyncWorkloadMutex;
 };
 
 // TypedWorkload used

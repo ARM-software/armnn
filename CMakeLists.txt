@@ -223,7 +223,7 @@ if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
             ${FLATBUFFERS_LIBRARY})
 
     if(Threads_FOUND AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
-        target_link_libraries(ArmnnQuantizerMain pthread)
+        target_link_libraries(ArmnnQuantizerMain ${CMAKE_THREAD_LIBS_INIT})
     endif()
 
     set_target_properties(armnnQuantizer PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
@@ -652,7 +652,7 @@ if(ARMCOMPUTENEON OR ARMCOMPUTECL)
 endif()
 
 if(PROFILING_BACKEND_STREAMLINE AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
-    target_link_libraries(armnn pthread)
+    target_link_libraries(armnn ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
 set_target_properties(armnn PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})

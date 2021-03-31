@@ -8,6 +8,7 @@
 #include "Layer.hpp"
 #include "Profiling.hpp"
 
+#include <armnn/BackendHelper.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/utility/Assert.hpp>
@@ -389,6 +390,18 @@ AsyncNetworkImpl::AsyncNetworkImpl(std::unique_ptr<IOptimizedNetwork> net,
                         std::make_pair(backendId, std::make_pair(std::move(workloadFactory), memoryManager)));
             }
         }
+    }
+
+    // Check backends support BackendCapability::AsyncExecution
+    for (auto const& backend : m_Backends)
+    {
+        if (!IsCapabilitySupported(backend.first, BackendCapability::AsyncExecution))
+        {
+            ARMNN_LOG(warning) << fmt::format("AsyncNetworkImpl() Backend: '{0}' does not support Async Execution. "
+                                              "Will fall back to default implementation.",
+                                              backend.first.Get());
+        }
+
     }
 
     profiling::ProfilingGuid networkGuid = m_OptimizedNetwork->GetGuid();

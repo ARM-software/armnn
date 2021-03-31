@@ -685,6 +685,9 @@ BOOST_AUTO_TEST_CASE(BackendCapabilityTest)
     BackendId backendId ="MockBackend";
     // MockBackend does not support the NonConstWeights capability
     BOOST_CHECK(!armnn::IsCapabilitySupported(backendId, armnn::BackendCapability::NonConstWeights));
+
+    // MockBackend does not support the AsyncExecution capability
+    BOOST_CHECK(!armnn::IsCapabilitySupported(backendId, armnn::BackendCapability::AsyncExecution));
 }
 
 BOOST_AUTO_TEST_CASE(BackendHintTest)

@@ -9,6 +9,10 @@
 namespace armnn
 {
 
+const std::set<armnn::BackendCapability> gpuAccCapabilities {
+    // add new capabilities here..
+};
+
 class ClBackend : public IBackendInternal
 {
 public:
@@ -49,6 +53,8 @@ public:
 
     IBackendInternal::IBackendSpecificModelContextPtr CreateBackendSpecificModelContext(
         const ModelOptions& modelOptions) const override;
+
+    bool HasCapability(BackendCapability capabilityClass) const override;
 };
 
 } // namespace armnn

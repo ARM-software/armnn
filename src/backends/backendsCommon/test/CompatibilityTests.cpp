@@ -125,6 +125,8 @@ BOOST_AUTO_TEST_CASE(Ref_Backends_Capability_Test)
 {
     auto refBackend  = std::make_unique<RefBackend>();
     BOOST_CHECK(refBackend->HasCapability(armnn::BackendCapability::NonConstWeights));
+
+    BOOST_CHECK(!refBackend->HasCapability(armnn::BackendCapability::AsyncExecution));
 }
 
 #endif

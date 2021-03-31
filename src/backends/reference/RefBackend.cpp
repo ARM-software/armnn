@@ -71,8 +71,8 @@ IBackendInternal::ILayerSupportSharedPtr RefBackend::GetLayerSupport() const
 
 bool RefBackend::HasCapability(BackendCapability capabilityClass) const
 {
-    auto search = backendCapabilities.find(capabilityClass);
-    if (search != backendCapabilities.end())
+    auto search = cpuRefCapabilities.find(capabilityClass);
+    if (search != cpuRefCapabilities.end())
     {
         return true;
     }

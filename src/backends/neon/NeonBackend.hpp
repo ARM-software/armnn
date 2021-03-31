@@ -9,6 +9,10 @@
 namespace armnn
 {
 
+const std::set<armnn::BackendCapability> cpuAccCapabilities {
+    // add new capabilities here..
+};
+
 class NeonBackend : public IBackendInternal
 {
 public:
@@ -47,6 +51,8 @@ public:
 
     IBackendInternal::IBackendSpecificModelContextPtr CreateBackendSpecificModelContext(
         const ModelOptions& modelOptions) const override;
+
+    bool HasCapability(BackendCapability capabilityClass) const override;
 };
 
 } // namespace armnn

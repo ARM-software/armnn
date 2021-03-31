@@ -9,7 +9,7 @@
 namespace armnn
 {
 
-const std::set<armnn::BackendCapability> backendCapabilities {
+const std::set<armnn::BackendCapability> cpuRefCapabilities {
     armnn::BackendCapability::NonConstWeights,
 };
 

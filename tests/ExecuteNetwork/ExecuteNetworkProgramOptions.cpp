@@ -417,6 +417,7 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
             m_ExNetParams.m_InputTensorDataFilePaths.empty();
     m_ExNetParams.m_DynamicBackendsPath = m_RuntimeOptions.m_DynamicBackendsPath;
 
+    m_RuntimeOptions.m_EnableGpuProfiling = m_ExNetParams.m_EnableProfiling;
 
     std::string tfliteExecutor = GetOptionValue<std::string>("tflite-executor", m_CxxResult);
 

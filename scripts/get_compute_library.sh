@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_02" # Release 21.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="2788609b8a10306e9eae47543b39812a7b075aaa" #Port ClTranspose to new API
+DEFAULT_CLFRAMEWORKREVISION="33f41fabd30fb444aaa0cf3e65b61794d498d151" #Fix trademarks throughout the codebase
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

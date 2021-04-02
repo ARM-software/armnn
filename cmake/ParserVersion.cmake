@@ -3,22 +3,6 @@
 # SPDX-License-Identifier: MIT
 #
 
-# Read the CaffeParser version components from file
-file(READ ${CMAKE_CURRENT_LIST_DIR}/../include/armnnCaffeParser/Version.hpp caffeVersion)
-
-# Parse the CaffeParser version components
-string(REGEX MATCH "#define CAFFE_PARSER_MAJOR_VERSION ([0-9]*)" _ ${caffeVersion})
-set(CAFFE_PARSER_MAJOR_VERSION ${CMAKE_MATCH_1})
-string(REGEX MATCH "#define CAFFE_PARSER_MINOR_VERSION ([0-9]*)" _ ${caffeVersion})
-set(CAFFE_PARSER_MINOR_VERSION ${CMAKE_MATCH_1})
-
-# Define LIB version
-set(CAFFE_PARSER_LIB_VERSION "${CAFFE_PARSER_MAJOR_VERSION}.${CAFFE_PARSER_MINOR_VERSION}")
-
-# Define LIB soversion
-set(CAFFE_PARSER_LIB_SOVERSION "${CAFFE_PARSER_MAJOR_VERSION}")
-
-
 # Read the OnnxParser version components from file
 file(READ ${CMAKE_CURRENT_LIST_DIR}/../include/armnnOnnxParser/Version.hpp onnxVersion)
 

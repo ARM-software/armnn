@@ -24,14 +24,13 @@ struct NormalizationParameters
 
 enum class SupportedFrontend
 {
-    Caffe      = 0,
-    TensorFlow = 1,
-    TFLite     = 2,
+    TensorFlow = 0,
+    TFLite     = 1,
 };
 
 /** Get normalization parameters.
  * Note that different flavours of models and different model data types have different normalization methods.
- * This tool currently only supports Caffe, TF and TFLite models
+ * This tool currently only supports TF and TFLite models
  *
  * @param[in] modelFormat   One of the supported frontends
  * @param[in] outputType    Output type of the image tensor, also the type of the intended model
@@ -46,8 +45,6 @@ NormalizationParameters GetNormalizationParameters(const SupportedFrontend& mode
     normParams.stddev = { 1.0, 1.0, 1.0 };
     switch (modelFormat)
     {
-        case SupportedFrontend::Caffe:
-            break;
         case SupportedFrontend::TensorFlow:
         case SupportedFrontend::TFLite:
         default:

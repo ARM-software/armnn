@@ -7,7 +7,6 @@ import pytest
 
 import pyarmnn._generated.pyarmnn as generated_armnn
 import pyarmnn._generated.pyarmnn as generated_deserializer
-import pyarmnn._generated.pyarmnn_caffeparser as generated_caffe
 import pyarmnn._generated.pyarmnn_onnxparser as generated_onnx
 import pyarmnn._generated.pyarmnn_tfliteparser as generated_tflite
 import pyarmnn._generated.pyarmnn_tfparser as generated_tf
@@ -28,7 +27,6 @@ def get_classes(swig_independent_classes: Tuple):
     return list(filter(lambda x: x[0] not in ignored_class_names,
                        inspect.getmembers(generated_armnn, inspect.isclass) +
                        inspect.getmembers(generated_deserializer, inspect.isclass) +
-                       inspect.getmembers(generated_caffe, inspect.isclass) +
                        inspect.getmembers(generated_tflite, inspect.isclass) +
                        inspect.getmembers(generated_onnx, inspect.isclass) +
                        inspect.getmembers(generated_tf, inspect.isclass)))

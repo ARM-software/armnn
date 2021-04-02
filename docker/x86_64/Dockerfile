@@ -105,10 +105,6 @@ RUN apt-get update && apt-get install -y \
     libatlas-base-dev 
 
 
-# Download caffe 1.0
-RUN cd $HOME && git clone https://github.com/BVLC/caffe.git && \
-    cd caffe && git checkout eeebdab16155d34ff8f5f42137da7df4d1c7eab0
-
 # Makefile update
 # To Do: Don't copy the Local Make file to docker
 # RUN cd $HOME/caffe/ && rm Makefile.config.example
@@ -123,15 +119,6 @@ RUN apt-get update && apt-get install -y \
 # ENV PATH=$HOME/armnn-devenv/google/x86_64_pb_install/bin/:$PATH
 # ENV LD_LIBRARY_PATH=$HOME/armnn-devenv/google/x86_64_pb_install/lib/:$LD_LIBRARY_PATH
 
-# Compile CAFFE
-RUN cd $HOME/caffe/ && mkdir build && cd build && \
-    export PATH=$HOME/armnn-devenv/google/x86_64_pb_install/bin/:$PATH && \
-    export LD_LIBRARY_PATH=$HOME/armnn-devenv/google/x86_64_pb_install/lib/:$LD_LIBRARY_PATH && \
-    ldconfig && \
-    cmake -DCMAKE_CXX_FLAGS=--std=c++11 ../ && \
-    make all -j$(nproc) && \
-    make test -j$(nproc) && \
-    make runtest -j$(nproc)
 
 # Build Boost library for arm64
 RUN cd $HOME && wget http://downloads.sourceforge.net/project/boost/boost/1.64.0/boost_1_64_0.tar.gz && \
@@ -211,8 +198,6 @@ RUN cd $HOME/armnn-devenv && \
     -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build/ \
     -DBOOST_ROOT=$HOME/armnn-devenv/boost_arm64_install/ \
     -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
-    -DCAFFE_GENERATED_SOURCES=$HOME/caffe/build/include \
-    -DBUILD_CAFFE_PARSER=1 \
     -DONNX_GENERATED_SOURCES=$HOME/armnn-devenv/onnx \
     -DBUILD_ONNX_PARSER=1 \
     -DTF_GENERATED_SOURCES=$HOME/armnn-devenv/tensorflow-protobuf \

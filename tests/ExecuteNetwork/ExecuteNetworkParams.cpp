@@ -41,14 +41,6 @@ void CheckModelFormat(const std::string& modelFormat)
                                               "built with serialization support.");
 #endif
     }
-    else if (modelFormat.find("caffe") != std::string::npos)
-    {
-#if defined(ARMNN_CAFFE_PARSER)
-#else
-        throw armnn::InvalidArgumentException("Can't run model in caffe format without a "
-                                              "built with Caffe parser support.");
-#endif
-    }
     else if (modelFormat.find("onnx") != std::string::npos)
     {
 #if defined(ARMNN_ONNX_PARSER)
@@ -83,7 +75,7 @@ void CheckModelFormat(const std::string& modelFormat)
     else
     {
         throw armnn::InvalidArgumentException(fmt::format("Unknown model format: '{}'. "
-                                                          "Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'",
+                                                          "Please include 'tensorflow', 'tflite' or 'onnx'",
                                                           modelFormat));
     }
 }

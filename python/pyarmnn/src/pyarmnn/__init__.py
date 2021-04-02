@@ -7,18 +7,6 @@ import logging
 from ._generated.pyarmnn_version import GetVersion, GetMajorVersion, GetMinorVersion
 
 # Parsers
-try:
-    from ._generated.pyarmnn_caffeparser import ICaffeParser
-except ImportError as err:
-    logger = logging.getLogger(__name__)
-    message = "Your ArmNN library instance does not support Caffe models parser functionality. "
-    logger.warning("%s Skipped ICaffeParser import.", message)
-    logger.debug(str(err))
-
-
-    def ICaffeParser():
-        """In case people try importing without having Arm NN built with this parser."""
-        raise RuntimeError(message)
 
 try:
     from ._generated.pyarmnn_onnxparser import IOnnxParser

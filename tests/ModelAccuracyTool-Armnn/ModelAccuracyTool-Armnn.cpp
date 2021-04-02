@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
                     "Path to armnn format model file",
                     cxxopts::value<std::string>(modelPath))
                 ("f,model-format",
-                    "The model format. Supported values: caffe, tensorflow, tflite",
+                    "The model format. Supported values: tensorflow, tflite",
                     cxxopts::value<std::string>(modelFormat))
                 ("i,input-name",
                     "Identifier of the input tensors in the network separated by comma with no space.",
@@ -312,11 +312,7 @@ int main(int argc, char* argv[])
             const unsigned int batchSize = 1;
             // Get normalisation parameters
             SupportedFrontend modelFrontend;
-            if (modelFormat == "caffe")
-            {
-                modelFrontend = SupportedFrontend::Caffe;
-            }
-            else if (modelFormat == "tensorflow")
+            if (modelFormat == "tensorflow")
             {
                 modelFrontend = SupportedFrontend::TensorFlow;
             }

@@ -39,14 +39,6 @@ macro(addDllCopyCommands target)
             addDllCopyCommand(${target} "$<TARGET_FILE_DIR:armnn>/armnn.dll" "$<TARGET_FILE_DIR:armnn>/armnn.dll")
         endif()
 
-        # armnnCaffeParser.dll
-        if ("armnnCaffeParser" IN_LIST target_deps)
-            addDllCopyCommand(${target} "$<TARGET_FILE_DIR:armnnCaffeParser>/armnnCaffeParser.dll"
-                                        "$<TARGET_FILE_DIR:armnnCaffeParser>/armnnCaffeParser.dll")
-            addDllCopyCommand(${target} "${PROTOBUF_ROOT}/bin/libprotobufd.dll"
-                                        "${PROTOBUF_ROOT}/bin/libprotobuf.dll")
-       endif()
-
         # armnnTfParser.dll
         if ("armnnTfParser" IN_LIST target_deps)
             addDllCopyCommand(${target} "$<TARGET_FILE_DIR:armnnTfParser>/armnnTfParser.dll"
@@ -59,19 +51,6 @@ macro(addDllCopyCommands target)
         if ("armnnTfLiteParser" IN_LIST target_deps)
             addDllCopyCommand(${target} "$<TARGET_FILE_DIR:armnnTfLiteParser>/armnnTfLiteParser.dll"
                                         "$<TARGET_FILE_DIR:armnnTfLiteParser>/armnnTfLiteParser.dll")
-        endif()
-
-        # caffe.dll and its dependencies
-        listContainsRegex(includeCaffeDlls "${target_deps}" "caffe")
-        if (${includeCaffeDlls})
-            addDllCopyCommand(${target} "${CAFFE_BUILD_ROOT}/lib/caffe-d.dll"
-                                        "${CAFFE_BUILD_ROOT}/lib/caffe.dll")
-            addDllCopyCommand(${target} "${PROTOBUF_ROOT}/bin/libprotobufd.dll"
-                                        "${PROTOBUF_ROOT}/bin/libprotobuf.dll")
-            addDllCopyCommand(${target} "${BLAS_ROOT}/bin/libopenblas.dll"          "${BLAS_ROOT}/bin/libopenblas.dll")
-            addDllCopyCommand(${target} "${MINGW32_ROOT}/bin/libgfortran-3.dll"     "${MINGW32_ROOT}/bin/libgfortran-3.dll")
-            addDllCopyCommand(${target} "${MINGW32_ROOT}/bin/libgcc_s_dw2-1.dll"    "${MINGW32_ROOT}/bin/libgcc_s_dw2-1.dll")
-            addDllCopyCommand(${target} "${MINGW32_ROOT}/bin/libquadmath-0.dll"     "${MINGW32_ROOT}/bin/libquadmath-0.dll")
         endif()
     endif()
 endmacro()

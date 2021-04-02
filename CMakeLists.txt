@@ -99,34 +99,6 @@ list(APPEND armnnUtils_sources
 add_library_ex(armnnUtils STATIC ${armnnUtils_sources})
 target_include_directories(armnnUtils PRIVATE src/backends)
 
-if(BUILD_CAFFE_PARSER)
-    # ArmNN Parser source files required for all build options
-    set(armnn_caffe_parser_sources)
-    list(APPEND armnn_caffe_parser_sources
-        include/armnnCaffeParser/ICaffeParser.hpp
-        include/armnnCaffeParser/Version.hpp
-        src/armnnCaffeParser/RecordByRecordCaffeParser.hpp
-        src/armnnCaffeParser/RecordByRecordCaffeParser.cpp
-        src/armnnCaffeParser/CaffeParser.hpp
-        src/armnnCaffeParser/CaffeParser.cpp
-        ${CAFFE_GENERATED_SOURCES}/caffe/proto/caffe.pb.cc
-        )
-    # The generated Caffe protobuf .cc file is not warning clean and we can't fix them.
-    if(COMPILER_IS_GNU_LIKE)
-        set_source_files_properties(${CAFFE_GENERATED_SOURCES}/caffe/proto/caffe.pb.cc PROPERTIES COMPILE_FLAGS "-Wno-unused-variable -Wno-unused-parameter -Wno-conversion -Wno-sign-conversion")
-    endif()
-
-    add_library_ex(armnnCaffeParser SHARED ${armnn_caffe_parser_sources})
-    set_target_properties(armnnCaffeParser PROPERTIES COMPILE_FLAGS "${CAFFE_PARSER_ADDITIONAL_COMPILE_FLAGS}")
-
-    target_include_directories(armnnCaffeParser PRIVATE src/armnnUtils)
-
-    target_link_libraries(armnnCaffeParser armnn)
-    target_link_libraries(armnnCaffeParser ${PROTOBUF_LIBRARIES})
-    set_target_properties(armnnCaffeParser PROPERTIES VERSION ${CAFFE_PARSER_LIB_VERSION} SOVERSION ${CAFFE_PARSER_LIB_SOVERSION})
-
-endif()
-
 if(BUILD_ONNX_PARSER)
     set(armnn_onnx_parser_sources)
     list(APPEND armnn_onnx_parser_sources
@@ -629,11 +601,6 @@ endif()
 add_subdirectory(third-party/fmt)
 target_link_libraries(armnn fmt)
 
-if(BUILD_CAFFE_PARSER)
-    install(TARGETS armnnCaffeParser
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-endif()
 if(BUILD_ONNX_PARSER)
     install(TARGETS armnnOnnxParser
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -872,21 +839,6 @@ if(BUILD_UNIT_TESTS)
         list(APPEND unittest_sources ${CMAKE_CURRENT_BINARY_DIR}/SchemaText.cpp)
     endif()
 
-    if(BUILD_CAFFE_PARSER AND ARMNNREF)
-        list(APPEND unittest_sources
-            src/armnnCaffeParser/test/TestAdd.cpp
-            src/armnnCaffeParser/test/TestConcat.cpp
-            src/armnnCaffeParser/test/TestConvolution.cpp
-            src/armnnCaffeParser/test/TestDropout.cpp
-            src/armnnCaffeParser/test/TestInputs.cpp
-            src/armnnCaffeParser/test/TestMul.cpp
-            src/armnnCaffeParser/test/TestPooling2d.cpp
-            src/armnnCaffeParser/test/TestInPlace.cpp
-            src/armnnCaffeParser/test/TestMultiInputsOutputs.cpp
-            src/armnnCaffeParser/test/TestSplit.cpp
-            )
-    endif()
-
     if(BUILD_ONNX_PARSER AND ARMNNREF)
         list(APPEND unittest_sources
             src/armnnOnnxParser/test/Addition.cpp
@@ -1026,10 +978,6 @@ if(BUILD_UNIT_TESTS)
         target_link_libraries(UnitTests armnnTfLiteParser)
     endif()
 
-    if(BUILD_CAFFE_PARSER)
-        target_link_libraries(UnitTests armnnCaffeParser)
-    endif()
-
     if(BUILD_ARMNN_SERIALIZER AND ARMNNREF)
         target_include_directories(UnitTests SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer)
         target_include_directories(UnitTests SYSTEM PRIVATE "${FLATBUFFERS_INCLUDE_PATH}")
@@ -1053,17 +1001,13 @@ if(BUILD_UNIT_TESTS)
     addDllCopyCommands(UnitTests)
 endif()
 
-if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER OR BUILD_CAFFE_PARSER) AND ARMNNREF)
+if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER) AND ARMNNREF)
     set(ArmnnConverter_sources
         src/armnnConverter/ArmnnConverter.cpp)
 
     add_executable_ex(ArmnnConverter ${ArmnnConverter_sources})
     target_include_directories(ArmnnConverter PRIVATE src/armnn)
     target_include_directories(ArmnnConverter PRIVATE src/armnnUtils)
-
-    if(BUILD_CAFFE_PARSER)
-        target_link_libraries(ArmnnConverter armnnCaffeParser)
-    endif()
 
     if(BUILD_ONNX_PARSER)
         target_link_libraries(ArmnnConverter armnnOnnxParser)

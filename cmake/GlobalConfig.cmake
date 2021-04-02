@@ -3,7 +3,6 @@
 # Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 #
-option(BUILD_CAFFE_PARSER "Build Caffe parser" OFF)
 option(BUILD_TF_PARSER "Build Tensorflow parser" OFF)
 option(BUILD_ONNX_PARSER "Build Onnx parser" OFF)
 option(BUILD_UNIT_TESTS "Build unit tests" ON)
@@ -159,7 +158,7 @@ endif()
 find_dependency(Threads)
 
 # Favour the protobuf passed on command line
-if(BUILD_TF_PARSER OR BUILD_CAFFE_PARSER OR BUILD_ONNX_PARSER)
+if(BUILD_TF_PARSER OR BUILD_ONNX_PARSER)
     find_library(PROTOBUF_LIBRARY_DEBUG NAMES "protobufd"
         PATHS ${PROTOBUF_ROOT}/lib
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
@@ -179,15 +178,6 @@ if(BUILD_TF_PARSER OR BUILD_CAFFE_PARSER OR BUILD_ONNX_PARSER)
 
     include_directories(SYSTEM "${PROTOBUF_INCLUDE_DIRS}")
     add_definitions(-DPROTOBUF_USE_DLLS)
-endif()
-
-# Caffe and its dependencies
-if(BUILD_CAFFE_PARSER)
-    add_definitions(-DARMNN_CAFFE_PARSER)
-
-    find_path(CAFFE_GENERATED_SOURCES "caffe/proto/caffe.pb.h"
-        HINTS ${CAFFE_BUILD_ROOT}/include)
-    include_directories(SYSTEM "${CAFFE_GENERATED_SOURCES}")
 endif()
 
 if(BUILD_TF_PARSER)
@@ -416,9 +406,6 @@ else()
 endif()
 
 
-if(NOT BUILD_CAFFE_PARSER)
-    message(STATUS "Caffe parser support is disabled")
-endif()
 
 if(NOT BUILD_TF_PARSER)
     message(STATUS "Tensorflow parser support is disabled")

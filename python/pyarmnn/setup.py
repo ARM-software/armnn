@@ -283,7 +283,6 @@ if __name__ == '__main__':
         ext_list.append(pyarmnn_optional_module)
 
 
-    add_parsers_ext('CaffeParser', extensions_to_build)
     add_parsers_ext('OnnxParser', extensions_to_build)
     add_parsers_ext('TfParser', extensions_to_build)
     add_parsers_ext('TfLiteParser', extensions_to_build)

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 #include "../InferenceTest.hpp"
-#include "../CaffePreprocessor.hpp"
+#include "../ImagePreprocessor.hpp"
 #include "armnnTfParser/ITfParser.hpp"
 
 int main(int argc, char* argv[])
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
         armnn::TensorShape inputTensorShape({ 1, 3, 224, 224 });
 
         using DataType = float;
-        using DatabaseType = CaffePreprocessor;
+        using DatabaseType = ImagePreprocessor<DataType>;;
         using ParserType = armnnTfParser::ITfParser;
         using ModelType = InferenceModel<ParserType, DataType>;
 

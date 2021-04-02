@@ -367,7 +367,7 @@ public:
         options
             .allow_unrecognised_options()
             .add_options()
-                ("m,model-dir", "Path to directory containing model files (.caffemodel/.prototxt/.tflite)",
+                ("m,model-dir", "Path to directory containing model files (.prototxt/.tflite)",
                  cxxopts::value<std::string>(cLineOptions.m_ModelDir))
                 ("c,compute", backendsMessage.c_str(),
                  cxxopts::value<std::vector<std::string>>(cLineOptions.m_ComputeDevices)->default_value("CpuRef"))

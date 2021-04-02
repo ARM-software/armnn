@@ -4,9 +4,6 @@
 //
 #include <armnn/Logging.hpp>
 
-#if defined(ARMNN_CAFFE_PARSER)
-#include <armnnCaffeParser/ICaffeParser.hpp>
-#endif
 #if defined(ARMNN_ONNX_PARSER)
 #include <armnnOnnxParser/IOnnxParser.hpp>
 #endif
@@ -81,9 +78,6 @@ int ParseCommandLineArgs(int argc, char* argv[],
     try
     {
         std::string modelFormatDescription("Format of the model file");
-#if defined(ARMNN_CAFFE_PARSER)
-        modelFormatDescription += ", caffe-binary, caffe-text";
-#endif
 #if defined(ARMNN_ONNX_PARSER)
         modelFormatDescription += ", onnx-binary, onnx-text";
 #endif
@@ -336,11 +330,10 @@ private:
 int main(int argc, char* argv[])
 {
 
-#if (!defined(ARMNN_CAFFE_PARSER)     \
-       && !defined(ARMNN_ONNX_PARSER) \
+#if (!defined(ARMNN_ONNX_PARSER) \
        && !defined(ARMNN_TF_PARSER)   \
        && !defined(ARMNN_TF_LITE_PARSER))
-    ARMNN_LOG(fatal) << "Not built with any of the supported parsers, Caffe, Onnx, Tensorflow, or TfLite.";
+    ARMNN_LOG(fatal) << "Not built with any of the supported parsers Onnx, Tensorflow, or TfLite.";
     return EXIT_FAILURE;
 #endif
 
@@ -399,20 +392,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        if (modelFormat.find("caffe") != std::string::npos)
-        {
-#if defined(ARMNN_CAFFE_PARSER)
-            if (!converter.CreateNetwork<armnnCaffeParser::ICaffeParser>())
-            {
-                ARMNN_LOG(fatal) << "Failed to load model from file";
-                return EXIT_FAILURE;
-            }
-#else
-            ARMNN_LOG(fatal) << "Not built with Caffe parser support.";
-            return EXIT_FAILURE;
-#endif
-        }
-        else if (modelFormat.find("onnx") != std::string::npos)
+        if (modelFormat.find("onnx") != std::string::npos)
         {
 #if defined(ARMNN_ONNX_PARSER)
             if (!converter.CreateNetwork<armnnOnnxParser::IOnnxParser>())

@@ -13,9 +13,6 @@
 #if defined(ARMNN_SERIALIZER)
 #include "armnnDeserializer/IDeserializer.hpp"
 #endif
-#if defined(ARMNN_CAFFE_PARSER)
-#include "armnnCaffeParser/ICaffeParser.hpp"
-#endif
 #if defined(ARMNN_TF_PARSER)
 #include "armnnTfParser/ITfParser.hpp"
 #endif
@@ -472,15 +469,6 @@ int main(int argc, const char* argv[])
         return EXIT_FAILURE;
     #endif
     }
-    else if (modelFormat.find("caffe") != std::string::npos)
-    {
-    #if defined(ARMNN_CAFFE_PARSER)
-        return MainImpl<armnnCaffeParser::ICaffeParser, float>(ProgramOptions.m_ExNetParams, runtime);
-    #else
-        ARMNN_LOG(fatal) << "Not built with Caffe parser support.";
-        return EXIT_FAILURE;
-    #endif
-    }
     else if (modelFormat.find("onnx") != std::string::npos)
     {
     #if defined(ARMNN_ONNX_PARSER)
@@ -526,7 +514,7 @@ int main(int argc, const char* argv[])
     else
     {
         ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat
-                         << "'. Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'";
+                         << "'. Please include 'tensorflow', 'tflite' or 'onnx'";
         return EXIT_FAILURE;
     }
 }

@@ -16,70 +16,6 @@ target_include_directories(inferenceTest PRIVATE ../src/armnnUtils)
 target_include_directories(inferenceTest PRIVATE ../src/backends)
 target_include_directories(inferenceTest PRIVATE ../third-party/stb)
 
-if(BUILD_CAFFE_PARSER)
-    macro(CaffeParserTest testName sources)
-        add_executable_ex(${testName} ${sources})
-        target_include_directories(${testName} PRIVATE ../src/armnnUtils)
-        target_include_directories(${testName} PRIVATE ../src/backends)
-        set_target_properties(${testName} PROPERTIES COMPILE_FLAGS "${CAFFE_PARSER_TEST_ADDITIONAL_COMPILE_FLAGS}")
-
-        target_link_libraries(${testName} inferenceTest)
-        target_link_libraries(${testName} armnnCaffeParser)
-        target_link_libraries(${testName} armnn)
-        target_link_libraries(${testName} ${CMAKE_THREAD_LIBS_INIT})
-        addDllCopyCommands(${testName})
-    endmacro()
-
-    set(CaffeCifar10AcrossChannels-Armnn_sources
-        CaffeCifar10AcrossChannels-Armnn/CaffeCifar10AcrossChannels-Armnn.cpp
-        Cifar10Database.hpp
-        Cifar10Database.cpp)
-    CaffeParserTest(CaffeCifar10AcrossChannels-Armnn "${CaffeCifar10AcrossChannels-Armnn_sources}")
-
-    set(CaffeMnist-Armnn_sources
-        CaffeMnist-Armnn/CaffeMnist-Armnn.cpp
-        MnistDatabase.hpp
-        MnistDatabase.cpp)
-    CaffeParserTest(CaffeMnist-Armnn "${CaffeMnist-Armnn_sources}")
-
-    set(CaffeAlexNet-Armnn_sources
-        CaffeAlexNet-Armnn/CaffeAlexNet-Armnn.cpp
-        CaffePreprocessor.hpp
-        CaffePreprocessor.cpp)
-    CaffeParserTest(CaffeAlexNet-Armnn "${CaffeAlexNet-Armnn_sources}")
-
-    set(MultipleNetworksCifar10_SRC
-        MultipleNetworksCifar10/MultipleNetworksCifar10.cpp
-        Cifar10Database.hpp
-        Cifar10Database.cpp)
-    CaffeParserTest(MultipleNetworksCifar10 "${MultipleNetworksCifar10_SRC}")
-
-    set(CaffeResNet-Armnn_sources
-        CaffeResNet-Armnn/CaffeResNet-Armnn.cpp
-        CaffePreprocessor.hpp
-        CaffePreprocessor.cpp)
-    CaffeParserTest(CaffeResNet-Armnn "${CaffeResNet-Armnn_sources}")
-
-    set(CaffeVGG-Armnn_sources
-        CaffeVGG-Armnn/CaffeVGG-Armnn.cpp
-        CaffePreprocessor.hpp
-        CaffePreprocessor.cpp)
-    CaffeParserTest(CaffeVGG-Armnn "${CaffeVGG-Armnn_sources}")
-
-    set(CaffeInception_BN-Armnn_sources
-        CaffeInception_BN-Armnn/CaffeInception_BN-Armnn.cpp
-        CaffePreprocessor.hpp
-        CaffePreprocessor.cpp)
-    CaffeParserTest(CaffeInception_BN-Armnn "${CaffeInception_BN-Armnn_sources}")
-
-    set(CaffeYolo-Armnn_sources
-        CaffeYolo-Armnn/CaffeYolo-Armnn.cpp
-        YoloDatabase.hpp
-        YoloDatabase.cpp
-        YoloInferenceTest.hpp)
-    CaffeParserTest(CaffeYolo-Armnn "${CaffeYolo-Armnn_sources}")
-endif()
-
 if(BUILD_TF_PARSER)
     macro(TfParserTest testName sources)
         add_executable_ex(${testName} ${sources})
@@ -119,8 +55,8 @@ if(BUILD_TF_PARSER)
 
     set(TfResNext-Armnn_sources
         TfResNext_Quantized-Armnn/TfResNext_Quantized-Armnn.cpp
-        CaffePreprocessor.hpp
-        CaffePreprocessor.cpp)
+        ImagePreprocessor.hpp
+        ImagePreprocessor.cpp)
     TfParserTest(TfResNext-Armnn "${TfResNext-Armnn_sources}")
 endif()
 
@@ -238,7 +174,7 @@ if (BUILD_ONNX_PARSER)
     OnnxParserTest(OnnxMobileNet-Armnn "${OnnxMobileNet-Armnn_sources}")
 endif()
 
-if (BUILD_ARMNN_SERIALIZER OR BUILD_CAFFE_PARSER OR BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER)
+if (BUILD_ARMNN_SERIALIZER OR BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER)
     set(ExecuteNetwork_sources
         ExecuteNetwork/ExecuteNetwork.cpp
         ExecuteNetwork/ExecuteNetworkProgramOptions.cpp
@@ -256,9 +192,6 @@ if (BUILD_ARMNN_SERIALIZER OR BUILD_CAFFE_PARSER OR BUILD_TF_PARSER OR BUILD_TF_
 
     if (BUILD_ARMNN_SERIALIZER)
         target_link_libraries(ExecuteNetwork armnnSerializer)
-    endif()
-    if (BUILD_CAFFE_PARSER)
-        target_link_libraries(ExecuteNetwork armnnCaffeParser)
     endif()
     if (BUILD_TF_PARSER)
         target_link_libraries(ExecuteNetwork armnnTfParser)
@@ -284,9 +217,6 @@ if(BUILD_ACCURACY_TOOL)
         target_link_libraries(${executorName} ${CMAKE_THREAD_LIBS_INIT})
         if (BUILD_ARMNN_SERIALIZER)
             target_link_libraries(${executorName} armnnSerializer)
-        endif()
-        if (BUILD_CAFFE_PARSER)
-            target_link_libraries(${executorName} armnnCaffeParser)
         endif()
         if (BUILD_TF_PARSER)
             target_link_libraries(${executorName} armnnTfParser)

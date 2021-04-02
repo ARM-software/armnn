@@ -6,7 +6,7 @@
 #include "armnn/ArmNN.hpp"
 #include "armnn/Utils.hpp"
 #include "armnn/INetwork.hpp"
-#include "armnnCaffeParser/ICaffeParser.hpp"
+#include "armnnTfParser/TfParser.hpp"
 #include "../Cifar10Database.hpp"
 #include "../InferenceTest.hpp"
 #include "../InferenceModel.hpp"
@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
             return EXIT_FAILURE;
         }
 
-        fs::path modelPath = fs::path(modelDir + "/cifar10_full_iter_60000.caffemodel");
+        fs::path modelPath = fs::path(modelDir + "/cifar10_tf.prototxt");
 
         // Create runtime
         // This will also load dynamic backend in case that the dynamic backend path is specified
@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
         };
         std::vector<Net> networks;
 
-        armnnCaffeParser::ICaffeParserPtr parser(armnnCaffeParser::ICaffeParser::Create());
+        armnnTfParser::ITfParserPtr parser(armnnTfParser::ITfParser::Create());
 
         const int networksCount = 4;
         for (int i = 0; i < networksCount; ++i)

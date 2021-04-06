@@ -359,7 +359,6 @@ void CalcPadding(uint32_t inputSize,
 
 armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr,
                                const std::vector<unsigned int>& shapes,
-                               const armnn::PermutationVector& dimensionMappings = {0, 1, 2, 3},
                                const bool outputTensor = false)
 {
     armnn::DataType type;
@@ -472,8 +471,7 @@ armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr,
             armnn::TensorInfo result(tensorShape,
                                      type,
                                      quantizationScales,
-                                     dimensionMappings[armnn::numeric_cast<unsigned int>(
-                                         tensorPtr->quantization->quantized_dimension)]);
+                                     armnn::numeric_cast<unsigned int>(tensorPtr->quantization->quantized_dimension));
             return result;
         }
     }
@@ -493,19 +491,17 @@ armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr,
     }
 }
 
-armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr,
-                               const armnn::PermutationVector& dimensionMappings = {0, 1, 2, 3})
+armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr)
 {
     auto const & dimensions = AsUnsignedVector(tensorPtr->shape);
-    return ToTensorInfo(tensorPtr, dimensions, dimensionMappings);
+    return ToTensorInfo(tensorPtr, dimensions);
 }
 
 armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr,
                                const bool outputTensor)
 {
     auto const & dimensions = AsUnsignedVector(tensorPtr->shape);
-    const armnn::PermutationVector& dimensionMappings = {0, 1, 2, 3};
-    return ToTensorInfo(tensorPtr, dimensions, dimensionMappings, outputTensor);
+    return ToTensorInfo(tensorPtr, dimensions, outputTensor);
 }
 
 template<typename T>
@@ -1013,7 +1009,7 @@ void TfLiteParserImpl::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operato
     PermutationVector permutationVector{ 2, 3, 1, 0 }; // [H, W, I, M] -> [M, I, H, W]
 
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
-    armnn::TensorInfo filterTensorInfo = ToTensorInfo(inputs[1], permutationVector);
+    armnn::TensorInfo filterTensorInfo = ToTensorInfo(inputs[1]);
 
     // Assuming input is NHWC
     unsigned int inputHeight = inputTensorInfo.GetShape()[1];

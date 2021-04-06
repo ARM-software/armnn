@@ -113,14 +113,14 @@ armnn::TensorShape Permuted(const armnn::TensorShape& srcShape,
 }
 
 armnn::TensorInfo Permuted(const armnn::TensorInfo& info,
-                           const armnn::PermutationVector& mappings,
-                           bool perChannelPermute)
+                           const armnn::PermutationVector& mappings)
 {
     armnn::TensorInfo outInfo(info);
     outInfo.SetShape(Permuted(info.GetShape(), mappings));
 
-    // If TensorInfo has Per-Axis Quantization then permute QuantizationDim to mapping
-    if (info.HasPerAxisQuantization() && perChannelPermute)
+    // If TensorInfo has Per-Axis Quantization then it also has a QuantizationDim which needs to
+    // be permuted according to the mapping
+    if (info.GetQuantizationDim().has_value())
     {
         outInfo.SetQuantizationDim(mappings[info.GetQuantizationDim().value()]);
     }

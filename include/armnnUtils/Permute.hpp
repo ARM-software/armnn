@@ -15,8 +15,7 @@ armnn::TensorShape Permuted(const armnn::TensorShape& srcShape,
                             const armnn::PermutationVector& mappings);
 
 armnn::TensorInfo Permuted(const armnn::TensorInfo& info,
-                           const armnn::PermutationVector& mappings,
-                           bool perChannelPermute = false);
+                           const armnn::PermutationVector& mappings);
 
 void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings,
              const void* src, void* dst, size_t dataTypeSize);

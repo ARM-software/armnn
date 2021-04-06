@@ -166,8 +166,10 @@ void Conv2DWithBiasesReluUint8Test(std::vector<armnn::BackendId>& backends)
                                             expectedOutputValues,
                                             biasShape,
                                             biasValues,
-                                            1, // filter scale
-                                            4, // filter offset
+                                            {1.0f}, // biasScale
+                                            {0},    // biasOffset
+                                            {1.0f}, // filterScale
+                                            {4},    // filterOffsets
                                             2, // output scale
                                             20); // output offset
 }

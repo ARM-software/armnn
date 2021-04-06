@@ -34,13 +34,16 @@ std::vector<char> CreateConv2dTfLiteModel(tflite::BuiltinOperator convolutionOpe
                                           const std::vector <int32_t>& outputTensorShape,
                                           const std::vector <T>& filterData,
                                           const std::vector <B>& biasData,
-                                          float filterScale = 1.0f,
-                                          int filterOffset = 0,
+                                          const std::vector<float> biasScales = {1.0f},
+                                          const std::vector<int64_t> biasOffsets = {0},
+                                          const std::vector<float> filterScales = {1.0f},
+                                          const std::vector<int64_t> filterOffsets = {0},
                                           float outputQuantScale = 2.0f,
                                           int outputQuantOffset = 0,
                                           float quantScale = 1.0f,
                                           int quantOffset = 0,
-                                          int32_t depth_multiplier = 1)
+                                          int32_t depth_multiplier = 1,
+                                          int32_t filterQuantizationDim = 0)
 {
     using namespace tflite;
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
@@ -67,12 +70,23 @@ std::vector<char> CreateConv2dTfLiteModel(tflite::BuiltinOperator convolutionOpe
                                      0,
                                      flatBufferBuilder.CreateVector<float>({ outputQuantScale }),
                                      flatBufferBuilder.CreateVector<int64_t>({ outputQuantOffset }));
+
     auto filterQuantizationParameters =
-        CreateQuantizationParameters(flatBufferBuilder,
-                                     0,
-                                     0,
-                                     flatBufferBuilder.CreateVector<float>({ filterScale }),
-                                     flatBufferBuilder.CreateVector<int64_t>({ filterOffset }));
+            CreateQuantizationParameters(flatBufferBuilder,
+                                         0,
+                                         0,
+                                         flatBufferBuilder.CreateVector<float>(filterScales),
+                                         flatBufferBuilder.CreateVector<int64_t>(filterOffsets),
+                                         tflite::QuantizationDetails_NONE,
+                                         0,
+                                         filterQuantizationDim);
+
+    auto biasQuantizationParameters =
+            CreateQuantizationParameters(flatBufferBuilder,
+                                         0,
+                                         0,
+                                         flatBufferBuilder.CreateVector<float>(biasScales),
+                                         flatBufferBuilder.CreateVector<int64_t>(biasOffsets));
 
     std::array<flatbuffers::Offset<Tensor>, 4> tensors;
     tensors[0] = CreateTensor(flatBufferBuilder,
@@ -100,7 +114,7 @@ std::vector<char> CreateConv2dTfLiteModel(tflite::BuiltinOperator convolutionOpe
                               biasTensorType,
                               2,
                               flatBufferBuilder.CreateString("bias"),
-                              quantizationParameters);
+                              biasQuantizationParameters);
     tensors[3] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
                                                                       outputTensorShape.size()),
@@ -192,13 +206,16 @@ void ConvolutionTest(tflite::BuiltinOperator convolutionOperatorCode,
                      std::vector<T>& expectedOutputValues,
                      const std::vector<int32_t>& biasShape = {},
                      const std::vector<B>& biasValues = {},
-                     float filterScale = 1.0f,
-                     int filterOffset = 0,
+                     const std::vector<float> biasScales = {1.0f},
+                     const std::vector<int64_t> biasOffsets = {0},
+                     const std::vector<float> filterScales = {1.0f},
+                     const std::vector<int64_t> filterOffsets = {0},
                      float outputQuantScale = 2.0f,
                      int outputQuantOffset = 0,
                      float quantScale = 1.0f,
                      int quantOffset = 0,
-                     int32_t depth_multiplier = 1)
+                     int32_t depth_multiplier = 1,
+                     int32_t filterQuantizationDim = 3)
 
 {
     using namespace tflite;
@@ -218,13 +235,16 @@ void ConvolutionTest(tflite::BuiltinOperator convolutionOperatorCode,
                                           outputShape,
                                           filterValues,
                                           biasValues,
-                                          filterScale,
-                                          filterOffset,
+                                          biasScales,
+                                          biasOffsets,
+                                          filterScales,
+                                          filterOffsets,
                                           outputQuantScale,
                                           outputQuantOffset,
                                           quantScale,
                                           quantOffset,
-                                          depth_multiplier);
+                                          depth_multiplier,
+                                          filterQuantizationDim);
 
 
     const Model* tfLiteModel = GetModel(modelBuffer.data());

@@ -291,7 +291,7 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
 
     // Mappings from TensorflowLite filter tensors to the ArmNN filter tensors (ArmNN weights have to be [M, I, H, W])
     armnn::PermutationVector permutationVector{ 2, 3, 1, 0 }; // [H, W, I, M] -> [M, I, H, W]
-    armnn::TensorInfo filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor, permutationVector);
+    armnn::TensorInfo filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
 
     // Assuming input is NHWC
     unsigned int inputHeight = inputTensorInfo.GetShape()[1];

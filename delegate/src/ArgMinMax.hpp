@@ -67,40 +67,26 @@ TfLiteStatus VisitArgMinMaxOperator(DelegateData& delegateData,
     {
         desc.m_Function = armnn::ArgMinMaxFunction::Max;
         auto* argMaxParameters = reinterpret_cast<TfLiteArgMaxParams*>(tfLiteNode->builtin_data);
-        switch (argMaxParameters->output_type)
+        if (argMaxParameters->output_type != kTfLiteInt32 && argMaxParameters->output_type != kTfLiteInt64)
         {
-            case kTfLiteInt32:
-                desc.m_Output_Type = armnn::DataType::Signed32;
-                break;
-            case kTfLiteInt64:
-                desc.m_Output_Type = armnn::DataType::Signed64;
-                break;
-            default:
-                TF_LITE_MAYBE_KERNEL_LOG(
-                    tfLiteContext,
-                    "TfLiteArmnnDelegate: output_type data type is not supported in operator #%d node #%d: ",
-                    argMinMaxOperatorCode, nodeIndex);
-                return kTfLiteError;
+            TF_LITE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnDelegate: output_type data type is not supported in operator #%d node #%d: ",
+                argMinMaxOperatorCode, nodeIndex);
+            return kTfLiteError;
         }
     }
     else
     {
         desc.m_Function = armnn::ArgMinMaxFunction::Min;
         auto* argMinParameters = reinterpret_cast<TfLiteArgMinParams*>(tfLiteNode->builtin_data);
-        switch (argMinParameters->output_type)
+        if (argMinParameters->output_type != kTfLiteInt32 && argMinParameters->output_type != kTfLiteInt64)
         {
-            case kTfLiteInt32:
-                desc.m_Output_Type = armnn::DataType::Signed32;
-                break;
-            case kTfLiteInt64:
-                desc.m_Output_Type = armnn::DataType::Signed64;
-                break;
-            default:
-                TF_LITE_MAYBE_KERNEL_LOG(
+            TF_LITE_MAYBE_KERNEL_LOG(
                     tfLiteContext,
                     "TfLiteArmnnDelegate: output_type data type is not supported in operator #%d node #%d: ",
                     argMinMaxOperatorCode, nodeIndex);
-                return kTfLiteError;
+            return kTfLiteError;
         }
     }
 

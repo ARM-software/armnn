@@ -70,7 +70,7 @@ struct ArgMinMaxDescriptor : BaseDescriptor
     ArgMinMaxFunction m_Function;
     /// Axis to reduce across the input tensor.
     int m_Axis;
-    // Tensor data type and this could be int32 or int64. Default type is int64.
+    /// Deprecated and will be removed in future release.
     armnn::DataType m_Output_Type;
 };
 

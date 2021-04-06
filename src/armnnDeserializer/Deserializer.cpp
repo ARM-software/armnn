@@ -589,6 +589,9 @@ armnn::TensorInfo ToTensorInfo(TensorRawPtr tensorPtr)
         case DataType_Signed32:
             type = armnn::DataType::Signed32;
             break;
+        case DataType_Signed64:
+            type = armnn::DataType::Signed64;
+            break;
         case DataType_Float32:
             type = armnn::DataType::Float32;
             break;

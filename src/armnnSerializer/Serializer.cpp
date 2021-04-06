@@ -1718,6 +1718,15 @@ flatbuffers::Offset<serializer::ConstTensor>
 
     switch (tensorInfo.GetDataType())
     {
+        case armnn::DataType::Signed64:
+        {
+            auto fbVector = CreateDataVector<int64_t>(constTensor.GetMemoryArea(), constTensor.GetNumBytes());
+            flatbuffers::Offset<serializer::LongData> flatBuffersData = serializer::CreateLongData(
+                    m_flatBufferBuilder,
+                    fbVector);
+            fbPayload = flatBuffersData.o;
+            break;
+        }
         case armnn::DataType::Float32:
         case armnn::DataType::Signed32:
         {

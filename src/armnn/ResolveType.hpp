@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -55,6 +55,12 @@ template<>
 struct ResolveTypeImpl<DataType::Signed32>
 {
     using Type = int32_t;
+};
+
+template<>
+struct ResolveTypeImpl<DataType::Signed64>
+{
+    using Type = int64_t;
 };
 
 template<>

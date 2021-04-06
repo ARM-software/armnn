@@ -39,7 +39,8 @@ enum DataType : byte {
     QAsymmU8 = 6,
     QSymmS16 = 7,
     QAsymmS8 = 8,
-    QSymmS8 = 9
+    QSymmS8 = 9,
+    Signed64 = 10
 }
 
 enum DataLayout : byte {

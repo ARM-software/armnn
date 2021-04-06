@@ -922,6 +922,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/DeserializeAbs.cpp
             src/armnnDeserializer/test/DeserializeActivation.cpp
             src/armnnDeserializer/test/DeserializeAdd.cpp
+            src/armnnDeserializer/test/DeserializeArgMinMax.cpp
             src/armnnDeserializer/test/DeserializeBatchToSpaceNd.cpp
             src/armnnDeserializer/test/DeserializeBatchNormalization.cpp
             src/armnnDeserializer/test/DeserializeComparison.cpp

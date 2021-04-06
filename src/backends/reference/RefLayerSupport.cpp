@@ -179,7 +179,7 @@ bool RefLayerSupport::IsArgMinMaxSupported(const armnn::TensorInfo &input, const
 {
     IgnoreUnused(descriptor);
 
-    std::array<DataType, 7> supportedTypes =
+    std::array<DataType, 8> supportedInputTypes =
     {
         DataType::BFloat16,
         DataType::Float16,
@@ -187,14 +187,20 @@ bool RefLayerSupport::IsArgMinMaxSupported(const armnn::TensorInfo &input, const
         DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16,
-        DataType::Signed32
+        DataType::Signed32,
+        DataType::Signed64
+    };
+
+    std::array<DataType,2> supportedOutputTypes = {
+        DataType::Signed32,
+        DataType::Signed64
     };
 
     bool supported = true;
 
-    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedInputTypes), reasonIfUnsupported,
                                   "Reference ArgMinMax: input is not a supported type.");
-    supported &= CheckSupportRule(TypeIs(output, DataType::Signed32), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedOutputTypes), reasonIfUnsupported,
                                   "Reference ArgMinMax: output type not supported");
 
     return supported;

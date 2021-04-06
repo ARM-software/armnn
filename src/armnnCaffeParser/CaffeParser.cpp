@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "CaffeParser.hpp"
@@ -1418,7 +1418,6 @@ void ICaffeParser::CaffeParserImpl::ParseArgmaxLayer(const LayerParameter& layer
 
     ArgMinMaxDescriptor desc;
     desc.m_Axis = axis;
-    desc.m_Output_Type = armnn::DataType::Signed32;
     desc.m_Function = ArgMinMaxFunction::Max;
 
     armnn::IConnectableLayer* argmaxLayer = m_Network->AddArgMinMaxLayer(desc,

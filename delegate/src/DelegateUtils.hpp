@@ -391,6 +391,8 @@ armnn::DataType GetDataType(const TfLiteTensor& tfLiteTensor)
             return armnn::DataType::QSymmS16;
         case kTfLiteInt32:
             return armnn::DataType::Signed32;
+        case kTfLiteInt64:
+            return armnn::DataType::Signed64;
         default:
             throw armnn::Exception(&"TfLiteArmnnDelegate: Unsupported data type: " [ tfLiteTensor.type]);
     }

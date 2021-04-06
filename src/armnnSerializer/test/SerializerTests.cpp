@@ -76,11 +76,11 @@ BOOST_AUTO_TEST_CASE(SerializeAddition)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeArgMinMax)
+void SerializeArgMinMaxTest(armnn::DataType dataType)
 {
     const std::string layerName("argminmax");
     const armnn::TensorInfo inputInfo({1, 2, 3}, armnn::DataType::Float32);
-    const armnn::TensorInfo outputInfo({1, 3}, armnn::DataType::Signed32);
+    const armnn::TensorInfo outputInfo({1, 3}, dataType);
 
     armnn::ArgMinMaxDescriptor descriptor;
     descriptor.m_Function = armnn::ArgMinMaxFunction::Max;
@@ -105,6 +105,16 @@ BOOST_AUTO_TEST_CASE(SerializeArgMinMax)
                                                                          {outputInfo},
                                                                          descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeArgMinMaxSigned32)
+{
+    SerializeArgMinMaxTest(armnn::DataType::Signed32);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeArgMinMaxSigned64)
+{
+    SerializeArgMinMaxTest(armnn::DataType::Signed64);
 }
 
 BOOST_AUTO_TEST_CASE(SerializeBatchNormalization)

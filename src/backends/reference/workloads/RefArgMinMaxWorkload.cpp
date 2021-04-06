@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -29,7 +29,7 @@ void RefArgMinMaxWorkload::Execute() const
 
     const TensorInfo &outputTensorInfo = GetTensorInfo(m_Data.m_Outputs[0]);
 
-    if (m_Data.m_Parameters.m_Output_Type == armnn::DataType::Signed32) {
+    if (outputTensorInfo.GetDataType() == armnn::DataType::Signed32) {
         int32_t *output = GetOutputTensorData<int32_t>(0, m_Data);
         ArgMinMax(decoder, output, inputTensorInfo, outputTensorInfo, m_Data.m_Parameters.m_Function,
                   m_Data.m_Parameters.m_Axis);

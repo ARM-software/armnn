@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -57,6 +57,8 @@ armnnSerializer::ConstTensorData GetFlatBufferConstTensorData(armnn::DataType da
         case armnn::DataType::QSymmS8:
         case armnn::DataType::Boolean:
             return armnnSerializer::ConstTensorData::ConstTensorData_ByteData;
+        case armnn::DataType::Signed64:
+            return armnnSerializer::ConstTensorData::ConstTensorData_LongData;
         default:
             return armnnSerializer::ConstTensorData::ConstTensorData_NONE;
     }
@@ -72,6 +74,8 @@ armnnSerializer::DataType GetFlatBufferDataType(armnn::DataType dataType)
             return armnnSerializer::DataType::DataType_Float16;
         case armnn::DataType::Signed32:
             return armnnSerializer::DataType::DataType_Signed32;
+        case armnn::DataType::Signed64:
+            return armnnSerializer::DataType::DataType_Signed64;
         case armnn::DataType::QSymmS16:
             return armnnSerializer::DataType::DataType_QSymmS16;
         case armnn::DataType::QAsymmS8:

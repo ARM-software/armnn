@@ -28,12 +28,23 @@ void FakeQuantization(const float* inputData, float* outputData, uint32_t numEle
 
 void RefFakeQuantizationFloat32Workload::Execute() const
 {
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
+}
+
+void RefFakeQuantizationFloat32Workload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
+
+void RefFakeQuantizationFloat32Workload::Execute(std::vector<ITensorHandle*> inputs,
+                                                 std::vector<ITensorHandle*> outputs) const
+{
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefFakeQuantizationFloat32Workload_Execute");
 
-    const TensorInfo& inputInfo = GetTensorInfo(m_Data.m_Inputs[0]);
+    const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
 
-    const float* inputData = GetInputTensorDataFloat(0, m_Data);
-    float* outputData = GetOutputTensorDataFloat(0, m_Data);
+    const float* inputData = reinterpret_cast<const float*>(inputs[0]->Map());
+    float* outputData = reinterpret_cast<float*>(outputs[0]->Map());
     FakeQuantization(inputData, outputData, inputInfo.GetNumElements(),
                      m_Data.m_Parameters.m_Min,
                      m_Data.m_Parameters.m_Max);

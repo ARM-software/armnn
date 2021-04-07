@@ -19,10 +19,21 @@ public:
     using BaseWorkload<RankQueueDescriptor>::BaseWorkload;
     virtual void Execute() const override
     {
-        const int32_t rank = static_cast<int32_t>(GetTensorInfo(m_Data.m_Inputs[0]).GetNumDimensions());
+        Execute(m_Data.m_Inputs, m_Data.m_Outputs);
+
+    }
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override
+    {
+        Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+    }
+
+private:
+    void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
+    {
+        const int32_t rank = static_cast<int32_t>(GetTensorInfo(inputs[0]).GetNumDimensions());
 
         std::memcpy(GetOutputTensorData<void>(0, m_Data), &rank, sizeof(int32_t));
-        m_Data.m_Outputs[0]->Unmap();
+        outputs[0]->Unmap();
     }
 };
 

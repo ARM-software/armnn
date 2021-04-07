@@ -16,7 +16,10 @@ class RefInstanceNormalizationWorkload : public BaseWorkload<InstanceNormalizati
 public:
     explicit RefInstanceNormalizationWorkload(const InstanceNormalizationQueueDescriptor& descriptor,
                                               const WorkloadInfo& info);
-    virtual void Execute() const override;
+    void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
+private:
+    void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
 };
 
 } //namespace armnn

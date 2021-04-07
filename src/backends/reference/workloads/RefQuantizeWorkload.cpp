@@ -34,21 +34,22 @@ RefQuantizeWorkload::RefQuantizeWorkload(const QuantizeQueueDescriptor& descript
 {
 }
 
-void RefQuantizeWorkload::PostAllocationConfigure()
-{
-    const TensorInfo& inputInfo = armnn::GetTensorInfo(m_Data.m_Inputs[0]);
-    m_InputDecoder = MakeDecoder<float>(inputInfo);
-
-    const TensorInfo& outputInfo = armnn::GetTensorInfo(m_Data.m_Outputs[0]);
-    m_OutputEncoder = MakeEncoder<float>(outputInfo);
-}
-
 void RefQuantizeWorkload::Execute() const
 {
-    m_InputDecoder->Reset(m_Data.m_Inputs[0]->Map());
-    m_OutputEncoder->Reset(m_Data.m_Outputs[0]->Map());
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
+}
 
-    QuantizeImpl(*m_InputDecoder, *m_OutputEncoder, m_NumElements);
+void RefQuantizeWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
+
+void RefQuantizeWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
+{
+    std::unique_ptr<Decoder<float>> inputDecoder = MakeDecoder<float>(GetTensorInfo(inputs[0]), inputs[0]->Map());
+    std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(outputs[0]), outputs[0]->Map());
+
+    QuantizeImpl(*inputDecoder, *outputEncoder, m_NumElements);
 }
 
 } //namespace armnn

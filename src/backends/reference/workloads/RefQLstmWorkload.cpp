@@ -45,19 +45,30 @@ RefQLstmWorkload::RefQLstmWorkload(const QLstmQueueDescriptor &descriptor, const
 
 void RefQLstmWorkload::Execute() const
 {
-    // This is a porting of the QLSTM::Execute() method in the Android code base
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
+}
+
+void RefQLstmWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
+
+void RefQLstmWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
+{
+    // This is a porting of the QLSTM::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs)
+    // method in the Android code base
     // Note: this implementation wraps the arithmetic functions of the LSTM cell in Quantize/Dequantize ops, so all
     // computation is done in the floating point domain. Arithmetic functions are found in LstmUtils.cpp.
     // Refer to: android/frameworks/ml/nn/common/operations/QLSTM.cpp
     const DataType& internalType = armnn::DataType::QSymmS16;
 
-    const TensorInfo& inputInfo = GetTensorInfo(m_Data.m_Inputs[0]);
-    const TensorInfo& outputStateInInfo = GetTensorInfo(m_Data.m_Inputs[1]);
-    const TensorInfo& cellStateInInfo = GetTensorInfo(m_Data.m_Inputs[2]);
+    const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
+    const TensorInfo& outputStateInInfo = GetTensorInfo(inputs[1]);
+    const TensorInfo& cellStateInInfo = GetTensorInfo(inputs[2]);
 
-    const TensorInfo& outputStateOutInfo = GetTensorInfo(m_Data.m_Outputs[0]);
-    const TensorInfo& cellStateOutInfo = GetTensorInfo(m_Data.m_Outputs[1]);
-    const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[2]);
+    const TensorInfo& outputStateOutInfo = GetTensorInfo(outputs[0]);
+    const TensorInfo& cellStateOutInfo = GetTensorInfo(outputs[1]);
+    const TensorInfo& outputInfo = GetTensorInfo(outputs[2]);
 
     const TensorShape& inputShape = inputInfo.GetShape();
     const TensorShape& outputStateInShape = outputStateInInfo.GetShape();
@@ -77,27 +88,27 @@ void RefQLstmWorkload::Execute() const
 
     // Input decoders
     std::unique_ptr<Decoder<float>> inputDecoder =
-            MakeDecoder<float>(inputInfo, m_Data.m_Inputs[0]->Map());
+            MakeDecoder<float>(inputInfo, inputs[0]->Map());
     std::unique_ptr<Decoder<float>> outputStateInDecoder =
-            MakeDecoder<float>(outputStateInInfo, m_Data.m_Inputs[1]->Map());
+            MakeDecoder<float>(outputStateInInfo, inputs[1]->Map());
     std::unique_ptr<Decoder<float>> cellStateInDecoder =
-            MakeDecoder<float>(cellStateInInfo, m_Data.m_Inputs[2]->Map());
+            MakeDecoder<float>(cellStateInInfo, inputs[2]->Map());
 
     // Output decoders
     std::unique_ptr<Decoder<float>> outputStateOutDecoder =
-            MakeDecoder<float>(outputStateOutInfo, m_Data.m_Outputs[0]->Map());
+            MakeDecoder<float>(outputStateOutInfo, outputs[0]->Map());
     std::unique_ptr<Decoder<float>> cellStateOutDecoder =
-            MakeDecoder<float>(cellStateOutInfo, m_Data.m_Outputs[1]->Map());
+            MakeDecoder<float>(cellStateOutInfo, outputs[1]->Map());
     std::unique_ptr<Decoder<float>> outputDecoder =
-            MakeDecoder<float>(outputInfo, m_Data.m_Outputs[2]->Map());
+            MakeDecoder<float>(outputInfo, outputs[2]->Map());
 
     // Output encoders
     std::unique_ptr<Encoder<float>> outputStateOutEncoder =
-            MakeEncoder<float>(outputStateOutInfo, m_Data.m_Outputs[0]->Map());
+            MakeEncoder<float>(outputStateOutInfo, outputs[0]->Map());
     std::unique_ptr<Encoder<float>> cellStateOutEncoder =
-            MakeEncoder<float>(cellStateOutInfo, m_Data.m_Outputs[1]->Map());
+            MakeEncoder<float>(cellStateOutInfo, outputs[1]->Map());
     std::unique_ptr<Encoder<float>> outputEncoder =
-            MakeEncoder<float>(outputInfo, m_Data.m_Outputs[2]->Map());
+            MakeEncoder<float>(outputInfo, outputs[2]->Map());
 
     // Weights decoders
     std::unique_ptr<Decoder<float>> inputToForgetWeightsDecoder = MakeDecoder<float>(

@@ -24,6 +24,100 @@ namespace experimental
 
 template<DataType ArmnnIType, DataType ArmnnOType,
         typename TInput = ResolveType <ArmnnIType>, typename TOutput = ResolveType <ArmnnOType>>
+void AsyncThreadedEndToEndTestImpl(INetworkPtr network,
+                                   const std::vector<std::map<int, std::vector<TInput>>>& inputTensorData,
+                                   const std::vector<std::map<int, std::vector<TOutput>>>& expectedOutputData,
+                                   std::vector<BackendId> backends,
+                                   const size_t numberOfInferences,
+                                   float tolerance = 0.000001f)
+{
+    // Create Runtime in which test will run
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // Optimize the Network
+    IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec());
+
+
+    // Creates AsyncNetwork
+    NetworkId networkId = 0;
+    std::string errorMessage;
+    const INetworkProperties networkProperties(false, false, true);
+    runtime->LoadNetwork(networkId, std::move(optNet), errorMessage, networkProperties);
+
+    std::vector<InputTensors> inputTensorsVec;
+    std::vector<OutputTensors> outputTensorsVec;
+    std::vector<std::map<int, std::vector<TOutput>>> outputStorageVec;
+    std::vector<std::unique_ptr<IWorkingMemHandle>> workingMemHandles;
+
+    for (unsigned int i = 0; i < numberOfInferences; ++i)
+    {
+        InputTensors inputTensors;
+        OutputTensors outputTensors;
+        outputStorageVec.emplace_back(std::map<int, std::vector<TOutput>>());
+
+        inputTensors.reserve(inputTensorData.size());
+        for (auto&& it : inputTensorData[i])
+        {
+            inputTensors.push_back({it.first,
+                                    ConstTensor(runtime->GetInputTensorInfo(networkId, it.first), it.second.data())});
+        }
+
+        outputTensors.reserve(expectedOutputData.size());
+        for (auto&& it : expectedOutputData[i])
+        {
+            std::vector<TOutput> out(it.second.size());
+            outputStorageVec[i].emplace(it.first, out);
+            outputTensors.push_back({it.first,
+                                     Tensor(runtime->GetOutputTensorInfo(networkId, it.first),
+                                            outputStorageVec[i].at(it.first).data())});
+        }
+
+        inputTensorsVec.push_back(inputTensors);
+        outputTensorsVec.push_back(outputTensors);
+
+        workingMemHandles.push_back(runtime->CreateWorkingMemHandle(networkId));
+    }
+
+    std::vector<std::thread> threads;
+    for (unsigned int i = 0; i < numberOfInferences; ++i)
+    {
+        // Access the vectors before we do anything multi-threaded
+        InputTensors& inputTensors = inputTensorsVec[i];
+        OutputTensors& outputTensors = outputTensorsVec[i];
+        IWorkingMemHandle& workingMemHandle = *workingMemHandles[i].get();
+
+        threads.emplace_back([&]()
+        {
+            // Run the async network
+            runtime->Execute(workingMemHandle, inputTensors, outputTensors);
+        });
+    }
+
+    for (unsigned int i = 0; i < numberOfInferences; ++i)
+    {
+        threads[i].join();
+    }
+
+    // Checks the results.
+    for (unsigned int i = 0; i < numberOfInferences; ++i)
+    {
+        for (auto &&it : expectedOutputData[i])
+        {
+            std::vector<TOutput> out = outputStorageVec[i].at(it.first);
+            for (unsigned int j = 0; j < out.size(); ++j)
+            {
+                BOOST_CHECK(Compare<ArmnnOType>(it.second[j], out[j], tolerance) == true);
+            }
+        }
+    }
+
+}
+
+
+
+template<DataType ArmnnIType, DataType ArmnnOType,
+        typename TInput = ResolveType <ArmnnIType>, typename TOutput = ResolveType <ArmnnOType>>
 void AsyncEndToEndTestImpl(INetworkPtr network,
                            const std::map<int, std::vector<TInput>>& inputTensorData,
                            const std::map<int, std::vector<TOutput>>& expectedOutputData,
@@ -169,7 +263,71 @@ void StridedSlicedEndToEndTest(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = {{0, inputData}};
     std::map<int, std::vector<T>> expectedOutputData = {{0, outputExpected}};
 
-    AsyncEndToEndTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+    AsyncEndToEndTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends, 1);
+}
+
+template<armnn::DataType ArmnnType>
+void StridedSlicedMultiThreadedEndToEndTest(const std::vector<BackendId>& backends)
+{
+    using namespace armnn;
+    using T = ResolveType<ArmnnType>;
+
+    const TensorShape& inputShape = {3, 2, 3, 1};
+    const TensorShape& outputShape = {1, 2, 3, 1};
+    const std::vector<int>& beginData = {1, 0, 0, 0};
+    const std::vector<int>& endData = {2, 2, 3, 1};
+    const std::vector<int>& stridesData = {1, 1, 1, 1};
+    int beginMask = 0;
+    int endMask = 0;
+    int shrinkAxisMask = 0;
+    int ellipsisMask = 0;
+    int newAxisMask = 0;
+
+    // Builds up the structure of the network
+    INetworkPtr net = CreateStridedSliceNetwork<ArmnnType>(inputShape,
+                                                           outputShape,
+                                                           beginData,
+                                                           endData,
+                                                           stridesData,
+                                                           beginMask,
+                                                           endMask,
+                                                           shrinkAxisMask,
+                                                           ellipsisMask,
+                                                           newAxisMask);
+
+    BOOST_TEST_CHECKPOINT("create a network");
+
+    // Creates structures for input & output.
+    std::vector<T> inputData1{
+            1.0f, 1.0f, 1.0f, 2.0f, 2.0f, 2.0f,
+
+            3.0f, 3.0f, 3.0f, 4.0f, 4.0f, 4.0f,
+
+            5.0f, 5.0f, 5.0f, 6.0f, 6.0f, 6.0f
+    };
+
+    std::vector<T> outputExpected1{ 3.0f, 3.0f, 3.0f, 4.0f, 4.0f, 4.0f };
+
+    // Creates structures for input & output.
+    std::vector<T> inputData2{
+            1.0f, 1.0f, 1.0f, 2.0f, 2.0f, 2.0f,
+
+            8.0f, 8.0f, 8.0f, 7.0f, 7.0f, 7.0f,
+
+            5.0f, 5.0f, 5.0f, 6.0f, 6.0f, 6.0f
+    };
+
+    std::vector<T> outputExpected2{ 8.0f, 8.0f, 8.0f, 7.0f, 7.0f, 7.0f };
+
+    std::vector<std::map<int, std::vector<T>>> inputTensors;
+    std::vector<std::map<int, std::vector<T>>> outputTensors;
+
+    inputTensors.push_back(std::map<int, std::vector<T>> {{0, inputData1}});
+    inputTensors.push_back(std::map<int, std::vector<T>> {{0, inputData2}});
+    outputTensors.push_back(std::map<int, std::vector<T>> {{0, outputExpected1}});
+    outputTensors.push_back(std::map<int, std::vector<T>> {{0, outputExpected2}});
+
+    AsyncThreadedEndToEndTestImpl<ArmnnType, ArmnnType>(move(net), inputTensors, outputTensors, backends, 2);
 }
 
 } // experimental namespace

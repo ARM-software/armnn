@@ -16,9 +16,11 @@ class RefDetectionPostProcessWorkload : public BaseWorkload<DetectionPostProcess
 public:
     explicit RefDetectionPostProcessWorkload(const DetectionPostProcessQueueDescriptor& descriptor,
                                              const WorkloadInfo& info);
-    virtual void Execute() const override;
+    void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
 
 private:
+    void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
     std::unique_ptr<ScopedCpuTensorHandle> m_Anchors;
 };
 

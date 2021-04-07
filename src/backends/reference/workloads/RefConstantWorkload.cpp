@@ -20,21 +20,20 @@ RefConstantWorkload::RefConstantWorkload(
     const ConstantQueueDescriptor& descriptor, const WorkloadInfo& info)
     : BaseWorkload<ConstantQueueDescriptor>(descriptor, info) {}
 
-void RefConstantWorkload::PostAllocationConfigure()
-{
-    const ConstantQueueDescriptor& data = this->m_Data;
-
-    ARMNN_ASSERT(data.m_LayerOutput != nullptr);
-
-    const TensorInfo& outputInfo = GetTensorInfo(data.m_Outputs[0]);
-    ARMNN_ASSERT(data.m_LayerOutput->GetTensorInfo().GetNumBytes() == outputInfo.GetNumBytes());
-
-    memcpy(GetOutputTensorData<void>(0, data), data.m_LayerOutput->GetConstTensor<void>(),
-        outputInfo.GetNumBytes());
-}
-
 void RefConstantWorkload::Execute() const
 {
+    Execute(m_Data.m_Outputs);
+}
+
+void RefConstantWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Outputs);
+}
+
+void RefConstantWorkload::Execute(std::vector<ITensorHandle*> outputs) const
+{
+    memcpy(outputs[0]->Map(), m_Data.m_LayerOutput->GetConstTensor<void>(), GetTensorInfo(outputs[0]).GetNumBytes());
+
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefConstantWorkload_Execute");
 }
 

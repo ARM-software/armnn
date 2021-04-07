@@ -40,25 +40,35 @@ RefLstmWorkload::RefLstmWorkload(const LstmQueueDescriptor &descriptor, const Wo
 
 void RefLstmWorkload::Execute() const
 {
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
+}
+
+void RefLstmWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
+
+void RefLstmWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
+{
     // This is a porting of the LSTM::Eval() method in the Android code base
     // Refer to: android/frameworks/ml/nn/common/operations/LSTM.cpp
 
-    const TensorInfo& inputInfo = GetTensorInfo(m_Data.m_Inputs[0]);
-    const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[0]);
+    const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
+    const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);
 
     const TensorShape& inputShape = inputInfo.GetShape();
     const DataType& outputType = outputInfo.GetDataType();
 
-    std::unique_ptr<Encoder<float>> outputStateOut = MakeEncoder<float>(outputInfo, m_Data.m_Outputs[1]->Map());
-    std::unique_ptr<Encoder<float>> cellStateOut   = MakeEncoder<float>(outputInfo, m_Data.m_Outputs[2]->Map());
-    std::unique_ptr<Encoder<float>> output         = MakeEncoder<float>(outputInfo, m_Data.m_Outputs[3]->Map());
+    std::unique_ptr<Encoder<float>> outputStateOut = MakeEncoder<float>(outputInfo, outputs[1]->Map());
+    std::unique_ptr<Encoder<float>> cellStateOut   = MakeEncoder<float>(outputInfo, outputs[2]->Map());
+    std::unique_ptr<Encoder<float>> output         = MakeEncoder<float>(outputInfo, outputs[3]->Map());
 
-    std::unique_ptr<Decoder<float>> cellStateOutDecoder = MakeDecoder<float>(outputInfo, m_Data.m_Outputs[2]->Map());
-    std::unique_ptr<Decoder<float>> outputDecoder       = MakeDecoder<float>(outputInfo, m_Data.m_Outputs[3]->Map());
+    std::unique_ptr<Decoder<float>> cellStateOutDecoder = MakeDecoder<float>(outputInfo, outputs[2]->Map());
+    std::unique_ptr<Decoder<float>> outputDecoder       = MakeDecoder<float>(outputInfo, outputs[3]->Map());
 
-    std::unique_ptr<Decoder<float>> inputData     = MakeDecoder<float>(inputInfo, m_Data.m_Inputs[0]->Map());
-    std::unique_ptr<Decoder<float>> outputStateIn = MakeDecoder<float>(inputInfo, m_Data.m_Inputs[1]->Map());
-    std::unique_ptr<Decoder<float>> cellStateIn   = MakeDecoder<float>(inputInfo, m_Data.m_Inputs[2]->Map());
+    std::unique_ptr<Decoder<float>> inputData     = MakeDecoder<float>(inputInfo, inputs[0]->Map());
+    std::unique_ptr<Decoder<float>> outputStateIn = MakeDecoder<float>(inputInfo, inputs[1]->Map());
+    std::unique_ptr<Decoder<float>> cellStateIn   = MakeDecoder<float>(inputInfo, inputs[2]->Map());
 
     const uint32_t nBatch = inputShape[0];
     const uint32_t nInput = inputShape[1];
@@ -71,19 +81,19 @@ void RefLstmWorkload::Execute() const
     const bool useLayerNorm = m_Data.m_Parameters.m_LayerNormEnabled;
 
     // Index the scratch buffers pointers to the global scratch buffer.
-    std::unique_ptr<Encoder<float>> inputGateScratch  = MakeEncoder<float>(outputInfo, m_Data.m_Outputs[0]->Map());
-    std::unique_ptr<Encoder<float>> cellScratch       = MakeEncoder<float>(outputInfo, m_Data.m_Outputs[0]->Map());
-    std::unique_ptr<Encoder<float>> forgetGateScratch = MakeEncoder<float>(outputInfo, m_Data.m_Outputs[0]->Map());
-    std::unique_ptr<Encoder<float>> outputGateScratch = MakeEncoder<float>(outputInfo, m_Data.m_Outputs[0]->Map());
+    std::unique_ptr<Encoder<float>> inputGateScratch  = MakeEncoder<float>(outputInfo, outputs[0]->Map());
+    std::unique_ptr<Encoder<float>> cellScratch       = MakeEncoder<float>(outputInfo, outputs[0]->Map());
+    std::unique_ptr<Encoder<float>> forgetGateScratch = MakeEncoder<float>(outputInfo, outputs[0]->Map());
+    std::unique_ptr<Encoder<float>> outputGateScratch = MakeEncoder<float>(outputInfo, outputs[0]->Map());
 
     std::unique_ptr<Decoder<float>> inputGateScratchDecoder =
-        MakeDecoder<float>(outputInfo, m_Data.m_Outputs[0]->Map());
+        MakeDecoder<float>(outputInfo, outputs[0]->Map());
     std::unique_ptr<Decoder<float>> cellScratchDecoder =
-        MakeDecoder<float>(outputInfo, m_Data.m_Outputs[0]->Map());
+        MakeDecoder<float>(outputInfo, outputs[0]->Map());
     std::unique_ptr<Decoder<float>> forgetGateScratchDecoder =
-        MakeDecoder<float>(outputInfo, m_Data.m_Outputs[0]->Map());
+        MakeDecoder<float>(outputInfo, outputs[0]->Map());
     std::unique_ptr<Decoder<float>> outputGateScratchDecoder =
-        MakeDecoder<float>(outputInfo, m_Data.m_Outputs[0]->Map());
+        MakeDecoder<float>(outputInfo, outputs[0]->Map());
 
     if (useCifg)
     {

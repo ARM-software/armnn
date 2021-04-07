@@ -24,6 +24,17 @@ RefBatchNormalizationWorkload::RefBatchNormalizationWorkload(const BatchNormaliz
 
 void RefBatchNormalizationWorkload::Execute() const
 {
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
+}
+
+void RefBatchNormalizationWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
+
+void RefBatchNormalizationWorkload::Execute(std::vector<ITensorHandle*> inputs,
+                                            std::vector<ITensorHandle*> outputs) const
+{
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefBatchNormalizationWorkload_Execute");
 
     std::unique_ptr<Decoder<float>> meanDecoder     = MakeDecoder<float>(m_Mean->GetTensorInfo(),
@@ -34,10 +45,10 @@ void RefBatchNormalizationWorkload::Execute() const
                                                                          m_Gamma->Map(true));
     std::unique_ptr<Decoder<float>> betaDecoder     = MakeDecoder<float>(m_Beta->GetTensorInfo(),
                                                                          m_Beta->Map(true));
-    std::unique_ptr<Decoder<float>> inputDecoder    = MakeDecoder<float>(GetTensorInfo(m_Data.m_Inputs[0]),
-                                                                         m_Data.m_Inputs[0]->Map());
-    std::unique_ptr<Encoder<float>> outputEncoder   = MakeEncoder<float>(GetTensorInfo(m_Data.m_Outputs[0]),
-                                                                         m_Data.m_Outputs[0]->Map());
+    std::unique_ptr<Decoder<float>> inputDecoder    = MakeDecoder<float>(GetTensorInfo(inputs[0]),
+                                                                         inputs[0]->Map());
+    std::unique_ptr<Encoder<float>> outputEncoder   = MakeEncoder<float>(GetTensorInfo(outputs[0]),
+                                                                         outputs[0]->Map());
 
     BatchNormImpl(m_Data, *meanDecoder, *varianceDecoder, *betaDecoder, *gammaDecoder, *inputDecoder, *outputEncoder);
 }

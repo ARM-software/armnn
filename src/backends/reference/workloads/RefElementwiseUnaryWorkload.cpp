@@ -28,28 +28,29 @@ RefElementwiseUnaryWorkload::RefElementwiseUnaryWorkload(const ElementwiseUnaryQ
     : BaseWorkload<ElementwiseUnaryQueueDescriptor>(desc, info)
 {}
 
-void RefElementwiseUnaryWorkload::PostAllocationConfigure()
+void RefElementwiseUnaryWorkload::Execute() const
 {
-    const TensorInfo& inputInfo = GetTensorInfo(m_Data.m_Inputs[0]);
-    const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[0]);
-
-    m_Input = MakeDecoder<InType>(inputInfo);
-
-    m_Output = MakeEncoder<OutType>(outputInfo);
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
 }
 
-void RefElementwiseUnaryWorkload::Execute() const
+void RefElementwiseUnaryWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
+
+void RefElementwiseUnaryWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefElementwiseUnaryWorkload_Execute");
 
-    const TensorInfo& inputInfo = GetTensorInfo(m_Data.m_Inputs[0]);
-    const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[0]);
+    const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
+    const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);
 
     const TensorShape& inShape = inputInfo.GetShape();
     const TensorShape& outShape = outputInfo.GetShape();
 
-    m_Input->Reset(m_Data.m_Inputs[0]->Map());
-    m_Output->Reset(m_Data.m_Outputs[0]->Map());
+    std::unique_ptr<Decoder<InType>>  input = MakeDecoder<InType>(inputInfo, inputs[0]->Map());
+    std::unique_ptr<Encoder<OutType>> output= MakeEncoder<OutType>(outputInfo, outputs[0]->Map());
 
     using AbsFunction   = ElementwiseUnaryFunction<abs<InType>>;
     using ExpFunction   = ElementwiseUnaryFunction<exp<InType>>;
@@ -61,27 +62,27 @@ void RefElementwiseUnaryWorkload::Execute() const
     {
         case UnaryOperation::Abs:
         {
-            AbsFunction(inShape, outShape, *m_Input, *m_Output);
+            AbsFunction(inShape, outShape, *input, *output);
             break;
         }
         case UnaryOperation::Exp:
         {
-            ExpFunction(inShape, outShape, *m_Input, *m_Output);
+            ExpFunction(inShape, outShape, *input, *output);
             break;
         }
         case UnaryOperation::Neg:
         {
-            NegFunction(inShape, outShape, *m_Input, *m_Output);
+            NegFunction(inShape, outShape, *input, *output);
             break;
         }
         case UnaryOperation::Rsqrt:
         {
-            RsqrtFunction(inShape, outShape, *m_Input, *m_Output);
+            RsqrtFunction(inShape, outShape, *input, *output);
             break;
         }
         case UnaryOperation::Sqrt:
         {
-            SqrtFunction(inShape, outShape, *m_Input, *m_Output);
+            SqrtFunction(inShape, outShape, *input, *output);
             break;
         }
         default:

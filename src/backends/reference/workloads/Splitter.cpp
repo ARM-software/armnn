@@ -18,12 +18,14 @@
 namespace armnn
 {
 
-void Split(const SplitterQueueDescriptor& data)
+void Split(const SplitterQueueDescriptor& data,
+           std::vector<ITensorHandle*> inputs,
+           std::vector<ITensorHandle*> outputs)
 {
-    const TensorInfo& inputInfo = GetTensorInfo(data.m_Inputs[0]);
+    const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
 
     std::unique_ptr<Decoder<float>> decoderPtr =
-        MakeDecoder<float>(inputInfo, data.m_Inputs[0]->Map());
+        MakeDecoder<float>(inputInfo, inputs[0]->Map());
     Decoder<float>& decoder = *decoderPtr;
 
     for (unsigned int index = 0; index < inputInfo.GetNumElements(); ++index)
@@ -45,7 +47,7 @@ void Split(const SplitterQueueDescriptor& data)
             SplitterQueueDescriptor::ViewOrigin const& view = data.m_ViewOrigins[viewIdx];
 
             //Split view extents are defined by the size of (the corresponding) input tensor.
-            const TensorInfo& outputInfo = GetTensorInfo(data.m_Outputs[viewIdx]);
+            const TensorInfo& outputInfo = GetTensorInfo(outputs[viewIdx]);
             ARMNN_ASSERT(outputInfo.GetNumDimensions() == inputInfo.GetNumDimensions());
 
             // Check all dimensions to see if this element is inside the given input view.
@@ -65,7 +67,7 @@ void Split(const SplitterQueueDescriptor& data)
             if (insideView)
             {
                 std::unique_ptr<Encoder<float>> encoderPtr =
-                    MakeEncoder<float>(outputInfo, data.m_Outputs[viewIdx]->Map());
+                    MakeEncoder<float>(outputInfo, outputs[viewIdx]->Map());
                 Encoder<float>& encoder = *encoderPtr;
 
                 unsigned int outIndex = 0;

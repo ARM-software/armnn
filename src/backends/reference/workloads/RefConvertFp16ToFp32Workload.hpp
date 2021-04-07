@@ -15,7 +15,10 @@ class RefConvertFp16ToFp32Workload : public Float16ToFloat32Workload<ConvertFp16
 {
 public:
     using Float16ToFloat32Workload<ConvertFp16ToFp32QueueDescriptor>::Float16ToFloat32Workload;
-    virtual void Execute() const override;
+    void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
+private:
+    void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
 };
 
 } //namespace armnn

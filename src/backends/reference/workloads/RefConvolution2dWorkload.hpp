@@ -19,21 +19,18 @@ public:
     explicit RefConvolution2dWorkload(const Convolution2dQueueDescriptor& descriptor,
                                       const WorkloadInfo& info);
 
-    void PostAllocationConfigure() override;
 
-    virtual void Execute() const override;
+    void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
 
 private:
+    void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
     std::unique_ptr<ScopedCpuTensorHandle> m_Weight;
     std::unique_ptr<ScopedCpuTensorHandle> m_Bias;
 
-    std::unique_ptr<Decoder<float>> m_InputDecoder;
-    std::unique_ptr<Encoder<float>> m_OutputEncoder;
     std::unique_ptr<Decoder<float>> m_FilterDecoder;
     std::unique_ptr<Decoder<float>> m_BiasDecoder;
 
-    TensorShape m_InputShape;
-    TensorShape m_OutputShape;
     TensorShape m_FilterShape;
 };
 

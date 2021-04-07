@@ -163,12 +163,22 @@ RefNormalizationWorkload::RefNormalizationWorkload(const NormalizationQueueDescr
 
 void RefNormalizationWorkload::Execute() const
 {
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
+}
+
+void RefNormalizationWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
+
+void RefNormalizationWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
+{
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefNormalizationWorkload_Execute");
 
-    const TensorInfo& inputInfo = GetTensorInfo(m_Data.m_Inputs[0]);
+    const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
 
-    auto inputDecoder  = MakeDecoder<float>(inputInfo, m_Data.m_Inputs[0]->Map());
-    auto outputEncoder = MakeEncoder<float>(inputInfo, m_Data.m_Outputs[0]->Map());
+    auto inputDecoder  = MakeDecoder<float>(inputInfo, inputs[0]->Map());
+    auto outputEncoder = MakeEncoder<float>(inputInfo, outputs[0]->Map());
 
     if (NormalizationAlgorithmMethod::LocalBrightness == m_Data.m_Parameters.m_NormMethodType)
     {

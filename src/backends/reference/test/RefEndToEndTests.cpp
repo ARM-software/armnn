@@ -1341,6 +1341,11 @@ BOOST_AUTO_TEST_CASE(RefAsyncFP32StridedSlicedEndToEndTest)
 {
     armnn::experimental::StridedSlicedEndToEndTest<armnn::DataType::Float32>(defaultBackends);
 }
+
+BOOST_AUTO_TEST_CASE(RefAsyncFP32StridedSlicedMultiThreadedEndToEndTest)
+{
+    armnn::experimental::StridedSlicedMultiThreadedEndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
 #endif
 
 BOOST_AUTO_TEST_SUITE_END()

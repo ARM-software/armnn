@@ -21,8 +21,11 @@ public:
     RefComparisonWorkload(const ComparisonQueueDescriptor& descriptor, const WorkloadInfo& info);
     void PostAllocationConfigure() override;
     void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
 
 private:
+    void PostAllocationConfigure(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs);
+    void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
     using InType  = float;
     using OutType = bool;
 

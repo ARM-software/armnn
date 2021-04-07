@@ -25,6 +25,9 @@ public:
     using TypedWorkload<TransposeQueueDescriptor, DataType>::m_Data;
     using TypedWorkload<TransposeQueueDescriptor, DataType>::TypedWorkload;
     void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
+private:
+    void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
 };
 
 using RefTransposeBFloat16Workload = RefTransposeWorkload<DataType::BFloat16>;

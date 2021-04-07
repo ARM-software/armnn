@@ -14,9 +14,11 @@ namespace armnn
 {
 
 template <typename DataType>
-void Splitter(const SplitterQueueDescriptor& data)
+void Splitter(const SplitterQueueDescriptor& data,
+              std::vector<ITensorHandle*> inputs,
+              std::vector<ITensorHandle*> outputs)
 {
-    const TensorInfo& inputInfo0 = GetTensorInfo(data.m_Inputs[0]);
+    const TensorInfo& inputInfo0 = GetTensorInfo(inputs[0]);
 
     for (unsigned int index = 0; index < inputInfo0.GetNumElements(); ++index)
     {
@@ -37,7 +39,7 @@ void Splitter(const SplitterQueueDescriptor& data)
             SplitterQueueDescriptor::ViewOrigin const& view = data.m_ViewOrigins[viewIdx];
 
             //Split view extents are defined by the size of (the corresponding) input tensor.
-            const TensorInfo& outputInfo = GetTensorInfo(data.m_Outputs[viewIdx]);
+            const TensorInfo& outputInfo = GetTensorInfo(outputs[viewIdx]);
             ARMNN_ASSERT(outputInfo.GetNumDimensions() == inputInfo0.GetNumDimensions());
 
             // Check all dimensions to see if this element is inside the given input view.
@@ -78,5 +80,7 @@ void Splitter(const SplitterQueueDescriptor& data)
     }
 }
 
-void Split(const SplitterQueueDescriptor& data);
+void Split(const SplitterQueueDescriptor& data,
+           std::vector<ITensorHandle*> inputs,
+           std::vector<ITensorHandle*> outputs);
 } //namespace armnn

@@ -20,14 +20,24 @@ RefPreluWorkload::RefPreluWorkload(const PreluQueueDescriptor& descriptor,
 
 void RefPreluWorkload::Execute() const
 {
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
+}
+
+void RefPreluWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
+
+void RefPreluWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
+{
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefPreluWorkload_Execute");
 
-    std::unique_ptr<Decoder<float>> inputDecoder = MakeDecoder<float>(GetTensorInfo(m_Data.m_Inputs[0]),
-                                                                      m_Data.m_Inputs[0]->Map());
-    std::unique_ptr<Decoder<float>> alphaDecoder = MakeDecoder<float>(GetTensorInfo(m_Data.m_Inputs[1]),
-                                                                      m_Data.m_Inputs[1]->Map());
-    std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(m_Data.m_Outputs[0]),
-                                                                       m_Data.m_Outputs[0]->Map());
+    std::unique_ptr<Decoder<float>> inputDecoder = MakeDecoder<float>(GetTensorInfo(inputs[0]),
+                                                                      inputs[0]->Map());
+    std::unique_ptr<Decoder<float>> alphaDecoder = MakeDecoder<float>(GetTensorInfo(inputs[1]),
+                                                                      inputs[1]->Map());
+    std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(outputs[0]),
+                                                                       outputs[0]->Map());
 
     PreluImpl(m_Data, *inputDecoder, *alphaDecoder, *outputEncoder);
 }

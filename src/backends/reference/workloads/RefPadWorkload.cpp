@@ -14,10 +14,20 @@ namespace armnn
 
 void RefPadWorkload::Execute() const
 {
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
+}
+
+void RefPadWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
+
+void RefPadWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
+{
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefPadWorkload_Execute");
 
-    const TensorInfo& inputInfo  = GetTensorInfo(m_Data.m_Inputs[0]);
-    const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[0]);
+    const TensorInfo& inputInfo  = GetTensorInfo(inputs[0]);
+    const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);
 
     armnn::Pad(inputInfo,
                outputInfo,

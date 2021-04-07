@@ -17,18 +17,30 @@ namespace armnn
 template<armnn::DataType DataType>
 void RefDebugWorkload<DataType>::Execute() const
 {
+    Execute(m_Data.m_Inputs);
+}
+
+template<armnn::DataType DataType>
+void RefDebugWorkload<DataType>::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Inputs);
+}
+
+template<armnn::DataType DataType>
+void RefDebugWorkload<DataType>::Execute(std::vector<ITensorHandle*> inputs) const
+{
     using T = ResolveType<DataType>;
 
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, GetName() + "_Execute");
 
-    const TensorInfo& inputInfo = GetTensorInfo(m_Data.m_Inputs[0]);
+    const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
 
     const T* inputData = GetInputTensorData<T>(0, m_Data);
     T* outputData = GetOutputTensorData<T>(0, m_Data);
 
     if (m_Callback)
     {
-        m_Callback(m_Data.m_Guid, m_Data.m_SlotIndex, m_Data.m_Inputs[0]);
+        m_Callback(m_Data.m_Guid, m_Data.m_SlotIndex, inputs[0]);
     }
     else
     {

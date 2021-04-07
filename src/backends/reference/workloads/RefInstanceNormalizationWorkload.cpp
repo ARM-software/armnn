@@ -20,12 +20,23 @@ RefInstanceNormalizationWorkload::RefInstanceNormalizationWorkload(
 
 void RefInstanceNormalizationWorkload::Execute() const
 {
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
+}
+
+void RefInstanceNormalizationWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
+
+void RefInstanceNormalizationWorkload::Execute(std::vector<ITensorHandle*> inputs,
+                                               std::vector<ITensorHandle*> outputs) const
+{
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefInstanceNormalizationWorkload_Execute");
 
-    std::unique_ptr<Decoder<float>> inputDecoder  = MakeDecoder<float>(GetTensorInfo(m_Data.m_Inputs[0]),
-                                                                       m_Data.m_Inputs[0]->Map());
-    std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(m_Data.m_Outputs[0]),
-                                                                       m_Data.m_Outputs[0]->Map());
+    std::unique_ptr<Decoder<float>> inputDecoder  = MakeDecoder<float>(GetTensorInfo(inputs[0]),
+                                                                       inputs[0]->Map());
+    std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(outputs[0]),
+                                                                       outputs[0]->Map());
 
     InstanceNorm(m_Data, *inputDecoder, *outputEncoder);
 }

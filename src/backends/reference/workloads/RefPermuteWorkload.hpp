@@ -25,6 +25,9 @@ public:
     using TypedWorkload<PermuteQueueDescriptor, DataType>::m_Data;
     using TypedWorkload<PermuteQueueDescriptor, DataType>::TypedWorkload;
     void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
+private:
+    void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
 };
 
 using RefPermuteBFloat16Workload = RefPermuteWorkload<DataType::BFloat16>;

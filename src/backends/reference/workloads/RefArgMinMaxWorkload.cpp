@@ -18,16 +18,27 @@ RefArgMinMaxWorkload::RefArgMinMaxWorkload(
         const WorkloadInfo& info)
         : BaseWorkload<ArgMinMaxQueueDescriptor>(descriptor, info) {}
 
+
 void RefArgMinMaxWorkload::Execute() const
+{
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
+}
+
+void RefArgMinMaxWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
+
+void RefArgMinMaxWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefArgMinMaxWorkload_Execute");
 
-    const TensorInfo &inputTensorInfo = GetTensorInfo(m_Data.m_Inputs[0]);
+    const TensorInfo &inputTensorInfo = GetTensorInfo(inputs[0]);
 
-    std::unique_ptr<Decoder<float>> decoderPtr = MakeDecoder<float>(inputTensorInfo, m_Data.m_Inputs[0]->Map());
+    std::unique_ptr<Decoder<float>> decoderPtr = MakeDecoder<float>(inputTensorInfo, inputs[0]->Map());
     Decoder<float> &decoder = *decoderPtr;
 
-    const TensorInfo &outputTensorInfo = GetTensorInfo(m_Data.m_Outputs[0]);
+    const TensorInfo &outputTensorInfo = GetTensorInfo(outputs[0]);
 
     if (outputTensorInfo.GetDataType() == armnn::DataType::Signed32) {
         int32_t *output = GetOutputTensorData<int32_t>(0, m_Data);

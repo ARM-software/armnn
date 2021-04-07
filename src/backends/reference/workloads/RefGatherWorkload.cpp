@@ -15,18 +15,28 @@ namespace armnn
 
 void RefGatherWorkload::Execute() const
 {
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
+}
+
+void RefGatherWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
+
+void RefGatherWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
+{
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefGatherWorkload_Execute");
 
-    const TensorInfo& inputInfo0 = GetTensorInfo(m_Data.m_Inputs[0]);
-    const TensorInfo& inputInfo1 = GetTensorInfo(m_Data.m_Inputs[1]);
-    const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[0]);
+    const TensorInfo& inputInfo0 = GetTensorInfo(inputs[0]);
+    const TensorInfo& inputInfo1 = GetTensorInfo(inputs[1]);
+    const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);
 
-    std::unique_ptr<Decoder<float>> decoderPtr = MakeDecoder<float>(inputInfo0, m_Data.m_Inputs[0]->Map());
+    std::unique_ptr<Decoder<float>> decoderPtr = MakeDecoder<float>(inputInfo0, inputs[0]->Map());
     Decoder<float>& decoder = *decoderPtr;
 
     const int32_t* indicesData = GetInputTensorData<int32_t>(1, m_Data);
 
-    std::unique_ptr<Encoder<float>> encoderPtr = MakeEncoder<float>(outputInfo, m_Data.m_Outputs[0]->Map());
+    std::unique_ptr<Encoder<float>> encoderPtr = MakeEncoder<float>(outputInfo, outputs[0]->Map());
     Encoder<float>& encoder = *encoderPtr;
 
     Gather(inputInfo0, inputInfo1, outputInfo, decoder, indicesData, encoder, m_Data.m_Parameters.m_Axis);

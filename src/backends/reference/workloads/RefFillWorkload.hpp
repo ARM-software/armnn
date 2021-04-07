@@ -15,7 +15,10 @@ class RefFillWorkload : public BaseWorkload<FillQueueDescriptor>
 {
 public:
     using BaseWorkload<FillQueueDescriptor>::BaseWorkload;
-    virtual void Execute() const override;
+    void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
+private:
+    void Execute(std::vector<ITensorHandle*> outputs) const;
 };
 
 } //namespace armnn

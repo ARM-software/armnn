@@ -18,9 +18,11 @@ class RefQLstmWorkload : public BaseWorkload<QLstmQueueDescriptor>
 public:
     explicit RefQLstmWorkload(const QLstmQueueDescriptor& descriptor, const WorkloadInfo& info);
 
-    virtual void Execute() const override;
+    void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
 
 private:
+    void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
     std::unique_ptr<ScopedCpuTensorHandle> m_InputToInputWeightsTensor;
     std::unique_ptr<ScopedCpuTensorHandle> m_InputToForgetWeightsTensor;
     std::unique_ptr<ScopedCpuTensorHandle> m_InputToCellWeightsTensor;

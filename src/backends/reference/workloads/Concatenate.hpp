@@ -10,5 +10,7 @@
 
 namespace armnn
 {
-void Concatenate(const ConcatQueueDescriptor &data);
+void Concatenate(const ConcatQueueDescriptor &data,
+                 std::vector<ITensorHandle*> inputs,
+                 std::vector<ITensorHandle*> outputs);
 } //namespace armnn

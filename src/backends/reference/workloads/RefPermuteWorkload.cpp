@@ -16,12 +16,25 @@ namespace armnn
 template <armnn::DataType DataType>
 void RefPermuteWorkload<DataType>::Execute() const
 {
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
+}
+
+template <armnn::DataType DataType>
+void RefPermuteWorkload<DataType>::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
+
+template <armnn::DataType DataType>
+void RefPermuteWorkload<DataType>::Execute(std::vector<ITensorHandle*> inputs,
+                                           std::vector<ITensorHandle*> outputs) const
+{
     using T = ResolveType<DataType>;
 
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, GetName() + "_Execute");
 
-    const ITensorHandle*     src      = m_Data.m_Inputs[0];
-    ITensorHandle*           dst      = m_Data.m_Outputs[0];
+    const ITensorHandle*     src      = inputs[0];
+    ITensorHandle*           dst      = outputs[0];
     const PermutationVector& mappings = m_Data.m_Parameters.m_DimMappings;
 
     armnnUtils::Permute(GetTensorInfo(dst).GetShape(), mappings,

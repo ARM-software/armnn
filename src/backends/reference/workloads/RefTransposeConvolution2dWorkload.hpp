@@ -21,22 +21,17 @@ public:
                                       const WorkloadInfo& info);
     ~RefTransposeConvolution2dWorkload() = default;
 
-    void PostAllocationConfigure() override;
-
     void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
 
 private:
+    void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
     std::unique_ptr<ScopedCpuTensorHandle> m_Weights;
     std::unique_ptr<ScopedCpuTensorHandle> m_Biases;
-
-    std::unique_ptr<Decoder<float>> m_InputDecoder;
-    std::unique_ptr<Encoder<float>> m_OutputEncoder;
 
     std::unique_ptr<Decoder<float>> m_WeightsDecoder;
     std::unique_ptr<Decoder<float>> m_BiasesDecoder;
 
-    TensorShape m_InputShape;
-    TensorShape m_OutputShape;
     TensorShape m_WeightsShape;
 };
 

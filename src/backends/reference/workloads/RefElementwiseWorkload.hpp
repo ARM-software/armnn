@@ -26,13 +26,11 @@ public:
     using BaseWorkload<ParentDescriptor>::m_Data;
 
     RefElementwiseWorkload(const ParentDescriptor& descriptor, const WorkloadInfo& info);
-    void PostAllocationConfigure() override;
     void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
 
 private:
-    std::unique_ptr<Decoder<InType>> m_Input0;
-    std::unique_ptr<Decoder<InType>> m_Input1;
-    std::unique_ptr<Encoder<OutType>> m_Output;
+    void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
 };
 
 template <typename DataType = float>

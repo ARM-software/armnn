@@ -19,16 +19,13 @@ public:
     using BaseWorkload<LogicalBinaryQueueDescriptor>::m_Data;
 
     RefLogicalBinaryWorkload(const LogicalBinaryQueueDescriptor& descriptor, const WorkloadInfo& info);
-    void PostAllocationConfigure() override;
-    virtual void Execute() const override;
+    void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
 
 private:
+    void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
     using InType  = bool;
     using OutType = bool;
-
-    std::unique_ptr<Decoder<InType>>  m_Input0;
-    std::unique_ptr<Decoder<InType>>  m_Input1;
-    std::unique_ptr<Encoder<OutType>> m_Output;
 };
 
 } // namespace armnn

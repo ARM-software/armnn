@@ -17,30 +17,20 @@ RefStridedSliceWorkload::RefStridedSliceWorkload(const StridedSliceQueueDescript
 
 void RefStridedSliceWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefStridedSliceWorkload_Execute");
-
-    const TensorInfo& inputInfo  = GetTensorInfo(m_Data.m_Inputs[0]);
-    const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[0]);
-
-    DataType inputDataType  = inputInfo.GetDataType();
-    DataType outputDataType = outputInfo.GetDataType();
-
-    ARMNN_ASSERT(inputDataType == outputDataType);
-    IgnoreUnused(outputDataType);
-
-    StridedSlice(inputInfo,
-                 m_Data.m_Parameters,
-                 m_Data.m_Inputs[0]->Map(),
-                 m_Data.m_Outputs[0]->Map(),
-                 GetDataTypeSize(inputDataType));
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
 }
 
-void RefStridedSliceWorkload::ExecuteAsync(WorkingMemDescriptor& descriptor)
+void RefStridedSliceWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefStridedSliceWorkload_Execute_WorkingMemDescriptor");
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
 
-    const TensorInfo& inputInfo  = GetTensorInfo(descriptor.m_Inputs[0]);
-    const TensorInfo& outputInfo = GetTensorInfo(descriptor.m_Outputs[0]);
+void RefStridedSliceWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
+{
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefStridedSliceWorkload_Execute");
+
+    const TensorInfo& inputInfo  = GetTensorInfo(inputs[0]);
+    const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);
 
     DataType inputDataType  = inputInfo.GetDataType();
     DataType outputDataType = outputInfo.GetDataType();
@@ -50,8 +40,8 @@ void RefStridedSliceWorkload::ExecuteAsync(WorkingMemDescriptor& descriptor)
 
     StridedSlice(inputInfo,
                  m_Data.m_Parameters,
-                 descriptor.m_Inputs[0]->Map(),
-                 descriptor.m_Outputs[0]->Map(),
+                 inputs[0]->Map(),
+                 outputs[0]->Map(),
                  GetDataTypeSize(inputDataType));
 }
 

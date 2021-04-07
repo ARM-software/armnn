@@ -30,10 +30,12 @@ public:
     using TypedWorkload<DebugQueueDescriptor, DataType>::TypedWorkload;
 
     void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
 
     void RegisterDebugCallback(const DebugCallbackFunction& func) override;
 
 private:
+    void Execute(std::vector<ITensorHandle*> inputs) const;
     DebugCallbackFunction m_Callback;
 };
 

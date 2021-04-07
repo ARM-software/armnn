@@ -20,6 +20,16 @@ RefStackWorkload::RefStackWorkload(const StackQueueDescriptor& descriptor,
 
 void RefStackWorkload::Execute() const
 {
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
+}
+
+void RefStackWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
+
+void RefStackWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
+{
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefStackWorkload_Execute");
 
     // Can perform a simple concatenation when axis == 0
@@ -29,7 +39,7 @@ void RefStackWorkload::Execute() const
         ARMNN_ASSERT(output != nullptr);
 
         unsigned int numInputs = m_Data.m_Parameters.m_NumInputs;
-        unsigned int inputLength = GetTensorInfo(m_Data.m_Inputs[0]).GetNumElements();
+        unsigned int inputLength = GetTensorInfo(inputs[0]).GetNumElements();
 
         for (unsigned int inputIdx=0; inputIdx<numInputs; ++inputIdx)
         {
@@ -43,13 +53,13 @@ void RefStackWorkload::Execute() const
     }
 
     std::vector<std::unique_ptr<Decoder<float>>> inputDecoders;
-    for (unsigned int i=0; i<m_Data.m_Inputs.size(); ++i)
+    for (unsigned int i=0; i<inputs.size(); ++i)
     {
-        inputDecoders.push_back(MakeDecoder<float>(GetTensorInfo(m_Data.m_Inputs[i]),
-                                                   m_Data.m_Inputs[i]->Map()));
+        inputDecoders.push_back(MakeDecoder<float>(GetTensorInfo(inputs[i]),
+                                                   inputs[i]->Map()));
     }
-    std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(m_Data.m_Outputs[0]),
-                                                                       m_Data.m_Outputs[0]->Map());
+    std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(outputs[0]),
+                                                                       outputs[0]->Map());
 
     Stack(m_Data, inputDecoders, *outputEncoder);
 }

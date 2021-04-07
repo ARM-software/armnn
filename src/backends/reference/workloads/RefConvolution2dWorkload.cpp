@@ -30,24 +30,26 @@ RefConvolution2dWorkload::RefConvolution2dWorkload(
     }
 }
 
-void RefConvolution2dWorkload::PostAllocationConfigure()
+void RefConvolution2dWorkload::Execute() const
 {
-    const TensorInfo& inputInfo = GetTensorInfo(m_Data.m_Inputs[0]);
-    m_InputShape = inputInfo.GetShape();
-    m_InputDecoder = MakeDecoder<float>(inputInfo);
-
-    const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[0]);
-    m_OutputShape = outputInfo.GetShape();
-    m_OutputEncoder = MakeEncoder<float>(outputInfo);
+    Execute(m_Data.m_Inputs, m_Data.m_Outputs);
 }
 
-void RefConvolution2dWorkload::Execute() const {
+void RefConvolution2dWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+{
+    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+}
+
+void RefConvolution2dWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefConvolution2dWorkload_Execute");
 
-    m_InputDecoder->Reset(m_Data.m_Inputs[0]->Map());
-    m_OutputEncoder->Reset(m_Data.m_Outputs[0]->Map());
+    std::unique_ptr<Decoder<float>> inputDecoder = MakeDecoder<float>(GetTensorInfo(inputs[0]), inputs[0]->Map());
+    std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(outputs[0]), outputs[0]->Map());
 
-    Convolve(m_InputShape, *m_InputDecoder, m_OutputShape, *m_OutputEncoder, m_FilterShape,
+    const TensorShape& inputShape = GetTensorInfo(inputs[0]).GetShape();
+    const TensorShape& outputShape = GetTensorInfo(outputs[0]).GetShape();
+
+    Convolve(inputShape, *inputDecoder, outputShape, *outputEncoder, m_FilterShape,
              *m_FilterDecoder, m_Data.m_Parameters.m_BiasEnabled, m_BiasDecoder.get(),
              m_Data.m_Parameters.m_DataLayout, m_Data.m_Parameters.m_PadTop, m_Data.m_Parameters.m_PadLeft,
              m_Data.m_Parameters.m_StrideX, m_Data.m_Parameters.m_StrideY,

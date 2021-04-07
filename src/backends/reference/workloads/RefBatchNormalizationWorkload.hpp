@@ -16,9 +16,11 @@ class RefBatchNormalizationWorkload : public BaseWorkload<BatchNormalizationQueu
 public:
     explicit RefBatchNormalizationWorkload(const BatchNormalizationQueueDescriptor& descriptor,
                                            const WorkloadInfo& info);
-    virtual void Execute() const override;
+    void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
 
 private:
+    void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
     std::unique_ptr<ScopedCpuTensorHandle> m_Mean;
     std::unique_ptr<ScopedCpuTensorHandle> m_Variance;
     std::unique_ptr<ScopedCpuTensorHandle> m_Beta;

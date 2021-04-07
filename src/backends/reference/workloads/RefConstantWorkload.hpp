@@ -19,8 +19,10 @@ class RefConstantWorkload : public BaseWorkload<ConstantQueueDescriptor>
 public:
     RefConstantWorkload(const ConstantQueueDescriptor& descriptor, const WorkloadInfo& info);
 
-    void PostAllocationConfigure() override;
-    virtual void Execute() const override;
+    void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
+private:
+    void Execute(std::vector<ITensorHandle*> outputs) const;
 };
 
 } //namespace armnn

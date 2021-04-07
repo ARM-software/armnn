@@ -16,13 +16,11 @@ class RefQuantizeWorkload : public BaseWorkload<QuantizeQueueDescriptor>
 {
 public:
     RefQuantizeWorkload(const QuantizeQueueDescriptor& descriptor, const WorkloadInfo &info);
-    void PostAllocationConfigure() override;
     void Execute() const override;
+    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
 
 private:
-
-    std::unique_ptr<Decoder<float>> m_InputDecoder;
-    std::unique_ptr<Encoder<float>> m_OutputEncoder;
+    void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
 
     size_t m_NumElements;
 };

@@ -230,7 +230,6 @@ Once the application executable is built, it can be executed with the following 
 * --preferred-backends: Takes the preferred backends in preference order, separated by comma.
                         For example: CpuAcc,GpuAcc,CpuRef. Accepted options: [CpuAcc, CpuRef, GpuAcc].
                         Defaults to CpuRef **[OPTIONAL]**
-* --help: Prints all the available options to screen
 
 ### Object Detection on a supplied video file
 
@@ -379,8 +378,8 @@ tensor names and calling `GetNetworkOutputBindingInfo()`.
 Generic object detection pipeline has 3 steps to perform data pre-processing, run inference and decode inference results
 in the post-processing step.
 
-See [`ObjDetectionPipeline`](./include/NetworkPipeline.hpp) and implementations for [`MobileNetSSDv1`](./include/NetworkPipeline.hpp)
-and [`YoloV3Tiny`](./include/NetworkPipeline.hpp) for more details.
+See [`ObjDetectionPipeline`](include/ObjectDetectionPipeline.hpp) and implementations for [`MobileNetSSDv1`](include/ObjectDetectionPipeline.hpp)
+and [`YoloV3Tiny`](include/ObjectDetectionPipeline.hpp) for more details.
 
 #### Pre-processing the Captured Frame
 Each frame captured from source is read as an `cv::Mat` in BGR format but channels are swapped to RGB in a frame reader

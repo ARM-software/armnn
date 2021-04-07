@@ -5,7 +5,7 @@
 
 #include "CvVideoFileWriter.hpp"
 
-namespace od
+namespace common
 {
 
 void CvVideoFileWriter::Init(const std::string& outputVideo, int encoding, double fps, int width, int height)
@@ -35,4 +35,4 @@ void CvVideoFileWriter::Close()
 {
     m_cvWriter.release();
 }
-}// namespace od
+}// namespace common

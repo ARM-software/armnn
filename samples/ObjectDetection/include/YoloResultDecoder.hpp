@@ -26,9 +26,9 @@ public:
      */
     YoloResultDecoder(float NMSThreshold, float ClsThreshold, float ObjectThreshold);
 
-    DetectedObjects Decode(const InferenceResults& results,
-                           const Size& outputFrameSize,
-                           const Size& resizedFrameSize,
+    DetectedObjects Decode(const common::InferenceResults<float>& results,
+                           const common::Size& outputFrameSize,
+                           const common::Size& resizedFrameSize,
                            const std::vector <std::string>& labels) override;
 private:
     float m_NmsThreshold;

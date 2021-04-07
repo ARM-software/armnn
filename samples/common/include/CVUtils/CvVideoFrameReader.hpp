@@ -8,7 +8,7 @@
 #include "IFrameReader.hpp"
 #include <opencv2/opencv.hpp>
 
-namespace od
+namespace common
 {
 
 class CvVideoFrameReader :
@@ -95,14 +95,14 @@ public:
     CvVideoFrameReaderRgbWrapper(const CvVideoFrameReaderRgbWrapper& o) = delete;
     CvVideoFrameReaderRgbWrapper(CvVideoFrameReaderRgbWrapper&& o) = delete;
 
-    CvVideoFrameReaderRgbWrapper(std::unique_ptr<od::CvVideoFrameReader> reader);
+    CvVideoFrameReaderRgbWrapper(std::unique_ptr<common::CvVideoFrameReader> reader);
 
     std::shared_ptr<cv::Mat> ReadFrame() override;
 
     bool IsExhausted(const std::shared_ptr<cv::Mat>& frame) const override;
 
 private:
-    std::unique_ptr<od::CvVideoFrameReader> m_reader;
+    std::unique_ptr<common::CvVideoFrameReader> m_reader;
 };
 
-}// namespace od
+}// namespace common

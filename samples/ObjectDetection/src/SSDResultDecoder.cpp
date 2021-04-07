@@ -12,9 +12,9 @@
 namespace od
 {
 
-DetectedObjects SSDResultDecoder::Decode(const InferenceResults& networkResults,
-    const Size& outputFrameSize,
-    const Size& resizedFrameSize,
+DetectedObjects SSDResultDecoder::Decode(const common::InferenceResults<float>& networkResults,
+    const common::Size& outputFrameSize,
+    const common::Size& resizedFrameSize,
     const std::vector<std::string>& labels)
 {
     // SSD network outputs 4 tensors: bounding boxes, labels, probabilities, number of detections.

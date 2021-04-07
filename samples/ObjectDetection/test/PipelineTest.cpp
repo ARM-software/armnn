@@ -4,7 +4,7 @@
 //
 #include <catch.hpp>
 #include <opencv2/opencv.hpp>
-#include <NetworkPipeline.hpp>
+#include "ObjectDetectionPipeline.hpp"
 #include "Types.hpp"
 
 static std::string GetResourceFilePath(const std::string& filename)
@@ -32,14 +32,14 @@ TEST_CASE("Test Network Execution SSD_MOBILE")
     std::string testResources = TEST_RESOURCE_DIR;
     REQUIRE(testResources != "");
     // Create the network options
-    od::ODPipelineOptions options;
+    common::PipelineOptions options;
     options.m_ModelFilePath = GetResourceFilePath("detect.tflite");
     options.m_ModelName = "SSD_MOBILE";
     options.m_backends = {"CpuAcc", "CpuRef"};
 
     od::IPipelinePtr objectDetectionPipeline = od::CreatePipeline(options);
 
-    od::InferenceResults results;
+    common::InferenceResults<float> results;
     cv::Mat processed;
     cv::Mat inputFrame = cv::imread(GetResourceFilePath("basketball1.png"), cv::IMREAD_COLOR);
     cv::cvtColor(inputFrame, inputFrame, cv::COLOR_BGR2RGB);

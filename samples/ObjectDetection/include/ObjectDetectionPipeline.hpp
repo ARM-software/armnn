@@ -27,7 +27,7 @@ public:
      * @param executor - unique pointer to inference runner
      * @param decoder - unique pointer to inference results decoder
      */
-    ObjDetectionPipeline(std::unique_ptr<ArmnnNetworkExecutor> executor,
+    ObjDetectionPipeline(std::unique_ptr<common::ArmnnNetworkExecutor<float>> executor,
                          std::unique_ptr<IDetectionResultDecoder> decoder);
 
     /**
@@ -48,7 +48,7 @@ public:
      * @param[in] processed - input inference data. Data type should be aligned with input tensor.
      * @param[out] result - raw floating point inference results.
      */
-    virtual void Inference(const cv::Mat& processed, InferenceResults& result);
+    virtual void Inference(const cv::Mat& processed, common::InferenceResults<float>& result);
 
     /**
      * @brief Standard inference results post-processing implementation.
@@ -58,13 +58,13 @@ public:
      * @param[in] inferenceResult - inference results to be decoded.
      * @param[in] callback - a function to be called after successful inference results decoding.
      */
-    virtual void PostProcessing(InferenceResults& inferenceResult,
+    virtual void PostProcessing(common::InferenceResults<float>& inferenceResult,
                                 const std::function<void (DetectedObjects)>& callback);
 
 protected:
-    std::unique_ptr<ArmnnNetworkExecutor> m_executor;
+    std::unique_ptr<common::ArmnnNetworkExecutor<float>> m_executor;
     std::unique_ptr<IDetectionResultDecoder> m_decoder;
-    Size m_inputImageSize{};
+    common::Size m_inputImageSize{};
     cv::Mat m_processedFrame;
 };
 
@@ -85,7 +85,7 @@ public:
      * @param ClsThreshold[in] -  class probability threshold for decoding step
      * @param ObjectThreshold[in] - detected object score threshold for decoding step
      */
-    YoloV3Tiny(std::unique_ptr<ArmnnNetworkExecutor> executor,
+    YoloV3Tiny(std::unique_ptr<common::ArmnnNetworkExecutor<float>> executor,
                float NMSThreshold, float ClsThreshold, float ObjectThreshold);
 
     /**
@@ -116,7 +116,7 @@ public:
      * @param[in] - unique pointer to inference runner
      * @paramp[in] objectThreshold - detected object score threshold for decoding step
      */
-    MobileNetSSDv1(std::unique_ptr<ArmnnNetworkExecutor> executor,
+    MobileNetSSDv1(std::unique_ptr<common::ArmnnNetworkExecutor<float>> executor,
                    float objectThreshold);
 
     /**
@@ -143,6 +143,6 @@ using IPipelinePtr = std::unique_ptr<od::ObjDetectionPipeline>;
  *
  * @return unique pointer to object detection pipeline.
  */
-IPipelinePtr CreatePipeline(od::ODPipelineOptions& config);
+IPipelinePtr CreatePipeline(common::PipelineOptions& config);
 
 }// namespace od

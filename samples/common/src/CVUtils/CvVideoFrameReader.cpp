@@ -6,7 +6,7 @@
 
 #include "CvVideoFrameReader.hpp"
 
-namespace od
+namespace common
 {
 
 std::shared_ptr<cv::Mat> CvVideoFrameReader::ReadFrame()
@@ -91,8 +91,8 @@ bool CvVideoFrameReaderRgbWrapper::IsExhausted(const std::shared_ptr<cv::Mat>& f
     return m_reader->IsExhausted(frame);
 }
 
-CvVideoFrameReaderRgbWrapper::CvVideoFrameReaderRgbWrapper(std::unique_ptr<od::CvVideoFrameReader> reader):
+CvVideoFrameReaderRgbWrapper::CvVideoFrameReaderRgbWrapper(std::unique_ptr<common::CvVideoFrameReader> reader):
         m_reader(std::move(reader))
 {}
 
-}// namespace od
+}// namespace common

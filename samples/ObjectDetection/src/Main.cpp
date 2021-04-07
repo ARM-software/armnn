@@ -6,13 +6,37 @@
 #include "CvVideoFrameReader.hpp"
 #include "CvWindowOutput.hpp"
 #include "CvVideoFileWriter.hpp"
-#include "NetworkPipeline.hpp"
+#include "ObjectDetectionPipeline.hpp"
 #include "CmdArgsParser.hpp"
 
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <random>
+
+const std::string MODEL_NAME = "--model-name";
+const std::string VIDEO_FILE_PATH = "--video-file-path";
+const std::string MODEL_FILE_PATH = "--model-file-path";
+const std::string OUTPUT_VIDEO_FILE_PATH = "--output-video-file-path";
+const std::string LABEL_PATH = "--label-path";
+const std::string PREFERRED_BACKENDS = "--preferred-backends";
+const std::string HELP = "--help";
+
+/*
+ * The accepted options for this Object detection executable
+ */
+static std::map<std::string, std::string> CMD_OPTIONS = {
+        {VIDEO_FILE_PATH, "[REQUIRED] Path to the video file to run object detection on"},
+        {MODEL_FILE_PATH, "[REQUIRED] Path to the Object Detection model to use"},
+        {LABEL_PATH, "[REQUIRED] Path to the label set for the provided model file. "
+                     "Label file is should just be an ordered list, seperated by new line."},
+        {MODEL_NAME, "[REQUIRED] The name of the model being used. Accepted options: YOLO_V3_TINY, SSD_MOBILE"},
+        {OUTPUT_VIDEO_FILE_PATH, "[OPTIONAL] Path to the output video file with detections added in. "
+                                 "If specified will save file to disk, else displays the output to screen"},
+        {PREFERRED_BACKENDS, "[OPTIONAL] Takes the preferred backends in preference order, separated by comma."
+                             " For example: CpuAcc,GpuAcc,CpuRef. Accepted options: [CpuAcc, CpuRef, GpuAcc]."
+                             " Defaults to CpuAcc,CpuRef"}
+};
 
 /*
  * Reads the user supplied backend preference, splits it by comma, and returns an ordered vector
@@ -34,10 +58,10 @@ std::vector<armnn::BackendId> GetPreferredBackendList(const std::string& preferr
 /*
  * Assigns a color to each label in the label set
  */
-std::vector<std::tuple<std::string, od::BBoxColor>> AssignColourToLabel(const std::string& pathToLabelFile)
+std::vector<std::tuple<std::string, common::BBoxColor>> AssignColourToLabel(const std::string& pathToLabelFile)
 {
     std::ifstream in(pathToLabelFile);
-    std::vector<std::tuple<std::string, od::BBoxColor>> labels;
+    std::vector<std::tuple<std::string, common::BBoxColor>> labels;
 
     std::string str;
     std::default_random_engine generator;
@@ -47,7 +71,7 @@ std::vector<std::tuple<std::string, od::BBoxColor>> AssignColourToLabel(const st
     {
         if(!str.empty())
         {
-            od::BBoxColor c{
+            common::BBoxColor c{
                 .colorCode = std::make_tuple(distribution(generator),
                                              distribution(generator),
                                              distribution(generator))
@@ -60,13 +84,13 @@ std::vector<std::tuple<std::string, od::BBoxColor>> AssignColourToLabel(const st
     return labels;
 }
 
-std::tuple<std::unique_ptr<od::IFrameReader<cv::Mat>>,
-           std::unique_ptr<od::IFrameOutput<cv::Mat>>>
+std::tuple<std::unique_ptr<common::IFrameReader<cv::Mat>>,
+           std::unique_ptr<common::IFrameOutput<cv::Mat>>>
            GetFrameSourceAndSink(const std::map<std::string, std::string>& options) {
 
-    std::unique_ptr<od::IFrameReader<cv::Mat>> readerPtr;
+    std::unique_ptr<common::IFrameReader<cv::Mat>> readerPtr;
 
-    std::unique_ptr<od::CvVideoFrameReader> reader = std::make_unique<od::CvVideoFrameReader>();
+    std::unique_ptr<common::CvVideoFrameReader> reader = std::make_unique<common::CvVideoFrameReader>();
     reader->Init(GetSpecifiedOption(options, VIDEO_FILE_PATH));
 
     auto enc = reader->GetSourceEncodingInt();
@@ -75,7 +99,7 @@ std::tuple<std::unique_ptr<od::IFrameReader<cv::Mat>>,
     auto h = reader->GetSourceHeight();
     if (!reader->ConvertToRGB())
     {
-        readerPtr = std::move(std::make_unique<od::CvVideoFrameReaderRgbWrapper>(std::move(reader)));
+        readerPtr = std::move(std::make_unique<common::CvVideoFrameReaderRgbWrapper>(std::move(reader)));
     }
     else
     {
@@ -85,14 +109,14 @@ std::tuple<std::unique_ptr<od::IFrameReader<cv::Mat>>,
     if(CheckOptionSpecified(options, OUTPUT_VIDEO_FILE_PATH))
     {
         std::string outputVideo = GetSpecifiedOption(options, OUTPUT_VIDEO_FILE_PATH);
-        auto writer = std::make_unique<od::CvVideoFileWriter>();
+        auto writer = std::make_unique<common::CvVideoFileWriter>();
         writer->Init(outputVideo, enc, fps, w, h);
 
         return std::make_tuple<>(std::move(readerPtr), std::move(writer));
     }
     else
     {
-        auto writer = std::make_unique<od::CvWindowOutput>();
+        auto writer = std::make_unique<common::CvWindowOutput>();
         writer->Init("Processed Video");
         return std::make_tuple<>(std::move(readerPtr), std::move(writer));
     }
@@ -109,7 +133,7 @@ int main(int argc, char *argv[])
     }
 
     // Create the network options
-    od::ODPipelineOptions pipelineOptions;
+    common::PipelineOptions pipelineOptions;
     pipelineOptions.m_ModelFilePath = GetSpecifiedOption(options, MODEL_FILE_PATH);
     pipelineOptions.m_ModelName = GetSpecifiedOption(options, MODEL_NAME);
 
@@ -127,8 +151,8 @@ int main(int argc, char *argv[])
     od::IPipelinePtr objectDetectionPipeline = od::CreatePipeline(pipelineOptions);
 
     auto inputAndOutput = GetFrameSourceAndSink(options);
-    std::unique_ptr<od::IFrameReader<cv::Mat>> reader = std::move(std::get<0>(inputAndOutput));
-    std::unique_ptr<od::IFrameOutput<cv::Mat>> sink = std::move(std::get<1>(inputAndOutput));
+    std::unique_ptr<common::IFrameReader<cv::Mat>> reader = std::move(std::get<0>(inputAndOutput));
+    std::unique_ptr<common::IFrameOutput<cv::Mat>> sink = std::move(std::get<1>(inputAndOutput));
 
     if (!sink->IsReady())
     {
@@ -136,7 +160,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    od::InferenceResults results;
+    common::InferenceResults<float> results;
 
     std::shared_ptr<cv::Mat> frame = reader->ReadFrame();
 

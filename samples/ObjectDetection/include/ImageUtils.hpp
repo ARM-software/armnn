@@ -21,7 +21,7 @@ const cv::InterpolationFlags DefaultResizeFlag = cv::INTER_NEAREST;
 */
 void AddInferenceOutputToFrame(od::DetectedObjects& decodedResults,
                                cv::Mat& inputFrame,
-                               std::vector<std::tuple<std::string, od::BBoxColor>>& labels);
+                               std::vector<std::tuple<std::string, common::BBoxColor>>& labels);
 
 /**
 * @brief Function to resize a frame while keeping aspect ratio.
@@ -30,7 +30,7 @@ void AddInferenceOutputToFrame(od::DetectedObjects& decodedResults,
 * @param[out]  dest            the frame we want to resize into.
 * @param[in]  aspectRatio      aspect ratio to use when resizing.
 */
-void ResizeFrame(const cv::Mat& frame, cv::Mat& dest, const od::Size& aspectRatio);
+void ResizeFrame(const cv::Mat& frame, cv::Mat& dest, const common::Size& aspectRatio);
 
 /**
 * @brief Function to pad a frame.
@@ -49,7 +49,7 @@ void PadFrame(const cv::Mat& src, cv::Mat& dest, int bottom, int right);
  * @param cache operation requires intermediate data container.
  * @param destSize size of the destination frame
  */
-void ResizeWithPad(const cv::Mat& frame, cv::Mat& dest, cv::Mat& cache, const od::Size& destSize);
+void ResizeWithPad(const cv::Mat& frame, cv::Mat& dest, cv::Mat& cache, const common::Size& destSize);
 
 /**
 * @brief Function to retrieve the cv::scalar color from a RGB tuple.

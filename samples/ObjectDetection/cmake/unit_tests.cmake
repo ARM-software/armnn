@@ -7,7 +7,7 @@ set(TEST_TARGET_NAME "${CMAKE_PROJECT_NAME}-tests")
 
 file(GLOB TEST_SOURCES "test/*")
 
-include(cmake/find_catch.cmake)
+include(../common/cmake/find_catch.cmake)
 
 file(DOWNLOAD "https://storage.googleapis.com/download.tensorflow.org/models/tflite/coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.zip"
         ${CMAKE_CURRENT_SOURCE_DIR}/test/resources/models.zip SHOW_PROGRESS)
@@ -43,7 +43,7 @@ ExternalProject_Add(vtest
         INSTALL_COMMAND ""
         )
 
-add_executable("${TEST_TARGET_NAME}" ${SOURCES} ${TEST_SOURCES})
+add_executable("${TEST_TARGET_NAME}" ${SOURCES} ${TEST_SOURCES} ${COMMON_SOURCES})
 
 add_dependencies(
     "${TEST_TARGET_NAME}"
@@ -60,6 +60,6 @@ endif()
 
 target_include_directories("${TEST_TARGET_NAME}" PUBLIC ${TEST_TPIP_INCLUDE}
     ${ARMNN_INCLUDE_DIR}
-    ${OPENCV_INCLUDE_DIR} ${DEPENDENCIES_DIR} ${TEST_RESOURCES_DIR})
+    ${OPENCV_INCLUDE_DIR} ${DEPENDENCIES_DIR} ${TEST_RESOURCES_DIR} ${COMMON_INCLUDE_DIR})
 
 target_link_libraries("${TEST_TARGET_NAME}" PUBLIC ${ARMNN_LIBS} ${OPENCV_LIBS} ${FFMPEG_LIBS})

@@ -3,23 +3,23 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "NetworkPipeline.hpp"
+#include "ObjectDetectionPipeline.hpp"
 #include "ImageUtils.hpp"
 
 namespace od
 {
 
-ObjDetectionPipeline::ObjDetectionPipeline(std::unique_ptr<ArmnnNetworkExecutor> executor,
+ObjDetectionPipeline::ObjDetectionPipeline(std::unique_ptr<common::ArmnnNetworkExecutor<float>> executor,
                                            std::unique_ptr<IDetectionResultDecoder> decoder) :
         m_executor(std::move(executor)),
         m_decoder(std::move(decoder)){}
 
-void od::ObjDetectionPipeline::Inference(const cv::Mat& processed, InferenceResults& result)
+void od::ObjDetectionPipeline::Inference(const cv::Mat& processed, common::InferenceResults<float>& result)
 {
     m_executor->Run(processed.data, processed.total() * processed.elemSize(), result);
 }
 
-void ObjDetectionPipeline::PostProcessing(InferenceResults& inferenceResult,
+void ObjDetectionPipeline::PostProcessing(common::InferenceResults<float>& inferenceResult,
         const std::function<void (DetectedObjects)>& callback)
 {
     DetectedObjects detections = m_decoder->Decode(inferenceResult, m_inputImageSize,
@@ -37,7 +37,7 @@ void ObjDetectionPipeline::PreProcessing(const cv::Mat& frame, cv::Mat& processe
     ResizeWithPad(frame, processed, m_processedFrame, m_executor->GetImageAspectRatio());
 }
 
-MobileNetSSDv1::MobileNetSSDv1(std::unique_ptr<ArmnnNetworkExecutor> executor,
+MobileNetSSDv1::MobileNetSSDv1(std::unique_ptr<common::ArmnnNetworkExecutor<float>> executor,
                                float objectThreshold) :
         ObjDetectionPipeline(std::move(executor),
                              std::make_unique<SSDResultDecoder>(objectThreshold))
@@ -53,7 +53,7 @@ void MobileNetSSDv1::PreProcessing(const cv::Mat& frame, cv::Mat& processed)
     }
 }
 
-YoloV3Tiny::YoloV3Tiny(std::unique_ptr<ArmnnNetworkExecutor> executor,
+YoloV3Tiny::YoloV3Tiny(std::unique_ptr<common::ArmnnNetworkExecutor<float>> executor,
                        float NMSThreshold, float ClsThreshold, float ObjectThreshold) :
         ObjDetectionPipeline(std::move(executor),
                              std::move(std::make_unique<YoloResultDecoder>(NMSThreshold,
@@ -70,9 +70,9 @@ void YoloV3Tiny::PreProcessing(const cv::Mat& frame, cv::Mat& processed)
     }
 }
 
-IPipelinePtr CreatePipeline(od::ODPipelineOptions& config)
+IPipelinePtr CreatePipeline(common::PipelineOptions& config)
 {
-    auto executor = std::make_unique<od::ArmnnNetworkExecutor>(config.m_ModelFilePath, config.m_backends);
+    auto executor = std::make_unique<common::ArmnnNetworkExecutor<float>>(config.m_ModelFilePath, config.m_backends);
 
     if (config.m_ModelName == "SSD_MOBILE")
     {

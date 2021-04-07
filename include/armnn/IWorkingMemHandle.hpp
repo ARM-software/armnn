@@ -10,6 +10,8 @@
 namespace armnn
 {
 
+using NetworkId = int;
+
 namespace experimental
 {
 
@@ -19,6 +21,9 @@ class IWorkingMemHandle
 {
 public:
     virtual ~IWorkingMemHandle() {};
+
+    /// Returns the NetworkId of the Network that this IWorkingMemHandle works with.
+    virtual NetworkId GetNetworkId() = 0;
 
     /// Allocate the backing memory required for execution. If this is not called, then allocation will be
     /// deferred to execution time. The mutex must be locked.

@@ -24,10 +24,17 @@ class WorkingMemHandle final : public IWorkingMemHandle
 {
 
 public:
-    WorkingMemHandle(std::vector<WorkingMemDescriptor> workingMemDescriptors,
+    WorkingMemHandle(NetworkId networkId,
+                     std::vector<WorkingMemDescriptor> workingMemDescriptors,
                      std::unordered_map<LayerGuid, WorkingMemDescriptor> workingMemDescriptorMap);
 
-    ~WorkingMemHandle() { FreeWorkingMemory(); }
+    ~WorkingMemHandle()
+    { FreeWorkingMemory(); }
+
+    NetworkId GetNetworkId() override
+    {
+        return m_NetworkId;
+    }
 
     /// Allocate the backing memory required for execution. If this is not called, then allocation will be
     /// deferred to execution time. The mutex must be locked.
@@ -106,6 +113,7 @@ public:
 private:
     void FreeWorkingMemory();
 
+    NetworkId m_NetworkId;
     std::shared_ptr<ProfilerImpl> m_Profiler;
 
     std::vector<WorkingMemDescriptor> m_WorkingMemDescriptors;

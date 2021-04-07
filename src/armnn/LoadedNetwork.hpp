@@ -37,10 +37,18 @@ public:
     using WorkloadQueue = std::vector< std::unique_ptr<IWorkload> >;
     ~LoadedNetwork(){ FreeWorkingMemory(); }
 
+    /// Create a new unique WorkingMemHandle object. Create multiple handles if you wish to have
+    /// overlapped Execution by calling this function from different threads.
+    std::unique_ptr<IWorkingMemHandle> CreateWorkingMemHandle(NetworkId networkId);
+
     TensorInfo GetInputTensorInfo(LayerBindingId layerId) const;
     TensorInfo GetOutputTensorInfo(LayerBindingId layerId) const;
 
     Status EnqueueWorkload(const InputTensors& inputTensors, const OutputTensors& outputTensors);
+
+    Status Execute(const InputTensors& inputTensors,
+                   const OutputTensors& outputTensors,
+                   IWorkingMemHandle& workingMemHandle);
 
     static std::unique_ptr<LoadedNetwork> MakeLoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                                                             std::string & errorMessage,
@@ -58,6 +66,11 @@ public:
 
     void SendNetworkStructure();
 
+    bool IsAsyncEnabled()
+    {
+        return m_NetworkProperties.m_AsyncEnabled;
+    }
+
     profiling::ProfilingGuid GetNetworkGuid();
 
 private:
@@ -67,13 +80,28 @@ private:
                   const INetworkProperties& networkProperties,
                   profiling::ProfilingService& profilingService);
 
+    void CollectInputTensorHandles(std::unordered_map<LayerGuid, std::vector<ITensorHandle*> >& tensorHandles,
+                                   std::vector<ITensorHandle*>& inputs,
+                                   const armnn::Layer* layer,
+                                   const TensorHandleFactoryRegistry& registry,
+                                   const bool isMemoryManaged = false);
+
+    void CreateOutputTensorHandles(std::unordered_map<LayerGuid, std::vector<ITensorHandle*> >& tensorHandles,
+                                   std::vector<ITensorHandle*>& outputs,
+                                   const armnn::Layer* layer,
+                                   const TensorHandleFactoryRegistry& registry,
+                                   const bool isMemoryManaged = false);
+
     void EnqueueInput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo);
 
     void EnqueueOutput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo);
 
+    void EnqueueInput(const BindableLayer& layer, const ConstTensor& inputTensor, WorkingMemHandle& handle);
+
+    void EnqueueOutput(const BindableLayer& layer, const Tensor& outputTensor, WorkingMemHandle& handle);
+
     bool Execute(std::unique_ptr<profiling::TimelineUtilityMethods>& timelineUtils,
                  profiling::ProfilingGuid inferenceGuid);
-
 
     const IWorkloadFactory& GetWorkloadFactory(const Layer& layer) const;
 
@@ -96,8 +124,7 @@ private:
     mutable std::mutex m_WorkingMemMutex;
 
     bool m_IsWorkingMemAllocated=false;
-    bool m_IsImportEnabled=false;
-    bool m_IsExportEnabled=false;
+    INetworkProperties m_NetworkProperties;
 
     TensorHandleFactoryRegistry m_TensorHandleFactoryRegistry;
 

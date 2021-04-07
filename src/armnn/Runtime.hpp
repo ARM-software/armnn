@@ -4,7 +4,6 @@
 //
 #pragma once
 
-#include "AsyncNetwork.hpp"
 #include "LoadedNetwork.hpp"
 #include "DeviceSpec.hpp"
 
@@ -56,17 +55,14 @@ public:
     TensorInfo GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
     TensorInfo GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
 
-    // Create Aysnchronous Network from the IOptimizedNetowrkPtr
-    std::unique_ptr<IAsyncNetwork> CreateAsyncNetwork(NetworkId& networkIdOut,
-                                                      IOptimizedNetworkPtr network,
-                                                      std::string& errorMessage,
-                                                      const INetworkProperties& networkProperties);
-
-
     // Evaluates network using input in inputTensors, outputs filled into outputTensors.
     Status EnqueueWorkload(NetworkId networkId,
-        const InputTensors& inputTensors,
-        const OutputTensors& outputTensors);
+                           const InputTensors& inputTensors,
+                           const OutputTensors& outputTensors);
+
+    Status Execute(IWorkingMemHandle& workingMemHandle,
+                   const InputTensors& inputTensors,
+                   const OutputTensors& outputTensors);
 
     /// Unloads a network from the Runtime.
     /// At the moment this only removes the network from the m_Impl->m_Network.
@@ -81,6 +77,10 @@ public:
     /// @param networkId The id of the network for which to get the profile.
     /// @return A pointer to the requested profiler, or nullptr if not found.
     const std::shared_ptr<IProfiler> GetProfiler(NetworkId networkId) const;
+
+    /// Create a new unique WorkingMemHandle object. Create multiple handles if you wish to have
+    /// overlapped Execution by calling this function from different threads.
+    std::unique_ptr<IWorkingMemHandle> CreateWorkingMemHandle(NetworkId networkId);
 
     /// Registers a callback function to debug layers performing custom computations on intermediate tensors.
     /// @param networkId The id of the network to register the callback.

@@ -40,15 +40,15 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
     // Creates AsyncNetwork
     NetworkId networkId = 0;
     std::string errorMessage;
-    const INetworkProperties networkProperties;
-    auto asyncNetwork = runtime->CreateAsyncNetwork(networkId, std::move(optNet), errorMessage, networkProperties);
+    const INetworkProperties networkProperties(false, false, true);
+    runtime->LoadNetwork(networkId, std::move(optNet), errorMessage, networkProperties);
 
     InputTensors inputTensors;
     inputTensors.reserve(inputTensorData.size());
     for (auto&& it : inputTensorData)
     {
         inputTensors.push_back({it.first,
-                                ConstTensor(asyncNetwork->GetInputTensorInfo(it.first), it.second.data())});
+                                ConstTensor(runtime->GetInputTensorInfo(networkId, it.first), it.second.data())});
     }
 
     OutputTensors outputTensors;
@@ -59,16 +59,16 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
         std::vector<TOutput> out(it.second.size());
         outputStorage.emplace(it.first, out);
         outputTensors.push_back({it.first,
-                                 Tensor(asyncNetwork->GetOutputTensorInfo(it.first),
+                                 Tensor(runtime->GetOutputTensorInfo(networkId, it.first),
                                         outputStorage.at(it.first).data())});
     }
 
     // Create WorkingMemHandle for this async network
-    std::unique_ptr<IWorkingMemHandle> workingMemHandle = asyncNetwork->CreateWorkingMemHandle();
+    std::unique_ptr<IWorkingMemHandle> workingMemHandle = runtime->CreateWorkingMemHandle(networkId);
     IWorkingMemHandle& workingMemHandleRef = *workingMemHandle.get();
 
     // Run the async network
-    asyncNetwork->Execute(inputTensors, outputTensors, workingMemHandleRef);
+    runtime->Execute(workingMemHandleRef, inputTensors, outputTensors);
 
     // Checks the results.
     for (auto&& it : expectedOutputData)

@@ -13,8 +13,10 @@ namespace armnn
 namespace experimental
 {
 
-WorkingMemHandle::WorkingMemHandle(std::vector<WorkingMemDescriptor> workingMemDescriptors,
+WorkingMemHandle::WorkingMemHandle(NetworkId networkId,
+                                   std::vector<WorkingMemDescriptor> workingMemDescriptors,
                                    std::unordered_map<LayerGuid, WorkingMemDescriptor> workingMemDescriptorMap) :
+    m_NetworkId(networkId),
     m_WorkingMemDescriptors(workingMemDescriptors),
     m_WorkingMemDescriptorMap(workingMemDescriptorMap),
     m_IsAllocated(false),

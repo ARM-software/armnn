@@ -10,13 +10,6 @@ namespace armnn
 struct LstmInputParams;
 struct QuantizedLstmInputParams;
 
-namespace experimental
-{
-
-class IAsyncNetwork;
-
-} // end experimental namespace
-
 class INetwork;
 class IOptimizedNetwork;
 class Graph;

@@ -5,9 +5,9 @@
 #pragma once
 
 #include "BackendOptions.hpp"
-#include "IAsyncNetwork.hpp"
 #include "INetwork.hpp"
 #include "IProfiler.hpp"
+#include "IWorkingMemHandle.hpp"
 #include "Tensor.hpp"
 #include "Types.hpp"
 #include "TypesUtils.hpp"
@@ -28,12 +28,14 @@ using IRuntimePtr = std::unique_ptr<IRuntime, void(*)(IRuntime* runtime)>;
 
 struct INetworkProperties
 {
-    INetworkProperties(bool importEnabled = false, bool exportEnabled = false)
+    INetworkProperties(bool importEnabled = false, bool exportEnabled = false, bool asyncEnabled = false)
         : m_ImportEnabled(importEnabled),
-          m_ExportEnabled(exportEnabled) {}
+          m_ExportEnabled(exportEnabled),
+          m_AsyncEnabled(asyncEnabled) {}
 
     const bool m_ImportEnabled;
     const bool m_ExportEnabled;
+    const bool m_AsyncEnabled;
 
     virtual ~INetworkProperties() {}
 };
@@ -145,20 +147,6 @@ public:
                        std::string& errorMessage,
                        const INetworkProperties& networkProperties);
 
-    /// This is an experimental function.
-    /// Creates an executable network. This network is thread safe allowing for multiple networks to be
-    /// loaded simultaneously via different threads.
-    /// Note that the network is never registered with the runtime so does not need to be 'Unloaded'.
-    /// @param [out] networkIdOut Unique identifier for the network is returned in this reference.
-    /// @param [in] network Complete network to load into the IRuntime.
-    /// @param [out] errorMessage Error message if there were any errors.
-    /// @param [out] networkProperties the INetworkProperties that govern how the network should operate.
-    /// @return The IAsyncNetwork
-    std::unique_ptr<IAsyncNetwork> CreateAsyncNetwork(NetworkId& networkIdOut,
-                                                      IOptimizedNetworkPtr network,
-                                                      std::string& errorMessage,
-                                                      const INetworkProperties& networkProperties);
-
     TensorInfo GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
     TensorInfo GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
 
@@ -166,6 +154,14 @@ public:
     Status EnqueueWorkload(NetworkId networkId,
                            const InputTensors& inputTensors,
                            const OutputTensors& outputTensors);
+
+    /// This is an experimental function.
+    /// Evaluates a network using input in inputTensors and outputs filled into outputTensors.
+    /// This function performs a thread safe execution of the network. Returns once execution is complete.
+    /// Will block until this and any other thread using the same workingMem object completes.
+    Status Execute(IWorkingMemHandle& workingMemHandle,
+                   const InputTensors& inputTensors,
+                   const OutputTensors& outputTensors);
 
     /// Unloads a network from the IRuntime.
     /// At the moment this only removes the network from the m_Impl->m_Network.
@@ -175,6 +171,10 @@ public:
     Status UnloadNetwork(NetworkId networkId);
 
     const IDeviceSpec& GetDeviceSpec() const;
+
+    /// Create a new unique WorkingMemHandle object. Create multiple handles if you wish to have
+    /// overlapped Execution by calling this function from different threads.
+    std::unique_ptr<IWorkingMemHandle> CreateWorkingMemHandle(NetworkId networkId);
 
     /// Gets the profiler corresponding to the given network id.
     /// @param networkId The id of the network for which to get the profile.

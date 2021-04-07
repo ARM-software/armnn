@@ -990,18 +990,19 @@ void IDeserializer::DeserializerImpl::SetupOutputLayers(GraphPtr graph)
 
         // GetBindingLayerInfo expect the index to be index in the vector not index property on each layer base
         LayerBindingId bindingId = GetBindingLayerInfo(graph, outputLayerIndex);
-        ARMNN_ASSERT_MSG(baseLayer->layerName()->c_str(), "Input has no name.");
+        ARMNN_ASSERT_MSG(baseLayer->layerName()->c_str(), "Output has no name.");
 
         IConnectableLayer* outputLayer =
             m_Network->AddOutputLayer(bindingId, baseLayer->layerName()->c_str());
 
         RegisterInputSlots(graph, outputLayerIndex, outputLayer);
-
         unsigned int sourceLayerIndex =
             GetLayerIndexInVector(graph, baseLayer->inputSlots()->Get(0)->connection()->sourceLayerIndex());
+        unsigned int outputSlotIndex =
+            GetLayerIndexInVector(graph, baseLayer->inputSlots()->Get(0)->connection()->outputSlotIndex());
         LayerBaseRawPtr sourceBaseLayer = GetBaseLayer(graph, sourceLayerIndex);
-        const armnn::TensorInfo& tensorInfo = ToTensorInfo(sourceBaseLayer->outputSlots()->Get(0)->tensorInfo());
-
+        const armnn::TensorInfo& tensorInfo = ToTensorInfo(
+            sourceBaseLayer->outputSlots()->Get(outputSlotIndex)->tensorInfo());
         BindingPointInfo bindingInfo = {bindingId, tensorInfo};
         m_OutputBindings.push_back(std::make_pair(baseLayer->layerName()->c_str(), bindingInfo));
     }

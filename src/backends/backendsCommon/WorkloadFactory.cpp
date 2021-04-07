@@ -138,6 +138,16 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                                                                   reason);
             break;
         }
+        case LayerType::Cast:
+        {
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject.IsCastSupported(OverrideDataType(input, dataType),
+                                                        OverrideDataType(output, dataType),
+                                                        reason);
+            break;
+        }
         case LayerType::Comparison:
         {
             auto cLayer = PolymorphicDowncast<const ComparisonLayer*>(&layer);
@@ -1341,6 +1351,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateBatchNormalization(
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& /*desc*/,
                                                                   const WorkloadInfo& /*Info*/) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateCast(const CastQueueDescriptor& /*descriptor*/,
+                                                       const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }

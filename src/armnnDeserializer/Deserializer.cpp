@@ -216,6 +216,7 @@ m_ParserFunctions(Layer_MAX+1, &IDeserializer::DeserializerImpl::ParseUnsupporte
     m_ParserFunctions[Layer_BatchToSpaceNdLayer]         = &DeserializerImpl::ParseBatchToSpaceNd;
     m_ParserFunctions[Layer_BatchNormalizationLayer]     = &DeserializerImpl::ParseBatchNormalization;
     m_ParserFunctions[Layer_ComparisonLayer]             = &DeserializerImpl::ParseComparison;
+    m_ParserFunctions[Layer_CastLayer]                   = &DeserializerImpl::ParseCast;
     m_ParserFunctions[Layer_ConcatLayer]                 = &DeserializerImpl::ParseConcat;
     m_ParserFunctions[Layer_ConstantLayer]               = &DeserializerImpl::ParseConstant;
     m_ParserFunctions[Layer_Convolution2dLayer]          = &DeserializerImpl::ParseConvolution2d;
@@ -288,6 +289,8 @@ LayerBaseRawPtr IDeserializer::DeserializerImpl::GetBaseLayer(const GraphPtr& gr
             return graphPtr->layers()->Get(layerIndex)->layer_as_BatchToSpaceNdLayer()->base();
         case Layer::Layer_BatchNormalizationLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_BatchNormalizationLayer()->base();
+        case Layer::Layer_CastLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_CastLayer()->base();
         case Layer::Layer_ComparisonLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_ComparisonLayer()->base();
         case Layer::Layer_ConcatLayer:
@@ -1270,6 +1273,27 @@ void IDeserializer::DeserializerImpl::ParseBatchNormalization(GraphPtr graph, un
                                                                      gamma,
                                                                      layerName.c_str());
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void IDeserializer::DeserializerImpl::ParseCast(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+    TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_LOCATION();
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = GetLayerName(graph, layerIndex);
+
+    IConnectableLayer* layer = m_Network->AddCastLayer(layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

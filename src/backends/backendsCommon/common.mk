@@ -43,6 +43,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/AdditionTestImpl.cpp \
     test/layerTests/ArgMinMaxTestImpl.cpp \
     test/layerTests/BatchNormalizationTestImpl.cpp \
+    test/layerTests/CastTestImpl.cpp \
     test/layerTests/ComparisonTestImpl.cpp \
     test/layerTests/ConcatTestImpl.cpp \
     test/layerTests/ConstantTestImpl.cpp \

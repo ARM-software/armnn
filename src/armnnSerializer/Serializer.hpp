@@ -126,6 +126,9 @@ private:
                                           const std::vector<armnn::ConstTensor>& constants,
                                           const char* name = nullptr);
 
+    void SerializeCastLayer(const armnn::IConnectableLayer* layer,
+                            const char* name = nullptr);
+
     void SerializeComparisonLayer(const armnn::IConnectableLayer* layer,
                                   const armnn::ComparisonDescriptor& descriptor,
                                   const char* name = nullptr);

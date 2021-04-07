@@ -87,6 +87,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                             const WorkloadInfo& Info) const;
 
+    virtual std::unique_ptr<IWorkload> CreateCast(const CastQueueDescriptor& descriptor,
+                                                  const WorkloadInfo& Info) const;
+
     virtual std::unique_ptr<IWorkload> CreateComparison(const ComparisonQueueDescriptor& descriptor,
                                                         const WorkloadInfo& Info) const;
 

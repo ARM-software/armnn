@@ -170,7 +170,8 @@ enum LayerType : uint {
     Fill = 57,
     Rank = 58,
     LogicalBinary = 59,
-    Reduce = 60
+    Reduce = 60,
+    Cast = 61
 }
 
 // Base layer table to be used as part of other layers
@@ -217,6 +218,10 @@ table ArgMinMaxLayer {
 table ArgMinMaxDescriptor{
     argMinMaxFunction:ArgMinMaxFunction;
     axis:int;
+}
+
+table CastLayer {
+    base:LayerBase;
 }
 
 enum ComparisonOperation : byte {
@@ -964,7 +969,8 @@ union Layer {
     FillLayer,
     RankLayer,
     LogicalBinaryLayer,
-    ReduceLayer
+    ReduceLayer,
+    CastLayer
 }
 
 table AnyLayer {

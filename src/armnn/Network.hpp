@@ -46,6 +46,8 @@ public:
     IConnectableLayer* AddBatchToSpaceNdLayer(const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
                                               const char* name = nullptr);
 
+    IConnectableLayer* AddCastLayer(const char* name = nullptr);
+
     IConnectableLayer* AddComparisonLayer(const ComparisonDescriptor& comparisonDescriptor,
                                           const char* name = nullptr);
 

@@ -706,6 +706,33 @@ void ArgMinMaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     }
 }
 
+void CastQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"CastQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    std::vector<DataType> supportedTypes =
+    {
+            DataType::BFloat16,
+            DataType::Float16,
+            DataType::Float32,
+            DataType::QAsymmS8,
+            DataType::QAsymmU8,
+            DataType::QSymmS8,
+            DataType::QSymmS16,
+            DataType::Signed32,
+            DataType::Signed64
+    };
+
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+}
+
 void SoftmaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     const std::string descriptorName{"SoftmaxQueueDescriptor"};

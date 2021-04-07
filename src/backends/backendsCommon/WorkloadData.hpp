@@ -155,6 +155,11 @@ struct ArgMinMaxQueueDescriptor : QueueDescriptorWithParameters<ArgMinMaxDescrip
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct CastQueueDescriptor : QueueDescriptor
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 // Fill layer workload data.
 struct FillQueueDescriptor : QueueDescriptorWithParameters<FillDescriptor>
 {

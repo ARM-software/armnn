@@ -104,6 +104,7 @@ private:
     void ParseArgMax(size_t subgraphIndex, size_t operatorIndex);
     void ParseAveragePool2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseBatchToSpaceND(size_t subgraphIndex, size_t operatorIndex);
+    void ParseCast(size_t subgraphIndex, size_t operatorIndex);
     void ParseConcatenation(size_t subgraphIndex, size_t operatorIndex);
     void ParseConv2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseDepthToSpace(size_t subgraphIndex, size_t operatorIndex);

@@ -178,6 +178,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateBatchToSpaceNd(const BatchT
     return std::make_unique<RefBatchToSpaceNdWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateCast(const CastQueueDescriptor& descriptor,
+                                                          const WorkloadInfo& info) const
+{
+    return std::make_unique<RefCastWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateComparison(const ComparisonQueueDescriptor& descriptor,
                                                                 const WorkloadInfo& info) const
 {

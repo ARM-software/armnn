@@ -68,6 +68,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/BatchNormalizationTestImpl.cpp
     layerTests/BatchNormalizationTestImpl.hpp
     layerTests/BatchToSpaceNdTestImpl.hpp
+    layerTests/CastTestImpl.cpp
+    layerTests/CastTestImpl.hpp
     layerTests/ComparisonTestImpl.cpp
     layerTests/ComparisonTestImpl.hpp
     layerTests/ConcatTestImpl.cpp

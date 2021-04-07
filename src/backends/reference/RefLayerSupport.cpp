@@ -303,6 +303,36 @@ bool RefLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
     return supported;
 }
 
+bool RefLayerSupport::IsCastSupported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    std::array<DataType, 9> supportedInputTypes =
+            {
+                    DataType::BFloat16,
+                    DataType::Float32,
+                    DataType::Float16,
+                    DataType::QSymmS8,
+                    DataType::QAsymmS8,
+                    DataType::QAsymmU8,
+                    DataType::QSymmS16,
+                    DataType::Signed32
+            };
+
+    bool supported = true;
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedInputTypes), reasonIfUnsupported,
+                                  "Reference cast: input is not a supported type");
+
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedInputTypes), reasonIfUnsupported,
+                                  "Reference cast: output is not a supported type");
+
+    supported &= CheckSupportRule(ShapesAreSameTotalSize(input, output), reasonIfUnsupported,
+                                  "Reference cast: input and output shapes have different number of total elements");
+
+    return supported;
+}
+
 bool RefLayerSupport::IsComparisonSupported(const TensorInfo& input0,
                                             const TensorInfo& input1,
                                             const TensorInfo& output,

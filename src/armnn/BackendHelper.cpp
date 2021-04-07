@@ -113,6 +113,13 @@ bool LayerSupportHandle::IsBatchToSpaceNdSupported(const TensorInfo& input,
                                                      reasonIfUnsupported.value());
 }
 
+bool LayerSupportHandle::IsCastSupported(const TensorInfo& input,
+                                         const TensorInfo& output,
+                                         Optional<std::string&> reasonIfUnsupported)
+{
+    return m_LayerSupport->IsCastSupported(input, output, reasonIfUnsupported.value());
+}
+
 bool LayerSupportHandle::IsComparisonSupported(const TensorInfo& input0,
                                                const TensorInfo& input1,
                                                const TensorInfo& output,

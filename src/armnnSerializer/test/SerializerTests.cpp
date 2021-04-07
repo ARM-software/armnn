@@ -200,6 +200,33 @@ BOOST_AUTO_TEST_CASE(SerializeBatchToSpaceNd)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeCast)
+{
+        const std::string layerName("cast");
+
+        const armnn::TensorShape shape{1, 5, 2, 3};
+
+        const armnn::TensorInfo inputInfo  = armnn::TensorInfo(shape, armnn::DataType::Signed32);
+        const armnn::TensorInfo outputInfo = armnn::TensorInfo(shape, armnn::DataType::Float32);
+
+        armnn::INetworkPtr network = armnn::INetwork::Create();
+        armnn::IConnectableLayer* inputLayer      = network->AddInputLayer(0);
+        armnn::IConnectableLayer* castLayer       = network->AddCastLayer(layerName.c_str());
+        armnn::IConnectableLayer* outputLayer     = network->AddOutputLayer(0);
+
+        inputLayer->GetOutputSlot(0).Connect(castLayer->GetInputSlot(0));
+        castLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+        inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+        castLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+        armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+        BOOST_CHECK(deserializedNetwork);
+
+        LayerVerifierBase verifier(layerName, {inputInfo}, {outputInfo});
+        deserializedNetwork->ExecuteStrategy(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeComparison)
 {
     const std::string layerName("comparison");

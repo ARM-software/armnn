@@ -425,8 +425,8 @@ struct ProfilingStaticGuid : public ProfilingGuid
     X(Switch) \
     X(Transpose) \
     X(TransposeConvolution2d) \
-    X(Unmap)
-
+    X(Unmap) \
+    X(Cast)
 /// When adding a new layer, adapt also the LastLayer enum value in the
 /// enum class LayerType below
 enum class LayerType
@@ -435,7 +435,7 @@ enum class LayerType
     LIST_OF_LAYER_TYPE
 #undef X
     FirstLayer = Activation,
-    LastLayer = Unmap
+    LastLayer = Cast
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

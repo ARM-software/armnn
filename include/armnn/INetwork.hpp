@@ -198,6 +198,11 @@ public:
     IConnectableLayer* AddArgMinMaxLayer(const ArgMinMaxDescriptor& desc,
                                          const char* name = nullptr);
 
+    /// Adds a cast layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddCastLayer(const char* name = nullptr);
+
     /// Add a Comparison layer to the network.
     /// @param name - Optional name for the layer.
     /// @param desc - Descriptor for the comparison operation.

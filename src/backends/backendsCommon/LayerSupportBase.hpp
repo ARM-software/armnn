@@ -47,6 +47,10 @@ public:
                                    const BatchToSpaceNdDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsCastSupported(const TensorInfo& input,
+                         const TensorInfo& output,
+                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsComparisonSupported(const TensorInfo& input0,
                                const TensorInfo& input1,
                                const TensorInfo& output,

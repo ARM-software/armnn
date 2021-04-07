@@ -24,6 +24,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 - ArgMinMax
 - BatchToSpaceNd
 - BatchNormalization
+- Cast
 - Comparison
 - Concat
 - Constant
@@ -109,6 +110,7 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 - ArgMinMax
 - BatchToSpaceNd
 - BatchNormalization
+- Cast
 - Concat
 - Comparison
 - Constant

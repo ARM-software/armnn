@@ -14,7 +14,6 @@
 #include <fmt/format.h>
 #include <iostream>
 
-
 using namespace armnn;
 namespace fb = flatbuffers;
 namespace serializer = armnnSerializer;
@@ -291,6 +290,16 @@ void SerializerStrategy::SerializeBatchNormalizationLayer(
                                                                                fbGammaConstTensorInfo);
 
     CreateAnyLayer(fbBatchNormalizationLayer.o, serializer::Layer::Layer_BatchNormalizationLayer);
+}
+
+void SerializerStrategy::SerializeCastLayer(const armnn::IConnectableLayer* layer,
+                                            const char* name)
+{
+    IgnoreUnused(name);
+
+    auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Cast);
+    auto fbCastLayer = serializer::CreateCastLayer(m_flatBufferBuilder, fbBaseLayer);
+    CreateAnyLayer(fbCastLayer.o, serializer::Layer::Layer_CastLayer);
 }
 
 void SerializerStrategy::SerializeComparisonLayer(const armnn::IConnectableLayer* layer,
@@ -1866,6 +1875,11 @@ void SerializerStrategy::ExecuteStrategy(const armnn::IConnectableLayer* layer,
             SerializeBatchToSpaceNdLayer(layer,
                                          layerDescriptor,
                                          name);
+            break;
+        }
+        case armnn::LayerType::Cast :
+        {
+            SerializeCastLayer(layer, name);
             break;
         }
         case armnn::LayerType::Comparison :

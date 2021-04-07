@@ -11,6 +11,7 @@
 #include "layers/ArgMinMaxLayer.hpp"
 #include "layers/BatchNormalizationLayer.hpp"
 #include "layers/BatchToSpaceNdLayer.hpp"
+#include "layers/CastLayer.hpp"
 #include "layers/ComparisonLayer.hpp"
 #include "layers/ConcatLayer.hpp"
 #include "layers/ConstantLayer.hpp"
@@ -166,5 +167,5 @@ DECLARE_LAYER(Switch)
 DECLARE_LAYER(Transpose)
 DECLARE_LAYER(TransposeConvolution2d)
 DECLARE_LAYER(Unmap)
-
+DECLARE_LAYER(Cast)
 }

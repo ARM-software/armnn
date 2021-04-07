@@ -61,6 +61,9 @@ struct ArgMinMaxLayerBuilder;
 struct ArgMinMaxDescriptor;
 struct ArgMinMaxDescriptorBuilder;
 
+struct CastLayer;
+struct CastLayerBuilder;
+
 struct ComparisonDescriptor;
 struct ComparisonDescriptorBuilder;
 
@@ -731,11 +734,12 @@ enum LayerType {
   LayerType_Rank = 58,
   LayerType_LogicalBinary = 59,
   LayerType_Reduce = 60,
+  LayerType_Cast = 61,
   LayerType_MIN = LayerType_Addition,
-  LayerType_MAX = LayerType_Reduce
+  LayerType_MAX = LayerType_Cast
 };
 
-inline const LayerType (&EnumValuesLayerType())[61] {
+inline const LayerType (&EnumValuesLayerType())[62] {
   static const LayerType values[] = {
     LayerType_Addition,
     LayerType_Input,
@@ -797,13 +801,14 @@ inline const LayerType (&EnumValuesLayerType())[61] {
     LayerType_Fill,
     LayerType_Rank,
     LayerType_LogicalBinary,
-    LayerType_Reduce
+    LayerType_Reduce,
+    LayerType_Cast
   };
   return values;
 }
 
 inline const char * const *EnumNamesLayerType() {
-  static const char * const names[62] = {
+  static const char * const names[63] = {
     "Addition",
     "Input",
     "Multiplication",
@@ -865,13 +870,14 @@ inline const char * const *EnumNamesLayerType() {
     "Rank",
     "LogicalBinary",
     "Reduce",
+    "Cast",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLayerType(LayerType e) {
-  if (flatbuffers::IsOutRange(e, LayerType_Addition, LayerType_Reduce)) return "";
+  if (flatbuffers::IsOutRange(e, LayerType_Addition, LayerType_Cast)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLayerType()[index];
 }
@@ -1206,11 +1212,12 @@ enum Layer {
   Layer_RankLayer = 59,
   Layer_LogicalBinaryLayer = 60,
   Layer_ReduceLayer = 61,
+  Layer_CastLayer = 62,
   Layer_MIN = Layer_NONE,
-  Layer_MAX = Layer_ReduceLayer
+  Layer_MAX = Layer_CastLayer
 };
 
-inline const Layer (&EnumValuesLayer())[62] {
+inline const Layer (&EnumValuesLayer())[63] {
   static const Layer values[] = {
     Layer_NONE,
     Layer_ActivationLayer,
@@ -1273,13 +1280,14 @@ inline const Layer (&EnumValuesLayer())[62] {
     Layer_FillLayer,
     Layer_RankLayer,
     Layer_LogicalBinaryLayer,
-    Layer_ReduceLayer
+    Layer_ReduceLayer,
+    Layer_CastLayer
   };
   return values;
 }
 
 inline const char * const *EnumNamesLayer() {
-  static const char * const names[63] = {
+  static const char * const names[64] = {
     "NONE",
     "ActivationLayer",
     "AdditionLayer",
@@ -1342,13 +1350,14 @@ inline const char * const *EnumNamesLayer() {
     "RankLayer",
     "LogicalBinaryLayer",
     "ReduceLayer",
+    "CastLayer",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLayer(Layer e) {
-  if (flatbuffers::IsOutRange(e, Layer_NONE, Layer_ReduceLayer)) return "";
+  if (flatbuffers::IsOutRange(e, Layer_NONE, Layer_CastLayer)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLayer()[index];
 }
@@ -1599,6 +1608,10 @@ template<> struct LayerTraits<armnnSerializer::LogicalBinaryLayer> {
 
 template<> struct LayerTraits<armnnSerializer::ReduceLayer> {
   static const Layer enum_value = Layer_ReduceLayer;
+};
+
+template<> struct LayerTraits<armnnSerializer::CastLayer> {
+  static const Layer enum_value = Layer_CastLayer;
 };
 
 bool VerifyLayer(flatbuffers::Verifier &verifier, const void *obj, Layer type);
@@ -2637,6 +2650,49 @@ inline flatbuffers::Offset<ArgMinMaxDescriptor> CreateArgMinMaxDescriptor(
   ArgMinMaxDescriptorBuilder builder_(_fbb);
   builder_.add_axis(axis);
   builder_.add_argMinMaxFunction(argMinMaxFunction);
+  return builder_.Finish();
+}
+
+struct CastLayer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef CastLayerBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_BASE = 4
+  };
+  const armnnSerializer::LayerBase *base() const {
+    return GetPointer<const armnnSerializer::LayerBase *>(VT_BASE);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_BASE) &&
+           verifier.VerifyTable(base()) &&
+           verifier.EndTable();
+  }
+};
+
+struct CastLayerBuilder {
+  typedef CastLayer Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_base(flatbuffers::Offset<armnnSerializer::LayerBase> base) {
+    fbb_.AddOffset(CastLayer::VT_BASE, base);
+  }
+  explicit CastLayerBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  CastLayerBuilder &operator=(const CastLayerBuilder &);
+  flatbuffers::Offset<CastLayer> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<CastLayer>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<CastLayer> CreateCastLayer(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<armnnSerializer::LayerBase> base = 0) {
+  CastLayerBuilder builder_(_fbb);
+  builder_.add_base(base);
   return builder_.Finish();
 }
 
@@ -9502,6 +9558,9 @@ struct AnyLayer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const armnnSerializer::ReduceLayer *layer_as_ReduceLayer() const {
     return layer_type() == armnnSerializer::Layer_ReduceLayer ? static_cast<const armnnSerializer::ReduceLayer *>(layer()) : nullptr;
   }
+  const armnnSerializer::CastLayer *layer_as_CastLayer() const {
+    return layer_type() == armnnSerializer::Layer_CastLayer ? static_cast<const armnnSerializer::CastLayer *>(layer()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_LAYER_TYPE) &&
@@ -9753,6 +9812,10 @@ template<> inline const armnnSerializer::LogicalBinaryLayer *AnyLayer::layer_as<
 
 template<> inline const armnnSerializer::ReduceLayer *AnyLayer::layer_as<armnnSerializer::ReduceLayer>() const {
   return layer_as_ReduceLayer();
+}
+
+template<> inline const armnnSerializer::CastLayer *AnyLayer::layer_as<armnnSerializer::CastLayer>() const {
+  return layer_as_CastLayer();
 }
 
 struct AnyLayerBuilder {
@@ -10207,6 +10270,10 @@ inline bool VerifyLayer(flatbuffers::Verifier &verifier, const void *obj, Layer 
     }
     case Layer_ReduceLayer: {
       auto ptr = reinterpret_cast<const armnnSerializer::ReduceLayer *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Layer_CastLayer: {
+      auto ptr = reinterpret_cast<const armnnSerializer::CastLayer *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

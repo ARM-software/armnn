@@ -47,6 +47,7 @@ BACKEND_SOURCES := \
         workloads/RefArgMinMaxWorkload.cpp \
         workloads/RefBatchNormalizationWorkload.cpp \
         workloads/RefBatchToSpaceNdWorkload.cpp \
+        workloads/RefCastWorkload.cpp \
         workloads/RefComparisonWorkload.cpp \
         workloads/RefConcatWorkload.cpp \
         workloads/RefConstantWorkload.cpp \

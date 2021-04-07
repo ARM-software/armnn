@@ -59,6 +59,10 @@ IConnectableLayer* INetwork::AddArgMinMaxLayer(const ArgMinMaxDescriptor& desc,
     return pNetworkImpl->AddArgMinMaxLayer(desc, name);
 }
 
+IConnectableLayer* INetwork::AddCastLayer(const char* name)
+{
+    return pNetworkImpl->AddCastLayer(name);
+}
 
 IConnectableLayer* INetwork::AddComparisonLayer(const ComparisonDescriptor& comparisonDescriptor,
                                                 const char* name)
@@ -1703,6 +1707,11 @@ IConnectableLayer* NetworkImpl::AddBatchToSpaceNdLayer(const BatchToSpaceNdDescr
                                             const char* name)
 {
     return m_Graph->AddLayer<BatchToSpaceNdLayer>(batchToSpaceNdDescriptor, name);
+}
+
+IConnectableLayer* NetworkImpl::AddCastLayer(const char* name)
+{
+    return m_Graph->AddLayer<CastLayer>(name);
 }
 
 IConnectableLayer* NetworkImpl::AddComparisonLayer(const ComparisonDescriptor& comparisonDescriptor,

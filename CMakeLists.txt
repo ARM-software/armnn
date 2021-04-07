@@ -283,6 +283,8 @@ list(APPEND armnn_sources
     src/armnn/layers/BatchNormalizationLayer.cpp
     src/armnn/layers/BatchToSpaceNdLayer.hpp
     src/armnn/layers/BatchToSpaceNdLayer.cpp
+    src/armnn/layers/CastLayer.hpp
+    src/armnn/layers/CastLayer.cpp
     src/armnn/layers/ComparisonLayer.hpp
     src/armnn/layers/ComparisonLayer.cpp
     src/armnn/layers/ConcatLayer.hpp
@@ -809,6 +811,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/ArgMinMax.cpp
              src/armnnTfLiteParser/test/AvgPool2D.cpp
              src/armnnTfLiteParser/test/BatchToSpaceND.cpp
+             src/armnnTfLiteParser/test/Cast.cpp
              src/armnnTfLiteParser/test/Concatenation.cpp
              src/armnnTfLiteParser/test/Constant.cpp
              src/armnnTfLiteParser/test/Conv2D.cpp
@@ -926,6 +929,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/DeserializeArgMinMax.cpp
             src/armnnDeserializer/test/DeserializeBatchToSpaceNd.cpp
             src/armnnDeserializer/test/DeserializeBatchNormalization.cpp
+            src/armnnDeserializer/test/DeserializeCast.cpp
             src/armnnDeserializer/test/DeserializeComparison.cpp
             src/armnnDeserializer/test/DeserializeConstant.cpp
             src/armnnDeserializer/test/DeserializeConvolution2d.cpp

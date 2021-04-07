@@ -608,6 +608,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_ARG_MAX]                 = &TfLiteParserImpl::ParseArgMax;
     m_ParserFunctions[tflite::BuiltinOperator_AVERAGE_POOL_2D]         = &TfLiteParserImpl::ParseAveragePool2D;
     m_ParserFunctions[tflite::BuiltinOperator_BATCH_TO_SPACE_ND]       = &TfLiteParserImpl::ParseBatchToSpaceND;
+    m_ParserFunctions[tflite::BuiltinOperator_CAST]                    = &TfLiteParserImpl::ParseCast;
     m_ParserFunctions[tflite::BuiltinOperator_CONCATENATION]           = &TfLiteParserImpl::ParseConcatenation;
     m_ParserFunctions[tflite::BuiltinOperator_CONV_2D]                 = &TfLiteParserImpl::ParseConv2D;
     m_ParserFunctions[tflite::BuiltinOperator_CUSTOM]                  = &TfLiteParserImpl::ParseCustomOperator;
@@ -874,6 +875,30 @@ void TfLiteParserImpl::ParseUnsupportedOperator(size_t subgraphIndex, size_t ope
 
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, inputTensorIds);
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, outputTensorIds);
+}
+
+void TfLiteParserImpl::ParseCast(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = fmt::format("Cast:{}:{}", subgraphIndex, operatorIndex);
+
+    IConnectableLayer* layer = m_Network->AddCastLayer(layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, outputTensorIndexes);
 }
 
 void TfLiteParserImpl::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)

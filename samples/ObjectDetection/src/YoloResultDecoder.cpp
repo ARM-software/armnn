@@ -13,9 +13,9 @@
 namespace od
 {
 
-DetectedObjects YoloResultDecoder::Decode(const InferenceResults& networkResults,
-                                         const Size& outputFrameSize,
-                                         const Size& resizedFrameSize,
+DetectedObjects YoloResultDecoder::Decode(const common::InferenceResults<float>& networkResults,
+                                         const common::Size& outputFrameSize,
+                                         const common::Size& resizedFrameSize,
                                          const std::vector<std::string>& labels)
 {
 
@@ -33,7 +33,7 @@ DetectedObjects YoloResultDecoder::Decode(const InferenceResults& networkResults
     DetectedObjects detectedObjects;
     DetectedObjects resultsAfterNMS;
 
-    for (const InferenceResult& result : networkResults)
+    for (const common::InferenceResult<float>& result : networkResults)
     {
         for (unsigned int i = 0; i < m_numBoxes; ++i)
         {

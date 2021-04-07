@@ -9,9 +9,10 @@
 #include <cstdint>
 #include <vector>
 #include <tuple>
+
 #include <armnn/BackendId.hpp>
 
-namespace od
+namespace common
 {
 
 struct Size
@@ -38,13 +39,16 @@ struct BBoxColor
     std::tuple<int, int, int> colorCode;
 };
 
-struct ODPipelineOptions
+struct PipelineOptions
 {
     std::string m_ModelName;
     std::string m_ModelFilePath;
     std::vector<armnn::BackendId> m_backends;
 };
 
-using InferenceResult = std::vector<float>;
-using InferenceResults = std::vector<InferenceResult>;
-}
+template<typename T>
+using InferenceResult = std::vector<T>;
+
+template<typename T>
+using InferenceResults = std::vector<InferenceResult<T>>;
+} // namespace common

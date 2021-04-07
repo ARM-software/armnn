@@ -3,23 +3,90 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ArmnnNetworkExecutor.hpp"
+#pragma once
+
 #include "Types.hpp"
 
-#include <random>
+#include "armnn/ArmNN.hpp"
+#include "armnnTfLiteParser/ITfLiteParser.hpp"
+#include "armnnUtils/DataLayoutIndexed.hpp"
+#include <armnn/Logging.hpp>
+
 #include <string>
+#include <vector>
 
-namespace od
+namespace common
 {
-
-armnn::DataType ArmnnNetworkExecutor::GetInputDataType() const
+/**
+* @brief Used to load in a network through ArmNN and run inference on it against a given backend.
+*
+*/
+template <class Tout>
+class ArmnnNetworkExecutor
 {
-    return m_inputBindingInfo.second.GetDataType();
-}
+private:
+    armnn::IRuntimePtr m_Runtime;
+    armnn::NetworkId m_NetId{};
+    mutable InferenceResults<Tout> m_OutputBuffer;
+    armnn::InputTensors     m_InputTensors;
+    armnn::OutputTensors    m_OutputTensors;
+    std::vector<armnnTfLiteParser::BindingPointInfo> m_outputBindingInfo;
 
-ArmnnNetworkExecutor::ArmnnNetworkExecutor(std::string& modelPath,
+    std::vector<std::string> m_outputLayerNamesList;
+
+    armnnTfLiteParser::BindingPointInfo m_inputBindingInfo;
+
+    void PrepareTensors(const void* inputData, const size_t dataBytes);
+
+    template <typename Enumeration>
+    auto log_as_int(Enumeration value)
+    -> typename std::underlying_type<Enumeration>::type
+    {
+        return static_cast<typename std::underlying_type<Enumeration>::type>(value);
+    }
+
+public:
+    ArmnnNetworkExecutor() = delete;
+
+    /**
+    * @brief Initializes the network with the given input data. Parsed through TfLiteParser and optimized for a
+    *        given backend.
+    *
+    * Note that the output layers names order in m_outputLayerNamesList affects the order of the feature vectors
+    * in output of the Run method.
+    *
+    *       * @param[in] modelPath - Relative path to the model file
+    *       * @param[in] backends - The list of preferred backends to run inference on
+    */
+    ArmnnNetworkExecutor(std::string& modelPath,
+                         std::vector<armnn::BackendId>& backends);
+
+    /**
+    * @brief Returns the aspect ratio of the associated model in the order of width, height.
+    */
+    Size GetImageAspectRatio();
+
+    armnn::DataType GetInputDataType() const;
+
+    float GetQuantizationScale();
+
+    int GetQuantizationOffset();
+
+    /**
+    * @brief Runs inference on the provided input data, and stores the results in the provided InferenceResults object.
+    *
+    * @param[in] inputData - input frame data
+    * @param[in] dataBytes - input data size in bytes
+    * @param[out] results - Vector of DetectionResult objects used to store the output result.
+    */
+    bool Run(const void* inputData, const size_t dataBytes, common::InferenceResults<Tout>& outResults);
+
+};
+
+template <class Tout>
+ArmnnNetworkExecutor<Tout>::ArmnnNetworkExecutor(std::string& modelPath,
                                            std::vector<armnn::BackendId>& preferredBackends)
-: m_Runtime(armnn::IRuntime::Create(armnn::IRuntime::CreationOptions()))
+        : m_Runtime(armnn::IRuntime::Create(armnn::IRuntime::CreationOptions()))
 {
     // Import the TensorFlow lite model.
     armnnTfLiteParser::ITfLiteParserPtr parser = armnnTfLiteParser::ITfLiteParser::Create();
@@ -36,7 +103,6 @@ ArmnnNetworkExecutor::ArmnnNetworkExecutor(std::string& modelPath,
     {
         m_outputBindingInfo.push_back(std::move(parser->GetNetworkOutputBindingInfo(0, name)));
     }
-
     std::vector<std::string> errorMessages;
     // optimize the network.
     armnn::IOptimizedNetworkPtr optNet = Optimize(*network,
@@ -57,6 +123,7 @@ ArmnnNetworkExecutor::ArmnnNetworkExecutor(std::string& modelPath,
     if (armnn::Status::Success != m_Runtime->LoadNetwork(m_NetId, std::move(optNet), errorMessage))
     {
         ARMNN_LOG(error) << errorMessage;
+        throw armnn::Exception(errorMessage);
     }
 
     //pre-allocate memory for output (the size of it never changes)
@@ -65,22 +132,8 @@ ArmnnNetworkExecutor::ArmnnNetworkExecutor(std::string& modelPath,
         const armnn::DataType dataType = m_outputBindingInfo[it].second.GetDataType();
         const armnn::TensorShape& tensorShape = m_outputBindingInfo[it].second.GetShape();
 
-        InferenceResult oneLayerOutResult;
-        switch (dataType)
-        {
-            case armnn::DataType::Float32:
-            {
-                oneLayerOutResult.resize(tensorShape.GetNumElements(), 0);
-                break;
-            }
-            default:
-            {
-                errorMessage = "ArmnnNetworkExecutor: unsupported output tensor data type";
-                ARMNN_LOG(error) << errorMessage << " " << log_as_int(dataType);
-                throw armnn::Exception(errorMessage);
-            }
-        }
-
+        std::vector<Tout> oneLayerOutResult;
+        oneLayerOutResult.resize(tensorShape.GetNumElements(), 0);
         m_OutputBuffer.emplace_back(oneLayerOutResult);
 
         // Make ArmNN output tensors
@@ -97,14 +150,22 @@ ArmnnNetworkExecutor::ArmnnNetworkExecutor(std::string& modelPath,
 
 }
 
-void ArmnnNetworkExecutor::PrepareTensors(const void* inputData, const size_t dataBytes)
+template <class Tout>
+armnn::DataType ArmnnNetworkExecutor<Tout>::GetInputDataType() const
+{
+    return m_inputBindingInfo.second.GetDataType();
+}
+
+template <class Tout>
+void ArmnnNetworkExecutor<Tout>::PrepareTensors(const void* inputData, const size_t dataBytes)
 {
     assert(m_inputBindingInfo.second.GetNumBytes() >= dataBytes);
     m_InputTensors.clear();
     m_InputTensors = {{ m_inputBindingInfo.first, armnn::ConstTensor(m_inputBindingInfo.second, inputData)}};
 }
 
-bool ArmnnNetworkExecutor::Run(const void* inputData, const size_t dataBytes, InferenceResults& outResults)
+template <class Tout>
+bool ArmnnNetworkExecutor<Tout>::Run(const void* inputData, const size_t dataBytes, InferenceResults<Tout>& outResults)
 {
     /* Prepare tensors if they are not ready */
     ARMNN_LOG(debug) << "Preparing tensors...";
@@ -129,7 +190,20 @@ bool ArmnnNetworkExecutor::Run(const void* inputData, const size_t dataBytes, In
     return (armnn::Status::Success == ret);
 }
 
-Size ArmnnNetworkExecutor::GetImageAspectRatio()
+template <class Tout>
+float ArmnnNetworkExecutor<Tout>::GetQuantizationScale()
+{
+    return this->m_inputBindingInfo.second.GetQuantizationScale();
+}
+
+template <class Tout>
+int ArmnnNetworkExecutor<Tout>::GetQuantizationOffset()
+{
+    return this->m_inputBindingInfo.second.GetQuantizationOffset();
+}
+
+template <class Tout>
+Size ArmnnNetworkExecutor<Tout>::GetImageAspectRatio()
 {
     const auto shape = m_inputBindingInfo.second.GetShape();
     assert(shape.GetNumDimensions() == 4);
@@ -137,4 +211,4 @@ Size ArmnnNetworkExecutor::GetImageAspectRatio()
     return Size(shape[nhwc.GetWidthIndex()],
                 shape[nhwc.GetHeightIndex()]);
 }
-}// namespace od
+}// namespace common

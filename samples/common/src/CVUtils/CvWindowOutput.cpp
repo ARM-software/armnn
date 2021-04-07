@@ -5,7 +5,7 @@
 
 #include "CvWindowOutput.hpp"
 
-namespace od
+namespace common
 {
 
 void CvWindowOutput::Init(const std::string& windowName)
@@ -30,4 +30,4 @@ bool CvWindowOutput::IsReady() const
 {
     return true;
 }
-}// namespace od
+}// namespace common

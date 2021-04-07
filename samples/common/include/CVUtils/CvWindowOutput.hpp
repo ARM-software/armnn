@@ -8,7 +8,7 @@
 #include "IFrameOutput.hpp"
 #include <opencv2/opencv.hpp>
 
-namespace od
+namespace common
 {
 
 class CvWindowOutput : public IFrameOutput<cv::Mat> {
@@ -50,4 +50,4 @@ private:
     std::string m_windowName;
 
 };
-}// namespace od
+}// namespace common

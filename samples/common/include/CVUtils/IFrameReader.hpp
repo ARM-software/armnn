@@ -8,7 +8,7 @@
 #include <cstddef>
 #include <memory>
 
-namespace od
+namespace common
 {
 /**
  * @brief Frame source reader interface
@@ -42,4 +42,4 @@ public:
 
 };
 
-}// namespace od
+}// namespace common

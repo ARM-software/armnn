@@ -30,9 +30,9 @@ public:
     *
     * @return     Vector of decoded detected objects.
     */
-    virtual DetectedObjects Decode(const InferenceResults& results,
-                                   const Size& outputFrameSize,
-                                   const Size& resizedFrameSize,
+    virtual DetectedObjects Decode(const common::InferenceResults<float>& results,
+                                   const common::Size& outputFrameSize,
+                                   const common::Size& resizedFrameSize,
                                    const std::vector<std::string>& labels) = 0;
 
 };

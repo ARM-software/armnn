@@ -45,7 +45,7 @@ int ParseOptions(std::map<std::string, std::string>& options, std::map<std::stri
                 std::string value = argv[++i];
                 options.insert({it->first, value});
             }
-            else if (std::string(argv[i]) == HELP)
+            else if (std::string(argv[i]) == "HELP")
             {
                 std::cout << "Available options" << std::endl;
                 for (auto & acceptedOption : acceptedOptions)

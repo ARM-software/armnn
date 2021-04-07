@@ -15,7 +15,7 @@ static cv::Scalar GetScalarColorCode(std::tuple<int, int, int> color)
 }
 
 void AddInferenceOutputToFrame(od::DetectedObjects& decodedResults, cv::Mat& inputFrame,
-                               std::vector<std::tuple<std::string, od::BBoxColor>>& labels)
+                               std::vector<std::tuple<std::string, common::BBoxColor>>& labels)
 {
     for(const od::DetectedObject& object : decodedResults)
     {
@@ -86,7 +86,7 @@ void AddInferenceOutputToFrame(od::DetectedObjects& decodedResults, cv::Mat& inp
 }
 
 
-void ResizeFrame(const cv::Mat& frame, cv::Mat& dest, const od::Size& aspectRatio)
+void ResizeFrame(const cv::Mat& frame, cv::Mat& dest, const common::Size& aspectRatio)
 {
     if(&dest != &frame)
     {
@@ -119,7 +119,7 @@ void PadFrame(const cv::Mat& src, cv::Mat& dest, const int bottom, const int rig
     }
 }
 
-void ResizeWithPad(const cv::Mat& frame, cv::Mat& dest, cv::Mat& cache, const od::Size& destSize)
+void ResizeWithPad(const cv::Mat& frame, cv::Mat& dest, cv::Mat& cache, const common::Size& destSize)
 {
     ResizeFrame(frame, cache, destSize);
     PadFrame(cache, dest,destSize.m_Height - cache.rows,destSize.m_Width - cache.cols);

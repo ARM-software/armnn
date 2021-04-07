@@ -8,7 +8,7 @@
 #include "IFrameOutput.hpp"
 #include <opencv2/opencv.hpp>
 
-namespace od
+namespace common
 {
 
 class CvVideoFileWriter : public IFrameOutput<cv::Mat> {
@@ -58,4 +58,4 @@ private:
     cv::VideoWriter m_cvWriter{};
     bool m_ready = false;
 };
-}// namespace od
+}// namespace common

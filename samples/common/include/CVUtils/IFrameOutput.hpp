@@ -8,7 +8,7 @@
 #include <cstddef>
 #include <memory>
 
-namespace od
+namespace common
 {
 /**
  * @brief Frames output interface
@@ -45,4 +45,4 @@ namespace od
 
     };
 
-}// namespace od
+}// namespace common

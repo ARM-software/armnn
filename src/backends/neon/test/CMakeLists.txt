@@ -24,7 +24,8 @@ list(APPEND armnnNeonBackendUnitTests_sources
 # Default to always including these tests.
 set(INCLUDE_NDK_BUG_TESTS "ON")
 # Reconsider if we in a debug build.
-if ( NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release" )
+string( TOLOWER ${CMAKE_BUILD_TYPE} BUILD_TYPE_LOWERCASE )
+if ( NOT BUILD_TYPE_LOWERCASE STREQUAL "release" )
     # And NDK_VERSION has been set.
     if ( DEFINED NDK_VERSION )
         # And the version is less than r21.

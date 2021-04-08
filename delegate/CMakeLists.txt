@@ -170,6 +170,36 @@ if(BUILD_UNIT_TESTS)
         src/test/TransposeTest.cpp
         src/test/TransposeTestHelper.hpp)
 
+        # There's a known Android NDK bug which causes a subset of NeonLayerTests to
+        # fail. We'll exclude these tests in NeonLayerTests_NDK_Bug.cpp if we're doing
+        # a debug build and NDK is less than r21.
+        # https://github.com/android/ndk/issues/1135
+
+        # Default to always including these tests.
+        set(INCLUDE_NDK_BUG_TESTS "ON")
+        # Reconsider if we in a debug build.
+        string( TOLOWER ${CMAKE_BUILD_TYPE} BUILD_TYPE_LOWERCASE )
+        if ( NOT BUILD_TYPE_LOWERCASE STREQUAL "release" )
+            message("CMAKE:: BUILD TYPE IS ${CMAKE_BUILD_TYPE}")
+            # And NDK_VERSION has been set.
+            if ( DEFINED NDK_VERSION )
+                message("CMAKE:: NDK DEFINED")
+                # And the version is less than r21.
+                if ( ${NDK_VERSION} STRLESS "r21" )
+                    message("CMAKE:: BUG TESTS OFF")
+                    set(INCLUDE_NDK_BUG_TESTS "OFF")
+                endif()
+            endif()
+        endif()
+
+        if ( INCLUDE_NDK_BUG_TESTS STREQUAL "ON" )
+           list(APPEND armnnDelegate_unittest_sources
+                src/test/NeonDelegateTests_NDK_Issue.cpp
+                )
+        else()
+
+        endif()
+
     add_executable(DelegateUnitTests ${armnnDelegate_unittest_sources})
     target_include_directories(DelegateUnitTests PRIVATE third-party)
 

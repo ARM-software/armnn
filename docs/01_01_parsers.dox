@@ -158,6 +158,8 @@ This reference guide provides a list of TensorFlow Lite operators the Arm NN SDK
 The Arm NN SDK TensorFlow Lite parser currently supports the following operators:
 
 - ADD
+- ARG_MAX
+_ ARG_MIN
 - AVERAGE_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - BATCH_TO_SPACE
 - CONCATENATION, Supported Fused Activation: RELU , RELU6 , TANH, NONE

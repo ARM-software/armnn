@@ -99,6 +99,9 @@ private:
 
     void ParseActivation(size_t subgraphIndex, size_t operatorIndex, armnn::ActivationFunction activationType);
     void ParseAdd(size_t subgraphIndex, size_t operatorIndex);
+    void ParseArgMinMax(size_t subgraphIndex, size_t operatorIndex, armnn::ArgMinMaxFunction argMinMaxFunction);
+    void ParseArgMin(size_t subgraphIndex, size_t operatorIndex);
+    void ParseArgMax(size_t subgraphIndex, size_t operatorIndex);
     void ParseAveragePool2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseBatchToSpaceND(size_t subgraphIndex, size_t operatorIndex);
     void ParseConcatenation(size_t subgraphIndex, size_t operatorIndex);
@@ -107,6 +110,7 @@ private:
     void ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseDequantize(size_t subgraphIndex, size_t operatorIndex);
     void ParseDetectionPostProcess(size_t subgraphIndex, size_t operatorIndex);
+    void ParseDiv(size_t subgraphIndex, size_t operatorIndex);
     void ParseElu(size_t subgraphIndex, size_t operatorIndex);
     void ParseExp(size_t subgraphIndex, size_t operatorIndex);
     void ParseFullyConnected(size_t subgraphIndex, size_t operatorIndex);
@@ -143,12 +147,10 @@ private:
     void ParseStridedSlice(size_t subgraphIndex, size_t operatorIndex);
     void ParseSub(size_t subgraphIndex, size_t operatorIndex);
     void ParseSum(size_t subgraphIndex, size_t operatorIndex);
-    void ParseDiv(size_t subgraphIndex, size_t operatorIndex);
     void ParseTanH(size_t subgraphIndex, size_t operatorIndex);
     void ParseTranspose(size_t subgraphIndex, size_t operatorIndex);
     void ParseTransposeConv(size_t subgraphIndex, size_t operatorIndex);
     void ParseUnpack(size_t subgraphIndex, size_t operatorIndex);
-    void ParseArgMax(size_t subgraphIndex, size_t operatorIndex);
 
     void RegisterProducerOfTensor(size_t subgraphIndex, size_t tensorIndex, armnn::IOutputSlot* slot);
     void RegisterConsumerOfTensor(size_t subgraphIndex, size_t tensorIndex, armnn::IInputSlot* slot);

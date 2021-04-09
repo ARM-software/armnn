@@ -806,6 +806,7 @@ if(BUILD_UNIT_TESTS)
         list(APPEND unittest_sources
              src/armnnTfLiteParser/test/Activations.cpp
              src/armnnTfLiteParser/test/Addition.cpp
+             src/armnnTfLiteParser/test/ArgMinMax.cpp
              src/armnnTfLiteParser/test/AvgPool2D.cpp
              src/armnnTfLiteParser/test/BatchToSpaceND.cpp
              src/armnnTfLiteParser/test/Concatenation.cpp

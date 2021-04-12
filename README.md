@@ -85,6 +85,16 @@ or take a look at previous [github issues](https://github.com/ARM-software/armnn
    you need it to execute our unit tests. Boost will soon be removed from Arm NN entirely.
 
 
+## How to get involved
+If you would like to get involved but don't know where to start, a good place to look is in our Github Issues.
+
+Feature requests without a volunteer to implement them are closed, but have the 'Help wanted' label, these can be found
+[here](https://github.com/ARM-software/armnn/issues?q=is%3Aissue+label%3A%22Help+wanted%22+).
+Once you find a suitable Issue, feel free to re-open it and add a comment,
+so that other people know you are working on it and can help.
+
+When the feature is implemented the 'Help wanted' label will be removed.
+
 ## Contributions
 The Arm NN project welcomes contributions. For more details on contributing to Arm NN see the [Contributing page](https://mlplatform.org/contributing/)
 on the [MLPlatform.org](https://mlplatform.org/) website, or see the [Contributor Guide](ContributorGuide.md).

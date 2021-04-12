@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_02" # Release 21.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="3b5981ce898569aafa98abdf220c73f1a80685b9" #Implement Fanout mode in CPPScheduler
+DEFAULT_CLFRAMEWORKREVISION="99b1a1cc1bdeaec08d2a8fb5ac5d104502e05570" #Fix bug on Implicit Padding for CL GEMMMatrixMultiplyInterleavedTransposed
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

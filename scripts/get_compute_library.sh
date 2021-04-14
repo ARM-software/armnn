@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_02" # Release 21.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="99b1a1cc1bdeaec08d2a8fb5ac5d104502e05570" #Fix bug on Implicit Padding for CL GEMMMatrixMultiplyInterleavedTransposed
+DEFAULT_CLFRAMEWORKREVISION="91b7f7423a97f0ae713a13182f289621dad17c43" #Port CLConvertFullyConnectedWeights to new API
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

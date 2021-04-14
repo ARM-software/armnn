@@ -32,6 +32,7 @@ if(ARMCOMPUTECL)
         ClContextDeserializer.cpp
         ClContextSerializer.hpp
         ClContextSerializer.cpp
+        ClImportTensorHandle.hpp
         ClImportTensorHandleFactory.cpp
         ClImportTensorHandleFactory.hpp
         ClLayerSupport.cpp

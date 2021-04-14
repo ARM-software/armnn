@@ -9,6 +9,7 @@ list(APPEND armnnClBackendUnitTests_sources
     ClCreateWorkloadTests.cpp
     ClEndToEndTests.cpp
     ClImportTensorHandleFactoryTests.cpp
+    ClImportTensorHandleTests.cpp
     ClJsonPrinterTests.cpp
     ClLayerSupportTests.cpp
     ClLayerTests.cpp

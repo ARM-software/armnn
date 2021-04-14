@@ -18,7 +18,7 @@ constexpr const char* ClImportTensorHandleFactoryId()
 }
 
 /**
- * This factory creates ClTensorHandles that refer to imported memory tensors.
+ * This factory creates ClImportTensorHandles that refer to imported memory tensors.
  */
 class ClImportTensorHandleFactory : public ITensorHandleFactory
 {

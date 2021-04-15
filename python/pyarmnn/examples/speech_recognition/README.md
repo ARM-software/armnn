@@ -53,6 +53,7 @@ To run ASR on an audio file, use the following command:
 ```bash
 $ python run_audio_file.py --audio_file_path <path/to/your_audio> --model_file_path <path/to/your_model> --labels_file_path <path/to/your_labels>
 ```
+Please ensure that your audio file has a sampling rate of 16000Hz.
 
 You may also add the optional flags:
 

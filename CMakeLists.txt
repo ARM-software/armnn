@@ -820,7 +820,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Dequantize.cpp
              src/armnnTfLiteParser/test/DetectionPostProcess.cpp
              src/armnnTfLiteParser/test/Div.cpp
-             src/armnnTfLiteParser/test/Exp.cpp
+             src/armnnTfLiteParser/test/ElementWiseUnary.cpp
              src/armnnTfLiteParser/test/FullyConnected.cpp
              src/armnnTfLiteParser/test/Gather.cpp
              src/armnnTfLiteParser/test/L2Normalization.cpp
@@ -831,7 +831,6 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Mean.cpp
              src/armnnTfLiteParser/test/Minimum.cpp
              src/armnnTfLiteParser/test/Multiplication.cpp
-             src/armnnTfLiteParser/test/Neg.cpp
              src/armnnTfLiteParser/test/Pack.cpp
              src/armnnTfLiteParser/test/Pad.cpp
              src/armnnTfLiteParser/test/Reduce.cpp

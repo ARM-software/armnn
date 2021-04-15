@@ -394,6 +394,9 @@ armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr,
         case tflite::TensorType_INT64:
             type = armnn::DataType::Signed64;
             break;
+        case tflite::TensorType_BOOL:
+            type = armnn::DataType::Boolean;
+            break;
         default:
         {
             CheckLocation location = CHECK_LOCATION();
@@ -603,6 +606,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
 , m_ParserFunctions(tflite::BuiltinOperator_MAX+1, &TfLiteParserImpl::ParseUnsupportedOperator)
 {
     // register supported operators
+    m_ParserFunctions[tflite::BuiltinOperator_ABS]                     = &TfLiteParserImpl::ParseAbs;
     m_ParserFunctions[tflite::BuiltinOperator_ADD]                     = &TfLiteParserImpl::ParseAdd;
     m_ParserFunctions[tflite::BuiltinOperator_ARG_MIN]                 = &TfLiteParserImpl::ParseArgMin;
     m_ParserFunctions[tflite::BuiltinOperator_ARG_MAX]                 = &TfLiteParserImpl::ParseArgMax;
@@ -622,6 +626,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_GATHER]                  = &TfLiteParserImpl::ParseGather;
     m_ParserFunctions[tflite::BuiltinOperator_HARD_SWISH]              = &TfLiteParserImpl::ParseHardSwish;
     m_ParserFunctions[tflite::BuiltinOperator_LEAKY_RELU]              = &TfLiteParserImpl::ParseLeakyRelu;
+    m_ParserFunctions[tflite::BuiltinOperator_LOGICAL_NOT]             = &TfLiteParserImpl::ParseLogicalNot;
     m_ParserFunctions[tflite::BuiltinOperator_LOGISTIC]                = &TfLiteParserImpl::ParseLogistic;
     m_ParserFunctions[tflite::BuiltinOperator_L2_NORMALIZATION]        = &TfLiteParserImpl::ParseL2Normalization;
     m_ParserFunctions[tflite::BuiltinOperator_MAX_POOL_2D]             = &TfLiteParserImpl::ParseMaxPool2D;
@@ -640,6 +645,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_RESHAPE]                 = &TfLiteParserImpl::ParseReshape;
     m_ParserFunctions[tflite::BuiltinOperator_RESIZE_BILINEAR]         = &TfLiteParserImpl::ParseResizeBilinear;
     m_ParserFunctions[tflite::BuiltinOperator_RESIZE_NEAREST_NEIGHBOR] = &TfLiteParserImpl::ParseResizeNearestNeighbor;
+    m_ParserFunctions[tflite::BuiltinOperator_RSQRT]                   = &TfLiteParserImpl::ParseRsqrt;
     m_ParserFunctions[tflite::BuiltinOperator_SLICE]                   = &TfLiteParserImpl::ParseSlice;
     m_ParserFunctions[tflite::BuiltinOperator_SOFTMAX]                 = &TfLiteParserImpl::ParseSoftmax;
     m_ParserFunctions[tflite::BuiltinOperator_SPACE_TO_BATCH_ND]       = &TfLiteParserImpl::ParseSpaceToBatchND;
@@ -1078,33 +1084,6 @@ void TfLiteParserImpl::ParseDequantize(size_t subgraphIndex, size_t operatorInde
     auto layerName = fmt::format("Dequantize:{}:{}", subgraphIndex, operatorIndex);
 
     IConnectableLayer* layer = m_Network->AddDequantizeLayer(layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
-
-    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
-    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
-
-    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, outputTensorIndexes);
-}
-
-void TfLiteParserImpl::ParseExp(size_t subgraphIndex, size_t operatorIndex)
-{
-    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
-
-    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
-    CHECK_VALID_SIZE(inputs.size(), 1);
-
-    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
-    CHECK_VALID_SIZE(outputs.size(), 1);
-
-    auto layerName = fmt::format("Exp:{}:{}", subgraphIndex, operatorIndex);
-
-    ElementwiseUnaryDescriptor desc;
-    desc.m_Operation = UnaryOperation::Exp;
-    IConnectableLayer* layer = m_Network->AddElementwiseUnaryLayer(desc, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
@@ -1915,31 +1894,6 @@ void TfLiteParserImpl::ParseMean(size_t subgraphIndex, size_t operatorIndex)
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
-}
-
-void TfLiteParserImpl::ParseNeg(size_t subgraphIndex, size_t operatorIndex)
-{
-  CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
-
-  auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
-  CHECK_VALID_SIZE(inputs.size(), 1);
-
-  auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
-  CHECK_VALID_SIZE(outputs.size(), 1);
-
-  auto layerName = fmt::format("Neg:{}:{}", subgraphIndex, operatorIndex);
-  armnn::ElementwiseUnaryDescriptor descriptor(armnn::UnaryOperation::Neg);
-  IConnectableLayer* layer = m_Network->AddElementwiseUnaryLayer(descriptor, layerName.c_str());
-  ARMNN_ASSERT(layer != nullptr);
-
-  TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
-  layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-  auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-  RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
-
-  auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
-  RegisterOutputSlots(subgraphIndex, operatorIndex, layer, outputTensorIndexes);
 }
 
 void TfLiteParserImpl::ParsePad(size_t subgraphIndex, size_t operatorIndex)
@@ -2758,15 +2712,35 @@ void TfLiteParserImpl::ParseSplit(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), numSplits);
 
-    armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[1]);
-    armnn::TensorInfo axisTensorInfo = ToTensorInfo(inputs[0]);
+    armnn::TensorInfo inputTensorInfo = ToTensorInfo(inputs[1]);
+    armnn::TensorInfo axisTensorInfo  = ToTensorInfo(inputs[0]);
+    ARMNN_ASSERT(axisTensorInfo.GetNumElements() == 1);
 
     BufferRawPtr axisBufferPtr = GetBuffer(m_Model, inputs[0]->buffer);
-    std::vector<unsigned int> axisData(axisTensorInfo.GetNumElements());
-    ::memcpy(axisData.data(), axisBufferPtr->data.data(), axisTensorInfo.GetNumBytes());
+    if (axisBufferPtr == nullptr)
+    {
+        throw ParseException(
+                fmt::format("Operation has invalid inputs. Failed to read axis. {}",
+                            CHECK_LOCATION().AsString()));
+    }
 
-    ARMNN_ASSERT(axisTensorInfo.GetNumElements() == 1);
-    const unsigned int splitDim = axisData[0];
+    std::vector<int32_t> axisData(axisTensorInfo.GetNumElements());
+    ::memcpy(axisData.data(), axisBufferPtr->data.data(), axisTensorInfo.GetNumBytes());
+    int32_t axis = axisData[0];
+
+    auto inputDimensions = static_cast<int32_t>(inputTensorInfo.GetNumDimensions());
+    if (((axis < -inputDimensions) && (axis < 0)) || ((axis >= inputDimensions) && (axis > 0)))
+    {
+        // Square bracket denotes inclusive n while parenthesis denotes exclusive n
+        // E.g. Rank 4 tensor can have axis in range [-4, 3)
+        // -1 == 3, -2 == 2, -3 == 1, -4 == 0
+        throw ParseException(
+                fmt::format("Operation has invalid axis: {}. Axis must be in range [-n, n) {}",
+                            axis,
+                            CHECK_LOCATION().AsString()));
+    }
+
+    const unsigned int splitDim = armnnUtils::GetUnsignedAxis(inputTensorInfo.GetNumDimensions(), axis);
 
     auto inputDimSize = inputTensorInfo.GetNumDimensions();
     if (inputDimSize > MaxNumOfTensorDimensions)
@@ -2863,9 +2837,29 @@ void TfLiteParserImpl::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
 
     // Get split axis
     BufferRawPtr axisBufferPtr = GetBuffer(m_Model, axisTensor->buffer);
+    if (axisBufferPtr == nullptr)
+    {
+        throw ParseException(
+                fmt::format("Operation has invalid inputs. Failed to read axis. {}",
+                            CHECK_LOCATION().AsString()));
+    }
+
     std::vector<int> axisData(axisTensorInfo.GetNumElements());
     ::memcpy(axisData.data(), axisBufferPtr->data.data(), axisTensorInfo.GetNumBytes());
-    const unsigned int splitDim = ComputeWrappedIndex(axisData[0], inputTensorInfo.GetNumDimensions());
+    int32_t axis = axisData[0];
+
+    auto inputDimensions = static_cast<int32_t>(inputTensorInfo.GetNumDimensions());
+    if (((axis < -inputDimensions) && (axis < 0)) || ((axis >= inputDimensions) && (axis > 0)))
+    {
+        // Square bracket denotes inclusive n while parenthesis denotes exclusive n
+        // E.g. Rank 4 tensor can have axis in range [-4, 3)
+        // -1 == 3, -2 == 2, -3 == 1, -4 == 0
+        throw ParseException(
+                fmt::format("Operation has invalid axis: {}. Axis must be in range [-n, n) {}",
+                            axis,
+                            CHECK_LOCATION().AsString()));
+    }
+    const unsigned int splitDim = ComputeWrappedIndex(axis, inputTensorInfo.GetNumDimensions());
 
     // Set split sizes
     CHECK_VALID_SIZE(splitsInfo.GetNumDimensions(), 1);
@@ -2988,6 +2982,7 @@ void TfLiteParserImpl::ParseArgMinMax(size_t subgraphIndex, size_t operatorIndex
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     armnn::TensorInfo axisTensorInfo   = ToTensorInfo(inputs[1]);
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    ARMNN_ASSERT(axisTensorInfo.GetNumElements() == 1);
 
     // Check if output tensor type is Signed32 or Signed64
     if (outputTensorInfo.GetDataType() != armnn::DataType::Signed32 &&
@@ -3206,6 +3201,59 @@ void TfLiteParserImpl::ParseReduce(size_t subgraphIndex, size_t operatorIndex, R
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
 
     // Register output tensor to the layer.
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, outputTensorIndexes);
+}
+
+void TfLiteParserImpl::ParseAbs(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Abs);
+}
+
+void TfLiteParserImpl::ParseExp(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Exp);
+}
+
+void TfLiteParserImpl::ParseLogicalNot(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::LogicalNot);
+}
+
+void TfLiteParserImpl::ParseNeg(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Neg);
+}
+
+void TfLiteParserImpl::ParseRsqrt(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Rsqrt);
+}
+
+void TfLiteParserImpl::ParseElementwiseUnary(size_t subgraphIndex, size_t operatorIndex, UnaryOperation unaryOperation)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    std::string layerName = std::string(GetUnaryOperationAsCString(unaryOperation)) + ":{}:{}";
+    std::string layerNameFormatted = fmt::format(layerName, subgraphIndex, operatorIndex);
+
+    ElementwiseUnaryDescriptor desc;
+    desc.m_Operation = unaryOperation;
+    IConnectableLayer* layer = m_Network->AddElementwiseUnaryLayer(desc, layerNameFormatted.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, outputTensorIndexes);
 }

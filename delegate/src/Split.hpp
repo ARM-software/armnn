@@ -47,7 +47,20 @@ TfLiteStatus VisitSplitOperator(DelegateData& delegateData,
     ARMNN_ASSERT(GetTensorInfoForTfLiteTensor(tfLiteAxisTensor).GetNumElements() == 1);
     auto* axisTensorDataPtr = tflite::GetTensorData<int32_t>(&tfLiteAxisTensor);
     std::vector<int32_t> axisTensorData(axisTensorDataPtr, axisTensorDataPtr + 1);
-    const unsigned int splitDim = axisTensorData[0];
+    int32_t axis = axisTensorData[0];
+
+    auto inputDimensions = static_cast<int32_t>(inputTensorInfo.GetNumDimensions());
+    if (((axis < -inputDimensions) && (axis < 0)) || ((axis >= inputDimensions) && (axis > 0)))
+    {
+        // Square bracket denotes inclusive n while parenthesis denotes exclusive n
+        // E.g. Rank 4 tensor can have axis in range [-4, 3)
+        // -1 == 3, -2 == 2, -3 == 1, -4 == 0
+        TF_LITE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnDelegate: Operation has invalid axis: #%d. Axis must be in range [-n, n) in node #%d:",
+                axis, nodeIndex);
+    }
+    const unsigned int splitDim = ComputeWrappedIndex(axis, inputTensorInfo.GetNumDimensions());
 
     std::vector<armnn::TensorInfo> outputs;
     for (unsigned int i = 0; i < numSplits; ++i)
@@ -171,19 +184,17 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
 
     auto* axisTensorDataPtr = tflite::GetTensorData<int32_t>(&tfLiteAxisTensor);
     std::vector<int32_t> axisTensorData(axisTensorDataPtr, axisTensorDataPtr + 1);
+    int32_t axis = axisTensorData[0];
 
-    auto ComputeWrappedIndex = [](int index, unsigned int numDimensions)
+    auto inputDimensions = static_cast<int32_t>(inputTensorInfo.GetNumDimensions());
+    if (((axis < -inputDimensions) && (axis < 0)) || ((axis >= inputDimensions) && (axis > 0)))
     {
-        int numDims = armnn::numeric_cast<int>(numDimensions);
-        int wrappedIndex = index < 0 ? numDims + index : index;
-        ARMNN_ASSERT(wrappedIndex >= 0);
-        ARMNN_ASSERT(wrappedIndex < numDims);
-
-        return static_cast<unsigned int>(wrappedIndex);
-    };
-
-    const unsigned int splitDim = ComputeWrappedIndex(axisTensorData[0],
-                                                      inputTensorInfo.GetNumDimensions());
+        TF_LITE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnDelegate: Operation has invalid axis: #%d. Axis must be in range [-n, n) in node #%d:",
+                axis, nodeIndex);
+    }
+    const unsigned int splitDim = ComputeWrappedIndex(axisTensorData[0], inputTensorInfo.GetNumDimensions());
 
     auto* splitVParameters = reinterpret_cast<TfLiteSplitVParams*>(tfLiteNode->builtin_data);
     unsigned int numSplits = 0;

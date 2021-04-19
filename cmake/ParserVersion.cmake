@@ -33,19 +33,3 @@ set(TFLITE_PARSER_LIB_VERSION "${TFLITE_PARSER_MAJOR_VERSION}.${TFLITE_PARSER_MI
 
 # Define LIB soversion
 set(TFLITE_PARSER_LIB_SOVERSION "${TFLITE_PARSER_MAJOR_VERSION}")
-
-
-# Read the TfParser version components from file
-file(READ ${CMAKE_CURRENT_LIST_DIR}/../include/armnnTfParser/Version.hpp tfVersion)
-
-# Parse the TfParser version components
-string(REGEX MATCH "#define TF_PARSER_MAJOR_VERSION ([0-9]*)" _ ${tfVersion})
-set(TF_PARSER_MAJOR_VERSION ${CMAKE_MATCH_1})
-string(REGEX MATCH "#define TF_PARSER_MINOR_VERSION ([0-9]*)" _ ${tfVersion})
-set(TF_PARSER_MINOR_VERSION ${CMAKE_MATCH_1})
-
-# Define LIB version
-set(TF_PARSER_LIB_VERSION "${TF_PARSER_MAJOR_VERSION}.${TF_PARSER_MINOR_VERSION}")
-
-# Define LIB soversion
-set(TF_PARSER_LIB_SOVERSION "${TF_PARSER_MAJOR_VERSION}")

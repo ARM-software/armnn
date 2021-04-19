@@ -3,7 +3,6 @@
 # Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 #
-option(BUILD_TF_PARSER "Build Tensorflow parser" OFF)
 option(BUILD_ONNX_PARSER "Build Onnx parser" OFF)
 option(BUILD_UNIT_TESTS "Build unit tests" ON)
 option(BUILD_TESTS "Build test applications" OFF)
@@ -157,7 +156,7 @@ endif()
 find_dependency(Threads)
 
 # Favour the protobuf passed on command line
-if(BUILD_TF_PARSER OR BUILD_ONNX_PARSER)
+if(BUILD_ONNX_PARSER)
     find_library(PROTOBUF_LIBRARY_DEBUG NAMES "protobufd"
         PATHS ${PROTOBUF_ROOT}/lib
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
@@ -177,21 +176,7 @@ if(BUILD_TF_PARSER OR BUILD_ONNX_PARSER)
 
     include_directories(SYSTEM "${PROTOBUF_INCLUDE_DIRS}")
     add_definitions(-DPROTOBUF_USE_DLLS)
-endif()
 
-if(BUILD_TF_PARSER)
-    add_definitions(-DARMNN_TF_PARSER)
-
-    find_path(TF_GENERATED_SOURCES "tensorflow/core/protobuf/saved_model.pb.cc")
-
-    # C++ sources generated for tf protobufs
-    file(GLOB_RECURSE TF_PROTOBUFS "${TF_GENERATED_SOURCES}/*.pb.cc")
-
-    # C++ headers generated for tf protobufs
-    include_directories(SYSTEM "${TF_GENERATED_SOURCES}")
-endif()
-
-if(BUILD_ONNX_PARSER)
     add_definitions(-DARMNN_ONNX_PARSER)
 
     find_path(ONNX_GENERATED_SOURCES "onnx/onnx.pb.cc")
@@ -404,11 +389,6 @@ else()
     CHECK_INCLUDE_FILE(valgrind/memcheck.h VALGRIND_FOUND)
 endif()
 
-
-
-if(NOT BUILD_TF_PARSER)
-    message(STATUS "Tensorflow parser support is disabled")
-endif()
 
 if(NOT BUILD_TF_LITE_PARSER)
     message(STATUS "Tensorflow Lite parser support is disabled")

@@ -108,7 +108,6 @@ if __name__ == "__main__":
     wrap_names = ['armnn_version',
         'armnn',
         'armnn_onnxparser',
-        'armnn_tfparser',
         'armnn_tfliteparser',
         'armnn_deserializer']
 

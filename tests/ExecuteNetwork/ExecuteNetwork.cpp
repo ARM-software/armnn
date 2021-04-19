@@ -13,9 +13,6 @@
 #if defined(ARMNN_SERIALIZER)
 #include "armnnDeserializer/IDeserializer.hpp"
 #endif
-#if defined(ARMNN_TF_PARSER)
-#include "armnnTfParser/ITfParser.hpp"
-#endif
 #if defined(ARMNN_TF_LITE_PARSER)
 #include "armnnTfLiteParser/ITfLiteParser.hpp"
 #endif
@@ -478,15 +475,6 @@ int main(int argc, const char* argv[])
         return EXIT_FAILURE;
     #endif
     }
-    else if (modelFormat.find("tensorflow") != std::string::npos)
-    {
-    #if defined(ARMNN_TF_PARSER)
-        return MainImpl<armnnTfParser::ITfParser, float>(ProgramOptions.m_ExNetParams, runtime);
-    #else
-        ARMNN_LOG(fatal) << "Not built with Tensorflow parser support.";
-        return EXIT_FAILURE;
-    #endif
-    }
     else if(modelFormat.find("tflite") != std::string::npos)
     {
         if (ProgramOptions.m_ExNetParams.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteParser)
@@ -514,7 +502,7 @@ int main(int argc, const char* argv[])
     else
     {
         ARMNN_LOG(fatal) << "Unknown model format: '" << modelFormat
-                         << "'. Please include 'tensorflow', 'tflite' or 'onnx'";
+                         << "'. Please include 'tflite' or 'onnx'";
         return EXIT_FAILURE;
     }
 }

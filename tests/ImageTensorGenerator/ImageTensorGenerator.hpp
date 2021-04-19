@@ -24,8 +24,7 @@ struct NormalizationParameters
 
 enum class SupportedFrontend
 {
-    TensorFlow = 0,
-    TFLite     = 1,
+    TFLite     = 0,
 };
 
 /** Get normalization parameters.
@@ -45,7 +44,6 @@ NormalizationParameters GetNormalizationParameters(const SupportedFrontend& mode
     normParams.stddev = { 1.0, 1.0, 1.0 };
     switch (modelFormat)
     {
-        case SupportedFrontend::TensorFlow:
         case SupportedFrontend::TFLite:
         default:
             switch (outputType)

@@ -16,50 +16,6 @@ target_include_directories(inferenceTest PRIVATE ../src/armnnUtils)
 target_include_directories(inferenceTest PRIVATE ../src/backends)
 target_include_directories(inferenceTest PRIVATE ../third-party/stb)
 
-if(BUILD_TF_PARSER)
-    macro(TfParserTest testName sources)
-        add_executable_ex(${testName} ${sources})
-        target_include_directories(${testName} PRIVATE ../src/armnnUtils)
-        target_include_directories(${testName} PRIVATE ../src/backends)
-
-        target_link_libraries(${testName} inferenceTest)
-        target_link_libraries(${testName} armnnTfParser)
-        target_link_libraries(${testName} armnn)
-        target_link_libraries(${testName} ${CMAKE_THREAD_LIBS_INIT})
-        addDllCopyCommands(${testName})
-    endmacro()
-
-    set(TfMnist-Armnn_sources
-        TfMnist-Armnn/TfMnist-Armnn.cpp
-        MnistDatabase.hpp
-        MnistDatabase.cpp)
-    TfParserTest(TfMnist-Armnn "${TfMnist-Armnn_sources}")
-
-    set(TfCifar10-Armnn_sources
-        TfCifar10-Armnn/TfCifar10-Armnn.cpp
-        Cifar10Database.hpp
-        Cifar10Database.cpp)
-    TfParserTest(TfCifar10-Armnn "${TfCifar10-Armnn_sources}")
-
-    set(TfMobileNet-Armnn_sources
-        TfMobileNet-Armnn/TfMobileNet-Armnn.cpp
-        ImagePreprocessor.hpp
-        ImagePreprocessor.cpp)
-    TfParserTest(TfMobileNet-Armnn "${TfMobileNet-Armnn_sources}")
-
-    set(TfInceptionV3-Armnn_sources
-        TfInceptionV3-Armnn/TfInceptionV3-Armnn.cpp
-        ImagePreprocessor.hpp
-        ImagePreprocessor.cpp)
-    TfParserTest(TfInceptionV3-Armnn "${TfInceptionV3-Armnn_sources}")
-
-    set(TfResNext-Armnn_sources
-        TfResNext_Quantized-Armnn/TfResNext_Quantized-Armnn.cpp
-        ImagePreprocessor.hpp
-        ImagePreprocessor.cpp)
-    TfParserTest(TfResNext-Armnn "${TfResNext-Armnn_sources}")
-endif()
-
 if (BUILD_TF_LITE_PARSER)
     macro(TfLiteParserTest testName sources)
         add_executable_ex(${testName} ${sources})
@@ -146,6 +102,9 @@ if (BUILD_TF_LITE_PARSER)
         ImagePreprocessor.hpp
         ImagePreprocessor.cpp)
     TfLiteParserTest(TfLiteYoloV3Big-Armnn "${TfLiteYoloV3Big-Armnn_sources}")
+
+
+
 endif()
 
 if (BUILD_ONNX_PARSER)
@@ -193,9 +152,6 @@ if (BUILD_ARMNN_SERIALIZER OR BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_O
     if (BUILD_ARMNN_SERIALIZER)
         target_link_libraries(ExecuteNetwork armnnSerializer)
     endif()
-    if (BUILD_TF_PARSER)
-        target_link_libraries(ExecuteNetwork armnnTfParser)
-    endif()
 
     if (BUILD_TF_LITE_PARSER)
         target_link_libraries(ExecuteNetwork armnnTfLiteParser)
@@ -217,9 +173,6 @@ if(BUILD_ACCURACY_TOOL)
         target_link_libraries(${executorName} ${CMAKE_THREAD_LIBS_INIT})
         if (BUILD_ARMNN_SERIALIZER)
             target_link_libraries(${executorName} armnnSerializer)
-        endif()
-        if (BUILD_TF_PARSER)
-            target_link_libraries(${executorName} armnnTfParser)
         endif()
         if (BUILD_TF_LITE_PARSER)
             target_link_libraries(${executorName} armnnTfLiteParser)

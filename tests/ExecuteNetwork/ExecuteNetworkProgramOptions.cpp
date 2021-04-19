@@ -173,8 +173,7 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  cxxopts::value<std::vector<std::string>>())
 
                 ("f,model-format",
-                 "armnn-binary, onnx-binary, onnx-text, tflite-binary, tensorflow-binary or "
-                 "tensorflow-text.",
+                 "armnn-binary, onnx-binary, onnx-text, tflite-binary",
                  cxxopts::value<std::string>())
 
                 ("m,model-path",

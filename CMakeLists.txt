@@ -124,31 +124,6 @@ if(BUILD_ONNX_PARSER)
     set_target_properties(armnnOnnxParser PROPERTIES VERSION ${ONNX_PARSER_LIB_VERSION} SOVERSION ${ONNX_PARSER_LIB_SOVERSION})
 endif()
 
-if(BUILD_TF_PARSER)
-    set(armnn_tf_parser_sources)
-    list(APPEND armnn_tf_parser_sources
-        include/armnnTfParser/ITfParser.hpp
-        include/armnnTfParser/Version.hpp
-        src/armnnTfParser/TfParser.hpp
-        src/armnnTfParser/TfParser.cpp
-        ${TF_PROTOBUFS}
-        )
-    # The generated tensorflow protobuf .cc files are not warning clean and we can't fix them.
-    if(COMPILER_IS_GNU_LIKE)
-        set_source_files_properties(${TF_PROTOBUFS} PROPERTIES COMPILE_FLAGS "-Wno-unused-variable -Wno-unused-parameter -Wno-conversion -Wno-sign-conversion  -Wno-error=deprecated-declarations")
-    endif()
-
-    add_library_ex(armnnTfParser SHARED ${armnn_tf_parser_sources})
-
-    target_include_directories(armnnTfParser PRIVATE src/armnnUtils)
-
-    target_link_libraries(armnnTfParser armnn)
-
-    # Protobuf (use the specific version tensorflow wants)
-    target_link_libraries(armnnTfParser ${PROTOBUF_LIBRARIES})
-    set_target_properties(armnnTfParser PROPERTIES VERSION ${TF_PARSER_LIB_VERSION} SOVERSION ${TF_PARSER_LIB_SOVERSION})
-endif()
-
 list(APPEND armnn_sources
     include/armnn/ArmNN.hpp
     include/armnn/BackendHelper.hpp
@@ -539,11 +514,6 @@ if(BUILD_ONNX_PARSER)
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
-if(BUILD_TF_PARSER)
-    install(TARGETS armnnTfParser
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-endif()
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
@@ -653,54 +623,6 @@ if(BUILD_UNIT_TESTS)
             src/armnn/test/RuntimeTests.cpp
             src/armnn/test/RuntimeTests.hpp
             )
-    endif()
-
-    if(BUILD_TF_PARSER AND ARMNNREF)
-        list(APPEND unittest_sources
-            src/armnnTfParser/test/Activations.cpp
-            src/armnnTfParser/test/Addition.cpp
-            src/armnnTfParser/test/AddN.cpp
-            src/armnnTfParser/test/Assert.cpp
-            src/armnnTfParser/test/BiasAdd.cpp
-            src/armnnTfParser/test/BroadcastForAdd.cpp
-            src/armnnTfParser/test/Convolution2d.cpp
-            src/armnnTfParser/test/Concat.cpp
-            src/armnnTfParser/test/ConcatOfConcats.cpp
-            src/armnnTfParser/test/DepthwiseConvolution2d.cpp
-            src/armnnTfParser/test/Equal.cpp
-            src/armnnTfParser/test/ExpandDims.cpp
-            src/armnnTfParser/test/FusedBatchNorm.cpp
-            src/armnnTfParser/test/Gather.cpp
-            src/armnnTfParser/test/Greater.cpp
-            src/armnnTfParser/test/Identity.cpp
-            src/armnnTfParser/test/LocalResponseNormalization.cpp
-            src/armnnTfParser/test/Maximum.cpp
-            src/armnnTfParser/test/MaximumForLeakyRelu.cpp
-            src/armnnTfParser/test/Mean.cpp
-            src/armnnTfParser/test/Minimum.cpp
-            src/armnnTfParser/test/Multiplication.cpp
-            src/armnnTfParser/test/Pad.cpp
-            src/armnnTfParser/test/MultiOutput.cpp
-            src/armnnTfParser/test/PassThru.cpp
-            src/armnnTfParser/test/Pooling.cpp
-            src/armnnTfParser/test/RealDiv.cpp
-            src/armnnTfParser/test/Reshape.cpp
-            src/armnnTfParser/test/ResizeBilinear.cpp
-            src/armnnTfParser/test/Rsqrt.cpp
-            src/armnnTfParser/test/Shape.cpp
-            src/armnnTfParser/test/Softmax.cpp
-            src/armnnTfParser/test/TestDependencies.cpp
-            src/armnnTfParser/test/FullyConnected.cpp
-            src/armnnTfParser/test/Constant.cpp
-            src/armnnTfParser/test/TestMultiInputsOutputs.cpp
-            src/armnnTfParser/test/Split.cpp
-            src/armnnTfParser/test/Squeeze.cpp
-            src/armnnTfParser/test/Stack.cpp
-            src/armnnTfParser/test/Sub.cpp
-            src/armnnTfParser/test/StridedSlice.cpp
-            src/armnnTfParser/test/Transpose.cpp
-            )
-
     endif()
 
     if(BUILD_TF_LITE_PARSER AND ARMNNREF)
@@ -885,10 +807,6 @@ if(BUILD_UNIT_TESTS)
     target_link_libraries(UnitTests armnn)
     target_link_libraries(UnitTests armnnUtils)
 
-    if(BUILD_TF_PARSER)
-        target_link_libraries(UnitTests armnnTfParser)
-    endif()
-
     if(BUILD_GATORD_MOCK)
         target_link_libraries(UnitTests gatordMockService)
     endif()
@@ -921,7 +839,7 @@ if(BUILD_UNIT_TESTS)
     addDllCopyCommands(UnitTests)
 endif()
 
-if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER) AND ARMNNREF)
+if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER) AND ARMNNREF)
     set(ArmnnConverter_sources
         src/armnnConverter/ArmnnConverter.cpp)
 
@@ -931,10 +849,6 @@ if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD
 
     if(BUILD_ONNX_PARSER)
         target_link_libraries(ArmnnConverter armnnOnnxParser)
-    endif()
-
-    if(BUILD_TF_PARSER)
-        target_link_libraries(ArmnnConverter armnnTfParser)
     endif()
 
     if(BUILD_TF_LITE_PARSER)

@@ -22,19 +22,6 @@ except ImportError as err:
         raise RuntimeError(message)
 
 try:
-    from ._generated.pyarmnn_tfparser import ITfParser
-except ImportError as err:
-    logger = logging.getLogger(__name__)
-    message = "Your ArmNN library instance does not support TF models parser functionality. "
-    logger.warning("%s Skipped ITfParser import.", message)
-    logger.debug(str(err))
-
-
-    def ITfParser():
-        """In case people try importing without having Arm NN built with this parser."""
-        raise RuntimeError(message)
-
-try:
     from ._generated.pyarmnn_tfliteparser import ITfLiteParser, TfLiteParserOptions
 except ImportError as err:
     logger = logging.getLogger(__name__)

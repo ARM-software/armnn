@@ -10,9 +10,6 @@
 #if defined(ARMNN_SERIALIZER)
 #include <armnnSerializer/ISerializer.hpp>
 #endif
-#if defined(ARMNN_TF_PARSER)
-#include <armnnTfParser/ITfParser.hpp>
-#endif
 #if defined(ARMNN_TF_LITE_PARSER)
 #include <armnnTfLiteParser/ITfLiteParser.hpp>
 #endif
@@ -402,19 +399,6 @@ int main(int argc, char* argv[])
             }
 #else
             ARMNN_LOG(fatal) << "Not built with Onnx parser support.";
-            return EXIT_FAILURE;
-#endif
-        }
-        else if (modelFormat.find("tensorflow") != std::string::npos)
-        {
-#if defined(ARMNN_TF_PARSER)
-            if (!converter.CreateNetwork<armnnTfParser::ITfParser>())
-            {
-                ARMNN_LOG(fatal) << "Failed to load model from file";
-                return EXIT_FAILURE;
-            }
-#else
-            ARMNN_LOG(fatal) << "Not built with Tensorflow parser support.";
             return EXIT_FAILURE;
 #endif
         }

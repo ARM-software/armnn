@@ -6,7 +6,7 @@
 #include "armnn/ArmNN.hpp"
 #include "armnn/Utils.hpp"
 #include "armnn/INetwork.hpp"
-#include "armnnTfParser/TfParser.hpp"
+#include "armnnTfLiteParser/TfLiteParser.hpp"
 #include "../Cifar10Database.hpp"
 #include "../InferenceTest.hpp"
 #include "../InferenceModel.hpp"
@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
         };
         std::vector<Net> networks;
 
-        armnnTfParser::ITfParserPtr parser(armnnTfParser::ITfParser::Create());
+        armnnTfLiteParser::ITfLiteParserPtr parser(armnnTfLiteParser::ITfLiteParserPtr::Create());
 
         const int networksCount = 4;
         for (int i = 0; i < networksCount; ++i)

@@ -12,9 +12,6 @@
 #if defined(ARMNN_SERIALIZER)
 #include "armnnDeserializer/IDeserializer.hpp"
 #endif
-#if defined(ARMNN_TF_PARSER)
-#include "armnnTfParser/ITfParser.hpp"
-#endif
 #if defined(ARMNN_TF_LITE_PARSER)
 #include "armnnTfLiteParser/ITfLiteParser.hpp"
 #endif

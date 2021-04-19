@@ -39,14 +39,6 @@ macro(addDllCopyCommands target)
             addDllCopyCommand(${target} "$<TARGET_FILE_DIR:armnn>/armnn.dll" "$<TARGET_FILE_DIR:armnn>/armnn.dll")
         endif()
 
-        # armnnTfParser.dll
-        if ("armnnTfParser" IN_LIST target_deps)
-            addDllCopyCommand(${target} "$<TARGET_FILE_DIR:armnnTfParser>/armnnTfParser.dll"
-                                        "$<TARGET_FILE_DIR:armnnTfParser>/armnnTfParser.dll")
-            addDllCopyCommand(${target} "${PROTOBUF_ROOT}/bin/libprotobufd.dll"
-                                        "${PROTOBUF_ROOT}/bin/libprotobuf.dll")
-        endif()
-
         # armnnTfLiteParser.dll
         if ("armnnTfLiteParser" IN_LIST target_deps)
             addDllCopyCommand(${target} "$<TARGET_FILE_DIR:armnnTfLiteParser>/armnnTfLiteParser.dll"

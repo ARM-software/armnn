@@ -72,7 +72,7 @@ def parse_command_line(desc: str = ""):
     parser.add_argument("-d", "--data-dir", help="Data directory which contains all the images.",
                         action="store", default="")
     parser.add_argument("-m", "--model-dir",
-                        help="Model directory which contains the model file (TF, TFLite, ONNX).", action="store",
+                        help="Model directory which contains the model file (TFLite, ONNX).", action="store",
                         default="")
     return parser.parse_args()
 

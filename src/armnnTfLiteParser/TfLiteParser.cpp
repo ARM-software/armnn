@@ -2374,15 +2374,6 @@ void TfLiteParserImpl::ParseFullyConnected(size_t subgraphIndex, size_t operator
 
     desc.m_ConstantWeights = IsConstTensor(inputs[1]);
 
-    // Either both weights and biases need to be inputs or both weights and biases need to be constant
-    if (inputs.size() == 3 && desc.m_ConstantWeights != IsConstTensor(inputs[2]))
-    {
-        throw ParseException(
-                fmt::format("Weights and bias are not compatible."
-                            "Node {}",
-                            CHECK_LOCATION().AsString()));
-    }
-
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     std::vector<unsigned int> tensorIndexesToRegister = {inputTensorIndexes[0]};
     if (desc.m_ConstantWeights)
@@ -3600,7 +3591,15 @@ TfLiteParserImpl::CreateConstTensorAndStoreData(TfLiteParserImpl::BufferRawPtr b
 bool TfLiteParserImpl::IsConstTensor(TensorRawPtr tensorPtr)
 {
     CHECK_TENSOR_PTR(tensorPtr);
-    return !tensorPtr->is_variable;
+    bool isConst = true;
+
+    auto buffer = GetBuffer(m_Model, tensorPtr->buffer);
+    if (buffer->data.size() == 0)
+    {
+        isConst = false;
+    }
+
+    return isConst;
 }
 
 

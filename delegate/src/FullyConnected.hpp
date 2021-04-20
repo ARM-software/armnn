@@ -77,15 +77,6 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
         {
             return kTfLiteError;
         }
-        if ((isConstantWeights && !tflite::IsConstantTensor(&tfLiteBiasTensor))
-            || (!isConstantWeights && tflite::IsConstantTensor(&tfLiteBiasTensor)))
-        {
-            TF_LITE_MAYBE_KERNEL_LOG(
-                tfLiteContext,
-                "TfLiteArmnnDelegate: Weights and bias are not compatible"
-                " in operator #%d node #%d: ", operatorCode, nodeIndex);
-            return kTfLiteError;
-        }
         biasTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteBiasTensor);
     }
     else

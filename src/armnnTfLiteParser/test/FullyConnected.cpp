@@ -224,7 +224,7 @@ struct FullyConnectedNonConstWeightsFixture : public ParserFlatbuffersFixture
                       "is_variable": true
                     }, )";
 
-            biasBuffer = R"(,{ "data": [ 10, 0, 0, 0 ] } )";
+            biasBuffer = R"(,{ "data": [] } )";
             outputs = "3";
         }
         m_JsonString = R"(
@@ -250,7 +250,6 @@ struct FullyConnectedNonConstWeightsFixture : public ParserFlatbuffersFixture
                         "details_type": 0,
                         "quantized_dimension": 0
                       },
-                      "is_variable": false
                     },
                     {
                       "shape": )" + filterShape + R"(,
@@ -263,7 +262,6 @@ struct FullyConnectedNonConstWeightsFixture : public ParserFlatbuffersFixture
                         "details_type": 0,
                         "quantized_dimension": 0
                       },
-                      "is_variable": true
                     },
                     )" + biasTensor + R"(
                     {
@@ -281,7 +279,6 @@ struct FullyConnectedNonConstWeightsFixture : public ParserFlatbuffersFixture
                         "details_type": 0,
                         "quantized_dimension": 0
                       },
-                      "is_variable": false
                     }
                   ],
                   "inputs": )" + inputTensors + R"(,
@@ -309,7 +306,7 @@ struct FullyConnectedNonConstWeightsFixture : public ParserFlatbuffersFixture
                   "data": []
                 },
                 {
-                  "data": [ 2, 3, 4, 5 ]
+                  "data": []
                 }
                 )" + biasBuffer + R"(
               ]

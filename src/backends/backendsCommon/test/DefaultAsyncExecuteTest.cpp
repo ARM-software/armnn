@@ -243,7 +243,6 @@ BOOST_AUTO_TEST_CASE(TestDefaultAsyncExeuteWithThreads)
     ValidateTensor(workingMemDescriptor2.m_Inputs[0], expectedExecuteval2);
 }
 
-
 BOOST_AUTO_TEST_SUITE_END()
 
 }

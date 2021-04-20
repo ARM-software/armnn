@@ -64,14 +64,16 @@ void ConstantLayer::ValidateTensorShapesFromInputs()
 
 void ConstantLayer::Accept(ILayerVisitor& visitor) const
 {
-    ConstTensor layerOutputTensor(m_LayerOutput->GetTensorInfo(), m_LayerOutput->Map(true)) ;
+    ManagedConstTensorHandle managedLayerOutput(m_LayerOutput);
+    ConstTensor layerOutputTensor(managedLayerOutput.GetTensorInfo(), managedLayerOutput.Map());
     visitor.VisitConstantLayer(this, layerOutputTensor, GetName());
 }
 
 void ConstantLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    std::vector<armnn::ConstTensor> constTensors { {m_LayerOutput->GetTensorInfo(), m_LayerOutput->Map(true)} };
-    strategy.ExecuteStrategy(this, BaseDescriptor(), constTensors, GetName());
+    ManagedConstTensorHandle managedLayerOutput(m_LayerOutput);
+    ConstTensor layerOutputTensor(managedLayerOutput.GetTensorInfo(), managedLayerOutput.Map());
+    strategy.ExecuteStrategy(this, BaseDescriptor(), { layerOutputTensor }, GetName());
 }
 
 } // namespace armnn

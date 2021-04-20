@@ -123,12 +123,14 @@ Layer::ConstantTensors TransposeConvolution2dLayer::GetConstantTensorsByRef()
 
 void TransposeConvolution2dLayer::Accept(ILayerVisitor& visitor) const
 {
-    ConstTensor weightsTensor(m_Weight->GetTensorInfo(), m_Weight->Map(true)) ;
-    Optional<ConstTensor> optionalBiasTensor = EmptyOptional();
+    ManagedConstTensorHandle managedWeight(m_Weight);
+    ConstTensor weightsTensor(managedWeight.GetTensorInfo(), managedWeight.Map());
 
+    Optional<ConstTensor> optionalBiasTensor = EmptyOptional();
+    ManagedConstTensorHandle managedBias(m_Bias);
     if (GetParameters().m_BiasEnabled)
     {
-        ConstTensor biasTensor(m_Bias->GetTensorInfo(), m_Bias->Map(true));
+        ConstTensor biasTensor(managedBias.GetTensorInfo(), managedBias.Map());
         optionalBiasTensor = Optional<ConstTensor>(biasTensor);
     }
 
@@ -137,11 +139,13 @@ void TransposeConvolution2dLayer::Accept(ILayerVisitor& visitor) const
 
 void TransposeConvolution2dLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    std::vector<armnn::ConstTensor> constTensors { {m_Weight->GetTensorInfo(), m_Weight->Map(true)} };
+    ManagedConstTensorHandle managedWeight(m_Weight);
+    std::vector<armnn::ConstTensor> constTensors { { managedWeight.GetTensorInfo(), managedWeight.Map() } };
 
+    ManagedConstTensorHandle managedBias(m_Bias);
     if (GetParameters().m_BiasEnabled)
     {
-        constTensors.emplace_back(ConstTensor(m_Bias->GetTensorInfo(), m_Bias->Map(true)));
+        constTensors.emplace_back(ConstTensor(managedBias.GetTensorInfo(), managedBias.Map()));
     }
 
     strategy.ExecuteStrategy(this, GetParameters(), constTensors, GetName());

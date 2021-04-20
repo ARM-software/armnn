@@ -175,4 +175,71 @@ const void* ConstCpuTensorHandle::GetConstTensor() const;
 template <>
 void* CpuTensorHandle::GetTensor() const;
 
+class ManagedConstTensorHandle
+{
+
+public:
+    explicit ManagedConstTensorHandle(std::shared_ptr<ConstCpuTensorHandle> ptr)
+        : m_Mapped(false)
+        , m_TensorHandle(std::move(ptr)) {};
+
+    /// RAII Managed resource Unmaps MemoryArea once out of scope
+    const void* Map(bool blocking = true)
+    {
+        if (m_TensorHandle)
+        {
+            auto pRet = m_TensorHandle->Map(blocking);
+            m_Mapped = true;
+            return pRet;
+        }
+        else
+        {
+            throw armnn::Exception("Attempting to Map null TensorHandle");
+        }
+
+    }
+
+    // Delete copy constructor as it's unnecessary
+    ManagedConstTensorHandle(const ConstCpuTensorHandle& other) = delete;
+
+    // Delete copy assignment as it's unnecessary
+    ManagedConstTensorHandle& operator=(const ManagedConstTensorHandle& other) = delete;
+
+    // Delete move assignment as it's unnecessary
+    ManagedConstTensorHandle& operator=(ManagedConstTensorHandle&& other) noexcept = delete;
+
+    ~ManagedConstTensorHandle()
+    {
+        // Bias tensor handles need to be initialized empty before entering scope of if statement checking if enabled
+        if (m_TensorHandle)
+        {
+            Unmap();
+        }
+    }
+
+    void Unmap()
+    {
+        // Only unmap if mapped and TensorHandle exists.
+        if (m_Mapped && m_TensorHandle)
+        {
+            m_TensorHandle->Unmap();
+            m_Mapped = false;
+        }
+    }
+
+    const TensorInfo& GetTensorInfo() const
+    {
+        return m_TensorHandle->GetTensorInfo();
+    }
+
+    bool IsMapped() const
+    {
+        return m_Mapped;
+    }
+
+private:
+    bool m_Mapped;
+    std::shared_ptr<ConstCpuTensorHandle> m_TensorHandle;
+};
+
 } // namespace armnn

@@ -72,20 +72,31 @@ Layer::ConstantTensors BatchNormalizationLayer::GetConstantTensorsByRef()
 
 void BatchNormalizationLayer::Accept(ILayerVisitor& visitor) const
 {
-    ConstTensor meanTensor(m_Mean->GetTensorInfo(), m_Mean->Map(true));
-    ConstTensor varianceTensor(m_Variance->GetTensorInfo(), m_Variance->Map(true));
-    ConstTensor betaTensor(m_Beta->GetTensorInfo(), m_Beta->Map(true));
-    ConstTensor gammaTensor(m_Gamma->GetTensorInfo(), m_Gamma->Map(true));
+    ManagedConstTensorHandle managedMean(m_Mean);
+    ManagedConstTensorHandle managedVariance(m_Variance);
+    ManagedConstTensorHandle managedBeta(m_Beta);
+    ManagedConstTensorHandle managedGamma(m_Gamma);
+
+    ConstTensor meanTensor(managedMean.GetTensorInfo(), managedMean.Map());
+    ConstTensor varianceTensor(managedVariance.GetTensorInfo(), managedVariance.Map());
+    ConstTensor betaTensor(managedBeta.GetTensorInfo(), managedBeta.Map());
+    ConstTensor gammaTensor(managedGamma.GetTensorInfo(), managedGamma.Map());
+
     visitor.VisitBatchNormalizationLayer(
             this, GetParameters(), meanTensor, varianceTensor, betaTensor, gammaTensor, GetName());
 }
 
 void BatchNormalizationLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    std::vector<armnn::ConstTensor> constTensors { {m_Mean->GetTensorInfo(), m_Mean->Map(true)},
-                                                   {m_Variance->GetTensorInfo(), m_Variance->Map(true)},
-                                                   {m_Beta->GetTensorInfo(), m_Beta->Map(true)},
-                                                   {m_Gamma->GetTensorInfo(), m_Gamma->Map(true)} };
+    ManagedConstTensorHandle managedMean(m_Mean);
+    ManagedConstTensorHandle managedVariance(m_Variance);
+    ManagedConstTensorHandle managedBeta(m_Beta);
+    ManagedConstTensorHandle managedGamma(m_Gamma);
+
+    std::vector<armnn::ConstTensor> constTensors { { managedMean.GetTensorInfo(), managedMean.Map() },
+                                                   { managedVariance.GetTensorInfo(), managedVariance.Map() },
+                                                   { managedBeta.GetTensorInfo(), managedBeta.Map() },
+                                                   { managedGamma.GetTensorInfo(), managedGamma.Map() } };
 
     strategy.ExecuteStrategy(this, GetParameters(), constTensors, GetName());
 }

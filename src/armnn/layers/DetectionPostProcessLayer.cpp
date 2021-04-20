@@ -80,14 +80,16 @@ Layer::ConstantTensors DetectionPostProcessLayer::GetConstantTensorsByRef()
 
 void DetectionPostProcessLayer::Accept(ILayerVisitor& visitor) const
 {
-    ConstTensor anchorTensor(m_Anchors->GetTensorInfo(), m_Anchors->GetConstTensor<void>());
+    ManagedConstTensorHandle managedAnchors(m_Anchors);
+    ConstTensor anchorTensor(managedAnchors.GetTensorInfo(), managedAnchors.Map());
     visitor.VisitDetectionPostProcessLayer(this, GetParameters(), anchorTensor, GetName());
+    m_Anchors->Unmap();
 }
 
 void DetectionPostProcessLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    std::vector<armnn::ConstTensor> constTensors { {m_Anchors->GetTensorInfo(), m_Anchors->GetConstTensor<void>()} };
-
+    ManagedConstTensorHandle managedAnchors(m_Anchors);
+    std::vector<armnn::ConstTensor> constTensors { {managedAnchors.GetTensorInfo(), managedAnchors.Map()} };
     strategy.ExecuteStrategy(this, GetParameters(), constTensors, GetName());
 }
 

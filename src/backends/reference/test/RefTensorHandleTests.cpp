@@ -167,6 +167,39 @@ BOOST_AUTO_TEST_CASE(RefTensorHandleSupportsInPlaceComputation)
     ARMNN_ASSERT(!(handleFactory.SupportsInPlaceComputation()));
 }
 
+BOOST_AUTO_TEST_CASE(TestManagedConstTensorHandle)
+{
+    // Initialize arguments
+    void* mem = nullptr;
+    TensorInfo info;
+
+    // Use PassthroughCpuTensor as others are abstract
+    auto passThroughHandle = std::make_shared<PassthroughCpuTensorHandle>(info, mem);
+
+    // Test managed handle is initialized with m_Mapped unset and once Map() called its set
+    ManagedConstTensorHandle managedHandle(passThroughHandle);
+    BOOST_CHECK(!managedHandle.IsMapped());
+    managedHandle.Map();
+    BOOST_CHECK(managedHandle.IsMapped());
+
+    // Test it can then be unmapped
+    managedHandle.Unmap();
+    BOOST_CHECK(!managedHandle.IsMapped());
+
+    // Test member function
+    BOOST_CHECK(managedHandle.GetTensorInfo() == info);
+
+    // Test that nullptr tensor handle doesn't get mapped
+    ManagedConstTensorHandle managedHandleNull(nullptr);
+    BOOST_CHECK(!managedHandleNull.IsMapped());
+    BOOST_CHECK_THROW(managedHandleNull.Map(), armnn::Exception);
+    BOOST_CHECK(!managedHandleNull.IsMapped());
+
+    // Check Unmap() when m_Mapped already false
+    managedHandleNull.Unmap();
+    BOOST_CHECK(!managedHandleNull.IsMapped());
+}
+
 #if !defined(__ANDROID__)
 // Only run these tests on non Android platforms
 BOOST_AUTO_TEST_CASE(CheckSourceType)

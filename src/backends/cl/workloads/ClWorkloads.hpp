@@ -16,7 +16,7 @@
 #include "ClDepthToSpaceWorkload.hpp"
 #include "ClDepthwiseConvolutionWorkload.hpp"
 #include "ClDequantizeWorkload.hpp"
-#include "ClDivisionFloatWorkload.hpp"
+#include "ClDivisionWorkload.hpp"
 #include "ClExpWorkload.hpp"
 #include "ClFillWorkload.hpp"
 #include "ClFloorFloatWorkload.hpp"

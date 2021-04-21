@@ -17,14 +17,14 @@ arm_compute::Status ClDivisionWorkloadValidate(const TensorInfo& input0,
                                                const TensorInfo& output,
                                                const ActivationDescriptor* activationDescriptor = nullptr);
 
-class ClDivisionFloatWorkload : public FloatWorkload<DivisionQueueDescriptor>
+class ClDivisionWorkload : public BaseWorkload<DivisionQueueDescriptor>
 {
 public:
-    ClDivisionFloatWorkload(const DivisionQueueDescriptor& descriptor,
-                            const WorkloadInfo& info,
-                            const arm_compute::CLCompileContext& clCompileContext);
+    ClDivisionWorkload(const DivisionQueueDescriptor& descriptor,
+                       const WorkloadInfo& info,
+                       const arm_compute::CLCompileContext& clCompileContext);
 
-    using FloatWorkload<DivisionQueueDescriptor>::FloatWorkload;
+    using BaseWorkload<DivisionQueueDescriptor>::BaseWorkload;
     void Execute() const override;
 
 private:

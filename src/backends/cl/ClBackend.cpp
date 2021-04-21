@@ -26,7 +26,7 @@
 #include "workloads/ClBatchNormalizationFloatWorkload.hpp"
 #include "workloads/ClConvolution2dWorkload.hpp"
 #include "workloads/ClDepthwiseConvolutionWorkload.hpp"
-#include "workloads/ClDivisionFloatWorkload.hpp"
+#include "workloads/ClDivisionWorkload.hpp"
 #include "workloads/ClFullyConnectedWorkload.hpp"
 #include "workloads/ClMultiplicationWorkload.hpp"
 #include "workloads/ClSubtractionWorkload.hpp"

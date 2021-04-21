@@ -40,7 +40,7 @@ BACKEND_SOURCES := \
         workloads/ClDepthToSpaceWorkload.cpp \
         workloads/ClDepthwiseConvolutionWorkload.cpp \
         workloads/ClDequantizeWorkload.cpp \
-        workloads/ClDivisionFloatWorkload.cpp \
+        workloads/ClDivisionWorkload.cpp \
         workloads/ClExpWorkload.cpp \
         workloads/ClFillWorkload.cpp \
         workloads/ClFloorFloatWorkload.cpp \

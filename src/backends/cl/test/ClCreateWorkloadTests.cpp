@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationUint8WorkloadTest)
 
 BOOST_AUTO_TEST_CASE(CreateDivisionFloatWorkloadTest)
 {
-    ClCreateElementwiseWorkloadTest<ClDivisionFloatWorkload,
+    ClCreateElementwiseWorkloadTest<ClDivisionWorkload,
                                     DivisionQueueDescriptor,
                                     DivisionLayer,
                                     armnn::DataType::Float32>();
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(CreateDivisionFloatWorkloadTest)
 
 BOOST_AUTO_TEST_CASE(CreateDivisionFloat16WorkloadTest)
 {
-    ClCreateElementwiseWorkloadTest<ClDivisionFloatWorkload,
+    ClCreateElementwiseWorkloadTest<ClDivisionWorkload,
                                     DivisionQueueDescriptor,
                                     DivisionLayer,
                                     armnn::DataType::Float16>();

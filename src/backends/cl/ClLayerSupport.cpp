@@ -33,7 +33,7 @@
 #include "workloads/ClDepthToSpaceWorkload.hpp"
 #include "workloads/ClDepthwiseConvolutionWorkload.hpp"
 #include "workloads/ClDequantizeWorkload.hpp"
-#include "workloads/ClDivisionFloatWorkload.hpp"
+#include "workloads/ClDivisionWorkload.hpp"
 #include "workloads/ClExpWorkload.hpp"
 #include "workloads/ClFillWorkload.hpp"
 #include "workloads/ClFloorFloatWorkload.hpp"

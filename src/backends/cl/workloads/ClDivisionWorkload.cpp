@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ClDivisionFloatWorkload.hpp"
+#include "ClDivisionWorkload.hpp"
 
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
@@ -31,12 +31,12 @@ arm_compute::Status ClDivisionWorkloadValidate(const TensorInfo& input0,
 }
 
 
-ClDivisionFloatWorkload::ClDivisionFloatWorkload(const DivisionQueueDescriptor& descriptor,
-                                                 const WorkloadInfo& info,
-                                                 const arm_compute::CLCompileContext& clCompileContext)
-    : FloatWorkload<DivisionQueueDescriptor>(descriptor, info)
+ClDivisionWorkload::ClDivisionWorkload(const DivisionQueueDescriptor& descriptor,
+                                       const WorkloadInfo& info,
+                                       const arm_compute::CLCompileContext& clCompileContext)
+    : BaseWorkload<DivisionQueueDescriptor>(descriptor, info)
 {
-    m_Data.ValidateInputsOutputs("ClDivisionFloatWorkload", 2, 1);
+    m_Data.ValidateInputsOutputs("ClDivisionWorkload", 2, 1);
 
     arm_compute::ICLTensor& input0 = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& input1 = static_cast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
@@ -47,9 +47,9 @@ ClDivisionFloatWorkload::ClDivisionFloatWorkload(const DivisionQueueDescriptor& 
     m_ArithmeticDivision.configure(clCompileContext, &input0, &input1, &output, activationInfo);
 }
 
-void ClDivisionFloatWorkload::Execute() const
+void ClDivisionWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClDivisionFloatWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClDivisionWorkload_Execute");
     RunClFunction(m_ArithmeticDivision, CHECK_LOCATION());
 }
 

@@ -325,7 +325,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDetectionPostProcess(
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDivision(const DivisionQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClDivisionFloatWorkload, NullWorkload>(descriptor, info, m_CLCompileContext);
+    return std::make_unique<ClDivisionWorkload>(descriptor, info, m_CLCompileContext);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor& descriptor,

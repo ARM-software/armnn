@@ -32,6 +32,3 @@ private:
 };
 
 } //namespace armnn
-
-
-

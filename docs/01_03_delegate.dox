@@ -45,6 +45,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - BATCH_TO_SPACE_ND
 
+- CAST
+
 - CONCATENATION, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 
 - CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE

@@ -486,6 +486,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                                tfLiteNode,
                                                nodeIndex,
                                                kTfLiteBuiltinBatchToSpaceNd);
+        case kTfLiteBuiltinCast:
+            return VisitCastOperator(delegateData,
+                                     tfLiteContext,
+                                     tfLiteNode,
+                                     nodeIndex,
+                                     kTfLiteBuiltinCast);
         case kTfLiteBuiltinConcatenation:
             return VisitControlOperator(delegateData,
                                         tfLiteContext,

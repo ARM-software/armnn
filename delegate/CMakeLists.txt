@@ -118,6 +118,8 @@ if(BUILD_UNIT_TESTS)
         src/test/ArmnnDelegateTest.cpp
         src/test/BatchSpaceTest.cpp
         src/test/BatchSpaceTestHelper.hpp
+        src/test/CastTest.cpp
+        src/test/CastTestHelper.hpp
         src/test/ComparisonTest.cpp
         src/test/ComparisonTestHelper.hpp
         src/test/ControlTest.cpp

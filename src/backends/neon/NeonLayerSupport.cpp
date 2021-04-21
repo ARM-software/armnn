@@ -27,6 +27,7 @@
 #include "workloads/NeonArgMinMaxWorkload.hpp"
 #include "workloads/NeonBatchNormalizationWorkload.hpp"
 #include "workloads/NeonBatchToSpaceNdWorkload.hpp"
+#include "workloads/NeonCastWorkload.hpp"
 #include "workloads/NeonExpWorkload.hpp"
 #include "workloads/NeonComparisonWorkload.hpp"
 #include "workloads/NeonConstantWorkload.hpp"
@@ -218,6 +219,16 @@ bool NeonLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
                                    input,
                                    output,
                                    descriptor);
+}
+
+bool NeonLayerSupport::IsCastSupported(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonCastValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output);
 }
 
 bool NeonLayerSupport::IsComparisonSupported(const TensorInfo& input0,

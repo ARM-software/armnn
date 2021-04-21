@@ -172,6 +172,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateBatchToSpaceNd(const Batch
     return std::make_unique<NeonBatchToSpaceNdWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateCast(const CastQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonCastWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateComparison(const ComparisonQueueDescriptor& descriptor,
                                                                  const WorkloadInfo& info) const
 {

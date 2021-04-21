@@ -186,6 +186,7 @@ private:
                 armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
                                                                  static_cast<uint8_t*>(memory));
                 break;
+            case arm_compute::DataType::QSYMM8:
             case arm_compute::DataType::QASYMM8_SIGNED:
                 armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
                                                                  static_cast<int8_t*>(memory));
@@ -228,6 +229,7 @@ private:
                 armcomputetensorutils::CopyArmComputeITensorData(static_cast<const uint8_t*>(memory),
                                                                  this->GetTensor());
                 break;
+            case arm_compute::DataType::QSYMM8:
             case arm_compute::DataType::QASYMM8_SIGNED:
                 armcomputetensorutils::CopyArmComputeITensorData(static_cast<const int8_t*>(memory),
                                                                  this->GetTensor());
@@ -320,6 +322,7 @@ private:
                 armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
                                                                  static_cast<uint8_t*>(memory));
                 break;
+            case arm_compute::DataType::QSYMM8:
             case arm_compute::DataType::QASYMM8_SIGNED:
                 armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
                                                                  static_cast<int8_t*>(memory));
@@ -354,6 +357,7 @@ private:
                 armcomputetensorutils::CopyArmComputeITensorData(static_cast<const uint8_t*>(memory),
                                                                  this->GetTensor());
                 break;
+            case arm_compute::DataType::QSYMM8:
             case arm_compute::DataType::QASYMM8_SIGNED:
                 armcomputetensorutils::CopyArmComputeITensorData(static_cast<const int8_t*>(memory),
                                                                  this->GetTensor());

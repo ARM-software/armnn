@@ -374,4 +374,294 @@ BOOST_FIXTURE_TEST_CASE( ParseConv2DAndRelu6WithBias, Relu6Conv2DWithBiasesFixtu
         });
 }
 
+
+struct PerChannelConv2DFixture : public ParserFlatbuffersFixture
+{
+    explicit PerChannelConv2DFixture()
+    {
+        m_JsonString = R"(
+        {
+            "version": 3,
+            "operator_codes": [
+                {
+                    "builtin_code": "CONV_2D",
+                    "version": 3
+                }
+            ],
+            "subgraphs": [
+                {
+                    "tensors": [
+                        {
+                            "shape": [
+                                1,
+                                4,
+                                4,
+                                2
+                            ],
+                            "type": "INT8",
+                            "buffer": 1,
+                            "name": "input",
+                            "quantization": {
+                                "min": [
+                                    -50.0
+                                ],
+                                "max": [
+                                    49.0
+                                ],
+                                "scale": [
+                                    0.388235
+                                ],
+                                "zero_point": [
+                                    1
+                                ],
+                                "details_type": "NONE",
+                                "quantized_dimension": 0
+                            },
+                            "is_variable": false
+                        },
+                        {
+                            "shape": [
+                                4
+                            ],
+                            "type": "INT32",
+                            "buffer": 2,
+                            "name": "model/conv2d/Conv2D",
+                            "quantization": {
+                                "scale": [
+                                    0.001523,
+                                    0.001197,
+                                    0.001517,
+                                    0.001364
+                                ],
+                                "zero_point": [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "details_type": "NONE",
+                                "quantized_dimension": 0
+                            },
+                            "is_variable": false
+                        },
+                        {
+                            "shape": [
+                                4,
+                                2,
+                                2,
+                                2
+                            ],
+                            "type": "INT8",
+                            "buffer": 3,
+                            "name": "model/conv2d/Conv2D1",
+                            "quantization": {
+                                "min": [
+                                    -0.498056,
+                                    -0.362561,
+                                    -0.307959,
+                                    -0.207799
+                                ],
+                                "max": [
+                                    0.339136,
+                                    0.391629,
+                                    0.496193,
+                                    0.446191
+                                ],
+                                "scale": [
+                                    0.003922,
+                                    0.003084,
+                                    0.003907,
+                                    0.003513
+                                ],
+                                "zero_point": [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "details_type": "NONE",
+                                "quantized_dimension": 0
+                            },
+                            "is_variable": false
+                        },
+                        {
+                            "shape": [
+                                1,
+                                4,
+                                4,
+                                4
+                            ],
+                            "type": "INT8",
+                            "buffer": 4,
+                            "name": "Identity",
+                            "quantization": {
+                                "min": [
+                                    -66.578751
+                                ],
+                                "max": [
+                                    70.137619
+                                ],
+                                "scale": [
+                                    0.536143
+                                ],
+                                "zero_point": [
+                                    -4
+                                ],
+                                "details_type": "NONE",
+                                "quantized_dimension": 0
+                            },
+                            "is_variable": false
+                        }
+                    ],
+                    "inputs": [
+                      0
+                    ],
+                    "outputs": [
+                      3
+                    ],
+                    "operators": [
+                      {
+                        "opcode_index": 0,
+                        "inputs": [
+                          0,
+                          2,
+                          1
+                        ],
+                        "outputs": [
+                          3
+                        ],
+                        "builtin_options_type": "Conv2DOptions",
+                        "builtin_options": {
+                          "padding": "SAME",
+                          "stride_w": 1,
+                          "stride_h": 1,
+                          "fused_activation_function": "NONE",
+                          "dilation_w_factor": 1,
+                          "dilation_h_factor": 1
+                        },
+                        "custom_options_format": "FLEXBUFFERS"
+                      }
+                    ],
+                    "name": "main"
+                }
+            ],
+            "description": "MLIR Converted.",
+            "buffers": [
+                {
+                },
+                {
+                },
+                {
+                    "data": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                },
+                {
+                    "data": [
+                        157,
+                        201,
+                        86,
+                        129,
+                        17,
+                        33,
+                        209,
+                        13,
+                        76,
+                        249,
+                        127,
+                        138,
+                        35,
+                        18,
+                        250,
+                        233,
+                        15,
+                        205,
+                        98,
+                        127,
+                        68,
+                        196,
+                        246,
+                        177,
+                        65,
+                        197,
+                        230,
+                        246,
+                        127,
+                        66,
+                        212,
+                        30
+                    ]
+                },
+                {
+                },
+                {
+                    "data": [
+                        49,
+                        46,
+                        53,
+                        46,
+                        48,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            ],
+            "metadata": [
+                {
+                    "name": "min_runtime_version",
+                    "buffer": 5
+                }
+            ]
+        }
+        )";
+        SetupSingleInputSingleOutput("input", "Identity");
+    }
+};
+
+BOOST_FIXTURE_TEST_CASE( ParsePerChannelConv2D, PerChannelConv2DFixture )
+{
+    RunTest<4, armnn::DataType::QAsymmS8>(
+        0,
+        {
+            -11, 40,-26, 11,-28,  8,  0, -8,
+            -10, 34, 47,  0,-33,-14, 28, 35,
+              6,-28,-26,  8, 13, 33,-31,-41,
+             31,-20,-31,-16,  8,-18,-44,  0
+        },
+        {
+            -21,-17,-23,-14, -1,-14,  1,  9,
+              1,-12,-22,-23,  2, -1, -3, 12,
+              7,  6,  8,-13,-21, -6,-31,  0,
+              9, -6, 24,  0,-22, -4, -7,-22,
+             -7, -9,  9, 11,-11,-16,  9,-27,
+             -1,  0,-26,  0,  9,-12, -8,-18,
+            -11, -3,-15,  7, 16, -2, -8, -7,
+            -14,-15,-14,  3,  9,-12, -6,-11
+        });
+}
+
 BOOST_AUTO_TEST_SUITE_END()

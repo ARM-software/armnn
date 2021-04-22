@@ -136,6 +136,7 @@ list(APPEND armnn_sources
     include/armnn/DescriptorsFwd.hpp
     include/armnn/Exceptions.hpp
     include/armnn/backends/ILayerSupport.hpp
+    include/armnn/IAsyncExecutionCallback.hpp
     include/armnn/ILayerVisitor.hpp
     include/armnn/INetwork.hpp
     include/armnn/IProfiler.hpp
@@ -302,6 +303,8 @@ list(APPEND armnn_sources
     src/armnn/layers/TransposeLayer.cpp
     src/armnn/layers/UnmapLayer.cpp
     src/armnn/layers/UnmapLayer.hpp
+    src/armnn/AsyncExecutionCallback.cpp
+    src/armnn/AsyncExecutionCallback.hpp
     src/armnn/BackendRegistry.cpp
     src/armnn/BackendSettings.hpp
     src/armnn/BackendHelper.cpp

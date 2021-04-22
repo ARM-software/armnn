@@ -8,6 +8,7 @@
 #include <functional>
 #include <memory>
 #include <stdint.h>
+#include <chrono>
 #include "BackendId.hpp"
 #include "Exceptions.hpp"
 #include "Deprecated.hpp"
@@ -20,6 +21,9 @@ constexpr unsigned int MaxNumOfTensorDimensions = 5U;
 /// The lowest performance data capture interval we support is 10 miliseconds.
 constexpr unsigned int LOWEST_CAPTURE_PERIOD = 10000u;
 
+/// Variable to control expire rate of priority queue
+constexpr unsigned int EXPIRE_RATE = 3U;
+
 /// @enum Status enumeration
 /// @var Status::Successful
 /// @var Status::Failure
@@ -31,14 +35,14 @@ enum class Status
 
 enum class DataType
 {
-    Float16 = 0,
-    Float32 = 1,
+    Float16  = 0,
+    Float32  = 1,
     QAsymmU8 = 2,
     Signed32 = 3,
-    Boolean = 4,
+    Boolean  = 4,
     QSymmS16 = 5,
     QuantizedSymm8PerAxis ARMNN_DEPRECATED_ENUM_MSG("Per Axis property inferred by number of scales in TensorInfo") = 6,
-    QSymmS8 = 7,
+    QSymmS8  = 7,
     QAsymmS8 = 8,
     BFloat16 = 9,
     Signed64 = 10,
@@ -51,6 +55,13 @@ enum class DataLayout
 {
     NCHW = 1,
     NHWC = 2
+};
+
+enum class QosExecPriority
+{
+    Low    = 0,
+    Medium = 1,
+    High   = 2
 };
 
 enum class ActivationFunction
@@ -304,6 +315,9 @@ class ITensorHandle;
 /// @param tensorHandle - TensorHandle for the input tensor to the Debug layer
 using DebugCallbackFunction = std::function<void(LayerGuid guid, unsigned int slotIndex, ITensorHandle* tensorHandle)>;
 
+/// Define a timer and associated inference ID for recording execution times
+using HighResolutionClock = std::chrono::high_resolution_clock::time_point;
+using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
 
 namespace profiling
 {

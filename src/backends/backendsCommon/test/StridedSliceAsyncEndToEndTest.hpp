@@ -9,7 +9,9 @@
 
 #include <armnn/IWorkingMemHandle.hpp>
 #include <armnn/INetwork.hpp>
+#include <armnn/IAsyncExecutionCallback.hpp>
 
+#include <AsyncExecutionCallback.hpp>
 #include <backendsCommon/test/CommonTestUtils.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -114,27 +116,29 @@ void AsyncThreadedEndToEndTestImpl(INetworkPtr network,
 
 }
 
-
-
 template<DataType ArmnnIType, DataType ArmnnOType,
-        typename TInput = ResolveType <ArmnnIType>, typename TOutput = ResolveType <ArmnnOType>>
+    typename TInput = ResolveType<ArmnnIType>, typename TOutput = ResolveType<ArmnnOType>>
 void AsyncEndToEndTestImpl(INetworkPtr network,
                            const std::map<int, std::vector<TInput>>& inputTensorData,
                            const std::map<int, std::vector<TOutput>>& expectedOutputData,
                            std::vector<BackendId> backends,
-                           float tolerance = 0.000001f)
+                           float tolerance = 0.000001f,
+                           size_t numThreads = 0)
 {
     // Create Runtime in which test will run
     IRuntime::CreationOptions options;
-    IRuntimePtr runtime(IRuntime::Create(options));
+    IRuntimePtr               runtime(IRuntime::Create(options));
 
     // Optimize the Network
     IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec());
 
     // Creates AsyncNetwork
     NetworkId networkId = 0;
+
     std::string errorMessage;
-    const INetworkProperties networkProperties(true, MemorySource::Undefined, MemorySource::Undefined);
+
+    const INetworkProperties networkProperties(true, MemorySource::Undefined, MemorySource::Undefined, numThreads);
+
     runtime->LoadNetwork(networkId, std::move(optNet), errorMessage, networkProperties);
 
     InputTensors inputTensors;
@@ -157,17 +161,50 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
                                         outputStorage.at(it.first).data())});
     }
 
-    // Create WorkingMemHandle for this async network
-    std::unique_ptr<IWorkingMemHandle> workingMemHandle = runtime->CreateWorkingMemHandle(networkId);
-    IWorkingMemHandle& workingMemHandleRef = *workingMemHandle.get();
+    if (numThreads == 0)
+    {
+        // Create WorkingMemHandle for this async network
+        std::unique_ptr<IWorkingMemHandle> workingMemHandle = runtime->CreateWorkingMemHandle(networkId);
+        IWorkingMemHandle& workingMemHandleRef = *workingMemHandle.get();
 
-    // Run the async network
-    runtime->Execute(workingMemHandleRef, inputTensors, outputTensors);
+        // Run the async network
+        runtime->Execute(workingMemHandleRef, inputTensors, outputTensors);
+    }
+    else
+    {
+        std::vector<IAsyncExecutionCallbackPtr> callbacks;
 
-    // Checks the results.
+        // Create 1000 callbacks that will be checked post scheduling
+        for (size_t i = 0; i < 1000; ++i)
+        {
+            callbacks.emplace_back(std::make_shared<AsyncExecutionCallback>());
+        }
+
+        // For the asyncronous execution, we are adding a pool of working memory handles (1 per thread) in the
+        // LoadedNetwork with a each scheduled inference having a spefic priority
+        for (IAsyncExecutionCallbackPtr cb : callbacks)
+        {
+            runtime->Schedule(networkId,
+                              inputTensors,
+                              outputTensors,
+                              static_cast<QosExecPriority>(rand()%3),
+                              cb);
+        }
+
+        // Wait until the execution signals a notify
+        for (IAsyncExecutionCallbackPtr cb : callbacks)
+        {
+            cb->Wait();
+            
+            // Checks the results.
+            BOOST_CHECK(cb->GetStatus() == Status::Success);
+        }
+    }
+
     for (auto&& it : expectedOutputData)
     {
         std::vector<TOutput> out = outputStorage.at(it.first);
+
         for (unsigned int i = 0; i < out.size(); ++i)
         {
             BOOST_CHECK(Compare<ArmnnOType>(it.second[i], out[i], tolerance) == true);
@@ -263,7 +300,103 @@ void StridedSlicedEndToEndTest(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = {{0, inputData}};
     std::map<int, std::vector<T>> expectedOutputData = {{0, outputExpected}};
 
-    AsyncEndToEndTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends, 1);
+    AsyncEndToEndTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends, 0.000001f);
+}
+
+template<armnn::DataType ArmnnType>
+void AsyncScheduledStridedSlicedEndToEndTest(const std::vector<BackendId>& backends)
+{
+    using namespace armnn;
+    using T = ResolveType<ArmnnType>;
+
+    const TensorShape& inputShape = {3, 2, 3, 1};
+    const TensorShape& outputShape = {1, 2, 3, 1};
+    const std::vector<int>& beginData = {1, 0, 0, 0};
+    const std::vector<int>& endData = {2, 2, 3, 1};
+    const std::vector<int>& stridesData = {1, 1, 1, 1};
+    int beginMask = 0;
+    int endMask = 0;
+    int shrinkAxisMask = 0;
+    int ellipsisMask = 0;
+    int newAxisMask = 0;
+
+    // Builds up the structure of the network
+    INetworkPtr net = CreateStridedSliceNetwork<ArmnnType>(inputShape,
+                                                           outputShape,
+                                                           beginData,
+                                                           endData,
+                                                           stridesData,
+                                                           beginMask,
+                                                           endMask,
+                                                           shrinkAxisMask,
+                                                           ellipsisMask,
+                                                           newAxisMask);
+
+    // Creates structures for input & output.
+    std::vector<T> inputData{
+            1.0f, 1.0f, 1.0f, 2.0f, 2.0f, 2.0f,
+
+            3.0f, 3.0f, 3.0f, 4.0f, 4.0f, 4.0f,
+
+            5.0f, 5.0f, 5.0f, 6.0f, 6.0f, 6.0f
+    };
+
+    std::vector<T> outputExpected{
+            3.0f, 3.0f, 3.0f, 4.0f, 4.0f, 4.0f
+    };
+
+    std::map<int, std::vector<T>> inputTensorData = {{0, inputData}};
+    std::map<int, std::vector<T>> expectedOutputData = {{0, outputExpected}};
+
+    AsyncEndToEndTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends, 0.000001f, 1);
+}
+
+template<armnn::DataType ArmnnType>
+void AsyncScheduledStridedSlicedMultiThreadedEndToEndTest(const std::vector<BackendId>& backends)
+{
+    using namespace armnn;
+    using T = ResolveType<ArmnnType>;
+
+    const TensorShape& inputShape = {3, 2, 3, 1};
+    const TensorShape& outputShape = {1, 2, 3, 1};
+    const std::vector<int>& beginData = {1, 0, 0, 0};
+    const std::vector<int>& endData = {2, 2, 3, 1};
+    const std::vector<int>& stridesData = {1, 1, 1, 1};
+    int beginMask = 0;
+    int endMask = 0;
+    int shrinkAxisMask = 0;
+    int ellipsisMask = 0;
+    int newAxisMask = 0;
+
+    // Builds up the structure of the network
+    INetworkPtr net = CreateStridedSliceNetwork<ArmnnType>(inputShape,
+                                                           outputShape,
+                                                           beginData,
+                                                           endData,
+                                                           stridesData,
+                                                           beginMask,
+                                                           endMask,
+                                                           shrinkAxisMask,
+                                                           ellipsisMask,
+                                                           newAxisMask);
+
+    // Creates structures for input & output.
+    std::vector<T> inputData{
+            1.0f, 1.0f, 1.0f, 2.0f, 2.0f, 2.0f,
+
+            3.0f, 3.0f, 3.0f, 4.0f, 4.0f, 4.0f,
+
+            5.0f, 5.0f, 5.0f, 6.0f, 6.0f, 6.0f
+    };
+
+    std::vector<T> outputExpected{
+            3.0f, 3.0f, 3.0f, 4.0f, 4.0f, 4.0f
+    };
+
+    std::map<int, std::vector<T>> inputTensorData = {{0, inputData}};
+    std::map<int, std::vector<T>> expectedOutputData = {{0, outputExpected}};
+
+    AsyncEndToEndTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends, 0.000001f, 3);
 }
 
 template<armnn::DataType ArmnnType>

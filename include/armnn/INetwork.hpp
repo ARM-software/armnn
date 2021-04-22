@@ -694,7 +694,6 @@ public:
 protected:
     ~INetwork();
 
-    friend class NetworkQuantizer;
     friend void VisitLayersTopologically(const INetwork* inputNetwork, IStrategy& strategy);
     friend class TestConnectionPreservation;
     friend TensorInfo GetInputTensorInfo(const INetwork* network);

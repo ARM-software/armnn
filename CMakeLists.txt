@@ -149,60 +149,6 @@ if(BUILD_TF_PARSER)
     set_target_properties(armnnTfParser PROPERTIES VERSION ${TF_PARSER_LIB_VERSION} SOVERSION ${TF_PARSER_LIB_SOVERSION})
 endif()
 
-if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
-    if(NOT BUILD_ARMNN_SERIALIZER)
-        message(ERROR, "In order to build the ArmNN Quantization Tool you must set BUILD_ARMNN_SERIALIZER = YES")
-    endif()
-
-    set(armnn_quantizer_sources)
-    list(APPEND armnn_quantizer_sources
-        src/armnnQuantizer/QuantizationDataSet.hpp
-        src/armnnQuantizer/QuantizationDataSet.cpp
-        src/armnnQuantizer/QuantizationInput.hpp
-        src/armnnQuantizer/QuantizationInput.cpp
-        src/armnnQuantizer/CommandLineProcessor.hpp
-        src/armnnQuantizer/CommandLineProcessor.cpp
-        )
-
-    add_library_ex(armnnQuantizer SHARED ${armnn_quantizer_sources})
-
-    target_include_directories(armnnQuantizer PRIVATE include/armnnDeserializer)
-    target_include_directories(armnnQuantizer PRIVATE src/armnnUtils)
-    target_include_directories(armnnQuantizer PRIVATE src/armnn)
-    target_include_directories(armnnQuantizer PRIVATE third-party)
-
-    include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
-    set_target_properties(armnnQuantizer PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-
-    target_link_libraries(armnnQuantizer armnn)
-
-    add_executable_ex(ArmnnQuantizerMain
-        src/armnnQuantizer/ArmNNQuantizerMain.cpp)
-
-    # cmake does not allow same executable and library name
-    # workaround that by rename that using set_target_properties
-    set_target_properties(ArmnnQuantizerMain
-        PROPERTIES OUTPUT_NAME ArmnnQuantizer)
-
-    target_include_directories(ArmnnQuantizerMain PRIVATE include/armnnDeserializer)
-    target_include_directories(ArmnnQuantizerMain PRIVATE src/armnn)
-
-    target_link_libraries(ArmnnQuantizerMain
-            armnnQuantizer
-            armnnSerializer
-            armnn
-            armnnUtils
-            ${FLATBUFFERS_LIBRARY})
-
-    if(Threads_FOUND AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
-        target_link_libraries(ArmnnQuantizerMain ${CMAKE_THREAD_LIBS_INIT})
-    endif()
-
-    set_target_properties(armnnQuantizer PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
-
-endif()
-
-
 list(APPEND armnn_sources
     include/armnn/ArmNN.hpp
     include/armnn/BackendHelper.hpp
@@ -388,8 +334,6 @@ list(APPEND armnn_sources
     src/armnn/Descriptors.cpp
     src/armnn/DeviceSpec.hpp
     src/armnn/DllExport.hpp
-    src/armnn/DynamicQuantizationStrategy.cpp
-    src/armnn/DynamicQuantizationStrategy.hpp
     src/armnn/Exceptions.cpp
     src/armnn/ExecutionFrame.cpp
     src/armnn/ExecutionFrame.hpp
@@ -413,11 +357,6 @@ list(APPEND armnn_sources
     src/armnn/Logging.cpp
     src/armnn/Network.cpp
     src/armnn/Network.hpp
-    src/armnn/NetworkQuantizationScheme.hpp
-    src/armnn/NetworkQuantizer.cpp
-    src/armnn/NetworkQuantizer.hpp
-    src/armnn/NetworkQuantizerUtils.cpp
-    src/armnn/NetworkQuantizerUtils.hpp
     src/armnn/NetworkUtils.cpp
     src/armnn/NetworkUtils.hpp
     src/armnn/Observable.cpp
@@ -426,14 +365,10 @@ list(APPEND armnn_sources
     src/armnn/Optimizer.hpp
     src/armnn/OutputHandler.cpp
     src/armnn/OutputHandler.hpp
-    src/armnn/OverrideInputRangeVisitor.cpp
-    src/armnn/OverrideInputRangeVisitor.hpp
     src/armnn/Profiling.cpp
     src/armnn/ProfilingEvent.cpp
     src/armnn/ProfilingEvent.hpp
     src/armnn/Profiling.hpp
-    src/armnn/QuantizerStrategy.hpp
-    src/armnn/QuantizerStrategy.cpp
     src/armnn/Runtime.cpp
     src/armnn/Runtime.hpp
     src/armnn/RangeTracker.cpp
@@ -441,8 +376,6 @@ list(APPEND armnn_sources
     src/armnn/ResolveType.hpp
     src/armnn/SerializeLayerParameters.cpp
     src/armnn/SerializeLayerParameters.hpp
-    src/armnn/StaticRangeStrategy.cpp
-    src/armnn/StaticRangeStrategy.hpp
     src/armnn/SubgraphView.cpp
     src/armnn/SubgraphView.hpp
     src/armnn/SubgraphViewSelector.cpp
@@ -717,7 +650,6 @@ if(BUILD_UNIT_TESTS)
     if(ARMNNREF)
         list(APPEND unittest_sources
             src/armnn/test/DebugCallbackTest.cpp
-            src/armnn/test/QuantizerTest.cpp
             src/armnn/test/RuntimeTests.cpp
             src/armnn/test/RuntimeTests.hpp
             )
@@ -859,12 +791,6 @@ if(BUILD_UNIT_TESTS)
             )
     endif()
 
-    if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
-        list(APPEND unittest_sources
-             src/armnnQuantizer/test/QuantizationDataSetTests.cpp
-             )
-    endif()
-
     if(BUILD_ARMNN_SERIALIZER AND ARMNNREF)
         enable_language(ASM)
         list(APPEND unittest_sources
@@ -982,12 +908,6 @@ if(BUILD_UNIT_TESTS)
         target_include_directories(UnitTests SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer)
         target_include_directories(UnitTests SYSTEM PRIVATE "${FLATBUFFERS_INCLUDE_PATH}")
         target_link_libraries(UnitTests armnnSerializer)
-    endif()
-
-    if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
-        target_include_directories(UnitTests SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnQuantizer)
-        target_include_directories(UnitTests SYSTEM PRIVATE "${FLATBUFFERS_INCLUDE_PATH}")
-        target_link_libraries(UnitTests armnnQuantizer armnnSerializer)
     endif()
 
     if(BUILD_ONNX_PARSER)

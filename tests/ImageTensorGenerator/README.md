@@ -4,7 +4,7 @@ The `ImageTensorGenerator` is a program for pre-processing a .jpg image before g
 
 Build option:
 To build ModelAccuracyTool, pass the following options to Cmake:
-* -DBUILD_ARMNN_QUANTIZER=1
+* -DBUILD_ACCURACY_TOOL=1
 
 |Cmd:|||
 | ---|---|---|

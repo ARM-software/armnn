@@ -243,7 +243,7 @@ if(BUILD_ACCURACY_TOOL)
     AccuracyTool(ModelAccuracyTool)
 endif()
 
-if(BUILD_ARMNN_QUANTIZER)
+if(BUILD_ACCURACY_TOOL)
     macro(ImageTensorExecutor executorName)
         target_link_libraries(${executorName} ${CMAKE_THREAD_LIBS_INIT})
         addDllCopyCommands(${executorName})

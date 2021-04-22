@@ -1286,6 +1286,12 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceMax2Float32, ReduceMaxSimpleTest2<DataType::
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceMinFloat32, ReduceMinSimpleTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceMinNegativeAxisFloat32, ReduceMinNegativeAxisTest<DataType::Float32>)
 
+// Cast
+ARMNN_AUTO_TEST_CASE_WITH_THF(CastInt32ToFloat, CastInt32ToFloat2dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(CastFloat16ToFloat32, CastFloat16ToFloat322dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(CastFloatToFloat16, CastFloat32ToFloat162dTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(CastFloatToUInt8, CastFloat32ToUInt82dTest)
+
 #if defined(ARMNNREF_ENABLED)
 
 // The ARMNN_COMPARE_REF_AUTO_TEST_CASE and the ARMNN_COMPARE_REF_FIXTURE_TEST_CASE test units are not available

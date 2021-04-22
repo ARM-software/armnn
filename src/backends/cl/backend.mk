@@ -31,6 +31,7 @@ BACKEND_SOURCES := \
         workloads/ClArgMinMaxWorkload.cpp \
         workloads/ClBatchNormalizationFloatWorkload.cpp \
         workloads/ClBatchToSpaceNdWorkload.cpp \
+        workloads/ClCastWorkload.cpp \
         workloads/ClComparisonWorkload.cpp \
         workloads/ClConcatWorkload.cpp \
         workloads/ClConstantWorkload.cpp \

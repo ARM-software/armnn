@@ -236,6 +236,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateBatchToSpaceNd(const BatchTo
     return MakeWorkload<ClBatchToSpaceNdWorkload>(descriptor, info, m_CLCompileContext);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateCast(const CastQueueDescriptor& descriptor,
+                                                         const WorkloadInfo& info) const
+{
+    return MakeWorkload<ClCastWorkload>(descriptor, info, m_CLCompileContext);
+}
+
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateComparison(const ComparisonQueueDescriptor& descriptor,
                                                                const WorkloadInfo& info) const
 {

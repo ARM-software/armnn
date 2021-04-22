@@ -25,6 +25,7 @@
 #include "workloads/ClArgMinMaxWorkload.hpp"
 #include "workloads/ClBatchNormalizationFloatWorkload.hpp"
 #include "workloads/ClBatchToSpaceNdWorkload.hpp"
+#include "workloads/ClCastWorkload.hpp"
 #include "workloads/ClComparisonWorkload.hpp"
 #include "workloads/ClConstantWorkload.hpp"
 #include "workloads/ClConvertFp16ToFp32Workload.hpp"
@@ -237,6 +238,16 @@ bool ClLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
                                    gamma,
                                    descriptor,
                                    nullptr);
+}
+
+bool ClLayerSupport::IsCastSupported(const TensorInfo& input,
+                                     const TensorInfo& output,
+                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClCastValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output);
 }
 
 bool ClLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,

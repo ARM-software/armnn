@@ -12,6 +12,7 @@
 #include "ClConstantWorkload.hpp"
 #include "ClBatchNormalizationFloatWorkload.hpp"
 #include "ClBatchToSpaceNdWorkload.hpp"
+#include "ClCastWorkload.hpp"
 #include "ClConvolution2dWorkload.hpp"
 #include "ClDepthToSpaceWorkload.hpp"
 #include "ClDepthwiseConvolutionWorkload.hpp"

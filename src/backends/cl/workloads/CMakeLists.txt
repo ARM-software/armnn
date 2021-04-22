@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Arm Ltd anc Contributors. All rights reserved.
+# Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -16,6 +16,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClBatchNormalizationFloatWorkload.hpp
     ClBatchToSpaceNdWorkload.cpp
     ClBatchToSpaceNdWorkload.hpp
+    ClCastWorkload.cpp
+    ClCastWorkload.hpp
     ClComparisonWorkload.cpp
     ClComparisonWorkload.hpp
     ClConcatWorkload.cpp

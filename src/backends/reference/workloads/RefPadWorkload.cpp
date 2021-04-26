@@ -31,6 +31,8 @@ void RefPadWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITe
 
     armnn::Pad(inputInfo,
                outputInfo,
+               inputs[0],
+               outputs[0],
                m_Data);
 }
 

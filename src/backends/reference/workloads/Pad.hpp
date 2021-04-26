@@ -15,6 +15,8 @@ namespace armnn
 
 void Pad(const TensorInfo& inputInfo,
          const TensorInfo& outputInfo,
+         const ITensorHandle* inputHandle,
+         ITensorHandle* outputHandle,
          const PadQueueDescriptor& data);
 
 } //namespace armnn

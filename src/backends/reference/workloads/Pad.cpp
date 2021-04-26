@@ -38,6 +38,8 @@ namespace armnn
 
 void Pad(const TensorInfo& inputInfo,
          const TensorInfo& outputInfo,
+         const ITensorHandle* inputHandle,
+         ITensorHandle* outputHandle,
          const PadQueueDescriptor& data)
 {
     auto padList  = data.m_Parameters.m_PadList;
@@ -66,15 +68,15 @@ void Pad(const TensorInfo& inputInfo,
     unsigned int outputHeight   = 0;
     unsigned int outputWidth    = 0;
 
-    auto inputData = MakeDecoder<float>(inputInfo, data.m_Inputs[0]->Map());
-    auto outData   = MakeEncoder<float>(outputInfo, data.m_Outputs[0]->Map());
+    auto inputData = MakeDecoder<float>(inputInfo, inputHandle->Map());
+    auto outData   = MakeEncoder<float>(outputInfo, outputHandle->Map());
 
     // Fill the output tensor with Pad value first
     if (outputInfo.IsQuantized())
     {
         // For Quantized types Pad Value should not be quantized with scale and offset of the tensor info
         auto temporaryInfo = TensorInfo(outputInfo.GetShape(), outputInfo.GetDataType(), 1.0f, 0);
-        auto outputData = MakeEncoder<float>(temporaryInfo, data.m_Outputs[0]->Map());
+        auto outputData = MakeEncoder<float>(temporaryInfo, outputHandle->Map());
         FillOutputWithPadValue(*outputData, padValue, numOutputElements);
     }
     else

@@ -74,23 +74,20 @@ public:
     profiling::ProfilingGuid GetNetworkGuid();
 
 private:
+    using WorkloadFactoryWithMemoryManager =
+    std::pair<IBackendInternal::IWorkloadFactoryPtr, IBackendInternal::IMemoryManagerSharedPtr>;
+
+    using WorkloadFactoryMap = std::unordered_map<BackendId, WorkloadFactoryWithMemoryManager>;
+
     void AllocateWorkingMemory(std::lock_guard<std::mutex>& lock);
+    void AllocateAndExecuteConstantWorkloads();
+
+    std::unordered_map<LayerGuid, ITensorHandle* > m_ConstantTensorHandles;
+    std::unordered_map<LayerGuid, std::unique_ptr<IWorkload> > m_ConstantWorkloads;
 
     LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                   const INetworkProperties& networkProperties,
                   profiling::ProfilingService& profilingService);
-
-    void CollectInputTensorHandles(std::unordered_map<LayerGuid, std::vector<ITensorHandle*> >& tensorHandles,
-                                   std::vector<ITensorHandle*>& inputs,
-                                   const armnn::Layer* layer,
-                                   const TensorHandleFactoryRegistry& registry,
-                                   const bool isMemoryManaged = false);
-
-    void CreateOutputTensorHandles(std::unordered_map<LayerGuid, std::vector<ITensorHandle*> >& tensorHandles,
-                                   std::vector<ITensorHandle*>& outputs,
-                                   const armnn::Layer* layer,
-                                   const TensorHandleFactoryRegistry& registry,
-                                   const bool isMemoryManaged = false);
 
     void EnqueueInput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo);
 
@@ -106,11 +103,6 @@ private:
     const IWorkloadFactory& GetWorkloadFactory(const Layer& layer) const;
 
     using BackendPtrMap = std::unordered_map<BackendId, IBackendInternalUniquePtr>;
-
-    using WorkloadFactoryWithMemoryManager =
-        std::pair<IBackendInternal::IWorkloadFactoryPtr, IBackendInternal::IMemoryManagerSharedPtr>;
-
-    using WorkloadFactoryMap = std::unordered_map<BackendId, WorkloadFactoryWithMemoryManager>;
 
     BackendPtrMap       m_Backends;
     WorkloadFactoryMap  m_WorkloadFactories;

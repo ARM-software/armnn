@@ -16,10 +16,10 @@ namespace armnn
 {
 
 void InstanceNorm(const InstanceNormalizationQueueDescriptor& data,
+                  const TensorInfo& inputInfo,
                   Decoder<float>& inputDecoder,
                   Encoder<float>& outputEncoder)
 {
-    const TensorInfo& inputInfo = GetTensorInfo(data.m_Inputs[0]);
     const TensorShape inputShape = inputInfo.GetShape();
 
     armnnUtils::DataLayoutIndexed dataLayout(data.m_Parameters.m_DataLayout);

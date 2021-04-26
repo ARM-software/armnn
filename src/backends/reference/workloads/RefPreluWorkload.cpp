@@ -32,6 +32,10 @@ void RefPreluWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<I
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefPreluWorkload_Execute");
 
+    const TensorInfo& inputInfo  = GetTensorInfo(inputs[0]);
+    const TensorInfo& alphaInfo  = GetTensorInfo(inputs[1]);
+    const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);
+
     std::unique_ptr<Decoder<float>> inputDecoder = MakeDecoder<float>(GetTensorInfo(inputs[0]),
                                                                       inputs[0]->Map());
     std::unique_ptr<Decoder<float>> alphaDecoder = MakeDecoder<float>(GetTensorInfo(inputs[1]),
@@ -39,7 +43,7 @@ void RefPreluWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<I
     std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(outputs[0]),
                                                                        outputs[0]->Map());
 
-    PreluImpl(m_Data, *inputDecoder, *alphaDecoder, *outputEncoder);
+    PreluImpl(inputInfo, alphaInfo, outputInfo, *inputDecoder, *alphaDecoder, *outputEncoder);
 }
 
 } // namespace armnn

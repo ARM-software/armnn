@@ -14,6 +14,7 @@ namespace armnn
 {
 
 void InstanceNorm(const InstanceNormalizationQueueDescriptor& data,
+                  const TensorInfo& inputInfo,
                   Decoder<float>& inputData,
                   Encoder<float>& outputData);
 

@@ -32,26 +32,6 @@ void RefStackWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<I
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefStackWorkload_Execute");
 
-    // Can perform a simple concatenation when axis == 0
-    if (!m_Data.m_Parameters.m_Axis)
-    {
-        float* output = GetOutputTensorData<float>(0, m_Data);
-        ARMNN_ASSERT(output != nullptr);
-
-        unsigned int numInputs = m_Data.m_Parameters.m_NumInputs;
-        unsigned int inputLength = GetTensorInfo(inputs[0]).GetNumElements();
-
-        for (unsigned int inputIdx=0; inputIdx<numInputs; ++inputIdx)
-        {
-            const float* input = GetInputTensorData<float>(inputIdx, m_Data);
-            for (unsigned int elmt=0; elmt<inputLength; ++elmt)
-            {
-                output[(inputIdx * inputLength) + elmt] = input[elmt];
-            }
-        }
-        return;
-    }
-
     std::vector<std::unique_ptr<Decoder<float>>> inputDecoders;
     for (unsigned int i=0; i<inputs.size(); ++i)
     {

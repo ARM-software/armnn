@@ -34,7 +34,7 @@ void RefGatherWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<
     std::unique_ptr<Decoder<float>> decoderPtr = MakeDecoder<float>(inputInfo0, inputs[0]->Map());
     Decoder<float>& decoder = *decoderPtr;
 
-    const int32_t* indicesData = GetInputTensorData<int32_t>(1, m_Data);
+    const int32_t* indicesData = reinterpret_cast<int32_t*>(inputs[1]->Map());
 
     std::unique_ptr<Encoder<float>> encoderPtr = MakeEncoder<float>(outputInfo, outputs[0]->Map());
     Encoder<float>& encoder = *encoderPtr;

@@ -37,8 +37,9 @@ void RefInstanceNormalizationWorkload::Execute(std::vector<ITensorHandle*> input
                                                                        inputs[0]->Map());
     std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(outputs[0]),
                                                                        outputs[0]->Map());
+    const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
 
-    InstanceNorm(m_Data, *inputDecoder, *outputEncoder);
+    InstanceNorm(m_Data, inputInfo, *inputDecoder, *outputEncoder);
 }
 
 } // namespace armnn

@@ -41,11 +41,11 @@ void RefArgMinMaxWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vect
     const TensorInfo &outputTensorInfo = GetTensorInfo(outputs[0]);
 
     if (outputTensorInfo.GetDataType() == armnn::DataType::Signed32) {
-        int32_t *output = GetOutputTensorData<int32_t>(0, m_Data);
+        int32_t *output = GetOutputTensorData<int32_t>(outputs[0]);
         ArgMinMax(decoder, output, inputTensorInfo, outputTensorInfo, m_Data.m_Parameters.m_Function,
                   m_Data.m_Parameters.m_Axis);
     } else {
-        int64_t *output = GetOutputTensorData<int64_t>(0, m_Data);
+        int64_t *output = GetOutputTensorData<int64_t>(outputs[0]);
         ArgMinMax(decoder, output, inputTensorInfo, outputTensorInfo, m_Data.m_Parameters.m_Function,
                   m_Data.m_Parameters.m_Axis);
     }

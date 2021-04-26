@@ -32,7 +32,7 @@ private:
     {
         const int32_t rank = static_cast<int32_t>(GetTensorInfo(inputs[0]).GetNumDimensions());
 
-        std::memcpy(GetOutputTensorData<void>(0, m_Data), &rank, sizeof(int32_t));
+        std::memcpy(outputs[0]->Map(), &rank, sizeof(int32_t));
         outputs[0]->Unmap();
     }
 };

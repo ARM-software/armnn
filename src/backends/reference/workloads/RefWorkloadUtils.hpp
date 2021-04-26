@@ -45,6 +45,12 @@ DataType* GetOutputTensorData(unsigned int idx, const PayloadType& data)
     return reinterpret_cast<DataType*>(tensorHandle->Map());
 }
 
+template <typename DataType>
+DataType* GetOutputTensorData(ITensorHandle* tensorHandle)
+{
+    return reinterpret_cast<DataType*>(tensorHandle->Map());
+}
+
 template <typename PayloadType>
 const float* GetInputTensorDataFloat(unsigned int idx, const PayloadType& data)
 {

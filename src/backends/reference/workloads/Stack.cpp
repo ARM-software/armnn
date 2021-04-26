@@ -24,6 +24,24 @@ void Stack(const StackQueueDescriptor& data,
 
     unsigned int axis = data.m_Parameters.m_Axis;
 
+    // Can perform a simple concatenation when axis == 0
+    if (!axis)
+    {
+        unsigned int numInputs = data.m_Parameters.m_NumInputs;
+        unsigned int inputLength = inputInfo.GetNumElements();
+
+        for (unsigned int inputIdx=0; inputIdx<numInputs; ++inputIdx)
+        {
+            for (unsigned int elmt=0; elmt<inputLength; ++elmt)
+            {
+                (*inputs[inputIdx])[elmt];
+                output[(inputIdx * inputLength) + elmt];
+                output.Set(inputs[inputIdx]->Get());
+            }
+        }
+        return;
+    }
+
     // Initialise output data
     unsigned int numOutputElements = 1;
     for (unsigned int i=0; i<outputNumDims; ++i)

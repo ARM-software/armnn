@@ -41,6 +41,11 @@ public:
     /// Release memory required for inference
     void ReleaseMemory();
 
+    std::vector<std::shared_ptr<IMemoryManager>>& GetMemoryManagers()
+    {
+        return m_MemoryManagers;
+    }
+
 private:
     std::vector<std::unique_ptr<ITensorHandleFactory>> m_Factories;
     std::vector<std::shared_ptr<IMemoryManager>> m_MemoryManagers;

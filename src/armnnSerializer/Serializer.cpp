@@ -1674,17 +1674,21 @@ flatbuffers::Offset<TensorInfo>  SerializerStrategy::CreateTensorInfo(const armn
 {
     // Get the dimensions
     std::vector<unsigned int> shape;
-    for(unsigned int dim = 0; dim < tensorInfo.GetShape().GetNumDimensions(); ++dim)
-    {
-        shape.push_back(tensorInfo.GetShape()[dim]);
-    }
-
     std::vector<bool> specificity;
     // This assumes that the TensorShape constructors have ensured that the size of m_DimensionsSpecificity
     // matches the size of dimensions.
     for(unsigned int dim = 0; dim < tensorInfo.GetShape().GetNumDimensions(); ++dim)
     {
         specificity.push_back(tensorInfo.GetShape().GetDimensionSpecificity(dim));
+
+        if (tensorInfo.GetShape().GetDimensionSpecificity(dim))
+        {
+            shape.push_back(tensorInfo.GetShape()[dim]);
+        }
+        else
+        {
+            shape.push_back(0);
+        }
     }
 
     if (tensorInfo.HasPerAxisQuantization())

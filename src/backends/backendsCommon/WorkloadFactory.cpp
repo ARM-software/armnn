@@ -8,7 +8,7 @@
 
 #include <armnn/Types.hpp>
 #include <armnn/LayerSupport.hpp>
-#include <armnn/ILayerSupport.hpp>
+#include <armnn/backends/ILayerSupport.hpp>
 #include <armnn/BackendHelper.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>

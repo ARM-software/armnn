@@ -6,7 +6,7 @@
 #pragma once
 
 #include <armnn/BackendId.hpp>
-#include <armnn/ILayerSupport.hpp>
+#include <armnn/backends/ILayerSupport.hpp>
 #include <armnn/Types.hpp>
 
 namespace armnn

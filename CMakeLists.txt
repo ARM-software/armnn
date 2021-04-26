@@ -135,7 +135,7 @@ list(APPEND armnn_sources
     include/armnn/Descriptors.hpp
     include/armnn/DescriptorsFwd.hpp
     include/armnn/Exceptions.hpp
-    include/armnn/ILayerSupport.hpp
+    include/armnn/backends/ILayerSupport.hpp
     include/armnn/ILayerVisitor.hpp
     include/armnn/INetwork.hpp
     include/armnn/IProfiler.hpp

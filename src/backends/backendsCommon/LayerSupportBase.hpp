@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/ILayerSupport.hpp>
+#include <armnn/backends/ILayerSupport.hpp>
 
 namespace armnn
 {

@@ -7,7 +7,7 @@
 
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/backends/DynamicBackend.hpp>
-#include <armnn/ILayerSupport.hpp>
+#include <armnn/backends/ILayerSupport.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>

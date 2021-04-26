@@ -166,7 +166,7 @@ Dynamic backends are registered during the runtime creation.
 
 ## The ILayerSupport interface
 
-Arm NN uses the [ILayerSupport](../../include/armnn/ILayerSupport.hpp) interface to decide if a layer
+Arm NN uses the [ILayerSupport](../../include/armnn/backends/ILayerSupport.hpp) interface to decide if a layer
 with a set of parameters (i.e. input and output tensors, descriptor, weights, filter, kernel if any) are
 supported on a given backend. The backends need a way to communicate this information by implementing
 the ```GetLayerSupport()``` function on the ```IBackendInternal``` interface.

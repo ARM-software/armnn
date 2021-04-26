@@ -5,7 +5,7 @@
 
 #include <armnn/LayerSupport.hpp>
 #include <armnn/Optional.hpp>
-#include <armnn/ILayerSupport.hpp>
+#include <armnn/backends/ILayerSupport.hpp>
 #include <armnn/BackendRegistry.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>

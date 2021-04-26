@@ -329,6 +329,11 @@ std::vector<unsigned int> AsUnsignedVector(const std::vector<int32_t> & in)
     result.reserve(in.size());
     for (auto & i : in)
     {
+        // If the location of the input data is -1 then the input should be ignored.
+        if (i == -1)
+        {
+            continue;
+        }
         result.push_back(CHECKED_NON_NEGATIVE(i));
     }
     return result;
@@ -3359,11 +3364,19 @@ TfLiteParserImpl::TensorRawPtrVector TfLiteParserImpl::GetInputs(const ModelPtr 
     const auto & operatorPtr = subgraphPtr->operators[operatorIndex];
 
     size_t inputCount = operatorPtr->inputs.size();
-    TensorRawPtrVector result(inputCount);
+    TensorRawPtrVector result;
     for (size_t i=0; i<inputCount; ++i)
     {
-        uint32_t inputId = CHECKED_NON_NEGATIVE(operatorPtr->inputs[i]);
-        result[i] = subgraphPtr->tensors[inputId].get();
+        // If the input location is -1 then assume input is turned off.
+        if (operatorPtr->inputs[i] == -1)
+        {
+            continue;
+        }
+        else
+        {
+            uint32_t inputId = CHECKED_NON_NEGATIVE(operatorPtr->inputs[i]);
+            result.push_back(subgraphPtr->tensors[inputId].get());
+        }
     }
     return result;
 }

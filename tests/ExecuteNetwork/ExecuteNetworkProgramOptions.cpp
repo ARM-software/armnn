@@ -194,6 +194,10 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "If left empty (the default), dynamic backends will not be used.",
                  cxxopts::value<std::string>(m_RuntimeOptions.m_DynamicBackendsPath))
 
+                ("n,concurrent",
+                 "If this option is enabled inferences will be executed in parallel asynchronously.",
+                 cxxopts::value<bool>(m_ExNetParams.m_Concurrent)->default_value("false")->implicit_value("true"))
+
                 ("d,input-tensor-data",
                  "Path to files containing the input data as a flat array separated by whitespace. "
                  "Several paths can be passed by separating them with a comma. If not specified, the network will be "
@@ -278,7 +282,11 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                 ("D,armnn-tflite-delegate",
                  "Enable Arm NN TfLite delegate. "
                  "This option is depreciated please use tflite-executor instead",
-                 cxxopts::value<bool>(m_ExNetParams.m_EnableDelegate)->default_value("false")->implicit_value("true"));
+                 cxxopts::value<bool>(m_ExNetParams.m_EnableDelegate)->default_value("false")->implicit_value("true"))
+
+               ("simultaneous-iterations",
+                "Number of simultaneous iterations to async-run the network for, default is set to 1",
+                cxxopts::value<size_t>(m_ExNetParams.m_SimultaneousIterations)->default_value("1"));
 
         m_CxxOptions.add_options("c) Optimization")
                 ("bf16-turbo-mode",

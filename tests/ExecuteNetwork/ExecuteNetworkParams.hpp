@@ -23,6 +23,7 @@ struct ExecuteNetworkParams
 
     std::string                   m_CachedNetworkFilePath;
     std::vector<armnn::BackendId> m_ComputeDevices;
+    bool                          m_Concurrent;
     bool                          m_DequantizeOutput;
     std::string                   m_DynamicBackendsPath;
     bool                          m_EnableBf16TurboMode;
@@ -49,6 +50,7 @@ struct ExecuteNetworkParams
     bool                          m_PrintIntermediate;
     bool                          m_QuantizeInput;
     bool                          m_SaveCachedNetwork;
+    size_t                        m_SimultaneousIterations;
     size_t                        m_SubgraphId;
     double                        m_ThresholdTime;
     int                           m_TuningLevel;

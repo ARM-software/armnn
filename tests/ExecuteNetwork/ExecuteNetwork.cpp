@@ -279,7 +279,8 @@ int MainImpl(const ExecuteNetworkParams& params,
     using TContainer =
            mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>, std::vector<int8_t>>;
 
-    std::vector<TContainer> inputDataContainers;
+    std::vector<std::vector<TContainer>> inputs;
+    std::vector<std::vector<TContainer>> outputs;
 
     try
     {
@@ -298,6 +299,7 @@ int MainImpl(const ExecuteNetworkParams& params,
         inferenceModelParams.m_CachedNetworkFilePath          = params.m_CachedNetworkFilePath;
         inferenceModelParams.m_NumberOfThreads                = params.m_NumberOfThreads;
         inferenceModelParams.m_MLGOTuningFilePath             = params.m_MLGOTuningFilePath;
+        inferenceModelParams.m_AsyncEnabled                   = params.m_Concurrent;
 
         for(const std::string& inputName: params.m_InputNames)
         {
@@ -324,106 +326,201 @@ int MainImpl(const ExecuteNetworkParams& params,
                                                  runtime);
 
         const size_t numInputs = inferenceModelParams.m_InputBindings.size();
-        for(unsigned int i = 0; i < numInputs; ++i)
+
+        armnn::Optional<QuantizationParams> qParams = params.m_QuantizeInput ?
+                                                      armnn::MakeOptional<QuantizationParams>(
+                                                          model.GetInputQuantizationParams()) :
+                                                      armnn::EmptyOptional();
+
+        for(unsigned int j = 0; j < params.m_SimultaneousIterations ; ++j)
         {
-            armnn::Optional<QuantizationParams> qParams = params.m_QuantizeInput ?
-                                                          armnn::MakeOptional<QuantizationParams>(
-                                                                  model.GetInputQuantizationParams()) :
-                                                          armnn::EmptyOptional();
-
-            armnn::Optional<std::string> dataFile = params.m_GenerateTensorData ?
-                                                    armnn::EmptyOptional() :
-                                                    armnn::MakeOptional<std::string>(
-                                                            params.m_InputTensorDataFilePaths[i]);
-
-            unsigned int numElements = model.GetInputSize(i);
-            if (params.m_InputTensorShapes.size() > i && params.m_InputTensorShapes[i])
+            std::vector<TContainer> inputDataContainers;
+            for(unsigned int i = 0; i < numInputs; ++i)
             {
-                // If the user has provided a tensor shape for the current input,
-                // override numElements
-                numElements = params.m_InputTensorShapes[i]->GetNumElements();
+                armnn::Optional<std::string> dataFile = params.m_GenerateTensorData ?
+                                                        armnn::EmptyOptional() :
+                                                        armnn::MakeOptional<std::string>(
+                                                            params.m_InputTensorDataFilePaths[(j * numInputs) + i]);
+
+                unsigned int numElements = model.GetInputSize(i);
+                if (params.m_InputTensorShapes.size() > i && params.m_InputTensorShapes[i])
+                {
+                    // If the user has provided a tensor shape for the current input,
+                    // override numElements
+                    numElements = params.m_InputTensorShapes[i]->GetNumElements();
+                }
+
+                TContainer tensorData;
+                PopulateTensorWithData(tensorData,
+                                       numElements,
+                                       params.m_InputTypes[i],
+                                       qParams,
+                                       dataFile);
+
+                inputDataContainers.push_back(tensorData);
             }
-
-            TContainer tensorData;
-            PopulateTensorWithData(tensorData,
-                                   numElements,
-                                   params.m_InputTypes[i],
-                                   qParams,
-                                   dataFile);
-
-            inputDataContainers.push_back(tensorData);
+            inputs.push_back(inputDataContainers);
         }
 
         const size_t numOutputs = inferenceModelParams.m_OutputBindings.size();
-        std::vector<TContainer> outputDataContainers;
 
-        for (unsigned int i = 0; i < numOutputs; ++i)
+        for (unsigned int j = 0; j < params.m_SimultaneousIterations; ++j)
         {
-            if (params.m_OutputTypes[i].compare("float") == 0)
+            std::vector <TContainer> outputDataContainers;
+            for (unsigned int i = 0; i < numOutputs; ++i)
             {
-                outputDataContainers.push_back(std::vector<float>(model.GetOutputSize(i)));
-            }
-            else if (params.m_OutputTypes[i].compare("int") == 0)
-            {
-                outputDataContainers.push_back(std::vector<int>(model.GetOutputSize(i)));
-            }
-            else if (params.m_OutputTypes[i].compare("qasymm8") == 0)
-            {
-                outputDataContainers.push_back(std::vector<uint8_t>(model.GetOutputSize(i)));
-            }
-            else if (params.m_OutputTypes[i].compare("qsymms8") == 0)
-            {
-                outputDataContainers.push_back(std::vector<int8_t>(model.GetOutputSize(i)));
-            }
-            else
-            {
-                ARMNN_LOG(fatal) << "Unsupported tensor data type \"" << params.m_OutputTypes[i] << "\". ";
-                return EXIT_FAILURE;
-            }
-        }
-
-        for (size_t x = 0; x < params.m_Iterations; x++)
-        {
-            // model.Run returns the inference time elapsed in EnqueueWorkload (in milliseconds)
-            auto inference_duration = model.Run(inputDataContainers, outputDataContainers);
-
-            if (params.m_GenerateTensorData)
-            {
-                ARMNN_LOG(warning) << "The input data was generated, note that the output will not be useful";
-            }
-
-            // Print output tensors
-            const auto& infosOut = model.GetOutputBindingInfos();
-            for (size_t i = 0; i < numOutputs; i++)
-            {
-                const armnn::TensorInfo& infoOut = infosOut[i].second;
-                auto outputTensorFile = params.m_OutputTensorFiles.empty() ? "" : params.m_OutputTensorFiles[i];
-
-                TensorPrinter printer(inferenceModelParams.m_OutputBindings[i],
-                                      infoOut,
-                                      outputTensorFile,
-                                      params.m_DequantizeOutput);
-                mapbox::util::apply_visitor(printer, outputDataContainers[i]);
-            }
-
-            ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)
-                            << std::fixed << inference_duration.count() << " ms\n";
-
-            // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
-            if (params.m_ThresholdTime != 0.0)
-            {
-                ARMNN_LOG(info) << "Threshold time: " << std::setprecision(2)
-                                << std::fixed << params.m_ThresholdTime << " ms";
-                auto thresholdMinusInference = params.m_ThresholdTime - inference_duration.count();
-                ARMNN_LOG(info) << "Threshold time - Inference time: " << std::setprecision(2)
-                                << std::fixed << thresholdMinusInference << " ms" << "\n";
-
-                if (thresholdMinusInference < 0)
+                if (params.m_OutputTypes[i].compare("float") == 0)
                 {
-                    std::string errorMessage = "Elapsed inference time is greater than provided threshold time.";
-                    ARMNN_LOG(fatal) << errorMessage;
+                    outputDataContainers.push_back(std::vector<float>(model.GetOutputSize(i)));
+                } else if (params.m_OutputTypes[i].compare("int") == 0)
+                {
+                    outputDataContainers.push_back(std::vector<int>(model.GetOutputSize(i)));
+                } else if (params.m_OutputTypes[i].compare("qasymm8") == 0)
+                {
+                    outputDataContainers.push_back(std::vector<uint8_t>(model.GetOutputSize(i)));
+                } else if (params.m_OutputTypes[i].compare("qsymms8") == 0)
+                {
+                    outputDataContainers.push_back(std::vector<int8_t>(model.GetOutputSize(i)));
+                } else
+                {
+                    ARMNN_LOG(fatal) << "Unsupported tensor data type \"" << params.m_OutputTypes[i] << "\". ";
+                    return EXIT_FAILURE;
                 }
             }
+            outputs.push_back(outputDataContainers);
+        }
+
+        if (!params.m_Concurrent)
+        {
+            // Synchronous Execution
+            for (size_t x = 0; x < params.m_Iterations; x++)
+            {
+                // model.Run returns the inference time elapsed in EnqueueWorkload (in milliseconds)
+                auto inference_duration = model.Run(inputs[0], outputs[0]);
+
+                if (params.m_GenerateTensorData)
+                {
+                    ARMNN_LOG(warning) << "The input data was generated, note that the output will not be useful";
+                }
+
+                // Print output tensors
+                const auto& infosOut = model.GetOutputBindingInfos();
+                for (size_t i = 0; i < numOutputs; i++)
+                {
+                    const armnn::TensorInfo& infoOut = infosOut[i].second;
+                    auto outputTensorFile = params.m_OutputTensorFiles.empty() ? "" : params.m_OutputTensorFiles[i];
+
+                    TensorPrinter printer(inferenceModelParams.m_OutputBindings[i],
+                                          infoOut,
+                                          outputTensorFile,
+                                          params.m_DequantizeOutput);
+                    mapbox::util::apply_visitor(printer, outputs[0][i]);
+                }
+
+                ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)
+                                << std::fixed << inference_duration.count() << " ms\n";
+
+                // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
+                if (params.m_ThresholdTime != 0.0)
+                {
+                    ARMNN_LOG(info) << "Threshold time: " << std::setprecision(2)
+                                    << std::fixed << params.m_ThresholdTime << " ms";
+                    auto thresholdMinusInference = params.m_ThresholdTime - inference_duration.count();
+                    ARMNN_LOG(info) << "Threshold time - Inference time: " << std::setprecision(2)
+                                    << std::fixed << thresholdMinusInference << " ms" << "\n";
+
+                    if (thresholdMinusInference < 0)
+                    {
+                        std::string errorMessage = "Elapsed inference time is greater than provided threshold time.";
+                        ARMNN_LOG(fatal) << errorMessage;
+                    }
+                }
+            }
+        }
+        else
+        {
+            try
+            {
+                ARMNN_LOG(info) << "Asynchronous Execution...  \n";
+                std::vector<std::future<std::tuple<armnn::profiling::ProfilingGuid,
+                std::chrono::duration<double, std::milli>>>> inferenceResults;
+                inferenceResults.reserve(params.m_SimultaneousIterations);
+
+                // Create WorkingMemHandles for each inference
+                std::vector<std::unique_ptr<armnn::experimental::IWorkingMemHandle>> workingMemHandles;
+                workingMemHandles.reserve(params.m_SimultaneousIterations);
+                for (unsigned int i = 0; i < params.m_SimultaneousIterations; ++i)
+                {
+                    workingMemHandles.push_back(model.CreateWorkingMemHandle());
+                }
+
+                // Run each inference in its own thread
+                for (unsigned int i = 0; i < params.m_SimultaneousIterations; ++i)
+                {
+                    armnn::experimental::IWorkingMemHandle& workingMemHandleRef = *workingMemHandles[i].get();
+                    inferenceResults.push_back(std::async(
+                        std::launch::async, [&model, &workingMemHandleRef, &inputs, &outputs, i]() {
+                            return model.RunAsync(workingMemHandleRef, inputs[i], outputs[i]);
+                        }
+                        ));
+                }
+
+                // Check the results
+                for (unsigned int j = 0; j < inferenceResults.size(); ++j)
+                {
+                    // Get the results
+                    auto inferenceResult = inferenceResults[j].get();
+                    auto inference_duration = std::get<1>(inferenceResult);
+                    auto inferenceID = std::get<0>(inferenceResult);
+
+                    if (params.m_GenerateTensorData)
+                    {
+                        ARMNN_LOG(warning) << "The input data was generated, note that the output will not be useful";
+                    }
+
+                    // Print output tensors
+                    const auto& infosOut = model.GetOutputBindingInfos();
+                    for (size_t i = 0; i < numOutputs; i++)
+                    {
+                        const armnn::TensorInfo& infoOut = infosOut[i].second;
+                        auto outputTensorFile = params.m_OutputTensorFiles.empty()
+                                                ? ""
+                                                : params.m_OutputTensorFiles[(j * numOutputs) + i];
+
+                        TensorPrinter printer(inferenceModelParams.m_OutputBindings[i],
+                                              infoOut,
+                                              outputTensorFile,
+                                              params.m_DequantizeOutput);
+                        mapbox::util::apply_visitor(printer, outputs[j][i]);
+                    }
+
+                    ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)
+                                    << std::fixed << inference_duration.count() << " ms\n";
+
+                    // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
+                    if (params.m_ThresholdTime != 0.0)
+                    {
+                        ARMNN_LOG(info) << "Threshold time: " << std::setprecision(2)
+                                        << std::fixed << params.m_ThresholdTime << " ms";
+                        auto thresholdMinusInference = params.m_ThresholdTime - inference_duration.count();
+                        ARMNN_LOG(info) << "Threshold time - Inference time: " << std::setprecision(2)
+                                        << std::fixed << thresholdMinusInference << " ms" << "\n";
+
+                        if (thresholdMinusInference < 0)
+                        {
+                            ARMNN_LOG(fatal) << "Elapsed inference time is greater than provided threshold time. \n";
+                        }
+                    }
+                    ARMNN_LOG(info) << "Asynchronous Execution is finished for Inference ID: " << inferenceID << " \n";
+
+                }
+            }
+            catch (const armnn::Exception& e)
+            {
+                ARMNN_LOG(fatal) << "Armnn Error: " << e.what();
+                return EXIT_FAILURE;
+            }
+
         }
     }
     catch (const armnn::Exception& e)

@@ -145,6 +145,12 @@ void ExecuteNetworkParams::ValidateParams()
 
         CheckModelFormat(m_ModelFormat);
 
+        // Check number of simultaneous iterations
+        if ((m_SimultaneousIterations < 1))
+        {
+            ARMNN_LOG(fatal) << "simultaneous-iterations cannot be less than 1. ";
+        }
+
         // Check input tensor shapes
         if ((m_InputTensorShapes.size() != 0) &&
             (m_InputTensorShapes.size() != m_InputNames.size()))
@@ -159,9 +165,18 @@ void ExecuteNetworkParams::ValidateParams()
                 ARMNN_LOG(fatal) << "One or more input data file paths are not valid. ";
             }
 
-            if (m_InputTensorDataFilePaths.size() != m_InputNames.size())
+            if (!m_Concurrent && m_InputTensorDataFilePaths.size() != m_InputNames.size())
             {
                 ARMNN_LOG(fatal) << "input-name and input-tensor-data must have the same amount of elements. ";
+            }
+
+            if (m_InputTensorDataFilePaths.size() < m_SimultaneousIterations * m_InputNames.size())
+            {
+                ARMNN_LOG(fatal) << "There is not enough input data for " << m_SimultaneousIterations << " execution.";
+            }
+            if (m_InputTensorDataFilePaths.size() > m_SimultaneousIterations * m_InputNames.size())
+            {
+                ARMNN_LOG(fatal) << "There is more input data for " << m_SimultaneousIterations << " execution.";
             }
         }
 
@@ -169,6 +184,12 @@ void ExecuteNetworkParams::ValidateParams()
             (m_OutputTensorFiles.size() != m_OutputNames.size()))
         {
             ARMNN_LOG(fatal) << "output-name and write-outputs-to-file must have the same amount of elements. ";
+        }
+
+        if ((m_OutputTensorFiles.size() != 0)
+            && m_OutputTensorFiles.size() != m_SimultaneousIterations * m_OutputNames.size())
+        {
+            ARMNN_LOG(fatal) << "There is not enough output data for " << m_SimultaneousIterations << " execution.";
         }
 
         if (m_InputTypes.size() == 0)

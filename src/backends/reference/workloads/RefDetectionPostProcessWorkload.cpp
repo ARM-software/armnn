@@ -46,10 +46,10 @@ void RefDetectionPostProcessWorkload::Execute(std::vector<ITensorHandle*> inputs
     auto scores       = MakeDecoder<float>(scoresInfo, inputs[1]->Map());
     auto anchors      = MakeDecoder<float>(anchorsInfo, m_Anchors->Map(false));
 
-    float* detectionBoxes   = GetOutputTensorData<float>(0, m_Data);
-    float* detectionClasses = GetOutputTensorData<float>(1, m_Data);
-    float* detectionScores  = GetOutputTensorData<float>(2, m_Data);
-    float* numDetections    = GetOutputTensorData<float>(3, m_Data);
+    float* detectionBoxes   = reinterpret_cast<float*>(outputs[0]->Map());
+    float* detectionClasses = reinterpret_cast<float*>(outputs[1]->Map());
+    float* detectionScores  = reinterpret_cast<float*>(outputs[2]->Map());
+    float* numDetections    = reinterpret_cast<float*>(outputs[3]->Map());
 
     DetectionPostProcess(boxEncodingsInfo, scoresInfo, anchorsInfo,
                          detectionBoxesInfo, detectionClassesInfo,

@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include "SampleDynamicAdditionWorkload.hpp"
 #include "SampleDynamicBackend.hpp"
@@ -45,7 +45,7 @@ std::unique_ptr<armnn::ITensorHandle> SampleDynamicWorkloadFactory::CreateTensor
         const armnn::TensorInfo& tensorInfo,
         const bool isMemoryManaged) const
 {
-    return std::make_unique<armnn::ScopedCpuTensorHandle>(tensorInfo);
+    return std::make_unique<armnn::ScopedTensorHandle>(tensorInfo);
 }
 
 std::unique_ptr<armnn::ITensorHandle> SampleDynamicWorkloadFactory::CreateTensorHandle(
@@ -53,7 +53,7 @@ std::unique_ptr<armnn::ITensorHandle> SampleDynamicWorkloadFactory::CreateTensor
         armnn::DataLayout dataLayout,
         const bool isMemoryManaged) const
 {
-    return std::make_unique<armnn::ScopedCpuTensorHandle>(tensorInfo);
+    return std::make_unique<armnn::ScopedTensorHandle>(tensorInfo);
 }
 
 std::unique_ptr<armnn::IWorkload> SampleDynamicWorkloadFactory::CreateAddition(

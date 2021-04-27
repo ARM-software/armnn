@@ -162,8 +162,8 @@ public:
             auto& newConv2dLayer = *graph.InsertNewLayer<ConvLayer>(base.GetInputSlot(0),
                                                                     convDescriptor,
                                                                     name.c_str());
-            newConv2dLayer.m_Weight = std::make_unique<ScopedCpuTensorHandle>(fusedWeightsTensor);
-            newConv2dLayer.m_Bias = std::make_unique<ScopedCpuTensorHandle>(ConstTensor(fusedBiasTensor));
+            newConv2dLayer.m_Weight = std::make_unique<ScopedTensorHandle>(fusedWeightsTensor);
+            newConv2dLayer.m_Bias = std::make_unique<ScopedTensorHandle>(ConstTensor(fusedBiasTensor));
 
             // Reconnects with original parent.
             newConv2dLayer.GetOutputSlot().MoveAllConnections(*parentOut);

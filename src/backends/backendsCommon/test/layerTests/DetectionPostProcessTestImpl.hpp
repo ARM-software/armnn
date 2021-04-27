@@ -8,7 +8,7 @@
 
 #include <armnn/Types.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
@@ -181,7 +181,7 @@ void DetectionPostProcessImpl(const armnn::TensorInfo& boxEncodingsInfo,
     auto outputScoresHandle = tensorHandleFactory.CreateTensorHandle(detectionScoresInfo);
     auto numDetectionHandle = tensorHandleFactory.CreateTensorHandle(numDetectionInfo);
 
-    armnn::ScopedCpuTensorHandle anchorsTensor(anchorsInfo);
+    armnn::ScopedTensorHandle anchorsTensor(anchorsInfo);
     AllocateAndCopyDataToITensorHandle(&anchorsTensor, &anchors[0][0]);
 
     armnn::DetectionPostProcessQueueDescriptor data;

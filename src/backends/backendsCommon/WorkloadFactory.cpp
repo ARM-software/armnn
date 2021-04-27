@@ -15,7 +15,7 @@
 #include <armnn/utility/TransformIterator.hpp>
 
 #include <backendsCommon/WorkloadFactory.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 

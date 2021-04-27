@@ -8,7 +8,7 @@
 
 #include <armnn/LstmParams.hpp>
 #include <armnn/TypesUtils.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 namespace armnn

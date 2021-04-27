@@ -8,7 +8,7 @@
 
 #include <QuantizeHelper.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <backendsCommon/test/DataTypeUtils.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
@@ -40,8 +40,8 @@ LayerTestResult<T, 2> SimpleFullyConnectedTestImpl(
 
     armnn::FullyConnectedQueueDescriptor data;
     armnn::WorkloadInfo info;
-    armnn::ScopedCpuTensorHandle weightsTensor(weightsDesc);
-    armnn::ScopedCpuTensorHandle biasTensor(biasesDesc);
+    armnn::ScopedTensorHandle weightsTensor(weightsDesc);
+    armnn::ScopedTensorHandle biasTensor(biasesDesc);
 
     AllocateAndCopyDataToITensorHandle(&weightsTensor, &weights[0][0]);
     AllocateAndCopyDataToITensorHandle(&biasTensor, &bias[0]);

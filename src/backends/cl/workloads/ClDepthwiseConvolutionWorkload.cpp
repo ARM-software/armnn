@@ -12,7 +12,7 @@
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <cl/ClTensorHandle.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/WorkloadUtils.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 
@@ -137,7 +137,7 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
 
     ARMNN_ASSERT(m_DepthwiseConvolutionLayer);
 
-    ScopedCpuTensorHandle weightsPermutedHandle(weightPermuted);
+    ScopedTensorHandle weightsPermutedHandle(weightPermuted);
     InitializeArmComputeClTensorData(*m_KernelTensor, &weightsPermutedHandle);
 
     if (m_BiasTensor)

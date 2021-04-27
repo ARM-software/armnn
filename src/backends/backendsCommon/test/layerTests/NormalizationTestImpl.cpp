@@ -10,7 +10,7 @@
 
 #include <armnn/utility/NumericCast.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
@@ -75,7 +75,7 @@ LayerTestResult<float,4> SimpleNormalizationTestImpl(
     data.m_Parameters.m_K = kappa;
     data.m_Parameters.m_DataLayout = armnn::DataLayout::NCHW;
 
-    armnn::PassthroughCpuTensorHandle refHandle(outputTensorInfo, &ret.outputExpected[0][0][0][0]);
+    armnn::PassthroughTensorHandle refHandle(outputTensorInfo, &ret.outputExpected[0][0][0][0]);
     armnn::NormalizationQueueDescriptor refData = data;
     armnn::WorkloadInfo refInfo = info;
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, &refHandle);
@@ -219,7 +219,7 @@ LayerTestResult<float,4> SimpleNormalizationNhwcTestImpl(
     data.m_Parameters.m_K = kappa;
     data.m_Parameters.m_DataLayout = armnn::DataLayout::NHWC;
 
-    armnn::PassthroughCpuTensorHandle refHandle(outputTensorInfo, &ret.outputExpected[0][0][0][0]);
+    armnn::PassthroughTensorHandle refHandle(outputTensorInfo, &ret.outputExpected[0][0][0][0]);
     armnn::NormalizationQueueDescriptor refData = data;
     armnn::WorkloadInfo refInfo = info;
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, &refHandle);

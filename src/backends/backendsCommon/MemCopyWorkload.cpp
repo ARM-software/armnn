@@ -6,7 +6,7 @@
 #include <ResolveType.hpp>
 
 #include <backendsCommon/MemCopyWorkload.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <armnn/utility/PolymorphicDowncast.hpp>
 

@@ -8,7 +8,7 @@
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <neon/NeonTensorHandle.hpp>
 #include <neon/NeonTimer.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <armnn/Utils.hpp>
 
@@ -33,7 +33,7 @@ void CopyArmComputeTensorData(arm_compute::Tensor& dstTensor, const T* srcData)
 }
 
 inline void InitializeArmComputeTensorData(arm_compute::Tensor& tensor,
-                                           const ConstCpuTensorHandle* handle)
+                                           const ConstTensorHandle* handle)
 {
     ARMNN_ASSERT(handle);
 

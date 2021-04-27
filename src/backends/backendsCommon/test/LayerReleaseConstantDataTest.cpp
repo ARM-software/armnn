@@ -7,7 +7,7 @@
 
 #include <Graph.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -35,10 +35,10 @@ BOOST_AUTO_TEST_CASE(ReleaseBatchNormalizationLayerConstantDataTest)
     BatchNormalizationLayer* const layer = graph.AddLayer<BatchNormalizationLayer>(layerDesc, "layer");
 
     armnn::TensorInfo weightInfo({3}, armnn::DataType::Float32);
-    layer->m_Mean     = std::make_unique<ScopedCpuTensorHandle>(weightInfo);
-    layer->m_Variance = std::make_unique<ScopedCpuTensorHandle>(weightInfo);
-    layer->m_Beta     = std::make_unique<ScopedCpuTensorHandle>(weightInfo);
-    layer->m_Gamma    = std::make_unique<ScopedCpuTensorHandle>(weightInfo);
+    layer->m_Mean     = std::make_unique<ScopedTensorHandle>(weightInfo);
+    layer->m_Variance = std::make_unique<ScopedTensorHandle>(weightInfo);
+    layer->m_Beta     = std::make_unique<ScopedTensorHandle>(weightInfo);
+    layer->m_Gamma    = std::make_unique<ScopedTensorHandle>(weightInfo);
     layer->m_Mean->Allocate();
     layer->m_Variance->Allocate();
     layer->m_Beta->Allocate();
@@ -87,9 +87,9 @@ BOOST_AUTO_TEST_CASE(ReleaseBatchNormalizationLayerConstantDataTest)
 
      Convolution2dLayer* const layer = graph.AddLayer<Convolution2dLayer>(layerDesc, "layer");
 
-     layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({2, 3, 5, 3},
+     layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({2, 3, 5, 3},
                                                                           armnn::DataType::Float32));
-     layer->m_Bias   = std::make_unique<ScopedCpuTensorHandle>
+     layer->m_Bias   = std::make_unique<ScopedTensorHandle>
              (TensorInfo({2}, GetBiasDataType(armnn::DataType::Float32)));
 
      layer->m_Weight->Allocate();
@@ -131,8 +131,8 @@ BOOST_AUTO_TEST_CASE(ReleaseDepthwiseConvolution2dLayerConstantDataTest)
 
     DepthwiseConvolution2dLayer* const layer = graph.AddLayer<DepthwiseConvolution2dLayer>(layerDesc, "layer");
 
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({3, 3, 5, 3}, DataType::Float32));
-    layer->m_Bias   = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({9}, DataType::Float32));
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({3, 3, 5, 3}, DataType::Float32));
+    layer->m_Bias   = std::make_unique<ScopedTensorHandle>(TensorInfo({9}, DataType::Float32));
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();
 
@@ -170,9 +170,9 @@ BOOST_AUTO_TEST_CASE(ReleaseFullyConnectedLayerConstantDataTest)
     float inputsQScale = 1.0f;
     float outputQScale = 2.0f;
 
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({7, 20},
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({7, 20},
                                                           DataType::QAsymmU8, inputsQScale, 0));
-    layer->m_Bias   = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({7},
+    layer->m_Bias   = std::make_unique<ScopedTensorHandle>(TensorInfo({7},
                                                           GetBiasDataType(DataType::QAsymmU8), inputsQScale));
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();

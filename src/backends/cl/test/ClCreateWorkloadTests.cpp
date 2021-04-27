@@ -395,8 +395,8 @@ BOOST_AUTO_TEST_CASE(CreateConvolution2dClCompiledContextWorkload)
 
 
     WorkloadInfo workloadInfo;
-    ScopedCpuTensorHandle weightTensor(kernelInfo);
-    ScopedCpuTensorHandle biasTensor(biasInfo);
+    ScopedTensorHandle weightTensor(kernelInfo);
+    ScopedTensorHandle biasTensor(biasInfo);
 
     AllocateAndCopyDataToITensorHandle(&weightTensor, kernelData.data());
     AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());

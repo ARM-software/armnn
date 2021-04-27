@@ -9,8 +9,8 @@
 #include <Graph.hpp>
 #include <InternalTypes.hpp>
 #include <layers/FullyConnectedLayer.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/WorkloadData.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <string>
 
@@ -240,7 +240,7 @@ BOOST_AUTO_TEST_CASE(ConstantTesst)
 
     const float Datum = 0.0f;
     ConstTensor output0({outputShape, DataType::Float32}, &Datum);
-    layer->m_LayerOutput = std::make_unique<ScopedCpuTensorHandle>(output0);
+    layer->m_LayerOutput = std::make_unique<ScopedTensorHandle>(output0);
 
     layer->GetOutputSlot(0).SetTensorInfo({{1, 1, 3, 3}, DataType::Float32});
 
@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE(Convolution2dTest)
 
     const float Datum = 0.0f;
     ConstTensor weights({{1, 1, 3, 3}, DataType::Float32}, &Datum);
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(weights);
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(weights);
 
     RunShapeInferenceTest<Convolution2dLayer>(layer, {{ 1, 1, 4, 4 }});
 }
@@ -339,7 +339,7 @@ BOOST_AUTO_TEST_CASE(DepthwiseConvolutionTest)
 
     const float Datum = 0.0f;
     ConstTensor weights({{ 2, 5, 3, 2 }, DataType::Float32}, &Datum);
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(weights);
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(weights);
 
     RunShapeInferenceTest<DepthwiseConvolution2dLayer>(layer, {{ 8, 18, 1, 2 }});
 }
@@ -379,7 +379,7 @@ BOOST_AUTO_TEST_CASE(DetectionPostProcessTest)
                                                        descriptor,
                                                        "detectionpostprocess");
 
-    layer->m_Anchors = std::make_unique<ScopedCpuTensorHandle>(anchorsTensor);
+    layer->m_Anchors = std::make_unique<ScopedTensorHandle>(anchorsTensor);
 
     RunShapeInferenceTest<DetectionPostProcessLayer>(layer, {{ 1, 3, 4 }, { 1, 3  }, { 1, 3 }, { 1 }});
 }
@@ -415,7 +415,7 @@ BOOST_AUTO_TEST_CASE(FullyConnectedTest)
 
     const float Datum = 0.0f;
     ConstTensor weights({{inputChannels, outputChannels}, DataType::Float32}, &Datum);
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(weights);
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(weights);
 
     RunShapeInferenceTest<FullyConnectedLayer>(layer, {{ 1, outputChannels }});
 }
@@ -469,18 +469,18 @@ BOOST_AUTO_TEST_CASE(LstmTest)
     float Datum = 0.0f;
     ConstTensor constTensor({{ 2, 5, 3, 2 }, DataType::Float32}, &Datum);
 
-    layer->m_BasicParameters.m_InputToCellWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_InputToForgetWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_CellBias = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_ForgetGateBias = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_CifgParameters.m_InputGateBias = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_OutputGateBias = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_RecurrentToForgetWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_RecurrentToCellWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_InputToOutputWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_RecurrentToOutputWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_CifgParameters.m_RecurrentToInputWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_CifgParameters.m_InputToInputWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_InputToCellWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_InputToForgetWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_CellBias = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_ForgetGateBias = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_CifgParameters.m_InputGateBias = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_OutputGateBias = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_RecurrentToForgetWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_RecurrentToCellWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_InputToOutputWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_RecurrentToOutputWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_CifgParameters.m_RecurrentToInputWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_CifgParameters.m_InputToInputWeights = std::make_unique<ScopedTensorHandle>(constTensor);
 
     RunShapeInferenceTest<LstmLayer>(layer, {{2, 80}, {2, 20}, {2, 20}, {2, 20}});
 }
@@ -557,18 +557,18 @@ BOOST_AUTO_TEST_CASE(QLstmTest)
     float Datum = 0.0f;
     ConstTensor constTensor({{ 2, 5, 3, 2 }, DataType::Float32}, &Datum);
 
-    layer->m_BasicParameters.m_InputToCellWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_InputToForgetWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_CellBias = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_ForgetGateBias = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_CifgParameters.m_InputGateBias = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_OutputGateBias = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_RecurrentToForgetWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_RecurrentToCellWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_InputToOutputWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_BasicParameters.m_RecurrentToOutputWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_CifgParameters.m_RecurrentToInputWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_CifgParameters.m_InputToInputWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_InputToCellWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_InputToForgetWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_CellBias = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_ForgetGateBias = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_CifgParameters.m_InputGateBias = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_OutputGateBias = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_RecurrentToForgetWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_RecurrentToCellWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_InputToOutputWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_BasicParameters.m_RecurrentToOutputWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_CifgParameters.m_RecurrentToInputWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_CifgParameters.m_InputToInputWeights = std::make_unique<ScopedTensorHandle>(constTensor);
 
     RunShapeInferenceTest<QLstmLayer>(layer, {{2, 20}, {2, 20}, {2, 20}});
 }
@@ -585,18 +585,18 @@ BOOST_AUTO_TEST_CASE(QuantizedLstmTest)
     float Datum = 0.0f;
     ConstTensor constTensor({{ 2, 5, 3, 2 }, DataType::Float32}, &Datum);
 
-    layer->m_QuantizedLstmParameters.m_InputToCellWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_QuantizedLstmParameters.m_InputToForgetWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_QuantizedLstmParameters.m_CellBias = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_QuantizedLstmParameters.m_ForgetGateBias = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_QuantizedLstmParameters.m_InputGateBias = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_QuantizedLstmParameters.m_OutputGateBias = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_QuantizedLstmParameters.m_RecurrentToForgetWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_QuantizedLstmParameters.m_RecurrentToCellWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_QuantizedLstmParameters.m_InputToOutputWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_QuantizedLstmParameters.m_RecurrentToOutputWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_QuantizedLstmParameters.m_RecurrentToInputWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
-    layer->m_QuantizedLstmParameters.m_InputToInputWeights = std::make_unique<ScopedCpuTensorHandle>(constTensor);
+    layer->m_QuantizedLstmParameters.m_InputToCellWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_QuantizedLstmParameters.m_InputToForgetWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_QuantizedLstmParameters.m_CellBias = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_QuantizedLstmParameters.m_ForgetGateBias = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_QuantizedLstmParameters.m_InputGateBias = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_QuantizedLstmParameters.m_OutputGateBias = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_QuantizedLstmParameters.m_RecurrentToForgetWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_QuantizedLstmParameters.m_RecurrentToCellWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_QuantizedLstmParameters.m_InputToOutputWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_QuantizedLstmParameters.m_RecurrentToOutputWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_QuantizedLstmParameters.m_RecurrentToInputWeights = std::make_unique<ScopedTensorHandle>(constTensor);
+    layer->m_QuantizedLstmParameters.m_InputToInputWeights = std::make_unique<ScopedTensorHandle>(constTensor);
 
     RunShapeInferenceTest<QuantizedLstmLayer>(layer, {{2, 20}, {2, 20}, {2, 20}});
 }

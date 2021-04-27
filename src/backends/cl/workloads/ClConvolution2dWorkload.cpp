@@ -12,7 +12,7 @@
 #include <cl/ClLayerSupport.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <arm_compute/runtime/CL/functions/CLConvolutionLayer.h>
 

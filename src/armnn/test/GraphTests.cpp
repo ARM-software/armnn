@@ -14,7 +14,7 @@
 
 #include <armnn/backends/IBackendInternal.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -603,7 +603,7 @@ BOOST_AUTO_TEST_CASE(CheckGraphConstTensorSharing)
 
         float weight = 1.0f;
         armnn::ConstTensor constTensor({{ 1, 1 }, armnn::DataType::Float32}, &weight);
-        fcLayer->m_Weight = std::make_shared<armnn::ScopedCpuTensorHandle>(constTensor);;
+        fcLayer->m_Weight = std::make_shared<armnn::ScopedTensorHandle>(constTensor);;
         // point sharedWeightPtr to graph1's const tensor
         sharedWeightPtr = fcLayer->m_Weight->GetConstTensor<float>();
 

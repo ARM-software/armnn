@@ -8,7 +8,7 @@
 #include "NeonWorkloadUtils.hpp"
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <neon/NeonTensorHandle.hpp>
 
 using namespace armnn::armcomputetensorutils;

@@ -9,16 +9,16 @@
 namespace armnn
 {
 
-class ScopedCpuTensorHandle;
+class ScopedTensorHandle;
 
 /// This layer represents a fully connected operation.
 class FullyConnectedLayer : public LayerWithParameters<FullyConnectedDescriptor>
 {
 public:
     /// A unique pointer to store Weight values.
-    std::shared_ptr<ConstCpuTensorHandle> m_Weight;
+    std::shared_ptr<ConstTensorHandle> m_Weight;
     /// A unique pointer to store Bias values.
-    std::shared_ptr<ConstCpuTensorHandle> m_Bias;
+    std::shared_ptr<ConstTensorHandle> m_Bias;
 
     /// Makes a workload for the FullyConnected type.
     /// @param [in] graph The graph where this layer can be found.

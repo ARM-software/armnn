@@ -9,7 +9,7 @@
 
 #include <armnn/utility/NumericCast.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
@@ -269,19 +269,19 @@ LstmNoCifgNoPeepholeNoProjectionTestImpl(
 
     auto outputGateBias = MakeTensor<float, 1>(tensorInfo4, {0., 0., 0., 0.});
 
-    armnn::ScopedCpuTensorHandle inputToInputWeightsTensor(tensorInfo8);
-    armnn::ScopedCpuTensorHandle inputToForgetWeightsTensor(tensorInfo8);
-    armnn::ScopedCpuTensorHandle inputToCellWeightsTensor(tensorInfo8);
-    armnn::ScopedCpuTensorHandle inputToOutputWeightsTensor(tensorInfo8);
-    armnn::ScopedCpuTensorHandle recurrentToInputWeightsTensor(tensorInfo16);
-    armnn::ScopedCpuTensorHandle recurrentToForgetWeightsTensor(tensorInfo16);
-    armnn::ScopedCpuTensorHandle recurrentToCellWeightsTensor(tensorInfo16);
-    armnn::ScopedCpuTensorHandle recurrentToOutputWeightsTensor(tensorInfo16);
-    armnn::ScopedCpuTensorHandle cellToInputWeightsTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle inputGateBiasTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle forgetGateBiasTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle cellBiasTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle outputGateBiasTensor(tensorInfo4);
+    armnn::ScopedTensorHandle inputToInputWeightsTensor(tensorInfo8);
+    armnn::ScopedTensorHandle inputToForgetWeightsTensor(tensorInfo8);
+    armnn::ScopedTensorHandle inputToCellWeightsTensor(tensorInfo8);
+    armnn::ScopedTensorHandle inputToOutputWeightsTensor(tensorInfo8);
+    armnn::ScopedTensorHandle recurrentToInputWeightsTensor(tensorInfo16);
+    armnn::ScopedTensorHandle recurrentToForgetWeightsTensor(tensorInfo16);
+    armnn::ScopedTensorHandle recurrentToCellWeightsTensor(tensorInfo16);
+    armnn::ScopedTensorHandle recurrentToOutputWeightsTensor(tensorInfo16);
+    armnn::ScopedTensorHandle cellToInputWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle inputGateBiasTensor(tensorInfo4);
+    armnn::ScopedTensorHandle forgetGateBiasTensor(tensorInfo4);
+    armnn::ScopedTensorHandle cellBiasTensor(tensorInfo4);
+    armnn::ScopedTensorHandle outputGateBiasTensor(tensorInfo4);
 
     AllocateAndCopyDataToITensorHandle(&inputToInputWeightsTensor, &inputToInputWeights[0][0]);
     AllocateAndCopyDataToITensorHandle(&inputToForgetWeightsTensor, &inputToForgetWeights[0][0]);
@@ -971,23 +971,23 @@ LstmLayerNoCifgWithPeepholeWithProjectionTestImpl(armnn::IWorkloadFactory& workl
     std::vector<float> projectionBiasVector(outputSize, 0.f);
     auto projectionBias = MakeTensor<float,1>(tensorInfo16, projectionBiasVector);
 
-    armnn::ScopedCpuTensorHandle inputToInputWeightsTensor(tensorInfo20x5);
-    armnn::ScopedCpuTensorHandle inputToForgetWeightsTensor(tensorInfo20x5);
-    armnn::ScopedCpuTensorHandle inputToCellWeightsTensor(tensorInfo20x5);
-    armnn::ScopedCpuTensorHandle inputToOutputWeightsTensor(tensorInfo20x5);
-    armnn::ScopedCpuTensorHandle recurrentToForgetWeightsTensor(tensorInfo20x16);
-    armnn::ScopedCpuTensorHandle recurrentToInputWeightsTensor(tensorInfo20x16);
-    armnn::ScopedCpuTensorHandle recurrentToCellWeightsTensor(tensorInfo20x16);
-    armnn::ScopedCpuTensorHandle recurrentToOutputWeightsTensor(tensorInfo20x16);
-    armnn::ScopedCpuTensorHandle cellToInputWeightsTensor(tensorInfo20);
-    armnn::ScopedCpuTensorHandle inputGateBiasTensor(tensorInfo20);
-    armnn::ScopedCpuTensorHandle forgetGateBiasTensor(tensorInfo20);
-    armnn::ScopedCpuTensorHandle cellBiasTensor(tensorInfo20);
-    armnn::ScopedCpuTensorHandle outputGateBiasTensor(tensorInfo20);
-    armnn::ScopedCpuTensorHandle cellToForgetWeightsTensor(tensorInfo20);
-    armnn::ScopedCpuTensorHandle cellToOutputWeightsTensor(tensorInfo20);
-    armnn::ScopedCpuTensorHandle projectionWeightsTensor(tensorInfo16x20);
-    armnn::ScopedCpuTensorHandle projectionBiasTensor(tensorInfo16);
+    armnn::ScopedTensorHandle inputToInputWeightsTensor(tensorInfo20x5);
+    armnn::ScopedTensorHandle inputToForgetWeightsTensor(tensorInfo20x5);
+    armnn::ScopedTensorHandle inputToCellWeightsTensor(tensorInfo20x5);
+    armnn::ScopedTensorHandle inputToOutputWeightsTensor(tensorInfo20x5);
+    armnn::ScopedTensorHandle recurrentToForgetWeightsTensor(tensorInfo20x16);
+    armnn::ScopedTensorHandle recurrentToInputWeightsTensor(tensorInfo20x16);
+    armnn::ScopedTensorHandle recurrentToCellWeightsTensor(tensorInfo20x16);
+    armnn::ScopedTensorHandle recurrentToOutputWeightsTensor(tensorInfo20x16);
+    armnn::ScopedTensorHandle cellToInputWeightsTensor(tensorInfo20);
+    armnn::ScopedTensorHandle inputGateBiasTensor(tensorInfo20);
+    armnn::ScopedTensorHandle forgetGateBiasTensor(tensorInfo20);
+    armnn::ScopedTensorHandle cellBiasTensor(tensorInfo20);
+    armnn::ScopedTensorHandle outputGateBiasTensor(tensorInfo20);
+    armnn::ScopedTensorHandle cellToForgetWeightsTensor(tensorInfo20);
+    armnn::ScopedTensorHandle cellToOutputWeightsTensor(tensorInfo20);
+    armnn::ScopedTensorHandle projectionWeightsTensor(tensorInfo16x20);
+    armnn::ScopedTensorHandle projectionBiasTensor(tensorInfo16);
 
     AllocateAndCopyDataToITensorHandle(&inputToInputWeightsTensor, &inputToInputWeights[0][0]);
     AllocateAndCopyDataToITensorHandle(&inputToForgetWeightsTensor, &inputToForgetWeights[0][0]);
@@ -1142,21 +1142,21 @@ LayerTestResult<T, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
     auto cellToOutputWeights = MakeTensor<float, 1>(tensorInfoNumUnits,
                 {-0.17135078f, 0.82760304f, 0.85573703f, -0.77109635f});
 
-    armnn::ScopedCpuTensorHandle inputToCellWeightsTensor(tensorInfoInput);
-    armnn::ScopedCpuTensorHandle inputToForgetWeightsTensor(tensorInfoInput);
-    armnn::ScopedCpuTensorHandle inputToOutputWeightsTensor(tensorInfoInput);
+    armnn::ScopedTensorHandle inputToCellWeightsTensor(tensorInfoInput);
+    armnn::ScopedTensorHandle inputToForgetWeightsTensor(tensorInfoInput);
+    armnn::ScopedTensorHandle inputToOutputWeightsTensor(tensorInfoInput);
 
-    armnn::ScopedCpuTensorHandle cellBiasTensor(tensorInfoNumUnits);
-    armnn::ScopedCpuTensorHandle forgetGateBiasTensor(tensorInfoNumUnits);
-    armnn::ScopedCpuTensorHandle outputGateBiasTensor(tensorInfoNumUnits);
+    armnn::ScopedTensorHandle cellBiasTensor(tensorInfoNumUnits);
+    armnn::ScopedTensorHandle forgetGateBiasTensor(tensorInfoNumUnits);
+    armnn::ScopedTensorHandle outputGateBiasTensor(tensorInfoNumUnits);
 
-    armnn::ScopedCpuTensorHandle recurrentToCellWeightsTensor(tensorInfoOutput);
-    armnn::ScopedCpuTensorHandle recurrentToForgetWeightsTensor(tensorInfoOutput);
-    armnn::ScopedCpuTensorHandle recurrentToOutputWeightsTensor(tensorInfoOutput);
+    armnn::ScopedTensorHandle recurrentToCellWeightsTensor(tensorInfoOutput);
+    armnn::ScopedTensorHandle recurrentToForgetWeightsTensor(tensorInfoOutput);
+    armnn::ScopedTensorHandle recurrentToOutputWeightsTensor(tensorInfoOutput);
 
 
-    armnn::ScopedCpuTensorHandle cellToForgetWeightsTensor(tensorInfoNumUnits);
-    armnn::ScopedCpuTensorHandle cellToOutputWeightsTensor(tensorInfoNumUnits);
+    armnn::ScopedTensorHandle cellToForgetWeightsTensor(tensorInfoNumUnits);
+    armnn::ScopedTensorHandle cellToOutputWeightsTensor(tensorInfoNumUnits);
 
     AllocateAndCopyDataToITensorHandle(&inputToCellWeightsTensor, &inputToCellWeights[0][0]);
     AllocateAndCopyDataToITensorHandle(&inputToForgetWeightsTensor, &inputToForgetWeights[0][0]);
@@ -1455,28 +1455,28 @@ LstmLayerNoCifgWithPeepholeWithProjectionWithLayerNormTestImpl(armnn::IWorkloadF
             MakeTensor<float, 1>(tensorInfo4, {0.6f, 0.2f, 0.2f, 0.5f}); //{numUnits}
 
 
-    armnn::ScopedCpuTensorHandle inputToInputWeightsTensor(tensorInfo4x5);
-    armnn::ScopedCpuTensorHandle inputToForgetWeightsTensor(tensorInfo4x5);
-    armnn::ScopedCpuTensorHandle inputToCellWeightsTensor(tensorInfo4x5);
-    armnn::ScopedCpuTensorHandle inputToOutputWeightsTensor(tensorInfo4x5);
-    armnn::ScopedCpuTensorHandle recurrentToForgetWeightsTensor(tensorInfo4x3);
-    armnn::ScopedCpuTensorHandle recurrentToInputWeightsTensor(tensorInfo4x3);
-    armnn::ScopedCpuTensorHandle recurrentToCellWeightsTensor(tensorInfo4x3);
-    armnn::ScopedCpuTensorHandle recurrentToOutputWeightsTensor(tensorInfo4x3);
-    armnn::ScopedCpuTensorHandle cellToInputWeightsTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle inputGateBiasTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle forgetGateBiasTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle cellBiasTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle outputGateBiasTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle cellToForgetWeightsTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle cellToOutputWeightsTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle projectionWeightsTensor(tensorInfo3x4);
-    armnn::ScopedCpuTensorHandle projectionBiasTensor(tensorInfo3);
+    armnn::ScopedTensorHandle inputToInputWeightsTensor(tensorInfo4x5);
+    armnn::ScopedTensorHandle inputToForgetWeightsTensor(tensorInfo4x5);
+    armnn::ScopedTensorHandle inputToCellWeightsTensor(tensorInfo4x5);
+    armnn::ScopedTensorHandle inputToOutputWeightsTensor(tensorInfo4x5);
+    armnn::ScopedTensorHandle recurrentToForgetWeightsTensor(tensorInfo4x3);
+    armnn::ScopedTensorHandle recurrentToInputWeightsTensor(tensorInfo4x3);
+    armnn::ScopedTensorHandle recurrentToCellWeightsTensor(tensorInfo4x3);
+    armnn::ScopedTensorHandle recurrentToOutputWeightsTensor(tensorInfo4x3);
+    armnn::ScopedTensorHandle cellToInputWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle inputGateBiasTensor(tensorInfo4);
+    armnn::ScopedTensorHandle forgetGateBiasTensor(tensorInfo4);
+    armnn::ScopedTensorHandle cellBiasTensor(tensorInfo4);
+    armnn::ScopedTensorHandle outputGateBiasTensor(tensorInfo4);
+    armnn::ScopedTensorHandle cellToForgetWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle cellToOutputWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle projectionWeightsTensor(tensorInfo3x4);
+    armnn::ScopedTensorHandle projectionBiasTensor(tensorInfo3);
 
-    armnn::ScopedCpuTensorHandle inputLayerNormWeightsTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle forgetLayerNormWeightsTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle cellLayerNormWeightsTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle outputLayerNormWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle inputLayerNormWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle forgetLayerNormWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle cellLayerNormWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle outputLayerNormWeightsTensor(tensorInfo4);
 
     AllocateAndCopyDataToITensorHandle(&inputToInputWeightsTensor, &inputToInputWeights[0][0]);
     AllocateAndCopyDataToITensorHandle(&inputToForgetWeightsTensor, &inputToForgetWeights[0][0]);
@@ -1673,21 +1673,21 @@ LayerTestResult<uint8_t, 2> QuantizedLstmTestImpl(
     auto cellBias       = MakeTensor<int32_t, 1>(biasInfo, {39481, 48624, 48976, -21419});
     auto outputGateBias = MakeTensor<int32_t, 1>(biasInfo, {-58999, -17050, -41852, -40538});
 
-    // ScopedCpuTensorHandles
-    armnn::ScopedCpuTensorHandle inputToInputWeightsTensor(inputWeightsInfo);
-    armnn::ScopedCpuTensorHandle inputToForgetWeightsTensor(inputWeightsInfo);
-    armnn::ScopedCpuTensorHandle inputToCellWeightsTensor(inputWeightsInfo);
-    armnn::ScopedCpuTensorHandle inputToOutputWeightsTensor(inputWeightsInfo);
+    // ScopedTensorHandles
+    armnn::ScopedTensorHandle inputToInputWeightsTensor(inputWeightsInfo);
+    armnn::ScopedTensorHandle inputToForgetWeightsTensor(inputWeightsInfo);
+    armnn::ScopedTensorHandle inputToCellWeightsTensor(inputWeightsInfo);
+    armnn::ScopedTensorHandle inputToOutputWeightsTensor(inputWeightsInfo);
 
-    armnn::ScopedCpuTensorHandle recurrentToInputWeightsTensor(recurrentWeightsInfo);
-    armnn::ScopedCpuTensorHandle recurrentToForgetWeightsTensor(recurrentWeightsInfo);
-    armnn::ScopedCpuTensorHandle recurrentToCellWeightsTensor(recurrentWeightsInfo);
-    armnn::ScopedCpuTensorHandle recurrentToOutputWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedTensorHandle recurrentToInputWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedTensorHandle recurrentToForgetWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedTensorHandle recurrentToCellWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedTensorHandle recurrentToOutputWeightsTensor(recurrentWeightsInfo);
 
-    armnn::ScopedCpuTensorHandle inputGateBiasTensor(biasInfo);
-    armnn::ScopedCpuTensorHandle forgetGateBiasTensor(biasInfo);
-    armnn::ScopedCpuTensorHandle cellBiasTensor(biasInfo);
-    armnn::ScopedCpuTensorHandle outputGateBiasTensor(biasInfo);
+    armnn::ScopedTensorHandle inputGateBiasTensor(biasInfo);
+    armnn::ScopedTensorHandle forgetGateBiasTensor(biasInfo);
+    armnn::ScopedTensorHandle cellBiasTensor(biasInfo);
+    armnn::ScopedTensorHandle outputGateBiasTensor(biasInfo);
 
     // Allocate and copy data
     AllocateAndCopyDataToITensorHandle(&inputToInputWeightsTensor, &inputToInputWeights[0][0]);
@@ -1891,22 +1891,22 @@ LayerTestResult<int8_t, 2> QLstmTestImpl(
     auto cellLayerNormWeights   = MakeTensor<int16_t, 1>(layerNormWeightsInfo, {22937, 6553, 9830, 26214});
     auto outputLayerNormWeights = MakeTensor<int16_t, 1>(layerNormWeightsInfo, {19660, 6553, 6553, 16384});
 
-    // ScopedCpuTensorHandles
-    armnn::ScopedCpuTensorHandle inputToForgetWeightsTensor(inputWeightsInfo);
-    armnn::ScopedCpuTensorHandle inputToCellWeightsTensor(inputWeightsInfo);
-    armnn::ScopedCpuTensorHandle inputToOutputWeightsTensor(inputWeightsInfo);
+    // ScopedTensorHandles
+    armnn::ScopedTensorHandle inputToForgetWeightsTensor(inputWeightsInfo);
+    armnn::ScopedTensorHandle inputToCellWeightsTensor(inputWeightsInfo);
+    armnn::ScopedTensorHandle inputToOutputWeightsTensor(inputWeightsInfo);
 
-    armnn::ScopedCpuTensorHandle recurrentToForgetWeightsTensor(recurrentWeightsInfo);
-    armnn::ScopedCpuTensorHandle recurrentToCellWeightsTensor(recurrentWeightsInfo);
-    armnn::ScopedCpuTensorHandle recurrentToOutputWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedTensorHandle recurrentToForgetWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedTensorHandle recurrentToCellWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedTensorHandle recurrentToOutputWeightsTensor(recurrentWeightsInfo);
 
-    armnn::ScopedCpuTensorHandle forgetGateBiasTensor(biasInfo);
-    armnn::ScopedCpuTensorHandle cellBiasTensor(biasInfo);
-    armnn::ScopedCpuTensorHandle outputGateBiasTensor(biasInfo);
+    armnn::ScopedTensorHandle forgetGateBiasTensor(biasInfo);
+    armnn::ScopedTensorHandle cellBiasTensor(biasInfo);
+    armnn::ScopedTensorHandle outputGateBiasTensor(biasInfo);
 
-    armnn::ScopedCpuTensorHandle forgetLayerNormWeightsTensor(layerNormWeightsInfo);
-    armnn::ScopedCpuTensorHandle cellLayerNormWeightsTensor(layerNormWeightsInfo);
-    armnn::ScopedCpuTensorHandle outputLayerNormWeightsTensor(layerNormWeightsInfo);
+    armnn::ScopedTensorHandle forgetLayerNormWeightsTensor(layerNormWeightsInfo);
+    armnn::ScopedTensorHandle cellLayerNormWeightsTensor(layerNormWeightsInfo);
+    armnn::ScopedTensorHandle outputLayerNormWeightsTensor(layerNormWeightsInfo);
 
     // Allocate and copy data
     AllocateAndCopyDataToITensorHandle(&inputToForgetWeightsTensor, &inputToForgetWeights[0][0]);
@@ -2145,28 +2145,28 @@ LayerTestResult<int8_t, 2> QLstmTestImpl1(
     auto projectionWeights = MakeTensor<int8_t, 2>(projectionWeightsInfo,
             {-25, 51, 3, -51, 25, 127, 77, 20, 18, 51, -102, 51});
 
-    // ScopedCpuTensorHandles
-    armnn::ScopedCpuTensorHandle inputToInputWeightsTensor(inputWeightsInfo);
-    armnn::ScopedCpuTensorHandle inputToForgetWeightsTensor(inputWeightsInfo);
-    armnn::ScopedCpuTensorHandle inputToCellWeightsTensor(inputWeightsInfo);
-    armnn::ScopedCpuTensorHandle inputToOutputWeightsTensor(inputWeightsInfo);
+    // ScopedTensorHandles
+    armnn::ScopedTensorHandle inputToInputWeightsTensor(inputWeightsInfo);
+    armnn::ScopedTensorHandle inputToForgetWeightsTensor(inputWeightsInfo);
+    armnn::ScopedTensorHandle inputToCellWeightsTensor(inputWeightsInfo);
+    armnn::ScopedTensorHandle inputToOutputWeightsTensor(inputWeightsInfo);
 
-    armnn::ScopedCpuTensorHandle recurrentToInputWeightsTensor(recurrentWeightsInfo);
-    armnn::ScopedCpuTensorHandle recurrentToForgetWeightsTensor(recurrentWeightsInfo);
-    armnn::ScopedCpuTensorHandle recurrentToCellWeightsTensor(recurrentWeightsInfo);
-    armnn::ScopedCpuTensorHandle recurrentToOutputWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedTensorHandle recurrentToInputWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedTensorHandle recurrentToForgetWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedTensorHandle recurrentToCellWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedTensorHandle recurrentToOutputWeightsTensor(recurrentWeightsInfo);
 
-    armnn::ScopedCpuTensorHandle inputGateBiasTensor(biasInfo);
-    armnn::ScopedCpuTensorHandle forgetGateBiasTensor(biasInfo);
-    armnn::ScopedCpuTensorHandle cellBiasTensor(biasInfo);
-    armnn::ScopedCpuTensorHandle outputGateBiasTensor(biasInfo);
+    armnn::ScopedTensorHandle inputGateBiasTensor(biasInfo);
+    armnn::ScopedTensorHandle forgetGateBiasTensor(biasInfo);
+    armnn::ScopedTensorHandle cellBiasTensor(biasInfo);
+    armnn::ScopedTensorHandle outputGateBiasTensor(biasInfo);
 
-    armnn::ScopedCpuTensorHandle inputLayerNormWeightsTensor(layerNormWeightsInfo);
-    armnn::ScopedCpuTensorHandle forgetLayerNormWeightsTensor(layerNormWeightsInfo);
-    armnn::ScopedCpuTensorHandle cellLayerNormWeightsTensor(layerNormWeightsInfo);
-    armnn::ScopedCpuTensorHandle outputLayerNormWeightsTensor(layerNormWeightsInfo);
+    armnn::ScopedTensorHandle inputLayerNormWeightsTensor(layerNormWeightsInfo);
+    armnn::ScopedTensorHandle forgetLayerNormWeightsTensor(layerNormWeightsInfo);
+    armnn::ScopedTensorHandle cellLayerNormWeightsTensor(layerNormWeightsInfo);
+    armnn::ScopedTensorHandle outputLayerNormWeightsTensor(layerNormWeightsInfo);
 
-    armnn::ScopedCpuTensorHandle projectionWeightsTensor(projectionWeightsInfo);
+    armnn::ScopedTensorHandle projectionWeightsTensor(projectionWeightsInfo);
 
     // Allocate and copy data
     AllocateAndCopyDataToITensorHandle(&inputToInputWeightsTensor, &inputToInputWeights[0][0]);
@@ -2411,24 +2411,24 @@ LayerTestResult<int8_t, 2> QLstmTestImpl2(
     auto projectionWeights = MakeTensor<int8_t, 2>(projectionWeightsInfo,
             {-25, 51, 3, -51, 25, 127, 77, 20, 18, 51, -102, 51});
 
-    // ScopedCpuTensorHandles
-    armnn::ScopedCpuTensorHandle inputToForgetWeightsTensor(inputWeightsInfo);
-    armnn::ScopedCpuTensorHandle inputToCellWeightsTensor(inputWeightsInfo);
-    armnn::ScopedCpuTensorHandle inputToOutputWeightsTensor(inputWeightsInfo);
+    // ScopedTensorHandles
+    armnn::ScopedTensorHandle inputToForgetWeightsTensor(inputWeightsInfo);
+    armnn::ScopedTensorHandle inputToCellWeightsTensor(inputWeightsInfo);
+    armnn::ScopedTensorHandle inputToOutputWeightsTensor(inputWeightsInfo);
 
-    armnn::ScopedCpuTensorHandle recurrentToForgetWeightsTensor(recurrentWeightsInfo);
-    armnn::ScopedCpuTensorHandle recurrentToCellWeightsTensor(recurrentWeightsInfo);
-    armnn::ScopedCpuTensorHandle recurrentToOutputWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedTensorHandle recurrentToForgetWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedTensorHandle recurrentToCellWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedTensorHandle recurrentToOutputWeightsTensor(recurrentWeightsInfo);
 
-    armnn::ScopedCpuTensorHandle forgetGateBiasTensor(biasInfo);
-    armnn::ScopedCpuTensorHandle cellBiasTensor(biasInfo);
-    armnn::ScopedCpuTensorHandle outputGateBiasTensor(biasInfo);
+    armnn::ScopedTensorHandle forgetGateBiasTensor(biasInfo);
+    armnn::ScopedTensorHandle cellBiasTensor(biasInfo);
+    armnn::ScopedTensorHandle outputGateBiasTensor(biasInfo);
 
-    armnn::ScopedCpuTensorHandle forgetLayerNormWeightsTensor(layerNormWeightsInfo);
-    armnn::ScopedCpuTensorHandle cellLayerNormWeightsTensor(layerNormWeightsInfo);
-    armnn::ScopedCpuTensorHandle outputLayerNormWeightsTensor(layerNormWeightsInfo);
+    armnn::ScopedTensorHandle forgetLayerNormWeightsTensor(layerNormWeightsInfo);
+    armnn::ScopedTensorHandle cellLayerNormWeightsTensor(layerNormWeightsInfo);
+    armnn::ScopedTensorHandle outputLayerNormWeightsTensor(layerNormWeightsInfo);
 
-    armnn::ScopedCpuTensorHandle projectionWeightsTensor(projectionWeightsInfo);
+    armnn::ScopedTensorHandle projectionWeightsTensor(projectionWeightsInfo);
 
     // Allocate and copy data
     AllocateAndCopyDataToITensorHandle(&inputToForgetWeightsTensor, &inputToForgetWeights[0][0]);

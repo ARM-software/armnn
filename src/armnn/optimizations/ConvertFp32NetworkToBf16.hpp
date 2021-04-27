@@ -35,7 +35,7 @@ inline LayerT* ConvertWeight(Layer* l)
             TensorInfo newInfo(info);
             newInfo.SetDataType(DataType::BFloat16);
             ConstTensor newInput(newInfo, newValues);
-            layer->m_Weight.reset(new ScopedCpuTensorHandle(newInput));
+            layer->m_Weight.reset(new ScopedTensorHandle(newInput));
         }
     }
     return layer;

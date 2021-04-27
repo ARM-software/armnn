@@ -72,8 +72,8 @@ BOOST_AUTO_TEST_CASE(Fp32NetworkToBf16OptimizationConv2DTest)
     armnn::Convolution2dDescriptor descriptor;
 
     auto conv = graph.AddLayer<armnn::Convolution2dLayer>(descriptor, "conv2d");
-    conv->m_Weight = std::make_unique<armnn::ScopedCpuTensorHandle>(weights);
-    conv->m_Bias = std::make_unique<armnn::ScopedCpuTensorHandle>(bias);
+    conv->m_Weight = std::make_unique<armnn::ScopedTensorHandle>(weights);
+    conv->m_Bias = std::make_unique<armnn::ScopedTensorHandle>(bias);
     conv->GetOutputSlot().SetTensorInfo(infoFP32);
 
     auto output = graph.AddLayer<armnn::OutputLayer>(1, "output");
@@ -142,8 +142,8 @@ BOOST_AUTO_TEST_CASE(Fp32NetworkToBf16OptimizationFullyConnectedTest)
     armnn::FullyConnectedDescriptor descriptor;
 
     auto fc = graph.AddLayer<armnn::FullyConnectedLayer>(descriptor, "fully");
-    fc->m_Weight = std::make_unique<armnn::ScopedCpuTensorHandle>(weights);
-    fc->m_Bias = std::make_unique<armnn::ScopedCpuTensorHandle>(bias);
+    fc->m_Weight = std::make_unique<armnn::ScopedTensorHandle>(weights);
+    fc->m_Bias = std::make_unique<armnn::ScopedTensorHandle>(bias);
     fc->GetOutputSlot().SetTensorInfo(infoFP32);
 
     auto output = graph.AddLayer<armnn::OutputLayer>(1, "output");

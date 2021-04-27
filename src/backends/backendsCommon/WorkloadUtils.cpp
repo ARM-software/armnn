@@ -11,7 +11,7 @@
 namespace armnn
 {
 
-armnn::ConstTensor PermuteTensor(const ConstCpuTensorHandle* tensor,
+armnn::ConstTensor PermuteTensor(const ConstTensorHandle* tensor,
                                  const PermutationVector& permutationVector, void* permuteBuffer)
 {
     ARMNN_ASSERT_MSG(tensor, "Invalid input tensor");
@@ -130,7 +130,7 @@ TensorInfo ConvertWeightTensorInfoFromArmnnToAcl(const TensorInfo& weightInfo, D
     return weightPermutedInfo;
 }
 
-armnn::ConstTensor ConvertWeightTensorFromArmnnToAcl(const ConstCpuTensorHandle* weightTensor,
+armnn::ConstTensor ConvertWeightTensorFromArmnnToAcl(const ConstTensorHandle* weightTensor,
                                                      DataLayout dataLayout,
                                                      void* permuteBuffer)
 {

@@ -8,7 +8,7 @@
 #include "Decoders.hpp"
 #include "Encoders.hpp"
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/Workload.hpp>
 
 namespace armnn
@@ -26,8 +26,8 @@ public:
 
 private:
     void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
-    std::unique_ptr<ScopedCpuTensorHandle> m_Weights;
-    std::unique_ptr<ScopedCpuTensorHandle> m_Biases;
+    std::unique_ptr<ScopedTensorHandle> m_Weights;
+    std::unique_ptr<ScopedTensorHandle> m_Biases;
 
     std::unique_ptr<Decoder<float>> m_WeightsDecoder;
     std::unique_ptr<Decoder<float>> m_BiasesDecoder;

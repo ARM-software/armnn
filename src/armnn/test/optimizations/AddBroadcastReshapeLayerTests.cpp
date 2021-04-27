@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_CASE(ReshapeParentConstLayerTest)
 
     uint8_t tensor[] = { 1, 1, 1, 1, 1 };
 
-    constant->m_LayerOutput = std::make_unique<ScopedCpuTensorHandle>(ConstTensor(info1, &tensor));
+    constant->m_LayerOutput = std::make_unique<ScopedTensorHandle>(ConstTensor(info1, &tensor));
 
     input->GetOutputSlot().SetTensorInfo(info0);
     constant->GetOutputSlot().SetTensorInfo(info1);
@@ -357,7 +357,7 @@ BOOST_AUTO_TEST_CASE(ReshapeParentConstAddLayerMultipleConnectionsTest)
     input->GetOutputSlot().SetTensorInfo(inputInfo);
     constant->GetOutputSlot().SetTensorInfo(constantTermInfo);
     float tensor[] = { 2.0f };
-    constant->m_LayerOutput = std::make_unique<ScopedCpuTensorHandle>(ConstTensor(constantTermInfo, &tensor));
+    constant->m_LayerOutput = std::make_unique<ScopedTensorHandle>(ConstTensor(constantTermInfo, &tensor));
     add1->GetOutputSlot().SetTensorInfo(outputInfo);
 
     input->GetOutputSlot().Connect(add1->GetInputSlot(0));

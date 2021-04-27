@@ -9,7 +9,7 @@
 namespace armnn
 {
 
-class ScopedCpuTensorHandle;
+class ScopedTensorHandle;
 
 /// A layer that the constant data can be bound to.
 class ConstantLayer : public Layer
@@ -43,7 +43,7 @@ public:
 
     void ExecuteStrategy(IStrategy& strategy) const override;
 
-    std::shared_ptr<ConstCpuTensorHandle> m_LayerOutput;
+    std::shared_ptr<ConstTensorHandle> m_LayerOutput;
 
 protected:
     /// Constructor to create a ConstantLayer.

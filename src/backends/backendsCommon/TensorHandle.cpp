@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include <armnn/Exceptions.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <cstring>
 
@@ -28,54 +28,54 @@ TensorShape GetUnpaddedTensorStrides(const TensorInfo& tensorInfo)
     return TensorShape(shape.GetNumDimensions(), strides.data());
 }
 
-ConstCpuTensorHandle::ConstCpuTensorHandle(const TensorInfo& tensorInfo)
+ConstTensorHandle::ConstTensorHandle(const TensorInfo& tensorInfo)
 : m_TensorInfo(tensorInfo)
 , m_Memory(nullptr)
 {
 }
 
 template <>
-const void* ConstCpuTensorHandle::GetConstTensor<void>() const
+const void* ConstTensorHandle::GetConstTensor<void>() const
 {
     return m_Memory;
 }
 
-CpuTensorHandle::CpuTensorHandle(const TensorInfo& tensorInfo)
-: ConstCpuTensorHandle(tensorInfo)
+TensorHandle::TensorHandle(const TensorInfo& tensorInfo)
+: ConstTensorHandle(tensorInfo)
 , m_MutableMemory(nullptr)
 {
 }
 
 template <>
-void* CpuTensorHandle::GetTensor<void>() const
+void* TensorHandle::GetTensor<void>() const
 {
     return m_MutableMemory;
 }
 
-ScopedCpuTensorHandle::ScopedCpuTensorHandle(const TensorInfo& tensorInfo)
-: CpuTensorHandle(tensorInfo)
+ScopedTensorHandle::ScopedTensorHandle(const TensorInfo& tensorInfo)
+: TensorHandle(tensorInfo)
 {
 }
 
-ScopedCpuTensorHandle::ScopedCpuTensorHandle(const ConstTensor& tensor)
-: ScopedCpuTensorHandle(tensor.GetInfo())
+ScopedTensorHandle::ScopedTensorHandle(const ConstTensor& tensor)
+: ScopedTensorHandle(tensor.GetInfo())
 {
     CopyFrom(tensor.GetMemoryArea(), tensor.GetNumBytes());
 }
 
-ScopedCpuTensorHandle::ScopedCpuTensorHandle(const ConstCpuTensorHandle& tensorHandle)
-: ScopedCpuTensorHandle(tensorHandle.GetTensorInfo())
+ScopedTensorHandle::ScopedTensorHandle(const ConstTensorHandle& tensorHandle)
+: ScopedTensorHandle(tensorHandle.GetTensorInfo())
 {
     CopyFrom(tensorHandle.GetConstTensor<void>(), tensorHandle.GetTensorInfo().GetNumBytes());
 }
 
-ScopedCpuTensorHandle::ScopedCpuTensorHandle(const ScopedCpuTensorHandle& other)
-: CpuTensorHandle(other.GetTensorInfo())
+ScopedTensorHandle::ScopedTensorHandle(const ScopedTensorHandle& other)
+: TensorHandle(other.GetTensorInfo())
 {
     CopyFrom(other);
 }
 
-ScopedCpuTensorHandle& ScopedCpuTensorHandle::operator=(const ScopedCpuTensorHandle& other)
+ScopedTensorHandle& ScopedTensorHandle::operator=(const ScopedTensorHandle& other)
 {
     ::operator delete(GetTensor<void>());
     SetMemory(nullptr);
@@ -83,12 +83,12 @@ ScopedCpuTensorHandle& ScopedCpuTensorHandle::operator=(const ScopedCpuTensorHan
     return *this;
 }
 
-ScopedCpuTensorHandle::~ScopedCpuTensorHandle()
+ScopedTensorHandle::~ScopedTensorHandle()
 {
     ::operator delete(GetTensor<void>());
 }
 
-void ScopedCpuTensorHandle::Allocate()
+void ScopedTensorHandle::Allocate()
 {
     if (GetTensor<void>() == nullptr)
     {
@@ -96,27 +96,27 @@ void ScopedCpuTensorHandle::Allocate()
     }
     else
     {
-        throw InvalidArgumentException("CpuTensorHandle::Allocate Trying to allocate a CpuTensorHandle"
+        throw InvalidArgumentException("TensorHandle::Allocate Trying to allocate a TensorHandle"
             "that already has allocated memory.");
     }
 }
 
-void ScopedCpuTensorHandle::CopyOutTo(void* memory) const
+void ScopedTensorHandle::CopyOutTo(void* memory) const
 {
     memcpy(memory, GetTensor<void>(), GetTensorInfo().GetNumBytes());
 }
 
-void ScopedCpuTensorHandle::CopyInFrom(const void* memory)
+void ScopedTensorHandle::CopyInFrom(const void* memory)
 {
     memcpy(GetTensor<void>(), memory, GetTensorInfo().GetNumBytes());
 }
 
-void ScopedCpuTensorHandle::CopyFrom(const ScopedCpuTensorHandle& other)
+void ScopedTensorHandle::CopyFrom(const ScopedTensorHandle& other)
 {
     CopyFrom(other.GetTensor<void>(), other.GetTensorInfo().GetNumBytes());
 }
 
-void ScopedCpuTensorHandle::CopyFrom(const void* srcMemory, unsigned int numBytes)
+void ScopedTensorHandle::CopyFrom(const void* srcMemory, unsigned int numBytes)
 {
     ARMNN_ASSERT(GetTensor<void>() == nullptr);
     ARMNN_ASSERT(GetTensorInfo().GetNumBytes() == numBytes);
@@ -128,14 +128,14 @@ void ScopedCpuTensorHandle::CopyFrom(const void* srcMemory, unsigned int numByte
     }
 }
 
-void PassthroughCpuTensorHandle::Allocate()
+void PassthroughTensorHandle::Allocate()
 {
-    throw InvalidArgumentException("PassthroughCpuTensorHandle::Allocate() should never be called");
+    throw InvalidArgumentException("PassthroughTensorHandle::Allocate() should never be called");
 }
 
-void ConstPassthroughCpuTensorHandle::Allocate()
+void ConstPassthroughTensorHandle::Allocate()
 {
-    throw InvalidArgumentException("ConstPassthroughCpuTensorHandle::Allocate() should never be called");
+    throw InvalidArgumentException("ConstPassthroughTensorHandle::Allocate() should never be called");
 }
 
 } // namespace armnn

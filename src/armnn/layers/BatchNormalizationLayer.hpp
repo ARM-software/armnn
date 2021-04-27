@@ -9,20 +9,20 @@
 namespace armnn
 {
 
-class ScopedCpuTensorHandle;
+class ScopedTensorHandle;
 
 /// This layer represents a batch normalization operation.
 class BatchNormalizationLayer : public LayerWithParameters<BatchNormalizationDescriptor>
 {
 public:
     /// A unique pointer to store Mean values
-    std::shared_ptr<ConstCpuTensorHandle> m_Mean;
+    std::shared_ptr<ConstTensorHandle> m_Mean;
     /// A unique pointer to store Variance values
-    std::shared_ptr<ConstCpuTensorHandle> m_Variance;
+    std::shared_ptr<ConstTensorHandle> m_Variance;
     /// A unique pointer to store Beta values
-    std::shared_ptr<ConstCpuTensorHandle> m_Beta;
+    std::shared_ptr<ConstTensorHandle> m_Beta;
     /// A unique pointer to store Gamma values
-    std::shared_ptr<ConstCpuTensorHandle> m_Gamma;
+    std::shared_ptr<ConstTensorHandle> m_Gamma;
 
     /// Makes a workload for the BatchNormalization type.
     /// @param [in] graph The graph where this layer can be found.

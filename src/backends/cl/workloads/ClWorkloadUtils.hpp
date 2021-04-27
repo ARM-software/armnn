@@ -8,7 +8,7 @@
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <cl/OpenClTimer.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <armnn/Utils.hpp>
 
@@ -88,7 +88,7 @@ inline auto SetClSliceData(const std::vector<unsigned int>& m_begin,
 }
 
 inline void InitializeArmComputeClTensorData(arm_compute::CLTensor& clTensor,
-                                             const ConstCpuTensorHandle* handle)
+                                             const ConstTensorHandle* handle)
 {
     ARMNN_ASSERT(handle);
 

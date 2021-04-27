@@ -10,7 +10,7 @@
 
 #include <Graph.hpp>
 #include <Optimizer.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
 #include <boost/test/unit_test.hpp>

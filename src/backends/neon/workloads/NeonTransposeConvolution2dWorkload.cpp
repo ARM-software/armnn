@@ -13,7 +13,7 @@
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <neon/workloads/NeonWorkloadUtils.hpp>
 

@@ -21,7 +21,7 @@ public:
 
 private:
     void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
-    std::unique_ptr<ScopedCpuTensorHandle> m_Anchors;
+    std::unique_ptr<ScopedTensorHandle> m_Anchors;
 };
 
 } //namespace armnn

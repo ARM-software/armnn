@@ -173,8 +173,8 @@ BOOST_AUTO_TEST_CASE(TestManagedConstTensorHandle)
     void* mem = nullptr;
     TensorInfo info;
 
-    // Use PassthroughCpuTensor as others are abstract
-    auto passThroughHandle = std::make_shared<PassthroughCpuTensorHandle>(info, mem);
+    // Use PassthroughTensor as others are abstract
+    auto passThroughHandle = std::make_shared<PassthroughTensorHandle>(info, mem);
 
     // Test managed handle is initialized with m_Mapped unset and once Map() called its set
     ManagedConstTensorHandle managedHandle(passThroughHandle);

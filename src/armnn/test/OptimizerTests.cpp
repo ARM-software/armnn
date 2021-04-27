@@ -18,9 +18,9 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnnUtils/FloatingPointConverter.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/LayerSupportBase.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -45,23 +45,23 @@ void CreateLSTMLayerHelper(Graph &graph, bool CifgEnabled)
     unsigned int numUnits = 4;
     unsigned int outputSize = 4;
 
-    layer->m_BasicParameters.m_InputToForgetWeights = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_InputToForgetWeights = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits, inputSize }, DataType::Float32));
-    layer->m_BasicParameters.m_InputToCellWeights = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_InputToCellWeights = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits, inputSize }, DataType::Float32));
-    layer->m_BasicParameters.m_InputToOutputWeights = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_InputToOutputWeights = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits, inputSize }, DataType::Float32));
-    layer->m_BasicParameters.m_RecurrentToForgetWeights = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_RecurrentToForgetWeights = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits, outputSize }, DataType::Float32));
-    layer->m_BasicParameters.m_RecurrentToCellWeights = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_RecurrentToCellWeights = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits, outputSize }, DataType::Float32));
-    layer->m_BasicParameters.m_RecurrentToOutputWeights = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_RecurrentToOutputWeights = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits, outputSize }, DataType::Float32));
-    layer->m_BasicParameters.m_ForgetGateBias = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_ForgetGateBias = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits }, DataType::Float32));
-    layer->m_BasicParameters.m_CellBias = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_CellBias = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits }, DataType::Float32));
-    layer->m_BasicParameters.m_OutputGateBias = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_OutputGateBias = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits }, DataType::Float32));
 
     layer->m_BasicParameters.m_InputToForgetWeights->Allocate();
@@ -76,11 +76,11 @@ void CreateLSTMLayerHelper(Graph &graph, bool CifgEnabled)
 
     if (!layerDesc.m_CifgEnabled)
     {
-        layer->m_CifgParameters.m_InputToInputWeights = std::make_unique<ScopedCpuTensorHandle>
+        layer->m_CifgParameters.m_InputToInputWeights = std::make_unique<ScopedTensorHandle>
                 (TensorInfo({ numUnits, inputSize }, DataType::Float32));
-        layer->m_CifgParameters.m_RecurrentToInputWeights = std::make_unique<ScopedCpuTensorHandle>
+        layer->m_CifgParameters.m_RecurrentToInputWeights = std::make_unique<ScopedTensorHandle>
                 (TensorInfo({ numUnits, outputSize }, DataType::Float32));
-        layer->m_CifgParameters.m_InputGateBias = std::make_unique<ScopedCpuTensorHandle>
+        layer->m_CifgParameters.m_InputGateBias = std::make_unique<ScopedTensorHandle>
                 (TensorInfo({ numUnits }, DataType::Float32));
         layer->m_CifgParameters.m_InputToInputWeights->Allocate();
         layer->m_CifgParameters.m_RecurrentToInputWeights->Allocate();
@@ -89,9 +89,9 @@ void CreateLSTMLayerHelper(Graph &graph, bool CifgEnabled)
 
     if (layerDesc.m_ProjectionEnabled)
     {
-        layer->m_ProjectionParameters.m_ProjectionWeights = std::make_unique<ScopedCpuTensorHandle>
+        layer->m_ProjectionParameters.m_ProjectionWeights = std::make_unique<ScopedTensorHandle>
                 (TensorInfo({ outputSize, numUnits }, DataType::Float32));
-        layer->m_ProjectionParameters.m_ProjectionBias = std::make_unique<ScopedCpuTensorHandle>
+        layer->m_ProjectionParameters.m_ProjectionBias = std::make_unique<ScopedTensorHandle>
                 (TensorInfo({ outputSize }, DataType::Float32));
         layer->m_ProjectionParameters.m_ProjectionWeights->Allocate();
         layer->m_ProjectionParameters.m_ProjectionBias->Allocate();
@@ -101,13 +101,13 @@ void CreateLSTMLayerHelper(Graph &graph, bool CifgEnabled)
     {
         if (!layerDesc.m_CifgEnabled)
         {
-            layer->m_PeepholeParameters.m_CellToInputWeights = std::make_unique<ScopedCpuTensorHandle>
+            layer->m_PeepholeParameters.m_CellToInputWeights = std::make_unique<ScopedTensorHandle>
                     (TensorInfo({ numUnits }, DataType::Float32));
             layer->m_PeepholeParameters.m_CellToInputWeights->Allocate();
         }
-        layer->m_PeepholeParameters.m_CellToForgetWeights = std::make_unique<ScopedCpuTensorHandle>
+        layer->m_PeepholeParameters.m_CellToForgetWeights = std::make_unique<ScopedTensorHandle>
                 (TensorInfo({ numUnits }, DataType::Float32));
-        layer->m_PeepholeParameters.m_CellToOutputWeights = std::make_unique<ScopedCpuTensorHandle>
+        layer->m_PeepholeParameters.m_CellToOutputWeights = std::make_unique<ScopedTensorHandle>
                 (TensorInfo({ numUnits }, DataType::Float32));
         layer->m_PeepholeParameters.m_CellToForgetWeights->Allocate();
         layer->m_PeepholeParameters.m_CellToOutputWeights->Allocate();
@@ -276,7 +276,7 @@ void CreateConvolution2dGraph(Graph &graph, const unsigned int* inputShape,
     input->GetOutputSlot().SetTensorInfo(inputInfo);
 
     Convolution2dLayer* layer = graph.AddLayer<Convolution2dLayer>(desc, "conv2d");
-    layer->m_Weight           = std::make_unique<armnn::ScopedCpuTensorHandle>(weights);
+    layer->m_Weight           = std::make_unique<armnn::ScopedTensorHandle>(weights);
     layer->GetOutputSlot().SetTensorInfo(outputInfo);
 
     Layer* output = graph.AddLayer<OutputLayer>(0, "output");
@@ -326,7 +326,7 @@ void CreateDepthwiseConvolution2dGraph(Graph &graph, const unsigned int* inputSh
     input->GetOutputSlot().SetTensorInfo(inputInfo);
 
     DepthwiseConvolution2dLayer* layer = graph.AddLayer<DepthwiseConvolution2dLayer>(desc, "depthwiseConv2d");
-    layer->m_Weight                    = std::make_unique<armnn::ScopedCpuTensorHandle>(weights);
+    layer->m_Weight                    = std::make_unique<armnn::ScopedTensorHandle>(weights);
     layer->GetOutputSlot().SetTensorInfo(outputInfo);
 
     Layer* output = graph.AddLayer<OutputLayer>(0, "output");
@@ -529,7 +529,7 @@ BOOST_AUTO_TEST_CASE(DetectionPostProcessValidateTensorShapes)
     descriptor.m_MaxDetections = 3;
 
     DetectionPostProcessLayer* layer = graph.AddLayer<DetectionPostProcessLayer>(descriptor, "detectionPostProcess");
-    layer->m_Anchors = std::make_unique<armnn::ScopedCpuTensorHandle>(anchors);
+    layer->m_Anchors = std::make_unique<armnn::ScopedTensorHandle>(anchors);
     layer->GetOutputSlot(0).SetTensorInfo(detectionBoxesInfo);
     layer->GetOutputSlot(1).SetTensorInfo(detectionScoresInfo);
     layer->GetOutputSlot(2).SetTensorInfo(detectionClassesInfo);
@@ -571,7 +571,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConvolution2dLayer)
     armnn::ConstTensor weights(armnn::TensorInfo(4, weightsShape, armnn::DataType::Float32), weightsVector);
 
     Convolution2dLayer* conv2dLayer = graph.AddLayer<Convolution2dLayer>(convolution2dDescriptor, "conv2d");
-    conv2dLayer->m_Weight           = std::make_unique<armnn::ScopedCpuTensorHandle>(weights);
+    conv2dLayer->m_Weight           = std::make_unique<armnn::ScopedTensorHandle>(weights);
     conv2dLayer->GetOutputSlot().SetTensorInfo(outputInfo);
 
     Layer* output = graph.AddLayer<OutputLayer>(0, "output");
@@ -1211,16 +1211,16 @@ BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnectionsFuseTest)
     input->GetOutputSlot().SetTensorInfo(inputInfo);
     conv->GetOutputSlot().SetTensorInfo(outputInfo);
     batchNorm->GetOutputSlot().SetTensorInfo(outputInfo);
-    conv->m_Weight        = std::make_unique<ScopedCpuTensorHandle>(weights);
-    batchNorm->m_Beta     = std::make_unique<ScopedCpuTensorHandle>(beta);
-    batchNorm->m_Gamma    = std::make_unique<ScopedCpuTensorHandle>(gamma);
-    batchNorm->m_Mean     = std::make_unique<ScopedCpuTensorHandle>(mean);
-    batchNorm->m_Variance = std::make_unique<ScopedCpuTensorHandle>(variance);
+    conv->m_Weight        = std::make_unique<ScopedTensorHandle>(weights);
+    batchNorm->m_Beta     = std::make_unique<ScopedTensorHandle>(beta);
+    batchNorm->m_Gamma    = std::make_unique<ScopedTensorHandle>(gamma);
+    batchNorm->m_Mean     = std::make_unique<ScopedTensorHandle>(mean);
+    batchNorm->m_Variance = std::make_unique<ScopedTensorHandle>(variance);
     if (convolution2dDescriptor.m_BiasEnabled)
     {
         std::vector<float> biasVector = { 11 };
         ConstTensor bias(TensorInfo(1, outputChannelSize, DataType::Float32), biasVector);
-        conv->m_Bias = std::make_unique<ScopedCpuTensorHandle>(bias);
+        conv->m_Bias = std::make_unique<ScopedTensorHandle>(bias);
     }
 
     // Connect layers

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "BaseIterator.hpp"
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 // Helper functions ported from the Android code base
 // Refer to: android/external/tensorflow/tensorflow/contrib/lite/kernels/internal/reference/portable_tensor_utils.cc
@@ -85,4 +85,4 @@ void SetActivationParameters(uint32_t activation,
                              float& outA,
                              float& outB);
 
-std::unique_ptr<armnn::ScopedCpuTensorHandle> AssignScopedCpuTensorHandle(const armnn::ConstCpuTensorHandle* ptr);
+std::unique_ptr<armnn::ScopedTensorHandle> AssignScopedTensorHandle(const armnn::ConstTensorHandle *ptr);

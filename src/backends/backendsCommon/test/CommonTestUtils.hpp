@@ -13,7 +13,7 @@
 #include <armnn/BackendRegistry.hpp>
 
 #include <armnn/Types.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <test/TestUtils.hpp>
 
@@ -72,8 +72,8 @@ bool Compare(T a, T b, float tolerance = 0.000001f)
 template <typename ConvolutionLayer>
 void SetWeightAndBias(ConvolutionLayer* layer, const armnn::TensorInfo& weightInfo, const armnn::TensorInfo& biasInfo)
 {
-    layer->m_Weight = std::make_unique<armnn::ScopedCpuTensorHandle>(weightInfo);
-    layer->m_Bias   = std::make_unique<armnn::ScopedCpuTensorHandle>(biasInfo);
+    layer->m_Weight = std::make_unique<armnn::ScopedTensorHandle>(weightInfo);
+    layer->m_Bias   = std::make_unique<armnn::ScopedTensorHandle>(biasInfo);
 
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();

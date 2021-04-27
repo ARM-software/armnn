@@ -9,9 +9,9 @@
 
 #include <armnn/utility/NumericCast.hpp>
 
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
 
 namespace armnn
 {

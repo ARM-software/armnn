@@ -11,7 +11,7 @@
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnnUtils/DataLayoutIndexed.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 #include <reference/test/RefWorkloadFactoryHelper.hpp>
@@ -74,10 +74,10 @@ LayerTestResult<T, 4> BatchNormTestImpl(
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
-    armnn::ScopedCpuTensorHandle meanTensor(tensorInfo);
-    armnn::ScopedCpuTensorHandle varianceTensor(tensorInfo);
-    armnn::ScopedCpuTensorHandle betaTensor(tensorInfo);
-    armnn::ScopedCpuTensorHandle gammaTensor(tensorInfo);
+    armnn::ScopedTensorHandle meanTensor(tensorInfo);
+    armnn::ScopedTensorHandle varianceTensor(tensorInfo);
+    armnn::ScopedTensorHandle betaTensor(tensorInfo);
+    armnn::ScopedTensorHandle gammaTensor(tensorInfo);
 
     armnn::BatchNormalizationQueueDescriptor descriptor;
     descriptor.m_Mean                    = &meanTensor;
@@ -160,10 +160,10 @@ LayerTestResult<T,4> BatchNormTestNhwcImpl(
 
     armnn::BatchNormalizationQueueDescriptor data;
     armnn::WorkloadInfo info;
-    armnn::ScopedCpuTensorHandle meanTensor(tensorInfo);
-    armnn::ScopedCpuTensorHandle varianceTensor(tensorInfo);
-    armnn::ScopedCpuTensorHandle betaTensor(tensorInfo);
-    armnn::ScopedCpuTensorHandle gammaTensor(tensorInfo);
+    armnn::ScopedTensorHandle meanTensor(tensorInfo);
+    armnn::ScopedTensorHandle varianceTensor(tensorInfo);
+    armnn::ScopedTensorHandle betaTensor(tensorInfo);
+    armnn::ScopedTensorHandle gammaTensor(tensorInfo);
 
     AllocateAndCopyDataToITensorHandle(&meanTensor, &mean[0]);
     AllocateAndCopyDataToITensorHandle(&varianceTensor, &variance[0]);
@@ -644,10 +644,10 @@ LayerTestResult<float,4> CompareBatchNormTest(
 
     armnn::BatchNormalizationQueueDescriptor data;
     armnn::WorkloadInfo info;
-    armnn::ScopedCpuTensorHandle meanTensor(tensorInfo);
-    armnn::ScopedCpuTensorHandle varianceTensor(tensorInfo);
-    armnn::ScopedCpuTensorHandle betaTensor(tensorInfo);
-    armnn::ScopedCpuTensorHandle gammaTensor(tensorInfo);
+    armnn::ScopedTensorHandle meanTensor(tensorInfo);
+    armnn::ScopedTensorHandle varianceTensor(tensorInfo);
+    armnn::ScopedTensorHandle betaTensor(tensorInfo);
+    armnn::ScopedTensorHandle gammaTensor(tensorInfo);
 
     AllocateAndCopyDataToITensorHandle(&meanTensor, &mean[0]);
     AllocateAndCopyDataToITensorHandle(&varianceTensor, &variance[0]);

@@ -10,7 +10,7 @@
 
 #include <armnnUtils/Permute.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <backendsCommon/test/DataLayoutUtils.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
@@ -68,7 +68,7 @@ void TransposeConvolution2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
     }
 
     // set up weights
-    ScopedCpuTensorHandle weightsTensor(weights.first);
+    ScopedTensorHandle weightsTensor(weights.first);
 
     TransposeConvolution2dQueueDescriptor queueDescriptor;
     queueDescriptor.m_Parameters = descriptor;
@@ -76,11 +76,11 @@ void TransposeConvolution2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
 
     AllocateAndCopyDataToITensorHandle(&weightsTensor, weights.second.data());
 
-    std::unique_ptr<ScopedCpuTensorHandle> biasesTensor;
+    std::unique_ptr<ScopedTensorHandle> biasesTensor;
     if (descriptor.m_BiasEnabled)
     {
         // set up biases
-        biasesTensor = std::make_unique<ScopedCpuTensorHandle>(biases.value().first);
+        biasesTensor = std::make_unique<ScopedTensorHandle>(biases.value().first);
         queueDescriptor.m_Bias = biasesTensor.get();
 
         AllocateAndCopyDataToITensorHandle(biasesTensor.get(), biases.value().second.data());
@@ -643,8 +643,8 @@ LayerTestResult<uint8_t, 4> TransposeConvolution2dPerAxisQuantTest(
     std::unique_ptr<ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputInfo);
 
     WorkloadInfo workloadInfo;
-    ScopedCpuTensorHandle weightTensor(kernelInfo);
-    ScopedCpuTensorHandle biasTensor(biasInfo);
+    ScopedTensorHandle weightTensor(kernelInfo);
+    ScopedTensorHandle biasTensor(biasInfo);
 
     AllocateAndCopyDataToITensorHandle(&weightTensor, kernelData.data());
     AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());

@@ -5,7 +5,7 @@
 
 #include <armnn/Exceptions.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/Workload.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -121,15 +121,15 @@ BOOST_AUTO_TEST_CASE(TestAsyncExecute)
     ConstTensor constInputTensor(info, inVals);
     ConstTensor constOutputTensor(info, outVals);
 
-    ScopedCpuTensorHandle syncInput0(constInputTensor);
-    ScopedCpuTensorHandle syncOutput0(constOutputTensor);
+    ScopedTensorHandle syncInput0(constInputTensor);
+    ScopedTensorHandle syncOutput0(constOutputTensor);
 
     std::unique_ptr<Workload0> workload0 = CreateWorkload<Workload0>(info, &syncInput0, &syncOutput0);
 
     workload0.get()->Execute();
 
-    ScopedCpuTensorHandle asyncInput0(constInputTensor);
-    ScopedCpuTensorHandle asyncOutput0(constOutputTensor);
+    ScopedTensorHandle asyncInput0(constInputTensor);
+    ScopedTensorHandle asyncOutput0(constOutputTensor);
 
     WorkingMemDescriptor workingMemDescriptor0;
     workingMemDescriptor0.m_Inputs = std::vector<ITensorHandle*>{&asyncInput0};
@@ -159,13 +159,13 @@ BOOST_AUTO_TEST_CASE(TestDefaultAsyncExecute)
     ConstTensor constOutputTensor(info, outVals);
     ConstTensor defaultTensor(info, &defaultVals);
 
-    ScopedCpuTensorHandle defaultInput = ScopedCpuTensorHandle(defaultTensor);
-    ScopedCpuTensorHandle defaultOutput = ScopedCpuTensorHandle(defaultTensor);
+    ScopedTensorHandle defaultInput = ScopedTensorHandle(defaultTensor);
+    ScopedTensorHandle defaultOutput = ScopedTensorHandle(defaultTensor);
 
     std::unique_ptr<Workload1> workload1 = CreateWorkload<Workload1>(info, &defaultInput, &defaultOutput);
 
-    ScopedCpuTensorHandle asyncInput(constInputTensor);
-    ScopedCpuTensorHandle asyncOutput(constOutputTensor);
+    ScopedTensorHandle asyncInput(constInputTensor);
+    ScopedTensorHandle asyncOutput(constOutputTensor);
 
     WorkingMemDescriptor workingMemDescriptor;
     workingMemDescriptor.m_Inputs = std::vector<ITensorHandle*>{&asyncInput};
@@ -202,20 +202,20 @@ BOOST_AUTO_TEST_CASE(TestDefaultAsyncExeuteWithThreads)
 
     ConstTensor defaultTensor(info, &defaultVals);
 
-    ScopedCpuTensorHandle defaultInput = ScopedCpuTensorHandle(defaultTensor);
-    ScopedCpuTensorHandle defaultOutput = ScopedCpuTensorHandle(defaultTensor);
+    ScopedTensorHandle defaultInput = ScopedTensorHandle(defaultTensor);
+    ScopedTensorHandle defaultOutput = ScopedTensorHandle(defaultTensor);
     std::unique_ptr<Workload1> workload = CreateWorkload<Workload1>(info, &defaultInput, &defaultOutput);
 
-    ScopedCpuTensorHandle asyncInput1(constInputTensor1);
-    ScopedCpuTensorHandle asyncOutput1(constOutputTensor1);
+    ScopedTensorHandle asyncInput1(constInputTensor1);
+    ScopedTensorHandle asyncOutput1(constOutputTensor1);
 
     WorkingMemDescriptor workingMemDescriptor1;
     workingMemDescriptor1.m_Inputs = std::vector<ITensorHandle*>{&asyncInput1};
     workingMemDescriptor1.m_Outputs = std::vector<ITensorHandle*>{&asyncOutput1};
 
 
-    ScopedCpuTensorHandle asyncInput2(constInputTensor2);
-    ScopedCpuTensorHandle asyncOutput2(constOutputTensor2);
+    ScopedTensorHandle asyncInput2(constInputTensor2);
+    ScopedTensorHandle asyncOutput2(constOutputTensor2);
 
     WorkingMemDescriptor workingMemDescriptor2;
     workingMemDescriptor2.m_Inputs = std::vector<ITensorHandle*>{&asyncInput2};

@@ -14,7 +14,7 @@
 
 #include <neon/NeonLayerSupport.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/WorkloadUtils.hpp>
 
 #include <arm_compute/runtime/NEON/functions/NEDepthwiseConvolutionLayer.h>
@@ -136,7 +136,7 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
 
     ARMNN_ASSERT(m_pDepthwiseConvolutionLayer);
 
-    ScopedCpuTensorHandle weightsPermutedHandle(weightPermuted);
+    ScopedTensorHandle weightsPermutedHandle(weightPermuted);
     InitializeArmComputeTensorData(*m_KernelTensor, &weightsPermutedHandle);
 
     if (m_Data.m_Parameters.m_BiasEnabled)

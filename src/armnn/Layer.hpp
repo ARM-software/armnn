@@ -200,7 +200,7 @@ inline const IOutputSlot* InputSlot::GetConnection() const { return GetConnected
 inline IOutputSlot* InputSlot::GetConnection() { return GetConnectedOutputSlot(); }
 
 
-class ScopedCpuTensorHandle;
+class ScopedTensorHandle;
 
 // Base layer class
 
@@ -391,7 +391,7 @@ protected:
     LayerType* CloneBase(Graph& graph, Params&& ... params) const;
 
     // Retrieve the Handles to the constants
-    using ConstantTensors = std::vector<std::reference_wrapper<std::shared_ptr<ConstCpuTensorHandle>>>;
+    using ConstantTensors = std::vector<std::reference_wrapper<std::shared_ptr<ConstTensorHandle>>>;
     virtual ConstantTensors GetConstantTensorsByRef() {return ConstantTensors(); };
 
     // "Blob"

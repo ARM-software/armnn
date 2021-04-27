@@ -4,6 +4,7 @@
 //
 #include "armnn_delegate.hpp"
 #include <armnn/Logging.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <iostream>
 #include <tensorflow/lite/minimal_logging.h>
@@ -54,6 +55,10 @@ std::vector<std::string> gpu_options {"gpu-tuning-level",
  *                 1,2 and 3 will create a tuning-file, 0 will apply the
  *                 tunings from an existing file
  *
+ *    Option key: "gpu-mlgo-tuning-file" \n
+ *    Possible values: [filenameString] \n
+ *    Description: File name for the MLGO tuning file
+ *
  *    Option key: "gpu-tuning-file" \n
  *    Possible values: [filenameString] \n
  *    Description: File name for the tuning file.
@@ -61,6 +66,28 @@ std::vector<std::string> gpu_options {"gpu-tuning-level",
  *    Option key: "gpu-kernel-profiling-enabled" \n
  *    Possible values: ["true"/"false"] \n
  *    Description: Enables GPU kernel profiling
+ *
+ *    Option key: "save-cached-network" \n
+ *    Possible values: ["true"/"false"] \n
+ *    Description: Enables saving of the cached network to a file,
+ *                 specified with the cached-network-filepath option
+ *
+ *    Option key: "cached-network-filepath" \n
+ *    Possible values: [filenameString] \n
+ *    Description: If non-empty, the given file will be used to load/save the cached network.
+ *                 If save-cached-network is given then the cached network will be saved to the given file.
+ *                 To save the cached network a file must already exist.
+ *                 If save-cached-network is not given then the cached network will be loaded from the given file.
+ *                 This will remove initial compilation time of kernels and speed up the first execution.
+ *
+ *    Option key: "enable-fast-math" \n
+ *    Possible values: ["true"/"false"] \n
+ *    Description: Enables fast_math options in backends that support it
+ *
+ *    Option key: "number-of-threads" \n
+ *    Possible values: ["1"-"64"] \n
+ *    Description: Assign the number of threads used by the CpuAcc backend.
+ *                 Default is set to 0 (Backend will decide number of threads to use).
  *
  *    Option key: "reduce-fp32-to-fp16" \n
  *    Possible values: ["true"/"false"] \n
@@ -139,6 +166,32 @@ TfLiteDelegate* tflite_plugin_create_delegate(char** options_keys,
             {
                 armnn::BackendOptions option("GpuAcc", {{"KernelProfilingEnabled", (*options_values[i] != '0')}});
                 options.AddBackendOption(option);
+            }
+            else if (std::string(options_keys[i]) == std::string("save-cached-network"))
+            {
+                armnn::BackendOptions option("GpuAcc", {{"SaveCachedNetwork", (*options_values[i] != '0')}});
+                optimizerOptions.m_ModelOptions.push_back(option);
+            }
+            else if (std::string(options_keys[i]) == std::string("cached-network-filepath"))
+            {
+                armnn::BackendOptions option("GpuAcc", {{"CachedNetworkFilePath", std::string(options_values[i])}});
+                optimizerOptions.m_ModelOptions.push_back(option);
+            }
+            // Process GPU & CPU backend options
+            else if (std::string(options_keys[i]) == std::string("enable-fast-math"))
+            {
+                armnn::BackendOptions modelOptionGpu("GpuAcc", {{"FastMathEnabled", (*options_values[i] != '0')}});
+                optimizerOptions.m_ModelOptions.push_back(modelOptionGpu);
+
+                armnn::BackendOptions modelOptionCpu("CpuAcc", {{"FastMathEnabled", (*options_values[i] != '0')}});
+                optimizerOptions.m_ModelOptions.push_back(modelOptionCpu);
+            }
+            // Process CPU backend options
+            else if (std::string(options_keys[i]) == std::string("number-of-threads"))
+            {
+                unsigned int numberOfThreads = armnn::numeric_cast<unsigned int>(atoi(options_values[i]));
+                armnn::BackendOptions modelOption("CpuAcc", {{"NumberOfThreads", numberOfThreads}});
+                optimizerOptions.m_ModelOptions.push_back(modelOption);
             }
             // Process reduce-fp32-to-fp16 option
             else if (std::string(options_keys[i]) == std::string("reduce-fp32-to-fp16"))

@@ -9,7 +9,7 @@
 
 #include <test/TensorHelpers.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <cl/ClContextControl.hpp>
@@ -79,10 +79,10 @@ BOOST_AUTO_TEST_CASE(OpenClTimerBatchNorm)
 
     BatchNormalizationQueueDescriptor data;
     WorkloadInfo info;
-    ScopedCpuTensorHandle meanTensor(tensorInfo);
-    ScopedCpuTensorHandle varianceTensor(tensorInfo);
-    ScopedCpuTensorHandle betaTensor(tensorInfo);
-    ScopedCpuTensorHandle gammaTensor(tensorInfo);
+    ScopedTensorHandle meanTensor(tensorInfo);
+    ScopedTensorHandle varianceTensor(tensorInfo);
+    ScopedTensorHandle betaTensor(tensorInfo);
+    ScopedTensorHandle gammaTensor(tensorInfo);
 
     AllocateAndCopyDataToITensorHandle(&meanTensor, &mean[0]);
     AllocateAndCopyDataToITensorHandle(&varianceTensor, &variance[0]);

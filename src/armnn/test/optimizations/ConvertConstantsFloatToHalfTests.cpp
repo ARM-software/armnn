@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(ConvertConstantsFloatToHalfTest)
     input->GetOutputSlot().SetTensorInfo(info);
 
     auto fc      = graph.AddLayer<armnn::FullyConnectedLayer>(armnn::FullyConnectedDescriptor(), "fc");
-    fc->m_Weight = std::make_unique<armnn::ScopedCpuTensorHandle>(weights);
+    fc->m_Weight = std::make_unique<armnn::ScopedTensorHandle>(weights);
     fc->GetOutputSlot().SetTensorInfo(info);
 
     auto output = graph.AddLayer<armnn::OutputLayer>(1, "output");

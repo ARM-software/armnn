@@ -7,7 +7,7 @@
 #include <layers/ConvertFp32ToFp16Layer.hpp>
 #include <test/TensorHelpers.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <reference/RefWorkloadFactory.hpp>
 #include <reference/RefLayerSupport.hpp>
 #include <backendsCommon/test/LayerTests.hpp>

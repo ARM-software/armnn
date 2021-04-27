@@ -18,7 +18,7 @@ RefTransposeConvolution2dWorkload::RefTransposeConvolution2dWorkload(
     BaseWorkload<TransposeConvolution2dQueueDescriptor>(descriptor, info)
 {
     // set up weights decoder
-    m_Weights = std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Weight));
+    m_Weights = std::make_unique<ScopedTensorHandle>(*(descriptor.m_Weight));
     const TensorInfo& weightsInfo = m_Weights->GetTensorInfo();
 
     m_WeightsDecoder = MakeDecoder<float>(weightsInfo, m_Weights->Map(true));
@@ -27,7 +27,7 @@ RefTransposeConvolution2dWorkload::RefTransposeConvolution2dWorkload(
     // set up biases decoder
     if (descriptor.m_Parameters.m_BiasEnabled)
     {
-        m_Biases = std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Bias));
+        m_Biases = std::make_unique<ScopedTensorHandle>(*(descriptor.m_Bias));
         const TensorInfo& biasesInfo = m_Biases->GetTensorInfo();
         m_BiasesDecoder = MakeDecoder<float>(biasesInfo, m_Biases->Map(true));
     }

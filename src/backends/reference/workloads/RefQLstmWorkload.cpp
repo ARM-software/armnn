@@ -15,32 +15,32 @@ namespace armnn
 
 RefQLstmWorkload::RefQLstmWorkload(const QLstmQueueDescriptor &descriptor, const WorkloadInfo &info)
         : BaseWorkload<QLstmQueueDescriptor>(descriptor, info)
-        , m_InputToInputWeightsTensor     (AssignScopedCpuTensorHandle(descriptor.m_InputToInputWeights))
-        , m_InputToForgetWeightsTensor    (AssignScopedCpuTensorHandle(descriptor.m_InputToForgetWeights))
-        , m_InputToCellWeightsTensor      (AssignScopedCpuTensorHandle(descriptor.m_InputToCellWeights))
-        , m_InputToOutputWeightsTensor    (AssignScopedCpuTensorHandle(descriptor.m_InputToOutputWeights))
+        , m_InputToInputWeightsTensor     (AssignScopedTensorHandle(descriptor.m_InputToInputWeights))
+        , m_InputToForgetWeightsTensor    (AssignScopedTensorHandle(descriptor.m_InputToForgetWeights))
+        , m_InputToCellWeightsTensor      (AssignScopedTensorHandle(descriptor.m_InputToCellWeights))
+        , m_InputToOutputWeightsTensor    (AssignScopedTensorHandle(descriptor.m_InputToOutputWeights))
 
-        , m_RecurrentToInputWeightsTensor (AssignScopedCpuTensorHandle(descriptor.m_RecurrentToInputWeights))
-        , m_RecurrentToForgetWeightsTensor(AssignScopedCpuTensorHandle(descriptor.m_RecurrentToForgetWeights))
-        , m_RecurrentToCellWeightsTensor  (AssignScopedCpuTensorHandle(descriptor.m_RecurrentToCellWeights))
-        , m_RecurrentToOutputWeightsTensor(AssignScopedCpuTensorHandle(descriptor.m_RecurrentToOutputWeights))
+        , m_RecurrentToInputWeightsTensor (AssignScopedTensorHandle(descriptor.m_RecurrentToInputWeights))
+        , m_RecurrentToForgetWeightsTensor(AssignScopedTensorHandle(descriptor.m_RecurrentToForgetWeights))
+        , m_RecurrentToCellWeightsTensor  (AssignScopedTensorHandle(descriptor.m_RecurrentToCellWeights))
+        , m_RecurrentToOutputWeightsTensor(AssignScopedTensorHandle(descriptor.m_RecurrentToOutputWeights))
 
-        , m_CellToInputWeightsTensor      (AssignScopedCpuTensorHandle(descriptor.m_CellToInputWeights))
-        , m_CellToForgetWeightsTensor     (AssignScopedCpuTensorHandle(descriptor.m_CellToForgetWeights))
-        , m_CellToOutputWeightsTensor     (AssignScopedCpuTensorHandle(descriptor.m_CellToOutputWeights))
+        , m_CellToInputWeightsTensor      (AssignScopedTensorHandle(descriptor.m_CellToInputWeights))
+        , m_CellToForgetWeightsTensor     (AssignScopedTensorHandle(descriptor.m_CellToForgetWeights))
+        , m_CellToOutputWeightsTensor     (AssignScopedTensorHandle(descriptor.m_CellToOutputWeights))
 
-        , m_InputGateBiasTensor           (AssignScopedCpuTensorHandle(descriptor.m_InputGateBias))
-        , m_ForgetGateBiasTensor          (AssignScopedCpuTensorHandle(descriptor.m_ForgetGateBias))
-        , m_CellBiasTensor                (AssignScopedCpuTensorHandle(descriptor.m_CellBias))
-        , m_OutputGateBiasTensor          (AssignScopedCpuTensorHandle(descriptor.m_OutputGateBias))
+        , m_InputGateBiasTensor           (AssignScopedTensorHandle(descriptor.m_InputGateBias))
+        , m_ForgetGateBiasTensor          (AssignScopedTensorHandle(descriptor.m_ForgetGateBias))
+        , m_CellBiasTensor                (AssignScopedTensorHandle(descriptor.m_CellBias))
+        , m_OutputGateBiasTensor          (AssignScopedTensorHandle(descriptor.m_OutputGateBias))
 
-        , m_ProjectionWeightsTensor       (AssignScopedCpuTensorHandle(descriptor.m_ProjectionWeights))
-        , m_ProjectionBiasTensor          (AssignScopedCpuTensorHandle(descriptor.m_ProjectionBias))
+        , m_ProjectionWeightsTensor       (AssignScopedTensorHandle(descriptor.m_ProjectionWeights))
+        , m_ProjectionBiasTensor          (AssignScopedTensorHandle(descriptor.m_ProjectionBias))
 
-        , m_InputLayerNormWeightsTensor   (AssignScopedCpuTensorHandle(descriptor.m_InputLayerNormWeights))
-        , m_ForgetLayerNormWeightsTensor  (AssignScopedCpuTensorHandle(descriptor.m_ForgetLayerNormWeights))
-        , m_CellLayerNormWeightsTensor    (AssignScopedCpuTensorHandle(descriptor.m_CellLayerNormWeights))
-        , m_OutputLayerNormWeightsTensor  (AssignScopedCpuTensorHandle(descriptor.m_OutputLayerNormWeights))
+        , m_InputLayerNormWeightsTensor   (AssignScopedTensorHandle(descriptor.m_InputLayerNormWeights))
+        , m_ForgetLayerNormWeightsTensor  (AssignScopedTensorHandle(descriptor.m_ForgetLayerNormWeights))
+        , m_CellLayerNormWeightsTensor    (AssignScopedTensorHandle(descriptor.m_CellLayerNormWeights))
+        , m_OutputLayerNormWeightsTensor  (AssignScopedTensorHandle(descriptor.m_OutputLayerNormWeights))
 {}
 
 void RefQLstmWorkload::Execute() const

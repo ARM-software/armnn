@@ -7,8 +7,8 @@
 #include "Graph.hpp"
 #include <ProfilingService.hpp>
 #include <armnn/utility/NumericCast.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/WorkloadData.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <fmt/format.h>
 
@@ -283,7 +283,7 @@ void Layer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
 void Layer::ReleaseConstantData()
 {
     // Now free up the static data.
-    OperateOnConstantTensors([](std::shared_ptr<ConstCpuTensorHandle>& handle)
+    OperateOnConstantTensors([](std::shared_ptr<ConstTensorHandle>& handle)
                                  {
                                      handle.reset();
                                  });

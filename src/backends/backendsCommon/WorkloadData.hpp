@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include <armnn/backends/CpuTensorHandleFwd.hpp>
+#include <armnn/backends/TensorHandleFwd.hpp>
 #include <armnn/backends/ITensorHandle.hpp>
 
 #include <InternalTypes.hpp>
@@ -175,8 +175,8 @@ struct FullyConnectedQueueDescriptor : QueueDescriptorWithParameters<FullyConnec
     {
     }
 
-    const ConstCpuTensorHandle* m_Weight;
-    const ConstCpuTensorHandle* m_Bias;
+    const ConstTensorHandle* m_Weight;
+    const ConstTensorHandle* m_Bias;
 
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
@@ -202,8 +202,8 @@ struct Convolution2dQueueDescriptor : QueueDescriptorWithParameters<Convolution2
     {
     }
 
-    const ConstCpuTensorHandle* m_Weight;
-    const ConstCpuTensorHandle* m_Bias;
+    const ConstTensorHandle* m_Weight;
+    const ConstTensorHandle* m_Bias;
 
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
@@ -217,8 +217,8 @@ struct DepthwiseConvolution2dQueueDescriptor : QueueDescriptorWithParameters<Dep
     {
     }
 
-    const ConstCpuTensorHandle* m_Weight;
-    const ConstCpuTensorHandle* m_Bias;
+    const ConstTensorHandle* m_Weight;
+    const ConstTensorHandle* m_Bias;
 
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
@@ -230,7 +230,7 @@ struct DetectionPostProcessQueueDescriptor : QueueDescriptorWithParameters<Detec
     {
     }
 
-    const ConstCpuTensorHandle* m_Anchors;
+    const ConstTensorHandle* m_Anchors;
 
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
@@ -305,10 +305,10 @@ struct BatchNormalizationQueueDescriptor : QueueDescriptorWithParameters<BatchNo
     {
     }
 
-    const ConstCpuTensorHandle* m_Mean;
-    const ConstCpuTensorHandle* m_Variance;
-    const ConstCpuTensorHandle* m_Beta;
-    const ConstCpuTensorHandle* m_Gamma;
+    const ConstTensorHandle* m_Mean;
+    const ConstTensorHandle* m_Variance;
+    const ConstTensorHandle* m_Beta;
+    const ConstTensorHandle* m_Gamma;
 
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
@@ -336,8 +336,8 @@ struct FakeQuantizationQueueDescriptor : QueueDescriptorWithParameters<FakeQuant
     {
     }
 
-    const ConstCpuTensorHandle* m_Min;
-    const ConstCpuTensorHandle* m_Max;
+    const ConstTensorHandle* m_Min;
+    const ConstTensorHandle* m_Max;
 
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
@@ -364,7 +364,7 @@ struct ConstantQueueDescriptor : QueueDescriptor
     {
     }
 
-    const ConstCpuTensorHandle* m_LayerOutput;
+    const ConstTensorHandle* m_LayerOutput;
 
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
@@ -416,27 +416,27 @@ struct LstmQueueDescriptor : QueueDescriptorWithParameters<LstmDescriptor>
     {
     }
 
-    const ConstCpuTensorHandle* m_InputToInputWeights;
-    const ConstCpuTensorHandle* m_InputToForgetWeights;
-    const ConstCpuTensorHandle* m_InputToCellWeights;
-    const ConstCpuTensorHandle* m_InputToOutputWeights;
-    const ConstCpuTensorHandle* m_RecurrentToInputWeights;
-    const ConstCpuTensorHandle* m_RecurrentToForgetWeights;
-    const ConstCpuTensorHandle* m_RecurrentToCellWeights;
-    const ConstCpuTensorHandle* m_RecurrentToOutputWeights;
-    const ConstCpuTensorHandle* m_CellToInputWeights;
-    const ConstCpuTensorHandle* m_CellToForgetWeights;
-    const ConstCpuTensorHandle* m_CellToOutputWeights;
-    const ConstCpuTensorHandle* m_InputGateBias;
-    const ConstCpuTensorHandle* m_ForgetGateBias;
-    const ConstCpuTensorHandle* m_CellBias;
-    const ConstCpuTensorHandle* m_OutputGateBias;
-    const ConstCpuTensorHandle* m_ProjectionWeights;
-    const ConstCpuTensorHandle* m_ProjectionBias;
-    const ConstCpuTensorHandle* m_InputLayerNormWeights;
-    const ConstCpuTensorHandle* m_ForgetLayerNormWeights;
-    const ConstCpuTensorHandle* m_CellLayerNormWeights;
-    const ConstCpuTensorHandle* m_OutputLayerNormWeights;
+    const ConstTensorHandle* m_InputToInputWeights;
+    const ConstTensorHandle* m_InputToForgetWeights;
+    const ConstTensorHandle* m_InputToCellWeights;
+    const ConstTensorHandle* m_InputToOutputWeights;
+    const ConstTensorHandle* m_RecurrentToInputWeights;
+    const ConstTensorHandle* m_RecurrentToForgetWeights;
+    const ConstTensorHandle* m_RecurrentToCellWeights;
+    const ConstTensorHandle* m_RecurrentToOutputWeights;
+    const ConstTensorHandle* m_CellToInputWeights;
+    const ConstTensorHandle* m_CellToForgetWeights;
+    const ConstTensorHandle* m_CellToOutputWeights;
+    const ConstTensorHandle* m_InputGateBias;
+    const ConstTensorHandle* m_ForgetGateBias;
+    const ConstTensorHandle* m_CellBias;
+    const ConstTensorHandle* m_OutputGateBias;
+    const ConstTensorHandle* m_ProjectionWeights;
+    const ConstTensorHandle* m_ProjectionBias;
+    const ConstTensorHandle* m_InputLayerNormWeights;
+    const ConstTensorHandle* m_ForgetLayerNormWeights;
+    const ConstTensorHandle* m_CellLayerNormWeights;
+    const ConstTensorHandle* m_OutputLayerNormWeights;
 
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
@@ -543,8 +543,8 @@ struct TransposeConvolution2dQueueDescriptor : QueueDescriptorWithParameters<Tra
         m_Bias(nullptr)
     {}
 
-    const ConstCpuTensorHandle* m_Weight;
-    const ConstCpuTensorHandle* m_Bias;
+    const ConstTensorHandle* m_Weight;
+    const ConstTensorHandle* m_Bias;
 
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
@@ -581,27 +581,27 @@ struct QLstmQueueDescriptor : QueueDescriptorWithParameters<QLstmDescriptor>
     {
     }
 
-    const ConstCpuTensorHandle* m_InputToInputWeights;
-    const ConstCpuTensorHandle* m_InputToForgetWeights;
-    const ConstCpuTensorHandle* m_InputToCellWeights;
-    const ConstCpuTensorHandle* m_InputToOutputWeights;
-    const ConstCpuTensorHandle* m_RecurrentToInputWeights;
-    const ConstCpuTensorHandle* m_RecurrentToForgetWeights;
-    const ConstCpuTensorHandle* m_RecurrentToCellWeights;
-    const ConstCpuTensorHandle* m_RecurrentToOutputWeights;
-    const ConstCpuTensorHandle* m_CellToInputWeights;
-    const ConstCpuTensorHandle* m_CellToForgetWeights;
-    const ConstCpuTensorHandle* m_CellToOutputWeights;
-    const ConstCpuTensorHandle* m_InputGateBias;
-    const ConstCpuTensorHandle* m_ForgetGateBias;
-    const ConstCpuTensorHandle* m_CellBias;
-    const ConstCpuTensorHandle* m_OutputGateBias;
-    const ConstCpuTensorHandle* m_ProjectionWeights;
-    const ConstCpuTensorHandle* m_ProjectionBias;
-    const ConstCpuTensorHandle* m_InputLayerNormWeights;
-    const ConstCpuTensorHandle* m_ForgetLayerNormWeights;
-    const ConstCpuTensorHandle* m_CellLayerNormWeights;
-    const ConstCpuTensorHandle* m_OutputLayerNormWeights;
+    const ConstTensorHandle* m_InputToInputWeights;
+    const ConstTensorHandle* m_InputToForgetWeights;
+    const ConstTensorHandle* m_InputToCellWeights;
+    const ConstTensorHandle* m_InputToOutputWeights;
+    const ConstTensorHandle* m_RecurrentToInputWeights;
+    const ConstTensorHandle* m_RecurrentToForgetWeights;
+    const ConstTensorHandle* m_RecurrentToCellWeights;
+    const ConstTensorHandle* m_RecurrentToOutputWeights;
+    const ConstTensorHandle* m_CellToInputWeights;
+    const ConstTensorHandle* m_CellToForgetWeights;
+    const ConstTensorHandle* m_CellToOutputWeights;
+    const ConstTensorHandle* m_InputGateBias;
+    const ConstTensorHandle* m_ForgetGateBias;
+    const ConstTensorHandle* m_CellBias;
+    const ConstTensorHandle* m_OutputGateBias;
+    const ConstTensorHandle* m_ProjectionWeights;
+    const ConstTensorHandle* m_ProjectionBias;
+    const ConstTensorHandle* m_InputLayerNormWeights;
+    const ConstTensorHandle* m_ForgetLayerNormWeights;
+    const ConstTensorHandle* m_CellLayerNormWeights;
+    const ConstTensorHandle* m_OutputLayerNormWeights;
 
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
@@ -625,20 +625,20 @@ struct QuantizedLstmQueueDescriptor : QueueDescriptor
         , m_OutputGateBias(nullptr)
     {}
 
-    const ConstCpuTensorHandle* m_InputToInputWeights;
-    const ConstCpuTensorHandle* m_InputToForgetWeights;
-    const ConstCpuTensorHandle* m_InputToCellWeights;
-    const ConstCpuTensorHandle* m_InputToOutputWeights;
+    const ConstTensorHandle* m_InputToInputWeights;
+    const ConstTensorHandle* m_InputToForgetWeights;
+    const ConstTensorHandle* m_InputToCellWeights;
+    const ConstTensorHandle* m_InputToOutputWeights;
 
-    const ConstCpuTensorHandle* m_RecurrentToInputWeights;
-    const ConstCpuTensorHandle* m_RecurrentToForgetWeights;
-    const ConstCpuTensorHandle* m_RecurrentToCellWeights;
-    const ConstCpuTensorHandle* m_RecurrentToOutputWeights;
+    const ConstTensorHandle* m_RecurrentToInputWeights;
+    const ConstTensorHandle* m_RecurrentToForgetWeights;
+    const ConstTensorHandle* m_RecurrentToCellWeights;
+    const ConstTensorHandle* m_RecurrentToOutputWeights;
 
-    const ConstCpuTensorHandle* m_InputGateBias;
-    const ConstCpuTensorHandle* m_ForgetGateBias;
-    const ConstCpuTensorHandle* m_CellBias;
-    const ConstCpuTensorHandle* m_OutputGateBias;
+    const ConstTensorHandle* m_InputGateBias;
+    const ConstTensorHandle* m_ForgetGateBias;
+    const ConstTensorHandle* m_CellBias;
+    const ConstTensorHandle* m_OutputGateBias;
 
     void Validate(const WorkloadInfo& workloadInfo) const;
 };

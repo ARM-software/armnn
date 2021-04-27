@@ -8,7 +8,7 @@
 
 #include <armnnUtils/DataLayoutIndexed.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 using namespace armnnUtils;

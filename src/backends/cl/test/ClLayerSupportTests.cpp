@@ -10,7 +10,7 @@
 #include <layers/MeanLayer.hpp>
 #include <test/TensorHelpers.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <cl/ClWorkloadFactory.hpp>
 #include <cl/test/ClContextControlFixture.hpp>
 #include <backendsCommon/test/IsLayerSupportedTestImpl.hpp>

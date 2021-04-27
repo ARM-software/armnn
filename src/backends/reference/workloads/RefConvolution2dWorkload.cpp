@@ -16,7 +16,7 @@ RefConvolution2dWorkload::RefConvolution2dWorkload(
         const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info)
         : BaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
 {
-    m_Weight = std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Weight));
+    m_Weight = std::make_unique<ScopedTensorHandle>(*(descriptor.m_Weight));
     const TensorInfo& rFilterInfo = m_Weight->GetTensorInfo();
 
     m_FilterShape = rFilterInfo.GetShape();
@@ -24,7 +24,7 @@ RefConvolution2dWorkload::RefConvolution2dWorkload(
 
     if (descriptor.m_Parameters.m_BiasEnabled)
     {
-        m_Bias = std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Bias));
+        m_Bias = std::make_unique<ScopedTensorHandle>(*(descriptor.m_Bias));
         const TensorInfo& biasInfo = m_Bias->GetTensorInfo();
         m_BiasDecoder = MakeDecoder<float>(biasInfo, m_Bias->Map(true));
     }

@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include "RefMemoryManager.hpp"
 

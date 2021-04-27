@@ -24,8 +24,8 @@ public:
 private:
     void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
 
-    std::unique_ptr <ScopedCpuTensorHandle> m_Weight;
-    std::unique_ptr <ScopedCpuTensorHandle> m_Bias;
+    std::unique_ptr <ScopedTensorHandle> m_Weight;
+    std::unique_ptr <ScopedTensorHandle> m_Bias;
 
     std::unique_ptr <Decoder<float>> m_FilterDecoder;
     std::unique_ptr <Decoder<float>> m_BiasDecoder;

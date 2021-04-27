@@ -16,7 +16,7 @@ namespace armnn
 RefDetectionPostProcessWorkload::RefDetectionPostProcessWorkload(
         const DetectionPostProcessQueueDescriptor& descriptor, const WorkloadInfo& info)
         : BaseWorkload<DetectionPostProcessQueueDescriptor>(descriptor, info),
-          m_Anchors(std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Anchors))) {}
+          m_Anchors(std::make_unique<ScopedTensorHandle>(*(descriptor.m_Anchors))) {}
 
 void RefDetectionPostProcessWorkload::Execute() const
 {

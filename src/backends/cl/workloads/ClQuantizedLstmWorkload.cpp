@@ -6,7 +6,7 @@
 #include "ClQuantizedLstmWorkload.hpp"
 #include "ClWorkloadUtils.hpp"
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <cl/ClTensorHandle.hpp>
 

@@ -7,7 +7,7 @@
 
 #include "ClWorkloadUtils.hpp"
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <cl/ClLayerSupport.hpp>
 #include <cl/ClTensorHandle.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>

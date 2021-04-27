@@ -16,7 +16,7 @@
 #include <armnn/Logging.hpp>
 #include <armnn/utility/Assert.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
 #include <backendsCommon/MemSyncWorkload.hpp>
@@ -484,7 +484,7 @@ public:
             auto inputTensor = inputTensorPair.second;
 
             std::unique_ptr<ITensorHandle> tensorHandle =
-                std::make_unique<ConstPassthroughCpuTensorHandle>(inputTensor.GetInfo(),inputTensor.GetMemoryArea());
+                std::make_unique<ConstPassthroughTensorHandle>(inputTensor.GetInfo(),inputTensor.GetMemoryArea());
             LayerBindingId layerId = inputTensorPair.first;
 
             m_InputTensorPins.emplace_back(std::move(tensorHandle), inputTensor.GetInfo(), layerId);
@@ -495,7 +495,7 @@ public:
             auto outputTensor = outputTensorPair.second;
 
             std::unique_ptr<ITensorHandle> tensorHandle =
-                std::make_unique<PassthroughCpuTensorHandle>(outputTensor.GetInfo(), outputTensor.GetMemoryArea());
+                std::make_unique<PassthroughTensorHandle>(outputTensor.GetInfo(), outputTensor.GetMemoryArea());
             LayerBindingId layerId = outputTensorPair.first;
 
             m_OutputTensorPins.emplace_back(std::move(tensorHandle), outputTensor.GetInfo(), layerId);
@@ -864,7 +864,7 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer,
         {
             // This assumes a CPU Tensor handle
             std::unique_ptr<ITensorHandle> tensorHandle =
-                    std::make_unique<ConstPassthroughCpuTensorHandle>(inputTensor.GetInfo(),
+                    std::make_unique<ConstPassthroughTensorHandle>(inputTensor.GetInfo(),
                                                                       inputTensor.GetMemoryArea());
 
             void* mem = tensorHandle->Map(false);
@@ -884,7 +884,7 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer,
     else
     {
         std::unique_ptr<ITensorHandle> tensorHandle =
-                std::make_unique<ConstPassthroughCpuTensorHandle>(inputTensor.GetInfo(), inputTensor.GetMemoryArea());
+                std::make_unique<ConstPassthroughTensorHandle>(inputTensor.GetInfo(), inputTensor.GetMemoryArea());
 
         auto copyFunc = [](void* dst, const void* src, size_t size)
         {
@@ -928,7 +928,7 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, const Tensor& outp
             if (CheckFlag(importFlags, MemorySource::Malloc))
             {
                 std::unique_ptr<ITensorHandle> tensorHandle =
-                        std::make_unique<PassthroughCpuTensorHandle>(outputTensor.GetInfo(),
+                        std::make_unique<PassthroughTensorHandle>(outputTensor.GetInfo(),
                                                                      outputTensor.GetMemoryArea());
 
                 void* mem = tensorHandle->Map(false);
@@ -964,7 +964,7 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, const Tensor& outp
         };
 
         std::unique_ptr<ITensorHandle> tensorHandle =
-                std::make_unique<PassthroughCpuTensorHandle>(outputTensor.GetInfo(),
+                std::make_unique<PassthroughTensorHandle>(outputTensor.GetInfo(),
                                                              outputTensor.GetMemoryArea());
 
         CopyTensorContentsGeneric(inputTensorHandle, tensorHandle.get(), copyFunc);

@@ -3,6 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 
+// This file is deprecated and will be removed soon.
+// Please use the new file include/armnn/TensorHandleFwd.hpp instead.
+
 #pragma once
 
 namespace armnn

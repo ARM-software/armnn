@@ -21,10 +21,10 @@ public:
 
 private:
     void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
-    std::unique_ptr<ScopedCpuTensorHandle> m_Mean;
-    std::unique_ptr<ScopedCpuTensorHandle> m_Variance;
-    std::unique_ptr<ScopedCpuTensorHandle> m_Beta;
-    std::unique_ptr<ScopedCpuTensorHandle> m_Gamma;
+    std::unique_ptr<ScopedTensorHandle> m_Mean;
+    std::unique_ptr<ScopedTensorHandle> m_Variance;
+    std::unique_ptr<ScopedTensorHandle> m_Beta;
+    std::unique_ptr<ScopedTensorHandle> m_Gamma;
 };
 
 } //namespace armnn

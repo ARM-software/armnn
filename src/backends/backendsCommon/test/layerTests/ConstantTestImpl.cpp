@@ -11,7 +11,7 @@
 
 #include <armnnUtils/Permute.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
@@ -101,7 +101,7 @@ LayerTestResult<T, 4> ConstantTestImpl(
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
-    armnn::ScopedCpuTensorHandle constantTensor(inputTensorInfo);
+    armnn::ScopedTensorHandle constantTensor(inputTensorInfo);
     AllocateAndCopyDataToITensorHandle(&constantTensor, &input[0][0][0][0]);
 
     armnn::ConstantQueueDescriptor descriptor;

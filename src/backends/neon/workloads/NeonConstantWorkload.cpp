@@ -11,7 +11,7 @@
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <neon/NeonTensorHandle.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/Workload.hpp>
 
 namespace armnn

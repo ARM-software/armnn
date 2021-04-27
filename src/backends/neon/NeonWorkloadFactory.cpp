@@ -15,10 +15,10 @@
 #include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/MakeWorkloadHelper.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
 #include <backendsCommon/MemImportWorkload.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <neon/workloads/NeonWorkloadUtils.hpp>
 #include <neon/workloads/NeonWorkloads.hpp>

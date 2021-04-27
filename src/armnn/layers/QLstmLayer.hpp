@@ -9,70 +9,70 @@
 namespace armnn
 {
 
-class ScopedCpuTensorHandle;
+class ScopedTensorHandle;
 
 struct QLstmBasicParameters
 {
     /// A unique pointer to represent 2D weights tensor with dimensions [num_units, inputSize] (QSymmS8).
-    std::shared_ptr<ConstCpuTensorHandle> m_InputToForgetWeights;
+    std::shared_ptr<ConstTensorHandle> m_InputToForgetWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [num_units, inputSize] (QSymmS8).
-    std::shared_ptr<ConstCpuTensorHandle> m_InputToCellWeights;
+    std::shared_ptr<ConstTensorHandle> m_InputToCellWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [num_units, inputSize] (QSymmS8).
-    std::shared_ptr<ConstCpuTensorHandle> m_InputToOutputWeights;
+    std::shared_ptr<ConstTensorHandle> m_InputToOutputWeights;
 
     /// A unique pointer to represent 2D weights tensor with dimensions [num_units, outputSize] (QSymmS8).
-    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToForgetWeights;
+    std::shared_ptr<ConstTensorHandle> m_RecurrentToForgetWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [num_units, outputSize] (QSymmS8).
-    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToCellWeights;
+    std::shared_ptr<ConstTensorHandle> m_RecurrentToCellWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [num_units, outputSize] (QSymmS8).
-    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToOutputWeights;
+    std::shared_ptr<ConstTensorHandle> m_RecurrentToOutputWeights;
 
     /// A unique pointer to represent 1D bias tensor with dimensions [num_units] (int32).
-    std::shared_ptr<ConstCpuTensorHandle> m_ForgetGateBias;
+    std::shared_ptr<ConstTensorHandle> m_ForgetGateBias;
     /// A unique pointer to represent 1D bias tensor with dimensions [num_units] (int32).
-    std::shared_ptr<ConstCpuTensorHandle> m_CellBias;
+    std::shared_ptr<ConstTensorHandle> m_CellBias;
     /// A unique pointer to represent 1D bias tensor with dimensions [num_units] (int32).
-    std::shared_ptr<ConstCpuTensorHandle> m_OutputGateBias;
+    std::shared_ptr<ConstTensorHandle> m_OutputGateBias;
 };
 
 struct QLstmOptProjectionParameters
 {
     /// A unique pointer to represent 2D weights tensor with dimensions [output_size, num_units] (QSymmS8).
-    std::shared_ptr<ConstCpuTensorHandle> m_ProjectionWeights;
+    std::shared_ptr<ConstTensorHandle> m_ProjectionWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [output_size] (int32).
-    std::shared_ptr<ConstCpuTensorHandle> m_ProjectionBias;
+    std::shared_ptr<ConstTensorHandle> m_ProjectionBias;
 };
 
 struct QLstmOptPeepholeParameters
 {
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units] (QSymmS16).
-    std::shared_ptr<ConstCpuTensorHandle> m_CellToInputWeights;
+    std::shared_ptr<ConstTensorHandle> m_CellToInputWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units] (QSymmS16).
-    std::shared_ptr<ConstCpuTensorHandle> m_CellToForgetWeights;
+    std::shared_ptr<ConstTensorHandle> m_CellToForgetWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units] (QSymmS16).
-    std::shared_ptr<ConstCpuTensorHandle> m_CellToOutputWeights;
+    std::shared_ptr<ConstTensorHandle> m_CellToOutputWeights;
 };
 
 struct QLstmOptCifgParameters
 {
     /// A unique pointer to represent 2D weights tensor with dimensions [input_size, num_units] (QSymmS8).
-    std::shared_ptr<ConstCpuTensorHandle> m_InputToInputWeights;
+    std::shared_ptr<ConstTensorHandle> m_InputToInputWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [input_size, num_units] (QSymmS8).
-    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToInputWeights;
+    std::shared_ptr<ConstTensorHandle> m_RecurrentToInputWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units] (int32).
-    std::shared_ptr<ConstCpuTensorHandle> m_InputGateBias;
+    std::shared_ptr<ConstTensorHandle> m_InputGateBias;
 };
 
 struct QLstmOptLayerNormParameters
 {
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units] (QSymmS16).
-    std::shared_ptr<ConstCpuTensorHandle> m_InputLayerNormWeights;
+    std::shared_ptr<ConstTensorHandle> m_InputLayerNormWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units] (QSymmS16).
-    std::shared_ptr<ConstCpuTensorHandle> m_ForgetLayerNormWeights;
+    std::shared_ptr<ConstTensorHandle> m_ForgetLayerNormWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units] (QSymmS16).
-    std::shared_ptr<ConstCpuTensorHandle> m_CellLayerNormWeights;
+    std::shared_ptr<ConstTensorHandle> m_CellLayerNormWeights;
     /// A unique pointer to represent 1D weights tensor with dimensions [num_units] (QSymmS16).
-    std::shared_ptr<ConstCpuTensorHandle> m_OutputLayerNormWeights;
+    std::shared_ptr<ConstTensorHandle> m_OutputLayerNormWeights;
 };
 
 /// This layer represents a QLstm operation.

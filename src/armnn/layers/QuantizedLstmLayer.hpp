@@ -9,36 +9,36 @@
 namespace armnn
 {
 
-class ScopedCpuTensorHandle;
+class ScopedTensorHandle;
 
 struct QuantizedLstmParameters
 {
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, inputSize] (QAsymm8).
-    std::shared_ptr<ConstCpuTensorHandle> m_InputToInputWeights;
+    std::shared_ptr<ConstTensorHandle> m_InputToInputWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, inputSize] (QAsymm8).
-    std::shared_ptr<ConstCpuTensorHandle> m_InputToForgetWeights;
+    std::shared_ptr<ConstTensorHandle> m_InputToForgetWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, inputSize] (QAsymm8).
-    std::shared_ptr<ConstCpuTensorHandle> m_InputToCellWeights;
+    std::shared_ptr<ConstTensorHandle> m_InputToCellWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, inputSize] (QAsymm8).
-    std::shared_ptr<ConstCpuTensorHandle> m_InputToOutputWeights;
+    std::shared_ptr<ConstTensorHandle> m_InputToOutputWeights;
 
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, outputSize] (QAsymm8).
-    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToInputWeights;
+    std::shared_ptr<ConstTensorHandle> m_RecurrentToInputWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, outputSize] (QAsymm8).
-    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToForgetWeights;
+    std::shared_ptr<ConstTensorHandle> m_RecurrentToForgetWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, outputSize] (QAsymm8).
-    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToCellWeights;
+    std::shared_ptr<ConstTensorHandle> m_RecurrentToCellWeights;
     /// A unique pointer to represent 2D weights tensor with dimensions [outputSize, outputSize] (QAsymm8).
-    std::shared_ptr<ConstCpuTensorHandle> m_RecurrentToOutputWeights;
+    std::shared_ptr<ConstTensorHandle> m_RecurrentToOutputWeights;
 
     /// A unique pointer to represent 1D bias tensor with dimensions [outputSize] (int32).
-    std::shared_ptr<ConstCpuTensorHandle> m_InputGateBias;
+    std::shared_ptr<ConstTensorHandle> m_InputGateBias;
     /// A unique pointer to represent 1D bias tensor with dimensions [outputSize] (int32).
-    std::shared_ptr<ConstCpuTensorHandle> m_ForgetGateBias;
+    std::shared_ptr<ConstTensorHandle> m_ForgetGateBias;
     /// A unique pointer to represent 1D bias tensor with dimensions [outputSize] (int32).
-    std::shared_ptr<ConstCpuTensorHandle> m_CellBias;
+    std::shared_ptr<ConstTensorHandle> m_CellBias;
     /// A unique pointer to represent 1D bias tensor with dimensions [outputSize] (int32).
-    std::shared_ptr<ConstCpuTensorHandle> m_OutputGateBias;
+    std::shared_ptr<ConstTensorHandle> m_OutputGateBias;
 };
 
 /// This layer represents a QuantizedLstm operation.

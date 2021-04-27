@@ -9,8 +9,8 @@
 #include <armnn/backends/DynamicBackend.hpp>
 #include <armnn/backends/ILayerSupport.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <Filesystem.hpp>
 #include <reference/workloads/RefConvolution2dWorkload.hpp>
 #include <Runtime.hpp>
@@ -1473,7 +1473,7 @@ void CreateReferenceDynamicBackendTestImpl()
         { outputInfo }
     };
     convolution2dQueueDescriptor.m_Inputs.push_back(nullptr);
-    auto weights = std::make_unique<ScopedCpuTensorHandle>(weightInfo);
+    auto weights = std::make_unique<ScopedTensorHandle>(weightInfo);
     convolution2dQueueDescriptor.m_Weight = weights.get();
 
     // Create a convolution workload with the dummy settings

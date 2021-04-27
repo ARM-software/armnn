@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "CpuTensorHandle.hpp"
+#include "TensorHandle.hpp"
 
 #include <armnn/backends/ITensorHandle.hpp>
 #include <armnn/Tensor.hpp>
@@ -206,7 +206,7 @@ void GatherTensorHandlePairs(const DescriptorType& descriptor,
 
 int32_t ConvertMaskToACLFormat(int32_t mask, int32_t numDim);
 
-armnn::ConstTensor PermuteTensor(const ConstCpuTensorHandle* tensor,
+armnn::ConstTensor PermuteTensor(const ConstTensorHandle* tensor,
                                  const PermutationVector& permutationVector,
                                  void* permuteBuffer);
 
@@ -214,7 +214,7 @@ void ReshapeWeightsForAcl(TensorInfo& weightInfo, DataLayout dataLayout);
 
 TensorInfo ConvertWeightTensorInfoFromArmnnToAcl(const TensorInfo& weightInfo, DataLayout dataLayout);
 
-armnn::ConstTensor ConvertWeightTensorFromArmnnToAcl(const ConstCpuTensorHandle* weightTensor,
+armnn::ConstTensor ConvertWeightTensorFromArmnnToAcl(const ConstTensorHandle* weightTensor,
                                                      DataLayout dataLayout,
                                                      void* permuteBuffer);
 

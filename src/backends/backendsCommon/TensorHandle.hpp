@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/CpuTensorHandleFwd.hpp>
+#include <armnn/backends/TensorHandleFwd.hpp>
 #include <armnn/backends/ITensorHandle.hpp>
 
 #include <armnn/TypesUtils.hpp>
@@ -23,8 +23,8 @@ namespace armnn
 // of a tensor, assuming fully packed data with no padding
 TensorShape GetUnpaddedTensorStrides(const TensorInfo& tensorInfo);
 
-// Abstract tensor handles wrapping a CPU-readable region of memory, interpreting it as tensor data.
-class ConstCpuTensorHandle : public ITensorHandle
+// Abstract tensor handles wrapping a readable region of memory, interpreting it as tensor data.
+class ConstTensorHandle : public ITensorHandle
 {
 public:
     template <typename T>
@@ -53,7 +53,7 @@ public:
     TensorShape GetShape() const override { return m_TensorInfo.GetShape(); }
 
 protected:
-    ConstCpuTensorHandle(const TensorInfo& tensorInfo);
+    ConstTensorHandle(const TensorInfo& tensorInfo);
 
     void SetConstMemory(const void* mem) { m_Memory = mem; }
 
@@ -62,18 +62,18 @@ private:
     void CopyOutTo(void *) const override { ARMNN_ASSERT_MSG(false, "Unimplemented"); }
     void CopyInFrom(const void*) override { ARMNN_ASSERT_MSG(false, "Unimplemented"); }
 
-    ConstCpuTensorHandle(const ConstCpuTensorHandle& other) = delete;
-    ConstCpuTensorHandle& operator=(const ConstCpuTensorHandle& other) = delete;
+    ConstTensorHandle(const ConstTensorHandle& other) = delete;
+    ConstTensorHandle& operator=(const ConstTensorHandle& other) = delete;
 
     TensorInfo m_TensorInfo;
     const void* m_Memory;
 };
 
 template<>
-const void* ConstCpuTensorHandle::GetConstTensor<void>() const;
+const void* ConstTensorHandle::GetConstTensor<void>() const;
 
-// Abstract specialization of ConstCpuTensorHandle that allows write access to the same data.
-class CpuTensorHandle : public ConstCpuTensorHandle
+// Abstract specialization of ConstTensorHandle that allows write access to the same data.
+class TensorHandle : public ConstTensorHandle
 {
 public:
     template <typename T>
@@ -84,7 +84,7 @@ public:
     }
 
 protected:
-    CpuTensorHandle(const TensorInfo& tensorInfo);
+    TensorHandle(const TensorInfo& tensorInfo);
 
     void SetMemory(void* mem)
     {
@@ -94,29 +94,29 @@ protected:
 
 private:
 
-    CpuTensorHandle(const CpuTensorHandle& other) = delete;
-    CpuTensorHandle& operator=(const CpuTensorHandle& other) = delete;
+    TensorHandle(const TensorHandle& other) = delete;
+    TensorHandle& operator=(const TensorHandle& other) = delete;
     void* m_MutableMemory;
 };
 
 template <>
-void* CpuTensorHandle::GetTensor<void>() const;
+void* TensorHandle::GetTensor<void>() const;
 
-// A CpuTensorHandle that owns the wrapped memory region.
-class ScopedCpuTensorHandle : public CpuTensorHandle
+// A TensorHandle that owns the wrapped memory region.
+class ScopedTensorHandle : public TensorHandle
 {
 public:
-    explicit ScopedCpuTensorHandle(const TensorInfo& tensorInfo);
+    explicit ScopedTensorHandle(const TensorInfo& tensorInfo);
 
     // Copies contents from Tensor.
-    explicit ScopedCpuTensorHandle(const ConstTensor& tensor);
+    explicit ScopedTensorHandle(const ConstTensor& tensor);
 
-    // Copies contents from ConstCpuTensorHandle
-    explicit ScopedCpuTensorHandle(const ConstCpuTensorHandle& tensorHandle);
+    // Copies contents from ConstTensorHandle
+    explicit ScopedTensorHandle(const ConstTensorHandle& tensorHandle);
 
-    ScopedCpuTensorHandle(const ScopedCpuTensorHandle& other);
-    ScopedCpuTensorHandle& operator=(const ScopedCpuTensorHandle& other);
-    ~ScopedCpuTensorHandle();
+    ScopedTensorHandle(const ScopedTensorHandle& other);
+    ScopedTensorHandle& operator=(const ScopedTensorHandle& other);
+    ~ScopedTensorHandle();
 
     virtual void Allocate() override;
 
@@ -125,21 +125,21 @@ private:
     void CopyOutTo(void* memory) const override;
     void CopyInFrom(const void* memory) override;
 
-    void CopyFrom(const ScopedCpuTensorHandle& other);
+    void CopyFrom(const ScopedTensorHandle& other);
     void CopyFrom(const void* srcMemory, unsigned int numBytes);
 };
 
-// A CpuTensorHandle that wraps an already allocated memory region.
+// A TensorHandle that wraps an already allocated memory region.
 //
 // Clients must make sure the passed in memory region stays alive for the lifetime of
-// the PassthroughCpuTensorHandle instance.
+// the PassthroughTensorHandle instance.
 //
-// Note there is no polymorphism to/from ConstPassthroughCpuTensorHandle.
-class PassthroughCpuTensorHandle : public CpuTensorHandle
+// Note there is no polymorphism to/from ConstPassthroughTensorHandle.
+class PassthroughTensorHandle : public TensorHandle
 {
 public:
-    PassthroughCpuTensorHandle(const TensorInfo& tensorInfo, void* mem)
-    :   CpuTensorHandle(tensorInfo)
+    PassthroughTensorHandle(const TensorInfo& tensorInfo, void* mem)
+    :   TensorHandle(tensorInfo)
     {
         SetMemory(mem);
     }
@@ -147,18 +147,18 @@ public:
     virtual void Allocate() override;
 };
 
-// A ConstCpuTensorHandle that wraps an already allocated memory region.
+// A ConstTensorHandle that wraps an already allocated memory region.
 //
 // This allows users to pass in const memory to a network.
 // Clients must make sure the passed in memory region stays alive for the lifetime of
-// the PassthroughCpuTensorHandle instance.
+// the PassthroughTensorHandle instance.
 //
-// Note there is no polymorphism to/from PassthroughCpuTensorHandle.
-class ConstPassthroughCpuTensorHandle : public ConstCpuTensorHandle
+// Note there is no polymorphism to/from PassthroughTensorHandle.
+class ConstPassthroughTensorHandle : public ConstTensorHandle
 {
 public:
-    ConstPassthroughCpuTensorHandle(const TensorInfo& tensorInfo, const void* mem)
-    :   ConstCpuTensorHandle(tensorInfo)
+    ConstPassthroughTensorHandle(const TensorInfo& tensorInfo, const void* mem)
+    :   ConstTensorHandle(tensorInfo)
     {
         SetConstMemory(mem);
     }
@@ -170,16 +170,16 @@ public:
 // Template specializations.
 
 template <>
-const void* ConstCpuTensorHandle::GetConstTensor() const;
+const void* ConstTensorHandle::GetConstTensor() const;
 
 template <>
-void* CpuTensorHandle::GetTensor() const;
+void* TensorHandle::GetTensor() const;
 
 class ManagedConstTensorHandle
 {
 
 public:
-    explicit ManagedConstTensorHandle(std::shared_ptr<ConstCpuTensorHandle> ptr)
+    explicit ManagedConstTensorHandle(std::shared_ptr<ConstTensorHandle> ptr)
         : m_Mapped(false)
         , m_TensorHandle(std::move(ptr)) {};
 
@@ -200,7 +200,7 @@ public:
     }
 
     // Delete copy constructor as it's unnecessary
-    ManagedConstTensorHandle(const ConstCpuTensorHandle& other) = delete;
+    ManagedConstTensorHandle(const ConstTensorHandle& other) = delete;
 
     // Delete copy assignment as it's unnecessary
     ManagedConstTensorHandle& operator=(const ManagedConstTensorHandle& other) = delete;
@@ -239,7 +239,19 @@ public:
 
 private:
     bool m_Mapped;
-    std::shared_ptr<ConstCpuTensorHandle> m_TensorHandle;
+    std::shared_ptr<ConstTensorHandle> m_TensorHandle;
 };
+
+using ConstCpuTensorHandle ARMNN_DEPRECATED_MSG("ConstCpuTensorHandle is deprecated, "
+                                                "use ConstTensorHandle instead") = ConstTensorHandle;
+using CpuTensorHandle ARMNN_DEPRECATED_MSG("CpuTensorHandle is deprecated, "
+                                           "use TensorHandle instead") = TensorHandle;
+using ScopedCpuTensorHandle ARMNN_DEPRECATED_MSG("ScopedCpuTensorHandle is deprecated, "
+                                                 "use ScopedTensorHandle instead") = ScopedTensorHandle;
+using PassthroughCpuTensorHandle ARMNN_DEPRECATED_MSG("PassthroughCpuTensorHandle is deprecated, use "
+                                                      "PassthroughTensorHandle instead") = PassthroughTensorHandle;
+using ConstPassthroughCpuTensorHandle ARMNN_DEPRECATED_MSG("ConstPassthroughCpuTensorHandle is "
+                                                           "deprecated, use ConstPassthroughTensorHandle "
+                                                           "instead") = ConstPassthroughTensorHandle;
 
 } // namespace armnn

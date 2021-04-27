@@ -9,16 +9,16 @@
 namespace armnn
 {
 
-class ScopedCpuTensorHandle;
+class ScopedTensorHandle;
 
 /// This layer represents a 2D transpose convolution operation.
 class TransposeConvolution2dLayer : public LayerWithParameters<TransposeConvolution2dDescriptor>
 {
 public:
     /// A unique pointer to store weight values.
-    std::shared_ptr<ConstCpuTensorHandle> m_Weight;
+    std::shared_ptr<ConstTensorHandle> m_Weight;
     /// A unique pointer to store bias values.
-    std::shared_ptr<ConstCpuTensorHandle> m_Bias;
+    std::shared_ptr<ConstTensorHandle> m_Bias;
 
     /// Makes a workload for the TransposeConvolution2d type.
     /// @param [in] graph The graph where this layer can be found.

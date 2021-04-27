@@ -4,9 +4,8 @@
 #
 
 list(APPEND armnnBackendsCommon_sources
-    CpuTensorHandle.cpp
-    CpuTensorHandle.hpp
-    CpuTensorHandleFwd.hpp
+    TensorHandle.cpp
+    TensorHandle.hpp
     DynamicBackend.cpp
     DynamicBackend.hpp
     DynamicBackendUtils.cpp

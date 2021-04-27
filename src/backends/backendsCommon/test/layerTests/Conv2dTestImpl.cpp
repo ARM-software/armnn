@@ -13,7 +13,7 @@
 #include <armnnUtils/DataLayoutIndexed.hpp>
 #include <armnnUtils/Permute.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <backendsCommon/test/DataLayoutUtils.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
@@ -318,8 +318,8 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
 
     armnn::Convolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
-    armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
-    armnn::ScopedCpuTensorHandle biasTensor(biasDesc);
+    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
+    armnn::ScopedTensorHandle biasTensor(biasDesc);
     // Permute the kernel if necessary
     boost::multi_array<T, 4> kernel = boost::multi_array<T, 4>(originalKernel);
     if (layout == armnn::DataLayout::NHWC)
@@ -423,10 +423,10 @@ LayerTestResult<O, 4> SimpleConvolution2dNhwcTestImpl(
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
-    armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
+    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
     AllocateAndCopyDataToITensorHandle(&weightsTensor, &kernel[0][0][0][0]);
 
-    armnn::ScopedCpuTensorHandle biasTensor(biasDesc);
+    armnn::ScopedTensorHandle biasTensor(biasDesc);
 
     armnn::Convolution2dQueueDescriptor data;
 
@@ -547,8 +547,8 @@ LayerTestResult<T,4> Convolution1dTestImpl(
 
     armnn::Convolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
-    armnn::ScopedCpuTensorHandle         weightsTensor(kernelInfo);
-    armnn::ScopedCpuTensorHandle         biasTensor(biasInfo);
+    armnn::ScopedTensorHandle         weightsTensor(kernelInfo);
+    armnn::ScopedTensorHandle         biasTensor(biasInfo);
 
     AllocateAndCopyDataToITensorHandle(&weightsTensor, kernelData.data());
     AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());
@@ -1349,8 +1349,8 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(
 
     armnn::Convolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
-    armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
-    armnn::ScopedCpuTensorHandle biasTensor(biasDesc);
+    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
+    armnn::ScopedTensorHandle biasTensor(biasDesc);
 
     AllocateAndCopyDataToITensorHandle(&weightsTensor, &kernel[0][0][0][0]);
     AllocateAndCopyDataToITensorHandle(&biasTensor, &bias[0]);
@@ -1722,11 +1722,11 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
-    armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
+    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
 
     AllocateAndCopyDataToITensorHandle(&weightsTensor, &kernel[0][0][0][0]);
 
-    armnn::ScopedCpuTensorHandle biasTensor(biasDesc);
+    armnn::ScopedTensorHandle biasTensor(biasDesc);
     if (biasEnabled)
     {
         AllocateAndCopyDataToITensorHandle(&biasTensor, &bias[0]);
@@ -1882,8 +1882,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
 
     armnn::DepthwiseConvolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
-    armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
-    armnn::ScopedCpuTensorHandle biasTensor(biasDesc);
+    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
+    armnn::ScopedTensorHandle biasTensor(biasDesc);
 
     AllocateAndCopyDataToITensorHandle(&weightsTensor, &kernel[0][0][0][0]);
     AllocateAndCopyDataToITensorHandle(&biasTensor, &bias[0]);
@@ -2095,8 +2095,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
 
     armnn::DepthwiseConvolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
-    armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
-    armnn::ScopedCpuTensorHandle biasTensor(biasDesc);
+    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
+    armnn::ScopedTensorHandle biasTensor(biasDesc);
 
     AllocateAndCopyDataToITensorHandle(&weightsTensor, &kernel[0][0][0][0]);
     AllocateAndCopyDataToITensorHandle(&biasTensor, &bias[0]);
@@ -2252,8 +2252,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
 
     armnn::DepthwiseConvolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
-    armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
-    armnn::ScopedCpuTensorHandle biasTensor(biasDesc);
+    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
+    armnn::ScopedTensorHandle biasTensor(biasDesc);
 
     boost::multi_array<T, 4> kernel = boost::multi_array<T, 4>(originalKernel);
     AllocateAndCopyDataToITensorHandle(&weightsTensor, &kernel[0][0][0][0]);
@@ -3007,8 +3007,8 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
 
     armnn::DepthwiseConvolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
-    armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
-    armnn::ScopedCpuTensorHandle biasTensor(biasDesc);
+    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
+    armnn::ScopedTensorHandle biasTensor(biasDesc);
 
     AllocateAndCopyDataToITensorHandle(&weightsTensor, &kernel[0][0][0][0]);
     AllocateAndCopyDataToITensorHandle(&biasTensor, &bias[0]);
@@ -3502,8 +3502,8 @@ LayerTestResult<uint8_t, 4> Convolution2dPerAxisQuantTest(
 
 
     WorkloadInfo workloadInfo;
-    ScopedCpuTensorHandle weightTensor(kernelInfo);
-    ScopedCpuTensorHandle biasTensor(biasInfo);
+    ScopedTensorHandle weightTensor(kernelInfo);
+    ScopedTensorHandle biasTensor(biasInfo);
 
     AllocateAndCopyDataToITensorHandle(&weightTensor, kernelData.data());
     AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());
@@ -3756,8 +3756,8 @@ LayerTestResult<uint8_t, 4> DepthwiseConvolution2dPerAxisQuantTest(
     std::unique_ptr<ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputInfo);
 
     WorkloadInfo workloadInfo;
-    ScopedCpuTensorHandle weightTensor(kernelInfo);
-    ScopedCpuTensorHandle biasTensor(biasInfo);
+    ScopedTensorHandle weightTensor(kernelInfo);
+    ScopedTensorHandle biasTensor(biasInfo);
 
     AllocateAndCopyDataToITensorHandle(&weightTensor, kernelData.data());
     AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());

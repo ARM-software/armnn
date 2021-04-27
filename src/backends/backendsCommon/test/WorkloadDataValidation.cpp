@@ -7,7 +7,7 @@
 
 #include <armnn/Exceptions.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/Workload.hpp>
 
 #include <reference/workloads/RefWorkloads.hpp>
@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(BatchNormalizationQueueDescriptor_Validate_DifferentQuantiz
 
     unsigned int sameShape[] = { 10 };
     TensorInfo sameInfo = armnn::TensorInfo(1, sameShape, armnn::DataType::QAsymmU8);
-    ScopedCpuTensorHandle sameTensor(sameInfo);
+    ScopedTensorHandle sameTensor(sameInfo);
 
     AddInputToWorkload(invalidData, invalidInfo, inputTensorInfo, nullptr);
     AddOutputToWorkload(invalidData, invalidInfo, outputTensorInfo, nullptr);
@@ -136,8 +136,8 @@ BOOST_AUTO_TEST_CASE(FullyConnectedQueueDescriptor_Validate_RequiredDataMissing)
     FullyConnectedQueueDescriptor invalidData;
     WorkloadInfo                  invalidInfo;
 
-    ScopedCpuTensorHandle weightTensor(weightsDesc);
-    ScopedCpuTensorHandle biasTensor(biasesDesc);
+    ScopedTensorHandle weightTensor(weightsDesc);
+    ScopedTensorHandle biasTensor(biasesDesc);
 
     AddInputToWorkload(invalidData, invalidInfo, inputTensorInfo, nullptr);
     AddOutputToWorkload(invalidData, invalidInfo, outputTensorInfo, nullptr);
@@ -515,27 +515,27 @@ BOOST_AUTO_TEST_CASE(LstmQueueDescriptor_Validate)
     AddOutputToWorkload(data, info, cellStateOutTensorInfo, nullptr);
     // AddOutputToWorkload(data, info, outputTensorInfo, nullptr); is left out
 
-    armnn::ScopedCpuTensorHandle inputToInputWeightsTensor(tensorInfo4x5);
-    armnn::ScopedCpuTensorHandle inputToForgetWeightsTensor(tensorInfo4x5);
-    armnn::ScopedCpuTensorHandle inputToCellWeightsTensor(tensorInfo4x5);
-    armnn::ScopedCpuTensorHandle inputToOutputWeightsTensor(tensorInfo4x5);
-    armnn::ScopedCpuTensorHandle recurrentToForgetWeightsTensor(tensorInfo4x3);
-    armnn::ScopedCpuTensorHandle recurrentToInputWeightsTensor(tensorInfo4x3);
-    armnn::ScopedCpuTensorHandle recurrentToCellWeightsTensor(tensorInfo4x3);
-    armnn::ScopedCpuTensorHandle recurrentToOutputWeightsTensor(tensorInfo4x3);
-    armnn::ScopedCpuTensorHandle cellToInputWeightsTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle inputGateBiasTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle forgetGateBiasTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle cellBiasTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle outputGateBiasTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle cellToForgetWeightsTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle cellToOutputWeightsTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle projectionWeightsTensor(tensorInfo3x4);
-    armnn::ScopedCpuTensorHandle projectionBiasTensor(tensorInfo3);
-    armnn::ScopedCpuTensorHandle inputLayerNormWeightsTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle forgetLayerNormWeightsTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle cellLayerNormWeightsTensor(tensorInfo4);
-    armnn::ScopedCpuTensorHandle outputLayerNormWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle inputToInputWeightsTensor(tensorInfo4x5);
+    armnn::ScopedTensorHandle inputToForgetWeightsTensor(tensorInfo4x5);
+    armnn::ScopedTensorHandle inputToCellWeightsTensor(tensorInfo4x5);
+    armnn::ScopedTensorHandle inputToOutputWeightsTensor(tensorInfo4x5);
+    armnn::ScopedTensorHandle recurrentToForgetWeightsTensor(tensorInfo4x3);
+    armnn::ScopedTensorHandle recurrentToInputWeightsTensor(tensorInfo4x3);
+    armnn::ScopedTensorHandle recurrentToCellWeightsTensor(tensorInfo4x3);
+    armnn::ScopedTensorHandle recurrentToOutputWeightsTensor(tensorInfo4x3);
+    armnn::ScopedTensorHandle cellToInputWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle inputGateBiasTensor(tensorInfo4);
+    armnn::ScopedTensorHandle forgetGateBiasTensor(tensorInfo4);
+    armnn::ScopedTensorHandle cellBiasTensor(tensorInfo4);
+    armnn::ScopedTensorHandle outputGateBiasTensor(tensorInfo4);
+    armnn::ScopedTensorHandle cellToForgetWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle cellToOutputWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle projectionWeightsTensor(tensorInfo3x4);
+    armnn::ScopedTensorHandle projectionBiasTensor(tensorInfo3);
+    armnn::ScopedTensorHandle inputLayerNormWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle forgetLayerNormWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle cellLayerNormWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle outputLayerNormWeightsTensor(tensorInfo4);
 
     data.m_InputToInputWeights = &inputToInputWeightsTensor;
     data.m_InputToForgetWeights = &inputToForgetWeightsTensor;
@@ -657,14 +657,14 @@ BOOST_AUTO_TEST_CASE(BiasPerAxisQuantization_Validate)
     AddInputToWorkload(queueDescriptor, workloadInfo, inputInfo, nullptr);
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, nullptr);
 
-    ScopedCpuTensorHandle weightTensor(weightInfo);
+    ScopedTensorHandle weightTensor(weightInfo);
     queueDescriptor.m_Weight = &weightTensor;
 
     // Test 1: correct per-axis quantization values
     const std::vector<float> biasPerAxisScales1  = { 3.75f, 5.25f };
     const TensorInfo biasInfo1(biasShape, biasType, biasPerAxisScales1, 0);
 
-    ScopedCpuTensorHandle biasHandle1(biasInfo1);
+    ScopedTensorHandle biasHandle1(biasInfo1);
     queueDescriptor.m_Bias = &biasHandle1;
 
     BOOST_CHECK_NO_THROW(queueDescriptor.Validate(workloadInfo));
@@ -673,7 +673,7 @@ BOOST_AUTO_TEST_CASE(BiasPerAxisQuantization_Validate)
     const std::vector<float> biasPerAxisScales2 = { 4.00f, 5.00f };
     const TensorInfo biasInfo2(biasShape, biasType, biasPerAxisScales2, 0);
 
-    ScopedCpuTensorHandle biasHandle2(biasInfo2);
+    ScopedTensorHandle biasHandle2(biasInfo2);
     queueDescriptor.m_Bias = &biasHandle2;
 
     BOOST_CHECK_NO_THROW(queueDescriptor.Validate(workloadInfo));
@@ -682,7 +682,7 @@ BOOST_AUTO_TEST_CASE(BiasPerAxisQuantization_Validate)
     const std::vector<float> biasPerAxisScales3 = { 3.75f, 5.25f, 5.25f };
     const TensorInfo biasInfo3(biasShape, biasType, biasPerAxisScales3, 0);
 
-    ScopedCpuTensorHandle biasHandle3(biasInfo3);
+    ScopedTensorHandle biasHandle3(biasInfo3);
     queueDescriptor.m_Bias = &biasHandle3;
 
     BOOST_CHECK_THROW(queueDescriptor.Validate(workloadInfo), InvalidArgumentException);

@@ -6,7 +6,7 @@
 #include "PadLayer.hpp"
 #include "LayerCloneBase.hpp"
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 

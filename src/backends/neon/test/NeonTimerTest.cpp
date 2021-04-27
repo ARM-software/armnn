@@ -8,7 +8,7 @@
 
 #include <test/TensorHelpers.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <neon/NeonTimer.hpp>

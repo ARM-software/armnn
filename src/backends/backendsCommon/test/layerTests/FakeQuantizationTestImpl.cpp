@@ -6,7 +6,7 @@
 #include "FakeQuantizationTestImpl.hpp"
 
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
@@ -48,7 +48,7 @@ LayerTestResult<float, 2> FakeQuantizationTest(
     data.m_Parameters.m_Min = min;
     data.m_Parameters.m_Max = max;
 
-    armnn::PassthroughCpuTensorHandle refHandle(tensorInfo, &ret.outputExpected[0][0]);
+    armnn::PassthroughTensorHandle refHandle(tensorInfo, &ret.outputExpected[0][0]);
     armnn::FakeQuantizationQueueDescriptor refData = data;
     armnn::WorkloadInfo refInfo = info;
     SetWorkloadOutput(refData, refInfo, 0, tensorInfo, &refHandle);

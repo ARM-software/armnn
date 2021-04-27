@@ -14,9 +14,9 @@
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -353,10 +353,10 @@ std::unique_ptr<BatchNormalizationWorkloadType> CreateBatchNormalizationWorkload
     BatchNormalizationLayer* const layer = graph.AddLayer<BatchNormalizationLayer>(layerDesc, "layer");
 
     armnn::TensorInfo weightInfo({3}, DataType);
-    layer->m_Mean     = std::make_unique<ScopedCpuTensorHandle>(weightInfo);
-    layer->m_Variance = std::make_unique<ScopedCpuTensorHandle>(weightInfo);
-    layer->m_Beta     = std::make_unique<ScopedCpuTensorHandle>(weightInfo);
-    layer->m_Gamma    = std::make_unique<ScopedCpuTensorHandle>(weightInfo);
+    layer->m_Mean     = std::make_unique<ScopedTensorHandle>(weightInfo);
+    layer->m_Variance = std::make_unique<ScopedTensorHandle>(weightInfo);
+    layer->m_Beta     = std::make_unique<ScopedTensorHandle>(weightInfo);
+    layer->m_Gamma    = std::make_unique<ScopedTensorHandle>(weightInfo);
     layer->m_Mean->Allocate();
     layer->m_Variance->Allocate();
     layer->m_Beta->Allocate();
@@ -411,10 +411,10 @@ std::unique_ptr<BatchNormalizationWorkloadType> CreateBatchNormalizationWithBlob
     BatchNormalizationLayer* const layer = graph.AddLayer<BatchNormalizationLayer>(layerDesc, "layer");
 
     armnn::TensorInfo weightInfo({3}, DataType);
-    layer->m_Mean     = std::make_unique<ScopedCpuTensorHandle>(weightInfo);
-    layer->m_Variance = std::make_unique<ScopedCpuTensorHandle>(weightInfo);
-    layer->m_Beta     = std::make_unique<ScopedCpuTensorHandle>(weightInfo);
-    layer->m_Gamma    = std::make_unique<ScopedCpuTensorHandle>(weightInfo);
+    layer->m_Mean     = std::make_unique<ScopedTensorHandle>(weightInfo);
+    layer->m_Variance = std::make_unique<ScopedTensorHandle>(weightInfo);
+    layer->m_Beta     = std::make_unique<ScopedTensorHandle>(weightInfo);
+    layer->m_Gamma    = std::make_unique<ScopedTensorHandle>(weightInfo);
     layer->m_Mean->Allocate();
     layer->m_Variance->Allocate();
     layer->m_Beta->Allocate();
@@ -492,8 +492,8 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadTest(armnn::IW
     TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 3, 8, 16} : TensorShape{2, 8, 16, 3};
     TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 2, 2, 10} : TensorShape{2, 2, 10, 2};
 
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo(weightShape, DataType));
-    layer->m_Bias   = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({2}, GetBiasDataType(DataType)));
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo(weightShape, DataType));
+    layer->m_Bias   = std::make_unique<ScopedTensorHandle>(TensorInfo({2}, GetBiasDataType(DataType)));
 
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();
@@ -555,8 +555,8 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dFusedActivationWithBlo
     TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 3, 8, 16} : TensorShape{2, 8, 16, 3};
     TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 2, 2, 10} : TensorShape{2, 2, 10, 2};
 
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo(weightShape, DataType));
-    layer->m_Bias   = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({2}, GetBiasDataType(DataType)));
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo(weightShape, DataType));
+    layer->m_Bias   = std::make_unique<ScopedTensorHandle>(TensorInfo({2}, GetBiasDataType(DataType)));
 
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();
@@ -639,8 +639,8 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadFastMathTest(a
     TensorShape inputShape  = TensorShape{1, 32, 149, 149};
     TensorShape outputShape = TensorShape{1, 32, 147, 147};
 
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo(weightShape, DataType));
-    layer->m_Bias   = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({2}, GetBiasDataType(DataType)));
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo(weightShape, DataType));
+    layer->m_Bias   = std::make_unique<ScopedTensorHandle>(TensorInfo({2}, GetBiasDataType(DataType)));
 
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();
@@ -692,23 +692,23 @@ std::unique_ptr<LstmWorkload> CreateLstmWorkloadTest(armnn::IWorkloadFactory& fa
     unsigned int numUnits = 4;
     unsigned int outputSize = 4;
 
-    layer->m_BasicParameters.m_InputToForgetWeights = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_InputToForgetWeights = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits, inputSize }, DataType::Float32));
-    layer->m_BasicParameters.m_InputToCellWeights = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_InputToCellWeights = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits, inputSize }, DataType::Float32));
-    layer->m_BasicParameters.m_InputToOutputWeights = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_InputToOutputWeights = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits, inputSize }, DataType::Float32));
-    layer->m_BasicParameters.m_RecurrentToForgetWeights = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_RecurrentToForgetWeights = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits, outputSize }, DataType::Float32));
-    layer->m_BasicParameters.m_RecurrentToCellWeights = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_RecurrentToCellWeights = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits, outputSize }, DataType::Float32));
-    layer->m_BasicParameters.m_RecurrentToOutputWeights = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_RecurrentToOutputWeights = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits, outputSize }, DataType::Float32));
-    layer->m_BasicParameters.m_ForgetGateBias = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_ForgetGateBias = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits }, DataType::Float32));
-    layer->m_BasicParameters.m_CellBias = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_CellBias = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits }, DataType::Float32));
-    layer->m_BasicParameters.m_OutputGateBias = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_BasicParameters.m_OutputGateBias = std::make_unique<ScopedTensorHandle>
             (TensorInfo({ numUnits }, DataType::Float32));
 
     layer->m_BasicParameters.m_InputToForgetWeights->Allocate();
@@ -724,9 +724,9 @@ std::unique_ptr<LstmWorkload> CreateLstmWorkloadTest(armnn::IWorkloadFactory& fa
 
     if (layerDesc.m_PeepholeEnabled)
     {
-        layer->m_PeepholeParameters.m_CellToForgetWeights = std::make_unique<ScopedCpuTensorHandle>
+        layer->m_PeepholeParameters.m_CellToForgetWeights = std::make_unique<ScopedTensorHandle>
                 (TensorInfo({ numUnits }, DataType::Float32));
-        layer->m_PeepholeParameters.m_CellToOutputWeights = std::make_unique<ScopedCpuTensorHandle>
+        layer->m_PeepholeParameters.m_CellToOutputWeights = std::make_unique<ScopedTensorHandle>
                 (TensorInfo({ numUnits }, DataType::Float32));
         layer->m_PeepholeParameters.m_CellToForgetWeights->Allocate();
         layer->m_PeepholeParameters.m_CellToOutputWeights->Allocate();
@@ -814,27 +814,27 @@ std::unique_ptr<QuantizedLstmWorkload> CreateQuantizedLstmWorkloadTest(armnn::IW
 
     // Weights and bias
     layer->m_QuantizedLstmParameters.m_InputToInputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(inputWeightsInfo);
+            std::make_unique<ScopedTensorHandle>(inputWeightsInfo);
     layer->m_QuantizedLstmParameters.m_InputToForgetWeights =
-            std::make_unique<ScopedCpuTensorHandle>(inputWeightsInfo);
+            std::make_unique<ScopedTensorHandle>(inputWeightsInfo);
     layer->m_QuantizedLstmParameters.m_InputToCellWeights =
-            std::make_unique<ScopedCpuTensorHandle>(inputWeightsInfo);
+            std::make_unique<ScopedTensorHandle>(inputWeightsInfo);
     layer->m_QuantizedLstmParameters.m_InputToOutputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(inputWeightsInfo);
+            std::make_unique<ScopedTensorHandle>(inputWeightsInfo);
 
     layer->m_QuantizedLstmParameters.m_RecurrentToInputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(recurrentWeightsInfo);
+            std::make_unique<ScopedTensorHandle>(recurrentWeightsInfo);
     layer->m_QuantizedLstmParameters.m_RecurrentToForgetWeights =
-            std::make_unique<ScopedCpuTensorHandle>(recurrentWeightsInfo);
+            std::make_unique<ScopedTensorHandle>(recurrentWeightsInfo);
     layer->m_QuantizedLstmParameters.m_RecurrentToCellWeights =
-            std::make_unique<ScopedCpuTensorHandle>(recurrentWeightsInfo);
+            std::make_unique<ScopedTensorHandle>(recurrentWeightsInfo);
     layer->m_QuantizedLstmParameters.m_RecurrentToOutputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(recurrentWeightsInfo);
+            std::make_unique<ScopedTensorHandle>(recurrentWeightsInfo);
 
-    layer->m_QuantizedLstmParameters.m_InputGateBias = std::make_unique<ScopedCpuTensorHandle>(biasInfo);
-    layer->m_QuantizedLstmParameters.m_ForgetGateBias = std::make_unique<ScopedCpuTensorHandle>(biasInfo);
-    layer->m_QuantizedLstmParameters.m_CellBias = std::make_unique<ScopedCpuTensorHandle>(biasInfo);
-    layer->m_QuantizedLstmParameters.m_OutputGateBias = std::make_unique<ScopedCpuTensorHandle>(biasInfo);
+    layer->m_QuantizedLstmParameters.m_InputGateBias = std::make_unique<ScopedTensorHandle>(biasInfo);
+    layer->m_QuantizedLstmParameters.m_ForgetGateBias = std::make_unique<ScopedTensorHandle>(biasInfo);
+    layer->m_QuantizedLstmParameters.m_CellBias = std::make_unique<ScopedTensorHandle>(biasInfo);
+    layer->m_QuantizedLstmParameters.m_OutputGateBias = std::make_unique<ScopedTensorHandle>(biasInfo);
 
     // Allocate weights and bias
     layer->m_QuantizedLstmParameters.m_InputToInputWeights->Allocate();
@@ -977,27 +977,27 @@ std::unique_ptr<QLstmWorkload> CreateQLstmWorkloadTest(armnn::IWorkloadFactory& 
     armnn::TensorInfo layerNormWeightsInfo({numUnits}, armnn::DataType::QSymmS16, layerNormScale, layerNormOffset);
 
     // Create and allocate tensors
-    layer->m_BasicParameters.m_InputToForgetWeights = std::make_unique<ScopedCpuTensorHandle>(inputWeightsInfo);
-    layer->m_BasicParameters.m_InputToCellWeights = std::make_unique<ScopedCpuTensorHandle>(inputWeightsInfo);
-    layer->m_BasicParameters.m_InputToOutputWeights = std::make_unique<ScopedCpuTensorHandle>(inputWeightsInfo);
+    layer->m_BasicParameters.m_InputToForgetWeights = std::make_unique<ScopedTensorHandle>(inputWeightsInfo);
+    layer->m_BasicParameters.m_InputToCellWeights = std::make_unique<ScopedTensorHandle>(inputWeightsInfo);
+    layer->m_BasicParameters.m_InputToOutputWeights = std::make_unique<ScopedTensorHandle>(inputWeightsInfo);
 
     layer->m_BasicParameters.m_RecurrentToForgetWeights =
-            std::make_unique<ScopedCpuTensorHandle>(recurrentWeightsInfo);
+            std::make_unique<ScopedTensorHandle>(recurrentWeightsInfo);
     layer->m_BasicParameters.m_RecurrentToCellWeights =
-            std::make_unique<ScopedCpuTensorHandle>(recurrentWeightsInfo);
+            std::make_unique<ScopedTensorHandle>(recurrentWeightsInfo);
     layer->m_BasicParameters.m_RecurrentToOutputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(recurrentWeightsInfo);
+            std::make_unique<ScopedTensorHandle>(recurrentWeightsInfo);
 
-    layer->m_BasicParameters.m_ForgetGateBias = std::make_unique<ScopedCpuTensorHandle>(biasInfo);
-    layer->m_BasicParameters.m_CellBias = std::make_unique<ScopedCpuTensorHandle>(biasInfo);
-    layer->m_BasicParameters.m_OutputGateBias = std::make_unique<ScopedCpuTensorHandle>(biasInfo);
+    layer->m_BasicParameters.m_ForgetGateBias = std::make_unique<ScopedTensorHandle>(biasInfo);
+    layer->m_BasicParameters.m_CellBias = std::make_unique<ScopedTensorHandle>(biasInfo);
+    layer->m_BasicParameters.m_OutputGateBias = std::make_unique<ScopedTensorHandle>(biasInfo);
 
     layer->m_LayerNormParameters.m_ForgetLayerNormWeights =
-            std::make_unique<ScopedCpuTensorHandle>(layerNormWeightsInfo);
+            std::make_unique<ScopedTensorHandle>(layerNormWeightsInfo);
     layer->m_LayerNormParameters.m_CellLayerNormWeights =
-            std::make_unique<ScopedCpuTensorHandle>(layerNormWeightsInfo);
+            std::make_unique<ScopedTensorHandle>(layerNormWeightsInfo);
     layer->m_LayerNormParameters.m_OutputLayerNormWeights =
-            std::make_unique<ScopedCpuTensorHandle>(layerNormWeightsInfo);
+            std::make_unique<ScopedTensorHandle>(layerNormWeightsInfo);
 
     layer->m_BasicParameters.m_InputToForgetWeights->Allocate();
     layer->m_BasicParameters.m_InputToCellWeights->Allocate();
@@ -1093,8 +1093,8 @@ std::unique_ptr<Convolution2dWorkload> CreateDirectConvolution2dWorkloadTest(arm
     float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
     float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
 
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({ 2, 3, 3, 3 }, DataType, inputsQScale));
-    layer->m_Bias   = std::make_unique<ScopedCpuTensorHandle>
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({ 2, 3, 3, 3 }, DataType, inputsQScale));
+    layer->m_Bias   = std::make_unique<ScopedTensorHandle>
         (TensorInfo({2},  GetBiasDataType(DataType), inputsQScale));
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();
@@ -1148,7 +1148,7 @@ std::unique_ptr<DepthwiseConvolution2dFloat32Workload> CreateDepthwiseConvolutio
 
     DepthwiseConvolution2dLayer* const layer = graph.AddLayer<DepthwiseConvolution2dLayer>(layerDesc, "layer");
 
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({1, 2, 4, 4}, DataType)); // [ M, I, H, W ]
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({1, 2, 4, 4}, DataType)); // [ M, I, H, W ]
     layer->m_Weight->Allocate();
 
     // Creates extra layers.
@@ -1200,8 +1200,8 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWorkloadTest(armnn::
     float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
     float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
 
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({7, 20}, DataType, inputsQScale, 0));
-    layer->m_Bias   = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({7}, GetBiasDataType(DataType), inputsQScale));
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({7, 20}, DataType, inputsQScale, 0));
+    layer->m_Bias   = std::make_unique<ScopedTensorHandle>(TensorInfo({7}, GetBiasDataType(DataType), inputsQScale));
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();
 
@@ -1245,8 +1245,8 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWithBlobWorkloadTest
     float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
     float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
 
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({7, 20}, DataType, inputsQScale, 0));
-    layer->m_Bias   = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({7}, GetBiasDataType(DataType), inputsQScale));
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({7, 20}, DataType, inputsQScale, 0));
+    layer->m_Bias   = std::make_unique<ScopedTensorHandle>(TensorInfo({7}, GetBiasDataType(DataType), inputsQScale));
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();
 
@@ -2108,7 +2108,7 @@ std::unique_ptr<ConstantWorkload> CreateConstantWorkloadTest(armnn::IWorkloadFac
     armnn::TensorInfo outputTensorInfo(outputShape, DataType);
 
     auto constant = graph.AddLayer<ConstantLayer>("constant");
-    constant->m_LayerOutput = std::make_unique<ScopedCpuTensorHandle>(outputTensorInfo);
+    constant->m_LayerOutput = std::make_unique<ScopedTensorHandle>(outputTensorInfo);
     BOOST_TEST_CHECKPOINT("created constant layer");
 
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");

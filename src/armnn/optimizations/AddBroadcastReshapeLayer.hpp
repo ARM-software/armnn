@@ -8,7 +8,7 @@
 
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 namespace armnn
 {
@@ -70,7 +70,7 @@ public:
             {
                 ConstantLayer& constantLayer = static_cast<ConstantLayer&>(parentLayer);
 
-                constantLayer.m_LayerOutput = std::make_unique<ScopedCpuTensorHandle>(
+                constantLayer.m_LayerOutput = std::make_unique<ScopedTensorHandle>(
                     ConstTensor(reshapeInfo, constantLayer.m_LayerOutput.get()->GetConstTensor<void>()));
                 constantLayer.GetOutputSlot().SetTensorInfo(reshapeInfo);
             }

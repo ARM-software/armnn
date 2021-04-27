@@ -7,7 +7,7 @@
 
 #include "LstmUtils.hpp"
 #include "BaseIterator.hpp"
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 
 // Helper functions ported from the Android code base
@@ -296,12 +296,12 @@ void SetActivationParameters(uint32_t activation,
     }
 }
 
-std::unique_ptr<armnn::ScopedCpuTensorHandle> AssignScopedCpuTensorHandle(const armnn::ConstCpuTensorHandle* ptr)
+std::unique_ptr<armnn::ScopedTensorHandle> AssignScopedTensorHandle(const armnn::ConstTensorHandle *ptr)
 {
     if (!ptr)
     {
         return nullptr;
     }
 
-    return std::make_unique<armnn::ScopedCpuTensorHandle>(*ptr);
+    return std::make_unique<armnn::ScopedTensorHandle>(*ptr);
 }

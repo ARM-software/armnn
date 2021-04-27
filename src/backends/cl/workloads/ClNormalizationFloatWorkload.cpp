@@ -5,7 +5,7 @@
 
 #include "ClNormalizationFloatWorkload.hpp"
 #include <cl/ClTensorHandle.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <cl/ClLayerSupport.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>

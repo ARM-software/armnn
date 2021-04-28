@@ -8,6 +8,7 @@
 #include <armnnUtils/DataLayoutIndexed.hpp>
 #include <armnnUtils/TensorUtils.hpp>
 #include <armnn/utility/NumericCast.hpp>
+#include <armnn/Logging.hpp>
 
 #include <algorithm>
 #include <iomanip>
@@ -212,15 +213,13 @@ void ValidateBiasTensorQuantization(const TensorInfo& biasTensor,
     // Helper lambda function to validate a single bias quantization scale value
     auto VerifyBiasQuantizationScale = [&descName](float biasScale, float expectedScale) -> void
     {
-        constexpr float tolerance = 0.000001f;
+        constexpr float tolerance = 0.0001f;
         if (std::abs(biasScale - expectedScale) > tolerance)
         {
             // Print the float values with extra precision to see very small differences
-            std::stringstream msg;
-            msg << std::setprecision(10) << descName << ": Expected " << expectedScale <<
-                " quantization scale for bias tensor (the product of the input and weight scales), but got " <<
-                biasScale;
-            throw InvalidArgumentException(msg.str(), CHECK_LOCATION());
+            ARMNN_LOG(warning) << std::setprecision(6) << descName << ": Expected " << expectedScale <<
+                " for bias quantization scale (product of input and weight scales), but got " <<
+                biasScale << ". Using scale provided.";
         }
     };
 

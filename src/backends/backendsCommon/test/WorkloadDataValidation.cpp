@@ -676,7 +676,7 @@ BOOST_AUTO_TEST_CASE(BiasPerAxisQuantization_Validate)
     ScopedCpuTensorHandle biasHandle2(biasInfo2);
     queueDescriptor.m_Bias = &biasHandle2;
 
-    BOOST_CHECK_THROW(queueDescriptor.Validate(workloadInfo), InvalidArgumentException);
+    BOOST_CHECK_NO_THROW(queueDescriptor.Validate(workloadInfo));
 
     // Test 3: mismatched number of quantization scales
     const std::vector<float> biasPerAxisScales3 = { 3.75f, 5.25f, 5.25f };

@@ -203,7 +203,6 @@ if(BUILD_UNIT_TESTS)
         endif()
 
     add_executable(DelegateUnitTests ${armnnDelegate_unittest_sources})
-    target_include_directories(DelegateUnitTests PRIVATE third-party)
 
     # Add half library from armnn third-party libraries
     target_link_libraries(DelegateUnitTests PRIVATE thirdparty_headers)

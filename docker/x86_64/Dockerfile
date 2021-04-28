@@ -95,22 +95,6 @@ RUN cd $HOME/google/protobuf-3.12.0 && \
     --with-protoc=$HOME/armnn-devenv/google/x86_64_pb_install/bin/protoc && \
     make install -j$(nproc)
 
-# Build Caffe for x86_64
-# Dep Install
-RUN apt-get update && apt-get install -y \
-    libleveldb-dev libsnappy-dev libopencv-dev libhdf5-serial-dev \
-    --no-install-recommends libboost-all-dev \
-    libgflags-dev libgoogle-glog-dev liblmdb-dev \
-    libopenblas-dev \
-    libatlas-base-dev 
-
-
-# Makefile update
-# To Do: Don't copy the Local Make file to docker
-# RUN cd $HOME/caffe/ && rm Makefile.config.example
-COPY Makefile.config /tmp
-RUN mv /tmp/Makefile.config $HOME/caffe/
-
 # Dep Error - Bug ARMNN 
 RUN apt-get update && apt-get install -y \
      python-numpy
@@ -200,8 +184,6 @@ RUN cd $HOME/armnn-devenv && \
     -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
     -DONNX_GENERATED_SOURCES=$HOME/armnn-devenv/onnx \
     -DBUILD_ONNX_PARSER=1 \
-    -DTF_GENERATED_SOURCES=$HOME/armnn-devenv/tensorflow-protobuf \
-    -DBUILD_TF_PARSER=1 \
     -DBUILD_TF_LITE_PARSER=1 \
     -DTF_LITE_GENERATED_PATH=$HOME/armnn-devenv/tflite \
     -DFLATBUFFERS_ROOT=$HOME/armnn-devenv/flatbuffers-arm64 \

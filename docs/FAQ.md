@@ -46,7 +46,3 @@ This problem has previously been reported to the boostorg GitHub project. The so
 ArmNN fails to build on Ubuntu 20.04
 ---------------------------------------------------------
 The compiler version update on Ubuntu 20.04 resulted in build errors in Flat buffers 1.10.0. Update to Flatbuffers 1.12.0 to resolve this problem. In addition when building flatbuffers specify -fPIC CXX flag to allow the libraries to be used in our shared objects. Without this the the ArmNN build can fail with libflatbuffers.a(util.cpp.o): relocation R_X86_64_PC32 against symbol `_ZN11flatbuffers9DirExistsEPKc' can not be used when making a shared object; recompile with -fPIC
-
-Caffe fails to build on Ubuntu 20.04
----------------------------------------------------------
-The default version of OpenCV on Ubuntu 20.04 is 4.2. This appears to be incomatible with Caffe. Building results in missing definitions of "CV_LOAD_IMAGE_COLOR". When building Caffe to use with ArmNN you can disable OpenCV. In the Makefile.config uncomment "# USE_OPENCV := 0".

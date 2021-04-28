@@ -49,14 +49,6 @@ void CheckModelFormat(const std::string& modelFormat)
                                               "built with Onnx parser support.");
 #endif
     }
-    else if (modelFormat.find("tensorflow") != std::string::npos)
-    {
-#if defined(ARMNN_TF_PARSER)
-#else
-        throw armnn::InvalidArgumentException("Can't run model in onnx format without a "
-                                              "built with Tensorflow parser support.");
-#endif
-    }
     else if (modelFormat.find("tflite") != std::string::npos)
     {
 #if defined(ARMNN_TF_LITE_PARSER)
@@ -75,7 +67,7 @@ void CheckModelFormat(const std::string& modelFormat)
     else
     {
         throw armnn::InvalidArgumentException(fmt::format("Unknown model format: '{}'. "
-                                                          "Please include 'tensorflow', 'tflite' or 'onnx'",
+                                                          "Please include 'tflite' or 'onnx'",
                                                           modelFormat));
     }
 }

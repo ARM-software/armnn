@@ -20,7 +20,7 @@ Arm NN SDK utilizes the Compute Library to target programmable cores, such as Co
 as efficiently as possible. To target Ethos NPUs the NPU-Driver is utilized. We also welcome new contributors to provide
 their [own driver and backend](src/backends/README.md). Note, Arm NN does not provide support for Cortex-M CPUs.
 
-The latest release supports models created with **Caffe**, **TensorFlow**, **TensorFlow Lite** (TfLite) and **ONNX**.
+The latest release supports models created with **TensorFlow Lite** (TfLite) and **ONNX**.
 Arm NN analysis a given model and replaces the operations within it with implementations particularly designed for the
 hardware you want to execute it on. This results in a great boost of execution speed. How much faster your neural
 network can be executed depends on the operations it contains and the available hardware. Below you can see the speedup
@@ -33,7 +33,7 @@ to build for a wide variety of target platforms, from a wide variety of host env
 
 
 ## Getting started: Software tools overview
-Depending on what kind of framework (Tensorflow, Caffe, ONNX) you've been using to create your model there are multiple
+Depending on what kind of framework (Tensorflow Lite, ONNX) you've been using to create your model there are multiple
 software tools available within Arm NN that can serve your needs.
 
 Generally, there is a **parser** available **for each supported framework**. Each parser allows you to run models from

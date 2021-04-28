@@ -3,11 +3,9 @@
 - [Introduction](#introduction)
 - [Cross-compiling ToolChain](#cross-compiling-toolchain)
 - [Build and install Google's Protobuf library](#build-and-install-google-s-protobuf-library)
-- [Build Caffe for x86_64](#build-caffe-for-x86-64)
 - [Build Boost library for arm64](#build-boost-library-for-arm64)
 - [Build Compute Library](#build-compute-library)
 - [Download ArmNN](#download-armnn)
-- [Build Tensorflow](#build-tensorflow)
 - [Build Flatbuffer](#build-flatbuffer)
 - [Build Onnx](#build-onnx)
 - [Build TfLite](#build-tflite)
@@ -19,7 +17,7 @@
 
 ## Introduction
 These are the step by step instructions on Cross-Compiling Arm NN under an x86_64 system to target an Arm64 system. This build flow has been tested with Ubuntu 16.04.
-The instructions assume you are using a bash shell and show how to build the Arm NN core library, Boost, Protobuf, Caffe, Tensorflow, Tflite, Flatbuffer and Compute Libraries.
+The instructions assume you are using a bash shell and show how to build the Arm NN core library, Boost, Protobuf, Tflite, Flatbuffer and Compute Libraries.
 Start by creating a directory to contain all components:
 
 '''
@@ -67,48 +65,6 @@ make install -j16
 cd ..
 ```
 
-## Build Caffe for x86_64
-* Ubuntu 16.04 installation. These steps are taken from the full Caffe installation documentation at: http://caffe.berkeleyvision.org/install_apt.html
-* Install dependencies:
-```bash
-sudo apt-get install libleveldb-dev libsnappy-dev libopencv-dev libhdf5-serial-dev
-sudo apt-get install --no-install-recommends libboost-all-dev
-sudo apt-get install libgflags-dev libgoogle-glog-dev liblmdb-dev
-sudo apt-get install libopenblas-dev
-sudo apt-get install libatlas-base-dev
-```
-* Download Caffe from: https://github.com/BVLC/caffe. We have tested using tag 1.0
-```bash
-cd $HOME/armnn-devenv
-git clone https://github.com/BVLC/caffe.git
-cd caffe
-git checkout eeebdab16155d34ff8f5f42137da7df4d1c7eab0
-cp Makefile.config.example Makefile.config
-```
-* Adjust Makefile.config as necessary for your environment, for example:
-```
-#CPU only version:
-CPU_ONLY := 1
-
-#Add hdf5 and protobuf include and library directories (Replace $HOME with explicit /home/username dir):
-INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial/ $(HOME)/armnn-devenv/google/x86_64_pb_install/include/
-LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu/hdf5/serial/ $(HOME)/armnn-devenv/google/x86_64_pb_install/lib/
-```
-* Setup environment:
-```bash
-export PATH=$HOME/armnn-devenv/google/x86_64_pb_install/bin/:$PATH
-export LD_LIBRARY_PATH=$HOME/armnn-devenv/google/x86_64_pb_install/lib/:$LD_LIBRARY_PATH
-```
-* Compilation with Make:
-```bash
-make all
-make test
-make runtest
-# These should all run without errors
-```
-
-* caffe.pb.h and caffe.pb.cc will be needed when building Arm NN's Caffe Parser
-
 ## Build Boost library for arm64
 * Build Boost library for arm64
     Download Boost version 1.64 from http://www.boost.org/doc/libs/1_64_0/more/getting_started/unix-variants.html
@@ -151,16 +107,6 @@ For example, if you want to checkout release branch of 21.02:
 ```bash
 git checkout branches/armnn_21_02
 git pull
-```
-
-## Build Tensorflow
-* Building Tensorflow version 2.3.1:
-```bash
-cd $HOME/armnn-devenv
-git clone https://github.com/tensorflow/tensorflow.git
-cd tensorflow/
-git checkout fcc4b966f1265f466e82617020af93670141b009
-../armnn/scripts/generate_tensorflow_protobuf.sh ../tensorflow-protobuf ../google/x86_64_pb_install
 ```
 
 ## Build Flatbuffer
@@ -206,9 +152,12 @@ onnx/onnx.proto --proto_path=. --proto_path=../google/x86_64_pb_install/include 
 ```
 
 ## Build TfLite
-* Building TfLite
+* Building TfLite (Tensorflow version 2.3.1)
 ```bash
 cd $HOME/armnn-devenv
+git clone https://github.com/tensorflow/tensorflow.git
+cd tensorflow/
+git checkout fcc4b966f1265f466e82617020af93670141b009
 mkdir tflite
 cd tflite
 cp ../tensorflow/tensorflow/lite/schema/schema.fbs .
@@ -231,12 +180,8 @@ CXX=aarch64-linux-gnu-g++ CC=aarch64-linux-gnu-gcc cmake .. \
 -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build/ \
 -DBOOST_ROOT=$HOME/armnn-devenv/boost_arm64_install/ \
 -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
--DCAFFE_GENERATED_SOURCES=$HOME/armnn-devenv/caffe/build/src \
--DBUILD_CAFFE_PARSER=1 \
 -DONNX_GENERATED_SOURCES=$HOME/armnn-devenv/onnx \
 -DBUILD_ONNX_PARSER=1 \
--DTF_GENERATED_SOURCES=$HOME/armnn-devenv/tensorflow-protobuf \
--DBUILD_TF_PARSER=1 \
 -DBUILD_TF_LITE_PARSER=1 \
 -DTF_LITE_GENERATED_PATH=$HOME/armnn-devenv/tflite \
 -DFLATBUFFERS_ROOT=$HOME/armnn-devenv/flatbuffers-arm64 \
@@ -394,14 +339,9 @@ sudo ldconfig
 <br><br>
 
 ### Undefined references to google::protobuf:: functions
-* When compiling Arm NN there are multiple errors of the following type:
-```
-libarmnnCaffeParser.so: undefined reference to `google::protobuf:*
-```
 * Missing or out of date protobuf compilation libraries.
     Use the command 'protoc --version' to check which version of protobuf is available (version 3.12.0 is required).
     Follow the instructions above to install protobuf 3.12.0
-    Note this will require you to recompile Caffe for x86_64
 <br><br>
 
 ### Errors on strict-aliasing rules when compiling the Compute Library

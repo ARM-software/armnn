@@ -15,7 +15,7 @@ To build ModelAccuracyTool, pass the following options to Cmake:
 | ---|---|---|
 | -h | --help                   | Display help messages |
 | -m | --model-path             | Path to armnn format model file |
-| -f | --model-format           | The model format. Supported values: caffe, tensorflow, tflite |
+| -f | --model-format           | The model format. Supported values: tflite |
 | -i | --input-name             | Identifier of the input tensors in the network separated by comma |
 | -o | --output-name            | Identifier of the output tensors in the network separated by comma |
 | -d | --data-dir               | Path to directory containing the ImageNet test data |

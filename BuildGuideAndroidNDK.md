@@ -5,7 +5,6 @@
 - [Build the Boost C++ libraries](#build-the-boost-c---libraries)
 - [Build the Compute Library](#build-the-compute-library)
 - [Build Google's Protobuf library](#build-google-s-protobuf-library)
-- [Download TensorFlow](#download-tensorflow)
 - [Build Arm NN](#build-armnn)
 - [Build Standalone Sample Dynamic Backend](#build-standalone-sample-dynamic-backend)
 - [Run the Arm NN unit tests on an Android device](#run-the-armnn-unit-tests-on-an-android-device)
@@ -14,10 +13,11 @@
 ## Introduction
 These are step by step instructions for using the Android NDK to build Arm NN.
 They have been tested on a clean install of Ubuntu 16.04, and should also work with other OS versions.
-The instructions show how to build the Arm NN core library and the optional TensorFlow parser.
+The instructions show how to build the Arm NN core library.
+Building protobuf is optional. We have given steps should the user wish to build it (i.e. as an Onnx dependency).
 All downloaded or generated files will be saved inside the `~/armnn-devenv` directory.
 
-#####Note: We are currently in the process of removing boost as a dependency to Arm NN. This process is finished for everything apart from our unit tests. This means you don't need boost to build and use Arm NN but you need it to execute our unit tests. Boost will soon be removed from Arm NN entirely. We also are deprecating support for Tensorflow parsers in 21.02. This will be removed in 21.05. 
+#####Note: We are currently in the process of removing boost as a dependency to Arm NN. This process is finished for everything apart from our unit tests. This means you don't need boost to build and use Arm NN but you need it to execute our unit tests. Boost will soon be removed from Arm NN entirely. 
 
 ## Download the Android NDK and make a standalone toolchain
 
@@ -90,7 +90,7 @@ scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" \
  benchmark_tests=0 validation_tests=0 os=android -j16
 ```
 
-## Build Google's Protobuf library
+## Build Google's Protobuf library (Optional)
 
 * Clone protobuf:
 ```bash
@@ -129,15 +129,6 @@ make install -j16
 cd ..
 ```
 
-## Download TensorFlow
-* Clone TensorFlow source code:
-```bash
-cd ~/armnn-devenv/google/
-git clone https://github.com/tensorflow/tensorflow.git
-    cd tensorflow/
-    git checkout fcc4b966f1265f466e82617020af93670141b009
-```
-
 ## Build Arm NN
 
 * Clone Arm NN source code:
@@ -159,13 +150,6 @@ git checkout branches/armnn_20_02
 git pull
 ```
 
-* Generate TensorFlow protobuf definitions:
-```bash
-cd ~/armnn-devenv/google/tensorflow
-~/armnn-devenv/armnn/scripts/generate_tensorflow_protobuf.sh \
- $HOME/armnn-devenv/google/tf_pb $HOME/armnn-devenv/google/x86_pb_install
-```
-
 * Build Arm NN:
 
  	(Requires CMake if not previously installed: `sudo apt install cmake`)
@@ -185,7 +169,6 @@ cmake .. \
     -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build \
     -DBOOST_ROOT=$HOME/armnn-devenv/boost/install/ \
     -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
-    -DTF_GENERATED_SOURCES=$HOME/armnn-devenv/google/tf_pb/ -DBUILD_TF_PARSER=1 \
     -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/arm64_pb_install/
 ```
 
@@ -236,7 +219,6 @@ make
 * Push the build results to an Android device and make symbolic links for shared libraries:
   Currently adb version we have used for testing is 1.0.41.
 ```bash
-adb push libarmnnTfParser.so /data/local/tmp/
 adb push libarmnn.so /data/local/tmp/
     adb push libtimelineDecoder.so /data/local/tmp/
 adb push UnitTests /data/local/tmp/

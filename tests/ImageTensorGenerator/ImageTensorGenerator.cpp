@@ -164,7 +164,7 @@ public:
                 ("f,model-format",
                     "Format of the intended model file that uses the images."
                     "Different formats have different image normalization styles."
-                    "Accepted values (tensorflow, tflite)",
+                    "Accepted value (tflite)",
                     cxxopts::value<std::string>(m_ModelFormat))
                 ("o,outfile",
                     "Output raw tensor file path",
@@ -235,11 +235,7 @@ public:
     unsigned int GetNewHeight() {return static_cast<unsigned int>(std::stoi(m_NewHeight));}
     SupportedFrontend GetModelFormat()
     {
-        if (m_ModelFormat == "tensorflow")
-        {
-            return SupportedFrontend::TensorFlow;
-        }
-        else if (m_ModelFormat == "tflite")
+        if (m_ModelFormat == "tflite")
         {
             return SupportedFrontend::TFLite;
         }

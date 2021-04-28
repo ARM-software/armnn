@@ -9,7 +9,7 @@ To build ModelAccuracyTool, pass the following options to Cmake:
 |Cmd:|||
 | ---|---|---|
 | -h | --help         | Display help messages |
-| -f | --model-format | Format of the intended model file that uses the images.Different formats have different image normalization styles.Accepted values (caffe, tensorflow, tflite) |
+| -f | --model-format | Format of the intended model file that uses the images.Different formats have different image normalization styles.Accepted values (tflite) |
 | -i | --infile       | Input image file to generate tensor from |
 | -o | --outfile      | Output raw tensor file path |
 | -z | --output-type  | The data type of the output tensors.If unset, defaults to "float" for all defined inputs. Accepted values (float, int or qasymm8)

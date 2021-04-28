@@ -78,7 +78,7 @@ std::vector<TensorShape> Pooling2dLayer::InferOutputShapes(const std::vector<Ten
                 }
 
                 // MakeS sure that border operations will start from inside the input and not the padded area.
-                // This is what both Caffe and CL do...
+                // This is what CL does...
                 if ((size - 1)*stride >= inSize + lowPad)
                 {
                     --size;

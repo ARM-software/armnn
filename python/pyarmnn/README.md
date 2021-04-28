@@ -170,7 +170,7 @@ Create a parser object and load your model file.
 import pyarmnn as ann
 import imageio
 
-# ONNX, Caffe and TF parsers also exist.
+# An ONNX parser also exists.
 parser = ann.ITfLiteParser()
 network = parser.CreateNetworkFromBinaryFile('./model.tflite')
 ```

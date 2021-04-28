@@ -16,7 +16,6 @@ other helpful information in each section.
  - @subpage md_python_pyarmnn_README
  - @subpage serializer
  - @subpage deserializer
- - @subpage md_src_armnnQuantizer_README
  - @subpage md_src_armnnConverter_README
  - @subpage md_tests_ImageCSVFileGenerator_README
  - @subpage md_tests_ImageTensorGenerator_README
@@ -33,8 +32,6 @@ namespace armnn
 /**
 
 @page md_python_pyarmnn_README PyArmNN
-
-@page md_src_armnnQuantizer_README Quantizer
 
 @page md_src_armnnConverter_README Converter
 

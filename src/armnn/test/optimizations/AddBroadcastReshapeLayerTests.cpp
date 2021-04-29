@@ -334,4 +334,68 @@ BOOST_AUTO_TEST_CASE(ReshapeParentConstLayerTest)
     BOOST_TEST(!reshapeLayer);
 }
 
+BOOST_AUTO_TEST_CASE(ReshapeParentConstAddLayerMultipleConnectionsTest)
+{
+    // In this test case we recreate the situation where an Addition layer has
+    // a constant second term, e.g. [1,512] + [1]. The AddBroadcastReshapeLayer
+    // should modify the constant tensor info to match the number of dimensions.
+    // However, if this constant term is being reused elsewhere then we shouldn't
+    // modify it. Instead we insert a resize layer.
+
+    // What we'll do is have two sequential add layers both using the same const tensor.
+    Graph graph;
+    const TensorInfo inputInfo({ 1, 512 }, DataType::Float32);
+    const TensorInfo constantTermInfo({ 1 }, DataType::Float32);
+    const TensorInfo outputInfo({ 1, 512 }, DataType::Float32);
+
+    auto input = graph.AddLayer<InputLayer>(0, "input");
+    auto constant = graph.AddLayer<ConstantLayer>("constant");
+    auto add1 = graph.AddLayer<AdditionLayer>("add1");
+    auto add2 = graph.AddLayer<AdditionLayer>("add2");
+    auto output = graph.AddLayer<OutputLayer>(0, "output");
+
+    input->GetOutputSlot().SetTensorInfo(inputInfo);
+    constant->GetOutputSlot().SetTensorInfo(constantTermInfo);
+    float tensor[] = { 2.0f };
+    constant->m_LayerOutput = std::make_unique<ScopedCpuTensorHandle>(ConstTensor(constantTermInfo, &tensor));
+    add1->GetOutputSlot().SetTensorInfo(outputInfo);
+
+    input->GetOutputSlot().Connect(add1->GetInputSlot(0));
+    constant->GetOutputSlot().Connect(add1->GetInputSlot(1));
+    add1->GetOutputSlot().Connect(add2->GetInputSlot(0));
+    add2->GetOutputSlot().Connect(output->GetInputSlot(0));
+    // This second connection should prevent the modification of the const output tensor.
+    constant->GetOutputSlot().Connect(add2->GetInputSlot(1));
+
+    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+                             &IsLayerOfType<InputLayer>,
+                             &IsLayerOfType<ConstantLayer>,
+                             &IsLayerOfType<AdditionLayer>,
+                             &IsLayerOfType<AdditionLayer>,
+                             &IsLayerOfType<OutputLayer>));
+
+    // Run optimizer
+    armnn::Optimizer::Pass(graph, MakeOptimizations(AddBroadcastReshapeLayer()));
+
+    // Broadcast reshape should have been added before each addition layer.
+    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+                             &IsLayerOfType<InputLayer>,
+                             &IsLayerOfType<ConstantLayer>,
+                             &IsLayerOfType<ReshapeLayer>,
+                             &IsLayerOfType<ReshapeLayer>,
+                             &IsLayerOfType<AdditionLayer>,
+                             &IsLayerOfType<AdditionLayer>,
+                             &IsLayerOfType<OutputLayer>));
+
+    // Ensure the output shape of the constant hasn't changed.
+    BOOST_TEST(constant->m_LayerOutput.get()->GetTensorInfo().GetShape() == constantTermInfo.GetShape());
+    // There should be two extra reshape layers with appropriate names.
+    Layer* const reshapeLayer1 = GetFirstLayerWithName(graph, "Reshape_for:add1-1");
+    Layer* const reshapeLayer2 = GetFirstLayerWithName(graph, "Reshape_for:add2-1");
+    BOOST_TEST(reshapeLayer1);
+    BOOST_TEST(reshapeLayer2);
+}
+
+
+
 BOOST_AUTO_TEST_SUITE_END()

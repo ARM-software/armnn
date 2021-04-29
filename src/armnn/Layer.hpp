@@ -275,7 +275,8 @@ public:
 
     virtual void CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
                                      const IWorkloadFactory& factory,
-                                     const bool IsMemoryManaged = true);
+                                     const bool IsMemoryManaged = true,
+                                     MemorySource memSource = MemorySource::Undefined);
 
     /// Creates a dynamically-allocated copy of this layer.
     /// @param graph - The Graph into which this Layer is being cloned.

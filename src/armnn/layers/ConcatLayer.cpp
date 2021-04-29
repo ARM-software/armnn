@@ -179,7 +179,8 @@ void ConcatLayer::CreateTensors(const TensorHandleFactoryRegistry& registry,
 
 void ConcatLayer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
                                       const IWorkloadFactory& workloadFactory,
-                                      const bool isMemoryManaged)
+                                      const bool isMemoryManaged,
+                                      MemorySource memSource)
 {
     OutputSlot& slot = GetOutputSlot(0);
     ITensorHandleFactory::FactoryId factoryId = slot.GetTensorHandleFactoryId();
@@ -190,7 +191,15 @@ void ConcatLayer::CreateTensorHandles(const TensorHandleFactoryRegistry& registr
     }
     else
     {
-        ITensorHandleFactory* handleFactory = registry.GetFactory(factoryId);
+        ITensorHandleFactory* handleFactory;
+        if (memSource == MemorySource::Undefined)
+        {
+            handleFactory = registry.GetFactory(factoryId);
+        }
+        else
+        {
+            handleFactory = registry.GetFactory(factoryId, memSource);
+        }
         ARMNN_ASSERT(handleFactory);
         CreateTensors(registry, *handleFactory, isMemoryManaged);
     }

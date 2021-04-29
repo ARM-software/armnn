@@ -83,8 +83,7 @@ BOOST_AUTO_TEST_CASE(FallbackImportToCpuAcc)
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(true, true);
-
+    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output
@@ -218,7 +217,7 @@ BOOST_AUTO_TEST_CASE(FallbackPaddingCopyToCpuAcc)
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(true, true);
+    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
 
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
@@ -350,8 +349,8 @@ BOOST_AUTO_TEST_CASE(FallbackImportFromCpuAcc)
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(true, true);
 
+    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output
@@ -485,7 +484,7 @@ BOOST_AUTO_TEST_CASE(FallbackPaddingCopyFromCpuAcc)
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(true, true);
+    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
 
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
@@ -615,7 +614,7 @@ BOOST_AUTO_TEST_CASE(FallbackDisableImportFromCpuAcc)
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(false, false);
+    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
 
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
@@ -678,7 +677,7 @@ BOOST_AUTO_TEST_CASE(FallbackDisableImportFromCpuAcc)
 }
 
 #if defined(ARMCOMPUTECL_ENABLED)
-BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackToCl)
+BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackToCl, * boost::unit_test::disabled())
 {
     using namespace armnn;
 
@@ -745,7 +744,8 @@ BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackToCl)
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(true, true);
+
+    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
 
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
@@ -926,7 +926,7 @@ BOOST_AUTO_TEST_CASE(NeonImportDisabledFallbackToCl)
     BOOST_TEST(outputData == expectedOutput);
 }
 
-BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackSubgraphToCl)
+BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackSubgraphToCl, * boost::unit_test::disabled())
 {
     using namespace armnn;
 
@@ -1004,7 +1004,8 @@ BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackSubgraphToCl)
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(true, true);
+
+    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
 
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 

@@ -249,7 +249,8 @@ void Layer::SetAdditionalInfo(QueueDescriptor& descriptor) const
 
 void Layer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
                                 const IWorkloadFactory& workloadFactory,
-                                const bool IsMemoryManaged)
+                                const bool IsMemoryManaged,
+                                MemorySource memSource)
 {
     for (unsigned int idx=0; idx < GetNumOutputSlots(); idx++)
     {
@@ -264,7 +265,15 @@ void Layer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
         }
         else
         {
-            ITensorHandleFactory* handleFactory = registry.GetFactory(factoryId);
+            ITensorHandleFactory* handleFactory;
+            if (memSource == MemorySource::Undefined )
+            {
+                handleFactory = registry.GetFactory(factoryId);
+            }
+            else
+            {
+                handleFactory = registry.GetFactory(factoryId, memSource);
+            }
             ARMNN_ASSERT(handleFactory);
             handler.CreateTensorHandles(*handleFactory, IsMemoryManaged);
         }

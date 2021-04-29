@@ -24,9 +24,11 @@ public:
     /// @param [in] registry Contains all the registered tensor handle factories available for use.
     /// @param [in] factory The workload factory which will create the workload.
     /// @param [in] IsMemoryManaged Determine whether or not to assign a memory manager during creation
+    /// @param [in] MemorySource Determine the source of memory e.g Malloc
     virtual void CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
                                      const IWorkloadFactory& factory,
-                                     const bool IsMemoryManaged = true) override;
+                                     const bool IsMemoryManaged = true,
+                                     MemorySource memSource = MemorySource::Undefined) override;
 
     /// Creates a dynamically-allocated copy of this layer.
     /// @param [in] graph The graph into which this layer is being cloned.

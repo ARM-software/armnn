@@ -209,7 +209,7 @@ inline void ImportNonAlignedInputPointerTest(std::vector<BackendId> backends)
     NetworkId netId;
     std::string ignoredErrorMessage;
     // Enable Importing
-    INetworkProperties networkProperties(true, false);
+    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Undefined);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output
@@ -274,7 +274,7 @@ inline void ExportNonAlignedOutputPointerTest(std::vector<BackendId> backends)
     NetworkId netId;
     std::string ignoredErrorMessage;
     // Enable Importing and Exporting
-    INetworkProperties networkProperties(true, true);
+    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output
@@ -345,7 +345,7 @@ inline void ImportAlignedPointerTest(std::vector<BackendId> backends)
     NetworkId netId;
     std::string ignoredErrorMessage;
     // Enable Importing
-    INetworkProperties networkProperties(true, true);
+    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output
@@ -428,7 +428,9 @@ inline void ImportOnlyWorkload(std::vector<BackendId> backends)
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(true, false);
+
+    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Undefined);
+
     BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
                == Status::Success);
 
@@ -516,7 +518,7 @@ inline void ExportOnlyWorkload(std::vector<BackendId> backends)
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(false, true);
+    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Malloc);
     BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
                == Status::Success);
 
@@ -603,7 +605,9 @@ inline void ImportAndExportWorkload(std::vector<BackendId> backends)
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(true, true);
+
+    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+
     BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
                == Status::Success);
 
@@ -694,7 +698,7 @@ inline void ExportOutputWithSeveralOutputSlotConnectionsTest(std::vector<Backend
     NetworkId netId;
     std::string ignoredErrorMessage;
     // Enable Importing
-    INetworkProperties networkProperties(true, true);
+    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output

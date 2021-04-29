@@ -49,6 +49,20 @@ ITensorHandleFactory* TensorHandleFactoryRegistry::GetFactory(ITensorHandleFacto
     return nullptr;
 }
 
+ITensorHandleFactory* TensorHandleFactoryRegistry::GetFactory(ITensorHandleFactory::FactoryId id,
+                                                              MemorySource memSource) const
+{
+    for (auto& factory : m_Factories)
+    {
+        if (factory->GetId() == id && factory->GetImportFlags() == static_cast<MemorySourceFlags>(memSource))
+        {
+            return factory.get();
+        }
+    }
+
+    return nullptr;
+}
+
 void TensorHandleFactoryRegistry::AquireMemory()
 {
     for (auto& mgr : m_MemoryManagers)

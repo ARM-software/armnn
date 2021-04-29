@@ -174,8 +174,10 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                 {
                     // If IsImportEnabled is true then we need to set IsMemoryManaged
                     // to false when creating TensorHandles
-                    layer->CreateTensorHandles(m_TensorHandleFactoryRegistry, workloadFactory,
-                                               !m_NetworkProperties.m_ImportEnabled);
+                    layer->CreateTensorHandles(m_TensorHandleFactoryRegistry,
+                                               workloadFactory,
+                                               !m_NetworkProperties.m_ImportEnabled,
+                                               m_NetworkProperties.m_InputSource);
                     break;
                 }
                 default:
@@ -186,8 +188,10 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                         (layer->GetOutputSlots()[0].GetNumConnections() == 1) &&
                         (layer->GetOutputSlots()[0].GetConnection(0)->GetOwningLayer().GetType() == LayerType::Output))
                     {
-                        layer->CreateTensorHandles(m_TensorHandleFactoryRegistry, workloadFactory,
-                                                   !m_NetworkProperties.m_ExportEnabled);
+                        layer->CreateTensorHandles(m_TensorHandleFactoryRegistry,
+                                                   workloadFactory,
+                                                   !m_NetworkProperties.m_ExportEnabled,
+                                                   m_NetworkProperties.m_OutputSource);
                     }
                     else
                     {

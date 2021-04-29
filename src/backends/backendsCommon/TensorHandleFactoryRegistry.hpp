@@ -35,6 +35,10 @@ public:
     /// Returns nullptr if not found
     ITensorHandleFactory* GetFactory(ITensorHandleFactory::FactoryId id) const;
 
+    /// Overload of above allowing specification of Memory Source
+    ITensorHandleFactory* GetFactory(ITensorHandleFactory::FactoryId id,
+                                     MemorySource memSource) const;
+
     /// Aquire memory required for inference
     void AquireMemory();
 

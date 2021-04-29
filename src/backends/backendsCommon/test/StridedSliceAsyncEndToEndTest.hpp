@@ -42,7 +42,7 @@ void AsyncThreadedEndToEndTestImpl(INetworkPtr network,
     // Creates AsyncNetwork
     NetworkId networkId = 0;
     std::string errorMessage;
-    const INetworkProperties networkProperties(false, false, true);
+    const INetworkProperties networkProperties(true, MemorySource::Undefined, MemorySource::Undefined);
     runtime->LoadNetwork(networkId, std::move(optNet), errorMessage, networkProperties);
 
     std::vector<InputTensors> inputTensorsVec;
@@ -134,7 +134,7 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
     // Creates AsyncNetwork
     NetworkId networkId = 0;
     std::string errorMessage;
-    const INetworkProperties networkProperties(false, false, true);
+    const INetworkProperties networkProperties(true, MemorySource::Undefined, MemorySource::Undefined);
     runtime->LoadNetwork(networkId, std::move(optNet), errorMessage, networkProperties);
 
     InputTensors inputTensors;

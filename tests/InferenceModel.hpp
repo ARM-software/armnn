@@ -479,7 +479,9 @@ public:
             ARMNN_SCOPED_HEAP_PROFILING("LoadNetwork");
 
             const auto loading_start_time = armnn::GetTimeNow();
-            armnn::INetworkProperties networkProperties(false, false, params.m_AsyncEnabled);
+            armnn::INetworkProperties networkProperties(params.m_AsyncEnabled,
+                                                        armnn::MemorySource::Undefined,
+                                                        armnn::MemorySource::Undefined);
             std::string errorMessage;
             ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, std::move(optNet), errorMessage, networkProperties);
 

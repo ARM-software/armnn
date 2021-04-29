@@ -128,7 +128,7 @@ Status RuntimeImpl::LoadNetwork(NetworkId& networkIdOut,
                                 IOptimizedNetworkPtr inNetwork,
                                 std::string& errorMessage)
 {
-    INetworkProperties networkProperties;
+    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
     return LoadNetwork(networkIdOut, std::move(inNetwork), errorMessage, networkProperties);
 }
 

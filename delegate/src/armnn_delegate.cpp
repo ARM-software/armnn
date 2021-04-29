@@ -365,7 +365,9 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
         armnn::Status loadingStatus;
         if (delegate->m_Options.GetOptimizerOptions().m_ImportEnabled)
         {
-            armnn::INetworkProperties networkProperties(true, true);
+            armnn::INetworkProperties networkProperties(false,
+                                                        armnn::MemorySource::Malloc,
+                                                        armnn::MemorySource::Malloc);
             loadingStatus = delegate->m_Runtime->LoadNetwork(networkId,
                                                              std::move(optNet),
                                                              errorMessage,

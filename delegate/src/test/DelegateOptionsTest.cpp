@@ -93,7 +93,7 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsDebugFunction")
         callback = true;
     };
 
-    armnn::INetworkProperties networkProperties;
+    armnn::INetworkProperties networkProperties(false, armnn::MemorySource::Undefined, armnn::MemorySource::Undefined);
     armnnDelegate::DelegateOptions delegateOptions(backends,
                                                    optimizerOptions,
                                                    armnn::EmptyOptional(),

@@ -5,18 +5,12 @@
 
 #pragma once
 
+#include <armnn/Types.hpp>
+
 #include <type_traits>
 
 namespace armnn
 {
-
-enum class MemorySource
-{
-    Undefined = 0,
-    Malloc = 1,
-    DmaBuf = 2,
-    DmaBufProtected = 4
-};
 
 using MemorySourceFlags = unsigned int;
 

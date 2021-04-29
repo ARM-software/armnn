@@ -28,14 +28,35 @@ using IRuntimePtr = std::unique_ptr<IRuntime, void(*)(IRuntime* runtime)>;
 
 struct INetworkProperties
 {
-    INetworkProperties(bool importEnabled = false, bool exportEnabled = false, bool asyncEnabled = false)
-        : m_ImportEnabled(importEnabled),
-          m_ExportEnabled(exportEnabled),
-          m_AsyncEnabled(asyncEnabled) {}
+    ARMNN_DEPRECATED_MSG("Please use INetworkProperties constructor with MemorySource argument")
+    INetworkProperties(bool importEnabled = false,
+                       bool exportEnabled = false,
+                       bool asyncEnabled = false)
+        : m_ImportEnabled(importEnabled)
+        , m_ExportEnabled(exportEnabled)
+        , m_AsyncEnabled(asyncEnabled)
+        , m_InputSource(MemorySource::Undefined)
+        , m_OutputSource(MemorySource::Undefined)
+        {}
 
+    INetworkProperties(bool asyncEnabled,
+                       MemorySource m_InputSource,
+                       MemorySource m_OutputSource)
+        : m_ImportEnabled(m_InputSource != MemorySource::Undefined)
+        , m_ExportEnabled(m_OutputSource != MemorySource::Undefined)
+        , m_AsyncEnabled(asyncEnabled)
+        , m_InputSource(m_InputSource)
+        , m_OutputSource(m_OutputSource)
+        {}
+
+    /// Deprecated and will be removed in future release.
     const bool m_ImportEnabled;
+    /// Deprecated and will be removed in future release.
     const bool m_ExportEnabled;
+
     const bool m_AsyncEnabled;
+    const MemorySource m_InputSource;
+    const MemorySource m_OutputSource;
 
     virtual ~INetworkProperties() {}
 };

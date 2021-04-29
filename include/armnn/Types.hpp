@@ -182,6 +182,15 @@ enum class ShapeInferenceMethod
     InferAndValidate = 1
 };
 
+/// Define the Memory Source to reduce copies
+enum class MemorySource : uint32_t
+{
+    Undefined = 0,
+    Malloc = 1,
+    DmaBuf = 2,
+    DmaBufProtected = 4
+};
+
 /// Each backend should implement an IBackend.
 class IBackend
 {

@@ -147,7 +147,10 @@ int LoadModel(const char* filename,
     // Load model into runtime
     {
         std::string errorMessage;
-        INetworkProperties modelProps(options.m_ImportEnabled, options.m_ImportEnabled);
+
+        armnn::MemorySource memSource = options.m_ImportEnabled ? armnn::MemorySource::Malloc
+                                                                : armnn::MemorySource::Undefined;
+        INetworkProperties modelProps(false, memSource, memSource);
         Status status = runtime.LoadNetwork(networkId, std::move(optimizedModel), errorMessage, modelProps);
         if (status != Status::Success)
         {

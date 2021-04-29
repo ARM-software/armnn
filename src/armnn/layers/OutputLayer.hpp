@@ -26,9 +26,10 @@ public:
     /// @param [in] IsMemoryManaged Determine whether or not to assign a memory manager during creation
     virtual void CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
                                      const IWorkloadFactory& factory,
-                                     const bool IsMemoryManaged = true) override
+                                     const bool isMemoryManaged = true,
+                                     MemorySource memSource = MemorySource::Undefined) override
     {
-        IgnoreUnused(registry, factory, IsMemoryManaged);
+        IgnoreUnused(registry, factory, isMemoryManaged, memSource);
     }
 
     /// Creates a dynamically-allocated copy of this layer.

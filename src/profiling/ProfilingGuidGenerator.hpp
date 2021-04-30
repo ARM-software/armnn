@@ -7,6 +7,8 @@
 
 #include "armnn/profiling/IProfilingGuidGenerator.hpp"
 
+#include <common/include/ProfilingGuid.hpp>
+
 #include <functional>
 #include <mutex>
 

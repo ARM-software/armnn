@@ -4,11 +4,11 @@
 //
 
 #include "FileOnlyProfilingConnection.hpp"
-#include "PacketVersionResolver.hpp"
 
 #include <armnn/Exceptions.hpp>
 #include <common/include/Constants.hpp>
 #include <common/include/ProfilingException.hpp>
+#include <common/include/PacketVersionResolver.hpp>
 
 #include <algorithm>
 #include <iostream>

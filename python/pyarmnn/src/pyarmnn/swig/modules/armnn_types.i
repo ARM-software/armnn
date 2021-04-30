@@ -4,6 +4,7 @@
 //
 %{
 #include "armnn/Types.hpp"
+#include "ProfilingGuid.hpp"
 %}
 
 %include <typemaps/permutation_vector.i>
@@ -110,6 +111,7 @@ Returns:
 #define ARMNN_DEPRECATED_ENUM  // SWIG does not support C++ attributes, need this to help generate from Deprecated.hpp.
 #define ARMNN_DEPRECATED_ENUM_MSG(message)  // SWIG does not support C++ attributes, need this to help generate from Deprecated.hpp.
 %include "armnn/Types.hpp"
+%include "ProfilingGuid.hpp"
 
 
 

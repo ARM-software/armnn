@@ -9,6 +9,8 @@
 #include <armnn/Logging.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
+#include <common/include/ProfilingGuid.hpp>
+
 #include <common/include/SocketConnectionException.hpp>
 
 #include <fmt/format.h>

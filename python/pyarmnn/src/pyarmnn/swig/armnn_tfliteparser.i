@@ -6,6 +6,7 @@
 %{
 #include "armnnTfLiteParser/ITfLiteParser.hpp"
 #include "armnn/Types.hpp"
+#include "ProfilingGuid.hpp"
 #include "armnn/INetwork.hpp"
 %}
 

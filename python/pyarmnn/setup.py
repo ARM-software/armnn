@@ -124,12 +124,25 @@ def find_includes(armnn_include_env: str = INCLUDE_ENV_NAME):
     Returns:
         list: A list of paths to include.
     """
-    armnn_include_path = os.getenv(armnn_include_env)
-    if armnn_include_path is not None and os.path.exists(armnn_include_path):
-        armnn_include_path = [armnn_include_path]
-    else:
-        armnn_include_path = ['/usr/local/include', '/usr/include']
-    return armnn_include_path
+
+    # split multiple paths
+    global armnn_include_path
+    armnn_include_path_raw = os.getenv(armnn_include_env)
+    if not armnn_include_path_raw == None:
+        armnn_include_path = armnn_include_path_raw.split(",")
+
+    # validate input paths
+    armnn_include_path_result = []
+    for path in armnn_include_path:
+        if path is not None and os.path.exists(path):
+            armnn_include_path_result = armnn_include_path_result + [path]
+
+
+    # if none exist revert to default
+    if len(armnn_include_path_result) == 0:
+        armnn_include_path_result = ['/usr/local/include', '/usr/include']
+    return armnn_include_path_result
+
 
 
 @lru_cache(maxsize=1)

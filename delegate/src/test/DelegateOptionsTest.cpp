@@ -4,6 +4,7 @@
 //
 
 #include "DelegateOptionsTestHelper.hpp"
+#include <common/include/ProfilingGuid.hpp>
 
 namespace armnnDelegate
 {

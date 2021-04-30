@@ -7,15 +7,17 @@
 
 #include "IPeriodicCounterCapture.hpp"
 #include "Holder.hpp"
-#include <Packet.hpp>
 #include "SendCounterPacket.hpp"
 #include "ICounterValues.hpp"
 #include "CounterIdMap.hpp"
 
+#include <armnn/backends/profiling/IBackendProfilingContext.hpp>
+
+#include <common/include/Packet.hpp>
+
 #include <atomic>
 #include <mutex>
 #include <thread>
-#include <armnn/backends/profiling/IBackendProfilingContext.hpp>
 
 namespace armnn
 {

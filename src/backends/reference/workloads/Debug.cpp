@@ -4,6 +4,7 @@
 //
 
 #include "Debug.hpp"
+#include <common/include/ProfilingGuid.hpp>
 
 #include <BFloat16.hpp>
 #include <Half.hpp>

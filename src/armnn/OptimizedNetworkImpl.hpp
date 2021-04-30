@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <common/include/ProfilingGuid.hpp>
+
 namespace armnn
 {
 

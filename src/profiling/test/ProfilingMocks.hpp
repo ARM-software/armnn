@@ -21,6 +21,8 @@
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
+#include <common/include/ProfilingGuid.hpp>
+
 #include <atomic>
 #include <condition_variable>
 #include <mutex>

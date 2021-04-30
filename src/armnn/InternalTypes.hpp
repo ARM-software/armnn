@@ -5,6 +5,7 @@
 #pragma once
 
 #include <armnn/Types.hpp>
+#include <common/include/ProfilingGuid.hpp>
 
 #include <array>
 

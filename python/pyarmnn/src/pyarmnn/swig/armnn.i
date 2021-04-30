@@ -6,6 +6,7 @@
 %{
 #define SWIG_FILE_WITH_INIT
 #include "armnn/Types.hpp"
+#include "ProfilingGuid.hpp"
 %}
 
 //typemap definitions and other common stuff

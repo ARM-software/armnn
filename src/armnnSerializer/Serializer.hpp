@@ -10,6 +10,8 @@
 
 #include <armnnSerializer/ISerializer.hpp>
 
+#include <common/include/ProfilingGuid.hpp>
+
 #include <unordered_map>
 
 #include "ArmnnSchema_generated.h"

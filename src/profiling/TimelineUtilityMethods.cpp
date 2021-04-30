@@ -3,8 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 #include "LabelsAndEventClasses.hpp"
-#include <Threads.hpp>
 #include "TimelineUtilityMethods.hpp"
+
+#include <common/include/ProfilingGuid.hpp>
+
+#include <Threads.hpp>
 
 namespace armnn
 {

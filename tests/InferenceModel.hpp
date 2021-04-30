@@ -11,6 +11,7 @@
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
+#include <common/include/ProfilingGuid.hpp>
 
 #if defined(ARMNN_SERIALIZER)
 #include "armnnDeserializer/IDeserializer.hpp"

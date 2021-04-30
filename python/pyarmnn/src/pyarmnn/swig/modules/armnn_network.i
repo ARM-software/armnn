@@ -6,6 +6,7 @@
 #include "armnn/INetwork.hpp"
 #include "armnn/BackendId.hpp"
 #include "armnn/Types.hpp"
+#include "ProfilingGuid.hpp"
 #include "armnn/Optional.hpp"
 #include <fstream>
 %}

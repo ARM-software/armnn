@@ -7,9 +7,18 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/utility/Assert.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 
 #include <arm_compute/core/Types.h>
+
+#if defined(ARMCOMPUTENEON_ENABLED)
+#include "neon/workloads/NeonReduceWorkload.hpp"
+#endif
+
+#if defined(ARMCOMPUTECL_ENABLED)
+#include "cl/workloads/ClReduceWorkload.hpp"
+#endif
 
 namespace armnn
 {
@@ -266,5 +275,90 @@ inline arm_compute::ReductionOperation ConvertReductionOperationToAcl(const Redu
         default:                         throw InvalidArgumentException("Unsupported Reduction operation");
     }
 }
+
+/// Function to compute the output tensor shape based on the axes and if keepDims is set.
+inline const TensorInfo ComputeReductionTensorShape(const armnn::TensorInfo& input,
+                                                    const std::vector<uint32_t>& vAxis,
+                                                    const bool keepDims)
+{
+    auto reducedTensorInfo = input;
+    unsigned int rank = reducedTensorInfo.GetNumDimensions();
+    unsigned int outputRank = 0;
+    // Calculate output dimension
+    if (keepDims)
+    {
+        outputRank = rank;
+    }
+    else if (vAxis.empty())
+    {
+        outputRank = 1;
+    }
+    else if (vAxis.size() > reducedTensorInfo.GetNumDimensions())
+    {
+        throw LayerValidationException("ReduceLayer: Dimensions to reduce can not be bigger than input dimensions");
+    }
+    else
+    {
+        outputRank = reducedTensorInfo.GetNumDimensions() - armnn::numeric_cast<unsigned int>(vAxis.size());
+        if (outputRank == 0)
+        {
+            outputRank = 1;
+        }
+    }
+    std::vector<unsigned int> dimSizes(outputRank, 1);
+    if (!vAxis.empty())
+    {
+        // Skip the dimension that has been reduced unless keepDims is true.
+        unsigned int outputIndex = 0;
+        for (unsigned int i = 0; i < reducedTensorInfo.GetNumDimensions(); ++i)
+        {
+            if (std::find(vAxis.begin(), vAxis.end(), i) == vAxis.end())
+            {
+                dimSizes[outputIndex] = armnn::numeric_cast<unsigned int>(reducedTensorInfo.GetShape()[i]);
+                ++outputIndex;
+            }
+            else if (keepDims)
+            {
+                dimSizes[outputIndex] = 1;
+                ++outputIndex;
+            }
+        }
+    }
+    const TensorShape inferredShape = TensorShape(outputRank, dimSizes.data());
+    reducedTensorInfo.SetShape(inferredShape);
+    return reducedTensorInfo;
+}
+
+/// Macro function check if layer with multiple axes is supported on each backend
+#define IS_MULTI_AXES_REDUCE_SUPPORTED(func, input, desc, status)                 \
+    armnn::TensorInfo inputTensorInfo = input;                                    \
+    unsigned int recalulatedAxis = 0;                                             \
+    std::vector<uint32_t> axes;                                                   \
+                                                                                  \
+    for (unsigned int i = 0; i != desc.m_vAxis.size(); ++i)                       \
+    {                                                                             \
+        axes.emplace_back(desc.m_vAxis[i]);                                       \
+                                                                                  \
+        const armnn::TensorInfo& reducedTensorInfo =                              \
+            ComputeReductionTensorShape(input, axes, desc.m_KeepDims);            \
+                                                                                  \
+        std::vector<uint32_t> singleAxis(1, desc.m_vAxis[i] - recalulatedAxis);   \
+                                                                                  \
+        armnn::ReduceDescriptor newReduceDescriptor = desc;                       \
+        newReduceDescriptor.m_vAxis.assign(singleAxis.begin(), singleAxis.end()); \
+                                                                                  \
+        status = func(inputTensorInfo, reducedTensorInfo, newReduceDescriptor);   \
+        if (!status)                                                              \
+        {                                                                         \
+            break;                                                                \
+        }                                                                         \
+                                                                                  \
+        if (!desc.m_KeepDims)                                                     \
+        {                                                                         \
+            recalulatedAxis++;                                                    \
+        }                                                                         \
+                                                                                  \
+        inputTensorInfo = reducedTensorInfo;                                      \
+    }
 
 } // namespace armnn

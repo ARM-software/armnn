@@ -29,6 +29,7 @@
 #include "workloads/NeonDivisionWorkload.hpp"
 #include "workloads/NeonFullyConnectedWorkload.hpp"
 #include "workloads/NeonMultiplicationWorkload.hpp"
+#include "workloads/NeonReduceWorkload.hpp"
 #include "workloads/NeonSubtractionWorkload.hpp"
 
 #include <Optimizer.hpp>
@@ -161,6 +162,7 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
         --it;
         Layer& base = **it;
 
+        // Fuse activation into previous layer if supported by backend
         if ((base.GetType() == LayerType::DepthwiseConvolution2d || base.GetType() == LayerType::Convolution2d
              || base.GetType() == LayerType::BatchNormalization || base.GetType() == LayerType::FullyConnected
              || base.GetType() == LayerType::Addition || base.GetType() == LayerType::Multiplication
@@ -391,6 +393,25 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                         }
                     }
                 }
+            }
+        }
+
+        // Separate reduce layer with multiple axes into multiple reduce layers with 1 axis.
+        if (base.GetType() == LayerType::Reduce)
+        {
+            ReduceLayer* baseLayer            = PolymorphicDowncast<ReduceLayer*>(&base);
+            ReduceDescriptor reduceDescriptor = baseLayer->GetParameters();
+
+            if (!reduceDescriptor.m_vAxis.empty() && reduceDescriptor.m_vAxis.size() > 1)
+            {
+                // Add new layers to the graph and connect them.
+                std::vector<Layer*> layers = ChainReduceLayers<ReduceLayer>(optimizationViews,
+                                                                            baseLayer,
+                                                                            reduceDescriptor);
+
+                // Replace existing baselayer with new subgraph.
+                ReplaceLayers<ReduceLayer>(optimizationViews, baseLayer, layers);
+                untouched.erase(baseLayer->GetGuid());
             }
         }
     }

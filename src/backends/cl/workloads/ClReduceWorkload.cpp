@@ -19,24 +19,28 @@ arm_compute::Status ClReduceWorkloadValidate(const TensorInfo& input,
                                              const TensorInfo& output,
                                              const ReduceDescriptor& desc)
 {
-    const arm_compute::TensorInfo aclInputInfo  = armcomputetensorutils::BuildArmComputeTensorInfo(input);
-    const arm_compute::TensorInfo aclOutputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(output);
-    if (!desc.m_vAxis.empty() && desc.m_vAxis.size() > 1)
+    if ( desc.m_vAxis.size()==1 || desc.m_vAxis.empty())
     {
-        return arm_compute::Status(arm_compute::ErrorCode::RUNTIME_ERROR,
-                                   "ClReduceWorkload: Reduction is supported only on 1 axis.");
+        const arm_compute::TensorInfo aclInputInfo  = armcomputetensorutils::BuildArmComputeTensorInfo(input);
+        const arm_compute::TensorInfo aclOutputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(output);
+
+        arm_compute::Coordinates coords = BuildArmComputeReductionCoordinates(aclInputInfo.num_dimensions(),
+                                                                              input.GetNumDimensions(),
+                                                                              desc.m_vAxis);
+
+        return arm_compute::CLReductionOperation::validate(&aclInputInfo,
+                                                           &aclOutputInfo,
+                                                           static_cast<unsigned int>(coords[0]),
+                                                           ConvertReductionOperationToAcl(desc),
+                                                           desc.m_KeepDims);
     }
-
-    arm_compute::Coordinates coords = BuildArmComputeReductionCoordinates(aclInputInfo.num_dimensions(),
-                                                                          input.GetNumDimensions(),
-                                                                          desc.m_vAxis);
-
-
-    return arm_compute::CLReductionOperation::validate(&aclInputInfo,
-                                                       &aclOutputInfo,
-                                                       static_cast<unsigned int>(coords[0]),
-                                                       ConvertReductionOperationToAcl(desc),
-                                                       desc.m_KeepDims);
+    else
+    {
+        // Validate layer if there are multiple axes.
+        arm_compute::Status status;
+        IS_MULTI_AXES_REDUCE_SUPPORTED(NeonReduceWorkloadValidate, input, desc, status);
+        return status;
+    }
 }
 
 ClReduceWorkload::ClReduceWorkload(const ReduceQueueDescriptor& descriptor, const WorkloadInfo& info)

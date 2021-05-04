@@ -7,10 +7,10 @@
 CMD=$( basename $0 )
 
 # For pinning to a ref use this:
-#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_02" # Release 21.02
+DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_05" # Release 21.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="9a81cd82a8102ee0bd69bfe4939d5c867aed15e9" #Fix bug on Implicit Padding for NEON FFT2D
+#DEFAULT_CLFRAMEWORKREVISION="1fac03717dab014fd202ea85a8f05b3dd475cb3c" #Fix bug on CLReductionOperation
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

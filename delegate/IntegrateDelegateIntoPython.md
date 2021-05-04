@@ -109,8 +109,7 @@ INFO: TfLiteArmnnDelegate: Created TfLite ArmNN delegate.
 Info: Shutdown time: 0.28 ms
 ```
 
-For more details on what kind of options you can pass to the Arm NN delegate please check 
-[armnn_delegate_adaptor.cpp](src/armnn_external_delegate.cpp).
+For more details of the kind of options you can pass to the Arm NN delegate please check the parameters of function [tflite_plugin_create_delegate](namespacetflite.xhtml).
 
 You can also test the functionality of the external delegate adaptor by running some unit tests:
 ```bash

@@ -96,18 +96,13 @@ TfLiteStatus VisitFillOperator(DelegateData& delegateData,
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
 
-    if(tflite::IsConstantTensor(&tfLiteInputTensor))
+    auto inputsTensorsProcess = ProcessInputs(layer,
+                                              delegateData,
+                                              tfLiteContext,
+                                              tfLiteNode);
+    if (inputsTensorsProcess == kTfLiteError)
     {
-        auto status = ConnectConstant(layer,
-                                      inputTensorInfo,
-                                      tfLiteContext,
-                                      tfLiteInputTensor,
-                                      delegateData,
-                                      tfLiteNode->inputs->data[0]);
-        if (status == kTfLiteError)
-        {
-            return status;
-        }
+        return inputsTensorsProcess;
     }
 
     return Connect(layer, tfLiteNode, delegateData);

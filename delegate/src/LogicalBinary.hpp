@@ -77,32 +77,13 @@ TfLiteStatus VisitLogicalBinaryOperator(DelegateData& delegateData,
     armnn::IOutputSlot& outputSlot = logicalBinaryLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
 
-    if(tflite::IsConstantTensor(&tfLiteInputTensor0))
+    auto inputsTensorsProcess = ProcessInputs(logicalBinaryLayer,
+                                              delegateData,
+                                              tfLiteContext,
+                                              tfLiteNode);
+    if (inputsTensorsProcess == kTfLiteError)
     {
-        auto status = ConnectConstant(logicalBinaryLayer,
-                                      inputTensorInfo0,
-                                      tfLiteContext,
-                                      tfLiteInputTensor0,
-                                      delegateData,
-                                      tfLiteNode->inputs->data[0]);
-        if (status == kTfLiteError)
-        {
-            return status;
-        }
-    }
-
-    if(tflite::IsConstantTensor(&tfLiteInputTensor1))
-    {
-        auto status = ConnectConstant(logicalBinaryLayer,
-                                      inputTensorInfo1,
-                                      tfLiteContext,
-                                      tfLiteInputTensor1,
-                                      delegateData,
-                                      tfLiteNode->inputs->data[1]);
-        if (status == kTfLiteError)
-        {
-            return status;
-        }
+        return inputsTensorsProcess;
     }
 
     // LogicalBinary operators support broadcasting

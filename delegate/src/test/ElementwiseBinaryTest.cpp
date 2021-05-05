@@ -129,6 +129,55 @@ void AddBroadcastTest(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
+void AddConstInputTest(std::vector<armnn::BackendId>& backends)
+{
+    std::vector<int32_t> input0Shape { 1, 3, 2, 1 };
+    std::vector<int32_t> input1Shape { 1 };
+    std::vector<int32_t> expectedOutputShape { 1, 3, 2, 1 };
+
+    std::vector<float> input0Values
+        {
+            0.0f,
+            1.0f,
+
+            2.0f,
+            3.0f,
+
+            4.0f,
+            5.0f,
+        };
+    std::vector<float> input1Values
+        {
+            0.5f
+        };
+    // Set output data
+    std::vector<float> expectedOutputValues
+        {
+            0.5f,
+            1.5f,
+
+            2.5f,
+            3.5f,
+
+            4.5f,
+            5.5f,
+        };
+
+    ElementwiseBinaryTest<float>(tflite::BuiltinOperator_ADD,
+                                 tflite::ActivationFunctionType_NONE,
+                                 ::tflite::TensorType_FLOAT32,
+                                 backends,
+                                 input0Shape,
+                                 input1Shape,
+                                 expectedOutputShape,
+                                 input0Values,
+                                 input1Values,
+                                 expectedOutputValues,
+                                 1.0f,
+                                 0,
+                                 true);
+}
+
 void AddActivationTest(std::vector<armnn::BackendId>& backends)
 {
     std::vector<int32_t> input0Shape { 1, 2, 2, 1 };
@@ -911,6 +960,12 @@ TEST_CASE ("ADD_Broadcast_CpuRef_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     AddBroadcastTest(backends);
+}
+
+TEST_CASE ("ADD_Constant_Input_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    AddConstInputTest(backends);
 }
 
 TEST_CASE ("ADD_Actiation_CpuRef_Test")

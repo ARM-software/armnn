@@ -87,8 +87,16 @@ TfLiteStatus VisitGatherOperator(DelegateData& delegateData,
 
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddGatherLayer(gatherDescriptor);
     ARMNN_ASSERT(layer != nullptr);
-
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputsTensorsProcess = ProcessInputs(layer,
+                                              delegateData,
+                                              tfLiteContext,
+                                              tfLiteNode);
+    if (inputsTensorsProcess == kTfLiteError)
+    {
+        return inputsTensorsProcess;
+    }
 
     Connect(layer, tfLiteNode, delegateData);
 

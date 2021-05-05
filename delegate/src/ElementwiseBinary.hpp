@@ -273,32 +273,13 @@ TfLiteStatus VisitElementwiseBinaryOperator(DelegateData& delegateData,
     armnn::IOutputSlot& outputSlot = elementwiseBinaryLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
 
-    if(tflite::IsConstantTensor(&tfLiteInputTensor0))
+    auto inputsTensorsProcess = ProcessInputs(elementwiseBinaryLayer,
+                                              delegateData,
+                                              tfLiteContext,
+                                              tfLiteNode);
+    if (inputsTensorsProcess == kTfLiteError)
     {
-        auto status = ConnectConstant(elementwiseBinaryLayer,
-                                      inputTensorInfo0,
-                                      tfLiteContext,
-                                      tfLiteInputTensor0,
-                                      delegateData,
-                                      tfLiteNode->inputs->data[0]);
-        if (status == kTfLiteError)
-        {
-            return status;
-        }
-    }
-
-    if(tflite::IsConstantTensor(&tfLiteInputTensor1))
-    {
-        auto status = ConnectConstant(elementwiseBinaryLayer,
-                                      inputTensorInfo1,
-                                      tfLiteContext,
-                                      tfLiteInputTensor1,
-                                      delegateData,
-                                      tfLiteNode->inputs->data[1]);
-        if (status == kTfLiteError)
-        {
-            return status;
-        }
+        return inputsTensorsProcess;
     }
 
     auto reshapeLayer = BroadcastTensor(inputTensorInfo0,

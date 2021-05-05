@@ -73,6 +73,15 @@ TfLiteStatus VisitDequantizeOperator(DelegateData& delegateData,
     armnn::IOutputSlot& outputSlot = dequantizeLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
 
+    auto inputsTensorsProcess = ProcessInputs(dequantizeLayer,
+                                              delegateData,
+                                              tfLiteContext,
+                                              tfLiteNode);
+    if (inputsTensorsProcess == kTfLiteError)
+    {
+        return inputsTensorsProcess;
+    }
+
     return Connect(dequantizeLayer, tfLiteNode, delegateData);
 }
 

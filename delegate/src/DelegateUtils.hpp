@@ -555,6 +555,46 @@ TfLiteStatus ConnectConstant(armnn::IConnectableLayer* layer,
     return kTfLiteOk;
 }
 
+TfLiteStatus ProcessInputs(armnn::IConnectableLayer* layer,
+                           armnnDelegate::DelegateData& delegateData,
+                           TfLiteContext* tfLiteContext,
+                           TfLiteNode* tfLiteNode)
+{
+    const TfLiteTensor* tfLiteTensors = tfLiteContext->tensors;
+    // Process input tensors
+    // If input tensor is a Constant tensor create a constant layer and connect it to the network
+    for (unsigned int inputIndex = 0; inputIndex < layer->GetNumInputSlots(); ++inputIndex)
+    {
+        const TfLiteTensor& tfLiteInputTensor = tfLiteTensors[tfLiteNode->inputs->data[inputIndex]];
+        if(tflite::IsConstantTensor(&tfLiteInputTensor))
+        {
+            armnn::TensorInfo inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
+            bool isSupported = false;
+            FORWARD_LAYER_SUPPORT_FUNC(__func__,
+                                       tfLiteContext,
+                                       IsConstantSupported,
+                                       delegateData.m_Backends,
+                                       isSupported,
+                                       inputTensorInfo);
+            if (!isSupported)
+            {
+                return kTfLiteError;
+            }
+            auto constantInput = CreateConstTensor(&tfLiteInputTensor,
+                                                   inputTensorInfo,
+                                                   armnn::Optional<armnn::PermutationVector&>());
+            armnn::IConnectableLayer* constantLayer = delegateData.m_Network->AddConstantLayer(constantInput);
+            armnn::IOutputSlot& outputSlot = constantLayer->GetOutputSlot(0);
+            outputSlot.SetTensorInfo(inputTensorInfo);
+
+            delegateData.m_OutputSlotForNode[static_cast<unsigned long>(inputIndex)] = &outputSlot;
+
+        }
+
+    }
+    return kTfLiteOk;
+}
+
 unsigned int ComputeWrappedIndex(int index, unsigned int numDimensions)
 {
     int numDims = armnn::numeric_cast<int>(numDimensions);

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "TestUtils.hpp"
+
 #include <armnn_delegate.hpp>
 
 #include <flatbuffers/flatbuffers.h>
@@ -19,12 +21,15 @@
 namespace
 {
 
+template <typename T>
 std::vector<char> CreateElementwiseBinaryTfLiteModel(tflite::BuiltinOperator binaryOperatorCode,
                                                      tflite::ActivationFunctionType activationType,
                                                      tflite::TensorType tensorType,
                                                      const std::vector <int32_t>& input0TensorShape,
                                                      const std::vector <int32_t>& input1TensorShape,
                                                      const std::vector <int32_t>& outputTensorShape,
+                                                     std::vector<T>& input1Values,
+                                                     bool constantInput = false,
                                                      float quantScale = 1.0f,
                                                      int quantOffset  = 0)
 {
@@ -32,6 +37,18 @@ std::vector<char> CreateElementwiseBinaryTfLiteModel(tflite::BuiltinOperator bin
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
+    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    if (constantInput)
+    {
+        buffers.push_back(
+            CreateBuffer(flatBufferBuilder,
+                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(input1Values.data()),
+                                                        sizeof(T) * input1Values.size())));
+    }
+    else
+    {
+        buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    }
     buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
 
     auto quantizationParameters =
@@ -54,14 +71,14 @@ std::vector<char> CreateElementwiseBinaryTfLiteModel(tflite::BuiltinOperator bin
                               flatBufferBuilder.CreateVector<int32_t>(input1TensorShape.data(),
                                                                       input1TensorShape.size()),
                               tensorType,
-                              0,
+                              1,
                               flatBufferBuilder.CreateString("input_1"),
                               quantizationParameters);
     tensors[2] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
                                                                       outputTensorShape.size()),
                               tensorType,
-                              0,
+                              2,
                               flatBufferBuilder.CreateString("output"),
                               quantizationParameters);
 
@@ -158,27 +175,30 @@ void ElementwiseBinaryTest(tflite::BuiltinOperator binaryOperatorCode,
                            std::vector<T>& input1Values,
                            std::vector<T>& expectedOutputValues,
                            float quantScale = 1.0f,
-                           int quantOffset  = 0)
+                           int quantOffset  = 0,
+                           bool constantInput = false)
 {
     using namespace tflite;
-    std::vector<char> modelBuffer = CreateElementwiseBinaryTfLiteModel(binaryOperatorCode,
-                                                                       activationType,
-                                                                       tensorType,
-                                                                       input0Shape,
-                                                                       input1Shape,
-                                                                       outputShape,
-                                                                       quantScale,
-                                                                       quantOffset);
+    std::vector<char> modelBuffer = CreateElementwiseBinaryTfLiteModel<T>(binaryOperatorCode,
+                                                                          activationType,
+                                                                          tensorType,
+                                                                          input0Shape,
+                                                                          input1Shape,
+                                                                          outputShape,
+                                                                          input1Values,
+                                                                          constantInput,
+                                                                          quantScale,
+                                                                          quantOffset);
 
     const Model* tfLiteModel = GetModel(modelBuffer.data());
     // Create TfLite Interpreters
-    std::unique_ptr<Interpreter> armnnDelegateInterpreter;
+    std::unique_ptr <Interpreter> armnnDelegateInterpreter;
     CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
               (&armnnDelegateInterpreter) == kTfLiteOk);
     CHECK(armnnDelegateInterpreter != nullptr);
     CHECK(armnnDelegateInterpreter->AllocateTensors() == kTfLiteOk);
 
-    std::unique_ptr<Interpreter> tfLiteInterpreter;
+    std::unique_ptr <Interpreter> tfLiteInterpreter;
     CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
               (&tfLiteInterpreter) == kTfLiteOk);
     CHECK(tfLiteInterpreter != nullptr);
@@ -187,57 +207,29 @@ void ElementwiseBinaryTest(tflite::BuiltinOperator binaryOperatorCode,
     // Create the ArmNN Delegate
     armnnDelegate::DelegateOptions delegateOptions(backends);
     std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
-        theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
-                         armnnDelegate::TfLiteArmnnDelegateDelete);
+    theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
+                     armnnDelegate::TfLiteArmnnDelegateDelete);
     CHECK(theArmnnDelegate != nullptr);
     // Modify armnnDelegateInterpreter to use armnnDelegate
     CHECK(armnnDelegateInterpreter->ModifyGraphWithDelegate(theArmnnDelegate.get()) == kTfLiteOk);
 
     // Set input data
-    auto tfLiteDelegateInput0Id = tfLiteInterpreter->inputs()[0];
-    auto tfLiteDelageInput0Data = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateInput0Id);
-    for (unsigned int i = 0; i < input0Values.size(); ++i)
+    armnnDelegate::FillInput<T>(tfLiteInterpreter, 0, input0Values);
+    armnnDelegate::FillInput<T>(armnnDelegateInterpreter, 0, input0Values);
+    if (!constantInput)
     {
-        tfLiteDelageInput0Data[i] = input0Values[i];
+        armnnDelegate::FillInput<T>(tfLiteInterpreter, 1, input1Values);
+        armnnDelegate::FillInput<T>(armnnDelegateInterpreter, 1, input1Values);
     }
-
-    auto tfLiteDelegateInput1Id = tfLiteInterpreter->inputs()[1];
-    auto tfLiteDelageInput1Data = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateInput1Id);
-    for (unsigned int i = 0; i < input1Values.size(); ++i)
-    {
-        tfLiteDelageInput1Data[i] = input1Values[i];
-    }
-
-    auto armnnDelegateInput0Id = armnnDelegateInterpreter->inputs()[0];
-    auto armnnDelegateInput0Data = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateInput0Id);
-    for (unsigned int i = 0; i < input0Values.size(); ++i)
-    {
-        armnnDelegateInput0Data[i] = input0Values[i];
-    }
-
-    auto armnnDelegateInput1Id = armnnDelegateInterpreter->inputs()[1];
-    auto armnnDelegateInput1Data = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateInput1Id);
-    for (unsigned int i = 0; i < input1Values.size(); ++i)
-    {
-        armnnDelegateInput1Data[i] = input1Values[i];
-    }
-
     // Run EnqueWorkload
     CHECK(tfLiteInterpreter->Invoke() == kTfLiteOk);
     CHECK(armnnDelegateInterpreter->Invoke() == kTfLiteOk);
 
     // Compare output data
-    auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[0];
-    auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateOutputId);
-    auto armnnDelegateOutputId = armnnDelegateInterpreter->outputs()[0];
-    auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateOutputId);
-    for (size_t i = 0; i < expectedOutputValues.size(); i++)
-    {
-        CHECK(expectedOutputValues[i] == armnnDelegateOutputData[i]);
-        CHECK(tfLiteDelageOutputData[i] == expectedOutputValues[i]);
-        CHECK(tfLiteDelageOutputData[i] == armnnDelegateOutputData[i]);
-    }
-
+    armnnDelegate::CompareOutputData<T>(tfLiteInterpreter,
+                                        armnnDelegateInterpreter,
+                                        outputShape,
+                                        expectedOutputValues);
     armnnDelegateInterpreter.reset(nullptr);
 }
 

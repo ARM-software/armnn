@@ -233,7 +233,7 @@ make
 cd build/
 ```
 
-* Create a symbolic link to libprotobuf.so.24.0.0:
+* Create a symbolic link to libprotobuf.so.23.0.0:
 
 ```bash
 ln -s libprotobuf.so.23.0.0 ./libprotobuf.so.23
@@ -292,7 +292,7 @@ sudo ./b2 clean
 ### Missing libz.so.1
 * When compiling armNN:
 ```bash
-/usr/lib/gcc-cross/aarch64-linux-gnu/5/../../../../aarch64-linux-gnu/bin/ld: warning: libz.so.1, needed by /home/<username>/armNN/usr/lib64/libprotobuf.so.24.0.0, not found (try using -rpath or -rpath-link)
+/usr/lib/gcc-cross/aarch64-linux-gnu/5/../../../../aarch64-linux-gnu/bin/ld: warning: libz.so.1, needed by /home/<username>/armNN/usr/lib64/libprotobuf.so.23.0.0, not found (try using -rpath or -rpath-link)
 ```
 
 * Missing arm64 libraries for libz.so.1, these can be added by adding a second architecture to dpkg and explicitly installing them:

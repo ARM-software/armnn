@@ -11,11 +11,10 @@ namespace armnn
 
 void Stack(const StackQueueDescriptor& data,
            std::vector<std::unique_ptr<Decoder<float>>>& inputs,
-           Encoder<float>& output)
+           Encoder<float>& output,
+           const TensorInfo& inputInfo,
+           const TensorInfo& outputInfo)
 {
-    const TensorInfo& outputInfo = GetTensorInfo(data.m_Outputs[0]);
-    const TensorInfo& inputInfo = GetTensorInfo(data.m_Inputs[0]);
-
     unsigned int outputNumDims = outputInfo.GetNumDimensions();
     unsigned int inputNumDims = inputInfo.GetNumDimensions();
 

@@ -15,6 +15,8 @@ namespace armnn
 
 void Stack (const StackQueueDescriptor&                   data,
             std::vector<std::unique_ptr<Decoder<float>>>& inputs,
-            Encoder<float>&                               output);
+            Encoder<float>&                               output,
+            const TensorInfo&                             inputInfo,
+            const TensorInfo&                             outputInfo);
 
 } // namespace armnn

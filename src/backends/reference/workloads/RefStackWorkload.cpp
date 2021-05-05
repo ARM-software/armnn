@@ -32,6 +32,9 @@ void RefStackWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<I
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefStackWorkload_Execute");
 
+    const TensorInfo& inputInfo  = GetTensorInfo(inputs[0]);
+    const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);
+
     std::vector<std::unique_ptr<Decoder<float>>> inputDecoders;
     for (unsigned int i=0; i<inputs.size(); ++i)
     {
@@ -41,7 +44,7 @@ void RefStackWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<I
     std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(outputs[0]),
                                                                        outputs[0]->Map());
 
-    Stack(m_Data, inputDecoders, *outputEncoder);
+    Stack(m_Data, inputDecoders, *outputEncoder, inputInfo, outputInfo);
 }
 
 } // namespace armnn

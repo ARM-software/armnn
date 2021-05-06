@@ -33,6 +33,7 @@ list(APPEND armnnDelegate_sources
         src/LogicalBinary.hpp
         src/Lstm.hpp
         src/Normalization.hpp
+        src/Pack.hpp
         src/Pad.hpp
         src/Pooling.hpp
         src/Quantization.hpp
@@ -145,6 +146,8 @@ if(BUILD_UNIT_TESTS)
         src/test/LstmTestHelper.hpp
         src/test/NormalizationTest.cpp
         src/test/NormalizationTestHelper.hpp
+        src/test/PackTest.cpp
+        src/test/PackTestHelper.hpp
         src/test/PadTest.cpp
         src/test/PadTestHelper.hpp
         src/test/Pooling2dTest.cpp

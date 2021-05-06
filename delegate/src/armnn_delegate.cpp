@@ -21,6 +21,7 @@
 #include "LogicalBinary.hpp"
 #include "Lstm.hpp"
 #include "Normalization.hpp"
+#include "Pack.hpp"
 #include "Pad.hpp"
 #include "Pooling.hpp"
 #include "Quantization.hpp"
@@ -712,6 +713,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                            tfLiteNode,
                                            nodeIndex,
                                            kTfLiteBuiltinNotEqual);
+        case kTfLiteBuiltinPack:
+            return VisitPackOperator(delegateData,
+                                     tfLiteContext,
+                                     tfLiteNode,
+                                     nodeIndex,
+                                     kTfLiteBuiltinPack);
         case kTfLiteBuiltinPad:
             return VisitPadOperator(delegateData,
                                     tfLiteContext,

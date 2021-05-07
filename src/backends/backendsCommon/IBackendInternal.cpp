@@ -76,6 +76,17 @@ IBackendInternal::IWorkloadFactoryPtr IBackendInternal::CreateWorkloadFactory(
     return CreateWorkloadFactory(tensorHandleFactoryRegistry);
 }
 
+IBackendInternal::IWorkloadFactoryPtr IBackendInternal::CreateWorkloadFactory(
+    class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry,
+    const ModelOptions& modelOptions,
+    MemorySourceFlags inputFlags,
+    MemorySourceFlags outputFlags) const
+{
+    IgnoreUnused(inputFlags);
+    IgnoreUnused(outputFlags);
+    return CreateWorkloadFactory(tensorHandleFactoryRegistry, modelOptions);
+}
+
 IBackendInternal::IBackendContextPtr IBackendInternal::CreateBackendContext(const IRuntime::CreationOptions&) const
 {
     return IBackendContextPtr{};
@@ -145,6 +156,13 @@ OptimizationViews IBackendInternal::OptimizeSubgraphView(const SubgraphView& sub
 bool IBackendInternal::SupportsTensorAllocatorAPI() const
 {
     return !GetHandleFactoryPreferences().empty();
+}
+
+void IBackendInternal::RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry,
+                                                     MemorySourceFlags /*inputFlags*/,
+                                                     MemorySourceFlags /*outputFlags*/)
+{
+    return RegisterTensorHandleFactories(registry);
 }
 
 ITensorHandleFactory::FactoryId IBackendInternal::GetBackwardCompatibleFavoriteHandleFactory()

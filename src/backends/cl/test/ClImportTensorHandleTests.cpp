@@ -11,6 +11,9 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <armnn/IRuntime.hpp>
+#include <armnn/INetwork.hpp>
+
 using namespace armnn;
 
 BOOST_AUTO_TEST_SUITE(ClImportTensorHandleTests)
@@ -38,7 +41,7 @@ BOOST_FIXTURE_TEST_CASE(ClMallocImport, ClContextControlFixture)
     const size_t totalBytes = tensor.info()->total_size();
     const size_t alignment =
         arm_compute::CLKernelLibrary::get().get_device().getInfo<CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE>();
-    size_t space = totalBytes + alignment;
+    size_t space = totalBytes + alignment + alignment;
     auto testData = std::make_unique<uint8_t[]>(space);
     void* alignedPtr = testData.get();
     BOOST_CHECK(std::align(alignment, totalBytes, alignedPtr, space));
@@ -57,7 +60,7 @@ BOOST_FIXTURE_TEST_CASE(ClMallocImport, ClContextControlFixture)
     // Validate result by checking that the output has no negative values
     for(unsigned int i = 0; i < numElements; ++i)
     {
-        BOOST_ASSERT(typedPtr[i] >= 0);
+        BOOST_TEST(typedPtr[i] >= 0);
     }
 }
 
@@ -78,7 +81,7 @@ BOOST_FIXTURE_TEST_CASE(ClIncorrectMemorySourceImport, ClContextControlFixture)
     const size_t totalBytes = tensor.info()->total_size();
     const size_t alignment =
         arm_compute::CLKernelLibrary::get().get_device().getInfo<CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE>();
-    size_t space = totalBytes + alignment;
+    size_t space = totalBytes + alignment + alignment;
     auto testData = std::make_unique<uint8_t[]>(space);
     void* alignedPtr = testData.get();
     BOOST_CHECK(std::align(alignment, totalBytes, alignedPtr, space));
@@ -106,6 +109,107 @@ BOOST_FIXTURE_TEST_CASE(ClInvalidMemorySourceImport, ClContextControlFixture)
 
     // Import non-support memory
     BOOST_CHECK_THROW(handle->Import(inputData.data(), invalidMemSource), MemoryImportException);
+}
+
+BOOST_FIXTURE_TEST_CASE(ClImportEndToEnd, ClContextControlFixture)
+{
+    // Create runtime in which test will run
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(armnn::IRuntime::Create(options));
+
+    // build up the structure of the network
+    INetworkPtr net(INetwork::Create());
+
+    IConnectableLayer* input = net->AddInputLayer(0, "Input");
+
+    ActivationDescriptor descriptor;
+    descriptor.m_Function = ActivationFunction::ReLu;
+    IConnectableLayer* activation = net->AddActivationLayer(descriptor, "Activation");
+
+    IConnectableLayer* output = net->AddOutputLayer(0, "Output");
+
+    input->GetOutputSlot(0).Connect(activation->GetInputSlot(0));
+    activation->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    TensorInfo tensorInfo = TensorInfo({ 1, 24, 16, 3 }, DataType::Float32);
+    unsigned int numElements = tensorInfo.GetNumElements();
+    size_t totalBytes = numElements * sizeof(float);
+
+    input->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    activation->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    // Optimize the network
+    OptimizerOptions optOptions;
+    optOptions.m_ImportEnabled = true;
+    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
+    BOOST_CHECK(optNet);
+
+    // Loads it into the runtime.
+    NetworkId netId;
+    std::string ignoredErrorMessage;
+    // Enable Importing
+    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+    runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
+
+    // Creates structures for input & output
+    const size_t alignment =
+        arm_compute::CLKernelLibrary::get().get_device().getInfo<CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE>();
+    size_t space = totalBytes + alignment + alignment;
+    auto inputData = std::make_unique<uint8_t[]>(space);
+    void* alignedInputPtr = inputData.get();
+    BOOST_CHECK(std::align(alignment, totalBytes, alignedInputPtr, space));
+
+    // Input with negative values
+    auto* intputPtr = reinterpret_cast<float*>(alignedInputPtr);
+    std::fill_n(intputPtr, numElements, -5.0f);
+
+    auto outputData = std::make_unique<uint8_t[]>(space);
+    void* alignedOutputPtr = outputData.get();
+    BOOST_CHECK(std::align(alignment, totalBytes, alignedOutputPtr, space));
+
+    InputTensors inputTensors
+    {
+        {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), alignedInputPtr)},
+    };
+    OutputTensors outputTensors
+    {
+        {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), alignedOutputPtr)}
+    };
+
+    runtime->GetProfiler(netId)->EnableProfiling(true);
+
+    // Do the inference
+    runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
+
+    // Retrieve the Profiler.Print() output to get the workload execution
+    ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
+    std::stringstream ss;
+    profilerManager.GetProfiler()->Print(ss);;
+    std::string dump = ss.str();
+
+    // Contains ActivationWorkload
+    std::size_t found = dump.find("ActivationWorkload");
+    BOOST_TEST(found != std::string::npos);
+
+    // Contains SyncMemGeneric
+    found = dump.find("SyncMemGeneric");
+    BOOST_TEST(found != std::string::npos);
+
+    // Does not contain CopyMemGeneric
+    found = dump.find("CopyMemGeneric");
+    BOOST_TEST(found == std::string::npos);
+
+    // Check output is as expected
+    // Validate result by checking that the output has no negative values
+    auto* outputResult = reinterpret_cast<float*>(alignedOutputPtr);
+    BOOST_TEST(outputResult);
+    for(unsigned int i = 0; i < numElements; ++i)
+    {
+        BOOST_TEST(outputResult[i] >= 0);
+    }
+
+    runtime->UnloadNetwork(netId);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

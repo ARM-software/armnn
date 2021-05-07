@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(FallbackImportToCpuAcc)
 {
     using namespace armnn;
 
-    // Create a mock backend object
+    // Create a mock backend objectN
     MockImportBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockImportBackendId());
     BOOST_TEST((backendObjPtr != nullptr));
@@ -677,7 +677,7 @@ BOOST_AUTO_TEST_CASE(FallbackDisableImportFromCpuAcc)
 }
 
 #if defined(ARMCOMPUTECL_ENABLED)
-BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackToCl, * boost::unit_test::disabled())
+BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackToCl)
 {
     using namespace armnn;
 
@@ -700,7 +700,7 @@ BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackToCl, * boost::unit_test::disabled
     add->GetOutputSlot(0).Connect(sub->GetInputSlot(1));
     sub->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    TensorInfo info = TensorInfo({ 1, 2, 3, 2 }, DataType::Float32);
+    TensorInfo info = TensorInfo({ 1, 2, 4, 2 }, DataType::Float32);
 
     input0->GetOutputSlot(0).SetTensorInfo(info);
     input1->GetOutputSlot(0).SetTensorInfo(info);
@@ -752,29 +752,43 @@ BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackToCl, * boost::unit_test::disabled
     // Creates structures for input & output
     std::vector<float> inputData0
     {
-        1.0f, 1.0f, 2.0f, 2.0f, 2.0f, 3.0f, 4.0f, 4.0f, 5.0f, 5.0f, 6.0f, 6.0f
+        1.0f, 1.0f, 2.0f, 2.0f, 2.0f, 3.0f, 4.0f, 4.0f, 5.0f, 5.0f, 6.0f, 6.0f, 1.0f, 1.0f, 2.0f, 2.0f
     };
     std::vector<float> inputData1
     {
-        0.0f, 1.0f, 1.0f, 2.0f, 3.0f, 3.0f, 3.0f, 4.0f, 4.0f, 5.0f, 5.0f, 6.0f
+        0.0f, 1.0f, 1.0f, 2.0f, 3.0f, 3.0f, 3.0f, 4.0f, 4.0f, 5.0f, 5.0f, 6.0f, 0.0f, 1.0f, 1.0f, 2.0f
     };
     std::vector<float> inputData2
     {
-        12.0f, 11.0f, 10.0f, 9.0f, 8.0f, 7.0f, 6.0f, 5.0f, 4.0f, 3.0f, 2.0f, 1.0f
+        12.0f, 11.0f, 10.0f, 9.0f, 8.0f, 7.0f, 6.0f, 5.0f, 4.0f, 3.0f, 2.0f, 1.0f, 12.0f, 11.0f, 10.0f, 9.0f
     };
 
-    std::vector<float> outputData(12);
+    std::vector<float> outputData(16);
 
     std::vector<float> expectedOutput
     {
-        11.0f, 9.0f, 7.0f, 5.0f, 3.0f, 1.0f, -1.0f, -3.0f, -5.0f, -7.0f, -9.0f, -11.0f
+        11.0f, 9.0f, 7.0f, 5.0f, 3.0f, 1.0f, -1.0f, -3.0f, -5.0f, -7.0f, -9.0f, -11.0f, 11.0f, 9.0f, 7.0f, 5.0f
     };
+
+    // Creates structures for input & output
+    unsigned int numElements = info.GetNumElements();
+    size_t totalBytes = numElements * sizeof(float);
+
+    // Prepare aligned data
+    const size_t alignment = 64;
+    size_t space = totalBytes + alignment + alignment;
+    auto inputData = std::make_unique<uint8_t[]>(space);
+    void* alignedInputPtr = inputData.get();
+    BOOST_CHECK(std::align(alignment, totalBytes, alignedInputPtr, space));
+
+    auto* intputPtr = reinterpret_cast<float*>(alignedInputPtr);
+    std::copy(inputData2.begin(), inputData2.end(), intputPtr);
 
     InputTensors inputTensors
     {
         { 0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData0.data()) },
         { 1, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 1), inputData1.data()) },
-        { 2, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 2), inputData2.data()) }
+        { 2, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 2), alignedInputPtr) }
     };
     OutputTensors outputTensors
     {
@@ -801,7 +815,11 @@ BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackToCl, * boost::unit_test::disabled
     BOOST_TEST(found != std::string::npos);
 
     // Check output is as expected
-    BOOST_TEST(outputData == expectedOutput);
+    for(unsigned int i = 0; i < numElements; ++i)
+    {
+        BOOST_TEST(outputData[i] == expectedOutput[i]);
+    }
+    runtime->UnloadNetwork(netId);
 }
 
 BOOST_AUTO_TEST_CASE(NeonImportDisabledFallbackToCl)
@@ -926,7 +944,7 @@ BOOST_AUTO_TEST_CASE(NeonImportDisabledFallbackToCl)
     BOOST_TEST(outputData == expectedOutput);
 }
 
-BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackSubgraphToCl, * boost::unit_test::disabled())
+BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackSubgraphToCl)
 {
     using namespace armnn;
 
@@ -937,6 +955,10 @@ BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackSubgraphToCl, * boost::unit_test::
     INetworkPtr net(INetwork::Create());
 
     Pooling2dDescriptor desc;
+    desc.m_PoolWidth = 2;
+    desc.m_PoolHeight = 2;
+    desc.m_StrideX = 2;
+    desc.m_StrideY = 2;
 
     IConnectableLayer* input0 = net->AddInputLayer(0, "input0");
     IConnectableLayer* input1 = net->AddInputLayer(1, "input1");
@@ -953,8 +975,8 @@ BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackSubgraphToCl, * boost::unit_test::
     sub->GetOutputSlot(0).Connect(pooling->GetInputSlot(0));
     pooling->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    TensorInfo info = TensorInfo({ 1, 2, 3, 2 }, DataType::Float32);
-    TensorInfo poolingInfo = TensorInfo({ 1, 2, 1, 1 }, DataType::Float32);
+    TensorInfo info = TensorInfo({ 1, 2, 4, 2 }, DataType::Float32);
+    TensorInfo poolingInfo = TensorInfo({ 1, 2, 2, 1 }, DataType::Float32);
 
     input0->GetOutputSlot(0).SetTensorInfo(info);
     input1->GetOutputSlot(0).SetTensorInfo(info);
@@ -1012,26 +1034,38 @@ BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackSubgraphToCl, * boost::unit_test::
     // Creates structures for input & output
     std::vector<float> inputData0
     {
-        1.0f, 1.0f, 2.0f, 2.0f, 2.0f, 3.0f, 4.0f, 4.0f, 5.0f, 5.0f, 6.0f, 6.0f
+        1.0f, 1.0f, 2.0f, 2.0f, 2.0f, 3.0f, 4.0f, 4.0f, 5.0f, 5.0f, 6.0f, 6.0f, 1.0f, 1.0f, 2.0f, 2.0f
     };
     std::vector<float> inputData1
     {
-        0.0f, 1.0f, 1.0f, 2.0f, 3.0f, 3.0f, 3.0f, 4.0f, 4.0f, 5.0f, 5.0f, 6.0f
+        0.0f, 1.0f, 1.0f, 2.0f, 3.0f, 3.0f, 3.0f, 4.0f, 4.0f, 5.0f, 5.0f, 6.0f, 0.0f, 1.0f, 1.0f, 2.0f
     };
     std::vector<float> inputData2
     {
-        12.0f, 11.0f, 10.0f, 9.0f, 8.0f, 7.0f, 6.0f, 5.0f, 4.0f, 3.0f, 2.0f, 1.0f
+        12.0f, 11.0f, 10.0f, 9.0f, 8.0f, 7.0f, 6.0f, 5.0f, 4.0f, 3.0f, 2.0f, 1.0f, 12.0f, 11.0f, 10.0f, 9.0f
     };
 
-    std::vector<float> outputData(2);
+    std::vector<float> outputData(4);
 
-    std::vector<float> expectedOutput{ 11.0f, -1.0f };
+    std::vector<float> expectedOutput{ 11.0f, 3.0f, -5.0f, 11.0f };
+
+    // Prepare aligned data
+    unsigned int numElements = info.GetNumElements();
+    size_t totalBytes = numElements * sizeof(float);
+    const size_t alignment = 64;
+    size_t space = totalBytes + alignment + alignment;
+    auto inputData = std::make_unique<uint8_t[]>(space);
+    void* alignedInputPtr = inputData.get();
+    BOOST_CHECK(std::align(alignment, totalBytes, alignedInputPtr, space));
+
+    auto* intputPtr = reinterpret_cast<float*>(alignedInputPtr);
+    std::copy(inputData2.begin(), inputData2.end(), intputPtr);
 
     InputTensors inputTensors
     {
         { 0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData0.data()) },
         { 1, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 1), inputData1.data()) },
-        { 2, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 2), inputData2.data()) }
+        { 2, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 2), alignedInputPtr) }
     };
     OutputTensors outputTensors
     {
@@ -1067,6 +1101,7 @@ BOOST_AUTO_TEST_CASE(NeonImportEnabledFallbackSubgraphToCl, * boost::unit_test::
 
     // Check output is as expected
     BOOST_TEST(outputData == expectedOutput);
+    runtime->UnloadNetwork(netId);
 }
 
 BOOST_AUTO_TEST_CASE(NeonImportDisableFallbackSubgraphToCl)

@@ -20,6 +20,7 @@ namespace armnn
 enum class CapabilityClass
 {
     PaddingRequired = 1,
+    FallbackImportDisabled = 2,
 
     // add new enum values here
 
@@ -80,7 +81,7 @@ public:
 
     virtual bool SupportsSubTensors() const = 0;
 
-    virtual bool SupportsMapUnmap() const final { return true; }
+    virtual bool SupportsMapUnmap() const { return true; }
 
     virtual MemorySourceFlags GetExportFlags() const { return 0; }
     virtual MemorySourceFlags GetImportFlags() const { return 0; }

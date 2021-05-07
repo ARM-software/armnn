@@ -4,12 +4,13 @@
 //
 
 #include "ClBackend.hpp"
+#include "ClBackendContext.hpp"
 #include "ClBackendId.hpp"
 #include "ClBackendModelContext.hpp"
-#include "ClWorkloadFactory.hpp"
-#include "ClBackendContext.hpp"
+#include "ClImportTensorHandleFactory.hpp"
 #include "ClLayerSupport.hpp"
 #include "ClTensorHandleFactory.hpp"
+#include "ClWorkloadFactory.hpp"
 
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Descriptors.hpp>
@@ -71,6 +72,8 @@ IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
 
     registry.RegisterMemoryManager(memoryManager);
     registry.RegisterFactory(std::make_unique<ClTensorHandleFactory>(memoryManager));
+    registry.RegisterFactory(std::make_unique<ClImportTensorHandleFactory>(
+        static_cast<MemorySourceFlags>(MemorySource::Malloc), static_cast<MemorySourceFlags>(MemorySource::Malloc)));
 
     return std::make_unique<ClWorkloadFactory>(
             PolymorphicPointerDowncast<ClMemoryManager>(memoryManager));
@@ -83,6 +86,24 @@ IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
 
     registry.RegisterMemoryManager(memoryManager);
     registry.RegisterFactory(std::make_unique<ClTensorHandleFactory>(memoryManager));
+    registry.RegisterFactory(std::make_unique<ClImportTensorHandleFactory>(
+        static_cast<MemorySourceFlags>(MemorySource::Malloc), static_cast<MemorySourceFlags>(MemorySource::Malloc)));
+
+    return std::make_unique<ClWorkloadFactory>(
+        PolymorphicPointerDowncast<ClMemoryManager>(memoryManager), CreateBackendSpecificModelContext(modelOptions));
+}
+
+IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
+    TensorHandleFactoryRegistry& registry,
+    const ModelOptions& modelOptions,
+    MemorySourceFlags inputFlags,
+    MemorySourceFlags outputFlags) const
+{
+    auto memoryManager = std::make_shared<ClMemoryManager>(std::make_unique<arm_compute::CLBufferAllocator>());
+
+    registry.RegisterMemoryManager(memoryManager);
+    registry.RegisterFactory(std::make_unique<ClTensorHandleFactory>(memoryManager));
+    registry.RegisterFactory(std::make_unique<ClImportTensorHandleFactory>(inputFlags, outputFlags));
 
     return std::make_unique<ClWorkloadFactory>(
         PolymorphicPointerDowncast<ClMemoryManager>(memoryManager), CreateBackendSpecificModelContext(modelOptions));
@@ -90,7 +111,8 @@ IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
 
 std::vector<ITensorHandleFactory::FactoryId> ClBackend::GetHandleFactoryPreferences() const
 {
-    return std::vector<ITensorHandleFactory::FactoryId> {ClTensorHandleFactory::GetIdStatic()};
+    return std::vector<ITensorHandleFactory::FactoryId> {ClTensorHandleFactory::GetIdStatic(),
+                                                         ClImportTensorHandleFactory::GetIdStatic()};
 }
 
 void ClBackend::RegisterTensorHandleFactories(TensorHandleFactoryRegistry& registry)
@@ -99,6 +121,19 @@ void ClBackend::RegisterTensorHandleFactories(TensorHandleFactoryRegistry& regis
 
     registry.RegisterMemoryManager(mgr);
     registry.RegisterFactory(std::make_unique<ClTensorHandleFactory>(mgr));
+    registry.RegisterFactory(std::make_unique<ClImportTensorHandleFactory>(
+        static_cast<MemorySourceFlags>(MemorySource::Malloc), static_cast<MemorySourceFlags>(MemorySource::Malloc)));
+}
+
+void ClBackend::RegisterTensorHandleFactories(TensorHandleFactoryRegistry& registry,
+                                              MemorySourceFlags inputFlags,
+                                              MemorySourceFlags outputFlags)
+{
+    auto mgr = std::make_shared<ClMemoryManager>(std::make_unique<arm_compute::CLBufferAllocator>());
+
+    registry.RegisterMemoryManager(mgr);
+    registry.RegisterFactory(std::make_unique<ClTensorHandleFactory>(mgr));
+    registry.RegisterFactory(std::make_unique<ClImportTensorHandleFactory>(inputFlags, outputFlags));
 }
 
 IBackendInternal::IBackendContextPtr ClBackend::CreateBackendContext(const IRuntime::CreationOptions& options) const

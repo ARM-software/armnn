@@ -126,6 +126,12 @@ public:
         class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry,
         const ModelOptions& modelOptions) const;
 
+    virtual IWorkloadFactoryPtr CreateWorkloadFactory(
+        class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry,
+        const ModelOptions& modelOptions,
+        MemorySourceFlags inputFlags,
+        MemorySourceFlags outputFlags) const;
+
     /// Create the runtime context of the backend
     ///
     /// Implementations may return a default-constructed IBackendContextPtr if
@@ -161,6 +167,13 @@ public:
     /// Either this method or CreateMemoryManager() and
     /// IWorkloadFactory::CreateTensor()/IWorkloadFactory::CreateSubtensor() methods must be implemented.
     virtual void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& /*registry*/) {}
+
+    /// (Optional) Register TensorHandleFactories
+    /// Either this method or CreateMemoryManager() and
+    /// IWorkloadFactory::CreateTensor()/IWorkloadFactory::CreateSubtensor() methods must be implemented.
+    virtual void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry,
+                                               MemorySourceFlags inputFlags,
+                                               MemorySourceFlags outputFlags);
 
     /// Returns the version of the Backend API
     static constexpr BackendVersion GetApiVersion() { return BackendVersion(1, 0); }

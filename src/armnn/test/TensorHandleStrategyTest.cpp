@@ -139,7 +139,8 @@ public:
         {
             "TestHandleFactoryA1",
             "TestHandleFactoryA2",
-            "TestHandleFactoryB1"
+            "TestHandleFactoryB1",
+            "TestHandleFactoryD1"
         };
     }
 
@@ -252,7 +253,7 @@ public:
     std::vector<ITensorHandleFactory::FactoryId> GetHandleFactoryPreferences() const override
     {
         return std::vector<ITensorHandleFactory::FactoryId>{
-            "TestHandleFactoryD1"
+            "TestHandleFactoryD1",
         };
     }
 
@@ -279,6 +280,7 @@ BOOST_AUTO_TEST_CASE(RegisterFactories)
     BOOST_TEST(backendA.GetHandleFactoryPreferences()[0] == "TestHandleFactoryA1");
     BOOST_TEST(backendA.GetHandleFactoryPreferences()[1] == "TestHandleFactoryA2");
     BOOST_TEST(backendA.GetHandleFactoryPreferences()[2] == "TestHandleFactoryB1");
+    BOOST_TEST(backendA.GetHandleFactoryPreferences()[3] == "TestHandleFactoryD1");
 
     TensorHandleFactoryRegistry registry;
     backendA.RegisterTensorHandleFactories(registry);
@@ -351,7 +353,7 @@ BOOST_AUTO_TEST_CASE(TensorHandleSelectionStrategy)
     OutputSlot& softmaxLayer4Out = softmaxLayer4->GetOutputSlot(0);
 
     // Check that the correct factory was selected
-    BOOST_TEST(inputLayerOut.GetTensorHandleFactoryId() == "TestHandleFactoryA1");
+    BOOST_TEST(inputLayerOut.GetTensorHandleFactoryId() == "TestHandleFactoryD1");
     BOOST_TEST(softmaxLayer1Out.GetTensorHandleFactoryId() == "TestHandleFactoryB1");
     BOOST_TEST(softmaxLayer2Out.GetTensorHandleFactoryId() == "TestHandleFactoryB1");
     BOOST_TEST(softmaxLayer3Out.GetTensorHandleFactoryId() == "TestHandleFactoryC1");

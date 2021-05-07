@@ -38,9 +38,9 @@ struct INetworkProperties
         , m_ExportEnabled(exportEnabled)
         , m_AsyncEnabled(asyncEnabled)
         , m_NumThreads(numThreads)
-        , m_InputSource(MemorySource::Undefined)
-        , m_OutputSource(MemorySource::Undefined)
-        {}
+        , m_InputSource(m_ImportEnabled ? MemorySource::Malloc : MemorySource::Undefined)
+        , m_OutputSource(m_ExportEnabled ? MemorySource::Malloc : MemorySource::Undefined)
+    {}
 
     INetworkProperties(bool asyncEnabled,
                        MemorySource m_InputSource,

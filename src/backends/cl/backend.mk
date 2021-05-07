@@ -20,6 +20,7 @@ BACKEND_SOURCES := \
         ClContextControl.cpp \
         ClContextDeserializer.cpp \
         ClContextSerializer.cpp \
+        ClImportTensorHandleFactory.cpp \
         ClLayerSupport.cpp \
         ClRegistryInitializer.cpp \
         ClTensorHandleFactory.cpp \

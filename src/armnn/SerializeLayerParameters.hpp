@@ -60,6 +60,11 @@ template <> struct StringifyLayerParameters<Pooling2dDescriptor>
     static void Serialize(ParameterStringifyFunction& fn, const Pooling2dDescriptor& desc);
 };
 
+template <> struct StringifyLayerParameters<ReduceDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const ReduceDescriptor& desc);
+};
+
 template <> struct StringifyLayerParameters<SoftmaxDescriptor>
 {
     static void Serialize(ParameterStringifyFunction& fn, const SoftmaxDescriptor& desc);

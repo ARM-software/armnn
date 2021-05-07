@@ -135,6 +135,26 @@ void StringifyLayerParameters<Pooling2dDescriptor>::Serialize(ParameterStringify
     fn("DataLayout", GetDataLayoutName(desc.m_DataLayout));
 }
 
+void StringifyLayerParameters<ReduceDescriptor>::Serialize(ParameterStringifyFunction& fn, const ReduceDescriptor& desc)
+{
+    {
+        std::stringstream ss;
+        int count = 0;
+        for (auto&& var : desc.m_vAxis)
+        {
+            if (count > 0)
+            {
+                ss << ",";
+            }
+            ss << var;
+            ++count;
+        }
+        fn("Axis", ss.str());
+    }
+    fn("KeepDims", (desc.m_KeepDims ? "true" : "false"));
+    fn("ReduceOperation", GetReduceOperationAsCString(desc.m_ReduceOperation));
+}
+
 void StringifyLayerParameters<SoftmaxDescriptor>::Serialize(ParameterStringifyFunction& fn,
                                                             const SoftmaxDescriptor& desc)
 {

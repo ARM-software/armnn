@@ -123,6 +123,17 @@ constexpr char const* GetPaddingMethodAsCString(PaddingMethod method)
     }
 }
 
+constexpr char const* GetReduceOperationAsCString(ReduceOperation reduce_operation)
+{
+    switch (reduce_operation)
+    {
+        case ReduceOperation::Sum:  return "Sum";
+        case ReduceOperation::Max:  return "Max";
+        case ReduceOperation::Mean: return "Mean";
+        case ReduceOperation::Min:  return "Min";
+        default:                    return "Unknown";
+    }
+}
 constexpr unsigned int GetDataTypeSize(DataType dataType)
 {
     switch (dataType)

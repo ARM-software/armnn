@@ -58,9 +58,15 @@ public:
 
     bool SupportsSubTensors() const override;
 
+    bool SupportsMapUnmap() const override;
+
     MemorySourceFlags GetExportFlags() const override;
 
     MemorySourceFlags GetImportFlags() const override;
+
+    std::vector<Capability> GetCapabilities(const IConnectableLayer* layer,
+                                            const IConnectableLayer* connectedLayer,
+                                            CapabilityClass capabilityClass) override;
 
 private:
     MemorySourceFlags m_ImportFlags;

@@ -27,8 +27,7 @@ public:
     /// @param [in] MemorySource Determine the source of memory e.g Malloc
     virtual void CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
                                      const IWorkloadFactory& factory,
-                                     const bool IsMemoryManaged = true,
-                                     MemorySource memSource = MemorySource::Undefined) override;
+                                     const bool IsMemoryManaged = true) override;
 
     /// Creates a dynamically-allocated copy of this layer.
     /// @param [in] graph The graph into which this layer is being cloned.

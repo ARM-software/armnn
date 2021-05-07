@@ -177,8 +177,7 @@ void SplitterLayer::CreateTensors(const TensorHandleFactoryRegistry& registry,
 
 void SplitterLayer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
                                         const IWorkloadFactory& workloadFactory,
-                                        const bool isMemoryManaged,
-                                        MemorySource memSource)
+                                        const bool isMemoryManaged)
 {
     OutputSlot& slot = GetOutputSlot(0);
     ITensorHandleFactory::FactoryId factoryId = slot.GetTensorHandleFactoryId();
@@ -189,15 +188,7 @@ void SplitterLayer::CreateTensorHandles(const TensorHandleFactoryRegistry& regis
     }
     else
     {
-        ITensorHandleFactory* handleFactory;
-        if (memSource == MemorySource::Undefined)
-        {
-            handleFactory = registry.GetFactory(factoryId);
-        }
-        else
-        {
-            handleFactory = registry.GetFactory(factoryId, memSource);
-        }
+        ITensorHandleFactory* handleFactory = registry.GetFactory(factoryId);
         ARMNN_ASSERT(handleFactory);
         CreateTensors(registry, *handleFactory, isMemoryManaged);
     }

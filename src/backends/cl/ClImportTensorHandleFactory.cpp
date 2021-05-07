@@ -106,6 +106,11 @@ bool ClImportTensorHandleFactory::SupportsSubTensors() const
     return true;
 }
 
+bool ClImportTensorHandleFactory::SupportsMapUnmap() const
+{
+    return false;
+}
+
 MemorySourceFlags ClImportTensorHandleFactory::GetExportFlags() const
 {
     return m_ExportFlags;
@@ -114,6 +119,21 @@ MemorySourceFlags ClImportTensorHandleFactory::GetExportFlags() const
 MemorySourceFlags ClImportTensorHandleFactory::GetImportFlags() const
 {
     return m_ImportFlags;
+}
+
+std::vector<Capability> ClImportTensorHandleFactory::GetCapabilities(const IConnectableLayer* layer,
+                                                                     const IConnectableLayer* connectedLayer,
+                                                                     CapabilityClass capabilityClass)
+{
+    IgnoreUnused(layer);
+    IgnoreUnused(connectedLayer);
+    std::vector<Capability> capabilities;
+    if (capabilityClass == CapabilityClass::FallbackImportDisabled)
+    {
+        Capability paddingCapability(CapabilityClass::FallbackImportDisabled, true);
+        capabilities.push_back(paddingCapability);
+    }
+    return capabilities;
 }
 
 }    // namespace armnn

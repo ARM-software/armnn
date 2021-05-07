@@ -150,7 +150,9 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
             if (backend->SupportsTensorAllocatorAPI())
             {
                 auto workloadFactory = backend->CreateWorkloadFactory(
-                    m_TensorHandleFactoryRegistry, m_OptimizedNetwork->pOptimizedNetworkImpl->GetModelOptions());
+                    m_TensorHandleFactoryRegistry, m_OptimizedNetwork->pOptimizedNetworkImpl->GetModelOptions(),
+                    static_cast<MemorySourceFlags>(m_NetworkProperties.m_InputSource),
+                    static_cast<MemorySourceFlags>(m_NetworkProperties.m_OutputSource));
                 m_WorkloadFactories.emplace(
                     std::make_pair(backendId, std::make_pair(std::move(workloadFactory), nullptr)));
             }
@@ -188,8 +190,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                     // to false when creating TensorHandles
                     layer->CreateTensorHandles(m_TensorHandleFactoryRegistry,
                                                workloadFactory,
-                                               !m_NetworkProperties.m_ImportEnabled,
-                                               m_NetworkProperties.m_InputSource);
+                                               !m_NetworkProperties.m_ImportEnabled);
                     break;
                 }
                 default:
@@ -202,8 +203,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                     {
                         layer->CreateTensorHandles(m_TensorHandleFactoryRegistry,
                                                    workloadFactory,
-                                                   !m_NetworkProperties.m_ExportEnabled,
-                                                   m_NetworkProperties.m_OutputSource);
+                                                   !m_NetworkProperties.m_ExportEnabled);
                     }
                     else
                     {
@@ -643,12 +643,12 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
     bool needMemCopy = true;
     if (m_NetworkProperties.m_ImportEnabled)  // Try import the input tensor
     {
-        if(CheckFlag(importFlags, MemorySource::Malloc) )
+        if(CheckFlag(importFlags, m_NetworkProperties.m_InputSource))
         {
             needMemCopy = false;
             // This assumes a CPU Tensor handle
             void* mem = tensorHandle->Map(false);
-            if (outputTensorHandle->Import(mem, MemorySource::Malloc))
+            if (outputTensorHandle->Import(mem, m_NetworkProperties.m_InputSource))
             {
                 tensorHandle->Unmap();
                 return; // No need for a workload since the import has been done.
@@ -718,11 +718,11 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
         if(layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetOwningLayer().GetType() != LayerType::Input)
         {
             MemorySourceFlags importFlags = inputTensorHandle->GetImportFlags();
-            if (CheckFlag(importFlags, MemorySource::Malloc))
+            if (CheckFlag(importFlags, m_NetworkProperties.m_OutputSource))
             {
                 needMemCopy = false;
                 void *mem = tensorHandle->Map(false);
-                bool importOk = inputTensorHandle->Import(mem, MemorySource::Malloc);
+                bool importOk = inputTensorHandle->Import(mem, m_NetworkProperties.m_OutputSource);
                 tensorHandle->Unmap();
 
                 if (importOk)
@@ -1013,7 +1013,7 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer,
     MemorySourceFlags importFlags = descriptor.m_Outputs[0]->GetImportFlags();
     if (m_NetworkProperties.m_ImportEnabled)  // Try import the input tensor
     {
-        if (CheckFlag(importFlags, MemorySource::Malloc) )
+        if (CheckFlag(importFlags, m_NetworkProperties.m_InputSource) )
         {
             // This assumes a CPU Tensor handle
             std::unique_ptr<ITensorHandle> tensorHandle =
@@ -1021,7 +1021,7 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer,
                                                                       inputTensor.GetMemoryArea());
 
             void* mem = tensorHandle->Map(false);
-            if (descriptor.m_Outputs[0]->Import(mem, MemorySource::Malloc))
+            if (descriptor.m_Outputs[0]->Import(mem, m_NetworkProperties.m_InputSource))
             {
                 tensorHandle->Unmap();
                 return;
@@ -1078,14 +1078,14 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, const Tensor& outp
         if (layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetOwningLayer().GetType() != LayerType::Input)
         {
             MemorySourceFlags importFlags = inputTensorHandle->GetImportFlags();
-            if (CheckFlag(importFlags, MemorySource::Malloc))
+            if (CheckFlag(importFlags, m_NetworkProperties.m_OutputSource))
             {
                 std::unique_ptr<ITensorHandle> tensorHandle =
                         std::make_unique<PassthroughTensorHandle>(outputTensor.GetInfo(),
                                                                      outputTensor.GetMemoryArea());
 
                 void* mem = tensorHandle->Map(false);
-                bool importOk = inputTensorHandle->Import(mem, MemorySource::Malloc);
+                bool importOk = inputTensorHandle->Import(mem, m_NetworkProperties.m_OutputSource);
                 tensorHandle->Unmap();
 
                 if (importOk)
@@ -1270,7 +1270,10 @@ std::unique_ptr<IWorkingMemHandle> LoadedNetwork::CreateWorkingMemHandle(Network
     {
         if (backend.second->SupportsTensorAllocatorAPI())
         {
-            backend.second->RegisterTensorHandleFactories(tensorHandleFactoryRegistry);
+            backend.second->RegisterTensorHandleFactories(
+                tensorHandleFactoryRegistry,
+                static_cast<MemorySourceFlags>(m_NetworkProperties.m_InputSource),
+                static_cast<MemorySourceFlags>(m_NetworkProperties.m_OutputSource));
             memoryManagers.emplace_back(tensorHandleFactoryRegistry.GetMemoryManagers().back());
         }
         else

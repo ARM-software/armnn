@@ -587,8 +587,7 @@ TfLiteStatus ProcessInputs(armnn::IConnectableLayer* layer,
             armnn::IOutputSlot& outputSlot = constantLayer->GetOutputSlot(0);
             outputSlot.SetTensorInfo(inputTensorInfo);
 
-            delegateData.m_OutputSlotForNode[static_cast<unsigned long>(inputIndex)] = &outputSlot;
-
+            delegateData.m_OutputSlotForNode[tfLiteNode->inputs->data[inputIndex]] = &outputSlot;
         }
 
     }

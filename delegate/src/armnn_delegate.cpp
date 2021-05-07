@@ -34,6 +34,7 @@
 #include "SpaceDepth.hpp"
 #include "Split.hpp"
 #include "Transpose.hpp"
+#include "Unpack.hpp"
 
 #include <flatbuffers/flatbuffers.h>
 #include <tensorflow/lite/context_util.h>
@@ -881,6 +882,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                            tfLiteNode,
                                            nodeIndex,
                                            kTfLiteBuiltinTanh);
+        case kTfLiteBuiltinUnpack:
+            return VisitUnpackOperator(delegateData,
+                                       tfLiteContext,
+                                       tfLiteNode,
+                                       nodeIndex,
+                                       kTfLiteBuiltinUnpack);
         default:
             return kTfLiteError;
     }

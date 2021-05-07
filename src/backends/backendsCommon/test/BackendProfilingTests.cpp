@@ -125,10 +125,10 @@ BOOST_AUTO_TEST_CASE(BackendProfilingCounterRegisterMockBackendTest)
 
     unsigned int shiftedId = 0;
 
-#if defined(ETHOSN_SUPPORT_ENABLED)
-    // Shift the id as ETHOSN is enabled.
-    shiftedId = 4;
-#endif
+    if (armnn::BackendRegistry().IsBackendRegistered("EthosNAcc"))
+    {
+        shiftedId = 4;
+    }
 
     // Check if the MockBackends 3 dummy counters {0, 1, 2-5 (four cores)} are registered
     armnn::BackendId mockId = armnn::MockBackendId();

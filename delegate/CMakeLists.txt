@@ -45,6 +45,7 @@ list(APPEND armnnDelegate_sources
         src/Softmax.hpp
         src/SpaceDepth.hpp
         src/Split.hpp
+        src/Unpack.hpp
         src/Transpose.hpp)
 
 add_library(armnnDelegate SHARED ${armnnDelegate_sources})
@@ -173,7 +174,9 @@ if(BUILD_UNIT_TESTS)
         src/test/TestUtils.hpp
         src/test/TestUtils.cpp
         src/test/TransposeTest.cpp
-        src/test/TransposeTestHelper.hpp)
+        src/test/TransposeTestHelper.hpp
+        src/test/UnpackTest.cpp
+        src/test/UnpackTestHelper.hpp)
 
         # There's a known Android NDK bug which causes a subset of NeonLayerTests to
         # fail. We'll exclude these tests in NeonLayerTests_NDK_Bug.cpp if we're doing

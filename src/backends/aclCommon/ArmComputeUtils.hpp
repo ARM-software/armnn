@@ -7,7 +7,6 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/utility/Assert.hpp>
-#include <armnn/utility/NumericCast.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 
 #include <arm_compute/core/Types.h>
@@ -266,60 +265,6 @@ inline arm_compute::ReductionOperation ConvertReductionOperationToAcl(const Redu
         case ReduceOperation::Min:    return arm_compute::ReductionOperation::MIN;
         default:                         throw InvalidArgumentException("Unsupported Reduction operation");
     }
-}
-
-/// Function to compute the output tensor shape based on the axes and if keepDims is set.
-inline const TensorShape ComputeReductionTensorShape(const armnn::TensorInfo& input,
-                                                     const std::vector<uint32_t>& vAxis,
-                                                     const bool keepDims)
-{
-    unsigned int rank = input.GetNumDimensions();
-    unsigned int outputRank = 0;
-
-    // Calculate output dimension
-    if (keepDims)
-    {
-        outputRank = rank;
-    }
-    else if (vAxis.empty())
-    {
-        outputRank = 1;
-    }
-    else if (vAxis.size() > input.GetNumDimensions())
-    {
-        throw LayerValidationException("ReduceLayer: Dimensions to reduce can not be bigger than input dimensions");
-    }
-    else
-    {
-        outputRank = input.GetNumDimensions() - armnn::numeric_cast<unsigned int>(vAxis.size());
-        if (outputRank == 0)
-        {
-            outputRank = 1;
-        }
-    }
-
-    std::vector<unsigned int> dimSizes(outputRank, 1);
-    if (!vAxis.empty())
-    {
-        // Skip the dimension that has been reduced unless keepDims is true.
-        unsigned int outputIndex = 0;
-        for (unsigned int i = 0; i < input.GetNumDimensions(); ++i)
-        {
-            if (std::find(vAxis.begin(), vAxis.end(), i) == vAxis.end())
-            {
-                dimSizes[outputIndex] = armnn::numeric_cast<unsigned int>(input.GetShape()[i]);
-                ++outputIndex;
-            }
-            else if (keepDims)
-            {
-                dimSizes[outputIndex] = 1;
-                ++outputIndex;
-            }
-        }
-    }
-
-    const TensorShape inferredShape = TensorShape(outputRank, dimSizes.data());
-    return inferredShape;
 }
 
 } // namespace armnn

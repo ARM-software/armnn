@@ -29,7 +29,6 @@
 #include "workloads/ClDivisionWorkload.hpp"
 #include "workloads/ClFullyConnectedWorkload.hpp"
 #include "workloads/ClMultiplicationWorkload.hpp"
-#include "workloads/ClReduceWorkload.hpp"
 #include "workloads/ClSubtractionWorkload.hpp"
 
 #include <Optimizer.hpp>
@@ -189,8 +188,7 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
         if ((base.GetType() == LayerType::DepthwiseConvolution2d || base.GetType() == LayerType::Convolution2d
             || base.GetType() == LayerType::BatchNormalization || base.GetType() == LayerType::FullyConnected
             || base.GetType() == LayerType::Addition || base.GetType() == LayerType::Multiplication
-            || base.GetType() == LayerType::Subtraction || base.GetType() == LayerType::Division
-            || base.GetType() == LayerType::Reduce)
+            || base.GetType() == LayerType::Subtraction || base.GetType() == LayerType::Division)
             && (base.GetAdditionalInformation<ActivationDescriptor>() == nullptr))
         {
             for (auto output = base.BeginOutputSlots(); output != base.EndOutputSlots(); ++output)
@@ -412,26 +410,6 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
-                            }
-                        }
-
-                        // Separate check for Reduce as we aren't fusing with activation layer
-                        if (base.GetType() == LayerType::Reduce)
-                        {
-                            ReduceLayer* baseLayer = PolymorphicDowncast<ReduceLayer*>(&base);
-
-                            // Get params from base layer
-                            ReduceDescriptor reduceDescriptor = baseLayer->GetParameters();
-
-                            arm_compute::Status status = ClReduceWorkloadValidate(
-                                    baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
-                                    baseLayer->GetOutputSlot(0).GetTensorInfo(),
-                                    reduceDescriptor);
-
-                            if (status)
-                            {
-                                ChainReduceLayers<ReduceLayer>(optimizationViews, baseLayer, reduceDescriptor);
-                                untouched.erase(baseLayer->GetGuid());
                             }
                         }
                     }

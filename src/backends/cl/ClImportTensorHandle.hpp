@@ -102,36 +102,26 @@ public:
         {
             if (source == MemorySource::Malloc)
             {
-                const size_t totalBytes = m_Tensor.info()->total_size();
-
                 const cl_import_properties_arm importProperties[] =
                 {
-                        CL_IMPORT_TYPE_ARM,
-                        CL_IMPORT_TYPE_HOST_ARM,
-                        0
+                    CL_IMPORT_TYPE_ARM,
+                    CL_IMPORT_TYPE_HOST_ARM,
+                    0
                 };
 
-                cl_int error = CL_SUCCESS;
-                cl_mem buffer = clImportMemoryARM(arm_compute::CLKernelLibrary::get().context().get(),
-                                                  CL_MEM_READ_WRITE, importProperties, memory, totalBytes, &error);
-                if (error != CL_SUCCESS)
+                return ClImport(importProperties, memory);
+            }
+            if (source == MemorySource::DmaBuf)
+            {
+                const cl_import_properties_arm importProperties[] =
                 {
-                    throw MemoryImportException(
-                        "ClImportTensorHandle::Invalid imported memory:" + std::to_string(error));
-                }
+                    CL_IMPORT_TYPE_ARM,
+                    CL_IMPORT_TYPE_DMA_BUF_ARM,
+                    0
+                };
 
-                cl::Buffer wrappedBuffer(buffer);
-                arm_compute::Status status = m_Tensor.allocator()->import_memory(wrappedBuffer);
+                return ClImport(importProperties, memory);
 
-                // Use the overloaded bool operator of Status to check if it worked, if not throw an exception
-                // with the Status error message
-                bool imported = (status.error_code() == arm_compute::ErrorCode::OK);
-                if (!imported)
-                {
-                    throw MemoryImportException(status.error_description());
-                }
-                ARMNN_ASSERT(!m_Tensor.info()->is_resizable());
-                return imported;
             }
             else
             {
@@ -146,6 +136,31 @@ public:
     }
 
 private:
+    bool ClImport(const cl_import_properties_arm* importProperties, void* memory)
+    {
+        const size_t totalBytes = m_Tensor.info()->total_size();
+        cl_int error = CL_SUCCESS;
+        cl_mem buffer = clImportMemoryARM(arm_compute::CLKernelLibrary::get().context().get(),
+                                          CL_MEM_READ_WRITE, importProperties, memory, totalBytes, &error);
+        if (error != CL_SUCCESS)
+        {
+            throw MemoryImportException("ClImportTensorHandle::Invalid imported memory");
+        }
+
+        cl::Buffer wrappedBuffer(buffer);
+        arm_compute::Status status = m_Tensor.allocator()->import_memory(wrappedBuffer);
+
+        // Use the overloaded bool operator of Status to check if it is success, if not throw an exception
+        // with the Status error message
+        bool imported = (status.error_code() == arm_compute::ErrorCode::OK);
+        if (!imported)
+        {
+            throw MemoryImportException(status.error_description());
+        }
+
+        ARMNN_ASSERT(!m_Tensor.info()->is_resizable());
+        return imported;
+    }
     // Only used for testing
     void CopyOutTo(void* memory) const override
     {

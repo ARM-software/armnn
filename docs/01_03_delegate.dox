@@ -113,6 +113,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - NOT_EQUAL
 
+- PACK
+
 - PAD
 
 - PRELU
@@ -160,6 +162,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 - TRANSPOSE
 
 - TRANSPOSE_CONV
+
+- UNPACK
 
 More machine learning operators will be supported in future releases.
 **/

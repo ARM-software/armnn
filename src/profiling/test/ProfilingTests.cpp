@@ -815,7 +815,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingObjectUids)
     BOOST_CHECK(nextCounterUids[0] > counterUids[0]);
 
     std::vector<uint16_t> counterUidsMultiCore;
-    uint16_t thirdUid = 4;
+    uint16_t thirdUid = nextCounterUids[0];
     uint16_t numberOfCores = 13;
     BOOST_CHECK_NO_THROW(counterUidsMultiCore = GetNextCounterUids(thirdUid, numberOfCores));
     BOOST_CHECK(counterUidsMultiCore.size() == numberOfCores);

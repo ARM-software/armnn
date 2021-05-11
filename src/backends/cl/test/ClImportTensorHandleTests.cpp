@@ -167,6 +167,8 @@ BOOST_FIXTURE_TEST_CASE(ClImportEndToEnd, ClContextControlFixture)
     auto outputData = std::make_unique<uint8_t[]>(space);
     void* alignedOutputPtr = outputData.get();
     BOOST_CHECK(std::align(alignment, totalBytes, alignedOutputPtr, space));
+    auto* outputPtr = reinterpret_cast<float*>(alignedOutputPtr);
+    std::fill_n(outputPtr, numElements, -10.0f);
 
     InputTensors inputTensors
     {
@@ -200,6 +202,8 @@ BOOST_FIXTURE_TEST_CASE(ClImportEndToEnd, ClContextControlFixture)
     found = dump.find("CopyMemGeneric");
     BOOST_TEST(found == std::string::npos);
 
+    runtime->UnloadNetwork(netId);
+
     // Check output is as expected
     // Validate result by checking that the output has no negative values
     auto* outputResult = reinterpret_cast<float*>(alignedOutputPtr);
@@ -208,8 +212,6 @@ BOOST_FIXTURE_TEST_CASE(ClImportEndToEnd, ClContextControlFixture)
     {
         BOOST_TEST(outputResult[i] >= 0);
     }
-
-    runtime->UnloadNetwork(netId);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

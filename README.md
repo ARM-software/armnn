@@ -70,13 +70,13 @@ or take a look at previous [github issues](https://github.com/ARM-software/armnn
 
 
 ## Note
-1. The following tools are **deprecated** in Arm NN 21.02 and will be removed in 21.05:
-    * TensorflowParser
-    * CaffeParser
+1. The following tools have been removed in 21.05:
+    * TensorFlow Parser
+    * Caffe Parser
     * Quantizer
 
-2. Ubuntu Linux 16.04 LTS will no longer be supported by April 30, 2021.
-   At that time, Ubuntu 16.04 LTS will no longer receive security patches or other software updates.
+2. Ubuntu Linux 16.04 LTS is no longer supported from April 30, 2021.
+   As a result Ubuntu 16.04 LTS will no longer receive security patches or other software updates.
    Consequently Arm NN will from the 21.08 Release at the end of August 2021 no longer be officially
    supported on Ubuntu 16.04 LTS but will instead be supported on Ubuntu 18.04 LTS.
 
@@ -127,6 +127,7 @@ Third party tools used by Arm NN:
 | Tool           | License (SPDX ID) | Description                    | Version | Provenience
 |----------------|-------------------|------------------------------------------------------------------|-------------|-------------------
 | cxxopts        | MIT               | A lightweight C++ option parser library | SHA 12e496da3d486b87fa9df43edea65232ed852510 | https://github.com/jarro2783/cxxopts
+| doctest        | MIT               | Header-only C++ testing framework | 2.4.0 | https://github.com/onqtam/doctest
 | fmt            | MIT               | {fmt} is an open-source formatting library providing a fast and safe alternative to C stdio and C++ iostreams. | 7.0.1 | https://github.com/fmtlib/fmt
 | ghc            | MIT               | A header-only single-file std::filesystem compatible helper library | 1.3.2 | https://github.com/gulrak/filesystem
 | half           | MIT               | IEEE 754 conformant 16-bit half-precision floating point library | 1.12.0 | http://half.sourceforge.net

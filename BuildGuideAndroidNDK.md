@@ -73,13 +73,11 @@ git clone https://github.com/ARM-software/ComputeLibrary.git
 * Checkout ComputeLibrary branch:
 ```bash
 cd ComputeLibrary
-git checkout <branch_name>
-git pull
+git checkout <tag_name>
 ```
-For example, if you want to checkout release branch of 20.02:
+For example, if you want to checkout release tag of 21.02:
 ```bash
-git checkout branches/arm_compute_20_02
-git pull
+git checkout v21.02
 ```
 
 * Build:
@@ -144,9 +142,9 @@ git checkout <branch_name>
 git pull
 ```
 
-For example, if you want to checkout release branch of 20.02:
+For example, if you want to checkout release branch of 21.02:
 ```bash
-git checkout branches/armnn_20_02
+git checkout branches/armnn_21_02
 git pull
 ```
 

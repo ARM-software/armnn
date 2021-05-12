@@ -16,8 +16,7 @@
 
 
 ## Introduction
-These are the step by step instructions on Cross-Compiling Arm NN under an x86_64 system to target an Arm64 system. This build flow has been tested with Ubuntu 16.04.
-The instructions assume you are using a bash shell and show how to build the Arm NN core library, Boost, Protobuf, Tflite, Flatbuffer and Compute Libraries.
+These are the step by step instructions on Cross-Compiling Arm NN under an x86_64 system to target an Arm64 system. This build flow has been tested with Ubuntu 16.04 and it depends on the same version of Ubuntu or Debian being installed on both the build host and target machines. The instructions assume you are using a bash shell and show how to build the Arm NN core library, Boost, Protobuf, Tflite, Flatbuffer and Compute Libraries.
 Start by creating a directory to contain all components:
 
 '''
@@ -25,7 +24,7 @@ mkdir $HOME/armnn-devenv
 cd $HOME/armnn-devenv
 '''
 
-#####Note: We are currently in the process of removing boost as a dependency to Arm NN. This process is finished for everything apart from our unit tests. This means you don't need boost to build and use Arm NN but you need it to execute our unit tests. Boost will soon be removed from Arm NN entirely. We also are deprecating support for Caffe and Tensorflow parsers in 21.02. This will be removed in 21.05. 
+#####Note: We are currently in the process of removing boost as a dependency to Arm NN. This process is finished for everything apart from our unit tests. This means you don't need boost to build and use Arm NN but you need it to execute our unit tests. Boost will soon be removed from Arm NN entirely. We have also removed support for Caffe and Tensorflow parsers from 21.05. 
 
 ## Cross-compiling ToolChain
 * Install the standard cross-compilation libraries for arm64:

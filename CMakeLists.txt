@@ -863,6 +863,9 @@ if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER) AND A
     target_link_libraries(ArmnnConverter armnn)
     target_link_libraries(ArmnnConverter ${CMAKE_THREAD_LIBS_INIT})
     addDllCopyCommands(ArmnnConverter)
+
+    install(TARGETS ArmnnConverter
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
 if(BUILD_BASE_PIPE_SERVER)

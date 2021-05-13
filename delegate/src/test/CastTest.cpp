@@ -72,12 +72,6 @@ TEST_CASE ("CAST_INT32_TO_FP32_CpuRef_Test")
 TEST_SUITE("CAST_CpuAccTests")
 {
 
-TEST_CASE ("CAST_UINT8_TO_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    CastUint8ToFp32Test(backends);
-}
-
 TEST_CASE ("CAST_INT32_TO_FP32_CpuAcc_Test")
 {
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
@@ -88,12 +82,6 @@ TEST_CASE ("CAST_INT32_TO_FP32_CpuAcc_Test")
 
 TEST_SUITE("CAST_GpuAccTests")
 {
-
-TEST_CASE ("CAST_UINT8_TO_FP32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    CastUint8ToFp32Test(backends);
-}
 
 TEST_CASE ("CAST_INT32_TO_FP32_GpuAcc_Test")
 {

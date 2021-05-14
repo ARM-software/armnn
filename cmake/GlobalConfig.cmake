@@ -66,6 +66,7 @@ endif()
 
 # Compiler flags that are always set
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -lz") # Necessary for when building with ACL set with compressed kernels
 if(COMPILER_IS_GNU_LIKE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Werror -Wold-style-cast -Wno-missing-braces -Wconversion -Wsign-conversion")
 elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)

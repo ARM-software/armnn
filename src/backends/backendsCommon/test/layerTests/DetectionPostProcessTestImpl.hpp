@@ -225,10 +225,14 @@ void DetectionPostProcessImpl(const armnn::TensorInfo& boxEncodingsInfo,
     CopyDataFromITensorHandle(detectionScoresResult.output.origin(), outputScoresHandle.get());
     CopyDataFromITensorHandle(numDetectionsResult.output.origin(), numDetectionHandle.get());
 
-    BOOST_TEST(CompareTensors(detectionBoxesResult.output, detectionBoxesResult.outputExpected));
-    BOOST_TEST(CompareTensors(detectionClassesResult.output, detectionClassesResult.outputExpected));
-    BOOST_TEST(CompareTensors(detectionScoresResult.output, detectionScoresResult.outputExpected));
-    BOOST_TEST(CompareTensors(numDetectionsResult.output, numDetectionsResult.outputExpected));
+    auto result = CompareTensors(detectionBoxesResult.output, detectionBoxesResult.outputExpected);
+    BOOST_TEST(result.m_Result, result.m_Message.str());
+    result = CompareTensors(detectionClassesResult.output, detectionClassesResult.outputExpected);
+    BOOST_TEST(result.m_Result, result.m_Message.str());
+    result = CompareTensors(detectionScoresResult.output, detectionScoresResult.outputExpected);
+    BOOST_TEST(result.m_Result, result.m_Message.str());
+    result = CompareTensors(numDetectionsResult.output, numDetectionsResult.outputExpected);
+    BOOST_TEST(result.m_Result, result.m_Message.str());
 }
 
 template<armnn::DataType QuantizedType, typename RawType = armnn::ResolveType<QuantizedType>>

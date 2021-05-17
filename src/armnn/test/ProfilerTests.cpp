@@ -8,7 +8,6 @@
 #include <armnn/utility/IgnoreUnused.hpp>
 
 #include <boost/test/unit_test.hpp>
-#include <boost/test/tools/output_test_stream.hpp>
 
 #include <memory>
 #include <thread>
@@ -225,9 +224,9 @@ BOOST_AUTO_TEST_CASE(WriteEventResults)
         size_t eventSequenceSizeAfter = armnn::GetProfilerEventSequenceSize(profiler.get());
         BOOST_TEST(eventSequenceSizeAfter == eventSequenceSizeBefore + 1);
 
-        boost::test_tools::output_test_stream output;
+        std::ostringstream output;
         profiler->AnalyzeEventsAndWriteResults(output);
-        BOOST_TEST(!output.is_empty(false));
+        BOOST_TEST(!output.str().empty());
 
         // output should contain event name 'test'
         BOOST_CHECK(output.str().find("test") != std::string::npos);

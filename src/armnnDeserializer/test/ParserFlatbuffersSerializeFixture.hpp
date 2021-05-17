@@ -238,6 +238,7 @@ void ParserFlatbuffersSerializeFixture::RunTest(
         armnn::BindingPointInfo bindingInfo = ConvertBindingInfo(
             m_Parser->GetNetworkOutputBindingInfo(layersId, it.first));
         auto outputExpected = MakeTensor<OutputDataType, NumOutputDimensions>(bindingInfo.second, it.second);
-        BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first]));
+        auto result = CompareTensors(outputExpected, outputStorage[it.first]);
+        BOOST_TEST(result.m_Result, result.m_Message.str());
     }
 }

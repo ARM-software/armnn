@@ -569,6 +569,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/optimizations/SquashEqualSiblingsTests.cpp
         src/armnn/test/optimizations/TransposeAsReshapeTests.cpp
         src/armnn/test/OptionalTest.cpp
+        src/armnn/test/PredicateResult.hpp
         src/armnn/test/ProfilerTests.cpp
         src/armnn/test/ProfilingEventTest.cpp
         src/armnn/test/ShapeInferenceTests.cpp

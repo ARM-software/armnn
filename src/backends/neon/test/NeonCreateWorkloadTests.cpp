@@ -23,8 +23,8 @@ BOOST_AUTO_TEST_SUITE(CreateWorkloadNeon)
 namespace
 {
 
-boost::test_tools::predicate_result CompareIAclTensorHandleShape(IAclTensorHandle*                    tensorHandle,
-                                                                std::initializer_list<unsigned int> expectedDimensions)
+armnn::PredicateResult CompareIAclTensorHandleShape(IAclTensorHandle* tensorHandle,
+                                                    std::initializer_list<unsigned int> expectedDimensions)
 {
     return CompareTensorHandleShape<IAclTensorHandle>(tensorHandle, expectedDimensions);
 }
@@ -564,16 +564,20 @@ static void NeonCreateResizeWorkloadTest(DataLayout dataLayout)
     auto inputHandle  = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
+    armnn::PredicateResult predResult(true);
     switch (dataLayout)
     {
         case DataLayout::NHWC:
-            BOOST_TEST(CompareIAclTensorHandleShape(inputHandle, { 2, 4, 4, 3 }));
-            BOOST_TEST(CompareIAclTensorHandleShape(outputHandle, { 2, 2, 2, 3 }));
+            predResult = CompareIAclTensorHandleShape(inputHandle, { 2, 4, 4, 3 });
+            BOOST_TEST(predResult.m_Result, predResult.m_Message.str());
+            predResult = CompareIAclTensorHandleShape(outputHandle, { 2, 2, 2, 3 });
+            BOOST_TEST(predResult.m_Result, predResult.m_Message.str());
             break;
-        case DataLayout::NCHW:
-        default:
-            BOOST_TEST(CompareIAclTensorHandleShape(inputHandle, { 2, 3, 4, 4 }));
-            BOOST_TEST(CompareIAclTensorHandleShape(outputHandle, { 2, 3, 2, 2 }));
+        default: // DataLayout::NCHW
+            predResult = CompareIAclTensorHandleShape(inputHandle, { 2, 3, 4, 4 });
+            BOOST_TEST(predResult.m_Result, predResult.m_Message.str());
+            predResult = CompareIAclTensorHandleShape(outputHandle, { 2, 3, 2, 2 });
+            BOOST_TEST(predResult.m_Result, predResult.m_Message.str());
     }
 }
 

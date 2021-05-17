@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include "PredicateResult.hpp"
 #include <armnn/Tensor.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnnUtils/FloatingPointComparison.hpp>
@@ -70,7 +71,7 @@ bool SelectiveCompareBoolean(T a, T b)
 };
 
 template <typename T, std::size_t n>
-boost::test_tools::predicate_result CompareTensors(const boost::multi_array<T, n>& a,
+armnn::PredicateResult CompareTensors(const boost::multi_array<T, n>& a,
                                                    const boost::multi_array<T, n>& b,
                                                    bool compareBoolean = false,
                                                    bool isDynamic = false)
@@ -84,8 +85,8 @@ boost::test_tools::predicate_result CompareTensors(const boost::multi_array<T, n
         {
             if (a.shape()[i] != b.shape()[i])
             {
-                boost::test_tools::predicate_result res(false);
-                res.message() << "Different shapes ["
+                armnn::PredicateResult res(false);
+                res.Message() << "Different shapes ["
                               << a.shape()[i]
                               << "!="
                               << b.shape()[i]
@@ -162,16 +163,16 @@ boost::test_tools::predicate_result CompareTensors(const boost::multi_array<T, n
         }
     }
 
-    boost::test_tools::predicate_result comparisonResult(true);
+    armnn::PredicateResult comparisonResult(true);
     if (numFailedElements > 0)
     {
-        comparisonResult = false;
-        comparisonResult.message() << numFailedElements << " different values at: ";
+        comparisonResult.SetResult(false);
+        comparisonResult.Message() << numFailedElements << " different values at: ";
         if (numFailedElements > maxReportedDifferences)
         {
             errorString << ", ... (and " << (numFailedElements - maxReportedDifferences) << " other differences)";
         }
-        comparisonResult.message() << errorString.str();
+        comparisonResult.Message() << errorString.str();
     }
 
     return comparisonResult;

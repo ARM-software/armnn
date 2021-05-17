@@ -321,7 +321,8 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
     {
         armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first);
         auto outputExpected = MakeTensor<DataType2, NumOutputDimensions>(bindingInfo.second, it.second, isDynamic);
-        BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first], false, isDynamic));
+        auto result = CompareTensors(outputExpected, outputStorage[it.first], false, isDynamic);
+        BOOST_TEST(result.m_Result, result.m_Message.str());
     }
 }
 
@@ -420,6 +421,7 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
     {
         armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first);
         auto outputExpected = MakeTensor<DataType2, NumOutputDimensions>(bindingInfo.second, it.second);
-        BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first], false));
+        auto result = CompareTensors(outputExpected, outputStorage[it.first], false);
+        BOOST_TEST(result.m_Result, result.m_Message.str());
     }
 }

@@ -45,7 +45,8 @@ void LstmUtilsVectorBatchVectorAddTestImpl(
     VectorBatchVectorAdd(*vecDecoder, vSize, *batchVecDecoder, nBatch, *batchVecEncoder);
 
     // check shape and compare values
-    BOOST_TEST(CompareTensors(batchVec, expectedOutput));
+    auto result = CompareTensors(batchVec, expectedOutput);
+    BOOST_TEST(result.m_Result, result.m_Message.str());
 
     // check if iterator is back at start position
     batchVecEncoder->Set(1.0f);
@@ -70,7 +71,8 @@ void LstmUtilsZeroVectorTestImpl(
     ZeroVector(*outputEncoder, vSize);
 
     // check shape and compare values
-    BOOST_TEST(CompareTensors(input, expectedOutput));
+    auto result = CompareTensors(input, expectedOutput);
+    BOOST_TEST(result.m_Result, result.m_Message.str());
 
     // check if iterator is back at start position
     outputEncoder->Set(1.0f);
@@ -96,7 +98,8 @@ void LstmUtilsMeanStddevNormalizationTestImpl(
     MeanStddevNormalization(*inputDecoder, *outputEncoder, vSize, nBatch, 1e-8f);
 
     // check shape and compare values
-    BOOST_TEST(CompareTensors(input, expectedOutput));
+    auto result = CompareTensors(input, expectedOutput);
+    BOOST_TEST(result.m_Result, result.m_Message.str());
 
     // check if iterator is back at start position
     outputEncoder->Set(1.0f);
@@ -123,7 +126,8 @@ void LstmUtilsVectorBatchVectorCwiseProductTestImpl(
     VectorBatchVectorCwiseProduct(*vecDecoder, vSize, *batchVecDecoder, nBatch, *batchVecEncoder);
 
     // check shape and compare values
-    BOOST_TEST(CompareTensors(batchVec, expectedOutput));
+    auto result = CompareTensors(batchVec, expectedOutput);
+    BOOST_TEST(result.m_Result, result.m_Message.str());
 
     // check if iterator is back at start position
     batchVecEncoder->Set(1.0f);

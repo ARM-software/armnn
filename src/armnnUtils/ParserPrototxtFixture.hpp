@@ -255,11 +255,13 @@ void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::ve
         auto outputExpected = MakeTensor<T, NumOutputDimensions>(bindingInfo.second, it.second);
         if (std::is_same<T, uint8_t>::value)
         {
-            BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first], true));
+            auto result = CompareTensors(outputExpected, outputStorage[it.first], true);
+            BOOST_TEST(result.m_Result, result.m_Message.str());
         }
         else
         {
-            BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first]));
+            auto result = CompareTensors(outputExpected, outputStorage[it.first]);
+            BOOST_TEST(result.m_Result, result.m_Message.str());
         }
     }
 }

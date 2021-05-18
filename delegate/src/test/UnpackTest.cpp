@@ -122,11 +122,23 @@ std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
 UnpackAxis0Num4Test<float>(tflite::TensorType_FLOAT32, backends);
 }
 
+TEST_CASE ("Unpack_Fp32_Axis2_Num6_CpuAcc_Test")
+{
+std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
+UnpackAxis2Num6Test<float>(tflite::TensorType_FLOAT32, backends);
+}
+
 // Uint8
 TEST_CASE ("Unpack_Uint8_Axis0_Num4_CpuAcc_Test")
 {
 std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
 UnpackAxis0Num4Test<uint8_t>(tflite::TensorType_UINT8, backends);
+}
+
+TEST_CASE ("Unpack_Uint8_Axis2_Num6_CpuAcc_Test")
+{
+std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
+UnpackAxis2Num6Test<uint8_t>(tflite::TensorType_UINT8, backends);
 }
 
 } // End of Unpack_CpuAccTests
@@ -141,11 +153,23 @@ std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
 UnpackAxis0Num4Test<float>(tflite::TensorType_FLOAT32, backends);
 }
 
+TEST_CASE ("Unpack_Fp32_Axis2_Num6_GpuAcc_Test")
+{
+std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+UnpackAxis2Num6Test<float>(tflite::TensorType_FLOAT32, backends);
+}
+
 // Uint8
 TEST_CASE ("Unpack_Uint8_Axis0_Num4_GpuAcc_Test")
 {
 std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
 UnpackAxis0Num4Test<uint8_t>(tflite::TensorType_UINT8, backends);
+}
+
+TEST_CASE ("Unpack_Uint8_Axis2_Num6_GpuAcc_Test")
+{
+std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+UnpackAxis2Num6Test<uint8_t>(tflite::TensorType_UINT8, backends);
 }
 
 } // End of Unpack_GpuAccTests

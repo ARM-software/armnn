@@ -118,9 +118,24 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
     }
     const std::vector<std::reference_wrapper<armnn::TensorInfo>> outputTensorInfos(outputs.begin(), outputs.end());
 
+    // Determine the shape of the Splitter layer outputs for validation
+    armnn::TensorShape splitOutShape = armnn::TensorShape(static_cast<unsigned int>(unpackDimSizes.size()),
+                                                          unpackDimSizes.data());
+
+    std::vector<armnn::TensorInfo> splitterOutputs;
+    for (unsigned int outputIndex = 0; outputIndex < outputTensorInfos.size(); ++outputIndex)
+    {
+        splitterOutputs.push_back(armnn::TensorInfo(splitOutShape,
+                                                    outputTensorInfos[outputIndex].get().GetDataType(),
+                                                    outputTensorInfos[outputIndex].get().GetQuantizationScale(),
+                                                    outputTensorInfos[outputIndex].get().GetQuantizationOffset()));
+    }
+    std::vector<std::reference_wrapper<armnn::TensorInfo>> splitterOutputTensorInfos(splitterOutputs.begin(),
+                                                                                     splitterOutputs.end());
+
     if (!delegateData.m_Network)
     {
-        // Check if supported
+        // Check if splitter is supported
         bool isSupported = false;
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    tfLiteContext,
@@ -128,10 +143,29 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
                                    delegateData.m_Backends,
                                    isSupported,
                                    inputTensorInfo,
-                                   outputTensorInfos,
+                                   splitterOutputTensorInfos,
                                    splitDesc);
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
+
+    // Create Reshape descriptor from the first outputTensorInfo to validate a single Reshape layer
+    // Use this descriptor later when creating every ReshapeLayer as all Reshape Layers should be the same
+    armnn::ReshapeDescriptor reshapeDescriptor;
+    reshapeDescriptor.m_TargetShape = outputTensorInfos[0].get().GetShape();
+
+    if (!delegateData.m_Network)
+    {
+        bool isSupported = false;
+        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+                                   tfLiteContext,
+                                   IsReshapeSupported,
+                                   delegateData.m_Backends,
+                                   isSupported,
+                                   splitterOutputTensorInfos[0],
+                                   outputTensorInfos[0],
+                                   reshapeDescriptor);
+        return isSupported ? kTfLiteOk : kTfLiteError;
+    };
 
     std::string splitterLayerName("Unpack Splitter");
 
@@ -147,28 +181,18 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
     // Connect the input slots
     delegateData.m_OutputSlotForNode[tfLiteNode->inputs->data[0]]->Connect(splitterLayer->GetInputSlot(0));
 
-    armnn::TensorShape splitOutShape = armnn::TensorShape(static_cast<unsigned int>(unpackDimSizes.size()),
-                                            unpackDimSizes.data());
-
     // Create reshape to remove the unpacked dimension for unpack operator of each output from Splitter.
     for (unsigned int outputIndex = 0; outputIndex < splitterLayer->GetNumOutputSlots(); ++outputIndex)
     {
-        armnn::TensorInfo outputTensorInfo  = outputTensorInfos[outputIndex];
-
         std::string reshapeLayerName("Unpack Reshape");
-        armnn::ReshapeDescriptor reshapeDescriptor;
-        reshapeDescriptor.m_TargetShape = outputTensorInfo.GetShape();
         armnn::IConnectableLayer* reshapeLayer = delegateData.m_Network->AddReshapeLayer(reshapeDescriptor,
                                                                                          reshapeLayerName.c_str());
-
         ARMNN_ASSERT(reshapeLayer != nullptr);
 
-        splitterLayer->GetOutputSlot(outputIndex).SetTensorInfo(armnn::TensorInfo(splitOutShape,
-                                                                          outputTensorInfo.GetDataType(),
-                                                                          outputTensorInfo.GetQuantizationScale(),
-                                                                          outputTensorInfo.GetQuantizationOffset()));
+        splitterLayer->GetOutputSlot(outputIndex).SetTensorInfo(splitterOutputTensorInfos[outputIndex]);
         splitterLayer->GetOutputSlot(outputIndex).Connect(reshapeLayer->GetInputSlot(0));
 
+        armnn::TensorInfo outputTensorInfo  = outputTensorInfos[outputIndex];
         reshapeLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
         armnn::IOutputSlot& slot = reshapeLayer->GetOutputSlot(0);

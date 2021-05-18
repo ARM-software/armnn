@@ -29,7 +29,6 @@
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
-#include <boost/test/execution_monitor.hpp>
 
 BOOST_AUTO_TEST_SUITE(RefEndToEnd)
 

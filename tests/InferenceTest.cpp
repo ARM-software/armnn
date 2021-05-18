@@ -68,9 +68,6 @@ bool ParseCommandLine(int argc, char** argv, IInferenceTestCaseProvider& testCas
     }
     catch (const std::exception& e)
     {
-        // Coverity points out that default_value(...) can throw a bad_lexical_cast,
-        // and that desc.add_options() can throw boost::io::too_few_args.
-        // They really won't in any of these cases.
         ARMNN_ASSERT_MSG(false, "Caught unexpected exception");
         std::cerr << "Fatal internal error: " << e.what() << std::endl;
         return false;

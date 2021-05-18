@@ -11,8 +11,6 @@
 #include <backendsCommon/test/CommonTestUtils.hpp>
 #include <ResolveType.hpp>
 
-#include <boost/test/unit_test_log.hpp>
-
 namespace
 {
 

@@ -5,6 +5,8 @@
 
 #include "NetworkExecutionUtils/NetworkExecutionUtils.hpp"
 #include "ExecuteNetworkProgramOptions.hpp"
+#include <armnn/IAsyncExecutionCallback.hpp>
+#include <AsyncExecutionCallback.hpp>
 
 #include <armnn/Logging.hpp>
 #include <Filesystem.hpp>
@@ -276,8 +278,7 @@ template<typename TParser, typename TDataType>
 int MainImpl(const ExecuteNetworkParams& params,
              const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
-    using TContainer =
-           mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>, std::vector<int8_t>>;
+    using namespace std::chrono;
 
     std::vector<std::vector<TContainer>> inputs;
     std::vector<std::vector<TContainer>> outputs;
@@ -300,6 +301,7 @@ int MainImpl(const ExecuteNetworkParams& params,
         inferenceModelParams.m_NumberOfThreads                = params.m_NumberOfThreads;
         inferenceModelParams.m_MLGOTuningFilePath             = params.m_MLGOTuningFilePath;
         inferenceModelParams.m_AsyncEnabled                   = params.m_Concurrent;
+        inferenceModelParams.m_ThreadPoolSize                 = params.m_ThreadPoolSize;
 
         for(const std::string& inputName: params.m_InputNames)
         {
@@ -390,9 +392,9 @@ int MainImpl(const ExecuteNetworkParams& params,
             outputs.push_back(outputDataContainers);
         }
 
+        // Synchronous execution
         if (!params.m_Concurrent)
         {
-            // Synchronous Execution
             for (size_t x = 0; x < params.m_Iterations; x++)
             {
                 // model.Run returns the inference time elapsed in EnqueueWorkload (in milliseconds)
@@ -437,13 +439,118 @@ int MainImpl(const ExecuteNetworkParams& params,
                 }
             }
         }
+        // Asynchronous execution using the Arm NN thread pool
+        else if (params.m_ThreadPoolSize >= 2)
+        {
+            try
+            {
+                ARMNN_LOG(info) << "Asynchronous execution with Arm NN thread pool...  \n";
+                std::vector<armnn::experimental::IAsyncExecutionCallbackPtr> callbacks;
+
+                // Create callbacks that will be checked post scheduling
+                for (size_t i = 0; i < params.m_SimultaneousIterations; ++i)
+                {
+                    // Point to ArmNN example implementation of AsyncExecutionCallback
+                    callbacks.emplace_back(std::make_shared<armnn::experimental::AsyncExecutionCallback>());
+                }
+
+                // Declare the latest and earliest inference times here to be used when calculating overall time
+                std::chrono::high_resolution_clock::time_point earliestStartTime;
+                std::chrono::high_resolution_clock::time_point latestEndTime =
+                    std::chrono::high_resolution_clock::now();
+
+                // For the asynchronous execution, we are adding a pool of working memory handles (1 per thread) in the
+                // LoadedNetwork with each scheduled inference having a specific priority
+                for (size_t i = 0; i < callbacks.size(); ++i)
+                {
+                    model.RunAsync(inputs[i], outputs[i], callbacks[i]);
+                }
+
+                // Check the results
+                unsigned int j = 0;
+                for (armnn::experimental::IAsyncExecutionCallbackPtr cb : callbacks)
+                {
+                    // Get the results
+                    auto endTime = time_point_cast<std::chrono::milliseconds>(cb->GetEndTime());
+                    auto startTime = time_point_cast<std::chrono::milliseconds>(cb->GetStartTime());
+                    auto inferenceDuration = endTime - startTime;
+
+                    if (latestEndTime < cb->GetEndTime())
+                    {
+                        latestEndTime = cb->GetEndTime();
+                    }
+
+                    if (earliestStartTime.time_since_epoch().count() == 0)
+                    {
+                        earliestStartTime = cb->GetStartTime();
+                    }
+                    else if (earliestStartTime > cb->GetStartTime())
+                    {
+                        earliestStartTime = cb->GetStartTime();
+                    }
+
+                    if (params.m_GenerateTensorData)
+                    {
+                        ARMNN_LOG(warning) << "The input data was generated, note that the output will not be useful";
+                    }
+
+                    // Print output tensors
+                    const auto& infosOut = model.GetOutputBindingInfos();
+                    for (size_t i = 0; i < numOutputs; i++)
+                    {
+                        const armnn::TensorInfo& infoOut = infosOut[i].second;
+                        auto outputTensorFile = params.m_OutputTensorFiles.empty()
+                                                ? ""
+                                                : params.m_OutputTensorFiles[(j * numOutputs) + i];
+
+                        TensorPrinter printer(inferenceModelParams.m_OutputBindings[i],
+                                              infoOut,
+                                              outputTensorFile,
+                                              params.m_DequantizeOutput);
+                        mapbox::util::apply_visitor(printer, outputs[j][i]);
+                    }
+
+                    ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)
+                                    << std::fixed << inferenceDuration.count() << " ms\n";
+
+                     // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
+                    if (params.m_ThresholdTime != 0.0)
+                    {
+                        ARMNN_LOG(info) << "Threshold time: " << std::setprecision(2)
+                                        << std::fixed << params.m_ThresholdTime << " ms";
+                        auto thresholdMinusInference =
+                            params.m_ThresholdTime - duration<double, std::milli>(inferenceDuration).count();
+                        ARMNN_LOG(info) << "Threshold time - Inference time: " << std::setprecision(2)
+                                        << std::fixed << thresholdMinusInference << " ms" << "\n";
+
+                        if (thresholdMinusInference < 0)
+                        {
+                            ARMNN_LOG(fatal) << "Elapsed inference time is greater than provided threshold time. \n";
+                        }
+                    }
+                    ++j;
+                }
+                //print duration difference between overallStartTime and overallEndTime
+                auto overallEndTime = time_point_cast<std::chrono::milliseconds>(latestEndTime);
+                auto overallStartTime = time_point_cast<std::chrono::milliseconds>(earliestStartTime);
+                auto totalInferenceDuration = overallEndTime - overallStartTime;
+                ARMNN_LOG(info) << "\nOverall Inference time: " << std::setprecision(2)
+                                << std::fixed << totalInferenceDuration.count() << " ms\n";
+            }
+            catch (const armnn::Exception& e)
+            {
+                ARMNN_LOG(fatal) << "Armnn Error: " << e.what();
+                return EXIT_FAILURE;
+            }
+        }
+        // Asynchronous execution using std::launch::async
         else
         {
             try
             {
-                ARMNN_LOG(info) << "Asynchronous Execution...  \n";
+                ARMNN_LOG(info) << "Asynchronous Execution with std::launch:async...  \n";
                 std::vector<std::future<std::tuple<armnn::profiling::ProfilingGuid,
-                std::chrono::duration<double, std::milli>>>> inferenceResults;
+                    std::chrono::duration<double, std::milli>>>> inferenceResults;
                 inferenceResults.reserve(params.m_SimultaneousIterations);
 
                 // Create WorkingMemHandles for each inference
@@ -455,6 +562,8 @@ int MainImpl(const ExecuteNetworkParams& params,
                 }
 
                 // Run each inference in its own thread
+                // start a timer
+                const auto start_time = armnn::GetTimeNow();
                 for (unsigned int i = 0; i < params.m_SimultaneousIterations; ++i)
                 {
                     armnn::experimental::IWorkingMemHandle& workingMemHandleRef = *workingMemHandles[i].get();
@@ -470,7 +579,7 @@ int MainImpl(const ExecuteNetworkParams& params,
                 {
                     // Get the results
                     auto inferenceResult = inferenceResults[j].get();
-                    auto inference_duration = std::get<1>(inferenceResult);
+                    auto inferenceDuration = std::get<1>(inferenceResult);
                     auto inferenceID = std::get<0>(inferenceResult);
 
                     if (params.m_GenerateTensorData)
@@ -495,14 +604,14 @@ int MainImpl(const ExecuteNetworkParams& params,
                     }
 
                     ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)
-                                    << std::fixed << inference_duration.count() << " ms\n";
+                                    << std::fixed << inferenceDuration.count() << " ms\n";
 
                     // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
                     if (params.m_ThresholdTime != 0.0)
                     {
                         ARMNN_LOG(info) << "Threshold time: " << std::setprecision(2)
                                         << std::fixed << params.m_ThresholdTime << " ms";
-                        auto thresholdMinusInference = params.m_ThresholdTime - inference_duration.count();
+                        auto thresholdMinusInference = params.m_ThresholdTime - inferenceDuration.count();
                         ARMNN_LOG(info) << "Threshold time - Inference time: " << std::setprecision(2)
                                         << std::fixed << thresholdMinusInference << " ms" << "\n";
 
@@ -514,13 +623,16 @@ int MainImpl(const ExecuteNetworkParams& params,
                     ARMNN_LOG(info) << "Asynchronous Execution is finished for Inference ID: " << inferenceID << " \n";
 
                 }
+                // finish timer
+                const auto duration = armnn::GetTimeDuration(start_time);
+                ARMNN_LOG(info) << "\nOverall Inference time: " << std::setprecision(2)
+                                << std::fixed << duration.count() << " ms\n";
             }
             catch (const armnn::Exception& e)
             {
                 ARMNN_LOG(fatal) << "Armnn Error: " << e.what();
                 return EXIT_FAILURE;
             }
-
         }
     }
     catch (const armnn::Exception& e)

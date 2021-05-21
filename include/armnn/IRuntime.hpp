@@ -33,7 +33,7 @@ struct INetworkProperties
     INetworkProperties(bool importEnabled = false,
                        bool exportEnabled = false,
                        bool asyncEnabled = false,
-                       size_t numThreads = 0)
+                       size_t numThreads = 1)
         : m_ImportEnabled(importEnabled)
         , m_ExportEnabled(exportEnabled)
         , m_AsyncEnabled(asyncEnabled)
@@ -45,7 +45,7 @@ struct INetworkProperties
     INetworkProperties(bool asyncEnabled,
                        MemorySource m_InputSource,
                        MemorySource m_OutputSource,
-                       size_t numThreads = 0)
+                       size_t numThreads = 1)
         : m_ImportEnabled(m_InputSource != MemorySource::Undefined)
         , m_ExportEnabled(m_OutputSource != MemorySource::Undefined)
         , m_AsyncEnabled(asyncEnabled)

@@ -1336,9 +1336,9 @@ BOOST_AUTO_TEST_CASE(RefStridedSliceInvalidSliceEndToEndTest)
     StridedSliceInvalidSliceEndToEndTest(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(RefAsyncFP32StridedSlicedEndToEndTest)
+BOOST_AUTO_TEST_CASE(RefThreadSafeFP32StridedSlicedEndToEndTest)
 {
-    armnn::experimental::StridedSlicedEndToEndTest<armnn::DataType::Float32>(defaultBackends);
+    armnn::experimental::StridedSlicedEndToEndTest<armnn::DataType::Float32>(defaultBackends, 1);
 }
 
 BOOST_AUTO_TEST_CASE(RefAsyncFP32StridedSlicedMultiThreadedEndToEndTest)
@@ -1346,15 +1346,9 @@ BOOST_AUTO_TEST_CASE(RefAsyncFP32StridedSlicedMultiThreadedEndToEndTest)
     armnn::experimental::StridedSlicedMultiThreadedEndToEndTest<armnn::DataType::Float32>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(RefAsyncScheduledFP32StridedSlicedEndToEndTest)
+BOOST_AUTO_TEST_CASE(RefAsyncFP32StridedSlicedScheduledMultiThreadedEndToEndTest)
 {
-    armnn::experimental::AsyncScheduledStridedSlicedEndToEndTest<armnn::DataType::Float32>(defaultBackends);
-}
-
-BOOST_AUTO_TEST_CASE(RefAsyncScheduledStridedSlicedMultiThreadedEndToEndTest)
-{
-    using namespace armnn::experimental;
-    AsyncScheduledStridedSlicedMultiThreadedEndToEndTest<armnn::DataType::Float32>(defaultBackends);
+    armnn::experimental::StridedSlicedEndToEndTest<armnn::DataType::Float32>(defaultBackends, 3);
 }
 #endif
 

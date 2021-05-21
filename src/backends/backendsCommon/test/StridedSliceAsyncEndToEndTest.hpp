@@ -123,7 +123,7 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
                            const std::map<int, std::vector<TOutput>>& expectedOutputData,
                            std::vector<BackendId> backends,
                            float tolerance = 0.000001f,
-                           size_t numThreads = 0)
+                           size_t numThreads = 1)
 {
     // Create Runtime in which test will run
     IRuntime::CreationOptions options;
@@ -161,7 +161,7 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
                                         outputStorage.at(it.first).data())});
     }
 
-    if (numThreads == 0)
+    if (numThreads <= 1)
     {
         // Create WorkingMemHandle for this async network
         std::unique_ptr<IWorkingMemHandle> workingMemHandle = runtime->CreateWorkingMemHandle(networkId);
@@ -254,7 +254,7 @@ INetworkPtr CreateStridedSliceNetwork(const TensorShape& inputShape,
 }
 
 template<armnn::DataType ArmnnType>
-void StridedSlicedEndToEndTest(const std::vector<BackendId>& backends)
+void StridedSlicedEndToEndTest(const std::vector<BackendId>& backends, size_t numThreads)
 {
     using namespace armnn;
     using T = ResolveType<ArmnnType>;
@@ -300,103 +300,12 @@ void StridedSlicedEndToEndTest(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = {{0, inputData}};
     std::map<int, std::vector<T>> expectedOutputData = {{0, outputExpected}};
 
-    AsyncEndToEndTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends, 0.000001f);
-}
-
-template<armnn::DataType ArmnnType>
-void AsyncScheduledStridedSlicedEndToEndTest(const std::vector<BackendId>& backends)
-{
-    using namespace armnn;
-    using T = ResolveType<ArmnnType>;
-
-    const TensorShape& inputShape = {3, 2, 3, 1};
-    const TensorShape& outputShape = {1, 2, 3, 1};
-    const std::vector<int>& beginData = {1, 0, 0, 0};
-    const std::vector<int>& endData = {2, 2, 3, 1};
-    const std::vector<int>& stridesData = {1, 1, 1, 1};
-    int beginMask = 0;
-    int endMask = 0;
-    int shrinkAxisMask = 0;
-    int ellipsisMask = 0;
-    int newAxisMask = 0;
-
-    // Builds up the structure of the network
-    INetworkPtr net = CreateStridedSliceNetwork<ArmnnType>(inputShape,
-                                                           outputShape,
-                                                           beginData,
-                                                           endData,
-                                                           stridesData,
-                                                           beginMask,
-                                                           endMask,
-                                                           shrinkAxisMask,
-                                                           ellipsisMask,
-                                                           newAxisMask);
-
-    // Creates structures for input & output.
-    std::vector<T> inputData{
-            1.0f, 1.0f, 1.0f, 2.0f, 2.0f, 2.0f,
-
-            3.0f, 3.0f, 3.0f, 4.0f, 4.0f, 4.0f,
-
-            5.0f, 5.0f, 5.0f, 6.0f, 6.0f, 6.0f
-    };
-
-    std::vector<T> outputExpected{
-            3.0f, 3.0f, 3.0f, 4.0f, 4.0f, 4.0f
-    };
-
-    std::map<int, std::vector<T>> inputTensorData = {{0, inputData}};
-    std::map<int, std::vector<T>> expectedOutputData = {{0, outputExpected}};
-
-    AsyncEndToEndTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends, 0.000001f, 1);
-}
-
-template<armnn::DataType ArmnnType>
-void AsyncScheduledStridedSlicedMultiThreadedEndToEndTest(const std::vector<BackendId>& backends)
-{
-    using namespace armnn;
-    using T = ResolveType<ArmnnType>;
-
-    const TensorShape& inputShape = {3, 2, 3, 1};
-    const TensorShape& outputShape = {1, 2, 3, 1};
-    const std::vector<int>& beginData = {1, 0, 0, 0};
-    const std::vector<int>& endData = {2, 2, 3, 1};
-    const std::vector<int>& stridesData = {1, 1, 1, 1};
-    int beginMask = 0;
-    int endMask = 0;
-    int shrinkAxisMask = 0;
-    int ellipsisMask = 0;
-    int newAxisMask = 0;
-
-    // Builds up the structure of the network
-    INetworkPtr net = CreateStridedSliceNetwork<ArmnnType>(inputShape,
-                                                           outputShape,
-                                                           beginData,
-                                                           endData,
-                                                           stridesData,
-                                                           beginMask,
-                                                           endMask,
-                                                           shrinkAxisMask,
-                                                           ellipsisMask,
-                                                           newAxisMask);
-
-    // Creates structures for input & output.
-    std::vector<T> inputData{
-            1.0f, 1.0f, 1.0f, 2.0f, 2.0f, 2.0f,
-
-            3.0f, 3.0f, 3.0f, 4.0f, 4.0f, 4.0f,
-
-            5.0f, 5.0f, 5.0f, 6.0f, 6.0f, 6.0f
-    };
-
-    std::vector<T> outputExpected{
-            3.0f, 3.0f, 3.0f, 4.0f, 4.0f, 4.0f
-    };
-
-    std::map<int, std::vector<T>> inputTensorData = {{0, inputData}};
-    std::map<int, std::vector<T>> expectedOutputData = {{0, outputExpected}};
-
-    AsyncEndToEndTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends, 0.000001f, 3);
+    AsyncEndToEndTestImpl<ArmnnType, ArmnnType>(move(net),
+                                                inputTensorData,
+                                                expectedOutputData,
+                                                backends,
+                                                0.000001f,
+                                                numThreads);
 }
 
 template<armnn::DataType ArmnnType>

@@ -195,7 +195,8 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  cxxopts::value<std::string>(m_RuntimeOptions.m_DynamicBackendsPath))
 
                 ("n,concurrent",
-                 "If this option is enabled inferences will be executed in parallel asynchronously.",
+                 "This option is for Arm NN internal asynchronous testing purposes. "
+                 "By default it is set to true if thread-pool-size or simultaneous-iterations are greater than 1",
                  cxxopts::value<bool>(m_ExNetParams.m_Concurrent)->default_value("false")->implicit_value("true"))
 
                 ("d,input-tensor-data",
@@ -284,9 +285,15 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "This option is depreciated please use tflite-executor instead",
                  cxxopts::value<bool>(m_ExNetParams.m_EnableDelegate)->default_value("false")->implicit_value("true"))
 
-               ("simultaneous-iterations",
-                "Number of simultaneous iterations to async-run the network for, default is set to 1",
-                cxxopts::value<size_t>(m_ExNetParams.m_SimultaneousIterations)->default_value("1"));
+                ("simultaneous-iterations",
+                 "Number of simultaneous iterations to async-run the network for, default is set to 1 (disabled). "
+                 "When thread-pool-size is set the Arm NN thread pool is used. Otherwise std::launch::async is used.",
+                 cxxopts::value<size_t>(m_ExNetParams.m_SimultaneousIterations)->default_value("1"))
+
+                ("thread-pool-size",
+                 "Number of Arm NN threads to use when running the network asynchronously via the Arm NN thread pool. "
+                 "The default is set to 1",
+                 cxxopts::value<size_t>(m_ExNetParams.m_ThreadPoolSize)->default_value("1"));
 
         m_CxxOptions.add_options("c) Optimization")
                 ("bf16-turbo-mode",
@@ -453,7 +460,11 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
                                        "please use tflite-executor instead.");
     }
 
-
+    // Set concurrent to true if the user expects to run inferences asynchronously
+    if (m_ExNetParams.m_SimultaneousIterations > 1)
+    {
+        m_ExNetParams.m_Concurrent = true;
+    }
 
     // Parse input tensor shape from the string we got from the command-line.
     std::vector<std::string> inputTensorShapesVector =

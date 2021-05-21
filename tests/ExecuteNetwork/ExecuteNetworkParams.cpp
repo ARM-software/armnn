@@ -138,9 +138,11 @@ void ExecuteNetworkParams::ValidateParams()
         CheckModelFormat(m_ModelFormat);
 
         // Check number of simultaneous iterations
-        if ((m_SimultaneousIterations < 1))
+        // Testing std::launch::async with a single iteration is possible if concurrent is manually set
+        if ((m_SimultaneousIterations <= 1 && m_ThreadPoolSize > 1) ||
+            (m_SimultaneousIterations <= 1 && !m_Concurrent))
         {
-            ARMNN_LOG(fatal) << "simultaneous-iterations cannot be less than 1. ";
+            ARMNN_LOG(fatal) << "simultaneous-iterations cannot be less than 2.";
         }
 
         // Check input tensor shapes

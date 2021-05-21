@@ -19,7 +19,7 @@
 #include <arm_compute/core/TensorShape.h>
 #include <arm_compute/core/Coordinates.h>
 
-#include <include/CL/cl_ext.h>
+#include <CL/cl_ext.h>
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 
 namespace armnn

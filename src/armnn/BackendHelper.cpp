@@ -722,6 +722,13 @@ bool LayerSupportHandle::IsRsqrtSupported(const TensorInfo& input,
     return m_LayerSupport->IsRsqrtSupported(input, output, reasonIfUnsupported.value());
 }
 
+bool LayerSupportHandle::IsShapeSupported(const TensorInfo& input,
+                                          const TensorInfo& output,
+                                          Optional<std::string&> reasonIfUnsupported)
+{
+    return m_LayerSupport->IsShapeSupported(input, output, reasonIfUnsupported.value());
+}
+
 bool LayerSupportHandle::IsSliceSupported(const TensorInfo& input,
                                           const TensorInfo& output,
                                           const SliceDescriptor& descriptor,

@@ -23,7 +23,7 @@ $ pip show pyarmnn
 You can also verify it by running the following and getting output similar to below:
 ```bash
 $ python -c "import pyarmnn as ann;print(ann.GetVersion())"
-'25.0.0'
+'26.0.0'
 ```
 
 ##### Dependencies

@@ -257,6 +257,7 @@ m_ParserFunctions(Layer_MAX+1, &IDeserializer::DeserializerImpl::ParseUnsupporte
     m_ParserFunctions[Layer_ResizeBilinearLayer]         = &DeserializerImpl::ParseResizeBilinear;
     m_ParserFunctions[Layer_ResizeLayer]                 = &DeserializerImpl::ParseResize;
     m_ParserFunctions[Layer_RsqrtLayer]                  = &DeserializerImpl::ParseRsqrt;
+    m_ParserFunctions[Layer_ShapeLayer]                  = &DeserializerImpl::ParseShape;
     m_ParserFunctions[Layer_SliceLayer]                  = &DeserializerImpl::ParseSlice;
     m_ParserFunctions[Layer_SoftmaxLayer]                = &DeserializerImpl::ParseSoftmax;
     m_ParserFunctions[Layer_SpaceToBatchNdLayer]         = &DeserializerImpl::ParseSpaceToBatchNd;
@@ -377,6 +378,8 @@ LayerBaseRawPtr IDeserializer::DeserializerImpl::GetBaseLayer(const GraphPtr& gr
             return graphPtr->layers()->Get(layerIndex)->layer_as_ResizeLayer()->base();
         case Layer::Layer_RsqrtLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_RsqrtLayer()->base();
+        case Layer::Layer_ShapeLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_ShapeLayer()->base();
         case Layer::Layer_SliceLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_SliceLayer()->base();
         case Layer::Layer_SoftmaxLayer:
@@ -2330,6 +2333,26 @@ void IDeserializer::DeserializerImpl::ParseResizeBilinear(GraphPtr graph, unsign
 
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddResizeLayer(descriptor, layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void IDeserializer::DeserializerImpl::ParseShape(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddShapeLayer( layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

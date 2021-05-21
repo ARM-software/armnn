@@ -60,6 +60,7 @@
 #include "layers/ReduceLayer.hpp"
 #include "layers/ReshapeLayer.hpp"
 #include "layers/ResizeLayer.hpp"
+#include "layers/ShapeLayer.hpp"
 #include "layers/SliceLayer.hpp"
 #include "layers/SoftmaxLayer.hpp"
 #include "layers/SpaceToBatchNdLayer.hpp"
@@ -154,6 +155,7 @@ DECLARE_LAYER(Rank)
 DECLARE_LAYER(Reduce)
 DECLARE_LAYER(Reshape)
 DECLARE_LAYER(Resize)
+DECLARE_LAYER(Shape)
 DECLARE_LAYER(Slice)
 DECLARE_LAYER(Softmax)
 DECLARE_LAYER(SpaceToBatchNd)

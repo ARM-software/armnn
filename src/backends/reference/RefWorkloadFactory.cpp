@@ -7,7 +7,6 @@
 #include <backendsCommon/MemImportWorkload.hpp>
 #include <backendsCommon/MakeWorkloadHelper.hpp>
 #include <backendsCommon/TensorHandle.hpp>
-#include <reference/workloads/RefFillWorkload.hpp>
 #include "RefWorkloadFactory.hpp"
 #include "RefBackendId.hpp"
 #include "workloads/RefWorkloads.hpp"
@@ -624,6 +623,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateRsqrt(const RsqrtQueueDescr
     elementwiseUnaryDescriptor.m_Parameters.m_Operation = UnaryOperation::Rsqrt;
 
     return CreateElementwiseUnary(elementwiseUnaryDescriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateShape(const ShapeQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
+{
+    return std::make_unique<RefShapeWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSlice(const SliceQueueDescriptor& descriptor,

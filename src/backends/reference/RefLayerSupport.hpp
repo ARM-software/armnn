@@ -297,9 +297,13 @@ public:
                            const TensorInfo& output,
                            const ResizeDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-    
+
     ARMNN_DEPRECATED_MSG("Use IsElementwiseUnarySupported instead")
     bool IsRsqrtSupported(const TensorInfo& input,
+                          const TensorInfo& output,
+                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
+    bool IsShapeSupported(const TensorInfo& input,
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 

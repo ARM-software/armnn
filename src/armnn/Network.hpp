@@ -250,6 +250,8 @@ public:
     IConnectableLayer* AddTransposeLayer(const TransposeDescriptor& transposeDescriptor,
                                          const char* name = nullptr);
 
+    IConnectableLayer* AddShapeLayer(const char* name = nullptr);
+
     IConnectableLayer* AddStackLayer(const StackDescriptor& stackDescriptor,
                                      const char* name = nullptr);
 

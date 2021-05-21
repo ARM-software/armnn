@@ -113,7 +113,7 @@ In order to check for the latest available Arm NN version use apt-cache search:
 
 
  # Export the ARMNN_MAJOR_VERSION to the latest visible e.g. libarmnn25 to allow installation using the below examples
- export ARMNN_MAJOR_VERSION=25
+ export ARMNN_MAJOR_VERSION=26
 ```
 
 
@@ -124,7 +124,7 @@ The easiest way to install all of the available packages for your systems archit
  sudo apt-get install -y python3-pyarmnn libarmnn-cpuacc-backend${ARMNN_MAJOR_VERSION} libarmnn-gpuacc-backend${ARMNN_MAJOR_VERSION} libarmnn-cpuref-backend${ARMNN_MAJOR_VERSION}
  # Verify installation via python:
  python3 -c "import pyarmnn as ann;print(ann.GetVersion())" 
- # Returns '{ARMNN_MAJOR_VERSION}.0.0' e.g. 25.0.0
+ # Returns '{ARMNN_MAJOR_VERSION}.0.0' e.g. 26.0.0
 ```
 This will install PyArmNN and the three backends for Neon, Compute Library and our Reference Backend.
 It will also install their dependencies including the arm-compute-library package along with the Tensorflow Lite Parser

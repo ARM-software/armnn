@@ -482,6 +482,11 @@ IConnectableLayer* INetwork::AddTransposeLayer(const TransposeDescriptor& transp
     return pNetworkImpl->AddTransposeLayer(transposeDescriptor, name);
 }
 
+IConnectableLayer* INetwork::AddShapeLayer(const char* name)
+{
+    return pNetworkImpl->AddShapeLayer(name);
+}
+
 IConnectableLayer* INetwork::AddStackLayer(const StackDescriptor& descriptor,
                                            const char* name)
 {
@@ -2097,6 +2102,11 @@ IConnectableLayer* NetworkImpl::AddResizeBilinearLayer(const ResizeBilinearDescr
 IConnectableLayer* NetworkImpl::AddResizeLayer(const ResizeDescriptor& resizeDescriptor, const char* name)
 {
     return m_Graph->AddLayer<ResizeLayer>(resizeDescriptor, name);
+}
+
+IConnectableLayer* NetworkImpl::AddShapeLayer(const char* name)
+{
+    return m_Graph->AddLayer<ShapeLayer>(name);
 }
 
 IConnectableLayer* NetworkImpl::AddInstanceNormalizationLayer(const InstanceNormalizationDescriptor& desc,

@@ -315,6 +315,9 @@ private:
                                      const armnn::NormalizationDescriptor& normalizationDescriptor,
                                      const char* name = nullptr);
 
+    void SerializeShapeLayer(const armnn::IConnectableLayer* layer,
+                             const char* name = nullptr);
+
     void SerializeSplitterLayer(const armnn::IConnectableLayer* layer,
                                 const armnn::ViewsDescriptor& viewsDescriptor,
                                 const char* name = nullptr);

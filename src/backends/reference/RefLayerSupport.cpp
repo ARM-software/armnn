@@ -1859,6 +1859,24 @@ bool RefLayerSupport::IsRsqrtSupported(const TensorInfo& input,
                                        reasonIfUnsupported);
 }
 
+bool RefLayerSupport::IsShapeSupported(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input);
+    bool supported = true;
+
+    std::array<DataType, 1> supportedTypes =
+    {
+        DataType::Signed32
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference Shape: output type not supported");
+
+    return supported;
+}
+
 bool RefLayerSupport::IsSliceSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        const SliceDescriptor& descriptor,

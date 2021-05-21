@@ -125,6 +125,7 @@ private:
     void ParseResize(GraphPtr graph, unsigned int layerIndex);
     void ParseResizeBilinear(GraphPtr graph, unsigned int layerIndex);
     void ParseRsqrt(GraphPtr graph, unsigned int layerIndex);
+    void ParseShape(GraphPtr graph, unsigned int layerIndex);
     void ParseSlice(GraphPtr graph, unsigned int layerIndex);
     void ParseSoftmax(GraphPtr graph, unsigned int layerIndex);
     void ParseSpaceToBatchNd(GraphPtr graph, unsigned int layerIndex);

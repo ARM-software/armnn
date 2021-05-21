@@ -276,6 +276,8 @@ list(APPEND armnn_sources
     src/armnn/layers/ReshapeLayer.cpp
     src/armnn/layers/ResizeLayer.hpp
     src/armnn/layers/ResizeLayer.cpp
+    src/armnn/layers/ShapeLayer.cpp
+    src/armnn/layers/ShapeLayer.hpp
     src/armnn/layers/SliceLayer.cpp
     src/armnn/layers/SliceLayer.hpp
     src/armnn/layers/SoftmaxLayer.hpp
@@ -757,6 +759,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/DeserializeReshape.cpp
             src/armnnDeserializer/test/DeserializeResizeBilinear.cpp
             src/armnnDeserializer/test/DeserializeRsqrt.cpp
+            src/armnnDeserializer/test/DeserializeShape.cpp
             src/armnnDeserializer/test/DeserializeSlice.cpp
             src/armnnDeserializer/test/DeserializeSpaceToBatchNd.cpp
             src/armnnDeserializer/test/DeserializeStridedSlice.cpp

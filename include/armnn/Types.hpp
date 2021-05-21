@@ -332,7 +332,8 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(Addition) \
     X(ArgMinMax) \
     X(BatchNormalization) \
-    X(BatchToSpaceNd) \
+    X(BatchToSpaceNd)      \
+    X(Cast) \
     X(Comparison) \
     X(Concat) \
     X(Constant) \
@@ -381,6 +382,7 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(Rank) \
     X(Resize) \
     X(Reduce) \
+    X(Shape) \
     X(Slice) \
     X(Softmax) \
     X(SpaceToBatchNd) \
@@ -394,7 +396,7 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(Transpose) \
     X(TransposeConvolution2d) \
     X(Unmap) \
-    X(Cast)
+
 /// When adding a new layer, adapt also the LastLayer enum value in the
 /// enum class LayerType below
 enum class LayerType
@@ -403,7 +405,7 @@ enum class LayerType
     LIST_OF_LAYER_TYPE
 #undef X
     FirstLayer = Activation,
-    LastLayer = Cast
+    LastLayer = Unmap
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

@@ -2805,6 +2805,33 @@ void MergeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     ValidateTensorDataTypesMatch(inputTensorInfo0, outputTensorInfo, descriptorName, "input_0", "output");
 }
 
+void ShapeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string& descriptorName{"ShapeQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    std::vector<DataType> supportedTypes =
+    {
+        DataType::BFloat16,
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QAsymmS8,
+        DataType::QAsymmU8,
+        DataType::QAsymmS8,
+        DataType::QSymmS8,
+        DataType::QSymmS16,
+        DataType::Signed32
+    };
+
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateDataTypes(outputTensorInfo, {DataType::Signed32}, descriptorName);
+}
+
 void SwitchQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     const std::string& descriptorName{"SwitchQueueDescriptor"};

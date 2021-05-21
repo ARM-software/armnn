@@ -1733,6 +1733,43 @@ ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcInt16_2, DepthToSpaceTest2<DataType::QSymmS
 ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcInt16_3, DepthToSpaceTest3<DataType::QSymmS16>, DataLayout::NHWC);
 ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcInt16_4, DepthToSpaceTest4<DataType::QSymmS16>, DataLayout::NHWC);
 
+// Shape
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize1Float16,  ShapeDimSize1Test<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize1Float32,  ShapeDimSize1Test<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize1QAsymmU8, ShapeDimSize1Test<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize1Signed32, ShapeDimSize1Test<DataType::Signed32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize1QSymmS16, ShapeDimSize1Test<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize1QSymmS8,  ShapeDimSize1Test<DataType::QSymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize1QAsymmS8, ShapeDimSize1Test<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize1BFloat16, ShapeDimSize1Test<DataType::BFloat16>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize2Float16,  ShapeDimSize2Test<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize2Float32,  ShapeDimSize2Test<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize2QAsymmU8, ShapeDimSize2Test<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize2Signed32, ShapeDimSize2Test<DataType::Signed32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize2QSymmS16, ShapeDimSize2Test<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize2QSymmS8,  ShapeDimSize2Test<DataType::QSymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize2QAsymmS8, ShapeDimSize2Test<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize2BFloat16, ShapeDimSize2Test<DataType::BFloat16>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize3Float16,  ShapeDimSize3Test<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize3Float32,  ShapeDimSize3Test<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize3QAsymmU8, ShapeDimSize3Test<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize3Signed32, ShapeDimSize3Test<DataType::Signed32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize3QSymmS16, ShapeDimSize3Test<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize3QSymmS8,  ShapeDimSize3Test<DataType::QSymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize3QAsymmS8, ShapeDimSize3Test<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize3BFloat16, ShapeDimSize3Test<DataType::BFloat16>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize4Float16,  ShapeDimSize4Test<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize4Float32,  ShapeDimSize4Test<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize4QAsymmU8, ShapeDimSize4Test<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize4Signed32, ShapeDimSize4Test<DataType::Signed32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize4QSymmS16, ShapeDimSize4Test<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize4QSymmS8,  ShapeDimSize4Test<DataType::QSymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize4QAsymmS8, ShapeDimSize4Test<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ShapeDimSize4BFloat16, ShapeDimSize4Test<DataType::BFloat16>)
+
 // SpaceToDepth
 ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToDepthNchwAsymmQ8, SpaceToDepthNchwAsymmQ8Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToDepthNhwcAsymmQ8, SpaceToDepthNhwcAsymmQ8Test)

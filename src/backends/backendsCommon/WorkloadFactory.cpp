@@ -1003,6 +1003,16 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                                                           reason);
             break;
         }
+        case LayerType::Shape:
+        {
+            const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject.IsShapeSupported(OverrideDataType(input, dataType),
+                                                         OverrideDataType(output, dataType),
+                                                         reason);
+            break;
+        }
         case LayerType::Slice:
         {
             auto cLayer = PolymorphicDowncast<const SliceLayer*>(&layer);
@@ -1668,6 +1678,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateResize(const ResizeQueueDescr
 }
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& /*descriptor*/,
+                                                         const WorkloadInfo& /*info*/) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateShape(const ShapeQueueDescriptor& /*descriptor*/,
                                                          const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();

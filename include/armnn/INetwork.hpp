@@ -506,6 +506,11 @@ public:
     IConnectableLayer* AddReshapeLayer(const ReshapeDescriptor& reshapeDescriptor,
                                        const char* name = nullptr);
 
+    /// Adds a shape layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddShapeLayer(const char* name = nullptr);
+
     /// Adds a space to batch layer to the network.
     /// @param spaceToBatchNdDescriptor - Parameters for the space to batch operation.
     /// @param name - Optional name for the layer.

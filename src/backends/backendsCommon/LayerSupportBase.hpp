@@ -344,6 +344,10 @@ public:
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsShapeSupported(const TensorInfo& input,
+                          const TensorInfo& output,
+                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsSliceSupported(const TensorInfo& input,
                           const TensorInfo& output,
                           const SliceDescriptor& descriptor,

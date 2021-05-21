@@ -171,7 +171,8 @@ enum LayerType : uint {
     Rank = 58,
     LogicalBinary = 59,
     Reduce = 60,
-    Cast = 61
+    Cast = 61,
+    Shape = 62
 }
 
 // Base layer table to be used as part of other layers
@@ -487,7 +488,7 @@ table ReshapeLayer {
 }
 
 table ReshapeDescriptor {
-  targetShape:[uint];
+    targetShape:[uint];
 }
 
 table PermuteLayer {
@@ -497,6 +498,10 @@ table PermuteLayer {
 
 table PermuteDescriptor {
     dimMappings:[uint];
+}
+
+table ShapeLayer {
+    base:LayerBase;
 }
 
 table SpaceToBatchNdLayer {
@@ -972,7 +977,8 @@ union Layer {
     RankLayer,
     LogicalBinaryLayer,
     ReduceLayer,
-    CastLayer
+    CastLayer,
+    ShapeLayer
 }
 
 table AnyLayer {

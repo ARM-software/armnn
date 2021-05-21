@@ -85,6 +85,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/SliceTestImpl.cpp \
     test/layerTests/QuantizeTestImpl.cpp \
     test/layerTests/SinTestImpl.cpp \
+    test/layerTests/ShapeTestImpl.cpp \
     test/layerTests/SoftmaxTestImpl.cpp \
     test/layerTests/SpaceToBatchNdTestImpl.cpp \
     test/layerTests/SpaceToDepthTestImpl.cpp \

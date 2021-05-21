@@ -1951,6 +1951,31 @@ TEST_CASE("EnsureResizeBilinearBackwardCompatibility")
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
+TEST_CASE("SerializeShape")
+{
+    const std::string layerName("shape");
+    const armnn::TensorInfo inputInfo({1, 3, 3, 1}, armnn::DataType::Signed32);
+    const armnn::TensorInfo outputInfo({ 4 }, armnn::DataType::Signed32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const shapeLayer = network->AddShapeLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(shapeLayer->GetInputSlot(0));
+    shapeLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    shapeLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    CHECK(deserializedNetwork);
+
+    LayerVerifierBase verifier(layerName, {inputInfo}, {outputInfo});
+
+    deserializedNetwork->ExecuteStrategy(verifier);
+}
+
 TEST_CASE("SerializeSlice")
 {
     const std::string layerName{"slice"};

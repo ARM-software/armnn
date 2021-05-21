@@ -557,6 +557,13 @@ bool LayerSupportBase::IsRsqrtSupported(const TensorInfo&, // input
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsShapeSupported(const TensorInfo&, // input
+                                        const TensorInfo&, // output
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsSliceSupported(const TensorInfo&, // input
                                         const TensorInfo&, // output
                                         const SliceDescriptor&, // descriptor

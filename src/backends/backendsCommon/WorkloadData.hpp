@@ -690,4 +690,9 @@ struct ReduceQueueDescriptor : QueueDescriptorWithParameters<ReduceDescriptor>
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct ShapeQueueDescriptor : QueueDescriptor
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } // namespace armnn

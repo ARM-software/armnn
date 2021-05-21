@@ -157,6 +157,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/RsqrtTestImpl.hpp
     layerTests/SinTestImpl.cpp
     layerTests/SinTestImpl.hpp
+    layerTests/ShapeTestImpl.cpp
+    layerTests/ShapeTestImpl.cpp
     layerTests/SliceTestImpl.cpp
     layerTests/SliceTestImpl.hpp
     layerTests/SoftmaxTestImpl.cpp

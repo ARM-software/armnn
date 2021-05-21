@@ -1309,6 +1309,17 @@ void SerializerStrategy::SerializeNormalizationLayer(const armnn::IConnectableLa
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_NormalizationLayer);
 }
 
+void SerializerStrategy::SerializeShapeLayer(const armnn::IConnectableLayer* layer,
+                                             const char* name)
+{
+    IgnoreUnused(name);
+
+    auto shapeBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Shape);
+    auto shapeLayer = serializer::CreateShapeLayer(m_flatBufferBuilder, shapeBaseLayer);
+
+    CreateAnyLayer(shapeLayer.o, serializer::Layer::Layer_ShapeLayer);
+}
+
 void SerializerStrategy::SerializeStackLayer(const armnn::IConnectableLayer* layer,
                                         const armnn::StackDescriptor& stackDescriptor,
                                         const char* name)
@@ -2136,6 +2147,11 @@ void SerializerStrategy::ExecuteStrategy(const armnn::IConnectableLayer* layer,
             const armnn::ResizeDescriptor& layerDescriptor =
                     static_cast<const armnn::ResizeDescriptor&>(descriptor);
             SerializeResizeLayer(layer, layerDescriptor, name);
+            break;
+        }
+        case armnn::LayerType::Shape:
+        {
+            SerializeShapeLayer(layer, name);
             break;
         }
         case armnn::LayerType::Slice:

@@ -615,6 +615,87 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConvolution2dLayer)
                              &IsLayerOfType<armnn::OutputLayer>));
 }
 
+BOOST_AUTO_TEST_CASE(FoldPadLayerIntoDepthwiseConvolution2dLayer)
+{
+    Graph              graph;
+    const unsigned int inputShape[]   = {1, 2, 2, 3};
+    const unsigned int paddedShape[]  = {1, 6, 6, 3};
+    const unsigned int weightsShape[] = {1, 2, 3, 3};
+    const unsigned int outputShape[]  = {1, 2, 1, 3};
+
+    armnn::TensorInfo inputInfo(4, inputShape, DataType::Float32);
+    armnn::TensorInfo paddedInfo(4, paddedShape, DataType::Float32);
+    armnn::TensorInfo outputInfo(4, outputShape, DataType::Float32);
+
+    Layer* input = graph.AddLayer<InputLayer>(0, "input");
+    input->GetOutputSlot().SetTensorInfo(inputInfo);
+
+    PadDescriptor padDescriptor({{0, 0},
+                                 {2, 2},
+                                 {2, 2},
+                                 {0, 0}});
+
+    PadLayer* padLayer = graph.AddLayer<PadLayer>(padDescriptor, "pad");
+    padLayer->GetOutputSlot().SetTensorInfo(paddedInfo);
+
+    DepthwiseConvolution2dDescriptor depthwiseConvolution2dDescriptor;
+    depthwiseConvolution2dDescriptor.m_BiasEnabled = false;
+    depthwiseConvolution2dDescriptor.m_StrideX     = 1;
+    depthwiseConvolution2dDescriptor.m_StrideY     = 1;
+    depthwiseConvolution2dDescriptor.m_DataLayout  = DataLayout::NHWC;
+
+    std::vector<float> weightsVector(18);
+    armnn::ConstTensor weights(armnn::TensorInfo(4, weightsShape, armnn::DataType::Float32), weightsVector);
+
+    auto* depthwiseConv2dLayer = graph
+        .AddLayer<DepthwiseConvolution2dLayer>(depthwiseConvolution2dDescriptor, "depthwiseConv2d");
+    depthwiseConv2dLayer->m_Weight = std::make_unique<armnn::ScopedTensorHandle>(weights);
+    depthwiseConv2dLayer->GetOutputSlot().SetTensorInfo(outputInfo);
+
+    Layer* output = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Connect up layers - input -> pad -> depthwiseConv2d -> output
+    input->GetOutputSlot().Connect(padLayer->GetInputSlot(0));
+    padLayer->GetOutputSlot().Connect(depthwiseConv2dLayer->GetInputSlot(0));
+    depthwiseConv2dLayer->GetOutputSlot().Connect(output->GetInputSlot(0));
+
+    auto checkSimpleDepthwiseConv2d = [](const armnn::Layer* const layer)->bool {
+        const auto depthwiseConv2dLayer       = static_cast<const armnn::DepthwiseConvolution2dLayer*>(layer);
+        const auto depthwiseConv2dLayerParams = depthwiseConv2dLayer->GetParameters();
+        return IsLayerOfType<armnn::DepthwiseConvolution2dLayer>(layer) && (layer->GetNameStr() == "depthwiseConv2d")&&
+            (depthwiseConv2dLayerParams.m_PadLeft == 0) && (depthwiseConv2dLayerParams.m_PadRight == 0) &&
+            (depthwiseConv2dLayerParams.m_PadTop == 0) && (depthwiseConv2dLayerParams.m_PadBottom == 0) &&
+            (depthwiseConv2dLayerParams.m_BiasEnabled == false) && (depthwiseConv2dLayerParams.m_StrideX == 1) &&
+            (depthwiseConv2dLayerParams.m_StrideY == 1)
+            && (depthwiseConv2dLayerParams.m_DataLayout == DataLayout::NHWC);
+    };
+
+    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+                             &IsLayerOfType<armnn::InputLayer>,
+                             &IsLayerOfType<armnn::PadLayer>,
+                             checkSimpleDepthwiseConv2d,
+                             &IsLayerOfType<armnn::OutputLayer>));
+
+    armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(FoldPadIntoDepthwiseConvolution2d()));
+
+    auto checkPadFoldedIntoDepthwiseConv2d = [](const armnn::Layer* const layer)->bool {
+        const auto depthwiseConv2dLayer       = static_cast<const armnn::DepthwiseConvolution2dLayer*>(layer);
+        const auto depthwiseConv2dLayerParams = depthwiseConv2dLayer->GetParameters();
+        return IsLayerOfType<armnn::DepthwiseConvolution2dLayer>(layer)
+            && (layer->GetNameStr() == "folded-pad-into-depthwiseConv2d") &&
+            (depthwiseConv2dLayerParams.m_PadLeft == 2) && (depthwiseConv2dLayerParams.m_PadRight == 2) &&
+            (depthwiseConv2dLayerParams.m_PadTop == 2) && (depthwiseConv2dLayerParams.m_PadBottom == 2) &&
+            (depthwiseConv2dLayerParams.m_BiasEnabled == false) && (depthwiseConv2dLayerParams.m_StrideX == 1) &&
+            (depthwiseConv2dLayerParams.m_StrideY == 1)
+            && (depthwiseConv2dLayerParams.m_DataLayout == DataLayout::NHWC);
+    };
+
+    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+                             &IsLayerOfType<armnn::InputLayer>,
+                             checkPadFoldedIntoDepthwiseConv2d,
+                             &IsLayerOfType<armnn::OutputLayer>));
+}
+
 BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer)
 {
     Graph graph;

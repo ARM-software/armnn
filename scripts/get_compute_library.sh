@@ -7,10 +7,10 @@
 CMD=$( basename $0 )
 
 # For pinning to a ref use this:
-DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_05" # Release 21.05
+#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_05" # Release 21.05
 #
 # For pinning to a revision use this:
-#DEFAULT_CLFRAMEWORKREVISION="1fac03717dab014fd202ea85a8f05b3dd475cb3c" #Fix bug on CLReductionOperation
+DEFAULT_CLFRAMEWORKREVISION="13c497a8a9a4aa9353719afe53ccc7db50da74fe" #Fix Macros.h include in NEScale
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

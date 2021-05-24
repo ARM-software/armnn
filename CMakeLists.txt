@@ -660,6 +660,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Multiplication.cpp
              src/armnnTfLiteParser/test/Pack.cpp
              src/armnnTfLiteParser/test/Pad.cpp
+             src/armnnTfLiteParser/test/Prelu.cpp
              src/armnnTfLiteParser/test/Reduce.cpp
              src/armnnTfLiteParser/test/Reshape.cpp
              src/armnnTfLiteParser/test/ResizeBilinear.cpp

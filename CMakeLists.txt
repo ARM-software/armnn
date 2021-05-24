@@ -554,6 +554,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/optimizations/ConvertConstantsBFloatTests.cpp
         src/armnn/test/optimizations/ConvertConstantsFloatToHalfTests.cpp
         src/armnn/test/optimizations/ConvertConstantsHalfToFloatTests.cpp
+        src/armnn/test/optimizations/FoldPadTests.cpp
         src/armnn/test/optimizations/Fp32NetworkToBf16ConverterTests.cpp
         src/armnn/test/optimizations/Fp32NetworkToFp16ConverterTests.cpp
         src/armnn/test/optimizations/FuseActivationTests.cpp

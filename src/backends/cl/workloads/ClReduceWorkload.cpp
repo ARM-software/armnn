@@ -38,7 +38,7 @@ arm_compute::Status ClReduceWorkloadValidate(const TensorInfo& input,
     {
         // Validate layer if there are multiple axes.
         arm_compute::Status status;
-        IS_MULTI_AXES_REDUCE_SUPPORTED(NeonReduceWorkloadValidate, input, desc, status);
+        IS_MULTI_AXES_REDUCE_SUPPORTED(ClReduceWorkloadValidate, input, desc, status);
         return status;
     }
 }

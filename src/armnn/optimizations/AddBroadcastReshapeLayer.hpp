@@ -17,7 +17,8 @@ namespace optimizations
 
 static const std::set<armnn::LayerType> broadcastOps{ LayerType::Addition,       LayerType::Division,
                                                       LayerType::Maximum,        LayerType::Minimum,
-                                                      LayerType::Multiplication, LayerType::Subtraction };
+                                                      LayerType::Multiplication, LayerType::Prelu,
+                                                      LayerType::Subtraction };
 
 class AddBroadcastReshapeLayerImpl
 {

@@ -133,6 +133,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - NEG
 - PACK
 - PAD
+- PRELU
 - QUANTIZE
 - RELU
 - RELU6

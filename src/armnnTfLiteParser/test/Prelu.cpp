@@ -106,7 +106,7 @@ struct PreluFixture : public ParserFlatbuffersFixture
 struct SimplePreluFixture : PreluFixture
 {
     SimplePreluFixture() : PreluFixture("[ 2, 3 ]",
-                                        "[ 1, 1 ]",
+                                        "[ 1 ]",
                                         "[ 2, 3 ]",
                                         "[ 0, 1 ]",
                                         "") {}
@@ -115,11 +115,21 @@ struct SimplePreluFixture : PreluFixture
 struct PreluConstAlphaFixture : PreluFixture
 {
     PreluConstAlphaFixture() : PreluFixture(
-        "[ 2, 3 ]",
-        "[ 2, 3 ]",
-        "[ 2, 3 ]",
+        "[ 1, 2, 3 ]",
+        "[ 1, 2, 3 ]",
+        "[ 1, 2, 3 ]",
         "[ 0 ]",
         "\"data\": [ 0, 0, 128, 62, 0, 0, 128, 62, 0, 0, 128, 62, 0, 0, 128, 62, 0, 0, 128, 62, 0, 0, 128, 62 ]"){}
+};
+
+struct PreluBroadcastAlphaFixture : PreluFixture
+{
+    PreluBroadcastAlphaFixture() : PreluFixture(
+        "[ 1, 1, 2, 3 ]",
+        "[ 1, 3 ]",
+        "[ 1, 1, 2, 3 ]",
+        "[ 0 ]",
+        "\"data\": [ 0, 0, 128, 62, 0, 0, 128, 62, 0, 0, 128, 62 ]"){}
 };
 
 struct PreluDynamicTensorFixture : PreluFixture
@@ -141,7 +151,15 @@ BOOST_FIXTURE_TEST_CASE(SimplePrelu, SimplePreluFixture)
 
 BOOST_FIXTURE_TEST_CASE(PreluConstAlpha, PreluConstAlphaFixture)
 {
-  RunTest<2, armnn::DataType::Float32>(
+  RunTest<3, armnn::DataType::Float32>(
+      0,
+      {{"input0", { -14.f, 2.f, 0.f, 1.f, -5.f, 14.f }}},
+      {{"output", { -3.5f, 2.f, 0.f, 1.f, -1.25f, 14.f }}});
+}
+
+BOOST_FIXTURE_TEST_CASE(PreluBroadcastAlpha, PreluBroadcastAlphaFixture)
+{
+  RunTest<4, armnn::DataType::Float32>(
       0,
       {{"input0", { -14.f, 2.f, 0.f, 1.f, -5.f, 14.f }}},
       {{"output", { -3.5f, 2.f, 0.f, 1.f, -1.25f, 14.f }}});

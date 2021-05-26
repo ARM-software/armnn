@@ -58,7 +58,7 @@ from the Arm ML-Zoo).
   cd BASEDIR
   #copy your model and label mapping
   cp ml-zoo/models/image_classification/mobilenet_v2_1.0_224/tflite_uint8/mobilenet_v2_1.0_224_quantized_1_default_1.tflite .
-  cp ml-zoo/models/image_classification/mobilenet_v2_1.0_224/tflite_uint8 labelmappings.txt .
+  cp ml-zoo/models/image_classification/mobilenet_v2_1.0_224/tflite_uint8/labelmappings.txt .
   ```
 
 4. Download a test image.

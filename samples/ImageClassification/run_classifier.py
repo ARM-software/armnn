@@ -147,7 +147,7 @@ def create_mapping(label_mapping_p):
     with open(label_mapping_p) as label_mapping_raw:
         for line in label_mapping_raw:
             label_mapping[idx] = line
-            idx = 1
+            idx += 1
 
     return label_mapping
 
@@ -228,7 +228,7 @@ if __name__ == "__main__":
         "--preferred_backends",
         help="list of backends in order of preference",
         type=str,
-        nargs=" ",
+        nargs="+",
         required=False,
         default=["CpuAcc", "CpuRef"],
     )

@@ -13,6 +13,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     CommonTestUtils.cpp
     CommonTestUtils.hpp
     ComparisonEndToEndTestImpl.hpp
+    CompatibilityTests.cpp
     DataLayoutUtils.hpp
     DataTypeUtils.hpp
     DefaultAsyncExecuteTest.cpp
@@ -180,11 +181,6 @@ if (ARMNNREF)
         OptimizedNetworkTests.cpp
         WorkloadDataValidation.cpp
         )
-endif()
-
-if(ARMCOMPUTENEON AND ARMCOMPUTECL)
-    list(APPEND armnnBackendsCommonUnitTests_sources
-        CompatibilityTests.cpp)
 endif()
 
 add_library(armnnBackendsCommonUnitTests OBJECT ${armnnBackendsCommonUnitTests_sources})

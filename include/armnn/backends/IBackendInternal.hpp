@@ -178,7 +178,16 @@ public:
     /// Returns the version of the Backend API
     static constexpr BackendVersion GetApiVersion() { return BackendVersion(1, 0); }
 
+    /// Returns a BackendCapability if the backend lists the capability
+    /// The BackendCapability must then be inspected to check whether or not that BackendCapability is supported
+    /// Otherwise returns an EmptyOptional if the BackendCapability is unlisted
+    virtual BackendCapabilities GetCapabilities() const
+    {
+        return BackendCapabilities("IBackendInternal NullCapabilities");
+    };
+
     /// Returns true if backend support the capability false otherwise
+    ARMNN_DEPRECATED_MSG("This function has been deprecated in favour of GetCapability")
     virtual bool HasCapability(BackendCapability /*capabilityClass*/) const { return false; }
 };
 

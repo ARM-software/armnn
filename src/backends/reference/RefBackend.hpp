@@ -8,10 +8,17 @@
 
 namespace armnn
 {
+// add new capabilities here..
+const BackendCapabilities cpuRefCapabilities("CpuRef",
+                                             {
+                                                    {"NonConstWeights", true},
+                                                    {"AsyncExecution", true}
+                                             });
 
-const std::set<armnn::BackendCapability> cpuRefCapabilities {
-    armnn::BackendCapability::NonConstWeights,
+const std::set<armnn::BackendCapability> oldCpuRefCapabilities {
+        armnn::BackendCapability::NonConstWeights,
 };
+
 
 class RefBackend : public IBackendInternal
 {
@@ -43,6 +50,11 @@ public:
     std::vector<ITensorHandleFactory::FactoryId> GetHandleFactoryPreferences() const override;
 
     void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry) override;
+
+    BackendCapabilities GetCapabilities() const override
+    {
+        return cpuRefCapabilities;
+    };
 
     bool HasCapability(BackendCapability capabilityClass) const override;
 };

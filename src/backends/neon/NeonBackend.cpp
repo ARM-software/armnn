@@ -132,16 +132,6 @@ IBackendInternal::ILayerSupportSharedPtr NeonBackend::GetLayerSupport(const Mode
     return layerSupport;
 }
 
-bool NeonBackend::HasCapability(BackendCapability capabilityClass) const
-{
-    auto search = cpuAccCapabilities.find(capabilityClass);
-    if (search != cpuAccCapabilities.end())
-    {
-        return true;
-    }
-    return false;
-}
-
 OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph) const
 {
     OptimizationViews optimizationViews;

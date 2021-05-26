@@ -9,9 +9,13 @@
 namespace armnn
 {
 
-const std::set<armnn::BackendCapability> cpuAccCapabilities {
-    // add new capabilities here..
-};
+// add new capabilities here..
+const BackendCapabilities cpuAccCapabilities("GpuAcc",
+                                             {
+                                                     {"NonConstWeights", false},
+                                                     {"AsyncExecution", false}
+                                             });
+
 
 class NeonBackend : public IBackendInternal
 {
@@ -52,7 +56,10 @@ public:
     IBackendInternal::IBackendSpecificModelContextPtr CreateBackendSpecificModelContext(
         const ModelOptions& modelOptions) const override;
 
-    bool HasCapability(BackendCapability capabilityClass) const override;
+    BackendCapabilities GetCapabilities() const override
+    {
+        return cpuAccCapabilities;
+    };
 };
 
 } // namespace armnn

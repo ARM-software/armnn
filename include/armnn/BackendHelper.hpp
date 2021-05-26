@@ -6,6 +6,7 @@
 #pragma once
 
 #include <armnn/BackendId.hpp>
+#include <armnn/BackendOptions.hpp>
 #include <armnn/backends/ILayerSupport.hpp>
 #include <armnn/Types.hpp>
 
@@ -436,7 +437,32 @@ private:
 /// Convenience function to retrieve the ILayerSupportHandle for a backend
 LayerSupportHandle GetILayerSupportByBackendId(const armnn::BackendId& backend);
 
+/// Convenience function to check if a capability exists in a BackendCapabilites struct
+bool HasCapability(const std::string& name,const BackendCapabilities& capabilities);
+
+/// Convenience function to check if a capability exists in a backend
+bool HasCapability(const std::string& name, const armnn::BackendId& backend);
+
+/// Convenience function to check if a given capability matches a  capability in a BackendCapabilities struct
+bool HasCapability(const BackendOptions::BackendOption& capability, const BackendCapabilities& capabilities);
+
+/// Convenience function to check if a given capability matches a  capability in a backend
+bool HasCapability(const BackendOptions::BackendOption& backendOption, const armnn::BackendId& backend);
+
+/// Returns a BackendCapability if the backend lists the capability
+/// The BackendCapability must then be inspected to check whether or not that BackendCapability is supported
+/// Otherwise returns an EmptyOptional if the BackendCapability is unlisted
+Optional<const BackendOptions::BackendOption> GetCapability(const std::string& backendCapabilityName,
+                                                            const BackendCapabilities& capabilities);
+
+/// Returns a BackendCapability if the backend lists the capability
+/// The BackendCapability must then be inspected to check whether or not that BackendCapability is supported
+/// Otherwise returns an EmptyOptional if the BackendCapability is unlisted
+Optional<const BackendOptions::BackendOption> GetCapability(const std::string& backendCapabilityName,
+                                                            const armnn::BackendId& backend);
+
 /// Convenience function to check a capability on a backend
+ARMNN_DEPRECATED_MSG("This function has been deprecated in favour of GetBackendCapability")
 bool IsCapabilitySupported(const armnn::BackendId& backend, armnn::BackendCapability capability);
 
 }

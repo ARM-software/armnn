@@ -8,6 +8,7 @@
 #include <cl/ClBackend.hpp>
 #include <neon/NeonBackend.hpp>
 #include <reference/RefBackend.hpp>
+#include <armnn/BackendHelper.hpp>
 
 #include <Network.hpp>
 
@@ -18,6 +19,7 @@ using namespace armnn;
 
 BOOST_AUTO_TEST_SUITE(BackendsCompatibility, * boost::unit_test::disabled())
 
+#if defined(ARMCOMPUTENEON_ENABLED)
 BOOST_AUTO_TEST_CASE(Neon_Cl_DirectCompatibility_Test)
 {
     auto neonBackend = std::make_unique<NeonBackend>();
@@ -114,7 +116,7 @@ BOOST_AUTO_TEST_CASE(Neon_Cl_DirectCompatibility_Test)
     });
     BOOST_TEST(importCount == 0);
 }
-
+#endif
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(BackendCapability)
@@ -124,9 +126,38 @@ BOOST_AUTO_TEST_SUITE(BackendCapability)
 BOOST_AUTO_TEST_CASE(Ref_Backends_Capability_Test)
 {
     auto refBackend  = std::make_unique<RefBackend>();
-    BOOST_CHECK(refBackend->HasCapability(armnn::BackendCapability::NonConstWeights));
+    auto refCapabilities = refBackend->GetCapabilities();
 
-    BOOST_CHECK(!refBackend->HasCapability(armnn::BackendCapability::AsyncExecution));
+    BOOST_CHECK(armnn::HasCapability("NonConstWeights", refCapabilities));
+    BOOST_CHECK(armnn::HasCapability("AsyncExecution", refCapabilities));
+
+    armnn::BackendOptions::BackendOption nonConstWeights{"NonConstWeights", true};
+    armnn::BackendOptions::BackendOption AsyncExecution{"AsyncExecution", true};
+
+    BOOST_CHECK(armnn::HasCapability(nonConstWeights, refCapabilities));
+    BOOST_CHECK(armnn::HasCapability(AsyncExecution, refCapabilities));
+}
+
+BOOST_AUTO_TEST_CASE(Ref_Backends_Unkown_Capability_Test)
+{
+    auto refBackend  = std::make_unique<RefBackend>();
+    auto refCapabilities = refBackend->GetCapabilities();
+
+    armnn::BackendOptions::BackendOption AsyncExecutionFalse{"AsyncExecution", false};
+    BOOST_CHECK(!armnn::HasCapability(AsyncExecutionFalse, refCapabilities));
+
+    armnn::BackendOptions::BackendOption AsyncExecutionInt{"AsyncExecution", 50};
+    BOOST_CHECK(!armnn::HasCapability(AsyncExecutionFalse, refCapabilities));
+
+    armnn::BackendOptions::BackendOption AsyncExecutionFloat{"AsyncExecution", 0.0f};
+    BOOST_CHECK(!armnn::HasCapability(AsyncExecutionFloat, refCapabilities));
+
+    armnn::BackendOptions::BackendOption AsyncExecutionString{"AsyncExecution", "true"};
+    BOOST_CHECK(!armnn::HasCapability(AsyncExecutionString, refCapabilities));
+
+    BOOST_CHECK(!armnn::HasCapability("Telekinesis", refCapabilities));
+    armnn::BackendOptions::BackendOption unkownCapability{"Telekinesis", true};
+    BOOST_CHECK(!armnn::HasCapability(unkownCapability, refCapabilities));
 }
 
 #endif
@@ -136,7 +167,16 @@ BOOST_AUTO_TEST_CASE(Ref_Backends_Capability_Test)
 BOOST_AUTO_TEST_CASE(Neon_Backends_Capability_Test)
 {
     auto neonBackend = std::make_unique<NeonBackend>();
-    BOOST_CHECK(!neonBackend->HasCapability(armnn::BackendCapability::NonConstWeights));
+    auto neonCapabilities = neonBackend->GetCapabilities();
+
+    BOOST_CHECK(armnn::HasCapability("NonConstWeights", neonCapabilities));
+    BOOST_CHECK(armnn::HasCapability("AsyncExecution", neonCapabilities));
+
+    armnn::BackendOptions::BackendOption nonConstWeights{"NonConstWeights", false};
+    armnn::BackendOptions::BackendOption AsyncExecution{"AsyncExecution", false};
+
+    BOOST_CHECK(armnn::HasCapability(nonConstWeights, neonCapabilities));
+    BOOST_CHECK(armnn::HasCapability(AsyncExecution, neonCapabilities));
 }
 
 #endif
@@ -145,8 +185,17 @@ BOOST_AUTO_TEST_CASE(Neon_Backends_Capability_Test)
 
 BOOST_AUTO_TEST_CASE(Cl_Backends_Capability_Test)
 {
-    auto clBackend   = std::make_unique<ClBackend>();
-    BOOST_CHECK(!clBackend->HasCapability(armnn::BackendCapability::NonConstWeights));
+    auto clBackend = std::make_unique<ClBackend>();
+    auto clCapabilities = clBackend->GetCapabilities();
+
+    BOOST_CHECK(armnn::HasCapability("NonConstWeights", clCapabilities));
+    BOOST_CHECK(armnn::HasCapability("AsyncExecution", clCapabilities));
+
+    armnn::BackendOptions::BackendOption nonConstWeights{"NonConstWeights", false};
+    armnn::BackendOptions::BackendOption AsyncExecution{"AsyncExecution", false};
+
+    BOOST_CHECK(armnn::HasCapability(nonConstWeights, clCapabilities));
+    BOOST_CHECK(armnn::HasCapability(AsyncExecution, clCapabilities));
 }
 
 #endif

@@ -15,6 +15,7 @@ struct BackendOptions;
 using NetworkOptions = std::vector<BackendOptions>;
 
 using ModelOptions = std::vector<BackendOptions>;
+using BackendCapabilities = BackendOptions;
 
 /// Struct for the users to pass backend specific options
 struct BackendOptions

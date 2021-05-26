@@ -177,16 +177,6 @@ IBackendInternal::ILayerSupportSharedPtr ClBackend::GetLayerSupport(const ModelO
     return layerSupport;
 }
 
-bool ClBackend::HasCapability(BackendCapability capabilityClass) const
-{
-    auto search = gpuAccCapabilities.find(capabilityClass);
-    if (search != gpuAccCapabilities.end())
-    {
-        return true;
-    }
-    return false;
-}
-
 OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                                   const ModelOptions& modelOptions) const
 {

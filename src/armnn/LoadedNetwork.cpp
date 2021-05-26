@@ -170,7 +170,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
 
     // Create the thread pool which will have working memory handles assigned to each thread
     // Should occur after factories are registered so that the WorkingMemHandles can be created
-    if (m_NetworkProperties.m_NumThreads > 1 && networkProperties.m_AsyncEnabled)
+    if (m_NetworkProperties.m_NumThreads > 0 && networkProperties.m_AsyncEnabled)
     {
         CreateThreadPool(m_NetworkProperties.m_NumThreads);
     }

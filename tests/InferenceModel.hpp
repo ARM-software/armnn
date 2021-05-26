@@ -121,7 +121,7 @@ struct Params
         , m_NumberOfThreads(0)
         , m_MLGOTuningFilePath("")
         , m_AsyncEnabled(false)
-        , m_ThreadPoolSize(1)
+        , m_ThreadPoolSize(0)
     {}
 };
 

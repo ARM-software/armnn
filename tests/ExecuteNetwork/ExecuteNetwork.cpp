@@ -440,7 +440,7 @@ int MainImpl(const ExecuteNetworkParams& params,
             }
         }
         // Asynchronous execution using the Arm NN thread pool
-        else if (params.m_ThreadPoolSize >= 2)
+        else if (params.m_ThreadPoolSize >= 1)
         {
             try
             {

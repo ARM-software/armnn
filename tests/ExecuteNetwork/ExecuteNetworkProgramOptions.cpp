@@ -292,8 +292,8 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
 
                 ("thread-pool-size",
                  "Number of Arm NN threads to use when running the network asynchronously via the Arm NN thread pool. "
-                 "The default is set to 1",
-                 cxxopts::value<size_t>(m_ExNetParams.m_ThreadPoolSize)->default_value("1"));
+                 "The default is set to 0",
+                 cxxopts::value<size_t>(m_ExNetParams.m_ThreadPoolSize)->default_value("0"));
 
         m_CxxOptions.add_options("c) Optimization")
                 ("bf16-turbo-mode",
@@ -461,7 +461,7 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
     }
 
     // Set concurrent to true if the user expects to run inferences asynchronously
-    if (m_ExNetParams.m_SimultaneousIterations > 1)
+    if (m_ExNetParams.m_SimultaneousIterations > 1 || m_ExNetParams.m_ThreadPoolSize > 0)
     {
         m_ExNetParams.m_Concurrent = true;
     }

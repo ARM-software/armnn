@@ -274,7 +274,11 @@ public:
     SizeType GetSize() const { return m_NumDimMappings; }
 
     ConstIterator begin() const { return m_DimMappings.begin(); }
-    ConstIterator end() const { return m_DimMappings.end(); }
+    /**
+     *
+     * @return pointer one past the end of the number of mapping not the length of m_DimMappings.
+     */
+    ConstIterator end() const { return m_DimMappings.begin() + m_NumDimMappings; }
 
     bool IsEqual(const PermutationVector& other) const
     {

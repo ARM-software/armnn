@@ -269,6 +269,47 @@ BOOST_AUTO_TEST_CASE(PermuteQuantizationDim)
     BOOST_CHECK(permuted.GetQuantizationDim().value() == 3U);
 }
 
+BOOST_AUTO_TEST_CASE(PermuteVectorIterator)
+{
+    // We're slightly breaking the spirit of std::array.end() because we're using it as a
+    // variable length rather than fixed length. This test is to use a couple of iterators and
+    // make sure it still mostly makes sense.
+
+    // Create zero length.
+    armnn::PermutationVector zeroPVector({});
+    // Begin should be equal to end.
+    BOOST_CHECK(zeroPVector.begin() == zeroPVector.end());
+
+    // Create length 4. Summing the 4 values should be 6.
+    armnn::PermutationVector fourPVector({ 0, 3, 2, 1 });
+    unsigned int sum = 0;
+    for (unsigned int it : fourPVector)
+    {
+        sum += it;
+    }
+    BOOST_CHECK(sum == 6);
+    // Directly use begin and end, make sure there are 4 iterations.
+    unsigned int iterations = 0;
+    auto itr = fourPVector.begin();
+    while(itr != fourPVector.end())
+    {
+        ++iterations;
+        itr++;
+    }
+    BOOST_CHECK(iterations == 4);
+
+    // Do the same with 2 elements.
+    armnn::PermutationVector twoPVector({ 0, 1 });
+    iterations = 0;
+    itr = twoPVector.begin();
+    while(itr != twoPVector.end())
+    {
+        ++iterations;
+        itr++;
+    }
+    BOOST_CHECK(iterations == 2);
+}
+
 #if defined(ARMNNREF_ENABLED)
 BOOST_AUTO_TEST_CASE(LayerSupportHandle)
 {

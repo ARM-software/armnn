@@ -1963,10 +1963,9 @@ void TfLiteParserImpl::ParsePrelu(size_t subgraphIndex, size_t operatorIndex)
 
     if (IsConstTensor(inputs[1]))
     {
-        armnn::IInputSlot* slot = &(layer->GetInputSlot(0));
-        RegisterConsumerOfTensor(subgraphIndex, 0, slot);
-
         auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+        armnn::IInputSlot* slot = &(layer->GetInputSlot(0));
+        RegisterConsumerOfTensor(subgraphIndex, inputTensorIndexes[0], slot);
 
         auto alphaTensorAndData = CreateConstTensorNonPermuted(inputs[1], alphaTensorInfo);
         std::string constLayerName = fmt::format("Constant:{}", inputs[1]->name);

@@ -103,6 +103,221 @@ struct PreluFixture : public ParserFlatbuffersFixture
     }
 };
 
+struct PreluNetworkFixture : public ParserFlatbuffersFixture
+{
+    explicit PreluNetworkFixture()
+    {
+        m_JsonString = R"(
+            {
+              "version": 3,
+              "operator_codes": [
+                {
+                  "builtin_code": "PRELU",
+                  "version": 1
+                },
+                {
+                  "builtin_code": "MUL",
+                  "version": 1
+                },
+                {
+                  "builtin_code": "ADD",
+                  "version": 1
+                }
+              ],
+              "subgraphs": [
+                {
+                  "tensors": [
+                    {
+                      "shape": [
+                        1,
+                        2,
+                        3
+                      ],
+                      "type": "FLOAT32",
+                      "buffer": 6,
+                      "name": "output",
+                      "quantization": {
+                        "details_type": "NONE",
+                        "quantized_dimension": 0
+                      },
+                    },
+                    {
+                      "shape": [
+                        1,
+                        2,
+                        3
+                      ],
+                      "type": "FLOAT32",
+                      "buffer": 5,
+                      "name": "mul",
+                      "quantization": {
+                        "details_type": "NONE",
+                        "quantized_dimension": 0
+                      }
+                    },
+                    {
+                      "shape": [
+                        1,
+                        2,
+                        3
+                      ],
+                      "type": "FLOAT32",
+                      "buffer": 1,
+                      "name": "input0",
+                      "quantization": {
+                        "details_type": "NONE",
+                        "quantized_dimension": 0
+                      }
+                    },
+                    {
+                      "shape": [
+                        2,
+                        3
+                      ],
+                      "type": "FLOAT32",
+                      "buffer": 2,
+                      "name": "alpha",
+                      "quantization": {
+                        "details_type": "NONE",
+                        "quantized_dimension": 0
+                      }
+                    },
+                    {
+                      "shape": [
+                        1
+                      ],
+                      "type": "FLOAT32",
+                      "buffer": 3,
+                      "name": "const0",
+                      "quantization": {
+                        "details_type": "NONE",
+                        "quantized_dimension": 0
+                      }
+                    },
+                    {
+                      "shape": [
+                        1,
+                        2,
+                        3
+                      ],
+                      "type": "FLOAT32",
+                      "buffer": 4,
+                      "name": "prelumul",
+                      "quantization": {
+                        "details_type": "NONE",
+                        "quantized_dimension": 0
+                      }
+                    }
+                  ],
+                  "inputs": [
+                    2
+                  ],
+                  "outputs": [
+                    0
+                  ],
+                  "operators": [
+                    {
+                      "opcode_index": 0,
+                      "inputs": [
+                        2,
+                        3
+                      ],
+                      "outputs": [
+                        5
+                      ],
+                      "builtin_options_type": "NONE",
+                      "custom_options_format": "FLEXBUFFERS"
+                    },
+                    {
+                      "opcode_index": 1,
+                      "inputs": [
+                        5,
+                        4
+                      ],
+                      "outputs": [
+                        1
+                      ],
+                      "builtin_options_type": "MulOptions",
+                      "builtin_options": {
+                        "fused_activation_function": "NONE"
+                      },
+                      "custom_options_format": "FLEXBUFFERS"
+                    },
+                    {
+                      "opcode_index": 2,
+                      "inputs": [
+                        5,
+                        1
+                      ],
+                      "outputs": [
+                        0
+                      ],
+                      "builtin_options_type": "AddOptions",
+                      "builtin_options": {
+                        "fused_activation_function": "NONE"
+                      },
+                      "custom_options_format": "FLEXBUFFERS"
+                    }
+                  ],
+                  "name": "main"
+                }
+              ],
+              "buffers": [
+                {
+                },
+                {
+                },
+                {
+                  "data": [
+                    0,
+                    0,
+                    128,
+                    62,
+                    0,
+                    0,
+                    128,
+                    62,
+                    0,
+                    0,
+                    128,
+                    62,
+                    0,
+                    0,
+                    128,
+                    62,
+                    0,
+                    0,
+                    128,
+                    62,
+                    0,
+                    0,
+                    128,
+                    62
+                  ]
+                },
+                {
+                  "data": [
+                    0,
+                    0,
+                    160,
+                    64
+                  ]
+                },
+                {
+                },
+                {
+                },
+                {
+                },
+                {
+                }
+              ],
+            }
+        )";
+        Setup();
+    }
+};
+
 struct SimplePreluFixture : PreluFixture
 {
     SimplePreluFixture() : PreluFixture("[ 2, 3 ]",
@@ -172,6 +387,14 @@ BOOST_FIXTURE_TEST_CASE(PreluDynamicTensor, PreluDynamicTensorFixture)
       {{"input0", { -14.f, 2.f, 0.f, 1.f, -5.f, 14.f }}},
       {{"output", { -3.5f, 2.f, 0.f, 1.f, -1.25f, 14.f }}},
       true);
+}
+
+BOOST_FIXTURE_TEST_CASE(PreluNetwork, PreluNetworkFixture)
+{
+  RunTest<3, armnn::DataType::Float32>(
+      0,
+      {{"input0", { -14.f, 2.f, 0.f, 1.f, -5.f, 14.f }}},
+      {{"output", { -21.f, 12.f, 0.f, 6.f, -7.5f, 84.f }}});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

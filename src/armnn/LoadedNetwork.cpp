@@ -168,13 +168,6 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
         }
     }
 
-    // Create the thread pool which will have working memory handles assigned to each thread
-    // Should occur after factories are registered so that the WorkingMemHandles can be created
-    if (m_NetworkProperties.m_NumThreads > 0 && networkProperties.m_AsyncEnabled)
-    {
-        CreateThreadPool(m_NetworkProperties.m_NumThreads);
-    }
-
     if (!networkProperties.m_AsyncEnabled)
     {
         for (auto&& layer : order)
@@ -312,6 +305,13 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
     else
     {
         AllocateAndExecuteConstantWorkloads();
+    }
+
+    // Create the thread pool which will have working memory handles assigned to each thread
+    // Should occur last so all factories and constant layer tensor handles are created
+    if (m_NetworkProperties.m_NumThreads > 0 && networkProperties.m_AsyncEnabled)
+    {
+        CreateThreadPool(m_NetworkProperties.m_NumThreads);
     }
 }
 

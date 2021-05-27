@@ -24,6 +24,7 @@
 #include "Pack.hpp"
 #include "Pad.hpp"
 #include "Pooling.hpp"
+#include "Prelu.hpp"
 #include "Quantization.hpp"
 #include "Redefine.hpp"
 #include "Reduce.hpp"
@@ -733,11 +734,11 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                     nodeIndex,
                                     kTfLiteBuiltinPadv2);
         case kTfLiteBuiltinPrelu:
-            return VisitActivationOperator(delegateData,
-                                           tfLiteContext,
-                                           tfLiteNode,
-                                           nodeIndex,
-                                           kTfLiteBuiltinPrelu);
+            return VisitPreluOperator(delegateData,
+                                      tfLiteContext,
+                                      tfLiteNode,
+                                      nodeIndex,
+                                      kTfLiteBuiltinPrelu);
         case kTfLiteBuiltinQuantize:
             return VisitQuantizeOperator(delegateData,
                                          tfLiteContext,

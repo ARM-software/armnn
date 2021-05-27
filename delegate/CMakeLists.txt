@@ -36,6 +36,7 @@ list(APPEND armnnDelegate_sources
         src/Pack.hpp
         src/Pad.hpp
         src/Pooling.hpp
+        src/Prelu.hpp
         src/Quantization.hpp
         src/Redefine.hpp
         src/Reduce.hpp
@@ -153,6 +154,8 @@ if(BUILD_UNIT_TESTS)
         src/test/PadTestHelper.hpp
         src/test/Pooling2dTest.cpp
         src/test/Pooling2dTestHelper.hpp
+        src/test/PreluTest.cpp
+        src/test/PreluTestHelper.hpp
         src/test/QuantizationTest.cpp
         src/test/QuantizationTestHelper.hpp
         src/test/RedefineTestHelper.hpp

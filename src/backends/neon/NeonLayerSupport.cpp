@@ -37,6 +37,7 @@
 #include "workloads/NeonDequantizeWorkload.hpp"
 #include "workloads/NeonInstanceNormalizationWorkload.hpp"
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
+#include "workloads/NeonLogWorkload.hpp"
 #include "workloads/NeonLogSoftmaxWorkload.hpp"
 #include "workloads/NeonLogicalAndWorkload.hpp"
 #include "workloads/NeonLogicalNotWorkload.hpp"
@@ -63,6 +64,7 @@
 #include "workloads/NeonReshapeWorkload.hpp"
 #include "workloads/NeonResizeWorkload.hpp"
 #include "workloads/NeonRsqrtWorkload.hpp"
+#include "workloads/NeonSinWorkload.hpp"
 #include "workloads/NeonSliceWorkload.hpp"
 #include "workloads/NeonSoftmaxWorkload.hpp"
 #include "workloads/NeonSpaceToBatchNdWorkload.hpp"
@@ -439,6 +441,16 @@ bool NeonLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
                                            reasonIfUnsupported,
                                            input,
                                            output);
+        case UnaryOperation::LogicalNot:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(NeonLogicalNotWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
+       case UnaryOperation::Log:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(NeonLogWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
         case UnaryOperation::Neg:
             FORWARD_WORKLOAD_VALIDATE_FUNC(NeonNegWorkloadValidate,
                                            reasonIfUnsupported,
@@ -449,8 +461,8 @@ bool NeonLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
                                            reasonIfUnsupported,
                                            input,
                                            output);
-        case UnaryOperation::LogicalNot:
-            FORWARD_WORKLOAD_VALIDATE_FUNC(NeonLogicalNotWorkloadValidate,
+        case UnaryOperation::Sin:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(NeonSinWorkloadValidate,
                                            reasonIfUnsupported,
                                            input,
                                            output);

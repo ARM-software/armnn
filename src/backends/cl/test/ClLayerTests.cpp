@@ -1847,11 +1847,27 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Neg3dFloat16, ClContextControlFixture, Neg3dTes
 
 // Exp
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Exp2d, ClContextControlFixture, Exp2dTest<DataType::Float32>)
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Exo3d, ClContextControlFixture, Exp3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Exp3d, ClContextControlFixture, Exp3dTest<DataType::Float32>)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ExpZero, ClContextControlFixture, ExpZeroTest<DataType::Float32>)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ExpNegative, ClContextControlFixture, ExpNegativeTest<DataType::Float32>)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Exp2dFloat16, ClContextControlFixture, Exp2dTest<DataType::Float16>)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Exp3dFloat16, ClContextControlFixture, Exp3dTest<DataType::Float16>)
+
+// Sin
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Sin2d, ClContextControlFixture, Sin2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Sin3d, ClContextControlFixture, Sin3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SinZero, ClContextControlFixture, SinZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SinNegative, ClContextControlFixture, SinNegativeTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Sin2dFloat16, ClContextControlFixture, Sin2dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Sin3dFloat16, ClContextControlFixture, Sin3dTest<DataType::Float16>)
+
+// Log
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Log2d, ClContextControlFixture, Log2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Log3d, ClContextControlFixture, Log3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(LogZero, ClContextControlFixture, LogZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(LogNegative, ClContextControlFixture, LogNegativeTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Log2dFloat16, ClContextControlFixture, Log2dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Log3dFloat16, ClContextControlFixture, Log3dTest<DataType::Float16>)
 
 // Logical
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(LogicalNot, ClContextControlFixture, LogicalNotTest)

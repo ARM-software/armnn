@@ -116,6 +116,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/L2NormalizationTestImpl.cpp
     layerTests/L2NormalizationTestImpl.hpp
     layerTests/LayerTestResult.hpp
+    layerTests/LogTestImpl.cpp
+    layerTests/LogTestImpl.hpp
     layerTests/LogicalTestImpl.cpp
     layerTests/LogicalTestImpl.hpp
     layerTests/LogSoftmaxTestImpl.cpp
@@ -153,6 +155,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/ResizeTestImpl.hpp
     layerTests/RsqrtTestImpl.cpp
     layerTests/RsqrtTestImpl.hpp
+    layerTests/SinTestImpl.cpp
+    layerTests/SinTestImpl.hpp
     layerTests/SliceTestImpl.cpp
     layerTests/SliceTestImpl.hpp
     layerTests/SoftmaxTestImpl.cpp

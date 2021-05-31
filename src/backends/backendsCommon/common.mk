@@ -65,6 +65,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/GatherTestImpl.cpp \
     test/layerTests/InstanceNormalizationTestImpl.cpp \
     test/layerTests/L2NormalizationTestImpl.cpp \
+    test/layerTests/LogTestImpl.cpp \
     test/layerTests/LogicalTestImpl.cpp \
     test/layerTests/LogSoftmaxTestImpl.cpp \
     test/layerTests/LstmTestImpl.cpp \
@@ -83,6 +84,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/RsqrtTestImpl.cpp \
     test/layerTests/SliceTestImpl.cpp \
     test/layerTests/QuantizeTestImpl.cpp \
+    test/layerTests/SinTestImpl.cpp \
     test/layerTests/SoftmaxTestImpl.cpp \
     test/layerTests/SpaceToBatchNdTestImpl.cpp \
     test/layerTests/SpaceToDepthTestImpl.cpp \

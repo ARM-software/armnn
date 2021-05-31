@@ -34,6 +34,7 @@
 #include <backendsCommon/test/layerTests/GatherTestImpl.hpp>
 #include <backendsCommon/test/layerTests/InstanceNormalizationTestImpl.hpp>
 #include <backendsCommon/test/layerTests/L2NormalizationTestImpl.hpp>
+#include <backendsCommon/test/layerTests/LogTestImpl.hpp>
 #include <backendsCommon/test/layerTests/LogicalTestImpl.hpp>
 #include <backendsCommon/test/layerTests/LogSoftmaxTestImpl.hpp>
 #include <backendsCommon/test/layerTests/LstmTestImpl.hpp>
@@ -54,6 +55,7 @@
 #include <backendsCommon/test/layerTests/ReshapeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ResizeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/RsqrtTestImpl.hpp>
+#include <backendsCommon/test/layerTests/SinTestImpl.hpp>
 #include <backendsCommon/test/layerTests/SliceTestImpl.hpp>
 #include <backendsCommon/test/layerTests/SoftmaxTestImpl.hpp>
 #include <backendsCommon/test/layerTests/SpaceToBatchNdTestImpl.hpp>

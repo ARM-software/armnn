@@ -2235,6 +2235,35 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(Exp3dQuantisedAsymm8, Exp3dTest<DataType::QAsymmU8
 ARMNN_AUTO_TEST_CASE_WITH_THF(Exp2dQuantisedSymm16, Exp2dTest<DataType::QSymmS16>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Exp3dQuantisedSymm16, Exp3dTest<DataType::QSymmS16>)
 
+// Log
+ARMNN_AUTO_TEST_CASE_WITH_THF(Log2d, Log2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Log3d, Log3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogZero, LogZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogNegative, LogNegativeTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Log2dFloat16, Log2dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Log3dFloat16, Log3dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Log2dQuantisedAsymmS8, Log2dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Log3dQuantisedAsymmS8, Log3dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Log2dQuantisedAsymm8, Log2dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Log3dQuantisedAsymm8, Log3dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Log2dQuantisedSymm16, Log2dTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Log3dQuantisedSymm16, Log3dTest<DataType::QSymmS16>)
+
+// Sin
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sin2d, Sin2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sin3d, Sin3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SinZero, SinZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SinNegative, SinNegativeTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sin2dFloat16, Sin2dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sin3dFloat16, Sin3dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sin2dQuantisedAsymmS8, Sin2dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sin3dQuantisedAsymmS8, Sin3dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sin2dQuantisedAsymm8, Sin2dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sin3dQuantisedAsymm8, Sin3dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sin2dQuantisedSymm16, Sin2dTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sin3dQuantisedSymm16, Sin3dTest<DataType::QSymmS16>)
+
+//Logical
 ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalNot, LogicalNotTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalNotInt, LogicalNotIntTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(LogicalAnd, LogicalAndTest)

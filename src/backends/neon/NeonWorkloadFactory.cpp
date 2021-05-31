@@ -294,6 +294,14 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateElementwiseUnary(
 
             return std::make_unique<NeonAbsWorkload>(absQueueDescriptor, info);
         }
+        case UnaryOperation::Exp:
+            return std::make_unique<NeonExpWorkload>(descriptor, info);
+        case UnaryOperation::LogicalNot:
+            return std::make_unique<NeonLogicalNotWorkload>(descriptor, info);
+        case UnaryOperation::Log:
+            return std::make_unique<NeonLogWorkload>(descriptor, info);
+        case UnaryOperation::Neg:
+            return std::make_unique<NeonNegWorkload>(descriptor, info);
         case UnaryOperation::Rsqrt:
         {
             RsqrtQueueDescriptor rsqrtQueueDescriptor;
@@ -302,12 +310,8 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateElementwiseUnary(
 
             return std::make_unique<NeonRsqrtWorkload>(rsqrtQueueDescriptor, info);
         }
-        case UnaryOperation::Neg:
-            return std::make_unique<NeonNegWorkload>(descriptor, info);
-        case UnaryOperation::Exp:
-            return std::make_unique<NeonExpWorkload>(descriptor, info);
-        case UnaryOperation::LogicalNot:
-            return std::make_unique<NeonLogicalNotWorkload>(descriptor, info);
+        case UnaryOperation::Sin:
+            return std::make_unique<NeonSinWorkload>(descriptor, info);
         default:
             return nullptr;
     }

@@ -931,37 +931,43 @@ enum UnaryOperation {
   UnaryOperation_Exp = 3,
   UnaryOperation_Neg = 4,
   UnaryOperation_LogicalNot = 5,
+  UnaryOperation_Log = 6,
+  UnaryOperation_Sin = 7,
   UnaryOperation_MIN = UnaryOperation_Abs,
-  UnaryOperation_MAX = UnaryOperation_LogicalNot
+  UnaryOperation_MAX = UnaryOperation_Sin
 };
 
-inline const UnaryOperation (&EnumValuesUnaryOperation())[6] {
+inline const UnaryOperation (&EnumValuesUnaryOperation())[8] {
   static const UnaryOperation values[] = {
     UnaryOperation_Abs,
     UnaryOperation_Rsqrt,
     UnaryOperation_Sqrt,
     UnaryOperation_Exp,
     UnaryOperation_Neg,
-    UnaryOperation_LogicalNot
+    UnaryOperation_LogicalNot,
+    UnaryOperation_Log,
+    UnaryOperation_Sin
   };
   return values;
 }
 
 inline const char * const *EnumNamesUnaryOperation() {
-  static const char * const names[7] = {
+  static const char * const names[9] = {
     "Abs",
     "Rsqrt",
     "Sqrt",
     "Exp",
     "Neg",
     "LogicalNot",
+    "Log",
+    "Sin",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameUnaryOperation(UnaryOperation e) {
-  if (flatbuffers::IsOutRange(e, UnaryOperation_Abs, UnaryOperation_LogicalNot)) return "";
+  if (flatbuffers::IsOutRange(e, UnaryOperation_Abs, UnaryOperation_Sin)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesUnaryOperation()[index];
 }

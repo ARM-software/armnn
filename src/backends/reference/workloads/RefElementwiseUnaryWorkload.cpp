@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -11,7 +11,9 @@
 #include "RefWorkloadUtils.hpp"
 #include "Abs.hpp"
 #include "Exp.hpp"
+#include "Log.hpp"
 #include "Rsqrt.hpp"
+#include "Sin.hpp"
 #include "Sqrt.hpp"
 
 #include <Profiling.hpp>
@@ -54,8 +56,10 @@ void RefElementwiseUnaryWorkload::Execute(std::vector<ITensorHandle*> inputs, st
 
     using AbsFunction   = ElementwiseUnaryFunction<abs<InType>>;
     using ExpFunction   = ElementwiseUnaryFunction<exp<InType>>;
+    using LogFunction   = ElementwiseUnaryFunction<log<InType>>;
     using NegFunction   = ElementwiseUnaryFunction<std::negate<InType>>;
     using RsqrtFunction = ElementwiseUnaryFunction<rsqrt<InType>>;
+    using SinFunction   = ElementwiseUnaryFunction<sin<InType>>;
     using SqrtFunction  = ElementwiseUnaryFunction<sqrt<InType>>;
 
     switch (m_Data.m_Parameters.m_Operation)
@@ -70,6 +74,11 @@ void RefElementwiseUnaryWorkload::Execute(std::vector<ITensorHandle*> inputs, st
             ExpFunction(inShape, outShape, *input, *output);
             break;
         }
+        case UnaryOperation::Log:
+        {
+            LogFunction(inShape, outShape, *input, *output);
+            break;
+        }
         case UnaryOperation::Neg:
         {
             NegFunction(inShape, outShape, *input, *output);
@@ -78,6 +87,11 @@ void RefElementwiseUnaryWorkload::Execute(std::vector<ITensorHandle*> inputs, st
         case UnaryOperation::Rsqrt:
         {
             RsqrtFunction(inShape, outShape, *input, *output);
+            break;
+        }
+        case UnaryOperation::Sin:
+        {
+            SinFunction(inShape, outShape, *input, *output);
             break;
         }
         case UnaryOperation::Sqrt:

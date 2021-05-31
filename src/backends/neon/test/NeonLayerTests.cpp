@@ -1354,9 +1354,21 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(NegNegative, NegNegativeTest<DataType::Float32>)
 
 // Exp
 ARMNN_AUTO_TEST_CASE_WITH_THF(Exp2d, Exp2dTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Exo3d, Exp3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Exp3d, Exp3dTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ExpZero, ExpZeroTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ExpNegative, ExpNegativeTest<DataType::Float32>)
+
+// Log
+ARMNN_AUTO_TEST_CASE_WITH_THF(Log2d, Log2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Log3d, Log3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogZero, LogZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogNegative, LogNegativeTest<DataType::Float32>)
+
+// Sin
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sin2d, Sin2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sin3d, Sin3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SinZero, SinZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SinNegative, SinNegativeTest<DataType::Float32>)
 
 // Fill
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFill, SimpleFillTest<DataType::Float32>)

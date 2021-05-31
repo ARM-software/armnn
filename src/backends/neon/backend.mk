@@ -48,6 +48,7 @@ BACKEND_SOURCES := \
         workloads/NeonGatherWorkload.cpp \
         workloads/NeonInstanceNormalizationWorkload.cpp \
         workloads/NeonL2NormalizationFloatWorkload.cpp \
+        workloads/NeonLogWorkload.cpp \
         workloads/NeonLogicalAndWorkload.cpp \
         workloads/NeonLogicalNotWorkload.cpp \
         workloads/NeonLogicalOrWorkload.cpp \
@@ -71,6 +72,7 @@ BACKEND_SOURCES := \
         workloads/NeonReshapeWorkload.cpp \
         workloads/NeonResizeWorkload.cpp \
         workloads/NeonRsqrtWorkload.cpp \
+        workloads/NeonSinWorkload.cpp \
         workloads/NeonSliceWorkload.cpp \
         workloads/NeonSoftmaxWorkload.cpp \
         workloads/NeonSpaceToBatchNdWorkload.cpp \

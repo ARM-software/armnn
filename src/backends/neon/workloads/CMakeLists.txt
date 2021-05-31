@@ -56,6 +56,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonInstanceNormalizationWorkload.hpp
     NeonL2NormalizationFloatWorkload.cpp
     NeonL2NormalizationFloatWorkload.hpp
+    NeonLogWorkload.cpp
+    NeonLogWorkload.hpp
     NeonLogicalAndWorkload.cpp
     NeonLogicalAndWorkload.hpp
     NeonLogicalNotWorkload.cpp
@@ -103,6 +105,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonResizeWorkload.hpp
     NeonRsqrtWorkload.cpp
     NeonRsqrtWorkload.hpp
+    NeonSinWorkload.cpp
+    NeonSinWorkload.hpp
     NeonSliceWorkload.cpp
     NeonSliceWorkload.hpp
     NeonSoftmaxWorkload.cpp

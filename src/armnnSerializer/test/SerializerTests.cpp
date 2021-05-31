@@ -23,31 +23,6 @@ using armnnDeserializer::IDeserializer;
 
 TEST_SUITE("SerializerTests")
 {
-TEST_CASE("SerializeAbs")
-{
-    const std::string layerName("abs");
-    const armnn::TensorInfo tensorInfo({1, 2, 3}, armnn::DataType::Float32);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const absLayer = network->AddAbsLayer(layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_END
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(absLayer->GetInputSlot(0));
-    absLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-    absLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    CHECK(deserializedNetwork);
-
-    LayerVerifierBase verifier(layerName, {tensorInfo}, {tensorInfo});
-    deserializedNetwork->ExecuteStrategy(verifier);
-}
 
 TEST_CASE("SerializeAddition")
 {
@@ -719,6 +694,51 @@ TEST_CASE("SerializeDeserializeEqual")
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
+void SerializeElementwiseUnaryTest(armnn::UnaryOperation unaryOperation)
+{
+    auto layerName = GetUnaryOperationAsCString(unaryOperation);
+
+    const armnn::TensorShape shape{2, 1, 2, 2};
+
+    const armnn::TensorInfo inputInfo  = armnn::TensorInfo(shape, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo = armnn::TensorInfo(shape, armnn::DataType::Float32);
+
+    armnn::ElementwiseUnaryDescriptor descriptor(unaryOperation);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const elementwiseUnaryLayer =
+                                network->AddElementwiseUnaryLayer(descriptor, layerName);
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(elementwiseUnaryLayer->GetInputSlot(0));
+    elementwiseUnaryLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    elementwiseUnaryLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+
+    CHECK(deserializedNetwork);
+
+    LayerVerifierBaseWithDescriptor<armnn::ElementwiseUnaryDescriptor>
+        verifier(layerName, { inputInfo }, { outputInfo }, descriptor);
+
+    deserializedNetwork->ExecuteStrategy(verifier);
+}
+
+TEST_CASE("SerializeElementwiseUnary")
+{
+    using op = armnn::UnaryOperation;
+    std::initializer_list<op> allUnaryOperations = {op::Abs, op::Exp, op::Sqrt, op::Rsqrt, op::Neg,
+                                                    op::LogicalNot, op::Log, op::Sin};
+
+    for (auto unaryOperation : allUnaryOperations)
+    {
+        SerializeElementwiseUnaryTest(unaryOperation);
+    }
+}
+
 TEST_CASE("SerializeFill")
 {
     const std::string layerName("fill");
@@ -1111,39 +1131,6 @@ TEST_CASE("SerializeLogicalBinary")
 
     LayerVerifierBaseWithDescriptor<armnn::LogicalBinaryDescriptor> verifier(
             layerName, { inputInfo, inputInfo }, { outputInfo }, descriptor);
-    deserializedNetwork->ExecuteStrategy(verifier);
-}
-
-TEST_CASE("SerializeLogicalUnary")
-{
-    const std::string layerName("elementwiseUnaryLogicalNot");
-
-    const armnn::TensorShape shape{2, 1, 2, 2};
-
-    const armnn::TensorInfo inputInfo  = armnn::TensorInfo(shape, armnn::DataType::Boolean);
-    const armnn::TensorInfo outputInfo = armnn::TensorInfo(shape, armnn::DataType::Boolean);
-
-    armnn::ElementwiseUnaryDescriptor descriptor(armnn::UnaryOperation::LogicalNot);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const elementwiseUnaryLayer =
-        network->AddElementwiseUnaryLayer(descriptor, layerName.c_str());
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(elementwiseUnaryLayer->GetInputSlot(0));
-    elementwiseUnaryLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
-    elementwiseUnaryLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-
-    CHECK(deserializedNetwork);
-
-    LayerVerifierBaseWithDescriptor<armnn::ElementwiseUnaryDescriptor> verifier(
-            layerName, { inputInfo }, { outputInfo }, descriptor);
-
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 

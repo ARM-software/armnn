@@ -50,6 +50,7 @@ BACKEND_SOURCES := \
         workloads/ClGatherWorkload.cpp \
         workloads/ClInstanceNormalizationWorkload.cpp \
         workloads/ClL2NormalizationFloatWorkload.cpp \
+        workloads/ClLogWorkload.cpp \
         workloads/ClLogicalAndWorkload.cpp \
         workloads/ClLogicalNotWorkload.cpp \
         workloads/ClLogicalOrWorkload.cpp \
@@ -72,6 +73,7 @@ BACKEND_SOURCES := \
         workloads/ClReshapeWorkload.cpp \
         workloads/ClResizeWorkload.cpp \
         workloads/ClRsqrtWorkload.cpp \
+        workloads/ClSinWorkload.cpp \
         workloads/ClSliceWorkload.cpp \
         workloads/ClSoftmaxWorkload.cpp \
         workloads/ClSpaceToBatchNdWorkload.cpp \

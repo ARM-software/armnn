@@ -36,8 +36,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClDepthwiseConvolutionWorkload.hpp
     ClDequantizeWorkload.cpp
     ClDequantizeWorkload.hpp
-        ClDivisionWorkload.cpp
-        ClDivisionWorkload.hpp
+    ClDivisionWorkload.cpp
+    ClDivisionWorkload.hpp
     ClExpWorkload.cpp
     ClExpWorkload.hpp
     ClFillWorkload.cpp
@@ -50,6 +50,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClGatherWorkload.hpp
     ClInstanceNormalizationWorkload.cpp
     ClInstanceNormalizationWorkload.hpp
+    ClLogWorkload.cpp
+    ClLogWorkload.hpp
     ClL2NormalizationFloatWorkload.cpp
     ClL2NormalizationFloatWorkload.hpp
     ClLogicalAndWorkload.cpp
@@ -97,6 +99,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClResizeWorkload.hpp
     ClRsqrtWorkload.cpp
     ClRsqrtWorkload.hpp
+    ClSinWorkload.cpp
+    ClSinWorkload.hpp
     ClSliceWorkload.cpp
     ClSliceWorkload.hpp
     ClSoftmaxWorkload.cpp

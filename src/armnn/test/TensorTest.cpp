@@ -2,7 +2,7 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <boost/test/unit_test.hpp>
+
 #include <armnn/Tensor.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 

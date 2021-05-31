@@ -349,6 +349,10 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateElementwiseUnary(const Eleme
         }
         case UnaryOperation::Exp:
             return std::make_unique<ClExpWorkload>(descriptor, info, m_CLCompileContext);
+         case UnaryOperation::Log:
+            return std::make_unique<ClLogWorkload>(descriptor, info, m_CLCompileContext);
+        case UnaryOperation::LogicalNot:
+            return std::make_unique<ClLogicalNotWorkload>(descriptor, info, m_CLCompileContext);
         case UnaryOperation::Neg:
             return std::make_unique<ClNegWorkload>(descriptor, info, m_CLCompileContext);
         case UnaryOperation::Rsqrt:
@@ -359,8 +363,8 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateElementwiseUnary(const Eleme
 
             return std::make_unique<ClRsqrtWorkload>(rsqrtQueueDescriptor, info, m_CLCompileContext);
         }
-        case UnaryOperation::LogicalNot:
-            return std::make_unique<ClLogicalNotWorkload>(descriptor, info, m_CLCompileContext);
+        case UnaryOperation::Sin:
+            return std::make_unique<ClSinWorkload>(descriptor, info, m_CLCompileContext);
         default:
             return nullptr;
     }

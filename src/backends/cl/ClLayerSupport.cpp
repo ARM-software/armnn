@@ -42,6 +42,7 @@
 #include "workloads/ClGatherWorkload.hpp"
 #include "workloads/ClInstanceNormalizationWorkload.hpp"
 #include "workloads/ClL2NormalizationFloatWorkload.hpp"
+#include "workloads/ClLogWorkload.hpp"
 #include "workloads/ClLogSoftmaxWorkload.hpp"
 #include "workloads/ClLogicalAndWorkload.hpp"
 #include "workloads/ClLogicalNotWorkload.hpp"
@@ -65,6 +66,7 @@
 #include "workloads/ClReshapeWorkload.hpp"
 #include "workloads/ClResizeWorkload.hpp"
 #include "workloads/ClRsqrtWorkload.hpp"
+#include "workloads/ClSinWorkload.hpp"
 #include "workloads/ClSliceWorkload.hpp"
 #include "workloads/ClSoftmaxWorkload.hpp"
 #include "workloads/ClSpaceToBatchNdWorkload.hpp"
@@ -465,6 +467,16 @@ bool ClLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
                                            reasonIfUnsupported,
                                            input,
                                            output);
+        case UnaryOperation::Log:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(ClLogWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
+        case UnaryOperation::LogicalNot:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(ClLogicalNotWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
         case UnaryOperation::Neg:
             FORWARD_WORKLOAD_VALIDATE_FUNC(ClNegWorkloadValidate,
                                            reasonIfUnsupported,
@@ -475,8 +487,8 @@ bool ClLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
                                            reasonIfUnsupported,
                                            input,
                                            output);
-        case UnaryOperation::LogicalNot:
-            FORWARD_WORKLOAD_VALIDATE_FUNC(ClLogicalNotWorkloadValidate,
+        case UnaryOperation::Sin:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(ClSinWorkloadValidate,
                                            reasonIfUnsupported,
                                            input,
                                            output);

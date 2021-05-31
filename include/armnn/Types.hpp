@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -108,7 +108,9 @@ enum class UnaryOperation
     Sqrt       = 2,
     Rsqrt      = 3,
     Neg        = 4,
-    LogicalNot = 5
+    LogicalNot = 5,
+    Log        = 6,
+    Sin        = 7
 };
 
 enum class PoolingAlgorithm

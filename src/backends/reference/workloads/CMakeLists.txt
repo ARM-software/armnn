@@ -39,6 +39,7 @@ list(APPEND armnnRefBackendWorkloads_sources
     Gather.hpp
     InstanceNorm.cpp
     InstanceNorm.hpp
+    Log.hpp
     LogSoftmax.cpp
     LogSoftmax.hpp
     LstmUtils.hpp
@@ -165,6 +166,7 @@ list(APPEND armnnRefBackendWorkloads_sources
     Resize.cpp
     Resize.hpp
     Rsqrt.hpp
+    Sin.hpp
     Slice.cpp
     Slice.hpp
     Softmax.cpp

@@ -144,6 +144,7 @@ private:
     void ParseResizeBilinear(size_t subgraphIndex, size_t operatorIndex);
     void ParseResizeNearestNeighbor(size_t subgraphIndex, size_t operatorIndex);
     void ParseRsqrt(size_t subgraphIndex, size_t operatorIndex);
+    void ParseShape(size_t subgraphIndex, size_t operatorIndex);
     void ParseSlice(size_t subgraphIndex, size_t operatorIndex);
     void ParseSoftmax(size_t subgraphIndex, size_t operatorIndex);
     void ParseSpaceToBatchND(size_t subgraphIndex, size_t operatorIndex);

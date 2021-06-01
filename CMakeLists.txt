@@ -666,6 +666,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/ResizeNearestNeighbor.cpp
              src/armnnTfLiteParser/test/Softmax.cpp
              src/armnnTfLiteParser/test/SpaceToBatchND.cpp
+             src/armnnTfLiteParser/test/Shape.cpp
              src/armnnTfLiteParser/test/Slice.cpp
              src/armnnTfLiteParser/test/Split.cpp
              src/armnnTfLiteParser/test/SplitV.cpp

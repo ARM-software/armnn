@@ -30,6 +30,7 @@
 #include "Reduce.hpp"
 #include "Resize.hpp"
 #include "Round.hpp"
+#include "Shape.hpp"
 #include "Slice.hpp"
 #include "Softmax.hpp"
 #include "SpaceDepth.hpp"
@@ -805,6 +806,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                                  tfLiteNode,
                                                  nodeIndex,
                                                  armnn::UnaryOperation::Rsqrt);
+        case kTfLiteBuiltinShape:
+            return VisitShapeOperator(delegateData,
+                                      tfLiteContext,
+                                      tfLiteNode,
+                                      nodeIndex,
+                                      kTfLiteBuiltinShape);
         case kTfLiteBuiltinSplit:
             return VisitSplitOperator(delegateData,
                                       tfLiteContext,

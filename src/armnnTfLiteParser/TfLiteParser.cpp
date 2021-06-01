@@ -648,6 +648,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_RESIZE_BILINEAR]         = &TfLiteParserImpl::ParseResizeBilinear;
     m_ParserFunctions[tflite::BuiltinOperator_RESIZE_NEAREST_NEIGHBOR] = &TfLiteParserImpl::ParseResizeNearestNeighbor;
     m_ParserFunctions[tflite::BuiltinOperator_RSQRT]                   = &TfLiteParserImpl::ParseRsqrt;
+    m_ParserFunctions[tflite::BuiltinOperator_SHAPE]                   = &TfLiteParserImpl::ParseShape;
     m_ParserFunctions[tflite::BuiltinOperator_SLICE]                   = &TfLiteParserImpl::ParseSlice;
     m_ParserFunctions[tflite::BuiltinOperator_SOFTMAX]                 = &TfLiteParserImpl::ParseSoftmax;
     m_ParserFunctions[tflite::BuiltinOperator_SPACE_TO_BATCH_ND]       = &TfLiteParserImpl::ParseSpaceToBatchND;
@@ -1635,6 +1636,41 @@ armnn::TensorInfo TfLiteParserImpl::OutputShapeOfSqueeze(const std::vector<uint3
     outTensorInfo.SetShape(outShape);
 
     return outTensorInfo;
+}
+
+void TfLiteParserImpl::ParseShape(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = fmt::format("Shape:{}:{}", subgraphIndex, operatorIndex);
+
+    IConnectableLayer* layer = m_Network->AddShapeLayer(layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+
+
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    // Check if output tensor type is Signed32 or Signed64
+    if (outputTensorInfo.GetDataType() != armnn::DataType::Signed32 &&
+        outputTensorInfo.GetDataType() != armnn::DataType::Signed64)
+    {
+        throw ParseException(
+            fmt::format(
+                "Output tensor data type is not supported. (Supported types: Signed32 & Signed64) {}",
+                CHECK_LOCATION().AsString()));
+    }
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, outputTensorIndexes);
 }
 
 void TfLiteParserImpl::ParseSqueeze(size_t subgraphIndex, size_t operatorIndex)

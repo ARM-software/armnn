@@ -42,6 +42,7 @@ list(APPEND armnnDelegate_sources
         src/Reduce.hpp
         src/Resize.hpp
         src/Round.hpp
+        src/Shape.hpp
         src/Slice.hpp
         src/Softmax.hpp
         src/SpaceDepth.hpp
@@ -170,6 +171,8 @@ if(BUILD_UNIT_TESTS)
         src/test/SoftmaxTestHelper.hpp
         src/test/SpaceDepthTest.cpp
         src/test/SpaceDepthTestHelper.hpp
+        src/test/ShapeTest.cpp
+        src/test/ShapeTestHelper.hpp
         src/test/SliceTest.cpp
         src/test/SliceTestHelper.hpp
         src/test/SplitTest.cpp

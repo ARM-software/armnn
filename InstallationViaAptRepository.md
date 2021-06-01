@@ -94,7 +94,7 @@ In order to check for the latest available Arm NN version use apt-cache search:
 ```
  apt-cache search libarmnn
 
- # This returns a list of matching packages, the latest being libarmnn23 i.e. ARMNN_MAJOR_VERSION=23
+ # This returns a list of matching packages including versions from previous releases
  libarmnn-cpuref-backend23 - Arm NN is an inference engine for CPUs, GPUs and NPUs
  libarmnn-cpuref-backend24 - Arm NN is an inference engine for CPUs, GPUs and NPUs
  libarmnn-dev - Arm NN is an inference engine for CPUs, GPUs and NPUs
@@ -103,6 +103,7 @@ In order to check for the latest available Arm NN version use apt-cache search:
  libarmnntfliteparser24 - Arm NN is an inference engine for CPUs, GPUs and NPUs # Note: removal of dash to suit debian naming conventions
  libarmnn23 - Arm NN is an inference engine for CPUs, GPUs and NPUs
  libarmnn24 - Arm NN is an inference engine for CPUs, GPUs and NPUs
+ libarmnn25 - Arm NN is an inference engine for CPUs, GPUs and NPUs
  libarmnn-aclcommon23 - Arm NN is an inference engine for CPUs, GPUs and NPUs
  libarmnnaclcommon24 - Arm NN is an inference engine for CPUs, GPUs and NPUs # Note: removal of dash to suit debian naming conventions
  libarmnn-cpuacc-backend23 - Arm NN is an inference engine for CPUs, GPUs and NPUs
@@ -111,8 +112,8 @@ In order to check for the latest available Arm NN version use apt-cache search:
  libarmnn-gpuacc-backend24 - Arm NN is an inference engine for CPUs, GPUs and NPUs
 
 
- # Export the ARMNN_MAJOR_VERSION to allow installation using the below examples
- export ARMNN_MAJOR_VERSION=24
+ # Export the ARMNN_MAJOR_VERSION to the latest visible e.g. libarmnn25 to allow installation using the below examples
+ export ARMNN_MAJOR_VERSION=25
 ```
 
 
@@ -123,7 +124,7 @@ The easiest way to install all of the available packages for your systems archit
  sudo apt-get install -y python3-pyarmnn libarmnn-cpuacc-backend${ARMNN_MAJOR_VERSION} libarmnn-gpuacc-backend${ARMNN_MAJOR_VERSION} libarmnn-cpuref-backend${ARMNN_MAJOR_VERSION}
  # Verify installation via python:
  python3 -c "import pyarmnn as ann;print(ann.GetVersion())" 
- # Returns '{ARMNN_MAJOR_VERSION}.0.0' e.g. 24.0.0
+ # Returns '{ARMNN_MAJOR_VERSION}.0.0' e.g. 25.0.0
 ```
 This will install PyArmNN and the three backends for Neon, Compute Library and our Reference Backend.
 It will also install their dependencies including the arm-compute-library package along with the Tensorflow Lite Parser
@@ -131,7 +132,11 @@ and it's dependency Arm NN Core.
 If the user does not wish to use PyArmNN they can go up a level of dependencies and instead just install the
 Tensorflow Lite Parser:
 ```
-  sudo apt-get install -y libarmnntfliteparser${ARMNN_MAJOR_VERSION} libarmnn-gpuacc-backend${ARMNN_MAJOR_VERSION}
+  # As the Tensorflow Lite Parser is now ABI stable it will have a different version to ARMNN_MAJOR_VERSION please choose latest version:
+  apt-cache search libarmnntfliteparser
+  # Returns e.g. libarmnntfliteparser24 so we then export that version, for reference this comes from include/armnnTfLiteParser/Version.hpp:
+  export TFLITE_PARSER_VERSION=24
+  sudo apt-get install -y libarmnntfliteparser${TFLITE_PARSER_VERSION} libarmnn-cpuacc-backend${ARMNN_MAJOR_VERSION}
 ```
 
 ## Uninstall packages

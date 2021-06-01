@@ -54,14 +54,10 @@ LayerTestResult<T, 2> Pad2dTestCommon(
         },
         qScale, qOffset);
 
-    auto inputTensor = MakeTensor<T, 2>(inputTensorInfo, std::vector<T>(inputValues));
-
-    LayerTestResult<T, 2> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, std::vector<T>(expectedOutputValues));
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
-
 
     armnn::PadQueueDescriptor descriptor;
 
@@ -81,14 +77,17 @@ LayerTestResult<T, 2> Pad2dTestCommon(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), inputValues.data());
 
     workload->PostAllocationConfigure();
     workload->Execute();
 
-    CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return result;
+    return LayerTestResult<T, 2>(actualOutput,
+                                 expectedOutputValues,
+                                 outputHandle->GetShape(),
+                                 outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T>
@@ -140,14 +139,10 @@ LayerTestResult<T, 3> Pad3dTestCommon(
        },
        qScale, qOffset);
 
-    auto inputTensor = MakeTensor<T, 3>(inputTensorInfo, std::vector<T>(inputValues));
-
-    LayerTestResult<T, 3> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, std::vector<T>(expectedOutputValues));
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
-
 
     armnn::PadQueueDescriptor descriptor;
 
@@ -167,14 +162,17 @@ LayerTestResult<T, 3> Pad3dTestCommon(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), inputValues.data());
 
     workload->PostAllocationConfigure();
     workload->Execute();
 
-    CopyDataFromITensorHandle(&result.output[0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return result;
+    return LayerTestResult<T, 3>(actualOutput,
+                                 expectedOutputValues,
+                                 outputHandle->GetShape(),
+                                 outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T>
@@ -380,10 +378,7 @@ LayerTestResult<T, 4> Pad4dTestCommon(
         },
         qScale, qOffset);
 
-    auto inputTensor = MakeTensor<T, 4>(inputTensorInfo, std::vector<T>(inputValues));
-
-    LayerTestResult<T, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, std::vector<T>(expectedOutputValues));
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
@@ -407,14 +402,17 @@ LayerTestResult<T, 4> Pad4dTestCommon(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), inputValues.data());
 
     workload->PostAllocationConfigure();
     workload->Execute();
 
-    CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return result;
+    return LayerTestResult<T, 4>(actualOutput,
+                                 expectedOutputValues,
+                                 outputHandle->GetShape(),
+                                 outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T>
@@ -453,10 +451,7 @@ LayerTestResult<T, 2> PadQAsymmTestCommon(
             p, p, p, p, p, p, p
         };
 
-    auto inputTensor = MakeTensor<T, 2>(inputTensorInfo, std::vector<T>(inputValues));
-
-    LayerTestResult<T, 2> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, std::vector<T>(expectedOutputValues));
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
@@ -480,14 +475,17 @@ LayerTestResult<T, 2> PadQAsymmTestCommon(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), inputValues.data());
 
     workload->PostAllocationConfigure();
     workload->Execute();
 
-    CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return result;
+    return LayerTestResult<T, 2>(actualOutput,
+                                 expectedOutputValues,
+                                 outputHandle->GetShape(),
+                                 outputTensorInfo.GetShape());
 }
 
 //

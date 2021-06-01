@@ -33,11 +33,8 @@ LayerTestResult<T, OutputDim> GatherTestImpl(
     const std::vector<T>& outputData)
 {
     IgnoreUnused(memoryManager);
-    auto params  = MakeTensor<T, ParamsDim>(paramsInfo, paramsData);
-    auto indices = MakeTensor<int32_t, IndicesDim>(indicesInfo, indicesData);
 
-    LayerTestResult<T, OutputDim> result(outputInfo);
-    result.outputExpected = MakeTensor<T, OutputDim>(outputInfo, outputData);
+    std::vector<T> actualOutput(outputInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> paramsHandle = tensorHandleFactory.CreateTensorHandle(paramsInfo);
     std::unique_ptr<armnn::ITensorHandle> indicesHandle = tensorHandleFactory.CreateTensorHandle(indicesInfo);
@@ -55,14 +52,17 @@ LayerTestResult<T, OutputDim> GatherTestImpl(
     indicesHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(paramsHandle.get(), params.origin());
-    CopyDataToITensorHandle(indicesHandle.get(), indices.origin());
+    CopyDataToITensorHandle(paramsHandle.get(), paramsData.data());
+    CopyDataToITensorHandle(indicesHandle.get(), indicesData.data());
 
     workload->Execute();
 
-    CopyDataFromITensorHandle(result.output.origin(), outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return result;
+    return LayerTestResult<T, OutputDim>(actualOutput,
+                                         outputData,
+                                         outputHandle->GetShape(),
+                                         outputInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>

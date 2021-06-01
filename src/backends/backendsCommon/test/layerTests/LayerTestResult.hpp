@@ -8,38 +8,56 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/utility/Assert.hpp>
 
-#include <boost/multi_array.hpp>
-
 #include <cstddef>
-
-template <std::size_t n>
-boost::array<unsigned int, n> GetTensorShapeAsArray(const armnn::TensorInfo& tensorInfo)
-{
-    ARMNN_ASSERT_MSG(n == tensorInfo.GetNumDimensions(),
-        "Attempting to construct a shape array of mismatching size");
-
-    boost::array<unsigned int, n> shape;
-    for (unsigned int i = 0; i < n; i++)
-    {
-        shape[i] = tensorInfo.GetShape()[i];
-    }
-    return shape;
-}
+#include <vector>
 
 template <typename T, std::size_t n>
 struct LayerTestResult
 {
     LayerTestResult(const armnn::TensorInfo& outputInfo)
+        : m_Supported(true)
+        , m_CompareBoolean(false)
     {
-        auto shape( GetTensorShapeAsArray<n>(outputInfo) );
-        output.resize(shape);
-        outputExpected.resize(shape);
-        supported = true;
-        compareBoolean = false;
+        m_ActualData.reserve(outputInfo.GetNumElements());
+        m_ExpectedData.reserve(outputInfo.GetNumElements());
+        m_ActualShape = outputInfo.GetShape();
+        m_ExpectedShape = outputInfo.GetShape();
     }
 
-    boost::multi_array<T, n> output;
-    boost::multi_array<T, n> outputExpected;
-    bool supported;
-    bool compareBoolean;
+    LayerTestResult(const std::vector<T>& actualData,
+                    const std::vector<T>& expectedData,
+                    const armnn::TensorShape& actualShape,
+                    const armnn::TensorShape& expectedShape)
+        : m_ActualData(actualData)
+        , m_ExpectedData(expectedData)
+        , m_ActualShape(actualShape)
+        , m_ExpectedShape(expectedShape)
+        , m_Supported(true)
+        , m_CompareBoolean(false)
+    {}
+
+    LayerTestResult(const std::vector<T>& actualData,
+                    const std::vector<T>& expectedData,
+                    const armnn::TensorShape& actualShape,
+                    const armnn::TensorShape& expectedShape,
+                    const bool compareBoolean)
+        : m_ActualData(actualData)
+        , m_ExpectedData(expectedData)
+        , m_ActualShape(actualShape)
+        , m_ExpectedShape(expectedShape)
+        , m_Supported(true)
+        , m_CompareBoolean(compareBoolean)
+    {}
+
+    std::vector<T> m_ActualData;
+    std::vector<T> m_ExpectedData;
+    armnn::TensorShape m_ActualShape;
+    armnn::TensorShape m_ExpectedShape;
+
+    bool m_Supported;
+    bool m_CompareBoolean;
 };
+
+
+
+

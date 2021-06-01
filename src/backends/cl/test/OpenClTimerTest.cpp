@@ -55,22 +55,22 @@ BOOST_AUTO_TEST_CASE(OpenClTimerBatchNorm)
     TensorInfo outputTensorInfo({num, channels, height, width}, DataType::Float32);
     TensorInfo tensorInfo({channels}, DataType::Float32);
 
-    auto input = MakeTensor<float, 4>(inputTensorInfo,
-        {
-             1.f, 4.f,
-             4.f, 2.f,
-             1.f, 6.f,
+    std::vector<float> input =
+    {
+         1.f, 4.f,
+         4.f, 2.f,
+         1.f, 6.f,
 
-             1.f, 1.f,
-             4.f, 1.f,
-            -2.f, 4.f
-        });
+         1.f, 1.f,
+         4.f, 1.f,
+        -2.f, 4.f
+    };
 
     // these values are per-channel of the input
-    auto mean     = MakeTensor<float, 1>(tensorInfo, { 3.f, -2.f });
-    auto variance = MakeTensor<float, 1>(tensorInfo, { 4.f,  9.f });
-    auto beta     = MakeTensor<float, 1>(tensorInfo, { 3.f,  2.f });
-    auto gamma    = MakeTensor<float, 1>(tensorInfo, { 2.f,  1.f });
+    std::vector<float> mean     = { 3.f, -2.f };
+    std::vector<float> variance = { 4.f,  9.f };
+    std::vector<float> beta     = { 3.f,  2.f };
+    std::vector<float> gamma    = { 2.f,  1.f };
 
     ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
@@ -84,10 +84,10 @@ BOOST_AUTO_TEST_CASE(OpenClTimerBatchNorm)
     ScopedTensorHandle betaTensor(tensorInfo);
     ScopedTensorHandle gammaTensor(tensorInfo);
 
-    AllocateAndCopyDataToITensorHandle(&meanTensor, &mean[0]);
-    AllocateAndCopyDataToITensorHandle(&varianceTensor, &variance[0]);
-    AllocateAndCopyDataToITensorHandle(&betaTensor, &beta[0]);
-    AllocateAndCopyDataToITensorHandle(&gammaTensor, &gamma[0]);
+    AllocateAndCopyDataToITensorHandle(&meanTensor, mean.data());
+    AllocateAndCopyDataToITensorHandle(&varianceTensor, variance.data());
+    AllocateAndCopyDataToITensorHandle(&betaTensor, beta.data());
+    AllocateAndCopyDataToITensorHandle(&gammaTensor, gamma.data());
 
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(OpenClTimerBatchNorm)
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), input.data());
 
     OpenClTimer openClTimer;
 

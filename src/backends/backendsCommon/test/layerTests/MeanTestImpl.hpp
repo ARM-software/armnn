@@ -40,11 +40,10 @@ LayerTestResult<T, OutputDim> MeanTestHelper(
     outputTensorInfo.SetQuantizationScale(scale);
     outputTensorInfo.SetQuantizationOffset(offset);
 
-    auto input = MakeTensor<T, InputDim>(inputTensorInfo, ConvertToDataType<ArmnnType>(inputData, inputTensorInfo));
+    auto input = ConvertToDataType<ArmnnType>(inputData, inputTensorInfo);
 
-    LayerTestResult<T, OutputDim> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<T, OutputDim>(
-            outputTensorInfo, ConvertToDataType<ArmnnType>(outputData, outputTensorInfo));
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
+    std::vector<T> expectedOutput = ConvertToDataType<ArmnnType>(outputData, outputTensorInfo);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
@@ -61,14 +60,17 @@ LayerTestResult<T, OutputDim> MeanTestHelper(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), input.origin());
+    CopyDataToITensorHandle(inputHandle.get(), input.data());
 
     workload->PostAllocationConfigure();
     workload->Execute();
 
-    CopyDataFromITensorHandle(result.output.origin(), outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return result;
+    return LayerTestResult<T, OutputDim>(actualOutput,
+                                         expectedOutput,
+                                         outputHandle->GetShape(),
+                                         outputTensorInfo.GetShape());
 }
 
 } // anonymous namespace

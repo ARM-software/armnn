@@ -5,19 +5,18 @@
 #pragma once
 
 #include "PredicateResult.hpp"
+
 #include <armnn/Tensor.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnnUtils/FloatingPointComparison.hpp>
 
 #include <QuantizeHelper.hpp>
 
-#include <boost/multi_array.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
-#include <boost/random/mersenne_twister.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <array>
 #include <cmath>
+#include <random>
 #include <vector>
 
 constexpr float g_FloatCloseToZeroTolerance = 1.0e-6f;
@@ -70,56 +69,91 @@ bool SelectiveCompareBoolean(T a, T b)
     return (((a == 0) && (b == 0)) || ((a != 0) && (b != 0)));
 };
 
-template <typename T, std::size_t n>
-armnn::PredicateResult CompareTensors(const boost::multi_array<T, n>& a,
-                                                   const boost::multi_array<T, n>& b,
-                                                   bool compareBoolean = false,
-                                                   bool isDynamic = false)
+template <typename T>
+armnn::PredicateResult CompareTensors(const std::vector<T>& actualData,
+                                      const std::vector<T>& expectedData,
+                                      const armnn::TensorShape& actualShape,
+                                      const armnn::TensorShape& expectedShape,
+                                      bool compareBoolean = false,
+                                      bool isDynamic = false)
 {
+    if (actualData.size() != expectedData.size())
+    {
+        armnn::PredicateResult res(false);
+        res.Message() << "Different data size ["
+                      << actualData.size()
+                      << "!="
+                      << expectedData.size()
+                      << "]";
+        return res;
+    }
+
+    if (actualShape.GetNumDimensions() != expectedShape.GetNumDimensions())
+    {
+        armnn::PredicateResult res(false);
+        res.Message() << "Different number of dimensions ["
+                      << actualShape.GetNumDimensions()
+                      << "!="
+                      << expectedShape.GetNumDimensions()
+                      << "]";
+        return res;
+    }
+
+    if (actualShape.GetNumElements() != expectedShape.GetNumElements())
+    {
+        armnn::PredicateResult res(false);
+        res.Message() << "Different number of elements ["
+                      << actualShape.GetNumElements()
+                      << "!="
+                      << expectedShape.GetNumElements()
+                      << "]";
+        return res;
+    }
+
+    unsigned int numberOfDimensions = actualShape.GetNumDimensions();
+
     if (!isDynamic)
     {
         // Checks they are same shape.
-        for (unsigned int i = 0;
-             i < n;
-             i++)
+        for (unsigned int i = 0; i < numberOfDimensions; ++i)
         {
-            if (a.shape()[i] != b.shape()[i])
+            if (actualShape[i] != expectedShape[i])
             {
                 armnn::PredicateResult res(false);
                 res.Message() << "Different shapes ["
-                              << a.shape()[i]
+                              << actualShape[i]
                               << "!="
-                              << b.shape()[i]
+                              << expectedShape[i]
                               << "]";
                 return res;
             }
         }
     }
 
-    // Now compares element-wise.
-
     // Fun iteration over n dimensions.
-    std::array<unsigned int, n> indices;
-    for (unsigned int i = 0; i < n; i++)
+    std::vector<unsigned int> indices;
+    for (unsigned int i = 0; i < numberOfDimensions; i++)
     {
-        indices[i] = 0;
+        indices.emplace_back(0);
     }
 
     std::stringstream errorString;
     int numFailedElements = 0;
     constexpr int maxReportedDifferences = 3;
+    unsigned int index = 0;
 
+    // Compare data element by element.
     while (true)
     {
         bool comparison;
         // As true for uint8_t is non-zero (1-255) we must have a dedicated compare for Booleans.
         if(compareBoolean)
         {
-            comparison = SelectiveCompareBoolean(a(indices), b(indices));
+            comparison = SelectiveCompareBoolean(actualData[index], expectedData[index]);
         }
         else
         {
-            comparison = SelectiveCompare(a(indices), b(indices));
+            comparison = SelectiveCompare(actualData[index], expectedData[index]);
         }
 
         if (!comparison)
@@ -133,34 +167,35 @@ armnn::PredicateResult CompareTensors(const boost::multi_array<T, n>& a,
                     errorString << ", ";
                 }
                 errorString << "[";
-                for (unsigned int i = 0; i < n; ++i)
+                for (unsigned int i = 0; i < numberOfDimensions; ++i)
                 {
                     errorString << indices[i];
-                    if (i != n - 1)
+                    if (i != numberOfDimensions - 1)
                     {
                         errorString << ",";
                     }
                 }
                 errorString << "]";
 
-                errorString << " (" << +a(indices) << " != " << +b(indices) << ")";
+                errorString << " (" << +actualData[index] << " != " << +expectedData[index] << ")";
             }
         }
 
-        ++indices[n - 1];
-        for (unsigned int i=n-1; i>0; i--)
+        ++indices[numberOfDimensions - 1];
+        for (unsigned int i=numberOfDimensions-1; i>0; i--)
         {
-            if (indices[i] == a.shape()[i])
+            if (indices[i] == actualShape[i])
             {
                 indices[i] = 0;
                 ++indices[i - 1];
             }
         }
-
-        if (indices[0] == a.shape()[0])
+        if (indices[0] == actualShape[0])
         {
             break;
         }
+
+        index++;
     }
 
     armnn::PredicateResult comparisonResult(true);
@@ -178,64 +213,14 @@ armnn::PredicateResult CompareTensors(const boost::multi_array<T, n>& a,
     return comparisonResult;
 }
 
-
-// Creates a boost::multi_array with the shape defined by the given TensorInfo.
-template <typename T, std::size_t n>
-boost::multi_array<T, n> MakeTensor(const armnn::TensorInfo& tensorInfo)
+template <typename T>
+std::vector<T> MakeRandomTensor(const armnn::TensorInfo& tensorInfo,
+                                unsigned int seed,
+                                float        min = -10.0f,
+                                float        max = 10.0f)
 {
-    std::array<unsigned int, n> shape;
-
-    for (unsigned int i = 0; i < n; i++)
-    {
-        shape[i] = tensorInfo.GetShape()[i];
-    }
-
-    return boost::multi_array<T, n>(shape);
-}
-
-// Creates a boost::multi_array with the shape defined by the given TensorInfo and contents defined by the given vector.
-template <typename T, std::size_t n>
-boost::multi_array<T, n> MakeTensor(
-    const armnn::TensorInfo& tensorInfo, const std::vector<T>& flat, bool isDynamic = false)
-{
-    if (!isDynamic)
-    {
-        ARMNN_ASSERT_MSG(flat.size() == tensorInfo.GetNumElements(), "Wrong number of components supplied to tensor");
-    }
-
-    std::array<unsigned int, n> shape;
-
-    // NOTE: tensorInfo.GetNumDimensions() might be different from n
-    const unsigned int returnDimensions = static_cast<unsigned int>(n);
-    const unsigned int actualDimensions = tensorInfo.GetNumDimensions();
-
-    const unsigned int paddedDimensions =
-        returnDimensions > actualDimensions ? returnDimensions - actualDimensions : 0u;
-
-    for (unsigned int i = 0u; i < returnDimensions; i++)
-    {
-        if (i < paddedDimensions)
-        {
-            shape[i] = 1u;
-        }
-        else
-        {
-            shape[i] = tensorInfo.GetShape()[i - paddedDimensions];
-        }
-    }
-
-    boost::const_multi_array_ref<T, n> arrayRef(&flat[0], shape);
-    return boost::multi_array<T, n>(arrayRef);
-}
-
-template <typename T, std::size_t n>
-boost::multi_array<T, n> MakeRandomTensor(const armnn::TensorInfo& tensorInfo,
-                                          unsigned int seed,
-                                          float        min = -10.0f,
-                                          float        max = 10.0f)
-{
-    boost::random::mt19937                          gen(seed);
-    boost::random::uniform_real_distribution<float> dist(min, max);
+    std::mt19937 gen(seed);
+    std::uniform_real_distribution<float> dist(min, max);
 
     std::vector<float> init(tensorInfo.GetNumElements());
     for (unsigned int i = 0; i < init.size(); i++)
@@ -246,5 +231,5 @@ boost::multi_array<T, n> MakeRandomTensor(const armnn::TensorInfo& tensorInfo,
     const float   qScale  = tensorInfo.GetQuantizationScale();
     const int32_t qOffset = tensorInfo.GetQuantizationOffset();
 
-    return MakeTensor<T, n>(tensorInfo, armnnUtils::QuantizedVector<T>(init, qScale, qOffset));
+    return armnnUtils::QuantizedVector<T>(init, qScale, qOffset);
 }

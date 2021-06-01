@@ -40,12 +40,9 @@ LayerTestResult<T, OutDim> StridedSliceTestImpl(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    boost::multi_array<T, InDim> input =
-        MakeTensor<T, InDim>(inputTensorInfo, armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset));
-
-    LayerTestResult<T, OutDim> ret(outputTensorInfo);
-    ret.outputExpected =
-        MakeTensor<T, OutDim>(outputTensorInfo, armnnUtils::QuantizedVector<T>(outputExpectedData, qScale, qOffset));
+    std::vector<T> input = armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset);
+    std::vector<T> expectedOutput = armnnUtils::QuantizedVector<T>(outputExpectedData, qScale, qOffset);
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle =
         tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
@@ -66,9 +63,12 @@ LayerTestResult<T, OutDim> StridedSliceTestImpl(
 
     ExecuteWorkload(*workload, memoryManager);
 
-    CopyDataFromITensorHandle(ret.output.data(), outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return ret;
+    return LayerTestResult<T, OutDim>(actualOutput,
+                                      expectedOutput,
+                                      outputHandle->GetShape(),
+                                      outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>

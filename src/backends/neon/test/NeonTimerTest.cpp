@@ -63,10 +63,6 @@ BOOST_AUTO_TEST_CASE(NeonTimerMeasure)
     armnn::TensorInfo outputTensorInfo({ outputBatchSize, outputChannels, outputHeight, outputWidth },
         armnn::DataType::Float32);
 
-    LayerTestResult<float, 4> result(inputTensorInfo);
-
-    auto input = MakeTensor<float, 4>(inputTensorInfo, inputData);
-
     ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -87,7 +83,7 @@ BOOST_AUTO_TEST_CASE(NeonTimerMeasure)
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), inputData.data());
 
     NeonTimer neonTimer;
     // Start the timer.

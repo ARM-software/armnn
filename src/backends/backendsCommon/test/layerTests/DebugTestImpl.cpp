@@ -40,12 +40,10 @@ LayerTestResult<T, Dim> DebugTestImpl(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    boost::multi_array<T, Dim> input =
-        MakeTensor<T, Dim>(inputTensorInfo, armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset));
+    std::vector<T> input = armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset);
 
-    LayerTestResult<T, Dim> ret(outputTensorInfo);
-    ret.outputExpected =
-        MakeTensor<T, Dim>(outputTensorInfo, armnnUtils::QuantizedVector<T>(outputExpectedData, qScale, qOffset));
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
+    std::vector<T> expectedOutput = armnnUtils::QuantizedVector<T>(outputExpectedData, qScale, qOffset);
 
     ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
@@ -73,9 +71,12 @@ LayerTestResult<T, Dim> DebugTestImpl(
 
     BOOST_TEST(oss.str() == expectedStringOutput);
 
-    CopyDataFromITensorHandle(ret.output.data(), outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return ret;
+    return LayerTestResult<T, Dim>(actualOutput,
+                                   expectedOutput,
+                                   outputHandle->GetShape(),
+                                   outputTensorInfo.GetShape());
 }
 
 template <armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>

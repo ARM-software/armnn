@@ -193,12 +193,12 @@ void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::ve
     }
 
     // Allocates storage for the output tensors to be written to and sets up the armnn output tensors.
-    std::map<std::string, boost::multi_array<T, NumOutputDimensions>> outputStorage;
+    std::map<std::string, std::vector<T>> outputStorage;
     armnn::OutputTensors outputTensors;
     for (auto&& it : expectedOutputData)
     {
         armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(it.first);
-        outputStorage.emplace(it.first, MakeTensor<T, NumOutputDimensions>(bindingInfo.second));
+        outputStorage.emplace(it.first, std::vector<T>(bindingInfo.second.GetNumElements()));
         outputTensors.push_back(
             { bindingInfo.first, armnn::Tensor(bindingInfo.second, outputStorage.at(it.first).data()) });
     }
@@ -252,15 +252,16 @@ void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::ve
             }
         }
 
-        auto outputExpected = MakeTensor<T, NumOutputDimensions>(bindingInfo.second, it.second);
+        auto outputExpected = it.second;
+        auto shape = bindingInfo.second.GetShape();
         if (std::is_same<T, uint8_t>::value)
         {
-            auto result = CompareTensors(outputExpected, outputStorage[it.first], true);
+            auto result = CompareTensors(outputExpected, outputStorage[it.first], shape, shape, true);
             BOOST_TEST(result.m_Result, result.m_Message.str());
         }
         else
         {
-            auto result = CompareTensors(outputExpected, outputStorage[it.first]);
+            auto result = CompareTensors(outputExpected, outputStorage[it.first], shape, shape);
             BOOST_TEST(result.m_Result, result.m_Message.str());
         }
     }

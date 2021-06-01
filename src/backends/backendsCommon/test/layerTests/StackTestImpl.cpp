@@ -33,14 +33,13 @@ LayerTestResult<T, outputDimLength> StackTestHelper(
 {
     IgnoreUnused(memoryManager);
     unsigned int numInputs = static_cast<unsigned int>(inputData.size());
-    std::vector<boost::multi_array<T, outputDimLength-1>> inputs;
+    std::vector<std::vector<T>> inputs;
     for (unsigned int i = 0; i < numInputs; ++i)
     {
-        inputs.push_back(MakeTensor<T, outputDimLength-1>(inputTensorInfo, inputData[i]));
+        inputs.emplace_back(inputData[i]);
     }
 
-    LayerTestResult<T, outputDimLength> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<T, outputDimLength>(outputTensorInfo, outputExpectedData);
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
 
     std::vector<std::unique_ptr<armnn::ITensorHandle>> inputHandles;
     for (unsigned int i = 0; i < numInputs; ++i)
@@ -60,7 +59,7 @@ LayerTestResult<T, outputDimLength> StackTestHelper(
         std::unique_ptr<armnn::ITensorHandle>& inputHandle = inputHandles[i];
         AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
         inputHandle->Allocate();
-        CopyDataToITensorHandle(inputHandle.get(), inputs[i].origin());
+        CopyDataToITensorHandle(inputHandle.get(), inputs[i].data());
     }
 
     AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
@@ -70,9 +69,12 @@ LayerTestResult<T, outputDimLength> StackTestHelper(
 
     workload->Execute();
 
-    CopyDataFromITensorHandle(result.output.origin(), outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return result;
+    return LayerTestResult<T, outputDimLength>(actualOutput,
+                                               outputExpectedData,
+                                               outputHandle->GetShape(),
+                                               outputTensorInfo.GetShape());
 }
 
 } // anonymous namespace

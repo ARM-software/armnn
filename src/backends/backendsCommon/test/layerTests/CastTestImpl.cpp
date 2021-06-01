@@ -31,10 +31,7 @@ LayerTestResult<TOutput, 4> CastTest(armnn::IWorkloadFactory& workloadFactory,
         outputTensorInfo.SetQuantizationOffset(quantizationOffset);
     }
 
-    auto input = MakeTensor<TInput, 4>(inputTensorInfo, inputValues);
-
-    LayerTestResult<TOutput, 4> ret(outputTensorInfo);
-    ret.outputExpected = MakeTensor<TOutput, 4>(outputTensorInfo, outputValues);
+    std::vector<TOutput> actualOutput(outputTensorInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
@@ -49,13 +46,16 @@ LayerTestResult<TOutput, 4> CastTest(armnn::IWorkloadFactory& workloadFactory,
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), inputValues.data());
 
     workload->Execute();
 
-    CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return ret;
+    return LayerTestResult<TOutput, 4>(actualOutput,
+                                       outputValues,
+                                       outputHandle->GetShape(),
+                                       outputTensorInfo.GetShape());
 }
 
 LayerTestResult<float, 4> CastInt32ToFloat2dTest(armnn::IWorkloadFactory& workloadFactory,

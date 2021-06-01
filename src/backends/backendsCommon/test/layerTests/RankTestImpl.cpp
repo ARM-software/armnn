@@ -14,7 +14,7 @@
 template<typename T, std::size_t n>
 LayerTestResult<int32_t, 1> RankTest(
         armnn::TensorInfo inputTensorInfo,
-        boost::multi_array<T, n> input,
+        std::vector<T> input,
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory)
@@ -24,8 +24,8 @@ LayerTestResult<int32_t, 1> RankTest(
     const armnn::TensorShape outputShape{armnn::Dimensionality::Scalar};
     armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Signed32);
 
-    LayerTestResult<int32_t , 1> ret(outputTensorInfo);
-    ret.outputExpected = MakeTensor<uint32_t, 1>(outputTensorInfo, { n });
+    std::vector<int32_t> actualOutput(outputTensorInfo.GetNumElements());
+    std::vector<int32_t> expectedOutput = { n };
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
@@ -40,13 +40,16 @@ LayerTestResult<int32_t, 1> RankTest(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), input.origin());
+    CopyDataToITensorHandle(inputHandle.get(), input.data());
 
     workload->Execute();
 
-    CopyDataFromITensorHandle(&ret.output[0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return ret;
+    return LayerTestResult<int32_t, 1>(actualOutput,
+                                       expectedOutput,
+                                       outputHandle->GetShape(),
+                                       outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T>
@@ -56,9 +59,7 @@ LayerTestResult<int32_t, 1> RankDimSize1Test(
         const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo({6}, ArmnnType, 1.0f, 0);
-    auto input = MakeTensor<T, 1>(inputTensorInfo, ConvertToDataType<ArmnnType>(
-            { -37.5f, -15.2f, -8.76f, -2.0f, -1.3f, -0.5f },
-            inputTensorInfo));
+    auto input = ConvertToDataType<ArmnnType>({ -37.5f, -15.2f, -8.76f, -2.0f, -1.3f, -0.5f }, inputTensorInfo);
 
     return RankTest<T, 1>(inputTensorInfo, input, workloadFactory, memoryManager, tensorHandleFactory);
 }
@@ -70,9 +71,7 @@ LayerTestResult<int32_t, 1> RankDimSize2Test(
         const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo({1, 3}, ArmnnType, 1.0f, 0);
-    auto input = MakeTensor<T, 2>(inputTensorInfo, ConvertToDataType<ArmnnType>(
-            { -37.5f, -15.2f, -8.76f },
-            inputTensorInfo));
+    auto input = ConvertToDataType<ArmnnType>({ -37.5f, -15.2f, -8.76f }, inputTensorInfo);
 
     return RankTest<T, 2>(inputTensorInfo, input, workloadFactory, memoryManager, tensorHandleFactory);
 }
@@ -84,9 +83,7 @@ LayerTestResult<int32_t, 1> RankDimSize3Test(
         const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo({1, 3, 2}, ArmnnType, 1.0f, 0);
-    auto input = MakeTensor<T, 3>(inputTensorInfo, ConvertToDataType<ArmnnType>(
-            { -37.5f, -15.2f, -8.76f, -2.0f, -1.5f, -1.3f},
-            inputTensorInfo));
+    auto input = ConvertToDataType<ArmnnType>({ -37.5f, -15.2f, -8.76f, -2.0f, -1.5f, -1.3f}, inputTensorInfo);
 
     return RankTest<T, 3>(inputTensorInfo, input, workloadFactory, memoryManager, tensorHandleFactory);
 }
@@ -98,10 +95,10 @@ LayerTestResult<int32_t, 1> RankDimSize4Test(
         const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     armnn::TensorInfo inputTensorInfo({1, 3, 2, 3}, ArmnnType, 1.0f, 0);
-    auto input = MakeTensor<T, 4>(inputTensorInfo, ConvertToDataType<ArmnnType>(
+    auto input = ConvertToDataType<ArmnnType>(
             { -37.5f, -15.2f, -8.76f, -2.0f, -1.5f, -1.3f, -0.5f, -0.4f, 0.0f,
               1.0f, 0.4f, 0.5f, 1.3f, 1.5f, 2.0f, 8.76f, 15.2f, 37.5f },
-            inputTensorInfo));
+            inputTensorInfo);
 
     return RankTest<T, 4>(inputTensorInfo, input, workloadFactory, memoryManager, tensorHandleFactory);
 }

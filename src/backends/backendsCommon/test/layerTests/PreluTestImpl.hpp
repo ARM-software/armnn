@@ -61,22 +61,18 @@ LayerTestResult<T, 4> PreluTest(
        0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, -2.0f, 0.0f, -2.0f, -4.0f
     };
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo,
-                                  armnnUtils::QuantizedVector<T>(inputData,
-                                                                 inputTensorInfo.GetQuantizationScale(),
-                                                                 inputTensorInfo.GetQuantizationOffset()));
+    std::vector<T> input = armnnUtils::QuantizedVector<T>(inputData,
+                                                          inputTensorInfo.GetQuantizationScale(),
+                                                          inputTensorInfo.GetQuantizationOffset());
 
-    auto alpha = MakeTensor<T, 4>(alphaTensorInfo,
-                                  armnnUtils::QuantizedVector<T>(alphaData,
+    std::vector<T> alpha = armnnUtils::QuantizedVector<T>(alphaData,
                                                                  alphaTensorInfo.GetQuantizationScale(),
-                                                                 alphaTensorInfo.GetQuantizationOffset()));
+                                                                 alphaTensorInfo.GetQuantizationOffset());
 
-    LayerTestResult<T, 4> result(outputTensorInfo);
-    result.outputExpected =
-        MakeTensor<T, 4>(outputTensorInfo,
-                         armnnUtils::QuantizedVector<T>(outputExpectedData,
-                                                        outputTensorInfo.GetQuantizationScale(),
-                                                        outputTensorInfo.GetQuantizationOffset()));
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
+    std::vector<T> expectedOutput = armnnUtils::QuantizedVector<T>(outputExpectedData,
+                                                                   outputTensorInfo.GetQuantizationScale(),
+                                                                   outputTensorInfo.GetQuantizationOffset());
 
     std::unique_ptr <armnn::ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr <armnn::ITensorHandle> alphaHandle  = tensorHandleFactory.CreateTensorHandle(alphaTensorInfo);
@@ -94,12 +90,15 @@ LayerTestResult<T, 4> PreluTest(
     alphaHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
-    CopyDataToITensorHandle(alphaHandle.get(), &alpha[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), input.data());
+    CopyDataToITensorHandle(alphaHandle.get(), alpha.data());
 
     workload->Execute();
 
-    CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return result;
+    return LayerTestResult<T, 4>(actualOutput,
+                                 expectedOutput,
+                                 outputHandle->GetShape(),
+                                 outputTensorInfo.GetShape());
 }

@@ -20,6 +20,7 @@
 
 #include <fmt/format.h>
 
+#include <vector>
 
 using armnnDeserializer::IDeserializer;
 using TensorRawPtr = armnnSerializer::TensorInfo*;
@@ -218,14 +219,14 @@ void ParserFlatbuffersSerializeFixture::RunTest(
     }
 
     // Allocate storage for the output tensors to be written to and setup the armnn output tensors.
-    std::map<std::string, boost::multi_array<OutputDataType, NumOutputDimensions>> outputStorage;
+    std::map<std::string, std::vector<OutputDataType>> outputStorage;
     armnn::OutputTensors outputTensors;
     for (auto&& it : expectedOutputData)
     {
         armnn::BindingPointInfo bindingInfo = ConvertBindingInfo(
             m_Parser->GetNetworkOutputBindingInfo(layersId, it.first));
         armnn::VerifyTensorInfoDataType(bindingInfo.second, ArmnnOutputType);
-        outputStorage.emplace(it.first, MakeTensor<OutputDataType, NumOutputDimensions>(bindingInfo.second));
+        outputStorage.emplace(it.first, std::vector<OutputDataType>(bindingInfo.second.GetNumElements()));
         outputTensors.push_back(
                 { bindingInfo.first, armnn::Tensor(bindingInfo.second, outputStorage.at(it.first).data()) });
     }
@@ -237,8 +238,9 @@ void ParserFlatbuffersSerializeFixture::RunTest(
     {
         armnn::BindingPointInfo bindingInfo = ConvertBindingInfo(
             m_Parser->GetNetworkOutputBindingInfo(layersId, it.first));
-        auto outputExpected = MakeTensor<OutputDataType, NumOutputDimensions>(bindingInfo.second, it.second);
-        auto result = CompareTensors(outputExpected, outputStorage[it.first]);
+        auto outputExpected = it.second;
+        auto result = CompareTensors(outputExpected, outputStorage[it.first],
+                                     bindingInfo.second.GetShape(), bindingInfo.second.GetShape());
         BOOST_TEST(result.m_Result, result.m_Message.str());
     }
 }

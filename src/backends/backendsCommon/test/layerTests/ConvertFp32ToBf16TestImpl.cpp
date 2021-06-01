@@ -20,8 +20,9 @@ LayerTestResult<armnn::BFloat16, 4> ConvertFp32ToBf16Test(
     const armnn::TensorInfo inputTensorInfo({1, 2, 4, 3}, armnn::DataType::Float32);
     const armnn::TensorInfo outputTensorInfo({1, 2, 4, 3}, armnn::DataType::BFloat16);
 
-    auto input = MakeTensor<float, 4>(inputTensorInfo,
-        { -37.5f, -15.2f, -8.76f,
+    std::vector<float> input =
+        {
+          -37.5f, -15.2f, -8.76f,
           -2.0f, -1.5f, -1.3f,
           -0.5f, -0.4f, 0.0f,
           1.0f, 0.4f, 0.5f,
@@ -33,13 +34,13 @@ LayerTestResult<armnn::BFloat16, 4> ConvertFp32ToBf16Test(
           -3.8f, // 0xC0733333 Round down
           -3.1055E+29f, // 0xF07ADC3C Round up
           -9.149516E-10f // 0xB07B7FFF Round down
-        });
+        };
 
-    std::vector<armnn::BFloat16> outputValues = armnnUtils::QuantizedVector<armnn::BFloat16>(
+    std::vector<armnn::BFloat16> expectedOutput = armnnUtils::QuantizedVector<armnn::BFloat16>(
         {
-            -37.5f, -15.2f, -8.76f,
-            -2.0f, -1.5f, -1.3f,
-            -0.5f, -0.4f, 0.0f,
+          -37.5f, -15.2f, -8.76f,
+          -2.0f, -1.5f, -1.3f,
+          -0.5f, -0.4f, 0.0f,
           1.0f, 0.4f, 0.5f,
           1.3f, 1.5f, 2.0f,
           8.76f, 15.2f, 37.5f,
@@ -52,8 +53,7 @@ LayerTestResult<armnn::BFloat16, 4> ConvertFp32ToBf16Test(
         },
         1.0f, 0);
 
-    LayerTestResult<armnn::BFloat16, 4> ret(outputTensorInfo);
-    ret.outputExpected = MakeTensor<armnn::BFloat16, 4>(outputTensorInfo, outputValues);
+    std::vector<armnn::BFloat16> actualOutput(outputTensorInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
@@ -68,11 +68,15 @@ LayerTestResult<armnn::BFloat16, 4> ConvertFp32ToBf16Test(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), input.data());
 
     workload->Execute();
 
-    CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return ret;
+    return LayerTestResult<armnn::BFloat16, 4>(actualOutput,
+                                               expectedOutput,
+                                               outputHandle->GetShape(),
+                                               outputTensorInfo.GetShape());
+
 }

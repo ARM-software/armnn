@@ -183,8 +183,8 @@ LayerTestResult<T, 4> TransposeConvolution2dTest(
 
     // execute test
     TransposeConvolution2dTestImpl(workloadFactory,
-                                                             memoryManager,
-                                                             tensorHandleFactory,
+                                   memoryManager,
+                                   tensorHandleFactory,
                                    descriptor,
                                    input,
                                    output,
@@ -193,11 +193,10 @@ LayerTestResult<T, 4> TransposeConvolution2dTest(
 
     // construct result object
     LayerTestResult<T, 4> testResult(outputInfo);
-    testResult.output         = MakeTensor<T, 4>(outputInfo, output.second);
-    testResult.outputExpected = MakeTensor<T, 4>(outputInfo,
-                                                 armnnUtils::QuantizedVector<T>(expectedOutputData,
-                                                                                outputInfo.GetQuantizationScale(),
-                                                                                outputInfo.GetQuantizationOffset()));
+    testResult.m_ActualData = output.second;
+    testResult.m_ExpectedData = armnnUtils::QuantizedVector<T>(expectedOutputData,
+                                                               outputInfo.GetQuantizationScale(),
+                                                               outputInfo.GetQuantizationOffset());
 
     return testResult;
 }
@@ -611,6 +610,8 @@ LayerTestResult<uint8_t, 4> TransposeConvolution2dPerAxisQuantTest(
 
     std::vector<int32_t> biasData = { -12, -8 };
 
+    std::vector<uint8_t> actualOutput(outputInfo.GetNumElements());
+
     std::vector<uint8_t> expectedOutputData =
     {
          9,  13,  21,  19,  27,
@@ -665,11 +666,12 @@ LayerTestResult<uint8_t, 4> TransposeConvolution2dPerAxisQuantTest(
 
     ExecuteWorkload(*workload, memoryManager);
 
-    LayerTestResult<uint8_t, 4> ret(outputInfo);
-    CopyDataFromITensorHandle(ret.output.origin(), outputHandle.get());
-    ret.outputExpected = MakeTensor<uint8_t, 4>(outputInfo, expectedOutputData);
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return ret;
+    return LayerTestResult<uint8_t, 4>(actualOutput,
+                                       expectedOutputData,
+                                       outputHandle->GetShape(),
+                                       outputInfo.GetShape());
 }
 
 //

@@ -293,7 +293,7 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
     FillInputTensors<armnnType1>(inputTensors, inputData, subgraphId);
 
     // Allocate storage for the output tensors to be written to and setup the armnn output tensors.
-    std::map<std::string, boost::multi_array<DataType2, NumOutputDimensions>> outputStorage;
+    std::map<std::string, std::vector<DataType2>> outputStorage;
     armnn::OutputTensors outputTensors;
     for (auto&& it : expectedOutputData)
     {
@@ -309,7 +309,7 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
                         it.first));
 
         armnn::VerifyTensorInfoDataType(outputTensorInfo, armnnType2);
-        outputStorage.emplace(it.first, MakeTensor<DataType2, NumOutputDimensions>(outputTensorInfo));
+        outputStorage.emplace(it.first, std::vector<DataType2>(outputTensorInfo.GetNumElements()));
         outputTensors.push_back(
                 { outputBindingId, armnn::Tensor(outputTensorInfo, outputStorage.at(it.first).data()) });
     }
@@ -320,8 +320,10 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
     for (auto&& it : expectedOutputData)
     {
         armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first);
-        auto outputExpected = MakeTensor<DataType2, NumOutputDimensions>(bindingInfo.second, it.second, isDynamic);
-        auto result = CompareTensors(outputExpected, outputStorage[it.first], false, isDynamic);
+        auto outputExpected = it.second;
+        auto result = CompareTensors(outputExpected, outputStorage[it.first],
+                                     bindingInfo.second.GetShape(), bindingInfo.second.GetShape(),
+                                     false, isDynamic);
         BOOST_TEST(result.m_Result, result.m_Message.str());
     }
 }
@@ -393,7 +395,7 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
     FillInputTensors<inputType2>(inputTensors, input2Data, subgraphId);
 
     // Allocate storage for the output tensors to be written to and setup the armnn output tensors.
-    std::map<std::string, boost::multi_array<DataType2, NumOutputDimensions>> outputStorage;
+    std::map<std::string, std::vector<DataType2>> outputStorage;
     armnn::OutputTensors outputTensors;
     for (auto&& it : expectedOutputData)
     {
@@ -409,7 +411,7 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
                         it.first));
 
         armnn::VerifyTensorInfoDataType(outputTensorInfo, outputType);
-        outputStorage.emplace(it.first, MakeTensor<DataType2, NumOutputDimensions>(outputTensorInfo));
+        outputStorage.emplace(it.first, std::vector<DataType2>(outputTensorInfo.GetNumElements()));
         outputTensors.push_back(
                 { outputBindingId, armnn::Tensor(outputTensorInfo, outputStorage.at(it.first).data()) });
     }
@@ -420,8 +422,9 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
     for (auto&& it : expectedOutputData)
     {
         armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first);
-        auto outputExpected = MakeTensor<DataType2, NumOutputDimensions>(bindingInfo.second, it.second);
-        auto result = CompareTensors(outputExpected, outputStorage[it.first], false);
+        auto outputExpected = it.second;
+        auto result = CompareTensors(outputExpected, outputStorage[it.first],
+                                     bindingInfo.second.GetShape(), bindingInfo.second.GetShape(), false);
         BOOST_TEST(result.m_Result, result.m_Message.str());
     }
 }

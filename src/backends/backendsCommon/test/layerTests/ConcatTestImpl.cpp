@@ -428,9 +428,9 @@ LayerTestResult<T, 1> Concat1dTestImpl(
 {
     TensorInfo inputTensorInfo({ 3 }, ArmnnType, qScale, qOffset);
 
-    auto input0 = MakeTensor<T, 1>(inputTensorInfo, QuantizedVector<T>({ 1.0f, 2.0f, 3.0f }, qScale, qOffset));
-    auto input1 = MakeTensor<T, 1>(inputTensorInfo, QuantizedVector<T>({ 4.0f, 5.0f, 6.0f }, qScale, qOffset));
-    auto input2 = MakeTensor<T, 1>(inputTensorInfo, QuantizedVector<T>({ 7.0f, 8.0f, 9.0f }, qScale, qOffset));
+    auto input0 = QuantizedVector<T>({ 1.0f, 2.0f, 3.0f }, qScale, qOffset);
+    auto input1 = QuantizedVector<T>({ 4.0f, 5.0f, 6.0f }, qScale, qOffset);
+    auto input2 = QuantizedVector<T>({ 7.0f, 8.0f, 9.0f }, qScale, qOffset);
 
     TensorInfo outputTensorInfo({ 9 }, ArmnnType, qScale, qOffset);
 
@@ -446,12 +446,12 @@ LayerTestResult<T, 1> Concat1dTestImpl(
                    0,
                    true);
 
-    result.output         = MakeTensor<T, 1>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 1>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ActualData   = output;
+    result.m_ExpectedData = QuantizedVector<T>(
         {
             1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -468,7 +468,7 @@ LayerTestResult<T, 2> Concat2dTestImpl(
 {
     TensorInfo inputTensorInfo({ 2, 3 }, ArmnnType, qScale, qOffset);
 
-    auto input0 = MakeTensor<T, 2>(inputTensorInfo, QuantizedVector<T>(
+    auto input0 = QuantizedVector<T>(
         {
             // Batch 0
             1.0f, 2.0f, 3.0f,
@@ -476,9 +476,9 @@ LayerTestResult<T, 2> Concat2dTestImpl(
             // Batch 1
             10.0f, 11.0f, 12.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
-    auto input1 = MakeTensor<T, 2>(inputTensorInfo, QuantizedVector<T>(
+    auto input1 = QuantizedVector<T>(
          {
             // Batch 0
             4.0f, 5.0f, 6.0f,
@@ -486,9 +486,9 @@ LayerTestResult<T, 2> Concat2dTestImpl(
             // Batch 1
             13.0f, 14.0f, 15.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
-    auto input2 = MakeTensor<T, 2>(inputTensorInfo, QuantizedVector<T>(
+    auto input2 = QuantizedVector<T>(
         {
             // Batch 0
             7.0f, 8.0f, 9.0f,
@@ -496,7 +496,7 @@ LayerTestResult<T, 2> Concat2dTestImpl(
             // Batch 1
             16.0f, 17.0f, 18.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     LayerTestResult<T, 2> result(outputTensorInfo);
 
@@ -510,7 +510,7 @@ LayerTestResult<T, 2> Concat2dTestImpl(
                    dimension,
                    true);
 
-    result.output = MakeTensor<T, 2>(outputTensorInfo, output);
+    result.m_ActualData = output;
     return result;
 }
 
@@ -527,7 +527,7 @@ LayerTestResult<T, 2> Concat2dDim0TestImpl(
     LayerTestResult<T, 2> result = Concat2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, tensorHandleFactory, outputTensorInfo, 0, qScale, qOffset);
 
-    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ExpectedData = QuantizedVector<T>(
         {
             // Batch 0
             1.0f, 2.0f, 3.0f,
@@ -547,7 +547,7 @@ LayerTestResult<T, 2> Concat2dDim0TestImpl(
             // Batch 5
             16.0f, 17.0f, 18.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -565,7 +565,7 @@ LayerTestResult<T, 2> Concat2dDim1TestImpl(
     LayerTestResult<T, 2> result = Concat2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, tensorHandleFactory, outputTensorInfo, 1, qScale, qOffset);
 
-    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ExpectedData = QuantizedVector<T>(
         {
             // Batch 0
             1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f,
@@ -573,7 +573,7 @@ LayerTestResult<T, 2> Concat2dDim1TestImpl(
             // Batch 1
             10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -587,7 +587,7 @@ LayerTestResult<T, 2> Concat2dDim0DiffInputDimsTestImpl(
     int32_t qOffset)
 {
     TensorInfo input0TensorInfo({ 2, 3 }, ArmnnType, qScale, qOffset);
-    auto input0 = MakeTensor<T, 2>(input0TensorInfo, QuantizedVector<T>(
+    auto input0 = QuantizedVector<T>(
         {
             // Batch 0
             1.0f, 2.0f, 3.0f,
@@ -595,10 +595,10 @@ LayerTestResult<T, 2> Concat2dDim0DiffInputDimsTestImpl(
             // Batch 1
             10.0f, 11.0f, 12.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo input1TensorInfo({ 3, 3 }, ArmnnType, qScale, qOffset);
-    auto input1 = MakeTensor<T, 2>(input1TensorInfo, QuantizedVector<T>(
+    auto input1 = QuantizedVector<T>(
         {
             // Batch 0
             4.0f, 5.0f, 6.0f,
@@ -609,15 +609,15 @@ LayerTestResult<T, 2> Concat2dDim0DiffInputDimsTestImpl(
             // Batch 0
             7.0f, 8.0f, 9.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo input2TensorInfo({ 1, 3 }, ArmnnType, qScale, qOffset);
-    auto input2 = MakeTensor<T, 2>(input2TensorInfo, QuantizedVector<T>(
+    auto input2 = QuantizedVector<T>(
         {
             // Batch 1
             16.0f, 17.0f, 18.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo outputTensorInfo({ 6, 3 }, ArmnnType, qScale, qOffset);
     LayerTestResult<T, 2> result(outputTensorInfo);
@@ -632,8 +632,8 @@ LayerTestResult<T, 2> Concat2dDim0DiffInputDimsTestImpl(
                    0,
                    true);
 
-    result.output = MakeTensor<T, 2>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ActualData = output;
+    result.m_ExpectedData = QuantizedVector<T>(
         {
             // Batch 0
             1.0f, 2.0f, 3.0f,
@@ -653,7 +653,7 @@ LayerTestResult<T, 2> Concat2dDim0DiffInputDimsTestImpl(
             // Batch 5
             16.0f, 17.0f, 18.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -667,7 +667,7 @@ LayerTestResult<T, 2> Concat2dDim1DiffInputDimsTestImpl(
     int32_t qOffset)
 {
     TensorInfo input0TensorInfo({ 2, 3 }, ArmnnType, qScale, qOffset);
-    auto input0 = MakeTensor<T, 2>(input0TensorInfo, QuantizedVector<T>(
+    auto input0 = QuantizedVector<T>(
         {
             // Batch 0
             1.0f, 2.0f, 3.0f,
@@ -675,10 +675,10 @@ LayerTestResult<T, 2> Concat2dDim1DiffInputDimsTestImpl(
             // Batch 1
             10.0f, 11.0f, 12.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo input1TensorInfo({ 2, 5 }, ArmnnType, qScale, qOffset);
-    auto input1 = MakeTensor<T, 2>(input1TensorInfo, QuantizedVector<T>(
+    auto input1 = QuantizedVector<T>(
         {
             // Batch 0
             4.0f, 5.0f, 6.0f, 7.0f, 8.0f,
@@ -686,10 +686,10 @@ LayerTestResult<T, 2> Concat2dDim1DiffInputDimsTestImpl(
             // Batch 1
             13.0f, 14.0f, 15.0f, 16.0f, 17.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo input2TensorInfo({ 2, 1 }, ArmnnType, qScale, qOffset);
-    auto input2 = MakeTensor<T, 2>(input2TensorInfo, QuantizedVector<T>(
+    auto input2 = QuantizedVector<T>(
         {
             // Batch 0
             9.0f,
@@ -697,7 +697,7 @@ LayerTestResult<T, 2> Concat2dDim1DiffInputDimsTestImpl(
             // Batch 1
             18.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo outputTensorInfo({ 2, 9 }, ArmnnType, qScale, qOffset);
     LayerTestResult<T, 2> result(outputTensorInfo);
@@ -712,8 +712,8 @@ LayerTestResult<T, 2> Concat2dDim1DiffInputDimsTestImpl(
                    1,
                    true);
 
-    result.output = MakeTensor<T, 2>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ActualData = output;
+    result.m_ExpectedData = QuantizedVector<T>(
         {
             // Batch 0
             1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f,
@@ -721,7 +721,7 @@ LayerTestResult<T, 2> Concat2dDim1DiffInputDimsTestImpl(
             // Batch 1
             10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -739,7 +739,7 @@ LayerTestResult<T, 3> Concat3dTestImpl(
 {
     TensorInfo inputTensorInfo({ 2, 3, 2 }, ArmnnType, qScale, qOffset);
 
-    auto input0 = MakeTensor<T, 3>(inputTensorInfo, QuantizedVector<T>(
+    auto input0 = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             1.0f, 2.0f,
@@ -759,9 +759,9 @@ LayerTestResult<T, 3> Concat3dTestImpl(
             // Batch 1, Channel 2
             23.0f, 24.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
-    auto input1 = MakeTensor<T, 3>(inputTensorInfo, QuantizedVector<T>(
+    auto input1 = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             7.0f, 8.0f,
@@ -781,9 +781,9 @@ LayerTestResult<T, 3> Concat3dTestImpl(
             // Batch 1, Channel 2
             29.0f, 30.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
-    auto input2 = MakeTensor<T, 3>(inputTensorInfo, QuantizedVector<T>(
+    auto input2 = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             13.0f, 14.0f,
@@ -803,7 +803,7 @@ LayerTestResult<T, 3> Concat3dTestImpl(
             // Batch 1, Channel 2
             35.0f, 36.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     LayerTestResult<T, 3> result(outputTensorInfo);
 
@@ -817,7 +817,7 @@ LayerTestResult<T, 3> Concat3dTestImpl(
                    dimension,
                    useSubtensor);
 
-    result.output = MakeTensor<T, 3>(outputTensorInfo, output);
+    result.m_ActualData = output;
     return result;
 }
 
@@ -834,7 +834,7 @@ LayerTestResult<T, 3> Concat3dDim0TestImpl(
     LayerTestResult<T, 3> result = Concat3dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, tensorHandleFactory, outputTensorInfo, 0, true, qScale, qOffset);
 
-    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ExpectedData = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             1.0f, 2.0f,
@@ -890,7 +890,7 @@ LayerTestResult<T, 3> Concat3dDim0TestImpl(
             // Batch 5, Channel 2
             35.0f, 36.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -908,7 +908,7 @@ LayerTestResult<T, 3> Concat3dDim1TestImpl(
     LayerTestResult<T, 3> result = Concat3dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, tensorHandleFactory, outputTensorInfo, 1, true, qScale, qOffset);
 
-    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ExpectedData = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             1.0f, 2.0f,
@@ -964,7 +964,7 @@ LayerTestResult<T, 3> Concat3dDim1TestImpl(
             // Batch 1, Channel 8
             35.0f, 36.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -983,7 +983,7 @@ LayerTestResult<T, 3> Concat3dDim2TestImpl(
     LayerTestResult<T, 3> result = Concat3dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, tensorHandleFactory, outputTensorInfo, 2, useSubtensor, qScale, qOffset);
 
-    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ExpectedData = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             1.0f, 2.0f, 7.0f, 8.0f, 13.0f, 14.0f,
@@ -1003,7 +1003,7 @@ LayerTestResult<T, 3> Concat3dDim2TestImpl(
             // Batch 1, Channel 2
             23.0f, 24.0f, 29.0f, 30.0f, 35.0f, 36.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -1017,7 +1017,7 @@ LayerTestResult<T, 3> Concat3dDim0DiffInputDimsTestImpl(
     int32_t qOffset)
 {
     TensorInfo input0TensorInfo({ 2, 3, 2 }, ArmnnType);
-    auto input0 = MakeTensor<T, 3>(input0TensorInfo, QuantizedVector<T>(
+    auto input0 = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             1.0f, 2.0f,
@@ -1037,10 +1037,10 @@ LayerTestResult<T, 3> Concat3dDim0DiffInputDimsTestImpl(
             // Batch 1, Channel 2
             23.0f, 24.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo input1TensorInfo({ 1, 3, 2 }, ArmnnType);
-    auto input1 = MakeTensor<T, 3>(input1TensorInfo, QuantizedVector<T>(
+    auto input1 = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             7.0f, 8.0f,
@@ -1051,10 +1051,10 @@ LayerTestResult<T, 3> Concat3dDim0DiffInputDimsTestImpl(
             // Batch 0, Channel 2
             11.0f, 12.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo input2TensorInfo({ 3, 3, 2 }, ArmnnType);
-    auto input2 = MakeTensor<T, 3>(input2TensorInfo, QuantizedVector<T>(
+    auto input2 = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             25.0f, 26.0f,
@@ -1083,7 +1083,7 @@ LayerTestResult<T, 3> Concat3dDim0DiffInputDimsTestImpl(
             // Batch 2, Channel 2
             35.0f, 36.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo outputTensorInfo({ 6, 3, 2 }, ArmnnType);
     LayerTestResult<T, 3> result(outputTensorInfo);
@@ -1098,8 +1098,8 @@ LayerTestResult<T, 3> Concat3dDim0DiffInputDimsTestImpl(
                    0,
                    true);
 
-    result.output = MakeTensor<T, 3>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ActualData = output;
+    result.m_ExpectedData = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             1.0f, 2.0f,
@@ -1155,7 +1155,7 @@ LayerTestResult<T, 3> Concat3dDim0DiffInputDimsTestImpl(
             // Batch 5, Channel 2
             35.0f, 36.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -1169,7 +1169,7 @@ LayerTestResult<T, 3> Concat3dDim1DiffInputDimsTestImpl(
     int32_t qOffset)
 {
     TensorInfo input0TensorInfo({ 2, 3, 2 }, ArmnnType, qScale, qOffset);
-    auto input0 = MakeTensor<T, 3>(input0TensorInfo, QuantizedVector<T>(
+    auto input0 = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             1.0f, 2.0f,
@@ -1189,10 +1189,10 @@ LayerTestResult<T, 3> Concat3dDim1DiffInputDimsTestImpl(
             // Batch 1, Channel 2
             23.0f, 24.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo input1TensorInfo({ 2, 4, 2 }, ArmnnType, qScale, qOffset);
-    auto input1 = MakeTensor<T, 3>(input1TensorInfo, QuantizedVector<T>(
+    auto input1 = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             7.0f, 8.0f,
@@ -1218,10 +1218,10 @@ LayerTestResult<T, 3> Concat3dDim1DiffInputDimsTestImpl(
             // Batch 1, Channel 3
             15.0f, 16.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo input2TensorInfo({ 2, 1, 2 }, ArmnnType, qScale, qOffset);
-    auto input2 = MakeTensor<T, 3>(input2TensorInfo, QuantizedVector<T>(
+    auto input2 = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             17.0f, 18.0f,
@@ -1229,7 +1229,7 @@ LayerTestResult<T, 3> Concat3dDim1DiffInputDimsTestImpl(
             // Batch 1, Channel 0
             31.0f, 32.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo outputTensorInfo({ 2, 8, 2 }, ArmnnType, qScale, qOffset);
     LayerTestResult<T, 3> result(outputTensorInfo);
@@ -1244,8 +1244,8 @@ LayerTestResult<T, 3> Concat3dDim1DiffInputDimsTestImpl(
                    1,
                    true);
 
-    result.output = MakeTensor<T, 3>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ActualData = output;
+    result.m_ExpectedData = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             1.0f, 2.0f,
@@ -1295,7 +1295,7 @@ LayerTestResult<T, 3> Concat3dDim1DiffInputDimsTestImpl(
             // Batch 1, Channel 7
             31.0f, 32.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -1310,7 +1310,7 @@ LayerTestResult<T, 3> Concat3dDim2DiffInputDimsTestImpl(
     int32_t qOffset)
 {
     TensorInfo input0TensorInfo({ 2, 3, 2 }, ArmnnType, qScale, qOffset);
-    auto input0 = MakeTensor<T, 3>(input0TensorInfo, QuantizedVector<T>(
+    auto input0 = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             1.0f, 2.0f,
@@ -1330,10 +1330,10 @@ LayerTestResult<T, 3> Concat3dDim2DiffInputDimsTestImpl(
             // Batch 1, Channel 2
             23.0f, 24.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo input1TensorInfo({ 2, 3, 1 }, ArmnnType, qScale, qOffset);
-    auto input1 = MakeTensor<T, 3>(input1TensorInfo, QuantizedVector<T>(
+    auto input1 = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             7.0f,
@@ -1353,10 +1353,10 @@ LayerTestResult<T, 3> Concat3dDim2DiffInputDimsTestImpl(
             // Batch 1, Channel 2
             29.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo input2TensorInfo({ 2, 3, 3 }, ArmnnType, qScale, qOffset);
-    auto input2 = MakeTensor<T, 3>(input2TensorInfo, QuantizedVector<T>(
+    auto input2 = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             13.0f, 14.0f, 50.0f,
@@ -1376,7 +1376,7 @@ LayerTestResult<T, 3> Concat3dDim2DiffInputDimsTestImpl(
             // Batch 1, Channel 2
             35.0f, 36.0f, 55.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo outputTensorInfo({ 2, 3, 6 }, ArmnnType, qScale, qOffset);
     LayerTestResult<T, 3> result(outputTensorInfo);
@@ -1391,8 +1391,8 @@ LayerTestResult<T, 3> Concat3dDim2DiffInputDimsTestImpl(
                    2,
                    useSubtensor);
 
-    result.output = MakeTensor<T, 3>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ActualData = output;
+    result.m_ExpectedData = QuantizedVector<T>(
         {
             // Batch 0, Channel 0
             1.0f, 2.0f, 7.0f, 13.0f, 14.0f, 50.0f,
@@ -1412,7 +1412,7 @@ LayerTestResult<T, 3> Concat3dDim2DiffInputDimsTestImpl(
             // Batch 1, Channel 2
             23.0f, 24.0f, 29.0f, 35.0f, 36.0f, 55.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -1430,7 +1430,7 @@ LayerTestResult<T, 4> Concat4dTestImpl(
 {
     TensorInfo inputTensorInfo({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
 
-    auto input0 = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(
+    auto input0 = QuantizedVector<T>(
         {
              1.0f,  2.0f,
              3.0f,  4.0f,
@@ -1439,9 +1439,9 @@ LayerTestResult<T, 4> Concat4dTestImpl(
              9.0f, 10.0f,
             11.0f, 12.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
-    auto input1 = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(
+    auto input1 = QuantizedVector<T>(
         {
             11.0f, 12.0f,
             13.0f, 14.0f,
@@ -1450,9 +1450,9 @@ LayerTestResult<T, 4> Concat4dTestImpl(
             19.0f, 20.0f,
             21.0f, 22.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
-    auto input2 = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(
+    auto input2 = QuantizedVector<T>(
         {
             21.0f, 22.0f,
             23.0f, 24.0f,
@@ -1461,7 +1461,7 @@ LayerTestResult<T, 4> Concat4dTestImpl(
             29.0f, 30.0f,
             31.0f, 32.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     LayerTestResult<T, 4> result(outputTensorInfo);
 
@@ -1478,7 +1478,7 @@ LayerTestResult<T, 4> Concat4dTestImpl(
                    dimension,
                    useSubtensor);
 
-    result.output = MakeTensor<T, 4>(outputTensorInfo, output);
+    result.m_ActualData = output;
     return result;
 }
 
@@ -1495,7 +1495,7 @@ LayerTestResult<T, 4> Concat4dDim0TestImpl(
     LayerTestResult<T, 4> result = Concat4dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, tensorHandleFactory, outputTensorInfo, 0, true, qScale, qOffset);
 
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ExpectedData = QuantizedVector<T>(
         {
              1.0f,  2.0f,
              3.0f,  4.0f,
@@ -1518,7 +1518,7 @@ LayerTestResult<T, 4> Concat4dDim0TestImpl(
             29.0f, 30.0f,
             31.0f, 32.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -1536,7 +1536,7 @@ LayerTestResult<T, 4> Concat4dDim1TestImpl(
     LayerTestResult<T, 4> result = Concat4dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, tensorHandleFactory, outputTensorInfo, 1, true, qScale, qOffset);
 
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ExpectedData = QuantizedVector<T>(
         {
              1.0f,  2.0f,
              3.0f,  4.0f,
@@ -1559,7 +1559,7 @@ LayerTestResult<T, 4> Concat4dDim1TestImpl(
             29.0f, 30.0f,
             31.0f, 32.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -1577,7 +1577,7 @@ LayerTestResult<T, 4> Concat4dDim2TestImpl(
     LayerTestResult<T, 4> result = Concat4dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, tensorHandleFactory, outputTensorInfo, 2, true, qScale, qOffset);
 
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ExpectedData = QuantizedVector<T>(
         {
              1.0f,  2.0f,
              3.0f,  4.0f,
@@ -1600,7 +1600,7 @@ LayerTestResult<T, 4> Concat4dDim2TestImpl(
             29.0f, 30.0f,
             31.0f, 32.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -1619,7 +1619,7 @@ LayerTestResult<T, 4> Concat4dDim3TestImpl(
     LayerTestResult<T, 4> result = Concat4dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, tensorHandleFactory, outputTensorInfo, 3, useSubtensor, qScale, qOffset);
 
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ExpectedData = QuantizedVector<T>(
         {
              1.0f,  2.0f,
             11.0f, 12.0f,
@@ -1642,7 +1642,7 @@ LayerTestResult<T, 4> Concat4dDim3TestImpl(
             21.0f, 22.0f,
             31.0f, 32.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -1658,7 +1658,7 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim0TestImpl(
     constexpr unsigned int dimension = 0u;
 
     TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
-    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(
+    auto input0 = QuantizedVector<T>(
         {
              1.0f,  2.0f,
              3.0f,  4.0f,
@@ -1667,11 +1667,11 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim0TestImpl(
              9.0f, 10.0f,
             11.0f, 12.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo inputTensorInfo1({ 2, 3, 2, 2 }, ArmnnType, qScale, qOffset);
 
-    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(
+    auto input1 = QuantizedVector<T>(
         {
             11.0f, 12.0f,
             13.0f, 14.0f,
@@ -1687,7 +1687,7 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim0TestImpl(
             29.0f, 30.0f,
             31.0f, 32.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo outputTensorInfo({ 3, 3, 2, 2 }, ArmnnType, qScale, qOffset);
 
@@ -1705,8 +1705,8 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim0TestImpl(
                    dimension,
                    true);
 
-    result.output = MakeTensor<T, 4>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ActualData = output;
+    result.m_ExpectedData = QuantizedVector<T>(
         {
              1.0f, 2.0f,
              3.0f, 4.0f,
@@ -1729,7 +1729,7 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim0TestImpl(
             29.0f, 30.0f,
             31.0f, 32.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -1745,7 +1745,7 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim1TestImpl(
     constexpr unsigned int dimension = 1u;
 
     TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
-    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(
+    auto input0 = QuantizedVector<T>(
         {
              1.0f,  2.0f,
              3.0f,  4.0f,
@@ -1754,18 +1754,18 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim1TestImpl(
              9.0f, 10.0f,
             11.0f, 12.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo inputTensorInfo1({ 1, 2, 2, 2 }, ArmnnType, qScale, qOffset);
 
-    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(
+    auto input1 = QuantizedVector<T>(
         {
             11.0f, 12.0f,
             13.0f, 14.0f,
             15.0f, 16.0f,
             17.0f, 18.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo outputTensorInfo({ 1, 5, 2, 2 }, ArmnnType, qScale, qOffset);
 
@@ -1783,8 +1783,8 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim1TestImpl(
                    dimension,
                    true);
 
-    result.output = MakeTensor<T, 4>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ActualData = output;
+    result.m_ExpectedData = QuantizedVector<T>(
         {
              1.0f,  2.0f,
              3.0f,  4.0f,
@@ -1797,7 +1797,7 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim1TestImpl(
             15.0f, 16.0f,
             17.0f, 18.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -1813,7 +1813,7 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim2TestImpl(
     constexpr unsigned int dimension = 2u;
 
     TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
-    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(
+    auto input0 = QuantizedVector<T>(
         {
              1.0f, 2.0f,
              3.0f, 4.0f,
@@ -1822,10 +1822,10 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim2TestImpl(
             9.0f, 10.0f,
             11.0f, 12.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo inputTensorInfo1({ 1, 3, 3, 2 }, ArmnnType, qScale, qOffset);
-    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(
+    auto input1 = QuantizedVector<T>(
         {
             11.0f, 12.0f,
             13.0f, 14.0f,
@@ -1837,7 +1837,7 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim2TestImpl(
             25.0f, 26.0f,
             27.0f, 28.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo outputTensorInfo({ 1, 3, 5, 2 }, ArmnnType, qScale, qOffset);
     LayerTestResult<T, 4> result(outputTensorInfo);
@@ -1854,8 +1854,8 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim2TestImpl(
                    dimension,
                    true);
 
-    result.output         = MakeTensor<T, 4>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ActualData   = output;
+    result.m_ExpectedData = QuantizedVector<T>(
         {
              1.0f,  2.0f,
              3.0f,  4.0f,
@@ -1875,7 +1875,7 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim2TestImpl(
             25.0f, 26.0f,
             27.0f, 28.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -1892,7 +1892,7 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim3TestImpl(
     constexpr unsigned int dimension = 3u;
 
     TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
-    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(
+    auto input0 = QuantizedVector<T>(
         {
              1.0f,  2.0f,
              3.0f,  4.0f,
@@ -1901,10 +1901,10 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim3TestImpl(
              9.0f, 10.0f,
             11.0f, 12.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo inputTensorInfo1({ 1, 3, 2, 3 }, ArmnnType, qScale, qOffset);
-    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(
+    auto input1 = QuantizedVector<T>(
         {
             11.0f, 12.0f, 13.0f,
             14.0f, 15.0f, 16.0f,
@@ -1915,7 +1915,7 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim3TestImpl(
             23.0f, 24.0f, 25.0f,
             26.0f, 27.0f, 28.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     TensorInfo outputTensorInfo({ 1, 3, 2, 5 }, ArmnnType, qScale, qOffset);
 
@@ -1933,8 +1933,8 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim3TestImpl(
                    dimension,
                    useSubtensor);
 
-    result.output = MakeTensor<T, 4>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+    result.m_ActualData = output;
+    result.m_ExpectedData = QuantizedVector<T>(
         {
             1.0f, 2.0f, 11.0f, 12.0f, 13.0f,
             3.0f, 4.0f, 14.0f, 15.0f, 16.0f,
@@ -1943,7 +1943,7 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim3TestImpl(
             9.0f, 10.0f, 23.0f, 24.0f, 25.0f,
             11.0f, 12.0f, 26.0f, 27.0f, 28.0f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return result;
 }
@@ -1968,7 +1968,7 @@ LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
     const float inputScale1 = 0.5f;
     const int32_t inputOffset1 = 5;
 
-    auto input1 = MakeTensor<T, 3>(inputTensorInfo1, std::vector<T>(
+    std::vector<T> input1 =
     {
         1, 2, 3,
         4, 5, 6,
@@ -1983,13 +1983,13 @@ LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
         28, 29, 30,
         31, 32, 33,
         34, 35, 36
-    }));
+    };
 
     // Quatized input2 tensor.
     const float inputScale2 = 0.2f;
     const int32_t inputOffset2 = 10;
 
-    auto input2 = MakeTensor<T, 3>(inputTensorInfo2, std::vector<T>(
+    std::vector<T> input2 =
     {
         37, 38, 39,
         40, 41, 42,
@@ -1997,15 +1997,15 @@ LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
         46, 47, 48,
         49, 50, 51,
         52, 53, 54
-    }));
+    };
 
     // Quantized output tensor.
     const float outputScale = 0.1f;
     const int32_t outputOffset = 20;
 
-    LayerTestResult<T, 3> ret(outputTensorInfo);
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
 
-    ret.outputExpected = MakeTensor<T, 3>(outputTensorInfo, std::vector<T>(
+    std::vector<T> expectedOutput =
     {
         0,   5,  74,
         10,  15,  76,
@@ -2027,7 +2027,7 @@ LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
         150, 155, 104,
         160, 165, 106,
         170, 175, 108
-    }));
+    };
 
     outputTensorInfo.SetQuantizationScale(outputScale);
     outputTensorInfo.SetQuantizationOffset(outputOffset);
@@ -2075,15 +2075,18 @@ LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
     inputHandle2->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0]);
-    CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0]);
+    CopyDataToITensorHandle(inputHandle1.get(), input1.data());
+    CopyDataToITensorHandle(inputHandle2.get(), input2.data());
 
     workload->PostAllocationConfigure();
     workload->Execute();
 
-    CopyDataFromITensorHandle(&ret.output[0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return ret;
+    return LayerTestResult<T, 3>(actualOutput,
+                                 expectedOutput,
+                                 outputHandle->GetShape(),
+                                 outputTensorInfo.GetShape());
 }
 
 //
@@ -2132,61 +2135,58 @@ LayerTestResult<float,3> ConcatTest(
     TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, DataType::Float32);
     TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, DataType::Float32);
 
-    LayerTestResult<float,3> ret(outputTensorInfo);
+    std::vector<float> actualOutput(outputTensorInfo.GetNumElements());
 
-    ret.outputExpected = MakeTensor<float, 3>(outputTensorInfo, std::vector<float>(
+    std::vector<float> expectedOutput =
     {
-            1.0f, 2.0f, 3.0f,
-            4.0f, 5.0f, 6.0f,
-            7.0f, 8.0f, 9.0f,
-            10.0f, 11.0f, 12.0f,
-            13.0f, 14.0f, 15.0f,
-            16.0f, 17.0f, 18.0f,
+        1.0f, 2.0f, 3.0f,
+        4.0f, 5.0f, 6.0f,
+        7.0f, 8.0f, 9.0f,
+        10.0f, 11.0f, 12.0f,
+        13.0f, 14.0f, 15.0f,
+        16.0f, 17.0f, 18.0f,
 
-            19.0f, 20.0f, 21.0f,
-            22.0f, 23.0f, 24.0f,
-            25.0f, 26.0f, 27.0f,
-            28.0f, 29.0f, 30.0f,
-            31.0f, 32.0f, 33.0f,
-            34.0f, 35.0f, 36.0f,
+        19.0f, 20.0f, 21.0f,
+        22.0f, 23.0f, 24.0f,
+        25.0f, 26.0f, 27.0f,
+        28.0f, 29.0f, 30.0f,
+        31.0f, 32.0f, 33.0f,
+        34.0f, 35.0f, 36.0f,
 
-            37.0f, 38.0f, 39.0f,
-            40.0f, 41.0f, 42.0f,
-            43.0f, 44.0f, 45.0f,
-            46.0f, 47.0f, 48.0f,
-            49.0f, 50.0f, 51.0f,
-            52.0f, 53.0f, 54.0f,
-        })
-    );
+        37.0f, 38.0f, 39.0f,
+        40.0f, 41.0f, 42.0f,
+        43.0f, 44.0f, 45.0f,
+        46.0f, 47.0f, 48.0f,
+        49.0f, 50.0f, 51.0f,
+        52.0f, 53.0f, 54.0f
+    };
 
-    auto input1 = MakeTensor<float, 3>(inputTensorInfo1, std::vector<float>(
-        {
-            1.0f, 2.0f, 3.0f,
-            4.0f, 5.0f, 6.0f,
-            7.0f, 8.0f, 9.0f,
-            10.0f, 11.0f, 12.0f,
-            13.0f, 14.0f, 15.0f,
-            16.0f, 17.0f, 18.0f,
+    std::vector<float> input1 =
+    {
+        1.0f, 2.0f, 3.0f,
+        4.0f, 5.0f, 6.0f,
+        7.0f, 8.0f, 9.0f,
+        10.0f, 11.0f, 12.0f,
+        13.0f, 14.0f, 15.0f,
+        16.0f, 17.0f, 18.0f,
 
-            19.0f, 20.0f, 21.0f,
-            22.0f, 23.0f, 24.0f,
-            25.0f, 26.0f, 27.0f,
-            28.0f, 29.0f, 30.0f,
-            31.0f, 32.0f, 33.0f,
-            34.0f, 35.0f, 36.0f,
-        })
-    );
+        19.0f, 20.0f, 21.0f,
+        22.0f, 23.0f, 24.0f,
+        25.0f, 26.0f, 27.0f,
+        28.0f, 29.0f, 30.0f,
+        31.0f, 32.0f, 33.0f,
+        34.0f, 35.0f, 36.0f
+    };
 
-    auto input2 = MakeTensor<float, 3>(inputTensorInfo2, std::vector<float>(
-        {
-            37.0f, 38.0f, 39.0f,
-            40.0f, 41.0f, 42.0f,
-            43.0f, 44.0f, 45.0f,
-            46.0f, 47.0f, 48.0f,
-            49.0f, 50.0f, 51.0f,
-            52.0f, 53.0f, 54.0f,
-        })
-    );
+    std::vector<float> input2 =
+    {
+        37.0f, 38.0f, 39.0f,
+        40.0f, 41.0f, 42.0f,
+        43.0f, 44.0f, 45.0f,
+        46.0f, 47.0f, 48.0f,
+        49.0f, 50.0f, 51.0f,
+        52.0f, 53.0f, 54.0f,
+    };
 
     std::vector<unsigned int> wOrigin1 = {0, 0, 0}; //Extent of the window is defined by size of input[0].
     ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
@@ -2223,15 +2223,18 @@ LayerTestResult<float,3> ConcatTest(
     inputHandle2->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0]);
-    CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0]);
+    CopyDataToITensorHandle(inputHandle1.get(), input1.data());
+    CopyDataToITensorHandle(inputHandle2.get(), input2.data());
 
     workload->PostAllocationConfigure();
     workload->Execute();
 
-    CopyDataFromITensorHandle(&ret.output[0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return ret;
+    return LayerTestResult<float, 3>(actualOutput,
+                                     expectedOutput,
+                                     outputHandle->GetShape(),
+                                     outputTensorInfo.GetShape());
 }
 
 LayerTestResult<float, 1> Concat1dTest(
@@ -2448,7 +2451,7 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
     const float inputScale1 = 0.015686f;
     const int32_t inputOffset1 = 192;
 
-    auto input1 = MakeTensor<uint8_t, 3>(inputTensorInfo1, std::vector<uint8_t>(
+    std::vector<uint8_t> input1 =
     {
         1, 2, 3,
         4, 5, 6,
@@ -2462,33 +2465,31 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
         25, 26, 27,
         28, 29, 30,
         31, 32, 33,
-        34, 35, 36,
-    })
-    );
+        34, 35, 36
+    };
 
     // Quatized input2 tensor. Range [-1, 4]
     const float inputScale2 = 0.019608f;
     const int32_t inputOffset2 = 50;
 
-    auto input2 = MakeTensor<uint8_t, 3>(inputTensorInfo2, std::vector<uint8_t>(
+    std::vector<uint8_t> input2 =
     {
         37, 38, 39,
         40, 41, 42,
         43, 44, 45,
         46, 47, 48,
         49, 50, 51,
-        52, 53, 54,
-    })
-    );
+        52, 53, 54
+    };
 
     // Output has the same quantization parameters than input1,
     // so that only the requantization of input2 is required
     const float outputScale = 0.015686f;
     const int32_t outputOffset = 192;
 
-    LayerTestResult<uint8_t, 3> ret(outputTensorInfo);
+    std::vector<uint8_t> actualOutput(outputTensorInfo.GetNumElements());
 
-    ret.outputExpected = MakeTensor<uint8_t, 3>(outputTensorInfo, std::vector<uint8_t>(
+    std::vector<uint8_t> expectedOutput =
     {
         1, 2, 3,
         4, 5, 6,
@@ -2509,9 +2510,8 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
         183, 184, 186,
         187, 188, 189,
         191, 192, 193,
-        195, 196, 197,
-    })
-    );
+        195, 196, 197
+    };
 
     outputTensorInfo.SetQuantizationScale(outputScale);
     outputTensorInfo.SetQuantizationOffset(outputOffset);
@@ -2555,15 +2555,18 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
     inputHandle2->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0]);
-    CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0]);
+    CopyDataToITensorHandle(inputHandle1.get(), input1.data());
+    CopyDataToITensorHandle(inputHandle2.get(), input2.data());
 
     workload->PostAllocationConfigure();
     workload->Execute();
 
-    CopyDataFromITensorHandle(&ret.output[0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return ret;
+    return LayerTestResult<uint8_t, 3>(actualOutput,
+                                       expectedOutput,
+                                       outputHandle->GetShape(),
+                                       outputTensorInfo.GetShape());
 }
 
 LayerTestResult<uint8_t, 3> ConcatUint8Test(
@@ -2601,34 +2604,9 @@ LayerTestResult<uint8_t, 3> ConcatUint8Test(
     inputTensorInfo2.SetQuantizationScale(scale);
     inputTensorInfo2.SetQuantizationOffset(offset);
 
-    LayerTestResult<uint8_t, 3> ret(outputTensorInfo);
+    std::vector<uint8_t> actualOutput(outputTensorInfo.GetNumElements());
 
-    ret.outputExpected = MakeTensor<uint8_t, 3>(outputTensorInfo, std::vector<uint8_t>(
-        {
-            1, 2, 3,
-            4, 5, 6,
-            7, 8, 9,
-            10, 11, 12,
-            13, 14, 15,
-            16, 17, 18,
-
-            19, 20, 21,
-            22, 23, 24,
-            25, 26, 27,
-            28, 29, 30,
-            31, 32, 33,
-            34, 35, 36,
-
-            37, 38, 39,
-            40, 41, 42,
-            43, 44, 45,
-            46, 47, 48,
-            49, 50, 51,
-            52, 53, 54,
-        })
-    );
-
-    auto input1 = MakeTensor<uint8_t, 3>(inputTensorInfo1, std::vector<uint8_t>(
+    std::vector<uint8_t> expectedOutput =
     {
         1, 2, 3,
         4, 5, 6,
@@ -2643,19 +2621,41 @@ LayerTestResult<uint8_t, 3> ConcatUint8Test(
         28, 29, 30,
         31, 32, 33,
         34, 35, 36,
-    })
-    );
 
-    auto input2 = MakeTensor<uint8_t, 3>(inputTensorInfo2, std::vector<uint8_t>(
+        37, 38, 39,
+        40, 41, 42,
+        43, 44, 45,
+        46, 47, 48,
+        49, 50, 51,
+        52, 53, 54
+    };
+
+    std::vector<uint8_t> input1 =
+    {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9,
+        10, 11, 12,
+        13, 14, 15,
+        16, 17, 18,
+
+        19, 20, 21,
+        22, 23, 24,
+        25, 26, 27,
+        28, 29, 30,
+        31, 32, 33,
+        34, 35, 36
+    };
+
+    std::vector<uint8_t> input2 =
     {
         37, 38, 39,
         40, 41, 42,
         43, 44, 45,
         46, 47, 48,
         49, 50, 51,
-        52, 53, 54,
-    })
-    );
+        52, 53, 54
+    };
 
     std::vector<unsigned int> wOrigin1 = { 0, 0, 0 }; //Extent of the window is defined by size of input[0].
     ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
@@ -2693,15 +2693,18 @@ LayerTestResult<uint8_t, 3> ConcatUint8Test(
     inputHandle2->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0]);
-    CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0]);
+    CopyDataToITensorHandle(inputHandle1.get(), input1.data());
+    CopyDataToITensorHandle(inputHandle2.get(), input2.data());
 
     workload->PostAllocationConfigure();
     workload->Execute();
 
-    CopyDataFromITensorHandle(&ret.output[0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return ret;
+    return LayerTestResult<uint8_t, 3>(actualOutput,
+                                       expectedOutput,
+                                       outputHandle->GetShape(),
+                                       outputTensorInfo.GetShape());
 }
 
 LayerTestResult<uint16_t, 3> ConcatUint16Test(
@@ -2739,9 +2742,9 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
     inputTensorInfo2.SetQuantizationScale(scale);
     inputTensorInfo2.SetQuantizationOffset(offset);
 
-    LayerTestResult<uint16_t, 3> ret(outputTensorInfo);
+    std::vector<uint16_t> actualOutput(outputTensorInfo.GetNumElements());
 
-    ret.outputExpected = MakeTensor<uint16_t, 3>(outputTensorInfo, std::vector<uint16_t>(
+    std::vector<uint16_t> expectedOutput =
     {
         1, 2, 3,
         4, 5, 6,
@@ -2762,10 +2765,10 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
         43, 44, 45,
         46, 47, 48,
         49, 50, 51,
-        52, 53, 54,
-    }));
+        52, 53, 54
+    };
 
-    auto input1 = MakeTensor<uint16_t, 3>(inputTensorInfo1, std::vector<uint16_t>(
+    std::vector<uint16_t> input1 =
     {
         1, 2, 3,
         4, 5, 6,
@@ -2780,9 +2783,9 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
         28, 29, 30,
         31, 32, 33,
         34, 35, 36,
-    }));
+    };
 
-    auto input2 = MakeTensor<uint16_t, 3>(inputTensorInfo2, std::vector<uint16_t>(
+    std::vector<uint16_t> input2 =
     {
         37, 38, 39,
         40, 41, 42,
@@ -2790,7 +2793,7 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
         46, 47, 48,
         49, 50, 51,
         52, 53, 54,
-    }));
+    };
 
     std::vector<unsigned int> wOrigin1 = { 0, 0, 0 }; //Extent of the window is defined by size of input[0].
     ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
@@ -2829,15 +2832,18 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
     inputHandle2->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0]);
-    CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0]);
+    CopyDataToITensorHandle(inputHandle1.get(), input1.data());
+    CopyDataToITensorHandle(inputHandle2.get(), input2.data());
 
     workload->PostAllocationConfigure();
     workload->Execute();
 
-    CopyDataFromITensorHandle(&ret.output[0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return ret;
+    return LayerTestResult<uint16_t, 3>(actualOutput,
+                                       expectedOutput,
+                                       outputHandle->GetShape(),
+                                       outputTensorInfo.GetShape());
 }
 
 LayerTestResult<uint8_t, 1> Concat1dUint8Test(

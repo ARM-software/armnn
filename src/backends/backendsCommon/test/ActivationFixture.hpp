@@ -11,20 +11,13 @@
 
 #include <test/TensorHelpers.hpp>
 
-#include <boost/multi_array.hpp>
-
 struct ActivationFixture
 {
     ActivationFixture()
     {
-        auto boostArrayExtents = boost::extents
-            [armnn::numeric_cast<boost::multi_array_types::extent_gen::index>(batchSize)]
-            [armnn::numeric_cast<boost::multi_array_types::extent_gen::index>(channels)]
-            [armnn::numeric_cast<boost::multi_array_types::extent_gen::index>(height)]
-            [armnn::numeric_cast<boost::multi_array_types::extent_gen::index>(width)];
-        output.resize(boostArrayExtents);
-        outputExpected.resize(boostArrayExtents);
-        input.resize(boostArrayExtents);
+        output.resize(batchSize * channels * height * width);
+        outputExpected.resize(batchSize * channels * height * width);
+        input.resize(batchSize * channels * height * width);
 
         unsigned int inputShape[]  = { batchSize, channels, height, width };
         unsigned int outputShape[] = { batchSize, channels, height, width };
@@ -32,7 +25,7 @@ struct ActivationFixture
         inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
         outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::DataType::Float32);
 
-        input = MakeRandomTensor<float, 4>(inputTensorInfo, 21453);
+        input = MakeRandomTensor<float>(inputTensorInfo, 21453);
     }
 
     unsigned int width     = 17;
@@ -40,9 +33,9 @@ struct ActivationFixture
     unsigned int channels  = 2;
     unsigned int batchSize = 5;
 
-    boost::multi_array<float, 4> output;
-    boost::multi_array<float, 4> outputExpected;
-    boost::multi_array<float, 4> input;
+    std::vector<float> output;
+    std::vector<float> outputExpected;
+    std::vector<float> input;
 
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -57,6 +50,6 @@ struct PositiveActivationFixture : public ActivationFixture
 {
     PositiveActivationFixture()
     {
-        input = MakeRandomTensor<float, 4>(inputTensorInfo, 2342423, 0.0f, 1.0f);
+        input = MakeRandomTensor<float>(inputTensorInfo, 2342423, 0.0f, 1.0f);
     }
 };

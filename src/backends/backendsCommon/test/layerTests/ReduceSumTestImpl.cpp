@@ -28,10 +28,9 @@ LayerTestResult<float, 4> ReduceTestCommon(
         bool keepDims = false)
 {
     IgnoreUnused(memoryManager);
-    auto inputTensor = MakeTensor<T, 4>(inputTensorInfo, ConvertToDataType<ArmnnType>(inputData, inputTensorInfo));
+    auto inputTensor = ConvertToDataType<ArmnnType>(inputData, inputTensorInfo);
 
-    LayerTestResult<float, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<float, 4>(outputTensorInfo, outputData);
+    std::vector<float> actualOutput(outputTensorInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
@@ -65,13 +64,16 @@ LayerTestResult<float, 4> ReduceTestCommon(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), inputTensor.origin());
+    CopyDataToITensorHandle(inputHandle.get(), inputTensor.data());
 
     workload->Execute();
 
-    CopyDataFromITensorHandle(result.output.origin(), outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return result;
+    return LayerTestResult<float, 4>(actualOutput,
+                                     outputData,
+                                     outputHandle->GetShape(),
+                                     outputTensorInfo.GetShape());
 }
 
 } // namespace

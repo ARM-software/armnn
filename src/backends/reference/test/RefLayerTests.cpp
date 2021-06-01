@@ -474,6 +474,7 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(InstanceNormFloat16Nhwc2, InstanceNormFloat16Test2
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleNormalizationAcross, SimpleNormalizationAcrossTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleNormalizationWithin, SimpleNormalizationWithinTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleNormalizationAcrossNhwc, SimpleNormalizationAcrossNhwcTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AcrossChannelNormalization, AcrossChannelNormalizationTest)
 
 // Softmax
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleSoftmaxBeta1, SimpleSoftmaxTest, 1.0f)

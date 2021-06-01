@@ -38,9 +38,11 @@ LayerTestResult<T, NumDims> LogSoftmaxTestImpl(
     int32_t qOffset = 0)
 {
     IgnoreUnused(memoryManager);
-    LayerTestResult<T, NumDims> result(outputInfo);
-    result.outputExpected =
-        MakeTensor<T, NumDims>(outputInfo, armnnUtils::QuantizedVector<T>(expectedOutputValues, qScale, qOffset));
+
+    auto inputTensor = armnnUtils::QuantizedVector<T>(inputValues, qScale, qOffset);
+
+    std::vector<T> actualOutput(outputInfo.GetNumElements());
+    std::vector<T> expectedOutput = armnnUtils::QuantizedVector<T>(expectedOutputValues, qScale, qOffset);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputInfo);
@@ -55,14 +57,17 @@ LayerTestResult<T, NumDims> LogSoftmaxTestImpl(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    auto inputTensor = MakeTensor<T, NumDims>(inputInfo, armnnUtils::QuantizedVector<T>(inputValues, qScale, qOffset));
-    CopyDataToITensorHandle(inputHandle.get(), inputTensor.origin());
+    CopyDataToITensorHandle(inputHandle.get(), inputTensor.data());
 
     ExecuteWorkload(*workload, memoryManager);
 
-    CopyDataFromITensorHandle(result.output.origin(), outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return result;
+    return LayerTestResult<T, NumDims>(actualOutput,
+                                       expectedOutput,
+                                       outputHandle->GetShape(),
+                                       outputInfo.GetShape());
+
 }
 
 } // anonymous namespace

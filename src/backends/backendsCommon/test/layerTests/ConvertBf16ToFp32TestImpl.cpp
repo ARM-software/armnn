@@ -23,16 +23,16 @@ LayerTestResult<float, 4> ConvertBf16ToFp32Test(
     std::vector<armnn::BFloat16> inputValues = armnnUtils::QuantizedVector<armnn::BFloat16>(
         {
             -37.5f, -15.2f, -8.76f, -2.0f, -1.5f, -1.3f, -0.5f, -0.4f, 0.0f,
-          1.0f, 0.4f, 0.5f, 1.3f, 1.5f, 2.0f, 8.76f, 15.2f, 37.5f
+            1.0f, 0.4f, 0.5f, 1.3f, 1.5f, 2.0f, 8.76f, 15.2f, 37.5f
         },
         1.0f, 0);
 
-    auto input = MakeTensor<armnn::BFloat16, 4>(inputTensorInfo, std::vector<armnn::BFloat16>(inputValues));
-
-    LayerTestResult<float, 4> ret(outputTensorInfo);
-    ret.outputExpected = MakeTensor<float, 4>(outputTensorInfo,
-        { -37.5f, -15.2f, -8.76f, -2.0f, -1.5f, -1.3f, -0.5f, -0.4f, 0.0f,
-          1.0f, 0.4f, 0.5f, 1.3f, 1.5f, 2.0f, 8.76f, 15.2f, 37.5f });
+    std::vector<float> actualOutput(outputTensorInfo.GetNumElements());
+    std::vector<float> expectedOutput =
+        {
+            -37.5f, -15.2f, -8.76f, -2.0f, -1.5f, -1.3f, -0.5f, -0.4f, 0.0f,
+            1.0f, 0.4f, 0.5f, 1.3f, 1.5f, 2.0f, 8.76f, 15.2f, 37.5f
+        };
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
@@ -47,11 +47,14 @@ LayerTestResult<float, 4> ConvertBf16ToFp32Test(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), inputValues.data());
 
     workload->Execute();
 
-    CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return ret;
+    return LayerTestResult<float, 4>(actualOutput,
+                                     expectedOutput,
+                                     outputHandle->GetShape(),
+                                     outputTensorInfo.GetShape());
 }

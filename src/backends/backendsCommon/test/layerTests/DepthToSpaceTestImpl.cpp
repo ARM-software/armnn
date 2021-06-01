@@ -44,12 +44,10 @@ LayerTestResult<T, 4> DepthToSpaceTestImpl(
         outputInfo.SetQuantizationOffset(qOffset);
     }
 
-    boost::multi_array<T, 4> input =
-        MakeTensor<T, 4>(inputInfo, armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset));
+    std::vector<T> input = armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset);
 
-    LayerTestResult<T, 4> result(outputInfo);
-    result.outputExpected =
-        MakeTensor<T, 4>(outputInfo, armnnUtils::QuantizedVector<T>(expectedOutputData, qScale, qOffset));
+    std::vector<T> actualOutput(outputInfo.GetNumElements());
+    std::vector<T> expectedOutput = armnnUtils::QuantizedVector<T>(expectedOutputData, qScale, qOffset);
 
     ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputInfo);
@@ -65,12 +63,16 @@ LayerTestResult<T, 4> DepthToSpaceTestImpl(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), input.origin());
+    CopyDataToITensorHandle(inputHandle.get(), input.data());
 
     workload->Execute();
 
-    CopyDataFromITensorHandle(result.output.origin(), outputHandle.get());
-    return result;
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
+
+    return LayerTestResult<T, 4>(actualOutput,
+                                 expectedOutput,
+                                 outputHandle->GetShape(),
+                                 outputInfo.GetShape());
 }
 
 } // anonymous namespace

@@ -55,9 +55,9 @@ LayerTestResult<T, NumDims> ElementwiseUnaryTestHelper(
     outputTensorInfo.SetQuantizationScale(outQuantScale);
     outputTensorInfo.SetQuantizationOffset(outQuantOffset);
 
-    auto input = MakeTensor<T, NumDims>(inputTensorInfo, ConvertToDataType<ArmnnType>(values, inputTensorInfo));
-
-    LayerTestResult<T, NumDims> ret(outputTensorInfo);
+    std::vector<T> input = ConvertToDataType<ArmnnType>(values, inputTensorInfo);
+    std::vector<T> expectedOutput = ConvertToDataType<ArmnnType>(outValues, inputTensorInfo);
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
@@ -73,16 +73,18 @@ LayerTestResult<T, NumDims> ElementwiseUnaryTestHelper(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), input.origin());
+    CopyDataToITensorHandle(inputHandle.get(), input.data());
 
     workload->PostAllocationConfigure();
     ExecuteWorkload(*workload, memoryManager);
 
-    CopyDataFromITensorHandle(ret.output.origin(), outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    ret.outputExpected = MakeTensor<T, NumDims>(outputTensorInfo, ConvertToDataType<ArmnnType>(outValues,
-        inputTensorInfo));
-    return ret;
+    return LayerTestResult<T, NumDims>(actualOutput,
+                                       expectedOutput,
+                                       outputHandle->GetShape(),
+                                       outputTensorInfo.GetShape());
+
 }
 
 template <std::size_t NumDims,

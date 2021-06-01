@@ -37,8 +37,10 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
     armnn::Pooling2dDescriptor descriptor,
     float qScale,
     int32_t qOffset,
-    const boost::multi_array<T, 4>& input,
-    const boost::multi_array<T, 4>& outputExpected)
+    const std::vector<T>& input,
+    const std::vector<T>& outputExpected,
+    const armnn::TensorShape& inputShape,
+    const armnn::TensorShape& outputShape)
 {
     IgnoreUnused(memoryManager);
     const armnn::DataLayout dataLayout = descriptor.m_DataLayout;
@@ -47,15 +49,15 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
     auto widthIndex = dimensionIndices.GetWidthIndex();
     auto channelsIndex = dimensionIndices.GetChannelsIndex();
 
-    unsigned int inputHeight     = armnn::numeric_cast<unsigned int>(input.shape()[heightIndex]);
-    unsigned int inputWidth      = armnn::numeric_cast<unsigned int>(input.shape()[widthIndex]);
-    unsigned int inputChannels   = armnn::numeric_cast<unsigned int>(input.shape()[channelsIndex]);
-    unsigned int inputBatchSize  = armnn::numeric_cast<unsigned int>(input.shape()[0]);
+    unsigned int inputHeight     = armnn::numeric_cast<unsigned int>(inputShape[heightIndex]);
+    unsigned int inputWidth      = armnn::numeric_cast<unsigned int>(inputShape[widthIndex]);
+    unsigned int inputChannels   = armnn::numeric_cast<unsigned int>(inputShape[channelsIndex]);
+    unsigned int inputBatchSize  = armnn::numeric_cast<unsigned int>(inputShape[0]);
 
-    unsigned int outputHeight    = armnn::numeric_cast<unsigned int>(outputExpected.shape()[heightIndex]);
-    unsigned int outputWidth     = armnn::numeric_cast<unsigned int>(outputExpected.shape()[widthIndex]);
-    unsigned int outputChannels  = armnn::numeric_cast<unsigned int>(outputExpected.shape()[channelsIndex]);
-    unsigned int outputBatchSize = armnn::numeric_cast<unsigned int>(outputExpected.shape()[0]);
+    unsigned int outputHeight    = armnn::numeric_cast<unsigned int>(outputShape[heightIndex]);
+    unsigned int outputWidth     = armnn::numeric_cast<unsigned int>(outputShape[widthIndex]);
+    unsigned int outputChannels  = armnn::numeric_cast<unsigned int>(outputShape[channelsIndex]);
+    unsigned int outputBatchSize = armnn::numeric_cast<unsigned int>(outputShape[0]);
 
     armnn::TensorInfo inputTensorInfo  = armnnUtils::GetTensorInfo(
         inputBatchSize, inputChannels, inputHeight, inputWidth, dataLayout, ArmnnType);
@@ -73,6 +75,7 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
     }
 
     LayerTestResult<T, 4> result(outputTensorInfo);
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
@@ -89,10 +92,10 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
     armnn::BackendId backend = workloadFactory.GetBackendId();
     const size_t reasonIfUnsupportedMaxLen = 255;
     char reasonIfUnsupported[reasonIfUnsupportedMaxLen+1];
-    result.supported = armnn::IsPooling2dSupported(backend, inputTensorInfo, outputTensorInfo,
-                                                   queueDescriptor.m_Parameters,
-                                                   reasonIfUnsupported, reasonIfUnsupportedMaxLen);
-    if (!result.supported)
+    result.m_Supported = armnn::IsPooling2dSupported(backend, inputTensorInfo, outputTensorInfo,
+                                                     queueDescriptor.m_Parameters,
+                                                     reasonIfUnsupported, reasonIfUnsupportedMaxLen);
+    if (!result.m_Supported)
     {
         return result;
     }
@@ -102,13 +105,14 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), input.data());
 
     workload->Execute();
 
-    CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    result.outputExpected = outputExpected;
+    result.m_ActualData = actualOutput;
+    result.m_ExpectedData = outputExpected;
 
     return result;
 }
@@ -194,15 +198,14 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(
     inputData.insert(inputData.end(), singleChannelData.begin(), singleChannelData.end());
     std::transform(singleChannelData.begin(), singleChannelData.end(), std::back_inserter(inputData), negator);
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputData, qScale, qOffset));
+    auto input = QuantizedVector<T>(inputData, qScale, qOffset);
 
     // These were calculated manually.
-    auto shape(GetTensorShapeAsArray<4>(outputTensorInfo));
-    boost::multi_array<T, 4> outputExpected(shape);
+    std::vector<T> outputExpected;
     if (forceNoPadding)
     {
-        outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-            QuantizedVector<T>({
+        outputExpected = QuantizedVector<T>(
+            {
                  8.0f,  8.0f,  8.0f,
                  9.0f,  7.0f,  9.0f,
                  9.0f,  9.0f,  9.0f,
@@ -219,12 +222,12 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(
                 -1.0f,  0.0f,  0.0f,
                 -1.0f, -1.0f, -1.0f
             },
-            qScale, qOffset));
+            qScale, qOffset);
     }
     else
     {
-        outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-            QuantizedVector<T>({
+        outputExpected = QuantizedVector<T>(
+            {
                 0.0f, 8.0f, 8.0f, 8.0f, 8.0f, 8.0f,
                 0.0f, 9.0f, 7.0f, 9.0f, 9.0f, 3.0f,
                 0.0f, 8.0f, 9.0f, 9.0f, 9.0f, 9.0f,
@@ -241,11 +244,12 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(
                 0.0f,-1.0f, 0.0f, 0.0f, 0.0f,-2.0f,
                 0.0f,-1.0f,-1.0f,-1.0f,-1.0f,-1.0f
             },
-            qScale, qOffset));
+            qScale, qOffset);
     }
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -312,12 +316,9 @@ LayerTestResult<T, 4> SimpleMaxPooling2dTestCommon(
         outputData = tmp1;
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, inputData);
-
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
-
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        inputData, outputData, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -384,12 +385,9 @@ LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(
         outputData = tmp1;
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, inputData);
-
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
-
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        inputData, outputData, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -422,26 +420,23 @@ LayerTestResult<T, 4> LargeTensorsAveragePooling2dTestCommon(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    std::vector<T> inputVec;
+    std::vector<T> input;
 
     for (unsigned int i = 0 ; i < inputTensorInfo.GetShape().GetNumElements(); ++i)
     {
-        inputVec.push_back(1);
+        input.push_back(1);
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, inputVec);
-
-    std::vector<T> outputVec;
+    std::vector<T> outputExpected;
 
     for (unsigned int i = 0 ; i < outputTensorInfo.GetShape().GetNumElements(); ++i)
     {
-        outputVec.push_back(1);
+        outputExpected.push_back(1);
     }
 
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputVec);
-
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -499,12 +494,9 @@ LayerTestResult<T, 4> SimpleL2Pooling2dTestCommon(
         outputData = tmp1;
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, inputData);
-
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
-
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        inputData, outputData, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -522,25 +514,26 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride1TestCommon(
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
 
     armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, ArmnnType);
-    auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>({
+    auto input = QuantizedVector<T>(
+        {
             2.0f, 1.0f, 5.0f, 2.0f,
             1.0f, 2.0f, 2.0f, 1.0f,
             5.0f, 4.0f, 1.0f, 5.0f,
             2.0f, 1.0f, 5.0f, 2.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2 }, ArmnnType);
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>({
+    auto outputExpected = QuantizedVector<T>(
+        {
             3.0f, 3.0f,
             3.0f, 3.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -558,8 +551,8 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride3TestCommon(
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
 
     armnn::TensorInfo inputTensorInfo({ 1, 1, 9, 9 }, ArmnnType);
-    auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>({
+    auto input = QuantizedVector<T>(
+        {
             2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f,
             1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f,
             5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f,
@@ -570,19 +563,20 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride3TestCommon(
             1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f,
             5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     armnn::TensorInfo outputTensorInfo({ 1, 1, 3, 3 }, ArmnnType);
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>({
+    auto outputExpected = QuantizedVector<T>(
+        {
             3.0f, 3.0f, 3.0f,
             3.0f, 3.0f, 3.0f,
             3.0f, 3.0f, 3.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -600,8 +594,8 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride4TestCommon(
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
 
     armnn::TensorInfo inputTensorInfo({ 1, 1, 7, 7 }, ArmnnType);
-    auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>({
+    auto input = QuantizedVector<T>(
+        {
             2.0f, 1.0f, 5.0f, 0.0f, 2.0f, 1.0f, 5.0f,
             1.0f, 2.0f, 2.0f, 0.0f, 1.0f, 2.0f, 2.0f,
             5.0f, 4.0f, 1.0f, 0.0f, 5.0f, 4.0f, 1.0f,
@@ -610,18 +604,19 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride4TestCommon(
             1.0f, 2.0f, 2.0f, 0.0f, 1.0f, 2.0f, 2.0f,
             5.0f, 4.0f, 1.0f, 0.0f, 5.0f, 4.0f, 1.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2 }, ArmnnType);
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>({
+    auto outputExpected = QuantizedVector<T>(
+        {
             3.0f, 3.0f,
             3.0f, 3.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -639,8 +634,8 @@ LayerTestResult<T, 4> L2Pooling2dSize7TestCommon(
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
 
     armnn::TensorInfo inputTensorInfo({ 1, 1, 7, 7 }, ArmnnType);
-    auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>({
+    auto input = QuantizedVector<T>(
+        {
             1.0f, 0.0f, 2.0f, 0.0f,  3.0f, 0.0f, 4.0f,
             0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,
             0.0f, 5.0f, 0.0f, 6.0f,  0.0f, 7.0f, 0.0f,
@@ -649,17 +644,18 @@ LayerTestResult<T, 4> L2Pooling2dSize7TestCommon(
             0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     armnn::TensorInfo outputTensorInfo({ 1, 1, 1, 1 }, ArmnnType);
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>({
+    auto outputExpected = QuantizedVector<T>(
+        {
             3.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -677,8 +673,8 @@ LayerTestResult<T, 4> L2Pooling2dSize9TestCommon(
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
 
     armnn::TensorInfo inputTensorInfo({ 1, 1, 9, 9 }, ArmnnType);
-    auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>({
+    auto input = QuantizedVector<T>(
+        {
             2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f,
             1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f,
             5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f,
@@ -689,17 +685,18 @@ LayerTestResult<T, 4> L2Pooling2dSize9TestCommon(
             1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f,
             5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     armnn::TensorInfo outputTensorInfo({ 1, 1, 1, 1 }, ArmnnType);
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>({
+    auto outputExpected = QuantizedVector<T>(
+        {
             3.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -727,21 +724,22 @@ LayerTestResult<T, 4> AsymmetricNonSquarePooling2dTestCommon(
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
 
     // Construct input data.
-    auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>({
+    auto input = QuantizedVector<T>(
+        {
             1.0f, 3.0f, 4.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     // These were calculated manually.
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>({
+    auto outputExpected = QuantizedVector<T>(
+        {
             0.0f, 3.0f, 0.0f, 3.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -788,7 +786,9 @@ LayerTestResult<T, 4> ComparePooling2dTestCommon(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    boost::multi_array<T, 4> input = MakeRandomTensor<T, 4>(inputTensorInfo, 81715);
+    std::vector<T> input = MakeRandomTensor<T>(inputTensorInfo, 81715);
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
+    std::vector<T> expectedOutput(outputTensorInfo.GetNumElements());
 
     LayerTestResult<T, 4> comparisonResult(outputTensorInfo);
 
@@ -817,10 +817,10 @@ LayerTestResult<T, 4> ComparePooling2dTestCommon(
     armnn::BackendId backend = workloadFactory.GetBackendId();
     const size_t reasonIfUnsupportedMaxLen = 255;
     char reasonIfUnsupported[reasonIfUnsupportedMaxLen+1];
-    comparisonResult.supported = armnn::IsPooling2dSupported(backend, inputTensorInfo, outputTensorInfo,
-                                                             data.m_Parameters,
-                                                             reasonIfUnsupported, reasonIfUnsupportedMaxLen);
-    if (!comparisonResult.supported)
+    comparisonResult.m_Supported = armnn::IsPooling2dSupported(backend, inputTensorInfo, outputTensorInfo,
+                                                               data.m_Parameters,
+                                                               reasonIfUnsupported, reasonIfUnsupportedMaxLen);
+    if (!comparisonResult.m_Supported)
     {
         return comparisonResult;
     }
@@ -838,14 +838,17 @@ LayerTestResult<T, 4> ComparePooling2dTestCommon(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
-    CopyDataToITensorHandle(inputHandleRef.get(), &input[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), input.data());
+    CopyDataToITensorHandle(inputHandleRef.get(), input.data());
 
     workload->Execute();
     workloadRef->Execute();
 
-    CopyDataFromITensorHandle(&comparisonResult.output[0][0][0][0], outputHandle.get());
-    CopyDataFromITensorHandle(&comparisonResult.outputExpected[0][0][0][0], outputHandleRef.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
+    CopyDataFromITensorHandle(expectedOutput.data(), outputHandleRef.get());
+
+    comparisonResult.m_ActualData = actualOutput;
+    comparisonResult.m_ExpectedData = expectedOutput;
 
     return comparisonResult;
 }
@@ -924,14 +927,15 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize2x2Stride2x2TestCommon(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputData, qScale, qOffset));
+    auto input = QuantizedVector<T>(inputData, qScale, qOffset);
 
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
+    auto outputExpected =
         forceNoPadding ? QuantizedVector<T>(expectedOutputDataNoPadding, qScale, qOffset) :
-                         QuantizedVector<T>(expectedOutputDataWithPadding, qScale, qOffset));
+                         QuantizedVector<T>(expectedOutputDataWithPadding, qScale, qOffset);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 //
@@ -1003,14 +1007,15 @@ LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2TestCommon(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputData, qScale, qOffset));
+    auto input = QuantizedVector<T>(inputData, qScale, qOffset);
 
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
+    auto outputExpected =
         forceNoPadding ? QuantizedVector<T>(expectedOutputDataNoPadding, qScale, qOffset) :
-                         QuantizedVector<T>(expectedOutputDataWithPadding, qScale, qOffset));
+                         QuantizedVector<T>(expectedOutputDataWithPadding, qScale, qOffset);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 
@@ -1044,25 +1049,26 @@ LayerTestResult<T, 4> IgnorePaddingSimpleMaxPooling2dTestCommon(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>({
+    auto input = QuantizedVector<T>(
+        {
             -1.0f, -2.0f,  3.0f,  4.0f,
             -1.0f, -2.0f,  3.0f,  4.0f,
              1.0f,  2.0f, -3.0f, -4.0f,
              1.0f,  2.0f, -3.0f, -4.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>({
+    auto outputExpected = QuantizedVector<T>(
+        {
             -1.0f,  3.0f,  4.0f,
              1.0f,  3.0f,  4.0f,
              1.0f,  2.0f, -4.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -1095,26 +1101,27 @@ LayerTestResult<T, 4> IgnorePaddingMaxPooling2dSize3TestCommon(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>({
+    auto input = QuantizedVector<T>(
+        {
             -1.0f, -2.0f,  3.0f,  4.0f,
             -1.0f, -2.0f,  3.0f,  4.0f,
              1.0f,  2.0f, -3.0f, -4.0f,
              1.0f,  2.0f, -3.0f, -4.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>({
+    auto outputExpected = QuantizedVector<T>(
+        {
             -1.0f,  3.0f,  4.0f,  4.0f,
              2.0f,  3.0f,  4.0f,  4.0f,
              2.0f,  3.0f,  4.0f,  4.0f,
              2.0f,  2.0f,  2.0f, -3.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -1147,25 +1154,26 @@ LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dTestCommon(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>({
+    auto input = QuantizedVector<T>(
+        {
             12.0f, 20.0f, 32.0f, 40.0f,
             12.0f, 20.0f, 32.0f, 40.0f,
             12.0f, 20.0f, 32.0f, 40.0f,
             12.0f, 20.0f, 32.0f, 40.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>({
+    auto outputExpected = QuantizedVector<T>(
+        {
             3.0f,  13.0f,  10.0f,
             6.0f,  26.0f,  20.0f,
             3.0f,  13.0f,  10.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -1199,24 +1207,25 @@ LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>({
+    auto input = QuantizedVector<T>(
+        {
             1.0f, 2.0f, 3.0f, 4.0f,
             1.0f, 2.0f, 3.0f, 4.0f,
             1.0f, 2.0f, 3.0f, 4.0f,
             1.0f, 2.0f, 3.0f, 4.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>({
+    auto outputExpected = QuantizedVector<T>(
+        {
             2.0f, 3.5f,
             2.0f, 3.5f
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -1249,26 +1258,27 @@ LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3TestCommon(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>({
+    auto input = QuantizedVector<T>(
+        {
             9.0f,   27.0f,  18.0f,  36.0f,
             18.0f,   9.0f,  18.0f,   9.0f,
             27.0f,  18.0f,   9.0f,  27.0f,
             9.0f,   27.0f,   9.0f,  18.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>({
+    auto outputExpected = QuantizedVector<T>(
+        {
              7.0f,  11.0f,  13.0f, 9.0f,
             12.0f,  17.0f,  19.0f, 13.0f,
             12.0f,  16.0f,  16.0f, 10.0f,
              9.0f,  11.0f,  12.0f, 7.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -1301,25 +1311,26 @@ LayerTestResult<T, 4> IgnorePaddingSimpleL2Pooling2dTestCommon(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>({
+    auto input = QuantizedVector<T>(
+        {
             2.0f,  4.0f, 8.0f, 16.0f,
             4.0f,  2.0f, 2.0f, 4.0f,
             8.0f,  2.0f, 4.0f, 2.0f,
             16.0f, 2.0f, 2.0f, 8.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>({
+    auto outputExpected = QuantizedVector<T>(
+        {
                1.0f,     4.4721f,   8.0f,
             4.4721f,     2.6457f,   2.236f,
                8.0f,     1.4142f,   4.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -1352,26 +1363,27 @@ LayerTestResult<T, 4> IgnorePaddingL2Pooling2dSize3TestCommon(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>({
+    auto input = QuantizedVector<T>(
+        {
             1.0f, 2.0f, 3.0f, 4.0f,
             1.0f, 2.0f, 3.0f, 4.0f,
             1.0f, 2.0f, 3.0f, 4.0f,
             1.0f, 2.0f, 3.0f, 4.0f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>({
+    auto outputExpected = QuantizedVector<T>(
+        {
             1.0540f, 1.7638f, 2.5385f, 2.3570f,
             1.2909f, 2.1602f, 3.1091f, 2.8867f,
             1.2909f, 2.1602f, 3.1091f, 2.8867f,
             1.0540f, 1.7638f, 2.5385f, 2.3570f,
         },
-        qScale, qOffset));
+        qScale, qOffset);
 
     return SimplePooling2dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset, input, outputExpected);
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 } // anonymous namespace

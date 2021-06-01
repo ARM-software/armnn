@@ -35,3 +35,8 @@ LayerTestResult<float, 4> CompareNormalizationTest(
     const armnn::ITensorHandleFactory& refTensorHandleFactory,
     armnn::NormalizationAlgorithmChannel normChannel,
     armnn::NormalizationAlgorithmMethod normMethod);
+
+LayerTestResult<float, 4> AcrossChannelNormalizationTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);

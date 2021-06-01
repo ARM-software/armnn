@@ -36,18 +36,14 @@ LayerTestResult<T, 4> InstanceNormTestImpl(
     int32_t qOffset = 0)
 {
     IgnoreUnused(memoryManager);
-    auto inputTensor = MakeTensor<T, 4>(inputTensorInfo,
-                                        armnnUtils::QuantizedVector<T>(inputValues, qScale, qOffset));
-
-    LayerTestResult<T, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-                                             armnnUtils::QuantizedVector<T>(expectedOutputValues, qScale, qOffset));
+    std::vector<T> inputTensor = armnnUtils::QuantizedVector<T>(inputValues, qScale, qOffset);
+    std::vector<T> expectedOutput = armnnUtils::QuantizedVector<T>(expectedOutputValues, qScale, qOffset);
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::WorkloadInfo info;
-
 
     AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
@@ -57,13 +53,16 @@ LayerTestResult<T, 4> InstanceNormTestImpl(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), inputTensor.data());
 
     workload->Execute();
 
-    CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return result;
+    return LayerTestResult<T, 4>(actualOutput,
+                                 expectedOutput,
+                                 outputHandle->GetShape(),
+                                 outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>

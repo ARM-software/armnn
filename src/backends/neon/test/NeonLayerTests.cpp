@@ -874,6 +874,7 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(Minimum1DVectorUint8, MinimumBroadcast1DVectorUint
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleNormalizationAcross, SimpleNormalizationAcrossTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleNormalizationWithin, SimpleNormalizationWithinTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleNormalizationAcrossNhwc, SimpleNormalizationAcrossNhwcTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AcrossChannelNormalization, AcrossChannelNormalizationTest)
 
 // Resize Bilinear - NCHW data layout
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleResizeBilinear, SimpleResizeBilinearTest<DataType::Float32>, DataLayout::NCHW)

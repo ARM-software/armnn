@@ -15,7 +15,7 @@
 template<typename T , std::size_t n>
 LayerTestResult<int32_t, 1> RankTest(
         armnn::TensorInfo inputTensorInfo,
-        boost::multi_array<T, n> input,
+        std::vector<T> input,
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory);

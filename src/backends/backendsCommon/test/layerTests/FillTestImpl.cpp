@@ -21,15 +21,15 @@ LayerTestResult<T, 4> SimpleFillTest(
     armnn::TensorInfo inputTensorInfo({4}, armnn::DataType::Signed32);
     armnn::TensorInfo outputTensorInfo({2, 2, 3, 2}, ArmnnType);
 
-    auto input = MakeTensor<int32_t, 1>(inputTensorInfo, ConvertToDataType<armnn::DataType::Signed32>(
-        {2, 2, 3, 2},
-        inputTensorInfo));
+    std::vector<int32_t> input = ConvertToDataType<armnn::DataType::Signed32>( { 2, 2, 3, 2 }, inputTensorInfo);
 
-    LayerTestResult<T, 4> ret(outputTensorInfo);
-        ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, ConvertToDataType<ArmnnType>(
-        { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-          1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
-        outputTensorInfo));
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
+    std::vector<T> expectedOutput = ConvertToDataType<ArmnnType>(
+        {
+            1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+        },
+        outputTensorInfo);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
@@ -45,13 +45,16 @@ LayerTestResult<T, 4> SimpleFillTest(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), &input[0]);
+    CopyDataToITensorHandle(inputHandle.get(), input.data());
 
     workload->Execute();
 
-    CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return ret;
+    return LayerTestResult<T, 4>(actualOutput,
+                                 expectedOutput,
+                                 outputHandle->GetShape(),
+                                 outputTensorInfo.GetShape());
 }
 
 //

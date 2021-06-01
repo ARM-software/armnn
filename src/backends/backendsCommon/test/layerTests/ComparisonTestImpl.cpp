@@ -52,10 +52,7 @@ LayerTestResult<uint8_t, NumDims> ComparisonTestImpl(
     ARMNN_ASSERT(outShape.GetNumDimensions() == NumDims);
     armnn::TensorInfo outputTensorInfo(outShape, armnn::DataType::Boolean, outQuantScale, outQuantOffset);
 
-    auto input0 = MakeTensor<InType, NumDims>(inputTensorInfo0, values0);
-    auto input1 = MakeTensor<InType, NumDims>(inputTensorInfo1, values1);
-
-    LayerTestResult<uint8_t, NumDims> ret(outputTensorInfo);
+    std::vector<uint8_t> actualOutput(outputTensorInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle0 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo0);
     std::unique_ptr<armnn::ITensorHandle> inputHandle1 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo1);
@@ -75,18 +72,19 @@ LayerTestResult<uint8_t, NumDims> ComparisonTestImpl(
     inputHandle1->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle0.get(), input0.origin());
-    CopyDataToITensorHandle(inputHandle1.get(), input1.origin());
+    CopyDataToITensorHandle(inputHandle0.get(), values0.data());
+    CopyDataToITensorHandle(inputHandle1.get(), values1.data());
 
     workload->PostAllocationConfigure();
     ExecuteWorkload(*workload, memoryManager);
 
-    CopyDataFromITensorHandle(ret.output.origin(), outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    ret.outputExpected = MakeTensor<uint8_t, NumDims>(outputTensorInfo, outValues);
-    ret.compareBoolean = true;
-
-    return ret;
+    return LayerTestResult<uint8_t, NumDims>(actualOutput,
+                                             outValues,
+                                             outputHandle->GetShape(),
+                                             outputTensorInfo.GetShape(),
+                                             true);
 }
 
 template <std::size_t NumDims,

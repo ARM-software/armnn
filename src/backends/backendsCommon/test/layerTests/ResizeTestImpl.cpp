@@ -95,21 +95,16 @@ LayerTestResult<T, NumDims> ResizeTestImpl(
     std::vector<T> inputData =
         armnnUtils::QuantizedVector<T>(params.m_InputData, params.m_InQuantScale, params.m_InQuantOffset);
 
-    std::vector<T> expectedOutputData =
-        armnnUtils::QuantizedVector<T>(params.m_ExpectedOutputData,
-                                       params.m_OutQuantScale,
-                                       params.m_OutQuantOffset);
+    std::vector<T> actualOutput(outputInfo.GetNumElements());
+    std::vector<T> expectedOutputData = armnnUtils::QuantizedVector<T>(params.m_ExpectedOutputData,
+                                                                       params.m_OutQuantScale,
+                                                                       params.m_OutQuantOffset);
 
     if (params.m_DataLayout == armnn::DataLayout::NHWC)
     {
         PermuteTensorNchwToNhwc(inputInfo, inputData);
         PermuteTensorNchwToNhwc(outputInfo, expectedOutputData);
     }
-
-    auto input = MakeTensor<T, NumDims>(inputInfo, inputData);
-
-    LayerTestResult<T, NumDims> result(outputInfo);
-    result.outputExpected = MakeTensor<T, NumDims>(outputInfo, expectedOutputData);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputInfo);
@@ -132,13 +127,17 @@ LayerTestResult<T, NumDims> ResizeTestImpl(
 
     inputHandle->Allocate();
     outputHandle->Allocate();
-    CopyDataToITensorHandle(inputHandle.get(), input.origin());
+    CopyDataToITensorHandle(inputHandle.get(), inputData.data());
 
     workload->PostAllocationConfigure();
     workload->Execute();
 
-    CopyDataFromITensorHandle(result.output.origin(), outputHandle.get());
-    return result;
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
+
+    return LayerTestResult<T, NumDims>(actualOutput,
+                                       expectedOutputData,
+                                       outputHandle->GetShape(),
+                                       outputInfo.GetShape());
 }
 
 } // anonymous namespace

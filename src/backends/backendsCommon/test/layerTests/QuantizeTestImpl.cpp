@@ -31,10 +31,7 @@ LayerTestResult<T, Dim> QuantizeTestImpl(
     armnn::QuantizeQueueDescriptor descriptor)
 {
     IgnoreUnused(memoryManager);
-    boost::multi_array<float, Dim> input = MakeTensor<float, Dim>(inputTensorInfo, inputData);
-
-    LayerTestResult<T, Dim> ret(outputTensorInfo);
-    ret.outputExpected = MakeTensor<T, Dim>(outputTensorInfo, expectedOutputData);
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
@@ -48,13 +45,16 @@ LayerTestResult<T, Dim> QuantizeTestImpl(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), input.data());
+    CopyDataToITensorHandle(inputHandle.get(), inputData.data());
 
     ExecuteWorkload(*workload, memoryManager);
 
-    CopyDataFromITensorHandle(ret.output.data(), outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return ret;
+    return LayerTestResult<T, Dim>(actualOutput,
+                                   expectedOutputData,
+                                   outputHandle->GetShape(),
+                                   outputTensorInfo.GetShape());
 }
 
 template <armnn::DataType ArmnnOutputType, typename T = armnn::ResolveType<ArmnnOutputType>>

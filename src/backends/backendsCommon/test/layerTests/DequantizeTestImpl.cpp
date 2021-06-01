@@ -27,10 +27,8 @@ LayerTestResult<T1, Dim> DequantizeTestImpl(
         armnn::DequantizeQueueDescriptor descriptor)
 {
     IgnoreUnused(memoryManager);
-    boost::multi_array<T, Dim> input = MakeTensor<T, Dim>(inputTensorInfo, inputData);
 
-    LayerTestResult<T1, Dim> ret(outputTensorInfo);
-    ret.outputExpected = MakeTensor<T1, Dim>(outputTensorInfo, expectedOutputData);
+    std::vector<T1> actualOutput(outputTensorInfo.GetNumElements());
 
     ARMNN_NO_DEPRECATE_WARN_BEGIN
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
@@ -46,13 +44,16 @@ LayerTestResult<T1, Dim> DequantizeTestImpl(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), input.data());
+    CopyDataToITensorHandle(inputHandle.get(), inputData.data());
 
     ExecuteWorkload(*workload, memoryManager);
 
-    CopyDataFromITensorHandle(ret.output.data(), outputHandle.get());
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
-    return ret;
+    return LayerTestResult<T1, Dim>(actualOutput,
+                                    expectedOutputData,
+                                    outputHandle->GetShape(),
+                                    outputTensorInfo.GetShape());
 }
 
 template <armnn::DataType ArmnnInputType,

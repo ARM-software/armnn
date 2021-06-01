@@ -11,7 +11,9 @@
 
 #include <backendsCommon/test/LayerTests.hpp>
 #include <backendsCommon/test/WorkloadFactoryHelper.hpp>
+
 #include "TensorHelpers.hpp"
+
 #include <boost/test/unit_test.hpp>
 
 inline void ConfigureLoggingTest()
@@ -38,11 +40,15 @@ template <typename T, std::size_t n>
 void CompareTestResultIfSupported(const std::string& testName, const LayerTestResult<T, n>& testResult)
 {
     bool testNameIndicatesUnsupported = testName.find("UNSUPPORTED") != std::string::npos;
-    BOOST_CHECK_MESSAGE(testNameIndicatesUnsupported != testResult.supported,
-        "The test name does not match the supportedness it is reporting");
-    if (testResult.supported)
+    BOOST_CHECK_MESSAGE(testNameIndicatesUnsupported != testResult.m_Supported,
+                        "The test name does not match the supportedness it is reporting");
+    if (testResult.m_Supported)
     {
-        auto result = CompareTensors(testResult.output, testResult.outputExpected, testResult.compareBoolean);
+        auto result = CompareTensors(testResult.m_ActualData,
+                                     testResult.m_ExpectedData,
+                                     testResult.m_ActualShape,
+                                     testResult.m_ExpectedShape,
+                                     testResult.m_CompareBoolean);
         BOOST_TEST(result.m_Result, result.m_Message.str());
     }
 }
@@ -53,11 +59,14 @@ void CompareTestResultIfSupported(const std::string& testName, const std::vector
     bool testNameIndicatesUnsupported = testName.find("UNSUPPORTED") != std::string::npos;
     for (unsigned int i = 0; i < testResult.size(); ++i)
     {
-        BOOST_CHECK_MESSAGE(testNameIndicatesUnsupported != testResult[i].supported,
-            "The test name does not match the supportedness it is reporting");
-        if (testResult[i].supported)
+        BOOST_CHECK_MESSAGE(testNameIndicatesUnsupported != testResult[i].m_Supported,
+                            "The test name does not match the supportedness it is reporting");
+        if (testResult[i].m_Supported)
         {
-            auto result = CompareTensors(testResult[i].output, testResult[i].outputExpected);
+            auto result = CompareTensors(testResult[i].m_ActualData,
+                                         testResult[i].m_ExpectedData,
+                                         testResult[i].m_ActualShape,
+                                         testResult[i].m_ExpectedShape);
             BOOST_TEST(result.m_Result, result.m_Message.str());
         }
     }

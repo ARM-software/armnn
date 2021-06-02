@@ -25,6 +25,11 @@ struct StringifyLayerParameters
     static void Serialize(ParameterStringifyFunction&, const LayerParameter&) {}
 };
 
+template <> struct StringifyLayerParameters<ComparisonDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const ComparisonDescriptor& desc);
+};
+
 template <> struct StringifyLayerParameters<PermuteDescriptor>
 {
     static void Serialize(ParameterStringifyFunction& fn, const PermuteDescriptor& desc);

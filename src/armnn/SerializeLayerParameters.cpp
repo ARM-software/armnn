@@ -11,6 +11,12 @@
 namespace armnn
 {
 
+void StringifyLayerParameters<ComparisonDescriptor>::Serialize(ParameterStringifyFunction& fn,
+                                                               const ComparisonDescriptor& desc)
+{
+    fn("Operation", GetComparisonOperationAsCString(desc.m_Operation));
+}
+
 void StringifyLayerParameters<PermuteDescriptor>::Serialize(ParameterStringifyFunction& fn,
                                                             const PermuteDescriptor& desc)
 {

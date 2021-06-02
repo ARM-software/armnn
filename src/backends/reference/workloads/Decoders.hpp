@@ -20,11 +20,7 @@ namespace
 
 inline std::unique_ptr<Decoder<float>> MakeSigned32PerAxisDecoder(const TensorInfo& info, const void* data)
 {
-    auto params = armnnUtils::GetPerAxisParams(info);
-    return std::make_unique<ScaledInt32PerAxisDecoder>(
-        static_cast<const int32_t*>(data),
-        params.second,
-        params.first);
+    return std::make_unique<ScaledInt32PerAxisDecoder>(static_cast<const int32_t*>(data), info);
 }
 
 inline std::unique_ptr<Decoder<float>> MakeSigned32Decoder(const TensorInfo& info, const void* data)
@@ -75,10 +71,7 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
         case armnn::DataType::QuantizedSymm8PerAxis:
         {
             std::pair<unsigned int, std::vector<float>> params = armnnUtils::GetPerAxisParams(info);
-            return std::make_unique<QSymm8PerAxisDecoder>(
-                static_cast<const int8_t*>(data),
-                params.second,
-                params.first);
+            return std::make_unique<QSymm8PerAxisDecoder>(static_cast<const int8_t*>(data), info);
         }
         ARMNN_NO_DEPRECATE_WARN_END
         case DataType::QAsymmS8:
@@ -123,10 +116,7 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
             if (info.HasPerAxisQuantization())
             {
                 std::pair<unsigned int, std::vector<float>> params = armnnUtils::GetPerAxisParams(info);
-                return std::make_unique<QSymm8PerAxisDecoder>(
-                    static_cast<const int8_t*>(data),
-                    params.second,
-                    params.first);
+                return std::make_unique<QSymm8PerAxisDecoder>(static_cast<const int8_t*>(data), info);
             }
             else
             {

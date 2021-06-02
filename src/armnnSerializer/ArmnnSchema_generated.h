@@ -9853,14 +9853,19 @@ inline flatbuffers::Offset<AnyLayer> CreateAnyLayer(
 struct FeatureCompatibilityVersions FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef FeatureCompatibilityVersionsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_BINDINGIDSSCHEME = 4
+    VT_BINDINGIDSSCHEME = 4,
+    VT_WEIGHTSLAYOUTSCHEME = 6
   };
   uint32_t bindingIdsScheme() const {
     return GetField<uint32_t>(VT_BINDINGIDSSCHEME, 0);
   }
+  uint32_t weightsLayoutScheme() const {
+    return GetField<uint32_t>(VT_WEIGHTSLAYOUTSCHEME, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_BINDINGIDSSCHEME) &&
+           VerifyField<uint32_t>(verifier, VT_WEIGHTSLAYOUTSCHEME) &&
            verifier.EndTable();
   }
 };
@@ -9871,6 +9876,9 @@ struct FeatureCompatibilityVersionsBuilder {
   flatbuffers::uoffset_t start_;
   void add_bindingIdsScheme(uint32_t bindingIdsScheme) {
     fbb_.AddElement<uint32_t>(FeatureCompatibilityVersions::VT_BINDINGIDSSCHEME, bindingIdsScheme, 0);
+  }
+  void add_weightsLayoutScheme(uint32_t weightsLayoutScheme) {
+    fbb_.AddElement<uint32_t>(FeatureCompatibilityVersions::VT_WEIGHTSLAYOUTSCHEME, weightsLayoutScheme, 0);
   }
   explicit FeatureCompatibilityVersionsBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -9886,8 +9894,10 @@ struct FeatureCompatibilityVersionsBuilder {
 
 inline flatbuffers::Offset<FeatureCompatibilityVersions> CreateFeatureCompatibilityVersions(
     flatbuffers::FlatBufferBuilder &_fbb,
-    uint32_t bindingIdsScheme = 0) {
+    uint32_t bindingIdsScheme = 0,
+    uint32_t weightsLayoutScheme = 0) {
   FeatureCompatibilityVersionsBuilder builder_(_fbb);
+  builder_.add_weightsLayoutScheme(weightsLayoutScheme);
   builder_.add_bindingIdsScheme(bindingIdsScheme);
   return builder_.Finish();
 }

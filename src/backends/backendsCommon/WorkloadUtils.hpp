@@ -214,8 +214,42 @@ void ReshapeWeightsForAcl(TensorInfo& weightInfo, DataLayout dataLayout);
 
 TensorInfo ConvertWeightTensorInfoFromArmnnToAcl(const TensorInfo& weightInfo, DataLayout dataLayout);
 
+/// Weights for depthwise have a datalayout of [1,H,W,O] = [1,H,W,I*M]
+/// This function coverts a TensorInfo from [1,H,W,I*M] to [1,I*M,H,W] (if NCHW) or keeps it at [1,H,W,I*M] (if NHWC)
+/// as required by the compute library
+/// Returns a tuple of converted weights tensor info and depth multiplier
+std::tuple<TensorInfo, unsigned int> Convert1HWOTensorInfoToAcl(const TensorInfo& weightInfo,
+                                                                const TensorInfo& inputInfo,
+                                                                const DataLayout dataLayout);
+
 armnn::ConstTensor ConvertWeightTensorFromArmnnToAcl(const ConstTensorHandle* weightTensor,
                                                      DataLayout dataLayout,
                                                      void* permuteBuffer);
+
+/// Weights for depthwise have a datalayout of [1,H,W,O] = [1,H,W,I*M]
+/// This function coverts a ConstCpuTensorHandle from [1,H,W,I*M] to [1,I*M,H,W] (if NCHW) or
+/// keeps it at [1,H,W,I*M] (if NHWC) as required by the compute library
+///
+/// \param weightTensor - ConstTensorHandle of weights tensor
+/// \param inputInfo - TensorInfo of input tensor
+/// \param dataLayout - DataLayout of the input tensor
+/// \param permuteBuffer - Pointer to memory with the size of tensor. Used for the permutation
+/// \return tuple of transformed weights-ConstTensor and depthwise multiplier
+std::tuple<ConstTensor, unsigned int> Convert1HWOTensorToAcl(const ConstTensorHandle* weightTensor,
+                                                             const TensorInfo& inputInfo,
+                                                             const DataLayout dataLayout,
+                                                             void* permuteBuffer);
+
+/// Converts a (weights) tensor from [1, H, W, I*M] = [1, H, W, O] to [M, I, H, W]
+///
+/// \param weightTensor - ConstTensorHandle of the weight tensor that should be converted
+/// \param inputInfo - TensorInfo of the corresponding input tensor
+/// \param dataLayout - DataLayout of the input tensor e.g. NHWC or NCHW
+/// \param permuteBuffer - Memory location with the same size as the weight tensor to write converted data to
+/// \return - A tuple of ConstTensor and unsigned int which is the converted weightTensor and the depthMultiplier
+std::tuple<ConstTensor, unsigned int> Convert1HWOtoMIHW(const ConstTensorHandle* weightTensor,
+                                                        const TensorInfo& inputInfo,
+                                                        const DataLayout& dataLayout,
+                                                        void* permuteBuffer);
 
 }  //namespace armnn

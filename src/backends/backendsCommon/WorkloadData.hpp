@@ -208,7 +208,19 @@ struct Convolution2dQueueDescriptor : QueueDescriptorWithParameters<Convolution2
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
-// Depthwise Convolution 2D layer workload data.
+/// Depthwise Convolution 2D layer workload data.
+///
+/// @note
+/// The weights are in the format [1, H, W, I*M]. Where I is the input channel size, M the depthwise mutliplier and
+/// H, W is the height and width of the filter kernel. If per channel quantization is applied
+/// the weights will be quantized along the last dimension/axis (I*M) which corresponds to the output channel size.
+/// If per channel quantization is applied the weights tensor will have I*M scales, one for each dimension
+/// of the quantization axis. You have to be aware of this when reshaping the weights tensor.
+/// Splitting the I*M axis, e.g. [1, H, W, I*M] --> [H, W, I, M], won't work without taking care of the
+/// corresponding quantization scales.
+/// If there is no per channel quantization applied reshaping the weights tensor won't cause any issues. There are
+/// preconfigured permutation functions available @link WorkloadUtils.hpp here.
+///
 struct DepthwiseConvolution2dQueueDescriptor : QueueDescriptorWithParameters<DepthwiseConvolution2dDescriptor>
 {
     DepthwiseConvolution2dQueueDescriptor()

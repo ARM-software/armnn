@@ -90,12 +90,12 @@ INetworkPtr CreatNetwork(bool depthwise, bool preventFusing)
 
     if (depthwise)
     {
-        //M Cin H W
-        weightsDimensionSizes[0] = 4;
-        weightsDimensionSizes[1] = 3;
+        // [1, H, W, Cout]
+        weightsDimensionSizes[0] = 1;
+        weightsDimensionSizes[1] = 2;
         weightsDimensionSizes[2] = 2;
-        weightsDimensionSizes[3] = 2;
-        outputDimensionSizes[3]  = weightsDimensionSizes[0] * weightsDimensionSizes[1];
+        weightsDimensionSizes[3] = 12;
+        outputDimensionSizes[3]  = weightsDimensionSizes[3];
     }
     const unsigned int outputChannelSize[]   = {outputDimensionSizes[3]};  // Cout
 
@@ -295,7 +295,7 @@ TEST_CASE("FuseBatchNormIntoDepthwiseConv2DFloat32Test")
 
 TEST_CASE("FuseBatchNormIntoDepthwiseConv2DFloat16Test")
 {
-    FuseBatchNormIntoConvTest<DepthwiseConv2dTest, DataType::Float16>(true, 0.1f,armnn::Compute::CpuRef);
+    FuseBatchNormIntoConvTest<DepthwiseConv2dTest, DataType::Float16>(true, 0.2f,armnn::Compute::CpuRef);
 }
 #endif
 

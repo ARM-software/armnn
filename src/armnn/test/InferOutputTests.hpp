@@ -518,7 +518,7 @@ void DepthwiseConvolution2dInferOutputShapeTest()
     armnn::TensorShape inputShape(4, inputSize.data());
     shapes.push_back(inputShape);
 
-    const std::vector<unsigned int> filterSize = { 1, 2, 3, 3};
+    const std::vector<unsigned int> filterSize = { 1, 3, 3, 2 };
     armnn::TensorShape filterShape(4, filterSize.data());
     shapes.push_back(filterShape);
 

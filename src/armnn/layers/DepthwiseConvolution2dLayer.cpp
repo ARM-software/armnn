@@ -98,24 +98,21 @@ DepthwiseConvolution2dLayer::InferOutputShapes(const std::vector<TensorShape>& i
     unsigned int inputBatchSize = inputShape[0];
     unsigned int inputHeight    = inputShape[dataLayoutIndex.GetHeightIndex()];
     unsigned int inputWidth     = inputShape[dataLayoutIndex.GetWidthIndex()];
-    unsigned int inputChannels  = inputShape[dataLayoutIndex.GetChannelsIndex()];
 
-    // Expected filter shape: [ M, I, H, W ] - This shape does NOT depend on the data layout
-    // Namely: [ depth multiplier, input channels, filter height, filter width ]
-    // Output channels = input channels * depthMultiplier
-    unsigned int depthMultiplier = filterShape[0];
+    // Expected filter shape: [ 1, H, W, O ] - This shape does NOT depend on the data layout
+    // Namely: [ 1, filter height, filter width, output channels ]
 
-    unsigned int filterHeight = filterShape[2];
+    unsigned int filterHeight = filterShape[1];
     unsigned int dilatedFilterHeight = filterHeight + (m_Param.m_DilationY - 1) * (filterHeight - 1);
     unsigned int readHeight   = (inputHeight + m_Param.m_PadTop + m_Param.m_PadBottom) - dilatedFilterHeight;
     unsigned int outputHeight = 1 + (readHeight / m_Param.m_StrideY);
 
-    unsigned int filterWidth = filterShape[3];
+    unsigned int filterWidth = filterShape[2];
     unsigned int dilatedFilterWidth = filterWidth + (m_Param.m_DilationX - 1) * (filterWidth - 1);
     unsigned int readWidth   = (inputWidth + m_Param.m_PadLeft + m_Param.m_PadRight) - dilatedFilterWidth;
     unsigned int outputWidth = 1 + (readWidth / m_Param.m_StrideX);
 
-    unsigned int outputChannels  = inputChannels * depthMultiplier;
+    unsigned int outputChannels  = filterShape[3];
     unsigned int outputBatchSize = inputBatchSize;
 
     TensorShape tensorShape = m_Param.m_DataLayout == armnn::DataLayout::NHWC ?

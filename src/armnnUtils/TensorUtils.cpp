@@ -142,7 +142,7 @@ unsigned int GetNumElementsAfter(const armnn::TensorShape& shape, unsigned int a
     unsigned int numDim = shape.GetNumDimensions();
     ARMNN_ASSERT(axis <= numDim - 1);
     unsigned int count = 1;
-    for (unsigned int i = axis; i < numDim; i++)
+    for (unsigned int i = axis+1; i < numDim; i++)
     {
         count *= shape[i];
     }
@@ -159,7 +159,7 @@ std::pair<unsigned int, std::vector<float>> GetPerAxisParams(const armnn::Tensor
             std::string("Per-axis quantization params not set for tensor of type ") +
             armnn::GetDataTypeName(info.GetDataType()), CHECK_LOCATION());
     }
-    unsigned int axisFactor = GetNumElementsAfter(info.GetShape(), quantizationDim.value());
+    unsigned int axisFactor = GetNumElementsAfter(info.GetShape(), quantizationDim.value()) ;
 
     return { axisFactor, scales };
 }

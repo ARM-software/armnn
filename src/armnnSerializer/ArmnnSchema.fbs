@@ -979,6 +979,7 @@ table AnyLayer {
 
 table FeatureCompatibilityVersions {
   bindingIdsScheme:uint = 0;
+  weightsLayoutScheme:uint = 0;
 }
 
 // Root type for serialized data is the graph of the network

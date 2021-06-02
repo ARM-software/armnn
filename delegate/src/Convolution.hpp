@@ -289,8 +289,6 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     const armnn::TensorInfo& inputTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
 
-    // Mappings from TensorflowLite filter tensors to the ArmNN filter tensors (ArmNN weights have to be [M, I, H, W])
-    armnn::PermutationVector permutationVector{ 2, 3, 1, 0 }; // [H, W, I, M] -> [M, I, H, W]
     armnn::TensorInfo filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
 
     // Assuming input is NHWC
@@ -300,12 +298,6 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     // TensorflowLite weights come in the format [1, H, W, I * M]
     unsigned int filterHeight = filterTensorInfo.GetShape()[1];
     unsigned int filterWidth  = filterTensorInfo.GetShape()[2];
-
-    // Reshape weights as [ H, W, I, M ]
-    filterTensorInfo.SetShape({ filterHeight,
-                                filterWidth,
-                                inputTensorInfo.GetShape()[3],
-                                filterTensorInfo.GetShape()[3] / inputTensorInfo.GetShape()[3] });
 
     // Calculate padding
     CalcPadding(inputHeight, filterHeight, descriptor.m_StrideY, descriptor.m_DilationY,
@@ -340,12 +332,8 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
         biasTensorInfo = armnn::TensorInfo(armnn::TensorShape({1}), GetDataType(tfLiteInputTensor));
     }
 
-    std::vector<uint8_t> swizzledData(filterTensorInfo.GetNumBytes());
-    auto filter =
-        CreateConstTensor(&tfLiteFilterTensor,
-                          filterTensorInfo,
-                          armnn::Optional<armnn::PermutationVector&>(permutationVector),
-                          swizzledData.data());
+    // For depthwise the weights layout is the same as for tflite [1, H, W, I*M]. No permutation required.
+    auto filter = CreateConstTensor(&tfLiteFilterTensor, filterTensorInfo);
 
     if (!delegateData.m_Network)
     {
@@ -369,8 +357,7 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     {
         auto biases =
             CreateConstTensor(&tfLiteContext->tensors[tfLiteNode->inputs->data[2]],
-                              biasTensorInfo,
-                              armnn::Optional<armnn::PermutationVector&>());
+                              biasTensorInfo);
         layer = delegateData.m_Network->AddDepthwiseConvolution2dLayer(descriptor,
                                                                        filter,
                                                                        armnn::Optional<armnn::ConstTensor>(biases));

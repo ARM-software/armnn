@@ -137,7 +137,7 @@ void TransposeConvolution2dImpl(const TransposeConvolution2dDescriptor& descript
         {
             for (unsigned int dOutput = 0u; dOutput < outputDepth; ++dOutput)
             {
-                rBiasesDecoder.SetIndex(dOutput, dOutput);
+                rBiasesDecoder[dOutput];
                 for (unsigned int yOutput = 0u; yOutput < outputHeight; ++yOutput)
                 {
                     for (unsigned int xOutput = 0u; xOutput < outputWidth; ++xOutput)

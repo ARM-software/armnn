@@ -927,6 +927,7 @@ IDeserializer::DeserializerImpl::FeatureVersions IDeserializer::DeserializerImpl
     if (graph->featureVersions())
     {
         versions.m_BindingIdScheme = graph->featureVersions()->bindingIdsScheme();
+        versions.m_WeightsLayoutScheme = graph->featureVersions()->weightsLayoutScheme();
     }
 
     return versions;
@@ -1420,19 +1421,51 @@ void IDeserializer::DeserializerImpl::ParseDepthwiseConvolution2d(GraphPtr graph
     descriptor.m_BiasEnabled = serializerDescriptor->biasEnabled();;
     descriptor.m_DataLayout  = ToDataLayout(serializerDescriptor->dataLayout());
 
-    armnn::ConstTensor weights = ToConstTensor(serializerLayer->weights());
-    armnn::ConstTensor biases;
+    IConnectableLayer* layer;
 
     armnn::Optional<armnn::ConstTensor> optionalBiases = armnn::EmptyOptional();
     if (descriptor.m_BiasEnabled)
     {
-        biases = ToConstTensor(serializerLayer->biases());
+        armnn::ConstTensor biases = ToConstTensor(serializerLayer->biases());
         optionalBiases = armnn::Optional<armnn::ConstTensor>(biases);
     }
-    IConnectableLayer* layer = m_Network->AddDepthwiseConvolution2dLayer(descriptor,
-                                                                         weights,
-                                                                         optionalBiases,
-                                                                         layerName.c_str());
+
+    armnn::ConstTensor weights = ToConstTensor(serializerLayer->weights());
+    // The data layout for weights in ArmNN used to be [M,I,H,W] but now it's changed to [1,H,W,I*M]
+    // When reading older flatbuffer files we need to add a permutation to get to the new layout.
+    if (this->GetFeatureVersions(graph).m_WeightsLayoutScheme <= 0)
+    {
+        // Permute weights  [ H, W, M, I ] --> [ 1, H, W, I*M ]
+        // Step1: [ M, I, H, W ] --> [ H, W, I, M]
+        PermutationVector permutationVector = { 3, 2, 0, 1 };
+        armnn::TensorInfo weightsInfo = weights.GetInfo();
+        std::unique_ptr<unsigned char[]> permuteBuffer(new unsigned char[weightsInfo.GetNumBytes()]);
+        weightsInfo = armnnUtils::Permuted(weightsInfo, permutationVector);
+        armnnUtils::Permute(weightsInfo.GetShape(), permutationVector,
+                            weights.GetMemoryArea(), permuteBuffer.get(),
+                            GetDataTypeSize(weightsInfo.GetDataType()));
+
+        // Step2: Reshape [ H, W, I, M] --> [ 1, H, W, I*M ]
+        auto weightsShape = weightsInfo.GetShape();
+        weightsInfo.SetShape({1,
+                              weightsShape[0],
+                              weightsShape[1],
+                              weightsShape[2]*weightsShape[3]});
+
+        armnn::ConstTensor weightsPermuted(weightsInfo, permuteBuffer.get());
+
+        layer = m_Network->AddDepthwiseConvolution2dLayer(descriptor,
+                                                          weightsPermuted,
+                                                          optionalBiases,
+                                                          layerName.c_str());
+    }
+    else
+    {
+        layer = m_Network->AddDepthwiseConvolution2dLayer(descriptor,
+                                                          weights,
+                                                          optionalBiases,
+                                                          layerName.c_str());
+    }
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

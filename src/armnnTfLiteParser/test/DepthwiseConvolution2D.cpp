@@ -624,7 +624,7 @@ TEST_CASE_FIXTURE(DepthwiseConvolution2dWeightsPerChannelQuant6Fixture,
           1,2,2,3,3,4,1,1,2,4,1,3,4,2,0,2,
           0,3,1,3,4,3,2,0,1,2,3,3,0,2,4,2,
           1,2,1,4,3,4,1,3,1,0,2,3,1,3,2,0},
-        { 9, 7, 3, 7,12, 8,22,22,27,22,13,17,13,10, 9,17,
+        {  9, 7, 3, 7,12, 8,22,22,27,22,13,17,13,10, 9,17,
           15, 9,12, 6,16,14,24,27,19,26,18,23, 9,10, 7, 3,
           18,14, 9,11, 7, 9,21,25,17,19,10,15,13, 9, 7, 9,
           15,16, 9, 1, 3, 9,11,12, 3,12, 9,12, 6, 2, 2, 6,
@@ -634,12 +634,12 @@ TEST_CASE_FIXTURE(DepthwiseConvolution2dWeightsPerChannelQuant6Fixture,
           12,16, 4, 4, 2, 6, 8,10,12, 8,16,16, 8, 6, 6,14,
           14, 3,14,10,15,15,27,25,16,14, 9,11,21,19,16,24,
           24,25,13, 7, 3,13,21,24,25,23,14,17,24,24,21,12,
-          7, 7, 3, 3,11,10,17,13,33,32,21,26,18,17,17,23,
-          3, 3, 2, 0, 2, 6, 9,13,10,20,20,24, 2, 4, 4, 8,
-          9, 4,10, 4, 2,14,22,16, 5, 7, 3, 5,13,20,20,19,
+           7, 7, 3, 3,11,10,17,13,33,32,21,26,18,17,17,23,
+           3, 3, 2, 0, 2, 6, 9,13,10,20,20,24, 2, 4, 4, 8,
+           9, 4,10, 4, 2,14,22,16, 5, 7, 3, 5,13,20,20,19,
           11,12, 6, 4, 4,12,12, 8, 9,10, 3, 6,12,18,18,15,
-          5, 4, 4, 2, 0, 6,12, 9,10,14, 6,10, 3, 6, 6,12,
-          3, 4, 1, 1, 3, 9, 9, 6, 2, 8, 6, 8, 0, 0, 0, 0});
+           5, 4, 4, 2, 0, 6,12, 9,10,14, 6,10, 3, 6, 6,12,
+           3, 4, 1, 1, 3, 9, 9, 6, 2, 8, 6, 8, 0, 0, 0, 0});
 }
 
 
@@ -973,4 +973,43 @@ TEST_CASE_FIXTURE(DepthwiseConvolution2dWeightsPerChannelQuant4_3_1Fixture,
           3, 4, 1, 1, 1, 3, 3, 2, 0, 0, 0, 0, 2, 4, 4, 8});
 }
 
+struct DepthwiseConvolution2dWeightsPerChannelQuant4_3_2Fixture : DepthwiseConvolution2dFixture2
+{
+    DepthwiseConvolution2dWeightsPerChannelQuant4_3_2Fixture()
+    : DepthwiseConvolution2dFixture2("[ 1, 2, 2, 2 ]",            // inputShape
+                                     "[ 1, 2, 2, 4 ]",           // outputShape
+                                     "[ 1, 3, 3, 4 ]",           // filterShape
+                                     // filter data is [ 0,1,2,3,4,5,6,7,8,
+                                     //                  0,1,2,3,4,5,6,7,8,
+                                     //                  0,1,2,3,4,5,6,7,8,
+                                     //                  0,1,2,3,4,5,6,7,8 ]
+                                     //                  quantized per channel with q_dim=3
+                                     "[0, 5,20, 9,16,25,60,21,32,"
+                                     " 0,10, 6,12,20,50,18,28,40,"
+                                     " 0, 3, 8,15,40,15,24,35,80,"
+                                     " 0, 4,10,30,12,20,30,70,24]",
+                                     "1",                        // stride w and h
+                                     "SAME",                     // padding type
+                                     "",                         // bias shape
+                                     "",                         // bias data
+                                     "[ 0.0 ]",                  // filter quantization min values
+                                     "[ 255.0 ]",                // filter quantization max values
+                                     "[0.25, 0.2, 0.1, 0.3333333333]",   // filter quantization scales
+                                     "[ 0, 0, 0, 0]",            // filter quantization zero-points
+                                     "3"                         // filter quantized axis
+                                                                 // (in case of per channel quantization)
+                                    )
+    {}
+};
+
+// An easy test with M > 1 for debugging
+TEST_CASE_FIXTURE(DepthwiseConvolution2dWeightsPerChannelQuant4_3_2Fixture,
+                  "ParseDepthwiseConv2DFilterWeightsPerChannelQuant4_3_2")
+{
+    RunTest<4, armnn::DataType::QAsymmS8>(
+        0,
+        { 0,1,2,3,4,5,6,7},
+        { 38,50,76,92,44,56,66,37,56,50,37,53,62,74,45,61});
 }
+
+} // end of TEST_SUITE("TensorflowLiteParser_DepthwiseConvolution2D")

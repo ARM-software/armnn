@@ -216,6 +216,11 @@ ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcInt16_3, DepthToSpaceTest3<DataType::QSymmS
 ARMNN_AUTO_TEST_CASE(DepthToSpaceNhwcInt16_4, DepthToSpaceTest4<DataType::QSymmS16>, DataLayout::NHWC);
 
 // Depthwise Convolution
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2d, DepthwiseConvolution2dTest, true, DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dUint8, DepthwiseConvolution2dUint8Test, true, DataLayout::NCHW)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedDepthwiseConvolution2d, DepthwiseConvolution2dTest, false, DataLayout::NCHW)
+
 ARMNN_AUTO_TEST_CASE_WITH_THF(DepthwiseConvolution2dDepthMul1,
                      DepthwiseConvolution2dDepthMul1Test, true, DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE_WITH_THF(UnbiasedDepthwiseConvolution2dDepthMul1,
@@ -291,16 +296,15 @@ TensorInfo CreateOutputTensorInfo(const TensorInfo& inputInfo,
     unsigned int inHeight = inputShape[2];
     unsigned int inBatchSize = inputShape[0];
 
-    unsigned int filterWidth = filterShape[3];
+    unsigned int filterWidth = filterShape[2];
     unsigned int readWidth = (inWidth + descriptor.m_PadLeft + descriptor.m_PadRight) - (filterWidth);
     unsigned int outWidth =  1u + (readWidth / descriptor.m_StrideX);
 
-    unsigned int filterHeight = filterShape[2];
+    unsigned int filterHeight = filterShape[1];
     unsigned int readHeight = (inHeight + descriptor.m_PadTop + descriptor.m_PadBottom) - (filterHeight);
     unsigned int outHeight = 1u + (readHeight / descriptor.m_StrideY);
-    unsigned int depthMultiplier = filterShape[0];
 
-    unsigned int outChannels = filterShape[1] * depthMultiplier;
+    unsigned int outChannels = filterShape[3];
     unsigned int outBatchSize = inBatchSize;
 
     TensorShape outputShape({outBatchSize, outChannels, outHeight, outWidth});
@@ -314,7 +318,7 @@ TEST_CASE("DepthwiseConv2dUtils")
 
     TensorInfo inputInfo({1, 1, 10, 10 }, dataType);
     TensorInfo outputInfo;
-    TensorInfo weightsInfo3x3({ 1, 1, 3, 3 }, dataType);
+    TensorInfo weightsInfo3x3({ 1, 3, 3, 1 }, dataType); // [1,H,W,I*M]
     TensorInfo biasesInfo;
 
     DepthwiseConvolution2dDescriptor descriptor;
@@ -380,7 +384,7 @@ TEST_CASE("DepthwiseConv2dUtils")
                                                             weightsInfo1x1, biasesInfo));
 
     // Supported shape 2x2
-    TensorInfo weightsInfo2x2({ 1, 1, 2, 2 }, DataType::Float32);
+    TensorInfo weightsInfo2x2({ 1, 2, 2, 1 }, DataType::Float32);
     descriptor = MakeDepthwiseConv2dDesc(1, 1);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo2x2, descriptor, dataType);
     CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,

@@ -163,6 +163,9 @@ private:
     {
         // Default values to zero for backward compatibility
         unsigned int m_BindingIdScheme = 0;
+
+        // Default values to zero for backward compatibility
+        unsigned int m_WeightsLayoutScheme = 0;
     };
 
     FeatureVersions GetFeatureVersions(GraphPtr graph);

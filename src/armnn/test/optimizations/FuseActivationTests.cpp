@@ -81,9 +81,9 @@ public:
     using LayerType = DepthwiseConvolution2dLayer;
     static const bool isElementWise = false;
 
-    static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }   // NHWCin
-    static TensorShape GetOutputShape()  { return TensorShape( {1, 3, 3, 12}); }  // NHWCout
-    static TensorShape GetWeightsShape() { return TensorShape( {4, 3, 2, 2}); }   // MCinHW
+    static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }   // [N,H,W,Cin]
+    static TensorShape GetOutputShape()  { return TensorShape( {1, 3, 3, 12}); }  // [N,H,W,Cout]
+    static TensorShape GetWeightsShape() { return TensorShape( {1, 2, 2, 12}); }  // [1,H,W,Cout]
 
     constexpr static const unsigned int inputSize  = 48; //batchIn * heightIn * widthIn * channelIn;
     constexpr static const unsigned int outputSize = 108; //batchOut * heightOut * widthOut * channelOut;

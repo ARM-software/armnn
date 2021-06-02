@@ -472,7 +472,8 @@ armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor)
 
 armnn::ConstTensor CreateConstTensor(const TfLiteTensor* tfLiteTensor,
                                      armnn::TensorInfo& tensorInfo,
-                                     armnn::Optional<armnn::PermutationVector&> permutationVector,
+                                     armnn::Optional<armnn::PermutationVector&>
+                                             permutationVector = armnn::EmptyOptional(),
                                      void* permutationData = nullptr)
 {
     if (tfLiteTensor->allocation_type != kTfLiteMmapRo)

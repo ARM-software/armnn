@@ -95,9 +95,12 @@ void Convolve(const TensorShape& rInputShape,
     const unsigned int heightIndex   = dataLayoutIndexed.GetHeightIndex();
     const unsigned int widthIndex    = dataLayoutIndexed.GetWidthIndex();
 
-    const unsigned int depthMultiplier = depthwise ? rFilterShape[0] : 1;
-    const unsigned int inputChannels   = depthwise ? rFilterShape[1] : rFilterShape[channelsIndex];
-    const unsigned int outputChannels  = depthwise ? inputChannels * depthMultiplier : rFilterShape[0];
+    // Weights layout:
+    // Conv2d:    [O,H,W,I]
+    // Depthwise: [1,H,W,O]
+    const unsigned int inputChannels   = rInputShape[channelsIndex];
+    const unsigned int outputChannels  = rOutputShape[channelsIndex];
+    const unsigned int depthMultiplier = depthwise ? outputChannels/inputChannels : 1;
 
     const unsigned int batchSize    = rOutputShape[0];
     const unsigned int outputHeight = rOutputShape[heightIndex];
@@ -105,16 +108,15 @@ void Convolve(const TensorShape& rInputShape,
     const unsigned int inputHeight  = rInputShape[heightIndex];
     const unsigned int inputWidth   = rInputShape[widthIndex];
 
-    const unsigned int filterHeight = depthwise ? rFilterShape[2] : rFilterShape[heightIndex];
-    const unsigned int filterWidth  = depthwise ? rFilterShape[3] : rFilterShape[widthIndex];
+    const unsigned int filterHeight = depthwise ? rFilterShape[1] : rFilterShape[heightIndex];
+    const unsigned int filterWidth  = depthwise ? rFilterShape[2] : rFilterShape[widthIndex];
 
     const std::vector<float> inputVec = rInputDecoder.DecodeTensor(rInputShape);
-    const std::vector<float> filterVec = rFilterDecoder.DecodeTensor(rFilterShape, depthMultiplier, depthwise);
+    const std::vector<float> filterVec = rFilterDecoder.DecodeTensor(rFilterShape, depthwise);
 
     const TensorShape biasShape{outputChannels};
     const std::vector<float> biasVec = biasEnabled ? pBiasDecoder->DecodeTensor(biasShape) : std::vector<float>();
 
-    unsigned int depthwiseMultiplierIdx = 0;
     for (unsigned int batchIdx = 0; batchIdx < batchSize; batchIdx++)
     {
         for (unsigned int cOutput = 0; cOutput < outputChannels; cOutput++)
@@ -130,13 +132,6 @@ void Convolve(const TensorShape& rInputShape,
                     // For normal, must loop over each input channel.
                     for (unsigned int cInput = 0; cInput < (depthwise ? 1 : inputChannels); cInput++)
                     {
-                        if (depthwise)
-                        {
-                            depthwiseMultiplierIdx = 0;
-                            cInput = cOutput / depthMultiplier;
-                            depthwiseMultiplierIdx = cOutput % depthMultiplier;
-                        }
-
                         for (unsigned int yFilter = 0; yFilter < filterHeight; yFilter++)
                         {
                             for (unsigned int xFilter = 0; xFilter < filterWidth; xFilter++)
@@ -147,10 +142,10 @@ void Convolve(const TensorShape& rInputShape,
                                 // Since dimensionality of kernel depends on depthwiseness, so does index.
                                 if (depthwise)
                                 {
-                                    filterIndex = depthwiseMultiplierIdx * filterWidth * filterHeight * inputChannels +
-                                                  cInput * filterWidth * filterHeight +
-                                                  yFilter * filterWidth +
-                                                  xFilter;
+                                    cInput = cOutput / depthMultiplier;
+                                    // filterDepth = outputChannels;
+                                    filterIndex = xFilter * outputChannels + cOutput +
+                                                  yFilter * filterWidth * outputChannels;
                                 }
                                 else
                                 {

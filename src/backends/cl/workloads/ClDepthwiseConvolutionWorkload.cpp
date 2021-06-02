@@ -33,12 +33,11 @@ arm_compute::Status ClDepthwiseConvolutionWorkloadValidate(const TensorInfo& inp
     const arm_compute::TensorInfo aclInputInfo  = BuildArmComputeTensorInfo(input,  descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
 
-    // ArmNN's weight format is [ M, I, H, W ]
-    const unsigned int aclDepthMultiplier = weights.GetShape()[0];
-
-    // Convert the weight format from ArmNN's [ M, I, H, W ] (does NOT depend on the data layout) to either
-    // [ 1, H, W, I * M ] (if NHWC) or [ 1, I * M, H, W ] (if NCHW), as required by the compute library
-    TensorInfo weightsPermuted = ConvertWeightTensorInfoFromArmnnToAcl(weights, descriptor.m_DataLayout);
+    // ArmNN's weight format is usually [ M, I, H, W ] but for depthwise its [ 1, H, W, I*M]
+    // Permute to [ 1, I * M, H, W ] (if NCHW) as required by the compute library
+    unsigned int aclDepthMultiplier;
+    TensorInfo weightsPermuted;
+    std::tie(weightsPermuted, aclDepthMultiplier) = Convert1HWOTensorInfoToAcl(weights, input,descriptor.m_DataLayout);
 
     // Convert the weights into the compute library format
     const arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weightsPermuted, descriptor.m_DataLayout);
@@ -79,14 +78,15 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
     const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
 {
-    // Allocate a buffer for the swizzling of the weight tensor
+    // ArmNN's weight format is usually [ M, I, H, W ] but for depthwise its [ 1, H, W, I*M]
+    // Permute to [ 1, I * M, H, W ] (if NCHW), as required by the compute library
+    ConstTensor weightPermuted;
+    unsigned int depthMultiplier;
     std::unique_ptr<unsigned char[]> permuteBuffer(new unsigned char[m_Data.m_Weight->GetTensorInfo().GetNumBytes()]);
-
-    // Convert the weight format from ArmNN's [ M, I, H, W ] (does NOT depend on the data layout) to either
-    // [ 1, H, W, I * M ] (if NHWC) or [ 1, I * M, H, W ] (if NCHW), as required by the compute library
-    ConstTensor weightPermuted = ConvertWeightTensorFromArmnnToAcl(m_Data.m_Weight,
-                                                                   m_Data.m_Parameters.m_DataLayout,
-                                                                   permuteBuffer.get());
+    std::tie(weightPermuted, depthMultiplier) = Convert1HWOTensorToAcl(m_Data.m_Weight,
+                                                                        info.m_InputTensorInfos[0],
+                                                                        m_Data.m_Parameters.m_DataLayout,
+                                                                        permuteBuffer.get());
 
     // Convert the weights into the compute library format
     m_KernelTensor = std::make_unique<arm_compute::CLTensor>();
@@ -112,12 +112,6 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
     arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
-
-    // ArmNN's weight format is [ M, I, H, W ]
-    auto& weightInfo = m_Data.m_Weight->GetTensorInfo();
-
-    // Get the depth multiplier
-    const unsigned int depthMultiplier = weightInfo.GetShape()[0];
 
     arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
 

@@ -1011,9 +1011,6 @@ void TfLiteParserImpl::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operato
     desc.m_DilationX = CHECKED_NON_NEGATIVE(options->dilation_w_factor);
     desc.m_DilationY = CHECKED_NON_NEGATIVE(options->dilation_h_factor);
 
-    // Mappings from TensorflowLite filter tensors to the ArmNN filter tensors (ArmNN weights have to be [M, I, H, W])
-    PermutationVector permutationVector{ 2, 3, 1, 0 }; // [H, W, I, M] -> [M, I, H, W]
-
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     armnn::TensorInfo filterTensorInfo = ToTensorInfo(inputs[1]);
 
@@ -1025,18 +1022,13 @@ void TfLiteParserImpl::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operato
     unsigned int filterHeight = filterTensorInfo.GetShape()[1];
     unsigned int filterWidth  = filterTensorInfo.GetShape()[2];
 
-    // Reshape weights as [ H, W, I, M ]
-    filterTensorInfo.SetShape({ filterHeight,
-                                filterWidth,
-                                inputTensorInfo.GetShape()[3],
-                                filterTensorInfo.GetShape()[3] / inputTensorInfo.GetShape()[3] });
-
     CalcPadding(inputHeight, filterHeight, desc.m_StrideY,
                 desc.m_DilationY, desc.m_PadTop, desc.m_PadBottom, options->padding);
     CalcPadding(inputWidth, filterWidth, desc.m_StrideX,
                 desc.m_DilationX, desc.m_PadLeft, desc.m_PadRight, options->padding);
 
-    auto filterTensorAndData = CreateConstTensorPermuted(inputs[1], filterTensorInfo, permutationVector);
+    // ArmNN uses the same filter tensor layout at TfLite [1, H, W, O] no need for any permutation
+    auto filterTensor = CreateConstTensorNonPermuted(inputs[1], filterTensorInfo);
     armnn::IConnectableLayer* layer = nullptr;
     auto layerName = fmt::format("DepthwiseConv2D:{}:{}", subgraphIndex, operatorIndex);
 
@@ -1046,14 +1038,14 @@ void TfLiteParserImpl::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operato
         TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
         auto biasTensorAndData = CreateConstTensorNonPermuted(inputs[2], biasTensorInfo);
         layer = m_Network->AddDepthwiseConvolution2dLayer(desc,
-                                                          filterTensorAndData.first,
+                                                          filterTensor,
                                                           Optional<ConstTensor>(biasTensorAndData),
                                                           layerName.c_str());
     }
     else
     {
         layer = m_Network->AddDepthwiseConvolution2dLayer(desc,
-                                                          filterTensorAndData.first,
+                                                          filterTensor,
                                                           EmptyOptional(),
                                                           layerName.c_str());
     }

@@ -128,7 +128,9 @@ private:
     void ResetParser();
     void Cleanup();
 
-    std::pair<armnn::ConstTensor, std::unique_ptr<float[]>> CreateConstTensor(const std::string name);
+    std::pair<armnn::ConstTensor, std::unique_ptr<float[]>>
+    CreateConstTensor(const std::string name,
+                      armnn::Optional<armnn::PermutationVector&> permutationVector = armnn::EmptyOptional());
 
     template <typename TypeList, typename Location>
     void ValidateInputs(const onnx::NodeProto& node,

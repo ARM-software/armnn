@@ -687,7 +687,7 @@ TEST_CASE("FoldPadLayerIntoDepthwiseConv2dLayer_ExecuteInferenceWithAndWithoutOp
     // avoided. The output tensors of each should match.
     const unsigned int inputShape[]   = {1, 4, 4, 3}; // NHWCin
     const unsigned int paddedShape[]  = {1, 6, 6, 3};
-    const unsigned int weightsShape[] = {4, 3, 2, 2};  // MCinHW
+    const unsigned int weightsShape[] = {1, 2, 2, 12};  // 1HWCout
     const unsigned int outputShape[]  = {1, 5, 5, 12}; // NHWCout
 
     std::vector<float> inputData({2.0f, 2.0f, 6.0f, 6.0f,

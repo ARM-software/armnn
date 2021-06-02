@@ -1659,10 +1659,9 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     unsigned int inputChannels  = armnn::numeric_cast<unsigned int>(inputShape[1]);
     unsigned int inputHeight    = armnn::numeric_cast<unsigned int>(inputShape[2]);
     unsigned int inputWidth     = armnn::numeric_cast<unsigned int>(inputShape[3]);
-    unsigned int kernelChanMul  = armnn::numeric_cast<unsigned int>(kernelShape[0]);
-    unsigned int kernelChannels = armnn::numeric_cast<unsigned int>(kernelShape[1]);
-    unsigned int kernelHeight   = armnn::numeric_cast<unsigned int>(kernelShape[2]);
-    unsigned int kernelWidth    = armnn::numeric_cast<unsigned int>(kernelShape[3]);
+    unsigned int kernelHeight   = armnn::numeric_cast<unsigned int>(kernelShape[1]);
+    unsigned int kernelWidth    = armnn::numeric_cast<unsigned int>(kernelShape[2]);
+    unsigned int kernelChannels = armnn::numeric_cast<unsigned int>(kernelShape[3]);
     unsigned int outputNum      = armnn::numeric_cast<unsigned int>(outputExpectedShape[0]);
     unsigned int outputChannels = armnn::numeric_cast<unsigned int>(outputExpectedShape[1]);
     unsigned int outputHeight   = armnn::numeric_cast<unsigned int>(outputExpectedShape[2]);
@@ -1677,7 +1676,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
             armnnUtils::GetTensorInfo(inputNum, inputChannels, inputHeight, inputWidth, layout, ArmnnType);
     armnn::TensorInfo outputTensorInfo =
             armnnUtils::GetTensorInfo(outputNum, outputChannels, outputHeight, outputWidth, layout, ArmnnType);
-    armnn::TensorInfo kernelDesc({kernelChanMul, kernelChannels, kernelHeight, kernelWidth}, ArmnnType);
+    armnn::TensorInfo kernelDesc({1, kernelHeight, kernelWidth, kernelChannels}, ArmnnType);
     armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, ArmnnBType);
 
     // Set quantization parameters if the requested type is a quantized type.
@@ -1792,19 +1791,17 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
 
     unsigned int kernelHeight = 3;
     unsigned int kernelWidth = 3;
-    unsigned int kernelChannels = inputChannels;
-    unsigned int kernelDepthMultiplier = 1;
 
     unsigned int outputHeight = 1;
     unsigned int outputWidth = 1;
-    unsigned int outputChannels = kernelChannels;
+    unsigned int outputChannels = inputChannels;
     unsigned int outputNum = inputNum;
 
     armnn::TensorInfo inputTensorInfo =
             armnnUtils::GetTensorInfo(inputNum, inputChannels, inputHeight, inputWidth, layout, ArmnnType);
     armnn::TensorInfo outputTensorInfo =
             armnnUtils::GetTensorInfo(outputNum, outputChannels, outputHeight, outputWidth, layout, ArmnnType);
-    armnn::TensorInfo kernelDesc({kernelDepthMultiplier, kernelChannels, kernelHeight, kernelWidth},
+    armnn::TensorInfo kernelDesc({1, kernelHeight, kernelWidth, outputChannels},
                                  ArmnnType);
     armnn::TensorInfo biasDesc({ outputChannels }, ArmnnBType);
 
@@ -1955,7 +1952,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
             inputBatchSize, inputChannels, inputHeight, inputWidth, layout, ArmnnType);
     armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo(
             outputBatchSize, outputChannels, outputHeight, outputWidth, layout, ArmnnType);
-    armnn::TensorInfo kernelDesc({depthMultiplier, inputChannels, kernelHeight, kernelWidth},
+    armnn::TensorInfo kernelDesc({1, kernelHeight, kernelWidth, outputChannels},
                                  ArmnnType);
     armnn::TensorInfo biasDesc({outputChannels}, ArmnnBType);
 
@@ -2040,33 +2037,18 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     // Manually calculated.
     std::vector<T> originalOutputImage = std::vector<T>(
         QuantizedVector<T>({
-             3.5f,  3.5f,  3.5f,  3.5f,  3.5f,  3.5f,  3.5f,
-             6.0f,  6.0f,  6.0f,  6.0f,  6.0f,  6.0f,  6.0f,
-             5.0f,  5.0f,  5.0f,  5.0f,  5.0f,  5.0f,  5.0f,
-             6.5f,  6.5f,  6.5f,  6.5f,  6.5f,  6.5f,  6.5f,
-             6.5f,  6.5f,  6.5f,  6.5f,  6.5f,  6.5f,  6.5f,
-             5.0f,  5.0f,  5.0f,  5.0f,  5.0f,  5.0f,  5.0f,
-
-            -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f,
-             0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-            -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f,
-
-             8.0f,  8.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-            10.0f, 10.0f, 0.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-            10.0f, 10.0f, 0.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-            10.0f, 10.0f, 0.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-            10.0f, 10.0f, 0.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-             8.0f,  8.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-
-             0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-             0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-             0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-             0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-             0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-             0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f
+               3,   3,   3,   3,   3,   3,   3,   3,   3,   3,   3,   3,   3,   3,
+               5,   5,   5,   5,   5,   5,   5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5,
+             5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5,   5,   5,   5,   5,   5,   5,   5,
+             2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5,
+             4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5,   6,   6,   6,   6,   6,   6,   6,
+               6,   6,   6,   6,   6,   6,   6,   6,   6,   6,   6,   6,   6,   6,
+               1,   3,   0,   0,   0,   0,   0,   2,   4,   0,   0,   0,   0,   0,
+               2,   4,   0,   0,   0,   0,   0,   2,   4,   0,   0,   0,   0,   0,
+               2,   4,   0,   0,   0,   0,   0,   2,   4,   0,   0,   0,   0,   0,
+               2,   4,   0,   0,   0,   0,   0,   3,   5,   0,   0,   0,   0,   0,
+               3,   5,   0,   0,   0,   0,   0,   3,   5,   0,   0,   0,   0,   0,
+               3,   5,   0,   0,   0,   0,   0,   3,   5,   0,   0,   0,   0,   0
         },
         outputTensorInfo.GetQuantizationScale(),
         outputTensorInfo.GetQuantizationOffset()));
@@ -2170,10 +2152,9 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     unsigned int outputChannels = armnn::numeric_cast<unsigned int>(originalOutputExpectedShape[1]);
     unsigned int outputNum      = armnn::numeric_cast<unsigned int>(originalOutputExpectedShape[0]);
 
-    unsigned int kernelHeight   = armnn::numeric_cast<unsigned int>(originalKernelShape[2]);
-    unsigned int kernelWidth    = armnn::numeric_cast<unsigned int>(originalKernelShape[3]);
-    unsigned int kernelChannels = armnn::numeric_cast<unsigned int>(originalKernelShape[1]);
-    unsigned int kernelDepthMul = armnn::numeric_cast<unsigned int>(originalKernelShape[0]);
+    unsigned int kernelHeight   = armnn::numeric_cast<unsigned int>(originalKernelShape[1]);
+    unsigned int kernelWidth    = armnn::numeric_cast<unsigned int>(originalKernelShape[2]);
+    unsigned int kernelChannels = armnn::numeric_cast<unsigned int>(originalKernelShape[3]);
 
     bool biasEnabled = bias.size() > 0;
 
@@ -2192,7 +2173,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
             armnnUtils::GetTensorInfo(2*outputNum, outputChannels, outputHeight, outputWidth, layout, ArmnnType);
 
     // Kernel must be NCHW layout always, independently of the layout of the input and output for depthwise convolution.
-    armnn::TensorInfo kernelDesc({kernelDepthMul, kernelChannels, kernelHeight, kernelWidth}, ArmnnType);
+    armnn::TensorInfo kernelDesc({1, kernelHeight, kernelWidth, kernelChannels}, ArmnnType);
 
     armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, ArmnnBType);
 
@@ -2332,9 +2313,9 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(
         inputTensorInfo.GetQuantizationOffset());
 
     // Use a depth multiplier of 1 on a 2-channel 4x4 kernel.
-    armnn::TensorInfo kernelTensorInfo({ 1, 2, 4, 4 }, ArmnnType);
-    auto kernel = QuantizedVector<T>(
-         {
+    // Weights layout for depthwise: [1,H,W,I*M]
+    armnn::TensorInfo kernelTensorInfo({ 1, 4, 4, 2 }, ArmnnType);
+    auto kernel = QuantizedVector<T>({
             32, 31, 30, 29,
             28, 27, 26, 25,
             24, 23, 22, 21,
@@ -2353,17 +2334,10 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(
     armnn::TensorInfo outputTensorInfo({ 1, 2, 5, 5 }, ArmnnType);
     auto expectedOutput = QuantizedVector<T>(
          {
-            1062, 1580, 1850, 1530, 1117,
-            2140, 3108, 3500, 2842, 2042,
-            3580, 5068, 5460, 4342, 3062,
-            3618, 5072, 5390, 4248, 2971,
-            3074, 4282, 4510, 3533, 2457,
-
-            1550, 2284, 2362, 1955, 1428,
-            2910, 4206, 4342, 3528, 2536,
-            3390, 4886, 5022, 4068, 2916,
-            3566, 5056, 5182, 4133, 2922,
-            3100, 4352, 4452, 3517, 2465
+             396, 664, 820, 756, 602, 1016, 1608, 1880, 1652, 1268, 1976, 2968, 3240, 2732,
+             2028, 2628, 3808, 4060, 3312, 2390, 2596, 3700, 3900, 3130, 2226, 2817, 4186,
+             4330, 3609, 2651, 5414, 7864, 8120, 6626, 4780, 6314, 9144, 9400, 7646, 5500,
+             6759, 9610, 9850, 7875, 5579, 5935, 8348, 8540, 6757, 4742
         },
         outputTensorInfo.GetQuantizationScale(),
         outputTensorInfo.GetQuantizationOffset());
@@ -2420,9 +2394,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestCommon(
         inputTensorInfo.GetQuantizationScale(),
         inputTensorInfo.GetQuantizationOffset());
 
-    armnn::TensorInfo kernelTensorInfo({ 1, 2, 4, 4 }, ArmnnType);
-    auto kernel = QuantizedVector<T>(
-         {
+    armnn::TensorInfo kernelTensorInfo({ 1, 4, 4, 2 }, ArmnnType);
+    auto kernel = QuantizedVector<T>({
              32, 31, 30, 29,
              28, 27, 26, 25,
              24, 23, 22, 21,
@@ -2439,17 +2412,17 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestCommon(
     armnn::TensorInfo outputTensorInfo({ 1, 2, 5, 5}, ArmnnType);
     auto expectedOutput = QuantizedVector<T>(
          {
-            1062, 1580, 1850, 1530, 1117,
-            2140, 3108, 3500, 2842, 2042,
-            3580, 5068, 5460, 4342, 3062,
-            3618, 5072, 5390, 4248, 2971,
-            3074, 4282, 4510, 3533, 2457,
+             396,664,820,756,602,
+             1016,1608,1880,1652,1268,
+             1976,2968,3240,2732,2028,
+             2628,3808,4060,3312,2390,
+             2596,3700,3900,3130,2226,
 
-            1550, 2284, 2362, 1955, 1428,
-            2910, 4206, 4342, 3528, 2536,
-            3390, 4886, 5022, 4068, 2916,
-            3566, 5056, 5182, 4133, 2922,
-            3100, 4352, 4452, 3517, 2465
+             2817,4186,4330,3609,2651,
+             5414,7864,8120,6626,4780,
+             6314,9144,9400,7646,5500,
+             6759,9610,9850,7875,5579,
+             5935,8348,8540,6757,4742
         },
         outputTensorInfo.GetQuantizationScale(),
         outputTensorInfo.GetQuantizationOffset());
@@ -2504,9 +2477,8 @@ LayerTestResult<T, 4> SimpleDepthwiseConvolution2d3x3Dilation3x3NhwcTestCommon(
         inputTensorInfo.GetQuantizationScale(),
         inputTensorInfo.GetQuantizationOffset());
 
-    armnn::TensorInfo kernelTensorInfo({ 1, 1, 3, 3 }, ArmnnType);
-    auto kernel = QuantizedVector<T>(
-        {
+    armnn::TensorInfo kernelTensorInfo({ 1, 3, 3, 1}, ArmnnType);
+    auto kernel = QuantizedVector<T>({
             1, 2, 3,
             4, 5, 6,
             7, 8, 9
@@ -2671,7 +2643,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2d3x3Dilation3x3Test(
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0
             };
 
-    armnn::TensorInfo kernelTensorInfo({ 1, 1, 3, 3}, ArmnnType);
+    armnn::TensorInfo kernelTensorInfo({ 1, 3, 3, 1}, ArmnnType);
     std::vector<float> kernelNoQuantizedValues =
             {
                     1, 2, 3,
@@ -2740,7 +2712,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2d2x3x3Dilation3x3Test(
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0
             };
 
-    armnn::TensorInfo kernelTensorInfo({ 1, 2, 3, 3}, ArmnnType);
+    armnn::TensorInfo kernelTensorInfo({ 1, 3, 3, 2}, ArmnnType);
     std::vector<float> kernelNoQuantizedValues =
             {
                     1, 2, 3,
@@ -2757,15 +2729,9 @@ LayerTestResult<T, 4> DepthwiseConvolution2d2x3x3Dilation3x3Test(
     armnn::TensorInfo outputTensorInfo({ 1, 2, 4, 4}, ArmnnType);
     std::vector<float> outputExpectedNoQuantizedValues =
             {
-                    6., 5., 5., 5.,
-                    6., 5., 5., 5.,
-                    6., 5., 5., 5.,
-                    3., 2., 2., 2.,
+                    2, 9, 9, 9, 2, 9, 9, 9, 2, 9, 9, 9, 5, 3, 3, 3, 3,
 
-                    6., 5., 5., 5.,
-                    6., 5., 5., 5.,
-                    6., 5., 5., 5.,
-                    3., 2., 2., 2.
+                    1, 1, 1, 3, 1, 1, 1, 3, 1, 1, 1, 6, 4, 4, 4
             };
 
     return DepthwiseConvolution2d3x3DilationTestCommon<ArmnnType, ArmnnBType>(
@@ -2804,7 +2770,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dMult4Test(
                     27.0, 28.0, 29.0
             };
 
-    armnn::TensorInfo kernelTensorInfo({ 4, 2, 2, 2}, ArmnnType);
+    armnn::TensorInfo kernelTensorInfo({ 1, 2, 2, 8}, ArmnnType);
 
     std::vector<float> kernelNoQuantizedValues =
             {
@@ -2836,29 +2802,10 @@ LayerTestResult<T, 4> DepthwiseConvolution2dMult4Test(
     armnn::TensorInfo outputTensorInfo({ 1, 8, 2, 2}, ArmnnType);
     std::vector<float> outputExpectedNoQuantizedValues =
             {
-                    10.f, 10.f,
-                    10.f, 10.f,
-
-                    1.f, 1.f,
-                    1.f, 1.f,
-
-                    2.f, 2.f,
-                    2.f, 2.f,
-
-                    3.f, 3.f,
-                    3.f, 3.f,
-
-                    23.f, 24.f,
-                    26.f, 27.f,
-
-                    2.5f, 2.6000001f,
-                    2.8f, 2.9f,
-
-                    4.2000003f, 4.4f,
-                    4.8f, 5.f,
-
-                    6.6000004f, 6.9f,
-                    7.5000005f, 7.8f
+                      4.5f,  4.5f,  4.5f,   4.5f,   5.5f,  5.5f,  5.5f,   5.5f,
+                      2.5f,  2.5f,  2.5f,   2.5f,   3.5f,  3.5f,  3.5f,   3.5f,
+                    10.05f, 10.5f, 11.4f, 11.85f, 12.75f, 13.3f, 14.4f, 14.95f,
+                     5.25f,  5.5f,  6.0f,  6.25f,  7.45f,  7.8f,  8.5f,  8.85f
             };
 
 
@@ -2898,7 +2845,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dMult2Test(
                     27.0, 28.0, 29.0
             };
 
-    armnn::TensorInfo kernelTensorInfo({ 2, 2, 2, 2}, ArmnnType);
+    armnn::TensorInfo kernelTensorInfo({ 1, 2, 2, 4}, ArmnnType);
 
     std::vector<float> kernelNoQuantizedValues =
             {
@@ -2919,17 +2866,10 @@ LayerTestResult<T, 4> DepthwiseConvolution2dMult2Test(
     armnn::TensorInfo outputTensorInfo({ 1, 4, 2, 2}, ArmnnType);
     std::vector<float> outputExpectedNoQuantizedValues =
             {
-                    10.f, 10.f,
-                    10.f, 10.f,
-
-                    1.f, 1.f,
-                    1.f, 1.f,
-
-                    4.2000003f, 4.4f,
-                    4.8f, 5.f,
-
-                    6.6000004f, 6.9f,
-                    7.5000005f, 7.8f
+                     4.5f, 4.5f, 4.5f,  4.5f,
+                     5.5f, 5.5f, 5.5f,  5.5f,
+                    5.25f, 5.5f, 6.0f, 6.25f,
+                    7.65f, 8.0f, 8.7f, 9.05f
             };
 
 
@@ -2984,7 +2924,7 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
 
     std::vector<unsigned int> inputShape;
     std::vector<unsigned int> outputShape;
-    std::vector<unsigned int> kernelShape{ channelMultiplier, inputChannels, kernelHeight, kernelWidth };
+    std::vector<unsigned int> kernelShape{ 1, kernelHeight, kernelWidth, outputChannels };
     std::vector<unsigned int> biasShape{ outputChannels };
     switch (layout.GetDataLayout())
     {
@@ -3609,6 +3549,14 @@ LayerTestResult<float, 4> DepthwiseConvolution2dDepthMul64Test(
     }
     armnn::TensorInfo kernelTensorInfo({ 64, 1, 2, 2 }, armnn::DataType::Float32);
 
+    // permute from [O,1,H,W] --> [1,H,W,O]
+    armnn::PermutationVector permutationVector {3,0,1,2};
+    kernelTensorInfo = armnnUtils::Permuted(kernelTensorInfo, permutationVector);
+    std::vector<float> kernelPermuted(kernelTensorInfo.GetNumElements());
+    armnnUtils::Permute(kernelTensorInfo.GetShape(), permutationVector,
+                        kernelData.data(), kernelPermuted.data(),
+                        GetDataTypeSize(kernelTensorInfo.GetDataType()));
+
     std::vector<float> expectedOutputData(64, 0.f);
     armnn::TensorInfo outputTensorInfo({ 1, 64, 1, 1 }, armnn::DataType::Float32);
 
@@ -3617,7 +3565,7 @@ LayerTestResult<float, 4> DepthwiseConvolution2dDepthMul64Test(
             memoryManager,
             tensorHandleFactory,
             input,
-            kernelData,
+            kernelPermuted,
             std::vector<float>(),
             expectedOutputData,
             inputTensorInfo.GetShape(),
@@ -3713,8 +3661,8 @@ LayerTestResult<uint8_t, 4> DepthwiseConvolution2dPerAxisQuantTest(
     TensorInfo outputInfo({ 1, 2, 2, 4 }, inputType, 1.0f, 128); // N H W C
 
     const std::vector<float> quantScales{ 1.0f, 0.5f, 1.0f, 0.5f };
-    const unsigned int quantDimension = 0;
-    TensorInfo kernelInfo({ 2, 2, 2, 2 }, kernelType, quantScales, quantDimension); // M I H W
+    const unsigned int quantDimension = 3;
+    TensorInfo kernelInfo({ 1, 2, 2, 4 }, kernelType, quantScales, quantDimension); // [1, H, W, I*M]
 
     const std::vector<float> biasQuantScales{ 0.5f, 0.25f, 0.5f, 0.25f };
     constexpr unsigned int biasQuantDimension = 0;

@@ -1787,7 +1787,8 @@ flatbuffers::Offset<armnnSerializer::FeatureCompatibilityVersions> SerializerStr
     flatbuffers::Offset<armnnSerializer::FeatureCompatibilityVersions> versionsTable =
         serializer::CreateFeatureCompatibilityVersions(
                 m_flatBufferBuilder,
-                1 // Binding ids scheme version
+                1, // Binding ids scheme version
+                1  // Weights layout scheme version
             );
     return versionsTable;
 }

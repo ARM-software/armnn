@@ -1149,7 +1149,7 @@ std::unique_ptr<DepthwiseConvolution2dFloat32Workload> CreateDepthwiseConvolutio
 
     DepthwiseConvolution2dLayer* const layer = graph.AddLayer<DepthwiseConvolution2dLayer>(layerDesc, "layer");
 
-    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({1, 2, 4, 4}, DataType)); // [ M, I, H, W ]
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({1, 4, 4, 2}, DataType)); // [ 1, H, W, I*M ]
     layer->m_Weight->Allocate();
 
     // Creates extra layers.
@@ -1181,7 +1181,7 @@ std::unique_ptr<DepthwiseConvolution2dFloat32Workload> CreateDepthwiseConvolutio
 
     CHECK(queueDescriptor.m_Inputs.size() == 1);
     CHECK(queueDescriptor.m_Outputs.size() == 1);
-    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({1, 2, 4, 4}, DataType)));
+    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({1, 4, 4, 2}, DataType)));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;

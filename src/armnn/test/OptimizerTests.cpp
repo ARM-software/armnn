@@ -340,7 +340,7 @@ TEST_CASE("DepthwiseConv2dValidateTensorShapesFromInputs")
 {
     Graph graph;
     const unsigned int inputShape[] = { 1, 2, 3, 3 };
-    const unsigned int weightsShape[] = { 1, 2, 3, 3 };
+    const unsigned int weightsShape[] = { 1, 3, 3, 2 };
     const unsigned int outputShape[] = { 1, 2, 1, 1 };
     CreateDepthwiseConvolution2dGraph(graph, inputShape, weightsShape, outputShape);
 
@@ -351,7 +351,7 @@ TEST_CASE("DepthwiseConv2dValidateTensorShapesFromInputsNhwc")
 {
     Graph graph;
     const unsigned int inputShape[] = { 1, 3, 3, 2 };
-    const unsigned int weightsShape[] = { 1, 2, 3, 3 };
+    const unsigned int weightsShape[] = { 1, 3, 3, 2 };
     const unsigned int outputShape[] = { 1, 1, 1, 2 };
     CreateDepthwiseConvolution2dGraph(graph, inputShape, weightsShape, outputShape, DataLayout::NHWC);
 

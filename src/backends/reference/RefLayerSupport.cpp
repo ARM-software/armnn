@@ -722,11 +722,8 @@ bool RefLayerSupport::IsDequantizeSupported(const TensorInfo& input,
     supported &= CheckSupportRule(TypeAnyOf(input, supportedInputTypes), reasonIfUnsupported,
                                   "Reference for Dequantize layer: input type not supported.");
 
-    supported &= CheckSupportRule( TypeNotPerAxisQuantized(input), reasonIfUnsupported,
-                                    "Reference for Dequantize layer: per-axis quantized input not support .");
-
     supported &= CheckSupportRule(TypeNotPerAxisQuantized(input), reasonIfUnsupported,
-                                  "Reference dequantize: per-axis quantized input not support .");
+                                  "Reference for Dequantize layer: per-axis quantized input not supported.");
 
     std::array<DataType,3> supportedOutputTypes = {
         DataType::BFloat16,

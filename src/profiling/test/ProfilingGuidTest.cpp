@@ -3,13 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "LabelsAndEventClasses.hpp"
+
 #include <armnn/Types.hpp>
 
-#include "LabelsAndEventClasses.hpp"
-#include "ProfilingGuidGenerator.hpp"
-
 #include <set>
-
 #include <boost/test/unit_test.hpp>
 #include <fmt/format.h>
 #include <thread>

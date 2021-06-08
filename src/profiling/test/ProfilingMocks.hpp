@@ -9,7 +9,6 @@
 #include <IProfilingConnectionFactory.hpp>
 #include <IProfilingServiceStatus.hpp>
 #include <ProfilingService.hpp>
-#include <ProfilingGuidGenerator.hpp>
 #include <ProfilingUtils.hpp>
 #include <SendCounterPacket.hpp>
 #include <SendThread.hpp>
@@ -21,7 +20,7 @@
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
-#include <common/include/ProfilingGuid.hpp>
+#include <common/include/ProfilingGuidGenerator.hpp>
 
 #include <atomic>
 #include <condition_variable>

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <common/include/ProfilingGuid.hpp>
+#include "ProfilingGuid.hpp"
 
 #include <string>
 

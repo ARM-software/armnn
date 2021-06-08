@@ -5,8 +5,10 @@
 #pragma once
 
 #include <armnn/IRuntime.hpp>
-#include <armnn/profiling/IProfilingGuidGenerator.hpp>
 #include <armnn/profiling/ISendTimelinePacket.hpp>
+
+#include <common/include/IProfilingGuidGenerator.hpp>
+
 #include <memory>
 #include <vector>
 

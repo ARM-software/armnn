@@ -21,7 +21,6 @@
 #include "PeriodicCounterSelectionCommandHandler.hpp"
 #include "PerJobCounterSelectionCommandHandler.hpp"
 #include "ProfilingConnectionFactory.hpp"
-#include "ProfilingGuidGenerator.hpp"
 #include "ProfilingStateMachine.hpp"
 #include "RequestCounterDirectoryCommandHandler.hpp"
 #include "SendCounterPacket.hpp"
@@ -30,6 +29,8 @@
 #include "TimelinePacketWriterFactory.hpp"
 #include "INotifyBackends.hpp"
 #include <armnn/backends/profiling/IBackendProfilingContext.hpp>
+
+#include <common/include/ProfilingGuidGenerator.hpp>
 
 #include <list>
 

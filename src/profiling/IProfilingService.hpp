@@ -9,7 +9,8 @@
 #include "Holder.hpp"
 #include "IProfilingServiceStatus.hpp"
 #include "ISendCounterPacket.hpp"
-#include "ProfilingGuidGenerator.hpp"
+
+#include <common/include/ProfilingGuidGenerator.hpp>
 
 namespace armnn
 {

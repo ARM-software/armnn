@@ -157,7 +157,6 @@ list(APPEND armnn_sources
     include/armnn/TypesUtils.hpp
     include/armnn/Utils.hpp
     include/armnn/Version.hpp
-    include/armnn/profiling/IProfilingGuidGenerator.hpp
     include/armnn/profiling/ISendTimelinePacket.hpp
     include/armnn/utility/Assert.hpp
     include/armnn/utility/IgnoreUnused.hpp
@@ -430,7 +429,6 @@ list(APPEND armnn_sources
     src/profiling/ProfilingConnectionDumpToFileDecorator.hpp
     src/profiling/ProfilingConnectionFactory.cpp
     src/profiling/ProfilingConnectionFactory.hpp
-    src/profiling/ProfilingGuidGenerator.hpp
     src/profiling/ProfilingService.cpp
     src/profiling/ProfilingService.hpp
     src/profiling/ProfilingStateMachine.cpp

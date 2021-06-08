@@ -128,14 +128,44 @@ TEST_CASE_FIXTURE(SqueezeFixtureWithSqueezeDimsSizeInvalid, "ParseSqueezeInvalid
 }
 
 
-struct SqueezeFixtureWithNegativeSqueezeDims : SqueezeFixture
+struct SqueezeFixtureWithNegativeSqueezeDims1 : SqueezeFixture
 {
-    SqueezeFixtureWithNegativeSqueezeDims() : SqueezeFixture("[ 1, 2, 2, 1 ]",
-                                                             "[ 1, 2, 2, 1 ]",
-                                                             "[ -2 , 2 ]") {}
+    SqueezeFixtureWithNegativeSqueezeDims1() : SqueezeFixture("[ 1, 2, 2, 1 ]",
+                                                             "[ 2, 2, 1 ]",
+                                                             "[ -1 ]") {}
 };
 
-TEST_CASE_FIXTURE(SqueezeFixtureWithNegativeSqueezeDims, "ParseSqueezeNegativeSqueezeDims")
+TEST_CASE_FIXTURE(SqueezeFixtureWithNegativeSqueezeDims1, "ParseSqueezeNegativeSqueezeDims1")
+{
+    SetupSingleInputSingleOutput("inputTensor", "outputTensor");
+    RunTest<3, armnn::DataType::QAsymmU8>(0, { 1, 2, 3, 4 }, { 1, 2, 3, 4 });
+            CHECK((m_Parser->GetNetworkOutputBindingInfo(0, "outputTensor").second.GetShape()
+                   == armnn::TensorShape({ 2, 2, 1 })));
+}
+
+struct SqueezeFixtureWithNegativeSqueezeDims2 : SqueezeFixture
+{
+    SqueezeFixtureWithNegativeSqueezeDims2() : SqueezeFixture("[ 1, 2, 2, 1 ]",
+                                                              "[ 1, 2, 2 ]",
+                                                              "[ -1 ]") {}
+};
+
+TEST_CASE_FIXTURE(SqueezeFixtureWithNegativeSqueezeDims2, "ParseSqueezeNegativeSqueezeDims2")
+{
+    SetupSingleInputSingleOutput("inputTensor", "outputTensor");
+    RunTest<3, armnn::DataType::QAsymmU8>(0, { 1, 2, 3, 4 }, { 1, 2, 3, 4 });
+            CHECK((m_Parser->GetNetworkOutputBindingInfo(0, "outputTensor").second.GetShape()
+                   == armnn::TensorShape({ 1, 2, 2 })));
+}
+
+struct SqueezeFixtureWithNegativeSqueezeDimsInvalid : SqueezeFixture
+{
+    SqueezeFixtureWithNegativeSqueezeDimsInvalid() : SqueezeFixture("[ 1, 2, 2, 1 ]",
+                                                                    "[ 1, 2, 2, 1 ]",
+                                                                    "[ -2 , 2 ]") {}
+};
+
+TEST_CASE_FIXTURE(SqueezeFixtureWithNegativeSqueezeDimsInvalid, "ParseSqueezeNegativeSqueezeDimsInvalid")
 {
     CHECK_THROWS_AS((SetupSingleInputSingleOutput("inputTensor", "outputTensor")), armnn::ParseException);
 }

@@ -105,6 +105,7 @@ LOCAL_SRC_FILES := \
         profiling/common/src/NetworkSockets.cpp \
         profiling/common/src/PacketVersionResolver.cpp \
         profiling/common/src/SwTrace.cpp \
+        profiling/common/src/LabelsAndEventClasses.cpp \
         profiling/server/src/timelineDecoder/TimelineCaptureCommandHandler.cpp \
         profiling/server/src/timelineDecoder/TimelineDecoder.cpp \
         profiling/server/src/timelineDecoder/TimelineDirectoryCaptureCommandHandler.cpp \
@@ -226,7 +227,6 @@ LOCAL_SRC_FILES := \
         src/profiling/DirectoryCaptureCommandHandler.cpp \
         src/profiling/FileOnlyProfilingConnection.cpp \
         src/profiling/Holder.cpp \
-        src/profiling/LabelsAndEventClasses.cpp \
         src/profiling/PacketBuffer.cpp \
         src/profiling/PeriodicCounterCapture.cpp \
         src/profiling/PeriodicCounterSelectionCommandHandler.cpp \

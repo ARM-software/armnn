@@ -4,19 +4,19 @@
 //
 #pragma once
 
-#include <armnn/Tensor.hpp>
-#include <armnn/Types.hpp>
-
 #include "Network.hpp"
 #include "LayerFwd.hpp"
 #include "Profiling.hpp"
 
+#include <armnn/Tensor.hpp>
 #include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 #include <ProfilingService.hpp>
 #include <TimelineUtilityMethods.hpp>
+
+#include <common/include/LabelsAndEventClasses.hpp>
 
 #include <mutex>
 #include <condition_variable>

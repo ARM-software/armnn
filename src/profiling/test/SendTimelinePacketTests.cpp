@@ -6,7 +6,6 @@
 #include "ProfilingMocks.hpp"
 
 #include <BufferManager.hpp>
-#include <LabelsAndEventClasses.hpp>
 #include <ProfilingService.hpp>
 #include <ProfilingUtils.hpp>
 #include <SendTimelinePacket.hpp>
@@ -14,6 +13,7 @@
 #include <TimelinePacketWriterFactory.hpp>
 
 #include <common/include/SwTrace.hpp>
+#include <common/include/LabelsAndEventClasses.hpp>
 
 #include <doctest/doctest.h>
 

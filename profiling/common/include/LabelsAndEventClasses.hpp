@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <common/include/ProfilingGuidGenerator.hpp>
+#include "ProfilingGuidGenerator.hpp"
 
-#include <DllExport.hpp>
+#include "DllExport.hpp"
 
 namespace armnn
 {

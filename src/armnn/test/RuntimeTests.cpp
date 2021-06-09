@@ -10,7 +10,7 @@
 #include <Runtime.hpp>
 #include <armnn/TypesUtils.hpp>
 
-#include <LabelsAndEventClasses.hpp>
+#include <common/include/LabelsAndEventClasses.hpp>
 #include <test/ProfilingTestUtils.hpp>
 
 #include <HeapProfiling.hpp>

@@ -21,8 +21,6 @@
 #include <backendsCommon/MemCopyWorkload.hpp>
 #include <backendsCommon/MemSyncWorkload.hpp>
 
-#include <LabelsAndEventClasses.hpp>
-
 #include <fmt/format.h>
 #include <armnn/utility/Timer.hpp>
 

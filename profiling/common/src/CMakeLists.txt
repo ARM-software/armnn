@@ -12,7 +12,8 @@ if(BUILD_TIMELINE_DECODER)
         CommonProfilingUtils.cpp
         NetworkSockets.cpp
         PacketVersionResolver.cpp
-        SwTrace.cpp)
+        SwTrace.cpp
+        LabelsAndEventClasses.cpp)
 
     include_directories(${PROJECT_SOURCE_DIR}/profiling/common/include)
     include_directories(${PROJECT_SOURCE_DIR}/common/include)

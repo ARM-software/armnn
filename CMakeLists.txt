@@ -414,8 +414,6 @@ list(APPEND armnn_sources
     src/profiling/IPeriodicCounterCapture.hpp
     src/profiling/IProfilingConnection.hpp
     src/profiling/IProfilingConnectionFactory.hpp
-    src/profiling/LabelsAndEventClasses.cpp
-    src/profiling/LabelsAndEventClasses.hpp
     src/profiling/NullProfilingConnection.hpp
     src/profiling/PacketBuffer.cpp
     src/profiling/PacketBuffer.hpp

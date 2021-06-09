@@ -4,7 +4,6 @@
 //
 
 #include <Filesystem.hpp>
-#include <LabelsAndEventClasses.hpp>
 #include <ProfilingService.hpp>
 #include "ProfilingTestUtils.hpp"
 #include "PrintPacketHeaderHandler.hpp"
@@ -12,6 +11,8 @@
 #include "TestTimelinePacketHandler.hpp"
 
 #include <doctest/doctest.h>
+
+#include <common/include/LabelsAndEventClasses.hpp>
 
 #include <cstdio>
 #include <sstream>

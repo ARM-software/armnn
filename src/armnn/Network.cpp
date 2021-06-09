@@ -28,6 +28,8 @@
 
 #include <ProfilingService.hpp>
 
+#include <common/include/ProfilingGuid.hpp>
+
 #include <fcntl.h>
 #include <algorithm>
 #include <fstream>

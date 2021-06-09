@@ -3,23 +3,22 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <common/include/CommandHandlerRegistry.hpp>
-#include <server/include/basePipeServer/ConnectionHandler.hpp>
 #include <DirectoryCaptureCommandHandler.hpp>
 #include <GatordMockService.hpp>
-#include <LabelsAndEventClasses.hpp>
 #include <ProfilingService.hpp>
 #include <TimelinePacketWriterFactory.hpp>
+#include <Runtime.hpp>
+#include <MockBackend.hpp>
+
+#include <common/include/LabelsAndEventClasses.hpp>
+#include <common/include/CommandHandlerRegistry.hpp>
 
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
 #include <server/include/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp>
 #include <server/include/timelineDecoder/TimelineDecoder.hpp>
-
-#include <Runtime.hpp>
-
-#include <MockBackend.hpp>
+#include <server/include/basePipeServer/ConnectionHandler.hpp>
 
 #include <doctest/doctest.h>
 

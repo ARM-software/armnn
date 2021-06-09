@@ -5,7 +5,8 @@
 
 #include "TestTimelinePacketHandler.hpp"
 #include "IProfilingConnection.hpp"
-#include <LabelsAndEventClasses.hpp>
+
+#include <common/include/LabelsAndEventClasses.hpp>
 
 #include <chrono>
 #include <iostream>

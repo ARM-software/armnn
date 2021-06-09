@@ -10,9 +10,10 @@
 
 #include <armnn/BackendId.hpp>
 #include <armnn/Optional.hpp>
-#include <armnn/Types.hpp>
 #include <BufferManager.hpp>
 #include <ProfilingService.hpp>
+
+#include <common/include/ProfilingGuid.hpp>
 
 using namespace armnn;
 using namespace armnn::profiling;

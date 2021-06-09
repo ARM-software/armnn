@@ -10,10 +10,11 @@
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
-#include <LabelsAndEventClasses.hpp>
 #include <Processes.hpp>
 #include <ProfilingService.hpp>
 #include <Threads.hpp>
+
+#include <common/include/LabelsAndEventClasses.hpp>
 
 #include <test/TestUtils.hpp>
 

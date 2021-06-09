@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "LabelsAndEventClasses.hpp"
-
 #include <armnn/Types.hpp>
+
+#include <common/include/LabelsAndEventClasses.hpp>
 
 #include <set>
 #include <doctest/doctest.h>

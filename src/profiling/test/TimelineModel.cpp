@@ -4,7 +4,8 @@
 //
 
 #include "TimelineModel.hpp"
-#include <LabelsAndEventClasses.hpp>
+
+#include <common/include/LabelsAndEventClasses.hpp>
 
 #include <algorithm>
 

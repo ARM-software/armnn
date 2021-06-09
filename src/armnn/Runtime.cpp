@@ -6,13 +6,14 @@
 
 #include <armnn/Version.hpp>
 #include <armnn/BackendRegistry.hpp>
-#include <LabelsAndEventClasses.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/utility/Timer.hpp>
 
 #include <armnn/backends/IBackendContext.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
+
+#include <common/include/LabelsAndEventClasses.hpp>
 
 #include <iostream>
 

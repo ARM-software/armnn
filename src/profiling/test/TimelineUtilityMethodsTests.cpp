@@ -8,8 +8,9 @@
 
 #include <SendTimelinePacket.hpp>
 #include <TimelineUtilityMethods.hpp>
-#include <LabelsAndEventClasses.hpp>
 #include <ProfilingService.hpp>
+
+#include <common/include/LabelsAndEventClasses.hpp>
 
 #include <memory>
 

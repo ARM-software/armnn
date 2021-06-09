@@ -26,8 +26,7 @@ WorkingMemHandle::WorkingMemHandle(
     m_MemoryManagers(memoryManagers),
     m_OwnedTensorHandles(std::move(ownedTensorHandles)),
     m_IsAllocated(false),
-    m_Mutex(),
-    m_InferenceId(profiling::ProfilingService::GetNextGuid())
+    m_Mutex()
 {
 }
 

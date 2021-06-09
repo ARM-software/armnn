@@ -23,19 +23,6 @@ public:
 
     // Notify the AsyncExecutionCallback object of the armnn execution status
     virtual void Notify(armnn::Status status, InferenceTimingPair timeTaken) = 0;
-
-    // Block the calling thread until the AsyncExecutionCallback object allows it to proceed
-    virtual void Wait() const = 0;
-
-    // Retrieve the ArmNN Status from the AsyncExecutionCallback that has been notified
-    virtual armnn::Status GetStatus() const = 0;
-
-    // Retrieve the start time before executing the inference
-    virtual HighResolutionClock GetStartTime() const = 0;
-
-    // Retrieve the time after executing the inference
-    virtual HighResolutionClock GetEndTime() const = 0;
-
 };
 
 } // experimental

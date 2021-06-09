@@ -9,6 +9,7 @@
 
 #include <armnn/IWorkingMemHandle.hpp>
 #include <armnn/INetwork.hpp>
+#include <armnn/Threadpool.hpp>
 #include <armnn/IAsyncExecutionCallback.hpp>
 
 #include <AsyncExecutionCallback.hpp>
@@ -137,7 +138,7 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
 
     std::string errorMessage;
 
-    const INetworkProperties networkProperties(true, MemorySource::Undefined, MemorySource::Undefined, numThreads);
+    const INetworkProperties networkProperties(true, MemorySource::Undefined, MemorySource::Undefined);
 
     runtime->LoadNetwork(networkId, std::move(optNet), errorMessage, networkProperties);
 
@@ -172,30 +173,32 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
     }
     else
     {
-        std::vector<IAsyncExecutionCallbackPtr> callbacks;
+        std::vector<std::shared_ptr<IWorkingMemHandle>> memHandles;
 
-        // Create 1000 callbacks that will be checked post scheduling
-        for (size_t i = 0; i < 1000; ++i)
+        for (size_t i = 0; i < numThreads; ++i)
         {
-            callbacks.emplace_back(std::make_shared<AsyncExecutionCallback>());
+            memHandles.emplace_back(runtime->CreateWorkingMemHandle(networkId));
         }
+
+        Threadpool threadpool(numThreads, runtime.get(), memHandles);
+        AsyncCallbackManager callbackManager;
 
         // For the asyncronous execution, we are adding a pool of working memory handles (1 per thread) in the
         // LoadedNetwork with a each scheduled inference having a spefic priority
-        for (IAsyncExecutionCallbackPtr cb : callbacks)
+        for (size_t i = 0; i < 1000; ++i)
         {
-            runtime->Schedule(networkId,
-                              inputTensors,
-                              outputTensors,
-                              static_cast<QosExecPriority>(rand()%3),
-                              cb);
+            threadpool.Schedule(networkId,
+                                inputTensors,
+                                outputTensors,
+                                static_cast<QosExecPriority>(rand()%3),
+                                callbackManager.GetNewCallback());
         }
 
         // Wait until the execution signals a notify
-        for (IAsyncExecutionCallbackPtr cb : callbacks)
+        for (size_t i = 0; i < 1000; ++i)
         {
-            cb->Wait();
-            
+            auto cb = callbackManager.GetNotifiedCallback();
+
             // Checks the results.
             CHECK(cb->GetStatus() == Status::Success);
         }

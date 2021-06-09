@@ -180,6 +180,7 @@ list(APPEND armnn_sources
     include/armnn/QuantizedLstmParams.hpp
     include/armnn/Tensor.hpp
     include/armnn/TensorFwd.hpp
+    include/armnn/Threadpool.hpp
     include/armnn/Types.hpp
     include/armnn/TypesUtils.hpp
     include/armnn/Utils.hpp
@@ -387,6 +388,7 @@ list(APPEND armnn_sources
     src/armnn/SubgraphViewSelector.cpp
     src/armnn/SubgraphViewSelector.hpp
     src/armnn/Tensor.cpp
+    src/armnn/Threadpool.cpp
     src/armnn/TypesUtils.cpp
     src/armnn/Utils.cpp
     src/armnn/WallClockTimer.cpp

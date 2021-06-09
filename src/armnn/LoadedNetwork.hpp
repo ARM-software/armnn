@@ -37,16 +37,9 @@ class LoadedNetwork
 public:
     using WorkloadQueue = std::vector<std::unique_ptr<IWorkload>>;
 
-    using ExecutionTuple = std::tuple<InputTensors,
-                                      OutputTensors,
-                                      std::shared_ptr<IAsyncExecutionCallback>>;
-
-    using ExecutionQueue = std::queue<std::shared_ptr<ExecutionTuple>>;
-
     ~LoadedNetwork()
     {
         FreeWorkingMemory();
-        TerminateThreadPool();
     }
 
     /// Create a new unique WorkingMemHandle object. Create multiple handles if you wish to have
@@ -64,17 +57,10 @@ public:
                    const OutputTensors& outputTensors,
                    IWorkingMemHandle& workingMemHandle);
 
-    /// Schedule an asynchronous execution on the loaded network
-    void Schedule(const InputTensors& inputTensors,
-                  const OutputTensors& outputTensors,
-                  const QosExecPriority priority,
-                  std::shared_ptr<IAsyncExecutionCallback> cb);
-
     static std::unique_ptr<LoadedNetwork> MakeLoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                                                             std::string& errorMessage,
                                                             const INetworkProperties& networkProperties,
-                                                            profiling::ProfilingService& profilingService,
-                                                            const NetworkId networkIdOut);
+                                                            profiling::ProfilingService& profilingService);
 
     // NOTE we return by reference as the purpose of this method is only to provide
     // access to the private m_Profiler and in theory we should not need to increment
@@ -108,8 +94,7 @@ private:
 
     LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                   const INetworkProperties& networkProperties,
-                  profiling::ProfilingService& profilingService,
-                  const NetworkId networkIdOut);
+                  profiling::ProfilingService& profilingService);
 
     void EnqueueInput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo);
 
@@ -119,14 +104,8 @@ private:
 
     void EnqueueOutput(const BindableLayer& layer, const Tensor& outputTensor, WorkingMemHandle& handle);
 
-    void ProcessExecPriorities(std::unique_ptr<IWorkingMemHandle> workingMemHandle);
-
     bool Execute(std::unique_ptr<profiling::TimelineUtilityMethods>& timelineUtils,
                  profiling::ProfilingGuid inferenceGuid);
-
-    void CreateThreadPool(std::size_t numThreads);
-
-    void TerminateThreadPool() noexcept;
 
     const IWorkloadFactory& GetWorkloadFactory(const Layer& layer) const;
 
@@ -146,24 +125,7 @@ private:
 
     bool m_IsWorkingMemAllocated = false;
 
-    std::vector<std::unique_ptr<std::thread>> m_Threads;
-    std::stack<IWorkingMemHandle>             m_WorkingMemHandles;
-
-    ExecutionQueue m_HighPriorityQueue;
-    ExecutionQueue m_MediumPriorityQueue;
-    ExecutionQueue m_LowPriorityQueue;
-
-    // Condition Variables require mutex which will guard the shared state.
-    // Has an event happened? Stop signal for example
-    std::condition_variable m_ThreadPoolEvent;
-    std::mutex              m_ThreadPoolMutex;
-
-    // The shared state for conditional variable
-    bool m_TerminatePool = false;
-
     INetworkProperties m_NetworkProperties;
-
-    const NetworkId m_NetworkId;
 
     TensorHandleFactoryRegistry m_TensorHandleFactoryRegistry;
 

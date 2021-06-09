@@ -25,9 +25,6 @@ public:
     /// Returns the NetworkId of the Network that this IWorkingMemHandle works with.
     virtual NetworkId GetNetworkId() = 0;
 
-    /// Returns the InferenceId of the Inference that this IWorkingMemHandle works with.
-    virtual profiling::ProfilingGuid GetInferenceId() = 0;
-
     /// Allocate the backing memory required for execution. If this is not called, then allocation will be
     /// deferred to execution time. The mutex must be locked.
     virtual void Allocate() = 0;

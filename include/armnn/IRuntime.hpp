@@ -32,24 +32,34 @@ struct INetworkProperties
     ARMNN_DEPRECATED_MSG("Please use INetworkProperties constructor with MemorySource argument")
     INetworkProperties(bool importEnabled = false,
                        bool exportEnabled = false,
-                       bool asyncEnabled = false,
-                       size_t numThreads = 1)
+                       bool asyncEnabled = false)
         : m_ImportEnabled(importEnabled)
         , m_ExportEnabled(exportEnabled)
         , m_AsyncEnabled(asyncEnabled)
-        , m_NumThreads(numThreads)
         , m_InputSource(m_ImportEnabled ? MemorySource::Malloc : MemorySource::Undefined)
         , m_OutputSource(m_ExportEnabled ? MemorySource::Malloc : MemorySource::Undefined)
     {}
 
+    ARMNN_DEPRECATED_MSG("Please use INetworkProperties constructor without numThreads argument")
     INetworkProperties(bool asyncEnabled,
                        MemorySource m_InputSource,
                        MemorySource m_OutputSource,
-                       size_t numThreads = 1)
+                       size_t numThreads)
+            : m_ImportEnabled(m_InputSource != MemorySource::Undefined)
+            , m_ExportEnabled(m_OutputSource != MemorySource::Undefined)
+            , m_AsyncEnabled(asyncEnabled)
+            , m_InputSource(m_InputSource)
+            , m_OutputSource(m_OutputSource)
+    {
+        armnn::IgnoreUnused(numThreads);
+    }
+
+    INetworkProperties(bool asyncEnabled,
+                       MemorySource m_InputSource,
+                       MemorySource m_OutputSource)
         : m_ImportEnabled(m_InputSource != MemorySource::Undefined)
         , m_ExportEnabled(m_OutputSource != MemorySource::Undefined)
         , m_AsyncEnabled(asyncEnabled)
-        , m_NumThreads(numThreads)
         , m_InputSource(m_InputSource)
         , m_OutputSource(m_OutputSource)
         {}
@@ -60,7 +70,6 @@ struct INetworkProperties
     const bool m_ExportEnabled;
 
     const bool   m_AsyncEnabled;
-    const size_t m_NumThreads;
 
     const MemorySource m_InputSource;
     const MemorySource m_OutputSource;
@@ -190,16 +199,6 @@ public:
     Status Execute(IWorkingMemHandle& workingMemHandle,
                    const InputTensors& inputTensors,
                    const OutputTensors& outputTensors);
-
-    /// This is an experimental function
-    /// Schedule a thread safe execution by taking the input tensors and an execution priority for Quality of Service.
-    /// The output tensors will then be filled and the callback object will notify that the execution has either
-    /// succeeded or failed.
-    void Schedule(NetworkId networkId,
-                  const InputTensors& inputTensors,
-                  const OutputTensors& outputTensors,
-                  const QosExecPriority priority,
-                  std::shared_ptr<IAsyncExecutionCallback> callback);
 
     /// Unloads a network from the IRuntime.
     /// At the moment this only removes the network from the m_Impl->m_Network.

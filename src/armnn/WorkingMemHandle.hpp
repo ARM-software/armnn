@@ -13,6 +13,7 @@
 #include <armnn/Tensor.hpp>
 
 #include <unordered_map>
+#include <mutex>
 
 namespace armnn
 {
@@ -38,10 +39,7 @@ public:
         return m_NetworkId;
     }
 
-    profiling::ProfilingGuid GetInferenceId() override
-    {
-        return m_InferenceId;
-    }
+
 
     /// Allocate the backing memory required for execution. If this is not called, then allocation will be
     /// deferred to execution time. The mutex must be locked.
@@ -92,7 +90,6 @@ private:
 
     bool m_IsAllocated;
     std::mutex m_Mutex;
-    profiling::ProfilingGuid m_InferenceId;
 };
 
 } // end experimental namespace

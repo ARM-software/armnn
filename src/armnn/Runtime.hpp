@@ -61,16 +61,6 @@ public:
                            const OutputTensors& outputTensors);
 
     /// This is an experimental function.
-    /// Schedule a thread safe execution by taking the input tensors and an execution priority for Quality of Service.
-    /// The output tensors will then be filled and the callback object will notify that the execution has either
-    /// succeeded or failed.
-    void Schedule(NetworkId networkId,
-                  const InputTensors& inputTensors,
-                  const OutputTensors& outputTensors,
-                  const QosExecPriority priority,
-                  std::shared_ptr<IAsyncExecutionCallback> callback);
-
-    /// This is an experimental function.
     /// Evaluates a network using input in inputTensors and outputs filled into outputTensors.
     /// This function performs a thread safe execution of the network. Returns once execution is complete.
     /// Will block until this and any other thread using the same workingMem object completes.

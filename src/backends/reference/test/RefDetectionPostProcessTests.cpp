@@ -8,46 +8,46 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/Types.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(RefDetectionPostProcess)
-
-BOOST_AUTO_TEST_CASE(TopKSortTest)
+TEST_SUITE("RefDetectionPostProcess")
+{
+TEST_CASE("TopKSortTest")
 {
     unsigned int k = 3;
     unsigned int indices[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
     float values[8] = { 0, 7, 6, 5, 4, 3, 2, 500 };
     armnn::TopKSort(k, indices, values, 8);
-    BOOST_TEST(indices[0] == 7);
-    BOOST_TEST(indices[1] == 1);
-    BOOST_TEST(indices[2] == 2);
+    CHECK(indices[0] == 7);
+    CHECK(indices[1] == 1);
+    CHECK(indices[2] == 2);
 }
 
-BOOST_AUTO_TEST_CASE(FullTopKSortTest)
+TEST_CASE("FullTopKSortTest")
 {
     unsigned int k = 8;
     unsigned int indices[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
     float values[8] = { 0, 7, 6, 5, 4, 3, 2, 500 };
     armnn::TopKSort(k, indices, values, 8);
-    BOOST_TEST(indices[0] == 7);
-    BOOST_TEST(indices[1] == 1);
-    BOOST_TEST(indices[2] == 2);
-    BOOST_TEST(indices[3] == 3);
-    BOOST_TEST(indices[4] == 4);
-    BOOST_TEST(indices[5] == 5);
-    BOOST_TEST(indices[6] == 6);
-    BOOST_TEST(indices[7] == 0);
+    CHECK(indices[0] == 7);
+    CHECK(indices[1] == 1);
+    CHECK(indices[2] == 2);
+    CHECK(indices[3] == 3);
+    CHECK(indices[4] == 4);
+    CHECK(indices[5] == 5);
+    CHECK(indices[6] == 6);
+    CHECK(indices[7] == 0);
 }
 
-BOOST_AUTO_TEST_CASE(IouTest)
+TEST_CASE("IouTest")
 {
     float boxI[4] = { 0.0f, 0.0f, 10.0f, 10.0f };
     float boxJ[4] = { 1.0f, 1.0f, 11.0f, 11.0f };
     float iou = armnn::IntersectionOverUnion(boxI, boxJ);
-    BOOST_TEST(iou == 0.68, boost::test_tools::tolerance(0.001));
+    CHECK(iou == doctest::Approx(0.68).epsilon(0.001f));
 }
 
-BOOST_AUTO_TEST_CASE(NmsFunction)
+TEST_CASE("NmsFunction")
 {
     std::vector<float> boxCorners({
         0.0f, 0.0f, 1.0f, 1.0f,
@@ -63,10 +63,10 @@ BOOST_AUTO_TEST_CASE(NmsFunction)
     std::vector<unsigned int> result =
         armnn::NonMaxSuppression(6, boxCorners, scores, 0.0, 3, 0.5);
 
-    BOOST_TEST(result.size() == 3);
-    BOOST_TEST(result[0] == 3);
-    BOOST_TEST(result[1] == 0);
-    BOOST_TEST(result[2] == 5);
+    CHECK(result.size() == 3);
+    CHECK(result[0] == 3);
+    CHECK(result[1] == 0);
+    CHECK(result[2] == 5);
 }
 
 void DetectionPostProcessTestImpl(bool useRegularNms,
@@ -149,28 +149,22 @@ void DetectionPostProcessTestImpl(bool useRegularNms,
                                 detectionScores.data(),
                                 numDetections.data());
 
-    BOOST_CHECK_EQUAL_COLLECTIONS(detectionBoxes.begin(),
+    CHECK(std::equal(detectionBoxes.begin(),
                                   detectionBoxes.end(),
                                   expectedDetectionBoxes.begin(),
-                                  expectedDetectionBoxes.end());
+                                  expectedDetectionBoxes.end()));
 
-    BOOST_CHECK_EQUAL_COLLECTIONS(detectionScores.begin(),
-                                  detectionScores.end(),
-                                  expectedDetectionScores.begin(),
-                                  expectedDetectionScores.end());
+    CHECK(std::equal(detectionScores.begin(), detectionScores.end(),
+        expectedDetectionScores.begin(), expectedDetectionScores.end()));
 
-    BOOST_CHECK_EQUAL_COLLECTIONS(detectionClasses.begin(),
-                                  detectionClasses.end(),
-                                  expectedDetectionClasses.begin(),
-                                  expectedDetectionClasses.end());
+    CHECK(std::equal(detectionClasses.begin(), detectionClasses.end(),
+        expectedDetectionClasses.begin(), expectedDetectionClasses.end()));
 
-    BOOST_CHECK_EQUAL_COLLECTIONS(numDetections.begin(),
-                                  numDetections.end(),
-                                  expectedNumDetections.begin(),
-                                  expectedNumDetections.end());
+    CHECK(std::equal(numDetections.begin(), numDetections.end(),
+        expectedNumDetections.begin(), expectedNumDetections.end()));
 }
 
-BOOST_AUTO_TEST_CASE(RegularNmsDetectionPostProcess)
+TEST_CASE("RegularNmsDetectionPostProcess")
 {
     std::vector<float> expectedDetectionBoxes({
         0.0f, 10.0f, 1.0f, 11.0f,
@@ -186,7 +180,7 @@ BOOST_AUTO_TEST_CASE(RegularNmsDetectionPostProcess)
                                  expectedDetectionScores, expectedNumDetections);
 }
 
-BOOST_AUTO_TEST_CASE(FastNmsDetectionPostProcess)
+TEST_CASE("FastNmsDetectionPostProcess")
 {
     std::vector<float> expectedDetectionBoxes({
         0.0f, 10.0f, 1.0f, 11.0f,
@@ -201,4 +195,4 @@ BOOST_AUTO_TEST_CASE(FastNmsDetectionPostProcess)
                                  expectedDetectionScores, expectedNumDetections);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

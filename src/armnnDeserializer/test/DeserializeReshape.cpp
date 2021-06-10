@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include <armnnDeserializer/IDeserializer.hpp>
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(Deserializer)
-
+TEST_SUITE("Deserializer_Reshape")
+{
 struct ReshapeFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit ReshapeFixture(const std::string &inputShape,
@@ -109,14 +108,14 @@ struct SimpleReshapeFixture2 : ReshapeFixture
                                              "Float32") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ReshapeQuantisedAsymm8, SimpleReshapeFixture)
+TEST_CASE_FIXTURE(SimpleReshapeFixture, "ReshapeQuantisedAsymm8")
 {
     RunTest<2, armnn::DataType::QAsymmU8>(0,
                                                 { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                                                 { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 }
 
-BOOST_FIXTURE_TEST_CASE(ReshapeFloat32, SimpleReshapeFixture2)
+TEST_CASE_FIXTURE(SimpleReshapeFixture2, "ReshapeFloat32")
 {
     RunTest<4, armnn::DataType::Float32>(0,
                                         { 111, 85, 226, 3 },
@@ -124,4 +123,4 @@ BOOST_FIXTURE_TEST_CASE(ReshapeFloat32, SimpleReshapeFixture2)
 }
 
 
-BOOST_AUTO_TEST_SUITE_END()
+}

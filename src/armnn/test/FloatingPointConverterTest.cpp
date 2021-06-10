@@ -8,11 +8,13 @@
 #include <BFloat16.hpp>
 #include <Half.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <vector>
 
-BOOST_AUTO_TEST_SUITE(TestFPConversion)
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_CASE(TestConvertFp32ToFp16)
+TEST_SUITE("TestFPConversion")
+{
+TEST_CASE("TestConvertFp32ToFp16")
 {
     using namespace half_float::literal;
 
@@ -27,14 +29,14 @@ BOOST_AUTO_TEST_CASE(TestConvertFp32ToFp16)
     {
         armnn::Half expected(floatArray[i]);
         armnn::Half actual = convertedBuffer[i];
-        BOOST_CHECK_EQUAL(expected, actual);
+        CHECK_EQ(expected, actual);
 
         float convertedHalf = actual;
-        BOOST_CHECK_CLOSE(floatArray[i], convertedHalf, 0.07);
+        CHECK_EQ(floatArray[i], doctest::Approx(convertedHalf).epsilon(0.07));
     }
 }
 
-BOOST_AUTO_TEST_CASE(TestConvertFp16ToFp32)
+TEST_CASE("TestConvertFp16ToFp32")
 {
     using namespace half_float::literal;
 
@@ -49,11 +51,11 @@ BOOST_AUTO_TEST_CASE(TestConvertFp16ToFp32)
     {
         float expected(halfArray[i]);
         float actual = convertedBuffer[i];
-        BOOST_CHECK_EQUAL(expected, actual);
+        CHECK_EQ(expected, actual);
     }
 }
 
-BOOST_AUTO_TEST_CASE(TestConvertFloat32ToBFloat16)
+TEST_CASE("TestConvertFloat32ToBFloat16")
 {
     float floatArray[] = { 1.704735E38f,   // 0x7F004000 round down
                            0.0f,           // 0x00000000 round down
@@ -102,11 +104,11 @@ BOOST_AUTO_TEST_CASE(TestConvertFloat32ToBFloat16)
     for (size_t i = 0; i < numFloats; i++)
     {
         armnn::BFloat16 actual = convertedBuffer[i];
-        BOOST_CHECK_EQUAL(expectedResult[i], actual.Val());
+        CHECK_EQ(expectedResult[i], actual.Val());
     }
 }
 
-BOOST_AUTO_TEST_CASE(TestConvertBFloat16ToFloat32)
+TEST_CASE("TestConvertBFloat16ToFloat32")
 {
     uint16_t bf16Array[] = { 16256, 16320, 38699, 16384, 49156, 32639 };
     size_t numFloats = sizeof(bf16Array) / sizeof(bf16Array[0]);
@@ -118,8 +120,8 @@ BOOST_AUTO_TEST_CASE(TestConvertBFloat16ToFloat32)
     for (size_t i = 0; i < numFloats; i++)
     {
         float actual = convertedBuffer[i];
-        BOOST_CHECK_EQUAL(expectedResult[i], actual);
+        CHECK_EQ(expectedResult[i], actual);
     }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

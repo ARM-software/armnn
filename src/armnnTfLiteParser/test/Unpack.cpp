@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_Unpack")
+{
 struct UnpackFixture : public ParserFlatbuffersFixture
 {
     explicit UnpackFixture(const std::string& inputShape,
@@ -110,7 +109,7 @@ struct DefaultUnpackAxisZeroUint8Fixture : UnpackFixture
     DefaultUnpackAxisZeroUint8Fixture() : UnpackFixture("[ 4, 1, 6 ]", 4, "[ 1, 6 ]", "0", "", "UINT8", "0.1", "0") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(UnpackAxisZeroNumIsDefaultNotSpecified, DefaultUnpackAxisZeroFixture)
+TEST_CASE_FIXTURE(DefaultUnpackAxisZeroFixture, "UnpackAxisZeroNumIsDefaultNotSpecified")
 {
     RunTest<2, armnn::DataType::Float32>(
         0,
@@ -124,7 +123,7 @@ BOOST_FIXTURE_TEST_CASE(UnpackAxisZeroNumIsDefaultNotSpecified, DefaultUnpackAxi
           {"outputTensor4", { 19.0f, 20.0f, 21.0f, 22.0f, 23.0f, 24.0f }} });
 }
 
-BOOST_FIXTURE_TEST_CASE(UnpackAxisZeroNumIsDefaultNotSpecifiedUint8, DefaultUnpackAxisZeroUint8Fixture)
+TEST_CASE_FIXTURE(DefaultUnpackAxisZeroUint8Fixture, "UnpackAxisZeroNumIsDefaultNotSpecifiedUint8")
 {
     RunTest<2, armnn::DataType::QAsymmU8>(
         0,
@@ -148,7 +147,7 @@ struct DefaultUnpackLastAxisUint8Fixture : UnpackFixture
     DefaultUnpackLastAxisUint8Fixture() : UnpackFixture("[ 4, 1, 6 ]", 6, "[ 4, 1 ]", "2", "6", "UINT8", "0.1", "0") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(UnpackLastAxisNumSix, DefaultUnpackLastAxisFixture)
+TEST_CASE_FIXTURE(DefaultUnpackLastAxisFixture, "UnpackLastAxisNumSix")
 {
     RunTest<2, armnn::DataType::Float32>(
         0,
@@ -164,7 +163,7 @@ BOOST_FIXTURE_TEST_CASE(UnpackLastAxisNumSix, DefaultUnpackLastAxisFixture)
           {"outputTensor6", { 6.0f, 12.0f, 18.0f, 24.0f }} });
 }
 
-BOOST_FIXTURE_TEST_CASE(UnpackLastAxisNumSixUint8, DefaultUnpackLastAxisUint8Fixture) {
+TEST_CASE_FIXTURE(DefaultUnpackLastAxisUint8Fixture, "UnpackLastAxisNumSixUint8") {
     RunTest<2, armnn::DataType::QAsymmU8>(
         0,
         {{"inputTensor", { 1, 2, 3, 4, 5, 6,
@@ -179,4 +178,4 @@ BOOST_FIXTURE_TEST_CASE(UnpackLastAxisNumSixUint8, DefaultUnpackLastAxisUint8Fix
          {"outputTensor6", { 60, 120, 180, 240 }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

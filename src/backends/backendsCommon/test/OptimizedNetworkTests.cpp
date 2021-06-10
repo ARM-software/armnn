@@ -3,17 +3,16 @@
 // SPDX-License-Identifier: MIT
 //
 
-
 #include <Graph.hpp>
 #include <Network.hpp>
 
 #include <reference/RefWorkloadFactory.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(OptimizedNetwork)
-
-BOOST_AUTO_TEST_CASE(SerializeToDot)
+TEST_SUITE("OptimizedNetwork")
+{
+TEST_CASE("SerializeToDot")
 {
     // build up the structure of the network
     armnn::INetworkPtr net(armnn::INetwork::Create());
@@ -62,10 +61,10 @@ BOOST_AUTO_TEST_CASE(SerializeToDot)
         "    " << addId << " -> " << outputId << " [label=< [4] >];\n"
         "}\n";
 
-    BOOST_TEST(ss.str() == expected.str());
+    CHECK(ss.str() == expected.str());
 }
 
-BOOST_AUTO_TEST_CASE(OptimizeValidateDeviceNonSupportLayerNoFallback)
+TEST_CASE("OptimizeValidateDeviceNonSupportLayerNoFallback")
 {
     // build up the structure of the network
     armnn::INetworkPtr net(armnn::INetwork::Create());
@@ -93,16 +92,16 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateDeviceNonSupportLayerNoFallback)
     try
     {
         Optimize(*net, backends, runtime->GetDeviceSpec(), armnn::OptimizerOptions(), errMessages);
-        BOOST_FAIL("Should have thrown an exception.");
+        FAIL("Should have thrown an exception.");
     }
     catch (const armnn::InvalidArgumentException& e)
     {
         // Different exceptions are thrown on different backends
     }
-    BOOST_CHECK(errMessages.size() > 0);
+    CHECK(errMessages.size() > 0);
 }
 
-BOOST_AUTO_TEST_CASE(OptimizeValidateDeviceNonSupportLayerWithFallback)
+TEST_CASE("OptimizeValidateDeviceNonSupportLayerWithFallback")
 {
     // build up the structure of the network
     armnn::INetworkPtr net(armnn::INetwork::Create());
@@ -126,7 +125,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateDeviceNonSupportLayerWithFallback)
 
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc, armnn::Compute::CpuRef };
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
-    BOOST_REQUIRE(optNet);
+    REQUIRE(optNet);
 
     armnn::Graph& graph = GetGraphForTesting(optNet.get());
     graph.AllocateDynamicBuffers();
@@ -139,19 +138,19 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateDeviceNonSupportLayerWithFallback)
 #if defined(ARMCOMPUTENEON_ENABLED)
         if (layer->GetType() == armnn::LayerType::Input || layer->GetType() == armnn::LayerType::Output)
         {
-            BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuAcc);
+            CHECK(layer->GetBackendId() == armnn::Compute::CpuAcc);
         }
         else if (layer->GetType() == armnn::LayerType::Normalization)
         {
-            BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
+            CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
         }
 #else
-        BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
+        CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
 #endif
     }
 }
 
-BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDevice)
+TEST_CASE("OptimizeValidateWorkloadsUndefinedComputeDevice")
 {
     const armnn::TensorInfo desc({3, 5}, armnn::DataType::Float32);
 
@@ -213,16 +212,16 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDevice)
     try
     {
         Optimize(*net, backends, runtime->GetDeviceSpec(), armnn::OptimizerOptions(), errMessages);
-        BOOST_FAIL("Should have thrown an exception.");
+        FAIL("Should have thrown an exception.");
     }
     catch (const armnn::InvalidArgumentException& e)
     {
         // Different exceptions are thrown on different backends
     }
-    BOOST_CHECK(errMessages.size() > 0);
+    CHECK(errMessages.size() > 0);
 }
 
-BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDeviceWithFallback)
+TEST_CASE("OptimizeValidateWorkloadsUndefinedComputeDeviceWithFallback")
 {
     const armnn::TensorInfo desc({3, 5}, armnn::DataType::Float32);
 
@@ -281,7 +280,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDeviceWithFallback
     std::vector<armnn::BackendId> backends = { armnn::Compute::Undefined, armnn::Compute::CpuRef };
 
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
-    BOOST_CHECK(optNet);
+    CHECK(optNet);
 
     armnn::Graph& graph = GetGraphForTesting(optNet.get());
     graph.AllocateDynamicBuffers();
@@ -290,13 +289,13 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDeviceWithFallback
     armnn::RefWorkloadFactory fact;
     for (auto&& layer : graph)
     {
-        BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
-        BOOST_CHECK_NO_THROW(
+        CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
+        CHECK_NOTHROW(
             layer->CreateWorkload(fact));
     }
 }
 
-BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsDuplicateComputeDeviceWithFallback)
+TEST_CASE("OptimizeValidateWorkloadsDuplicateComputeDeviceWithFallback")
 {
     // build up the structure of the network
     armnn::INetworkPtr net(armnn::INetwork::Create());
@@ -323,7 +322,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsDuplicateComputeDeviceWithFallback
                                              armnn::Compute::CpuRef };
 
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
-    BOOST_REQUIRE(optNet);
+    REQUIRE(optNet);
 
     armnn::Graph& graph = GetGraphForTesting(optNet.get());
     graph.AllocateDynamicBuffers();
@@ -338,25 +337,25 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsDuplicateComputeDeviceWithFallback
 #if defined(ARMCOMPUTENEON_ENABLED)
         if (layer->GetType() == armnn::LayerType::Input || layer->GetType() == armnn::LayerType::Output)
         {
-            BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuAcc);
+            CHECK(layer->GetBackendId() == armnn::Compute::CpuAcc);
         }
         else if (layer->GetType() == armnn::LayerType::Normalization)
         {
-            BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
+            CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
         }
 #elif defined(ARMCOMPUTECL_ENABLED)
         if (layer->GetType() == armnn::LayerType::Input || layer->GetType() == armnn::LayerType::Output)
         {
-            BOOST_CHECK(layer->GetBackendId() == armnn::Compute::GpuAcc);
+            CHECK(layer->GetBackendId() == armnn::Compute::GpuAcc);
         }
         else if (layer->GetType() == armnn::LayerType::Normalization)
         {
-            BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
+            CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
         }
 #else
-        BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
+        CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
 #endif
     }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

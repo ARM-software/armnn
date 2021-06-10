@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include <armnnDeserializer/IDeserializer.hpp>
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(Deserializer)
-
+TEST_SUITE("Deserializer_Pooling2d")
+{
 struct Pooling2dFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit Pooling2dFixture(const std::string &inputShape,
@@ -141,30 +140,30 @@ struct SimpleL2Pooling2dFixture : Pooling2dFixture
                                                   "Float32", "NHWC", "L2") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(Pooling2dFloat32Avg, SimpleAvgPooling2dFixture)
+TEST_CASE_FIXTURE(SimpleAvgPooling2dFixture, "Pooling2dFloat32Avg")
 {
     RunTest<4, armnn::DataType::Float32>(0, { 2, 3, 5, 2 }, { 3 });
 }
 
-BOOST_FIXTURE_TEST_CASE(Pooling2dQuantisedAsymm8Avg, SimpleAvgPooling2dFixture2)
+TEST_CASE_FIXTURE(SimpleAvgPooling2dFixture2, "Pooling2dQuantisedAsymm8Avg")
 {
     RunTest<4, armnn::DataType::QAsymmU8>(0,{ 20, 40, 60, 80 },{ 50 });
 }
 
-BOOST_FIXTURE_TEST_CASE(Pooling2dFloat32Max, SimpleMaxPooling2dFixture)
+TEST_CASE_FIXTURE(SimpleMaxPooling2dFixture, "Pooling2dFloat32Max")
 {
     RunTest<4, armnn::DataType::Float32>(0, { 2, 5, 5, 2 }, { 5 });
 }
 
-BOOST_FIXTURE_TEST_CASE(Pooling2dQuantisedAsymm8Max, SimpleMaxPooling2dFixture2)
+TEST_CASE_FIXTURE(SimpleMaxPooling2dFixture2, "Pooling2dQuantisedAsymm8Max")
 {
     RunTest<4, armnn::DataType::QAsymmU8>(0,{ 20, 40, 60, 80 },{ 80 });
 }
 
-BOOST_FIXTURE_TEST_CASE(Pooling2dFloat32L2, SimpleL2Pooling2dFixture)
+TEST_CASE_FIXTURE(SimpleL2Pooling2dFixture, "Pooling2dFloat32L2")
 {
     RunTest<4, armnn::DataType::Float32>(0, { 2, 3, 5, 2 }, { 3.2403703f });
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}
 

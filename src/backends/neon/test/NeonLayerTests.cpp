@@ -14,10 +14,10 @@
 #include <backendsCommon/test/ActivationFixture.hpp>
 #include <backendsCommon/test/LayerTests.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(Compute_ArmComputeNeon)
-
+TEST_SUITE("Compute_ArmComputeNeon")
+{
 using namespace armnn;
 
 using FactoryType = NeonWorkloadFactory;
@@ -308,7 +308,7 @@ TensorInfo CreateOutputTensorInfo(const TensorInfo& inputInfo,
 }
 }
 
-BOOST_AUTO_TEST_CASE(DepthwiseConv2dUtils)
+TEST_CASE("DepthwiseConv2dUtils")
 {
     const DataType dataType = DataType::Float32;
 
@@ -323,73 +323,73 @@ BOOST_AUTO_TEST_CASE(DepthwiseConv2dUtils)
     // Strides supported: 1,2,3
     descriptor = MakeDepthwiseConv2dDesc(1, 1);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
-    BOOST_TEST(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
+    CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
                                                             weightsInfo3x3, biasesInfo));
 
     descriptor = MakeDepthwiseConv2dDesc(1, 2);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
-    BOOST_TEST(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
+    CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
                                                             weightsInfo3x3, biasesInfo));
 
     descriptor = MakeDepthwiseConv2dDesc(1, 3);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
-    BOOST_TEST(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
+    CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
                                                             weightsInfo3x3, biasesInfo));
 
     descriptor = MakeDepthwiseConv2dDesc(2, 1);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
-    BOOST_TEST(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
+    CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
                                                             weightsInfo3x3, biasesInfo));
 
     descriptor = MakeDepthwiseConv2dDesc(2, 2);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
-    BOOST_TEST(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
+    CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
                                                             weightsInfo3x3, biasesInfo));
 
     descriptor = MakeDepthwiseConv2dDesc(2, 3);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
-    BOOST_TEST(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
+    CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
                                                             weightsInfo3x3, biasesInfo));
 
     descriptor = MakeDepthwiseConv2dDesc(3, 1);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
-    BOOST_TEST(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
+    CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
                                                             weightsInfo3x3, biasesInfo));
 
     descriptor = MakeDepthwiseConv2dDesc(3, 2);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
-    BOOST_TEST(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
+    CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
                                                             weightsInfo3x3, biasesInfo));
 
     descriptor = MakeDepthwiseConv2dDesc(3, 3);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
-    BOOST_TEST(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
+    CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
                                                             weightsInfo3x3, biasesInfo));
 
     // Supported stride 4
     descriptor = MakeDepthwiseConv2dDesc(4, 1);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
-    BOOST_TEST(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
+    CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
                                                             weightsInfo3x3, biasesInfo));
 
     // Supported weights shape 1x1
     TensorInfo weightsInfo1x1({ 1, 1, 1, 1 }, DataType::Float32);
     descriptor = MakeDepthwiseConv2dDesc(1, 1);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo1x1, descriptor, dataType);
-    BOOST_TEST(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
+    CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
                                                             weightsInfo1x1, biasesInfo));
 
     // Supported shape 2x2
     TensorInfo weightsInfo2x2({ 1, 1, 2, 2 }, DataType::Float32);
     descriptor = MakeDepthwiseConv2dDesc(1, 1);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo2x2, descriptor, dataType);
-    BOOST_TEST(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
+    CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
                                                             weightsInfo2x2, biasesInfo));
 
     // Asymmetric padding
     descriptor = MakeDepthwiseConv2dDesc(1, 1, 1, 1, 2, 1, 2);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
-    BOOST_TEST(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
+    CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
                                                             weightsInfo3x3, biasesInfo));
 }
 
@@ -1498,4 +1498,4 @@ ARMNN_COMPARE_REF_FIXTURE_TEST_CASE_WITH_THF(CompareEluActivationWithReference, 
 
 #endif
 
-BOOST_AUTO_TEST_SUITE_END()
+}

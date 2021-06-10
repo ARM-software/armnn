@@ -6,10 +6,8 @@
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include <armnnDeserializer/IDeserializer.hpp>
 
-#include <boost/test/unit_test.hpp>
-
-BOOST_AUTO_TEST_SUITE(Deserializer)
-
+TEST_SUITE("Deserializer_LogSoftmax")
+{
 struct LogSoftmaxFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit LogSoftmaxFixture(const std::string &shape,
@@ -111,7 +109,7 @@ struct LogSoftmaxFloat32Fixture : LogSoftmaxFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(LogSoftmaxFloat32, LogSoftmaxFloat32Fixture)
+TEST_CASE_FIXTURE(LogSoftmaxFloat32Fixture, "LogSoftmaxFloat32")
 {
     RunTest<4, armnn::DataType::Float32>(
         0,
@@ -125,4 +123,4 @@ BOOST_FIXTURE_TEST_CASE(LogSoftmaxFloat32, LogSoftmaxFloat32Fixture)
         });
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

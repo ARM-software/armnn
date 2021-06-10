@@ -8,12 +8,12 @@
 
 #include <armnn/INetwork.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 using namespace armnn;
 
-BOOST_AUTO_TEST_SUITE(Optimizer)
-
+TEST_SUITE("Optimizer_ReduceMultipleAxes")
+{
 INetworkPtr CreateSimpleReduceNetwork(ReduceDescriptor reduceDescriptor,
                                       TensorShape& inputShape,
                                       TensorShape& outputShape)
@@ -22,10 +22,10 @@ INetworkPtr CreateSimpleReduceNetwork(ReduceDescriptor reduceDescriptor,
     INetworkPtr network = INetwork::Create();
 
     const std::string layerName("reduce_layer");
-    const TensorInfo inputInfo (inputShape, DataType::Float32);
+    const TensorInfo inputInfo(inputShape, DataType::Float32);
     const TensorInfo outputInfo(outputShape, DataType::Float32);
 
-    IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
+    IConnectableLayer* const inputLayer = network->AddInputLayer(0);
     IConnectableLayer* const reduceLayer = network->AddReduceLayer(reduceDescriptor, layerName.c_str());
     IConnectableLayer* const outputLayer1 = network->AddOutputLayer(0);
     IConnectableLayer* const outputLayer2 = network->AddOutputLayer(1);
@@ -56,37 +56,36 @@ void ReduceWithMultipleAxesTest(INetworkPtr& network,
     Graph& graph = GetGraphForTesting(optNet.get());
     if (numOfAxes == 2)
     {
-        BOOST_CHECK(graph.GetNumLayers() == 5);
-        BOOST_TEST(CheckSequence(graph.cbegin(),
-                                 graph.cend(),
-                                 &IsLayerOfType<InputLayer>,
-                                 &IsLayerOfType<ReduceLayer>,
-                                 &IsLayerOfType<ReduceLayer>,
-                                 &IsLayerOfType<OutputLayer>,
-                                 &IsLayerOfType<OutputLayer>));
-    }
-    else
+        CHECK(graph.GetNumLayers() == 5);
+        CHECK(CheckSequence(graph.cbegin(),
+                            graph.cend(),
+                            &IsLayerOfType<InputLayer>,
+                            &IsLayerOfType<ReduceLayer>,
+                            &IsLayerOfType<ReduceLayer>,
+                            &IsLayerOfType<OutputLayer>,
+                            &IsLayerOfType<OutputLayer>));
+    } else
     {
-        BOOST_CHECK(graph.GetNumLayers() == 6);
-        BOOST_TEST(CheckSequence(graph.cbegin(),
-                                 graph.cend(),
-                                 &IsLayerOfType<InputLayer>,
-                                 &IsLayerOfType<ReduceLayer>,
-                                 &IsLayerOfType<ReduceLayer>,
-                                 &IsLayerOfType<ReduceLayer>,
-                                 &IsLayerOfType<OutputLayer>,
-                                 &IsLayerOfType<OutputLayer>));
+        CHECK(graph.GetNumLayers() == 6);
+        CHECK(CheckSequence(graph.cbegin(),
+                            graph.cend(),
+                            &IsLayerOfType<InputLayer>,
+                            &IsLayerOfType<ReduceLayer>,
+                            &IsLayerOfType<ReduceLayer>,
+                            &IsLayerOfType<ReduceLayer>,
+                            &IsLayerOfType<OutputLayer>,
+                            &IsLayerOfType<OutputLayer>));
     }
 
     // Get last layer in new chain, layers name follow 0, 1, 2 pattern
     std::string layerName = "reduce_layer_" + std::to_string(numOfAxes - 1);
     Layer* const reduceLayer = GetFirstLayerWithName(graph, layerName);
-    BOOST_TEST(reduceLayer);
+    CHECK(reduceLayer);
     auto reduceTensorInfo = reduceLayer->GetOutputSlot().GetTensorInfo();
 
     // Tensorshape and the data type are correct
-    BOOST_TEST((reduceTensorInfo.GetShape() == outputShape));
-    BOOST_TEST((reduceTensorInfo.GetDataType() == DataType::Float32));
+    CHECK((reduceTensorInfo.GetShape() == outputShape));
+    CHECK((reduceTensorInfo.GetDataType() == DataType::Float32));
 
     // Load network into runtime
     NetworkId networkIdentifier;
@@ -95,45 +94,45 @@ void ReduceWithMultipleAxesTest(INetworkPtr& network,
     // Create input and output tensors
     std::vector<float> outputData(expectedOutput.size());
     InputTensors inputTensors
-    {
-        { 0, armnn::ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0), inputData.data()) }
-    };
+        {
+            {0, armnn::ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0), inputData.data())}
+        };
     OutputTensors outputTensors
-    {
-        { 0, armnn::Tensor(run->GetOutputTensorInfo(networkIdentifier, 0), outputData.data()) },
-        { 1, armnn::Tensor(run->GetOutputTensorInfo(networkIdentifier, 1), outputData.data()) }
-    };
+        {
+            {0, armnn::Tensor(run->GetOutputTensorInfo(networkIdentifier, 0), outputData.data())},
+            {1, armnn::Tensor(run->GetOutputTensorInfo(networkIdentifier, 1), outputData.data())}
+        };
 
     // Run inference
     run->EnqueueWorkload(networkIdentifier, inputTensors, outputTensors);
 
     // Checks the results
-    BOOST_TEST(outputData == expectedOutput);
+    CHECK(outputData == expectedOutput);
 }
 
 void ReduceSumWithTwoAxesKeepDimsTest(Compute backendId)
 {
     armnn::ReduceDescriptor reduceDescriptor;
-    reduceDescriptor.m_vAxis = { 1, 2 };
+    reduceDescriptor.m_vAxis = {1, 2};
     reduceDescriptor.m_KeepDims = true;
     reduceDescriptor.m_ReduceOperation = armnn::ReduceOperation::Sum;
 
-    TensorShape inputShape  = { 1, 3, 2, 4 };
-    TensorShape outputShape = { 1, 1, 1, 4 };
+    TensorShape inputShape = {1, 3, 2, 4};
+    TensorShape outputShape = {1, 1, 1, 4};
 
     // Construct ArmNN network
     INetworkPtr network = CreateSimpleReduceNetwork(reduceDescriptor, inputShape, outputShape);
 
     // Creates structures for input & output.
-    const std::vector<float> inputData({  1.0f,   2.0f,   3.0f,   4.0f,
-                                          5.0f,   6.0f,   7.0f,   8.0f,
+    const std::vector<float> inputData({1.0f, 2.0f, 3.0f, 4.0f,
+                                        5.0f, 6.0f, 7.0f, 8.0f,
 
-                                          10.0f,  20.0f,  30.0f,  40.0f,
-                                          50.0f,  60.0f,  70.0f,  80.0f,
+                                        10.0f, 20.0f, 30.0f, 40.0f,
+                                        50.0f, 60.0f, 70.0f, 80.0f,
 
-                                          100.0f, 200.0f, 300.0f, 400.0f,
-                                          500.0f, 600.0f, 700.0f, 800.0f });
-    const std::vector<float> expectedOutput({ 666.0f, 888.0f, 1110.0f, 1332.0f });
+                                        100.0f, 200.0f, 300.0f, 400.0f,
+                                        500.0f, 600.0f, 700.0f, 800.0f});
+    const std::vector<float> expectedOutput({666.0f, 888.0f, 1110.0f, 1332.0f});
 
     ReduceWithMultipleAxesTest(network,
                                outputShape,
@@ -146,26 +145,26 @@ void ReduceSumWithTwoAxesKeepDimsTest(Compute backendId)
 void ReduceSumWithTwoAxesTest(Compute backendId)
 {
     armnn::ReduceDescriptor reduceDescriptor;
-    reduceDescriptor.m_vAxis = { 1, 2 };
+    reduceDescriptor.m_vAxis = {1, 2};
     reduceDescriptor.m_KeepDims = false;
     reduceDescriptor.m_ReduceOperation = armnn::ReduceOperation::Sum;
 
-    TensorShape inputShape  = { 1, 3, 2, 4 };
-    TensorShape outputShape = { 1, 4 };
+    TensorShape inputShape = {1, 3, 2, 4};
+    TensorShape outputShape = {1, 4};
 
     // Construct ArmNN network
     INetworkPtr network = CreateSimpleReduceNetwork(reduceDescriptor, inputShape, outputShape);
 
     // Creates structures for input & output.
-    const std::vector<float> inputData({  1.0f,   2.0f,   3.0f,   4.0f,
-                                          5.0f,   6.0f,   7.0f,   8.0f,
+    const std::vector<float> inputData({1.0f, 2.0f, 3.0f, 4.0f,
+                                        5.0f, 6.0f, 7.0f, 8.0f,
 
-                                          10.0f,  20.0f,  30.0f,  40.0f,
-                                          50.0f,  60.0f,  70.0f,  80.0f,
+                                        10.0f, 20.0f, 30.0f, 40.0f,
+                                        50.0f, 60.0f, 70.0f, 80.0f,
 
-                                          100.0f, 200.0f, 300.0f, 400.0f,
-                                          500.0f, 600.0f, 700.0f, 800.0f });
-    const std::vector<float> expectedOutput({ 666.0f, 888.0f, 1110.0f, 1332.0f });
+                                        100.0f, 200.0f, 300.0f, 400.0f,
+                                        500.0f, 600.0f, 700.0f, 800.0f});
+    const std::vector<float> expectedOutput({666.0f, 888.0f, 1110.0f, 1332.0f});
 
     ReduceWithMultipleAxesTest(network,
                                outputShape,
@@ -178,29 +177,29 @@ void ReduceSumWithTwoAxesTest(Compute backendId)
 void ReduceSumWithThreeAxesKeepDimsTest(Compute backendId)
 {
     armnn::ReduceDescriptor reduceDescriptor;
-    reduceDescriptor.m_vAxis = { 0, 2, 3 };
+    reduceDescriptor.m_vAxis = {0, 2, 3};
     reduceDescriptor.m_KeepDims = true;
     reduceDescriptor.m_ReduceOperation = armnn::ReduceOperation::Sum;
 
-    TensorShape inputShape  = { 2, 2, 2, 2 };
-    TensorShape outputShape = { 1, 2, 1, 1 };
+    TensorShape inputShape = {2, 2, 2, 2};
+    TensorShape outputShape = {1, 2, 1, 1};
 
     // Construct ArmNN network
     INetworkPtr network = CreateSimpleReduceNetwork(reduceDescriptor, inputShape, outputShape);
 
     // Creates structures for input & output.
-    const std::vector<float> inputData({  1.0f,   2.0f,
-                                          3.0f,   4.0f,
+    const std::vector<float> inputData({1.0f, 2.0f,
+                                        3.0f, 4.0f,
 
-                                          5.0f,   6.0f,
-                                          7.0f,   8.0f,
+                                        5.0f, 6.0f,
+                                        7.0f, 8.0f,
 
-                                          10.0f,  20.0f,
-                                          30.0f,  40.0f,
+                                        10.0f, 20.0f,
+                                        30.0f, 40.0f,
 
-                                          50.0f,  60.0f,
-                                          70.0f,  80.0f });
-    const std::vector<float> expectedOutput({ 110.0f, 286.0f });
+                                        50.0f, 60.0f,
+                                        70.0f, 80.0f});
+    const std::vector<float> expectedOutput({110.0f, 286.0f});
 
     ReduceWithMultipleAxesTest(network,
                                outputShape,
@@ -213,29 +212,29 @@ void ReduceSumWithThreeAxesKeepDimsTest(Compute backendId)
 void ReduceSumWithThreeAxesTest(Compute backendId)
 {
     armnn::ReduceDescriptor reduceDescriptor;
-    reduceDescriptor.m_vAxis = { 0, 2, 3 };
+    reduceDescriptor.m_vAxis = {0, 2, 3};
     reduceDescriptor.m_KeepDims = false;
     reduceDescriptor.m_ReduceOperation = armnn::ReduceOperation::Sum;
 
-    TensorShape inputShape  = { 2, 2, 2, 2 };
-    TensorShape outputShape = { 2 };
+    TensorShape inputShape = {2, 2, 2, 2};
+    TensorShape outputShape = {2};
 
     // Construct ArmNN network
     INetworkPtr network = CreateSimpleReduceNetwork(reduceDescriptor, inputShape, outputShape);
 
     // Creates structures for input & output.
-    const std::vector<float> inputData({  1.0f,   2.0f,
-                                          3.0f,   4.0f,
+    const std::vector<float> inputData({1.0f, 2.0f,
+                                        3.0f, 4.0f,
 
-                                          5.0f,   6.0f,
-                                          7.0f,   8.0f,
+                                        5.0f, 6.0f,
+                                        7.0f, 8.0f,
 
-                                          10.0f,  20.0f,
-                                          30.0f,  40.0f,
+                                        10.0f, 20.0f,
+                                        30.0f, 40.0f,
 
-                                          50.0f,  60.0f,
-                                          70.0f,  80.0f });
-    const std::vector<float> expectedOutput({ 110.0f, 286.0f });
+                                        50.0f, 60.0f,
+                                        70.0f, 80.0f});
+    const std::vector<float> expectedOutput({110.0f, 286.0f});
 
     ReduceWithMultipleAxesTest(network,
                                outputShape,
@@ -247,47 +246,47 @@ void ReduceSumWithThreeAxesTest(Compute backendId)
 
 using namespace armnn;
 #if defined(ARMCOMPUTENEON_ENABLED)
-BOOST_AUTO_TEST_CASE(ReduceSumWithTwoAxesKeepDimsCpuAccTest)
+TEST_CASE("ReduceSumWithTwoAxesKeepDimsCpuAccTest")
 {
     ReduceSumWithTwoAxesKeepDimsTest(Compute::CpuAcc);
 }
 
-BOOST_AUTO_TEST_CASE(ReduceSumWithTwoAxesCpuAccTest)
+TEST_CASE("ReduceSumWithTwoAxesCpuAccTest")
 {
     ReduceSumWithTwoAxesTest(Compute::CpuAcc);
 }
 
-BOOST_AUTO_TEST_CASE(ReduceSumWithThreeAxesKeepDimsCpuAccTest)
+TEST_CASE("ReduceSumWithThreeAxesKeepDimsCpuAccTest")
 {
     ReduceSumWithThreeAxesKeepDimsTest(Compute::CpuAcc);
 }
 
-BOOST_AUTO_TEST_CASE(ReduceSumWithThreeAxesCpuAccTest)
+TEST_CASE("ReduceSumWithThreeAxesCpuAccTest")
 {
     ReduceSumWithThreeAxesTest(Compute::CpuAcc);
 }
 #endif
 
 #if defined(ARMCOMPUTECL_ENABLED)
-BOOST_AUTO_TEST_CASE(ReduceSumWithTwoAxesKeepDimsGpuAccTest)
+TEST_CASE("ReduceSumWithTwoAxesKeepDimsGpuAccTest")
 {
     ReduceSumWithTwoAxesKeepDimsTest(Compute::GpuAcc);
 }
 
-BOOST_AUTO_TEST_CASE(ReduceSumWithTwoAxesGpuAccTest)
+TEST_CASE("ReduceSumWithTwoAxesGpuAccTest")
 {
     ReduceSumWithTwoAxesTest(Compute::GpuAcc);
 }
 
-BOOST_AUTO_TEST_CASE(ReduceSumWithThreeAxesKeepDimsGpuAccTest)
+TEST_CASE("ReduceSumWithThreeAxesKeepDimsGpuAccTest")
 {
     ReduceSumWithThreeAxesKeepDimsTest(Compute::GpuAcc);
 }
 
-BOOST_AUTO_TEST_CASE(ReduceSumWithThreeAxesGpuAccTest)
+TEST_CASE("ReduceSumWithThreeAxesGpuAccTest")
 {
     ReduceSumWithThreeAxesTest(Compute::GpuAcc);
 }
 #endif
 
-BOOST_AUTO_TEST_SUITE_END()
+}

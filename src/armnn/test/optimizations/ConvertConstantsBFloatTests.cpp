@@ -8,14 +8,15 @@
 #include <BFloat16.hpp>
 #include <Optimizer.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 using namespace armnn;
 
-BOOST_AUTO_TEST_SUITE(Optimizer)
+TEST_SUITE("Optimizer")
+{
 using namespace armnn::optimizations;
 
-BOOST_AUTO_TEST_CASE(ConvertConstantsFloatToBFloatTest)
+TEST_CASE("ConvertConstantsFloatToBFloatTest")
 {
     armnn::Graph graph;
 
@@ -48,27 +49,27 @@ BOOST_AUTO_TEST_CASE(ConvertConstantsFloatToBFloatTest)
     fc->GetOutputSlot().Connect(output->GetInputSlot(0));
 
     // Check tensor data type before conversion
-    BOOST_CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::Float32);
+    CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::Float32);
 
     // Run the optimizer
     armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(ConvertConstantsFloatToBFloat()));
 
     // Check tensor data type after conversion
-    BOOST_CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::BFloat16);
+    CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::BFloat16);
 
     // Check whether data matches expected Bf16 data
     const BFloat16* data = fc->m_Weight->GetConstTensor<BFloat16>();
-    BOOST_CHECK(data[0] == BFloat16(0.0f));
-    BOOST_CHECK(data[1] == BFloat16(-1.0f));
-    BOOST_CHECK(data[2] == BFloat16(3.796875f)); // 0x4073
-    BOOST_CHECK(data[3] == BFloat16(3.1072295E29f)); // 0x707B
-    BOOST_CHECK(data[4] == BFloat16(9.131327E-10f)); // 0x307B
-    BOOST_CHECK(data[5] == BFloat16(-3.796875f)); // 0xC073
-    BOOST_CHECK(data[6] == BFloat16(-3.1072295E29f)); // 0xF07B
-    BOOST_CHECK(data[7] == BFloat16(-9.131327E-10f)); // 0xB07B
+    CHECK(data[0] == BFloat16(0.0f));
+    CHECK(data[1] == BFloat16(-1.0f));
+    CHECK(data[2] == BFloat16(3.796875f)); // 0x4073
+    CHECK(data[3] == BFloat16(3.1072295E29f)); // 0x707B
+    CHECK(data[4] == BFloat16(9.131327E-10f)); // 0x307B
+    CHECK(data[5] == BFloat16(-3.796875f)); // 0xC073
+    CHECK(data[6] == BFloat16(-3.1072295E29f)); // 0xF07B
+    CHECK(data[7] == BFloat16(-9.131327E-10f)); // 0xB07B
 }
 
-BOOST_AUTO_TEST_CASE(ConvertConstantsBFloatToFloatTest)
+TEST_CASE("ConvertConstantsBFloatToFloatTest")
 {
     armnn::Graph graph;
 
@@ -104,24 +105,24 @@ BOOST_AUTO_TEST_CASE(ConvertConstantsBFloatToFloatTest)
     fc->GetOutputSlot().Connect(output->GetInputSlot(0));
 
     //Test the tensor info is correct.
-    BOOST_CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::BFloat16);
+    CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::BFloat16);
 
     // Run the optimizer
     armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(ConvertConstantsBFloatToFloat()));
 
     //Test the tensor info is correct.
-    BOOST_CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::Float32);
+    CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::Float32);
 
     // Now test the data matches float32 data
     const float* data = fc->m_Weight->GetConstTensor<float>();
-    BOOST_CHECK(data[0] == 0.0f);
-    BOOST_CHECK(data[1] == -1.0f);
-    BOOST_CHECK(data[2] == 3.796875f);
-    BOOST_CHECK(data[3] == 3.1072295E29f);
-    BOOST_CHECK(data[4] == 9.131327E-10f);
-    BOOST_CHECK(data[5] == -3.796875f);
-    BOOST_CHECK(data[6] == -3.1072295E29f);
-    BOOST_CHECK(data[7] == -9.131327E-10f);
+    CHECK(data[0] == 0.0f);
+    CHECK(data[1] == -1.0f);
+    CHECK(data[2] == 3.796875f);
+    CHECK(data[3] == 3.1072295E29f);
+    CHECK(data[4] == 9.131327E-10f);
+    CHECK(data[5] == -3.796875f);
+    CHECK(data[6] == -3.1072295E29f);
+    CHECK(data[7] == -9.131327E-10f);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

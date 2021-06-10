@@ -14,7 +14,7 @@
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <vector>
 
@@ -169,7 +169,7 @@ void EndToEndLayerTestImpl(INetworkPtr network,
         std::vector<TOutput> out = outputStorage.at(it.first);
         for (unsigned int i = 0; i < out.size(); ++i)
         {
-            BOOST_CHECK_MESSAGE(Compare<ArmnnOType>(it.second[i], out[i], tolerance) == true,
+            CHECK_MESSAGE(Compare<ArmnnOType>(it.second[i], out[i], tolerance) == true,
                     "Actual output: " << out[i] << ". Expected output:" << it.second[i]);
 
         }
@@ -203,7 +203,7 @@ inline void ImportNonAlignedInputPointerTest(std::vector<BackendId> backends)
 
     // Optimize the network
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
-    BOOST_CHECK(optNet);
+    CHECK(optNet);
 
     // Loads it into the runtime.
     NetworkId netId;
@@ -238,7 +238,7 @@ inline void ImportNonAlignedInputPointerTest(std::vector<BackendId> backends)
     runtime->GetProfiler(netId)->EnableProfiling(true);
 
     // Do the inference and expect it to fail with a ImportMemoryException
-    BOOST_CHECK_THROW(runtime->EnqueueWorkload(netId, inputTensors, outputTensors), MemoryImportException);
+    CHECK_THROWS_AS(runtime->EnqueueWorkload(netId, inputTensors, outputTensors), MemoryImportException);
 }
 
 inline void ExportNonAlignedOutputPointerTest(std::vector<BackendId> backends)
@@ -268,7 +268,7 @@ inline void ExportNonAlignedOutputPointerTest(std::vector<BackendId> backends)
 
     // Optimize the network
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
-    BOOST_CHECK(optNet);
+    CHECK(optNet);
 
     // Loads it into the runtime.
     NetworkId netId;
@@ -304,11 +304,11 @@ inline void ExportNonAlignedOutputPointerTest(std::vector<BackendId> backends)
     if (backends[0] == Compute::CpuAcc)
     {
         // For CpuAcc the NeonTensorHandle will throw its own exception on misaligned memory
-        BOOST_CHECK_THROW(runtime->EnqueueWorkload(netId, inputTensors, outputTensors), MemoryImportException);
+        CHECK_THROWS_AS(runtime->EnqueueWorkload(netId, inputTensors, outputTensors), MemoryImportException);
     }
     else
     {
-        BOOST_CHECK_THROW(runtime->EnqueueWorkload(netId, inputTensors, outputTensors), MemoryExportException);
+        CHECK_THROWS_AS(runtime->EnqueueWorkload(netId, inputTensors, outputTensors), MemoryExportException);
     }
 }
 
@@ -339,7 +339,7 @@ inline void ImportAlignedPointerTest(std::vector<BackendId> backends)
 
     // Optimize the network
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
-    BOOST_CHECK(optNet);
+    CHECK(optNet);
 
     // Loads it into the runtime.
     NetworkId netId;
@@ -383,18 +383,18 @@ inline void ImportAlignedPointerTest(std::vector<BackendId> backends)
 
     // Contains ActivationWorkload
     std::size_t found = dump.find("ActivationWorkload");
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
 
     // Contains SyncMemGeneric
     found = dump.find("SyncMemGeneric");
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
 
     // Does not contain CopyMemGeneric
     found = dump.find("CopyMemGeneric");
-    BOOST_TEST(found == std::string::npos);
+    CHECK(found == std::string::npos);
 
     // Check output is as expected
-    BOOST_TEST(outputData == expectedOutput);
+    CHECK(outputData == expectedOutput);
 }
 
 inline void ImportOnlyWorkload(std::vector<BackendId> backends)
@@ -424,17 +424,17 @@ inline void ImportOnlyWorkload(std::vector<BackendId> backends)
     // optimize the network
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
-    BOOST_TEST_CHECKPOINT("Load Network");
+    INFO("Load Network");
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
 
     INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Undefined);
 
-    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
+    CHECK(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
                == Status::Success);
 
-    BOOST_TEST_CHECKPOINT("Generate Data");
+    INFO("Generate Data");
     // Creates structures for input & output
     std::vector<float> inputData
     {
@@ -448,7 +448,7 @@ inline void ImportOnlyWorkload(std::vector<BackendId> backends)
          1.0f, 4.0f, 9.0f, 16.0f
     };
 
-    BOOST_TEST_CHECKPOINT("Create Network");
+    INFO("Create Network");
     InputTensors inputTensors
     {
         {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())},
@@ -458,15 +458,14 @@ inline void ImportOnlyWorkload(std::vector<BackendId> backends)
         {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data())}
     };
 
-    BOOST_TEST_CHECKPOINT("Get Profiler");
-
+    INFO("Get Profiler");
     runtime->GetProfiler(netId)->EnableProfiling(true);
 
-    BOOST_TEST_CHECKPOINT("Run Inference");
+    INFO("Run Inference");
     // Do the inference
     runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
 
-    BOOST_TEST_CHECKPOINT("Print Profiler");
+    INFO("Print Profiler");
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
     std::stringstream ss;
@@ -474,17 +473,17 @@ inline void ImportOnlyWorkload(std::vector<BackendId> backends)
     std::string dump = ss.str();
 
     // Check there are no SyncMemGeneric workloads as we didn't export
-    BOOST_TEST_CHECKPOINT("Find SyncMemGeneric");
+    INFO("Find SyncMemGeneric");
     int count = SubStringCounter(dump, "SyncMemGeneric");
-    BOOST_TEST(count == 0);
+    CHECK(count == 0);
 
     // Should only be 1 CopyMemGeneric for the output as we imported
-    BOOST_TEST_CHECKPOINT("Find CopyMemGeneric");
+    INFO("Find CopyMemGeneric");
     count = SubStringCounter(dump, "CopyMemGeneric");
-    BOOST_TEST(count == 1);
+    CHECK(count == 1);
 
     // Check the output is correct
-    BOOST_CHECK_EQUAL_COLLECTIONS(outputData.begin(), outputData.end(), expectedOutput.begin(), expectedOutput.end());
+    CHECK(std::equal(outputData.begin(), outputData.end(), expectedOutput.begin(), expectedOutput.end()));
 }
 
 inline void ExportOnlyWorkload(std::vector<BackendId> backends)
@@ -514,15 +513,15 @@ inline void ExportOnlyWorkload(std::vector<BackendId> backends)
     // optimize the network
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
-    BOOST_TEST_CHECKPOINT("Load Network");
+    INFO("Load Network");
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
     INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Malloc);
-    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
+    CHECK(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
                == Status::Success);
 
-    BOOST_TEST_CHECKPOINT("Generate Data");
+    INFO("Generate Data");
     // Creates structures for input & output
     std::vector<float> inputData
     {
@@ -536,7 +535,7 @@ inline void ExportOnlyWorkload(std::vector<BackendId> backends)
          1.0f, 4.0f, 9.0f, 16.0f
     };
 
-    BOOST_TEST_CHECKPOINT("Create Network");
+    INFO("Create Network");
     InputTensors inputTensors
     {
         {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())},
@@ -546,15 +545,14 @@ inline void ExportOnlyWorkload(std::vector<BackendId> backends)
         {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data())}
     };
 
-    BOOST_TEST_CHECKPOINT("Get Profiler");
-
+    INFO("Get Profiler");
     runtime->GetProfiler(netId)->EnableProfiling(true);
 
-    BOOST_TEST_CHECKPOINT("Run Inference");
+    INFO("Run Inference");
     // Do the inference
     runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
 
-    BOOST_TEST_CHECKPOINT("Print Profiler");
+    INFO("Print Profiler");
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
     std::stringstream ss;
@@ -562,17 +560,17 @@ inline void ExportOnlyWorkload(std::vector<BackendId> backends)
     std::string dump = ss.str();
 
     // Check there is a SyncMemGeneric workload as we exported
-    BOOST_TEST_CHECKPOINT("Find SyncMemGeneric");
+    INFO("Find SyncMemGeneric");
     int count = SubStringCounter(dump, "SyncMemGeneric");
-    BOOST_TEST(count == 1);
+    CHECK(count == 1);
 
     // Should be 1 CopyMemGeneric for the output as we did not import
-    BOOST_TEST_CHECKPOINT("Find CopyMemGeneric");
+    INFO("Find CopyMemGeneric");
     count = SubStringCounter(dump, "CopyMemGeneric");
-    BOOST_TEST(count == 1);
+    CHECK(count == 1);
 
     // Check the output is correct
-    BOOST_CHECK_EQUAL_COLLECTIONS(outputData.begin(), outputData.end(), expectedOutput.begin(), expectedOutput.end());
+    CHECK(std::equal(outputData.begin(), outputData.end(), expectedOutput.begin(), expectedOutput.end()));
 }
 
 inline void ImportAndExportWorkload(std::vector<BackendId> backends)
@@ -601,17 +599,17 @@ inline void ImportAndExportWorkload(std::vector<BackendId> backends)
 
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
-    BOOST_TEST_CHECKPOINT("Load Network");
+    INFO("Load Network");
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
 
     INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
 
-    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
+    CHECK(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
                == Status::Success);
 
-    BOOST_TEST_CHECKPOINT("Generate Data");
+    INFO("Generate Data");
     // Creates structures for input & output
     std::vector<float> inputData
     {
@@ -625,7 +623,7 @@ inline void ImportAndExportWorkload(std::vector<BackendId> backends)
          1.0f, 4.0f, 9.0f, 16.0f
     };
 
-    BOOST_TEST_CHECKPOINT("Create Network");
+    INFO("Create Network");
     InputTensors inputTensors
     {
         {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())},
@@ -635,15 +633,14 @@ inline void ImportAndExportWorkload(std::vector<BackendId> backends)
         {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data())}
     };
 
-    BOOST_TEST_CHECKPOINT("Get Profiler");
-
+    INFO("Get Profiler");
     runtime->GetProfiler(netId)->EnableProfiling(true);
 
-    BOOST_TEST_CHECKPOINT("Run Inference");
+    INFO("Run Inference");
     // Do the inference
     runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
 
-    BOOST_TEST_CHECKPOINT("Print Profiler");
+    INFO("Print Profiler");
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
     std::stringstream ss;
@@ -651,17 +648,17 @@ inline void ImportAndExportWorkload(std::vector<BackendId> backends)
     std::string dump = ss.str();
 
     // Check there is a SyncMemGeneric workload as we exported
-    BOOST_TEST_CHECKPOINT("Find SyncMemGeneric");
+    INFO("Find SyncMemGeneric");
     int count = SubStringCounter(dump, "SyncMemGeneric");
-    BOOST_TEST(count == 1);
+    CHECK(count == 1);
 
     // Shouldn't be any CopyMemGeneric workloads
-    BOOST_TEST_CHECKPOINT("Find CopyMemGeneric");
+    INFO("Find CopyMemGeneric");
     count = SubStringCounter(dump, "CopyMemGeneric");
-    BOOST_TEST(count == 0);
+    CHECK(count == 0);
 
     // Check the output is correct
-    BOOST_CHECK_EQUAL_COLLECTIONS(outputData.begin(), outputData.end(), expectedOutput.begin(), expectedOutput.end());
+    CHECK(std::equal(outputData.begin(), outputData.end(), expectedOutput.begin(), expectedOutput.end()));
 }
 
 inline void ExportOutputWithSeveralOutputSlotConnectionsTest(std::vector<BackendId> backends)
@@ -753,19 +750,19 @@ inline void ExportOutputWithSeveralOutputSlotConnectionsTest(std::vector<Backend
         found = dump.find("ClActivationWorkload");
     }
 
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
     // No contains SyncMemGeneric
     found = dump.find("SyncMemGeneric");
-    BOOST_TEST(found == std::string::npos);
+    CHECK(found == std::string::npos);
     // Contains CopyMemGeneric
     found = dump.find("CopyMemGeneric");
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
 
     // Check that the outputs are correct
-    BOOST_CHECK_EQUAL_COLLECTIONS(outputData0.begin(), outputData0.end(),
-                                  expectedOutput.begin(), expectedOutput.end());
-    BOOST_CHECK_EQUAL_COLLECTIONS(outputData1.begin(), outputData1.end(),
-                                  expectedOutput.begin(), expectedOutput.end());
+    CHECK(std::equal(outputData0.begin(), outputData0.end(),
+                                  expectedOutput.begin(), expectedOutput.end()));
+    CHECK(std::equal(outputData1.begin(), outputData1.end(),
+                                  expectedOutput.begin(), expectedOutput.end()));
 }
 
 inline void StridedSliceInvalidSliceEndToEndTest(std::vector<BackendId> backends)
@@ -801,7 +798,7 @@ inline void StridedSliceInvalidSliceEndToEndTest(std::vector<BackendId> backends
     stridedSlice->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 3 }, DataType::Float32));
 
     // Attempt to optimize the network and check that the correct exception is thrown
-    BOOST_CHECK_THROW(Optimize(*net, backends, runtime->GetDeviceSpec()), armnn::LayerValidationException);
+    CHECK_THROWS_AS(Optimize(*net, backends, runtime->GetDeviceSpec()), armnn::LayerValidationException);
 }
 
 } // anonymous namespace

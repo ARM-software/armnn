@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_Quantize")
+{
     struct QuantizeFixture : public ParserFlatbuffersFixture
     {
         explicit QuantizeFixture(const std::string & inputShape,
@@ -80,7 +79,7 @@ BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
                                                          "UINT8") {}
     };
 
-    BOOST_FIXTURE_TEST_CASE(SimpleQuantizeQAsymm8, SimpleQuantizeFixtureQAsymm8)
+    TEST_CASE_FIXTURE(SimpleQuantizeQAsymm8, SimpleQuantizeFixtureQAsymm8)
     {
         RunTest<2, armnn::DataType::Float32, armnn::DataType::QuantisedAsymm8>(
                 0,
@@ -95,7 +94,7 @@ BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
                                                          "INT16") {}
     };
 
-    BOOST_FIXTURE_TEST_CASE(SimpleQuantizeQsymm16, SimpleQuantizeFixtureQSymm16)
+    TEST_CASE_FIXTURE(SimpleQuantizeFixtureQSymm16, "SimpleQuantizeQsymm16")
     {
         RunTest<2, armnn::DataType::Float32, armnn::DataType::QuantisedSymm16>(
                 0,
@@ -110,7 +109,7 @@ BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
                                                          "INT8") {}
     };
 
-    BOOST_FIXTURE_TEST_CASE(SimpleQuantizeQSymmS8, SimpleQuantizeFixtureQSymmS8)
+    TEST_CASE_FIXTURE(SimpleQuantizeFixtureQSymmS8, "SimpleQuantizeQSymmS8")
     {
         RunTest<2, armnn::DataType::Float32, armnn::DataType::QSymmS8>(
                 0,
@@ -118,4 +117,4 @@ BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
                 {{"outputTensor", { 0,    1,    5,    127,    -128,   -1 }}});
     }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

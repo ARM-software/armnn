@@ -7,12 +7,13 @@
 
 #include <Optimizer.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(Optimizer)
+TEST_SUITE("Optimizer")
+{
 using namespace armnn::optimizations;
 
-BOOST_AUTO_TEST_CASE(MoveTransposeUpTest)
+TEST_CASE("MoveTransposeUpTest")
 {
     const armnn::TensorInfo info({ 1, 5, 2, 3 }, armnn::DataType::Float32);
     const armnn::TensorInfo transposed({ 1, 3, 5, 2 }, armnn::DataType::Float32);
@@ -67,7 +68,7 @@ BOOST_AUTO_TEST_CASE(MoveTransposeUpTest)
         ->GetOutputHandler()
         .SetTensorInfo(info);
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
                              &IsLayerOfType<armnn::InputLayer>, &IsLayerOfType<armnn::InputLayer>,
                              &IsLayerOfType<armnn::MultiplicationLayer>, &IsLayerOfType<armnn::MemCopyLayer>,
                              &IsLayerOfType<armnn::FloorLayer>, &IsLayerOfType<armnn::FakeQuantizationLayer>,
@@ -77,7 +78,7 @@ BOOST_AUTO_TEST_CASE(MoveTransposeUpTest)
     armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(MoveTransposeUp()));
 
     // The transpose is moved to the top. New transposes for layers with multiple inputs.
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
                              &IsLayerOfType<armnn::InputLayer>, &IsLayerOfType<armnn::InputLayer>,
                              &IsLayerOfType<armnn::TransposeLayer>, &IsLayerOfType<armnn::TransposeLayer>,
                              &IsLayerOfType<armnn::TransposeLayer>, &IsLayerOfType<armnn::MultiplicationLayer>,
@@ -87,7 +88,7 @@ BOOST_AUTO_TEST_CASE(MoveTransposeUpTest)
 
     std::list<std::string> testRelatedLayers = { transposeLayerName };
 
-    BOOST_TEST(CheckRelatedLayers<armnn::TransposeLayer>(graph, testRelatedLayers));
+    CHECK(CheckRelatedLayers<armnn::TransposeLayer>(graph, testRelatedLayers));
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

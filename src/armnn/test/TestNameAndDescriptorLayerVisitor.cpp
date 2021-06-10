@@ -7,11 +7,13 @@
 
 #include <armnn/Exceptions.hpp>
 
+#include <doctest/doctest.h>
+
 namespace
 {
 
-#define TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(name) \
-BOOST_AUTO_TEST_CASE(Check##name##LayerVisitorNameAndDescriptor) \
+#define TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(name, testName) \
+TEST_CASE(#testName) \
 { \
     const char* layerName = "name##Layer"; \
     armnn::name##Descriptor descriptor = GetDescriptor<armnn::name##Descriptor>(); \
@@ -21,8 +23,8 @@ BOOST_AUTO_TEST_CASE(Check##name##LayerVisitorNameAndDescriptor) \
     layer->Accept(visitor); \
 }
 
-#define TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(name) \
-BOOST_AUTO_TEST_CASE(Check##name##LayerVisitorNameNullptrAndDescriptor) \
+#define TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(name, testName) \
+TEST_CASE(#testName) \
 { \
     armnn::name##Descriptor descriptor = GetDescriptor<armnn::name##Descriptor>(); \
     Test##name##LayerVisitor visitor(descriptor); \
@@ -30,10 +32,6 @@ BOOST_AUTO_TEST_CASE(Check##name##LayerVisitorNameNullptrAndDescriptor) \
     armnn::IConnectableLayer *const layer = net.Add##name##Layer(descriptor); \
     layer->Accept(visitor); \
 }
-
-#define TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(name) \
-TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(name) \
-TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(name)
 
 template<typename Descriptor> Descriptor GetDescriptor();
 
@@ -273,35 +271,93 @@ armnn::TransposeDescriptor GetDescriptor<armnn::TransposeDescriptor>()
 
 } // anonymous namespace
 
-BOOST_AUTO_TEST_SUITE(TestNameAndDescriptorLayerVisitor)
+TEST_SUITE("TestNameAndDescriptorLayerVisitor")
+{
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Activation, CheckAdditionLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(ArgMinMax, CheckArgMinMaxLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(DepthToSpace, CheckDepthToSpaceLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(BatchToSpaceNd, CheckBatchToSpaceNdLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Comparison, CheckComparisonLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Concat, CheckConcatLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(ElementwiseUnary, CheckElementwiseUnaryLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Fill, CheckFillLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Gather, CheckGatherLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(InstanceNormalization,
+                                                  CheckInstanceNormalizationLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(L2Normalization, CheckL2NormalizationLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(LogicalBinary, CheckLogicalBinaruLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(LogSoftmax, CheckLogSoftmaxLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Mean, CheckMeanLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Normalization, CheckNormalizationLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Pad, CheckPadLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Permute, CheckPermuteLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Pooling2d, CheckPooling2dLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Reshape, CheckReshapeLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Resize, CheckResizeLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Slice, CheckSliceLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Softmax, CheckSoftmaxLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(SpaceToBatchNd, CheckSpaceToBatchNdLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(SpaceToDepth, CheckSpaceToDepthLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Splitter, CheckSplitterLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Stack, CheckStackLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(StridedSlice, CheckStridedSliceLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Transpose, CheckTransposeLayerVisitorNameAndDescriptor)
 
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Activation)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(ArgMinMax)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(DepthToSpace)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(BatchToSpaceNd)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Comparison)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Concat)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(ElementwiseUnary)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Fill)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Gather)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(InstanceNormalization)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(L2Normalization)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(LogicalBinary)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(LogSoftmax)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Mean)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Normalization)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Pad)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Permute)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Pooling2d)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Reshape)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Resize)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Slice)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Softmax)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(SpaceToBatchNd)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(SpaceToDepth)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Splitter)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Stack)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(StridedSlice)
-TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Transpose)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Activation,
+    CheckAdditionLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(ArgMinMax,
+    CheckArgMinMaxLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(DepthToSpace,
+    CheckDepthToSpaceLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(BatchToSpaceNd,
+    CheckBatchToSpaceNdLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Comparison,
+    CheckComparisonLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Concat,
+    CheckConcatLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(ElementwiseUnary,
+    CheckElementwiseUnaryLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Fill,
+    CheckFillLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Gather,
+    CheckGatherLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(InstanceNormalization,
+    CheckInstanceNormalizationLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(L2Normalization,
+    CheckL2NormalizationLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(LogicalBinary,
+    CheckLogicalBinaruLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(LogSoftmax,
+    CheckLogSoftmaxLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Mean,
+    CheckMeanLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Normalization,
+    CheckNormalizationLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Pad,
+    CheckPadLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Permute,
+    CheckPermuteLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Pooling2d,
+    CheckPooling2dLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Reshape,
+    CheckReshapeLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Resize,
+    CheckResizeLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Slice,
+    CheckSliceLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Softmax,
+    CheckSoftmaxLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(SpaceToBatchNd,
+    CheckSpaceToBatchNdLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(SpaceToDepth,
+    CheckSpaceToDepthLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Splitter,
+    CheckSplitterLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Stack,
+    CheckStackLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(StridedSlice,
+    CheckStridedSliceLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Transpose,
+    CheckTransposeLayerVisitorNameNullptrAndDescriptor)
 
-BOOST_AUTO_TEST_SUITE_END()
+}

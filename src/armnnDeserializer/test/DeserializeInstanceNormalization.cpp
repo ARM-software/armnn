@@ -8,10 +8,8 @@
 
 #include <string>
 
-#include <boost/test/unit_test.hpp>
-
-BOOST_AUTO_TEST_SUITE(Deserializer)
-
+TEST_SUITE("Deserializer_InstanceNormalization")
+{
 struct InstanceNormalizationFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit InstanceNormalizationFixture(const std::string &inputShape,
@@ -120,7 +118,7 @@ struct InstanceNormalizationFloat32Fixture : InstanceNormalizationFixture
                                                                        "NHWC") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(InstanceNormalizationFloat32, InstanceNormalizationFloat32Fixture)
+TEST_CASE_FIXTURE(InstanceNormalizationFloat32Fixture, "InstanceNormalizationFloat32")
 {
     RunTest<4, armnn::DataType::Float32>(
         0,
@@ -152,4 +150,4 @@ BOOST_FIXTURE_TEST_CASE(InstanceNormalizationFloat32, InstanceNormalizationFloat
         });
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

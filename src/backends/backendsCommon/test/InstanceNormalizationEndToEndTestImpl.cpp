@@ -16,7 +16,7 @@
 
 #include <test/TestUtils.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 namespace
 {
@@ -82,7 +82,7 @@ void InstanceNormalizationEndToEnd(const std::vector<armnn::BackendId>& backends
                                                                             beta,
                                                                             eps);
 
-    BOOST_TEST_CHECKPOINT("Create a network");
+    CHECK(net);
 
     std::map<int, std::vector<float>> inputTensorData = { { 0, inputData } };
     std::map<int, std::vector<float>> expectedOutputTensorData = { { 0, expectedOutputData } };

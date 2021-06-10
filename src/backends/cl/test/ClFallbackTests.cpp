@@ -7,11 +7,11 @@
 
 #include <test/GraphUtils.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(ClFallback)
-
-BOOST_AUTO_TEST_CASE(ClImportEnabledFallbackToNeon)
+TEST_SUITE("ClFallback")
+{
+TEST_CASE("ClImportEnabledFallbackToNeon")
 {
     using namespace armnn;
 
@@ -62,18 +62,18 @@ BOOST_AUTO_TEST_CASE(ClImportEnabledFallbackToNeon)
     armnn::Layer* const layer6 = GetFirstLayerWithName(graph, "output");
 
     // Checks order is valid.
-    BOOST_TEST(CheckOrder(graph, layer0, layer1));
-    BOOST_TEST(CheckOrder(graph, layer1, layer2));
-    BOOST_TEST(CheckOrder(graph, layer2, layer3));
-    BOOST_TEST(CheckOrder(graph, layer3, layer4));
-    BOOST_TEST(CheckOrder(graph, layer4, layer5));
-    BOOST_TEST(CheckOrder(graph, layer5, layer6));
+    CHECK(CheckOrder(graph, layer0, layer1));
+    CHECK(CheckOrder(graph, layer1, layer2));
+    CHECK(CheckOrder(graph, layer2, layer3));
+    CHECK(CheckOrder(graph, layer3, layer4));
+    CHECK(CheckOrder(graph, layer4, layer5));
+    CHECK(CheckOrder(graph, layer5, layer6));
 
     // Use memory import between backends
-    BOOST_TEST((layer4->GetType() == LayerType::MemCopy));
+    CHECK((layer4->GetType() == LayerType::MemCopy));
 
     // Correctly use backend hint
-    BOOST_TEST((layer5->GetBackendId() == Compute::CpuAcc ));
+    CHECK((layer5->GetBackendId() == Compute::CpuAcc ));
 
     // Load it into the runtime. It should pass.
     NetworkId netId;
@@ -109,14 +109,14 @@ BOOST_AUTO_TEST_CASE(ClImportEnabledFallbackToNeon)
     size_t space = totalBytes + alignment + alignment;
     auto inputData0 = std::make_unique<uint8_t[]>(space);
     void* alignedInputPtr0 = inputData0.get();
-    BOOST_CHECK(std::align(alignment, totalBytes, alignedInputPtr0, space));
+    CHECK(std::align(alignment, totalBytes, alignedInputPtr0, space));
 
     auto* intputPtr0 = reinterpret_cast<float*>(alignedInputPtr0);
     std::copy(inputValue0.begin(), inputValue0.end(), intputPtr0);
 
     auto inputData1 = std::make_unique<uint8_t[]>(space);
     void* alignedInputPtr1 = inputData1.get();
-    BOOST_CHECK(std::align(alignment, totalBytes, alignedInputPtr1, space));
+    CHECK(std::align(alignment, totalBytes, alignedInputPtr1, space));
 
     auto* intputPtr1 = reinterpret_cast<float*>(alignedInputPtr1);
     std::copy(inputValue1.begin(), inputValue1.end(), intputPtr1);
@@ -145,19 +145,19 @@ BOOST_AUTO_TEST_CASE(ClImportEnabledFallbackToNeon)
 
     // Executed Subtraction using CpuAcc
     std::size_t found = dump.find("NeonSubtractionWorkload_Execute");
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
 
     // Contain CopyMemGeneric
     found = dump.find("CopyMemGeneric");
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
 
     // Check output is as expected
-    BOOST_TEST(outputData == expectedOutput);
+    CHECK(outputData == expectedOutput);
 
     runtime->UnloadNetwork(netId);
 }
 
-BOOST_AUTO_TEST_CASE(ClImportDisabledFallbackToNeon)
+TEST_CASE("ClImportDisabledFallbackToNeon")
 {
     using namespace armnn;
 
@@ -207,18 +207,18 @@ BOOST_AUTO_TEST_CASE(ClImportDisabledFallbackToNeon)
     armnn::Layer* const layer6 = GetFirstLayerWithName(graph, "output");
 
     // Checks order is valid.
-    BOOST_TEST(CheckOrder(graph, layer0, layer1));
-    BOOST_TEST(CheckOrder(graph, layer1, layer2));
-    BOOST_TEST(CheckOrder(graph, layer2, layer3));
-    BOOST_TEST(CheckOrder(graph, layer3, layer4));
-    BOOST_TEST(CheckOrder(graph, layer4, layer5));
-    BOOST_TEST(CheckOrder(graph, layer5, layer6));
+    CHECK(CheckOrder(graph, layer0, layer1));
+    CHECK(CheckOrder(graph, layer1, layer2));
+    CHECK(CheckOrder(graph, layer2, layer3));
+    CHECK(CheckOrder(graph, layer3, layer4));
+    CHECK(CheckOrder(graph, layer4, layer5));
+    CHECK(CheckOrder(graph, layer5, layer6));
 
     // Use memory import between backends
-    BOOST_TEST((layer4->GetType() == LayerType::MemCopy));
+    CHECK((layer4->GetType() == LayerType::MemCopy));
 
     // Correctly use backend hint
-    BOOST_TEST((layer5->GetBackendId() == Compute::CpuAcc ));
+    CHECK((layer5->GetBackendId() == Compute::CpuAcc ));
 
     // Load it into the runtime. It should pass.
     NetworkId netId;
@@ -269,17 +269,17 @@ BOOST_AUTO_TEST_CASE(ClImportDisabledFallbackToNeon)
 
     // Executed Subtraction using CpuAcc
     std::size_t found = dump.find("NeonSubtractionWorkload_Execute");
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
 
     // Contain CopyMemGeneric
     found = dump.find("CopyMemGeneric");
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
 
     // Check output is as expected
-    BOOST_TEST(outputData == expectedOutput);
+    CHECK(outputData == expectedOutput);
 }
 
-BOOST_AUTO_TEST_CASE(ClImportEnabledFallbackSubgraphToNeon)
+TEST_CASE("ClImportEnabledFallbackSubgraphToNeon")
 {
     using namespace armnn;
 
@@ -342,21 +342,21 @@ BOOST_AUTO_TEST_CASE(ClImportEnabledFallbackSubgraphToNeon)
     armnn::Layer* const layer8 = GetFirstLayerWithName(graph, "output");
 
     // Checks order is valid.
-    BOOST_TEST(CheckOrder(graph, layer0, layer1));
-    BOOST_TEST(CheckOrder(graph, layer1, layer2));
-    BOOST_TEST(CheckOrder(graph, layer2, layer3));
-    BOOST_TEST(CheckOrder(graph, layer3, layer4));
-    BOOST_TEST(CheckOrder(graph, layer4, layer5));
-    BOOST_TEST(CheckOrder(graph, layer5, layer6));
-    BOOST_TEST(CheckOrder(graph, layer6, layer7));
-    BOOST_TEST(CheckOrder(graph, layer7, layer8));
+    CHECK(CheckOrder(graph, layer0, layer1));
+    CHECK(CheckOrder(graph, layer1, layer2));
+    CHECK(CheckOrder(graph, layer2, layer3));
+    CHECK(CheckOrder(graph, layer3, layer4));
+    CHECK(CheckOrder(graph, layer4, layer5));
+    CHECK(CheckOrder(graph, layer5, layer6));
+    CHECK(CheckOrder(graph, layer6, layer7));
+    CHECK(CheckOrder(graph, layer7, layer8));
 
     // Use memory import between backends
-    BOOST_TEST((layer4->GetType() == LayerType::MemCopy));
-    BOOST_TEST((layer6->GetType() == LayerType::MemCopy));
+    CHECK((layer4->GetType() == LayerType::MemCopy));
+    CHECK((layer6->GetType() == LayerType::MemCopy));
 
     // Correctly use backend hint
-    BOOST_TEST((layer5->GetBackendId() == Compute::CpuAcc ));
+    CHECK((layer5->GetBackendId() == Compute::CpuAcc ));
 
     // Load it into the runtime. It should pass.
     NetworkId netId;
@@ -388,14 +388,14 @@ BOOST_AUTO_TEST_CASE(ClImportEnabledFallbackSubgraphToNeon)
     size_t space = totalBytes + alignment + alignment;
     auto inputData0 = std::make_unique<uint8_t[]>(space);
     void* alignedInputPtr0 = inputData0.get();
-    BOOST_CHECK(std::align(alignment, totalBytes, alignedInputPtr0, space));
+    CHECK(std::align(alignment, totalBytes, alignedInputPtr0, space));
 
     auto* intputPtr0 = reinterpret_cast<float*>(alignedInputPtr0);
     std::copy(inputValue0.begin(), inputValue0.end(), intputPtr0);
 
     auto inputData1 = std::make_unique<uint8_t[]>(space);
     void* alignedInputPtr1 = inputData1.get();
-    BOOST_CHECK(std::align(alignment, totalBytes, alignedInputPtr1, space));
+    CHECK(std::align(alignment, totalBytes, alignedInputPtr1, space));
 
     auto* intputPtr1 = reinterpret_cast<float*>(alignedInputPtr1);
     std::copy(inputValue1.begin(), inputValue1.end(), intputPtr1);
@@ -424,23 +424,23 @@ BOOST_AUTO_TEST_CASE(ClImportEnabledFallbackSubgraphToNeon)
 
     // Executed Subtraction using CpuAcc
     std::size_t found = dump.find("NeonSubtractionWorkload_Execute");
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
 
     // Correctly switch back to GpuAcc
     found = dump.find("ClPooling2dWorkload_Execute");
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
 
     // Contain CopyMemGeneric
     found = dump.find("CopyMemGeneric");
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
 
     // Check output is as expected
-    BOOST_TEST(outputData == expectedOutput);
+    CHECK(outputData == expectedOutput);
 
     runtime->UnloadNetwork(netId);
 }
 
-BOOST_AUTO_TEST_CASE(ClImportDisableFallbackSubgraphToNeon)
+TEST_CASE("ClImportDisableFallbackSubgraphToNeon")
 {
     using namespace armnn;
 
@@ -498,21 +498,21 @@ BOOST_AUTO_TEST_CASE(ClImportDisableFallbackSubgraphToNeon)
     armnn::Layer* const layer8 = GetFirstLayerWithName(graph, "output");
 
     // Checks order is valid.
-    BOOST_TEST(CheckOrder(graph, layer0, layer1));
-    BOOST_TEST(CheckOrder(graph, layer1, layer2));
-    BOOST_TEST(CheckOrder(graph, layer2, layer3));
-    BOOST_TEST(CheckOrder(graph, layer3, layer4));
-    BOOST_TEST(CheckOrder(graph, layer4, layer5));
-    BOOST_TEST(CheckOrder(graph, layer5, layer6));
-    BOOST_TEST(CheckOrder(graph, layer6, layer7));
-    BOOST_TEST(CheckOrder(graph, layer7, layer8));
+    CHECK(CheckOrder(graph, layer0, layer1));
+    CHECK(CheckOrder(graph, layer1, layer2));
+    CHECK(CheckOrder(graph, layer2, layer3));
+    CHECK(CheckOrder(graph, layer3, layer4));
+    CHECK(CheckOrder(graph, layer4, layer5));
+    CHECK(CheckOrder(graph, layer5, layer6));
+    CHECK(CheckOrder(graph, layer6, layer7));
+    CHECK(CheckOrder(graph, layer7, layer8));
 
     // Use memory import between backends
-    BOOST_TEST((layer4->GetType() == LayerType::MemCopy));
-    BOOST_TEST((layer6->GetType() == LayerType::MemCopy));
+    CHECK((layer4->GetType() == LayerType::MemCopy));
+    CHECK((layer6->GetType() == LayerType::MemCopy));
 
     // Correctly use backend hint
-    BOOST_TEST((layer5->GetBackendId() == Compute::CpuAcc ));
+    CHECK((layer5->GetBackendId() == Compute::CpuAcc ));
 
     // Load it into the runtime. It should pass.
     NetworkId netId;
@@ -560,18 +560,18 @@ BOOST_AUTO_TEST_CASE(ClImportDisableFallbackSubgraphToNeon)
 
     // Executed Subtraction using CpuAcc
     std::size_t found = dump.find("NeonSubtractionWorkload_Execute");
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
 
     // Correctly switch back to GpuAcc
     found = dump.find("ClPooling2dWorkload_Execute");
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
 
     // Contain CopyMemGeneric
     found = dump.find("CopyMemGeneric");
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
 
     // Check output is as expected
-    BOOST_TEST(outputData == expectedOutput);
+    CHECK(outputData == expectedOutput);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

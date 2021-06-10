@@ -8,12 +8,10 @@
 
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/test/unit_test.hpp>
-
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(Deserializer)
-
+TEST_SUITE("Deserializer_Multiplication")
+{
 struct MultiplicationFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit MultiplicationFixture(const std::string & inputShape1,
@@ -143,7 +141,7 @@ struct SimpleMultiplicationFixture2 : MultiplicationFixture
                                                            "Float32") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(MultiplicationQuantisedAsymm8, SimpleMultiplicationFixture)
+TEST_CASE_FIXTURE(SimpleMultiplicationFixture, "MultiplicationQuantisedAsymm8")
 {
   RunTest<2, armnn::DataType::QAsymmU8>(
       0,
@@ -152,7 +150,7 @@ BOOST_FIXTURE_TEST_CASE(MultiplicationQuantisedAsymm8, SimpleMultiplicationFixtu
       {{"OutputLayer", { 0, 5, 12, 21 }}});
 }
 
-BOOST_FIXTURE_TEST_CASE(MultiplicationFloat32, SimpleMultiplicationFixture2)
+TEST_CASE_FIXTURE(SimpleMultiplicationFixture2, "MultiplicationFloat32")
 {
     RunTest<4, armnn::DataType::Float32>(
     0,
@@ -161,4 +159,4 @@ BOOST_FIXTURE_TEST_CASE(MultiplicationFloat32, SimpleMultiplicationFixture2)
     {{"OutputLayer", { 500, 320, 226, 108 }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

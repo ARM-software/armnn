@@ -8,8 +8,10 @@
 #include <neon/NeonWorkloadFactory.hpp>
 #include <test/UnitTests.hpp>
 
-BOOST_AUTO_TEST_SUITE(Compute_ArmComputeNeon)
+#include <doctest/doctest.h>
 
+TEST_SUITE("Compute_ArmComputeNeon")
+{
 using namespace armnn;
 
 using FactoryType = NeonWorkloadFactory;
@@ -44,4 +46,4 @@ ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareSoftmaxBeta2WithReference, Comp
 
 #endif
 
-BOOST_AUTO_TEST_SUITE_END()
+}

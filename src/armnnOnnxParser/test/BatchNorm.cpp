@@ -3,12 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "armnnOnnxParser/IOnnxParser.hpp"
 #include  "ParserPrototxtFixture.hpp"
 
-BOOST_AUTO_TEST_SUITE(OnnxParser)
-
+TEST_SUITE("OnnxParser_BatchNorm")
+{
 struct BatchNormalizationMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser::IOnnxParser>
 {
     BatchNormalizationMainFixture()
@@ -164,7 +163,7 @@ struct BatchNormalizationMainFixture : public armnnUtils::ParserPrototxtFixture<
     }
 };
 
-BOOST_FIXTURE_TEST_CASE(ValidBatchNormalizationTest, BatchNormalizationMainFixture)
+TEST_CASE_FIXTURE(BatchNormalizationMainFixture, "ValidBatchNormalizationTest")
 {
     RunTest<4>({{"Input", {1, 2, 3, 4, 5, 6, 7, 8, 9}}},             // Input data.
                {{"Output", {-2.8277204f, -2.12079024f, -1.4138602f,
@@ -332,11 +331,11 @@ struct BatchNormalizationBisFixture : public armnnUtils::ParserPrototxtFixture<a
     }
 };
 
-BOOST_FIXTURE_TEST_CASE(ValidBatchNormalizationBisTest, BatchNormalizationBisFixture)
+TEST_CASE_FIXTURE(BatchNormalizationBisFixture, "ValidBatchNormalizationBisTest")
 {
     RunTest<4>({{"Input", {-1, 0.0, 1, 2, 3.0, 4.0}}},           // Input data.
                {{"Output", {-0.999995f, 0.0, 0.999995f,
                             -0.22474074f, 1.0f, 2.2247407f}}});  // Expected output data.
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

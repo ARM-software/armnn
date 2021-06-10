@@ -11,7 +11,7 @@
 #include <Runtime.hpp>
 #include "TestTimelinePacketHandler.hpp"
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <cstdio>
 #include <sstream>
@@ -33,9 +33,9 @@ class FileOnlyHelperService : public ProfilingService
     armnn::profiling::ProfilingService m_ProfilingService;
 };
 
-BOOST_AUTO_TEST_SUITE(FileOnlyProfilingDecoratorTests)
-
-BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
+TEST_SUITE("FileOnlyProfilingDecoratorTests")
+{
+TEST_CASE("TestFileOnlyProfiling")
 {
     // Get all registered backends
     std::vector<BackendId> suitableBackends = GetSuitableBackendRegistered();
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
 
         // Load it into the runtime. It should succeed.
         armnn::NetworkId netId;
-        BOOST_TEST(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
+        CHECK(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
 
         // Creates structures for input & output.
         std::vector<float> inputData(16);
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
         for (auto &error : model.GetErrors()) {
             std::cout << error.what() << std::endl;
         }
-        BOOST_TEST(model.GetErrors().empty());
+        CHECK(model.GetErrors().empty());
         std::vector<std::string> desc = GetModelDescription(model);
         std::vector<std::string> expectedOutput;
         expectedOutput.push_back("Entity [0] name = input type = layer");
@@ -147,11 +147,11 @@ BOOST_AUTO_TEST_CASE(TestFileOnlyProfiling)
         expectedOutput.push_back("Entity [55] type = workload_execution");
         expectedOutput.push_back("   event: [59] class [start_of_life]");
         expectedOutput.push_back("   event: [61] class [end_of_life]");
-        BOOST_TEST(CompareOutput(desc, expectedOutput));
+        CHECK(CompareOutput(desc, expectedOutput));
     }
 }
 
-BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
+TEST_CASE("DumpOutgoingValidFileEndToEnd")
 {
     // Get all registered backends
     std::vector<BackendId> suitableBackends = GetSuitableBackendRegistered();
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
         // Create a temporary file name.
         fs::path tempPath = armnnUtils::Filesystem::NamedTempFile("DumpOutgoingValidFileEndToEnd_CaptureFile.txt");
         // Make sure the file does not exist at this point
-        BOOST_CHECK(!fs::exists(tempPath));
+        CHECK(!fs::exists(tempPath));
 
         armnn::IRuntime::CreationOptions options;
         options.m_ProfilingOptions.m_EnableProfiling     = true;
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
 
         // Load it into the runtime. It should succeed.
         armnn::NetworkId netId;
-        BOOST_TEST(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
+        CHECK(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
 
         // Creates structures for input & output.
         std::vector<float> inputData(16);
@@ -231,13 +231,13 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
         GetProfilingService(&runtime).ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
 
         // The output file size should be greater than 0.
-        BOOST_CHECK(fs::file_size(tempPath) > 0);
+        CHECK(fs::file_size(tempPath) > 0);
 
         // NOTE: would be an interesting exercise to take this file and decode it
 
         // Delete the tmp file.
-        BOOST_CHECK(fs::remove(tempPath));
+        CHECK(fs::remove(tempPath));
     }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

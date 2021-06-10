@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_DepthToSpace")
+{
 struct DepthToSpaceFixture : public ParserFlatbuffersFixture
 {
     explicit DepthToSpaceFixture(const std::string& inputShape,
@@ -81,7 +80,7 @@ struct SimpleDepthToSpaceFixture : public DepthToSpaceFixture
     SimpleDepthToSpaceFixture() : DepthToSpaceFixture("[ 1, 2, 2, 4 ]", "[ 1, 4, 4, 1 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseDepthToSpace, SimpleDepthToSpaceFixture)
+TEST_CASE_FIXTURE(SimpleDepthToSpaceFixture, "ParseDepthToSpace")
 {
     RunTest<4, armnn::DataType::Float32>
         (0,
@@ -95,4 +94,4 @@ BOOST_FIXTURE_TEST_CASE(ParseDepthToSpace, SimpleDepthToSpaceFixture)
                               11.f,  12.f,  15.f,  16.f }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

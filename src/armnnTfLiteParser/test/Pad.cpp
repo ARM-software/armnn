@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_Pad")
+{
 struct PadFixture : public ParserFlatbuffersFixture
 {
     explicit PadFixture(const std::string& inputShape,
@@ -93,7 +92,7 @@ struct SimplePadFixture : public PadFixture
                                     "[  1,0,0,0, 1,0,0,0, 2,0,0,0, 2,0,0,0 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParsePad, SimplePadFixture)
+TEST_CASE_FIXTURE(SimplePadFixture, "ParsePad")
 {
     RunTest<2, armnn::DataType::Float32>
         (0,
@@ -111,7 +110,7 @@ struct Uint8PadFixture : public PadFixture
                                   "UINT8", "-2.0", "3") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParsePadUint8, Uint8PadFixture)
+TEST_CASE_FIXTURE(Uint8PadFixture, "ParsePadUint8")
 {
     RunTest<2, armnn::DataType::QAsymmU8>
         (0,
@@ -129,7 +128,7 @@ struct Int8PadFixture : public PadFixture
                                     "INT8", "-2.0", "3") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParsePadInt8, Int8PadFixture)
+TEST_CASE_FIXTURE(Int8PadFixture, "ParsePadInt8")
 {
     RunTest<2, armnn::DataType::QAsymmS8>
         (0,
@@ -140,4 +139,4 @@ BOOST_FIXTURE_TEST_CASE(ParsePadInt8, Int8PadFixture)
                               3, 3, 3, 3, 3, 3, 3 }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

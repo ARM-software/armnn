@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <iostream>
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_ArgMinMax")
+{
 struct ArgMinMaxFixture : public ParserFlatbuffersFixture
 {
     explicit ArgMinMaxFixture(const std::string& operatorCode,
@@ -93,7 +92,7 @@ struct SimpleArgMaxFixture : public ArgMinMaxFixture
                                              "[ 3, 0, 0, 0 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseSimpleArgMax, SimpleArgMaxFixture)
+TEST_CASE_FIXTURE(SimpleArgMaxFixture, "ParseSimpleArgMax")
 {
     RunTest<3, armnn::DataType::Float32, armnn::DataType::Signed32>(
             0,
@@ -109,7 +108,7 @@ struct ArgMaxFixture : public ArgMinMaxFixture
                                        "[ 0, 0, 0, 0 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseArgMax, ArgMaxFixture)
+TEST_CASE_FIXTURE(ArgMaxFixture, "ParseArgMax")
 {
     RunTest<3, armnn::DataType::Float32, armnn::DataType::Signed32>(
             0,
@@ -131,7 +130,7 @@ struct SimpleArgMinFixture : public ArgMinMaxFixture
                                              "[ 3, 0, 0, 0 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseSimpleArgMin, SimpleArgMinFixture)
+TEST_CASE_FIXTURE(SimpleArgMinFixture, "ParseSimpleArgMin")
 {
     RunTest<3, armnn::DataType::Float32, armnn::DataType::Signed32>(
             0,
@@ -147,7 +146,7 @@ struct ArgMinFixture : public ArgMinMaxFixture
                                        "[ 0, 0, 0, 0 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseArgMin, ArgMinFixture)
+TEST_CASE_FIXTURE(ArgMinFixture, "ParseArgMin")
 {
     RunTest<3, armnn::DataType::Float32, armnn::DataType::Signed32>(
             0,
@@ -161,4 +160,4 @@ BOOST_FIXTURE_TEST_CASE(ParseArgMin, ArgMinFixture)
                                  0, 0, 0, 0 } } });
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

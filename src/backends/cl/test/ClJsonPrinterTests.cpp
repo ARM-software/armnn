@@ -8,16 +8,13 @@
 #include <cl/test/ClContextControlFixture.hpp>
 #include <backendsCommon/test/JsonPrinterTestImpl.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <vector>
 
-BOOST_FIXTURE_TEST_SUITE(ClJsonPrinter, ClProfilingContextControlFixture)
-
-BOOST_AUTO_TEST_CASE(SoftmaxProfilerJsonPrinterGpuAccTest)
+TEST_CASE_FIXTURE(ClProfilingContextControlFixture, "SoftmaxProfilerJsonPrinterGpuAccTest")
 {
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     RunSoftmaxProfilerJsonPrinterTest(backends);
-}
 
-BOOST_AUTO_TEST_SUITE_END()
+}

@@ -11,6 +11,7 @@
 #include <Network.hpp>
 #include <VerificationHelpers.hpp>
 
+#include <doctest/doctest.h>
 #include <fmt/format.h>
 
 #include <iomanip>
@@ -257,12 +258,12 @@ void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::ve
         if (std::is_same<T, uint8_t>::value)
         {
             auto result = CompareTensors(outputExpected, outputStorage[it.first], shape, shape, true);
-            BOOST_TEST(result.m_Result, result.m_Message.str());
+            CHECK_MESSAGE(result.m_Result, result.m_Message.str());
         }
         else
         {
             auto result = CompareTensors(outputExpected, outputStorage[it.first], shape, shape);
-            BOOST_TEST(result.m_Result, result.m_Message.str());
+            CHECK_MESSAGE(result.m_Result, result.m_Message.str());
         }
     }
 }

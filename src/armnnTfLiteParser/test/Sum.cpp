@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_Sum")
+{
 struct SumFixture : public ParserFlatbuffersFixture
 {
     explicit SumFixture(const std::string& inputShape,
@@ -93,7 +92,7 @@ struct SimpleSumFixture : public SumFixture
     SimpleSumFixture() : SumFixture("[ 1, 3, 2, 4 ]", "[ 1, 1, 1, 4 ]", "[ 2 ]", "[ 1, 0, 0, 0,  2, 0, 0, 0 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseSum, SimpleSumFixture)
+TEST_CASE_FIXTURE(SimpleSumFixture, "ParseSum")
 {
     RunTest<4, armnn::DataType::Float32, armnn::DataType::Float32>
         (0, {{ "inputTensor", { 1.0f,   2.0f,   3.0f,   4.0f,
@@ -107,4 +106,4 @@ BOOST_FIXTURE_TEST_CASE(ParseSum, SimpleSumFixture)
             {{ "outputTensor", { 666.0f, 888.0f, 1110.0f, 1332.0f } } });
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

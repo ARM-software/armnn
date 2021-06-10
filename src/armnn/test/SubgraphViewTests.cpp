@@ -2,7 +2,8 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <boost/test/unit_test.hpp>
+
+#include <doctest/doctest.h>
 
 #include <Graph.hpp>
 #include <SubgraphView.hpp>
@@ -89,24 +90,21 @@ std::vector<T> ToSortedArray(Iterator begin, Iterator end)
 template <typename T>
 void CompareVectors(const std::vector<T>& result, const std::vector<T>& expected)
 {
-    BOOST_CHECK_EQUAL_COLLECTIONS(result.begin(), result.end(), expected.begin(), expected.end());
+    CHECK(std::equal(result.begin(), result.end(), expected.begin(), expected.end()));
 }
 
 void CompareSubgraphViews(SubgraphViewSelector::SubgraphViewPtr& result,
                           SubgraphViewSelector::SubgraphViewPtr& expected)
 {
     // expect both to be valid subgraphs
-    BOOST_TEST((result.get() != nullptr));
-    BOOST_TEST((expected.get() != nullptr));
+    CHECK((result.get() != nullptr));
+    CHECK((expected.get() != nullptr));
 
     if (result.get() != nullptr && expected.get() != nullptr)
     {
-        // try to detect all other obvious errors too, mainly because here
-        // we can get a nicer error message from boost, the collection test
-        // also report error for these
-        BOOST_TEST(result->GetInputSlots().size() == expected->GetInputSlots().size());
-        BOOST_TEST(result->GetOutputSlots().size() == expected->GetOutputSlots().size());
-        BOOST_TEST(result->GetLayers().size() == expected->GetLayers().size());
+        CHECK(result->GetInputSlots().size() == expected->GetInputSlots().size());
+        CHECK(result->GetOutputSlots().size() == expected->GetOutputSlots().size());
+        CHECK(result->GetLayers().size() == expected->GetLayers().size());
 
         auto resultLayers = ToSortedArray<Layer *>(result->GetLayers().begin(),
                                                    result->GetLayers().end());
@@ -130,9 +128,9 @@ void CompareSubgraphViews(SubgraphViewSelector::SubgraphViewPtr& result,
 
 } // namespace <anonymous>
 
-BOOST_AUTO_TEST_SUITE(SubgraphSubstitution)
-
-BOOST_AUTO_TEST_CASE(SingleInputSingleOutput)
+TEST_SUITE("SubgraphSubstitution")
+{
+TEST_CASE("SingleInputSingleOutput")
 {
     // Construct graph
     Graph graph;
@@ -166,11 +164,11 @@ BOOST_AUTO_TEST_CASE(SingleInputSingleOutput)
     graph.SubstituteSubgraph(*subgraph, preCompiledLayer);
 
     // Check that connections are correct after substitution
-    BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn);
-    BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subgraphOutputConn);
+    CHECK_EQ(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn);
+    CHECK_EQ(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subgraphOutputConn);
 }
 
-BOOST_AUTO_TEST_CASE(SingleInputSingleOutputSubstituteGraph)
+TEST_CASE("SingleInputSingleOutputSubstituteGraph")
 {
     // Construct graph
     Graph graph;
@@ -209,11 +207,11 @@ BOOST_AUTO_TEST_CASE(SingleInputSingleOutputSubstituteGraph)
     graph.SubstituteSubgraph(*subgraph, *substituteSubgraph);
 
     // Check that connections are correct after substitution
-    BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn);
-    BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subgraphOutputConn);
+    CHECK_EQ(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn);
+    CHECK_EQ(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subgraphOutputConn);
 }
 
-BOOST_AUTO_TEST_CASE(MultiInputSingleOutput)
+TEST_CASE("MultiInputSingleOutput")
 {
     // Construct graph
     Graph graph;
@@ -258,13 +256,13 @@ BOOST_AUTO_TEST_CASE(MultiInputSingleOutput)
     graph.SubstituteSubgraph(*subgraph, preCompiledLayer);
 
     // Check that connections are correct after substitution
-    BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn1);
-    BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(1).GetConnection(), subgraphInputConn2);
+    CHECK_EQ(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn1);
+    CHECK_EQ(preCompiledLayer->GetInputSlot(1).GetConnection(), subgraphInputConn2);
 
-    BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subgraphOutputConn);
+    CHECK_EQ(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subgraphOutputConn);
 }
 
-BOOST_AUTO_TEST_CASE(SingleInputMultiOutput)
+TEST_CASE("SingleInputMultiOutput")
 {
     // Construct graph
     Graph graph;
@@ -307,13 +305,13 @@ BOOST_AUTO_TEST_CASE(SingleInputMultiOutput)
     graph.SubstituteSubgraph(*subgraph, preCompiledLayer);
 
     // Check that connections are correct after substitution
-    BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn1);
+    CHECK_EQ(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn1);
 
-    BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subgraphOutputConn1);
-    BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(1).GetConnection(0), subgraphOutputConn2);
+    CHECK_EQ(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subgraphOutputConn1);
+    CHECK_EQ(preCompiledLayer->GetOutputSlot(1).GetConnection(0), subgraphOutputConn2);
 }
 
-BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
+TEST_CASE("MultiInputMultiOutput")
 {
     // Construct graph
     Graph graph;
@@ -359,14 +357,14 @@ BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
     graph.SubstituteSubgraph(*subgraph, preCompiledLayer);
 
     // Check that connections are correct after substitution
-    BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn1);
-    BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(1).GetConnection(), subgraphInputConn2);
+    CHECK_EQ(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn1);
+    CHECK_EQ(preCompiledLayer->GetInputSlot(1).GetConnection(), subgraphInputConn2);
 
-    BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subgraphOutputConn1);
-    BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(1).GetConnection(0), subgraphOutputConn2);
+    CHECK_EQ(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subgraphOutputConn1);
+    CHECK_EQ(preCompiledLayer->GetOutputSlot(1).GetConnection(0), subgraphOutputConn2);
 }
 
-BOOST_AUTO_TEST_CASE(EraseReplacedLayers)
+TEST_CASE("EraseReplacedLayers")
 {
     // Construct graph
     Graph graph;
@@ -404,24 +402,24 @@ BOOST_AUTO_TEST_CASE(EraseReplacedLayers)
     graph.SubstituteSubgraph(*subgraph, preCompiledLayer);
 
     // Check that the layers belonging to the sub-graph have been erased from the graph after substitution
-    BOOST_CHECK(!AreAnySubgraphLayersPresentInGraph(subgraphLayers, graph));
+    CHECK(!AreAnySubgraphLayersPresentInGraph(subgraphLayers, graph));
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}
 
-BOOST_AUTO_TEST_SUITE(SubgraphSelection)
-
-BOOST_AUTO_TEST_CASE(SubgraphForEmptyGraph)
+TEST_SUITE("SubgraphSelection")
+{
+TEST_CASE("SubgraphForEmptyGraph")
 {
     Graph graph;
     SubgraphView subgraph(graph);
 
-    BOOST_TEST(subgraph.GetInputSlots().empty());
-    BOOST_TEST(subgraph.GetOutputSlots().empty());
-    BOOST_TEST(subgraph.GetLayers().empty());
+    CHECK(subgraph.GetInputSlots().empty());
+    CHECK(subgraph.GetOutputSlots().empty());
+    CHECK(subgraph.GetLayers().empty());
 }
 
-BOOST_AUTO_TEST_CASE(SubgraphForEntireGraph)
+TEST_CASE("SubgraphForEntireGraph")
 {
     Graph graph;
 
@@ -436,12 +434,12 @@ BOOST_AUTO_TEST_CASE(SubgraphForEntireGraph)
 
     SubgraphView subgraph(graph);
 
-    BOOST_TEST(subgraph.GetInputSlots().empty());
-    BOOST_TEST(subgraph.GetOutputSlots().empty());
-    BOOST_TEST(subgraph.GetLayers().size() == graph.GetNumLayers());
+    CHECK(subgraph.GetInputSlots().empty());
+    CHECK(subgraph.GetOutputSlots().empty());
+    CHECK(subgraph.GetLayers().size() == graph.GetNumLayers());
 }
 
-BOOST_AUTO_TEST_CASE(NoSubgraphsForNoMatch)
+TEST_CASE("NoSubgraphsForNoMatch")
 {
     Graph graph;
 
@@ -451,10 +449,10 @@ BOOST_AUTO_TEST_CASE(NoSubgraphsForNoMatch)
     SubgraphViewSelector::Subgraphs subgraphs =
         SubgraphViewSelector::SelectSubgraphs(graph, [](const Layer &) { return false; });
 
-    BOOST_TEST(subgraphs.empty());
+    CHECK(subgraphs.empty());
 }
 
-BOOST_AUTO_TEST_CASE(OneSubgraphsSelectedASingleMatch)
+TEST_CASE("OneSubgraphsSelectedASingleMatch")
 {
     Graph graph;
 
@@ -471,7 +469,7 @@ BOOST_AUTO_TEST_CASE(OneSubgraphsSelectedASingleMatch)
                 return isOutput;
             });
 
-    BOOST_TEST(subgraphs.size() == 1);
+    CHECK(subgraphs.size() == 1);
     if (subgraphs.size() == 1)
     {
         auto expected = CreateSubgraphViewFrom(CreateInputsFrom({output}),
@@ -483,7 +481,7 @@ BOOST_AUTO_TEST_CASE(OneSubgraphsSelectedASingleMatch)
     }
 }
 
-BOOST_AUTO_TEST_CASE(MultipleLayersSelectedInTheMiddle)
+TEST_CASE("MultipleLayersSelectedInTheMiddle")
 {
     Graph graph;
 
@@ -506,7 +504,7 @@ BOOST_AUTO_TEST_CASE(MultipleLayersSelectedInTheMiddle)
                 return toSelect;
             });
 
-    BOOST_TEST(subgraphs.size() == 1);
+    CHECK(subgraphs.size() == 1);
     if (subgraphs.size() == 1)
     {
         auto expected = CreateSubgraphViewFrom(CreateInputsFrom({mid1}),
@@ -517,7 +515,7 @@ BOOST_AUTO_TEST_CASE(MultipleLayersSelectedInTheMiddle)
     }
 }
 
-BOOST_AUTO_TEST_CASE(DisjointGraphs)
+TEST_CASE("DisjointGraphs")
 {
     // The input graph has two disjoint sections and all layers are selected.
     // This should result in two subgraphs being produced.
@@ -542,11 +540,11 @@ BOOST_AUTO_TEST_CASE(DisjointGraphs)
     // expected results to test against
     auto expected1 = CreateSubgraphViewFrom({}, {}, { o0, n0, i0 });
     auto expected2 = CreateSubgraphViewFrom({}, {}, { o1, n1, i1 });
-    BOOST_TEST(subgraphs.size() == 2);
+    CHECK(subgraphs.size() == 2);
     if (subgraphs.size() == 2)
     {
-        BOOST_TEST((subgraphs[0] != nullptr));
-        BOOST_TEST((subgraphs[1] != nullptr));
+        CHECK((subgraphs[0] != nullptr));
+        CHECK((subgraphs[1] != nullptr));
         if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr)
         {
             if (std::find(subgraphs[0]->GetLayers().begin(), subgraphs[0]->GetLayers().end(), i0) !=
@@ -564,7 +562,7 @@ BOOST_AUTO_TEST_CASE(DisjointGraphs)
     }
 }
 
-BOOST_AUTO_TEST_CASE(IslandInTheMiddle)
+TEST_CASE("IslandInTheMiddle")
 {
     // This case represent the scenario when a non-selected X1 node placed in the middle
     // of the selected M* nodes.
@@ -629,12 +627,12 @@ BOOST_AUTO_TEST_CASE(IslandInTheMiddle)
             std::vector<OutputSlot*>{},
             { m5, m6 });
 
-    BOOST_TEST(subgraphs.size() == 2);
+    CHECK(subgraphs.size() == 2);
     if (subgraphs.size() == 2)
     {
         // we need to have valid subgraph pointers here
-        BOOST_TEST((subgraphs[0] != nullptr));
-        BOOST_TEST((subgraphs[1] != nullptr));
+        CHECK((subgraphs[0] != nullptr));
+        CHECK((subgraphs[1] != nullptr));
 
         if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr)
         {
@@ -646,8 +644,8 @@ BOOST_AUTO_TEST_CASE(IslandInTheMiddle)
             }
             );
 
-            BOOST_TEST(subgraphs[0]->GetLayers().size() == 2);
-            BOOST_TEST(subgraphs[1]->GetLayers().size() == 5);
+            CHECK(subgraphs[0]->GetLayers().size() == 2);
+            CHECK(subgraphs[1]->GetLayers().size() == 5);
 
             CompareSubgraphViews(subgraphs[0], smallerSubgraph);
             CompareSubgraphViews(subgraphs[1], largerSubgraph);
@@ -655,7 +653,7 @@ BOOST_AUTO_TEST_CASE(IslandInTheMiddle)
     }
 }
 
-BOOST_AUTO_TEST_CASE(MultipleSimpleSubgraphs)
+TEST_CASE("MultipleSimpleSubgraphs")
 {
     // This test case represents the scenario when we have two distinct subgraphs
     // in a simple linear network. The selected nodes are the M* and the
@@ -704,12 +702,12 @@ BOOST_AUTO_TEST_CASE(MultipleSimpleSubgraphs)
                                                   CreateOutputsFrom({m3}),
                                                   {m3});
 
-    BOOST_TEST(subgraphs.size() == 2);
+    CHECK(subgraphs.size() == 2);
     if (subgraphs.size() == 2)
     {
         // we need to have valid subgraph pointers here
-        BOOST_TEST((subgraphs[0] != nullptr));
-        BOOST_TEST((subgraphs[1] != nullptr));
+        CHECK((subgraphs[0] != nullptr));
+        CHECK((subgraphs[1] != nullptr));
 
         if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr)
         {
@@ -721,8 +719,8 @@ BOOST_AUTO_TEST_CASE(MultipleSimpleSubgraphs)
                 }
             );
 
-            BOOST_TEST(subgraphs[0]->GetLayers().size() == 1);
-            BOOST_TEST(subgraphs[1]->GetLayers().size() == 2);
+            CHECK(subgraphs[0]->GetLayers().size() == 1);
+            CHECK(subgraphs[1]->GetLayers().size() == 2);
 
             CompareSubgraphViews(subgraphs[0], smallerSubgraph);
             CompareSubgraphViews(subgraphs[1], largerSubgraph);
@@ -730,7 +728,7 @@ BOOST_AUTO_TEST_CASE(MultipleSimpleSubgraphs)
     }
 }
 
-BOOST_AUTO_TEST_CASE(SimpleLinearTest)
+TEST_CASE("SimpleLinearTest")
 {
     //X1 -> M1 -> M2 -> X2
     //Where the input slots of M1 and the output slots of M2 are to be the sub graph boundaries.
@@ -765,7 +763,7 @@ BOOST_AUTO_TEST_CASE(SimpleLinearTest)
                         return toSelect;
                     });
 
-    BOOST_CHECK(subgraphs.size() == 1);
+    CHECK(subgraphs.size() == 1);
     if(subgraphs.size() == 1)
     {
         auto expected = CreateSubgraphViewFrom(CreateInputsFrom({layerM1}),
@@ -776,7 +774,7 @@ BOOST_AUTO_TEST_CASE(SimpleLinearTest)
     }
 }
 
-BOOST_AUTO_TEST_CASE(MultiInputSingleOutput)
+TEST_CASE("MultiInputSingleOutput")
 {
     //X1 -> M1 -> M3 -> X3
     //X2 -> M2 -> M3 -> X3
@@ -820,7 +818,7 @@ BOOST_AUTO_TEST_CASE(MultiInputSingleOutput)
                         return toSelect;
                     });
 
-    BOOST_CHECK(subgraphs.size() == 1);
+    CHECK(subgraphs.size() == 1);
     if (subgraphs.size() == 1)
     {
         auto expected = CreateSubgraphViewFrom(CreateInputsFrom({layerM1, layerM2}),
@@ -831,7 +829,7 @@ BOOST_AUTO_TEST_CASE(MultiInputSingleOutput)
     }
 }
 
-BOOST_AUTO_TEST_CASE(SingleInputMultiOutput)
+TEST_CASE("SingleInputMultiOutput")
 {
     //X1 -> M1 -> M2 -> X2
     //X1 -> M1 -> M3 -> X3
@@ -876,7 +874,7 @@ BOOST_AUTO_TEST_CASE(SingleInputMultiOutput)
                         return toSelect;
                     });
 
-    BOOST_CHECK(subgraphs.size() == 1);
+    CHECK(subgraphs.size() == 1);
     if(subgraphs.size() == 1)
     {
         auto expected = CreateSubgraphViewFrom(CreateInputsFrom({layerM1}),
@@ -887,7 +885,7 @@ BOOST_AUTO_TEST_CASE(SingleInputMultiOutput)
     }
 }
 
-BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
+TEST_CASE("MultiInputMultiOutput")
 {
     // This case represents the scenario with multiple inputs and multiple outputs
     //
@@ -940,7 +938,7 @@ BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
             });
 
 
-    BOOST_CHECK(subgraphs.size() == 1);
+    CHECK(subgraphs.size() == 1);
     if (subgraphs.size() == 1)
     {
         auto expected = CreateSubgraphViewFrom(CreateInputsFrom({m1, m2}),
@@ -951,7 +949,7 @@ BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
     }
 }
 
-BOOST_AUTO_TEST_CASE(ValidMerge)
+TEST_CASE("ValidMerge")
 {
     // Checks that a node that has multiple choices for merge candidates (M3 in this case) correctly merges with the
     // one that it can (M0), and doesn't merge with the ones it can't (X2 and M2).
@@ -1001,12 +999,12 @@ BOOST_AUTO_TEST_CASE(ValidMerge)
         CreateOutputsFrom({ }),
         { m0, m3 });
 
-    BOOST_TEST(subgraphs.size() == 2);
+    CHECK(subgraphs.size() == 2);
     if (subgraphs.size() == 2)
     {
         // we need to have valid subgraph pointers here
-        BOOST_TEST((subgraphs[0] != nullptr));
-        BOOST_TEST((subgraphs[1] != nullptr));
+        CHECK((subgraphs[0] != nullptr));
+        CHECK((subgraphs[1] != nullptr));
 
         if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr)
         {
@@ -1024,7 +1022,7 @@ BOOST_AUTO_TEST_CASE(ValidMerge)
     }
 }
 
-BOOST_AUTO_TEST_CASE(PropagatedDependencies)
+TEST_CASE("PropagatedDependencies")
 {
     // Version of IslandInTheMiddle with longer chain
     // to make sure antecedents are propagated.
@@ -1095,13 +1093,13 @@ BOOST_AUTO_TEST_CASE(PropagatedDependencies)
     auto smallerSubgraph =
         CreateSubgraphViewFrom(CreateInputsFrom({ m10 }), CreateOutputsFrom({ m10 }), { m10 });
 
-    BOOST_TEST(subgraphs.size() == 3);
+    CHECK(subgraphs.size() == 3);
     if (subgraphs.size() == 3)
     {
         // we need to have valid subgraph pointers here
-        BOOST_TEST((subgraphs[0] != nullptr));
-        BOOST_TEST((subgraphs[1] != nullptr));
-        BOOST_TEST((subgraphs[2] != nullptr));
+        CHECK((subgraphs[0] != nullptr));
+        CHECK((subgraphs[1] != nullptr));
+        CHECK((subgraphs[2] != nullptr));
 
         if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr && subgraphs[2].get() != nullptr)
         {
@@ -1120,7 +1118,7 @@ BOOST_AUTO_TEST_CASE(PropagatedDependencies)
     }
 }
 
-BOOST_AUTO_TEST_CASE(Random)
+TEST_CASE("Random")
 {
     // Creates random networks, splits them into subgraphs and checks the resulting subgraphs obey the required
     // dependency rules. We can easily generate very large networks which helps cover corner cases the other
@@ -1319,7 +1317,7 @@ BOOST_AUTO_TEST_CASE(Random)
                     Layer* l = toProcess.front();
                     toProcess.pop();
 
-                    BOOST_CHECK(layerToSubgraph[l] != subgraph.get());
+                    CHECK(layerToSubgraph[l] != subgraph.get());
 
                     for (const InputSlot& is : l->GetInputSlots())
                     {
@@ -1331,11 +1329,11 @@ BOOST_AUTO_TEST_CASE(Random)
     }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}
 
-BOOST_AUTO_TEST_SUITE(IntegrationTests)
-
-BOOST_AUTO_TEST_CASE(SingleSubgraph)
+TEST_SUITE("IntegrationTests")
+{
+TEST_CASE("SingleSubgraph")
 {
     // This test case represents the scenario when we have one subgraph
     // in which two layers have GpuAcc backend assigned
@@ -1368,18 +1366,18 @@ BOOST_AUTO_TEST_CASE(SingleSubgraph)
                 return toSelect;
             });
 
-    BOOST_TEST(subgraphs.size() == 1);
+    CHECK(subgraphs.size() == 1);
     if(subgraphs.size() == 1)
     {
-        BOOST_TEST((subgraphs[0] != nullptr));
+        CHECK((subgraphs[0] != nullptr));
 
         if (subgraphs[0].get() != nullptr)
         {
             unsigned int numInputSlots = armnn::numeric_cast<unsigned int>(subgraphs[0]->GetInputSlots().size());
             unsigned int numOutputSlots = armnn::numeric_cast<unsigned int>(subgraphs[0]->GetOutputSlots().size());
 
-            BOOST_TEST((numInputSlots == 1));
-            BOOST_TEST((numOutputSlots == 1));
+            CHECK((numInputSlots == 1));
+            CHECK((numOutputSlots == 1));
 
             // Save sub-graph connections for comparison after substitution
             IOutputSlot* subgraphInputConn1 = subgraphs[0]->GetInputSlot(0)->GetConnection();
@@ -1393,14 +1391,14 @@ BOOST_AUTO_TEST_CASE(SingleSubgraph)
             graph.SubstituteSubgraph(*subgraphs[0], preCompiledLayer);
 
             // Check that connections are correct after substitution
-            BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn1);
+            CHECK_EQ(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn1);
 
-            BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subgraphOutputConn1);
+            CHECK_EQ(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subgraphOutputConn1);
         }
     }
 }
 
-BOOST_AUTO_TEST_CASE(MultipleSubgraphs)
+TEST_CASE("MultipleSubgraphs")
 {
     // This test case represents the scenario when we have two subgraphs
     // in which two layers have CpuAcc backend assigned
@@ -1441,11 +1439,11 @@ BOOST_AUTO_TEST_CASE(MultipleSubgraphs)
                 return toSelect;
             });
 
-    BOOST_TEST(subgraphs.size() == 2);
+    CHECK(subgraphs.size() == 2);
     if(subgraphs.size() == 2)
     {
-        BOOST_TEST((subgraphs[0] != nullptr));
-        BOOST_TEST((subgraphs[1] != nullptr));
+        CHECK((subgraphs[0] != nullptr));
+        CHECK((subgraphs[1] != nullptr));
 
         if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr)
         {
@@ -1484,18 +1482,18 @@ BOOST_AUTO_TEST_CASE(MultipleSubgraphs)
             graph.SubstituteSubgraph(*subgraphs[1], preCompiledLayer2);
 
             // Check that connections are correct after substitution
-            BOOST_CHECK_EQUAL(preCompiledLayer1->GetInputSlot(0).GetConnection(), subgraph1InputConn);
-            BOOST_CHECK_EQUAL(preCompiledLayer1->GetOutputSlot(0).GetConnection(0), subgraph1OutputConn1);
-            BOOST_CHECK_EQUAL(preCompiledLayer1->GetOutputSlot(1).GetConnection(0), subgraph1OutputConn2);
+            CHECK_EQ(preCompiledLayer1->GetInputSlot(0).GetConnection(), subgraph1InputConn);
+            CHECK_EQ(preCompiledLayer1->GetOutputSlot(0).GetConnection(0), subgraph1OutputConn1);
+            CHECK_EQ(preCompiledLayer1->GetOutputSlot(1).GetConnection(0), subgraph1OutputConn2);
 
-            BOOST_CHECK_EQUAL(preCompiledLayer2->GetInputSlot(0).GetConnection(), subgraph2InputConn1);
-            BOOST_CHECK_EQUAL(preCompiledLayer2->GetInputSlot(1).GetConnection(), subgraph2InputConn2);
-            BOOST_CHECK_EQUAL(preCompiledLayer2->GetOutputSlot(0).GetConnection(0), subgraph2OutputConn);
+            CHECK_EQ(preCompiledLayer2->GetInputSlot(0).GetConnection(), subgraph2InputConn1);
+            CHECK_EQ(preCompiledLayer2->GetInputSlot(1).GetConnection(), subgraph2InputConn2);
+            CHECK_EQ(preCompiledLayer2->GetOutputSlot(0).GetConnection(0), subgraph2OutputConn);
         }
     }
 }
 
-BOOST_AUTO_TEST_CASE(SubgraphCycles)
+TEST_CASE("SubgraphCycles")
 {
     // This case represent the scenario when a naive split could lead to a cyclic dependency between two subgraphs
     //
@@ -1555,12 +1553,12 @@ BOOST_AUTO_TEST_CASE(SubgraphCycles)
                                                  CreateOutputsFrom({m2}),
                                                  {m2});
 
-    BOOST_TEST(subgraphs.size() == 2);
+    CHECK(subgraphs.size() == 2);
     if (subgraphs.size() == 2)
     {
         // we need to have valid subgraph pointers here
-        BOOST_TEST((subgraphs[0] != nullptr));
-        BOOST_TEST((subgraphs[1] != nullptr));
+        CHECK((subgraphs[0] != nullptr));
+        CHECK((subgraphs[1] != nullptr));
 
         if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr)
         {
@@ -1573,8 +1571,8 @@ BOOST_AUTO_TEST_CASE(SubgraphCycles)
             );
 
             // one subgraph needs to be size=1 and the other one is 4
-            BOOST_TEST(subgraphs[0]->GetLayers().size() == 1);
-            BOOST_TEST(subgraphs[1]->GetLayers().size() == 2);
+            CHECK(subgraphs[0]->GetLayers().size() == 1);
+            CHECK(subgraphs[1]->GetLayers().size() == 2);
 
             CompareSubgraphViews(subgraphs[0], outputSubgraph);
             CompareSubgraphViews(subgraphs[1], inputSubgraph);
@@ -1582,7 +1580,7 @@ BOOST_AUTO_TEST_CASE(SubgraphCycles)
     }
 }
 
-BOOST_AUTO_TEST_CASE(SubgraphOrder)
+TEST_CASE("SubgraphOrder")
 {
     Graph graph;
 
@@ -1603,10 +1601,10 @@ BOOST_AUTO_TEST_CASE(SubgraphOrder)
     LayerType expectedSorted[] = {LayerType::Input, LayerType::Activation, LayerType::Output};
     view->ForEachLayer([&idx, &expectedSorted](const Layer* l)
         {
-            BOOST_TEST((expectedSorted[idx] == l->GetType()));
+            CHECK((expectedSorted[idx] == l->GetType()));
             idx++;
         }
     );
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

@@ -20,7 +20,7 @@
 
 #include <test/TensorHelpers.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <string>
 #include <utility>

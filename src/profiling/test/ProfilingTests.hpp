@@ -16,7 +16,7 @@
 #include <common/include/CommandHandlerFunctor.hpp>
 
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <chrono>
 #include <thread>
@@ -213,15 +213,15 @@ public:
         , m_BackupProfilingConnectionFactory(nullptr)
 
     {
-        BOOST_CHECK(m_MockProfilingConnectionFactory);
+        CHECK(m_MockProfilingConnectionFactory);
         SwapProfilingConnectionFactory(m_ProfilingService,
                                        m_MockProfilingConnectionFactory.get(),
                                        m_BackupProfilingConnectionFactory);
-        BOOST_CHECK(m_BackupProfilingConnectionFactory);
+        CHECK(m_BackupProfilingConnectionFactory);
     }
     ~SwapProfilingConnectionFactoryHelper()
     {
-        BOOST_CHECK(m_BackupProfilingConnectionFactory);
+        CHECK(m_BackupProfilingConnectionFactory);
         IProfilingConnectionFactory* temp = nullptr;
         SwapProfilingConnectionFactory(m_ProfilingService,
                                        m_BackupProfilingConnectionFactory,

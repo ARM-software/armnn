@@ -12,6 +12,8 @@
 
 #include <armnn/utility/IgnoreUnused.hpp>
 
+#include <doctest/doctest.h>
+
 namespace
 {
 armnn::Graph dummyGraph;
@@ -756,7 +758,7 @@ bool IsLayerSupportedTest(FactoryType *factory, Tag<Type>)
         try
         {
             bool retVal = LayerPolicy::MakeDummyWorkload(factory, numIn, numOut).get() != nullptr;
-            BOOST_CHECK_MESSAGE(retVal, layerName << errorMsg);
+            CHECK_MESSAGE(retVal, layerName << errorMsg);
             return retVal;
         }
         catch(const armnn::InvalidArgumentException& e)
@@ -768,13 +770,13 @@ bool IsLayerSupportedTest(FactoryType *factory, Tag<Type>)
         catch(const std::exception& e)
         {
             errorMsg = e.what();
-            BOOST_TEST_ERROR(layerName << ": " << errorMsg);
+            FAIL(layerName << ": " << errorMsg);
             return false;
         }
         catch(...)
         {
             errorMsg = "Unexpected error while testing support for ";
-            BOOST_TEST_ERROR(errorMsg << layerName);
+            FAIL(errorMsg << layerName);
             return false;
         }
     }
@@ -784,7 +786,7 @@ bool IsLayerSupportedTest(FactoryType *factory, Tag<Type>)
         try
         {
             bool retVal = LayerPolicy::MakeDummyWorkload(factory, numIn, numOut).get() == nullptr;
-            BOOST_CHECK_MESSAGE(retVal, layerName << errorMsg);
+            CHECK_MESSAGE(retVal, layerName << errorMsg);
             return retVal;
         }
         // These two exceptions are ok: For workloads that are partially supported, attempting to instantiate them
@@ -803,13 +805,13 @@ bool IsLayerSupportedTest(FactoryType *factory, Tag<Type>)
         catch(const std::exception& e)
         {
             errorMsg = e.what();
-            BOOST_TEST_ERROR(layerName << ": " << errorMsg);
+            FAIL(layerName << ": " << errorMsg);
             return false;
         }
         catch(...)
         {
             errorMsg = "Unexpected error while testing support for ";
-            BOOST_TEST_ERROR(errorMsg << layerName);
+            FAIL(errorMsg << layerName);
             return false;
         }
     }
@@ -871,7 +873,7 @@ bool TestLayerTypeMatches()
     std::stringstream ss;
     ss << LayerPolicy::NameStr << " layer type mismatches expected layer type value.";
     bool v = Type == layer.m_Layer->GetType();
-    BOOST_CHECK_MESSAGE(v, ss.str());
+    CHECK_MESSAGE(v, ss.str());
     return v;
 }
 

@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
@@ -12,8 +11,8 @@
 
 using armnnTfLiteParser::TfLiteParserImpl;
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_Constant")
+{
 struct ConstantAddFixture : public ParserFlatbuffersFixture
 {
     explicit ConstantAddFixture(const std::string & inputShape,
@@ -101,7 +100,7 @@ struct SimpleConstantAddFixture : ConstantAddFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(SimpleConstantAdd, SimpleConstantAddFixture)
+TEST_CASE_FIXTURE(SimpleConstantAddFixture, "SimpleConstantAdd")
 {
     RunTest<2, armnn::DataType::QAsymmU8>(
                 0,
@@ -110,4 +109,4 @@ BOOST_FIXTURE_TEST_CASE(SimpleConstantAdd, SimpleConstantAddFixture)
                 );
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

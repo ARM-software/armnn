@@ -3,12 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "armnnOnnxParser/IOnnxParser.hpp"
 #include  "ParserPrototxtFixture.hpp"
 
-BOOST_AUTO_TEST_SUITE(OnnxParser)
-
+TEST_SUITE("OnnxParser_Conv2D")
+{
 struct SimpleConv2DFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser::IOnnxParser>
 {
     SimpleConv2DFixture()
@@ -578,7 +577,7 @@ struct Conv2DwithDilationFixture : public armnnUtils::ParserPrototxtFixture<armn
     }
 };
 
-BOOST_FIXTURE_TEST_CASE(ValidConvTest, SimpleConv2DFixture)
+TEST_CASE_FIXTURE(SimpleConv2DFixture, "ValidConvTest")
 {
     RunTest<4>({{"Input", {1.0, 2.0, 3.0,
                            4.0, 5.0, 6.0,
@@ -588,7 +587,7 @@ BOOST_FIXTURE_TEST_CASE(ValidConvTest, SimpleConv2DFixture)
                            7.0 * 4 + 8.0 * 1 + 9.0 * 2}}});
 }
 
-BOOST_FIXTURE_TEST_CASE(ValidConvWithBiasTest, Conv2DWithBiasesFixture)
+TEST_CASE_FIXTURE(Conv2DWithBiasesFixture, "ValidConvWithBiasTest")
 {
     RunTest<4>({{"Input", {1.0, 2.0,
                            3.0, 4.0}}},
@@ -598,7 +597,7 @@ BOOST_FIXTURE_TEST_CASE(ValidConvWithBiasTest, Conv2DWithBiasesFixture)
                            4.0 * 2 + 0 * 1 + 0 * 0 + 0 * 6 + 10}}});
 }
 
-BOOST_FIXTURE_TEST_CASE(ValidConvDimReducTest, Conv2DDimReducingFixture)
+TEST_CASE_FIXTURE(Conv2DDimReducingFixture, "ValidConvDimReducTest")
 {
     RunTest<4>({{"Input", {1.0, 2.0, 3.0, 4.0, -1, -2, 3, 4, 1 , 1, 1, 1 }}},
               {{"Output", {-1 * 1 + 2 * -1, -1 * 2 + 2 * -2,
@@ -606,7 +605,7 @@ BOOST_FIXTURE_TEST_CASE(ValidConvDimReducTest, Conv2DDimReducingFixture)
                            1, 2, 3, 4}}});
 }
 
-BOOST_FIXTURE_TEST_CASE(ValidConvWithDilationTest, Conv2DwithDilationFixture)
+TEST_CASE_FIXTURE(Conv2DwithDilationFixture, "ValidConvWithDilationTest")
 {
     RunTest<4>({{"Input", {1.0, 2.0, 3.0, 4.0, 5.0, 6.0,
                            7.0, 8.0, 9.0, 10.0, 11.0, 12.0,
@@ -617,4 +616,4 @@ BOOST_FIXTURE_TEST_CASE(ValidConvWithDilationTest, Conv2DwithDilationFixture)
                {{"Output", {39.0, 58.0, 153.0, 172.0 }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

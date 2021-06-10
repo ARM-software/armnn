@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_Maximum")
+{
 struct MaximumFixture : public ParserFlatbuffersFixture
 {
     explicit MaximumFixture(const std::string & inputShape1,
@@ -90,7 +89,7 @@ struct MaximumFixture4D4D : MaximumFixture
                                           "[ 1, 2, 2, 3 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseMaximum4D4D, MaximumFixture4D4D)
+TEST_CASE_FIXTURE(MaximumFixture4D4D, "ParseMaximum4D4D")
 {
   RunTest<4, armnn::DataType::Float32>(
       0,
@@ -115,7 +114,7 @@ struct MaximumBroadcastFixture4D4D : MaximumFixture
                                                    "[ 1, 2, 2, 3 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseMaximumBroadcast4D4D, MaximumBroadcastFixture4D4D)
+TEST_CASE_FIXTURE(MaximumBroadcastFixture4D4D, "ParseMaximumBroadcast4D4D")
 {
   RunTest<4, armnn::DataType::Float32>(
       0,
@@ -135,7 +134,7 @@ struct MaximumBroadcastFixture4D1D : MaximumFixture
                                                    "[ 1, 2, 2, 3 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseMaximumBroadcast4D1D, MaximumBroadcastFixture4D1D)
+TEST_CASE_FIXTURE(MaximumBroadcastFixture4D1D, "ParseMaximumBroadcast4D1D")
 {
   RunTest<4, armnn::DataType::Float32>(
       0,
@@ -157,7 +156,7 @@ struct MaximumBroadcastFixture1D4D : MaximumFixture
                                                    "[ 1, 2, 2, 3 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseMaximumBroadcast1D4D, MaximumBroadcastFixture1D4D)
+TEST_CASE_FIXTURE(MaximumBroadcastFixture1D4D, "ParseMaximumBroadcast1D4D")
 {
   RunTest<4, armnn::DataType::Float32>(
       0,
@@ -172,4 +171,4 @@ BOOST_FIXTURE_TEST_CASE(ParseMaximumBroadcast1D4D, MaximumBroadcastFixture1D4D)
                           9.0f, 10.0f, 11.0f }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

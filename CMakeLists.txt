@@ -619,6 +619,7 @@ if(BUILD_UNIT_TESTS)
         src/profiling/test/SendTimelinePacketTests.cpp
         src/profiling/test/TimelinePacketTests.cpp
         src/profiling/test/TimelineUtilityMethodsTests.cpp
+        third-party/doctest/doctest.h
         )
 
     if(ARMNNREF)

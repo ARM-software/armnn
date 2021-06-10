@@ -14,8 +14,7 @@
 #include <SubgraphView.hpp>
 #include <SubgraphViewSelector.hpp>
 
-#include <boost/test/unit_test.hpp>
-
+#include <doctest/doctest.h>
 
 using namespace armnn;
 
@@ -28,31 +27,31 @@ void CheckLayers(Graph& graph)
         {
             case LayerType::Input:
                 ++m_inputLayerCount;
-                BOOST_TEST((layer->GetName() == std::string("inLayer0") ||
+                CHECK((layer->GetName() == std::string("inLayer0") ||
                             layer->GetName() == std::string("inLayer1")));
                 break;
             // The Addition layer should become a PreCompiled Layer after Optimisation
             case LayerType::PreCompiled:
                 ++m_addLayerCount;
-                BOOST_TEST(layer->GetName() == "pre-compiled");
+                CHECK(std::string(layer->GetName()) == "pre-compiled");
                 break;
             case LayerType::Output:
                 ++m_outputLayerCount;
-                BOOST_TEST(layer->GetName() == "outLayer");
+                CHECK(std::string(layer->GetName()) == "outLayer");
                 break;
             default:
                 //Fail for anything else
-                BOOST_TEST(false);
+                CHECK(false);
         }
     }
-    BOOST_TEST(m_inputLayerCount == 2);
-    BOOST_TEST(m_outputLayerCount == 1);
-    BOOST_TEST(m_addLayerCount == 1);
+    CHECK(m_inputLayerCount == 2);
+    CHECK(m_outputLayerCount == 1);
+    CHECK(m_addLayerCount == 1);
 }
 
-BOOST_AUTO_TEST_SUITE(OptimizationViewsTestSuite)
-
-BOOST_AUTO_TEST_CASE(OptimizedViewsSubgraphLayerCount)
+TEST_SUITE("OptimizationViewsTestSuite")
+{
+TEST_CASE("OptimizedViewsSubgraphLayerCount")
 {
     OptimizationViews view;
     // Construct a graph with 3 layers
@@ -117,10 +116,10 @@ BOOST_AUTO_TEST_CASE(OptimizedViewsSubgraphLayerCount)
             CreateOutputsFrom({convLayer2}),
             {convLayer1, convLayer2, substitutionpreCompiledLayer});
 
-    BOOST_CHECK(view.Validate(*originalSubgraph));
+    CHECK(view.Validate(*originalSubgraph));
 }
 
-BOOST_AUTO_TEST_CASE(OptimizedViewsSubgraphLayerCountFailValidate)
+TEST_CASE("OptimizedViewsSubgraphLayerCountFailValidate")
 {
     OptimizationViews view;
     // Construct a graph with 3 layers
@@ -180,10 +179,10 @@ BOOST_AUTO_TEST_CASE(OptimizedViewsSubgraphLayerCountFailValidate)
                                    {convLayer1, convLayer2, substitutionpreCompiledLayer});
 
     // Validate should fail as convLayer1 is not counted
-    BOOST_CHECK(!view.Validate(*originalSubgraph));
+    CHECK(!view.Validate(*originalSubgraph));
 }
 
-BOOST_AUTO_TEST_CASE(OptimizeViewsValidateDeviceMockBackend)
+TEST_CASE("OptimizeViewsValidateDeviceMockBackend")
 {
     // build up the structure of the network
     armnn::INetworkPtr net(armnn::INetwork::Create());
@@ -209,11 +208,11 @@ BOOST_AUTO_TEST_CASE(OptimizeViewsValidateDeviceMockBackend)
 
     std::vector<armnn::BackendId> backends = { MockBackend().GetIdStatic() };
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
-    BOOST_CHECK(optNet);
+    CHECK(optNet);
 
     // Check the optimised graph
     armnn::Graph& graph = GetGraphForTesting(optNet.get());
     CheckLayers(graph);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

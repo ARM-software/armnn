@@ -11,7 +11,7 @@
 #include <armnn/INetwork.hpp>
 #include <armnn/LstmParams.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 namespace
 {
@@ -260,11 +260,11 @@ void QLstmEndToEnd(const std::vector<armnn::BackendId>& backends)
     constexpr int8_t toleranceInt8 = 1;
     for (unsigned int i = 0u; i < outputStateOutResult.size(); ++i)
     {
-        BOOST_TEST(IsCloseEnough(outputStateOutVector[i], outputStateOutResult[i], toleranceInt8));
+        CHECK(IsCloseEnough(outputStateOutVector[i], outputStateOutResult[i], toleranceInt8));
     }
 
     for (unsigned int i = 0u; i < outputResult.size(); ++i)
     {
-        BOOST_TEST(IsCloseEnough(outputVector[i], outputResult[i], toleranceInt8));
+        CHECK(IsCloseEnough(outputVector[i], outputResult[i], toleranceInt8));
     }
 }

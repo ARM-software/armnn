@@ -12,8 +12,7 @@
 
 #include <armnn/BackendRegistry.hpp>
 
-#include <boost/test/unit_test.hpp>
-
+#include <doctest/doctest.h>
 #include <unordered_map>
 
 using namespace armnn;
@@ -64,7 +63,7 @@ Layer* AddInputLayer(Graph& graph,
                      LayerBindingId inputId = 0)
 {
     Layer* const inputLayer = graph.AddLayer<InputLayer>(inputId, layerName.c_str());
-    BOOST_TEST(inputLayer);
+    CHECK(inputLayer);
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
     return inputLayer;
 }
@@ -74,7 +73,7 @@ Layer* AddOutputLayer(Graph& graph,
                       const std::string& layerName)
 {
     Layer* const outputLayer = graph.AddLayer<OutputLayer>(0, layerName.c_str());
-    BOOST_TEST(outputLayer);
+    CHECK(outputLayer);
     return outputLayer;
 }
 
@@ -88,7 +87,7 @@ Convolution2dLayer* AddConvolutionLayer(Graph& graph,
                                         const TensorInfo& outputInfo)
 {
     Convolution2dLayer* const convLayer = graph.AddLayer<Convolution2dLayer>(convolutionDescriptor, layerName.c_str());
-    BOOST_TEST(convLayer);
+    CHECK(convLayer);
     SetWeightAndBias(convLayer, weightInfo, biasInfo);
     convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
     layersInGraph.insert(std::make_pair(convLayer->GetName(), convLayer));
@@ -103,7 +102,7 @@ Pooling2dLayer* AddPoolingLayer(Graph& graph,
                                 const TensorInfo& outputInfo)
 {
     Pooling2dLayer* const poolingLayer = graph.AddLayer<Pooling2dLayer>(poolingDescriptor, layerName.c_str());
-    BOOST_TEST(poolingLayer);
+    CHECK(poolingLayer);
     poolingLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
     layersInGraph.insert(std::make_pair(poolingLayer->GetName(), poolingLayer));
     return poolingLayer;
@@ -116,7 +115,7 @@ AdditionLayer* AddAdditionaLayer(Graph& graph,
                                  const TensorInfo& outputInfo)
 {
     AdditionLayer* const additionLayer = graph.AddLayer<AdditionLayer>(layerName.c_str());
-    BOOST_TEST(additionLayer);
+    CHECK(additionLayer);
     additionLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
     layersInGraph.insert(std::make_pair(additionLayer->GetName(), additionLayer));
     return additionLayer;
@@ -140,23 +139,23 @@ void CheckSubstitution(const OptimizationViews::SubstitutionPair& substitution,
     const SubgraphView::OutputSlots& replacementSubgraphOutputSlots = replacementSubgraph.GetOutputSlots();
     const SubgraphView::Layers&      replacementSubgraphLayers      = replacementSubgraph.GetLayers();
 
-    BOOST_TEST(substitutableSubgraphInputSlots.size()  == expectedSubstitutableSubgraphSize.m_NumInputSlots);
-    BOOST_TEST(substitutableSubgraphOutputSlots.size() == expectedSubstitutableSubgraphSize.m_NumOutputSlots);
-    BOOST_TEST(substitutableSubgraphLayers.size()      == expectedSubstitutableSubgraphSize.m_NumLayers);
+    CHECK(substitutableSubgraphInputSlots.size()  == expectedSubstitutableSubgraphSize.m_NumInputSlots);
+    CHECK(substitutableSubgraphOutputSlots.size() == expectedSubstitutableSubgraphSize.m_NumOutputSlots);
+    CHECK(substitutableSubgraphLayers.size()      == expectedSubstitutableSubgraphSize.m_NumLayers);
 
-    BOOST_TEST(AreEqual(substitutableSubgraphInputSlots,  expectedSubstitutableInputSlots));
-    BOOST_TEST(AreEqual(substitutableSubgraphOutputSlots, expectedSubstitutableOutputSlots));
-    BOOST_TEST(AreEqual(substitutableSubgraphLayers,      expectedSubstitutableLayers));
+    CHECK(AreEqual(substitutableSubgraphInputSlots,  expectedSubstitutableInputSlots));
+    CHECK(AreEqual(substitutableSubgraphOutputSlots, expectedSubstitutableOutputSlots));
+    CHECK(AreEqual(substitutableSubgraphLayers,      expectedSubstitutableLayers));
 
-    BOOST_TEST(replacementSubgraphInputSlots.size()  == expectedReplacementSubgraphSize.m_NumInputSlots);
-    BOOST_TEST(replacementSubgraphOutputSlots.size() == expectedReplacementSubgraphSize.m_NumOutputSlots);
-    BOOST_TEST(replacementSubgraphLayers.size()      == expectedReplacementSubgraphSize.m_NumLayers);
+    CHECK(replacementSubgraphInputSlots.size()  == expectedReplacementSubgraphSize.m_NumInputSlots);
+    CHECK(replacementSubgraphOutputSlots.size() == expectedReplacementSubgraphSize.m_NumOutputSlots);
+    CHECK(replacementSubgraphLayers.size()      == expectedReplacementSubgraphSize.m_NumLayers);
 
-    BOOST_TEST(!AreEqual(replacementSubgraphInputSlots,  expectedSubstitutableInputSlots));
-    BOOST_TEST(!AreEqual(replacementSubgraphOutputSlots, expectedSubstitutableOutputSlots));
-    BOOST_TEST(!AreEqual(replacementSubgraphLayers,      expectedSubstitutableLayers));
+    CHECK(!AreEqual(replacementSubgraphInputSlots,  expectedSubstitutableInputSlots));
+    CHECK(!AreEqual(replacementSubgraphOutputSlots, expectedSubstitutableOutputSlots));
+    CHECK(!AreEqual(replacementSubgraphLayers,      expectedSubstitutableLayers));
 
-    BOOST_TEST(std::all_of(replacementSubgraphLayers.begin(),
+    CHECK(std::all_of(replacementSubgraphLayers.begin(),
                            replacementSubgraphLayers.end(),
                            [](const Layer* layer)
     {
@@ -175,13 +174,13 @@ void CheckFailedSubgraph(const SubgraphView& failedSubgraph,
     const SubgraphView::OutputSlots& failedSubgraphOutputSlots = failedSubgraph.GetOutputSlots();
     const SubgraphView::Layers&      failedSubgraphLayers      = failedSubgraph.GetLayers();
 
-    BOOST_TEST(failedSubgraphInputSlots.size()  == expectedFailedSubgraphSize.m_NumInputSlots);
-    BOOST_TEST(failedSubgraphOutputSlots.size() == expectedFailedSubgraphSize.m_NumOutputSlots);
-    BOOST_TEST(failedSubgraphLayers.size()      == expectedFailedSubgraphSize.m_NumLayers);
+    CHECK(failedSubgraphInputSlots.size()  == expectedFailedSubgraphSize.m_NumInputSlots);
+    CHECK(failedSubgraphOutputSlots.size() == expectedFailedSubgraphSize.m_NumOutputSlots);
+    CHECK(failedSubgraphLayers.size()      == expectedFailedSubgraphSize.m_NumLayers);
 
-    BOOST_TEST(AreEqual(failedSubgraphInputSlots,  expectedFailedInputSlots));
-    BOOST_TEST(AreEqual(failedSubgraphOutputSlots, expectedFailedOutputSlots));
-    BOOST_TEST(AreEqual(failedSubgraphLayers,      expectedFailedLayers));
+    CHECK(AreEqual(failedSubgraphInputSlots,  expectedFailedInputSlots));
+    CHECK(AreEqual(failedSubgraphOutputSlots, expectedFailedOutputSlots));
+    CHECK(AreEqual(failedSubgraphLayers,      expectedFailedLayers));
 }
 
 // Convenience function to check that the given untouched subgraph matches the specified expected values
@@ -195,13 +194,13 @@ void CheckUntouchedSubgraph(const SubgraphView& untouchedSubgraph,
     const SubgraphView::OutputSlots& untouchedSubgraphOutputSlots = untouchedSubgraph.GetOutputSlots();
     const SubgraphView::Layers&      untouchedSubgraphLayers      = untouchedSubgraph.GetLayers();
 
-    BOOST_TEST(untouchedSubgraphInputSlots.size()  == expectedUntouchedSubgraphSize.m_NumInputSlots);
-    BOOST_TEST(untouchedSubgraphOutputSlots.size() == expectedUntouchedSubgraphSize.m_NumOutputSlots);
-    BOOST_TEST(untouchedSubgraphLayers.size()      == expectedUntouchedSubgraphSize.m_NumLayers);
+    CHECK(untouchedSubgraphInputSlots.size()  == expectedUntouchedSubgraphSize.m_NumInputSlots);
+    CHECK(untouchedSubgraphOutputSlots.size() == expectedUntouchedSubgraphSize.m_NumOutputSlots);
+    CHECK(untouchedSubgraphLayers.size()      == expectedUntouchedSubgraphSize.m_NumLayers);
 
-    BOOST_TEST(AreEqual(untouchedSubgraphInputSlots,  expectedUntouchedInputSlots));
-    BOOST_TEST(AreEqual(untouchedSubgraphOutputSlots, expectedUntouchedOutputSlots));
-    BOOST_TEST(AreEqual(untouchedSubgraphLayers,      expectedUntouchedLayers));
+    CHECK(AreEqual(untouchedSubgraphInputSlots,  expectedUntouchedInputSlots));
+    CHECK(AreEqual(untouchedSubgraphOutputSlots, expectedUntouchedOutputSlots));
+    CHECK(AreEqual(untouchedSubgraphLayers,      expectedUntouchedLayers));
 }
 
 // Creates a subgraph containing only a single unsupported layer (only convolutions are unsupported by the mock backend)
@@ -551,28 +550,28 @@ void FullyUnsupporteSubgraphTestImpl1()
 
     // Create an unsupported subgraph
     SubgraphView::SubgraphViewPtr subgraphPtr = BuildFullyUnsupportedSubgraph1(graph, layersInGraph);
-    BOOST_TEST((subgraphPtr != nullptr));
+    CHECK((subgraphPtr != nullptr));
 
     const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
     const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
     const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
 
-    BOOST_TEST(subgraphInputSlots.size()  == 1);
-    BOOST_TEST(subgraphOutputSlots.size() == 1);
-    BOOST_TEST(subgraphLayers.size()      == 1);
+    CHECK(subgraphInputSlots.size()  == 1);
+    CHECK(subgraphOutputSlots.size() == 1);
+    CHECK(subgraphLayers.size()      == 1);
 
-    BOOST_TEST(Contains(layersInGraph, "pooling layer"));
+    CHECK(Contains(layersInGraph, "pooling layer"));
 
     // Create a mock backend object
     MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
-    BOOST_TEST((backendObjPtr != nullptr));
+    CHECK((backendObjPtr != nullptr));
 
     // Optimize the subgraph
     OptimizationViews optimizationViews;
 
     // Check that the optimization is carried out correctly, but no optimization is performed
-    BOOST_CHECK_NO_THROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
+    CHECK_NOTHROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
 
     // =======================================================================
     // The expected results are:
@@ -585,14 +584,14 @@ void FullyUnsupporteSubgraphTestImpl1()
     // Check the substitutions
     // -----------------------
 
-    BOOST_TEST(optimizationViews.GetSubstitutions().empty());
+    CHECK(optimizationViews.GetSubstitutions().empty());
 
     // --------------------------
     // Check the failed subgraphs
     // --------------------------
 
     const OptimizationViews::Subgraphs& failedSubgraphs = optimizationViews.GetFailedSubgraphs();
-    BOOST_TEST(failedSubgraphs.size() == 1);
+    CHECK(failedSubgraphs.size() == 1);
 
     CheckFailedSubgraph(failedSubgraphs.at(0),
                         { subgraphInputSlots.size(), subgraphOutputSlots.size(), subgraphLayers.size() },
@@ -604,7 +603,7 @@ void FullyUnsupporteSubgraphTestImpl1()
     // Check the untouched subgraphs
     // -----------------------------
 
-    BOOST_TEST(optimizationViews.GetUntouchedSubgraphs().empty());
+    CHECK(optimizationViews.GetUntouchedSubgraphs().empty());
 }
 
 // The input subgraph contains only unsupported layers (only convolutions are unsupported by the mock backend)
@@ -615,30 +614,30 @@ void FullyUnsupporteSubgraphTestImpl2()
 
     // Create an unsupported subgraph
     SubgraphView::SubgraphViewPtr subgraphPtr = BuildFullyUnsupportedSubgraph2(graph, layersInGraph);
-    BOOST_TEST((subgraphPtr != nullptr));
+    CHECK((subgraphPtr != nullptr));
 
     const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
     const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
     const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
 
-    BOOST_TEST(subgraphInputSlots.size()  == 1);
-    BOOST_TEST(subgraphOutputSlots.size() == 1);
-    BOOST_TEST(subgraphLayers.size()      == 3);
+    CHECK(subgraphInputSlots.size()  == 1);
+    CHECK(subgraphOutputSlots.size() == 1);
+    CHECK(subgraphLayers.size()      == 3);
 
-    BOOST_TEST(Contains(layersInGraph, "pooling1 layer"));
-    BOOST_TEST(Contains(layersInGraph, "pooling2 layer"));
-    BOOST_TEST(Contains(layersInGraph, "pooling3 layer"));
+    CHECK(Contains(layersInGraph, "pooling1 layer"));
+    CHECK(Contains(layersInGraph, "pooling2 layer"));
+    CHECK(Contains(layersInGraph, "pooling3 layer"));
 
     // Create a mock backend object
     MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
-    BOOST_TEST((backendObjPtr != nullptr));
+    CHECK((backendObjPtr != nullptr));
 
     // Optimize the subgraph
     OptimizationViews optimizationViews;
 
     // Check that the optimization is carried out correctly, but no optimization is performed
-    BOOST_CHECK_NO_THROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
+    CHECK_NOTHROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
 
     // =======================================================================
     // The expected results are:
@@ -651,18 +650,18 @@ void FullyUnsupporteSubgraphTestImpl2()
     // Check the substitutions
     // -----------------------
 
-    BOOST_TEST(optimizationViews.GetSubstitutions().empty());
+    CHECK(optimizationViews.GetSubstitutions().empty());
 
     // --------------------------
     // Check the failed subgraphs
     // --------------------------
 
     const OptimizationViews::Subgraphs& failedSubgraphs = optimizationViews.GetFailedSubgraphs();
-    BOOST_TEST(failedSubgraphs.size() == 1);
+    CHECK(failedSubgraphs.size() == 1);
 
-    std::vector<Layer*> expectedFailedLayers{ layersInGraph.at("pooling1 layer"),
-                                              layersInGraph.at("pooling2 layer"),
-                                              layersInGraph.at("pooling3 layer") };
+    std::list<Layer*> expectedFailedLayers{ layersInGraph.at("pooling1 layer"),
+                                            layersInGraph.at("pooling2 layer"),
+                                            layersInGraph.at("pooling3 layer") };
 
     const SubgraphView& failedSubgraph = failedSubgraphs.at(0);
 
@@ -674,15 +673,15 @@ void FullyUnsupporteSubgraphTestImpl2()
 
     const SubgraphView::Layers& failedSubgraphLayers = failedSubgraph.GetLayers();
 
-    BOOST_TEST(failedSubgraphLayers.front() + 0, expectedFailedLayers.at(0));
-    BOOST_TEST(failedSubgraphLayers.front() + 1, expectedFailedLayers.at(1));
-    BOOST_TEST(failedSubgraphLayers.front() + 2, expectedFailedLayers.at(2));
+    CHECK_EQ(failedSubgraphLayers.front() + 0, expectedFailedLayers.front() + 0);
+    CHECK_EQ(failedSubgraphLayers.front() + 1, expectedFailedLayers.front() + 1);
+    CHECK_EQ(failedSubgraphLayers.front() + 2, expectedFailedLayers.front() + 2);
 
     // -----------------------------
     // Check the untouched subgraphs
     // -----------------------------
 
-    BOOST_TEST(optimizationViews.GetUntouchedSubgraphs().empty());
+    CHECK(optimizationViews.GetUntouchedSubgraphs().empty());
 }
 
 // A simple case with only one layer (convolution) to optimize, supported by the mock backend
@@ -693,28 +692,28 @@ void FullyOptimizableSubgraphTestImpl1()
 
     // Create a fully optimizable subgraph
     SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildFullyOptimizableSubgraph1(graph, layersInGraph);
-    BOOST_TEST((subgraphPtr != nullptr));
+    CHECK((subgraphPtr != nullptr));
 
     const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
     const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
     const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
 
-    BOOST_TEST(subgraphInputSlots.size()  == 1);
-    BOOST_TEST(subgraphOutputSlots.size() == 1);
-    BOOST_TEST(subgraphLayers.size()      == 1);
+    CHECK(subgraphInputSlots.size()  == 1);
+    CHECK(subgraphOutputSlots.size() == 1);
+    CHECK(subgraphLayers.size()      == 1);
 
-    BOOST_TEST(Contains(layersInGraph, "conv layer"));
+    CHECK(Contains(layersInGraph, "conv layer"));
 
     // Create a mock backend object
     MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
-    BOOST_TEST((backendObjPtr != nullptr));
+    CHECK((backendObjPtr != nullptr));
 
     // Optimize the subgraph
     OptimizationViews optimizationViews;
 
     // Check that the optimization is carried out correctly
-    BOOST_CHECK_NO_THROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
+    CHECK_NOTHROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
 
     // ===========================================================================================
     // The expected results are:
@@ -728,7 +727,7 @@ void FullyOptimizableSubgraphTestImpl1()
     // -----------------------
 
     const OptimizationViews::Substitutions& substitutions = optimizationViews.GetSubstitutions();
-    BOOST_TEST(substitutions.size() == 1);
+    CHECK(substitutions.size() == 1);
 
     CheckSubstitution(substitutions.at(0),
                       { subgraphInputSlots.size(), subgraphOutputSlots.size(), subgraphLayers.size() },
@@ -741,13 +740,13 @@ void FullyOptimizableSubgraphTestImpl1()
     // Check the failed subgraphs
     // --------------------------
 
-    BOOST_TEST(optimizationViews.GetFailedSubgraphs().empty());
+    CHECK(optimizationViews.GetFailedSubgraphs().empty());
 
     // -----------------------------
     // Check the untouched subgraphs
     // -----------------------------
 
-    BOOST_TEST(optimizationViews.GetUntouchedSubgraphs().empty());
+    CHECK(optimizationViews.GetUntouchedSubgraphs().empty());
 }
 
 // A case with five layers (all convolutions) to optimize, all supported by the mock backend
@@ -758,32 +757,32 @@ void FullyOptimizableSubgraphTestImpl2()
 
     // Create a fully optimizable subgraph
     SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildFullyOptimizableSubgraph2(graph, layersInGraph);
-    BOOST_TEST((subgraphPtr != nullptr));
+    CHECK((subgraphPtr != nullptr));
 
     const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
     const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
     const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
 
-    BOOST_TEST(subgraphPtr->GetInputSlots().size()  == 1);
-    BOOST_TEST(subgraphPtr->GetOutputSlots().size() == 1);
-    BOOST_TEST(subgraphPtr->GetLayers().size()      == 5);
+    CHECK(subgraphPtr->GetInputSlots().size()  == 1);
+    CHECK(subgraphPtr->GetOutputSlots().size() == 1);
+    CHECK(subgraphPtr->GetLayers().size()      == 5);
 
-    BOOST_TEST(Contains(layersInGraph, "conv1 layer"));
-    BOOST_TEST(Contains(layersInGraph, "conv2 layer"));
-    BOOST_TEST(Contains(layersInGraph, "conv3 layer"));
-    BOOST_TEST(Contains(layersInGraph, "conv4 layer"));
-    BOOST_TEST(Contains(layersInGraph, "conv5 layer"));
+    CHECK(Contains(layersInGraph, "conv1 layer"));
+    CHECK(Contains(layersInGraph, "conv2 layer"));
+    CHECK(Contains(layersInGraph, "conv3 layer"));
+    CHECK(Contains(layersInGraph, "conv4 layer"));
+    CHECK(Contains(layersInGraph, "conv5 layer"));
 
     // Create a mock backend object
     MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
-    BOOST_TEST((backendObjPtr != nullptr));
+    CHECK((backendObjPtr != nullptr));
 
     // Optimize the subgraph
     OptimizationViews optimizationViews;
 
     // Check that the optimization is carried out correctly
-    BOOST_CHECK_NO_THROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
+    CHECK_NOTHROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
 
     // ===========================================================================================
     // The expected results are:
@@ -797,7 +796,7 @@ void FullyOptimizableSubgraphTestImpl2()
     // -----------------------
 
     const OptimizationViews::Substitutions& substitutions = optimizationViews.GetSubstitutions();
-    BOOST_TEST(substitutions.size() == 1);
+    CHECK(substitutions.size() == 1);
 
     std::list<Layer*> expectedSubstitutableLayers{ layersInGraph.at("conv1 layer"),
                                                    layersInGraph.at("conv2 layer"),
@@ -816,23 +815,23 @@ void FullyOptimizableSubgraphTestImpl2()
 
     const SubgraphView::Layers& substitutableSubgraphLayers = substitution.m_SubstitutableSubgraph.GetLayers();
 
-    BOOST_TEST(substitutableSubgraphLayers.front() + 0, expectedSubstitutableLayers.front() + 0);
-    BOOST_TEST(substitutableSubgraphLayers.front() + 1, expectedSubstitutableLayers.front() + 1);
-    BOOST_TEST(substitutableSubgraphLayers.front() + 2, expectedSubstitutableLayers.front() + 2);
-    BOOST_TEST(substitutableSubgraphLayers.front() + 3, expectedSubstitutableLayers.front() + 3);
-    BOOST_TEST(substitutableSubgraphLayers.front() + 4, expectedSubstitutableLayers.front() + 4);
+    CHECK_EQ(substitutableSubgraphLayers.front() + 0, expectedSubstitutableLayers.front() + 0);
+    CHECK_EQ(substitutableSubgraphLayers.front() + 1, expectedSubstitutableLayers.front() + 1);
+    CHECK_EQ(substitutableSubgraphLayers.front() + 2, expectedSubstitutableLayers.front() + 2);
+    CHECK_EQ(substitutableSubgraphLayers.front() + 3, expectedSubstitutableLayers.front() + 3);
+    CHECK_EQ(substitutableSubgraphLayers.front() + 4, expectedSubstitutableLayers.front() + 4);
 
     // --------------------------
     // Check the failed subgraphs
     // --------------------------
 
-    BOOST_TEST(optimizationViews.GetFailedSubgraphs().empty());
+    CHECK(optimizationViews.GetFailedSubgraphs().empty());
 
     // -----------------------------
     // Check the untouched subgraphs
     // -----------------------------
 
-    BOOST_TEST(optimizationViews.GetUntouchedSubgraphs().empty());
+    CHECK(optimizationViews.GetUntouchedSubgraphs().empty());
 }
 
 // The input subgraph contaions both supported and unsupported layers
@@ -844,32 +843,32 @@ void PartiallySupportedSubgraphTestImpl()
 
     // Create a fully optimizable subgraph
     SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildPartiallySupportedSubgraph(graph, layersInGraph);
-    BOOST_TEST((subgraphPtr != nullptr));
+    CHECK((subgraphPtr != nullptr));
 
     const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
     const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
     const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
 
-    BOOST_TEST(subgraphInputSlots.size()  == 1);
-    BOOST_TEST(subgraphOutputSlots.size() == 1);
-    BOOST_TEST(subgraphLayers.size()      == 5);
+    CHECK(subgraphInputSlots.size()  == 1);
+    CHECK(subgraphOutputSlots.size() == 1);
+    CHECK(subgraphLayers.size()      == 5);
 
-    BOOST_TEST(Contains(layersInGraph, "conv1 layer"));
-    BOOST_TEST(Contains(layersInGraph, "pooling1 layer"));
-    BOOST_TEST(Contains(layersInGraph, "pooling2 layer"));
-    BOOST_TEST(Contains(layersInGraph, "conv2 layer"));
-    BOOST_TEST(Contains(layersInGraph, "pooling3 layer"));
+    CHECK(Contains(layersInGraph, "conv1 layer"));
+    CHECK(Contains(layersInGraph, "pooling1 layer"));
+    CHECK(Contains(layersInGraph, "pooling2 layer"));
+    CHECK(Contains(layersInGraph, "conv2 layer"));
+    CHECK(Contains(layersInGraph, "pooling3 layer"));
 
     // Create a mock backend object
     MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
-    BOOST_TEST((backendObjPtr != nullptr));
+    CHECK((backendObjPtr != nullptr));
 
     // Optimize the subgraph
     OptimizationViews optimizationViews;
 
     // Check that the optimization is carried out correctly
-    BOOST_CHECK_NO_THROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
+    CHECK_NOTHROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
 
     // ========================================================================
     // The expected results are:
@@ -883,7 +882,7 @@ void PartiallySupportedSubgraphTestImpl()
     // -----------------------
 
     OptimizationViews::Substitutions substitutions = optimizationViews.GetSubstitutions();
-    BOOST_TEST(substitutions.size() == 2);
+    CHECK(substitutions.size() == 2);
     // Sort into a consistent order
     std::sort(substitutions.begin(), substitutions.end(), [](auto s1, auto s2) {
         return strcmp(s1.m_SubstitutableSubgraph.GetLayers().front()->GetName(),
@@ -925,7 +924,7 @@ void PartiallySupportedSubgraphTestImpl()
     // --------------------------
 
     OptimizationViews::Subgraphs failedSubgraphs = optimizationViews.GetFailedSubgraphs();
-    BOOST_TEST(failedSubgraphs.size() == 2);
+    CHECK(failedSubgraphs.size() == 2);
     // Sort into a consistent order
     std::sort(failedSubgraphs.begin(), failedSubgraphs.end(), [](auto s1, auto s2) {
         return strcmp(s1.GetLayers().front()->GetName(), s2.GetLayers().front()->GetName()) < 0;
@@ -963,7 +962,7 @@ void PartiallySupportedSubgraphTestImpl()
     // Check the untouched subgraphs
     // -----------------------------
 
-    BOOST_TEST(optimizationViews.GetUntouchedSubgraphs().empty());
+    CHECK(optimizationViews.GetUntouchedSubgraphs().empty());
 }
 
 // The input subgraph contains only unoptimizable layers ("unoptimizable" is added to the layer's name)
@@ -974,28 +973,28 @@ void FullyUnoptimizableSubgraphTestImpl1()
 
     // Create a fully optimizable subgraph
     SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildFullyUnoptimizableSubgraph1(graph, layersInGraph);
-    BOOST_TEST((subgraphPtr != nullptr));
+    CHECK((subgraphPtr != nullptr));
 
     const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
     const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
     const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
 
-    BOOST_TEST(subgraphInputSlots.size()  == 1);
-    BOOST_TEST(subgraphOutputSlots.size() == 1);
-    BOOST_TEST(subgraphLayers.size()      == 1);
+    CHECK(subgraphInputSlots.size()  == 1);
+    CHECK(subgraphOutputSlots.size() == 1);
+    CHECK(subgraphLayers.size()      == 1);
 
-    BOOST_TEST(Contains(layersInGraph, "conv layer unoptimizable"));
+    CHECK(Contains(layersInGraph, "conv layer unoptimizable"));
 
     // Create a mock backend object
     MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
-    BOOST_TEST((backendObjPtr != nullptr));
+    CHECK((backendObjPtr != nullptr));
 
     // Optimize the subgraph
     OptimizationViews optimizationViews;
 
     // Check that the optimization is carried out correctly
-    BOOST_CHECK_NO_THROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
+    CHECK_NOTHROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
 
     // ============================================================================
     // The expected results are:
@@ -1008,20 +1007,20 @@ void FullyUnoptimizableSubgraphTestImpl1()
     // Check the substitutions
     // -----------------------
 
-    BOOST_TEST(optimizationViews.GetSubstitutions().empty());
+    CHECK(optimizationViews.GetSubstitutions().empty());
 
     // --------------------------
     // Check the failed subgraphs
     // --------------------------
 
-    BOOST_TEST(optimizationViews.GetFailedSubgraphs().empty());
+    CHECK(optimizationViews.GetFailedSubgraphs().empty());
 
     // -----------------------------
     // Check the untouched subgraphs
     // -----------------------------
 
     const OptimizationViews::Subgraphs& untouchedSubgraphs = optimizationViews.GetUntouchedSubgraphs();
-    BOOST_TEST(untouchedSubgraphs.size() == 1);
+    CHECK(untouchedSubgraphs.size() == 1);
 
     CheckUntouchedSubgraph(untouchedSubgraphs.at(0),
                            { subgraphInputSlots.size(), subgraphOutputSlots.size(), subgraphLayers.size() },
@@ -1038,32 +1037,32 @@ void PartiallyOptimizableSubgraphTestImpl1()
 
     // Create a fully optimizable subgraph
     SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildPartiallyOptimizableSubgraph1(graph, layersInGraph);
-    BOOST_TEST((subgraphPtr != nullptr));
+    CHECK((subgraphPtr != nullptr));
 
     const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
     const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
     const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
 
-    BOOST_TEST(subgraphInputSlots.size()  == 1);
-    BOOST_TEST(subgraphOutputSlots.size() == 1);
-    BOOST_TEST(subgraphLayers.size()      == 5);
+    CHECK(subgraphInputSlots.size()  == 1);
+    CHECK(subgraphOutputSlots.size() == 1);
+    CHECK(subgraphLayers.size()      == 5);
 
-    BOOST_TEST(Contains(layersInGraph, "conv1 layer"));
-    BOOST_TEST(Contains(layersInGraph, "conv2 layer unoptimizable"));
-    BOOST_TEST(Contains(layersInGraph, "conv3 layer"));
-    BOOST_TEST(Contains(layersInGraph, "conv4 layer unoptimizable"));
-    BOOST_TEST(Contains(layersInGraph, "conv5 layer"));
+    CHECK(Contains(layersInGraph, "conv1 layer"));
+    CHECK(Contains(layersInGraph, "conv2 layer unoptimizable"));
+    CHECK(Contains(layersInGraph, "conv3 layer"));
+    CHECK(Contains(layersInGraph, "conv4 layer unoptimizable"));
+    CHECK(Contains(layersInGraph, "conv5 layer"));
 
     // Create a mock backend object
     MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
-    BOOST_TEST((backendObjPtr != nullptr));
+    CHECK((backendObjPtr != nullptr));
 
     // Optimize the subgraph
     OptimizationViews optimizationViews;
 
     // Check that the optimization is carried out correctly
-    BOOST_CHECK_NO_THROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
+    CHECK_NOTHROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
 
     // ===============================================================================
     // The expected results are:
@@ -1077,7 +1076,7 @@ void PartiallyOptimizableSubgraphTestImpl1()
     // -----------------------
 
     OptimizationViews::Substitutions substitutions = optimizationViews.GetSubstitutions();
-    BOOST_TEST(substitutions.size() == 3);
+    CHECK(substitutions.size() == 3);
     // Sort into a consistent order
     std::sort(substitutions.begin(), substitutions.end(),
         [](auto s1, auto s2) { return strcmp(s1.m_SubstitutableSubgraph.GetLayers().front()->GetName(),
@@ -1122,14 +1121,14 @@ void PartiallyOptimizableSubgraphTestImpl1()
     // Check the failed subgraphs
     // --------------------------
 
-    BOOST_TEST(optimizationViews.GetFailedSubgraphs().empty());
+    CHECK(optimizationViews.GetFailedSubgraphs().empty());
 
     // -----------------------------
     // Check the untouched subgraphs
     // -----------------------------
 
     OptimizationViews::Subgraphs untouchedSubgraphs = optimizationViews.GetUntouchedSubgraphs();
-    BOOST_TEST(untouchedSubgraphs.size() == 2);
+    CHECK(untouchedSubgraphs.size() == 2);
     // Sort into a consistent order
     std::sort(untouchedSubgraphs.begin(), untouchedSubgraphs.end(), [](auto s1, auto s2) {
         return strcmp(s1.GetLayers().front()->GetName(), s2.GetLayers().front()->GetName()) < 0;
@@ -1172,31 +1171,31 @@ void PartiallyOptimizableSubgraphTestImpl2()
 
     // Create a partially optimizable subgraph
     SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildPartiallyOptimizableSubgraph2(graph, layersInGraph);
-    BOOST_TEST((subgraphPtr != nullptr));
+    CHECK((subgraphPtr != nullptr));
 
     const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
     const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
     const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
 
-    BOOST_TEST(subgraphInputSlots.size()  == 2);
-    BOOST_TEST(subgraphOutputSlots.size() == 1);
-    BOOST_TEST(subgraphLayers.size()      == 4);
+    CHECK(subgraphInputSlots.size()  == 2);
+    CHECK(subgraphOutputSlots.size() == 1);
+    CHECK(subgraphLayers.size()      == 4);
 
-    BOOST_TEST(Contains(layersInGraph, "conv1 layer"));
-    BOOST_TEST(Contains(layersInGraph, "conv2 layer unoptimizable"));
-    BOOST_TEST(Contains(layersInGraph, "conv3 layer"));
-    BOOST_TEST(Contains(layersInGraph, "add layer"));
+    CHECK(Contains(layersInGraph, "conv1 layer"));
+    CHECK(Contains(layersInGraph, "conv2 layer unoptimizable"));
+    CHECK(Contains(layersInGraph, "conv3 layer"));
+    CHECK(Contains(layersInGraph, "add layer"));
 
     // Create a mock backend object
     MockBackendInitialiser initialiser; // Register the Mock Backend
     auto backendObjPtr = CreateBackendObject(MockBackendId());
-    BOOST_TEST((backendObjPtr != nullptr));
+    CHECK((backendObjPtr != nullptr));
 
     // Optimize the subgraph
     OptimizationViews optimizationViews;
 
     // Check that the optimization is carried out correctly
-    BOOST_CHECK_NO_THROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
+    CHECK_NOTHROW(optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraphPtr));
 
     // ==============================================================================
     // The expected results are:
@@ -1210,7 +1209,7 @@ void PartiallyOptimizableSubgraphTestImpl2()
     // -----------------------
 
     const OptimizationViews::Substitutions& substitutions = optimizationViews.GetSubstitutions();
-    BOOST_TEST(substitutions.size() == 1);
+    CHECK(substitutions.size() == 1);
 
     ExpectedSubgraphSize expectedSubstitutableSubgraphSizes{ 2, 1, 3 };
     ExpectedSubgraphSize expectedReplacementSubgraphSizes{ 2, 1, 1 };
@@ -1241,14 +1240,14 @@ void PartiallyOptimizableSubgraphTestImpl2()
     // Check the failed subgraphs
     // --------------------------
 
-    BOOST_TEST(optimizationViews.GetFailedSubgraphs().empty());
+    CHECK(optimizationViews.GetFailedSubgraphs().empty());
 
     // -----------------------------
     // Check the untouched subgraphs
     // -----------------------------
 
     const OptimizationViews::Subgraphs& untouchedSubgraphs = optimizationViews.GetUntouchedSubgraphs();
-    BOOST_TEST(untouchedSubgraphs.size() == 1);
+    CHECK(untouchedSubgraphs.size() == 1);
 
     std::vector<ExpectedSubgraphSize> expectedUntouchedSubgraphSizes{ { 1, 1, 1 } };
     std::vector<SubgraphView::InputSlots> expectedUntouchedInputSlots
@@ -1276,15 +1275,15 @@ void PartiallyOptimizableSubgraphTestImpl2()
 
 } // Anonymous namespace
 
-BOOST_AUTO_TEST_SUITE(OptimizeSubGraph)
+TEST_SUITE("OptimizeSubGraph")
+{
+TEST_CASE("FullyUnsupportedSubgraph1")     { FullyUnsupporteSubgraphTestImpl1();      }
+TEST_CASE("FullyUnsupportedSubgraph2")     { FullyUnsupporteSubgraphTestImpl2();      }
+TEST_CASE("FullyOptimizableSubgraph1")     { FullyOptimizableSubgraphTestImpl1();     }
+TEST_CASE("FullyOptimizableSubgraph2")     { FullyOptimizableSubgraphTestImpl2();     }
+TEST_CASE("PartiallySupportedSubgraph")    { PartiallySupportedSubgraphTestImpl();    }
+TEST_CASE("FullyUnoptimizableSubgraph")    { FullyUnoptimizableSubgraphTestImpl1();   }
+TEST_CASE("PartiallyOptimizableSubgraph1") { PartiallyOptimizableSubgraphTestImpl1(); }
+TEST_CASE("PartiallyOptimizableSubgraph2") { PartiallyOptimizableSubgraphTestImpl2(); }
 
-BOOST_AUTO_TEST_CASE(FullyUnsupportedSubgraph1)     { FullyUnsupporteSubgraphTestImpl1();      }
-BOOST_AUTO_TEST_CASE(FullyUnsupportedSubgraph2)     { FullyUnsupporteSubgraphTestImpl2();      }
-BOOST_AUTO_TEST_CASE(FullyOptimizableSubgraph1)     { FullyOptimizableSubgraphTestImpl1();     }
-BOOST_AUTO_TEST_CASE(FullyOptimizableSubgraph2)     { FullyOptimizableSubgraphTestImpl2();     }
-BOOST_AUTO_TEST_CASE(PartiallySupportedSubgraph)    { PartiallySupportedSubgraphTestImpl();    }
-BOOST_AUTO_TEST_CASE(FullyUnoptimizableSubgraph)    { FullyUnoptimizableSubgraphTestImpl1();   }
-BOOST_AUTO_TEST_CASE(PartiallyOptimizableSubgraph1) { PartiallyOptimizableSubgraphTestImpl1(); }
-BOOST_AUTO_TEST_CASE(PartiallyOptimizableSubgraph2) { PartiallyOptimizableSubgraphTestImpl2(); }
-
-BOOST_AUTO_TEST_SUITE_END()
+}

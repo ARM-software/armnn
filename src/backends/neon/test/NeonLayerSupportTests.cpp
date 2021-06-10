@@ -14,132 +14,132 @@
 #include <backendsCommon/test/IsLayerSupportedTestImpl.hpp>
 #include <backendsCommon/test/LayerTests.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(NeonLayerSupport)
-
-BOOST_AUTO_TEST_CASE(IsLayerSupportedFloat16Neon)
+TEST_SUITE("NeonLayerSupport")
+{
+TEST_CASE("IsLayerSupportedFloat16Neon")
 {
     armnn::NeonWorkloadFactory factory =
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
     IsLayerSupportedTests<armnn::NeonWorkloadFactory, armnn::DataType::Float16>(&factory);
 }
 
-BOOST_AUTO_TEST_CASE(IsLayerSupportedFloat32Neon)
+TEST_CASE("IsLayerSupportedFloat32Neon")
 {
     armnn::NeonWorkloadFactory factory =
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
     IsLayerSupportedTests<armnn::NeonWorkloadFactory, armnn::DataType::Float32>(&factory);
 }
 
-BOOST_AUTO_TEST_CASE(IsLayerSupportedQAsymmU8Neon)
+TEST_CASE("IsLayerSupportedQAsymmU8Neon")
 {
     armnn::NeonWorkloadFactory factory =
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
     IsLayerSupportedTests<armnn::NeonWorkloadFactory, armnn::DataType::QAsymmU8>(&factory);
 }
 
-BOOST_AUTO_TEST_CASE(IsLayerSupportedQAsymmS8Neon)
+TEST_CASE("IsLayerSupportedQAsymmS8Neon")
 {
     armnn::NeonWorkloadFactory factory =
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
     IsLayerSupportedTests<armnn::NeonWorkloadFactory, armnn::DataType::QAsymmS8>(&factory);
 }
 
-BOOST_AUTO_TEST_CASE(IsLayerSupportedQSymmS8Neon)
+TEST_CASE("IsLayerSupportedQSymmS8Neon")
 {
     armnn::NeonWorkloadFactory factory =
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
     IsLayerSupportedTests<armnn::NeonWorkloadFactory, armnn::DataType::QSymmS8>(&factory);
 }
 
-BOOST_AUTO_TEST_CASE(IsConvertFp16ToFp32SupportedNeon)
+TEST_CASE("IsConvertFp16ToFp32SupportedNeon")
 {
     std::string reasonIfUnsupported;
 
     bool result = IsConvertLayerSupportedTests<armnn::NeonWorkloadFactory, armnn::ConvertFp16ToFp32Layer,
       armnn::DataType::Float16, armnn::DataType::Float32>(reasonIfUnsupported);
 
-    BOOST_CHECK(result);
+    CHECK(result);
 }
 
-BOOST_AUTO_TEST_CASE(IsConvertFp32ToFp16SupportedNeon)
+TEST_CASE("IsConvertFp32ToFp16SupportedNeon")
 {
     std::string reasonIfUnsupported;
 
     bool result = IsConvertLayerSupportedTests<armnn::NeonWorkloadFactory, armnn::ConvertFp32ToFp16Layer,
       armnn::DataType::Float32, armnn::DataType::Float16>(reasonIfUnsupported);
 
-    BOOST_CHECK(result);
+    CHECK(result);
 }
 
-BOOST_AUTO_TEST_CASE(IsLogicalBinarySupportedNeon)
+TEST_CASE("IsLogicalBinarySupportedNeon")
 {
     std::string reasonIfUnsupported;
 
     bool result = IsLogicalBinaryLayerSupportedTests<armnn::NeonWorkloadFactory,
       armnn::DataType::Boolean, armnn::DataType::Boolean>(reasonIfUnsupported);
 
-    BOOST_CHECK(result);
+    CHECK(result);
 }
 
-BOOST_AUTO_TEST_CASE(IsLogicalBinaryBroadcastSupportedNeon)
+TEST_CASE("IsLogicalBinaryBroadcastSupportedNeon")
 {
     std::string reasonIfUnsupported;
 
     bool result = IsLogicalBinaryLayerBroadcastSupportedTests<armnn::NeonWorkloadFactory,
       armnn::DataType::Boolean, armnn::DataType::Boolean>(reasonIfUnsupported);
 
-    BOOST_CHECK(result);
+    CHECK(result);
 }
 
-BOOST_AUTO_TEST_CASE(IsMeanSupportedNeon)
+TEST_CASE("IsMeanSupportedNeon")
 {
     std::string reasonIfUnsupported;
 
     bool result = IsMeanLayerSupportedTests<armnn::NeonWorkloadFactory,
       armnn::DataType::Float32, armnn::DataType::Float32>(reasonIfUnsupported);
 
-    BOOST_CHECK(result);
+    CHECK(result);
 }
 
-BOOST_AUTO_TEST_CASE(IsConstantSupportedNeon)
+TEST_CASE("IsConstantSupportedNeon")
 {
     std::string reasonIfUnsupported;
 
     bool result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
             armnn::DataType::Float16>(reasonIfUnsupported);
-    BOOST_CHECK(result);
+    CHECK(result);
 
     result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
             armnn::DataType::Float32>(reasonIfUnsupported);
-    BOOST_CHECK(result);
+    CHECK(result);
 
     result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
             armnn::DataType::QAsymmU8>(reasonIfUnsupported);
-    BOOST_CHECK(result);
+    CHECK(result);
 
     result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
             armnn::DataType::Boolean>(reasonIfUnsupported);
-    BOOST_CHECK(!result);
+    CHECK(!result);
 
     result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
             armnn::DataType::QSymmS16>(reasonIfUnsupported);
-    BOOST_CHECK(result);
+    CHECK(result);
 
     result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
             armnn::DataType::QSymmS8>(reasonIfUnsupported);
-    BOOST_CHECK(result);
+    CHECK(result);
 
     result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
             armnn::DataType::QAsymmS8>(reasonIfUnsupported);
-    BOOST_CHECK(result);
+    CHECK(result);
 
     result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
             armnn::DataType::BFloat16>(reasonIfUnsupported);
-    BOOST_CHECK(result);
+    CHECK(result);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

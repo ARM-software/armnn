@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_Gather")
+{
 struct GatherFixture : public ParserFlatbuffersFixture
 {
     explicit GatherFixture(const std::string& paramsShape,
@@ -95,7 +94,7 @@ struct SimpleGatherFixture : public GatherFixture
     SimpleGatherFixture() : GatherFixture("[ 5, 2 ]", "[ 3, 2 ]", "[ 3 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseGather, SimpleGatherFixture)
+TEST_CASE_FIXTURE(SimpleGatherFixture, "ParseGather")
 {
     RunTest<2, armnn::DataType::Float32, armnn::DataType::Signed32, armnn::DataType::Float32>
         (0,
@@ -109,7 +108,7 @@ struct GatherUint8Fixture : public GatherFixture
     GatherUint8Fixture() : GatherFixture("[ 8 ]", "[ 3 ]", "[ 3 ]", "UINT8") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseGatherUint8, GatherUint8Fixture)
+TEST_CASE_FIXTURE(GatherUint8Fixture, "ParseGatherUint8")
 {
     RunTest<1, armnn::DataType::QAsymmU8, armnn::DataType::Signed32, armnn::DataType::QAsymmU8>
         (0,
@@ -118,4 +117,4 @@ BOOST_FIXTURE_TEST_CASE(ParseGatherUint8, GatherUint8Fixture)
          {{ "outputTensor", { 8, 7, 6 }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

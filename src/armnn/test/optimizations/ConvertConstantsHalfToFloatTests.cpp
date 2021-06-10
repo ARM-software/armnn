@@ -7,12 +7,13 @@
 
 #include <Optimizer.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(Optimizer)
+TEST_SUITE("Optimizer")
+{
 using namespace armnn::optimizations;
 
-BOOST_AUTO_TEST_CASE(ConvertConstantsHalfToFloatTest)
+TEST_CASE("ConvertConstantsHalfToFloatTest")
 {
     armnn::Graph graph;
 
@@ -41,20 +42,20 @@ BOOST_AUTO_TEST_CASE(ConvertConstantsHalfToFloatTest)
     fc->GetOutputSlot().Connect(output->GetInputSlot(0));
 
     //Test the tensor info is correct.
-    BOOST_CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::Float16);
+    CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::Float16);
 
     // Run the optimizer
     armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(ConvertConstantsHalfToFloat()));
 
     //Test the tensor info is correct.
-    BOOST_CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::Float32);
+    CHECK(fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::Float32);
 
     // Now test the data matches float32 data
     const float* data = fc->m_Weight->GetConstTensor<float>();
-    BOOST_CHECK(1.0f == data[0]);
-    BOOST_CHECK(2.0f == data[1]);
-    BOOST_CHECK(3.0f == data[2]);
-    BOOST_CHECK(4.0f == data[3]);
+    CHECK(1.0f == data[0]);
+    CHECK(2.0f == data[1]);
+    CHECK(3.0f == data[2]);
+    CHECK(4.0f == data[3]);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_L2Normalization")
+{
 struct L2NormalizationFixture : public ParserFlatbuffersFixture
 {
     explicit L2NormalizationFixture(const std::string & inputOutputShape)
@@ -82,7 +81,7 @@ struct L2NormalizationFixture4D : L2NormalizationFixture
     L2NormalizationFixture4D() : L2NormalizationFixture("[ 1, 1, 4, 3 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseL2Normalization4D, L2NormalizationFixture4D)
+TEST_CASE_FIXTURE(L2NormalizationFixture4D, "ParseL2Normalization4D")
 {
   RunTest<4, armnn::DataType::Float32>(
       0,
@@ -113,7 +112,7 @@ struct L2NormalizationSimpleFixture4D : L2NormalizationFixture
     L2NormalizationSimpleFixture4D() : L2NormalizationFixture("[ 1, 1, 1, 4 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseL2NormalizationEps4D, L2NormalizationSimpleFixture4D)
+TEST_CASE_FIXTURE(L2NormalizationSimpleFixture4D, "ParseL2NormalizationEps4D")
 {
       RunTest<4, armnn::DataType::Float32>(
       0,
@@ -125,4 +124,4 @@ BOOST_FIXTURE_TEST_CASE(ParseL2NormalizationEps4D, L2NormalizationSimpleFixture4
                           0.00000004f / CalcL2Norm({ 0.00000001f, 0.00000002f, 0.00000003f, 0.00000004f }) }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

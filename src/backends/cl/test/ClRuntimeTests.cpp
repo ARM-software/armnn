@@ -11,15 +11,15 @@
 #include <test/ProfilingTestUtils.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #ifdef WITH_VALGRIND
 #include <valgrind/memcheck.h>
 #endif
 
-BOOST_AUTO_TEST_SUITE(ClRuntime)
-
-BOOST_AUTO_TEST_CASE(RuntimeValidateGpuDeviceSupportLayerNoFallback)
+TEST_SUITE("ClRuntime")
+{
+TEST_CASE("RuntimeValidateGpuDeviceSupportLayerNoFallback")
 {
     // build up the structure of the network
     armnn::INetworkPtr net(armnn::INetwork::Create());
@@ -35,17 +35,17 @@ BOOST_AUTO_TEST_CASE(RuntimeValidateGpuDeviceSupportLayerNoFallback)
 
     std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
-    BOOST_CHECK(optNet);
+    CHECK(optNet);
 
     // Load it into the runtime. It should success.
     armnn::NetworkId netId;
-    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == armnn::Status::Success);
+    CHECK(runtime->LoadNetwork(netId, std::move(optNet)) == armnn::Status::Success);
 }
 
 #ifdef ARMNN_LEAK_CHECKING_ENABLED
-BOOST_AUTO_TEST_CASE(RuntimeMemoryLeaksGpuAcc)
+TEST_CASE("RuntimeMemoryLeaksGpuAcc")
 {
-    BOOST_TEST(ARMNN_LEAK_CHECKER_IS_ACTIVE());
+    CHECK(ARMNN_LEAK_CHECKER_IS_ACTIVE());
     armnn::IRuntime::CreationOptions options;
     armnn::RuntimeImpl runtime(options);
     armnn::RuntimeLoadedNetworksReserve(&runtime);
@@ -59,21 +59,21 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryLeaksGpuAcc)
 
     {
         ARMNN_SCOPED_LEAK_CHECKER("LoadAndUnloadNetworkGpuAcc");
-        BOOST_TEST(ARMNN_NO_LEAKS_IN_SCOPE());
+        CHECK(ARMNN_NO_LEAKS_IN_SCOPE());
         // In the second run we check for all remaining memory
         // in use after the network was unloaded. If there is any
         // then it will be treated as a memory leak.
         CreateAndDropDummyNetwork(backends, runtime);
-        BOOST_TEST(ARMNN_NO_LEAKS_IN_SCOPE());
-        BOOST_TEST(ARMNN_BYTES_LEAKED_IN_SCOPE() == 0);
-        BOOST_TEST(ARMNN_OBJECTS_LEAKED_IN_SCOPE() == 0);
+        CHECK(ARMNN_NO_LEAKS_IN_SCOPE());
+        CHECK(ARMNN_BYTES_LEAKED_IN_SCOPE() == 0);
+        CHECK(ARMNN_OBJECTS_LEAKED_IN_SCOPE() == 0);
     }
 }
 #endif
 
 // Note: this part of the code is due to be removed when we fully trust the gperftools based results.
 #if defined(WITH_VALGRIND)
-BOOST_AUTO_TEST_CASE(RuntimeMemoryUsage)
+TEST_CASE("RuntimeMemoryUsage")
 {
     // From documentation:
 
@@ -135,12 +135,12 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryUsage)
     VALGRIND_COUNT_LEAKS(leakedAfter, dubious, reachableAfter, suppressed);
 
     // If we're not running under Valgrind, these vars will have been initialised to 0, so this will always pass.
-    BOOST_TEST(leakedBefore == leakedAfter);
+    CHECK(leakedBefore == leakedAfter);
 
     // Add resonable threshold after and before running valgrind with the ACL clear cache function.
     // TODO Threshold set to 80k until the root cause of the memory leakage is found and fixed. Revert threshold
     // value to 1024 when fixed.
-    BOOST_TEST(static_cast<long>(reachableAfter) - static_cast<long>(reachableBefore) < 81920);
+    CHECK(static_cast<long>(reachableAfter) - static_cast<long>(reachableBefore) < 81920);
 
     // These are needed because VALGRIND_COUNT_LEAKS is a macro that assigns to the parameters
     // so they are assigned to, but still considered unused, causing a warning.
@@ -149,9 +149,9 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryUsage)
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(ProfilingPostOptimisationStructureGpuAcc)
+TEST_CASE("ProfilingPostOptimisationStructureGpuAcc")
 {
     VerifyPostOptimisationStructureTestImpl(armnn::Compute::GpuAcc);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

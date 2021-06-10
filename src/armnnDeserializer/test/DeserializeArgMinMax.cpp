@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include "../Deserializer.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(DeserializeParser)
-
+TEST_SUITE("DeserializeParser_ArgMinMax")
+{
 struct ArgMinMaxFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit ArgMinMaxFixture(const std::string& inputShape,
@@ -123,7 +122,7 @@ struct SimpleArgMinMaxFixture : public ArgMinMaxFixture
                                                 "Max") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ArgMinMax, SimpleArgMinMaxFixture)
+TEST_CASE_FIXTURE(SimpleArgMinMaxFixture, "ArgMinMax")
 {
     RunTest<3, armnn::DataType::Float32, armnn::DataType::Signed64>(
             0,
@@ -131,4 +130,4 @@ BOOST_FIXTURE_TEST_CASE(ArgMinMax, SimpleArgMinMaxFixture)
             {{"OutputLayer",{ 3l }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

@@ -3,12 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "armnnOnnxParser/IOnnxParser.hpp"
 #include "ParserPrototxtFixture.hpp"
 
-BOOST_AUTO_TEST_SUITE(OnnxParser)
-
+TEST_SUITE("OnnxParser_Clip")
+{
 struct ClipMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser::IOnnxParser>
 {
     ClipMainFixture(std::string min, std::string max)
@@ -68,7 +67,7 @@ struct ClipFixture : ClipMainFixture
     ClipFixture() : ClipMainFixture("2", "3.5") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ValidClipTest, ClipFixture)
+TEST_CASE_FIXTURE(ClipFixture, "ValidClipTest")
 {
     RunTest<1>({{"Input",  { -1.5f, 1.25f, 3.5f, 8.0, 2.5}}},
                {{ "Output", { 2.0f, 2.0f, 3.5f, 3.5, 2.5}}});
@@ -79,7 +78,7 @@ struct ClipNoMaxInputFixture : ClipMainFixture
     ClipNoMaxInputFixture() : ClipMainFixture("0", std::string()) {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ValidNoMaxInputClipTest, ClipNoMaxInputFixture)
+TEST_CASE_FIXTURE(ClipNoMaxInputFixture, "ValidNoMaxInputClipTest")
 {
     RunTest<1>({{"Input",  { -1.5f, -5.25f, -0.5f, 8.0f, std::numeric_limits<float>::max() }}},
                {{ "Output", { 0.0f, 0.0f, 0.0f, 8.0f, std::numeric_limits<float>::max() }}});
@@ -90,7 +89,7 @@ struct ClipNoMinInputFixture : ClipMainFixture
     ClipNoMinInputFixture() : ClipMainFixture(std::string(), "6") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ValidNoMinInputClipTest, ClipNoMinInputFixture)
+TEST_CASE_FIXTURE(ClipNoMinInputFixture, "ValidNoMinInputClipTest")
 {
     RunTest<1>({{"Input",   { std::numeric_limits<float>::lowest(), -5.25f, -0.5f, 8.0f, 200.0f }}},
                {{ "Output", { std::numeric_limits<float>::lowest(), -5.25f, -0.5f, 6.0f, 6.0f }}});
@@ -101,7 +100,7 @@ struct ClipNoInputFixture : ClipMainFixture
     ClipNoInputFixture() : ClipMainFixture(std::string(), std::string()) {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ValidNoInputClipTest, ClipNoInputFixture)
+TEST_CASE_FIXTURE(ClipNoInputFixture, "ValidNoInputClipTest")
 {
     RunTest<1>({{"Input",   { std::numeric_limits<float>::lowest(), -1.25f, 3.5f, 8.0f,
                               std::numeric_limits<float>::max()}}},
@@ -109,4 +108,4 @@ BOOST_FIXTURE_TEST_CASE(ValidNoInputClipTest, ClipNoInputFixture)
                               std::numeric_limits<float>::max()}}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

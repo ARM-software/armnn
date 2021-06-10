@@ -22,14 +22,14 @@
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(NeonEndToEnd)
-
-std::vector<armnn::BackendId> defaultBackends = {armnn::Compute::CpuAcc};
+TEST_SUITE("NeonEndToEnd")
+{
+std::vector<armnn::BackendId> neonDefaultBackends = {armnn::Compute::CpuAcc};
 
 // Abs
-BOOST_AUTO_TEST_CASE(NeonAbsEndToEndTestFloat32)
+TEST_CASE("NeonAbsEndToEndTestFloat32")
 {
     std::vector<float> expectedOutput =
     {
@@ -37,22 +37,22 @@ BOOST_AUTO_TEST_CASE(NeonAbsEndToEndTestFloat32)
         3.f, 3.f, 3.f, 3.f, 4.f, 4.f, 4.f, 4.f
     };
 
-    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends,
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(neonDefaultBackends,
                                                              UnaryOperation::Abs,
                                                              expectedOutput);
 }
 
 // Constant
-BOOST_AUTO_TEST_CASE(ConstantUsage_Neon_Float32)
+TEST_CASE("ConstantUsage_Neon_Float32")
 {
-    BOOST_TEST(ConstantUsageFloat32Test(defaultBackends));
+    CHECK(ConstantUsageFloat32Test(neonDefaultBackends));
 }
 
 #if defined(ARMNNREF_ENABLED)
 
 // This test unit needs the reference backend, it's not available if the reference backend is not built
 
-BOOST_AUTO_TEST_CASE(FallbackToCpuRef)
+TEST_CASE("FallbackToCpuRef")
 {
     using namespace armnn;
 
@@ -83,519 +83,523 @@ BOOST_AUTO_TEST_CASE(FallbackToCpuRef)
 
     // Load it into the runtime. It should pass.
     NetworkId netId;
-    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
+    CHECK(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
 }
 
 #endif
 
-BOOST_AUTO_TEST_CASE(NeonGreaterSimpleEndToEndTest)
+TEST_CASE("NeonGreaterSimpleEndToEndTest")
 {
     const std::vector<uint8_t> expectedOutput({ 0, 0, 0, 0,  1, 1, 1, 1,
                                                 0, 0, 0, 0,  0, 0, 0, 0 });
 
-    ComparisonSimpleEndToEnd<armnn::DataType::Float32>(defaultBackends,
+    ComparisonSimpleEndToEnd<armnn::DataType::Float32>(neonDefaultBackends,
                                                        ComparisonOperation::Greater,
                                                        expectedOutput);
 }
 
-BOOST_AUTO_TEST_CASE(NeonGreaterSimpleEndToEndUint8Test)
+TEST_CASE("NeonGreaterSimpleEndToEndUint8Test")
 {
     const std::vector<uint8_t> expectedOutput({ 0, 0, 0, 0,  1, 1, 1, 1,
                                                 0, 0, 0, 0,  0, 0, 0, 0 });
 
-    ComparisonSimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends,
+    ComparisonSimpleEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends,
                                                                ComparisonOperation::Greater,
                                                                expectedOutput);
 }
 
-BOOST_AUTO_TEST_CASE(NeonGreaterBroadcastEndToEndTest)
+TEST_CASE("NeonGreaterBroadcastEndToEndTest")
 {
     const std::vector<uint8_t> expectedOutput({ 0, 1, 0, 0, 0, 1,
                                                 1, 1, 1, 1, 1, 1 });
 
-    ComparisonBroadcastEndToEnd<armnn::DataType::Float32>(defaultBackends,
+    ComparisonBroadcastEndToEnd<armnn::DataType::Float32>(neonDefaultBackends,
                                                           ComparisonOperation::Greater,
                                                           expectedOutput);
 }
 
-BOOST_AUTO_TEST_CASE(NeonGreaterBroadcastEndToEndUint8Test)
+TEST_CASE("NeonGreaterBroadcastEndToEndUint8Test")
 {
     const std::vector<uint8_t> expectedOutput({ 0, 1, 0, 0, 0, 1,
                                                 1, 1, 1, 1, 1, 1 });
 
-    ComparisonBroadcastEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends,
+    ComparisonBroadcastEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends,
                                                                   ComparisonOperation::Greater,
                                                                   expectedOutput);
 }
 
-BOOST_AUTO_TEST_CASE(NeonConcatEndToEndDim0Test)
+TEST_CASE("NeonConcatEndToEndDim0Test")
 {
-    ConcatDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ConcatDim0EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonConcatEndToEndDim0Uint8Test)
+TEST_CASE("NeonConcatEndToEndDim0Uint8Test")
 {
-    ConcatDim0EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    ConcatDim0EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonConcatEndToEndDim1Test)
+TEST_CASE("NeonConcatEndToEndDim1Test")
 {
-    ConcatDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ConcatDim1EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonConcatEndToEndDim1Uint8Test)
+TEST_CASE("NeonConcatEndToEndDim1Uint8Test")
 {
-    ConcatDim1EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    ConcatDim1EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonConcatEndToEndDim3Test)
+TEST_CASE("NeonConcatEndToEndDim3Test")
 {
-    ConcatDim3EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ConcatDim3EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonConcatEndToEndDim3Uint8Test)
+TEST_CASE("NeonConcatEndToEndDim3Uint8Test")
 {
-    ConcatDim3EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    ConcatDim3EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
 // DepthToSpace
-BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNchwFloat32)
+TEST_CASE("DephtToSpaceEndToEndNchwFloat32")
 {
-    DepthToSpaceEndToEnd<armnn::DataType::Float32>(defaultBackends, armnn::DataLayout::NCHW);
+    DepthToSpaceEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, armnn::DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNchwFloat16)
+TEST_CASE("DephtToSpaceEndToEndNchwFloat16")
 {
-    DepthToSpaceEndToEnd<armnn::DataType::Float16>(defaultBackends, armnn::DataLayout::NCHW);
+    DepthToSpaceEndToEnd<armnn::DataType::Float16>(neonDefaultBackends, armnn::DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNchwUint8)
+TEST_CASE("DephtToSpaceEndToEndNchwUint8")
 {
-    DepthToSpaceEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, armnn::DataLayout::NCHW);
+    DepthToSpaceEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends, armnn::DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNchwInt16)
+TEST_CASE("DephtToSpaceEndToEndNchwInt16")
 {
-    DepthToSpaceEndToEnd<armnn::DataType::QSymmS16>(defaultBackends, armnn::DataLayout::NCHW);
+    DepthToSpaceEndToEnd<armnn::DataType::QSymmS16>(neonDefaultBackends, armnn::DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNhwcFloat32)
+TEST_CASE("DephtToSpaceEndToEndNhwcFloat32")
 {
-    DepthToSpaceEndToEnd<armnn::DataType::Float32>(defaultBackends, armnn::DataLayout::NHWC);
+    DepthToSpaceEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, armnn::DataLayout::NHWC);
 }
 
-BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNhwcFloat16)
+TEST_CASE("DephtToSpaceEndToEndNhwcFloat16")
 {
-    DepthToSpaceEndToEnd<armnn::DataType::Float16>(defaultBackends, armnn::DataLayout::NHWC);
+    DepthToSpaceEndToEnd<armnn::DataType::Float16>(neonDefaultBackends, armnn::DataLayout::NHWC);
 }
 
-BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNhwcUint8)
+TEST_CASE("DephtToSpaceEndToEndNhwcUint8")
 {
-    DepthToSpaceEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, armnn::DataLayout::NHWC);
+    DepthToSpaceEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends, armnn::DataLayout::NHWC);
 }
 
-BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNhwcInt16)
+TEST_CASE("DephtToSpaceEndToEndNhwcInt16")
 {
-    DepthToSpaceEndToEnd<armnn::DataType::QSymmS16>(defaultBackends, armnn::DataLayout::NHWC);
+    DepthToSpaceEndToEnd<armnn::DataType::QSymmS16>(neonDefaultBackends, armnn::DataLayout::NHWC);
 }
 
 // Dequantize
-BOOST_AUTO_TEST_CASE(DequantizeEndToEndSimpleTest)
+TEST_CASE("DequantizeEndToEndSimpleTest")
 {
-    DequantizeEndToEndSimple<armnn::DataType::QAsymmU8>(defaultBackends);
+    DequantizeEndToEndSimple<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(DequantizeEndToEndOffsetTest)
+TEST_CASE("DequantizeEndToEndOffsetTest")
 {
-    DequantizeEndToEndOffset<armnn::DataType::QAsymmU8>(defaultBackends);
+    DequantizeEndToEndOffset<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonEluEndToEndTestFloat32)
+TEST_CASE("NeonEluEndToEndTestFloat32")
 {
-    EluEndToEndTest<armnn::DataType::Float32>(defaultBackends);
+    EluEndToEndTest<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonEluEndToEndTestFloat16)
+TEST_CASE("NeonEluEndToEndTestFloat16")
 {
-    EluEndToEndTest<armnn::DataType::Float16>(defaultBackends);
+    EluEndToEndTest<armnn::DataType::Float16>(neonDefaultBackends);
 }
 
 // HardSwish
-BOOST_AUTO_TEST_CASE(NeonHardSwishEndToEndTestFloat32)
+TEST_CASE("NeonHardSwishEndToEndTestFloat32")
 {
-    HardSwishEndToEndTest<armnn::DataType::Float32>(defaultBackends);
+    HardSwishEndToEndTest<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonHardSwishEndToEndTestFloat16)
+TEST_CASE("NeonHardSwishEndToEndTestFloat16")
 {
-    HardSwishEndToEndTest<armnn::DataType::Float16>(defaultBackends);
+    HardSwishEndToEndTest<armnn::DataType::Float16>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonHardSwishEndToEndTestQAsymmS8)
+TEST_CASE("NeonHardSwishEndToEndTestQAsymmS8")
 {
-    HardSwishEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+    HardSwishEndToEndTest<armnn::DataType::QAsymmS8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonHardSwishEndToEndTestQAsymmU8)
+TEST_CASE("NeonHardSwishEndToEndTestQAsymmU8")
 {
-    HardSwishEndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
+    HardSwishEndToEndTest<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonPreluEndToEndFloat32Test)
+TEST_CASE("NeonPreluEndToEndFloat32Test")
 {
-    PreluEndToEndNegativeTest<armnn::DataType::Float32>(defaultBackends);
+    PreluEndToEndNegativeTest<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonPreluEndToEndTestUint8Test)
+TEST_CASE("NeonPreluEndToEndTestUint8Test")
 {
-    PreluEndToEndPositiveTest<armnn::DataType::QAsymmU8>(defaultBackends);
+    PreluEndToEndPositiveTest<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSpaceToDepthNhwcEndToEndTest1)
+TEST_CASE("NeonSpaceToDepthNhwcEndToEndTest1")
 {
-    SpaceToDepthNhwcEndToEndTest1(defaultBackends);
+    SpaceToDepthNhwcEndToEndTest1(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSpaceToDepthNchwEndToEndTest1)
+TEST_CASE("NeonSpaceToDepthNchwEndToEndTest1")
 {
-    SpaceToDepthNchwEndToEndTest1(defaultBackends);
+    SpaceToDepthNchwEndToEndTest1(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSpaceToDepthNhwcEndToEndTest2)
+TEST_CASE("NeonSpaceToDepthNhwcEndToEndTest2")
 {
-    SpaceToDepthNhwcEndToEndTest2(defaultBackends);
+    SpaceToDepthNhwcEndToEndTest2(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSpaceToDepthNchwEndToEndTest2)
+TEST_CASE("NeonSpaceToDepthNchwEndToEndTest2")
 {
-    SpaceToDepthNchwEndToEndTest2(defaultBackends);
+    SpaceToDepthNchwEndToEndTest2(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter1dEndToEndTest)
+TEST_CASE("NeonSplitter1dEndToEndTest")
 {
-    Splitter1dEndToEnd<armnn::DataType::Float32>(defaultBackends);
+    Splitter1dEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter1dEndToEndUint8Test)
+TEST_CASE("NeonSplitter1dEndToEndUint8Test")
 {
-    Splitter1dEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    Splitter1dEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter2dDim0EndToEndTest)
+TEST_CASE("NeonSplitter2dDim0EndToEndTest")
 {
-    Splitter2dDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    Splitter2dDim0EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter2dDim1EndToEndTest)
+TEST_CASE("NeonSplitter2dDim1EndToEndTest")
 {
-    Splitter2dDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    Splitter2dDim1EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter2dDim0EndToEndUint8Test)
+TEST_CASE("NeonSplitter2dDim0EndToEndUint8Test")
 {
-    Splitter2dDim0EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    Splitter2dDim0EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter2dDim1EndToEndUint8Test)
+TEST_CASE("NeonSplitter2dDim1EndToEndUint8Test")
 {
-    Splitter2dDim1EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    Splitter2dDim1EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter3dDim0EndToEndTest)
+TEST_CASE("NeonSplitter3dDim0EndToEndTest")
 {
-    Splitter3dDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    Splitter3dDim0EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter3dDim1EndToEndTest)
+TEST_CASE("NeonSplitter3dDim1EndToEndTest")
 {
-    Splitter3dDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    Splitter3dDim1EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter3dDim2EndToEndTest)
+TEST_CASE("NeonSplitter3dDim2EndToEndTest")
 {
-    Splitter3dDim2EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    Splitter3dDim2EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter3dDim0EndToEndUint8Test)
+TEST_CASE("NeonSplitter3dDim0EndToEndUint8Test")
 {
-    Splitter3dDim0EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    Splitter3dDim0EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter3dDim1EndToEndUint8Test)
+TEST_CASE("NeonSplitter3dDim1EndToEndUint8Test")
 {
-    Splitter3dDim1EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    Splitter3dDim1EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter3dDim2EndToEndUint8Test)
+TEST_CASE("NeonSplitter3dDim2EndToEndUint8Test")
 {
-    Splitter3dDim2EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    Splitter3dDim2EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter4dDim0EndToEndTest)
+TEST_CASE("NeonSplitter4dDim0EndToEndTest")
 {
-    Splitter4dDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    Splitter4dDim0EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter4dDim1EndToEndTest)
+TEST_CASE("NeonSplitter4dDim1EndToEndTest")
 {
-    Splitter4dDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    Splitter4dDim1EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter4dDim2EndToEndTest)
+TEST_CASE("NeonSplitter4dDim2EndToEndTest")
 {
-    Splitter4dDim2EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    Splitter4dDim2EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter4dDim3EndToEndTest)
+TEST_CASE("NeonSplitter4dDim3EndToEndTest")
 {
-    Splitter4dDim3EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    Splitter4dDim3EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter4dDim0EndToEndUint8Test)
+TEST_CASE("NeonSplitter4dDim0EndToEndUint8Test")
 {
-    Splitter4dDim0EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    Splitter4dDim0EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter4dDim1EndToEndUint8Test)
+TEST_CASE("NeonSplitter4dDim1EndToEndUint8Test")
 {
-    Splitter4dDim1EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    Splitter4dDim1EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter4dDim2EndToEndUint8Test)
+TEST_CASE("NeonSplitter4dDim2EndToEndUint8Test")
 {
-    Splitter4dDim2EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    Splitter4dDim2EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitter4dDim3EndToEndUint8Test)
+TEST_CASE("NeonSplitter4dDim3EndToEndUint8Test")
 {
-    Splitter4dDim3EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    Splitter4dDim3EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonQuantizedLstmEndToEndTest)
+TEST_CASE("NeonQuantizedLstmEndToEndTest")
 {
-    QuantizedLstmEndToEnd(defaultBackends);
+    QuantizedLstmEndToEnd(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonTransposeConvolution2dEndToEndFloatNchwTest)
+TEST_CASE("NeonTransposeConvolution2dEndToEndFloatNchwTest")
 {
     TransposeConvolution2dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(
-        defaultBackends, armnn::DataLayout::NCHW);
+        neonDefaultBackends, armnn::DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(NeonTransposeConvolution2dEndToEndUint8NchwTest)
+TEST_CASE("NeonTransposeConvolution2dEndToEndUint8NchwTest")
 {
     TransposeConvolution2dEndToEnd<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
-        defaultBackends, armnn::DataLayout::NCHW);
+        neonDefaultBackends, armnn::DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(NeonTransposeConvolution2dEndToEndFloatNhwcTest)
+TEST_CASE("NeonTransposeConvolution2dEndToEndFloatNhwcTest")
 {
     TransposeConvolution2dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(
-        defaultBackends, armnn::DataLayout::NHWC);
+        neonDefaultBackends, armnn::DataLayout::NHWC);
 }
 
-BOOST_AUTO_TEST_CASE(NeonTransposeConvolution2dEndToEndUint8NhwcTest)
+TEST_CASE("NeonTransposeConvolution2dEndToEndUint8NhwcTest")
 {
     TransposeConvolution2dEndToEnd<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
-        defaultBackends, armnn::DataLayout::NHWC);
+        neonDefaultBackends, armnn::DataLayout::NHWC);
 }
 
-BOOST_AUTO_TEST_CASE(NeonImportNonAlignedInputPointerTest)
+TEST_CASE("NeonImportNonAlignedInputPointerTest")
 {
-    ImportNonAlignedInputPointerTest(defaultBackends);
+    ImportNonAlignedInputPointerTest(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonExportNonAlignedOutputPointerTest)
+TEST_CASE("NeonExportNonAlignedOutputPointerTest")
 {
-    ExportNonAlignedOutputPointerTest(defaultBackends);
+    ExportNonAlignedOutputPointerTest(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonImportAlignedPointerTest)
+TEST_CASE("NeonImportAlignedPointerTest")
 {
-    ImportAlignedPointerTest(defaultBackends);
+    ImportAlignedPointerTest(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonImportOnlyWorkload)
+TEST_CASE("NeonImportOnlyWorkload")
 {
-    ImportOnlyWorkload(defaultBackends);
+    ImportOnlyWorkload(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonExportOnlyWorkload)
+TEST_CASE("NeonExportOnlyWorkload")
 {
-    ExportOnlyWorkload(defaultBackends);
+    ExportOnlyWorkload(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonImportAndExportWorkload)
+TEST_CASE("NeonImportAndExportWorkload")
 {
-    ImportAndExportWorkload(defaultBackends);
+    ImportAndExportWorkload(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonExportOutputWithSeveralOutputSlotConnectionsTest)
+TEST_CASE("NeonExportOutputWithSeveralOutputSlotConnectionsTest")
 {
-    ExportOutputWithSeveralOutputSlotConnectionsTest(defaultBackends);
+    ExportOutputWithSeveralOutputSlotConnectionsTest(neonDefaultBackends);
 }
 
 // InstanceNormalization
-BOOST_AUTO_TEST_CASE(NeonInstanceNormalizationNchwEndToEndTest1)
+TEST_CASE("NeonInstanceNormalizationNchwEndToEndTest1")
 {
-    InstanceNormalizationNchwEndToEndTest1(defaultBackends);
+    InstanceNormalizationNchwEndToEndTest1(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonInstanceNormalizationNchwEndToEndTest2)
+TEST_CASE("NeonInstanceNormalizationNchwEndToEndTest2")
 {
-    InstanceNormalizationNchwEndToEndTest2(defaultBackends);
+    InstanceNormalizationNchwEndToEndTest2(neonDefaultBackends);
 }
 
 // Fill
-BOOST_AUTO_TEST_CASE(NeonFillEndToEndTest)
+TEST_CASE("NeonFillEndToEndTest")
 {
-    FillEndToEnd<armnn::DataType::Float32>(defaultBackends);
+    FillEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(RefFillEndToEndTestFloat16)
+TEST_CASE("RefFillEndToEndTestFloat16")
 {
-    FillEndToEnd<armnn::DataType::Float16>(defaultBackends);
+    FillEndToEnd<armnn::DataType::Float16>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonFillEndToEndTestInt32)
+TEST_CASE("NeonFillEndToEndTestInt32")
 {
-    FillEndToEnd<armnn::DataType::Signed32>(defaultBackends);
+    FillEndToEnd<armnn::DataType::Signed32>(neonDefaultBackends);
 }
 
 // ArgMinMax
-BOOST_AUTO_TEST_CASE(NeonArgMaxSimpleTest)
+TEST_CASE("NeonArgMaxSimpleTest")
 {
-    ArgMaxEndToEndSimple<armnn::DataType::Float32>(defaultBackends);
+    ArgMaxEndToEndSimple<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMinSimpleTest)
+TEST_CASE("NeonArgMinSimpleTest")
 {
-    ArgMinEndToEndSimple<armnn::DataType::Float32>(defaultBackends);
+    ArgMinEndToEndSimple<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMaxAxis0Test)
+TEST_CASE("NeonArgMaxAxis0Test")
 {
-    ArgMaxAxis0EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ArgMaxAxis0EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMinAxis0Test)
+TEST_CASE("NeonArgMinAxis0Test")
 {
-    ArgMinAxis0EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ArgMinAxis0EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMaxAxis1Test)
+TEST_CASE("NeonArgMaxAxis1Test")
 {
-    ArgMaxAxis1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ArgMaxAxis1EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMinAxis1Test)
+TEST_CASE("NeonArgMinAxis1Test")
 {
-    ArgMinAxis1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ArgMinAxis1EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMaxAxis2Test)
+TEST_CASE("NeonArgMaxAxis2Test")
 {
-    ArgMaxAxis2EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ArgMaxAxis2EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMinAxis2Test)
+TEST_CASE("NeonArgMinAxis2Test")
 {
-    ArgMinAxis2EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ArgMinAxis2EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMaxAxis3Test)
+TEST_CASE("NeonArgMaxAxis3Test")
 {
-    ArgMaxAxis3EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ArgMaxAxis3EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMinAxis3Test)
+TEST_CASE("NeonArgMinAxis3Test")
 {
-    ArgMinAxis3EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ArgMinAxis3EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMaxSimpleTestQuantisedAsymm8)
+TEST_CASE("NeonArgMaxSimpleTestQuantisedAsymm8")
 {
-    ArgMaxEndToEndSimple<armnn::DataType::QAsymmU8>(defaultBackends);
+    ArgMaxEndToEndSimple<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMinSimpleTestQuantisedAsymm8)
+TEST_CASE("NeonArgMinSimpleTestQuantisedAsymm8")
 {
-    ArgMinEndToEndSimple<armnn::DataType::QAsymmU8>(defaultBackends);
+    ArgMinEndToEndSimple<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMaxAxis0TestQuantisedAsymm8)
+TEST_CASE("NeonArgMaxAxis0TestQuantisedAsymm8")
 {
-    ArgMaxAxis0EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    ArgMaxAxis0EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMinAxis0TestQuantisedAsymm8)
+TEST_CASE("NeonArgMinAxis0TestQuantisedAsymm8")
 {
-    ArgMinAxis0EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    ArgMinAxis0EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMaxAxis1TestQuantisedAsymm8)
+TEST_CASE("NeonArgMaxAxis1TestQuantisedAsymm8")
 {
-    ArgMaxAxis1EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    ArgMaxAxis1EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMinAxis1TestQuantisedAsymm8)
+TEST_CASE("NeonArgMinAxis1TestQuantisedAsymm8")
 {
-    ArgMinAxis1EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    ArgMinAxis1EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMaxAxis2TestQuantisedAsymm8)
+TEST_CASE("NeonArgMaxAxis2TestQuantisedAsymm8")
 {
-    ArgMaxAxis2EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    ArgMaxAxis2EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMinAxis2TestQuantisedAsymm8)
+TEST_CASE("NeonArgMinAxis2TestQuantisedAsymm8")
 {
-    ArgMinAxis2EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    ArgMinAxis2EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMaxAxis3TestQuantisedAsymm8)
+TEST_CASE("NeonArgMaxAxis3TestQuantisedAsymm8")
 {
-    ArgMaxAxis3EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    ArgMaxAxis3EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonArgMinAxis3TestQuantisedAsymm8)
+TEST_CASE("NeonArgMinAxis3TestQuantisedAsymm8")
 {
-    ArgMinAxis3EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+    ArgMinAxis3EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonStridedSliceInvalidSliceEndToEndTest)
+TEST_CASE("NeonStridedSliceInvalidSliceEndToEndTest")
 {
-    StridedSliceInvalidSliceEndToEndTest(defaultBackends);
+    StridedSliceInvalidSliceEndToEndTest(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonDetectionPostProcessRegularNmsTest, * boost::unit_test::disabled())
-{
-    std::vector<float> boxEncodings({
-                                        0.0f, 0.0f, 0.0f, 0.0f,
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, -1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 0.0f, 0.0f,
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 0.0f, 0.0f
-                                    });
-    std::vector<float> scores({
-                                  0.0f, 0.9f, 0.8f,
-                                  0.0f, 0.75f, 0.72f,
-                                  0.0f, 0.6f, 0.5f,
-                                  0.0f, 0.93f, 0.95f,
-                                  0.0f, 0.5f, 0.4f,
-                                  0.0f, 0.3f, 0.2f
-                              });
-    std::vector<float> anchors({
-                                   0.5f, 0.5f, 1.0f, 1.0f,
-                                   0.5f, 0.5f, 1.0f, 1.0f,
-                                   0.5f, 0.5f, 1.0f, 1.0f,
-                                   0.5f, 10.5f, 1.0f, 1.0f,
-                                   0.5f, 10.5f, 1.0f, 1.0f,
-                                   0.5f, 100.5f, 1.0f, 1.0f
-                               });
-    DetectionPostProcessRegularNmsEndToEnd<armnn::DataType::Float32>(defaultBackends, boxEncodings, scores, anchors);
-}
+// DISABLED
+//TEST_CASE("NeonDetectionPostProcessRegularNmsTest")
+//{
+//    std::vector<float> boxEncodings({
+//                                        0.0f, 0.0f, 0.0f, 0.0f,
+//                                        0.0f, 1.0f, 0.0f, 0.0f,
+//                                        0.0f, -1.0f, 0.0f, 0.0f,
+//                                        0.0f, 0.0f, 0.0f, 0.0f,
+//                                        0.0f, 1.0f, 0.0f, 0.0f,
+//                                        0.0f, 0.0f, 0.0f, 0.0f
+//                                    });
+//    std::vector<float> scores({
+//                                  0.0f, 0.9f, 0.8f,
+//                                  0.0f, 0.75f, 0.72f,
+//                                  0.0f, 0.6f, 0.5f,
+//                                  0.0f, 0.93f, 0.95f,
+//                                  0.0f, 0.5f, 0.4f,
+//                                  0.0f, 0.3f, 0.2f
+//                              });
+//    std::vector<float> anchors({
+//                                   0.5f, 0.5f, 1.0f, 1.0f,
+//                                   0.5f, 0.5f, 1.0f, 1.0f,
+//                                   0.5f, 0.5f, 1.0f, 1.0f,
+//                                   0.5f, 10.5f, 1.0f, 1.0f,
+//                                   0.5f, 10.5f, 1.0f, 1.0f,
+//                                   0.5f, 100.5f, 1.0f, 1.0f
+//                               });
+//    DetectionPostProcessRegularNmsEndToEnd<armnn::DataType::Float32>(neonDefaultBackends,
+//                                                                     boxEncodings,
+//                                                                     scores,
+//                                                                     anchors);
+//}
 
 inline void QuantizeData(uint8_t* quant, const float* dequant, const TensorInfo& info)
 {
@@ -605,136 +609,141 @@ inline void QuantizeData(uint8_t* quant, const float* dequant, const TensorInfo&
     }
 }
 
-BOOST_AUTO_TEST_CASE(NeonDetectionPostProcessRegularNmsUint8Test, * boost::unit_test::disabled())
+// DISABLED
+//TEST_CASE("NeonDetectionPostProcessRegularNmsUint8Test")
+//{
+//    armnn::TensorInfo boxEncodingsInfo({ 1, 6, 4 }, armnn::DataType::Float32);
+//    armnn::TensorInfo scoresInfo({ 1, 6, 3 }, armnn::DataType::Float32);
+//    armnn::TensorInfo anchorsInfo({ 6, 4 }, armnn::DataType::Float32);
+//
+//    boxEncodingsInfo.SetQuantizationScale(1.0f);
+//    boxEncodingsInfo.SetQuantizationOffset(1);
+//    scoresInfo.SetQuantizationScale(0.01f);
+//    scoresInfo.SetQuantizationOffset(0);
+//    anchorsInfo.SetQuantizationScale(0.5f);
+//    anchorsInfo.SetQuantizationOffset(0);
+//
+//    std::vector<float> boxEncodings({
+//                                        0.0f, 0.0f, 0.0f, 0.0f,
+//                                        0.0f, 1.0f, 0.0f, 0.0f,
+//                                        0.0f, -1.0f, 0.0f, 0.0f,
+//                                        0.0f, 0.0f, 0.0f, 0.0f,
+//                                        0.0f, 1.0f, 0.0f, 0.0f,
+//                                        0.0f, 0.0f, 0.0f, 0.0f
+//                                    });
+//    std::vector<float> scores({
+//                                  0.0f, 0.9f, 0.8f,
+//                                  0.0f, 0.75f, 0.72f,
+//                                  0.0f, 0.6f, 0.5f,
+//                                  0.0f, 0.93f, 0.95f,
+//                                  0.0f, 0.5f, 0.4f,
+//                                  0.0f, 0.3f, 0.2f
+//                              });
+//    std::vector<float> anchors({
+//                                   0.5f, 0.5f, 1.0f, 1.0f,
+//                                   0.5f, 0.5f, 1.0f, 1.0f,
+//                                   0.5f, 0.5f, 1.0f, 1.0f,
+//                                   0.5f, 10.5f, 1.0f, 1.0f,
+//                                   0.5f, 10.5f, 1.0f, 1.0f,
+//                                   0.5f, 100.5f, 1.0f, 1.0f
+//                               });
+//
+//    std::vector<uint8_t> qBoxEncodings(boxEncodings.size(), 0);
+//    std::vector<uint8_t> qScores(scores.size(), 0);
+//    std::vector<uint8_t> qAnchors(anchors.size(), 0);
+//    QuantizeData(qBoxEncodings.data(), boxEncodings.data(), boxEncodingsInfo);
+//    QuantizeData(qScores.data(), scores.data(), scoresInfo);
+//    QuantizeData(qAnchors.data(), anchors.data(), anchorsInfo);
+//    DetectionPostProcessRegularNmsEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends, qBoxEncodings,
+//                                                                             qScores, qAnchors,
+//                                                                             1.0f, 1, 0.01f, 0, 0.5f, 0);
+//}
+//
+//TEST_CASE("NeonDetectionPostProcessFastNmsTest")
+//{
+//    std::vector<float> boxEncodings({
+//                                        0.0f, 0.0f, 0.0f, 0.0f,
+//                                        0.0f, 1.0f, 0.0f, 0.0f,
+//                                        0.0f, -1.0f, 0.0f, 0.0f,
+//                                        0.0f, 0.0f, 0.0f, 0.0f,
+//                                        0.0f, 1.0f, 0.0f, 0.0f,
+//                                        0.0f, 0.0f, 0.0f, 0.0f
+//                                    });
+//    std::vector<float> scores({
+//                                  0.0f, 0.9f, 0.8f,
+//                                  0.0f, 0.75f, 0.72f,
+//                                  0.0f, 0.6f, 0.5f,
+//                                  0.0f, 0.93f, 0.95f,
+//                                  0.0f, 0.5f, 0.4f,
+//                                  0.0f, 0.3f, 0.2f
+//                              });
+//    std::vector<float> anchors({
+//                                   0.5f, 0.5f, 1.0f, 1.0f,
+//                                   0.5f, 0.5f, 1.0f, 1.0f,
+//                                   0.5f, 0.5f, 1.0f, 1.0f,
+//                                   0.5f, 10.5f, 1.0f, 1.0f,
+//                                   0.5f, 10.5f, 1.0f, 1.0f,
+//                                   0.5f, 100.5f, 1.0f, 1.0f
+//                               });
+//    DetectionPostProcessFastNmsEndToEnd<armnn::DataType::Float32>(neonDefaultBackends,
+//                                                                  boxEncodings,
+//                                                                  scores,
+//                                                                  anchors);
+//}
+//
+// DISABLED
+//TEST_CASE("NeonDetectionPostProcessFastNmsUint8Test")
+//{
+//    armnn::TensorInfo boxEncodingsInfo({ 1, 6, 4 }, armnn::DataType::Float32);
+//    armnn::TensorInfo scoresInfo({ 1, 6, 3 }, armnn::DataType::Float32);
+//    armnn::TensorInfo anchorsInfo({ 6, 4 }, armnn::DataType::Float32);
+//
+//    boxEncodingsInfo.SetQuantizationScale(1.0f);
+//    boxEncodingsInfo.SetQuantizationOffset(1);
+//    scoresInfo.SetQuantizationScale(0.01f);
+//    scoresInfo.SetQuantizationOffset(0);
+//    anchorsInfo.SetQuantizationScale(0.5f);
+//    anchorsInfo.SetQuantizationOffset(0);
+//
+//    std::vector<float> boxEncodings({
+//                                        0.0f, 0.0f, 0.0f, 0.0f,
+//                                        0.0f, 1.0f, 0.0f, 0.0f,
+//                                        0.0f, -1.0f, 0.0f, 0.0f,
+//                                        0.0f, 0.0f, 0.0f, 0.0f,
+//                                        0.0f, 1.0f, 0.0f, 0.0f,
+//                                        0.0f, 0.0f, 0.0f, 0.0f
+//                                    });
+//    std::vector<float> scores({
+//                                  0.0f, 0.9f, 0.8f,
+//                                  0.0f, 0.75f, 0.72f,
+//                                  0.0f, 0.6f, 0.5f,
+//                                  0.0f, 0.93f, 0.95f,
+//                                  0.0f, 0.5f, 0.4f,
+//                                  0.0f, 0.3f, 0.2f
+//                              });
+//    std::vector<float> anchors({
+//                                   0.5f, 0.5f, 1.0f, 1.0f,
+//                                   0.5f, 0.5f, 1.0f, 1.0f,
+//                                   0.5f, 0.5f, 1.0f, 1.0f,
+//                                   0.5f, 10.5f, 1.0f, 1.0f,
+//                                   0.5f, 10.5f, 1.0f, 1.0f,
+//                                   0.5f, 100.5f, 1.0f, 1.0f
+//                               });
+//
+//    std::vector<uint8_t> qBoxEncodings(boxEncodings.size(), 0);
+//    std::vector<uint8_t> qScores(scores.size(), 0);
+//    std::vector<uint8_t> qAnchors(anchors.size(), 0);
+//    QuantizeData(qBoxEncodings.data(), boxEncodings.data(), boxEncodingsInfo);
+//    QuantizeData(qScores.data(), scores.data(), scoresInfo);
+//    QuantizeData(qAnchors.data(), anchors.data(), anchorsInfo);
+//    DetectionPostProcessFastNmsEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends, qBoxEncodings,
+//                                                                          qScores, qAnchors,
+//                                                                          1.0f, 1, 0.01f, 0, 0.5f, 0);
+//}
+
+TEST_CASE("NeonQLstmEndToEndTest")
 {
-    armnn::TensorInfo boxEncodingsInfo({ 1, 6, 4 }, armnn::DataType::Float32);
-    armnn::TensorInfo scoresInfo({ 1, 6, 3 }, armnn::DataType::Float32);
-    armnn::TensorInfo anchorsInfo({ 6, 4 }, armnn::DataType::Float32);
-
-    boxEncodingsInfo.SetQuantizationScale(1.0f);
-    boxEncodingsInfo.SetQuantizationOffset(1);
-    scoresInfo.SetQuantizationScale(0.01f);
-    scoresInfo.SetQuantizationOffset(0);
-    anchorsInfo.SetQuantizationScale(0.5f);
-    anchorsInfo.SetQuantizationOffset(0);
-
-    std::vector<float> boxEncodings({
-                                        0.0f, 0.0f, 0.0f, 0.0f,
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, -1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 0.0f, 0.0f,
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 0.0f, 0.0f
-                                    });
-    std::vector<float> scores({
-                                  0.0f, 0.9f, 0.8f,
-                                  0.0f, 0.75f, 0.72f,
-                                  0.0f, 0.6f, 0.5f,
-                                  0.0f, 0.93f, 0.95f,
-                                  0.0f, 0.5f, 0.4f,
-                                  0.0f, 0.3f, 0.2f
-                              });
-    std::vector<float> anchors({
-                                   0.5f, 0.5f, 1.0f, 1.0f,
-                                   0.5f, 0.5f, 1.0f, 1.0f,
-                                   0.5f, 0.5f, 1.0f, 1.0f,
-                                   0.5f, 10.5f, 1.0f, 1.0f,
-                                   0.5f, 10.5f, 1.0f, 1.0f,
-                                   0.5f, 100.5f, 1.0f, 1.0f
-                               });
-
-    std::vector<uint8_t> qBoxEncodings(boxEncodings.size(), 0);
-    std::vector<uint8_t> qScores(scores.size(), 0);
-    std::vector<uint8_t> qAnchors(anchors.size(), 0);
-    QuantizeData(qBoxEncodings.data(), boxEncodings.data(), boxEncodingsInfo);
-    QuantizeData(qScores.data(), scores.data(), scoresInfo);
-    QuantizeData(qAnchors.data(), anchors.data(), anchorsInfo);
-    DetectionPostProcessRegularNmsEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, qBoxEncodings,
-                                                                             qScores, qAnchors,
-                                                                             1.0f, 1, 0.01f, 0, 0.5f, 0);
+    QLstmEndToEnd(neonDefaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonDetectionPostProcessFastNmsTest, * boost::unit_test::disabled())
-{
-    std::vector<float> boxEncodings({
-                                        0.0f, 0.0f, 0.0f, 0.0f,
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, -1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 0.0f, 0.0f,
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 0.0f, 0.0f
-                                    });
-    std::vector<float> scores({
-                                  0.0f, 0.9f, 0.8f,
-                                  0.0f, 0.75f, 0.72f,
-                                  0.0f, 0.6f, 0.5f,
-                                  0.0f, 0.93f, 0.95f,
-                                  0.0f, 0.5f, 0.4f,
-                                  0.0f, 0.3f, 0.2f
-                              });
-    std::vector<float> anchors({
-                                   0.5f, 0.5f, 1.0f, 1.0f,
-                                   0.5f, 0.5f, 1.0f, 1.0f,
-                                   0.5f, 0.5f, 1.0f, 1.0f,
-                                   0.5f, 10.5f, 1.0f, 1.0f,
-                                   0.5f, 10.5f, 1.0f, 1.0f,
-                                   0.5f, 100.5f, 1.0f, 1.0f
-                               });
-    DetectionPostProcessFastNmsEndToEnd<armnn::DataType::Float32>(defaultBackends, boxEncodings, scores, anchors);
 }
-
-BOOST_AUTO_TEST_CASE(NeonDetectionPostProcessFastNmsUint8Test, * boost::unit_test::disabled())
-{
-    armnn::TensorInfo boxEncodingsInfo({ 1, 6, 4 }, armnn::DataType::Float32);
-    armnn::TensorInfo scoresInfo({ 1, 6, 3 }, armnn::DataType::Float32);
-    armnn::TensorInfo anchorsInfo({ 6, 4 }, armnn::DataType::Float32);
-
-    boxEncodingsInfo.SetQuantizationScale(1.0f);
-    boxEncodingsInfo.SetQuantizationOffset(1);
-    scoresInfo.SetQuantizationScale(0.01f);
-    scoresInfo.SetQuantizationOffset(0);
-    anchorsInfo.SetQuantizationScale(0.5f);
-    anchorsInfo.SetQuantizationOffset(0);
-
-    std::vector<float> boxEncodings({
-                                        0.0f, 0.0f, 0.0f, 0.0f,
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, -1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 0.0f, 0.0f,
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 0.0f, 0.0f
-                                    });
-    std::vector<float> scores({
-                                  0.0f, 0.9f, 0.8f,
-                                  0.0f, 0.75f, 0.72f,
-                                  0.0f, 0.6f, 0.5f,
-                                  0.0f, 0.93f, 0.95f,
-                                  0.0f, 0.5f, 0.4f,
-                                  0.0f, 0.3f, 0.2f
-                              });
-    std::vector<float> anchors({
-                                   0.5f, 0.5f, 1.0f, 1.0f,
-                                   0.5f, 0.5f, 1.0f, 1.0f,
-                                   0.5f, 0.5f, 1.0f, 1.0f,
-                                   0.5f, 10.5f, 1.0f, 1.0f,
-                                   0.5f, 10.5f, 1.0f, 1.0f,
-                                   0.5f, 100.5f, 1.0f, 1.0f
-                               });
-
-    std::vector<uint8_t> qBoxEncodings(boxEncodings.size(), 0);
-    std::vector<uint8_t> qScores(scores.size(), 0);
-    std::vector<uint8_t> qAnchors(anchors.size(), 0);
-    QuantizeData(qBoxEncodings.data(), boxEncodings.data(), boxEncodingsInfo);
-    QuantizeData(qScores.data(), scores.data(), scoresInfo);
-    QuantizeData(qAnchors.data(), anchors.data(), anchorsInfo);
-    DetectionPostProcessFastNmsEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, qBoxEncodings,
-                                                                          qScores, qAnchors,
-                                                                          1.0f, 1, 0.01f, 0, 0.5f, 0);
-}
-
-BOOST_AUTO_TEST_CASE(NeonQLstmEndToEndTest)
-{
-    QLstmEndToEnd(defaultBackends);
-}
-
-BOOST_AUTO_TEST_SUITE_END()

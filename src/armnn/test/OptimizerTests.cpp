@@ -15,6 +15,7 @@
 #include <armnn/INetwork.hpp>
 #include <armnn/LayerVisitorBase.hpp>
 
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnnUtils/FloatingPointConverter.hpp>
 
@@ -22,7 +23,7 @@
 #include <backendsCommon/LayerSupportBase.hpp>
 #include <backendsCommon/TensorHandle.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 using namespace armnn;
 
@@ -140,10 +141,11 @@ void CreateLSTMLayerHelper(Graph &graph, bool CifgEnabled)
 
 }    // namespace
 
-BOOST_AUTO_TEST_SUITE(Optimizer)
+TEST_SUITE("Optimizer")
+{
 using namespace armnn::optimizations;
 
-BOOST_AUTO_TEST_CASE(LSTMValidateTensorShapesFromInputsCIFGDisabledTest)
+TEST_CASE("LSTMValidateTensorShapesFromInputsCIFGDisabledTest")
 {
     Graph graph;
 
@@ -151,10 +153,10 @@ BOOST_AUTO_TEST_CASE(LSTMValidateTensorShapesFromInputsCIFGDisabledTest)
     CreateLSTMLayerHelper(graph, false);
 
     //This function used to call ValidateShapesFromInputs();
-    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+    CHECK_NOTHROW(graph.InferTensorInfos());
 }
 
-BOOST_AUTO_TEST_CASE(LSTMValidateTensorShapesFromInputsCIFGEnabledTest)
+TEST_CASE("LSTMValidateTensorShapesFromInputsCIFGEnabledTest")
 {
     Graph graph;
 
@@ -162,10 +164,10 @@ BOOST_AUTO_TEST_CASE(LSTMValidateTensorShapesFromInputsCIFGEnabledTest)
     CreateLSTMLayerHelper(graph, true);
 
     //This function used to call ValidateShapesFromInputs();
-    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+    CHECK_NOTHROW(graph.InferTensorInfos());
 }
 
-BOOST_AUTO_TEST_CASE(InsertConvertersTest)
+TEST_CASE("InsertConvertersTest")
 {
     const armnn::TensorInfo info({ 1, 5, 2, 3 }, armnn::DataType::Float16);
 
@@ -191,7 +193,7 @@ BOOST_AUTO_TEST_CASE(InsertConvertersTest)
         ->GetOutputHandler().SetTensorInfo(info);
 
     // Check graph layer sequence before inserting convert layers
-    BOOST_TEST(CheckSequence(graph.cbegin(),
+    CHECK(CheckSequence(graph.cbegin(),
                              graph.cend(),
                              &IsLayerOfType<armnn::InputLayer>,
                              &IsLayerOfType<armnn::InputLayer>,
@@ -241,7 +243,7 @@ BOOST_AUTO_TEST_CASE(InsertConvertersTest)
     }
 
     // Check sequence of layers after inserting convert layers
-    BOOST_TEST(CheckSequence(graph.cbegin(),
+    CHECK(CheckSequence(graph.cbegin(),
                              graph.cend(),
                              &IsLayerOfType<armnn::InputLayer>,
                              &IsLayerOfType<armnn::InputLayer>,
@@ -284,7 +286,7 @@ void CreateConvolution2dGraph(Graph &graph, const unsigned int* inputShape,
     layer->GetOutputSlot().Connect(output->GetInputSlot(0));
 }
 
-BOOST_AUTO_TEST_CASE(Conv2dValidateTensorShapesFromInputs)
+TEST_CASE("Conv2dValidateTensorShapesFromInputs")
 {
     Graph graph;
     const unsigned int inputShape[] = { 1, 3, 8, 16 };
@@ -292,10 +294,10 @@ BOOST_AUTO_TEST_CASE(Conv2dValidateTensorShapesFromInputs)
     const unsigned int outputShape[] = { 1, 2, 4, 14 };
     CreateConvolution2dGraph(graph, inputShape, weightsShape, outputShape);
 
-    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+    CHECK_NOTHROW(graph.InferTensorInfos());
 }
 
-BOOST_AUTO_TEST_CASE(Conv2dValidateTensorShapesFromInputsNhwc)
+TEST_CASE("Conv2dValidateTensorShapesFromInputsNhwc")
 {
     Graph graph;
     const unsigned int inputShape[] = { 1, 8, 16, 3 };
@@ -303,7 +305,7 @@ BOOST_AUTO_TEST_CASE(Conv2dValidateTensorShapesFromInputsNhwc)
     const unsigned int outputShape[] = { 1, 4, 14, 2 };
     CreateConvolution2dGraph(graph, inputShape, weightsShape, outputShape, DataLayout::NHWC);
 
-    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+    CHECK_NOTHROW(graph.InferTensorInfos());
 }
 
 void CreateDepthwiseConvolution2dGraph(Graph &graph, const unsigned int* inputShape,
@@ -334,7 +336,7 @@ void CreateDepthwiseConvolution2dGraph(Graph &graph, const unsigned int* inputSh
     layer->GetOutputSlot().Connect(output->GetInputSlot(0));
 }
 
-BOOST_AUTO_TEST_CASE(DepthwiseConv2dValidateTensorShapesFromInputs)
+TEST_CASE("DepthwiseConv2dValidateTensorShapesFromInputs")
 {
     Graph graph;
     const unsigned int inputShape[] = { 1, 2, 3, 3 };
@@ -342,10 +344,10 @@ BOOST_AUTO_TEST_CASE(DepthwiseConv2dValidateTensorShapesFromInputs)
     const unsigned int outputShape[] = { 1, 2, 1, 1 };
     CreateDepthwiseConvolution2dGraph(graph, inputShape, weightsShape, outputShape);
 
-    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+    CHECK_NOTHROW(graph.InferTensorInfos());
 }
 
-BOOST_AUTO_TEST_CASE(DepthwiseConv2dValidateTensorShapesFromInputsNhwc)
+TEST_CASE("DepthwiseConv2dValidateTensorShapesFromInputsNhwc")
 {
     Graph graph;
     const unsigned int inputShape[] = { 1, 3, 3, 2 };
@@ -353,7 +355,7 @@ BOOST_AUTO_TEST_CASE(DepthwiseConv2dValidateTensorShapesFromInputsNhwc)
     const unsigned int outputShape[] = { 1, 1, 1, 2 };
     CreateDepthwiseConvolution2dGraph(graph, inputShape, weightsShape, outputShape, DataLayout::NHWC);
 
-    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+    CHECK_NOTHROW(graph.InferTensorInfos());
 }
 
 void CreatePooling2dGraph(Graph& graph, const unsigned int* inputShape,  const unsigned int* outputShape,
@@ -384,24 +386,24 @@ void CreatePooling2dGraph(Graph& graph, const unsigned int* inputShape,  const u
     layer->GetOutputSlot().Connect(output->GetInputSlot(0));
 }
 
-BOOST_AUTO_TEST_CASE(Pooling2dValidateTensorShapesFromInputs)
+TEST_CASE("Pooling2dValidateTensorShapesFromInputs")
 {
     Graph graph;
     const unsigned int inputShape[]  = { 5, 3, 52, 60 };
     const unsigned int outputShape[] = { 5, 3, 11, 13 };
     CreatePooling2dGraph(graph, inputShape, outputShape, DataLayout::NCHW);
 
-    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+    CHECK_NOTHROW(graph.InferTensorInfos());
 }
 
-BOOST_AUTO_TEST_CASE(Pooling2dValidateTensorShapesFromInputsNhwc)
+TEST_CASE("Pooling2dValidateTensorShapesFromInputsNhwc")
 {
     Graph graph;
     const unsigned int inputShape[]  = { 5, 52, 60, 3 };
     const unsigned int outputShape[] = { 5, 11, 13, 3 };
     CreatePooling2dGraph(graph, inputShape, outputShape, DataLayout::NHWC);
 
-    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+    CHECK_NOTHROW(graph.InferTensorInfos());
 }
 
 void CreateResizeBilinearGraph(Graph& graph,
@@ -429,24 +431,24 @@ void CreateResizeBilinearGraph(Graph& graph,
     layer->GetOutputSlot().Connect(output->GetInputSlot(0));
 }
 
-BOOST_AUTO_TEST_CASE(ResizeBilinearValidateTensorShapesFromInputs)
+TEST_CASE("ResizeBilinearValidateTensorShapesFromInputs")
 {
     Graph graph;
     const unsigned int inputShape[]  = { 1, 2, 4, 5 };
     const unsigned int outputShape[] = { 1, 2, 3, 4 };
     CreateResizeBilinearGraph(graph, inputShape, outputShape);
 
-    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+    CHECK_NOTHROW(graph.InferTensorInfos());
 }
 
-BOOST_AUTO_TEST_CASE(ResizeBilinearValidateTensorShapesFromInputsNhwc)
+TEST_CASE("ResizeBilinearValidateTensorShapesFromInputsNhwc")
 {
     Graph graph;
     const unsigned int inputShape[]  = { 1, 4, 5, 2 };
     const unsigned int outputShape[] = { 1, 3, 4, 2 };
     CreateResizeBilinearGraph(graph, inputShape, outputShape, DataLayout::NHWC);
 
-    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+    CHECK_NOTHROW(graph.InferTensorInfos());
 }
 
 void CreateGatherGraph(Graph& graph,
@@ -470,7 +472,7 @@ void CreateGatherGraph(Graph& graph,
     layer->GetOutputSlot().Connect(output->GetInputSlot(0));
 }
 
-BOOST_AUTO_TEST_CASE(GatherValidateTensorShapesFromInputs)
+TEST_CASE("GatherValidateTensorShapesFromInputs")
 {
     Graph graph;
     armnn::TensorInfo paramsInfo({10, 5}, DataType::Float32);
@@ -479,10 +481,10 @@ BOOST_AUTO_TEST_CASE(GatherValidateTensorShapesFromInputs)
 
     CreateGatherGraph(graph, paramsInfo, indicesInfo, outputInfo);
 
-    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+    CHECK_NOTHROW(graph.InferTensorInfos());
 }
 
-BOOST_AUTO_TEST_CASE(GatherValidateTensorShapesFromInputs1DParams)
+TEST_CASE("GatherValidateTensorShapesFromInputs1DParams")
 {
     Graph graph;
     armnn::TensorInfo paramsInfo({8}, DataType::Float32);
@@ -491,10 +493,10 @@ BOOST_AUTO_TEST_CASE(GatherValidateTensorShapesFromInputs1DParams)
 
     CreateGatherGraph(graph, paramsInfo, indicesInfo, outputInfo);
 
-    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+    CHECK_NOTHROW(graph.InferTensorInfos());
 }
 
-BOOST_AUTO_TEST_CASE(GatherValidateTensorShapesFromInputsMultiDimIndices)
+TEST_CASE("GatherValidateTensorShapesFromInputsMultiDimIndices")
 {
     Graph graph;
     armnn::TensorInfo paramsInfo({3, 2, 5}, DataType::Float32);
@@ -503,10 +505,10 @@ BOOST_AUTO_TEST_CASE(GatherValidateTensorShapesFromInputsMultiDimIndices)
 
     CreateGatherGraph(graph, paramsInfo, indicesInfo, outputInfo);
 
-    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+    CHECK_NOTHROW(graph.InferTensorInfos());
 }
 
-BOOST_AUTO_TEST_CASE(DetectionPostProcessValidateTensorShapes)
+TEST_CASE("DetectionPostProcessValidateTensorShapes")
 {
     Graph graph;
     armnn::TensorInfo boxEncodingsInfo({1, 10, 4}, DataType::QAsymmU8);
@@ -538,7 +540,7 @@ BOOST_AUTO_TEST_CASE(DetectionPostProcessValidateTensorShapes)
     input0->GetOutputSlot().Connect(layer->GetInputSlot(0));
     input1->GetOutputSlot().Connect(layer->GetInputSlot(1));
 
-    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+    CHECK_NOTHROW(graph.InferTensorInfos());
 }
 
 class MockLayerSupport : public LayerSupportBase
@@ -612,21 +614,21 @@ public:
     };
 };
 
-BOOST_AUTO_TEST_CASE(BackendCapabilityTest)
+TEST_CASE("BackendCapabilityTest")
 {
     BackendId backendId = "MockBackend";
 
     armnn::BackendOptions::BackendOption nonConstWeights{"NonConstWeights", true};
 
     // MockBackend does not support the NonConstWeights capability
-    BOOST_CHECK(!armnn::HasCapability(nonConstWeights, backendId));
-    BOOST_CHECK(!armnn::HasCapability("NonConstWeights", backendId));
+    CHECK(!armnn::HasCapability(nonConstWeights, backendId));
+    CHECK(!armnn::HasCapability("NonConstWeights", backendId));
 
     // MockBackend does not support the AsyncExecution capability
-    BOOST_CHECK(!armnn::GetCapability("AsyncExecution", backendId).has_value());
+    CHECK(!armnn::GetCapability("AsyncExecution", backendId).has_value());
 }
 
-BOOST_AUTO_TEST_CASE(BackendHintTest)
+TEST_CASE("BackendHintTest")
 {
     class TestBackendAssignment : public LayerVisitorBase<VisitorNoThrowPolicy>
     {
@@ -635,14 +637,14 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
         {
             IgnoreUnused(id, name);
             auto inputLayer = PolymorphicDowncast<const InputLayer*>(layer);
-            BOOST_TEST((inputLayer->GetBackendId() == "MockBackend"));
+            CHECK((inputLayer->GetBackendId() == "MockBackend"));
         }
 
         void VisitOutputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name = nullptr) override
         {
             IgnoreUnused(id, name);
             auto outputLayer = PolymorphicDowncast<const OutputLayer*>(layer);
-            BOOST_TEST((outputLayer->GetBackendId() == "MockBackend"));
+            CHECK((outputLayer->GetBackendId() == "MockBackend"));
         }
 
         void VisitActivationLayer(const IConnectableLayer* layer,
@@ -651,7 +653,7 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
         {
             IgnoreUnused(activationDescriptor, name);
             auto activation = PolymorphicDowncast<const ActivationLayer*>(layer);
-            BOOST_TEST((activation->GetBackendId() == "CustomBackend"));
+            CHECK((activation->GetBackendId() == "CustomBackend"));
         }
     };
 
@@ -718,7 +720,7 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
                                             lastLayer,
                                             EmptyOptional());
 
-    BOOST_TEST(res.IsOk());
+    CHECK(res.IsOk());
 
     TestBackendAssignment visitor;
     for (auto it = firstLayer; it != lastLayer; ++it)
@@ -728,7 +730,7 @@ BOOST_AUTO_TEST_CASE(BackendHintTest)
 }
 
 // Tests that OptimizeForExclusiveConnections works, fusing when needed, using BatchNorm fusing as example
-BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnectionsFuseTest)
+TEST_CASE("OptimizeForExclusiveConnectionsFuseTest")
 {
     using namespace armnn;
     // Define layers information
@@ -786,8 +788,8 @@ BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnectionsFuseTest)
     conv->GetOutputSlot(0).Connect(batchNorm->GetInputSlot(0));
     batchNorm->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    BOOST_CHECK(4 == graph.GetNumLayers());
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(4 == graph.GetNumLayers());
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<Convolution2dLayer>,
                              &IsLayerOfType<BatchNormalizationLayer>,
@@ -801,15 +803,15 @@ BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnectionsFuseTest)
                (layer->GetNameStr() == "fused-batchNorm-into-convolution");
     };
 
-    BOOST_CHECK(3 == graph.GetNumLayers());
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(3 == graph.GetNumLayers());
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              checkFusedConv2d,
                              &IsLayerOfType<OutputLayer>));
 }
 
 // Tests that OptimizeForExclusiveConnections works, not fusing when not needed, using BatchNorm fusing as example
-BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnectionsWithoutFuseTest)
+TEST_CASE("OptimizeForExclusiveConnectionsWithoutFuseTest")
 {
     // Define the network
     Graph graph;
@@ -828,8 +830,8 @@ BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnectionsWithoutFuseTest)
     batchNorm->GetOutputSlot(0).Connect(output->GetInputSlot(0));
     conv->GetOutputSlot(0).Connect(output2->GetInputSlot(0));
 
-    BOOST_CHECK(5 == graph.GetNumLayers());
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(5 == graph.GetNumLayers());
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<armnn::InputLayer>,
                              &IsLayerOfType<armnn::Convolution2dLayer>,
                              &IsLayerOfType<armnn::BatchNormalizationLayer>,
@@ -838,12 +840,12 @@ BOOST_AUTO_TEST_CASE(OptimizeForExclusiveConnectionsWithoutFuseTest)
     // Optimize graph
     armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(FuseBatchNormIntoConvolution2DFloat32()));
 
-    BOOST_CHECK(5 == graph.GetNumLayers());
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(5 == graph.GetNumLayers());
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<armnn::InputLayer>,
                              &IsLayerOfType<armnn::Convolution2dLayer>,
                              &IsLayerOfType<armnn::BatchNormalizationLayer>,
                              &IsLayerOfType<armnn::OutputLayer>,
                              &IsLayerOfType<armnn::OutputLayer>));
 }
-BOOST_AUTO_TEST_SUITE_END()
+}

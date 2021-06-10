@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_Pack")
+{
 struct PackFixture : public ParserFlatbuffersFixture
 {
     explicit PackFixture(const std::string & inputShape,
@@ -103,7 +102,7 @@ struct SimplePackFixture : PackFixture
                                       "3") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParsePack, SimplePackFixture)
+TEST_CASE_FIXTURE(SimplePackFixture, "ParsePack")
 {
     RunTest<4, armnn::DataType::Float32>(
     0,
@@ -150,4 +149,4 @@ BOOST_FIXTURE_TEST_CASE(ParsePack, SimplePackFixture)
                          18, 36 } } });
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

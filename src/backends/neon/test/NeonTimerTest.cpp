@@ -18,23 +18,23 @@
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <cstdlib>
 #include <algorithm>
 
 using namespace armnn;
 
-BOOST_AUTO_TEST_SUITE(NeonTimerInstrument)
+TEST_SUITE("NeonTimerInstrument")
+{
 
-
-BOOST_AUTO_TEST_CASE(NeonTimerGetName)
+TEST_CASE("NeonTimerGetName")
 {
     NeonTimer neonTimer;
-    BOOST_CHECK_EQUAL(neonTimer.GetName(), "NeonKernelTimer");
+    CHECK_EQ(std::string(neonTimer.GetName()), "NeonKernelTimer");
 }
 
-BOOST_AUTO_TEST_CASE(NeonTimerMeasure)
+TEST_CASE("NeonTimerMeasure")
 {
     NeonWorkloadFactory workloadFactory =
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
@@ -95,19 +95,19 @@ BOOST_AUTO_TEST_CASE(NeonTimerMeasure)
 
     std::vector<Measurement> measurements = neonTimer.GetMeasurements();
 
-    BOOST_CHECK(measurements.size() <= 2);
+    CHECK(measurements.size() <= 2);
     if (measurements.size() > 1)
     {
-        BOOST_CHECK_EQUAL(measurements[0].m_Name, "NeonKernelTimer/0: NEFillBorderKernel");
-        BOOST_CHECK(measurements[0].m_Value > 0.0);
+        CHECK_EQ(measurements[0].m_Name, "NeonKernelTimer/0: NEFillBorderKernel");
+        CHECK(measurements[0].m_Value > 0.0);
     }
     std::ostringstream oss_neon;
     std::ostringstream oss_cpu;
     oss_neon << "NeonKernelTimer/" << measurements.size()-1 << ": NEActivationLayerKernel";
     oss_cpu << "NeonKernelTimer/" << measurements.size()-1 << ": CpuActivationKernel";
-    BOOST_CHECK(measurements[measurements.size()-1].m_Name == oss_neon.str() ||
-                measurements[measurements.size()-1].m_Name == oss_cpu.str());
-    BOOST_CHECK(measurements[measurements.size()-1].m_Value > 0.0);
+    CHECK((measurements[measurements.size()-1].m_Name == oss_neon.str() ||
+                measurements[measurements.size()-1].m_Name == oss_cpu.str()));
+    CHECK(measurements[measurements.size()-1].m_Value > 0.0);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

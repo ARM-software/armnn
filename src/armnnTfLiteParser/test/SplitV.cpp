@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser")
+{
 struct SplitVFixture : public ParserFlatbuffersFixture
 {
     explicit SplitVFixture(const std::string& inputShape,
@@ -126,7 +125,7 @@ struct SimpleSplitVAxisOneFixture : SplitVFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseAxisOneSplitVTwo, SimpleSplitVAxisOneFixture)
+TEST_CASE_FIXTURE(SimpleSplitVAxisOneFixture, "ParseAxisOneSplitVTwo")
 {
     RunTest<4, armnn::DataType::Float32>(
         0,
@@ -148,7 +147,7 @@ struct SimpleSplitVAxisTwoFixture : SplitVFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseAxisTwoSplitVTwo, SimpleSplitVAxisTwoFixture)
+TEST_CASE_FIXTURE(SimpleSplitVAxisTwoFixture, "ParseAxisTwoSplitVTwo")
 {
     RunTest<4, armnn::DataType::Float32>(
         0,
@@ -170,7 +169,7 @@ struct SimpleSplitVAxisThreeFixture : SplitVFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseAxisThreeSplitVTwo, SimpleSplitVAxisThreeFixture)
+TEST_CASE_FIXTURE(SimpleSplitVAxisThreeFixture, "ParseAxisThreeSplitVTwo")
 {
     RunTest<4, armnn::DataType::Float32>(
         0,
@@ -192,7 +191,7 @@ struct SimpleSplitVAxisFourFixture : SplitVFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseAxisFourSplitVTwo, SimpleSplitVAxisFourFixture)
+TEST_CASE_FIXTURE(SimpleSplitVAxisFourFixture, "ParseAxisFourSplitVTwo")
 {
     RunTest<4, armnn::DataType::Float32>(
         0,
@@ -206,4 +205,4 @@ BOOST_FIXTURE_TEST_CASE(ParseAxisFourSplitVTwo, SimpleSplitVAxisFourFixture)
           {"outputTensor2", { 4.0f, 8.0f, 12.0f, 16.0f, 20.0f, 24.0f, 28.0f, 32.0f } } } );
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

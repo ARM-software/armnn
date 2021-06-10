@@ -9,7 +9,7 @@
 #include <armnn/backends/IBackendInternal.hpp>
 #include <reference/RefBackend.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 namespace
 {
@@ -33,20 +33,20 @@ private:
 
 }
 
-BOOST_AUTO_TEST_SUITE(BackendRegistryTests)
-
-BOOST_AUTO_TEST_CASE(SwapRegistry)
+TEST_SUITE("BackendRegistryTests")
+{
+TEST_CASE("SwapRegistry")
 {
     using namespace armnn;
     auto nFactories = BackendRegistryInstance().Size();
     {
         SwapRegistryStorage helper;
-        BOOST_TEST(BackendRegistryInstance().Size() == 0);
+        CHECK(BackendRegistryInstance().Size() == 0);
     }
-    BOOST_TEST(BackendRegistryInstance().Size() == nFactories);
+    CHECK(BackendRegistryInstance().Size() == nFactories);
 }
 
-BOOST_AUTO_TEST_CASE(TestRegistryHelper)
+TEST_CASE("TestRegistryHelper")
 {
     using namespace armnn;
     SwapRegistryStorage helper;
@@ -64,19 +64,19 @@ BOOST_AUTO_TEST_CASE(TestRegistryHelper)
     );
 
     // sanity check: the factory has not been called yet
-    BOOST_TEST(called == false);
+    CHECK(called == false);
 
     auto factoryFunction = BackendRegistryInstance().GetFactory("HelloWorld");
 
     // sanity check: the factory still not called
-    BOOST_TEST(called == false);
+    CHECK(called == false);
 
     factoryFunction();
-    BOOST_TEST(called == true);
+    CHECK(called == true);
     BackendRegistryInstance().Deregister("HelloWorld");
 }
 
-BOOST_AUTO_TEST_CASE(TestDirectCallToRegistry)
+TEST_CASE("TestDirectCallToRegistry")
 {
     using namespace armnn;
     SwapRegistryStorage helper;
@@ -92,15 +92,15 @@ BOOST_AUTO_TEST_CASE(TestDirectCallToRegistry)
     );
 
     // sanity check: the factory has not been called yet
-    BOOST_TEST(called == false);
+    CHECK(called == false);
 
     auto factoryFunction = BackendRegistryInstance().GetFactory("HelloWorld");
 
     // sanity check: the factory still not called
-    BOOST_TEST(called == false);
+    CHECK(called == false);
 
     factoryFunction();
-    BOOST_TEST(called == true);
+    CHECK(called == true);
     BackendRegistryInstance().Deregister("HelloWorld");
 }
 
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE(TestDirectCallToRegistry)
 // of Neon not being detected the exception is raised and so the backend is not added to the supportedBackends
 // list
 
-BOOST_AUTO_TEST_CASE(ThrowBackendUnavailableException)
+TEST_CASE("ThrowBackendUnavailableException")
 {
     using namespace armnn;
 
@@ -142,9 +142,9 @@ BOOST_AUTO_TEST_CASE(ThrowBackendUnavailableException)
     catch (const BackendUnavailableException& e)
     {
         // Caught
-        BOOST_CHECK_EQUAL(e.what(), exceptionMessage);
-        BOOST_TEST_MESSAGE("ThrowBackendUnavailableExceptionImpl: BackendUnavailableException caught.");
+        CHECK_EQ(e.what(), exceptionMessage);
+        MESSAGE("ThrowBackendUnavailableExceptionImpl: BackendUnavailableException caught.");
     }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

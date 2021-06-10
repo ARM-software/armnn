@@ -7,7 +7,7 @@
 #include <armnn/TypesUtils.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <memory>
 #include <thread>
@@ -34,7 +34,7 @@ namespace
 
 void RegisterUnregisterProfilerSingleThreadImpl(bool &res)
 {
-    // Important! Don't use BOOST_TEST macros in this function as they
+    // Important! Don't use CHECK macros in this function as they
     // seem to have problems when used in threads
 
     // Get a reference to the profiler manager.
@@ -61,36 +61,36 @@ void RegisterUnregisterProfilerSingleThreadImpl(bool &res)
 
 } // namespace
 
-BOOST_AUTO_TEST_SUITE(Profiler)
-
-BOOST_AUTO_TEST_CASE(EnableDisableProfiling)
+TEST_SUITE("Profiler")
+{
+TEST_CASE("EnableDisableProfiling")
 {
     std::unique_ptr<armnn::IProfiler> profiler = std::make_unique<armnn::IProfiler>();
 
     // Check that profiling is disabled by default.
-    BOOST_TEST(!profiler->IsProfilingEnabled());
+    CHECK(!profiler->IsProfilingEnabled());
 
     // Enable profiling.
     profiler->EnableProfiling(true);
 
     // Check that profiling is enabled.
-    BOOST_TEST(profiler->IsProfilingEnabled());
+    CHECK(profiler->IsProfilingEnabled());
 
     // Disable profiling.
     profiler->EnableProfiling(false);
 
     // Check that profiling is disabled.
-    BOOST_TEST(!profiler->IsProfilingEnabled());
+    CHECK(!profiler->IsProfilingEnabled());
 }
 
-BOOST_AUTO_TEST_CASE(RegisterUnregisterProfilerSingleThread)
+TEST_CASE("RegisterUnregisterProfilerSingleThread")
 {
     bool res = false;
     RegisterUnregisterProfilerSingleThreadImpl(res);
-    BOOST_TEST(res);
+    CHECK(res);
 }
 
-BOOST_AUTO_TEST_CASE(RegisterUnregisterProfilerMultipleThreads)
+TEST_CASE("RegisterUnregisterProfilerMultipleThreads")
 {
     bool res[3] = {false, false, false};
     std::thread thread1([&res]() { RegisterUnregisterProfilerSingleThreadImpl(res[0]); });
@@ -103,11 +103,11 @@ BOOST_AUTO_TEST_CASE(RegisterUnregisterProfilerMultipleThreads)
 
     for (int i = 0 ; i < 3 ; i++)
     {
-        BOOST_TEST(res[i]);
+        CHECK(res[i]);
     }
 }
 
-BOOST_AUTO_TEST_CASE(ProfilingMacros)
+TEST_CASE("ProfilingMacros")
 {
     // Get a reference to the profiler manager.
     armnn::ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
@@ -115,13 +115,13 @@ BOOST_AUTO_TEST_CASE(ProfilingMacros)
     { // --- No profiler ---
 
         // Check that there's no profiler registered for this thread.
-        BOOST_TEST(!profilerManager.GetProfiler());
+        CHECK(!profilerManager.GetProfiler());
 
         // Test scoped event.
         { ARMNN_SCOPED_PROFILING_EVENT(armnn::Compute::CpuAcc, "test"); }
 
         // Check that we still cannot get a profiler for this thread.
-        BOOST_TEST(!profilerManager.GetProfiler());
+        CHECK(!profilerManager.GetProfiler());
     }
 
     // Create and register a profiler for this thread.
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(ProfilingMacros)
 
         // Check that no profiling event has been added to the sequence.
         size_t eventSequenceSizeAfter = armnn::GetProfilerEventSequenceSize(profiler.get());
-        BOOST_TEST(eventSequenceSizeBefore == eventSequenceSizeAfter);
+        CHECK(eventSequenceSizeBefore == eventSequenceSizeAfter);
     }
 
     // Enable profiling.
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(ProfilingMacros)
 
         // Check that a profiling event has been added to the sequence.
         size_t eventSequenceSizeAfter = armnn::GetProfilerEventSequenceSize(profiler.get());
-        BOOST_TEST(eventSequenceSizeAfter == eventSequenceSizeBefore + 1);
+        CHECK(eventSequenceSizeAfter == eventSequenceSizeBefore + 1);
     }
 
     // Disable profiling here to not print out anything on stdout.
@@ -165,13 +165,13 @@ BOOST_AUTO_TEST_CASE(ProfilingMacros)
 
 // This test unit needs the reference backend, it's not available if the reference backend is not built
 
-BOOST_AUTO_TEST_CASE(RuntimeLoadNetwork)
+TEST_CASE("RuntimeLoadNetwork")
 {
     // Get a reference to the profiler manager.
     armnn::ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
 
     // Check that there's no profiler registered for this thread.
-    BOOST_TEST(!profilerManager.GetProfiler());
+    CHECK(!profilerManager.GetProfiler());
 
     // Build a mock-network and load it into the runtime.
     armnn::IRuntime::CreationOptions options;
@@ -183,18 +183,18 @@ BOOST_AUTO_TEST_CASE(RuntimeLoadNetwork)
     runtime->LoadNetwork(networkIdentifier, armnn::Optimize(*mockNetwork, backends, runtime->GetDeviceSpec()));
 
     // Check that now there's a profiler registered for this thread (created and registered by the loading the network).
-    BOOST_TEST(profilerManager.GetProfiler());
+    CHECK(profilerManager.GetProfiler());
 
     // Unload the network.
     runtime->UnloadNetwork(networkIdentifier);
 
     // Check that the profiler has been un-registered for this thread.
-    BOOST_TEST(!profilerManager.GetProfiler());
+    CHECK(!profilerManager.GetProfiler());
 }
 
 #endif
 
-BOOST_AUTO_TEST_CASE(WriteEventResults)
+TEST_CASE("WriteEventResults")
 {
     // Get a reference to the profiler manager.
     armnn::ProfilerManager& profileManager = armnn::ProfilerManager::GetInstance();
@@ -222,35 +222,35 @@ BOOST_AUTO_TEST_CASE(WriteEventResults)
 
         // Check that a profiling event has been added to the sequence.
         size_t eventSequenceSizeAfter = armnn::GetProfilerEventSequenceSize(profiler.get());
-        BOOST_TEST(eventSequenceSizeAfter == eventSequenceSizeBefore + 1);
+        CHECK(eventSequenceSizeAfter == eventSequenceSizeBefore + 1);
 
         std::ostringstream output;
         profiler->AnalyzeEventsAndWriteResults(output);
-        BOOST_TEST(!output.str().empty());
+        CHECK(!output.str().empty());
 
         // output should contain event name 'test'
-        BOOST_CHECK(output.str().find("test") != std::string::npos);
+        CHECK(output.str().find("test") != std::string::npos);
 
         // output should contain headers
-        BOOST_CHECK(output.str().find("Event Sequence - Name") != std::string::npos);
-        BOOST_CHECK(output.str().find("Event Stats - Name") != std::string::npos);
-        BOOST_CHECK(output.str().find("Total") != std::string::npos);
-        BOOST_CHECK(output.str().find("Device") != std::string::npos);
+        CHECK(output.str().find("Event Sequence - Name") != std::string::npos);
+        CHECK(output.str().find("Event Stats - Name") != std::string::npos);
+        CHECK(output.str().find("Total") != std::string::npos);
+        CHECK(output.str().find("Device") != std::string::npos);
         // output should contain compute device 'CpuAcc'
-        BOOST_CHECK(output.str().find("CpuAcc") != std::string::npos);
+        CHECK(output.str().find("CpuAcc") != std::string::npos);
         // output should not contain un-readable numbers
-        BOOST_CHECK(output.str().find("e+") == std::string::npos);
+        CHECK(output.str().find("e+") == std::string::npos);
         // output should not contain un-readable numbers
-        BOOST_CHECK(output.str().find("+") == std::string::npos);
+        CHECK(output.str().find("+") == std::string::npos);
         // output should not contain zero value
-        BOOST_CHECK(output.str().find(" 0 ") == std::string::npos);
+        CHECK(output.str().find(" 0 ") == std::string::npos);
     }
 
     // Disable profiling here to not print out anything on stdout.
     profiler->EnableProfiling(false);
 }
 
-BOOST_AUTO_TEST_CASE(ProfilerJsonPrinter)
+TEST_CASE("ProfilerJsonPrinter")
 {
     class TestInstrument : public armnn::Instrument
     {
@@ -350,8 +350,8 @@ BOOST_AUTO_TEST_CASE(ProfilerJsonPrinter)
                               "2.000000\n\t\t\t\t\t\t\t],\n\t\t\t\t\t\t\t\""
                               "unit\": \"us\"\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n}\n");
 
-    BOOST_CHECK(output == blessedOutput);
+    CHECK(output == blessedOutput);
     armnn::ProfilerManager::GetInstance().RegisterProfiler(nullptr);
 }
 
-BOOST_AUTO_TEST_SUITE_END();
+}

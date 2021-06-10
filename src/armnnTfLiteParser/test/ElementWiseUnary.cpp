@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_ElementwiseUnary")
+{
 struct ElementWiseUnaryFixture : public ParserFlatbuffersFixture
 {
     explicit ElementWiseUnaryFixture(const std::string& operatorCode,
@@ -75,7 +74,7 @@ struct SimpleAbsFixture : public ElementWiseUnaryFixture
     SimpleAbsFixture() : ElementWiseUnaryFixture("ABS", "FLOAT32", "[ 2, 2 ]", "[ 2, 2 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseAbs, SimpleAbsFixture)
+TEST_CASE_FIXTURE(SimpleAbsFixture, "ParseAbs")
 {
     std::vector<float> inputValues
     {
@@ -99,7 +98,7 @@ struct SimpleExpFixture : public ElementWiseUnaryFixture
     SimpleExpFixture() : ElementWiseUnaryFixture("EXP", "FLOAT32", "[ 1, 2, 3, 1 ]", "[ 1, 2, 3, 1 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseExp, SimpleExpFixture)
+TEST_CASE_FIXTURE(SimpleExpFixture, "ParseExp")
 {
     RunTest<4, armnn::DataType::Float32>(0, {{ "inputTensor", { 0.0f,  1.0f,  2.0f,
                                                                 3.0f,  4.0f,  5.0f} }},
@@ -112,7 +111,7 @@ struct SimpleLogicalNotFixture : public ElementWiseUnaryFixture
     SimpleLogicalNotFixture() : ElementWiseUnaryFixture("LOGICAL_NOT", "BOOL", "[ 1, 1, 1, 4 ]", "[ 1, 1, 1, 4 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseLogicalNot, SimpleLogicalNotFixture)
+TEST_CASE_FIXTURE(SimpleLogicalNotFixture, "ParseLogicalNot")
 {
     RunTest<4, armnn::DataType::Boolean>(0, {{ "inputTensor", { 0, 1, 0, 1 } }},
                                             {{ "outputTensor",{ 1, 0, 1, 0 } } });
@@ -123,7 +122,7 @@ struct SimpleNegFixture : public ElementWiseUnaryFixture
     SimpleNegFixture() : ElementWiseUnaryFixture("NEG", "FLOAT32", "[ 1, 2, 3, 1 ]", "[ 1, 2, 3, 1 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseNeg, SimpleNegFixture)
+TEST_CASE_FIXTURE(SimpleNegFixture, "ParseNeg")
 {
     RunTest<4, armnn::DataType::Float32>(0, {{ "inputTensor", { 0.0f, 1.0f, -2.0f,
                                                                 20.0855185f, -54.5980834f, 5.0f} }},
@@ -136,7 +135,7 @@ struct SimpleRsqrtFixture : public ElementWiseUnaryFixture
     SimpleRsqrtFixture() : ElementWiseUnaryFixture("RSQRT", "FLOAT32", "[ 1, 2, 3, 1 ]", "[ 1, 2, 3, 1 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseRsqrt, SimpleRsqrtFixture)
+TEST_CASE_FIXTURE(SimpleRsqrtFixture, "ParseRsqrt")
 {
     RunTest<4, armnn::DataType::Float32>(0, {{ "inputTensor", { 1.0f, 4.0f, 16.0f,
                                                                 25.0f, 64.0f, 100.0f } }},
@@ -144,5 +143,4 @@ BOOST_FIXTURE_TEST_CASE(ParseRsqrt, SimpleRsqrtFixture)
                                                                 0.2f, 0.125f, 0.1f} }});
 }
 
-
-BOOST_AUTO_TEST_SUITE_END()
+}

@@ -11,9 +11,8 @@
 
 #include <test/UnitTests.hpp>
 
-#include <boost/test/unit_test.hpp>
-
-BOOST_AUTO_TEST_SUITE(Compute_Reference)
+TEST_SUITE("Compute_Reference")
+{
 
 using namespace armnn;
 
@@ -1437,15 +1436,15 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(PermuteQSymm16ValueSet2Test, PermuteValueSet2Test<
 ARMNN_AUTO_TEST_CASE_WITH_THF(PermuteQSymm16ValueSet3Test, PermuteValueSet3Test<DataType::QSymmS16>)
 
 // Lstm
-BOOST_AUTO_TEST_CASE(LstmUtilsZeroVector) {
+TEST_CASE("LstmUtilsZeroVector") {
                               LstmUtilsZeroVectorTest(); }
-BOOST_AUTO_TEST_CASE(LstmUtilsMeanStddevNormalization) {
+TEST_CASE("LstmUtilsMeanStddevNormalization") {
                               LstmUtilsMeanStddevNormalizationNoneZeroInputTest();
                               LstmUtilsMeanStddevNormalizationAllZeroInputTest();
                               LstmUtilsMeanStddevNormalizationMixedZeroInputTest(); }
-BOOST_AUTO_TEST_CASE(LstmUtilsVectorBatchVectorCwiseProduct) {
+TEST_CASE("LstmUtilsVectorBatchVectorCwiseProduct") {
                               LstmUtilsVectorBatchVectorCwiseProductTest(); }
-BOOST_AUTO_TEST_CASE(LstmUtilsVectorBatchVectorAdd) {
+TEST_CASE("LstmUtilsVectorBatchVectorAdd") {
                               LstmUtilsVectorBatchVectorAddTest(); }
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(LstmLayerFloat32WithCifgWithPeepholeNoProjection,
@@ -1873,43 +1872,37 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(Abs2dQuantisedSymm16, Abs2dTest<DataType::QSymmS16
 ARMNN_AUTO_TEST_CASE_WITH_THF(Abs3dQuantisedSymm16, Abs3dTest<DataType::QSymmS16>)
 
 // Detection PostProcess
-BOOST_AUTO_TEST_CASE(DetectionPostProcessRegularNmsFloat)
+TEST_CASE("DetectionPostProcessRegularNmsFloat")
 {
     DetectionPostProcessRegularNmsFloatTest<RefWorkloadFactory>();
 }
-BOOST_AUTO_TEST_CASE(DetectionPostProcessFastNmsFloat)
+TEST_CASE("DetectionPostProcessFastNmsFloat")
 {
     DetectionPostProcessFastNmsFloatTest<RefWorkloadFactory>();
 }
-BOOST_AUTO_TEST_CASE(DetectionPostProcessRegularNmsInt8)
+TEST_CASE("DetectionPostProcessRegularNmsInt8")
 {
-    DetectionPostProcessRegularNmsQuantizedTest<
-        RefWorkloadFactory, DataType::QAsymmS8>();
+    DetectionPostProcessRegularNmsQuantizedTest<RefWorkloadFactory, DataType::QAsymmS8>();
 }
-BOOST_AUTO_TEST_CASE(DetectionPostProcessFastNmsInt8)
+TEST_CASE("DetectionPostProcessFastNmsInt8")
 {
-    DetectionPostProcessRegularNmsQuantizedTest<
-        RefWorkloadFactory, DataType::QAsymmS8>();
+    DetectionPostProcessRegularNmsQuantizedTest<RefWorkloadFactory, DataType::QAsymmS8>();
 }
-BOOST_AUTO_TEST_CASE(DetectionPostProcessRegularNmsUint8)
+TEST_CASE("DetectionPostProcessRegularNmsUint8")
 {
-    DetectionPostProcessRegularNmsQuantizedTest<
-        RefWorkloadFactory, DataType::QAsymmU8>();
+    DetectionPostProcessRegularNmsQuantizedTest<RefWorkloadFactory, DataType::QAsymmU8>();
 }
-BOOST_AUTO_TEST_CASE(DetectionPostProcessFastNmsUint8)
+TEST_CASE("DetectionPostProcessFastNmsUint8")
 {
-    DetectionPostProcessRegularNmsQuantizedTest<
-        RefWorkloadFactory, DataType::QAsymmU8>();
+    DetectionPostProcessRegularNmsQuantizedTest<RefWorkloadFactory, DataType::QAsymmU8>();
 }
-BOOST_AUTO_TEST_CASE(DetectionPostProcessRegularNmsInt16)
+TEST_CASE("DetectionPostProcessRegularNmsInt16")
 {
-    DetectionPostProcessRegularNmsQuantizedTest<
-        RefWorkloadFactory, DataType::QSymmS16>();
+    DetectionPostProcessRegularNmsQuantizedTest<RefWorkloadFactory, DataType::QSymmS16>();
 }
-BOOST_AUTO_TEST_CASE(DetectionPostProcessFastNmsInt16)
+TEST_CASE("DetectionPostProcessFastNmsInt16")
 {
-    DetectionPostProcessFastNmsQuantizedTest<
-        RefWorkloadFactory, DataType::QSymmS16>();
+    DetectionPostProcessFastNmsQuantizedTest<RefWorkloadFactory, DataType::QSymmS16>();
 }
 
 // Dequantize
@@ -2271,4 +2264,4 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceMax2Float32, ReduceMaxSimpleTest2<DataType::
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceMinFloat32, ReduceMinSimpleTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceMinNegativeAxisFloat32, ReduceMinNegativeAxisTest<DataType::Float32>)
 
-BOOST_AUTO_TEST_SUITE_END()
+}

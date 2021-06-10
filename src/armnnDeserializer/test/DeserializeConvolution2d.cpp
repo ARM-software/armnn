@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include <armnnDeserializer/IDeserializer.hpp>
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(Deserializer)
-
+TEST_SUITE("Deserializer_Convolution2D")
+{
 struct Convolution2dFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit Convolution2dFixture(const std::string & inputShape1,
@@ -130,7 +129,7 @@ struct SimpleConvolution2dFixture : Convolution2dFixture
                                      "Float32") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(Convolution2dFloat32, SimpleConvolution2dFixture)
+TEST_CASE_FIXTURE(SimpleConvolution2dFixture, "Convolution2dFloat32")
 {
     RunTest<4, armnn::DataType::Float32>(
             0,
@@ -138,4 +137,4 @@ BOOST_FIXTURE_TEST_CASE(Convolution2dFloat32, SimpleConvolution2dFixture)
             {{"OutputLayer", {23, 33, 24, 91, 99, 48, 26, 50, 19}}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

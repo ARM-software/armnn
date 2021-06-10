@@ -9,7 +9,7 @@
 
 #include <Network.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 namespace
 {
@@ -27,27 +27,27 @@ bool AreAllLayerInputSlotsConnected(const armnn::IConnectableLayer& layer)
 
 }
 
-BOOST_AUTO_TEST_SUITE(Network)
-
-BOOST_AUTO_TEST_CASE(LayerGuids)
+TEST_SUITE("Network")
+{
+TEST_CASE("LayerGuids")
 {
     armnn::NetworkImpl net;
     armnn::LayerGuid inputId = net.AddInputLayer(0)->GetGuid();
     armnn::LayerGuid addId = net.AddAdditionLayer()->GetGuid();
     armnn::LayerGuid outputId = net.AddOutputLayer(0)->GetGuid();
 
-    BOOST_TEST(inputId != addId);
-    BOOST_TEST(addId != outputId);
-    BOOST_TEST(inputId != outputId);
+    CHECK(inputId != addId);
+    CHECK(addId != outputId);
+    CHECK(inputId != outputId);
 }
 
-BOOST_AUTO_TEST_CASE(NetworkBasic)
+TEST_CASE("NetworkBasic")
 {
     armnn::NetworkImpl net;
-    BOOST_TEST(net.PrintGraph() == armnn::Status::Success);
+    CHECK(net.PrintGraph() == armnn::Status::Success);
 }
 
-BOOST_AUTO_TEST_CASE(LayerNamesAreOptionalForINetwork)
+TEST_CASE("LayerNamesAreOptionalForINetwork")
 {
     armnn::INetworkPtr inet(armnn::INetwork::Create());
     inet->AddInputLayer(0);
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(LayerNamesAreOptionalForINetwork)
     inet->AddOutputLayer(0);
 }
 
-BOOST_AUTO_TEST_CASE(LayerNamesAreOptionalForNetwork)
+TEST_CASE("LayerNamesAreOptionalForNetwork")
 {
     armnn::NetworkImpl net;
     net.AddInputLayer(0);
@@ -65,12 +65,12 @@ BOOST_AUTO_TEST_CASE(LayerNamesAreOptionalForNetwork)
     net.AddOutputLayer(0);
 }
 
-BOOST_AUTO_TEST_CASE(NetworkModification)
+TEST_CASE("NetworkModification")
 {
     armnn::NetworkImpl net;
 
     armnn::IConnectableLayer* const inputLayer = net.AddInputLayer(0, "input layer");
-    BOOST_TEST(inputLayer);
+    CHECK(inputLayer);
 
     unsigned int dims[] = { 10,1,1,1 };
     std::vector<float> convWeightsData(10);
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(NetworkModification)
                                                                           weights,
                                                                           armnn::EmptyOptional(),
                                                                           "conv layer");
-    BOOST_TEST(convLayer);
+    CHECK(convLayer);
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
 
@@ -90,31 +90,31 @@ BOOST_AUTO_TEST_CASE(NetworkModification)
                                                                                      weights,
                                                                                      armnn::EmptyOptional(),
                                                                                      "fully connected");
-    BOOST_TEST(fullyConnectedLayer);
+    CHECK(fullyConnectedLayer);
 
     convLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(0));
 
     armnn::Pooling2dDescriptor pooling2dDesc;
     armnn::IConnectableLayer* const poolingLayer = net.AddPooling2dLayer(pooling2dDesc, "pooling2d");
-    BOOST_TEST(poolingLayer);
+    CHECK(poolingLayer);
 
     fullyConnectedLayer->GetOutputSlot(0).Connect(poolingLayer->GetInputSlot(0));
 
     armnn::ActivationDescriptor activationDesc;
     armnn::IConnectableLayer* const activationLayer = net.AddActivationLayer(activationDesc, "activation");
-    BOOST_TEST(activationLayer);
+    CHECK(activationLayer);
 
     poolingLayer->GetOutputSlot(0).Connect(activationLayer->GetInputSlot(0));
 
     armnn::NormalizationDescriptor normalizationDesc;
     armnn::IConnectableLayer* const normalizationLayer = net.AddNormalizationLayer(normalizationDesc, "normalization");
-    BOOST_TEST(normalizationLayer);
+    CHECK(normalizationLayer);
 
     activationLayer->GetOutputSlot(0).Connect(normalizationLayer->GetInputSlot(0));
 
     armnn::SoftmaxDescriptor softmaxDesc;
     armnn::IConnectableLayer* const softmaxLayer = net.AddSoftmaxLayer(softmaxDesc, "softmax");
-    BOOST_TEST(softmaxLayer);
+    CHECK(softmaxLayer);
 
     normalizationLayer->GetOutputSlot(0).Connect(softmaxLayer->GetInputSlot(0));
 
@@ -130,42 +130,42 @@ BOOST_AUTO_TEST_CASE(NetworkModification)
         invalidTensor,
         invalidTensor,
         "batch norm");
-    BOOST_TEST(batchNormalizationLayer);
+    CHECK(batchNormalizationLayer);
 
     softmaxLayer->GetOutputSlot(0).Connect(batchNormalizationLayer->GetInputSlot(0));
 
     armnn::IConnectableLayer* const additionLayer = net.AddAdditionLayer("addition");
-    BOOST_TEST(additionLayer);
+    CHECK(additionLayer);
 
     batchNormalizationLayer->GetOutputSlot(0).Connect(additionLayer->GetInputSlot(0));
     batchNormalizationLayer->GetOutputSlot(0).Connect(additionLayer->GetInputSlot(1));
 
     armnn::IConnectableLayer* const multiplicationLayer = net.AddMultiplicationLayer("multiplication");
-    BOOST_TEST(multiplicationLayer);
+    CHECK(multiplicationLayer);
 
     additionLayer->GetOutputSlot(0).Connect(multiplicationLayer->GetInputSlot(0));
     additionLayer->GetOutputSlot(0).Connect(multiplicationLayer->GetInputSlot(1));
 
     armnn::IConnectableLayer* const outputLayer = net.AddOutputLayer(0, "output layer");
-    BOOST_TEST(outputLayer);
+    CHECK(outputLayer);
 
     multiplicationLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     //Tests that all layers are present in the graph.
-    BOOST_TEST(net.GetGraph().GetNumLayers() == 11);
+    CHECK(net.GetGraph().GetNumLayers() == 11);
 
     //Tests that the vertices exist and have correct names.
-    BOOST_TEST(GraphHasNamedLayer(net.GetGraph(), "input layer"));
-    BOOST_TEST(GraphHasNamedLayer(net.GetGraph(), "conv layer"));
-    BOOST_TEST(GraphHasNamedLayer(net.GetGraph(), "fully connected"));
-    BOOST_TEST(GraphHasNamedLayer(net.GetGraph(), "pooling2d"));
-    BOOST_TEST(GraphHasNamedLayer(net.GetGraph(), "activation"));
-    BOOST_TEST(GraphHasNamedLayer(net.GetGraph(), "normalization"));
-    BOOST_TEST(GraphHasNamedLayer(net.GetGraph(), "softmax"));
-    BOOST_TEST(GraphHasNamedLayer(net.GetGraph(), "batch norm"));
-    BOOST_TEST(GraphHasNamedLayer(net.GetGraph(), "addition"));
-    BOOST_TEST(GraphHasNamedLayer(net.GetGraph(), "multiplication"));
-    BOOST_TEST(GraphHasNamedLayer(net.GetGraph(), "output layer"));
+    CHECK(GraphHasNamedLayer(net.GetGraph(), "input layer"));
+    CHECK(GraphHasNamedLayer(net.GetGraph(), "conv layer"));
+    CHECK(GraphHasNamedLayer(net.GetGraph(), "fully connected"));
+    CHECK(GraphHasNamedLayer(net.GetGraph(), "pooling2d"));
+    CHECK(GraphHasNamedLayer(net.GetGraph(), "activation"));
+    CHECK(GraphHasNamedLayer(net.GetGraph(), "normalization"));
+    CHECK(GraphHasNamedLayer(net.GetGraph(), "softmax"));
+    CHECK(GraphHasNamedLayer(net.GetGraph(), "batch norm"));
+    CHECK(GraphHasNamedLayer(net.GetGraph(), "addition"));
+    CHECK(GraphHasNamedLayer(net.GetGraph(), "multiplication"));
+    CHECK(GraphHasNamedLayer(net.GetGraph(), "output layer"));
 
     auto checkOneOutputToOneInputConnection = []
         (const armnn::IConnectableLayer* const srcLayer,
@@ -173,14 +173,14 @@ BOOST_AUTO_TEST_CASE(NetworkModification)
          int expectedSrcNumInputs = 1,
          int expectedDstNumOutputs = 1)
         {
-            BOOST_TEST(srcLayer->GetNumInputSlots() == expectedSrcNumInputs);
-            BOOST_TEST(srcLayer->GetNumOutputSlots() == 1);
-            BOOST_TEST(tgtLayer->GetNumInputSlots() == 1);
-            BOOST_TEST(tgtLayer->GetNumOutputSlots() == expectedDstNumOutputs);
+            CHECK(srcLayer->GetNumInputSlots() == expectedSrcNumInputs);
+            CHECK(srcLayer->GetNumOutputSlots() == 1);
+            CHECK(tgtLayer->GetNumInputSlots() == 1);
+            CHECK(tgtLayer->GetNumOutputSlots() == expectedDstNumOutputs);
 
-            BOOST_TEST(srcLayer->GetOutputSlot(0).GetNumConnections() == 1);
-            BOOST_TEST(srcLayer->GetOutputSlot(0).GetConnection(0) == &tgtLayer->GetInputSlot(0));
-            BOOST_TEST(&srcLayer->GetOutputSlot(0) == tgtLayer->GetInputSlot(0).GetConnection());
+            CHECK(srcLayer->GetOutputSlot(0).GetNumConnections() == 1);
+            CHECK(srcLayer->GetOutputSlot(0).GetConnection(0) == &tgtLayer->GetInputSlot(0));
+            CHECK(&srcLayer->GetOutputSlot(0) == tgtLayer->GetInputSlot(0).GetConnection());
         };
     auto checkOneOutputToTwoInputsConnections = []
         (const armnn::IConnectableLayer* const srcLayer,
@@ -188,29 +188,29 @@ BOOST_AUTO_TEST_CASE(NetworkModification)
          int expectedSrcNumInputs,
          int expectedDstNumOutputs = 1)
         {
-            BOOST_TEST(srcLayer->GetNumInputSlots() == expectedSrcNumInputs);
-            BOOST_TEST(srcLayer->GetNumOutputSlots() == 1);
-            BOOST_TEST(tgtLayer->GetNumInputSlots() == 2);
-            BOOST_TEST(tgtLayer->GetNumOutputSlots() == expectedDstNumOutputs);
+            CHECK(srcLayer->GetNumInputSlots() == expectedSrcNumInputs);
+            CHECK(srcLayer->GetNumOutputSlots() == 1);
+            CHECK(tgtLayer->GetNumInputSlots() == 2);
+            CHECK(tgtLayer->GetNumOutputSlots() == expectedDstNumOutputs);
 
-            BOOST_TEST(srcLayer->GetOutputSlot(0).GetNumConnections() == 2);
+            CHECK(srcLayer->GetOutputSlot(0).GetNumConnections() == 2);
             for (unsigned int i = 0; i < srcLayer->GetOutputSlot(0).GetNumConnections(); ++i)
             {
-                BOOST_TEST(srcLayer->GetOutputSlot(0).GetConnection(i) == &tgtLayer->GetInputSlot(i));
-                BOOST_TEST(&srcLayer->GetOutputSlot(0) == tgtLayer->GetInputSlot(i).GetConnection());
+                CHECK(srcLayer->GetOutputSlot(0).GetConnection(i) == &tgtLayer->GetInputSlot(i));
+                CHECK(&srcLayer->GetOutputSlot(0) == tgtLayer->GetInputSlot(i).GetConnection());
             }
         };
 
-    BOOST_TEST(AreAllLayerInputSlotsConnected(*convLayer));
-    BOOST_TEST(AreAllLayerInputSlotsConnected(*fullyConnectedLayer));
-    BOOST_TEST(AreAllLayerInputSlotsConnected(*poolingLayer));
-    BOOST_TEST(AreAllLayerInputSlotsConnected(*activationLayer));
-    BOOST_TEST(AreAllLayerInputSlotsConnected(*normalizationLayer));
-    BOOST_TEST(AreAllLayerInputSlotsConnected(*softmaxLayer));
-    BOOST_TEST(AreAllLayerInputSlotsConnected(*batchNormalizationLayer));
-    BOOST_TEST(AreAllLayerInputSlotsConnected(*additionLayer));
-    BOOST_TEST(AreAllLayerInputSlotsConnected(*multiplicationLayer));
-    BOOST_TEST(AreAllLayerInputSlotsConnected(*outputLayer));
+    CHECK(AreAllLayerInputSlotsConnected(*convLayer));
+    CHECK(AreAllLayerInputSlotsConnected(*fullyConnectedLayer));
+    CHECK(AreAllLayerInputSlotsConnected(*poolingLayer));
+    CHECK(AreAllLayerInputSlotsConnected(*activationLayer));
+    CHECK(AreAllLayerInputSlotsConnected(*normalizationLayer));
+    CHECK(AreAllLayerInputSlotsConnected(*softmaxLayer));
+    CHECK(AreAllLayerInputSlotsConnected(*batchNormalizationLayer));
+    CHECK(AreAllLayerInputSlotsConnected(*additionLayer));
+    CHECK(AreAllLayerInputSlotsConnected(*multiplicationLayer));
+    CHECK(AreAllLayerInputSlotsConnected(*outputLayer));
 
     // Checks connectivity.
     checkOneOutputToOneInputConnection(inputLayer, convLayer, 0);
@@ -225,32 +225,32 @@ BOOST_AUTO_TEST_CASE(NetworkModification)
     checkOneOutputToOneInputConnection(multiplicationLayer, outputLayer, 2, 0);
 }
 
-BOOST_AUTO_TEST_CASE(NetworkModification_SplitterConcat)
+TEST_CASE("NetworkModification_SplitterConcat")
 {
     armnn::NetworkImpl net;
 
     // Adds an input layer and an input tensor descriptor.
     armnn::IConnectableLayer* inputLayer = net.AddInputLayer(0, "input layer");
-    BOOST_TEST(inputLayer);
+    CHECK(inputLayer);
 
     // Adds a splitter layer.
     armnn::ViewsDescriptor splitterDesc(2,4);
 
     armnn::IConnectableLayer* splitterLayer = net.AddSplitterLayer(splitterDesc, "splitter layer");
-    BOOST_TEST(splitterLayer);
+    CHECK(splitterLayer);
 
     inputLayer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
 
     // Adds a softmax layer 1.
     armnn::SoftmaxDescriptor softmaxDescriptor;
     armnn::IConnectableLayer* softmaxLayer1 = net.AddSoftmaxLayer(softmaxDescriptor, "softmax_1");
-    BOOST_TEST(softmaxLayer1);
+    CHECK(softmaxLayer1);
 
     splitterLayer->GetOutputSlot(0).Connect(softmaxLayer1->GetInputSlot(0));
 
     // Adds a softmax layer 2.
     armnn::IConnectableLayer* softmaxLayer2 = net.AddSoftmaxLayer(softmaxDescriptor, "softmax_2");
-    BOOST_TEST(softmaxLayer2);
+    CHECK(softmaxLayer2);
 
     splitterLayer->GetOutputSlot(1).Connect(softmaxLayer2->GetInputSlot(0));
 
@@ -258,62 +258,62 @@ BOOST_AUTO_TEST_CASE(NetworkModification_SplitterConcat)
     armnn::OriginsDescriptor concatDesc(2, 4);
 
     armnn::IConnectableLayer* concatLayer = net.AddConcatLayer(concatDesc, "concat layer");
-    BOOST_TEST(concatLayer);
+    CHECK(concatLayer);
 
     softmaxLayer1->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(0));
     softmaxLayer2->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(1));
 
     // Adds an output layer.
     armnn::IConnectableLayer* outputLayer = net.AddOutputLayer(0, "output layer");
-    BOOST_TEST(outputLayer);
+    CHECK(outputLayer);
 
     concatLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
-    BOOST_TEST(splitterLayer->GetNumOutputSlots() == 2);
-    BOOST_TEST(splitterLayer->GetOutputSlot(0).GetConnection(0) == &softmaxLayer1->GetInputSlot(0));
-    BOOST_TEST(&splitterLayer->GetOutputSlot(0) == softmaxLayer1->GetInputSlot(0).GetConnection());
-    BOOST_TEST(splitterLayer->GetOutputSlot(1).GetConnection(0) == &softmaxLayer2->GetInputSlot(0));
-    BOOST_TEST(&splitterLayer->GetOutputSlot(1) == softmaxLayer2->GetInputSlot(0).GetConnection());
+    CHECK(splitterLayer->GetNumOutputSlots() == 2);
+    CHECK(splitterLayer->GetOutputSlot(0).GetConnection(0) == &softmaxLayer1->GetInputSlot(0));
+    CHECK(&splitterLayer->GetOutputSlot(0) == softmaxLayer1->GetInputSlot(0).GetConnection());
+    CHECK(splitterLayer->GetOutputSlot(1).GetConnection(0) == &softmaxLayer2->GetInputSlot(0));
+    CHECK(&splitterLayer->GetOutputSlot(1) == softmaxLayer2->GetInputSlot(0).GetConnection());
 
-    BOOST_TEST(concatLayer->GetNumInputSlots() == 2);
-    BOOST_TEST(softmaxLayer1->GetOutputSlot(0).GetConnection(0) == &concatLayer->GetInputSlot(0));
-    BOOST_TEST(&softmaxLayer1->GetOutputSlot(0) == concatLayer->GetInputSlot(0).GetConnection());
-    BOOST_TEST(softmaxLayer2->GetOutputSlot(0).GetConnection(0) == &concatLayer->GetInputSlot(1));
-    BOOST_TEST(&softmaxLayer2->GetOutputSlot(0) == concatLayer->GetInputSlot(1).GetConnection());
+    CHECK(concatLayer->GetNumInputSlots() == 2);
+    CHECK(softmaxLayer1->GetOutputSlot(0).GetConnection(0) == &concatLayer->GetInputSlot(0));
+    CHECK(&softmaxLayer1->GetOutputSlot(0) == concatLayer->GetInputSlot(0).GetConnection());
+    CHECK(softmaxLayer2->GetOutputSlot(0).GetConnection(0) == &concatLayer->GetInputSlot(1));
+    CHECK(&softmaxLayer2->GetOutputSlot(0) == concatLayer->GetInputSlot(1).GetConnection());
 }
 
-BOOST_AUTO_TEST_CASE(NetworkModification_SplitterAddition)
+TEST_CASE("NetworkModification_SplitterAddition")
 {
     armnn::NetworkImpl net;
 
     // Adds an input layer and an input tensor descriptor.
     armnn::IConnectableLayer* layer = net.AddInputLayer(0, "input layer");
-    BOOST_TEST(layer);
+    CHECK(layer);
 
     // Adds a splitter layer.
     armnn::ViewsDescriptor splitterDesc(2,4);
 
     armnn::IConnectableLayer* const splitterLayer = net.AddSplitterLayer(splitterDesc, "splitter layer");
-    BOOST_TEST(splitterLayer);
+    CHECK(splitterLayer);
 
     layer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
 
     // Adds a softmax layer 1.
     armnn::SoftmaxDescriptor softmaxDescriptor;
     armnn::IConnectableLayer* const softmax1Layer = net.AddSoftmaxLayer(softmaxDescriptor, "softmax_1");
-    BOOST_TEST(softmax1Layer);
+    CHECK(softmax1Layer);
 
     splitterLayer->GetOutputSlot(0).Connect(softmax1Layer->GetInputSlot(0));
 
     // Adds a softmax layer 2.
     armnn::IConnectableLayer* const softmax2Layer = net.AddSoftmaxLayer(softmaxDescriptor, "softmax_2");
-    BOOST_TEST(softmax2Layer);
+    CHECK(softmax2Layer);
 
     splitterLayer->GetOutputSlot(1).Connect(softmax2Layer->GetInputSlot(0));
 
     // Adds addition layer.
     layer = net.AddAdditionLayer("add layer");
-    BOOST_TEST(layer);
+    CHECK(layer);
 
     softmax1Layer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
     softmax2Layer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
@@ -324,40 +324,40 @@ BOOST_AUTO_TEST_CASE(NetworkModification_SplitterAddition)
 
     prevLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
 
-    BOOST_TEST(layer);
+    CHECK(layer);
 }
 
-BOOST_AUTO_TEST_CASE(NetworkModification_SplitterMultiplication)
+TEST_CASE("NetworkModification_SplitterMultiplication")
 {
     armnn::NetworkImpl net;
 
     // Adds an input layer and an input tensor descriptor.
     armnn::IConnectableLayer* layer = net.AddInputLayer(0, "input layer");
-    BOOST_TEST(layer);
+    CHECK(layer);
 
     // Adds a splitter layer.
     armnn::ViewsDescriptor splitterDesc(2,4);
     armnn::IConnectableLayer* const splitterLayer = net.AddSplitterLayer(splitterDesc, "splitter layer");
-    BOOST_TEST(splitterLayer);
+    CHECK(splitterLayer);
 
     layer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
 
     // Adds a softmax layer 1.
     armnn::SoftmaxDescriptor softmaxDescriptor;
     armnn::IConnectableLayer* const softmax1Layer = net.AddSoftmaxLayer(softmaxDescriptor, "softmax_1");
-    BOOST_TEST(softmax1Layer);
+    CHECK(softmax1Layer);
 
     splitterLayer->GetOutputSlot(0).Connect(softmax1Layer->GetInputSlot(0));
 
     // Adds a softmax layer 2.
     armnn::IConnectableLayer* const softmax2Layer = net.AddSoftmaxLayer(softmaxDescriptor, "softmax_2");
-    BOOST_TEST(softmax2Layer);
+    CHECK(softmax2Layer);
 
     splitterLayer->GetOutputSlot(1).Connect(softmax2Layer->GetInputSlot(0));
 
     // Adds multiplication layer.
     layer = net.AddMultiplicationLayer("multiplication layer");
-    BOOST_TEST(layer);
+    CHECK(layer);
 
     softmax1Layer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
     softmax2Layer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
@@ -365,12 +365,12 @@ BOOST_AUTO_TEST_CASE(NetworkModification_SplitterMultiplication)
     // Adds an output layer.
     armnn::IConnectableLayer* prevLayer = layer;
     layer = net.AddOutputLayer(0, "output layer");
-    BOOST_TEST(layer);
+    CHECK(layer);
 
     prevLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
 }
 
-BOOST_AUTO_TEST_CASE(Network_AddQuantize)
+TEST_CASE("Network_AddQuantize")
 {
     struct Test : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
     {
@@ -378,20 +378,20 @@ BOOST_AUTO_TEST_CASE(Network_AddQuantize)
         {
             m_Visited = true;
 
-            BOOST_TEST(layer);
+            CHECK(layer);
 
             std::string expectedName = std::string("quantize");
-            BOOST_TEST(std::string(layer->GetName()) == expectedName);
-            BOOST_TEST(std::string(name) == expectedName);
+            CHECK(std::string(layer->GetName()) == expectedName);
+            CHECK(std::string(name) == expectedName);
 
-            BOOST_TEST(layer->GetNumInputSlots() == 1);
-            BOOST_TEST(layer->GetNumOutputSlots() == 1);
+            CHECK(layer->GetNumInputSlots() == 1);
+            CHECK(layer->GetNumOutputSlots() == 1);
 
             const armnn::TensorInfo& infoIn = layer->GetInputSlot(0).GetConnection()->GetTensorInfo();
-            BOOST_TEST((infoIn.GetDataType() == armnn::DataType::Float32));
+            CHECK((infoIn.GetDataType() == armnn::DataType::Float32));
 
             const armnn::TensorInfo& infoOut = layer->GetOutputSlot(0).GetTensorInfo();
-            BOOST_TEST((infoOut.GetDataType() == armnn::DataType::QAsymmU8));
+            CHECK((infoOut.GetDataType() == armnn::DataType::QAsymmU8));
         }
 
         bool m_Visited = false;
@@ -416,11 +416,11 @@ BOOST_AUTO_TEST_CASE(Network_AddQuantize)
     Test testQuantize;
     graph->Accept(testQuantize);
 
-    BOOST_TEST(testQuantize.m_Visited == true);
+    CHECK(testQuantize.m_Visited == true);
 
 }
 
-BOOST_AUTO_TEST_CASE(Network_AddMerge)
+TEST_CASE("Network_AddMerge")
 {
     struct Test : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
     {
@@ -428,23 +428,23 @@ BOOST_AUTO_TEST_CASE(Network_AddMerge)
         {
             m_Visited = true;
 
-            BOOST_TEST(layer);
+            CHECK(layer);
 
             std::string expectedName = std::string("merge");
-            BOOST_TEST(std::string(layer->GetName()) == expectedName);
-            BOOST_TEST(std::string(name) == expectedName);
+            CHECK(std::string(layer->GetName()) == expectedName);
+            CHECK(std::string(name) == expectedName);
 
-            BOOST_TEST(layer->GetNumInputSlots() == 2);
-            BOOST_TEST(layer->GetNumOutputSlots() == 1);
+            CHECK(layer->GetNumInputSlots() == 2);
+            CHECK(layer->GetNumOutputSlots() == 1);
 
             const armnn::TensorInfo& infoIn0 = layer->GetInputSlot(0).GetConnection()->GetTensorInfo();
-            BOOST_TEST((infoIn0.GetDataType() == armnn::DataType::Float32));
+            CHECK((infoIn0.GetDataType() == armnn::DataType::Float32));
 
             const armnn::TensorInfo& infoIn1 = layer->GetInputSlot(1).GetConnection()->GetTensorInfo();
-            BOOST_TEST((infoIn1.GetDataType() == armnn::DataType::Float32));
+            CHECK((infoIn1.GetDataType() == armnn::DataType::Float32));
 
             const armnn::TensorInfo& infoOut = layer->GetOutputSlot(0).GetTensorInfo();
-            BOOST_TEST((infoOut.GetDataType() == armnn::DataType::Float32));
+            CHECK((infoOut.GetDataType() == armnn::DataType::Float32));
         }
 
         bool m_Visited = false;
@@ -469,10 +469,10 @@ BOOST_AUTO_TEST_CASE(Network_AddMerge)
     Test testMerge;
     network->Accept(testMerge);
 
-    BOOST_TEST(testMerge.m_Visited == true);
+    CHECK(testMerge.m_Visited == true);
 }
 
-BOOST_AUTO_TEST_CASE(StandInLayerNetworkTest)
+TEST_CASE("StandInLayerNetworkTest")
 {
     // Create a simple network with a StandIn some place in it.
     armnn::NetworkImpl net;
@@ -498,14 +498,14 @@ BOOST_AUTO_TEST_CASE(StandInLayerNetworkTest)
     standIn->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
     // Check that the layer is there.
-    BOOST_TEST(GraphHasNamedLayer(net.GetGraph(), "StandIn"));
+    CHECK(GraphHasNamedLayer(net.GetGraph(), "StandIn"));
     // Check that it is connected as expected.
-    BOOST_TEST(input->GetOutputSlot(0).GetConnection(0) == &floor->GetInputSlot(0));
-    BOOST_TEST(floor->GetOutputSlot(0).GetConnection(0) == &standIn->GetInputSlot(0));
-    BOOST_TEST(standIn->GetOutputSlot(0).GetConnection(0) == &output->GetInputSlot(0));
+    CHECK(input->GetOutputSlot(0).GetConnection(0) == &floor->GetInputSlot(0));
+    CHECK(floor->GetOutputSlot(0).GetConnection(0) == &standIn->GetInputSlot(0));
+    CHECK(standIn->GetOutputSlot(0).GetConnection(0) == &output->GetInputSlot(0));
 }
 
-BOOST_AUTO_TEST_CASE(StandInLayerSingleInputMultipleOutputsNetworkTest)
+TEST_CASE("StandInLayerSingleInputMultipleOutputsNetworkTest")
 {
     // Another test with one input and two outputs on the StandIn layer.
     armnn::NetworkImpl net;
@@ -531,11 +531,11 @@ BOOST_AUTO_TEST_CASE(StandInLayerSingleInputMultipleOutputsNetworkTest)
     standIn->GetOutputSlot(1).Connect(output1->GetInputSlot(0));
 
     // Check that the layer is there.
-    BOOST_TEST(GraphHasNamedLayer(net.GetGraph(), "StandIn"));
+    CHECK(GraphHasNamedLayer(net.GetGraph(), "StandIn"));
     // Check that it is connected as expected.
-    BOOST_TEST(input->GetOutputSlot(0).GetConnection(0) == &standIn->GetInputSlot(0));
-    BOOST_TEST(standIn->GetOutputSlot(0).GetConnection(0) == &output0->GetInputSlot(0));
-    BOOST_TEST(standIn->GetOutputSlot(1).GetConnection(0) == &output1->GetInputSlot(0));
+    CHECK(input->GetOutputSlot(0).GetConnection(0) == &standIn->GetInputSlot(0));
+    CHECK(standIn->GetOutputSlot(0).GetConnection(0) == &output0->GetInputSlot(0));
+    CHECK(standIn->GetOutputSlot(1).GetConnection(0) == &output1->GetInputSlot(0));
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

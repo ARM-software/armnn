@@ -3,12 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_InputOutputTensorNames")
+{
 struct EmptyNetworkFixture : public ParserFlatbuffersFixture
 {
     explicit EmptyNetworkFixture() {
@@ -21,12 +20,12 @@ struct EmptyNetworkFixture : public ParserFlatbuffersFixture
     }
 };
 
-BOOST_FIXTURE_TEST_CASE(EmptyNetworkHasNoInputsAndOutputs, EmptyNetworkFixture)
+TEST_CASE_FIXTURE(EmptyNetworkFixture, "EmptyNetworkHasNoInputsAndOutputs")
 {
     Setup();
-    BOOST_TEST(m_Parser->GetSubgraphCount() == 1);
-    BOOST_TEST(m_Parser->GetSubgraphInputTensorNames(0).size() == 0);
-    BOOST_TEST(m_Parser->GetSubgraphOutputTensorNames(0).size() == 0);
+    CHECK(m_Parser->GetSubgraphCount() == 1);
+    CHECK(m_Parser->GetSubgraphInputTensorNames(0).size() == 0);
+    CHECK(m_Parser->GetSubgraphOutputTensorNames(0).size() == 0);
 }
 
 struct MissingTensorsFixture : public ParserFlatbuffersFixture
@@ -45,10 +44,10 @@ struct MissingTensorsFixture : public ParserFlatbuffersFixture
     }
 };
 
-BOOST_FIXTURE_TEST_CASE(MissingTensorsThrowException, MissingTensorsFixture)
+TEST_CASE_FIXTURE(MissingTensorsFixture, "MissingTensorsThrowException")
 {
     // this throws because it cannot do the input output tensor connections
-    BOOST_CHECK_THROW(Setup(), armnn::ParseException);
+    CHECK_THROWS_AS(Setup(), armnn::ParseException);
 }
 
 struct InvalidTensorsFixture : public ParserFlatbuffersFixture
@@ -78,11 +77,11 @@ struct InvalidTensorsFixture : public ParserFlatbuffersFixture
     }
 };
 
-BOOST_FIXTURE_TEST_CASE(InvalidTensorsThrowException, InvalidTensorsFixture)
+TEST_CASE_FIXTURE(InvalidTensorsFixture, "InvalidTensorsThrowException")
 {
     // Tensor numDimensions must be less than or equal to MaxNumOfTensorDimensions
     static_assert(armnn::MaxNumOfTensorDimensions == 5, "Please update InvalidTensorsFixture");
-    BOOST_CHECK_THROW(Setup(), armnn::InvalidArgumentException);
+    CHECK_THROWS_AS(Setup(), armnn::InvalidArgumentException);
 }
 
 struct ValidTensorsFixture : public ParserFlatbuffersFixture
@@ -128,22 +127,22 @@ struct ValidTensorsFixture : public ParserFlatbuffersFixture
     }
 };
 
-BOOST_FIXTURE_TEST_CASE(GetValidInputOutputTensorNames, ValidTensorsFixture)
+TEST_CASE_FIXTURE(ValidTensorsFixture, "GetValidInputOutputTensorNames")
 {
     Setup();
-    BOOST_CHECK_EQUAL(m_Parser->GetSubgraphInputTensorNames(0).size(), 1u);
-    BOOST_CHECK_EQUAL(m_Parser->GetSubgraphOutputTensorNames(0).size(), 1u);
-    BOOST_CHECK_EQUAL(m_Parser->GetSubgraphInputTensorNames(0)[0], "In");
-    BOOST_CHECK_EQUAL(m_Parser->GetSubgraphOutputTensorNames(0)[0], "Out");
+    CHECK_EQ(m_Parser->GetSubgraphInputTensorNames(0).size(), 1u);
+    CHECK_EQ(m_Parser->GetSubgraphOutputTensorNames(0).size(), 1u);
+    CHECK_EQ(m_Parser->GetSubgraphInputTensorNames(0)[0], "In");
+    CHECK_EQ(m_Parser->GetSubgraphOutputTensorNames(0)[0], "Out");
 }
 
-BOOST_FIXTURE_TEST_CASE(ThrowIfSubgraphIdInvalidForInOutNames, ValidTensorsFixture)
+TEST_CASE_FIXTURE(ValidTensorsFixture, "ThrowIfSubgraphIdInvalidForInOutNames")
 {
     Setup();
 
     // these throw because of the invalid subgraph id
-    BOOST_CHECK_THROW(m_Parser->GetSubgraphInputTensorNames(1), armnn::ParseException);
-    BOOST_CHECK_THROW(m_Parser->GetSubgraphOutputTensorNames(1), armnn::ParseException);
+    CHECK_THROWS_AS(m_Parser->GetSubgraphInputTensorNames(1), armnn::ParseException);
+    CHECK_THROWS_AS(m_Parser->GetSubgraphOutputTensorNames(1), armnn::ParseException);
 }
 
 struct Rank0TensorFixture : public ParserFlatbuffersFixture
@@ -185,14 +184,14 @@ struct Rank0TensorFixture : public ParserFlatbuffersFixture
     }
 };
 
-BOOST_FIXTURE_TEST_CASE(Rank0Tensor, Rank0TensorFixture)
+TEST_CASE_FIXTURE(Rank0TensorFixture, "Rank0Tensor")
 {
     Setup();
-    BOOST_CHECK_EQUAL(m_Parser->GetSubgraphInputTensorNames(0).size(), 2u);
-    BOOST_CHECK_EQUAL(m_Parser->GetSubgraphOutputTensorNames(0).size(), 1u);
-    BOOST_CHECK_EQUAL(m_Parser->GetSubgraphInputTensorNames(0)[0], "In0");
-    BOOST_CHECK_EQUAL(m_Parser->GetSubgraphInputTensorNames(0)[1], "In1");
-    BOOST_CHECK_EQUAL(m_Parser->GetSubgraphOutputTensorNames(0)[0], "Out");
+    CHECK_EQ(m_Parser->GetSubgraphInputTensorNames(0).size(), 2u);
+    CHECK_EQ(m_Parser->GetSubgraphOutputTensorNames(0).size(), 1u);
+    CHECK_EQ(m_Parser->GetSubgraphInputTensorNames(0)[0], "In0");
+    CHECK_EQ(m_Parser->GetSubgraphInputTensorNames(0)[1], "In1");
+    CHECK_EQ(m_Parser->GetSubgraphOutputTensorNames(0)[0], "Out");
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

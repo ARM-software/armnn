@@ -3,14 +3,15 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include <armnnDeserializer/IDeserializer.hpp>
 
+#include <doctest/doctest.h>
+
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(DeserializeParser)
-
+TEST_SUITE("DeserializeParser_Activation")
+{
 struct ActivationFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit ActivationFixture(const std::string& inputShape,
@@ -141,7 +142,7 @@ struct SimpleActivationFixture4 : ActivationFixture
 };
 
 
-BOOST_FIXTURE_TEST_CASE(ActivationReluQuantisedAsymm8, SimpleActivationFixture)
+TEST_CASE_FIXTURE(SimpleActivationFixture, "ActivationReluQuantisedAsymm8")
 {
     RunTest<4, armnn::DataType::QAsymmU8>(
             0,
@@ -149,7 +150,7 @@ BOOST_FIXTURE_TEST_CASE(ActivationReluQuantisedAsymm8, SimpleActivationFixture)
             {{"OutputLayer", {10, 0, 2, 0}}});
 }
 
-BOOST_FIXTURE_TEST_CASE(ActivationReluFloat32, SimpleActivationFixture2)
+TEST_CASE_FIXTURE(SimpleActivationFixture2, "ActivationReluFloat32")
 {
     RunTest<4, armnn::DataType::Float32>(
             0,
@@ -158,7 +159,7 @@ BOOST_FIXTURE_TEST_CASE(ActivationReluFloat32, SimpleActivationFixture2)
 }
 
 
-BOOST_FIXTURE_TEST_CASE(ActivationBoundedReluQuantisedAsymm8, SimpleActivationFixture3)
+TEST_CASE_FIXTURE(SimpleActivationFixture3, "ActivationBoundedReluQuantisedAsymm8")
 {
     RunTest<4, armnn::DataType::QAsymmU8>(
             0,
@@ -166,7 +167,7 @@ BOOST_FIXTURE_TEST_CASE(ActivationBoundedReluQuantisedAsymm8, SimpleActivationFi
             {{"OutputLayer", {5, 0, 2, 0}}});
 }
 
-BOOST_FIXTURE_TEST_CASE(ActivationBoundedReluFloat32, SimpleActivationFixture4)
+TEST_CASE_FIXTURE(SimpleActivationFixture4, "ActivationBoundedReluFloat32")
 {
     RunTest<4, armnn::DataType::Float32>(
             0,
@@ -174,4 +175,4 @@ BOOST_FIXTURE_TEST_CASE(ActivationBoundedReluFloat32, SimpleActivationFixture4)
             {{"OutputLayer", {5, 0, 5, 3}}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

@@ -2,12 +2,13 @@
 // Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#define BOOST_TEST_MODULE UnitTests
-#include <boost/test/unit_test.hpp>
+
+#ifndef DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#endif
+#include <doctest/doctest.h>
 
 #include "UnitTests.hpp"
-#include <armnn/Logging.hpp>
-#include <armnn/utility/NumericCast.hpp>
 
 struct ConfigureLoggingFixture
 {
@@ -17,21 +18,20 @@ struct ConfigureLoggingFixture
     }
 };
 
-BOOST_GLOBAL_FIXTURE(ConfigureLoggingFixture);
 
-BOOST_AUTO_TEST_SUITE(LoggerSuite)
 
-BOOST_AUTO_TEST_CASE(LoggerTest)
+TEST_SUITE("LoggerSuite")
+{
+TEST_CASE_FIXTURE(ConfigureLoggingFixture, "LoggerTest")
 {
     std::stringstream ss;
-
     {
         struct StreamRedirector
         {
         public:
             StreamRedirector(std::ostream& stream, std::streambuf* newStreamBuffer)
-                : m_Stream(stream)
-                , m_BackupBuffer(m_Stream.rdbuf(newStreamBuffer))
+            : m_Stream(stream)
+            , m_BackupBuffer(m_Stream.rdbuf(newStreamBuffer))
             {}
             ~StreamRedirector() { m_Stream.rdbuf(m_BackupBuffer); }
 
@@ -40,13 +40,11 @@ BOOST_AUTO_TEST_CASE(LoggerTest)
             std::streambuf* m_BackupBuffer;
         };
 
-
         StreamRedirector redirect(std::cout, ss.rdbuf());
 
         using namespace armnn;
         SetLogFilter(LogSeverity::Trace);
         SetAllLoggingSinks(true, false, false);
-
 
         ARMNN_LOG(trace) << "My trace message; " << -2;
         ARMNN_LOG(debug) << "My debug message; " << -1;
@@ -56,15 +54,14 @@ BOOST_AUTO_TEST_CASE(LoggerTest)
         ARMNN_LOG(fatal) << "My fatal message; "  << 3;
 
         SetLogFilter(LogSeverity::Fatal);
-
     }
 
-    BOOST_CHECK(ss.str().find("Trace: My trace message; -2") != std::string::npos);
-    BOOST_CHECK(ss.str().find("Debug: My debug message; -1") != std::string::npos);
-    BOOST_CHECK(ss.str().find("Info: My info message; 0") != std::string::npos);
-    BOOST_CHECK(ss.str().find("Warning: My warning message; 1") != std::string::npos);
-    BOOST_CHECK(ss.str().find("Error: My error message; 2") != std::string::npos);
-    BOOST_CHECK(ss.str().find("Fatal: My fatal message; 3") != std::string::npos);
+    CHECK(ss.str().find("Trace: My trace message; -2") != std::string::npos);
+    CHECK(ss.str().find("Debug: My debug message; -1") != std::string::npos);
+    CHECK(ss.str().find("Info: My info message; 0") != std::string::npos);
+    CHECK(ss.str().find("Warning: My warning message; 1") != std::string::npos);
+    CHECK(ss.str().find("Error: My error message; 2") != std::string::npos);
+    CHECK(ss.str().find("Fatal: My fatal message; 3") != std::string::npos);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

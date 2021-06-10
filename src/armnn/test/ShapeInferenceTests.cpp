@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <armnn/Tensor.hpp>
 #include <Graph.hpp>
@@ -14,7 +14,8 @@
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(ShapeInferenceTests)
+TEST_SUITE("ShapeInferenceTests")
+{
 using namespace armnn;
 namespace
 {
@@ -72,7 +73,7 @@ void RunShapeInferenceTest(LayerT* const layer,
 
         for (unsigned int i = 0; i < outputSize; ++i)
         {
-            BOOST_CHECK(layer->GetOutputSlot(i).GetTensorInfo().GetShape() == expectedOutputShapes[i]);
+            CHECK(layer->GetOutputSlot(i).GetTensorInfo().GetShape() == expectedOutputShapes[i]);
         }
     };
 
@@ -84,14 +85,14 @@ void RunShapeInferenceTest(LayerT* const layer,
 
     layer->SetShapeInferenceMethod(ShapeInferenceMethod::ValidateOnly);
 
-    BOOST_CHECK_THROW(layer->ValidateTensorShapesFromInputs(), LayerValidationException);
+    CHECK_THROWS_AS(layer->ValidateTensorShapesFromInputs(), LayerValidationException);
 
     layer->SetShapeInferenceMethod(ShapeInferenceMethod::InferAndValidate);
     layer->ValidateTensorShapesFromInputs();
 
     for (unsigned int i = 0; i < outputSize; ++i)
     {
-        BOOST_CHECK(layer->GetOutputSlot(i).GetTensorInfo().GetShape() == expectedOutputShapes[i]);
+        CHECK(layer->GetOutputSlot(i).GetTensorInfo().GetShape() == expectedOutputShapes[i]);
     }
 
     // Test inference with Dimensionality::Specified and various combinations of dimensions of unknown size
@@ -116,7 +117,7 @@ void CreateGraphAndRunTest(const std::vector<TensorShape>& inputShapes,
     RunShapeInferenceTest<LayerT>(layer, dimensionSizeLists);
 }
 
-BOOST_AUTO_TEST_CASE(NetworkOptionsTest)
+TEST_CASE("NetworkOptionsTest")
 {
      BackendOptions ShapeInferenceMethodOption("ShapeInferenceMethod",
      {
@@ -136,9 +137,9 @@ BOOST_AUTO_TEST_CASE(NetworkOptionsTest)
     inputLayer->GetOutputSlot(0).Connect(activationLayer->GetInputSlot(0));
     activationLayer->GetOutputSlot(0).SetTensorInfo({TensorShape{Dimensionality::NotSpecified}, DataType::Float32});
 
-    BOOST_CHECK_NO_THROW(activationLayer->GetOutputSlot(0).IsTensorInfoSet());
+    CHECK_NOTHROW(activationLayer->GetOutputSlot(0).IsTensorInfoSet());
 
-    BOOST_CHECK(activationLayer->GetOutputSlot(0).GetTensorInfo() == tensorInfo);
+    CHECK(activationLayer->GetOutputSlot(0).GetTensorInfo() == tensorInfo);
 
 
     ShapeInferenceMethodOption = BackendOptions("ShapeInferenceMethod",
@@ -156,7 +157,7 @@ BOOST_AUTO_TEST_CASE(NetworkOptionsTest)
     inputLayer->GetOutputSlot(0).Connect(activationLayer->GetInputSlot(0));
     activationLayer->GetOutputSlot(0).SetTensorInfo({TensorShape{Dimensionality::NotSpecified}, DataType::Float32});
 
-    BOOST_CHECK_NO_THROW(activationLayer->GetOutputSlot(0).IsTensorInfoSet());
+    CHECK_NOTHROW(activationLayer->GetOutputSlot(0).IsTensorInfoSet());
 
     network = INetwork::Create();
 
@@ -168,22 +169,22 @@ BOOST_AUTO_TEST_CASE(NetworkOptionsTest)
     inputLayer->GetOutputSlot(0).Connect(activationLayer->GetInputSlot(0));
     activationLayer->GetOutputSlot(0).SetTensorInfo({TensorShape{Dimensionality::NotSpecified}, DataType::Float32});
 
-    BOOST_CHECK_NO_THROW(activationLayer->GetOutputSlot(0).IsTensorInfoSet());
+    CHECK_NOTHROW(activationLayer->GetOutputSlot(0).IsTensorInfoSet());
 }
 
-BOOST_AUTO_TEST_CASE(AbsTest)
+TEST_CASE("AbsTest")
 {
     ActivationDescriptor descriptor;
     descriptor.m_Function = ActivationFunction::Abs;
     CreateGraphAndRunTest<ActivationLayer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, descriptor, "activation");
 }
 
-BOOST_AUTO_TEST_CASE(AdditionTest)
+TEST_CASE("AdditionTest")
 {
     CreateGraphAndRunTest<AdditionLayer>({{ 5, 7, 6, 2 }, { 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, "add");
 }
 
-BOOST_AUTO_TEST_CASE(ArgMinMaxTest)
+TEST_CASE("ArgMinMaxTest")
 {
     armnn::ArgMinMaxDescriptor descriptor;
     descriptor.m_Function = ArgMinMaxFunction::Min;
@@ -192,13 +193,13 @@ BOOST_AUTO_TEST_CASE(ArgMinMaxTest)
     CreateGraphAndRunTest<ArgMinMaxLayer>({{ 1, 3, 2, 4 }}, {{ 1, 2, 4 }}, descriptor, "argMinMax");
 }
 
-BOOST_AUTO_TEST_CASE(BatchNormalizationTest)
+TEST_CASE("BatchNormalizationTest")
 {
     BatchNormalizationDescriptor descriptor;
     CreateGraphAndRunTest<BatchNormalizationLayer>({{ 1, 2, 3, 2 }}, {{ 1, 2, 3, 2 }}, descriptor, "batchNorm");
 }
 
-BOOST_AUTO_TEST_CASE(BatchToSpaceNdTest)
+TEST_CASE("BatchToSpaceNdTest")
 {
     BatchToSpaceNdDescriptor descriptor;
 
@@ -212,7 +213,7 @@ BOOST_AUTO_TEST_CASE(BatchToSpaceNdTest)
     CreateGraphAndRunTest<BatchToSpaceNdLayer>({{ 4, 2, 2, 1 }}, {{ 1, 4, 4, 1 }}, descriptor, "batchtospacend");
 }
 
-BOOST_AUTO_TEST_CASE(ComparisionTest)
+TEST_CASE("ComparisionTest")
 {
     ComparisonDescriptor descriptor;
     descriptor.m_Operation = ComparisonOperation::Equal;
@@ -222,7 +223,7 @@ BOOST_AUTO_TEST_CASE(ComparisionTest)
                                            "comparision");
 }
 
-BOOST_AUTO_TEST_CASE(ConcatTest)
+TEST_CASE("ConcatTest")
 {
     ConcatDescriptor descriptor(2, 3);
 
@@ -232,7 +233,7 @@ BOOST_AUTO_TEST_CASE(ConcatTest)
     CreateGraphAndRunTest<ConcatLayer>({{ 1, 2, 1 }, { 1, 2, 1 }}, {{ 2, 2, 1 }}, descriptor, "concat");
 }
 
-BOOST_AUTO_TEST_CASE(ConstantTesst)
+TEST_CASE("ConstantTesst")
 {
     Graph graph;
     TensorShape outputShape{ 1, 1, 3, 3 };
@@ -246,31 +247,31 @@ BOOST_AUTO_TEST_CASE(ConstantTesst)
 
     layer->ValidateTensorShapesFromInputs();
 
-    BOOST_CHECK(layer->GetOutputSlot(0).GetTensorInfo().GetShape() == outputShape);
+    CHECK(layer->GetOutputSlot(0).GetTensorInfo().GetShape() == outputShape);
 }
 
-BOOST_AUTO_TEST_CASE(ConvertBf16ToFp32Test)
+TEST_CASE("ConvertBf16ToFp32Test")
 {
     CreateGraphAndRunTest<ConvertBf16ToFp32Layer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, "floor");
 }
 
-BOOST_AUTO_TEST_CASE(ConvertFp16ToBf16Test)
+TEST_CASE("ConvertFp16ToBf16Test")
 {
     const TensorShape tensorShape{5, 7, 6, 2};
     CreateGraphAndRunTest<ConvertFp32ToBf16Layer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, "floor");
 }
 
-BOOST_AUTO_TEST_CASE(ConvertFp16ToFp32Test)
+TEST_CASE("ConvertFp16ToFp32Test")
 {
     CreateGraphAndRunTest<ConvertFp16ToFp32Layer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, "floor");
 }
 
-BOOST_AUTO_TEST_CASE(ConvertFp32ToFp16Test)
+TEST_CASE("ConvertFp32ToFp16Test")
 {
     CreateGraphAndRunTest<ConvertFp32ToFp16Layer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, "floor");
 }
 
-BOOST_AUTO_TEST_CASE(Convolution2dTest)
+TEST_CASE("Convolution2dTest")
 {
     const TensorShape inputShape{1, 1, 10, 10};
 
@@ -299,13 +300,13 @@ BOOST_AUTO_TEST_CASE(Convolution2dTest)
     RunShapeInferenceTest<Convolution2dLayer>(layer, {{ 1, 1, 4, 4 }});
 }
 
-BOOST_AUTO_TEST_CASE(DebugLayerTest)
+TEST_CASE("DebugLayerTest")
 {
     const TensorShape tensorShape;
     CreateGraphAndRunTest<DebugLayer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, "debug");
 }
 
-BOOST_AUTO_TEST_CASE(DepthToSpaceTest)
+TEST_CASE("DepthToSpaceTest")
 {
     DepthToSpaceDescriptor descriptor;
 
@@ -315,7 +316,7 @@ BOOST_AUTO_TEST_CASE(DepthToSpaceTest)
     CreateGraphAndRunTest<DepthToSpaceLayer>({{ 1, 1, 1, 8}}, {{ 1, 2, 2, 2 }}, descriptor, "depthtospace");
 }
 
-BOOST_AUTO_TEST_CASE(DepthwiseConvolutionTest)
+TEST_CASE("DepthwiseConvolutionTest")
 {
     DepthwiseConvolution2dDescriptor descriptor;
 
@@ -344,13 +345,13 @@ BOOST_AUTO_TEST_CASE(DepthwiseConvolutionTest)
     RunShapeInferenceTest<DepthwiseConvolution2dLayer>(layer, {{ 8, 18, 1, 2 }});
 }
 
-BOOST_AUTO_TEST_CASE(DequantizeTest)
+TEST_CASE("DequantizeTest")
 {
     const TensorShape tensorShape{5, 7, 6, 2};
     CreateGraphAndRunTest<DequantizeLayer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, "dequantize");
 }
 
-BOOST_AUTO_TEST_CASE(DetectionPostProcessTest)
+TEST_CASE("DetectionPostProcessTest")
 {
     const TensorShape detectionBoxesInfo{ 1, 3, 4 };
     const TensorShape detectionScoresInfo{ 1, 3, 4 };
@@ -384,7 +385,7 @@ BOOST_AUTO_TEST_CASE(DetectionPostProcessTest)
     RunShapeInferenceTest<DetectionPostProcessLayer>(layer, {{ 1, 3, 4 }, { 1, 3  }, { 1, 3 }, { 1 }});
 }
 
-BOOST_AUTO_TEST_CASE(FakeQuantizationTest)
+TEST_CASE("FakeQuantizationTest")
 {
     FakeQuantizationDescriptor descriptor;
     descriptor.m_Max = 1;
@@ -392,13 +393,13 @@ BOOST_AUTO_TEST_CASE(FakeQuantizationTest)
     CreateGraphAndRunTest<FakeQuantizationLayer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, descriptor, "fakequantization");
 }
 
-BOOST_AUTO_TEST_CASE(FloorTest)
+TEST_CASE("FloorTest")
 {
     const TensorShape tensorShape{5, 7, 6, 2};
     CreateGraphAndRunTest<FloorLayer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, "floor");
 }
 
-BOOST_AUTO_TEST_CASE(FullyConnectedTest)
+TEST_CASE("FullyConnectedTest")
 {
     Graph graph;
 
@@ -420,12 +421,12 @@ BOOST_AUTO_TEST_CASE(FullyConnectedTest)
     RunShapeInferenceTest<FullyConnectedLayer>(layer, {{ 1, outputChannels }});
 }
 
-BOOST_AUTO_TEST_CASE(GatherTest)
+TEST_CASE("GatherTest")
 {
     CreateGraphAndRunTest<GatherLayer>({{ 7, 6, 2}, {2,3}}, {{ 2, 3, 6, 2 }}, GatherDescriptor(), "gather");
 }
 
-BOOST_AUTO_TEST_CASE(InstanceNormalizationTest)
+TEST_CASE("InstanceNormalizationTest")
 {
     const TensorShape tensorShape{5, 7, 6, 2};
 
@@ -434,7 +435,7 @@ BOOST_AUTO_TEST_CASE(InstanceNormalizationTest)
                                                       "instancenorm");
 }
 
-BOOST_AUTO_TEST_CASE(L2NormalizationTest)
+TEST_CASE("L2NormalizationTest")
 {
     const TensorShape tensorShape{5, 7, 6, 2};
 
@@ -443,14 +444,14 @@ BOOST_AUTO_TEST_CASE(L2NormalizationTest)
                                                 "l2norm");
 }
 
-BOOST_AUTO_TEST_CASE(LogSoftMaxTest)
+TEST_CASE("LogSoftMaxTest")
 {
     const TensorShape tensorShape{5, 7, 6, 2};
 
     CreateGraphAndRunTest<LogSoftmaxLayer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, LogSoftmaxDescriptor(), "logsoftmax");
 }
 
-BOOST_AUTO_TEST_CASE(LstmTest)
+TEST_CASE("LstmTest")
 {
     const TensorShape inputShape{2, 5};
     const TensorShape inputCellState{2, 20};
@@ -485,7 +486,7 @@ BOOST_AUTO_TEST_CASE(LstmTest)
     RunShapeInferenceTest<LstmLayer>(layer, {{2, 80}, {2, 20}, {2, 20}, {2, 20}});
 }
 
-BOOST_AUTO_TEST_CASE(MeanLayerTest)
+TEST_CASE("MeanLayerTest")
 {
     MeanDescriptor descriptor;
     descriptor.m_Axis = {0};
@@ -493,30 +494,30 @@ BOOST_AUTO_TEST_CASE(MeanLayerTest)
     CreateGraphAndRunTest<MeanLayer>({{ 5, 7, 6, 2 }}, {{ 7, 6, 2 }}, descriptor, "mean");
 }
 
-BOOST_AUTO_TEST_CASE(MemCopyTest)
+TEST_CASE("MemCopyTest")
 {
     CreateGraphAndRunTest<MemCopyLayer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, "memcopy");
 }
 
-BOOST_AUTO_TEST_CASE(MemImportTest)
+TEST_CASE("MemImportTest")
 {
     CreateGraphAndRunTest<MemImportLayer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, "memomport");
 }
 
-BOOST_AUTO_TEST_CASE(MergeTest)
+TEST_CASE("MergeTest")
 {
     const TensorShape tensorShape{ 5, 7, 6, 2 };
     CreateGraphAndRunTest<MergeLayer>({ { 5, 7, 6, 2 }, { 5, 7, 6, 2 } }, {{ 5, 7, 6, 2 }}, "merge");
 }
 
-BOOST_AUTO_TEST_CASE(NormalizationTest)
+TEST_CASE("NormalizationTest")
 {
     const TensorShape tensorShape{5, 7, 6, 2};
 
     CreateGraphAndRunTest<NormalizationLayer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, NormalizationDescriptor(), "l2norm");
 }
 
-BOOST_AUTO_TEST_CASE(PermuteTest)
+TEST_CASE("PermuteTest")
 {
     PermuteDescriptor descriptor;
     descriptor.m_DimMappings = {0U, 2U, 3U, 1U};
@@ -524,7 +525,7 @@ BOOST_AUTO_TEST_CASE(PermuteTest)
     CreateGraphAndRunTest<PermuteLayer>({{ 1, 2, 2, 3 }}, {{ 1, 3, 2, 2 }}, descriptor, "permute");
 }
 
-BOOST_AUTO_TEST_CASE(Pooling2dTest)
+TEST_CASE("Pooling2dTest")
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::Max;
@@ -539,7 +540,7 @@ BOOST_AUTO_TEST_CASE(Pooling2dTest)
     CreateGraphAndRunTest<Pooling2dLayer>({{ 1, 2, 8, 13 }}, {{ 1, 2, 2, 8 }}, descriptor, "pooling2d");
 }
 
-BOOST_AUTO_TEST_CASE(QLstmTest)
+TEST_CASE("QLstmTest")
 {
     const TensorShape inputShape{2, 5};
     const TensorShape inputCellState{2, 20};
@@ -573,7 +574,7 @@ BOOST_AUTO_TEST_CASE(QLstmTest)
     RunShapeInferenceTest<QLstmLayer>(layer, {{2, 20}, {2, 20}, {2, 20}});
 }
 
-BOOST_AUTO_TEST_CASE(QuantizedLstmTest)
+TEST_CASE("QuantizedLstmTest")
 {
     const TensorShape inputShape{2, 5};
     const TensorShape inputCellState{2, 20};
@@ -601,13 +602,13 @@ BOOST_AUTO_TEST_CASE(QuantizedLstmTest)
     RunShapeInferenceTest<QuantizedLstmLayer>(layer, {{2, 20}, {2, 20}, {2, 20}});
 }
 
-BOOST_AUTO_TEST_CASE(QuantizeTest)
+TEST_CASE("QuantizeTest")
 {
     const TensorShape tensorShape { 5, 4, 7, 6 };
     CreateGraphAndRunTest<QuantizeLayer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, "mean");
 }
 
-BOOST_AUTO_TEST_CASE(RankTest)
+TEST_CASE("RankTest")
 {
    // due to rank having a scalar output we need a custom test
    const TensorShape expectedOutputs(Dimensionality::Scalar);
@@ -617,23 +618,23 @@ BOOST_AUTO_TEST_CASE(RankTest)
 
    layer->GetOutputSlot(0).SetTensorInfo({TensorShape(Dimensionality::NotSpecified), DataType::Float32});
 
-   BOOST_CHECK_THROW(
+   CHECK_THROWS_AS(
            layer->ValidateTensorShapesFromInputs(), LayerValidationException);
 
    layer->SetShapeInferenceMethod(ShapeInferenceMethod::InferAndValidate);
 
     layer->ValidateTensorShapesFromInputs();
 
-   BOOST_CHECK(layer->GetOutputSlot(0).GetTensorInfo().GetShape() == expectedOutputs);
+   CHECK(layer->GetOutputSlot(0).GetTensorInfo().GetShape() == expectedOutputs);
 
    layer->GetOutputSlot(0).SetTensorInfo({TensorShape(Dimensionality::Scalar), DataType::Float32});
 
     layer->ValidateTensorShapesFromInputs();
 
-   BOOST_CHECK(layer->GetOutputSlot(0).GetTensorInfo().GetShape() == expectedOutputs);
+   CHECK(layer->GetOutputSlot(0).GetTensorInfo().GetShape() == expectedOutputs);
 }
 
-BOOST_AUTO_TEST_CASE(ReshapeTest)
+TEST_CASE("ReshapeTest")
 {
     ReshapeDescriptor descriptor;
 
@@ -642,7 +643,7 @@ BOOST_AUTO_TEST_CASE(ReshapeTest)
     CreateGraphAndRunTest<ReshapeLayer>({{ 2, 2, 2, 2 }}, {{ 1, 1, 1, 8 }}, descriptor, "reshape");
 }
 
-BOOST_AUTO_TEST_CASE(ResizeTest)
+TEST_CASE("ResizeTest")
 {
     ResizeDescriptor descriptor;
 
@@ -652,7 +653,7 @@ BOOST_AUTO_TEST_CASE(ResizeTest)
     CreateGraphAndRunTest<ResizeLayer>({{ 1, 7, 6, 2 }}, {{ 1, 7, 6, 2 }}, descriptor, "resize");
 }
 
-BOOST_AUTO_TEST_CASE(SliceTest)
+TEST_CASE("SliceTest")
 {
     SliceDescriptor descriptor;
     descriptor.m_Begin  = { 1, 0, 1, 2 };
@@ -661,7 +662,7 @@ BOOST_AUTO_TEST_CASE(SliceTest)
     CreateGraphAndRunTest<SliceLayer>({{ 3, 2, 3, 5 }}, {{ 2, 1, 2, 3 }}, descriptor, "mean");
 }
 
-BOOST_AUTO_TEST_CASE(SpaceToBatchNdTest)
+TEST_CASE("SpaceToBatchNdTest")
 {
     SpaceToBatchNdDescriptor descriptor;
 
@@ -675,7 +676,7 @@ BOOST_AUTO_TEST_CASE(SpaceToBatchNdTest)
     CreateGraphAndRunTest<SpaceToBatchNdLayer>({{ 1, 4, 4, 1 }}, {{ 4, 2, 2, 1 }}, descriptor, "spacetobatchnd");
 }
 
-BOOST_AUTO_TEST_CASE(SpaceToDepth)
+TEST_CASE("SpaceToDepth")
 {
     SpaceToDepthDescriptor descriptor;
 
@@ -685,7 +686,7 @@ BOOST_AUTO_TEST_CASE(SpaceToDepth)
     CreateGraphAndRunTest<SpaceToDepthLayer>({{ 1, 2, 2, 2 }}, {{ 1, 1, 1, 8}}, descriptor, "spacetodepth");
 }
 
-BOOST_AUTO_TEST_CASE(SplitterTest)
+TEST_CASE("SplitterTest")
 {
     SplitterDescriptor descriptor(2, 3);
 
@@ -700,7 +701,7 @@ BOOST_AUTO_TEST_CASE(SplitterTest)
     CreateGraphAndRunTest<SplitterLayer>({{ 2, 2, 2 }}, {{ 1, 2, 2 }, { 1, 2, 2 }}, descriptor, "splitter");
 }
 
-BOOST_AUTO_TEST_CASE(StackTest)
+TEST_CASE("StackTest")
 {
     StackDescriptor descriptor;
 
@@ -711,7 +712,7 @@ BOOST_AUTO_TEST_CASE(StackTest)
     CreateGraphAndRunTest<StackLayer>({{ 3, 2, 3 }, { 3, 2, 3 }}, {{ 2, 3, 2, 3 }}, descriptor, "stack");
 }
 
-BOOST_AUTO_TEST_CASE(StridedSliceTest)
+TEST_CASE("StridedSliceTest")
 {
     StridedSliceDescriptor descriptor;
 
@@ -722,12 +723,12 @@ BOOST_AUTO_TEST_CASE(StridedSliceTest)
     CreateGraphAndRunTest<StridedSliceLayer>({{ 3, 2, 3, 1 }}, {{ 2, 1, 2, 1 }}, descriptor, "stridedslice");
 }
 
-BOOST_AUTO_TEST_CASE(Switchtest)
+TEST_CASE("Switchtest")
 {
     CreateGraphAndRunTest<SwitchLayer>({{ 3, 2, 3, 1 }, { 3, 2, 3, 1 }}, {{ 3, 2, 3, 1 }, { 3, 2, 3, 1 }}, "switch");
 }
 
-BOOST_AUTO_TEST_CASE(TransposeConvolution2dTest)
+TEST_CASE("TransposeConvolution2dTest")
 {
     StridedSliceDescriptor descriptor;
 
@@ -738,7 +739,7 @@ BOOST_AUTO_TEST_CASE(TransposeConvolution2dTest)
     CreateGraphAndRunTest<StridedSliceLayer>({{ 3, 2, 3, 1 }}, {{ 2, 1, 2, 1 }}, descriptor, "t");
 }
 
-BOOST_AUTO_TEST_CASE(TransposeTest)
+TEST_CASE("TransposeTest")
 {
     armnn::TransposeDescriptor descriptor;
     descriptor.m_DimMappings = {0U, 3U, 1U, 2U};
@@ -746,5 +747,5 @@ BOOST_AUTO_TEST_CASE(TransposeTest)
     CreateGraphAndRunTest<TransposeLayer>({{ 1, 2, 2, 3 }}, {{ 1, 3, 2, 2 }}, descriptor, "stridedslice");
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}
 }

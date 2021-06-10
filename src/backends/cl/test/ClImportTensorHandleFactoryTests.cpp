@@ -3,14 +3,17 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <armnn/utility/Assert.hpp>
+
 #include <cl/ClImportTensorHandleFactory.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(ClImportTensorHandleFactoryTests)
+TEST_SUITE("ClImportTensorHandleFactoryTests")
+{
 using namespace armnn;
 
-BOOST_AUTO_TEST_CASE(ImportTensorFactoryAskedToCreateManagedTensorThrowsException)
+TEST_CASE("ImportTensorFactoryAskedToCreateManagedTensorThrowsException")
 {
     // Create the factory to import tensors.
     ClImportTensorHandleFactory factory(static_cast<MemorySourceFlags>(MemorySource::Malloc),
@@ -18,11 +21,11 @@ BOOST_AUTO_TEST_CASE(ImportTensorFactoryAskedToCreateManagedTensorThrowsExceptio
     TensorInfo tensorInfo;
     // This factory is designed to import the memory of tensors. Asking for a handle that requires
     // a memory manager should result in an exception.
-    BOOST_REQUIRE_THROW(factory.CreateTensorHandle(tensorInfo, true), InvalidArgumentException);
-    BOOST_REQUIRE_THROW(factory.CreateTensorHandle(tensorInfo, DataLayout::NCHW, true), InvalidArgumentException);
+    REQUIRE_THROWS_AS(factory.CreateTensorHandle(tensorInfo, true), InvalidArgumentException);
+    REQUIRE_THROWS_AS(factory.CreateTensorHandle(tensorInfo, DataLayout::NCHW, true), InvalidArgumentException);
 }
 
-BOOST_AUTO_TEST_CASE(ImportTensorFactoryCreateMallocTensorHandle)
+TEST_CASE("ImportTensorFactoryCreateMallocTensorHandle")
 {
     // Create the factory to import tensors.
     ClImportTensorHandleFactory factory(static_cast<MemorySourceFlags>(MemorySource::Malloc),
@@ -32,24 +35,24 @@ BOOST_AUTO_TEST_CASE(ImportTensorFactoryCreateMallocTensorHandle)
     // Start with the TensorInfo factory method. Create an import tensor handle and verify the data is
     // passed through correctly.
     auto tensorHandle = factory.CreateTensorHandle(tensorInfo);
-    BOOST_ASSERT(tensorHandle);
-    BOOST_ASSERT(tensorHandle->GetImportFlags() == static_cast<MemorySourceFlags>(MemorySource::Malloc));
-    BOOST_ASSERT(tensorHandle->GetShape() == tensorShape);
+    ARMNN_ASSERT(tensorHandle);
+    ARMNN_ASSERT(tensorHandle->GetImportFlags() == static_cast<MemorySourceFlags>(MemorySource::Malloc));
+    ARMNN_ASSERT(tensorHandle->GetShape() == tensorShape);
 
     // Same method but explicitly specifying isManaged = false.
     tensorHandle = factory.CreateTensorHandle(tensorInfo, false);
-    BOOST_CHECK(tensorHandle);
-    BOOST_ASSERT(tensorHandle->GetImportFlags() == static_cast<MemorySourceFlags>(MemorySource::Malloc));
-    BOOST_ASSERT(tensorHandle->GetShape() == tensorShape);
+    CHECK(tensorHandle);
+    ARMNN_ASSERT(tensorHandle->GetImportFlags() == static_cast<MemorySourceFlags>(MemorySource::Malloc));
+    ARMNN_ASSERT(tensorHandle->GetShape() == tensorShape);
 
     // Now try TensorInfo and DataLayout factory method.
     tensorHandle = factory.CreateTensorHandle(tensorInfo, DataLayout::NHWC);
-    BOOST_CHECK(tensorHandle);
-    BOOST_ASSERT(tensorHandle->GetImportFlags() == static_cast<MemorySourceFlags>(MemorySource::Malloc));
-    BOOST_ASSERT(tensorHandle->GetShape() == tensorShape);
+    CHECK(tensorHandle);
+    ARMNN_ASSERT(tensorHandle->GetImportFlags() == static_cast<MemorySourceFlags>(MemorySource::Malloc));
+    ARMNN_ASSERT(tensorHandle->GetShape() == tensorShape);
 }
 
-BOOST_AUTO_TEST_CASE(CreateSubtensorOfImportTensor)
+TEST_CASE("CreateSubtensorOfImportTensor")
 {
     // Create the factory to import tensors.
     ClImportTensorHandleFactory factory(static_cast<MemorySourceFlags>(MemorySource::Malloc),
@@ -63,12 +66,12 @@ BOOST_AUTO_TEST_CASE(CreateSubtensorOfImportTensor)
     // Starting at an offset of 1x1.
     uint32_t origin[4] = { 1, 1, 0, 0 };
     auto subTensor     = factory.CreateSubTensorHandle(*tensorHandle, subTensorShape, origin);
-    BOOST_CHECK(subTensor);
-    BOOST_ASSERT(subTensor->GetShape() == subTensorShape);
-    BOOST_ASSERT(subTensor->GetParent() == tensorHandle.get());
+    CHECK(subTensor);
+    ARMNN_ASSERT(subTensor->GetShape() == subTensorShape);
+    ARMNN_ASSERT(subTensor->GetParent() == tensorHandle.get());
 }
 
-BOOST_AUTO_TEST_CASE(CreateSubtensorNonZeroXYIsInvalid)
+TEST_CASE("CreateSubtensorNonZeroXYIsInvalid")
 {
     // Create the factory to import tensors.
     ClImportTensorHandleFactory factory(static_cast<MemorySourceFlags>(MemorySource::Malloc),
@@ -84,10 +87,10 @@ BOOST_AUTO_TEST_CASE(CreateSubtensorNonZeroXYIsInvalid)
     uint32_t origin[4] = { 0, 0, 1, 1 };
     auto subTensor     = factory.CreateSubTensorHandle(*tensorHandle, subTensorShape, origin);
     // We expect a nullptr.
-    BOOST_ASSERT(subTensor == nullptr);
+    ARMNN_ASSERT(subTensor == nullptr);
 }
 
-BOOST_AUTO_TEST_CASE(CreateSubtensorXYMustMatchParent)
+TEST_CASE("CreateSubtensorXYMustMatchParent")
 {
     // Create the factory to import tensors.
     ClImportTensorHandleFactory factory(static_cast<MemorySourceFlags>(MemorySource::Malloc),
@@ -102,10 +105,10 @@ BOOST_AUTO_TEST_CASE(CreateSubtensorXYMustMatchParent)
     uint32_t origin[4] = { 1, 1, 0, 0 };
     auto subTensor     = factory.CreateSubTensorHandle(*tensorHandle, subTensorShape, origin);
     // We expect a nullptr.
-    BOOST_ASSERT(subTensor == nullptr);
+    ARMNN_ASSERT(subTensor == nullptr);
 }
 
-BOOST_AUTO_TEST_CASE(CreateSubtensorMustBeSmallerThanParent)
+TEST_CASE("CreateSubtensorMustBeSmallerThanParent")
 {
     // Create the factory to import tensors.
     ClImportTensorHandleFactory factory(static_cast<MemorySourceFlags>(MemorySource::Malloc),
@@ -119,7 +122,7 @@ BOOST_AUTO_TEST_CASE(CreateSubtensorMustBeSmallerThanParent)
     uint32_t origin[4] = { 1, 1, 0, 0 };
     // This should result in a nullptr.
     auto subTensor = factory.CreateSubTensorHandle(*tensorHandle, subTensorShape, origin);
-    BOOST_ASSERT(subTensor == nullptr);
+    ARMNN_ASSERT(subTensor == nullptr);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

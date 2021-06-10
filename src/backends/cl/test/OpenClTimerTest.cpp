@@ -21,7 +21,7 @@
 
 #include <arm_compute/runtime/CL/CLScheduler.h>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <iostream>
 
@@ -38,11 +38,10 @@ struct OpenClFixture
     ClContextControl m_ClContextControl;
 };
 
-BOOST_FIXTURE_TEST_SUITE(OpenClTimerBatchNorm, OpenClFixture)
-using FactoryType = ClWorkloadFactory;
-
-BOOST_AUTO_TEST_CASE(OpenClTimerBatchNorm)
+TEST_CASE_FIXTURE(OpenClFixture, "OpenClTimerBatchNorm")
 {
+//using FactoryType = ClWorkloadFactory;
+
     auto memoryManager = ClWorkloadFactoryHelper::GetMemoryManager();
     ClWorkloadFactory workloadFactory = ClWorkloadFactoryHelper::GetFactory(memoryManager);
 
@@ -109,7 +108,7 @@ BOOST_AUTO_TEST_CASE(OpenClTimerBatchNorm)
 
     OpenClTimer openClTimer;
 
-    BOOST_CHECK_EQUAL(openClTimer.GetName(), "OpenClKernelTimer");
+    CHECK_EQ(openClTimer.GetName(), "OpenClKernelTimer");
 
     //Start the timer
     openClTimer.Start();
@@ -120,15 +119,13 @@ BOOST_AUTO_TEST_CASE(OpenClTimerBatchNorm)
     //Stop the timer
     openClTimer.Stop();
 
-    BOOST_CHECK_EQUAL(openClTimer.GetMeasurements().size(), 1);
+    CHECK_EQ(openClTimer.GetMeasurements().size(), 1);
 
-    BOOST_CHECK_EQUAL(openClTimer.GetMeasurements().front().m_Name,
+    CHECK_EQ(openClTimer.GetMeasurements().front().m_Name,
                       "OpenClKernelTimer/0: batchnormalization_layer_nchw GWS[1,3,2]");
 
-    BOOST_CHECK(openClTimer.GetMeasurements().front().m_Value > 0);
+    CHECK(openClTimer.GetMeasurements().front().m_Value > 0);
 
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 
 #endif //aarch64 or x86_64

@@ -10,6 +10,8 @@
 #include <armnn/INetwork.hpp>
 #include <ResolveType.hpp>
 
+#include <doctest/doctest.h>
+
 namespace{
 
 template<typename T>
@@ -89,7 +91,7 @@ void DetectionPostProcessEndToEnd(const std::vector<BackendId>& backends, bool u
     armnn::INetworkPtr net = CreateDetectionPostProcessNetwork<T>(boxEncodingsInfo, scoresInfo,
                                                                   anchorsInfo, anchors, useRegularNms);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     std::map<int, std::vector<T>> inputTensorData = {{ 0, boxEncodings }, { 1, scores }};
     std::map<int, std::vector<float>> expectedOutputData = {{ 0, expectedDetectionBoxes },

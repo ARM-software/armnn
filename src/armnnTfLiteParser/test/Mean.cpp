@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_Mean")
+{
 struct MeanNoReduceFixture : public ParserFlatbuffersFixture
 {
     explicit MeanNoReduceFixture(const std::string & inputShape,
@@ -89,10 +88,10 @@ struct SimpleMeanNoReduceFixture : public MeanNoReduceFixture
     SimpleMeanNoReduceFixture() : MeanNoReduceFixture("[ 2, 2 ]", "[ 1, 1 ]", "[ 0 ]", "[ ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseMeanNoReduce, SimpleMeanNoReduceFixture)
+TEST_CASE_FIXTURE(SimpleMeanNoReduceFixture, "ParseMeanNoReduce")
 {
     RunTest<2, armnn::DataType::Float32>(0, {{ "inputTensor", { 1.0f, 1.0f, 2.0f, 2.0f } } },
                                             {{ "outputTensor", { 1.5f } } });
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

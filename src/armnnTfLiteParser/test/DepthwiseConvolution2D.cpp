@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_DepthwiseConvolution2D")
+{
 struct DepthwiseConvolution2dFixture : public ParserFlatbuffersFixture
 {
     explicit DepthwiseConvolution2dFixture(const std::string& inputShape,
@@ -131,7 +130,7 @@ struct DepthwiseConvolution2dSameFixture : DepthwiseConvolution2dFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DSame, DepthwiseConvolution2dSameFixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dSameFixture, "ParseDepthwiseConv2DSame")
 {
     RunTest<4, armnn::DataType::QAsymmU8>(
         0,
@@ -158,7 +157,7 @@ struct DepthwiseConvolution2dValidFixture : DepthwiseConvolution2dFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DValid, DepthwiseConvolution2dValidFixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dValidFixture, "ParseDepthwiseConv2DValid")
 {
     RunTest<4, armnn::DataType::QAsymmU8>(
         0,
@@ -183,7 +182,7 @@ struct DepthwiseConvolution2dSameBiasFixture : DepthwiseConvolution2dFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DSameBias, DepthwiseConvolution2dSameBiasFixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dSameBiasFixture, "ParseDepthwiseConv2DSameBias")
 {
     RunTest<4, armnn::DataType::QAsymmU8>(
         0,
@@ -210,7 +209,7 @@ struct DynamicDepthwiseConvolution2dSameBiasFixture : DepthwiseConvolution2dFixt
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseDynamicDepthwiseConv2DSameBias, DynamicDepthwiseConvolution2dSameBiasFixture)
+TEST_CASE_FIXTURE(DynamicDepthwiseConvolution2dSameBiasFixture, "ParseDynamicDepthwiseConv2DSameBias")
 {
     RunTest<4, armnn::DataType::QAsymmU8, armnn::DataType::QAsymmU8>(0,
                                                       { { "inputTensor", { 0, 1, 2,
@@ -365,7 +364,7 @@ struct DepthwiseConvolution2dNoQuantFixture : DepthwiseConvolution2dFixture2
 };
 
 // No quantization meaning scale=1.0 and offset=0.0 and tensor quantization
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DNoQuant, DepthwiseConvolution2dNoQuantFixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dNoQuantFixture, "ParseDepthwiseConv2DNoQuant")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
         0,
@@ -397,7 +396,7 @@ struct DepthwiseConvolution2dNoChannelQuantFixture : DepthwiseConvolution2dFixtu
 };
 
 // Uses per channel quantization on weights but with scales = 1.0 and offsets = 0.0
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DFilterNoChannelQuant, DepthwiseConvolution2dNoChannelQuantFixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dNoChannelQuantFixture, "ParseDepthwiseConv2DFilterNoChannelQuant")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
         0,
@@ -432,8 +431,8 @@ struct DepthwiseConvolution2dWeightsPerChannelQuantFixture : DepthwiseConvolutio
 };
 
 // Weights are per channel quantized but all scales are set to the same value
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DFilterWeightsPerChannelQuant,
-                        DepthwiseConvolution2dWeightsPerChannelQuantFixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dWeightsPerChannelQuantFixture,
+                  "ParseDepthwiseConv2DFilterWeightsPerChannelQuant")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
         0,
@@ -468,8 +467,8 @@ struct DepthwiseConvolution2dWeightsPerChannelQuant1Fixture : DepthwiseConvoluti
 };
 
 // Uses per channel quantization on weights all scales are different in this test
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DFilterWeightsPerChannelQuant1,
-                        DepthwiseConvolution2dWeightsPerChannelQuant1Fixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dWeightsPerChannelQuant1Fixture,
+                  "ParseDepthwiseConv2DFilterWeightsPerChannelQuant1")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
         0,
@@ -506,8 +505,8 @@ struct DepthwiseConvolution2dWeightsPerChannelQuant2Fixture : DepthwiseConvoluti
 
 // Uses per channel quantization on weights all scales are different in this test
 // Uses different shape for weights and input compared to the other tests above
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DFilterWeightsPerChannelQuant2,
-                        DepthwiseConvolution2dWeightsPerChannelQuant2Fixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dWeightsPerChannelQuant2Fixture,
+                  "ParseDepthwiseConv2DFilterWeightsPerChannelQuant2")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
         0,
@@ -555,8 +554,8 @@ struct DepthwiseConvolution2dWeightsPerChannelQuant4Fixture : DepthwiseConvoluti
 };
 
 // Test for depthwise_multiplier different to one (M > 1)
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DFilterWeightsPerChannelQuant4,
-                        DepthwiseConvolution2dWeightsPerChannelQuant4Fixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dWeightsPerChannelQuant4Fixture,
+                  "ParseDepthwiseConv2DFilterWeightsPerChannelQuant4")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
         0,
@@ -616,8 +615,8 @@ struct DepthwiseConvolution2dWeightsPerChannelQuant6Fixture : DepthwiseConvoluti
 };
 
 
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DFilterWeightsPerChannelQuant6,
-                        DepthwiseConvolution2dWeightsPerChannelQuant6Fixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dWeightsPerChannelQuant6Fixture,
+                  "ParseDepthwiseConv2DFilterWeightsPerChannelQuant6")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
         0,
@@ -672,8 +671,8 @@ struct DepthwiseConvolution2dWeightsPerChannelQuant1_1Fixture : DepthwiseConvolu
 };
 
 
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DFilterWeightsPerChannelQuant1_1,
-                        DepthwiseConvolution2dWeightsPerChannelQuant1_1Fixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dWeightsPerChannelQuant1_1Fixture,
+                  "ParseDepthwiseConv2DFilterWeightsPerChannelQuant1_1")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
         0,
@@ -712,8 +711,8 @@ struct DepthwiseConvolution2dWeightsPerChannelQuant1_2Fixture : DepthwiseConvolu
 };
 
 
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DFilterWeightsPerChannelQuant1_2,
-                        DepthwiseConvolution2dWeightsPerChannelQuant1_2Fixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dWeightsPerChannelQuant1_2Fixture,
+                  "ParseDepthwiseConv2DFilterWeightsPerChannelQuant1_2")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
         0,
@@ -759,8 +758,8 @@ struct DepthwiseConvolution2dWeightsPerChannelQuant4_1Fixture : DepthwiseConvolu
 };
 
 
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DFilterWeightsPerChannelQuant4_1,
-                        DepthwiseConvolution2dWeightsPerChannelQuant4_1Fixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dWeightsPerChannelQuant4_1Fixture,
+                  "ParseDepthwiseConv2DFilterWeightsPerChannelQuant4_1")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
         0,
@@ -821,8 +820,8 @@ struct DepthwiseConvolution2dWeightsPerChannelQuant4_2Fixture : DepthwiseConvolu
 };
 
 
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DFilterWeightsPerChannelQuant4_2,
-                        DepthwiseConvolution2dWeightsPerChannelQuant4_2Fixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dWeightsPerChannelQuant4_2Fixture,
+                  "ParseDepthwiseConv2DFilterWeightsPerChannelQuant4_2")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
         0,
@@ -887,8 +886,8 @@ struct DepthwiseConvolution2dWeightsPerChannelQuant4_5Fixture : DepthwiseConvolu
 };
 
 // Test for depthwise_multiplier different to one (M > 1)
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DFilterWeightsPerChannelQuant4_5,
-                        DepthwiseConvolution2dWeightsPerChannelQuant4_5Fixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dWeightsPerChannelQuant4_5Fixture,
+                  "ParseDepthwiseConv2DFilterWeightsPerChannelQuant4_5")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
         0,
@@ -947,8 +946,8 @@ struct DepthwiseConvolution2dWeightsPerChannelQuant4_3_1Fixture : DepthwiseConvo
 };
 
 // Test for depthwise_multiplier different to one (M > 1)
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DFilterWeightsPerChannelQuant4_3_1,
-                        DepthwiseConvolution2dWeightsPerChannelQuant4_3_1Fixture)
+TEST_CASE_FIXTURE(DepthwiseConvolution2dWeightsPerChannelQuant4_3_1Fixture,
+                  "ParseDepthwiseConv2DFilterWeightsPerChannelQuant4_3_1")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
         0,
@@ -974,4 +973,4 @@ BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DFilterWeightsPerChannelQuant4_3_1,
           3, 4, 1, 1, 1, 3, 3, 2, 0, 0, 0, 0, 2, 4, 4, 8});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

@@ -17,29 +17,29 @@
 #include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(Graph)
-
-BOOST_AUTO_TEST_CASE(ClassGraph)
+TEST_SUITE("Graph")
+{
+TEST_CASE("ClassGraph")
 {
     armnn::Graph graph;
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::InputLayer>(0, "layerA"));
-    BOOST_TEST(GraphHasNamedLayer(graph, "layerA"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::InputLayer>(0, "layerA"));
+    CHECK(GraphHasNamedLayer(graph, "layerA"));
 }
 
-BOOST_AUTO_TEST_CASE(TopologicalSort)
+TEST_CASE("TopologicalSort")
 {
     armnn::Graph graph;
 
     armnn::ActivationDescriptor activationDefaults;
 
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::InputLayer>(0, "layerA"));
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerB"));
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::AdditionLayer>("layerC"));
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::OutputLayer>(0, "output"));
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerD"));
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerE"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::InputLayer>(0, "layerA"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerB"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::AdditionLayer>("layerC"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::OutputLayer>(0, "output"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerD"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerE"));
 
     armnn::Layer* const layerA = GetFirstLayerWithName(graph, "layerA");
     armnn::Layer* const layerB = GetFirstLayerWithName(graph, "layerB");
@@ -64,14 +64,14 @@ BOOST_AUTO_TEST_CASE(TopologicalSort)
     layerC->GetOutputSlot(0).Connect(layerO->GetInputSlot(0));
 
     // check order is valid
-    BOOST_TEST(CheckOrder(graph, layerA, layerD));
-    BOOST_TEST(CheckOrder(graph, layerA, layerE));
-    BOOST_TEST(CheckOrder(graph, layerD, layerC));
-    BOOST_TEST(CheckOrder(graph, layerE, layerB));
-    BOOST_TEST(CheckOrder(graph, layerB, layerC));
+    CHECK(CheckOrder(graph, layerA, layerD));
+    CHECK(CheckOrder(graph, layerA, layerE));
+    CHECK(CheckOrder(graph, layerD, layerC));
+    CHECK(CheckOrder(graph, layerE, layerB));
+    CHECK(CheckOrder(graph, layerB, layerC));
 }
 
-BOOST_AUTO_TEST_CASE(InsertNewLayerBefore)
+TEST_CASE("InsertNewLayerBefore")
 {
     armnn::Graph graph;
     armnn::TensorInfo tensorInfo({ 1, 1, 1, 1 }, armnn::DataType::Float32);
@@ -79,11 +79,11 @@ BOOST_AUTO_TEST_CASE(InsertNewLayerBefore)
     std::vector<armnn::Layer*> order;
 
     armnn::ActivationDescriptor activationDefaults;
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::InputLayer>(0, "layerA"));
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerB"));
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerC"));
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::AdditionLayer>("layerD"));
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::OutputLayer>(0, "output"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::InputLayer>(0, "layerA"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerB"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerC"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::AdditionLayer>("layerD"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::OutputLayer>(0, "output"));
 
     armnn::Layer* const layerA = GetFirstLayerWithName(graph, "layerA");
     armnn::Layer* const layerB = GetFirstLayerWithName(graph, "layerB");
@@ -108,10 +108,10 @@ BOOST_AUTO_TEST_CASE(InsertNewLayerBefore)
     layerD->GetOutputSlot(0).Connect(layerO->GetInputSlot(0));
 
     // Checks order is valid.
-    BOOST_TEST(CheckOrder(graph, layerA, layerB));
-    BOOST_TEST(CheckOrder(graph, layerA, layerC));
-    BOOST_TEST(CheckOrder(graph, layerB, layerD));
-    BOOST_TEST(CheckOrder(graph, layerC, layerD));
+    CHECK(CheckOrder(graph, layerA, layerB));
+    CHECK(CheckOrder(graph, layerA, layerC));
+    CHECK(CheckOrder(graph, layerB, layerD));
+    CHECK(CheckOrder(graph, layerC, layerD));
 
     //    A
     //   / \'
@@ -120,18 +120,18 @@ BOOST_AUTO_TEST_CASE(InsertNewLayerBefore)
     //    \ E
     //     \|
     //      D
-    BOOST_CHECK_NO_THROW(graph.InsertNewLayer<armnn::ActivationLayer>(layerD->GetInputSlot(1),
+    CHECK_NOTHROW(graph.InsertNewLayer<armnn::ActivationLayer>(layerD->GetInputSlot(1),
                                                                       activationDefaults,
                                                                       "layerE"));
 
     armnn::Layer* const layerE = GetFirstLayerWithName(graph, "layerE");
 
     // Checks order is valid.
-    BOOST_TEST(CheckOrder(graph, layerA, layerB));
-    BOOST_TEST(CheckOrder(graph, layerA, layerC));
-    BOOST_TEST(CheckOrder(graph, layerB, layerD));
-    BOOST_TEST(CheckOrder(graph, layerC, layerE));
-    BOOST_TEST(CheckOrder(graph, layerE, layerD));
+    CHECK(CheckOrder(graph, layerA, layerB));
+    CHECK(CheckOrder(graph, layerA, layerC));
+    CHECK(CheckOrder(graph, layerB, layerD));
+    CHECK(CheckOrder(graph, layerC, layerE));
+    CHECK(CheckOrder(graph, layerE, layerD));
 
     //      A
     //     /|
@@ -142,22 +142,22 @@ BOOST_AUTO_TEST_CASE(InsertNewLayerBefore)
     //    \ E
     //     \|
     //      D
-    BOOST_CHECK_NO_THROW(graph.InsertNewLayer<armnn::ActivationLayer>(layerC->GetInputSlot(0),
+    CHECK_NOTHROW(graph.InsertNewLayer<armnn::ActivationLayer>(layerC->GetInputSlot(0),
                                                                       activationDefaults,
                                                                       "layerF"));
 
     armnn::Layer* const layerF = GetFirstLayerWithName(graph, "layerF");
 
     // Checks order is valid.
-    BOOST_TEST(CheckOrder(graph, layerA, layerB));
-    BOOST_TEST(CheckOrder(graph, layerA, layerF));
-    BOOST_TEST(CheckOrder(graph, layerF, layerC));
-    BOOST_TEST(CheckOrder(graph, layerB, layerD));
-    BOOST_TEST(CheckOrder(graph, layerC, layerE));
-    BOOST_TEST(CheckOrder(graph, layerE, layerD));
+    CHECK(CheckOrder(graph, layerA, layerB));
+    CHECK(CheckOrder(graph, layerA, layerF));
+    CHECK(CheckOrder(graph, layerF, layerC));
+    CHECK(CheckOrder(graph, layerB, layerD));
+    CHECK(CheckOrder(graph, layerC, layerE));
+    CHECK(CheckOrder(graph, layerE, layerD));
 }
 
-BOOST_AUTO_TEST_CASE(InsertNewLayerAfter)
+TEST_CASE("InsertNewLayerAfter")
 {
     armnn::Graph graph;
     armnn::TensorInfo tensorInfo({ 1, 1, 1, 1 }, armnn::DataType::Float32);
@@ -165,11 +165,11 @@ BOOST_AUTO_TEST_CASE(InsertNewLayerAfter)
     std::vector<armnn::Layer*> order;
 
     armnn::ActivationDescriptor activationDefaults;
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::InputLayer>(0, "layerA"));
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerB"));
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerC"));
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::AdditionLayer>("layerD"));
-    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::OutputLayer>(0, "output"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::InputLayer>(0, "layerA"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerB"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerC"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::AdditionLayer>("layerD"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::OutputLayer>(0, "output"));
 
     armnn::Layer* const layerA = GetFirstLayerWithName(graph, "layerA");
     armnn::Layer* const layerB = GetFirstLayerWithName(graph, "layerB");
@@ -194,10 +194,10 @@ BOOST_AUTO_TEST_CASE(InsertNewLayerAfter)
     layerD->GetOutputSlot(0).Connect(layerO->GetInputSlot(0));
 
     // Checks order is valid.
-    BOOST_TEST(CheckOrder(graph, layerA, layerB));
-    BOOST_TEST(CheckOrder(graph, layerA, layerC));
-    BOOST_TEST(CheckOrder(graph, layerB, layerD));
-    BOOST_TEST(CheckOrder(graph, layerC, layerD));
+    CHECK(CheckOrder(graph, layerA, layerB));
+    CHECK(CheckOrder(graph, layerA, layerC));
+    CHECK(CheckOrder(graph, layerB, layerD));
+    CHECK(CheckOrder(graph, layerC, layerD));
 
     //    A
     //   / \'
@@ -206,18 +206,18 @@ BOOST_AUTO_TEST_CASE(InsertNewLayerAfter)
     //    \ E
     //     \|
     //      D
-    BOOST_CHECK_NO_THROW(graph.InsertNewLayer<armnn::ActivationLayer>(layerC->GetOutputSlot(),
+    CHECK_NOTHROW(graph.InsertNewLayer<armnn::ActivationLayer>(layerC->GetOutputSlot(),
                                                                       activationDefaults,
                                                                       "layerE"));
 
     armnn::Layer* const layerE = GetFirstLayerWithName(graph, "layerE");
 
     // Checks order is valid.
-    BOOST_TEST(CheckOrder(graph, layerA, layerB));
-    BOOST_TEST(CheckOrder(graph, layerA, layerC));
-    BOOST_TEST(CheckOrder(graph, layerB, layerD));
-    BOOST_TEST(CheckOrder(graph, layerC, layerE));
-    BOOST_TEST(CheckOrder(graph, layerE, layerD));
+    CHECK(CheckOrder(graph, layerA, layerB));
+    CHECK(CheckOrder(graph, layerA, layerC));
+    CHECK(CheckOrder(graph, layerB, layerD));
+    CHECK(CheckOrder(graph, layerC, layerE));
+    CHECK(CheckOrder(graph, layerE, layerD));
 
 
     //    A
@@ -229,19 +229,19 @@ BOOST_AUTO_TEST_CASE(InsertNewLayerAfter)
     //   \  E
     //    \ /
     //     D
-    BOOST_CHECK_NO_THROW(graph.InsertNewLayer<armnn::ActivationLayer>(layerA->GetOutputSlot(),
+    CHECK_NOTHROW(graph.InsertNewLayer<armnn::ActivationLayer>(layerA->GetOutputSlot(),
                                                                       activationDefaults,
                                                                       "layerF"));
 
     armnn::Layer* const layerF = GetFirstLayerWithName(graph, "layerF");
 
     // Checks order is valid.
-    BOOST_TEST(CheckOrder(graph, layerA, layerF));
-    BOOST_TEST(CheckOrder(graph, layerF, layerB));
-    BOOST_TEST(CheckOrder(graph, layerF, layerC));
-    BOOST_TEST(CheckOrder(graph, layerB, layerD));
-    BOOST_TEST(CheckOrder(graph, layerC, layerE));
-    BOOST_TEST(CheckOrder(graph, layerE, layerD));
+    CHECK(CheckOrder(graph, layerA, layerF));
+    CHECK(CheckOrder(graph, layerF, layerB));
+    CHECK(CheckOrder(graph, layerF, layerC));
+    CHECK(CheckOrder(graph, layerB, layerD));
+    CHECK(CheckOrder(graph, layerC, layerE));
+    CHECK(CheckOrder(graph, layerE, layerD));
 }
 
 namespace
@@ -282,7 +282,7 @@ static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armn
         std::sort(sortedNewEdges.begin(), sortedNewEdges.end());
 
         auto last = std::unique(sortedNewEdges.begin(), sortedNewEdges.end());
-        BOOST_CHECK_MESSAGE(last == sortedNewEdges.end(), "New graph contains duplicate edges!");
+        CHECK_MESSAGE(last == sortedNewEdges.end(), "New graph contains duplicate edges!");
     }
 
     // Each new edge must be tested.
@@ -308,13 +308,13 @@ static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armn
             // Each vertex should correspond to a layer.
             const armnn::Layer* srcLayer = edge.first;
             const armnn::Layer* dstLayer = edge.second;
-            BOOST_TEST(srcLayer);
-            BOOST_TEST(dstLayer);
+            CHECK(srcLayer);
+            CHECK(dstLayer);
 
             // Both layers must have the same compute device.
             if (srcLayer && dstLayer)
             {
-                BOOST_TEST((srcLayer->GetBackendId() == dstLayer->GetBackendId()));
+                CHECK((srcLayer->GetBackendId() == dstLayer->GetBackendId()));
             }
 
             // Marks edge in original graph as observed (by deleting it).
@@ -329,9 +329,9 @@ static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armn
 
             if (srcLayer == nullptr || dstLayer == nullptr)
             {
-                BOOST_ERROR("At least one of the two ends of a new edge (" << edge.first << ", " << edge.second << ") "
-                            "introduced after adding copy layers to a graph "
-                            "correspond to a layer not known to the graph");
+                FAIL("At least one of the two ends of a new edge (" << edge.first << ", " << edge.second
+                                    << ") introduced after adding copy layers to a graph "
+                                       "correspond to a layer not known to the graph");
                 continue;
             }
 
@@ -341,14 +341,14 @@ static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armn
 
             if (srcLayerInOrigGraph == dstLayerInOrigGraph)
             {
-                BOOST_ERROR("A new edge ("
-                            << edge.first->GetName()
-                            << ", "
-                            << edge.second->GetName()
-                            << ") introduced after adding copy "
-                               "layers to a graph is invalid. One of the ends should be present in the original "
-                               "graph and the other should not, but "
-                            << (srcLayerInOrigGraph ? "both are" : "none are"));
+                FAIL("A new edge ("
+                                << edge.first->GetName()
+                                << ", "
+                                << edge.second->GetName()
+                                << ") introduced after adding copy "
+                                   "layers to a graph is invalid. One of the ends should be present in the original "
+                                   "graph and the other should not, but "
+                                << (srcLayerInOrigGraph ? "both are" : "none are"));
                 continue;
             }
 
@@ -376,7 +376,7 @@ static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armn
 
             if (adjEdges.empty())
             {
-                BOOST_ERROR("An edge connecting a layer and a copy layer exists, (" << edge.first << ", " <<
+                FAIL("An edge connecting a layer and a copy layer exists, (" << edge.first << ", " <<
                             edge.second << "),  but no other edges connecting the copy layer '" << copyLayer->GetName()
                             << "' to other layers could be found");
                 continue;
@@ -390,14 +390,14 @@ static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armn
 
                 if (!adjLayer)
                 {
-                    BOOST_ERROR("An edge (" << adjEdge.first << ", " << adjEdge.second <<") is adjacent to an edge "
-                                "connecting a layer and a copy layer, (" << edge.first << ", " << edge.second << "), "
-                                "but the non-copy layer in the former does not correspond to a layer");
+                    FAIL("An edge (" << adjEdge.first << ", " << adjEdge.second <<") is adjacent to an "
+                                "edge connecting a layer and a copy layer, (" << edge.first << ", " << edge.second <<
+                                "), but the non-copy layer in the former does not correspond to a layer");
                     continue;
                 }
 
                 // Both layers must have different compute devices.
-                BOOST_TEST((nonCopyLayer->GetBackendId() != adjLayer->GetBackendId()));
+                CHECK((nonCopyLayer->GetBackendId() != adjLayer->GetBackendId()));
 
                 // There must exist an edge connecting both layers directly in the original graph.
                 {
@@ -420,8 +420,8 @@ static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armn
                     }
                     else
                     {
-                        BOOST_ERROR("An edge (" << adjEdge.first << ", " << adjEdge.second << ") is adjacent to an "
-                            "edge connecting a layer and a copy layer, (" << edge.first << ", " << edge.second <<
+                        FAIL("An edge (" << adjEdge.first << ", " << adjEdge.second << ") is adjacent to "
+                            "an edge connecting a layer and a copy layer, (" << edge.first << ", " << edge.second <<
                             "), but there is no edge connecting the layers in the original graph");
                     }
                 }
@@ -429,7 +429,7 @@ static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armn
         }
     }
 
-    BOOST_TEST(origEdges.empty(), "Not all of the edges in the original graph correspond to paths in the new graph");
+    CHECK_MESSAGE(origEdges.empty(), "Not all of the edges in the original graph correspond to paths in the new graph");
 }
 
 struct CopyLayersFixture
@@ -513,7 +513,7 @@ private:
     };
 };
 
-BOOST_FIXTURE_TEST_CASE(AddCopyLayers, CopyLayersFixture)
+TEST_CASE_FIXTURE(CopyLayersFixture, "AddCopyLayers")
 {
     InitialiseTestGraph();
     const armnn::Graph origGraph(m_Graph);
@@ -522,7 +522,7 @@ BOOST_FIXTURE_TEST_CASE(AddCopyLayers, CopyLayersFixture)
     TestGraphAfterAddingCopyLayers(m_Graph, origGraph);
 }
 
-BOOST_FIXTURE_TEST_CASE(AddCopyLayersSeveralTimes, CopyLayersFixture)
+TEST_CASE_FIXTURE(CopyLayersFixture, "AddCopyLayersSeveralTimes")
 {
     InitialiseTestGraph();
     m_Graph.AddCompatibilityLayers(m_Backends, m_FactoryRegistry);
@@ -533,11 +533,11 @@ BOOST_FIXTURE_TEST_CASE(AddCopyLayersSeveralTimes, CopyLayersFixture)
     {
         m_Graph.AddCompatibilityLayers(m_Backends, m_FactoryRegistry);
         const std::vector<Edge> otherEdges = GetEdgeList(m_Graph);
-        BOOST_TEST((edges == otherEdges));
+        CHECK((edges == otherEdges));
     }
 }
 
-BOOST_FIXTURE_TEST_CASE(CopyLayersAddedBetweenSameLayersHaveDifferentNames, CopyLayersFixture)
+TEST_CASE_FIXTURE(CopyLayersFixture, "CopyLayersAddedBetweenSameLayersHaveDifferentNames")
 {
     armnn::Graph graph;
 
@@ -567,13 +567,13 @@ BOOST_FIXTURE_TEST_CASE(CopyLayersAddedBetweenSameLayersHaveDifferentNames, Copy
     graph.AddCompatibilityLayers(m_Backends, m_FactoryRegistry);
 
     std::vector<Edge> edges = GetEdgeList(graph);
-    BOOST_CHECK(edges.size() == 6u);
+    CHECK(edges.size() == 6u);
     std::sort(edges.begin(), edges.end());
     auto last = std::unique(edges.begin(), edges.end());
-    BOOST_CHECK_MESSAGE(last == edges.end(), "Found duplicated edges after AddCompatibilityLayers()");
+    CHECK_MESSAGE(last == edges.end(), "Found duplicated edges after AddCompatibilityLayers()");
 }
 
-BOOST_AUTO_TEST_CASE(DuplicateLayerNames)
+TEST_CASE("DuplicateLayerNames")
 {
     armnn::Graph graph;
 
@@ -586,11 +586,11 @@ BOOST_AUTO_TEST_CASE(DuplicateLayerNames)
     inputLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     auto it = graph.TopologicalSort().begin();
-    BOOST_TEST(((*it)->GetType() == armnn::LayerType::Input));
-    BOOST_TEST(((*std::next(it))->GetType() == armnn::LayerType::Output));
+    CHECK(((*it)->GetType() == armnn::LayerType::Input));
+    CHECK(((*std::next(it))->GetType() == armnn::LayerType::Output));
 }
 
-BOOST_AUTO_TEST_CASE(CheckGraphConstTensorSharing)
+TEST_CASE("CheckGraphConstTensorSharing")
 {
     armnn::Graph graph0;
     const float* sharedWeightPtr;
@@ -611,7 +611,7 @@ BOOST_AUTO_TEST_CASE(CheckGraphConstTensorSharing)
         // graph1 goes out of scope
     }
 
-    BOOST_TEST(*sharedWeightPtr == 1);
+    CHECK(*sharedWeightPtr == 1);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

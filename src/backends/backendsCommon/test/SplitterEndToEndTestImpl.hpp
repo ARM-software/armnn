@@ -12,7 +12,7 @@
 
 #include <backendsCommon/test/CommonTestUtils.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <vector>
 
@@ -86,7 +86,7 @@ void Splitter1dEndToEnd(const std::vector<BackendId>& backends)
     // Builds up the structure of the network
     INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     // Creates structures for input & output.
     std::vector<T> inputData{ 1, 2, 3, 4 };
@@ -114,7 +114,7 @@ void Splitter2dDim0EndToEnd(const std::vector<BackendId>& backends)
     // Builds up the structure of the network
     INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     // Creates structures for input & output.
     std::vector<T> inputData{
@@ -149,7 +149,7 @@ void Splitter2dDim1EndToEnd(const std::vector<BackendId>& backends)
     // Builds up the structure of the network
     INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     // Creates structures for input & output.
     std::vector<T> inputData{
@@ -187,7 +187,7 @@ void Splitter3dDim0EndToEnd(const std::vector<BackendId>& backends)
     // Builds up the structure of the network
     INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     // Creates structures for input & output.
     std::vector<T> inputData{
@@ -235,7 +235,7 @@ void Splitter3dDim1EndToEnd(const std::vector<BackendId>& backends)
     // Builds up the structure of the network
     INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     // Creates structures for input & output.
     std::vector<T> inputData{
@@ -283,7 +283,7 @@ void Splitter3dDim2EndToEnd(const std::vector<BackendId>& backends)
     // Builds up the structure of the network
     INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     // Creates structures for input & output.
     std::vector<T> inputData{
@@ -323,7 +323,7 @@ void Splitter4dDim0EndToEnd(const std::vector<BackendId>& backends)
     // Builds up the structure of the network
     INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     // Creates structures for input & output.
     std::vector<T> inputData{
@@ -403,7 +403,7 @@ void Splitter4dDim1EndToEnd(const std::vector<BackendId>& backends)
     // Builds up the structure of the network
     INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     // Creates structures for input & output.
     std::vector<T> inputData{
@@ -483,7 +483,7 @@ void Splitter4dDim2EndToEnd(const std::vector<BackendId>& backends)
     // Builds up the structure of the network
     INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     // Creates structures for input & output.
     std::vector<T> inputData{
@@ -562,7 +562,7 @@ void Splitter4dDim3EndToEnd(const std::vector<BackendId>& backends)
     // Builds up the structure of the network
     INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     // Creates structures for input & output.
     std::vector<T> inputData{

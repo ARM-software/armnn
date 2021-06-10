@@ -9,16 +9,17 @@
 #include <cl/ClImportTensorHandleFactory.hpp>
 #include <cl/test/ClContextControlFixture.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
+
 
 #include <armnn/IRuntime.hpp>
 #include <armnn/INetwork.hpp>
 
 using namespace armnn;
 
-BOOST_AUTO_TEST_SUITE(ClImportTensorHandleTests)
-
-BOOST_FIXTURE_TEST_CASE(ClMallocImport, ClContextControlFixture)
+TEST_SUITE("ClImportTensorHandleTests")
+{
+TEST_CASE_FIXTURE(ClContextControlFixture, "ClMallocImport")
 {
     ClImportTensorHandleFactory handleFactory(static_cast<MemorySourceFlags>(MemorySource::Malloc),
                                               static_cast<MemorySourceFlags>(MemorySource::Malloc));
@@ -44,10 +45,10 @@ BOOST_FIXTURE_TEST_CASE(ClMallocImport, ClContextControlFixture)
     size_t space = totalBytes + alignment + alignment;
     auto testData = std::make_unique<uint8_t[]>(space);
     void* alignedPtr = testData.get();
-    BOOST_CHECK(std::align(alignment, totalBytes, alignedPtr, space));
+    CHECK(std::align(alignment, totalBytes, alignedPtr, space));
 
     // Import memory
-    BOOST_CHECK(handle->Import(alignedPtr, armnn::MemorySource::Malloc));
+    CHECK(handle->Import(alignedPtr, armnn::MemorySource::Malloc));
 
     // Input with negative values
     auto* typedPtr = reinterpret_cast<float*>(alignedPtr);
@@ -60,11 +61,11 @@ BOOST_FIXTURE_TEST_CASE(ClMallocImport, ClContextControlFixture)
     // Validate result by checking that the output has no negative values
     for(unsigned int i = 0; i < numElements; ++i)
     {
-        BOOST_TEST(typedPtr[i] >= 0);
+        CHECK(typedPtr[i] >= 0);
     }
 }
 
-BOOST_FIXTURE_TEST_CASE(ClIncorrectMemorySourceImport, ClContextControlFixture)
+TEST_CASE_FIXTURE(ClContextControlFixture, "ClIncorrectMemorySourceImport")
 {
     ClImportTensorHandleFactory handleFactory(static_cast<MemorySourceFlags>(MemorySource::Malloc),
                                               static_cast<MemorySourceFlags>(MemorySource::Malloc));
@@ -84,13 +85,13 @@ BOOST_FIXTURE_TEST_CASE(ClIncorrectMemorySourceImport, ClContextControlFixture)
     size_t space = totalBytes + alignment + alignment;
     auto testData = std::make_unique<uint8_t[]>(space);
     void* alignedPtr = testData.get();
-    BOOST_CHECK(std::align(alignment, totalBytes, alignedPtr, space));
+    CHECK(std::align(alignment, totalBytes, alignedPtr, space));
 
     // Import memory
-    BOOST_CHECK_THROW(handle->Import(alignedPtr, armnn::MemorySource::Undefined), MemoryImportException);
+    CHECK_THROWS_AS(handle->Import(alignedPtr, armnn::MemorySource::Undefined), MemoryImportException);
 }
 
-BOOST_FIXTURE_TEST_CASE(ClInvalidMemorySourceImport, ClContextControlFixture)
+TEST_CASE_FIXTURE(ClContextControlFixture, "ClInvalidMemorySourceImport")
 {
     MemorySource invalidMemSource = static_cast<MemorySource>(256);
     ClImportTensorHandleFactory handleFactory(static_cast<MemorySourceFlags>(invalidMemSource),
@@ -108,10 +109,10 @@ BOOST_FIXTURE_TEST_CASE(ClInvalidMemorySourceImport, ClContextControlFixture)
     };
 
     // Import non-support memory
-    BOOST_CHECK_THROW(handle->Import(inputData.data(), invalidMemSource), MemoryImportException);
+    CHECK_THROWS_AS(handle->Import(inputData.data(), invalidMemSource), MemoryImportException);
 }
 
-BOOST_FIXTURE_TEST_CASE(ClImportEndToEnd, ClContextControlFixture)
+TEST_CASE_FIXTURE(ClContextControlFixture, "ClImportEndToEnd")
 {
     // Create runtime in which test will run
     IRuntime::CreationOptions options;
@@ -143,7 +144,7 @@ BOOST_FIXTURE_TEST_CASE(ClImportEndToEnd, ClContextControlFixture)
     optOptions.m_ImportEnabled = true;
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
-    BOOST_CHECK(optNet);
+    CHECK(optNet);
 
     // Loads it into the runtime.
     NetworkId netId;
@@ -158,7 +159,7 @@ BOOST_FIXTURE_TEST_CASE(ClImportEndToEnd, ClContextControlFixture)
     size_t space = totalBytes + alignment + alignment;
     auto inputData = std::make_unique<uint8_t[]>(space);
     void* alignedInputPtr = inputData.get();
-    BOOST_CHECK(std::align(alignment, totalBytes, alignedInputPtr, space));
+    CHECK(std::align(alignment, totalBytes, alignedInputPtr, space));
 
     // Input with negative values
     auto* intputPtr = reinterpret_cast<float*>(alignedInputPtr);
@@ -166,7 +167,7 @@ BOOST_FIXTURE_TEST_CASE(ClImportEndToEnd, ClContextControlFixture)
 
     auto outputData = std::make_unique<uint8_t[]>(space);
     void* alignedOutputPtr = outputData.get();
-    BOOST_CHECK(std::align(alignment, totalBytes, alignedOutputPtr, space));
+    CHECK(std::align(alignment, totalBytes, alignedOutputPtr, space));
     auto* outputPtr = reinterpret_cast<float*>(alignedOutputPtr);
     std::fill_n(outputPtr, numElements, -10.0f);
 
@@ -192,26 +193,26 @@ BOOST_FIXTURE_TEST_CASE(ClImportEndToEnd, ClContextControlFixture)
 
     // Contains ActivationWorkload
     std::size_t found = dump.find("ActivationWorkload");
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
 
     // Contains SyncMemGeneric
     found = dump.find("SyncMemGeneric");
-    BOOST_TEST(found != std::string::npos);
+    CHECK(found != std::string::npos);
 
     // Does not contain CopyMemGeneric
     found = dump.find("CopyMemGeneric");
-    BOOST_TEST(found == std::string::npos);
+    CHECK(found == std::string::npos);
 
     runtime->UnloadNetwork(netId);
 
     // Check output is as expected
     // Validate result by checking that the output has no negative values
     auto* outputResult = reinterpret_cast<float*>(alignedOutputPtr);
-    BOOST_TEST(outputResult);
+    CHECK(outputResult);
     for(unsigned int i = 0; i < numElements; ++i)
     {
-        BOOST_TEST(outputResult[i] >= 0);
+        CHECK(outputResult[i] >= 0);
     }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

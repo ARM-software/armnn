@@ -3,12 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "armnnOnnxParser/IOnnxParser.hpp"
 #include  "ParserPrototxtFixture.hpp"
 
-BOOST_AUTO_TEST_SUITE(OnnxParser)
-
+TEST_SUITE("OnnxParser_DepthConv")
+{
 struct SimpleDepthConv2DFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser::IOnnxParser>
 {
     SimpleDepthConv2DFixture()
@@ -153,10 +152,10 @@ struct SimpleDepthConv2DFixture : public armnnUtils::ParserPrototxtFixture<armnn
 };
 
 
-BOOST_FIXTURE_TEST_CASE(ValidDepthConvTest, SimpleDepthConv2DFixture)
+TEST_CASE_FIXTURE(SimpleDepthConv2DFixture, "ValidDepthConvTest")
 {
     RunTest<4>({{"Input", { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}}},
                {{"Output", { 10, 52, 126 }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

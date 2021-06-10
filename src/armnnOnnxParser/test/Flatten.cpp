@@ -3,12 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "armnnOnnxParser/IOnnxParser.hpp"
 #include  "ParserPrototxtFixture.hpp"
 
-BOOST_AUTO_TEST_SUITE(OnnxParser)
-
+TEST_SUITE("OnnxParser_Flatter")
+{
 struct FlattenMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser::IOnnxParser>
 {
     FlattenMainFixture(const std::string& dataType)
@@ -382,7 +381,7 @@ struct FlattenInvalidAxisFixture : FlattenInvalidNegativeAxisFixture
     FlattenInvalidAxisFixture() : FlattenInvalidNegativeAxisFixture("1") { }
 };
 
-BOOST_FIXTURE_TEST_CASE(ValidFlattenTest, FlattenValidFixture)
+TEST_CASE_FIXTURE(FlattenValidFixture, "ValidFlattenTest")
 {
     RunTest<2>({{"Input",
                           { 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f,
@@ -394,7 +393,7 @@ BOOST_FIXTURE_TEST_CASE(ValidFlattenTest, FlattenValidFixture)
                             1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f }}});
 }
 
-BOOST_FIXTURE_TEST_CASE(ValidFlattenDefaultTest, FlattenDefaultValidFixture)
+TEST_CASE_FIXTURE(FlattenDefaultValidFixture, "ValidFlattenDefaultTest")
 {
     RunTest<2>({{"Input",
                     { 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f,
@@ -406,7 +405,7 @@ BOOST_FIXTURE_TEST_CASE(ValidFlattenDefaultTest, FlattenDefaultValidFixture)
                         1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f }}});
 }
 
-BOOST_FIXTURE_TEST_CASE(ValidFlattenAxisZeroTest, FlattenAxisZeroValidFixture)
+TEST_CASE_FIXTURE(FlattenAxisZeroValidFixture, "ValidFlattenAxisZeroTest")
 {
     RunTest<2>({{"Input",
                     { 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f,
@@ -418,7 +417,7 @@ BOOST_FIXTURE_TEST_CASE(ValidFlattenAxisZeroTest, FlattenAxisZeroValidFixture)
                         1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f }}});
 }
 
-BOOST_FIXTURE_TEST_CASE(ValidFlattenNegativeAxisTest, FlattenNegativeAxisValidFixture)
+TEST_CASE_FIXTURE(FlattenNegativeAxisValidFixture, "ValidFlattenNegativeAxisTest")
 {
     RunTest<2>({{"Input",
                     { 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f,
@@ -430,14 +429,14 @@ BOOST_FIXTURE_TEST_CASE(ValidFlattenNegativeAxisTest, FlattenNegativeAxisValidFi
                         1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f }}});
 }
 
-BOOST_FIXTURE_TEST_CASE(IncorrectDataTypeFlatten, FlattenInvalidFixture)
+TEST_CASE_FIXTURE(FlattenInvalidFixture, "IncorrectDataTypeFlatten")
 {
-    BOOST_CHECK_THROW(Setup(), armnn::ParseException);
+    CHECK_THROWS_AS(Setup(), armnn::ParseException);
 }
 
-BOOST_FIXTURE_TEST_CASE(IncorrectAxisFlatten, FlattenInvalidAxisFixture)
+TEST_CASE_FIXTURE(FlattenInvalidAxisFixture, "IncorrectAxisFlatten")
 {
-    BOOST_CHECK_THROW(Setup(), armnn::ParseException);
+    CHECK_THROWS_AS(Setup(), armnn::ParseException);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

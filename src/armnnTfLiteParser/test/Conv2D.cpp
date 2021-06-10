@@ -3,13 +3,12 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 #include <sstream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_Conv2D")
+{
 struct SimpleConv2DFixture : public ParserFlatbuffersFixture
 {
     explicit SimpleConv2DFixture()
@@ -87,7 +86,7 @@ struct SimpleConv2DFixture : public ParserFlatbuffersFixture
     }
 };
 
-BOOST_FIXTURE_TEST_CASE( ParseSimpleConv2D, SimpleConv2DFixture )
+TEST_CASE_FIXTURE(SimpleConv2DFixture, "ParseSimpleConv2D")
 {
     RunTest<4, armnn::DataType::QAsymmU8>(
         0,
@@ -217,7 +216,7 @@ struct SimpleConv2DWithBiasesFixture : Conv2DWithBiasesFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE( ParseConv2DWithBias, SimpleConv2DWithBiasesFixture )
+TEST_CASE_FIXTURE(SimpleConv2DWithBiasesFixture, "ParseConv2DWithBias")
 {
     RunTest<4, armnn::DataType::QAsymmU8>(
         0,
@@ -247,7 +246,7 @@ struct DynamicConv2DWithBiasesFixture : Conv2DWithBiasesFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE( ParseDynamicConv2DWithBias, DynamicConv2DWithBiasesFixture )
+TEST_CASE_FIXTURE(DynamicConv2DWithBiasesFixture, "ParseDynamicConv2DWithBias")
 {
     RunTest<4,
         armnn::DataType::QAsymmU8,
@@ -288,7 +287,7 @@ struct Conv2DShapeTestFixture : Conv2DWithBiasesFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE( ParseConv2D_112x112_out, Conv2DShapeTestFixture )
+TEST_CASE_FIXTURE(Conv2DShapeTestFixture, "ParseConv2D_112x112_out")
 {
 }
 
@@ -310,7 +309,7 @@ struct ReluConv2DWithBiasesFixture : Conv2DWithBiasesFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE( ParseConv2DAndReluWithBias, ReluConv2DWithBiasesFixture )
+TEST_CASE_FIXTURE(ReluConv2DWithBiasesFixture, "ParseConv2DAndReluWithBias")
 {
     uint8_t bias = 16;
     uint8_t outZero = 20;
@@ -353,7 +352,7 @@ struct Relu6Conv2DWithBiasesFixture : Conv2DWithBiasesFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE( ParseConv2DAndRelu6WithBias, Relu6Conv2DWithBiasesFixture )
+TEST_CASE_FIXTURE(Relu6Conv2DWithBiasesFixture, "ParseConv2DAndRelu6WithBias")
 {
     uint8_t relu6Min = 6 / 2; // divide by output scale
 
@@ -642,7 +641,7 @@ struct PerChannelConv2DFixture : public ParserFlatbuffersFixture
     }
 };
 
-BOOST_FIXTURE_TEST_CASE( ParsePerChannelConv2D, PerChannelConv2DFixture )
+TEST_CASE_FIXTURE(PerChannelConv2DFixture, "ParsePerChannelConv2D")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
         0,
@@ -664,4 +663,4 @@ BOOST_FIXTURE_TEST_CASE( ParsePerChannelConv2D, PerChannelConv2DFixture )
         });
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

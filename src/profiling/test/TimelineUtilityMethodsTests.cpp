@@ -13,14 +13,14 @@
 
 #include <memory>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 using namespace armnn;
 using namespace armnn::profiling;
 
-BOOST_AUTO_TEST_SUITE(TimelineUtilityMethodsTests)
-
-BOOST_AUTO_TEST_CASE(CreateTypedLabelTest)
+TEST_SUITE("TimelineUtilityMethodsTests")
+{
+TEST_CASE("CreateTypedLabelTest")
 {
     MockBufferManager mockBufferManager(1024);
     ProfilingService  profilingService;
@@ -35,18 +35,18 @@ BOOST_AUTO_TEST_CASE(CreateTypedLabelTest)
     const std::string entityName = "some entity";
     ProfilingStaticGuid labelTypeGuid(456);
 
-    BOOST_CHECK_NO_THROW(timelineUtilityMethods.MarkEntityWithLabel(entityGuid, entityName, labelTypeGuid));
+    CHECK_NOTHROW(timelineUtilityMethods.MarkEntityWithLabel(entityGuid, entityName, labelTypeGuid));
 
     // Commit all packets at once
     timelineUtilityMethods.Commit();
 
     // Get the readable buffer
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
-    BOOST_CHECK(readableBuffer != nullptr);
+    CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_CHECK(size == 76);
+    CHECK(size == 76);
     const unsigned char* readableData = readableBuffer->GetReadableData();
-    BOOST_CHECK(readableData != nullptr);
+    CHECK(readableData != nullptr);
 
     // Utils
     unsigned int offset = 0;
@@ -70,21 +70,21 @@ BOOST_AUTO_TEST_CASE(CreateTypedLabelTest)
     mockBufferManager.MarkRead(readableBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
+TEST_CASE("SendWellKnownLabelsAndEventClassesTest")
 {
     MockBufferManager mockBufferManager(1024);
     ProfilingService  profilingService;
     SendTimelinePacket sendTimelinePacket(mockBufferManager);
 
-    BOOST_CHECK_NO_THROW(TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses(sendTimelinePacket));
+    CHECK_NOTHROW(TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses(sendTimelinePacket));
 
     // Get the readable buffer
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
-    BOOST_CHECK(readableBuffer != nullptr);
+    CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_TEST(size == 460);
+    CHECK(size == 460);
     const unsigned char* readableData = readableBuffer->GetReadableData();
-    BOOST_CHECK(readableData != nullptr);
+    CHECK(readableData != nullptr);
 
     // Utils
     unsigned int offset = 0;
@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE(SendWellKnownLabelsAndEventClassesTest)
     mockBufferManager.MarkRead(readableBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(CreateNamedTypedChildEntityTest)
+TEST_CASE("CreateNamedTypedChildEntityTest")
 {
     MockBufferManager mockBufferManager(1024);
     ProfilingService  profilingService;
@@ -212,30 +212,30 @@ BOOST_AUTO_TEST_CASE(CreateNamedTypedChildEntityTest)
     // Generate first guid to ensure that the named typed entity guid is not 0 on local single test.
     profilingService.NextGuid();
 
-    BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedChildEntity(parentEntityGuid, "", entityType),
+    CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedChildEntity(parentEntityGuid, "", entityType),
                       InvalidArgumentException);
-    BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedChildEntity(parentEntityGuid, entityName, ""),
+    CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedChildEntity(parentEntityGuid, entityName, ""),
                       InvalidArgumentException);
-    BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedChildEntity(
+    CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedChildEntity(
         childEntityGuid, parentEntityGuid, "", entityType), InvalidArgumentException);
-    BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedChildEntity(
+    CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedChildEntity(
         childEntityGuid, parentEntityGuid, entityName, ""), InvalidArgumentException);
 
-    BOOST_CHECK_NO_THROW(childEntityGuid = timelineUtilityMethods.CreateNamedTypedChildEntity(parentEntityGuid,
+    CHECK_NOTHROW(childEntityGuid = timelineUtilityMethods.CreateNamedTypedChildEntity(parentEntityGuid,
                                                                                               entityName,
                                                                                               entityType));
-    BOOST_CHECK(childEntityGuid != ProfilingGuid(0));
+    CHECK(childEntityGuid != ProfilingGuid(0));
 
     // Commit all packets at once
     timelineUtilityMethods.Commit();
 
     // Get the readable buffer
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
-    BOOST_CHECK(readableBuffer != nullptr);
+    CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_CHECK(size == 196);
+    CHECK(size == 196);
     const unsigned char* readableData = readableBuffer->GetReadableData();
-    BOOST_CHECK(readableData != nullptr);
+    CHECK(readableData != nullptr);
 
     // Utils
     unsigned int offset = 0;
@@ -284,7 +284,7 @@ BOOST_AUTO_TEST_CASE(CreateNamedTypedChildEntityTest)
     mockBufferManager.MarkRead(readableBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(DeclareLabelTest)
+TEST_CASE("DeclareLabelTest")
 {
     MockBufferManager mockBufferManager(1024);
     ProfilingService  profilingService;
@@ -295,25 +295,25 @@ BOOST_AUTO_TEST_CASE(DeclareLabelTest)
     profilingService.NextGuid();
 
     // Try declaring an invalid (empty) label
-    BOOST_CHECK_THROW(timelineUtilityMethods.DeclareLabel(""), InvalidArgumentException);
+    CHECK_THROWS_AS(timelineUtilityMethods.DeclareLabel(""), InvalidArgumentException);
 
     // Try declaring an invalid (wrong SWTrace format) label
-    BOOST_CHECK_THROW(timelineUtilityMethods.DeclareLabel("inv@lid lab€l"), RuntimeException);
+    CHECK_THROWS_AS(timelineUtilityMethods.DeclareLabel("inv@lid lab€l"), RuntimeException);
 
     // Declare a valid label
     const std::string labelName = "valid label";
     ProfilingGuid labelGuid = 0;
-    BOOST_CHECK_NO_THROW(labelGuid = timelineUtilityMethods.DeclareLabel(labelName));
-    BOOST_CHECK(labelGuid != ProfilingGuid(0));
+    CHECK_NOTHROW(labelGuid = timelineUtilityMethods.DeclareLabel(labelName));
+    CHECK(labelGuid != ProfilingGuid(0));
 
     // Try adding the same label as before
     ProfilingGuid newLabelGuid = 0;
-    BOOST_CHECK_NO_THROW(newLabelGuid = timelineUtilityMethods.DeclareLabel(labelName));
-    BOOST_CHECK(newLabelGuid != ProfilingGuid(0));
-    BOOST_CHECK(newLabelGuid == labelGuid);
+    CHECK_NOTHROW(newLabelGuid = timelineUtilityMethods.DeclareLabel(labelName));
+    CHECK(newLabelGuid != ProfilingGuid(0));
+    CHECK(newLabelGuid == labelGuid);
 }
 
-BOOST_AUTO_TEST_CASE(CreateNameTypeEntityInvalidTest)
+TEST_CASE("CreateNameTypeEntityInvalidTest")
 {
     MockBufferManager mockBufferManager(1024);
     ProfilingService  profilingService;
@@ -321,24 +321,24 @@ BOOST_AUTO_TEST_CASE(CreateNameTypeEntityInvalidTest)
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
 
     // Invalid name
-    BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedEntity("", "Type"), InvalidArgumentException);
+    CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedEntity("", "Type"), InvalidArgumentException);
 
     // Invalid type
-    BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedEntity("Name", ""), InvalidArgumentException);
+    CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedEntity("Name", ""), InvalidArgumentException);
 
     ProfilingDynamicGuid guid = profilingService.NextGuid();
 
     // CreatedNamedTypedEntity with Guid - Invalid name
-    BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedEntity(guid, "", "Type"),
+    CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedEntity(guid, "", "Type"),
                       InvalidArgumentException);
 
     // CreatedNamedTypedEntity with Guid - Invalid type
-    BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedEntity(guid, "Name", ""),
+    CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedEntity(guid, "Name", ""),
                       InvalidArgumentException);
 
 }
 
-BOOST_AUTO_TEST_CASE(CreateNameTypeEntityTest)
+TEST_CASE("CreateNameTypeEntityTest")
 {
     MockBufferManager mockBufferManager(1024);
     ProfilingService  profilingService;
@@ -352,18 +352,18 @@ BOOST_AUTO_TEST_CASE(CreateNameTypeEntityTest)
     profilingService.NextGuid();
 
     ProfilingDynamicGuid guid = timelineUtilityMethods.CreateNamedTypedEntity(entityName, entityType);
-    BOOST_CHECK(guid != ProfilingGuid(0));
+    CHECK(guid != ProfilingGuid(0));
 
     // Commit all packets at once
     timelineUtilityMethods.Commit();
 
     // Get the readable buffer
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
-    BOOST_CHECK(readableBuffer != nullptr);
+    CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
-    BOOST_CHECK(size == 148);
+    CHECK(size == 148);
     const unsigned char* readableData = readableBuffer->GetReadableData();
-    BOOST_CHECK(readableData != nullptr);
+    CHECK(readableData != nullptr);
 
     // Utils
     unsigned int offset = 0;
@@ -405,7 +405,7 @@ BOOST_AUTO_TEST_CASE(CreateNameTypeEntityTest)
     mockBufferManager.MarkRead(readableBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(RecordEventTest)
+TEST_CASE("RecordEventTest")
 {
     MockBufferManager mockBufferManager(1024);
     ProfilingService  profilingService;
@@ -417,21 +417,21 @@ BOOST_AUTO_TEST_CASE(RecordEventTest)
     ProfilingGuid entityGuid(123);
     ProfilingStaticGuid eventClassGuid(456);
     ProfilingDynamicGuid eventGuid(0);
-    BOOST_CHECK_NO_THROW(eventGuid = timelineUtilityMethods.RecordEvent(entityGuid, eventClassGuid));
-    BOOST_CHECK(eventGuid != ProfilingGuid(0));
+    CHECK_NOTHROW(eventGuid = timelineUtilityMethods.RecordEvent(entityGuid, eventClassGuid));
+    CHECK(eventGuid != ProfilingGuid(0));
 
     // Commit all packets at once
     timelineUtilityMethods.Commit();
 
     // Get the readable buffer
     auto readableBuffer = mockBufferManager.GetReadableBuffer();
-    BOOST_CHECK(readableBuffer != nullptr);
+    CHECK(readableBuffer != nullptr);
     unsigned int size = readableBuffer->GetSize();
 
-    BOOST_CHECK(size == 68 + ThreadIdSize);
+    CHECK(size == 68 + ThreadIdSize);
 
     const unsigned char* readableData = readableBuffer->GetReadableData();
-    BOOST_CHECK(readableData != nullptr);
+    CHECK(readableData != nullptr);
 
     // Utils
     unsigned int offset = 0;
@@ -455,4 +455,4 @@ BOOST_AUTO_TEST_CASE(RecordEventTest)
     mockBufferManager.MarkRead(readableBuffer);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

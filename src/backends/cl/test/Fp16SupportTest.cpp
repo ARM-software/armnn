@@ -13,15 +13,15 @@
 #include <backendsCommon/TensorHandle.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <set>
 
 using namespace armnn;
 
-BOOST_AUTO_TEST_SUITE(Fp16Support)
-
-BOOST_AUTO_TEST_CASE(Fp16DataTypeSupport)
+TEST_SUITE("Fp16Support")
+{
+TEST_CASE("Fp16DataTypeSupport")
 {
     Graph graph;
 
@@ -40,12 +40,12 @@ BOOST_AUTO_TEST_CASE(Fp16DataTypeSupport)
     inputLayer2->GetOutputSlot().SetTensorInfo(fp16TensorInfo);
     additionLayer->GetOutputSlot().SetTensorInfo(fp16TensorInfo);
 
-    BOOST_CHECK(inputLayer1->GetOutputSlot(0).GetTensorInfo().GetDataType() == armnn::DataType::Float16);
-    BOOST_CHECK(inputLayer2->GetOutputSlot(0).GetTensorInfo().GetDataType() == armnn::DataType::Float16);
-    BOOST_CHECK(additionLayer->GetOutputSlot(0).GetTensorInfo().GetDataType() == armnn::DataType::Float16);
+    CHECK(inputLayer1->GetOutputSlot(0).GetTensorInfo().GetDataType() == armnn::DataType::Float16);
+    CHECK(inputLayer2->GetOutputSlot(0).GetTensorInfo().GetDataType() == armnn::DataType::Float16);
+    CHECK(additionLayer->GetOutputSlot(0).GetTensorInfo().GetDataType() == armnn::DataType::Float16);
 }
 
-BOOST_AUTO_TEST_CASE(Fp16AdditionTest)
+TEST_CASE("Fp16AdditionTest")
 {
    using namespace half_float::literal;
    // Create runtime in which test will run
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(Fp16AdditionTest)
    runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
 
    // Checks the results.
-   BOOST_TEST(outputData == std::vector<Half>({ 101.0_h, 202.0_h, 303.0_h, 404.0_h})); // Add
+   CHECK(outputData == std::vector<Half>({ 101.0_h, 202.0_h, 303.0_h, 404.0_h})); // Add
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

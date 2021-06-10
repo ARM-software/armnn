@@ -7,13 +7,13 @@
 #include <armnn/IRuntime.hpp>
 #include <armnn/INetwork.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <set>
 
-BOOST_AUTO_TEST_SUITE(FlowControl)
-
-BOOST_AUTO_TEST_CASE(ErrorOnLoadNetwork)
+TEST_SUITE("FlowControl")
+{
+TEST_CASE("ErrorOnLoadNetwork")
 {
     using namespace armnn;
 
@@ -56,13 +56,13 @@ BOOST_AUTO_TEST_CASE(ErrorOnLoadNetwork)
     try
     {
         Optimize(*net, backends, runtime->GetDeviceSpec(), OptimizerOptions(), errMessages);
-        BOOST_FAIL("Should have thrown an exception.");
+        FAIL("Should have thrown an exception.");
     }
     catch (const InvalidArgumentException& e)
     {
         // Different exceptions are thrown on different backends
     }
-    BOOST_TEST(errMessages.size() > 0);
+    CHECK(errMessages.size() > 0);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

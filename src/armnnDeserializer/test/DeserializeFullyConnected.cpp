@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include <armnnDeserializer/IDeserializer.hpp>
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(DeserializeParser)
-
+TEST_SUITE("DeserializeParser_FullyConnected")
+{
 struct FullyConnectedFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit FullyConnectedFixture(const std::string & inputShape1,
@@ -128,7 +127,7 @@ struct FullyConnectedWithNoBiasFixture : FullyConnectedFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(FullyConnectedWithNoBias, FullyConnectedWithNoBiasFixture)
+TEST_CASE_FIXTURE(FullyConnectedWithNoBiasFixture, "FullyConnectedWithNoBias")
 {
     RunTest<2, armnn::DataType::QAsymmU8>(
          0,
@@ -136,4 +135,4 @@ BOOST_FIXTURE_TEST_CASE(FullyConnectedWithNoBias, FullyConnectedWithNoBiasFixtur
          {{"OutputLayer", { 400/2 }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

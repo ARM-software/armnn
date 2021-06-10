@@ -12,7 +12,7 @@
 
 #include <QuantizeHelper.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <array>
 #include <cmath>

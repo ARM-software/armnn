@@ -3,10 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "../TfLiteParser.hpp"
 #include <iostream>
 #include <string>
+
+#include <doctest/doctest.h>
+
+TEST_SUITE("TensorflowLiteParser_OutputShapeOfSqueeze")
+{
 
 struct TfLiteParserFixture
 {
@@ -19,41 +23,38 @@ struct TfLiteParserFixture
 
 };
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser);
-
-
-BOOST_FIXTURE_TEST_CASE( EmptySqueezeDims_OutputWithAllDimensionsSqueezed, TfLiteParserFixture )
+TEST_CASE_FIXTURE(TfLiteParserFixture, "EmptySqueezeDims_OutputWithAllDimensionsSqueezed")
 {
 
     std::vector<uint32_t> squeezeDims = {  };
 
     armnn::TensorInfo inputTensorInfo = armnn::TensorInfo(4, m_InputShape, armnn::DataType::Float32);
     armnn::TensorInfo outputTensorInfo = m_Parser.OutputShapeOfSqueeze(squeezeDims, inputTensorInfo);
-    BOOST_TEST(outputTensorInfo.GetNumElements() == 4);
-    BOOST_TEST(outputTensorInfo.GetNumDimensions() == 2);
-    BOOST_TEST((outputTensorInfo.GetShape() == armnn::TensorShape({ 2, 2 })));
+    CHECK(outputTensorInfo.GetNumElements() == 4);
+    CHECK(outputTensorInfo.GetNumDimensions() == 2);
+    CHECK((outputTensorInfo.GetShape() == armnn::TensorShape({ 2, 2 })));
 };
 
-BOOST_FIXTURE_TEST_CASE( SqueezeDimsNotIncludingSizeOneDimensions_NoDimensionsSqueezedInOutput, TfLiteParserFixture )
+TEST_CASE_FIXTURE(TfLiteParserFixture, "SqueezeDimsNotIncludingSizeOneDimensions_NoDimensionsSqueezedInOutput")
 {
     std::vector<uint32_t> squeezeDims = { 1, 2 };
 
     armnn::TensorInfo inputTensorInfo = armnn::TensorInfo(4, m_InputShape, armnn::DataType::Float32);
     armnn::TensorInfo outputTensorInfo = m_Parser.OutputShapeOfSqueeze(squeezeDims, inputTensorInfo);
-    BOOST_TEST(outputTensorInfo.GetNumElements() == 4);
-    BOOST_TEST(outputTensorInfo.GetNumDimensions() == 4);
-    BOOST_TEST((outputTensorInfo.GetShape() == armnn::TensorShape({ 1, 2, 2, 1 })));
+    CHECK(outputTensorInfo.GetNumElements() == 4);
+    CHECK(outputTensorInfo.GetNumDimensions() == 4);
+    CHECK((outputTensorInfo.GetShape() == armnn::TensorShape({ 1, 2, 2, 1 })));
 };
 
-BOOST_FIXTURE_TEST_CASE( SqueezeDimsRangePartial_OutputWithDimensionsWithinRangeSqueezed, TfLiteParserFixture )
+TEST_CASE_FIXTURE(TfLiteParserFixture, "SqueezeDimsRangePartial_OutputWithDimensionsWithinRangeSqueezed")
 {
     std::vector<uint32_t> squeezeDims = { 1, 3 };
 
     armnn::TensorInfo inputTensorInfo = armnn::TensorInfo(4, m_InputShape, armnn::DataType::Float32);
     armnn::TensorInfo outputTensorInfo = m_Parser.OutputShapeOfSqueeze(squeezeDims, inputTensorInfo);
-    BOOST_TEST(outputTensorInfo.GetNumElements() == 4);
-    BOOST_TEST(outputTensorInfo.GetNumDimensions() == 3);
-    BOOST_TEST((outputTensorInfo.GetShape() == armnn::TensorShape({ 1, 2, 2 })));
+    CHECK(outputTensorInfo.GetNumElements() == 4);
+    CHECK(outputTensorInfo.GetNumDimensions() == 3);
+    CHECK((outputTensorInfo.GetShape() == armnn::TensorShape({ 1, 2, 2 })));
 };
 
-BOOST_AUTO_TEST_SUITE_END();
+}

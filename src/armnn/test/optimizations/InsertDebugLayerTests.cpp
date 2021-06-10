@@ -7,12 +7,13 @@
 
 #include <Optimizer.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(Optimizer)
+TEST_SUITE("Optimizer")
+{
 using namespace armnn::optimizations;
 
-BOOST_AUTO_TEST_CASE(InsertDebugOptimizationTest)
+TEST_CASE("InsertDebugOptimizationTest")
 {
     armnn::Graph graph;
 
@@ -31,15 +32,15 @@ BOOST_AUTO_TEST_CASE(InsertDebugOptimizationTest)
     input->GetOutputSlot().Connect(floor->GetInputSlot(0));
     floor->GetOutputSlot().Connect(output->GetInputSlot(0));
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
                              &IsLayerOfType<armnn::FloorLayer>, &IsLayerOfType<armnn::OutputLayer>));
 
     // Run the optimizer
     armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(InsertDebugLayer()));
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
                              &IsLayerOfType<armnn::DebugLayer>, &IsLayerOfType<armnn::FloorLayer>,
                              &IsLayerOfType<armnn::DebugLayer>, &IsLayerOfType<armnn::OutputLayer>));
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

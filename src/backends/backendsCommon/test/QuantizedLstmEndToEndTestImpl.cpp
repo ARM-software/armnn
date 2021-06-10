@@ -17,7 +17,7 @@
 
 #include <test/TensorHelpers.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <type_traits>
 
@@ -196,8 +196,6 @@ void QuantizedLstmEndToEnd(const std::vector<armnn::BackendId>& backends)
     // Builds up the structure of the network
     armnn::INetworkPtr net = CreateQuantizedLstmNetwork(inputDesc.GetShape(), outputDesc.GetShape());
 
-    BOOST_TEST_CHECKPOINT("create a network");
-
     IRuntime::CreationOptions options;
     IRuntimePtr runtime(IRuntime::Create(options));
 
@@ -232,12 +230,12 @@ void QuantizedLstmEndToEnd(const std::vector<armnn::BackendId>& backends)
     constexpr int16_t toleranceInt16 = 2;
     for (unsigned int i = 0u; i < cellStateOutResult.size(); ++i)
     {
-        BOOST_CHECK(IsCloseEnough(cellStateOutVector[i], cellStateOutResult[i], toleranceInt16));
+        CHECK(IsCloseEnough(cellStateOutVector[i], cellStateOutResult[i], toleranceInt16));
     }
 
     constexpr uint8_t toleranceUint8 = 1;
     for (unsigned int i = 0u; i < outputStateOutResult.size(); ++i)
     {
-        BOOST_TEST(IsCloseEnough(outputStateOutVector[i], outputStateOutResult[i], toleranceUint8));
+        CHECK(IsCloseEnough(outputStateOutVector[i], outputStateOutResult[i], toleranceUint8));
     }
 }

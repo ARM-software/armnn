@@ -11,6 +11,7 @@
 #include <ResolveType.hpp>
 
 #include <armnnUtils/DataLayoutIndexed.hpp>
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
@@ -18,7 +19,7 @@
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <utility>
 
@@ -36,11 +37,11 @@ std::unique_ptr<Workload> MakeAndCheckWorkload(Layer& layer,
                                                const ModelOptions& modelOptions = {})
 {
     std::unique_ptr<IWorkload> workload = layer.CreateWorkload(factory);
-    BOOST_TEST(workload.get() == PolymorphicDowncast<Workload*>(workload.get()),
+    CHECK_MESSAGE(workload.get() == PolymorphicDowncast<Workload*>(workload.get()),
                "Cannot convert to derived class");
     std::string reasonIfUnsupported;
     layer.SetBackendId(factory.GetBackendId());
-    BOOST_TEST(factory.IsLayerSupported(layer, layer.GetDataType(), reasonIfUnsupported, modelOptions));
+    CHECK(factory.IsLayerSupported(layer, layer.GetDataType(), reasonIfUnsupported, modelOptions));
     return std::unique_ptr<Workload>(static_cast<Workload*>(workload.release()));
 }
 
@@ -90,11 +91,11 @@ std::unique_ptr<ActivationWorkload> CreateActivationWorkloadTest(armnn::IWorkloa
     auto workload = MakeAndCheckWorkload<ActivationWorkload>(*layer, factory);
 
     ActivationQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_A == 3.5f);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_B == -10.0f);
-    BOOST_TEST((queueDescriptor.m_Parameters.m_Function == ActivationFunction::Abs));
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Parameters.m_A == 3.5f);
+    CHECK(queueDescriptor.m_Parameters.m_B == -10.0f);
+    CHECK((queueDescriptor.m_Parameters.m_Function == ActivationFunction::Abs));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -126,8 +127,8 @@ std::unique_ptr<WorkloadType> CreateElementwiseWorkloadTest(armnn::IWorkloadFact
     auto workload = MakeAndCheckWorkload<WorkloadType>(*layer, factory);
 
     DescriptorType queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 2);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 2);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -165,9 +166,9 @@ std::unique_ptr<WorkloadType> CreateSubtractionWithBlobWorkloadTest(armnn::IWork
     std::shared_ptr<ActivationDescriptor>
         activationDescPtr = layer->GetAdditionalInformation<ActivationDescriptor>();
 
-    BOOST_ASSERT(static_cast<float>(activationDescPtr->m_A) == 10.0f);
-    BOOST_ASSERT(static_cast<float>(activationDescPtr->m_B) == 5.0f);
-    BOOST_ASSERT(
+    ARMNN_ASSERT(static_cast<float>(activationDescPtr->m_A) == 10.0f);
+    ARMNN_ASSERT(static_cast<float>(activationDescPtr->m_B) == 5.0f);
+    ARMNN_ASSERT(
         static_cast<ActivationFunction>(activationDescPtr->m_Function) == armnn::ActivationFunction::BoundedReLu
     );
 
@@ -179,14 +180,14 @@ std::unique_ptr<WorkloadType> CreateSubtractionWithBlobWorkloadTest(armnn::IWork
     const ActivationDescriptor* queueDescBlobPtr =
         queueDescriptor.template GetAdditionalInformation<ActivationDescriptor>();
     IgnoreUnused(queueDescBlobPtr);
-    BOOST_ASSERT(static_cast<float>(queueDescBlobPtr->m_A) == 10.0f);
-    BOOST_ASSERT(static_cast<float>(queueDescBlobPtr->m_B) == 5.0f);
-    BOOST_ASSERT(
+    ARMNN_ASSERT(static_cast<float>(queueDescBlobPtr->m_A) == 10.0f);
+    ARMNN_ASSERT(static_cast<float>(queueDescBlobPtr->m_B) == 5.0f);
+    ARMNN_ASSERT(
         static_cast<ActivationFunction>(queueDescBlobPtr->m_Function) == armnn::ActivationFunction::BoundedReLu
     );
 
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 2);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 2);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     return workload;
 }
@@ -223,9 +224,9 @@ std::unique_ptr<WorkloadType> CreateMultiplicationWithBlobWorkloadTest(armnn::IW
     std::shared_ptr<ActivationDescriptor>
         activationDescPtr = layer->GetAdditionalInformation<ActivationDescriptor>();
 
-    BOOST_ASSERT(static_cast<float>(activationDescPtr->m_A) == 10.0f);
-    BOOST_ASSERT(static_cast<float>(activationDescPtr->m_B) == 5.0f);
-    BOOST_ASSERT(
+    ARMNN_ASSERT(static_cast<float>(activationDescPtr->m_A) == 10.0f);
+    ARMNN_ASSERT(static_cast<float>(activationDescPtr->m_B) == 5.0f);
+    ARMNN_ASSERT(
         static_cast<ActivationFunction>(activationDescPtr->m_Function) == armnn::ActivationFunction::BoundedReLu
     );
 
@@ -233,14 +234,14 @@ std::unique_ptr<WorkloadType> CreateMultiplicationWithBlobWorkloadTest(armnn::IW
     auto workload = MakeAndCheckWorkload<WorkloadType>(*layer, factory);
 
     DescriptorType queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 2);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 2);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
     const ActivationDescriptor* queueDescBlobPtr =
         queueDescriptor.template GetAdditionalInformation<ActivationDescriptor>();
     IgnoreUnused(queueDescBlobPtr);
-    BOOST_ASSERT(static_cast<float>(queueDescBlobPtr->m_A) == 10.0f);
-    BOOST_ASSERT(static_cast<float>(queueDescBlobPtr->m_B) == 5.0f);
-    BOOST_ASSERT(
+    ARMNN_ASSERT(static_cast<float>(queueDescBlobPtr->m_A) == 10.0f);
+    ARMNN_ASSERT(static_cast<float>(queueDescBlobPtr->m_B) == 5.0f);
+    ARMNN_ASSERT(
         static_cast<ActivationFunction>(queueDescBlobPtr->m_Function) == armnn::ActivationFunction::BoundedReLu
     );
 
@@ -279,9 +280,9 @@ std::unique_ptr<WorkloadType> CreateAdditionWithBlobWorkloadTest(armnn::IWorkloa
     std::shared_ptr<ActivationDescriptor>
         activationDescPtr = layer->template GetAdditionalInformation<ActivationDescriptor>();
 
-    BOOST_ASSERT(static_cast<float>(activationDescPtr->m_A) == 10.0f);
-    BOOST_ASSERT(static_cast<float>(activationDescPtr->m_B) == 5.0f);
-    BOOST_ASSERT(
+    ARMNN_ASSERT(static_cast<float>(activationDescPtr->m_A) == 10.0f);
+    ARMNN_ASSERT(static_cast<float>(activationDescPtr->m_B) == 5.0f);
+    ARMNN_ASSERT(
         static_cast<ActivationFunction>(activationDescPtr->m_Function) == armnn::ActivationFunction::BoundedReLu
     );
 
@@ -292,11 +293,11 @@ std::unique_ptr<WorkloadType> CreateAdditionWithBlobWorkloadTest(armnn::IWorkloa
     const ActivationDescriptor* queueDescBlobPtr =
         queueDescriptor.template GetAdditionalInformation<ActivationDescriptor>();
     IgnoreUnused(queueDescBlobPtr);
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 2);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_ASSERT(static_cast<float>(queueDescBlobPtr->m_A) == 10.0f);
-    BOOST_ASSERT(static_cast<float>(queueDescBlobPtr->m_B) == 5.0f);
-    BOOST_ASSERT(
+    CHECK(queueDescriptor.m_Inputs.size() == 2);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
+    ARMNN_ASSERT(static_cast<float>(queueDescBlobPtr->m_A) == 10.0f);
+    ARMNN_ASSERT(static_cast<float>(queueDescBlobPtr->m_B) == 5.0f);
+    ARMNN_ASSERT(
         static_cast<ActivationFunction>(queueDescBlobPtr->m_Function) == armnn::ActivationFunction::BoundedReLu
     );
 
@@ -324,8 +325,8 @@ std::unique_ptr<WorkloadType> CreateElementwiseUnaryWorkloadTest(armnn::IWorkloa
     auto workload = MakeAndCheckWorkload<WorkloadType>(*layer, factory);
     DescriptorType queueDescriptor = workload->GetData();
 
-    BOOST_TEST(queueDescriptor.m_Inputs.size()  == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size()  == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     return workload;
 }
@@ -375,14 +376,14 @@ std::unique_ptr<BatchNormalizationWorkloadType> CreateBatchNormalizationWorkload
     // Makes the workload and checks it.
     auto workload = MakeAndCheckWorkload<BatchNormalizationWorkloadType>(*layer, factory);
     BatchNormalizationQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Parameters.m_Eps == 0.05f);
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_TEST((queueDescriptor.m_Mean->GetTensorInfo() == TensorInfo({3}, DataType)));
-    BOOST_TEST((queueDescriptor.m_Variance->GetTensorInfo() == TensorInfo({3}, DataType)));
-    BOOST_TEST((queueDescriptor.m_Gamma->GetTensorInfo() == TensorInfo({3}, DataType)));
-    BOOST_TEST((queueDescriptor.m_Beta->GetTensorInfo() == TensorInfo({3}, DataType)));
-    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
+    CHECK(queueDescriptor.m_Parameters.m_Eps == 0.05f);
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
+    CHECK((queueDescriptor.m_Mean->GetTensorInfo() == TensorInfo({3}, DataType)));
+    CHECK((queueDescriptor.m_Variance->GetTensorInfo() == TensorInfo({3}, DataType)));
+    CHECK((queueDescriptor.m_Gamma->GetTensorInfo() == TensorInfo({3}, DataType)));
+    CHECK((queueDescriptor.m_Beta->GetTensorInfo() == TensorInfo({3}, DataType)));
+    CHECK((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -429,9 +430,9 @@ std::unique_ptr<BatchNormalizationWorkloadType> CreateBatchNormalizationWithBlob
 
     // Check that the additional information can be queried from the layer
     std::shared_ptr<ActivationDescriptor> activationDescPtr = layer->GetAdditionalInformation<ActivationDescriptor>();
-    BOOST_ASSERT(static_cast<float>(activationDescPtr->m_A) == 10.0f);
-    BOOST_ASSERT(static_cast<float>(activationDescPtr->m_B) == 5.0f);
-    BOOST_ASSERT(
+    ARMNN_ASSERT(static_cast<float>(activationDescPtr->m_A) == 10.0f);
+    ARMNN_ASSERT(static_cast<float>(activationDescPtr->m_B) == 5.0f);
+    ARMNN_ASSERT(
         static_cast<ActivationFunction>(activationDescPtr->m_Function) == armnn::ActivationFunction::BoundedReLu
     );
 
@@ -450,20 +451,20 @@ std::unique_ptr<BatchNormalizationWorkloadType> CreateBatchNormalizationWithBlob
     BatchNormalizationQueueDescriptor queueDescriptor = workload->GetData();
     const ActivationDescriptor* queueDescBlobPtr = queueDescriptor.GetAdditionalInformation<ActivationDescriptor>();
     IgnoreUnused(queueDescBlobPtr);
-    BOOST_ASSERT(static_cast<float>(queueDescBlobPtr->m_A) == 10.0f);
-    BOOST_ASSERT(static_cast<float>(queueDescBlobPtr->m_B) == 5.0f);
-    BOOST_ASSERT(
+    ARMNN_ASSERT(static_cast<float>(queueDescBlobPtr->m_A) == 10.0f);
+    ARMNN_ASSERT(static_cast<float>(queueDescBlobPtr->m_B) == 5.0f);
+    ARMNN_ASSERT(
         static_cast<ActivationFunction>(queueDescBlobPtr->m_Function) == armnn::ActivationFunction::BoundedReLu
     );
 
-    BOOST_TEST(queueDescriptor.m_Parameters.m_Eps == 0.05f);
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_TEST((queueDescriptor.m_Mean->GetTensorInfo() == TensorInfo({3}, DataType)));
-    BOOST_TEST((queueDescriptor.m_Variance->GetTensorInfo() == TensorInfo({3}, DataType)));
-    BOOST_TEST((queueDescriptor.m_Gamma->GetTensorInfo() == TensorInfo({3}, DataType)));
-    BOOST_TEST((queueDescriptor.m_Beta->GetTensorInfo() == TensorInfo({3}, DataType)));
-    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
+    CHECK(queueDescriptor.m_Parameters.m_Eps == 0.05f);
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
+    CHECK((queueDescriptor.m_Mean->GetTensorInfo() == TensorInfo({3}, DataType)));
+    CHECK((queueDescriptor.m_Variance->GetTensorInfo() == TensorInfo({3}, DataType)));
+    CHECK((queueDescriptor.m_Gamma->GetTensorInfo() == TensorInfo({3}, DataType)));
+    CHECK((queueDescriptor.m_Beta->GetTensorInfo() == TensorInfo({3}, DataType)));
+    CHECK((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -511,19 +512,19 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadTest(armnn::IW
     auto workload = MakeAndCheckWorkload<Convolution2dWorkload>(*layer, factory, modelOptions);
 
     Convolution2dQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Parameters.m_StrideX == 2);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_StrideY == 4);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadLeft == 3);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadRight == 3);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadTop == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadBottom == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_BiasEnabled);
-    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
+    CHECK(queueDescriptor.m_Parameters.m_StrideX == 2);
+    CHECK(queueDescriptor.m_Parameters.m_StrideY == 4);
+    CHECK(queueDescriptor.m_Parameters.m_PadLeft == 3);
+    CHECK(queueDescriptor.m_Parameters.m_PadRight == 3);
+    CHECK(queueDescriptor.m_Parameters.m_PadTop == 1);
+    CHECK(queueDescriptor.m_Parameters.m_PadBottom == 1);
+    CHECK(queueDescriptor.m_Parameters.m_BiasEnabled);
+    CHECK((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
 
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_TEST((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo(weightShape, DataType)));
-    BOOST_TEST((queueDescriptor.m_Bias->GetTensorInfo() ==
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
+    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo(weightShape, DataType)));
+    CHECK((queueDescriptor.m_Bias->GetTensorInfo() ==
         TensorInfo({2}, GetBiasDataType(DataType))));
 
     // Returns so we can do extra, backend-specific tests.
@@ -571,9 +572,9 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dFusedActivationWithBlo
     // Check that the additional information can be queried from the layer
     std::shared_ptr<ActivationDescriptor> activationDescPtr = layer->GetAdditionalInformation<ActivationDescriptor>();
 
-    BOOST_ASSERT(static_cast<float>(activationDescPtr->m_A) == 10.0f);
-    BOOST_ASSERT(static_cast<float>(activationDescPtr->m_B) == 5.0f);
-    BOOST_ASSERT(
+    ARMNN_ASSERT(static_cast<float>(activationDescPtr->m_A) == 10.0f);
+    ARMNN_ASSERT(static_cast<float>(activationDescPtr->m_B) == 5.0f);
+    ARMNN_ASSERT(
         static_cast<ActivationFunction>(activationDescPtr->m_Function) == armnn::ActivationFunction::BoundedReLu
     );
 
@@ -592,25 +593,25 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dFusedActivationWithBlo
     Convolution2dQueueDescriptor queueDescriptor = workload->GetData();
     const ActivationDescriptor* queueDescBlobPtr = queueDescriptor.GetAdditionalInformation<ActivationDescriptor>();
     IgnoreUnused(queueDescBlobPtr);
-    BOOST_ASSERT(static_cast<float>(queueDescBlobPtr->m_A) == 10.0f);
-    BOOST_ASSERT(static_cast<float>(queueDescBlobPtr->m_B) == 5.0f);
-    BOOST_ASSERT(
+    ARMNN_ASSERT(static_cast<float>(queueDescBlobPtr->m_A) == 10.0f);
+    ARMNN_ASSERT(static_cast<float>(queueDescBlobPtr->m_B) == 5.0f);
+    ARMNN_ASSERT(
         static_cast<ActivationFunction>(queueDescBlobPtr->m_Function) == armnn::ActivationFunction::BoundedReLu
     );
 
-    BOOST_TEST(queueDescriptor.m_Parameters.m_StrideX == 2);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_StrideY == 4);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadLeft == 3);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadRight == 3);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadTop == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadBottom == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_BiasEnabled);
-    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_TEST((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo(weightShape, DataType)));
-    BOOST_TEST((queueDescriptor.m_Bias->GetTensorInfo() ==
+    CHECK(queueDescriptor.m_Parameters.m_StrideX == 2);
+    CHECK(queueDescriptor.m_Parameters.m_StrideY == 4);
+    CHECK(queueDescriptor.m_Parameters.m_PadLeft == 3);
+    CHECK(queueDescriptor.m_Parameters.m_PadRight == 3);
+    CHECK(queueDescriptor.m_Parameters.m_PadTop == 1);
+    CHECK(queueDescriptor.m_Parameters.m_PadBottom == 1);
+    CHECK(queueDescriptor.m_Parameters.m_BiasEnabled);
+    CHECK((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
+    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo(weightShape, DataType)));
+    CHECK((queueDescriptor.m_Bias->GetTensorInfo() ==
         TensorInfo({2}, GetBiasDataType(DataType))));
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -658,17 +659,17 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadFastMathTest(a
     auto workload = MakeAndCheckWorkload<Convolution2dWorkload>(*layer, factory, modelOptions);
 
     Convolution2dQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Parameters.m_StrideX == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_StrideY == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadLeft == 0);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadRight == 0);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadTop == 0);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadBottom == 0);
-    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
+    CHECK(queueDescriptor.m_Parameters.m_StrideX == 1);
+    CHECK(queueDescriptor.m_Parameters.m_StrideY == 1);
+    CHECK(queueDescriptor.m_Parameters.m_PadLeft == 0);
+    CHECK(queueDescriptor.m_Parameters.m_PadRight == 0);
+    CHECK(queueDescriptor.m_Parameters.m_PadTop == 0);
+    CHECK(queueDescriptor.m_Parameters.m_PadBottom == 0);
+    CHECK((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
 
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_TEST((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo(weightShape, DataType)));
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
+    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo(weightShape, DataType)));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -760,17 +761,17 @@ std::unique_ptr<LstmWorkload> CreateLstmWorkloadTest(armnn::IWorkloadFactory& fa
     // make the workload and check it
     auto workload = MakeAndCheckWorkload<LstmWorkload>(*layer, factory);
     LstmQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Parameters.m_ActivationFunc == 4);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_ClippingThresCell == 0.0f);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_ClippingThresProj == 0.0f);
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 3);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 4);
+    CHECK(queueDescriptor.m_Parameters.m_ActivationFunc == 4);
+    CHECK(queueDescriptor.m_Parameters.m_ClippingThresCell == 0.0f);
+    CHECK(queueDescriptor.m_Parameters.m_ClippingThresProj == 0.0f);
+    CHECK(queueDescriptor.m_Inputs.size() == 3);
+    CHECK(queueDescriptor.m_Outputs.size() == 4);
 
-    BOOST_TEST((queueDescriptor.m_InputToForgetWeights->GetTensorInfo() == TensorInfo({ numUnits, inputSize },
+    CHECK((queueDescriptor.m_InputToForgetWeights->GetTensorInfo() == TensorInfo({ numUnits, inputSize },
                                                                                      DataType::Float32)));
-    BOOST_TEST((queueDescriptor.m_OutputGateBias->GetTensorInfo() == TensorInfo({ numUnits },
+    CHECK((queueDescriptor.m_OutputGateBias->GetTensorInfo() == TensorInfo({ numUnits },
                                                                                      DataType::Float32)));
-    BOOST_TEST((queueDescriptor.m_CellBias->GetTensorInfo() == TensorInfo({ numUnits }, DataType::Float32)));
+    CHECK((queueDescriptor.m_CellBias->GetTensorInfo() == TensorInfo({ numUnits }, DataType::Float32)));
     return workload;
 }
 
@@ -891,24 +892,24 @@ std::unique_ptr<QuantizedLstmWorkload> CreateQuantizedLstmWorkloadTest(armnn::IW
     QuantizedLstmQueueDescriptor queueDescriptor = workload->GetData();
 
     // Validate input/output sizes
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 3);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 2);
+    CHECK(queueDescriptor.m_Inputs.size() == 3);
+    CHECK(queueDescriptor.m_Outputs.size() == 2);
 
     // Validate weight tensor info
-    BOOST_TEST((queueDescriptor.m_InputToInputWeights->GetTensorInfo() == inputWeightsInfo));
-    BOOST_TEST((queueDescriptor.m_InputToForgetWeights->GetTensorInfo() == inputWeightsInfo));
-    BOOST_TEST((queueDescriptor.m_InputToCellWeights->GetTensorInfo() == inputWeightsInfo));
-    BOOST_TEST((queueDescriptor.m_InputToOutputWeights->GetTensorInfo() == inputWeightsInfo));
+    CHECK((queueDescriptor.m_InputToInputWeights->GetTensorInfo() == inputWeightsInfo));
+    CHECK((queueDescriptor.m_InputToForgetWeights->GetTensorInfo() == inputWeightsInfo));
+    CHECK((queueDescriptor.m_InputToCellWeights->GetTensorInfo() == inputWeightsInfo));
+    CHECK((queueDescriptor.m_InputToOutputWeights->GetTensorInfo() == inputWeightsInfo));
 
-    BOOST_TEST((queueDescriptor.m_RecurrentToInputWeights->GetTensorInfo() == recurrentWeightsInfo));
-    BOOST_TEST((queueDescriptor.m_RecurrentToForgetWeights->GetTensorInfo() == recurrentWeightsInfo));
-    BOOST_TEST((queueDescriptor.m_RecurrentToCellWeights->GetTensorInfo() == recurrentWeightsInfo));
-    BOOST_TEST((queueDescriptor.m_RecurrentToOutputWeights->GetTensorInfo() == recurrentWeightsInfo));
+    CHECK((queueDescriptor.m_RecurrentToInputWeights->GetTensorInfo() == recurrentWeightsInfo));
+    CHECK((queueDescriptor.m_RecurrentToForgetWeights->GetTensorInfo() == recurrentWeightsInfo));
+    CHECK((queueDescriptor.m_RecurrentToCellWeights->GetTensorInfo() == recurrentWeightsInfo));
+    CHECK((queueDescriptor.m_RecurrentToOutputWeights->GetTensorInfo() == recurrentWeightsInfo));
 
-    BOOST_TEST((queueDescriptor.m_InputGateBias->GetTensorInfo() == biasInfo));
-    BOOST_TEST((queueDescriptor.m_ForgetGateBias->GetTensorInfo() == biasInfo));
-    BOOST_TEST((queueDescriptor.m_CellBias->GetTensorInfo() == biasInfo));
-    BOOST_TEST((queueDescriptor.m_OutputGateBias->GetTensorInfo() == biasInfo));
+    CHECK((queueDescriptor.m_InputGateBias->GetTensorInfo() == biasInfo));
+    CHECK((queueDescriptor.m_ForgetGateBias->GetTensorInfo() == biasInfo));
+    CHECK((queueDescriptor.m_CellBias->GetTensorInfo() == biasInfo));
+    CHECK((queueDescriptor.m_OutputGateBias->GetTensorInfo() == biasInfo));
 
     return workload;
 }
@@ -1054,22 +1055,22 @@ std::unique_ptr<QLstmWorkload> CreateQLstmWorkloadTest(armnn::IWorkloadFactory& 
     // Create and check workload
     auto workload = MakeAndCheckWorkload<QLstmWorkload>(*layer, factory);
     QLstmQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Parameters.m_CellClip == 0.0f);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_ProjectionClip == 0.0f);
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 3);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 3);
+    CHECK(queueDescriptor.m_Parameters.m_CellClip == 0.0f);
+    CHECK(queueDescriptor.m_Parameters.m_ProjectionClip == 0.0f);
+    CHECK(queueDescriptor.m_Inputs.size() == 3);
+    CHECK(queueDescriptor.m_Outputs.size() == 3);
 
-    BOOST_TEST((queueDescriptor.m_InputToForgetWeights->GetTensorInfo() == inputWeightsInfo));
-    BOOST_TEST((queueDescriptor.m_InputToCellWeights->GetTensorInfo() == inputWeightsInfo));
-    BOOST_TEST((queueDescriptor.m_InputToOutputWeights->GetTensorInfo() == inputWeightsInfo));
+    CHECK((queueDescriptor.m_InputToForgetWeights->GetTensorInfo() == inputWeightsInfo));
+    CHECK((queueDescriptor.m_InputToCellWeights->GetTensorInfo() == inputWeightsInfo));
+    CHECK((queueDescriptor.m_InputToOutputWeights->GetTensorInfo() == inputWeightsInfo));
 
-    BOOST_TEST((queueDescriptor.m_RecurrentToForgetWeights->GetTensorInfo() == recurrentWeightsInfo));
-    BOOST_TEST((queueDescriptor.m_RecurrentToCellWeights->GetTensorInfo() == recurrentWeightsInfo));
-    BOOST_TEST((queueDescriptor.m_RecurrentToOutputWeights->GetTensorInfo() == recurrentWeightsInfo));
+    CHECK((queueDescriptor.m_RecurrentToForgetWeights->GetTensorInfo() == recurrentWeightsInfo));
+    CHECK((queueDescriptor.m_RecurrentToCellWeights->GetTensorInfo() == recurrentWeightsInfo));
+    CHECK((queueDescriptor.m_RecurrentToOutputWeights->GetTensorInfo() == recurrentWeightsInfo));
 
-    BOOST_TEST((queueDescriptor.m_ForgetGateBias->GetTensorInfo() == biasInfo));
-    BOOST_TEST((queueDescriptor.m_CellBias->GetTensorInfo() == biasInfo));
-    BOOST_TEST((queueDescriptor.m_OutputGateBias->GetTensorInfo() == biasInfo));
+    CHECK((queueDescriptor.m_ForgetGateBias->GetTensorInfo() == biasInfo));
+    CHECK((queueDescriptor.m_CellBias->GetTensorInfo() == biasInfo));
+    CHECK((queueDescriptor.m_OutputGateBias->GetTensorInfo() == biasInfo));
 
     return workload;
 }
@@ -1112,19 +1113,19 @@ std::unique_ptr<Convolution2dWorkload> CreateDirectConvolution2dWorkloadTest(arm
     auto workload = MakeAndCheckWorkload<Convolution2dWorkload>(*layer, factory);
 
     Convolution2dQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Parameters.m_StrideX == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_StrideY == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadLeft == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadRight == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadTop == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadBottom == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_BiasEnabled == true);
+    CHECK(queueDescriptor.m_Parameters.m_StrideX == 1);
+    CHECK(queueDescriptor.m_Parameters.m_StrideY == 1);
+    CHECK(queueDescriptor.m_Parameters.m_PadLeft == 1);
+    CHECK(queueDescriptor.m_Parameters.m_PadRight == 1);
+    CHECK(queueDescriptor.m_Parameters.m_PadTop == 1);
+    CHECK(queueDescriptor.m_Parameters.m_PadBottom == 1);
+    CHECK(queueDescriptor.m_Parameters.m_BiasEnabled == true);
 
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_TEST((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({2, 3, 3, 3},
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
+    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({2, 3, 3, 3},
         DataType, inputsQScale)));
-    BOOST_TEST((queueDescriptor.m_Bias->GetTensorInfo()
+    CHECK((queueDescriptor.m_Bias->GetTensorInfo()
                 == TensorInfo({2},  GetBiasDataType(DataType), inputsQScale)));
 
     // Returns so we can do extra, backend-specific tests.
@@ -1169,18 +1170,18 @@ std::unique_ptr<DepthwiseConvolution2dFloat32Workload> CreateDepthwiseConvolutio
     auto workload = MakeAndCheckWorkload<DepthwiseConvolution2dFloat32Workload>(*layer, factory);
 
     DepthwiseConvolution2dQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Parameters.m_StrideX == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_StrideY == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadLeft == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadRight == 2);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadTop == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadBottom == 2);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_BiasEnabled == false);
-    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
+    CHECK(queueDescriptor.m_Parameters.m_StrideX == 1);
+    CHECK(queueDescriptor.m_Parameters.m_StrideY == 1);
+    CHECK(queueDescriptor.m_Parameters.m_PadLeft == 1);
+    CHECK(queueDescriptor.m_Parameters.m_PadRight == 2);
+    CHECK(queueDescriptor.m_Parameters.m_PadTop == 1);
+    CHECK(queueDescriptor.m_Parameters.m_PadBottom == 2);
+    CHECK(queueDescriptor.m_Parameters.m_BiasEnabled == false);
+    CHECK((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
 
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_TEST((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({1, 2, 4, 4}, DataType)));
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
+    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({1, 2, 4, 4}, DataType)));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -1218,13 +1219,13 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWorkloadTest(armnn::
     auto workload = MakeAndCheckWorkload<FullyConnectedWorkload>(*layer, factory);
 
     FullyConnectedQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Parameters.m_BiasEnabled == true);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_TransposeWeightMatrix == true);
+    CHECK(queueDescriptor.m_Parameters.m_BiasEnabled == true);
+    CHECK(queueDescriptor.m_Parameters.m_TransposeWeightMatrix == true);
 
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_TEST((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({7, 20}, DataType, inputsQScale)));
-    BOOST_TEST((queueDescriptor.m_Bias->GetTensorInfo() == TensorInfo({7}, GetBiasDataType(DataType), inputsQScale)));
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
+    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({7, 20}, DataType, inputsQScale)));
+    CHECK((queueDescriptor.m_Bias->GetTensorInfo() == TensorInfo({7}, GetBiasDataType(DataType), inputsQScale)));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -1259,9 +1260,9 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWithBlobWorkloadTest
 
     // Check that the additional information can be queried from the layer
     std::shared_ptr<ActivationDescriptor> activationDescPtr = layer->GetAdditionalInformation<ActivationDescriptor>();
-    BOOST_ASSERT(static_cast<float>(activationDescPtr->m_A) == 10.0f);
-    BOOST_ASSERT(static_cast<float>(activationDescPtr->m_B) == 5.0f);
-    BOOST_ASSERT(static_cast<ActivationFunction>(activationDescPtr->m_Function) ==
+    ARMNN_ASSERT(static_cast<float>(activationDescPtr->m_A) == 10.0f);
+    ARMNN_ASSERT(static_cast<float>(activationDescPtr->m_B) == 5.0f);
+    ARMNN_ASSERT(static_cast<ActivationFunction>(activationDescPtr->m_Function) ==
         armnn::ActivationFunction::BoundedReLu);
 
     // Creates extra layers.
@@ -1281,18 +1282,18 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWithBlobWorkloadTest
     const ActivationDescriptor* queueDescBlobPtr = queueDescriptor.GetAdditionalInformation<ActivationDescriptor>();
     IgnoreUnused(queueDescBlobPtr);
 
-    BOOST_ASSERT(static_cast<float>(queueDescBlobPtr->m_A) == 10.0f);
-    BOOST_ASSERT(static_cast<float>(queueDescBlobPtr->m_B) == 5.0f);
-    BOOST_ASSERT(
+    ARMNN_ASSERT(static_cast<float>(queueDescBlobPtr->m_A) == 10.0f);
+    ARMNN_ASSERT(static_cast<float>(queueDescBlobPtr->m_B) == 5.0f);
+    ARMNN_ASSERT(
         static_cast<ActivationFunction>(queueDescBlobPtr->m_Function) == armnn::ActivationFunction::BoundedReLu
     );
 
-    BOOST_TEST(queueDescriptor.m_Parameters.m_BiasEnabled == true);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_TransposeWeightMatrix == true);
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_TEST((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({7, 20}, DataType, inputsQScale)));
-    BOOST_TEST((queueDescriptor.m_Bias->GetTensorInfo() == TensorInfo({7}, GetBiasDataType(DataType), inputsQScale)));
+    CHECK(queueDescriptor.m_Parameters.m_BiasEnabled == true);
+    CHECK(queueDescriptor.m_Parameters.m_TransposeWeightMatrix == true);
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
+    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({7, 20}, DataType, inputsQScale)));
+    CHECK((queueDescriptor.m_Bias->GetTensorInfo() == TensorInfo({7}, GetBiasDataType(DataType), inputsQScale)));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -1336,16 +1337,16 @@ std::unique_ptr<NormalizationWorkload> CreateNormalizationWorkloadTest(armnn::IW
     auto workload = MakeAndCheckWorkload<NormalizationWorkload>(*layer, factory);
 
     NormalizationQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST((queueDescriptor.m_Parameters.m_NormChannelType == NormalizationAlgorithmChannel::Across));
-    BOOST_TEST((queueDescriptor.m_Parameters.m_NormMethodType == NormalizationAlgorithmMethod::LocalBrightness));
-    BOOST_TEST(queueDescriptor.m_Parameters.m_NormSize == 3);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_Alpha == 0.5f);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_Beta == -1.0f);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_K == 0.2f);
-    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
+    CHECK((queueDescriptor.m_Parameters.m_NormChannelType == NormalizationAlgorithmChannel::Across));
+    CHECK((queueDescriptor.m_Parameters.m_NormMethodType == NormalizationAlgorithmMethod::LocalBrightness));
+    CHECK(queueDescriptor.m_Parameters.m_NormSize == 3);
+    CHECK(queueDescriptor.m_Parameters.m_Alpha == 0.5f);
+    CHECK(queueDescriptor.m_Parameters.m_Beta == -1.0f);
+    CHECK(queueDescriptor.m_Parameters.m_K == 0.2f);
+    CHECK((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
 
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -1388,20 +1389,20 @@ std::unique_ptr<Pooling2dWorkload> CreatePooling2dWorkloadTest(armnn::IWorkloadF
     auto workload = MakeAndCheckWorkload<Pooling2dWorkload>(*layer, factory);
 
     Pooling2dQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST((queueDescriptor.m_Parameters.m_PoolType == PoolingAlgorithm::Average));
-    BOOST_TEST((queueDescriptor.m_Parameters.m_OutputShapeRounding == OutputShapeRounding::Floor));
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PoolWidth == 3);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PoolHeight == 3);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_StrideX == 2);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_StrideY == 3);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadLeft == 2);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadRight == 2);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadTop == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_PadBottom == 1);
-    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
+    CHECK((queueDescriptor.m_Parameters.m_PoolType == PoolingAlgorithm::Average));
+    CHECK((queueDescriptor.m_Parameters.m_OutputShapeRounding == OutputShapeRounding::Floor));
+    CHECK(queueDescriptor.m_Parameters.m_PoolWidth == 3);
+    CHECK(queueDescriptor.m_Parameters.m_PoolHeight == 3);
+    CHECK(queueDescriptor.m_Parameters.m_StrideX == 2);
+    CHECK(queueDescriptor.m_Parameters.m_StrideY == 3);
+    CHECK(queueDescriptor.m_Parameters.m_PadLeft == 2);
+    CHECK(queueDescriptor.m_Parameters.m_PadRight == 2);
+    CHECK(queueDescriptor.m_Parameters.m_PadTop == 1);
+    CHECK(queueDescriptor.m_Parameters.m_PadBottom == 1);
+    CHECK((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
 
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     // Return so we can do extra, backend-specific tests
     return workload;
@@ -1445,8 +1446,8 @@ std::unique_ptr<SoftmaxWorkload> CreateSoftmaxWorkloadTest(armnn::IWorkloadFacto
     auto workload = MakeAndCheckWorkload<SoftmaxWorkload>(*layer, factory);
 
     SoftmaxQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     // Return so we can do extra, backend-specific tests.
     return workload;
@@ -1494,19 +1495,19 @@ std::unique_ptr<SplitterWorkload>
     auto workload = MakeAndCheckWorkload<SplitterWorkload>(*layer, factory);
 
     SplitterQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 3);
-    BOOST_TEST(queueDescriptor.m_ViewOrigins.size() == 3);
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 3);
+    CHECK(queueDescriptor.m_ViewOrigins.size() == 3);
 
-    BOOST_TEST(queueDescriptor.m_ViewOrigins[0].m_Origin[0] == 0);
-    BOOST_TEST(queueDescriptor.m_ViewOrigins[1].m_Origin[0] == 1);
-    BOOST_TEST(queueDescriptor.m_ViewOrigins[2].m_Origin[0] == 3);
-    BOOST_TEST(queueDescriptor.m_ViewOrigins[0].m_Origin[1] == 0);
-    BOOST_TEST(queueDescriptor.m_ViewOrigins[1].m_Origin[1] == 0);
-    BOOST_TEST(queueDescriptor.m_ViewOrigins[2].m_Origin[1] == 0);
-    BOOST_TEST(queueDescriptor.m_ViewOrigins[0].m_Origin[2] == 0);
-    BOOST_TEST(queueDescriptor.m_ViewOrigins[1].m_Origin[2] == 0);
-    BOOST_TEST(queueDescriptor.m_ViewOrigins[2].m_Origin[2] == 0);
+    CHECK(queueDescriptor.m_ViewOrigins[0].m_Origin[0] == 0);
+    CHECK(queueDescriptor.m_ViewOrigins[1].m_Origin[0] == 1);
+    CHECK(queueDescriptor.m_ViewOrigins[2].m_Origin[0] == 3);
+    CHECK(queueDescriptor.m_ViewOrigins[0].m_Origin[1] == 0);
+    CHECK(queueDescriptor.m_ViewOrigins[1].m_Origin[1] == 0);
+    CHECK(queueDescriptor.m_ViewOrigins[2].m_Origin[1] == 0);
+    CHECK(queueDescriptor.m_ViewOrigins[0].m_Origin[2] == 0);
+    CHECK(queueDescriptor.m_ViewOrigins[1].m_Origin[2] == 0);
+    CHECK(queueDescriptor.m_ViewOrigins[2].m_Origin[2] == 0);
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -1536,8 +1537,9 @@ std::pair<std::unique_ptr<SplitterWorkload>, std::unique_ptr<ConcatWorkload>>
     splitterViews.SetViewOriginCoord(1, 2, 0);
     splitterViews.SetViewOriginCoord(1, 3, 0);
 
+    // create splitter layer
     Layer* const splitter = graph.AddLayer<SplitterLayer>(splitterViews, "splitter");
-    BOOST_TEST_CHECKPOINT("created splitter layer");
+    CHECK(splitter);
 
     armnn::OriginsDescriptor concatViews(2);
     concatViews.SetViewOriginCoord(0, 0, 0);
@@ -1550,28 +1552,31 @@ std::pair<std::unique_ptr<SplitterWorkload>, std::unique_ptr<ConcatWorkload>>
     concatViews.SetViewOriginCoord(1, 2, 0);
     concatViews.SetViewOriginCoord(1, 3, 0);
 
+    // create concat layer
     Layer* const concat = graph.AddLayer<ConcatLayer>(concatViews, "concat");
-    BOOST_TEST_CHECKPOINT("created concat layer");
+    CHECK(concat);
 
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
     // Adds connections.
+    // connect input to splitter
     Connect(input, splitter, inputTensorInfo, 0, 0);
-    BOOST_TEST_CHECKPOINT("connect input to splitter");
+    // connect splitter[0] to concat[1]
     Connect(splitter, concat, splitTensorInfo1, 0, 1); // The splitter & concat are connected up.
-    BOOST_TEST_CHECKPOINT("connect splitter[0] to concat[1]");
+    // connect splitter[1] to concat[0]
     Connect(splitter, concat, splitTensorInfo2, 1, 0); // So that the outputs are flipped round.
-    BOOST_TEST_CHECKPOINT("connect splitter[1] to concat[0]");
+    // connect concat to output
     Connect(concat, output, inputTensorInfo, 0, 0);
-    BOOST_TEST_CHECKPOINT("connect concat to output");
 
+    // created tensor handles
     CreateTensorHandles(graph, factory);
-    BOOST_TEST_CHECKPOINT("created tensor handles");
 
+    // created splitter workload
     auto workloadSplitter = MakeAndCheckWorkload<SplitterWorkload>(*splitter, factory);
-    BOOST_TEST_CHECKPOINT("created splitter workload");
+    CHECK(workloadSplitter);
+    // created concat workload
     auto workloadConcat = MakeAndCheckWorkload<ConcatWorkload>(*concat, factory);
-    BOOST_TEST_CHECKPOINT("created concat workload");
+    CHECK(workloadConcat);
 
     return {std::move(workloadSplitter), std::move(workloadConcat)};
 }
@@ -1691,9 +1696,9 @@ std::unique_ptr<ResizeWorkload> CreateResizeBilinearWorkloadTest(armnn::IWorkloa
     auto workload = MakeAndCheckWorkload<ResizeWorkload>(*layer, factory);
 
     auto queueDescriptor = workload->GetData();
-    BOOST_CHECK(queueDescriptor.m_Inputs.size()  == 1);
-    BOOST_CHECK(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_CHECK(queueDescriptor.m_Parameters.m_DataLayout == dataLayout);
+    CHECK(queueDescriptor.m_Inputs.size()  == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Parameters.m_DataLayout == dataLayout);
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -1722,8 +1727,8 @@ std::unique_ptr<BatchToSpaceNdWorkload> CreateBatchToSpaceNdWorkloadTest(armnn::
     auto workload = MakeAndCheckWorkload<BatchToSpaceNdWorkload>(*layer, factory);
 
     BatchToSpaceNdQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     return workload;
 }
@@ -1756,8 +1761,8 @@ std::unique_ptr<LogSoftmaxWorkload> CreateLogSoftmaxWorkloadTest(armnn::IWorkloa
     auto workload = MakeAndCheckWorkload<LogSoftmaxWorkload>(*layer, factory);
 
     LogSoftmaxQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     // Return so we can do extra, backend-specific tests.
     return workload;
@@ -1793,9 +1798,9 @@ std::unique_ptr<L2NormalizationWorkload> CreateL2NormalizationWorkloadTest(armnn
     auto workload = MakeAndCheckWorkload<L2NormalizationWorkload>(*layer, factory);
 
     L2NormalizationQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -1826,8 +1831,8 @@ std::unique_ptr<ReshapeWorkload> CreateReshapeWorkloadTest(armnn::IWorkloadFacto
     auto workload = MakeAndCheckWorkload<ReshapeWorkload>(*layer, factory);
 
     ReshapeQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -1855,8 +1860,8 @@ std::unique_ptr<ConvertFp16ToFp32Float32Workload> CreateConvertFp16ToFp32Workloa
     auto workload = MakeAndCheckWorkload<ConvertFp16ToFp32Float32Workload>(*layer, factory);
 
     ConvertFp16ToFp32QueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -1884,8 +1889,8 @@ std::unique_ptr<ConvertFp32ToFp16Float16Workload> CreateConvertFp32ToFp16Workloa
     auto workload = MakeAndCheckWorkload<ConvertFp32ToFp16Float16Workload>(*layer, factory);
 
     ConvertFp32ToFp16QueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -1915,10 +1920,10 @@ std::unique_ptr<MeanWorkload> CreateMeanWorkloadTest(armnn::IWorkloadFactory& fa
     auto workload = MakeAndCheckWorkload<MeanWorkload>(*layer, factory);
 
     MeanQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Parameters.m_Axis == descriptor.m_Axis);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_KeepDims == descriptor.m_KeepDims);
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Parameters.m_Axis == descriptor.m_Axis);
+    CHECK(queueDescriptor.m_Parameters.m_KeepDims == descriptor.m_KeepDims);
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -1944,24 +1949,26 @@ std::unique_ptr<ConcatWorkload> CreateConcatWorkloadTest(armnn::IWorkloadFactory
                                                   inputShapes.end(),
                                                   concatAxis);
 
+    // create concat layer
     Layer* const concat = graph.AddLayer<ConcatLayer>(descriptor, "concat");
-    BOOST_TEST_CHECKPOINT("created concat layer");
+    CHECK(concat);
 
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
     // Adds connections.
+    // connect input0 to concat
     Connect(input0, concat, inputTensorInfo, 0, 0);
-    BOOST_TEST_CHECKPOINT("connect input0 to concat");
+    // connect input1 to concat
     Connect(input1, concat, inputTensorInfo, 0, 1);
-    BOOST_TEST_CHECKPOINT("connect input1 to concat");
+    // connect concat to output
     Connect(concat, output, outputTensorInfo, 0, 0);
-    BOOST_TEST_CHECKPOINT("connect concat to output");
 
+    // create tensor handles
     CreateTensorHandles(graph, factory);
-    BOOST_TEST_CHECKPOINT("created tensor handles");
 
+    // create concat workload
     auto workloadConcat = MakeAndCheckWorkload<ConcatWorkload>(*concat, factory);
-    BOOST_TEST_CHECKPOINT("created concat workload");
+    CHECK(workloadConcat);
 
     return workloadConcat;
 }
@@ -1979,7 +1986,7 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
 
     // Add an input layer
     armnn::IConnectableLayer* const inputLayer = net->AddInputLayer(0, "input layer");
-    BOOST_TEST(inputLayer);
+    CHECK(inputLayer);
 
     // ArmNN weights tensor shape is OIHW (out channels, in channels, height, width) for NCHW
     // ArmNN weights tensor shape is OHWI (out channels, height, width, in channels) for NHWC
@@ -2035,11 +2042,11 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
                                               convLayerName.c_str());
     }
 
-    BOOST_TEST(convLayer);
+    CHECK(convLayer);
 
     // Add an output layer
     armnn::IConnectableLayer* const outputLayer = net->AddOutputLayer(0, "output layer");
-    BOOST_TEST(outputLayer);
+    CHECK(outputLayer);
 
     // set the tensors in the network (NHWC format)
     TensorInfo inputTensorInfo(TensorShape({ 1, 16, 16, 16 }), dataType);
@@ -2070,7 +2077,7 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
     armnn::OptimizerOptions optimizerOptions;
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec(),
                                                                optimizerOptions);
-    BOOST_CHECK(optimizedNet != nullptr);
+    CHECK(optimizedNet != nullptr);
 
     // Find the PreCompiled layer in the optimised graph
     armnn::Graph& optimisedGraph = GetGraphForTesting(optimizedNet.get());
@@ -2082,7 +2089,7 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
             preCompiledLayer = layer;
         }
     }
-    BOOST_CHECK(preCompiledLayer != nullptr);
+    CHECK(preCompiledLayer != nullptr);
 
     // Create the TensorHandles.
     CreateTensorHandles(optimisedGraph, factory);
@@ -2091,8 +2098,8 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
     auto workload = MakeAndCheckWorkload<PreCompiledWorkload>(*preCompiledLayer, factory);
 
     PreCompiledQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size()  == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size()  == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     // Returns the workload so we can do extra, backend-specific tests.
     // NOTE: We need to return the optimised network as well, otherwise it gets
@@ -2107,21 +2114,23 @@ std::unique_ptr<ConstantWorkload> CreateConstantWorkloadTest(armnn::IWorkloadFac
 {
     armnn::TensorInfo outputTensorInfo(outputShape, DataType);
 
+    // create constant layer
     auto constant = graph.AddLayer<ConstantLayer>("constant");
+    CHECK(constant);
     constant->m_LayerOutput = std::make_unique<ScopedTensorHandle>(outputTensorInfo);
-    BOOST_TEST_CHECKPOINT("created constant layer");
 
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
     // Adds connections.
+    // connect constant to output
     Connect(constant, output, outputTensorInfo, 0, 0);
-    BOOST_TEST_CHECKPOINT("connect constant to output");
 
+    // create tensor handles
     CreateTensorHandles(graph, factory);
-    BOOST_TEST_CHECKPOINT("created tensor handles");
 
+    // create Constant workload"
     auto workloadConstant = MakeAndCheckWorkload<ConstantWorkload>(*constant, factory);
-    BOOST_TEST_CHECKPOINT("created Constant workload");
+    CHECK(workloadConstant);
 
     return workloadConstant;
 }
@@ -2136,15 +2145,15 @@ std::unique_ptr<PreluWorkload> CreatePreluWorkloadTest(armnn::IWorkloadFactory& 
 {
     // Creates the PReLU layer
     Layer* const layer = graph.AddLayer<PreluLayer>("prelu");
-    BOOST_CHECK(layer != nullptr);
+    CHECK(layer != nullptr);
 
     // Creates extra layers
     Layer* const input  = graph.AddLayer<InputLayer> (0, "input");
     Layer* const alpha  = graph.AddLayer<InputLayer> (1, "alpha");
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
-    BOOST_CHECK(input  != nullptr);
-    BOOST_CHECK(alpha  != nullptr);
-    BOOST_CHECK(output != nullptr);
+    CHECK(input  != nullptr);
+    CHECK(alpha  != nullptr);
+    CHECK(output != nullptr);
 
     // Connects up
     armnn::TensorInfo inputTensorInfo (inputShape,  dataType);
@@ -2159,8 +2168,8 @@ std::unique_ptr<PreluWorkload> CreatePreluWorkloadTest(armnn::IWorkloadFactory& 
     auto workload = MakeAndCheckWorkload<PreluWorkload>(*layer, factory);
 
     PreluQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 2);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 2);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -2191,8 +2200,8 @@ std::unique_ptr<SpaceToDepthWorkload> CreateSpaceToDepthWorkloadTest(armnn::IWor
     auto workload = MakeAndCheckWorkload<SpaceToDepthWorkload>(*layer, factory);
 
     SpaceToDepthQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     return workload;
 }
@@ -2211,7 +2220,7 @@ std::unique_ptr<StackWorkload> CreateStackWorkloadTest(armnn::IWorkloadFactory& 
     // Constructs the Stack layer.
     armnn::StackDescriptor descriptor(axis, numInputs, inputShape);
     Layer* const stackLayer = graph.AddLayer<StackLayer>(descriptor, "stack");
-    BOOST_CHECK(stackLayer != nullptr);
+    CHECK(stackLayer != nullptr);
 
     // Constructs layer inputs and output.
     std::vector<Layer*> inputs;
@@ -2221,10 +2230,10 @@ std::unique_ptr<StackWorkload> CreateStackWorkloadTest(armnn::IWorkloadFactory& 
             static_cast<int>(i),
             ("input" + std::to_string(i)).c_str()
         ));
-        BOOST_CHECK(inputs[i] != nullptr);
+        CHECK(inputs[i] != nullptr);
     }
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
-    BOOST_CHECK(output != nullptr);
+    CHECK(output != nullptr);
 
     // Adds connections.
     for (unsigned int i=0; i<numInputs; ++i)
@@ -2237,8 +2246,8 @@ std::unique_ptr<StackWorkload> CreateStackWorkloadTest(armnn::IWorkloadFactory& 
 
     auto stackWorkload = MakeAndCheckWorkload<StackWorkload>(*stackLayer, factory);
     StackQueueDescriptor queueDescriptor = stackWorkload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == numInputs);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == numInputs);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     return stackWorkload;
 }

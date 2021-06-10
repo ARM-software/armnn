@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include <armnnDeserializer/IDeserializer.hpp>
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(Deserializer)
-
+TEST_SUITE("Deserializer_Transpose")
+{
 struct TransposeFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit TransposeFixture(const std::string &inputShape,
@@ -110,7 +109,7 @@ struct SimpleTranspose2DFixture : TransposeFixture
                                                   "QuantisedAsymm8") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(SimpleTranspose2DQuantisedAsymm8, SimpleTranspose2DFixture)
+TEST_CASE_FIXTURE(SimpleTranspose2DFixture, "SimpleTranspose2DQuantisedAsymm8")
 {
     RunTest<2, armnn::DataType::QAsymmU8>(0,
                                                  { 1, 2, 3, 4, 5, 6 },
@@ -125,7 +124,7 @@ struct SimpleTranspose4DFixture : TransposeFixture
                                                   "QuantisedAsymm8") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(SimpleTranspose4DQuantisedAsymm8, SimpleTranspose4DFixture)
+TEST_CASE_FIXTURE(SimpleTranspose4DFixture, "SimpleTranspose4DQuantisedAsymm8")
 {
     RunTest<4, armnn::DataType::QAsymmU8>(0,
                                                  {  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12,
@@ -134,4 +133,4 @@ BOOST_FIXTURE_TEST_CASE(SimpleTranspose4DQuantisedAsymm8, SimpleTranspose4DFixtu
                                                     3, 15,  7, 19, 11, 23,  4, 16,  8, 20, 12, 24 });
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

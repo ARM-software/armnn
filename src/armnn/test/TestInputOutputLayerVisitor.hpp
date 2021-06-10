@@ -5,14 +5,14 @@
 #pragma once
 
 #include "TestLayerVisitor.hpp"
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 namespace armnn
 {
 
 void CheckLayerBindingId(LayerBindingId visitorId, LayerBindingId id)
 {
-    BOOST_CHECK_EQUAL(visitorId, id);
+    CHECK_EQ(visitorId, id);
 }
 
 // Concrete TestLayerVisitor subclasses for layers taking LayerBindingId argument with overridden VisitLayer methods

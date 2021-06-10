@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_SpaceToBatchND")
+{
 struct SpaceToBatchNDFixture : public ParserFlatbuffersFixture
 {
     explicit SpaceToBatchNDFixture(const std::string & inputShape,
@@ -105,7 +104,7 @@ struct SpaceToBatchNDFixtureSimpleTest : public SpaceToBatchNDFixture
                                                               "[ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(SpaceToBatchNdSimpleTest, SpaceToBatchNDFixtureSimpleTest)
+TEST_CASE_FIXTURE(SpaceToBatchNDFixtureSimpleTest, "SpaceToBatchNdSimpleTest")
 {
     RunTest<4, armnn::DataType::Float32>
         (0,
@@ -128,7 +127,7 @@ struct SpaceToBatchNDFixtureMultipleInputBatchesTest : public SpaceToBatchNDFixt
                                                                             "[ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(SpaceToBatchNdMultipleInputBatchesTest, SpaceToBatchNDFixtureMultipleInputBatchesTest)
+TEST_CASE_FIXTURE(SpaceToBatchNDFixtureMultipleInputBatchesTest, "SpaceToBatchNdMultipleInputBatchesTest")
 {
     RunTest<4, armnn::DataType::Float32>
         (0,
@@ -150,7 +149,7 @@ struct SpaceToBatchNDFixturePaddingTest : public SpaceToBatchNDFixture
                                                                "[ 1,0,0,0, 0,0,0,0, 2,0,0,0, 0,0,0,0 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(SpaceToBatchNdPaddingTest, SpaceToBatchNDFixturePaddingTest)
+TEST_CASE_FIXTURE(SpaceToBatchNDFixturePaddingTest, "SpaceToBatchNdPaddingTest")
 {
     RunTest<4, armnn::DataType::Float32>
         (0,
@@ -175,4 +174,4 @@ BOOST_FIXTURE_TEST_CASE(SpaceToBatchNdPaddingTest, SpaceToBatchNDFixturePaddingT
                                0.0f, 10.0f, }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

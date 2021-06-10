@@ -13,14 +13,12 @@
 
 #include <layers/StandInLayer.hpp>
 
-#include <boost/test/unit_test.hpp>
-
 #include <sstream>
 #include <string>
 #include <vector>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_Unsupported")
+{
 using namespace armnn;
 
 class StandInLayerVerifier : public LayerVisitorBase<VisitorThrowingPolicy>
@@ -41,27 +39,27 @@ public:
                            const char*) override
     {
         unsigned int numInputs = armnn::numeric_cast<unsigned int>(m_InputInfos.size());
-        BOOST_CHECK(descriptor.m_NumInputs    == numInputs);
-        BOOST_CHECK(layer->GetNumInputSlots() == numInputs);
+        CHECK(descriptor.m_NumInputs    == numInputs);
+        CHECK(layer->GetNumInputSlots() == numInputs);
 
         unsigned int numOutputs = armnn::numeric_cast<unsigned int>(m_OutputInfos.size());
-        BOOST_CHECK(descriptor.m_NumOutputs    == numOutputs);
-        BOOST_CHECK(layer->GetNumOutputSlots() == numOutputs);
+        CHECK(descriptor.m_NumOutputs    == numOutputs);
+        CHECK(layer->GetNumOutputSlots() == numOutputs);
 
         const StandInLayer* standInLayer = PolymorphicDowncast<const StandInLayer*>(layer);
         for (unsigned int i = 0u; i < numInputs; ++i)
         {
             const OutputSlot* connectedSlot = standInLayer->GetInputSlot(i).GetConnectedOutputSlot();
-            BOOST_CHECK(connectedSlot != nullptr);
+            CHECK(connectedSlot != nullptr);
 
             const TensorInfo& inputInfo = connectedSlot->GetTensorInfo();
-            BOOST_CHECK(inputInfo == m_InputInfos[i]);
+            CHECK(inputInfo == m_InputInfos[i]);
         }
 
         for (unsigned int i = 0u; i < numOutputs; ++i)
         {
             const TensorInfo& outputInfo = layer->GetOutputSlot(i).GetTensorInfo();
-            BOOST_CHECK(outputInfo == m_OutputInfos[i]);
+            CHECK(outputInfo == m_OutputInfos[i]);
         }
     }
 
@@ -237,14 +235,14 @@ public:
                              { TensorInfo({ 3, 3 }, DataType::Float32) }) {}
 };
 
-BOOST_FIXTURE_TEST_CASE(UnsupportedCustomOperator1Input1Output, DummyCustom1Input1OutputFixture)
+TEST_CASE_FIXTURE(DummyCustom1Input1OutputFixture, "UnsupportedCustomOperator1Input1Output")
 {
     RunTest();
 }
 
-BOOST_FIXTURE_TEST_CASE(UnsupportedCustomOperator2Inputs1Output, DummyCustom2Inputs1OutputFixture)
+TEST_CASE_FIXTURE(DummyCustom2Inputs1OutputFixture, "UnsupportedCustomOperator2Inputs1Output")
 {
     RunTest();
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

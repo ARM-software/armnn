@@ -7,10 +7,8 @@
 
 #include <test/UnitTests.hpp>
 
-#include <boost/test/unit_test.hpp>
-
-BOOST_AUTO_TEST_SUITE(LayerValidateOutput)
-
+TEST_SUITE("LayerValidateOutput")
+{
 // ArgMinMax
 ARMNN_SIMPLE_TEST_CASE(ArgMinMaxInferOutputShape4d, ArgMinMaxInferOutputShape4dTest)
 ARMNN_SIMPLE_TEST_CASE(ArgMinMaxInferOutputShape3d, ArgMinMaxInferOutputShape3dTest)
@@ -52,4 +50,4 @@ ARMNN_SIMPLE_TEST_CASE(QLstmInferOutputShape, QLstmInferOutputShapeTest)
 // QuantizedLstm
 ARMNN_SIMPLE_TEST_CASE(QuantizedLstmInferOutputShape, QuantizedLstmInferOutputShapeTest)
 
-BOOST_AUTO_TEST_SUITE_END()
+}

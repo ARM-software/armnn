@@ -15,13 +15,14 @@
 #include <arm_compute/runtime/Allocator.h>
 #include <backendsCommon/test/CommonTestUtils.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 #include <armnn/utility/Assert.hpp>
 
-BOOST_AUTO_TEST_SUITE(NeonTensorHandleTests)
+TEST_SUITE("NeonTensorHandleTests")
+{
 using namespace armnn;
 
-BOOST_AUTO_TEST_CASE(NeonTensorHandleGetCapabilitiesNoPadding)
+TEST_CASE("NeonTensorHandleGetCapabilitiesNoPadding")
 {
     std::shared_ptr<NeonMemoryManager> memoryManager = std::make_shared<NeonMemoryManager>();
     NeonTensorHandleFactory handleFactory(memoryManager);
@@ -43,18 +44,18 @@ BOOST_AUTO_TEST_CASE(NeonTensorHandleGetCapabilitiesNoPadding)
     std::vector<Capability> capabilities = handleFactory.GetCapabilities(input,
                                                                          softmax,
                                                                          CapabilityClass::PaddingRequired);
-    BOOST_TEST(capabilities.empty());
+    CHECK(capabilities.empty());
 
     // No padding required for Softmax
     capabilities = handleFactory.GetCapabilities(softmax, output, CapabilityClass::PaddingRequired);
-    BOOST_TEST(capabilities.empty());
+    CHECK(capabilities.empty());
 
     // No padding required for output
     capabilities = handleFactory.GetCapabilities(output, nullptr, CapabilityClass::PaddingRequired);
-    BOOST_TEST(capabilities.empty());
+    CHECK(capabilities.empty());
 }
 
-BOOST_AUTO_TEST_CASE(NeonTensorHandleGetCapabilitiesPadding)
+TEST_CASE("NeonTensorHandleGetCapabilitiesPadding")
 {
     std::shared_ptr<NeonMemoryManager> memoryManager = std::make_shared<NeonMemoryManager>();
     NeonTensorHandleFactory handleFactory(memoryManager);
@@ -75,20 +76,20 @@ BOOST_AUTO_TEST_CASE(NeonTensorHandleGetCapabilitiesPadding)
     std::vector<Capability> capabilities = handleFactory.GetCapabilities(input,
                                                                          pooling,
                                                                          CapabilityClass::PaddingRequired);
-    BOOST_TEST(capabilities.empty());
+    CHECK(capabilities.empty());
 
     // No padding required for output
     capabilities = handleFactory.GetCapabilities(output, nullptr, CapabilityClass::PaddingRequired);
-    BOOST_TEST(capabilities.empty());
+    CHECK(capabilities.empty());
 
     // Padding required for Pooling2d
     capabilities = handleFactory.GetCapabilities(pooling, output, CapabilityClass::PaddingRequired);
-    BOOST_TEST(capabilities.size() == 1);
-    BOOST_TEST((capabilities[0].m_CapabilityClass == CapabilityClass::PaddingRequired));
-    BOOST_TEST(capabilities[0].m_Value);
+    CHECK(capabilities.size() == 1);
+    CHECK((capabilities[0].m_CapabilityClass == CapabilityClass::PaddingRequired));
+    CHECK(capabilities[0].m_Value);
 }
 
-BOOST_AUTO_TEST_CASE(ConcatOnXorYSubTensorsNoPaddingRequiredTest)
+TEST_CASE("ConcatOnXorYSubTensorsNoPaddingRequiredTest")
 {
     armnn::INetworkPtr net(armnn::INetwork::Create());
 
@@ -163,7 +164,7 @@ BOOST_AUTO_TEST_CASE(ConcatOnXorYSubTensorsNoPaddingRequiredTest)
     }
 }
 
-BOOST_AUTO_TEST_CASE(ConcatonXorYPaddingRequiredTest)
+TEST_CASE("ConcatonXorYPaddingRequiredTest")
 {
     armnn::INetworkPtr net(armnn::INetwork::Create());
 
@@ -246,7 +247,7 @@ BOOST_AUTO_TEST_CASE(ConcatonXorYPaddingRequiredTest)
     ARMNN_ASSERT(numberOfSubTensors == 0);
 }
 
-BOOST_AUTO_TEST_CASE(SplitteronXorYNoPaddingRequiredTest)
+TEST_CASE("SplitteronXorYNoPaddingRequiredTest")
 {
     using namespace armnn;
 
@@ -443,14 +444,14 @@ BOOST_AUTO_TEST_CASE(SplitteronXorYNoPaddingRequiredTest)
         std::vector<float> out = outputStorage.at(it.first);
         for (unsigned int i = 0; i < out.size(); ++i)
         {
-            BOOST_CHECK_MESSAGE(Compare<armnn::DataType::Float32>(it.second[i], out[i], tolerance) == true,
+            CHECK_MESSAGE(Compare<armnn::DataType::Float32>(it.second[i], out[i], tolerance) == true,
                     "Actual output: " << out[i] << ". Expected output:" << it.second[i]);
 
         }
     }
 }
 
-BOOST_AUTO_TEST_CASE(SplitteronXorYPaddingRequiredTest)
+TEST_CASE("SplitteronXorYPaddingRequiredTest")
 {
     using namespace armnn;
 
@@ -618,14 +619,14 @@ BOOST_AUTO_TEST_CASE(SplitteronXorYPaddingRequiredTest)
         std::vector<float> out = outputStorage.at(it.first);
         for (unsigned int i = 0; i < out.size(); ++i)
         {
-            BOOST_CHECK_MESSAGE(Compare<armnn::DataType::Float32>(it.second[i], out[i], tolerance) == true,
+            CHECK_MESSAGE(Compare<armnn::DataType::Float32>(it.second[i], out[i], tolerance) == true,
                     "Actual output: " << out[i] << ". Expected output:" << it.second[i]);
 
         }
     }
 }
 
-BOOST_AUTO_TEST_CASE(NeonTensorHandleFactoryMemoryManaged)
+TEST_CASE("NeonTensorHandleFactoryMemoryManaged")
 {
     std::shared_ptr<NeonMemoryManager> memoryManager = std::make_shared<NeonMemoryManager>(
         std::make_unique<arm_compute::Allocator>(),
@@ -641,31 +642,31 @@ BOOST_AUTO_TEST_CASE(NeonTensorHandleFactoryMemoryManaged)
     memoryManager->Acquire();
     {
         float* buffer = reinterpret_cast<float*>(handle->Map());
-        BOOST_CHECK(buffer != nullptr); // Yields a valid pointer
+        CHECK(buffer != nullptr); // Yields a valid pointer
         buffer[0] = 1.5f;
         buffer[1] = 2.5f;
-        BOOST_CHECK(buffer[0] == 1.5f); // Memory is writable and readable
-        BOOST_CHECK(buffer[1] == 2.5f); // Memory is writable and readable
+        CHECK(buffer[0] == 1.5f); // Memory is writable and readable
+        CHECK(buffer[1] == 2.5f); // Memory is writable and readable
     }
     memoryManager->Release();
 
     memoryManager->Acquire();
     {
         float* buffer = reinterpret_cast<float*>(handle->Map());
-        BOOST_CHECK(buffer != nullptr); // Yields a valid pointer
+        CHECK(buffer != nullptr); // Yields a valid pointer
         buffer[0] = 3.5f;
         buffer[1] = 4.5f;
-        BOOST_CHECK(buffer[0] == 3.5f); // Memory is writable and readable
-        BOOST_CHECK(buffer[1] == 4.5f); // Memory is writable and readable
+        CHECK(buffer[0] == 3.5f); // Memory is writable and readable
+        CHECK(buffer[1] == 4.5f); // Memory is writable and readable
     }
     memoryManager->Release();
 
     float testPtr[2] = { 2.5f, 5.5f };
     // Cannot import as import is disabled
-    BOOST_CHECK_THROW(handle->Import(static_cast<void*>(testPtr), MemorySource::Malloc), MemoryImportException);
+    CHECK_THROWS_AS(handle->Import(static_cast<void*>(testPtr), MemorySource::Malloc), MemoryImportException);
 }
 
-BOOST_AUTO_TEST_CASE(NeonTensorHandleFactoryImport)
+TEST_CASE("NeonTensorHandleFactoryImport")
 {
     std::shared_ptr<NeonMemoryManager> memoryManager = std::make_shared<NeonMemoryManager>(
         std::make_unique<arm_compute::Allocator>(),
@@ -680,25 +681,25 @@ BOOST_AUTO_TEST_CASE(NeonTensorHandleFactoryImport)
     memoryManager->Acquire();
 
     // No buffer allocated when import is enabled
-    BOOST_CHECK((PolymorphicDowncast<NeonTensorHandle*>(handle.get()))->GetTensor().buffer() == nullptr);
+    CHECK((PolymorphicDowncast<NeonTensorHandle*>(handle.get()))->GetTensor().buffer() == nullptr);
 
     float testPtr[2] = { 2.5f, 5.5f };
     // Correctly import
-    BOOST_CHECK(handle->Import(static_cast<void*>(testPtr), MemorySource::Malloc));
+    CHECK(handle->Import(static_cast<void*>(testPtr), MemorySource::Malloc));
     float* buffer = reinterpret_cast<float*>(handle->Map());
-    BOOST_CHECK(buffer != nullptr); // Yields a valid pointer after import
-    BOOST_CHECK(buffer == testPtr); // buffer is pointing to testPtr
+    CHECK(buffer != nullptr); // Yields a valid pointer after import
+    CHECK(buffer == testPtr); // buffer is pointing to testPtr
     // Memory is writable and readable with correct value
-    BOOST_CHECK(buffer[0] == 2.5f);
-    BOOST_CHECK(buffer[1] == 5.5f);
+    CHECK(buffer[0] == 2.5f);
+    CHECK(buffer[1] == 5.5f);
     buffer[0] = 3.5f;
     buffer[1] = 10.0f;
-    BOOST_CHECK(buffer[0] == 3.5f);
-    BOOST_CHECK(buffer[1] == 10.0f);
+    CHECK(buffer[0] == 3.5f);
+    CHECK(buffer[1] == 10.0f);
     memoryManager->Release();
 }
 
-BOOST_AUTO_TEST_CASE(NeonTensorHandleSupportsInPlaceComputation)
+TEST_CASE("NeonTensorHandleSupportsInPlaceComputation")
 {
     std::shared_ptr<NeonMemoryManager> memoryManager = std::make_shared<NeonMemoryManager>();
     NeonTensorHandleFactory handleFactory(memoryManager);
@@ -707,4 +708,4 @@ BOOST_AUTO_TEST_CASE(NeonTensorHandleSupportsInPlaceComputation)
     ARMNN_ASSERT(handleFactory.SupportsInPlaceComputation());
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

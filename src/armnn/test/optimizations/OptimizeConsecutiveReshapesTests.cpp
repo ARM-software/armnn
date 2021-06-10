@@ -7,12 +7,13 @@
 
 #include <Optimizer.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(Optimizer)
+TEST_SUITE("Optimizer")
+{
 using namespace armnn::optimizations;
 
-BOOST_AUTO_TEST_CASE(OptimizeConsecutiveReshapesTest)
+TEST_CASE("OptimizeConsecutiveReshapesTest")
 {
     armnn::Graph graph;
 
@@ -39,7 +40,7 @@ BOOST_AUTO_TEST_CASE(OptimizeConsecutiveReshapesTest)
         reshape1->GetOutputHandler().SetTensorInfo(info1);
         reshape2->GetOutputHandler().SetTensorInfo(info2);
 
-        BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
+        CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
                                  &IsLayerOfType<armnn::ReshapeLayer>, &IsLayerOfType<armnn::ReshapeLayer>,
                                  &IsLayerOfType<armnn::OutputLayer>));
 
@@ -53,13 +54,13 @@ BOOST_AUTO_TEST_CASE(OptimizeConsecutiveReshapesTest)
         };
 
         // The two reshapes are replaced by a single equivalent reshape.
-        BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>, checkReshape,
+        CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>, checkReshape,
                                  &IsLayerOfType<armnn::OutputLayer>));
 
         // Check the new reshape layer has the other two reshapes as related layers
         std::list<std::string> testRelatedLayers = { reshape2Name, reshape1Name };
 
-        BOOST_TEST(CheckRelatedLayers<armnn::ReshapeLayer>(graph, testRelatedLayers));
+        CHECK(CheckRelatedLayers<armnn::ReshapeLayer>(graph, testRelatedLayers));
     }
 
     {
@@ -72,9 +73,9 @@ BOOST_AUTO_TEST_CASE(OptimizeConsecutiveReshapesTest)
         armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(OptimizeConsecutiveReshapes()));
 
         // The two reshapes are removed.
-        BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
+        CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
                                  &IsLayerOfType<armnn::OutputLayer>));
     }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

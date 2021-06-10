@@ -12,7 +12,7 @@
 
 #include <armnn/utility/NumericCast.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <vector>
 
@@ -61,7 +61,7 @@ void ComparisonSimpleEndToEnd(const std::vector<BackendId>& backends,
     // Builds up the structure of the network
     INetworkPtr net = CreateComparisonNetwork<ArmnnInType>(inputShapes, outputShape, operation);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     const std::vector<TInput> input0({ 1, 1, 1, 1,  5, 5, 5, 5,
                                        3, 3, 3, 3,  4, 4, 4, 4 });
@@ -88,8 +88,6 @@ void ComparisonBroadcastEndToEnd(const std::vector<BackendId>& backends,
 
     // Builds up the structure of the network
     INetworkPtr net = CreateComparisonNetwork<ArmnnInType>(inputShapes, outputShape, operation);
-
-    BOOST_TEST_CHECKPOINT("create a network");
 
     const std::vector<TInput> input0({ 1, 2, 3, 1, 0, 6,
                                        7, 8, 9, 10, 11, 12 });

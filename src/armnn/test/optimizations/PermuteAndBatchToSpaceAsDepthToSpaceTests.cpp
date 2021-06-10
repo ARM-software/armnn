@@ -8,11 +8,12 @@
 #include <Network.hpp>
 #include <Optimizer.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 using namespace armnn;
 
-BOOST_AUTO_TEST_SUITE(Optimizer)
+TEST_SUITE("Optimizer")
+{
 using namespace armnn::optimizations;
 
 namespace
@@ -83,13 +84,13 @@ std::unique_ptr<NetworkImpl> CreateTransposeTestNetworkImpl()
 
 /// Tests that the optimization performed by PermuteAndBatchToSpaceAsDepthToSpace is as expected.
 /// Note this does not ensure the correctness of the optimization - that is done in the below test.
-BOOST_AUTO_TEST_CASE(PermuteAndBatchToSpaceAsDepthToSpaceOptimizerTest)
+TEST_CASE("PermuteAndBatchToSpaceAsDepthToSpaceOptimizerTest")
 {
     std::unique_ptr<NetworkImpl> network = CreateTestNetworkImpl();
     Graph graph         = network.get()->GetGraph();
 
     // Confirm initial graph is as we expect
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<InputLayer>, &IsLayerOfType<PermuteLayer>,
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<InputLayer>, &IsLayerOfType<PermuteLayer>,
                              &IsLayerOfType<BatchToSpaceNdLayer>, &IsLayerOfType<OutputLayer>));
 
     // Perform the optimization which should merge the two layers into a DepthToSpace
@@ -103,23 +104,23 @@ BOOST_AUTO_TEST_CASE(PermuteAndBatchToSpaceAsDepthToSpaceOptimizerTest)
                layer->GetOutputHandler().GetTensorInfo() == TensorInfo({ 1, 4, 6, 1 }, DataType::Float32);
     };
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<InputLayer>, checkDepthToSpace,
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<InputLayer>, checkDepthToSpace,
                              &IsLayerOfType<OutputLayer>));
 
     // Check the new layer has the two merged layers listed as related layers
     std::list<std::string> testRelatedLayers = { "batchToSpace", "permute" };
-    BOOST_TEST(CheckRelatedLayers<DepthToSpaceLayer>(graph, testRelatedLayers));
+    CHECK(CheckRelatedLayers<DepthToSpaceLayer>(graph, testRelatedLayers));
 }
 
 /// Tests that the optimization performed by PermuteAndBatchToSpaceAsDepthToSpace is as expected.
 /// Note this does not ensure the correctness of the optimization - that is done in the below test.
-BOOST_AUTO_TEST_CASE(TransposeAndBatchToSpaceAsDepthToSpaceOptimizerTest)
+TEST_CASE("TransposeAndBatchToSpaceAsDepthToSpaceOptimizerTest")
 {
     std::unique_ptr<NetworkImpl> network = CreateTransposeTestNetworkImpl();
     Graph graph         = network.get()->GetGraph();
 
     // Confirm initial graph is as we expect
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<InputLayer>, &IsLayerOfType<TransposeLayer>,
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<InputLayer>, &IsLayerOfType<TransposeLayer>,
                              &IsLayerOfType<BatchToSpaceNdLayer>, &IsLayerOfType<OutputLayer>));
 
     // Perform the optimization which should merge the two layers into a DepthToSpace
@@ -133,12 +134,12 @@ BOOST_AUTO_TEST_CASE(TransposeAndBatchToSpaceAsDepthToSpaceOptimizerTest)
                layer->GetOutputHandler().GetTensorInfo() == TensorInfo({ 1, 4, 6, 1 }, DataType::Float32);
     };
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<InputLayer>, checkDepthToSpace,
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<InputLayer>, checkDepthToSpace,
                              &IsLayerOfType<OutputLayer>));
 
     // Check the new layer has the two merged layers listed as related layers
     std::list<std::string> testRelatedLayers = { "batchToSpace", "permute" };
-    BOOST_TEST(CheckRelatedLayers<DepthToSpaceLayer>(graph, testRelatedLayers));
+    CHECK(CheckRelatedLayers<DepthToSpaceLayer>(graph, testRelatedLayers));
 }
 
 // This unit test needs the reference backend, it's not available if the reference backend is not built
@@ -208,7 +209,7 @@ INetworkPtr CreateTransposeTestNetwork()
 
 /// Tests that a optimization performed by PermuteAndBatchToSpaceAsDepthToSpace does not change the behaviour
 /// of the network (i.e. it still produces the correct output).
-BOOST_AUTO_TEST_CASE(PermuteAndBatchToSpaceAsDepthToSpaceCorrectnessTest)
+TEST_CASE("PermuteAndBatchToSpaceAsDepthToSpaceCorrectnessTest")
 {
     INetworkPtr network = CreateTestNetwork();
 
@@ -217,7 +218,7 @@ BOOST_AUTO_TEST_CASE(PermuteAndBatchToSpaceAsDepthToSpaceCorrectnessTest)
 
     // Confirm that the optimization has actually taken place
     const Graph& optGraph = GetGraphForTesting(optimizedNetwork.get());
-    BOOST_TEST(CheckSequence(optGraph.cbegin(), optGraph.cend(), &IsLayerOfType<InputLayer>,
+    CHECK(CheckSequence(optGraph.cbegin(), optGraph.cend(), &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<DepthToSpaceLayer>, &IsLayerOfType<OutputLayer>));
 
     // Load the graph into a runtime so we can check it produces the correct output
@@ -250,12 +251,12 @@ BOOST_AUTO_TEST_CASE(PermuteAndBatchToSpaceAsDepthToSpaceCorrectnessTest)
         -3.0f, -4.0f,   -30.0f, -40.0f,    -300.0f, -400.0f,
         // clang-format on
     };
-    BOOST_TEST(outputData == expectedOutput);
+    CHECK(outputData == expectedOutput);
 }
 
 /// Tests that a optimization performed by PermuteAndBatchToSpaceAsDepthToSpace does not change the behaviour
 /// of the network (i.e. it still produces the correct output).
-BOOST_AUTO_TEST_CASE(TransposeAndBatchToSpaceAsDepthToSpaceCorrectnessTest)
+TEST_CASE("TransposeAndBatchToSpaceAsDepthToSpaceCorrectnessTest")
 {
     INetworkPtr network = CreateTransposeTestNetwork();
 
@@ -264,7 +265,7 @@ BOOST_AUTO_TEST_CASE(TransposeAndBatchToSpaceAsDepthToSpaceCorrectnessTest)
 
     // Confirm that the optimization has actually taken place
     const Graph& optGraph = GetGraphForTesting(optimizedNetwork.get());
-    BOOST_TEST(CheckSequence(optGraph.cbegin(), optGraph.cend(), &IsLayerOfType<InputLayer>,
+    CHECK(CheckSequence(optGraph.cbegin(), optGraph.cend(), &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<DepthToSpaceLayer>, &IsLayerOfType<OutputLayer>));
 
     // Load the graph into a runtime so we can check it produces the correct output
@@ -297,8 +298,8 @@ BOOST_AUTO_TEST_CASE(TransposeAndBatchToSpaceAsDepthToSpaceCorrectnessTest)
             -3.0f, -4.0f,   -30.0f, -40.0f,    -300.0f, -400.0f,
             // clang-format on
     };
-    BOOST_TEST(outputData == expectedOutput);
+    CHECK(outputData == expectedOutput);
 }
 #endif
 
-BOOST_AUTO_TEST_SUITE_END()
+}

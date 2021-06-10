@@ -10,11 +10,11 @@
 
 #include <neon/NeonWorkloadFactory.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(NeonOptimizedNetwork)
-
-BOOST_AUTO_TEST_CASE(OptimizeValidateCpuAccDeviceSupportLayerNoFallback)
+TEST_SUITE("NeonOptimizedNetwork")
+{
+TEST_CASE("OptimizeValidateCpuAccDeviceSupportLayerNoFallback")
 {
     // build up the structure of the network
     armnn::INetworkPtr net(armnn::INetwork::Create());
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateCpuAccDeviceSupportLayerNoFallback)
 
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
-    BOOST_CHECK(optNet);
+    CHECK(optNet);
     // validate workloads
     armnn::NeonWorkloadFactory fact =
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
@@ -38,13 +38,13 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateCpuAccDeviceSupportLayerNoFallback)
     armnn::Graph& graph = GetGraphForTesting(optNet.get());
     for (auto&& layer : graph)
     {
-        BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuAcc);
-        BOOST_CHECK_NO_THROW(
+        CHECK(layer->GetBackendId() == armnn::Compute::CpuAcc);
+        CHECK_NOTHROW(
             layer->CreateWorkload(fact));
     }
 }
 
-BOOST_AUTO_TEST_CASE(OptimizeValidateDeviceNonSupportLayerNoFallback)
+TEST_CASE("OptimizeValidateDeviceNonSupportLayerNoFallback")
 {
     // build up the structure of the network
     armnn::INetworkPtr net(armnn::INetwork::Create());
@@ -72,16 +72,16 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateDeviceNonSupportLayerNoFallback)
     try
     {
         Optimize(*net, backends, runtime->GetDeviceSpec(), armnn::OptimizerOptions(), errMessages);
-        BOOST_FAIL("Should have thrown an exception.");
+        FAIL("Should have thrown an exception.");
     }
     catch (const armnn::InvalidArgumentException& e)
     {
         // Different exceptions are thrown on different backends
     }
-    BOOST_CHECK(errMessages.size() > 0);
+    CHECK(errMessages.size() > 0);
 }
 
-BOOST_AUTO_TEST_CASE(FastMathEnabledTestOnCpuAcc)
+TEST_CASE("FastMathEnabledTestOnCpuAcc")
 {
     armnn::INetworkPtr net(armnn::INetwork::Create());
 
@@ -102,16 +102,16 @@ BOOST_AUTO_TEST_CASE(FastMathEnabledTestOnCpuAcc)
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(
     *net, backends, runtime->GetDeviceSpec(), optimizerOptions);
 
-    BOOST_CHECK(optimizedNet);
+    CHECK(optimizedNet);
 
     auto modelOptionsOut = GetModelOptionsForTesting(optimizedNet.get());
 
-    BOOST_TEST(modelOptionsOut.size() == 1);
-    BOOST_TEST(modelOptionsOut[0].GetOption(0).GetName() == "FastMathEnabled");
-    BOOST_TEST(modelOptionsOut[0].GetOption(0).GetValue().AsBool() == true);
+    CHECK(modelOptionsOut.size() == 1);
+    CHECK(modelOptionsOut[0].GetOption(0).GetName() == "FastMathEnabled");
+    CHECK(modelOptionsOut[0].GetOption(0).GetValue().AsBool() == true);
 }
 
-BOOST_AUTO_TEST_CASE(NumberOfThreadsTestOnCpuAcc)
+TEST_CASE("NumberOfThreadsTestOnCpuAcc")
 {
     armnn::INetworkPtr net(armnn::INetwork::Create());
 
@@ -134,15 +134,15 @@ BOOST_AUTO_TEST_CASE(NumberOfThreadsTestOnCpuAcc)
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(
             *net, backends, runtime->GetDeviceSpec(), optimizerOptions);
 
-    BOOST_CHECK(optimizedNet);
+    CHECK(optimizedNet);
     std::unique_ptr<armnn::Graph> graphPtr;
     armnn::OptimizedNetworkImpl impl(std::move(graphPtr), optimizerOptions.m_ModelOptions);
 
     auto modelOptionsOut = impl.GetModelOptions();
 
-    BOOST_TEST(modelOptionsOut.size() == 1);
-    BOOST_TEST(modelOptionsOut[0].GetOption(0).GetName() == "NumberOfThreads");
-    BOOST_TEST(modelOptionsOut[0].GetOption(0).GetValue().AsUnsignedInt() == numberOfThreads);
+    CHECK(modelOptionsOut.size() == 1);
+    CHECK(modelOptionsOut[0].GetOption(0).GetName() == "NumberOfThreads");
+    CHECK(modelOptionsOut[0].GetOption(0).GetValue().AsUnsignedInt() == numberOfThreads);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include <armnnDeserializer/IDeserializer.hpp>
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(Deserializer)
-
+TEST_SUITE("Deserializer_Fill")
+{
 struct FillFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit FillFixture()
@@ -123,7 +122,7 @@ struct SimpleFillFixture : FillFixture
     SimpleFillFixture() : FillFixture() {}
 };
 
-BOOST_FIXTURE_TEST_CASE(Fill, SimpleFillFixture)
+TEST_CASE_FIXTURE(SimpleFillFixture, "Fill")
 {
     RunTest<4, armnn::DataType::Signed32, armnn::DataType::Float32>(
             0,
@@ -131,4 +130,4 @@ BOOST_FIXTURE_TEST_CASE(Fill, SimpleFillFixture)
             {{"OutputLayer",{ 1, 1, 1, 1, 1, 1, 1, 1, 1}}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

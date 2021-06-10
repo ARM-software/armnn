@@ -10,7 +10,7 @@
 #include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <utility>
 
@@ -23,9 +23,9 @@ using namespace std;
 // Checks weights and biases before the method called and after.
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-BOOST_AUTO_TEST_SUITE(LayerReleaseConstantDataTest)
-
-BOOST_AUTO_TEST_CASE(ReleaseBatchNormalizationLayerConstantDataTest)
+TEST_SUITE("LayerReleaseConstantDataTest")
+{
+TEST_CASE("ReleaseBatchNormalizationLayerConstantDataTest")
 {
     Graph graph;
 
@@ -54,24 +54,24 @@ BOOST_AUTO_TEST_CASE(ReleaseBatchNormalizationLayerConstantDataTest)
     Connect(layer, output, tensorInfo);
 
     // check the constants that they are not NULL
-    BOOST_CHECK(layer->m_Mean != nullptr);
-    BOOST_CHECK(layer->m_Variance != nullptr);
-    BOOST_CHECK(layer->m_Beta != nullptr);
-    BOOST_CHECK(layer->m_Gamma != nullptr);
+    CHECK(layer->m_Mean != nullptr);
+    CHECK(layer->m_Variance != nullptr);
+    CHECK(layer->m_Beta != nullptr);
+    CHECK(layer->m_Gamma != nullptr);
 
     // free up the constants..
     layer->ReleaseConstantData();
 
     // check the constants that they are NULL now
-    BOOST_CHECK(layer->m_Mean == nullptr);
-    BOOST_CHECK(layer->m_Variance == nullptr);
-    BOOST_CHECK(layer->m_Beta == nullptr);
-    BOOST_CHECK(layer->m_Gamma == nullptr);
+    CHECK(layer->m_Mean == nullptr);
+    CHECK(layer->m_Variance == nullptr);
+    CHECK(layer->m_Beta == nullptr);
+    CHECK(layer->m_Gamma == nullptr);
 
  }
 
 
- BOOST_AUTO_TEST_CASE(ReleaseConvolution2dLayerConstantDataTest)
+ TEST_CASE("ReleaseConvolution2dLayerConstantDataTest")
  {
      Graph graph;
 
@@ -104,18 +104,18 @@ BOOST_AUTO_TEST_CASE(ReleaseBatchNormalizationLayerConstantDataTest)
      Connect(layer, output, TensorInfo({2, 2, 2, 10}, armnn::DataType::Float32));
 
      // check the constants that they are not NULL
-     BOOST_CHECK(layer->m_Weight != nullptr);
-     BOOST_CHECK(layer->m_Bias != nullptr);
+     CHECK(layer->m_Weight != nullptr);
+     CHECK(layer->m_Bias != nullptr);
 
      // free up the constants..
      layer->ReleaseConstantData();
 
      // check the constants that they are NULL now
-     BOOST_CHECK(layer->m_Weight == nullptr);
-     BOOST_CHECK(layer->m_Bias == nullptr);
+     CHECK(layer->m_Weight == nullptr);
+     CHECK(layer->m_Bias == nullptr);
 }
 
-BOOST_AUTO_TEST_CASE(ReleaseDepthwiseConvolution2dLayerConstantDataTest)
+TEST_CASE("ReleaseDepthwiseConvolution2dLayerConstantDataTest")
 {
     Graph graph;
 
@@ -145,18 +145,18 @@ BOOST_AUTO_TEST_CASE(ReleaseDepthwiseConvolution2dLayerConstantDataTest)
     Connect(layer, output, TensorInfo({2, 9, 2, 10}, armnn::DataType::Float32));
 
     // check the constants that they are not NULL
-    BOOST_CHECK(layer->m_Weight != nullptr);
-    BOOST_CHECK(layer->m_Bias != nullptr);
+    CHECK(layer->m_Weight != nullptr);
+    CHECK(layer->m_Bias != nullptr);
 
     // free up the constants..
     layer->ReleaseConstantData();
 
     // check the constants that they are NULL now
-    BOOST_CHECK(layer->m_Weight == nullptr);
-    BOOST_CHECK(layer->m_Bias == nullptr);
+    CHECK(layer->m_Weight == nullptr);
+    CHECK(layer->m_Bias == nullptr);
 }
 
-BOOST_AUTO_TEST_CASE(ReleaseFullyConnectedLayerConstantDataTest)
+TEST_CASE("ReleaseFullyConnectedLayerConstantDataTest")
 {
     Graph graph;
 
@@ -186,16 +186,16 @@ BOOST_AUTO_TEST_CASE(ReleaseFullyConnectedLayerConstantDataTest)
     Connect(layer, output, TensorInfo({3, 7}, DataType::QAsymmU8, outputQScale));
 
     // check the constants that they are not NULL
-    BOOST_CHECK(layer->m_Weight != nullptr);
-    BOOST_CHECK(layer->m_Bias != nullptr);
+    CHECK(layer->m_Weight != nullptr);
+    CHECK(layer->m_Bias != nullptr);
 
     // free up the constants..
     layer->ReleaseConstantData();
 
     // check the constants that they are NULL now
-    BOOST_CHECK(layer->m_Weight == nullptr);
-    BOOST_CHECK(layer->m_Bias == nullptr);
+    CHECK(layer->m_Weight == nullptr);
+    CHECK(layer->m_Bias == nullptr);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}
 

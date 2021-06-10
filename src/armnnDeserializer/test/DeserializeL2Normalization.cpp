@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include <armnnDeserializer/IDeserializer.hpp>
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(Deserializer)
-
+TEST_SUITE("Deserializer_L2Normalization")
+{
 struct L2NormalizationFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit L2NormalizationFixture(const std::string &inputShape,
@@ -114,7 +113,7 @@ struct L2NormFixture : L2NormalizationFixture
                                            "0.00000001"){}
 };
 
-BOOST_FIXTURE_TEST_CASE(L2NormalizationFloat32, L2NormFixture)
+TEST_CASE_FIXTURE(L2NormFixture, "L2NormalizationFloat32")
 {
     // 1 / sqrt(1^2 + 2^2 + 3^2)
     const float approxInvL2Norm = 0.267261f;
@@ -126,7 +125,7 @@ BOOST_FIXTURE_TEST_CASE(L2NormalizationFloat32, L2NormFixture)
                                                            3.0f * approxInvL2Norm }}});
 }
 
-BOOST_FIXTURE_TEST_CASE(L2NormalizationEpsilonLimitFloat32, L2NormFixture)
+TEST_CASE_FIXTURE(L2NormFixture, "L2NormalizationEpsilonLimitFloat32")
 {
     // 1 / sqrt(1e-8)
     const float approxInvL2Norm = 10000;
@@ -138,4 +137,4 @@ BOOST_FIXTURE_TEST_CASE(L2NormalizationEpsilonLimitFloat32, L2NormFixture)
                                                            0.00000003f * approxInvL2Norm }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

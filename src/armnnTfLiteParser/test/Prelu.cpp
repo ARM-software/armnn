@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_Prelu")
+{
 struct PreluFixture : public ParserFlatbuffersFixture
 {
     explicit PreluFixture(const std::string& inputShape,
@@ -356,7 +356,7 @@ struct PreluDynamicTensorFixture : PreluFixture
                                                "\"data\": [ 0, 0, 128, 62 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(SimplePrelu, SimplePreluFixture)
+TEST_CASE_FIXTURE(SimplePreluFixture, "SimplePrelu")
 {
   RunTest<2, armnn::DataType::Float32>(
       0,
@@ -364,7 +364,7 @@ BOOST_FIXTURE_TEST_CASE(SimplePrelu, SimplePreluFixture)
       {{"output", { -3.5f, 2.f, 0.f, 1.f, -1.25f, 14.f }}});
 }
 
-BOOST_FIXTURE_TEST_CASE(PreluConstAlpha, PreluConstAlphaFixture)
+TEST_CASE_FIXTURE(PreluConstAlphaFixture, "PreluConstAlpha")
 {
   RunTest<3, armnn::DataType::Float32>(
       0,
@@ -372,7 +372,7 @@ BOOST_FIXTURE_TEST_CASE(PreluConstAlpha, PreluConstAlphaFixture)
       {{"output", { -3.5f, 2.f, 0.f, 1.f, -1.25f, 14.f }}});
 }
 
-BOOST_FIXTURE_TEST_CASE(PreluBroadcastAlpha, PreluBroadcastAlphaFixture)
+TEST_CASE_FIXTURE(PreluBroadcastAlphaFixture, "PreluBroadcastAlpha")
 {
   RunTest<4, armnn::DataType::Float32>(
       0,
@@ -380,7 +380,7 @@ BOOST_FIXTURE_TEST_CASE(PreluBroadcastAlpha, PreluBroadcastAlphaFixture)
       {{"output", { -3.5f, 2.f, 0.f, 1.f, -1.25f, 14.f }}});
 }
 
-BOOST_FIXTURE_TEST_CASE(PreluDynamicTensor, PreluDynamicTensorFixture)
+TEST_CASE_FIXTURE(PreluDynamicTensorFixture, "PreluDynamicTensor")
 {
   RunTest<2, armnn::DataType::Float32, armnn::DataType::Float32>(
       0,
@@ -389,7 +389,7 @@ BOOST_FIXTURE_TEST_CASE(PreluDynamicTensor, PreluDynamicTensorFixture)
       true);
 }
 
-BOOST_FIXTURE_TEST_CASE(PreluNetwork, PreluNetworkFixture)
+TEST_CASE_FIXTURE(PreluNetworkFixture, "PreluNetwork")
 {
   RunTest<3, armnn::DataType::Float32>(
       0,
@@ -397,4 +397,4 @@ BOOST_FIXTURE_TEST_CASE(PreluNetwork, PreluNetworkFixture)
       {{"output", { -21.f, 12.f, 0.f, 6.f, -7.5f, 84.f }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

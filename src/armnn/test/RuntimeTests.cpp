@@ -20,7 +20,7 @@
 #include <valgrind/memcheck.h>
 #endif
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 #include "RuntimeTests.hpp"
 #include "TestUtils.hpp"
 
@@ -34,9 +34,9 @@ void RuntimeLoadedNetworksReserve(armnn::RuntimeImpl* runtime)
 
 }
 
-BOOST_AUTO_TEST_SUITE(Runtime)
-
-BOOST_AUTO_TEST_CASE(RuntimeUnloadNetwork)
+TEST_SUITE("Runtime")
+{
+TEST_CASE("RuntimeUnloadNetwork")
 {
     // build 2 mock-networks and load them into the runtime
     armnn::IRuntime::CreationOptions options;
@@ -56,9 +56,9 @@ BOOST_AUTO_TEST_CASE(RuntimeUnloadNetwork)
     runtime->LoadNetwork(networkIdentifier2, Optimize(*mockNetwork2, backends, runtime->GetDeviceSpec()));
 
     // Unloads one by its networkID.
-    BOOST_TEST(runtime->UnloadNetwork(networkIdentifier1) == armnn::Status::Success);
+    CHECK(runtime->UnloadNetwork(networkIdentifier1) == armnn::Status::Success);
 
-    BOOST_TEST(runtime->UnloadNetwork(networkIdentifier1) == armnn::Status::Failure);
+    CHECK(runtime->UnloadNetwork(networkIdentifier1) == armnn::Status::Failure);
 }
 
 // Note: the current builds we don't do valgrind and gperftools based leak checking at the same
@@ -76,26 +76,24 @@ struct DisableGlobalLeakChecking
     }
 };
 
-BOOST_GLOBAL_FIXTURE(DisableGlobalLeakChecking);
-
-BOOST_AUTO_TEST_CASE(RuntimeHeapMemoryUsageSanityChecks)
+TEST_CASE_FIXTURE(DisableGlobalLeakChecking,  "RuntimeHeapMemoryUsageSanityChecks")
 {
-    BOOST_TEST(ARMNN_LEAK_CHECKER_IS_ACTIVE());
+    CHECK(ARMNN_LEAK_CHECKER_IS_ACTIVE());
     {
         ARMNN_SCOPED_LEAK_CHECKER("Sanity_Check_Outer");
         {
             ARMNN_SCOPED_LEAK_CHECKER("Sanity_Check_Inner");
-            BOOST_TEST(ARMNN_NO_LEAKS_IN_SCOPE() == true);
+            CHECK(ARMNN_NO_LEAKS_IN_SCOPE() == true);
             std::unique_ptr<char[]> dummyAllocation(new char[1000]);
-            BOOST_CHECK_MESSAGE(ARMNN_NO_LEAKS_IN_SCOPE() == false,
-                "A leak of 1000 bytes is expected here. "
-                "Please make sure environment variable: HEAPCHECK=draconian is set!");
-            BOOST_TEST(ARMNN_BYTES_LEAKED_IN_SCOPE() == 1000);
-            BOOST_TEST(ARMNN_OBJECTS_LEAKED_IN_SCOPE() == 1);
+            // "A leak of 1000 bytes is expected here. "
+            // "Please make sure environment variable: HEAPCHECK=draconian is set!"
+            CHECK((ARMNN_NO_LEAKS_IN_SCOPE() == false));
+            CHECK(ARMNN_BYTES_LEAKED_IN_SCOPE() == 1000);
+            CHECK(ARMNN_OBJECTS_LEAKED_IN_SCOPE() == 1);
         }
-        BOOST_TEST(ARMNN_NO_LEAKS_IN_SCOPE());
-        BOOST_TEST(ARMNN_BYTES_LEAKED_IN_SCOPE() == 0);
-        BOOST_TEST(ARMNN_OBJECTS_LEAKED_IN_SCOPE() == 0);
+        CHECK(ARMNN_NO_LEAKS_IN_SCOPE());
+        CHECK(ARMNN_BYTES_LEAKED_IN_SCOPE() == 0);
+        CHECK(ARMNN_OBJECTS_LEAKED_IN_SCOPE() == 0);
     }
 }
 
@@ -105,8 +103,9 @@ BOOST_AUTO_TEST_CASE(RuntimeHeapMemoryUsageSanityChecks)
 #ifdef WITH_VALGRIND
 // Run with the following command to get all the amazing output (in the devenv/build folder) :)
 // valgrind --leak-check=full --show-leak-kinds=all --log-file=Valgrind_Memcheck_Leak_Report.txt armnn/test/UnitTests
-BOOST_AUTO_TEST_CASE(RuntimeMemoryLeak)
+TEST_CASE("RuntimeMemoryLeak")
 {
+    MESSAGE("RuntimeMemoryLeak");
     // From documentation:
 
     // This means that no pointer to the block can be found. The block is classified as "lost",
@@ -155,8 +154,8 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryLeak)
     }
 
     // If we're not running under Valgrind, these vars will have been initialised to 0, so this will always pass.
-    BOOST_TEST(leakedBefore == leakedAfter);
-    BOOST_TEST(reachableBefore == reachableAfter);
+    CHECK(leakedBefore == leakedAfter);
+    CHECK(reachableBefore == reachableAfter);
 
     // These are needed because VALGRIND_COUNT_LEAKS is a macro that assigns to the parameters
     // so they are assigned to, but still considered unused, causing a warning.
@@ -165,7 +164,7 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryLeak)
 }
 #endif // WITH_VALGRIND
 
-BOOST_AUTO_TEST_CASE(RuntimeCpuRef)
+TEST_CASE("RuntimeCpuRef")
 {
     using namespace armnn;
 
@@ -196,10 +195,10 @@ BOOST_AUTO_TEST_CASE(RuntimeCpuRef)
 
     // Load it into the runtime. It should success.
     armnn::NetworkId netId;
-    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
+    CHECK(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
 }
 
-BOOST_AUTO_TEST_CASE(RuntimeFallbackToCpuRef)
+TEST_CASE("RuntimeFallbackToCpuRef")
 {
     using namespace armnn;
 
@@ -231,10 +230,10 @@ BOOST_AUTO_TEST_CASE(RuntimeFallbackToCpuRef)
 
     // Load it into the runtime. It should succeed.
     armnn::NetworkId netId;
-    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
+    CHECK(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
 }
 
-BOOST_AUTO_TEST_CASE(IVGCVSW_1929_QuantizedSoftmaxIssue)
+TEST_CASE("IVGCVSW_1929_QuantizedSoftmaxIssue")
 {
     // Test for issue reported by Chris Nix in https://jira.arm.com/browse/IVGCVSW-1929
     using namespace armnn;
@@ -270,16 +269,16 @@ BOOST_AUTO_TEST_CASE(IVGCVSW_1929_QuantizedSoftmaxIssue)
                                                       runtime->GetDeviceSpec(),
                                                       OptimizerOptions(),
                                                       errMessages);
-        BOOST_FAIL("An exception should have been thrown");
+        FAIL("An exception should have been thrown");
     }
     catch (const InvalidArgumentException& e)
     {
         // Different exceptions are thrown on different backends
     }
-    BOOST_CHECK(errMessages.size() > 0);
+    CHECK(errMessages.size() > 0);
 }
 
-BOOST_AUTO_TEST_CASE(RuntimeBackendOptions)
+TEST_CASE("RuntimeBackendOptions")
 {
     using namespace armnn;
 
@@ -307,27 +306,27 @@ BOOST_AUTO_TEST_CASE(RuntimeBackendOptions)
 
 
     // First group
-    BOOST_TEST(backendOptions[0].GetBackendId().Get() == "FakeBackend1");
-    BOOST_TEST(backendOptions[0].GetOption(0).GetName() == "Option1");
-    BOOST_TEST(backendOptions[0].GetOption(0).GetValue().IsFloat() == true);
-    BOOST_TEST(backendOptions[0].GetOption(0).GetValue().AsFloat() == 1.3f);
+    CHECK(backendOptions[0].GetBackendId().Get() == "FakeBackend1");
+    CHECK(backendOptions[0].GetOption(0).GetName() == "Option1");
+    CHECK(backendOptions[0].GetOption(0).GetValue().IsFloat() == true);
+    CHECK(backendOptions[0].GetOption(0).GetValue().AsFloat() == 1.3f);
 
-    BOOST_TEST(backendOptions[0].GetOption(1).GetName() == "Option2");
-    BOOST_TEST(backendOptions[0].GetOption(1).GetValue().IsBool() == true);
-    BOOST_TEST(backendOptions[0].GetOption(1).GetValue().AsBool() == true);
+    CHECK(backendOptions[0].GetOption(1).GetName() == "Option2");
+    CHECK(backendOptions[0].GetOption(1).GetValue().IsBool() == true);
+    CHECK(backendOptions[0].GetOption(1).GetValue().AsBool() == true);
 
-    BOOST_TEST(backendOptions[0].GetOption(2).GetName() == "Option3");
-    BOOST_TEST(backendOptions[0].GetOption(2).GetValue().IsString() == true);
-    BOOST_TEST(backendOptions[0].GetOption(2).GetValue().AsString() == "some_value");
+    CHECK(backendOptions[0].GetOption(2).GetName() == "Option3");
+    CHECK(backendOptions[0].GetOption(2).GetValue().IsString() == true);
+    CHECK(backendOptions[0].GetOption(2).GetValue().AsString() == "some_value");
 
     // Second group
-    BOOST_TEST(backendOptions[1].GetBackendId().Get() == "FakeBackend1");
-    BOOST_TEST(backendOptions[1].GetOption(0).GetName() == "Option4");
-    BOOST_TEST(backendOptions[1].GetOption(0).GetValue().IsInt() == true);
-    BOOST_TEST(backendOptions[1].GetOption(0).GetValue().AsInt() == 42);
+    CHECK(backendOptions[1].GetBackendId().Get() == "FakeBackend1");
+    CHECK(backendOptions[1].GetOption(0).GetName() == "Option4");
+    CHECK(backendOptions[1].GetOption(0).GetValue().IsInt() == true);
+    CHECK(backendOptions[1].GetOption(0).GetValue().AsInt() == 42);
 }
 
-BOOST_AUTO_TEST_CASE(ProfilingDisable)
+TEST_CASE("ProfilingDisable")
 {
     using namespace armnn;
 
@@ -358,17 +357,17 @@ BOOST_AUTO_TEST_CASE(ProfilingDisable)
 
     // Load it into the runtime. It should succeed.
     armnn::NetworkId netId;
-    BOOST_TEST(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
+    CHECK(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
 
     profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
     profiling::BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
     auto readableBuffer = bufferManager.GetReadableBuffer();
 
     // Profiling is not enabled, the post-optimisation structure should not be created
-    BOOST_TEST(!readableBuffer);
+    CHECK(!readableBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
+TEST_CASE("ProfilingEnableCpuRef")
 {
     using namespace armnn;
     using namespace armnn::profiling;
@@ -410,29 +409,29 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
 
     // Load it into the runtime. It should succeed.
     armnn::NetworkId netId;
-    BOOST_TEST(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
+    CHECK(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
 
     profiling::BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
     auto readableBuffer = bufferManager.GetReadableBuffer();
 
     // Profiling is enabled, the post-optimisation structure should be created
-    BOOST_CHECK(readableBuffer != nullptr);
+    CHECK(readableBuffer != nullptr);
 
     unsigned int size = readableBuffer->GetSize();
 
     const unsigned char* readableData = readableBuffer->GetReadableData();
-    BOOST_CHECK(readableData != nullptr);
+    CHECK(readableData != nullptr);
 
     unsigned int offset = 0;
 
     // Verify Header
     VerifyTimelineHeaderBinary(readableData, offset, size - 8);
-    BOOST_TEST_MESSAGE("HEADER OK");
+    MESSAGE("HEADER OK");
 
     // Post-optimisation network
     // Network entity
     VerifyTimelineEntityBinaryPacketData(optNetGuid, readableData, offset);
-    BOOST_TEST_MESSAGE("NETWORK ENTITY OK");
+    MESSAGE("NETWORK ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -442,7 +441,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NETWORK TYPE RELATIONSHIP OK");
+    MESSAGE("NETWORK TYPE RELATIONSHIP OK");
 
     // Network - START OF LIFE
     ProfilingGuid networkSolEventGuid = VerifyTimelineEventBinaryPacket(EmptyOptional(),
@@ -450,7 +449,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                                         EmptyOptional(),
                                                                         readableData,
                                                                         offset);
-    BOOST_TEST_MESSAGE("NETWORK START OF LIFE EVENT OK");
+    MESSAGE("NETWORK START OF LIFE EVENT OK");
 
     // Network - START OF LIFE event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -460,7 +459,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NETWORK START OF LIFE RELATIONSHIP OK");
+    MESSAGE("NETWORK START OF LIFE RELATIONSHIP OK");
 
     // Process ID Label
     int processID = armnnUtils::Processes::GetCurrentId();
@@ -468,7 +467,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
     ss << processID;
     std::string processIdLabel = ss.str();
     VerifyTimelineLabelBinaryPacketData(EmptyOptional(), processIdLabel, readableData, offset);
-    BOOST_TEST_MESSAGE("PROCESS ID LABEL OK");
+    MESSAGE("PROCESS ID LABEL OK");
 
     // Entity - Process ID relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -478,16 +477,16 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::PROCESS_ID_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NETWORK PROCESS ID RELATIONSHIP OK");
+    MESSAGE("NETWORK PROCESS ID RELATIONSHIP OK");
 
     // Input layer
     // Input layer entity
     VerifyTimelineEntityBinaryPacketData(input->GetGuid(), readableData, offset);
-    BOOST_TEST_MESSAGE("INPUT ENTITY OK");
+    MESSAGE("INPUT ENTITY OK");
 
     // Name Entity
     ProfilingGuid inputLabelGuid = VerifyTimelineLabelBinaryPacketData(EmptyOptional(), "input", readableData, offset);
-    BOOST_TEST_MESSAGE("INPUT NAME LABEL OK");
+    MESSAGE("INPUT NAME LABEL OK");
 
     // Entity - Name relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -497,7 +496,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INPUT NAME RELATIONSHIP OK");
+    MESSAGE("INPUT NAME RELATIONSHIP OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -507,7 +506,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INPUT TYPE RELATIONSHIP OK");
+    MESSAGE("INPUT TYPE RELATIONSHIP OK");
 
     // Network - Input layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -517,17 +516,17 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NETWORK - INPUT CHILD RELATIONSHIP OK");
+    MESSAGE("NETWORK - INPUT CHILD RELATIONSHIP OK");
 
     // Normalization layer
     // Normalization layer entity
     VerifyTimelineEntityBinaryPacketData(normalize->GetGuid(), readableData, offset);
-    BOOST_TEST_MESSAGE("NORMALIZATION LAYER ENTITY OK");
+    MESSAGE("NORMALIZATION LAYER ENTITY OK");
 
     // Name entity
     ProfilingGuid normalizationLayerNameGuid = VerifyTimelineLabelBinaryPacketData(
         EmptyOptional(), "normalization", readableData, offset);
-    BOOST_TEST_MESSAGE("NORMALIZATION LAYER NAME LABEL OK");
+    MESSAGE("NORMALIZATION LAYER NAME LABEL OK");
 
     // Entity - Name relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -537,7 +536,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NORMALIZATION LAYER NAME RELATIONSHIP OK");
+    MESSAGE("NORMALIZATION LAYER NAME RELATIONSHIP OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -547,7 +546,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NORMALIZATION LAYER TYPE RELATIONSHIP OK");
+    MESSAGE("NORMALIZATION LAYER TYPE RELATIONSHIP OK");
 
     // Network - Normalize layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -557,7 +556,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NETWORK - NORMALIZATION LAYER CHILD RELATIONSHIP OK");
+    MESSAGE("NETWORK - NORMALIZATION LAYER CHILD RELATIONSHIP OK");
 
     // Input layer - Normalize layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -567,13 +566,13 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::CONNECTION_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INPUT - NORMALIZATION LAYER CONNECTION OK");
+    MESSAGE("INPUT - NORMALIZATION LAYER CONNECTION OK");
 
     // Normalization workload
     // Normalization workload entity
     ProfilingGuid normalizationWorkloadGuid = VerifyTimelineEntityBinaryPacketData(
         EmptyOptional(), readableData, offset);
-    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD ENTITY OK");
+    MESSAGE("NORMALIZATION WORKLOAD ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -583,12 +582,12 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD TYPE RELATIONSHIP OK");
+    MESSAGE("NORMALIZATION WORKLOAD TYPE RELATIONSHIP OK");
 
     // BackendId entity
     ProfilingGuid cpuRefLabelGuid = VerifyTimelineLabelBinaryPacketData(
         EmptyOptional(), "CpuRef", readableData, offset);
-    BOOST_TEST_MESSAGE("CPUREF LABEL OK");
+    MESSAGE("CPUREF LABEL OK");
 
     // Entity - BackendId relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -598,7 +597,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::BACKENDID_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD BACKEND ID RELATIONSHIP OK");
+    MESSAGE("NORMALIZATION WORKLOAD BACKEND ID RELATIONSHIP OK");
 
     // Normalize layer - Normalize workload relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -608,17 +607,17 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NORMALIZATION LAYER - WORKLOAD CHILD RELATIONSHIP OK");
+    MESSAGE("NORMALIZATION LAYER - WORKLOAD CHILD RELATIONSHIP OK");
 
     // Output layer
     // Output layer entity
     VerifyTimelineEntityBinaryPacketData(output->GetGuid(), readableData, offset);
-    BOOST_TEST_MESSAGE("OUTPUT LAYER ENTITY OK");
+    MESSAGE("OUTPUT LAYER ENTITY OK");
 
     // Name entity
     ProfilingGuid outputLabelGuid = VerifyTimelineLabelBinaryPacketData(
         EmptyOptional(), "output", readableData, offset);
-    BOOST_TEST_MESSAGE("OUTPUT LAYER NAME LABEL OK");
+    MESSAGE("OUTPUT LAYER NAME LABEL OK");
 
     // Entity - Name relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -628,7 +627,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("OUTPUT LAYER NAME RELATIONSHIP OK");
+    MESSAGE("OUTPUT LAYER NAME RELATIONSHIP OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -638,7 +637,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("OUTPUT LAYER TYPE RELATIONSHIP OK");
+    MESSAGE("OUTPUT LAYER TYPE RELATIONSHIP OK");
 
     // Network - Output layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -648,7 +647,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NETWORK - OUTPUT LAYER CHILD RELATIONSHIP OK");
+    MESSAGE("NETWORK - OUTPUT LAYER CHILD RELATIONSHIP OK");
 
     // Normalize layer - Output layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -658,7 +657,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::CONNECTION_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NORMALIZE LAYER - OUTPUT LAYER CONNECTION OK");
+    MESSAGE("NORMALIZE LAYER - OUTPUT LAYER CONNECTION OK");
 
     bufferManager.MarkRead(readableBuffer);
 
@@ -680,33 +679,33 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
 
     // Get readable buffer for input workload
     auto  inputReadableBuffer = bufferManager.GetReadableBuffer();
-    BOOST_CHECK(inputReadableBuffer != nullptr);
+    CHECK(inputReadableBuffer != nullptr);
 
     // Get readable buffer for output workload
     auto outputReadableBuffer = bufferManager.GetReadableBuffer();
-    BOOST_CHECK(outputReadableBuffer != nullptr);
+    CHECK(outputReadableBuffer != nullptr);
 
     // Get readable buffer for inference timeline
     auto inferenceReadableBuffer = bufferManager.GetReadableBuffer();
-    BOOST_CHECK(inferenceReadableBuffer != nullptr);
+    CHECK(inferenceReadableBuffer != nullptr);
 
     // Validate input workload data
     size = inputReadableBuffer->GetSize();
-    BOOST_CHECK(size == 164);
+    CHECK(size == 164);
 
     readableData = inputReadableBuffer->GetReadableData();
-    BOOST_CHECK(readableData != nullptr);
+    CHECK(readableData != nullptr);
 
     offset = 0;
 
     // Verify Header
     VerifyTimelineHeaderBinary(readableData, offset, 156);
-    BOOST_TEST_MESSAGE("INPUT WORKLOAD HEADER OK");
+    MESSAGE("INPUT WORKLOAD HEADER OK");
 
     // Input workload
     // Input workload entity
     ProfilingGuid inputWorkloadGuid = VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
-    BOOST_TEST_MESSAGE("INPUT WORKLOAD ENTITY OK");
+    MESSAGE("INPUT WORKLOAD ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -716,12 +715,12 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INPUT WORKLOAD TYPE RELATIONSHIP OK");
+    MESSAGE("INPUT WORKLOAD TYPE RELATIONSHIP OK");
 
     // BackendId entity
     ProfilingGuid CpuRefLabelGuid = VerifyTimelineLabelBinaryPacketData(
         EmptyOptional(), "CpuRef", readableData, offset);
-    BOOST_TEST_MESSAGE("CPUREF LABEL OK (INPUT WORKLOAD)");
+    MESSAGE("CPUREF LABEL OK (INPUT WORKLOAD)");
 
     // Entity - BackendId relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -731,7 +730,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::BACKENDID_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INPUT WORKLOAD BACKEND ID RELATIONSHIP OK");
+    MESSAGE("INPUT WORKLOAD BACKEND ID RELATIONSHIP OK");
 
     // Input layer - Input workload relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -741,27 +740,27 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INPUT LAYER - INPUT WORKLOAD CHILD RELATIONSHIP OK");
+    MESSAGE("INPUT LAYER - INPUT WORKLOAD CHILD RELATIONSHIP OK");
 
     bufferManager.MarkRead(inputReadableBuffer);
 
     // Validate output workload data
     size = outputReadableBuffer->GetSize();
-    BOOST_CHECK(size == 164);
+    CHECK(size == 164);
 
     readableData = outputReadableBuffer->GetReadableData();
-    BOOST_CHECK(readableData != nullptr);
+    CHECK(readableData != nullptr);
 
     offset = 0;
 
     // Verify Header
     VerifyTimelineHeaderBinary(readableData, offset, 156);
-    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD HEADER OK");
+    MESSAGE("OUTPUT WORKLOAD HEADER OK");
 
     // Output workload
     // Output workload entity
     ProfilingGuid outputWorkloadGuid = VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
-    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD ENTITY OK");
+    MESSAGE("OUTPUT WORKLOAD ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -771,11 +770,11 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD TYPE RELATIONSHIP OK");
+    MESSAGE("OUTPUT WORKLOAD TYPE RELATIONSHIP OK");
 
     // BackendId entity
     VerifyTimelineLabelBinaryPacketData(EmptyOptional(), "CpuRef", readableData, offset);
-    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD CPU REF LABEL OK");
+    MESSAGE("OUTPUT WORKLOAD CPU REF LABEL OK");
 
     // Entity - BackendId relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -785,7 +784,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::BACKENDID_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD BACKEND ID RELATIONSHIP OK");
+    MESSAGE("OUTPUT WORKLOAD BACKEND ID RELATIONSHIP OK");
 
     // Output layer - Output workload relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -795,27 +794,27 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("OUTPUT LAYER - OUTPUT WORKLOAD CHILD RELATIONSHIP OK");
+    MESSAGE("OUTPUT LAYER - OUTPUT WORKLOAD CHILD RELATIONSHIP OK");
 
     bufferManager.MarkRead(outputReadableBuffer);
 
     // Validate inference data
     size = inferenceReadableBuffer->GetSize();
-    BOOST_CHECK(size == 976 + 8 * ThreadIdSize);
+    CHECK(size == 976 + 8 * ThreadIdSize);
 
     readableData = inferenceReadableBuffer->GetReadableData();
-    BOOST_CHECK(readableData != nullptr);
+    CHECK(readableData != nullptr);
 
     offset = 0;
 
     // Verify Header
     VerifyTimelineHeaderBinary(readableData, offset, 968 + 8 * ThreadIdSize);
-    BOOST_TEST_MESSAGE("INFERENCE HEADER OK");
+    MESSAGE("INFERENCE HEADER OK");
 
     // Inference timeline trace
     // Inference entity
     ProfilingGuid inferenceGuid = VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
-    BOOST_TEST_MESSAGE("INFERENCE ENTITY OK");
+    MESSAGE("INFERENCE ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -825,7 +824,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INFERENCE TYPE RELATIONSHIP OK");
+    MESSAGE("INFERENCE TYPE RELATIONSHIP OK");
 
     // Network - Inference relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -835,13 +834,13 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NETWORK - INFERENCE EXECUTION_OF RELATIONSHIP OK");
+    MESSAGE("NETWORK - INFERENCE EXECUTION_OF RELATIONSHIP OK");
 
     // Start Inference life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid inferenceEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    BOOST_TEST_MESSAGE("INFERENCE START OF LIFE EVENT OK");
+    MESSAGE("INFERENCE START OF LIFE EVENT OK");
 
     // Inference - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -851,14 +850,14 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INFERENCE START OF LIFE RELATIONSHIP OK");
+    MESSAGE("INFERENCE START OF LIFE RELATIONSHIP OK");
 
     // Execution
     // Input workload execution
     // Input workload execution entity
     ProfilingGuid inputWorkloadExecutionGuid = VerifyTimelineEntityBinaryPacketData(
         EmptyOptional(), readableData, offset);
-    BOOST_TEST_MESSAGE("INPUT WORKLOAD EXECUTION ENTITY OK");
+    MESSAGE("INPUT WORKLOAD EXECUTION ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -868,7 +867,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INPUT WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
+    MESSAGE("INPUT WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
 
     // Inference - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -878,7 +877,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INFERENCE - INPUT WORKLOAD EXECUTION CHILD RELATIONSHIP OK");
+    MESSAGE("INFERENCE - INPUT WORKLOAD EXECUTION CHILD RELATIONSHIP OK");
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -888,7 +887,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INPUT WORKLOAD - INPUT WORKLOAD EXECUTION RELATIONSHIP OK");
+    MESSAGE("INPUT WORKLOAD - INPUT WORKLOAD EXECUTION RELATIONSHIP OK");
 
     // Start Input workload execution life
     // Event packet - timeline, threadId, eventGuid
@@ -903,7 +902,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INPUT WORKLOAD EXECUTION - START OF LIFE EVENT RELATIONSHIP OK");
+    MESSAGE("INPUT WORKLOAD EXECUTION - START OF LIFE EVENT RELATIONSHIP OK");
 
     // End of Input workload execution life
     // Event packet - timeline, threadId, eventGuid
@@ -918,13 +917,13 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INPUT WORKLOAD EXECUTION - END OF LIFE EVENT RELATIONSHIP OK");
+    MESSAGE("INPUT WORKLOAD EXECUTION - END OF LIFE EVENT RELATIONSHIP OK");
 
     // Normalize workload execution
     // Normalize workload execution entity
     ProfilingGuid normalizeWorkloadExecutionGuid = VerifyTimelineEntityBinaryPacketData(
         EmptyOptional(), readableData, offset);
-    BOOST_TEST_MESSAGE("NORMALIZE WORKLOAD EXECUTION ENTITY OK");
+    MESSAGE("NORMALIZE WORKLOAD EXECUTION ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -934,7 +933,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NORMALIZE WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
+    MESSAGE("NORMALIZE WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
 
     // Inference - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -944,7 +943,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INFERENCE - NORMALIZE WORKLOAD EXECUTION CHILD RELATIONSHIP OK");
+    MESSAGE("INFERENCE - NORMALIZE WORKLOAD EXECUTION CHILD RELATIONSHIP OK");
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -954,13 +953,13 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD - NORMALIZATION WORKLOAD EXECUTION RELATIONSHIP OK");
+    MESSAGE("NORMALIZATION WORKLOAD - NORMALIZATION WORKLOAD EXECUTION RELATIONSHIP OK");
 
     // Start Normalize workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid normalizationWorkloadExecutionSOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD EXECUTION START OF LIFE EVENT OK");
+    MESSAGE("NORMALIZATION WORKLOAD EXECUTION START OF LIFE EVENT OK");
 
     // Normalize workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -970,13 +969,13 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD EXECUTION START OF LIFE RELATIONSHIP OK");
+    MESSAGE("NORMALIZATION WORKLOAD EXECUTION START OF LIFE RELATIONSHIP OK");
 
     // End of Normalize workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid normalizationWorkloadExecutionEOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD EXECUTION END OF LIFE EVENT OK");
+    MESSAGE("NORMALIZATION WORKLOAD EXECUTION END OF LIFE EVENT OK");
 
     // Normalize workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -986,13 +985,13 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("NORMALIZATION WORKLOAD EXECUTION END OF LIFE RELATIONSHIP OK");
+    MESSAGE("NORMALIZATION WORKLOAD EXECUTION END OF LIFE RELATIONSHIP OK");
 
     // Output workload execution
     // Output workload execution entity
     ProfilingGuid outputWorkloadExecutionGuid = VerifyTimelineEntityBinaryPacketData(
         EmptyOptional(), readableData, offset);
-    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD EXECUTION ENTITY OK");
+    MESSAGE("OUTPUT WORKLOAD EXECUTION ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -1002,7 +1001,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
+    MESSAGE("OUTPUT WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
 
     // Inference - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -1012,7 +1011,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INFERENCE - OUTPUT WORKLOAD EXECUTION CHILD RELATIONSHIP OK");
+    MESSAGE("INFERENCE - OUTPUT WORKLOAD EXECUTION CHILD RELATIONSHIP OK");
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -1022,13 +1021,13 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
-     BOOST_TEST_MESSAGE("OUTPUT WORKLOAD - OUTPUT WORKLOAD EXECUTION EXECUTION_OF RELATIONSHIP OK");
+    MESSAGE("OUTPUT WORKLOAD - OUTPUT WORKLOAD EXECUTION EXECUTION_OF RELATIONSHIP OK");
 
     // Start Output workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid outputWorkloadExecutionSOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD EXECUTION START OF LIFE EVENT OK");
+    MESSAGE("OUTPUT WORKLOAD EXECUTION START OF LIFE EVENT OK");
 
     // Output workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -1038,13 +1037,13 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD EXECUTION - START OF LIFE EVENT RELATIONSHIP OK");
+    MESSAGE("OUTPUT WORKLOAD EXECUTION - START OF LIFE EVENT RELATIONSHIP OK");
 
     // End of Normalize workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid outputWorkloadExecutionEOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD EXECUTION END OF LIFE EVENT OK");
+    MESSAGE("OUTPUT WORKLOAD EXECUTION END OF LIFE EVENT OK");
 
     // Output workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -1054,13 +1053,13 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("OUTPUT WORKLOAD EXECUTION - END OF LIFE EVENT RELATIONSHIP OK");
+    MESSAGE("OUTPUT WORKLOAD EXECUTION - END OF LIFE EVENT RELATIONSHIP OK");
 
     // End of Inference life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid inferenceEOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    BOOST_TEST_MESSAGE("INFERENCE END OF LIFE EVENT OK");
+    MESSAGE("INFERENCE END OF LIFE EVENT OK");
 
     // Inference - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -1070,14 +1069,14 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    BOOST_TEST_MESSAGE("INFERENCE - END OF LIFE EVENT RELATIONSHIP OK");
+    MESSAGE("INFERENCE - END OF LIFE EVENT RELATIONSHIP OK");
 
     bufferManager.MarkRead(inferenceReadableBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ProfilingPostOptimisationStructureCpuRef)
+TEST_CASE("ProfilingPostOptimisationStructureCpuRef")
 {
     VerifyPostOptimisationStructureTestImpl(armnn::Compute::CpuRef);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

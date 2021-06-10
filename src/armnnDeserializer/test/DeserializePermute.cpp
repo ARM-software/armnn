@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include <armnnDeserializer/IDeserializer.hpp>
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(Deserializer)
-
+TEST_SUITE("Deserializer_Permute")
+{
 struct PermuteFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit PermuteFixture(const std::string &inputShape,
@@ -110,7 +109,7 @@ struct SimplePermute2DFixture : PermuteFixture
                                               "QuantisedAsymm8") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(SimplePermute2DQuantisedAsymm8, SimplePermute2DFixture)
+TEST_CASE_FIXTURE(SimplePermute2DFixture, "SimplePermute2DQuantisedAsymm8")
 {
     RunTest<2, armnn::DataType::QAsymmU8>(0,
                                                  { 1, 2, 3, 4, 5, 6 },
@@ -125,7 +124,7 @@ struct SimplePermute4DFixture : PermuteFixture
                                               "QuantisedAsymm8") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(SimplePermute4DQuantisedAsymm8, SimplePermute4DFixture)
+TEST_CASE_FIXTURE(SimplePermute4DFixture, "SimplePermute4DQuantisedAsymm8")
 {
     RunTest<4, armnn::DataType::QAsymmU8>(0,
                                                  {  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12,
@@ -134,4 +133,4 @@ BOOST_FIXTURE_TEST_CASE(SimplePermute4DQuantisedAsymm8, SimplePermute4DFixture)
                                                     3, 15,  7, 19, 11, 23,  4, 16,  8, 20, 12, 24 });
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

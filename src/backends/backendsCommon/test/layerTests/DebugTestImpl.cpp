@@ -14,6 +14,8 @@
 
 #include <test/TensorHelpers.hpp>
 
+#include <doctest/doctest.h>
+
 namespace
 {
 
@@ -69,7 +71,7 @@ LayerTestResult<T, Dim> DebugTestImpl(
 
     std::cout.rdbuf(coutStreambuf);
 
-    BOOST_TEST(oss.str() == expectedStringOutput);
+    CHECK(oss.str() == expectedStringOutput);
 
     CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 

@@ -4,7 +4,7 @@
 //
 #include "ModelAccuracyChecker.hpp"
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <iostream>
 #include <string>
@@ -50,12 +50,12 @@ struct TestHelper
 };
 }
 
-BOOST_AUTO_TEST_SUITE(ModelAccuracyCheckerTest)
-
+TEST_SUITE("ModelAccuracyCheckerTest")
+{
 using TContainer =
         mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>, std::vector<int8_t>>;
 
-BOOST_FIXTURE_TEST_CASE(TestFloat32OutputTensorAccuracy, TestHelper)
+TEST_CASE_FIXTURE(TestHelper, "TestFloat32OutputTensorAccuracy")
 {
     ModelAccuracyChecker checker(GetValidationLabelSet(), GetModelOutputLabels());
 
@@ -70,7 +70,7 @@ BOOST_FIXTURE_TEST_CASE(TestFloat32OutputTensorAccuracy, TestHelper)
 
     // Top 1 Accuracy
     float totalAccuracy = checker.GetAccuracy(1);
-    BOOST_CHECK(totalAccuracy == 100.0f);
+    CHECK(totalAccuracy == 100.0f);
 
     // Add image 2 and check accuracy
     std::vector<float> inferenceOutputVector2 = {0.10f, 0.0f, 0.0f, 0.0f, 0.05f, 0.70f, 0.0f, 0.0f, 0.0f, 0.15f};
@@ -83,11 +83,11 @@ BOOST_FIXTURE_TEST_CASE(TestFloat32OutputTensorAccuracy, TestHelper)
 
     // Top 1 Accuracy
     totalAccuracy = checker.GetAccuracy(1);
-    BOOST_CHECK(totalAccuracy == 50.0f);
+    CHECK(totalAccuracy == 50.0f);
 
     // Top 2 Accuracy
     totalAccuracy = checker.GetAccuracy(2);
-    BOOST_CHECK(totalAccuracy == 100.0f);
+    CHECK(totalAccuracy == 100.0f);
 
     // Add image 3 and check accuracy
     std::vector<float> inferenceOutputVector3 = {0.0f, 0.10f, 0.0f, 0.0f, 0.05f, 0.70f, 0.0f, 0.0f, 0.0f, 0.15f};
@@ -100,15 +100,15 @@ BOOST_FIXTURE_TEST_CASE(TestFloat32OutputTensorAccuracy, TestHelper)
 
     // Top 1 Accuracy
     totalAccuracy = checker.GetAccuracy(1);
-    BOOST_CHECK(totalAccuracy == 33.3333321f);
+    CHECK(totalAccuracy == 33.3333321f);
 
     // Top 2 Accuracy
     totalAccuracy = checker.GetAccuracy(2);
-    BOOST_CHECK(totalAccuracy == 66.6666641f);
+    CHECK(totalAccuracy == 66.6666641f);
 
     // Top 3 Accuracy
     totalAccuracy = checker.GetAccuracy(3);
-    BOOST_CHECK(totalAccuracy == 100.0f);
+    CHECK(totalAccuracy == 100.0f);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

@@ -3,12 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_TransposeConv")
+{
 struct TransposeConvFixture : public ParserFlatbuffersFixture
 {
     explicit TransposeConvFixture(const std::string& inputShape,
@@ -116,7 +115,7 @@ struct SimpleTransposeConvFixture : TransposeConvFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE( ParseSimpleTransposeConv, SimpleTransposeConvFixture )
+TEST_CASE_FIXTURE(SimpleTransposeConvFixture, "ParseSimpleTransposeConv")
 {
     RunTest<4, armnn::DataType::QAsymmU8>(
         0,
@@ -255,7 +254,7 @@ struct SimpleTransposeConvFixtureWithBias : TransposeConvFixtureWithBias
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE( ParseSimpleTransposeConvWithBias, SimpleTransposeConvFixtureWithBias )
+TEST_CASE_FIXTURE(SimpleTransposeConvFixtureWithBias, "ParseSimpleTransposeConvWithBias")
 {
     RunTest<4, armnn::DataType::QAsymmU8>(
         0,
@@ -571,7 +570,7 @@ struct TransposeConvPerChannelFixture : public ParserFlatbuffersFixture
     }
 };
 
-BOOST_FIXTURE_TEST_CASE( ParseTransposeConvPerChannel, TransposeConvPerChannelFixture )
+TEST_CASE_FIXTURE(TransposeConvPerChannelFixture, "ParseTransposeConvPerChannel")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
         0,
@@ -601,4 +600,4 @@ BOOST_FIXTURE_TEST_CASE( ParseTransposeConvPerChannel, TransposeConvPerChannelFi
         });
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

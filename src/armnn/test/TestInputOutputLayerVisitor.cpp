@@ -5,12 +5,14 @@
 #include "TestInputOutputLayerVisitor.hpp"
 #include "Network.hpp"
 
+#include <doctest/doctest.h>
+
 namespace armnn
 {
 
-BOOST_AUTO_TEST_SUITE(TestInputOutputLayerVisitor)
-
-BOOST_AUTO_TEST_CASE(CheckInputLayerVisitorBindingIdAndName)
+TEST_SUITE("TestInputOutputLayerVisitor")
+{
+TEST_CASE("CheckInputLayerVisitorBindingIdAndName")
 {
     const char* layerName = "InputLayer";
     TestInputLayerVisitor visitor(1, layerName);
@@ -20,7 +22,7 @@ BOOST_AUTO_TEST_CASE(CheckInputLayerVisitorBindingIdAndName)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckInputLayerVisitorBindingIdAndNameNull)
+TEST_CASE("CheckInputLayerVisitorBindingIdAndNameNull")
 {
     TestInputLayerVisitor visitor(1);
     NetworkImpl net;
@@ -29,7 +31,7 @@ BOOST_AUTO_TEST_CASE(CheckInputLayerVisitorBindingIdAndNameNull)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckOutputLayerVisitorBindingIdAndName)
+TEST_CASE("CheckOutputLayerVisitorBindingIdAndName")
 {
     const char* layerName = "OutputLayer";
     TestOutputLayerVisitor visitor(1, layerName);
@@ -39,7 +41,7 @@ BOOST_AUTO_TEST_CASE(CheckOutputLayerVisitorBindingIdAndName)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckOutputLayerVisitorBindingIdAndNameNull)
+TEST_CASE("CheckOutputLayerVisitorBindingIdAndNameNull")
 {
     TestOutputLayerVisitor visitor(1);
     NetworkImpl net;
@@ -48,6 +50,6 @@ BOOST_AUTO_TEST_CASE(CheckOutputLayerVisitorBindingIdAndNameNull)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}
 
 } //namespace armnn

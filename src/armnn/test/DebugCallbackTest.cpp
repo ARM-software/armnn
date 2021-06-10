@@ -9,10 +9,10 @@
 #include <armnn/Types.hpp>
 #include <Runtime.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(DebugCallback)
-
+TEST_SUITE("DebugCallback")
+{
 namespace
 {
 
@@ -39,7 +39,7 @@ INetworkPtr CreateSimpleNetwork()
     return net;
 }
 
-BOOST_AUTO_TEST_CASE(RuntimeRegisterDebugCallback)
+TEST_CASE("RuntimeRegisterDebugCallback")
 {
     INetworkPtr net = CreateSimpleNetwork();
 
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(RuntimeRegisterDebugCallback)
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizerOptions);
 
     NetworkId netId;
-    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
+    CHECK(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
 
     // Set up callback function
     int callCount = 0;
@@ -83,17 +83,17 @@ BOOST_AUTO_TEST_CASE(RuntimeRegisterDebugCallback)
     runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
 
     // Check that the callback was called twice
-    BOOST_TEST(callCount == 2);
+    CHECK(callCount == 2);
 
     // Check that tensor handles passed to callback have correct shapes
     const std::vector<TensorShape> expectedShapes({TensorShape({1, 1, 1, 5}), TensorShape({1, 1, 1, 5})});
-    BOOST_TEST(tensorShapes == expectedShapes);
+    CHECK(tensorShapes == expectedShapes);
 
     // Check that slot indexes passed to callback are correct
     const std::vector<unsigned int> expectedSlotIndexes({0, 0});
-    BOOST_TEST(slotIndexes == expectedSlotIndexes);
+    CHECK(slotIndexes == expectedSlotIndexes);
 }
 
 } // anonymous namespace
 
-BOOST_AUTO_TEST_SUITE_END()
+}

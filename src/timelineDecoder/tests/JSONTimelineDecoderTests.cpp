@@ -8,13 +8,12 @@
 #include <server/include/timelineDecoder/TimelineDecoder.hpp>
 #include <Filesystem.hpp>
 
-#include <boost/test/test_tools.hpp>
-#include <boost/test/unit_test_suite.hpp>
+#include <doctest/doctest.h>
 
 #include <fstream>
 
-BOOST_AUTO_TEST_SUITE(JSONTimelineDecoderTests)
-
+TEST_SUITE("JSONTimelineDecoderTests")
+{
 using namespace armnn;
 using namespace timelinedecoder;
 
@@ -683,103 +682,103 @@ void RunSimpleModelThroughDecoder(JSONTimelineDecoder& timelineDecoder)
     timelineDecoder.CreateRelationship(relationship90);
 }
 
-BOOST_AUTO_TEST_CASE(JSONTimelineDecoderTestStructure)
+TEST_CASE("JSONTimelineDecoderTestStructure")
 {
     JSONTimelineDecoder timelineDecoder;
     RunSimpleModelThroughDecoder(timelineDecoder);
 
     JSONTimelineDecoder::Model model = timelineDecoder.GetModel();
-    BOOST_CHECK(model.jsonEntities.size() == 20);
+    CHECK(model.jsonEntities.size() == 20);
     JSONTimelineDecoder::JSONEntity rootEntity = model.jsonEntities.at(6);
-    BOOST_CHECK(rootEntity.childEntities.size() == 4);
+    CHECK(rootEntity.childEntities.size() == 4);
 
     // Testing input layer model
     JSONTimelineDecoder::JSONEntity entity0 = model.jsonEntities.at(rootEntity.childEntities[0]);
-    BOOST_CHECK(entity0.GetName() == "input");
-    BOOST_CHECK(entity0.GetType() == "layer");
+    CHECK(entity0.GetName() == "input");
+    CHECK(entity0.GetType() == "layer");
 
-    BOOST_CHECK(entity0.childEntities.size() == 1);
+    CHECK(entity0.childEntities.size() == 1);
     JSONTimelineDecoder::JSONEntity input_workload_entity = model.jsonEntities.at(entity0.childEntities[0]);
-    BOOST_CHECK(input_workload_entity.childEntities.size() == 1);
-    BOOST_CHECK(input_workload_entity.GetType() == "workload");
-    BOOST_CHECK(input_workload_entity.extendedData.at("backendId") == "CpuRef");
+    CHECK(input_workload_entity.childEntities.size() == 1);
+    CHECK(input_workload_entity.GetType() == "workload");
+    CHECK(input_workload_entity.extendedData.at("backendId") == "CpuRef");
 
     JSONTimelineDecoder::JSONEntity input_workload_execution_entity = model.jsonEntities
             .at(input_workload_entity.childEntities[0]);
-    BOOST_CHECK(input_workload_execution_entity.childEntities.size() == 2);
-    BOOST_CHECK(input_workload_execution_entity.GetType() == "workload_execution");
+    CHECK(input_workload_execution_entity.childEntities.size() == 2);
+    CHECK(input_workload_execution_entity.GetType() == "workload_execution");
 
     JSONTimelineDecoder::JSONEntity input_workload_execution_event0 = model.jsonEntities
             .at(input_workload_execution_entity.childEntities[0]);
-    BOOST_CHECK(input_workload_execution_event0.GetType() == "Event");
-    BOOST_CHECK(input_workload_execution_event0.childEntities.size() == 0);
-    BOOST_CHECK(model.events.at(input_workload_execution_event0.GetGuid()).m_ThreadId > uint64_t(0));
-    BOOST_CHECK(model.events.at(input_workload_execution_event0.GetGuid()).m_TimeStamp > uint64_t(0));
+    CHECK(input_workload_execution_event0.GetType() == "Event");
+    CHECK(input_workload_execution_event0.childEntities.size() == 0);
+    CHECK(model.events.at(input_workload_execution_event0.GetGuid()).m_ThreadId > uint64_t(0));
+    CHECK(model.events.at(input_workload_execution_event0.GetGuid()).m_TimeStamp > uint64_t(0));
 
     JSONTimelineDecoder::JSONEntity input_workload_execution_event1 = model.jsonEntities
             .at(input_workload_execution_entity.childEntities[1]);
-    BOOST_CHECK(input_workload_execution_event0.GetType() == "Event");
-    BOOST_CHECK(input_workload_execution_event1.childEntities.size() == 0);
-    BOOST_CHECK(model.events.at(input_workload_execution_event1.GetGuid()).m_ThreadId > uint64_t(0));
-    BOOST_CHECK(model.events.at(input_workload_execution_event1.GetGuid()).m_TimeStamp > uint64_t(0));
+    CHECK(input_workload_execution_event0.GetType() == "Event");
+    CHECK(input_workload_execution_event1.childEntities.size() == 0);
+    CHECK(model.events.at(input_workload_execution_event1.GetGuid()).m_ThreadId > uint64_t(0));
+    CHECK(model.events.at(input_workload_execution_event1.GetGuid()).m_TimeStamp > uint64_t(0));
 
     // Testing normalization layer model
     JSONTimelineDecoder::JSONEntity entity1 = model.jsonEntities.at(rootEntity.childEntities[1]);
-    BOOST_CHECK(entity1.GetName() == "normalization");
-    BOOST_CHECK(entity1.GetType() == "layer");
+    CHECK(entity1.GetName() == "normalization");
+    CHECK(entity1.GetType() == "layer");
 
     JSONTimelineDecoder::JSONEntity normalization_workload_entity = model.jsonEntities
             .at(entity1.childEntities[0]);
-    BOOST_CHECK(normalization_workload_entity.GetType() == "workload");
-    BOOST_CHECK(normalization_workload_entity.extendedData.at("backendId") == "CpuRef");
+    CHECK(normalization_workload_entity.GetType() == "workload");
+    CHECK(normalization_workload_entity.extendedData.at("backendId") == "CpuRef");
 
     JSONTimelineDecoder::JSONEntity normalization_workload_execution_entity = model.jsonEntities
             .at(normalization_workload_entity.childEntities[0]);
-    BOOST_CHECK(normalization_workload_execution_entity.GetType() == "workload_execution");
+    CHECK(normalization_workload_execution_entity.GetType() == "workload_execution");
 
     JSONTimelineDecoder::JSONEntity normalization_workload_execution_event0 = model.jsonEntities
             .at(normalization_workload_execution_entity.childEntities[0]);
-    BOOST_CHECK(normalization_workload_execution_event0.GetType() == "Event");
-    BOOST_CHECK(model.events.at(normalization_workload_execution_event0.GetGuid()).m_ThreadId > uint64_t(0));
-    BOOST_CHECK(model.events.at(normalization_workload_execution_event0.GetGuid()).m_TimeStamp > uint64_t(0));
+    CHECK(normalization_workload_execution_event0.GetType() == "Event");
+    CHECK(model.events.at(normalization_workload_execution_event0.GetGuid()).m_ThreadId > uint64_t(0));
+    CHECK(model.events.at(normalization_workload_execution_event0.GetGuid()).m_TimeStamp > uint64_t(0));
 
     JSONTimelineDecoder::JSONEntity normalization_workload_execution_event1 = model.jsonEntities
             .at(normalization_workload_execution_entity.childEntities[1]);
-    BOOST_CHECK(normalization_workload_execution_event1.GetType() == "Event");
-    BOOST_CHECK(model.events.at(normalization_workload_execution_event1.GetGuid()).m_ThreadId > uint64_t(0));
-    BOOST_CHECK(model.events.at(normalization_workload_execution_event1.GetGuid()).m_TimeStamp > uint64_t(0));
+    CHECK(normalization_workload_execution_event1.GetType() == "Event");
+    CHECK(model.events.at(normalization_workload_execution_event1.GetGuid()).m_ThreadId > uint64_t(0));
+    CHECK(model.events.at(normalization_workload_execution_event1.GetGuid()).m_TimeStamp > uint64_t(0));
 
     // Testing output layer model
     JSONTimelineDecoder::JSONEntity entity2 = model.jsonEntities.at(rootEntity.childEntities[2]);
-    BOOST_CHECK(entity2.GetName() == "output");
-    BOOST_CHECK(entity2.GetType() == "layer");
+    CHECK(entity2.GetName() == "output");
+    CHECK(entity2.GetType() == "layer");
 
     JSONTimelineDecoder::JSONEntity output_workload_entity = model.jsonEntities.at(entity2.childEntities[0]);
-    BOOST_CHECK(output_workload_entity.GetType() == "workload");
-    BOOST_CHECK(output_workload_entity.extendedData.at("backendId") == "CpuRef");
+    CHECK(output_workload_entity.GetType() == "workload");
+    CHECK(output_workload_entity.extendedData.at("backendId") == "CpuRef");
 
     JSONTimelineDecoder::JSONEntity output_workload_execution_entity = model.jsonEntities
             .at(output_workload_entity.childEntities[0]);
-    BOOST_CHECK(output_workload_execution_entity.GetType() == "workload_execution");
+    CHECK(output_workload_execution_entity.GetType() == "workload_execution");
 
     JSONTimelineDecoder::JSONEntity output_workload_execution_event0 = model.jsonEntities
             .at(output_workload_execution_entity.childEntities[0]);
-    BOOST_CHECK(output_workload_execution_event0.GetType() == "Event");
-    BOOST_CHECK(model.events.at(output_workload_execution_event0.GetGuid()).m_ThreadId > uint64_t(0));
-    BOOST_CHECK(model.events.at(output_workload_execution_event0.GetGuid()).m_TimeStamp > uint64_t(0));
+    CHECK(output_workload_execution_event0.GetType() == "Event");
+    CHECK(model.events.at(output_workload_execution_event0.GetGuid()).m_ThreadId > uint64_t(0));
+    CHECK(model.events.at(output_workload_execution_event0.GetGuid()).m_TimeStamp > uint64_t(0));
 
     JSONTimelineDecoder::JSONEntity output_workload_execution_event1 = model.jsonEntities
             .at(output_workload_execution_entity.childEntities[1]);
-    BOOST_CHECK(output_workload_execution_event1.GetType() == "Event");
-    BOOST_CHECK(model.events.at(output_workload_execution_event1.GetGuid()).m_ThreadId > uint64_t(0));
-    BOOST_CHECK(model.events.at(output_workload_execution_event1.GetGuid()).m_TimeStamp > uint64_t(0));
+    CHECK(output_workload_execution_event1.GetType() == "Event");
+    CHECK(model.events.at(output_workload_execution_event1.GetGuid()).m_ThreadId > uint64_t(0));
+    CHECK(model.events.at(output_workload_execution_event1.GetGuid()).m_TimeStamp > uint64_t(0));
 
     JSONTimelineDecoder::JSONEntity entity48 =  model.jsonEntities.at(rootEntity.childEntities[3]);
-    BOOST_CHECK(entity48.GetName() == "");
-    BOOST_CHECK(entity48.GetType() == "inference");
+    CHECK(entity48.GetName() == "");
+    CHECK(entity48.GetType() == "inference");
 }
 
-BOOST_AUTO_TEST_CASE(JSONTimelineDecoderTestJSON)
+TEST_CASE("JSONTimelineDecoderTestJSON")
 {
     JSONTimelineDecoder timelineDecoder;
     RunSimpleModelThroughDecoder(timelineDecoder);
@@ -788,12 +787,12 @@ BOOST_AUTO_TEST_CASE(JSONTimelineDecoderTestJSON)
     JSONTimelineDecoder::JSONEntity rootEntity = model.jsonEntities.at(6);
 
     std::string jsonString = timelineDecoder.GetJSONString(rootEntity);
-    BOOST_CHECK(jsonString != "");
-    BOOST_CHECK(jsonString.find("input_0: {")!=std::string::npos);
-    BOOST_CHECK(jsonString.find("type: Measurement,\n"
+    CHECK(jsonString != "");
+    CHECK(jsonString.find("input_0: {")!=std::string::npos);
+    CHECK(jsonString.find("type: Measurement,\n"
                                    "\t\t\tbackendId :CpuRef,")!=std::string::npos);
-    BOOST_CHECK(jsonString.find("normalization_2: {")!=std::string::npos);
-    BOOST_CHECK(jsonString.find("output_4: {")!=std::string::npos);
+    CHECK(jsonString.find("normalization_2: {")!=std::string::npos);
+    CHECK(jsonString.find("output_4: {")!=std::string::npos);
 
     // Create a temporary file to write Json output to
     fs::path tempFile = armnnUtils::Filesystem::NamedTempFile("JSONTimelineDecoderTestJSON.json");
@@ -814,14 +813,14 @@ BOOST_AUTO_TEST_CASE(JSONTimelineDecoderTestJSON)
     inFile.close();
     std::string outfileJson = strStream.str();
 
-    BOOST_CHECK(outfileJson != "");
-    BOOST_CHECK(outfileJson.find("input_0: {")!=std::string::npos);
-    BOOST_CHECK(outfileJson.find("type: Measurement,\n"
+    CHECK(outfileJson != "");
+    CHECK(outfileJson.find("input_0: {")!=std::string::npos);
+    CHECK(outfileJson.find("type: Measurement,\n"
                                 "\t\t\tbackendId :CpuRef,")!=std::string::npos);
-    BOOST_CHECK(outfileJson.find("normalization_2: {")!=std::string::npos);
-    BOOST_CHECK(outfileJson.find("output_4: {")!=std::string::npos);
+    CHECK(outfileJson.find("normalization_2: {")!=std::string::npos);
+    CHECK(outfileJson.find("output_4: {")!=std::string::npos);
 
     // Remove temporary file
     fs::remove(tempFile);
 }
-BOOST_AUTO_TEST_SUITE_END()
+}

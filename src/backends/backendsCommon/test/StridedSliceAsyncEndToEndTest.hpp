@@ -14,7 +14,7 @@
 #include <AsyncExecutionCallback.hpp>
 #include <backendsCommon/test/CommonTestUtils.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <vector>
 
@@ -109,7 +109,7 @@ void AsyncThreadedEndToEndTestImpl(INetworkPtr network,
             std::vector<TOutput> out = outputStorageVec[i].at(it.first);
             for (unsigned int j = 0; j < out.size(); ++j)
             {
-                BOOST_CHECK(Compare<ArmnnOType>(it.second[j], out[j], tolerance) == true);
+                CHECK(Compare<ArmnnOType>(it.second[j], out[j], tolerance) == true);
             }
         }
     }
@@ -197,7 +197,7 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
             cb->Wait();
             
             // Checks the results.
-            BOOST_CHECK(cb->GetStatus() == Status::Success);
+            CHECK(cb->GetStatus() == Status::Success);
         }
     }
 
@@ -207,7 +207,7 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
 
         for (unsigned int i = 0; i < out.size(); ++i)
         {
-            BOOST_CHECK(Compare<ArmnnOType>(it.second[i], out[i], tolerance) == true);
+            CHECK(Compare<ArmnnOType>(it.second[i], out[i], tolerance) == true);
         }
     }
 }
@@ -282,8 +282,7 @@ void StridedSlicedEndToEndTest(const std::vector<BackendId>& backends, size_t nu
                                                            ellipsisMask,
                                                            newAxisMask);
 
-    BOOST_TEST_CHECKPOINT("create a network");
-
+    CHECK(net);
     // Creates structures for input & output.
     std::vector<T> inputData{
             1.0f, 1.0f, 1.0f, 2.0f, 2.0f, 2.0f,
@@ -337,7 +336,7 @@ void StridedSlicedMultiThreadedEndToEndTest(const std::vector<BackendId>& backen
                                                            ellipsisMask,
                                                            newAxisMask);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     // Creates structures for input & output.
     std::vector<T> inputData1{

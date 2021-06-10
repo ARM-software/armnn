@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include <armnnDeserializer/IDeserializer.hpp>
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(Deserializer)
-
+TEST_SUITE("Deserializer_Division")
+{
 struct DivisionFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit DivisionFixture(const std::string & inputShape1,
@@ -138,7 +137,7 @@ struct SimpleDivisionFixture2 : DivisionFixture
                                                "Float32") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(DivisionQuantisedAsymm8, SimpleDivisionFixture)
+TEST_CASE_FIXTURE(SimpleDivisionFixture, "DivisionQuantisedAsymm8")
 {
     RunTest<2, armnn::DataType::QAsymmU8>(
         0,
@@ -147,7 +146,7 @@ BOOST_FIXTURE_TEST_CASE(DivisionQuantisedAsymm8, SimpleDivisionFixture)
         {{"OutputLayer", { 0, 5, 3,  3 }}});
 }
 
-BOOST_FIXTURE_TEST_CASE(DivisionFloat32, SimpleDivisionFixture2)
+TEST_CASE_FIXTURE(SimpleDivisionFixture2, "DivisionFloat32")
 {
     RunTest<4, armnn::DataType::Float32>(
         0,
@@ -156,4 +155,4 @@ BOOST_FIXTURE_TEST_CASE(DivisionFloat32, SimpleDivisionFixture2)
         {{"OutputLayer", { 20,  5,  226, 3 }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

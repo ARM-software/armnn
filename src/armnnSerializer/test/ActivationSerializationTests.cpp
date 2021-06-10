@@ -11,12 +11,12 @@
 #include <armnnDeserializer/IDeserializer.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <sstream>
 
-BOOST_AUTO_TEST_SUITE(SerializerTests)
-
+TEST_SUITE("SerializerTests")
+{
 class VerifyActivationName : public armnn::IStrategy
 {
 public:
@@ -29,12 +29,12 @@ public:
         IgnoreUnused(layer, descriptor, constants, id);
         if (layer->GetType() == armnn::LayerType::Activation)
         {
-            BOOST_TEST(name == "activation");
+            CHECK(std::string(name) == "activation");
         }
     }
 };
 
-BOOST_AUTO_TEST_CASE(ActivationSerialization)
+TEST_CASE("ActivationSerialization")
 {
     armnnDeserializer::IDeserializerPtr parser = armnnDeserializer::IDeserializer::Create();
 
@@ -97,8 +97,7 @@ BOOST_AUTO_TEST_CASE(ActivationSerialization)
         {0, armnn::Tensor(run->GetOutputTensorInfo(networkIdentifier, 0), outputData.data())}
     };
     run->EnqueueWorkload(networkIdentifier, inputTensors, outputTensors);
-    BOOST_CHECK_EQUAL_COLLECTIONS(outputData.begin(), outputData.end(),
-    expectedOutputData.begin(), expectedOutputData.end());
+    CHECK(std::equal(outputData.begin(), outputData.end(), expectedOutputData.begin(), expectedOutputData.end()));
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

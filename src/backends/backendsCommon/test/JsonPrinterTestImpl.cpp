@@ -12,11 +12,12 @@
 #include <armnn/IRuntime.hpp>
 #include <armnn/INetwork.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <sstream>
 #include <stack>
 #include <string>
+#include <algorithm>
 
 inline bool AreMatchingPair(const char opening, const char closing)
 {
@@ -67,7 +68,7 @@ std::vector<double> ExtractMeasurements(const std::string& exp)
             }
             catch (std::invalid_argument const&)
             {
-                BOOST_FAIL("Could not convert measurements to double: " + numberString);
+                FAIL("Could not convert measurements to double: " + numberString);
             }
 
             numberString.clear();
@@ -82,7 +83,7 @@ std::vector<double> ExtractMeasurements(const std::string& exp)
             }
             catch (std::invalid_argument const&)
             {
-                BOOST_FAIL("Could not convert measurements to double: " + numberString);
+                FAIL("Could not convert measurements to double: " + numberString);
             }
             numberString.clear();
         }
@@ -120,7 +121,7 @@ std::string GetSoftmaxProfilerJson(const std::vector<armnn::BackendId>& backends
 {
     using namespace armnn;
 
-    BOOST_CHECK(!backends.empty());
+    CHECK(!backends.empty());
 
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
 
@@ -160,12 +161,12 @@ std::string GetSoftmaxProfilerJson(const std::vector<armnn::BackendId>& backends
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
     if(!optNet)
     {
-        BOOST_FAIL("Error occurred during Optimization, Optimize() returned nullptr.");
+        FAIL("Error occurred during Optimization, Optimize() returned nullptr.");
     }
     // load it into the runtime
     NetworkId netId;
     auto error = runtime->LoadNetwork(netId, std::move(optNet));
-    BOOST_TEST(error == Status::Success);
+    CHECK(error == Status::Success);
 
     // create structures for input & output
     std::vector<uint8_t> inputData
@@ -202,7 +203,7 @@ inline void ValidateProfilerJson(std::string& result)
 {
     // ensure all measurements are greater than zero
     std::vector<double> measurementsVector = ExtractMeasurements(result);
-    BOOST_CHECK(!measurementsVector.empty());
+    CHECK(!measurementsVector.empty());
 
     // check sections contain raw and unit tags
     // first ensure Parenthesis are balanced
@@ -219,12 +220,12 @@ inline void ValidateProfilerJson(std::string& result)
                 sectionVector.erase(sectionVector.begin() + static_cast<int>(i));
             }
         }
-        BOOST_CHECK(!sectionVector.empty());
+        CHECK(!sectionVector.empty());
 
-        BOOST_CHECK(std::all_of(sectionVector.begin(), sectionVector.end(),
+        CHECK(std::all_of(sectionVector.begin(), sectionVector.end(),
                                 [](std::string i) { return (i.find("\"raw\":") != std::string::npos); }));
 
-        BOOST_CHECK(std::all_of(sectionVector.begin(), sectionVector.end(),
+        CHECK(std::all_of(sectionVector.begin(), sectionVector.end(),
                                 [](std::string i) { return (i.find("\"unit\":") != std::string::npos); }));
     }
 
@@ -235,11 +236,11 @@ inline void ValidateProfilerJson(std::string& result)
     result.erase(std::remove_if (result.begin(),result.end(),
                                  [](char c) { return c == '\t'; }), result.end());
 
-    BOOST_CHECK(result.find("ArmNN") != std::string::npos);
-    BOOST_CHECK(result.find("inference_measurements") != std::string::npos);
+    CHECK(result.find("ArmNN") != std::string::npos);
+    CHECK(result.find("inference_measurements") != std::string::npos);
 
     // ensure no spare parenthesis present in print output
-    BOOST_CHECK(AreParenthesesMatching(result));
+    CHECK(AreParenthesesMatching(result));
 }
 
 void RunSoftmaxProfilerJsonPrinterTest(const std::vector<armnn::BackendId>& backends)
@@ -253,11 +254,11 @@ void RunSoftmaxProfilerJsonPrinterTest(const std::vector<armnn::BackendId>& back
     const armnn::BackendId& firstBackend = backends.at(0);
     if (firstBackend == armnn::Compute::GpuAcc)
     {
-        BOOST_CHECK(result.find("OpenClKernelTimer/: softmax_layer_max_shift_exp_sum_quantized_serial GWS[,,]")
+        CHECK(result.find("OpenClKernelTimer/: softmax_layer_max_shift_exp_sum_quantized_serial GWS[,,]")
                     != std::string::npos);
     }
     else if (firstBackend == armnn::Compute::CpuAcc)
     {
-        BOOST_CHECK(result.find("NeonKernelTimer/: CpuLogitsDLogSoftmaxKernel_#") != std::string::npos);
+        CHECK(result.find("NeonKernelTimer/: CpuLogitsDLogSoftmaxKernel_#") != std::string::npos);
     }
 }

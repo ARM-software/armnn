@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_FullyConnected")
+{
 struct FullyConnectedFixture : public ParserFlatbuffersFixture
 {
     explicit FullyConnectedFixture(const std::string& inputShape,
@@ -122,7 +121,7 @@ struct FullyConnectedWithNoBiasFixture : FullyConnectedFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(FullyConnectedWithNoBias, FullyConnectedWithNoBiasFixture)
+TEST_CASE_FIXTURE(FullyConnectedWithNoBiasFixture, "FullyConnectedWithNoBias")
 {
     RunTest<2, armnn::DataType::QAsymmU8>(
         0,
@@ -142,7 +141,7 @@ struct FullyConnectedWithBiasFixture : FullyConnectedFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseFullyConnectedWithBias, FullyConnectedWithBiasFixture)
+TEST_CASE_FIXTURE(FullyConnectedWithBiasFixture, "ParseFullyConnectedWithBias")
 {
     RunTest<2, armnn::DataType::QAsymmU8>(
         0,
@@ -162,7 +161,7 @@ struct FullyConnectedWithBiasMultipleOutputsFixture : FullyConnectedFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(FullyConnectedWithBiasMultipleOutputs, FullyConnectedWithBiasMultipleOutputsFixture)
+TEST_CASE_FIXTURE(FullyConnectedWithBiasMultipleOutputsFixture, "FullyConnectedWithBiasMultipleOutputs")
 {
     RunTest<2, armnn::DataType::QAsymmU8>(
             0,
@@ -182,9 +181,8 @@ struct DynamicFullyConnectedWithBiasMultipleOutputsFixture : FullyConnectedFixtu
     { }
 };
 
-BOOST_FIXTURE_TEST_CASE(
-    DynamicFullyConnectedWithBiasMultipleOutputs,
-    DynamicFullyConnectedWithBiasMultipleOutputsFixture)
+TEST_CASE_FIXTURE(
+    DynamicFullyConnectedWithBiasMultipleOutputsFixture, "DynamicFullyConnectedWithBiasMultipleOutputs")
 {
     RunTest<2,
             armnn::DataType::QAsymmU8,
@@ -327,7 +325,7 @@ struct FullyConnectedNonConstWeights : FullyConnectedNonConstWeightsFixture
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseFullyConnectedNonConstWeights, FullyConnectedNonConstWeights)
+TEST_CASE_FIXTURE(FullyConnectedNonConstWeights, "ParseFullyConnectedNonConstWeights")
 {
     RunTest<2, armnn::DataType::QAsymmS8,
             armnn::DataType::Signed32,
@@ -348,7 +346,7 @@ struct FullyConnectedNonConstWeightsNoBias : FullyConnectedNonConstWeightsFixtur
     {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseFullyConnectedNonConstWeightsNoBias, FullyConnectedNonConstWeightsNoBias)
+TEST_CASE_FIXTURE(FullyConnectedNonConstWeightsNoBias, "ParseFullyConnectedNonConstWeightsNoBias")
 {
     RunTest<2, armnn::DataType::QAsymmS8,
             armnn::DataType::QAsymmS8>(
@@ -357,4 +355,4 @@ BOOST_FIXTURE_TEST_CASE(ParseFullyConnectedNonConstWeightsNoBias, FullyConnected
             {{"output", { 20 }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

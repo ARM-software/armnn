@@ -8,11 +8,12 @@
 
 #include <Optimizer.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 using namespace armnn;
 
-BOOST_AUTO_TEST_SUITE(Optimizer)
+TEST_SUITE("Optimizer")
+{
 using namespace optimizations;
 
 void AddBroadcastReshapeLayerOptimizerTest(const TensorInfo& info0,
@@ -36,7 +37,7 @@ void AddBroadcastReshapeLayerOptimizerTest(const TensorInfo& info0,
     input1->GetOutputSlot().Connect(add->GetInputSlot(1));
     add->GetOutputSlot().Connect(output->GetInputSlot(0));
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<AdditionLayer>,
@@ -46,7 +47,7 @@ void AddBroadcastReshapeLayerOptimizerTest(const TensorInfo& info0,
     armnn::Optimizer::Pass(graph, MakeOptimizations(AddBroadcastReshapeLayer()));
 
     // Broadcast reshape layer has been added to the graph correctly
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<ReshapeLayer>,
@@ -54,15 +55,15 @@ void AddBroadcastReshapeLayerOptimizerTest(const TensorInfo& info0,
                              &IsLayerOfType<OutputLayer>));
 
     Layer* const reshapeLayer = GetFirstLayerWithName(graph, reshapeLayerName);
-    BOOST_TEST(reshapeLayer);
+    CHECK(reshapeLayer);
     auto addedReshapeTensorInfo = reshapeLayer->GetOutputSlot().GetTensorInfo();
 
     // Tensorshape and the data type are correct
-    BOOST_TEST((addedReshapeTensorInfo.GetShape() == expectedReshapeShape));
-    BOOST_TEST((addedReshapeTensorInfo.GetDataType() == expectedDataType));
+    CHECK((addedReshapeTensorInfo.GetShape() == expectedReshapeShape));
+    CHECK((addedReshapeTensorInfo.GetDataType() == expectedDataType));
 }
 
-BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayerSimpleTest)
+TEST_CASE("AddBroadcastReshapeLayerSimpleTest")
 {
     const TensorInfo info0({ 1, 2, 3, 5 }, DataType::Float32);
     const TensorInfo info1({ 1 }, DataType::Float32);
@@ -71,7 +72,7 @@ BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayerSimpleTest)
                                           DataType::Float32);
 }
 
-BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayer1DTest)
+TEST_CASE("AddBroadcastReshapeLayer1DTest")
 {
     const TensorInfo info0({ 1, 2, 3, 5 }, DataType::Float32);
     const TensorInfo info1({ 5 }, DataType::Float32);
@@ -81,7 +82,7 @@ BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayer1DTest)
                                           DataType::Float32);
 }
 
-BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayer2DTest)
+TEST_CASE("AddBroadcastReshapeLayer2DTest")
 {
     const TensorInfo info0({ 1, 2, 3, 5 }, DataType::Float32);
     const TensorInfo info1({ 3, 5 }, DataType::Float32);
@@ -91,7 +92,7 @@ BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayer2DTest)
                                           DataType::Float32);
 }
 
-BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayer3DTest)
+TEST_CASE("AddBroadcastReshapeLayer3DTest")
 {
     const TensorInfo info0({ 2, 1, 1, 1 }, DataType::Float32);
     const TensorInfo info1({ 3, 4, 5 }, DataType::Float32);
@@ -101,7 +102,7 @@ BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayer3DTest)
                                           DataType::Float32);
 }
 
-BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayer3DMergedTest)
+TEST_CASE("AddBroadcastReshapeLayer3DMergedTest")
 {
     const TensorInfo info0({ 2, 3, 1, 1 }, DataType::Float32);
     const TensorInfo info1({ 3, 4, 5 }, DataType::Float32);
@@ -111,7 +112,7 @@ BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayer3DMergedTest)
                                           DataType::Float32);
 }
 
-BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayerSubtractionTest)
+TEST_CASE("AddBroadcastReshapeLayerSubtractionTest")
 {
     Graph graph;
     const TensorInfo info0({ 5 }, DataType::Float32);
@@ -130,7 +131,7 @@ BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayerSubtractionTest)
     input1->GetOutputSlot().Connect(sub->GetInputSlot(1));
     sub->GetOutputSlot().Connect(output->GetInputSlot(0));
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<SubtractionLayer>,
@@ -140,7 +141,7 @@ BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayerSubtractionTest)
     armnn::Optimizer::Pass(graph, MakeOptimizations(AddBroadcastReshapeLayer()));
 
     // Broadcast reshape layer has been added to the graph correctly
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<ReshapeLayer>,
@@ -148,15 +149,15 @@ BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayerSubtractionTest)
                              &IsLayerOfType<OutputLayer>));
 
     Layer* const reshapeLayer = GetFirstLayerWithName(graph, "Reshape_for:sub-0");
-    BOOST_TEST(reshapeLayer);
+    CHECK(reshapeLayer);
     auto addedReshapeTensorInfo = reshapeLayer->GetOutputSlot().GetTensorInfo();
 
     // Tensorshape and the data type are correct
-    BOOST_TEST((addedReshapeTensorInfo.GetShape() == TensorShape({ 1, 1, 1, 5 })));
-    BOOST_TEST((addedReshapeTensorInfo.GetDataType() == DataType::Float32));
+    CHECK((addedReshapeTensorInfo.GetShape() == TensorShape({ 1, 1, 1, 5 })));
+    CHECK((addedReshapeTensorInfo.GetDataType() == DataType::Float32));
 }
 
-BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayerDivisionTest)
+TEST_CASE("AddBroadcastReshapeLayerDivisionTest")
 {
     Graph graph;
     const TensorInfo info0({ 1, 4, 5 }, DataType::QAsymmS8);
@@ -175,7 +176,7 @@ BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayerDivisionTest)
     input1->GetOutputSlot().Connect(div->GetInputSlot(1));
     div->GetOutputSlot().Connect(output->GetInputSlot(0));
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<DivisionLayer>,
@@ -185,7 +186,7 @@ BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayerDivisionTest)
     armnn::Optimizer::Pass(graph, MakeOptimizations(AddBroadcastReshapeLayer()));
 
     // Broadcast reshape layer has been added to the graph correctly
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<ReshapeLayer>,
@@ -193,15 +194,15 @@ BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayerDivisionTest)
                              &IsLayerOfType<OutputLayer>));
 
     Layer* const reshapeLayer = GetFirstLayerWithName(graph, "Reshape_for:div-0");
-    BOOST_TEST(reshapeLayer);
+    CHECK(reshapeLayer);
     auto addedReshapeTensorInfo = reshapeLayer->GetOutputSlot().GetTensorInfo();
 
     // Tensorshape and the data type are correct
-    BOOST_TEST((addedReshapeTensorInfo.GetShape() == TensorShape({ 1, 1, 4, 5 })));
-    BOOST_TEST((addedReshapeTensorInfo.GetDataType() == DataType::QAsymmS8));
+    CHECK((addedReshapeTensorInfo.GetShape() == TensorShape({ 1, 1, 4, 5 })));
+    CHECK((addedReshapeTensorInfo.GetDataType() == DataType::QAsymmS8));
 }
 
-BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayerMultiplicationTest)
+TEST_CASE("AddBroadcastReshapeLayerMultiplicationTest")
 {
     Graph graph;
     const TensorInfo info0({ 3, 5 }, DataType::QAsymmU8);
@@ -220,7 +221,7 @@ BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayerMultiplicationTest)
     input1->GetOutputSlot().Connect(mul->GetInputSlot(1));
     mul->GetOutputSlot().Connect(output->GetInputSlot(0));
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<MultiplicationLayer>,
@@ -230,7 +231,7 @@ BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayerMultiplicationTest)
     armnn::Optimizer::Pass(graph, MakeOptimizations(AddBroadcastReshapeLayer()));
 
     // Broadcast reshape layer has been added to the graph correctly
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<ReshapeLayer>,
@@ -238,15 +239,15 @@ BOOST_AUTO_TEST_CASE(AddBroadcastReshapeLayerMultiplicationTest)
                              &IsLayerOfType<OutputLayer>));
 
     Layer* const reshapeLayer = GetFirstLayerWithName(graph, "Reshape_for:mul-0");
-    BOOST_TEST(reshapeLayer);
+    CHECK(reshapeLayer);
     auto addedReshapeTensorInfo = reshapeLayer->GetOutputSlot().GetTensorInfo();
 
     // Tensorshape and the data type are correct
-    BOOST_TEST((addedReshapeTensorInfo.GetShape() == TensorShape({ 1, 1, 3, 5 })));
-    BOOST_TEST((addedReshapeTensorInfo.GetDataType() == DataType::QAsymmU8));
+    CHECK((addedReshapeTensorInfo.GetShape() == TensorShape({ 1, 1, 3, 5 })));
+    CHECK((addedReshapeTensorInfo.GetDataType() == DataType::QAsymmU8));
 }
 
-BOOST_AUTO_TEST_CASE(AddNoBroadcastReshapeLayerTest)
+TEST_CASE("AddNoBroadcastReshapeLayerTest")
 {
     Graph graph;
     const TensorInfo info0({ 1, 1, 1, 1 }, DataType::QAsymmU8);
@@ -265,7 +266,7 @@ BOOST_AUTO_TEST_CASE(AddNoBroadcastReshapeLayerTest)
     input1->GetOutputSlot().Connect(mul->GetInputSlot(1));
     mul->GetOutputSlot().Connect(output->GetInputSlot(0));
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<MultiplicationLayer>,
@@ -275,17 +276,17 @@ BOOST_AUTO_TEST_CASE(AddNoBroadcastReshapeLayerTest)
     armnn::Optimizer::Pass(graph, MakeOptimizations(AddBroadcastReshapeLayer()));
 
     // Broadcast reshape layer has not been added to the graph
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<MultiplicationLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     Layer* const reshapeLayer = GetFirstLayerWithName(graph, "Reshape_for:mul-0");
-    BOOST_TEST(!reshapeLayer);
+    CHECK(!reshapeLayer);
 }
 
-BOOST_AUTO_TEST_CASE(ReshapeParentConstLayerTest)
+TEST_CASE("ReshapeParentConstLayerTest")
 {
     Graph graph;
     const TensorInfo info0({ 1, 2, 3, 5 }, DataType::QAsymmU8);
@@ -309,7 +310,7 @@ BOOST_AUTO_TEST_CASE(ReshapeParentConstLayerTest)
     constant->GetOutputSlot().Connect(mul->GetInputSlot(1));
     mul->GetOutputSlot().Connect(output->GetInputSlot(0));
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<ConstantLayer>,
                              &IsLayerOfType<MultiplicationLayer>,
@@ -319,22 +320,22 @@ BOOST_AUTO_TEST_CASE(ReshapeParentConstLayerTest)
     armnn::Optimizer::Pass(graph, MakeOptimizations(AddBroadcastReshapeLayer()));
 
     // Broadcast reshape layer has not been added to the graph
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<ConstantLayer>,
                              &IsLayerOfType<MultiplicationLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     TensorShape expectedShape = TensorShape{ 1, 1, 1, 5 };
-    BOOST_TEST(constant->m_LayerOutput.get()->GetTensorInfo().GetShape() == expectedShape);
+    CHECK(constant->m_LayerOutput.get()->GetTensorInfo().GetShape() == expectedShape);
 
-    BOOST_TEST(constant->m_LayerOutput.get()->GetTensorInfo().GetNumDimensions() == info0.GetNumDimensions());
+    CHECK(constant->m_LayerOutput.get()->GetTensorInfo().GetNumDimensions() == info0.GetNumDimensions());
 
     Layer* const reshapeLayer = GetFirstLayerWithName(graph, "Reshape_for:mul-0");
-    BOOST_TEST(!reshapeLayer);
+    CHECK(!reshapeLayer);
 }
 
-BOOST_AUTO_TEST_CASE(ReshapeParentConstAddLayerMultipleConnectionsTest)
+TEST_CASE("ReshapeParentConstAddLayerMultipleConnectionsTest")
 {
     // In this test case we recreate the situation where an Addition layer has
     // a constant second term, e.g. [1,512] + [1]. The AddBroadcastReshapeLayer
@@ -367,7 +368,7 @@ BOOST_AUTO_TEST_CASE(ReshapeParentConstAddLayerMultipleConnectionsTest)
     // This second connection should prevent the modification of the const output tensor.
     constant->GetOutputSlot().Connect(add2->GetInputSlot(1));
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<ConstantLayer>,
                              &IsLayerOfType<AdditionLayer>,
@@ -378,7 +379,7 @@ BOOST_AUTO_TEST_CASE(ReshapeParentConstAddLayerMultipleConnectionsTest)
     armnn::Optimizer::Pass(graph, MakeOptimizations(AddBroadcastReshapeLayer()));
 
     // Broadcast reshape should have been added before each addition layer.
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<ConstantLayer>,
                              &IsLayerOfType<ReshapeLayer>,
@@ -388,14 +389,14 @@ BOOST_AUTO_TEST_CASE(ReshapeParentConstAddLayerMultipleConnectionsTest)
                              &IsLayerOfType<OutputLayer>));
 
     // Ensure the output shape of the constant hasn't changed.
-    BOOST_TEST(constant->m_LayerOutput.get()->GetTensorInfo().GetShape() == constantTermInfo.GetShape());
+    CHECK(constant->m_LayerOutput.get()->GetTensorInfo().GetShape() == constantTermInfo.GetShape());
     // There should be two extra reshape layers with appropriate names.
     Layer* const reshapeLayer1 = GetFirstLayerWithName(graph, "Reshape_for:add1-1");
     Layer* const reshapeLayer2 = GetFirstLayerWithName(graph, "Reshape_for:add2-1");
-    BOOST_TEST(reshapeLayer1);
-    BOOST_TEST(reshapeLayer2);
+    CHECK(reshapeLayer1);
+    CHECK(reshapeLayer2);
 }
 
 
 
-BOOST_AUTO_TEST_SUITE_END()
+}

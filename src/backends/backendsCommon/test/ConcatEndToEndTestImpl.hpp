@@ -12,7 +12,7 @@
 
 #include <armnn/utility/NumericCast.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <vector>
 
@@ -64,7 +64,7 @@ void ConcatDim0EndToEnd(const std::vector<BackendId>& backends)
     // Builds up the structure of the network
     INetworkPtr net = CreateConcatNetwork<ArmnnType>(inputShapes, outputShape, concatAxis);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     // Creates structures for input & output.
     std::vector<T> inputData{
@@ -128,8 +128,6 @@ void ConcatDim1EndToEnd(const std::vector<BackendId>& backends)
     // Builds up the structure of the network
     INetworkPtr net = CreateConcatNetwork<ArmnnType>(inputShapes, outputShape, concatAxis);
 
-    BOOST_TEST_CHECKPOINT("create a network");
-
     // Creates structures for input & output.
     std::vector<T> inputData{
         1, 2,
@@ -192,8 +190,6 @@ void ConcatDim2EndToEnd(const std::vector<BackendId>& backends)
     // Builds up the structure of the network
     INetworkPtr net = CreateConcatNetwork<ArmnnType>(inputShapes, outputShape, concatAxis);
 
-    BOOST_TEST_CHECKPOINT("create a network");
-
     // Creates structures for input & output.
     std::vector<T> inputData{
         1, 2,
@@ -254,8 +250,6 @@ void ConcatDim3EndToEnd(const std::vector<BackendId>& backends)
 
     // Builds up the structure of the network
     INetworkPtr net = CreateConcatNetwork<ArmnnType>(inputShapes, outputShape, concatAxis);
-
-    BOOST_TEST_CHECKPOINT("create a network");
 
     // Creates structures for input & output.
     std::vector<T> inputData{

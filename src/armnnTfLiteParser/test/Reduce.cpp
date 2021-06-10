@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_Reduce")
+{
 struct ReduceMaxFixture : public ParserFlatbuffersFixture
 {
     explicit ReduceMaxFixture(const std::string& inputShape,
@@ -93,7 +92,7 @@ struct SimpleReduceMaxFixture : public ReduceMaxFixture
     SimpleReduceMaxFixture() : ReduceMaxFixture("[ 1, 1, 2, 3 ]", "[ 1, 1, 1, 3 ]", "[ 1 ]", "[  2,0,0,0 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseReduceMax, SimpleReduceMaxFixture)
+TEST_CASE_FIXTURE(SimpleReduceMaxFixture, "ParseReduceMax")
 {
     RunTest<4, armnn::DataType::Float32, armnn::DataType::Float32>
         (0, {{ "inputTensor",  { 1001.0f, 11.0f,   1003.0f,
@@ -182,7 +181,7 @@ struct SimpleReduceMinFixture : public ReduceMinFixture
     SimpleReduceMinFixture() : ReduceMinFixture("[ 1, 1, 2, 3 ]", "[ 1, 1, 1, 3 ]", "[ 1 ]", "[ 2, 0, 0, 0 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseReduceMin, SimpleReduceMinFixture)
+TEST_CASE_FIXTURE(SimpleReduceMinFixture, "ParseReduceMin")
 {
     RunTest<4, armnn::DataType::Float32, armnn::DataType::Float32>
         (0, {{ "inputTensor",  { 1001.0f, 11.0f,   1003.0f,
@@ -190,4 +189,4 @@ BOOST_FIXTURE_TEST_CASE(ParseReduceMin, SimpleReduceMinFixture)
             {{ "outputTensor", { 10.0f, 11.0f, 12.0f } } });
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

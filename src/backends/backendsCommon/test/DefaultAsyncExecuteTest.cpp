@@ -8,19 +8,21 @@
 #include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/Workload.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 using namespace armnn;
 
-BOOST_AUTO_TEST_SUITE(WorkloadAsyncExecuteTests)
 
 namespace
+{
+
+TEST_SUITE("WorkloadAsyncExecuteTests")
 {
 
 struct Workload0 : BaseWorkload<ElementwiseUnaryQueueDescriptor>
 {
     Workload0(const ElementwiseUnaryQueueDescriptor& descriptor, const WorkloadInfo& info)
-            : BaseWorkload(descriptor, info)
+        : BaseWorkload(descriptor, info)
     {
     }
 
@@ -33,7 +35,9 @@ struct Workload0 : BaseWorkload<ElementwiseUnaryQueueDescriptor>
         int* inVals = static_cast<int*>(m_Data.m_Inputs[0][0].Map());
         int* outVals = static_cast<int*>(m_Data.m_Outputs[0][0].Map());
 
-        for (unsigned int i = 0; i < m_Data.m_Inputs[0][0].GetShape().GetNumElements(); ++i)
+        for (unsigned int i = 0;
+             i < m_Data.m_Inputs[0][0].GetShape().GetNumElements();
+             ++i)
         {
             outVals[i] = inVals[i] * outVals[i];
             inVals[i] = outVals[i];
@@ -45,7 +49,9 @@ struct Workload0 : BaseWorkload<ElementwiseUnaryQueueDescriptor>
         int* inVals = static_cast<int*>(desc.m_Inputs[0][0].Map());
         int* outVals = static_cast<int*>(desc.m_Outputs[0][0].Map());
 
-        for (unsigned int i = 0; i < desc.m_Inputs[0][0].GetShape().GetNumElements(); ++i)
+        for (unsigned int i = 0;
+             i < desc.m_Inputs[0][0].GetShape().GetNumElements();
+             ++i)
         {
             outVals[i] = inVals[i] + outVals[i];
             inVals[i] = outVals[i];
@@ -61,7 +67,7 @@ struct Workload0 : BaseWorkload<ElementwiseUnaryQueueDescriptor>
 struct Workload1 : BaseWorkload<ElementwiseUnaryQueueDescriptor>
 {
     Workload1(const ElementwiseUnaryQueueDescriptor& descriptor, const WorkloadInfo& info)
-            : BaseWorkload(descriptor, info)
+        : BaseWorkload(descriptor, info)
     {
     }
 
@@ -70,7 +76,9 @@ struct Workload1 : BaseWorkload<ElementwiseUnaryQueueDescriptor>
         int* inVals = static_cast<int*>(m_Data.m_Inputs[0][0].Map());
         int* outVals = static_cast<int*>(m_Data.m_Outputs[0][0].Map());
 
-        for (unsigned int i = 0; i < m_Data.m_Inputs[0][0].GetShape().GetNumElements(); ++i)
+        for (unsigned int i = 0;
+             i < m_Data.m_Inputs[0][0].GetShape().GetNumElements();
+             ++i)
         {
             outVals[i] = inVals[i] * outVals[i];
             inVals[i] = outVals[i];
@@ -83,7 +91,9 @@ void ValidateTensor(ITensorHandle* tensorHandle, int expectedValue)
     int* actualOutput = static_cast<int*>(tensorHandle->Map());
 
     bool allValuesCorrect = true;
-    for (unsigned int i = 0; i < tensorHandle->GetShape().GetNumElements(); ++i)
+    for (unsigned int i = 0;
+         i < tensorHandle->GetShape().GetNumElements();
+         ++i)
     {
         if (actualOutput[i] != expectedValue)
         {
@@ -91,7 +101,7 @@ void ValidateTensor(ITensorHandle* tensorHandle, int expectedValue)
         }
     }
 
-    BOOST_CHECK(allValuesCorrect);
+    CHECK(allValuesCorrect);
 }
 
 template<typename Workload>
@@ -108,7 +118,7 @@ std::unique_ptr<Workload> CreateWorkload(TensorInfo info, ITensorHandle* inputTe
     return std::make_unique<Workload>(elementwiseUnaryQueueDescriptor, workloadInfo);
 }
 
-BOOST_AUTO_TEST_CASE(TestAsyncExecute)
+TEST_CASE("TestAsyncExecute")
 {
     TensorInfo info({5}, DataType::Signed32);
 
@@ -145,7 +155,7 @@ BOOST_AUTO_TEST_CASE(TestAsyncExecute)
     ValidateTensor(&workload0.get()->GetQueueDescriptor()->m_Inputs[0][0], expectedExecuteval);
 }
 
-BOOST_AUTO_TEST_CASE(TestDefaultAsyncExecute)
+TEST_CASE("TestDefaultAsyncExecute")
 {
     TensorInfo info({5}, DataType::Signed32);
 
@@ -179,7 +189,7 @@ BOOST_AUTO_TEST_CASE(TestDefaultAsyncExecute)
     ValidateTensor(workingMemDescriptor.m_Inputs[0], expectedExecuteval);
 }
 
-BOOST_AUTO_TEST_CASE(TestDefaultAsyncExeuteWithThreads)
+TEST_CASE("TestDefaultAsyncExeuteWithThreads")
 {
     // Use a large vector so the threads have a chance to interact
     unsigned int vecSize = 1000;
@@ -243,6 +253,6 @@ BOOST_AUTO_TEST_CASE(TestDefaultAsyncExeuteWithThreads)
     ValidateTensor(workingMemDescriptor2.m_Inputs[0], expectedExecuteval2);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}
 
 }

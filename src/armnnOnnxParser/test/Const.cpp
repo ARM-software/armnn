@@ -3,12 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "armnnOnnxParser/IOnnxParser.hpp"
 #include  "ParserPrototxtFixture.hpp"
 
-BOOST_AUTO_TEST_SUITE(OnnxParser)
-
+TEST_SUITE("OnnxParser_Const")
+{
 struct ConstMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser::IOnnxParser>
 {
     ConstMainFixture(const std::string& dataType)
@@ -74,14 +73,14 @@ struct ConstInvalidFixture : ConstMainFixture
     ConstInvalidFixture() : ConstMainFixture("10") { }
 };
 
-BOOST_FIXTURE_TEST_CASE(ValidConstTest, ConstValidFixture)
+TEST_CASE_FIXTURE(ConstValidFixture, "ValidConstTest")
 {
     RunTest<1>({ }, {{ "Output" , {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0}}});
 }
 
-BOOST_FIXTURE_TEST_CASE(IncorrectDataTypeConst, ConstInvalidFixture)
+TEST_CASE_FIXTURE(ConstInvalidFixture, "IncorrectDataTypeConst")
 {
-   BOOST_CHECK_THROW( Setup(), armnn::ParseException);
+   CHECK_THROWS_AS( Setup(), armnn::ParseException);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

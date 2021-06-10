@@ -7,7 +7,7 @@
 
 #include <cl/test/ClContextControlFixture.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <fstream>
 
@@ -66,9 +66,7 @@ std::vector<char> ReadBinaryFile(const std::string& binaryFileName)
 
 } // anonymous namespace
 
-BOOST_FIXTURE_TEST_SUITE(ClContextSerializer, ClContextControlFixture)
-
-BOOST_AUTO_TEST_CASE(ClContextSerializerTest)
+TEST_CASE_FIXTURE(ClContextControlFixture, "ClContextSerializerTest")
 {
     // Get tmp directory and create blank file.
     fs::path filePath = armnnUtils::Filesystem::NamedTempFile("Armnn-CachedNetworkFileTest-TempFile.bin");
@@ -101,24 +99,24 @@ BOOST_AUTO_TEST_CASE(ClContextSerializerTest)
             *net1, backends, runtime->GetDeviceSpec(), optimizerOptions1);
     armnn::IOptimizedNetworkPtr optNet2 = armnn::Optimize(
             *net2, backends, runtime->GetDeviceSpec(), optimizerOptions2);
-    BOOST_CHECK(optNet1);
-    BOOST_CHECK(optNet2);
+    CHECK(optNet1);
+    CHECK(optNet2);
 
     // Cached file should be empty until net1 is loaded into runtime.
-    BOOST_TEST(fs::is_empty(filePathString));
+    CHECK(fs::is_empty(filePathString));
 
     // Load net1 into the runtime.
     armnn::NetworkId netId1;
-    BOOST_TEST(runtime->LoadNetwork(netId1, std::move(optNet1)) == armnn::Status::Success);
+    CHECK(runtime->LoadNetwork(netId1, std::move(optNet1)) == armnn::Status::Success);
 
     // File should now exist and not be empty. It has been serialized.
-    BOOST_TEST(fs::exists(filePathString));
+    CHECK(fs::exists(filePathString));
     std::vector<char> dataSerialized = ReadBinaryFile(filePathString);
-    BOOST_TEST(dataSerialized.size() != 0);
+    CHECK(dataSerialized.size() != 0);
 
     // Load net2 into the runtime using file and deserialize.
     armnn::NetworkId netId2;
-    BOOST_TEST(runtime->LoadNetwork(netId2, std::move(optNet2)) == armnn::Status::Success);
+    CHECK(runtime->LoadNetwork(netId2, std::move(optNet2)) == armnn::Status::Success);
 
     // Run inference and get output data.
     std::vector<uint8_t> outputData1(5);
@@ -128,11 +126,8 @@ BOOST_AUTO_TEST_CASE(ClContextSerializerTest)
     RunInference(netId2, runtime, outputData2);
 
     // Compare outputs from both networks.
-    BOOST_CHECK_EQUAL_COLLECTIONS(outputData1.begin(), outputData1.end(),
-                                  outputData2.begin(), outputData2.end());
+    CHECK(std::equal(outputData1.begin(), outputData1.end(), outputData2.begin(), outputData2.end()));
 
     // Remove temp file created.
     fs::remove(filePath);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

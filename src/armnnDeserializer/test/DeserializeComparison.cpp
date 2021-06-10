@@ -9,12 +9,10 @@
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
-#include <boost/test/unit_test.hpp>
-
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(Deserializer)
-
+TEST_SUITE("Deserializer_Comparison")
+{
 #define DECLARE_SIMPLE_COMPARISON_FIXTURE(operation, dataType) \
 struct Simple##operation##dataType##Fixture : public SimpleComparisonFixture \
 { \
@@ -24,7 +22,7 @@ struct Simple##operation##dataType##Fixture : public SimpleComparisonFixture \
 
 #define DECLARE_SIMPLE_COMPARISON_TEST_CASE(operation, dataType) \
 DECLARE_SIMPLE_COMPARISON_FIXTURE(operation, dataType) \
-BOOST_FIXTURE_TEST_CASE(operation##dataType, Simple##operation##dataType##Fixture) \
+TEST_CASE_FIXTURE(Simple##operation##dataType##Fixture, #operation#dataType) \
 { \
     using T = armnn::ResolveType<armnn::DataType::dataType>; \
     constexpr float   qScale  = 1.f; \
@@ -259,4 +257,4 @@ DECLARE_SIMPLE_COMPARISON_TEST_CASE(Less,           QAsymmU8)
 DECLARE_SIMPLE_COMPARISON_TEST_CASE(LessOrEqual,    QAsymmU8)
 DECLARE_SIMPLE_COMPARISON_TEST_CASE(NotEqual,       QAsymmU8)
 
-BOOST_AUTO_TEST_SUITE_END()
+}

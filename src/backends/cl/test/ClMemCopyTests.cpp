@@ -11,44 +11,44 @@
 #include <reference/RefWorkloadFactory.hpp>
 #include <reference/test/RefWorkloadFactoryHelper.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(ClMemCopy)
-
-BOOST_AUTO_TEST_CASE(CopyBetweenCpuAndGpu)
+TEST_SUITE("ClMemCopy")
+{
+TEST_CASE("CopyBetweenCpuAndGpu")
 {
     LayerTestResult<float, 4> result =
         MemCopyTest<armnn::RefWorkloadFactory, armnn::ClWorkloadFactory, armnn::DataType::Float32>(false);
     auto predResult = CompareTensors(result.m_ActualData,  result.m_ExpectedData,
                                      result.m_ActualShape, result.m_ExpectedShape);
-    BOOST_TEST(predResult.m_Result, predResult.m_Message.str());
+    CHECK_MESSAGE(predResult.m_Result, predResult.m_Message.str());
 }
 
-BOOST_AUTO_TEST_CASE(CopyBetweenGpuAndCpu)
+TEST_CASE("CopyBetweenGpuAndCpu")
 {
     LayerTestResult<float, 4> result =
         MemCopyTest<armnn::ClWorkloadFactory, armnn::RefWorkloadFactory, armnn::DataType::Float32>(false);
     auto predResult = CompareTensors(result.m_ActualData,  result.m_ExpectedData,
                                      result.m_ActualShape, result.m_ExpectedShape);
-    BOOST_TEST(predResult.m_Result, predResult.m_Message.str());
+    CHECK_MESSAGE(predResult.m_Result, predResult.m_Message.str());
 }
 
-BOOST_AUTO_TEST_CASE(CopyBetweenCpuAndGpuWithSubtensors)
+TEST_CASE("CopyBetweenCpuAndGpuWithSubtensors")
 {
     LayerTestResult<float, 4> result =
         MemCopyTest<armnn::RefWorkloadFactory, armnn::ClWorkloadFactory, armnn::DataType::Float32>(true);
     auto predResult = CompareTensors(result.m_ActualData,  result.m_ExpectedData,
                                      result.m_ActualShape, result.m_ExpectedShape);
-    BOOST_TEST(predResult.m_Result, predResult.m_Message.str());
+    CHECK_MESSAGE(predResult.m_Result, predResult.m_Message.str());
 }
 
-BOOST_AUTO_TEST_CASE(CopyBetweenGpuAndCpuWithSubtensors)
+TEST_CASE("CopyBetweenGpuAndCpuWithSubtensors")
 {
     LayerTestResult<float, 4> result =
         MemCopyTest<armnn::ClWorkloadFactory, armnn::RefWorkloadFactory, armnn::DataType::Float32>(true);
     auto predResult = CompareTensors(result.m_ActualData,  result.m_ExpectedData,
                                      result.m_ActualShape, result.m_ExpectedShape);
-    BOOST_TEST(predResult.m_Result, predResult.m_Message.str());
+    CHECK_MESSAGE(predResult.m_Result, predResult.m_Message.str());
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

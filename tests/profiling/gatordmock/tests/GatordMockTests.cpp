@@ -11,6 +11,7 @@
 #include <ProfilingService.hpp>
 #include <TimelinePacketWriterFactory.hpp>
 
+#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
 #include <server/include/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp>
@@ -20,16 +21,15 @@
 
 #include <MockBackend.hpp>
 
-#include <boost/test/test_tools.hpp>
-#include <boost/test/unit_test_suite.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(GatordMockTests)
-
+TEST_SUITE("GatordMockTests")
+{
 using namespace armnn;
 using namespace std::this_thread;
 using namespace std::chrono_literals;
 
-BOOST_AUTO_TEST_CASE(CounterCaptureHandlingTest)
+TEST_CASE("CounterCaptureHandlingTest")
 {
     arm::pipe::PacketVersionResolver packetVersionResolver;
 
@@ -113,7 +113,7 @@ void WaitFor(std::function<bool()> predicate, std::string errorMsg, uint32_t tim
     {
         if (timeSlept >= timeout)
         {
-            BOOST_FAIL("Timeout: " + errorMsg);
+            FAIL("Timeout: " + errorMsg);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
         timeSlept += sleepTime;
@@ -143,13 +143,13 @@ void CheckTimelineDirectory(arm::pipe::TimelineDirectoryCaptureCommandHandler& c
     std::unique_ptr<profiling::IPacketBuffer> packetBuffer = bufferManager.GetReadableBuffer();
 
     uint8_t readStreamVersion = ReadUint8(packetBuffer, offset);
-    BOOST_CHECK(readStreamVersion == 4);
+    CHECK(readStreamVersion == 4);
     offset += uint8_t_size;
     uint8_t readPointerBytes = ReadUint8(packetBuffer, offset);
-    BOOST_CHECK(readPointerBytes == uint64_t_size);
+    CHECK(readPointerBytes == uint64_t_size);
     offset += uint8_t_size;
     uint8_t readThreadIdBytes = ReadUint8(packetBuffer, offset);
-    BOOST_CHECK(readThreadIdBytes == threadId_size);
+    CHECK(readThreadIdBytes == threadId_size);
     offset += uint8_t_size;
 
     uint32_t declarationSize = profiling::ReadUint32(packetBuffer, offset);
@@ -166,20 +166,20 @@ void CheckTimelineDirectory(arm::pipe::TimelineDirectoryCaptureCommandHandler& c
         arm::pipe::SwTraceMessage& bufferMessage = swTraceBufferMessages[index];
         arm::pipe::SwTraceMessage& handlerMessage = commandHandler.m_SwTraceMessages[index];
 
-        BOOST_CHECK(bufferMessage.m_Name == handlerMessage.m_Name);
-        BOOST_CHECK(bufferMessage.m_UiName == handlerMessage.m_UiName);
-        BOOST_CHECK(bufferMessage.m_Id == handlerMessage.m_Id);
+        CHECK(bufferMessage.m_Name == handlerMessage.m_Name);
+        CHECK(bufferMessage.m_UiName == handlerMessage.m_UiName);
+        CHECK(bufferMessage.m_Id == handlerMessage.m_Id);
 
-        BOOST_CHECK(bufferMessage.m_ArgTypes.size() == handlerMessage.m_ArgTypes.size());
+        CHECK(bufferMessage.m_ArgTypes.size() == handlerMessage.m_ArgTypes.size());
         for(uint32_t i = 0; i < bufferMessage.m_ArgTypes.size(); ++i)
         {
-            BOOST_CHECK(bufferMessage.m_ArgTypes[i] == handlerMessage.m_ArgTypes[i]);
+            CHECK(bufferMessage.m_ArgTypes[i] == handlerMessage.m_ArgTypes[i]);
         }
 
-        BOOST_CHECK(bufferMessage.m_ArgNames.size() == handlerMessage.m_ArgNames.size());
+        CHECK(bufferMessage.m_ArgNames.size() == handlerMessage.m_ArgNames.size());
         for(uint32_t i = 0; i < bufferMessage.m_ArgNames.size(); ++i)
         {
-            BOOST_CHECK(bufferMessage.m_ArgNames[i] == handlerMessage.m_ArgNames[i]);
+            CHECK(bufferMessage.m_ArgNames[i] == handlerMessage.m_ArgNames[i]);
         }
     }
 }
@@ -187,56 +187,56 @@ void CheckTimelineDirectory(arm::pipe::TimelineDirectoryCaptureCommandHandler& c
 void CheckTimelinePackets(arm::pipe::TimelineDecoder& timelineDecoder)
 {
     unsigned int i = 0; // Use a postfix increment to avoid changing indexes each time the packet gets updated.
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::NAME_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::NAME_LABEL);
+    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::NAME_GUID);
+    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::NAME_LABEL);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::TYPE_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::TYPE_LABEL);
+    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::TYPE_GUID);
+    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::TYPE_LABEL);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::INDEX_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::INDEX_LABEL);
+    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::INDEX_GUID);
+    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::INDEX_LABEL);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::BACKENDID_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::BACKENDID_LABEL);
+    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::BACKENDID_GUID);
+    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::BACKENDID_LABEL);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::CHILD_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::CHILD_LABEL);
+    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::CHILD_GUID);
+    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::CHILD_LABEL);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::EXECUTION_OF_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name ==
+    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::EXECUTION_OF_GUID);
+    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name ==
                 profiling::LabelsAndEventClasses::EXECUTION_OF_LABEL);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::PROCESS_ID_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name ==
+    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::PROCESS_ID_GUID);
+    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name ==
                 profiling::LabelsAndEventClasses::PROCESS_ID_LABEL);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::LAYER_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::LAYER);
+    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::LAYER_GUID);
+    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::LAYER);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::WORKLOAD_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::WORKLOAD);
+    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::WORKLOAD_GUID);
+    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::WORKLOAD);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::NETWORK_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::NETWORK);
+    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::NETWORK_GUID);
+    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::NETWORK);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::CONNECTION_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::CONNECTION);
+    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::CONNECTION_GUID);
+    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::CONNECTION);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::INFERENCE_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::INFERENCE);
+    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::INFERENCE_GUID);
+    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::INFERENCE);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid ==
+    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid ==
                 profiling::LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name ==
+    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name ==
                 profiling::LabelsAndEventClasses::WORKLOAD_EXECUTION);
 
-    BOOST_CHECK(timelineDecoder.GetModel().m_EventClasses[0].m_Guid ==
+    CHECK(timelineDecoder.GetModel().m_EventClasses[0].m_Guid ==
                 profiling::LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
-    BOOST_CHECK(timelineDecoder.GetModel().m_EventClasses[1].m_Guid ==
+    CHECK(timelineDecoder.GetModel().m_EventClasses[1].m_Guid ==
                 profiling::LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
 }
 
-BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
+TEST_CASE("GatorDMockEndToEnd")
 {
     // The purpose of this test is to setup both sides of the profiling service and get to the point of receiving
     // performance data.
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     // Setup the mock service to bind to the UDS.
     std::string udsNamespace = "gatord_namespace";
 
-    BOOST_CHECK_NO_THROW(arm::pipe::ConnectionHandler connectionHandler(udsNamespace, false));
+    CHECK_NOTHROW(arm::pipe::ConnectionHandler connectionHandler(udsNamespace, false));
 
     arm::pipe::ConnectionHandler connectionHandler(udsNamespace, false);
 
@@ -257,9 +257,9 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Bring the profiling service to the "WaitingForAck" state
-    BOOST_CHECK(profilingService.GetCurrentState() == profiling::ProfilingState::Uninitialised);
+    CHECK(profilingService.GetCurrentState() == profiling::ProfilingState::Uninitialised);
     profilingService.Update();
-    BOOST_CHECK(profilingService.GetCurrentState() == profiling::ProfilingState::NotConnected);
+    CHECK(profilingService.GetCurrentState() == profiling::ProfilingState::NotConnected);
     profilingService.Update();
 
     // Connect the profiling service
@@ -280,7 +280,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     // Read the stream metadata on the mock side.
     if (!mockService.WaitForStreamMetaData())
     {
-        BOOST_FAIL("Failed to receive StreamMetaData");
+        FAIL("Failed to receive StreamMetaData");
     }
     // Send Ack from GatorD
     mockService.SendConnectionAck();
@@ -306,10 +306,10 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     const profiling::ICounterDirectory& receivedCounterDirectory = directoryCaptureCommandHandler.GetCounterDirectory();
 
     // Compare the basics of the counter directory from the service and the one we received over the wire.
-    BOOST_CHECK(serviceCounterDirectory.GetDeviceCount() == receivedCounterDirectory.GetDeviceCount());
-    BOOST_CHECK(serviceCounterDirectory.GetCounterSetCount() == receivedCounterDirectory.GetCounterSetCount());
-    BOOST_CHECK(serviceCounterDirectory.GetCategoryCount() == receivedCounterDirectory.GetCategoryCount());
-    BOOST_CHECK(serviceCounterDirectory.GetCounterCount() == receivedCounterDirectory.GetCounterCount());
+    CHECK(serviceCounterDirectory.GetDeviceCount() == receivedCounterDirectory.GetDeviceCount());
+    CHECK(serviceCounterDirectory.GetCounterSetCount() == receivedCounterDirectory.GetCounterSetCount());
+    CHECK(serviceCounterDirectory.GetCategoryCount() == receivedCounterDirectory.GetCategoryCount());
+    CHECK(serviceCounterDirectory.GetCounterCount() == receivedCounterDirectory.GetCounterCount());
 
     receivedCounterDirectory.GetDeviceCount();
     serviceCounterDirectory.GetDeviceCount();
@@ -319,9 +319,9 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     {
         // Find the same device in the received counter directory.
         auto foundDevice = receivedCounterDirectory.GetDevices().find(device.second->m_Uid);
-        BOOST_CHECK(foundDevice != receivedCounterDirectory.GetDevices().end());
-        BOOST_CHECK(device.second->m_Name.compare((*foundDevice).second->m_Name) == 0);
-        BOOST_CHECK(device.second->m_Cores == (*foundDevice).second->m_Cores);
+        CHECK(foundDevice != receivedCounterDirectory.GetDevices().end());
+        CHECK(device.second->m_Name.compare((*foundDevice).second->m_Name) == 0);
+        CHECK(device.second->m_Cores == (*foundDevice).second->m_Cores);
     }
 
     const profiling::CounterSets& serviceCounterSets = serviceCounterDirectory.GetCounterSets();
@@ -329,9 +329,9 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     {
         // Find the same counter set in the received counter directory.
         auto foundCounterSet = receivedCounterDirectory.GetCounterSets().find(counterSet.second->m_Uid);
-        BOOST_CHECK(foundCounterSet != receivedCounterDirectory.GetCounterSets().end());
-        BOOST_CHECK(counterSet.second->m_Name.compare((*foundCounterSet).second->m_Name) == 0);
-        BOOST_CHECK(counterSet.second->m_Count == (*foundCounterSet).second->m_Count);
+        CHECK(foundCounterSet != receivedCounterDirectory.GetCounterSets().end());
+        CHECK(counterSet.second->m_Name.compare((*foundCounterSet).second->m_Name) == 0);
+        CHECK(counterSet.second->m_Count == (*foundCounterSet).second->m_Count);
     }
 
     const profiling::Categories& serviceCategories = serviceCounterDirectory.GetCategories();
@@ -356,7 +356,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
                         return false;
                     };
                 // Then let vector == do the work.
-                BOOST_CHECK(std::equal(category->m_Counters.begin(), category->m_Counters.end(),
+                CHECK(std::equal(category->m_Counters.begin(), category->m_Counters.end(),
                                        receivedCategory->m_Counters.begin(), comparator));
                 break;
             }
@@ -371,14 +371,14 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
         // Note we can't check m_MaxCounterUid here as it will likely differ between the two counter directories.
         uint16_t translated = directoryCaptureCommandHandler.TranslateUIDCopyToOriginal(receivedCounter.first);
         const profiling::Counter* serviceCounter = serviceCounterDirectory.GetCounter(translated);
-        BOOST_CHECK(serviceCounter->m_DeviceUid == receivedCounter.second->m_DeviceUid);
-        BOOST_CHECK(serviceCounter->m_Name.compare(receivedCounter.second->m_Name) == 0);
-        BOOST_CHECK(serviceCounter->m_CounterSetUid == receivedCounter.second->m_CounterSetUid);
-        BOOST_CHECK(serviceCounter->m_Multiplier == receivedCounter.second->m_Multiplier);
-        BOOST_CHECK(serviceCounter->m_Interpolation == receivedCounter.second->m_Interpolation);
-        BOOST_CHECK(serviceCounter->m_Class == receivedCounter.second->m_Class);
-        BOOST_CHECK(serviceCounter->m_Units.compare(receivedCounter.second->m_Units) == 0);
-        BOOST_CHECK(serviceCounter->m_Description.compare(receivedCounter.second->m_Description) == 0);
+        CHECK(serviceCounter->m_DeviceUid == receivedCounter.second->m_DeviceUid);
+        CHECK(serviceCounter->m_Name.compare(receivedCounter.second->m_Name) == 0);
+        CHECK(serviceCounter->m_CounterSetUid == receivedCounter.second->m_CounterSetUid);
+        CHECK(serviceCounter->m_Multiplier == receivedCounter.second->m_Multiplier);
+        CHECK(serviceCounter->m_Interpolation == receivedCounter.second->m_Interpolation);
+        CHECK(serviceCounter->m_Class == receivedCounter.second->m_Class);
+        CHECK(serviceCounter->m_Units.compare(receivedCounter.second->m_Units) == 0);
+        CHECK(serviceCounter->m_Description.compare(receivedCounter.second->m_Description) == 0);
     }
 
     mockService.WaitForReceivingThread();
@@ -388,7 +388,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     // PeriodicCounterCapture data received. These are yet to be integrated.
 }
 
-BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
+TEST_CASE("GatorDMockTimeLineActivation")
 {
     // This test requires the CpuRef backend to be enabled
     if(!BackendRegistryInstance().IsBackendRegistered("CpuRef"))
@@ -412,7 +412,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
     // Read the stream metadata on the mock side.
     if (!mockService.WaitForStreamMetaData())
     {
-        BOOST_FAIL("Failed to receive StreamMetaData");
+        FAIL("Failed to receive StreamMetaData");
     }
 
     armnn::MockBackendProfilingService mockProfilingService = armnn::MockBackendProfilingService::Instance();
@@ -454,11 +454,11 @@ BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
             "MockGatord did not receive mock backend test entity");
 
     // Packets we expect from SendWellKnownLabelsAndEventClassesTest
-    BOOST_CHECK(timelineDecoder.GetModel().m_Entities.size() == 1);
-    BOOST_CHECK(timelineDecoder.GetModel().m_EventClasses.size()  == 2);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels.size()  == 15);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Relationships.size()  == 0);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Events.size()  == 0);
+    CHECK(timelineDecoder.GetModel().m_Entities.size() == 1);
+    CHECK(timelineDecoder.GetModel().m_EventClasses.size()  == 2);
+    CHECK(timelineDecoder.GetModel().m_Labels.size()  == 15);
+    CHECK(timelineDecoder.GetModel().m_Relationships.size()  == 0);
+    CHECK(timelineDecoder.GetModel().m_Events.size()  == 0);
 
     mockService.SendDeactivateTimelinePacket();
 
@@ -485,14 +485,14 @@ BOOST_AUTO_TEST_CASE(GatorDMockTimeLineActivation)
             "MockGatord did not receive well known timeline labels");
 
     // Packets we expect from SendWellKnownLabelsAndEventClassesTest * 2 + network above (input, norm, backend, output)
-    BOOST_CHECK(timelineDecoder.GetModel().m_Entities.size() == 6);
-    BOOST_CHECK(timelineDecoder.GetModel().m_EventClasses.size()  == 4);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Labels.size()  == 34);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Relationships.size()  == 15);
-    BOOST_CHECK(timelineDecoder.GetModel().m_Events.size()  == 0);
+    CHECK(timelineDecoder.GetModel().m_Entities.size() == 6);
+    CHECK(timelineDecoder.GetModel().m_EventClasses.size()  == 4);
+    CHECK(timelineDecoder.GetModel().m_Labels.size()  == 34);
+    CHECK(timelineDecoder.GetModel().m_Relationships.size()  == 15);
+    CHECK(timelineDecoder.GetModel().m_Events.size()  == 0);
 
     mockService.WaitForReceivingThread();
     GetProfilingService(&runtime).Disconnect();
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

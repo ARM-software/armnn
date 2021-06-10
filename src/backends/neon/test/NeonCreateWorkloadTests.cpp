@@ -18,8 +18,10 @@
 #include <neon/workloads/NeonWorkloadUtils.hpp>
 #include <neon/workloads/NeonWorkloads.hpp>
 
-BOOST_AUTO_TEST_SUITE(CreateWorkloadNeon)
+#include <doctest/doctest.h>
 
+TEST_SUITE("CreateWorkloadNeon")
+{
 namespace
 {
 
@@ -77,18 +79,18 @@ static void NeonCreateActivationWorkloadTest()
     ActivationQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle  = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo({1, 1}, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo({1, 1}, DataType)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle, TensorInfo({1, 1}, DataType)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo({1, 1}, DataType)));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateActivationFloat16Workload)
+TEST_CASE("CreateActivationFloat16Workload")
 {
     NeonCreateActivationWorkloadTest<DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateActivationFloatWorkload)
+TEST_CASE("CreateActivationFloatWorkload")
 {
     NeonCreateActivationWorkloadTest<DataType::Float32>();
 }
@@ -109,13 +111,13 @@ static void NeonCreateElementwiseWorkloadTest()
     auto inputHandle1 = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto inputHandle2 = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[1]);
     auto outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle1, TensorInfo({2, 3}, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle2, TensorInfo({2, 3}, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo({2, 3}, DataType)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle1, TensorInfo({2, 3}, DataType)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle2, TensorInfo({2, 3}, DataType)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo({2, 3}, DataType)));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateAdditionFloat16Workload)
+TEST_CASE("CreateAdditionFloat16Workload")
 {
     NeonCreateElementwiseWorkloadTest<NeonAdditionWorkload,
                                       AdditionQueueDescriptor,
@@ -124,7 +126,7 @@ BOOST_AUTO_TEST_CASE(CreateAdditionFloat16Workload)
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
+TEST_CASE("CreateAdditionFloatWorkload")
 {
     NeonCreateElementwiseWorkloadTest<NeonAdditionWorkload,
                                       AdditionQueueDescriptor,
@@ -133,7 +135,7 @@ BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateSubtractionFloat16Workload)
+TEST_CASE("CreateSubtractionFloat16Workload")
 {
     NeonCreateElementwiseWorkloadTest<NeonSubtractionWorkload,
                                       SubtractionQueueDescriptor,
@@ -142,7 +144,7 @@ BOOST_AUTO_TEST_CASE(CreateSubtractionFloat16Workload)
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateSubtractionFloatWorkload)
+TEST_CASE("CreateSubtractionFloatWorkload")
 {
     NeonCreateElementwiseWorkloadTest<NeonSubtractionWorkload,
                                       SubtractionQueueDescriptor,
@@ -150,7 +152,7 @@ BOOST_AUTO_TEST_CASE(CreateSubtractionFloatWorkload)
                                       DataType::Float32>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateSubtractionUint8Workload)
+TEST_CASE("CreateSubtractionUint8Workload")
 {
     NeonCreateElementwiseWorkloadTest<NeonSubtractionWorkload,
                                       SubtractionQueueDescriptor,
@@ -159,7 +161,7 @@ BOOST_AUTO_TEST_CASE(CreateSubtractionUint8Workload)
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat16Workload)
+TEST_CASE("CreateMultiplicationFloat16Workload")
 {
     NeonCreateElementwiseWorkloadTest<NeonMultiplicationWorkload,
                                       MultiplicationQueueDescriptor,
@@ -168,7 +170,7 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat16Workload)
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkload)
+TEST_CASE("CreateMultiplicationFloatWorkload")
 {
     NeonCreateElementwiseWorkloadTest<NeonMultiplicationWorkload,
                                       MultiplicationQueueDescriptor,
@@ -176,7 +178,7 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkload)
                                       DataType::Float32>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateMultiplicationUint8Workload)
+TEST_CASE("CreateMultiplicationUint8Workload")
 {
     NeonCreateElementwiseWorkloadTest<NeonMultiplicationWorkload,
                                       MultiplicationQueueDescriptor,
@@ -184,7 +186,7 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationUint8Workload)
                                       DataType::QAsymmU8>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateDivisionFloatWorkloadTest)
+TEST_CASE("CreateDivisionFloatWorkloadTest")
 {
     NeonCreateElementwiseWorkloadTest<NeonDivisionWorkload,
                                       DivisionQueueDescriptor,
@@ -210,28 +212,28 @@ static void NeonCreateBatchNormalizationWorkloadTest(DataLayout dataLayout)
     TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 3, 4, 4} : TensorShape{2, 4, 4, 3};
     TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 3, 4, 4} : TensorShape{2, 4, 4, 3};
 
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat16NchwWorkload)
+TEST_CASE("CreateBatchNormalizationFloat16NchwWorkload")
 {
     NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationWorkload, DataType::Float16>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat16NhwcWorkload)
+TEST_CASE("CreateBatchNormalizationFloat16NhwcWorkload")
 {
     NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationWorkload, DataType::Float16>(DataLayout::NHWC);
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloatNchwWorkload)
+TEST_CASE("CreateBatchNormalizationFloatNchwWorkload")
 {
     NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationWorkload, DataType::Float32>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloatNhwcWorkload)
+TEST_CASE("CreateBatchNormalizationFloatNhwcWorkload")
 {
     NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationWorkload, DataType::Float32>(DataLayout::NHWC);
 }
@@ -252,33 +254,33 @@ static void NeonCreateConvolution2dWorkloadTest(DataLayout dataLayout = DataLayo
     Convolution2dQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle  = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle,  TensorInfo(outputShape, DataType)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle,  TensorInfo(outputShape, DataType)));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateConvolution2dFloat16NchwWorkload)
+TEST_CASE("CreateConvolution2dFloat16NchwWorkload")
 {
     NeonCreateConvolution2dWorkloadTest<DataType::Float16>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateConvolution2dFloat16NhwcWorkload)
+TEST_CASE("CreateConvolution2dFloat16NhwcWorkload")
 {
     NeonCreateConvolution2dWorkloadTest<DataType::Float16>(DataLayout::NHWC);
 }
 
 #endif
-BOOST_AUTO_TEST_CASE(CreateConvolution2dFloatNchwWorkload)
+TEST_CASE("CreateConvolution2dFloatNchwWorkload")
 {
     NeonCreateConvolution2dWorkloadTest<DataType::Float32>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateConvolution2dFloatNhwcWorkload)
+TEST_CASE("CreateConvolution2dFloatNhwcWorkload")
 {
     NeonCreateConvolution2dWorkloadTest<DataType::Float32>(DataLayout::NHWC);
 }
 
-BOOST_AUTO_TEST_CASE(CreateConvolution2dFastMathEnabledWorkload)
+TEST_CASE("CreateConvolution2dFastMathEnabledWorkload")
 {
     Graph graph;
     using ModelOptions = std::vector<BackendOptions>;
@@ -324,17 +326,17 @@ static void NeonCreateDepthWiseConvolutionWorkloadTest(DataLayout dataLayout)
     TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
                                                                : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
 
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
 }
 
-BOOST_AUTO_TEST_CASE(CreateDepthWiseConvolution2dFloat32NhwcWorkload)
+TEST_CASE("CreateDepthWiseConvolution2dFloat32NhwcWorkload")
 {
     NeonCreateDepthWiseConvolutionWorkloadTest<DataType::Float32>(DataLayout::NHWC);
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateDepthWiseConvolution2dFloat16NhwcWorkload)
+TEST_CASE("CreateDepthWiseConvolution2dFloat16NhwcWorkload")
 {
     NeonCreateDepthWiseConvolutionWorkloadTest<DataType::Float16>(DataLayout::NHWC);
 }
@@ -357,28 +359,28 @@ static void NeonCreateFullyConnectedWorkloadTest()
     // Checks that outputs and inputs are as we expect them (see definition of CreateFullyConnectedWorkloadTest).
     float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
     float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo({3, 1, 4, 5}, DataType, inputsQScale)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo({3, 7}, DataType, outputQScale)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle, TensorInfo({3, 1, 4, 5}, DataType, inputsQScale)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo({3, 7}, DataType, outputQScale)));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloat16Workload)
+TEST_CASE("CreateFullyConnectedFloat16Workload")
 {
     NeonCreateFullyConnectedWorkloadTest<NeonFullyConnectedWorkload, DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloatWorkload)
+TEST_CASE("CreateFullyConnectedFloatWorkload")
 {
     NeonCreateFullyConnectedWorkloadTest<NeonFullyConnectedWorkload, DataType::Float32>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateFullyConnectedQAsymmU8Workload)
+TEST_CASE("CreateFullyConnectedQAsymmU8Workload")
 {
     NeonCreateFullyConnectedWorkloadTest<NeonFullyConnectedWorkload, DataType::QAsymmU8>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateFullyConnectedQAsymmS8Workload)
+TEST_CASE("CreateFullyConnectedQAsymmS8Workload")
 {
     NeonCreateFullyConnectedWorkloadTest<NeonFullyConnectedWorkload, DataType::QAsymmS8>();
 }
@@ -400,28 +402,28 @@ static void NeonCreateNormalizationWorkloadTest(DataLayout dataLayout)
     TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? TensorShape{3, 5, 5, 1} : TensorShape{3, 1, 5, 5};
     TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? TensorShape{3, 5, 5, 1} : TensorShape{3, 1, 5, 5};
 
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateNormalizationFloat16NchwWorkload)
+TEST_CASE("CreateNormalizationFloat16NchwWorkload")
 {
     NeonCreateNormalizationWorkloadTest<NeonNormalizationFloatWorkload, DataType::Float16>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreateNormalizationFloat16NhwcWorkload)
+TEST_CASE("CreateNormalizationFloat16NhwcWorkload")
 {
     NeonCreateNormalizationWorkloadTest<NeonNormalizationFloatWorkload, DataType::Float16>(DataLayout::NHWC);
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateNormalizationFloatNchwWorkload)
+TEST_CASE("CreateNormalizationFloatNchwWorkload")
 {
     NeonCreateNormalizationWorkloadTest<NeonNormalizationFloatWorkload, DataType::Float32>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreateNormalizationFloatNhwcWorkload)
+TEST_CASE("CreateNormalizationFloatNhwcWorkload")
 {
     NeonCreateNormalizationWorkloadTest<NeonNormalizationFloatWorkload, DataType::Float32>(DataLayout::NHWC);
 }
@@ -443,33 +445,33 @@ static void NeonCreatePooling2dWorkloadTest(DataLayout dataLayout = DataLayout::
     Pooling2dQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle  = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreatePooling2dFloat16Workload)
+TEST_CASE("CreatePooling2dFloat16Workload")
 {
     NeonCreatePooling2dWorkloadTest<DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreatePooling2dFloatNchwWorkload)
+TEST_CASE("CreatePooling2dFloatNchwWorkload")
 {
     NeonCreatePooling2dWorkloadTest<DataType::Float32>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreatePooling2dFloatNhwcWorkload)
+TEST_CASE("CreatePooling2dFloatNhwcWorkload")
 {
     NeonCreatePooling2dWorkloadTest<DataType::Float32>(DataLayout::NHWC);
 }
 
-BOOST_AUTO_TEST_CASE(CreatePooling2dUint8NchwWorkload)
+TEST_CASE("CreatePooling2dUint8NchwWorkload")
 {
     NeonCreatePooling2dWorkloadTest<DataType::QAsymmU8>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreatePooling2dUint8NhwcWorkload)
+TEST_CASE("CreatePooling2dUint8NhwcWorkload")
 {
     NeonCreatePooling2dWorkloadTest<DataType::QAsymmU8>(DataLayout::NHWC);
 }
@@ -495,24 +497,24 @@ static void NeonCreatePreluWorkloadTest(const armnn::TensorShape& inputShape,
     auto inputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto alphaHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[1]);
     auto outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, dataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(alphaHandle, TensorInfo(alphaShape, dataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, dataType)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, dataType)));
+    CHECK(TestNeonTensorHandleInfo(alphaHandle, TensorInfo(alphaShape, dataType)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, dataType)));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-    BOOST_AUTO_TEST_CASE(CreatePreluFloat16Workload)
+TEST_CASE("CreatePreluFloat16Workload")
 {
     NeonCreatePreluWorkloadTest({ 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 }, DataType::Float16);
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreatePreluFloatWorkload)
+TEST_CASE("CreatePreluFloatWorkload")
 {
     NeonCreatePreluWorkloadTest({ 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 }, DataType::Float32);
 }
 
-BOOST_AUTO_TEST_CASE(CreatePreluUint8Workload)
+TEST_CASE("CreatePreluUint8Workload")
 {
     NeonCreatePreluWorkloadTest({ 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 }, DataType::QAsymmU8);
 }
@@ -530,23 +532,23 @@ static void NeonCreateReshapeWorkloadTest()
     ReshapeQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle  = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo({4, 1}, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo({1, 4}, DataType)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle, TensorInfo({4, 1}, DataType)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo({1, 4}, DataType)));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateReshapeFloat16Workload)
+TEST_CASE("CreateReshapeFloat16Workload")
 {
     NeonCreateReshapeWorkloadTest<DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateReshapeFloatWorkload)
+TEST_CASE("CreateReshapeFloatWorkload")
 {
     NeonCreateReshapeWorkloadTest<DataType::Float32>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateReshapeUint8Workload)
+TEST_CASE("CreateReshapeUint8Workload")
 {
     NeonCreateReshapeWorkloadTest<DataType::QAsymmU8>();
 }
@@ -569,34 +571,34 @@ static void NeonCreateResizeWorkloadTest(DataLayout dataLayout)
     {
         case DataLayout::NHWC:
             predResult = CompareIAclTensorHandleShape(inputHandle, { 2, 4, 4, 3 });
-            BOOST_TEST(predResult.m_Result, predResult.m_Message.str());
+            CHECK_MESSAGE(predResult.m_Result, predResult.m_Message.str());
             predResult = CompareIAclTensorHandleShape(outputHandle, { 2, 2, 2, 3 });
-            BOOST_TEST(predResult.m_Result, predResult.m_Message.str());
+            CHECK_MESSAGE(predResult.m_Result, predResult.m_Message.str());
             break;
         default: // DataLayout::NCHW
             predResult = CompareIAclTensorHandleShape(inputHandle, { 2, 3, 4, 4 });
-            BOOST_TEST(predResult.m_Result, predResult.m_Message.str());
+            CHECK_MESSAGE(predResult.m_Result, predResult.m_Message.str());
             predResult = CompareIAclTensorHandleShape(outputHandle, { 2, 3, 2, 2 });
-            BOOST_TEST(predResult.m_Result, predResult.m_Message.str());
+            CHECK_MESSAGE(predResult.m_Result, predResult.m_Message.str());
     }
 }
 
-BOOST_AUTO_TEST_CASE(CreateResizeFloat32NchwWorkload)
+TEST_CASE("CreateResizeFloat32NchwWorkload")
 {
     NeonCreateResizeWorkloadTest<NeonResizeWorkload, armnn::DataType::Float32>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreateResizeUint8NchwWorkload)
+TEST_CASE("CreateResizeUint8NchwWorkload")
 {
     NeonCreateResizeWorkloadTest<NeonResizeWorkload, armnn::DataType::QAsymmU8>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreateResizeFloat32NhwcWorkload)
+TEST_CASE("CreateResizeFloat32NhwcWorkload")
 {
     NeonCreateResizeWorkloadTest<NeonResizeWorkload, armnn::DataType::Float32>(DataLayout::NHWC);
 }
 
-BOOST_AUTO_TEST_CASE(CreateResizeUint8NhwcWorkload)
+TEST_CASE("CreateResizeUint8NhwcWorkload")
 {
     NeonCreateResizeWorkloadTest<NeonResizeWorkload, armnn::DataType::QAsymmU8>(DataLayout::NHWC);
 }
@@ -625,28 +627,28 @@ static void NeonCreateSoftmaxWorkloadTest()
         tensorInfo.SetQuantizationOffset(-128);
         tensorInfo.SetQuantizationScale(1.f / 256);
     }
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, tensorInfo));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, tensorInfo));
+    CHECK(TestNeonTensorHandleInfo(inputHandle, tensorInfo));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, tensorInfo));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateSoftmaxFloat16Workload)
+TEST_CASE("CreateSoftmaxFloat16Workload")
 {
     NeonCreateSoftmaxWorkloadTest<NeonSoftmaxWorkload, DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateSoftmaxFloatWorkload)
+TEST_CASE("CreateSoftmaxFloatWorkload")
 {
     NeonCreateSoftmaxWorkloadTest<NeonSoftmaxWorkload, DataType::Float32>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateSoftmaxQAsymmU8Workload)
+TEST_CASE("CreateSoftmaxQAsymmU8Workload")
 {
     NeonCreateSoftmaxWorkloadTest<NeonSoftmaxWorkload, DataType::QAsymmU8>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateSoftmaxQAsymmS8Workload)
+TEST_CASE("CreateSoftmaxQAsymmS8Workload")
 {
     NeonCreateSoftmaxWorkloadTest<NeonSoftmaxWorkload, DataType::QAsymmS8>();
 }
@@ -664,31 +666,31 @@ static void NeonSpaceToDepthWorkloadTest()
     auto inputHandle  = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo({ 1, 2, 2, 1 }, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo({ 1, 1, 1, 4 }, DataType)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle, TensorInfo({ 1, 2, 2, 1 }, DataType)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo({ 1, 1, 1, 4 }, DataType)));
 }
 
-BOOST_AUTO_TEST_CASE(CreateSpaceToDepthFloat32Workload)
+TEST_CASE("CreateSpaceToDepthFloat32Workload")
 {
     NeonSpaceToDepthWorkloadTest<NeonSpaceToDepthWorkload, armnn::DataType::Float32>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateSpaceToDepthFloat16Workload)
+TEST_CASE("CreateSpaceToDepthFloat16Workload")
 {
     NeonSpaceToDepthWorkloadTest<NeonSpaceToDepthWorkload, armnn::DataType::Float16>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateSpaceToDepthQAsymm8Workload)
+TEST_CASE("CreateSpaceToDepthQAsymm8Workload")
 {
     NeonSpaceToDepthWorkloadTest<NeonSpaceToDepthWorkload, armnn::DataType::QAsymmU8>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateSpaceToDepthQSymm16Workload)
+TEST_CASE("CreateSpaceToDepthQSymm16Workload")
 {
     NeonSpaceToDepthWorkloadTest<NeonSpaceToDepthWorkload, armnn::DataType::QSymmS16>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateSplitterWorkload)
+TEST_CASE("CreateSplitterWorkload")
 {
     Graph graph;
     NeonWorkloadFactory factory =
@@ -699,19 +701,19 @@ BOOST_AUTO_TEST_CASE(CreateSplitterWorkload)
     // Checks that outputs are as we expect them (see definition of CreateSplitterWorkloadTest).
     SplitterQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo({5, 7, 7}, DataType::Float32)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle, TensorInfo({5, 7, 7}, DataType::Float32)));
 
     auto outputHandle0 = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle0, TensorInfo({1, 7, 7}, DataType::Float32)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle0, TensorInfo({1, 7, 7}, DataType::Float32)));
 
     auto outputHandle1 = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[1]);
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle1, TensorInfo({2, 7, 7}, DataType::Float32)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle1, TensorInfo({2, 7, 7}, DataType::Float32)));
 
     auto outputHandle2 = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[2]);
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle2, TensorInfo({2, 7, 7}, DataType::Float32)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle2, TensorInfo({2, 7, 7}, DataType::Float32)));
 }
 
-BOOST_AUTO_TEST_CASE(CreateSplitterConcat)
+TEST_CASE("CreateSplitterConcat")
 {
     // Tests that it is possible to decide which output of the splitter layer
     // should be lined to which input of the concat layer.
@@ -736,17 +738,17 @@ BOOST_AUTO_TEST_CASE(CreateSplitterConcat)
     armnn::IAclTensorHandle* mIn0 = dynamic_cast<armnn::IAclTensorHandle*>(wlConcat->GetData().m_Inputs[0]);
     armnn::IAclTensorHandle* mIn1 = dynamic_cast<armnn::IAclTensorHandle*>(wlConcat->GetData().m_Inputs[1]);
 
-    BOOST_TEST(sOut0);
-    BOOST_TEST(sOut1);
-    BOOST_TEST(mIn0);
-    BOOST_TEST(mIn1);
+    CHECK(sOut0);
+    CHECK(sOut1);
+    CHECK(mIn0);
+    CHECK(mIn1);
 
     bool validDataPointers = (sOut0 == mIn1) && (sOut1 == mIn0);
 
-    BOOST_TEST(validDataPointers);
+    CHECK(validDataPointers);
 }
 
-BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
+TEST_CASE("CreateSingleOutputMultipleInputs")
 {
     // Tests that it is possible to assign multiple (two) different layers to each of the outputs of a splitter layer.
     // We created a splitter with two outputs. That each of those outputs is used by two different activation layers
@@ -773,24 +775,24 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
     armnn::IAclTensorHandle* activ1_1Im = dynamic_cast<armnn::IAclTensorHandle*>(wlActiv1_1->GetData().m_Inputs[0]);
 
 
-    BOOST_TEST(sOut0);
-    BOOST_TEST(sOut1);
-    BOOST_TEST(activ0_0Im);
-    BOOST_TEST(activ0_1Im);
-    BOOST_TEST(activ1_0Im);
-    BOOST_TEST(activ1_1Im);
+    CHECK(sOut0);
+    CHECK(sOut1);
+    CHECK(activ0_0Im);
+    CHECK(activ0_1Im);
+    CHECK(activ1_0Im);
+    CHECK(activ1_1Im);
 
     bool validDataPointers = (sOut0 == activ0_0Im) && (sOut0 == activ0_1Im) &&
                              (sOut1 == activ1_0Im) && (sOut1 == activ1_1Im);
 
-    BOOST_TEST(validDataPointers);
+    CHECK(validDataPointers);
 }
 
 #if defined(ARMNNREF_ENABLED)
 
 // This test unit needs the reference backend, it's not available if the reference backend is not built
 
-BOOST_AUTO_TEST_CASE(CreateMemCopyWorkloadsNeon)
+TEST_CASE("CreateMemCopyWorkloadsNeon")
 {
     NeonWorkloadFactory factory =
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
@@ -819,28 +821,28 @@ static void NeonCreateL2NormalizationWorkloadTest(DataLayout dataLayout)
     TensorShape outputShape = (dataLayout == DataLayout::NCHW) ?
                 TensorShape{ 5, 20, 50, 67 } : TensorShape{ 5, 50, 67, 20 };
 
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateL2NormalizationFloat16NchwWorkload)
+TEST_CASE("CreateL2NormalizationFloat16NchwWorkload")
 {
     NeonCreateL2NormalizationWorkloadTest<NeonL2NormalizationFloatWorkload, DataType::Float16>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreateL2NormalizationFloat16NhwcWorkload)
+TEST_CASE("CreateL2NormalizationFloat16NhwcWorkload")
 {
     NeonCreateL2NormalizationWorkloadTest<NeonL2NormalizationFloatWorkload, DataType::Float16>(DataLayout::NHWC);
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateL2NormalizationNchwWorkload)
+TEST_CASE("CreateL2NormalizationNchwWorkload")
 {
     NeonCreateL2NormalizationWorkloadTest<NeonL2NormalizationFloatWorkload, DataType::Float32>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreateL2NormalizationNhwcWorkload)
+TEST_CASE("CreateL2NormalizationNhwcWorkload")
 {
     NeonCreateL2NormalizationWorkloadTest<NeonL2NormalizationFloatWorkload, DataType::Float32>(DataLayout::NHWC);
 }
@@ -860,18 +862,18 @@ static void NeonCreateLogSoftmaxWorkloadTest()
     auto outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
     armnn::TensorInfo tensorInfo({4, 1}, DataType);
 
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, tensorInfo));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, tensorInfo));
+    CHECK(TestNeonTensorHandleInfo(inputHandle, tensorInfo));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, tensorInfo));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateLogSoftmaxFloat16Workload)
+TEST_CASE("CreateLogSoftmaxFloat16Workload")
 {
     NeonCreateLogSoftmaxWorkloadTest<NeonLogSoftmaxWorkload, DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateLogSoftmaxFloatWorkload)
+TEST_CASE("CreateLogSoftmaxFloatWorkload")
 {
     NeonCreateLogSoftmaxWorkloadTest<NeonLogSoftmaxWorkload, DataType::Float32>();
 }
@@ -890,11 +892,11 @@ static void NeonCreateLstmWorkloadTest()
     auto inputHandle  = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[1]);
 
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo({ 2, 2 }, DataType::Float32)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo({ 2, 4 }, DataType::Float32)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle, TensorInfo({ 2, 2 }, DataType::Float32)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo({ 2, 4 }, DataType::Float32)));
 }
 
-BOOST_AUTO_TEST_CASE(CreateLSTMWorkloadFloatWorkload)
+TEST_CASE("CreateLSTMWorkloadFloatWorkload")
 {
     NeonCreateLstmWorkloadTest<NeonLstmFloatWorkload>();
 }
@@ -914,37 +916,37 @@ static void NeonCreateConcatWorkloadTest(std::initializer_list<unsigned int> out
     auto inputHandle1 = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[1]);
     auto outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle0, TensorInfo({ 2, 3, 2, 5 }, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle1, TensorInfo({ 2, 3, 2, 5 }, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle0, TensorInfo({ 2, 3, 2, 5 }, DataType)));
+    CHECK(TestNeonTensorHandleInfo(inputHandle1, TensorInfo({ 2, 3, 2, 5 }, DataType)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
 }
 
-BOOST_AUTO_TEST_CASE(CreateConcatDim0Float32Workload)
+TEST_CASE("CreateConcatDim0Float32Workload")
 {
     NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::Float32>({ 4, 3, 2, 5 }, 0);
 }
 
-BOOST_AUTO_TEST_CASE(CreateConcatDim1Float32Workload)
+TEST_CASE("CreateConcatDim1Float32Workload")
 {
     NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::Float32>({ 2, 6, 2, 5 }, 1);
 }
 
-BOOST_AUTO_TEST_CASE(CreateConcatDim3Float32Workload)
+TEST_CASE("CreateConcatDim3Float32Workload")
 {
     NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::Float32>({ 2, 3, 2, 10 }, 3);
 }
 
-BOOST_AUTO_TEST_CASE(CreateConcatDim0Uint8Workload)
+TEST_CASE("CreateConcatDim0Uint8Workload")
 {
     NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::QAsymmU8>({ 4, 3, 2, 5 }, 0);
 }
 
-BOOST_AUTO_TEST_CASE(CreateConcatDim1Uint8Workload)
+TEST_CASE("CreateConcatDim1Uint8Workload")
 {
     NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::QAsymmU8>({ 2, 6, 2, 5 }, 1);
 }
 
-BOOST_AUTO_TEST_CASE(CreateConcatDim3Uint8Workload)
+TEST_CASE("CreateConcatDim3Uint8Workload")
 {
     NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::QAsymmU8>({ 2, 3, 2, 10 }, 3);
 }
@@ -971,25 +973,25 @@ static void NeonCreateStackWorkloadTest(const std::initializer_list<unsigned int
     for (unsigned int i = 0; i < numInputs; ++i)
     {
         auto inputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[i]);
-        BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
+        CHECK(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
     }
     auto outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
+    CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
 }
 
-BOOST_AUTO_TEST_CASE(CreateStackFloat32Workload)
+TEST_CASE("CreateStackFloat32Workload")
 {
     NeonCreateStackWorkloadTest<armnn::DataType::Float32>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateStackFloat16Workload)
+TEST_CASE("CreateStackFloat16Workload")
 {
     NeonCreateStackWorkloadTest<armnn::DataType::Float16>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateStackUint8Workload)
+TEST_CASE("CreateStackUint8Workload")
 {
     NeonCreateStackWorkloadTest<armnn::DataType::QAsymmU8>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);
 }
@@ -1005,27 +1007,27 @@ static void NeonCreateQuantizedLstmWorkloadTest()
     QuantizedLstmQueueDescriptor queueDescriptor = workload->GetData();
 
     IAclTensorHandle* inputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
-    BOOST_TEST((inputHandle->GetShape() == TensorShape({2, 2})));
-    BOOST_TEST((inputHandle->GetDataType() == arm_compute::DataType::QASYMM8));
+    CHECK((inputHandle->GetShape() == TensorShape({2, 2})));
+    CHECK((inputHandle->GetDataType() == arm_compute::DataType::QASYMM8));
 
     IAclTensorHandle* cellStateInHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[1]);
-    BOOST_TEST((cellStateInHandle->GetShape() == TensorShape({2, 4})));
-    BOOST_TEST((cellStateInHandle->GetDataType() == arm_compute::DataType::QSYMM16));
+    CHECK((cellStateInHandle->GetShape() == TensorShape({2, 4})));
+    CHECK((cellStateInHandle->GetDataType() == arm_compute::DataType::QSYMM16));
 
     IAclTensorHandle* outputStateInHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[2]);
-    BOOST_TEST((outputStateInHandle->GetShape() == TensorShape({2, 4})));
-    BOOST_TEST((outputStateInHandle->GetDataType() == arm_compute::DataType::QASYMM8));
+    CHECK((outputStateInHandle->GetShape() == TensorShape({2, 4})));
+    CHECK((outputStateInHandle->GetDataType() == arm_compute::DataType::QASYMM8));
 
     IAclTensorHandle* cellStateOutHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST((cellStateOutHandle->GetShape() == TensorShape({2, 4})));
-    BOOST_TEST((cellStateOutHandle->GetDataType() == arm_compute::DataType::QSYMM16));
+    CHECK((cellStateOutHandle->GetShape() == TensorShape({2, 4})));
+    CHECK((cellStateOutHandle->GetDataType() == arm_compute::DataType::QSYMM16));
 
     IAclTensorHandle* outputStateOutHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[1]);
-    BOOST_TEST((outputStateOutHandle->GetShape() == TensorShape({2, 4})));
-    BOOST_TEST((outputStateOutHandle->GetDataType() == arm_compute::DataType::QASYMM8));
+    CHECK((outputStateOutHandle->GetShape() == TensorShape({2, 4})));
+    CHECK((outputStateOutHandle->GetDataType() == arm_compute::DataType::QASYMM8));
 }
 
-BOOST_AUTO_TEST_CASE(CreateQuantizedLstmWorkload)
+TEST_CASE("CreateQuantizedLstmWorkload")
 {
     NeonCreateQuantizedLstmWorkloadTest<NeonQuantizedLstmWorkload>();
 }
@@ -1040,21 +1042,21 @@ static void NeonCreateQLstmWorkloadTest()
     QLstmQueueDescriptor queueDescriptor = workload->GetData();
 
     IAclTensorHandle* inputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
-    BOOST_TEST((inputHandle->GetShape() == TensorShape({2, 4})));
-    BOOST_TEST((inputHandle->GetDataType() == arm_compute::DataType::QASYMM8_SIGNED));
+    CHECK((inputHandle->GetShape() == TensorShape({2, 4})));
+    CHECK((inputHandle->GetDataType() == arm_compute::DataType::QASYMM8_SIGNED));
 
     IAclTensorHandle* cellStateOutHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[1]);
-    BOOST_TEST((cellStateOutHandle->GetShape() == TensorShape({2, 4})));
-    BOOST_TEST((cellStateOutHandle->GetDataType() == arm_compute::DataType::QSYMM16));
+    CHECK((cellStateOutHandle->GetShape() == TensorShape({2, 4})));
+    CHECK((cellStateOutHandle->GetDataType() == arm_compute::DataType::QSYMM16));
 
     IAclTensorHandle* outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[2]);
-    BOOST_TEST((outputHandle->GetShape() == TensorShape({2, 4})));
-    BOOST_TEST((outputHandle->GetDataType() == arm_compute::DataType::QASYMM8_SIGNED));
+    CHECK((outputHandle->GetShape() == TensorShape({2, 4})));
+    CHECK((outputHandle->GetDataType() == arm_compute::DataType::QASYMM8_SIGNED));
 }
 
-BOOST_AUTO_TEST_CASE(CreateQLstmWorkloadTest)
+TEST_CASE("CreateQLstmWorkloadTest")
 {
     NeonCreateQLstmWorkloadTest<NeonQLstmWorkload>();
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

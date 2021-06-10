@@ -3,12 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "armnnOnnxParser/IOnnxParser.hpp"
 #include  "ParserPrototxtFixture.hpp"
 
-BOOST_AUTO_TEST_SUITE(OnnxParser)
-
+TEST_SUITE("OnnxParser_Reshape")
+{
 struct ReshapeMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser::IOnnxParser>
 {
     ReshapeMainFixture(const std::string& dataType)
@@ -189,12 +188,12 @@ struct ReshapeInvalidFixture : ReshapeMainFixture
     ReshapeInvalidFixture() : ReshapeMainFixture("10") { }
 };
 
-BOOST_FIXTURE_TEST_CASE(ValidReshapeTest, ReshapeValidFixture)
+TEST_CASE_FIXTURE(ReshapeValidFixture, "ValidReshapeTest")
 {
     RunTest<2>({{"Input", { 0.0f, 1.0f, 2.0f, 3.0f }}}, {{"Output", { 0.0f, 1.0f, 2.0f, 3.0f }}});
 }
 
-BOOST_FIXTURE_TEST_CASE(ValidRank4ReshapeTest, ReshapeValidRank4Fixture)
+TEST_CASE_FIXTURE(ReshapeValidRank4Fixture, "ValidRank4ReshapeTest")
 {
     RunTest<2>(
         {{"Input",
@@ -207,9 +206,9 @@ BOOST_FIXTURE_TEST_CASE(ValidRank4ReshapeTest, ReshapeValidRank4Fixture)
                      1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f}}});
 }
 
-BOOST_FIXTURE_TEST_CASE(IncorrectDataTypeReshape, ReshapeInvalidFixture)
+TEST_CASE_FIXTURE(ReshapeInvalidFixture, "IncorrectDataTypeReshape")
 {
-   BOOST_CHECK_THROW(Setup(), armnn::ParseException);
+   CHECK_THROWS_AS(Setup(), armnn::ParseException);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

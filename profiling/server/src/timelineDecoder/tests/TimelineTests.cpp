@@ -15,11 +15,10 @@
 #include <PacketBuffer.hpp>
 #include <TimelinePacketWriterFactory.hpp>
 
-#include <boost/test/test_tools.hpp>
-#include <boost/test/unit_test_suite.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(TimelineDecoderTests)
-
+TEST_SUITE("TimelineDecoderTests")
+{
 void SendTimelinePacketToCommandHandler(const unsigned char* packetBuffer,
                                         arm::pipe::CommandHandlerFunctor& CommandHandler)
 {
@@ -38,7 +37,7 @@ void SendTimelinePacketToCommandHandler(const unsigned char* packetBuffer,
 
     arm::pipe::Packet packet(header[0], PacketDataLength, uniquePacketData);
 
-    BOOST_CHECK(std::memcmp(packetBuffer + offset, packet.GetData(), packet.GetLength()) == 0);
+    CHECK(std::memcmp(packetBuffer + offset, packet.GetData(), packet.GetLength()) == 0);
 
     CommandHandler(packet);
 }
@@ -69,7 +68,7 @@ void PushRelationship(arm::pipe::TimelineDecoder::Model& model,
     model.m_Relationships.emplace_back(relationship);
 }
 
-BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
+TEST_CASE("TimelineDirectoryTest")
 {
     uint32_t uint8_t_size  = sizeof(uint8_t);
     uint32_t uint32_t_size = sizeof(uint32_t);
@@ -101,13 +100,13 @@ BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
     std::unique_ptr<armnn::profiling::IPacketBuffer> packetBuffer = bufferManager.GetReadableBuffer();
 
     uint8_t readStreamVersion = ReadUint8(packetBuffer, offset);
-    BOOST_CHECK(readStreamVersion == 4);
+    CHECK(readStreamVersion == 4);
     offset += uint8_t_size;
     uint8_t readPointerBytes = ReadUint8(packetBuffer, offset);
-    BOOST_CHECK(readPointerBytes == uint64_t_size);
+    CHECK(readPointerBytes == uint64_t_size);
     offset += uint8_t_size;
     uint8_t readThreadIdBytes = ReadUint8(packetBuffer, offset);
-    BOOST_CHECK(readThreadIdBytes == armnn::profiling::ThreadIdSize);
+    CHECK(readThreadIdBytes == armnn::profiling::ThreadIdSize);
     offset += uint8_t_size;
 
     uint32_t declarationSize = arm::pipe::ReadUint32(packetBuffer->GetReadableData(), offset);
@@ -126,25 +125,25 @@ BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
         arm::pipe::SwTraceMessage& bufferMessage = swTraceBufferMessages[index];
         arm::pipe::SwTraceMessage& handlerMessage = timelineDirectoryCaptureCommandHandler.m_SwTraceMessages[index];
 
-        BOOST_CHECK(bufferMessage.m_Name == handlerMessage.m_Name);
-        BOOST_CHECK(bufferMessage.m_UiName == handlerMessage.m_UiName);
-        BOOST_CHECK(bufferMessage.m_Id == handlerMessage.m_Id);
+        CHECK(bufferMessage.m_Name == handlerMessage.m_Name);
+        CHECK(bufferMessage.m_UiName == handlerMessage.m_UiName);
+        CHECK(bufferMessage.m_Id == handlerMessage.m_Id);
 
-        BOOST_CHECK(bufferMessage.m_ArgTypes.size() == handlerMessage.m_ArgTypes.size());
+        CHECK(bufferMessage.m_ArgTypes.size() == handlerMessage.m_ArgTypes.size());
         for(uint32_t i = 0; i < bufferMessage.m_ArgTypes.size(); ++i)
         {
-            BOOST_CHECK(bufferMessage.m_ArgTypes[i] == handlerMessage.m_ArgTypes[i]);
+            CHECK(bufferMessage.m_ArgTypes[i] == handlerMessage.m_ArgTypes[i]);
         }
 
-        BOOST_CHECK(bufferMessage.m_ArgNames.size() == handlerMessage.m_ArgNames.size());
+        CHECK(bufferMessage.m_ArgNames.size() == handlerMessage.m_ArgNames.size());
         for(uint32_t i = 0; i < bufferMessage.m_ArgNames.size(); ++i)
         {
-            BOOST_CHECK(bufferMessage.m_ArgNames[i] == handlerMessage.m_ArgNames[i]);
+            CHECK(bufferMessage.m_ArgNames[i] == handlerMessage.m_ArgNames[i]);
         }
     }
 }
 
-BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
+TEST_CASE("TimelineCaptureTest")
 {
     armnn::profiling::BufferManager bufferManager(50);
     armnn::profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
@@ -163,11 +162,11 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
         armnn::profiling::ThreadIdSize);
 
     using Status = arm::pipe::ITimelineDecoder::TimelineStatus;
-    BOOST_CHECK(timelineDecoder.SetEntityCallback(PushEntity)             == Status::TimelineStatus_Success);
-    BOOST_CHECK(timelineDecoder.SetEventClassCallback(PushEventClass)     == Status::TimelineStatus_Success);
-    BOOST_CHECK(timelineDecoder.SetEventCallback(PushEvent)               == Status::TimelineStatus_Success);
-    BOOST_CHECK(timelineDecoder.SetLabelCallback(PushLabel)               == Status::TimelineStatus_Success);
-    BOOST_CHECK(timelineDecoder.SetRelationshipCallback(PushRelationship) == Status::TimelineStatus_Success);
+    CHECK(timelineDecoder.SetEntityCallback(PushEntity)             == Status::TimelineStatus_Success);
+    CHECK(timelineDecoder.SetEventClassCallback(PushEventClass)     == Status::TimelineStatus_Success);
+    CHECK(timelineDecoder.SetEventCallback(PushEvent)               == Status::TimelineStatus_Success);
+    CHECK(timelineDecoder.SetLabelCallback(PushLabel)               == Status::TimelineStatus_Success);
+    CHECK(timelineDecoder.SetRelationshipCallback(PushRelationship) == Status::TimelineStatus_Success);
 
     const uint64_t entityGuid = 111111u;
     const uint64_t eventClassGuid = 22222u;
@@ -241,26 +240,26 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTest)
 
     for (unsigned long i = 0; i < 10; ++i)
     {
-        BOOST_CHECK(model.m_Entities[i].m_Guid == entityGuid);
+        CHECK(model.m_Entities[i].m_Guid == entityGuid);
 
-        BOOST_CHECK(model.m_EventClasses[i].m_Guid == eventClassGuid);
+        CHECK(model.m_EventClasses[i].m_Guid == eventClassGuid);
 
-        BOOST_CHECK(model.m_Events[i].m_TimeStamp == timestamp);
-        BOOST_CHECK(model.m_Events[i].m_ThreadId == uint64ThreadId);
-        BOOST_CHECK(model.m_Events[i].m_Guid == eventGuid);
+        CHECK(model.m_Events[i].m_TimeStamp == timestamp);
+        CHECK(model.m_Events[i].m_ThreadId == uint64ThreadId);
+        CHECK(model.m_Events[i].m_Guid == eventGuid);
 
-        BOOST_CHECK(model.m_Labels[i].m_Guid == labelGuid);
-        BOOST_CHECK(model.m_Labels[i].m_Name == labelName);
+        CHECK(model.m_Labels[i].m_Guid == labelGuid);
+        CHECK(model.m_Labels[i].m_Name == labelName);
 
-        BOOST_CHECK(model.m_Relationships[i].m_RelationshipType ==
+        CHECK(model.m_Relationships[i].m_RelationshipType ==
             arm::pipe::ITimelineDecoder::RelationshipType::DataLink);
-        BOOST_CHECK(model.m_Relationships[i].m_Guid == relationshipGuid);
-        BOOST_CHECK(model.m_Relationships[i].m_HeadGuid == headGuid);
-        BOOST_CHECK(model.m_Relationships[i].m_TailGuid == tailGuid);
+        CHECK(model.m_Relationships[i].m_Guid == relationshipGuid);
+        CHECK(model.m_Relationships[i].m_HeadGuid == headGuid);
+        CHECK(model.m_Relationships[i].m_TailGuid == tailGuid);
     }
 }
 
-BOOST_AUTO_TEST_CASE(TimelineCaptureTestMultipleStringsInBuffer)
+TEST_CASE("TimelineCaptureTestMultipleStringsInBuffer")
 {
     armnn::profiling::BufferManager               bufferManager(50);
     armnn::profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
@@ -278,11 +277,11 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTestMultipleStringsInBuffer)
         armnn::profiling::ThreadIdSize);
 
     using Status = arm::pipe::TimelineDecoder::TimelineStatus;
-    BOOST_CHECK(timelineDecoder.SetEntityCallback(PushEntity) == Status::TimelineStatus_Success);
-    BOOST_CHECK(timelineDecoder.SetEventClassCallback(PushEventClass) == Status::TimelineStatus_Success);
-    BOOST_CHECK(timelineDecoder.SetEventCallback(PushEvent) == Status::TimelineStatus_Success);
-    BOOST_CHECK(timelineDecoder.SetLabelCallback(PushLabel) == Status::TimelineStatus_Success);
-    BOOST_CHECK(timelineDecoder.SetRelationshipCallback(PushRelationship) == Status::TimelineStatus_Success);
+    CHECK(timelineDecoder.SetEntityCallback(PushEntity) == Status::TimelineStatus_Success);
+    CHECK(timelineDecoder.SetEventClassCallback(PushEventClass) == Status::TimelineStatus_Success);
+    CHECK(timelineDecoder.SetEventCallback(PushEvent) == Status::TimelineStatus_Success);
+    CHECK(timelineDecoder.SetLabelCallback(PushLabel) == Status::TimelineStatus_Success);
+    CHECK(timelineDecoder.SetRelationshipCallback(PushRelationship) == Status::TimelineStatus_Success);
 
     const uint64_t entityGuid         = 111111u;
     const uint64_t eventClassGuid     = 22222u;
@@ -346,28 +345,28 @@ BOOST_AUTO_TEST_CASE(TimelineCaptureTestMultipleStringsInBuffer)
 
     for ( unsigned long i = 0; i < 9; ++i )
     {
-        BOOST_CHECK(model.m_Entities[i].m_Guid == entityGuid);
+        CHECK(model.m_Entities[i].m_Guid == entityGuid);
 
-        BOOST_CHECK(model.m_EventClasses[i].m_Guid == eventClassGuid);
+        CHECK(model.m_EventClasses[i].m_Guid == eventClassGuid);
 
-        BOOST_CHECK(model.m_Labels[i].m_Guid == labelGuid);
+        CHECK(model.m_Labels[i].m_Guid == labelGuid);
 
-        BOOST_CHECK(model.m_Events[i].m_TimeStamp == timestamp);
-        BOOST_CHECK(model.m_Events[i].m_ThreadId == uint64ThreadId);
-        BOOST_CHECK(model.m_Events[i].m_Guid == eventGuid);
+        CHECK(model.m_Events[i].m_TimeStamp == timestamp);
+        CHECK(model.m_Events[i].m_ThreadId == uint64ThreadId);
+        CHECK(model.m_Events[i].m_Guid == eventGuid);
 
-        BOOST_CHECK(model.m_Relationships[i].m_RelationshipType ==
+        CHECK(model.m_Relationships[i].m_RelationshipType ==
             arm::pipe::ITimelineDecoder::RelationshipType::DataLink);
-        BOOST_CHECK(model.m_Relationships[i].m_Guid == relationshipGuid);
-        BOOST_CHECK(model.m_Relationships[i].m_HeadGuid == headGuid);
-        BOOST_CHECK(model.m_Relationships[i].m_TailGuid == tailGuid);
+        CHECK(model.m_Relationships[i].m_Guid == relationshipGuid);
+        CHECK(model.m_Relationships[i].m_HeadGuid == headGuid);
+        CHECK(model.m_Relationships[i].m_TailGuid == tailGuid);
     }
     for ( unsigned long i = 0; i < 9; i += 3 )
     {
-        BOOST_CHECK(model.m_Labels[i].m_Name == labelName);
-        BOOST_CHECK(model.m_Labels[i+1].m_Name == labelName2);
-        BOOST_CHECK(model.m_Labels[i+2].m_Name == labelName3);
+        CHECK(model.m_Labels[i].m_Name == labelName);
+        CHECK(model.m_Labels[i+1].m_Name == labelName2);
+        CHECK(model.m_Labels[i+2].m_Name == labelName3);
     }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

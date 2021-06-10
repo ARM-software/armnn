@@ -14,12 +14,11 @@
 
 #include <Filesystem.hpp>
 
+#include <doctest/doctest.h>
 
-#include <boost/test/unit_test.hpp>
-
-BOOST_AUTO_TEST_SUITE(ClOptimizedNetwork)
-
-BOOST_AUTO_TEST_CASE(OptimizeValidateGpuDeviceSupportLayerNoFallback)
+TEST_SUITE("ClOptimizedNetwork")
+{
+TEST_CASE("OptimizeValidateGpuDeviceSupportLayerNoFallback")
 {
     // build up the structure of the network
     armnn::INetworkPtr net(armnn::INetwork::Create());
@@ -35,7 +34,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateGpuDeviceSupportLayerNoFallback)
 
     std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
-    BOOST_CHECK(optNet);
+    CHECK(optNet);
     // validate workloads
     armnn::ClWorkloadFactory fact =
         ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
@@ -43,13 +42,13 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateGpuDeviceSupportLayerNoFallback)
     const armnn::Graph& theGraph = GetGraphForTesting(optNet.get());
     for (auto&& layer : theGraph)
     {
-        BOOST_CHECK(layer->GetBackendId() == armnn::Compute::GpuAcc);
-        BOOST_CHECK_NO_THROW(
+        CHECK(layer->GetBackendId() == armnn::Compute::GpuAcc);
+        CHECK_NOTHROW(
             layer->CreateWorkload(fact));
     }
 }
 
-BOOST_AUTO_TEST_CASE(FP16TurboModeTestOnGpuAcc)
+TEST_CASE("FP16TurboModeTestOnGpuAcc")
 {
     // Test to check when Fp16 Turbo mode set
     // it converts the Fp32 network to Fp16 Network
@@ -96,17 +95,17 @@ BOOST_AUTO_TEST_CASE(FP16TurboModeTestOnGpuAcc)
     const armnn::Graph& graph = GetGraphForTesting(optimizedNet.get());
 
     // Tests that all layers are present in the graph.
-    BOOST_TEST(graph.GetNumLayers() == 5);
+    CHECK(graph.GetNumLayers() == 5);
 
     // Tests that the vertices exist and have correct names.
-    BOOST_TEST(GraphHasNamedLayer(graph, "input layer"));
-    BOOST_TEST(GraphHasNamedLayer(graph, "convert_fp32_to_fp16-0-input layer"));
-    BOOST_TEST(GraphHasNamedLayer(graph, "activation layer"));
-    BOOST_TEST(GraphHasNamedLayer(graph, "convert_fp16_to_fp32-0-output layer"));
-    BOOST_TEST(GraphHasNamedLayer(graph, "output layer"));
+    CHECK(GraphHasNamedLayer(graph, "input layer"));
+    CHECK(GraphHasNamedLayer(graph, "convert_fp32_to_fp16-0-input layer"));
+    CHECK(GraphHasNamedLayer(graph, "activation layer"));
+    CHECK(GraphHasNamedLayer(graph, "convert_fp16_to_fp32-0-output layer"));
+    CHECK(GraphHasNamedLayer(graph, "output layer"));
 }
 
-BOOST_AUTO_TEST_CASE(FastMathEnabledTestOnGpuAcc)
+TEST_CASE("FastMathEnabledTestOnGpuAcc")
 {
     armnn::INetworkPtr net(armnn::INetwork::Create());
 
@@ -127,16 +126,16 @@ BOOST_AUTO_TEST_CASE(FastMathEnabledTestOnGpuAcc)
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(
     *net, backends, runtime->GetDeviceSpec(), optimizerOptions);
 
-    BOOST_CHECK(optimizedNet);
+    CHECK(optimizedNet);
 
     auto modelOptionsOut = GetModelOptionsForTesting(optimizedNet.get());
 
-    BOOST_TEST(modelOptionsOut.size() == 1);
-    BOOST_TEST(modelOptionsOut[0].GetOption(0).GetName() == "FastMathEnabled");
-    BOOST_TEST(modelOptionsOut[0].GetOption(0).GetValue().AsBool() == true);
+    CHECK(modelOptionsOut.size() == 1);
+    CHECK(modelOptionsOut[0].GetOption(0).GetName() == "FastMathEnabled");
+    CHECK(modelOptionsOut[0].GetOption(0).GetValue().AsBool() == true);
 }
 
-BOOST_AUTO_TEST_CASE(CheckMLGOTuningFile)
+TEST_CASE("CheckMLGOTuningFile")
 {
     class ClBackendContextTestClass : public armnn::ClBackendContext
     {
@@ -202,7 +201,7 @@ BOOST_AUTO_TEST_CASE(CheckMLGOTuningFile)
     catch (std::exception &e)
     {
         std::cerr << "Unable to write to file at location [" << validFile.c_str() << "] : " << e.what() << std::endl;
-        BOOST_TEST(false);
+        CHECK(false);
     }
 
     armnn::IRuntime::CreationOptions creationOptions1;
@@ -216,7 +215,7 @@ BOOST_AUTO_TEST_CASE(CheckMLGOTuningFile)
 
     creationOptions1.m_BackendOptions.emplace_back(validOptions);
     ClBackendContextTestClass clBackendContext1(creationOptions1);
-    BOOST_TEST(clBackendContext1.call_reload_from_file());
+    CHECK(clBackendContext1.call_reload_from_file());
 
     armnn::BackendOptions invalidOptions
             {
@@ -229,7 +228,7 @@ BOOST_AUTO_TEST_CASE(CheckMLGOTuningFile)
     armnn::IRuntime::CreationOptions creationOptions2;
     creationOptions2.m_BackendOptions.emplace_back(invalidOptions);
     ClBackendContextTestClass clBackendContext2(creationOptions2);
-    BOOST_TEST(clBackendContext2.call_reload_from_file() == false);
+    CHECK(clBackendContext2.call_reload_from_file() == false);
 
     armnn::BackendOptions invalidPathOptions
             {
@@ -242,7 +241,7 @@ BOOST_AUTO_TEST_CASE(CheckMLGOTuningFile)
     armnn::IRuntime::CreationOptions creationOptions3;
     creationOptions3.m_BackendOptions.emplace_back(invalidPathOptions);
     ClBackendContextTestClass clBackendContext3(creationOptions3);
-    BOOST_TEST(clBackendContext3.call_reload_from_file() == false);
+    CHECK(clBackendContext3.call_reload_from_file() == false);
 }
 
-BOOST_AUTO_TEST_SUITE_END();
+}

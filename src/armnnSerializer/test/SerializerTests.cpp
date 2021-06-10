@@ -17,13 +17,13 @@
 #include <random>
 #include <vector>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 using armnnDeserializer::IDeserializer;
 
-BOOST_AUTO_TEST_SUITE(SerializerTests)
-
-BOOST_AUTO_TEST_CASE(SerializeAbs)
+TEST_SUITE("SerializerTests")
+{
+TEST_CASE("SerializeAbs")
 {
     const std::string layerName("abs");
     const armnn::TensorInfo tensorInfo({1, 2, 3}, armnn::DataType::Float32);
@@ -43,13 +43,13 @@ BOOST_AUTO_TEST_CASE(SerializeAbs)
     absLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBase verifier(layerName, {tensorInfo}, {tensorInfo});
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeAddition)
+TEST_CASE("SerializeAddition")
 {
     const std::string layerName("addition");
     const armnn::TensorInfo tensorInfo({1, 2, 3}, armnn::DataType::Float32);
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(SerializeAddition)
 
     std::string serializedNetwork = SerializeNetwork(*network);
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(serializedNetwork);
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBase verifier(layerName, {tensorInfo, tensorInfo}, {tensorInfo});
     deserializedNetwork->ExecuteStrategy(verifier);
@@ -98,7 +98,7 @@ void SerializeArgMinMaxTest(armnn::DataType dataType)
     argMinMaxLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::ArgMinMaxDescriptor> verifier(layerName,
                                                                          {inputInfo},
@@ -107,17 +107,17 @@ void SerializeArgMinMaxTest(armnn::DataType dataType)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeArgMinMaxSigned32)
+TEST_CASE("SerializeArgMinMaxSigned32")
 {
     SerializeArgMinMaxTest(armnn::DataType::Signed32);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeArgMinMaxSigned64)
+TEST_CASE("SerializeArgMinMaxSigned64")
 {
     SerializeArgMinMaxTest(armnn::DataType::Signed64);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeBatchNormalization)
+TEST_CASE("SerializeBatchNormalization")
 {
     const std::string layerName("batchNormalization");
     const armnn::TensorInfo inputInfo ({ 1, 3, 3, 1 }, armnn::DataType::Float32);
@@ -161,14 +161,14 @@ BOOST_AUTO_TEST_CASE(SerializeBatchNormalization)
     batchNormalizationLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptorAndConstants<armnn::BatchNormalizationDescriptor> verifier(
         layerName, {inputInfo}, {outputInfo}, descriptor, constants);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeBatchToSpaceNd)
+TEST_CASE("SerializeBatchToSpaceNd")
 {
     const std::string layerName("spaceToBatchNd");
     const armnn::TensorInfo inputInfo({4, 1, 2, 2}, armnn::DataType::Float32);
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(SerializeBatchToSpaceNd)
     batchToSpaceNdLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::BatchToSpaceNdDescriptor> verifier(layerName,
                                                                               {inputInfo},
@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE(SerializeBatchToSpaceNd)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeCast)
+TEST_CASE("SerializeCast")
 {
         const std::string layerName("cast");
 
@@ -221,13 +221,13 @@ BOOST_AUTO_TEST_CASE(SerializeCast)
         castLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
         armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-        BOOST_CHECK(deserializedNetwork);
+        CHECK(deserializedNetwork);
 
         LayerVerifierBase verifier(layerName, {inputInfo}, {outputInfo});
         deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeComparison)
+TEST_CASE("SerializeComparison")
 {
     const std::string layerName("comparison");
 
@@ -253,7 +253,7 @@ BOOST_AUTO_TEST_CASE(SerializeComparison)
     comparisonLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::ComparisonDescriptor> verifier(layerName,
                                                                           { inputInfo, inputInfo },
@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_CASE(SerializeComparison)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeConstant)
+TEST_CASE("SerializeConstant")
 {
     class ConstantLayerVerifier : public LayerVerifierBase
     {
@@ -324,13 +324,13 @@ BOOST_AUTO_TEST_CASE(SerializeConstant)
     add->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     ConstantLayerVerifier verifier(layerName, {}, {info}, {constTensor});
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeConvolution2d)
+TEST_CASE("SerializeConvolution2d")
 {
     const std::string layerName("convolution2d");
     const armnn::TensorInfo inputInfo ({ 1, 5, 5, 1 }, armnn::DataType::Float32);
@@ -373,7 +373,7 @@ BOOST_AUTO_TEST_CASE(SerializeConvolution2d)
     convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     const std::vector<armnn::ConstTensor>& constants {weights, biases};
     LayerVerifierBaseWithDescriptorAndConstants<armnn::Convolution2dDescriptor> verifier(
@@ -381,7 +381,7 @@ BOOST_AUTO_TEST_CASE(SerializeConvolution2d)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeConvolution2dWithPerAxisParams)
+TEST_CASE("SerializeConvolution2dWithPerAxisParams")
 {
     using namespace armnn;
 
@@ -428,7 +428,7 @@ BOOST_AUTO_TEST_CASE(SerializeConvolution2dWithPerAxisParams)
     convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     const std::vector<armnn::ConstTensor>& constants {weights, biases};
     LayerVerifierBaseWithDescriptorAndConstants<Convolution2dDescriptor> verifier(
@@ -436,7 +436,7 @@ BOOST_AUTO_TEST_CASE(SerializeConvolution2dWithPerAxisParams)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeDepthToSpace)
+TEST_CASE("SerializeDepthToSpace")
 {
     const std::string layerName("depthToSpace");
 
@@ -459,13 +459,13 @@ BOOST_AUTO_TEST_CASE(SerializeDepthToSpace)
     depthToSpaceLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::DepthToSpaceDescriptor> verifier(layerName, {inputInfo}, {outputInfo}, desc);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2d)
+TEST_CASE("SerializeDepthwiseConvolution2d")
 {
     const std::string layerName("depwiseConvolution2d");
     const armnn::TensorInfo inputInfo ({ 1, 5, 5, 3 }, armnn::DataType::Float32);
@@ -508,7 +508,7 @@ BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2d)
     depthwiseConvLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     const std::vector<armnn::ConstTensor>& constants {weights, biases};
     LayerVerifierBaseWithDescriptorAndConstants<armnn::DepthwiseConvolution2dDescriptor> verifier(
@@ -516,7 +516,7 @@ BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2d)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2dWithPerAxisParams)
+TEST_CASE("SerializeDepthwiseConvolution2dWithPerAxisParams")
 {
     using namespace armnn;
 
@@ -565,7 +565,7 @@ BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2dWithPerAxisParams)
     depthwiseConvLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     const std::vector<armnn::ConstTensor>& constants {weights, biases};
     LayerVerifierBaseWithDescriptorAndConstants<armnn::DepthwiseConvolution2dDescriptor> verifier(
@@ -573,7 +573,7 @@ BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2dWithPerAxisParams)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeDequantize)
+TEST_CASE("SerializeDequantize")
 {
     const std::string layerName("dequantize");
     const armnn::TensorInfo inputInfo({ 1, 5, 2, 3 }, armnn::DataType::QAsymmU8, 0.5f, 1);
@@ -591,13 +591,13 @@ BOOST_AUTO_TEST_CASE(SerializeDequantize)
     dequantizeLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBase verifier(layerName, {inputInfo}, {outputInfo});
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeDeserializeDetectionPostProcess)
+TEST_CASE("SerializeDeserializeDetectionPostProcess")
 {
     const std::string layerName("detectionPostProcess");
 
@@ -656,7 +656,7 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeDetectionPostProcess)
     }
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     const std::vector<armnn::ConstTensor>& constants {anchors};
     LayerVerifierBaseWithDescriptorAndConstants<armnn::DetectionPostProcessDescriptor> verifier(
@@ -664,7 +664,7 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeDetectionPostProcess)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeDivision)
+TEST_CASE("SerializeDivision")
 {
     const std::string layerName("division");
     const armnn::TensorInfo info({ 1, 5, 2, 3 }, armnn::DataType::Float32);
@@ -684,13 +684,13 @@ BOOST_AUTO_TEST_CASE(SerializeDivision)
     divisionLayer->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBase verifier(layerName, {info, info}, {info});
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeDeserializeEqual)
+TEST_CASE("SerializeDeserializeEqual")
 {
     const std::string layerName("EqualLayer");
     const armnn::TensorInfo inputTensorInfo1 = armnn::TensorInfo({2, 1, 2, 4}, armnn::DataType::Float32);
@@ -713,13 +713,13 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeEqual)
     equalLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBase verifier(layerName, {inputTensorInfo1, inputTensorInfo2}, {outputTensorInfo});
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeFill)
+TEST_CASE("SerializeFill")
 {
     const std::string layerName("fill");
     const armnn::TensorInfo inputInfo({4}, armnn::DataType::Signed32);
@@ -739,14 +739,14 @@ BOOST_AUTO_TEST_CASE(SerializeFill)
     fillLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::FillDescriptor> verifier(layerName, {inputInfo}, {outputInfo}, descriptor);
 
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeFloor)
+TEST_CASE("SerializeFloor")
 {
     const std::string layerName("floor");
     const armnn::TensorInfo info({4,4}, armnn::DataType::Float32);
@@ -763,13 +763,13 @@ BOOST_AUTO_TEST_CASE(SerializeFloor)
     floorLayer->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBase verifier(layerName, {info}, {info});
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeFullyConnected)
+TEST_CASE("SerializeFullyConnected")
 {
     const std::string layerName("fullyConnected");
     const armnn::TensorInfo inputInfo ({ 2, 5, 1, 1 }, armnn::DataType::Float32);
@@ -803,7 +803,7 @@ BOOST_AUTO_TEST_CASE(SerializeFullyConnected)
     fullyConnectedLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     const std::vector<armnn::ConstTensor> constants {weights, biases};
     LayerVerifierBaseWithDescriptorAndConstants<armnn::FullyConnectedDescriptor> verifier(
@@ -811,7 +811,7 @@ BOOST_AUTO_TEST_CASE(SerializeFullyConnected)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeFullyConnectedWeightsAsInputs)
+TEST_CASE("SerializeFullyConnectedWeightsAsInputs")
 {
     const std::string layerName("fullyConnected_weights_as_inputs");
     const armnn::TensorInfo inputInfo ({ 2, 5, 1, 1 }, armnn::DataType::Float32);
@@ -850,7 +850,7 @@ BOOST_AUTO_TEST_CASE(SerializeFullyConnectedWeightsAsInputs)
     fullyConnectedLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     const std::vector<armnn::ConstTensor> constants {};
     LayerVerifierBaseWithDescriptorAndConstants<armnn::FullyConnectedDescriptor> verifier(
@@ -858,7 +858,7 @@ BOOST_AUTO_TEST_CASE(SerializeFullyConnectedWeightsAsInputs)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeGather)
+TEST_CASE("SerializeGather")
 {
     using GatherDescriptor = armnn::GatherDescriptor;
     class GatherLayerVerifier : public LayerVerifierBaseWithDescriptor<GatherDescriptor>
@@ -886,7 +886,7 @@ BOOST_AUTO_TEST_CASE(SerializeGather)
                 {
                     VerifyNameAndConnections(layer, name);
                     const GatherDescriptor& layerDescriptor = static_cast<const GatherDescriptor&>(descriptor);
-                    BOOST_CHECK(layerDescriptor.m_Axis == m_Descriptor.m_Axis);
+                    CHECK(layerDescriptor.m_Axis == m_Descriptor.m_Axis);
                 }
             }
         }
@@ -922,7 +922,7 @@ BOOST_AUTO_TEST_CASE(SerializeGather)
     gatherLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     GatherLayerVerifier verifier(layerName, {paramsInfo, indicesInfo}, {outputInfo}, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
@@ -932,7 +932,7 @@ BOOST_AUTO_TEST_CASE(SerializeGather)
 // NOTE: Until the deprecated AddGreaterLayer disappears this test checks that calling
 //       AddGreaterLayer places a ComparisonLayer into the serialized format and that
 //       when this deserialises we have a ComparisonLayer
-BOOST_AUTO_TEST_CASE(SerializeGreaterDeprecated)
+TEST_CASE("SerializeGreaterDeprecated")
 {
     const std::string layerName("greater");
 
@@ -958,14 +958,14 @@ BOOST_AUTO_TEST_CASE(SerializeGreaterDeprecated)
     equalLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBase verifier(layerName, { inputInfo, inputInfo }, { outputInfo });
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
 
-BOOST_AUTO_TEST_CASE(SerializeInstanceNormalization)
+TEST_CASE("SerializeInstanceNormalization")
 {
     const std::string layerName("instanceNormalization");
     const armnn::TensorInfo info({ 1, 2, 1, 5 }, armnn::DataType::Float32);
@@ -989,14 +989,14 @@ BOOST_AUTO_TEST_CASE(SerializeInstanceNormalization)
     instanceNormLayer->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::InstanceNormalizationDescriptor> verifier(
             layerName, {info}, {info}, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeL2Normalization)
+TEST_CASE("SerializeL2Normalization")
 {
     const std::string l2NormLayerName("l2Normalization");
     const armnn::TensorInfo info({1, 2, 1, 5}, armnn::DataType::Float32);
@@ -1017,14 +1017,14 @@ BOOST_AUTO_TEST_CASE(SerializeL2Normalization)
     l2NormLayer->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::L2NormalizationDescriptor> verifier(
             l2NormLayerName, {info}, {info}, desc);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(EnsureL2NormalizationBackwardCompatibility)
+TEST_CASE("EnsureL2NormalizationBackwardCompatibility")
 {
     // The hex data below is a flat buffer containing a simple network with one input
     // a L2Normalization layer and an output layer with dimensions as per the tensor infos below.
@@ -1066,7 +1066,7 @@ BOOST_AUTO_TEST_CASE(EnsureL2NormalizationBackwardCompatibility)
 
     armnn::INetworkPtr deserializedNetwork =
         DeserializeNetwork(std::string(l2NormalizationModel.begin(), l2NormalizationModel.end()));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     const std::string layerName("l2Normalization");
     const armnn::TensorInfo inputInfo = armnn::TensorInfo({1, 2, 1, 5}, armnn::DataType::Float32);
@@ -1081,7 +1081,7 @@ BOOST_AUTO_TEST_CASE(EnsureL2NormalizationBackwardCompatibility)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeLogicalBinary)
+TEST_CASE("SerializeLogicalBinary")
 {
     const std::string layerName("logicalBinaryAnd");
 
@@ -1107,14 +1107,14 @@ BOOST_AUTO_TEST_CASE(SerializeLogicalBinary)
     logicalBinaryLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::LogicalBinaryDescriptor> verifier(
             layerName, { inputInfo, inputInfo }, { outputInfo }, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeLogicalUnary)
+TEST_CASE("SerializeLogicalUnary")
 {
     const std::string layerName("elementwiseUnaryLogicalNot");
 
@@ -1139,7 +1139,7 @@ BOOST_AUTO_TEST_CASE(SerializeLogicalUnary)
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
 
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::ElementwiseUnaryDescriptor> verifier(
             layerName, { inputInfo }, { outputInfo }, descriptor);
@@ -1147,7 +1147,7 @@ BOOST_AUTO_TEST_CASE(SerializeLogicalUnary)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeLogSoftmax)
+TEST_CASE("SerializeLogSoftmax")
 {
     const std::string layerName("log_softmax");
     const armnn::TensorInfo info({1, 10}, armnn::DataType::Float32);
@@ -1168,13 +1168,13 @@ BOOST_AUTO_TEST_CASE(SerializeLogSoftmax)
     logSoftmaxLayer->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::LogSoftmaxDescriptor> verifier(layerName, {info}, {info}, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeMaximum)
+TEST_CASE("SerializeMaximum")
 {
     const std::string layerName("maximum");
     const armnn::TensorInfo info({ 1, 2, 2, 3 }, armnn::DataType::Float32);
@@ -1194,13 +1194,13 @@ BOOST_AUTO_TEST_CASE(SerializeMaximum)
     maximumLayer->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBase verifier(layerName, {info, info}, {info});
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeMean)
+TEST_CASE("SerializeMean")
 {
     const std::string layerName("mean");
     const armnn::TensorInfo inputInfo({1, 1, 3, 2}, armnn::DataType::Float32);
@@ -1222,13 +1222,13 @@ BOOST_AUTO_TEST_CASE(SerializeMean)
     meanLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::MeanDescriptor> verifier(layerName, {inputInfo}, {outputInfo}, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeMerge)
+TEST_CASE("SerializeMerge")
 {
     const std::string layerName("merge");
     const armnn::TensorInfo info({ 1, 2, 2, 3 }, armnn::DataType::Float32);
@@ -1248,7 +1248,7 @@ BOOST_AUTO_TEST_CASE(SerializeMerge)
     mergeLayer->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBase verifier(layerName, {info, info}, {info});
     deserializedNetwork->ExecuteStrategy(verifier);
@@ -1298,7 +1298,7 @@ public:
 // NOTE: Until the deprecated AddMergerLayer disappears this test checks that calling
 //       AddMergerLayer places a ConcatLayer into the serialized format and that
 //       when this deserialises we have a ConcatLayer
-BOOST_AUTO_TEST_CASE(SerializeMerger)
+TEST_CASE("SerializeMerger")
 {
     const std::string layerName("merger");
     const armnn::TensorInfo inputInfo = armnn::TensorInfo({2, 3, 2, 2}, armnn::DataType::Float32);
@@ -1327,13 +1327,13 @@ BOOST_AUTO_TEST_CASE(SerializeMerger)
 
     std::string mergerLayerNetwork = SerializeNetwork(*network);
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(mergerLayerNetwork);
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     MergerLayerVerifier verifier(layerName, {inputInfo, inputInfo}, {outputInfo}, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(EnsureMergerLayerBackwardCompatibility)
+TEST_CASE("EnsureMergerLayerBackwardCompatibility")
 {
     // The hex data below is a flat buffer containing a simple network with two inputs
     // a merger layer (now deprecated) and an output layer with dimensions as per the tensor infos below.
@@ -1388,7 +1388,7 @@ BOOST_AUTO_TEST_CASE(EnsureMergerLayerBackwardCompatibility)
     };
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(std::string(mergerModel.begin(), mergerModel.end()));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     const armnn::TensorInfo inputInfo  = armnn::TensorInfo({ 2, 3, 2, 2 }, armnn::DataType::Float32);
     const armnn::TensorInfo outputInfo = armnn::TensorInfo({ 4, 3, 2, 2 }, armnn::DataType::Float32);
@@ -1402,7 +1402,7 @@ BOOST_AUTO_TEST_CASE(EnsureMergerLayerBackwardCompatibility)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeConcat)
+TEST_CASE("SerializeConcat")
 {
     const std::string layerName("concat");
     const armnn::TensorInfo inputInfo = armnn::TensorInfo({2, 3, 2, 2}, armnn::DataType::Float32);
@@ -1429,7 +1429,7 @@ BOOST_AUTO_TEST_CASE(SerializeConcat)
 
     std::string concatLayerNetwork = SerializeNetwork(*network);
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(concatLayerNetwork);
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     // NOTE: using the MergerLayerVerifier to ensure that it is a concat layer and not a
     //       merger layer that gets placed into the graph.
@@ -1437,7 +1437,7 @@ BOOST_AUTO_TEST_CASE(SerializeConcat)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeMinimum)
+TEST_CASE("SerializeMinimum")
 {
     const std::string layerName("minimum");
     const armnn::TensorInfo info({ 1, 2, 2, 3 }, armnn::DataType::Float32);
@@ -1457,13 +1457,13 @@ BOOST_AUTO_TEST_CASE(SerializeMinimum)
     minimumLayer->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBase verifier(layerName, {info, info}, {info});
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeMultiplication)
+TEST_CASE("SerializeMultiplication")
 {
     const std::string layerName("multiplication");
     const armnn::TensorInfo info({ 1, 5, 2, 3 }, armnn::DataType::Float32);
@@ -1483,13 +1483,13 @@ BOOST_AUTO_TEST_CASE(SerializeMultiplication)
     multiplicationLayer->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBase verifier(layerName, {info, info}, {info});
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializePrelu)
+TEST_CASE("SerializePrelu")
 {
     const std::string layerName("prelu");
 
@@ -1512,13 +1512,13 @@ BOOST_AUTO_TEST_CASE(SerializePrelu)
     preluLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBase verifier(layerName, {inputTensorInfo, alphaTensorInfo}, {outputTensorInfo});
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeNormalization)
+TEST_CASE("SerializeNormalization")
 {
     const std::string layerName("normalization");
     const armnn::TensorInfo info({2, 1, 2, 2}, armnn::DataType::Float32);
@@ -1542,13 +1542,13 @@ BOOST_AUTO_TEST_CASE(SerializeNormalization)
     normalizationLayer->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::NormalizationDescriptor> verifier(layerName, {info}, {info}, desc);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializePad)
+TEST_CASE("SerializePad")
 {
     const std::string layerName("pad");
     const armnn::TensorInfo inputTensorInfo = armnn::TensorInfo({1, 2, 3, 4}, armnn::DataType::Float32);
@@ -1568,7 +1568,7 @@ BOOST_AUTO_TEST_CASE(SerializePad)
     padLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::PadDescriptor> verifier(layerName,
                                                                    {inputTensorInfo},
@@ -1577,7 +1577,7 @@ BOOST_AUTO_TEST_CASE(SerializePad)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(EnsurePadBackwardCompatibility)
+TEST_CASE("EnsurePadBackwardCompatibility")
 {
     // The PadDescriptor is being extended with a float PadValue (so a value other than 0
     // can be used to pad the tensor.
@@ -1620,7 +1620,7 @@ BOOST_AUTO_TEST_CASE(EnsurePadBackwardCompatibility)
     };
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(std::string(padModel.begin(), padModel.end()));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     const armnn::TensorInfo inputInfo  = armnn::TensorInfo({ 1, 2, 3, 4 }, armnn::DataType::Float32);
     const armnn::TensorInfo outputInfo = armnn::TensorInfo({ 1, 3, 5, 7 }, armnn::DataType::Float32);
@@ -1631,7 +1631,7 @@ BOOST_AUTO_TEST_CASE(EnsurePadBackwardCompatibility)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializePermute)
+TEST_CASE("SerializePermute")
 {
     const std::string layerName("permute");
     const armnn::TensorInfo inputTensorInfo({4, 3, 2, 1}, armnn::DataType::Float32);
@@ -1651,14 +1651,14 @@ BOOST_AUTO_TEST_CASE(SerializePermute)
     permuteLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::PermuteDescriptor> verifier(
             layerName, {inputTensorInfo}, {outputTensorInfo}, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializePooling2d)
+TEST_CASE("SerializePooling2d")
 {
     const std::string layerName("pooling2d");
     const armnn::TensorInfo inputInfo({1, 2, 2, 1}, armnn::DataType::Float32);
@@ -1690,14 +1690,14 @@ BOOST_AUTO_TEST_CASE(SerializePooling2d)
     pooling2dLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::Pooling2dDescriptor> verifier(
             layerName, {inputInfo}, {outputInfo}, desc);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeQuantize)
+TEST_CASE("SerializeQuantize")
 {
     const std::string layerName("quantize");
     const armnn::TensorInfo info({ 1, 2, 2, 3 }, armnn::DataType::Float32);
@@ -1714,13 +1714,13 @@ BOOST_AUTO_TEST_CASE(SerializeQuantize)
     quantizeLayer->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBase verifier(layerName, {info}, {info});
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeRank)
+TEST_CASE("SerializeRank")
 {
     const std::string layerName("rank");
     const armnn::TensorInfo inputInfo({1, 9}, armnn::DataType::Float32);
@@ -1738,13 +1738,13 @@ BOOST_AUTO_TEST_CASE(SerializeRank)
     rankLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBase verifier(layerName, {inputInfo}, {outputInfo});
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeReduceSum)
+TEST_CASE("SerializeReduceSum")
 {
     const std::string layerName("Reduce_Sum");
     const armnn::TensorInfo inputInfo({1, 1, 3, 2}, armnn::DataType::Float32);
@@ -1766,13 +1766,13 @@ BOOST_AUTO_TEST_CASE(SerializeReduceSum)
     reduceSumLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::ReduceDescriptor> verifier(layerName, {inputInfo}, {outputInfo}, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeReshape)
+TEST_CASE("SerializeReshape")
 {
     const std::string layerName("reshape");
     const armnn::TensorInfo inputInfo({1, 9}, armnn::DataType::Float32);
@@ -1792,14 +1792,14 @@ BOOST_AUTO_TEST_CASE(SerializeReshape)
     reshapeLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::ReshapeDescriptor> verifier(
             layerName, {inputInfo}, {outputInfo}, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeResize)
+TEST_CASE("SerializeResize")
 {
     const std::string layerName("resize");
     const armnn::TensorInfo inputInfo  = armnn::TensorInfo({1, 3, 5, 5}, armnn::DataType::Float32);
@@ -1824,7 +1824,7 @@ BOOST_AUTO_TEST_CASE(SerializeResize)
     resizeLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::ResizeDescriptor> verifier(layerName, {inputInfo}, {outputInfo}, desc);
     deserializedNetwork->ExecuteStrategy(verifier);
@@ -1856,12 +1856,12 @@ public:
                 VerifyNameAndConnections(layer, name);
                 const armnn::ResizeDescriptor& layerDescriptor =
                         static_cast<const armnn::ResizeDescriptor&>(descriptor);
-                BOOST_CHECK(layerDescriptor.m_Method             == armnn::ResizeMethod::Bilinear);
-                BOOST_CHECK(layerDescriptor.m_TargetWidth        == m_Descriptor.m_TargetWidth);
-                BOOST_CHECK(layerDescriptor.m_TargetHeight       == m_Descriptor.m_TargetHeight);
-                BOOST_CHECK(layerDescriptor.m_DataLayout         == m_Descriptor.m_DataLayout);
-                BOOST_CHECK(layerDescriptor.m_AlignCorners       == m_Descriptor.m_AlignCorners);
-                BOOST_CHECK(layerDescriptor.m_HalfPixelCenters   == m_Descriptor.m_HalfPixelCenters);
+                CHECK(layerDescriptor.m_Method             == armnn::ResizeMethod::Bilinear);
+                CHECK(layerDescriptor.m_TargetWidth        == m_Descriptor.m_TargetWidth);
+                CHECK(layerDescriptor.m_TargetHeight       == m_Descriptor.m_TargetHeight);
+                CHECK(layerDescriptor.m_DataLayout         == m_Descriptor.m_DataLayout);
+                CHECK(layerDescriptor.m_AlignCorners       == m_Descriptor.m_AlignCorners);
+                CHECK(layerDescriptor.m_HalfPixelCenters   == m_Descriptor.m_HalfPixelCenters);
                 break;
             }
             default:
@@ -1876,7 +1876,7 @@ public:
 // NOTE: Until the deprecated AddResizeBilinearLayer disappears this test checks that
 //       calling AddResizeBilinearLayer places a ResizeLayer into the serialized format
 //       and that when this deserialises we have a ResizeLayer
-BOOST_AUTO_TEST_CASE(SerializeResizeBilinear)
+TEST_CASE("SerializeResizeBilinear")
 {
     const std::string layerName("resizeBilinear");
     const armnn::TensorInfo inputInfo  = armnn::TensorInfo({1, 3, 5, 5}, armnn::DataType::Float32);
@@ -1902,13 +1902,13 @@ BOOST_AUTO_TEST_CASE(SerializeResizeBilinear)
     resizeLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     ResizeBilinearLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, desc);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(EnsureResizeBilinearBackwardCompatibility)
+TEST_CASE("EnsureResizeBilinearBackwardCompatibility")
 {
     // The hex data below is a flat buffer containing a simple network with an input,
     // a ResizeBilinearLayer (now deprecated) and an output
@@ -1951,7 +1951,7 @@ BOOST_AUTO_TEST_CASE(EnsureResizeBilinearBackwardCompatibility)
 
     armnn::INetworkPtr deserializedNetwork =
         DeserializeNetwork(std::string(resizeBilinearModel.begin(), resizeBilinearModel.end()));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     const armnn::TensorInfo inputInfo  = armnn::TensorInfo({1, 3, 5, 5}, armnn::DataType::Float32);
     const armnn::TensorInfo outputInfo = armnn::TensorInfo({1, 3, 2, 4}, armnn::DataType::Float32);
@@ -1964,7 +1964,7 @@ BOOST_AUTO_TEST_CASE(EnsureResizeBilinearBackwardCompatibility)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeSlice)
+TEST_CASE("SerializeSlice")
 {
     const std::string layerName{"slice"};
 
@@ -1986,13 +1986,13 @@ BOOST_AUTO_TEST_CASE(SerializeSlice)
     sliceLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::SliceDescriptor> verifier(layerName, {inputInfo}, {outputInfo}, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeSoftmax)
+TEST_CASE("SerializeSoftmax")
 {
     const std::string layerName("softmax");
     const armnn::TensorInfo info({1, 10}, armnn::DataType::Float32);
@@ -2012,13 +2012,13 @@ BOOST_AUTO_TEST_CASE(SerializeSoftmax)
     softmaxLayer->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::SoftmaxDescriptor> verifier(layerName, {info}, {info}, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeSpaceToBatchNd)
+TEST_CASE("SerializeSpaceToBatchNd")
 {
     const std::string layerName("spaceToBatchNd");
     const armnn::TensorInfo inputInfo({2, 1, 2, 4}, armnn::DataType::Float32);
@@ -2041,14 +2041,14 @@ BOOST_AUTO_TEST_CASE(SerializeSpaceToBatchNd)
     spaceToBatchNdLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::SpaceToBatchNdDescriptor> verifier(
             layerName, {inputInfo}, {outputInfo}, desc);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeSpaceToDepth)
+TEST_CASE("SerializeSpaceToDepth")
 {
     const std::string layerName("spaceToDepth");
 
@@ -2071,14 +2071,14 @@ BOOST_AUTO_TEST_CASE(SerializeSpaceToDepth)
     spaceToDepthLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::SpaceToDepthDescriptor> verifier(
             layerName, {inputInfo}, {outputInfo}, desc);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeSplitter)
+TEST_CASE("SerializeSplitter")
 {
     const unsigned int numViews = 3;
     const unsigned int numDimensions = 4;
@@ -2125,14 +2125,14 @@ BOOST_AUTO_TEST_CASE(SerializeSplitter)
     splitterLayer->GetOutputSlot(2).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::ViewsDescriptor> verifier(
             layerName, {inputInfo}, {outputInfo, outputInfo, outputInfo}, desc);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeStack)
+TEST_CASE("SerializeStack")
 {
     const std::string layerName("stack");
 
@@ -2156,14 +2156,14 @@ BOOST_AUTO_TEST_CASE(SerializeStack)
     stackLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::StackDescriptor> verifier(
             layerName, {inputTensorInfo, inputTensorInfo}, {outputTensorInfo}, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeStandIn)
+TEST_CASE("SerializeStandIn")
 {
     const std::string layerName("standIn");
 
@@ -2190,14 +2190,14 @@ BOOST_AUTO_TEST_CASE(SerializeStandIn)
     standInLayer->GetOutputSlot(1).SetTensorInfo(tensorInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::StandInDescriptor> verifier(
             layerName, { tensorInfo, tensorInfo }, { tensorInfo, tensorInfo }, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeStridedSlice)
+TEST_CASE("SerializeStridedSlice")
 {
     const std::string layerName("stridedSlice");
     const armnn::TensorInfo inputInfo = armnn::TensorInfo({3, 2, 3, 1}, armnn::DataType::Float32);
@@ -2220,14 +2220,14 @@ BOOST_AUTO_TEST_CASE(SerializeStridedSlice)
     stridedSliceLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::StridedSliceDescriptor> verifier(
             layerName, {inputInfo}, {outputInfo}, desc);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeSubtraction)
+TEST_CASE("SerializeSubtraction")
 {
     const std::string layerName("subtraction");
     const armnn::TensorInfo info({ 1, 4 }, armnn::DataType::Float32);
@@ -2247,13 +2247,13 @@ BOOST_AUTO_TEST_CASE(SerializeSubtraction)
     subtractionLayer->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBase verifier(layerName, {info, info}, {info});
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeSwitch)
+TEST_CASE("SerializeSwitch")
 {
     class SwitchLayerVerifier : public LayerVerifierBase
     {
@@ -2312,13 +2312,13 @@ BOOST_AUTO_TEST_CASE(SerializeSwitch)
     switchLayer->GetOutputSlot(1).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     SwitchLayerVerifier verifier(layerName, {info, info}, {info, info});
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeTranspose)
+TEST_CASE("SerializeTranspose")
 {
     const std::string layerName("transpose");
     const armnn::TensorInfo inputTensorInfo({4, 3, 2, 1}, armnn::DataType::Float32);
@@ -2338,14 +2338,14 @@ BOOST_AUTO_TEST_CASE(SerializeTranspose)
     transposeLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::TransposeDescriptor> verifier(
             layerName, {inputTensorInfo}, {outputTensorInfo}, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeTransposeConvolution2d)
+TEST_CASE("SerializeTransposeConvolution2d")
 {
     const std::string layerName("transposeConvolution2d");
     const armnn::TensorInfo inputInfo ({ 1, 7, 7, 1 }, armnn::DataType::Float32);
@@ -2386,7 +2386,7 @@ BOOST_AUTO_TEST_CASE(SerializeTransposeConvolution2d)
     convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     const std::vector<armnn::ConstTensor> constants {weights, biases};
     LayerVerifierBaseWithDescriptorAndConstants<armnn::TransposeConvolution2dDescriptor> verifier(
@@ -2394,7 +2394,7 @@ BOOST_AUTO_TEST_CASE(SerializeTransposeConvolution2d)
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeDeserializeNonLinearNetwork)
+TEST_CASE("SerializeDeserializeNonLinearNetwork")
 {
     class ConstantLayerVerifier : public LayerVerifierBase
     {
@@ -2456,10 +2456,10 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeNonLinearNetwork)
     add->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
+    CHECK(deserializedNetwork);
 
     ConstantLayerVerifier verifier(layerName, {}, {info}, constTensor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

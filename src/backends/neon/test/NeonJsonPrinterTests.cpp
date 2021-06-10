@@ -7,16 +7,16 @@
 
 #include <backendsCommon/test/JsonPrinterTestImpl.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <vector>
 
-BOOST_AUTO_TEST_SUITE(NeonJsonPrinter)
-
-BOOST_AUTO_TEST_CASE(SoftmaxProfilerJsonPrinterCpuAccTest)
+TEST_SUITE("NeonJsonPrinter")
+{
+TEST_CASE("SoftmaxProfilerJsonPrinterCpuAccTest")
 {
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
     RunSoftmaxProfilerJsonPrinterTest(backends);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

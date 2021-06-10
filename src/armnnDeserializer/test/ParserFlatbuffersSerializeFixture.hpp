@@ -19,6 +19,7 @@
 #include <ResolveType.hpp>
 
 #include <fmt/format.h>
+#include <doctest/doctest.h>
 
 #include <vector>
 
@@ -154,12 +155,12 @@ struct ParserFlatbuffersSerializeFixture
                       const float scale, const int64_t zeroPoint)
     {
         armnn::IgnoreUnused(name);
-        BOOST_CHECK_EQUAL(shapeSize, tensors->dimensions()->size());
-        BOOST_CHECK_EQUAL_COLLECTIONS(shape.begin(), shape.end(),
-                                      tensors->dimensions()->begin(), tensors->dimensions()->end());
-        BOOST_CHECK_EQUAL(tensorType.dataType(), tensors->dataType());
-        BOOST_CHECK_EQUAL(scale, tensors->quantizationScale());
-        BOOST_CHECK_EQUAL(zeroPoint, tensors->quantizationOffset());
+        CHECK_EQ(shapeSize, tensors->dimensions()->size());
+        CHECK(std::equal(shape.begin(), shape.end(),
+                                      tensors->dimensions()->begin(), tensors->dimensions()->end()));
+        CHECK_EQ(tensorType.dataType(), tensors->dataType());
+        CHECK_EQ(scale, tensors->quantizationScale());
+        CHECK_EQ(zeroPoint, tensors->quantizationOffset());
     }
 };
 
@@ -241,6 +242,6 @@ void ParserFlatbuffersSerializeFixture::RunTest(
         auto outputExpected = it.second;
         auto result = CompareTensors(outputExpected, outputStorage[it.first],
                                      bindingInfo.second.GetShape(), bindingInfo.second.GetShape());
-        BOOST_TEST(result.m_Result, result.m_Message.str());
+        CHECK_MESSAGE(result.m_Result, result.m_Message.str());
     }
 }

@@ -12,8 +12,8 @@
 #include <random>
 #include <vector>
 
-#include <boost/test/unit_test.hpp>
-
+#include <cstdlib>
+#include <doctest/doctest.h>
 
 armnn::INetworkPtr DeserializeNetwork(const std::string& serializerString);
 
@@ -82,7 +82,7 @@ public:
 protected:
     void VerifyDescriptor(const Descriptor& descriptor)
     {
-        BOOST_CHECK(descriptor == m_Descriptor);
+        CHECK(descriptor == m_Descriptor);
     }
 
     Descriptor m_Descriptor;
@@ -93,12 +93,12 @@ void CompareConstTensorData(const void* data1, const void* data2, unsigned int n
 {
     T typedData1 = static_cast<T>(data1);
     T typedData2 = static_cast<T>(data2);
-    BOOST_CHECK(typedData1);
-    BOOST_CHECK(typedData2);
+    CHECK(typedData1);
+    CHECK(typedData2);
 
     for (unsigned int i = 0; i < numElements; i++)
     {
-        BOOST_TEST(typedData1[i] == typedData2[i]);
+        CHECK(typedData1[i] == typedData2[i]);
     }
 }
 
@@ -161,7 +161,7 @@ static std::vector<DataType> GenerateRandomData(size_t size)
     static std::default_random_engine generator;
 
     std::vector<DataType> randomData(size);
-    std::generate(randomData.begin(), randomData.end(), []() { return distribution(generator); });
+    generate(randomData.begin(), randomData.end(), []() { return distribution(generator); });
 
     return randomData;
 }

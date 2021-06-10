@@ -20,6 +20,7 @@
 #include <test/TensorHelpers.hpp>
 
 #include <fmt/format.h>
+#include <doctest/doctest.h>
 
 #include "flatbuffers/idl.h"
 #include "flatbuffers/util.h"
@@ -207,22 +208,22 @@ struct ParserFlatbuffersFixture
                       const std::vector<float>& min, const std::vector<float>& max,
                       const std::vector<float>& scale, const std::vector<int64_t>& zeroPoint)
     {
-        BOOST_CHECK(tensors);
-        BOOST_CHECK_EQUAL(shapeSize, tensors->shape.size());
-        BOOST_CHECK_EQUAL_COLLECTIONS(shape.begin(), shape.end(), tensors->shape.begin(), tensors->shape.end());
-        BOOST_CHECK_EQUAL(tensorType, tensors->type);
-        BOOST_CHECK_EQUAL(buffer, tensors->buffer);
-        BOOST_CHECK_EQUAL(name, tensors->name);
-        BOOST_CHECK(tensors->quantization);
-        BOOST_CHECK_EQUAL_COLLECTIONS(min.begin(), min.end(), tensors->quantization.get()->min.begin(),
-                                      tensors->quantization.get()->min.end());
-        BOOST_CHECK_EQUAL_COLLECTIONS(max.begin(), max.end(), tensors->quantization.get()->max.begin(),
-                                      tensors->quantization.get()->max.end());
-        BOOST_CHECK_EQUAL_COLLECTIONS(scale.begin(), scale.end(), tensors->quantization.get()->scale.begin(),
-                                      tensors->quantization.get()->scale.end());
-        BOOST_CHECK_EQUAL_COLLECTIONS(zeroPoint.begin(), zeroPoint.end(),
+        CHECK(tensors);
+        CHECK_EQ(shapeSize, tensors->shape.size());
+        CHECK(std::equal(shape.begin(), shape.end(), tensors->shape.begin(), tensors->shape.end()));
+        CHECK_EQ(tensorType, tensors->type);
+        CHECK_EQ(buffer, tensors->buffer);
+        CHECK_EQ(name, tensors->name);
+        CHECK(tensors->quantization);
+        CHECK(std::equal(min.begin(), min.end(), tensors->quantization.get()->min.begin(),
+                                      tensors->quantization.get()->min.end()));
+        CHECK(std::equal(max.begin(), max.end(), tensors->quantization.get()->max.begin(),
+                                      tensors->quantization.get()->max.end()));
+        CHECK(std::equal(scale.begin(), scale.end(), tensors->quantization.get()->scale.begin(),
+                                      tensors->quantization.get()->scale.end()));
+        CHECK(std::equal(zeroPoint.begin(), zeroPoint.end(),
                                       tensors->quantization.get()->zero_point.begin(),
-                                      tensors->quantization.get()->zero_point.end());
+                                      tensors->quantization.get()->zero_point.end()));
     }
 
 private:
@@ -302,7 +303,7 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
 
         // Check that output tensors have correct number of dimensions (NumOutputDimensions specified in test)
         auto outputNumDimensions = outputTensorInfo.GetNumDimensions();
-        BOOST_CHECK_MESSAGE((outputNumDimensions == NumOutputDimensions),
+        CHECK_MESSAGE((outputNumDimensions == NumOutputDimensions),
             fmt::format("Number of dimensions expected {}, but got {} for output layer {}",
                         NumOutputDimensions,
                         outputNumDimensions,
@@ -324,7 +325,7 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
         auto result = CompareTensors(outputExpected, outputStorage[it.first],
                                      bindingInfo.second.GetShape(), bindingInfo.second.GetShape(),
                                      false, isDynamic);
-        BOOST_TEST(result.m_Result, result.m_Message.str());
+        CHECK_MESSAGE(result.m_Result, result.m_Message.str());
     }
 }
 
@@ -368,7 +369,7 @@ void ParserFlatbuffersFixture::RunTest(std::size_t subgraphId,
         {
             for (unsigned int i = 0; i < out.size(); ++i)
             {
-                BOOST_TEST(it.second[i] == out[i], boost::test_tools::tolerance(0.000001f));
+                CHECK(doctest::Approx(it.second[i]).epsilon(0.000001f) == out[i]);
             }
         }
     }
@@ -404,7 +405,7 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
 
         // Check that output tensors have correct number of dimensions (NumOutputDimensions specified in test)
         auto outputNumDimensions = outputTensorInfo.GetNumDimensions();
-        BOOST_CHECK_MESSAGE((outputNumDimensions == NumOutputDimensions),
+        CHECK_MESSAGE((outputNumDimensions == NumOutputDimensions),
             fmt::format("Number of dimensions expected {}, but got {} for output layer {}",
                         NumOutputDimensions,
                         outputNumDimensions,
@@ -425,6 +426,6 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
         auto outputExpected = it.second;
         auto result = CompareTensors(outputExpected, outputStorage[it.first],
                                      bindingInfo.second.GetShape(), bindingInfo.second.GetShape(), false);
-        BOOST_TEST(result.m_Result, result.m_Message.str());
+        CHECK_MESSAGE(result.m_Result, result.m_Message.str());
     }
 }

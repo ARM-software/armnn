@@ -7,20 +7,20 @@
 
 #include <test/UnitTests.hpp>
 
-BOOST_AUTO_TEST_SUITE(DynamicBackendTests)
+#include <doctest/doctest.h>
 
+TEST_SUITE("DynamicBackendTests")
+{
 ARMNN_SIMPLE_TEST_CASE(OpenCloseHandle, OpenCloseHandleTestImpl);
 ARMNN_SIMPLE_TEST_CASE(CloseInvalidHandle, CloseInvalidHandleTestImpl);
 ARMNN_SIMPLE_TEST_CASE(OpenEmptyFileName, OpenEmptyFileNameTestImpl);
 ARMNN_SIMPLE_TEST_CASE(OpenNotExistingFile, OpenNotExistingFileTestImpl);
-ARMNN_SIMPLE_TEST_CASE(OpenNotSharedObjectFile, OpenNotSharedObjectTestImpl);
 ARMNN_SIMPLE_TEST_CASE(GetValidEntryPoint, GetValidEntryPointTestImpl);
 ARMNN_SIMPLE_TEST_CASE(GetNameMangledEntryPoint, GetNameMangledEntryPointTestImpl);
 ARMNN_SIMPLE_TEST_CASE(GetNoExternEntryPoint, GetNoExternEntryPointTestImpl);
 ARMNN_SIMPLE_TEST_CASE(GetNotExistingEntryPoint, GetNotExistingEntryPointTestImpl);
 
 ARMNN_SIMPLE_TEST_CASE(BackendVersioning, BackendVersioningTestImpl);
-
 
 ARMNN_SIMPLE_TEST_CASE(CreateDynamicBackendObjectInvalidHandle,
                        CreateDynamicBackendObjectInvalidHandleTestImpl);
@@ -39,10 +39,11 @@ ARMNN_SIMPLE_TEST_CASE(CreateDynamicBackendObjectInvalidInterface6,
 ARMNN_SIMPLE_TEST_CASE(CreateDynamicBackendObjectInvalidInterface7,
                        CreateDynamicBackendObjectInvalidInterface7TestImpl);
 
+ARMNN_SIMPLE_TEST_CASE(OpenNotSharedObjectFile, OpenNotSharedObjectTestImpl);
+ARMNN_SIMPLE_TEST_CASE(GetSharedObjects, GetSharedObjectsTestImpl);
+
 ARMNN_SIMPLE_TEST_CASE(GetBackendPaths, GetBackendPathsTestImpl)
 ARMNN_SIMPLE_TEST_CASE(GetBackendPathsOverride, GetBackendPathsOverrideTestImpl)
-
-ARMNN_SIMPLE_TEST_CASE(GetSharedObjects, GetSharedObjectsTestImpl);
 
 ARMNN_SIMPLE_TEST_CASE(CreateDynamicBackends, CreateDynamicBackendsTestImpl);
 ARMNN_SIMPLE_TEST_CASE(CreateDynamicBackendsNoPaths, CreateDynamicBackendsNoPathsTestImpl);
@@ -76,4 +77,4 @@ ARMNN_SIMPLE_TEST_CASE(CreateSampleDynamicBackend, CreateSampleDynamicBackendTes
 ARMNN_SIMPLE_TEST_CASE(SampleDynamicBackendEndToEnd, SampleDynamicBackendEndToEndTestImpl);
 #endif
 
-BOOST_AUTO_TEST_SUITE_END()
+}

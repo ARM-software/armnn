@@ -189,6 +189,7 @@ target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
+target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/third-party)
 
 # Dummy shared object for testing.
 # This is a simple library used to test the utility functions that will be used to handle the shared objects.

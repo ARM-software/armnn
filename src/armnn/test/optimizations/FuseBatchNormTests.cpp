@@ -10,12 +10,12 @@
 #include <armnn/INetwork.hpp>
 #include <test/TestUtils.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 using namespace armnn;
 
-BOOST_AUTO_TEST_SUITE(Optimizer)
-
+TEST_SUITE("Optimizer")
+{
 namespace
 {
 
@@ -194,8 +194,8 @@ void FuseBatchNormIntoConvTest(bool depthwise, float tolerance, armnn::Compute b
                (layer->GetNameStr() == "fused-batchNorm-into-convolution");
     };
 
-    BOOST_CHECK(3 == graphFused.GetNumLayers());
-    BOOST_TEST(CheckSequence(graphFused.cbegin(),
+    CHECK(3 == graphFused.GetNumLayers());
+    CHECK(CheckSequence(graphFused.cbegin(),
                              graphFused.cend(),
                              &IsLayerOfType<InputLayer>,
                              checkFusedConv2d,
@@ -203,7 +203,7 @@ void FuseBatchNormIntoConvTest(bool depthwise, float tolerance, armnn::Compute b
 
     // Load network into runtime
     NetworkId networkIdentifier;
-    BOOST_TEST(run->LoadNetwork(networkIdentifier, std::move(optNetFused)) == Status::Success);
+    CHECK(run->LoadNetwork(networkIdentifier, std::move(optNetFused)) == Status::Success);
 
     //Creates structures for inputs and outputs.
     std::vector<T> inputDataFused = GetVector<T>(48, 1.0f, 0.1f);
@@ -235,8 +235,8 @@ void FuseBatchNormIntoConvTest(bool depthwise, float tolerance, armnn::Compute b
 
     Graph& graphNotFused = GetGraphForTesting(optNetNotFused.get());
 
-    BOOST_CHECK(5 == graphNotFused.GetNumLayers());
-    BOOST_TEST(CheckSequence(graphNotFused.cbegin(),
+    CHECK(5 == graphNotFused.GetNumLayers());
+    CHECK(CheckSequence(graphNotFused.cbegin(),
                              graphNotFused.cend(),
                              &IsLayerOfType<armnn::InputLayer>,
                              &IsLayerOfType<ConvLayerType>,
@@ -246,7 +246,7 @@ void FuseBatchNormIntoConvTest(bool depthwise, float tolerance, armnn::Compute b
 
     // Load network into runtime
     NetworkId networkIdentifierNotFused;
-    BOOST_TEST(runNotFused->LoadNetwork(networkIdentifierNotFused, std::move(optNetNotFused)) == Status::Success);
+    CHECK(runNotFused->LoadNetwork(networkIdentifierNotFused, std::move(optNetNotFused)) == Status::Success);
 
     //Creates structures for inputs and outputs.
     std::vector<T> inputDataNotFused = GetVector<T>(48, 1.0f, 0.1f);
@@ -269,33 +269,34 @@ void FuseBatchNormIntoConvTest(bool depthwise, float tolerance, armnn::Compute b
     runNotFused->EnqueueWorkload(networkIdentifierNotFused, inputTensorsNotFused, outputTensorsNotFused);
 
     // Check the output of the fused-convolution matches with the output of the batchNormm in the "NotFused" network
+    auto epsilon = T(tolerance);
     for (unsigned int n = 0; n < outputDataFused.size(); ++n)
     {
-        BOOST_CHECK_CLOSE(outputDataFused[n], outputDataNotFused[n], T(tolerance));
+        CHECK_EQ(outputDataFused[n], doctest::Approx(outputDataNotFused[n]).epsilon(epsilon));
     }
 }
 
 // This unit test needs the reference backend, it's not available if the reference backend is not built
 #if defined(ARMNNREF_ENABLED)
-BOOST_AUTO_TEST_CASE(FuseBatchNormIntoConv2DFloat32Test)
+TEST_CASE("FuseBatchNormIntoConv2DFloat32Test")
 {
     FuseBatchNormIntoConvTest<Conv2dTest, DataType::Float32>(false, 0.0001f, armnn::Compute::CpuRef);
 }
 
-BOOST_AUTO_TEST_CASE(FuseBatchNormIntoConv2DFloat16Test)
+TEST_CASE("FuseBatchNormIntoConv2DFloat16Test")
 {
     FuseBatchNormIntoConvTest<Conv2dTest, DataType::Float16>(false, 0.1f, armnn::Compute::CpuRef);
 }
 
-BOOST_AUTO_TEST_CASE(FuseBatchNormIntoDepthwiseConv2DFloat32Test)
+TEST_CASE("FuseBatchNormIntoDepthwiseConv2DFloat32Test")
 {
     FuseBatchNormIntoConvTest<DepthwiseConv2dTest, DataType::Float32>(true, 0.0001f,armnn::Compute::CpuRef);
 }
 
-BOOST_AUTO_TEST_CASE(FuseBatchNormIntoDepthwiseConv2DFloat16Test)
+TEST_CASE("FuseBatchNormIntoDepthwiseConv2DFloat16Test")
 {
     FuseBatchNormIntoConvTest<DepthwiseConv2dTest, DataType::Float16>(true, 0.1f,armnn::Compute::CpuRef);
 }
 #endif
 
-BOOST_AUTO_TEST_SUITE_END()
+}

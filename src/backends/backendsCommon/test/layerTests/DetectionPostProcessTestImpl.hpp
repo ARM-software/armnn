@@ -18,6 +18,8 @@
 
 #include <test/TensorHelpers.hpp>
 
+#include <doctest/doctest.h>
+
 namespace
 {
 
@@ -221,25 +223,25 @@ void DetectionPostProcessImpl(const armnn::TensorInfo& boxEncodingsInfo,
                                  expectedDetectionBoxes,
                                  outputBoxesHandle->GetShape(),
                                  detectionBoxesInfo.GetShape());
-    BOOST_TEST(result.m_Result, result.m_Message.str());
+    CHECK_MESSAGE(result.m_Result, result.m_Message.str());
 
     result = CompareTensors(actualDetectionClassesOutput,
                             expectedDetectionClasses,
                             classesHandle->GetShape(),
                             detectionClassesInfo.GetShape());
-    BOOST_TEST(result.m_Result, result.m_Message.str());
+    CHECK_MESSAGE(result.m_Result, result.m_Message.str());
 
     result = CompareTensors(actualDetectionScoresOutput,
                             expectedDetectionScores,
                             outputScoresHandle->GetShape(),
                             detectionScoresInfo.GetShape());
-    BOOST_TEST(result.m_Result, result.m_Message.str());
+    CHECK_MESSAGE(result.m_Result, result.m_Message.str());
 
     result = CompareTensors(actualNumDetectionOutput,
                             expectedNumDetections,
                             numDetectionHandle->GetShape(),
                             numDetectionInfo.GetShape());
-    BOOST_TEST(result.m_Result, result.m_Message.str());
+    CHECK_MESSAGE(result.m_Result, result.m_Message.str());
 }
 
 template<armnn::DataType QuantizedType, typename RawType = armnn::ResolveType<QuantizedType>>

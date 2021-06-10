@@ -7,13 +7,13 @@
 #include <Network.hpp>
 
 #include <reference/RefWorkloadFactory.hpp>
-
-#include <boost/test/unit_test.hpp>
 #include <test/GraphUtils.hpp>
 
-BOOST_AUTO_TEST_SUITE(RefOptimizedNetwork)
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_CASE(OptimizeValidateCpuRefWorkloads)
+TEST_SUITE("RefOptimizedNetwork")
+{
+TEST_CASE("OptimizeValidateCpuRefWorkloads")
 {
     const armnn::TensorInfo desc({3, 5}, armnn::DataType::Float32);
 
@@ -73,17 +73,17 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateCpuRefWorkloads)
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
     armnn::Graph& graph = GetGraphForTesting(optNet.get());
     graph.AllocateDynamicBuffers();
-    BOOST_CHECK(optNet);
+    CHECK(optNet);
 
     // Validates workloads.
     armnn::RefWorkloadFactory fact;
     for (auto&& layer : graph)
     {
-        BOOST_CHECK_NO_THROW(layer->CreateWorkload(fact));
+        CHECK_NOTHROW(layer->CreateWorkload(fact));
     }
 }
 
-BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsCpuRefPermuteLayer)
+TEST_CASE("OptimizeValidateWorkloadsCpuRefPermuteLayer")
 {
     // Create runtime in which test will run
     armnn::IRuntime::CreationOptions options;
@@ -115,11 +115,11 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsCpuRefPermuteLayer)
 
     for (auto&& layer : graph)
     {
-        BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
+        CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
     }
 }
 
-BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsCpuRefMeanLayer)
+TEST_CASE("OptimizeValidateWorkloadsCpuRefMeanLayer")
 {
     // Create runtime in which test will run
     armnn::IRuntime::CreationOptions options;
@@ -149,11 +149,11 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsCpuRefMeanLayer)
     graph.AllocateDynamicBuffers();
     for (auto&& layer : graph)
     {
-        BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
+        CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
     }
 }
 
-BOOST_AUTO_TEST_CASE(DebugTestOnCpuRef)
+TEST_CASE("DebugTestOnCpuRef")
 {
     // build up the structure of the network
     armnn::INetworkPtr net(armnn::INetwork::Create());
@@ -192,14 +192,14 @@ BOOST_AUTO_TEST_CASE(DebugTestOnCpuRef)
     graph.AllocateDynamicBuffers();
 
     // Tests that all layers are present in the graph.
-    BOOST_TEST(graph.GetNumLayers() == 5);
+    CHECK(graph.GetNumLayers() == 5);
 
     // Tests that the vertices exist and have correct names.
-    BOOST_TEST(GraphHasNamedLayer(graph, "InputLayer"));
-    BOOST_TEST(GraphHasNamedLayer(graph, "DebugLayerAfterInputLayer_0"));
-    BOOST_TEST(GraphHasNamedLayer(graph, "ActivationLayer"));
-    BOOST_TEST(GraphHasNamedLayer(graph, "DebugLayerAfterActivationLayer_0"));
-    BOOST_TEST(GraphHasNamedLayer(graph, "OutputLayer"));
+    CHECK(GraphHasNamedLayer(graph, "InputLayer"));
+    CHECK(GraphHasNamedLayer(graph, "DebugLayerAfterInputLayer_0"));
+    CHECK(GraphHasNamedLayer(graph, "ActivationLayer"));
+    CHECK(GraphHasNamedLayer(graph, "DebugLayerAfterActivationLayer_0"));
+    CHECK(GraphHasNamedLayer(graph, "OutputLayer"));
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

@@ -6,6 +6,8 @@
 #include "SerializerTestUtils.hpp"
 #include "../Serializer.hpp"
 
+#include <doctest/doctest.h>
+
 using armnnDeserializer::IDeserializer;
 
 LayerVerifierBase::LayerVerifierBase(const std::string& layerName,
@@ -37,34 +39,33 @@ void LayerVerifierBase::ExecuteStrategy(const armnn::IConnectableLayer* layer,
 
 void LayerVerifierBase::VerifyNameAndConnections(const armnn::IConnectableLayer* layer, const char* name)
 {
-    BOOST_TEST(name == m_LayerName.c_str());
+    CHECK(std::string(name) == m_LayerName.c_str());
 
-    BOOST_TEST(layer->GetNumInputSlots() == m_InputTensorInfos.size());
-    BOOST_TEST(layer->GetNumOutputSlots() == m_OutputTensorInfos.size());
+    CHECK(layer->GetNumInputSlots() == m_InputTensorInfos.size());
+    CHECK(layer->GetNumOutputSlots() == m_OutputTensorInfos.size());
 
     for (unsigned int i = 0; i < m_InputTensorInfos.size(); i++)
     {
         const armnn::IOutputSlot* connectedOutput = layer->GetInputSlot(i).GetConnection();
-        BOOST_CHECK(connectedOutput);
+        CHECK(connectedOutput);
 
         const armnn::TensorInfo& connectedInfo = connectedOutput->GetTensorInfo();
-        BOOST_TEST(connectedInfo.GetShape() == m_InputTensorInfos[i].GetShape());
-        BOOST_TEST(
+        CHECK(connectedInfo.GetShape() == m_InputTensorInfos[i].GetShape());
+        CHECK(
             GetDataTypeName(connectedInfo.GetDataType()) == GetDataTypeName(m_InputTensorInfos[i].GetDataType()));
 
-        BOOST_TEST(connectedInfo.GetQuantizationScale() == m_InputTensorInfos[i].GetQuantizationScale());
-        BOOST_TEST(connectedInfo.GetQuantizationOffset() == m_InputTensorInfos[i].GetQuantizationOffset());
+        CHECK(connectedInfo.GetQuantizationScale() == m_InputTensorInfos[i].GetQuantizationScale());
+        CHECK(connectedInfo.GetQuantizationOffset() == m_InputTensorInfos[i].GetQuantizationOffset());
     }
 
     for (unsigned int i = 0; i < m_OutputTensorInfos.size(); i++)
     {
         const armnn::TensorInfo& outputInfo = layer->GetOutputSlot(i).GetTensorInfo();
-        BOOST_TEST(outputInfo.GetShape() == m_OutputTensorInfos[i].GetShape());
-        BOOST_TEST(
-            GetDataTypeName(outputInfo.GetDataType()) == GetDataTypeName(m_OutputTensorInfos[i].GetDataType()));
+        CHECK(outputInfo.GetShape() == m_OutputTensorInfos[i].GetShape());
+        CHECK(GetDataTypeName(outputInfo.GetDataType()) == GetDataTypeName(m_OutputTensorInfos[i].GetDataType()));
 
-        BOOST_TEST(outputInfo.GetQuantizationScale() == m_OutputTensorInfos[i].GetQuantizationScale());
-        BOOST_TEST(outputInfo.GetQuantizationOffset() == m_OutputTensorInfos[i].GetQuantizationOffset());
+        CHECK(outputInfo.GetQuantizationScale() == m_OutputTensorInfos[i].GetQuantizationScale());
+        CHECK(outputInfo.GetQuantizationOffset() == m_OutputTensorInfos[i].GetQuantizationOffset());
     }
 }
 
@@ -74,23 +75,23 @@ void LayerVerifierBase::VerifyConstTensors(const std::string& tensorName,
 {
     if (expectedPtr == nullptr)
     {
-        BOOST_CHECK_MESSAGE(actualPtr == nullptr, tensorName + " should not exist");
+        CHECK_MESSAGE(actualPtr == nullptr, tensorName + " should not exist");
     }
     else
     {
-        BOOST_CHECK_MESSAGE(actualPtr != nullptr, tensorName + " should have been set");
+        CHECK_MESSAGE(actualPtr != nullptr, tensorName + " should have been set");
         if (actualPtr != nullptr)
         {
             const armnn::TensorInfo& expectedInfo = expectedPtr->GetInfo();
             const armnn::TensorInfo& actualInfo = actualPtr->GetInfo();
 
-            BOOST_CHECK_MESSAGE(expectedInfo.GetShape() == actualInfo.GetShape(),
+            CHECK_MESSAGE(expectedInfo.GetShape() == actualInfo.GetShape(),
                                 tensorName + " shapes don't match");
-            BOOST_CHECK_MESSAGE(
+            CHECK_MESSAGE(
                     GetDataTypeName(expectedInfo.GetDataType()) == GetDataTypeName(actualInfo.GetDataType()),
                     tensorName + " data types don't match");
 
-            BOOST_CHECK_MESSAGE(expectedPtr->GetNumBytes() == actualPtr->GetNumBytes(),
+            CHECK_MESSAGE(expectedPtr->GetNumBytes() == actualPtr->GetNumBytes(),
                                 tensorName + " (GetNumBytes) data sizes do not match");
             if (expectedPtr->GetNumBytes() == actualPtr->GetNumBytes())
             {
@@ -106,7 +107,7 @@ void LayerVerifierBase::VerifyConstTensors(const std::string& tensorName,
                         break;
                     }
                 }
-                BOOST_CHECK_MESSAGE(same, tensorName + " data does not match");
+                CHECK_MESSAGE(same, tensorName + " data does not match");
             }
         }
     }
@@ -114,8 +115,8 @@ void LayerVerifierBase::VerifyConstTensors(const std::string& tensorName,
 
 void CompareConstTensor(const armnn::ConstTensor& tensor1, const armnn::ConstTensor& tensor2)
 {
-    BOOST_TEST(tensor1.GetShape() == tensor2.GetShape());
-    BOOST_TEST(GetDataTypeName(tensor1.GetDataType()) == GetDataTypeName(tensor2.GetDataType()));
+    CHECK(tensor1.GetShape() == tensor2.GetShape());
+    CHECK(GetDataTypeName(tensor1.GetDataType()) == GetDataTypeName(tensor2.GetDataType()));
 
     switch (tensor1.GetDataType())
     {
@@ -138,8 +139,8 @@ void CompareConstTensor(const armnn::ConstTensor& tensor1, const armnn::ConstTen
             break;
         default:
             // Note that Float16 is not yet implemented
-            BOOST_TEST_MESSAGE("Unexpected datatype");
-            BOOST_TEST(false);
+            MESSAGE("Unexpected datatype");
+            CHECK(false);
     }
 }
 

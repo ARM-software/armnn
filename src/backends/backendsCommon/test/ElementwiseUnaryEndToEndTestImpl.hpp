@@ -12,7 +12,7 @@
 
 #include <armnn/utility/NumericCast.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <vector>
 
@@ -61,7 +61,7 @@ void ElementwiseUnarySimpleEndToEnd(const std::vector<BackendId>& backends,
     // Builds up the structure of the network
     INetworkPtr net = CreateElementwiseUnaryNetwork<ArmnnInType>(inputShape, outputShape, operation, qScale, qOffset);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     const std::vector<float> input({ 1, -1, 1, 1,  5, -5, 5, 5,
                                        -3, 3, 3, 3,  4, 4, -4, 4 });

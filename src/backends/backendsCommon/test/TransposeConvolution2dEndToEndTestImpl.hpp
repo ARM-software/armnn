@@ -14,8 +14,6 @@
 
 #include <backendsCommon/test/CommonTestUtils.hpp>
 
-#include <boost/test/unit_test.hpp>
-
 #include <map>
 #include <vector>
 

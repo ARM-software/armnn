@@ -6,40 +6,40 @@
 #include <PrototxtConversions.hpp>
 #include "armnn/Tensor.hpp"
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(PrototxtConversions)
-
-BOOST_AUTO_TEST_CASE(ConvertInt32ToOctalStringTest)
+TEST_SUITE("PrototxtConversions")
+{
+TEST_CASE("ConvertInt32ToOctalStringTest")
 {
     using armnnUtils::ConvertInt32ToOctalString;
 
     std::string octalString = ConvertInt32ToOctalString(1);
-    BOOST_TEST(octalString.compare("\\\\001\\\\000\\\\000\\\\000"));
+    CHECK(octalString.compare("\\\\001\\\\000\\\\000\\\\000"));
 
     octalString = ConvertInt32ToOctalString(256);
-    BOOST_TEST(octalString.compare("\\\\000\\\\100\\\\000\\\\000"));
+    CHECK(octalString.compare("\\\\000\\\\100\\\\000\\\\000"));
 
     octalString = ConvertInt32ToOctalString(65536);
-    BOOST_TEST(octalString.compare("\\\\000\\\\000\\\\100\\\\000"));
+    CHECK(octalString.compare("\\\\000\\\\000\\\\100\\\\000"));
 
     octalString = ConvertInt32ToOctalString(16777216);
-    BOOST_TEST(octalString.compare("\\\\000\\\\000\\\\000\\\\100"));
+    CHECK(octalString.compare("\\\\000\\\\000\\\\000\\\\100"));
 
     octalString = ConvertInt32ToOctalString(-1);
-    BOOST_TEST(octalString.compare("\\\\377\\\\377\\\\377\\\\377"));
+    CHECK(octalString.compare("\\\\377\\\\377\\\\377\\\\377"));
 
     octalString = ConvertInt32ToOctalString(-256);
-    BOOST_TEST(octalString.compare("\\\\000\\\\377\\\\377\\\\377"));
+    CHECK(octalString.compare("\\\\000\\\\377\\\\377\\\\377"));
 
     octalString = ConvertInt32ToOctalString(-65536);
-    BOOST_TEST(octalString.compare("\\\\000\\\\000\\\\377\\\\377"));
+    CHECK(octalString.compare("\\\\000\\\\000\\\\377\\\\377"));
 
     octalString = ConvertInt32ToOctalString(-16777216);
-    BOOST_TEST(octalString.compare("\\\\000\\\\000\\\\000\\\\377"));
+    CHECK(octalString.compare("\\\\000\\\\000\\\\000\\\\377"));
 }
 
-BOOST_AUTO_TEST_CASE(ConvertTensorShapeToStringTest)
+TEST_CASE("ConvertTensorShapeToStringTest")
 {
     using armnnUtils::ConvertTensorShapeToString;
     using armnn::TensorShape;
@@ -51,13 +51,13 @@ BOOST_AUTO_TEST_CASE(ConvertTensorShapeToStringTest)
     };
 
     auto output_string = createAndConvert({5});
-    BOOST_TEST(output_string.compare(
+    CHECK(output_string.compare(
         "dim {\n"
         "size: 5\n"
         "}"));
 
     output_string = createAndConvert({4, 5});
-    BOOST_TEST(output_string.compare(
+    CHECK(output_string.compare(
         "dim {\n"
             "size: 4\n"
         "}\n"
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(ConvertTensorShapeToStringTest)
         ));
 
     output_string = createAndConvert({3, 4, 5});
-    BOOST_TEST(output_string.compare(
+    CHECK(output_string.compare(
         "dim {\n"
             "size: 3\n"
         "}\n"
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(ConvertTensorShapeToStringTest)
         ));
 
     output_string = createAndConvert({2, 3, 4, 5});
-    BOOST_TEST(output_string.compare(
+    CHECK(output_string.compare(
         "dim {\n"
             "size: 2\n"
         "}\n"
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(ConvertTensorShapeToStringTest)
         ));
 
     output_string = createAndConvert({1, 2, 3, 4, 5});
-    BOOST_TEST(output_string.compare(
+    CHECK(output_string.compare(
         "dim {\n"
             "size: 1\n"
         "}\n"
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(ConvertTensorShapeToStringTest)
         ));
 
     output_string = createAndConvert({0xffffffff, 0xffffffff});
-    BOOST_TEST(output_string.compare(
+    CHECK(output_string.compare(
         "dim {\n"
             "size: 4294967295\n"
         "}\n"
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(ConvertTensorShapeToStringTest)
         ));
 
     output_string = createAndConvert({1, 0});
-    BOOST_TEST(output_string.compare(
+    CHECK(output_string.compare(
         "dim {\n"
             "size: 1\n"
         "}\n"
@@ -135,4 +135,4 @@ BOOST_AUTO_TEST_CASE(ConvertTensorShapeToStringTest)
         ));
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

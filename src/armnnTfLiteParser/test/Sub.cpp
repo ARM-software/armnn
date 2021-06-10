@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_Sub")
+{
 struct SubFixture : public ParserFlatbuffersFixture
 {
     explicit SubFixture(const std::string & inputShape1,
@@ -95,7 +94,7 @@ struct SimpleSubFixture : SubFixture
                                     "[ 1, 4 ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(SimpleSub, SimpleSubFixture)
+TEST_CASE_FIXTURE(SimpleSubFixture, "SimpleSub")
 {
   RunTest<2, armnn::DataType::QAsymmU8>(
       0,
@@ -111,7 +110,7 @@ struct DynamicSubFixture : SubFixture
                                      "[  ]") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(DynamicSub, DynamicSubFixture)
+TEST_CASE_FIXTURE(DynamicSubFixture, "DynamicSub")
 {
     RunTest<2, armnn::DataType::QAsymmU8, armnn::DataType::QAsymmU8>(
         0,
@@ -121,4 +120,4 @@ BOOST_FIXTURE_TEST_CASE(DynamicSub, DynamicSubFixture)
         true);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

@@ -6,8 +6,7 @@
 
 #include "TestLayerVisitor.hpp"
 
-
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 namespace
 {

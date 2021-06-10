@@ -3,14 +3,15 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "armnnOnnxParser/IOnnxParser.hpp"
 
-BOOST_AUTO_TEST_SUITE(OnnxParser)
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_CASE(Create)
+TEST_SUITE("OnnxParser_Constructor")
+{
+TEST_CASE("Create")
 {
     armnnOnnxParser::IOnnxParserPtr parser(armnnOnnxParser::IOnnxParser::Create());
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

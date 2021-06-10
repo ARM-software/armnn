@@ -3,12 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "armnnOnnxParser/IOnnxParser.hpp"
 #include  "ParserPrototxtFixture.hpp"
 
-BOOST_AUTO_TEST_SUITE(OnnxParser)
-
+TEST_SUITE("OnnxParser_Relu")
+{
 struct ReluMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser::IOnnxParser>
 {
     ReluMainFixture()
@@ -61,10 +60,10 @@ struct ReluMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParse
     }
 };
 
-BOOST_FIXTURE_TEST_CASE(ValidReluTest, ReluMainFixture)
+TEST_CASE_FIXTURE(ReluMainFixture, "ValidReluTest")
 {
     RunTest<1>({{"Input",  { -1.0f, -0.5f, 1.25f, -3.0f}}},
                {{ "Output", { 0.0f, 0.0f, 1.25f, 0.0f}}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

@@ -2,12 +2,11 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <boost/test/unit_test.hpp>
 #include "armnnTfLiteParser/ITfLiteParser.hpp"
 #include "ParserFlatbuffersFixture.hpp"
 
-BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
-
+TEST_SUITE("TensorflowLiteParser_AvgPool2D")
+{
 struct AvgPool2DFixture : public ParserFlatbuffersFixture
 {
     explicit AvgPool2DFixture(std::string inputdim, std::string outputdim, std::string dataType)
@@ -96,25 +95,25 @@ struct AvgPoolLiteFixture2DOutput : AvgPool2DFixture
     AvgPoolLiteFixture2DOutput() : AvgPool2DFixture("[ 1, 4, 4, 1 ]", "[ 1, 2, 2, 1 ]", "UINT8") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(AvgPoolLite1DOutput, AvgPoolLiteFixtureUint1DOutput)
+TEST_CASE_FIXTURE(AvgPoolLiteFixtureUint1DOutput, "AvgPoolLite1DOutput")
 {
     RunTest<4, armnn::DataType::QAsymmU8>(0, {2, 3, 5, 2 }, { 3 });
 }
 
-BOOST_FIXTURE_TEST_CASE(AvgPoolLiteFloat1DOutput, AvgPoolLiteFixtureFloat1DOutput)
+TEST_CASE_FIXTURE(AvgPoolLiteFixtureFloat1DOutput, "AvgPoolLiteFloat1DOutput")
 {
     RunTest<4, armnn::DataType::Float32>(0, { 2.0f, 3.0f, 5.0f, 2.0f },  { 3.0f });
 }
 
-BOOST_FIXTURE_TEST_CASE(AvgPoolLite2DOutput, AvgPoolLiteFixture2DOutput)
+TEST_CASE_FIXTURE(AvgPoolLiteFixture2DOutput, "AvgPoolLite2DOutput")
 {
     RunTest<4, armnn::DataType::QAsymmU8>(
         0, { 1, 2, 2, 3, 5, 6, 7, 8, 3, 2, 1, 0, 1, 2, 3, 4 }, { 4, 5, 2, 2 });
 }
 
-BOOST_FIXTURE_TEST_CASE(IncorrectDataTypeError, AvgPoolLiteFixtureFloat1DOutput)
+TEST_CASE_FIXTURE(AvgPoolLiteFixtureFloat1DOutput, "IncorrectDataTypeError")
 {
-    BOOST_CHECK_THROW((RunTest<4, armnn::DataType::QAsymmU8>(0, {2, 3, 5, 2 }, { 3 })), armnn::Exception);
+    CHECK_THROWS_AS((RunTest<4, armnn::DataType::QAsymmU8>(0, {2, 3, 5, 2 }, { 3 })), armnn::Exception);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

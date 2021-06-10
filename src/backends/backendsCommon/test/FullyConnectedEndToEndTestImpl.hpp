@@ -12,7 +12,7 @@
 
 #include <armnn/utility/NumericCast.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <vector>
 
@@ -83,7 +83,7 @@ void FullyConnectedWithDynamicWeightsEndToEnd(const std::vector<armnn::BackendId
                                                                             weightsTensorInfo,
                                                                             descriptor);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(network);
 
     std::map<int, std::vector<T>> inputTensorData    = {{ 0, inputData }, {1, weightsData}};
     std::map<int, std::vector<T>> expectedOutputTensorData = {{ 0, expectedOutputData }};

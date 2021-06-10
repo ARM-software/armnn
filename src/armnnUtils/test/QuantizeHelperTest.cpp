@@ -6,12 +6,12 @@
 #include <QuantizeHelper.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <vector>
 
-BOOST_AUTO_TEST_SUITE(QuantizeHelper)
-
+TEST_SUITE("QuantizeHelper")
+{
 namespace
 {
 
@@ -24,23 +24,23 @@ bool IsFloatIterFunc(T iter)
 
 } // anonymous namespace
 
-BOOST_AUTO_TEST_CASE(IsFloatIterFuncTest)
+TEST_CASE("IsFloatIterFuncTest")
 {
     std::vector<float> fArray;
-    BOOST_TEST(IsFloatIterFunc(fArray.begin()) == true);
-    BOOST_TEST(IsFloatIterFunc(fArray.cbegin()) == true);
+    CHECK(IsFloatIterFunc(fArray.begin()) == true);
+    CHECK(IsFloatIterFunc(fArray.cbegin()) == true);
 
     std::vector<double> dArray;
-    BOOST_TEST(IsFloatIterFunc(dArray.begin()) == true);
+    CHECK(IsFloatIterFunc(dArray.begin()) == true);
 
     std::vector<int> iArray;
-    BOOST_TEST(IsFloatIterFunc(iArray.begin()) == false);
+    CHECK(IsFloatIterFunc(iArray.begin()) == false);
 
     float floats[5];
-    BOOST_TEST(IsFloatIterFunc(&floats[0]) == true);
+    CHECK(IsFloatIterFunc(&floats[0]) == true);
 
     int ints[5];
-    BOOST_TEST(IsFloatIterFunc(&ints[0]) == false);
+    CHECK(IsFloatIterFunc(&ints[0]) == false);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

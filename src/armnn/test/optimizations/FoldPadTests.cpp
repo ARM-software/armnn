@@ -6,15 +6,16 @@
 #include "LayersFwd.hpp"
 #include <Network.hpp>
 #include <test/TestUtils.hpp>
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 #include <backendsCommon/TensorHandle.hpp>
 #include <Optimizer.hpp>
 
-BOOST_AUTO_TEST_SUITE(Optimizer)
+TEST_SUITE("Optimizer")
+{
 using namespace armnn;
 using namespace armnn::optimizations;
 
-BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConvolution2dLayer)
+TEST_CASE("FoldPadLayerIntoConvolution2dLayer")
 {
     Graph              graph;
     const unsigned int inputShape[]   = {1, 2, 2, 3};
@@ -67,7 +68,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConvolution2dLayer)
             (conv2dLayerParams.m_BiasEnabled == false) && (conv2dLayerParams.m_DataLayout == DataLayout::NHWC);
     };
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<PadLayer>,
                              checkSimpleConv2d,
@@ -85,13 +86,13 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConvolution2dLayer)
             (conv2dLayerParams.m_BiasEnabled == false) && (conv2dLayerParams.m_DataLayout == DataLayout::NHWC);
     };
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              checkPadFoldedIntoConv2d,
                              &IsLayerOfType<OutputLayer>));
 }
 
-BOOST_AUTO_TEST_CASE(FoldPadLayerIntoDepthwiseConvolution2dLayer)
+TEST_CASE("FoldPadLayerIntoDepthwiseConvolution2dLayer")
 {
     Graph              graph;
     const unsigned int inputShape[]   = {1, 2, 2, 3};
@@ -146,7 +147,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoDepthwiseConvolution2dLayer)
             (depthwiseConv2dLayerParams.m_DataLayout == DataLayout::NHWC);
     };
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<PadLayer>,
                              checkSimpleDepthwiseConv2d,
@@ -166,13 +167,13 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoDepthwiseConvolution2dLayer)
             (depthwiseConv2dLayerParams.m_DataLayout == DataLayout::NHWC);
     };
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              checkPadFoldedIntoDepthwiseConv2d,
                              &IsLayerOfType<OutputLayer>));
 }
 
-BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer)
+TEST_CASE("FoldPadLayerIntoPooling2dLayer")
 {
     Graph              graph;
     const unsigned int inputShape[]  = {1, 2, 2, 3};
@@ -218,7 +219,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer)
             (pool2dLayer->GetParameters() == pooling2dDescriptor);
     };
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<PadLayer>,
                              checkSimplePool2d,
@@ -248,13 +249,13 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer)
             (pool2dLayerParams.m_PadBottom == 1) && (pool2dLayerParams.m_PaddingMethod == PaddingMethod::IgnoreValue);
     };
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              checkPadFoldedIntoPool2d,
                              &IsLayerOfType<OutputLayer>));
 }
 
-BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2d_PadWithMultipleOutputsShouldNotBeOptimized)
+TEST_CASE("FoldPadLayerIntoPooling2d_PadWithMultipleOutputsShouldNotBeOptimized")
 {
     // In this test case we'll setup a pad layer with two outputs. One goes to a polling layers and the other
     // goes to an output layer. FoldPadLayerIntoPooling2d should not optimize this graph as it uses the
@@ -308,7 +309,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2d_PadWithMultipleOutputsShouldNotBe
     };
 
     // Initial sequence.
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<PadLayer>,
                              checkSimplePool2d,
@@ -318,7 +319,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2d_PadWithMultipleOutputsShouldNotBe
     armnn::Optimizer::Pass(graph, MakeOptimizations(FoldPadIntoPooling2d()));
 
     // The network should not change.
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<PadLayer>,
                              checkSimplePool2d,
@@ -326,7 +327,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2d_PadWithMultipleOutputsShouldNotBe
                              &IsLayerOfType<OutputLayer>));
 }
 
-BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer_PoolingLayerWithExcludePaddingShouldNotTakeMorePadding)
+TEST_CASE("FoldPadLayerIntoPooling2dLayer_PoolingLayerWithExcludePaddingShouldNotTakeMorePadding")
 {
     // In this test setup input, Pad layer, Pooling layer that includes padding, output layer. The optimization
     // should not work as the pooling layer already includes and existing pad and specifies PaddingMethod::Exclude.
@@ -380,7 +381,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer_PoolingLayerWithExcludePaddi
             (pool2dLayer->GetParameters() == pooling2dDescriptor);
     };
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<PadLayer>,
                              checkSimplePool2d,
@@ -389,14 +390,14 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer_PoolingLayerWithExcludePaddi
     armnn::Optimizer::Pass(graph, MakeOptimizations(FoldPadIntoPooling2d()));
 
     // The optimization should not have modified the graph.
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<PadLayer>,
                              checkSimplePool2d,
                              &IsLayerOfType<OutputLayer>));
 }
 
-BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer_MaxPoolingLayerWithLargePadValueShouldNotBeFolded)
+TEST_CASE("FoldPadLayerIntoPooling2dLayer_MaxPoolingLayerWithLargePadValueShouldNotBeFolded")
 {
     // In this test setup input, Pad layer with a large pad value, Max Pooling layer, output layer. The optimization
     // should not work as the pad value will modify the result of the max pooling layer.
@@ -447,7 +448,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer_MaxPoolingLayerWithLargePadV
             (pool2dLayer->GetParameters() == pooling2dDescriptor);
     };
 
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<PadLayer>,
                              checkSimplePool2d,
@@ -456,7 +457,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer_MaxPoolingLayerWithLargePadV
     armnn::Optimizer::Pass(graph, MakeOptimizations(FoldPadIntoPooling2d()));
 
     // The optimization should not have modified the graph.
-    BOOST_TEST(CheckSequence(graph.cbegin(), graph.cend(),
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<PadLayer>,
                              checkSimplePool2d,
@@ -464,7 +465,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer_MaxPoolingLayerWithLargePadV
 }
 
 #if defined(ARMNNREF_ENABLED)
-BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer_ExecuteInferenceWithAndWithoutOptimization)
+TEST_CASE("FoldPadLayerIntoPooling2dLayer_ExecuteInferenceWithAndWithoutOptimization")
 {
     // The idea of this test to run a simple pad+pool2d network twice. Once
     // with FoldPadLayerIntoPooling2dLayer enabled and a second time with it
@@ -523,7 +524,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer_ExecuteInferenceWithAndWitho
         IOptimizedNetworkPtr optimizedNetwork = Optimize(*network, {Compute::CpuRef}, run->GetDeviceSpec());
         // Load network into runtime
         NetworkId            networkIdentifier;
-        BOOST_TEST(run->LoadNetwork(networkIdentifier, std::move(optimizedNetwork)) == Status::Success);
+        CHECK(run->LoadNetwork(networkIdentifier, std::move(optimizedNetwork)) == Status::Success);
 
         InputTensors inputTensors{{0, ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0), inputData.data())}};
 
@@ -544,7 +545,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer_ExecuteInferenceWithAndWitho
 
         // Optimize and load and execute it a second time.
         optimizedNetwork = Optimize(*network, {Compute::CpuRef}, run->GetDeviceSpec());
-        BOOST_TEST(run->LoadNetwork(networkIdentifier, std::move(optimizedNetwork)) == Status::Success);
+        CHECK(run->LoadNetwork(networkIdentifier, std::move(optimizedNetwork)) == Status::Success);
         std::vector<float> goldenData(32, 0.0f);
         std::vector<float> padOutputData(72, 0.0f);
         OutputTensors      goldenTensors{{0, Tensor(outputInfo, goldenData.data())},
@@ -552,7 +553,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer_ExecuteInferenceWithAndWitho
         run->EnqueueWorkload(networkIdentifier, inputTensors, goldenTensors);
 
         // Now we can compare goldenData against optimizedData. They should be the same.
-        BOOST_TEST(std::equal(goldenData.begin(), goldenData.end(), optimizedData.begin()));
+        CHECK(std::equal(goldenData.begin(), goldenData.end(), optimizedData.begin()));
     }
     catch (const std::exception& e)
     {
@@ -561,7 +562,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoPooling2dLayer_ExecuteInferenceWithAndWitho
     }
 }
 
-BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConv2dLayer_ExecuteInferenceWithAndWithoutOptimization)
+TEST_CASE("FoldPadLayerIntoConv2dLayer_ExecuteInferenceWithAndWithoutOptimization")
 {
     // The idea of this test to run a simple pad+conv2d network twice. Once
     // with FoldPadLayerIntoConv2dLayer enabled and a second time with it
@@ -641,7 +642,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConv2dLayer_ExecuteInferenceWithAndWithoutO
         IOptimizedNetworkPtr optimizedNetwork = Optimize(*network, {Compute::CpuRef}, run->GetDeviceSpec());
         // Load network into runtime
         NetworkId            networkIdentifier;
-        BOOST_TEST(run->LoadNetwork(networkIdentifier, std::move(optimizedNetwork)) == Status::Success);
+        CHECK(run->LoadNetwork(networkIdentifier, std::move(optimizedNetwork)) == Status::Success);
 
         InputTensors inputTensors{{0, ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0), inputData.data())}};
 
@@ -662,7 +663,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConv2dLayer_ExecuteInferenceWithAndWithoutO
 
         // Optimize and load and execute it a second time.
         optimizedNetwork = Optimize(*network, {Compute::CpuRef}, run->GetDeviceSpec());
-        BOOST_TEST(run->LoadNetwork(networkIdentifier, std::move(optimizedNetwork)) == Status::Success);
+        CHECK(run->LoadNetwork(networkIdentifier, std::move(optimizedNetwork)) == Status::Success);
         std::vector<float> goldenData(100, 0.0f);
         std::vector<float> padOutputData(108, 0.0f);
         OutputTensors      goldenTensors{{0, Tensor(outputInfo, goldenData.data())},
@@ -670,7 +671,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConv2dLayer_ExecuteInferenceWithAndWithoutO
         run->EnqueueWorkload(networkIdentifier, inputTensors, goldenTensors);
 
         // Now we can compare goldenData against optimizedData. They should be the same.
-        BOOST_TEST(std::equal(goldenData.begin(), goldenData.end(), optimizedData.begin()));
+        CHECK(std::equal(goldenData.begin(), goldenData.end(), optimizedData.begin()));
     }
     catch (const std::exception& e)
     {
@@ -679,7 +680,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConv2dLayer_ExecuteInferenceWithAndWithoutO
     }
 }
 
-BOOST_AUTO_TEST_CASE(FoldPadLayerIntoDepthwiseConv2dLayer_ExecuteInferenceWithAndWithoutOptimization)
+TEST_CASE("FoldPadLayerIntoDepthwiseConv2dLayer_ExecuteInferenceWithAndWithoutOptimization")
 {
     // The idea of this test to run a simple pad+depthwiseconv2d network twice. Once
     // with FoldPadLayerIntoDeptwiseConv2dLayer enabled and a second time with it
@@ -759,7 +760,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoDepthwiseConv2dLayer_ExecuteInferenceWithAn
         IOptimizedNetworkPtr optimizedNetwork = Optimize(*network, {Compute::CpuRef}, run->GetDeviceSpec());
         // Load network into runtime
         NetworkId            networkIdentifier;
-        BOOST_TEST(run->LoadNetwork(networkIdentifier, std::move(optimizedNetwork)) == Status::Success);
+        CHECK(run->LoadNetwork(networkIdentifier, std::move(optimizedNetwork)) == Status::Success);
 
         InputTensors inputTensors{{0, ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0), inputData.data())}};
 
@@ -780,7 +781,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoDepthwiseConv2dLayer_ExecuteInferenceWithAn
 
         // Optimize and load and execute it a second time.
         optimizedNetwork = Optimize(*network, {Compute::CpuRef}, run->GetDeviceSpec());
-        BOOST_TEST(run->LoadNetwork(networkIdentifier, std::move(optimizedNetwork)) == Status::Success);
+        CHECK(run->LoadNetwork(networkIdentifier, std::move(optimizedNetwork)) == Status::Success);
         std::vector<float> goldenData(300, 0.0f);
         std::vector<float> padOutputData(108, 0.0f);
         OutputTensors      goldenTensors{{0, Tensor(outputInfo, goldenData.data())},
@@ -788,7 +789,7 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoDepthwiseConv2dLayer_ExecuteInferenceWithAn
         run->EnqueueWorkload(networkIdentifier, inputTensors, goldenTensors);
 
         // Now we can compare goldenData against optimizedData. They should be the same.
-        BOOST_TEST(std::equal(goldenData.begin(), goldenData.end(), optimizedData.begin()));
+        CHECK(std::equal(goldenData.begin(), goldenData.end(), optimizedData.begin()));
     }
     catch (const std::exception& e)
     {
@@ -798,4 +799,4 @@ BOOST_AUTO_TEST_CASE(FoldPadLayerIntoDepthwiseConv2dLayer_ExecuteInferenceWithAn
 }
 #endif
 
-BOOST_AUTO_TEST_SUITE_END()
+}

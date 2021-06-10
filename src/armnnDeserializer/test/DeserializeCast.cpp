@@ -9,13 +9,10 @@
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
-#include <boost/test/unit_test.hpp>
-
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(Deserializer)
-
-
+TEST_SUITE("Deserializer_Cast")
+{
 struct CastFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit CastFixture(const std::string& inputShape,
@@ -112,12 +109,12 @@ struct SimpleCastFixture : CastFixture
                                       "Float32") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(SimpleCast, SimpleCastFixture)
+TEST_CASE_FIXTURE(SimpleCastFixture, "SimpleCast")
 {
-RunTest<2, armnn::DataType::Signed32 , armnn::DataType::Float32>(
-0,
-{{"inputTensor",  { 0,   -1,   5,   -100,   200,   -255 }}},
-{{"outputTensor", { 0.0f, -1.0f, 5.0f, -100.0f, 200.0f, -255.0f }}});
+    RunTest<2, armnn::DataType::Signed32 , armnn::DataType::Float32>(
+        0,
+        {{"inputTensor",  { 0,   -1,   5,   -100,   200,   -255 }}},
+        {{"outputTensor", { 0.0f, -1.0f, 5.0f, -100.0f, 200.0f, -255.0f }}});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

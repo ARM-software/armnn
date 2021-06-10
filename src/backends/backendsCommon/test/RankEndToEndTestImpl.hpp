@@ -12,6 +12,8 @@
 
 #include <ResolveType.hpp>
 
+#include <doctest/doctest.h>
+
 namespace
 {
 
@@ -50,7 +52,7 @@ void RankEndToEnd(const std::vector<armnn::BackendId>& backends)
 
     armnn::INetworkPtr network = CreateRankNetwork(inputInfo, outputInfo);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(network);
 
     std::map<int, std::vector<T>> inputTensorData   = {{ 0, inputData }};
     std::map<int, std::vector<int32_t>> expectedOutputTensorData = {{ 0, expectedOutputData }};

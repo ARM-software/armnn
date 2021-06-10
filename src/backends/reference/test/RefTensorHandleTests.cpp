@@ -5,12 +5,13 @@
 #include <reference/RefTensorHandle.hpp>
 #include <reference/RefTensorHandleFactory.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(RefTensorHandleTests)
+TEST_SUITE("RefTensorHandleTests")
+{
 using namespace armnn;
 
-BOOST_AUTO_TEST_CASE(AcquireAndRelease)
+TEST_CASE("AcquireAndRelease")
 {
     std::shared_ptr<RefMemoryManager> memoryManager = std::make_shared<RefMemoryManager>();
 
@@ -24,11 +25,11 @@ BOOST_AUTO_TEST_CASE(AcquireAndRelease)
     {
         float* buffer = reinterpret_cast<float*>(handle.Map());
 
-        BOOST_CHECK(buffer != nullptr); // Yields a valid pointer
+        CHECK(buffer != nullptr); // Yields a valid pointer
 
         buffer[0] = 2.5f;
 
-        BOOST_CHECK(buffer[0] == 2.5f); // Memory is writable and readable
+        CHECK(buffer[0] == 2.5f); // Memory is writable and readable
 
     }
     memoryManager->Release();
@@ -37,16 +38,16 @@ BOOST_AUTO_TEST_CASE(AcquireAndRelease)
     {
         float* buffer = reinterpret_cast<float*>(handle.Map());
 
-        BOOST_CHECK(buffer != nullptr); // Yields a valid pointer
+        CHECK(buffer != nullptr); // Yields a valid pointer
 
         buffer[0] = 3.5f;
 
-        BOOST_CHECK(buffer[0] == 3.5f); // Memory is writable and readable
+        CHECK(buffer[0] == 3.5f); // Memory is writable and readable
     }
     memoryManager->Release();
 }
 
-BOOST_AUTO_TEST_CASE(RefTensorHandleFactoryMemoryManaged)
+TEST_CASE("RefTensorHandleFactoryMemoryManaged")
 {
     std::shared_ptr<RefMemoryManager> memoryManager = std::make_shared<RefMemoryManager>();
     RefTensorHandleFactory handleFactory(memoryManager);
@@ -60,31 +61,31 @@ BOOST_AUTO_TEST_CASE(RefTensorHandleFactoryMemoryManaged)
     memoryManager->Acquire();
     {
         float* buffer = reinterpret_cast<float*>(handle->Map());
-        BOOST_CHECK(buffer != nullptr); // Yields a valid pointer
+        CHECK(buffer != nullptr); // Yields a valid pointer
         buffer[0] = 1.5f;
         buffer[1] = 2.5f;
-        BOOST_CHECK(buffer[0] == 1.5f); // Memory is writable and readable
-        BOOST_CHECK(buffer[1] == 2.5f); // Memory is writable and readable
+        CHECK(buffer[0] == 1.5f); // Memory is writable and readable
+        CHECK(buffer[1] == 2.5f); // Memory is writable and readable
     }
     memoryManager->Release();
 
     memoryManager->Acquire();
     {
         float* buffer = reinterpret_cast<float*>(handle->Map());
-        BOOST_CHECK(buffer != nullptr); // Yields a valid pointer
+        CHECK(buffer != nullptr); // Yields a valid pointer
         buffer[0] = 3.5f;
         buffer[1] = 4.5f;
-        BOOST_CHECK(buffer[0] == 3.5f); // Memory is writable and readable
-        BOOST_CHECK(buffer[1] == 4.5f); // Memory is writable and readable
+        CHECK(buffer[0] == 3.5f); // Memory is writable and readable
+        CHECK(buffer[1] == 4.5f); // Memory is writable and readable
     }
     memoryManager->Release();
 
     float testPtr[2] = { 2.5f, 5.5f };
     // Cannot import as import is disabled
-    BOOST_CHECK(!handle->Import(static_cast<void*>(testPtr), MemorySource::Malloc));
+    CHECK(!handle->Import(static_cast<void*>(testPtr), MemorySource::Malloc));
 }
 
-BOOST_AUTO_TEST_CASE(RefTensorHandleFactoryImport)
+TEST_CASE("RefTensorHandleFactoryImport")
 {
     std::shared_ptr<RefMemoryManager> memoryManager = std::make_shared<RefMemoryManager>();
     RefTensorHandleFactory handleFactory(memoryManager);
@@ -97,25 +98,25 @@ BOOST_AUTO_TEST_CASE(RefTensorHandleFactoryImport)
     memoryManager->Acquire();
 
     // No buffer allocated when import is enabled
-    BOOST_CHECK_THROW(handle->Map(), armnn::NullPointerException);
+    CHECK_THROWS_AS(handle->Map(), armnn::NullPointerException);
 
     float testPtr[2] = { 2.5f, 5.5f };
     // Correctly import
-    BOOST_CHECK(handle->Import(static_cast<void*>(testPtr), MemorySource::Malloc));
+    CHECK(handle->Import(static_cast<void*>(testPtr), MemorySource::Malloc));
     float* buffer = reinterpret_cast<float*>(handle->Map());
-    BOOST_CHECK(buffer != nullptr); // Yields a valid pointer after import
-    BOOST_CHECK(buffer == testPtr); // buffer is pointing to testPtr
+    CHECK(buffer != nullptr); // Yields a valid pointer after import
+    CHECK(buffer == testPtr); // buffer is pointing to testPtr
     // Memory is writable and readable with correct value
-    BOOST_CHECK(buffer[0] == 2.5f);
-    BOOST_CHECK(buffer[1] == 5.5f);
+    CHECK(buffer[0] == 2.5f);
+    CHECK(buffer[1] == 5.5f);
     buffer[0] = 3.5f;
     buffer[1] = 10.0f;
-    BOOST_CHECK(buffer[0] == 3.5f);
-    BOOST_CHECK(buffer[1] == 10.0f);
+    CHECK(buffer[0] == 3.5f);
+    CHECK(buffer[1] == 10.0f);
     memoryManager->Release();
 }
 
-BOOST_AUTO_TEST_CASE(RefTensorHandleImport)
+TEST_CASE("RefTensorHandleImport")
 {
     TensorInfo info({ 1, 1, 2, 1 }, DataType::Float32);
     RefTensorHandle handle(info, static_cast<unsigned int>(MemorySource::Malloc));
@@ -124,24 +125,24 @@ BOOST_AUTO_TEST_CASE(RefTensorHandleImport)
     handle.Allocate();
 
     // No buffer allocated when import is enabled
-    BOOST_CHECK_THROW(handle.Map(), armnn::NullPointerException);
+    CHECK_THROWS_AS(handle.Map(), armnn::NullPointerException);
 
     float testPtr[2] = { 2.5f, 5.5f };
     // Correctly import
-    BOOST_CHECK(handle.Import(static_cast<void*>(testPtr), MemorySource::Malloc));
+    CHECK(handle.Import(static_cast<void*>(testPtr), MemorySource::Malloc));
     float* buffer = reinterpret_cast<float*>(handle.Map());
-    BOOST_CHECK(buffer != nullptr); // Yields a valid pointer after import
-    BOOST_CHECK(buffer == testPtr); // buffer is pointing to testPtr
+    CHECK(buffer != nullptr); // Yields a valid pointer after import
+    CHECK(buffer == testPtr); // buffer is pointing to testPtr
     // Memory is writable and readable with correct value
-    BOOST_CHECK(buffer[0] == 2.5f);
-    BOOST_CHECK(buffer[1] == 5.5f);
+    CHECK(buffer[0] == 2.5f);
+    CHECK(buffer[1] == 5.5f);
     buffer[0] = 3.5f;
     buffer[1] = 10.0f;
-    BOOST_CHECK(buffer[0] == 3.5f);
-    BOOST_CHECK(buffer[1] == 10.0f);
+    CHECK(buffer[0] == 3.5f);
+    CHECK(buffer[1] == 10.0f);
 }
 
-BOOST_AUTO_TEST_CASE(RefTensorHandleGetCapabilities)
+TEST_CASE("RefTensorHandleGetCapabilities")
 {
     std::shared_ptr<RefMemoryManager> memoryManager = std::make_shared<RefMemoryManager>();
     RefTensorHandleFactory handleFactory(memoryManager);
@@ -155,10 +156,10 @@ BOOST_AUTO_TEST_CASE(RefTensorHandleGetCapabilities)
     std::vector<Capability> capabilities = handleFactory.GetCapabilities(input,
                                                                          output,
                                                                          CapabilityClass::PaddingRequired);
-    BOOST_CHECK(capabilities.empty());
+    CHECK(capabilities.empty());
 }
 
-BOOST_AUTO_TEST_CASE(RefTensorHandleSupportsInPlaceComputation)
+TEST_CASE("RefTensorHandleSupportsInPlaceComputation")
 {
     std::shared_ptr<RefMemoryManager> memoryManager = std::make_shared<RefMemoryManager>();
     RefTensorHandleFactory handleFactory(memoryManager);
@@ -167,7 +168,7 @@ BOOST_AUTO_TEST_CASE(RefTensorHandleSupportsInPlaceComputation)
     ARMNN_ASSERT(!(handleFactory.SupportsInPlaceComputation()));
 }
 
-BOOST_AUTO_TEST_CASE(TestManagedConstTensorHandle)
+TEST_CASE("TestManagedConstTensorHandle")
 {
     // Initialize arguments
     void* mem = nullptr;
@@ -178,31 +179,31 @@ BOOST_AUTO_TEST_CASE(TestManagedConstTensorHandle)
 
     // Test managed handle is initialized with m_Mapped unset and once Map() called its set
     ManagedConstTensorHandle managedHandle(passThroughHandle);
-    BOOST_CHECK(!managedHandle.IsMapped());
+    CHECK(!managedHandle.IsMapped());
     managedHandle.Map();
-    BOOST_CHECK(managedHandle.IsMapped());
+    CHECK(managedHandle.IsMapped());
 
     // Test it can then be unmapped
     managedHandle.Unmap();
-    BOOST_CHECK(!managedHandle.IsMapped());
+    CHECK(!managedHandle.IsMapped());
 
     // Test member function
-    BOOST_CHECK(managedHandle.GetTensorInfo() == info);
+    CHECK(managedHandle.GetTensorInfo() == info);
 
     // Test that nullptr tensor handle doesn't get mapped
     ManagedConstTensorHandle managedHandleNull(nullptr);
-    BOOST_CHECK(!managedHandleNull.IsMapped());
-    BOOST_CHECK_THROW(managedHandleNull.Map(), armnn::Exception);
-    BOOST_CHECK(!managedHandleNull.IsMapped());
+    CHECK(!managedHandleNull.IsMapped());
+    CHECK_THROWS_AS(managedHandleNull.Map(), armnn::Exception);
+    CHECK(!managedHandleNull.IsMapped());
 
     // Check Unmap() when m_Mapped already false
     managedHandleNull.Unmap();
-    BOOST_CHECK(!managedHandleNull.IsMapped());
+    CHECK(!managedHandleNull.IsMapped());
 }
 
 #if !defined(__ANDROID__)
 // Only run these tests on non Android platforms
-BOOST_AUTO_TEST_CASE(CheckSourceType)
+TEST_CASE("CheckSourceType")
 {
     TensorInfo info({1}, DataType::Float32);
     RefTensorHandle handle(info, static_cast<unsigned int>(MemorySource::Malloc));
@@ -210,18 +211,18 @@ BOOST_AUTO_TEST_CASE(CheckSourceType)
     int* testPtr = new int(4);
 
     // Not supported
-    BOOST_CHECK(!handle.Import(static_cast<void *>(testPtr), MemorySource::DmaBuf));
+    CHECK(!handle.Import(static_cast<void *>(testPtr), MemorySource::DmaBuf));
 
     // Not supported
-    BOOST_CHECK(!handle.Import(static_cast<void *>(testPtr), MemorySource::DmaBufProtected));
+    CHECK(!handle.Import(static_cast<void *>(testPtr), MemorySource::DmaBufProtected));
 
     // Supported
-    BOOST_CHECK(handle.Import(static_cast<void *>(testPtr), MemorySource::Malloc));
+    CHECK(handle.Import(static_cast<void *>(testPtr), MemorySource::Malloc));
 
     delete testPtr;
 }
 
-BOOST_AUTO_TEST_CASE(ReusePointer)
+TEST_CASE("ReusePointer")
 {
     TensorInfo info({1}, DataType::Float32);
     RefTensorHandle handle(info, static_cast<unsigned int>(MemorySource::Malloc));
@@ -231,12 +232,12 @@ BOOST_AUTO_TEST_CASE(ReusePointer)
     handle.Import(static_cast<void *>(testPtr), MemorySource::Malloc);
 
     // Reusing previously Imported pointer
-    BOOST_CHECK(handle.Import(static_cast<void *>(testPtr), MemorySource::Malloc));
+    CHECK(handle.Import(static_cast<void *>(testPtr), MemorySource::Malloc));
 
     delete testPtr;
 }
 
-BOOST_AUTO_TEST_CASE(MisalignedPointer)
+TEST_CASE("MisalignedPointer")
 {
     TensorInfo info({2}, DataType::Float32);
     RefTensorHandle handle(info, static_cast<unsigned int>(MemorySource::Malloc));
@@ -247,11 +248,11 @@ BOOST_AUTO_TEST_CASE(MisalignedPointer)
     // Increment pointer by 1 byte
     void* misalignedPtr = static_cast<void*>(reinterpret_cast<char*>(testPtr) + 1);
 
-    BOOST_CHECK(!handle.Import(misalignedPtr, MemorySource::Malloc));
+    CHECK(!handle.Import(misalignedPtr, MemorySource::Malloc));
 
     delete[] testPtr;
 }
 
 #endif
 
-BOOST_AUTO_TEST_SUITE_END()
+}

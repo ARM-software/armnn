@@ -6,56 +6,56 @@
 #include "ConstTensorLayerVisitor.hpp"
 #include "Network.hpp"
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 namespace armnn
 {
 
 void TestConvolution2dLayerVisitor::CheckDescriptor(const Convolution2dDescriptor &convolution2dDescriptor)
 {
-    BOOST_CHECK(m_Descriptor.m_PadLeft == convolution2dDescriptor.m_PadLeft);
-    BOOST_CHECK(m_Descriptor.m_PadRight == convolution2dDescriptor.m_PadRight);
-    BOOST_CHECK(m_Descriptor.m_PadTop == convolution2dDescriptor.m_PadTop);
-    BOOST_CHECK(m_Descriptor.m_PadBottom == convolution2dDescriptor.m_PadBottom);
-    BOOST_CHECK(m_Descriptor.m_StrideX == convolution2dDescriptor.m_StrideX);
-    BOOST_CHECK(m_Descriptor.m_StrideY == convolution2dDescriptor.m_StrideY);
-    BOOST_CHECK(m_Descriptor.m_BiasEnabled == convolution2dDescriptor.m_BiasEnabled);
-    BOOST_CHECK(m_Descriptor.m_DataLayout == convolution2dDescriptor.m_DataLayout);
+    CHECK(m_Descriptor.m_PadLeft == convolution2dDescriptor.m_PadLeft);
+    CHECK(m_Descriptor.m_PadRight == convolution2dDescriptor.m_PadRight);
+    CHECK(m_Descriptor.m_PadTop == convolution2dDescriptor.m_PadTop);
+    CHECK(m_Descriptor.m_PadBottom == convolution2dDescriptor.m_PadBottom);
+    CHECK(m_Descriptor.m_StrideX == convolution2dDescriptor.m_StrideX);
+    CHECK(m_Descriptor.m_StrideY == convolution2dDescriptor.m_StrideY);
+    CHECK(m_Descriptor.m_BiasEnabled == convolution2dDescriptor.m_BiasEnabled);
+    CHECK(m_Descriptor.m_DataLayout == convolution2dDescriptor.m_DataLayout);
 }
 
 void TestDepthwiseConvolution2dLayerVisitor::CheckDescriptor(
         const DepthwiseConvolution2dDescriptor& convolution2dDescriptor)
 {
-    BOOST_CHECK(m_Descriptor.m_PadLeft == convolution2dDescriptor.m_PadLeft);
-    BOOST_CHECK(m_Descriptor.m_PadRight == convolution2dDescriptor.m_PadRight);
-    BOOST_CHECK(m_Descriptor.m_PadTop == convolution2dDescriptor.m_PadTop);
-    BOOST_CHECK(m_Descriptor.m_PadBottom == convolution2dDescriptor.m_PadBottom);
-    BOOST_CHECK(m_Descriptor.m_StrideX == convolution2dDescriptor.m_StrideX);
-    BOOST_CHECK(m_Descriptor.m_StrideY == convolution2dDescriptor.m_StrideY);
-    BOOST_CHECK(m_Descriptor.m_BiasEnabled == convolution2dDescriptor.m_BiasEnabled);
-    BOOST_CHECK(m_Descriptor.m_DataLayout == convolution2dDescriptor.m_DataLayout);
+    CHECK(m_Descriptor.m_PadLeft == convolution2dDescriptor.m_PadLeft);
+    CHECK(m_Descriptor.m_PadRight == convolution2dDescriptor.m_PadRight);
+    CHECK(m_Descriptor.m_PadTop == convolution2dDescriptor.m_PadTop);
+    CHECK(m_Descriptor.m_PadBottom == convolution2dDescriptor.m_PadBottom);
+    CHECK(m_Descriptor.m_StrideX == convolution2dDescriptor.m_StrideX);
+    CHECK(m_Descriptor.m_StrideY == convolution2dDescriptor.m_StrideY);
+    CHECK(m_Descriptor.m_BiasEnabled == convolution2dDescriptor.m_BiasEnabled);
+    CHECK(m_Descriptor.m_DataLayout == convolution2dDescriptor.m_DataLayout);
 }
 
 void TestFullyConnectedLayerVistor::CheckDescriptor(const FullyConnectedDescriptor& descriptor)
 {
-    BOOST_CHECK(m_Descriptor.m_BiasEnabled == descriptor.m_BiasEnabled);
-    BOOST_CHECK(m_Descriptor.m_TransposeWeightMatrix == descriptor.m_TransposeWeightMatrix);
+    CHECK(m_Descriptor.m_BiasEnabled == descriptor.m_BiasEnabled);
+    CHECK(m_Descriptor.m_TransposeWeightMatrix == descriptor.m_TransposeWeightMatrix);
 }
 
 void TestBatchNormalizationLayerVisitor::CheckDescriptor(const BatchNormalizationDescriptor& descriptor)
 {
-    BOOST_CHECK(m_Descriptor.m_Eps == descriptor.m_Eps);
-    BOOST_CHECK(m_Descriptor.m_DataLayout == descriptor.m_DataLayout);
+    CHECK(m_Descriptor.m_Eps == descriptor.m_Eps);
+    CHECK(m_Descriptor.m_DataLayout == descriptor.m_DataLayout);
 }
 
 void TestLstmLayerVisitor::CheckDescriptor(const LstmDescriptor& descriptor)
 {
-    BOOST_CHECK(m_Descriptor.m_ActivationFunc == descriptor.m_ActivationFunc);
-    BOOST_CHECK(m_Descriptor.m_ClippingThresCell == descriptor.m_ClippingThresCell);
-    BOOST_CHECK(m_Descriptor.m_ClippingThresProj == descriptor.m_ClippingThresProj);
-    BOOST_CHECK(m_Descriptor.m_CifgEnabled == descriptor.m_CifgEnabled);
-    BOOST_CHECK(m_Descriptor.m_PeepholeEnabled == descriptor.m_PeepholeEnabled);
-    BOOST_CHECK(m_Descriptor.m_ProjectionEnabled == descriptor.m_ProjectionEnabled);
+    CHECK(m_Descriptor.m_ActivationFunc == descriptor.m_ActivationFunc);
+    CHECK(m_Descriptor.m_ClippingThresCell == descriptor.m_ClippingThresCell);
+    CHECK(m_Descriptor.m_ClippingThresProj == descriptor.m_ClippingThresProj);
+    CHECK(m_Descriptor.m_CifgEnabled == descriptor.m_CifgEnabled);
+    CHECK(m_Descriptor.m_PeepholeEnabled == descriptor.m_PeepholeEnabled);
+    CHECK(m_Descriptor.m_ProjectionEnabled == descriptor.m_ProjectionEnabled);
 }
 
 void TestLstmLayerVisitor::CheckConstTensorPtrs(const std::string& name,
@@ -64,11 +64,11 @@ void TestLstmLayerVisitor::CheckConstTensorPtrs(const std::string& name,
 {
     if (expected == nullptr)
     {
-        BOOST_CHECK_MESSAGE(actual == nullptr, name + " actual should have been a nullptr");
+        CHECK_MESSAGE(actual == nullptr, name + " actual should have been a nullptr");
     }
     else
     {
-        BOOST_CHECK_MESSAGE(actual != nullptr, name + " actual should have been set");
+        CHECK_MESSAGE(actual != nullptr, name + " actual should have been set");
         if (actual != nullptr)
         {
             CheckConstTensors(*expected, *actual);
@@ -113,11 +113,11 @@ void TestQLstmLayerVisitor::CheckConstTensorPtrs(const std::string& name,
 {
     if (expected == nullptr)
     {
-        BOOST_CHECK_MESSAGE(actual == nullptr, name + " actual should have been a nullptr");
+        CHECK_MESSAGE(actual == nullptr, name + " actual should have been a nullptr");
     }
     else
     {
-        BOOST_CHECK_MESSAGE(actual != nullptr, name + " actual should have been set");
+        CHECK_MESSAGE(actual != nullptr, name + " actual should have been set");
         if (actual != nullptr)
         {
             CheckConstTensors(*expected, *actual);
@@ -127,11 +127,11 @@ void TestQLstmLayerVisitor::CheckConstTensorPtrs(const std::string& name,
 
 void TestQLstmLayerVisitor::CheckDescriptor(const QLstmDescriptor& descriptor)
 {
-    BOOST_CHECK(m_Descriptor.m_CellClip == descriptor.m_CellClip);
-    BOOST_CHECK(m_Descriptor.m_ProjectionClip == descriptor.m_ProjectionClip);
-    BOOST_CHECK(m_Descriptor.m_CifgEnabled == descriptor.m_CifgEnabled);
-    BOOST_CHECK(m_Descriptor.m_PeepholeEnabled == descriptor.m_PeepholeEnabled);
-    BOOST_CHECK(m_Descriptor.m_ProjectionEnabled == descriptor.m_ProjectionEnabled);
+    CHECK(m_Descriptor.m_CellClip == descriptor.m_CellClip);
+    CHECK(m_Descriptor.m_ProjectionClip == descriptor.m_ProjectionClip);
+    CHECK(m_Descriptor.m_CifgEnabled == descriptor.m_CifgEnabled);
+    CHECK(m_Descriptor.m_PeepholeEnabled == descriptor.m_PeepholeEnabled);
+    CHECK(m_Descriptor.m_ProjectionEnabled == descriptor.m_ProjectionEnabled);
 }
 
 void TestQLstmLayerVisitor::CheckInputParameters(const LstmInputParams& inputParams)
@@ -211,11 +211,11 @@ void TestQuantizedLstmLayerVisitor::CheckConstTensorPtrs(const std::string& name
 {
     if (expected == nullptr)
     {
-        BOOST_CHECK_MESSAGE(actual == nullptr, name + " actual should have been a nullptr");
+        CHECK_MESSAGE(actual == nullptr, name + " actual should have been a nullptr");
     }
     else
     {
-        BOOST_CHECK_MESSAGE(actual != nullptr, name + " actual should have been set");
+        CHECK_MESSAGE(actual != nullptr, name + " actual should have been set");
         if (actual != nullptr)
         {
             CheckConstTensors(*expected, *actual);
@@ -263,9 +263,9 @@ void TestQuantizedLstmLayerVisitor::CheckInputParameters(const QuantizedLstmInpu
     CheckConstTensorPtrs("OutputGateBias", m_InputParams.m_OutputGateBias, inputParams.m_OutputGateBias);
 }
 
-BOOST_AUTO_TEST_SUITE(TestConstTensorLayerVisitor)
-
-BOOST_AUTO_TEST_CASE(CheckConvolution2dLayer)
+TEST_SUITE("TestConstTensorLayerVisitor")
+{
+TEST_CASE("CheckConvolution2dLayer")
 {
     Convolution2dDescriptor descriptor;
     descriptor.m_PadLeft = 2;
@@ -288,7 +288,7 @@ BOOST_AUTO_TEST_CASE(CheckConvolution2dLayer)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckNamedConvolution2dLayer)
+TEST_CASE("CheckNamedConvolution2dLayer")
 {
     const char* layerName = "Convolution2dLayer";
     Convolution2dDescriptor descriptor;
@@ -312,7 +312,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedConvolution2dLayer)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckConvolution2dLayerWithBiases)
+TEST_CASE("CheckConvolution2dLayerWithBiases")
 {
     Convolution2dDescriptor descriptor;
     descriptor.m_PadLeft = 2;
@@ -341,7 +341,7 @@ BOOST_AUTO_TEST_CASE(CheckConvolution2dLayerWithBiases)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckNamedConvolution2dLayerWithBiases)
+TEST_CASE("CheckNamedConvolution2dLayerWithBiases")
 {
     const char* layerName = "Convolution2dLayer";
     Convolution2dDescriptor descriptor;
@@ -371,7 +371,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedConvolution2dLayerWithBiases)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckDepthwiseConvolution2dLayer)
+TEST_CASE("CheckDepthwiseConvolution2dLayer")
 {
     DepthwiseConvolution2dDescriptor descriptor;
     descriptor.m_PadLeft = 2;
@@ -394,7 +394,7 @@ BOOST_AUTO_TEST_CASE(CheckDepthwiseConvolution2dLayer)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckNamedDepthwiseConvolution2dLayer)
+TEST_CASE("CheckNamedDepthwiseConvolution2dLayer")
 {
     const char* layerName = "DepthwiseConvolution2dLayer";
     DepthwiseConvolution2dDescriptor descriptor;
@@ -421,7 +421,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedDepthwiseConvolution2dLayer)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckDepthwiseConvolution2dLayerWithBiases)
+TEST_CASE("CheckDepthwiseConvolution2dLayerWithBiases")
 {
     DepthwiseConvolution2dDescriptor descriptor;
     descriptor.m_PadLeft = 2;
@@ -450,7 +450,7 @@ BOOST_AUTO_TEST_CASE(CheckDepthwiseConvolution2dLayerWithBiases)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckNamedDepthwiseConvolution2dLayerWithBiases)
+TEST_CASE("CheckNamedDepthwiseConvolution2dLayerWithBiases")
 {
     const char* layerName = "DepthwiseConvolution2dLayer";
     DepthwiseConvolution2dDescriptor descriptor;
@@ -480,7 +480,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedDepthwiseConvolution2dLayerWithBiases)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckFullyConnectedLayer)
+TEST_CASE("CheckFullyConnectedLayer")
 {
     FullyConnectedDescriptor descriptor;
     descriptor.m_TransposeWeightMatrix = true;
@@ -497,7 +497,7 @@ BOOST_AUTO_TEST_CASE(CheckFullyConnectedLayer)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckNamedFullyConnectedLayer)
+TEST_CASE("CheckNamedFullyConnectedLayer")
 {
     const char* layerName = "FullyConnectedLayer";
     FullyConnectedDescriptor descriptor;
@@ -515,7 +515,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedFullyConnectedLayer)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckFullyConnectedLayerWithBiases)
+TEST_CASE("CheckFullyConnectedLayerWithBiases")
 {
     FullyConnectedDescriptor descriptor;
     descriptor.m_TransposeWeightMatrix = true;
@@ -538,7 +538,7 @@ BOOST_AUTO_TEST_CASE(CheckFullyConnectedLayerWithBiases)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckNamedFullyConnectedLayerWithBiases)
+TEST_CASE("CheckNamedFullyConnectedLayerWithBiases")
 {
     const char* layerName = "FullyConnectedLayer";
     FullyConnectedDescriptor descriptor;
@@ -562,7 +562,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedFullyConnectedLayerWithBiases)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckBatchNormalizationLayer)
+TEST_CASE("CheckBatchNormalizationLayer")
 {
     BatchNormalizationDescriptor descriptor;
     descriptor.m_Eps = 0.0002f;
@@ -592,7 +592,7 @@ BOOST_AUTO_TEST_CASE(CheckBatchNormalizationLayer)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckNamedBatchNormalizationLayer)
+TEST_CASE("CheckNamedBatchNormalizationLayer")
 {
     const char* layerName = "BatchNormalizationLayer";
     BatchNormalizationDescriptor descriptor;
@@ -624,7 +624,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedBatchNormalizationLayer)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckConstLayer)
+TEST_CASE("CheckConstLayer")
 {
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
@@ -638,7 +638,7 @@ BOOST_AUTO_TEST_CASE(CheckConstLayer)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckNamedConstLayer)
+TEST_CASE("CheckNamedConstLayer")
 {
     const char* layerName = "ConstantLayer";
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
@@ -653,7 +653,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedConstLayer)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckLstmLayerBasic)
+TEST_CASE("CheckLstmLayerBasic")
 {
     LstmDescriptor descriptor;
     descriptor.m_ActivationFunc = 3;
@@ -725,7 +725,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerBasic)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerBasic)
+TEST_CASE("CheckNamedLstmLayerBasic")
 {
     const char* layerName = "LstmLayer";
     LstmDescriptor descriptor;
@@ -798,7 +798,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerBasic)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckLstmLayerCifgDisabled)
+TEST_CASE("CheckLstmLayerCifgDisabled")
 {
     LstmDescriptor descriptor;
     descriptor.m_ActivationFunc = 3;
@@ -889,7 +889,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerCifgDisabled)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerCifgDisabled)
+TEST_CASE("CheckNamedLstmLayerCifgDisabled")
 {
     const char* layerName = "LstmLayer";
     LstmDescriptor descriptor;
@@ -982,7 +982,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerCifgDisabled)
 }
 
 // TODO add one with peephole
-BOOST_AUTO_TEST_CASE(CheckLstmLayerPeephole)
+TEST_CASE("CheckLstmLayerPeephole")
 {
     LstmDescriptor descriptor;
     descriptor.m_ActivationFunc = 3;
@@ -1068,7 +1068,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerPeephole)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckLstmLayerPeepholeCifgDisabled)
+TEST_CASE("CheckLstmLayerPeepholeCifgDisabled")
 {
     LstmDescriptor descriptor;
     descriptor.m_ActivationFunc = 3;
@@ -1182,7 +1182,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerPeepholeCifgDisabled)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerPeephole)
+TEST_CASE("CheckNamedLstmLayerPeephole")
 {
     const char* layerName = "LstmLayer";
     LstmDescriptor descriptor;
@@ -1270,7 +1270,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerPeephole)
 }
 
 // TODO add one with projection
-BOOST_AUTO_TEST_CASE(CheckLstmLayerProjection)
+TEST_CASE("CheckLstmLayerProjection")
 {
     LstmDescriptor descriptor;
     descriptor.m_ActivationFunc = 3;
@@ -1356,7 +1356,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerProjection)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerProjection)
+TEST_CASE("CheckNamedLstmLayerProjection")
 {
     const char* layerName = "LstmLayer";
     LstmDescriptor descriptor;
@@ -1443,7 +1443,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerProjection)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckQLstmLayerBasic)
+TEST_CASE("CheckQLstmLayerBasic")
 {
     QLstmDescriptor descriptor;
     descriptor.m_ProjectionClip = 0.5f;
@@ -1515,7 +1515,7 @@ BOOST_AUTO_TEST_CASE(CheckQLstmLayerBasic)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckNamedQLstmLayerBasic)
+TEST_CASE("CheckNamedQLstmLayerBasic")
 {
     const char* layerName = "QLstmLayer";
     QLstmDescriptor descriptor;
@@ -1588,7 +1588,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedQLstmLayerBasic)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgDisabled)
+TEST_CASE("CheckQLstmLayerCifgDisabled")
 {
     QLstmDescriptor descriptor;
     descriptor.m_ProjectionClip = 0.5f;
@@ -1683,7 +1683,7 @@ BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgDisabled)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgDisabledPeepholeEnabled)
+TEST_CASE("CheckQLstmLayerCifgDisabledPeepholeEnabled")
 {
     QLstmDescriptor descriptor;
     descriptor.m_ProjectionClip = 0.5f;
@@ -1800,7 +1800,7 @@ BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgDisabledPeepholeEnabled)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgEnabledPeepholeEnabled)
+TEST_CASE("CheckQLstmLayerCifgEnabledPeepholeEnabled")
 {
     QLstmDescriptor descriptor;
     descriptor.m_ProjectionClip = 0.5f;
@@ -1890,7 +1890,7 @@ BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgEnabledPeepholeEnabled)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckQLstmLayerProjectionEnabled)
+TEST_CASE("CheckQLstmLayerProjectionEnabled")
 {
     QLstmDescriptor descriptor;
     descriptor.m_ProjectionClip = 0.5f;
@@ -1980,7 +1980,7 @@ BOOST_AUTO_TEST_CASE(CheckQLstmLayerProjectionEnabled)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgDisabledLayerNormEnabled)
+TEST_CASE("CheckQLstmLayerCifgDisabledLayerNormEnabled")
 {
     QLstmDescriptor descriptor;
     descriptor.m_ProjectionClip = 0.5f;
@@ -2104,7 +2104,7 @@ BOOST_AUTO_TEST_CASE(CheckQLstmLayerCifgDisabledLayerNormEnabled)
 }
 
 
-BOOST_AUTO_TEST_CASE(CheckQuantizedLstmLayer)
+TEST_CASE("CheckQuantizedLstmLayer")
 {
     std::vector<uint8_t> inputToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned int> inputToInputWeightsDimensions = {1, 1, 3, 3};
@@ -2193,7 +2193,7 @@ BOOST_AUTO_TEST_CASE(CheckQuantizedLstmLayer)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckNamedQuantizedLstmLayer)
+TEST_CASE("CheckNamedQuantizedLstmLayer")
 {
     const char* layerName = "LstmLayer";
     std::vector<uint8_t> inputToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -2283,6 +2283,6 @@ BOOST_AUTO_TEST_CASE(CheckNamedQuantizedLstmLayer)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}
 
 } // namespace armnn

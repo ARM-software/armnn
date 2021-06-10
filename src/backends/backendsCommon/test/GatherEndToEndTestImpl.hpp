@@ -10,6 +10,8 @@
 #include <armnn/INetwork.hpp>
 #include <ResolveType.hpp>
 
+#include <doctest/doctest.h>
+
 namespace{
 
 armnn::INetworkPtr CreateGatherNetwork(const armnn::TensorInfo& paramsInfo,
@@ -59,7 +61,7 @@ void GatherEndToEnd(const std::vector<BackendId>& backends)
     // Builds up the structure of the network
     armnn::INetworkPtr net = CreateGatherNetwork(paramsInfo, indicesInfo, outputInfo, indicesData);
 
-    BOOST_TEST_CHECKPOINT("create a network");
+    CHECK(net);
 
     std::map<int, std::vector<T>> inputTensorData = {{ 0, paramsData }};
     std::map<int, std::vector<T>> expectedOutputData = {{ 0, expectedOutput }};
@@ -114,8 +116,6 @@ void GatherMultiDimEndToEnd(const std::vector<BackendId>& backends)
 
     // Builds up the structure of the network
     armnn::INetworkPtr net = CreateGatherNetwork(paramsInfo, indicesInfo, outputInfo, indicesData);
-
-    BOOST_TEST_CHECKPOINT("create a network");
 
     std::map<int, std::vector<T>> inputTensorData = {{ 0, paramsData }};
     std::map<int, std::vector<T>> expectedOutputData = {{ 0, expectedOutput }};

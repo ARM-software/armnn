@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include <armnnDeserializer/IDeserializer.hpp>
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(Deserializer)
-
+TEST_SUITE("Deserializer_Pad")
+{
 struct PadFixture : public ParserFlatbuffersSerializeFixture
 {
     explicit PadFixture(const std::string &inputShape,
@@ -110,7 +109,7 @@ struct SimplePadFixture : PadFixture
                                     "QuantisedAsymm8") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(SimplePadQuantisedAsymm8, SimplePadFixture)
+TEST_CASE_FIXTURE(SimplePadFixture, "SimplePadQuantisedAsymm8")
 {
     RunTest<3, armnn::DataType::QAsymmU8>(0,
                                                  {
@@ -126,4 +125,4 @@ BOOST_FIXTURE_TEST_CASE(SimplePadQuantisedAsymm8, SimplePadFixture)
                                                  });
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

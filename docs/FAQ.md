@@ -46,3 +46,17 @@ This problem has previously been reported to the boostorg GitHub project. The so
 ArmNN fails to build on Ubuntu 20.04
 ---------------------------------------------------------
 The compiler version update on Ubuntu 20.04 resulted in build errors in Flat buffers 1.10.0. Update to Flatbuffers 1.12.0 to resolve this problem. In addition when building flatbuffers specify -fPIC CXX flag to allow the libraries to be used in our shared objects. Without this the the ArmNN build can fail with libflatbuffers.a(util.cpp.o): relocation R_X86_64_PC32 against symbol `_ZN11flatbuffers9DirExistsEPKc' can not be used when making a shared object; recompile with -fPIC
+
+Tensorflow Lite benchmarking tool fails with segmentation fault when using the Arm NN delegate.
+---------------------------------------------------------
+There are occaisional problems using native build versions of the Tensorflow Lite benchmarking tool. It can be sensitive to errors in command line parameter usage. A simple misspelling of a delegate name will result in a bus error. Here is a sample command line usage that is known to work for the Arm NN delegate.
+
+This example is for:
+
+* Execution on Android using a native binary downloaded from [Tensorflow Lite performance measurment](https://www.tensorflow.org/lite/performance/measurement#native_benchmark_binary).
+* Uses a TF Lite model that has been downloaded from the ML-zoo. In this case [MobileNet v2 1.0 224 UINT8](https://github.com/ARM-software/ML-zoo/tree/master/models/image_classification/mobilenet_v2_1.0_224/tflite_uint8).
+* Arm NN and its dependent libraries are in the current directory, /data/local/tmp.
+
+~~~
+LD_LIBRARY_PATH=/vendor/lib64/egl:/vendor/lib/egl/:. ./android_aarch64_benchmark_model --num_threads=4 --graph=/data/local/tmp/mobilenet_v2_1.0_224_quantized_1_default_1.tflite --external_delegate_path="libarmnnDelegate.so" --external_delegate_options="backends:GpuAcc"
+~~~

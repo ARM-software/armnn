@@ -17,107 +17,109 @@
 
 using namespace armnn;
 
-#if defined(ARMCOMPUTENEON_ENABLED)
-// Disabled Test Suite
-//TEST_SUITE("BackendsCompatibility")
-//TEST_CASE("Neon_Cl_DirectCompatibility_Test")
-//{
-//    auto neonBackend = std::make_unique<NeonBackend>();
-//    auto clBackend = std::make_unique<ClBackend>();
-//
-//    TensorHandleFactoryRegistry registry;
-//    neonBackend->RegisterTensorHandleFactories(registry);
-//    clBackend->RegisterTensorHandleFactories(registry);
-//
-//    const BackendId& neonBackendId = neonBackend->GetId();
-//    const BackendId& clBackendId = clBackend->GetId();
-//
-//    BackendsMap backends;
-//    backends[neonBackendId] = std::move(neonBackend);
-//    backends[clBackendId] = std::move(clBackend);
-//
-//    armnn::Graph graph;
-//
-//    armnn::InputLayer* const inputLayer = graph.AddLayer<armnn::InputLayer>(0, "input");
-//
-//    inputLayer->SetBackendId(neonBackendId);
-//
-//    armnn::SoftmaxDescriptor smDesc;
-//    armnn::SoftmaxLayer* const softmaxLayer1 = graph.AddLayer<armnn::SoftmaxLayer>(smDesc, "softmax1");
-//    softmaxLayer1->SetBackendId(clBackendId);
-//
-//    armnn::SoftmaxLayer* const softmaxLayer2 = graph.AddLayer<armnn::SoftmaxLayer>(smDesc, "softmax2");
-//    softmaxLayer2->SetBackendId(neonBackendId);
-//
-//    armnn::SoftmaxLayer* const softmaxLayer3 = graph.AddLayer<armnn::SoftmaxLayer>(smDesc, "softmax3");
-//    softmaxLayer3->SetBackendId(clBackendId);
-//
-//    armnn::SoftmaxLayer* const softmaxLayer4 = graph.AddLayer<armnn::SoftmaxLayer>(smDesc, "softmax4");
-//    softmaxLayer4->SetBackendId(neonBackendId);
-//
-//    armnn::OutputLayer* const outputLayer = graph.AddLayer<armnn::OutputLayer>(0, "output");
-//    outputLayer->SetBackendId(clBackendId);
-//
-//    inputLayer->GetOutputSlot(0).Connect(softmaxLayer1->GetInputSlot(0));
-//    softmaxLayer1->GetOutputSlot(0).Connect(softmaxLayer2->GetInputSlot(0));
-//    softmaxLayer2->GetOutputSlot(0).Connect(softmaxLayer3->GetInputSlot(0));
-//    softmaxLayer3->GetOutputSlot(0).Connect(softmaxLayer4->GetInputSlot(0));
-//    softmaxLayer4->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-//
-//    graph.TopologicalSort();
-//
-//    std::vector<std::string> errors;
-//    auto result = SelectTensorHandleStrategy(graph, backends, registry, true, errors);
-//
-//    CHECK(result.m_Error == false);
-//    CHECK(result.m_Warning == false);
-//
-//    OutputSlot& inputLayerOut = inputLayer->GetOutputSlot(0);
-//    OutputSlot& softmaxLayer1Out = softmaxLayer1->GetOutputSlot(0);
-//    OutputSlot& softmaxLayer2Out = softmaxLayer2->GetOutputSlot(0);
-//    OutputSlot& softmaxLayer3Out = softmaxLayer3->GetOutputSlot(0);
-//    OutputSlot& softmaxLayer4Out = softmaxLayer4->GetOutputSlot(0);
-//
-//    // Check that the correct factory was selected
-//    CHECK(inputLayerOut.GetTensorHandleFactoryId()    == "Arm/Cl/TensorHandleFactory");
-//    CHECK(softmaxLayer1Out.GetTensorHandleFactoryId() == "Arm/Cl/TensorHandleFactory");
-//    CHECK(softmaxLayer2Out.GetTensorHandleFactoryId() == "Arm/Cl/TensorHandleFactory");
-//    CHECK(softmaxLayer3Out.GetTensorHandleFactoryId() == "Arm/Cl/TensorHandleFactory");
-//    CHECK(softmaxLayer4Out.GetTensorHandleFactoryId() == "Arm/Cl/TensorHandleFactory");
-//
-//    // Check that the correct strategy was selected
-//    CHECK((inputLayerOut.GetEdgeStrategyForConnection(0) == EdgeStrategy::DirectCompatibility));
-//    CHECK((softmaxLayer1Out.GetEdgeStrategyForConnection(0) == EdgeStrategy::DirectCompatibility));
-//    CHECK((softmaxLayer2Out.GetEdgeStrategyForConnection(0) == EdgeStrategy::DirectCompatibility));
-//    CHECK((softmaxLayer3Out.GetEdgeStrategyForConnection(0) == EdgeStrategy::DirectCompatibility));
-//    CHECK((softmaxLayer4Out.GetEdgeStrategyForConnection(0) == EdgeStrategy::DirectCompatibility));
-//
-//    graph.AddCompatibilityLayers(backends, registry);
-//
-//    // Test for copy layers
-//    int copyCount= 0;
-//    graph.ForEachLayer([&copyCount](Layer* layer)
-//    {
-//        if (layer->GetType() == LayerType::MemCopy)
-//        {
-//            copyCount++;
-//        }
-//    });
-//    CHECK(copyCount == 0);
-//
-//    // Test for import layers
-//    int importCount= 0;
-//    graph.ForEachLayer([&importCount](Layer *layer)
-//    {
-//        if (layer->GetType() == LayerType::MemImport)
-//        {
-//            importCount++;
-//        }
-//    });
-//    CHECK(importCount == 0);
-//}
-//
-//}
+#if defined(ARMCOMPUTENEON_ENABLED) && defined(ARMCOMPUTECL_ENABLED)
+
+TEST_SUITE("BackendsCompatibility")
+{
+// Partially disabled Test Suite
+TEST_CASE("Neon_Cl_DirectCompatibility_Test")
+{
+    auto neonBackend = std::make_unique<NeonBackend>();
+    auto clBackend = std::make_unique<ClBackend>();
+
+    TensorHandleFactoryRegistry registry;
+    neonBackend->RegisterTensorHandleFactories(registry);
+    clBackend->RegisterTensorHandleFactories(registry);
+
+    const BackendId& neonBackendId = neonBackend->GetId();
+    const BackendId& clBackendId = clBackend->GetId();
+
+    BackendsMap backends;
+    backends[neonBackendId] = std::move(neonBackend);
+    backends[clBackendId] = std::move(clBackend);
+
+    armnn::Graph graph;
+
+    armnn::InputLayer* const inputLayer = graph.AddLayer<armnn::InputLayer>(0, "input");
+
+    inputLayer->SetBackendId(neonBackendId);
+
+    armnn::SoftmaxDescriptor smDesc;
+    armnn::SoftmaxLayer* const softmaxLayer1 = graph.AddLayer<armnn::SoftmaxLayer>(smDesc, "softmax1");
+    softmaxLayer1->SetBackendId(clBackendId);
+
+    armnn::SoftmaxLayer* const softmaxLayer2 = graph.AddLayer<armnn::SoftmaxLayer>(smDesc, "softmax2");
+    softmaxLayer2->SetBackendId(neonBackendId);
+
+    armnn::SoftmaxLayer* const softmaxLayer3 = graph.AddLayer<armnn::SoftmaxLayer>(smDesc, "softmax3");
+    softmaxLayer3->SetBackendId(clBackendId);
+
+    armnn::SoftmaxLayer* const softmaxLayer4 = graph.AddLayer<armnn::SoftmaxLayer>(smDesc, "softmax4");
+    softmaxLayer4->SetBackendId(neonBackendId);
+
+    armnn::OutputLayer* const outputLayer = graph.AddLayer<armnn::OutputLayer>(0, "output");
+    outputLayer->SetBackendId(clBackendId);
+
+    inputLayer->GetOutputSlot(0).Connect(softmaxLayer1->GetInputSlot(0));
+    softmaxLayer1->GetOutputSlot(0).Connect(softmaxLayer2->GetInputSlot(0));
+    softmaxLayer2->GetOutputSlot(0).Connect(softmaxLayer3->GetInputSlot(0));
+    softmaxLayer3->GetOutputSlot(0).Connect(softmaxLayer4->GetInputSlot(0));
+    softmaxLayer4->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    graph.TopologicalSort();
+
+    std::vector<std::string> errors;
+    auto result = SelectTensorHandleStrategy(graph, backends, registry, true, errors);
+
+    CHECK(result.m_Error == false);
+    CHECK(result.m_Warning == false);
+
+    // OutputSlot& inputLayerOut = inputLayer->GetOutputSlot(0);
+    // OutputSlot& softmaxLayer1Out = softmaxLayer1->GetOutputSlot(0);
+    // OutputSlot& softmaxLayer2Out = softmaxLayer2->GetOutputSlot(0);
+    // OutputSlot& softmaxLayer3Out = softmaxLayer3->GetOutputSlot(0);
+    // OutputSlot& softmaxLayer4Out = softmaxLayer4->GetOutputSlot(0);
+
+    // // Check that the correct factory was selected
+    // CHECK(inputLayerOut.GetTensorHandleFactoryId()    == "Arm/Cl/TensorHandleFactory");
+    // CHECK(softmaxLayer1Out.GetTensorHandleFactoryId() == "Arm/Cl/TensorHandleFactory");
+    // CHECK(softmaxLayer2Out.GetTensorHandleFactoryId() == "Arm/Cl/TensorHandleFactory");
+    // CHECK(softmaxLayer3Out.GetTensorHandleFactoryId() == "Arm/Cl/TensorHandleFactory");
+    // CHECK(softmaxLayer4Out.GetTensorHandleFactoryId() == "Arm/Cl/TensorHandleFactory");
+
+    // // Check that the correct strategy was selected
+    // CHECK((inputLayerOut.GetEdgeStrategyForConnection(0) == EdgeStrategy::DirectCompatibility));
+    // CHECK((softmaxLayer1Out.GetEdgeStrategyForConnection(0) == EdgeStrategy::DirectCompatibility));
+    // CHECK((softmaxLayer2Out.GetEdgeStrategyForConnection(0) == EdgeStrategy::DirectCompatibility));
+    // CHECK((softmaxLayer3Out.GetEdgeStrategyForConnection(0) == EdgeStrategy::DirectCompatibility));
+    // CHECK((softmaxLayer4Out.GetEdgeStrategyForConnection(0) == EdgeStrategy::DirectCompatibility));
+
+    graph.AddCompatibilityLayers(backends, registry);
+
+    // Test for copy layers
+    int copyCount= 0;
+    graph.ForEachLayer([&copyCount](Layer* layer)
+    {
+        if (layer->GetType() == LayerType::MemCopy)
+        {
+            copyCount++;
+        }
+    });
+    // CHECK(copyCount == 0);
+
+    // Test for import layers
+    int importCount= 0;
+    graph.ForEachLayer([&importCount](Layer *layer)
+    {
+        if (layer->GetType() == LayerType::MemImport)
+        {
+            importCount++;
+        }
+    });
+    // CHECK(importCount == 0);
+}
+
+}
 #endif
 
 TEST_SUITE("BackendCapability")

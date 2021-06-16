@@ -53,7 +53,7 @@ TfLite will then delegate operations, that can be accelerated with Arm NN, to Ar
 executed with the usual TfLite runtime. This is our **recommended way to accelerate TfLite models**. As with our parsers
 there are tutorials in our doxygen documentation that can be found in the [wiki section](https://github.com/ARM-software/armnn/wiki/Documentation).
 
-If you would like to use **Arm NN on Android** you can follow this guide which explains [how to build Arm NN using the AndroidNDK]().
+If you would like to use **Arm NN on Android** you can follow this guide which explains [how to build Arm NN using the AndroidNDK](BuildGuideAndroidNDK.md).
 But you might also want to take a look at another repository which implements a hardware abstraction layer (HAL) for
 Android. The repository is called [Android-NN-Driver](https://github.com/ARM-software/android-nn-driver) and when
 integrated into Android it will automatically run neural networks with Arm NN.

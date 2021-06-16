@@ -8,7 +8,7 @@
 #include <backendsCommon/Workload.hpp>
 
 #include <arm_compute/core/Error.h>
-#include <arm_compute/runtime/CL/functions/CLElementWiseUnaryLayer.h>
+#include <arm_compute/runtime/CL/functions/CLElementwiseUnaryLayer.h>
 
 namespace armnn
 {

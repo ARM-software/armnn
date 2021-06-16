@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_05" # Release 21.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="a5c428a5428d1c7a9d1d03fd198d6a8578b6c12c" #Fixed segfault in NEGEMMConv2d
+DEFAULT_CLFRAMEWORKREVISION="08302c17cd57356b35d46e17dc8d8f76672da5cf" #Add CPU discovery capabilities.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

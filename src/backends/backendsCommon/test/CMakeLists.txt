@@ -10,12 +10,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     BackendIdTests.cpp
     BackendProfilingTests.cpp
     BackendRegistryTests.cpp
-    CommonTestUtils.cpp
-    CommonTestUtils.hpp
     ComparisonEndToEndTestImpl.hpp
     CompatibilityTests.cpp
-    DataLayoutUtils.hpp
-    DataTypeUtils.hpp
     DefaultAsyncExecuteTest.cpp
     DepthToSpaceEndToEndTestImpl.hpp
     DequantizeEndToEndTestImpl.hpp
@@ -54,10 +50,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     SpaceToDepthEndToEndTestImpl.hpp
     SplitterEndToEndTestImpl.hpp
     StridedSliceAsyncEndToEndTest.hpp
-    TensorCopyUtils.cpp
-    TensorCopyUtils.hpp
     WorkloadFactoryHelper.hpp
-    WorkloadTestUtils.hpp
     layerTests/AbsTestImpl.cpp
     layerTests/AbsTestImpl.hpp
     layerTests/ActivationTestImpl.cpp
@@ -115,7 +108,6 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/InstanceNormalizationTestImpl.hpp
     layerTests/L2NormalizationTestImpl.cpp
     layerTests/L2NormalizationTestImpl.hpp
-    layerTests/LayerTestResult.hpp
     layerTests/LogTestImpl.cpp
     layerTests/LogTestImpl.hpp
     layerTests/LogicalTestImpl.cpp

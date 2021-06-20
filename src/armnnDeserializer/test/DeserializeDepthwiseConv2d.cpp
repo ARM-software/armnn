@@ -7,12 +7,12 @@
 
 #include <armnnDeserializer/IDeserializer.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
 #include <string>
 
-BOOST_AUTO_TEST_SUITE(Deserializer)
-
+TEST_SUITE("Deserializer_DepthwiseConv2d")
+{
 struct DepthwiseConv2dFlatbufferVersion1Fixture : public ParserFlatbuffersSerializeFixture
 {
     explicit DepthwiseConv2dFlatbufferVersion1Fixture()
@@ -218,7 +218,7 @@ struct DepthwiseConv2dFlatbufferVersion1Fixture : public ParserFlatbuffersSerial
 // file. It ensures older models can still be read and executed
 // featureVersion weights layout scheme 1 indicates a change in the depthwise weights layout within
 // armm from [M,I,H,W] --> [1,H,W,I*M]
-BOOST_FIXTURE_TEST_CASE(DepthwiseConv2d_FlatbufferVersion1, DepthwiseConv2dFlatbufferVersion1Fixture)
+TEST_CASE_FIXTURE(DepthwiseConv2dFlatbufferVersion1Fixture, "DepthwiseConv2d_FlatbufferVersion1")
 {
     RunTest<4, armnn::DataType::QAsymmS8>(
             0,
@@ -230,4 +230,4 @@ BOOST_FIXTURE_TEST_CASE(DepthwiseConv2d_FlatbufferVersion1, DepthwiseConv2dFlatb
               25,36,12,37,42,25,29,14, 9});
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

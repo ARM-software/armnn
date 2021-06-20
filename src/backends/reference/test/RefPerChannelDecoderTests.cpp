@@ -4,42 +4,40 @@
 //
 
 #include <reference/workloads/Decoders.hpp>
-#include <armnn/utility/NumericCast.hpp>
 
 #include <fmt/format.h>
 
-#include <boost/test/unit_test.hpp>
+#include <doctest/doctest.h>
 
-BOOST_AUTO_TEST_SUITE(RefPerChannelDecoder)
-
+TEST_SUITE("RefPerChannelDecoder")
+{
 template<typename T>
 void CompareVector(std::vector<T> vec1, std::vector<T> vec2)
 {
-    BOOST_TEST(vec1.size() == vec2.size());
+    CHECK(vec1.size() == vec2.size());
 
     bool mismatch = false;
     for (uint i = 0; i < vec1.size(); ++i)
     {
         if (vec1[i] != vec2[i])
         {
-            /*std::stringstream ss;
-            ss << "Vector value mismatch: index=" << i << "  " <<  vec1[i] << "!=" << vec2[i];*/
-            BOOST_TEST_MESSAGE(fmt::format("Vector value mismatch: index={}  {} != {}",
-                                           i,
-                                           vec1[i],
-                                           vec2[i]));
+            MESSAGE(fmt::format("Vector value mismatch: index={}  {} != {}",
+                                i,
+                                vec1[i],
+                                vec2[i]));
+
             mismatch = true;
         }
     }
 
     if (mismatch)
     {
-        BOOST_FAIL("Error in CompareVector. Vectors don't match.");
+        FAIL("Error in CompareVector. Vectors don't match.");
     }
 }
 
 // Ensure quantization works for none depthwise convolutions
-BOOST_AUTO_TEST_CASE(RefPerChannelDecoderTest1)
+TEST_CASE("RefPerChannelDecoderTest1")
 {
     using namespace armnn;
     std::vector<int8_t> input =
@@ -62,7 +60,7 @@ BOOST_AUTO_TEST_CASE(RefPerChannelDecoderTest1)
 }
 
 // Ensure quantization works for depthwise convolutions M=1
-BOOST_AUTO_TEST_CASE(RefPerChannelDecoderTest2)
+TEST_CASE("RefPerChannelDecoderTest2")
 {
     using namespace armnn;
     std::vector<int8_t> input =
@@ -88,7 +86,7 @@ BOOST_AUTO_TEST_CASE(RefPerChannelDecoderTest2)
 }
 
 // Ensure quantization works for depthwise convolutions M=2
-BOOST_AUTO_TEST_CASE(RefPerChannelDecoderTest3)
+TEST_CASE("RefPerChannelDecoderTest3")
 {
     using namespace armnn;
     std::vector<int8_t> input =
@@ -121,7 +119,7 @@ BOOST_AUTO_TEST_CASE(RefPerChannelDecoderTest3)
 }
 
 // Ensure quantization works for depthwise convolutions M=2 for int32
-BOOST_AUTO_TEST_CASE(RefPerChannelDecoderTest4)
+TEST_CASE("RefPerChannelDecoderTest4")
 {
     using namespace armnn;
     std::vector<int32_t> input =
@@ -153,4 +151,4 @@ BOOST_AUTO_TEST_CASE(RefPerChannelDecoderTest4)
     CompareVector(output, expOutput);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

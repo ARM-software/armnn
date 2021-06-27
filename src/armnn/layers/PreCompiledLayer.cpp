@@ -24,7 +24,7 @@ PreCompiledLayer::~PreCompiledLayer()
 PreCompiledLayer* PreCompiledLayer::Clone(Graph& graph) const
 {
     PreCompiledLayer* clone = CloneBase<PreCompiledLayer>(graph, m_Param, GetName());
-    clone->m_PreCompiledObject.reset(const_cast<PreCompiledLayer*>(this)->m_PreCompiledObject.release());
+    clone->m_PreCompiledObject = const_cast<PreCompiledLayer*>(this)->m_PreCompiledObject;
     return clone;
 }
 
@@ -46,7 +46,7 @@ void PreCompiledLayer::ValidateTensorShapesFromInputs()
 
 void PreCompiledLayer::SetPreCompiledObject(PreCompiledObjectPtr preCompiledObject)
 {
-    m_PreCompiledObject = std::move(preCompiledObject);
+    m_PreCompiledObject = std::make_shared<const void*>(preCompiledObject.release());
 }
 
 void PreCompiledLayer::Accept(ILayerVisitor& visitor) const

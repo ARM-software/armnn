@@ -11,6 +11,7 @@ namespace armnn
 class OptimizedNetworkImpl
 {
 public:
+    OptimizedNetworkImpl(const OptimizedNetworkImpl& other, const ModelOptions& modelOptions);
     OptimizedNetworkImpl(std::unique_ptr<Graph> graph);
     OptimizedNetworkImpl(std::unique_ptr<Graph> graph, const ModelOptions& modelOptions);
     virtual ~OptimizedNetworkImpl();

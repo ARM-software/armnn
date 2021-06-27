@@ -18,6 +18,8 @@
 #include <test/TestUtils.hpp>
 
 #include <algorithm>
+#include <random>
+#include <vector>
 
 // Checks that two collections have the exact same contents (in any order)
 // The given collections do not have to contain duplicates
@@ -94,3 +96,24 @@ armnn::TensorShape MakeTensorShape(unsigned int batches,
                                    unsigned int height,
                                    unsigned int width,
                                    armnn::DataLayout layout);
+
+template<typename DataType>
+static std::vector<DataType> GenerateRandomData(size_t size)
+{
+    constexpr bool isIntegerType = std::is_integral<DataType>::value;
+    using Distribution =
+    typename std::conditional<isIntegerType,
+            std::uniform_int_distribution<DataType>,
+            std::uniform_real_distribution<DataType>>::type;
+
+    static constexpr DataType lowerLimit = std::numeric_limits<DataType>::min();
+    static constexpr DataType upperLimit = std::numeric_limits<DataType>::max();
+
+    static Distribution distribution(lowerLimit, upperLimit);
+    static std::default_random_engine generator;
+
+    std::vector<DataType> randomData(size);
+    generate(randomData.begin(), randomData.end(), []() { return distribution(generator); });
+
+    return randomData;
+}

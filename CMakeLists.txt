@@ -561,6 +561,7 @@ set_target_properties(armnn PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION 
 if(BUILD_UNIT_TESTS)
     set(unittest_sources)
     list(APPEND unittest_sources
+        src/armnn/test/CloneTests.cpp
         src/armnn/test/ConstTensorLayerVisitor.hpp
         src/armnn/test/ConstTensorLayerVisitor.cpp
         src/armnn/test/EndToEndTest.cpp

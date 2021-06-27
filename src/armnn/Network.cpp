@@ -543,6 +543,8 @@ void INetwork::Destroy(INetwork* network)
     delete network;
 }
 
+IOptimizedNetwork::IOptimizedNetwork(const IOptimizedNetwork& other, const ModelOptions& modelOptions)
+    : pOptimizedNetworkImpl(new OptimizedNetworkImpl(*other.pOptimizedNetworkImpl.get(), modelOptions)) {}
 
 IOptimizedNetwork::IOptimizedNetwork(std::unique_ptr<Graph> graph)
     : pOptimizedNetworkImpl(new OptimizedNetworkImpl(std::move(graph))) {}
@@ -2619,6 +2621,13 @@ void NetworkImpl::ExecuteStrategy(IStrategy& strategy) const
     {
         layer->ExecuteStrategy(strategy);
     };
+}
+
+OptimizedNetworkImpl::OptimizedNetworkImpl(const OptimizedNetworkImpl& other, const ModelOptions& modelOptions)
+    : m_Graph(new Graph(*other.m_Graph.get()))
+    , m_Guid(profiling::ProfilingService::GetNextGuid())
+    , m_ModelOptions(modelOptions)
+{
 }
 
 OptimizedNetworkImpl::OptimizedNetworkImpl(std::unique_ptr<Graph> graph)

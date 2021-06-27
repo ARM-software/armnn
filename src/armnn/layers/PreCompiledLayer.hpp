@@ -41,7 +41,7 @@ private:
     PreCompiledLayer(const PreCompiledLayer& other) = delete;
     PreCompiledLayer& operator=(const PreCompiledLayer& other) = delete;
 
-    PreCompiledObjectPtr m_PreCompiledObject;
+    std::shared_ptr<const void*> m_PreCompiledObject;
 };
 
 } // namespace armnn

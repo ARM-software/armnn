@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "CommonTestUtils.hpp"
+
 #include <Graph.hpp>
 #include <Network.hpp>
 
@@ -355,6 +357,133 @@ TEST_CASE("OptimizeValidateWorkloadsDuplicateComputeDeviceWithFallback")
 #else
         CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
 #endif
+    }
+}
+
+TEST_CASE("OptimizeNetworkCopy")
+{
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime = armnn::IRuntime::Create(options);
+    std::vector<armnn::NetworkId> networkIds;
+
+    const std::string layerName("convolution2d");
+    const armnn::TensorInfo inputInfo ({ 1, 5, 5, 1 }, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({ 1, 2, 2, 1 }, armnn::DataType::Float32);
+
+    const armnn::TensorInfo weightsInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
+    const armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32);
+
+    std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
+    armnn::ConstTensor weights(weightsInfo, weightsData);
+
+    std::vector<float> biasesData = GenerateRandomData<float>(biasesInfo.GetNumElements());
+    armnn::ConstTensor biases(biasesInfo, biasesData);
+
+    armnn::Convolution2dDescriptor descriptor;
+    descriptor.m_PadLeft     = 1;
+    descriptor.m_PadRight    = 1;
+    descriptor.m_PadTop      = 1;
+    descriptor.m_PadBottom   = 1;
+    descriptor.m_StrideX     = 2;
+    descriptor.m_StrideY     = 2;
+    descriptor.m_DilationX   = 2;
+    descriptor.m_DilationY   = 2;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_DataLayout  = armnn::DataLayout::NHWC;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const convLayer   =
+            network->AddConvolution2dLayer(descriptor,
+                                           weights,
+                                           armnn::Optional<armnn::ConstTensor>(biases),
+                                           layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
+    convLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    std::vector<armnn::BackendId> preferredBackends { "CpuRef" };
+    armnn::ModelOptions modelOptions;
+    armnn::OptimizerOptions optimizerOptions(false, false, false, false, modelOptions);
+    std::vector<std::string> errorMessages;
+
+    // optimize the network.
+    armnn::IOptimizedNetworkPtr optNet = Optimize(*network,
+                                                  preferredBackends,
+                                                  runtime->GetDeviceSpec(),
+                                                  optimizerOptions,
+                                                  armnn::Optional<std::vector<std::string>&>(errorMessages));
+
+    for (unsigned int i = 0; i < 2; ++i)
+    {
+        armnn::ModelOptions optimizedModelOptions;
+        auto copy = armnn::IOptimizedNetworkPtr(new armnn::IOptimizedNetwork(*optNet.get(), optimizedModelOptions),
+                                               &armnn::IOptimizedNetwork::Destroy);
+
+        CHECK(copy);
+
+        armnn::NetworkId netId;
+        std::string errorMessage;
+
+        CHECK(armnn::Status::Success == runtime->LoadNetwork(netId, std::move(copy), errorMessage));
+
+        // Record the networkID for the loaded network
+        networkIds.emplace_back(netId);
+    }
+    armnn::NetworkId optNetId;
+    std::string errorMessage;
+
+    // Load the original optNet
+    CHECK(armnn::Status::Success == runtime->LoadNetwork(optNetId, std::move(optNet), errorMessage));
+
+    std::vector<float> inputData = GenerateRandomData<float>(runtime->GetInputTensorInfo(optNetId, 0).GetNumElements());
+    std::vector<float> outputData(runtime->GetOutputTensorInfo(optNetId, 0).GetNumElements());
+
+    armnn::InputTensors inputTensors
+    {
+        {
+            0 ,armnn::ConstTensor(runtime->GetInputTensorInfo(optNetId, 0), inputData.data())
+        }
+    };
+    armnn::OutputTensors outputTensors
+    {
+        {
+            0, armnn::Tensor(runtime->GetOutputTensorInfo(optNetId, 0), outputData.data())
+        }
+    };
+    runtime->EnqueueWorkload(optNetId, inputTensors, outputTensors);
+    runtime->UnloadNetwork(optNetId);
+
+    // Record the networkID for the loaded network
+    for (unsigned int i = 0; i < networkIds.size(); ++i)
+    {
+        armnn::NetworkId netId = networkIds[i];
+        std::vector<float> copyOutputData(runtime->GetOutputTensorInfo(netId, 0).GetNumElements());
+
+        armnn::InputTensors copyInputTensors
+        {
+            {
+                0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())
+            }
+        };
+        armnn::OutputTensors copyOutputTensors
+        {
+            {
+                0, armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), copyOutputData.data())
+            }
+        };
+        runtime->EnqueueWorkload(netId, copyInputTensors, copyOutputTensors);
+        runtime->UnloadNetwork(netId);
+
+        // Check results are identical to "original" version
+        for (unsigned int j = 0; j < outputData.size(); ++j)
+        {
+            CHECK(outputData[j] == copyOutputData[j]);
+        }
     }
 }
 

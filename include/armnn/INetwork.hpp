@@ -731,6 +731,9 @@ public:
 
     profiling::ProfilingGuid GetGuid() const;
 
+    // Creates a copy of the IOptimizedNetwork. The IOptimizedNetwork will not be reoptimized,
+    // the provided ModelOptions will only be used when creating a LoadedNetwork. 
+    IOptimizedNetwork(const IOptimizedNetwork& other, const ModelOptions& modelOptions);
     IOptimizedNetwork(std::unique_ptr<Graph> graph);
     IOptimizedNetwork(std::unique_ptr<OptimizedNetworkImpl> impl);
     ~IOptimizedNetwork();

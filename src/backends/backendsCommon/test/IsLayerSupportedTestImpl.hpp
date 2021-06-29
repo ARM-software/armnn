@@ -300,7 +300,7 @@ struct DummyLstmLayer
         typename LstmLayerType::DescriptorType desc;
         desc.m_CifgEnabled = false;
 
-        m_Layer = dummyGraph.AddLayer<LstmLayerType>(armnn::LstmDescriptor(), "");
+        m_Layer = dummyGraph.AddLayer<LstmLayerType>(desc, "");
         m_Layer->m_BasicParameters.m_InputToForgetWeights     = std::make_unique<armnn::ScopedTensorHandle>(
                 armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
         m_Layer->m_BasicParameters.m_InputToCellWeights       = std::make_unique<armnn::ScopedTensorHandle>(
@@ -342,18 +342,18 @@ struct DummyLayer<armnn::LstmLayer>
 {
 };
 
-template <typename QLstmLayerType>
-struct DummyQLstmLayer
+template<>
+struct DummyLayer<armnn::QLstmLayer>
 {
-    DummyQLstmLayer()
+    DummyLayer()
     {
-        typename QLstmLayerType::DescriptorType desc;
+        armnn::QLstmLayer::DescriptorType desc;
         desc.m_CifgEnabled = false;
         desc.m_PeepholeEnabled = true;
         desc.m_ProjectionEnabled = true;
         desc.m_LayerNormEnabled = true;
 
-        m_Layer = dummyGraph.AddLayer<QLstmLayerType>(armnn::QLstmDescriptor(), "qLstm");
+        m_Layer = dummyGraph.AddLayer<armnn::QLstmLayer>(desc, "qLstm");
 
         // Basic params
         m_Layer->m_BasicParameters.m_InputToForgetWeights     = std::make_unique<armnn::ScopedTensorHandle>(
@@ -410,7 +410,7 @@ struct DummyQLstmLayer
                 armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QSymmS16));
     }
 
-    ~DummyQLstmLayer()
+    ~DummyLayer()
     {
         dummyGraph.EraseLayer(m_Layer);
     }

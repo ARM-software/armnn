@@ -834,6 +834,9 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             LstmInputParamsInfo paramsInfo;
 
             // Basic parameters
+            ARMNN_ASSERT(cLayer->m_BasicParameters.m_InputToForgetWeights.get() != nullptr);
+            ARMNN_ASSERT(cLayer->m_BasicParameters.m_InputToCellWeights.get() != nullptr);
+            ARMNN_ASSERT(cLayer->m_BasicParameters.m_InputToOutputWeights.get() != nullptr);
             paramsInfo.m_InputToForgetWeights = &cLayer->m_BasicParameters.m_InputToForgetWeights->GetTensorInfo();
             paramsInfo.m_InputToCellWeights   = &cLayer->m_BasicParameters.m_InputToCellWeights->GetTensorInfo();
             paramsInfo.m_InputToOutputWeights = &cLayer->m_BasicParameters.m_InputToOutputWeights->GetTensorInfo();

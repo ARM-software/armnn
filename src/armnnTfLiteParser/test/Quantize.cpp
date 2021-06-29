@@ -1,21 +1,19 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "ParserFlatbuffersFixture.hpp"
-#include "../TfLiteParser.hpp"
 
-#include <string>
-#include <iostream>
 
 TEST_SUITE("TensorflowLiteParser_Quantize")
 {
     struct QuantizeFixture : public ParserFlatbuffersFixture
     {
-        explicit QuantizeFixture(const std::string & inputShape,
-                                 const std::string & outputShape,
-                                 const std::string & dataType)
+        explicit QuantizeFixture(const std::string& inputShape,
+                                 const std::string& outputShape,
+                                 const std::string& dataType,
+                                 const std::string& zeroPoint = "[ 0 ]")
         {
             m_JsonString = R"(
             {
@@ -32,7 +30,7 @@ TEST_SUITE("TensorflowLiteParser_Quantize")
                                 "min": [ 0.0 ],
                                 "max": [ 255.0 ],
                                 "scale": [ 1.0 ],
-                                "zero_point": [ 0 ],
+                                "zero_point": )" + zeroPoint + R"(,
                             }
                         },
                         {
@@ -44,7 +42,7 @@ TEST_SUITE("TensorflowLiteParser_Quantize")
                                 "min": [ 0.0 ],
                                 "max": [ 255.0 ],
                                 "scale": [ 1.5 ],
-                                "zero_point": [ 0 ],
+                                "zero_point": )" + zeroPoint + R"(,
                             }
                         }
                     ],
@@ -79,9 +77,9 @@ TEST_SUITE("TensorflowLiteParser_Quantize")
                                                          "UINT8") {}
     };
 
-    TEST_CASE_FIXTURE(SimpleQuantizeQAsymm8, SimpleQuantizeFixtureQAsymm8)
+    TEST_CASE_FIXTURE(SimpleQuantizeFixtureQAsymm8, "SimpleQuantizeFixtureQAsymm8")
     {
-        RunTest<2, armnn::DataType::Float32, armnn::DataType::QuantisedAsymm8>(
+        RunTest<2, armnn::DataType::Float32, armnn::DataType::QAsymmU8>(
                 0,
                 {{"inputTensor",  { 0.0f, 1.5f, 7.5f, 150.0f, 300.0f, 382.5f }}},
                 {{"outputTensor", { 0u,   1u,   5u,   100u,   200u,   255u }}});
@@ -96,7 +94,7 @@ TEST_SUITE("TensorflowLiteParser_Quantize")
 
     TEST_CASE_FIXTURE(SimpleQuantizeFixtureQSymm16, "SimpleQuantizeQsymm16")
     {
-        RunTest<2, armnn::DataType::Float32, armnn::DataType::QuantisedSymm16>(
+        RunTest<2, armnn::DataType::Float32, armnn::DataType::QSymmS16>(
                 0,
                 {{"inputTensor",  { 0.0f, 1.5f, 7.5f, 49150.5f, -1.5f,-49152.0f }}},
                 {{"outputTensor", { 0,    1,    5,    32767,    -1,   -32768 }}});
@@ -106,7 +104,8 @@ TEST_SUITE("TensorflowLiteParser_Quantize")
     {
         SimpleQuantizeFixtureQSymmS8() : QuantizeFixture("[ 1, 6 ]",
                                                          "[ 1, 6 ]",
-                                                         "INT8") {}
+                                                         "INT8",
+                                                         "[]") {}
     };
 
     TEST_CASE_FIXTURE(SimpleQuantizeFixtureQSymmS8, "SimpleQuantizeQSymmS8")

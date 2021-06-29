@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -22,7 +22,7 @@ struct EmptyNetworkFixture : public ParserFlatbuffersFixture
 
 TEST_CASE_FIXTURE(EmptyNetworkFixture, "EmptyNetworkHasNoInputsAndOutputs")
 {
-    Setup();
+    Setup(false);
     CHECK(m_Parser->GetSubgraphCount() == 1);
     CHECK(m_Parser->GetSubgraphInputTensorNames(0).size() == 0);
     CHECK(m_Parser->GetSubgraphOutputTensorNames(0).size() == 0);

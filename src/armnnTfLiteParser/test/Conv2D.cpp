@@ -1,10 +1,9 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "ParserFlatbuffersFixture.hpp"
-#include "../TfLiteParser.hpp"
 #include <sstream>
 
 TEST_SUITE("TensorflowLiteParser_Conv2D")

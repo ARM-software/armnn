@@ -1,13 +1,11 @@
 //
-// Copyright © 2021 Arm Ltd. All rights reserved.
+// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include <doctest/doctest.h>
 #include "ParserFlatbuffersFixture.hpp"
-#include "../TfLiteParser.hpp"
 
-#include <string>
 
 TEST_SUITE("TensorflowLiteParser_Prelu")
 {

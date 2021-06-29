@@ -4,7 +4,6 @@
 //
 
 #include "ParserFlatbuffersFixture.hpp"
-#include "../TfLiteParser.hpp"
 
 TEST_SUITE("TensorflowLiteParser_Shape")
 {

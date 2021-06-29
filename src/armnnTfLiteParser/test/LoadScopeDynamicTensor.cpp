@@ -6,7 +6,6 @@
 #include "armnnTfLiteParser/ITfLiteParser.hpp"
 #include "ParserFlatbuffersFixture.hpp"
 
-#include <string>
 
 TEST_SUITE("TensorflowLiteParser_LoadScopeDynamicTensor")
 {

@@ -64,6 +64,10 @@ public:
 
 public:
     // testable helpers
+    armnn::INetworkPtr CreateNetworkFromBinaryAsDynamic(const std::vector<uint8_t>& binaryContent);
+
+    armnn::INetworkPtr LoadModel(std::unique_ptr<tflite::ModelT> model);
+
     static ModelPtr LoadModelFromFile(const char* fileName);
     static ModelPtr LoadModelFromBinary(const uint8_t* binaryContent, size_t len);
     static TensorRawPtrVector GetInputs(const ModelPtr& model, size_t subgraphIndex, size_t operatorIndex);

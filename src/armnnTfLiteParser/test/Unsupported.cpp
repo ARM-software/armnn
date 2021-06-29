@@ -1,10 +1,9 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "ParserFlatbuffersFixture.hpp"
-#include "../TfLiteParser.hpp"
 
 #include <armnn/LayerVisitorBase.hpp>
 #include <armnn/utility/Assert.hpp>
@@ -14,7 +13,6 @@
 #include <layers/StandInLayer.hpp>
 
 #include <sstream>
-#include <string>
 #include <vector>
 
 TEST_SUITE("TensorflowLiteParser_Unsupported")

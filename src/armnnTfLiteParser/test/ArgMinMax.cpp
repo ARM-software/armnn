@@ -4,10 +4,7 @@
 //
 
 #include "ParserFlatbuffersFixture.hpp"
-#include "../TfLiteParser.hpp"
 
-#include <iostream>
-#include <string>
 
 TEST_SUITE("TensorflowLiteParser_ArgMinMax")
 {

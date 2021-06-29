@@ -1,8 +1,7 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "armnnTfLiteParser/ITfLiteParser.hpp"
 #include "ParserFlatbuffersFixture.hpp"
 
 TEST_SUITE("TensorflowLiteParser_AvgPool2D")

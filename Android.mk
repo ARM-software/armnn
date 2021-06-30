@@ -395,6 +395,7 @@ LOCAL_SRC_FILES := \
         src/armnn/test/optimizations/OptimizeInversePermutesTests.cpp \
         src/armnn/test/optimizations/PermuteAndBatchToSpaceAsDepthToSpaceTests.cpp \
         src/armnn/test/optimizations/PermuteAsReshapeTests.cpp \
+        src/armnn/test/optimizations/RedirectMembersToConstantInputsTests.cpp \
         src/armnn/test/optimizations/ReduceMultipleAxesTests.cpp \
         src/armnn/test/optimizations/SquashEqualSiblingsTests.cpp \
         src/armnn/test/optimizations/TransposeAsReshapeTests.cpp \

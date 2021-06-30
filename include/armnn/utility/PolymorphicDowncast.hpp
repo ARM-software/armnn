@@ -48,14 +48,14 @@ std::shared_ptr<T1> DynamicPointerCast (const std::shared_ptr<T2>& sp)
 
 // static_pointer_cast overload for raw pointers
 template<class T1, class T2>
-inline T1* StaticPointerCast(T2 *ptr)
+inline T1* StaticPointerCast(T2* ptr)
 {
     return static_cast<T1*>(ptr);
 }
 
 // dynamic_pointer_cast overload for raw pointers
 template<class T1, class T2>
-inline T1* DynamicPointerCast(T2 *ptr)
+inline T1* DynamicPointerCast(T2* ptr)
 {
     return dynamic_cast<T1*>(ptr);
 }
@@ -71,13 +71,12 @@ inline T1* DynamicPointerCast(T2 *ptr)
 /// \param value        Pointer to the source object
 /// \return             Pointer of type DestType (Pointer of type child)
 template<typename DestType, typename SourceType>
-DestType PolymorphicDowncast(SourceType value)
+DestType PolymorphicDowncast(SourceType* value)
 {
-    static_assert(std::is_pointer<SourceType>::value &&
-                  std::is_pointer<DestType>::value,
+    static_assert(std::is_pointer<DestType>::value,
                   "PolymorphicDowncast only works with pointer types.");
 
-    ARMNN_POLYMORPHIC_CAST_CHECK(dynamic_cast<DestType>(value) == static_cast<DestType>(value));
+    ARMNN_POLYMORPHIC_CAST_CHECK(dynamic_cast<DestType>(value) == value);
     return static_cast<DestType>(value);
 }
 
@@ -94,7 +93,7 @@ template<typename DestType, typename SourceType>
 auto PolymorphicPointerDowncast(const SourceType& value)
 {
     ARMNN_POLYMORPHIC_CAST_CHECK(utility::DynamicPointerCast<DestType>(value)
-                                 == utility::StaticPointerCast<DestType>(value));
+                                 == value);
     return utility::StaticPointerCast<DestType>(value);
 }
 

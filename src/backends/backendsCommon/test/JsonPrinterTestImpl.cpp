@@ -259,6 +259,12 @@ void RunSoftmaxProfilerJsonPrinterTest(const std::vector<armnn::BackendId>& back
     }
     else if (firstBackend == armnn::Compute::CpuAcc)
     {
-        CHECK(result.find("NeonKernelTimer/: CpuLogitsDLogSoftmaxKernel_#") != std::string::npos);
+        CHECK(result.find("NeonKernelTimer") != std::string::npos);     // Validate backend
+
+        bool softmaxCheck = ((result.find("softmax") != std::string::npos) ||            // Validate softmax
+                             (result.find("Softmax") != std::string::npos) ||
+                             (result.find("SoftMax") != std::string::npos));
+        CHECK(softmaxCheck);
+
     }
 }

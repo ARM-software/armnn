@@ -105,8 +105,9 @@ TEST_CASE("NeonTimerMeasure")
     std::ostringstream oss_cpu;
     oss_neon << "NeonKernelTimer/" << measurements.size()-1 << ": NEActivationLayerKernel";
     oss_cpu << "NeonKernelTimer/" << measurements.size()-1 << ": CpuActivationKernel";
-    CHECK((measurements[measurements.size()-1].m_Name == oss_neon.str() ||
-                measurements[measurements.size()-1].m_Name == oss_cpu.str()));
+    bool kernelCheck = ((measurements[measurements.size()-1].m_Name.find(oss_neon.str()) != std::string::npos)
+                        || (measurements[measurements.size()-1].m_Name.find(oss_cpu.str()) != std::string::npos));
+    CHECK(kernelCheck);
     CHECK(measurements[measurements.size()-1].m_Value > 0.0);
 }
 

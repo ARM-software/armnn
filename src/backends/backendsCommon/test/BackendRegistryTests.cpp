@@ -117,18 +117,14 @@ TEST_CASE("ThrowBackendUnavailableException")
 
     const BackendId mockBackendId("MockDynamicBackend");
 
-    const std::string exceptionMessage("Neon support not found on device, could not register CpuAcc Backend.\n");
+    const std::string exceptionMessage("Mock error message to test unavailable backend");
 
-    // Register the mock backend with a factory function lambda equivalent to NeonRegisterInitializer
+    // Register the mock backend with a factory function lambda that always throws
     BackendRegistryInstance().Register(mockBackendId,
             [exceptionMessage]()
             {
-                if (false)
-                {
-                    return IBackendInternalUniquePtr(new RefBackend);
-                }
-                ARMNN_LOG(info) << "Neon support not found on device, could not register CpuAcc Backend.";
                 throw armnn::BackendUnavailableException(exceptionMessage);
+                return IBackendInternalUniquePtr(); // Satisfy return type
             });
 
     // Get the factory function of the mock backend
@@ -138,12 +134,12 @@ TEST_CASE("ThrowBackendUnavailableException")
     {
         // Call the factory function as done during runtime backend registering
         auto backend = factoryFunc();
+        FAIL("Expected exception to have been thrown");
     }
     catch (const BackendUnavailableException& e)
     {
         // Caught
         CHECK_EQ(e.what(), exceptionMessage);
-        MESSAGE("ThrowBackendUnavailableExceptionImpl: BackendUnavailableException caught.");
     }
 }
 

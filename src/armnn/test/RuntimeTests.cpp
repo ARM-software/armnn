@@ -105,7 +105,6 @@ TEST_CASE_FIXTURE(DisableGlobalLeakChecking,  "RuntimeHeapMemoryUsageSanityCheck
 // valgrind --leak-check=full --show-leak-kinds=all --log-file=Valgrind_Memcheck_Leak_Report.txt armnn/test/UnitTests
 TEST_CASE("RuntimeMemoryLeak")
 {
-    MESSAGE("RuntimeMemoryLeak");
     // From documentation:
 
     // This means that no pointer to the block can be found. The block is classified as "lost",
@@ -426,12 +425,10 @@ TEST_CASE("ProfilingEnableCpuRef")
 
     // Verify Header
     VerifyTimelineHeaderBinary(readableData, offset, size - 8);
-    MESSAGE("HEADER OK");
 
     // Post-optimisation network
     // Network entity
     VerifyTimelineEntityBinaryPacketData(optNetGuid, readableData, offset);
-    MESSAGE("NETWORK ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -441,7 +438,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NETWORK TYPE RELATIONSHIP OK");
 
     // Network - START OF LIFE
     ProfilingGuid networkSolEventGuid = VerifyTimelineEventBinaryPacket(EmptyOptional(),
@@ -449,7 +445,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                                         EmptyOptional(),
                                                                         readableData,
                                                                         offset);
-    MESSAGE("NETWORK START OF LIFE EVENT OK");
 
     // Network - START OF LIFE event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -459,7 +454,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("NETWORK START OF LIFE RELATIONSHIP OK");
 
     // Process ID Label
     int processID = armnnUtils::Processes::GetCurrentId();
@@ -467,7 +461,6 @@ TEST_CASE("ProfilingEnableCpuRef")
     ss << processID;
     std::string processIdLabel = ss.str();
     VerifyTimelineLabelBinaryPacketData(EmptyOptional(), processIdLabel, readableData, offset);
-    MESSAGE("PROCESS ID LABEL OK");
 
     // Entity - Process ID relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -477,16 +470,13 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::PROCESS_ID_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NETWORK PROCESS ID RELATIONSHIP OK");
 
     // Input layer
     // Input layer entity
     VerifyTimelineEntityBinaryPacketData(input->GetGuid(), readableData, offset);
-    MESSAGE("INPUT ENTITY OK");
 
     // Name Entity
     ProfilingGuid inputLabelGuid = VerifyTimelineLabelBinaryPacketData(EmptyOptional(), "input", readableData, offset);
-    MESSAGE("INPUT NAME LABEL OK");
 
     // Entity - Name relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -496,7 +486,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT NAME RELATIONSHIP OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -506,7 +495,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT TYPE RELATIONSHIP OK");
 
     // Network - Input layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -516,17 +504,14 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NETWORK - INPUT CHILD RELATIONSHIP OK");
 
     // Normalization layer
     // Normalization layer entity
     VerifyTimelineEntityBinaryPacketData(normalize->GetGuid(), readableData, offset);
-    MESSAGE("NORMALIZATION LAYER ENTITY OK");
 
     // Name entity
     ProfilingGuid normalizationLayerNameGuid = VerifyTimelineLabelBinaryPacketData(
         EmptyOptional(), "normalization", readableData, offset);
-    MESSAGE("NORMALIZATION LAYER NAME LABEL OK");
 
     // Entity - Name relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -536,7 +521,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NORMALIZATION LAYER NAME RELATIONSHIP OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -546,7 +530,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NORMALIZATION LAYER TYPE RELATIONSHIP OK");
 
     // Network - Normalize layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -556,7 +539,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NETWORK - NORMALIZATION LAYER CHILD RELATIONSHIP OK");
 
     // Input layer - Normalize layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -566,13 +548,11 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::CONNECTION_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT - NORMALIZATION LAYER CONNECTION OK");
 
     // Normalization workload
     // Normalization workload entity
     ProfilingGuid normalizationWorkloadGuid = VerifyTimelineEntityBinaryPacketData(
         EmptyOptional(), readableData, offset);
-    MESSAGE("NORMALIZATION WORKLOAD ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -582,12 +562,10 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NORMALIZATION WORKLOAD TYPE RELATIONSHIP OK");
 
     // BackendId entity
     ProfilingGuid cpuRefLabelGuid = VerifyTimelineLabelBinaryPacketData(
         EmptyOptional(), "CpuRef", readableData, offset);
-    MESSAGE("CPUREF LABEL OK");
 
     // Entity - BackendId relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -597,7 +575,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::BACKENDID_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NORMALIZATION WORKLOAD BACKEND ID RELATIONSHIP OK");
 
     // Normalize layer - Normalize workload relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -607,17 +584,14 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NORMALIZATION LAYER - WORKLOAD CHILD RELATIONSHIP OK");
 
     // Output layer
     // Output layer entity
     VerifyTimelineEntityBinaryPacketData(output->GetGuid(), readableData, offset);
-    MESSAGE("OUTPUT LAYER ENTITY OK");
 
     // Name entity
     ProfilingGuid outputLabelGuid = VerifyTimelineLabelBinaryPacketData(
         EmptyOptional(), "output", readableData, offset);
-    MESSAGE("OUTPUT LAYER NAME LABEL OK");
 
     // Entity - Name relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -627,7 +601,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT LAYER NAME RELATIONSHIP OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -637,7 +610,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT LAYER TYPE RELATIONSHIP OK");
 
     // Network - Output layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -647,7 +619,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NETWORK - OUTPUT LAYER CHILD RELATIONSHIP OK");
 
     // Normalize layer - Output layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -657,7 +628,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::CONNECTION_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NORMALIZE LAYER - OUTPUT LAYER CONNECTION OK");
 
     bufferManager.MarkRead(readableBuffer);
 
@@ -700,12 +670,10 @@ TEST_CASE("ProfilingEnableCpuRef")
 
     // Verify Header
     VerifyTimelineHeaderBinary(readableData, offset, 156);
-    MESSAGE("INPUT WORKLOAD HEADER OK");
 
     // Input workload
     // Input workload entity
     ProfilingGuid inputWorkloadGuid = VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
-    MESSAGE("INPUT WORKLOAD ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -715,12 +683,10 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT WORKLOAD TYPE RELATIONSHIP OK");
 
     // BackendId entity
     ProfilingGuid CpuRefLabelGuid = VerifyTimelineLabelBinaryPacketData(
         EmptyOptional(), "CpuRef", readableData, offset);
-    MESSAGE("CPUREF LABEL OK (INPUT WORKLOAD)");
 
     // Entity - BackendId relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -730,7 +696,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::BACKENDID_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT WORKLOAD BACKEND ID RELATIONSHIP OK");
 
     // Input layer - Input workload relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -740,7 +705,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT LAYER - INPUT WORKLOAD CHILD RELATIONSHIP OK");
 
     bufferManager.MarkRead(inputReadableBuffer);
 
@@ -755,12 +719,10 @@ TEST_CASE("ProfilingEnableCpuRef")
 
     // Verify Header
     VerifyTimelineHeaderBinary(readableData, offset, 156);
-    MESSAGE("OUTPUT WORKLOAD HEADER OK");
 
     // Output workload
     // Output workload entity
     ProfilingGuid outputWorkloadGuid = VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
-    MESSAGE("OUTPUT WORKLOAD ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -770,11 +732,9 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT WORKLOAD TYPE RELATIONSHIP OK");
 
     // BackendId entity
     VerifyTimelineLabelBinaryPacketData(EmptyOptional(), "CpuRef", readableData, offset);
-    MESSAGE("OUTPUT WORKLOAD CPU REF LABEL OK");
 
     // Entity - BackendId relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -784,7 +744,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::BACKENDID_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT WORKLOAD BACKEND ID RELATIONSHIP OK");
 
     // Output layer - Output workload relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -794,7 +753,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT LAYER - OUTPUT WORKLOAD CHILD RELATIONSHIP OK");
 
     bufferManager.MarkRead(outputReadableBuffer);
 
@@ -809,12 +767,10 @@ TEST_CASE("ProfilingEnableCpuRef")
 
     // Verify Header
     VerifyTimelineHeaderBinary(readableData, offset, 968 + 8 * ThreadIdSize);
-    MESSAGE("INFERENCE HEADER OK");
 
     // Inference timeline trace
     // Inference entity
     ProfilingGuid inferenceGuid = VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
-    MESSAGE("INFERENCE ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -824,7 +780,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INFERENCE TYPE RELATIONSHIP OK");
 
     // Network - Inference relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -834,13 +789,11 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NETWORK - INFERENCE EXECUTION_OF RELATIONSHIP OK");
 
     // Start Inference life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid inferenceEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("INFERENCE START OF LIFE EVENT OK");
 
     // Inference - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -850,14 +803,12 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("INFERENCE START OF LIFE RELATIONSHIP OK");
 
     // Execution
     // Input workload execution
     // Input workload execution entity
     ProfilingGuid inputWorkloadExecutionGuid = VerifyTimelineEntityBinaryPacketData(
         EmptyOptional(), readableData, offset);
-    MESSAGE("INPUT WORKLOAD EXECUTION ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -867,7 +818,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
 
     // Inference - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -877,7 +827,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INFERENCE - INPUT WORKLOAD EXECUTION CHILD RELATIONSHIP OK");
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -887,7 +836,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT WORKLOAD - INPUT WORKLOAD EXECUTION RELATIONSHIP OK");
 
     // Start Input workload execution life
     // Event packet - timeline, threadId, eventGuid
@@ -902,7 +850,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT WORKLOAD EXECUTION - START OF LIFE EVENT RELATIONSHIP OK");
 
     // End of Input workload execution life
     // Event packet - timeline, threadId, eventGuid
@@ -917,13 +864,11 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT WORKLOAD EXECUTION - END OF LIFE EVENT RELATIONSHIP OK");
 
     // Normalize workload execution
     // Normalize workload execution entity
     ProfilingGuid normalizeWorkloadExecutionGuid = VerifyTimelineEntityBinaryPacketData(
         EmptyOptional(), readableData, offset);
-    MESSAGE("NORMALIZE WORKLOAD EXECUTION ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -933,7 +878,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NORMALIZE WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
 
     // Inference - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -943,7 +887,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INFERENCE - NORMALIZE WORKLOAD EXECUTION CHILD RELATIONSHIP OK");
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -953,13 +896,11 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NORMALIZATION WORKLOAD - NORMALIZATION WORKLOAD EXECUTION RELATIONSHIP OK");
 
     // Start Normalize workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid normalizationWorkloadExecutionSOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("NORMALIZATION WORKLOAD EXECUTION START OF LIFE EVENT OK");
 
     // Normalize workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -969,13 +910,11 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("NORMALIZATION WORKLOAD EXECUTION START OF LIFE RELATIONSHIP OK");
 
     // End of Normalize workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid normalizationWorkloadExecutionEOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("NORMALIZATION WORKLOAD EXECUTION END OF LIFE EVENT OK");
 
     // Normalize workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -985,13 +924,11 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("NORMALIZATION WORKLOAD EXECUTION END OF LIFE RELATIONSHIP OK");
 
     // Output workload execution
     // Output workload execution entity
     ProfilingGuid outputWorkloadExecutionGuid = VerifyTimelineEntityBinaryPacketData(
         EmptyOptional(), readableData, offset);
-    MESSAGE("OUTPUT WORKLOAD EXECUTION ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -1001,7 +938,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
 
     // Inference - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -1011,7 +947,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INFERENCE - OUTPUT WORKLOAD EXECUTION CHILD RELATIONSHIP OK");
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -1021,13 +956,11 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT WORKLOAD - OUTPUT WORKLOAD EXECUTION EXECUTION_OF RELATIONSHIP OK");
 
     // Start Output workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid outputWorkloadExecutionSOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("OUTPUT WORKLOAD EXECUTION START OF LIFE EVENT OK");
 
     // Output workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -1037,13 +970,11 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT WORKLOAD EXECUTION - START OF LIFE EVENT RELATIONSHIP OK");
 
     // End of Normalize workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid outputWorkloadExecutionEOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("OUTPUT WORKLOAD EXECUTION END OF LIFE EVENT OK");
 
     // Output workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -1053,13 +984,11 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT WORKLOAD EXECUTION - END OF LIFE EVENT RELATIONSHIP OK");
 
     // End of Inference life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid inferenceEOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("INFERENCE END OF LIFE EVENT OK");
 
     // Inference - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -1069,7 +998,6 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("INFERENCE - END OF LIFE EVENT RELATIONSHIP OK");
 
     bufferManager.MarkRead(inferenceReadableBuffer);
 }

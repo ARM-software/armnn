@@ -454,12 +454,10 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
 
     // Verify Header
     VerifyTimelineHeaderBinary(readableData, offset, size - 8);
-    MESSAGE("HEADER OK");
 
     // Post-optimisation network
     // Network entity
     VerifyTimelineEntityBinaryPacketData(optNetGuid, readableData, offset);
-    MESSAGE("NETWORK ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -469,7 +467,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NETWORK TYPE RELATIONSHIP OK");
 
     // Network - START OF LIFE
     ProfilingGuid networkSolEventGuid = VerifyTimelineEventBinaryPacket(EmptyOptional(),
@@ -477,7 +474,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                                         EmptyOptional(),
                                                                         readableData,
                                                                         offset);
-    MESSAGE("NETWORK START OF LIFE EVENT OK");
 
     // Network - START OF LIFE event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -487,7 +483,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("NETWORK START OF LIFE RELATIONSHIP OK");
 
     // Process ID Label
     int processID = armnnUtils::Processes::GetCurrentId();
@@ -495,7 +490,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     ss << processID;
     std::string processIdLabel = ss.str();
     VerifyTimelineLabelBinaryPacketData(EmptyOptional(), processIdLabel, readableData, offset);
-    MESSAGE("PROCESS ID LABEL OK");
 
     // Entity - Process ID relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -505,16 +499,13 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::PROCESS_ID_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NETWORK PROCESS ID RELATIONSHIP OK");
 
     // Input layer
     // Input layer entity
     VerifyTimelineEntityBinaryPacketData(input->GetGuid(), readableData, offset);
-    MESSAGE("INPUT ENTITY OK");
 
     // Name Entity
     ProfilingGuid inputLabelGuid = VerifyTimelineLabelBinaryPacketData(EmptyOptional(), "input", readableData, offset);
-    MESSAGE("INPUT NAME LABEL OK");
 
     // Entity - Name relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -524,7 +515,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT NAME RELATIONSHIP OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -534,7 +524,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT TYPE RELATIONSHIP OK");
 
     // Network - Input layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -544,7 +533,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NETWORK - INPUT CHILD RELATIONSHIP OK");
 
     // Conv2d layer
     // Conv2d layer entity
@@ -553,7 +541,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     // Name entity
     ProfilingGuid conv2dNameLabelGuid = VerifyTimelineLabelBinaryPacketData(
         EmptyOptional(), "<Unnamed>", readableData, offset);
-    MESSAGE("CONV2D NAME LABEL OK");
 
     // Entity - Name relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -563,7 +550,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("CONV2D NAME RELATIONSHIP OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -573,7 +559,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("CONV2D TYPE RELATIONSHIP OK");
 
     // Network - Conv2d layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -583,7 +568,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NETWORK - CONV2D CHILD RELATIONSHIP OK");
 
     // Input layer - Conv2d layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -593,12 +577,10 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::CONNECTION_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT - CONV2D LAYER CONNECTION OK");
 
     // Conv2d workload
     // Conv2d workload entity
     ProfilingGuid conv2DWorkloadGuid = VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
-    MESSAGE("CONV2D WORKLOAD ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -608,7 +590,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("CONV2D WORKLOAD TYPE RELATIONSHIP OK");
 
     // BackendId entity
     ProfilingGuid backendIdLabelGuid = VerifyTimelineLabelBinaryPacketData(
@@ -622,7 +603,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::BACKENDID_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("CONV2D WORKLOAD BACKEND ID RELATIONSHIP OK");
 
 
     // Conv2d layer - Conv2d workload relationship
@@ -633,17 +613,14 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("CONV2D LAYER - WORKLOAD CHILD RELATIONSHIP OK");
 
     // Abs layer
     // Abs layer entity
     VerifyTimelineEntityBinaryPacketData(abs->GetGuid(), readableData, offset);
-    MESSAGE("ABS ENTITY OK");
 
     // Name entity
     ProfilingGuid absLabelGuid = VerifyTimelineLabelBinaryPacketData(
         EmptyOptional(), "abs", readableData, offset);
-    MESSAGE("ABS NAME LABEL OK");
 
     // Entity - Name relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -653,7 +630,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("ABS LAYER - NAME RELATIONSHIP OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -663,7 +639,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("ABS LAYER TYPE RELATIONSHIP OK");
 
     // Network - Abs layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -673,7 +648,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NETWORK - ABS LAYER CHILD RELATIONSHIP OK");
 
     // Conv2d layer - Abs layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -683,12 +657,10 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::CONNECTION_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("CONV2D LAYER - ABS LAYER CONNECTION OK");
 
     // Abs workload
     // Abs workload entity
     ProfilingGuid absWorkloadGuid = VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
-    MESSAGE("ABS WORKLOAD ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -698,11 +670,9 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("ABS WORKLAD TYPE RELATIONSHIP OK");
 
     // BackendId entity
     VerifyTimelineLabelBinaryPacketData(EmptyOptional(), backendId.Get(), readableData, offset);
-    MESSAGE("BACKEND ID LABEL OK");
 
     // Entity - BackendId relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -712,7 +682,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::BACKENDID_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("ABS WORKLOAD BACKEND ID RELATIONSHIP OK");
 
     // Abs layer - Abs workload relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -722,12 +691,10 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("ABS LAYER - WORKLOAD CHILD RELATIONSHIP OK");
 
     // Output layer
     // Output layer entity
     VerifyTimelineEntityBinaryPacketData(output->GetGuid(), readableData, offset);
-    MESSAGE("OUTPUT LAYER ENTITY OK");
 
     // Name entity
     ProfilingGuid outputLabelGuid = VerifyTimelineLabelBinaryPacketData(
@@ -741,7 +708,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT LAYER NAME RELATIONSHIP OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -751,7 +717,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT LAYER TYPE RELATIONSHIP OK");
 
     // Network - Output layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -761,7 +726,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NETWORK - OUTPUT LAYER CHILD RELATIONSHIP OK");
 
     // Abs layer - Output layer relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -771,7 +735,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::CONNECTION_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("ABS LAYER - OUTPUT LAYER CONNECTION OK");
 
     bufferManager.MarkRead(readableBuffer);
 
@@ -814,12 +777,10 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
 
     // Verify Header
     VerifyTimelineHeaderBinary(readableData, offset, 156);
-    MESSAGE("INPUT WORKLOAD HEADER OK");
 
     // Input workload
     // Input workload entity
     ProfilingGuid inputWorkloadGuid = VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
-    MESSAGE("INPUT WORKLOAD TYPE RELATIONSHIP OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -829,7 +790,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT WORKLOAD TYPE RELATIONSHIP OK");
 
     // BackendId entity
     VerifyTimelineLabelBinaryPacketData(EmptyOptional(), backendId.Get(), readableData, offset);
@@ -842,7 +802,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::BACKENDID_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT WORKLOAD BACKEND ID RELATIONSHIP OK");
 
     // Input layer - Input workload relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -852,7 +811,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT LAYER - INPUT WORKLOAD CHILD RELATIONSHIP OK");
 
     bufferManager.MarkRead(inputReadableBuffer);
 
@@ -867,12 +825,10 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
 
     // Verify Header
     VerifyTimelineHeaderBinary(readableData, offset, 156);
-    MESSAGE("OUTPUT WORKLOAD HEADER OK");
 
     // Output workload
     // Output workload entity
     ProfilingGuid outputWorkloadGuid = VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
-    MESSAGE("OUTPUT WORKLOAD ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -882,11 +838,9 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT WORKLOAD TYPE RELATIONSHIP OK");
 
     // BackendId entity
     VerifyTimelineLabelBinaryPacketData(EmptyOptional(), backendId.Get(), readableData, offset);
-    MESSAGE("OUTPUT WORKLOAD LABEL OK");
 
     // Entity - BackendId relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -896,7 +850,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::BACKENDID_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT WORKLOAD BACKEND ID RELATIONSHIP OK");
 
     // Output layer - Output workload relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -906,7 +859,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT LAYER - OUTPUT WORKLOAD CHILD RELATIONSHIP OK");
 
     bufferManager.MarkRead(outputReadableBuffer);
 
@@ -922,12 +874,10 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
 
     // Verify Header
     VerifyTimelineHeaderBinary(readableData, offset, 1220 + 10 * ThreadIdSize);
-    MESSAGE("INFERENCE HEADER OK");
 
     // Inference timeline trace
     // Inference entity
     ProfilingGuid inferenceGuid = VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
-    MESSAGE("INFERENCE ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -937,7 +887,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INFERENCE TYPE RELATIONSHIP OK");
 
     // Network - Inference relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -947,13 +896,11 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("NETWORK - INFERENCE EXECUTION_OF RELATIONSHIP OK");
 
     // Start Inference life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid inferenceEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("INFERENCE START OF LIFE EVENT OK");
 
     // Inference - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -963,14 +910,12 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("INFERENCE START OF LIFE RELATIONSHIP OK");
 
     // Execution
     // Input workload execution
     // Input workload execution entity
     ProfilingGuid inputWorkloadExecutionGuid = VerifyTimelineEntityBinaryPacketData(
         EmptyOptional(), readableData, offset);
-    MESSAGE("INPUT WORKLOAD EXECUTION ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -980,7 +925,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
 
     // Inference - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -990,7 +934,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT WORKLOAD - INPUT WORKLOAD EXECUTION RELATIONSHIP OK");
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -1000,13 +943,11 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT WORKLOAD - INPUT WORKLOAD EXECUTION RELATIONSHIP OK");
 
     // Start Input workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid inputWorkloadExecutionSOLEventId = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("INPUT WORKLOAD EXECUTION - START OF LIFE EVENT OK");
 
     // Input workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -1016,13 +957,11 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT WORKLOAD EXECUTION - START OF LIFE EVENT RELATIONSHIP OK");
 
     // End of Input workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid inputWorkloadExecutionEOLEventId = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("INPUT WORKLOAD EXECUTION - END OF LIFE EVENT OK");
 
     // Input workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -1032,13 +971,11 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("INPUT WORKLOAD EXECUTION - END OF LIFE EVENT RELATIONSHIP OK");
 
     // Conv2d workload execution
     // Conv2d workload execution entity
     ProfilingGuid conv2DWorkloadExecutionGuid = VerifyTimelineEntityBinaryPacketData(
         EmptyOptional(), readableData, offset);
-    MESSAGE("CONV2D WORKLOAD EXECUTION ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -1048,7 +985,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("CONV2D WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
 
     // Inference - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -1058,7 +994,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INFERENCE - CONV2D WORKLOAD EXECUTION CHILD RELATIONSHIP OK");
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -1068,13 +1003,11 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("CONV2D WORKLOAD - CONV2D WORKLOAD EXECUTION RELATIONSHIP OK");
 
     // Start Conv2d workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid conv2DWorkloadExecutionSOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("CONV2D WORKLOAD EXECUTION START OF LIFE EVENT OK");
 
     // Conv2d workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -1084,13 +1017,11 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("CONV2D WORKLOAD EXECUTION START OF LIFE RELATIONSHIP OK");
 
     // End of Conv2d workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid conv2DWorkloadExecutionEOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("CONV2D WORKLOAD EXECUTION END OF LIFE EVENT OK");
 
     // Conv2d workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -1100,13 +1031,11 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("CONV2D WORKLOAD EXECUTION END OF LIFE RELATIONSHIP OK");
 
     // Abs workload execution
     // Abs workload execution entity
     ProfilingGuid absWorkloadExecutionGuid = VerifyTimelineEntityBinaryPacketData(
         EmptyOptional(), readableData, offset);
-    MESSAGE("ABS WORKLOAD EXECUTION ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -1116,7 +1045,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("ABS WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
 
     // Inference - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -1126,7 +1054,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INFERENCE - ABS WORKLOAD EXECUTION CHILD RELATIONSHIP OK");
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -1136,13 +1063,11 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("ABS WORKLOAD - ABS WORKLOAD EXECUTION RELATIONSHIP OK");
 
     // Start Abs workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid absWorkloadExecutionSOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("ABS WORKLOAD EXECUTION START OF LIFE EVENT OK");
 
     // Abs workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -1152,13 +1077,11 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("ABS WORKLOAD EXECUTION START OF LIFE RELATIONSHIP OK");
 
     // End of Abs workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid absWorkloadExecutionEOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("ABS WORKLOAD EXECUTION END OF LIFE EVENT OK");
 
     // Abs workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -1168,13 +1091,11 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("ABS WORKLOAD EXECUTION END OF LIFE RELATIONSHIP OK");
 
     // Output workload execution
     // Output workload execution entity
     ProfilingGuid outputWorkloadExecutionGuid = VerifyTimelineEntityBinaryPacketData(
         EmptyOptional(), readableData, offset);
-    MESSAGE("OUTPUT WORKLOAD EXECUTION ENTITY OK");
 
     // Entity - Type relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
@@ -1184,7 +1105,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT WORKLOAD EXECUTION TYPE RELATIONSHIP OK");
 
     // Inference - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -1194,7 +1114,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("INFERENCE - OUTPUT WORKLOAD EXECUTION CHILD RELATIONSHIP OK");
 
     // Workload - Workload execution relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
@@ -1204,13 +1123,11 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::EXECUTION_OF_GUID,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT WORKLOAD - OUTPUT WORKLOAD EXECUTION EXECUTION_OF RELATIONSHIP OK");
 
     // Start Output workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid outputWorkloadExecutionSOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("OUTPUT WORKLOAD EXECUTION START OF LIFE EVENT OK");
 
     // Output workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -1220,13 +1137,11 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT WORKLOAD EXECUTION - START OF LIFE EVENT RELATIONSHIP OK");
 
     // End of Normalize workload execution life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid outputWorkloadExecutionEOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("OUTPUT WORKLOAD EXECUTION END OF LIFE EVENT OK");
 
     // Output workload execution - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -1236,13 +1151,11 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("OUTPUT WORKLOAD EXECUTION - END OF LIFE EVENT RELATIONSHIP OK");
 
     // End of Inference life
     // Event packet - timeline, threadId, eventGuid
     ProfilingGuid inferenceEOLEventGuid = VerifyTimelineEventBinaryPacket(
         EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
-    MESSAGE("INFERENCE END OF LIFE EVENT OK");
 
     // Inference - event relationship
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
@@ -1252,7 +1165,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);
-    MESSAGE("INFERENCE - END OF LIFE EVENT RELATIONSHIP OK");
 
     bufferManager.MarkRead(inferenceReadableBuffer);
 }

@@ -202,7 +202,7 @@ TEST_CASE("NumericCast")
 
     CHECK_NOTHROW(numeric_cast<int8_t>(static_cast<float>(int8_max)));
     CHECK_NOTHROW(numeric_cast<int16_t>(static_cast<float>(int16_max)));
-    CHECK_NOTHROW(numeric_cast<int32_t>(static_cast<float>(int32_max)));
+    CHECK_NOTHROW(numeric_cast<int32_t>(static_cast<double>(int32_max)));
 
     CHECK_THROWS_AS(numeric_cast<int8_t>(float_max), std::bad_cast);
     CHECK_THROWS_AS(numeric_cast<int16_t>(float_max), std::bad_cast);

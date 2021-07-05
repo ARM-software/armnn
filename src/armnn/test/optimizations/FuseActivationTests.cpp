@@ -17,9 +17,7 @@
 
 using namespace armnn;
 
-TEST_SUITE("Optimizer")
-{
-namespace armnn
+namespace
 {
 
 template<typename T>
@@ -471,10 +469,11 @@ bool FuseActivationSimpleTest(ActivationDescriptor activationDescriptor, Compute
     return success;
 }
 
-} // namespace armnn
+}
 
-using namespace armnn;
 #if defined(ARMCOMPUTENEON_ENABLED)
+TEST_SUITE("Optimizer")
+{
 // ReLu fused into Receiver Layers Float32
 TEST_CASE("FuseReLUIntoConvFloat32CpuAccTest")
 {
@@ -712,9 +711,12 @@ TEST_CASE("LayerFollowedByActivationQAsymmU8CpuAccTest")
         (activationDescriptor, Compute::CpuAcc)), "FullyConnected + Activation function " <<
         static_cast<int>(activationDescriptor.m_Function));
 }
+}
 #endif
 
 #if defined(ARMCOMPUTECL_ENABLED)
+TEST_SUITE("Optimizer")
+{
 // ReLu fused into Receiver Layers Float32
 TEST_CASE("FuseReLUIntoConvFloat32GpuAccTest")
 {
@@ -1176,6 +1178,5 @@ TEST_CASE("LayerFollowedByActivationQAsymmU8GpuAccTest")
         (activationDescriptor, Compute::GpuAcc)), "FullyConnected + Activation function " <<
         static_cast<int>(activationDescriptor.m_Function));
 }
-#endif
-
 }
+#endif

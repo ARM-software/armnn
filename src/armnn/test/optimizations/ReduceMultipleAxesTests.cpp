@@ -12,8 +12,9 @@
 
 using namespace armnn;
 
-TEST_SUITE("Optimizer_ReduceMultipleAxes")
+namespace
 {
+#if defined(ARMCOMPUTENEON_ENABLED)||defined(ARMCOMPUTECL_ENABLED)
 INetworkPtr CreateSimpleReduceNetwork(ReduceDescriptor reduceDescriptor,
                                       TensorShape& inputShape,
                                       TensorShape& outputShape)
@@ -243,9 +244,12 @@ void ReduceSumWithThreeAxesTest(Compute backendId)
                                reduceDescriptor.m_vAxis.size(),
                                backendId);
 }
+#endif
+}
 
-using namespace armnn;
 #if defined(ARMCOMPUTENEON_ENABLED)
+TEST_SUITE("Optimizer_ReduceMultipleAxesCpu")
+{
 TEST_CASE("ReduceSumWithTwoAxesKeepDimsCpuAccTest")
 {
     ReduceSumWithTwoAxesKeepDimsTest(Compute::CpuAcc);
@@ -265,9 +269,12 @@ TEST_CASE("ReduceSumWithThreeAxesCpuAccTest")
 {
     ReduceSumWithThreeAxesTest(Compute::CpuAcc);
 }
+}
 #endif
 
 #if defined(ARMCOMPUTECL_ENABLED)
+TEST_SUITE("Optimizer_ReduceMultipleAxesGpu")
+{
 TEST_CASE("ReduceSumWithTwoAxesKeepDimsGpuAccTest")
 {
     ReduceSumWithTwoAxesKeepDimsTest(Compute::GpuAcc);
@@ -287,6 +294,5 @@ TEST_CASE("ReduceSumWithThreeAxesGpuAccTest")
 {
     ReduceSumWithThreeAxesTest(Compute::GpuAcc);
 }
-#endif
-
 }
+#endif

@@ -21,7 +21,7 @@ void FullyConnected(const TensorShape& rInputShape,
                     Encoder<float>& rOutputEncoder,
                     const TensorShape& rWeightsShape,
                     Decoder<float>& rWeightDecoder,
-                    Decoder<float>& rBiasDecoder,
+                    Decoder<float>* rBiasDecoder,
                     bool biasEnabled,
                     unsigned int K,
                     bool transposeWeights);

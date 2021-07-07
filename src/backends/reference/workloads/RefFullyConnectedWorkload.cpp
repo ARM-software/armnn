@@ -102,7 +102,7 @@ void RefFullyConnectedWorkload::Execute(std::vector<ITensorHandle*> inputs, std:
                    *OutputEncoder,
                    m_WeightShape,
                    *m_WeightDecoder,
-                   *m_BiasDecoder,
+                   m_BiasDecoder.get(),
                    m_Data.m_Parameters.m_BiasEnabled,
                    m_NumActivations,
                    m_Data.m_Parameters.m_TransposeWeightMatrix);

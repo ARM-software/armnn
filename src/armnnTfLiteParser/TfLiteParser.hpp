@@ -106,6 +106,7 @@ private:
     void ParseAveragePool2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseBatchToSpaceND(size_t subgraphIndex, size_t operatorIndex);
     void ParseCast(size_t subgraphIndex, size_t operatorIndex);
+    void ParseComparison(size_t subgraphIndex, size_t operatorIndex, armnn::ComparisonOperation comparisonOperation);
     void ParseConcatenation(size_t subgraphIndex, size_t operatorIndex);
     void ParseConv2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseDepthToSpace(size_t subgraphIndex, size_t operatorIndex);
@@ -115,12 +116,17 @@ private:
     void ParseDiv(size_t subgraphIndex, size_t operatorIndex);
     void ParseElementwiseUnary(size_t subgraphIndex, size_t operatorIndex, armnn::UnaryOperation unaryOperation);
     void ParseElu(size_t subgraphIndex, size_t operatorIndex);
+    void ParseEqual(size_t subgraphIndex, size_t operatorIndex);
     void ParseExp(size_t subgraphIndex, size_t operatorIndex);
     void ParseExpandDims(size_t subgraphIndex, size_t operatorIndex);
     void ParseFullyConnected(size_t subgraphIndex, size_t operatorIndex);
     void ParseGather(size_t subgraphIndex, size_t operatorIndex);
+    void ParseGreater(size_t subgraphIndex, size_t operatorIndex);
+    void ParseGreaterOrEqual(size_t subgraphIndex, size_t operatorIndex);
     void ParseHardSwish(size_t subgraphIndex, size_t operatorIndex);
     void ParseLeakyRelu(size_t subgraphIndex, size_t operatorIndex);
+    void ParseLess(size_t subgraphIndex, size_t operatorIndex);
+    void ParseLessOrEqual(size_t subgraphIndex, size_t operatorIndex);
     void ParseLogicalNot(size_t subgraphIndex, size_t operatorIndex);
     void ParseLogistic(size_t subgraphIndex, size_t operatorIndex);
     void ParseL2Normalization(size_t subgraphIndex, size_t operatorIndex);
@@ -130,6 +136,7 @@ private:
     void ParseMinimum(size_t subgraphIndex, size_t operatorIndex);
     void ParseMul(size_t subgraphIndex, size_t operatorIndex);
     void ParseNeg(size_t subgraphIndex, size_t operatorIndex);
+    void ParseNotEqual(size_t subgraphIndex, size_t operatorIndex);
     void ParsePack(size_t subgraphIndex, size_t operatorIndex);
     void ParsePad(size_t subgraphIndex, size_t operatorIndex);
     void ParsePool(size_t subgraphIndex, size_t operatorIndex, armnn::PoolingAlgorithm algorithm);

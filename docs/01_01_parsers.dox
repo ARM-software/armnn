@@ -117,11 +117,16 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - DEQUANTIZE
 - DIV
 - ELU
+- EQUAL
 - EXP
 - FULLY_CONNECTED, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - GATHER
+- GREATER
+- GREATER_EQUAL
 - HARD_SWISH
 - LEAKY_RELU
+- LESS
+- LESS_EQUAL
 - LOGICAL_NOT
 - LOGISTIC
 - L2_NORMALIZATION
@@ -131,6 +136,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - MINIMUM
 - MUL
 - NEG
+- NOT_EQUAL
 - PACK
 - PAD
 - PRELU

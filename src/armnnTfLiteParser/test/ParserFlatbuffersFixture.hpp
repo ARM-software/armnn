@@ -322,10 +322,20 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
     {
         armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first);
         auto outputExpected = it.second;
-        auto result = CompareTensors(outputExpected, outputStorage[it.first],
-                                     bindingInfo.second.GetShape(), bindingInfo.second.GetShape(),
-                                     false, isDynamic);
-        CHECK_MESSAGE(result.m_Result, result.m_Message.str());
+        if (std::is_same<DataType2, uint8_t>::value)
+        {
+            auto result = CompareTensors(outputExpected, outputStorage[it.first],
+                                         bindingInfo.second.GetShape(), bindingInfo.second.GetShape(),
+                                         true, isDynamic);
+            CHECK_MESSAGE(result.m_Result, result.m_Message.str());
+        }
+        else
+        {
+            auto result = CompareTensors(outputExpected, outputStorage[it.first],
+                                         bindingInfo.second.GetShape(), bindingInfo.second.GetShape(),
+                                         false, isDynamic);
+            CHECK_MESSAGE(result.m_Result, result.m_Message.str());
+        }
     }
 }
 
@@ -424,8 +434,17 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
     {
         armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first);
         auto outputExpected = it.second;
-        auto result = CompareTensors(outputExpected, outputStorage[it.first],
-                                     bindingInfo.second.GetShape(), bindingInfo.second.GetShape(), false);
-        CHECK_MESSAGE(result.m_Result, result.m_Message.str());
+        if (std::is_same<DataType2, uint8_t>::value)
+        {
+            auto result = CompareTensors(outputExpected, outputStorage[it.first],
+                                         bindingInfo.second.GetShape(), bindingInfo.second.GetShape(), true);
+            CHECK_MESSAGE(result.m_Result, result.m_Message.str());
+        }
+        else
+        {
+            auto result = CompareTensors(outputExpected, outputStorage[it.first],
+                                         bindingInfo.second.GetShape(), bindingInfo.second.GetShape());
+            CHECK_MESSAGE(result.m_Result, result.m_Message.str());
+        }
     }
 }

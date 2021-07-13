@@ -90,36 +90,26 @@ class TestFullyConnectedLayerVistor : public TestLayerVisitor
 {
 public:
     explicit TestFullyConnectedLayerVistor(const FullyConnectedDescriptor& descriptor,
-                                           const ConstTensor& weights,
-                                           const Optional<ConstTensor> biases,
                                            const char* name = nullptr)
         : TestLayerVisitor(name)
         , m_Descriptor(descriptor)
-        , m_Weights(weights)
-        , m_Biases(biases)
     {}
 
     virtual ~TestFullyConnectedLayerVistor() {}
 
     void VisitFullyConnectedLayer(const IConnectableLayer* layer,
                                   const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                  const ConstTensor& weights,
-                                  const Optional<ConstTensor>& biases,
                                   const char* name = nullptr) override
     {
         CheckLayerPointer(layer);
         CheckLayerName(name);
         CheckDescriptor(fullyConnectedDescriptor);
-        CheckConstTensors(m_Weights, weights);
-        CheckOptionalConstTensors(m_Biases, biases);
     }
 
 protected:
     void CheckDescriptor(const FullyConnectedDescriptor& descriptor);
 private:
     FullyConnectedDescriptor m_Descriptor;
-    ConstTensor m_Weights;
-    Optional<ConstTensor> m_Biases;
 };
 
 class TestBatchNormalizationLayerVisitor : public TestLayerVisitor

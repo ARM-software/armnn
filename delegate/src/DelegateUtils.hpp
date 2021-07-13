@@ -482,6 +482,11 @@ armnn::ConstTensor CreateConstTensor(const TfLiteTensor* tfLiteTensor,
             "TfLiteArmnnDelegate:  Not constant allocation type: " + std::to_string(tfLiteTensor->allocation_type));
     }
 
+    if(tflite::IsConstantTensor(tfLiteTensor))
+    {
+        tensorInfo.SetConstant();
+    }
+
     if (permutationVector.has_value() && permutationVector.value().GetSize() > 0 && permutationData != nullptr)
     {
         // Permute tensor info

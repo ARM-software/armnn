@@ -12,7 +12,8 @@ namespace armnn
 const BackendCapabilities cpuRefCapabilities("CpuRef",
                                              {
                                                     {"NonConstWeights", true},
-                                                    {"AsyncExecution", true}
+                                                    {"AsyncExecution", true},
+                                                    {"ConstantTensorsAsInputs", true}
                                              });
 
 const std::set<armnn::BackendCapability> oldCpuRefCapabilities {

@@ -22,56 +22,6 @@
 
 template<typename T, typename B>
 LayerTestResult<T, 2> SimpleFullyConnectedTestImpl(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        const armnn::ITensorHandleFactory& tensorHandleFactory,
-        armnn::TensorInfo inputTensorInfo,
-        armnn::TensorInfo outputTensorInfo,
-        armnn::TensorInfo weightsDesc,
-        armnn::TensorInfo biasesDesc,
-        std::vector<T>& weights,
-        std::vector<B>& bias,
-        std::vector<T>& input,
-        bool biasEnabled,
-        bool transposeWeights)
-{
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
-
-    armnn::FullyConnectedQueueDescriptor data;
-    armnn::WorkloadInfo info;
-    armnn::ScopedTensorHandle weightsTensor(weightsDesc);
-    armnn::ScopedTensorHandle biasTensor(biasesDesc);
-
-    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
-
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, weights.data());
-    AllocateAndCopyDataToITensorHandle(&biasTensor, bias.data());
-
-    AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
-    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
-    data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor;
-    data.m_Parameters.m_BiasEnabled = biasEnabled;
-    data.m_Parameters.m_TransposeWeightMatrix = transposeWeights;
-
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateFullyConnected(data, info);
-    LayerTestResult<T, 2> result(outputTensorInfo);
-
-    inputHandle->Allocate();
-    outputHandle->Allocate();
-    CopyDataToITensorHandle(inputHandle.get(), input.data());
-
-    ExecuteWorkload(*workload, memoryManager);
-
-    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
-    result.m_ActualData = actualOutput;
-
-    return result;
-}
-
-template<typename T, typename B>
-LayerTestResult<T, 2> SimpleFullyConnectedTestWeightsAsInputsImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
@@ -83,7 +33,8 @@ LayerTestResult<T, 2> SimpleFullyConnectedTestWeightsAsInputsImpl(
     std::vector<B>& bias,
     std::vector<T>& input,
     bool biasEnabled,
-    bool transposeWeights)
+    bool transposeWeights,
+    bool constantWeights)
 {
     std::unique_ptr<armnn::ITensorHandle> input0Handle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> input1Handle = tensorHandleFactory.CreateTensorHandle(weightsTensorInfo);
@@ -93,13 +44,23 @@ LayerTestResult<T, 2> SimpleFullyConnectedTestWeightsAsInputsImpl(
 
     armnn::FullyConnectedQueueDescriptor data;
     armnn::WorkloadInfo info;
+    armnn::ScopedTensorHandle weightsTensor(weightsTensorInfo);
+    armnn::ScopedTensorHandle biasTensor(biasesTensorInfo);
+
+    AllocateAndCopyDataToITensorHandle(&weightsTensor, weights.data());
+    AllocateAndCopyDataToITensorHandle(&biasTensor, bias.data());
 
     AddInputToWorkload(data, info, inputTensorInfo, input0Handle.get());
     AddInputToWorkload(data, info, weightsTensorInfo, input1Handle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    // Need to set as layer members will be null when creating the workload because the optimization hasn't been run.
+    data.m_Weight = &weightsTensor;
+    data.m_Bias = &biasTensor;
+
     data.m_Parameters.m_BiasEnabled = biasEnabled;
     data.m_Parameters.m_TransposeWeightMatrix = transposeWeights;
-    data.m_Parameters.m_ConstantWeights = false;
+    data.m_Parameters.m_ConstantWeights = constantWeights;
 
     std::unique_ptr<armnn::ITensorHandle> input2Handle = nullptr;
     if (biasEnabled)
@@ -180,36 +141,19 @@ LayerTestResult<T, 2> FullyConnectedTest(
 
     std::vector<int32_t> bias = {9250, 67500};
 
-    if (constantWeights)
-    {
-        result = SimpleFullyConnectedTestImpl<T>(workloadFactory,
-                                                 memoryManager,
-                                                 tensorHandleFactory,
-                                                 inputTensorInfo,
-                                                 outputTensorInfo,
-                                                 weightsDesc,
-                                                 biasesDesc,
-                                                 weights,
-                                                 bias,
-                                                 input,
-                                                 biasEnabled,
-                                                 true);
-    }
-    else
-    {
-        result = SimpleFullyConnectedTestWeightsAsInputsImpl<T>(workloadFactory,
-                                                 memoryManager,
-                                                 tensorHandleFactory,
-                                                 inputTensorInfo,
-                                                 outputTensorInfo,
-                                                 weightsDesc,
-                                                 biasesDesc,
-                                                 weights,
-                                                 bias,
-                                                 input,
-                                                 biasEnabled,
-                                                 true);
-    }
+    result = SimpleFullyConnectedTestImpl<T>(workloadFactory,
+                                             memoryManager,
+                                             tensorHandleFactory,
+                                             inputTensorInfo,
+                                             outputTensorInfo,
+                                             weightsDesc,
+                                             biasesDesc,
+                                             weights,
+                                             bias,
+                                             input,
+                                             biasEnabled,
+                                             true,
+                                             constantWeights);
 
     if (biasEnabled)
     {
@@ -299,7 +243,7 @@ LayerTestResult<T, 2> FullyConnectedLargeTestCommon(
         inputTensorInfo, outputTensorInfo,
         weightsDesc, biasesDesc,
         weights, biasValues, input,
-        true, transposeWeights
+        true, transposeWeights, true
     );
 
     result.m_ExpectedData = armnnUtils::QuantizedVector<T>({ 965432.0f }, qScale, qOffset);
@@ -408,7 +352,7 @@ LayerTestResult<float, 2> FullyConnectedFloat32Test(
         inputTensorInfo, outputTensorInfo,
         weightsDesc, biasesDesc,
         weights, biasValues, input,
-        biasEnabled, transposeWeights
+        biasEnabled, transposeWeights, true
     );
 
     std::vector<float> expectedOutput =

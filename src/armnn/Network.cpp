@@ -30,6 +30,8 @@
 
 #include <common/include/ProfilingGuid.hpp>
 
+#include <fmt/format.h>
+
 #include <fcntl.h>
 #include <algorithm>
 #include <fstream>
@@ -178,6 +180,12 @@ IConnectableLayer* INetwork::AddFillLayer(const FillDescriptor& fillDescriptor,
 }
 
 IConnectableLayer* INetwork::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                                    const char* name)
+{
+    return pNetworkImpl->AddFullyConnectedLayer(fullyConnectedDescriptor, name);
+}
+
+IConnectableLayer* INetwork::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                     const ConstTensor& weights,
                                                     const Optional<ConstTensor>& biases,
                                                     const char* name)
@@ -185,28 +193,6 @@ IConnectableLayer* INetwork::AddFullyConnectedLayer(const FullyConnectedDescript
     return pNetworkImpl->AddFullyConnectedLayer(fullyConnectedDescriptor,
                                                 armnn::Optional<ConstTensor>(weights),
                                                 biases,
-                                                name);
-}
-
-IConnectableLayer* INetwork::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                    const ConstTensor& weights,
-                                                    const char* name)
-{
-    armnn::Optional<ConstTensor> biases;
-    return pNetworkImpl->AddFullyConnectedLayer(fullyConnectedDescriptor,
-                                                armnn::Optional<ConstTensor>(weights),
-                                                biases,
-                                                name);
-}
-
-IConnectableLayer* INetwork::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                    const ConstTensor& weights,
-                                                    const ConstTensor& biases,
-                                                    const char* name)
-{
-    return pNetworkImpl->AddFullyConnectedLayer(fullyConnectedDescriptor,
-                                                armnn::Optional<ConstTensor>(weights),
-                                                armnn::Optional<ConstTensor>(biases),
                                                 name);
 }
 
@@ -1799,33 +1785,10 @@ IConnectableLayer* NetworkImpl::AddFillLayer(const FillDescriptor& fillDescripto
     return m_Graph->AddLayer<FillLayer>(fillDescriptor, name);
 }
 
-IConnectableLayer* NetworkImpl::AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                           const Optional<ConstTensor>& weights,
-                                                           const Optional<ConstTensor>& biases,
-                                                           const char* name)
+IConnectableLayer* NetworkImpl::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                                       const char* name)
 {
-    if (fullyConnectedDescriptor.m_ConstantWeights && !weights.has_value())
-    {
-        throw InvalidArgumentException("AddFullyConnectedLayer: weights cannot be empty");
-
-        if (fullyConnectedDescriptor.m_BiasEnabled && !biases.has_value())
-        {
-            throw InvalidArgumentException("AddFullyConnectedLayer: biases cannot be empty");
-        }
-    }
-
-    const auto layer = m_Graph->AddLayer<FullyConnectedLayer>(fullyConnectedDescriptor, name);
-
-    if (fullyConnectedDescriptor.m_ConstantWeights)
-    {
-        layer->m_Weight = std::make_shared<ScopedTensorHandle>(weights.value());
-        if (fullyConnectedDescriptor.m_BiasEnabled)
-        {
-            layer->m_Bias = std::make_shared<ScopedTensorHandle>(biases.value());
-        }
-    }
-
-    return layer;
+    return m_Graph->AddLayer<FullyConnectedLayer>(fullyConnectedDescriptor, name);
 }
 
 IConnectableLayer* NetworkImpl::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
@@ -1833,35 +1796,76 @@ IConnectableLayer* NetworkImpl::AddFullyConnectedLayer(const FullyConnectedDescr
                                                        const Optional<ConstTensor>& biases,
                                                        const char* name)
 {
-    return AddFullyConnectedLayerImpl(fullyConnectedDescriptor, weights, biases, name);
+    ConstantLayer* weightsLayer = nullptr;
+    ConstantLayer* biasLayer    = nullptr;
+    unsigned int   numInputs    = fullyConnectedDescriptor.GetNumInputs();
+
+    // Add a constant layer for weights
+    if (weights.has_value())
+    {
+        weightsLayer = m_Graph->AddLayer<ConstantLayer>("Weights");
+        weightsLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(weights.value());
+        weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsLayer->m_LayerOutput->GetTensorInfo());
+    }
+    else if (fullyConnectedDescriptor.m_ConstantWeights)
+    {
+        throw InvalidArgumentException("AddFullyConnectedLayer: Constant weights tensor is empty.");
+    }
+
+    // Add a constant layer for biases
+    if (biases.has_value() && fullyConnectedDescriptor.m_BiasEnabled)
+    {
+        biasLayer = m_Graph->AddLayer<ConstantLayer>("Biases");
+        biasLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(biases.value());
+        biasLayer->GetOutputSlot(0).SetTensorInfo(biasLayer->m_LayerOutput->GetTensorInfo());
+    }
+
+    if (numInputs < 2)
+    {
+        throw InvalidArgumentException("AddFullyConnectedLayer: Requires at least 2 input tensors: Input, Weights");
+    }
+
+    auto layer = m_Graph->AddLayer<FullyConnectedLayer>(fullyConnectedDescriptor, name);
+
+    if (weightsLayer)
+    {
+        // Connect weights layer
+        weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+    }
+
+    if ( fullyConnectedDescriptor.m_BiasEnabled && numInputs == 3 )
+    {
+        if (biasLayer)
+        {
+            // Connect bias layer
+            biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2));
+        }
+    }
+    else if ( !fullyConnectedDescriptor.m_BiasEnabled && numInputs == 2 )
+    {
+        // Bias is disabled
+        layer->m_Bias = nullptr;
+    }
+    else
+    {
+        throw InvalidArgumentException(fmt::format(
+                "AddFullyConnectedLayer: Value mismatch. When bias is enabled in the "
+                "descriptor the number of inputs is expected to be 3 otherwise 2. "
+                "BiasEnabled={}, numInputs={}",
+                fullyConnectedDescriptor.m_BiasEnabled,
+                numInputs));
+    }
+
+    return layer;
 }
 
 IConnectableLayer* NetworkImpl::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                   const ConstTensor& weights,
-                                                   const Optional<ConstTensor>& biases,
-                                                   const char* name)
+                                                       const ConstTensor& weights,
+                                                       const Optional<ConstTensor>& biases,
+                                                       const char* name)
 {
     Optional<ConstTensor> optionalWeights(weights);
-    return AddFullyConnectedLayerImpl(fullyConnectedDescriptor, optionalWeights, biases, name);
-}
-
-IConnectableLayer* NetworkImpl::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                   const ConstTensor& weights,
-                                                   const char* name)
-{
-    Optional<ConstTensor> optionalWeights(weights);
-    Optional<ConstTensor> biases;
-    return AddFullyConnectedLayerImpl(fullyConnectedDescriptor, optionalWeights, biases, name);
-}
-
-IConnectableLayer* NetworkImpl::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                   const ConstTensor& weights,
-                                                   const ConstTensor& biases,
-                                                   const char* name)
-{
-    Optional<ConstTensor> optionalWeights(weights);
-    Optional<ConstTensor> optionalBiases(biases);
-    return AddFullyConnectedLayerImpl(fullyConnectedDescriptor, optionalWeights, optionalBiases, name);
+    return AddFullyConnectedLayer(fullyConnectedDescriptor, optionalWeights, biases, name);
 }
 
 IConnectableLayer* NetworkImpl::AddConcatLayer(const ConcatDescriptor& concatDescriptor,

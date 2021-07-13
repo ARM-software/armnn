@@ -789,6 +789,41 @@ TEST_CASE("SerializeFloor")
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
+using FullyConnectedDescriptor = armnn::FullyConnectedDescriptor;
+class FullyConnectedLayerVerifier : public LayerVerifierBaseWithDescriptor<FullyConnectedDescriptor>
+{
+public:
+    FullyConnectedLayerVerifier(const std::string& layerName,
+                        const std::vector<armnn::TensorInfo>& inputInfos,
+                        const std::vector<armnn::TensorInfo>& outputInfos,
+                        const FullyConnectedDescriptor& descriptor)
+        : LayerVerifierBaseWithDescriptor<FullyConnectedDescriptor>(layerName, inputInfos, outputInfos, descriptor) {}
+
+    void ExecuteStrategy(const armnn::IConnectableLayer* layer,
+                         const armnn::BaseDescriptor& descriptor,
+                         const std::vector<armnn::ConstTensor>& constants,
+                         const char* name,
+                         const armnn::LayerBindingId id = 0) override
+    {
+        armnn::IgnoreUnused(constants, id);
+        switch (layer->GetType())
+        {
+            case armnn::LayerType::Input: break;
+            case armnn::LayerType::Output: break;
+            case armnn::LayerType::Constant: break;
+            default:
+            {
+                VerifyNameAndConnections(layer, name);
+                const FullyConnectedDescriptor& layerDescriptor =
+                        static_cast<const FullyConnectedDescriptor&>(descriptor);
+                CHECK(layerDescriptor.m_ConstantWeights == m_Descriptor.m_ConstantWeights);
+                CHECK(layerDescriptor.m_BiasEnabled == m_Descriptor.m_BiasEnabled);
+                CHECK(layerDescriptor.m_TransposeWeightMatrix == m_Descriptor.m_TransposeWeightMatrix);
+            }
+        }
+    }
+};
+
 TEST_CASE("SerializeFullyConnected")
 {
     const std::string layerName("fullyConnected");
@@ -809,11 +844,16 @@ TEST_CASE("SerializeFullyConnected")
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+
+    // Old way of handling constant tensors.
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const fullyConnectedLayer =
         network->AddFullyConnectedLayer(descriptor,
                                         weights,
                                         armnn::Optional<armnn::ConstTensor>(biases),
                                         layerName.c_str());
+    ARMNN_NO_DEPRECATE_WARN_END
+
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(0));
@@ -825,13 +865,11 @@ TEST_CASE("SerializeFullyConnected")
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
     CHECK(deserializedNetwork);
 
-    const std::vector<armnn::ConstTensor> constants {weights, biases};
-    LayerVerifierBaseWithDescriptorAndConstants<armnn::FullyConnectedDescriptor> verifier(
-            layerName, {inputInfo}, {outputInfo}, descriptor, constants);
+    FullyConnectedLayerVerifier verifier(layerName, {inputInfo, weightsInfo, biasesInfo}, {outputInfo}, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-TEST_CASE("SerializeFullyConnectedWeightsAsInputs")
+TEST_CASE("SerializeFullyConnectedWeightsAndBiasesAsInputs")
 {
     const std::string layerName("fullyConnected_weights_as_inputs");
     const armnn::TensorInfo inputInfo ({ 2, 5, 1, 1 }, armnn::DataType::Float32);
@@ -854,8 +892,6 @@ TEST_CASE("SerializeFullyConnectedWeightsAsInputs")
     armnn::IConnectableLayer* const biasInputLayer = network->AddInputLayer(2);
     armnn::IConnectableLayer* const fullyConnectedLayer =
         network->AddFullyConnectedLayer(descriptor,
-                                        weights,
-                                        bias,
                                         layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
@@ -875,6 +911,49 @@ TEST_CASE("SerializeFullyConnectedWeightsAsInputs")
     const std::vector<armnn::ConstTensor> constants {};
     LayerVerifierBaseWithDescriptorAndConstants<armnn::FullyConnectedDescriptor> verifier(
         layerName, {inputInfo, weightsInfo, biasesInfo}, {outputInfo}, descriptor, constants);
+    deserializedNetwork->ExecuteStrategy(verifier);
+}
+
+TEST_CASE("SerializeFullyConnectedWeightsAndBiasesAsConstantLayers")
+{
+    const std::string layerName("fullyConnected_weights_as_inputs");
+    const armnn::TensorInfo inputInfo ({ 2, 5, 1, 1 }, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({ 2, 3 }, armnn::DataType::Float32);
+
+    const armnn::TensorInfo weightsInfo({ 5, 3 }, armnn::DataType::Float32);
+    const armnn::TensorInfo biasesInfo ({ 3 }, armnn::DataType::Float32);
+
+    std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
+    std::vector<float> biasesData  = GenerateRandomData<float>(biasesInfo.GetNumElements());
+    armnn::ConstTensor weights(weightsInfo, weightsData);
+    armnn::ConstTensor biases(biasesInfo, biasesData);
+
+    armnn::FullyConnectedDescriptor descriptor;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_TransposeWeightMatrix = false;
+    descriptor.m_ConstantWeights = true;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const weightsLayer = network->AddConstantLayer(weights, "Weights");
+    armnn::IConnectableLayer* const biasesLayer = network->AddConstantLayer(biases, "Biases");
+    armnn::IConnectableLayer* const fullyConnectedLayer = network->AddFullyConnectedLayer(descriptor,layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(0));
+    weightsLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(1));
+    biasesLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(2));
+    fullyConnectedLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
+    biasesLayer->GetOutputSlot(0).SetTensorInfo(biasesInfo);
+    fullyConnectedLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    CHECK(deserializedNetwork);
+
+    FullyConnectedLayerVerifier verifier(layerName, {inputInfo, weightsInfo, biasesInfo}, {outputInfo}, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 

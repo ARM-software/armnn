@@ -16,20 +16,6 @@ RefFullyConnectedWorkload::RefFullyConnectedWorkload(
     const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info)
         : BaseWorkload<FullyConnectedQueueDescriptor>(descriptor, info)
 {
-    if (descriptor.m_Parameters.m_ConstantWeights)
-    {
-        m_Weight = std::make_unique<ScopedTensorHandle>(*(descriptor.m_Weight));
-        const TensorInfo& rWeightInfo = m_Weight->GetTensorInfo();
-        m_WeightShape = rWeightInfo.GetShape();
-        m_WeightDecoder = MakeDecoder<float>(rWeightInfo, m_Weight->Map(true));
-
-        if (descriptor.m_Parameters.m_BiasEnabled)
-        {
-            m_Bias = std::make_unique<ScopedTensorHandle>(*(descriptor.m_Bias));
-            const TensorInfo& biasInfo = m_Bias->GetTensorInfo();
-            m_BiasDecoder = MakeDecoder<float>(biasInfo, m_Bias->Map(true));
-        }
-    }
 }
 
 void RefFullyConnectedWorkload::PostAllocationConfigure()
@@ -44,18 +30,15 @@ void RefFullyConnectedWorkload::PostAllocationConfigure(std::vector<ITensorHandl
     ARMNN_ASSERT(inputInfo.GetNumDimensions() > 1);
     m_InputShape = inputInfo.GetShape();
 
-    if (!m_Data.m_Parameters.m_ConstantWeights)
-    {
-        const TensorInfo& rWeightInfo = GetTensorInfo(inputs[1]);
-        ARMNN_ASSERT(inputInfo.GetNumDimensions() > 1);
-        m_WeightShape = rWeightInfo.GetShape();
-        m_WeightDecoder = MakeDecoder<float>(rWeightInfo);
+    const TensorInfo& rWeightInfo = GetTensorInfo(inputs[1]);
+    ARMNN_ASSERT(inputInfo.GetNumDimensions() > 1);
+    m_WeightShape = rWeightInfo.GetShape();
+    m_WeightDecoder = MakeDecoder<float>(rWeightInfo);
 
-        if (m_Data.m_Parameters.m_BiasEnabled)
-        {
-            const TensorInfo& biasInfo = GetTensorInfo(inputs[2]);
-            m_BiasDecoder = MakeDecoder<float>(biasInfo);
-        }
+    if (m_Data.m_Parameters.m_BiasEnabled)
+    {
+        const TensorInfo& biasInfo = GetTensorInfo(inputs[2]);
+        m_BiasDecoder = MakeDecoder<float>(biasInfo);
     }
 
     const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);
@@ -87,13 +70,10 @@ void RefFullyConnectedWorkload::Execute(std::vector<ITensorHandle*> inputs, std:
     std::unique_ptr<Decoder<float>> inputDecoder = MakeDecoder<float>(GetTensorInfo(inputs[0]), inputs[0]->Map());
     std::unique_ptr<Encoder<float>> OutputEncoder = MakeEncoder<float>(GetTensorInfo(outputs[0]), outputs[0]->Map());
 
-    if (!m_Data.m_Parameters.m_ConstantWeights)
+    m_WeightDecoder->Reset(inputs[1]->Map());
+    if (m_Data.m_Parameters.m_BiasEnabled)
     {
-        m_WeightDecoder->Reset(inputs[1]->Map());
-        if (m_Data.m_Parameters.m_BiasEnabled)
-        {
-            m_BiasDecoder->Reset(inputs[2]->Map());
-        }
+        m_BiasDecoder->Reset(inputs[2]->Map());
     }
 
     FullyConnected(m_InputShape,

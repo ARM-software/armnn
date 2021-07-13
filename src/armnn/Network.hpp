@@ -133,24 +133,17 @@ public:
     IConnectableLayer* AddFloorLayer(const char* name = nullptr);
 
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                              const char* name = nullptr);
+
+    IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                               const Optional<ConstTensor>& weights,
                                               const Optional<ConstTensor>& biases,
                                               const char* name = nullptr);
 
+    ARMNN_DEPRECATED_MSG("This AddFullyConnectedLayer overload is deprecated")
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                               const ConstTensor& weights,
                                               const Optional<ConstTensor>& biases,
-                                              const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG("This AddFullyConnectedLayer overload is deprecated")
-    IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                              const ConstTensor& weights,
-                                              const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG("This AddFullyConnectedLayer overload is deprecated")
-    IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                              const ConstTensor& weights,
-                                              const ConstTensor& biases,
                                               const char* name = nullptr);
 
     ARMNN_DEPRECATED_MSG("This AddGatherLayer overload is deprecated")
@@ -287,11 +280,6 @@ private:
                                                           const ConstTensor& weights,
                                                           const Optional<ConstTensor>& biases,
                                                           const char* name);
-
-    IConnectableLayer* AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                  const Optional<ConstTensor>& weights,
-                                                  const Optional<ConstTensor>& biases,
-                                                  const char* name);
 
     bool GetShapeInferenceMethod();
     NetworkOptions m_NetworkOptions;

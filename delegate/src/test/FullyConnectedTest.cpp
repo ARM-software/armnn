@@ -34,7 +34,7 @@ void FullyConnectedFp32Test(std::vector<armnn::BackendId>& backends, bool consta
                               constantWeights);
 }
 
-void FullyConnectedActicationTest(std::vector<armnn::BackendId>& backends, bool constantWeights = true)
+void FullyConnectedActivationTest(std::vector<armnn::BackendId>& backends, bool constantWeights = true)
 {
     std::vector<int32_t> inputTensorShape   { 1, 4, 1, 1 };
     std::vector<int32_t> weightsTensorShape { 1, 4 };
@@ -106,7 +106,7 @@ TEST_CASE ("FullyConnected_Int8_GpuAcc_Test")
 TEST_CASE ("FullyConnected_Activation_GpuAcc_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    FullyConnectedActicationTest(backends);
+    FullyConnectedActivationTest(backends);
 }
 
 } // End of TEST_SUITE("FullyConnected_GpuAccTests")
@@ -129,7 +129,7 @@ TEST_CASE ("FullyConnected_Int8_CpuAcc_Test")
 TEST_CASE ("FullyConnected_Activation_CpuAcc_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    FullyConnectedActicationTest(backends);
+    FullyConnectedActivationTest(backends);
 }
 
 } // End of TEST_SUITE("FullyConnected_CpuAccTests")
@@ -152,7 +152,7 @@ TEST_CASE ("FullyConnected_Int8_CpuRef_Test")
 TEST_CASE ("FullyConnected_Activation_CpuRef_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    FullyConnectedActicationTest(backends);
+    FullyConnectedActivationTest(backends);
 }
 
 TEST_CASE ("FullyConnected_Weights_As_Inputs_FP32_CpuRef_Test")
@@ -170,7 +170,7 @@ TEST_CASE ("FullyConnected_Weights_As_Inputs_Int8_CpuRef_Test")
 TEST_CASE ("FullyConnected_Weights_As_Inputs_Activation_CpuRef_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    FullyConnectedActicationTest(backends, false);
+    FullyConnectedActivationTest(backends, false);
 }
 
 } // End of TEST_SUITE("FullyConnected_CpuRefTests")

@@ -28,14 +28,57 @@ armnn::INetworkPtr CreateFullyConnectedNetworkNonConstWeights(const armnn::Tenso
 
     armnn::IConnectableLayer* inputLayer  = network->AddInputLayer(0, "Input");
     armnn::IConnectableLayer* weightsInputLayer   = network->AddInputLayer(1, "Weights_Input");
-    armnn::IConnectableLayer* fullyConnectedLayer = network->AddFullyConnectedLayer(descriptor,
-                                                                                    armnn::EmptyOptional(),
-                                                                                    armnn::EmptyOptional(),
-                                                                                    "Fully_Connected");
+    armnn::IConnectableLayer* fullyConnectedLayer = network->AddFullyConnectedLayer(descriptor, "Fully_Connected");
     armnn::IConnectableLayer* outputLayer = network->AddOutputLayer(0, "Output");
 
     Connect(inputLayer, fullyConnectedLayer, inputTensorInfo, 0, 0);
     Connect(weightsInputLayer, fullyConnectedLayer, weightsTensorInfo, 0, 1);
+    Connect(fullyConnectedLayer, outputLayer, outputTensorInfo, 0, 0);
+
+    return network;
+}
+
+armnn::INetworkPtr CreateFullyConnectedNetworkNonConstWeightsConstBias(const armnn::TensorInfo& inputTensorInfo,
+                                                                       const armnn::TensorInfo& outputTensorInfo,
+                                                                       const armnn::TensorInfo& weightsTensorInfo,
+                                                                       const armnn::TensorInfo& biasTensorInfo,
+                                                                       const armnn::ConstTensor& biasConstantTensor,
+                                                                       armnn::FullyConnectedDescriptor descriptor)
+{
+    armnn::INetworkPtr network(armnn::INetwork::Create());
+
+    armnn::IConnectableLayer* inputLayer  = network->AddInputLayer(0, "Input");
+    armnn::IConnectableLayer* weightsInputLayer   = network->AddInputLayer(1, "Weights_Input");
+    armnn::IConnectableLayer* biasLayer  = network->AddConstantLayer(biasConstantTensor, "Weights");
+    armnn::IConnectableLayer* fullyConnectedLayer = network->AddFullyConnectedLayer(descriptor, "Fully_Connected");
+    armnn::IConnectableLayer* outputLayer = network->AddOutputLayer(0, "Output");
+
+    Connect(inputLayer, fullyConnectedLayer, inputTensorInfo, 0, 0);
+    Connect(weightsInputLayer, fullyConnectedLayer, weightsTensorInfo, 0, 1);
+    Connect(biasLayer, fullyConnectedLayer, biasTensorInfo, 0, 2);
+    Connect(fullyConnectedLayer, outputLayer, outputTensorInfo, 0, 0);
+
+    return network;
+}
+
+armnn::INetworkPtr CreateFullyConnectedNetworkConstWeightsNonConstBias(const armnn::TensorInfo& inputTensorInfo,
+                                                                       const armnn::TensorInfo& outputTensorInfo,
+                                                                       const armnn::TensorInfo& weightsTensorInfo,
+                                                                       const armnn::TensorInfo& biasTensorInfo,
+                                                                       const armnn::ConstTensor& weightsConstantTensor,
+                                                                       armnn::FullyConnectedDescriptor descriptor)
+{
+    armnn::INetworkPtr network(armnn::INetwork::Create());
+
+    armnn::IConnectableLayer* inputLayer  = network->AddInputLayer(0, "Input");
+    armnn::IConnectableLayer* weightsLayer  = network->AddConstantLayer(weightsConstantTensor, "Weights");
+    armnn::IConnectableLayer* biasLayer   = network->AddInputLayer(2, "Bias_Input");
+    armnn::IConnectableLayer* fullyConnectedLayer = network->AddFullyConnectedLayer(descriptor, "Fully_Connected");
+    armnn::IConnectableLayer* outputLayer = network->AddOutputLayer(0, "Output");
+
+    Connect(inputLayer, fullyConnectedLayer, inputTensorInfo, 0, 0);
+    Connect(weightsLayer, fullyConnectedLayer, weightsTensorInfo, 0, 1);
+    Connect(biasLayer, fullyConnectedLayer, biasTensorInfo, 0, 2);
     Connect(fullyConnectedLayer, outputLayer, outputTensorInfo, 0, 0);
 
     return network;
@@ -94,4 +137,123 @@ void FullyConnectedWithDynamicWeightsEndToEnd(const std::vector<armnn::BackendId
                                                 backends,
                                                 1.0f);
 }
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+void FullyConnectedWithDynamicOrConstantInputsEndToEnd(const std::vector<armnn::BackendId>& backends,
+                                                       const bool transposeWeights,
+                                                       const bool constantWeightsOrBias)
+{
+    unsigned int inputWidth = 1;
+    unsigned int inputHeight = 1;
+    unsigned int inputChannels = 5;
+    unsigned int inputNum = 2;
+
+    unsigned int outputChannels = 3;
+    unsigned int outputNum = 2;
+
+    unsigned int inputShape[]   = { inputNum, inputChannels, inputHeight, inputWidth };
+    unsigned int outputShape[]  = { outputNum, outputChannels };
+    unsigned int weightsShape[] = { inputChannels, outputChannels };
+
+    if (transposeWeights)
+    {
+        std::swap(weightsShape[0], weightsShape[1]);
+    }
+
+    unsigned int biasShape[] = { outputChannels };
+
+    armnn::TensorInfo inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
+    armnn::TensorInfo outputTensorInfo = armnn::TensorInfo(2, outputShape, armnn::DataType::Float32);
+    armnn::TensorInfo weightsDesc = armnn::TensorInfo(2, weightsShape, armnn::DataType::Float32);
+    armnn::TensorInfo biasesDesc = armnn::TensorInfo(1, biasShape, armnn::DataType::Float32);
+
+    std::vector<float> input =
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f,
+        5.0f, 4.0f, 3.0f, 2.0f, 1.0f
+    };
+
+    std::vector<float> weights =
+    {
+        .5f, 2.f, .5f,
+        .5f, 2.f, 1.f,
+        .5f, 2.f, 2.f,
+        .5f, 2.f, 3.f,
+        .5f, 2.f, 4.f
+    };
+
+    if (transposeWeights)
+    {
+        weights =
+        {
+            .5f, .5f, .5f, .5f, .5f,
+            2.f, 2.f, 2.f, 2.f, 2.f,
+            .5f, 1.f, 2.f, 3.f, 4.f
+        };
+    }
+
+    std::vector<float> biasValues = std::vector<float>({10.f, 20.f, 30.f});
+
+    std::vector<float> expectedOutput =
+    {
+        0.5f + 1.0f + 1.5f + 2.0f + 2.5f + biasValues[0],
+        2.0f + 4.0f + 6.0f + 8.0f + 10.f + biasValues[1],
+        0.5f + 2.0f + 6.0f + 12.f + 20.f + biasValues[2],
+
+        2.5f + 2.0f + 1.5f + 1.0f + 0.5f + biasValues[0],
+        10.0f + 8.0f + 6.0f + 4.0f + 2.f + biasValues[1],
+        2.5f + 4.0f + 6.0f + 6.f + 4.f   + biasValues[2]
+    };
+
+    FullyConnectedDescriptor descriptor;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_TransposeWeightMatrix = transposeWeights;
+    descriptor.m_ConstantWeights = constantWeightsOrBias;
+
+    if (!constantWeightsOrBias)
+    {
+        // Tests non constant weights and constant bias.
+        ConstTensor biasConstantTensor(biasesDesc, biasValues.data());
+
+        armnn::INetworkPtr network = CreateFullyConnectedNetworkNonConstWeightsConstBias(inputTensorInfo,
+                                                                                         outputTensorInfo,
+                                                                                         weightsDesc,
+                                                                                         biasesDesc,
+                                                                                         biasConstantTensor,
+                                                                                         descriptor);
+        CHECK(network);
+
+        std::map<int, std::vector<T>> inputTensorData    = {{ 0, input }, {1, weights}};
+        std::map<int, std::vector<T>> expectedOutputTensorData = {{ 0, expectedOutput }};
+
+        EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(network),
+                                                    inputTensorData,
+                                                    expectedOutputTensorData,
+                                                    backends,
+                                                    1.0f);
+    }
+    else
+    {
+        // Tests constant weights and non constant bias.
+        ConstTensor weightsConstantTensor(weightsDesc, weights.data());
+
+        armnn::INetworkPtr network = CreateFullyConnectedNetworkConstWeightsNonConstBias(inputTensorInfo,
+                                                                                         outputTensorInfo,
+                                                                                         weightsDesc,
+                                                                                         biasesDesc,
+                                                                                         weightsConstantTensor,
+                                                                                         descriptor);
+        CHECK(network);
+
+        std::map<int, std::vector<T>> inputTensorData    = {{ 0, input }, {2, biasValues}};
+        std::map<int, std::vector<T>> expectedOutputTensorData = {{ 0, expectedOutput }};
+
+        EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(network),
+                                                    inputTensorData,
+                                                    expectedOutputTensorData,
+                                                    backends,
+                                                    1.0f);
+    }
+}
+
 } // anonymous namespace

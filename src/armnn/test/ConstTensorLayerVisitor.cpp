@@ -484,16 +484,23 @@ TEST_CASE("CheckFullyConnectedLayer")
 {
     FullyConnectedDescriptor descriptor;
     descriptor.m_TransposeWeightMatrix = true;
+    descriptor.m_ConstantWeights = true;
+    descriptor.m_BiasEnabled = false;
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
     ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
-    TestFullyConnectedLayerVistor visitor(descriptor, weights, EmptyOptional());
+    TestConstantLayerVisitor weightsVisitor(weights);
+    TestFullyConnectedLayerVistor visitor(descriptor);
 
     NetworkImpl net;
 
-    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, EmptyOptional());
+    IConnectableLayer* const weightsLayer = net.AddConstantLayer(weights);
+    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor);
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+
+    weightsLayer->Accept(weightsVisitor);
     layer->Accept(visitor);
 }
 
@@ -502,16 +509,23 @@ TEST_CASE("CheckNamedFullyConnectedLayer")
     const char* layerName = "FullyConnectedLayer";
     FullyConnectedDescriptor descriptor;
     descriptor.m_TransposeWeightMatrix = true;
+    descriptor.m_ConstantWeights = true;
+    descriptor.m_BiasEnabled = false;
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
     ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
-    TestFullyConnectedLayerVistor visitor(descriptor, weights, EmptyOptional(), layerName);
+    TestConstantLayerVisitor weightsVisitor(weights);
+    TestFullyConnectedLayerVistor visitor(descriptor, layerName);
 
     NetworkImpl net;
 
-    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, EmptyOptional(), layerName);
+    IConnectableLayer* const weightsLayer = net.AddConstantLayer(weights);
+    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, layerName);
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+
+    weightsLayer->Accept(weightsVisitor);
     layer->Accept(visitor);
 }
 
@@ -519,6 +533,7 @@ TEST_CASE("CheckFullyConnectedLayerWithBiases")
 {
     FullyConnectedDescriptor descriptor;
     descriptor.m_TransposeWeightMatrix = true;
+    descriptor.m_ConstantWeights = true;
     descriptor.m_BiasEnabled = true;
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
@@ -528,13 +543,21 @@ TEST_CASE("CheckFullyConnectedLayerWithBiases")
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
     ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32), biasData);
-    Optional<ConstTensor> optionalBiases(biases);
 
-    TestFullyConnectedLayerVistor visitor(descriptor, weights, optionalBiases);
+    TestConstantLayerVisitor weightsVisitor(weights);
+    TestConstantLayerVisitor biasesVisitor(biases);
+    TestFullyConnectedLayerVistor visitor(descriptor);
 
     NetworkImpl net;
 
-    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, optionalBiases);
+    IConnectableLayer* const weightsLayer = net.AddConstantLayer(weights);
+    IConnectableLayer* const biasesLayer = net.AddConstantLayer(biases);
+    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor);
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+    biasesLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2));
+
+    weightsLayer->Accept(weightsVisitor);
+    biasesLayer->Accept(biasesVisitor);
     layer->Accept(visitor);
 }
 
@@ -543,6 +566,7 @@ TEST_CASE("CheckNamedFullyConnectedLayerWithBiases")
     const char* layerName = "FullyConnectedLayer";
     FullyConnectedDescriptor descriptor;
     descriptor.m_TransposeWeightMatrix = true;
+    descriptor.m_ConstantWeights = true;
     descriptor.m_BiasEnabled = true;
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
@@ -552,13 +576,21 @@ TEST_CASE("CheckNamedFullyConnectedLayerWithBiases")
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
     ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32), biasData);
-    Optional<ConstTensor> optionalBiases(biases);
 
-    TestFullyConnectedLayerVistor visitor(descriptor, weights, optionalBiases, layerName);
+    TestConstantLayerVisitor weightsVisitor(weights);
+    TestConstantLayerVisitor biasesVisitor(biases);
+    TestFullyConnectedLayerVistor visitor(descriptor, layerName);
 
     NetworkImpl net;
 
-    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, optionalBiases, layerName);
+    IConnectableLayer* const weightsLayer = net.AddConstantLayer(weights);
+    IConnectableLayer* const biasesLayer = net.AddConstantLayer(biases);
+    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, layerName);
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+    biasesLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2));
+
+    weightsLayer->Accept(weightsVisitor);
+    biasesLayer->Accept(biasesVisitor);
     layer->Accept(visitor);
 }
 

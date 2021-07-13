@@ -198,6 +198,16 @@ public:
     virtual void VisitFloorLayer(const IConnectableLayer* layer,
                                  const char* name = nullptr) = 0;
 
+
+    /// Function that a fully connected layer should call back to when its Accept(ILayerVisitor&)
+    /// function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param fullyConnectedDescriptor - Description of the fully connected layer.
+    /// @param name - Optional name for the layer.
+    virtual void VisitFullyConnectedLayer(const IConnectableLayer* layer,
+                                          const FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                          const char* name = nullptr) = 0;
+
     /// Function that a fully connected layer should call back to when its Accept(ILayerVisitor&)
     /// function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
@@ -205,6 +215,7 @@ public:
     /// @param weights - Tensor for the weights data.
     /// @param biases - Optional tensor for the bias data.
     /// @param name - Optional name for the layer.
+    ARMNN_DEPRECATED_MSG("Use VisitFullyConnectedLayer without ConstTensors")
     virtual void VisitFullyConnectedLayer(const IConnectableLayer* layer,
                                           const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                           const ConstTensor& weights,

@@ -402,7 +402,7 @@ struct FullyConnectedDescriptor : BaseDescriptor
     }
 
     /// Get the number of views/inputs.
-    uint32_t GetNumViews() const;
+    uint32_t GetNumInputs() const;
 
     /// Enable/disable bias.
     bool m_BiasEnabled;

@@ -110,6 +110,10 @@ public:
 
     void VisitFullyConnectedLayer(const IConnectableLayer*,
                                   const FullyConnectedDescriptor&,
+                                  const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitFullyConnectedLayer(const IConnectableLayer*,
+                                  const FullyConnectedDescriptor&,
                                   const ConstTensor&,
                                   const Optional<ConstTensor>&,
                                   const char*) override { DefaultPolicy::Apply(__func__); }

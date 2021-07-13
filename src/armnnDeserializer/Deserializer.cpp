@@ -688,6 +688,7 @@ armnn::ConstTensor ToConstTensor(ConstTensorRawPtr constTensorPtr)
 {
     CHECK_CONST_TENSOR_PTR(constTensorPtr);
     armnn::TensorInfo tensorInfo = ToTensorInfo(constTensorPtr->info());
+    tensorInfo.SetConstant();
 
     switch (constTensorPtr->data_type())
     {
@@ -938,6 +939,7 @@ IDeserializer::DeserializerImpl::FeatureVersions IDeserializer::DeserializerImpl
     {
         versions.m_BindingIdScheme = graph->featureVersions()->bindingIdsScheme();
         versions.m_WeightsLayoutScheme = graph->featureVersions()->weightsLayoutScheme();
+        versions.m_ConstTensorsAsInputs = graph->featureVersions()->constantTensorsAsInputs();
     }
 
     return versions;
@@ -1052,13 +1054,15 @@ void IDeserializer::DeserializerImpl::RegisterOutputSlots(GraphPtr graph,
 }
 
 void IDeserializer::DeserializerImpl::RegisterInputSlots(GraphPtr graph,
-                                      uint32_t layerIndex,
-                                      armnn::IConnectableLayer* layer)
+                                                         uint32_t layerIndex,
+                                                         armnn::IConnectableLayer* layer,
+                                                         std::vector<unsigned int> ignoreSlots)
 {
     CHECK_LAYERS(graph, 0, layerIndex);
     ARMNN_ASSERT(layer != nullptr);
     LayerBaseRawPtr baseLayer = GetBaseLayer(graph, layerIndex);
-    if (baseLayer->inputSlots()->size() != layer->GetNumInputSlots())
+
+    if (baseLayer->inputSlots()->size() != (layer->GetNumInputSlots() - ignoreSlots.size()))
     {
         throw ParseException(fmt::format("The number of inputslots ({0}) does not match the number expected ({1})"
                                          " for layer index:{2} {3}",
@@ -1070,10 +1074,14 @@ void IDeserializer::DeserializerImpl::RegisterInputSlots(GraphPtr graph,
 
     for (unsigned int i = 0; i < layer->GetNumInputSlots(); ++i)
     {
-        auto fbInputSlot = baseLayer->inputSlots()->Get(i);
-        auto fbConnection = fbInputSlot->connection();
-        armnn::IInputSlot* inputSlot = &(layer->GetInputSlot(fbInputSlot->index()));
-        RegisterInputSlotOfConnection(fbConnection->sourceLayerIndex(), fbConnection->outputSlotIndex(), inputSlot);
+        // Check if slot should be ignored.
+        if (std::find(ignoreSlots.begin(), ignoreSlots.end(), i) == ignoreSlots.end())
+        {
+            auto fbInputSlot = baseLayer->inputSlots()->Get(i);
+            auto fbConnection = fbInputSlot->connection();
+            armnn::IInputSlot* inputSlot = &(layer->GetInputSlot(fbInputSlot->index()));
+            RegisterInputSlotOfConnection(fbConnection->sourceLayerIndex(), fbConnection->outputSlotIndex(), inputSlot);
+        }
     }
 }
 
@@ -1924,40 +1932,47 @@ void IDeserializer::DeserializerImpl::ParseFullyConnected(GraphPtr graph, unsign
     fullyConnectedDescriptor.m_BiasEnabled = flatBufferDescriptor->biasEnabled();
     fullyConnectedDescriptor.m_TransposeWeightMatrix = flatBufferDescriptor->transposeWeightsMatrix();
     fullyConnectedDescriptor.m_ConstantWeights = flatBufferDescriptor->constantWeights();
-    uint32_t numInputs = 1;
-    if (!fullyConnectedDescriptor.m_ConstantWeights)
+
+    armnn::IConnectableLayer* layer;
+    std::vector<unsigned int> ignoreSlots {};
+
+    // Weights and biases used to be always constant and were stored as members of the layer. This has changed and
+    // they are now passed as inputs. If they are constant then they will be stored in a ConstantLayer.
+    if (this->GetFeatureVersions(graph).m_ConstTensorsAsInputs <= 0)
     {
-        numInputs = 2;
+        // If the model stores weights and biases as members of the layer we have to read them from there
+        // but add them to their own ConstantLayer for compatibility
+        CHECK_VALID_SIZE(inputs.size(), 1);
+        layer = m_Network->AddFullyConnectedLayer(fullyConnectedDescriptor,
+                                                  layerName.c_str());
+
+        armnn::ConstTensor weightsTensor = ToConstTensor(flatBufferLayer->weights());
+        auto weightsLayer = m_Network->AddConstantLayer(weightsTensor);
+        weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
+        weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsTensor.GetInfo());
+        ignoreSlots.emplace_back(1u);
+
         if (fullyConnectedDescriptor.m_BiasEnabled)
         {
-            numInputs = 3;
+            armnn::ConstTensor biasTensor = ToConstTensor(flatBufferLayer->biases());
+            auto biasLayer = m_Network->AddConstantLayer(biasTensor);
+            biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
+            biasLayer->GetOutputSlot(0).SetTensorInfo(biasTensor.GetInfo());
+            ignoreSlots.emplace_back(2u);
         }
     }
-    CHECK_VALID_SIZE(inputs.size(), numInputs);
-
-    armnn::Optional <armnn::ConstTensor> optionalWeights = armnn::EmptyOptional();
-    armnn::Optional<armnn::ConstTensor> optionalBiases = armnn::EmptyOptional();
-    if (fullyConnectedDescriptor.m_ConstantWeights)
+    else
     {
-        armnn::ConstTensor weightsTensorData = ToConstTensor(flatBufferLayer->weights());
-        optionalWeights = armnn::Optional<armnn::ConstTensor>(weightsTensorData);
-
-        if (flatBufferDescriptor->biasEnabled())
-        {
-            armnn::ConstTensor biasTensorData = ToConstTensor(flatBufferLayer->biases());
-            optionalBiases = armnn::Optional<armnn::ConstTensor>(biasTensorData);
-        }
+        layer = m_Network->AddFullyConnectedLayer(fullyConnectedDescriptor,
+                                                  layerName.c_str());
+        uint32_t numInputs = fullyConnectedDescriptor.GetNumInputs();
+        CHECK_VALID_SIZE(inputs.size(), numInputs);
     }
-
-    armnn::IConnectableLayer* layer = m_Network->AddFullyConnectedLayer(fullyConnectedDescriptor,
-                                                                        optionalWeights,
-                                                                        optionalBiases,
-                                                                        layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
-    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterInputSlots(graph, layerIndex, layer, ignoreSlots);
     RegisterOutputSlots(graph, layerIndex, layer);
 }
 

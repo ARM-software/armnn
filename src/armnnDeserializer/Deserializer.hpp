@@ -143,9 +143,12 @@ private:
     void ParseTransposeConvolution2d(GraphPtr graph, unsigned int layerIndex);
     void ParseUnidirectionalSequenceLstm(GraphPtr graph, unsigned int layerIndex);
 
-    void RegisterInputSlots(GraphPtr graph, uint32_t layerIndex,
-                            armnn::IConnectableLayer* layer);
-    void RegisterOutputSlots(GraphPtr graph, uint32_t layerIndex,
+    void RegisterInputSlots(GraphPtr graph,
+                            uint32_t layerIndex,
+                            armnn::IConnectableLayer* layer,
+                            std::vector<unsigned int> ignoreSlots = {});
+    void RegisterOutputSlots(GraphPtr graph,
+                             uint32_t layerIndex,
                              armnn::IConnectableLayer* layer);
 
     // NOTE index here must be from flatbuffer object index property
@@ -171,6 +174,9 @@ private:
 
         // Default values to zero for backward compatibility
         unsigned int m_WeightsLayoutScheme = 0;
+
+        // Default values to zero for backward compatibility
+        unsigned int m_ConstTensorsAsInputs = 0;
     };
 
     FeatureVersions GetFeatureVersions(GraphPtr graph);

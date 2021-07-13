@@ -36,7 +36,11 @@ const TensorInfo OverrideDataType(const TensorInfo& info, Optional<DataType> typ
         return info;
     }
 
-    return TensorInfo(info.GetShape(), type.value(), info.GetQuantizationScale(), info.GetQuantizationOffset());
+    return TensorInfo(info.GetShape(),
+                      type.value(),
+                      info.GetQuantizationScale(),
+                      info.GetQuantizationOffset(),
+                      info.IsConstant());
 }
 
 } // anonymous namespace
@@ -364,16 +368,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             TensorInfo weightsInfo;
             const TensorInfo* weightsInfoPtr = nullptr;
 
-            if (descriptor.m_ConstantWeights)
-            {
-                ARMNN_ASSERT(cLayer->m_Weight.get() != nullptr);
-                weightsInfo = OverrideDataType(cLayer->m_Weight->GetTensorInfo(), dataType);
-            }
-            else
-            {
-                weightsInfo = OverrideDataType(layer.GetInputSlot(1).GetConnection()->GetTensorInfo(), dataType);
-
-            }
+            weightsInfo = OverrideDataType(layer.GetInputSlot(1).GetConnection()->GetTensorInfo(), dataType);
             weightsInfoPtr = &weightsInfo;
 
             TensorInfo biasInfo;
@@ -385,17 +380,8 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
 
             if (descriptor.m_BiasEnabled)
             {
-                if(descriptor.m_ConstantWeights)
-                {
-                    ARMNN_ASSERT(cLayer->m_Bias.get() != nullptr);
-                    biasInfo = OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType));
-                    biasInfoPtr = &biasInfo;
-                }
-                else
-                {
-                    biasInfo = OverrideDataType(layer.GetInputSlot(2).GetConnection()->GetTensorInfo(), dataType);
-                    biasInfoPtr = &biasInfo;
-                }
+                biasInfo = OverrideDataType(layer.GetInputSlot(2).GetConnection()->GetTensorInfo(), dataType);
+                biasInfoPtr = &biasInfo;
             }
             else
             {

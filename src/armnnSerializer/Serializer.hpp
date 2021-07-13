@@ -184,7 +184,6 @@ private:
 
     void SerializeFullyConnectedLayer(const armnn::IConnectableLayer* layer,
                                       const armnn::FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                      const std::vector<armnn::ConstTensor>& constants,
                                       const char* name = nullptr);
 
     void SerializeGatherLayer(const armnn::IConnectableLayer* layer,

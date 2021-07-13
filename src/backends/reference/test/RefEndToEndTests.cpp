@@ -600,9 +600,19 @@ TEST_CASE("RefFillEndToEndTestInt32")
     FillEndToEnd<armnn::DataType::Signed32>(defaultBackends);
 }
 
-TEST_CASE("RefFullyConnectedEndToEndTestInt32")
+TEST_CASE("RefFullyConnectedEndToEndTestFloat32")
 {
     FullyConnectedWithDynamicWeightsEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefFullyConnectedEndToEndTestNonConstantWeightsConstantBiasesFloat32")
+{
+    FullyConnectedWithDynamicOrConstantInputsEndToEnd<armnn::DataType::Float32>(defaultBackends, true, true);
+}
+
+TEST_CASE("RefFullyConnectedEndToEndTestConstantWeightsNonConstantBiasesFloat32")
+{
+    FullyConnectedWithDynamicOrConstantInputsEndToEnd<armnn::DataType::Float32>(defaultBackends, true, false);
 }
 
 TEST_CASE("RefGatherFloatTest")

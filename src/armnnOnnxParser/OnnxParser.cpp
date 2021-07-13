@@ -532,6 +532,9 @@ OnnxParserImpl::CreateConstTensor(const std::string name,
     TensorInfo tensorInfo = *m_TensorsInfo[name].m_info;
     onnx::TensorProto onnxTensor = *m_TensorsInfo[name].m_tensor;
 
+    // Makes sure IsConstant flag is set.
+    tensorInfo.SetConstant();
+
     // Const tensors requires at least a list of values
     if (tensorInfo.GetNumElements() == 0)
     {
@@ -972,27 +975,41 @@ void OnnxParserImpl::AddFullyConnected(const onnx::NodeProto& matmulNode, const 
                                                m_TensorsInfo[biasName].m_dtype ),
                             CHECK_LOCATION().AsString()));
         }
-        layer = m_Network->AddFullyConnectedLayer(desc,
-                                                  CreateConstTensor(weightName).first,
-                                                  Optional<ConstTensor>(CreateConstTensor(biasName).first),
-                                                  matmulNode.name().c_str());
+
+        // Just add a FullyConnected layer, weights and biases are handled as inputs now.
+        layer = m_Network->AddFullyConnectedLayer(desc, matmulNode.name().c_str());
         ARMNN_ASSERT(layer != nullptr);
 
         auto outputInfo = ComputeOutputInfo({addNode->output(0)}, layer,
                                             {m_TensorsInfo[inputName].m_info->GetShape(),
                                              m_TensorsInfo[weightName].m_info->GetShape()});
-
         layer->GetOutputSlot(0).SetTensorInfo(outputInfo[0]);
 
-        RegisterInputSlots(layer, {inputName});
+        // Add constant layer to store weights/biases and connect to FullyConnected layer..
+        if(m_TensorsInfo[weightName].isConstant())
+        {
+            IConnectableLayer* weightsLayer = m_Network->AddConstantLayer(CreateConstTensor(weightName).first);
+
+            weightInfo.SetConstant();
+            weightsLayer->GetOutputSlot(0).SetTensorInfo(weightInfo);
+            weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
+        }
+
+        if(m_TensorsInfo[biasName].isConstant())
+        {
+            IConnectableLayer* biasLayer = m_Network->AddConstantLayer(CreateConstTensor(biasName).first);
+
+            biasInfo.SetConstant();
+            biasLayer->GetOutputSlot(0).SetTensorInfo(biasInfo);
+            biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
+        }
+
+        RegisterInputSlots(layer, {inputName, weightName, biasName});
         RegisterOutputSlots(layer, {addNode->output(0)});
     }
     else
     {
-        layer = m_Network->AddFullyConnectedLayer(desc,
-                                                  CreateConstTensor(weightName).first,
-                                                  EmptyOptional(),
-                                                  matmulNode.name().c_str());
+        layer = m_Network->AddFullyConnectedLayer(desc, matmulNode.name().c_str());
         ARMNN_ASSERT(layer != nullptr);
 
         auto outputInfo = ComputeOutputInfo({matmulNode.output(0)}, layer,
@@ -1000,7 +1017,18 @@ void OnnxParserImpl::AddFullyConnected(const onnx::NodeProto& matmulNode, const 
                                              m_TensorsInfo[weightName].m_info->GetShape()});
         layer->GetOutputSlot(0).SetTensorInfo(outputInfo[0]);
 
-        RegisterInputSlots(layer, {inputName});
+        // Add constant layer to store weights and connect to FullyConnected layer.
+        if(m_TensorsInfo[weightName].isConstant())
+        {
+            TensorInfo weightInfo = *m_TensorsInfo[weightName].m_info;
+            IConnectableLayer* weightsLayer = m_Network->AddConstantLayer(CreateConstTensor(weightName).first);
+
+            weightInfo.SetConstant();
+            weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
+            weightsLayer->GetOutputSlot(0).SetTensorInfo(weightInfo);
+        }
+
+        RegisterInputSlots(layer, {inputName, weightName});
         RegisterOutputSlots(layer, {matmulNode.output(0)});
     }
 }
@@ -1755,6 +1783,7 @@ void OnnxParserImpl::RegisterInputSlots(IConnectableLayer* layer, const std::vec
                         layer->GetNumInputSlots(),
                         CHECK_LOCATION().AsString()));
     }
+
     for (unsigned int slotIndex = 0; slotIndex < layer->GetNumInputSlots(); ++slotIndex)
     {
         std::string tensorId = tensorIds[slotIndex];

@@ -1041,15 +1041,12 @@ void FullyConnectedQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
 {
     const std::string descriptorName{"FullyConnectedQueueDescriptor"};
 
-    uint32_t numInputs = 1;
-    if (!m_Parameters.m_ConstantWeights)
+    uint32_t numInputs = 2;
+    if (m_Parameters.m_BiasEnabled)
     {
-        numInputs = 2;
-        if (m_Parameters.m_BiasEnabled)
-        {
-            numInputs = 3;
-        }
+        numInputs = 3;
     }
+
     ValidateNumInputs(workloadInfo, descriptorName, numInputs);
     ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
@@ -1063,30 +1060,12 @@ void FullyConnectedQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
         throw InvalidArgumentException(descriptorName + ": Input tensor must have 2 or 4 dimensions.");
     }
 
-    TensorInfo weightTensorInfo;
-    if (m_Parameters.m_ConstantWeights)
-    {
-        ValidatePointer(m_Weight, descriptorName, "weight");
-        weightTensorInfo = m_Weight->GetTensorInfo();
-    }
-    else
-    {
-        weightTensorInfo  = workloadInfo.m_InputTensorInfos[1];
-    }
+    TensorInfo weightTensorInfo = workloadInfo.m_InputTensorInfos[1];
     ValidateTensorNumDimensions(weightTensorInfo, descriptorName, 2, "weight");
 
     if (m_Parameters.m_BiasEnabled)
     {
-        TensorInfo biasTensorInfo;
-        if (m_Parameters.m_ConstantWeights)
-        {
-            ValidatePointer(m_Bias, descriptorName, "bias");
-            biasTensorInfo = m_Bias->GetTensorInfo();
-        }
-        else
-        {
-            biasTensorInfo  = workloadInfo.m_InputTensorInfos[2];
-        }
+        TensorInfo biasTensorInfo = workloadInfo.m_InputTensorInfos[2];
         // Validates type and quantization values.
         ValidateBiasTensorQuantization(biasTensorInfo, inputTensorInfo, weightTensorInfo, descriptorName);
         ValidateTensorDataType(biasTensorInfo, GetBiasDataType(inputTensorInfo.GetDataType()), descriptorName, "bias");
@@ -1894,11 +1873,9 @@ void FloorQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     };
 
     ValidateDataTypes(inputTensorInfo,  supportedTypes, descriptorName);
-
-    if (inputTensorInfo != outputTensorInfo)
-    {
-        throw InvalidArgumentException(descriptorName + ": Input and output tensor infos do not match.");
-    }
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+    ValidateTensorQuantizationSpace(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
 void LstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

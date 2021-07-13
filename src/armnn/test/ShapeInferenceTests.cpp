@@ -401,24 +401,16 @@ TEST_CASE("FloorTest")
 
 TEST_CASE("FullyConnectedTest")
 {
-    Graph graph;
-
     const unsigned int inputWidth = 3u;
     const unsigned int inputHeight = 2u;
     const unsigned int inputChannels = 1u;
     const unsigned int outputChannels = 2u;
 
-    auto layer = BuildGraph<FullyConnectedLayer>(&graph,
-                                                 {{1, inputChannels, inputHeight, inputWidth}},
-                                                 FullyConnectedDescriptor(),
-                                                 "fc");
-
-
-    const float Datum = 0.0f;
-    ConstTensor weights({{inputChannels, outputChannels}, DataType::Float32}, &Datum);
-    layer->m_Weight = std::make_unique<ScopedTensorHandle>(weights);
-
-    RunShapeInferenceTest<FullyConnectedLayer>(layer, {{ 1, outputChannels }});
+    CreateGraphAndRunTest<FullyConnectedLayer>({{ 1, inputChannels, inputHeight, inputWidth }, // input
+                                                { inputChannels, outputChannels }},            // weights
+                                               {{ 1, outputChannels }},                        // output
+                                               FullyConnectedDescriptor(),
+                                               "fc");
 }
 
 TEST_CASE("GatherTest")

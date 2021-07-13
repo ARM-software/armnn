@@ -598,14 +598,14 @@ TEST_CASE("CheckGraphConstTensorSharing")
     {
         armnn::Graph graph1;
 
-        armnn::FullyConnectedLayer* const fcLayer =
-                graph1.AddLayer<armnn::FullyConnectedLayer>(armnn::FullyConnectedDescriptor(), "fc");
+        armnn::ConstantLayer* const constantLayer = graph1.AddLayer<armnn::ConstantLayer>("ConstantLayer");
 
         float weight = 1.0f;
         armnn::ConstTensor constTensor({{ 1, 1 }, armnn::DataType::Float32}, &weight);
-        fcLayer->m_Weight = std::make_shared<armnn::ScopedTensorHandle>(constTensor);;
+        constantLayer->m_LayerOutput = std::make_shared<armnn::ScopedTensorHandle>(constTensor);;
+
         // point sharedWeightPtr to graph1's const tensor
-        sharedWeightPtr = fcLayer->m_Weight->GetConstTensor<float>();
+        sharedWeightPtr = constantLayer->m_LayerOutput->GetConstTensor<float>();
 
         graph0 = armnn::Graph(graph1);
         // graph1 goes out of scope

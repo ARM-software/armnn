@@ -8,6 +8,7 @@
 #include <Network.hpp>
 #include <ResolveType.hpp>
 #include <armnn/INetwork.hpp>
+#include "test/GraphUtils.hpp"
 #include <test/TestUtils.hpp>
 
 #include <doctest/doctest.h>
@@ -41,6 +42,7 @@ struct Convolution2dTest
 {
     using LayerType = Convolution2dLayer;
     static const bool isElementWise = false;
+    static const bool isConstTensorAsInputSupported = false;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }  // NHWCin
     static TensorShape GetOutputShape()  { return TensorShape( {1, 3, 3, 4}); }  // NHWCout
@@ -70,6 +72,16 @@ struct Convolution2dTest
 
         return network->AddConvolution2dLayer(descriptor, weights, optionalBias, name);
     }
+
+    static std::vector<IConnectableLayer*> AddConstantLayers(INetwork* network,
+                                                             float scale = 1.f,
+                                                             int32_t offset = 0)
+    {
+        IgnoreUnused(network);
+        IgnoreUnused(scale);
+        IgnoreUnused(offset);
+        return {};
+    }
 };
 
 template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
@@ -78,6 +90,7 @@ struct DWConvolution2dTest
 public:
     using LayerType = DepthwiseConvolution2dLayer;
     static const bool isElementWise = false;
+    static const bool isConstTensorAsInputSupported = false;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }   // [N,H,W,Cin]
     static TensorShape GetOutputShape()  { return TensorShape( {1, 3, 3, 12}); }  // [N,H,W,Cout]
@@ -108,6 +121,16 @@ public:
 
         return network->AddDepthwiseConvolution2dLayer(descriptor, weights, optionalBias, name);
     }
+
+    static std::vector<IConnectableLayer*> AddConstantLayers(INetwork* network,
+                                                             float scale = 1.f,
+                                                             int32_t offset = 0)
+    {
+        IgnoreUnused(network);
+        IgnoreUnused(scale);
+        IgnoreUnused(offset);
+        return {};
+    }
 };
 
 template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
@@ -116,6 +139,7 @@ struct FullyConnectedTest
 public:
     using LayerType = FullyConnectedLayer;
     static const bool isElementWise = false;
+    static const bool isConstTensorAsInputSupported = true;
 
     static TensorShape GetInputShape()   { return TensorShape( {2, 5, 1, 1}); } // NCinHW
     static TensorShape GetOutputShape()  { return TensorShape( {2, 3}); }       // NCout
@@ -129,18 +153,31 @@ public:
                                                float scale = 1.f,
                                                int32_t offset = 0)
     {
+        IgnoreUnused(scale);
+        IgnoreUnused(offset);
+
         FullyConnectedDescriptor descriptor;
         descriptor.m_BiasEnabled = false;
 
+        return network->AddFullyConnectedLayer(descriptor, name);
+    }
+
+    static std::vector<IConnectableLayer*> AddConstantLayers(INetwork* network,
+                                                             float scale = 1.f,
+                                                             int32_t offset = 0)
+    {
         std::vector<float> weightsData   = { 1,  2,  3,  4,  5,
                                              6,  7,  8,  9, 10,
-                                            11, 12, 13, 14, 15};
+                                             11, 12, 13, 14, 15};
         std::vector<T>     weightsVector = armnnUtils::QuantizedVector<T>(weightsData, scale, offset);
-        TensorInfo         weightsInfo(GetWeightsShape(), ArmnnType, scale, offset);
+        TensorInfo         weightsInfo(GetWeightsShape(), ArmnnType, scale, offset, true);
         ConstTensor        weights(weightsInfo, weightsVector);
-        Optional<ConstTensor> optionalBias;
 
-        return network->AddFullyConnectedLayer(descriptor, weights, optionalBias, name);
+        IConnectableLayer* weightsLayer = network->AddConstantLayer(weights, "Weights");
+        weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
+
+        std::vector<IConnectableLayer*> layers = { weightsLayer };
+        return layers;
     }
 };
 
@@ -150,6 +187,7 @@ struct BatchNormTest
 public:
     using LayerType = BatchNormalizationLayer;
     static const bool isElementWise = false;
+    static const bool isConstTensorAsInputSupported = false;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }  // NHWCin
     static TensorShape GetOutputShape()  { return TensorShape( {1, 4, 4, 3}); }  // NHWCout
@@ -181,6 +219,16 @@ public:
 
         return network->AddBatchNormalizationLayer(descriptor, mean, variance, beta, gamma, name);
     }
+
+    static std::vector<IConnectableLayer*> AddConstantLayers(INetwork* network,
+                                                             float scale = 1.f,
+                                                             int32_t offset = 0)
+    {
+        IgnoreUnused(network);
+        IgnoreUnused(scale);
+        IgnoreUnused(offset);
+        return {};
+    }
 };
 
 template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
@@ -188,6 +236,7 @@ struct MultiplicationTest
 {
     using LayerType = MultiplicationLayer;
     static const bool isElementWise = true;
+    static const bool isConstTensorAsInputSupported = false;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }  // NHWCin
     static TensorShape GetOutputShape()  { return TensorShape( {1, 4, 4, 3}); }  // NHWCout
@@ -205,6 +254,16 @@ struct MultiplicationTest
 
         return network->AddMultiplicationLayer(name);
     }
+
+    static std::vector<IConnectableLayer*> AddConstantLayers(INetwork* network,
+                                                             float scale = 1.f,
+                                                             int32_t offset = 0)
+    {
+        IgnoreUnused(network);
+        IgnoreUnused(scale);
+        IgnoreUnused(offset);
+        return {};
+    }
 };
 
 template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
@@ -212,6 +271,7 @@ struct AdditionTest
 {
     using LayerType = AdditionLayer;
     static const bool isElementWise = true;
+    static const bool isConstTensorAsInputSupported = false;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }  // NHWCin
     static TensorShape GetOutputShape()  { return TensorShape( {1, 4, 4, 3}); }  // NHWCout
@@ -229,6 +289,16 @@ struct AdditionTest
 
         return network->AddAdditionLayer(name);
     }
+
+    static std::vector<IConnectableLayer*> AddConstantLayers(INetwork* network,
+                                                             float scale = 1.f,
+                                                             int32_t offset = 0)
+    {
+        IgnoreUnused(network);
+        IgnoreUnused(scale);
+        IgnoreUnused(offset);
+        return {};
+    }
 };
 
 template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
@@ -236,6 +306,7 @@ struct SubtractionTest
 {
     using LayerType = SubtractionLayer;
     static const bool isElementWise = true;
+    static const bool isConstTensorAsInputSupported = false;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }  // NHWCin
     static TensorShape GetOutputShape()  { return TensorShape( {1, 4, 4, 3}); }  // NHWCout
@@ -253,6 +324,16 @@ struct SubtractionTest
 
         return network->AddSubtractionLayer(name);
     }
+
+    static std::vector<IConnectableLayer*> AddConstantLayers(INetwork* network,
+                                                             float scale = 1.f,
+                                                             int32_t offset = 0)
+    {
+        IgnoreUnused(network);
+        IgnoreUnused(scale);
+        IgnoreUnused(offset);
+        return {};
+    }
 };
 
 template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
@@ -260,6 +341,7 @@ struct DivisionTest
 {
     using LayerType = DivisionLayer;
     static const bool isElementWise = true;
+    static const bool isConstTensorAsInputSupported = false;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }  // NHWCin
     static TensorShape GetOutputShape()  { return TensorShape( {1, 4, 4, 3}); }  // NHWCout
@@ -277,11 +359,21 @@ struct DivisionTest
 
         return network->AddDivisionLayer(name);
     }
+
+    static std::vector<IConnectableLayer*> AddConstantLayers(INetwork* network,
+                                                             float scale = 1.f,
+                                                             int32_t offset = 0)
+    {
+        IgnoreUnused(network);
+        IgnoreUnused(scale);
+        IgnoreUnused(offset);
+        return {};
+    }
 };
 
 template<typename LayerTest,
          DataType ArmnnType>
-INetworkPtr CreatNetwork(ActivationDescriptor activationDescriptor, bool preventFusing,
+INetworkPtr CreateNetwork(ActivationDescriptor activationDescriptor, bool preventFusing,
                          float scale, int32_t offset)
 {
     // Create a network
@@ -299,6 +391,20 @@ INetworkPtr CreatNetwork(ActivationDescriptor activationDescriptor, bool prevent
 
     IConnectableLayer* outputLayer  = network->AddOutputLayer(0);
     IConnectableLayer* output2Layer = preventFusing?network->AddOutputLayer(1):nullptr;
+
+    // If ConstTensorAsInputs is supported weights and bias are stored as constant layers.
+    if(LayerTest::isConstTensorAsInputSupported)
+    {
+        std::vector<IConnectableLayer*> constantLayers = LayerTest::AddConstantLayers(network.get(),
+                                                                                      scale,
+                                                                                      offset);
+
+        // Connect constant layers to receiverLayer.
+        for (unsigned int i = 0; i < constantLayers.size(); ++i)
+        {
+            constantLayers[i]->GetOutputSlot(0).Connect(receiverLayer->GetInputSlot(i + 1));
+        }
+    }
 
     // Define layers information
     TensorInfo inputInfo(LayerTest::GetInputShape(), ArmnnType, scale, offset);
@@ -335,7 +441,7 @@ void FuseActivationIntoPreviousLayerTest(ActivationDescriptor activationDescript
 {
     // FIRST NETWORK: Fused
     // Construct ArmNN network
-    INetworkPtr networkFused = CreatNetwork<LayerTest, ArmnnType>(activationDescriptor, false, scale, offset);
+    INetworkPtr networkFused = CreateNetwork<LayerTest, ArmnnType>(activationDescriptor, false, scale, offset);
 
     // Create ArmNN runtime
     IRuntimePtr run = IRuntime::Create(IRuntime::CreationOptions()); // default options
@@ -350,12 +456,31 @@ void FuseActivationIntoPreviousLayerTest(ActivationDescriptor activationDescript
             (layer->GetNameStr() == "fused-activation-into-receiverLayer");
     };
 
-    CHECK(3 == graphFused.GetNumLayers());
-    CHECK(CheckSequence(graphFused.cbegin(),
-                             graphFused.cend(),
-                             &IsLayerOfType<InputLayer>,
-                             checkFusedConv2d,
-                             &IsLayerOfType<OutputLayer>));
+    // If ConstTensorAsInputs is supported, weights and bias are stored as constant layers.
+    if(LayerTest::isConstTensorAsInputSupported)
+    {
+        CHECK(4 == graphFused.GetNumLayers());
+        CHECK(CheckSequence(graphFused.cbegin(),
+                            graphFused.cend(),
+                            &IsLayerOfType<InputLayer>,
+                            &IsLayerOfType<ConstantLayer>,
+                            checkFusedConv2d,
+                            &IsLayerOfType<OutputLayer>));
+
+        // Check if new constant layer is connected to fused receiver layer.
+        Layer* fusedReceiverLayer = GetFirstLayerWithName(graphFused, "fused-activation-into-receiverLayer");
+        CHECK(fusedReceiverLayer);
+        CHECK(fusedReceiverLayer->GetInputSlot(1).GetConnection() != nullptr);
+    }
+    else
+    {
+        CHECK(3 == graphFused.GetNumLayers());
+        CHECK(CheckSequence(graphFused.cbegin(),
+                            graphFused.cend(),
+                            &IsLayerOfType<InputLayer>,
+                            checkFusedConv2d,
+                            &IsLayerOfType<OutputLayer>));
+    }
 
     // Load network into runtime
     NetworkId networkIdentifier;
@@ -376,7 +501,7 @@ void FuseActivationIntoPreviousLayerTest(ActivationDescriptor activationDescript
 
     // SECOND NETWORK: NotFused
     // Construct ArmNN network
-    INetworkPtr networkNotFused = CreatNetwork<LayerTest, ArmnnType>(activationDescriptor, true, scale, offset);
+    INetworkPtr networkNotFused = CreateNetwork<LayerTest, ArmnnType>(activationDescriptor, true, scale, offset);
 
     // Create ArmNN runtime
     IRuntimePtr runNotFused = IRuntime::Create(IRuntime::CreationOptions()); // default options
@@ -386,14 +511,30 @@ void FuseActivationIntoPreviousLayerTest(ActivationDescriptor activationDescript
 
     Graph& graphNotFused = GetGraphForTesting(optNetNotFused.get());
 
-    CHECK(5 == graphNotFused.GetNumLayers());
-    CHECK(CheckSequence(graphNotFused.cbegin(),
-                             graphNotFused.cend(),
-                             &IsLayerOfType<InputLayer>,
-                             &IsLayerOfType<LayerType>,
-                             &IsLayerOfType<ActivationLayer>,
-                             &IsLayerOfType<OutputLayer>,
-                             &IsLayerOfType<OutputLayer>));
+    // If ConstTensorAsInputs is supported, weights and bias are stored as constant layers.
+    if(LayerTest::isConstTensorAsInputSupported)
+    {
+        CHECK(6 == graphNotFused.GetNumLayers());
+        CHECK(CheckSequence(graphNotFused.cbegin(),
+                            graphNotFused.cend(),
+                            &IsLayerOfType<InputLayer>,
+                            &IsLayerOfType<ConstantLayer>,
+                            &IsLayerOfType<LayerType>,
+                            &IsLayerOfType<ActivationLayer>,
+                            &IsLayerOfType<OutputLayer>,
+                            &IsLayerOfType<OutputLayer>));
+    }
+    else
+    {
+        CHECK(5 == graphNotFused.GetNumLayers());
+        CHECK(CheckSequence(graphNotFused.cbegin(),
+                            graphNotFused.cend(),
+                            &IsLayerOfType<InputLayer>,
+                            &IsLayerOfType<LayerType>,
+                            &IsLayerOfType<ActivationLayer>,
+                            &IsLayerOfType<OutputLayer>,
+                            &IsLayerOfType<OutputLayer>));
+    }
 
     // Load network into runtime
     NetworkId networkIdentifierNotFused;
@@ -433,7 +574,7 @@ bool FuseActivationSimpleTest(ActivationDescriptor activationDescriptor, Compute
     try
     {
         // Construct ArmNN network
-        INetworkPtr networkFused = CreatNetwork<LayerTest, ArmnnType>(activationDescriptor, false, scale, offset);
+        INetworkPtr networkFused = CreateNetwork<LayerTest, ArmnnType>(activationDescriptor, false, scale, offset);
 
         // Create ArmNN runtime
         IRuntimePtr run = IRuntime::Create(IRuntime::CreationOptions()); // default options

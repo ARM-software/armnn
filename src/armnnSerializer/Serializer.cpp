@@ -1126,7 +1126,6 @@ void SerializerStrategy::SerializeQuantizeLayer(const armnn::IConnectableLayer *
 // Build FlatBuffer for FullyConnected Layer
 void SerializerStrategy::SerializeFullyConnectedLayer(const armnn::IConnectableLayer* layer,
                                                       const armnn::FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                      const std::vector<armnn::ConstTensor>& constants,
                                                       const char*)
 {
     // Create FlatBuffer BaseLayer
@@ -1139,28 +1138,10 @@ void SerializerStrategy::SerializeFullyConnectedLayer(const armnn::IConnectableL
                                                    fullyConnectedDescriptor.m_TransposeWeightMatrix,
                                                    fullyConnectedDescriptor.m_ConstantWeights);
 
-    // Create FlatBuffer weights data
-    flatbuffers::Offset<serializer::ConstTensor> flatBufferWeights;
-    // Create FlatBuffer bias data
-    flatbuffers::Offset<serializer::ConstTensor> flatBufferBiases;
-    if (fullyConnectedDescriptor.m_ConstantWeights && !constants.empty())
-    {
-        armnn::ConstTensor weights = constants.at(0);
-        flatBufferWeights = CreateConstTensorInfo(weights);
-
-        if (fullyConnectedDescriptor.m_BiasEnabled)
-        {
-            armnn::ConstTensor biases = constants.at(1);
-            flatBufferBiases = CreateConstTensorInfo(biases);
-        }
-    }
-
     // Create FlatBuffer FullyConnectedLayer
     auto flatBufferLayer = serializer::CreateFullyConnectedLayer(m_flatBufferBuilder,
                                                                  flatBufferBaseLayer,
-                                                                 flatBufferDescriptor,
-                                                                 flatBufferWeights,
-                                                                 flatBufferBiases);
+                                                                 flatBufferDescriptor);
 
     // Add created FullyConnectedLayer to the FlatBufferLayers
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_FullyConnectedLayer);
@@ -1916,7 +1897,8 @@ flatbuffers::Offset<armnnSerializer::FeatureCompatibilityVersions> SerializerStr
         serializer::CreateFeatureCompatibilityVersions(
                 m_flatBufferBuilder,
                 1, // Binding ids scheme version
-                1  // Weights layout scheme version
+                1, // Weights layout scheme version
+                1  // Constant tensors as inputs version
             );
     return versionsTable;
 }
@@ -2110,7 +2092,7 @@ void SerializerStrategy::ExecuteStrategy(const armnn::IConnectableLayer* layer,
         {
             const armnn::FullyConnectedDescriptor& layerDescriptor =
                     static_cast<const armnn::FullyConnectedDescriptor&>(descriptor);
-            SerializeFullyConnectedLayer(layer, layerDescriptor, constants, name);
+            SerializeFullyConnectedLayer(layer, layerDescriptor, name);
             break;
         }
         case armnn::LayerType::Gather :

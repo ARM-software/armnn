@@ -1685,7 +1685,8 @@ struct TensorInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_QUANTIZATIONSCALES = 12,
     VT_QUANTIZATIONDIM = 14,
     VT_DIMENSIONALITY = 16,
-    VT_DIMENSIONSPECIFICITY = 18
+    VT_DIMENSIONSPECIFICITY = 18,
+    VT_ISCONSTANT = 20
   };
   const flatbuffers::Vector<uint32_t> *dimensions() const {
     return GetPointer<const flatbuffers::Vector<uint32_t> *>(VT_DIMENSIONS);
@@ -1711,6 +1712,9 @@ struct TensorInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<uint8_t> *dimensionSpecificity() const {
     return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_DIMENSIONSPECIFICITY);
   }
+  bool isConstant() const {
+    return GetField<uint8_t>(VT_ISCONSTANT, 0) != 0;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_DIMENSIONS) &&
@@ -1724,6 +1728,7 @@ struct TensorInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint32_t>(verifier, VT_DIMENSIONALITY) &&
            VerifyOffset(verifier, VT_DIMENSIONSPECIFICITY) &&
            verifier.VerifyVector(dimensionSpecificity()) &&
+           VerifyField<uint8_t>(verifier, VT_ISCONSTANT) &&
            verifier.EndTable();
   }
 };
@@ -1756,6 +1761,9 @@ struct TensorInfoBuilder {
   void add_dimensionSpecificity(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> dimensionSpecificity) {
     fbb_.AddOffset(TensorInfo::VT_DIMENSIONSPECIFICITY, dimensionSpecificity);
   }
+  void add_isConstant(bool isConstant) {
+    fbb_.AddElement<uint8_t>(TensorInfo::VT_ISCONSTANT, static_cast<uint8_t>(isConstant), 0);
+  }
   explicit TensorInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1777,7 +1785,8 @@ inline flatbuffers::Offset<TensorInfo> CreateTensorInfo(
     flatbuffers::Offset<flatbuffers::Vector<float>> quantizationScales = 0,
     uint32_t quantizationDim = 0,
     uint32_t dimensionality = 1,
-    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> dimensionSpecificity = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> dimensionSpecificity = 0,
+    bool isConstant = false) {
   TensorInfoBuilder builder_(_fbb);
   builder_.add_dimensionSpecificity(dimensionSpecificity);
   builder_.add_dimensionality(dimensionality);
@@ -1786,6 +1795,7 @@ inline flatbuffers::Offset<TensorInfo> CreateTensorInfo(
   builder_.add_quantizationOffset(quantizationOffset);
   builder_.add_quantizationScale(quantizationScale);
   builder_.add_dimensions(dimensions);
+  builder_.add_isConstant(isConstant);
   builder_.add_dataType(dataType);
   return builder_.Finish();
 }
@@ -1799,7 +1809,8 @@ inline flatbuffers::Offset<TensorInfo> CreateTensorInfoDirect(
     const std::vector<float> *quantizationScales = nullptr,
     uint32_t quantizationDim = 0,
     uint32_t dimensionality = 1,
-    const std::vector<uint8_t> *dimensionSpecificity = nullptr) {
+    const std::vector<uint8_t> *dimensionSpecificity = nullptr,
+    bool isConstant = false) {
   auto dimensions__ = dimensions ? _fbb.CreateVector<uint32_t>(*dimensions) : 0;
   auto quantizationScales__ = quantizationScales ? _fbb.CreateVector<float>(*quantizationScales) : 0;
   auto dimensionSpecificity__ = dimensionSpecificity ? _fbb.CreateVector<uint8_t>(*dimensionSpecificity) : 0;
@@ -1812,7 +1823,8 @@ inline flatbuffers::Offset<TensorInfo> CreateTensorInfoDirect(
       quantizationScales__,
       quantizationDim,
       dimensionality,
-      dimensionSpecificity__);
+      dimensionSpecificity__,
+      isConstant);
 }
 
 struct ByteData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -10124,7 +10136,8 @@ struct FeatureCompatibilityVersions FLATBUFFERS_FINAL_CLASS : private flatbuffer
   typedef FeatureCompatibilityVersionsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_BINDINGIDSSCHEME = 4,
-    VT_WEIGHTSLAYOUTSCHEME = 6
+    VT_WEIGHTSLAYOUTSCHEME = 6,
+    VT_CONSTANTTENSORSASINPUTS = 8
   };
   uint32_t bindingIdsScheme() const {
     return GetField<uint32_t>(VT_BINDINGIDSSCHEME, 0);
@@ -10132,10 +10145,14 @@ struct FeatureCompatibilityVersions FLATBUFFERS_FINAL_CLASS : private flatbuffer
   uint32_t weightsLayoutScheme() const {
     return GetField<uint32_t>(VT_WEIGHTSLAYOUTSCHEME, 0);
   }
+  uint32_t constantTensorsAsInputs() const {
+    return GetField<uint32_t>(VT_CONSTANTTENSORSASINPUTS, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_BINDINGIDSSCHEME) &&
            VerifyField<uint32_t>(verifier, VT_WEIGHTSLAYOUTSCHEME) &&
+           VerifyField<uint32_t>(verifier, VT_CONSTANTTENSORSASINPUTS) &&
            verifier.EndTable();
   }
 };
@@ -10149,6 +10166,9 @@ struct FeatureCompatibilityVersionsBuilder {
   }
   void add_weightsLayoutScheme(uint32_t weightsLayoutScheme) {
     fbb_.AddElement<uint32_t>(FeatureCompatibilityVersions::VT_WEIGHTSLAYOUTSCHEME, weightsLayoutScheme, 0);
+  }
+  void add_constantTensorsAsInputs(uint32_t constantTensorsAsInputs) {
+    fbb_.AddElement<uint32_t>(FeatureCompatibilityVersions::VT_CONSTANTTENSORSASINPUTS, constantTensorsAsInputs, 0);
   }
   explicit FeatureCompatibilityVersionsBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -10165,8 +10185,10 @@ struct FeatureCompatibilityVersionsBuilder {
 inline flatbuffers::Offset<FeatureCompatibilityVersions> CreateFeatureCompatibilityVersions(
     flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t bindingIdsScheme = 0,
-    uint32_t weightsLayoutScheme = 0) {
+    uint32_t weightsLayoutScheme = 0,
+    uint32_t constantTensorsAsInputs = 0) {
   FeatureCompatibilityVersionsBuilder builder_(_fbb);
+  builder_.add_constantTensorsAsInputs(constantTensorsAsInputs);
   builder_.add_weightsLayoutScheme(weightsLayoutScheme);
   builder_.add_bindingIdsScheme(bindingIdsScheme);
   return builder_.Finish();

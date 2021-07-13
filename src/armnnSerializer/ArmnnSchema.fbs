@@ -69,6 +69,7 @@ table TensorInfo {
     quantizationDim:uint;
     dimensionality:uint = 1;
     dimensionSpecificity:[bool];
+    isConstant:bool = false;
 }
 
 struct Connection {
@@ -324,7 +325,7 @@ table FloorLayer{
 table FullyConnectedLayer {
     base:LayerBase;
     descriptor:FullyConnectedDescriptor;
-    weights:ConstTensor;
+    weights:ConstTensor; // ConstTensors are now passed as inputs.
     biases:ConstTensor;
 }
 
@@ -1007,6 +1008,7 @@ table AnyLayer {
 table FeatureCompatibilityVersions {
   bindingIdsScheme:uint = 0;
   weightsLayoutScheme:uint = 0;
+  constantTensorsAsInputs:uint = 0;
 }
 
 // Root type for serialized data is the graph of the network

@@ -425,19 +425,13 @@ int StridedSliceDescriptor::GetStopForAxis(const TensorShape& inputShape,
 
 }
 
-uint32_t FullyConnectedDescriptor::GetNumViews() const
+uint32_t FullyConnectedDescriptor::GetNumInputs() const
 {
-    // Return 1 with constant weights, otherwise check if bias is enabled
-    uint32_t numInputs = 1;
-    if (!m_ConstantWeights)
+    // Return 2 otherwise check if bias is enabled
+    unsigned int numInputs = 2;
+    if (m_BiasEnabled)
     {
-        // non-const weights
-        numInputs = 2;
-        if (m_BiasEnabled)
-        {
-            // non-const bias
-            numInputs = 3;
-        }
+        numInputs = 3;
     }
     return numInputs;
 }

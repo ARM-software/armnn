@@ -555,6 +555,9 @@ CreateConstTensorImpl(TfLiteParserImpl::BufferRawPtr bufferPtr,
         ::memcpy(data.get(), bufferPtr->data.data(), tensorInfo.GetNumBytes());
     }
 
+    // Make sure isConstant flag is set.
+    tensorInfo.SetConstant();
+
     return std::make_pair(ConstTensor(tensorInfo, data.get()), std::move(data));
 }
 
@@ -2571,42 +2574,26 @@ void TfLiteParserImpl::ParseFullyConnected(size_t subgraphIndex, size_t operator
     armnn::IConnectableLayer* layer = nullptr;
     auto layerName = fmt::format("FullyConnected:{}:{}", subgraphIndex, operatorIndex);
 
-    Optional<ConstTensor> filterOptionalConstTensor;
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    // Add the first input tensor to the registration list
+    std::vector<unsigned int> tensorIndexesToRegister = {inputTensorIndexes[0]};
+    std::vector<unsigned int> ignoreInputWhenRegister = {};
 
     desc.m_ConstantWeights = IsConstTensor(inputs[1]);
 
-    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    std::vector<unsigned int> tensorIndexesToRegister = {inputTensorIndexes[0]};
-    if (desc.m_ConstantWeights)
-    {
-        filterOptionalConstTensor = Optional<ConstTensor>(CreateConstTensorNonPermuted(inputs[1], filterTensorInfo));
-    }
-    else
-    {
-        // Non const weights will need to be registered as inputs
-        tensorIndexesToRegister.emplace_back(inputTensorIndexes[1]);
-    }
+    // Add the weights input to the registration list, constant layers will be added by SetupConstantLayers if constant.
+    tensorIndexesToRegister.emplace_back(inputTensorIndexes[1]);
 
-    Optional<ConstTensor> biasOptionalConstTensor;
     if (inputs.size() == 3)
     {
         desc.m_BiasEnabled = true;
-        if (desc.m_ConstantWeights)
-        {
-            TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
-            biasOptionalConstTensor   =  Optional<ConstTensor>(CreateConstTensorNonPermuted(inputs[2], biasTensorInfo));
-        }
-        else
-        {
-            // Non const biases will need to be registered as inputs
-            tensorIndexesToRegister.emplace_back(inputTensorIndexes[2]);
-        }
+
+        // Add the biases input to the registration list, constant layer will be added by SetupConstantLayers.
+        tensorIndexesToRegister.emplace_back(inputTensorIndexes[2]);
     }
 
-    layer = m_Network->AddFullyConnectedLayer(desc,
-                                              filterOptionalConstTensor,
-                                              biasOptionalConstTensor,
-                                              layerName.c_str());
+    // Filters and biases are always passed to fully connected as inputs
+    layer = m_Network->AddFullyConnectedLayer(desc, layerName.c_str());
 
     ARMNN_ASSERT(layer != nullptr);
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
@@ -3732,6 +3719,7 @@ void TfLiteParserImpl::RegisterInputSlots(size_t subgraphIndex,
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
     ARMNN_ASSERT(layer != nullptr);
+
     if (tensorIndexes.size() + startingSlotIndex != layer->GetNumInputSlots())
     {
         throw ParseException(
@@ -3831,19 +3819,27 @@ void TfLiteParserImpl::SetupConstantLayers(size_t subgraphIndex)
                 m_SubgraphConnections[subgraphIndex][tensorIndex].inputSlots.size() > 0)
             {
                 TensorRawPtr tensorPtr = subgraphPtr->tensors[tensorIndex].get();
-                armnn::TensorInfo tensorInfo = ToTensorInfo(tensorPtr);
-                auto tensorAndData = CreateConstTensorNonPermuted(tensorPtr, tensorInfo);
 
-                std::string layerName = fmt::format("Constant:{}", tensorPtr->name);
-                IConnectableLayer *layer =
-                    m_Network->AddConstantLayer(tensorAndData, layerName.c_str());
+                if(IsConstTensor(tensorPtr))
+                {
+                    armnn::TensorInfo tensorInfo = ToTensorInfo(tensorPtr);
+                    auto tensorAndData = CreateConstTensorNonPermuted(tensorPtr, tensorInfo);
 
-                layer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-                RegisterOutputSlots(subgraphIndex,
-                                    VIRTUAL_OPERATOR_ID,
-                                    layer,
-                                    { tensorIndex });
+                    std::string layerName = fmt::format("Constant:{}", tensorPtr->name);
+                    IConnectableLayer *layer = m_Network->AddConstantLayer(tensorAndData, layerName.c_str());
 
+                    layer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+                    RegisterOutputSlots(subgraphIndex,
+                                        VIRTUAL_OPERATOR_ID,
+                                        layer,
+                                        { tensorIndex });
+                }
+                else
+                {
+                    throw ParseException(
+                            fmt::format("Invalid Tensor: Tensor should be constant. {}",
+                                        CHECK_LOCATION().AsString()));
+                }
             }
         }
     }
@@ -3863,6 +3859,9 @@ TfLiteParserImpl::CreateConstTensorAndStoreData(TfLiteParserImpl::BufferRawPtr b
                                             armnn::TensorInfo& tensorInfo,
                                             armnn::Optional<armnn::PermutationVector&> permutationVector)
 {
+    // Make sure isConstant flag is set.
+    tensorInfo.SetConstant();
+
     auto constData = CreateConstTensorImpl<T>(bufferPtr,
                                               tensorPtr,
                                               tensorInfo,
@@ -3885,7 +3884,6 @@ bool TfLiteParserImpl::IsConstTensor(TensorRawPtr tensorPtr)
     return isConst;
 }
 
-
 std::pair<armnn::ConstTensor, TfLiteParserImpl::SupportedDataStorage>
 TfLiteParserImpl::CreateConstTensorPermuted(TensorRawPtr tensorPtr,
                                             armnn::TensorInfo& tensorInfo,
@@ -3894,6 +3892,9 @@ TfLiteParserImpl::CreateConstTensorPermuted(TensorRawPtr tensorPtr,
     CHECK_TENSOR_PTR(tensorPtr);
     auto bufferPtr = GetBuffer(m_Model, tensorPtr->buffer);
     CHECK_BUFFER_SIZE(bufferPtr, tensorInfo, tensorPtr->buffer);
+
+    // Make sure isConstant flag is set.
+    tensorInfo.SetConstant();
 
     switch (tensorInfo.GetDataType())
     {
@@ -3940,6 +3941,9 @@ armnn::ConstTensor TfLiteParserImpl::CreateConstTensorNonPermuted(TensorRawPtr t
     CHECK_TENSOR_PTR(tensorPtr);
     auto bufferPtr = GetBuffer(m_Model, tensorPtr->buffer);
     CHECK_BUFFER_SIZE(bufferPtr, tensorInfo, tensorPtr->buffer);
+
+    // Make sure isConstant flag is set.
+    tensorInfo.SetConstant();
 
     return ConstTensor(tensorInfo, bufferPtr->data.data());
 }

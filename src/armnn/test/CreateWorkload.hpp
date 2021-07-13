@@ -1193,7 +1193,7 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWorkloadTest(armnn::
 {
     // Creates the layer we're testing.
     FullyConnectedDescriptor layerDesc;
-    layerDesc.m_BiasEnabled = true;
+    layerDesc.m_BiasEnabled = false;
     layerDesc.m_TransposeWeightMatrix = true;
 
     FullyConnectedLayer* const layer = graph.AddLayer<FullyConnectedLayer>(layerDesc, "layer");
@@ -1201,17 +1201,24 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWorkloadTest(armnn::
     float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
     float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
 
+    // As optimization isn't run member variables need to be updated.
     layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({7, 20}, DataType, inputsQScale, 0));
-    layer->m_Bias   = std::make_unique<ScopedTensorHandle>(TensorInfo({7}, GetBiasDataType(DataType), inputsQScale));
     layer->m_Weight->Allocate();
-    layer->m_Bias->Allocate();
+
+    armnn::TensorInfo weightsTensorInfo({7, 20}, DataType, inputsQScale);
+    weightsTensorInfo.SetConstant();
 
     // Creates extra layers.
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
+    auto const weights = graph.AddLayer<ConstantLayer>("weights");
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
+    weights->m_LayerOutput = std::make_unique<ScopedTensorHandle>(weightsTensorInfo);
+    weights->m_LayerOutput->Allocate();
+
     // Connects up.
-    Connect(input, layer, TensorInfo({3, 1, 4, 5}, DataType, inputsQScale));
+    Connect(input, layer, TensorInfo({3, 1, 4, 5}, DataType, inputsQScale), 0, 0);
+    Connect(weights, layer, weightsTensorInfo, 0, 1);
     Connect(layer, output, TensorInfo({3, 7}, DataType, outputQScale));
     CreateTensorHandles(graph, factory);
 
@@ -1219,13 +1226,10 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWorkloadTest(armnn::
     auto workload = MakeAndCheckWorkload<FullyConnectedWorkload>(*layer, factory);
 
     FullyConnectedQueueDescriptor queueDescriptor = workload->GetData();
-    CHECK(queueDescriptor.m_Parameters.m_BiasEnabled == true);
     CHECK(queueDescriptor.m_Parameters.m_TransposeWeightMatrix == true);
 
-    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 2);
     CHECK(queueDescriptor.m_Outputs.size() == 1);
-    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({7, 20}, DataType, inputsQScale)));
-    CHECK((queueDescriptor.m_Bias->GetTensorInfo() == TensorInfo({7}, GetBiasDataType(DataType), inputsQScale)));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -1246,10 +1250,16 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWithBlobWorkloadTest
     float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
     float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
 
+    // As optimization isn't run member variables need to be updated.
     layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({7, 20}, DataType, inputsQScale, 0));
     layer->m_Bias   = std::make_unique<ScopedTensorHandle>(TensorInfo({7}, GetBiasDataType(DataType), inputsQScale));
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();
+
+    armnn::TensorInfo weightsTensorInfo({7, 20}, DataType, inputsQScale);
+    armnn::TensorInfo biasesTensorInfo({7}, GetBiasDataType(DataType), inputsQScale);
+    weightsTensorInfo.SetConstant();
+    biasesTensorInfo.SetConstant();
 
     auto activationDesc = std::make_shared<ActivationDescriptor>();
     activationDesc->m_A        = 10.0f;
@@ -1267,10 +1277,19 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWithBlobWorkloadTest
 
     // Creates extra layers.
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
+    auto const weights = graph.AddLayer<ConstantLayer>("weights");
+    auto const biases = graph.AddLayer<ConstantLayer>("biases");
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
+    weights->m_LayerOutput = std::make_unique<ScopedTensorHandle>(weightsTensorInfo);
+    weights->m_LayerOutput->Allocate();
+    biases->m_LayerOutput = std::make_unique<ScopedTensorHandle>(biasesTensorInfo);
+    biases->m_LayerOutput->Allocate();
+
     // Connects up.
-    Connect(input, layer, TensorInfo({3, 1, 4, 5}, DataType, inputsQScale));
+    Connect(input, layer, TensorInfo({3, 1, 4, 5}, DataType, inputsQScale), 0, 0);
+    Connect(weights, layer, weightsTensorInfo, 0, 1);
+    Connect(biases, layer, biasesTensorInfo, 0, 2);
     Connect(layer, output, TensorInfo({3, 7}, DataType, outputQScale));
     CreateTensorHandles(graph, factory);
 
@@ -1290,10 +1309,52 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWithBlobWorkloadTest
 
     CHECK(queueDescriptor.m_Parameters.m_BiasEnabled == true);
     CHECK(queueDescriptor.m_Parameters.m_TransposeWeightMatrix == true);
-    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 3);
     CHECK(queueDescriptor.m_Outputs.size() == 1);
-    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({7, 20}, DataType, inputsQScale)));
-    CHECK((queueDescriptor.m_Bias->GetTensorInfo() == TensorInfo({7}, GetBiasDataType(DataType), inputsQScale)));
+
+    // Returns so we can do extra, backend-specific tests.
+    return workload;
+}
+
+template <typename FullyConnectedWorkload, armnn::DataType DataType>
+std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWorkloadWeightsBiasesAsInputsTest
+    (armnn::IWorkloadFactory& factory,
+     armnn::Graph&            graph)
+{
+    // Creates the layer we're testing.
+    FullyConnectedDescriptor layerDesc;
+    layerDesc.m_BiasEnabled = true;
+    layerDesc.m_TransposeWeightMatrix = true;
+    layerDesc.m_ConstantWeights = false;
+
+    FullyConnectedLayer* const layer = graph.AddLayer<FullyConnectedLayer>(layerDesc, "layer");
+
+    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
+
+    // Creates extra layers with weights and biases as input layers.
+    Layer* const input   = graph.AddLayer<InputLayer>(1, "input");
+    Layer* const weights = graph.AddLayer<InputLayer>(2, "weights");
+    Layer* const biases  = graph.AddLayer<InputLayer>(3, "biases");
+    Layer* const output  = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Connects up.
+    Connect(input, layer, TensorInfo({3, 1, 4, 5}, DataType, inputsQScale), 0, 0);
+    Connect(weights, layer, TensorInfo({7, 20}, DataType, inputsQScale), 0, 1);
+    Connect(biases, layer, TensorInfo({7}, GetBiasDataType(DataType), inputsQScale), 0, 2);
+    Connect(layer, output, TensorInfo({3, 7}, DataType, outputQScale));
+    CreateTensorHandles(graph, factory);
+
+    // Makes the workload and checks it.
+    auto workload = MakeAndCheckWorkload<FullyConnectedWorkload>(*layer, factory);
+
+    FullyConnectedQueueDescriptor queueDescriptor = workload->GetData();
+
+    CHECK(queueDescriptor.m_Parameters.m_BiasEnabled == true);
+    CHECK(queueDescriptor.m_Parameters.m_TransposeWeightMatrix == true);
+    CHECK(queueDescriptor.m_Parameters.m_ConstantWeights == false);
+    CHECK(queueDescriptor.m_Inputs.size() == 3);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
 
     // Returns so we can do extra, backend-specific tests.
     return workload;

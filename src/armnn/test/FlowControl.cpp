@@ -58,7 +58,7 @@ TEST_CASE("ErrorOnLoadNetwork")
         Optimize(*net, backends, runtime->GetDeviceSpec(), OptimizerOptions(), errMessages);
         FAIL("Should have thrown an exception.");
     }
-    catch (const InvalidArgumentException& e)
+    catch (const InvalidArgumentException&)
     {
         // Different exceptions are thrown on different backends
     }

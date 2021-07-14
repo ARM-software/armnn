@@ -194,7 +194,7 @@ void Threadpool::ProcessExecPriorities(uint32_t index)
             cb->Notify(Status::Success, std::make_pair(startTime, armnn::GetTimeNow())) :
             cb->Notify(Status::Failure, std::make_pair(startTime, armnn::GetTimeNow()));
         }
-        catch (const RuntimeException &error)
+        catch (const RuntimeException&)
         {
             cb->Notify(Status::Failure, std::make_pair(startTime, armnn::GetTimeNow()));
         }

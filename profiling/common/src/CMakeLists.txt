@@ -28,6 +28,8 @@ if(BUILD_TIMELINE_DECODER)
     # to simplify the build. No extra .so file to deploy to boards etc.
     add_library_ex(pipeCommon STATIC ${pipeCommon_sources})
 
+    target_compile_definitions(pipeCommon PRIVATE "ARMNN_COMPILING_DLL")
+
     # install the target
     install(
         TARGETS pipeCommon

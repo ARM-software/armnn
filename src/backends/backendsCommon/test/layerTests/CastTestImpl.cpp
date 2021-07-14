@@ -113,7 +113,7 @@ LayerTestResult<float, 4> CastUInt8ToFloat2dTest(armnn::IWorkloadFactory& worklo
                                                const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
                                                const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    std::vector<u_int8_t> inputValues = { 1, 3, 1, 3, 1, 3, 1, 3, 1,
+    std::vector<uint8_t> inputValues = { 1, 3, 1, 3, 1, 3, 1, 3, 1,
                                          3, 1, 3, 1, 2, 1, 3, 1, 3 };
     std::vector<float> outputValues  = { 1.0f, 3.0f, 1.0f, 3.0f, 1.0f, 3.0f, 1.0f, 3.0f, 1.0f,
                                          3.0f, 1.0f, 3.0f, 1.0f, 2.0f, 1.0f, 3.0f, 1.0f, 3.0f };

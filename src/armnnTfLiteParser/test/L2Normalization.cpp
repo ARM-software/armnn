@@ -8,6 +8,7 @@
 
 #include <string>
 #include <iostream>
+#include <numeric>
 
 TEST_SUITE("TensorflowLiteParser_L2Normalization")
 {

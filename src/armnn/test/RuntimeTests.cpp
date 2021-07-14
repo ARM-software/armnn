@@ -270,7 +270,7 @@ TEST_CASE("IVGCVSW_1929_QuantizedSoftmaxIssue")
                                                       errMessages);
         FAIL("An exception should have been thrown");
     }
-    catch (const InvalidArgumentException& e)
+    catch (const InvalidArgumentException&)
     {
         // Different exceptions are thrown on different backends
     }

@@ -16,6 +16,8 @@
 
 #include <test/TensorHelpers.hpp>
 
+#include <numeric>
+
 namespace
 {
 

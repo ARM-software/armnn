@@ -456,7 +456,7 @@ public:
         for (uint32_t i = 0; i < size; ++i)
         {
             this->operator[](i);
-            decodedTensor.emplace_back(*m_Iterator);
+            decodedTensor.emplace_back(static_cast<float>(*m_Iterator));
         }
 
         return decodedTensor;

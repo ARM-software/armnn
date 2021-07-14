@@ -85,7 +85,7 @@ void Reduce(const TensorInfo& inputInfo,
     {
         case ReduceOperation::Mean:
         case ReduceOperation::Sum:
-            std::fill(tempOut.begin(), tempOut.end(), 0.0);
+            std::fill(tempOut.begin(), tempOut.end(), 0.0f);
             break;
         case ReduceOperation::Max:
             std::fill(tempOut.begin(), tempOut.end(), -1 * std::numeric_limits<float>::max());

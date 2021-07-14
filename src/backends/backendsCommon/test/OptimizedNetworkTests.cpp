@@ -96,7 +96,7 @@ TEST_CASE("OptimizeValidateDeviceNonSupportLayerNoFallback")
         Optimize(*net, backends, runtime->GetDeviceSpec(), armnn::OptimizerOptions(), errMessages);
         FAIL("Should have thrown an exception.");
     }
-    catch (const armnn::InvalidArgumentException& e)
+    catch (const armnn::InvalidArgumentException&)
     {
         // Different exceptions are thrown on different backends
     }
@@ -216,7 +216,7 @@ TEST_CASE("OptimizeValidateWorkloadsUndefinedComputeDevice")
         Optimize(*net, backends, runtime->GetDeviceSpec(), armnn::OptimizerOptions(), errMessages);
         FAIL("Should have thrown an exception.");
     }
-    catch (const armnn::InvalidArgumentException& e)
+    catch (const armnn::InvalidArgumentException&)
     {
         // Different exceptions are thrown on different backends
     }

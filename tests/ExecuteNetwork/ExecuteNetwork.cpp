@@ -9,7 +9,7 @@
 #include <AsyncExecutionCallback.hpp>
 
 #include <armnn/Logging.hpp>
-#include <Filesystem.hpp>
+#include <armnnUtils/Filesystem.hpp>
 #include <InferenceTest.hpp>
 
 #if defined(ARMNN_SERIALIZER)

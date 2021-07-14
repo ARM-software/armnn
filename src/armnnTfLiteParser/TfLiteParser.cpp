@@ -20,7 +20,7 @@
 
 // armnnUtils:
 #include <armnnUtils/Permute.hpp>
-#include <Filesystem.hpp>
+#include <armnnUtils/Filesystem.hpp>
 
 #include <ParserHelper.hpp>
 #include <VerificationHelpers.hpp>

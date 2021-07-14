@@ -12,7 +12,7 @@
 
 #include <Processes.hpp>
 #include <ProfilingService.hpp>
-#include <Threads.hpp>
+#include <armnnUtils/Threads.hpp>
 
 #include <common/include/LabelsAndEventClasses.hpp>
 

@@ -10,7 +10,7 @@
 #include <server/include/timelineDecoder/TimelineDecoder.hpp>
 
 #include <BufferManager.hpp>
-#include <Threads.hpp>
+#include <armnnUtils/Threads.hpp>
 #include <ProfilingService.hpp>
 #include <PacketBuffer.hpp>
 #include <TimelinePacketWriterFactory.hpp>

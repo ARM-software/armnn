@@ -4,7 +4,7 @@
 //
 
 #include "../ProfilingConnectionDumpToFileDecorator.hpp"
-#include <Filesystem.hpp>
+#include <armnnUtils/Filesystem.hpp>
 #include <Runtime.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>

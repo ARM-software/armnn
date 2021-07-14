@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <Filesystem.hpp>
+#include <armnnUtils/Filesystem.hpp>
 #include <cxxopts/cxxopts.hpp>
 
 #include <algorithm>

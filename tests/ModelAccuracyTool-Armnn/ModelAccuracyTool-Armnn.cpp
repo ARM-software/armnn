@@ -7,7 +7,7 @@
 #include "../InferenceTest.hpp"
 #include "ModelAccuracyChecker.hpp"
 #include "armnnDeserializer/IDeserializer.hpp"
-#include <Filesystem.hpp>
+#include <armnnUtils/Filesystem.hpp>
 
 #include <cxxopts/cxxopts.hpp>
 #include <map>

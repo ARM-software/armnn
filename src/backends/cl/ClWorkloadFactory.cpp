@@ -29,7 +29,7 @@
 #include <arm_compute/runtime/CL/CLBufferAllocator.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
 
-#include <Filesystem.hpp>
+#include <armnnUtils/Filesystem.hpp>
 #include <fstream>
 
 namespace armnn

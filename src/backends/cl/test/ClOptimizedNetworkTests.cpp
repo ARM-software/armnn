@@ -12,7 +12,7 @@
 #include <cl/ClWorkloadFactory.hpp>
 #include <cl/ClBackendContext.hpp>
 
-#include <Filesystem.hpp>
+#include <armnnUtils/Filesystem.hpp>
 
 #include <doctest/doctest.h>
 

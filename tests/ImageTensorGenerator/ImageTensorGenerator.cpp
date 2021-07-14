@@ -7,7 +7,7 @@
 #include "../InferenceTestImage.hpp"
 #include <armnn/Logging.hpp>
 #include <armnn/TypesUtils.hpp>
-#include <Filesystem.hpp>
+#include <armnnUtils/Filesystem.hpp>
 
 #include <mapbox/variant.hpp>
 #include <cxxopts/cxxopts.hpp>

@@ -6,7 +6,7 @@
 #include <armnn/Logging.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
 #include "armnn/utility/StringUtils.hpp"
-#include <Filesystem.hpp>
+#include <armnnUtils/Filesystem.hpp>
 
 #include <regex>
 

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "Threads.hpp"
+#include <armnnUtils/Threads.hpp>
 
 #if defined(__linux__)
 #include <unistd.h>

@@ -9,7 +9,7 @@
 #include <ProfilingService.hpp>
 #include <ProfilingUtils.hpp>
 #include <SendTimelinePacket.hpp>
-#include <Threads.hpp>
+#include <armnnUtils/Threads.hpp>
 #include <TimelinePacketWriterFactory.hpp>
 
 #include <common/include/SwTrace.hpp>

@@ -11,7 +11,7 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
 #include <backendsCommon/TensorHandle.hpp>
-#include <Filesystem.hpp>
+#include <armnnUtils/Filesystem.hpp>
 #include <reference/workloads/RefConvolution2dWorkload.hpp>
 #include <Runtime.hpp>
 

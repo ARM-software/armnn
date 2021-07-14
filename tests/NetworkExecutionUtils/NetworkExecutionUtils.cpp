@@ -5,7 +5,7 @@
 
 #include "NetworkExecutionUtils.hpp"
 
-#include <Filesystem.hpp>
+#include <armnnUtils/Filesystem.hpp>
 #include <InferenceTest.hpp>
 #include <ResolveType.hpp>
 

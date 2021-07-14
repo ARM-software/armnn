@@ -24,7 +24,7 @@
 #include <armnnOnnxParser/IOnnxParser.hpp>
 #endif
 
-#include <Filesystem.hpp>
+#include <armnnUtils/Filesystem.hpp>
 #include <HeapProfiling.hpp>
 #include <TensorIOUtils.hpp>
 

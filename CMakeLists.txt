@@ -59,12 +59,13 @@ set(armnnUtils_sources)
 list(APPEND armnnUtils_sources
     include/armnnUtils/DataLayoutIndexed.hpp
     include/armnnUtils/Permute.hpp
+    include/armnnUtils/Filesystem.hpp
     include/armnnUtils/FloatingPointComparison.hpp
     include/armnnUtils/FloatingPointConverter.hpp
     include/armnnUtils/TensorUtils.hpp
+    include/armnnUtils/Threads.hpp
     include/armnnUtils/Transpose.hpp
     src/armnnUtils/BFloat16.hpp
-    src/armnnUtils/Filesystem.hpp
     src/armnnUtils/Filesystem.cpp
     src/armnnUtils/GraphTopologicalSort.hpp
     src/armnnUtils/Half.hpp
@@ -91,7 +92,6 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/QuantizeHelper.hpp
     src/armnnUtils/TensorIOUtils.hpp
     src/armnnUtils/TensorUtils.cpp
-    src/armnnUtils/Threads.hpp
     src/armnnUtils/Threads.cpp
     src/armnnUtils/Transpose.cpp
     )

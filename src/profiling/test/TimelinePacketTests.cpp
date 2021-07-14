@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <Threads.hpp>
+#include <armnnUtils/Threads.hpp>
 #include <ProfilingUtils.hpp>
 
 #include <armnn/utility/NumericCast.hpp>

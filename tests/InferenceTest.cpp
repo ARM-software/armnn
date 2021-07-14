@@ -5,7 +5,7 @@
 #include "InferenceTest.hpp"
 
 #include <armnn/utility/Assert.hpp>
-#include <Filesystem.hpp>
+#include <armnnUtils/Filesystem.hpp>
 
 #include "../src/armnn/Profiling.hpp"
 #include <cxxopts/cxxopts.hpp>

@@ -7,7 +7,7 @@
 #include <common/include/LabelsAndEventClasses.hpp>
 
 
-#include <Threads.hpp>
+#include <armnnUtils/Threads.hpp>
 
 namespace armnn
 {

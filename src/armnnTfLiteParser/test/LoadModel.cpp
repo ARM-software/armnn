@@ -6,7 +6,7 @@
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
-#include <Filesystem.hpp>
+#include <armnnUtils/Filesystem.hpp>
 
 using armnnTfLiteParser::TfLiteParserImpl;
 using ModelPtr = TfLiteParserImpl::ModelPtr;

@@ -13,13 +13,14 @@ namespace armnn
 const BackendCapabilities gpuAccCapabilities("GpuAcc",
                                              {
                                                      {"NonConstWeights", false},
-                                                     {"AsyncExecution", false}
+                                                     {"AsyncExecution", false},
+                                                     {"ProtectedContentAllocation", true}
                                              });
 
 class ClBackend : public IBackendInternal
 {
 public:
-    ClBackend()  = default;
+    ClBackend() : m_EnableCustomAllocator(false) {};
     ~ClBackend() = default;
 
     static const BackendId& GetIdStatic();
@@ -70,6 +71,18 @@ public:
     {
         return gpuAccCapabilities;
     };
+
+    virtual bool UseCustomMemoryAllocator(armnn::Optional<std::string&> errMsg) override
+    {
+        IgnoreUnused(errMsg);
+
+        // Set flag to signal the backend to use a custom memory allocator
+        m_EnableCustomAllocator = true;
+
+        return m_EnableCustomAllocator;
+    }
+
+    bool m_EnableCustomAllocator;
 };
 
 } // namespace armnn

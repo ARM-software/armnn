@@ -6,6 +6,7 @@
 
 #include <armnn/Version.hpp>
 #include <armnn/BackendRegistry.hpp>
+#include <armnn/BackendHelper.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/utility/Timer.hpp>
 
@@ -281,6 +282,32 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
             auto factoryFun = BackendRegistryInstance().GetFactory(id);
             auto backend = factoryFun();
             ARMNN_ASSERT(backend.get() != nullptr);
+
+            // If the runtime is created in protected mode only add backends that support this mode
+            if (options.m_ProtectedMode)
+            {
+                // check if backend supports ProtectedMode
+                using BackendCapability = BackendOptions::BackendOption;
+                BackendCapability protectedContentCapability {"ProtectedContentAllocation", true};
+                if (!HasCapability(protectedContentCapability, id))
+                {
+                    // Protected Content Allocation is not supported by the backend
+                    // backend should not be registered
+                    ARMNN_LOG(warning) << "Backend "
+                                       << id
+                                       << " is not registered as does not support protected content allocation \n";
+                    continue;
+                }
+                std::string err;
+                if (!backend->UseCustomMemoryAllocator(err))
+                {
+                    ARMNN_LOG(error) << "The backend "
+                                     << id
+                                     << " reported an error when entering protected mode. Backend won't be used."
+                                     << " ErrorMsg: " << err;
+                    continue;
+                }
+            }
 
             auto context = backend->CreateBackendContext(options);
 

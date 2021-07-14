@@ -90,6 +90,7 @@ public:
             , m_EnableGpuProfiling(false)
             , m_DynamicBackendsPath("")
             , m_CustomAllocator(nullptr)
+            , m_ProtectedMode(false)
         {}
 
         /// If set, uses the GpuAcc tuned parameters from the given object when executing GPU workloads.
@@ -107,6 +108,12 @@ public:
         /// Set this for when you need to allocate Protected Working Memory, required for ProtectedMode
         /// Only supported for GpuAcc
         ICustomAllocator* m_CustomAllocator;
+
+        /// Setting this flag will allow the user to create the Runtime in protected mode.
+        /// It will run all the inferences on protected memory and will make sure that
+        /// INetworkProperties::m_ImportEnabled set to true with MemorySource::DmaBufProtected option
+        /// This will use Protected Memory Allocator associated with the backend
+        bool m_ProtectedMode;
 
         struct ExternalProfilingOptions
         {

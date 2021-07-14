@@ -560,7 +560,7 @@ void CreateDynamicBackendObjectInvalidInterface6TestImpl()
 
     BackendVersion dynamicBackendVersion;
     CHECK_NOTHROW(dynamicBackendVersion = dynamicBackend->GetBackendVersion());
-    CHECK((dynamicBackendVersion == BackendVersion({ 1, 0 })));
+    CHECK((dynamicBackendVersion >= BackendVersion({ 1, 0 })));
 
     IBackendInternalUniquePtr dynamicBackendInstance1;
     CHECK_THROWS_AS(dynamicBackendInstance1 = dynamicBackend->GetBackend(), RuntimeException);

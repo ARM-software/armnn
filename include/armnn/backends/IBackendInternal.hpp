@@ -56,6 +56,13 @@ struct BackendVersion
                (this->m_Major == other.m_Major &&
                 this->m_Minor <= other.m_Minor);
     }
+
+    bool operator>=(const BackendVersion& other) const
+    {
+        return this->m_Major > other.m_Major ||
+               (this->m_Major == other.m_Major &&
+                this->m_Minor >= other.m_Minor);
+    }
 };
 
 inline std::ostream& operator<<(std::ostream& os, const BackendVersion& backendVersion)
@@ -176,7 +183,7 @@ public:
                                                MemorySourceFlags outputFlags);
 
     /// Returns the version of the Backend API
-    static constexpr BackendVersion GetApiVersion() { return BackendVersion(1, 0); }
+    static constexpr BackendVersion GetApiVersion() { return BackendVersion(1, 1); }
 
     /// Returns a BackendCapability if the backend lists the capability
     /// The BackendCapability must then be inspected to check whether or not that BackendCapability is supported
@@ -189,6 +196,24 @@ public:
     /// Returns true if backend support the capability false otherwise
     ARMNN_DEPRECATED_MSG("This function has been deprecated in favour of GetCapability")
     virtual bool HasCapability(BackendCapability /*capabilityClass*/) const { return false; }
+
+    /// Signals the backend to use a custom memory allocator provided by the user
+    ///
+    /// \param errMsg - Optional string variable to return error messages
+    /// \return - Returns true if switching to custom allocator was successful
+    virtual bool UseCustomMemoryAllocator(armnn::Optional<std::string&> errMsg)
+    {
+        if (errMsg)
+        {
+            std::stringstream message;
+            message << "The backend " << GetId() << " doesn't support using a custom allocator. This error might"
+                                                    " be related with the protected mode if the backend doesn't"
+                                                    " fully support it.";
+
+            errMsg.value() = message.str();
+        }
+        return false;
+    }
 };
 
 using IBackendInternalUniquePtr = std::unique_ptr<IBackendInternal>;

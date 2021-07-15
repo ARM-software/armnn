@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -13,7 +13,7 @@ namespace armnn
 class ScopedTensorHandle;
 
 /// This layer represents a LSTM operation.
-class LstmLayer : public LayerWithParameters<LstmDescriptor>
+class UnidirectionalSequenceLstmLayer : public LayerWithParameters<LstmDescriptor>
 {
 public:
 
@@ -23,7 +23,7 @@ public:
     LstmOptPeepholeParameters m_PeepholeParameters;
     LstmOptLayerNormParameters m_LayerNormParameters;
 
-    /// Makes a workload for the LSTM type.
+    /// Makes a workload for the UnidirectionalSequence LSTM type.
     /// @param [in] graph The graph where this layer can be found.
     /// @param [in] factory The workload factory which will create the workload.
     /// @return A pointer to the created workload, or nullptr if not created.
@@ -31,10 +31,10 @@ public:
 
     /// Creates a dynamically-allocated copy of this layer.
     /// @param [in] graph The graph into which this layer is being cloned.
-    LstmLayer* Clone(Graph& graph) const override;
+    UnidirectionalSequenceLstmLayer* Clone(Graph& graph) const override;
 
     /// Check if the input tensor shape(s)
-    /// will lead to a valid configuration of @ref LstmLayer.
+    /// will lead to a valid configuration of @ref UnidirectionalSequenceLstmLayer.
     /// @param [in] shapeInferenceMethod Indicates if output shape shall be overwritten or just validated.
     void ValidateTensorShapesFromInputs() override;
 
@@ -49,13 +49,13 @@ public:
     void ExecuteStrategy(IStrategy& strategy) const override;
 
 protected:
-    /// Constructor to create a LstmLayer.
+    /// Constructor to create a UnidirectionalSequenceLstmLayer.
     /// @param [in] param LstmDescriptor to configure the lstm operation.
     /// @param [in] name Optional name for the layer.
-    LstmLayer(const LstmDescriptor& param, const char* name);
+    UnidirectionalSequenceLstmLayer(const LstmDescriptor& param, const char* name);
 
     /// Default destructor
-    ~LstmLayer() = default;
+    ~UnidirectionalSequenceLstmLayer() = default;
 
     /// Retrieve the handles to the constant values stored by the layer.
     /// @return A vector of the constant tensors stored by this layer.

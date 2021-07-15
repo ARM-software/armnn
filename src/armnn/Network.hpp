@@ -269,6 +269,10 @@ public:
     IConnectableLayer* AddTransposeLayer(const TransposeDescriptor& transposeDescriptor,
                                          const char* name = nullptr);
 
+    IConnectableLayer* AddUnidirectionalSequenceLstmLayer(const UnidirectionalSequenceLstmDescriptor& descriptor,
+                                                          const LstmInputParams& params,
+                                                          const char* name = nullptr);
+
     void Accept(ILayerVisitor& visitor) const;
 
     void ExecuteStrategy(IStrategy& strategy) const;

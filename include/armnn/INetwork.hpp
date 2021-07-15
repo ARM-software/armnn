@@ -691,6 +691,15 @@ public:
     IConnectableLayer* AddLogicalBinaryLayer(const LogicalBinaryDescriptor& descriptor,
                                                      const char* name = nullptr);
 
+    /// Add a UnidirectionalSequenceLstm layer to the network
+    /// @param descriptor - Parameters for the UnidirectionalSequenceLstm operation
+    /// @param params - Weights and biases for the UnidirectionalSequenceLstm
+    /// @param name - Optional name for the layer
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddUnidirectionalSequenceLstmLayer(const UnidirectionalSequenceLstmDescriptor& descriptor,
+                                                          const LstmInputParams& params,
+                                                          const char* name = nullptr);
+
     void Accept(ILayerVisitor& visitor) const;
 
     void ExecuteStrategy(IStrategy& strategy) const;

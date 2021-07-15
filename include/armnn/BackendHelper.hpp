@@ -433,6 +433,17 @@ public:
                               const TransposeDescriptor& descriptor,
                               Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
+    bool IsUnidirectionalSequenceLstmSupported(
+        const TensorInfo& input,
+        const TensorInfo& outputStateIn,
+        const TensorInfo& cellStateIn,
+        const TensorInfo& output,
+        const Optional<TensorInfo>& hiddenStateOutput,
+        const Optional<TensorInfo>& cellStateOutput,
+        const LstmDescriptor& descriptor,
+        const LstmInputParamsInfo& paramsInfo,
+        Optional<std::string&> reasonIfUnsupported = EmptyOptional());
+
 private:
     std::shared_ptr<ILayerSupport> m_LayerSupport;
     const BackendId m_BackendId;

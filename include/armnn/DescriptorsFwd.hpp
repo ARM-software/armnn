@@ -55,5 +55,6 @@ using LogSoftmaxDescriptor   = SoftmaxDescriptor;
 /// MergerDescriptor is deprecated, use ConcatDescriptor instead
 using MergerDescriptor       = OriginsDescriptor;
 using SplitterDescriptor     = ViewsDescriptor;
+using UnidirectionalSequenceLstmDescriptor = LstmDescriptor;
 
 } // namespace armnn

@@ -342,6 +342,56 @@ struct DummyLayer<armnn::LstmLayer>
 {
 };
 
+template <typename UnidirectionalSequenceLstmLayerType>
+struct DummyUnidirectionalSequenceLstmLayer
+{
+    DummyUnidirectionalSequenceLstmLayer()
+    {
+        typename UnidirectionalSequenceLstmLayerType::DescriptorType desc;
+        desc.m_CifgEnabled = false;
+
+        m_Layer = dummyGraph.AddLayer<UnidirectionalSequenceLstmLayerType>(desc, "");
+        m_Layer->m_BasicParameters.m_InputToForgetWeights     = std::make_unique<armnn::ScopedTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
+        m_Layer->m_BasicParameters.m_InputToCellWeights       = std::make_unique<armnn::ScopedTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
+        m_Layer->m_BasicParameters.m_InputToOutputWeights     = std::make_unique<armnn::ScopedTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
+        m_Layer->m_BasicParameters.m_RecurrentToForgetWeights = std::make_unique<armnn::ScopedTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
+        m_Layer->m_BasicParameters.m_RecurrentToCellWeights   = std::make_unique<armnn::ScopedTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
+        m_Layer->m_BasicParameters.m_RecurrentToOutputWeights = std::make_unique<armnn::ScopedTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
+        m_Layer->m_BasicParameters.m_ForgetGateBias           = std::make_unique<armnn::ScopedTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
+        m_Layer->m_BasicParameters.m_CellBias                 = std::make_unique<armnn::ScopedTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
+        m_Layer->m_BasicParameters.m_OutputGateBias           = std::make_unique<armnn::ScopedTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
+
+        m_Layer->m_CifgParameters.m_InputToInputWeights        = std::make_unique<armnn::ScopedTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
+        m_Layer->m_CifgParameters.m_RecurrentToInputWeights    = std::make_unique<armnn::ScopedTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
+        m_Layer->m_CifgParameters.m_InputGateBias              = std::make_unique<armnn::ScopedTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
+    }
+
+    ~DummyUnidirectionalSequenceLstmLayer()
+    {
+        dummyGraph.EraseLayer(m_Layer);
+    }
+
+    armnn::UnidirectionalSequenceLstmLayer* m_Layer;
+};
+
+template<>
+struct DummyLayer<armnn::UnidirectionalSequenceLstmLayer>
+        : public DummyUnidirectionalSequenceLstmLayer<armnn::UnidirectionalSequenceLstmLayer>
+{
+};
+
 template<>
 struct DummyLayer<armnn::QLstmLayer>
 {
@@ -651,6 +701,7 @@ DECLARE_LAYER_POLICY_2_PARAM(Pooling2d)
 DECLARE_LAYER_POLICY_2_PARAM(PreCompiled)
 
 DECLARE_LAYER_POLICY_1_PARAM(Prelu)
+
 DECLARE_LAYER_POLICY_2_PARAM(QLstm)
 
 DECLARE_LAYER_POLICY_1_PARAM(QuantizedLstm)
@@ -690,6 +741,8 @@ DECLARE_LAYER_POLICY_1_PARAM(Switch)
 DECLARE_LAYER_POLICY_2_PARAM(Transpose)
 
 DECLARE_LAYER_POLICY_2_PARAM(TransposeConvolution2d)
+
+DECLARE_LAYER_POLICY_2_PARAM(UnidirectionalSequenceLstm)
 
 DECLARE_LAYER_POLICY_MAP_PARAM(Unmap, void)
 

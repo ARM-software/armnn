@@ -678,4 +678,17 @@ bool LayerSupportBase::IsTransposeSupported(const TensorInfo&, // input
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsUnidirectionalSequenceLstmSupported(const TensorInfo&, // input
+                                                             const TensorInfo&, // outputStateIn
+                                                             const TensorInfo&, // cellStateIn
+                                                             const TensorInfo&, // output
+                                                             const Optional<TensorInfo>&, // hiddenStateOut
+                                                             const Optional<TensorInfo>&, // cellStateOut
+                                                             const LstmDescriptor&, // descriptor
+                                                             const LstmInputParamsInfo&, // paramsInfo
+                                                             Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 } // namespace armnn

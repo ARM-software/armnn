@@ -331,6 +331,8 @@ list(APPEND armnn_sources
     src/armnn/layers/TransposeConvolution2dLayer.hpp
     src/armnn/layers/TransposeLayer.hpp
     src/armnn/layers/TransposeLayer.cpp
+    src/armnn/layers/UnidirectionalSequenceLstmLayer.cpp
+    src/armnn/layers/UnidirectionalSequenceLstmLayer.hpp
     src/armnn/layers/UnmapLayer.cpp
     src/armnn/layers/UnmapLayer.hpp
     src/armnn/AsyncExecutionCallback.cpp

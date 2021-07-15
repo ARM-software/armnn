@@ -73,6 +73,7 @@
 #include "layers/SwitchLayer.hpp"
 #include "layers/TransposeConvolution2dLayer.hpp"
 #include "layers/TransposeLayer.hpp"
+#include "layers/UnidirectionalSequenceLstmLayer.hpp"
 #include "layers/UnmapLayer.hpp"
 
 namespace armnn
@@ -107,6 +108,7 @@ DECLARE_LAYER(Addition)
 DECLARE_LAYER(ArgMinMax)
 DECLARE_LAYER(BatchNormalization)
 DECLARE_LAYER(BatchToSpaceNd)
+DECLARE_LAYER(Cast)
 DECLARE_LAYER(Comparison)
 DECLARE_LAYER(Concat)
 DECLARE_LAYER(Constant)
@@ -168,6 +170,6 @@ DECLARE_LAYER(Subtraction)
 DECLARE_LAYER(Switch)
 DECLARE_LAYER(Transpose)
 DECLARE_LAYER(TransposeConvolution2d)
+DECLARE_LAYER(UnidirectionalSequenceLstm)
 DECLARE_LAYER(Unmap)
-DECLARE_LAYER(Cast)
 }

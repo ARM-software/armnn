@@ -289,6 +289,10 @@ public:
         const TransposeConvolution2dQueueDescriptor& descriptor,
         const WorkloadInfo& info) const;
 
+    virtual std::unique_ptr<IWorkload> CreateUnidirectionalSequenceLstm(
+        const UnidirectionalSequenceLstmQueueDescriptor& descriptor,
+        const WorkloadInfo& info) const;
+
 private:
     static bool IsLayerConfigurationSupported(const BackendId& backendId,
                                        const IConnectableLayer& connectableLayer,

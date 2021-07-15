@@ -218,6 +218,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/SwitchLayer.cpp \
         src/armnn/layers/TransposeConvolution2dLayer.cpp \
         src/armnn/layers/TransposeLayer.cpp \
+        src/armnn/layers/UnidirectionalSequenceLstmLayer.cpp \
         src/armnn/layers/UnmapLayer.cpp \
         src/profiling/ActivateTimelineReportingCommandHandler.cpp \
         src/profiling/BufferManager.cpp \

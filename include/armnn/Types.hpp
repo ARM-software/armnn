@@ -333,7 +333,6 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(ArgMinMax) \
     X(BatchNormalization) \
     X(BatchToSpaceNd)      \
-    X(Cast) \
     X(Comparison) \
     X(Concat) \
     X(Constant) \
@@ -382,7 +381,6 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(Rank) \
     X(Resize) \
     X(Reduce) \
-    X(Shape) \
     X(Slice) \
     X(Softmax) \
     X(SpaceToBatchNd) \
@@ -396,6 +394,11 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(Transpose) \
     X(TransposeConvolution2d) \
     X(Unmap) \
+    X(Cast) \
+    X(Shape) \
+    X(UnidirectionalSequenceLstm) \
+
+// New layers should be added at last to minimize instability.
 
 /// When adding a new layer, adapt also the LastLayer enum value in the
 /// enum class LayerType below
@@ -405,7 +408,7 @@ enum class LayerType
     LIST_OF_LAYER_TYPE
 #undef X
     FirstLayer = Activation,
-    LastLayer = Unmap
+    LastLayer = UnidirectionalSequenceLstm
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

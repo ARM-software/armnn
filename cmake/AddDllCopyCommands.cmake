@@ -5,15 +5,6 @@ macro (addDllCopyCommand target sourceDebug sourceRelease)
         $<TARGET_FILE_DIR:${target}>)
 endmacro()
 
-macro (addBoostDllCopyCommand target ignored sourceReleaseLib ignored sourceDebugLib)
-    string(REGEX REPLACE ".lib$" ".dll" sourceReleaseDll ${sourceReleaseLib})
-    string(REGEX REPLACE "/libboost" "/boost" sourceReleaseDll2 ${sourceReleaseDll})
-
-    string(REGEX REPLACE ".lib$" ".dll" sourceDebugDll ${sourceDebugLib})
-    string(REGEX REPLACE "/libboost" "/boost" sourceDebugDll2 ${sourceDebugDll})
-    addDllCopyCommand(${target} ${sourceDebugDll2} ${sourceReleaseDll2})
-endmacro()
-
 # Checks if the given list contains an entry which matches the given regex.
 function(listContainsRegex result list regex)
     set(${result} 0 PARENT_SCOPE)

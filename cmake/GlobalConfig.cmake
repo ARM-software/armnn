@@ -26,7 +26,6 @@ option(DYNAMIC_BACKEND_PATHS "Colon seperated list of paths where to load the dy
 option(SAMPLE_DYNAMIC_BACKEND "Include the sample dynamic backend and its tests in the build" OFF)
 option(BUILD_GATORD_MOCK "Build the Gatord simulator for external profiling testing." ON)
 option(BUILD_TIMELINE_DECODER "Build the Timeline Decoder for external profiling." ON)
-option(SHARED_BOOST "Use dynamic linking for boost libraries" OFF)
 option(BUILD_BASE_PIPE_SERVER "Build the server to handle external profiling pipe traffic" ON)
 option(BUILD_PYTHON_WHL "Build Python wheel package" OFF)
 option(BUILD_PYTHON_SRC "Build Python source package" OFF)
@@ -123,23 +122,6 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
 include(CMakeFindDependencyMacro)
-
-if (NOT BUILD_PIPE_ONLY)
-  # Boost
-  message(STATUS "Finding Boost")
-  if(SHARED_BOOST)
-    add_definitions(-DBOOST_ALL_DYN_LINK)
-    set(Boost_USE_STATIC_LIBS OFF)
-  else()
-    set(Boost_USE_STATIC_LIBS ON)
-  endif()
-  if (BUILD_UNIT_TESTS)
-    add_definitions("-DBOOST_ALL_NO_LIB") # Turn off auto-linking as we specify the libs manually
-    find_package(Boost 1.59 REQUIRED COMPONENTS unit_test_framework)
-    include_directories(SYSTEM "${Boost_INCLUDE_DIRS}")
-    link_directories(${Boost_LIBRARY_DIRS})
-  endif()
-endif()
 
 if (NOT BUILD_PIPE_ONLY)
   # cxxopts (Alternative to boost::program_options)

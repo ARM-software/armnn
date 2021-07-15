@@ -361,11 +361,6 @@ LOCAL_CFLAGS += \
         -DARMNNREF_ENABLED
 endif # ARMNN_REF_ENABLED == 1
 
-ifeq ($(Q_OR_LATER),1)
-LOCAL_CFLAGS += \
-        -DBOOST_NO_AUTO_PTR
-endif # PLATFORM_VERSION == Q or later
-
 LOCAL_SRC_FILES := \
         $(ARMNN_BACKEND_TEST_SOURCES) \
         src/armnn/test/ConstTensorLayerVisitor.cpp \
@@ -445,7 +440,6 @@ endif
 
 LOCAL_STATIC_LIBRARIES := \
         libneuralnetworks_common \
-        libboost_unit_test_framework \
         libflatbuffers-framework \
         arm_compute_library
 

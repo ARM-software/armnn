@@ -836,7 +836,6 @@ if(BUILD_UNIT_TESTS)
     endif()
 
     target_link_libraries(UnitTests ${CMAKE_THREAD_LIBS_INIT})
-    target_link_libraries(UnitTests ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
     target_link_libraries(UnitTests armnn)
     target_link_libraries(UnitTests armnnUtils)

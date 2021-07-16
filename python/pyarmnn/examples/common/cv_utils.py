@@ -1,4 +1,4 @@
-# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2020-2021 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 
 """
@@ -14,7 +14,7 @@ import numpy as np
 import pyarmnn as ann
 
 
-def preprocess(frame: np.ndarray, input_binding_info: tuple):
+def preprocess(frame: np.ndarray, input_binding_info: tuple, is_normalised: bool):
     """
     Takes a frame, resizes, swaps channels and converts data type to match
     model input layer. The converted frame is wrapped in a const tensor
@@ -23,6 +23,7 @@ def preprocess(frame: np.ndarray, input_binding_info: tuple):
     Args:
         frame: Captured frame from video.
         input_binding_info:  Contains shape and data type of model input layer.
+        is_normalised: if the input layer expects normalised data
 
     Returns:
         Input tensor.
@@ -34,7 +35,8 @@ def preprocess(frame: np.ndarray, input_binding_info: tuple):
     # Expand dimensions and convert data type to match model input
     if input_binding_info[1].GetDataType() == ann.DataType_Float32:
         data_type = np.float32
-        resized_frame = resized_frame.astype("float32")/255
+        if is_normalised:
+            resized_frame = resized_frame.astype("float32")/255
     else:
         data_type = np.uint8
 

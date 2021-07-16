@@ -1,6 +1,6 @@
-# Automatic Speech Recognition with PyArmNN
+# Keyword Spotting with PyArmNN
 
-This sample application guides the user to perform automatic speech recognition (ASR) with PyArmNN API.
+This sample application guides the user to perform Keyword Spotting (KWS) with PyArmNN API.
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ You can also verify it by running the following and getting output similar to be
 
 ```bash
 $ python -c "import pyarmnn as ann;print(ann.GetVersion())"
-'28.0.0'
+'26.0.0'
 ```
 
 ### Dependencies
@@ -36,23 +36,24 @@ $ pip install -r requirements.txt
 ```
 
 ### Model
-The model we are using is the [Wav2Letter](https://github.com/ARM-software/ML-zoo/tree/master/models/speech_recognition/wav2letter/tflite_int8 ) which can be found in the [Arm Model Zoo repository](
+
+The model we are using is the [DS CNN Large](https://github.com/ARM-software/ML-zoo/raw/68b5fbc77ed28e67b2efc915997ea4477c1d9d5b/models/keyword_spotting/ds_cnn_large/tflite_clustered_int8/) which can be found in the [Arm Model Zoo repository](
 https://github.com/ARM-software/ML-zoo/tree/master/models).
 
-A small selection of suitable wav files containing human speech can be found [here](https://github.com/Azure-Samples/cognitive-services-speech-sdk/tree/master/sampledata/audiofiles).
+A small selection of suitable wav files containing keywords can be found [here](https://git.mlplatform.org/ml/ethos-u/ml-embedded-evaluation-kit.git/plain/resources/kws/samples/).
 
-Labels for this model are defined within run_audio_file.py.
+Labels for this model are defined within run_audio_classification.py.
 
-## Performing Automatic Speech Recognition
+## Performing Keyword Spotting
 
 ### Processing Audio Files
 
 Please ensure that your audio file has a sampling rate of 16000Hz.
 
-To run ASR on an audio file, use the following command:
+To run KWS on an audio file, use the following command:
 
 ```bash
-$ python run_audio_file.py --audio_file_path <path/to/your_audio> --model_file_path <path/to/your_model>
+$ python run_audio_classification.py --audio_file_path <path/to/your_audio> --model_file_path <path/to/your_model> 
 ```
 
 You may also add the optional flags:
@@ -69,24 +70,41 @@ You may also add the optional flags:
 
 * `--help` prints all available options to screen
 
+
+### Processing Audio Streams
+
+To run KWS on a live audio stream, use the following command:
+
+```bash
+$ python run_audio_classification.py --model_file_path <path/to/your_model> --duration (optional)
+```
+You will be prompted to select an input microphone and inference will commence
+after 3 seconds.
+
+
+You may also add the following optional flag in addition to those for run_audio_file.py:
+
+* `--duration`
+
+  * Integer number of seconds to perform inference. Default is to continue indefinitely.
+
 ## Application Overview
 
 1. [Initialization](#initialization)
 
 2. [Creating a network](#creating-a-network)
 
-3. [Automatic speech recognition pipeline](#automatic-speech-recognition-pipeline)
+3. [Keyword Spotting Pipeline](#keyword-spotting-pipeline)
 
 ### Initialization
 
-The application parses the supplied user arguments and loads the audio file in chunks through the `capture_audio()` method which accepts sampling criteria as an `AudioCaptureParams` tuple.
+The application parses the supplied user arguments and loads the audio file or stream in chunks through the `capture_audio()` method which accepts sampling criteria as an `AudioCaptureParams` tuple.
 
-With ASR from an audio file, the application will create a generator object to yield blocks of audio data from the file with a minimum sample size defined in AudioCaptureParams. 
+With KWS from an audio file, the application will create a generator object to yield blocks of audio data from the file with a minimum sample size defined in AudioCaptureParams. 
 
-MFCC features are extracted from each block based on criteria defined in the `MFCCParams` tuple.  
-these extracted features constitute the input tensors for the model.
+MFCC features are extracted from each block based on criteria defined in the `MFCCParams` tuple. These extracted features constitute the input tensors for the model.
 
-To interpret the inference result of the loaded network; the application passes the label dictionary defined in run_audio_file.py to a decoder and displays the result.
+To interpret the inference result of the loaded network; the application passes the label dictionary defined in run_audio_classification.py to a decoder and displays the result.
 
 ### Creating a network
 
@@ -106,7 +124,7 @@ For this application, the main point of contact with PyArmNN is through the `Arm
 
 ```python
 # common/network_executor.py
-# The provided wav2letter model is in .tflite format so we use TfLiteParser() to import the graph
+# The provided kws model is in .tflite format so we use TfLiteParser() to import the graph
 if ext == '.tflite':
     parser = ann.ITfLiteParser()
 network = parser.CreateNetworkFromBinaryFile(model_file)
@@ -122,30 +140,27 @@ self.input_binding_info = parser.GetNetworkInputBindingInfo(graph_id, input_name
 self.output_binding_info = parser.GetNetworkOutputBindingInfo(graph_id, output_name)
 ```
 
-### Automatic speech recognition pipeline
+### Keyword Spotting pipeline
+
+
 Mel-frequency Cepstral Coefficients (MFCCs, [see Wikipedia](https://en.wikipedia.org/wiki/Mel-frequency_cepstrum)) are extracted based on criteria defined in the MFCCParams tuple and associated`MFCC Class`.
 MFCCs are the result of computing the dot product of the Discrete Cosine Transform (DCT) Matrix and the log of the Mel energy.
 
 The `MFCC` class is used in conjunction with the `AudioPreProcessor` class to extract and process MFCC features from a given audio frame. 
 
 
-After all the MFCCs needed for an inference have been extracted from the audio data we convolve them with 1-dimensional Savitzky-Golay filters to compute the first and second MFCC derivatives with respect to time. The MFCCs and the derivatives constitute the input tensors that will be classified by an `ArmnnNetworkExecutor`object.
-
+After all the MFCCs needed for an inference have been extracted from the audio data they constitute the input tensors that will be classified by an `ArmnnNetworkExecutor`object.
 
 ```python
-# mfcc.py & wav2lettermfcc.py
-# Extract MFCC features
-log_mel_energy = np.maximum(log_mel_energy, log_mel_energy.max() - top_db)
-mfcc_feats = np.dot(self.__dct_matrix, log_mel_energy)
-...
-# Compute first and second derivatives (delta and delta-delta respectively) by passing a
-# Savitzky-Golay filter as a 1D convolution over the features
-for i in range(features.shape[1]):
-            idelta = np.convolve(features[:, i], self.__savgol_order1_coeffs, 'same')
-            mfcc_delta_np[:, i] = (idelta)
-            ideltadelta = np.convolve(features[:, i], self.savgol_order2_coeffs, 'same')
-            mfcc_delta2_np[:, i] = (ideltadelta)
-```
+# mfcc.py
+# Extract MFCC features from audio_data
+audio_data.resize(self._frame_len_padded)
+spec = self.spectrum_calc(audio_data)
+mel_energy = np.dot(self._np_mel_bank.astype(np.float32),
+                    np.transpose(spec).astype(np.float32))
+log_mel_energy = self.log_mel(mel_energy)
+mfcc_feats = np.dot(self._dct_matrix, log_mel_energy)
+
 
 ```python
 # audio_utils.py
@@ -164,12 +179,11 @@ status = runtime.EnqueueWorkload(net_id, input_tensors, self.output_tensors)
 self.output_result = ann.workload_tensors_to_ndarray(self.output_tensors)
 ```
 
-The output from the inference must be decoded to obtain the recognised characters from the speech. A simple greedy decoder classifies the results by taking the highest element of the output as a key for the labels dictionary. The value returned is a character which is appended to a list, and the list is filtered to remove unwanted characters. The produced string is displayed on the console.
+The output from the inference must be decoded to obtain the recognised classification. A simple greedy decoder classifies the results by taking the highest element of the output as a key for the labels dictionary. The value returned is a keyword or unknown/silence which is appended to a list along with the calculated probability. The list elements are displayed on the console if they exceed the threshold value specified in main().
+
 
 ## Next steps
 
-Having now gained a solid understanding of performing automatic speech recognition with PyArmNN, you are able to take control and create your own application. For your next steps we suggest to first implement your own network, which can be done by updating the parameters of `ModelParams` and `MfccParams` to match your custom model. The `ArmnnNetworkExecutor` class will handle the network optimisation and loading for you.
+Having now gained a solid understanding of performing keyword spotting with PyArmNN, you are able to take control and create your own application. We suggest to first implement your own network, which can be done by updating the parameters of `AudioCaptureParams` and `MFCC_Params` to match your custom model. The `ArmnnNetworkExecutor` class will handle the network optimisation and loading for you.
 
-An important step to improving accuracy of the generated output sentences is by providing cleaner data to the network. This can be done by including additional preprocessing steps such as noise reduction of your audio data.
-
-In this application, we had used a greedy decoder to decode the integer-encoded output however, better results can be achieved by implementing a beam search decoder. You may even try adding a language model at the end to aim to correct any spelling mistakes the model may produce.
+An important factor in improving accuracy of the generated output is providing cleaner data to the network. This can be done by including additional preprocessing steps such as noise reduction of your audio data.

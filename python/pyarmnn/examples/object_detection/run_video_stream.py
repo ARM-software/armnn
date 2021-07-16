@@ -47,6 +47,7 @@ def main(args):
     video = init_video_stream_capture(args.video_source)
     executor = ArmnnNetworkExecutor(args.model_file_path, args.preferred_backends)
 
+    model_name = args.model_name
     process_output, resize_factor = get_model_processing(args.model_name, video, executor.input_binding_info)
     labels = dict_labels(args.label_path, include_rgb=True)
 
@@ -55,7 +56,11 @@ def main(args):
         frame = cv2.flip(frame, 1)  # Horizontally flip the frame
         if not frame_present:
             raise RuntimeError('Error reading frame from video stream')
-        input_tensors = preprocess(frame, executor.input_binding_info)
+
+        if model_name == "ssd_mobilenet_v1":
+            input_tensors = preprocess(frame, executor.input_binding_info, True)
+        else:
+            input_tensors = preprocess(frame, executor.input_binding_info, False)
         print("Running inference...")
         output_result = executor.run(input_tensors)
         detections = process_output(output_result)

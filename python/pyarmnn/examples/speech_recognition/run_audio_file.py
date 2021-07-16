@@ -1,20 +1,29 @@
-# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 
 """Automatic speech recognition with PyArmNN demo for processing audio clips to text."""
 
 import sys
 import os
-from argparse import ArgumentParser
+import numpy as np
 
 script_dir = os.path.dirname(__file__)
 sys.path.insert(1, os.path.join(script_dir, '..', 'common'))
 
+from argparse import ArgumentParser
 from network_executor import ArmnnNetworkExecutor
-from utils import dict_labels
-from preprocess import MFCCParams, Preprocessor, MFCC
-from audio_capture import AudioCapture, ModelParams
-from audio_utils import decode_text, prepare_input_tensors, display_text
+from utils import prepare_input_tensors
+from audio_capture import AudioCaptureParams, capture_audio
+from audio_utils import decode_text, display_text
+from wav2letter_mfcc import Wav2LetterMFCC, W2LAudioPreprocessor
+from mfcc import MFCCParams
+
+# Model Specific Labels
+labels = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h', 8: 'i', 9: 'j', 10: 'k', 11: 'l', 12: 'm',
+          13: 'n',
+          14: 'o', 15: 'p', 16: 'q', 17: 'r', 18: 's', 19: 't', 20: 'u', 21: 'v', 22: 'w', 23: 'x', 24: 'y',
+          25: 'z',
+          26: "'", 27: ' ', 28: '$'}
 
 
 def parse_args():
@@ -32,12 +41,6 @@ def parse_args():
         help="Path to ASR model to use",
     )
     parser.add_argument(
-        "--labels_file_path",
-        required=True,
-        type=str,
-        help="Path to text file containing labels to map to model output",
-    )
-    parser.add_argument(
         "--preferred_backends",
         type=str,
         nargs="+",
@@ -52,22 +55,23 @@ def parse_args():
 def main(args):
     # Read command line args
     audio_file = args.audio_file_path
-    model = ModelParams(args.model_file_path)
-    labels = dict_labels(args.labels_file_path)
 
     # Create the ArmNN inference runner
-    network = ArmnnNetworkExecutor(model.path, args.preferred_backends)
+    network = ArmnnNetworkExecutor(args.model_file_path, args.preferred_backends)
 
-    audio_capture = AudioCapture(model)
-    buffer = audio_capture.from_audio_file(audio_file)
+    # Specify model specific audio data requirements
+    audio_capture_params = AudioCaptureParams(dtype=np.float32, overlap=31712, min_samples=47712, sampling_freq=16000,
+                                              mono=True)
 
-    # Create the preprocessor
+    buffer = capture_audio(audio_file, audio_capture_params)
+
+    # Extract features and create the preprocessor
+
     mfcc_params = MFCCParams(sampling_freq=16000, num_fbank_bins=128, mel_lo_freq=0, mel_hi_freq=8000,
-                                        num_mfcc_feats=13, frame_len=512, use_htk_method=False, n_FFT=512)
-    mfcc = MFCC(mfcc_params)
-    preprocessor = Preprocessor(mfcc, model_input_size=296, stride=160)
+                             num_mfcc_feats=13, frame_len=512, use_htk_method=False, n_fft=512)
 
-    text = ""
+    wmfcc = Wav2LetterMFCC(mfcc_params)
+    preprocessor = W2LAudioPreprocessor(wmfcc, model_input_size=296, stride=160)
     current_r_context = ""
     is_first_window = True
 

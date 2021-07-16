@@ -1,4 +1,4 @@
-# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 
 import os
@@ -6,12 +6,13 @@ import ntpath
 
 import urllib.request
 import zipfile
-
 import pytest
 
 script_dir = os.path.dirname(__file__)
+
+
 @pytest.fixture(scope="session")
-def test_data_folder(request):
+def test_data_folder():
     """
         This fixture returns path to folder with shared test resources among all tests
     """
@@ -19,11 +20,12 @@ def test_data_folder(request):
     data_dir = os.path.join(script_dir, "testdata")
     if not os.path.exists(data_dir):
         os.mkdir(data_dir)
-
     files_to_download = ["https://raw.githubusercontent.com/opencv/opencv/4.0.0/samples/data/messi5.jpg",
                          "https://raw.githubusercontent.com/opencv/opencv/4.0.0/samples/data/basketball1.png",
                          "https://raw.githubusercontent.com/opencv/opencv/4.0.0/samples/data/Megamind.avi",
-                         "https://storage.googleapis.com/download.tensorflow.org/models/tflite/coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.zip"
+                         "https://github.com/ARM-software/ML-zoo/raw/master/models/object_detection/ssd_mobilenet_v1/tflite_uint8/ssd_mobilenet_v1.tflite",
+                         "https://git.mlplatform.org/ml/ethos-u/ml-embedded-evaluation-kit.git/plain/resources/kws/samples/yes.wav",
+                         "https://raw.githubusercontent.com/Azure-Samples/cognitive-services-speech-sdk/master/sampledata/audiofiles/myVoiceIsMyPassportVerifyMe04.wav"
                          ]
 
     for file in files_to_download:
@@ -33,8 +35,5 @@ def test_data_folder(request):
             print("\nDownloading test file: " + file_path + "\n")
             urllib.request.urlretrieve(file, file_path)
 
-    # Any unzipping needed, and moving around of files
-    with zipfile.ZipFile(os.path.join(data_dir, "coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.zip"), 'r') as zip_ref:
-        zip_ref.extractall(data_dir)
 
     return data_dir

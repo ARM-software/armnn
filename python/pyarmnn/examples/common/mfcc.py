@@ -1,22 +1,13 @@
-# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 
 """Class used to extract the Mel-frequency cepstral coefficients from a given audio frame."""
 
 import numpy as np
+import collections
 
-
-class MFCCParams:
-    def __init__(self, sampling_freq, num_fbank_bins,
-                 mel_lo_freq, mel_hi_freq, num_mfcc_feats, frame_len, use_htk_method, n_FFT):
-        self.sampling_freq = sampling_freq
-        self.num_fbank_bins = num_fbank_bins
-        self.mel_lo_freq = mel_lo_freq
-        self.mel_hi_freq = mel_hi_freq
-        self.num_mfcc_feats = num_mfcc_feats
-        self.frame_len = frame_len
-        self.use_htk_method = use_htk_method
-        self.n_FFT = n_FFT
+MFCCParams = collections.namedtuple('MFCCParams', ['sampling_freq', 'num_fbank_bins', 'mel_lo_freq', 'mel_hi_freq',
+                                                   'num_mfcc_feats', 'frame_len', 'use_htk_method', 'n_fft'])
 
 
 class MFCC:
@@ -27,21 +18,21 @@ class MFCC:
         self.MIN_LOG_HZ = 1000.0
         self.MIN_LOG_MEL = self.MIN_LOG_HZ / self.FREQ_STEP
         self.LOG_STEP = 1.8562979903656 / 27.0
-        self.__frame_len_padded = int(2 ** (np.ceil((np.log(self.mfcc_params.frame_len) / np.log(2.0)))))
-        self.__filter_bank_initialised = False
-        self.__frame = np.zeros(self.__frame_len_padded)
-        self.__buffer = np.zeros(self.__frame_len_padded)
-        self.__filter_bank_filter_first = np.zeros(self.mfcc_params.num_fbank_bins)
-        self.__filter_bank_filter_last = np.zeros(self.mfcc_params.num_fbank_bins)
+        self._frame_len_padded = int(2 ** (np.ceil((np.log(self.mfcc_params.frame_len) / np.log(2.0)))))
+        self._filter_bank_initialised = False
+        self.__frame = np.zeros(self._frame_len_padded)
+        self.__buffer = np.zeros(self._frame_len_padded)
+        self._filter_bank_filter_first = np.zeros(self.mfcc_params.num_fbank_bins)
+        self._filter_bank_filter_last = np.zeros(self.mfcc_params.num_fbank_bins)
         self.__mel_energies = np.zeros(self.mfcc_params.num_fbank_bins)
-        self.__dct_matrix = self.create_dct_matrix(self.mfcc_params.num_fbank_bins, self.mfcc_params.num_mfcc_feats)
+        self._dct_matrix = self.create_dct_matrix(self.mfcc_params.num_fbank_bins, self.mfcc_params.num_mfcc_feats)
         self.__mel_filter_bank = self.create_mel_filter_bank()
-        self.__np_mel_bank = np.zeros([self.mfcc_params.num_fbank_bins, int(self.mfcc_params.n_FFT / 2) + 1])
+        self._np_mel_bank = np.zeros([self.mfcc_params.num_fbank_bins, int(self.mfcc_params.n_fft / 2) + 1])
 
         for i in range(self.mfcc_params.num_fbank_bins):
             k = 0
-            for j in range(int(self.__filter_bank_filter_first[i]), int(self.__filter_bank_filter_last[i]) + 1):
-                self.__np_mel_bank[i, j] = self.__mel_filter_bank[i][k]
+            for j in range(int(self._filter_bank_filter_first[i]), int(self._filter_bank_filter_last[i]) + 1):
+                self._np_mel_bank[i, j] = self.__mel_filter_bank[i][k]
                 k += 1
 
     def mel_scale(self, freq, use_htk_method):
@@ -84,6 +75,14 @@ class MFCC:
                 freq = self.MIN_LOG_HZ * np.exp(self.LOG_STEP * (mel_freq - self.MIN_LOG_MEL))
             return freq
 
+    def spectrum_calc(self, audio_data):
+        return np.abs(np.fft.rfft(np.hanning(self.mfcc_params.frame_len + 1)[0:self.mfcc_params.frame_len] * audio_data,
+                                  self.mfcc_params.n_fft))
+
+    def log_mel(self, mel_energy):
+        mel_energy += 1e-10  # Avoid division by zero
+        return np.log(mel_energy)
+
     def mfcc_compute(self, audio_data):
         """
         Extracts the MFCC for a single frame.
@@ -96,22 +95,14 @@ class MFCC:
         """
         if len(audio_data) != self.mfcc_params.frame_len:
             raise ValueError(
-                f"audio_data buffer size {len(audio_data)} does not match the frame length {self.mfcc_params.frame_len}")
+                f"audio_data buffer size {len(audio_data)} does not match frame length {self.mfcc_params.frame_len}")
 
         audio_data = np.array(audio_data)
-        spec = np.abs(np.fft.rfft(np.hanning(self.mfcc_params.n_FFT + 1)[0:self.mfcc_params.n_FFT] * audio_data,
-                                  self.mfcc_params.n_FFT)) ** 2
-        mel_energy = np.dot(self.__np_mel_bank.astype(np.float32),
+        spec = self.spectrum_calc(audio_data)
+        mel_energy = np.dot(self._np_mel_bank.astype(np.float32),
                             np.transpose(spec).astype(np.float32))
-
-        mel_energy += 1e-10
-        log_mel_energy = 10.0 * np.log10(mel_energy)
-        top_db = 80.0
-
-        log_mel_energy = np.maximum(log_mel_energy, log_mel_energy.max() - top_db)
-
-        mfcc_feats = np.dot(self.__dct_matrix, log_mel_energy)
-
+        log_mel_energy = self.log_mel(mel_energy)
+        mfcc_feats = np.dot(self._dct_matrix, log_mel_energy)
         return mfcc_feats
 
     def create_dct_matrix(self, num_fbank_bins, num_mfcc_feats):
@@ -125,18 +116,20 @@ class MFCC:
         Returns:
             the DCT matrix
         """
+
         dct_m = np.zeros(num_fbank_bins * num_mfcc_feats)
         for k in range(num_mfcc_feats):
             for n in range(num_fbank_bins):
-                if k == 0:
-                    dct_m[(k * num_fbank_bins) + n] = 2 * np.sqrt(1 / (4 * num_fbank_bins)) * np.cos(
-                        (np.pi / num_fbank_bins) * (n + 0.5) * k)
-                else:
-                    dct_m[(k * num_fbank_bins) + n] = 2 * np.sqrt(1 / (2 * num_fbank_bins)) * np.cos(
-                        (np.pi / num_fbank_bins) * (n + 0.5) * k)
-
+                dct_m[(k * num_fbank_bins) + n] = (np.sqrt(2 / num_fbank_bins)) * np.cos(
+                    (np.pi / num_fbank_bins) * (n + 0.5) * k)
         dct_m = np.reshape(dct_m, [self.mfcc_params.num_mfcc_feats, self.mfcc_params.num_fbank_bins])
         return dct_m
+
+    def mel_norm(self, weight, right_mel, left_mel):
+        """
+        Placeholder function over-ridden in child class
+        """
+        return weight
 
     def create_mel_filter_bank(self):
         """
@@ -145,16 +138,17 @@ class MFCC:
         Returns:
             the mel filter bank
         """
-        num_fft_bins = int(self.__frame_len_padded / 2)
-        fft_bin_width = self.mfcc_params.sampling_freq / self.__frame_len_padded
+        # FFT calculations are greatly accelerated for frame lengths which are powers of 2
+        # Frames are padded and FFT bin width/length calculated accordingly
+        num_fft_bins = int(self._frame_len_padded / 2)
+        fft_bin_width = self.mfcc_params.sampling_freq / self._frame_len_padded
 
-        mel_low_freq = self.mel_scale(self.mfcc_params.mel_lo_freq, False)
-        mel_high_freq = self.mel_scale(self.mfcc_params.mel_hi_freq, False)
+        mel_low_freq = self.mel_scale(self.mfcc_params.mel_lo_freq, self.mfcc_params.use_htk_method)
+        mel_high_freq = self.mel_scale(self.mfcc_params.mel_hi_freq, self.mfcc_params.use_htk_method)
         mel_freq_delta = (mel_high_freq - mel_low_freq) / (self.mfcc_params.num_fbank_bins + 1)
 
         this_bin = np.zeros(num_fft_bins)
         mel_fbank = [0] * self.mfcc_params.num_fbank_bins
-
         for bin_num in range(self.mfcc_params.num_fbank_bins):
             left_mel = mel_low_freq + bin_num * mel_freq_delta
             center_mel = mel_low_freq + (bin_num + 1) * mel_freq_delta
@@ -163,7 +157,7 @@ class MFCC:
 
             for i in range(num_fft_bins):
                 freq = (fft_bin_width * i)
-                mel = self.mel_scale(freq, False)
+                mel = self.mel_scale(freq, self.mfcc_params.use_htk_method)
                 this_bin[i] = 0.0
 
                 if (mel > left_mel) and (mel < right_mel):
@@ -172,16 +166,14 @@ class MFCC:
                     else:
                         weight = (right_mel - mel) / (right_mel - center_mel)
 
-                    enorm = 2.0 / (self.inv_mel_scale(right_mel, False) - self.inv_mel_scale(left_mel, False))
-                    weight *= enorm
-                    this_bin[i] = weight
+                    this_bin[i] = self.mel_norm(weight, right_mel, left_mel)
 
                     if first_index == -1:
                         first_index = i
                     last_index = i
 
-            self.__filter_bank_filter_first[bin_num] = first_index
-            self.__filter_bank_filter_last[bin_num] = last_index
+            self._filter_bank_filter_first[bin_num] = first_index
+            self._filter_bank_filter_last[bin_num] = last_index
             mel_fbank[bin_num] = np.zeros(last_index - first_index + 1)
             j = 0
 
@@ -192,69 +184,55 @@ class MFCC:
         return mel_fbank
 
 
-class Preprocessor:
+class AudioPreprocessor:
 
     def __init__(self, mfcc, model_input_size, stride):
         self.model_input_size = model_input_size
         self.stride = stride
+        self._mfcc_calc = mfcc
 
-        # Savitzky - Golay differential filters
-        self.__savgol_order1_coeffs = np.array([6.66666667e-02, 5.00000000e-02, 3.33333333e-02,
-                                                1.66666667e-02, -3.46944695e-18, -1.66666667e-02,
-                                                -3.33333333e-02, -5.00000000e-02, -6.66666667e-02])
-
-        self.savgol_order2_coeffs = np.array([0.06060606, 0.01515152, -0.01731602,
-                                              -0.03679654, -0.04329004, -0.03679654,
-                                              -0.01731602, 0.01515152, 0.06060606])
-
-        self.__mfcc_calc = mfcc
-
-    def __normalize(self, values):
+    def _normalize(self, values):
         """
         Normalize values to mean 0 and std 1
         """
         ret_val = (values - np.mean(values)) / np.std(values)
         return ret_val
 
-    def __get_features(self, features, mfcc_instance, audio_data):
+    def _get_features(self, features, mfcc_instance, audio_data):
         idx = 0
         while len(features) < self.model_input_size * mfcc_instance.mfcc_params.num_mfcc_feats:
-            features.extend(mfcc_instance.mfcc_compute(audio_data[idx:idx + int(mfcc_instance.mfcc_params.frame_len)]))
+            current_frame_feats = mfcc_instance.mfcc_compute(audio_data[idx:idx + int(mfcc_instance.mfcc_params.frame_len)])
+            features.extend(current_frame_feats)
             idx += self.stride
+
+    def mfcc_delta_calc(self, features):
+        """
+        Placeholder function over-ridden in child class
+        """
+        return features
 
     def extract_features(self, audio_data):
         """
-        Extracts the MFCC features, and calculates each features first and second order derivative.
+        Extracts the MFCC features. Also calculates each features first and second order derivatives
+        if the mfcc_delta_calc() function has been implemented by a child class.
         The matrix returned should be sized appropriately for input to the model, based
         on the model info specified in the MFCC instance.
 
         Args:
-            mfcc_instance: The instance of MFCC used for this calculation
             audio_data: the audio data to be used for this calculation
         Returns:
             the derived MFCC feature vector, sized appropriately for inference
         """
 
         num_samples_per_inference = ((self.model_input_size - 1)
-                                     * self.stride) + self.__mfcc_calc.mfcc_params.frame_len
+                                     * self.stride) + self._mfcc_calc.mfcc_params.frame_len
+
         if len(audio_data) < num_samples_per_inference:
             raise ValueError("audio_data size for feature extraction is smaller than "
                              "the expected number of samples needed for inference")
 
         features = []
-        self.__get_features(features, self.__mfcc_calc, np.asarray(audio_data))
-        features = np.reshape(np.array(features), (self.model_input_size, self.__mfcc_calc.mfcc_params.num_mfcc_feats))
-
-        mfcc_delta_np = np.zeros_like(features)
-        mfcc_delta2_np = np.zeros_like(features)
-
-        for i in range(features.shape[1]):
-            idelta = np.convolve(features[:, i], self.__savgol_order1_coeffs, 'same')
-            mfcc_delta_np[:, i] = (idelta)
-            ideltadelta = np.convolve(features[:, i], self.savgol_order2_coeffs, 'same')
-            mfcc_delta2_np[:, i] = (ideltadelta)
-
-        features = np.concatenate((self.__normalize(features), self.__normalize(mfcc_delta_np),
-                                   self.__normalize(mfcc_delta2_np)), axis=1)
-
+        self._get_features(features, self._mfcc_calc, np.asarray(audio_data))
+        features = np.reshape(np.array(features), (self.model_input_size, self._mfcc_calc.mfcc_params.num_mfcc_feats))
+        features = self.mfcc_delta_calc(features)
         return np.float32(features)

@@ -1,4 +1,4 @@
-# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2020-2021 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 
 """
@@ -54,7 +54,11 @@ def main(args):
         frame_present, frame = video.read()
         if not frame_present:
             continue
-        input_tensors = preprocess(frame, executor.input_binding_info)
+        model_name = args.model_name
+        if model_name == "ssd_mobilenet_v1":
+            input_tensors = preprocess(frame, executor.input_binding_info, True)
+        else:
+            input_tensors = preprocess(frame, executor.input_binding_info, False)
         output_result = executor.run(input_tensors)
         detections = process_output(output_result)
         draw_bounding_boxes(frame, detections, resize_factor, labels)

@@ -163,6 +163,7 @@ list(APPEND armnn_sources
     include/armnn/DescriptorsFwd.hpp
     include/armnn/Exceptions.hpp
     include/armnn/backends/ILayerSupport.hpp
+    include/armnn/backends/ICustomAllocator.hpp
     include/armnn/IAsyncExecutionCallback.hpp
     include/armnn/ILayerVisitor.hpp
     include/armnn/INetwork.hpp

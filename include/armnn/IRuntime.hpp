@@ -14,6 +14,7 @@
 #include "TypesUtils.hpp"
 #include "profiling/ILocalPacketHandler.hpp"
 
+#include <armnn/backends/ICustomAllocator.hpp>
 #include <memory>
 
 namespace armnn
@@ -88,6 +89,7 @@ public:
             : m_GpuAccTunedParameters(nullptr)
             , m_EnableGpuProfiling(false)
             , m_DynamicBackendsPath("")
+            , m_CustomAllocator(nullptr)
         {}
 
         /// If set, uses the GpuAcc tuned parameters from the given object when executing GPU workloads.
@@ -100,6 +102,11 @@ public:
         /// Setting this value will override the paths set by the DYNAMIC_BACKEND_PATHS compiler directive
         /// Only a single path is allowed for the override
         std::string m_DynamicBackendsPath;
+
+        /// A Custom Allocator used for allocation of working memory in the backends.
+        /// Set this for when you need to allocate Protected Working Memory, required for ProtectedMode
+        /// Only supported for GpuAcc
+        ICustomAllocator* m_CustomAllocator;
 
         struct ExternalProfilingOptions
         {

@@ -485,7 +485,8 @@ public:
             const auto loading_start_time = armnn::GetTimeNow();
             armnn::INetworkProperties networkProperties(params.m_AsyncEnabled,
                                                         armnn::MemorySource::Undefined,
-                                                        armnn::MemorySource::Undefined);
+                                                        armnn::MemorySource::Undefined,
+                                                        enableProfiling);
             std::string errorMessage;
             ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, std::move(optNet), errorMessage, networkProperties);
 
@@ -563,10 +564,6 @@ public:
         }
 
         std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkIdentifier);
-        if (profiler)
-        {
-            profiler->EnableProfiling(m_EnableProfiling);
-        }
 
         // Start timer to record inference time in EnqueueWorkload (in milliseconds)
         const auto start_time = armnn::GetTimeNow();
@@ -617,10 +614,6 @@ public:
         }
 
         std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkIdentifier);
-        if (profiler)
-        {
-            profiler->EnableProfiling(m_EnableProfiling);
-        }
 
         // Start timer to record inference time in EnqueueWorkload (in milliseconds)
         const auto start_time = armnn::GetTimeNow();
@@ -672,10 +665,6 @@ public:
         }
 
         std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkIdentifier);
-        if (profiler)
-        {
-            profiler->EnableProfiling(m_EnableProfiling);
-        }
 
         m_Threadpool->Schedule(m_NetworkIdentifier,
                                MakeInputTensors(inputContainers),

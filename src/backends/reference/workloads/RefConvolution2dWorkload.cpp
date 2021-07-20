@@ -13,18 +13,33 @@
 namespace armnn
 {
 RefConvolution2dWorkload::RefConvolution2dWorkload(
-        const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info)
-        : BaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
+    const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info)
+    : BaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
 {
-    m_Weight = std::make_unique<ScopedTensorHandle>(*(descriptor.m_Weight));
+    // Construct params for reporting operator details
+    std::string workloadName = "RefConvolution2dWorkload_Execute_Guid" + std::to_string(this->GetGuid());
+
+    WorkloadInfo detailsInfo;
+    detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;
+    detailsInfo.m_OutputTensorInfos = info.m_OutputTensorInfos;
+    detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Weight->GetTensorInfo());
+    if (descriptor.m_Parameters.m_BiasEnabled)
+    {
+        detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Bias->GetTensorInfo());
+    }
+
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC(workloadName, descriptor.m_Parameters, detailsInfo);
+
+    m_Weight = std::make_unique<ScopedTensorHandle>(*( descriptor.m_Weight ));
     const TensorInfo& rFilterInfo = m_Weight->GetTensorInfo();
 
     m_FilterShape = rFilterInfo.GetShape();
     m_FilterDecoder = MakeDecoder<float>(rFilterInfo, m_Weight.get()->Map(true));
 
-    if (descriptor.m_Parameters.m_BiasEnabled)
+    if ( descriptor.m_Parameters.m_BiasEnabled )
     {
-        m_Bias = std::make_unique<ScopedTensorHandle>(*(descriptor.m_Bias));
+        m_Bias = std::make_unique<ScopedTensorHandle>(*( descriptor.m_Bias ));
         const TensorInfo& biasInfo = m_Bias->GetTensorInfo();
         m_BiasDecoder = MakeDecoder<float>(biasInfo, m_Bias->Map(true));
     }
@@ -35,13 +50,15 @@ void RefConvolution2dWorkload::Execute() const
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
 }
 
-void RefConvolution2dWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+void RefConvolution2dWorkload::ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)
 {
     Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
 }
 
-void RefConvolution2dWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefConvolution2dWorkload_Execute");
+void RefConvolution2dWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
+{
+    std::string workloadName = "RefConvolutionWorkload_Execute_Guid" + std::to_string(this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, workloadName);
 
     std::unique_ptr<Decoder<float>> inputDecoder = MakeDecoder<float>(GetTensorInfo(inputs[0]), inputs[0]->Map());
     std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(outputs[0]), outputs[0]->Map());

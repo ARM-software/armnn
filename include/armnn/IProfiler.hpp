@@ -16,6 +16,8 @@ class ProfilerImpl;
 class BackendId;
 class Instrument;
 class Event;
+struct WorkloadInfo;
+
 class IProfiler
 {
 public:
@@ -41,12 +43,22 @@ public:
     IProfiler();
 
 private:
+
     using InstrumentPtr = std::unique_ptr<Instrument>;
+
+    template<typename DescriptorType>
+    void AddLayerDetails(const std::string& name,
+                         const DescriptorType& desc,
+                         const WorkloadInfo& infos);
+
     Event* BeginEvent(const BackendId& backendId,
                       const std::string& label,
                       std::vector<InstrumentPtr>&& instruments);
+
     std::unique_ptr<ProfilerImpl> pProfilerImpl;
+
     friend class ScopedProfilingEvent;
+    friend class ScopedProfilingUpdateDescriptions;
 
     // Friend functions for unit testing, see ProfilerTests.cpp.
     friend size_t GetProfilerEventSequenceSize(armnn::IProfiler* profiler);

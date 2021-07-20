@@ -281,6 +281,13 @@ void ProfilerImpl::PopulateDescendants(std::map<const Event*, std::vector<const 
     }
 }
 
+void ConfigureDetailsObject(JsonChildObject& detailsObject,
+                            std::string layerDetailsStr)
+{
+    detailsObject.SetType(JsonObjectType::ExecObjectDesc);
+    detailsObject.SetAndParseDetails(layerDetailsStr);
+
+}
 
 void ExtractJsonObjects(unsigned int inferenceIndex,
                         const Event* parentEvent,
@@ -347,7 +354,6 @@ void ProfilerImpl::Print(std::ostream& outStream) const
     PopulateDescendants(descendantsMap);
 
     JsonChildObject inferenceObject{"inference_measurements"};
-    JsonChildObject layerObject{"layer_measurements"};
     std::vector<JsonChildObject> workloadObjects;
     std::map<unsigned int, std::vector<JsonChildObject>> workloadToKernelObjects;
 
@@ -359,6 +365,15 @@ void ProfilerImpl::Print(std::ostream& outStream) const
 
     printer.PrintHeader();
     printer.PrintArmNNHeader();
+
+    if (m_ProfilingDetails.get()->DetailsExist())
+    {
+        JsonChildObject detailsObject{"layer_details"};
+        ConfigureDetailsObject(detailsObject, m_ProfilingDetails.get()->GetProfilingDetails());
+
+        size_t id=0;
+        printer.PrintJsonChildObject(detailsObject, id);
+    }
 
     // print inference object, also prints child layer and kernel measurements
     size_t id=0;
@@ -525,10 +540,10 @@ void IProfiler::Print(std::ostream& outStream) const
 }
 
 Event* IProfiler::BeginEvent(const BackendId& backendId,
-                  const std::string& label,
-                  std::vector<InstrumentPtr>&& instruments)
+                             const std::string& label,
+                             std::vector<InstrumentPtr>&& instruments)
 {
-    return pProfilerImpl->BeginEvent(this, backendId, label,  std::move(instruments));
+    return pProfilerImpl->BeginEvent(this, backendId, label, std::move(instruments));
 }
 
 IProfiler::~IProfiler() = default;

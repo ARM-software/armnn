@@ -33,44 +33,52 @@ struct INetworkProperties
     ARMNN_DEPRECATED_MSG("Please use INetworkProperties constructor with MemorySource argument")
     INetworkProperties(bool importEnabled = false,
                        bool exportEnabled = false,
-                       bool asyncEnabled = false)
-        : m_ImportEnabled(importEnabled)
-        , m_ExportEnabled(exportEnabled)
-        , m_AsyncEnabled(asyncEnabled)
-        , m_InputSource(m_ImportEnabled ? MemorySource::Malloc : MemorySource::Undefined)
-        , m_OutputSource(m_ExportEnabled ? MemorySource::Malloc : MemorySource::Undefined)
+                       bool asyncEnabled = false,
+                       bool profilingEnabled = false)
+        : m_ImportEnabled(importEnabled),
+          m_ExportEnabled(exportEnabled),
+          m_AsyncEnabled(asyncEnabled),
+          m_ProfilingEnabled(profilingEnabled),
+          m_InputSource(m_ImportEnabled ? MemorySource::Malloc : MemorySource::Undefined),
+          m_OutputSource(m_ExportEnabled ? MemorySource::Malloc : MemorySource::Undefined)
     {}
 
     ARMNN_DEPRECATED_MSG("Please use INetworkProperties constructor without numThreads argument")
     INetworkProperties(bool asyncEnabled,
                        MemorySource m_InputSource,
                        MemorySource m_OutputSource,
-                       size_t numThreads)
-            : m_ImportEnabled(m_InputSource != MemorySource::Undefined)
-            , m_ExportEnabled(m_OutputSource != MemorySource::Undefined)
-            , m_AsyncEnabled(asyncEnabled)
-            , m_InputSource(m_InputSource)
-            , m_OutputSource(m_OutputSource)
+                       size_t numThreads,
+                       bool profilingEnabled = false)
+        : m_ImportEnabled(m_InputSource != MemorySource::Undefined),
+          m_ExportEnabled(m_OutputSource != MemorySource::Undefined),
+          m_AsyncEnabled(asyncEnabled),
+          m_ProfilingEnabled(profilingEnabled),
+          m_InputSource(m_InputSource),
+          m_OutputSource(m_OutputSource)
     {
         armnn::IgnoreUnused(numThreads);
     }
 
     INetworkProperties(bool asyncEnabled,
                        MemorySource m_InputSource,
-                       MemorySource m_OutputSource)
-        : m_ImportEnabled(m_InputSource != MemorySource::Undefined)
-        , m_ExportEnabled(m_OutputSource != MemorySource::Undefined)
-        , m_AsyncEnabled(asyncEnabled)
-        , m_InputSource(m_InputSource)
-        , m_OutputSource(m_OutputSource)
-        {}
+                       MemorySource m_OutputSource,
+                       bool profilingEnabled = false)
+        : m_ImportEnabled(m_InputSource != MemorySource::Undefined),
+          m_ExportEnabled(m_OutputSource != MemorySource::Undefined),
+          m_AsyncEnabled(asyncEnabled),
+          m_ProfilingEnabled(profilingEnabled),
+          m_InputSource(m_InputSource),
+          m_OutputSource(m_OutputSource)
+    {}
 
     /// Deprecated and will be removed in future release.
     const bool m_ImportEnabled;
     /// Deprecated and will be removed in future release.
     const bool m_ExportEnabled;
 
-    const bool   m_AsyncEnabled;
+    const bool m_AsyncEnabled;
+
+    const bool m_ProfilingEnabled;
 
     const MemorySource m_InputSource;
     const MemorySource m_OutputSource;

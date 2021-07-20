@@ -5,6 +5,7 @@
 #pragma once
 
 #include "ProfilingEvent.hpp"
+#include "ProfilingDetails.hpp"
 
 #include <armnn/utility/IgnoreUnused.hpp>
 #include "armnn/IProfiler.hpp"
@@ -38,6 +39,14 @@ public:
                       const std::string& name,
                       std::vector<InstrumentPtr>&& instruments);
 
+    template<typename DescriptorType>
+    void AddLayerDetails(const std::string& label,
+                         const DescriptorType& desc,
+                         const WorkloadInfo& infos)
+    {
+        m_ProfilingDetails->AddDetailsToString(label, desc, infos);
+    }
+
     // Marks the end of a user-defined event.
     void EndEvent(Event* event);
 
@@ -61,6 +70,8 @@ public:
     uint32_t GetEventColor(const BackendId& backendId) const;
 
     using EventPtr = std::unique_ptr<Event>;
+    using DescPtr = std::unique_ptr<ProfilingDetails>;
+
     struct Marker
     {
         std::size_t m_Id;
@@ -83,6 +94,7 @@ public:
 
     std::stack<Event*> m_Parents;
     std::vector<EventPtr> m_EventSequence;
+    DescPtr m_ProfilingDetails = std::make_unique<ProfilingDetails>();
     bool m_ProfilingEnabled;
 };
 
@@ -152,8 +164,39 @@ private:
     IProfiler* m_Profiler; ///< Profiler used
 };
 
+// Helper to easily add operator details during profiling.
+class ScopedProfilingUpdateDescriptions
+{
+public:
+    template<typename DescriptorType>
+    ScopedProfilingUpdateDescriptions(const std::string& name, const DescriptorType& desc, const WorkloadInfo& infos)
+        : m_Profiler(ProfilerManager::GetInstance().GetProfiler())
+    {
+        if (m_Profiler && m_Profiler->IsProfilingEnabled())
+        {
+            m_Profiler->AddLayerDetails(name, desc, infos);
+        }
+    }
+
+    ~ScopedProfilingUpdateDescriptions()
+    {}
+
+private:
+
+    IProfiler* m_Profiler; ///< Profiler used
+};
+
+template<typename DescriptorType>
+void IProfiler::AddLayerDetails(const std::string& name,
+                                const DescriptorType& desc,
+                                const WorkloadInfo& infos)
+{
+    return pProfilerImpl->AddLayerDetails(name, desc, infos);
+}
+
 } // namespace armnn
 
+// Event Definitions for profiling
 #define ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS_UNIQUE_LOC_INNER(lineNumber, backendId, /*name,*/ ...) \
     armnn::ScopedProfilingEvent e_ ## lineNumber(backendId, /*name,*/ __VA_ARGS__);
 
@@ -172,3 +215,13 @@ private:
 
 #define ARMNN_SCOPED_PROFILING_EVENT(backendId, name) \
     ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(backendId, name, armnn::WallClockTimer())
+
+// Workload Description definitons for profiling
+#define ARMNN_REPORT_PROFILING_WORKLOAD_DESC_UNIQUE_LOC_INNER(lineNumber, name, desc, infos) \
+    armnn::ScopedProfilingUpdateDescriptions e_ ## lineNumber(name, desc, infos);
+
+#define ARMNN_REPORT_PROFILING_WORKLOAD_DESC_UNIQUE_LOC(lineNumber, name, desc, infos) \
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC_UNIQUE_LOC_INNER(lineNumber, name, desc, infos)
+
+#define ARMNN_REPORT_PROFILING_WORKLOAD_DESC(name, desc, infos) \
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC_UNIQUE_LOC(__LINE__, name, desc, infos)

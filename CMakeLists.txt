@@ -377,6 +377,7 @@ list(APPEND armnn_sources
     src/armnn/OutputHandler.hpp
     src/armnn/Profiling.cpp
     src/armnn/ProfilingEvent.cpp
+    src/armnn/ProfilingDetails.hpp
     src/armnn/ProfilingEvent.hpp
     src/armnn/Profiling.hpp
     src/armnn/Runtime.cpp

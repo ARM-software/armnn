@@ -120,6 +120,23 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
                                                   aclDilationInfo,
                                                   isFastMathEnabled);
 
+     // Add details for profiling output
+    std::string workloadName = "ClConvolution2dWorkload_Execute_Guid" + std::to_string(this->GetGuid());
+
+    WorkloadInfo detailsInfo;
+
+    detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;
+    detailsInfo.m_OutputTensorInfos = info.m_OutputTensorInfos;
+    detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Weight->GetTensorInfo());
+    detailsInfo.m_ConvolutionMethod = armnn::Optional<std::string>(GetConvolutionMethodString());
+    if (descriptor.m_Parameters.m_BiasEnabled)
+    {
+        detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Bias->GetTensorInfo());
+    }
+
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC(workloadName, descriptor.m_Parameters, detailsInfo);
+
     InitializeArmComputeClTensorData(*m_KernelTensor, m_Data.m_Weight);
 
     if (m_BiasTensor)
@@ -142,6 +159,23 @@ void ClConvolution2dWorkload::Execute() const
 arm_compute::ConvolutionMethod ClConvolution2dWorkload::GetConvolutionMethod() const
 {
     return m_ConvolutionMethod;
+}
+
+std::string ClConvolution2dWorkload::GetConvolutionMethodString()
+{
+    switch ( m_ConvolutionMethod )
+    {
+        case arm_compute::ConvolutionMethod::FFT:
+            return "FFT";
+        case arm_compute::ConvolutionMethod::DIRECT:
+            return "Direct";
+        case arm_compute::ConvolutionMethod::GEMM:
+            return "GEMM";
+        case arm_compute::ConvolutionMethod::WINOGRAD:
+            return "Winograd";
+        default:
+            return "Unknown";
+    }
 }
 
 void ClConvolution2dWorkload::FreeUnusedTensors()

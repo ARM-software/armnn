@@ -5,12 +5,13 @@
 
 #pragma once
 
-#include <ostream>
-#include <string.h>
+#include <string>
 #include <map>
 #include <set>
+#include <sstream>
 
 #include "Instrument.hpp"
+#include "JsonUtils.hpp"
 
 namespace armnn
 {
@@ -18,19 +19,31 @@ namespace armnn
 enum class JsonObjectType
 {
     Measurement,
-    Event
+    Event,
+    ExecObjectDesc
 };
 
 struct JsonChildObject
 {
+    // Object type changes according to the JsonObjectType specified in enum
     JsonChildObject(const std::string& label)
-            : m_Label(label), m_Unit(Measurement::Unit::TIME_MS), m_Type(JsonObjectType::Event)
+        : m_Label(label), m_Unit(Measurement::Unit::TIME_MS), m_Type(JsonObjectType::Event)
     {}
     JsonChildObject(const JsonChildObject&) = default;
 
     void AddMeasurement(const double measurement)
     {
         m_Measurements.push_back(measurement);
+    }
+
+    void SetAndParseDetails(std::string layerDetailsStr)
+    {
+        std::stringstream layerDetails(layerDetailsStr);
+        std::string stringLine;
+        while (std::getline(layerDetails, stringLine, '\n'))
+        {
+            m_LayerDetailsList.push_back(stringLine);
+        }
     }
 
     void AddChild(const JsonChildObject& childObject)
@@ -69,39 +82,31 @@ struct JsonChildObject
     Measurement::Unit m_Unit;
     JsonObjectType m_Type;
     std::vector<double> m_Measurements;
+    std::vector<std::string> m_LayerDetailsList;
     std::vector<JsonChildObject> m_Children;
 
 private:
     JsonChildObject() = delete;
 };
 
-class JsonPrinter
+class JsonPrinter : public JsonUtils
 {
 public:
     void PrintJsonChildObject(const JsonChildObject& object, size_t& id);
-    void PrintHeader();
-    void PrintArmNNHeader();
-    void PrintFooter();
-    void PrintSeparator();
-    void PrintNewLine();
     void PrintLabel(const std::string& label, size_t id);
     void PrintUnit(armnn::Measurement::Unit unit);
     void PrintType(armnn::JsonObjectType type);
     void PrintMeasurementsList(const std::vector<double>& measurementsVector);
 
 public:
-    JsonPrinter(std::ostream &outputStream)
-        : m_OutputStream(outputStream), m_NumTabs(0)
+    JsonPrinter(std::ostream& outputStream)
+        : JsonUtils(outputStream), m_OutputStream(outputStream)
     {}
 
 private:
     std::string MakeKey(const std::string& label, size_t id);
-    void PrintTabs();
-    void DecrementNumberOfTabs();
-    void IncrementNumberOfTabs();
 
-    std::ostream &m_OutputStream;
-    unsigned int m_NumTabs;
+    std::ostream& m_OutputStream;
 };
 
 } // namespace armnn

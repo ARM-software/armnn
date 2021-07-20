@@ -125,6 +125,8 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
     m_Profiler = std::make_shared<IProfiler>();
     ProfilerManager::GetInstance().RegisterProfiler(m_Profiler.get());
 
+    m_Profiler->EnableProfiling(networkProperties.m_ProfilingEnabled);
+
     Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().TopologicalSort();
     //First create tensor handlers, backends and workload factories.
     //Handlers are created before workloads are.

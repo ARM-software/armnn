@@ -232,7 +232,7 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  cxxopts::value<bool>(m_ExNetParams.m_ParseUnsupported)->default_value("false")->implicit_value("true"))
 
                 ("q,quantize-input",
-                 "If this option is enabled, all float inputs will be quantized to qasymm8. "
+                 "If this option is enabled, all float inputs will be quantized as appropriate for the model's inputs. "
                  "If unset, default to not quantized. Accepted values (true or false)",
                  cxxopts::value<bool>(m_ExNetParams.m_QuantizeInput)->default_value("false")->implicit_value("true"))
 
@@ -264,13 +264,13 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                 ("y,input-type",
                  "The type of the input tensors in the network separated by comma. "
                  "If unset, defaults to \"float\" for all defined inputs. "
-                 "Accepted values (float, int or qasymm8).",
+                 "Accepted values (float, int, qasymms8 or qasymmu8).",
                  cxxopts::value<std::string>())
 
                 ("z,output-type",
                  "The type of the output tensors in the network separated by comma. "
                  "If unset, defaults to \"float\" for all defined outputs. "
-                 "Accepted values (float, int or qasymm8).",
+                 "Accepted values (float, int,  qasymms8 or qasymmu8).",
                  cxxopts::value<std::string>())
 
                 ("T,tflite-executor",

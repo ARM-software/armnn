@@ -8,3 +8,8 @@ if(BUILD_SAMPLE_APP AND SAMPLE_DYNAMIC_BACKEND)
     target_link_libraries(DynamicSample armnn ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
+if(BUILD_SAMPLE_APP AND ARMCOMPUTECL)
+    add_executable(CustomMemoryAllocatorSample CustomMemoryAllocatorSample.cpp)
+    target_link_libraries(CustomMemoryAllocatorSample armnn ${CMAKE_THREAD_LIBS_INIT})
+endif()
+

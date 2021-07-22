@@ -39,6 +39,7 @@ void BackendRegistry::Register(const BackendId& id, BackendRegistry::FactoryFunc
 void BackendRegistry::Deregister(const BackendId& id)
 {
     m_Factories.erase(id);
+    DeregisterAllocator(id);
 
     if (m_ProfilingService.has_value() && m_ProfilingService.value().IsProfilingEnabled())
     {
@@ -106,5 +107,25 @@ void BackendRegistry::SetProfilingService(armnn::Optional<profiling::ProfilingSe
     m_ProfilingService = profilingService;
 }
 
+void BackendRegistry::RegisterAllocator(const BackendId& id, std::shared_ptr<ICustomAllocator> alloc)
+{
+    if (m_CustomMemoryAllocatorMap.find(id) != m_CustomMemoryAllocatorMap.end())
+    {
+        throw InvalidArgumentException(
+            std::string(id) + " already has an allocator associated with it",
+            CHECK_LOCATION());
+    }
+    m_CustomMemoryAllocatorMap[id] = alloc;
+}
+
+void BackendRegistry::DeregisterAllocator(const BackendId& id)
+{
+    m_CustomMemoryAllocatorMap.erase(id);
+}
+
+std::unordered_map<BackendId, std::shared_ptr<ICustomAllocator>> BackendRegistry::GetAllocators()
+{
+    return m_CustomMemoryAllocatorMap;
+}
 
 } // namespace armnn

@@ -61,7 +61,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClMallocImport")
     // Validate result by checking that the output has no negative values
     for(unsigned int i = 0; i < numElements; ++i)
     {
-        CHECK(typedPtr[i] >= 0);
+        CHECK(typedPtr[i] == 0);
     }
 }
 

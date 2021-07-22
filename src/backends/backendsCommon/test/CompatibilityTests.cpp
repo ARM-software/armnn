@@ -3,8 +3,12 @@
 // SPDX-License-Identifier: MIT
 //
 
+#if defined(ARMCOMPUTECL_ENABLED)
 #include <cl/ClBackend.hpp>
+#endif
+#if defined(ARMCOMPUTENEON_ENABLED)
 #include <neon/NeonBackend.hpp>
+#endif
 #include <reference/RefBackend.hpp>
 #include <armnn/BackendHelper.hpp>
 

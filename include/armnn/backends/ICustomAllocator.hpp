@@ -7,6 +7,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <armnn/MemorySources.hpp>
 
 namespace armnn
 {
@@ -23,13 +24,20 @@ public:
      * @param[in] alignment Alignment that the returned pointer should comply with
      *
      * @return A pointer to the allocated memory
+     * The returned pointer must be host write accessible
      */
-    virtual void *allocate(size_t size, size_t alignment) = 0;
-    /** Interface to be implemented by the child class to free the allocated tensor */
-    virtual void free(void *ptr) = 0;
+    virtual void* allocate(size_t size, size_t alignment) = 0;
 
-    // Utility Function to define the Custom Memory Allocators capabilities
-    virtual bool SupportsProtectedMemory() = 0;
+    /** Interface to be implemented by the child class to free the allocated bytes */
+    virtual void free(void* ptr) = 0;
+
+    //  Used to specify what type of memory is being allocated by this allocator.
+    //  Supported types are:
+    //      MemorySource::Malloc
+    //  Unsupported types are:
+    //      MemorySource::DmaBuf
+    //      MemorySource::DmaBufProtected
+    virtual armnn::MemorySource GetMemorySourceType() = 0;
 
 };
 } // namespace armnn

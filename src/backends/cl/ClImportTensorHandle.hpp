@@ -140,10 +140,16 @@ public:
 private:
     bool ClImport(const cl_import_properties_arm* importProperties, void* memory)
     {
-        const size_t totalBytes = m_Tensor.info()->total_size();
+        size_t totalBytes = m_Tensor.info()->total_size();
+
+        // Round the size of the buffer to a multiple of the CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE
+        auto cachelineAlignment =
+                arm_compute::CLKernelLibrary::get().get_device().getInfo<CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE>();
+        auto roundedSize = cachelineAlignment + totalBytes - (totalBytes % cachelineAlignment);
+
         cl_int error = CL_SUCCESS;
         cl_mem buffer = clImportMemoryARM(arm_compute::CLKernelLibrary::get().context().get(),
-                                          CL_MEM_READ_WRITE, importProperties, memory, totalBytes, &error);
+                                          CL_MEM_READ_WRITE, importProperties, memory, roundedSize, &error);
         if (error != CL_SUCCESS)
         {
             throw MemoryImportException("ClImportTensorHandle::Invalid imported memory" + std::to_string(error));

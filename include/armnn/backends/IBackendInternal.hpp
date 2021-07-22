@@ -199,10 +199,13 @@ public:
 
     /// Signals the backend to use a custom memory allocator provided by the user
     ///
+    /// \param allocator - a pointer to the provided ICustomAllocator to use with this backend
     /// \param errMsg - Optional string variable to return error messages
     /// \return - Returns true if switching to custom allocator was successful
-    virtual bool UseCustomMemoryAllocator(armnn::Optional<std::string&> errMsg)
+    virtual bool UseCustomMemoryAllocator(std::shared_ptr<ICustomAllocator> allocator,
+                                          armnn::Optional<std::string&> errMsg)
     {
+        IgnoreUnused(allocator);
         if (errMsg)
         {
             std::stringstream message;

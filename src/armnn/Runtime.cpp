@@ -130,7 +130,8 @@ Status RuntimeImpl::LoadNetwork(NetworkId& networkIdOut,
                                 IOptimizedNetworkPtr inNetwork,
                                 std::string& errorMessage)
 {
-    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    INetworkProperties networkProperties(
+            false, MemorySource::Undefined, MemorySource::Undefined);
     return LoadNetwork(networkIdOut, std::move(inNetwork), errorMessage, networkProperties);
 }
 
@@ -267,7 +268,8 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
 
     if ( options.m_ProfilingOptions.m_TimelineEnabled && !options.m_ProfilingOptions.m_EnableProfiling )
     {
-        throw RuntimeException("It is not possible to enable timeline reporting without profiling being enabled");
+        throw RuntimeException(
+                "It is not possible to enable timeline reporting without profiling being enabled");
     }
 
     // Load any available/compatible dynamic backend before the runtime
@@ -282,6 +284,8 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
             auto factoryFun = BackendRegistryInstance().GetFactory(id);
             auto backend = factoryFun();
             ARMNN_ASSERT(backend.get() != nullptr);
+
+            auto customAllocatorMapIterator = options.m_CustomAllocatorMap.find(id);
 
             // If the runtime is created in protected mode only add backends that support this mode
             if (options.m_ProtectedMode)
@@ -298,17 +302,61 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
                                        << " is not registered as does not support protected content allocation \n";
                     continue;
                 }
-                std::string err;
-                if (!backend->UseCustomMemoryAllocator(err))
+                // The user is responsible to provide a custom memory allocator which allows to allocate
+                // protected memory
+                if (customAllocatorMapIterator != options.m_CustomAllocatorMap.end())
                 {
-                    ARMNN_LOG(error) << "The backend "
+                    std::string err;
+                    if (customAllocatorMapIterator->second->GetMemorySourceType()
+                        == armnn::MemorySource::DmaBufProtected)
+                    {
+                        if (!backend->UseCustomMemoryAllocator(customAllocatorMapIterator->second, err))
+                        {
+                            ARMNN_LOG(error) << "The backend "
+                                             << id
+                                             << " reported an error when entering protected mode. Backend won't be"
+                                             << " used. ErrorMsg: " << err;
+                            continue;
+                        }
+                        // No errors so register the Custom Allocator with the BackendRegistry
+                        BackendRegistryInstance().RegisterAllocator(id, customAllocatorMapIterator->second);
+                    }
+                    else
+                    {
+                        ARMNN_LOG(error) << "The CustomAllocator provided with the runtime options doesn't support "
+                                     "protected memory. Protected mode can't be activated. The backend "
                                      << id
-                                     << " reported an error when entering protected mode. Backend won't be used."
-                                     << " ErrorMsg: " << err;
+                                     << " is not going to be used. MemorySource must be MemorySource::DmaBufProtected";
+                        continue;
+                    }
+                }
+                else
+                {
+                    ARMNN_LOG(error) << "Protected mode can't be activated for backend: "
+                                     << id
+                                     << " no custom allocator was provided to the runtime options.";
                     continue;
                 }
             }
-
+            else
+            {
+                // If a custom memory allocator is provided make the backend use that instead of the default
+                if (customAllocatorMapIterator != options.m_CustomAllocatorMap.end())
+                {
+                    std::string err;
+                    if (!backend->UseCustomMemoryAllocator(customAllocatorMapIterator->second, err))
+                    {
+                        ARMNN_LOG(error) << "The backend "
+                                         << id
+                                         << " reported an error when trying to use the provided custom allocator."
+                                            " Backend won't be used."
+                                         << " ErrorMsg: " << err;
+                        continue;
+                    }
+                    // No errors so register the Custom Allocator with the BackendRegistry
+                    BackendRegistryInstance().RegisterAllocator(id, customAllocatorMapIterator->second);
+                }
+            }
             auto context = backend->CreateBackendContext(options);
 
             // backends are allowed to return nullptrs if they

@@ -15,7 +15,7 @@ namespace armnn
 {
 
 #if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)
-BaseMemoryManager::BaseMemoryManager(std::unique_ptr<arm_compute::IAllocator> alloc,
+BaseMemoryManager::BaseMemoryManager(std::shared_ptr<arm_compute::IAllocator> alloc,
                                      MemoryAffinity memoryAffinity)
 {
     ARMNN_ASSERT(alloc);

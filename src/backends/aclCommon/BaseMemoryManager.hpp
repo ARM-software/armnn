@@ -15,6 +15,7 @@
 #include <arm_compute/runtime/IAllocator.h>
 #include <arm_compute/runtime/IMemoryGroup.h>
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>
+#include <arm_compute/runtime/CL/CLTensorAllocator.h>
 #endif
 
 namespace armnn
@@ -36,14 +37,14 @@ public:
     void Release() override;
 
 #if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)
-    BaseMemoryManager(std::unique_ptr<arm_compute::IAllocator> alloc, MemoryAffinity memoryAffinity);
+    BaseMemoryManager(std::shared_ptr<arm_compute::IAllocator> alloc, MemoryAffinity memoryAffinity);
 
     std::shared_ptr<arm_compute::MemoryManagerOnDemand>& GetIntraLayerManager() { return m_IntraLayerMemoryMgr; }
     std::shared_ptr<arm_compute::MemoryManagerOnDemand>& GetInterLayerManager() { return m_InterLayerMemoryMgr; }
     std::shared_ptr<arm_compute::IMemoryGroup>& GetInterLayerMemoryGroup()      { return m_InterLayerMemoryGroup; }
 
 protected:
-    std::unique_ptr<arm_compute::IAllocator>            m_Allocator;
+    std::shared_ptr<arm_compute::IAllocator>            m_Allocator;
     std::shared_ptr<arm_compute::MemoryManagerOnDemand> m_IntraLayerMemoryMgr;
     std::shared_ptr<arm_compute::MemoryManagerOnDemand> m_InterLayerMemoryMgr;
     std::shared_ptr<arm_compute::IMemoryGroup>          m_InterLayerMemoryGroup;
@@ -81,9 +82,10 @@ public:
     ClMemoryManager() {}
     virtual ~ClMemoryManager() {}
 
-    ClMemoryManager(std::unique_ptr<arm_compute::IAllocator> alloc)
+    ClMemoryManager(std::shared_ptr<arm_compute::IAllocator> alloc)
     : BaseMemoryManager(std::move(alloc), MemoryAffinity::Buffer)
     {
+        arm_compute::CLTensorAllocator::set_global_allocator(alloc.get());
         m_InterLayerMemoryGroup = CreateMemoryGroup(m_InterLayerMemoryMgr);
     }
 

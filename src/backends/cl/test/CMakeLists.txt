@@ -6,6 +6,7 @@
 list(APPEND armnnClBackendUnitTests_sources
     ClContextControlFixture.hpp
     ClContextSerializerTests.cpp
+    ClCustomAllocatorTests.cpp
     ClCreateWorkloadTests.cpp
     ClEndToEndTests.cpp
     ClImportTensorHandleFactoryTests.cpp

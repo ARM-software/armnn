@@ -16,6 +16,7 @@
 
 #include <armnn/backends/ICustomAllocator.hpp>
 #include <memory>
+#include <map>
 
 namespace armnn
 {
@@ -103,8 +104,8 @@ public:
             : m_GpuAccTunedParameters(nullptr)
             , m_EnableGpuProfiling(false)
             , m_DynamicBackendsPath("")
-            , m_CustomAllocator(nullptr)
             , m_ProtectedMode(false)
+            , m_CustomAllocatorMap()
         {}
 
         /// If set, uses the GpuAcc tuned parameters from the given object when executing GPU workloads.
@@ -118,16 +119,21 @@ public:
         /// Only a single path is allowed for the override
         std::string m_DynamicBackendsPath;
 
-        /// A Custom Allocator used for allocation of working memory in the backends.
-        /// Set this for when you need to allocate Protected Working Memory, required for ProtectedMode
-        /// Only supported for GpuAcc
-        ICustomAllocator* m_CustomAllocator;
-
         /// Setting this flag will allow the user to create the Runtime in protected mode.
         /// It will run all the inferences on protected memory and will make sure that
         /// INetworkProperties::m_ImportEnabled set to true with MemorySource::DmaBufProtected option
-        /// This will use Protected Memory Allocator associated with the backend
+        /// This requires that the backend supports Protected Memory and has an allocator capable of
+        /// allocating Protected Memory associated with it.
         bool m_ProtectedMode;
+
+        /// @brief A map to define a custom memory allocator for specific backend Ids.
+        ///
+        /// @details  A Custom Allocator is used for allocation of working memory in the backends.
+        /// Set this if you need to take control of how memory is allocated on a backend. Required for
+        /// Protected Mode in order to correctly allocate Protected Memory
+        ///
+        /// @note Only supported for GpuAcc
+        std::map<BackendId, std::shared_ptr<ICustomAllocator>> m_CustomAllocatorMap;
 
         struct ExternalProfilingOptions
         {

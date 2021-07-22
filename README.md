@@ -80,10 +80,6 @@ or take a look at previous [github issues](https://github.com/ARM-software/armnn
    Consequently Arm NN will from the 21.08 Release at the end of August 2021 no longer be officially
    supported on Ubuntu 16.04 LTS but will instead be supported on Ubuntu 18.04 LTS.
 
-3. We are currently in the process of removing [boost](https://www.boost.org/) as a dependency to Arm NN. This process
-   is finished for everything apart from our unit tests. This means you don't need boost to build and use Arm NN but
-   you need it to execute our unit tests. Boost will soon be removed from Arm NN entirely.
-
 
 ## How to get involved
 If you would like to get involved but don't know where to start, a good place to look is in our Github Issues.

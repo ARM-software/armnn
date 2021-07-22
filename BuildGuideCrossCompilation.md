@@ -3,7 +3,6 @@
 - [Introduction](#introduction)
 - [Cross-compiling ToolChain](#cross-compiling-toolchain)
 - [Build and install Google's Protobuf library](#build-and-install-google-s-protobuf-library)
-- [Build Boost library for arm64](#build-boost-library-for-arm64)
 - [Build Compute Library](#build-compute-library)
 - [Download ArmNN](#download-armnn)
 - [Build Flatbuffer](#build-flatbuffer)
@@ -16,7 +15,7 @@
 
 
 ## Introduction
-These are the step by step instructions on Cross-Compiling Arm NN under an x86_64 system to target an Arm64 system. This build flow has been tested with Ubuntu 16.04 and it depends on the same version of Ubuntu or Debian being installed on both the build host and target machines. The instructions assume you are using a bash shell and show how to build the Arm NN core library, Boost, Protobuf, Tflite, Flatbuffer and Compute Libraries.
+These are the step by step instructions on Cross-Compiling Arm NN under an x86_64 system to target an Arm64 system. This build flow has been tested with Ubuntu 16.04 and it depends on the same version of Ubuntu or Debian being installed on both the build host and target machines. The instructions assume you are using a bash shell and show how to build the Arm NN core library, Protobuf, Tflite, Flatbuffer and Compute Libraries.
 Start by creating a directory to contain all components:
 
 '''
@@ -24,7 +23,6 @@ mkdir $HOME/armnn-devenv
 cd $HOME/armnn-devenv
 '''
 
-#####Note: We are currently in the process of removing boost as a dependency to Arm NN. This process is finished for everything apart from our unit tests. This means you don't need boost to build and use Arm NN but you need it to execute our unit tests. Boost will soon be removed from Arm NN entirely. We have also removed support for Caffe and Tensorflow parsers from 21.05. 
 
 ## Cross-compiling ToolChain
 * Install the standard cross-compilation libraries for arm64:
@@ -64,18 +62,6 @@ make install -j16
 cd ..
 ```
 
-## Build Boost library for arm64
-* Build Boost library for arm64
-    Download Boost version 1.64 from http://www.boost.org/doc/libs/1_64_0/more/getting_started/unix-variants.html
-    Using any version of Boost greater than 1.64 will fail to build Arm NN, due to different dependency issues.
-```bash
-cd $HOME/armnn-devenv
-tar -zxvf boost_1_64_0.tar.gz
-cd boost_1_64_0
-echo "using gcc : arm : aarch64-linux-gnu-g++ ;" > user_config.jam
-./bootstrap.sh --prefix=$HOME/armnn-devenv/boost_arm64_install
-./b2 install toolset=gcc-arm link=static cxxflags=-fPIC --with-test --with-log --with-program_options -j32 --user-config=user_config.jam
-```
 
 ## Build Compute Library
 * Building the Arm Compute Library:
@@ -177,7 +163,6 @@ cd build
 CXX=aarch64-linux-gnu-g++ CC=aarch64-linux-gnu-gcc cmake .. \
 -DARMCOMPUTE_ROOT=$HOME/armnn-devenv/ComputeLibrary \
 -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build/ \
--DBOOST_ROOT=$HOME/armnn-devenv/boost_arm64_install/ \
 -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
 -DONNX_GENERATED_SOURCES=$HOME/armnn-devenv/onnx \
 -DBUILD_ONNX_PARSER=1 \
@@ -248,46 +233,6 @@ Running 4493 test cases...
 ```
 
 ## Troubleshooting and Errors:
-### Error adding symbols: File in wrong format
-* When building Arm NN:
-```bash
-/usr/local/lib/libboost_log.a: error adding symbols: File in wrong format
-collect2: error: ld returned 1 exit status
-CMakeFiles/armnn.dir/build.make:4028: recipe for target 'libarmnn.so' failed
-make[2]: *** [libarmnn.so] Error 1
-CMakeFiles/Makefile2:105: recipe for target 'CMakeFiles/armnn.dir/all' failed
-make[1]: *** [CMakeFiles/armnn.dir/all] Error 2
-Makefile:127: recipe for target 'all' failed
-make: *** [all] Error 2
-```
-* Boost libraries are not compiled for the correct architecture, try recompiling for arm64
-<br><br>
-
-### Virtual memory exhausted
-* When compiling the boost libraries:
-```bash
-virtual memory exhausted: Cannot allocate memory
-```
-* Not enough memory available to compile. Increase the amount of RAM or swap space available.
-<br><br>
-
-### Unrecognized command line option '-m64'
-* When compiling the boost libraries:
-```bash
-aarch64-linux-gnu-g++: error: unrecognized command line option ‘-m64’
-```
-* Clean the boost library directory before trying to build with a different architecture:
-```bash
-sudo ./b2 clean
-```
-* It should show the following for arm64:
-```bash
-- 32-bit                   : no
-- 64-bit                   : yes
-- arm                      : yes
-```
-<br><br>
-
 ### Missing libz.so.1
 * When compiling armNN:
 ```bash

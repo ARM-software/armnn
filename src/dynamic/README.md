@@ -23,15 +23,13 @@ The makefile used for building the standalone reference dynamic backend is also 
 ### Standalone dynamic backend build
 
 The easiest way to build a standalone sample dynamic backend is to build using environment configured compiler
-and specify the Arm NN path and Boost path to the CMake command:
+and specify the Arm NN path to the CMake command:
 
 ```shell
 cd ${DYNAMIC_BACKEND_DIR}
 mkdir build
 cd build
-cmake -DBOOST_ROOT=${BOOST_PATH} \
-      -DBoost_SYSTEM_LIBRARY=${BOOST_PATH}/lib/libboost_system.a \
-      -DARMNN_PATH=${ARMNN_PATH}/libarmnn.so ..
+cmake -DARMNN_PATH=${ARMNN_PATH}/libarmnn.so ..
 ```
 
 Then run the build

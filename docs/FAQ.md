@@ -3,6 +3,8 @@ Frequently asked questions
 
 These are issues that have been commonly seen when using ArmNN.
 
+Note: The 21.08 release of Arm NN removes Boost library dependency. You are not required to install boost library with 21.08 and newer releases.
+
 Problems seen when trying to build armnn and ComputeLibrary obtained from GitHub
 -----------------------------------------------------------------------------
 

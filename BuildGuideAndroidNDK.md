@@ -2,7 +2,6 @@
 
 - [Introduction](#introduction)
 - [Download the Android NDK and make a standalone toolchain](#download-the-android-ndk-and-make-a-standalone-toolchain)
-- [Build the Boost C++ libraries](#build-the-boost-c---libraries)
 - [Build the Compute Library](#build-the-compute-library)
 - [Build Google's Protobuf library](#build-google-s-protobuf-library)
 - [Build Arm NN](#build-armnn)
@@ -16,8 +15,6 @@ They have been tested on a clean install of Ubuntu 16.04, and should also work w
 The instructions show how to build the Arm NN core library.
 Building protobuf is optional. We have given steps should the user wish to build it (i.e. as an Onnx dependency).
 All downloaded or generated files will be saved inside the `~/armnn-devenv` directory.
-
-#####Note: We are currently in the process of removing boost as a dependency to Arm NN. This process is finished for everything apart from our unit tests. This means you don't need boost to build and use Arm NN but you need it to execute our unit tests. Boost will soon be removed from Arm NN entirely. 
 
 ## Download the Android NDK and make a standalone toolchain
 
@@ -36,30 +33,6 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
  ```
 
 * With the android ndk-20b, you don't need to use the make_standalone_toolchain script to create a toolchain for a specific version of android. Android's current preference is for you to just specify the architecture and operating system while setting the compiler and just use the ndk directory.
-
-## Build the Boost C++ libraries
-
-* Download Boost version 1.64:
-```bash
-mkdir ~/armnn-devenv/boost
-cd ~/armnn-devenv/boost
-wget https://dl.bintray.com/boostorg/release/1.64.0/source/boost_1_64_0.tar.bz2
-tar xvf boost_1_64_0.tar.bz2
-```
-
-* Build:
-
-	(Requires clang if not previously installed: `sudo apt-get install clang`)
-    
-    Note: You can specify the 'Android_API' version you want. For example, if your ANDROID_API is 27 then the compiler will be aarch64-linux-android27-clang++.
-```bash
-echo "using clang : arm : aarch64-linux-android<Android_API>-clang++ ;" > $HOME/armnn-devenv/boost/user-config.jam
-cd ~/armnn-devenv/boost/boost_1_64_0
-./bootstrap.sh --prefix=$HOME/armnn-devenv/boost/install
-./b2 install --user-config=$HOME/armnn-devenv/boost/user-config.jam \
- toolset=clang-arm link=static cxxflags=-fPIC \
- --with-test --with-log --with-program_options -j16
-```
 
 ## Build the Compute Library
 * Clone the Compute Library:
@@ -165,7 +138,6 @@ cmake .. \
     -DCMAKE_EXE_LINKER_FLAGS="-pie -llog -lz" \
     -DARMCOMPUTE_ROOT=$HOME/armnn-devenv/ComputeLibrary/ \
     -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build \
-    -DBOOST_ROOT=$HOME/armnn-devenv/boost/install/ \
     -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
     -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/arm64_pb_install/
 ```
@@ -201,8 +173,6 @@ cmake \
 -DCMAKE_CXX_FLAGS=--std=c++14 \
 -DCMAKE_EXE_LINKER_FLAGS="-pie -llog" \
 -DCMAKE_MODULE_LINKER_FLAGS="-llog" \
--DBOOST_ROOT=$HOME/armnn-devenv/boost/install \
--DBoost_SYSTEM_LIBRARY=$HOME/armnn-devenv/boost/install/lib/libboost_system.a \
 -DARMNN_PATH=$HOME/armnn-devenv/armnn/build/libarmnn.so ..
 ```
 

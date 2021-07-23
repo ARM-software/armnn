@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_05" # Release 21.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="24b892072a2bd8190ba63d09fb0082113d7d032a" #Port NECol2ImKernel.
+DEFAULT_CLFRAMEWORKREVISION="f67034e7f52596eece094b37fb386c946e1b87ee" #Fix NN driver build script for Android R.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

@@ -348,6 +348,11 @@ private:
     void SerializeTransposeLayer(const armnn::IConnectableLayer* layer,
                                  const armnn::TransposeDescriptor& descriptor,
                                  const char* name = nullptr);
+
+    void SerializeUnidirectionalSequenceLstmLayer(const armnn::IConnectableLayer* layer,
+                                                  const armnn::UnidirectionalSequenceLstmDescriptor& descriptor,
+                                                  const std::vector<armnn::ConstTensor>& constants,
+                                                  const char* name = nullptr);
 };
 
 

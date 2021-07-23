@@ -76,6 +76,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 - Switch
 - Transpose
 - TransposeConvolution2d
+- UnidirectionalSequenceLstm
 
 More machine learning layers will be supported in future releases.
 
@@ -163,6 +164,7 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 - Switch
 - Transpose
 - TransposeConvolution2d
+- UnidirectionalSequenceLstm
 
 More machine learning layers will be supported in future releases.
 

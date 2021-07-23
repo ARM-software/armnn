@@ -362,6 +362,12 @@ struct ReduceLayerBuilder;
 struct ReduceDescriptor;
 struct ReduceDescriptorBuilder;
 
+struct UnidirectionalSequenceLstmDescriptor;
+struct UnidirectionalSequenceLstmDescriptorBuilder;
+
+struct UnidirectionalSequenceLstmLayer;
+struct UnidirectionalSequenceLstmLayerBuilder;
+
 struct AnyLayer;
 struct AnyLayerBuilder;
 
@@ -740,11 +746,12 @@ enum LayerType {
   LayerType_Reduce = 60,
   LayerType_Cast = 61,
   LayerType_Shape = 62,
+  LayerType_UnidirectionalSequenceLstm = 63,
   LayerType_MIN = LayerType_Addition,
-  LayerType_MAX = LayerType_Shape
+  LayerType_MAX = LayerType_UnidirectionalSequenceLstm
 };
 
-inline const LayerType (&EnumValuesLayerType())[63] {
+inline const LayerType (&EnumValuesLayerType())[64] {
   static const LayerType values[] = {
     LayerType_Addition,
     LayerType_Input,
@@ -808,13 +815,14 @@ inline const LayerType (&EnumValuesLayerType())[63] {
     LayerType_LogicalBinary,
     LayerType_Reduce,
     LayerType_Cast,
-    LayerType_Shape
+    LayerType_Shape,
+    LayerType_UnidirectionalSequenceLstm
   };
   return values;
 }
 
 inline const char * const *EnumNamesLayerType() {
-  static const char * const names[64] = {
+  static const char * const names[65] = {
     "Addition",
     "Input",
     "Multiplication",
@@ -878,13 +886,14 @@ inline const char * const *EnumNamesLayerType() {
     "Reduce",
     "Cast",
     "Shape",
+    "UnidirectionalSequenceLstm",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLayerType(LayerType e) {
-  if (flatbuffers::IsOutRange(e, LayerType_Addition, LayerType_Shape)) return "";
+  if (flatbuffers::IsOutRange(e, LayerType_Addition, LayerType_UnidirectionalSequenceLstm)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLayerType()[index];
 }
@@ -1227,11 +1236,12 @@ enum Layer {
   Layer_ReduceLayer = 61,
   Layer_CastLayer = 62,
   Layer_ShapeLayer = 63,
+  Layer_UnidirectionalSequenceLstmLayer = 64,
   Layer_MIN = Layer_NONE,
-  Layer_MAX = Layer_ShapeLayer
+  Layer_MAX = Layer_UnidirectionalSequenceLstmLayer
 };
 
-inline const Layer (&EnumValuesLayer())[64] {
+inline const Layer (&EnumValuesLayer())[65] {
   static const Layer values[] = {
     Layer_NONE,
     Layer_ActivationLayer,
@@ -1296,13 +1306,14 @@ inline const Layer (&EnumValuesLayer())[64] {
     Layer_LogicalBinaryLayer,
     Layer_ReduceLayer,
     Layer_CastLayer,
-    Layer_ShapeLayer
+    Layer_ShapeLayer,
+    Layer_UnidirectionalSequenceLstmLayer
   };
   return values;
 }
 
 inline const char * const *EnumNamesLayer() {
-  static const char * const names[65] = {
+  static const char * const names[66] = {
     "NONE",
     "ActivationLayer",
     "AdditionLayer",
@@ -1367,13 +1378,14 @@ inline const char * const *EnumNamesLayer() {
     "ReduceLayer",
     "CastLayer",
     "ShapeLayer",
+    "UnidirectionalSequenceLstmLayer",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLayer(Layer e) {
-  if (flatbuffers::IsOutRange(e, Layer_NONE, Layer_ShapeLayer)) return "";
+  if (flatbuffers::IsOutRange(e, Layer_NONE, Layer_UnidirectionalSequenceLstmLayer)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLayer()[index];
 }
@@ -1632,6 +1644,10 @@ template<> struct LayerTraits<armnnSerializer::CastLayer> {
 
 template<> struct LayerTraits<armnnSerializer::ShapeLayer> {
   static const Layer enum_value = Layer_ShapeLayer;
+};
+
+template<> struct LayerTraits<armnnSerializer::UnidirectionalSequenceLstmLayer> {
+  static const Layer enum_value = Layer_UnidirectionalSequenceLstmLayer;
 };
 
 bool VerifyLayer(flatbuffers::Verifier &verifier, const void *obj, Layer type);
@@ -9425,6 +9441,183 @@ inline flatbuffers::Offset<ReduceDescriptor> CreateReduceDescriptorDirect(
       reduceOperation);
 }
 
+struct UnidirectionalSequenceLstmDescriptor FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef UnidirectionalSequenceLstmDescriptorBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ACTIVATIONFUNC = 4,
+    VT_CLIPPINGTHRESCELL = 6,
+    VT_CLIPPINGTHRESPROJ = 8,
+    VT_CIFGENABLED = 10,
+    VT_PEEPHOLEENABLED = 12,
+    VT_PROJECTIONENABLED = 14,
+    VT_LAYERNORMENABLED = 16,
+    VT_TIMEMAJOR = 18
+  };
+  uint32_t activationFunc() const {
+    return GetField<uint32_t>(VT_ACTIVATIONFUNC, 0);
+  }
+  float clippingThresCell() const {
+    return GetField<float>(VT_CLIPPINGTHRESCELL, 0.0f);
+  }
+  float clippingThresProj() const {
+    return GetField<float>(VT_CLIPPINGTHRESPROJ, 0.0f);
+  }
+  bool cifgEnabled() const {
+    return GetField<uint8_t>(VT_CIFGENABLED, 1) != 0;
+  }
+  bool peepholeEnabled() const {
+    return GetField<uint8_t>(VT_PEEPHOLEENABLED, 0) != 0;
+  }
+  bool projectionEnabled() const {
+    return GetField<uint8_t>(VT_PROJECTIONENABLED, 0) != 0;
+  }
+  bool layerNormEnabled() const {
+    return GetField<uint8_t>(VT_LAYERNORMENABLED, 0) != 0;
+  }
+  bool timeMajor() const {
+    return GetField<uint8_t>(VT_TIMEMAJOR, 0) != 0;
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint32_t>(verifier, VT_ACTIVATIONFUNC) &&
+           VerifyField<float>(verifier, VT_CLIPPINGTHRESCELL) &&
+           VerifyField<float>(verifier, VT_CLIPPINGTHRESPROJ) &&
+           VerifyField<uint8_t>(verifier, VT_CIFGENABLED) &&
+           VerifyField<uint8_t>(verifier, VT_PEEPHOLEENABLED) &&
+           VerifyField<uint8_t>(verifier, VT_PROJECTIONENABLED) &&
+           VerifyField<uint8_t>(verifier, VT_LAYERNORMENABLED) &&
+           VerifyField<uint8_t>(verifier, VT_TIMEMAJOR) &&
+           verifier.EndTable();
+  }
+};
+
+struct UnidirectionalSequenceLstmDescriptorBuilder {
+  typedef UnidirectionalSequenceLstmDescriptor Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_activationFunc(uint32_t activationFunc) {
+    fbb_.AddElement<uint32_t>(UnidirectionalSequenceLstmDescriptor::VT_ACTIVATIONFUNC, activationFunc, 0);
+  }
+  void add_clippingThresCell(float clippingThresCell) {
+    fbb_.AddElement<float>(UnidirectionalSequenceLstmDescriptor::VT_CLIPPINGTHRESCELL, clippingThresCell, 0.0f);
+  }
+  void add_clippingThresProj(float clippingThresProj) {
+    fbb_.AddElement<float>(UnidirectionalSequenceLstmDescriptor::VT_CLIPPINGTHRESPROJ, clippingThresProj, 0.0f);
+  }
+  void add_cifgEnabled(bool cifgEnabled) {
+    fbb_.AddElement<uint8_t>(UnidirectionalSequenceLstmDescriptor::VT_CIFGENABLED, static_cast<uint8_t>(cifgEnabled), 1);
+  }
+  void add_peepholeEnabled(bool peepholeEnabled) {
+    fbb_.AddElement<uint8_t>(UnidirectionalSequenceLstmDescriptor::VT_PEEPHOLEENABLED, static_cast<uint8_t>(peepholeEnabled), 0);
+  }
+  void add_projectionEnabled(bool projectionEnabled) {
+    fbb_.AddElement<uint8_t>(UnidirectionalSequenceLstmDescriptor::VT_PROJECTIONENABLED, static_cast<uint8_t>(projectionEnabled), 0);
+  }
+  void add_layerNormEnabled(bool layerNormEnabled) {
+    fbb_.AddElement<uint8_t>(UnidirectionalSequenceLstmDescriptor::VT_LAYERNORMENABLED, static_cast<uint8_t>(layerNormEnabled), 0);
+  }
+  void add_timeMajor(bool timeMajor) {
+    fbb_.AddElement<uint8_t>(UnidirectionalSequenceLstmDescriptor::VT_TIMEMAJOR, static_cast<uint8_t>(timeMajor), 0);
+  }
+  explicit UnidirectionalSequenceLstmDescriptorBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  UnidirectionalSequenceLstmDescriptorBuilder &operator=(const UnidirectionalSequenceLstmDescriptorBuilder &);
+  flatbuffers::Offset<UnidirectionalSequenceLstmDescriptor> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<UnidirectionalSequenceLstmDescriptor>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<UnidirectionalSequenceLstmDescriptor> CreateUnidirectionalSequenceLstmDescriptor(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint32_t activationFunc = 0,
+    float clippingThresCell = 0.0f,
+    float clippingThresProj = 0.0f,
+    bool cifgEnabled = true,
+    bool peepholeEnabled = false,
+    bool projectionEnabled = false,
+    bool layerNormEnabled = false,
+    bool timeMajor = false) {
+  UnidirectionalSequenceLstmDescriptorBuilder builder_(_fbb);
+  builder_.add_clippingThresProj(clippingThresProj);
+  builder_.add_clippingThresCell(clippingThresCell);
+  builder_.add_activationFunc(activationFunc);
+  builder_.add_timeMajor(timeMajor);
+  builder_.add_layerNormEnabled(layerNormEnabled);
+  builder_.add_projectionEnabled(projectionEnabled);
+  builder_.add_peepholeEnabled(peepholeEnabled);
+  builder_.add_cifgEnabled(cifgEnabled);
+  return builder_.Finish();
+}
+
+struct UnidirectionalSequenceLstmLayer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef UnidirectionalSequenceLstmLayerBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_BASE = 4,
+    VT_DESCRIPTOR = 6,
+    VT_INPUTPARAMS = 8
+  };
+  const armnnSerializer::LayerBase *base() const {
+    return GetPointer<const armnnSerializer::LayerBase *>(VT_BASE);
+  }
+  const armnnSerializer::UnidirectionalSequenceLstmDescriptor *descriptor() const {
+    return GetPointer<const armnnSerializer::UnidirectionalSequenceLstmDescriptor *>(VT_DESCRIPTOR);
+  }
+  const armnnSerializer::LstmInputParams *inputParams() const {
+    return GetPointer<const armnnSerializer::LstmInputParams *>(VT_INPUTPARAMS);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_BASE) &&
+           verifier.VerifyTable(base()) &&
+           VerifyOffset(verifier, VT_DESCRIPTOR) &&
+           verifier.VerifyTable(descriptor()) &&
+           VerifyOffset(verifier, VT_INPUTPARAMS) &&
+           verifier.VerifyTable(inputParams()) &&
+           verifier.EndTable();
+  }
+};
+
+struct UnidirectionalSequenceLstmLayerBuilder {
+  typedef UnidirectionalSequenceLstmLayer Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_base(flatbuffers::Offset<armnnSerializer::LayerBase> base) {
+    fbb_.AddOffset(UnidirectionalSequenceLstmLayer::VT_BASE, base);
+  }
+  void add_descriptor(flatbuffers::Offset<armnnSerializer::UnidirectionalSequenceLstmDescriptor> descriptor) {
+    fbb_.AddOffset(UnidirectionalSequenceLstmLayer::VT_DESCRIPTOR, descriptor);
+  }
+  void add_inputParams(flatbuffers::Offset<armnnSerializer::LstmInputParams> inputParams) {
+    fbb_.AddOffset(UnidirectionalSequenceLstmLayer::VT_INPUTPARAMS, inputParams);
+  }
+  explicit UnidirectionalSequenceLstmLayerBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  UnidirectionalSequenceLstmLayerBuilder &operator=(const UnidirectionalSequenceLstmLayerBuilder &);
+  flatbuffers::Offset<UnidirectionalSequenceLstmLayer> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<UnidirectionalSequenceLstmLayer>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<UnidirectionalSequenceLstmLayer> CreateUnidirectionalSequenceLstmLayer(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<armnnSerializer::LayerBase> base = 0,
+    flatbuffers::Offset<armnnSerializer::UnidirectionalSequenceLstmDescriptor> descriptor = 0,
+    flatbuffers::Offset<armnnSerializer::LstmInputParams> inputParams = 0) {
+  UnidirectionalSequenceLstmLayerBuilder builder_(_fbb);
+  builder_.add_inputParams(inputParams);
+  builder_.add_descriptor(descriptor);
+  builder_.add_base(base);
+  return builder_.Finish();
+}
+
 struct AnyLayer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef AnyLayerBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -9626,6 +9819,9 @@ struct AnyLayer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const armnnSerializer::ShapeLayer *layer_as_ShapeLayer() const {
     return layer_type() == armnnSerializer::Layer_ShapeLayer ? static_cast<const armnnSerializer::ShapeLayer *>(layer()) : nullptr;
+  }
+  const armnnSerializer::UnidirectionalSequenceLstmLayer *layer_as_UnidirectionalSequenceLstmLayer() const {
+    return layer_type() == armnnSerializer::Layer_UnidirectionalSequenceLstmLayer ? static_cast<const armnnSerializer::UnidirectionalSequenceLstmLayer *>(layer()) : nullptr;
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -9886,6 +10082,10 @@ template<> inline const armnnSerializer::CastLayer *AnyLayer::layer_as<armnnSeri
 
 template<> inline const armnnSerializer::ShapeLayer *AnyLayer::layer_as<armnnSerializer::ShapeLayer>() const {
   return layer_as_ShapeLayer();
+}
+
+template<> inline const armnnSerializer::UnidirectionalSequenceLstmLayer *AnyLayer::layer_as<armnnSerializer::UnidirectionalSequenceLstmLayer>() const {
+  return layer_as_UnidirectionalSequenceLstmLayer();
 }
 
 struct AnyLayerBuilder {
@@ -10358,6 +10558,10 @@ inline bool VerifyLayer(flatbuffers::Verifier &verifier, const void *obj, Layer 
     }
     case Layer_ShapeLayer: {
       auto ptr = reinterpret_cast<const armnnSerializer::ShapeLayer *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Layer_UnidirectionalSequenceLstmLayer: {
+      auto ptr = reinterpret_cast<const armnnSerializer::UnidirectionalSequenceLstmLayer *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

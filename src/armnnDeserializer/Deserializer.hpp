@@ -28,6 +28,7 @@ using TensorRawPtrVector = std::vector<TensorRawPtr>;
 using LayerRawPtr = const armnnSerializer::LayerBase *;
 using LayerBaseRawPtr = const armnnSerializer::LayerBase *;
 using LayerBaseRawPtrVector = std::vector<LayerBaseRawPtr>;
+using UnidirectionalSequenceLstmDescriptorPtr = const armnnSerializer::UnidirectionalSequenceLstmDescriptor *;
 
 class IDeserializer::DeserializerImpl
 {
@@ -67,6 +68,8 @@ public:
     static armnn::LstmInputParams GetLstmInputParams(LstmDescriptorPtr lstmDescriptor,
                                                      LstmInputParamsPtr lstmInputParams);
     static armnn::QLstmDescriptor GetQLstmDescriptor(QLstmDescriptorPtr qLstmDescriptorPtr);
+    static armnn::UnidirectionalSequenceLstmDescriptor GetUnidirectionalSequenceLstmDescriptor(
+        UnidirectionalSequenceLstmDescriptorPtr descriptor);
     static armnn::TensorInfo OutputShapeOfReshape(const armnn::TensorInfo & inputTensorInfo,
                                                   const std::vector<uint32_t> & targetDimsIn);
 
@@ -138,6 +141,7 @@ private:
     void ParseSwitch(GraphPtr graph, unsigned int layerIndex);
     void ParseTranspose(GraphPtr graph, unsigned int layerIndex);
     void ParseTransposeConvolution2d(GraphPtr graph, unsigned int layerIndex);
+    void ParseUnidirectionalSequenceLstm(GraphPtr graph, unsigned int layerIndex);
 
     void RegisterInputSlots(GraphPtr graph, uint32_t layerIndex,
                             armnn::IConnectableLayer* layer);

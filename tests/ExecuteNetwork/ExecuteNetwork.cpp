@@ -356,15 +356,31 @@ int MainImpl(const ExecuteNetworkParams& params,
                                                           model.GetInputQuantizationParams()) :
                                                       armnn::EmptyOptional();
 
-        for(unsigned int j = 0; j < params.m_SimultaneousIterations ; ++j)
+        if (params.m_InputTensorDataFilePaths.size() > numInputs)
+        {
+            ARMNN_LOG(info) << "Given network has " << numInputs << " input/s. One input-tensor-data file is required "
+                            << "for each input. The user provided "
+                            << params.m_InputTensorDataFilePaths.size()
+                            << " input-tensor-data file/s which will be used to fill the input/s.\n";
+        }
+
+        for(unsigned int j = 0; j < params.m_Iterations ; ++j)
         {
             std::vector<TContainer> inputDataContainers;
             for(unsigned int i = 0; i < numInputs; ++i)
             {
+                // If there are less input files given than required for the execution of
+                // params.m_Iterations we simply start with the first input file again
+                size_t inputFileIndex = j * numInputs + i;
+                if (!params.m_InputTensorDataFilePaths.empty())
+                {
+                    inputFileIndex = inputFileIndex % params.m_InputTensorDataFilePaths.size();
+                }
+
                 armnn::Optional<std::string> dataFile = params.m_GenerateTensorData ?
                                                         armnn::EmptyOptional() :
                                                         armnn::MakeOptional<std::string>(
-                                                            params.m_InputTensorDataFilePaths[(j * numInputs) + i]);
+                                                            params.m_InputTensorDataFilePaths.at(inputFileIndex));
 
                 unsigned int numElements = model.GetInputSize(i);
                 if (params.m_InputTensorShapes.size() > i && params.m_InputTensorShapes[i])
@@ -388,7 +404,7 @@ int MainImpl(const ExecuteNetworkParams& params,
 
         const size_t numOutputs = inferenceModelParams.m_OutputBindings.size();
 
-        for (unsigned int j = 0; j < params.m_SimultaneousIterations; ++j)
+        for (unsigned int j = 0; j < params.m_Iterations; ++j)
         {
             std::vector <TContainer> outputDataContainers;
             for (unsigned int i = 0; i < numOutputs; ++i)
@@ -418,13 +434,30 @@ int MainImpl(const ExecuteNetworkParams& params,
             outputs.push_back(outputDataContainers);
         }
 
+        if (params.m_Iterations > 1)
+        {
+            std::stringstream msg;
+            msg << "Network will be executed " << params.m_Iterations;
+            if (params.m_Concurrent)
+            {
+                msg << " times in an asynchronous manner. ";
+            }
+            else
+            {
+                msg << " times successively. ";
+            }
+            msg << "The input-tensor-data files will be reused recursively if the user didn't provide enough to "
+                   "cover each execution.";
+            ARMNN_LOG(info) << msg.str();
+        }
+
         // Synchronous execution
         if (!params.m_Concurrent)
         {
             for (size_t x = 0; x < params.m_Iterations; x++)
             {
                 // model.Run returns the inference time elapsed in EnqueueWorkload (in milliseconds)
-                auto inference_duration = model.Run(inputs[0], outputs[0]);
+                auto inference_duration = model.Run(inputs[x], outputs[x]);
 
                 if (params.m_GenerateTensorData)
                 {
@@ -436,13 +469,29 @@ int MainImpl(const ExecuteNetworkParams& params,
                 for (size_t i = 0; i < numOutputs; i++)
                 {
                     const armnn::TensorInfo& infoOut = infosOut[i].second;
-                    auto outputTensorFile = params.m_OutputTensorFiles.empty() ? "" : params.m_OutputTensorFiles[i];
+
+                    // We've made sure before that the number of output files either equals numOutputs, in which case
+                    // we override those files when processing the results of each iteration (only the result of the
+                    // last iteration will be stored), or there are enough
+                    // output files for each output of each iteration.
+                    size_t outputFileIndex = x * numOutputs + i;
+                    if (!params.m_OutputTensorFiles.empty())
+                    {
+                        outputFileIndex = outputFileIndex % params.m_OutputTensorFiles.size();
+                        ARMNN_LOG(info) << "Writing output " << i << " named: '"
+                                        << inferenceModelParams.m_OutputBindings[i]
+                                        << "' of iteration: " << x+1 << " to file: '"
+                                        << params.m_OutputTensorFiles[outputFileIndex] << "'";
+                    }
+                    auto outputTensorFile = params.m_OutputTensorFiles.empty()
+                                            ? ""
+                                            : params.m_OutputTensorFiles[outputFileIndex];
 
                     TensorPrinter printer(inferenceModelParams.m_OutputBindings[i],
                                           infoOut,
                                           outputTensorFile,
                                           params.m_DequantizeOutput);
-                    mapbox::util::apply_visitor(printer, outputs[0][i]);
+                    mapbox::util::apply_visitor(printer, outputs[x][i]);
                 }
 
                 ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)
@@ -481,7 +530,7 @@ int MainImpl(const ExecuteNetworkParams& params,
 
                 // For the asynchronous execution, we are adding a pool of working memory handles (1 per thread) in the
                 // LoadedNetwork with each scheduled inference having a specific priority
-                for (size_t i = 0; i < params.m_SimultaneousIterations; ++i)
+                for (size_t i = 0; i < params.m_Iterations; ++i)
                 {
                     std::shared_ptr<armnn::AsyncExecutionCallback> cb = callbackManager.GetNewCallback();
                     inferenceOutputMap.insert({cb->GetInferenceId(), outputs[i]});
@@ -490,7 +539,7 @@ int MainImpl(const ExecuteNetworkParams& params,
 
                 // Check the results
                 unsigned int j = 0;
-                for (size_t iteration = 0; iteration < params.m_SimultaneousIterations; ++iteration)
+                for (size_t iteration = 0; iteration < params.m_Iterations; ++iteration)
                 {
                     auto cb = callbackManager.GetNotifiedCallback();
 
@@ -522,10 +571,24 @@ int MainImpl(const ExecuteNetworkParams& params,
                     const auto& infosOut = model.GetOutputBindingInfos();
                     for (size_t i = 0; i < numOutputs; i++)
                     {
+                        // We've made sure before that the number of output files either equals numOutputs, in which
+                        // case we override those files when processing the results of each iteration (only the result
+                        // of the last iteration will be stored), or there are enough
+                        // output files for each output of each iteration.
+                        size_t outputFileIndex = iteration * numOutputs + i;
+                        if (!params.m_OutputTensorFiles.empty())
+                        {
+                            outputFileIndex = outputFileIndex % params.m_OutputTensorFiles.size();
+                            ARMNN_LOG(info) << "Writing output " << i << " named: '"
+                                            << inferenceModelParams.m_OutputBindings[i]
+                                            << "' of iteration: " << iteration+1 << " to file: '"
+                                            << params.m_OutputTensorFiles[outputFileIndex] << "'";
+                        }
+
                         const armnn::TensorInfo& infoOut = infosOut[i].second;
                         auto outputTensorFile = params.m_OutputTensorFiles.empty()
                                                 ? ""
-                                                : params.m_OutputTensorFiles[(j * numOutputs) + i];
+                                                : params.m_OutputTensorFiles[outputFileIndex];
 
                         TensorPrinter printer(inferenceModelParams.m_OutputBindings[i],
                                               infoOut,
@@ -575,12 +638,12 @@ int MainImpl(const ExecuteNetworkParams& params,
                 ARMNN_LOG(info) << "Asynchronous Execution with std::launch:async...  \n";
                 std::vector<std::future<std::tuple<unsigned int,
                     std::chrono::duration<double, std::milli>>>> inferenceResults;
-                inferenceResults.reserve(params.m_SimultaneousIterations);
+                inferenceResults.reserve(params.m_Iterations);
 
                 // Create WorkingMemHandles for each inference
                 std::vector<std::unique_ptr<armnn::experimental::IWorkingMemHandle>> workingMemHandles;
-                workingMemHandles.reserve(params.m_SimultaneousIterations);
-                for (unsigned int i = 0; i < params.m_SimultaneousIterations; ++i)
+                workingMemHandles.reserve(params.m_Iterations);
+                for (unsigned int i = 0; i < params.m_Iterations; ++i)
                 {
                     workingMemHandles.push_back(model.CreateWorkingMemHandle());
                 }
@@ -588,7 +651,7 @@ int MainImpl(const ExecuteNetworkParams& params,
                 // Run each inference in its own thread
                 // start a timer
                 const auto start_time = armnn::GetTimeNow();
-                for (unsigned int i = 0; i < params.m_SimultaneousIterations; ++i)
+                for (unsigned int i = 0; i < params.m_Iterations; ++i)
                 {
                     armnn::experimental::IWorkingMemHandle& workingMemHandleRef = *workingMemHandles[i].get();
 
@@ -616,10 +679,23 @@ int MainImpl(const ExecuteNetworkParams& params,
                     const auto& infosOut = model.GetOutputBindingInfos();
                     for (size_t i = 0; i < numOutputs; i++)
                     {
+                        // We've made sure before that the number of output files either equals numOutputs, in which
+                        // case we override those files when processing the results of each iteration (only the result
+                        // of the last iteration will be stored), or there are enough
+                        // output files for each output of each iteration.
+                        size_t outputFileIndex = j * numOutputs + i;
+                        if (!params.m_OutputTensorFiles.empty())
+                        {
+                            outputFileIndex = outputFileIndex % params.m_OutputTensorFiles.size();
+                            ARMNN_LOG(info) << "Writing output " << i << " named: '"
+                                            << inferenceModelParams.m_OutputBindings[i]
+                                            << "' of iteration: " << j+1 << " to file: '"
+                                            << params.m_OutputTensorFiles[outputFileIndex] << "'";
+                        }
                         const armnn::TensorInfo& infoOut = infosOut[i].second;
                         auto outputTensorFile = params.m_OutputTensorFiles.empty()
                                                 ? ""
-                                                : params.m_OutputTensorFiles[(j * numOutputs) + i];
+                                                : params.m_OutputTensorFiles[outputFileIndex];
 
                         TensorPrinter printer(inferenceModelParams.m_OutputBindings[i],
                                               infoOut,
@@ -683,7 +759,14 @@ int main(int argc, const char* argv[])
 
 
     // Get ExecuteNetwork parameters and runtime options from command line
-    ProgramOptions ProgramOptions(argc, argv);
+    // This might throw an InvalidArgumentException if the user provided invalid inputs
+    ProgramOptions ProgramOptions;
+    try {
+        ProgramOptions.ParseOptions(argc, argv);
+    } catch (const std::exception &e){
+        ARMNN_LOG(fatal) << e.what();
+        return EXIT_FAILURE;
+    }
 
     // Create runtime
     std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(ProgramOptions.m_RuntimeOptions));

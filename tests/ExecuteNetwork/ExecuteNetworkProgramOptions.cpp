@@ -139,6 +139,20 @@ void CheckRequiredOptions(const cxxopts::ParseResult& result)
     }
 }
 
+void CheckForDeprecatedOptions(const cxxopts::ParseResult& result)
+{
+    if(result.count("simultaneous-iterations") > 0)
+    {
+        ARMNN_LOG(warning) << "DEPRECATED: The program option 'simultaneous-iterations' is deprecated and will be "
+                              "removed soon. Please use the option 'iterations' combined with 'concurrent' instead.";
+    }
+    if(result.count("armnn-tflite-delegate") > 0)
+    {
+        ARMNN_LOG(warning) << "DEPRECATED: The program option 'armnn-tflite-delegate' is deprecated and will be "
+                              "removed soon. Please use the option 'tflite-executor' instead.";
+    }
+}
+
 void ProgramOptions::ValidateExecuteNetworkParams()
 {
     m_ExNetParams.ValidateParams();
@@ -196,13 +210,15 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
 
                 ("n,concurrent",
                  "This option is for Arm NN internal asynchronous testing purposes. "
-                 "By default it is set to true if thread-pool-size or simultaneous-iterations are greater than 1",
+                 "False by default. If set to true will use std::launch::async or the Arm NN thread pool, "
+                 "if 'thread-pool-size' is greater than 0, for asynchronous execution.",
                  cxxopts::value<bool>(m_ExNetParams.m_Concurrent)->default_value("false")->implicit_value("true"))
 
                 ("d,input-tensor-data",
                  "Path to files containing the input data as a flat array separated by whitespace. "
-                 "Several paths can be passed by separating them with a comma. If not specified, the network will be "
-                 "run with dummy data (useful for profiling).",
+                 "Several paths can be passed by separating them with a comma if the network has multiple inputs "
+                 "or you wish to run the model multiple times with different input data using the 'iterations' option. "
+                 "If not specified, the network will be run with dummy data (useful for profiling).",
                  cxxopts::value<std::string>()->default_value(""))
 
                 ("h,help", "Display usage information")
@@ -213,7 +229,14 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  cxxopts::value<bool>(m_ExNetParams.m_InferOutputShape)->default_value("false")->implicit_value("true"))
 
                 ("iterations",
-                 "Number of iterations to run the network for, default is set to 1",
+                 "Number of iterations to run the network for, default is set to 1. "
+                 "If you wish to run the model with different input data for every execution you can do so by "
+                 "supplying more input file paths to the 'input-tensor-data' option. "
+                 "Note: The number of input files provided must be divisible by the number of inputs of the model. "
+                 "e.g. Your model has 2 inputs and you supply 4 input files. If you set 'iterations' to 6 the first "
+                 "run will consume the first two inputs, the second the next two and the last will begin from the "
+                 "start and use the first two inputs again. "
+                 "Note: If the 'concurrent' option is enabled all iterations will be run asynchronously.",
                  cxxopts::value<size_t>(m_ExNetParams.m_Iterations)->default_value("1"))
 
                 ("l,dequantize-output",
@@ -282,17 +305,20 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
 
                 ("D,armnn-tflite-delegate",
                  "Enable Arm NN TfLite delegate. "
-                 "This option is depreciated please use tflite-executor instead",
+                 "DEPRECATED: This option is deprecated please use tflite-executor instead",
                  cxxopts::value<bool>(m_ExNetParams.m_EnableDelegate)->default_value("false")->implicit_value("true"))
 
                 ("simultaneous-iterations",
                  "Number of simultaneous iterations to async-run the network for, default is set to 1 (disabled). "
-                 "When thread-pool-size is set the Arm NN thread pool is used. Otherwise std::launch::async is used.",
+                 "When thread-pool-size is set the Arm NN thread pool is used. Otherwise std::launch::async is used."
+                 "DEPRECATED: This option is deprecated and will be removed soon. "
+                 "Please use the option 'iterations' combined with 'concurrent' instead.",
                  cxxopts::value<size_t>(m_ExNetParams.m_SimultaneousIterations)->default_value("1"))
 
                 ("thread-pool-size",
                  "Number of Arm NN threads to use when running the network asynchronously via the Arm NN thread pool. "
-                 "The default is set to 0",
+                 "The default is set to 0 which equals disabled. If 'thread-pool-size' is greater than 0 the "
+                 "'concurrent' option is automatically set to true.",
                  cxxopts::value<size_t>(m_ExNetParams.m_ThreadPoolSize)->default_value("0"));
 
         m_CxxOptions.add_options("c) Optimization")
@@ -409,6 +435,7 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
 
     CheckRequiredOptions(m_CxxResult);
     CheckOptionDependencies(m_CxxResult);
+    CheckForDeprecatedOptions(m_CxxResult);
 
     // Some options can't be assigned directly because they need some post-processing:
     auto computeDevices = GetOptionValue<std::vector<std::string>>("compute", m_CxxResult);
@@ -453,15 +480,19 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
         throw armnn::InvalidArgumentException ("Invalid tflite-executor option");
     }
 
+    // For backwards compatibility when deprecated options are used
     if (m_ExNetParams.m_EnableDelegate)
     {
         m_ExNetParams.m_TfLiteExecutor = ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteDelegate;
-        ARMNN_LOG(info) << fmt::format("armnn-tflite-delegate option is being depreciated, "
-                                       "please use tflite-executor instead.");
+    }
+    if (m_ExNetParams.m_SimultaneousIterations > 1)
+    {
+        m_ExNetParams.m_Iterations = m_ExNetParams.m_SimultaneousIterations;
+        m_ExNetParams.m_Concurrent = true;
     }
 
     // Set concurrent to true if the user expects to run inferences asynchronously
-    if (m_ExNetParams.m_SimultaneousIterations > 1 || m_ExNetParams.m_ThreadPoolSize > 0)
+    if (m_ExNetParams.m_ThreadPoolSize > 0)
     {
         m_ExNetParams.m_Concurrent = true;
     }

@@ -110,115 +110,122 @@ void CheckClTuningParameter(const int& tuningLevel,
 
 void ExecuteNetworkParams::ValidateParams()
 {
-    // Set to true if it is preferred to throw an exception rather than use ARMNN_LOG
-    bool throwExc = false;
-
-    try
+    if (m_DynamicBackendsPath == "")
     {
-        if (m_DynamicBackendsPath == "")
+        // Check compute devices are valid unless they are dynamically loaded at runtime
+        std::string invalidBackends;
+        if (!CheckRequestedBackendsAreValid(m_ComputeDevices, armnn::Optional<std::string&>(invalidBackends)))
         {
-            // Check compute devices are valid unless they are dynamically loaded at runtime
-            std::string invalidBackends;
-            if (!CheckRequestedBackendsAreValid(m_ComputeDevices, armnn::Optional<std::string&>(invalidBackends)))
-            {
-                ARMNN_LOG(fatal) << "The list of preferred devices contains invalid backend IDs: "
-                                 << invalidBackends;
-            }
-        }
-
-        CheckClTuningParameter(m_TuningLevel, m_TuningPath, m_ComputeDevices);
-
-        if (m_EnableBf16TurboMode && m_EnableFp16TurboMode)
-        {
-            ARMNN_LOG(fatal) << "BFloat16 and Float16 turbo mode cannot be enabled at the same time.";
-        }
-
-        m_IsModelBinary = IsModelBinary(m_ModelFormat);
-
-        CheckModelFormat(m_ModelFormat);
-
-        // Check input tensor shapes
-        if ((m_InputTensorShapes.size() != 0) &&
-            (m_InputTensorShapes.size() != m_InputNames.size()))
-        {
-            ARMNN_LOG(fatal) << "input-name and input-tensor-shape must have the same amount of elements. ";
-        }
-
-        if (m_InputTensorDataFilePaths.size() != 0)
-        {
-            if (!ValidatePaths(m_InputTensorDataFilePaths, true))
-            {
-                ARMNN_LOG(fatal) << "One or more input data file paths are not valid. ";
-            }
-
-            if (!m_Concurrent && m_InputTensorDataFilePaths.size() != m_InputNames.size())
-            {
-                ARMNN_LOG(fatal) << "input-name and input-tensor-data must have the same amount of elements. ";
-            }
-
-            if (m_InputTensorDataFilePaths.size() < m_SimultaneousIterations * m_InputNames.size())
-            {
-                ARMNN_LOG(fatal) << "There is not enough input data for " << m_SimultaneousIterations << " execution.";
-            }
-            if (m_InputTensorDataFilePaths.size() > m_SimultaneousIterations * m_InputNames.size())
-            {
-                ARMNN_LOG(fatal) << "There is more input data for " << m_SimultaneousIterations << " execution.";
-            }
-        }
-
-        if ((m_OutputTensorFiles.size() != 0) &&
-            (m_OutputTensorFiles.size() != m_OutputNames.size()))
-        {
-            ARMNN_LOG(fatal) << "output-name and write-outputs-to-file must have the same amount of elements. ";
-        }
-
-        if ((m_OutputTensorFiles.size() != 0)
-            && m_OutputTensorFiles.size() != m_SimultaneousIterations * m_OutputNames.size())
-        {
-            ARMNN_LOG(fatal) << "There is not enough output data for " << m_SimultaneousIterations << " execution.";
-        }
-
-        if (m_InputTypes.size() == 0)
-        {
-            //Defaults the value of all inputs to "float"
-            m_InputTypes.assign(m_InputNames.size(), "float");
-        }
-        else if ((m_InputTypes.size() != 0) &&
-                 (m_InputTypes.size() != m_InputNames.size()))
-        {
-            ARMNN_LOG(fatal) << "input-name and input-type must have the same amount of elements.";
-        }
-
-        if (m_OutputTypes.size() == 0)
-        {
-            //Defaults the value of all outputs to "float"
-            m_OutputTypes.assign(m_OutputNames.size(), "float");
-        }
-        else if ((m_OutputTypes.size() != 0) &&
-                 (m_OutputTypes.size() != m_OutputNames.size()))
-        {
-            ARMNN_LOG(fatal) << "output-name and output-type must have the same amount of elements.";
-        }
-
-        // Check that threshold time is not less than zero
-        if (m_ThresholdTime < 0)
-        {
-            ARMNN_LOG(fatal) << "Threshold time supplied as a command line argument is less than zero.";
+            ARMNN_LOG(fatal) << "The list of preferred devices contains invalid backend IDs: "
+                             << invalidBackends;
         }
     }
-    catch (std::string& exc)
+
+    CheckClTuningParameter(m_TuningLevel, m_TuningPath, m_ComputeDevices);
+
+    if (m_EnableBf16TurboMode && m_EnableFp16TurboMode)
     {
-        if (throwExc)
+        throw armnn::InvalidArgumentException("BFloat16 and Float16 turbo mode cannot be "
+                                              "enabled at the same time.");
+    }
+
+    m_IsModelBinary = IsModelBinary(m_ModelFormat);
+
+    CheckModelFormat(m_ModelFormat);
+
+    // Check input tensor shapes
+    if ((m_InputTensorShapes.size() != 0) &&
+        (m_InputTensorShapes.size() != m_InputNames.size()))
+    {
+        throw armnn::InvalidArgumentException("input-name and input-tensor-shape must have "
+                                              "the same amount of elements. ");
+    }
+
+    if (m_InputTensorDataFilePaths.size() != 0)
+    {
+        if (!ValidatePaths(m_InputTensorDataFilePaths, true))
         {
-            throw armnn::InvalidArgumentException(exc);
+            throw armnn::InvalidArgumentException("One or more input data file paths are not valid.");
         }
-        else
+
+        if (m_InputTensorDataFilePaths.size() < m_InputNames.size())
         {
-            std::cout << exc;
-            exit(EXIT_FAILURE);
+            throw armnn::InvalidArgumentException(
+                    fmt::format("According to the number of input names the user provided the network has {} "
+                                "inputs. But only {} input-tensor-data file paths were provided. Each input of the "
+                                "model is expected to be stored in it's own file.",
+                                m_InputNames.size(),
+                                m_InputTensorDataFilePaths.size()));
+        }
+        else if (m_InputTensorDataFilePaths.size() % m_InputNames.size() != 0)
+        {
+            throw armnn::InvalidArgumentException(
+                    fmt::format("According to the number of input names the user provided the network has {} "
+                                "inputs. The user specified {} input-tensor-data file paths which is not "
+                                "divisible by the number of inputs.",
+                                m_InputNames.size(),
+                                m_InputTensorDataFilePaths.size()));
         }
     }
-    // Check turbo modes
+
+    if (m_InputTypes.size() == 0)
+    {
+        //Defaults the value of all inputs to "float"
+        m_InputTypes.assign(m_InputNames.size(), "float");
+    }
+    else if ((m_InputTypes.size() != 0) &&
+             (m_InputTypes.size() != m_InputNames.size()))
+    {
+        throw armnn::InvalidArgumentException("input-name and input-type must have the same amount of elements.");
+    }
+
+    // Make sure that the number of input files given is divisible by the number of inputs of the model
+    if (!(m_InputTensorDataFilePaths.size() % m_InputNames.size() == 0))
+    {
+        throw armnn::InvalidArgumentException(
+                fmt::format("The number of input-tensor-data files ({0}) is not divisible by the "
+                            "number of inputs ({1} according to the number of input names).",
+                            m_InputTensorDataFilePaths.size(),
+                            m_InputNames.size()));
+    }
+
+    if (m_OutputTypes.size() == 0)
+    {
+        //Defaults the value of all outputs to "float"
+        m_OutputTypes.assign(m_OutputNames.size(), "float");
+    }
+    else if ((m_OutputTypes.size() != 0) &&
+             (m_OutputTypes.size() != m_OutputNames.size()))
+    {
+        throw armnn::InvalidArgumentException("output-name and output-type must have the same amount of elements.");
+    }
+
+    // Make sure that the number of output files given is equal to the number of outputs of the model
+    // or equal to the number of outputs of the model multiplied with the number of iterations
+    if (!m_OutputTensorFiles.empty())
+    {
+        if ((m_OutputTensorFiles.size() != m_OutputNames.size()) &&
+            (m_OutputTensorFiles.size() != m_OutputNames.size() * m_Iterations))
+        {
+            std::stringstream errmsg;
+            auto numOutputs = m_OutputNames.size();
+            throw armnn::InvalidArgumentException(
+                    fmt::format("The user provided {0} output-tensor files. The only allowed number of output-tensor "
+                                "files is the number of outputs of the network ({1} according to the number of "
+                                "output names) or the number of outputs multiplied with the number of times the "
+                                "network should be executed (NumOutputs * NumIterations = {1} * {2} = {3}).",
+                                m_OutputTensorFiles.size(),
+                                numOutputs,
+                                m_Iterations,
+                                numOutputs*m_Iterations));
+        }
+    }
+
+    // Check that threshold time is not less than zero
+    if (m_ThresholdTime < 0)
+    {
+        throw armnn::InvalidArgumentException("Threshold time supplied as a command line argument is less than zero.");
+    }
 
     // Warn if ExecuteNetwork will generate dummy input data
     if (m_GenerateTensorData)

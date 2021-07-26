@@ -117,6 +117,8 @@ public:
                 {
                     CL_IMPORT_TYPE_ARM,
                     CL_IMPORT_TYPE_DMA_BUF_ARM,
+                    CL_IMPORT_DMA_BUF_DATA_CONSISTENCY_WITH_HOST_ARM,
+                    CL_TRUE,
                     0
                 };
 
@@ -144,7 +146,7 @@ private:
                                           CL_MEM_READ_WRITE, importProperties, memory, totalBytes, &error);
         if (error != CL_SUCCESS)
         {
-            throw MemoryImportException("ClImportTensorHandle::Invalid imported memory");
+            throw MemoryImportException("ClImportTensorHandle::Invalid imported memory" + std::to_string(error));
         }
 
         cl::Buffer wrappedBuffer(buffer);

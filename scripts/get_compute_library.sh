@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_05" # Release 21.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="22f5ed51f1b01f7cf6993a556a0b763e437926fc" #Avoid allocation of auxiliary memory in CpuGemmConvolution
+DEFAULT_CLFRAMEWORKREVISION="980558373f14c135a331fa23b61558c7d177edf2" #Fix memory lifetime issue
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

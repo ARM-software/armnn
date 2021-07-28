@@ -17,7 +17,7 @@ void CompareVector(std::vector<T> vec1, std::vector<T> vec2)
     CHECK(vec1.size() == vec2.size());
 
     bool mismatch = false;
-    for (uint i = 0; i < vec1.size(); ++i)
+    for (uint32_t i = 0; i < vec1.size(); ++i)
     {
         if (vec1[i] != vec2[i])
         {

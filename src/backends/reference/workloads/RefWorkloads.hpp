@@ -69,6 +69,7 @@
 #include "RefSpaceToDepthWorkload.hpp"
 #include "RefTransposeConvolution2dWorkload.hpp"
 #include "RefTransposeWorkload.hpp"
+#include "RefUnidirectionalSequenceLstmWorkload.hpp"
 #include "RefWorkloadUtils.hpp"
 #include "Resize.hpp"
 #include "Softmax.hpp"

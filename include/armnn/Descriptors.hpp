@@ -926,7 +926,7 @@ struct LstmDescriptor : BaseDescriptor
         , m_PeepholeEnabled(false)
         , m_ProjectionEnabled(false)
         , m_LayerNormEnabled(false)
-        , m_TimeMajor(true)
+        , m_TimeMajor(false)
     {}
 
     bool operator ==(const LstmDescriptor& rhs) const

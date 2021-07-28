@@ -42,6 +42,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Log.hpp
     LogSoftmax.cpp
     LogSoftmax.hpp
+    Lstm.cpp
+    Lstm.hpp
     LstmUtils.hpp
     LstmUtils.cpp
     Maximum.hpp
@@ -162,6 +164,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefTransposeConvolution2dWorkload.hpp
     RefTransposeWorkload.cpp
     RefTransposeWorkload.hpp
+    RefUnidirectionalSequenceLstmWorkload.cpp
+    RefUnidirectionalSequenceLstmWorkload.hpp
     RefWorkloads.hpp
     RefWorkloadUtils.hpp
     Resize.cpp

@@ -1,0 +1,36 @@
+//
+// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// SPDX-License-Identifier: MIT
+//
+
+#pragma once
+
+#include "LayerTestResult.hpp"
+
+#include <armnn/backends/IBackendInternal.hpp>
+#include <backendsCommon/WorkloadFactory.hpp>
+
+LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32TimeMajorTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjectionTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjectionWithLayerNormTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+LayerTestResult<float, 3> UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjectionTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);

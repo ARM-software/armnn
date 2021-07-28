@@ -37,6 +37,7 @@ BACKEND_SOURCES := \
         workloads/Gather.cpp \
         workloads/InstanceNorm.cpp \
         workloads/LogSoftmax.cpp \
+        workloads/Lstm.cpp \
         workloads/LstmUtils.cpp \
         workloads/Concatenate.cpp \
         workloads/Pad.cpp \
@@ -95,6 +96,7 @@ BACKEND_SOURCES := \
         workloads/RefSplitterWorkload.cpp \
         workloads/RefTransposeConvolution2dWorkload.cpp \
         workloads/RefTransposeWorkload.cpp \
+        workloads/RefUnidirectionalSequenceLstmWorkload.cpp \
         workloads/Resize.cpp \
         workloads/Slice.cpp \
         workloads/SpaceToBatchNd.cpp \

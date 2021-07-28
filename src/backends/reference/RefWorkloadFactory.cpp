@@ -712,4 +712,11 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateTransposeConvolution2d(
     return std::make_unique<RefTransposeConvolution2dWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateUnidirectionalSequenceLstm(
+    const UnidirectionalSequenceLstmQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return std::make_unique<RefUnidirectionalSequenceLstmWorkload>(descriptor, info);;
+}
+
 } // namespace armnn

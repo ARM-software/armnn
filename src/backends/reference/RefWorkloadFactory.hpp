@@ -276,6 +276,10 @@ public:
     std::unique_ptr<IWorkload> CreateTransposeConvolution2d(const TransposeConvolution2dQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateUnidirectionalSequenceLstm(
+        const UnidirectionalSequenceLstmQueueDescriptor& descriptor,
+        const WorkloadInfo& info) const override;
+
 private:
     template <typename F32Workload, typename U8Workload, typename QueueDescriptorType>
     std::unique_ptr<IWorkload> MakeWorkload(const QueueDescriptorType& descriptor, const WorkloadInfo& info) const;

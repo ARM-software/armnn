@@ -67,3 +67,4 @@
 #include <backendsCommon/test/layerTests/SubtractionTestImpl.hpp>
 #include <backendsCommon/test/layerTests/TransposeConvolution2dTestImpl.hpp>
 #include <backendsCommon/test/layerTests/TransposeTestImpl.hpp>
+#include <backendsCommon/test/layerTests/UnidirectionalSequenceLstmTestImpl.hpp>

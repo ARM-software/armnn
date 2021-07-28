@@ -169,6 +169,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/SubtractionTestImpl.hpp
     layerTests/TransposeConvolution2dTestImpl.cpp
     layerTests/TransposeConvolution2dTestImpl.hpp
+    layerTests/UnidirectionalSequenceLstmTestImpl.cpp
+    layerTests/UnidirectionalSequenceLstmTestImpl.hpp
 )
 
 if (ARMNNREF)

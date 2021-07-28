@@ -1,9 +1,9 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
-#include "RefLstmWorkload.hpp"
+#include "RefUnidirectionalSequenceLstmWorkload.hpp"
 #include "Activation.hpp"
 #include "Encoders.hpp"
 #include "Decoders.hpp"
@@ -11,11 +11,15 @@
 #include "LstmUtils.hpp"
 #include "RefWorkloadUtils.hpp"
 
+#include <armnnUtils/Permute.hpp>
+
 namespace armnn
 {
 
-RefLstmWorkload::RefLstmWorkload(const LstmQueueDescriptor &descriptor, const WorkloadInfo &info)
-    : BaseWorkload<LstmQueueDescriptor>(descriptor, info)
+RefUnidirectionalSequenceLstmWorkload::RefUnidirectionalSequenceLstmWorkload(
+    const UnidirectionalSequenceLstmQueueDescriptor& descriptor,
+    const WorkloadInfo& info)
+    : BaseWorkload<UnidirectionalSequenceLstmQueueDescriptor>(descriptor, info)
     , m_InputToInputWeightsTensor     (AssignScopedTensorHandle(descriptor.m_InputToInputWeights))
     , m_InputToForgetWeightsTensor    (AssignScopedTensorHandle(descriptor.m_InputToForgetWeights))
     , m_InputToCellWeightsTensor      (AssignScopedTensorHandle(descriptor.m_InputToCellWeights))
@@ -39,81 +43,106 @@ RefLstmWorkload::RefLstmWorkload(const LstmQueueDescriptor &descriptor, const Wo
     , m_OutputLayerNormWeights        (AssignScopedTensorHandle(descriptor.m_OutputLayerNormWeights))
 {}
 
-void RefLstmWorkload::Execute() const
+void RefUnidirectionalSequenceLstmWorkload::Execute() const
 {
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
 }
 
-void RefLstmWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+void RefUnidirectionalSequenceLstmWorkload::ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)
 {
     Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
 }
 
-void RefLstmWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
+void RefUnidirectionalSequenceLstmWorkload::Execute(std::vector<ITensorHandle*> inputs,
+                                                    std::vector<ITensorHandle*> outputs) const
 {
-    // This is a porting of the LSTM::Eval() method in the Android code base
-    // Refer to: android/frameworks/ml/nn/common/operations/LSTM.cpp
+    TensorInfo inputInfo = GetTensorInfo(inputs[0]);
+    const TensorInfo& outputStateInfo = GetTensorInfo(inputs[1]);
+    const TensorInfo& cellStateInfo = GetTensorInfo(inputs[2]);
+    TensorInfo outputInfo = GetTensorInfo(outputs[0]);
+    TensorShape& inputShape = inputInfo.GetShape();
+    TensorShape& outputShape= outputInfo.GetShape();
+    auto inputTensor = reinterpret_cast<float*>(inputs[0]->Map());
 
-    const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
-    const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);
+    if (!m_Data.m_Parameters.m_TimeMajor)
+    {
+        // Permute to time major
+        const PermutationVector& mappings = {1U, 0U, 2U};
+        std::vector<float> inputValue(inputTensor, inputTensor + inputInfo.GetNumElements());
+        inputShape = armnnUtils::Permuted(inputInfo.GetShape(), mappings);
+        inputInfo.SetShape(inputShape);
+        armnnUtils::Permute(inputShape, mappings,  inputValue.data(), inputTensor, sizeof(float));
 
-    const TensorShape& inputShape = inputInfo.GetShape();
+        outputShape = armnnUtils::Permuted(outputInfo.GetShape(), mappings);
+        outputInfo.SetShape(outputShape);
+    }
+    unsigned int maxTime = inputShape[0];
+    unsigned int batchSize = inputShape[1];
+    unsigned int outputSize = outputShape[2];
+    unsigned int inputSize = inputShape[2];
 
-    std::unique_ptr<Encoder<float>> outputStateOut = MakeEncoder<float>(outputInfo, outputs[1]->Map());
-    std::unique_ptr<Encoder<float>> cellStateOut   = MakeEncoder<float>(outputInfo, outputs[2]->Map());
-    std::unique_ptr<Encoder<float>> output         = MakeEncoder<float>(outputInfo, outputs[3]->Map());
+    TensorInfo scratchInfo = outputInfo;
+    scratchInfo.SetShape({batchSize, cellStateInfo.GetShape()[1]});
 
-    std::unique_ptr<Decoder<float>> cellStateOutDecoder = MakeDecoder<float>(outputInfo, outputs[2]->Map());
-    std::unique_ptr<Decoder<float>> outputDecoder       = MakeDecoder<float>(outputInfo, outputs[3]->Map());
+    std::vector<float> inputGateScratchBuffer;
+    std::vector<float> cellScratchBuffer(scratchInfo.GetNumElements(), 0.);
+    std::vector<float> forgetGateScratchBuffer(scratchInfo.GetNumElements(), 0.);
+    std::vector<float> outputGateScratchBuffer(scratchInfo.GetNumElements(), 0.);
 
-    std::unique_ptr<Decoder<float>> inputData     = MakeDecoder<float>(inputInfo, inputs[0]->Map());
-    std::unique_ptr<Decoder<float>> outputStateIn = MakeDecoder<float>(inputInfo, inputs[1]->Map());
-    std::unique_ptr<Decoder<float>> cellStateIn   = MakeDecoder<float>(inputInfo, inputs[2]->Map());
+    std::vector<float> outputStateOutBuffer(outputStateInfo.GetNumElements(), 0.);
+    std::vector<float> cellStateOutBuffer(cellStateInfo.GetNumElements(), 0.);
 
-    const uint32_t nBatch = inputShape[0];
-    const uint32_t nCell   = m_InputToOutputWeightsTensor->GetShape()[0];
+    void* outputStateOutData = outputStateOutBuffer.data();
+    void* cellStateOutData = cellStateOutBuffer.data();
+
+    std::unique_ptr<Encoder<float>> inputGateScratch;
+    std::unique_ptr<Encoder<float>> cellScratch = MakeEncoder<float>(scratchInfo, cellScratchBuffer.data());
+    std::unique_ptr<Encoder<float>> forgetGateScratch = MakeEncoder<float>(scratchInfo, forgetGateScratchBuffer.data());
+    std::unique_ptr<Encoder<float>> outputGateScratch = MakeEncoder<float>(scratchInfo, outputGateScratchBuffer.data());
+
+    std::unique_ptr<Decoder<float>> inputGateScratchDecoder;
+    std::unique_ptr<Decoder<float>> cellScratchDecoder = MakeDecoder<float>(scratchInfo, cellScratchBuffer.data());
+    std::unique_ptr<Decoder<float>> forgetGateScratchDecoder = MakeDecoder<float>(scratchInfo,
+                                                                                  forgetGateScratchBuffer.data());
+    std::unique_ptr<Decoder<float>> outputGateScratchDecoder = MakeDecoder<float>(scratchInfo,
+                                                                                  outputGateScratchBuffer.data());
 
     const bool useCifg      = m_Data.m_Parameters.m_CifgEnabled;
     const bool usePeephole  = m_Data.m_Parameters.m_PeepholeEnabled;
     const bool useLayerNorm = m_Data.m_Parameters.m_LayerNormEnabled;
 
-    // Index the scratch buffers pointers to the global scratch buffer.
-    std::unique_ptr<Encoder<float>> inputGateScratch  = MakeEncoder<float>(outputInfo, outputs[0]->Map());
-    std::unique_ptr<Encoder<float>> cellScratch       = MakeEncoder<float>(outputInfo, outputs[0]->Map());
-    std::unique_ptr<Encoder<float>> forgetGateScratch = MakeEncoder<float>(outputInfo, outputs[0]->Map());
-    std::unique_ptr<Encoder<float>> outputGateScratch = MakeEncoder<float>(outputInfo, outputs[0]->Map());
-
-    std::unique_ptr<Decoder<float>> inputGateScratchDecoder =
-        MakeDecoder<float>(outputInfo, outputs[0]->Map());
-    std::unique_ptr<Decoder<float>> cellScratchDecoder =
-        MakeDecoder<float>(outputInfo, outputs[0]->Map());
-    std::unique_ptr<Decoder<float>> forgetGateScratchDecoder =
-        MakeDecoder<float>(outputInfo, outputs[0]->Map());
-    std::unique_ptr<Decoder<float>> outputGateScratchDecoder =
-        MakeDecoder<float>(outputInfo, outputs[0]->Map());
-
-    if (useCifg)
+    if (!useCifg)
     {
-        *cellScratch       += (0 * nCell * nBatch);
-        *forgetGateScratch += (1 * nCell * nBatch);
-        *outputGateScratch += (2 * nCell * nBatch);
-
-        *cellScratchDecoder       += (0 * nCell * nBatch);
-        *forgetGateScratchDecoder += (1 * nCell * nBatch);
-        *outputGateScratchDecoder += (2 * nCell * nBatch);
+        inputGateScratchBuffer.resize(scratchInfo.GetNumElements(), 0.);
+        inputGateScratch = MakeEncoder<float>(scratchInfo, inputGateScratchBuffer.data());
+        inputGateScratchDecoder = MakeDecoder<float>(scratchInfo, inputGateScratchBuffer.data());
     }
-    else
-    {
-        *inputGateScratch  += (0 * nCell * nBatch);
-        *cellScratch       += (1 * nCell * nBatch);
-        *forgetGateScratch += (2 * nCell * nBatch);
-        *outputGateScratch += (3 * nCell * nBatch);
 
-        *inputGateScratchDecoder  += (0 * nCell * nBatch);
-        *cellScratchDecoder       += (1 * nCell * nBatch);
-        *forgetGateScratchDecoder += (2 * nCell * nBatch);
-        *outputGateScratchDecoder += (3 * nCell * nBatch);
-    }
+    std::unique_ptr<Encoder<float>> outputStateOut = MakeEncoder<float>(outputStateInfo, outputStateOutData);
+    std::unique_ptr<Encoder<float>> cellStateOut   = MakeEncoder<float>(cellStateInfo, cellStateOutData);
+    std::unique_ptr<Decoder<float>> cellStateOutDecoder = MakeDecoder<float>(cellStateInfo, cellStateOutData);
+
+    TensorInfo lstmInputInfo = inputInfo;
+    TensorShape batchInputShape = TensorShape({batchSize, inputSize});
+    lstmInputInfo.SetShape(batchInputShape);
+
+    TensorInfo lstmOutputInfo = outputInfo;
+    lstmOutputInfo.SetShape({batchSize, outputSize});
+
+    const TensorShape& inputToOutputWeightsShape = m_InputToOutputWeightsTensor->GetShape();
+    const TensorShape& recurrentToOutputWeightsShape = m_RecurrentToOutputWeightsTensor->GetShape();
+    unsigned int nOutput = recurrentToOutputWeightsShape[1];
+    auto outputStateInData = inputs[1]->Map();
+    std::unique_ptr<Decoder<float>> outputStateIn = MakeDecoder<float>(outputStateInfo, outputStateInData);
+
+    auto cellStateInData = inputs[2]->Map();
+    std::unique_ptr<Decoder<float>> cellStateIn = MakeDecoder<float>(cellStateInfo, cellStateInData);
+
+    auto currentInputData = reinterpret_cast<float*>(inputs[0]->Map());
+    std::unique_ptr<Decoder<float>> inputData = MakeDecoder<float>(lstmInputInfo, currentInputData);
+    auto currentOutputData = reinterpret_cast<float*>(outputs[0]->Map());
+    std::unique_ptr<Encoder<float>> output = MakeEncoder<float>(lstmOutputInfo, currentOutputData);
+    std::unique_ptr<Decoder<float>> outputDecoder = MakeDecoder<float>(lstmOutputInfo, currentOutputData);
 
     std::unique_ptr<Decoder<float>> inputToInputWeightsTensor;
     std::unique_ptr<Decoder<float>> inputToForgetWeightsTensor = MakeDecoder<float>(
@@ -150,9 +179,6 @@ void RefLstmWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<IT
     std::unique_ptr<Decoder<float>> forgetLayerNormWeights;
     std::unique_ptr<Decoder<float>> cellLayerNormWeights;
     std::unique_ptr<Decoder<float>> outputLayerNormWeights;
-
-    const TensorShape& inputToOutputWeightsShape = m_InputToOutputWeightsTensor->GetShape();
-    const TensorShape& recurrentToOutputWeightsShape = m_RecurrentToOutputWeightsTensor->GetShape();
 
     if (useLayerNorm)
     {
@@ -204,9 +230,14 @@ void RefLstmWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<IT
         }
     }
 
-    LstmImpl(m_Data.m_Parameters,
-                 inputInfo,
-                 outputInfo,
+    unsigned int batchInputSize = batchSize * inputSize;
+    unsigned int batchOutputSize = batchSize * nOutput;
+
+    for (unsigned int t = 0; t < maxTime; ++t)
+    {
+        LstmImpl(m_Data.m_Parameters,
+                 lstmInputInfo,
+                 lstmOutputInfo,
                  inputToOutputWeightsShape,
                  recurrentToOutputWeightsShape,
                  inputData,
@@ -247,6 +278,30 @@ void RefLstmWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<IT
                  forgetGateScratchDecoder,
                  outputGateScratchDecoder,
                  m_LayerNormEpsilon);
+
+        currentInputData += batchInputSize;
+        inputData = MakeDecoder<float>(lstmInputInfo, currentInputData);
+        currentOutputData += batchOutputSize;
+        output = MakeEncoder<float>(lstmOutputInfo, currentOutputData);
+        outputDecoder = MakeDecoder<float>(lstmOutputInfo, currentOutputData);
+
+        // Assign output state out to the next output state in
+        outputStateIn = MakeDecoder<float>(outputStateInfo, outputStateOutData);
+
+        // Assign cell state out to the next cell state in
+        cellStateIn = MakeDecoder<float>(cellStateInfo, cellStateOutData);
+    }
+
+    if (!m_Data.m_Parameters.m_TimeMajor)
+    {
+        // Permute Output back to batch major
+        const PermutationVector& mappings = {1U, 0U, 2U};
+        auto outputData = reinterpret_cast<float*>(outputs[0]->Map());
+        std::vector<float> outputValue(outputData, outputData + outputInfo.GetNumElements());
+        outputShape = armnnUtils::Permuted(outputInfo.GetShape(), mappings);
+        outputInfo.SetShape(outputShape);
+        armnnUtils::Permute(outputShape, mappings, outputValue.data(), outputData, sizeof(float));
+    }
 }
 
 } //namespace armnn

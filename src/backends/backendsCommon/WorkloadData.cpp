@@ -3734,9 +3734,7 @@ void UnidirectionalSequenceLstmQueueDescriptor::Validate(const WorkloadInfo& wor
 
     std::vector<DataType> supportedTypes =
     {
-        DataType::Float16,
-        DataType::Float32,
-        DataType::QAsymmS8
+        DataType::Float32
     };
 
     // check for supported type of one input and match them with all the other input and output

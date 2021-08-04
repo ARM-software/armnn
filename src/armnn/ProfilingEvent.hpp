@@ -9,6 +9,10 @@
 #include <vector>
 #include <chrono>
 #include <memory>
+
+#include <common/include/ProfilingGuid.hpp>
+#include <armnn/Optional.hpp>
+
 #include "Instrument.hpp"
 #include "armnn/Types.hpp"
 
@@ -30,7 +34,8 @@ public:
           IProfiler* profiler,
           Event* parent,
           const BackendId backendId,
-          std::vector<InstrumentPtr>&& instrument);
+          std::vector<InstrumentPtr>&& instrument,
+          const Optional<profiling::ProfilingGuid> guid);
 
     Event(const Event& other) = delete;
 
@@ -66,6 +71,10 @@ public:
     /// \return Backend id of the event
     BackendId GetBackendId() const;
 
+    /// Get the associated profiling GUID if the event is a workload
+    /// \return Optional GUID of the event
+    Optional<profiling::ProfilingGuid> GetProfilingGuid() const;
+
     /// Assignment operator
     Event& operator=(const Event& other) = delete;
 
@@ -87,6 +96,9 @@ private:
 
     /// Instruments to use
     Instruments m_Instruments;
+
+    /// Workload Profiling id
+    Optional<profiling::ProfilingGuid> m_ProfilingGuid;
 };
 
 } // namespace armnn

@@ -16,6 +16,14 @@
 
 #define ARMNN_SCOPED_PROFILING_EVENT_NEON(name) \
     ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc, \
+                                                  armnn::EmptyOptional(), \
+                                                  name, \
+                                                  armnn::NeonTimer(), \
+                                                  armnn::WallClockTimer())
+
+#define ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID(name, guid) \
+    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc, \
+                                                  guid, \
                                                   name, \
                                                   armnn::NeonTimer(), \
                                                   armnn::WallClockTimer())
@@ -24,6 +32,23 @@ using namespace armnn::armcomputetensorutils;
 
 namespace armnn
 {
+
+inline std::string GetConvolutionMethodString(arm_compute::ConvolutionMethod& convolutionMethod)
+{
+    switch (convolutionMethod)
+    {
+        case arm_compute::ConvolutionMethod::FFT:
+            return "FFT";
+        case arm_compute::ConvolutionMethod::DIRECT:
+            return "Direct";
+        case arm_compute::ConvolutionMethod::GEMM:
+            return "GEMM";
+        case arm_compute::ConvolutionMethod::WINOGRAD:
+            return "Winograd";
+        default:
+            return "Unknown";
+    }
+}
 
 template <typename T>
 void CopyArmComputeTensorData(arm_compute::Tensor& dstTensor, const T* srcData)

@@ -24,6 +24,10 @@ void JsonPrinter::PrintJsonChildObject(const JsonChildObject& object, size_t& id
     if (object.GetType() != JsonObjectType::ExecObjectDesc)
     {
         PrintLabel(object.m_Label, id);
+        if (object.m_Guid.has_value())
+        {
+            PrintGuid(object.m_Guid.value());
+        }
         PrintType(object.m_Type);
     }
 
@@ -120,6 +124,11 @@ void JsonPrinter::PrintType(armnn::JsonObjectType type)
     m_OutputStream << R"(")";
 }
 
+void JsonPrinter::PrintGuid(armnn::profiling::ProfilingGuid guid)
+{
+    PrintTabs();
+    m_OutputStream << std::quoted("GUID") << ": " << std::quoted(std::to_string(guid)) << std::endl;
+}
 
 void JsonPrinter::PrintMeasurementsList(const std::vector<double>& measurementsVector)
 {

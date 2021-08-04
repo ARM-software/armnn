@@ -70,7 +70,6 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
     : BaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
     , m_ConvolutionLayer(memoryManager)
 {
-    // todo: check tensor shapes match.
     const TensorInfo& weightInfo = m_Data.m_Weight->GetTensorInfo();
 
     m_KernelTensor = std::make_unique<arm_compute::CLTensor>();
@@ -121,21 +120,22 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
                                                   isFastMathEnabled);
 
      // Add details for profiling output
-    std::string workloadName = "ClConvolution2dWorkload_Execute_Guid" + std::to_string(this->GetGuid());
-
     WorkloadInfo detailsInfo;
 
     detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;
     detailsInfo.m_OutputTensorInfos = info.m_OutputTensorInfos;
     detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Weight->GetTensorInfo());
-    detailsInfo.m_ConvolutionMethod = armnn::Optional<std::string>(GetConvolutionMethodString());
+    detailsInfo.m_ConvolutionMethod = armnn::Optional<std::string>(GetConvolutionMethodString(m_ConvolutionMethod));
     if (descriptor.m_Parameters.m_BiasEnabled)
     {
         detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Bias->GetTensorInfo());
     }
 
     // Report Profiling Details
-    ARMNN_REPORT_PROFILING_WORKLOAD_DESC(workloadName, descriptor.m_Parameters, detailsInfo);
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClConvolution2dWorkload_Execute_Guid",
+                                         descriptor.m_Parameters,
+                                         detailsInfo,
+                                         this->GetGuid());
 
     InitializeArmComputeClTensorData(*m_KernelTensor, m_Data.m_Weight);
 
@@ -152,30 +152,13 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
 
 void ClConvolution2dWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClConvolution2dWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClConvolution2dWorkload_Execute", this->GetGuid());
     RunClFunction(m_ConvolutionLayer, CHECK_LOCATION());
 }
 
 arm_compute::ConvolutionMethod ClConvolution2dWorkload::GetConvolutionMethod() const
 {
     return m_ConvolutionMethod;
-}
-
-std::string ClConvolution2dWorkload::GetConvolutionMethodString()
-{
-    switch ( m_ConvolutionMethod )
-    {
-        case arm_compute::ConvolutionMethod::FFT:
-            return "FFT";
-        case arm_compute::ConvolutionMethod::DIRECT:
-            return "Direct";
-        case arm_compute::ConvolutionMethod::GEMM:
-            return "GEMM";
-        case arm_compute::ConvolutionMethod::WINOGRAD:
-            return "Winograd";
-        default:
-            return "Unknown";
-    }
 }
 
 void ClConvolution2dWorkload::FreeUnusedTensors()

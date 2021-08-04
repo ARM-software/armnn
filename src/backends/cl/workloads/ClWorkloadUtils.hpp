@@ -19,12 +19,37 @@
 
 #define ARMNN_SCOPED_PROFILING_EVENT_CL(name) \
     ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::GpuAcc, \
+                                                  armnn::EmptyOptional(), \
+                                                  name, \
+                                                  armnn::OpenClTimer(), \
+                                                  armnn::WallClockTimer())
+
+#define ARMNN_SCOPED_PROFILING_EVENT_CL_GUID(name, guid) \
+    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::GpuAcc, \
+                                                  guid, \
                                                   name, \
                                                   armnn::OpenClTimer(), \
                                                   armnn::WallClockTimer())
 
 namespace armnn
 {
+
+inline std::string GetConvolutionMethodString(arm_compute::ConvolutionMethod& convolutionMethod)
+{
+    switch (convolutionMethod)
+    {
+        case arm_compute::ConvolutionMethod::FFT:
+            return "FFT";
+        case arm_compute::ConvolutionMethod::DIRECT:
+            return "Direct";
+        case arm_compute::ConvolutionMethod::GEMM:
+            return "GEMM";
+        case arm_compute::ConvolutionMethod::WINOGRAD:
+            return "Winograd";
+        default:
+            return "Unknown";
+    }
+}
 
 template <typename T>
 void CopyArmComputeClTensorData(arm_compute::CLTensor& dstTensor, const T* srcData)

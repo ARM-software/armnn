@@ -16,9 +16,6 @@ RefConvolution2dWorkload::RefConvolution2dWorkload(
     const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info)
     : BaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
 {
-    // Construct params for reporting operator details
-    std::string workloadName = "RefConvolution2dWorkload_Execute_Guid" + std::to_string(this->GetGuid());
-
     WorkloadInfo detailsInfo;
     detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;
     detailsInfo.m_OutputTensorInfos = info.m_OutputTensorInfos;
@@ -29,7 +26,10 @@ RefConvolution2dWorkload::RefConvolution2dWorkload(
     }
 
     // Report Profiling Details
-    ARMNN_REPORT_PROFILING_WORKLOAD_DESC(workloadName, descriptor.m_Parameters, detailsInfo);
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("RefConvolution2dWorkload_Execute",
+                                         descriptor.m_Parameters,
+                                         detailsInfo,
+                                         this->GetGuid());
 
     m_Weight = std::make_unique<ScopedTensorHandle>(*( descriptor.m_Weight ));
     const TensorInfo& rFilterInfo = m_Weight->GetTensorInfo();
@@ -57,8 +57,7 @@ void RefConvolution2dWorkload::ExecuteAsync(WorkingMemDescriptor& workingMemDesc
 
 void RefConvolution2dWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
 {
-    std::string workloadName = "RefConvolutionWorkload_Execute_Guid" + std::to_string(this->GetGuid());
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, workloadName);
+    ARMNN_SCOPED_PROFILING_EVENT_GUID(Compute::CpuRef, "RefConvolution2dWorkload_Execute", this->GetGuid());
 
     std::unique_ptr<Decoder<float>> inputDecoder = MakeDecoder<float>(GetTensorInfo(inputs[0]), inputs[0]->Map());
     std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(outputs[0]), outputs[0]->Map());

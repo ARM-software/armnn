@@ -4,12 +4,13 @@
 //
 #pragma once
 
+#include <common/include/ProfilingGuid.hpp>
 #include "ProfilingEvent.hpp"
 #include "ProfilingDetails.hpp"
-
-#include <armnn/utility/IgnoreUnused.hpp>
 #include "armnn/IProfiler.hpp"
 
+#include <armnn/Optional.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 #include "WallClockTimer.hpp"
 
 #include <chrono>
@@ -37,14 +38,16 @@ public:
     Event* BeginEvent(armnn::IProfiler* profiler,
                       const BackendId& backendId,
                       const std::string& name,
-                      std::vector<InstrumentPtr>&& instruments);
+                      std::vector<InstrumentPtr>&& instruments,
+                      const Optional<profiling::ProfilingGuid>& guid);
 
     template<typename DescriptorType>
     void AddLayerDetails(const std::string& label,
                          const DescriptorType& desc,
-                         const WorkloadInfo& infos)
+                         const WorkloadInfo& infos,
+                         const profiling::ProfilingGuid guid)
     {
-        m_ProfilingDetails->AddDetailsToString(label, desc, infos);
+        m_ProfilingDetails->AddDetailsToString(label, desc, infos, guid);
     }
 
     // Marks the end of a user-defined event.
@@ -125,7 +128,10 @@ public:
     using InstrumentPtr = std::unique_ptr<Instrument>;
 
     template<typename... Args>
-    ScopedProfilingEvent(const BackendId& backendId, const std::string& name, Args&&... args)
+    ScopedProfilingEvent(const BackendId& backendId,
+                         const Optional<profiling::ProfilingGuid>& guid,
+                         const std::string& name,
+                         Args&& ... args)
         : m_Event(nullptr)
         , m_Profiler(ProfilerManager::GetInstance().GetProfiler())
     {
@@ -134,7 +140,7 @@ public:
             std::vector<InstrumentPtr> instruments(0);
             instruments.reserve(sizeof...(args)); //One allocation
             ConstructNextInVector(instruments, std::forward<Args>(args)...);
-            m_Event = m_Profiler->BeginEvent(backendId, name, std::move(instruments));
+            m_Event = m_Profiler->BeginEvent(backendId, name, std::move(instruments), guid);
         }
     }
 
@@ -165,43 +171,36 @@ private:
 };
 
 // Helper to easily add operator details during profiling.
-class ScopedProfilingUpdateDescriptions
+template<typename DescriptorType>
+inline void ProfilingUpdateDescriptions(const std::string& name,
+                                        const DescriptorType& desc,
+                                        const WorkloadInfo& infos,
+                                        const profiling::ProfilingGuid guid)
 {
-public:
-    template<typename DescriptorType>
-    ScopedProfilingUpdateDescriptions(const std::string& name, const DescriptorType& desc, const WorkloadInfo& infos)
-        : m_Profiler(ProfilerManager::GetInstance().GetProfiler())
+    IProfiler* profiler(ProfilerManager::GetInstance().GetProfiler()); ///< Profiler used
+    if (profiler && profiler->IsProfilingEnabled())
     {
-        if (m_Profiler && m_Profiler->IsProfilingEnabled())
-        {
-            m_Profiler->AddLayerDetails(name, desc, infos);
-        }
+        profiler->AddLayerDetails(name, desc, infos, guid);
     }
-
-    ~ScopedProfilingUpdateDescriptions()
-    {}
-
-private:
-
-    IProfiler* m_Profiler; ///< Profiler used
-};
+}
 
 template<typename DescriptorType>
 void IProfiler::AddLayerDetails(const std::string& name,
                                 const DescriptorType& desc,
-                                const WorkloadInfo& infos)
+                                const WorkloadInfo& infos,
+                                const profiling::ProfilingGuid guid)
 {
-    return pProfilerImpl->AddLayerDetails(name, desc, infos);
+    return pProfilerImpl->AddLayerDetails(name, desc, infos, guid);
 }
 
 } // namespace armnn
 
 // Event Definitions for profiling
-#define ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS_UNIQUE_LOC_INNER(lineNumber, backendId, /*name,*/ ...) \
-    armnn::ScopedProfilingEvent e_ ## lineNumber(backendId, /*name,*/ __VA_ARGS__);
+#define ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS_UNIQUE_LOC_INNER(lineNumber, backendId, guid, /*name,*/ ...) \
+    armnn::ScopedProfilingEvent e_ ## lineNumber(backendId, guid, /*name,*/ __VA_ARGS__);
 
-#define ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS_UNIQUE_LOC(lineNumber, backendId, /*name,*/ ...) \
-    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS_UNIQUE_LOC_INNER(lineNumber, backendId, /*name,*/ __VA_ARGS__)
+#define ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS_UNIQUE_LOC(lineNumber, backendId, guid, /*name,*/ ...) \
+    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS_UNIQUE_LOC_INNER(lineNumber, backendId, guid, /*name,*/ __VA_ARGS__)
 
 // The event name must be known at compile time i.e. if you are going to use this version of the macro
 // in code the first argument you supply after the backendId must be the name.
@@ -210,18 +209,15 @@ void IProfiler::AddLayerDetails(const std::string& name,
 //       legal and unique variable name (so long as you don't use the macro twice on the same line).
 //       The concat preprocessing operator (##) very unhelpfully will not expand macros see
 //       https://gcc.gnu.org/onlinedocs/cpp/Concatenation.html for the gory details.
-#define ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(backendId, /*name,*/ ...) \
-    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS_UNIQUE_LOC(__LINE__,backendId, /*name,*/ __VA_ARGS__)
+#define ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(backendId, guid, /*name,*/ ...) \
+    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS_UNIQUE_LOC(__LINE__,backendId, guid, /*name,*/ __VA_ARGS__)
 
 #define ARMNN_SCOPED_PROFILING_EVENT(backendId, name) \
-    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(backendId, name, armnn::WallClockTimer())
+    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(backendId, armnn::EmptyOptional(), name, armnn::WallClockTimer())
+
+#define ARMNN_SCOPED_PROFILING_EVENT_GUID(backendId, name, guid) \
+    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(backendId, guid, name, armnn::WallClockTimer())
 
 // Workload Description definitons for profiling
-#define ARMNN_REPORT_PROFILING_WORKLOAD_DESC_UNIQUE_LOC_INNER(lineNumber, name, desc, infos) \
-    armnn::ScopedProfilingUpdateDescriptions e_ ## lineNumber(name, desc, infos);
-
-#define ARMNN_REPORT_PROFILING_WORKLOAD_DESC_UNIQUE_LOC(lineNumber, name, desc, infos) \
-    ARMNN_REPORT_PROFILING_WORKLOAD_DESC_UNIQUE_LOC_INNER(lineNumber, name, desc, infos)
-
-#define ARMNN_REPORT_PROFILING_WORKLOAD_DESC(name, desc, infos) \
-    ARMNN_REPORT_PROFILING_WORKLOAD_DESC_UNIQUE_LOC(__LINE__, name, desc, infos)
+#define ARMNN_REPORT_PROFILING_WORKLOAD_DESC(name, desc, infos, guid) \
+    armnn::ProfilingUpdateDescriptions(name, desc, infos, guid);

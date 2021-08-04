@@ -119,21 +119,22 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
                                                  isFastMathEnabled);
 
     // Add details for profiling output
-    std::string workloadName = "NeonConvolution2dWorkload_Execute_Guid" + std::to_string(this->GetGuid());
-
     WorkloadInfo detailsInfo;
 
     detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;
     detailsInfo.m_OutputTensorInfos = info.m_OutputTensorInfos;
     detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Weight->GetTensorInfo());
-    detailsInfo.m_ConvolutionMethod = armnn::Optional<std::string>(GetConvolutionMethodString());
+    detailsInfo.m_ConvolutionMethod = armnn::Optional<std::string>(GetConvolutionMethodString(m_ConvolutionMethod));
     if (descriptor.m_Parameters.m_BiasEnabled)
     {
         detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Bias->GetTensorInfo());
     }
 
     // Report Profiling Details
-    ARMNN_REPORT_PROFILING_WORKLOAD_DESC(workloadName, descriptor.m_Parameters, detailsInfo);
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonConvolution2dWorkload_Execute",
+                                         descriptor.m_Parameters,
+                                         detailsInfo,
+                                         this->GetGuid());
 
     m_ConvolutionLayer.reset(convolutionLayer.release());
 
@@ -152,30 +153,13 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
 
 void NeonConvolution2dWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonConvolution2dWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonConvolution2dWorkload_Execute", this->GetGuid());
     m_ConvolutionLayer->run();
 }
 
 arm_compute::ConvolutionMethod NeonConvolution2dWorkload::GetConvolutionMethod() const
 {
     return m_ConvolutionMethod;
-}
-
-std::string NeonConvolution2dWorkload::GetConvolutionMethodString()
-{
-    switch ( m_ConvolutionMethod )
-    {
-        case arm_compute::ConvolutionMethod::FFT:
-            return "FFT";
-        case arm_compute::ConvolutionMethod::DIRECT:
-            return "Direct";
-        case arm_compute::ConvolutionMethod::GEMM:
-            return "GEMM";
-        case arm_compute::ConvolutionMethod::WINOGRAD:
-            return "Winograd";
-        default:
-            return "Unknown";
-    }
 }
 
 void NeonConvolution2dWorkload::FreeUnusedTensors()

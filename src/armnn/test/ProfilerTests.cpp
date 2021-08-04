@@ -4,16 +4,13 @@
 //
 
 #include <armnn/IRuntime.hpp>
-#include <armnn/TypesUtils.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <doctest/doctest.h>
 
-#include <memory>
 #include <thread>
-#include <ostream>
 
 #include <Profiling.hpp>
+#include <armnn/Optional.hpp>
 
 namespace armnn
 {
@@ -216,7 +213,10 @@ TEST_CASE("WriteEventResults")
             // Need to directly create a ScopedProfilingEvent as the one created by the macro falls out of scope
             // immediately causing the Event.Stop() function method to be called immediately after the Event.Start()
             // function resulting in periodic test failures on the Dent and Smith HiKeys
-            armnn::ScopedProfilingEvent testEvent(armnn::Compute::CpuAcc, "test", armnn::WallClockTimer());
+            armnn::ScopedProfilingEvent testEvent(armnn::Compute::CpuAcc,
+                                                  armnn::EmptyOptional(),
+                                                  "test",
+                                                  armnn::WallClockTimer());
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
 
@@ -288,18 +288,33 @@ TEST_CASE("ProfilerJsonPrinter")
 
     {
         // Test scoped macro.
-        ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc, "EnqueueWorkload", TestInstrument())
-        ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc, "Level 0", TestInstrument())
+        ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc,
+                                                      armnn::EmptyOptional(),
+                                                      "EnqueueWorkload",
+                                                      TestInstrument())
+        ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc,
+                                                      armnn::EmptyOptional(),
+                                                      "Level 0",
+                                                      TestInstrument())
         {
             {
-                ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc, "Level 1A", TestInstrument())
+                ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc,
+                                                              armnn::EmptyOptional(),
+                                                              "Level 1A",
+                                                              TestInstrument())
             }
 
             {
-                ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc, "Level 1B", TestInstrument())
+                ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc,
+                                                              armnn::EmptyOptional(),
+                                                              "Level 1B",
+                                                              TestInstrument())
 
                 {
-                    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc, "Level 2A", TestInstrument())
+                    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc,
+                                                                  armnn::EmptyOptional(),
+                                                                  "Level 2A",
+                                                                  TestInstrument())
                 }
             }
         }

@@ -12,12 +12,14 @@ Event::Event(const std::string& eventName,
              IProfiler* profiler,
              Event* parent,
              const BackendId backendId,
-             std::vector<InstrumentPtr>&& instruments)
+             std::vector<InstrumentPtr>&& instruments,
+             const Optional<profiling::ProfilingGuid> guid)
     : m_EventName(eventName)
     , m_Profiler(profiler)
     , m_Parent(parent)
     , m_BackendId(backendId)
     , m_Instruments(std::move(instruments))
+    , m_ProfilingGuid(guid)
 {
 }
 
@@ -27,7 +29,7 @@ Event::Event(Event&& other) noexcept
     , m_Parent(other.m_Parent)
     , m_BackendId(other.m_BackendId)
     , m_Instruments(std::move(other.m_Instruments))
-
+    , m_ProfilingGuid(other.m_ProfilingGuid)
 {
 }
 
@@ -84,6 +86,12 @@ BackendId Event::GetBackendId() const
     return m_BackendId;
 }
 
+Optional<profiling::ProfilingGuid> Event::GetProfilingGuid() const
+{
+    return m_ProfilingGuid;
+}
+
+
 Event& Event::operator=(Event&& other) noexcept
 {
     if (this == &other)
@@ -95,6 +103,7 @@ Event& Event::operator=(Event&& other) noexcept
     m_Profiler = other.m_Profiler;
     m_Parent = other.m_Parent;
     m_BackendId = other.m_BackendId;
+    m_ProfilingGuid = other.m_ProfilingGuid;
     other.m_Profiler = nullptr;
     other.m_Parent = nullptr;
     return *this;

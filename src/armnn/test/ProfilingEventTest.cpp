@@ -27,7 +27,8 @@ TEST_CASE("ProfilingEventTest")
                     nullptr,
                     nullptr,
                     BackendId(),
-                    std::move(insts1));
+                    std::move(insts1),
+                    EmptyOptional());
 
     CHECK_EQ(testEvent.GetName(), "EventName");
 
@@ -50,7 +51,8 @@ TEST_CASE("ProfilingEventTest")
                      profileManager.GetProfiler(),
                      &testEvent,
                      cpuAccBackendId,
-                     std::move(insts2));
+                     std::move(insts2),
+                     EmptyOptional());
 
     CHECK_EQ(&testEvent, testEvent2.GetParentEvent());
     CHECK_EQ(profileManager.GetProfiler(), testEvent2.GetProfiler());
@@ -70,7 +72,8 @@ TEST_CASE("ProfilingEventTestOnGpuAcc")
                     nullptr,
                     nullptr,
                     BackendId(),
-                    std::move(insts1));
+                    std::move(insts1),
+                    EmptyOptional());
 
     CHECK_EQ(testEvent.GetName(), "GPUEvent");
 
@@ -93,7 +96,8 @@ TEST_CASE("ProfilingEventTestOnGpuAcc")
                      profileManager.GetProfiler(),
                      &testEvent,
                      gpuAccBackendId,
-                     std::move(insts2));
+                     std::move(insts2),
+                     EmptyOptional());
 
     CHECK_EQ(&testEvent, testEvent2.GetParentEvent());
     CHECK_EQ(profileManager.GetProfiler(), testEvent2.GetProfiler());

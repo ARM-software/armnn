@@ -33,10 +33,16 @@ public:
     template<typename DescriptorType>
     void AddDetailsToString(const std::string& workloadName,
                             const DescriptorType& desc,
-                            const WorkloadInfo& infos)
+                            const WorkloadInfo& infos,
+                            const profiling::ProfilingGuid guid)
     {
         m_ProfilingDetails << std::quoted("Name") << ": " << std::quoted(workloadName) << " ";
         PrintHeader();
+
+        PrintTabs();
+        m_ProfilingDetails << std::quoted("GUID") << ": " << std::quoted(std::to_string(guid));
+        PrintSeparator();
+        PrintNewLine();
 
         // Print tensor infos and related data types
         PrintInfos(infos.m_InputTensorInfos, "Input");

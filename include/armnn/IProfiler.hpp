@@ -49,16 +49,23 @@ private:
     template<typename DescriptorType>
     void AddLayerDetails(const std::string& name,
                          const DescriptorType& desc,
-                         const WorkloadInfo& infos);
+                         const WorkloadInfo& infos,
+                         const profiling::ProfilingGuid guid);
 
     Event* BeginEvent(const BackendId& backendId,
                       const std::string& label,
-                      std::vector<InstrumentPtr>&& instruments);
+                      std::vector<InstrumentPtr>&& instruments,
+                      const Optional<profiling::ProfilingGuid>& guid);
 
     std::unique_ptr<ProfilerImpl> pProfilerImpl;
 
     friend class ScopedProfilingEvent;
-    friend class ScopedProfilingUpdateDescriptions;
+
+    template<typename DescriptorType>
+    friend inline void ProfilingUpdateDescriptions(const std::string& name,
+                                                   const DescriptorType& desc,
+                                                   const WorkloadInfo& infos,
+                                                   const profiling::ProfilingGuid guid);
 
     // Friend functions for unit testing, see ProfilerTests.cpp.
     friend size_t GetProfilerEventSequenceSize(armnn::IProfiler* profiler);

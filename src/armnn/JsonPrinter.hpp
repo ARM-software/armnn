@@ -10,6 +10,7 @@
 #include <set>
 #include <sstream>
 
+#include <ProfilingGuid.hpp>
 #include "Instrument.hpp"
 #include "JsonUtils.hpp"
 
@@ -27,7 +28,10 @@ struct JsonChildObject
 {
     // Object type changes according to the JsonObjectType specified in enum
     JsonChildObject(const std::string& label)
-        : m_Label(label), m_Unit(Measurement::Unit::TIME_MS), m_Type(JsonObjectType::Event)
+        : m_Label(label),
+          m_Unit(Measurement::Unit::TIME_MS),
+          m_Type(JsonObjectType::Event),
+          m_Guid(armnn::EmptyOptional())
     {}
     JsonChildObject(const JsonChildObject&) = default;
 
@@ -44,6 +48,11 @@ struct JsonChildObject
         {
             m_LayerDetailsList.push_back(stringLine);
         }
+    }
+
+    void SetGuid(profiling::ProfilingGuid guid)
+    {
+        m_Guid = Optional<profiling::ProfilingGuid>(guid);
     }
 
     void AddChild(const JsonChildObject& childObject)
@@ -81,6 +90,7 @@ struct JsonChildObject
     std::string m_Label;
     Measurement::Unit m_Unit;
     JsonObjectType m_Type;
+    Optional<profiling::ProfilingGuid> m_Guid;
     std::vector<double> m_Measurements;
     std::vector<std::string> m_LayerDetailsList;
     std::vector<JsonChildObject> m_Children;
@@ -96,6 +106,7 @@ public:
     void PrintLabel(const std::string& label, size_t id);
     void PrintUnit(armnn::Measurement::Unit unit);
     void PrintType(armnn::JsonObjectType type);
+    void PrintGuid(armnn::profiling::ProfilingGuid guid);
     void PrintMeasurementsList(const std::vector<double>& measurementsVector);
 
 public:

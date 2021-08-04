@@ -37,7 +37,6 @@ public:
     void Execute() const override;
 
     arm_compute::ConvolutionMethod GetConvolutionMethod() const;
-    std::string GetConvolutionMethodString();
 
 private:
     std::unique_ptr<arm_compute::IFunction> m_ConvolutionLayer;

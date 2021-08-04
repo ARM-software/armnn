@@ -46,7 +46,7 @@ void PreCompiledLayer::ValidateTensorShapesFromInputs()
 
 void PreCompiledLayer::SetPreCompiledObject(PreCompiledObjectPtr preCompiledObject)
 {
-    m_PreCompiledObject = std::make_shared<const void*>(preCompiledObject.release());
+    m_PreCompiledObject = std::move(preCompiledObject);
 }
 
 void PreCompiledLayer::Accept(ILayerVisitor& visitor) const

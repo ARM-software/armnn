@@ -25,12 +25,18 @@ const armnn::BackendId& GetCloneIdStatic()
     return s_Id;
 }
 
+template <typename T>
+void DeleteAsType(const void* const blob)
+{
+    delete static_cast<const T*>(blob);
+}
+
 class TestWorkloadFactory : public armnn::WorkloadFactoryBase
 {
 public:
 
-    TestWorkloadFactory()
-        : m_Ptr(nullptr)
+    TestWorkloadFactory(void* ptr)
+        : m_Ptr(ptr)
     {}
 
     const armnn::BackendId& GetBackendId() const override
@@ -41,14 +47,7 @@ public:
     std::unique_ptr<armnn::IWorkload> CreatePreCompiled(const armnn::PreCompiledQueueDescriptor& descriptor,
                                                         const armnn::WorkloadInfo&) const override
     {
-        if (m_Ptr)
-        {
-            CHECK(descriptor.m_PreCompiledObject == m_Ptr);
-        }
-        else
-        {
-            m_Ptr = descriptor.m_PreCompiledObject;
-        }
+        CHECK(descriptor.m_PreCompiledObject == m_Ptr);
         return nullptr;
     }
 
@@ -67,9 +66,10 @@ TEST_CASE ("PreCompiledLayerClonePreservesObject")
 
     armnn::Layer* const preCompiledLayer = graph1.AddLayer<armnn::PreCompiledLayer>(descriptor, "preCompiled");
     armnn::PreCompiledLayer* layer = armnn::PolymorphicDowncast<armnn::PreCompiledLayer*>(preCompiledLayer);
+    std::unique_ptr<std::string> payload = std::make_unique<std::string>("Hello");
 
-    armnn::PreCompiledObjectPtr payloadObject;
-    TestWorkloadFactory factory;
+    armnn::PreCompiledObjectPtr payloadObject(payload.release(), DeleteAsType<std::string>);
+    TestWorkloadFactory factory(payloadObject.get());
 
     layer->SetPreCompiledObject(std::move(payloadObject));
     layer->CreateWorkload(factory);
@@ -90,7 +90,7 @@ TEST_CASE ("PreCompiledLayerCloneNoObject")
     armnn::Layer* const preCompiledLayer = graph1.AddLayer<armnn::PreCompiledLayer>(descriptor, "preCompiled");
     armnn::PreCompiledLayer* layer = armnn::PolymorphicDowncast<armnn::PreCompiledLayer*>(preCompiledLayer);
 
-    TestWorkloadFactory factory;
+    TestWorkloadFactory factory(nullptr);
     layer->CreateWorkload(factory);
 
     armnn::PreCompiledLayer* clone = layer->Clone(graph2);

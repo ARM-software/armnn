@@ -1167,7 +1167,7 @@ void TfLiteParserImpl::ParseExpandDims(size_t subgraphIndex, size_t operatorInde
             axis = inputDimSize + axis + 1;
         }
 
-        unsigned int shape[inputDimSize + 1];
+        unsigned int shape[static_cast<unsigned int>(inputDimSize) + 1];
         unsigned int inputShapeIndex = 0;
         for (unsigned int i = 0; i < static_cast<unsigned int>(inputDimSize + 1); ++i)
         {

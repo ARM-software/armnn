@@ -36,7 +36,7 @@ ClAdditionWorkload::ClAdditionWorkload(const AdditionQueueDescriptor& descriptor
 
 void ClAdditionWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClAdditionWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClAdditionWorkload_Execute", this->GetGuid());
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

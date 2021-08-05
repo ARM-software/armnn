@@ -50,6 +50,12 @@ ClSpaceToBatchNdWorkload::ClSpaceToBatchNdWorkload(
     const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<SpaceToBatchNdQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClSpaceToBatchNdWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("ClSpaceToBatchNdWorkload", 1, 1);
 
     arm_compute::ICLTensor& input  =
@@ -81,7 +87,7 @@ ClSpaceToBatchNdWorkload::ClSpaceToBatchNdWorkload(
 
 void ClSpaceToBatchNdWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClSpaceToBatchNdWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClSpaceToBatchNdWorkload_Execute", this->GetGuid());
     RunClFunction(m_SpaceToBatchLayer, CHECK_LOCATION());
 }
 

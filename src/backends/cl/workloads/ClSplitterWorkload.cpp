@@ -57,6 +57,11 @@ ClSplitterWorkload::ClSplitterWorkload(const SplitterQueueDescriptor& descriptor
                                        const arm_compute::CLCompileContext&)
         : BaseWorkload<SplitterQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClSplitterWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
     bool allOutputsAreSubtensors = true;
 
     // Check that all outputs are sub-tensors
@@ -109,7 +114,7 @@ void ClSplitterWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_CL("ClSplitterWorkload_Execute");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClSplitterWorkload_Execute", this->GetGuid());
         m_Layer->run();
     }
 }

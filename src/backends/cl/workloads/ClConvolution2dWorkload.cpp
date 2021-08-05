@@ -132,7 +132,7 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
     }
 
     // Report Profiling Details
-    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClConvolution2dWorkload_Execute_Guid",
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClConvolution2dWorkload_Construct",
                                          descriptor.m_Parameters,
                                          detailsInfo,
                                          this->GetGuid());

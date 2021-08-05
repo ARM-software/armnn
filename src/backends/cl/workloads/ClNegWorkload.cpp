@@ -38,7 +38,7 @@ ClNegWorkload::ClNegWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
 
 void ClNegWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClNegWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClNegWorkload_Execute", this->GetGuid());
     RunClFunction(m_NegLayer, CHECK_LOCATION());
 }
 

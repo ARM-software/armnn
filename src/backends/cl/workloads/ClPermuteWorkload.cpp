@@ -31,6 +31,12 @@ ClPermuteWorkload::ClPermuteWorkload(const PermuteQueueDescriptor& descriptor,
                                      const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<PermuteQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClPermuteWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     using armcomputetensorutils::BuildArmComputePermutationVector;
 
     m_Data.ValidateInputsOutputs(GetName(), 1, 1);
@@ -45,7 +51,7 @@ ClPermuteWorkload::ClPermuteWorkload(const PermuteQueueDescriptor& descriptor,
 
 void ClPermuteWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL( GetName() + "_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID(GetName() + "_Execute", this->GetGuid());
     RunClFunction(m_PermuteFunction, CHECK_LOCATION());
 }
 

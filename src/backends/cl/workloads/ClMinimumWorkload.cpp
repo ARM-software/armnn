@@ -52,7 +52,7 @@ ClMinimumWorkload::ClMinimumWorkload(const MinimumQueueDescriptor& descriptor,
 
 void ClMinimumWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClMinimumWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClMinimumWorkload_Execute", this->GetGuid());
     RunClFunction(m_MinimumLayer, CHECK_LOCATION());
 }
 

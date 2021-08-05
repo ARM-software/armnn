@@ -30,7 +30,7 @@ ClConvertFp16ToFp32Workload::ClConvertFp16ToFp32Workload(
 
 void ClConvertFp16ToFp32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClConvertFp16ToFp32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClConvertFp16ToFp32Workload_Execute", this->GetGuid());
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

@@ -35,6 +35,12 @@ ClInstanceNormalizationWorkload::ClInstanceNormalizationWorkload(
     const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<InstanceNormalizationQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClInstanceNormalizationWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("ClInstanceNormalizationWorkload", 1, 1);
 
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -54,7 +60,7 @@ ClInstanceNormalizationWorkload::ClInstanceNormalizationWorkload(
 
 void ClInstanceNormalizationWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClInstanceNormalizationWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClInstanceNormalizationWorkload_Execute", this->GetGuid());
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

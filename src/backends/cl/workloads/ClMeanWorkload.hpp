@@ -14,7 +14,7 @@ namespace armnn
 
 arm_compute::Status ClMeanValidate(const TensorInfo& input,
                                    const TensorInfo& output,
-                                   const MeanDescriptor& desc);
+                                   const MeanDescriptor& descriptor);
 
 class ClMeanWorkload : public BaseWorkload<MeanQueueDescriptor>
 {

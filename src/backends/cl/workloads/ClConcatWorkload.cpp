@@ -18,9 +18,9 @@ using namespace armcomputetensorutils;
 
 namespace
 {
-size_t CalcAxis(const OriginsDescriptor& desc)
+size_t CalcAxis(const OriginsDescriptor& descriptor)
 {
-    return (desc.GetNumDimensions() - desc.GetConcatAxis()) - 1;
+    return (descriptor.GetNumDimensions() - descriptor.GetConcatAxis()) - 1;
 }
 } //namespace
 
@@ -50,6 +50,12 @@ ClConcatWorkload::ClConcatWorkload(const ConcatQueueDescriptor& descriptor,
                                    const arm_compute::CLCompileContext& clCompileContext)
 : BaseWorkload<ConcatQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClConcatWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     bool allInputsAreSubtensors = true;
 
     // Check that all inputs are sub-tensors
@@ -95,7 +101,7 @@ void ClConcatWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_CL("ClConcatWorkload_Execute");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClConcatWorkload_Execute", this->GetGuid());
         m_Layer->run();
     }
 }

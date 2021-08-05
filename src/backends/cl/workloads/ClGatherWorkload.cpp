@@ -31,6 +31,12 @@ ClGatherWorkload::ClGatherWorkload(const GatherQueueDescriptor& descriptor,
                                    const arm_compute::CLCompileContext& clCompileContext)
         : BaseWorkload<GatherQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClGatherWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("ClGatherWorkload", 1, 1);
 
     arm_compute::ICLTensor& input    = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -44,7 +50,7 @@ ClGatherWorkload::ClGatherWorkload(const GatherQueueDescriptor& descriptor,
 
 void ClGatherWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClGatherWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClGatherWorkload_Execute", this->GetGuid());
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 } // namespace armnn

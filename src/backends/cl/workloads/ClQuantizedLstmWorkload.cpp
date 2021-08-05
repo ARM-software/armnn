@@ -137,7 +137,7 @@ ClQuantizedLstmWorkload::ClQuantizedLstmWorkload(const QuantizedLstmQueueDescrip
 
 void ClQuantizedLstmWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClQuantizedLstmWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClQuantizedLstmWorkload_Execute", this->GetGuid());
     RunClFunction(m_QuantizedLstmLayer, CHECK_LOCATION());
 }
 

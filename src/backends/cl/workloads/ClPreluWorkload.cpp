@@ -42,7 +42,7 @@ ClPreluWorkload::ClPreluWorkload(const PreluQueueDescriptor& descriptor,
 
 void ClPreluWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClPreluWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClPreluWorkload_Execute", this->GetGuid());
     RunClFunction(m_PreluLayer, CHECK_LOCATION());
 }
 

@@ -49,7 +49,7 @@ ClDivisionWorkload::ClDivisionWorkload(const DivisionQueueDescriptor& descriptor
 
 void ClDivisionWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClDivisionWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClDivisionWorkload_Execute", this->GetGuid());
     RunClFunction(m_ArithmeticDivision, CHECK_LOCATION());
 }
 

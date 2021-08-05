@@ -36,7 +36,7 @@ ClSubtractionWorkload::ClSubtractionWorkload(const SubtractionQueueDescriptor& d
 
 void ClSubtractionWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClSubtractionWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClSubtractionWorkload_Execute", this->GetGuid());
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

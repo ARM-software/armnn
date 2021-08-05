@@ -44,7 +44,7 @@ ClQuantizeWorkload::ClQuantizeWorkload(const QuantizeQueueDescriptor& descriptor
 
 void ClQuantizeWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClQuantizeWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClQuantizeWorkload_Execute", this->GetGuid());
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

@@ -44,6 +44,12 @@ ClComparisonWorkload::ClComparisonWorkload(const ComparisonQueueDescriptor& desc
                                            const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<ComparisonQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonComparisonWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("ClComparisonWorkload", 2, 1);
 
     arm_compute::ICLTensor& input0 = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -57,7 +63,7 @@ ClComparisonWorkload::ClComparisonWorkload(const ComparisonQueueDescriptor& desc
 
 void ClComparisonWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClComparisonWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClComparisonWorkload_Execute", this->GetGuid());
     RunClFunction(m_ComparisonLayer, CHECK_LOCATION());
 }
 

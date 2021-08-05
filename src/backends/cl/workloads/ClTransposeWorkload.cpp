@@ -31,6 +31,12 @@ ClTransposeWorkload::ClTransposeWorkload(const TransposeQueueDescriptor& descrip
                                          const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<TransposeQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClTransposeWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs(GetName(), 1, 1);
 
     const arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -45,7 +51,7 @@ ClTransposeWorkload::ClTransposeWorkload(const TransposeQueueDescriptor& descrip
 
 void ClTransposeWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL(GetName() + "_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID(GetName() + "_Execute", this->GetGuid());
     RunClFunction(m_PermuteFunction, CHECK_LOCATION());
 }
 

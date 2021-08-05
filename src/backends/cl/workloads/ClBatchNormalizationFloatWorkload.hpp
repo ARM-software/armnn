@@ -19,7 +19,7 @@ arm_compute::Status ClBatchNormalizationValidate(const TensorInfo& input,
                                                  const TensorInfo& var,
                                                  const TensorInfo& beta,
                                                  const TensorInfo& gamma,
-                                                 const BatchNormalizationDescriptor& desc,
+                                                 const BatchNormalizationDescriptor& descriptor,
                                                  const ActivationDescriptor* activationDescriptor = nullptr);
 
 class ClBatchNormalizationFloatWorkload : public FloatWorkload<BatchNormalizationQueueDescriptor>

@@ -32,6 +32,12 @@ ClLogSoftmaxWorkload::ClLogSoftmaxWorkload(const LogSoftmaxQueueDescriptor& desc
         : BaseWorkload<LogSoftmaxQueueDescriptor>(descriptor, info)
         , m_LogSoftmaxLayer(memoryManager)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClLogSoftmaxWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("ClLogSoftmaxWorkload", 1, 1);
 
     arm_compute::ICLTensor& input  = static_cast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -43,7 +49,7 @@ ClLogSoftmaxWorkload::ClLogSoftmaxWorkload(const LogSoftmaxQueueDescriptor& desc
 
 void ClLogSoftmaxWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClLogSoftmaxWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClLogSoftmaxWorkload_Execute", this->GetGuid());
     RunClFunction(m_LogSoftmaxLayer, CHECK_LOCATION());
 }
 

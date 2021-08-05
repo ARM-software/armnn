@@ -33,6 +33,12 @@ ClLogicalNotWorkload::ClLogicalNotWorkload(const ElementwiseUnaryQueueDescriptor
                                            const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClLogicalNotWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("ClLogicalNotWorkload", 1, 1);
 
     arm_compute::ICLTensor& input  = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -43,7 +49,7 @@ ClLogicalNotWorkload::ClLogicalNotWorkload(const ElementwiseUnaryQueueDescriptor
 
 void ClLogicalNotWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClLogicalNotWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClLogicalNotWorkload_Execute", this->GetGuid());
     m_LogicalNotLayer.run();
 }
 

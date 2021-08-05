@@ -36,6 +36,12 @@ ClLogicalOrWorkload::ClLogicalOrWorkload(const LogicalBinaryQueueDescriptor& des
                                          const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<LogicalBinaryQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClLogicalOrWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("ClLogicalOrWorkload", 2, 1);
 
     arm_compute::ICLTensor& input0 = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -47,7 +53,7 @@ ClLogicalOrWorkload::ClLogicalOrWorkload(const LogicalBinaryQueueDescriptor& des
 
 void ClLogicalOrWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClLogicalOrWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClLogicalOrWorkload_Execute", this->GetGuid());
     m_LogicalOrLayer.run();
 }
 

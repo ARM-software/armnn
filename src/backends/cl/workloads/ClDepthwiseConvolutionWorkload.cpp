@@ -78,15 +78,32 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
     const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
 {
+    // Add details for profiling output
+    WorkloadInfo detailsInfo;
+
+    detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;
+    detailsInfo.m_OutputTensorInfos = info.m_OutputTensorInfos;
+    detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Weight->GetTensorInfo());
+    if (descriptor.m_Parameters.m_BiasEnabled)
+    {
+        detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Bias->GetTensorInfo());
+    }
+
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClDepthwiseConvolutionWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         detailsInfo,
+                                         this->GetGuid());
+
     // ArmNN's weight format is usually [ M, I, H, W ] but for depthwise its [ 1, H, W, I*M]
     // Permute to [ 1, I * M, H, W ] (if NCHW), as required by the compute library
     ConstTensor weightPermuted;
     unsigned int depthMultiplier;
     std::unique_ptr<unsigned char[]> permuteBuffer(new unsigned char[m_Data.m_Weight->GetTensorInfo().GetNumBytes()]);
     std::tie(weightPermuted, depthMultiplier) = Convert1HWOTensorToAcl(m_Data.m_Weight,
-                                                                        info.m_InputTensorInfos[0],
-                                                                        m_Data.m_Parameters.m_DataLayout,
-                                                                        permuteBuffer.get());
+                                                                       info.m_InputTensorInfos[0],
+                                                                       m_Data.m_Parameters.m_DataLayout,
+                                                                       permuteBuffer.get());
 
     // Convert the weights into the compute library format
     m_KernelTensor = std::make_unique<arm_compute::CLTensor>();
@@ -151,7 +168,7 @@ void ClDepthwiseConvolutionWorkload::FreeUnusedTensors()
 
 void ClDepthwiseConvolutionWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClDepthwiseConvolutionWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClDepthwiseConvolutionWorkload_Execute", this->GetGuid());
     ARMNN_ASSERT(m_DepthwiseConvolutionLayer);
 
     RunClFunction(*m_DepthwiseConvolutionLayer, CHECK_LOCATION());

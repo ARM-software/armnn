@@ -49,6 +49,12 @@ ClStackWorkload::ClStackWorkload(const StackQueueDescriptor& descriptor,
                                  const arm_compute::CLCompileContext& clCompileContext)
 : BaseWorkload<StackQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClStackWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     std::vector<arm_compute::ICLTensor*> aclInputs;
     for (auto input : m_Data.m_Inputs)
     {
@@ -67,7 +73,7 @@ void ClStackWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_CL("ClStackWorkload_Execute");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClStackWorkload_Execute", this->GetGuid());
         m_Layer->run();
     }
 }

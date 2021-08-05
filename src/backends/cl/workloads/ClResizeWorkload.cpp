@@ -51,6 +51,12 @@ ClResizeWorkload::ClResizeWorkload(const ResizeQueueDescriptor& descriptor,
                                    const arm_compute::CLCompileContext& clCompileContext)
   : BaseWorkload<ResizeQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClResizeWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("ClResizeWorkload", 1, 1);
 
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -81,7 +87,7 @@ ClResizeWorkload::ClResizeWorkload(const ResizeQueueDescriptor& descriptor,
 
 void ClResizeWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClResizeWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClResizeWorkload_Execute", this->GetGuid());
     RunClFunction(m_ResizeLayer, CHECK_LOCATION());
 }
 

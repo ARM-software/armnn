@@ -35,7 +35,7 @@ ClFloorFloatWorkload::ClFloorFloatWorkload(const FloorQueueDescriptor& descripto
 
 void ClFloorFloatWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClFloorFloatWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClFloorFloatWorkload_Execute", this->GetGuid());
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

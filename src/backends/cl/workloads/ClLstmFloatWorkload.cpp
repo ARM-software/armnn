@@ -24,6 +24,12 @@ ClLstmFloatWorkload::ClLstmFloatWorkload(const LstmQueueDescriptor &descriptor,
                                          const arm_compute::CLCompileContext& clCompileContext)
         : FloatWorkload<LstmQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClLstmFloatWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     arm_compute::LSTMParams<arm_compute::ICLTensor> lstm_param;
 
     // Basic parameters
@@ -254,7 +260,7 @@ ClLstmFloatWorkload::ClLstmFloatWorkload(const LstmQueueDescriptor &descriptor,
 
 void ClLstmFloatWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClLstmFloatWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClLstmFloatWorkload_Execute", this->GetGuid());
     RunClFunction(m_LstmLayer, CHECK_LOCATION());
 }
 

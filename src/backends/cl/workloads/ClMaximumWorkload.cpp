@@ -52,7 +52,7 @@ ClMaximumWorkload::ClMaximumWorkload(const MaximumQueueDescriptor& descriptor,
 
 void ClMaximumWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClMaximumWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClMaximumWorkload_Execute", this->GetGuid());
     RunClFunction(m_MaximumLayer, CHECK_LOCATION());
 }
 

@@ -20,6 +20,12 @@ ClPadWorkload::ClPadWorkload(const PadQueueDescriptor& descriptor,
                              const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<PadQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClPadWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     this->m_Data.ValidateInputsOutputs("ClPadWorkload", 1, 1);
 
     arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(this->m_Data.m_Inputs[0])->GetTensor();
@@ -40,7 +46,7 @@ ClPadWorkload::ClPadWorkload(const PadQueueDescriptor& descriptor,
 
 void ClPadWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClPadWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClPadWorkload_Execute", this->GetGuid());
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

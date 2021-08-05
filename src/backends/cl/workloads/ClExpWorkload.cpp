@@ -28,6 +28,12 @@ ClExpWorkload::ClExpWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
                              const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClExpWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("ClExpWorkload", 1, 1);
 
     arm_compute::ICLTensor& input  = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -38,7 +44,7 @@ ClExpWorkload::ClExpWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
 
 void ClExpWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClExpWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClExpWorkload_Execute", this->GetGuid());
     RunClFunction(m_ExpLayer, CHECK_LOCATION());
 }
 

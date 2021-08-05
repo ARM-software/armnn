@@ -16,7 +16,7 @@ namespace armnn
 
 arm_compute::Status ClDepthToSpaceWorkloadValidate(const TensorInfo& input,
                                                    const TensorInfo& output,
-                                                   const DepthToSpaceDescriptor& desc);
+                                                   const DepthToSpaceDescriptor& descriptor);
 
 class ClDepthToSpaceWorkload : public BaseWorkload<DepthToSpaceQueueDescriptor>
 {

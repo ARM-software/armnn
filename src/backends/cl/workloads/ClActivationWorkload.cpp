@@ -34,19 +34,25 @@ ClActivationWorkload::ClActivationWorkload(const ActivationQueueDescriptor& desc
                                            const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<ActivationQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClActivationWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("ClActivationWorkload", 1, 1);
 
     const arm_compute::ActivationLayerInfo activationLayerInfo =
         ConvertActivationDescriptorToAclActivationLayerInfo(m_Data.m_Parameters);
 
-    arm_compute::ICLTensor& input  = static_cast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ICLTensor& input = static_cast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     m_ActivationLayer.configure(clCompileContext, &input, &output, activationLayerInfo);
 }
 
 void ClActivationWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClActivationWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClActivationWorkload_Execute", this->GetGuid());
     RunClFunction(m_ActivationLayer, CHECK_LOCATION());
 }
 

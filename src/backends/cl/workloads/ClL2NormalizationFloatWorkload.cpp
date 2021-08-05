@@ -31,6 +31,12 @@ ClL2NormalizationFloatWorkload::ClL2NormalizationFloatWorkload(const L2Normaliza
                                                                const arm_compute::CLCompileContext& clCompileContext)
     : FloatWorkload<L2NormalizationQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClL2NormalizationFloatWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("ClL2NormalizationFloatWorkload", 1, 1);
 
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -47,7 +53,7 @@ ClL2NormalizationFloatWorkload::ClL2NormalizationFloatWorkload(const L2Normaliza
 
 void ClL2NormalizationFloatWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClL2NormalizationFloatWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClL2NormalizationFloatWorkload_Execute", this->GetGuid());
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

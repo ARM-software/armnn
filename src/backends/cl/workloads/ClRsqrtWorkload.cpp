@@ -38,7 +38,7 @@ ClRsqrtWorkload::ClRsqrtWorkload(const RsqrtQueueDescriptor& descriptor,
 
 void ClRsqrtWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClRsqrtWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClRsqrtWorkload_Execute", this->GetGuid());
     RunClFunction(m_RsqrtLayer, CHECK_LOCATION());
 }
 

@@ -20,6 +20,12 @@ ClFillWorkload::ClFillWorkload(const FillQueueDescriptor& descriptor,
                                const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<FillQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClFillWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("ClFillWorkload", 1, 1);
 
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(this->m_Data.m_Outputs[0])->GetTensor();
@@ -30,7 +36,7 @@ ClFillWorkload::ClFillWorkload(const FillQueueDescriptor& descriptor,
 
 void ClFillWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClFillWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClFillWorkload_Execute", this->GetGuid());
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

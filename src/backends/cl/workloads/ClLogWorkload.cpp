@@ -38,7 +38,7 @@ ClLogWorkload::ClLogWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
 
 void ClLogWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClLogWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClLogWorkload_Execute", this->GetGuid());
     RunClFunction(m_LogLayer, CHECK_LOCATION());
 }
 

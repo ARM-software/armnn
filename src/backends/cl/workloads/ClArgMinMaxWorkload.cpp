@@ -57,6 +57,12 @@ ClArgMinMaxWorkload::ClArgMinMaxWorkload(const ArgMinMaxQueueDescriptor& descrip
                                          const arm_compute::CLCompileContext& clCompileContext)
         : BaseWorkload<ArgMinMaxQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClArgMinMaxWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(this->m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(this->m_Data.m_Outputs[0])->GetTensor();
 
@@ -80,7 +86,7 @@ ClArgMinMaxWorkload::ClArgMinMaxWorkload(const ArgMinMaxQueueDescriptor& descrip
 
 void ClArgMinMaxWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClArgMinMaxWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClArgMinMaxWorkload_Execute", this->GetGuid());
     RunClFunction(m_ArgMinMaxLayer, CHECK_LOCATION());
 }
 

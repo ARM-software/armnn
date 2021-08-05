@@ -22,21 +22,21 @@ arm_compute::Status ClBatchNormalizationValidate(const TensorInfo& input,
                                                  const TensorInfo& var,
                                                  const TensorInfo& beta,
                                                  const TensorInfo& gamma,
-                                                 const BatchNormalizationDescriptor& desc,
+                                                 const BatchNormalizationDescriptor& descriptor,
                                                  const ActivationDescriptor* activationDescriptor)
 {
     const arm_compute::TensorInfo aclInputInfo =
-          armcomputetensorutils::BuildArmComputeTensorInfo(input, desc.m_DataLayout);
+        armcomputetensorutils::BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclOutputInfo =
-          armcomputetensorutils::BuildArmComputeTensorInfo(output, desc.m_DataLayout);
+        armcomputetensorutils::BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclMeanInfo =
-          armcomputetensorutils::BuildArmComputeTensorInfo(mean, desc.m_DataLayout);
+        armcomputetensorutils::BuildArmComputeTensorInfo(mean, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclVarInfo =
-          armcomputetensorutils::BuildArmComputeTensorInfo(var, desc.m_DataLayout);
+        armcomputetensorutils::BuildArmComputeTensorInfo(var, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclBetaInfo =
-          armcomputetensorutils::BuildArmComputeTensorInfo(beta, desc.m_DataLayout);
+        armcomputetensorutils::BuildArmComputeTensorInfo(beta, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclGammaInfo =
-          armcomputetensorutils::BuildArmComputeTensorInfo(gamma, desc.m_DataLayout);
+        armcomputetensorutils::BuildArmComputeTensorInfo(gamma, descriptor.m_DataLayout);
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertActivationDescriptorToAclActivationLayerInfo(
             activationDescriptor);
@@ -47,7 +47,7 @@ arm_compute::Status ClBatchNormalizationValidate(const TensorInfo& input,
                                                             &aclVarInfo,
                                                             &aclBetaInfo,
                                                             &aclGammaInfo,
-                                                            desc.m_Eps,
+                                                            descriptor.m_Eps,
                                                             activationInfo);
 }
 
@@ -57,6 +57,12 @@ ClBatchNormalizationFloatWorkload::ClBatchNormalizationFloatWorkload(
     const arm_compute::CLCompileContext& clCompileContext)
     : FloatWorkload<BatchNormalizationQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClBatchNormalizationWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Mean = std::make_unique<arm_compute::CLTensor>();
     BuildArmComputeTensor(*m_Mean, m_Data.m_Mean->GetTensorInfo());
 
@@ -103,7 +109,7 @@ ClBatchNormalizationFloatWorkload::ClBatchNormalizationFloatWorkload(
 
 void ClBatchNormalizationFloatWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClBatchNormalizationFloatWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClBatchNormalizationFloatWorkload_Execute", this->GetGuid());
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

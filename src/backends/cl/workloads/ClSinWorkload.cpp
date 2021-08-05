@@ -38,7 +38,7 @@ ClSinWorkload::ClSinWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
 
 void ClSinWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClSinWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClSinWorkload_Execute", this->GetGuid());
     RunClFunction(m_SinLayer, CHECK_LOCATION());
 }
 

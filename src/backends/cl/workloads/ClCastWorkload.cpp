@@ -40,7 +40,7 @@ ClCastWorkload::ClCastWorkload(const CastQueueDescriptor& descriptor,
 
 void ClCastWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClCastWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClCastWorkload_Execute", this->GetGuid());
     RunClFunction(m_CastLayer, CHECK_LOCATION());
 }
 

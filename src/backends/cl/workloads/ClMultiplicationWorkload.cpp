@@ -75,7 +75,7 @@ ClMultiplicationWorkload::ClMultiplicationWorkload(const MultiplicationQueueDesc
 
 void ClMultiplicationWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClMultiplicationWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClMultiplicationWorkload_Execute", this->GetGuid());
     RunClFunction(m_PixelWiseMultiplication, CHECK_LOCATION());
 }
 

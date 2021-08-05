@@ -19,6 +19,12 @@ ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor& descriptor,
                                  const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<QLstmQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClQLstmWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     arm_compute::LSTMParams<arm_compute::ICLTensor> qLstmParams;
 
     // Mandatory params
@@ -231,6 +237,7 @@ ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor& descriptor,
 
 void ClQLstmWorkload::Execute() const
 {
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClQuantizedLstmWorkload_Execute", this->GetGuid());
     m_QLstmLayer.run();
 }
 

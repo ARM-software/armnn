@@ -49,7 +49,7 @@ void ClDequantizeWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_CL("ClDequantizeWorkload_Execute");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClDequantizeWorkload_Execute", this->GetGuid());
         m_Layer->run();
     }
 }

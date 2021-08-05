@@ -39,7 +39,7 @@ ClAbsWorkload::ClAbsWorkload(const AbsQueueDescriptor& descriptor,
 
 void ClAbsWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClAbsWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClAbsWorkload_Execute", this->GetGuid());
     RunClFunction(m_AbsLayer, CHECK_LOCATION());
 }
 

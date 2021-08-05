@@ -33,6 +33,12 @@ ClPooling2dWorkload::ClPooling2dWorkload(
     const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<Pooling2dQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClPooling2dWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("ClPooling2dWorkload", 1, 1);
 
     arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -55,7 +61,7 @@ ClPooling2dWorkload::ClPooling2dWorkload(
 
 void ClPooling2dWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClPooling2dWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClPooling2dWorkload_Execute", this->GetGuid());
     RunClFunction(m_PoolingLayer, CHECK_LOCATION());
 }
 

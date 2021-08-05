@@ -14,7 +14,7 @@ namespace armnn
 
 arm_compute::Status ClReduceWorkloadValidate(const TensorInfo& input,
                                              const TensorInfo& output,
-                                             const ReduceDescriptor& desc);
+                                             const ReduceDescriptor& descriptor);
 
 class ClReduceWorkload : public BaseWorkload<ReduceQueueDescriptor>
 {

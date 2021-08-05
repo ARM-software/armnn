@@ -57,6 +57,12 @@ ClStridedSliceWorkload::ClStridedSliceWorkload(const StridedSliceQueueDescriptor
                                                const arm_compute::CLCompileContext& clCompileContext)
     : BaseWorkload<StridedSliceQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClStridedSliceWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("ClStridedSliceWorkload", 1, 1);
 
     arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -92,7 +98,7 @@ ClStridedSliceWorkload::ClStridedSliceWorkload(const StridedSliceQueueDescriptor
 
 void ClStridedSliceWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClStridedSliceWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClStridedSliceWorkload_Execute", this->GetGuid());
     RunClFunction(m_StridedSliceLayer, CHECK_LOCATION());
 }
 

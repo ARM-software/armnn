@@ -13,7 +13,7 @@ namespace armnn
 
 arm_compute::Status ClBatchToSpaceNdWorkloadValidate(const TensorInfo& input,
                                                      const TensorInfo& output,
-                                                     const BatchToSpaceNdDescriptor& desc);
+                                                     const BatchToSpaceNdDescriptor& descriptor);
 
 class ClBatchToSpaceNdWorkload : public BaseWorkload<BatchToSpaceNdQueueDescriptor>
 {

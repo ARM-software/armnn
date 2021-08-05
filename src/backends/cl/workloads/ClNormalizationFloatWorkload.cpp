@@ -33,6 +33,12 @@ ClNormalizationFloatWorkload::ClNormalizationFloatWorkload(const NormalizationQu
                                                            const arm_compute::CLCompileContext& clCompileContext)
     : FloatWorkload<NormalizationQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClNormalizationWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("ClNormalizationFloatWorkload", 1, 1);
 
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -49,7 +55,7 @@ ClNormalizationFloatWorkload::ClNormalizationFloatWorkload(const NormalizationQu
 
 void ClNormalizationFloatWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClNormalizationFloatWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClNormalizationFloatWorkload_Execute", this->GetGuid());
     RunClFunction(m_NormalizationLayer, CHECK_LOCATION());
 }
 

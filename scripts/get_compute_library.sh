@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_05" # Release 21.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="8e2f64f214fa3ce5834db966222fa3b804e236a2" #Create custom flags for enabling fp16 support
+DEFAULT_CLFRAMEWORKREVISION="3f74389bf771274162dc5e6fd87bbfa2d38ea667" #Remove 21.08 deprecated code
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

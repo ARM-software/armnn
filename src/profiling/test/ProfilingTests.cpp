@@ -42,6 +42,7 @@
 
 #include <doctest/doctest.h>
 
+#include <algorithm>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
@@ -534,17 +535,15 @@ TEST_CASE("CheckProfilingStateMachine")
 
     ProfilingStateMachine profilingState17(ProfilingState::Uninitialised);
 
-    std::thread thread1(ProfilingCurrentStateThreadImpl, std::ref(profilingState17));
-    std::thread thread2(ProfilingCurrentStateThreadImpl, std::ref(profilingState17));
-    std::thread thread3(ProfilingCurrentStateThreadImpl, std::ref(profilingState17));
-    std::thread thread4(ProfilingCurrentStateThreadImpl, std::ref(profilingState17));
-    std::thread thread5(ProfilingCurrentStateThreadImpl, std::ref(profilingState17));
-
-    thread1.join();
-    thread2.join();
-    thread3.join();
-    thread4.join();
-    thread5.join();
+    std::vector<std::thread> threads;
+    for (unsigned int i = 0; i < 5; ++i)
+    {
+        threads.push_back(std::thread(ProfilingCurrentStateThreadImpl, std::ref(profilingState17)));
+    }
+    std::for_each(threads.begin(), threads.end(), [](std::thread& theThread)
+    {
+        theThread.join();
+    });
 
     CHECK((profilingState17.GetCurrentState() == ProfilingState::NotConnected));
 }
@@ -703,36 +702,36 @@ TEST_CASE("CheckProfilingServiceCounterValues")
     std::vector<std::thread> writers;
 
     CHECK(!counters.empty());
+    uint16_t inferencesRun = armnn::profiling::INFERENCES_RUN;
 
     // Test GetAbsoluteCounterValue
     for (int i = 0; i < 4; ++i)
     {
         // Increment and decrement the INFERENCES_RUN counter 250 times
-        writers.push_back(std::thread([&profilingService]()
+        writers.push_back(std::thread([&profilingService, inferencesRun]()
                                       {
                                           for (int i = 0; i < 250; ++i)
                                           {
-                                              profilingService.IncrementCounterValue(INFERENCES_RUN);
+                                              profilingService.IncrementCounterValue(inferencesRun);
                                           }
                                       }));
         // Add 10 to the INFERENCES_RUN counter 200 times
-        writers.push_back(std::thread([&profilingService]()
+        writers.push_back(std::thread([&profilingService, inferencesRun]()
                                       {
                                           for (int i = 0; i < 200; ++i)
                                           {
-                                              profilingService.AddCounterValue(INFERENCES_RUN, 10);
+                                              profilingService.AddCounterValue(inferencesRun, 10);
                                           }
                                       }));
         // Subtract 5 from the INFERENCES_RUN counter 200 times
-        writers.push_back(std::thread([&profilingService]()
+        writers.push_back(std::thread([&profilingService, inferencesRun]()
                                       {
                                           for (int i = 0; i < 200; ++i)
                                           {
-                                              profilingService.SubtractCounterValue(INFERENCES_RUN, 5);
+                                              profilingService.SubtractCounterValue(inferencesRun, 5);
                                           }
                                       }));
     }
-
     std::for_each(writers.begin(), writers.end(), mem_fn(&std::thread::join));
 
     uint32_t absoluteCounterValue = 0;
@@ -749,38 +748,38 @@ TEST_CASE("CheckProfilingServiceCounterValues")
     writers.clear();
     uint32_t deltaCounterValue = 0;
     //Start a reading thread to randomly read the INFERENCES_RUN counter value
-    std::thread reader([&profilingService](uint32_t& deltaCounterValue)
+    std::thread reader([&profilingService, inferencesRun](uint32_t& deltaCounterValue)
                        {
                            for (int i = 0; i < 300; ++i)
                            {
-                               deltaCounterValue += profilingService.GetDeltaCounterValue(INFERENCES_RUN);
+                               deltaCounterValue += profilingService.GetDeltaCounterValue(inferencesRun);
                            }
                        }, std::ref(deltaCounterValue));
 
     for (int i = 0; i < 4; ++i)
     {
         // Increment and decrement the INFERENCES_RUN counter 250 times
-        writers.push_back(std::thread([&profilingService]()
+        writers.push_back(std::thread([&profilingService, inferencesRun]()
                                       {
                                           for (int i = 0; i < 250; ++i)
                                           {
-                                              profilingService.IncrementCounterValue(INFERENCES_RUN);
+                                              profilingService.IncrementCounterValue(inferencesRun);
                                           }
                                       }));
         // Add 10 to the INFERENCES_RUN counter 200 times
-        writers.push_back(std::thread([&profilingService]()
+        writers.push_back(std::thread([&profilingService, inferencesRun]()
                                       {
                                           for (int i = 0; i < 200; ++i)
                                           {
-                                              profilingService.AddCounterValue(INFERENCES_RUN, 10);
+                                              profilingService.AddCounterValue(inferencesRun, 10);
                                           }
                                       }));
         // Subtract 5 from the INFERENCES_RUN counter 200 times
-        writers.push_back(std::thread([&profilingService]()
+        writers.push_back(std::thread([&profilingService, inferencesRun]()
                                       {
                                           for (int i = 0; i < 200; ++i)
                                           {
-                                              profilingService.SubtractCounterValue(INFERENCES_RUN, 5);
+                                              profilingService.SubtractCounterValue(inferencesRun, 5);
                                           }
                                       }));
     }

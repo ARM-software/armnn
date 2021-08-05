@@ -7,6 +7,7 @@
 
 #include <doctest/doctest.h>
 
+#include <algorithm>
 #include <thread>
 
 #include <Profiling.hpp>
@@ -90,15 +91,17 @@ TEST_CASE("RegisterUnregisterProfilerSingleThread")
 TEST_CASE("RegisterUnregisterProfilerMultipleThreads")
 {
     bool res[3] = {false, false, false};
-    std::thread thread1([&res]() { RegisterUnregisterProfilerSingleThreadImpl(res[0]); });
-    std::thread thread2([&res]() { RegisterUnregisterProfilerSingleThreadImpl(res[1]); });
-    std::thread thread3([&res]() { RegisterUnregisterProfilerSingleThreadImpl(res[2]); });
+    std::vector<std::thread> threads;
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+        threads.push_back(std::thread([&res, i]() { RegisterUnregisterProfilerSingleThreadImpl(res[i]); }));
+    }
+    std::for_each(threads.begin(), threads.end(), [](std::thread& theThread)
+    {
+        theThread.join();
+    });
 
-    thread1.join();
-    thread2.join();
-    thread3.join();
-
-    for (int i = 0 ; i < 3 ; i++)
+    for (int i = 0 ; i < 3 ; ++i)
     {
         CHECK(res[i]);
     }

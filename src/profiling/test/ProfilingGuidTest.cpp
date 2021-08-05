@@ -7,6 +7,8 @@
 
 #include <common/include/LabelsAndEventClasses.hpp>
 
+#include <algorithm>
+#include <functional>
 #include <set>
 #include <doctest/doctest.h>
 #include <fmt/format.h>
@@ -133,25 +135,26 @@ TEST_CASE("DynamicGuidGeneratorTest")
     }
 }
 
+void GenerateProfilingGUID(ProfilingGuidGenerator& guidGenerator)
+{
+    for (int i = 0; i < 1000; ++i)
+    {
+        guidGenerator.NextGuid();
+    }
+}
+
 TEST_CASE("ProfilingGuidThreadTest")
 {
     ProfilingGuidGenerator profilingGuidGenerator;
-
-    auto guidGenerator = [&profilingGuidGenerator]()
+    std::vector<std::thread> threads;
+    for (unsigned int i = 0; i < 3; ++i)
     {
-        for (int i = 0; i < 1000; ++i)
-        {
-            profilingGuidGenerator.NextGuid();
-        }
-    };
-
-    std::thread t1(guidGenerator);
-    std::thread t2(guidGenerator);
-    std::thread t3(guidGenerator);
-
-    t1.join();
-    t2.join();
-    t3.join();
+        threads.push_back(std::thread(GenerateProfilingGUID, std::ref(profilingGuidGenerator)));
+    }
+    std::for_each(threads.begin(), threads.end(), [](std::thread& theThread)
+    {
+        theThread.join();
+    });
 
     uint64_t guid = profilingGuidGenerator.NextGuid();
     CHECK(guid == 3000u);

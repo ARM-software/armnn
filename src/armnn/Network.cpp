@@ -1594,12 +1594,12 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     // Get the optimized graph
     Graph& optGraph = optNetObjPtr->pOptimizedNetworkImpl->GetGraph();
 
+    // Infer the tensor infos for all output slots. Throws an exception on failure
+    optGraph.InferTensorInfos();
+
     // Perform AddBroadcastReshapeLayer optimisation
     using namespace optimizations;
     Optimizer::Pass(optGraph, MakeOptimizations(AddBroadcastReshapeLayer()));
-
-    // Infer the tensor infos for all output slots. Throws an exception on failure
-    optGraph.InferTensorInfos();
 
     // Perform optimisation passes
     Optimizer::Pass(optGraph, MakeOptimizations(SquashEqualPermuteSiblings(),

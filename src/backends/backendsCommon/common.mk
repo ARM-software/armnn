@@ -78,6 +78,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/Pooling2dTestImpl.cpp \
     test/layerTests/RankTestImpl.cpp \
     test/layerTests/ReductionTestImpl.cpp \
+    test/layerTests/ReduceProdTestImpl.cpp \
     test/layerTests/ReduceSumTestImpl.cpp \
     test/layerTests/ReshapeTestImpl.cpp \
     test/layerTests/ResizeTestImpl.cpp \

@@ -133,6 +133,7 @@ constexpr char const* GetReduceOperationAsCString(ReduceOperation reduce_operati
         case ReduceOperation::Max:  return "Max";
         case ReduceOperation::Mean: return "Mean";
         case ReduceOperation::Min:  return "Min";
+        case ReduceOperation::Prod: return "Prod";
         default:                    return "Unknown";
     }
 }

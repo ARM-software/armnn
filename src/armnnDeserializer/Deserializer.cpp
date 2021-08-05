@@ -522,6 +522,8 @@ armnn::ReduceOperation ToReduceOperation(armnnSerializer::ReduceOperation operat
             return armnn::ReduceOperation::Mean;
         case armnnSerializer::ReduceOperation::ReduceOperation_Min:
             return armnn::ReduceOperation::Min;
+        case armnnSerializer::ReduceOperation::ReduceOperation_Prod:
+            return armnn::ReduceOperation::Prod;
         default:
             return armnn::ReduceOperation::Sum;
     }

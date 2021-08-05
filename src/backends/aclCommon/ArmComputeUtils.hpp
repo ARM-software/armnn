@@ -272,7 +272,8 @@ inline arm_compute::ReductionOperation ConvertReductionOperationToAcl(const Redu
         case ReduceOperation::Mean:   return arm_compute::ReductionOperation::MEAN_SUM;
         case ReduceOperation::Max:    return arm_compute::ReductionOperation::MAX;
         case ReduceOperation::Min:    return arm_compute::ReductionOperation::MIN;
-        default:                         throw InvalidArgumentException("Unsupported Reduction operation");
+        case ReduceOperation::Prod:   return arm_compute::ReductionOperation::PROD;
+        default:                      throw InvalidArgumentException("Unsupported Reduction operation");
     }
 }
 

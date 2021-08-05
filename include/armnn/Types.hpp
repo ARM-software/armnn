@@ -134,7 +134,8 @@ enum class ReduceOperation
     Sum  = 0,
     Max  = 1,
     Mean = 2,
-    Min  = 3
+    Min  = 3,
+    Prod = 4
 };
 
 enum class ResizeMethod

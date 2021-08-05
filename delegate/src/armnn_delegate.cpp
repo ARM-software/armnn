@@ -765,6 +765,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                        tfLiteNode,
                                        nodeIndex,
                                        kTfLiteBuiltinReduceMin);
+        case kTfLiteBuiltinReduceProd:
+            return VisitReduceOperator(delegateData,
+                                       tfLiteContext,
+                                       tfLiteNode,
+                                       nodeIndex,
+                                       kTfLiteBuiltinReduceProd);
         case kTfLiteBuiltinRelu:
             return VisitActivationOperator(delegateData,
                                            tfLiteContext,

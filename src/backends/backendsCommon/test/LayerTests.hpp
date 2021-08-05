@@ -51,6 +51,7 @@
 #include <backendsCommon/test/layerTests/QuantizeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/RankTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ReductionTestImpl.hpp>
+#include <backendsCommon/test/layerTests/ReduceProdTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ReduceSumTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ReshapeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ResizeTestImpl.hpp>

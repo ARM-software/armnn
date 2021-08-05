@@ -91,6 +91,10 @@ TfLiteStatus VisitReduceOperator(DelegateData& delegateData,
     {
         desc.m_ReduceOperation = armnn::ReduceOperation::Sum;
     }
+    else if (reduceOperatorCode == kTfLiteBuiltinReduceProd)
+    {
+        desc.m_ReduceOperation = armnn::ReduceOperation::Prod;
+    }
     else
     {
         TF_LITE_MAYBE_KERNEL_LOG(

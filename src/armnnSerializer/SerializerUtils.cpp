@@ -219,6 +219,8 @@ armnnSerializer::ReduceOperation GetFlatBufferReduceOperation(armnn::ReduceOpera
             return armnnSerializer::ReduceOperation::ReduceOperation_Mean;
         case armnn::ReduceOperation::Min:
             return armnnSerializer::ReduceOperation::ReduceOperation_Min;
+        case armnn::ReduceOperation::Prod:
+            return armnnSerializer::ReduceOperation::ReduceOperation_Prod;
         default:
             return armnnSerializer::ReduceOperation::ReduceOperation_Sum;
     }

@@ -559,26 +559,29 @@ enum ReduceOperation {
   ReduceOperation_Max = 1,
   ReduceOperation_Mean = 2,
   ReduceOperation_Min = 3,
+  ReduceOperation_Prod = 4,
   ReduceOperation_MIN = ReduceOperation_Sum,
-  ReduceOperation_MAX = ReduceOperation_Min
+  ReduceOperation_MAX = ReduceOperation_Prod
 };
 
-inline const ReduceOperation (&EnumValuesReduceOperation())[4] {
+inline const ReduceOperation (&EnumValuesReduceOperation())[5] {
   static const ReduceOperation values[] = {
     ReduceOperation_Sum,
     ReduceOperation_Max,
     ReduceOperation_Mean,
-    ReduceOperation_Min
+    ReduceOperation_Min,
+    ReduceOperation_Prod
   };
   return values;
 }
 
 inline const char * const *EnumNamesReduceOperation() {
-  static const char * const names[5] = {
+  static const char * const names[6] = {
     "Sum",
     "Max",
     "Mean",
     "Min",
+    "Prod",
     nullptr
   };
   return names;

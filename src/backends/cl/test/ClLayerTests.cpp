@@ -1894,6 +1894,15 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(
     ReduceSumSingleAxisFloat32_3, ClContextControlFixture, ReduceSumSingleAxisTest3<DataType::Float32>)
 
+// ReduceProd
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ReduceProdFloat32, ClContextControlFixture, ReduceProdSimpleTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(
+    ReduceProdSingleAxisFloat32_1, ClContextControlFixture, ReduceProdSingleAxisTest1<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(
+    ReduceProdSingleAxisFloat32_2, ClContextControlFixture, ReduceProdSingleAxisTest2<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(
+    ReduceProdSingleAxisFloat32_3, ClContextControlFixture, ReduceProdSingleAxisTest3<DataType::Float32>)
+
 // ReduceMax
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ReduceMaxFloat32, ClContextControlFixture, ReduceMaxSimpleTest<DataType::Float32>)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(

@@ -677,6 +677,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_RELU6]                   = &TfLiteParserImpl::ParseRelu6;
     m_ParserFunctions[tflite::BuiltinOperator_REDUCE_MAX]              = &TfLiteParserImpl::ParseReduceMax;
     m_ParserFunctions[tflite::BuiltinOperator_REDUCE_MIN]              = &TfLiteParserImpl::ParseReduceMin;
+    m_ParserFunctions[tflite::BuiltinOperator_REDUCE_PROD]             = &TfLiteParserImpl::ParseReduceProd;
     m_ParserFunctions[tflite::BuiltinOperator_RESHAPE]                 = &TfLiteParserImpl::ParseReshape;
     m_ParserFunctions[tflite::BuiltinOperator_RESIZE_BILINEAR]         = &TfLiteParserImpl::ParseResizeBilinear;
     m_ParserFunctions[tflite::BuiltinOperator_RESIZE_NEAREST_NEIGHBOR] = &TfLiteParserImpl::ParseResizeNearestNeighbor;
@@ -3319,6 +3320,11 @@ void TfLiteParserImpl::ParseDepthToSpace(size_t subgraphIndex, size_t operatorIn
 void TfLiteParserImpl::ParseSum(size_t subgraphIndex, size_t operatorIndex)
 {
     ParseReduce(subgraphIndex, operatorIndex, armnn::ReduceOperation::Sum);
+}
+
+void TfLiteParserImpl::ParseReduceProd(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseReduce(subgraphIndex, operatorIndex, armnn::ReduceOperation::Prod);
 }
 
 void TfLiteParserImpl::ParseReduceMax(size_t subgraphIndex, size_t operatorIndex)

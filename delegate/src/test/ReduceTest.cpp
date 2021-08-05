@@ -350,5 +350,74 @@ TEST_CASE ("Sum_Fp32_GpuAcc_Test")
 
 } // End of Sum_GpuAccTests
 
+// PROD Tests
+TEST_SUITE("Prod_CpuRefTests")
+{
+
+TEST_CASE ("Prod_Uint8_KeepDims_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
+    std::vector<uint8_t> expectedOutputValues { 4, 6, 3 };
+    ReduceUint8KeepDimsTest(tflite::BuiltinOperator_REDUCE_PROD,
+                            backends,
+                            expectedOutputValues);
+}
+
+TEST_CASE ("Prod_Fp32_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
+    std::vector<float>   expectedOutputValues { 10010.0f, 11022.0f, 12036.0f };
+    ReduceFp32Test(tflite::BuiltinOperator_REDUCE_PROD,
+                   backends,
+                   expectedOutputValues);
+}
+
+} // End of Prod_CpuRefTests
+
+TEST_SUITE("Prod_CpuAccTests")
+{
+
+TEST_CASE ("Prod_Uint8_KeepDims_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
+    std::vector<uint8_t> expectedOutputValues { 4, 6, 3 };
+    ReduceUint8KeepDimsTest(tflite::BuiltinOperator_REDUCE_PROD,
+                            backends,
+                            expectedOutputValues);
+}
+
+TEST_CASE ("Prod_Fp32_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
+    std::vector<float>   expectedOutputValues { 10010.0f, 11022.0f, 12036.0f };
+    ReduceFp32Test(tflite::BuiltinOperator_REDUCE_PROD,
+                   backends,
+                   expectedOutputValues);
+}
+
+} // End of Prod_CpuAccTests
+
+TEST_SUITE("Prod_GpuAccTests")
+{
+
+TEST_CASE ("Prod_Uint8_KeepDims_GpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+    std::vector<uint8_t> expectedOutputValues { 4, 6, 3 };
+    ReduceUint8KeepDimsTest(tflite::BuiltinOperator_REDUCE_PROD,
+                            backends,
+                            expectedOutputValues);
+}
+
+TEST_CASE ("Prod_Fp32_GpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+    std::vector<float>   expectedOutputValues { 10010.0f, 11022.0f, 12036.0f };
+    ReduceFp32Test(tflite::BuiltinOperator_REDUCE_PROD,
+                   backends,
+                   expectedOutputValues);
+}
+
+} // End of Prod_GpuAccTests
 
 } // namespace armnnDelegate

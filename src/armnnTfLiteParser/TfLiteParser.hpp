@@ -150,6 +150,7 @@ private:
     void ParseReduce(size_t subgraphIndex, size_t operatorIndex, armnn::ReduceOperation reduceOperation);
     void ParseReduceMax(size_t subgraphIndex, size_t operatorIndex);
     void ParseReduceMin(size_t subgraphIndex, size_t operatorIndex);
+    void ParseReduceProd(size_t subgraphIndex, size_t operatorIndex);
     void ParseRelu(size_t subgraphIndex, size_t operatorIndex);
     void ParseRelu6(size_t subgraphIndex, size_t operatorIndex);
     void ParseReshape(size_t subgraphIndex, size_t operatorIndex);

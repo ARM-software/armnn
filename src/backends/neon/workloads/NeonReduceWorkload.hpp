@@ -14,7 +14,7 @@ namespace armnn
 
 arm_compute::Status NeonReduceWorkloadValidate(const TensorInfo& input,
                                                const TensorInfo& output,
-                                               const ReduceDescriptor& desc);
+                                               const ReduceDescriptor& descriptor);
 
 class NeonReduceWorkload : public BaseWorkload<ReduceQueueDescriptor>
 {

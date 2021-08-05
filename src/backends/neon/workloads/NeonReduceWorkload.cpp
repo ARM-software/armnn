@@ -18,28 +18,28 @@ using namespace armcomputetensorutils;
 
 arm_compute::Status NeonReduceWorkloadValidate(const TensorInfo& input,
                                                const TensorInfo& output,
-                                               const ReduceDescriptor& desc)
+                                               const ReduceDescriptor& descriptor)
 {
-    if ( desc.m_vAxis.size()==1 || desc.m_vAxis.empty())
+    if ( descriptor.m_vAxis.size()==1 || descriptor.m_vAxis.empty())
     {
         const arm_compute::TensorInfo aclInputInfo  = armcomputetensorutils::BuildArmComputeTensorInfo(input);
         const arm_compute::TensorInfo aclOutputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(output);
 
         arm_compute::Coordinates coords = BuildArmComputeReductionCoordinates(aclInputInfo.num_dimensions(),
                                                                               input.GetNumDimensions(),
-                                                                              desc.m_vAxis);
+                                                                              descriptor.m_vAxis);
 
         return arm_compute::NEReductionOperation::validate(&aclInputInfo,
                                                            &aclOutputInfo,
                                                            static_cast<unsigned int>(coords[0]),
-                                                           ConvertReductionOperationToAcl(desc),
-                                                           desc.m_KeepDims);
+                                                           ConvertReductionOperationToAcl(descriptor),
+                                                           descriptor.m_KeepDims);
     }
     else
     {
         // Validate layer if there are multiple axes.
         arm_compute::Status status;
-        IS_MULTI_AXES_REDUCE_SUPPORTED(NeonReduceWorkloadValidate, input, desc, status);
+        IS_MULTI_AXES_REDUCE_SUPPORTED(NeonReduceWorkloadValidate, input, descriptor, status);
         return status;
     }
 }
@@ -47,6 +47,12 @@ arm_compute::Status NeonReduceWorkloadValidate(const TensorInfo& input,
 NeonReduceWorkload::NeonReduceWorkload(const ReduceQueueDescriptor& descriptor, const WorkloadInfo& info)
     : BaseWorkload<ReduceQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonReduceWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("NeonReduceWorkload", 1, 1);
 
     arm_compute::ITensor& input  = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -65,7 +71,7 @@ NeonReduceWorkload::NeonReduceWorkload(const ReduceQueueDescriptor& descriptor, 
 
 void NeonReduceWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonReduceWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonReduceWorkload_Execute", this->GetGuid());
     m_Layer.run();
 }
 

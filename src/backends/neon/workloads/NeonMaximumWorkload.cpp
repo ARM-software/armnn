@@ -39,7 +39,7 @@ NeonMaximumWorkload::NeonMaximumWorkload(const MaximumQueueDescriptor& descripto
 
 void NeonMaximumWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonMaximumWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonMaximumWorkload_Execute", this->GetGuid());
     m_MaxLayer.run();
 }
 

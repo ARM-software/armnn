@@ -19,6 +19,7 @@
 namespace armnn
 {
 using namespace armcomputetensorutils;
+using ACLMemManagerOnDemand = std::shared_ptr<arm_compute::MemoryManagerOnDemand>;
 
 arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                        const TensorInfo& output,
@@ -32,10 +33,10 @@ arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
     const arm_compute::TensorInfo aclWeights = BuildArmComputeTensorInfo(weights);
 
     arm_compute::TensorInfo aclBiases;
-    arm_compute::TensorInfo *optionalAclBiases = nullptr;
+    arm_compute::TensorInfo* optionalAclBiases = nullptr;
     if (descriptor.m_BiasEnabled)
     {
-        aclBiases  = BuildArmComputeTensorInfo(biases);
+        aclBiases = BuildArmComputeTensorInfo(biases);
         optionalAclBiases = &aclBiases;
     }
 
@@ -50,7 +51,8 @@ arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
 }
 
 NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueueDescriptor& descriptor,
-    const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
+                                                       const WorkloadInfo& info,
+                                                       ACLMemManagerOnDemand& memoryManager)
     : BaseWorkload<FullyConnectedQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonFullyConnectedWorkload", 1, 1);
@@ -69,8 +71,8 @@ NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueue
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
-    arm_compute::FullyConnectedLayerInfo fc_info  =
-            ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor.m_Parameters, activationInfo);
+    arm_compute::FullyConnectedLayerInfo fc_info =
+        ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor.m_Parameters, activationInfo);
 
     auto layer = std::make_unique<arm_compute::NEFullyConnectedLayer>(memoryManager);
     layer->configure(&input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output, fc_info);
@@ -98,6 +100,23 @@ NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueue
         }
     }
 
+    // Add details for profiling output
+    WorkloadInfo detailsInfo;
+
+    detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;
+    detailsInfo.m_OutputTensorInfos = info.m_OutputTensorInfos;
+    detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Weight->GetTensorInfo());
+    if (descriptor.m_Parameters.m_BiasEnabled)
+    {
+        detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Bias->GetTensorInfo());
+    }
+
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonFullyConnectedWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         detailsInfo,
+                                         this->GetGuid());
+
     // Force Compute Library to perform the necessary copying and reshaping, after which
     // delete all the input tensors that will no longer be needed
     m_FullyConnectedLayer->prepare();
@@ -106,7 +125,7 @@ NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueue
 
 void NeonFullyConnectedWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonFullyConnectedWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonFullyConnectedWorkload_Execute", this->GetGuid());
     m_FullyConnectedLayer->run();
 }
 

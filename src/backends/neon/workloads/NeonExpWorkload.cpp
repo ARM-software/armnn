@@ -25,6 +25,12 @@ arm_compute::Status NeonExpWorkloadValidate(const TensorInfo& input, const Tenso
 NeonExpWorkload::NeonExpWorkload(const ElementwiseUnaryQueueDescriptor& descriptor, const WorkloadInfo& info)
     : BaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonExpWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("NeonExpWorkload", 1, 1);
 
     arm_compute::ITensor& input  = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -35,7 +41,7 @@ NeonExpWorkload::NeonExpWorkload(const ElementwiseUnaryQueueDescriptor& descript
 
 void NeonExpWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonExpWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonExpWorkload_Execute", this->GetGuid());
     m_ExpLayer.run();
 }
 

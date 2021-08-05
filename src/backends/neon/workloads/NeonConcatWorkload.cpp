@@ -18,9 +18,9 @@ using namespace armcomputetensorutils;
 
 namespace
 {
-size_t CalcAxis(const armnn::OriginsDescriptor& desc)
+size_t CalcAxis(const armnn::OriginsDescriptor& descriptor)
 {
-    return (desc.GetNumDimensions() - desc.GetConcatAxis()) - 1;
+    return (descriptor.GetNumDimensions() - descriptor.GetConcatAxis()) - 1;
 }
 } //namespace
 
@@ -50,6 +50,12 @@ NeonConcatWorkload::NeonConcatWorkload(
 const ConcatQueueDescriptor& descriptor, const WorkloadInfo& info)
         : BaseWorkload<ConcatQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonConcatWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     bool allInputsAreSubtensors = true;
 
     // Check that all inputs are sub-tensors
@@ -93,7 +99,7 @@ void NeonConcatWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonConcatWorkload_Execute");
+        ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonConcatWorkload_Execute", this->GetGuid());
         m_Layer->run();
     }
 }

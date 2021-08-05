@@ -20,7 +20,7 @@ arm_compute::Status NeonDetectionPostProcessValidate(const TensorInfo& boxEncodi
                                                      const TensorInfo& detectionClasses,
                                                      const TensorInfo& detectionScores,
                                                      const TensorInfo& numDetections,
-                                                     const DetectionPostProcessDescriptor &desc);
+                                                     const DetectionPostProcessDescriptor &descriptor);
 
 class NeonDetectionPostProcessWorkload : public BaseWorkload<DetectionPostProcessQueueDescriptor>
 {

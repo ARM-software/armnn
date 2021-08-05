@@ -77,6 +77,23 @@ NeonTransposeConvolution2dWorkload::NeonTransposeConvolution2dWorkload(
 
     arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
 
+    // Add details for profiling output
+    WorkloadInfo detailsInfo;
+
+    detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;
+    detailsInfo.m_OutputTensorInfos = info.m_OutputTensorInfos;
+    detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Weight->GetTensorInfo());
+    if (descriptor.m_Parameters.m_BiasEnabled)
+    {
+        detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Bias->GetTensorInfo());
+    }
+
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonTransposeConvolution2dWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         detailsInfo,
+                                         this->GetGuid());
+
     m_Layer = std::make_unique<arm_compute::NEDeconvolutionLayer>(memoryManager);
     m_Layer->configure(&input, m_KernelTensor.get(), m_BiasTensor.get(), &output, padStrideInfo);
 
@@ -95,7 +112,7 @@ NeonTransposeConvolution2dWorkload::NeonTransposeConvolution2dWorkload(
 
 void NeonTransposeConvolution2dWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonTransposeConvolution2dWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonTransposeConvolution2dWorkload_Execute", this->GetGuid());
     m_Layer->run();
 }
 

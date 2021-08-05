@@ -14,19 +14,19 @@
 namespace armnn
 {
 
-arm_compute::DetectionPostProcessLayerInfo MakeInfo(const DetectionPostProcessDescriptor& desc)
+arm_compute::DetectionPostProcessLayerInfo MakeInfo(const DetectionPostProcessDescriptor& descriptor)
 {
-    return arm_compute::DetectionPostProcessLayerInfo(desc.m_MaxDetections,
-                                                      desc.m_MaxClassesPerDetection,
-                                                      desc.m_NmsScoreThreshold,
-                                                      desc.m_NmsIouThreshold,
-                                                      desc.m_NumClasses,
-                                                      { desc.m_ScaleX,
-                                                        desc.m_ScaleY,
-                                                        desc.m_ScaleW,
-                                                        desc.m_ScaleH },
-                                                      desc.m_UseRegularNms,
-                                                      desc.m_DetectionsPerClass);
+    return arm_compute::DetectionPostProcessLayerInfo(descriptor.m_MaxDetections,
+                                                      descriptor.m_MaxClassesPerDetection,
+                                                      descriptor.m_NmsScoreThreshold,
+                                                      descriptor.m_NmsIouThreshold,
+                                                      descriptor.m_NumClasses,
+                                                      { descriptor.m_ScaleX,
+                                                        descriptor.m_ScaleY,
+                                                        descriptor.m_ScaleW,
+                                                        descriptor.m_ScaleH },
+                                                      descriptor.m_UseRegularNms,
+                                                      descriptor.m_DetectionsPerClass);
 }
 
 arm_compute::Status NeonDetectionPostProcessValidate(const TensorInfo& boxEncodings,
@@ -36,9 +36,9 @@ arm_compute::Status NeonDetectionPostProcessValidate(const TensorInfo& boxEncodi
                                                      const TensorInfo& detectionClasses,
                                                      const TensorInfo& detectionScores,
                                                      const TensorInfo& numDetections,
-                                                     const DetectionPostProcessDescriptor &desc)
+                                                     const DetectionPostProcessDescriptor &descriptor)
 {
-    arm_compute::DetectionPostProcessLayerInfo info = MakeInfo(desc);
+    arm_compute::DetectionPostProcessLayerInfo info = MakeInfo(descriptor);
 
     const arm_compute::TensorInfo aclBoxEncodings =
         armcomputetensorutils::BuildArmComputeTensorInfo(boxEncodings);
@@ -77,6 +77,12 @@ NeonDetectionPostProcessWorkload::NeonDetectionPostProcessWorkload(
     const WorkloadInfo& info)
     : BaseWorkload<DetectionPostProcessQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonDetectionPostProcessWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Anchors = std::make_unique<arm_compute::Tensor>();
     BuildArmComputeTensor(*m_Anchors, descriptor.m_Anchors->GetTensorInfo());
 
@@ -104,7 +110,7 @@ NeonDetectionPostProcessWorkload::NeonDetectionPostProcessWorkload(
 
 void NeonDetectionPostProcessWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonDetectionPostProcessWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonDetectionPostProcessWorkload_Execute", this->GetGuid());
     m_Func.run();
 }
 

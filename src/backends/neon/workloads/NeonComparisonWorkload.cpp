@@ -34,6 +34,12 @@ arm_compute::Status NeonComparisonWorkloadValidate(const TensorInfo& input0,
 NeonComparisonWorkload::NeonComparisonWorkload(const ComparisonQueueDescriptor& descriptor, const WorkloadInfo& info)
     : BaseWorkload<ComparisonQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonComparisonWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("NeonComparisonWorkload", 2, 1);
 
     arm_compute::ITensor& input0 = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -47,7 +53,7 @@ NeonComparisonWorkload::NeonComparisonWorkload(const ComparisonQueueDescriptor& 
 
 void NeonComparisonWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonComparisonWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonComparisonWorkload_Execute", this->GetGuid());
     m_ComparisonLayer.run();
 }
 

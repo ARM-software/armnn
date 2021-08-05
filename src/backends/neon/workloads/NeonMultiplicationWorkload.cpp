@@ -77,7 +77,7 @@ NeonMultiplicationWorkload::NeonMultiplicationWorkload(const MultiplicationQueue
 
 void NeonMultiplicationWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonMultiplicationWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonMultiplicationWorkload_Execute", this->GetGuid());
     m_PixelWiseMultiplication->run();
 }
 

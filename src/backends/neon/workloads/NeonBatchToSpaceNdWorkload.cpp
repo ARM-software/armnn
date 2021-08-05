@@ -19,14 +19,14 @@ using namespace armcomputetensorutils;
 
 arm_compute::Status NeonBatchToSpaceNdWorkloadValidate(const TensorInfo& input,
                                                        const TensorInfo& output,
-                                                       const BatchToSpaceNdDescriptor& desc)
+                                                       const BatchToSpaceNdDescriptor& descriptor)
 {
-    const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input, desc.m_DataLayout);
-    const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, desc.m_DataLayout);
+    const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
+    const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
 
     // ArmNN blockShape is [H, W] Cl asks for W, H
-    int32_t blockHeight = armnn::numeric_cast<int32_t>(desc.m_BlockShape[0]);
-    int32_t blockWidth = armnn::numeric_cast<int32_t>(desc.m_BlockShape[1]);
+    int32_t blockHeight = armnn::numeric_cast<int32_t>(descriptor.m_BlockShape[0]);
+    int32_t blockWidth = armnn::numeric_cast<int32_t>(descriptor.m_BlockShape[1]);
 
     const arm_compute::Status aclStatus = arm_compute::NEBatchToSpaceLayer::validate(&aclInputInfo,
                                                                                      blockWidth,
@@ -35,10 +35,16 @@ arm_compute::Status NeonBatchToSpaceNdWorkloadValidate(const TensorInfo& input,
     return aclStatus;
 }
 
-NeonBatchToSpaceNdWorkload::NeonBatchToSpaceNdWorkload(const BatchToSpaceNdQueueDescriptor& desc,
+NeonBatchToSpaceNdWorkload::NeonBatchToSpaceNdWorkload(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                        const WorkloadInfo& info)
-    : BaseWorkload<BatchToSpaceNdQueueDescriptor>(desc, info)
+    : BaseWorkload<BatchToSpaceNdQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonBatchToSpaceWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("NeonBatchToSpaceNdWorkload", 1, 1);
 
     arm_compute::ITensor& input  =
@@ -51,8 +57,8 @@ NeonBatchToSpaceNdWorkload::NeonBatchToSpaceNdWorkload(const BatchToSpaceNdQueue
     output.info()->set_data_layout(aclDataLayout);
 
     // ArmNN blockShape is [H, W] Cl asks for W, H
-    int32_t blockHeight = armnn::numeric_cast<int32_t>(desc.m_Parameters.m_BlockShape[0]);
-    int32_t blockWidth = armnn::numeric_cast<int32_t>(desc.m_Parameters.m_BlockShape[1]);
+    int32_t blockHeight = armnn::numeric_cast<int32_t>(descriptor.m_Parameters.m_BlockShape[0]);
+    int32_t blockWidth = armnn::numeric_cast<int32_t>(descriptor.m_Parameters.m_BlockShape[1]);
 
     m_Layer.reset(new arm_compute::NEBatchToSpaceLayer());
     m_Layer->configure(&input, blockWidth, blockHeight, &output);
@@ -63,7 +69,7 @@ void NeonBatchToSpaceNdWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonSpaceToBatchNdWorkload_Execute");
+        ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonSpaceToBatchNdWorkload_Execute", this->GetGuid());
         m_Layer->run();
     }
 }

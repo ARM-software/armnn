@@ -44,7 +44,7 @@ NeonDequantizeWorkload::NeonDequantizeWorkload(const DequantizeQueueDescriptor& 
 
 void NeonDequantizeWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonDequantizeWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonDequantizeWorkload_Execute", this->GetGuid());
     m_Layer->run();
 }
 

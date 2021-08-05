@@ -37,6 +37,12 @@ NeonPooling2dWorkload::NeonPooling2dWorkload(
     const Pooling2dQueueDescriptor& descriptor, const WorkloadInfo& info)
     : BaseWorkload<Pooling2dQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonPooling2dWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("NeonPooling2dWorkload", 1, 1);
 
     arm_compute::ITensor& input = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -55,7 +61,7 @@ NeonPooling2dWorkload::NeonPooling2dWorkload(
 
 void NeonPooling2dWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonPooling2dWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonPooling2dWorkload_Execute", this->GetGuid());
     m_PoolingLayer->run();
 }
 

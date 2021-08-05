@@ -41,10 +41,16 @@ arm_compute::Status NeonSpaceToBatchNdWorkloadValidate(const TensorInfo& input,
                                                       &aclOutputInfo);
 }
 
-NeonSpaceToBatchNdWorkload::NeonSpaceToBatchNdWorkload(const SpaceToBatchNdQueueDescriptor& desc,
+NeonSpaceToBatchNdWorkload::NeonSpaceToBatchNdWorkload(const SpaceToBatchNdQueueDescriptor& descriptor,
                                                        const WorkloadInfo& info)
-        : BaseWorkload<SpaceToBatchNdQueueDescriptor>(desc, info)
+        : BaseWorkload<SpaceToBatchNdQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonSpaceToBatchNdWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("NESpaceToBatchNdWorkload", 1, 1);
 
     arm_compute::ITensor& input  =
@@ -79,7 +85,7 @@ void NeonSpaceToBatchNdWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonSpaceToBatchNdWorkload_Execute");
+        ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonSpaceToBatchNdWorkload_Execute", this->GetGuid());
         m_Layer->run();
     }
 }

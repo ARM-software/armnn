@@ -29,10 +29,16 @@ arm_compute::Status NeonDepthToSpaceWorkloadValidate(const TensorInfo& input,
     return arm_compute::NEDepthToSpaceLayer::validate(&aclInput, &aclOutput, blockSize);
 }
 
-NeonDepthToSpaceWorkload::NeonDepthToSpaceWorkload(const DepthToSpaceQueueDescriptor& desc,
+NeonDepthToSpaceWorkload::NeonDepthToSpaceWorkload(const DepthToSpaceQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info)
-    : BaseWorkload<DepthToSpaceQueueDescriptor>(desc, info)
+    : BaseWorkload<DepthToSpaceQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonDepthToSpaceWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("NeonDepthToSpaceWorkload", 1, 1);
 
     arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
@@ -41,7 +47,7 @@ NeonDepthToSpaceWorkload::NeonDepthToSpaceWorkload(const DepthToSpaceQueueDescri
             PolymorphicPointerDowncast<IAclTensorHandle>(m_Data.m_Inputs[0])->GetTensor();
     input.info()->set_data_layout(aclDataLayout);
 
-    int32_t blockSize = armnn::numeric_cast<int32_t>(desc.m_Parameters.m_BlockSize);
+    int32_t blockSize = armnn::numeric_cast<int32_t>(descriptor.m_Parameters.m_BlockSize);
 
     arm_compute::ITensor& output =
             PolymorphicPointerDowncast<IAclTensorHandle>(m_Data.m_Outputs[0])->GetTensor();
@@ -53,7 +59,7 @@ NeonDepthToSpaceWorkload::NeonDepthToSpaceWorkload(const DepthToSpaceQueueDescri
 
 void NeonDepthToSpaceWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonDepthToSpaceWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonDepthToSpaceWorkload_Execute", this->GetGuid());
     m_Layer.run();
 }
 

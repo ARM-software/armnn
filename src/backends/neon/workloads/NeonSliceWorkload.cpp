@@ -37,6 +37,13 @@ NeonSliceWorkload::NeonSliceWorkload(const SliceQueueDescriptor& descriptor,
                                      const WorkloadInfo& info)
         : BaseWorkload<SliceQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonSliceWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
+
     m_Data.ValidateInputsOutputs("NeonSliceWorkload", 1, 1);
 
     arm_compute::ITensor& input = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -52,7 +59,7 @@ NeonSliceWorkload::NeonSliceWorkload(const SliceQueueDescriptor& descriptor,
 
 void NeonSliceWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonSliceWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonSliceWorkload_Execute", this->GetGuid());
     m_SliceFunction.run();
 }
 

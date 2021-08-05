@@ -43,7 +43,7 @@ void NeonQuantizeWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonQuantizeWorkload_Execute");
+        ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonQuantizeWorkload_Execute", this->GetGuid());
         m_Layer->run();
     }
 }

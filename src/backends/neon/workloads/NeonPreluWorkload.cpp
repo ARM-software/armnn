@@ -45,7 +45,7 @@ NeonPreluWorkload::NeonPreluWorkload(const PreluQueueDescriptor& descriptor,
 
 void NeonPreluWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonPreluWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonPreluWorkload_Execute", this->GetGuid());
     m_PreluLayer->run();
 }
 

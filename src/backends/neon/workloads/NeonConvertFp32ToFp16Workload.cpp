@@ -25,7 +25,7 @@ NeonConvertFp32ToFp16Workload::NeonConvertFp32ToFp16Workload(const ConvertFp32To
 
 void NeonConvertFp32ToFp16Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonConvertFp32ToFp16Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonConvertFp32ToFp16Workload_Execute", this->GetGuid());
 
     auto convertFunc = [](uint8_t* dst, const uint8_t* src, size_t size)
         {

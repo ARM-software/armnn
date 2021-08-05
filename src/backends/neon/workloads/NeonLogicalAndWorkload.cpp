@@ -33,6 +33,12 @@ NeonLogicalAndWorkload::NeonLogicalAndWorkload(const LogicalBinaryQueueDescripto
                                                const WorkloadInfo& info)
     : BaseWorkload<LogicalBinaryQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonLogicalAndWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("NeonLogicalAndWorkload", 2, 1);
 
     arm_compute::ITensor& input0 = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -44,7 +50,7 @@ NeonLogicalAndWorkload::NeonLogicalAndWorkload(const LogicalBinaryQueueDescripto
 
 void NeonLogicalAndWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonLogicalAndWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonLogicalAndWorkload_Execute", this->GetGuid());
     m_LogicalAndLayer.run();
 }
 

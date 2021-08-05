@@ -19,6 +19,12 @@ using namespace armcomputetensorutils;
 NeonFillWorkload::NeonFillWorkload(const FillQueueDescriptor& descriptor, const WorkloadInfo& info)
     : BaseWorkload<FillQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonFillWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("NeonFillWorkload", 1, 1);
 
     arm_compute::ITensor& output = static_cast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
@@ -31,7 +37,7 @@ NeonFillWorkload::NeonFillWorkload(const FillQueueDescriptor& descriptor, const 
 
 void NeonFillWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonFillWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonFillWorkload_Execute", this->GetGuid());
     m_Layer->run();
 }
 

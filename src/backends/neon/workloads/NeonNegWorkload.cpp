@@ -35,7 +35,7 @@ NeonNegWorkload::NeonNegWorkload(const ElementwiseUnaryQueueDescriptor& descript
 
 void NeonNegWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonNegWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonNegWorkload_Execute", this->GetGuid());
     m_NegLayer.run();
 }
 

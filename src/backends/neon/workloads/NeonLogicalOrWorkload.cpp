@@ -30,9 +30,15 @@ arm_compute::Status NeonLogicalOrWorkloadValidate(const TensorInfo& input0,
 }
 
 NeonLogicalOrWorkload::NeonLogicalOrWorkload(const LogicalBinaryQueueDescriptor& descriptor,
-                                               const WorkloadInfo& info)
+                                             const WorkloadInfo& info)
     : BaseWorkload<LogicalBinaryQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonLogicalOrWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("NeonLogicalOrWorkload", 2, 1);
 
     arm_compute::ITensor& input0 = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -44,7 +50,7 @@ NeonLogicalOrWorkload::NeonLogicalOrWorkload(const LogicalBinaryQueueDescriptor&
 
 void NeonLogicalOrWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonLogicalOrWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonLogicalOrWorkload_Execute", this->GetGuid());
     m_LogicalOrLayer.run();
 }
 

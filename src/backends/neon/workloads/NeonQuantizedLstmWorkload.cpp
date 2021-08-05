@@ -124,6 +124,7 @@ NeonQuantizedLstmWorkload::NeonQuantizedLstmWorkload(const QuantizedLstmQueueDes
 
 void NeonQuantizedLstmWorkload::Execute() const
 {
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonQuantizedLstmWorkload_Execute", this->GetGuid());
     m_QuantizedLstmLayer.run();
 }
 

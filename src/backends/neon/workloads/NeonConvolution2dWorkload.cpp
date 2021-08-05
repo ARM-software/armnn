@@ -131,7 +131,7 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
     }
 
     // Report Profiling Details
-    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonConvolution2dWorkload_Execute",
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonConvolution2dWorkload_Construct",
                                          descriptor.m_Parameters,
                                          detailsInfo,
                                          this->GetGuid());

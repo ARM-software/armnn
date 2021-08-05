@@ -40,7 +40,7 @@ NeonMinimumWorkload::NeonMinimumWorkload(const MinimumQueueDescriptor& descripto
 
 void NeonMinimumWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonMinimumWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonMinimumWorkload_Execute", this->GetGuid());
     m_MinLayer.run();
 }
 

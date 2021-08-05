@@ -53,7 +53,7 @@ NeonConstantWorkload::NeonConstantWorkload(const ConstantQueueDescriptor& descri
 
 void NeonConstantWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonConstantWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonConstantWorkload_Execute", this->GetGuid());
 
     using namespace armcomputetensorutils;
 

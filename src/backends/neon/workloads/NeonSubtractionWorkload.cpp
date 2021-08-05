@@ -57,7 +57,7 @@ NeonSubtractionWorkload::NeonSubtractionWorkload(const SubtractionQueueDescripto
 
 void NeonSubtractionWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonSubtractionWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonSubtractionWorkload_Execute", this->GetGuid());
     m_SubLayer->run();
 }
 

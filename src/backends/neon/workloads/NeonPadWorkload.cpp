@@ -19,6 +19,12 @@ using namespace armcomputetensorutils;
 NeonPadWorkload::NeonPadWorkload(const PadQueueDescriptor& descriptor, const WorkloadInfo& info)
     : BaseWorkload<PadQueueDescriptor>(descriptor, info)
 {
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonPadWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         info,
+                                         this->GetGuid());
+
     m_Data.ValidateInputsOutputs("NeonPadWorkload", 1, 1);
 
     arm_compute::ITensor& input = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -41,7 +47,7 @@ NeonPadWorkload::NeonPadWorkload(const PadQueueDescriptor& descriptor, const Wor
 
 void NeonPadWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonPadWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonPadWorkload_Execute", this->GetGuid());
     m_Layer->run();
 }
 

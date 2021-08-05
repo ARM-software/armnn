@@ -35,7 +35,7 @@ NeonAbsWorkload::NeonAbsWorkload(const AbsQueueDescriptor& descriptor, const Wor
 
 void NeonAbsWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonAbsWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonAbsWorkload_Execute", this->GetGuid());
     m_AbsLayer.run();
 }
 

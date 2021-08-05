@@ -35,7 +35,7 @@ NeonLogWorkload::NeonLogWorkload(const ElementwiseUnaryQueueDescriptor& descript
 
 void NeonLogWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonLogWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonLogWorkload_Execute", this->GetGuid());
     m_LogLayer.run();
 }
 

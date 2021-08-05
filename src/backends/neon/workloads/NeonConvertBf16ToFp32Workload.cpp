@@ -24,7 +24,7 @@ NeonConvertBf16ToFp32Workload::NeonConvertBf16ToFp32Workload(const ConvertBf16To
 
 void NeonConvertBf16ToFp32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonConvertBf16ToFp32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonConvertBf16ToFp32Workload_Execute", this->GetGuid());
 
     auto convertFunc = [](uint8_t* dst, const uint8_t* src, size_t size)
         {

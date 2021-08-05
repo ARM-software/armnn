@@ -29,7 +29,7 @@ NeonFloorFloatWorkload::NeonFloorFloatWorkload(const FloorQueueDescriptor& descr
 
 void NeonFloorFloatWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonFloorFloatWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonFloorFloatWorkload_Execute", this->GetGuid());
     m_Layer->run();
 }
 } //namespace armnn

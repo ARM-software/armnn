@@ -1,0 +1,3269 @@
+/// Copyright (c) 2021 ARM Limited and Contributors. All rights reserved.
+///
+/// SPDX-License-Identifier: MIT
+///
+
+namespace armnn
+{
+/**
+@page operator_list Arm NN Operators
+
+@tableofcontents
+
+@section S5_1_operator_list Arm NN Operators
+
+Arm NN supports operators that are listed in below table.
+
+Arm NN supports a wide list of data-types.
+The main data-types that the Machine Learning functions support are the following:
+  <ul>
+    <li><b>BFLOAT16:</b> 16-bit non-standard brain floating point
+    <li><b>QASYMMU8:</b> 8-bit unsigned asymmetric quantized
+    <li><b>QASYMMS8:</b> 8-bit signed asymmetric quantized
+    <li><b>QUANTIZEDSYMM8PERAXIS:</b> 8-bit signed symmetric quantized
+    <li><b>QSYMMS8:</b> 8-bit unsigned symmetric quantized
+    <li><b>QSYMMS16:</b> 16-bit unsigned symmetric quantized
+    <li><b>FLOAT32:</b> 32-bit single precision floating point
+    <li><b>FLOAT16:</b> 16-bit half precision floating point
+    <li><b>SIGNED32:</b> 32-bit signed integer
+    <li><b>BOOLEAN:</b> 8-bit unsigned char
+    <li><b>All:</b> Agnostic to any specific data type
+  </ul>
+
+Arm NN supports the following data layouts (fast changing dimension from right to left):
+  <ul>
+    <li><b>NHWC:</b> Layout where channels are in the fastest changing dimension
+    <li><b>NCHW:</b> Layout where width is in the fastest changing dimension
+    <li><b>All:</b> Agnostic to any specific data layout
+  </ul>
+where N = batches, C = channels, H = height, W = width
+
+<table>
+<caption id="multi_row"></caption>
+<tr>
+  <th>Operator
+  <th>Description
+  <th>Equivalent Android NNAPI Operator
+  <th>Backends
+  <th>Data Layouts
+  <th>Data Types
+<tr>
+  <td rowspan="3">AbsLayer
+  <td rowspan="3"> Layer to perform absolute operation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_ABS
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+       <tr><th>
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>SIGNED32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+       <tr><th>
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">ActivationLayer
+  <td rowspan="3" style="width:200px;"> Layer to simulate an activation layer with the specified activation function.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_ABS
+       <li>ANEURALNETWORKS_ELU
+       <li>ANEURALNETWORKS_HARD_SWISH
+       <li>ANEURALNETWORKS_LOGISTIC
+       <li>ANEURALNETWORKS_PRELU
+       <li>ANEURALNETWORKS_RELU
+       <li>ANEURALNETWORKS_RELU1
+       <li>ANEURALNETWORKS_RELU6
+       <li>ANEURALNETWORKS_SQRT
+       <li>ANEURALNETWORKS_TANH
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+    <ul>
+      <li>All
+    </ul>
+  <td>
+    <table>
+      <tr><th>
+      <tr><td>QASYMMU8
+      <tr><td>QASYMMS8
+      <tr><td>QSYMMS16
+      <tr><td>FLOAT16
+      <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+      <tr><th>
+      <tr><td>QASYMMU8
+      <tr><td>QASYMMS8
+      <tr><td>QSYMMS16
+      <tr><td>FLOAT16
+      <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">AdditionLayer
+  <td rowspan="3" style="width:200px;"> Layer to add 2 tensors.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_ADD
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QSYMMS16
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QSYMMS16
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">ArgMinMaxLayer
+  <td rowspan="3" style="width:200px;"> Layer to calculate the index of the minimum or maximum values in a tensor
+  based on an axis.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_ARGMAX
+       <li>ANEURALNETWORKS_ARGMIN
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+       <tr><td>SIGNED64
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">BatchNormalizationLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform batch normalization.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT32
+    <tr><td>FLOAT16
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT32
+    <tr><td>FLOAT16
+    </table>
+<tr>
+  <td rowspan="3">BatchToSpaceNdLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform a batch to space transformation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_BATCH_TO_SPACE_ND
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">CastLayer
+  <td rowspan="3" style="width:200px;"> Layer to cast a tensor to a type.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_CAST
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QSYMMS8
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMS8
+    <tr><td>QASYMMU8
+    <tr><td>FLOAT16
+    <tr><td>SIGNED32
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMS8
+    <tr><td>QASYMMU8
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">ComparisonLayer
+  <td rowspan="3" style="width:200px;"> Layer to compare 2 tensors.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_EQUAL
+       <li>ANEURALNETWORKS_GREATER
+       <li>ANEURALNETWORKS_GREATER_EQUAL
+       <li>ANEURALNETWORKS_LESS
+       <li>ANEURALNETWORKS_LESS_EQUAL
+       <li>ANEURALNETWORKS_NOT_EQUAL
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>BOOLEAN
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+   <td>CpuAcc
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+         <tr><td>All
+      </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">ConcatLayer
+  <td rowspan="3" style="width:200px;"> Layer to concatenate tensors along a given axis.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_CONCATENATION
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">ConstantLayer
+  <td rowspan="3" style="width:200px;"> Layer to provide a constant tensor.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">ConvertBf16ToFp32Layer
+  <td rowspan="3" style="width:200px;"> Layer to convert BFloat16 tensor to Float32 tensor.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+         <tr><td>BFLOAT16
+         <tr><td>FLOAT32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+         <tr><th>
+         <tr><td>BFLOAT16
+         <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+         <tr><th>
+         <tr><td>BFLOAT16
+         <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">ConvertFp16ToFp32Layer
+  <td rowspan="3" style="width:200px;"> Layer to convert Float16 tensor to Float32 tensor.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+         <tr><td>FLOAT16
+         <tr><td>FLOAT32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+         <tr><th>
+         <tr><td>FLOAT16
+         <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+         <tr><th>
+         <tr><td>FLOAT16
+         <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">ConvertFp32ToBf16Layer
+  <td rowspan="3" style="width:200px;"> Layer to convert Float32 tensor to BFloat16 tensor.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+         <tr><td>BFLOAT16
+         <tr><td>FLOAT32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+         <tr><th>
+         <tr><td>BFLOAT16
+         <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+         <tr><th>
+         <tr><td>BFLOAT16
+         <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">ConvertFp32ToFp16Layer
+  <td rowspan="3" style="width:200px;"> Layer to convert Float32 tensor to Float16 tensor.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+         <tr><td>FLOAT16
+         <tr><td>FLOAT32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+         <tr><th>
+         <tr><td>FLOAT16
+         <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+         <tr><th>
+         <tr><td>FLOAT16
+         <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">Convolution2dLayer
+  <td rowspan="3" style="width:200px;"> Layer to compute a convolution operation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_CONV_2D
+       <li>ANEURALNETWORKS_GROUPED_CONV_2D
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QUANTIZEDSYMM8PERAXIS
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QUANTIZEDSYMM8PERAXIS
+    </table>
+<tr>
+  <td rowspan="1">DebugLayer
+  <td rowspan="1" style="width:200px;"> Layer to print out inter layer tensor information.
+  <td rowspan="1">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td rowspan="3">DepthToSpaceLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform Depth to Space transformation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_DEPTH_TO_SPACE
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">DepthwiseConvolution2dLayer
+  <td rowspan="3" style="width:200px;"> Layer to compute a deconvolution or transpose convolution.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_DEPTHWISE_CONV_2D
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>SIGNED32
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QUANTIZEDSYMM8PERAXIS
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>SIGNED32
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QUANTIZEDSYMM8PERAXIS
+    </table>
+<tr>
+  <td rowspan="3">DequantizeLayer
+  <td rowspan="3" style="width:200px;"> Layer to dequantize the values in a tensor.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_DEQUANTIZE
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QUANTIZEDSYMM8PERAXIS
+    <tr><td>QSYMMS8
+    <tr><td>QSYMMS16
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QUANTIZEDSYMM8PERAXIS
+    <tr><td>QSYMMS8
+    <tr><td>QSYMMS16
+    </table>
+<tr>
+  <td rowspan="2">DetectionPostProcessLayer
+  <td rowspan="2" style="width:200px;"> Layer to generate the detection output based on center size encoded boxes, class prediction and anchors by doing non maximum suppression (NMS).
+  <td rowspan="2">
+      <ul>
+       <li>ANEURALNETWORKS_DETECTION_POSTPROCESSING
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">DivisionLayer
+  <td rowspan="3" style="width:200px;"> Layer to divide 2 tensors.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_DIV
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">ElementwiseBaseLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform Add - Div - Max - Min - Mul operations.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_ADD
+       <li>ANEURALNETWORKS_DIV
+       <li>ANEURALNETWORKS_MAXIMUM
+       <li>ANEURALNETWORKS_MINIMUM
+       <li>ANEURALNETWORKS_MUL
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QSYMMS16
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QSYMMS16
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">ElementwiseUnaryLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform Rsqrt - Exp - Neg - Log - Abs - Sin - Sqrt operations.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_ABS
+       <li>ANEURALNETWORKS_EXP
+       <li>ANEURALNETWORKS_LOG
+       <li>ANEURALNETWORKS_NEG
+       <li>ANEURALNETWORKS_RSQRT
+       <li>ANEURALNETWORKS_SIN
+       <li>ANEURALNETWORKS_SQRT
+      </ul>
+  <td>CpuRef
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+    </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>SIGNED32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="1">FakeQuantizationLayer
+  <td rowspan="1" style="width:200px;"> Layer to quantize float values and dequantize afterwards. The current implementation does not dequantize the values.
+  <td rowspan="1">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+         <tr><td>FLOAT32
+      </table>
+<tr>
+  <td rowspan="3">FillLayer
+  <td rowspan="3" style="width:200px;"> Layer to set the values of a tensor with a given value.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_FILL
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">FloorLayer
+  <td rowspan="3" style="width:200px;"> Layer to round the value to the lowest whole number.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_FLOOR
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT32
+    <tr><td>FLOAT16
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT32
+    <tr><td>FLOAT16
+    </table>
+<tr>
+  <td rowspan="3">FullyConnectedLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform a fully connected / dense operation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_FULLY_CONNECTED
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    </table>
+<tr>
+  <td rowspan="3">GatherLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform the gather operation along the chosen axis.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_GATHER
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="1">InputLayer
+  <td rowspan="1" style="width:200px;"> Special layer used to provide input data to the computational network.
+  <td rowspan="1">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>All
+   <td>
+         <ul>
+          <li>All
+         </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">InstanceNormalizationLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform an instance normalization on a given axis.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_INSTANCE_NORMALIZATION
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">L2NormalizationLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform an L2 normalization on a given axis.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_L2_NORMALIZATION
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">LogSoftmaxLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform the log softmax activations given logits.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">LogicalBinaryLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform Logical AND - Logical NOT - Logical OR operations.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_LOGICAL_AND
+       <li>ANEURALNETWORKS_LOGICAL_NOT
+       <li>ANEURALNETWORKS_LOGICAL_OR
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+         <tr><td>BOOLEAN
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>BOOLEAN
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>BOOLEAN
+    </table>
+<tr>
+  <td rowspan="3">LstmLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform a single time step in a Long Short-Term Memory (LSTM) operation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_LSTM
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">MapLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform map operation on tensor.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+         <tr><td>All
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">MaximumLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform an elementwise maximum of two tensors.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>SIGNED32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QSYMMS16
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>SIGNED32
+    </table>
+<tr>
+  <td rowspan="3">MeanLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform reduce mean operation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_MEAN
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">MemCopyLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform memory copy operation.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>BOOLEAN
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">MemImportLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform memory import operation.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+         <tr><td>All
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">MergeLayer
+  <td rowspan="3" style="width:200px;"> Layer to concatenate tensors along a given axis.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_CONCATENATION
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">MinimumLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform an elementwise minimum of two tensors.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_MINIMUM
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QSYMMS16
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QSYMMS16
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>SIGNED32
+    </table>
+<tr>
+  <td rowspan="3">MultiplicationLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform an elementwise multiplication of two tensors.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_MUL
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QSYMMS16
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QSYMMS16
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>SIGNED32
+    </table>
+<tr>
+  <td rowspan="3">NormalizationLayer
+  <td rowspan="3" style="width:200px;"> Layer to compute normalization operation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_LOCAL_RESPONSE_NORMALIZATION
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT32
+    <tr><td>FLOAT16
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT32
+    <tr><td>FLOAT16
+    </table>
+<tr>
+  <td rowspan="1">OutputLayer
+  <td rowspan="1" style="width:200px;"> A special layer providing access to a user supplied buffer into which the output of a network can be written.
+  <td rowspan="1">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>All
+   <td>
+         <ul>
+          <li>All
+         </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">PadLayer
+  <td rowspan="3" style="width:200px;"> Layer to pad a tensor.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_PAD
+       <li>ANEURALNETWORKS_PAD_V2
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">PermuteLayer
+  <td rowspan="3" style="width:200px;"> Layer to transpose an ND tensor.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_TRANSPOSE
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">Pooling2dLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform pooling with the specified pooling operation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_AVERAGE_POOL_2D
+       <li>ANEURALNETWORKS_L2_POOL_2D
+       <li>ANEURALNETWORKS_MAX_POOL_2D
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="1">PreCompiledLayer
+  <td rowspan="1" style="width:200px;"> Opaque layer provided by a backend which provides an executable representation of a subgraph from the original network.
+  <td rowspan="1">
+      <ul>  
+       <li>N/A
+      </ul>
+   <td>N/A
+   <td>N/A
+   <td>N/A
+<tr>
+  <td rowspan="3">PreluLayer
+  <td rowspan="3" style="width:200px;"> Layer to compute the activation layer with the PRELU activation function.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_PRELU
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">QLstmLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform quantized LSTM (Long Short-Term Memory) operation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_QUANTIZED_LSTM
+       <li>ANEURALNETWORKS_QUANTIZED_16BIT_LSTM
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+         <tr><td>All
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMS8
+    <tr><td>QASYMMU8
+    <tr><td>SIGNED32
+    <tr><td>QSYMMS16
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMS8
+    <tr><td>QASYMMU8
+    <tr><td>SIGNED32
+    <tr><td>QSYMMS16
+    </table>
+<tr>
+  <td rowspan="3">QuantizeLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform quantization operation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_QUANTIZE
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QASYMM16
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QASYMM16
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">QuantizedLstmLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform quantized LSTM (Long Short-Term Memory) operation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_QUANTIZED_LSTM
+       <li>ANEURALNETWORKS_QUANTIZED_16BIT_LSTM
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+         <tr><td>All
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>SIGNED32
+    <tr><td>QASYMMU8
+    <tr><td>QSYMMS16
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>SIGNED32
+    <tr><td>QASYMMU8
+    <tr><td>QSYMMS16
+    </table>
+<tr>
+  <td rowspan="3">RankLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform a rank operation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_RANK
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+         <tr><td>All
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">ReduceLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform reduce with the following operations - ARG_IDX_MAX: Index of the max value - ARG_IDX_MIN: Index of the min value - MEAN_SUM:    Mean of sum - PROD:        Product - SUM_SQUARE:  Sum of squares - SUM:         Sum - MIN:         Min - MAX:         Max
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_REDUCE_MAX
+       <li>ANEURALNETWORKS_REDUCE_MIN
+       <li>ANEURALNETWORKS_REDUCE_SUM
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>SIGNED32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>SIGNED32
+    </table>
+<tr>
+  <td rowspan="3">ReshapeLayer
+  <td rowspan="3" style="width:200px;"> Layer to reshape a tensor.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_RESHAPE
+       <li>ANEURALNETWORKS_SQUEEZE
+       <li>ANEURALNETWORKS_EXPAND_DIMS
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+       <tr><td>BOOLEAN
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">ResizeLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform resize of a tensor using one of the interpolation methods: - Bilinear -  Nearest Neighbor.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_RESIZE_BILINEAR
+       <li>ANEURALNETWORKS_RESIZE_NEAREST_NEIGHBOR
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">RsqrtLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform Rsqrt operation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_RSQRT
+      </ul>
+  <td>CpuRef
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+    </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>SIGNED32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">ShapeLayer
+  <td rowspan="3" style="width:200px;"> Layer to return the shape of the input tensor.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+  <td>CpuRef
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">SliceLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform tensor slicing.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_SLICE
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">SoftmaxLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform softmax, log-softmax operation over the specified axis.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_LOG_SOFTMAX
+       <li>ANEURALNETWORKS_SOFTMAX
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">SpaceToBatchNdLayer
+  <td rowspan="3" style="width:200px;"> Layer to divide spatial dimensions of the tensor into a grid of blocks and interleaves these blocks with the batch dimension.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_SPACE_TO_BATCH_ND
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">SpaceToDepthLayer
+  <td rowspan="3" style="width:200px;"> Layer to rearrange blocks of spatial data into depth.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_SPACE_TO_DEPTH
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">SplitterLayer
+  <td rowspan="3" style="width:200px;"> Layer to split a tensor along a given axis.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_SPLIT
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">StackLayer
+  <td rowspan="3" style="width:200px;"> Layer to stack tensors along an axis.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="1">StandInLayer
+  <td rowspan="1" style="width:200px;"> A layer to represent "unknown" or "unsupported" operations in the input graph. It has a configurable number of input and output slots and an optional name.
+  <td rowspan="1">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>N/A
+   <td>N/A
+   <td>N/A
+<tr>
+  <td rowspan="3">StridedSliceLayer
+  <td rowspan="3" style="width:200px;"> Layer to extract a strided slice of a tensor.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_STRIDED_SLICE
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">SubtractionLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform an elementwise subtract of 2 tensors.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_SUB
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QSYMMS16
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QSYMMS16
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">TransposeConvolution2dLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform 2D transpose convolution (deconvolution) operation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_TRANSPOSE_CONV_2D
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QUANTIZEDSYMM8PERAXIS
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QUANTIZEDSYMM8PERAXIS
+    </table>
+<tr>
+  <td rowspan="3">TransposeLayer
+  <td rowspan="3" style="width:200px;"> Layer to transpose a tensor.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_TRANSPOSE
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td rowspan="3">UnidirectionalSquenceLstmLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform unidirectional LSTM operation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_UNIDIRECTIONAL_SEQUENCE_LSTM
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+         <tr><td>All
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QUANTIZEDSYMM8PERAXIS
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>SIGNED32
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>QASYMMU8
+    <tr><td>QASYMMS8
+    <tr><td>QUANTIZEDSYMM8PERAXIS
+    </table>
+<tr>
+  <td rowspan="3">UnmapLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform unmap operation on tensor.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+         <tr><td>All
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NHWC
+       <li>NCHW
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
+    </table>
+</table>
+
+*/
+} // namespace

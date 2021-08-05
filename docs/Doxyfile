@@ -820,6 +820,7 @@ INPUT                  = ./docs/01_00_software_tools.dox \
                          ./docs/02_build_guides.dox \
                          ./docs/03_use_guides.dox \
                          ./docs/04_contributor.dox \
+                         ./docs/05_operator_list.dox \
                          ./docs/FAQ.md \
                          ./tests/ImageCSVFileGenerator/README.md \
                          ./tests/ImageTensorGenerator/README.md \

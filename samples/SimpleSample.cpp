@@ -31,10 +31,12 @@ int main()
     float weightsData[] = {1.0f}; // Identity
     TensorInfo weightsInfo(TensorShape({1, 1}), DataType::Float32);
     armnn::ConstTensor weights(weightsInfo, weightsData);
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer *fullyConnected = myNetwork->AddFullyConnectedLayer(fullyConnectedDesc,
                                                                           weights,
                                                                           EmptyOptional(),
                                                                           "fully connected");
+    ARMNN_NO_DEPRECATE_WARN_END
 
     IConnectableLayer *InputLayer = myNetwork->AddInputLayer(0);
     IConnectableLayer *OutputLayer = myNetwork->AddOutputLayer(0);

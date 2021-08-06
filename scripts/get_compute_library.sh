@@ -7,10 +7,10 @@
 CMD=$( basename $0 )
 
 # For pinning to a ref use this:
-#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_05" # Release 21.05
+DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_08" # Release 21.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="3f74389bf771274162dc5e6fd87bbfa2d38ea667" #Remove 21.08 deprecated code
+#DEFAULT_CLFRAMEWORKREVISION="3f74389bf771274162dc5e6fd87bbfa2d38ea667" #Remove 21.08 deprecated code
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

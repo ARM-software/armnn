@@ -171,7 +171,7 @@ libarmnn.so
 libarmnn.so.26
 libarmnn.so.26.0
 libarmnnTfLiteParser.so
-libarmnnTfLiteParser.so.24.1
+libarmnnTfLiteParser.so.24.2
 libavcodec.so
 libavcodec.so.58
 libavcodec.so.58.54.100

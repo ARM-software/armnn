@@ -426,7 +426,7 @@ armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr,
     }
     else
     {
-        unsigned long shapeSignatureSize = tensorPtr->shape_signature.size();
+        size_t shapeSignatureSize = tensorPtr->shape_signature.size();
 
         // If a shape signature exists we will use that to infer dynamic tensors
         if (shapeSignatureSize != 0)
@@ -444,12 +444,12 @@ armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr,
                 }
             }
 
-            bool dimMask[tensorPtr->shape_signature.size()];
+            std::unique_ptr<bool[]> dimMask = std::make_unique<bool[]>(tensorPtr->shape_signature.size());
             for (unsigned int i = 0; i < tensorPtr->shape_signature.size(); ++i)
             {
                 dimMask[i] = tensorPtr->shape_signature[i] == -1 ? false : true;
             }
-            tensorShape = TensorShape(static_cast<unsigned int>(safeShape.size()), safeShape.data(), dimMask);
+            tensorShape = TensorShape(static_cast<unsigned int>(safeShape.size()), safeShape.data(), dimMask.get());
         }
         // If there is no shape signature treat the tensor as dynamic if the shape has a size of zero
         else if (shape.size() == 0)
@@ -1170,7 +1170,7 @@ void TfLiteParserImpl::ParseExpandDims(size_t subgraphIndex, size_t operatorInde
             axis = inputDimSize + axis + 1;
         }
 
-        unsigned int shape[static_cast<unsigned int>(inputDimSize) + 1];
+        std::vector<unsigned int> shape(static_cast<unsigned int>(inputDimSize) + 1);
         unsigned int inputShapeIndex = 0;
         for (unsigned int i = 0; i < static_cast<unsigned int>(inputDimSize + 1); ++i)
         {
@@ -1185,7 +1185,7 @@ void TfLiteParserImpl::ParseExpandDims(size_t subgraphIndex, size_t operatorInde
             }
         }
 
-        reshapeDesc.m_TargetShape = TensorShape(static_cast<unsigned int>(inputDimSize + 1), shape);
+        reshapeDesc.m_TargetShape = TensorShape(static_cast<unsigned int>(inputDimSize + 1), shape.data());
     }
 
     IConnectableLayer* layer = m_Network->AddReshapeLayer(reshapeDesc, layerName.c_str());

@@ -38,6 +38,11 @@ std::unique_ptr<IWorkload> FullyConnectedLayer::CreateWorkload(const IWorkloadFa
 FullyConnectedLayer* FullyConnectedLayer::Clone(Graph& graph) const
 {
     auto layer = CloneBase<FullyConnectedLayer>(graph, m_Param, GetName());
+    layer->m_Weight = m_Weight ? m_Weight : nullptr;
+    if (layer->m_Param.m_BiasEnabled)
+    {
+        layer->m_Bias = m_Bias ? m_Bias : nullptr;
+    }
     return std::move(layer);
 }
 

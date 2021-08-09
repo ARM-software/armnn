@@ -29,6 +29,7 @@ int main()
 
     float weightsData[] = {1.0f}; // Identity
     TensorInfo weightsInfo(TensorShape({1, 1}), DataType::Float32);
+    weightsInfo.SetConstant();
     ConstTensor weights(weightsInfo, weightsData);
 
     // Constant layer that now holds weights data for FullyConnected
@@ -54,7 +55,7 @@ int main()
 
     TensorInfo outputTensorInfo(TensorShape({1, 1}), DataType::Float32);
     fullyConnectedLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-    constantWeightsLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+    constantWeightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
 
     // Optimise ArmNN network
     IOptimizedNetworkPtr optNet = Optimize(*myNetwork, {Compute::CpuRef}, run->GetDeviceSpec());

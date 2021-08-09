@@ -407,12 +407,18 @@ bool LayerSupportHandle::IsFullyConnectedSupported(const TensorInfo& input,
         {
             if(!weights.IsConstant())
             {
+                reasonIfUnsupported.value() =
+                        "This backend might not support non constant weights. "
+                        "If weights are constant make sure to set IsConstant when creating TensorInfo";
                 return false;
             }
             if(descriptor.m_BiasEnabled)
             {
                 if(!biases.IsConstant())
                 {
+                    reasonIfUnsupported.value() =
+                            "This backend might not support non constant bias. "
+                            "If bias are constant make sure to set IsConstant when creating TensorInfo";
                     return false;
                 }
             }

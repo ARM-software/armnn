@@ -26,7 +26,7 @@ RefConvolution2dWorkload::RefConvolution2dWorkload(
     }
 
     // Report Profiling Details
-    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("RefConvolution2dWorkload_Execute",
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("RefConvolution2dWorkload_Construct",
                                          descriptor.m_Parameters,
                                          detailsInfo,
                                          this->GetGuid());

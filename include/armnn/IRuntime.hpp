@@ -39,36 +39,40 @@ struct INetworkProperties
           m_ExportEnabled(exportEnabled),
           m_AsyncEnabled(asyncEnabled),
           m_ProfilingEnabled(profilingEnabled),
+          m_OutputNetworkDetails(false),
           m_InputSource(m_ImportEnabled ? MemorySource::Malloc : MemorySource::Undefined),
           m_OutputSource(m_ExportEnabled ? MemorySource::Malloc : MemorySource::Undefined)
     {}
 
     ARMNN_DEPRECATED_MSG("Please use INetworkProperties constructor without numThreads argument")
     INetworkProperties(bool asyncEnabled,
-                       MemorySource m_InputSource,
-                       MemorySource m_OutputSource,
+                       MemorySource inputSource,
+                       MemorySource outputSource,
                        size_t numThreads,
                        bool profilingEnabled = false)
-        : m_ImportEnabled(m_InputSource != MemorySource::Undefined),
-          m_ExportEnabled(m_OutputSource != MemorySource::Undefined),
+        : m_ImportEnabled(inputSource != MemorySource::Undefined),
+          m_ExportEnabled(outputSource != MemorySource::Undefined),
           m_AsyncEnabled(asyncEnabled),
           m_ProfilingEnabled(profilingEnabled),
-          m_InputSource(m_InputSource),
-          m_OutputSource(m_OutputSource)
+          m_OutputNetworkDetails(false),
+          m_InputSource(inputSource),
+          m_OutputSource(outputSource)
     {
         armnn::IgnoreUnused(numThreads);
     }
 
     INetworkProperties(bool asyncEnabled,
-                       MemorySource m_InputSource,
-                       MemorySource m_OutputSource,
-                       bool profilingEnabled = false)
-        : m_ImportEnabled(m_InputSource != MemorySource::Undefined),
-          m_ExportEnabled(m_OutputSource != MemorySource::Undefined),
+                       MemorySource inputSource,
+                       MemorySource outputSource,
+                       bool profilingEnabled = false,
+                       bool outputDetails = false)
+        : m_ImportEnabled(inputSource != MemorySource::Undefined),
+          m_ExportEnabled(outputSource != MemorySource::Undefined),
           m_AsyncEnabled(asyncEnabled),
           m_ProfilingEnabled(profilingEnabled),
-          m_InputSource(m_InputSource),
-          m_OutputSource(m_OutputSource)
+          m_OutputNetworkDetails(outputDetails),
+          m_InputSource(inputSource),
+          m_OutputSource(outputSource)
     {}
 
     /// Deprecated and will be removed in future release.
@@ -79,6 +83,8 @@ struct INetworkProperties
     const bool m_AsyncEnabled;
 
     const bool m_ProfilingEnabled;
+
+    const bool m_OutputNetworkDetails;
 
     const MemorySource m_InputSource;
     const MemorySource m_OutputSource;

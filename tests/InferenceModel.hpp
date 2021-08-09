@@ -100,6 +100,7 @@ struct Params
     bool                            m_InferOutputShape;
     bool                            m_EnableFastMath;
     bool                            m_SaveCachedNetwork;
+    bool                            m_OutputDetailsToStdOut;
     std::string                     m_CachedNetworkFilePath;
     unsigned int                    m_NumberOfThreads;
     std::string                     m_MLGOTuningFilePath;
@@ -119,6 +120,7 @@ struct Params
         , m_InferOutputShape(false)
         , m_EnableFastMath(false)
         , m_SaveCachedNetwork(false)
+        , m_OutputDetailsToStdOut(false)
         , m_CachedNetworkFilePath("")
         , m_NumberOfThreads(0)
         , m_MLGOTuningFilePath("")
@@ -489,7 +491,8 @@ public:
             armnn::INetworkProperties networkProperties(params.m_AsyncEnabled,
                                                         armnn::MemorySource::Undefined,
                                                         armnn::MemorySource::Undefined,
-                                                        enableProfiling);
+                                                        enableProfiling,
+                                                        params.m_OutputDetailsToStdOut);
             std::string errorMessage;
             ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, std::move(optNet), errorMessage, networkProperties);
 

@@ -324,6 +324,7 @@ int MainImpl(const ExecuteNetworkParams& params,
         inferenceModelParams.m_MLGOTuningFilePath             = params.m_MLGOTuningFilePath;
         inferenceModelParams.m_AsyncEnabled                   = params.m_Concurrent;
         inferenceModelParams.m_ThreadPoolSize                 = params.m_ThreadPoolSize;
+        inferenceModelParams.m_OutputDetailsToStdOut          = params.m_OutputDetailsToStdOut;
 
         for(const std::string& inputName: params.m_InputNames)
         {
@@ -765,6 +766,12 @@ int main(int argc, const char* argv[])
         ProgramOptions.ParseOptions(argc, argv);
     } catch (const std::exception &e){
         ARMNN_LOG(fatal) << e.what();
+        return EXIT_FAILURE;
+    }
+
+    if (ProgramOptions.m_ExNetParams.m_OutputDetailsToStdOut && !ProgramOptions.m_ExNetParams.m_EnableProfiling)
+    {
+        ARMNN_LOG(fatal) << "You must enable profiling if you would like to output layer details";
         return EXIT_FAILURE;
     }
 

@@ -407,7 +407,12 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
 
                 ("u,counter-capture-period",
                  "If profiling is enabled in 'file-only' mode this is the capture period that will be used in the test",
-                 cxxopts::value<uint32_t>(m_RuntimeOptions.m_ProfilingOptions.m_CapturePeriod)->default_value("150"));
+                 cxxopts::value<uint32_t>(m_RuntimeOptions.m_ProfilingOptions.m_CapturePeriod)->default_value("150"))
+
+                ("output-network-details",
+                 "Outputs layer tensor infos and descriptors to std out. Defaults to off.",
+                 cxxopts::value<bool>(m_ExNetParams.m_OutputDetailsToStdOut)->default_value("false")
+                                                                            ->implicit_value("true"));
     }
     catch (const std::exception& e)
     {

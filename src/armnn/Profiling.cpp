@@ -196,6 +196,11 @@ void ProfilerImpl::EnableProfiling(bool enableProfiling)
     m_ProfilingEnabled = enableProfiling;
 }
 
+void ProfilerImpl::EnableNetworkDetailsToStdOut()
+{
+    m_EnableDetailsToStdOut = true;
+}
+
 Event* ProfilerImpl::BeginEvent(armnn::IProfiler* profiler,
                                 const BackendId& backendId,
                                 const std::string& label,
@@ -378,7 +383,7 @@ void ProfilerImpl::Print(std::ostream& outStream) const
     printer.PrintHeader();
     printer.PrintArmNNHeader();
 
-    if (m_ProfilingDetails.get()->DetailsExist())
+    if (m_ProfilingDetails.get()->DetailsExist() && m_EnableDetailsToStdOut)
     {
         JsonChildObject detailsObject{ "layer_details" };
         ConfigureDetailsObject(detailsObject, m_ProfilingDetails.get()->GetProfilingDetails());
@@ -537,6 +542,11 @@ IProfiler* ProfilerManager::GetProfiler()
 void IProfiler::EnableProfiling(bool enableProfiling)
 {
     pProfilerImpl->EnableProfiling(enableProfiling);
+}
+
+void IProfiler::EnableNetworkDetailsToStdOut()
+{
+    pProfilerImpl->EnableNetworkDetailsToStdOut();
 }
 
 bool IProfiler::IsProfilingEnabled()

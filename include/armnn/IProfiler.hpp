@@ -39,6 +39,10 @@ public:
     /// @param [out] outStream The stream where to write the profiling results to.
     void Print(std::ostream& outStream) const;
 
+    /// Print out details of each layer within the network that possesses a descriptor.
+    /// Also outputs tensor info.
+    void EnableNetworkDetailsToStdOut();
+
     ~IProfiler();
     IProfiler();
 

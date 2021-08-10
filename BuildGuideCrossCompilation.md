@@ -145,7 +145,7 @@ cd tensorflow/
 git checkout fcc4b966f1265f466e82617020af93670141b009
 mkdir tflite
 cd tflite
-cp ../tensorflow/tensorflow/lite/schema/schema.fbs .
+cp ../tensorflow/lite/schema/schema.fbs .
 ../flatbuffers-1.12.0/build/flatc -c --gen-object-api --reflect-types --reflect-names schema.fbs
 ```
 

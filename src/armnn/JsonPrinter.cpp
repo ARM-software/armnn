@@ -127,7 +127,7 @@ void JsonPrinter::PrintType(armnn::JsonObjectType type)
 void JsonPrinter::PrintGuid(armnn::profiling::ProfilingGuid guid)
 {
     PrintTabs();
-    m_OutputStream << std::quoted("GUID") << ": " << std::quoted(std::to_string(guid)) << std::endl;
+    m_OutputStream << std::quoted("GUID") << ": " << std::quoted(std::to_string(guid))  << "," << std::endl;
 }
 
 void JsonPrinter::PrintMeasurementsList(const std::vector<double>& measurementsVector)

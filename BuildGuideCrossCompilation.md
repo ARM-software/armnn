@@ -143,6 +143,7 @@ cd $HOME/armnn-devenv
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow/
 git checkout fcc4b966f1265f466e82617020af93670141b009
+cd ..
 mkdir tflite
 cd tflite
 cp ../tensorflow/tensorflow/lite/schema/schema.fbs .

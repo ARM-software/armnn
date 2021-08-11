@@ -307,6 +307,8 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
                 if (customAllocatorMapIterator != options.m_CustomAllocatorMap.end())
                 {
                     std::string err;
+                    // Check we have actually been given an allocator.
+                    ARMNN_ASSERT(customAllocatorMapIterator->second != nullptr);
                     if (customAllocatorMapIterator->second->GetMemorySourceType()
                         == armnn::MemorySource::DmaBufProtected)
                     {

@@ -15,6 +15,9 @@
 #include <arm_compute/runtime/IAllocator.h>
 #include <arm_compute/runtime/IMemoryGroup.h>
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>
+#endif
+
+#if defined(ARMCOMPUTECL_ENABLED)
 #include <arm_compute/runtime/CL/CLTensorAllocator.h>
 #endif
 

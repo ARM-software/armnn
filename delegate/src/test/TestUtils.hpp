@@ -42,6 +42,9 @@ void CompareData(bool tensor1[], bool tensor2[], size_t tensorSize);
 /// Can be used to compare float data coming from a tflite interpreter with a tolerance of limit_of_float*100
 void CompareData(float tensor1[], float tensor2[], size_t tensorSize);
 
+/// Can be used to compare float data coming from a tflite interpreter with a given percentage tolerance
+void CompareData(float tensor1[], float tensor2[], size_t tensorSize, float percentTolerance);
+
 /// Can be used to compare int8_t data coming from a tflite interpreter with a tolerance of 1
 void CompareData(int8_t tensor1[], int8_t tensor2[], size_t tensorSize);
 

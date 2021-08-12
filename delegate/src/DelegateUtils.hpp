@@ -506,6 +506,13 @@ armnn::ConstTensor CreateConstTensor(const TfLiteTensor* tfLiteTensor,
     }
 }
 
+armnn::ConstTensor* GetConstTensorForTfLiteTensor(const TfLiteTensor* tfLiteTensors, TfLiteNode* tfLiteNode, int index)
+{
+    const TfLiteTensor &tfLiteTensor = tfLiteTensors[tfLiteNode->inputs->data[index]];
+    armnn::TensorInfo tensorInfo = GetTensorInfoForTfLiteTensor(tfLiteTensor);
+    return new armnn::ConstTensor(tensorInfo, tfLiteTensor.data.data);
+}
+
 void CalcPadding(uint32_t inputSize,
                  uint32_t filterSize,
                  uint32_t stride,
@@ -559,6 +566,15 @@ TfLiteStatus ConnectConstant(armnn::IConnectableLayer* layer,
     data.m_OutputSlotForNode[static_cast<unsigned long>(slotIndex)] = &outputSlot;
 
     return kTfLiteOk;
+}
+
+bool IsOptionalOperandPresent(TfLiteNode* tfLiteNode, const int operandIndex)
+{
+    if (tfLiteNode->inputs->data[operandIndex] < 0) {
+        return true;
+    }
+    return false;
+
 }
 
 TfLiteStatus ProcessInputs(armnn::IConnectableLayer* layer,

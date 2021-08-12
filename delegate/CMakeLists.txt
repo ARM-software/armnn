@@ -181,6 +181,8 @@ if(BUILD_UNIT_TESTS)
         src/test/TestUtils.cpp
         src/test/TransposeTest.cpp
         src/test/TransposeTestHelper.hpp
+        src/test/UnidirectionalSequenceLstmTest.cpp
+        src/test/UnidirectionalSequenceLstmTestHelper.hpp
         src/test/UnpackTest.cpp
         src/test/UnpackTestHelper.hpp)
 

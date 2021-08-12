@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -19,11 +19,11 @@
 namespace armnnDelegate
 {
 
-TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
-                               TfLiteContext* tfLiteContext,
-                               TfLiteNode* tfLiteNode,
-                               int nodeIndex,
-                               int32_t operatorCode)
+TfLiteStatus VisitUnidirectionalSequenceLstmOperator(DelegateData& delegateData,
+                                                     TfLiteContext* tfLiteContext,
+                                                     TfLiteNode* tfLiteNode,
+                                                     int nodeIndex,
+                                                     int32_t operatorCode)
 {
     auto numInputs = tfLiteNode->inputs->size;
     if (numInputs < 2)
@@ -34,7 +34,7 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
         return kTfLiteError;
     }
 
-    const auto nodeParams = reinterpret_cast<TfLiteLSTMParams*>(tfLiteNode->builtin_data);
+    const auto nodeParams = reinterpret_cast<TfLiteUnidirectionalSequenceLSTMParams *>(tfLiteNode->builtin_data);
     const TfLiteTensor* tfLiteTensors = tfLiteContext->tensors;
 
     const TfLiteTensor& tfLiteInputTensor = tfLiteTensors[tfLiteNode->inputs->data[0]];
@@ -49,7 +49,9 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
         return kTfLiteError;
     }
 
-    // Set the params structure for the AddLstmLayer call
+    // Set the params structure for the AddUnidirectionalSequenceLstmLayer call
+    // Please refer to each operand at
+    // https://www.tensorflow.org/mlir/tfl_ops#tflunidirectional_sequence_lstm_tflunidirectionalsequencelstmop
     armnn::LstmInputParams params;
 
     if (!IsOptionalOperandPresent(tfLiteNode, 1))
@@ -134,7 +136,7 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
     }
 
     // set the layer descriptor
-    armnn::LstmDescriptor desc;
+    armnn::UnidirectionalSequenceLstmDescriptor desc;
     desc.m_ActivationFunc    = NonNegative(nodeParams->activation, nodeIndex);
     desc.m_ClippingThresCell = nodeParams->cell_clip;
     desc.m_ClippingThresProj = nodeParams->proj_clip;
@@ -147,12 +149,13 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
                                 || params.m_ForgetLayerNormWeights != nullptr
                                 || params.m_CellLayerNormWeights != nullptr
                                 || params.m_OutputLayerNormWeights != nullptr);
+    desc.m_TimeMajor = nodeParams->time_major;
 
     const armnn::TensorInfo& inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
 
     unsigned int batchSize  = inputTensorInfo.GetShape()[0];
-    unsigned int outputSize = outputTensorInfo.GetShape()[1];
+    unsigned int outputSize = outputTensorInfo.GetShape()[2];
     unsigned int numUnits   = cellStateInInfo.GetShape()[1];
 
     armnn::DataType dataType = inputTensorInfo.GetDataType();
@@ -215,21 +218,23 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
         paramsInfo.m_OutputLayerNormWeights = &(params.m_OutputLayerNormWeights->GetInfo());
     }
 
+    // hiddenStateOutput and cellStateOutput do not present in TfLite UnidirectionalSequenceLstm
+    armnn::Optional<armnn::TensorInfo> optionalTensor;
+
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    tfLiteContext,
-                                   IsLstmSupported,
+                                   IsUnidirectionalSequenceLstmSupported,
                                    delegateData.m_Backends,
                                    isSupported,
                                    inputTensorInfo,
                                    outputStateInInfo,
                                    cellStateInInfo,
-                                   scratchBufferTensorInfo,
-                                   outputStateOutTensorInfo,
-                                   cellStateOutTensorInfo,
                                    outputInfo,
+                                   optionalTensor,
+                                   optionalTensor,
                                    desc,
                                    paramsInfo);
     };
@@ -240,13 +245,10 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddLstmLayer(desc, params);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddUnidirectionalSequenceLstmLayer(desc, params);
     ARMNN_ASSERT(layer != nullptr);
 
-    layer->GetOutputSlot(0).SetTensorInfo(scratchBufferTensorInfo);
-    layer->GetOutputSlot(1).SetTensorInfo(outputStateOutTensorInfo);
-    layer->GetOutputSlot(2).SetTensorInfo(cellStateOutTensorInfo);
-    layer->GetOutputSlot(3).SetTensorInfo(outputTensorInfo);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // Connect the inputs
     // input_layer
@@ -256,8 +258,7 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
     //outputStateIn
     delegateData.m_OutputSlotForNode[tfLiteNode->inputs->data[19]]->Connect(layer->GetInputSlot(2));
 
-    // In the test_model there is only 1 Output
-    armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(1);
+    armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
     delegateData.m_OutputSlotForNode[static_cast<unsigned long>(tfLiteNode->outputs->data[0])] = &outputSlot;
     return kTfLiteOk;
 }

@@ -36,6 +36,7 @@
 #include "SpaceDepth.hpp"
 #include "Split.hpp"
 #include "Transpose.hpp"
+#include "UnidirectionalSequenceLstm.hpp"
 #include "Unpack.hpp"
 
 #include <flatbuffers/flatbuffers.h>
@@ -890,6 +891,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                            tfLiteNode,
                                            nodeIndex,
                                            kTfLiteBuiltinTanh);
+        case kTfLiteBuiltinUnidirectionalSequenceLstm:
+            return VisitUnidirectionalSequenceLstmOperator(delegateData,
+                                                           tfLiteContext,
+                                                           tfLiteNode,
+                                                           nodeIndex,
+                                                           kTfLiteBuiltinUnidirectionalSequenceLstm);
         case kTfLiteBuiltinUnpack:
             return VisitUnpackOperator(delegateData,
                                        tfLiteContext,

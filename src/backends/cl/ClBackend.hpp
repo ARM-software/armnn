@@ -15,6 +15,9 @@
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <CL/cl_ext.h>
 
+// System includes for mapping and unmapping memory
+#include <sys/mman.h>
+
 namespace armnn
 {
 
@@ -121,7 +124,9 @@ public:
             auto hostMemPtr = m_CustomAllocator->allocate(size, alignment);
             cl_mem buffer = MapAllocatedMemory(hostMemPtr, size, m_CustomAllocator->GetMemorySourceType());
 
-            return std::make_unique<ClBackendCustomAllocatorMemoryRegion>(cl::Buffer(buffer), hostMemPtr);
+            return std::make_unique<ClBackendCustomAllocatorMemoryRegion>(cl::Buffer(buffer),
+                                                                          hostMemPtr,
+                                                                          m_CustomAllocator->GetMemorySourceType());
         }
     private:
         cl_mem MapAllocatedMemory(void* memory, size_t size, MemorySource source)
@@ -154,6 +159,32 @@ public:
                 throw armnn::Exception(
                     "Mapping allocated memory from CustomMemoryAllocator failed, errcode: " + std::to_string(error));
             }
+            else if (source == MemorySource::DmaBuf)
+            {
+                const cl_import_properties_arm importProperties[] =
+                        {
+                        CL_IMPORT_TYPE_ARM,
+                        CL_IMPORT_TYPE_DMA_BUF_ARM,
+                        CL_IMPORT_DMA_BUF_DATA_CONSISTENCY_WITH_HOST_ARM,
+                        CL_TRUE,
+                        0
+                        };
+                cl_int error = CL_SUCCESS;
+                cl_mem buffer = clImportMemoryARM(arm_compute::CLKernelLibrary::get().context().get(),
+                                                  CL_MEM_READ_WRITE,
+                                                  importProperties,
+                                                  memory,
+                                                  roundedSize,
+                                                  &error);
+                if (error == CL_SUCCESS)
+                {
+                    m_AllocatedBufferMappings.insert(std::make_pair(static_cast<void *>(buffer), memory));
+                    return buffer;
+                }
+                throw armnn::Exception(
+                        "Mapping allocated memory from CustomMemoryAllocator failed, errcode: "
+                         + std::to_string(error));
+            }
             throw armnn::Exception(
                     "Attempting to allocate memory with unsupported MemorySource type in CustomAllocator");
         }
@@ -165,11 +196,12 @@ public:
     {
     public:
         // We need to have a new version of ICLMemoryRegion which holds a hostMemPtr to allow for cpu copy access
-        ClBackendCustomAllocatorMemoryRegion(const cl::Buffer &buffer, void* hostMemPtr)
+        ClBackendCustomAllocatorMemoryRegion(const cl::Buffer &buffer, void* hostMemPtr, armnn::MemorySource source)
             : ICLMemoryRegion(buffer.getInfo<CL_MEM_SIZE>())
         {
             _mem = buffer;
             m_HostMemPtr = hostMemPtr;
+            m_MemorySource = source;
         }
 
         // Inherited methods overridden :
@@ -185,16 +217,47 @@ public:
             {
                 throw armnn::Exception("ClBackend: Attempting to map memory with an invalid host ptr");
             }
-            _mapping = m_HostMemPtr;
-            return _mapping;
+            if (_mapping != nullptr)
+            {
+                throw armnn::Exception("ClBackend: Attempting to map memory which has not yet been unmapped");
+            }
+            switch (m_MemorySource)
+            {
+                case armnn::MemorySource::Malloc:
+                    _mapping = m_HostMemPtr;
+                    return _mapping;
+                    break;
+                case armnn::MemorySource::DmaBuf:
+                    // If the source is a Dmabuf then the memory ptr should be pointing to an integer value for the fd
+                    _mapping = mmap(NULL, _size, PROT_WRITE, MAP_SHARED, *(reinterpret_cast<int*>(m_HostMemPtr)), 0);
+                    return _mapping;
+                    break;
+                default:
+                    throw armnn::Exception("ClBackend: Attempting to map imported memory without a valid source");
+                    break;
+            }
         }
 
         void unmap(cl::CommandQueue &q) override
         {
             armnn::IgnoreUnused(q);
-            _mapping = nullptr;
+            switch (m_MemorySource)
+            {
+                case armnn::MemorySource::Malloc:
+                    _mapping = nullptr;
+                    break;
+                case armnn::MemorySource::DmaBuf:
+                    munmap(_mapping, _size);
+                    _mapping = nullptr;
+                    break;
+                default:
+                    throw armnn::Exception("ClBackend: Attempting to unmap imported memory without a valid source");
+                    break;
+            }
         }
+    private:
         void* m_HostMemPtr = nullptr;
+        armnn::MemorySource m_MemorySource;
     };
 
     std::shared_ptr<ClBackendCustomAllocatorWrapper> m_CustomAllocator;

@@ -34,8 +34,8 @@ public:
     //  Used to specify what type of memory is being allocated by this allocator.
     //  Supported types are:
     //      MemorySource::Malloc
-    //  Unsupported types are:
     //      MemorySource::DmaBuf
+    //  Unsupported types are:
     //      MemorySource::DmaBufProtected
     virtual armnn::MemorySource GetMemorySourceType() = 0;
 

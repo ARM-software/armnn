@@ -305,6 +305,24 @@ public:
     /// Adds a fully connected layer to the network.
     /// @param fullyConnectedDescriptor - Description of the fully connected layer.
     /// @return - Interface for configuring the layer.
+    ///
+    /// @note Weights and biases are passed in as inputs. If they are constant tensors you can simply store
+    ///       them in a ConstantLayer as seen below. A full example can be found in samples/SimpleSample.cpp.
+    ///
+    /// @code
+    /// // Make sure the IsConstant flag is set on the weightsInfo before passing it to the ConstTensor.
+    /// ConstTensor weights(weightsInfo, weightsData);
+    ///
+    /// // Constant layer that now holds weights data for FullyConnected
+    /// IConnectableLayer* const constantWeightsLayer = myNetwork->AddConstantLayer(weights, "weights");
+    ///
+    /// FullyConnectedDescriptor fullyConnectedDesc;
+    /// IConnectableLayer* const fullyConnectedLayer = myNetwork->AddFullyConnectedLayer(fullyConnectedDesc,
+    ///                                                                                  "fully connected");
+    /// IConnectableLayer* InputLayer = myNetwork->AddInputLayer(0);
+    /// InputLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(0));
+    /// constantWeightsLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(1));
+    /// @endcode
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                               const char* name = nullptr);
 

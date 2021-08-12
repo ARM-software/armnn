@@ -20,7 +20,6 @@
 #include <CL/cl_ext.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
 
-
 /** Sample implementation of ICustomAllocator for use with the ClBackend.
  *  Note: any memory allocated must be host accessible with write access to allow for weights and biases
  *  to be passed in. Read access is not required.. */
@@ -58,20 +57,9 @@ public:
     }
 };
 
-TEST_SUITE("ClCustomAllocatorTests")
-{
-
-// This is a copy of the SimpleSample app modified to use a custom
-// allocator for the clbackend. It creates a FullyConnected network with a single layer
-// taking a single number as an input
-TEST_CASE("ClCustomAllocatorTest")
+armnn::INetworkPtr CreateTestNetwork(armnn::TensorInfo& inputTensorInfo)
 {
     using namespace armnn;
-
-    float number = 3;
-
-    // Construct ArmNN network
-    armnn::NetworkId networkIdentifier;
     INetworkPtr myNetwork = INetwork::Create();
 
     armnn::FullyConnectedDescriptor fullyConnectedDesc;
@@ -91,19 +79,40 @@ TEST_CASE("ClCustomAllocatorTest")
     InputLayer->GetOutputSlot(0).Connect(fullyConnected->GetInputSlot(0));
     fullyConnected->GetOutputSlot(0).Connect(OutputLayer->GetInputSlot(0));
 
+    //Set the tensors in the network.
+
+    InputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+
+    TensorInfo outputTensorInfo(TensorShape({1, 1}), DataType::Float32);
+    fullyConnected->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    return myNetwork;
+}
+
+TEST_SUITE("ClCustomAllocatorTests")
+{
+
+// This is a copy of the SimpleSample app modified to use a custom
+// allocator for the clbackend. It creates a FullyConnected network with a single layer
+// taking a single number as an input
+TEST_CASE("ClCustomAllocatorTest")
+{
+    using namespace armnn;
+
+    float number = 3;
+
+    // Construct ArmNN network
+    armnn::NetworkId networkIdentifier;
+
+    TensorInfo inputTensorInfo(TensorShape({1, 1}), DataType::Float32);
+
+    INetworkPtr myNetwork = CreateTestNetwork(inputTensorInfo);
 
     // Create ArmNN runtime
     IRuntime::CreationOptions options; // default options
     auto customAllocator = std::make_shared<SampleClBackendCustomAllocator>();
     options.m_CustomAllocatorMap = {{"GpuAcc", std::move(customAllocator)}};
     IRuntimePtr run = IRuntime::Create(options);
-
-    //Set the tensors in the network.
-    TensorInfo inputTensorInfo(TensorShape({1, 1}), DataType::Float32);
-    InputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
-
-    TensorInfo outputTensorInfo(TensorShape({1, 1}), DataType::Float32);
-    fullyConnected->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // Optimise ArmNN network
     OptimizerOptions optOptions;
@@ -153,6 +162,63 @@ TEST_CASE("ClCustomAllocatorTest")
 
     run->UnloadNetwork(networkIdentifier);
     CHECK(outputResult[0] == number);
+    auto& backendRegistry = armnn::BackendRegistryInstance();
+    backendRegistry.DeregisterAllocator(ClBackend::GetIdStatic());
+}
+
+TEST_CASE("ClCustomAllocatorCpuAccNegativeTest")
+{
+    using namespace armnn;
+
+    // Create ArmNN runtime
+    IRuntime::CreationOptions options; // default options
+    auto customAllocator = std::make_shared<SampleClBackendCustomAllocator>();
+    options.m_CustomAllocatorMap = {{"CpuAcc", std::move(customAllocator)}};
+    IRuntimePtr run = IRuntime::Create(options);
+
+    TensorInfo inputTensorInfo(TensorShape({1, 1}), DataType::Float32);
+    INetworkPtr myNetwork = CreateTestNetwork(inputTensorInfo);
+
+    // Optimise ArmNN network
+    OptimizerOptions optOptions;
+    optOptions.m_ImportEnabled = true;
+    IOptimizedNetworkPtr optNet(nullptr, nullptr);
+    std::vector<std::string> errMessages;
+
+    try
+    {
+        optNet = Optimize(*myNetwork, {"CpuAcc"}, run->GetDeviceSpec(), optOptions, errMessages);
+        FAIL("Should have thrown an exception as GetAvailablePreferredBackends() should be empty in Optimize().");
+    }
+    catch (const armnn::InvalidArgumentException& e)
+    {
+        // Different exceptions are thrown on different backends
+    }
+    CHECK(errMessages.size() > 0);
+
+    auto& backendRegistry = armnn::BackendRegistryInstance();
+    backendRegistry.DeregisterAllocator(ClBackend::GetIdStatic());
+}
+
+TEST_CASE("ClCustomAllocatorGpuAccNullptrTest")
+{
+    using namespace armnn;
+
+    // Create ArmNN runtime
+    IRuntime::CreationOptions options; // default options
+    auto customAllocator = std::make_shared<SampleClBackendCustomAllocator>();
+    options.m_CustomAllocatorMap = {{"GpuAcc", nullptr}};
+
+    try
+    {
+        IRuntimePtr run = IRuntime::Create(options);
+        FAIL("Should have thrown an exception in RuntimeImpl::RuntimeImpl().");
+    }
+    catch (const armnn::Exception& e)
+    {
+        // Caught successfully
+    }
+
     auto& backendRegistry = armnn::BackendRegistryInstance();
     backendRegistry.DeregisterAllocator(ClBackend::GetIdStatic());
 }

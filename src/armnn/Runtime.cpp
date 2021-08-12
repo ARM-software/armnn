@@ -286,6 +286,11 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
             ARMNN_ASSERT(backend.get() != nullptr);
 
             auto customAllocatorMapIterator = options.m_CustomAllocatorMap.find(id);
+            if (customAllocatorMapIterator != options.m_CustomAllocatorMap.end() &&
+                customAllocatorMapIterator->second == nullptr)
+            {
+                throw armnn::Exception("Allocator associated with id " + id.Get() + " is null");
+            }
 
             // If the runtime is created in protected mode only add backends that support this mode
             if (options.m_ProtectedMode)
@@ -307,8 +312,6 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
                 if (customAllocatorMapIterator != options.m_CustomAllocatorMap.end())
                 {
                     std::string err;
-                    // Check we have actually been given an allocator.
-                    ARMNN_ASSERT(customAllocatorMapIterator->second != nullptr);
                     if (customAllocatorMapIterator->second->GetMemorySourceType()
                         == armnn::MemorySource::DmaBufProtected)
                     {

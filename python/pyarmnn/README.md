@@ -138,7 +138,7 @@ If you want to use system default locations, just set *ARMNN_INCLUDE* to point t
 
 ```bash
 $ export  ARMNN_LIB=/path/to/libs
-$ export  ARMNN_INCLUDE=/path/to/headers
+$ export  ARMNN_INCLUDE=/full/path/to/armnn/include:/full/path/to/armnn/profiling/common/include
 ```
 
 Install PyArmNN as follows:

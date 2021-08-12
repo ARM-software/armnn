@@ -129,7 +129,7 @@ def find_includes(armnn_include_env: str = INCLUDE_ENV_NAME):
     global armnn_include_path
     armnn_include_path_raw = os.getenv(armnn_include_env)
     if not armnn_include_path_raw == None:
-        armnn_include_path = armnn_include_path_raw.split(",")
+        armnn_include_path = armnn_include_path_raw.split(":")
 
     # validate input paths
     armnn_include_path_result = []

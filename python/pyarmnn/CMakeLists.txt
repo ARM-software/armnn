@@ -13,7 +13,7 @@ configure_file(${SWIG_GENERATE_IN} ${SWIG_GENERATE} COPYONLY)
 
 # local env variables passed down to the python scripts
 # scripts can thus be used standalone
-set(ARMNN_ENV ARMNN_INCLUDE="${PROJECT_SOURCE_DIR}/include,${PROJECT_SOURCE_DIR}/profiling/common/include"
+set(ARMNN_ENV ARMNN_INCLUDE="${PROJECT_SOURCE_DIR}/include:${PROJECT_SOURCE_DIR}/profiling/common/include"
               ARMNN_LIB=${PROJECT_BINARY_DIR}
               SWIG_EXECUTABLE=${SWIG_EXECUTABLE})
 

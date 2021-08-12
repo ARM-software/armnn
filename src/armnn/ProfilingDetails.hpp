@@ -53,7 +53,7 @@ public:
         {
             PrintInfo(infos.m_BiasTensorInfo.value(), "Bias");
         }
-        if ( infos.m_BiasTensorInfo.has_value())
+        if ( infos.m_WeightsTensorInfo.has_value())
         {
             PrintInfo(infos.m_WeightsTensorInfo.value(), "Weights");
         }

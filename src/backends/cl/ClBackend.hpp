@@ -140,9 +140,9 @@ public:
             {
                 const cl_import_properties_arm importProperties[] =
                         {
-                        CL_IMPORT_TYPE_ARM,
-                        CL_IMPORT_TYPE_HOST_ARM,
-                        0
+                            CL_IMPORT_TYPE_ARM,
+                            CL_IMPORT_TYPE_HOST_ARM,
+                            0
                         };
                 cl_int error = CL_SUCCESS;
                 cl_mem buffer = clImportMemoryARM(arm_compute::CLKernelLibrary::get().context().get(),
@@ -163,11 +163,37 @@ public:
             {
                 const cl_import_properties_arm importProperties[] =
                         {
-                        CL_IMPORT_TYPE_ARM,
-                        CL_IMPORT_TYPE_DMA_BUF_ARM,
-                        CL_IMPORT_DMA_BUF_DATA_CONSISTENCY_WITH_HOST_ARM,
-                        CL_TRUE,
-                        0
+                            CL_IMPORT_TYPE_ARM,
+                            CL_IMPORT_TYPE_DMA_BUF_ARM,
+                            CL_IMPORT_DMA_BUF_DATA_CONSISTENCY_WITH_HOST_ARM,
+                            CL_TRUE,
+                            0
+                        };
+                cl_int error = CL_SUCCESS;
+                cl_mem buffer = clImportMemoryARM(arm_compute::CLKernelLibrary::get().context().get(),
+                                                  CL_MEM_READ_WRITE,
+                                                  importProperties,
+                                                  memory,
+                                                  roundedSize,
+                                                  &error);
+                if (error == CL_SUCCESS)
+                {
+                    m_AllocatedBufferMappings.insert(std::make_pair(static_cast<void *>(buffer), memory));
+                    return buffer;
+                }
+                throw armnn::Exception(
+                        "Mapping allocated memory from CustomMemoryAllocator failed, errcode: "
+                         + std::to_string(error));
+            }
+            else if (source == MemorySource::DmaBufProtected)
+            {
+                const cl_import_properties_arm importProperties[] =
+                        {
+                                CL_IMPORT_TYPE_ARM,
+                                CL_IMPORT_TYPE_DMA_BUF_ARM,
+                                CL_IMPORT_TYPE_PROTECTED_ARM,
+                                CL_TRUE,
+                                0
                         };
                 cl_int error = CL_SUCCESS;
                 cl_mem buffer = clImportMemoryARM(arm_compute::CLKernelLibrary::get().context().get(),
@@ -228,6 +254,7 @@ public:
                     return _mapping;
                     break;
                 case armnn::MemorySource::DmaBuf:
+                case armnn::MemorySource::DmaBufProtected:
                     // If the source is a Dmabuf then the memory ptr should be pointing to an integer value for the fd
                     _mapping = mmap(NULL, _size, PROT_WRITE, MAP_SHARED, *(reinterpret_cast<int*>(m_HostMemPtr)), 0);
                     return _mapping;
@@ -247,6 +274,7 @@ public:
                     _mapping = nullptr;
                     break;
                 case armnn::MemorySource::DmaBuf:
+                case armnn::MemorySource::DmaBufProtected:
                     munmap(_mapping, _size);
                     _mapping = nullptr;
                     break;

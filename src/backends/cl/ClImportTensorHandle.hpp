@@ -125,6 +125,20 @@ public:
                 return ClImport(importProperties, memory);
 
             }
+            if (source == MemorySource::DmaBufProtected)
+            {
+                const cl_import_properties_arm importProperties[] =
+                {
+                    CL_IMPORT_TYPE_ARM,
+                    CL_IMPORT_TYPE_DMA_BUF_ARM,
+                    CL_IMPORT_TYPE_PROTECTED_ARM,
+                    CL_TRUE,
+                    0
+                };
+
+                return ClImport(importProperties, memory, true);
+
+            }
             else
             {
                 throw MemoryImportException("ClImportTensorHandle::Import flag is not supported");
@@ -134,11 +148,10 @@ public:
         {
             throw MemoryImportException("ClImportTensorHandle::Incorrect import flag");
         }
-        return false;
     }
 
 private:
-    bool ClImport(const cl_import_properties_arm* importProperties, void* memory)
+    bool ClImport(const cl_import_properties_arm* importProperties, void* memory, bool isProtected = false)
     {
         size_t totalBytes = m_Tensor.info()->total_size();
 
@@ -148,8 +161,18 @@ private:
         auto roundedSize = cachelineAlignment + totalBytes - (totalBytes % cachelineAlignment);
 
         cl_int error = CL_SUCCESS;
-        cl_mem buffer = clImportMemoryARM(arm_compute::CLKernelLibrary::get().context().get(),
-                                          CL_MEM_READ_WRITE, importProperties, memory, roundedSize, &error);
+        cl_mem buffer;
+        if (isProtected)
+        {
+            buffer = clImportMemoryARM(arm_compute::CLKernelLibrary::get().context().get(),
+                                       CL_MEM_HOST_NO_ACCESS, importProperties, memory, roundedSize, &error);
+        }
+        else
+        {
+            buffer = clImportMemoryARM(arm_compute::CLKernelLibrary::get().context().get(),
+                                       CL_MEM_READ_WRITE, importProperties, memory, roundedSize, &error);
+        }
+
         if (error != CL_SUCCESS)
         {
             throw MemoryImportException("ClImportTensorHandle::Invalid imported memory" + std::to_string(error));

@@ -162,7 +162,8 @@ void ProfilerImpl::AnalyzeEventSequenceAndWriteResults(ItertType first, ItertTyp
 }
 
 ProfilerImpl::ProfilerImpl()
-    : m_ProfilingEnabled(false)
+    : m_ProfilingEnabled(false),
+      m_EnableDetailsToStdOut(false)
 {
     m_EventSequence.reserve(g_ProfilingEventCountHint);
 

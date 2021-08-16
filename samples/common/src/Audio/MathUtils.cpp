@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -41,7 +41,7 @@ void MathUtils::FftF32(std::vector<float>& input,
     }
 }
 
-float MathUtils::DotProductF32(float* srcPtrA, float* srcPtrB,
+float MathUtils::DotProductF32(const float* srcPtrA, float* srcPtrB,
                                const int srcLen)
 {
     float output = 0.f;
@@ -53,10 +53,10 @@ float MathUtils::DotProductF32(float* srcPtrA, float* srcPtrB,
     return output;
 }
 
-bool MathUtils::ComplexMagnitudeSquaredF32(float* ptrSrc,
-                                           const int srcLen,
+bool MathUtils::ComplexMagnitudeSquaredF32(const float* ptrSrc,
+                                           int srcLen,
                                            float* ptrDst,
-                                           const int dstLen)
+                                           int dstLen)
 {
     if (dstLen < srcLen/2)
     {
@@ -64,7 +64,7 @@ bool MathUtils::ComplexMagnitudeSquaredF32(float* ptrSrc,
         return false;
     }
 
-    for (int j = 0; j < srcLen; ++j)
+    for (int j = 0; j < dstLen; ++j)
     {
         const float real = *ptrSrc++;
         const float im = *ptrSrc++;
@@ -83,7 +83,7 @@ void MathUtils::VecLogarithmF32(std::vector <float>& input,
     }
 }
 
-float MathUtils::MeanF32(float* ptrSrc, const uint32_t srcLen)
+float MathUtils::MeanF32(const float* ptrSrc, const uint32_t srcLen)
 {
     if (!srcLen)
     {
@@ -94,14 +94,13 @@ float MathUtils::MeanF32(float* ptrSrc, const uint32_t srcLen)
     return acc/srcLen;
 }
 
-float MathUtils::StdDevF32(float* ptrSrc, const uint32_t srcLen,
-                           const float mean)
+float MathUtils::StdDevF32(const float* ptrSrc, uint32_t srcLen, float mean)
 {
     if (!srcLen)
     {
         return 0.f;
     }
-    auto VarianceFunction = [=](float acc, const float value) {
+    auto VarianceFunction = [mean, srcLen](float acc, const float value) {
         return acc + (((value - mean) * (value - mean))/ srcLen);
     };
 

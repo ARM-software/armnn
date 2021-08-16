@@ -1,48 +1,23 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+#ifndef SPEECH_RECOGNITION_EXAMPLE_WAV2LETTERPREPROCESSOR_HPP
+#define SPEECH_RECOGNITION_EXAMPLE_WAV2LETTERPREPROCESSOR_HPP
 
-#pragma once
-
+#include <numeric>
 #include "DataStructures.hpp"
 #include "SlidingWindow.hpp"
-#include <numeric>
 #include "MFCC.hpp"
+#include "Wav2LetterMFCC.hpp"
+// Class to facilitate pre-processing calculation for Wav2Letter model for ASR 
+using AudioWindow = SlidingWindow<const float>;
 
-/* Class to facilitate pre-processing calculation for Wav2Letter model
-     * for ASR */
-using AudioWindow = SlidingWindow <const float>;
-
-class Preprocess
+class Wav2LetterPreprocessor 
 {
 public:
-
-    MFCC                _m_mfcc;            /* MFCC instance */
-
-    /* Actual buffers to be populated */
-    Array2d<float>      _m_mfccBuf;         /* Contiguous buffer 1D: MFCC */
-    Array2d<float>      _m_delta1Buf;       /* Contiguous buffer 1D: Delta 1 */
-    Array2d<float>      _m_delta2Buf;       /* Contiguous buffer 1D: Delta 2 */
-
-    uint32_t            _m_windowLen;       /* Window length for MFCC */
-    uint32_t            _m_windowStride;    /* Window stride len for MFCC */
-    AudioWindow         _m_window;          /* Sliding window */
-
-    /**
-     * @brief       Constructor
-     * @param[in]   numMfccFeatures     number of MFCC features per window
-     * @param[in]   windowLen           number of elements in a window
-     * @param[in]   windowStride        stride (in number of elements) for
-     *                                  moving the window
-     * @param[in]   numMfccVectors      number of MFCC vectors per window
-    */
-    Preprocess(
-            const uint32_t  windowLen,
-            const uint32_t  windowStride,
-            const MFCC mfccInst);
-    Preprocess() = delete;
-    ~Preprocess();
+    Wav2LetterPreprocessor(uint32_t windowLen, uint32_t windowStride,
+                           std::unique_ptr<Wav2LetterMFCC> mfccInst);
 
     /**
      * @brief       Calculates the features required from audio data. This
@@ -55,12 +30,19 @@ public:
      * @param[in]   tensor        tensor to be populated
      * @return      true if successful, false in case of error.
      */
-    bool Invoke(const float* audioData,
-                const uint32_t  audioDataLen,
-                std::vector<int8_t>& output,
-                int quantOffset,
+    bool Invoke(const float* audioData, uint32_t audioDataLen, std::vector<int8_t>& output, int quantOffset,
                 float quantScale);
 
+    std::unique_ptr<MFCC> m_mfcc;
+
+    // Actual buffers to be populated 
+    Array2d<float> m_mfccBuf;         // Contiguous buffer 1D: MFCC 
+    Array2d<float> m_delta1Buf;       // Contiguous buffer 1D: Delta 1 
+    Array2d<float> m_delta2Buf;       // Contiguous buffer 1D: Delta 2
+
+    uint32_t m_windowLen;       // Window length for MFCC 
+    uint32_t m_windowStride;    // Window stride len for MFCC 
+    AudioWindow m_window;       // Sliding window 
 
 protected:
     /**
@@ -73,16 +55,18 @@ protected:
      *
      * @return true if successful, false otherwise
      */
-    static bool _ComputeDeltas(Array2d<float>& mfcc,
-                               Array2d<float>& delta1,
-                               Array2d<float>& delta2);
+    static bool ComputeDeltas(Array2d<float>& mfcc,
+                              Array2d<float>& delta1,
+                              Array2d<float>& delta2);
+
+protected:
 
     /**
      * @brief      Given a 2D vector of floats, computes the mean
      * @param[in]   vec      vector of vector of floats
      * @return      mean value
      */
-    static float _GetMean(Array2d<float>& vec);
+    static float GetMean(Array2d<float>& vec);
 
     /**
      * @brief       Given a 2D vector of floats, computes the stddev
@@ -90,8 +74,7 @@ protected:
      * @param[in]   mean     mean value of the vector passed in
      * @return      stddev value
      */
-    static float _GetStdDev(Array2d<float>& vec,
-                            const float mean);
+    static float GetStdDev(Array2d<float>& vec, float mean);
 
     /**
      * @brief           Given a 2D vector of floats, normalises it using
@@ -99,13 +82,13 @@ protected:
      * @param[in/out]   vec      vector of vector of floats
      * @return
      */
-    static void _NormaliseVec(Array2d<float>& vec);
+    static void NormaliseVec(Array2d<float>& vec);
 
     /**
      * @brief       Normalises the MFCC and delta buffers
      * @return
      */
-    void _Normalise();
+    void Normalise();
 
     /**
      * @brief       Given the quantisation and data type limits, computes
@@ -117,12 +100,12 @@ protected:
      * @param[in]   maxVal          Numerical limit - maximum
      * @return      floating point quantised value
      */
-    static float _GetQuantElem(
-            const float     elem,
-            const float     quantScale,
-            const int       quantOffset,
-            const float     minVal,
-            const float     maxVal);
+    static float GetQuantElem(
+            float elem,
+            float quantScale,
+            int quantOffset,
+            float minVal,
+            float maxVal);
 
     /**
      * @brief       Quantises the MFCC and delta buffers, and places them
@@ -137,39 +120,39 @@ protected:
      * @param[in]   quantScale      quantisation scale
      * @param[in]   quantOffset     quantisation offset
      */
-    template <typename T>
-    bool _Quantise(T* outputBuf, int quantOffset, float quantScale)
+    template<typename T>
+    bool Quantise(T*outputBuf, int quantOffset, float quantScale) 
     {
-        /* Populate */
+        // Populate 
         T* outputBufMfcc = outputBuf;
-        T* outputBufD1 = outputBuf + this->_m_mfcc._m_params.m_numMfccFeatures;
-        T* outputBufD2 = outputBufD1 + this->_m_mfcc._m_params.m_numMfccFeatures;
-        const uint32_t ptrIncr = this->_m_mfcc._m_params.m_numMfccFeatures * 2; /* (3 vectors - 1 vector) */
+        T* outputBufD1 = outputBuf + this->m_mfcc->m_params.m_numMfccFeatures;
+        T* outputBufD2 = outputBufD1 + this->m_mfcc->m_params.m_numMfccFeatures;
+        const uint32_t ptrIncr = this->m_mfcc->m_params.m_numMfccFeatures * 2; // (3 vectors - 1 vector) 
 
         const float minVal = std::numeric_limits<T>::min();
         const float maxVal = std::numeric_limits<T>::max();
 
-        /* We need to do a transpose while copying and concatenating
-         * the tensor*/
-        for (uint32_t j = 0; j < this->_m_mfcc._m_params.m_numMfccVectors; ++j) {
-            for (uint32_t i = 0; i < this->_m_mfcc._m_params.m_numMfccFeatures; ++i)
+        // We need to do a transpose while copying and concatenating the tensor
+        for (uint32_t j = 0; j < this->m_mfcc->m_params.m_numMfccVectors; ++j) 
+        {
+            for (uint32_t i = 0; i < this->m_mfcc->m_params.m_numMfccFeatures; ++i) 
             {
-                *outputBufMfcc++ = static_cast<T>(this->_GetQuantElem(
-                        this->_m_mfccBuf(i, j), quantScale,
+                *outputBufMfcc++ = static_cast<T>(Wav2LetterPreprocessor::GetQuantElem(
+                        this->m_mfccBuf(i, j), quantScale,
                         quantOffset, minVal, maxVal));
-                *outputBufD1++ = static_cast<T>(this->_GetQuantElem(
-                        this->_m_delta1Buf(i, j), quantScale,
+                *outputBufD1++ = static_cast<T>(Wav2LetterPreprocessor::GetQuantElem(
+                        this->m_delta1Buf(i, j), quantScale,
                         quantOffset, minVal, maxVal));
-                *outputBufD2++ = static_cast<T>(this->_GetQuantElem(
-                        this->_m_delta2Buf(i, j), quantScale,
+                *outputBufD2++ = static_cast<T>(Wav2LetterPreprocessor::GetQuantElem(
+                        this->m_delta2Buf(i, j), quantScale,
                         quantOffset, minVal, maxVal));
             }
             outputBufMfcc += ptrIncr;
             outputBufD1 += ptrIncr;
             outputBufD2 += ptrIncr;
         }
-
         return true;
     }
 };
 
+#endif //SPEECH_RECOGNITION_EXAMPLE_WAV2LETTERPREPROCESSOR_HPP

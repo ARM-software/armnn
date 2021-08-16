@@ -6,9 +6,10 @@
 #include <catch.hpp>
 #include <limits>
 
-#include "MFCC.hpp"
+#include "Wav2LetterMFCC.hpp"
 
-const std::vector<float> testWav = std::vector<float>{
+const std::vector<float> testWav = std::vector<float>
+{
     -3.0f, 0.0f, 1.0f, -1.0f, 2.0f, 3.0f, -2.0f, 2.0f,
             1.0f, -2.0f, 0.0f, 3.0f, -1.0f, 8.0f, 3.0f, 2.0f,
             -1.0f, -1.0f, 2.0f, 7.0f, 3.0f, 5.0f, 6.0f, 6.0f,
@@ -84,15 +85,16 @@ TEST_CASE("Test MFCC")
 
     std::vector<float> fullAudioData;
 
-        for (auto f : testWav)
-            {
-                fullAudioData.emplace_back( f / (1<<15));
-            }
+    for (auto f : testWav)
+    {
+        fullAudioData.emplace_back( f / (1<<15));
+    }
 
+    MfccParams mfccParams(sampFreq, 128, 0, 8000, numMfccFeats,
+                          frameLenSamples, false, 1);
 
-    MfccParams mfccParams(sampFreq, 128, 0, 8000, numMfccFeats, frameLenSamples, false, 1);
-
-    MFCC mfccInst = MFCC(mfccParams);
+    Wav2LetterMFCC mfccInst = Wav2LetterMFCC(mfccParams);
+    mfccInst.Init();
     auto mfccOutput = mfccInst.MfccCompute(fullAudioData);
 
     std::vector<float> expected = { -834.96564f, 21.02699f, 18.62856f, 7.3412f, 18.90791f, -5.36034f, 6.52351f,

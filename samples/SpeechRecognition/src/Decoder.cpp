@@ -5,33 +5,32 @@
 
 #include "Decoder.hpp"
 
-namespace asr {
+namespace asr 
+{
 
-    Decoder::Decoder(std::map<int, std::string>& labels):
-            m_labels(labels)
-    {}
+Decoder::Decoder(std::map<int, std::string>& labels) :
+            m_labels(labels) {}
 
-    std::string Decoder::FilterCharacters(std::vector<char>& unfiltered)
+std::string Decoder::FilterCharacters(std::vector<char>& unfiltered) 
+{
+    std::string filtered;
+
+    for (int i = 0; i < unfiltered.size(); ++i) 
     {
-        std::string filtered = "";
-
-        for(int i = 0; i < unfiltered.size(); ++i)
+        if (unfiltered.at(i) == '$') 
         {
-            if (unfiltered.at(i) == '$')
-            {
-                continue;
-            }
-
-            else if (i + 1 < unfiltered.size() && unfiltered.at(i) == unfiltered.at(i + 1))
-            {
-                continue;
-            }
-            else
-            {
-                filtered += unfiltered.at(i);
-            }
+            continue;
+        } 
+        else if (i + 1 < unfiltered.size() && unfiltered.at(i) == unfiltered.at(i + 1)) 
+        {
+            continue;
+        } 
+        else 
+        {
+            filtered += unfiltered.at(i);
         }
-        return filtered;
     }
-}// namespace
+    return filtered;
+}
+} // namespace asr
 

@@ -47,7 +47,8 @@ include_directories(../common/include/Utils)
 include_directories(../common/include/CVUtils)
 
 file(GLOB SOURCES "src/*.cpp")
-file(GLOB COMMON_SOURCES "../common/src/**/*.cpp")
+file(GLOB CVUTILS_SOURCES "../common/src/CVUtils**/*.cpp")
+file(GLOB UTILS_SOURCES "../common/src/Utils**/*.cpp")
 list(REMOVE_ITEM SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/Main.cpp)
 file(GLOB TEST_SOURCES "test/*.cpp")
 file(GLOB APP_MAIN "src/Main.cpp")
@@ -59,7 +60,7 @@ endif()
 
 set(APP_TARGET_NAME "${CMAKE_PROJECT_NAME}")
 
-add_executable("${APP_TARGET_NAME}" ${SOURCES} ${COMMON_SOURCES} ${APP_MAIN})
+add_executable("${APP_TARGET_NAME}" ${SOURCES} ${CVUTILS_SOURCES} ${UTILS_SOURCES} ${APP_MAIN})
 
 if (NOT OPENCV_LIBS_FOUND)
     message("Building OpenCV libs")

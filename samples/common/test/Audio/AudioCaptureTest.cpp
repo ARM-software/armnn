@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -14,7 +14,7 @@ TEST_CASE("Test capture of audio file")
     std::string testResources = TEST_RESOURCE_DIR;
     REQUIRE(testResources != "");
     std::string file =  testResources + "/" + "myVoiceIsMyPassportVerifyMe04.wav";
-    asr::AudioCapture capture;
+    audio::AudioCapture capture;
     std::vector<float> audioData = capture.LoadAudioFile(file);
     capture.InitSlidingWindow(audioData.data(), audioData.size(), 47712, 16000);
 
@@ -49,7 +49,7 @@ TEST_CASE("Test sliding window of audio capture")
     std::string testResources = TEST_RESOURCE_DIR;
     REQUIRE(testResources != "");
     std::string file =  testResources + "/" + "myVoiceIsMyPassportVerifyMe04.wav";
-    asr::AudioCapture capture;
+    audio::AudioCapture capture;
     std::vector<float> audioData = capture.LoadAudioFile(file);
     capture.InitSlidingWindow(audioData.data(), audioData.size(), 47712, 16000);
     capture.Next();

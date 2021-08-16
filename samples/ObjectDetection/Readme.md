@@ -247,8 +247,9 @@ LD_LIBRARY_PATH=/path/to/armnn/libs:/path/to/opencv/libs ./object_detection_exam
  --model-name [YOLO_V3_TINY | SSD_MOBILE]
 ```
 
-This application has been verified to work against the MobileNet SSD model, which can be downloaded along with it's label set from:
-* https://storage.googleapis.com/download.tensorflow.org/models/tflite/coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.zip
+This application has been verified to work against the MobileNet SSD and the YOLO V3 tiny models, which can be downloaded along with their label sets from the Arm Model Zoo:
+* https://github.com/ARM-software/ML-zoo/tree/master/models/object_detection/ssd_mobilenet_v1
+* https://github.com/ARM-software/ML-zoo/tree/master/models/object_detection/yolo_v3_tiny
 
 ---
 

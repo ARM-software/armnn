@@ -15,7 +15,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED     ON)
 set(CMAKE_C_EXTENSIONS              OFF)
 set(CMAKE_CXX_EXTENSIONS            OFF)
 
-project (speech-recognition-example)
+project (keyword-spotting-example)
 
 set(CMAKE_C_FLAGS_DEBUG         "-DDEBUG -O0 -g -fPIC -pthread")
 set(CMAKE_C_FLAGS_RELEASE       "-DNDEBUG -O3 -fPIC -pthread")

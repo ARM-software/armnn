@@ -35,8 +35,8 @@ public:
      * @param[in]   srcLen      Number of elements in the array/vector
      * @return      dot product
      */
-    static float DotProductF32(float* srcPtrA, float* srcPtrB,
-                               const int srcLen);
+    static float DotProductF32(const float* srcPtrA, float* srcPtrB,
+                               int srcLen);
 
     /**
      * @brief       Computes the squared magnitude of floating point
@@ -48,10 +48,10 @@ public:
      * @param[in]   dstLen      output buffer len (for sanity check only)
      * @return      true if successful, false otherwise
      */
-    static bool ComplexMagnitudeSquaredF32(float* ptrSrc,
-                                           const int srcLen,
+    static bool ComplexMagnitudeSquaredF32(const float* ptrSrc,
+                                           int srcLen,
                                            float* ptrDst,
-                                           const int dstLen);
+                                           int dstLen);
 
     /**
          * @brief       Computes the natural logarithms of input floating point
@@ -70,7 +70,7 @@ public:
          * @param[in]   srcLen  Number of elements in the array/vector
          * @return      average value
          */
-    static float MeanF32(float* ptrSrc, const uint32_t srcLen);
+    static float MeanF32(const float* ptrSrc, uint32_t srcLen);
 
     /**
      * @brief       Gets the standard deviation of a floating point array
@@ -80,6 +80,6 @@ public:
      * @param[in]   mean    pre-computed mean value
      * @return      standard deviation value
      */
-    static float StdDevF32(float* ptrSrc, const uint32_t srcLen,
-                           const float mean);
+    static float StdDevF32(const float* ptrSrc, uint32_t srcLen,
+                           float mean);
 };

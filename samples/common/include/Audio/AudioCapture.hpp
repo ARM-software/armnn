@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,16 +7,13 @@
 
 #include <string>
 #include <iostream>
-
-#include <math.h>
-
+#include <cmath>
 #include <vector>
-
 #include <exception>
 
 #include "SlidingWindow.hpp"
 
-namespace asr
+namespace audio
 {
 
 /**
@@ -29,19 +26,17 @@ namespace asr
     public:
 
         SlidingWindow<const float> m_window;
-        int lastReadIdx= 0;
 
         /**
         * @brief Default constructor
         */
-        AudioCapture()
-        {};
+        AudioCapture() = default;
 
         /**
         * @brief Function to load the audio data captured from the
          * input file to memory.
         */
-        std::vector<float> LoadAudioFile(std::string filePath);
+        static std::vector<float> LoadAudioFile(std::string filePath);
 
         /**
         * @brief Function to initialize the sliding window. This will set its position in memory, its
@@ -59,4 +54,4 @@ namespace asr
         */
         std::vector<float> Next();
     };
-} // namespace asr
+} // namespace audio

@@ -6,8 +6,8 @@
 #include <catch.hpp>
 #include <limits>
 
-#include "Preprocess.hpp"
 #include "DataStructures.hpp"
+#include "Wav2LetterPreprocessor.hpp"
 
 void PopulateTestWavVector(std::vector<int16_t>& vec)
 {
@@ -51,9 +51,10 @@ TEST_CASE("Preprocessing calculation INT8")
     /* Populate with dummy input */
     PopulateTestWavVector(testWav1);
 
-    MfccParams mfccParams(sampFreq, 128, 0, 8000, numMfccFeats, frameLenSamples, false, numMfccVectors);
+    MfccParams mfccParams(sampFreq, 128, 0, 8000, numMfccFeats,
+                          frameLenSamples, false, numMfccVectors);
 
-    MFCC mfccInst = MFCC(mfccParams);
+    std::unique_ptr<Wav2LetterMFCC> mfccInst = std::make_unique<Wav2LetterMFCC>(mfccParams);
 
     std::vector<float> fullAudioData;
 
@@ -65,7 +66,7 @@ TEST_CASE("Preprocessing calculation INT8")
         }
     }
 
-    Preprocess prep(frameLenSamples, windowStride, mfccInst);
+    Wav2LetterPreprocessor prep(frameLenSamples, windowStride, std::move(mfccInst));
 
     std::vector<int8_t> outputBuffer(outputBufferSize);
 

@@ -46,8 +46,8 @@ namespace asr
                     rowVector.emplace_back(static_cast<int16_t>(contextToProcess[row * rowLength + j]));
                 }
 
-                int max_index = std::distance(rowVector.begin(),std::max_element(rowVector.begin(), rowVector.end()));
-                unfilteredText.emplace_back(this->m_labels.at(max_index)[0]);
+                int maxIndex = std::distance(rowVector.begin(), std::max_element(rowVector.begin(), rowVector.end()));
+                unfilteredText.emplace_back(this->m_labels.at(maxIndex)[0]);
             }
 
             std::string filteredText = FilterCharacters(unfilteredText);

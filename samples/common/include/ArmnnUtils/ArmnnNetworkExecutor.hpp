@@ -72,6 +72,10 @@ public:
 
     int GetQuantizationOffset();
 
+    float GetOutputQuantizationScale(int tensorIndex);
+
+    int GetOutputQuantizationOffset(int tensorIndex);
+
     /**
     * @brief Runs inference on the provided input data, and stores the results in the provided InferenceResults object.
     *
@@ -200,6 +204,20 @@ template <class Tout>
 int ArmnnNetworkExecutor<Tout>::GetQuantizationOffset()
 {
     return this->m_inputBindingInfo.second.GetQuantizationOffset();
+}
+
+template <class Tout>
+float ArmnnNetworkExecutor<Tout>::GetOutputQuantizationScale(int tensorIndex)
+{
+    assert(this->m_outputLayerNamesList.size() > tensorIndex);
+    return this->m_outputBindingInfo[tensorIndex].second.GetQuantizationScale();
+}
+
+template <class Tout>
+int ArmnnNetworkExecutor<Tout>::GetOutputQuantizationOffset(int tensorIndex)
+{
+    assert(this->m_outputLayerNamesList.size() > tensorIndex);
+    return this->m_outputBindingInfo[tensorIndex].second.GetQuantizationOffset();
 }
 
 template <class Tout>

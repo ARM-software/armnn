@@ -141,6 +141,8 @@ TEST_CASE("ThrowBackendUnavailableException")
         // Caught
         CHECK_EQ(e.what(), exceptionMessage);
     }
+    // Clean up the registry for the next test.
+    BackendRegistryInstance().Deregister(mockBackendId);
 }
 
 }

@@ -804,6 +804,9 @@ TEST_CASE("BackendHintTest")
     {
         (*it)->Accept(visitor);
     }
+    // Clean up the registry for the next test.
+    backendRegistry.Deregister("MockBackend");
+    backendRegistry.Deregister("CustomBackend");
 }
 
 // Tests that OptimizeForExclusiveConnections works, fusing when needed, using BatchNorm fusing as example

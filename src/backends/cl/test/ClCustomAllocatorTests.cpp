@@ -181,7 +181,6 @@ TEST_CASE("ClCustomAllocatorCpuAccNegativeTest")
     auto customAllocator = std::make_shared<SampleClBackendCustomAllocator>();
     options.m_CustomAllocatorMap = {{"CpuAcc", std::move(customAllocator)}};
     IRuntimePtr run = IRuntime::Create(options);
-
     TensorInfo inputTensorInfo(TensorShape({1, 1}), DataType::Float32);
     INetworkPtr myNetwork = CreateTestNetwork(inputTensorInfo);
 
@@ -191,21 +190,28 @@ TEST_CASE("ClCustomAllocatorCpuAccNegativeTest")
     IOptimizedNetworkPtr optNet(nullptr, nullptr);
     std::vector<std::string> errMessages;
 
-    try
-    {
-        optNet = Optimize(*myNetwork, {"CpuAcc"}, run->GetDeviceSpec(), optOptions, errMessages);
-        FAIL("Should have thrown an exception as GetAvailablePreferredBackends() should be empty in Optimize().");
-    }
-    catch (const armnn::InvalidArgumentException& e)
-    {
-        // Different exceptions are thrown on different backends
-    }
-    CHECK(errMessages.size() > 0);
+    CHECK_THROWS_AS_MESSAGE(Optimize(*myNetwork, {"CpuAcc"}, run->GetDeviceSpec(), optOptions, errMessages),
+                            armnn::InvalidArgumentException,
+                            "Expected an exception as GetAvailablePreferredBackends() should be empty in Optimize().");
 
     auto& backendRegistry = armnn::BackendRegistryInstance();
     backendRegistry.DeregisterAllocator(NeonBackend::GetIdStatic());
 }
 
 #endif
+
+TEST_CASE("ClCustomAllocatorGpuAccNullptrTest")
+{
+    using namespace armnn;
+
+    // Create ArmNN runtime
+    IRuntime::CreationOptions options; // default options
+    auto customAllocator = std::make_shared<SampleClBackendCustomAllocator>();
+    options.m_CustomAllocatorMap = {{"GpuAcc", nullptr}};
+
+    CHECK_THROWS_AS_MESSAGE(IRuntimePtr run = IRuntime::Create(options),
+                            armnn::Exception,
+                            "Expected exception in RuntimeImpl::RuntimeImpl() as allocator was nullptr.");
+}
 
 } // test suite ClCustomAllocatorTests

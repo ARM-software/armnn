@@ -265,7 +265,6 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
 {
     const auto start_time = armnn::GetTimeNow();
     ARMNN_LOG(info) << "ArmNN v" << ARMNN_VERSION << "\n";
-
     if ( options.m_ProfilingOptions.m_TimelineEnabled && !options.m_ProfilingOptions.m_EnableProfiling )
     {
         throw RuntimeException(
@@ -282,13 +281,18 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
         // Store backend contexts for the supported ones
         try {
             auto factoryFun = BackendRegistryInstance().GetFactory(id);
+            ARMNN_ASSERT(factoryFun != nullptr);
             auto backend = factoryFun();
+            ARMNN_ASSERT(backend != nullptr);
             ARMNN_ASSERT(backend.get() != nullptr);
 
             auto customAllocatorMapIterator = options.m_CustomAllocatorMap.find(id);
             if (customAllocatorMapIterator != options.m_CustomAllocatorMap.end() &&
                 customAllocatorMapIterator->second == nullptr)
             {
+                // We need to manually clean up  the dynamic backends before throwing an exception.
+                DynamicBackendUtils::DeregisterDynamicBackends(m_DeviceSpec.GetDynamicBackends());
+                m_DeviceSpec.ClearDynamicBackends();
                 throw armnn::Exception("Allocator associated with id " + id.Get() + " is null");
             }
 

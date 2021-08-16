@@ -11,6 +11,9 @@
 #include <armnn/Utils.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <cl/ClBackend.hpp>
+#if defined(ARMCOMPUTENEON_ENABLED)
+#include <neon/NeonBackend.hpp>
+#endif
 
 #include <doctest/doctest.h>
 
@@ -166,6 +169,9 @@ TEST_CASE("ClCustomAllocatorTest")
     backendRegistry.DeregisterAllocator(ClBackend::GetIdStatic());
 }
 
+// Only run this test if NEON is enabled
+#if defined(ARMCOMPUTENEON_ENABLED)
+
 TEST_CASE("ClCustomAllocatorCpuAccNegativeTest")
 {
     using namespace armnn;
@@ -197,30 +203,9 @@ TEST_CASE("ClCustomAllocatorCpuAccNegativeTest")
     CHECK(errMessages.size() > 0);
 
     auto& backendRegistry = armnn::BackendRegistryInstance();
-    backendRegistry.DeregisterAllocator(ClBackend::GetIdStatic());
+    backendRegistry.DeregisterAllocator(NeonBackend::GetIdStatic());
 }
 
-TEST_CASE("ClCustomAllocatorGpuAccNullptrTest")
-{
-    using namespace armnn;
-
-    // Create ArmNN runtime
-    IRuntime::CreationOptions options; // default options
-    auto customAllocator = std::make_shared<SampleClBackendCustomAllocator>();
-    options.m_CustomAllocatorMap = {{"GpuAcc", nullptr}};
-
-    try
-    {
-        IRuntimePtr run = IRuntime::Create(options);
-        FAIL("Should have thrown an exception in RuntimeImpl::RuntimeImpl().");
-    }
-    catch (const armnn::Exception& e)
-    {
-        // Caught successfully
-    }
-
-    auto& backendRegistry = armnn::BackendRegistryInstance();
-    backendRegistry.DeregisterAllocator(ClBackend::GetIdStatic());
-}
+#endif
 
 } // test suite ClCustomAllocatorTests

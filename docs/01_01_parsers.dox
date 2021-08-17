@@ -22,7 +22,7 @@ bindings take a look into the @ref md_python_pyarmnn_README section.
 
 
 
-@section S5_onnx_parser ArmNN Onnx Parser
+@section S5_onnx_parser Arm NN Onnx Parser
 
 `armnnOnnxParser` is a library for loading neural networks defined in ONNX protobuf files into the Arm NN runtime.
 
@@ -92,7 +92,7 @@ More machine learning operators will be supported in future releases.
 
 
 
-@section S6_tf_lite_parser ArmNN Tf Lite Parser
+@section S6_tf_lite_parser Arm NN Tf Lite Parser
 
 `armnnTfLiteParser` is a library for loading neural networks defined by TensorFlow Lite FlatBuffers files
 into the Arm NN runtime.

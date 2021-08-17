@@ -183,7 +183,7 @@ public:
                                                MemorySourceFlags outputFlags);
 
     /// Returns the version of the Backend API
-    static constexpr BackendVersion GetApiVersion() { return BackendVersion(1, 1); }
+    static constexpr BackendVersion GetApiVersion() { return BackendVersion(1, 0); }
 
     /// Returns a BackendCapability if the backend lists the capability
     /// The BackendCapability must then be inspected to check whether or not that BackendCapability is supported

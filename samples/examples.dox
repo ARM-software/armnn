@@ -1,0 +1,41 @@
+/// Copyright (c) 2021 ARM Limited and Contributors. All rights reserved.
+///
+/// SPDX-License-Identifier: MIT
+///
+
+namespace armnn
+{
+/**
+This is a very simple example which uses the Arm NN SDK API to create a neural network which consists of
+nothing else but a single fully connected layer with a single weights value. It's as minimalistic as it can get.
+
+@note Most of our users won't use our API to create a network manually. Usually you would use one of our software
+      tools like the @ref S6_tf_lite_parser "TfLite Parser" that will translate a TfLite model into Arm NN for you.
+      Still it's a very nice example to see how an Arm NN network is created, optimized and executed.
+
+      (You can find more complex examples using the TfLite Parser in samples/ObjectDetection and
+       samples/SpeechRecognition. And another example using @ref md_python_pyarmnn_README "PyArmnn" in
+       samples/ImageClassification)
+@example SimpleSample.cpp
+**/
+
+/**
+This is simple example that shows how to use a dynamic backend. Dynamic Backends can be compiled as standalone
+against Arm NN and can be loaded by Arm NN dynamically at runtime. This way you can quickly integrate new backends
+without having to worry or recompile Arm NN.
+
+This example makes use of a very simplistic dynamic backend called 'SampleDynamic'. There is a guide that tells you
+more about dynamic backends and how this particular backend was created so you can create a dynamic backend
+yourself @ref md_src_dynamic_README.
+@example DynamicSample.cpp
+**/
+
+/**
+This example is basically a copy of the SimpleSample example. But it makes use of a CustomAllocator to allocate
+memory for the inputs, outputs and inter layer memory.
+
+@note This is currently an experimental interface
+@example CustomMemoryAllocatorSample.cpp
+**/
+
+}

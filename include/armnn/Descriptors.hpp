@@ -402,6 +402,10 @@ struct FullyConnectedDescriptor : BaseDescriptor
     }
 
     /// Get the number of views/inputs.
+    ARMNN_DEPRECATED_MSG("Use GetNumInputs instead")
+    uint32_t GetNumViews() const;
+
+    /// Get the number of views/inputs.
     uint32_t GetNumInputs() const;
 
     /// Enable/disable bias.

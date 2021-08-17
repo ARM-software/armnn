@@ -425,6 +425,11 @@ int StridedSliceDescriptor::GetStopForAxis(const TensorShape& inputShape,
 
 }
 
+uint32_t FullyConnectedDescriptor::GetNumViews() const
+{
+    return GetNumInputs();
+}
+
 uint32_t FullyConnectedDescriptor::GetNumInputs() const
 {
     // Return 2 otherwise check if bias is enabled

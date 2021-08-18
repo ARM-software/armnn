@@ -21,6 +21,7 @@ struct VisitorNoThrowPolicy
 };
 
 /// Visitor base class with empty implementations.
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 template<typename DefaultPolicy>
 class LayerVisitorBase : public ILayerVisitor
 {
@@ -280,5 +281,6 @@ public:
                              const char*) override { DefaultPolicy::Apply(__func__); }
 
 };
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

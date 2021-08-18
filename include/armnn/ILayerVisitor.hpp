@@ -16,6 +16,7 @@ namespace armnn
 class ILayerVisitor
 {
 protected:
+    ARMNN_DEPRECATED_MSG("Use ABI stable IStrategy instead.")
     ILayerVisitor() {}
     virtual ~ILayerVisitor() {}
 

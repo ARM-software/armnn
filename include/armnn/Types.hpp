@@ -56,6 +56,15 @@ enum class DataLayout
     NHWC = 2
 };
 
+/// Define the behaviour of the internal profiler when outputting network details
+enum class ProfilingDetailsMethod
+{
+    Undefined = 0,
+    DetailsWithEvents = 1,
+    DetailsOnly = 2
+};
+
+
 enum class QosExecPriority
 {
     Low    = 0,

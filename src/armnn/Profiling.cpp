@@ -163,7 +163,7 @@ void ProfilerImpl::AnalyzeEventSequenceAndWriteResults(ItertType first, ItertTyp
 
 ProfilerImpl::ProfilerImpl()
     : m_ProfilingEnabled(false),
-      m_EnableDetailsToStdOut(false)
+      m_DetailsToStdOutMethod(ProfilingDetailsMethod::Undefined)
 {
     m_EventSequence.reserve(g_ProfilingEventCountHint);
 
@@ -197,9 +197,9 @@ void ProfilerImpl::EnableProfiling(bool enableProfiling)
     m_ProfilingEnabled = enableProfiling;
 }
 
-void ProfilerImpl::EnableNetworkDetailsToStdOut()
+void ProfilerImpl::EnableNetworkDetailsToStdOut(ProfilingDetailsMethod details)
 {
-    m_EnableDetailsToStdOut = true;
+    m_DetailsToStdOutMethod = details;
 }
 
 Event* ProfilerImpl::BeginEvent(armnn::IProfiler* profiler,
@@ -384,7 +384,9 @@ void ProfilerImpl::Print(std::ostream& outStream) const
     printer.PrintHeader();
     printer.PrintArmNNHeader();
 
-    if (m_ProfilingDetails.get()->DetailsExist() && m_EnableDetailsToStdOut)
+    if (m_ProfilingDetails.get()->DetailsExist() &&
+        (m_DetailsToStdOutMethod == ProfilingDetailsMethod::DetailsOnly
+         || m_DetailsToStdOutMethod == ProfilingDetailsMethod::DetailsWithEvents))
     {
         JsonChildObject detailsObject{ "layer_details" };
         ConfigureDetailsObject(detailsObject, m_ProfilingDetails.get()->GetProfilingDetails());
@@ -395,8 +397,10 @@ void ProfilerImpl::Print(std::ostream& outStream) const
 
     // print inference object, also prints child layer and kernel measurements
     size_t id = 0;
-    printer.PrintJsonChildObject(inferenceObject, id);
-
+    if (m_DetailsToStdOutMethod != ProfilingDetailsMethod::DetailsOnly)
+    {
+        printer.PrintJsonChildObject(inferenceObject, id);
+    }
     // end of ArmNN
     printer.PrintNewLine();
     printer.PrintFooter();
@@ -409,6 +413,11 @@ void ProfilerImpl::Print(std::ostream& outStream) const
     // Restores previous precision settings.
     outStream.flags(oldFlags);
     outStream.precision(oldPrecision);
+
+    if (m_DetailsToStdOutMethod == ProfilingDetailsMethod::DetailsOnly)
+    {
+        exit(0);
+    }
 }
 
 void ProfilerImpl::AnalyzeEventsAndWriteResults(std::ostream& outStream) const
@@ -545,9 +554,9 @@ void IProfiler::EnableProfiling(bool enableProfiling)
     pProfilerImpl->EnableProfiling(enableProfiling);
 }
 
-void IProfiler::EnableNetworkDetailsToStdOut()
+void IProfiler::EnableNetworkDetailsToStdOut(ProfilingDetailsMethod detailsMethod)
 {
-    pProfilerImpl->EnableNetworkDetailsToStdOut();
+    pProfilerImpl->EnableNetworkDetailsToStdOut(detailsMethod);
 }
 
 bool IProfiler::IsProfilingEnabled()

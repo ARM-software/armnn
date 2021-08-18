@@ -60,7 +60,7 @@ public:
     bool IsProfilingEnabled();
 
     // Enables outputting the layer descriptors and infos to stdout
-    void EnableNetworkDetailsToStdOut();
+    void EnableNetworkDetailsToStdOut(ProfilingDetailsMethod detailsMethod);
 
     // Increments the event tag, allowing grouping of events in a user-defined manner (e.g. per inference).
     void UpdateEventTag();
@@ -102,7 +102,8 @@ public:
     std::vector<EventPtr> m_EventSequence;
     DescPtr m_ProfilingDetails = std::make_unique<ProfilingDetails>();
     bool m_ProfilingEnabled;
-    bool m_EnableDetailsToStdOut;
+    ProfilingDetailsMethod m_DetailsToStdOutMethod;
+
 };
 
 // Singleton profiler manager.

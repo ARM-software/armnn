@@ -410,9 +410,14 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  cxxopts::value<uint32_t>(m_RuntimeOptions.m_ProfilingOptions.m_CapturePeriod)->default_value("150"))
 
                 ("output-network-details",
-                 "Outputs layer tensor infos and descriptors to std out. Defaults to off.",
+                 "Outputs layer tensor infos and descriptors to std out along with profiling events. Defaults to off.",
                  cxxopts::value<bool>(m_ExNetParams.m_OutputDetailsToStdOut)->default_value("false")
-                                                                            ->implicit_value("true"));
+                                                                            ->implicit_value("true"))
+                ("output-network-details-only",
+                 "Outputs layer tensor infos and descriptors to std out without profiling events. Defaults to off.",
+                 cxxopts::value<bool>(m_ExNetParams.m_OutputDetailsOnlyToStdOut)->default_value("false")
+                                                                                ->implicit_value("true"));
+
     }
     catch (const std::exception& e)
     {

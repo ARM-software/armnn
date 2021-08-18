@@ -127,7 +127,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
 
     m_Profiler->EnableProfiling(networkProperties.m_ProfilingEnabled);
 
-    if (networkProperties.m_OutputNetworkDetails) m_Profiler->EnableNetworkDetailsToStdOut();
+    m_Profiler->EnableNetworkDetailsToStdOut(networkProperties.m_OutputNetworkDetailsMethod);
 
     Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().TopologicalSort();
     //First create tensor handlers, backends and workload factories.

@@ -40,8 +40,8 @@ public:
     void Print(std::ostream& outStream) const;
 
     /// Print out details of each layer within the network that possesses a descriptor.
-    /// Also outputs tensor info.
-    void EnableNetworkDetailsToStdOut();
+    /// Also outputs tensor info. This will be part of the profiling json output
+    void EnableNetworkDetailsToStdOut(ProfilingDetailsMethod detailsMethod);
 
     ~IProfiler();
     IProfiler();

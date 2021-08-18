@@ -40,7 +40,7 @@ struct INetworkProperties
           m_ExportEnabled(exportEnabled),
           m_AsyncEnabled(asyncEnabled),
           m_ProfilingEnabled(profilingEnabled),
-          m_OutputNetworkDetails(false),
+          m_OutputNetworkDetailsMethod(ProfilingDetailsMethod::Undefined),
           m_InputSource(m_ImportEnabled ? MemorySource::Malloc : MemorySource::Undefined),
           m_OutputSource(m_ExportEnabled ? MemorySource::Malloc : MemorySource::Undefined)
     {}
@@ -55,7 +55,7 @@ struct INetworkProperties
           m_ExportEnabled(outputSource != MemorySource::Undefined),
           m_AsyncEnabled(asyncEnabled),
           m_ProfilingEnabled(profilingEnabled),
-          m_OutputNetworkDetails(false),
+          m_OutputNetworkDetailsMethod(ProfilingDetailsMethod::Undefined),
           m_InputSource(inputSource),
           m_OutputSource(outputSource)
     {
@@ -66,12 +66,12 @@ struct INetworkProperties
                        MemorySource inputSource,
                        MemorySource outputSource,
                        bool profilingEnabled = false,
-                       bool outputDetails = false)
+                       ProfilingDetailsMethod detailsMethod = ProfilingDetailsMethod::Undefined)
         : m_ImportEnabled(inputSource != MemorySource::Undefined),
           m_ExportEnabled(outputSource != MemorySource::Undefined),
           m_AsyncEnabled(asyncEnabled),
           m_ProfilingEnabled(profilingEnabled),
-          m_OutputNetworkDetails(outputDetails),
+          m_OutputNetworkDetailsMethod(detailsMethod),
           m_InputSource(inputSource),
           m_OutputSource(outputSource)
     {}
@@ -85,7 +85,7 @@ struct INetworkProperties
 
     const bool m_ProfilingEnabled;
 
-    const bool m_OutputNetworkDetails;
+    const ProfilingDetailsMethod m_OutputNetworkDetailsMethod;
 
     const MemorySource m_InputSource;
     const MemorySource m_OutputSource;

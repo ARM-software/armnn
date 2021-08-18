@@ -101,6 +101,7 @@ struct Params
     bool                            m_EnableFastMath;
     bool                            m_SaveCachedNetwork;
     bool                            m_OutputDetailsToStdOut;
+    bool                            m_OutputDetailsOnlyToStdOut;
     std::string                     m_CachedNetworkFilePath;
     unsigned int                    m_NumberOfThreads;
     std::string                     m_MLGOTuningFilePath;
@@ -121,6 +122,7 @@ struct Params
         , m_EnableFastMath(false)
         , m_SaveCachedNetwork(false)
         , m_OutputDetailsToStdOut(false)
+        , m_OutputDetailsOnlyToStdOut(false)
         , m_CachedNetworkFilePath("")
         , m_NumberOfThreads(0)
         , m_MLGOTuningFilePath("")
@@ -406,7 +408,8 @@ public:
                    bool enableProfiling,
                    const std::string& dynamicBackendsPath,
                    const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
-        : m_EnableProfiling(enableProfiling)
+        : m_EnableProfiling(enableProfiling),
+          m_ProfilingDetailsMethod(armnn::ProfilingDetailsMethod::Undefined)
         , m_DynamicBackendsPath(dynamicBackendsPath)
     {
         if (runtime)
@@ -420,6 +423,12 @@ public:
             options.m_DynamicBackendsPath = m_DynamicBackendsPath;
             m_Runtime = armnn::IRuntime::Create(options);
         }
+
+        // Configure the Profiler if the the profiling details are opted for
+        if (params.m_OutputDetailsOnlyToStdOut)
+            m_ProfilingDetailsMethod = armnn::ProfilingDetailsMethod::DetailsOnly;
+        else if (params.m_OutputDetailsToStdOut)
+            m_ProfilingDetailsMethod = armnn::ProfilingDetailsMethod::DetailsWithEvents;
 
         std::string invalidBackends;
         if (!CheckRequestedBackendsAreValid(params.m_ComputeDevices, armnn::Optional<std::string&>(invalidBackends)))
@@ -492,7 +501,7 @@ public:
                                                         armnn::MemorySource::Undefined,
                                                         armnn::MemorySource::Undefined,
                                                         enableProfiling,
-                                                        params.m_OutputDetailsToStdOut);
+                                                        m_ProfilingDetailsMethod);
             std::string errorMessage;
             ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, std::move(optNet), errorMessage, networkProperties);
 
@@ -744,6 +753,7 @@ private:
     std::vector<armnn::BindingPointInfo> m_InputBindings;
     std::vector<armnn::BindingPointInfo> m_OutputBindings;
     bool m_EnableProfiling;
+    armnn::ProfilingDetailsMethod m_ProfilingDetailsMethod;
     std::string m_DynamicBackendsPath;
 
     template<typename TContainer>

@@ -44,6 +44,7 @@ struct ExecuteNetworkParams
     std::string                   m_ModelPath;
     unsigned int                  m_NumberOfThreads;
     bool                          m_OutputDetailsToStdOut;
+    bool                          m_OutputDetailsOnlyToStdOut;
     std::vector<std::string>      m_OutputNames;
     std::vector<std::string>      m_OutputTensorFiles;
     std::vector<std::string>      m_OutputTypes;

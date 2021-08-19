@@ -119,6 +119,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - ELU
 - EQUAL
 - EXP
+- EXPAND_DIMS
 - FULLY_CONNECTED, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - GATHER
 - GREATER
@@ -149,6 +150,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - RESIZE_BILINEAR
 - RESIZE_NEAREST_NEIGHBOR
 - RSQRT
+- SHAPE
 - SLICE
 - SOFTMAX
 - SPACE_TO_BATCH

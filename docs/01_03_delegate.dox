@@ -139,6 +139,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - RSQRT
 
+- SHAPE
+
 - SOFTMAX
 
 - SPACE_TO_BATCH_ND

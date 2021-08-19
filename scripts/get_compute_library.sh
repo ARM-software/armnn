@@ -75,6 +75,12 @@ fi
 
 git fetch && git fetch https://review.mlplatform.org/ml/ComputeLibrary && git checkout ${CLFRAMEWORKREVISION}
 AssertZeroExitCode "Fetching and checking out ${CLFRAMEWORKREVISION} failed"
+# If the target ACL revision includes a branch we also need to do a pull.
+# This generally occurs with a release branch.
+if [[ "${CLFRAMEWORKREVISION}" == *"branches"* ]]; then
+    git pull
+    AssertZeroExitCode "ACL reference includes a branch but git pull failed."
+fi
 
 # Set commit hook so we can submit reviews to gerrit
 (curl -Lo `git rev-parse --git-dir`/hooks/commit-msg https://review.mlplatform.org/tools/hooks/commit-msg; chmod +x `git rev-parse --git-dir`/hooks/commit-msg)

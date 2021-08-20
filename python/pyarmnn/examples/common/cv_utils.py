@@ -32,12 +32,18 @@ def preprocess(frame: np.ndarray, input_binding_info: tuple):
     resized_frame = resize_with_aspect_ratio(frame, input_binding_info)
 
     # Expand dimensions and convert data type to match model input
-    data_type = np.float32 if input_binding_info[1].GetDataType() == ann.DataType_Float32 else np.uint8
+    if input_binding_info[1].GetDataType() == ann.DataType_Float32:
+        data_type = np.float32
+        resized_frame = resized_frame.astype("float32")/255
+    else:
+        data_type = np.uint8
+
     resized_frame = np.expand_dims(np.asarray(resized_frame, dtype=data_type), axis=0)
     assert resized_frame.shape == tuple(input_binding_info[1].GetShape())
 
     input_tensors = ann.make_input_tensors([input_binding_info], [resized_frame])
     return input_tensors
+
 
 
 def resize_with_aspect_ratio(frame: np.ndarray, input_binding_info: tuple):

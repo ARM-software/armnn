@@ -73,7 +73,7 @@ ClTransposeConvolution2dWorkload::ClTransposeConvolution2dWorkload(
     }
 
     // Report Profiling Details
-    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClTransposeConvolutionWorkload_Construct",
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClTransposeConvolution2dWorkload_Construct",
                                          descriptor.m_Parameters,
                                          detailsInfo,
                                          this->GetGuid());

@@ -19,6 +19,7 @@
 #include <armnn/backends/IMemoryManager.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
 #include <backendsCommon/MemSyncWorkload.hpp>
+#include <armnn/BackendHelper.hpp>
 
 #include <fmt/format.h>
 
@@ -143,6 +144,14 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
             auto it = m_Backends.emplace(std::make_pair(backendId, createBackend()));
 
             IBackendInternal* backend = it.first->second.get();
+
+            if (networkProperties.m_AsyncEnabled &&
+                HasCapability(BackendOptions::BackendOption{"AsyncExecution", false}, backend->GetCapabilities()))
+            {
+                std::string er = backend->GetId();
+                er += " does not support AsyncExecution";
+                throw BackendCapabilityException(er);
+            }
 
             if (backend->SupportsTensorAllocatorAPI())
             {

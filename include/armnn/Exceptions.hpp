@@ -155,6 +155,12 @@ public:
     using Exception::Exception;
 };
 
+class BackendCapabilityException : public Exception
+{
+public:
+    using Exception::Exception;
+};
+
 template <typename ExceptionType>
 void ConditionalThrow(bool condition, const std::string& message)
 {

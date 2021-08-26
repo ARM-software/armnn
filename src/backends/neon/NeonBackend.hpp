@@ -13,7 +13,10 @@ namespace armnn
 const BackendCapabilities cpuAccCapabilities("GpuAcc",
                                              {
                                                      {"NonConstWeights", false},
-                                                     {"AsyncExecution", false}
+                                                     {"AsyncExecution", false},
+                                                     {"ProtectedContentAllocation", false},
+                                                     {"ConstantTensorsAsInputs", false},
+                                                     {"PreImportIOTensors", false}
                                              });
 
 

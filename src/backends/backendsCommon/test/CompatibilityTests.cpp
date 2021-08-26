@@ -128,26 +128,27 @@ TEST_CASE("Neon_Cl_DirectCompatibility_Test")
 
 TEST_SUITE("BackendCapability")
 {
-#if defined(ARMNNREF_ENABLED)
 
-TEST_CASE("Ref_Backends_Capability_Test")
+namespace
 {
-    auto refBackend  = std::make_unique<RefBackend>();
-    auto refCapabilities = refBackend->GetCapabilities();
 
-    CHECK(armnn::HasCapability("NonConstWeights", refCapabilities));
-    CHECK(armnn::HasCapability("AsyncExecution", refCapabilities));
-
-    armnn::BackendOptions::BackendOption nonConstWeights{"NonConstWeights", true};
-    armnn::BackendOptions::BackendOption AsyncExecution{"AsyncExecution", true};
-
-    CHECK(armnn::HasCapability(nonConstWeights, refCapabilities));
-    CHECK(armnn::HasCapability(AsyncExecution, refCapabilities));
+void CapabilityTestHelper(BackendCapabilities &capabilities,
+                          std::vector<std::pair<std::string, bool>> capabilityVector)
+{
+    for (auto pair : capabilityVector)
+    {
+        CHECK_MESSAGE(armnn::HasCapability(pair.first, capabilities),
+                        pair.first << " capability was not been found");
+        CHECK_MESSAGE(armnn::HasCapability(BackendOptions::BackendOption{pair.first, pair.second}, capabilities),
+                        pair.first << " capability set incorrectly");
+    }
 }
 
-TEST_CASE("Ref_Backends_Unkown_Capability_Test")
+#if defined(ARMNNREF_ENABLED)
+
+TEST_CASE("Ref_Backends_Unknown_Capability_Test")
 {
-    auto refBackend  = std::make_unique<RefBackend>();
+    auto refBackend = std::make_unique<RefBackend>();
     auto refCapabilities = refBackend->GetCapabilities();
 
     armnn::BackendOptions::BackendOption AsyncExecutionFalse{"AsyncExecution", false};
@@ -167,44 +168,53 @@ TEST_CASE("Ref_Backends_Unkown_Capability_Test")
     CHECK(!armnn::HasCapability(unkownCapability, refCapabilities));
 }
 
+TEST_CASE ("Ref_Backends_Capability_Test")
+{
+    auto refBackend = std::make_unique<RefBackend>();
+    auto refCapabilities = refBackend->GetCapabilities();
+
+    CapabilityTestHelper(refCapabilities,
+                         {{"NonConstWeights", true},
+                          {"AsyncExecution", true},
+                          {"ProtectedContentAllocation", false},
+                          {"ConstantTensorsAsInputs", true},
+                          {"PreImportIOTensors", false}});
+}
+
 #endif
 
 #if defined(ARMCOMPUTENEON_ENABLED)
 
-TEST_CASE("Neon_Backends_Capability_Test")
+TEST_CASE ("Neon_Backends_Capability_Test")
 {
     auto neonBackend = std::make_unique<NeonBackend>();
     auto neonCapabilities = neonBackend->GetCapabilities();
 
-    CHECK(armnn::HasCapability("NonConstWeights", neonCapabilities));
-    CHECK(armnn::HasCapability("AsyncExecution", neonCapabilities));
-
-    armnn::BackendOptions::BackendOption nonConstWeights{"NonConstWeights", false};
-    armnn::BackendOptions::BackendOption AsyncExecution{"AsyncExecution", false};
-
-    CHECK(armnn::HasCapability(nonConstWeights, neonCapabilities));
-    CHECK(armnn::HasCapability(AsyncExecution, neonCapabilities));
+    CapabilityTestHelper(neonCapabilities,
+                         {{"NonConstWeights", false},
+                          {"AsyncExecution", false},
+                          {"ProtectedContentAllocation", false},
+                          {"ConstantTensorsAsInputs", false},
+                          {"PreImportIOTensors", false}});
 }
 
 #endif
 
 #if defined(ARMCOMPUTECL_ENABLED)
 
-TEST_CASE("Cl_Backends_Capability_Test")
+TEST_CASE ("Cl_Backends_Capability_Test")
 {
     auto clBackend = std::make_unique<ClBackend>();
     auto clCapabilities = clBackend->GetCapabilities();
 
-    CHECK(armnn::HasCapability("NonConstWeights", clCapabilities));
-    CHECK(armnn::HasCapability("AsyncExecution", clCapabilities));
-
-    armnn::BackendOptions::BackendOption nonConstWeights{"NonConstWeights", false};
-    armnn::BackendOptions::BackendOption AsyncExecution{"AsyncExecution", false};
-
-    CHECK(armnn::HasCapability(nonConstWeights, clCapabilities));
-    CHECK(armnn::HasCapability(AsyncExecution, clCapabilities));
+    CapabilityTestHelper(clCapabilities,
+                         {{"NonConstWeights", false},
+                          {"AsyncExecution", false},
+                          {"ProtectedContentAllocation", true},
+                          {"ConstantTensorsAsInputs", false},
+                          {"PreImportIOTensors", false}});
 }
 
 #endif
-
+}
 }

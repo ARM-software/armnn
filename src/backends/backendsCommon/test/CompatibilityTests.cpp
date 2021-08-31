@@ -132,6 +132,7 @@ TEST_SUITE("BackendCapability")
 namespace
 {
 
+#if defined(ARMNNREF_ENABLED) || defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)
 void CapabilityTestHelper(BackendCapabilities &capabilities,
                           std::vector<std::pair<std::string, bool>> capabilityVector)
 {
@@ -143,6 +144,7 @@ void CapabilityTestHelper(BackendCapabilities &capabilities,
                         pair.first << " capability set incorrectly");
     }
 }
+#endif
 
 #if defined(ARMNNREF_ENABLED)
 

@@ -165,6 +165,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - TRANSPOSE_CONV
 
+- UNIDIRECTIONAL_SEQUENCE_LSTM
+
 - UNPACK
 
 More machine learning operators will be supported in future releases.

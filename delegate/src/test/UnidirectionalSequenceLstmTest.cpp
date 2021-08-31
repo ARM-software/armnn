@@ -786,7 +786,615 @@ void UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionWithLayerNormTest
                                               isTimeMajor);
 }
 
+void UnidirectionalSequenceLstmInt8Test(std::vector<armnn::BackendId>& backends)
+{
+    int32_t batchSize = 3;
+    int32_t timeSize = 2;
+    int32_t inputSize = 3;
+    int32_t outputSize = 4;
+    // cellSize and outputSize have the same size when there is no projection.
+    int32_t numUnits = outputSize;
 
+    //tensorInfo12
+    bool hasInputToInputWeights = true;
+    std::vector<int8_t> inputToInputWeights = { -4, -1, -1, -2, 3, -2, 2, 4, 1, -4, -2, 3 };
+
+    std::vector<int8_t> inputToForgetWeights = { 2, 1, 4, -4, 3, -1, -3, -2, -3, 1, -4, -1 };
+
+    std::vector<int8_t> inputToCellWeights = { -2, 1, -2, 4, -3, -2, -4, 3, -2, -2, -6, 3 };
+
+    std::vector<int8_t> inputToOutputWeights = { 2, 5, -4, 5, 2, -3, 5, 7, 3, -5, 1, -4 };
+
+    //tensorInfo16
+    bool hasRecurrentToInputWeights = true;
+    std::vector<int8_t> recurrentToInputWeights = { -1, 1, -1, 1, -3, -4, -1, 4, 2, 3, 5, -1, 1, 3, -1, -1 };
+
+    std::vector<int8_t> recurrentToForgetWeights = { -1, 1, -1, 1, -3, -4, -1, 4, 2, 3, 5, -1, 1, 3, -2, -1 };
+
+    std::vector<int8_t> recurrentToCellWeights = { -2, -3, -1, -3, -4, 2, 1, -1, 2, 2, 1, 2, 3, -2, 3, -3 };
+
+    std::vector<int8_t> recurrentToOutputWeights = { -3, 3, -1, -2, -2, -2, -1, -5, 1, 3, -4, -1, -1, -1, 2, -1 };
+
+    // tensorInfo4
+    bool hasCellToInputWeights = false;
+    std::vector<int8_t> cellToInputWeights;
+    bool hasCellToForgetWeights = false;
+    std::vector<int8_t> cellToForgetWeights;
+    bool hasCellToOutputWeights = false;
+    std::vector<int8_t> cellToOutputWeights;
+
+    bool hasInputGateBias = true;
+    std::vector<float> inputGateBias = { 0., 0., 0., 0. };
+    std::vector<float> forgetGateBias = { 1., 1., 1., 1. };
+    std::vector<float> cellBias = { 0., 0., 0., 0. };
+    std::vector<float> outputGateBias = { 0., 0., 0., 0. };
+
+    bool hasProjectionWeights = false;
+    std::vector<int8_t> projectionWeights;
+    bool hasProjectionBias = false;
+    std::vector<float> projectionBias;
+
+    bool hasInputLayerNormWeights = false;
+    std::vector<float> inputLayerNormWeights;
+    bool hasForgetLayerNormWeights = false;
+    std::vector<float> forgetLayerNormWeights;
+    bool hasCellLayerNormWeights = false;
+    std::vector<float> cellLayerNormWeights;
+    bool hasOutputLayerNormWeights = false;
+    std::vector<float> outputLayerNormWeights;
+
+    std::vector<float> inputValues = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.4f,
+                                       0.3f, 0.2f, 0.1f, 0.2f, 0.3f, 0.4f,
+                                       0.5f, 0.4f, 0.3f, 0.2f, 0.1f, 0.2f };
+
+    std::vector<float> expectedOutputValues = { -0.0142517f, -0.0198845f, -0.0120569f, -0.0116868f,
+                                                -0.0350714f, -0.0343202f, -0.047504f, -0.0569789f,
+                                                -0.0146346f, 0.0106663f, -0.0247238f, -0.0319502f,
+                                                -0.0294759f, -0.0129935f, -0.0444175f, -0.0444354f,
+                                                -0.0280855f, 0.00545101f, -0.051422f, -0.0463838f,
+                                                -0.0310702f, 0.00915739f, -0.0625207f, -0.0482648f };
+
+    tflite::ActivationFunctionType activationFunction = tflite::ActivationFunctionType_TANH;
+    float clippingThresCell = 10.f;
+    float clippingThresProj = 0.f;
+    bool isTimeMajor = false;
+
+    UnidirectionalSequenceLstmTestImpl<int8_t>(backends,
+                                               ::tflite::TensorType_INT8,
+                                               batchSize,
+                                               timeSize,
+                                               inputSize,
+                                               outputSize,
+                                               numUnits,
+                                               hasInputToInputWeights,
+                                               inputToInputWeights,
+                                               inputToForgetWeights,
+                                               inputToCellWeights,
+                                               inputToOutputWeights,
+                                               hasRecurrentToInputWeights,
+                                               recurrentToInputWeights,
+                                               recurrentToForgetWeights,
+                                               recurrentToCellWeights,
+                                               recurrentToOutputWeights,
+                                               hasCellToInputWeights,
+                                               cellToInputWeights,
+                                               hasCellToForgetWeights,
+                                               cellToForgetWeights,
+                                               hasCellToOutputWeights,
+                                               cellToOutputWeights,
+                                               hasInputGateBias,
+                                               inputGateBias,
+                                               forgetGateBias,
+                                               cellBias,
+                                               outputGateBias,
+                                               hasProjectionWeights,
+                                               projectionWeights,
+                                               hasProjectionBias,
+                                               projectionBias,
+                                               hasInputLayerNormWeights,
+                                               inputLayerNormWeights,
+                                               hasForgetLayerNormWeights,
+                                               forgetLayerNormWeights,
+                                               hasCellLayerNormWeights,
+                                               cellLayerNormWeights,
+                                               hasOutputLayerNormWeights,
+                                               outputLayerNormWeights,
+                                               inputValues,
+                                               expectedOutputValues,
+                                               activationFunction,
+                                               clippingThresCell,
+                                               clippingThresProj,
+                                               isTimeMajor,
+                                               0.1f);
+}
+
+void UnidirectionalSequenceLstmInt8TimeMajorTest(std::vector<armnn::BackendId>& backends)
+{
+    int32_t batchSize = 3;
+    int32_t timeSize = 2;
+    int32_t inputSize = 3;
+    int32_t outputSize = 4;
+    // cellSize and outputSize have the same size when there is no projection.
+    int32_t numUnits = outputSize;
+
+    //tensorInfo12
+    bool hasInputToInputWeights = true;
+    std::vector<int8_t> inputToInputWeights = { -4, -1, -1, -2, 3, -2, 2, 4, 1, -4, -2, 3 };
+
+    std::vector<int8_t> inputToForgetWeights = { 2, 1, 4, -4, 3, -1, -3, -2, -3, 1, -4, -1 };
+
+    std::vector<int8_t> inputToCellWeights = { -2, 1, -2, 4, -3, -2, -4, 3, -2, -2, -6, 3 };
+
+    std::vector<int8_t> inputToOutputWeights = { 2, 5, -4, 5, 2, -3, 5, 7, 3, -5, 1, -4 };
+
+    //tensorInfo16
+    bool hasRecurrentToInputWeights = true;
+    std::vector<int8_t> recurrentToInputWeights = { -1, 1, -1, 1, -3, -4, -1, 4, 2, 3, 5, -1, 1, 3, -1, -1 };
+
+    std::vector<int8_t> recurrentToForgetWeights = { -1, 1, -1, 1, -3, -4, -1, 4, 2, 3, 5, -1, 1, 3, -2, -1 };
+
+    std::vector<int8_t> recurrentToCellWeights = { -2, -3, -1, -3, -4, 2, 1, -1, 2, 2, 1, 2, 3, -2, 3, -3 };
+
+    std::vector<int8_t> recurrentToOutputWeights = { -3, 3, -1, -2, -2, -2, -1, -5, 1, 3, -4, -1, -1, -1, 2, -1 };
+
+    // tensorInfo4
+    bool hasCellToInputWeights = false;
+    std::vector<int8_t> cellToInputWeights;
+    bool hasCellToForgetWeights = false;
+    std::vector<int8_t> cellToForgetWeights;
+    bool hasCellToOutputWeights = false;
+    std::vector<int8_t> cellToOutputWeights;
+
+    bool hasInputGateBias = true;
+    std::vector<float> inputGateBias = { 0., 0., 0., 0. };
+    std::vector<float> forgetGateBias = { 1., 1., 1., 1. };
+    std::vector<float> cellBias = { 0., 0., 0., 0. };
+    std::vector<float> outputGateBias = { 0., 0., 0., 0. };
+
+    bool hasProjectionWeights = false;
+    std::vector<int8_t> projectionWeights;
+    bool hasProjectionBias = false;
+    std::vector<float> projectionBias;
+
+    bool hasInputLayerNormWeights = false;
+    std::vector<float> inputLayerNormWeights;
+    bool hasForgetLayerNormWeights = false;
+    std::vector<float> forgetLayerNormWeights;
+    bool hasCellLayerNormWeights = false;
+    std::vector<float> cellLayerNormWeights;
+    bool hasOutputLayerNormWeights = false;
+    std::vector<float> outputLayerNormWeights;
+
+    std::vector<float> inputValues = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.4f,
+                                       0.3f, 0.2f, 0.1f, 0.2f, 0.3f, 0.4f,
+                                       0.5f, 0.4f, 0.3f, 0.2f, 0.1f, 0.2f };
+
+    std::vector<float> expectedOutputValues = { -0.0142517f, -0.0198845f, -0.0120122f, -0.0116868f,
+                                                -0.0261295f, -0.0188487f, -0.0345463f, -0.049733f,
+                                                -0.0146346f, 0.0106663f, -0.0247238f, -0.0319502f,
+                                                -0.0291863f, -0.0369402f, -0.0354071f, -0.0296529f,
+                                                -0.0419539f, -0.00617731f, -0.0814796f, -0.0804005f,
+                                                -0.0244737f, 0.0119905f, -0.0457527f, -0.0331862f };
+
+    tflite::ActivationFunctionType activationFunction = tflite::ActivationFunctionType_TANH;
+    float clippingThresCell = 10.f;
+    float clippingThresProj = 0.f;
+    bool isTimeMajor = true;
+
+    UnidirectionalSequenceLstmTestImpl<int8_t>(backends,
+                                               ::tflite::TensorType_INT8,
+                                               batchSize,
+                                               timeSize,
+                                               inputSize,
+                                               outputSize,
+                                               numUnits,
+                                               hasInputToInputWeights,
+                                               inputToInputWeights,
+                                               inputToForgetWeights,
+                                               inputToCellWeights,
+                                               inputToOutputWeights,
+                                               hasRecurrentToInputWeights,
+                                               recurrentToInputWeights,
+                                               recurrentToForgetWeights,
+                                               recurrentToCellWeights,
+                                               recurrentToOutputWeights,
+                                               hasCellToInputWeights,
+                                               cellToInputWeights,
+                                               hasCellToForgetWeights,
+                                               cellToForgetWeights,
+                                               hasCellToOutputWeights,
+                                               cellToOutputWeights,
+                                               hasInputGateBias,
+                                               inputGateBias,
+                                               forgetGateBias,
+                                               cellBias,
+                                               outputGateBias,
+                                               hasProjectionWeights,
+                                               projectionWeights,
+                                               hasProjectionBias,
+                                               projectionBias,
+                                               hasInputLayerNormWeights,
+                                               inputLayerNormWeights,
+                                               hasForgetLayerNormWeights,
+                                               forgetLayerNormWeights,
+                                               hasCellLayerNormWeights,
+                                               cellLayerNormWeights,
+                                               hasOutputLayerNormWeights,
+                                               outputLayerNormWeights,
+                                               inputValues,
+                                               expectedOutputValues,
+                                               activationFunction,
+                                               clippingThresCell,
+                                               clippingThresProj,
+                                               isTimeMajor,
+                                               0.1);
+}
+
+void UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionTest(std::vector<armnn::BackendId>& backends)
+{
+    int32_t batchSize = 3;
+    int32_t timeSize = 2;
+    int32_t inputSize = 3;
+    int32_t outputSize = 4;
+    int32_t numUnits = 4;
+
+    bool hasInputToInputWeights = true;
+    std::vector<int8_t> inputToInputWeights = { -4, -1, -1, -2, 3, -2, 2, 4, 1, -4, -2, 3 };
+
+    std::vector<int8_t> inputToForgetWeights = { 2, 1, 4, -4, 3, -1, -3, -2, -3, 1, -4, -1 };
+
+    std::vector<int8_t> inputToCellWeights = { -2, 1, -2, 4, -3, -2, -4, 3, -2, -2, -6, 3 };
+
+    std::vector<int8_t> inputToOutputWeights = { 2, 5, -4, 5, 2, -3, 5, 7, 3, -5, 1, -4 };
+
+    //tensorInfo16
+    bool hasRecurrentToInputWeights = true;
+    std::vector<int8_t> recurrentToInputWeights = { -1, 1, -1, 1, -3, -4, -1, 4, 2, 3, 5, -1, 1, 3, -1, -1 };
+
+    std::vector<int8_t> recurrentToForgetWeights = { -1, 1, -1, 1, -3, -4, -1, 4, 2, 3, 5, -1, 1, 3, -2, -1 };
+
+    std::vector<int8_t> recurrentToCellWeights = { -2, -3, -1, -3, -4, 2, 1, -1, 2, 2, 1, 2, 3, -2, 3, -3 };
+
+    std::vector<int8_t> recurrentToOutputWeights = { -3, 3, -1, -2, -2, -2, -1, -5, 1, 3, -4, -1, -1, -1, 2, -1 };
+
+    // tensorInfo4
+    bool hasCellToInputWeights = true;
+    std::vector<int8_t> cellToInputWeights = { 5, 10, 25, 15 };
+    bool hasCellToForgetWeights = true;
+    std::vector<int8_t> cellToForgetWeights = { -5, 15, 25, 3 };
+    bool hasCellToOutputWeights = true;
+    std::vector<int8_t> cellToOutputWeights = { 10, -10, -5, 50 };
+
+    bool hasInputGateBias = true;
+    std::vector<float> inputGateBias = { 0.02234832f,  0.14757581f,   0.18176508f,  0.10380666f};
+    std::vector<float> forgetGateBias = { 0.035185695f, -0.042891346f, -0.3032477f, 0.23027696f};
+    std::vector<float> cellBias = { -0.124379363f, 0.55531194f, 0.23377132f,   0.033463873f };
+    std::vector<float> outputGateBias = { 0.046159424f,  -0.12809046f, 0.03563469f, 0.12648113f };
+
+    bool hasProjectionWeights = true;
+    std::vector<int8_t> projectionWeights = { -25, 51, 3, -5, 25, 127, 77, 20, 18, 51, -10, 51, -25, 88, 77, -13 };
+    bool hasProjectionBias = true;
+    std::vector<float> projectionBias(outputSize, 0.f);
+
+    bool hasInputLayerNormWeights = false;
+    std::vector<float> inputLayerNormWeights;
+    bool hasForgetLayerNormWeights = false;
+    std::vector<float> forgetLayerNormWeights;
+    bool hasCellLayerNormWeights = false;
+    std::vector<float> cellLayerNormWeights;
+    bool hasOutputLayerNormWeights = false;
+    std::vector<float> outputLayerNormWeights;
+
+    std::vector<float> inputValues = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.4f,
+                                       0.3f, 0.2f, 0.1f, 0.2f, 0.3f, 0.4f,
+                                       0.5f, 0.4f, 0.3f, 0.2f, 0.1f, 0.2f };
+
+    std::vector<float> expectedOutputValues = { 0.612103f, 1.56788f, 0.31966f, 1.42956f,
+                                                0.909718f, 3.07916f, -0.560586f, 3.8907f,
+                                                0.753671f, 1.77485f, 0.365122f, 1.60077f,
+                                                0.812644f, 2.79092f, -0.605396f, 3.61742f,
+                                                0.791857f, 1.64353f, 0.316588f, 1.55192f,
+                                                0.807265f, 2.47012f, -0.539598f, 3.25654f };
+
+    tflite::ActivationFunctionType activationFunction = tflite::ActivationFunctionType_TANH;
+    float clippingThresCell = 10.f;
+    float clippingThresProj = 0.f;
+    bool isTimeMajor = false;
+
+    UnidirectionalSequenceLstmTestImpl<int8_t>(backends,
+                                               ::tflite::TensorType_INT8,
+                                               batchSize,
+                                               timeSize,
+                                               inputSize,
+                                               outputSize,
+                                               numUnits,
+                                               hasInputToInputWeights,
+                                               inputToInputWeights,
+                                               inputToForgetWeights,
+                                               inputToCellWeights,
+                                               inputToOutputWeights,
+                                               hasRecurrentToInputWeights,
+                                               recurrentToInputWeights,
+                                               recurrentToForgetWeights,
+                                               recurrentToCellWeights,
+                                               recurrentToOutputWeights,
+                                               hasCellToInputWeights,
+                                               cellToInputWeights,
+                                               hasCellToForgetWeights,
+                                               cellToForgetWeights,
+                                               hasCellToOutputWeights,
+                                               cellToOutputWeights,
+                                               hasInputGateBias,
+                                               inputGateBias,
+                                               forgetGateBias,
+                                               cellBias,
+                                               outputGateBias,
+                                               hasProjectionWeights,
+                                               projectionWeights,
+                                               hasProjectionBias,
+                                               projectionBias,
+                                               hasInputLayerNormWeights,
+                                               inputLayerNormWeights,
+                                               hasForgetLayerNormWeights,
+                                               forgetLayerNormWeights,
+                                               hasCellLayerNormWeights,
+                                               cellLayerNormWeights,
+                                               hasOutputLayerNormWeights,
+                                               outputLayerNormWeights,
+                                               inputValues,
+                                               expectedOutputValues,
+                                               activationFunction,
+                                               clippingThresCell,
+                                               clippingThresProj,
+                                               isTimeMajor,
+                                               0.1f);
+}
+
+void UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoProjectionTest(std::vector<armnn::BackendId>& backends)
+{
+    int32_t batchSize = 3;
+    int32_t timeSize = 2;
+    int32_t inputSize = 3;
+    int32_t outputSize = 4;
+    // cellSize and outputSize have the same size when there is no projection.
+    int32_t numUnits = outputSize;
+
+    //tensorInfo12,
+    bool hasInputToInputWeights = false;
+    std::vector<int8_t> inputToInputWeights;
+
+    std::vector<int8_t> inputToForgetWeights = { 2, 1, 4, -4, 3, -1, -3, -2, -3, 1, -4, -1 };
+
+    std::vector<int8_t> inputToCellWeights = { -2, 1, -2, 4, -3, -2, -4, 3, -2, -2, -6, 3 };
+
+    std::vector<int8_t> inputToOutputWeights = { 2, 5, -4, 5, 2, -3, 5, 7, 3, -5, 1, -4 };
+
+    //tensorInfo16,
+    bool hasRecurrentToInputWeights = false;
+    std::vector<int8_t> recurrentToInputWeights;
+    std::vector<int8_t> recurrentToForgetWeights = { -1, 1, -1, 1, -3, -4, -1, 4, 2, 3, 5, -1, 1, 3, -2, -1 };
+
+    std::vector<int8_t> recurrentToCellWeights = { -2, -3, -1, -3, -4, 2, 1, -1, 2, 2, 1, 2, 3, -2, 3, -3 };
+
+    std::vector<int8_t> recurrentToOutputWeights = { -3, 3, -1, -2, -2, -2, -1, -5, 1, 3, -4, -1, -1, -1, 2, -1 };
+
+    // tensorInfo4
+    bool hasCellToInputWeights = false;
+    std::vector<int8_t> cellToInputWeights;
+    bool hasCellToForgetWeights = true;
+    std::vector<int8_t> cellToForgetWeights = { 47, -52, -24, 31 };
+    bool hasCellToOutputWeights = true;
+    std::vector<int8_t> cellToOutputWeights = { -17, 82, 85, -77 };
+
+    bool hasInputGateBias = false;
+    std::vector<float> inputGateBias;
+    std::vector<float> forgetGateBias = { 1., 1., 1., 1. };
+    std::vector<float> cellBias = { 0., 0., 0., 0. };
+    std::vector<float> outputGateBias = { 0., 0., 0., 0. };
+
+   bool hasProjectionWeights = false;
+    std::vector<int8_t> projectionWeights;
+    bool hasProjectionBias = false;
+    std::vector<float> projectionBias;
+
+    bool hasInputLayerNormWeights = false;
+    std::vector<float> inputLayerNormWeights;
+    bool hasForgetLayerNormWeights = false;
+    std::vector<float> forgetLayerNormWeights;
+    bool hasCellLayerNormWeights = false;
+    std::vector<float> cellLayerNormWeights;
+    bool hasOutputLayerNormWeights = false;
+    std::vector<float> outputLayerNormWeights;
+
+    std::vector<float> inputValues = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.4f,
+                                       0.3f, 0.2f, 0.1f, 0.2f, 0.3f, 0.4f,
+                                       0.5f, 0.4f, 0.3f, 0.2f, 0.1f, 0.2f };
+
+    std::vector<float> expectedOutputValues = { -0.0072104f, -0.00991171f, -0.00650478f, -0.00713055f,
+                                                -0.0191782f, -0.0161269f, -0.0233683f, -0.054299f,
+                                                -0.00783725f, 0.00635271f, -0.0126718f, -0.022613f,
+                                                -0.0161351f, -0.00775868f, -0.021054f, -0.0339778f,
+                                                -0.0146392f, 0.00330261f, -0.0258733f, -0.0407797f,
+                                                -0.0174297f, 0.0050105f, -0.0266275f, -0.0362564f };
+
+    tflite::ActivationFunctionType activationFunction = tflite::ActivationFunctionType_TANH;
+    float clippingThresCell = 10.f;
+    float clippingThresProj = 0.f;
+    bool isTimeMajor = false;
+
+    UnidirectionalSequenceLstmTestImpl<int8_t>(backends,
+                                               ::tflite::TensorType_INT8,
+                                               batchSize,
+                                               timeSize,
+                                               inputSize,
+                                               outputSize,
+                                               numUnits,
+                                               hasInputToInputWeights,
+                                               inputToInputWeights,
+                                               inputToForgetWeights,
+                                               inputToCellWeights,
+                                               inputToOutputWeights,
+                                               hasRecurrentToInputWeights,
+                                               recurrentToInputWeights,
+                                               recurrentToForgetWeights,
+                                               recurrentToCellWeights,
+                                               recurrentToOutputWeights,
+                                               hasCellToInputWeights,
+                                               cellToInputWeights,
+                                               hasCellToForgetWeights,
+                                               cellToForgetWeights,
+                                               hasCellToOutputWeights,
+                                               cellToOutputWeights,
+                                               hasInputGateBias,
+                                               inputGateBias,
+                                               forgetGateBias,
+                                               cellBias,
+                                               outputGateBias,
+                                               hasProjectionWeights,
+                                               projectionWeights,
+                                               hasProjectionBias,
+                                               projectionBias,
+                                               hasInputLayerNormWeights,
+                                               inputLayerNormWeights,
+                                               hasForgetLayerNormWeights,
+                                               forgetLayerNormWeights,
+                                               hasCellLayerNormWeights,
+                                               cellLayerNormWeights,
+                                               hasOutputLayerNormWeights,
+                                               outputLayerNormWeights,
+                                               inputValues,
+                                               expectedOutputValues,
+                                               activationFunction,
+                                               clippingThresCell,
+                                               clippingThresProj,
+                                               isTimeMajor,
+                                               0.1);
+}
+
+void UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionWithLayerNormTest(
+    std::vector<armnn::BackendId>& backends)
+{
+    int32_t batchSize = 3;
+    int32_t timeSize = 2;
+    int32_t inputSize = 3;
+    int32_t outputSize = 4;
+    int32_t numUnits = 5;
+
+    bool hasInputToInputWeights = true;
+    std::vector<int8_t> inputToInputWeights = { -4, -1, -1, -2, 3, -2, 2, 4, 1, -4, -2, 3, 2, 2, -4 };
+
+    std::vector<int8_t> inputToForgetWeights = { 2, 1, 4, -4, 3, -1, -3, -2, -3, 1, -4, -1, -3, -2, -4 };
+
+    std::vector<int8_t> inputToCellWeights = { -2, 1, -2, 4, -3, -2, -4, 3, -2, -2, -6, 3, 2, 5, -4 };
+
+    std::vector<int8_t> inputToOutputWeights = { 2, 5, -4, 5, 2, -3, 5, 7, 3, -5, 1, -4, -4, -1, -1 };
+
+    bool hasRecurrentToInputWeights = true;
+    std::vector<int8_t> recurrentToInputWeights = { -1, 1, -1, 1, -3, -4, -1, 4, 2, 3,
+                                                    5, -1, 1, 3, -1, -1, -1, 4, 2, 3 };
+
+    std::vector<int8_t> recurrentToForgetWeights = { -1, 1, -1, 1, -3, -4, -1, 4, 2, 3,
+                                                     5, -1, 1, 3, -2, -1, -1, 2, 2, 1 };
+
+    std::vector<int8_t> recurrentToCellWeights = { -2, -3, -1, -3, -4, 2, 1, -1, 2, 2,
+                                                   1, 2, 3, -2, 3, -3,  -1, -5, 1, 3 };
+
+    std::vector<int8_t> recurrentToOutputWeights = { -3, 3, -1, -2, -2, -2, -1, -5, 1, 3,
+                                                     -4, -1, -1, -1, 2, -1, 5, 1, -3, -4 };
+
+    // tensorInfo5
+    bool hasCellToInputWeights = true;
+    std::vector<int8_t> cellToInputWeights = { 5, 3, 8, -5, 2 };
+    bool hasCellToForgetWeights = true;
+    std::vector<int8_t> cellToForgetWeights = { -2, -7, 5, -3, 4 };
+    bool hasCellToOutputWeights = true;
+    std::vector<int8_t> cellToOutputWeights = { 9, -10 , -5, 5, 1 };
+
+    bool hasInputGateBias = true;
+    std::vector<float> inputGateBias = { 0.03f, 0.15f, 0.22f, 0.38f, 0.05f };
+    std::vector<float> forgetGateBias = { 0.1f, -0.3f, -0.2f, 0.1f, 0.4f };
+    std::vector<float> cellBias = { -0.05f, 0.72f, 0.25f, 0.08f, 0.1f };
+    std::vector<float> outputGateBias = { 0.05f, -0.01f, 0.2f, 0.1f, -0.2f };
+
+    bool hasProjectionWeights = true;
+    std::vector<int8_t> projectionWeights = { -1, 2, 1, -2, 1, 5, 3, 8, 7, 2,
+                                              -4, 2, 5, -4, 3, -2, 3, 8, -7, 2 };
+    bool hasProjectionBias = true;
+    std::vector<float> projectionBias(outputSize, 0.f);
+
+    bool hasInputLayerNormWeights = true;
+    std::vector<float> inputLayerNormWeights = { 0.1f, 0.2f, -0.3f, -0.1f, 0.5f };
+    bool hasForgetLayerNormWeights = true;
+    std::vector<float> forgetLayerNormWeights = { -0.1f, 0.2f, 0.3f, 0.5f, 0.2f };
+    bool hasCellLayerNormWeights = true;
+    std::vector<float> cellLayerNormWeights = { 0.5f, 0.2f, 0.3f, 0.4f, -0.5f };
+    bool hasOutputLayerNormWeights = true;
+    std::vector<float> outputLayerNormWeights = { 0.6f, -0.2f, -0.2f, 0.5f, 0.1f };
+
+    std::vector<float> inputValues = { 1., 8., 3., 4., 5., 4.,
+                                       3., 2., 1., 2., 3., 4.,
+                                       5., 4., 3., 2., 1., 2. };
+
+    std::vector<float> expectedOutputValues = { 0.0471276f, 0.0168155f, 0.0789885f, 0.16550f,
+                                                0.0643133f, -0.0400722f, 0.100593f, 0.197722f,
+                                                0.0465562f, -0.0600682f, 0.0622087f, 0.115053f,
+                                                0.056287f, -0.0566218f, 0.0856832f, 0.148484f,
+                                                0.0457859f, -0.0588112f, 0.0623636f, 0.114333f,
+                                                0.0509271f, -0.0754262f, 0.058600f, 0.0801288f };
+
+    tflite::ActivationFunctionType activationFunction = tflite::ActivationFunctionType_TANH;
+    float clippingThresCell = 10.f;
+    float clippingThresProj = 0.f;
+    bool isTimeMajor = false;
+
+    UnidirectionalSequenceLstmTestImpl<int8_t>(backends,
+                                               ::tflite::TensorType_INT8,
+                                               batchSize,
+                                               timeSize,
+                                               inputSize,
+                                               outputSize,
+                                               numUnits,
+                                               hasInputToInputWeights,
+                                               inputToInputWeights,
+                                               inputToForgetWeights,
+                                               inputToCellWeights,
+                                               inputToOutputWeights,
+                                               hasRecurrentToInputWeights,
+                                               recurrentToInputWeights,
+                                               recurrentToForgetWeights,
+                                               recurrentToCellWeights,
+                                               recurrentToOutputWeights,
+                                               hasCellToInputWeights,
+                                               cellToInputWeights,
+                                               hasCellToForgetWeights,
+                                               cellToForgetWeights,
+                                               hasCellToOutputWeights,
+                                               cellToOutputWeights,
+                                               hasInputGateBias,
+                                               inputGateBias,
+                                               forgetGateBias,
+                                               cellBias,
+                                               outputGateBias,
+                                               hasProjectionWeights,
+                                               projectionWeights,
+                                               hasProjectionBias,
+                                               projectionBias,
+                                               hasInputLayerNormWeights,
+                                               inputLayerNormWeights,
+                                               hasForgetLayerNormWeights,
+                                               forgetLayerNormWeights,
+                                               hasCellLayerNormWeights,
+                                               cellLayerNormWeights,
+                                               hasOutputLayerNormWeights,
+                                               outputLayerNormWeights,
+                                               inputValues,
+                                               expectedOutputValues,
+                                               activationFunction,
+                                               clippingThresCell,
+                                               clippingThresProj,
+                                               isTimeMajor,
+                                               0.1);
+}
 
 TEST_SUITE("UnidirectionalSequenceLstmTest_CpuRefTests")
 {
@@ -819,6 +1427,36 @@ TEST_CASE ("UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionWithLayerN
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionWithLayerNormTest(backends);
+}
+
+TEST_CASE ("UnidirectionalSequenceLstmInt8Test_CpuRef_Test")
+{
+    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
+    UnidirectionalSequenceLstmInt8Test(backends);
+}
+
+TEST_CASE ("UnidirectionalSequenceLstmTimeInt8TimeMajorTest_CpuRef_Test")
+{
+    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
+    UnidirectionalSequenceLstmInt8TimeMajorTest(backends);
+}
+
+TEST_CASE ("UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionTest_CpuRef_Test")
+{
+    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
+    UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionTest(backends);
+}
+
+TEST_CASE ("UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoProjectionTest_CpuRef_Test")
+{
+    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
+    UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoProjectionTest(backends);
+}
+
+TEST_CASE ("UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionWithLayerNormTest_CpuRef_Test")
+{
+    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
+    UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionWithLayerNormTest(backends);
 }
 
 } //End of TEST_SUITE("UnidirectionalSequenceLstmTest_CpuRef")

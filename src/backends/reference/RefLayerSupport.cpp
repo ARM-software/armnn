@@ -2317,9 +2317,10 @@ bool RefLayerSupport::IsUnidirectionalSequenceLstmSupported(
         DataType::Float32
     };
 
-    std::array<DataType, 1> supportedWeightTypes =
+    std::array<DataType, 2> supportedWeightTypes =
     {
-        DataType::Float32
+        DataType::Float32,
+        DataType::QAsymmS8
     };
 
     // check inputs and outputs

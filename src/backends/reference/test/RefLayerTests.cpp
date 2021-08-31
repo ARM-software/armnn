@@ -2341,5 +2341,15 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerNoCifgWithPeepholeW
                               UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjectionWithLayerNormTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjection,
                               UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjectionTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerInt8,
+                              UnidirectionalSequenceLstmLayerInt8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerInt8TimeMajor,
+                              UnidirectionalSequenceLstmLayerInt8TimeMajorTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeWithProjection,
+                              UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeWithProjectionTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeWithProjectionWithLayerNorm,
+                              UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeWithProjectionWithLayerNormTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoProjection,
+                              UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoProjectionTest)
 
 }

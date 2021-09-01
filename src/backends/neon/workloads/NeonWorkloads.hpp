@@ -11,6 +11,7 @@
 #include "NeonBatchNormalizationWorkload.hpp"
 #include "NeonBatchToSpaceNdWorkload.hpp"
 #include "NeonCastWorkload.hpp"
+#include "NeonChannelShuffleWorkload.hpp"
 #include "NeonComparisonWorkload.hpp"
 #include "NeonConcatWorkload.hpp"
 #include "NeonConstantWorkload.hpp"

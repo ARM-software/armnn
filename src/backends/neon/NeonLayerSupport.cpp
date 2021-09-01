@@ -28,13 +28,15 @@
 #include "workloads/NeonBatchNormalizationWorkload.hpp"
 #include "workloads/NeonBatchToSpaceNdWorkload.hpp"
 #include "workloads/NeonCastWorkload.hpp"
-#include "workloads/NeonExpWorkload.hpp"
+#include "workloads/NeonChannelShuffleWorkload.hpp"
 #include "workloads/NeonComparisonWorkload.hpp"
+#include "workloads/NeonConcatWorkload.hpp"
 #include "workloads/NeonConstantWorkload.hpp"
 #include "workloads/NeonConvolution2dWorkload.hpp"
 #include "workloads/NeonDepthToSpaceWorkload.hpp"
 #include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
 #include "workloads/NeonDequantizeWorkload.hpp"
+#include "workloads/NeonExpWorkload.hpp"
 #include "workloads/NeonInstanceNormalizationWorkload.hpp"
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
 #include "workloads/NeonLogWorkload.hpp"
@@ -45,7 +47,6 @@
 #include "workloads/NeonLstmFloatWorkload.hpp"
 #include "workloads/NeonMaximumWorkload.hpp"
 #include "workloads/NeonMeanWorkload.hpp"
-#include "workloads/NeonConcatWorkload.hpp"
 #include "workloads/NeonMinimumWorkload.hpp"
 #include "workloads/NeonMultiplicationWorkload.hpp"
 #include "workloads/NeonDivisionWorkload.hpp"
@@ -231,6 +232,18 @@ bool NeonLayerSupport::IsCastSupported(const TensorInfo& input,
                                    reasonIfUnsupported,
                                    input,
                                    output);
+}
+
+bool NeonLayerSupport::IsChannelShuffleSupported(const TensorInfo& input,
+                                                 const TensorInfo& output,
+                                                 const ChannelShuffleDescriptor& descriptor,
+                                                 Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonChannelShuffleValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool NeonLayerSupport::IsComparisonSupported(const TensorInfo& input0,

@@ -74,6 +74,9 @@ public:
     std::unique_ptr<IWorkload> CreateCast(const CastQueueDescriptor& descriptor,
                                           const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateChannelShuffle(const ChannelShuffleQueueDescriptor& descriptor,
+                                                    const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateComparison(const ComparisonQueueDescriptor& descriptor,
                                                 const WorkloadInfo& Info) const override;
 

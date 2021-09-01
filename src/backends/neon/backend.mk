@@ -29,6 +29,7 @@ BACKEND_SOURCES := \
         workloads/NeonBatchNormalizationWorkload.cpp \
         workloads/NeonBatchToSpaceNdWorkload.cpp \
         workloads/NeonCastWorkload.cpp \
+        workloads/NeonChannelShuffleWorkload.cpp \
         workloads/NeonComparisonWorkload.cpp \
         workloads/NeonConcatWorkload.cpp \
         workloads/NeonConstantWorkload.cpp \

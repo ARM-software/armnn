@@ -178,6 +178,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateCast(const CastQueueDescri
     return std::make_unique<NeonCastWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateChannelShuffle(const ChannelShuffleQueueDescriptor& descriptor,
+                                                                     const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonChannelShuffleWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateComparison(const ComparisonQueueDescriptor& descriptor,
                                                                  const WorkloadInfo& info) const
 {

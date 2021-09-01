@@ -18,6 +18,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonBatchToSpaceNdWorkload.hpp
     NeonCastWorkload.cpp
     NeonCastWorkload.hpp
+    NeonChannelShuffleWorkload.cpp
+    NeonChannelShuffleWorkload.hpp
     NeonComparisonWorkload.cpp
     NeonComparisonWorkload.hpp
     NeonConcatWorkload.cpp

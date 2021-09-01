@@ -131,6 +131,7 @@ private:
     void ParseLeakyRelu(size_t subgraphIndex, size_t operatorIndex);
     void ParseLess(size_t subgraphIndex, size_t operatorIndex);
     void ParseLessOrEqual(size_t subgraphIndex, size_t operatorIndex);
+    void ParseLocalResponseNormalization(size_t subgraphIndex, size_t operatorIndex);
     void ParseLogicalNot(size_t subgraphIndex, size_t operatorIndex);
     void ParseLogistic(size_t subgraphIndex, size_t operatorIndex);
     void ParseL2Normalization(size_t subgraphIndex, size_t operatorIndex);

@@ -265,6 +265,7 @@ public:
 
 /// Type of identifiers for bindable layers (inputs, outputs).
 using LayerBindingId = int;
+using ImportedInputId = unsigned int;
 
 class PermutationVector
 {

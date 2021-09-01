@@ -61,6 +61,113 @@ TEST_CASE("RuntimeUnloadNetwork")
     CHECK(runtime->UnloadNetwork(networkIdentifier1) == armnn::Status::Failure);
 }
 
+TEST_CASE("RuntimePreImportInputs")
+{
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr               runtime(armnn::IRuntime::Create(options));
+
+    armnn::NetworkId   networkIdentifier1 = 1;
+
+    armnn::INetworkPtr testNetwork(armnn::INetwork::Create());
+    auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
+    auto inputLayer2 = testNetwork->AddInputLayer(1, "input 2 layer");
+    auto addLayer = testNetwork->AddAdditionLayer("add layer");
+    auto outputLayer = testNetwork->AddOutputLayer(2, "output layer");
+
+    TensorInfo tensorInfo{{4}, armnn::DataType::Signed32};
+
+    inputLayer1->GetOutputSlot(0).Connect(addLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    inputLayer2->GetOutputSlot(0).Connect(addLayer->GetInputSlot(1));
+    inputLayer2->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    addLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    addLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+
+    std::string er;
+    armnn::INetworkProperties networkProperties(true, MemorySource::Malloc, MemorySource::Undefined);
+    runtime->LoadNetwork(networkIdentifier1,
+                         Optimize(*testNetwork, backends, runtime->GetDeviceSpec()),
+                         er,
+                         networkProperties);
+
+    std::vector<int> inputData1(4, 10);
+    std::vector<int> inputData2(4, 20);
+    std::vector<int> output(4);
+
+    ConstTensor inputTensor1({{4}, armnn::DataType::Signed32}, inputData1.data());
+    ConstTensor inputTensor2({{4}, armnn::DataType::Signed32}, inputData2.data());
+
+    Tensor outputTensor({{4}, armnn::DataType::Signed32}, output.data());
+
+    auto importedInputVec1 = runtime->ImportInputs(networkIdentifier1, {{0, inputTensor1}});
+    CHECK(importedInputVec1.size() == 1);
+    CHECK(importedInputVec1[0] == 0);
+
+    auto memHandle = runtime->CreateWorkingMemHandle(networkIdentifier1);
+
+    runtime->Execute(*memHandle.get(), {{1, inputTensor2}}, {{2, outputTensor}}, {0 /* pre-imported id */});
+    for (auto val : output)
+    {
+        CHECK(val == 30);
+    }
+
+    auto importedInputVec2 = runtime->ImportInputs(networkIdentifier1, {{1, inputTensor2}});
+    CHECK(importedInputVec2.size() == 1);
+    CHECK(importedInputVec2[0] == 1);
+
+    runtime->Execute(*memHandle.get(), {{0, inputTensor1}}, {{2, outputTensor}}, {1 /* pre-imported id */});
+    for (auto val : output)
+    {
+        CHECK(val == 30);
+    }
+
+    runtime->Execute(*memHandle.get(), {}, {{2, outputTensor}}, {0, 1});
+    for (auto val : output)
+    {
+        CHECK(val == 30);
+    }
+
+    // Duplicate ImportedInputId and LayerBindingId
+    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(),{},{{2, outputTensor}},{0, 0});
+                    , armnn::InvalidArgumentException);
+
+    // Duplicate LayerBindingId
+    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {{1, inputTensor2}}, {{2, outputTensor}},{1});
+                    , armnn::InvalidArgumentException);
+
+    // Incorrect ImportedInputId
+    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {{1, inputTensor2}}, {{2, outputTensor}},{10});
+                    , armnn::InvalidArgumentException);
+
+    // Incorrect LayerBindingId
+    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {{-2, inputTensor2}}, {{2, outputTensor}},{1});
+                    , armnn::InvalidArgumentException);
+
+    // Incorrect layer binding id and ImportedInputId
+    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {{-2, inputTensor2}}, {{2, outputTensor}},{10});
+                    , armnn::InvalidArgumentException);
+
+
+    auto importedInputVec3 = runtime->ImportInputs(networkIdentifier1, {{1, inputTensor2}});
+    CHECK(importedInputVec3[0] == 2);
+    // Too many ImportedInputIds
+    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {}, {{2, outputTensor}},{0, 1, 2});
+                    , armnn::InvalidArgumentException);
+
+    // Too many InputTensors
+    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(),
+                                     {{0, inputTensor2}, {1, inputTensor2}, {2, inputTensor2}},
+                                     {{2, outputTensor}});
+                    , armnn::InvalidArgumentException);
+
+    // Too few ImportedInputIds
+    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {}, {{2, outputTensor}},{0});
+                    , armnn::InvalidArgumentException);
+}
+
 // Note: the current builds we don't do valgrind and gperftools based leak checking at the same
 //       time, so in practice WITH_VALGRIND and ARMNN_LEAK_CHECKING_ENABLED are exclusive. The
 //       valgrind tests can stay for x86 builds, but on hikey Valgrind is just way too slow

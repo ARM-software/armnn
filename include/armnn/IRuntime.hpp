@@ -221,6 +221,14 @@ public:
     TensorInfo GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
     TensorInfo GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
 
+
+    /// ImportInputs separates the importing and mapping of InputTensors from network execution.
+    /// Allowing for a set of InputTensors to be imported and mapped once, but used in execution many times.
+    /// This function is not thread safe and must not be used while other threads are calling Execute().
+    /// Only compatible with AsyncEnabled networks
+    std::vector<ImportedInputId> ImportInputs(NetworkId networkId, const InputTensors& inputTensors);
+
+
     /// Evaluates a network using input in inputTensors and outputs filled into outputTensors
     Status EnqueueWorkload(NetworkId networkId,
                            const InputTensors& inputTensors,
@@ -232,7 +240,8 @@ public:
     /// Will block until this and any other thread using the same workingMem object completes.
     Status Execute(IWorkingMemHandle& workingMemHandle,
                    const InputTensors& inputTensors,
-                   const OutputTensors& outputTensors);
+                   const OutputTensors& outputTensors,
+                   std::vector<ImportedInputId> preImportedInputs = {});
 
     /// Unloads a network from the IRuntime.
     /// At the moment this only removes the network from the m_Impl->m_Network.

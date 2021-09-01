@@ -21,11 +21,23 @@ namespace armnn
 namespace experimental
 {
 
+
 class WorkingMemHandle final : public IWorkingMemHandle
 {
 
 public:
+    struct InputConnectionInfo
+    {
+        LayerBindingId m_LayerBindingId;
+        unsigned int m_DescriptorIndex;
+        unsigned int m_InputIndex;
+    };
+
+    WorkingMemHandle(NetworkId networkId) : m_NetworkId(networkId){}
+
     WorkingMemHandle(NetworkId networkId,
+                     std::vector<std::pair<LayerBindingId, LayerGuid>> inputHandles,
+                     std::vector<InputConnectionInfo> inputConnections,
                      std::vector<WorkingMemDescriptor> workingMemDescriptors,
                      std::unordered_map<LayerGuid, WorkingMemDescriptor> workingMemDescriptorMap,
                      std::vector<std::shared_ptr<IMemoryManager>> memoryManagers,
@@ -38,8 +50,6 @@ public:
     {
         return m_NetworkId;
     }
-
-
 
     /// Allocate the backing memory required for execution. If this is not called, then allocation will be
     /// deferred to execution time. The mutex must be locked.
@@ -75,9 +85,27 @@ public:
         return m_WorkingMemDescriptors[id];
     }
 
+    ITensorHandle* GetInputHandle(LayerBindingId layerBindingId) const
+    {
+        return m_InputHandleMap.at(layerBindingId);
+    };
+
+    const std::vector<std::vector<ITensorHandle*>::iterator>& GetInputConnections(LayerBindingId layerBindingId) const
+    {
+        return m_InputConnectionMap.at(layerBindingId);
+    };
+
+    std::unordered_map<LayerBindingId, bool> GetValidationMap() const
+    {
+        return m_ValidationMap;
+    };
+
 private:
     NetworkId m_NetworkId;
     std::shared_ptr<ProfilerImpl> m_Profiler;
+
+    std::unordered_map<LayerBindingId, ITensorHandle*> m_InputHandleMap;
+    std::unordered_map<LayerBindingId, std::vector<std::vector<ITensorHandle*>::iterator>> m_InputConnectionMap;
 
     std::vector<WorkingMemDescriptor> m_WorkingMemDescriptors;
     std::unordered_map<LayerGuid, WorkingMemDescriptor> m_WorkingMemDescriptorMap;
@@ -88,6 +116,7 @@ private:
     // constant tensor's can be shared by multiple WorkingMemHandles and so will not be stored here
     std::unordered_map<LayerGuid, std::vector<std::unique_ptr<ITensorHandle> > >  m_OwnedTensorHandles;
 
+    std::unordered_map<LayerBindingId, bool> m_ValidationMap;
     bool m_IsAllocated;
     std::mutex m_Mutex;
 };

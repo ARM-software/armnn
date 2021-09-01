@@ -132,6 +132,8 @@ public:
     }
 
     bool IsCpuRef() const { return m_Id == GetComputeDeviceAsCString(Compute::CpuRef); }
+    bool IsCpuAcc() const { return m_Id == GetComputeDeviceAsCString(Compute::CpuAcc); }
+    bool IsGpuAcc() const { return m_Id == GetComputeDeviceAsCString(Compute::GpuAcc); }
 
     const std::string& Get() const { return m_Id; }
 

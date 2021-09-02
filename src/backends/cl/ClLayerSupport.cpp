@@ -26,6 +26,7 @@
 #include "workloads/ClBatchNormalizationFloatWorkload.hpp"
 #include "workloads/ClBatchToSpaceNdWorkload.hpp"
 #include "workloads/ClCastWorkload.hpp"
+#include "workloads/ClChannelShuffleWorkload.hpp"
 #include "workloads/ClComparisonWorkload.hpp"
 #include "workloads/ClConstantWorkload.hpp"
 #include "workloads/ClConvertFp16ToFp32Workload.hpp"
@@ -242,6 +243,18 @@ bool ClLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
                                    nullptr);
 }
 
+bool ClLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
+                                               const TensorInfo& output,
+                                               const BatchToSpaceNdDescriptor& descriptor,
+                                               Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClBatchToSpaceNdWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
+}
+
 bool ClLayerSupport::IsCastSupported(const TensorInfo& input,
                                      const TensorInfo& output,
                                      Optional<std::string&> reasonIfUnsupported) const
@@ -252,12 +265,12 @@ bool ClLayerSupport::IsCastSupported(const TensorInfo& input,
                                    output);
 }
 
-bool ClLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
+bool ClLayerSupport::IsChannelShuffleSupported(const TensorInfo& input,
                                                const TensorInfo& output,
-                                               const BatchToSpaceNdDescriptor& descriptor,
+                                               const ChannelShuffleDescriptor& descriptor,
                                                Optional<std::string&> reasonIfUnsupported) const
 {
-    FORWARD_WORKLOAD_VALIDATE_FUNC(ClBatchToSpaceNdWorkloadValidate,
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClChannelShuffleValidate,
                                    reasonIfUnsupported,
                                    input,
                                    output,

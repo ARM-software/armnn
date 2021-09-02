@@ -242,6 +242,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateCast(const CastQueueDescript
     return MakeWorkload<ClCastWorkload>(descriptor, info, m_CLCompileContext);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateChannelShuffle(const ChannelShuffleQueueDescriptor& descriptor,
+                                                                   const WorkloadInfo& info) const
+{
+    return MakeWorkload<ClChannelShuffleWorkload>(descriptor, info, m_CLCompileContext);
+}
+
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateComparison(const ComparisonQueueDescriptor& descriptor,
                                                                const WorkloadInfo& info) const
 {

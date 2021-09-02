@@ -18,6 +18,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClBatchToSpaceNdWorkload.hpp
     ClCastWorkload.cpp
     ClCastWorkload.hpp
+    ClChannelShuffleWorkload.cpp
+    ClChannelShuffleWorkload.hpp
     ClComparisonWorkload.cpp
     ClComparisonWorkload.hpp
     ClConcatWorkload.cpp

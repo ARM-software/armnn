@@ -33,6 +33,7 @@ BACKEND_SOURCES := \
         workloads/ClBatchNormalizationFloatWorkload.cpp \
         workloads/ClBatchToSpaceNdWorkload.cpp \
         workloads/ClCastWorkload.cpp \
+        workloads/ClChannelShuffleWorkload.cpp \
         workloads/ClComparisonWorkload.cpp \
         workloads/ClConcatWorkload.cpp \
         workloads/ClConstantWorkload.cpp \

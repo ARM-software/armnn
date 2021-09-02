@@ -1920,6 +1920,10 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(CastFloat16ToFloat32, ClContextControlFixture, 
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(CastFloatToFloat16, ClContextControlFixture, CastFloat32ToFloat162dTest)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(CastFloatToUInt8, ClContextControlFixture, CastFloat32ToUInt82dTest)
 
+// ChannelShuffle
+ARMNN_AUTO_TEST_CASE_WITH_THF(ChannelShuffle4DFloat32, ChannelShuffle4DTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ChannelShuffle4DQAsymmU8, ChannelShuffle4DTest<DataType::QAsymmU8>)
+
 #if defined(ARMNNREF_ENABLED)
 
 TEST_CASE_FIXTURE(ClContextControlFixture, "ClContextControlFixture") {}

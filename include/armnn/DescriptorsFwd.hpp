@@ -13,6 +13,7 @@ struct ActivationDescriptor;
 struct ArgMinMaxDescriptor;
 struct BatchNormalizationDescriptor;
 struct BatchToSpaceNdDescriptor;
+struct ChannelShuffleDescriptor;
 struct ComparisonDescriptor;
 struct Convolution2dDescriptor;
 struct DepthwiseConvolution2dDescriptor;

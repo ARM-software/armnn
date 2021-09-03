@@ -12,6 +12,7 @@
 #include "layers/BatchNormalizationLayer.hpp"
 #include "layers/BatchToSpaceNdLayer.hpp"
 #include "layers/CastLayer.hpp"
+#include "layers/ChannelShuffleLayer.hpp"
 #include "layers/ComparisonLayer.hpp"
 #include "layers/ConcatLayer.hpp"
 #include "layers/ConstantLayer.hpp"
@@ -109,6 +110,7 @@ DECLARE_LAYER(ArgMinMax)
 DECLARE_LAYER(BatchNormalization)
 DECLARE_LAYER(BatchToSpaceNd)
 DECLARE_LAYER(Cast)
+DECLARE_LAYER(ChannelShuffle)
 DECLARE_LAYER(Comparison)
 DECLARE_LAYER(Concat)
 DECLARE_LAYER(Constant)

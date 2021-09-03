@@ -421,7 +421,7 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(Cast) \
     X(Shape) \
     X(UnidirectionalSequenceLstm) \
-
+    X(ChannelShuffle) \
 // New layers should be added at last to minimize instability.
 
 /// When adding a new layer, adapt also the LastLayer enum value in the

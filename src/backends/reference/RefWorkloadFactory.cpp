@@ -183,6 +183,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateCast(const CastQueueDescrip
     return std::make_unique<RefCastWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateChannelShuffle(const ChannelShuffleQueueDescriptor &descriptor,
+                                                                    const WorkloadInfo &info) const
+{
+    return std::make_unique<RefChannelShuffleWorkload>(descriptor,info);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateComparison(const ComparisonQueueDescriptor& descriptor,
                                                                 const WorkloadInfo& info) const
 {

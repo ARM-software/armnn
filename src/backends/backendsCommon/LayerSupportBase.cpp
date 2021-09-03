@@ -95,6 +95,14 @@ bool LayerSupportBase::IsCastSupported(const TensorInfo&, //input
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsChannelShuffleSupported(const TensorInfo&, //input
+                                                 const TensorInfo&, //output
+                                                 const ChannelShuffleDescriptor&, //descriptor
+                                                 Optional<std::string &> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsComparisonSupported(const TensorInfo&, // input0
                                              const TensorInfo&, // input1
                                              const TensorInfo&, // output

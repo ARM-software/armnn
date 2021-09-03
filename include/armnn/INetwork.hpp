@@ -704,6 +704,13 @@ public:
                                                           const LstmInputParams& params,
                                                           const char* name = nullptr);
 
+    /// Add a ChannelShuffle layer to the network
+    /// @param descriptor - Parameters for the ChannelShuffle operation
+    /// @param name - Optional name for the layer
+    /// @return - Interface for configuring the layer
+    IConnectableLayer* AddChannelShuffleLayer(const ChannelShuffleDescriptor& descriptor,
+                                              const char* name = nullptr);
+
     void Accept(ILayerVisitor& visitor) const;
 
     void ExecuteStrategy(IStrategy& strategy) const;

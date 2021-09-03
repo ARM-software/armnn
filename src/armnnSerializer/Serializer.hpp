@@ -131,6 +131,10 @@ private:
     void SerializeCastLayer(const armnn::IConnectableLayer* layer,
                             const char* name = nullptr);
 
+    void SerializeChannelShuffleLayer(const armnn::IConnectableLayer* layer,
+                                      const armnn::ChannelShuffleDescriptor& descriptor,
+                                      const char* name = nullptr);
+
     void SerializeComparisonLayer(const armnn::IConnectableLayer* layer,
                                   const armnn::ComparisonDescriptor& descriptor,
                                   const char* name = nullptr);

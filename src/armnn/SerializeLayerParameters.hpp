@@ -40,6 +40,11 @@ template <> struct StringifyLayerParameters<BatchToSpaceNdDescriptor>
     static void Serialize(ParameterStringifyFunction& fn, const BatchToSpaceNdDescriptor& desc);
 };
 
+template <> struct StringifyLayerParameters<ChannelShuffleDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const ChannelShuffleDescriptor& desc);
+};
+
 template <> struct StringifyLayerParameters<ComparisonDescriptor>
 {
     static void Serialize(ParameterStringifyFunction& fn, const ComparisonDescriptor& desc);

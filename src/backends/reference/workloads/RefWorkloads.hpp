@@ -19,6 +19,7 @@
 #include "RefBatchNormalizationWorkload.hpp"
 #include "RefBatchToSpaceNdWorkload.hpp"
 #include "RefCastWorkload.hpp"
+#include "RefChannelShuffleWorkload.hpp"
 #include "RefComparisonWorkload.hpp"
 #include "RefConvolution2dWorkload.hpp"
 #include "RefConstantWorkload.hpp"

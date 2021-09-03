@@ -176,6 +176,7 @@ enum LayerType : uint {
     Cast = 61,
     Shape = 62,
     UnidirectionalSequenceLstm = 63,
+    ChannelShuffle = 64,
 }
 
 // Base layer table to be used as part of other layers
@@ -226,6 +227,16 @@ table ArgMinMaxDescriptor{
 
 table CastLayer {
     base:LayerBase;
+}
+
+table ChannelShuffleLayer {
+    base:LayerBase;
+    descriptor:ChannelShuffleDescriptor;
+}
+
+table ChannelShuffleDescriptor {
+    axis:uint = 0;
+    numGroups:uint = 0;
 }
 
 enum ComparisonOperation : byte {
@@ -1000,6 +1011,7 @@ union Layer {
     CastLayer,
     ShapeLayer,
     UnidirectionalSequenceLstmLayer,
+    ChannelShuffleLayer,
 }
 
 table AnyLayer {

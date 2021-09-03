@@ -2971,6 +2971,19 @@ void TransposeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
+void ChannelShuffleQueueDescriptor::Validate(const WorkloadInfo &workloadInfo) const
+{
+    const std::string descriptorName{"TransposeQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo, descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+}
+
 void QLstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     const std::string descriptorName{"QLstmQueueDescriptor"};

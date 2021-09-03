@@ -202,6 +202,34 @@ TEST_CASE("SerializeCast")
         deserializedNetwork->ExecuteStrategy(verifier);
 }
 
+TEST_CASE("SerializeChannelShuffle")
+{
+    const std::string layerName("channelShuffle");
+    const armnn::TensorInfo inputInfo({1, 9}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({1, 9}, armnn::DataType::Float32);
+
+    armnn::ChannelShuffleDescriptor descriptor({3, 1});
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const ChannelShuffleLayer =
+            network->AddChannelShuffleLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(ChannelShuffleLayer->GetInputSlot(0));
+    ChannelShuffleLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    ChannelShuffleLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    CHECK(deserializedNetwork);
+
+    LayerVerifierBaseWithDescriptor<armnn::ChannelShuffleDescriptor> verifier(
+            layerName, {inputInfo}, {outputInfo}, descriptor);
+    deserializedNetwork->ExecuteStrategy(verifier);
+}
+
 TEST_CASE("SerializeComparison")
 {
     const std::string layerName("comparison");

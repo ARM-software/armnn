@@ -62,6 +62,13 @@ void StringifyLayerParameters<BatchToSpaceNdDescriptor>::Serialize(ParameterStri
     fn("DataLayout", GetDataLayoutName(desc.m_DataLayout));
 }
 
+void StringifyLayerParameters<ChannelShuffleDescriptor>::Serialize(ParameterStringifyFunction& fn,
+                                                                   const ChannelShuffleDescriptor& desc)
+{
+    fn("Axis", std::to_string(desc.m_Axis));
+    fn("NumGroups", std::to_string(desc.m_NumGroups));
+}
+
 void StringifyLayerParameters<ComparisonDescriptor>::Serialize(ParameterStringifyFunction& fn,
                                                                const ComparisonDescriptor& desc)
 {

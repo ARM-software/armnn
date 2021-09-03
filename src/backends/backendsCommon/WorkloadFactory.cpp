@@ -152,6 +152,21 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                                                         reason);
             break;
         }
+        case LayerType::ChannelShuffle:
+        {
+            auto cLayer = PolymorphicDowncast<const ChannelShuffleLayer*>(&layer);
+
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+
+            const ChannelShuffleDescriptor descriptor = cLayer->GetParameters();
+
+            result = layerSupportObject.IsChannelShuffleSupported(OverrideDataType(input, dataType),
+                                                                  OverrideDataType(output, dataType),
+                                                                  descriptor,
+                                                                  reason);
+            break;
+        }
         case LayerType::Comparison:
         {
             auto cLayer = PolymorphicDowncast<const ComparisonLayer*>(&layer);
@@ -1497,6 +1512,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateBatchToSpaceNd(const BatchToS
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateCast(const CastQueueDescriptor& /*descriptor*/,
                                                        const WorkloadInfo& /*info*/) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateChannelShuffle(const ChannelShuffleQueueDescriptor& /*descriptor*/,
+                                                                  const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }

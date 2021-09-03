@@ -12,6 +12,7 @@
 #include <backendsCommon/test/layerTests/BatchNormalizationTestImpl.hpp>
 #include <backendsCommon/test/layerTests/BatchToSpaceNdTestImpl.hpp>
 #include <backendsCommon/test/layerTests/CastTestImpl.hpp>
+#include <backendsCommon/test/layerTests/ChannelShuffleTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ComparisonTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ConcatTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ConvertBf16ToFp32TestImpl.hpp>

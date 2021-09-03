@@ -64,6 +64,9 @@ public:
 
     IConnectableLayer* AddCastLayer(const char* name = nullptr);
 
+    IConnectableLayer* AddChannelShuffleLayer(const ChannelShuffleDescriptor& channelShuffleDescriptor,
+                                              const char* name = nullptr);
+
     IConnectableLayer* AddComparisonLayer(const ComparisonDescriptor& comparisonDescriptor,
                                           const char* name = nullptr);
 

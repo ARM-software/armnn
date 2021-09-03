@@ -302,6 +302,19 @@ void SerializerStrategy::SerializeCastLayer(const armnn::IConnectableLayer* laye
     CreateAnyLayer(fbCastLayer.o, serializer::Layer::Layer_CastLayer);
 }
 
+void SerializerStrategy::SerializeChannelShuffleLayer(const armnn::IConnectableLayer* layer,
+                                                      const armnn::ChannelShuffleDescriptor& descriptor,
+                                                      const char* name)
+{
+    IgnoreUnused(name);
+    auto fbDescriptor = CreateChannelShuffleDescriptor(m_flatBufferBuilder,
+                                                       descriptor.m_Axis,
+                                                       descriptor.m_NumGroups);
+    auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_ChannelShuffle);
+    auto fbChannelShuffleLayer = serializer::CreateChannelShuffleLayer(m_flatBufferBuilder, fbBaseLayer, fbDescriptor);
+    CreateAnyLayer(fbChannelShuffleLayer.o, serializer::Layer::Layer_ChannelShuffleLayer);
+}
+
 void SerializerStrategy::SerializeComparisonLayer(const armnn::IConnectableLayer* layer,
                                              const armnn::ComparisonDescriptor& descriptor,
                                              const char* name)
@@ -1995,6 +2008,15 @@ void SerializerStrategy::ExecuteStrategy(const armnn::IConnectableLayer* layer,
         case armnn::LayerType::Cast :
         {
             SerializeCastLayer(layer, name);
+            break;
+        }
+        case armnn::LayerType::ChannelShuffle :
+        {
+            const armnn::ChannelShuffleDescriptor& layerDescriptor =
+                                                     static_cast<const armnn::ChannelShuffleDescriptor&>(descriptor);
+            SerializeChannelShuffleLayer(layer,
+                                         layerDescriptor,
+                                         name);
             break;
         }
         case armnn::LayerType::Comparison :

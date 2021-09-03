@@ -221,6 +221,8 @@ list(APPEND armnn_sources
     src/armnn/layers/BatchToSpaceNdLayer.cpp
     src/armnn/layers/CastLayer.hpp
     src/armnn/layers/CastLayer.cpp
+    src/armnn/layers/ChannelShuffleLayer.hpp
+    src/armnn/layers/ChannelShuffleLayer.cpp
     src/armnn/layers/ComparisonLayer.hpp
     src/armnn/layers/ComparisonLayer.cpp
     src/armnn/layers/ConcatLayer.hpp
@@ -785,6 +787,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/DeserializeBatchToSpaceNd.cpp
             src/armnnDeserializer/test/DeserializeBatchNormalization.cpp
             src/armnnDeserializer/test/DeserializeCast.cpp
+            src/armnnDeserializer/test/DeserializeChannelShuffle.cpp
             src/armnnDeserializer/test/DeserializeComparison.cpp
             src/armnnDeserializer/test/DeserializeConstant.cpp
             src/armnnDeserializer/test/DeserializeConvolution2d.cpp

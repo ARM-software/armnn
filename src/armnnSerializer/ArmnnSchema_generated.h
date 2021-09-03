@@ -65,6 +65,12 @@ struct ArgMinMaxDescriptorBuilder;
 struct CastLayer;
 struct CastLayerBuilder;
 
+struct ChannelShuffleLayer;
+struct ChannelShuffleLayerBuilder;
+
+struct ChannelShuffleDescriptor;
+struct ChannelShuffleDescriptorBuilder;
+
 struct ComparisonDescriptor;
 struct ComparisonDescriptorBuilder;
 
@@ -588,7 +594,7 @@ inline const char * const *EnumNamesReduceOperation() {
 }
 
 inline const char *EnumNameReduceOperation(ReduceOperation e) {
-  if (flatbuffers::IsOutRange(e, ReduceOperation_Sum, ReduceOperation_Min)) return "";
+  if (flatbuffers::IsOutRange(e, ReduceOperation_Sum, ReduceOperation_Prod)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesReduceOperation()[index];
 }
@@ -750,11 +756,12 @@ enum LayerType {
   LayerType_Cast = 61,
   LayerType_Shape = 62,
   LayerType_UnidirectionalSequenceLstm = 63,
+  LayerType_ChannelShuffle = 64,
   LayerType_MIN = LayerType_Addition,
-  LayerType_MAX = LayerType_UnidirectionalSequenceLstm
+  LayerType_MAX = LayerType_ChannelShuffle
 };
 
-inline const LayerType (&EnumValuesLayerType())[64] {
+inline const LayerType (&EnumValuesLayerType())[65] {
   static const LayerType values[] = {
     LayerType_Addition,
     LayerType_Input,
@@ -819,13 +826,14 @@ inline const LayerType (&EnumValuesLayerType())[64] {
     LayerType_Reduce,
     LayerType_Cast,
     LayerType_Shape,
-    LayerType_UnidirectionalSequenceLstm
+    LayerType_UnidirectionalSequenceLstm,
+    LayerType_ChannelShuffle
   };
   return values;
 }
 
 inline const char * const *EnumNamesLayerType() {
-  static const char * const names[65] = {
+  static const char * const names[66] = {
     "Addition",
     "Input",
     "Multiplication",
@@ -890,13 +898,14 @@ inline const char * const *EnumNamesLayerType() {
     "Cast",
     "Shape",
     "UnidirectionalSequenceLstm",
+    "ChannelShuffle",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLayerType(LayerType e) {
-  if (flatbuffers::IsOutRange(e, LayerType_Addition, LayerType_UnidirectionalSequenceLstm)) return "";
+  if (flatbuffers::IsOutRange(e, LayerType_Addition, LayerType_ChannelShuffle)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLayerType()[index];
 }
@@ -1240,11 +1249,12 @@ enum Layer {
   Layer_CastLayer = 62,
   Layer_ShapeLayer = 63,
   Layer_UnidirectionalSequenceLstmLayer = 64,
+  Layer_ChannelShuffleLayer = 65,
   Layer_MIN = Layer_NONE,
-  Layer_MAX = Layer_UnidirectionalSequenceLstmLayer
+  Layer_MAX = Layer_ChannelShuffleLayer
 };
 
-inline const Layer (&EnumValuesLayer())[65] {
+inline const Layer (&EnumValuesLayer())[66] {
   static const Layer values[] = {
     Layer_NONE,
     Layer_ActivationLayer,
@@ -1310,13 +1320,14 @@ inline const Layer (&EnumValuesLayer())[65] {
     Layer_ReduceLayer,
     Layer_CastLayer,
     Layer_ShapeLayer,
-    Layer_UnidirectionalSequenceLstmLayer
+    Layer_UnidirectionalSequenceLstmLayer,
+    Layer_ChannelShuffleLayer
   };
   return values;
 }
 
 inline const char * const *EnumNamesLayer() {
-  static const char * const names[66] = {
+  static const char * const names[67] = {
     "NONE",
     "ActivationLayer",
     "AdditionLayer",
@@ -1382,13 +1393,14 @@ inline const char * const *EnumNamesLayer() {
     "CastLayer",
     "ShapeLayer",
     "UnidirectionalSequenceLstmLayer",
+    "ChannelShuffleLayer",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLayer(Layer e) {
-  if (flatbuffers::IsOutRange(e, Layer_NONE, Layer_UnidirectionalSequenceLstmLayer)) return "";
+  if (flatbuffers::IsOutRange(e, Layer_NONE, Layer_ChannelShuffleLayer)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLayer()[index];
 }
@@ -1651,6 +1663,10 @@ template<> struct LayerTraits<armnnSerializer::ShapeLayer> {
 
 template<> struct LayerTraits<armnnSerializer::UnidirectionalSequenceLstmLayer> {
   static const Layer enum_value = Layer_UnidirectionalSequenceLstmLayer;
+};
+
+template<> struct LayerTraits<armnnSerializer::ChannelShuffleLayer> {
+  static const Layer enum_value = Layer_ChannelShuffleLayer;
 };
 
 bool VerifyLayer(flatbuffers::Verifier &verifier, const void *obj, Layer type);
@@ -2744,6 +2760,112 @@ inline flatbuffers::Offset<CastLayer> CreateCastLayer(
     flatbuffers::Offset<armnnSerializer::LayerBase> base = 0) {
   CastLayerBuilder builder_(_fbb);
   builder_.add_base(base);
+  return builder_.Finish();
+}
+
+struct ChannelShuffleLayer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ChannelShuffleLayerBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_BASE = 4,
+    VT_DESCRIPTOR = 6
+  };
+  const armnnSerializer::LayerBase *base() const {
+    return GetPointer<const armnnSerializer::LayerBase *>(VT_BASE);
+  }
+  const armnnSerializer::ChannelShuffleDescriptor *descriptor() const {
+    return GetPointer<const armnnSerializer::ChannelShuffleDescriptor *>(VT_DESCRIPTOR);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_BASE) &&
+           verifier.VerifyTable(base()) &&
+           VerifyOffset(verifier, VT_DESCRIPTOR) &&
+           verifier.VerifyTable(descriptor()) &&
+           verifier.EndTable();
+  }
+};
+
+struct ChannelShuffleLayerBuilder {
+  typedef ChannelShuffleLayer Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_base(flatbuffers::Offset<armnnSerializer::LayerBase> base) {
+    fbb_.AddOffset(ChannelShuffleLayer::VT_BASE, base);
+  }
+  void add_descriptor(flatbuffers::Offset<armnnSerializer::ChannelShuffleDescriptor> descriptor) {
+    fbb_.AddOffset(ChannelShuffleLayer::VT_DESCRIPTOR, descriptor);
+  }
+  explicit ChannelShuffleLayerBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ChannelShuffleLayerBuilder &operator=(const ChannelShuffleLayerBuilder &);
+  flatbuffers::Offset<ChannelShuffleLayer> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<ChannelShuffleLayer>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<ChannelShuffleLayer> CreateChannelShuffleLayer(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<armnnSerializer::LayerBase> base = 0,
+    flatbuffers::Offset<armnnSerializer::ChannelShuffleDescriptor> descriptor = 0) {
+  ChannelShuffleLayerBuilder builder_(_fbb);
+  builder_.add_descriptor(descriptor);
+  builder_.add_base(base);
+  return builder_.Finish();
+}
+
+struct ChannelShuffleDescriptor FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ChannelShuffleDescriptorBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_AXIS = 4,
+    VT_NUMGROUPS = 6
+  };
+  uint32_t axis() const {
+    return GetField<uint32_t>(VT_AXIS, 0);
+  }
+  uint32_t numGroups() const {
+    return GetField<uint32_t>(VT_NUMGROUPS, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint32_t>(verifier, VT_AXIS) &&
+           VerifyField<uint32_t>(verifier, VT_NUMGROUPS) &&
+           verifier.EndTable();
+  }
+};
+
+struct ChannelShuffleDescriptorBuilder {
+  typedef ChannelShuffleDescriptor Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_axis(uint32_t axis) {
+    fbb_.AddElement<uint32_t>(ChannelShuffleDescriptor::VT_AXIS, axis, 0);
+  }
+  void add_numGroups(uint32_t numGroups) {
+    fbb_.AddElement<uint32_t>(ChannelShuffleDescriptor::VT_NUMGROUPS, numGroups, 0);
+  }
+  explicit ChannelShuffleDescriptorBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ChannelShuffleDescriptorBuilder &operator=(const ChannelShuffleDescriptorBuilder &);
+  flatbuffers::Offset<ChannelShuffleDescriptor> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<ChannelShuffleDescriptor>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<ChannelShuffleDescriptor> CreateChannelShuffleDescriptor(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint32_t axis = 0,
+    uint32_t numGroups = 0) {
+  ChannelShuffleDescriptorBuilder builder_(_fbb);
+  builder_.add_numGroups(numGroups);
+  builder_.add_axis(axis);
   return builder_.Finish();
 }
 
@@ -9838,6 +9960,9 @@ struct AnyLayer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const armnnSerializer::UnidirectionalSequenceLstmLayer *layer_as_UnidirectionalSequenceLstmLayer() const {
     return layer_type() == armnnSerializer::Layer_UnidirectionalSequenceLstmLayer ? static_cast<const armnnSerializer::UnidirectionalSequenceLstmLayer *>(layer()) : nullptr;
   }
+  const armnnSerializer::ChannelShuffleLayer *layer_as_ChannelShuffleLayer() const {
+    return layer_type() == armnnSerializer::Layer_ChannelShuffleLayer ? static_cast<const armnnSerializer::ChannelShuffleLayer *>(layer()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_LAYER_TYPE) &&
@@ -10101,6 +10226,10 @@ template<> inline const armnnSerializer::ShapeLayer *AnyLayer::layer_as<armnnSer
 
 template<> inline const armnnSerializer::UnidirectionalSequenceLstmLayer *AnyLayer::layer_as<armnnSerializer::UnidirectionalSequenceLstmLayer>() const {
   return layer_as_UnidirectionalSequenceLstmLayer();
+}
+
+template<> inline const armnnSerializer::ChannelShuffleLayer *AnyLayer::layer_as<armnnSerializer::ChannelShuffleLayer>() const {
+  return layer_as_ChannelShuffleLayer();
 }
 
 struct AnyLayerBuilder {
@@ -10587,6 +10716,10 @@ inline bool VerifyLayer(flatbuffers::Verifier &verifier, const void *obj, Layer 
     }
     case Layer_UnidirectionalSequenceLstmLayer: {
       auto ptr = reinterpret_cast<const armnnSerializer::UnidirectionalSequenceLstmLayer *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Layer_ChannelShuffleLayer: {
+      auto ptr = reinterpret_cast<const armnnSerializer::ChannelShuffleLayer *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

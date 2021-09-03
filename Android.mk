@@ -156,6 +156,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/BatchNormalizationLayer.cpp \
         src/armnn/layers/BatchToSpaceNdLayer.cpp \
         src/armnn/layers/CastLayer.cpp \
+        src/armnn/layers/ChannelShuffleLayer.cpp \
         src/armnn/layers/ComparisonLayer.cpp \
         src/armnn/layers/ConcatLayer.cpp \
         src/armnn/layers/ConstantLayer.cpp \

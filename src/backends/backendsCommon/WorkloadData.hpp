@@ -747,4 +747,9 @@ struct UnidirectionalSequenceLstmQueueDescriptor : QueueDescriptorWithParameters
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct ChannelShuffleQueueDescriptor : QueueDescriptorWithParameters<ChannelShuffleDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } // namespace armnn

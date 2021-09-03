@@ -68,6 +68,9 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefBatchToSpaceNdWorkload.hpp
     RefCastWorkload.cpp
     RefCastWorkload.hpp
+    RefChannelShuffleWorkload.cpp
+    RefChannelShuffleWorkload.hpp
+    RefShapeWorkload.hpp
     RefComparisonWorkload.cpp
     RefComparisonWorkload.hpp
     RefConcatWorkload.cpp

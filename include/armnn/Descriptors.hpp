@@ -1342,4 +1342,26 @@ struct ReduceDescriptor : BaseDescriptor
     ReduceOperation m_ReduceOperation;
 };
 
+/// A ChannelShuffleDescriptor for the ChannelShuffle operator
+struct ChannelShuffleDescriptor : BaseDescriptor
+{
+    ChannelShuffleDescriptor()
+        : m_NumGroups(0), m_Axis(0)
+    {}
+
+    ChannelShuffleDescriptor(const uint32_t& numGroups, const uint32_t& axis)
+        : m_NumGroups(numGroups), m_Axis(axis)
+    {}
+
+    bool operator ==(const ChannelShuffleDescriptor& rhs) const
+    {
+        return m_NumGroups == rhs.m_NumGroups;
+    }
+
+    /// Number of groups for the channel shuffle operation
+    uint32_t m_NumGroups;
+    /// Axis to apply channel shuffle operation on
+    uint32_t m_Axis;
+};
+
 } // namespace armnn

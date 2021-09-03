@@ -512,6 +512,12 @@ IConnectableLayer* INetwork::AddUnidirectionalSequenceLstmLayer(
     return pNetworkImpl->AddUnidirectionalSequenceLstmLayer(descriptor, params, name);
 }
 
+IConnectableLayer* INetwork::AddChannelShuffleLayer(const ChannelShuffleDescriptor &descriptor,
+                                                    const char* name)
+{
+    return pNetworkImpl->AddChannelShuffleLayer(descriptor, name);
+}
+
 void INetwork::Accept(ILayerVisitor& visitor) const
 {
     return pNetworkImpl->Accept(visitor);
@@ -1816,6 +1822,11 @@ IConnectableLayer* NetworkImpl::AddBatchToSpaceNdLayer(const BatchToSpaceNdDescr
 IConnectableLayer* NetworkImpl::AddCastLayer(const char* name)
 {
     return m_Graph->AddLayer<CastLayer>(name);
+}
+IConnectableLayer* NetworkImpl::AddChannelShuffleLayer(const ChannelShuffleDescriptor& channelShuffleDescriptor,
+                                               const char* name)
+{
+    return m_Graph->AddLayer<ChannelShuffleLayer>(channelShuffleDescriptor, name);
 }
 
 IConnectableLayer* NetworkImpl::AddComparisonLayer(const ComparisonDescriptor& comparisonDescriptor,

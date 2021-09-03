@@ -333,6 +333,39 @@ bool RefLayerSupport::IsCastSupported(const TensorInfo& input,
     return supported;
 }
 
+bool RefLayerSupport::IsChannelShuffleSupported(const TensorInfo& input,
+                                                const TensorInfo& output,
+                                                const ChannelShuffleDescriptor& descriptor,
+                                                Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(descriptor);
+    bool supported = true;
+
+    // Define supported output and inputs types.
+    std::array<DataType, 7> supportedTypes =
+    {
+        DataType::BFloat16,
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QAsymmS8,
+        DataType::QAsymmU8,
+        DataType::QSymmS8,
+        DataType::QSymmS16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference ChannelShuffle: input is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference ChannelShuffle: output is not a supported type.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference ChannelShuffle: input and output types are mismatched.");
+
+    return supported;
+}
+
+
 bool RefLayerSupport::IsComparisonSupported(const TensorInfo& input0,
                                             const TensorInfo& input1,
                                             const TensorInfo& output,

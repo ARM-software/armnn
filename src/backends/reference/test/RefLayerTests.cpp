@@ -1398,6 +1398,13 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleReshapeQuantisedSymm16, SimpleReshapeTest<Da
 ARMNN_AUTO_TEST_CASE_WITH_THF(Reshape5d, Reshape5dTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReshapeBoolean, ReshapeBooleanTest)
 
+// ChannelShuffle
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleChannelShuffleFloat32, SimpleChannelShuffleTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleChannelShuffleQAsymmU8, SimpleChannelShuffleTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ChannelShuffle2DFloat32, ChannelShuffle2DTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ChannelShuffle2DQAsymmU8, ChannelShuffle2DTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ChannelShuffle4DFloat32, ChannelShuffle4DTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ChannelShuffle4DQAsymmU8, ChannelShuffle4DTest<DataType::QAsymmU8>)
 
 // Rsqrt
 ARMNN_AUTO_TEST_CASE_WITH_THF(Rsqrt2d, Rsqrt2dTest<DataType::Float32>)

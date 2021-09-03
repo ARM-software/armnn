@@ -64,6 +64,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/BatchToSpaceNdTestImpl.hpp
     layerTests/CastTestImpl.cpp
     layerTests/CastTestImpl.hpp
+    layerTests/ChannelShuffleTestImpl.cpp
+    layerTests/ChannelShuffleTestImpl.hpp
     layerTests/ComparisonTestImpl.cpp
     layerTests/ComparisonTestImpl.hpp
     layerTests/ConcatTestImpl.cpp

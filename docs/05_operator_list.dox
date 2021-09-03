@@ -2452,6 +2452,7 @@ where N = batches, C = channels, H = height, W = width
        <li>ANEURALNETWORKS_REDUCE_MAX
        <li>ANEURALNETWORKS_REDUCE_MIN
        <li>ANEURALNETWORKS_REDUCE_SUM
+       <li>ANEURALNETWORKS_REDUCE_PROD
       </ul>
    <td>CpuRef
      <td>

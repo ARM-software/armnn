@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include "IgnoreUnused.hpp"
 #include "Optimization.hpp"
 
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 namespace armnn

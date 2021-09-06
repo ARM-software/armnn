@@ -27,6 +27,7 @@ public:
       , m_WriteBuffer(nullptr)
       , m_Offset(8u)
       , m_RemainingBufferSize(0u)
+      , m_PacketDataLength(0u)
     {}
 
     /// Commits the current buffer and reset the member variables

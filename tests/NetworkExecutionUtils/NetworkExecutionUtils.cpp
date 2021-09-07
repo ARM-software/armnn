@@ -116,19 +116,26 @@ std::vector<std::string> ParseStringList(const std::string& inputString, const c
 TensorPrinter::TensorPrinter(const std::string& binding,
                              const armnn::TensorInfo& info,
                              const std::string& outputTensorFile,
-                             bool dequantizeOutput)
+                             bool dequantizeOutput,
+                             const bool printToConsole)
                              : m_OutputBinding(binding)
                              , m_Scale(info.GetQuantizationScale())
                              , m_Offset(info.GetQuantizationOffset())
                              , m_OutputTensorFile(outputTensorFile)
-                             , m_DequantizeOutput(dequantizeOutput) {}
+                             , m_DequantizeOutput(dequantizeOutput)
+                             , m_PrintToConsole(printToConsole) {}
 
 void TensorPrinter::operator()(const std::vector<float>& values)
 {
-    ForEachValue(values, [](float value)
+    if (m_PrintToConsole)
     {
-        printf("%f ", value);
-    });
+        std::cout << m_OutputBinding << ": ";
+        ForEachValue(values, [](float value)
+        {
+            printf("%f ", value);
+        });
+        printf("\n");
+    }
     WriteToFile(values);
 }
 
@@ -142,9 +149,19 @@ void TensorPrinter::operator()(const std::vector<uint8_t>& values)
         ForEachValue(values, [&scale, &offset, &dequantizedValues](uint8_t value)
         {
             auto dequantizedValue = armnn::Dequantize(value, scale, offset);
-            printf("%f ", dequantizedValue);
             dequantizedValues.push_back(dequantizedValue);
         });
+
+        if (m_PrintToConsole)
+        {
+            std::cout << m_OutputBinding << ": ";
+            ForEachValue(dequantizedValues, [](float value)
+            {
+                printf("%f ", value);
+            });
+            printf("\n");
+        }
+
         WriteToFile(dequantizedValues);
     }
     else
@@ -156,31 +173,47 @@ void TensorPrinter::operator()(const std::vector<uint8_t>& values)
 
 void TensorPrinter::operator()(const std::vector<int8_t>& values)
 {
-    ForEachValue(values, [](int8_t value)
+    if (m_PrintToConsole)
     {
-        printf("%d ", value);
-    });
+        std::cout << m_OutputBinding << ": ";
+        ForEachValue(values, [](int8_t value)
+        {
+            printf("%d ", value);
+        });
+        printf("\n");
+    }
     WriteToFile(values);
 }
 
 void TensorPrinter::operator()(const std::vector<int>& values)
 {
-    ForEachValue(values, [](int value)
+    if (m_PrintToConsole)
     {
-        printf("%d ", value);
-    });
+        std::cout << m_OutputBinding << ": ";
+        ForEachValue(values, [](int value)
+        {
+            printf("%d ", value);
+        });
+        printf("\n");
+    }
     WriteToFile(values);
 }
 
 template<typename Container, typename Delegate>
 void TensorPrinter::ForEachValue(const Container& c, Delegate delegate)
 {
-    std::cout << m_OutputBinding << ": ";
+    if (m_PrintToConsole)
+    {
+        std::cout << m_OutputBinding << ": ";
+    }
     for (const auto& value : c)
     {
         delegate(value);
     }
-    printf("\n");
+    if (m_PrintToConsole)
+    {
+        printf("\n");
+    }
 }
 
 template<typename T>

@@ -26,7 +26,8 @@ struct TensorPrinter
     TensorPrinter(const std::string& binding,
                   const armnn::TensorInfo& info,
                   const std::string& outputTensorFile,
-                  bool dequantizeOutput);
+                  bool dequantizeOutput,
+                  bool printToConsole = true);
 
     void operator()(const std::vector<float>& values);
 
@@ -48,6 +49,7 @@ private:
     int m_Offset;
     std::string m_OutputTensorFile;
     bool m_DequantizeOutput;
+    bool m_PrintToConsole;
 };
 
 using TContainer =

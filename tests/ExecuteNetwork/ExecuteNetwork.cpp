@@ -238,9 +238,12 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
                     return EXIT_FAILURE;
                 }
 
-                for (int i = 0; i < outputSize; ++i)
+                if (!params.m_DontPrintOutputs)
                 {
-                    printf("%f ", tfLiteDelageOutputData[i]);
+                    for (int i = 0; i < outputSize; ++i)
+                    {
+                        printf("%f ", tfLiteDelageOutputData[i]);
+                    }
                 }
             }
             else if (params.m_OutputTypes[outputIndex].compare("int") == 0)
@@ -253,9 +256,12 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
                     return EXIT_FAILURE;
                 }
 
-                for (int i = 0; i < outputSize; ++i)
+                if (!params.m_DontPrintOutputs)
                 {
-                    printf("%d ", tfLiteDelageOutputData[i]);
+                    for (int i = 0; i < outputSize; ++i)
+                    {
+                        printf("%d ", tfLiteDelageOutputData[i]);
+                    }
                 }
             }
             else if (params.m_OutputTypes[outputIndex].compare("qsymms8") == 0)
@@ -268,9 +274,12 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
                     return EXIT_FAILURE;
                 }
 
-                for (int i = 0; i < outputSize; ++i)
+                if (!params.m_DontPrintOutputs)
                 {
-                    printf("%d ", tfLiteDelageOutputData[i]);
+                    for (int i = 0; i < outputSize; ++i)
+                    {
+                        printf("%d ", tfLiteDelageOutputData[i]);
+                    }
                 }
             }
             else if (params.m_OutputTypes[outputIndex].compare("qasymm8") == 0 ||
@@ -284,9 +293,12 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
                     return EXIT_FAILURE;
                 }
 
-                for (int i = 0; i < outputSize; ++i)
+                if (!params.m_DontPrintOutputs)
                 {
-                    printf("%u ", tfLiteDelageOutputData[i]);
+                    for (int i = 0; i < outputSize; ++i)
+                    {
+                        printf("%u ", tfLiteDelageOutputData[i]);
+                    }
                 }
             }
             else
@@ -472,6 +484,10 @@ int MainImpl(const ExecuteNetworkParams& params,
                 {
                     ARMNN_LOG(warning) << "The input data was generated, note that the output will not be useful";
                 }
+                if (params.m_DontPrintOutputs)
+                {
+                    ARMNN_LOG(info) << "Printing outputs to console is disabled.";
+                }
 
                 // Print output tensors
                 const auto& infosOut = model.GetOutputBindingInfos();
@@ -479,9 +495,9 @@ int MainImpl(const ExecuteNetworkParams& params,
                 {
                     const armnn::TensorInfo& infoOut = infosOut[i].second;
 
-                    // We've made sure before that the number of output files either equals numOutputs, in which case
-                    // we override those files when processing the results of each iteration (only the result of the
-                    // last iteration will be stored), or there are enough
+                    // We've made sure before that the number of output files either equals numOutputs, in which
+                    // case we override those files when processing the results of each iteration (only the result
+                    // of the last iteration will be stored), or there are enough
                     // output files for each output of each iteration.
                     size_t outputFileIndex = x * numOutputs + i;
                     if (!params.m_OutputTensorFiles.empty())
@@ -499,7 +515,8 @@ int MainImpl(const ExecuteNetworkParams& params,
                     TensorPrinter printer(inferenceModelParams.m_OutputBindings[i],
                                           infoOut,
                                           outputTensorFile,
-                                          params.m_DequantizeOutput);
+                                          params.m_DequantizeOutput,
+                                          !params.m_DontPrintOutputs);
                     mapbox::util::apply_visitor(printer, outputs[x][i]);
                 }
 
@@ -575,14 +592,18 @@ int MainImpl(const ExecuteNetworkParams& params,
                     {
                         ARMNN_LOG(warning) << "The input data was generated, note that the output will not be useful";
                     }
+                    if (params.m_DontPrintOutputs)
+                    {
+                        ARMNN_LOG(info) << "Printing outputs to console is disabled.";
+                    }
 
                     // Print output tensors
                     const auto& infosOut = model.GetOutputBindingInfos();
                     for (size_t i = 0; i < numOutputs; i++)
                     {
                         // We've made sure before that the number of output files either equals numOutputs, in which
-                        // case we override those files when processing the results of each iteration (only the result
-                        // of the last iteration will be stored), or there are enough
+                        // case we override those files when processing the results of each iteration (only the
+                        // result of the last iteration will be stored), or there are enough
                         // output files for each output of each iteration.
                         size_t outputFileIndex = iteration * numOutputs + i;
                         if (!params.m_OutputTensorFiles.empty())
@@ -602,7 +623,8 @@ int MainImpl(const ExecuteNetworkParams& params,
                         TensorPrinter printer(inferenceModelParams.m_OutputBindings[i],
                                               infoOut,
                                               outputTensorFile,
-                                              params.m_DequantizeOutput);
+                                              params.m_DequantizeOutput,
+                                              !params.m_DontPrintOutputs);
                         mapbox::util::apply_visitor(printer, inferenceOutputMap.at(cb->GetInferenceId())[i]);
                     }
 
@@ -683,14 +705,18 @@ int MainImpl(const ExecuteNetworkParams& params,
                     {
                         ARMNN_LOG(warning) << "The input data was generated, note that the output will not be useful";
                     }
+                    if (params.m_DontPrintOutputs)
+                    {
+                        ARMNN_LOG(info) << "Printing outputs to console is disabled.";
+                    }
 
                     // Print output tensors
                     const auto& infosOut = model.GetOutputBindingInfos();
                     for (size_t i = 0; i < numOutputs; i++)
                     {
                         // We've made sure before that the number of output files either equals numOutputs, in which
-                        // case we override those files when processing the results of each iteration (only the result
-                        // of the last iteration will be stored), or there are enough
+                        // case we override those files when processing the results of each iteration (only the
+                        // result of the last iteration will be stored), or there are enough
                         // output files for each output of each iteration.
                         size_t outputFileIndex = j * numOutputs + i;
                         if (!params.m_OutputTensorFiles.empty())
@@ -709,7 +735,8 @@ int MainImpl(const ExecuteNetworkParams& params,
                         TensorPrinter printer(inferenceModelParams.m_OutputBindings[i],
                                               infoOut,
                                               outputTensorFile,
-                                              params.m_DequantizeOutput);
+                                              params.m_DequantizeOutput,
+                                              !params.m_DontPrintOutputs);
                         mapbox::util::apply_visitor(printer, outputs[j][i]);
                     }
 

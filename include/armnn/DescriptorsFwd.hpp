@@ -16,6 +16,7 @@ struct BatchToSpaceNdDescriptor;
 struct ChannelShuffleDescriptor;
 struct ComparisonDescriptor;
 struct Convolution2dDescriptor;
+struct Convolution3dDescriptor;
 struct DepthwiseConvolution2dDescriptor;
 struct DetectionPostProcessDescriptor;
 struct ElementwiseUnaryDescriptor;

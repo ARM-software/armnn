@@ -53,7 +53,8 @@ enum class DataType
 enum class DataLayout
 {
     NCHW = 1,
-    NHWC = 2
+    NHWC = 2,
+    NDHWC = 3
 };
 
 /// Define the behaviour of the internal profiler when outputting network details
@@ -422,6 +423,8 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(Shape) \
     X(UnidirectionalSequenceLstm) \
     X(ChannelShuffle) \
+    X(Convolution3d) \
+
 // New layers should be added at last to minimize instability.
 
 /// When adding a new layer, adapt also the LastLayer enum value in the

@@ -605,6 +605,76 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
     return supported;
 }
 
+bool RefLayerSupport::IsConvolution3dSupported(const TensorInfo& input,
+                                               const TensorInfo& output,
+                                               const Convolution3dDescriptor& descriptor,
+                                               const TensorInfo& weights,
+                                               const Optional<TensorInfo>& biases,
+                                               Optional<std::string&> reasonIfUnsupported) const
+{
+    bool supported = true;
+
+    // Define supported types.
+    std::array<DataType,7> supportedTypes =
+    {
+        DataType::BFloat16,
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QAsymmS8,
+        DataType::QAsymmU8,
+        DataType::QSymmS8,
+        DataType::QSymmS16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference Convolution3d: input is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference Convolution3d: output is not a supported type.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference Convolution3d: input and output types mismatched.");
+
+    const DataType inputType = input.GetDataType();
+    if (IsQuantized8BitType(inputType))
+    {
+        std::array<DataType, 3> supportedWeightTypes =
+        {
+            DataType::QAsymmS8,
+            DataType::QAsymmU8,
+            DataType::QSymmS8
+        };
+
+        supported &= CheckSupportRule(TypeAnyOf(weights, supportedWeightTypes), reasonIfUnsupported,
+                                      "Reference Convolution3d: weights type not supported for quantized input.");
+    }
+    else
+    {
+        supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
+                                      "Reference Convolution3d: weights is not a supported type.");
+
+        supported &= CheckSupportRule(TypesAreEqual(input, weights), reasonIfUnsupported,
+                                      "Reference Convolution3d: input and weights types mismatched.");
+    }
+
+    if (biases.has_value())
+    {
+        std::array<DataType,4> biasesSupportedTypes =
+        {
+            DataType::BFloat16,
+            DataType::Float32,
+            DataType::Float16,
+            DataType::Signed32
+        };
+
+        supported &= CheckSupportRule(TypeAnyOf(biases.value(), biasesSupportedTypes), reasonIfUnsupported,
+                                      "Reference Convolution3d: biases is not a supported type.");
+    }
+    IgnoreUnused(descriptor);
+
+    return supported;
+}
+
 bool RefLayerSupport::IsDebugSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        Optional<std::string&> reasonIfUnsupported) const

@@ -241,6 +241,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvolution2d(const Convolu
     return std::make_unique<RefConvolution2dWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvolution3d(const Convolution3dQueueDescriptor& descriptor,
+                                                                   const WorkloadInfo& info) const
+{
+    return std::make_unique<RefConvolution3dWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {

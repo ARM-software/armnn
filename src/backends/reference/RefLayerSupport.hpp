@@ -92,6 +92,13 @@ public:
                                   const Optional<TensorInfo>& biases,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsConvolution3dSupported(const TensorInfo& input,
+                                  const TensorInfo& output,
+                                  const Convolution3dDescriptor& descriptor,
+                                  const TensorInfo& weights,
+                                  const Optional<TensorInfo>& biases,
+                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsDebugSupported(const TensorInfo& input,
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;

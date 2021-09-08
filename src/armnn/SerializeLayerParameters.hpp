@@ -55,6 +55,11 @@ template <> struct StringifyLayerParameters<Convolution2dDescriptor>
     static void Serialize(ParameterStringifyFunction& fn, const Convolution2dDescriptor& desc);
 };
 
+template <> struct StringifyLayerParameters<Convolution3dDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const Convolution3dDescriptor& desc);
+};
+
 template <> struct StringifyLayerParameters<DetectionPostProcessDescriptor>
 {
     static void Serialize(ParameterStringifyFunction& fn, const DetectionPostProcessDescriptor& desc);

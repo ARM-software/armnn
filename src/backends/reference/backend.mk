@@ -27,6 +27,7 @@ BACKEND_SOURCES := \
         workloads/BatchToSpaceNd.cpp \
         workloads/Broadcast.cpp \
         workloads/ConvImpl.cpp \
+        workloads/Conv3dImpl.cpp \
         workloads/Debug.cpp \
         workloads/DepthToSpace.cpp \
         workloads/DetectionPostProcess.cpp \
@@ -58,6 +59,7 @@ BACKEND_SOURCES := \
         workloads/RefConvertFp32ToBf16Workload.cpp \
         workloads/RefConvertFp32ToFp16Workload.cpp \
         workloads/RefConvolution2dWorkload.cpp \
+        workloads/RefConvolution3dWorkload.cpp \
         workloads/RefDebugWorkload.cpp \
         workloads/RefDepthToSpaceWorkload.cpp \
         workloads/RefDepthwiseConvolution2dWorkload.cpp \

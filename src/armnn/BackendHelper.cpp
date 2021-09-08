@@ -282,6 +282,21 @@ bool LayerSupportHandle::IsConvolution2dSupported(const TensorInfo& input,
                                                     reasonIfUnsupported.value());
 }
 
+bool LayerSupportHandle::IsConvolution3dSupported(const TensorInfo& input,
+                                                  const TensorInfo& output,
+                                                  const Convolution3dDescriptor& descriptor,
+                                                  const TensorInfo& weights,
+                                                  const Optional<TensorInfo>& biases,
+                                                  Optional<std::string&> reasonIfUnsupported)
+{
+    return m_LayerSupport->IsConvolution3dSupported(input,
+                                                    output,
+                                                    descriptor,
+                                                    weights,
+                                                    biases,
+                                                    reasonIfUnsupported.value());
+}
+
 bool LayerSupportHandle::IsDebugSupported(const TensorInfo& input,
                                           const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported)

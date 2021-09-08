@@ -18,6 +18,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Broadcast.hpp
     ConvImpl.cpp
     ConvImpl.hpp
+    Conv3dImpl.cpp
+    Conv3dImpl.hpp
     Debug.cpp
     Debug.hpp
     Decoders.hpp
@@ -87,6 +89,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefConvertFp32ToFp16Workload.hpp
     RefConvolution2dWorkload.cpp
     RefConvolution2dWorkload.hpp
+    RefConvolution3dWorkload.cpp
+    RefConvolution3dWorkload.hpp
     RefElementwiseWorkload.cpp
     RefElementwiseWorkload.hpp
     RefDebugWorkload.cpp

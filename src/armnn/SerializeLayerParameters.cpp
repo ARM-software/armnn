@@ -101,6 +101,33 @@ void StringifyLayerParameters<Convolution2dDescriptor>::Serialize(ParameterStrin
     fn("DataLayout", GetDataLayoutName(desc.m_DataLayout));
 }
 
+void StringifyLayerParameters<Convolution3dDescriptor>::Serialize(ParameterStringifyFunction& fn,
+                                                                  const Convolution3dDescriptor& desc)
+{
+    {
+        std::stringstream ss;
+        ss << "(" << desc.m_PadTop    << "," << desc.m_PadLeft
+           << "," << desc.m_PadBottom << "," << desc.m_PadRight
+           << "," << desc.m_PadFront  << "," << desc.m_PadBack << ")";
+        fn("Padding(T,L,B,R,F,B)",ss.str());
+    }
+
+    {
+        std::stringstream ss;
+        ss << "(" << desc.m_StrideX <<  "," << desc.m_StrideY << "," << desc.m_StrideZ << ")";
+        fn("Stride(X,Y,Z)", ss.str());
+    }
+
+    {
+        std::stringstream ss;
+        ss << "(" << desc.m_DilationX << "," << desc.m_DilationY << "," << desc.m_DilationZ << ")";
+        fn("Dilation(X,Y)", ss.str());
+    }
+
+    fn("BiasEnabled",(desc.m_BiasEnabled ? "true" : "false"));
+    fn("DataLayout", GetDataLayoutName(desc.m_DataLayout));
+}
+
 void StringifyLayerParameters<DetectionPostProcessDescriptor>::Serialize(ParameterStringifyFunction& fn,
                                                                          const DetectionPostProcessDescriptor& desc)
 {

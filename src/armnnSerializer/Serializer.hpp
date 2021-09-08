@@ -144,12 +144,17 @@ private:
                               const char* name = nullptr);
 
     void SerializeConstantLayer(const armnn::IConnectableLayer* layer,
-                                const std::vector<armnn::ConstTensor>& contants,
+                                const std::vector<armnn::ConstTensor>& constants,
                                 const char* name = nullptr);
 
     void SerializeConvolution2dLayer(const armnn::IConnectableLayer* layer,
                                      const armnn::Convolution2dDescriptor& descriptor,
-                                     const std::vector<armnn::ConstTensor>& contants,
+                                     const std::vector<armnn::ConstTensor>& constants,
+                                     const char* name = nullptr);
+
+    void SerializeConvolution3dLayer(const armnn::IConnectableLayer* layer,
+                                     const armnn::Convolution3dDescriptor& descriptor,
+                                     const std::vector<armnn::ConstTensor>& constants,
                                      const char* name = nullptr);
 
     void SerializeDepthToSpaceLayer(const armnn::IConnectableLayer* layer,

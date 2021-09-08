@@ -45,7 +45,8 @@ enum DataType : byte {
 
 enum DataLayout : byte {
     NHWC = 0,
-    NCHW = 1
+    NCHW = 1,
+    NDHWC = 2
 }
 
 enum ReduceOperation: byte {
@@ -177,6 +178,7 @@ enum LayerType : uint {
     Shape = 62,
     UnidirectionalSequenceLstm = 63,
     ChannelShuffle = 64,
+    Convolution3d = 65,
 }
 
 // Base layer table to be used as part of other layers
@@ -280,6 +282,30 @@ table Convolution2dDescriptor {
     dilationY:uint = 1;
     biasEnabled:bool = false;
     dataLayout:DataLayout = NCHW;
+}
+
+table Convolution3dLayer {
+    base:LayerBase;
+    descriptor:Convolution3dDescriptor;
+    weights:ConstTensor;
+    biases:ConstTensor;
+}
+
+table Convolution3dDescriptor {
+    padLeft:uint;
+    padRight:uint;
+    padTop:uint;
+    padBottom:uint;
+    padFront:uint;
+    padBack:uint;
+    strideX:uint;
+    strideY:uint;
+    strideZ:uint;
+    dilationX:uint = 1;
+    dilationY:uint = 1;
+    dilationZ:uint = 1;
+    biasEnabled:bool = false;
+    dataLayout:DataLayout = NDHWC;
 }
 
 table DepthToSpaceLayer {
@@ -1012,6 +1038,7 @@ union Layer {
     ShapeLayer,
     UnidirectionalSequenceLstmLayer,
     ChannelShuffleLayer,
+    Convolution3dLayer,
 }
 
 table AnyLayer {

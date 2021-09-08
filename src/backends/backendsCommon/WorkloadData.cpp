@@ -1322,6 +1322,67 @@ void Convolution2dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) co
     }
 }
 
+void Convolution3dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"Convolution3dQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 5, "input");
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 5, "output");
+
+    ValidatePointer(m_Weight, descriptorName, "weight");
+
+    const TensorInfo& weightTensorInfo = m_Weight->GetTensorInfo();
+    ValidateTensorNumDimensions(weightTensorInfo, descriptorName, 5, "weight");
+
+    ValidateWeightDataType(inputTensorInfo, weightTensorInfo, descriptorName);
+
+    Optional<TensorInfo> optionalBiasTensorInfo;
+    if (m_Parameters.m_BiasEnabled)
+    {
+        ValidatePointer(m_Bias, descriptorName, "bias");
+
+        optionalBiasTensorInfo = MakeOptional<TensorInfo>(m_Bias->GetTensorInfo());
+        const TensorInfo& biasTensorInfo = optionalBiasTensorInfo.value();
+
+        ValidateTensorDataType(biasTensorInfo, GetBiasDataType(inputTensorInfo.GetDataType()), descriptorName, "bias");
+        ValidateBiasTensorQuantization(biasTensorInfo, inputTensorInfo, weightTensorInfo, descriptorName);
+    }
+
+    if (m_Parameters.m_StrideX <= 0 || m_Parameters.m_StrideY <= 0 || m_Parameters.m_StrideZ <= 0 )
+    {
+        throw InvalidArgumentException(
+                fmt::format("{}: strideX (provided {}), strideY (provided {}) or strideZ (provided {})"
+                            "cannot be either negative or 0.",
+                            descriptorName, m_Parameters.m_StrideX, m_Parameters.m_StrideY, m_Parameters.m_StrideZ));
+    }
+
+    ValidatePerAxisQuantization(inputTensorInfo,
+                                outputTensorInfo,
+                                weightTensorInfo,
+                                optionalBiasTensorInfo,
+                                descriptorName);
+
+    std::vector<DataType> supportedTypes =
+    {
+        DataType::BFloat16,
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QAsymmS8,
+        DataType::QAsymmU8,
+        DataType::QSymmS16,
+        DataType::QSymmS8
+    };
+
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+}
+
 void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     const std::string descriptorName{"DepthwiseConvolution2dQueueDescriptor"};

@@ -397,6 +397,54 @@ void SerializerStrategy::SerializeConvolution2dLayer(const armnn::IConnectableLa
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_Convolution2dLayer);
 }
 
+// Build FlatBuffer for Convolution2dLayer
+void SerializerStrategy::SerializeConvolution3dLayer(const armnn::IConnectableLayer* layer,
+                                                     const armnn::Convolution3dDescriptor& descriptor,
+                                                     const std::vector<armnn::ConstTensor>& constants,
+                                                     const char* name)
+{
+    IgnoreUnused(name);
+
+    const armnn::ConstTensor weights = constants[0];
+
+    // Create FlatBuffer BaseLayer
+    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Convolution2d);
+
+    auto flatBufferDescriptor = CreateConvolution3dDescriptor(m_flatBufferBuilder,
+                                                              descriptor.m_PadLeft,
+                                                              descriptor.m_PadRight,
+                                                              descriptor.m_PadTop,
+                                                              descriptor.m_PadBottom,
+                                                              descriptor.m_PadFront,
+                                                              descriptor.m_PadBack,
+                                                              descriptor.m_StrideX,
+                                                              descriptor.m_StrideY,
+                                                              descriptor.m_StrideZ,
+                                                              descriptor.m_DilationX,
+                                                              descriptor.m_DilationY,
+                                                              descriptor.m_DilationZ,
+                                                              descriptor.m_BiasEnabled,
+                                                              GetFlatBufferDataLayout(descriptor.m_DataLayout));
+    auto flatBufferWeightsConstTensorInfo = CreateConstTensorInfo(weights);
+    flatbuffers::Offset<serializer::ConstTensor> flatBufferBiasesConstTensorInfo;
+
+    if (constants.size() > 1)
+    {
+        const armnn::ConstTensor biases = constants[1];
+        flatBufferBiasesConstTensorInfo = CreateConstTensorInfo(biases);
+    }
+
+    // Create the FlatBuffer Convolution2dLayer
+    auto flatBufferLayer = CreateConvolution3dLayer(m_flatBufferBuilder,
+                                                    flatBufferBaseLayer,
+                                                    flatBufferDescriptor,
+                                                    flatBufferWeightsConstTensorInfo,
+                                                    flatBufferBiasesConstTensorInfo);
+
+    // Add the AnyLayer to the FlatBufferLayers
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_Convolution3dLayer);
+}
+
 void SerializerStrategy::SerializeDepthToSpaceLayer(const armnn::IConnectableLayer* layer,
                                                const armnn::DepthToSpaceDescriptor& descriptor,
                                                const char* name)
@@ -2049,6 +2097,16 @@ void SerializerStrategy::ExecuteStrategy(const armnn::IConnectableLayer* layer,
             const armnn::Convolution2dDescriptor& layerDescriptor =
                     static_cast<const armnn::Convolution2dDescriptor&>(descriptor);
             SerializeConvolution2dLayer(layer,
+                                        layerDescriptor,
+                                        constants,
+                                        name);
+            break;
+        }
+        case armnn::LayerType::Convolution3d :
+        {
+            const armnn::Convolution3dDescriptor& layerDescriptor =
+                    static_cast<const armnn::Convolution3dDescriptor&>(descriptor);
+            SerializeConvolution3dLayer(layer,
                                         layerDescriptor,
                                         constants,
                                         name);

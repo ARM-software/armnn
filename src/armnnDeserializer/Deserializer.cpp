@@ -221,6 +221,7 @@ m_ParserFunctions(Layer_MAX+1, &IDeserializer::DeserializerImpl::ParseUnsupporte
     m_ParserFunctions[Layer_ConcatLayer]                 = &DeserializerImpl::ParseConcat;
     m_ParserFunctions[Layer_ConstantLayer]               = &DeserializerImpl::ParseConstant;
     m_ParserFunctions[Layer_Convolution2dLayer]          = &DeserializerImpl::ParseConvolution2d;
+    m_ParserFunctions[Layer_Convolution3dLayer]          = &DeserializerImpl::ParseConvolution3d;
     m_ParserFunctions[Layer_DepthToSpaceLayer]           = &DeserializerImpl::ParseDepthToSpace;
     m_ParserFunctions[Layer_DepthwiseConvolution2dLayer] = &DeserializerImpl::ParseDepthwiseConvolution2d;
     m_ParserFunctions[Layer_DequantizeLayer]             = &DeserializerImpl::ParseDequantize;
@@ -304,6 +305,8 @@ LayerBaseRawPtr IDeserializer::DeserializerImpl::GetBaseLayer(const GraphPtr& gr
             return graphPtr->layers()->Get(layerIndex)->layer_as_ConstantLayer()->base();
         case Layer::Layer_Convolution2dLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_Convolution2dLayer()->base();
+        case Layer::Layer_Convolution3dLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_Convolution3dLayer()->base();
         case Layer::Layer_DepthToSpaceLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_DepthToSpaceLayer()->base();
         case Layer::Layer_DepthwiseConvolution2dLayer:
@@ -444,6 +447,8 @@ armnn::DataLayout ToDataLayout(armnnSerializer::DataLayout dataLayout)
     {
         case armnnSerializer::DataLayout::DataLayout_NHWC:
             return armnn::DataLayout::NHWC;
+        case armnnSerializer::DataLayout::DataLayout_NDHWC:
+            return armnn::DataLayout::NDHWC;
         case armnnSerializer::DataLayout::DataLayout_NCHW:
         default:
             return armnn::DataLayout::NCHW;
@@ -1382,6 +1387,56 @@ void IDeserializer::DeserializerImpl::ParseConvolution2d(GraphPtr graph, unsigne
         optionalBiases = armnn::Optional<armnn::ConstTensor>(biases);
     }
     IConnectableLayer* layer = m_Network->AddConvolution2dLayer(descriptor,
+                                                                weights,
+                                                                optionalBiases,
+                                                                layerName.c_str());
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void IDeserializer::DeserializerImpl::ParseConvolution3d(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_LOCATION();
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto serializerLayer = graph->layers()->Get(layerIndex)->layer_as_Convolution3dLayer();
+    auto layerName = GetLayerName(graph, layerIndex);
+    auto serializerDescriptor = serializerLayer->descriptor();
+
+    armnn::Convolution3dDescriptor descriptor;
+    descriptor.m_PadLeft = serializerDescriptor->padLeft();
+    descriptor.m_PadRight = serializerDescriptor->padRight();
+    descriptor.m_PadTop = serializerDescriptor->padTop();
+    descriptor.m_PadBottom = serializerDescriptor->padBottom();
+    descriptor.m_PadFront = serializerDescriptor->padFront();
+    descriptor.m_PadBack = serializerDescriptor->padBack();
+    descriptor.m_StrideX = serializerDescriptor->strideX();
+    descriptor.m_StrideY = serializerDescriptor->strideY();
+    descriptor.m_StrideZ = serializerDescriptor->strideZ();
+    descriptor.m_DilationX = serializerDescriptor->dilationX();
+    descriptor.m_DilationY = serializerDescriptor->dilationY();
+    descriptor.m_DilationZ = serializerDescriptor->dilationZ();
+    descriptor.m_BiasEnabled = serializerDescriptor->biasEnabled();;
+    descriptor.m_DataLayout = ToDataLayout(serializerDescriptor->dataLayout());
+
+    armnn::ConstTensor weights = ToConstTensor(serializerLayer->weights());
+    armnn::ConstTensor biases;
+
+    armnn::Optional<armnn::ConstTensor> optionalBiases = armnn::EmptyOptional();
+    if (descriptor.m_BiasEnabled)
+    {
+        biases = ToConstTensor(serializerLayer->biases());
+        optionalBiases = armnn::Optional<armnn::ConstTensor>(biases);
+    }
+    IConnectableLayer* layer = m_Network->AddConvolution3dLayer(descriptor,
                                                                 weights,
                                                                 optionalBiases,
                                                                 layerName.c_str());

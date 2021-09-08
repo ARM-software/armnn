@@ -20,6 +20,7 @@
 #include <backendsCommon/test/layerTests/ConvertFp32ToBf16TestImpl.hpp>
 #include <backendsCommon/test/layerTests/ConvertFp32ToFp16TestImpl.hpp>
 #include <backendsCommon/test/layerTests/Conv2dTestImpl.hpp>
+#include <backendsCommon/test/layerTests/Conv3dTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ConstantTestImpl.hpp>
 #include <backendsCommon/test/layerTests/DebugTestImpl.hpp>
 #include <backendsCommon/test/layerTests/DepthToSpaceTestImpl.hpp>

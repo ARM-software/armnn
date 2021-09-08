@@ -165,6 +165,16 @@ bool LayerSupportBase::IsConvolution2dSupported(const TensorInfo&, // input
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsConvolution3dSupported(const TensorInfo&, // input
+                                                const TensorInfo&, // output
+                                                const Convolution3dDescriptor&, // descriptor
+                                                const TensorInfo&, // weights
+                                                const Optional<TensorInfo>&, // biases
+                                                Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsDebugSupported(const TensorInfo&, // input
                                         const TensorInfo&, // output
                                         Optional<std::string&> reasonIfUnsupported) const

@@ -22,6 +22,7 @@
 #include "RefChannelShuffleWorkload.hpp"
 #include "RefComparisonWorkload.hpp"
 #include "RefConvolution2dWorkload.hpp"
+#include "RefConvolution3dWorkload.hpp"
 #include "RefConstantWorkload.hpp"
 #include "RefConcatWorkload.hpp"
 #include "RefConvertBf16ToFp32Workload.hpp"

@@ -218,9 +218,10 @@ constexpr const char* GetDataLayoutName(DataLayout dataLayout)
 {
     switch (dataLayout)
     {
-        case DataLayout::NCHW: return "NCHW";
-        case DataLayout::NHWC: return "NHWC";
-        default:               return "Unknown";
+        case DataLayout::NCHW:  return "NCHW";
+        case DataLayout::NHWC:  return "NHWC";
+        case DataLayout::NDHWC: return "NDHWC";
+        default:                return "Unknown";
     }
 }
 

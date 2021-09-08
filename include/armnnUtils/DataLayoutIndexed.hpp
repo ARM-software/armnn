@@ -23,6 +23,7 @@ public:
     unsigned int      GetChannelsIndex() const { return m_ChannelsIndex; }
     unsigned int      GetHeightIndex()   const { return m_HeightIndex; }
     unsigned int      GetWidthIndex()    const { return m_WidthIndex; }
+    unsigned int      GetDepthIndex()    const { return m_DepthIndex; }
 
     inline unsigned int GetIndex(const armnn::TensorShape& shape,
                                  unsigned int batchIndex, unsigned int channelIndex,
@@ -63,6 +64,7 @@ private:
     unsigned int      m_ChannelsIndex;
     unsigned int      m_HeightIndex;
     unsigned int      m_WidthIndex;
+    unsigned int      m_DepthIndex;
 };
 
 /// Equality methods

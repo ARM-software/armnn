@@ -86,6 +86,12 @@ struct Convolution2dLayerBuilder;
 struct Convolution2dDescriptor;
 struct Convolution2dDescriptorBuilder;
 
+struct Convolution3dLayer;
+struct Convolution3dLayerBuilder;
+
+struct Convolution3dDescriptor;
+struct Convolution3dDescriptorBuilder;
+
 struct DepthToSpaceLayer;
 struct DepthToSpaceLayerBuilder;
 
@@ -533,29 +539,32 @@ inline const char *EnumNameDataType(DataType e) {
 enum DataLayout {
   DataLayout_NHWC = 0,
   DataLayout_NCHW = 1,
+  DataLayout_NDHWC = 2,
   DataLayout_MIN = DataLayout_NHWC,
-  DataLayout_MAX = DataLayout_NCHW
+  DataLayout_MAX = DataLayout_NDHWC
 };
 
-inline const DataLayout (&EnumValuesDataLayout())[2] {
+inline const DataLayout (&EnumValuesDataLayout())[3] {
   static const DataLayout values[] = {
     DataLayout_NHWC,
-    DataLayout_NCHW
+    DataLayout_NCHW,
+    DataLayout_NDHWC
   };
   return values;
 }
 
 inline const char * const *EnumNamesDataLayout() {
-  static const char * const names[3] = {
+  static const char * const names[4] = {
     "NHWC",
     "NCHW",
+    "NDHWC",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameDataLayout(DataLayout e) {
-  if (flatbuffers::IsOutRange(e, DataLayout_NHWC, DataLayout_NCHW)) return "";
+  if (flatbuffers::IsOutRange(e, DataLayout_NHWC, DataLayout_NDHWC)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesDataLayout()[index];
 }
@@ -757,11 +766,12 @@ enum LayerType {
   LayerType_Shape = 62,
   LayerType_UnidirectionalSequenceLstm = 63,
   LayerType_ChannelShuffle = 64,
+  LayerType_Convolution3d = 65,
   LayerType_MIN = LayerType_Addition,
-  LayerType_MAX = LayerType_ChannelShuffle
+  LayerType_MAX = LayerType_Convolution3d
 };
 
-inline const LayerType (&EnumValuesLayerType())[65] {
+inline const LayerType (&EnumValuesLayerType())[66] {
   static const LayerType values[] = {
     LayerType_Addition,
     LayerType_Input,
@@ -827,13 +837,14 @@ inline const LayerType (&EnumValuesLayerType())[65] {
     LayerType_Cast,
     LayerType_Shape,
     LayerType_UnidirectionalSequenceLstm,
-    LayerType_ChannelShuffle
+    LayerType_ChannelShuffle,
+    LayerType_Convolution3d
   };
   return values;
 }
 
 inline const char * const *EnumNamesLayerType() {
-  static const char * const names[66] = {
+  static const char * const names[67] = {
     "Addition",
     "Input",
     "Multiplication",
@@ -899,13 +910,14 @@ inline const char * const *EnumNamesLayerType() {
     "Shape",
     "UnidirectionalSequenceLstm",
     "ChannelShuffle",
+    "Convolution3d",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLayerType(LayerType e) {
-  if (flatbuffers::IsOutRange(e, LayerType_Addition, LayerType_ChannelShuffle)) return "";
+  if (flatbuffers::IsOutRange(e, LayerType_Addition, LayerType_Convolution3d)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLayerType()[index];
 }
@@ -1250,11 +1262,12 @@ enum Layer {
   Layer_ShapeLayer = 63,
   Layer_UnidirectionalSequenceLstmLayer = 64,
   Layer_ChannelShuffleLayer = 65,
+  Layer_Convolution3dLayer = 66,
   Layer_MIN = Layer_NONE,
-  Layer_MAX = Layer_ChannelShuffleLayer
+  Layer_MAX = Layer_Convolution3dLayer
 };
 
-inline const Layer (&EnumValuesLayer())[66] {
+inline const Layer (&EnumValuesLayer())[67] {
   static const Layer values[] = {
     Layer_NONE,
     Layer_ActivationLayer,
@@ -1321,13 +1334,14 @@ inline const Layer (&EnumValuesLayer())[66] {
     Layer_CastLayer,
     Layer_ShapeLayer,
     Layer_UnidirectionalSequenceLstmLayer,
-    Layer_ChannelShuffleLayer
+    Layer_ChannelShuffleLayer,
+    Layer_Convolution3dLayer
   };
   return values;
 }
 
 inline const char * const *EnumNamesLayer() {
-  static const char * const names[67] = {
+  static const char * const names[68] = {
     "NONE",
     "ActivationLayer",
     "AdditionLayer",
@@ -1394,13 +1408,14 @@ inline const char * const *EnumNamesLayer() {
     "ShapeLayer",
     "UnidirectionalSequenceLstmLayer",
     "ChannelShuffleLayer",
+    "Convolution3dLayer",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLayer(Layer e) {
-  if (flatbuffers::IsOutRange(e, Layer_NONE, Layer_ChannelShuffleLayer)) return "";
+  if (flatbuffers::IsOutRange(e, Layer_NONE, Layer_Convolution3dLayer)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLayer()[index];
 }
@@ -1667,6 +1682,10 @@ template<> struct LayerTraits<armnnSerializer::UnidirectionalSequenceLstmLayer> 
 
 template<> struct LayerTraits<armnnSerializer::ChannelShuffleLayer> {
   static const Layer enum_value = Layer_ChannelShuffleLayer;
+};
+
+template<> struct LayerTraits<armnnSerializer::Convolution3dLayer> {
+  static const Layer enum_value = Layer_Convolution3dLayer;
 };
 
 bool VerifyLayer(flatbuffers::Verifier &verifier, const void *obj, Layer type);
@@ -3218,6 +3237,254 @@ inline flatbuffers::Offset<Convolution2dDescriptor> CreateConvolution2dDescripto
   builder_.add_dilationX(dilationX);
   builder_.add_strideY(strideY);
   builder_.add_strideX(strideX);
+  builder_.add_padBottom(padBottom);
+  builder_.add_padTop(padTop);
+  builder_.add_padRight(padRight);
+  builder_.add_padLeft(padLeft);
+  builder_.add_dataLayout(dataLayout);
+  builder_.add_biasEnabled(biasEnabled);
+  return builder_.Finish();
+}
+
+struct Convolution3dLayer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef Convolution3dLayerBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_BASE = 4,
+    VT_DESCRIPTOR = 6,
+    VT_WEIGHTS = 8,
+    VT_BIASES = 10
+  };
+  const armnnSerializer::LayerBase *base() const {
+    return GetPointer<const armnnSerializer::LayerBase *>(VT_BASE);
+  }
+  const armnnSerializer::Convolution3dDescriptor *descriptor() const {
+    return GetPointer<const armnnSerializer::Convolution3dDescriptor *>(VT_DESCRIPTOR);
+  }
+  const armnnSerializer::ConstTensor *weights() const {
+    return GetPointer<const armnnSerializer::ConstTensor *>(VT_WEIGHTS);
+  }
+  const armnnSerializer::ConstTensor *biases() const {
+    return GetPointer<const armnnSerializer::ConstTensor *>(VT_BIASES);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_BASE) &&
+           verifier.VerifyTable(base()) &&
+           VerifyOffset(verifier, VT_DESCRIPTOR) &&
+           verifier.VerifyTable(descriptor()) &&
+           VerifyOffset(verifier, VT_WEIGHTS) &&
+           verifier.VerifyTable(weights()) &&
+           VerifyOffset(verifier, VT_BIASES) &&
+           verifier.VerifyTable(biases()) &&
+           verifier.EndTable();
+  }
+};
+
+struct Convolution3dLayerBuilder {
+  typedef Convolution3dLayer Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_base(flatbuffers::Offset<armnnSerializer::LayerBase> base) {
+    fbb_.AddOffset(Convolution3dLayer::VT_BASE, base);
+  }
+  void add_descriptor(flatbuffers::Offset<armnnSerializer::Convolution3dDescriptor> descriptor) {
+    fbb_.AddOffset(Convolution3dLayer::VT_DESCRIPTOR, descriptor);
+  }
+  void add_weights(flatbuffers::Offset<armnnSerializer::ConstTensor> weights) {
+    fbb_.AddOffset(Convolution3dLayer::VT_WEIGHTS, weights);
+  }
+  void add_biases(flatbuffers::Offset<armnnSerializer::ConstTensor> biases) {
+    fbb_.AddOffset(Convolution3dLayer::VT_BIASES, biases);
+  }
+  explicit Convolution3dLayerBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  Convolution3dLayerBuilder &operator=(const Convolution3dLayerBuilder &);
+  flatbuffers::Offset<Convolution3dLayer> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Convolution3dLayer>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Convolution3dLayer> CreateConvolution3dLayer(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<armnnSerializer::LayerBase> base = 0,
+    flatbuffers::Offset<armnnSerializer::Convolution3dDescriptor> descriptor = 0,
+    flatbuffers::Offset<armnnSerializer::ConstTensor> weights = 0,
+    flatbuffers::Offset<armnnSerializer::ConstTensor> biases = 0) {
+  Convolution3dLayerBuilder builder_(_fbb);
+  builder_.add_biases(biases);
+  builder_.add_weights(weights);
+  builder_.add_descriptor(descriptor);
+  builder_.add_base(base);
+  return builder_.Finish();
+}
+
+struct Convolution3dDescriptor FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef Convolution3dDescriptorBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_PADLEFT = 4,
+    VT_PADRIGHT = 6,
+    VT_PADTOP = 8,
+    VT_PADBOTTOM = 10,
+    VT_PADFRONT = 12,
+    VT_PADBACK = 14,
+    VT_STRIDEX = 16,
+    VT_STRIDEY = 18,
+    VT_STRIDEZ = 20,
+    VT_DILATIONX = 22,
+    VT_DILATIONY = 24,
+    VT_DILATIONZ = 26,
+    VT_BIASENABLED = 28,
+    VT_DATALAYOUT = 30
+  };
+  uint32_t padLeft() const {
+    return GetField<uint32_t>(VT_PADLEFT, 0);
+  }
+  uint32_t padRight() const {
+    return GetField<uint32_t>(VT_PADRIGHT, 0);
+  }
+  uint32_t padTop() const {
+    return GetField<uint32_t>(VT_PADTOP, 0);
+  }
+  uint32_t padBottom() const {
+    return GetField<uint32_t>(VT_PADBOTTOM, 0);
+  }
+  uint32_t padFront() const {
+    return GetField<uint32_t>(VT_PADFRONT, 0);
+  }
+  uint32_t padBack() const {
+    return GetField<uint32_t>(VT_PADBACK, 0);
+  }
+  uint32_t strideX() const {
+    return GetField<uint32_t>(VT_STRIDEX, 0);
+  }
+  uint32_t strideY() const {
+    return GetField<uint32_t>(VT_STRIDEY, 0);
+  }
+  uint32_t strideZ() const {
+    return GetField<uint32_t>(VT_STRIDEZ, 0);
+  }
+  uint32_t dilationX() const {
+    return GetField<uint32_t>(VT_DILATIONX, 1);
+  }
+  uint32_t dilationY() const {
+    return GetField<uint32_t>(VT_DILATIONY, 1);
+  }
+  uint32_t dilationZ() const {
+    return GetField<uint32_t>(VT_DILATIONZ, 1);
+  }
+  bool biasEnabled() const {
+    return GetField<uint8_t>(VT_BIASENABLED, 0) != 0;
+  }
+  armnnSerializer::DataLayout dataLayout() const {
+    return static_cast<armnnSerializer::DataLayout>(GetField<int8_t>(VT_DATALAYOUT, 2));
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint32_t>(verifier, VT_PADLEFT) &&
+           VerifyField<uint32_t>(verifier, VT_PADRIGHT) &&
+           VerifyField<uint32_t>(verifier, VT_PADTOP) &&
+           VerifyField<uint32_t>(verifier, VT_PADBOTTOM) &&
+           VerifyField<uint32_t>(verifier, VT_PADFRONT) &&
+           VerifyField<uint32_t>(verifier, VT_PADBACK) &&
+           VerifyField<uint32_t>(verifier, VT_STRIDEX) &&
+           VerifyField<uint32_t>(verifier, VT_STRIDEY) &&
+           VerifyField<uint32_t>(verifier, VT_STRIDEZ) &&
+           VerifyField<uint32_t>(verifier, VT_DILATIONX) &&
+           VerifyField<uint32_t>(verifier, VT_DILATIONY) &&
+           VerifyField<uint32_t>(verifier, VT_DILATIONZ) &&
+           VerifyField<uint8_t>(verifier, VT_BIASENABLED) &&
+           VerifyField<int8_t>(verifier, VT_DATALAYOUT) &&
+           verifier.EndTable();
+  }
+};
+
+struct Convolution3dDescriptorBuilder {
+  typedef Convolution3dDescriptor Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_padLeft(uint32_t padLeft) {
+    fbb_.AddElement<uint32_t>(Convolution3dDescriptor::VT_PADLEFT, padLeft, 0);
+  }
+  void add_padRight(uint32_t padRight) {
+    fbb_.AddElement<uint32_t>(Convolution3dDescriptor::VT_PADRIGHT, padRight, 0);
+  }
+  void add_padTop(uint32_t padTop) {
+    fbb_.AddElement<uint32_t>(Convolution3dDescriptor::VT_PADTOP, padTop, 0);
+  }
+  void add_padBottom(uint32_t padBottom) {
+    fbb_.AddElement<uint32_t>(Convolution3dDescriptor::VT_PADBOTTOM, padBottom, 0);
+  }
+  void add_padFront(uint32_t padFront) {
+    fbb_.AddElement<uint32_t>(Convolution3dDescriptor::VT_PADFRONT, padFront, 0);
+  }
+  void add_padBack(uint32_t padBack) {
+    fbb_.AddElement<uint32_t>(Convolution3dDescriptor::VT_PADBACK, padBack, 0);
+  }
+  void add_strideX(uint32_t strideX) {
+    fbb_.AddElement<uint32_t>(Convolution3dDescriptor::VT_STRIDEX, strideX, 0);
+  }
+  void add_strideY(uint32_t strideY) {
+    fbb_.AddElement<uint32_t>(Convolution3dDescriptor::VT_STRIDEY, strideY, 0);
+  }
+  void add_strideZ(uint32_t strideZ) {
+    fbb_.AddElement<uint32_t>(Convolution3dDescriptor::VT_STRIDEZ, strideZ, 0);
+  }
+  void add_dilationX(uint32_t dilationX) {
+    fbb_.AddElement<uint32_t>(Convolution3dDescriptor::VT_DILATIONX, dilationX, 1);
+  }
+  void add_dilationY(uint32_t dilationY) {
+    fbb_.AddElement<uint32_t>(Convolution3dDescriptor::VT_DILATIONY, dilationY, 1);
+  }
+  void add_dilationZ(uint32_t dilationZ) {
+    fbb_.AddElement<uint32_t>(Convolution3dDescriptor::VT_DILATIONZ, dilationZ, 1);
+  }
+  void add_biasEnabled(bool biasEnabled) {
+    fbb_.AddElement<uint8_t>(Convolution3dDescriptor::VT_BIASENABLED, static_cast<uint8_t>(biasEnabled), 0);
+  }
+  void add_dataLayout(armnnSerializer::DataLayout dataLayout) {
+    fbb_.AddElement<int8_t>(Convolution3dDescriptor::VT_DATALAYOUT, static_cast<int8_t>(dataLayout), 2);
+  }
+  explicit Convolution3dDescriptorBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  Convolution3dDescriptorBuilder &operator=(const Convolution3dDescriptorBuilder &);
+  flatbuffers::Offset<Convolution3dDescriptor> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Convolution3dDescriptor>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Convolution3dDescriptor> CreateConvolution3dDescriptor(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint32_t padLeft = 0,
+    uint32_t padRight = 0,
+    uint32_t padTop = 0,
+    uint32_t padBottom = 0,
+    uint32_t padFront = 0,
+    uint32_t padBack = 0,
+    uint32_t strideX = 0,
+    uint32_t strideY = 0,
+    uint32_t strideZ = 0,
+    uint32_t dilationX = 1,
+    uint32_t dilationY = 1,
+    uint32_t dilationZ = 1,
+    bool biasEnabled = false,
+    armnnSerializer::DataLayout dataLayout = armnnSerializer::DataLayout_NDHWC) {
+  Convolution3dDescriptorBuilder builder_(_fbb);
+  builder_.add_dilationZ(dilationZ);
+  builder_.add_dilationY(dilationY);
+  builder_.add_dilationX(dilationX);
+  builder_.add_strideZ(strideZ);
+  builder_.add_strideY(strideY);
+  builder_.add_strideX(strideX);
+  builder_.add_padBack(padBack);
+  builder_.add_padFront(padFront);
   builder_.add_padBottom(padBottom);
   builder_.add_padTop(padTop);
   builder_.add_padRight(padRight);
@@ -9963,6 +10230,9 @@ struct AnyLayer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const armnnSerializer::ChannelShuffleLayer *layer_as_ChannelShuffleLayer() const {
     return layer_type() == armnnSerializer::Layer_ChannelShuffleLayer ? static_cast<const armnnSerializer::ChannelShuffleLayer *>(layer()) : nullptr;
   }
+  const armnnSerializer::Convolution3dLayer *layer_as_Convolution3dLayer() const {
+    return layer_type() == armnnSerializer::Layer_Convolution3dLayer ? static_cast<const armnnSerializer::Convolution3dLayer *>(layer()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_LAYER_TYPE) &&
@@ -10230,6 +10500,10 @@ template<> inline const armnnSerializer::UnidirectionalSequenceLstmLayer *AnyLay
 
 template<> inline const armnnSerializer::ChannelShuffleLayer *AnyLayer::layer_as<armnnSerializer::ChannelShuffleLayer>() const {
   return layer_as_ChannelShuffleLayer();
+}
+
+template<> inline const armnnSerializer::Convolution3dLayer *AnyLayer::layer_as<armnnSerializer::Convolution3dLayer>() const {
+  return layer_as_Convolution3dLayer();
 }
 
 struct AnyLayerBuilder {
@@ -10720,6 +10994,10 @@ inline bool VerifyLayer(flatbuffers::Verifier &verifier, const void *obj, Layer 
     }
     case Layer_ChannelShuffleLayer: {
       auto ptr = reinterpret_cast<const armnnSerializer::ChannelShuffleLayer *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Layer_Convolution3dLayer: {
+      auto ptr = reinterpret_cast<const armnnSerializer::Convolution3dLayer *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

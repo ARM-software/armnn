@@ -225,17 +225,43 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo output = OverrideDataType(layer.GetOutputSlot(0).GetTensorInfo(), dataType);
             ARMNN_ASSERT(cLayer->m_Weight.get() != nullptr);
 
-            const Convolution2dDescriptor& descriptor  = cLayer->GetParameters();
+            const Convolution2dDescriptor& descriptor = cLayer->GetParameters();
 
             // Construct optional biases object based on the value of m_BiasEnabled
             Optional<TensorInfo> biases;
             if (descriptor.m_BiasEnabled)
             {
-                biases =
-                    OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType));
+                biases = OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType));
             }
 
             result = layerSupportObject.IsConvolution2dSupported(
+                                              input,
+                                              output,
+                                              descriptor,
+                                              OverrideDataType(cLayer->m_Weight->GetTensorInfo(), dataType),
+                                              biases,
+                                              reason);
+            break;
+        }
+        case LayerType::Convolution3d:
+        {
+            auto cLayer = PolymorphicDowncast<const Convolution3dLayer*>(&layer);
+
+            const TensorInfo input  = OverrideDataType(layer.GetInputSlot(0).GetConnection()->GetTensorInfo(),
+                                                       dataType);
+            const TensorInfo output = OverrideDataType(layer.GetOutputSlot(0).GetTensorInfo(), dataType);
+            ARMNN_ASSERT(cLayer->m_Weight.get() != nullptr);
+
+            const Convolution3dDescriptor& descriptor = cLayer->GetParameters();
+
+            // Construct optional biases object based on the value of m_BiasEnabled
+            Optional<TensorInfo> biases;
+            if (descriptor.m_BiasEnabled)
+            {
+                biases = OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType));
+            }
+
+            result = layerSupportObject.IsConvolution3dSupported(
                                               input,
                                               output,
                                               descriptor,
@@ -1565,6 +1591,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvertFp32ToFp16(const Conve
 }
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvolution2d(const Convolution2dQueueDescriptor& /*descriptor*/,
+                                                                 const WorkloadInfo& /*info*/) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvolution3d(const Convolution3dQueueDescriptor& /*descriptor*/,
                                                                  const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();

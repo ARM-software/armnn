@@ -231,6 +231,8 @@ list(APPEND armnn_sources
     src/armnn/layers/ConstantLayer.cpp
     src/armnn/layers/Convolution2dLayer.hpp
     src/armnn/layers/Convolution2dLayer.cpp
+    src/armnn/layers/Convolution3dLayer.hpp
+    src/armnn/layers/Convolution3dLayer.cpp
     src/armnn/layers/ConvertBf16ToFp32Layer.cpp
     src/armnn/layers/ConvertBf16ToFp32Layer.hpp
     src/armnn/layers/ConvertFp16ToFp32Layer.hpp
@@ -793,6 +795,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/DeserializeComparison.cpp
             src/armnnDeserializer/test/DeserializeConstant.cpp
             src/armnnDeserializer/test/DeserializeConvolution2d.cpp
+            src/armnnDeserializer/test/DeserializeConvolution3d.cpp
             src/armnnDeserializer/test/DeserializeDepthToSpace.cpp
             src/armnnDeserializer/test/DeserializeDepthwiseConv2d.cpp
             src/armnnDeserializer/test/DeserializeDivision.cpp

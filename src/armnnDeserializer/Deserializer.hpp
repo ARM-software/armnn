@@ -93,6 +93,7 @@ private:
     void ParseConcat(GraphPtr graph, unsigned int layerIndex);
     void ParseConstant(GraphPtr graph, unsigned int layerIndex);
     void ParseConvolution2d(GraphPtr graph, unsigned int layerIndex);
+    void ParseConvolution3d(GraphPtr graph, unsigned int layerIndex);
     void ParseDepthToSpace(GraphPtr graph, unsigned int layerIndex);
     void ParseDepthwiseConvolution2d(GraphPtr graph, unsigned int layerIndex);
     void ParseDequantize(GraphPtr graph, unsigned int layerIndex);

@@ -468,6 +468,74 @@ struct Convolution2dDescriptor : BaseDescriptor
     DataLayout           m_DataLayout;
 };
 
+/// A Convolution3dDescriptor for the Convolution3dLayer.
+struct Convolution3dDescriptor : BaseDescriptor
+{
+    Convolution3dDescriptor()
+        : m_PadLeft(0)
+        , m_PadRight(0)
+        , m_PadTop(0)
+        , m_PadBottom(0)
+        , m_PadFront(0)
+        , m_PadBack(0)
+        , m_StrideX(1)
+        , m_StrideY(1)
+        , m_StrideZ(1)
+        , m_DilationX(1)
+        , m_DilationY(1)
+        , m_DilationZ(1)
+        , m_BiasEnabled(false)
+        , m_DataLayout(DataLayout::NDHWC)
+    {}
+
+    bool operator ==(const Convolution3dDescriptor& rhs) const
+    {
+        return m_PadLeft     == rhs.m_PadLeft &&
+               m_PadRight    == rhs.m_PadRight &&
+               m_PadTop      == rhs.m_PadTop &&
+               m_PadBottom   == rhs.m_PadBottom &&
+               m_PadFront    == rhs.m_PadFront &&
+               m_PadBack     == rhs.m_PadBack &&
+               m_StrideX     == rhs.m_StrideX &&
+               m_StrideY     == rhs.m_StrideY &&
+               m_StrideZ     == rhs.m_StrideZ &&
+               m_DilationX   == rhs.m_DilationX &&
+               m_DilationY   == rhs.m_DilationY &&
+               m_DilationZ   == rhs.m_DilationZ &&
+               m_BiasEnabled == rhs.m_BiasEnabled &&
+               m_DataLayout  == rhs.m_DataLayout;
+    }
+
+    /// Padding left value in the width dimension.
+    uint32_t             m_PadLeft;
+    /// Padding right value in the width dimension.
+    uint32_t             m_PadRight;
+    /// Padding top value in the height dimension.
+    uint32_t             m_PadTop;
+    /// Padding bottom value in the height dimension.
+    uint32_t             m_PadBottom;
+    /// Padding front value in the depth dimension.
+    uint32_t             m_PadFront;
+    /// Padding back value in the depth dimension.
+    uint32_t             m_PadBack;
+    /// Stride value when proceeding through input for the width dimension.
+    uint32_t             m_StrideX;
+    /// Stride value when proceeding through input for the height dimension.
+    uint32_t             m_StrideY;
+    /// Stride value when proceeding through input for the depth dimension.
+    uint32_t             m_StrideZ;
+    /// Dilation along x axis
+    uint32_t             m_DilationX;
+    /// Dilation along y axis
+    uint32_t             m_DilationY;
+    /// Dilation along z axis
+    uint32_t             m_DilationZ;
+    /// Enable/disable bias.
+    bool                 m_BiasEnabled;
+    /// The data layout to be used (NDHWC).
+    DataLayout           m_DataLayout;
+};
+
 /// A DepthwiseConvolution2dDescriptor for the DepthwiseConvolution2dLayer.
 struct DepthwiseConvolution2dDescriptor : BaseDescriptor
 {

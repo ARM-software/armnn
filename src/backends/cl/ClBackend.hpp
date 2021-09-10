@@ -28,7 +28,9 @@ const BackendCapabilities gpuAccCapabilities("GpuAcc",
                                                      {"AsyncExecution", false},
                                                      {"ProtectedContentAllocation", true},
                                                      {"ConstantTensorsAsInputs", false},
-                                                     {"PreImportIOTensors", false}
+                                                     {"PreImportIOTensors", false},
+                                                     {"ExternallyManagedMemory", false},
+                                                     {"MultiAxisPacking", false}
                                              });
 
 class ClBackend : public IBackendInternal

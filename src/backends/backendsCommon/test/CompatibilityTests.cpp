@@ -180,7 +180,9 @@ TEST_CASE ("Ref_Backends_Capability_Test")
                           {"AsyncExecution", true},
                           {"ProtectedContentAllocation", false},
                           {"ConstantTensorsAsInputs", true},
-                          {"PreImportIOTensors", false}});
+                          {"PreImportIOTensors", false},
+                          {"ExternallyManagedMemory", false},
+                          {"MultiAxisPacking", false}});
 }
 
 #endif
@@ -197,7 +199,9 @@ TEST_CASE ("Neon_Backends_Capability_Test")
                           {"AsyncExecution", false},
                           {"ProtectedContentAllocation", false},
                           {"ConstantTensorsAsInputs", false},
-                          {"PreImportIOTensors", false}});
+                          {"PreImportIOTensors", false},
+                          {"ExternallyManagedMemory", false},
+                          {"MultiAxisPacking", false}});
 }
 
 #endif
@@ -214,7 +218,9 @@ TEST_CASE ("Cl_Backends_Capability_Test")
                           {"AsyncExecution", false},
                           {"ProtectedContentAllocation", true},
                           {"ConstantTensorsAsInputs", false},
-                          {"PreImportIOTensors", false}});
+                          {"PreImportIOTensors", false},
+                          {"ExternallyManagedMemory", false},
+                          {"MultiAxisPacking", false}});
 }
 
 #endif

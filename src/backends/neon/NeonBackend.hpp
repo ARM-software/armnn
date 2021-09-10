@@ -16,7 +16,9 @@ const BackendCapabilities cpuAccCapabilities("GpuAcc",
                                                      {"AsyncExecution", false},
                                                      {"ProtectedContentAllocation", false},
                                                      {"ConstantTensorsAsInputs", false},
-                                                     {"PreImportIOTensors", false}
+                                                     {"PreImportIOTensors", false},
+                                                     {"ExternallyManagedMemory", false},
+                                                     {"MultiAxisPacking", false}
                                              });
 
 

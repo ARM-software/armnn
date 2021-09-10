@@ -1609,13 +1609,38 @@ void TfLiteParserImpl::ParseSlice(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo sizeTensorInfo = ToTensorInfo(inputs[2]);
     BufferRawPtr sizeBufferPtr = GetBuffer(m_Model, inputs[2]->buffer);
 
+    std::vector<int> signedSize(sizeTensorInfo.GetNumElements());
+    ::memcpy(signedSize.data(), sizeBufferPtr->data.data(), sizeTensorInfo.GetNumBytes());
     std::vector<unsigned int> size(sizeTensorInfo.GetNumElements());
-    ::memcpy(size.data(), sizeBufferPtr->data.data(), sizeTensorInfo.GetNumBytes());
+    TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
+
+    for (unsigned int i = 0; i < signedSize.size(); ++i)
+    {
+        int signedValue = signedSize[i];
+        
+        if (signedValue < -1 || signedValue > static_cast<int>(inputTensorInfo.GetShape()[i] - begin[i]))
+        {
+            throw ParseException(fmt::format("Invalid value for size {} size must be in range "
+                                             "[-1, inputDimSize - begin] [-1, {}] inclusive {}",
+                                             signedValue,
+                                             inputTensorInfo.GetShape()[i] - begin[i],
+                                             CHECK_LOCATION().AsString()));
+        }
+
+        if (signedValue == -1)
+        {
+            size[i] = inputTensorInfo.GetShape()[i] - begin[i];
+        }
+        else
+        {
+            size[i] = static_cast<unsigned int>(signedValue);
+        }
+    }
+
     desc = SliceDescriptor(begin, size);
 
     auto layerName = fmt::format("Slice:{}:{}", subgraphIndex, operatorIndex);
 
-    TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
     CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
 

@@ -176,7 +176,7 @@ struct DynamicSliceFixtureD213 : SliceFixture
     DynamicSliceFixtureD213() : SliceFixture("[ 3, 2, 3 ]",
                                             "[ ]",
                                               "[ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]",
-                                                "[ 2, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0 ]") {}
+                                                "[ 255, 255, 255, 255, 1, 0, 0, 0, 255, 255, 255, 255 ]") {}
 };
 
 TEST_CASE_FIXTURE(DynamicSliceFixtureD213, "DynamicSliceD213")
@@ -187,5 +187,4 @@ TEST_CASE_FIXTURE(DynamicSliceFixtureD213, "DynamicSliceD213")
         {{"outputTensor", { 3, 3, 3, 5, 5, 5 }}},
         true);
 }
-
 }

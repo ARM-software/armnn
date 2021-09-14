@@ -202,17 +202,9 @@ void TensorPrinter::operator()(const std::vector<int>& values)
 template<typename Container, typename Delegate>
 void TensorPrinter::ForEachValue(const Container& c, Delegate delegate)
 {
-    if (m_PrintToConsole)
-    {
-        std::cout << m_OutputBinding << ": ";
-    }
     for (const auto& value : c)
     {
         delegate(value);
-    }
-    if (m_PrintToConsole)
-    {
-        printf("\n");
     }
 }
 

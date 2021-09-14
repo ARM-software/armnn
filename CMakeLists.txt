@@ -19,6 +19,8 @@ foreach(cmake_file ${additional_cmake_files})
     include(${cmake_file})
 endforeach()
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/delegate/cmake/Modules/")
+
 cmake_policy(SET CMP0057 NEW)
 
 set(as_subproject Armnn)

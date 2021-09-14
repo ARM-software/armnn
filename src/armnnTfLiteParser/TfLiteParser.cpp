@@ -32,6 +32,8 @@
 
 #include <fmt/format.h>
 
+#include <tensorflow/lite/version.h>
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -767,7 +769,14 @@ INetworkPtr TfLiteParserImpl::CreateNetworkFromModel()
             for (OperatorPtr const& op : subgraph->operators)
             {
                 auto const& opCodePtr = m_Model->operator_codes[op->opcode_index];
+
+// work around the introduction of the deprecated_builtin_code introduced in 2.4 in a backwards compatible manner
+#if TF_MAJOR_VERSION > 2 || (TF_MAJOR_VERSION == 2 && TF_MINOR_VERSION > 3)
+                auto builtinCode = std::max(opCodePtr->builtin_code,
+                        static_cast<tflite::BuiltinOperator>(opCodePtr->deprecated_builtin_code));
+#else
                 auto builtinCode = opCodePtr->builtin_code;
+#endif
 
                 if (builtinCode > tflite::BuiltinOperator_MAX)
                 {
@@ -887,7 +896,14 @@ void TfLiteParserImpl::ParseUnsupportedOperator(size_t subgraphIndex, size_t ope
     const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
 
     auto opcodeIndex = operatorPtr->opcode_index;
+
+// work around the introduction of the deprecated_builtin_code introduced in 2.4 in a backwards compatible manner
+#if TF_MAJOR_VERSION > 2 || (TF_MAJOR_VERSION == 2 && TF_MINOR_VERSION > 3)
+    auto opcode      = std::max(m_Model->operator_codes[opcodeIndex]->builtin_code,
+            static_cast<tflite::BuiltinOperator>(m_Model->operator_codes[opcodeIndex]->deprecated_builtin_code));
+#else
     auto opcode      = m_Model->operator_codes[opcodeIndex]->builtin_code;
+#endif
 
     if (!m_Options || !m_Options.value().m_StandInLayerForUnsupported)
     {

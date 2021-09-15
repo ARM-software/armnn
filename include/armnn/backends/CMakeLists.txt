@@ -10,6 +10,7 @@ list(APPEND armnnBackendsAPI_sources
      IBackendInternal.hpp
      IBackendContext.hpp
      IMemoryManager.hpp
+     IMemoryOptimizerStrategy.hpp
      ITensorHandle.hpp
      ITensorHandleFactory.hpp
      IWorkload.hpp

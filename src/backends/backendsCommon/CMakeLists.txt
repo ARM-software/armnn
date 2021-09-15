@@ -47,6 +47,8 @@ list(APPEND armnnBackendsCommon_sources
     WorkloadUtils.hpp
 )
 
+add_subdirectory(memoryOptimizationStrategies)
+
 if(BUILD_UNIT_TESTS)
     add_subdirectory(test)
 endif()

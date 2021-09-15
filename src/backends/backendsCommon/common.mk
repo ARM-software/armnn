@@ -23,7 +23,8 @@ COMMON_SOURCES := \
     UnmapWorkload.cpp \
     WorkloadData.cpp \
     WorkloadFactory.cpp \
-    WorkloadUtils.cpp
+    WorkloadUtils.cpp \
+    memoryOptimizationStrategies/ConstLayerMemoryOptimizerStrategy.cpp
 
 # COMMON_TEST_SOURCES contains the list of files to be included
 # in the Android unit test build (armnn-tests) and it is picked
@@ -95,7 +96,8 @@ COMMON_TEST_SOURCES := \
     test/layerTests/StridedSliceTestImpl.cpp \
     test/layerTests/SubtractionTestImpl.cpp \
     test/layerTests/TransposeConvolution2dTestImpl.cpp \
-    test/layerTests/UnidirectionalSequenceLstmTestImpl.cpp
+    test/layerTests/UnidirectionalSequenceLstmTestImpl.cpp \
+    memoryOptimizationStrategies/test/ConstLayerMemoryOptimizerStrategyTests.cpp
 
 ifeq ($(ARMNN_REF_ENABLED),1)
 COMMON_TEST_SOURCES += \

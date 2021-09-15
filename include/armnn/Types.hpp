@@ -213,6 +213,19 @@ enum class MemorySource : uint32_t
     DmaBufProtected = 4
 };
 
+enum class MemBlockStrategyType
+{
+    // MemBlocks can be packed on the Y axis only.
+    // In other words MemBlocks with overlapping lifetimes cannot use the same MemBin,
+    // equivalent to blob or pooling memory management.
+    SingleAxisPacking  = 0,
+
+    // MemBlocks can be packed on the Y and X axis.
+    // In other words MemBlocks with overlapping lifetimes can use the same MemBin,
+    // equivalent to offset or slab memory management.
+    MultiAxisPacking  = 1
+};
+
 /// Each backend should implement an IBackend.
 class IBackend
 {

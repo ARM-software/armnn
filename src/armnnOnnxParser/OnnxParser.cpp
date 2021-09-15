@@ -1189,8 +1189,16 @@ void OnnxParserImpl::ParseActivation(const onnx::NodeProto& node, const armnn::A
 
     if (func == ActivationFunction::BoundedReLu)
     {
-        desc.m_A = node.input(2).empty() ? std::numeric_limits<float>::max() : std::stof(node.input(2));
-        desc.m_B = node.input(1).empty() ? std::numeric_limits<float>::lowest() : std::stof(node.input(1));
+        if (node.input_size() == 1 && node.attribute_size() > 0)
+        {
+            desc.m_A = ReadOptionalNodeFloatAttribute(node, "max", std::numeric_limits<float>::max());
+            desc.m_B = ReadOptionalNodeFloatAttribute(node, "min", std::numeric_limits<float>::lowest());
+        }
+        else
+        {
+            desc.m_A = node.input(2).empty() ? std::numeric_limits<float>::max() : std::stof(node.input(2));
+            desc.m_B = node.input(1).empty() ? std::numeric_limits<float>::lowest() : std::stof(node.input(1));
+        }
     }
 
     IConnectableLayer* const layer = m_Network->AddActivationLayer(desc, node.name().c_str());

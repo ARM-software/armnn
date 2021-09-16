@@ -117,6 +117,7 @@ private:
     void ParseFlatten(const onnx::NodeProto& node);
     void ParseGlobalAveragePool(const onnx::NodeProto& node);
     void ParseMaxPool(const onnx::NodeProto& nodeProto);
+    void ParseShape(const onnx::NodeProto& node);
     void ParseReshape(const onnx::NodeProto& nodeProto);
 
     void RegisterInputSlots(armnn::IConnectableLayer* layer, const std::vector<std::string>& tensorIndexes);

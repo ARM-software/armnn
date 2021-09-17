@@ -49,6 +49,9 @@ The Arm NN SDK ONNX parser currently only supports fp32 operators.
 - Flatten
   - See the ONNX [Flatten documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Flatten) for more information.
 
+- Gather
+  - See the ONNX [Gather documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Gather) for more information.
+
 - GlobalAveragePool
   - See the ONNX [GlobalAveragePool documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#GlobalAveragePool) for more information.
 
@@ -63,6 +66,9 @@ The Arm NN SDK ONNX parser currently only supports fp32 operators.
 
 - Reshape
   - See the ONNX [Reshape documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Reshape) for more information.
+
+- Shape
+  - See the ONNX [Shape documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Shape) for more information.
 
 - Sigmoid
   - See the ONNX [Sigmoid documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Sigmoid) for more information.

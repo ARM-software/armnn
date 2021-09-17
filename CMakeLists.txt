@@ -758,7 +758,9 @@ if(BUILD_UNIT_TESTS)
             src/armnnOnnxParser/test/DepthConv.cpp
             src/armnnOnnxParser/test/Flatten.cpp
             src/armnnOnnxParser/test/FullyConnected.cpp
+            src/armnnOnnxParser/test/Gather.cpp
             src/armnnOnnxParser/test/GetInputsOutputs.cpp
+            src/armnnOnnxParser/test/OnnxParserTestUtils.hpp
             src/armnnOnnxParser/test/Pooling.cpp
             src/armnnOnnxParser/test/ProtoxtFixture.cpp
             src/armnnOnnxParser/test/Relu.cpp

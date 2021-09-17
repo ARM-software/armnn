@@ -98,6 +98,7 @@ private:
     void AddPoolingLayer(const onnx::NodeProto& nodeProto, armnn::Pooling2dDescriptor& desc);
 
     void CreateConstantLayer(const std::string& tensorName, const std::string& layerName);
+    void CreateInt64ConstantLayer(const std::string& tensorName, const std::string& layerName);
     void CreateReshapeLayer(const std::string& inputName,
                             const std::string& outputName,
                             const std::string& layerName);
@@ -115,6 +116,7 @@ private:
     void ParseConstant(const onnx::NodeProto& nodeProto);
     void ParseConv(const onnx::NodeProto& nodeProto);
     void ParseFlatten(const onnx::NodeProto& node);
+    void ParseGather(const onnx::NodeProto& node);
     void ParseGlobalAveragePool(const onnx::NodeProto& node);
     void ParseMaxPool(const onnx::NodeProto& nodeProto);
     void ParseShape(const onnx::NodeProto& node);
@@ -132,6 +134,10 @@ private:
     std::pair<armnn::ConstTensor, std::unique_ptr<float[]>>
     CreateConstTensor(const std::string name,
                       armnn::Optional<armnn::PermutationVector&> permutationVector = armnn::EmptyOptional());
+
+    std::pair<armnn::ConstTensor, std::unique_ptr<int32_t[]>>
+    CreateInt64ConstTensor(const std::string name,
+                           armnn::Optional<armnn::PermutationVector&> permutationVector = armnn::EmptyOptional());
 
     template <typename TypeList, typename Location>
     void ValidateInputs(const onnx::NodeProto& node,

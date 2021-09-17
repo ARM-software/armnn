@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_08" # Release 21.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="7891a73ef36f4ad7b71069b3c57694f85bb79454" #Move CPU/GPU files from Core/Runtime to the respective backend folders
+DEFAULT_CLFRAMEWORKREVISION="93d6cf0028aea111f624b320027576a26354e998" #Decouple logging flag from debug and assert flags
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

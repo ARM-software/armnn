@@ -72,6 +72,12 @@ find_package(TfLite REQUIRED MODULE)
 
 target_link_libraries(armnnDelegate PUBLIC ${TfLite_LIB})
 
+#  lpthread and ldl are not required for Android
+if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL Android)
+    target_link_libraries(armnnDelegate PUBLIC -lpthread)
+    target_link_libraries(armnnDelegate PUBLIC -ldl)
+endif()
+
 # Various tflite header files are not warning clean
 # We can't change compilation flags on header files directly, so we need to add them to an interface library first
 add_library(tflite_headers INTERFACE)

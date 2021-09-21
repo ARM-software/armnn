@@ -1112,7 +1112,7 @@ Status LoadedNetwork::Execute(const InputTensors& inputTensors,
                 previouslyUsed = true;
             }
         }
-        catch (std::out_of_range)
+        catch (const std::out_of_range& error)
         {
             throw InvalidArgumentException(fmt::format("Unknown LayerBindingId id: {}", layerBindingId));
         }
@@ -1141,7 +1141,7 @@ Status LoadedNetwork::Execute(const InputTensors& inputTensors,
                     previouslyUsed = true;
                 }
             }
-            catch (std::out_of_range)
+            catch (const std::out_of_range& error)
             {
                 throw InvalidArgumentException(fmt::format("Unknown LayerBindingId id: {}", layerBindingId));
             }

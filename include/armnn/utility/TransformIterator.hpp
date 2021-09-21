@@ -32,14 +32,18 @@ public:
 
     ~TransformIterator() = default;
 
-    TransformIterator operator=(TransformIterator const& transformIterator)
+    TransformIterator& operator=(TransformIterator const& rhs)
     {
-        return { transformIterator.m_it, transformIterator.m_fn };
+        m_fn = rhs.m_fn;
+        m_it = rhs.m_it;
+        return *this;
     }
 
-    TransformIterator operator=(TransformIterator&& transformIterator)
+    TransformIterator& operator=(TransformIterator&& rhs)
     {
-        return { transformIterator.m_it, transformIterator.m_fn };
+        m_fn = std::move(rhs.m_fn);
+        m_it = std::move(rhs.m_it);
+        return *this;
     }
 
     TransformIterator operator++() {++m_it; return *this;}
@@ -70,7 +74,7 @@ public:
 
 private:
     Iterator m_it;
-    const Function m_fn;
+    Function m_fn;
 };
 
 template<typename Function, typename Iterator>
